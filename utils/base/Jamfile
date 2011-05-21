@@ -1,0 +1,9 @@
+SubDir TREX utils base ;
+
+ModuleVars utils : RAPID_XML SUFSHARE ;
+ModuleIncludes utils : $(RAPID_XML) ;
+ModuleLibraries utils : boost_thread dl ;
+ObjectC++Flags Pdlfcn.cc : -DSUFSHARE=\\\"$(SUFSHARE)\\\" ; 
+ModuleFiles utils : Exception.cc ErrnoExcept.cc TextLog.cc LogManager.cc
+                    XmlUtils.cc Pdlfcn.cc PluginLoader.cc SingletonDummy.cc 
+                    SingletonServer.cc ;

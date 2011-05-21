@@ -1,0 +1,3 @@
+SubDir TREX domain component ;
+
+ModuleFiles domain : DomainImpl.cc ;

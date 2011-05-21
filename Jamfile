@@ -1,0 +1,10 @@
+SubDir TREX ;
+
+SubInclude TREX utils ;
+SubInclude TREX domain ;
+SubInclude TREX transaction ;
+SubInclude TREX agent ;
+# plugins 
+SubInclude TREX extra ;
+
+Doxygen doc ;

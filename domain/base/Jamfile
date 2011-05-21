@@ -1,0 +1,4 @@
+SubDir TREX domain base ;
+
+ModuleIncludes domain : $(RAPID_XML) ;
+ModuleFiles domain : DomainBase.cc BasicEnumerated.cc BasicInterval.cc Variable.cc ;

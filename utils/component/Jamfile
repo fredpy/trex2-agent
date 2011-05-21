@@ -1,0 +1,3 @@
+SubDir TREX utils component ;
+
+ModuleFiles utils : RStat.cc ;
