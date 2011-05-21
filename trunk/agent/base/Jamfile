@@ -1,0 +1,4 @@
+SubDir TREX agent base ;
+
+ModuleIncludes agent : $(RAPID_XML) ;
+ModuleFiles agent : Agent.cc Clock.cc ;

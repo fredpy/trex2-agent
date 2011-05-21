@@ -1,0 +1,115 @@
+Installing TREX
+
+1) Third party requirements
+
+TREX uses third party utilities and libraries. Here's sa list of them :
+ - jam (http://www.perforce.com/jam/jam.html) This is a make replacement     
+       utility used to compile TREX.
+ - rapidXML (http://rapidxml.sourceforge.net/) This is used for configuration 
+            parsing. TREX used to rely on TinyXML version embedded in Europa
+            but keeping this would have been annoying as this version was part
+            of Europa and keeping the ability to connect to Europa while using
+            a version of TinyXML which is not necessarily the Europa one would
+            have been tricky. On top of that rapidxml is really lightweight
+            (only templates defined in C++ headers) and very fast (performance
+            close to strlen).
+ - boost (http://www.boost.org) This library is widely used for basic
+         utilities and compatibilty with the TR1 C++0x standard.
+	 version 1.40 or above (tested against 1.40 up to 1.46) 
+
+Other utilies are of interrest but not necessary to use TREX:
+ - doxygen (http://www.doxygen.org/) This utility is needed only if you want 
+           to generate this documentation.
+ - graphviz (http://www.graphviz.org/) Recommended for documentation but it 
+            may also be used for plan visualization by showing tokens and 
+            their relations as a graph.
+
+For europa plug-in :
+  - europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above.
+               this is the core libaray used for planning on the EuropaReactor
+	       Simply install the binary distribution provided for your platform
+	       Note : Europa does not compile on gcc 4.3 and above. Because of
+	       	      this make sure that your version of gcc is 4.1.x or 4.2.x
+
+Note:
+  rapidxml is bundled into TREX. Nothing as been changed in this libray and if
+  one prefers to use another version of this library he justs need to define 
+  the environment variable TINY_XML_ROOT with the directory where this one is 
+  before compiling TREX.
+
+2) Set your environment
+
+The devConfig bash file loads all the variables needed to be able to
+compile and execute TREX. If you are using bash you can edit your
+~/.profile (or ~/.bash_profile depending on your configuration/platform).
+Considering that you have put TREX on the directory <trex-dir> you can put 
+the following lines :
+------------------------------------------------------------------------
+path=`pwd` 
+cd <trex-dir> 
+source devConfig 
+cd $path 
+------------------------------------------------------------------------
+
+Attention:
+  Under MacOS X you also need to define DYLD_BIND_AT_LAUNCH to allow dynamic 
+  library loading on the fly. Indeed, this version of TREX supports plug-ins 
+  allowing to define externally new reactors and components and MacOS X needs 
+  to be informed about that. To do so add the following line in your 
+  ~/.profile :
+------------------------------------------------------------------------
+export DYLD_BIND_AT_LAUNCH=YES
+------------------------------------------------------------------------
+
+3) TREX general structure
+
+This version of TREX is composed of multiples libraries and components which
+are organized as follow (see doc/fig/SWarchi.png):
+  - Main libraries: They are also called module. All of them are compiled into 
+        the lib directory. There's 4 of them described more in detail in this 
+        document :
+	 * TREXutils : A set of classes that represent basic functionalities 
+              that are used by TREX but are more based on generic programming 
+              paradigms and design patterns that could be used for other 
+              programs.
+         * TREXdomains : Definition of domains and variables as manipulated by 
+              TREX for information exchange between reactors. A variable is 
+              defined by a name and a domain. A domain is a typed, possibly 
+              continuous, set of possible values for this varaible. A domain 
+              cannot be empty and can only be restricted.
+         * TREXtransaction : This library define the reactors which is the 
+              basic component that can be composed inside TREX. It defines 
+              also Obsevations and Goals which are data that can be exchanged 
+              between reactors.
+         * TREXagent : Defines the TREX agent. The agent is the main entity 
+              that manages the loading and execution of the reactors as their 
+              interaction.
+         * TREX commands: A set of simple commands that can be used to execute 
+              a TREX agent. They are compiled into the bin directory. There is
+              two generic commands that gives a simple illustration on how one 
+              can create and manipulate an Agent :
+	        - amc : This program takes a configuration file as argument. 
+                        Provided that this file defines correctly an Agent it 
+                        will execute this agent until its end.
+		- sim : This program takes similar argument as amc. The 
+                        difference here is that it provides a simple interface 
+                        to run the agent in an interactive way allowing to 
+                        step through clock ticks.
+  - TREX plug-ins: These are optionnally compiled and the source is usually 
+        located under extra/<name>. You can comile them by calling jam <name>. 
+        The result will be put under the plugin directory as a dynamic library 
+        named TREX<name>.
+  - TREX documentation: Generated from the source using jam doc. It will be 
+        installed on the doc directory.
+  - TREX logs: Usually generated under the log directory after any run of a 
+        TREX agent.
+  - TREX utilities and scripts: Under offboard. Provides a set of scripts and 
+        utilities to help the processing of TREX logs.
+  - nightly build: Under nightly,. Used to run nightly builds of the head.
+  - Configurations files Usually under cfg. A set of configuration files that 
+        can be used to define new agents and/or reactors.
+
+Compiling the core components (main libraries and commands) is done with the command jam.
+
+Compilation of the plug-ins is done using the command jam <name>
+

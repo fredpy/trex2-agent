@@ -1,0 +1,4 @@
+SubDir TREX extra ;
+
+SubInclude TREX extra lightswitch ;
+SubInclude TREX extra vitre ;

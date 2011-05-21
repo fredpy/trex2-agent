@@ -1,0 +1,5 @@
+SubDir TREX extra vitre ;
+
+ModulePlugin vitre : transaction ;
+ModuleLibraries vitre : boost_system ;
+ModuleFiles vitre : Vitre.cc ;

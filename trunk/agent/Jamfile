@@ -1,0 +1,5 @@
+SubDir TREX agent ;
+
+Module agent : transaction ;
+SubInclude TREX agent base ;
+SubInclude TREX agent component ;

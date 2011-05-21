@@ -1,0 +1,39 @@
+
+rule RemoveBinaries {
+  local target = $(1) ;
+  NotFile $(target) ;
+}
+
+actions RemoveBinaries {
+# '*.output' & '*.gprof' should probably have separate rules and actions, but ...
+find . \( -name '*.[ao]' -o -name '*.so' -o -name '*_[gop]' -o -name '*_rt' -o -name '*_no' -o -name '*.output' -o -name '*.gprof' \) -exec rm {} \;
+}
+
+rule Doxygen {
+  local target = $(1) ;
+  NotFile $(target) ;
+  Always $(target) ;
+}
+
+actions Doxygen {
+$(DOXYGEN_CMD)
+}
+
+{
+  local SUBDIR = [ FDirName $(TREX) ] ;
+
+  include [ FDirName  $(SUBDIR) Platformrules ] ;
+  include [ FDirName  $(SUBDIR) Modulerules ] ;
+  
+  PROJECT = TREX ;
+  TREX_READY = TRUE ;
+}
+
+rule CheckBranch {
+  NotFile $(1) ;
+  Always $(1) ;
+} 
+
+actions CheckBranch {
+  cd $(2) ; svn info | grep -q $(1) ;
+}

@@ -1,0 +1,4 @@
+SubDir TREX extra lightswitch ;
+
+ModulePlugin lightswitch : transaction ;
+ModuleFiles lightswitch : LightSwitch.cc ;

@@ -1,0 +1,5 @@
+SubDir TREX domain ;
+
+Module domain : utils ; 
+SubInclude TREX domain base ;
+SubInclude TREX domain component ;
