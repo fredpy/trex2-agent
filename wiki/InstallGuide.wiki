@@ -1,0 +1,72 @@
+#summary Introduce how to install this program along with its external dependencies
+#labels Featured,Phase-Deploy,Phase-Requirements
+
+= Introduction =
+
+This is the documentation of TREX codename barreleye. This version is the first TREX version that do not rely on Europa for its core functionalities as a result one can use TREX with which ever planner he wants - as long as this one can hanlde properly the goal representation expected by TREX.
+
+This page describes what are this framework dependencies and how to install it.
+
+=  External dependencies =
+
+The number of third party dependency has been kept relatively small still we use few libraries and programs  : 
+  * *jam* (http://www.perforce.com/jam/jam.html) This is a make replacement utility used to compile TREX. The version used during development was jam 2.5
+  * *boost libraries* (http://www.boost.org) This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. We use some of the recent addition to the library such as boost graph and flyweight. Therefor we recommend to take a recent version (at least 1.38.0 -- we tested it with both v 1.40.0 and the latest v 1.46.1) 
+  * *rapidxml* (http://rapidxml.sourceforge.net/) This is used for configuration parsing. TREX used to rely on TinyXML version embedded in Europa but keeping this would have been annoying as this version was part of Europa and keeping the ability to connect to Europa while using a version of TinyXML which is not necessarily the Europa one would have been tricky. On top of that rapidxml is really lightweight (only templates defined in C++ headers) and very fast (performance close to strlen). The version used -- and provided -- for this package is 1.13.
+
+It is also recommended to use gcc version 4.1.x or above for compiling the overall project
+
+Others utilies are of interrest but not necessary to use TREX:
+  * *doxygen* (http://www.doxygen.org/) This utility is needed only if you want to generate this documentation.
+  * *graphviz* (http://www.graphviz.org/) Recommended for documentation but it may also be used for plan visualization by showing tokens and their relations as a graph.
+
+
+= Installing TREX =
+
+== Setting up your environment ==
+
+The devConfig bash file loads all the variables needed to be able to compile and execute TREX. If you are using bash you can edit your ~/.profile (or ~/.bash_profile depending on your configuration/platform). Considering that you have put TREX on the directory `<trex-dir>` you can put the following lines :
+{{{
+path=`pwd` 
+cd <trex-dir> 
+source devConfig 
+cd $path 
+}}}
+
+== Compiling and generating documentation ==
+
+As soon as all of the above is done you can :
+  * compile the core libraries 
+{{{
+cd $TREX_HOME
+jam
+}}}
+  * generate the html documentation under `doc/html/
+{{{
+cd $TREX_HOME
+jam doc
+}}}
+  * compile one of the plugins provided under the `extra/` sub directory. For example for vitre :
+{{{
+cd $TREX_HOME
+jam vitre
+}}}
+
+== running TREX ==
+
+The core library provide two simples executables :
+  * *amc* execute the agent in batch mode 
+  * *sim* execute the agent in small interactive mode with a simulated clock to help debugging a mission
+
+all of them takes a mission file as argument and one `sample` mission is given under `cfg/` to run it just type :
+{{{
+amc sample 
+}}}
+or
+{{{
+sim  sample
+}}}
+
+Further details on this should be provided the documentation generated through `jam doc` compilation command and will be included in the future on this wiki
+
+ 
