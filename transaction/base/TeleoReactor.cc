@@ -79,14 +79,14 @@ bool details::external::post_goal(goal_id const &g) {
 }
 
 void details::external::dispatch(TICK current, details::goal_queue &sent) {
-  details::goal_queue::iterator i=m_pos->second.begin();    
+  details::goal_queue::iterator i=m_pos->second.begin();
+  IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
   
-  for( ; m_pos->second.end()!=i && (*i)->startsBefore(current);  ) {
+  for( ; m_pos->second.end()!=i && (*i)->startsBefore(dispatch_w.upperBound());  ) {
     if( (*i)->startsAfter(current) ) {
       // Need to check for dispatching
-      if( m_pos->first.accept_goals() &&
-	  (*i)->startsBefore(m_pos->first.dispatch_window(current).upperBound()) ) {
-	// syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
+      if( m_pos->first.accept_goals() ) {
+ 	// syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
 	// 	<<m_pos->first.name()<<"\".";
 	m_pos->first.request(*i);
 	i = m_pos->second.erase(i);
