@@ -285,7 +285,9 @@ namespace TREX {
 	}
 
       private:
-	bool synchronize() {}
+	bool synchronize() {
+	  return true;
+	}
 
       };
       AgentProxy *m_proxy;
