@@ -27,7 +27,7 @@ namespace TREX {
    * @ingroup lightswitch
    */
   void initPlugin() {
-    ::s_log->syslog("vitre")<<"Vitre loaded."<<std::endl;
+    ::s_log->syslog("plugin.vitre")<<"Vitre loaded."<<std::endl;
     // ::decl;
   }
 
