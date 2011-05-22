@@ -42,6 +42,14 @@ namespace TREX {
       europa_mapping m_internal_goals;
 
       Assembly m_assembly;
+
+      void reset_deliberation() {
+	m_planStart = getInitialTick();
+	m_steps = 0;
+      }
+
+      TREX::transaction::TICK m_planStart;
+      unsigned long           m_steps;
       
       friend class Assembly;
     }; //TREX::europa::EuropaReactor

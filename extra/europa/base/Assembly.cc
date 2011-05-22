@@ -1,4 +1,5 @@
 #include "EuropaReactor.hh"
+#include "bits/europa_convert.hh"
 
 #include "PLASMA/ModuleConstraintEngine.hh"
 #include "PLASMA/ModulePlanDatabase.hh"
@@ -11,6 +12,7 @@
 #include "PLASMA/Propagators.hh"
 #include "PLASMA/Schema.hh"
 #include "PLASMA/NddlInterpreter.hh"
+#include "PLASMA/TokenVariable.hh"
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -193,3 +195,39 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return m_constraintEngine->constraintConsistent();
 }
 
+EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable) {
+  // create the token
+  EUROPA::DbClientId cli =  m_planDatabase->getClient();
+  EUROPA::ObjectId timeline = cli->getObject(pred.object().str().c_str());
+  std::string 
+    pred_name = timeline->getType().toString()+"."+pred.predicate().str();
+  
+  EUROPA::TokenId tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
+  // Restrict attributes (apart the temporal ones)
+  for(Predicate::const_iterator i=pred.begin(); pred.end()!=i; ++i) {
+    EUROPA::ConstrainedVariableId param = tok->getVariable(i->first.str());
+    
+    if( param.isId() ) {
+      try {
+	europa_restrict(param, i->second.domain());	  
+      } catch(DomainExcept const &de) {
+	m_reactor.syslog("WARN")<<"Restriciting attribute "<<i->first
+				<<" on token "<<pred.object()<<'.'<<pred.predicate()
+				<<" triggered an exception: "<<de;
+      }
+    } else 
+      m_reactor.syslog("WARN")<<"Unknown attribute "<<i->first
+			      <<" for token "<<pred.object()<<'.'<<pred.predicate();
+  }
+  // Set the object
+  EUROPA::ConstrainedVariableId 
+    obj_var = tok->getObject();
+  obj_var->specify(timeline->getKey());
+  
+  return tok;
+}
+
+void Assembly::mark_active() {
+  m_state = ACTIVE;
+  m_reactor.reset_deliberation();
+}

@@ -40,6 +40,13 @@ namespace TREX {
 	EUROPA::Domain    *m_dom;
 	EUROPA::DataTypeId m_type;	
       }; // TREX::europa::details::europa_domain
+
+      inline void europa_restrict(EUROPA::ConstrainedVariableId const &var,
+				  TREX::transaction::DomainBase const &dom) {
+	europa_domain convert(var->lastDomain());
+	dom.accept(convert);
+	var->restrictBaseDomain(convert.domain());
+      }
       
     } // TREX::europa::details
   } // TREX::europa
