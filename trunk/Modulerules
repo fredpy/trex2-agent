@@ -2,7 +2,7 @@
 
 if ! $(ModuleRules_INCLUDED) {
   ModuleRules_INCLUDED = TRUE ;
-
+  
   # LIBRARIES in { STATIC , SHARED , NONE }
   LIBRARIES ?= SHARED ;
 
@@ -253,6 +253,9 @@ if ! $(ModuleRules_INCLUDED) {
 
     if $(kind) = lib {
       Depends lib : $(name) ;
+    } else {
+      NotFile $(kind)s ;
+      Depends $(kind)s : $(name) ;
     }
     Depends $(name) : $(files) ;
     Clean clean : $(name) ;
@@ -281,10 +284,13 @@ if ! $(ModuleRules_INCLUDED) {
     local files = $(2) ;
     local kind = [ on $(name:G=module) return $(KIND) ] ;
 
-    local dest = $($(_top)) ;
-    if $(kind) = plugin {
-      dest = [ FDirName $($(_top)) plugin ] ;
-    } 
+    local dest ;
+    if $(kind) = lib {
+       dest = $($(_top))  ;
+    } else {
+       dest = [ FDirName $($(_top)) plugin ] ;
+    }
+ 
     MakeLocate $(name) $(files:D=) : [ FDirName $(dest) cfg ] ;
     Depends $(name) : $(files:D=) ;
     Clean clean : $(files:D=) ;
