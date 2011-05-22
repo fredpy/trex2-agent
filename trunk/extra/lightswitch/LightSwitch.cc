@@ -44,7 +44,7 @@ namespace TREX {
    * @ingroup lightswitch
    */
   void initPlugin() {
-    ::s_log->syslog("lightswitch")<<"LightSwitch loaded."<<std::endl;
+    ::s_log->syslog("plugin.lightswitch")<<"LightSwitch loaded."<<std::endl;
     // ::decl;
   }
 
