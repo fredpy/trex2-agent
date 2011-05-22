@@ -1,7 +1,32 @@
 /** @defgroup amccmd amc command
  * @brief A simple agent batch running command
  *
- * This module embeds all the code related to the @c amc program 
+ * This module embeds all the code related to the @c amc program
+ *
+ * @h1 amc command usage
+ *
+ * The amc command line is the basic way t execute an agent in batch
+ * mode. It can ba e called like this :
+ * @code
+ * amc <mission>[.cfg] [-sim [steps]
+ * @endcode 
+ * Where :
+ * @li @c @<mission@> is the name of a mission configuration file.
+ * There should be a file named @c @<mission@>.cfg in the @c TREX_PATH
+ * that describes an agent in XML format
+ * @li @c -sim indicates that we want to use StepClock instead of the
+ * default clock. Otherwise it loads the clock loaded by
+ * @c @<mission@>.cfg or RealTimeClock if none was required
+ * @c @<steps@> indicates the maximum number of deliberation steps per tick
+ * StepClock should allow.
+ *
+ * The programs locate the file @c <mission> int TREX_PATH -- or @c <mission>.cfg
+ * if @c <mission> is not found -- parse its XML content in order to initialize
+ * the rset of reactors loaded and the potential clock defined and execute it
+ * until completion. If no clock is provided the command uses a default real-time
+ * clock with a tick duration of 1 second.
+ *
+ * @sa TREX::agent::Agent::Agent(std::string const &, Clock *) 
  *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  * @ingroup commands
