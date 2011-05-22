@@ -98,6 +98,49 @@ namespace TREX {
        * Create a new Agent by parsing the onctent of the file @f file_name.
        * If @p clock is not provided, it will take the first clock defined
        * in @p file_name.
+       * Create a new Agent by parsing the content of the xml structure @p conf.
+       * If the clock has not beeen set yet, it will take the first clock defined
+       * in @p file_name.
+       *
+       * An Agent configuration xml definition can be defined as follow:
+       * @code
+       * <Agent name="<agent name>" finalTick="<final tick>" config="<extra cfg>" >
+       *    <!-- plugin loading information -->
+       *    <!-- clocks defintions -->
+       *    <!-- reactors definitions -->
+       *    <!-- goal definitions -->
+       * </Agent>
+       * @endcode
+       *
+       * Where the attributes are as follow
+       * @li @c name is the name of the agent
+       * @li @c finalTick is a value greater than 0 that indicates
+       *     the agent lifetime
+       * @li @c config is an optional attribute that points to another XML file.
+       *     this file will contains extra tags that will be parse in simlar mananer
+       *     to the childs of this root tag.
+       *
+       * the child tags will be parsed in the following order:
+       * @li Plugin information allowing TREX to load external plugins. These
+       *     XML tags have the following syntax :
+       *     @code
+       *     <Plugin name="TREXvitre" />
+       *     @endcode
+       *     and will result on the  attempting to load the dynamic libray @e TREXvitre
+       *     as a TREX plugin. These need to be loaded firast as oner plugin can defines
+       *     new clocks or reactors types used by this agent
+       * @li Clock definition. These will be parsed only if a clock is not defined and as
+       *     a result only the first clock definition may be parsed in this configuration
+       *     The tag of the XML depends on the way the clock class declared itself inside
+       *     TREX. And you need to look at the documentation of the clock class you want
+       *     to use in order to know how to declare it in this file.
+       * @li Reactors definition. these will define all the reactors that are declared
+       *     initially on this agent. As for clock, the way to specify a reactor depends
+       *     on the type of reactor and onwe should look at its documentation to know
+       *     further
+       * @li The initial goals for this mission. Goals have generic xml format that
+       *     is described in TREX::transaction::Goal class documentation
+       * 
        *
        * This constructor will try first to locate @p file_name and if does
        * not find it will try to locate @p file_name.cfg
@@ -105,6 +148,8 @@ namespace TREX {
        * @pre @p file_name is a a valid file on current directory or accessible
        *      through TREX_PATH
        * @pre @p file_name is a valid xml file that defines an agent 
+       * @pre the root node of @p file_name needs to be an Agent tag
+       *
        *
        * @throw TREX::utils::ErrnoExcept failed to locate the file
        * @throw rapidxml::parse_error parse error while loading the file

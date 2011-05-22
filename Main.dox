@@ -243,6 +243,7 @@ pseudo real-time clakc but most of the time the we use @c sim to replay a past m
  *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  */
+
 /** @defgroup utils Basic utilities
  * @brief simple utilities library
  *
@@ -253,6 +254,7 @@ pseudo real-time clakc but most of the time the we use @c sim to replay a past m
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup core
  */
+
 /** @defgroup domains Domains
  * @brief generic constrained variables 
  *
@@ -263,6 +265,7 @@ pseudo real-time clakc but most of the time the we use @c sim to replay a past m
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup core
  */
+
 /** @defgroup transaction TREX transaction 
  * @brief TREX reactors and messaging types
  *
@@ -273,25 +276,6 @@ pseudo real-time clakc but most of the time the we use @c sim to replay a past m
  *
  * Usually plug-ins are based on this library and can then defines new
  * reactors, observations, goals or clocks.
- *
- * @author Conor McGann @& Frederic Py <fpy@mbari.org>
- * @ingroup core
- */
-/** @defgroup agent TREX agent 
- * @brief The TREX agent
- * 
- * Defines a TREX agent and some utilities that helps to manipulate it.
- * It provides also two generic clocks to allow basic agent execution.
- * All of these are provided by the library  @c lib/libTREXagent
- * 
- * @author Conor McGann @& Frederic Py <fpy@mbari.org>
- * @ingroup core
- */
-/** @defgroup commands TREX commands
- * @brief Commands for agent execution 
- *
- * This module includes all the commands that allow to execute and/or
- * debug a TREX agent. They are all compiled in the @c bin directory
  *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  * @ingroup core
