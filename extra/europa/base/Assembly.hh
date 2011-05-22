@@ -49,6 +49,9 @@ namespace TREX {
       static EUROPA::LabelStr const PRIVATE_MODE;
       static EUROPA::LabelStr const IGNORE_MODE;
 
+      static EUROPA::LabelStr const MISSION_END;
+      static EUROPA::LabelStr const TICK_DURATION;
+
       Assembly(EuropaReactor &owner);
       ~Assembly();
 

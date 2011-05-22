@@ -226,7 +226,8 @@ namespace TREX {
        * @post The reactor is ready to be executed in the agent
        *
        * @sa handleInit()
-       * @sa getCurrentTick()
+       * @sa getInitialTick() const
+       * @sa getCurrentTick() const
        */
       void initialize(TICK final);
 
@@ -389,7 +390,18 @@ namespace TREX {
       TICK getInitialTick() const {
 	return m_initialTick; 
       }
-      /** brief Get current tick
+      /** @brief Tick duration
+       *
+       * Indicates the duration of the tick. This duration is expected to
+       * be expressed in seconds even though nothing in the architecture
+       * constraint such aspect.
+       *
+       * @return the duration of a single tick
+       */
+      double tickDuration() const {
+	return m_graph.tickDuration();
+      }
+      /** @brief Get current tick
        *
        * @return current tick date
        *
@@ -685,6 +697,7 @@ namespace TREX {
       void clear_externals();
 
       bool m_inited;
+      bool m_firstTick;
       graph &m_graph;
 
       /** @brief Reactor name
@@ -712,8 +725,8 @@ namespace TREX {
        */
       TICK m_lookahead;
       
-      TICK m_initialTick;
-      TICK m_finalTick;
+      TICK   m_initialTick;
+      TICK   m_finalTick;
       
       
       mutable TICK m_deadline;

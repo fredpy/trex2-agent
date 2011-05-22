@@ -226,6 +226,9 @@ namespace TREX {
       TICK getCurrentTick() const {
 	return m_currentTick;
       }
+      virtual double tickDuration() const {
+	return 1.0;
+      }
 
       size_type count_reactors() const {
 	return m_reactors.size();

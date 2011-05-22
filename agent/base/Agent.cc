@@ -39,17 +39,16 @@ namespace TREX {
       class init_visitor :public CycleDetector {
       public:
 	/** @brief Constructor
-	 *
-	 * @param[in] final Value of the final tick of the mission
+	 * @param[in] final the final tick of the mission
 	 */
-	init_visitor(TICK final)
-	  :m_finalTick(final) {}
+	explicit init_visitor(TICK final)
+	  :m_final(final) {}
 	/** @brief Copy constructor
 	 *
 	 * @param[in] other the instance to copy
 	 */
 	init_visitor(init_visitor const &other) 
-	  :CycleDetector(other), m_finalTick(other.m_finalTick) {}
+	  :CycleDetector(other), m_final(other.m_final) {}
 	/** @brief Destructor */
 	virtual ~init_visitor() {}
 	
@@ -70,7 +69,7 @@ namespace TREX {
 	 */
 	void finish_vertex(graph::reactor_id r, graph const &g) {
 	  if( is_valid(r) )
-	    r->initialize(m_finalTick);
+	    r->initialize(m_final);
 	}
       protected:
 	/** @brief Final tick value
@@ -78,7 +77,7 @@ namespace TREX {
 	 * Stores the final tick of the mission that will be proovided to
 	 * the reactors during the depth first search execution of this visitor.
 	 */
-	TICK m_finalTick;
+	TICK m_final;
 
       };
 

@@ -49,9 +49,21 @@ namespace TREX {
        * @return current tick value
        */
       virtual TREX::transaction::TICK getNextTick() =0;
-
+      /** @brief Initial tick
+       *
+       * @return the value of the initial tick
+       */
       virtual TREX::transaction::TICK initialTick() const {
 	return 0;
+      }
+      /** @brief tick duration
+       *
+       * This methods return the TICK duration. It is expected to be in seconds
+       *
+       * @return tick duration
+       */
+      virtual double tickDuration() const {
+	return 1.0;
       }
       /** @brief Sleep until next tick
        *
