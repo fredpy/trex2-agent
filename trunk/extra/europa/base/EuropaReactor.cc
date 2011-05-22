@@ -1,7 +1,10 @@
 #include "EuropaReactor.hh"
 
+#include "bits/europa_convert.hh"
+
 #include "PLASMA/PlanDatabase.hh"
 #include "PLASMA/Token.hh"
+#include "PLASMA/TokenVariable.hh"
 
 using namespace TREX::europa;
 using namespace TREX::transaction;
@@ -82,9 +85,30 @@ EuropaReactor::~EuropaReactor() {}
 //  - TREX transaction callback 
 
 void EuropaReactor::notify(Observation const &o) {
+  EUROPA::TokenId tok = m_assembly.convert(o, false);
+  // restrict start to current tick
+  tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
+							     getCurrentTick()));
+  tok->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
+							   PLUS_INFINITY));
+  // m_core->notify(tok);
 }
 
 void EuropaReactor::handleRequest(goal_id const &g) {
+  EUROPA::TokenId tok = m_assembly.convert(*g, false);
+  // restrict start, duration and end
+  try {
+    details::europa_restrict(tok->start(), g->getStart());
+    details::europa_restrict(tok->duration(), g->getDuration());
+    details::europa_restrict(tok->end(), g->getEnd());
+  } catch(DomainExcept const &de) {
+    syslog("ERROR")<<"Failed to restrict goal "<<g->object()<<'.'<<g->predicate()
+		   <<'['<<g<<"] temporal attributes: "<<de;
+    return;
+  }
+  m_internal_goals[tok->getKey()] = g;
+  if( m_assembly.inactive() )
+    m_assembly.mark_active();
 }
 
 void EuropaReactor::handleRecall(goal_id const &g) {
@@ -106,12 +130,19 @@ void EuropaReactor::handleInit() {
 }
 
 void EuropaReactor::handleTickStart() {
+  if( getCurrentTick()==getInitialTick() )
+    reset_deliberation();
 }
 
 bool EuropaReactor::synchronize() {
 }
 
 bool EuropaReactor::hasWork() {
+  if( m_assembly.active() )
+    return true;
+  /* extra tests in between */
+    
+  return true;
 }
 
 void EuropaReactor::resume() {

@@ -2,6 +2,7 @@
 # define H_Assembly
 
 # include "LogManager.hh"
+# include "Predicate.hh"
 
 # include "PLASMA/PlanDatabase.hh"
 # include "PLASMA/RulesEngineDefs.hh"
@@ -92,7 +93,32 @@ namespace TREX {
 	return m_ignore.end()!=m_ignore.find(obj);
       }
 
+      EUROPA::TokenId convert(TREX::transaction::Predicate const &pred, bool rejectable);
+
+      bool inactive() const {
+	return INACTIVE==m_state;
+      }
+      bool active() const {
+	return ACTIVE==m_state;
+      }
+      bool invalid() const {
+	return INVALID==m_state;
+      }
+      void mark_inactive() {
+	m_state = INACTIVE;
+      }
+      void mark_active();
+      void mark_invalid() {
+	m_state = INVALID;
+      }
+
     private:
+      enum State {
+	INACTIVE = 0,
+	ACTIVE, 
+	INVALID
+      };
+      State m_state;
       EuropaReactor &m_reactor;
 
       EUROPA::SchemaId           m_schema;
