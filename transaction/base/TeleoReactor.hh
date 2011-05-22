@@ -789,7 +789,7 @@ namespace TREX {
        * @param[in] msg The error msg
        */
       DispatchError(TeleoReactor const &r, goal_id const &g, std::string const &msg) throw()
-	:ReactorException(g, buil_msg(g, msg)) {}
+	:ReactorException(r, buil_msg(g, msg)) {}
       /** @brief Desturctor */
       ~DispatchError() throw() {}
       
