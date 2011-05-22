@@ -17,6 +17,7 @@
  */
 #include <cctype>
 
+#include "TREXversion.hh"
 #include "Agent.hh"
 #include "StepClock.hh"
 
@@ -153,6 +154,8 @@ namespace {
  * @ingroup simcmd
  */
 int main(int argc, char **argv) {
+  std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
+
   if( argc<2 || argc>4 ) {
     std::cerr << "Invalid argument list:"
 	      <<"\n Usage: "<<argv[0]<<" configFile [steps]"

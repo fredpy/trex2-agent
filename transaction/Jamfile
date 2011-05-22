@@ -1,5 +1,7 @@
 SubDir TREX transaction ;
 
-Module transaction : domain ; 
-SubInclude TREX transaction base ;
-SubInclude TREX transaction component ;
+# if ! $(TREX_READY) {
+  Module transaction : domain ; 
+  SubInclude TREX transaction base ;
+  SubInclude TREX transaction component ;
+# }

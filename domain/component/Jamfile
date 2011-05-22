@@ -1,3 +1,5 @@
 SubDir TREX domain component ;
 
-ModuleFiles domain : DomainImpl.cc ;
+# if ! $(TREX_READY) {
+  ModuleFiles domain : DomainImpl.cc ;
+# }

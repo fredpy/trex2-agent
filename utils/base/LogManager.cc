@@ -18,6 +18,7 @@
 #include <iomanip>
 
 #include "LogManager.hh"
+#include "TREXversion.hh"
 
 using namespace TREX::utils; 
 
@@ -157,6 +158,7 @@ std::string const &LogManager::logPath() {
     if( 0!=ret && EEXIST!=errno )
       throw ErrnoExcept("LogManager: error while creating cfg dir");
     m_syslog.open(m_path+'/'+TREX_LOG_FILE);
+    m_syslog<<"TREX version "<<TREX::version::str();
     loadSearchPath();
     *m_inited = true;
   }
