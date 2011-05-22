@@ -1,0 +1,10 @@
+SubDir TREX utils ;
+
+# if ! $(TREX_READY) {
+
+  Module utils ; 
+  SubInclude TREX utils base ;
+  SubInclude TREX utils component ;
+
+
+# }

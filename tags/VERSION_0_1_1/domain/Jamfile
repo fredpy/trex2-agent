@@ -1,0 +1,9 @@
+SubDir TREX domain ;
+
+# if ! $(TREX_READY) {
+
+  Module domain : utils ; 
+  SubInclude TREX domain base ;
+  SubInclude TREX domain component ;
+
+# }

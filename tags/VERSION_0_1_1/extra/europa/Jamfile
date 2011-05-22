@@ -1,0 +1,32 @@
+SubDir TREX extra europa ;
+
+#if ! $(TREX_READY) {
+
+  ModulePlugin europa : transaction ;
+
+  EUROPA_FLAGS = -DTIXML_USE_STL ;
+  
+  if $(DEBUG) {
+    E_EXT = g ;
+  } else {
+    E_EXT = o ;
+    EUROPA_FLAGS += -DEUROPA_FAST ;
+  }
+  
+  EUROPA_LIBS = PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml NDDL
+                RulesEngine Solvers System ;
+
+  # won't compile unless EUROPA_HOME is defined
+  ModuleVars europa : EUROPA_HOME ;
+
+  ModuleIncludes europa : $(EUROPA_HOME)/include ;
+  ModuleC++Flags europa : $(EUROPA_FLAGS) ;
+  
+  ModuleLibraries europa : $(EUROPA_LIBS)_$(E_EXT) : $(EUROPA_HOME)/lib ;
+  
+  ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg ;
+  
+  SubInclude TREX extra europa base ;
+#}
+
+

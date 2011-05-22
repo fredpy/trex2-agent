@@ -1,0 +1,5 @@
+SubDir TREX transaction component ;
+
+# if ! $(TREX_READY) {
+  # insert rules here
+# }
