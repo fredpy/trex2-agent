@@ -19,16 +19,6 @@ actions Doxygen {
 $(DOXYGEN_CMD)
 }
 
-{
-  local SUBDIR = [ FDirName $(TREX) ] ;
-
-  include [ FDirName  $(SUBDIR) Platformrules ] ;
-  include [ FDirName  $(SUBDIR) Modulerules ] ;
-  
-  PROJECT = TREX ;
-  TREX_READY = TRUE ;
-}
-
 rule CheckBranch {
   NotFile $(1) ;
   Always $(1) ;
@@ -37,3 +27,35 @@ rule CheckBranch {
 actions CheckBranch {
   cd $(2) ; svn info | grep -q $(1) ;
 }
+
+
+rule Dist {
+  local file = $(1)-$(TREX_MAJOR).$(TREX_MINOR).$(TREX_RELEASE).tgz ;
+  NotFile dist ;
+  NotFile $(1) ;
+  Depends dist : clean ;
+  Depends dist : $(file) ;
+  MakeDist $(file) : $(1) ;
+} 
+
+rule MakeDist {
+  Clean clean : $(1) ;
+  Always $(1) ;
+}
+
+actions MakeDist {
+  tar zcf $(1) -s /\./$(2)/ $(TREX)/*
+}
+
+{
+  local SUBDIR = [ FDirName $(TREX) ] ;
+
+  include [ FDirName  $(SUBDIR) Platformrules ] ;
+  include [ FDirName  $(SUBDIR) Modulerules ] ;
+#  include [ FDirName  $(SUBDIR) Jamfile ] ;
+  
+  PROJECT = TREX ;
+  TREX_READY = TRUE ;
+}
+
+

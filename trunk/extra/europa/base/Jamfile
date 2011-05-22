@@ -1,3 +1,5 @@
 SubDir TREX extra europa base ;
 
-ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc ;
+# if ! $(TREX_READY) {
+  ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc ;
+# }

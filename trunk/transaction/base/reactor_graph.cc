@@ -29,7 +29,8 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 // structors :
 
 graph::graph(Symbol const &name, TICK init) 
-  :m_name(name), m_currentTick(init) {}
+  :m_name(name), m_currentTick(init) {
+}
 
 graph::graph(Symbol const &name, ext_iterator const &conf, TICK init) 
   :m_name(name), m_currentTick(init) {

@@ -1,3 +1,7 @@
 SubDir TREX utils component ;
 
-ModuleFiles utils : RStat.cc ;
+# if ! $(TREX_READY) {
+
+  ModuleFiles utils : RStat.cc ;
+
+# }

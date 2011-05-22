@@ -1,5 +1,9 @@
 SubDir TREX agent ;
 
-Module agent : transaction ;
-SubInclude TREX agent base ;
-SubInclude TREX agent component ;
+# if ! $(TREX_READY) {
+
+  Module agent : transaction ;
+  SubInclude TREX agent base ;
+  SubInclude TREX agent component ;
+
+# }
