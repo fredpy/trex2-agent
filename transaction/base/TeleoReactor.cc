@@ -20,6 +20,18 @@ ReactorException::ReactorException(TeleoReactor const &r,
   :GraphException(r.m_graph, r.getName().str(), msg) {}
 
 
+/*
+ * class TREX::transaction::DispatchError
+ */
+// statics 
+std::string DispatchError::buil_msg(goal_id const &g, std::string const &msg) throw() {
+  std::ostringstream oss;
+  oss<<"While dispatching ";
+  if( !!g ) 
+    oss<<g->object()<<'.'<<g->predicate();
+  oss<<'['<<g<<"]: "<<msg;
+  return oss.str();
+}
 
 
 
@@ -86,14 +98,14 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
     if( (*i)->startsAfter(current) ) {
       // Need to check for dispatching
       if( m_pos->first.accept_goals() ) {
- 	// syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
-	// 	<<m_pos->first.name()<<"\".";
+	syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
+	 	<<m_pos->first.name()<<"\".";
 	m_pos->first.request(*i);
 	i = m_pos->second.erase(i);
       } else 
 	++i;
     } else {
-      // syslog()<<"Goal "<<(*i)->predicate()<<'['<<(*i)<<"] is in the past !";
+      syslog()<<"Goal "<<(*i)->predicate()<<'['<<(*i)<<"] is in the past !";
       i = m_pos->second.erase(i);
     }
   } 
@@ -234,11 +246,15 @@ void TeleoReactor::postObservation(Observation const &obs) {
 }
 
 bool TeleoReactor::postGoal(goal_id const &g) {
+  if( !g ) 
+    throw DispatchError(*this, g, "Invalid goal Id");
+    
   details::external tl(m_externals.find(g->object()), m_externals.end());
-
-  if( tl.valid() )
+  
+  if( !tl.valid() )
     return tl.post_goal(g);
-  return false;
+  else 
+    throw DispatchError(*this, g, "Goals can only be posted on External timelines");
 }
 
 goal_id TeleoReactor::postGoal(Goal const &g) {
@@ -246,8 +262,10 @@ goal_id TeleoReactor::postGoal(Goal const &g) {
   
   if( postGoal(tmp) )
     return tmp;
-  else 
+  else {
+    // should never happen !?
     return goal_id();
+  }
 }
 
 bool TeleoReactor::postRecall(goal_id const &g) {
@@ -263,6 +281,7 @@ bool TeleoReactor::postRecall(goal_id const &g) {
 void TeleoReactor::initialize(TICK final) {
   if( m_inited )
     throw ReactorException(*this, "Attempted to initialize this reactor twice.");
+  m_initialTick = getCurrentTick();
   m_finalTick   = final;
   syslog()<<" execution latency is "<<getExecLatency();
   handleInit();   // allow derived class intialization
