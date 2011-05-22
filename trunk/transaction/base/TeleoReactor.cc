@@ -159,7 +159,7 @@ TREX::utils::internals::LogEntry details::external::syslog() {
 
 
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
-  :m_inited(false), m_graph(*(arg.second)), 
+  :m_inited(false), m_firstTick(true), m_graph(*(arg.second)), 
    m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
    m_latency(parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
@@ -187,7 +187,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
    
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name, 
 			   TICK latency, TICK lookahead, bool log)
-  :m_inited(false), m_graph(*owner), m_name(name),
+  :m_inited(false), m_firstTick(true), m_graph(*owner), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {}
 
@@ -269,6 +269,8 @@ goal_id TeleoReactor::postGoal(Goal const &g) {
 }
 
 bool TeleoReactor::postRecall(goal_id const &g) {
+  if( !g )
+    return false;
   details::external tl(m_externals.find(g->object()), m_externals.end());
 
   if( tl.valid() ) {
@@ -281,14 +283,19 @@ bool TeleoReactor::postRecall(goal_id const &g) {
 void TeleoReactor::initialize(TICK final) {
   if( m_inited )
     throw ReactorException(*this, "Attempted to initialize this reactor twice.");
-  m_initialTick = getCurrentTick();
   m_finalTick   = final;
   syslog()<<" execution latency is "<<getExecLatency();
   handleInit();   // allow derived class intialization
+  m_firstTick = true;
   m_inited = true;
 }
 
 void TeleoReactor::newTick() {
+  if( m_firstTick ) {
+    m_initialTick = getCurrentTick();
+    m_firstTick = false;
+  }
+
   handleTickStart(); // allow derived class processing
 
   // Dispatched goals management
@@ -297,7 +304,7 @@ void TeleoReactor::newTick() {
 				  // I do nothing with it for now  
   // Manage goal dispatching
   for( ; i.valid(); ++i )
-    i.dispatch(getCurrentTick(), dispatched);
+    i.dispatch(getCurrentTick(), dispatched);  
 }
 
 void TeleoReactor::doNotify() {

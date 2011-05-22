@@ -79,8 +79,9 @@ TICK RealTimeClock::getNextTick() {
       setNextTickDate(tickIncr);
       // If more than 10% late indicate the issue in the log
       if( ratio>=0.1 ) {
-	m_log->syslog("Clock")<<'['<<m_tick<<"] "<<howLate<<" secs late."
-			      <<std::endl;
+	std::ostringstream oss;
+	oss<<"Clock]["<<m_tick;
+	m_log->syslog(oss.str())<<howLate<<" secs late."<<std::endl;
       }
     }
   }
@@ -106,9 +107,11 @@ double RealTimeClock::getSleepDelay() const {
     }
     if( delay<0.0 ) {
       // If we are already late log it
-      m_log->syslog("Clock")<<'['<<tick<<"] "<<(-delay)
-			    <<" secs late before sleep."
-			    <<std::endl;
+      std::ostringstream oss;
+      oss<<"Clock]["<<m_tick;
+      m_log->syslog(oss.str())<<(-delay)
+			      <<" secs late before sleep."
+			      <<std::endl;
       delay = 0.0;
     }
     return delay;

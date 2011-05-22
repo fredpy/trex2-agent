@@ -69,6 +69,10 @@ EUROPA::LabelStr const Assembly::INTERNAL_MODE("Internal");
 EUROPA::LabelStr const Assembly::PRIVATE_MODE("Private");
 EUROPA::LabelStr const Assembly::IGNORE_MODE("Ignore");
 
+EUROPA::LabelStr const Assembly::MISSION_END("MISSION_END");
+EUROPA::LabelStr const Assembly::TICK_DURATION("TICK_DURATION");
+
+
 // structors 
 
 Assembly::Assembly(EuropaReactor &owner)

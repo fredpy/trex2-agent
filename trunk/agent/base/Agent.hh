@@ -316,6 +316,11 @@ namespace TREX {
        *  @sa sendRequest(rapidxml::xml_node<> &)
        */
       size_t sendRequests(TREX::utils::ext_iterator &g);
+
+      double tickDuration() const {
+	return m_clock->tickDuration();
+      }
+
     private:
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:

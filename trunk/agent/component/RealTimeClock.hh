@@ -71,6 +71,11 @@ namespace TREX {
        */
       TREX::transaction::TICK getNextTick();
 
+      double tickDuration() const {
+	return m_floatTick;
+      }
+
+
     private:
       /** @brief Start the clock
        * initialize the clock based on current system time
