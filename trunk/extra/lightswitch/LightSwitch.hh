@@ -58,17 +58,25 @@ namespace TREX {
       /** @brief State of the timeline */
       bool m_on;
       /** @brief Is the state already posted as observation ? */
-      bool m_posted;
+      bool m_firstTick;
 
+      void setValue(bool val);
+      
       std::list<TREX::transaction::goal_id> m_pending;
 
       /** @brief Name of the predicate on */
       static TREX::utils::Symbol const onPred;
       /** @brief Name of the predicate off */
       static TREX::utils::Symbol const offPred;
+      /** @brief Name of the predicate up */
+      static TREX::utils::Symbol const upPred;
+      /** @brief Name of the predicate down */
+      static TREX::utils::Symbol const downPred;
 
-      /** @brief Name of the timeline */
+      /** @brief Name of the timeline for light */
       static TREX::utils::Symbol const lightObj;
+      /** @brief Name of the timeline for light */
+      static TREX::utils::Symbol const switchObj;
     };
 
   }
