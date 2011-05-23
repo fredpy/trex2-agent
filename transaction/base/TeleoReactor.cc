@@ -60,9 +60,11 @@ details::external::external(details::external const &other)
   :m_pos(other.m_pos), m_last(other.m_last) {}
 
 details::external::external(details::external_set::iterator const &pos,
-			    details::external_set::iterator const &last)
+			    details::external_set::iterator const &last, 
+			    bool only_active)
   :m_pos(pos), m_last(last) {
-  next_active();
+  if( only_active )
+    next_active();
 }
 
 // manipulators
@@ -148,7 +150,7 @@ bool details::external::operator==(details::external const &other) const {
 }
 
 TREX::utils::internals::LogEntry details::external::syslog() {
-  m_pos->first.client().syslog(m_pos->first.name().str());
+  return m_pos->first.client().syslog(m_pos->first.name().str());
 }
 
 /*
@@ -248,10 +250,10 @@ void TeleoReactor::postObservation(Observation const &obs) {
 bool TeleoReactor::postGoal(goal_id const &g) {
   if( !g ) 
     throw DispatchError(*this, g, "Invalid goal Id");
-    
-  details::external tl(m_externals.find(g->object()), m_externals.end());
+
+  details::external tl(m_externals.find(g->object()), m_externals.end(), false);
   
-  if( !tl.valid() )
+  if( tl.valid() )
     return tl.post_goal(g);
   else 
     throw DispatchError(*this, g, "Goals can only be posted on External timelines");

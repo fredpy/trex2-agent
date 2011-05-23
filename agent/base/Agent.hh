@@ -331,7 +331,10 @@ namespace TREX {
 	bool postRequest(TREX::transaction::goal_id const &g) {
 	  if( !isExternal(g->object()) )
 	    use(g->object());
-	  postGoal(g);
+	  if( isExternal(g->object()) )
+	    postGoal(g);
+	  else
+	    syslog("ERROR")<<"Unable to subscribe to "<<g->object();
 	}
 
       private:

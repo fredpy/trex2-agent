@@ -87,7 +87,7 @@ namespace TREX {
        * be after @a date if possible
        *
        * @retval true if the domain of @c start intersects
-       * @c [start+delay,@c +inf). In this case the @c start time is
+       * @c [date+delay,@c +inf). In this case the @c start time is
        * constrained to be necessarily greater or equal to @a date
        * @retval false otherwise 
        */

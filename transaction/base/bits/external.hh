@@ -234,7 +234,8 @@ namespace TREX {
 	external_set::iterator m_pos, m_last;
 
 	external(external_set::iterator const &pos,
-		 external_set::iterator const &last);
+		 external_set::iterator const &last, 
+		 bool only_active=true);
 
 
 	static bool cmp_goals(IntegerDomain const &a, IntegerDomain const &b);

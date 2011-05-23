@@ -141,6 +141,7 @@ namespace {
  * be in the future.
  * @li @c P @<file@>[.req] parse @c @<file@> - or @c @<file@>.req if not
  * found - and load the goals attached to it
+ * @li @c K @<reactor@> kill the specified reactor
  * @li @c H print help
  * The progam will terminate either on user request (@c Q) or when
  * the mission is completed.

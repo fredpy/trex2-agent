@@ -452,10 +452,9 @@ bool Agent::doNext() {
 }
 
 void Agent::sendRequest(goal_id const &g) {
-  if( has_timeline(g->object()) )
-    m_proxy->postRequest(g);
-  else 
-    syslog("WARN")<<"Cannot post goal on unknnown timeline \""<<g->object()<<"\".";
+  if( !has_timeline(g->object()) )
+    syslog("WARN")<<"Posting goal on a unknnown timeline \""<<g->object()<<"\".";
+  m_proxy->postRequest(g);
 }
 
 size_t Agent::sendRequests(ext_iterator &iter) {

@@ -1,3 +1,3 @@
 <Mission>
- <Goal on="light" pred="On"/>
+ <Goal on="switch" pred="Down"/>
 </Mission>

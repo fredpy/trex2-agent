@@ -56,46 +56,70 @@ Symbol const Light::offPred("Off");
 
 Symbol const Light::lightObj("light");
 
+Symbol const Light::upPred("Up");
+
+Symbol const Light::downPred("Down");
+
+Symbol const Light::switchObj("switch");
+
+
 Light::Light(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false), 
    m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			 "state")),
-   m_posted(false) {
-  provide(lightObj); // declare the timeline
+   m_firstTick(true) {
+  provide(lightObj); // declare the light timeline
+  provide(switchObj); // declare the switch timeline 
 }
 
 Light::~Light() {}
 
-bool Light::synchronize() {
-  if( !m_posted ) {
-    Symbol state;
-    if( m_on ) 
-      state = onPred;
-    else
-      state = offPred;
-    Observation obs(lightObj, state);
-    postObservation(obs);
-    m_posted = true;
+void Light::setValue(bool val) {
+  Symbol light_v, switch_v;
+  m_on = val;
+
+  if( m_on ) {
+    light_v = onPred;
+    switch_v = downPred;
   } else {
-    while( !m_pending.empty() ) {
-      TICK cur = getCurrentTick();
+    light_v = offPred;
+    switch_v = upPred;
+  }
+  postObservation(Observation(lightObj, light_v));
+  postObservation(Observation(switchObj, switch_v));
+} 
+
+
+bool Light::synchronize() {
+  if( m_firstTick ) {
+    setValue(m_on);
+    m_firstTick = false;
+  } else {
+    TICK cur = getCurrentTick();
+    
+    while( !m_pending.empty() )
       if( m_pending.front()->startsAfter(cur) ) {
+	// it can start after cur
 	if( m_pending.front()->startsBefore(cur) ) {
-	  Observation obs(*(m_pending.front()));
+	  // it can also starts before cur => it can be set to cur 
+	  setValue(downPred==m_pending.front()->predicate());
 	  m_pending.pop_front();
-	  postObservation(obs);
 	}
+	// if we reched this point that mesans that the goal
+	// necessarily starts in the future (or has been
+	// processed)
 	break;
       } else {
+	// too late to execute => remove it
 	m_pending.pop_front();
       }
-    }
   }
+  // always succeed
   return true;
 }
 
 void Light::handleRequest(goal_id const &g) {
-  if( g->predicate()==onPred || g->predicate()==offPred ) {
+  if( g->predicate()==upPred || g->predicate()==downPred ) {
     // I insert it on my list
     IntegerDomain::bound lo = g->getStart().lowerBound();
     if( lo.isInfinity() ) {
