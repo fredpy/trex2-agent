@@ -416,9 +416,12 @@ namespace TREX {
        * with the name of the timeline assicaited to the relation @p r
        */
       void operator()(std::ostream &out, graph::relation_type const &rel) const {
-	if( rel->active() )
-	  label(out, rel->name());
-	else 
+	if( rel->active() ) {
+	  out<<"[label=\""<<rel->name();
+	  if( rel->accept_goals() )
+	    out<<'['<<rel->latency()<<':'<<rel->look_ahead()<<']';
+	  out<<"\"]";
+	} else 
 	  // display inactive relation in red
 	  out<<"[label=\""<<rel->name()<<"\" color=\"red\"]";
       }
