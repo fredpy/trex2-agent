@@ -152,6 +152,60 @@ namespace TREX {
 	return m_graph.getName();
       }
       
+      /** @brief reactor initial tick
+       *
+       * This method indicates the tick during which the reactor has been
+       * initialized.
+       *
+       * @pre the reactor has bein initialized
+       *
+       * @return the tick during which the reactor got started
+       *
+       * @sa handleInit() 
+       * @sa getCurrentTick() const
+       * @sa getFinalTick() const
+       */
+      TICK getInitialTick() const {
+	return m_initialTick; 
+      }
+      /** @brief Tick duration
+       *
+       * Indicates the duration of the tick. This duration is expected to
+       * be expressed in seconds even though nothing in the architecture
+       * constraint such aspect.
+       *
+       * @return the duration of a single tick
+       */
+      double tickDuration() const {
+	return m_graph.tickDuration();
+      }
+      /** @brief Get current tick
+       *
+       * @return current tick date
+       *
+       * @sa getInitialTick() const
+       * @sa getFinalTick()
+       * @sa graph::getInitialTick() const
+       */
+      TICK getCurrentTick() const {
+	return m_graph.getCurrentTick();
+      }
+      /** @brief Get final tick
+       *
+       * Identify the agent final tick. This value correspond to the maximum
+       * possible life-time of the agent.
+       *
+       * @ pre the reactor is initialized
+       *
+       * @return mission final tick
+       *
+       * @sa initialize()
+       * @sa getInitialTick() const
+       * @sa getCurrentTick() const
+       */
+      TICK getFinalTick() const {
+	return m_finalTick;
+      }
       /** @brief reactor latency
        *
        * Indicates the reactor @p deliberation latency. Thids vlaue reflects
@@ -374,60 +428,6 @@ namespace TREX {
 	return false;
       }
 
-      /** @brief reactor initial tick
-       *
-       * This method indicates the tick during which the reactor has been
-       * initialized.
-       *
-       * @pre the reactor has bein initialized
-       *
-       * @return the tick during which the reactor got started
-       *
-       * @sa handleInit() 
-       * @sa getCurrentTick() const
-       * @sa getFinalTick() const
-       */
-      TICK getInitialTick() const {
-	return m_initialTick; 
-      }
-      /** @brief Tick duration
-       *
-       * Indicates the duration of the tick. This duration is expected to
-       * be expressed in seconds even though nothing in the architecture
-       * constraint such aspect.
-       *
-       * @return the duration of a single tick
-       */
-      double tickDuration() const {
-	return m_graph.tickDuration();
-      }
-      /** @brief Get current tick
-       *
-       * @return current tick date
-       *
-       * @sa getInitialTick() const
-       * @sa getFinalTick()
-       * @sa graph::getInitialTick() const
-       */
-      TICK getCurrentTick() const {
-	return m_graph.getCurrentTick();
-      }
-      /** @brief Get final tick
-       *
-       * Identify the agent final tick. This value correspond to the maximum
-       * possible life-time of the agent.
-       *
-       * @ pre the reactor is initialized
-       *
-       * @return mission final tick
-       *
-       * @sa initialize()
-       * @sa getInitialTick() const
-       * @sa getCurrentTick() const
-       */
-      TICK getFinalTick() const {
-	return m_finalTick;
-      }
 
       /** @brief Produce an observation
        *
