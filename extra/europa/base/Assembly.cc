@@ -65,14 +65,16 @@ std::string const Assembly::DEFAULT_ATTR("defaultPredicate");
 
 EUROPA::LabelStr const Assembly::TREX_TIMELINE("AgentTimeline");
 
-EUROPA::LabelStr const Assembly::EXTERNAL_MODE("External");
-EUROPA::LabelStr const Assembly::OBSERVE_MODE("Observer");
-EUROPA::LabelStr const Assembly::INTERNAL_MODE("Internal");
-EUROPA::LabelStr const Assembly::PRIVATE_MODE("Private");
-EUROPA::LabelStr const Assembly::IGNORE_MODE("Ignore");
+Symbol const Assembly::EXTERNAL_MODE("External");
+Symbol const Assembly::OBSERVE_MODE("Observer");
+Symbol const Assembly::INTERNAL_MODE("Internal");
+Symbol const Assembly::PRIVATE_MODE("Private");
+Symbol const Assembly::IGNORE_MODE("Ignore");
 
 EUROPA::LabelStr const Assembly::MISSION_END("MISSION_END");
 EUROPA::LabelStr const Assembly::TICK_DURATION("TICK_DURATION");
+
+std::string const Assembly::UNDEFINED_PRED("undefined");
 
 
 // structors 
@@ -115,15 +117,13 @@ Assembly::~Assembly() {
 
 // observers 
 
-EUROPA::eint Assembly::specified_attribute(EUROPA::ObjectId const &obj, 
-					   std::string const &attr) const {
+EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj, 
+						  std::string const &attr) const {
   std::string full_name = obj->getName().toString()+"."+attr;
   EUROPA::ConstrainedVariableId var = obj->getVariable(full_name);
   if( var.isNoId() )
     throw EuropaException("Variable "+full_name+" does not exist.");
-  if( !var->isSpecified() )
-    throw EuropaException("Variable "+full_name+" is not fully specified.");
-  return var->getSpecifiedValue();
+  return var;
 }
 
 bool Assembly::isInternal(EUROPA::ObjectId const &obj) const {
@@ -195,36 +195,66 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return m_constraintEngine->constraintConsistent();
 }
 
-EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable) {
+EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
+				  bool undefOnUnknown) {
   // create the token
   EUROPA::DbClientId cli =  m_planDatabase->getClient();
   EUROPA::ObjectId timeline = cli->getObject(pred.object().str().c_str());
   std::string 
     pred_name = timeline->getType().toString()+"."+pred.predicate().str();
+
   
-  EUROPA::TokenId tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
-  // Restrict attributes (apart the temporal ones)
-  for(Predicate::const_iterator i=pred.begin(); pred.end()!=i; ++i) {
-    EUROPA::ConstrainedVariableId param = tok->getVariable(i->first.str());
-    
-    if( param.isId() ) {
-      try {
-	europa_restrict(param, i->second.domain());	  
-      } catch(DomainExcept const &de) {
-	m_reactor.syslog("WARN")<<"Restriciting attribute "<<i->first
-				<<" on token "<<pred.object()<<'.'<<pred.predicate()
-				<<" triggered an exception: "<<de;
+  
+  EUROPA::TokenId tok;
+
+  if( m_schema->isPredicate(pred_name.c_str()) ) {    
+    tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
+  
+    if( tok.isId() ) { // < double check ...
+      // Restrict attributes (apart the temporal ones)
+      for(Predicate::const_iterator i=pred.begin(); pred.end()!=i; ++i) {
+	EUROPA::ConstrainedVariableId param = tok->getVariable(i->first.str());
+	
+	if( param.isId() ) {
+	  try {
+	    europa_restrict(param, i->second.domain());	  
+	  } catch(DomainExcept const &de) {
+	    m_reactor.syslog("WARN")<<"Restriciting attribute "<<i->first
+				    <<" on token "<<pred.object()<<'.'<<pred.predicate()
+				    <<" triggered an exception: "<<de;
+	  }
+	} else 
+	  m_reactor.syslog("WARN")<<"Unknown attribute "<<i->first
+				  <<" for token "<<pred.object()<<'.'<<pred.predicate();
       }
-    } else 
-      m_reactor.syslog("WARN")<<"Unknown attribute "<<i->first
-			      <<" for token "<<pred.object()<<'.'<<pred.predicate();
+      // Set the object
+      EUROPA::ConstrainedVariableId 
+	obj_var = tok->getObject();
+      obj_var->specify(timeline->getKey());
+      return tok;
+    }
   }
-  // Set the object
-  EUROPA::ConstrainedVariableId 
-    obj_var = tok->getObject();
-  obj_var->specify(timeline->getKey());
-  
-  return tok;
+  // If I am here the mean that I failed 
+  if( undefOnUnknown  ) {
+    pred_name = timeline->getType().toString()+"."+UNDEFINED_PRED;
+    
+    m_reactor.syslog("WARN")<<"predicate "<<pred.object()<<'.'
+			    <<pred.predicate()<<" is unknown by europa.\n"
+			    <<"\tReplacing it by "<<UNDEFINED_PRED;
+    if( m_schema->isPredicate(pred_name.c_str()) ) {    
+      tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
+      // Set the object
+      EUROPA::ConstrainedVariableId 
+	obj_var = tok->getObject();
+      obj_var->specify(timeline->getKey());
+      return tok;
+    } else 
+      m_reactor.syslog("WARN")<<"Not even able to create undefined !!!!";
+  } else 
+    m_reactor.syslog("WARN")<<"predicate "<<pred.object()<<'.'
+			    <<pred.predicate()<<" is unknown by europa.\n"
+			    <<"\tIgnoring it.";    
+  return EUROPA::TokenId::noId();
 }
 
 void Assembly::mark_active() {

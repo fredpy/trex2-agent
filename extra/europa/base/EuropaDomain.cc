@@ -77,6 +77,13 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
 }
 
 
+/*
+ * class TREX::europa::EuropaEntity
+ */
+// static
+
+Symbol const EuropaEntity::type_name("europa_object");
+
 namespace {
 
   // declare EuropaEntity domain
@@ -84,12 +91,6 @@ namespace {
 
 } // ::
 
-/*
- * class TREX::europa::EuropaEntity
- */
-// static
-
-Symbol const EuropaEntity::type_name("europa_object");
 
 /*
  * class TREX::europa::EuropaDomain
