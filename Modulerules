@@ -186,7 +186,7 @@ if ! $(ModuleRules_INCLUDED) {
 	  FCheckVar $(output) : $(dep) ;
 	}
 	Object $(output) : $(file) ;
-	ObjectC++Flags $(file) : $(flags) ;
+	ObjectC++Flags $(file) : $(flags) $(POSITION_INDEPENDENT_CODE_FLAG) ;
       }
     }
   }
