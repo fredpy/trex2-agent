@@ -94,25 +94,29 @@ bool Light::synchronize() {
   if( m_firstTick ) {
     setValue(m_on);
     m_firstTick = false;
+    m_nextSwitch = getCurrentTick()+1;
   } else {
     TICK cur = getCurrentTick();
-    
-    while( !m_pending.empty() )
-      if( m_pending.front()->startsAfter(cur) ) {
-	// it can start after cur
-	if( m_pending.front()->startsBefore(cur) ) {
-	  // it can also starts before cur => it can be set to cur 
-	  setValue(downPred==m_pending.front()->predicate());
+
+    if( m_nextSwitch<=cur ) {
+      while( !m_pending.empty() )
+	if( m_pending.front()->startsAfter(cur) ) {
+	  // it can start after cur
+	  if( m_pending.front()->startsBefore(cur) ) {
+	    // it can also starts before cur => it can be set to cur 
+	    setValue(downPred==m_pending.front()->predicate());
+	    m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
+	    m_pending.pop_front();
+	  }
+	  // if we reched this point that mesans that the goal
+	  // necessarily starts in the future (or has been
+	  // processed)
+	  break;
+	} else {
+	  // too late to execute => remove it
 	  m_pending.pop_front();
 	}
-	// if we reched this point that mesans that the goal
-	// necessarily starts in the future (or has been
-	// processed)
-	break;
-      } else {
-	// too late to execute => remove it
-	m_pending.pop_front();
-      }
+    }
   }
   // always succeed
   return true;

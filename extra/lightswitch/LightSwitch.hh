@@ -57,6 +57,7 @@ namespace TREX {
 
       /** @brief State of the timeline */
       bool m_on;
+      TREX::transaction::TICK m_nextSwitch;
       /** @brief Is the state already posted as observation ? */
       bool m_firstTick;
 
