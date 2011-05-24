@@ -66,7 +66,7 @@ std::string const Assembly::DEFAULT_ATTR("defaultPredicate");
 EUROPA::LabelStr const Assembly::TREX_TIMELINE("AgentTimeline");
 
 Symbol const Assembly::EXTERNAL_MODE("External");
-Symbol const Assembly::OBSERVE_MODE("Observer");
+Symbol const Assembly::OBSERVE_MODE("Observe");
 Symbol const Assembly::INTERNAL_MODE("Internal");
 Symbol const Assembly::PRIVATE_MODE("Private");
 Symbol const Assembly::IGNORE_MODE("Ignore");

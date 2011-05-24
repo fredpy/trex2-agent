@@ -78,13 +78,18 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
       if( !isInternal(trex_name) ) {
 	// Formally it would be better to demote it as External
 	// but for now we will just hide this timeline to the rest of the world
-	syslog("WARNING")<<"Unable to declare "<<trex_name<<" as Internal ...\n"
-			 <<"\t making it Private.";
+	syslog("WARN")<<"Unable to declare "<<trex_name<<" as Internal ...\n"
+		      <<"\t making it Private.";
       } 
     } else if( Assembly::IGNORE_MODE==mode_val ) {
       m_assembly.ignore(*it);
-    } 
-    // everything else is just private ...
+    } else {
+      // everything else is just private ...
+      if( Assembly::PRIVATE_MODE!=mode_val ) 
+	// should never happen
+	syslog("WARN")<<"timeline "<<trex_name<<" mode \""<<mode_val<<"\" is unknown.\n"
+		      <<"\tI'll assume it is Private.";
+    }
   }
 }
 
