@@ -28,7 +28,7 @@ Switch::Up {
     contained_by(Light.Off);
 }
 
-Light light = new Light(External);
+Light light = new Light(Observe);
 Switch switch = new Switch(External);
 
 close();
