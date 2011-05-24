@@ -24,7 +24,7 @@ SubDir TREX extra europa ;
   
   ModuleLibraries europa : $(EUROPA_LIBS)_$(E_EXT) : $(EUROPA_HOME)/lib ;
   
-  ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg ;
+  ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg cfg/test.nddl ;
   
   SubInclude TREX extra europa base ;
 #}

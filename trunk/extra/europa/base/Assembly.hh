@@ -44,14 +44,16 @@ namespace TREX {
 
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     public:
-      static EUROPA::LabelStr const EXTERNAL_MODE;
-      static EUROPA::LabelStr const OBSERVE_MODE;
-      static EUROPA::LabelStr const INTERNAL_MODE;
-      static EUROPA::LabelStr const PRIVATE_MODE;
-      static EUROPA::LabelStr const IGNORE_MODE;
+      static TREX::utils::Symbol const EXTERNAL_MODE;
+      static TREX::utils::Symbol const OBSERVE_MODE;
+      static TREX::utils::Symbol const INTERNAL_MODE;
+      static TREX::utils::Symbol const PRIVATE_MODE;
+      static TREX::utils::Symbol const IGNORE_MODE;
 
       static EUROPA::LabelStr const MISSION_END;
       static EUROPA::LabelStr const TICK_DURATION;
+
+      static std::string const UNDEFINED_PRED;
 
       Assembly(EuropaReactor &owner);
       ~Assembly();
@@ -71,13 +73,13 @@ namespace TREX {
 	return m_rulesEngine;
       }
 
-      EUROPA::eint specified_attribute(EUROPA::ObjectId const &obj, 
-				       std::string const &attr) const;
-      EUROPA::LabelStr mode(EUROPA::ObjectId const &obj) const {
-	return EUROPA::LabelStr(specified_attribute(obj, MODE_ATTR));	 
+      EUROPA::ConstrainedVariableId attribute(EUROPA::ObjectId const &obj,
+					      std::string const &attr) const;
+      EUROPA::ConstrainedVariableId mode(EUROPA::ObjectId const &obj) const {
+	return attribute(obj, MODE_ATTR);
       }
-      EUROPA::LabelStr default_pred(EUROPA::ObjectId const &obj) const {
-	return EUROPA::LabelStr(specified_attribute(obj, DEFAULT_ATTR));
+      EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
+	return attribute(obj, DEFAULT_ATTR);
       }
       void trex_timelines(std::list<EUROPA::ObjectId> &objs) const {
 	m_planDatabase->getObjectsByType(TREX_TIMELINE, objs);
@@ -93,7 +95,8 @@ namespace TREX {
 	return m_ignore.end()!=m_ignore.find(obj);
       }
 
-      EUROPA::TokenId convert(TREX::transaction::Predicate const &pred, bool rejectable);
+      EUROPA::TokenId convert(TREX::transaction::Predicate const &pred, bool rejectable,
+			      bool undefOnUnknown);
 
       bool inactive() const {
 	return INACTIVE==m_state;

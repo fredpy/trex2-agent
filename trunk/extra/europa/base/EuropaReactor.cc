@@ -44,26 +44,36 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
   }
 
   // Now load solver configuration 
+  #if 0
   std::string solver_cfg = parse_attr<std::string>(xml_factory::node(arg), 
 						   "solverConfig");  
   if( solver_cfg.empty() )
     throw XmlError(xml_factory::node(arg), "solverConfig attribute is empty");
   // MISSING start : how to implement this ?
 
-  // MISSIN end
+  // MISSING end
+  #endif 
   // finally I identify the external end internal timelines
   std::list<EUROPA::ObjectId> objs;
   m_assembly.trex_timelines(objs);
+  syslog()<<"Found "<<objs.size()<<" TREX timeline declarations";
   
   for(std::list<EUROPA::ObjectId>::const_iterator it=objs.begin(); 
       objs.end()!=it; ++it) {
     EUROPA::LabelStr name = (*it)->getName();
-    EUROPA::LabelStr mode = m_assembly.mode(*it);
-    Symbol trex_name(name.c_str());
-    
-    if( Assembly::EXTERNAL_MODE==mode || Assembly::OBSERVE_MODE==mode ) 
-      use(trex_name, Assembly::OBSERVE_MODE!=mode);      
-    else if( Assembly::INTERNAL_MODE==mode ) {
+    Symbol trex_name(name.c_str()), mode_val;
+    EUROPA::ConstrainedVariableId mode = m_assembly.mode(*it);    
+    if( !mode->isSpecified() ) 
+      throw ReactorException(*this, 
+			     "Mode of timeline "+trex_name.str()+" is not specified");
+    else {
+      EUROPA::DataTypeId type = mode->getDataType();
+      mode_val = type->toString(mode->getSpecifiedValue());
+    }
+       
+    if( Assembly::EXTERNAL_MODE==mode_val || Assembly::OBSERVE_MODE==mode_val ) 
+      use(trex_name, Assembly::OBSERVE_MODE!=mode_val);      
+    else if( Assembly::INTERNAL_MODE==mode_val ) {
       provide(trex_name);
       if( !isInternal(trex_name) ) {
 	// Formally it would be better to demote it as External
@@ -71,7 +81,7 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
 	syslog("WARNING")<<"Unable to declare "<<trex_name<<" as Internal ...\n"
 			 <<"\t making it Private.";
       } 
-    } else if( Assembly::IGNORE_MODE==mode ) {
+    } else if( Assembly::IGNORE_MODE==mode_val ) {
       m_assembly.ignore(*it);
     } 
     // everything else is just private ...
@@ -85,30 +95,44 @@ EuropaReactor::~EuropaReactor() {}
 //  - TREX transaction callback 
 
 void EuropaReactor::notify(Observation const &o) {
-  EUROPA::TokenId tok = m_assembly.convert(o, false);
-  // restrict start to current tick
-  tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
-							     getCurrentTick()));
-  tok->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
-							   PLUS_INFINITY));
-  // m_core->notify(tok);
+  EUROPA::TokenId tok = m_assembly.convert(o, false, true);
+
+  if( tok.isId() ) {
+    // restrict start to current tick
+    tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
+							       getCurrentTick()));
+    tok->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
+							     PLUS_INFINITY));
+    // m_core->notify(tok);
+  } else {
+    syslog("ERROR")<<"Failed to produce observation "
+		   <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
+  }
 }
 
 void EuropaReactor::handleRequest(goal_id const &g) {
-  EUROPA::TokenId tok = m_assembly.convert(*g, false);
-  // restrict start, duration and end
-  try {
-    details::europa_restrict(tok->start(), g->getStart());
-    details::europa_restrict(tok->duration(), g->getDuration());
-    details::europa_restrict(tok->end(), g->getEnd());
-  } catch(DomainExcept const &de) {
-    syslog("ERROR")<<"Failed to restrict goal "<<g->object()<<'.'<<g->predicate()
-		   <<'['<<g<<"] temporal attributes: "<<de;
-    return;
+  EUROPA::TokenId tok = m_assembly.convert(*g, true, false);
+
+  if( tok.isId() ) {
+    // restrict start, duration and end
+    try {
+      details::europa_restrict(tok->start(), g->getStart());
+      details::europa_restrict(tok->duration(), g->getDuration());
+      details::europa_restrict(tok->end(), g->getEnd());
+    } catch(DomainExcept const &de) {
+      syslog("ERROR")<<"Failed to restrict goal "<<g->object()<<'.'<<g->predicate()
+		     <<'['<<g<<"] temporal attributes: "<<de;
+      return;
+    }
+    syslog()<<"Received goal "
+	    <<g->object()<<'.'<<g->predicate()<<'['<<g<<']';
+    m_internal_goals[tok->getKey()] = g;
+    if( m_assembly.inactive() )
+      m_assembly.mark_active();
+  } else {
+    syslog("WARN")<<"Ignored unknown goal "
+		  <<g->object()<<'.'<<g->predicate();
   }
-  m_internal_goals[tok->getKey()] = g;
-  if( m_assembly.inactive() )
-    m_assembly.mark_active();
 }
 
 void EuropaReactor::handleRecall(goal_id const &g) {
