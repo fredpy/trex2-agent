@@ -26,7 +26,9 @@ SubDir TOP extra europa ;
   
   ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg cfg/test.nddl ;
   
-  ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc EuropaDomain.cc ;
+  ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc EuropaDomain.cc 
+                       DbCore.cc
+                       ;
 #}
 
 

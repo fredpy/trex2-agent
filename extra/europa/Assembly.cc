@@ -1,23 +1,26 @@
 #include "EuropaReactor.hh"
 #include "bits/europa_convert.hh"
 
-#include "PLASMA/ModuleConstraintEngine.hh"
-#include "PLASMA/ModulePlanDatabase.hh"
-#include "PLASMA/ModuleRulesEngine.hh"
-#include "PLASMA/ModuleTemporalNetwork.hh"
-#include "PLASMA/ModuleSolvers.hh"
-#include "PLASMA/ModuleNddl.hh"
+#include <PLASMA/ModuleConstraintEngine.hh>
+#include <PLASMA/ModulePlanDatabase.hh>
+#include <PLASMA/ModuleRulesEngine.hh>
+#include <PLASMA/ModuleTemporalNetwork.hh>
+#include <PLASMA/ModuleSolvers.hh>
+#include <PLASMA/ModuleNddl.hh>
 
-#include "PLASMA/RulesEngine.hh"
-#include "PLASMA/Propagators.hh"
-#include "PLASMA/Schema.hh"
-#include "PLASMA/NddlInterpreter.hh"
-#include "PLASMA/TokenVariable.hh"
+#include <PLASMA/RulesEngine.hh>
+#include <PLASMA/Propagators.hh>
+#include <PLASMA/Schema.hh>
+#include <PLASMA/NddlInterpreter.hh>
+#include <PLASMA/TokenVariable.hh>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
 using namespace TREX::transaction;
 using namespace TREX::utils;
+
+TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
+  :EuropaException(msg+"; on\n"+tok.toLongString()) {}
 
 /*
  * class TREX::europa::details::Schema
@@ -136,6 +139,19 @@ bool Assembly::isExternal(EUROPA::ObjectId const &obj) const {
     m_reactor.isExternal(obj->getName().c_str());  
 }
 
+bool Assembly::ignored(EUROPA::TokenId const &tok) const {
+  EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
+  std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
+  std::list<EUROPA::ObjectId>::const_iterator o = objs.begin();
+
+  for( ; objs.end()!=o; ++o)     
+    if( !isIgnored(*o) )
+      return false;
+  return !objs.empty();
+}
+  
+
+
 // modifiers 
 
 bool Assembly::playTransaction(std::string const &nddl) {
@@ -219,12 +235,12 @@ EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
 	  try {
 	    europa_restrict(param, i->second.domain());	  
 	  } catch(DomainExcept const &de) {
-	    m_reactor.syslog("WARN")<<"Restriciting attribute "<<i->first
+	    m_reactor.log("WARN")<<"Restriciting attribute "<<i->first
 				    <<" on token "<<pred.object()<<'.'<<pred.predicate()
 				    <<" triggered an exception: "<<de;
 	  }
 	} else 
-	  m_reactor.syslog("WARN")<<"Unknown attribute "<<i->first
+	  m_reactor.log("WARN")<<"Unknown attribute "<<i->first
 				  <<" for token "<<pred.object()<<'.'<<pred.predicate();
       }
       // Set the object
@@ -238,7 +254,7 @@ EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
   if( undefOnUnknown  ) {
     pred_name = timeline->getType().toString()+"."+UNDEFINED_PRED;
     
-    m_reactor.syslog("WARN")<<"predicate "<<pred.object()<<'.'
+    m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
 			    <<pred.predicate()<<" is unknown by europa.\n"
 			    <<"\tReplacing it by "<<UNDEFINED_PRED;
     if( m_schema->isPredicate(pred_name.c_str()) ) {    
@@ -249,9 +265,9 @@ EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
       obj_var->specify(timeline->getKey());
       return tok;
     } else 
-      m_reactor.syslog("WARN")<<"Not even able to create undefined !!!!";
+      m_reactor.log("WARN")<<"Not even able to create undefined !!!!";
   } else 
-    m_reactor.syslog("WARN")<<"predicate "<<pred.object()<<'.'
+    m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
 			    <<pred.predicate()<<" is unknown by europa.\n"
 			    <<"\tIgnoring it.";    
   return EUROPA::TokenId::noId();

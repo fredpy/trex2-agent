@@ -1,7 +1,7 @@
 #ifndef H_EuropaReactor 
 # define H_EuropaReactor 
 
-# include "Assembly.hh"
+# include "DbCore.hh"
 
 # include <trex/transaction/TeleoReactor.hh>
 
@@ -23,6 +23,11 @@ namespace TREX {
 	return m_assembly;
       }
 
+      TREX::utils::internals::LogEntry 
+      log(std::string const &context) {
+	return syslog(context);
+      }
+
     private:
       // TREX transaction callbacks
       void notify(TREX::transaction::Observation const &o);
@@ -42,6 +47,7 @@ namespace TREX {
       europa_mapping m_internal_goals;
 
       Assembly m_assembly;
+      DbCore   m_core;
 
       void reset_deliberation() {
 	m_planStart = getInitialTick();
@@ -50,7 +56,7 @@ namespace TREX {
 
       TREX::transaction::TICK m_planStart;
       unsigned long           m_steps;
-      
+
       friend class Assembly;
     }; //TREX::europa::EuropaReactor
 

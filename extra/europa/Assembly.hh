@@ -19,6 +19,13 @@ namespace TREX {
       virtual ~EuropaException() throw() {}
     }; // TREX::europa::EuropaException
 
+    class TokenError :public EuropaException {
+    public:
+      TokenError(EUROPA::Token const &tok, std::string const &msg) throw();
+      ~TokenError() throw() {}
+    }; // TREX::europa::TokenError
+      
+
     class EuropaReactor;
     class SchemaPlugin;
     class Assembly;
@@ -88,6 +95,8 @@ namespace TREX {
       void ignore(EUROPA::ObjectId const &obj) {
 	m_ignore.insert(obj);
       }
+      bool ignored(EUROPA::TokenId const &obj) const;
+      
 
       bool isInternal(EUROPA::ObjectId const &obj) const;	
       bool isExternal(EUROPA::ObjectId const &obj) const;

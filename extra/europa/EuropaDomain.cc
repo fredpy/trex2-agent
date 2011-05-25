@@ -206,7 +206,7 @@ void europa_domain::visit(BasicEnumerated const *dom) {
 }
 
 void europa_domain::visit(BasicInterval const *dom) {
-  if( m_dom->isEnumerated() ) {
+  if( m_dom->isInterval() ) {
     std::auto_ptr<EUROPA::Domain> tmp(m_dom->copy());
     
     tmp->intersect(m_type->createValue(dom->getStringLower()),
