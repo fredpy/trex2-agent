@@ -1,4 +1,4 @@
-SubDir TREX ;
+SubDir TOP ;
 
 # if ! $(TREX_READY) {
 
@@ -6,16 +6,11 @@ SubDir TREX ;
   TREX_MINOR = 1 ;
   TREX_RELEASE = 1 ;
   
-  SubInclude TREX utils ;
-  SubInclude TREX domain ;
-  SubInclude TREX transaction ;
-  SubInclude TREX agent ;
-  # plugins 
-  SubInclude TREX extra ;
+  SubInclude TOP trex ;
+  SubInclude TOP extra ;
 
   Dist trex2-agent ;
 
   Doxygen doc ;
-
   
 # }

@@ -1,4 +1,4 @@
-SubDir TREX extra lightswitch ;
+SubDir TOP extra lightswitch ;
 
 #if ! $(TREX_READY) {
   ModulePlugin lightswitch : transaction ;
