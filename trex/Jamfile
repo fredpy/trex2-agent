@@ -6,5 +6,6 @@ SubDir TOP trex ;
   SubInclude TOP trex domain ;
   SubInclude TOP trex transaction ;
   SubInclude TOP trex agent ;
+  SubInclude TOP trex cmds ;
 
 # }
