@@ -12,8 +12,8 @@
 # define H_StepClock
 
 # include "Clock.hh"
-# include "LogManager.hh"
-# include "StringExtract.hh"
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/StringExtract.hh>
 
 namespace TREX {
   namespace agent {

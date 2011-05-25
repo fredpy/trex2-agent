@@ -41,9 +41,8 @@ if ! $(ModuleRules_INCLUDED) {
     LOCATE_OBJECTS on $(module) += [ FDirName $(SUBDIR) objects ] ;
     LOCATE_SHARED on $(module) += [ FDirName $($(_top)) lib ] ;
     local inc = [ on $(module) return $(INCLUDES) ] ;
-    inc = [ FMergeList $(inc) $(SUBDIR) ] ;
-    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
-    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
+    # inc = [ FMergeList $(inc) $(SUBDIR) ] ;    
+    inc = [ FMergeList $(inc) [ FDirName $($(_top)) ] ] ;    
     INCLUDES on $(module) = $(inc) ;
   }
 
@@ -66,7 +65,8 @@ if ! $(ModuleRules_INCLUDED) {
     LOCATE_OBJECTS on $(module) += [ FDirName $(SUBDIR) objects ] ;
     LOCATE_SHARED on $(module) += [ FDirName $($(_top)) lib ] ;
     local inc = [ on $(module) return $(INCLUDES) ] ;
-    inc = [ FMergeList $(inc) $(SUBDIR) ] ;
+    # inc = [ FMergeList $(inc) $(SUBDIR) ] ;
+    inc = [ FMergeList $(inc) [ FDirName $($(_top)) ] ] ;
     # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
     # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
     INCLUDES on $(module) = $(inc) ;
@@ -137,10 +137,9 @@ if ! $(ModuleRules_INCLUDED) {
     local files = $(2) ;
     
     local module = $(name:G=module) ;
-    local inc = [ on $(module) return $(INCLUDES) ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) ] ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) bits ] ] ;
-    INCLUDES on $(module) = $(inc) ;
+    # local inc = [ on $(module) return $(INCLUDES) ] ;
+    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) ] ] ;
+    # INCLUDES on $(module) = $(inc) ;
     
     ModulePart $(module) : $(files) ;
   }
@@ -173,7 +172,7 @@ if ! $(ModuleRules_INCLUDED) {
     local headers ; 
     for link in $(links) {
       local module = $(link:G=module) ; 
-      headers += [ on $(module) return $(INCLUDES) ] ;
+      headers = [ FMergeList $(headers) [ on $(module) return $(INCLUDES) ] ] ;
     }
     for file in $(files) {
       if $(file:S) != $(SUFOBJ) {

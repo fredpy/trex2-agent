@@ -1,8 +1,8 @@
 #include <arpa/inet.h>
 #include <boost/array.hpp>
 
-#include "Plugin.hh"
-#include "LogManager.hh"
+#include <trex/utils/Plugin.hh>
+#include <trex/utils/LogManager.hh>
 #include "Vitre.hh"
 
 using namespace TREX::utils;

@@ -13,7 +13,7 @@
 
 # include <boost/shared_ptr.hpp>
 
-# include "rapidxml_utils.hpp"
+# include <rapidxml/rapidxml_utils.hpp>
 # include "StringExtract.hh"
 # include "Exception.hh"
 # include "LogManager.hh"

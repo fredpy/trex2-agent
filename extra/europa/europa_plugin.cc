@@ -1,7 +1,7 @@
 #include "EuropaReactor.hh"
 
-#include "Plugin.hh"
-#include "LogManager.hh"
+#include <trex/utils/Plugin.hh>
+#include <trex/utils/LogManager.hh>
 
 using namespace TREX::europa;
 using namespace TREX::transaction;

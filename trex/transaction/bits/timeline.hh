@@ -1,7 +1,7 @@
 #ifndef H_BITS_timeline 
 # define H_BITS_timeline
 
-# include "Relation.hh"
+# include "../Relation.hh"
 
 namespace TREX {
   namespace transaction {

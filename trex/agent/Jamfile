@@ -3,7 +3,6 @@ SubDir TOP trex agent ;
 # if ! $(TREX_READY) {
 
   Module agent : transaction ;
-  ModuleIncludes agent : $(RAPID_XML) ;
   ModuleFiles agent : Agent.cc Clock.cc RealTimeClock.cc StepClock.cc ;
 
 # }

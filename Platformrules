@@ -145,7 +145,7 @@ if $(OS) = CYGWIN {
 	}
 }
 
-RAPID_XML ?= [ FDirName $(TOP) rapidxml ] ;
+RAPID_XML ?= [ FDirName $($(_top)) ] ;
 BOOST_ROOT ?= [ FDirName usr local ] ;
 
 # Need to check boost version to be 1.37.0 and up

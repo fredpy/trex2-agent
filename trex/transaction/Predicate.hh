@@ -16,7 +16,7 @@
 # include <list>
 
 // put it this way to avoid conflict with Europa
-# include "../../domain/base/Variable.hh"
+# include <trex/domain/Variable.hh>
 
 namespace TREX {
   namespace transaction {

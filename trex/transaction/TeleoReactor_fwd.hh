@@ -17,7 +17,7 @@
 
 # include "Observation.hh"
 # include "Goal.hh"
-# include "id_mapper.hh"
+# include <trex/utils/id_mapper.hh>
 
 namespace TREX {
   namespace transaction {

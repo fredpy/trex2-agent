@@ -42,9 +42,9 @@
  */
 #include <cstring>
 
-#include "Agent.hh"
-#include "RealTimeClock.hh"
-#include "StepClock.hh"
+#include <trex/agent/Agent.hh>
+#include <trex/agent/RealTimeClock.hh>
+#include <trex/agent/StepClock.hh>
 
 using namespace TREX::agent;
 using namespace TREX::utils;

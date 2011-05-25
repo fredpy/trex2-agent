@@ -20,7 +20,7 @@
 
 # include "agent_graph.hh"
 # include "Clock.hh"
-# include "PluginLoader.hh"
+# include <trex/utils/PluginLoader.hh>
 
 namespace TREX {
   namespace agent {

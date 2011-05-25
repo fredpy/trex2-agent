@@ -11,9 +11,9 @@
 #ifndef H_Clock
 #define H_Clock
 
-# include "Tick.hh"
-# include "ErrnoExcept.hh"
-# include "XmlFactory.hh"
+# include <trex/transaction/Tick.hh>
+# include <trex/utils/ErrnoExcept.hh>
+# include <trex/utils/XmlFactory.hh>
 
 namespace TREX {
   namespace agent {
