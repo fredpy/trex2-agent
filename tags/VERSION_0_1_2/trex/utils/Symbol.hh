@@ -1,0 +1,313 @@
+/* -*- C++ -*- */
+/** @file "Symbol.hh"
+ *
+ * Symbol class deintion and utilities
+ *
+ * This header defines the Symbol class. Symbol is a class based on
+ * standard C++ string but managed via  a unique instance reference
+ * counting pointer ensuring better performances and memory management
+ * for constant strings frequenlty used.
+ *
+ * @note In this latest implementation this class is just some wrapper
+ * of @c boost::flyweight class which ewas kept just toavoid heavy
+ * modifications of the client classes.
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
+ */
+#ifndef H_Symbol 
+# define H_Symbol
+
+# include <string>
+
+# include <boost/flyweight.hpp>
+# include <boost/flyweight/no_tracking.hpp>
+# include <boost/flyweight/intermodule_holder.hpp>
+
+# include "IOstreamable.hh"
+# include "Hashable.hh"
+# include "StringExtract.hh"
+
+namespace TREX {
+  namespace utils {
+
+    /** @brief generic symbol class
+     *
+     * @param CharT character type
+     * @param Traits character manipulation traits for @e CharT
+     * @param Alloc  A memory allocator
+     *
+     * This class offer a generic symbol class definition.
+     * A symbol is a a string access point ensuring that there's
+     * no more than one string value stored in memory. It relies
+     * on a unique reference memory managed by a reference counter
+     * to ensure both equality efficiency and better memory management.
+     *
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup utils
+     */
+    template< class CharT, class Traits=std::char_traits<CharT>,
+	      class Alloc=std::allocator<CharT> >
+    class BasicSymbol :public ostreamable, public istreamable, 
+		       public Hashable {
+    public:
+      /** @brief equivalent string type */
+      typedef std::basic_string<CharT, Traits, Alloc> str_type;
+      
+    private:
+      /** @brief the symbol value
+       *
+       * @note I have purposedly set the policy to @c no_tracking.
+       * This implies that all symbol created will remain in
+       * memory until the end of the program. This make sense as
+       * these symbols will be used all along the agent lifetime
+       * but if you think it implies an increasing memory usage you
+       * can change it back by removing this.
+       * @note @c intermodule_holder is used to support dynmic
+       * libraries loading (and/or plug-ins)
+       */
+      typedef typename 
+        boost::flyweight< str_type,
+			  boost::flyweights::no_tracking,
+			  boost::flyweights::intermodule_holder > ref_type;
+
+    public:
+      /** @brief Constructor
+       *
+       * @param str a string
+       *
+       * Create a new symbol with the same value as @e str
+       */
+      BasicSymbol(str_type const &str = str_type()) 
+	:m_name(create(str)) {}
+      /** @brief Constructor
+       *
+       * @param str a string
+       * @param len A length
+       *
+       * Create a new symbol with the value of @e str up to its @e len
+       * character.
+       *
+       * @sa BasicSymbol &reset(CharT const *str, size_t len)
+       */
+      BasicSymbol(CharT const *str, size_t len =str_type::npos)
+	:m_name(create(str, len)) {}
+      /** @brief Copy constructor
+       *
+       * @param other another instance
+       *
+       * Create a new symbol with the same value as @e other
+       */
+      BasicSymbol(BasicSymbol const &other)
+	:m_name(other.m_name) {}
+      /** @brief Destructor */
+      ~BasicSymbol() {
+      }
+
+      /** @brief Asignment operator
+       *
+       * @param other another instance
+       *
+       * Copy the value of @e other into current instance
+       *
+       * @return current instance after operation
+       */
+      BasicSymbol &operator= (BasicSymbol const &other) {
+	m_name = other.m_name;
+	return *this;
+      }
+
+      /** @brief Eeset value
+       *
+       * @param str a string
+       * @param len A length
+       *
+       * Change current instance value with the value of @e str up
+       * to its @e len character.
+       *
+       * @sa BasicSymbol(CharT const *str, size_t len)
+       */
+      BasicSymbol &reset(CharT const *str=NULL, size_t len=str_type::npos) {
+	m_name = create(str, len);
+	return *this;
+      }
+      
+      /** @brief Check for emptyness
+       *
+       * @retval true if length()==0
+       * @retval false otherwise
+       *
+       * @sa size_t length() const
+       */
+      bool empty() const {
+	return m_name.get().empty();
+      }
+      /** @brief Symbol length
+       *
+       * @return the length of the string representing this instance
+       */
+      size_t length() const {
+	return size_t(empty()?0:m_name->size());
+      }
+      
+      /** @brief Equality test
+       *
+       * @param other Another instance
+       *
+       * Test if current instance is equal to @e other. This method
+       * relies on uniquer instance memory to ensure that this test
+       * is done in constant time independently of the string length
+       *
+       * @retval true if current instance is equal to @e other
+       * @retval false otherwise
+       *
+       * @sa bool operator!=(BasicSymbol const &) const
+       */
+      bool operator==(BasicSymbol const &other) const {
+	return m_name==other.m_name;
+      }
+      /** @brief Difference test
+       *
+       * @param other Another instance
+       *
+       * Test if current instance is different from @e other. This method
+       * relies on uniquer instance memory to ensure that this test
+       * is done in constant time independently of the string length
+       *
+       * @retval true if current instance is not equal to @e other
+       * @retval false otherwise
+       *
+       * @sa bool operator==(BasicSymbol const &) const
+       */
+      bool operator!=(BasicSymbol const &other) const {
+	return !operator==(other);
+      }
+      /** @brief Less than test
+       *
+       * @param other instance
+       *
+       * test if current instance is less than @e other. In the
+       * case these two are equals, the operation is accelerated
+       * by the unique instance memory
+       *
+       * @retval true if current instance is before @e other
+       * @retval false  otherwise
+       */
+      bool operator< (BasicSymbol const &other) const;
+      /** @brief Greater than test
+       *
+       * @param other instance
+       *
+       * test if current instance is greater than @e other. In the
+       * case these two are equals, the operation is accelerated
+       * by the unique instance memory
+       *
+       * @retval true if current instance is after @e other
+       * @retval false  otherwise
+       */
+      bool operator> (BasicSymbol const &other) const {
+	return other.operator< (*this);
+      }
+      /** @brief Less or equal to test
+       *
+       * @param other instance
+       *
+       * test if current instance is less or equal @e other. In the
+       * case these two are equals, the operation is accelerated
+       * by the unique instance memory
+       *
+       * @retval false if current instance is after @e other
+       * @retval true  otherwise
+       */
+      bool operator<=(BasicSymbol const &other) const {
+	return !operator> (other);
+      }
+      /** @brief Greater or equal to test
+       *
+       * @param other instance
+       *
+       * test if current instance is greater or equal @e other. In the
+       * case these two are equals, the operation is accelerated
+       * by the unique instance memory
+       *
+       * @retval false if current instance is before @e other
+       * @retval true  otherwise
+       */
+      bool operator>=(BasicSymbol const &other) const {
+	return !operator< (other);
+      }
+
+      /** @brief String value
+       *
+       * @return the equivalent string value to this instance
+       */
+      str_type const &str() const {
+	return m_name.get();
+      }
+
+    private:
+      /** @brief symbol value */
+      ref_type m_name;
+      /** @brief Symbol creation
+       *
+       * @param str A string
+       *
+       * Create a new entry into the unique memory corresponding to
+       * @e str
+       *
+       * @return The reference to the cell corresponding to @e str
+       */
+      static ref_type create(str_type const &str);
+      /** @brief Symbol creation
+       *
+       * @param str A string
+       * @param len a length
+       *
+       * Create a new entry into the unique memory corresponding to
+       * @e str up to the @e len character.
+       *
+       * @return The reference to the cell corresponding 
+       */
+      static ref_type create(CharT const *str, size_t len);
+
+      std::ostream &print_to(std::ostream &out) const;
+      std::istream &read_from(std::istream &in);
+      size_t hash() const;
+
+    }; // TREX::utils::BasicSymbol<>
+
+# define In_H_Symbol
+#  include "bits/Symbol.tcc"
+# undef In_H_Symbol
+
+    /** @brief char based BasicSymbol
+     *
+     * This typedef is the default type one would use to
+     * manipulate symbols. It is the counterpart of the standard
+     * C++ string class.
+     *
+     * @ingroup utils
+     */
+    typedef BasicSymbol<char> Symbol;
+
+    
+    /** @brief string casting specialization
+     * @param in A string
+     * @param format A format
+     * @relates Symbol
+     *
+     * This specialization just copy the content of @a in in a new Symbol
+     *
+     * @return a Symbol with the value of @a in
+     * @ingroup utils
+     */ 
+    template<>
+    inline Symbol string_cast<Symbol>(std::string const &in,
+				      std::ios_base &(*format)(std::ios_base &)) {
+      return Symbol(in);
+    }
+  } // TREX::utils
+} // TREX 
+
+#endif // H_Symbol

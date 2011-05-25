@@ -1,0 +1,34 @@
+#include "TREX.nddl"
+
+class Light extends AgentTimeline {
+    predicate On {}
+    predicate Off {}
+
+    Light(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class Switch extends AgentTimeline {
+    predicate Up {}
+    predicate downs {}
+
+    Switch(Mode _mode) {
+	super(_mode);
+    }
+}
+
+
+Light::On {
+    starts(Switch.downs click);
+    precedes(end, click.end);
+}
+
+Switch::Up {
+    contained_by(Light.Off);
+}
+
+Light light = new Light(Observe);
+Switch switch = new Switch(External);
+
+close();

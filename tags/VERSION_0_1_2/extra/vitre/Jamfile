@@ -1,0 +1,7 @@
+SubDir TOP extra vitre ;
+
+#if ! $(TREX_READY) {
+  ModulePlugin vitre : transaction ;
+  ModuleLibraries vitre : boost_system ;
+  ModuleFiles vitre : Vitre.cc ;
+#}

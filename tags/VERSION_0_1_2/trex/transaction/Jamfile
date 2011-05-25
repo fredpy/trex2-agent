@@ -1,0 +1,12 @@
+SubDir TOP trex transaction ;
+
+# if ! $(TREX_READY) {
+  Module transaction : domain ; 
+  ModuleIncludes transaction : $(RAPID_XML) ;
+  # ModuleLibraries transaction : boost_graph ;
+  ModuleFiles transaction : Predicate.cc Goal.cc Observation.cc TeleoReactor.cc
+                            Relation.cc reactor_graph.cc
+                            # Need to update them :
+                            # TransactionLogger.cc LogPlayer.cc
+                           ;
+# }

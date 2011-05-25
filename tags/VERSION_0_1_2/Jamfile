@@ -1,0 +1,16 @@
+SubDir TOP ;
+
+# if ! $(TREX_READY) {
+
+  TREX_MAJOR = 0 ;
+  TREX_MINOR = 1 ;
+  TREX_RELEASE = 2 ;
+  
+  SubInclude TOP trex ;
+  SubInclude TOP extra ;
+
+  Dist trex2-agent ;
+
+  Doxygen doc ;
+  
+# }
