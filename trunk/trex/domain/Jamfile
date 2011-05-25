@@ -1,9 +1,10 @@
-SubDir TREX domain ;
+SubDir TOP trex domain ;
 
 # if ! $(TREX_READY) {
 
   Module domain : utils ; 
-  SubInclude TREX domain base ;
-  SubInclude TREX domain component ;
+  ModuleIncludes domain : $(RAPID_XML) ;
+  ModuleFiles domain : DomainBase.cc BasicEnumerated.cc BasicInterval.cc Variable.cc
+                       DomainImpl.cc ;
 
 # }
