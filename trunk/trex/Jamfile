@@ -1,0 +1,10 @@
+SubDir TOP trex ;
+
+# if ! $(TREX_READY) {
+
+  SubInclude TOP trex utils ;
+  SubInclude TOP trex domain ;
+  SubInclude TOP trex transaction ;
+  SubInclude TOP trex agent ;
+
+# }
