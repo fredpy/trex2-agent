@@ -2,9 +2,9 @@
 
 #include "bits/europa_convert.hh"
 
-#include "PLASMA/PlanDatabase.hh"
-#include "PLASMA/Token.hh"
-#include "PLASMA/TokenVariable.hh"
+#include <PLASMA/PlanDatabase.hh>
+#include <PLASMA/Token.hh>
+#include <PLASMA/TokenVariable.hh>
 
 using namespace TREX::europa;
 using namespace TREX::transaction;
@@ -17,7 +17,7 @@ using namespace TREX::utils;
 // structors 
 
 EuropaReactor::EuropaReactor(xml_arg_type arg)
-  :TeleoReactor(arg, false), m_assembly(*this) {
+  :TeleoReactor(arg, false), m_assembly(*this), m_core(*this) {
   bool found;
   std::string short_nddl = getName().str()+".nddl",
     long_nddl = getGraphName().str()+short_nddl, 
@@ -108,7 +108,7 @@ void EuropaReactor::notify(Observation const &o) {
 							       getCurrentTick()));
     tok->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
 							     PLUS_INFINITY));
-    // m_core->notify(tok);
+    m_core.notify(tok);
   } else {
     syslog("ERROR")<<"Failed to produce observation "
 		   <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
@@ -129,8 +129,6 @@ void EuropaReactor::handleRequest(goal_id const &g) {
 		     <<'['<<g<<"] temporal attributes: "<<de;
       return;
     }
-    syslog()<<"Received goal "
-	    <<g->object()<<'.'<<g->predicate()<<'['<<g<<']';
     m_internal_goals[tok->getKey()] = g;
     if( m_assembly.inactive() )
       m_assembly.mark_active();
@@ -156,6 +154,23 @@ void EuropaReactor::handleRecall(goal_id const &g) {
 //  - TREX execution callbacks
 
 void EuropaReactor::handleInit() {
+  // Now is the time to set my timing constants in the model
+  EUROPA::ConstrainedVariableId 
+    mission_end = m_assembly.plan_db()->getGlobalVariable(Assembly::MISSION_END),
+    tick_duration = m_assembly.plan_db()->getGlobalVariable(Assembly::TICK_DURATION);
+  if( mission_end.isNoId() )
+    throw ReactorException(*this, "Unable to locate "+Assembly::MISSION_END.toString()+
+			   " in the model");
+  if( tick_duration.isNoId() )
+    throw ReactorException(*this, "Unable to locate "+Assembly::TICK_DURATION.toString()+
+			   " in the model");
+  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(getFinalTick(), 
+							    getFinalTick()));
+  tick_duration->restrictBaseDomain(EUROPA::IntervalIntDomain(tickDuration(),
+							      tickDuration()));
+  
+  // Next thing is to process facts
+  m_core.initialize();
 }
 
 void EuropaReactor::handleTickStart() {
@@ -164,6 +179,8 @@ void EuropaReactor::handleTickStart() {
 }
 
 bool EuropaReactor::synchronize() {
+  m_core.processPending();
+  return !m_assembly.invalid();
 }
 
 bool EuropaReactor::hasWork() {
