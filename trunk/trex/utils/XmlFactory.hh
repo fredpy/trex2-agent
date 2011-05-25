@@ -15,7 +15,7 @@
 # include <utility>
 # include <iostream>
 
-# include "../base/XmlUtils.hh" // avoid conflict with Europa 
+# include "XmlUtils.hh" // avoid conflict with Europa 
 # include "Factory.hh"
 # include "Symbol.hh"
 

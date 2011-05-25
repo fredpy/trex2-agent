@@ -10,7 +10,7 @@
 #ifndef H_BITS_external
 # define H_BITS_external
 
-# include "Goal.hh"
+# include "../Goal.hh"
 # include "timeline.hh"
 
 # include <boost/iterator_adaptors.hpp>

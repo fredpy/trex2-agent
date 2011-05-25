@@ -16,8 +16,8 @@
  */
 #include <iostream>
 
-#include "Plugin.hh"
-#include "LogManager.hh"
+#include <trex/utils/Plugin.hh>
+#include <trex/utils/LogManager.hh>
 #include "LightSwitch.hh"
 
 using namespace TREX::utils;

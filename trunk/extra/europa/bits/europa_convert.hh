@@ -1,10 +1,10 @@
 #ifndef H_europa_convert
 # define H_europa_convert 
 
-# include "PLASMA/Domain.hh"
-# include "PLASMA/DataType.hh"
+# include <PLASMA/Domain.hh>
+# include <PLASMA/DataType.hh>
 
-# include "DomainVisitor.hh"
+# include <trex/domain/DomainVisitor.hh>
 
 namespace TREX {
   namespace europa {

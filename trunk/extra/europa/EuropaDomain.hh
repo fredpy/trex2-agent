@@ -1,9 +1,9 @@
 #ifndef H_EuropaDomain 
 # define H_EuropaDomain
 
-# include "EnumeratedDomain.hh"
+# include <trex/domain/EnumeratedDomain.hh>
 
-# include "PLASMA/Domain.hh"
+# include <PLASMA/Domain.hh>
 
 namespace TREX {
   namespace europa {

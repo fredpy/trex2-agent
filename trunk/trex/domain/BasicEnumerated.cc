@@ -7,7 +7,7 @@
  */
 #include <sstream>
 
-#include "rapidxml_print.hpp"
+#include <rapidxml/rapidxml_print.hpp>
 #include "DomainVisitor.hh"
 
 using namespace TREX::transaction;

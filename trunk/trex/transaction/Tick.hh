@@ -10,7 +10,7 @@
 #ifndef H_Tick
 # define H_Tick
 
-# include "IntegerDomain.hh"
+# include <trex/domain/IntegerDomain.hh>
 
 namespace TREX {
   namespace transaction {

@@ -18,7 +18,7 @@
 # define H_DomainBase
 
 # include <boost/any.hpp>
-# include "XmlFactory.hh"
+# include <trex/utils/XmlFactory.hh>
 # include "DomainVisitor_fwd.hh"
 
 namespace TREX {

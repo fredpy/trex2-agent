@@ -1,7 +1,7 @@
 #ifndef FWD_Agent
 # define FWD_Agent
 
-# include "TeleoReactor_fwd.hh"
+# include <trex/transaction/TeleoReactor_fwd.hh>
 
 namespace TREX {
   namespace agent {

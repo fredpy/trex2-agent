@@ -14,7 +14,7 @@
 # include <boost/static_assert.hpp>
 # include <boost/type_traits.hpp>
 
-# include "Symbol.hh"
+# include <trex/utils/Symbol.hh>
 # include "DomainBase.hh"
 
 namespace TREX {

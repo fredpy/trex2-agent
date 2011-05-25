@@ -9,7 +9,7 @@
 #ifndef H_LightSwitch
 # define H_LightSwitch
 
-# include "TeleoReactor.hh"
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   /** @brief lightswitch plug-in utilities

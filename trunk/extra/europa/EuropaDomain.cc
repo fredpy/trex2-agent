@@ -1,10 +1,10 @@
 #include "EuropaDomain.hh"
 #include "Assembly.hh"
 
-#include "BooleanDomain.hh"
-#include "IntegerDomain.hh"
-#include "FloatDomain.hh"
-#include "StringDomain.hh"
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/IntegerDomain.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/StringDomain.hh>
 
 #include "bits/europa_convert.hh"
 

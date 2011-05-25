@@ -17,9 +17,9 @@
  */
 #include <cctype>
 
-#include "TREXversion.hh"
-#include "Agent.hh"
-#include "StepClock.hh"
+#include <trex/utils/TREXversion.hh>
+#include <trex/agent/Agent.hh>
+#include <trex/agent/StepClock.hh>
 
 using namespace TREX::agent;
 using namespace TREX::utils;

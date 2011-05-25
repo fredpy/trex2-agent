@@ -1,13 +1,13 @@
 #ifndef H_Assembly
 # define H_Assembly
 
-# include "LogManager.hh"
-# include "Predicate.hh"
+# include <trex/utils/LogManager.hh>
+# include <trex/transaction/Predicate.hh>
 
-# include "PLASMA/PlanDatabase.hh"
-# include "PLASMA/RulesEngineDefs.hh"
-# include "PLASMA/Module.hh"
-# include "PLASMA/Engine.hh"
+# include <PLASMA/PlanDatabase.hh>
+# include <PLASMA/RulesEngineDefs.hh>
+# include <PLASMA/Module.hh>
+# include <PLASMA/Engine.hh>
 
 namespace TREX {
   namespace europa {

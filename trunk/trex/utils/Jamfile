@@ -6,6 +6,7 @@ SubDir TOP trex utils ;
 
   ModuleVars utils : RAPID_XML SUFSHARE ;
   ModuleLibraries utils : boost_thread dl ;
+  ModuleIncludes utils : $(RAPID_XML) ;
 
   ObjectC++Flags Pdlfcn.cc : -DSUFSHARE=\\\"$(SUFSHARE)\\\" ;
   ObjectC++Flags TREXversion.cc : -DTREX_MAJOR=$(TREX_MAJOR) 

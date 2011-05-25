@@ -3,7 +3,7 @@
 
 # include <boost/asio.hpp> 
 
-# include "TeleoReactor.hh"
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   namespace vitre {

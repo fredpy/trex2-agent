@@ -3,7 +3,7 @@
 
 # include "Assembly.hh"
 
-# include "TeleoReactor.hh"
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   namespace europa {
