@@ -4,7 +4,7 @@ SubDir TOP ;
 
   TREX_MAJOR = 0 ;
   TREX_MINOR = 1 ;
-  TREX_RELEASE = 1 ;
+  TREX_RELEASE = 2 ;
   
   SubInclude TOP trex ;
   SubInclude TOP extra ;

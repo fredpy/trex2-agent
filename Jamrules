@@ -40,15 +40,16 @@ rule Dist {
 
 rule MakeDist {
   Clean clean : $(1) ;
+  DISTFILES = [ FDirName $($(_top)) * ] ;
   Always $(1) ;
 }
 
-actions MakeDist {
-  tar zcf $(1) -s /\./$(2)/ $(TREX)/*
+actions MakeDist bind DISTFILES {
+  tar zcf $(1) -s /\./$(2)/ $(DISTFILES)
 }
 
 {
-  local SUBDIR = [ FDirName $(TREX) ] ;
+  local SUBDIR = [ FDirName $($(_top)) ] ;
 
   include [ FDirName  $(SUBDIR) Platformrules ] ;
   include [ FDirName  $(SUBDIR) Modulerules ] ;
