@@ -1,4 +1,4 @@
-SubDir TREX extra europa ;
+SubDir TOP extra europa ;
 
 #if ! $(TREX_READY) {
 
@@ -26,7 +26,7 @@ SubDir TREX extra europa ;
   
   ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg cfg/test.nddl ;
   
-  SubInclude TREX extra europa base ;
+  ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc EuropaDomain.cc ;
 #}
 
 
