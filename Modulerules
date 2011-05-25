@@ -42,8 +42,8 @@ if ! $(ModuleRules_INCLUDED) {
     LOCATE_SHARED on $(module) += [ FDirName $($(_top)) lib ] ;
     local inc = [ on $(module) return $(INCLUDES) ] ;
     inc = [ FMergeList $(inc) $(SUBDIR) ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
+    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
+    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
     INCLUDES on $(module) = $(inc) ;
   }
 
@@ -67,8 +67,8 @@ if ! $(ModuleRules_INCLUDED) {
     LOCATE_SHARED on $(module) += [ FDirName $($(_top)) lib ] ;
     local inc = [ on $(module) return $(INCLUDES) ] ;
     inc = [ FMergeList $(inc) $(SUBDIR) ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
-    inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
+    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) base ] ] ;
+    # inc = [ FMergeList $(inc) [ FDirName $(SUBDIR) component ] ] ;
     INCLUDES on $(module) = $(inc) ;
   }
 
