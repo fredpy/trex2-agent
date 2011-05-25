@@ -1,9 +1,9 @@
-SubDir TREX agent ;
+SubDir TOP trex agent ;
 
 # if ! $(TREX_READY) {
 
   Module agent : transaction ;
-  SubInclude TREX agent base ;
-  SubInclude TREX agent component ;
+  ModuleIncludes agent : $(RAPID_XML) ;
+  ModuleFiles agent : Agent.cc Clock.cc RealTimeClock.cc StepClock.cc ;
 
 # }
