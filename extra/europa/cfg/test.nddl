@@ -50,6 +50,6 @@ Switch::Up {
 Light light = new Light(Observe);
 Switch switch = new Switch(External);
 
-Luminance lum = new Switch(Internal);
+Luminance lum = new Luminance(Internal);
 
 close();

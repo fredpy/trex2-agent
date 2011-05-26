@@ -17,7 +17,7 @@ namespace TREX {
       void removed(EUROPA::TokenId const &tok);
       void request(TREX::utils::Symbol const &tl, EUROPA::TokenId const &tok);
       void recall(EUROPA::TokenId const &tok);
-      void notify(TREX::utils::Symbol const &tl, EUROPA::TokenId const &tok);
+      void notify(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
 
       Assembly &assembly() {
 	return m_assembly;

@@ -16,8 +16,10 @@ namespace TREX {
 
       bool initialize();
       void notify(EUROPA::ObjectId const &obj, EUROPA::TokenId const &tok);
+      void doNotify();
 
       bool complete_externals();
+      bool synchronize();
       void commit();
       bool propagate();
       void processPending();
@@ -29,9 +31,23 @@ namespace TREX {
 	return m_observations.end()!=m_observations.find(tok);
       }
       
+      void set_internal(EUROPA::ObjectId const &obj);
 
     private:
       void commit_and_restrict(EUROPA::TokenId const &token);
+      bool merge_token(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand);
+      bool insert_token(EUROPA::TokenId const &tok, size_t &steps);
+      bool resolve_token(EUROPA::TokenId const &tok, size_t &steps, 
+			 EUROPA::TokenId const &cand);
+      bool resolve_tokens(size_t &steps);
+      bool insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &res, 
+			  size_t &steps);
+      bool complete_internals(size_t &steps);
+
+      bool in_tick_horizon(EUROPA::TokenId const &tok) const;
+      bool in_scope(EUROPA::TokenId const &tok) const;
+      bool is_unit(EUROPA::TokenId const &tok, EUROPA::TokenId &cand);
+      bool in_synch_scope(EUROPA::TokenId const &tok, EUROPA::TokenId &cand);
 
       // europa callbacks
       void notifyAdded(EUROPA::TokenId const &token);
@@ -61,7 +77,12 @@ namespace TREX {
       
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_observations;
-      std::map<EUROPA::ObjectId, EUROPA::TokenId> m_last_obs;
+      EUROPA::TokenSet m_completed_obs;
+      
+      typedef std::map<EUROPA::ObjectId, EUROPA::TokenId> current_state_map;
+      
+      current_state_map m_external_obs;
+      current_state_map m_internal_obs;
     }; // TREX::europa::DbCore
     
 
