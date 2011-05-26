@@ -1,5 +1,6 @@
 #include "EuropaReactor.hh"
 #include "bits/europa_convert.hh"
+#include "DbSolver.hh"
 
 #include <PLASMA/ModuleConstraintEngine.hh>
 #include <PLASMA/ModulePlanDatabase.hh>
@@ -13,6 +14,8 @@
 #include <PLASMA/Schema.hh>
 #include <PLASMA/NddlInterpreter.hh>
 #include <PLASMA/TokenVariable.hh>
+
+#include <PLASMA/XMLUtils.hh>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -83,7 +86,7 @@ std::string const Assembly::UNDEFINED_PRED("undefined");
 // structors 
 
 Assembly::Assembly(EuropaReactor &owner)
-  :m_reactor(owner) {
+  :m_reactor(owner), m_solver(NULL) {
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
   addModule((new EUROPA::ModuleConstraintLibrary())->getId());  
   addModule((new EUROPA::ModulePlanDatabase())->getId());
@@ -114,6 +117,10 @@ Assembly::Assembly(EuropaReactor &owner)
 }
 
 Assembly::~Assembly() {
+  if( NULL!=m_solver ) {
+    delete m_solver;
+    m_solver = NULL; // just for being on the safe side ...
+  }
   // cleanup base class
   doShutdown();
 }
@@ -153,6 +160,23 @@ bool Assembly::ignored(EUROPA::TokenId const &tok) const {
 
 
 // modifiers 
+
+void Assembly::configure_solver(std::string const &cfg) {
+  if( NULL==m_solver ) {
+    bool found;
+    std::string file = m_reactor.manager().use(cfg, found);
+    
+    if( !found )
+      throw ReactorException(m_reactor, "Unable to locate solver config file \""+
+			     cfg+"\".");
+    std::auto_ptr<EUROPA::TiXmlElement> xml(EUROPA::initXml(file.c_str()));
+    
+    if( NULL==xml.get() )
+      throw ReactorException(m_reactor, "Unable to parse xml content of "+file);
+    m_solver = new DbSolver(*this, *xml);
+  } else 
+    m_reactor.syslog("WARN")<<"Attempted to configure the solver more than once.";
+}
 
 bool Assembly::playTransaction(std::string const &nddl) {
   bool found;
@@ -211,14 +235,16 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return m_constraintEngine->constraintConsistent();
 }
 
-EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
-				  bool undefOnUnknown) {
+std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
+Assembly::convert(Predicate const &pred, bool rejectable,
+		  bool undefOnUnknown) {
   // create the token
   EUROPA::DbClientId cli =  m_planDatabase->getClient();
   EUROPA::ObjectId timeline = cli->getObject(pred.object().str().c_str());
   std::string 
     pred_name = timeline->getType().toString()+"."+pred.predicate().str();
-
+  
+  
   
   
   EUROPA::TokenId tok;
@@ -247,7 +273,7 @@ EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
       EUROPA::ConstrainedVariableId 
 	obj_var = tok->getObject();
       obj_var->specify(timeline->getKey());
-      return tok;
+      return std::make_pair(timeline, tok);
     }
   }
   // If I am here the mean that I failed 
@@ -263,14 +289,14 @@ EUROPA::TokenId Assembly::convert(Predicate const &pred, bool rejectable,
       EUROPA::ConstrainedVariableId 
 	obj_var = tok->getObject();
       obj_var->specify(timeline->getKey());
-      return tok;
+      return std::make_pair(timeline, tok);
     } else 
       m_reactor.log("WARN")<<"Not even able to create undefined !!!!";
   } else 
     m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
 			    <<pred.predicate()<<" is unknown by europa.\n"
 			    <<"\tIgnoring it.";    
-  return EUROPA::TokenId::noId();
+  return std::make_pair(timeline, EUROPA::TokenId::noId());
 }
 
 void Assembly::mark_active() {

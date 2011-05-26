@@ -1,4 +1,5 @@
 #include "EuropaReactor.hh"
+#include "DbSolver.hh"
 
 #include "bits/europa_convert.hh"
 
@@ -44,15 +45,11 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
   }
 
   // Now load solver configuration 
-  #if 0
   std::string solver_cfg = parse_attr<std::string>(xml_factory::node(arg), 
 						   "solverConfig");  
   if( solver_cfg.empty() )
     throw XmlError(xml_factory::node(arg), "solverConfig attribute is empty");
-  // MISSING start : how to implement this ?
-
-  // MISSING end
-  #endif 
+  m_assembly.configure_solver(solver_cfg);
   // finally I identify the external end internal timelines
   std::list<EUROPA::ObjectId> objs;
   m_assembly.trex_timelines(objs);
@@ -100,15 +97,16 @@ EuropaReactor::~EuropaReactor() {}
 //  - TREX transaction callback 
 
 void EuropaReactor::notify(Observation const &o) {
-  EUROPA::TokenId tok = m_assembly.convert(o, false, true);
+  std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
+    ret = m_assembly.convert(o, false, true);
 
-  if( tok.isId() ) {
+  if( ret.second.isId() ) {
     // restrict start to current tick
-    tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
+    ret.second->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
 							       getCurrentTick()));
-    tok->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
+    ret.second->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
 							     PLUS_INFINITY));
-    m_core.notify(tok);
+    m_core.notify(ret.first, ret.second);
   } else {
     syslog("ERROR")<<"Failed to produce observation "
 		   <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
@@ -116,7 +114,7 @@ void EuropaReactor::notify(Observation const &o) {
 }
 
 void EuropaReactor::handleRequest(goal_id const &g) {
-  EUROPA::TokenId tok = m_assembly.convert(*g, true, false);
+  EUROPA::TokenId tok = m_assembly.convert(*g, true, false).second;
 
   if( tok.isId() ) {
     // restrict start, duration and end
@@ -180,6 +178,9 @@ void EuropaReactor::handleTickStart() {
 
 bool EuropaReactor::synchronize() {
   m_core.processPending();
+  if( !( m_core.complete_externals() /* && m_core->synchronize() */ ) ) {
+    m_assembly.solver().reset();
+  }
   return !m_assembly.invalid();
 }
 

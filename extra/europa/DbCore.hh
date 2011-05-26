@@ -4,6 +4,7 @@
 # include "Assembly.hh"
 
 # include <PLASMA/PlanDatabaseListener.hh>
+# include <PLASMA/Token.hh>
 
 namespace TREX {
   namespace europa {
@@ -14,12 +15,24 @@ namespace TREX {
       ~DbCore();
 
       bool initialize();
-      void notify(EUROPA::TokenId const &tok);
+      void notify(EUROPA::ObjectId const &obj, EUROPA::TokenId const &tok);
 
+      bool complete_externals();
+      void commit();
       bool propagate();
       void processPending();
 
+      bool is_goal(EUROPA::TokenId const &tok) const {
+	return m_goals.end()!=m_goals.find(tok);
+      }
+      bool is_observation(EUROPA::TokenId const &tok) const {
+	return m_observations.end()!=m_observations.find(tok);
+      }
+      
+
     private:
+      void commit_and_restrict(EUROPA::TokenId const &token);
+
       // europa callbacks
       void notifyAdded(EUROPA::TokenId const &token);
       void notfiyRemoved(EUROPA::TokenId const &Token);
@@ -48,6 +61,7 @@ namespace TREX {
       
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_observations;
+      std::map<EUROPA::ObjectId, EUROPA::TokenId> m_last_obs;
     }; // TREX::europa::DbCore
     
 

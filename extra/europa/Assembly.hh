@@ -11,7 +11,7 @@
 
 namespace TREX {
   namespace europa {
-
+    
     class EuropaException :public TREX::utils::Exception {
     public:
       EuropaException(std::string const &msg) throw() 
@@ -49,6 +49,8 @@ namespace TREX {
       
     } // TREX::europa::details
 
+    class DbSolver;
+
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     public:
       static TREX::utils::Symbol const EXTERNAL_MODE;
@@ -66,6 +68,7 @@ namespace TREX {
       ~Assembly();
 
       bool playTransaction(std::string const &nddl);
+      void configure_solver(std::string const &cfg);
       
       EUROPA::SchemaId const &schema() const {
 	return m_schema;
@@ -88,6 +91,10 @@ namespace TREX {
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
 	return attribute(obj, DEFAULT_ATTR);
       }
+      DbSolver &solver() const {
+	return *m_solver;
+      }
+
       void trex_timelines(std::list<EUROPA::ObjectId> &objs) const {
 	m_planDatabase->getObjectsByType(TREX_TIMELINE, objs);
       }
@@ -104,8 +111,9 @@ namespace TREX {
 	return m_ignore.end()!=m_ignore.find(obj);
       }
 
-      EUROPA::TokenId convert(TREX::transaction::Predicate const &pred, bool rejectable,
-			      bool undefOnUnknown);
+      std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
+      convert(TREX::transaction::Predicate const &pred, bool rejectable,
+	      bool undefOnUnknown);
 
       bool inactive() const {
 	return INACTIVE==m_state;
@@ -132,6 +140,7 @@ namespace TREX {
       };
       State m_state;
       EuropaReactor &m_reactor;
+      DbSolver      *m_solver;
 
       EUROPA::SchemaId           m_schema;
       EUROPA::ConstraintEngineId m_constraintEngine;

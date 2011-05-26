@@ -30,9 +30,70 @@ bool DbCore::initialize() {
   return propagate();  
 }
 
-void DbCore::notify(EUROPA::TokenId const &tok) {
+void DbCore::notify(EUROPA::ObjectId const &obj, EUROPA::TokenId const &tok) {
   m_observations.insert(tok);
+  m_last_obs[obj] = tok;
+  m_reactor.log("core")<<"OBS "<<tok->toString()
+		       <<": "<<obj->getName().toString()<<'.'
+		       <<tok->getUnqualifiedPredicateName().toString();
 }
+
+void DbCore::commit_and_restrict(EUROPA::TokenId const &token) {
+  token->commit();
+  token->getState()->touch(); // notify the solver
+  // propagate constraints before doing anything 
+  propagate();
+  
+  token->getObject()->restrictBaseDomain(token->getObject()->lastDomain());
+  // restrict start to its current value 
+  token->start()->restrictBaseDomain(token->start()->lastDomain());
+  if( token->end()->lastDomain().getUpperBound() < m_reactor.getCurrentTick() )
+    token->end()->restrictBaseDomain(token->end()->lastDomain());
+  else 
+    token->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(m_reactor.getCurrentTick(), 
+							       PLUS_INFINITY));
+}
+
+bool DbCore::complete_externals() {
+  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+  EUROPA::IntervalIntDomain future(cur+1, PLUS_INFINITY);
+
+  for(std::map<EUROPA::ObjectId, EUROPA::TokenId>::const_iterator it=m_last_obs.begin();
+      m_last_obs.end()!=it; ++it) {
+    if( it->second->end()->lastDomain().getUpperBound()==cur ) {
+      m_reactor.log(it->first->getName().toString())<<"Missed expected observation.\n";
+      m_reactor.assembly().mark_invalid();
+      return false;
+    }
+    it->second->end()->restrictBaseDomain(future);
+    if( !propagate() ) {
+      m_reactor.log(it->first->getName().toString())
+	<<"Failed to apply inertial value assumption.";
+      m_reactor.assembly().mark_invalid();
+      return false;
+    }
+  }
+  return true;
+}
+
+
+void DbCore::commit() {
+  if( !m_reactor.assembly().invalid() ) {
+    for(EUROPA::TokenSet::const_iterator it=m_observations.begin(); 
+	m_observations.end()!=it; ++it) {
+#ifdef BACKWARD
+      EUROPA::TokenId active = ((*it)->isActive()?*it:(*it)->getActiveToken());
+#else 
+      EUROPA::TokenId active = *it;
+#endif
+      if( !active->isCommitted() )
+	commit_and_restrict(active);
+      if( !propagate() )
+	return;
+    }
+  }
+}
+
 
 void DbCore::apply_facts(std::list<EUROPA::TokenId> const &facts) {
   EUROPA::IntervalIntDomain mission_scope(m_reactor.getInitialTick(), 

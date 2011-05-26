@@ -11,17 +11,36 @@ class Light extends AgentTimeline {
 
 class Switch extends AgentTimeline {
     predicate Up {}
-    predicate downs {}
+    predicate Down {}
 
     Switch(Mode _mode) {
 	super(_mode);
     }
 }
 
+class Luminance extends AgentTimeline {
+    predicate Bright {}
+    predicate Dim {}
+    
+    Luminance(Mode _mode) {
+	super(_mode);
+    }
+}
+
+Luminance::Bright {
+    met_by(Light.Off);
+    meets(Light.Off);
+}
 
 Light::On {
-    starts(Switch.downs click);
+    starts(Switch.Down click);
     precedes(end, click.end);
+    contained_by(Luminance.Bright);
+}
+
+
+Light::Off {
+    contained_by(Luminance.Dim);
 }
 
 Switch::Up {
@@ -30,5 +49,7 @@ Switch::Up {
 
 Light light = new Light(Observe);
 Switch switch = new Switch(External);
+
+Luminance lum = new Switch(Internal);
 
 close();
