@@ -315,6 +315,62 @@ bool DbCore::resolve_token(EUROPA::TokenId const &tok, size_t &steps,
   return false;
 }
 
+void DbCore::recall(EUROPA::eint const &g) {
+  m_recalls.insert(g);
+}
+
+bool DbCore::process_recalls() {
+  bool recalls = false;
+  
+  for(std::set<EUROPA::eint>::iterator i=m_recalls.begin();
+      m_recalls.end()!=i; ++i) {
+    EUROPA::EntityId entity = EUROPA::Entity::getEntity(*i);
+    if( entity.isId() ) {
+      EUROPA::TokenId tok(entity);
+      token->discard();
+      recalls = true;
+    } 
+  }
+  m_recalls.clear();
+  return recalls;
+}
+
+void DbCore::reset_observations() {
+  EUROPA::TokenSet observations = m_observations;
+  EUROPA::IntervalIntDomain future(m_reactor.getCurrentTick()+1, PLUS_INFINITY);
+  
+  for(EUROPA::TokenSet::iterator i=observations.begin(); observations.end()!=i; ++i) {
+    EUROPA::TokenSet merged = (*i)->getMergedTokens();
+    for(EUROPA::TokenSet::const_iterator j=merged.begin(); merged.end()!=j; ++j)
+      (*j)->cancel();
+    if( is_current(*i) ) {
+      if( !( (*i)->isCommitted() || (*i)->isInactive() ) )
+	(*i)->cancel();
+      if( (*i)->end()->isSpecified() )
+	(*i)->end()->reset();
+      else 
+	(*i)->end()->relax();
+      (*i)->end()->restrictBaseDomain(future);
+    } else 
+      (*i)->discard();    
+  }
+}
+
+void DbCore::reset_goals(bool discard) {
+}
+
+void DbCore::reset_other_tokens() {
+}
+
+
+bool DbCore::relax(bool discard) {
+  m_reactor.log("core")<<"Beginning database relax.";
+  reset_observations();
+  reset_goals(discard);
+  reset_other_tokens();
+  
+}
+
 bool DbCore::resolve_tokens(size_t &steps) {
   size_t last_count;
 

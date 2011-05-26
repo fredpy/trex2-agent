@@ -14,6 +14,9 @@ namespace TREX {
       explicit DbCore(EuropaReactor &owner);
       ~DbCore();
 
+      void recall(EUROPA::eint const &g);
+      bool process_recalls();
+
       bool initialize();
       void notify(EUROPA::ObjectId const &obj, EUROPA::TokenId const &tok);
       void doNotify();
@@ -23,6 +26,8 @@ namespace TREX {
       void commit();
       bool propagate();
       void processPending();
+      
+      bool relax(bool discard);
 
       bool is_goal(EUROPA::TokenId const &tok) const {
 	return m_goals.end()!=m_goals.find(tok);
@@ -34,6 +39,12 @@ namespace TREX {
       void set_internal(EUROPA::ObjectId const &obj);
 
     private:
+      bool is_current(EUROPA::TokenId const &tok) const;
+
+      void reset_observations();
+      void reset_goals(bool discard);
+      void reset_other_tokens();
+
       void commit_and_restrict(EUROPA::TokenId const &token);
       bool merge_token(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand);
       bool insert_token(EUROPA::TokenId const &tok, size_t &steps);
@@ -78,8 +89,10 @@ namespace TREX {
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_observations;
       EUROPA::TokenSet m_completed_obs;
+
+      std::set<EUROPA::eint> m_recalls;
       
-      typedef std::map<EUROPA::ObjectId, EUROPA::TokenId> current_state_map;
+      typedef std::map<EUROPA::ObjectId, EUROPA::TokenId> current_state_map;      
       
       current_state_map m_external_obs;
       current_state_map m_internal_obs;
