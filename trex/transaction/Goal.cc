@@ -192,15 +192,15 @@ Variable const &Goal::getAttribute(Symbol const &name) const {
 }
 
 IntegerDomain const &Goal::getStart() const {
-  m_start.typedDomain<IntegerDomain>();
+  return m_start.typedDomain<IntegerDomain>();
 }
 
 IntegerDomain const &Goal::getDuration() const {
-  m_duration.typedDomain<IntegerDomain>();
+  return m_duration.typedDomain<IntegerDomain>();
 }
 
 IntegerDomain const &Goal::getEnd() const {
-  m_end.typedDomain<IntegerDomain>();
+  return m_end.typedDomain<IntegerDomain>();
 }
 
 
