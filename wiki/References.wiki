@@ -2,4 +2,4 @@
 
 = References =
 
-<a name="aamas10">`[aamas 2010]`</a> A Systematic Agent Framework for Situated Autonomous Systems. F. Py, K. Rajan & C. McGann. _9th Int. Conf. on Autonomous Agents and Multiagent Systems (AAMAS)_ ,  May 2010, Toronto, Canada.
+<a name="aamas10">`[aamas 2010]`</a> [http://www.mbari.org/autonomy/Publications/aamas10.pdf  A Systematic Agent Framework for Situated Autonomous Systems]. F. Py, K. Rajan & C. !McGann  _9th Int. Conf. on Autonomous Agents and Multiagent Systems (AAMAS)_ ,  May 2010, Toronto, Canada.
