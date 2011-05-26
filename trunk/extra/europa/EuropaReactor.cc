@@ -182,7 +182,7 @@ bool EuropaReactor::synchronize() {
   m_core.processPending();
   if( !( m_core.complete_externals() && m_core.synchronize()) ) {
     m_assembly.solver().reset();
-    // bool discard_curren_vals = process_recalls();
+    bool discard_current_vals = m_core.process_recalls();
     m_assembly.mark_inactive();
     // bool relax_failed = !m_core.relax(false);
     // bool resolve_failed = !m_core.synchronize();
