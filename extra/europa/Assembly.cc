@@ -308,7 +308,7 @@ Assembly::convert(Predicate const &pred, bool rejectable,
     pred_name = timeline->getType().toString()+"."+UNDEFINED_PRED;
     
     m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
-			    <<pred.predicate()<<" is unknown by europa.\n"
+			    <<pred.predicate()<<" is unknown by the model.\n"
 			    <<"\tReplacing it by "<<UNDEFINED_PRED;
     if( m_schema->isPredicate(pred_name.c_str()) ) {    
       tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
@@ -317,11 +317,16 @@ Assembly::convert(Predicate const &pred, bool rejectable,
 	obj_var = tok->getObject();
       obj_var->specify(timeline->getKey());
       return std::make_pair(timeline, tok);
-    } else 
-      m_reactor.log("WARN")<<"Not even able to create undefined !!!!";
+    } else {
+      // This should never happen
+      std::ostringstream oss;
+      oss<<"Unable to create "<<UNDEFINED_PRED<<" on timeline "
+	 <<timeline->getName().toString();
+      throw EuropaException(oss.str());
+    }
   } else 
     m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
-			    <<pred.predicate()<<" is unknown by europa.\n"
+			    <<pred.predicate()<<" is unknown by the model.\n"
 			    <<"\tIgnoring it.";    
   return std::make_pair(timeline, EUROPA::TokenId::noId());
 }
