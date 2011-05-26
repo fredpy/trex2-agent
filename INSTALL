@@ -23,13 +23,23 @@ Other utilies are of interrest but not necessary to use TREX:
  - graphviz (http://www.graphviz.org/) Recommended for documentation but it 
             may also be used for plan visualization by showing tokens and 
             their relations as a graph.
+To compile trex linbraries there's currently two approaches supported:
+
+ - jam (http://www.perforce.com/jam/jam.html) the compilation utility used until now 
+       for compiling TREX. The version used is jam 2.5.
+ - cmake (http://www.cmake.org/) newly added which -- among other things -- allows to 
+       integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+
+Note:
+    The support of these two tools is temporary. Indeed jam proved to be more and more 
+    difficult to maintain as the project grew in size and flexibility. cmake is the 
+    candidate to replace it and if it proves to be well suited will make jam support 
+    deprecated.
 
 For europa plug-in :
   - europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above.
                this is the core libaray used for planning on the EuropaReactor
 	       Simply install the binary distribution provided for your platform
-	       Note : Europa does not compile on gcc 4.3 and above. Because of
-	       	      this make sure that your version of gcc is 4.1.x or 4.2.x
 
 Note:
   rapidxml is bundled into TREX. Nothing as been changed in this libray and if
@@ -109,7 +119,51 @@ are organized as follow (see doc/fig/SWarchi.png):
   - Configurations files Usually under cfg. A set of configuration files that 
         can be used to define new agents and/or reactors.
 
-Compiling the core components (main libraries and commands) is done with the command jam.
+==============================================================================
+Compiling with jam
+------------------------------------------------------------------------------
 
-Compilation of the plug-ins is done using the command jam <name>
+You need to make sure that your envoironment is correctly set 
+(see "2) Set your environment" above).
 
+Warning:
+	*All* the jam commands should be run from $TREX_HOME
+
+To compile the core components just run the command jam :
+> jam
+
+Compilation of plug-ins is done either individualy. Exampe=le for the plug-in vitre :
+> jam vitre
+or globally with the target plugins
+> jam plugins
+
+You can generate the doc using doxygen by running :
+> jame doc
+
+
+==============================================================================
+Compiling with cmake
+------------------------------------------------------------------------------
+
+More details can be found on cmake official documentation 
+(http://www.cmake.org/cmake/help/runningcmake.html). 
+But here's a quick tutorial to use make as the end compilation tool :
+
+Create your working directory :
+> mkdir trex2.build
+> cd trex2.build
+
+run cmake by passing the location of the source tree as argument (we'll assume 
+that trex2.build is ate the same level as trex2-agent source directory)
+> cmake ../trex2-agent/
+
+If no error occured, you can just run make as usual
+> make
+
+Note :
+     Right now camke compiles everything by default. This is a first integration 
+     and we will make sure in the future that the behavior is closer to what we 
+     have with jam where plug-ins are only compiled on demand.
+
+Finally you can generate the documentation from doxygen using :
+> make doc

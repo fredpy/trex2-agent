@@ -151,8 +151,8 @@ running @c jam @c doc
 
 @subsection install-cmake Compiling with cmake
 
-More details can be found on cmake @link http://www.cmake.org/cmake/help/runningcmake.html 
- official documentation @endlink. But here's a quick tutorial to use make as the end
+More details can be found on cmake <a href="http://www.cmake.org/cmake/help/runningcmake.html">
+ official documentation</a>. But here's a quick tutorial to use make as the end
  compilation tool.
 
 Create your working directory :
@@ -257,9 +257,14 @@ Linking CXX executable sim
 [100%] Built target sim
 @endcode 
 
-@note Right now cmake caompiles everything by default. This is a first integration
+@note Right now cmake compiles everything by default. This is a first integration
       and we will make sure in the future that the behavior is closer to what we
       have with jam where plug-ins are only compiled on demand.
+
+Finally, if you want ot gernate this doc just do :
+@code 
+> make doc
+@endcode
 
 @section Running an example
 
