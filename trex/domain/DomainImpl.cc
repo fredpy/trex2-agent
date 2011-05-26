@@ -1,5 +1,5 @@
 /** @file "DomainImpl.cc
- * @brief Various domains implemetation
+ * @brief Various domains implementation
  *
  * This file implements the code for domains which are part of the TREX
  * core.
