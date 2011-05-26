@@ -280,7 +280,7 @@ if ! $(ModuleRules_INCLUDED) {
 
   rule ModuleCfg {
     local name = $(1:G=) ;
-    local files = $(2) ;
+    local files = [ FGristFiles $(2) ] ;
     local kind = [ on $(name:G=module) return $(KIND) ] ;
 
     local dest ;
@@ -289,9 +289,12 @@ if ! $(ModuleRules_INCLUDED) {
     } else {
        dest = [ FDirName $($(_top)) plugin ] ;
     }
- 
-    MakeLocate $(name) $(files:D=) : [ FDirName $(dest) cfg ] ;
-    Depends $(name) : $(files:D=) ;
+
+    for file in $(files) {
+      MakeLocate $(file:D=) : [ FDirName $(dest) cfg ] ;
+      Depends $(name:G=module) : [ FGristFiles $(file:D=) ] ;
+    }
+    
     Clean clean : $(files:D=) ;
     for f in $(files) {
       File $(f:D=) : $(f) ;
