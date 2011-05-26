@@ -34,7 +34,8 @@ graph::graph(Symbol const &name, TICK init)
 
 graph::graph(Symbol const &name, ext_iterator const &conf, TICK init) 
   :m_name(name), m_currentTick(init) {
-  size_t number = add_reactors(conf);
+      size_t number = add_reactors(conf);
+      syslog()<<"Created "<<number<<" reactors.";
 }
 
 graph::~graph() {

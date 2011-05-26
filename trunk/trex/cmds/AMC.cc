@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
       return -1;
     }
   }
-  Agent agent(argv[1], clk.release());
+  Agent agent(configFile, clk.release());
   agent.setClock(new RealTimeClock(1.0));
   agent.run();
   return 0;

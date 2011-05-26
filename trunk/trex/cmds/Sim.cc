@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 
   if( argc>=3 )
     clk.reset(new StepClock(0, string_cast<size_t>(argv[2])));
-  Agent agent(argv[1], clk.release());
+  Agent agent(configFile, clk.release());
   agent.setClock(new StepClock(0, 60));
   agent.initComplete();
   printHelp();

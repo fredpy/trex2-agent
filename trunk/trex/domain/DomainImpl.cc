@@ -57,11 +57,12 @@ BooleanDomain::BooleanDomain(rapidxml::xml_node<> const &node)
 
 std::ostream &BooleanDomain::toXml(std::ostream &out, 
 				   size_t tabs) const {
-  std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-  out<<"<bool";
-  if( !m_full )
-    out<<" value=\""<<m_val<<'\"';
-  out<<"/>";
+    std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
+    out<<"<bool";
+    if( !m_full )
+        out<<" value=\""<<m_val<<'\"';
+    out<<"/>";
+    return out;
 }
 
 

@@ -329,12 +329,13 @@ namespace TREX {
 	~AgentProxy() {}
 	
 	bool postRequest(TREX::transaction::goal_id const &g) {
-	  if( !isExternal(g->object()) )
-	    use(g->object());
-	  if( isExternal(g->object()) )
-	    postGoal(g);
-	  else
-	    syslog("ERROR")<<"Unable to subscribe to "<<g->object();
+        if( !isExternal(g->object()) )
+            use(g->object());
+        if( isExternal(g->object()) )
+            return postGoal(g);
+        else
+            syslog("ERROR")<<"Unable to subscribe to "<<g->object();
+        return false;
 	}
 
       private:
