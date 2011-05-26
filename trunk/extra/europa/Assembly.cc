@@ -127,6 +127,25 @@ Assembly::~Assembly() {
 
 // observers 
 
+void Assembly::check_default(EUROPA::ObjectId const &obj) const {
+  EUROPA::ConstrainedVariableId var = default_pred(obj);
+  std::ostringstream oss;
+
+  if( var.isNoId() || !var->isSpecified() ) {
+    oss<<"Internal timeline "<<obj->getName().toString()
+       <<" does not specify its "<<DEFAULT_ATTR;
+    throw EuropaException(oss.str());
+  }
+  EUROPA::DataTypeId type = var->getDataType();
+  std::string short_pred = type->toString(var->getSpecifiedValue()),
+    long_pred = obj->getType().toString()+"."+short_pred;
+  if( !m_schema->isPredicate(long_pred.c_str()) ) {
+    oss<<"Internal timeline "<<obj->getName().toString()
+       <<" default predicate \""<<short_pred<<"\" does not exist";
+    throw EuropaException(oss.str());
+  }
+}
+
 EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj, 
 						  std::string const &attr) const {
   std::string full_name = obj->getName().toString()+"."+attr;
@@ -156,8 +175,16 @@ bool Assembly::ignored(EUROPA::TokenId const &tok) const {
       return false;
   return !objs.empty();
 }
-  
 
+bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
+  if( ignored(tok) )
+    return false;
+  if( tok->getState()->lastDomain().isMember(EUROPA::Token::REJECTED) )
+    return true;
+  if( !active() || tok->isCommitted() )
+    return false;
+  return m_solver->inDeliberation(tok);
+}
 
 // modifiers 
 

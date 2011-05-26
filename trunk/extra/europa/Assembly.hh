@@ -91,6 +91,7 @@ namespace TREX {
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
 	return attribute(obj, DEFAULT_ATTR);
       }
+      void check_default(EUROPA::ObjectId const &obj) const;
       DbSolver &solver() const {
 	return *m_solver;
       }
@@ -102,7 +103,8 @@ namespace TREX {
       void ignore(EUROPA::ObjectId const &obj) {
 	m_ignore.insert(obj);
       }
-      bool ignored(EUROPA::TokenId const &obj) const;
+      bool ignored(EUROPA::TokenId const &tok) const;
+      bool in_deliberation(EUROPA::TokenId const &tok) const;
       
 
       bool isInternal(EUROPA::ObjectId const &obj) const;	

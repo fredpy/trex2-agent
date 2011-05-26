@@ -71,13 +71,15 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
     if( Assembly::EXTERNAL_MODE==mode_val || Assembly::OBSERVE_MODE==mode_val ) 
       use(trex_name, Assembly::OBSERVE_MODE!=mode_val);      
     else if( Assembly::INTERNAL_MODE==mode_val ) {
+      m_assembly.check_default(*it);
       provide(trex_name);
       if( !isInternal(trex_name) ) {
 	// Formally it would be better to demote it as External
 	// but for now we will just hide this timeline to the rest of the world
 	syslog("WARN")<<"Unable to declare "<<trex_name<<" as Internal ...\n"
 		      <<"\t making it Private.";
-      } 
+      } else 
+	m_core.set_internal(*it);
     } else if( Assembly::IGNORE_MODE==mode_val ) {
       m_assembly.ignore(*it);
     } else {
@@ -178,9 +180,24 @@ void EuropaReactor::handleTickStart() {
 
 bool EuropaReactor::synchronize() {
   m_core.processPending();
-  if( !( m_core.complete_externals() /* && m_core->synchronize() */ ) ) {
+  if( !( m_core.complete_externals() && m_core.synchronize()) ) {
     m_assembly.solver().reset();
+    // bool discard_curren_vals = process_recalls();
+    m_assembly.mark_inactive();
+    // bool relax_failed = !m_core.relax(false);
+    // bool resolve_failed = !m_core.synchronize();
+    // if( discard_curren_vals || relax_failed || relax_failed ) {
+    //   m_assembly.mark_inactive();
+    //   relax_failed = m_core.relax(true);
+    //   resolve_failed = m_core.synchronize();
+    //   if( relax_failed || relax_failed )
+    //      return false;
+    // }
   }
+  m_core.commit();
+  m_core.doNotify();
+  // update_goals();
+
   return !m_assembly.invalid();
 }
 
@@ -230,9 +247,10 @@ void EuropaReactor::recall(EUROPA::TokenId const &tok) {
   }
 }
 
-void EuropaReactor::notify(Symbol const &tl, 
+void EuropaReactor::notify(EUROPA::ObjectId const &tl, 
 			   EUROPA::TokenId const &tok) {
-  Observation obs(tl, tok->getUnqualifiedPredicateName().toString());
+  Observation obs(tl->getName().c_str(), 
+		  tok->getUnqualifiedPredicateName().toString());
   
   // populate the observation 
 
