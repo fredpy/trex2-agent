@@ -60,6 +60,8 @@ Symbol const Light::upPred("Up");
 
 Symbol const Light::downPred("Down");
 
+Symbol const Light::brokenPred("Broken");
+
 Symbol const Light::switchObj("switch");
 
 
@@ -103,12 +105,18 @@ bool Light::synchronize() {
 	if( m_pending.front()->startsAfter(cur) ) {
 	  // it can start after cur
 	  if( m_pending.front()->startsBefore(cur) ) {
+	    
 	    // it can also starts before cur => it can be set to cur 
-	    setValue(downPred==m_pending.front()->predicate());
+	    if( brokenPred!=m_pending.front()->predicate() )
+	      setValue(downPred==m_pending.front()->predicate());
+	    else {
+	      Observation obs(*m_pending.front());
+	      postObservation(obs);
+	    }
 	    m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
 	    m_pending.pop_front();
 	  }
-	  // if we reched this point that mesans that the goal
+	  // if we reached this point that mesans that the goal
 	  // necessarily starts in the future (or has been
 	  // processed)
 	  break;
@@ -123,7 +131,7 @@ bool Light::synchronize() {
 }
 
 void Light::handleRequest(goal_id const &g) {
-  if( g->predicate()==upPred || g->predicate()==downPred ) {
+  if( g->predicate()==upPred || g->predicate()==downPred || g->predicate()==brokenPred ) {
     // I insert it on my list
     IntegerDomain::bound lo = g->getStart().lowerBound();
     if( lo.isInfinity() ) {

@@ -73,6 +73,8 @@ namespace TREX {
       static TREX::utils::Symbol const upPred;
       /** @brief Name of the predicate down */
       static TREX::utils::Symbol const downPred;
+      /** @brief Name of the predicate broken */
+      static TREX::utils::Symbol const brokenPred;
 
       /** @brief Name of the timeline for light */
       static TREX::utils::Symbol const lightObj;
