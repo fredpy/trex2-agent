@@ -16,9 +16,6 @@ representation expected by TREX.
 
 TREX uses third party utilities and libraries. Here's sa list of them
 : 
-@li @b jam (http://www.perforce.com/jam/jam.html) This is a @c make
-replacement utility used to compile TREX. The version used during
-development was jam 2.5
 @li @b rapidXML (http://rapidxml.sourceforge.net/) This is used for
 configuration parsing.  TREX used to rely on TinyXML version embedded
 in Europa but keeping this would have been annoying as this version
@@ -45,6 +42,18 @@ showing tokens and their relations as a graph.
 libray and if one prefers to use another version of this library he
 justs need to define the environment variable @c TINY_XML_ROOT with
 the directory where this one is before compiling TREX.
+
+To compile trex linbraries ther's currently two approaches supported:
+@li @b jam (http://www.perforce.com/jam/jam.html) the compilation utility used 
+    until now for compiling TREX. The version used is jam 2.5.
+@li @b cmake (http://www.cmake.org/) newly added which -- among other things --
+   allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+
+@note The support of these two tools is temporary. Indeed jam proved to be more
+      and more difficult to maintin as the project grew in size and flexibility.
+      cmake is the candidate to replace it and if it proves to be well suited
+      will make jam support deprecated.
+
 
 @subsection install-env Set your environment
 
@@ -78,24 +87,24 @@ components which are organized as follow:
 them are compiled into the @c lib directory. There's 4 of them
 described more in detail in this document :
 <ul>
-<li> @c TREXutils : A set of classes that represent basic
+<li> @c TREXutils (trex/utils): A set of classes that represent basic
 functionallities that are used by TREX but are more based on 
 generic programming paradigms and design patterns that could be
 used for other programs.</li>
-<li> @c TREXdomains : Definition of domains and variables as manipulated
+<li> @c TREXdomains (trex/domain): Definition of domains and variables as manipulated
 by TREX for information exchange between reactors. A variabl is
 defined by a name and a domain. A domain is a typed, possibly continuous,
 set of possible values for this varaible. A domain cannot be empty and
 can only be restricted.</li>
-<li> @c TREXtransaction : This library define the reactors which is the
+<li> @c TREXtransaction (trex/transaction): This library define the reactors which is the
 basic component that can be composed inside TREX. It defines also
 Obsevations and Goals which are the data that can be exchanged between
 reactors.</li>
-<li> @c TREXagent : Defines the TREX agent. The agent is the main
+<li> @c TREXagent (trex/agen): Defines the TREX agent. The agent is the main
 entity that manages the loading and execution of the reactors as their
 interaction.</li>
 </ul>
-@li <b> TREX commands: </b> A set of simple commands that can be used
+@li <b> TREX commands (trex/cmds): </b> A set of simple commands that can be used
 to execute a TREX agent. They are compiled into the @c bin
 directory. There's two generic commands that gives a simple
 illustration on how one can create and manipulate an Agent :
@@ -122,13 +131,139 @@ set of scripts and utilities to help the processing  of TREX logs.
 of the head.
 @li <b> Configurations files </b> Usually under @c cfg. A set of configuration files that can be used to define new agents and/or reactors.
 
-Compiling the core components (main libraries and commands) is done with the command @c jam. 
 
-Compilation of the plug-ins is done using the command @c jam @<name@>
+@subsection install-jam Compiling with jam
+
+You need to make sure that your envoironment is correctly set (see #install-env).
+@warning All the jam commands should be run from @c $TREX_HOME
+
+To compile the cores compienents (libraries and executables) just run the command @c jam
+
+Compilation of the plug-ins is done either by running @c jam  @<name@> to compile
+one specific plugin (e.g jam vitre) or @c jam @c plugins t ocompile all the plugins
+in the project. 
+
+@note Further details such as extra dependencies or requirement may be described in
+      each plug-in documentation
+
+you can also generate the documentation (provided that you have doxygen installed) by
+running @c jam @c doc
+
+@subsection install-cmake Compiling with cmake
+
+More details can be found on cmake @link http://www.cmake.org/cmake/help/runningcmake.html 
+ official documentation @endlink. But here's a quick tutorial to use make as the end
+ compilation tool.
+
+Create your working directory :
+@code 
+> mkdir trex2.build
+> cd trex2.build 
+@endcode
+run cmake by passing the location of the source tree as argument 
+(we'll assume that trex2.build is ate the same level as trex2-agent source
+directory)
+@code 
+> cmake ../trex2-agent/
+-- The C compiler identification is GNU
+-- The CXX compiler identification is GNU
+-- Checking whether C compiler has -isysroot
+-- Checking whether C compiler has -isysroot - yes
+-- Checking whether C compiler supports OSX deployment target flag
+-- Checking whether C compiler supports OSX deployment target flag - yes
+-- Check for working C compiler: /usr/bin/gcc
+-- Check for working C compiler: /usr/bin/gcc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Checking whether CXX compiler has -isysroot
+-- Checking whether CXX compiler has -isysroot - yes
+-- Checking whether CXX compiler supports OSX deployment target flag
+-- Checking whether CXX compiler supports OSX deployment target flag - yes
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Boost version: 1.46.1
+-- Found the following Boost libraries:
+--   system
+-- Looking for pthread_self in pthread
+-- Looking for pthread_self in pthread - found
+-- Looking for clock_gettime in rt
+-- Looking for clock_gettime in rt - not found
+-- Looking for dlopen in dl
+-- Looking for dlopen in dl - found
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/fpy/Coding/trex2.build
+@endcode
+If no error occured, you can just run make as usual 
+@code 
+> make
+Scanning dependencies of target TREXutils
+[  3%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/ErrnoExcept.cc.o
+[  6%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/Exception.cc.o
+[  9%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/LogManager.cc.o
+[ 12%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/Pdlfcn.cc.o
+[ 15%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/PluginLoader.cc.o
+[ 18%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/RStat.cc.o
+[ 21%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/SingletonDummy.cc.o
+[ 25%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/SingletonServer.cc.o
+[ 28%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/TextLog.cc.o
+[ 31%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/TREXversion.cc.o
+[ 34%] Building CXX object CMakeFiles/TREXutils.dir/trex/utils/XmlUtils.cc.o
+Linking CXX shared library libTREXutils.dylib
+[ 34%] Built target TREXutils
+Scanning dependencies of target TREXdomain
+[ 37%] Building CXX object CMakeFiles/TREXdomain.dir/trex/domain/BasicEnumerated.cc.o
+[ 40%] Building CXX object CMakeFiles/TREXdomain.dir/trex/domain/BasicInterval.cc.o
+[ 43%] Building CXX object CMakeFiles/TREXdomain.dir/trex/domain/DomainBase.cc.o
+[ 46%] Building CXX object CMakeFiles/TREXdomain.dir/trex/domain/DomainImpl.cc.o
+[ 50%] Building CXX object CMakeFiles/TREXdomain.dir/trex/domain/Variable.cc.o
+Linking CXX shared library libTREXdomain.dylib
+[ 50%] Built target TREXdomain
+Scanning dependencies of target TREXtransaction
+[ 53%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/Goal.cc.o
+[ 56%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/LogPlayer.cc.o
+[ 59%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/Observation.cc.o
+[ 62%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/Predicate.cc.o
+[ 65%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/reactor_graph.cc.o
+[ 68%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/Relation.cc.o
+[ 71%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/TeleoReactor.cc.o
+[ 75%] Building CXX object CMakeFiles/TREXtransaction.dir/trex/transaction/TransactionLogger.cc.o
+Linking CXX shared library libTREXtransaction.dylib
+[ 75%] Built target TREXtransaction
+Scanning dependencies of target TREXagent
+[ 78%] Building CXX object CMakeFiles/TREXagent.dir/trex/agent/Agent.cc.o
+[ 81%] Building CXX object CMakeFiles/TREXagent.dir/trex/agent/Clock.cc.o
+[ 84%] Building CXX object CMakeFiles/TREXagent.dir/trex/agent/RealTimeClock.cc.o
+[ 87%] Building CXX object CMakeFiles/TREXagent.dir/trex/agent/StepClock.cc.o
+Linking CXX shared library libTREXagent.dylib
+[ 87%] Built target TREXagent
+Scanning dependencies of target TREXlightswitch
+[ 90%] Building CXX object CMakeFiles/TREXlightswitch.dir/extra/lightswitch/LightSwitch.cc.o
+Linking CXX shared library libTREXlightswitch.dylib
+[ 90%] Built target TREXlightswitch
+Scanning dependencies of target TREXvitre
+[ 93%] Building CXX object CMakeFiles/TREXvitre.dir/extra/vitre/Vitre.cc.o
+Linking CXX shared library libTREXvitre.dylib
+[ 93%] Built target TREXvitre
+Scanning dependencies of target amc
+[ 96%] Building CXX object CMakeFiles/amc.dir/trex/cmds/AMC.cc.o
+Linking CXX executable amc
+[ 96%] Built target amc
+Scanning dependencies of target sim
+[100%] Building CXX object CMakeFiles/sim.dir/trex/cmds/Sim.cc.o
+Linking CXX executable sim
+[100%] Built target sim
+@endcode 
+
+@note Right now cmake caompiles everything by default. This is a first integration
+      and we will make sure in the future that the behavior is closer to what we
+      have with jam where plug-ins are only compiled on demand.
 
 @section Running an example
 
-So farthis version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch plug-in. To use it you first need to compile the @c sim utility and @c lightswitch plug-in :
+So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch plug-in. To use it you first need to compile the @c sim utility and @c lightswitch plug-in :
 @code 
 ~$ cd $TREX_HOME
 TREX2$ jam sim
