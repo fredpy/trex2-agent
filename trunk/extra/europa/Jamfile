@@ -24,10 +24,10 @@ SubDir TOP extra europa ;
   
   ModuleLibraries europa : $(EUROPA_LIBS)_$(E_EXT) : $(EUROPA_HOME)/lib ;
   
-  ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg cfg/test.nddl ;
+  ModuleCfg europa : cfg/TREX.nddl cfg/NDDL.cfg cfg/test.nddl cfg/test.solver.xml ;
   
   ModuleFiles europa : europa_plugin.cc EuropaReactor.cc Assembly.cc EuropaDomain.cc 
-                       DbCore.cc
+                       DbCore.cc DbSolver.cc
                        ;
 #}
 
