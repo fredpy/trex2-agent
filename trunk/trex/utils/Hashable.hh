@@ -1,8 +1,8 @@
-/** @file "utils/base/Hashable.hh"
+/** @file "trex/utils/Hashable.hh"
  * @brief TR1 hashing utilities
  *
  * This file provides some utilities to ease the
- * definition of th has function for a class.
+ * definition of the hash function for a class.
  *
  * @note This implementation is currently based on boost
  * TR1 compatibility hash definition

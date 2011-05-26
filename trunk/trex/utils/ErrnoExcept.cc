@@ -1,4 +1,4 @@
-/** @file "utils/base/ErrnoExcept.cc"
+/** @file "trex/utils/ErrnoExcept.cc"
  * @brief ErrnoExcept implementation
  * 
  * @author Frederic Py <fpy@mbari.org>

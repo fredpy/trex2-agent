@@ -1,4 +1,4 @@
-/** @file "utils/base/ErrnoExcept.hh"
+/** @file "trex/utils/ErrnoExcept.hh"
  *
  * @brief ErrnoExcept definition.
  *
