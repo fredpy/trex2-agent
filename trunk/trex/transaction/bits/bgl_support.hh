@@ -1,4 +1,4 @@
-/** @file transaction/base/bits/bgl_support.hh"
+/** @file trex/transaction/bits/bgl_support.hh"
  * 
  * @brief Boost Graph Library support code 
  *
@@ -39,31 +39,105 @@ namespace boost {
 
   public:
     // Graph concept
+    /** @brief Graph vertex
+     * 
+     * Indicates to boost graph library the type of a vertex.
+     * In TREX each reactor is a vertex of the graph
+     */
     typedef graph_type::reactor_id        vertex_descriptor;
+    /** @brief Graph edge
+     * 
+     * Indicates to boost graph library the type of an edge.
+     * In TREX ansd edge connects an external timeline to its 
+     * internal counterpart
+     */
     typedef graph_type::relation_type     edge_descriptor;
 
+    /** @brief Graph type
+     * 
+     * indicatess to BGL that a reactor garph is a directed graph
+     */
     typedef graph_type::directed_category      directed_category;
+    /** @brief Allowing parllelele edges information
+     *
+     * Indicates to BGL that a TREX graph allows to have multiples edges 
+     * with idenitcal sources and targets. 
+     * 
+     * @note In current version a graph edge repredsent a single timeline 
+     * relation. As a reesult there's often multiples relation between two 
+     * reactors. As this increase the complexity of the graph traversal we 
+     * may in thefuture change this if this cost becomes prohibitve.
+     */
     typedef graph_type::edge_parallel_category edge_parallel_category;
+    /** @brief Graph traverssal category
+     *
+     * Indicates that  a reactor graph is a ditrectional graph
+     */
     typedef graph_type::traversal_category     traversal_category;
 
+    /** @brief NUll reactor
+     * 
+     * This method is used to identify a null reactor. Such value is often used
+     * by relations that are incomplete (ie external timelines that do not have 
+     * an internal counterpart
+     *
+     * @return A null reactor reference
+     */
     static inline vertex_descriptor null_vertex() {
       return graph_type::null_reactor();
     }
 
     // Incidence Graph Concept
+    /** @brief external relation iterator
+     * 
+     * An iterator used to iterate through all the @u active external relations
+     * of a reactor. 
+     * 
+     * @sa Relation::active() const
+     */
     typedef TREX::transaction::TeleoReactor::external_iterator  out_edge_iterator;
+    /** @brief type gfor the number of external timelines
+     * 
+     * The type used to indciate the number of external relations of a reactor
+     */
     typedef TREX::transaction::TeleoReactor::size_type          degree_size_type;
 
-    // Adjacency Graph Concetp
+    // Adjacency Graph Concept
+    /** @brief Adjacency list iterator
+     * 
+     * Iterator used to iterate through adjecent reactors. Adjacent reactors
+     * are reactors relted through a relation (an external timeline of the first 
+     * is internal to the second)
+     *
+     * @sa out_edge_iterator
+     */
     typedef boost::adjacency_iterator<graph_type, vertex_descriptor,
 				      out_edge_iterator, 
 				      graph_type::difference_type> adjacency_iterator;
     // vertex List graph Concept
+    /** @brief Reactors iterator
+     * 
+     * Iterator used to iterate through al ther reactors of the graph
+     */
     typedef graph_type::reactor_iterator     vertex_iterator;
+    /** @brief Type for the number of reactors
+     *
+     * The type used t oindicate the number of reactors on a graph
+     */
     typedef graph_type::size_type            vertices_size_type;
 
     // edge List graph Concept
+    /** @brief Graph edges iterator
+     * 
+     * An iterator used t oiterate through all the realtions of the graph
+     * @sa vertex_iterator
+     * @sa out_edge_iterator
+     */
     typedef graph_type::edge_iterator     edge_iterator;
+    /** @brief Type for the number of relations
+     *
+     * The type used t oindicate the number of relarions on a graph
+     */
     typedef graph_type::size_type         edges_size_type;
   }; // boost::graph_traits<TREX::transaction::graph>
 

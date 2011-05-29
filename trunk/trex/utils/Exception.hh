@@ -1,5 +1,4 @@
-/* -*- C++ -*- */
-/** @file "utils/base/Exception.hh"
+/** @file "trex/utils/Exception.hh"
  * @brief TREX exception base
  *
  * This file declares the Exception class used a basis for all the exceptions 

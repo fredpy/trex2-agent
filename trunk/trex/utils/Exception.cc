@@ -1,4 +1,4 @@
-/** @file "utils/base/Exception.cc"
+/** @file "trex/utils/Exception.cc"
  * @brief TREX Exception implementation
  *
  * @author Frederic Py <fpy@mbari.org>

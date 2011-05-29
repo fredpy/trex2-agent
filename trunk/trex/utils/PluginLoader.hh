@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-/** @file "utils/base/PluginLoader.hh"
+/** @file "trex/utils/PluginLoader.hh"
  * @brief plug-in loading utility
  *
  * This file defines the class PluginLoader which is used to load TREX plug-ins

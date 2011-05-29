@@ -1,5 +1,4 @@
-/**
- * @file   "utils/base/Pdlfcn.hh"
+/** @file   "trex/utils/Pdlfcn.hh"
  * @author Patrick Daley
  * @date   
  * @brief Dynamic librares loading

@@ -102,6 +102,7 @@ namespace TREX {
 	bound &operator= (Ty const &val) {
 	  m_inf = false;
 	  m_value = val;
+    return *this;
 	}
 
 	/** @brief Check for infinity
