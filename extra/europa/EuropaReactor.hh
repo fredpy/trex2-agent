@@ -1,3 +1,11 @@
+/** @file extra/europa/EuropaReactor.hh
+ * @brief Definition of an europa based reactor
+ * 
+ * This files defines the europa based deliberative reactor
+ * 
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup europa
+ */
 #ifndef H_EuropaReactor 
 # define H_EuropaReactor 
 
@@ -8,6 +16,23 @@
 namespace TREX {
   namespace europa {
     
+    /** @brief Europa based deliberative reactor
+     * 
+     * This reactor is a reactor that is able to synchronize and deliberate 
+     * based on the europa-pso planning engine.
+     * It loads a nddl model and uses this model to deduces its internal 
+     * timelines values and post goals to its external timelines as execution 
+     * frontier advances.
+     * 
+     * Th EuropaReactor class itself is mostly a proxy that interfaces trex 
+     * callbacks with europa calls. and most of the implementation is on the 
+     * DbCore and Assembly classes
+     * 
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     * @sa DbCore
+     * @sa Assembly
+     */
     class EuropaReactor :public TREX::transaction::TeleoReactor {
     public:
       EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
@@ -20,12 +45,12 @@ namespace TREX {
       void notify(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
 
       Assembly &assembly() {
-	return m_assembly;
+        return m_assembly;
       }
 
       TREX::utils::internals::LogEntry 
       log(std::string const &context) {
-	return syslog(context);
+        return syslog(context);
       }
 
     private:
@@ -50,8 +75,8 @@ namespace TREX {
       DbCore   m_core;
 
       void reset_deliberation() {
-	m_planStart = getInitialTick();
-	m_steps = 0;
+        m_planStart = getInitialTick();
+        m_steps = 0;
       }
 
       TREX::transaction::TICK m_planStart;

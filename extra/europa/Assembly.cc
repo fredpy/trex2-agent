@@ -32,7 +32,7 @@ TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
 // modifiers
 
 void Schema::registerComponents(Assembly const &assembly) {
-  EUROPA::ConstraintEngineId const &ce=assembly.constraint_engine();
+  // EUROPA::ConstraintEngineId const &ce=assembly.constraint_engine();
 
   for(std::set<SchemaPlugin *>::const_iterator i = m_plugins.begin();
       m_plugins.end()!=i; ++i) 
@@ -163,6 +163,18 @@ bool Assembly::isInternal(EUROPA::ObjectId const &obj) const {
 bool Assembly::isExternal(EUROPA::ObjectId const &obj) const {
   return m_schema->isA(obj->getType(), TREX_TIMELINE)  &&
     m_reactor.isExternal(obj->getName().c_str());  
+}
+
+bool Assembly::internal(EUROPA::TokenId const &tok) const {
+  EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
+  std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
+  
+  std::list<EUROPA::ObjectId>::const_iterator o = objs.begin();
+  
+  for( ; objs.end()!=o; ++o) 
+    if( !isInternal(*o) )
+      return false;
+  return true;
 }
 
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
