@@ -1,4 +1,4 @@
-/** @file "utils/base/bits/Factory.tcc"
+/** @file "trex/utils/bits/Factory.tcc"
  * @brief Factory class implementation
  *
  * This file provide the implementation of different methods of the

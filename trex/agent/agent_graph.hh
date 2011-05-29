@@ -1,4 +1,4 @@
-/** @file agent/base/agent_graph.hh
+/** @file trex/agent/agent_graph.hh
  *
  * @brief utilities for TREX agen reactor graph management
  *
@@ -115,6 +115,18 @@ namespace TREX {
       
 			   
     protected:
+      /** @brief Check for node validity
+       * @param[in] r A reactor reference
+       * 
+       * Check that @p r referes to an exisiting reactor. This method is 
+       * used during graph traversal to vcheck that the an edge is not pointing
+       * to nothing
+       * 
+       * @retval true if @p r refers to a reactor
+       * @retval false otherwise
+       * 
+       * @sa TREX::transaction::garph::null_reactor()
+       */
       bool is_valid(TREX::transaction::graph::reactor_id r) const {
 	return TREX::transaction::graph::null_reactor()!=r;
       }

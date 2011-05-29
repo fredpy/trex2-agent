@@ -1,4 +1,4 @@
-/** @file "utils/base/PluginLoader.cc"
+/** @file "trex/utils/PluginLoader.cc"
  *
  * @brief Implementation of PluginLoader
  *

@@ -1,4 +1,4 @@
-/** @file "utils/base/LogManager.hh"
+/** @file "trex/utils/LogManager.hh"
  * @brief LogManager class definition
  * 
  * This header defines the LogManager utility alogn with several macro and 
@@ -190,7 +190,7 @@ namespace TREX {
        * @throw  ErrnoExcept A problem occured while trying to create log
        * directory
        * @return A complete name of @p file_name along with the path where it 
-			           was located 
+       was located 
        * @sa logPath()
        * @sa file_name(std::string const &)
        * @sa std::string locate(std::string const &, bool &) const
@@ -211,7 +211,7 @@ namespace TREX {
       internals::LogEntry syslog(std::string const &who);
       TextLog &syslog();
 			/** @} */
-
+      
       /** @brief Current verbosity level
        * @return the current verbosity level
        * @sa setLogLevel(LogLevel)
@@ -267,13 +267,32 @@ namespace TREX {
        * @sa std::string locate(std::string const &file, bool &found) const
        */
       bool addSearchPath(std::string const &path);
-
+      
+      /** @brief TREX_PATH iterator
+       * 
+       * An iterator used to go through all the path used by LogManager to 
+       * locate a file
+       * 
+       * @sa locate(std::string const &,bool &) const
+       */
       typedef std::list<std::string>::const_iterator path_iterator;
+      /** @brief First path
+       * 
+       * @return An iterator refering to the first element of TREX_PATH
+       * @sa setLogPath(std::string const &)
+       * @sa end() const
+       */
       path_iterator begin() const {
-	return m_searchPath.begin();
+        return m_searchPath.begin();
       }
+      /** @brief End of searh path
+       * 
+       * @return An iterator refering to the ebnd of TREX_PATH
+       * @sa setLogPath(std::string const &)
+       * @sa begin() const
+       */
       path_iterator end() const {
-	return m_searchPath.end();
+        return m_searchPath.end();
       }
 			
       /** @brief Locate a file 

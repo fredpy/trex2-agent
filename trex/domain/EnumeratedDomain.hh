@@ -61,11 +61,11 @@ namespace TREX {
     private:
       /** @brief Internal domain elements container */
       typedef std::set<Ty, Comp> container_type;
-
+      
     public:
       /** @brief Possible values iterator */
       typedef typename container_type::const_iterator iterator;
-
+      
       /** @brief Constructor
        *
        * @param type a symbolic type name
@@ -73,7 +73,7 @@ namespace TREX {
        * Create a new instance as a full domain of type @e type.
        */
       explicit EnumeratedDomain(TREX::utils::Symbol const &type)
-	:BasicEnumerated(type) {}
+      :BasicEnumerated(type) {}
       /** @brief Constructor
        * @tparam Iter an iterator type
        * @param type A symbolic type name
@@ -90,12 +90,12 @@ namespace TREX {
        */
       template<class Iter>
       EnumeratedDomain(TREX::utils::Symbol const &type,
-		       Iter from, Iter to)
-	:BasicEnumerated(type), m_elements(from, to) {
-	if( m_elements.empty() )
-	  throw EmptyDomain(*this, "Newly created EnumeratedDomain is empty.");
+                       Iter from, Iter to)
+      :BasicEnumerated(type), m_elements(from, to) {
+        if( m_elements.empty() )
+          throw EmptyDomain(*this, "Newly created EnumeratedDomain is empty.");
       }
-
+      
       /** @brief Constructor
        * @param type A symbolic type name
        * @param val A value
@@ -104,14 +104,14 @@ namespace TREX {
        * @e val
        */
       explicit EnumeratedDomain(TREX::utils::Symbol const &type,
-				Ty const &val)
-	:BasicEnumerated(type) {
-	add(val);
+                                Ty const &val)
+      :BasicEnumerated(type) {
+        add(val);
       }
-
+      
       /** @brief Destructor */
       virtual ~EnumeratedDomain() {}
-
+      
       // Extra helpers
       /** @brief Add an element to the domain
        *
@@ -129,7 +129,7 @@ namespace TREX {
        * @sa template<class Iter> void add(Iter, Iter)
        */
       void add(Ty const &val) {
-	m_elements.insert(val);
+        m_elements.insert(val);
       }
       /** @brief Add an element to the domain
        *
@@ -153,33 +153,33 @@ namespace TREX {
        */
       template<class Iter>
       void add(Iter from, Iter to) {
-	m_elements.insert(from, to);
+        m_elements.insert(from, to);
       }
-
+      
       /** @brief test for membership
        * @param val A value
        * @retval true if @e val is a possible value for this domain
        * @retval false otherwise
        */
       bool contains(Ty const &val) const {
-	return isFull() || end()!=m_elements.find(val);
+        return isFull() || end()!=m_elements.find(val);
       }
       bool intersect(DomainBase const &other) const;
       bool equals(DomainBase const &other) const;
       DomainBase &restrictWith(DomainBase const &other);
       
       size_t getSize() const {
-	return m_elements.size();
+        return m_elements.size();
       }
-
+      
       boost::any getElement(size_t i) const {
-	typename container_type::const_iterator it = begin();
-	// std::set doe not provide operator[]
-	// I need to do the iteration by my own
-	for(; i>0 && end()!=it; ++it, --i);
-	// if it==end() the behavior is undefined
-	// but that also means that i>=getSize()
-	return *it;
+        typename container_type::const_iterator it = begin();
+        // std::set doe not provide operator[]
+        // I need to do the iteration by my own
+        for(; i>0 && end()!=it; ++it, --i);
+        // if it==end() the behavior is undefined
+        // but that also means that i>=getSize()
+        return *it;
       }
       /** @brief First element
        *
@@ -189,7 +189,7 @@ namespace TREX {
        * @return An iterator to the beginnig of the possible values collection
        */
       iterator begin() const {
-	return m_elements.begin();
+        return m_elements.begin();
       }
       /** @brief End iterator
        *
@@ -199,9 +199,9 @@ namespace TREX {
        * @return An iterator to the end of the possible values collection
        */
       iterator end() const {
-	return m_elements.end();
+        return m_elements.end();
       }
-
+      
     protected:
       /** @brief Copy constructor
        *
@@ -210,7 +210,7 @@ namespace TREX {
        * Create a new instance which is a copy of @e other
        */
       EnumeratedDomain(EnumeratedDomain const &other)
-	:BasicEnumerated(other), m_elements(other.m_elements) {}
+      :BasicEnumerated(other), m_elements(other.m_elements) {}
       /** @brief XML parsing constructor
        * @param node An XML node
        *
@@ -233,18 +233,18 @@ namespace TREX {
        * will be considered as full.
        */
       EnumeratedDomain(rapidxml::xml_node<> const &node) 
-	:BasicEnumerated(node) {
-	completeParsing(node);
+      :BasicEnumerated(node) {
+        completeParsing(node);
       }
-
+      
       void addTextValue(std::string const &val) {
-	add(TREX::utils::string_cast<Ty>(val));
+        add(TREX::utils::string_cast<Ty>(val));
       }
       std::ostream &print_value(std::ostream &out, size_t i) const {
-	// Not very optimal but this is the easiest way to go
-	return out<<(getTypedElement<Ty, false>(i));
+        // Not very optimal but this is the easiest way to go
+        return out<<(getTypedElement<Ty, false>(i));
       }
-
+      
     private:
       /** @brief Domain elements
        *
@@ -256,72 +256,72 @@ namespace TREX {
        * expected to create a full domain
        */
       container_type m_elements;
-
+      
     }; // EnumeratedDomain<>
-
+    
     /*
      * class EnumeratedDomain<>
      */
-
+    
     template<class Ty, class Cmp>
     bool EnumeratedDomain<Ty, Cmp>::intersect(DomainBase const &other) const {
       if( getTypeName()!=other.getTypeName() ) 
-	return false;
+        return false;
       else {
-	EnumeratedDomain<Ty, Cmp> const &ref 
-	  = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
-	if( isFull() || ref.isFull() )
-	  return true;
-	else {
-	  iterator i = begin(), j = ref.begin();
-	  iterator const endi = end();
-	  iterator const endj = ref.end();
-	  
-	  while( endi!=i && endj!=j ) {
-	    if( m_elements.key_comp()(*i, *j) )
-	      ++i;
-	    else if( m_elements.key_comp()(*j, *i) )
-	      ++j;
-	    else 
-	      // *i and *j are equals -> intersection is not empty
-	      return true;
-	  }
-	  // no similar items -> itersection is empty
-	  return false;
-	}
+        EnumeratedDomain<Ty, Cmp> const &ref 
+        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
+        if( isFull() || ref.isFull() )
+          return true;
+        else {
+          iterator i = begin(), j = ref.begin();
+          iterator const endi = end();
+          iterator const endj = ref.end();
+          
+          while( endi!=i && endj!=j ) {
+            if( m_elements.key_comp()(*i, *j) )
+              ++i;
+            else if( m_elements.key_comp()(*j, *i) )
+              ++j;
+            else 
+              // *i and *j are equals -> intersection is not empty
+              return true;
+          }
+          // no similar items -> itersection is empty
+          return false;
+        }
       }
     }
     
     template<class Ty, class Cmp>
     bool EnumeratedDomain<Ty, Cmp>::equals(DomainBase const &other) const {
       if( getTypeName()!=other.getTypeName() ) 
-	return false;
+        return false;
       else {
-	EnumeratedDomain<Ty, Cmp> const &ref 
-	  = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
-	return m_elements==ref.m_elements;
+        EnumeratedDomain<Ty, Cmp> const &ref 
+        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
+        return m_elements==ref.m_elements;
       }
     }
     
     template<class Ty, class Cmp>
     DomainBase &EnumeratedDomain<Ty, Cmp>::restrictWith(DomainBase const &other) {
       if( getTypeName()!=other.getTypeName() ) 
-	throw EmptyDomain(*this, "Incompatible types");
+        throw EmptyDomain(*this, "Incompatible types");
       else {
-	EnumeratedDomain<Ty, Cmp> const &ref 
-	  = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);    
-	container_type tmp;
-	std::set_intersection(begin(), end(), ref.begin(), ref.end(), 
-			      std::inserter(tmp, tmp.begin()), 
-			      m_elements.key_comp());
-	if( tmp.empty() ) 
-	  throw EmptyDomain(*this, "intersection is empty.");
-	m_elements.swap(tmp);
+        EnumeratedDomain<Ty, Cmp> const &ref 
+        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);    
+        container_type tmp;
+        std::set_intersection(begin(), end(), ref.begin(), ref.end(), 
+                              std::inserter(tmp, tmp.begin()), 
+                              m_elements.key_comp());
+        if( tmp.empty() ) 
+          throw EmptyDomain(*this, "intersection is empty.");
+        m_elements.swap(tmp);
       }
       return *this;
     }
     
-
+    
   } // TREX::transaction
 } // TREX
 

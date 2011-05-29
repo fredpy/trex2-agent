@@ -1,4 +1,4 @@
-/** @file "utils/base/Plugin.hh"
+/** @file "trex/utils/Plugin.hh"
  *
  * @brief Plugin header
  *
@@ -20,6 +20,14 @@ namespace TREX {
 	
   namespace utils {
     namespace internals {
+      /** @brief Pointer to a plugin function
+       * 
+       * This type is used internally to know how to refer to the @c initPlugin 
+       * function
+       *
+       * @sa TREX::initPlugin()
+       * @ingroup utils
+       */
       typedef void (*plugin_fn)();
     }
   }

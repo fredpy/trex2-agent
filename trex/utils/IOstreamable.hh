@@ -1,4 +1,4 @@
-/** @file "utils/base/IOstreamable.hh"
+/** @file "trex/utils/IOstreamable.hh"
  * @brief Standard streams support utilities
  *
  * This file provides some utilities to ease the
@@ -23,8 +23,30 @@ namespace TREX {
 
 namespace std {
 	
-  ostream &operator<<(ostream &, TREX::utils::ostreamable const &);
-  istream &operator>>(istream &, TREX::utils::istreamable &);
+  /** @brief Output operator overload
+   *
+   * @param[in,out] out An output stream
+   * @param[in] x An ostreamable instance
+   * 
+   * Writes the value of @p x into @p out 
+   *
+   * @return @p out after the operation
+   * 
+   * @sa TREX::utils::ostreamable::print_to(std::ostream &) const
+   */
+  ostream &operator<<(ostream &out, TREX::utils::ostreamable const &x);
+  /** @brief Input operator overload
+   *
+   * @param[in,out] in An input stream
+   * @param[out] x An istreamable instance
+   * 
+   * Reads the value of @p x from @p in
+   *
+   * @return @p in after the operation
+   * 
+   * @sa TREX::utils::istreamable::read_from(std::istream &)
+   */
+  istream &operator>>(istream &in, TREX::utils::istreamable &x);
 
 } // std
 
@@ -101,34 +123,11 @@ namespace TREX {
 }
 
 namespace std {
-  /** @brief Standard output stream operator
-   * @param[in,out] out an output stream
-   * @param[in] x an @c ostreamable instance
-   *
-   * Prints the content of @p x into @p out
-   * 
-   * @return @p out after the operation
-   *
-   * @relates TREX::utils::ostreamable
-   * @sa std::ostream &TREX::utils::ostreamable::print_to(std::ostream &) const
-   */
   inline ostream &operator<<(ostream &out, 
 			     TREX::utils::ostreamable const &x) {
     return x.print_to(out);
   }
   
-  /** @brief Standard input stream operator
-   *
-   * @param[in,out] in an input stream
-   * @param[out] x an istreamable instance
-   *
-   * Reads an instreamable in @p in and stores it in @p x
-   *
-   * @return @p in after the operation
-   *
-   * @relates TREX::utils::istreamable
-   * @sa std::istream &TREX::utils::istreamable::read_from(std::istream &)
-   */
   inline istream &operator>>(istream &in, 
 			     TREX::utils::istreamable &x) {
     return x.read_from(in);
