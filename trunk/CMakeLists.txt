@@ -32,6 +32,7 @@
 ########################################################################
 
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 ########################################################################
 # Project definitions                                                  #
@@ -44,7 +45,7 @@ set(TREX_PATCH 2)
 ########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
-find_package(Boost COMPONENTS system)
+find_package(Boost 1.38.0 COMPONENTS thread system)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 else(Boost_FOUND)
@@ -85,6 +86,13 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 endif(DOXYGEN_FOUND)
 
 ########################################################################
+# Europa                                                               #
+########################################################################
+find_package(Europa 
+  COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
+             NDDL RulesEngine Solvers System)
+
+########################################################################
 # Include Directories                                                  #
 ########################################################################
 include_directories(
@@ -93,7 +101,7 @@ include_directories(
   trex/domain
   trex/agent
   trex/utils
-  trex/rapidxml
+  trex/rapidxml  
   )
 
 ########################################################################
@@ -138,22 +146,34 @@ set(TREX_LIBRARIES TREXutils TREXagent TREXdomain TREXtransaction)
 ########################################################################
 # TREX plugins.                                                        #
 ########################################################################
-macro(trex_plugin folder)
+add_custom_target(plugins COMMENT "Build all the trex plugins")
+
+macro(trex_pg name folder)
   get_filename_component(basename ${folder} NAME_WE)
-  set(plugin_name "TREX${basename}")
+  set(${name} "TREX${basename}")
+endmacro(trex_pg) 
+
+macro(trex_plugin folder)
+  trex_pg(plugin_name ${folder})
   set(plugin_files "")
   file(GLOB_RECURSE plugin_files
     RELATIVE ${PROJECT_SOURCE_DIR} ${folder}/*.cc)
-  add_library(${plugin_name} SHARED ${plugin_files})
+  add_library(${plugin_name} SHARED EXCLUDE_FROM_ALL ${plugin_files})
   target_link_libraries(${plugin_name}
     ${TREX_LIBRARIES} ${Boost_LIBRARIES} ${SYSTEM_LIBRARIES})
+  add_dependencies(plugins ${plugin_name})
 endmacro(trex_plugin)
 
 trex_plugin(extra/vitre)
 trex_plugin(extra/lightswitch)
-if(EUROPA)
+if(EUROPA_FOUND)
+  include_directories(${EUROPA_INCLUDE_DIRS})
   trex_plugin(extra/europa)
-endif(EUROPA)
+  trex_pg(europa_pg extra/europa)
+  set_property(TARGET ${europa_pg} PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
+  set_property(TARGET ${europa_pg} PROPERTY ${EUROPA_LIBRARIES})
+  target_link_libraries(${europa_pg} ${EUROPA_LIBRARIES})
+endif(EUROPA_FOUND)
 
 ########################################################################
 # TREX executables.                                                    #
