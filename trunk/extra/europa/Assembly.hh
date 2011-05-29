@@ -105,7 +105,8 @@ namespace TREX {
       }
       bool ignored(EUROPA::TokenId const &tok) const;
       bool in_deliberation(EUROPA::TokenId const &tok) const;
-      
+
+      bool internal(EUROPA::TokenId const &tok) const;      
 
       bool isInternal(EUROPA::ObjectId const &obj) const;	
       bool isExternal(EUROPA::ObjectId const &obj) const;

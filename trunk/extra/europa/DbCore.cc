@@ -80,8 +80,8 @@ bool DbCore::complete_externals() {
     }
     (*it)->end()->restrictBaseDomain(now);      
     if( !propagate() ) {
-      m_reactor.log("synchronize")
-	<<"Failed to terminate external observation "<<(*it)->getPredicateName().toString();
+      m_reactor.log("synchronize")<<"Failed to terminate external observation "
+        <<(*it)->getPredicateName().toString();
       m_reactor.assembly().mark_invalid();
       return false;
     }
@@ -327,13 +327,27 @@ bool DbCore::process_recalls() {
     EUROPA::EntityId entity = EUROPA::Entity::getEntity(*i);
     if( entity.isId() ) {
       EUROPA::TokenId tok(entity);
-      token->discard();
+      tok->discard();
       recalls = true;
     } 
   }
   m_recalls.clear();
   return recalls;
 }
+
+bool DbCore::is_current(EUROPA::TokenId const &tok) const {
+  if( tok->isCommitted() && !tok->isTerminated() ) {
+    TREX::transaction::TICK 
+    end_max = EUROPA::cast_long(tok->end()->baseDomain().getUpperBound());
+    
+    if( m_reactor.assembly().internal(tok) ) 
+      return end_max>=m_reactor.getCurrentTick();
+    else 
+      return end_max>m_reactor.getCurrentTick(); 
+  }
+  return false;
+}
+
 
 void DbCore::reset_observations() {
   EUROPA::TokenSet observations = m_observations;
@@ -345,11 +359,11 @@ void DbCore::reset_observations() {
       (*j)->cancel();
     if( is_current(*i) ) {
       if( !( (*i)->isCommitted() || (*i)->isInactive() ) )
-	(*i)->cancel();
+        (*i)->cancel();
       if( (*i)->end()->isSpecified() )
-	(*i)->end()->reset();
+        (*i)->end()->reset();
       else 
-	(*i)->end()->relax();
+        (*i)->end()->relax();
       (*i)->end()->restrictBaseDomain(future);
     } else 
       (*i)->discard();    
@@ -357,18 +371,110 @@ void DbCore::reset_observations() {
 }
 
 void DbCore::reset_goals(bool discard) {
+  std::vector<EUROPA::TokenId> past, present;
+  EUROPA::TokenSet goals = m_goals;
+  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+  EUROPA::IntervalIntDomain future(cur, PLUS_INFINITY);
+  
+  for(EUROPA::TokenSet::const_iterator i=goals.begin(); goals.end()!=i; ++i) {
+    EUROPA::TokenId 
+      base = (*i)->isMerged()?(*i)->getActiveToken():*i;
+    if( is_current(*i) ) {
+      m_goals.erase(*i);
+    } else if( discard ||
+              base->end()->baseDomain().getUpperBound()<=cur ||
+              ( (*i)->isRejected() &&   
+               (*i)->start()->baseDomain().getUpperBound()<cur ) ||
+              ( (*i)->isMerged() && is_current(base) ) )
+      past.push_back(*i);
+    else {
+      if( (*i)->isActive() ) {
+        std::vector<EUROPA::ConstrainedVariableId> const &
+          vars = (*i)->getVariables();
+        std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
+          j = vars.begin();
+        for(; vars.end()!=j; ++j)
+          if( (*j)->canBeSpecified() && (*j)->isSpecified() )
+            (*j)->reset();
+      }
+      if( (*i)->start()->baseDomain().getUpperBound()<cur )
+        past.push_back(*i);
+      else if( !(*i)->isInactive() ) {
+        (*i)->cancel();
+        (*i)->start()->restrictBaseDomain(future);
+      }
+    }
+  }
+  
+  for(std::vector<EUROPA::TokenId>::const_iterator i=past.begin();
+      past.end()!=i; ++i) {
+    m_reactor.removed(*i);
+    (*i)->discard();
+  }
 }
 
-void DbCore::reset_other_tokens() {
+void DbCore::copy_value(EUROPA::TokenId const &tok) {
+  EUROPA::DbClientId cli = m_reactor.assembly().plan_db()->getClient();
+  EUROPA::IntervalIntDomain future(m_reactor.getCurrentTick(), PLUS_INFINITY);
+  EUROPA::TokenId 
+    cpy = cli->createToken(tok->getPredicateName().c_str(), NULL, false);
+  cpy->activate();
+  
+  for(size_t i=0; i<tok->parameters().size(); ++i) {
+    cpy->parameters()[i]->restrictBaseDomain(tok->parameters()[i]->baseDomain());
+  }
+  cpy->getObject()->restrictBaseDomain(tok->getObject()->baseDomain());
+  cpy->start()->restrictBaseDomain(tok->start()->baseDomain());
+  if( is_observation(tok) ) {
+    cpy->end()->restrictBaseDomain(future);
+    m_observations.insert(cpy);    
+  } else if( is_goal(tok) ) {
+    cpy->duration()->restrictBaseDomain(tok->duration()->baseDomain());
+    cpy->end()->restrictBaseDomain(tok->end()->baseDomain());
+    m_goals.insert(cpy);
+  }
+  cpy->duration()->restrictBaseDomain(EUROPA::IntervalIntDomain(1, PLUS_INFINITY));
+  cpy->commit();
 }
 
+void DbCore::reset_other_tokens(bool discard) {
+  std::vector<EUROPA::TokenId> discards;
+  EUROPA::TokenSet const all_toks = m_reactor.assembly().plan_db()->getTokens();
+  for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
+      all_toks.end()!=i; ++i) {
+    if( is_current(*i) ) {
+      if( !discard || is_observation(*i) )
+        copy_value(*i);
+      discards.push_back(*i);
+    } else if( !( is_goal(*i) || is_observation(*i) ) )
+      discards.push_back(*i);
+  }
+  EUROPA::Entity::discardAll(discards);
+}
+
+bool DbCore::insert_copies() {
+  for(EUROPA::TokenSet::const_iterator i=m_commited.begin(); m_commited.end()!=i; ++i) {
+    size_t steps = 0;
+    
+    if( !insert_token(*i, steps) ) {
+      m_reactor.log("core")<<"Failed to insert commtd value "
+          <<(*i)->getPredicateName().toString();
+      m_reactor.assembly().mark_invalid();
+      return false;
+    }
+  }
+  return true;
+}
 
 bool DbCore::relax(bool discard) {
   m_reactor.log("core")<<"Beginning database relax.";
   reset_observations();
   reset_goals(discard);
-  reset_other_tokens();
-  
+  reset_other_tokens(discard);
+  if( insert_copies() )
+    return true;
+  m_reactor.log("core")<<"Relax failed.";
+  return false;
 }
 
 bool DbCore::resolve_tokens(size_t &steps) {
@@ -530,6 +636,8 @@ void DbCore::notfiyRemoved(EUROPA::TokenId const &token) {
   m_goals.erase(token);
   remove_from_agenda(token);
   m_reactor.removed(token);
+  if( token->isCommitted() )
+    m_commited.erase(token);
 }
 
 void DbCore::notifyActivated(EUROPA::TokenId const &token) {
@@ -559,6 +667,7 @@ void DbCore::notifySplit(EUROPA::TokenId const &token) {
 void DbCore::notifyCommitted(EUROPA::TokenId const &token) {
   m_reactor.log("core")<<"COMMIT "<<token->toString()
 			  <<": "<<token->getPredicateName().toString();
+  m_commited.insert(token);
 }
 
 void DbCore::notifyRejected(EUROPA::TokenId const &token) {

@@ -40,10 +40,11 @@ namespace TREX {
 
     private:
       bool is_current(EUROPA::TokenId const &tok) const;
+      void copy_value(EUROPA::TokenId const &tok);
 
       void reset_observations();
       void reset_goals(bool discard);
-      void reset_other_tokens();
+      void reset_other_tokens(bool discard);
 
       void commit_and_restrict(EUROPA::TokenId const &token);
       bool merge_token(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand);
@@ -80,6 +81,7 @@ namespace TREX {
       void remove_from_agenda(EUROPA::TokenId const &token);
 
       void apply_facts(std::list<EUROPA::TokenId> const &facts);
+      bool insert_copies();
 
       EuropaReactor &m_reactor;
       
@@ -89,7 +91,8 @@ namespace TREX {
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_observations;
       EUROPA::TokenSet m_completed_obs;
-
+      EUROPA::TokenSet m_commited;
+      
       std::set<EUROPA::eint> m_recalls;
       
       typedef std::map<EUROPA::ObjectId, EUROPA::TokenId> current_state_map;      
