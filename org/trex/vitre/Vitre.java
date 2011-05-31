@@ -5,6 +5,8 @@
  *
  * @author <a href="mailto:fpy@mbari1224.shore.mbari.org">Frederic Py</a>
  */
+package org.trex.vitre;
+
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Dimension;

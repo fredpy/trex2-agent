@@ -43,6 +43,11 @@ set(TREX_MINOR 1)
 set(TREX_PATCH 2)
 
 ########################################################################
+# Java JDK                                                             #
+########################################################################
+find_package(Java COMPONENTS Development)
+
+########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
 find_package(Boost 1.38.0 COMPONENTS thread system)
@@ -57,19 +62,11 @@ endif(Boost_FOUND)
 ########################################################################
 include(CheckLibraryExists)
 
-check_library_exists(pthread pthread_self "" LIB_PTHREAD)
-if(LIB_PTHREAD)
-  set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} pthread)
-endif(LIB_PTHREAD)
-
-check_library_exists(rt clock_gettime "" LIB_RT)
-if(LIB_RT)
-  set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} rt)
-endif(LIB_RT)
-
 check_library_exists(dl dlopen "" LIB_DL)
 if(LIB_DL)
   set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} dl)
+else(LIB_DL) 
+  message(FATAL_ERROR "TREX requires lib dl")  
 endif(LIB_DL)
 
 ########################################################################
@@ -77,12 +74,12 @@ endif(LIB_DL)
 ########################################################################
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
 endif(DOXYGEN_FOUND)
 
 ########################################################################
@@ -90,7 +87,7 @@ endif(DOXYGEN_FOUND)
 ########################################################################
 find_package(Europa 
   COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
-             NDDL RulesEngine Solvers System)
+  NDDL RulesEngine Solvers System)
 
 ########################################################################
 # Include Directories                                                  #
@@ -98,17 +95,14 @@ find_package(Europa
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
- )
+  )
 
 ########################################################################
 # Compiler definitions                                                 #
 ########################################################################
-add_definitions(
- -DSUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}"
-  )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in 
-			${CMAKE_CURRENT_BINARY_DIR}/trex/version.hh @ONLY)
+  ${CMAKE_CURRENT_BINARY_DIR}/trex/version.hh @ONLY)
 
 ########################################################################
 # TREX libraries.                                                      #
@@ -117,6 +111,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in
 # TREXutils
 file(GLOB_RECURSE TREX_UTILS_FILES trex/utils/*.cc)
 add_library(TREXutils SHARED ${TREX_UTILS_FILES})
+set_property(SOURCE trex/utils/Pdlfcn.cc 
+  PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 # TREXdomain
 file(GLOB_RECURSE TREX_DOMAIN_FILES
@@ -128,13 +124,13 @@ target_link_libraries(TREXdomain TREXutils)
 file(GLOB_RECURSE TREX_TRANSACTION_FILES
   RELATIVE ${PROJECT_SOURCE_DIR} trex/transaction/*.cc)
 add_library(TREXtransaction SHARED ${TREX_TRANSACTION_FILES})
-target_link_libraries(TREXtransaction TREXdomain TREXutils)
+target_link_libraries(TREXtransaction TREXdomain)
 
 # TREXagent
 file(GLOB_RECURSE TREX_AGENT_FILES 
   RELATIVE ${PROJECT_SOURCE_DIR} trex/agent/*.cc)
 add_library(TREXagent SHARED ${TREX_AGENT_FILES})
-target_link_libraries(TREXagent TREXtransaction TREXdomain TREXutils)
+target_link_libraries(TREXagent TREXtransaction)
 
 
 set(TREX_LIBRARIES TREXutils TREXagent TREXdomain TREXtransaction)
@@ -149,22 +145,71 @@ macro(trex_pg name folder)
   set(${name} "TREX${basename}")
 endmacro(trex_pg) 
 
-macro(trex_plugin folder)
+macro(trex_plugin folder module)
   trex_pg(plugin_name ${folder})
   set(plugin_files "")
   file(GLOB_RECURSE plugin_files
     RELATIVE ${PROJECT_SOURCE_DIR} ${folder}/*.cc)
   add_library(${plugin_name} SHARED EXCLUDE_FROM_ALL ${plugin_files})
-  target_link_libraries(${plugin_name}
-    ${TREX_LIBRARIES} ${Boost_LIBRARIES} ${SYSTEM_LIBRARIES})
+  target_link_libraries(${plugin_name} ${module})
   add_dependencies(plugins ${plugin_name})
 endmacro(trex_plugin)
 
-trex_plugin(extra/vitre)
-trex_plugin(extra/lightswitch)
-if(EUROPA_FOUND)
+########################################################################
+# vitre                                                                #
+########################################################################
+trex_plugin(extra/vitre TREXtransaction)
+trex_pg(vitre_pg extra/vitre)
+target_link_libraries(${vitre_pg} ${Boost_LIBRARIES})
+
+
+
+if(Java_Development_FOUND)
+  enable_language(Java)
+
+  macro(make_jar_executable target main_class)
+    get_target_property(var_loc "${target}" LOCATION)
+    add_custom_command(TARGET ${target} POST_BUILD 
+      COMMAND ${CMAKE_Java_ARCHIVE} ufe ${var_loc} ${main_class} 
+      COMMENT "Creating JAR entry point.")
+    UNSET(var_loc)
+  endmacro()
+
+  set(CMAKE_Java_FLAGS "-sourcepath \"${PROJECT_SOURCE_DIR}\"")
+
+  # following is a patch/hack to make cmake compiles jars files properly
+  # compile a Java file into an object file
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.class")
+  set(CMAKE_Java_COMPILE_OBJECT
+    "<CMAKE_Java_COMPILER> <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/.class\""
+  )
+  # this is a place holder if java needed flags for javac they would go here.
+  set(CMAKE_Java_CREATE_STATIC_LIBRARY
+    "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/.class\" ."
+    )
+  # end of the patch 
+  file(GLOB_RECURSE TREX_vitre_SOURCE_FILES
+    RELATIVE ${PROJECT_SOURCE_DIR} org/trex/vitre/*.java)
+  add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
+  make_jar_executable(Vitre "org.trex.vitre.Vitre")
+  add_dependencies(plugins Vitre)
+  add_dependencies(Vitre ${vitre_pg})
+else(Java_Development_FOUND)
+  message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
+endif(Java_Development_FOUND)
+
+
+########################################################################
+# lightswitch                                                          #
+########################################################################
+trex_plugin(extra/lightswitch TREXtransaction)
+
+########################################################################
+# europa                                                               #
+########################################################################
+if(EUROPA_FOUND) 
   include_directories(${EUROPA_INCLUDE_DIRS})
-  trex_plugin(extra/europa)
+  trex_plugin(extra/europa TREXtransaction)
   trex_pg(europa_pg extra/europa)
   set_property(TARGET ${europa_pg} PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
   set_property(TARGET ${europa_pg} PROPERTY ${EUROPA_LIBRARIES})
@@ -178,8 +223,7 @@ macro(trex_cmd path)
   get_filename_component(basename ${path} NAME_WE)
   string(TOLOWER ${basename} cmd_name)
   add_executable(${cmd_name} ${path})
-  target_link_libraries(${cmd_name}
-    ${TREX_LIBRARIES} ${Boost_LIBRARIES} ${SYSTEM_LIBRARIES})
+  target_link_libraries(${cmd_name} TREXagent)
 endmacro(trex_cmd)
 
 trex_cmd(trex/cmds/AMC.cc)
