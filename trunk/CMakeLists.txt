@@ -167,6 +167,7 @@ target_link_libraries(${vitre_pg} ${Boost_LIBRARIES})
 if(Java_Development_FOUND)
   enable_language(Java)
 
+  # a macro to indicate to java where is the main class
   macro(make_jar_executable target main_class)
     get_target_property(var_loc "${target}" LOCATION)
     add_custom_command(TARGET ${target} POST_BUILD 
@@ -192,7 +193,6 @@ if(Java_Development_FOUND)
     RELATIVE ${PROJECT_SOURCE_DIR} org/trex/vitre/*.java)
   add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
   make_jar_executable(Vitre "org.trex.vitre.Vitre")
-  add_dependencies(plugins Vitre)
   add_dependencies(Vitre ${vitre_pg})
 else(Java_Development_FOUND)
   message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
