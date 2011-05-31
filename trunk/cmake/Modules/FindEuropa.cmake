@@ -53,8 +53,10 @@ if(_europa_MISSING)
   if(Europa_FIND_REQUIRED)
     message(SEND_ERROR "Unable to find the requested europa libraries")
   endif(Europa_FIND_REQUIRED)
+  message(STATUS "Europa not found\nSet your EUROPA_HOME if you want ot compile this plugin")
 else(_europa_MISSING)
   set(EUROPA_FOUND TRUE)
+  message(STATUS "Europa found : include directory is ${EUROPA_INCLUDE_DIR}")
 endif(_europa_MISSING)
 
 
