@@ -1,5 +1,8 @@
 # include "TREXversion.hh"
+
+#ifndef TREX_MAJOR // needed as jam does not generate version.hh
 # include <trex/version.hh>
+#endif 
 
 # include <sstream>
 
