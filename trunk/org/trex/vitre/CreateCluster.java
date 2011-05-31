@@ -1,4 +1,7 @@
+package org.trex.vitre;
+
 import java.io.*;
+
 public class CreateCluster {
 	private int clusters=0, activePoints=0, stability=0, distribution=-1;
 	private float max=0, min=-1, mean=0;

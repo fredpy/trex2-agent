@@ -1,4 +1,7 @@
+package org.trex.vitre;
+
 import java.io.*;
+
 public class Probability {
 
 	//This method creates a file name Probability.log in the TREX log directory containing

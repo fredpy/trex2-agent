@@ -5,6 +5,8 @@
  *
  * @author <a href="mailto:fpy@mbari.org">Frederic Py</a>
  */
+package org.trex.vitre;
+
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.net.ConnectException;

@@ -5,6 +5,7 @@
  *
  * @author <a href="mailto:fpy@porbeagle.shore.mbari.org">Frederic Py</a>
  */
+package org.trex.vitre;
 
 public class Tick
 {

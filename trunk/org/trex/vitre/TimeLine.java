@@ -5,6 +5,7 @@
  *
  * @author <a href="mailto:fpy@mbari.org">Frederic Py</a>
  */
+package org.trex.vitre;
 
 import java.util.LinkedList;
 import java.util.ListIterator;

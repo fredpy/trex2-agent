@@ -5,6 +5,8 @@
  *
  * @author <a href="mailto:fpy@mbari.org">Frederic Py</a>
  */
+package org.trex.vitre;
+
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
