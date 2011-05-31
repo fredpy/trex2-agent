@@ -97,22 +97,18 @@ find_package(Europa
 ########################################################################
 include_directories(
   ${PROJECT_SOURCE_DIR}
-  trex/transaction
-  trex/domain
-  trex/agent
-  trex/utils
-  trex/rapidxml  
-  )
+  ${CMAKE_CURRENT_BINARY_DIR}
+ )
 
 ########################################################################
 # Compiler definitions                                                 #
 ########################################################################
 add_definitions(
-  -DTREX_MAJOR=${TREX_MAJOR}
-  -DTREX_MINOR=${TREX_MINOR}
-  -DTREX_RELEASE=${TREX_PATCH}
-  -DSUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}"
+ -DSUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}"
   )
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in 
+			${CMAKE_CURRENT_BINARY_DIR}/trex/version.hh @ONLY)
 
 ########################################################################
 # TREX libraries.                                                      #

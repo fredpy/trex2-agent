@@ -1,4 +1,5 @@
 # include "TREXversion.hh"
+# include <trex/version.hh>
 
 # include <sstream>
 
@@ -12,7 +13,7 @@ unsigned short TREX::version::minor() {
 }
 
 unsigned short TREX::version::release() {
-  return TREX_RELEASE;
+  return TREX_PATCH;
 }
 
 unsigned long TREX::version::number() {

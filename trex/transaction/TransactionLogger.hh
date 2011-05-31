@@ -15,7 +15,7 @@
 # include <set>
 
 # include "Relation.hh"
-# include "LogManager.hh"
+# include <trex/utils/LogManager.hh>
 
 namespace TREX {
   namespace transaction {
