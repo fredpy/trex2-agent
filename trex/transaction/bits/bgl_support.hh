@@ -493,7 +493,7 @@ namespace TREX {
 	if( rel->active() ) {
 	  out<<"[label=\""<<rel->name();
 	  if( rel->accept_goals() )
-	    out<<'['<<rel->latency()<<':'<<rel->look_ahead()<<']';
+	    out<<'['<<rel->latency()<<':'<<rel->look_ahead()<<"]\" color=\"blue";
 	  out<<"\"]";
 	} else 
 	  // display inactive relation in red
