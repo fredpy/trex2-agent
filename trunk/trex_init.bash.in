@@ -1,0 +1,28 @@
+#!/bin/bash
+
+TREX_LIBS=@CMAKE_INSTALL_PREFIX@/lib
+TREX_BINS=@CMAKE_INSTALL_PREFIX@/bin
+TREX_SHARED=@CMAKE_INSTALL_PREFIX@/shared/trex
+
+if [ -n "${LD_LIBRARY_PATH+x}" ]; then
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TREX_LIBS}
+else
+    export LD_LIBRARY_PATH=${TREX_LIBS}
+fi
+
+if [ -n "${PATH+x}" ]; then
+    export PATH=${PATH}:${TREX_BINS}
+else 
+    export PATH=${TREX_BINS}
+fi
+
+if [ -n "${TREX_PATH+x}" ]; then
+    export TREX_PATH=${TREX_PATH}:${TREX_HOME}/cfg:${TREX_HOME}/plugins
+else
+    export TREX_PATH=${TREX_HOME}/cfg:${TREX_HOME}/plugins
+fi
+
+if [ -n "${TREX_LOG_DIR+x}" ]; then
+else
+    export TREX_LOG_DIR=${TREX_SHARED}/log
+fi
