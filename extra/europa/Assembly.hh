@@ -115,57 +115,302 @@ namespace TREX {
 			 */
       static TREX::utils::Symbol const IGNORE_MODE;
 			
+			/** @brief Europa mission end variable
+			 * 
+			 * The name of the variable in the model that is used to specify the 
+			 * the life time of the TREX agent
+			 * 
+			 * @sa EuropaReactor::getFinalTick() const
+			 */
       static EUROPA::LabelStr const MISSION_END;
+			/** @brief tick duration variable
+			 *
+			 * The name of the variable in the model that is used to specify the 
+			 * duration of a tick. 
+			 * 
+			 * @sa EuropaReactor::tickDuration() const
+			 */
       static EUROPA::LabelStr const TICK_DURATION;
 			
+			/** @brief @c undefined predicate name
+			 * 
+			 * The name of the @c undefined predicate for a TREX agent timeline. This 
+			 * predicate is often used whenever a new observation comes with a 
+			 * predicate name that is unknown by the europa model
+			 */
       static std::string const UNDEFINED_PRED;
 			
+			/** @brief Constructor
+			 *
+			 * @param[in] owner the EuropaReactor that created this instance
+			 * 
+			 * Create a new instance associated to @p owner
+			 */
       Assembly(EuropaReactor &owner);
       ~Assembly();
 			
+			/** @brief Load a model
+			 *
+			 * @param[in] nddl A nddl file symbolic name
+			 * 
+			 * @pre A nddl configuration file named "NDDL.cfg" or "temp_nddl_gen.cfg"
+			 *      can be found in the TREX_PATH
+			 * @pre The file @p nddl exist and is a valid nddl file 
+			 * 
+			 * This method initialize the plan database using the model specified in 
+			 * the file @p nddl
+			 * 
+			 * @throw TREX::transaction::ReactorException An error occured while 
+			 *        trying to load the model or either of the nddl configuartion 
+			 *         files
+			 * @throw TREX::utils::XmlError Erro while parsing the XML content of the 
+			 *         nddl configuration file
+			 * @retval true The model was lsucessfully loaded and the plan data base 
+			 *              is consistent
+			 * @retval false The plan database is inconsitent after loading the model
+			 */
       bool playTransaction(std::string const &nddl);
+			/** @brief That plan solver configuration
+			 * 
+			 * @param[in] A solver configuration file
+			 * 
+			 * @pre @p cfg is a file that can be found in TREX_PATH
+			 * @pre @p cfg is a file in XML that can be used to create a DbSolver
+			 * @pre This method has not been called before for this instance
+			 * 
+			 * Associate this class to a DbSolver configured using the xml content of 
+			 * @p cfg
+			 * @throw TREX::transaction::ReactorException Unable to locate @p cfg
+			 * @throw TREX::transaction::ReactorException Unable to parse @p cfg as XML
+			 * 
+			 * @sa DbSolver::DbSolver(Assembly const &, EUROPA::TiXmlElement const &) 
+			 */
       void configure_solver(std::string const &cfg);
-      
+     
+			/** @brief Get europa schema
+			 *
+			 * @return the schema associated to this class
+			 */
       EUROPA::SchemaId const &schema() const {
 				return m_schema;
       }
-      EUROPA::ConstraintEngineId const &constraint_engine() const {
+			/** @brief Get europa constraint engine
+			 *
+			 * @return the constraint engine associated to this class
+			 */
+			EUROPA::ConstraintEngineId const &constraint_engine() const {
 				return m_constraintEngine;
       }
+			/** @brief Get europa plan database
+			 *
+			 * @return the plan database associated to this class
+			 */
       EUROPA::PlanDatabaseId const &plan_db() const {
 				return m_planDatabase;
       }
+			/** @brief Get europa rules engine
+			 *
+			 * @return the rule engine associated to this class
+			 */
       EUROPA::RulesEngineId const &rules_engine() const {
 				return m_rulesEngine;
       }
 			
+			/** @brief Extract an object attribute
+			 * 
+			 * @param[in] obj An object
+			 * @param[in] str An attribute name
+			 * 
+			 * Extract the attribute @p str from the object @p obj
+			 * 
+			 * @pre @p obj has an attribute named @p str
+			 * @throw EuropaException The attribute @p str does not exist on @p obj
+			 * @return The variable associated to the attribute @p str on @p obj
+			 */
       EUROPA::ConstrainedVariableId attribute(EUROPA::ObjectId const &obj,
 																							std::string const &attr) const;
+			/** @brief Get timeline mode
+			 * 
+			 * @param[in] obj An object
+			 *
+			 * @pre @p obj is a a trex timeline
+			 * 
+			 * Extract the mode of the timeline @p obj. This mode reflects whether 
+			 * the timeline is @e Internal, @e External or any other mode available.  
+			 * 
+			 * @throw EuropaException @p obj is not a TREX timeline
+			 * @return the variable that gives the mode of @p obj
+			 *
+			 * @sa INTERNAL_MODE
+			 * @sa EXTERNAL_MODE
+			 * @sa OBSERVE_MODE
+			 * @sa PRIVATE_MODE
+			 * @sa IGNORE_MODE
+			 */
       EUROPA::ConstrainedVariableId mode(EUROPA::ObjectId const &obj) const {
 				return attribute(obj, MODE_ATTR);
       }
+			/** @brief Get default predicate value
+			 * 
+			 * @param[in] obj An object
+			 * 
+			 * @pre @p obj is a trex timeline
+			 * 
+			 * Gets the timeline default predicate value. This value will be used to
+			 * set the timeline state whwnever the model cannot idenitfy its value 
+			 * 
+			 * @throw EuropaException @p obj is not a TREX timeline
+			 * @return the variable that gives the default predicate of @p obj
+			 */
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
 				return attribute(obj, DEFAULT_ATTR);
       }
+			/** @brief Check for default predicate
+			 * 
+			 * @param[in] obj An object
+			 * 
+			 * @pre @p obj is a TREX timeline
+			 * @pre the default predicate for @p obj is a fully specified value (ie a 
+			 *      single value) and correspond ot a possible predicate for this 
+			 *      object
+			 * 
+			 * Check that @p obj specifies a correct default predicate
+			 * 
+			 * @throw EuropaException @p obj is not a TREX timeline
+			 * @throw EuropaException The default predicate of @p obj is not a singleton
+			 * @throw EuropaException the default predicate of @p obj is not a valid
+			 *                        predicate
+			 * @sa default_pred(EUROPA::ObjectId const &) const
+			 */
       void check_default(EUROPA::ObjectId const &obj) const;
+			/** @brief Get the solver
+			 *
+			 * @return the solver used by this class
+			 * @sa configure_solver((std::string const &)
+			 */
       DbSolver &solver() const {
 				return *m_solver;
       }
 			
+			/** @brief Get trex timelines
+			 *
+			 * @param[out] objs A list 
+			 * 
+			 * Extract all the timleines of the model that are specified as trex 
+			 * timelines and store them in @p objs
+			 *
+			 * Trex timelines are derived from the base class AgentTimeline in nddl;
+			 * this method allows to selct of the objects that derive from this class 
+			 * in the plan database
+			 * 
+			 * @sa TREX_TIMELINE
+			 */
       void trex_timelines(std::list<EUROPA::ObjectId> &objs) const {
 				m_planDatabase->getObjectsByType(TREX_TIMELINE, objs);
       }
-			
+			/** @brief Set as ignored object
+			 * 
+			 * @param[in] obj An object
+			 * 
+			 * Add @p obj to the object to be ignored in the plan database
+			 * @post all the tokens associated to @p obj will be ignored during 
+			 * deliberation 
+			 */
       void ignore(EUROPA::ObjectId const &obj) {
 				m_ignore.insert(obj);
       }
+			/** @pre Ignored tokens filtering
+			 * 
+			 * @param[in] tok A token
+			 * 
+			 * Check if the token @p tok should be ignored. This mean that all the
+			 * possible values of its associated object are in the @p ignore list 
+			 * 
+			 * @retval true @p tok is ignored and can be discarded  from deliberation
+			 * @retval false there's still a possibility that @p tok is not to be 
+			 *               ignored
+			 * @sa ignore(EUROPA::ObjectId const &)
+			 * @sa isIgnored(EUROPA::ObjectId const &) const
+			 *
+			 */
       bool ignored(EUROPA::TokenId const &tok) const;
-      bool in_deliberation(EUROPA::TokenId const &tok) const;
+			/** @pre Check if part of deliberation
+			 *
+			 * @param[in] tok A token
+			 * 
+			 * Check if the token @p tok is part of current deliberation
+			 * 
+			 * This method is used during synchronization in order to avoid to badly 
+			 * impact any possible planning that happens meanwhile
+			 * 
+			 * @return true if @p tok is part of pending deliberation
+			 * @retval false otherwise
+			 */
+			bool in_deliberation(EUROPA::TokenId const &tok) const;
 			
+			/** @brief Check if internal
+			 * 
+			 * @param[in] tok A token
+			 * 
+			 * @retval true if all the possible objects for @p tok are trex 
+			 *              @p Internal timelines
+			 * @retval false otherwise
+			 * @sa isInternal(EUROPA::ObjectId const &) const
+			 */
       bool internal(EUROPA::TokenId const &tok) const;      
 			
+			/** @brief Check if internal 
+			 *
+			 * @param[in] obj An object 
+			 * 
+			 * Check if @p obj is a trex @e Internal timeline.
+			 * 
+			 * @note This checkinfg is at the reactor level -- and not simply ate the 
+			 *       model level. Indeed, it may happen that a timeline has been 
+			 *       specified as @e Internal by the model but was already owned by 
+			 *       another reactor. In that case a warning message would have been 
+			 *       displayed in TREX.log and this timeline mode would have been set 
+			 *       as @e Private and this method will return @c false
+			 * @bug I am not sure that this policy to migrate a timline from 
+			 *       @e Internal o @e Private is the good one. It may be better to 
+			 *       demote failed @e Internal timelines to @e External until we can 
+			 *       take ownership of this timeline ...
+			 * 
+			 * @retval true if @p obj is a trex @e Internal timeline
+			 * @retval false otherwise
+			 * @sa isExternal(EUROPA::ObjectId const &) const
+			 * @sa isIgnored(EUROPA::ObjectId const &) const
+			 */
       bool isInternal(EUROPA::ObjectId const &obj) const;	
+			/** @brief Check if external 
+			 *
+			 * @param[in] obj An object 
+			 * 
+			 * Check if @p obj is a trex @e External timeline.
+			 * 
+			 * @note This checking is at the reactor level -- and not simply ate the 
+			 *       model level. Although for @p External timelines both the model 
+			 *       and trex should be aligned 
+			 * @retval true if @p obj is a trex @e External timeline
+			 * @retval false otherwise
+			 *
+			 * @sa isInternal(EUROPA::ObjectId const &) const
+			 * @sa isIgnored(EUROPA::ObjectId const &) const
+			 */
       bool isExternal(EUROPA::ObjectId const &obj) const;
+			/** @brief Check if ignored 
+			 *
+			 * @param[in] obj An object 
+			 * 
+			 * Check if @p obj is a part of the objects to be ignored
+			 * 
+			 * @retval true if @p obj is part of the ignore list
+			 * @retval false otherwise
+			 *
+			 * @sa isInternal(EUROPA::ObjectId const &) const
+			 * @sa isIgnored(EUROPA::ObjectId const &) const
+			 * @sa ignore(EUROPA::ObjectId const &)
+			 */			
       bool isIgnored(EUROPA::ObjectId const &obj) const {
 				return m_ignore.end()!=m_ignore.find(obj);
       }

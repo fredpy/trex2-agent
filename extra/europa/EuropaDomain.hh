@@ -8,6 +8,17 @@
 namespace TREX {
   namespace europa {
     
+    /** @brief Proxy between trex and europa domains
+     *
+     * This class is a simpel proxy between europa domain internal representation
+     * and TREX domain representation
+     * 
+     * It allows to easily access to europa domain information as if it were a 
+     * TREX domain
+     * 
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class EuropaDomain :public TREX::transaction::DomainBase {
     public:
       static TREX::utils::Symbol const type_name;

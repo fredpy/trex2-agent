@@ -73,8 +73,8 @@ void VitreReactor::handleInit() {
 void VitreReactor::send(std::string const &str) {
   uint32_t msg_len = htonl(str.length());
   boost::array<boost::asio::const_buffer, 2> msg = {
-      boost::asio::buffer(&msg_len, sizeof(msg_len)),
-      boost::asio::buffer(str) };
+      {boost::asio::buffer(&msg_len, sizeof(msg_len)),
+      boost::asio::buffer(str)} };
   try {
     m_socket.send(msg);
   } catch( std::exception &e) {
