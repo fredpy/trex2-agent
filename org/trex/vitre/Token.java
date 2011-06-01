@@ -35,6 +35,13 @@ public class Token {
 	m_tooltip = name;
     }
 
+    public boolean isFailed() {
+	return m_shortName.equals("Failed");
+    }
+    public boolean isUndefined() {
+	return m_shortName.equals("undefined");
+    }
+
     public void setToolTip(String message) {
 	m_tooltip = message;
     }

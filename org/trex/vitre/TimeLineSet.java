@@ -124,7 +124,8 @@ public class TimeLineSet
 	double rowHeight = 18;
 	int count = 0;
 	
-	LinkedList<TimeLine.PaintResult> hints = new LinkedList<TimeLine.PaintResult>();
+	LinkedList<TimeLine.PaintResult> 
+	    hints = new LinkedList<TimeLine.PaintResult>();
 
 	g2.setPaint(Color.white);
 	while( iter.hasNext() ) {
@@ -150,9 +151,10 @@ public class TimeLineSet
 	
 	while( iter.hasNext() ) {
 	    TimeLine cur = iter.next();
-	    Rectangle2D tlArea = new Rectangle2D.Double(chart.getX(), 
-							chart.getY()+2+count*(rowHeight+4),
-							chart.getWidth(), rowHeight);
+	    Rectangle2D 
+		tlArea = new Rectangle2D.Double(chart.getX(), 
+						chart.getY()+2+count*(rowHeight+4),
+						chart.getWidth(), rowHeight);
 
 	    hints.offer(cur.initPaint(tlArea, start));
 	    ++count;

@@ -151,7 +151,8 @@ public class TimeLine
 	return g2.getFontMetrics().getStringBounds(content, g2);
     }
 
-    public static double getTickLength(Graphics2D g2, PaintResult state, Tick clk, double tickX) {
+    public static double getTickLength(Graphics2D g2, PaintResult state, 
+				       Tick clk, double tickX) {
 	TickInterval previous = null;
 	double posX = state.area.getX();
 	boolean inTick = false;
@@ -171,8 +172,10 @@ public class TimeLine
 		break;
 	    } 
 	    if( cmp==0 ) { 
-		if( !tokStart.isSingleton() && (null==previous || !previous.equals(tokStart)) ) {
-		    size = minBlock(g2, tokStart.toString()).getWidth()+2*defaultMargin;
+		if( !tokStart.isSingleton() && 
+		    (null==previous || !previous.equals(tokStart)) ) {
+		    size = minBlock(g2, 
+				    tokStart.toString()).getWidth()+2*defaultMargin;
 		    state.predictedWidth += size;
 		}
 		inTick = true;
@@ -208,18 +211,44 @@ public class TimeLine
 	return state.predictedWidth;
     }
 
+    static final int TOK_OK =0;
+    static final int TOK_UNDEFINED =1;
+    static final int TOK_FAILED =2;
     
+    public static int kindOf(Token tok) {
+	if( tok.isUndefined() ) {
+	    return TOK_UNDEFINED;
+	} else if( tok.isFailed() ) {
+	    return TOK_FAILED;
+	} else {
+	    return TOK_OK;
+	}
+    }
 
-    private static Rectangle2D drawBlock(Graphics2D g2, PaintResult state, String content, double width,
-					 Rectangle2D textInfo) {
-	Rectangle2D area = new Rectangle2D.Double(state.area.getX(), state.area.getY(),
+    private static Rectangle2D drawBlock(Graphics2D g2, PaintResult state, 
+					 String content, double width,
+					 Rectangle2D textInfo, int kind) {
+	Rectangle2D area = new Rectangle2D.Double(state.area.getX(), 
+						  state.area.getY(),
 						  width, state.area.getHeight());
+	Color col_from, col_to;
+	if( TOK_FAILED==kind ) {
+	    col_from = new Color(1f, 0.8f, 0.8f);
+	    col_to = new Color(0.8f, 0.5f, 0.5f);
+	} else if( TOK_UNDEFINED==kind ) {
+	    col_from = new Color(1f, 1f, 0.8f);
+	    col_to = new Color(0.8f, 0.8f, 0.5f);
+	} else {
+	    col_from = new Color(0.8f, 1f, 0.8f);
+	    col_to = new Color(0.5f, 0.8f, 0.5f);
+	}
+	    	
 	g2.setPaint(new GradientPaint((int)area.getX(), (int)area.getY(),
-				      new Color(0.8f, 1f, 0.8f),
+				      col_from,
 				      (int)area.getX(), (int)(area.getY()+area.getHeight()),
-				      new Color(0.5f, 0.8f, 0.5f)));
+				      col_to));
 	g2.fill(area);
-	g2.setPaint(new Color(0.25f, 0.5f, 0.25f));
+	g2.setPaint(new Color(0.25f, 0.25f, 0.25f));
 	g2.draw(area);
 	
 	Shape savedClip = g2.getClip();
@@ -235,15 +264,16 @@ public class TimeLine
 	return area;
     }
 
-    private static Rectangle2D drawBlock(Graphics2D g2, PaintResult state, String content, double width) {
-	return drawBlock(g2, state, content, width, minBlock(g2, content));
+    private static Rectangle2D drawBlock(Graphics2D g2, PaintResult state, String content, double width,
+					 int kind) {
+	return drawBlock(g2, state, content, width, minBlock(g2, content), kind);
     }
 
     private static Rectangle2D drawBlock(Graphics2D g2, PaintResult state, String content, double tickX, 
-				  double margin) {
+					 double margin, int kind) {
 	Rectangle2D txt = minBlock(g2, content);
 
-	return drawBlock(g2, state, content, txt.getWidth()+2*margin, txt);
+	return drawBlock(g2, state, content, txt.getWidth()+2*margin, txt, kind);
     }
 
     public static PaintResult drawTick(Graphics2D g2, PaintResult state, Tick clk, 
@@ -273,7 +303,7 @@ public class TimeLine
 			state.area.setRect(tickX, state.area.getY(),
 					   state.area.getWidth()-tickX,
 					   state.area.getHeight());
-		    drawBlock(g2, state, tokStart.toString(), tickX, defaultMargin);
+		    drawBlock(g2, state, tokStart.toString(), tickX, defaultMargin, kindOf(cur));
 		}
 		inTick = true;
 	    }
@@ -286,9 +316,11 @@ public class TimeLine
 		return state;
 	    }
 	    if( cmp==0 ) {
-		cur.setBox(drawBlock(g2, state, cur.getShortName(), tickX-state.area.getX()+tickWidth));
+		cur.setBox(drawBlock(g2, state, cur.getShortName(), tickX-state.area.getX()+tickWidth, 
+				     kindOf(cur)));
 	    } else if( inTick ) 
-		cur.setBox(drawBlock(g2, state, cur.getShortName(), tickX, defaultMargin+extraMargin));
+		cur.setBox(drawBlock(g2, state, cur.getShortName(), tickX, defaultMargin+extraMargin,
+				     kindOf(cur)));
 	    
 	    if( previous.getLowerBound().equals(clk) ) {
 		if( !previous.isSingleton() ) {
@@ -296,7 +328,7 @@ public class TimeLine
 			state.area.setRect(tickX, state.area.getY(),
 					   state.area.getWidth()-tickX,
 					   state.area.getHeight());
-		    drawBlock(g2, state, previous.toString(), tickX, defaultMargin);
+		    drawBlock(g2, state, previous.toString(), tickX, defaultMargin, kindOf(cur));
 		}
 	    } else {
 		state.drawIter.previous();
