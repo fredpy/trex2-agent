@@ -21,7 +21,7 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
   :TeleoReactor(arg, false), m_assembly(*this), m_core(*this) {
   bool found;
   std::string short_nddl = getName().str()+".nddl",
-    long_nddl = getGraphName().str()+short_nddl, 
+    long_nddl = getGraphName().str()+"."+short_nddl, 
     nddl;
   // locate nddl model 
   //   - 1st look for <agent>.<reactor>.nddl
