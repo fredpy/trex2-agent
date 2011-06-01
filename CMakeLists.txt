@@ -42,6 +42,9 @@ set(TREX_MAJOR 0)
 set(TREX_MINOR 1)
 set(TREX_PATCH 2)
 
+set(Trex_LIBRARY_DIRS "")
+set(Trex_CONFIG_DIRS "")
+
 ########################################################################
 # Java JDK                                                             #
 ########################################################################
@@ -53,6 +56,7 @@ find_package(Java COMPONENTS Development)
 find_package(Boost 1.38.0 COMPONENTS thread system)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
+  list(APPEND Trex_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})
 else(Boost_FOUND)
   message(FATAL_ERROR "TREX requires Boost C++ libraries")
 endif(Boost_FOUND)
@@ -89,6 +93,7 @@ find_package(Europa
   COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
   NDDL RulesEngine Solvers System)
 
+
 ########################################################################
 # Include Directories                                                  #
 ########################################################################
@@ -109,6 +114,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in
 ########################################################################
 
 add_custom_target(core COMMENT "Trex core libraries")
+list(APPEND Trex_LIBRARY_DIRS ${CMAKE_CURRENT_BINARY_DIR})
+list(APPEND Trex_CONFIG_DIRS ${CMAKE_SOURCE_DIR}/cfg)
 
 # TREXutils
 file(GLOB_RECURSE TREX_UTILS_FILES trex/utils/*.cc)
@@ -175,6 +182,7 @@ macro(trex_plugin folder module)
   install(DIRECTORY ${folder}/cfg DESTINATION shared/trex OPTIONAL
     FILES_MATCHING PATTERN "*" 
     PATTERN ".svn" EXCLUDE)
+  list(APPEND Trex_CONFIG_DIRS ${CMAKE_SOURCE_DIR}/${folder}/cfg)
 endmacro(trex_plugin)
 
 ########################################################################
@@ -234,6 +242,7 @@ trex_plugin(extra/lightswitch TREXtransaction)
 ########################################################################
 if(EUROPA_FOUND) 
   include_directories(${EUROPA_INCLUDE_DIRS})
+  list(APPEND Trex_LIBRARY_DIRS ${EUROPA_LIBRARY_DIRS})
   trex_plugin(extra/europa TREXtransaction)
   trex_pg(europa_pg extra/europa)
   set_property(TARGET ${europa_pg} PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
@@ -265,7 +274,18 @@ install(DIRECTORY log DESTINATION shared/trex/log
   DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
   FILES_MATCHING PATTERN "*" EXCLUDE)
   
-# create a default bash environement file
+list(REMOVE_DUPLICATES Trex_LIBRARY_DIRS)
+list(REMOVE_DUPLICATES Trex_CONFIG_DIRS)
+
+# prepare list for bash
+string(REPLACE ";" ":" TREX_LIBRARY_DIRS "${Trex_LIBRARY_DIRS}")
+string(REPLACE ";" ":" TREX_CONFIG_DIRS "${Trex_CONFIG_DIRS}")
+
+# A file just for testing inside the build directory
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_devel.bash.in
+  ${CMAKE_CURRENT_BINARY_DIR}/trex_devel.bash @ONLY)
+
+# create a default bash environement file for installed version
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)

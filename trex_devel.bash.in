@@ -1,0 +1,35 @@
+#!/bin/bash
+
+
+TREX_LIBS=@TREX_LIBRARY_DIRS@
+TREX_BINS=@CMAKE_BINARY_DIR@
+
+platform='unknown'
+lib_path_var=LD_LIBRARY_PATH
+unamestr=`uname`
+if [[ "$unamestr" == 'Darwin' ]]; then
+    if [ -n "${DYLD_LIBRARY_PATH+x}" ]; then
+	export DYLD_LIBRARY_PATH=${TREX_LIBS}:${LD_LIBRARY_PATH}
+    else
+	export DYLD_LIBRARY_PATH=${TREX_LIBS}
+    fi
+    export DYLD_BIND_AT_LAUNCH=YES
+else 
+    if [ -n "${LD_LIBRARY_PATH+x}" ]; then
+	export LD_LIBRARY_PATH=${TREX_LIBS}:${LD_LIBRARY_PATH}
+    else
+	export LD_LIBRARY_PATH=${TREX_LIBS}
+    fi
+fi
+   
+
+if [ -n "${PATH+x}" ]; then
+    export PATH=${TREX_BINS}:${PATH}
+else 
+    export PATH=${TREX_BINS}
+fi
+
+export TREX_PATH=@TREX_CONFIG_DIRS@
+
+export TREX_LOG_DIR=@CMAKE_SOURCE_DIR@/log
+
