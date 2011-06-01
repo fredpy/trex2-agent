@@ -218,6 +218,7 @@ else(${CMAKE_GENERATOR} MATCHES "Xcode")
     add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
     make_jar_executable(Vitre "org.trex.vitre.Vitre")
     add_dependencies(Vitre ${vitre_pg})
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Vitre.jar OPTIONAL DESTINATION shared/trex/java)
   else(Java_Development_FOUND)
     message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
   endif(Java_Development_FOUND)
@@ -261,6 +262,7 @@ install(DIRECTORY cfg DESTINATION shared/trex
 
 # create the default log directory
 install(DIRECTORY log DESTINATION shared/trex/log
+  DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
   FILES_MATCHING PATTERN "*" EXCLUDE)
   
 # create a default bash environement file
