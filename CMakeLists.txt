@@ -108,37 +108,55 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in
 # TREX libraries.                                                      #
 ########################################################################
 
+add_custom_target(core COMMENT "Trex core libraries")
+
 # TREXutils
 file(GLOB_RECURSE TREX_UTILS_FILES trex/utils/*.cc)
 add_library(TREXutils SHARED ${TREX_UTILS_FILES})
+add_dependencies(core TREXutils)
 set_property(SOURCE trex/utils/Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
+install(DIRECTORY trex/utils DESTINATION include/trex
+          FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN ".svn" EXCLUDE)
 
 # TREXdomain
 file(GLOB_RECURSE TREX_DOMAIN_FILES
   RELATIVE ${PROJECT_SOURCE_DIR} trex/domain/*.cc)
 add_library(TREXdomain SHARED ${TREX_DOMAIN_FILES})
+add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)
+install(DIRECTORY trex/domain DESTINATION include/trex
+          FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN ".svn" EXCLUDE)
 
 # TREXtransaction
 file(GLOB_RECURSE TREX_TRANSACTION_FILES
   RELATIVE ${PROJECT_SOURCE_DIR} trex/transaction/*.cc)
 add_library(TREXtransaction SHARED ${TREX_TRANSACTION_FILES})
+add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain)
+install(DIRECTORY trex/transaction DESTINATION include/trex
+          FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN ".svn" EXCLUDE)
 
 # TREXagent
 file(GLOB_RECURSE TREX_AGENT_FILES 
   RELATIVE ${PROJECT_SOURCE_DIR} trex/agent/*.cc)
 add_library(TREXagent SHARED ${TREX_AGENT_FILES})
+add_dependencies(core TREXagent)
 target_link_libraries(TREXagent TREXtransaction)
-
+install(DIRECTORY trex/agent DESTINATION include/trex
+          FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN ".svn" EXCLUDE)
 
 set(TREX_LIBRARIES TREXutils TREXagent TREXdomain TREXtransaction)
 
+install(TARGETS ${TREX_LIBRARIES} DESTINATION lib)
 ########################################################################
 # TREX plugins.                                                        #
 ########################################################################
-add_custom_target(plugins COMMENT "Build all the trex plugins")
+add_custom_target(plugins COMMENT "Trex plugins")
 
 macro(trex_pg name folder)
   get_filename_component(basename ${folder} NAME_WE)
@@ -150,9 +168,13 @@ macro(trex_plugin folder module)
   set(plugin_files "")
   file(GLOB_RECURSE plugin_files
     RELATIVE ${PROJECT_SOURCE_DIR} ${folder}/*.cc)
-  add_library(${plugin_name} SHARED EXCLUDE_FROM_ALL ${plugin_files})
+  add_library(${plugin_name} SHARED ${plugin_files})
   target_link_libraries(${plugin_name} ${module})
   add_dependencies(plugins ${plugin_name})
+  install(TARGETS ${plugin_name} DESTINATION shared/trex/plugins OPTIONAL)
+  install(DIRECTORY ${folder}/cfg DESTINATION shared/trex OPTIONAL
+    FILES_MATCHING PATTERN "*" 
+    PATTERN ".svn" EXCLUDE)
 endmacro(trex_plugin)
 
 ########################################################################
@@ -163,41 +185,43 @@ trex_pg(vitre_pg extra/vitre)
 target_link_libraries(${vitre_pg} ${Boost_LIBRARIES})
 
 
+if(${CMAKE_GENERATOR} MATCHES "Xcode")
+    message(STATUS "Will not compile Vitre.jar under Xcode")
+else(${CMAKE_GENERATOR} MATCHES "Xcode")
+  if(Java_Development_FOUND)
+    enable_language(Java)
 
-if(Java_Development_FOUND)
-  enable_language(Java)
+    # a macro to indicate to java where is the main class
+    macro(make_jar_executable target main_class)
+      get_target_property(var_loc "${target}" LOCATION)
+      add_custom_command(TARGET ${target} POST_BUILD 
+	COMMAND ${CMAKE_Java_ARCHIVE} ufe ${var_loc} ${main_class} 
+	COMMENT "Creating JAR entry point.")
+      UNSET(var_loc)
+    endmacro()
 
-  # a macro to indicate to java where is the main class
-  macro(make_jar_executable target main_class)
-    get_target_property(var_loc "${target}" LOCATION)
-    add_custom_command(TARGET ${target} POST_BUILD 
-      COMMAND ${CMAKE_Java_ARCHIVE} ufe ${var_loc} ${main_class} 
-      COMMENT "Creating JAR entry point.")
-    UNSET(var_loc)
-  endmacro()
+    set(CMAKE_Java_FLAGS "-sourcepath \"${PROJECT_SOURCE_DIR}\"")
 
-  set(CMAKE_Java_FLAGS "-sourcepath \"${PROJECT_SOURCE_DIR}\"")
-
-  # following is a patch/hack to make cmake compiles jars files properly
-  # compile a Java file into an object file
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.class")
-  set(CMAKE_Java_COMPILE_OBJECT
-    "<CMAKE_Java_COMPILER> <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/.class\""
-  )
-  # this is a place holder if java needed flags for javac they would go here.
-  set(CMAKE_Java_CREATE_STATIC_LIBRARY
-    "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/.class\" ."
-    )
-  # end of the patch 
-  file(GLOB_RECURSE TREX_vitre_SOURCE_FILES
-    RELATIVE ${PROJECT_SOURCE_DIR} org/trex/vitre/*.java)
-  add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
-  make_jar_executable(Vitre "org.trex.vitre.Vitre")
-  add_dependencies(Vitre ${vitre_pg})
-else(Java_Development_FOUND)
-  message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
-endif(Java_Development_FOUND)
-
+    # following is a patch/hack to make cmake compiles jars files properly
+    # compile a Java file into an object file
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.class")
+    set(CMAKE_Java_COMPILE_OBJECT
+      "<CMAKE_Java_COMPILER> <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/.class\""
+      )
+    # this is a place holder if java needed flags for javac they would go here.
+    set(CMAKE_Java_CREATE_STATIC_LIBRARY
+      "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/.class\" ."
+      )
+    # end of the patch 
+    file(GLOB_RECURSE TREX_vitre_SOURCE_FILES
+      RELATIVE ${CMAKE_SOURCE_DIR} org/trex/vitre/*.java)
+    add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
+    make_jar_executable(Vitre "org.trex.vitre.Vitre")
+    add_dependencies(Vitre ${vitre_pg})
+  else(Java_Development_FOUND)
+    message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
+  endif(Java_Development_FOUND)
+endif(${CMAKE_GENERATOR} MATCHES "Xcode")
 
 ########################################################################
 # lightswitch                                                          #
@@ -224,7 +248,22 @@ macro(trex_cmd path)
   string(TOLOWER ${basename} cmd_name)
   add_executable(${cmd_name} ${path})
   target_link_libraries(${cmd_name} TREXagent)
+  add_dependencies(core ${cmd_name})
+  install(TARGETS ${cmd_name} DESTINATION bin)  
 endmacro(trex_cmd)
 
 trex_cmd(trex/cmds/AMC.cc)
 trex_cmd(trex/cmds/Sim.cc)
+
+install(DIRECTORY cfg DESTINATION shared/trex 
+  FILES_MATCHING PATTERN "*" 
+  PATTERN ".svn" EXCLUDE)
+
+# create the default log directory
+install(DIRECTORY log DESTINATION shared/trex/log
+  FILES_MATCHING PATTERN "*" EXCLUDE)
+  
+# create a default bash environement file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
+  ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
