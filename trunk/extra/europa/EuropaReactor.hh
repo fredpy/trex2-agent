@@ -65,7 +65,7 @@ namespace TREX {
       bool synchronize();
       bool hasWork();
       void resume();
-      
+
       typedef std::map<EUROPA::eint, TREX::transaction::goal_id> europa_mapping;
 
       europa_mapping m_external_goals;
@@ -78,8 +78,10 @@ namespace TREX {
         m_planStart = getInitialTick();
         m_steps = 0;
       }
+      bool deactivate_solver();
 
       TREX::transaction::TICK m_planStart;
+      bool                    m_completedThisTick;
       unsigned long           m_steps;
 
       friend class Assembly;

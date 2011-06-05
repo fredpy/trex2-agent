@@ -7,6 +7,8 @@
 #include <PLASMA/Token.hh>
 #include <PLASMA/TokenVariable.hh>
 
+#include <PLASMA/Debug.hh>
+
 using namespace TREX::europa;
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -79,7 +81,7 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
 	syslog("WARN")<<"Unable to declare "<<trex_name<<" as Internal ...\n"
 		      <<"\t making it Private.";
       } else 
-	m_core.set_internal(*it);
+        m_core.set_internal(*it); 
     } else if( Assembly::IGNORE_MODE==mode_val ) {
       m_assembly.ignore(*it);
     } else {
@@ -100,15 +102,14 @@ EuropaReactor::~EuropaReactor() {}
 
 void EuropaReactor::notify(Observation const &o) {
   std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
-    ret = m_assembly.convert(o, false, true);
+    ret = m_assembly.convert(o, true);
 
   if( ret.second.isId() ) {
-    // restrict start to current tick
     ret.second->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
 							       getCurrentTick()));
     ret.second->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
 							     PLUS_INFINITY));
-    m_core.notify(ret.first, ret.second);
+    m_core.notify(ret);
   } else {
     syslog("ERROR")<<"Failed to produce observation "
 		   <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
@@ -116,7 +117,7 @@ void EuropaReactor::notify(Observation const &o) {
 }
 
 void EuropaReactor::handleRequest(goal_id const &g) {
-  EUROPA::TokenId tok = m_assembly.convert(*g, true, false).second;
+  EUROPA::TokenId tok = m_assembly.convert(*g, false).second;
 
   if( tok.isId() ) {
     // restrict start, duration and end
@@ -170,57 +171,65 @@ void EuropaReactor::handleInit() {
 							      tickDuration()));
   
   // Next thing is to process facts
-  m_core.initialize();
+  // m_core.initialize();
 }
 
 void EuropaReactor::handleTickStart() {
   if( getCurrentTick()==getInitialTick() )
     reset_deliberation();
+  m_completedThisTick = false;
 }
 
 bool EuropaReactor::synchronize() {
-  m_core.processPending();
-  if( !( m_core.complete_externals() && m_core.synchronize()) ) {
+  if( !( m_core.update_externals() && m_core.synchronize() ) ) {
     m_assembly.solver().reset();
-    /* bool discard_current_vals = */ m_core.process_recalls();
+    // doRecalls
     m_assembly.mark_inactive();
-    // bool relax_failed = !m_core.relax(false);
-    // bool resolve_failed = !m_core.synchronize();
-    // if( discard_curren_vals || relax_failed || relax_failed ) {
-    //   m_assembly.mark_inactive();
-    //   relax_failed = m_core.relax(true);
-    //   resolve_failed = m_core.synchronize();
-    //   if( relax_failed || relax_failed )
-    //      return false;
-    // }
+    if( !( m_core.relax(false) && m_core.synchronize()) ) {
+      m_assembly.mark_inactive();
+      if( !(m_core.relax(true) && m_core.synchronize()) ) {
+        syslog()<<"Unable to explain the current state of the world.";
+        return false;
+      }
+    }
   }
-  m_core.commit();
   m_core.doNotify();
-  // update_goals();
-
-  return !m_assembly.invalid();
-}
-
-bool EuropaReactor::hasWork() {
-  if( m_assembly.active() )
-    return true;
-  /* extra tests in between */
-    
+  std::string dbg_pln = manager().file_name(getName().str()+".plan.dot");
+  std::ofstream of(dbg_pln.c_str());
+  m_assembly.logPlan(of);
   return true;
 }
 
+bool EuropaReactor::hasWork() {
+  if( m_assembly.invalid() )
+    return false;
+  if( m_assembly.active() )
+    return true;
+  return !m_completedThisTick;
+}
+
 void EuropaReactor::resume() {
+  if( m_assembly.invalid() ) {
+    syslog("ERROR")<<"Cannot resume deliberation with an invalid database.";
+    return;
+  }
+  if( m_assembly.solver().isExhausted() ) {
+    syslog("WARN")<<"No plan found.";
+    m_assembly.mark_invalid();
+  }
 }
 
 //  - Europa interface callbacks
 
 void EuropaReactor::removed(EUROPA::TokenId const &tok) {
   europa_mapping::iterator i = m_external_goals.find(tok->getKey());
-  if( m_external_goals.end()!=i ) 
+  if( m_external_goals.end()!=i ) {
     m_external_goals.erase(i);
-  else {
+  } else {
     i = m_internal_goals.find(tok->getKey());
-    m_internal_goals.erase(i);
+    if( m_internal_goals.end()!=i ) {
+      m_internal_goals.erase(i);
+    }
   }
 }
 
@@ -257,3 +266,13 @@ void EuropaReactor::notify(EUROPA::ObjectId const &tl,
   postObservation(obs);
 }
 
+
+bool EuropaReactor::deactivate_solver() {
+  m_assembly.solver().clear();
+  // if( !timelines_are_complete() ) {
+  //   m_assembly.mark_invalid();
+  //   syslog("ERROR")<<"Incomplete after planning.";
+  //   return false;
+  // }
+  return true;
+}

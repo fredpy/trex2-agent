@@ -16,6 +16,8 @@
 #include <PLASMA/TokenVariable.hh>
 
 #include <PLASMA/XMLUtils.hh>
+#include <PLASMA/Debug.hh>
+#include <PLASMA/Timeline.hh>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -23,11 +25,27 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
-:EuropaException(msg+"; on\n"+tok.toLongString()) {}
+ :EuropaException(msg+"; on\n"+tok.toLongString()) {}
 
 /*
  * class TREX::europa::details::Schema
  */
+std::string const Schema::EUROPA_DEBUG("Europa.log");
+
+
+Schema::Schema() {
+  m_europa_debug.open(m_log->file_name(EUROPA_DEBUG).c_str());
+  DebugMessage::setStream(m_europa_debug);
+  bool found;
+  std::string cfg_dbg = m_log->use("Debug.cfg", found);
+  
+  if( found ) {
+    std::ifstream cfg(cfg_dbg.c_str());
+    DebugMessage::readConfigFile(cfg);
+  } else
+    m_log->syslog("EUROPA")<<"No Debug.cfg keeping default europa debug verbosity.";
+}
+
 
 // modifiers
 
@@ -86,7 +104,7 @@ std::string const Assembly::UNDEFINED_PRED("undefined");
 // structors 
 
 Assembly::Assembly(EuropaReactor &owner)
-:m_reactor(owner), m_solver(NULL) {
+ :m_reactor(owner), m_solver(NULL) {
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
   addModule((new EUROPA::ModuleConstraintLibrary())->getId());  
   addModule((new EUROPA::ModulePlanDatabase())->getId());
@@ -127,27 +145,56 @@ Assembly::~Assembly() {
 
 // observers 
 
+void Assembly::logPlan(std::ostream &out) const {
+  EUROPA::TokenSet const all_toks = m_planDatabase->getTokens();
+  out<<"digraph plan_"<<m_reactor.getCurrentTick()<<" {\n";
+  out<<"  node[shape=\"box\"];\n";
+  for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
+      all_toks.end()!=i; ++i) {
+    if( !ignored(*i) ) {
+      EUROPA::eint key;
+      if( (*i)->isMerged() ) {
+	key = (*i)->getActiveToken()->getKey();
+      } else {
+	key = (*i)->getKey();
+	out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()
+	   <<" from "<<(*i)->start()->lastDomain().toString()
+	   <<" to "<<(*i)->end()->lastDomain().toString()<<"\"";
+	if( (*i)->isFact() )
+	  out<<" color=red";
+	out<<"];\n";
+      }      
+      EUROPA::TokenId master = (*i)->master();
+      if( master.isId() ) {
+	out<<"  t"<<master->getKey()<<"->t"<<key
+	   <<"[label=\""<<(*i)->getRelation().toString()<<"\"];\n";
+      }
+    }
+  }
+  out<<"}\n";
+}
+
 void Assembly::check_default(EUROPA::ObjectId const &obj) const {
   EUROPA::ConstrainedVariableId var = default_pred(obj);
   std::ostringstream oss;
 	
   if( var.isNoId() || !var->isSpecified() ) {
     oss<<"Internal timeline "<<obj->getName().toString()
-		<<" does not specify its "<<DEFAULT_ATTR;
+       <<" does not specify its "<<DEFAULT_ATTR;
     throw EuropaException(oss.str());
   }
   EUROPA::DataTypeId type = var->getDataType();
   std::string short_pred = type->toString(var->getSpecifiedValue()),
-	long_pred = obj->getType().toString()+"."+short_pred;
+    long_pred = obj->getType().toString()+"."+short_pred;
   if( !m_schema->isPredicate(long_pred.c_str()) ) {
     oss<<"Internal timeline "<<obj->getName().toString()
-		<<" default predicate \""<<short_pred<<"\" does not exist";
+       <<" default predicate \""<<short_pred<<"\" does not exist";
     throw EuropaException(oss.str());
   }
 }
 
 EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj, 
-																									std::string const &attr) const {
+						  std::string const &attr) const {
   std::string full_name = obj->getName().toString()+"."+attr;
   EUROPA::ConstrainedVariableId var = obj->getVariable(full_name);
   if( var.isNoId() )
@@ -157,12 +204,12 @@ EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
 
 bool Assembly::isInternal(EUROPA::ObjectId const &obj) const {
   return m_schema->isA(obj->getType(), TREX_TIMELINE)  &&
-	m_reactor.isInternal(obj->getName().c_str());
+    m_reactor.isInternal(obj->getName().c_str());
 }
 
 bool Assembly::isExternal(EUROPA::ObjectId const &obj) const {
   return m_schema->isA(obj->getType(), TREX_TIMELINE)  &&
-	m_reactor.isExternal(obj->getName().c_str());  
+    m_reactor.isExternal(obj->getName().c_str());  
 }
 
 bool Assembly::internal(EUROPA::TokenId const &tok) const {
@@ -198,7 +245,113 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
   return m_solver->inDeliberation(tok);
 }
 
+bool Assembly::overlaps_now(EUROPA::TokenId const &tok) const {
+  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+
+  return tok->start()->lastDomain().getUpperBound()<=cur
+  && tok->end()->lastDomain().getLowerBound()>=cur 
+  && tok->end()->lastDomain().getLowerBound()>m_reactor.getInitialTick();
+}
+
+bool Assembly::in_synch_scope(EUROPA::TokenId const &tok, 
+                              EUROPA::TokenId &cand) const {
+  return overlaps_now(tok) && !( ignored(tok) || in_deliberation(tok) )
+  && is_unit(tok, cand);
+}
+
+bool Assembly::is_unit(EUROPA::TokenId const &tok, EUROPA::TokenId &cand) const {
+  if( tok->getObject()->lastDomain().isSingleton() ) {
+    std::vector<EUROPA::TokenId> compats;
+    size_t choices=0;
+    
+    m_planDatabase->getCompatibleTokens(tok, compats, UINT_MAX, true);
+    for(std::vector<EUROPA::TokenId>::const_iterator i=compats.begin();
+        compats.end()!=i && choices<=1; ++i)
+      if( !in_deliberation(*i) ) {
+        ++choices;
+        cand = *i;
+      }
+    if( choices==1 && !m_planDatabase->hasOrderingChoice(tok) )
+      return true;
+    if( choices==0 ) {
+      cand = EUROPA::TokenId::noId();
+      return true;
+    }
+  }
+  return false;
+}
+
+
 // modifiers 
+
+bool Assembly::merge_token(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand) {
+  if( invalid() || cand.isNoId() )
+    return false;
+  if( !( tok->isInactive() && 
+        tok->getState()->lastDomain().isMember(EUROPA::Token::MERGED) ) )
+    return false;
+  tok->merge(cand);
+  propagate();
+  return true;
+}
+
+bool Assembly::insert_token(EUROPA::TokenId const &tok, size_t &steps) {
+  if( invalid() || in_deliberation(tok) )
+    return false;
+  if( tok->isInactive() )
+    tok->activate();
+  EUROPA::ObjectDomain const &objs=tok->getObject()->lastDomain();
+  if( !objs.isSingleton() )
+    return false;
+  EUROPA::ObjectId obj = objs.getObject(objs.getSingletonValue());
+  if( EUROPA::TimelineId::convertable(obj) ) {
+    std::vector<EUROPA::OrderingChoice> choices;
+    m_planDatabase->getOrderingChoices(tok, choices, 1);
+    if( choices.empty() )
+      return false;
+    EUROPA::TokenId p = choices[0].second.first, s = choices[0].second.second;
+    choices[0].first->constrain(p, s);
+  }
+  propagate();
+  for(EUROPA::TokenSet::const_iterator i=tok->slaves().begin();
+      tok->slaves().end()!=i; ++i) {
+    if( invalid() )
+      return false;
+    EUROPA::TokenId cand;
+    if( in_synch_scope(*i, cand) ) {
+      ++steps;
+      if( !resolve(*i, cand, steps) )
+        return false;
+    }
+  }
+  return true;
+}
+
+bool Assembly::resolve(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand, size_t &steps) {
+  if( merge_token(tok, cand) || insert_token(tok, steps) )
+    return true;
+  mark_invalid();
+  return false;
+}
+
+bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok, size_t &steps) {
+  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+  EUROPA::IntervalIntDomain now(cur, cur);
+  EUROPA::ConstrainedVariableId name = m_reactor.assembly().default_pred(obj);
+  EUROPA::DataTypeId type = name->getDataType();
+  std::string short_pred = type->toString(name->getSpecifiedValue()),
+  pred_name = obj->getType().toString()+"."+short_pred;
+  EUROPA::DbClientId cli = m_planDatabase->getClient();
+  
+  tok = cli->createToken(pred_name.c_str(), NULL, false);
+  
+  tok->activate();
+  tok->start()->restrictBaseDomain(now);
+  tok->getObject()->specify(obj->getKey());
+  return insert_token(tok, steps);
+}
+
+
 
 void Assembly::configure_solver(std::string const &cfg) {
   if( NULL==m_solver ) {
@@ -207,7 +360,7 @@ void Assembly::configure_solver(std::string const &cfg) {
     
     if( !found )
       throw ReactorException(m_reactor, "Unable to locate solver config file \""+
-														 cfg+"\".");
+			     cfg+"\".");
     std::auto_ptr<EUROPA::TiXmlElement> xml(EUROPA::initXml(file.c_str()));
     
     if( NULL==xml.get() )
@@ -240,11 +393,11 @@ bool Assembly::playTransaction(std::string const &nddl) {
 		
     // Extract include information
     for(rapidxml::xml_node<> const *child = xml_root->first_node("include");
-				NULL!=child; child = child->next_sibling("include") ) {
+	NULL!=child; child = child->next_sibling("include") ) {
       std::string path = parse_attr<std::string>(*child, "path");
       // replace ';' by ':'
       for(size_t pos=path.find(';'); pos<path.size(); pos=path.find(pos, ';'))
-				path[pos] = ':';
+	path[pos] = ':';
       getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);   
     }
   }
@@ -262,7 +415,7 @@ bool Assembly::playTransaction(std::string const &nddl) {
   } catch(EUROPA::PSLanguageExceptionList const &le) {
     std::ostringstream err;
     err<<"Error while parsing nddl file:\n"
-		<<le;
+       <<le;
     throw ReactorException(m_reactor, err.str());
   } catch(Error const &error) {
     throw ReactorException(m_reactor, "Error while parsing nddl file: "+error.getMsg());
@@ -274,73 +427,72 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return m_constraintEngine->constraintConsistent();
 }
 
-std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
-Assembly::convert(Predicate const &pred, bool rejectable,
-									bool undefOnUnknown) {
-  // create the token
-  EUROPA::DbClientId cli =  m_planDatabase->getClient();
+bool Assembly::propagate() {
+  if( invalid() )
+    return false;
+  if( !m_constraintEngine->propagate() ) {
+    m_reactor.log("")<<"Inconsistent plan.";
+    mark_invalid();
+  }
+  return !invalid();
+}
+
+std::pair<EUROPA::ObjectId, EUROPA::TokenId> Assembly::convert(Predicate const &pred, bool fact) {
+  // First we create the token
+  EUROPA::DbClientId cli    = m_planDatabase->getClient();
   EUROPA::ObjectId timeline = cli->getObject(pred.object().str().c_str());
-  std::string 
-	pred_name = timeline->getType().toString()+"."+pred.predicate().str();
-  
-  
-  
-  
-  EUROPA::TokenId tok;
-	
-  if( m_schema->isPredicate(pred_name.c_str()) ) {    
-    tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
-		
-    if( tok.isId() ) { // < double check ...
-      // Restrict attributes (apart the temporal ones)
+  std::string pred_name = timeline->getType().toString()+"."+pred.predicate().str();
+  EUROPA::TokenId tok = EUROPA::TokenId::noId();
+  // if not a fact then it is rejectable
+  bool rejectable = !fact;
+
+  // Check that the predicate exists 
+  if( m_schema->isPredicate(pred_name.c_str()) ) {
+    tok = cli->createToken(pred_name.c_str(), NULL, rejectable, fact);
+    if( tok.isId() ) {
+      // restrict attributes 
       for(Predicate::const_iterator i=pred.begin(); pred.end()!=i; ++i) {
-				EUROPA::ConstrainedVariableId param = tok->getVariable(i->first.str());
-				
-				if( param.isId() ) {
-					try {
-						europa_restrict(param, i->second.domain());	  
-					} catch(DomainExcept const &de) {
-						m_reactor.log("WARN")<<"Restriciting attribute "<<i->first
-				    <<" on token "<<pred.object()<<'.'<<pred.predicate()
-				    <<" triggered an exception: "<<de;
-					}
-				} else 
-					m_reactor.log("WARN")<<"Unknown attribute "<<i->first
-				  <<" for token "<<pred.object()<<'.'<<pred.predicate();
+	EUROPA::ConstrainedVariableId param = tok->getVariable(i->first.str());
+	
+	if( param.isId() ) {
+	  try {
+	    europa_restrict(param, i->second.domain());
+	  } catch(DomainExcept const &e) {
+	    m_reactor.log("WARN")<<"Failed to restrict attribute "<<i->first
+				 <<" on token "<<pred.object()<<'.'<<pred.predicate()
+				 <<": "<<e;
+	  }
+	} else {
+	  m_reactor.log("WARN")<<"Unknown attribute "<<i->first<<" on token "
+			       <<pred.object()<<'.'<<pred.predicate();
+	}
       }
-      // Set the object
-      EUROPA::ConstrainedVariableId 
-			obj_var = tok->getObject();
-      obj_var->specify(timeline->getKey());
-      return std::make_pair(timeline, tok);
+    } 
+  } else {
+    // the predicate is unknown : give a warning 
+    m_reactor.log("WARN")<<"Unknown predicate "<<pred.predicate()
+			 <<" for object "<<pred.object();
+    if( fact ) {
+      // If it is a fact I need to deal with it : set it to "undefined"
+      pred_name = timeline->getType().toString()+"."+UNDEFINED_PRED;
+      if( m_schema->isPredicate(pred_name.c_str()) ) {
+	tok = cli->createToken(pred_name.c_str(), NULL, rejectable, fact);
+      } else {
+	// that should never happen !!!
+	std::ostringstream oss;
+	oss<<"Unable to create special \""<<UNDEFINED_PRED
+	   <<"\" predicate on object "<<timeline->getName().toString();
+	throw EuropaException(oss.str());
+      }
     }
   }
-  // If I am here the mean that I failed 
-  if( undefOnUnknown  ) {
-    pred_name = timeline->getType().toString()+"."+UNDEFINED_PRED;
-    
-    m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
-		<<pred.predicate()<<" is unknown by the model.\n"
-		<<"\tReplacing it by "<<UNDEFINED_PRED;
-    if( m_schema->isPredicate(pred_name.c_str()) ) {    
-      tok = cli->createToken(pred_name.c_str(), NULL, rejectable);
-      // Set the object
-      EUROPA::ConstrainedVariableId 
-			obj_var = tok->getObject();
-      obj_var->specify(timeline->getKey());
-      return std::make_pair(timeline, tok);
-    } else {
-      // This should never happen
-      std::ostringstream oss;
-      oss<<"Unable to create "<<UNDEFINED_PRED<<" on timeline "
-			<<timeline->getName().toString();
-      throw EuropaException(oss.str());
-    }
-  } else 
-    m_reactor.log("WARN")<<"predicate "<<pred.object()<<'.'
-		<<pred.predicate()<<" is unknown by the model.\n"
-		<<"\tIgnoring it.";    
-  return std::make_pair(timeline, EUROPA::TokenId::noId());
+  if( tok.isId() ) {
+    // Now restrict the object to timeline
+    EUROPA::ConstrainedVariableId 
+    obj_var=tok->getObject();
+    obj_var->specify(timeline->getKey());
+  }
+  return std::make_pair(timeline, tok);
 }
 
 void Assembly::mark_active() {
