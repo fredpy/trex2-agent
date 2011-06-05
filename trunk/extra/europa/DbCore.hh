@@ -17,11 +17,14 @@ namespace TREX {
       ~DbCore();
       
       void set_internal(EUROPA::ObjectId const &obj);
+      void initialize();
 
       void notify(state_map::value_type const &obs);
       bool update_externals();
       bool synchronize();
       void doNotify();
+      
+      void step();
       
       bool relax(bool aggressive);
       
@@ -30,6 +33,7 @@ namespace TREX {
       bool is_goal(EUROPA::TokenId const &tok) const {
         return tok->master().isNoId() && m_goals.end()!=m_goals.find(tok); 
       }
+      void apply_facts(std::list<EUROPA::TokenId> const &facts); 
       
       bool propagate();
       void process_pendings();

@@ -10,6 +10,7 @@
 # define H_EuropaReactor 
 
 # include "DbCore.hh"
+# include "DeliberationFilter.hh"
 
 # include <trex/transaction/TeleoReactor.hh>
 
@@ -53,6 +54,10 @@ namespace TREX {
         return syslog(context);
       }
 
+      void end_deliberation() {
+        m_assembly.mark_inactive();
+        m_completedThisTick = true;
+      }
     private:
       // TREX transaction callbacks
       void notify(TREX::transaction::Observation const &o);
@@ -79,12 +84,18 @@ namespace TREX {
         m_steps = 0;
       }
       bool deactivate_solver();
-
+      void set_filter(DeliberationFilter *filt) {
+	m_filter = filt;
+      }
+      
       TREX::transaction::TICK m_planStart;
       bool                    m_completedThisTick;
       unsigned long           m_steps;
 
+      DeliberationFilter *m_filter;
+
       friend class Assembly;
+      friend class DeliberationFilter;
     }; //TREX::europa::EuropaReactor
 
   } // TREX::europa

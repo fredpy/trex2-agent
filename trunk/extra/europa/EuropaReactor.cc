@@ -20,7 +20,8 @@ using namespace TREX::utils;
 // structors 
 
 EuropaReactor::EuropaReactor(xml_arg_type arg)
-  :TeleoReactor(arg, false), m_assembly(*this), m_core(*this) {
+  :TeleoReactor(arg, false), m_assembly(*this), m_core(*this), 
+   m_filter(NULL) {
   bool found;
   std::string short_nddl = getName().str()+".nddl",
     long_nddl = getGraphName().str()+"."+short_nddl, 
@@ -51,6 +52,7 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
 						   "solverConfig");  
   if( solver_cfg.empty() )
     throw XmlError(xml_factory::node(arg), "solverConfig attribute is empty");
+  DeliberationFilter::set_current(this);
   m_assembly.configure_solver(solver_cfg);
   // finally I identify the external end internal timelines
   std::list<EUROPA::ObjectId> objs;
@@ -171,7 +173,7 @@ void EuropaReactor::handleInit() {
 							      tickDuration()));
   
   // Next thing is to process facts
-  // m_core.initialize();
+  m_core.initialize();
 }
 
 void EuropaReactor::handleTickStart() {
@@ -181,6 +183,7 @@ void EuropaReactor::handleTickStart() {
 }
 
 bool EuropaReactor::synchronize() {
+  m_filter->set_horizon(getCurrentTick(), getCurrentTick()+1);
   if( !( m_core.update_externals() && m_core.synchronize() ) ) {
     m_assembly.solver().reset();
     // doRecalls
@@ -193,6 +196,11 @@ bool EuropaReactor::synchronize() {
       }
     }
   }
+  TREX::transaction::TICK 
+    deadline = getCurrentTick()+getExecLatency()+getLookAhead();
+  
+  m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
+				 
   m_core.doNotify();
   std::string dbg_pln = manager().file_name(getName().str()+".plan.dot");
   std::ofstream of(dbg_pln.c_str());
@@ -217,6 +225,7 @@ void EuropaReactor::resume() {
     syslog("WARN")<<"No plan found.";
     m_assembly.mark_invalid();
   }
+  m_core.step();
 }
 
 //  - Europa interface callbacks

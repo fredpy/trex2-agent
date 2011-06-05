@@ -24,6 +24,22 @@ using namespace TREX::europa::details;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+namespace {
+  
+  class DefaultSchema :public SchemaPlugin {
+  public:
+    void registerComponents(Assembly const &assembly);
+  }; 
+
+  DefaultSchema trex_schema;
+
+}
+
+void DefaultSchema::registerComponents(Assembly const &assembly) {
+  TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DeliberationFilter, 
+			    DeliberationFilter); 
+}
+
 TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
  :EuropaException(msg+"; on\n"+tok.toLongString()) {}
 
@@ -34,7 +50,7 @@ std::string const Schema::EUROPA_DEBUG("Europa.log");
 
 
 Schema::Schema() {
-  m_europa_debug.open(m_log->file_name(EUROPA_DEBUG).c_str());
+  m_europa_debug.open(m_log->file_name("Europa.log").c_str());
   DebugMessage::setStream(m_europa_debug);
   bool found;
   std::string cfg_dbg = m_log->use("Debug.cfg", found);
@@ -365,6 +381,11 @@ void Assembly::configure_solver(std::string const &cfg) {
     
     if( NULL==xml.get() )
       throw ReactorException(m_reactor, "Unable to parse xml content of "+file);
+    // Insert the DeliberationFilter 
+    EUROPA::TiXmlElement filter("FlawFilter");
+    filter.SetAttribute("component", "DeliberationFilter");
+    xml->InsertBeforeChild(xml->FirstChild(), filter);
+
     m_solver = new DbSolver(*this, *xml);
   } else 
     m_reactor.syslog("WARN")<<"Attempted to configure the solver more than once.";
