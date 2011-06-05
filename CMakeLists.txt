@@ -118,7 +118,7 @@ list(APPEND Trex_LIBRARY_DIRS ${CMAKE_CURRENT_BINARY_DIR})
 list(APPEND Trex_CONFIG_DIRS ${CMAKE_SOURCE_DIR}/cfg)
 
 # TREXutils
-file(GLOB_RECURSE TREX_UTILS_FILES trex/utils/*.cc)
+file(GLOB TREX_UTILS_FILES trex/utils/*.cc)
 add_library(TREXutils SHARED ${TREX_UTILS_FILES})
 add_dependencies(core TREXutils)
 set_property(SOURCE trex/utils/Pdlfcn.cc 
@@ -128,7 +128,7 @@ install(DIRECTORY trex/utils DESTINATION include/trex
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXdomain
-file(GLOB_RECURSE TREX_DOMAIN_FILES
+file(GLOB TREX_DOMAIN_FILES
   RELATIVE ${PROJECT_SOURCE_DIR} trex/domain/*.cc)
 add_library(TREXdomain SHARED ${TREX_DOMAIN_FILES})
 add_dependencies(core TREXdomain)
@@ -138,7 +138,7 @@ install(DIRECTORY trex/domain DESTINATION include/trex
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXtransaction
-file(GLOB_RECURSE TREX_TRANSACTION_FILES
+file(GLOB TREX_TRANSACTION_FILES
   RELATIVE ${PROJECT_SOURCE_DIR} trex/transaction/*.cc)
 add_library(TREXtransaction SHARED ${TREX_TRANSACTION_FILES})
 add_dependencies(core TREXtransaction)
@@ -148,14 +148,15 @@ install(DIRECTORY trex/transaction DESTINATION include/trex
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXagent
-file(GLOB_RECURSE TREX_AGENT_FILES 
+file(GLOB TREX_AGENT_FILES 
   RELATIVE ${PROJECT_SOURCE_DIR} trex/agent/*.cc)
 add_library(TREXagent SHARED ${TREX_AGENT_FILES})
 add_dependencies(core TREXagent)
 target_link_libraries(TREXagent TREXtransaction)
 install(DIRECTORY trex/agent DESTINATION include/trex
           FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-	  PATTERN ".svn" EXCLUDE)
+	  PATTERN ".svn" EXCLUDE
+	  PATTERN "private" EXCLUDE)
 
 set(TREX_LIBRARIES TREXutils TREXagent TREXdomain TREXtransaction)
 
@@ -173,7 +174,7 @@ endmacro(trex_pg)
 macro(trex_plugin folder module)
   trex_pg(plugin_name ${folder})
   set(plugin_files "")
-  file(GLOB_RECURSE plugin_files
+  file(GLOB plugin_files
     RELATIVE ${PROJECT_SOURCE_DIR} ${folder}/*.cc)
   add_library(${plugin_name} SHARED ${plugin_files})
   target_link_libraries(${plugin_name} ${module})
