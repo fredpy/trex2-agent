@@ -121,7 +121,7 @@ namespace TREX {
        * @return the anme of the reactor
        */
       TREX::utils::Symbol const &getName() const {
-				return m_name;
+	return m_name;
       }
       /** @brief get \"agent\" name
        *
@@ -140,7 +140,7 @@ namespace TREX {
        * @sa getGraphName() const
        */
       TREX::utils::Symbol const &getAgentName() const {
-				return getGraphName();
+	return getGraphName();
       }
       /** @brief Get graph name
        *
@@ -149,7 +149,7 @@ namespace TREX {
        * @sa class TREX::transaction::graph
        */
       TREX::utils::Symbol const &getGraphName() const {
-				return m_graph.getName();
+	return m_graph.getName();
       }
       
       /** @brief reactor initial tick
@@ -166,7 +166,7 @@ namespace TREX {
        * @sa getFinalTick() const
        */
       TICK getInitialTick() const {
-				return m_initialTick; 
+	return m_initialTick; 
       }
       /** @brief Tick duration
        *
@@ -177,7 +177,7 @@ namespace TREX {
        * @return the duration of a single tick
        */
       double tickDuration() const {
-				return m_graph.tickDuration();
+	return m_graph.tickDuration();
       }
       /** @brief Get current tick
        *
@@ -188,7 +188,7 @@ namespace TREX {
        * @sa graph::getInitialTick() const
        */
       TICK getCurrentTick() const {
-				return m_graph.getCurrentTick();
+	return m_graph.getCurrentTick();
       }
       /** @brief Get final tick
        *
@@ -204,7 +204,7 @@ namespace TREX {
        * @sa getCurrentTick() const
        */
       TICK getFinalTick() const {
-				return m_finalTick;
+	return m_finalTick;
       }
       /** @brief reactor latency
        *
@@ -217,7 +217,7 @@ namespace TREX {
        * @sa getExecLatency() const
        */
       TICK getLatency() const {
-				return m_latency;
+	return m_latency;
       }
       /** @brief reactor execution latency
        *
@@ -234,7 +234,7 @@ namespace TREX {
        * @sa getLatency() const
        */
       TICK getExecLatency() const {
-				return m_latency+m_maxDelay;
+	return m_latency+m_maxDelay;
       }
       /** @brief Get reactor look-ahead
        *
@@ -244,7 +244,7 @@ namespace TREX {
        * @return the reactor look-ahead
        */
       TICK getLookAhead() const {
-				return m_lookahead;
+	return m_lookahead;
       }
       /** @btrief New observation callback
        *
@@ -367,7 +367,7 @@ namespace TREX {
        * @return the number of @e External timelines on this reactor
        */
       size_type         count_externals() const {
-				return m_externals.size();
+	return m_externals.size();
       }
       /** @brief beginning of @e External timelines set
        *
@@ -397,14 +397,14 @@ namespace TREX {
        * look-ahead of @p lookahead and associate it to the graph @p owner
        */
       TeleoReactor(graph *owner, TREX::utils::Symbol const &name,
-									 TICK latency, TICK lookahead, bool log=false);
+		   TICK latency, TICK lookahead, bool log=false);
 			
       /** @brief LogManager acces point
        *
        * @return the LogManager instance for this run
        */
       TREX::utils::LogManager &manager() const {
-				return m_graph.manager();
+	return m_graph.manager();
       }
 			
       /** @brief Check if need to deliberate
@@ -425,7 +425,7 @@ namespace TREX {
        * @sa step()
        */
       virtual bool hasWork() {
-				return false;
+	return false;
       }
 			
 			
@@ -685,10 +685,10 @@ namespace TREX {
        */
       TREX::utils::internals::LogEntry 
       syslog(std::string const &context=std::string()) {
-				if( context.empty() )
-					return m_graph.syslog(getName().str());
-				else
-					return m_graph.syslog(getName().str()+"|"+context);
+	if( context.empty() )
+	  return m_graph.syslog(getName().str());
+	else
+	  return m_graph.syslog(getName().str()+"|"+context);
       }
       
     private:
@@ -744,8 +744,8 @@ namespace TREX {
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 			
       void isolate() {
-				clear_internals();
-				clear_externals();
+	clear_internals();
+	clear_externals();
       }
 			
       // call-backs from timeline
@@ -781,7 +781,7 @@ namespace TREX {
        * @param[in] msg The error message
        */
       SynchronizationError(TeleoReactor const &r, std::string const &msg) throw()
-			:ReactorException(r, msg) {}
+	:ReactorException(r, msg) {}
       /** @brief Desturctor */
       ~SynchronizationError() throw() {}
     }; // TREX::transaction::SynchronizationError
@@ -802,7 +802,7 @@ namespace TREX {
        * @param[in] msg The error msg
        */
       DispatchError(TeleoReactor const &r, goal_id const &g, std::string const &msg) throw()
-			:ReactorException(r, buil_msg(g, msg)) {}
+	:ReactorException(r, buil_msg(g, msg)) {}
       /** @brief Desturctor */
       ~DispatchError() throw() {}
       

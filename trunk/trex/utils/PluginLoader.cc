@@ -17,7 +17,7 @@ using namespace TREX::utils::internals;
  */ 
 
 PluginError::PluginError(Symbol const &name, 
-												 std::string const &msg) throw()
+                         std::string const &msg) throw()
 :Exception("Plugin("+name.str()+") "+msg+": "+p_dlerror()) {}
 
 /* 
@@ -31,12 +31,12 @@ PluginLoader::~PluginLoader() {
    * Unloading plug-ins at destruction appeared to be a bad idea
    */
   // handle_map::iterator i;
-	
+  
   // // Unload all the plugins loaded 
   // while( !m_loaded.empty() ) {
   //   i = m_loaded.begin();
   //   void *handle = i->second.first;
-		
+  
   //   if( 0!=p_dlclose(handle) )
   //     throw PluginError(i->first, "Failed to unload");
   //   m_loaded.erase(i);
@@ -53,12 +53,12 @@ void PluginLoader::load(Symbol const &name) {
     if( found ) {
       void *handle = p_dlopen(fileName.c_str(), RTLD_NOW);
       if( NULL==handle )
-				throw PluginError(name, "Failed to load \""+name.str()+"\"");
+        throw PluginError(name, "Failed to load \""+name.str()+"\"");
       plugin_fn f_init = (plugin_fn)p_dlsym(handle, "initPlugin");
       if( NULL==f_init ) {
-				PluginError err(name, "missing initPugin");
-				p_dlclose(handle);
-				throw err;
+        PluginError err(name, "missing initPugin");
+        p_dlclose(handle);
+        throw err;
       }
       m_loaded[name] = std::make_pair(handle, 1);
       // call to f_init : may throw an exception but
@@ -77,9 +77,9 @@ bool PluginLoader::unload(Symbol const &name) {
     if( (i->second.second--)<=1 ) {
       void *handle = i->second.first;
       if( 0!=p_dlclose(handle) )
-				throw PluginError(i->first, "Failed to unload");
+        throw PluginError(i->first, "Failed to unload");
       m_loaded.erase(i);
-			return true;
+      return true;
     }
   }
   return false;
