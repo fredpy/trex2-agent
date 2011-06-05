@@ -1,4 +1,5 @@
 #include "EuropaReactor.hh"
+#include "DbSolver.hh"
 
 # include <PLASMA/Token.hh>
 # include <PLASMA/TokenVariable.hh>
@@ -26,6 +27,85 @@ inline bool DbCore::is_current(EUROPA::TokenId const &tok) const {
 
 
 // - modifiers
+
+void DbCore::step() {
+  if( propagate() ) {
+    DbSolver &solver = m_reactor.assembly().solver();
+    
+    if( m_reactor.assembly().inactive() ) {
+      m_reactor.assembly().mark_active();
+    }
+    solver.step();
+    process_pendings();
+    
+    if( solver.noMoreFlaws() ) {
+      m_reactor.end_deliberation();
+    }
+  }
+}
+
+void DbCore::apply_facts(std::list<EUROPA::TokenId> const &facts) {
+  EUROPA::IntervalIntDomain mission_scope(m_reactor.getInitialTick(),
+                                          m_reactor.getFinalTick()),
+  end_scope(m_reactor.getInitialTick()+1, PLUS_INFINITY);
+  
+  for(std::list<EUROPA::TokenId>::const_iterator i=facts.begin();
+      facts.end()!=i; ++i) {
+    if( !(*i)->getObject()->baseDomain().isSingleton() )
+      throw TokenError(**i, "Facts should be associated to a unique object");
+    EUROPA::ObjectDomain const &domain = (*i)->getObject()->baseDomain();
+    EUROPA::ObjectId object = domain.getObject(domain.getSingletonValue());
+    
+    if( m_reactor.assembly().isExternal(object) )
+      throw TokenError(**i, "Cannot apply facts to external timelines");
+    if( m_reactor.assembly().isIgnored(object) ) {
+      m_reactor.log("WARN")<<"Ignoring fact "<<(*i)->toString()<<':'
+      <<object->toString()<<'.'
+      <<(*i)->getUnqualifiedPredicateName().toString();
+      m_reactor.assembly().ignore(*i);
+    } else {
+      EUROPA::IntervalIntDomain start_bounds(mission_scope), end_bounds(end_scope);
+      
+      start_bounds.intersect((*i)->start()->baseDomain());
+      if( start_bounds.isEmpty() ) {
+        m_reactor.log("WARN")<<"Ignoring fact "<<(*i)->toString()<<':'
+        <<object->toString()<<'.'
+        <<(*i)->getUnqualifiedPredicateName().toString()
+        <<" as its starts outside of mission scope.";
+        m_reactor.assembly().ignore(*i);
+      } else {
+        (*i)->start()->restrictBaseDomain(start_bounds);
+        end_bounds.intersect((*i)->end()->baseDomain());
+        if( end_bounds.isEmpty() ) {
+          m_reactor.log("WARN")<<"Ignoring fact "<<(*i)->toString()<<':'
+          <<object->toString()<<'.'
+          <<(*i)->getUnqualifiedPredicateName().toString()
+          <<" as it cannot end after the initial tick.";
+          m_reactor.assembly().ignore(*i);
+        } else {
+          (*i)->end()->restrictBaseDomain(end_bounds);
+          (*i)->activate();
+          object->constrain(*i, *i);
+        }
+      }
+    }
+  }
+}
+
+void DbCore::initialize() {
+  EUROPA::TokenSet const &all = m_reactor.assembly().plan_db()->getTokens();
+  std::list<EUROPA::TokenId> facts;
+  for(EUROPA::TokenSet::const_iterator i=all.begin(); all.end()!=i; ++i) {
+    if( (*i)->isFact() )
+      facts.push_back(*i);
+  }
+  apply_facts(facts);
+  if( !propagate() ) {
+    debugMsg("trex:init", "Applying facts resulted on propagation failure");
+    throw EuropaException("Failed to apply facts.");
+  }
+}
+
 
 void DbCore::notify(DbCore::state_map::value_type const &obs) {
   std::pair<state_map::iterator, bool>
