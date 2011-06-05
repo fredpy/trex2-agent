@@ -35,7 +35,7 @@ Luminance::Bright {
 Light::On {
     starts(Switch.Down click);
     precedes(end, click.end);
-    contained_by(Luminance.Bright);
+    contained_by(Luminance.Bright);    
 }
 
 
@@ -45,7 +45,13 @@ Light::Off {
 
 Switch::Up {
     contained_by(Light.Off);
+    met_by(Down);
 }
+
+Switch::Down {
+    met_by(Up);
+}
+
 
 Light light = new Light(Observe);
 Switch switch = new Switch(External);
