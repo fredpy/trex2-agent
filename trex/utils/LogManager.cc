@@ -206,7 +206,7 @@ void LogManager::createLatest() {
       symlink(m_path.c_str(), latest.c_str());
       return;
     } else if( EEXIST!=errno )
-      throw ErrnoExcept("LogManager: error while trying to create log dir:");
+      throw ErrnoExcept("LogManager: error while trying to create log dir");
   }
   throw ErrnoExcept("LogManager", "Too many attempts ... clean up your "
 		    "log directory");
