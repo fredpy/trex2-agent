@@ -23,19 +23,32 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
   :TeleoReactor(arg, false), m_assembly(*this), m_core(*this), 
    m_filter(NULL) {
   bool found;
-  std::string short_nddl = getName().str()+".nddl",
-    long_nddl = getGraphName().str()+"."+short_nddl, 
-    nddl;
-  // locate nddl model 
-  //   - 1st look for <agent>.<reactor>.nddl
-  nddl = manager().use(long_nddl, found);
-  if( !found ) {
-    // if not found look for jsut <reactor>.nddl
-    nddl = manager().use(short_nddl, found);
-    if( !found )
-      // no model found for this reactor 
-      throw ReactorException(*this, "Unable to locate \""+long_nddl+"\" or \""+
-			     short_nddl+"\"");
+  std::string nddl;
+  rapidxml::xml_node<> const &cfg = TeleoReactor::xml_factory::node(arg);
+  rapidxml::xml_attribute<> const *model = cfg.first_attribute("model");
+
+  if( NULL!=model ) {
+    std::string file_name(model->value(), model->value_size());
+    
+    if( file_name.empty() )
+      throw XmlError(cfg, "Attribute model is empty");
+    nddl = manager().use(file_name, found);
+    if( !found ) 
+      throw XmlError(cfg, "Unable to locate model file \""+file_name+"\"");
+  } else {
+    std::string short_nddl = getName().str()+".nddl",
+      long_nddl = getGraphName().str()+"."+short_nddl;
+    // locate nddl model 
+    //   - 1st look for <agent>.<reactor>.nddl
+    nddl = manager().use(long_nddl, found);
+    if( !found ) {
+      // if not found look for jsut <reactor>.nddl
+      nddl = manager().use(short_nddl, found);
+      if( !found )
+	// no model found for this reactor 
+	throw ReactorException(*this, "Unable to locate \""+long_nddl+"\" or \""+
+			       short_nddl+"\"");
+    }
   }
   // Load the model
   if( !m_assembly.playTransaction(nddl) )
@@ -97,6 +110,37 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
 }
 
 EuropaReactor::~EuropaReactor() {}
+
+bool EuropaReactor::in_scope(EUROPA::TokenId const &tok) {
+  TREX::transaction::TICK 
+    deadline = getCurrentTick()+getExecLatency()+getLookAhead();
+  if( !m_assembly.ignored(tok) ) {
+    EUROPA::IntervalIntDomain start_t = tok->start()->lastDomain(), 
+      end_t = tok->end()->lastDomain();
+    return end_t.getUpperBound() >= getCurrentTick() &&
+      ( start_t.getUpperBound() < getFinalTick() ||
+	start_t.getLowerBound() <=deadline );
+  }
+}
+
+bool EuropaReactor::dispatch_window(EUROPA::ObjectId const &obj, 
+				    TREX::transaction::TICK &from, 
+				    TREX::transaction::TICK &to) {
+  TREX::utils::Symbol name(obj->getName().toString());
+  external_iterator pos = find_external(name);
+  if( pos.valid() && pos->accept_goals() ) {
+    TREX::transaction::IntegerDomain window = pos->dispatch_window(getCurrentTick());
+    TREX::transaction::IntegerDomain::bound 
+      lo = window.lowerBound(), hi = window.upperBound();
+    from = lo.value();
+    if( hi.isInfinity() )
+      to = getFinalTick();
+    else
+      to = hi.value();
+    return true;
+  }
+  return false;
+}
 
 // callbacks
 
@@ -180,10 +224,15 @@ void EuropaReactor::handleTickStart() {
   if( getCurrentTick()==getInitialTick() )
     reset_deliberation();
   m_completedThisTick = false;
+  TREX::transaction::TICK 
+    deadline = getCurrentTick()+getExecLatency()+getLookAhead();
+  
+  m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
+  m_core.doDispatch();
 }
 
 bool EuropaReactor::synchronize() {
-  m_filter->set_horizon(getCurrentTick(), getCurrentTick()+1);
+  // m_filter->set_horizon(getCurrentTick(), getCurrentTick()+1);
   if( !( m_core.update_externals() && m_core.synchronize() ) ) {
     m_assembly.solver().reset();
     // doRecalls
@@ -196,15 +245,13 @@ bool EuropaReactor::synchronize() {
       }
     }
   }
-  TREX::transaction::TICK 
-    deadline = getCurrentTick()+getExecLatency()+getLookAhead();
+  // TREX::transaction::TICK 
+  //   deadline = getCurrentTick()+getExecLatency()+getLookAhead();
   
-  m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
+  // m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
 				 
   m_core.doNotify();
-  std::string dbg_pln = manager().file_name(getName().str()+".plan.dot");
-  std::ofstream of(dbg_pln.c_str());
-  m_assembly.logPlan(of);
+  logPlan();
   return true;
 }
 
@@ -217,6 +264,7 @@ bool EuropaReactor::hasWork() {
 }
 
 void EuropaReactor::resume() {
+  // syslog()<<"step "<<m_steps;
   if( m_assembly.invalid() ) {
     syslog("ERROR")<<"Cannot resume deliberation with an invalid database.";
     return;
@@ -225,6 +273,7 @@ void EuropaReactor::resume() {
     syslog("WARN")<<"No plan found.";
     m_assembly.mark_invalid();
   }
+  ++m_steps;
   m_core.step();
 }
 
@@ -242,14 +291,13 @@ void EuropaReactor::removed(EUROPA::TokenId const &tok) {
   }
 }
 
-void EuropaReactor::request(Symbol const &tl, 
-				EUROPA::TokenId const &tok) {
+void EuropaReactor::request(EUROPA::ObjectId const &tl, 
+			    EUROPA::TokenId const &tok) {
   europa_mapping::iterator i = m_external_goals.find(tok->getKey());
   if( m_external_goals.end()==i ) {
-    Goal myGoal(tl, tok->getUnqualifiedPredicateName().toString());
+    TREX::utils::Symbol name(tl->getName().toString());
+    Goal myGoal(name, tok->getUnqualifiedPredicateName().toString());
     
-    // build the goal
-
     goal_id request = postGoal(myGoal);
     if( request )
       m_external_goals[tok->getKey()] = request;
