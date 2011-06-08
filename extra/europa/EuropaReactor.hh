@@ -41,9 +41,15 @@ namespace TREX {
 
       // EUROPA callbacks
       void removed(EUROPA::TokenId const &tok);
-      void request(TREX::utils::Symbol const &tl, EUROPA::TokenId const &tok);
+      void request(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
       void recall(EUROPA::TokenId const &tok);
       void notify(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
+
+      bool in_scope(EUROPA::TokenId const &tok);
+
+      bool dispatch_window(EUROPA::ObjectId const &obj, 
+			   TREX::transaction::TICK &from, 
+			   TREX::transaction::TICK &to);
 
       Assembly &assembly() {
         return m_assembly;
@@ -57,6 +63,16 @@ namespace TREX {
       void end_deliberation() {
         m_assembly.mark_inactive();
         m_completedThisTick = true;
+	if( m_steps>1 ) {
+	  syslog()<<"Deliberation completed in "<<m_steps<<" steps";
+	  logPlan();
+	}
+      }
+
+      void logPlan() const {
+	  std::string dbg_pln = manager().file_name(getName().str()+".plan.dot");
+	  std::ofstream of(dbg_pln.c_str());
+	  m_assembly.logPlan(of);
       }
     private:
       // TREX transaction callbacks
