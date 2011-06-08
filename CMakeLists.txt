@@ -43,6 +43,37 @@ set(TREX_MAJOR 0)
 set(TREX_MINOR 1)
 set(TREX_PATCH 3)
 
+# CPack version numbers for release tarball name.
+set(CPACK_PACKAGE_VERSION_MAJOR ${TREX_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${TREX_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${TREX_PATCH})
+
+set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
+message(STATUS "VERSION = ${VERSION}")
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent excutive")
+set(CPACK_PACKAGE_VENDOR "TREX2 development team")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
+set(CPACK_GENERATOR TGZ)
+set(
+CPACK_SOURCE_PACKAGE_FILE_NAME
+"${CMAKE_PROJECT_NAME}-${VERSION}"
+CACHE INTERNAL "tarball basename"
+)
+set(CPACK_SOURCE_GENERATOR TGZ)
+# The following components are regex's to match anywhere (unless anchored)
+# in absolute path + filename to find files or directories to be excluded
+# from source tarball.
+set(CPACK_SOURCE_IGNORE_FILES
+"~$"
+"log/latest/"
+"log/[1-9][0-9]*\\\\.[1-9][0-9]*\\\\.[0-9][0-9]*/"
+"/\\\\.svn/"
+"\\\\.DS_Store$"
+)
+#message("CPACK_SOURCE_IGNORE_FILES = ${CPACK_SOURCE_IGNORE_FILES}")
+include(CPack)
+
 set(Trex_LIBRARY_DIRS "")
 set(Trex_CONFIG_DIRS "")
 
