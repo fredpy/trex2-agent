@@ -214,7 +214,10 @@ details::external TeleoReactor::ext_begin() {
 details::external TeleoReactor::ext_end() {
   return details::external(m_externals.end(), m_externals.end());
 }
-  
+
+details::external TeleoReactor::find_external(TREX::utils::Symbol const &name) {
+  return details::external(m_externals.find(name), m_externals.end());
+}
 
 // modifers/callbacks
 
