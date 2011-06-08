@@ -64,7 +64,7 @@ namespace TREX {
        *   <!-- attribute definition -->
        * </Goal>
        * @endcode
-       * If @c start, @c duration or @c end varaiables are defined it
+       * If @c start, @c duration or @c end variables are defined it
        * checks that  their domains are properly defined and propageated.
        *
        * @throw PredicateException Error while trying to parse
