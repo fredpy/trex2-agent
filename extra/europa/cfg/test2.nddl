@@ -4,6 +4,6 @@ Light light = new Light(Observe);
 Switch switch = new Switch(External);
 LightSwitch sw = new LightSwitch(switch);
 
-Luminance lum = new Luminance(Internal);
+Luminance lum2 = new Luminance(Internal);
 
 close();

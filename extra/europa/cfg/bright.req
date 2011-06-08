@@ -1,0 +1,5 @@
+<Mission>
+ <Goal on="lum" pred="Bright">
+   <Variable name="end"><int min="10000"/></Variable>
+ </Goal>
+</Mission>
