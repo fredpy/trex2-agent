@@ -1,26 +1,18 @@
 <Solver name="DefaultTestSolver">
-  <!-- FlawFilter component="HorizonFilter" policy="PartiallyContained"/ -->
+ 	<FlawFilter component="DeliberationFilter"/>
 
-  <ThreatManager defaultPriority="0">
-    <FlawHandler component="StandardThreatHandler"/>
-    <FlawFilter class-match="Reservoir"/>
-    <FlawFilter class-match="Reusable"/>
-  </ThreatManager>
+  	<ThreatManager defaultPriority="10">
+    		<FlawHandler component="StandardThreatHandler"/>
+  	</ThreatManager>
 
-  <OpenConditionManager defaultPriority="0">
-    <FlawHandler component="StandardOpenConditionHandler"/>
-  </OpenConditionManager>
+  	<OpenConditionManager defaultPriority="100">
+    		<FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
 
-  <UnboundVariableManager defaultPriority="0">
-    <FlawFilter var-match="start"/>
-    <FlawFilter var-match="end"/>
-    <FlawFilter var-match="duration"/>
-    <FlawFilter class-match="Resource" var-match="time"/>
-    <FlawFilter class-match="Resource" var-match="quantity"/>
-    <FlawFilter class-match="Reservoir" var-match="time"/>
-    <FlawFilter class-match="Reservoir" var-match="quantity"/>
-    <FlawFilter class-match="Reusable" var-match="quantity"/>
-    <FlawFilter component="InfiniteDynamicFilter"/>
-    <FlawHandler component="StandardVariableHandler"/>
-  </UnboundVariableManager>
+  	<UnboundVariableManager defaultPriority="0">
+    		<FlawFilter var-match="start"/>
+    		<FlawFilter var-match="end"/>
+    		<FlawFilter var-match="duration"/>
+    		<FlawHandler component="StandardVariableHandler"/>
+  	</UnboundVariableManager>
 </Solver>
