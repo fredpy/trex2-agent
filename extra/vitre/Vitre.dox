@@ -1,0 +1,7 @@
+/* -*- C++ -*- */
+/** @defgroup vitre Vitre graphic interface
+ * @brief A simple visual interface for TREX
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup plugins 
+ */
