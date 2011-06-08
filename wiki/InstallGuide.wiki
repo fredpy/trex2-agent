@@ -106,6 +106,6 @@ or
 sim  sample
 }}}
 
-Further details on this should be provided the documentation generated through `jam doc` compilation command and will be included in the future on this wiki
+Further details on this should be provided the documentation generated through `make doc` compilation command and will be included in the future on this wiki
 
  
