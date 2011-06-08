@@ -1,9 +1,0 @@
-SubDir TOP trex cmds ;
-
-# if ! $(TREX_READY) {
-
-  ModuleMain amc : AMC.cc : agent ;
-  
-  ModuleMain sim : Sim.cc : agent ;
-
-# }

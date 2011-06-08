@@ -43,16 +43,14 @@ libray and if one prefers to use another version of this library he
 justs need to define the environment variable @c TINY_XML_ROOT with
 the directory where this one is before compiling TREX.
 
-To compile trex linbraries ther's currently two approaches supported:
-@li @b jam (http://www.perforce.com/jam/jam.html) the compilation utility used 
-    until now for compiling TREX. The version used is jam 2.5.
+To compile trex libraries there's currently one approach supported:
 @li @b cmake (http://www.cmake.org/) newly added which -- among other things --
    allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
 
-@note The support of these two tools is temporary. Indeed jam proved to be more
-      and more difficult to maintin as the project grew in size and flexibility.
-      cmake is the candidate to replace it and if it proves to be well suited
-      will make jam support deprecated.
+@warning  We used to also support jam (http://www.perforce.com/jam/jam.html) 
+       for historical reasonS. Still this tool became more and more problematic 
+       for the overal maintenance of the project. We have now decided to move 
+       fully to cmake.
 
 
 @subsection install-env Set your environment
@@ -76,6 +74,20 @@ the following line in your @c ~/.profile :
 @code
 export DYLD_BIND_AT_LAUNCH=YES
 @endcode
+
+In order to be able to compile europa plugin you'll also need to set your 
+EUROPA_HOME to the directory where europa is installed. For example
+@code
+export EUROPA_HOME=${HOME}/europa
+@endcode
+The expected structure from cmake is the following :
+@code
+$EUROPA_HOME
+  + lib        # europa libraries (we use the _o versions)
+  + include    # PS*.hh headers
+    + PLASMA   # plasma headers
+@endcode
+This should be the case if you installed the binary package of europa
 
 @subsection install-main TREX general structure 
 
@@ -131,23 +143,6 @@ set of scripts and utilities to help the processing  of TREX logs.
 of the head.
 @li <b> Configurations files </b> Usually under @c cfg. A set of configuration files that can be used to define new agents and/or reactors.
 
-
-@subsection install-jam Compiling with jam
-
-You need to make sure that your envoironment is correctly set (see #install-env).
-@warning All the jam commands should be run from @c $TREX_HOME
-
-To compile the cores compienents (libraries and executables) just run the command @c jam
-
-Compilation of the plug-ins is done either by running @c jam  @<name@> to compile
-one specific plugin (e.g jam vitre) or @c jam @c plugins t ocompile all the plugins
-in the project. 
-
-@note Further details such as extra dependencies or requirement may be described in
-      each plug-in documentation
-
-you can also generate the documentation (provided that you have doxygen installed) by
-running @c jam @c doc
 
 @subsection install-cmake Compiling with cmake
 
@@ -257,74 +252,121 @@ Linking CXX executable sim
 [100%] Built target sim
 @endcode 
 
-@note Right now cmake compiles everything by default. This is a first integration
-      and we will make sure in the future that the behavior is closer to what we
-      have with jam where plug-ins are only compiled on demand.
+@note right now camke integrates as much plug-ins as possible into the all target
+      ther's no easy way to deactivate a plug-in in the compilation -- except 
+      editing CmakeLists.txt. We will probably change that in the future
 
-Finally, if you want ot gernate this doc just do :
+You can install the output using the usual :
+@code 
+> make install
+@endcode 
+By default everything iis installed under @c /usr/local and tou can source the file
+@c /usr/local/shared/trex/trex_init.bash to setup you environment. To change the 
+target directory you can either use ccmake command and change CMAKE_INSTALL_PREFIX
+value or look on how to change this value with the cmake command you are using.
+
+Finally, if you want ot generate this doc just do :
 @code 
 > make doc
 @endcode
 
 @section Running an example
 
-So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch plug-in. To use it you first need to compile the @c sim utility and @c lightswitch plug-in :
+So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch, vitre and europa plug-ins. To use it you first need to compile your source and also the extra Vitre.jar program :
 @code 
-~$ cd $TREX_HOME
-TREX2$ jam sim
-...found 243 target(s)...
-...updating 27 target(s)...
+~$ cd trex2.build 
+trex2.build$ make 
 [...]
-Link bin/sim 
-Chmod1 bin/sim 
-...updated 27 target(s)...
-TREX2$ jam lightswitch
-...found 235 target(s)...
-...updating 2 target(s)...
-C++ extra/lightswitch/objects/LightSwitch.o 
-SharedArchive plugin/libTREXlightswitch.dylib 
-...updated 2 target(s)...
-TREX2$
+trex2.build$ make Vitre 
+[...]
+trex.build$
 @endcode
 
-After have compiled check that your @c $TREX_PATH contains both @c $TREX_HOME/cfg
-and @c $TREX_HOME/plugin. For exampel in my configuration, where TREX is installed
-on /Users/fpy/Coding/TREX2, I have:
+After having compile you can either install the binaries or set-up your enviroment 
+to run the code from the build directory. For the later we generate locally the 
+trex-devel.bash file that can be sourced
 @code 
-TREX2$ echo $TREX_PATH
-/Users/fpy/Coding/TREX2/cfg:/Users/fpy/Coding/TREX2/plugin
-@endcode
+trex2.build$ source trex_devel.bash
+@encode
 
-You can now start the simulation but beforehand we are going to give a look at the configuration files on $TREX_HOME/cfg used for this short test. We are going to use 3 of them :
-@li @c sample.cfg Is rthe mission config file
-@li @c lighton.req and @c lightoff.req are fiules describing goals that one can post interactivelly through the sim interface
+
+You can now start the simulation but beforehand we are going to give a look at 
+the configuration files on $TREX_HOME/cfg used for this short test. 
+We are going to use 3 of them :
+@li @c sample.cfg Is the mission config file
+@li @c lighton.req and @c lightoff.req are files describing goals 
+    that one can post interactivelly through the sim interface
 
 The content of @c sample.cfg should looks similar to this :
 @code  
 <Agent name="sample" finalTick="100" >
+       <Plugin name="TREXvitre"/>
        <Plugin name="TREXlightswitch"/>
-       <Light name="switch" latency="0" lookahead="1" state="1"/>
+       <Plugin name="TREXeuropa"/>
+
+       <Light name="light" latency="0" lookahead="1" log="1" state="1"/>
+
+       <EuropaReactor name="test" lookahead="20" latency="3" 
+		      solverConfig="test.solver.xml" />
+       <EuropaReactor name="test2" lookahead="20" latency="3" 
+		      solverConfig="test.solver.xml" />
+
+       <VitreReactor name="switchView" latency="0" lookahead="0"
+                     log="0" port="31415">
+         <External name="light" goals="0"/>
+         <External name="switch" goals="0"/>
+         <External name="lum" goals="0"/>
+         <External name="lum2" goals="0"/>
+       </VitreReactor>
+
+      <Goal on="lum" pred="Bright">
+        <Variable name="end"><int min="10000"/></Variable>
+      </Goal>
+
+      <Goal on="lum2" pred="Dim">
+	<Variable name="start"><int min="20"/></Variable>
+        <Variable name="end"><int min="10000"/></Variable>
+      </Goal>
 </Agent>
 @endcode
 The @c Agent tag declare the global agent with its @c name and @c finalTick both of them can be freely modified.
 
 The @c Plugin tag indicates that this mission need to load the @c TREXlightswitch plug-in. Based on that @c sim will automatically look on local directory and @c TREX_PATH to locate this plug-in.
 
-Finally @c Light declare a reactor which is implemented in @c TREXlightswitch. This one starts with a @c state of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.
+The @c Light declare a reactor which is implemented in @c TREXlightswitch. This one starts with a @c state of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.
+
+The @c EuropaReactor declare a reactor which is implemented in @c TREXeuropa. These 
+two reactors are keeping track on the light to know if the luminance is bright or 
+dark. and can switch the light on the desired state according to their objectives.
+
+The @c VitreReactor declare a reactor that will connect to the Vitre.jar graphic 
+interface in order to visualize the state of each timeline. The "External" tags 
+specifies which timelines this reactor needs to look at. Feel free to change these.
+
+Finally the two Goal at the end gives the objectives for each EuropaReactor. 
+Quickly stated : @c test will want to be on a Bright state at the end of the mission 
+while @c test2 will want to be Dim at the end of the mission starting from the tick 20
 
 @subsection start the @c sample mission
 
-To satrt the sample mission you can do the following :
+To start the sample mission you can do the following :
+@li start Vitre java application
 @code 
-TREX2$ sim sample 
+trex2.build$ java -jar Vitre.jar
+@endcode 
+@li start the simulation in "debug" mode :
+@code 
+trex2.build$ sim sample
+This is TREX v0.1.3
 Options:
   Q :- quit
   N :- next tick
   G :- goto tick (e.g. g100)
   P :- post the goals from the attached file
        (e.g P goal.req)
+  K :- kill one reactor (e.g K foo)
   H :- print this help message
-[sample:0]>
+[sample:0]> 
 @endcode
 The mission is loaded and the prompt indicate the name of the agent (sample) and
 the current tick value 0. You can use commands to interact with the agent by advancing of one tick (N), go to a given tick in the future (G) or post a request described in a file (P)
@@ -339,6 +381,9 @@ log$ tail -F latest/TREX.log
 @endcode
 At this stage it indicate the lightsiwtch plug-in was successfully loaded. But as the mission you'll see other messages including new observations on timelines (ASSERT), requests, ...
 
+This is especially true as the two reactors test and test2 will compete to have 
+the light on or off starting from the tick 20.
+
 Going back to the sim shell you can then uses the command to switch the lights on or off on your reactor. For example 
 @code 
 Options:
@@ -347,6 +392,7 @@ Options:
   G :- goto tick (e.g. g100)
   P :- post the goals from the attached file
        (e.g P goal.req)
+  K :- kill one reactor (e.g K foo)
   H :- print this help message
 [sample:0]> n
 [sample:1]> P lighton

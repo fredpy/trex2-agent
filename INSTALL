@@ -3,8 +3,6 @@ Installing TREX
 1) Third party requirements
 
 TREX uses third party utilities and libraries. Here's sa list of them :
- - jam (http://www.perforce.com/jam/jam.html) This is a make replacement     
-       utility used to compile TREX.
  - rapidXML (http://rapidxml.sourceforge.net/) This is used for configuration 
             parsing. TREX used to rely on TinyXML version embedded in Europa
             but keeping this would have been annoying as this version was part
@@ -23,24 +21,20 @@ Other utilies are of interrest but not necessary to use TREX:
  - graphviz (http://www.graphviz.org/) Recommended for documentation but it 
             may also be used for plan visualization by showing tokens and 
             their relations as a graph.
-To compile trex linbraries there's currently two approaches supported:
-
- - jam (http://www.perforce.com/jam/jam.html) the compilation utility used until now 
-       for compiling TREX. The version used is jam 2.5.
+To compile trex linbraries there's currently one approach supported:
  - cmake (http://www.cmake.org/) newly added which -- among other things -- allows to 
        integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
 
 Note:
-    The support of these two tools is temporary. Indeed jam proved to be more and more 
-    difficult to maintain as the project grew in size and flexibility. cmake is the 
-    candidate to replace it and if it proves to be well suited will make jam support 
-    deprecated.
+    We used ato also support jam (http://www.perforce.com/jam/jam.html) for historical 
+    reason. Still this tool became more and more problematic ofr the overal maintenance 
+    of the project. We have now decided to modev fully to cmake.
 
 For europa plug-in :
   - europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above.
                this is the core libaray used for planning on the EuropaReactor
-	       Simply install the binary distribution provided for your platform
-
+	       Simply install the binary distribution provided for your platform. 
+	       The version we use is europa 2.5 (binary package)
 Note:
   rapidxml is bundled into TREX. Nothing as been changed in this libray and if
   one prefers to use another version of this library he justs need to define 
@@ -70,7 +64,20 @@ Attention:
 ------------------------------------------------------------------------
 export DYLD_BIND_AT_LAUNCH=YES
 ------------------------------------------------------------------------
+  
+  In order to be able to compile europa plugin you'll also need to set your 
+  EUROPA_HOME to the directory where europa is installed. For example
+------------------------------------------------------------------------
+export EUROPA_HOME=${HOME}/europa
+------------------------------------------------------------------------
+  The expected structure from cmake is the following :
+  $EUROPA_HOME
+    + lib        # europa libraries (we use the _o versions)
+    + include    # PS*.hh headers
+      + PLASMA   # plasma headers
 
+  This should be the case if you installed the binary package of europa
+	
 3) TREX general structure
 
 This version of TREX is composed of multiples libraries and components which
@@ -118,28 +125,6 @@ are organized as follow (see doc/fig/SWarchi.png):
   - nightly build: Under nightly,. Used to run nightly builds of the head.
   - Configurations files Usually under cfg. A set of configuration files that 
         can be used to define new agents and/or reactors.
-
-==============================================================================
-Compiling with jam
-------------------------------------------------------------------------------
-
-You need to make sure that your envoironment is correctly set 
-(see "2) Set your environment" above).
-
-Warning:
-	*All* the jam commands should be run from $TREX_HOME
-
-To compile the core components just run the command jam :
-> jam
-
-Compilation of plug-ins is done either individualy. Exampe=le for the plug-in vitre :
-> jam vitre
-or globally with the target plugins
-> jam plugins
-
-You can generate the doc using doxygen by running :
-> jame doc
-
 
 ==============================================================================
 Compiling with cmake

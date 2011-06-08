@@ -1,3 +1,4 @@
+# -*- cmake -*-
 ########################################################################
 # Copyright (c) 2011, Ricardo Martins                                  #
 # All rights reserved.                                                 #
@@ -40,7 +41,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 1)
-set(TREX_PATCH 2)
+set(TREX_PATCH 3)
 
 set(Trex_LIBRARY_DIRS "")
 set(Trex_CONFIG_DIRS "")

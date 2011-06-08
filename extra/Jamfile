@@ -1,9 +1,0 @@
-SubDir TOP extra ;
-
-# if ! $(TREX_READY) {
-
-  SubInclude TOP extra lightswitch ;
-  SubInclude TOP extra vitre ;
-  SubInclude TOP extra europa ;
-
-# }
