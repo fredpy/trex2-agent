@@ -1,6 +1,0 @@
-SubDir TOP extra lightswitch ;
-
-#if ! $(TREX_READY) {
-  ModulePlugin lightswitch : transaction ;
-  ModuleFiles lightswitch : LightSwitch.cc ;
-#}

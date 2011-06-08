@@ -1,8 +1,0 @@
-SubDir TOP trex agent ;
-
-# if ! $(TREX_READY) {
-
-  Module agent : transaction ;
-  ModuleFiles agent : Agent.cc Clock.cc RealTimeClock.cc StepClock.cc ;
-
-# }
