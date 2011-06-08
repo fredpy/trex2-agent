@@ -690,6 +690,8 @@ namespace TREX {
 	else
 	  return m_graph.syslog(getName().str()+"|"+context);
       }
+
+      external_iterator find_external(TREX::utils::Symbol const &name);
       
     private:
 			
