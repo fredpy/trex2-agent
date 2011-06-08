@@ -1,0 +1,6 @@
+/* -*- C++ -*- */
+/** @defgroup europa Europa plug-in
+ *
+ * @author Frederic Py <fpy@mbari.org> @& Conor McGann
+ * @ingroup plugins 
+ */
