@@ -173,15 +173,22 @@ void Assembly::logPlan(std::ostream &out) const {
 	key = (*i)->getActiveToken()->getKey();
       } else {
 	key = (*i)->getKey();
-	out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()
-	   <<" from "<<(*i)->start()->lastDomain().toString()
-	   <<" to "<<(*i)->end()->lastDomain().toString()<<"\"";
-	if( (*i)->isFact() )
+	out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
+	   <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
+	   <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
+	   <<" state "<<(*i)->getState()->lastDomain().toString()<<"\"";
+	if( ignored(*i) || in_deliberation(*i) ) 
+	  out<<" color=grey";
+	else if( (*i)->isFact() )
 	  out<<" color=red";
+	else if( (*i)->isActive() )
+	  out<<" color=blue";
 	out<<"];\n";
       }      
       EUROPA::TokenId master = (*i)->master();
       if( master.isId() ) {
+	if( master->isMerged() )
+	  master = master->getActiveToken();
 	out<<"  t"<<master->getKey()<<"->t"<<key
 	   <<"[label=\""<<(*i)->getRelation().toString()<<"\"];\n";
       }
@@ -382,10 +389,9 @@ void Assembly::configure_solver(std::string const &cfg) {
     if( NULL==xml.get() )
       throw ReactorException(m_reactor, "Unable to parse xml content of "+file);
     // Insert the DeliberationFilter 
-    EUROPA::TiXmlElement filter("FlawFilter");
-    filter.SetAttribute("component", "DeliberationFilter");
-    xml->InsertBeforeChild(xml->FirstChild(), filter);
-
+    // EUROPA::TiXmlElement filter("FlawFilter");
+    // filter.SetAttribute("component", "DeliberationFilter");
+    // xml->InsertBeforeChild(xml->FirstChild(), filter);
     m_solver = new DbSolver(*this, *xml);
   } else 
     m_reactor.syslog("WARN")<<"Attempted to configure the solver more than once.";
