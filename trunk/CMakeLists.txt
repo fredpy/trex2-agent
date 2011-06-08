@@ -74,6 +74,16 @@ else(LIB_DL)
   message(FATAL_ERROR "TREX requires lib dl")  
 endif(LIB_DL)
 
+check_library_exists(pthread pthread_self "" LIB_PTHREAD)
+if(LIB_PTHREAD)
+  set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} pthread)
+endif(LIB_PTHREAD)
+
+check_library_exists(rt shm_unlink "" LIB_RT)
+if(LIB_RT)
+  set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} rt)
+endif(LIB_RT)
+
 ########################################################################
 # Doxygen                                                              #
 ########################################################################
@@ -122,6 +132,7 @@ list(APPEND Trex_CONFIG_DIRS ${CMAKE_SOURCE_DIR}/cfg)
 file(GLOB TREX_UTILS_FILES trex/utils/*.cc)
 add_library(TREXutils SHARED ${TREX_UTILS_FILES})
 add_dependencies(core TREXutils)
+target_link_libraries(TREXutils ${SYSTEM_LIBRARIES})
 set_property(SOURCE trex/utils/Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 install(DIRECTORY trex/utils DESTINATION include/trex
