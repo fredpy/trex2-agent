@@ -1,0 +1,14 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="64,83,293,112"/>
+<area shape="rect" id="node6" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="341,83,525,112"/>
+<area shape="rect" id="node22" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="824,160,1005,189"/>
+<area shape="rect" id="node8" href="$d8/d48/Goal_8cc.html" title="Goal implementation." alt="" coords="5,160,189,189"/>
+<area shape="rect" id="node11" href="$d8/d06/LogPlayer_8cc_source.html" title="trex/transaction/LogPlayer.cc" alt="" coords="213,160,435,189"/>
+<area shape="rect" id="node14" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="483,160,760,189"/>
+<area shape="rect" id="node16" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="292,237,452,267"/>
+<area shape="rect" id="node19" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="500,237,743,267"/>
+<area shape="rect" id="node24" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="1241,237,1436,267"/>
+<area shape="rect" id="node27" href="$d5/d24/DbCore_8hh_source.html" title="extra/europa/DbCore.hh" alt="" coords="1484,237,1668,267"/>
+<area shape="rect" id="node29" href="$df/d3b/DeliberationFilter_8hh_source.html" title="extra/europa/DeliberationFilter.hh" alt="" coords="791,237,1039,267"/>
+<area shape="rect" id="node32" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="1063,237,1217,267"/>
+</map>

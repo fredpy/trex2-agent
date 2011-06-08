@@ -1,0 +1,14 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="467,83,640,112"/>
+<area shape="rect" id="node20" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="757,83,947,112"/>
+<area shape="rect" id="node23" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="1089,83,1244,112"/>
+<area shape="rect" id="node5" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="5,160,195,189"/>
+<area shape="rect" id="node7" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="72,237,259,267"/>
+<area shape="rect" id="node10" href="$df/df7/Exception_8cc.html" title="TREX Exception implementation." alt="" coords="269,160,443,189"/>
+<area shape="rect" id="node13" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="467,160,640,189"/>
+<area shape="rect" id="node15" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="848,160,1029,189"/>
+<area shape="rect" id="node18" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="664,160,824,189"/>
+<area shape="rect" id="node25" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="1077,160,1256,189"/>
+<area shape="rect" id="node28" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="1304,160,1483,189"/>
+<area shape="rect" id="node30" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="1507,160,1696,189"/>
+</map>

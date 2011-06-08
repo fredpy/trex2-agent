@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation." alt="" coords="471,85,735,115"/>
+<area shape="rect" id="node4" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="7,5,348,35"/>
+<area shape="rect" id="node6" href="$de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation." alt="" coords="59,59,296,88"/>
+<area shape="rect" id="node8" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; client_id_traits \&gt;" alt="" coords="35,112,320,141"/>
+<area shape="rect" id="node10" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="55,165,300,195"/>
+</map>

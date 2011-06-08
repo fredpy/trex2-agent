@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness." alt="" coords="431,5,676,35"/>
+<area shape="rect" id="node5" href="$db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee" title="TREX::utils::is_tag" alt="" coords="480,59,627,88"/>
+<area shape="rect" id="node7" href="$dc/d78/classTREX_1_1utils_1_1XmlFactory.html#ad4834fb740a1e1a4b63b23b5a1fa47d1" title="XML node extraction." alt="" coords="441,112,665,141"/>
+<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4deea395ad456b51d92f0bdbf7e282d9" title="Intternal timeline declaration." alt="" coords="401,165,705,195"/>
+<area shape="rect" id="node15" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a56378773bb12cfeb1646b5910b7dbedf" title="External timeline declaration." alt="" coords="413,219,693,248"/>
+<area shape="rect" id="node11" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value." alt="" coords="805,219,1024,248"/>
+<area shape="rect" id="node13" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="767,165,1063,195"/>
+<area shape="rect" id="node17" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline." alt="" coords="756,272,1073,301"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node8" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="393,83,572,112"/>
+<area shape="rect" id="node21" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="748,83,975,112"/>
+<area shape="rect" id="node16" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="515,160,669,190"/>
+<area shape="rect" id="node19" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="717,160,843,190"/>
+<area shape="rect" id="node23" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="867,160,1011,190"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="108,83,303,112"/>
+<area shape="rect" id="node6" href="$db/d1a/EuropaReactor_8hh.html" title="Definition of an europa based reactor." alt="" coords="351,83,583,112"/>
+<area shape="rect" id="node16" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="607,83,844,112"/>
+<area shape="rect" id="node19" href="$db/df2/LightSwitch_8hh.html" title="lightswitch plug&#45;in utilities" alt="" coords="892,83,1129,112"/>
+<area shape="rect" id="node21" href="$d2/d6a/Vitre_8cc_source.html" title="extra/vitre/Vitre.cc" alt="" coords="1153,83,1305,112"/>
+<area shape="rect" id="node24" href="$d1/deb/Vitre_8hh_source.html" title="extra/vitre/Vitre.hh" alt="" coords="1353,83,1505,112"/>
+<area shape="rect" id="node26" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="1529,83,1689,112"/>
+<area shape="rect" id="node29" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="1737,83,1940,112"/>
+<area shape="rect" id="node33" href="$d7/d5f/LogPlayer_8hh_source.html" title="trex/transaction/LogPlayer.hh" alt="" coords="1964,83,2185,112"/>
+<area shape="rect" id="node35" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="2209,83,2460,112"/>
+<area shape="rect" id="node37" href="$d6/d8a/Relation_8cc_source.html" title="trex/transaction/Relation.cc" alt="" coords="2484,83,2695,112"/>
+<area shape="rect" id="node39" href="$d7/d2c/TeleoReactor_8cc.html" title="Provides implementation for TeleoReactor." alt="" coords="2719,83,2964,112"/>
+<area shape="rect" id="node8" href="$dc/d3a/DbCore_8cc_source.html" title="extra/europa/DbCore.cc" alt="" coords="5,160,189,189"/>
+<area shape="rect" id="node10" href="$d2/dc9/DeliberationFilter_8cc_source.html" title="extra/europa/DeliberationFilter.cc" alt="" coords="213,160,461,189"/>
+<area shape="rect" id="node12" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="485,160,709,189"/>
+<area shape="rect" id="node14" href="$db/d0f/EuropaReactor_8cc_source.html" title="extra/europa/EuropaReactor.cc" alt="" coords="733,160,965,189"/>
+<area shape="rect" id="node31" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="1759,160,1919,189"/>
+</map>

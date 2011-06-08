@@ -1,0 +1,15 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="1293,83,1539,112"/>
+<area shape="rect" id="node5" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="5,160,200,189"/>
+<area shape="rect" id="node8" href="$db/d1a/EuropaReactor_8hh.html" title="Definition of an europa based reactor." alt="" coords="248,160,480,189"/>
+<area shape="rect" id="node10" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="504,160,741,189"/>
+<area shape="rect" id="node13" href="$db/df2/LightSwitch_8hh.html" title="lightswitch plug&#45;in utilities" alt="" coords="789,160,1027,189"/>
+<area shape="rect" id="node15" href="$d2/d6a/Vitre_8cc_source.html" title="extra/vitre/Vitre.cc" alt="" coords="1051,160,1203,189"/>
+<area shape="rect" id="node18" href="$d1/deb/Vitre_8hh_source.html" title="extra/vitre/Vitre.hh" alt="" coords="1251,160,1403,189"/>
+<area shape="rect" id="node20" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="1427,160,1587,189"/>
+<area shape="rect" id="node23" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="1635,160,1837,189"/>
+<area shape="rect" id="node25" href="$d7/d5f/LogPlayer_8hh_source.html" title="trex/transaction/LogPlayer.hh" alt="" coords="1861,160,2083,189"/>
+<area shape="rect" id="node27" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="2107,160,2357,189"/>
+<area shape="rect" id="node29" href="$d6/d8a/Relation_8cc_source.html" title="trex/transaction/Relation.cc" alt="" coords="2381,160,2592,189"/>
+<area shape="rect" id="node31" href="$d7/d2c/TeleoReactor_8cc.html" title="Provides implementation for TeleoReactor." alt="" coords="2616,160,2861,189"/>
+</map>

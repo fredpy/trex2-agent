@@ -1,0 +1,8 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="372,5,636,35"/>
+<area shape="rect" id="node5" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="333,59,675,88"/>
+<area shape="rect" id="node7" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="348,112,660,141"/>
+<area shape="rect" id="node9" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="371,165,637,195"/>
+<area shape="rect" id="node13" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain." alt="" coords="351,219,657,248"/>
+<area shape="rect" id="node11" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ade12e51928076cc0dc2ffe0f5b4629c1" title="Duplicate method." alt="" coords="723,165,1005,195"/>
+</map>

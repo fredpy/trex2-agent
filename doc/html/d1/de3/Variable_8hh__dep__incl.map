@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="208,83,392,112"/>
+<area shape="rect" id="node16" href="$d1/d8f/Predicate_8hh.html" title="abstract TREX predicate for transactions" alt="" coords="697,83,919,112"/>
+<area shape="rect" id="node5" href="$d8/d48/Goal_8cc.html" title="Goal implementation." alt="" coords="5,160,189,189"/>
+<area shape="rect" id="node8" href="$d8/d06/LogPlayer_8cc_source.html" title="trex/transaction/LogPlayer.cc" alt="" coords="264,160,485,189"/>
+<area shape="rect" id="node11" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="493,237,771,267"/>
+<area shape="rect" id="node13" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="599,315,841,344"/>
+<area shape="rect" id="node18" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="871,237,1065,267"/>
+<area shape="rect" id="node21" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/Assembly.hh" alt="" coords="896,160,1091,189"/>
+<area shape="rect" id="node26" href="$d3/d2f/Observation_8hh.html" title="TREX observation definition." alt="" coords="533,160,771,189"/>
+<area shape="rect" id="node29" href="$d5/da1/Predicate_8cc.html" title="Precicate class implementation." alt="" coords="1115,160,1336,189"/>
+</map>

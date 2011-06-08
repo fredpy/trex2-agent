@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node4" href="$d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor." alt="" coords="1068,84,1292,113"/>
+<area shape="rect" id="node10" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa." alt="" coords="1428,49,1615,79"/>
+<area shape="rect" id="node13" href="$d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html" title="TREX::europa::DeliberationFilter" alt="" coords="1751,105,1991,135"/>
+<area shape="rect" id="node6" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="579,5,824,35"/>
+</map>

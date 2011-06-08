@@ -1,0 +1,19 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="1417,83,1604,112"/>
+<area shape="rect" id="node6" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1652,83,1839,112"/>
+<area shape="rect" id="node42" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="3241,160,3423,189"/>
+<area shape="rect" id="node8" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="5,237,200,267"/>
+<area shape="rect" id="node11" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/Assembly.hh" alt="" coords="73,160,268,189"/>
+<area shape="rect" id="node14" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="292,160,516,189"/>
+<area shape="rect" id="node16" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="540,160,777,189"/>
+<area shape="rect" id="node19" href="$d2/d6a/Vitre_8cc_source.html" title="extra/vitre/Vitre.cc" alt="" coords="825,160,977,189"/>
+<area shape="rect" id="node22" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="1025,160,1244,189"/>
+<area shape="rect" id="node25" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="1292,160,1511,189"/>
+<area shape="rect" id="node27" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="1535,160,1721,189"/>
+<area shape="rect" id="node30" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="1769,160,1956,189"/>
+<area shape="rect" id="node32" href="$d3/d0c/TransactionLogger_8cc_source.html" title="trex/transaction/TransactionLogger.cc" alt="" coords="1980,160,2257,189"/>
+<area shape="rect" id="node35" href="$d0/de8/TransactionLogger_8hh.html" title="Definition of reactors transaction logging class." alt="" coords="2305,160,2583,189"/>
+<area shape="rect" id="node37" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="2607,160,2796,189"/>
+<area shape="rect" id="node40" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="2844,160,3033,189"/>
+<area shape="rect" id="node45" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="3057,160,3217,189"/>
+</map>

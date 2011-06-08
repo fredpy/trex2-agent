@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="node4" href="$d1/d8f/Predicate_8hh.html" title="abstract TREX predicate for transactions" alt="" coords="197,238,304,267"/>
+<area shape="rect" id="node12" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="503,160,569,190"/>
+<area shape="rect" id="node16" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="199,83,361,112"/>
+<area shape="rect" id="node10" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="273,315,452,344"/>
+<area shape="rect" id="node14" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="476,315,703,344"/>
+<area shape="rect" id="node18" href="$d3/d2f/Observation_8hh.html" title="TREX observation definition." alt="" coords="203,160,325,190"/>
+<area shape="rect" id="node21" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="328,238,397,267"/>
+<area shape="rect" id="node28" href="$d6/dc7/id__mapper_8hh_source.html" title="trex/utils/id_mapper.hh" alt="" coords="5,160,179,190"/>
+</map>

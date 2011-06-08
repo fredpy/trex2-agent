@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" id="node9" href="$d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception." alt="" coords="808,5,1035,35"/>
+<area shape="rect" id="node13" href="$d7/d2a/classTREX_1_1transaction_1_1MultipleReactors.html" title="Conflicting reactor names." alt="" coords="787,59,1056,88"/>
+<area shape="rect" id="node15" href="$d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception." alt="" coords="783,112,1060,141"/>
+<area shape="rect" id="node2" href="$db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception." alt="" coords="247,59,420,88"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="28,32,175,61"/>
+<area shape="rect" id="node6" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="7,85,196,115"/>
+<area shape="rect" id="node11" href="$de/dc8/classTREX_1_1agent_1_1CycleDetected.html" title="Cyclic dependency exception." alt="" coords="1144,5,1368,35"/>
+<area shape="rect" id="node17" href="$d4/d2a/classTREX_1_1transaction_1_1DispatchError.html" title="Goal posting error." alt="" coords="1133,59,1379,88"/>
+<area shape="rect" id="node19" href="$d2/d66/classTREX_1_1transaction_1_1MultipleInternals.html" title="Exception for timeline ownership conflict." alt="" coords="1123,112,1389,141"/>
+<area shape="rect" id="node21" href="$d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html" title="Synchronization related exception." alt="" coords="1109,165,1403,195"/>
+</map>

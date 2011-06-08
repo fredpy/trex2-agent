@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK" alt="" coords="295,5,543,35"/>
+<area shape="rect" id="node5" href="$d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed." alt="" coords="272,59,565,88"/>
+<area shape="rect" id="node7" href="$de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick." alt="" coords="319,112,519,141"/>
+<area shape="rect" id="node9" href="$de/d50/classTREX_1_1agent_1_1Clock.html#a8e5c8220d013ea86948d2d09faaaecc2" title="Time left before next tick." alt="" coords="613,112,877,141"/>
+</map>

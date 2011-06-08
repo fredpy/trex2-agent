@@ -1,0 +1,8 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a9c0bd9325737278cdd1fa9f663dd6bc2" title="Relation latency." alt="" coords="401,59,673,88"/>
+<area shape="rect" id="node9" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a0de19a8c047fe6aab1aebb884e5f8bf9" title="Timeline look ahead." alt="" coords="391,112,684,141"/>
+<area shape="rect" id="node5" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency." alt="" coords="735,5,1060,35"/>
+<area shape="rect" id="node7" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity." alt="" coords="772,59,1023,88"/>
+<area shape="rect" id="node11" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1" title="Check if accept goal." alt="" coords="743,112,1052,141"/>
+<area shape="rect" id="node13" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead." alt="" coords="1109,139,1459,168"/>
+</map>

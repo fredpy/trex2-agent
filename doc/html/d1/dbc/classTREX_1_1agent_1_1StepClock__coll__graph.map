@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock." alt="" coords="731,5,885,35"/>
+<area shape="rect" id="node4" href="$d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="TREX::utils::XmlFactory\&lt; Product, Output, Arg \&gt;::declare\&lt; StepClock \&gt;" alt="" coords="553,59,1063,88"/>
+<area shape="rect" id="node6" href="$da/d57/classXmlFactory_1_1factory__type_1_1template_01declare.html" title="XmlFactory::factory_type::template declare\&lt;StepClock \&gt;" alt="" coords="5,59,424,88"/>
+<area shape="rect" id="node8" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="613,112,1003,141"/>
+<area shape="rect" id="node10" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management." alt="" coords="121,112,308,141"/>
+</map>

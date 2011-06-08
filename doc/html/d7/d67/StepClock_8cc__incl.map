@@ -1,0 +1,8 @@
+<map id="G" name="G">
+<area shape="rect" id="node4" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="304,83,382,112"/>
+<area shape="rect" id="node13" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="508,238,642,267"/>
+<area shape="rect" id="node15" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="52,238,175,267"/>
+<area shape="rect" id="node6" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="252,160,434,190"/>
+<area shape="rect" id="node8" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="230,315,355,344"/>
+<area shape="rect" id="node10" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="23,160,204,190"/>
+</map>

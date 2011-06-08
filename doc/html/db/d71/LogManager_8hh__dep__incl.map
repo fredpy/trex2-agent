@@ -1,0 +1,29 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="5,160,200,189"/>
+<area shape="rect" id="node6" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/Assembly.hh" alt="" coords="380,83,575,112"/>
+<area shape="rect" id="node18" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="599,83,823,112"/>
+<area shape="rect" id="node20" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="847,83,1084,112"/>
+<area shape="rect" id="node23" href="$d2/d6a/Vitre_8cc_source.html" title="extra/vitre/Vitre.cc" alt="" coords="1132,83,1284,112"/>
+<area shape="rect" id="node26" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="989,237,1208,267"/>
+<area shape="rect" id="node29" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="1256,237,1475,267"/>
+<area shape="rect" id="node33" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="1499,237,1685,267"/>
+<area shape="rect" id="node36" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="1733,237,1920,267"/>
+<area shape="rect" id="node41" href="$d3/d0c/TransactionLogger_8cc_source.html" title="trex/transaction/TransactionLogger.cc" alt="" coords="1535,83,1812,112"/>
+<area shape="rect" id="node44" href="$d0/de8/TransactionLogger_8hh.html" title="Definition of reactors transaction logging class." alt="" coords="1860,83,2137,112"/>
+<area shape="rect" id="node46" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="2161,83,2351,112"/>
+<area shape="rect" id="node49" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="2399,83,2588,112"/>
+<area shape="rect" id="node58" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="2612,83,2793,112"/>
+<area shape="rect" id="node75" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="2861,83,3021,112"/>
+<area shape="rect" id="node9" href="$d5/d24/DbCore_8hh_source.html" title="extra/europa/DbCore.hh" alt="" coords="1013,160,1197,189"/>
+<area shape="rect" id="node11" href="$d6/d11/DbSolver_8hh_source.html" title="extra/europa/DbSolver.hh" alt="" coords="248,160,440,189"/>
+<area shape="rect" id="node13" href="$df/d3b/DeliberationFilter_8hh_source.html" title="extra/europa/DeliberationFilter.hh" alt="" coords="464,160,712,189"/>
+<area shape="rect" id="node15" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="736,160,965,189"/>
+<area shape="rect" id="node31" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="1753,315,1900,344"/>
+<area shape="rect" id="node39" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="1939,315,2077,344"/>
+<area shape="rect" id="node51" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="2389,160,2549,189"/>
+<area shape="rect" id="node54" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="1944,237,2104,267"/>
+<area shape="rect" id="node61" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="1484,160,1639,189"/>
+<area shape="rect" id="node68" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="2651,237,2896,267"/>
+<area shape="rect" id="node71" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="2597,160,2808,189"/>
+<area shape="rect" id="node77" href="$d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="2883,160,3043,189"/>
+</map>

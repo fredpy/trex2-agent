@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="447,83,572,112"/>
+<area shape="rect" id="node11" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="799,83,876,112"/>
+<area shape="rect" id="node26" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="1067,160,1256,189"/>
+<area shape="rect" id="node5" href="$d8/d12/Agent__fwd_8hh_source.html" title="Agent_fwd.hh" alt="" coords="557,160,672,189"/>
+<area shape="rect" id="node7" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="5,160,251,189"/>
+<area shape="rect" id="node13" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="976,160,1043,189"/>
+<area shape="rect" id="node15" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="703,315,828,344"/>
+<area shape="rect" id="node17" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="747,160,928,189"/>
+<area shape="rect" id="node20" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="761,237,884,267"/>
+<area shape="rect" id="node23" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="908,237,1063,267"/>
+</map>

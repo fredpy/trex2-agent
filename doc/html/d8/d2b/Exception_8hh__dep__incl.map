@@ -1,0 +1,13 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="307,83,497,112"/>
+<area shape="rect" id="node10" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="23,160,210,189"/>
+<area shape="rect" id="node15" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="347,237,529,267"/>
+<area shape="rect" id="node20" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="803,237,963,267"/>
+<area shape="rect" id="node27" href="$df/df7/Exception_8cc.html" title="TREX Exception implementation." alt="" coords="718,83,891,112"/>
+<area shape="rect" id="node30" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="521,83,694,112"/>
+<area shape="rect" id="node5" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="274,315,434,344"/>
+<area shape="rect" id="node8" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="546,315,701,344"/>
+<area shape="rect" id="node13" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="725,160,911,189"/>
+<area shape="rect" id="node22" href="$de/d73/RStat_8cc.html" title="RStat implementation." alt="" coords="309,160,455,189"/>
+<area shape="rect" id="node25" href="$d2/dd9/RStat_8hh.html" title="Definition of RStat." alt="" coords="503,160,650,189"/>
+</map>

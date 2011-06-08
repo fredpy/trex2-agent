@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="node7" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="TREX::transaction::IntervalDomain\&lt; double \&gt;" alt="" coords="835,5,1165,35"/>
+<area shape="rect" id="node11" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="TREX::transaction::IntervalDomain\&lt; long \&gt;" alt="" coords="843,59,1157,88"/>
+<area shape="rect" id="node15" href="$d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain." alt="" coords="871,112,1129,141"/>
+<area shape="rect" id="node17" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="Interval based domains." alt="" coords="825,165,1175,195"/>
+<area shape="rect" id="node2" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition." alt="" coords="245,85,485,115"/>
+<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="7,85,196,115"/>
+<area shape="rect" id="node9" href="$d3/da8/classTREX_1_1transaction_1_1FloatDomain.html" title="Float domain." alt="" coords="1232,5,1472,35"/>
+<area shape="rect" id="node13" href="$d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain." alt="" coords="1224,59,1480,88"/>
+</map>

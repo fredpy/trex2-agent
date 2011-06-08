@@ -1,0 +1,10 @@
+<map id="G" name="G">
+<area shape="rect" id="node7" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="416,83,549,112"/>
+<area shape="rect" id="node13" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="981,237,1091,267"/>
+<area shape="rect" id="node19" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="653,83,776,112"/>
+<area shape="rect" id="node17" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1037,315,1171,344"/>
+<area shape="rect" id="node23" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="504,160,600,189"/>
+<area shape="rect" id="node26" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="691,160,819,189"/>
+<area shape="rect" id="node28" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="843,160,949,189"/>
+<area shape="rect" id="node31" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="973,160,1099,189"/>
+</map>
