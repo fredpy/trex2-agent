@@ -369,8 +369,20 @@ namespace TREX {
        *              @p Internal timelines
        * @retval false otherwise
        * @sa isInternal(EUROPA::ObjectId const &) const
+       * @sa external(EUROPA::ObjectId const &) const
        */
       bool internal(EUROPA::TokenId const &tok) const;      
+      /** @brief Check if external
+       * 
+       * @param[in] tok A token
+       * 
+       * @retval true if all the possible objects for @p tok are trex 
+       *              @p External timelines
+       * @retval false otherwise
+       * @sa isExternal(EUROPA::ObjectId const &) const
+       * @sa internal(EUROPA::ObjectId const &) const
+       */
+      bool external(EUROPA::TokenId const &tok) const;      
       
       /** @brief Check if internal 
        *

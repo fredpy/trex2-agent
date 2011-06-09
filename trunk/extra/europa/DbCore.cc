@@ -44,6 +44,12 @@ DbCore::DbCore(EuropaReactor &owner)
 
 DbCore::~DbCore() {}
 
+// 
+
+std::string DbCore::dbg(std::string const &base) const {
+  return base+":_"+m_reactor.getName().str();
+}
+
 // modifiers 
 
 void DbCore::initialize() {
@@ -107,9 +113,10 @@ void DbCore::notify(state_map::value_type const &obs) {
     m_completed_obs.insert(pred);
     ret.first->second = obs.second;
   }
-  debugMsg("trex:token", '['<<m_reactor.getCurrentTick()<<"] OBSERVATION "
+  debugMsg(dbg("trex:token"), '['<<m_reactor.getCurrentTick()<<"] OBSERVATION "
 	   <<obs.first->toString()
 	   <<'.'<<obs.second->getUnqualifiedPredicateName().toString());
+  m_observations.insert(obs.second);
 }
 
 bool DbCore::update_externals() {
@@ -119,27 +126,21 @@ bool DbCore::update_externals() {
   // First terminate former observations
   for(EUROPA::TokenSet::const_iterator i=m_completed_obs.begin();
       m_completed_obs.end()!=i; ++i) {
-    debugMsg("trex:sync", '['<<cur<<"] closing old observation "
+    debugMsg(dbg("trex:sync"), '['<<cur<<"] closing old observation "
 	     <<(*i)->toString()<<": "<<(*i)->getPredicateName().toString());
     (*i)->end()->restrictBaseDomain(now);    
-    debugMsg("trex:sync", "\tend="
-	     <<(*i)->end()->baseDomain().toString());
-    // if( (*i)->canBeTerminated(cur+1) ) {
-    //   debugMsg("trex:sync", '['<<cur<<"] terminating old observation "
-    // 	       <<(*i)->toString());
-    //   (*i)->terminate();
-    // }
+    m_reactor.removed(*i);
   }
   m_completed_obs.clear();
   
   // Now apply inertial value asumption on cuureent observations
   for(state_map::const_iterator i=m_externals.begin(); m_externals.end()!=i; ++i) {
-    debugMsg("trex:sync", '['<<cur<<"] applying inertial value assumption to "
+    debugMsg(dbg("trex:sync"), '['<<cur<<"] applying inertial value assumption to "
 	     <<i->first->toString()
 	     <<'.'<<i->second->getUnqualifiedPredicateName().toString());
     i->second->end()->restrictBaseDomain(future);    
   }
-  debugMsg("trex:sync", '['<<cur<<"] Propagating external state updates");
+  debugMsg(dbg("trex:sync"), '['<<cur<<"] Propagating external state updates");
   return propagate();
 }
 
@@ -149,14 +150,14 @@ bool DbCore::synchronize() {
   if( resolve(steps) ) {
     if( update_internals(steps) ) {
       if( resolve(steps) ) {
-	debugMsg("trex:sync", "SUCESS after "<<steps<<" steps.");
+	debugMsg(dbg("trex:sync"), "SUCESS after "<<steps<<" steps.");
 	return true;
       } else 
-	debugMsg("trex:sync", "FAILED to resolve internal timelines updates");
+	debugMsg(dbg("trex:sync"), "FAILED to resolve internal timelines updates");
     } else
-      debugMsg("trex:sync", "FAILED to identify internal timelines state");
+      debugMsg(dbg("trex:sync"), "FAILED to identify internal timelines state");
   } else
-    debugMsg("trex:sync", "FAILED to resolve current state");
+    debugMsg(dbg("trex:sync"), "FAILED to resolve current state");
   return false;
 }
 
@@ -169,14 +170,14 @@ bool DbCore::process_agenda(EUROPA::TokenSet agenda, size_t &steps) {
       EUROPA::TokenId cand;
       
       if( assembly.in_synch_scope(*i, cand) ) {
-	debugMsg("trex:agenda", "resolving "<<(*i)->toString());
+	debugMsg(dbg("trex:agenda"), "resolving "<<(*i)->toString());
 	++steps;
 	if( !( assembly.resolve(*i, cand, steps) && propagate() ) ) {
-	  debugMsg("trex:agenda", "FAILED to resolve "<<(*i)->toString());
+	  debugMsg(dbg("trex:agenda"), "FAILED to resolve "<<(*i)->toString());
 	  return false;
 	}
       }
-    }      
+    }
   }
   return true;
 }
@@ -191,17 +192,17 @@ bool DbCore::resolve(size_t &steps) {
       return false;
 
     // first process the facts
-    condDebugMsg(!m_facts_agenda.empty(), "trex:sync", 
+    condDebugMsg(!m_facts_agenda.empty(), dbg("trex:sync"), 
 		 m_facts_agenda.size()<<" facts in the agenda.");
     if( !process_agenda(m_facts_agenda, steps) ) {
-      debugMsg("trex:sync", "Failed to resolve facts");
+      debugMsg(dbg("trex:sync"), "Failed to resolve facts");
       return false;
     }
     // then process everything else
-    condDebugMsg(!m_agenda.empty(), "trex:sync", 
+    condDebugMsg(!m_agenda.empty(), dbg("trex:sync"), 
 		 m_agenda.size()<<" tokens in the agenda.");
     if( !process_agenda(m_agenda, steps) ) {
-      debugMsg("trex:sync", "Failed to resolve tokens");
+      debugMsg(dbg("trex:sync"), "Failed to resolve tokens");
       return false;
     }
   } while( last_count!=steps );
@@ -223,14 +224,14 @@ bool DbCore::update_internals(size_t &steps) {
     if( active.isId() ) {
       active->end()->restrictBaseDomain(future);
       if( active->isMerged() )
-      active = active->getActiveToken();
+	active = active->getActiveToken();
     }
 
     if( last_obs.isNoId() ) {
-      debugMsg("trex:sync", '['<<cur<<"] setting "<<i->first->toString()
+      debugMsg(dbg("trex:sync"), '['<<cur<<"] setting "<<i->first->toString()
 	       <<" state to its default.");
       if( !assembly.insert_default(i->first, last_obs, steps) ) {
-	debugMsg("trex:sync", "FAILED to insert default value on "
+	debugMsg(dbg("trex:sync"), "FAILED to insert default value on "
 		 <<i->first->toString());
 	return false;
       }
@@ -253,13 +254,14 @@ bool DbCore::reset_goal(EUROPA::TokenId const &tok, bool aggressive) {
   EUROPA::TokenId active = (tok->isMerged()?tok->getActiveToken():tok);
   
   if( active->end()->baseDomain().getUpperBound()<cur ) {
-    debugMsg("trex:relax", "DISCARD completed goal "<<tok->toString()
+    debugMsg(dbg("trex:relax"), "DISCARD completed goal "<<tok->toString()
 	     <<": "<<tok->getPredicateName().toString());
+    // m_reactor.removed(tok);
     return true;
   }
   if( tok->start()->baseDomain().getUpperBound()<=cur ) {
     if( aggressive ) {
-      debugMsg("trex:relax", "DISCARD goal started  in the past "<<tok->toString()
+      debugMsg(dbg("trex:relax"), "DISCARD goal started  in the past "<<tok->toString()
 	       <<": "<<tok->getPredicateName().toString());
       return true;
     }
@@ -269,56 +271,50 @@ bool DbCore::reset_goal(EUROPA::TokenId const &tok, bool aggressive) {
 }
 
 bool DbCore::relax(bool aggressive) {
-  Assembly &assembly = m_reactor.assembly();
+  Assembly &assembly = m_reactor.assembly();  
 
   m_reactor.log("core")<<"Beginning database relax"
-		       <<(aggressive?" and forget about the past":"");
-  debugMsg("trex:relax", "START "<<(aggressive?"aggressive ":"")<<"relax");
+     		       <<(aggressive?" and forget about the past":"");
+  debugMsg(dbg("trex:relax"), "START "<<(aggressive?"aggressive ":"")<<"relax");
+  // recall all of my former objectives
+  m_reactor.relax();
   // Put the solver out of the way 
   assembly.solver().clear();
   assembly.mark_inactive();
 
-  EUROPA::TokenSet all = assembly.plan_db()->getTokens();
   TICK cur = m_reactor.getCurrentTick();
 
-  for(EUROPA::TokenSet::const_iterator i=all.begin(); all.end()!=i; ++i) {
-    if( (*i)->isFact() ) {
-      if( aggressive && (*i)->end()->baseDomain().getUpperBound()<=cur ) {
-	// In aggressive mode we get rid of the past 
-	debugMsg("trex:relax", "DISCARD past fact "<<(*i)->toString()
-		 <<(*i)->getPredicateName().toString());
+  // First pass deal with facts produced by TREX
+  for(EUROPA::TokenSet::const_iterator i=m_observations.begin(); 
+      m_observations.end()!=i; ++i) {
+    if( aggressive && (*i)->end()->baseDomain().getUpperBound()<=cur ) {
+  	debugMsg(dbg("trex:relax"), "DISCARD past fact "<<(*i)->toString()
+  		 <<(*i)->getPredicateName().toString());
 	(*i)->discard();
-      } else 
-	(*i)->cancel();
-    } else if( is_goal(*i) ) {
-      if( reset_goal(*i, aggressive) )
-	(*i)->discard();
-      else {
-	std::vector<EUROPA::ConstrainedVariableId> const &vars = (*i)->getVariables();
+    } else 
+      (*i)->cancel();    
+  }
+  // Second pass deal with the goals 
+  for(EUROPA::TokenSet::const_iterator i=m_goals.begin(); 
+      m_goals.end()!=i; ++i) 
+    if( reset_goal(*i, aggressive) ) 
+      (*i)->discard();
+    else {
+      // Make sure that the domain is fully relaxed 
+      std::vector<EUROPA::ConstrainedVariableId> const &vars = (*i)->getVariables();
+      if( !(*i)->isInactive() )
 	(*i)->cancel();
 
-	for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
-	    vars.end()!=v; ++v) {
-	  if( (*v)->canBeSpecified() && (*v)->isSpecified() )
-	    (*v)->reset();
-	  (*v)->relax();
-	}
+      for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
+	  vars.end()!=v; ++v) {
+	if( (*v)->canBeSpecified() && (*v)->isSpecified() )
+	  (*v)->reset();
+	(*v)->relax();
       }
-    } else if( assembly.internal(*i) ) {
-      // internal objects are either merged with a fact (or a goal) or 
-      // from the future
-      (*i)->discard();
-    } else if( assembly.overlaps_now(*i) ) {
-      if( aggressive ) {
-	condDebugMsg(!(*i)->isMerged(), "trex:relax", "DISCARD token "
-		     <<(*i)->toString()<<": "<<(*i)->getPredicateName().toString());
-	(*i)->discard();
-      } else if( !(*i)->isInactive() )
-	(*i)->cancel();
     }
-  }
+  // finally I probably should  get rid of other tokens ... 
   
-  debugMsg("trex:relax", "SUCESS");
+  debugMsg(dbg("trex:relax"), "SUCESS");
   m_reactor.logPlan();
   return true;
 }
@@ -326,7 +322,7 @@ bool DbCore::relax(bool aggressive) {
 void DbCore::step() {
   Assembly &assembly = m_reactor.assembly();
 
-  debugMsg("trex:step", '['<<m_reactor.getCurrentTick()<<"] START deliberation step");
+  debugMsg(dbg("trex:step"), '['<<m_reactor.getCurrentTick()<<"] START deliberation step");
   
   if( propagate() ) {
     DbSolver &solver = assembly.solver();
@@ -341,6 +337,8 @@ void DbCore::step() {
 }
 
 void DbCore::doDispatch() {
+  EUROPA::DbClientId cli = m_reactor.assembly().plan_db()->getClient();
+
   // todo add a notion of guards to avoid to dispatch too early
   for( state_map::const_iterator i=m_externals.begin();
        m_externals.end()!=i; ++i) {
@@ -355,8 +353,21 @@ void DbCore::doDispatch() {
       // now dispatch tokens that can start before to 
       // and are not part of deliberation
       for( ;last!=it && (*it)->start()->lastDomain().getLowerBound()<to; ++it)
-	if( !m_reactor.assembly().in_deliberation(*it) )
+	if( !m_reactor.assembly().in_deliberation(*it) ) {
+	  // // to be safe just put it in a new token 
+	  // EUROPA::TokenId 
+	  //   requested = cli->createToken((*it)->getPredicateName().c_str(),
+	  // 				 NULL, false, false);
+	  // cli->merge(requested, (*it));
 	  m_reactor.request(i->first, *it);
+	  debugMsg(dbg("trex:token:state"), '['<<m_reactor.getCurrentTick()
+		   <<"] REQUESTED "<<(*it)->toString()<<": "
+		   <<i->first->toString()<<'.'
+		   <<(*it)->getUnqualifiedPredicateName().toString()
+		   <<"\n\tstart = "<<(*it)->start()->lastDomain().toString()
+		   <<"\n\tduration = "<<(*it)->duration()->lastDomain().toString()
+		   <<"\n\tend = "<<(*it)->end()->lastDomain().toString());
+	}
     }
   }
 }
@@ -380,6 +391,7 @@ void DbCore::doNotify() {
       // create the fact
       EUROPA::TokenId obs = cli->createToken(last_obs->getPredicateName().c_str(),
 					     NULL, false, true);
+      m_observations.insert(obs);
       obs->start()->restrictBaseDomain(now);
       obs->getObject()->specify(i->first->getKey());
       cli->merge(obs, last_obs);
@@ -392,6 +404,7 @@ void DbCore::doNotify() {
 	(*p)->restrictBaseDomain((*p)->lastDomain());
       if( i->second.isId() ) {
 	i->second->end()->restrictBaseDomain(now);
+	m_reactor.removed(i->second);
 	// if( i->second->canBeTerminated(cur+1) ) {
 	// 	i->second->terminate();
 	// }
@@ -408,7 +421,7 @@ bool DbCore::propagate() {
     process_pending();
     return true;
   }
-  debugMsg("trex:core", "Failed to propagate");
+  debugMsg(dbg("trex:core"), "Failed to propagate");
   return false;
 }
 
@@ -419,11 +432,11 @@ void DbCore::process_pending() {
   TICK cur = m_reactor.getCurrentTick();
   
   std::swap(pending, m_pending);
-  condDebugMsg(!pending.empty(), "trex:pending", '['<<cur<<"] "
+  condDebugMsg(!pending.empty(), dbg("trex:pending"), '['<<cur<<"] "
 	       <<pending.size()<<" pending tokens");
   for(EUROPA::TokenSet::const_iterator i=pending.begin(); pending.end()!=i; ++i) {
     if( m_reactor.assembly().ignored(*i) ) {
-      debugMsg("trex:token", '['<<cur<<"] IGNORE "<<(*i)->toString()
+      debugMsg(dbg("trex:token"), '['<<cur<<"] IGNORE "<<(*i)->toString()
 	       <<": "<<(*i)->getPredicateName().toString());
     } else {
       EUROPA::TokenId master = (*i)->master();
@@ -434,12 +447,12 @@ void DbCore::process_pending() {
 	  // A new goal necessirly start during the mission 
 	  (*i)->start()->restrictBaseDomain(scope);
 	  propagate();
-	  debugMsg("trex:token", '['<<cur<<"] GOAL "<<(*i)->toString()
+	  debugMsg(dbg("trex:token"), '['<<cur<<"] GOAL "<<(*i)->toString()
 		   <<": "<<(*i)->getPredicateName().toString());
 	}
       }
       if( (*i)->isFact() ) {
-	debugMsg("trex:token", '['<<cur<<"] FACT "<<(*i)->toString()
+	debugMsg(dbg("trex:token"), '['<<cur<<"] FACT "<<(*i)->toString()
 		 <<": "<<(*i)->getPredicateName().toString());
       }
       if( (*i)->isInactive() )
@@ -466,57 +479,58 @@ void DbCore::remove_from_agenda(EUROPA::TokenId const &token) {
 // europa callbacks
 
 void DbCore::notifyAdded(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "ADD "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "ADD "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   m_pending.insert(token);
 }
 
 void DbCore::notifyRemoved(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "REMOVE "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "REMOVE "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   m_pending.erase(token);
   remove_from_agenda(token);
   m_goals.erase(token);
   m_completed_obs.erase(token);
+  m_observations.erase(token);
 }
 
 void DbCore::notifyActivated(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "ACTIVE "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "ACTIVE "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   remove_from_agenda(token);
 }
 
 void DbCore::notifyDeactivated(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "INACTIVE "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "INACTIVE "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   add_to_agenda(token);
 }
 
 void DbCore::notifyMerged(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "MERGE "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "MERGE "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   remove_from_agenda(token);
 }
 
 void DbCore::notifySplit(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "SPLIT "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "SPLIT "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   add_to_agenda(token);
 }
 
 void DbCore::notifyCommitted(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "COMMIT "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "COMMIT "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
 }
 
 void DbCore::notifyRejected(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "REJECT "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "REJECT "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   remove_from_agenda(token);
 }
 
 void DbCore::notifyTerminated(EUROPA::TokenId const &token) {
-  debugMsg("trex:token:state", "TERMINATE "<<token->toString()
+  debugMsg(dbg("trex:token:state"), "TERMINATE "<<token->toString()
 	   <<": "<<token->getPredicateName().toString());
   remove_from_agenda(token);
 }
