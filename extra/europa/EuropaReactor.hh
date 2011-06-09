@@ -42,6 +42,7 @@ namespace TREX {
       // EUROPA callbacks
       void removed(EUROPA::TokenId const &tok);
       void request(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
+      void relax();
       void recall(EUROPA::TokenId const &tok);
       void notify(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
 

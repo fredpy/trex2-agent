@@ -280,12 +280,18 @@ void EuropaReactor::resume() {
 //  - Europa interface callbacks
 
 void EuropaReactor::removed(EUROPA::TokenId const &tok) {
-  europa_mapping::iterator i = m_external_goals.find(tok->getKey());
+  EUROPA::TokenId active = tok;
+  if( tok->isMerged() )
+    active = tok->getActiveToken();
+
+  europa_mapping::iterator i = m_external_goals.find(active->getKey());
   if( m_external_goals.end()!=i ) {
+    syslog("goals")<<"Completed "<<i->second;
     m_external_goals.erase(i);
   } else {
     i = m_internal_goals.find(tok->getKey());
     if( m_internal_goals.end()!=i ) {
+      syslog("requests")<<"Completed "<<i->second;
       m_internal_goals.erase(i);
     }
   }
@@ -293,22 +299,40 @@ void EuropaReactor::removed(EUROPA::TokenId const &tok) {
 
 void EuropaReactor::request(EUROPA::ObjectId const &tl, 
 			    EUROPA::TokenId const &tok) {
-  europa_mapping::iterator i = m_external_goals.find(tok->getKey());
+  EUROPA::TokenId active = tok;
+  if( tok->isMerged() )
+    active = tok->getActiveToken();
+
+  europa_mapping::iterator i = m_external_goals.find(active->getKey());
   if( m_external_goals.end()==i ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal myGoal(name, tok->getUnqualifiedPredicateName().toString());
     
     goal_id request = postGoal(myGoal);
     if( request )
-      m_external_goals[tok->getKey()] = request;
-  }  
+      m_external_goals[active->getKey()] = request;
+  } 
+}
+
+void EuropaReactor::relax() {
+  for(europa_mapping::const_iterator i=m_external_goals.begin();
+      m_external_goals.end()!=i; ++i) {
+    syslog("recall")<<"RECALL "<<i->second;
+    postRecall(i->second);    
+  }
+  m_external_goals.clear();  
 }
 
 void EuropaReactor::recall(EUROPA::TokenId const &tok) {
-  europa_mapping::iterator i = m_external_goals.find(tok->getKey());
+  EUROPA::TokenId active = tok;
+  if( tok->isMerged() )
+    active = tok->getActiveToken();
+
+  europa_mapping::iterator i = m_external_goals.find(active->getKey());
   if( m_external_goals.end()!=i ) {
     goal_id g = i->second;
     m_external_goals.erase(i);
+    syslog("recall")<<"RECALL "<<i->second;
     postRecall(g);
   }
 }

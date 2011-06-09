@@ -42,6 +42,8 @@ namespace TREX {
 
       static EUROPA::TokenId find_current(EUROPA::TimelineId const &tl, 
 					  TREX::transaction::TICK now);
+
+      std::string dbg(std::string const &base) const;
       bool propagate();
       bool resolve(size_t &steps);
       bool update_internals(size_t &steps);
@@ -61,6 +63,7 @@ namespace TREX {
 
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_completed_obs;
+      EUROPA::TokenSet m_observations;
       
       // europa callbacks
       void notifyAdded(EUROPA::TokenId const &token);
@@ -78,7 +81,7 @@ namespace TREX {
 
       void process_pending();
 
-      EUROPA::TokenSet m_pending;
+      EUROPA::TokenSet m_pending;      
 
       void add_to_agenda(EUROPA::TokenId const &token);
       void remove_from_agenda(EUROPA::TokenId const &token);

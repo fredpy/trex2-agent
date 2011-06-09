@@ -247,6 +247,18 @@ bool Assembly::internal(EUROPA::TokenId const &tok) const {
   return true;
 }
 
+bool Assembly::external(EUROPA::TokenId const &tok) const {
+  EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
+  std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
+  
+  std::list<EUROPA::ObjectId>::const_iterator o = objs.begin();
+  
+  for( ; objs.end()!=o; ++o) 
+    if( !isExternal(*o) )
+      return false;
+  return true;
+}
+
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
   std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
