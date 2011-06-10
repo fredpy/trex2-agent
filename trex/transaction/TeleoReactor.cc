@@ -288,8 +288,10 @@ bool TeleoReactor::postRecall(goal_id const &g) {
 void TeleoReactor::initialize(TICK final) {
   if( m_inited )
     throw ReactorException(*this, "Attempted to initialize this reactor twice.");
+  m_initialTick = getCurrentTick(); 
   m_finalTick   = final;
-  syslog()<<" execution latency is "<<getExecLatency();
+  syslog()<<"Creation tick is "<<getInitialTick();
+  syslog()<<"Execution latency is "<<getExecLatency();
   handleInit();   // allow derived class intialization
   m_firstTick = true;
   m_inited = true;
@@ -297,7 +299,11 @@ void TeleoReactor::initialize(TICK final) {
 
 void TeleoReactor::newTick() {
   if( m_firstTick ) {
-    m_initialTick = getCurrentTick();
+    if( getCurrentTick()!=m_initialTick ) {
+      syslog("WARN")<<"Updating initiali tick from "<<m_initialTick
+		    <<" to "<<getCurrentTick();
+      m_initialTick = getCurrentTick();
+    }
     m_firstTick = false;
   }
 
