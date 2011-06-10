@@ -70,10 +70,12 @@ namespace TREX {
 	}
       }
 
-      void logPlan() const {
-	  std::string dbg_pln = manager().file_name(getName().str()+".plan.dot");
-	  std::ofstream of(dbg_pln.c_str());
-	  m_assembly.logPlan(of);
+      void logPlan(std::string fname=std::string()) const {
+	if( fname.empty() )
+	  fname = "plan";
+	std::string dbg_pln = manager().file_name(getName().str()+"."+fname+".dot");
+	std::ofstream of(dbg_pln.c_str());
+	m_assembly.logPlan(of);
       }
     private:
       // TREX transaction callbacks

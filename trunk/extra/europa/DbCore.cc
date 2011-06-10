@@ -24,17 +24,6 @@ DbCore::find_after(EUROPA::TimelineId const &tl, TICK now) {
   return  std::make_pair(i, last);
 }
 
-EUROPA::TokenId DbCore::find_current(EUROPA::TimelineId const &tl, TICK now) {
-  seq_iter i, last;
-  boost::tie(i, last) = find_after(tl, now);
-  
-  if( last!=i ) {
-    if( (*i)->start()->lastDomain().getUpperBound()<=now )
-      return *i;
-  }
-  return EUROPA::TokenId::noId();
-}
-
 
 // structors 
 
@@ -129,6 +118,9 @@ bool DbCore::update_externals() {
     debugMsg(dbg("trex:sync"), '['<<cur<<"] closing old observation "
 	     <<(*i)->toString()<<": "<<(*i)->getPredicateName().toString());
     (*i)->end()->restrictBaseDomain(now);    
+    debugMsg(dbg("trex:sync"), '['<<cur<<"] end time closed :"
+	     <<"\n\tbase "<<(*i)->end()->baseDomain().toString()
+	     <<"\n\tlast "<<(*i)->end()->lastDomain().toString());
     m_reactor.removed(*i);
   }
   m_completed_obs.clear();
@@ -174,6 +166,7 @@ bool DbCore::process_agenda(EUROPA::TokenSet agenda, size_t &steps) {
 	++steps;
 	if( !( assembly.resolve(*i, cand, steps) && propagate() ) ) {
 	  debugMsg(dbg("trex:agenda"), "FAILED to resolve "<<(*i)->toString());
+	  m_reactor.logPlan("failure");
 	  return false;
 	}
       }
@@ -218,8 +211,8 @@ bool DbCore::update_internals(size_t &steps) {
   if( assembly.invalid() )
     return false;
   for(state_map::const_iterator i=m_internals.begin(); m_internals.end()!=i; ++i) {
-    EUROPA::TokenId active = i->second,
-      last_obs = find_current(i->first, cur);
+    EUROPA::TokenId active = i->second, last_obs;
+    seq_iter p_cur, last;
 
     if( active.isId() ) {
       active->end()->restrictBaseDomain(future);
@@ -227,7 +220,11 @@ bool DbCore::update_internals(size_t &steps) {
 	active = active->getActiveToken();
     }
 
-    if( last_obs.isNoId() ) {
+    boost::tie(p_cur, last) = find_after(i->first, cur);
+    if( p_cur!=last && (*p_cur)->start()->lastDomain().getUpperBound()<=cur ) 
+      last_obs = *p_cur;
+    else {
+      // did not find an observation for current tick
       debugMsg(dbg("trex:sync"), '['<<cur<<"] setting "<<i->first->toString()
 	       <<" state to its default.");
       if( !assembly.insert_default(i->first, last_obs, steps) ) {
@@ -235,8 +232,8 @@ bool DbCore::update_internals(size_t &steps) {
 		 <<i->first->toString());
 	return false;
       }
-    }
-    
+    } 
+   
     if( last_obs->start()->lastDomain().getUpperBound()>=cur ) {
       last_obs->start()->specify(cur);
       if( last_obs!=active && active.isId() )
@@ -248,6 +245,12 @@ bool DbCore::update_internals(size_t &steps) {
   return true;
 }
 
+void DbCore::remove_goal(EUROPA::TokenId const &tok) {
+  if( m_goals.erase(tok) )
+    m_reactor.removed(tok);
+}
+
+
 bool DbCore::reset_goal(EUROPA::TokenId const &tok, bool aggressive) {
   TICK cur = m_reactor.getCurrentTick();
   EUROPA::IntervalIntDomain future(cur, PLUS_INFINITY);
@@ -256,7 +259,6 @@ bool DbCore::reset_goal(EUROPA::TokenId const &tok, bool aggressive) {
   if( active->end()->baseDomain().getUpperBound()<cur ) {
     debugMsg(dbg("trex:relax"), "DISCARD completed goal "<<tok->toString()
 	     <<": "<<tok->getPredicateName().toString());
-    // m_reactor.removed(tok);
     return true;
   }
   if( tok->start()->baseDomain().getUpperBound()<=cur ) {
@@ -283,20 +285,24 @@ bool DbCore::relax(bool aggressive) {
   assembly.mark_inactive();
 
   TICK cur = m_reactor.getCurrentTick();
+  
+  // First pass : deal with facts produced by TREX
 
-  // First pass deal with facts produced by TREX
-  for(EUROPA::TokenSet::const_iterator i=m_observations.begin(); 
-      m_observations.end()!=i; ++i) {
+  EUROPA::TokenSet relax_list = m_observations;
+  for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
+      relax_list.end()!=i; ++i) {
     if( aggressive && (*i)->end()->baseDomain().getUpperBound()<=cur ) {
   	debugMsg(dbg("trex:relax"), "DISCARD past fact "<<(*i)->toString()
   		 <<(*i)->getPredicateName().toString());
-	(*i)->discard();
+	(*i)->discard();	
     } else 
-      (*i)->cancel();    
+      (*i)->cancel();
   }
-  // Second pass deal with the goals 
-  for(EUROPA::TokenSet::const_iterator i=m_goals.begin(); 
-      m_goals.end()!=i; ++i) 
+
+  // Second pass : deal with the goals 
+  relax_list = m_goals;
+  for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
+      relax_list.end()!=i; ++i) 
     if( reset_goal(*i, aggressive) ) 
       (*i)->discard();
     else {
@@ -331,8 +337,9 @@ void DbCore::step() {
       assembly.mark_active();
     solver.step();
     process_pending();
-    if( solver.noMoreFlaws() ) 
+    if( solver.noMoreFlaws() ) {      
       m_reactor.end_deliberation();
+    }
   }
 }
 
@@ -377,43 +384,61 @@ void DbCore::doNotify() {
   EUROPA::DbClientId cli = m_reactor.assembly().plan_db()->getClient();
   EUROPA::IntervalIntDomain now(cur, cur), future(cur+1, PLUS_INFINITY);
 
+  // Update my internal state
   for(state_map::iterator i=m_internals.begin(); m_internals.end()!=i; ++i) {
-    // Look for current state in the plan
-    EUROPA::TokenId active = i->second,
-      last_obs = find_current(i->first, cur);
-
-    last_obs->end()->restrictBaseDomain(future);
-    if( active.isId() ) {
-      if( active->isMerged() )
-	active = active->getActiveToken();
-    }
-    if( active!=last_obs ) {
-      // create the fact
-      EUROPA::TokenId obs = cli->createToken(last_obs->getPredicateName().c_str(),
+    seq_iter p, p_cur, last;
+    
+    boost::tie(p, last) = find_after(i->first, cur-1);
+    
+    p_cur = p;
+    if( last!=p_cur && (*p_cur)->end()->lastDomain().getUpperBound()<=cur ) 
+      ++p_cur;
+    if( last==p_cur || (*p_cur)->start()->lastDomain().getLowerBound()>cur )
+      throw EuropaException("Unexpected missing state for internal timeline "+
+			    i->first->getName().toString());
+    else if( (*p_cur)->start()->lastDomain().getUpperBound()>=cur ) {
+      // From here  I know that I have a new observation 
+      EUROPA::TokenId obs = cli->createToken((*p_cur)->getPredicateName().c_str(),
 					     NULL, false, true);
-      m_observations.insert(obs);
       obs->start()->restrictBaseDomain(now);
+      obs->end()->restrictBaseDomain(future);
       obs->getObject()->specify(i->first->getKey());
-      cli->merge(obs, last_obs);
+      cli->merge(obs, *p_cur);
       propagate();
-      // restrict all the attribute and the object
+      // restrict the fact attributes to what we are going to produce
       obs->getObject()->restrictBaseDomain(obs->getObject()->getLastDomain());
-
       for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
-	    p=obs->parameters().begin(); obs->parameters().end()!=p; ++p) 
-	(*p)->restrictBaseDomain((*p)->lastDomain());
+	    v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
+	(*v)->restrictBaseDomain((*v)->lastDomain());	            
+      m_observations.insert(obs);
+      
+      // check if any requested goal was completed
+      EUROPA::TokenSet cands = (*p)->getMergedTokens();
+      if( (*p)!=i->second ) {
+	if( i->second.isId() )
+	  cands.erase(i->second);
+	cands.insert(*p);
+      }
+      for(EUROPA::TokenSet::const_iterator it=cands.begin(); cands.end()!=it; ++it) {
+	// We assume that if a goal token is completed then
+	// the goal itself is completed
+	// - note formally it is not necessarily true as this
+	//   goal may depend on future tokens. To check that
+	//   I need to se iff this token is the master of a token
+	//   that is yet to be completed... this could be checked
+	//   in the future but for now lets try to be efficient 
+	//   instead
+	remove_goal(*it);	
+      }
+      // finally update the current state
       if( i->second.isId() ) {
 	i->second->end()->restrictBaseDomain(now);
-	m_reactor.removed(i->second);
-	// if( i->second->canBeTerminated(cur+1) ) {
-	// 	i->second->terminate();
-	// }
       }
       i->second = obs;
-      m_reactor.notify(i->first, i->second);
+      m_reactor.notify(i->first, obs);
     }
     i->second->end()->restrictBaseDomain(future);
-  }
+  } 
 }
 
 bool DbCore::propagate() {
@@ -476,6 +501,26 @@ void DbCore::remove_from_agenda(EUROPA::TokenId const &token) {
     m_agenda.erase(token);
 }
 
+void DbCore::remove_observation(EUROPA::TokenId const &tok) {
+  TICK cur = m_reactor.getCurrentTick();
+
+  if( m_observations.erase(tok) &&
+      tok->end()->getUpperBound()>=cur ) {
+    EUROPA::ObjectDomain const &domain=tok->getObject()->baseDomain();
+    EUROPA::ObjectId object = domain.getObject(domain.getSingletonValue());
+    state_map::iterator i = m_internals.find(object);
+    if( m_internals.end()!=i ) {
+      if( tok==i->second )
+	i->second = EUROPA::TokenId::noId();
+    } else {
+      i = m_externals.find(tok);
+      if( m_externals.end()!=i &&
+	  tok==i->second ) 
+	i->second = EUROPA::TokenId::noId();
+    }
+  }
+}
+
 // europa callbacks
 
 void DbCore::notifyAdded(EUROPA::TokenId const &token) {
@@ -489,9 +534,9 @@ void DbCore::notifyRemoved(EUROPA::TokenId const &token) {
 	   <<": "<<token->getPredicateName().toString());
   m_pending.erase(token);
   remove_from_agenda(token);
-  m_goals.erase(token);
+  remove_goal(token);
   m_completed_obs.erase(token);
-  m_observations.erase(token);
+  remove_observation(token);
 }
 
 void DbCore::notifyActivated(EUROPA::TokenId const &token) {

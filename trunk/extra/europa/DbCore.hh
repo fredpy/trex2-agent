@@ -40,9 +40,6 @@ namespace TREX {
       static std::pair<seq_iter, seq_iter> find_after(EUROPA::TimelineId const &tl,
 						      TREX::transaction::TICK now);
 
-      static EUROPA::TokenId find_current(EUROPA::TimelineId const &tl, 
-					  TREX::transaction::TICK now);
-
       std::string dbg(std::string const &base) const;
       bool propagate();
       bool resolve(size_t &steps);
@@ -59,11 +56,14 @@ namespace TREX {
       bool is_goal(EUROPA::TokenId const &tok) const {
 	return m_goals.end()!=m_goals.find(tok);
       }
+      void remove_goal(EUROPA::TokenId const &tok);
       bool reset_goal(EUROPA::TokenId const &tok, bool aggressive);
 
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_completed_obs;
       EUROPA::TokenSet m_observations;
+
+      void remove_observation(EUROPA::TokenId const &tok);
       
       // europa callbacks
       void notifyAdded(EUROPA::TokenId const &token);
