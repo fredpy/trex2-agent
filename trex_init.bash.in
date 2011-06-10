@@ -31,9 +31,9 @@ else
 fi
 
 if [ -n "${TREX_PATH+x}" ]; then
-    export TREX_PATH=${TREX_PATH}:${TREX_HOME}/cfg:${TREX_HOME}/plugins
+    export TREX_PATH=${TREX_PATH}:${TREX_SHARED}/cfg:${TREX_SHARED}/plugins
 else
-    export TREX_PATH=${TREX_HOME}/cfg:${TREX_HOME}/plugins
+    export TREX_PATH=${TREX_SHARED}/cfg:${TREX_SHARED}/plugins
 fi
 
 if [ -z "${TREX_LOG_DIR+x}" ]; then
