@@ -193,7 +193,7 @@ void EuropaReactor::handleRecall(goal_id const &g) {
       m_internal_goals.erase(i);
 
       // Need to notify the europa solver
-      // m_core->recall(key);
+      m_core.recall(key);
       return;
     }
 }
@@ -249,8 +249,8 @@ bool EuropaReactor::synchronize() {
   //   deadline = getCurrentTick()+getExecLatency()+getLookAhead();
   
   // m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
-  m_core.archive();
   m_core.doNotify();
+  // m_core.archive();
   logPlan();
   return true;
 }

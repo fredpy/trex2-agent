@@ -324,8 +324,14 @@ bool DbCore::relax(bool aggressive) {
 	(*v)->relax();
       }
     }
-  // finally I probably should  get rid of other tokens ... 
-  
+  // third pass get rid of recalled goals
+  relax_list = m_recalled;
+  for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
+      relax_list.end()!=i; ++i) {
+    debugMsg(dbg("trex:relax"), "DISCARD recalled goal "<<(*i)->toString());
+    (*i)->discard();
+  }
+      
   debugMsg(dbg("trex:relax"), "SUCESS");
   m_reactor.logPlan();
   return true;
@@ -448,6 +454,17 @@ void DbCore::doNotify() {
   } 
 }
 
+void DbCore::recall(EUROPA::eint const &key) {
+  EUROPA::EntityId entity = EUROPA::Entity::getEntity(key);
+  
+  if( entity.isId() && EUROPA::TokenId::convertable(entity) ) {
+    EUROPA::TokenId goal(entity);
+    
+    if( m_goals.erase(goal) ) 
+      m_recalled.insert(goal);
+  }
+}
+
 bool DbCore::propagate() {
   if( m_reactor.assembly().propagate() ) {
     process_pending();
@@ -532,8 +549,7 @@ void DbCore::archive() {
   TICK cur = m_reactor.getCurrentTick();
 
   if( m_reactor.assembly().inactive() ) {
-    EUROPA::TokenSet terminated = m_terminated;
-    size_t removed = 0;
+    EUROPA::TokenSet terminated = m_terminated, removed;
 
     condDebugMsg(!terminated.empty(), dbg("trex:archive"), 
 		 "Evaluating "<<terminated.size()<<" facts for archiving.");
@@ -543,8 +559,7 @@ void DbCore::archive() {
       // First case the token is inactive 
       if( token->isInactive() ) {
 	debugMsg(dbg("trex:archive"), "DISCARD inactive fact "<<token->toString());
-	token->discard();
-	++removed;
+	removed.insert(token);
       } else {
 	if( token->isMerged() ) {
  	  token = token->getActiveToken();
@@ -553,29 +568,49 @@ void DbCore::archive() {
 	  token->restrictBaseDomains();
 	  token->makeFact();
 	  m_terminated.insert(token);
-	  (*i)->discard();
-	  ++removed;
+	  removed.insert(token);
 	} else 
 	  token->restrictBaseDomains();
 	// Look for merged goals or tokens with no master
 	EUROPA::TokenSet tokens = token->getMergedTokens();
 	for(EUROPA::TokenSet::const_iterator j=tokens.begin(); tokens.end()!=j; ++j) {
 	  if( remove_goal(*j, false) || (*j)->master().isNoId() ) {
-	    (*j)->discard();
-	    ++removed;
+	    debugMsg(dbg("trex:archive"), 
+		     "DISCARD merged token "<<(*j)->toString());
+	    removed.insert(token);
 	  }
 	}
 	// Look for inactive slaves 
 	tokens = token->slaves();
 	for(EUROPA::TokenSet::const_iterator j=tokens.begin(); tokens.end()!=j; ++j) {
-	  if( (*j)->isInactive() && (*j)->end()->lastDomain().getUpperBound()<=cur ) {
-	    (*j)->discard();
-	    ++removed;
+	  if( !(*j)->isActive() 
+	      && (*j)->end()->lastDomain().getUpperBound()<=cur ) {
+	    if( !( (*j)->isMerged() && (*j)->isFact() ) )
+		removed.insert(*j);
 	  }
 	}
+	// if( token->slaves().empty() ) {
+	//   EUROPA::TokenId master = token->master();
+	//   if( master.isNoId() )
+	//     removed.insert(token);
+	// }
+      }
+    }    
+    terminated = m_recalled;
+    for(EUROPA::TokenSet::const_iterator i=terminated.begin(); 
+	terminated.end()!=i; ++i) {
+      // for now play it safe and just remove the one that are not active
+      // in the future we may be more aggressive on this one
+      if( !(*i)->isActive() ) {
+	debugMsg(dbg("trex:archive"), "DISCARD recalled goal "<<(*i)->toString());
+	removed.insert(*i);
       }
     }
-    condDebugMsg(removed>0, dbg("trex:archive"), "Archived "<<removed<<" tokens");
+    condDebugMsg(!removed.empty(), dbg("trex:archive"), 
+		 "Archiving "<<removed.size()<<" tokens");
+    for(EUROPA::TokenSet::const_iterator i=removed.begin(); 
+	removed.end()!=i; ++i)
+      (*i)->discard();
   }
 }
 
@@ -597,6 +632,7 @@ void DbCore::notifyRemoved(EUROPA::TokenId const &token) {
   m_completed_obs.erase(token);
   remove_observation(token);
   m_terminated.erase(token);
+  m_recalled.erase(token);
 }
 
 void DbCore::notifyActivated(EUROPA::TokenId const &token) {

@@ -22,10 +22,12 @@ namespace TREX {
       // - internal timelines
       void set_internal(EUROPA::ObjectId const &obj);
       void doNotify();
+      void recall(EUROPA::eint const &key);
+
       // - external timelines
       void notify(state_map::value_type const &obs);
       bool update_externals();
-      void doDispatch();
+      void doDispatch();      
 
       // synchronization 
       bool synchronize();
@@ -61,6 +63,7 @@ namespace TREX {
       bool reset_goal(EUROPA::TokenId const &tok, bool aggressive);
 
       EUROPA::TokenSet m_goals;
+      EUROPA::TokenSet m_recalled;
       EUROPA::TokenSet m_completed_obs;
       EUROPA::TokenSet m_observations;
 

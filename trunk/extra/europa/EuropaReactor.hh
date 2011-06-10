@@ -66,6 +66,7 @@ namespace TREX {
         m_completedThisTick = true;
 	if( m_steps>1 ) {
 	  syslog()<<"Deliberation completed in "<<m_steps<<" steps";
+	  m_core.archive();
 	  logPlan();
 	}
       }
