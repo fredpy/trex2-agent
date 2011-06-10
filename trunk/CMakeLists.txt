@@ -150,6 +150,7 @@ include_directories(
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex/version.hh.in 
   ${CMAKE_CURRENT_BINARY_DIR}/trex/version.hh @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex/version.hh DESTINATION include/trex)
 
 ########################################################################
 # TREX libraries.                                                      #
