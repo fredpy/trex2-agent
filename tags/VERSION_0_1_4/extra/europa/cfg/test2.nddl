@@ -1,0 +1,9 @@
+#include "lightswitch.nddl"
+
+Light light = new Light(Observe);
+Switch switch = new Switch(External);
+LightSwitch sw = new LightSwitch(switch);
+
+Luminance lum2 = new Luminance(Internal);
+
+close();

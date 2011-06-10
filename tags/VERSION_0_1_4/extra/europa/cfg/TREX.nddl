@@ -1,0 +1,46 @@
+#include "Plasma.nddl"
+
+/*
+ * Some global constants fixed by TREX
+ */ 
+float TICK_DURATION;
+int   MISSION_END;
+
+
+enum Mode {
+  External, // Synchronize observations and dispatch goals
+  Observe,  // No goal dispatching 
+  Internal, // Publish updates and accept goals
+  Private,  // Not visible externally 
+  Ignore    // Not used at all
+}
+
+class AgentTimeline extends Timeline {
+  Mode   mode;
+  string defaultPredicate;
+
+  predicate undefined {};
+
+  predicate Failed {};
+
+  AgentTimeline(Mode _mode) {
+    mode = _mode;
+    defaultPredicate = "undefined";
+  }
+  
+  AgentTimeline(Mode _mode, string _default) {
+    mode = _mode;
+    defaultPredicate = _default;
+  }
+}
+
+// constraint checkExternal(test, obj) { test <: bool };
+
+
+// constraint bind(var, defaultValue) {}
+// constraint default(var, defaultValue) {}
+
+// constraint bindMax(var, defaultValue) {}
+
+// constraint defaultOnCommit(var, defaultValue) {}
+
