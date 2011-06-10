@@ -56,8 +56,7 @@ Luminance::Dim {
 }
 
 Light::On {
-    starts(Switch.Down click);
-    precedes(end, click.end);
+    starts(Switch.Down);
     contained_by(Luminance.Bright);    
 }
 
