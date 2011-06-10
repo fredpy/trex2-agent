@@ -30,6 +30,7 @@ namespace TREX {
       // synchronization 
       bool synchronize();
       bool relax(bool aggressive = false);
+      void archive();
 
       // deliberation
       void step();
@@ -56,7 +57,7 @@ namespace TREX {
       bool is_goal(EUROPA::TokenId const &tok) const {
 	return m_goals.end()!=m_goals.find(tok);
       }
-      void remove_goal(EUROPA::TokenId const &tok);
+      bool remove_goal(EUROPA::TokenId const &tok, bool restrict=true);
       bool reset_goal(EUROPA::TokenId const &tok, bool aggressive);
 
       EUROPA::TokenSet m_goals;
@@ -88,6 +89,7 @@ namespace TREX {
 
       EUROPA::TokenSet m_facts_agenda;      
       EUROPA::TokenSet m_agenda;
+      EUROPA::TokenSet m_terminated;
     }; 
 
 
