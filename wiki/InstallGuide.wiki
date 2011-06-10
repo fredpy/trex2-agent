@@ -10,18 +10,18 @@ This page describes what are this framework dependencies and how to install it.
 =  External dependencies =
 
 The number of third party dependency has been kept relatively small still we use few libraries and programs  : 
- * [http://www.cmake.org/ *cmake*] newly added which -- among other things -- allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
- * [http://www.boost.org *boost libraries*] This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. We use some of the recent addition to the library such as boost graph and flyweight. Therefor we recommend to take a recent version (at least 1.38.0 -- we tested it with both v 1.40.0 and the latest v 1.46.1) 
- * [http://rapidxml.sourceforge.net/ *rapidxml*] This is used for configuration parsing. TREX used to rely on TinyXML version embedded in Europa but keeping this would have been annoying as this version was part of Europa and keeping the ability to connect to Europa while using a version of TinyXML which is not necessarily the Europa one would have been tricky. On top of that rapidxml is really lightweight (only templates defined in C++ headers) and very fast (performance close to strlen). The version used -- and provided -- for this package is 1.13.
+ * [http://www.cmake.org/ cmake] newly added which -- among other things -- allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+ * [http://www.boost.org boost libraries] This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. We use some of the recent addition to the library such as boost graph and flyweight. Therefor we recommend to take a recent version (at least 1.38.0 -- we tested it with both v 1.40.0 and the latest v 1.46.1) 
+ * [http://rapidxml.sourceforge.net/ rapidxml] This is used for configuration parsing. TREX used to rely on TinyXML version embedded in Europa but keeping this would have been annoying as this version was part of Europa and keeping the ability to connect to Europa while using a version of TinyXML which is not necessarily the Europa one would have been tricky. On top of that rapidxml is really lightweight (only templates defined in C++ headers) and very fast (performance close to strlen). The version used -- and provided -- for this package is 1.13.
 
 It is also recommended to use gcc version 4.1.x or above for compiling the overall project
 
 Others utilies are of interrest but not necessary to use TREX:
-  * [http://www.doxygen.org/ *doxygen*]  This utility is needed only if you want to generate this documentation.
-  * [http://www.graphviz.org/ *graphviz*] Recommended for documentation but it may also be used for plan visualization by showing tokens and their relations as a graph.
+  * [http://www.doxygen.org/ doxygen]  This utility is needed only if you want to generate this documentation.
+  * [http://www.graphviz.org/ graphviz] Recommended for documentation but it may also be used for plan visualization by showing tokens and their relations as a graph.
 
 For europa plug-in :
-  * [http://code.google.com/p/europa-pso/ *europa-pso*] version 2.4 or above.
+  * [http://code.google.com/p/europa-pso/ europa-pso] version 2.4 or above.
                this is the core libaray used for planning on the EuropaReactor
 	       Simply install the binary distribution provided for your platform. 
 	       The version we use is europa 2.5 (binary package)
