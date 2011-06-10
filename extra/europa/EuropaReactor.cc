@@ -350,10 +350,5 @@ void EuropaReactor::notify(EUROPA::ObjectId const &tl,
 
 bool EuropaReactor::deactivate_solver() {
   m_assembly.solver().clear();
-  // if( !timelines_are_complete() ) {
-  //   m_assembly.mark_invalid();
-  //   syslog("ERROR")<<"Incomplete after planning.";
-  //   return false;
-  // }
   return true;
 }
