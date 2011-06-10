@@ -249,7 +249,7 @@ bool EuropaReactor::synchronize() {
   //   deadline = getCurrentTick()+getExecLatency()+getLookAhead();
   
   // m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
-				 
+  m_core.archive();
   m_core.doNotify();
   logPlan();
   return true;
@@ -283,15 +283,20 @@ void EuropaReactor::removed(EUROPA::TokenId const &tok) {
   EUROPA::TokenId active = tok;
   if( tok->isMerged() )
     active = tok->getActiveToken();
+  TICK end_time = EUROPA::cast_basis(active->end()->lastDomain().getUpperBound());
+  int delay = getCurrentTick()-end_time;
 
   europa_mapping::iterator i = m_external_goals.find(active->getKey());
   if( m_external_goals.end()!=i ) {
-    syslog("goals")<<"Completed "<<i->second;
     m_external_goals.erase(i);
   } else {
     i = m_internal_goals.find(tok->getKey());
     if( m_internal_goals.end()!=i ) {
-      syslog("requests")<<"Completed "<<i->second;
+      if( delay>0 ) 
+	syslog("goals")<<"Request ["<<i->second<<"] completed ("<<delay
+		       <<" ticks ago).";
+      else
+	syslog("goals")<<"Request ["<<i->second<<"] completed.";
       m_internal_goals.erase(i);
     }
   }
