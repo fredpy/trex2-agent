@@ -169,6 +169,7 @@ set_property(SOURCE trex/utils/Pdlfcn.cc
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 install(DIRECTORY trex/utils DESTINATION include/trex
           FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN "private" EXCLUDE
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXdomain
@@ -179,6 +180,7 @@ add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)
 install(DIRECTORY trex/domain DESTINATION include/trex
           FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN "private" EXCLUDE
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXtransaction
@@ -189,6 +191,7 @@ add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain)
 install(DIRECTORY trex/transaction DESTINATION include/trex
           FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+	  PATTERN "private" EXCLUDE
 	  PATTERN ".svn" EXCLUDE)
 
 # TREXagent
