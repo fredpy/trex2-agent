@@ -73,359 +73,392 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>Agent.cc</h1><a href="../../d1/d37/Agent_8cc.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;<a class="code" href="../../d8/d62/Agent_8hh.html" title="Definition of an Agent.">Agent.hh</a>&quot;</span>
-<a name="l00008"></a>00008 
-<a name="l00009"></a>00009 <span class="preprocessor">#include &lt;iostream&gt;</span>
-<a name="l00010"></a>00010 <span class="preprocessor">#include &lt;iterator&gt;</span>
-<a name="l00011"></a>00011 <span class="preprocessor">#include &lt;boost/graph/topological_sort.hpp&gt;</span>
-<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;boost/graph/graphviz.hpp&gt;</span>
-<a name="l00013"></a>00013 
-<a name="l00014"></a>00014 
-<a name="l00015"></a>00015 <span class="keyword">using namespace </span>TREX::agent;
-<a name="l00016"></a>00016 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00017"></a>00017 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00018"></a>00018 
-<a name="l00019"></a>00019 <span class="keyword">namespace </span>TREX {
-<a name="l00020"></a>00020   <span class="keyword">namespace </span>agent {
-<a name="l00021"></a>00021     <span class="keyword">namespace </span>details {
-<a name="l00039"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html">00039</a>       <span class="keyword">class </span><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">init_visitor</a> :<span class="keyword">public</span> <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a> {
-<a name="l00040"></a>00040       <span class="keyword">public</span>:
-<a name="l00044"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a">00044</a>        <span class="keyword">explicit</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a" title="Constructor.">init_visitor</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>)
-<a name="l00045"></a>00045          :<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>(final) {}
-<a name="l00050"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#abb3cf8a63c1264cdfa49ffa6ea10e176">00050</a>        <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a" title="Constructor.">init_visitor</a>(<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">init_visitor</a> <span class="keyword">const</span> &amp;other) 
-<a name="l00051"></a>00051          :<a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a>(other), <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>(other.<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>) {}
-<a name="l00053"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#ad622ef9674e4b0262c6cb4576c69431d">00053</a>        <span class="keyword">virtual</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#ad622ef9674e4b0262c6cb4576c69431d" title="Destructor.">~init_visitor</a>() {}
-<a name="l00054"></a>00054        
-<a name="l00070"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a1a68bce0e21cc0d6851731deb6979a2f">00070</a>        <span class="keywordtype">void</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a1a68bce0e21cc0d6851731deb6979a2f" title="Finish vertex callback.">finish_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00071"></a>00071          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
-<a name="l00072"></a>00072            r-&gt;initialize(<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>);
-<a name="l00073"></a>00073        }
-<a name="l00074"></a>00074       <span class="keyword">protected</span>:
-<a name="l00080"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8">00080</a>        <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>;
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082       };
-<a name="l00083"></a>00083 
-<a name="l00106"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html">00106</a>       <span class="keyword">class </span><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a> :<span class="keyword">public</span> <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a> {
-<a name="l00107"></a>00107       <span class="keyword">public</span>:
-<a name="l00117"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183">00117</a>        <span class="keyword">typedef</span> std::list&lt;graph::reactor_id&gt; <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a>;
-<a name="l00118"></a>00118 
-<a name="l00132"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a3d7529128ba0cc8e7c9a3a8299b7c504">00132</a>        <span class="keyword">explicit</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(<a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a> &amp;sync_order)
-<a name="l00133"></a>00133          :m_sync(&amp;sync_order) {}
-<a name="l00140"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a3736cfc6ac6a8f9a348c786be51844a1">00140</a>        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(<a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a> <span class="keyword">const</span> &amp;other) 
-<a name="l00141"></a>00141          :<a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a>(other), m_sync(other.m_sync) {}
-<a name="l00143"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#acf32ffadeae3d176b625c1033cf89ac3">00143</a>        <span class="keyword">virtual</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#acf32ffadeae3d176b625c1033cf89ac3" title="Destructor.">~sync_scheduller</a>() {}
-<a name="l00144"></a>00144 
-<a name="l00154"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#ae0556834dc5bd4bbd0f9ae1bc9577c83">00154</a>        <span class="keywordtype">void</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#ae0556834dc5bd4bbd0f9ae1bc9577c83" title="First encounter of a reactor.">discover_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00155"></a>00155          <span class="comment">// First encounter with r :</span>
-<a name="l00156"></a>00156          <span class="comment">//   - inform him that a new tick has started </span>
-<a name="l00157"></a>00157          <span class="comment">//        this will result on dispatching its goals if possible</span>
-<a name="l00158"></a>00158          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
-<a name="l00159"></a>00159            r-&gt;newTick();
-<a name="l00160"></a>00160        }
-<a name="l00161"></a>00161        
-<a name="l00172"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a259b07d8a32bfcc4af35c10b6a7ace4c">00172</a>        <span class="keywordtype">void</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a259b07d8a32bfcc4af35c10b6a7ace4c" title="Finish vertex callback.">finish_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00173"></a>00173          <span class="comment">// Completed all the vertex below :</span>
-<a name="l00174"></a>00174          <span class="comment">//   - this the next candidate to be synchronized</span>
-<a name="l00175"></a>00175          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
-<a name="l00176"></a>00176            m_sync-&gt;push_back(r);
-<a name="l00177"></a>00177        }
-<a name="l00178"></a>00178 
-<a name="l00179"></a>00179       <span class="keyword">private</span>:
-<a name="l00181"></a>00181        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a>               *m_sync;
-<a name="l00182"></a>00182 
-<a name="l00183"></a>00183        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(); <span class="comment">// no code in purpose</span>
-<a name="l00184"></a>00184       };
-<a name="l00185"></a>00185 
-<a name="l00186"></a>00186     }
-<a name="l00187"></a>00187   }
-<a name="l00188"></a>00188 }
-<a name="l00189"></a>00189 
-<a name="l00190"></a><a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html#a5063b33fa56ee336ced1a0a0f764e499">00190</a> AgentException::AgentException(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;agent, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
-<a name="l00191"></a>00191  :<a class="code" href="../../dd/dcc/classTREX_1_1transaction_1_1GraphException.html" title="Graph Exception.">GraphException</a>(agent, msg) {}
-<a name="l00192"></a>00192 
-<a name="l00193"></a>00193 <span class="comment">/*</span>
-<a name="l00194"></a>00194 <span class="comment"> * class TREX::agent::Agent</span>
-<a name="l00195"></a>00195 <span class="comment"> */</span> 
-<a name="l00196"></a>00196 
-<a name="l00197"></a>00197 <span class="comment">// static </span>
-<a name="l00198"></a>00198 
-<a name="l00199"></a>00199 <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> Agent::initialTick(<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) {
-<a name="l00200"></a>00200   <span class="keywordflow">return</span> (NULL==clk)?0:clk-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a2812fa34ba6dc2ef1f1a75a73b0dd95a" title="Initial tick.">initialTick</a>();
-<a name="l00201"></a>00201 }
-<a name="l00202"></a>00202 
-<a name="l00203"></a>00203 <span class="comment">// structors :</span>
-<a name="l00204"></a>00204 
-<a name="l00205"></a>00205 <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
-<a name="l00206"></a>00206   :<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a>(name, initialTick(clk)), 
-<a name="l00207"></a>00207    m_clock(clk), m_finalTick(final) {
-<a name="l00208"></a>00208   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
-<a name="l00209"></a>00209   add_reactor(m_proxy);
-<a name="l00210"></a>00210 }
+<a name="l00007"></a>00007 <span class="comment">/*********************************************************************</span>
+<a name="l00008"></a>00008 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00009"></a>00009 <span class="comment"> * </span>
+<a name="l00010"></a>00010 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00011"></a>00011 <span class="comment"> *  All rights reserved.</span>
+<a name="l00012"></a>00012 <span class="comment"> * </span>
+<a name="l00013"></a>00013 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00014"></a>00014 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00015"></a>00015 <span class="comment"> *  are met:</span>
+<a name="l00016"></a>00016 <span class="comment"> * </span>
+<a name="l00017"></a>00017 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00018"></a>00018 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00019"></a>00019 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00020"></a>00020 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00021"></a>00021 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00022"></a>00022 <span class="comment"> *     with the distribution.</span>
+<a name="l00023"></a>00023 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00024"></a>00024 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00025"></a>00025 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00026"></a>00026 <span class="comment"> * </span>
+<a name="l00027"></a>00027 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00028"></a>00028 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00029"></a>00029 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00030"></a>00030 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00031"></a>00031 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00032"></a>00032 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00033"></a>00033 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00034"></a>00034 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00035"></a>00035 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00036"></a>00036 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00037"></a>00037 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00038"></a>00038 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00039"></a>00039 <span class="comment"> */</span>
+<a name="l00040"></a>00040 <span class="preprocessor">#include &quot;<a class="code" href="../../d8/d62/Agent_8hh.html" title="Definition of an Agent.">Agent.hh</a>&quot;</span>
+<a name="l00041"></a>00041 
+<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;iostream&gt;</span>
+<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;iterator&gt;</span>
+<a name="l00044"></a>00044 <span class="preprocessor">#include &lt;boost/graph/topological_sort.hpp&gt;</span>
+<a name="l00045"></a>00045 <span class="preprocessor">#include &lt;boost/graph/graphviz.hpp&gt;</span>
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 <span class="keyword">using namespace </span>TREX::agent;
+<a name="l00049"></a>00049 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00050"></a>00050 <span class="keyword">using namespace </span>TREX::utils;
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="keyword">namespace </span>TREX {
+<a name="l00053"></a>00053   <span class="keyword">namespace </span>agent {
+<a name="l00054"></a>00054     <span class="keyword">namespace </span>details {
+<a name="l00072"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html">00072</a>       <span class="keyword">class </span><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">init_visitor</a> :<span class="keyword">public</span> <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a> {
+<a name="l00073"></a>00073       <span class="keyword">public</span>:
+<a name="l00077"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a">00077</a>        <span class="keyword">explicit</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a" title="Constructor.">init_visitor</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>)
+<a name="l00078"></a>00078          :<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>(final) {}
+<a name="l00083"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#abb3cf8a63c1264cdfa49ffa6ea10e176">00083</a>        <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a6c9bf8d4d5c8f730a99847e5ede4532a" title="Constructor.">init_visitor</a>(<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">init_visitor</a> <span class="keyword">const</span> &amp;other) 
+<a name="l00084"></a>00084          :<a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a>(other), <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>(other.<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>) {}
+<a name="l00086"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#ad622ef9674e4b0262c6cb4576c69431d">00086</a>        <span class="keyword">virtual</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#ad622ef9674e4b0262c6cb4576c69431d" title="Destructor.">~init_visitor</a>() {}
+<a name="l00087"></a>00087        
+<a name="l00103"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a1a68bce0e21cc0d6851731deb6979a2f">00103</a>        <span class="keywordtype">void</span> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a1a68bce0e21cc0d6851731deb6979a2f" title="Finish vertex callback.">finish_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00104"></a>00104          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
+<a name="l00105"></a>00105            r-&gt;initialize(<a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>);
+<a name="l00106"></a>00106        }
+<a name="l00107"></a>00107       <span class="keyword">protected</span>:
+<a name="l00113"></a><a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8">00113</a>        <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8" title="Final tick value.">m_final</a>;
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115       };
+<a name="l00116"></a>00116 
+<a name="l00139"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html">00139</a>       <span class="keyword">class </span><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a> :<span class="keyword">public</span> <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a> {
+<a name="l00140"></a>00140       <span class="keyword">public</span>:
+<a name="l00150"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183">00150</a>        <span class="keyword">typedef</span> std::list&lt;graph::reactor_id&gt; <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a>;
+<a name="l00151"></a>00151 
+<a name="l00165"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a3d7529128ba0cc8e7c9a3a8299b7c504">00165</a>        <span class="keyword">explicit</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(<a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a> &amp;sync_order)
+<a name="l00166"></a>00166          :m_sync(&amp;sync_order) {}
+<a name="l00173"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a3736cfc6ac6a8f9a348c786be51844a1">00173</a>        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(<a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a> <span class="keyword">const</span> &amp;other) 
+<a name="l00174"></a>00174          :<a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector.">CycleDetector</a>(other), m_sync(other.m_sync) {}
+<a name="l00176"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#acf32ffadeae3d176b625c1033cf89ac3">00176</a>        <span class="keyword">virtual</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#acf32ffadeae3d176b625c1033cf89ac3" title="Destructor.">~sync_scheduller</a>() {}
+<a name="l00177"></a>00177 
+<a name="l00187"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#ae0556834dc5bd4bbd0f9ae1bc9577c83">00187</a>        <span class="keywordtype">void</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#ae0556834dc5bd4bbd0f9ae1bc9577c83" title="First encounter of a reactor.">discover_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00188"></a>00188          <span class="comment">// First encounter with r :</span>
+<a name="l00189"></a>00189          <span class="comment">//   - inform him that a new tick has started </span>
+<a name="l00190"></a>00190          <span class="comment">//        this will result on dispatching its goals if possible</span>
+<a name="l00191"></a>00191          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
+<a name="l00192"></a>00192            r-&gt;newTick();
+<a name="l00193"></a>00193        }
+<a name="l00194"></a>00194        
+<a name="l00205"></a><a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a259b07d8a32bfcc4af35c10b6a7ace4c">00205</a>        <span class="keywordtype">void</span> <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a259b07d8a32bfcc4af35c10b6a7ace4c" title="Finish vertex callback.">finish_vertex</a>(graph::reactor_id r, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00206"></a>00206          <span class="comment">// Completed all the vertex below :</span>
+<a name="l00207"></a>00207          <span class="comment">//   - this the next candidate to be synchronized</span>
+<a name="l00208"></a>00208          <span class="keywordflow">if</span>( <a class="code" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity.">is_valid</a>(r) )
+<a name="l00209"></a>00209            m_sync-&gt;push_back(r);
+<a name="l00210"></a>00210        }
 <a name="l00211"></a>00211 
-<a name="l00212"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad94b8e9d8de99889021df1e69ffb7aac">00212</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(std::string <span class="keyword">const</span> &amp;file_name, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
-<a name="l00213"></a>00213   :m_clock(clk) {
-<a name="l00214"></a>00214   updateTick(initialTick(m_clock));
-<a name="l00215"></a>00215   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
-<a name="l00216"></a>00216   add_reactor(m_proxy);
-<a name="l00217"></a>00217   loadConf(file_name);
-<a name="l00218"></a>00218 }
-<a name="l00219"></a>00219 
-<a name="l00220"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a8cdf0eaabc5c93221d79dae25660f326">00220</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(rapidxml::xml_node&lt;&gt; &amp;conf, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
-<a name="l00221"></a>00221   :m_clock(clk) {
-<a name="l00222"></a>00222   updateTick(initialTick(m_clock));
-<a name="l00223"></a>00223   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
-<a name="l00224"></a>00224   add_reactor(m_proxy);
-<a name="l00225"></a>00225   loadConf(conf);
-<a name="l00226"></a>00226 }
-<a name="l00227"></a>00227 
-<a name="l00228"></a>00228 
-<a name="l00229"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb">00229</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb" title="Destructor.">Agent::~Agent</a>() {
-<a name="l00230"></a>00230   m_proxy = NULL;
-<a name="l00231"></a>00231   clear();
-<a name="l00232"></a>00232   <span class="keywordflow">if</span>( NULL!=m_clock )
-<a name="l00233"></a>00233     <span class="keyword">delete</span> m_clock;
+<a name="l00212"></a>00212       <span class="keyword">private</span>:
+<a name="l00214"></a>00214        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">reactor_queue</a>               *m_sync;
+<a name="l00215"></a>00215 
+<a name="l00216"></a>00216        <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">sync_scheduller</a>(); <span class="comment">// no code in purpose</span>
+<a name="l00217"></a>00217       };
+<a name="l00218"></a>00218 
+<a name="l00219"></a>00219     }
+<a name="l00220"></a>00220   }
+<a name="l00221"></a>00221 }
+<a name="l00222"></a>00222 
+<a name="l00223"></a><a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html#a5063b33fa56ee336ced1a0a0f764e499">00223</a> AgentException::AgentException(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> &amp;agent, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
+<a name="l00224"></a>00224  :<a class="code" href="../../dd/dcc/classTREX_1_1transaction_1_1GraphException.html" title="Graph Exception.">GraphException</a>(agent, msg) {}
+<a name="l00225"></a>00225 
+<a name="l00226"></a>00226 <span class="comment">/*</span>
+<a name="l00227"></a>00227 <span class="comment"> * class TREX::agent::Agent</span>
+<a name="l00228"></a>00228 <span class="comment"> */</span> 
+<a name="l00229"></a>00229 
+<a name="l00230"></a>00230 <span class="comment">// static </span>
+<a name="l00231"></a>00231 
+<a name="l00232"></a>00232 <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> Agent::initialTick(<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) {
+<a name="l00233"></a>00233   <span class="keywordflow">return</span> (NULL==clk)?0:clk-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a2812fa34ba6dc2ef1f1a75a73b0dd95a" title="Initial tick.">initialTick</a>();
 <a name="l00234"></a>00234 }
 <a name="l00235"></a>00235 
-<a name="l00236"></a>00236 <span class="comment">// observers :</span>
+<a name="l00236"></a>00236 <span class="comment">// structors :</span>
 <a name="l00237"></a>00237 
-<a name="l00238"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130">00238</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">Agent::missionCompleted</a>() {
-<a name="l00239"></a>00239   <span class="keywordflow">if</span>( count_reactors()&lt;=1 ) {
-<a name="l00240"></a>00240     <span class="comment">// If there&#39;s only one reactior left it is probably</span>
-<a name="l00241"></a>00241     <span class="comment">// my AgentProxy =&gt; no real reactor available</span>
-<a name="l00242"></a>00242     syslog()&lt;&lt;<span class="stringliteral">&quot;No reactor left.&quot;</span>;
-<a name="l00243"></a>00243     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00244"></a>00244   }
-<a name="l00245"></a>00245   <span class="keywordflow">return</span> getCurrentTick()&gt;=m_finalTick;
-<a name="l00246"></a>00246 }
-<a name="l00247"></a>00247 
-<a name="l00248"></a>00248 <span class="comment">// manipulators :</span>
-<a name="l00249"></a>00249 
-<a name="l00250"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a744b2e4a225a427e85593d28b2dbeb88">00250</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a744b2e4a225a427e85593d28b2dbeb88" title="Set agent clock.">Agent::setClock</a>(<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clock) {
-<a name="l00251"></a>00251   <span class="keywordflow">if</span>( NULL==m_clock ) {
-<a name="l00252"></a>00252     m_clock = clock;
-<a name="l00253"></a>00253     updateTick(initialTick(m_clock));
-<a name="l00254"></a>00254     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00255"></a>00255   } <span class="keywordflow">else</span> {
-<a name="l00256"></a>00256     <span class="keyword">delete</span> clock;
-<a name="l00257"></a>00257     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00258"></a>00258   }
+<a name="l00238"></a>00238 <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
+<a name="l00239"></a>00239   :<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a>(name, initialTick(clk)), 
+<a name="l00240"></a>00240    m_clock(clk), m_finalTick(final) {
+<a name="l00241"></a>00241   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
+<a name="l00242"></a>00242   add_reactor(m_proxy);
+<a name="l00243"></a>00243 }
+<a name="l00244"></a>00244 
+<a name="l00245"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad94b8e9d8de99889021df1e69ffb7aac">00245</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(std::string <span class="keyword">const</span> &amp;file_name, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
+<a name="l00246"></a>00246   :m_clock(clk) {
+<a name="l00247"></a>00247   updateTick(initialTick(m_clock));
+<a name="l00248"></a>00248   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
+<a name="l00249"></a>00249   add_reactor(m_proxy);
+<a name="l00250"></a>00250   loadConf(file_name);
+<a name="l00251"></a>00251 }
+<a name="l00252"></a>00252 
+<a name="l00253"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a8cdf0eaabc5c93221d79dae25660f326">00253</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent::Agent</a>(rapidxml::xml_node&lt;&gt; &amp;conf, <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clk) 
+<a name="l00254"></a>00254   :m_clock(clk) {
+<a name="l00255"></a>00255   updateTick(initialTick(m_clock));
+<a name="l00256"></a>00256   m_proxy = <span class="keyword">new</span> AgentProxy(*<span class="keyword">this</span>);
+<a name="l00257"></a>00257   add_reactor(m_proxy);
+<a name="l00258"></a>00258   loadConf(conf);
 <a name="l00259"></a>00259 }
 <a name="l00260"></a>00260 
-<a name="l00261"></a>00261 <span class="keywordtype">void</span> Agent::loadPlugin(rapidxml::xml_node&lt;&gt; &amp;pg) {
-<a name="l00262"></a>00262   <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> name = parse_attr&lt;Symbol&gt;(pg, <span class="stringliteral">&quot;name&quot;</span>);
-<a name="l00263"></a>00263   m_pg-&gt;load(name);
-<a name="l00264"></a>00264 }
-<a name="l00265"></a>00265 
-<a name="l00266"></a>00266 <span class="keywordtype">void</span> Agent::loadConf(rapidxml::xml_node&lt;&gt; &amp;config) {
-<a name="l00267"></a>00267   <span class="keywordflow">if</span>( !<a class="code" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">is_tag</a>(config, <span class="stringliteral">&quot;Agent&quot;</span>) )
-<a name="l00268"></a>00268     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Not an Agent node&quot;</span>);
-<a name="l00269"></a>00269   <span class="comment">// Extract attributes</span>
-<a name="l00270"></a>00270   <span class="keywordflow">try</span> {
-<a name="l00271"></a>00271     <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> name = parse_attr&lt;std::string&gt;(config, <span class="stringliteral">&quot;name&quot;</span>);
-<a name="l00272"></a>00272     <span class="keywordflow">if</span>( name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
-<a name="l00273"></a>00273       <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Agent name is empty.&quot;</span>);
-<a name="l00274"></a>00274     set_name(name);
-<a name="l00275"></a>00275     m_finalTick = parse_attr&lt;TICK&gt;(config, <span class="stringliteral">&quot;finalTick&quot;</span>);
-<a name="l00276"></a>00276     <span class="keywordflow">if</span>( m_finalTick&lt;=0 ) 
-<a name="l00277"></a>00277       <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;agent life time should be greater than 0&quot;</span>);
-<a name="l00278"></a>00278   } <span class="keywordflow">catch</span>(<a class="code" href="../../df/d3e/classTREX_1_1utils_1_1bad__string__cast.html" title="Bad string cast exception.">bad_string_cast</a> <span class="keyword">const</span> &amp;e) {
-<a name="l00279"></a>00279     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, e.<a class="code" href="../../df/d3e/classTREX_1_1utils_1_1bad__string__cast.html#a05793e6ddc3f517d5fbf279d5309c626" title="Exception message.">what</a>());
-<a name="l00280"></a>00280   }
-<a name="l00281"></a>00281   <span class="comment">// Now iterate through the sub-tags </span>
-<a name="l00282"></a>00282   <a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> <span class="keyword">const</span> c_start(config, <span class="stringliteral">&quot;config&quot;</span>); 
-<a name="l00283"></a>00283   <a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> iter; 
-<a name="l00284"></a>00284 
-<a name="l00285"></a>00285   <span class="keywordflow">if</span>( !c_start.valid() )
-<a name="l00286"></a>00286     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Agent node do not have sub nodes.&quot;</span>);
-<a name="l00287"></a>00287 
-<a name="l00288"></a>00288   <span class="comment">// First load the plugins :</span>
-<a name="l00289"></a>00289   syslog()&lt;&lt;<span class="stringliteral">&quot;Loading plug-ins...&quot;</span>;
-<a name="l00290"></a>00290   iter = c_start;
-<a name="l00291"></a>00291   <span class="keywordflow">if</span>( <a class="code" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">is_tag</a>(*iter, <span class="stringliteral">&quot;Plugin&quot;</span>) )
-<a name="l00292"></a>00292     loadPlugin(*iter);
-<a name="l00293"></a>00293   <span class="keywordflow">for</span>( iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Plugin&quot;</span>); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>(); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Plugin&quot;</span>) )
-<a name="l00294"></a>00294     loadPlugin(*iter);
-<a name="l00295"></a>00295 
-<a name="l00296"></a>00296   
-<a name="l00297"></a>00297   <span class="comment">// Look for A clock : Note only the first clock found is used</span>
-<a name="l00298"></a>00298   <span class="keywordflow">if</span>( NULL==m_clock ) {
-<a name="l00299"></a>00299     <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="Singleton accessor.">SingletonUse&lt;Clock::xml_factory&gt;</a> clk_f;
-<a name="l00300"></a>00300     iter = c_start;
-<a name="l00301"></a>00301     clk_f-&gt;iter_produce(iter, m_clock);
-<a name="l00302"></a>00302   }
-<a name="l00303"></a>00303   <span class="comment">// List the reactors available for helping the user :</span>
-<a name="l00304"></a>00304   <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;xml_factory&gt;</a> reactor_f;
-<a name="l00305"></a>00305   
-<a name="l00306"></a>00306   <span class="comment">// First look for the reactor types available</span>
-<a name="l00307"></a>00307   std::list&lt;Symbol&gt; reactors_types;
-<a name="l00308"></a>00308 
-<a name="l00309"></a>00309   reactor_f-&gt;getIds(reactors_types);
-<a name="l00310"></a>00310   <span class="keywordflow">if</span>( reactors_types.empty() ) {
-<a name="l00311"></a>00311     syslog()&lt;&lt;<span class="stringliteral">&quot;ERROR : no reactor types available.&quot;</span>;
-<a name="l00312"></a>00312   } <span class="keywordflow">else</span> {
-<a name="l00313"></a>00313     <span class="comment">// Display the list of reactor types</span>
-<a name="l00314"></a>00314     std::ostringstream oss;
-<a name="l00315"></a>00315 
-<a name="l00316"></a>00316     <span class="keywordflow">while</span>( !reactors_types.empty() ) {
-<a name="l00317"></a>00317       oss&lt;&lt;<span class="stringliteral">&quot;\n\t- &quot;</span>&lt;&lt;reactors_types.front();
-<a name="l00318"></a>00318       reactors_types.pop_front();
-<a name="l00319"></a>00319     }
-<a name="l00320"></a>00320     syslog()&lt;&lt;<span class="stringliteral">&quot;Loading reactors; available reactor types are :&quot;</span>&lt;&lt;oss.str();
-<a name="l00321"></a>00321 
-<a name="l00322"></a>00322     iter = c_start;
-<a name="l00323"></a>00323     add_reactors(iter);                     
-<a name="l00324"></a>00324   }
-<a name="l00325"></a>00325   
-<a name="l00326"></a>00326   <span class="comment">// Now load and post the goals </span>
-<a name="l00327"></a>00327   syslog()&lt;&lt;<span class="stringliteral">&quot;load initial goals of the agent&quot;</span>;
-<a name="l00328"></a>00328   iter = c_start;
-<a name="l00329"></a>00329   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">sendRequests</a>(iter);
-<a name="l00330"></a>00330 }
-<a name="l00331"></a>00331 
-<a name="l00332"></a>00332 <span class="keywordtype">void</span> Agent::loadConf(std::string <span class="keyword">const</span> &amp;file_name) {
-<a name="l00333"></a>00333   <span class="keywordtype">bool</span> found;
-<a name="l00334"></a>00334   std::string name = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(file_name, found);
-<a name="l00335"></a>00335   <span class="keywordflow">if</span>( !found ) {
-<a name="l00336"></a>00336     name = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(file_name+<span class="stringliteral">&quot;.cfg&quot;</span>, found);
-<a name="l00337"></a>00337     <span class="keywordflow">if</span>( !found )
-<a name="l00338"></a>00338       <span class="keywordflow">throw</span> <a class="code" href="../../d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html" title="errno handling exception">ErrnoExcept</a>(<span class="stringliteral">&quot;Unable to locate &quot;</span>+file_name);
-<a name="l00339"></a>00339   }
-<a name="l00340"></a>00340   rapidxml::file&lt;&gt; file(name.c_str());
-<a name="l00341"></a>00341   rapidxml::xml_document&lt;&gt; doc;
-<a name="l00342"></a>00342   doc.parse&lt;0&gt;(file.data());
-<a name="l00343"></a>00343   rapidxml::xml_node&lt;&gt; *root = doc.first_node();
-<a name="l00344"></a>00344   <span class="keywordflow">if</span>( NULL==root ) 
-<a name="l00345"></a>00345     <span class="keywordflow">throw</span> <a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">TREX::utils::Exception</a>(std::string(<span class="stringliteral">&quot;Configuration file : \&quot;&quot;</span>)+
-<a name="l00346"></a>00346                              file_name+<span class="stringliteral">&quot;\&quot; is empty.&quot;</span>);
-<a name="l00347"></a>00347   loadConf(*root);
-<a name="l00348"></a>00348 }
-<a name="l00349"></a>00349 
-<a name="l00350"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a">00350</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization.">Agent::initComplete</a>() {
-<a name="l00351"></a>00351   <span class="keywordflow">if</span>( <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name.">getName</a>().empty() ) 
-<a name="l00352"></a>00352     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception.">AgentException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Agent has no name :&quot;</span>
-<a name="l00353"></a>00353                       <span class="stringliteral">&quot; You probably forgot to initialize it.&quot;</span>);
-<a name="l00354"></a>00354   <span class="keywordflow">if</span>( NULL==m_clock )
-<a name="l00355"></a>00355     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception.">AgentException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Agent is not connected to a clock&quot;</span>);
-<a name="l00356"></a>00356   <span class="comment">// Complete the init for the reactors and check that there&#39;s no cycle</span>
-<a name="l00357"></a>00357   <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">details::init_visitor</a> init(m_finalTick);
-<a name="l00358"></a>00358   boost::depth_first_search(me(), boost::visitor(init));
-<a name="l00359"></a>00359   
-<a name="l00360"></a>00360   <span class="comment">// Check for missing timelines </span>
-<a name="l00361"></a>00361   <span class="keywordflow">for</span>(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) 
-<a name="l00362"></a>00362     <span class="keywordflow">if</span>( !(*it)-&gt;owned() ) 
-<a name="l00363"></a>00363       syslog(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Timeline \&quot;&quot;</span>&lt;&lt;(*it)-&gt;name()&lt;&lt;<span class="stringliteral">&quot;\&quot; has no owner.&quot;</span>;
-<a name="l00364"></a>00364   
-<a name="l00365"></a>00365 
-<a name="l00366"></a>00366   <span class="comment">// Create initial graph file</span>
-<a name="l00367"></a>00367   std::string graph_dot = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name">file_name</a>(<span class="stringliteral">&quot;reactors.dot&quot;</span>);
-<a name="l00368"></a>00368   std::ofstream dotf(graph_dot.c_str());
-<a name="l00369"></a>00369   
-<a name="l00370"></a>00370   <a class="code" href="../../df/db2/classTREX_1_1transaction_1_1graph__names__writer.html" title="graphviz display helper">graph_names_writer</a> gn;
-<a name="l00371"></a>00371   boost::write_graphviz(dotf, me(), gn, gn);
-<a name="l00372"></a>00372   syslog()&lt;&lt;<span class="stringliteral">&quot;Initial graph logged in \&quot;reactors.dot\&quot;.&quot;</span>;
-<a name="l00373"></a>00373 
-<a name="l00374"></a>00374 
-<a name="l00375"></a>00375   <span class="comment">// start the clock</span>
-<a name="l00376"></a>00376   m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock.">doStart</a>();
-<a name="l00377"></a>00377   syslog(<span class="stringliteral">&quot;START&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;\t=========================================================&quot;</span>;
-<a name="l00378"></a>00378 }
-<a name="l00379"></a>00379 
-<a name="l00380"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2d3d07af39c9cac23f06ac956bf40b84">00380</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2d3d07af39c9cac23f06ac956bf40b84" title="run the agent">Agent::run</a>() {
-<a name="l00381"></a>00381   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization.">initComplete</a>();
-<a name="l00382"></a>00382   <span class="keywordflow">while</span>( <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick.">doNext</a>() );
-<a name="l00383"></a>00383   syslog()&lt;&lt;<span class="stringliteral">&quot;Mission completed.&quot;</span>&lt;&lt;std::endl;
-<a name="l00384"></a>00384 }
-<a name="l00385"></a>00385 
-<a name="l00386"></a>00386 
-<a name="l00387"></a>00387 <span class="keywordtype">void</span> Agent::synchronize() {
-<a name="l00388"></a>00388   <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">details::sync_scheduller::reactor_queue</a> queue;
-<a name="l00389"></a>00389   <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">details::sync_scheduller</a> sync(queue);
-<a name="l00390"></a>00390 
-<a name="l00391"></a>00391   <span class="comment">// Identify synchronization order while notifying of the new tick</span>
-<a name="l00392"></a>00392   boost::depth_first_search(me(), boost::visitor(sync));
-<a name="l00393"></a>00393   <span class="comment">// Execute synchronization</span>
-<a name="l00394"></a>00394   <span class="comment">//  - could be done with a dfs but we choose for now to do it using the</span>
-<a name="l00395"></a>00395   <span class="comment">//  output list of sync_scheduller to avoid a potentially costfull graph</span>
-<a name="l00396"></a>00396   <span class="comment">//  exploration.</span>
-<a name="l00397"></a>00397   <span class="keywordflow">while</span>( !queue.empty() ) {
-<a name="l00398"></a>00398     <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r = queue.front();
-<a name="l00399"></a>00399     queue.pop_front();
-<a name="l00400"></a>00400     <span class="comment">// Update timelines for r</span>
-<a name="l00401"></a>00401     r-&gt;doNotify();
-<a name="l00402"></a>00402 
-<a name="l00403"></a>00403     <span class="comment">// synchronization</span>
-<a name="l00404"></a>00404     <span class="keywordflow">if</span>( r-&gt;doSynchronize() ) {
-<a name="l00405"></a>00405       <span class="keywordtype">double</span> wr = r-&gt;workRatio();
+<a name="l00261"></a>00261 
+<a name="l00262"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb">00262</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb" title="Destructor.">Agent::~Agent</a>() {
+<a name="l00263"></a>00263   m_proxy = NULL;
+<a name="l00264"></a>00264   clear();
+<a name="l00265"></a>00265   <span class="keywordflow">if</span>( NULL!=m_clock )
+<a name="l00266"></a>00266     <span class="keyword">delete</span> m_clock;
+<a name="l00267"></a>00267 }
+<a name="l00268"></a>00268 
+<a name="l00269"></a>00269 <span class="comment">// observers :</span>
+<a name="l00270"></a>00270 
+<a name="l00271"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130">00271</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">Agent::missionCompleted</a>() {
+<a name="l00272"></a>00272   <span class="keywordflow">if</span>( count_reactors()&lt;=1 ) {
+<a name="l00273"></a>00273     <span class="comment">// If there&#39;s only one reactior left it is probably</span>
+<a name="l00274"></a>00274     <span class="comment">// my AgentProxy =&gt; no real reactor available</span>
+<a name="l00275"></a>00275     syslog()&lt;&lt;<span class="stringliteral">&quot;No reactor left.&quot;</span>;
+<a name="l00276"></a>00276     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00277"></a>00277   }
+<a name="l00278"></a>00278   <span class="keywordflow">return</span> getCurrentTick()&gt;=m_finalTick;
+<a name="l00279"></a>00279 }
+<a name="l00280"></a>00280 
+<a name="l00281"></a>00281 <span class="comment">// manipulators :</span>
+<a name="l00282"></a>00282 
+<a name="l00283"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a744b2e4a225a427e85593d28b2dbeb88">00283</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a744b2e4a225a427e85593d28b2dbeb88" title="Set agent clock.">Agent::setClock</a>(<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clock) {
+<a name="l00284"></a>00284   <span class="keywordflow">if</span>( NULL==m_clock ) {
+<a name="l00285"></a>00285     m_clock = clock;
+<a name="l00286"></a>00286     updateTick(initialTick(m_clock));
+<a name="l00287"></a>00287     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00288"></a>00288   } <span class="keywordflow">else</span> {
+<a name="l00289"></a>00289     <span class="keyword">delete</span> clock;
+<a name="l00290"></a>00290     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00291"></a>00291   }
+<a name="l00292"></a>00292 }
+<a name="l00293"></a>00293 
+<a name="l00294"></a>00294 <span class="keywordtype">void</span> Agent::loadPlugin(rapidxml::xml_node&lt;&gt; &amp;pg) {
+<a name="l00295"></a>00295   <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> name = parse_attr&lt;Symbol&gt;(pg, <span class="stringliteral">&quot;name&quot;</span>);
+<a name="l00296"></a>00296   m_pg-&gt;load(name);
+<a name="l00297"></a>00297 }
+<a name="l00298"></a>00298 
+<a name="l00299"></a>00299 <span class="keywordtype">void</span> Agent::loadConf(rapidxml::xml_node&lt;&gt; &amp;config) {
+<a name="l00300"></a>00300   <span class="keywordflow">if</span>( !<a class="code" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">is_tag</a>(config, <span class="stringliteral">&quot;Agent&quot;</span>) )
+<a name="l00301"></a>00301     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Not an Agent node&quot;</span>);
+<a name="l00302"></a>00302   <span class="comment">// Extract attributes</span>
+<a name="l00303"></a>00303   <span class="keywordflow">try</span> {
+<a name="l00304"></a>00304     <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> name = parse_attr&lt;std::string&gt;(config, <span class="stringliteral">&quot;name&quot;</span>);
+<a name="l00305"></a>00305     <span class="keywordflow">if</span>( name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
+<a name="l00306"></a>00306       <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Agent name is empty.&quot;</span>);
+<a name="l00307"></a>00307     set_name(name);
+<a name="l00308"></a>00308     m_finalTick = parse_attr&lt;TICK&gt;(config, <span class="stringliteral">&quot;finalTick&quot;</span>);
+<a name="l00309"></a>00309     <span class="keywordflow">if</span>( m_finalTick&lt;=0 ) 
+<a name="l00310"></a>00310       <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;agent life time should be greater than 0&quot;</span>);
+<a name="l00311"></a>00311   } <span class="keywordflow">catch</span>(<a class="code" href="../../df/d3e/classTREX_1_1utils_1_1bad__string__cast.html" title="Bad string cast exception.">bad_string_cast</a> <span class="keyword">const</span> &amp;e) {
+<a name="l00312"></a>00312     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, e.<a class="code" href="../../df/d3e/classTREX_1_1utils_1_1bad__string__cast.html#a05793e6ddc3f517d5fbf279d5309c626" title="Exception message.">what</a>());
+<a name="l00313"></a>00313   }
+<a name="l00314"></a>00314   <span class="comment">// Now iterate through the sub-tags </span>
+<a name="l00315"></a>00315   <a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> <span class="keyword">const</span> c_start(config, <span class="stringliteral">&quot;config&quot;</span>); 
+<a name="l00316"></a>00316   <a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> iter; 
+<a name="l00317"></a>00317 
+<a name="l00318"></a>00318   <span class="keywordflow">if</span>( !c_start.valid() )
+<a name="l00319"></a>00319     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(config, <span class="stringliteral">&quot;Agent node do not have sub nodes.&quot;</span>);
+<a name="l00320"></a>00320 
+<a name="l00321"></a>00321   <span class="comment">// First load the plugins :</span>
+<a name="l00322"></a>00322   syslog()&lt;&lt;<span class="stringliteral">&quot;Loading plug-ins...&quot;</span>;
+<a name="l00323"></a>00323   iter = c_start;
+<a name="l00324"></a>00324   <span class="keywordflow">if</span>( <a class="code" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">is_tag</a>(*iter, <span class="stringliteral">&quot;Plugin&quot;</span>) )
+<a name="l00325"></a>00325     loadPlugin(*iter);
+<a name="l00326"></a>00326   <span class="keywordflow">for</span>( iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Plugin&quot;</span>); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>(); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Plugin&quot;</span>) )
+<a name="l00327"></a>00327     loadPlugin(*iter);
+<a name="l00328"></a>00328 
+<a name="l00329"></a>00329   
+<a name="l00330"></a>00330   <span class="comment">// Look for A clock : Note only the first clock found is used</span>
+<a name="l00331"></a>00331   <span class="keywordflow">if</span>( NULL==m_clock ) {
+<a name="l00332"></a>00332     <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="Singleton accessor.">SingletonUse&lt;Clock::xml_factory&gt;</a> clk_f;
+<a name="l00333"></a>00333     iter = c_start;
+<a name="l00334"></a>00334     clk_f-&gt;iter_produce(iter, m_clock);
+<a name="l00335"></a>00335   }
+<a name="l00336"></a>00336   <span class="comment">// List the reactors available for helping the user :</span>
+<a name="l00337"></a>00337   <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;xml_factory&gt;</a> reactor_f;
+<a name="l00338"></a>00338   
+<a name="l00339"></a>00339   <span class="comment">// First look for the reactor types available</span>
+<a name="l00340"></a>00340   std::list&lt;Symbol&gt; reactors_types;
+<a name="l00341"></a>00341 
+<a name="l00342"></a>00342   reactor_f-&gt;getIds(reactors_types);
+<a name="l00343"></a>00343   <span class="keywordflow">if</span>( reactors_types.empty() ) {
+<a name="l00344"></a>00344     syslog()&lt;&lt;<span class="stringliteral">&quot;ERROR : no reactor types available.&quot;</span>;
+<a name="l00345"></a>00345   } <span class="keywordflow">else</span> {
+<a name="l00346"></a>00346     <span class="comment">// Display the list of reactor types</span>
+<a name="l00347"></a>00347     std::ostringstream oss;
+<a name="l00348"></a>00348 
+<a name="l00349"></a>00349     <span class="keywordflow">while</span>( !reactors_types.empty() ) {
+<a name="l00350"></a>00350       oss&lt;&lt;<span class="stringliteral">&quot;\n\t- &quot;</span>&lt;&lt;reactors_types.front();
+<a name="l00351"></a>00351       reactors_types.pop_front();
+<a name="l00352"></a>00352     }
+<a name="l00353"></a>00353     syslog()&lt;&lt;<span class="stringliteral">&quot;Loading reactors; available reactor types are :&quot;</span>&lt;&lt;oss.str();
+<a name="l00354"></a>00354 
+<a name="l00355"></a>00355     iter = c_start;
+<a name="l00356"></a>00356     add_reactors(iter);                     
+<a name="l00357"></a>00357   }
+<a name="l00358"></a>00358   
+<a name="l00359"></a>00359   <span class="comment">// Now load and post the goals </span>
+<a name="l00360"></a>00360   syslog()&lt;&lt;<span class="stringliteral">&quot;load initial goals of the agent&quot;</span>;
+<a name="l00361"></a>00361   iter = c_start;
+<a name="l00362"></a>00362   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">sendRequests</a>(iter);
+<a name="l00363"></a>00363 }
+<a name="l00364"></a>00364 
+<a name="l00365"></a>00365 <span class="keywordtype">void</span> Agent::loadConf(std::string <span class="keyword">const</span> &amp;file_name) {
+<a name="l00366"></a>00366   <span class="keywordtype">bool</span> found;
+<a name="l00367"></a>00367   std::string name = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(file_name, found);
+<a name="l00368"></a>00368   <span class="keywordflow">if</span>( !found ) {
+<a name="l00369"></a>00369     name = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(file_name+<span class="stringliteral">&quot;.cfg&quot;</span>, found);
+<a name="l00370"></a>00370     <span class="keywordflow">if</span>( !found )
+<a name="l00371"></a>00371       <span class="keywordflow">throw</span> <a class="code" href="../../d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html" title="errno handling exception">ErrnoExcept</a>(<span class="stringliteral">&quot;Unable to locate &quot;</span>+file_name);
+<a name="l00372"></a>00372   }
+<a name="l00373"></a>00373   rapidxml::file&lt;&gt; file(name.c_str());
+<a name="l00374"></a>00374   rapidxml::xml_document&lt;&gt; doc;
+<a name="l00375"></a>00375   doc.parse&lt;0&gt;(file.data());
+<a name="l00376"></a>00376   rapidxml::xml_node&lt;&gt; *root = doc.first_node();
+<a name="l00377"></a>00377   <span class="keywordflow">if</span>( NULL==root ) 
+<a name="l00378"></a>00378     <span class="keywordflow">throw</span> <a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">TREX::utils::Exception</a>(std::string(<span class="stringliteral">&quot;Configuration file : \&quot;&quot;</span>)+
+<a name="l00379"></a>00379                              file_name+<span class="stringliteral">&quot;\&quot; is empty.&quot;</span>);
+<a name="l00380"></a>00380   loadConf(*root);
+<a name="l00381"></a>00381 }
+<a name="l00382"></a>00382 
+<a name="l00383"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a">00383</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization.">Agent::initComplete</a>() {
+<a name="l00384"></a>00384   <span class="keywordflow">if</span>( <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name.">getName</a>().empty() ) 
+<a name="l00385"></a>00385     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception.">AgentException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Agent has no name :&quot;</span>
+<a name="l00386"></a>00386                       <span class="stringliteral">&quot; You probably forgot to initialize it.&quot;</span>);
+<a name="l00387"></a>00387   <span class="keywordflow">if</span>( NULL==m_clock )
+<a name="l00388"></a>00388     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception.">AgentException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Agent is not connected to a clock&quot;</span>);
+<a name="l00389"></a>00389   <span class="comment">// Complete the init for the reactors and check that there&#39;s no cycle</span>
+<a name="l00390"></a>00390   <a class="code" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor.">details::init_visitor</a> init(m_finalTick);
+<a name="l00391"></a>00391   boost::depth_first_search(me(), boost::visitor(init));
+<a name="l00392"></a>00392   
+<a name="l00393"></a>00393   <span class="comment">// Check for missing timelines </span>
+<a name="l00394"></a>00394   <span class="keywordflow">for</span>(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) 
+<a name="l00395"></a>00395     <span class="keywordflow">if</span>( !(*it)-&gt;owned() ) 
+<a name="l00396"></a>00396       syslog(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Timeline \&quot;&quot;</span>&lt;&lt;(*it)-&gt;name()&lt;&lt;<span class="stringliteral">&quot;\&quot; has no owner.&quot;</span>;
+<a name="l00397"></a>00397   
+<a name="l00398"></a>00398 
+<a name="l00399"></a>00399   <span class="comment">// Create initial graph file</span>
+<a name="l00400"></a>00400   std::string graph_dot = manager().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name">file_name</a>(<span class="stringliteral">&quot;reactors.dot&quot;</span>);
+<a name="l00401"></a>00401   std::ofstream dotf(graph_dot.c_str());
+<a name="l00402"></a>00402   
+<a name="l00403"></a>00403   <a class="code" href="../../df/db2/classTREX_1_1transaction_1_1graph__names__writer.html" title="graphviz display helper">graph_names_writer</a> gn;
+<a name="l00404"></a>00404   boost::write_graphviz(dotf, me(), gn, gn);
+<a name="l00405"></a>00405   syslog()&lt;&lt;<span class="stringliteral">&quot;Initial graph logged in \&quot;reactors.dot\&quot;.&quot;</span>;
 <a name="l00406"></a>00406 
-<a name="l00407"></a>00407       <span class="keywordflow">if</span>( !std::isnan(wr) ) {
-<a name="l00408"></a>00408        <span class="comment">// this reactor has deliberation :</span>
-<a name="l00409"></a>00409        <span class="comment">//   - add it to the edf scheduler</span>
-<a name="l00410"></a>00410        m_edf.insert(std::make_pair(wr, r));
-<a name="l00411"></a>00411       }
-<a name="l00412"></a>00412     } <span class="keywordflow">else</span> {
-<a name="l00413"></a>00413       <span class="comment">// r failed =&gt; kill the reactor</span>
-<a name="l00414"></a>00414       kill_reactor(r);
-<a name="l00415"></a>00415     }
-<a name="l00416"></a>00416   }
+<a name="l00407"></a>00407 
+<a name="l00408"></a>00408   <span class="comment">// start the clock</span>
+<a name="l00409"></a>00409   m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock.">doStart</a>();
+<a name="l00410"></a>00410   syslog(<span class="stringliteral">&quot;START&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;\t=========================================================&quot;</span>;
+<a name="l00411"></a>00411 }
+<a name="l00412"></a>00412 
+<a name="l00413"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2d3d07af39c9cac23f06ac956bf40b84">00413</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2d3d07af39c9cac23f06ac956bf40b84" title="run the agent">Agent::run</a>() {
+<a name="l00414"></a>00414   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization.">initComplete</a>();
+<a name="l00415"></a>00415   <span class="keywordflow">while</span>( <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick.">doNext</a>() );
+<a name="l00416"></a>00416   syslog()&lt;&lt;<span class="stringliteral">&quot;Mission completed.&quot;</span>&lt;&lt;std::endl;
 <a name="l00417"></a>00417 }
 <a name="l00418"></a>00418 
-<a name="l00419"></a>00419 <span class="keywordtype">bool</span> Agent::executeReactor() {
-<a name="l00420"></a>00420   <span class="keywordflow">if</span>( m_edf.empty() )
-<a name="l00421"></a>00421     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00422"></a>00422   <span class="keywordflow">else</span> {
-<a name="l00423"></a>00423     <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r = m_edf.begin()-&gt;second;
-<a name="l00424"></a>00424     m_edf.erase(m_edf.begin());
-<a name="l00425"></a>00425     r-&gt;step();
-<a name="l00426"></a>00426 
-<a name="l00427"></a>00427     <span class="keywordtype">double</span> wr = r-&gt;workRatio();
-<a name="l00428"></a>00428     <span class="keywordflow">if</span>( !std::isnan(wr) ) {
-<a name="l00429"></a>00429       m_edf.insert(std::make_pair(wr, r));
-<a name="l00430"></a>00430       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00431"></a>00431     }
-<a name="l00432"></a>00432     <span class="keywordflow">return</span> !m_edf.empty();
-<a name="l00433"></a>00433   }
-<a name="l00434"></a>00434 }
-<a name="l00435"></a>00435     
-<a name="l00436"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5">00436</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick.">Agent::doNext</a>() {
-<a name="l00437"></a>00437   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">missionCompleted</a>() ) {
-<a name="l00438"></a>00438     <span class="keywordflow">if</span>( empty() )
-<a name="l00439"></a>00439       syslog()&lt;&lt;<span class="stringliteral">&quot;No more reactor active.&quot;</span>;    
-<a name="l00440"></a>00440     syslog(<span class="stringliteral">&quot;END&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;\t=========================================================&quot;</span>;
-<a name="l00441"></a>00441     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00442"></a>00442   }
-<a name="l00443"></a>00443   synchronize();
-<a name="l00444"></a>00444   
-<a name="l00445"></a>00445   <span class="keywordflow">while</span>( m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>()==getCurrentTick() &amp;&amp; executeReactor() );
-<a name="l00446"></a>00446   <span class="keywordflow">while</span>( m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>()==getCurrentTick() )
-<a name="l00447"></a>00447     m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick.">sleep</a>();
-<a name="l00448"></a>00448   
-<a name="l00449"></a>00449   updateTick(m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>());
-<a name="l00450"></a>00450 
-<a name="l00451"></a>00451   <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00452"></a>00452 }
-<a name="l00453"></a>00453 
-<a name="l00454"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a">00454</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">Agent::sendRequest</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00455"></a>00455   <span class="keywordflow">if</span>( !has_timeline(g-&gt;object()) )
-<a name="l00456"></a>00456     syslog(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Posting goal on a unknnown timeline \&quot;&quot;</span>&lt;&lt;g-&gt;object()&lt;&lt;<span class="stringliteral">&quot;\&quot;.&quot;</span>;
-<a name="l00457"></a>00457   m_proxy-&gt;postRequest(g);
-<a name="l00458"></a>00458 }
+<a name="l00419"></a>00419 
+<a name="l00420"></a>00420 <span class="keywordtype">void</span> Agent::synchronize() {
+<a name="l00421"></a>00421   <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html#a349b7132f9e88bb24e3146c63a19e183" title="scheduling queue type">details::sync_scheduller::reactor_queue</a> queue;
+<a name="l00422"></a>00422   <a class="code" href="../../d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor">details::sync_scheduller</a> sync(queue);
+<a name="l00423"></a>00423 
+<a name="l00424"></a>00424   <span class="comment">// Identify synchronization order while notifying of the new tick</span>
+<a name="l00425"></a>00425   boost::depth_first_search(me(), boost::visitor(sync));
+<a name="l00426"></a>00426   <span class="comment">// Execute synchronization</span>
+<a name="l00427"></a>00427   <span class="comment">//  - could be done with a dfs but we choose for now to do it using the</span>
+<a name="l00428"></a>00428   <span class="comment">//  output list of sync_scheduller to avoid a potentially costfull graph</span>
+<a name="l00429"></a>00429   <span class="comment">//  exploration.</span>
+<a name="l00430"></a>00430   <span class="keywordflow">while</span>( !queue.empty() ) {
+<a name="l00431"></a>00431     <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r = queue.front();
+<a name="l00432"></a>00432     queue.pop_front();
+<a name="l00433"></a>00433     <span class="comment">// Update timelines for r</span>
+<a name="l00434"></a>00434     r-&gt;doNotify();
+<a name="l00435"></a>00435 
+<a name="l00436"></a>00436     <span class="comment">// synchronization</span>
+<a name="l00437"></a>00437     <span class="keywordflow">if</span>( r-&gt;doSynchronize() ) {
+<a name="l00438"></a>00438       <span class="keywordtype">double</span> wr = r-&gt;workRatio();
+<a name="l00439"></a>00439 
+<a name="l00440"></a>00440       <span class="keywordflow">if</span>( !std::isnan(wr) ) {
+<a name="l00441"></a>00441        <span class="comment">// this reactor has deliberation :</span>
+<a name="l00442"></a>00442        <span class="comment">//   - add it to the edf scheduler</span>
+<a name="l00443"></a>00443        m_edf.insert(std::make_pair(wr, r));
+<a name="l00444"></a>00444       }
+<a name="l00445"></a>00445     } <span class="keywordflow">else</span> {
+<a name="l00446"></a>00446       <span class="comment">// r failed =&gt; kill the reactor</span>
+<a name="l00447"></a>00447       kill_reactor(r);
+<a name="l00448"></a>00448     }
+<a name="l00449"></a>00449   }
+<a name="l00450"></a>00450 }
+<a name="l00451"></a>00451 
+<a name="l00452"></a>00452 <span class="keywordtype">bool</span> Agent::executeReactor() {
+<a name="l00453"></a>00453   <span class="keywordflow">if</span>( m_edf.empty() )
+<a name="l00454"></a>00454     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00455"></a>00455   <span class="keywordflow">else</span> {
+<a name="l00456"></a>00456     <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r = m_edf.begin()-&gt;second;
+<a name="l00457"></a>00457     m_edf.erase(m_edf.begin());
+<a name="l00458"></a>00458     r-&gt;step();
 <a name="l00459"></a>00459 
-<a name="l00460"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80">00460</a> <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">Agent::sendRequests</a>(<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> &amp;iter) {
-<a name="l00461"></a>00461   <span class="keywordtype">size_t</span> ret = 0;
-<a name="l00462"></a>00462   <span class="keywordflow">if</span>( iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>() ) {
-<a name="l00463"></a>00463     <span class="keywordflow">for</span>(iter = iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a98a822361ee189e4097b3a3dde484982" title="Find element.">find_tag</a>(<span class="stringliteral">&quot;Goal&quot;</span>); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>(); iter = iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Goal&quot;</span>) ) {
-<a name="l00464"></a>00464       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">sendRequest</a>(*iter);
-<a name="l00465"></a>00465       ++ret;
-<a name="l00466"></a>00466     }
-<a name="l00467"></a>00467     syslog()&lt;&lt;ret&lt;&lt;<span class="stringliteral">&quot; goal&quot;</span>&lt;&lt;(ret&gt;1?<span class="stringliteral">&quot;s&quot;</span>:<span class="stringliteral">&quot;&quot;</span>)&lt;&lt;<span class="stringliteral">&quot; loaded.&quot;</span>;
-<a name="l00468"></a>00468   } <span class="keywordflow">else</span> 
-<a name="l00469"></a>00469     syslog()&lt;&lt;<span class="stringliteral">&quot;There&#39;s no tag in this file.&quot;</span>;
-<a name="l00470"></a>00470   <span class="keywordflow">return</span> ret;
-<a name="l00471"></a>00471 }
-<a name="l00472"></a>00472 
-<a name="l00473"></a>00473 
+<a name="l00460"></a>00460     <span class="keywordtype">double</span> wr = r-&gt;workRatio();
+<a name="l00461"></a>00461     <span class="keywordflow">if</span>( !std::isnan(wr) ) {
+<a name="l00462"></a>00462       m_edf.insert(std::make_pair(wr, r));
+<a name="l00463"></a>00463       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00464"></a>00464     }
+<a name="l00465"></a>00465     <span class="keywordflow">return</span> !m_edf.empty();
+<a name="l00466"></a>00466   }
+<a name="l00467"></a>00467 }
+<a name="l00468"></a>00468     
+<a name="l00469"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5">00469</a> <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick.">Agent::doNext</a>() {
+<a name="l00470"></a>00470   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">missionCompleted</a>() ) {
+<a name="l00471"></a>00471     <span class="keywordflow">if</span>( empty() )
+<a name="l00472"></a>00472       syslog()&lt;&lt;<span class="stringliteral">&quot;No more reactor active.&quot;</span>;    
+<a name="l00473"></a>00473     syslog(<span class="stringliteral">&quot;END&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;\t=========================================================&quot;</span>;
+<a name="l00474"></a>00474     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00475"></a>00475   }
+<a name="l00476"></a>00476   synchronize();
+<a name="l00477"></a>00477   
+<a name="l00478"></a>00478   <span class="keywordflow">while</span>( m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>()==getCurrentTick() &amp;&amp; executeReactor() );
+<a name="l00479"></a>00479   <span class="keywordflow">while</span>( m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>()==getCurrentTick() )
+<a name="l00480"></a>00480     m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick.">sleep</a>();
+<a name="l00481"></a>00481   
+<a name="l00482"></a>00482   updateTick(m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK">getNextTick</a>());
+<a name="l00483"></a>00483 
+<a name="l00484"></a>00484   <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00485"></a>00485 }
+<a name="l00486"></a>00486 
+<a name="l00487"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a">00487</a> <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">Agent::sendRequest</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00488"></a>00488   <span class="keywordflow">if</span>( !has_timeline(g-&gt;object()) )
+<a name="l00489"></a>00489     syslog(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Posting goal on a unknnown timeline \&quot;&quot;</span>&lt;&lt;g-&gt;object()&lt;&lt;<span class="stringliteral">&quot;\&quot;.&quot;</span>;
+<a name="l00490"></a>00490   m_proxy-&gt;postRequest(g);
+<a name="l00491"></a>00491 }
+<a name="l00492"></a>00492 
+<a name="l00493"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80">00493</a> <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">Agent::sendRequests</a>(<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">ext_iterator</a> &amp;iter) {
+<a name="l00494"></a>00494   <span class="keywordtype">size_t</span> ret = 0;
+<a name="l00495"></a>00495   <span class="keywordflow">if</span>( iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>() ) {
+<a name="l00496"></a>00496     <span class="keywordflow">for</span>(iter = iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a98a822361ee189e4097b3a3dde484982" title="Find element.">find_tag</a>(<span class="stringliteral">&quot;Goal&quot;</span>); iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity.">valid</a>(); iter = iter.<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node">next</a>(<span class="stringliteral">&quot;Goal&quot;</span>) ) {
+<a name="l00497"></a>00497       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">sendRequest</a>(*iter);
+<a name="l00498"></a>00498       ++ret;
+<a name="l00499"></a>00499     }
+<a name="l00500"></a>00500     syslog()&lt;&lt;ret&lt;&lt;<span class="stringliteral">&quot; goal&quot;</span>&lt;&lt;(ret&gt;1?<span class="stringliteral">&quot;s&quot;</span>:<span class="stringliteral">&quot;&quot;</span>)&lt;&lt;<span class="stringliteral">&quot; loaded.&quot;</span>;
+<a name="l00501"></a>00501   } <span class="keywordflow">else</span> 
+<a name="l00502"></a>00502     syslog()&lt;&lt;<span class="stringliteral">&quot;There&#39;s no tag in this file.&quot;</span>;
+<a name="l00503"></a>00503   <span class="keywordflow">return</span> ret;
+<a name="l00504"></a>00504 }
+<a name="l00505"></a>00505 
+<a name="l00506"></a>00506 
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

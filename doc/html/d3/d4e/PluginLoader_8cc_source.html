@@ -73,87 +73,120 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>PluginLoader.cc</h1><a href="../../d3/d4e/PluginLoader_8cc.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="../../d4/d27/PluginLoader_8hh.html" title="plug-in loading utility">PluginLoader.hh</a>&quot;</span>
-<a name="l00009"></a>00009 <span class="preprocessor">#include &quot;<a class="code" href="../../d5/dee/Pdlfcn_8hh.html" title="Dynamic librares loading.">Pdlfcn.hh</a>&quot;</span>
-<a name="l00010"></a>00010 <span class="preprocessor">#include &quot;<a class="code" href="../../d1/dac/Plugin_8hh.html" title="Plugin header.">Plugin.hh</a>&quot;</span>
-<a name="l00011"></a>00011 
-<a name="l00012"></a>00012 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00013"></a>00013 <span class="keyword">using namespace </span>TREX::utils::internals;
-<a name="l00014"></a>00014 
-<a name="l00015"></a>00015 <span class="comment">/*</span>
-<a name="l00016"></a>00016 <span class="comment"> * class TREX::utils::PluginError</span>
-<a name="l00017"></a>00017 <span class="comment"> */</span> 
-<a name="l00018"></a>00018 
-<a name="l00019"></a>00019 PluginError::PluginError(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, 
-<a name="l00020"></a>00020                          std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
-<a name="l00021"></a>00021 :<a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">Exception</a>(<span class="stringliteral">&quot;Plugin(&quot;</span>+name.str()+<span class="stringliteral">&quot;) &quot;</span>+msg+<span class="stringliteral">&quot;: &quot;</span>+<a class="code" href="../../db/d81/group__utils.html#gaf785ca09d263e0eb84990305a3efd172" title="dynamic library error messages">p_dlerror</a>()) {}
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="comment">/* </span>
-<a name="l00024"></a>00024 <span class="comment"> * class TREX::utils::PluginLoader</span>
-<a name="l00025"></a>00025 <span class="comment"> */</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="comment">// structors :</span>
-<a name="l00028"></a>00028 
-<a name="l00029"></a>00029 PluginLoader::~PluginLoader() {
-<a name="l00030"></a>00030   <span class="comment">/*</span>
-<a name="l00031"></a>00031 <span class="comment">   * Unloading plug-ins at destruction appeared to be a bad idea</span>
-<a name="l00032"></a>00032 <span class="comment">   */</span>
-<a name="l00033"></a>00033   <span class="comment">// handle_map::iterator i;</span>
-<a name="l00034"></a>00034   
-<a name="l00035"></a>00035   <span class="comment">// // Unload all the plugins loaded </span>
-<a name="l00036"></a>00036   <span class="comment">// while( !m_loaded.empty() ) {</span>
-<a name="l00037"></a>00037   <span class="comment">//   i = m_loaded.begin();</span>
-<a name="l00038"></a>00038   <span class="comment">//   void *handle = i-&gt;second.first;</span>
-<a name="l00039"></a>00039   
-<a name="l00040"></a>00040   <span class="comment">//   if( 0!=p_dlclose(handle) )</span>
-<a name="l00041"></a>00041   <span class="comment">//     throw PluginError(i-&gt;first, &quot;Failed to unload&quot;);</span>
-<a name="l00042"></a>00042   <span class="comment">//   m_loaded.erase(i);</span>
-<a name="l00043"></a>00043   <span class="comment">// }</span>
-<a name="l00044"></a>00044 }
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046 <span class="comment">// Modifiers :</span>
+<a name="l00008"></a>00008 <span class="comment">/*********************************************************************</span>
+<a name="l00009"></a>00009 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00010"></a>00010 <span class="comment"> * </span>
+<a name="l00011"></a>00011 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00012"></a>00012 <span class="comment"> *  All rights reserved.</span>
+<a name="l00013"></a>00013 <span class="comment"> * </span>
+<a name="l00014"></a>00014 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00015"></a>00015 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00016"></a>00016 <span class="comment"> *  are met:</span>
+<a name="l00017"></a>00017 <span class="comment"> * </span>
+<a name="l00018"></a>00018 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00019"></a>00019 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00020"></a>00020 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00021"></a>00021 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00022"></a>00022 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00023"></a>00023 <span class="comment"> *     with the distribution.</span>
+<a name="l00024"></a>00024 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00025"></a>00025 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00026"></a>00026 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00027"></a>00027 <span class="comment"> * </span>
+<a name="l00028"></a>00028 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00029"></a>00029 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00030"></a>00030 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00031"></a>00031 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00032"></a>00032 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00033"></a>00033 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00034"></a>00034 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00035"></a>00035 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00036"></a>00036 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00037"></a>00037 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00038"></a>00038 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00039"></a>00039 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00040"></a>00040 <span class="comment"> */</span>
+<a name="l00041"></a>00041 <span class="preprocessor">#include &quot;<a class="code" href="../../d4/d27/PluginLoader_8hh.html" title="plug-in loading utility">PluginLoader.hh</a>&quot;</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &quot;<a class="code" href="../../d5/dee/Pdlfcn_8hh.html" title="Dynamic librares loading.">Pdlfcn.hh</a>&quot;</span>
+<a name="l00043"></a>00043 <span class="preprocessor">#include &quot;<a class="code" href="../../d1/dac/Plugin_8hh.html" title="Plugin header.">Plugin.hh</a>&quot;</span>
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045 <span class="keyword">using namespace </span>TREX::utils;
+<a name="l00046"></a>00046 <span class="keyword">using namespace </span>TREX::utils::internals;
 <a name="l00047"></a>00047 
-<a name="l00048"></a><a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a96e2d7e2e01cfdb9df4fce7a4571589e">00048</a> <span class="keywordtype">void</span> <a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a96e2d7e2e01cfdb9df4fce7a4571589e" title="plug-in load method">PluginLoader::load</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name) {
-<a name="l00049"></a>00049   handle_map::iterator i = m_loaded.find(name);
-<a name="l00050"></a>00050   <span class="keywordflow">if</span>( m_loaded.end()==i ) {
-<a name="l00051"></a>00051     <span class="keywordtype">bool</span> found;
-<a name="l00052"></a>00052     std::string fileName = m_log-&gt;locate(<span class="stringliteral">&quot;lib&quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<a class="code" href="../../db/d81/group__utils.html#gacf8ed29050e73a10bf7fc4bd3c358fcf" title="Dynamic library extension helper.">p_dlext</a>(), found);
-<a name="l00053"></a>00053     <span class="keywordflow">if</span>( found ) {
-<a name="l00054"></a>00054       <span class="keywordtype">void</span> *handle = <a class="code" href="../../db/d81/group__utils.html#ga8b756aa2ec5e6f7028c7aba2110f1250" title="dynamic library load">p_dlopen</a>(fileName.c_str(), RTLD_NOW);
-<a name="l00055"></a>00055       <span class="keywordflow">if</span>( NULL==handle )
-<a name="l00056"></a>00056         <span class="keywordflow">throw</span> <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a>(name, <span class="stringliteral">&quot;Failed to load \&quot;&quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<span class="stringliteral">&quot;\&quot;&quot;</span>);
-<a name="l00057"></a>00057       <a class="code" href="../../db/d81/group__utils.html#ga97debfe654055e7dfcd0654242630fa8" title="Pointer to a plugin function.">plugin_fn</a> f_init = (<a class="code" href="../../db/d81/group__utils.html#ga97debfe654055e7dfcd0654242630fa8" title="Pointer to a plugin function.">plugin_fn</a>)<a class="code" href="../../db/d81/group__utils.html#gad59cc820c06c31cbfa785db5bba5ed10" title="dynamic library symbol access">p_dlsym</a>(handle, <span class="stringliteral">&quot;initPlugin&quot;</span>);
-<a name="l00058"></a>00058       <span class="keywordflow">if</span>( NULL==f_init ) {
-<a name="l00059"></a>00059         <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a> err(name, <span class="stringliteral">&quot;missing initPugin&quot;</span>);
-<a name="l00060"></a>00060         <a class="code" href="../../db/d81/group__utils.html#gaf461c22af8a134ad93eb912bb3871b30" title="Close a dynamic library.">p_dlclose</a>(handle);
-<a name="l00061"></a>00061         <span class="keywordflow">throw</span> err;
-<a name="l00062"></a>00062       }
-<a name="l00063"></a>00063       m_loaded[name] = std::make_pair(handle, 1);
-<a name="l00064"></a>00064       <span class="comment">// call to f_init : may throw an exception but</span>
-<a name="l00065"></a>00065       <span class="comment">//                  it is too be avoided</span>
-<a name="l00066"></a>00066       f_init();
-<a name="l00067"></a>00067     } <span class="keywordflow">else</span> 
-<a name="l00068"></a>00068       <span class="keywordflow">throw</span> <a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">Exception</a>(<span class="stringliteral">&quot;Unable to locate plugin &quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>());
-<a name="l00069"></a>00069   } <span class="keywordflow">else</span> {
-<a name="l00070"></a>00070     i-&gt;second.second += 1;
-<a name="l00071"></a>00071   }
-<a name="l00072"></a>00072 }
-<a name="l00073"></a>00073 
-<a name="l00074"></a><a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a006748e28d83153f1d1edbaf79426cd9">00074</a> <span class="keywordtype">bool</span> <a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a006748e28d83153f1d1edbaf79426cd9" title="plug-in unload method">PluginLoader::unload</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name) {
-<a name="l00075"></a>00075   handle_map::iterator i = m_loaded.find(name);
-<a name="l00076"></a>00076   <span class="keywordflow">if</span>( m_loaded.end()!=i ) {
-<a name="l00077"></a>00077     <span class="keywordflow">if</span>( (i-&gt;second.second--)&lt;=1 ) {
-<a name="l00078"></a>00078       <span class="keywordtype">void</span> *handle = i-&gt;second.first;
-<a name="l00079"></a>00079       <span class="keywordflow">if</span>( 0!=<a class="code" href="../../db/d81/group__utils.html#gaf461c22af8a134ad93eb912bb3871b30" title="Close a dynamic library.">p_dlclose</a>(handle) )
-<a name="l00080"></a>00080         <span class="keywordflow">throw</span> <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a>(i-&gt;first, <span class="stringliteral">&quot;Failed to unload&quot;</span>);
-<a name="l00081"></a>00081       m_loaded.erase(i);
-<a name="l00082"></a>00082       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00083"></a>00083     }
-<a name="l00084"></a>00084   }
-<a name="l00085"></a>00085   <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00086"></a>00086 }
+<a name="l00048"></a>00048 <span class="comment">/*</span>
+<a name="l00049"></a>00049 <span class="comment"> * class TREX::utils::PluginError</span>
+<a name="l00050"></a>00050 <span class="comment"> */</span> 
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 PluginError::PluginError(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, 
+<a name="l00053"></a>00053                          std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
+<a name="l00054"></a>00054 :<a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">Exception</a>(<span class="stringliteral">&quot;Plugin(&quot;</span>+name.str()+<span class="stringliteral">&quot;) &quot;</span>+msg+<span class="stringliteral">&quot;: &quot;</span>+<a class="code" href="../../db/d81/group__utils.html#gaf785ca09d263e0eb84990305a3efd172" title="dynamic library error messages">p_dlerror</a>()) {}
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="comment">/* </span>
+<a name="l00057"></a>00057 <span class="comment"> * class TREX::utils::PluginLoader</span>
+<a name="l00058"></a>00058 <span class="comment"> */</span>
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060 <span class="comment">// structors :</span>
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062 PluginLoader::~PluginLoader() {
+<a name="l00063"></a>00063   <span class="comment">/*</span>
+<a name="l00064"></a>00064 <span class="comment">   * Unloading plug-ins at destruction appeared to be a bad idea</span>
+<a name="l00065"></a>00065 <span class="comment">   */</span>
+<a name="l00066"></a>00066   <span class="comment">// handle_map::iterator i;</span>
+<a name="l00067"></a>00067   
+<a name="l00068"></a>00068   <span class="comment">// // Unload all the plugins loaded </span>
+<a name="l00069"></a>00069   <span class="comment">// while( !m_loaded.empty() ) {</span>
+<a name="l00070"></a>00070   <span class="comment">//   i = m_loaded.begin();</span>
+<a name="l00071"></a>00071   <span class="comment">//   void *handle = i-&gt;second.first;</span>
+<a name="l00072"></a>00072   
+<a name="l00073"></a>00073   <span class="comment">//   if( 0!=p_dlclose(handle) )</span>
+<a name="l00074"></a>00074   <span class="comment">//     throw PluginError(i-&gt;first, &quot;Failed to unload&quot;);</span>
+<a name="l00075"></a>00075   <span class="comment">//   m_loaded.erase(i);</span>
+<a name="l00076"></a>00076   <span class="comment">// }</span>
+<a name="l00077"></a>00077 }
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079 <span class="comment">// Modifiers :</span>
+<a name="l00080"></a>00080 
+<a name="l00081"></a><a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a96e2d7e2e01cfdb9df4fce7a4571589e">00081</a> <span class="keywordtype">void</span> <a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a96e2d7e2e01cfdb9df4fce7a4571589e" title="plug-in load method">PluginLoader::load</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name) {
+<a name="l00082"></a>00082   handle_map::iterator i = m_loaded.find(name);
+<a name="l00083"></a>00083   <span class="keywordflow">if</span>( m_loaded.end()==i ) {
+<a name="l00084"></a>00084     <span class="keywordtype">bool</span> found;
+<a name="l00085"></a>00085     std::string fileName = m_log-&gt;locate(<span class="stringliteral">&quot;lib&quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<a class="code" href="../../db/d81/group__utils.html#gacf8ed29050e73a10bf7fc4bd3c358fcf" title="Dynamic library extension helper.">p_dlext</a>(), found);
+<a name="l00086"></a>00086     <span class="keywordflow">if</span>( found ) {
+<a name="l00087"></a>00087       <span class="keywordtype">void</span> *handle = <a class="code" href="../../db/d81/group__utils.html#ga8b756aa2ec5e6f7028c7aba2110f1250" title="dynamic library load">p_dlopen</a>(fileName.c_str(), RTLD_NOW);
+<a name="l00088"></a>00088       <span class="keywordflow">if</span>( NULL==handle )
+<a name="l00089"></a>00089         <span class="keywordflow">throw</span> <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a>(name, <span class="stringliteral">&quot;Failed to load \&quot;&quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<span class="stringliteral">&quot;\&quot;&quot;</span>);
+<a name="l00090"></a>00090       <a class="code" href="../../db/d81/group__utils.html#ga97debfe654055e7dfcd0654242630fa8" title="Pointer to a plugin function.">plugin_fn</a> f_init = (<a class="code" href="../../db/d81/group__utils.html#ga97debfe654055e7dfcd0654242630fa8" title="Pointer to a plugin function.">plugin_fn</a>)<a class="code" href="../../db/d81/group__utils.html#gad59cc820c06c31cbfa785db5bba5ed10" title="dynamic library symbol access">p_dlsym</a>(handle, <span class="stringliteral">&quot;initPlugin&quot;</span>);
+<a name="l00091"></a>00091       <span class="keywordflow">if</span>( NULL==f_init ) {
+<a name="l00092"></a>00092         <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a> err(name, <span class="stringliteral">&quot;missing initPugin&quot;</span>);
+<a name="l00093"></a>00093         <a class="code" href="../../db/d81/group__utils.html#gaf461c22af8a134ad93eb912bb3871b30" title="Close a dynamic library.">p_dlclose</a>(handle);
+<a name="l00094"></a>00094         <span class="keywordflow">throw</span> err;
+<a name="l00095"></a>00095       }
+<a name="l00096"></a>00096       m_loaded[name] = std::make_pair(handle, 1);
+<a name="l00097"></a>00097       <span class="comment">// call to f_init : may throw an exception but</span>
+<a name="l00098"></a>00098       <span class="comment">//                  it is too be avoided</span>
+<a name="l00099"></a>00099       f_init();
+<a name="l00100"></a>00100     } <span class="keywordflow">else</span> 
+<a name="l00101"></a>00101       <span class="keywordflow">throw</span> <a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html" title="TREX exception.">Exception</a>(<span class="stringliteral">&quot;Unable to locate plugin &quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>());
+<a name="l00102"></a>00102   } <span class="keywordflow">else</span> {
+<a name="l00103"></a>00103     i-&gt;second.second += 1;
+<a name="l00104"></a>00104   }
+<a name="l00105"></a>00105 }
+<a name="l00106"></a>00106 
+<a name="l00107"></a><a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a006748e28d83153f1d1edbaf79426cd9">00107</a> <span class="keywordtype">bool</span> <a class="code" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html#a006748e28d83153f1d1edbaf79426cd9" title="plug-in unload method">PluginLoader::unload</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name) {
+<a name="l00108"></a>00108   handle_map::iterator i = m_loaded.find(name);
+<a name="l00109"></a>00109   <span class="keywordflow">if</span>( m_loaded.end()!=i ) {
+<a name="l00110"></a>00110     <span class="keywordflow">if</span>( (i-&gt;second.second--)&lt;=1 ) {
+<a name="l00111"></a>00111       <span class="keywordtype">void</span> *handle = i-&gt;second.first;
+<a name="l00112"></a>00112       <span class="keywordflow">if</span>( 0!=<a class="code" href="../../db/d81/group__utils.html#gaf461c22af8a134ad93eb912bb3871b30" title="Close a dynamic library.">p_dlclose</a>(handle) )
+<a name="l00113"></a>00113         <span class="keywordflow">throw</span> <a class="code" href="../../d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error.">PluginError</a>(i-&gt;first, <span class="stringliteral">&quot;Failed to unload&quot;</span>);
+<a name="l00114"></a>00114       m_loaded.erase(i);
+<a name="l00115"></a>00115       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00116"></a>00116     }
+<a name="l00117"></a>00117   }
+<a name="l00118"></a>00118   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00119"></a>00119 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

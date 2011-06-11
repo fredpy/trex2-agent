@@ -72,221 +72,254 @@ window.onload = initDynSections;
   </div>
 </div>
 <div class="contents">
-<h1>Relation.cc</h1><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="preprocessor">#include &quot;bits/timeline.hh&quot;</span>
-<a name="l00002"></a>00002 <span class="preprocessor">#include &quot;<a class="code" href="../../db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo-Reactor.">TeleoReactor.hh</a>&quot;</span>
-<a name="l00003"></a>00003 
-<a name="l00004"></a>00004 <span class="keyword">using namespace </span>TREX;
-<a name="l00005"></a>00005 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00006"></a>00006 <span class="keyword">using namespace </span>TREX::transaction::details;
-<a name="l00007"></a>00007 
-<a name="l00008"></a>00008 <span class="comment">/*</span>
-<a name="l00009"></a>00009 <span class="comment"> * class TREX::transaction::MultipleInternals</span>
-<a name="l00010"></a>00010 <span class="comment"> */</span>
-<a name="l00011"></a>00011 
-<a name="l00012"></a><a class="code" href="../../d2/d66/classTREX_1_1transaction_1_1MultipleInternals.html#ac1bc0577e224eade878f4a8eb5dbda0e">00012</a> MultipleInternals::MultipleInternals(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;faulty, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">timeline</a>,
-<a name="l00013"></a>00013                                  <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;owner) <span class="keywordflow">throw</span>() 
-<a name="l00014"></a>00014   :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(faulty, <span class="stringliteral">&quot;timeline &quot;</span>+<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">timeline</a>.str()+<span class="stringliteral">&quot; already Internal to &quot;</span>
-<a name="l00015"></a>00015                   +owner.getName().str()) {}
-<a name="l00016"></a>00016 
-<a name="l00017"></a>00017 <span class="comment">/*</span>
-<a name="l00018"></a>00018 <span class="comment"> * class TREX::transaction::details::timeline</span>
-<a name="l00019"></a>00019 <span class="comment"> */</span>
-<a name="l00020"></a>00020 
-<a name="l00021"></a>00021 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> timeline::s_failed(<span class="stringliteral">&quot;Failed&quot;</span>);
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="comment">// structors :</span>
-<a name="l00024"></a>00024 
-<a name="l00025"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a6a015df8d1deed2cd713faa34abe4749">00025</a> timeline::timeline(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;name)
-<a name="l00026"></a>00026   :m_name(name), m_owner(NULL), m_lastObs(name, s_failed),
-<a name="l00027"></a>00027    m_obsDate(date) {}
-<a name="l00028"></a>00028 
-<a name="l00029"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a2f7c2f6248ed7ad9e404fdeb605fc72b">00029</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a6a015df8d1deed2cd713faa34abe4749" title="Constructor.">timeline::timeline</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;serv)
-<a name="l00030"></a>00030   :m_name(name), m_owner(&amp;serv), m_lastObs(name, s_failed),
-<a name="l00031"></a>00031    m_obsDate(date) {}
-<a name="l00032"></a>00032 
-<a name="l00033"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a45e2ae6bdea509886bbe6689b026af4c">00033</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a45e2ae6bdea509886bbe6689b026af4c" title="Destructor.">timeline::~timeline</a>() {
-<a name="l00034"></a>00034   <span class="comment">// maybe some clean-up to do (?)</span>
-<a name="l00035"></a>00035 }
+<h1>Relation.cc</h1><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*********************************************************************</span>
+<a name="l00002"></a>00002 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00003"></a>00003 <span class="comment"> * </span>
+<a name="l00004"></a>00004 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00005"></a>00005 <span class="comment"> *  All rights reserved.</span>
+<a name="l00006"></a>00006 <span class="comment"> * </span>
+<a name="l00007"></a>00007 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00008"></a>00008 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00009"></a>00009 <span class="comment"> *  are met:</span>
+<a name="l00010"></a>00010 <span class="comment"> * </span>
+<a name="l00011"></a>00011 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00012"></a>00012 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00013"></a>00013 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00014"></a>00014 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00015"></a>00015 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00016"></a>00016 <span class="comment"> *     with the distribution.</span>
+<a name="l00017"></a>00017 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00018"></a>00018 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00019"></a>00019 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00020"></a>00020 <span class="comment"> * </span>
+<a name="l00021"></a>00021 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00022"></a>00022 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00023"></a>00023 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00024"></a>00024 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00025"></a>00025 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00026"></a>00026 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00027"></a>00027 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00028"></a>00028 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00029"></a>00029 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00030"></a>00030 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00033"></a>00033 <span class="comment"> */</span>
+<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;bits/timeline.hh&quot;</span>
+<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;<a class="code" href="../../db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo-Reactor.">TeleoReactor.hh</a>&quot;</span>
 <a name="l00036"></a>00036 
-<a name="l00037"></a>00037 <span class="comment">// observers :</span>
-<a name="l00038"></a>00038 
-<a name="l00039"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b">00039</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">timeline::look_ahead</a>()<span class="keyword"> const </span>{
-<a name="l00040"></a>00040   <span class="keywordflow">return</span> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>()?<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6" title="Get reactor look-ahead.">getLookAhead</a>():0;
-<a name="l00041"></a>00041 }
-<a name="l00042"></a>00042 
-<a name="l00043"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea">00043</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">timeline::latency</a>()<span class="keyword"> const </span>{
-<a name="l00044"></a>00044   <span class="keywordflow">return</span> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>()?<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>():0;
-<a name="l00045"></a>00045 }
-<a name="l00046"></a>00046 
-<a name="l00047"></a>00047 <span class="comment">// modifiers :</span>
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="keywordtype">bool</span> timeline::assign(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;r) {
-<a name="l00050"></a>00050   <span class="keywordtype">bool</span> ret = <span class="keyword">true</span>;
-<a name="l00051"></a>00051   
-<a name="l00052"></a>00052   <span class="keywordflow">if</span>( NULL==m_owner ) {
-<a name="l00053"></a>00053     client_set::iterator pos = m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element.">find</a>(r.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>());
-<a name="l00054"></a>00054     
-<a name="l00055"></a>00055     <span class="keywordflow">if</span>( m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=pos ) {
-<a name="l00056"></a>00056       unsubscribe(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a>(<span class="keyword">this</span>, pos));
-<a name="l00057"></a>00057       ret = <span class="keyword">false</span>;
-<a name="l00058"></a>00058     }
-<a name="l00059"></a>00059     m_owner = &amp;r;
-<a name="l00060"></a>00060     r.assigned(<span class="keyword">this</span>);
-<a name="l00061"></a>00061     latency_update(0);
-<a name="l00062"></a>00062   } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( !<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a10e49dbba3e291ae9d828e6797480657" title="Check for ownership.">owned_by</a>(r) ) 
-<a name="l00063"></a>00063     <span class="keywordflow">throw</span> <a class="code" href="../../d2/d66/classTREX_1_1transaction_1_1MultipleInternals.html" title="Exception for timeline ownership conflict.">MultipleInternals</a>(r, <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>(), <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>());
-<a name="l00064"></a>00064   <span class="keywordflow">return</span> ret;
-<a name="l00065"></a>00065 }
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="keywordtype">void</span> timeline::unassign(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <span class="keywordtype">bool</span> demotion, <span class="keywordtype">bool</span> control) {
-<a name="l00068"></a>00068   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() ) {
-<a name="l00069"></a>00069     <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> *tmp = m_owner;
-<a name="l00070"></a>00070     
-<a name="l00071"></a>00071     m_owner-&gt;unassigned(<span class="keyword">this</span>);
-<a name="l00072"></a>00072     m_owner = NULL;
-<a name="l00073"></a>00073     postObservation(date, <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a>(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>(), s_failed));
-<a name="l00074"></a>00074     latency_update(tmp-&gt;<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>());
-<a name="l00075"></a>00075     <span class="keywordflow">if</span>( demotion ) 
-<a name="l00076"></a>00076       subscribe(*tmp, control);
-<a name="l00077"></a>00077   }
+<a name="l00037"></a>00037 <span class="keyword">using namespace </span>TREX;
+<a name="l00038"></a>00038 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00039"></a>00039 <span class="keyword">using namespace </span>TREX::transaction::details;
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 <span class="comment">/*</span>
+<a name="l00042"></a>00042 <span class="comment"> * class TREX::transaction::MultipleInternals</span>
+<a name="l00043"></a>00043 <span class="comment"> */</span>
+<a name="l00044"></a>00044 
+<a name="l00045"></a><a class="code" href="../../d2/d66/classTREX_1_1transaction_1_1MultipleInternals.html#ac1bc0577e224eade878f4a8eb5dbda0e">00045</a> MultipleInternals::MultipleInternals(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;faulty, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">timeline</a>,
+<a name="l00046"></a>00046                                  <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;owner) <span class="keywordflow">throw</span>() 
+<a name="l00047"></a>00047   :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(faulty, <span class="stringliteral">&quot;timeline &quot;</span>+<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">timeline</a>.str()+<span class="stringliteral">&quot; already Internal to &quot;</span>
+<a name="l00048"></a>00048                   +owner.getName().str()) {}
+<a name="l00049"></a>00049 
+<a name="l00050"></a>00050 <span class="comment">/*</span>
+<a name="l00051"></a>00051 <span class="comment"> * class TREX::transaction::details::timeline</span>
+<a name="l00052"></a>00052 <span class="comment"> */</span>
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> timeline::s_failed(<span class="stringliteral">&quot;Failed&quot;</span>);
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="comment">// structors :</span>
+<a name="l00057"></a>00057 
+<a name="l00058"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a6a015df8d1deed2cd713faa34abe4749">00058</a> timeline::timeline(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;name)
+<a name="l00059"></a>00059   :m_name(name), m_owner(NULL), m_lastObs(name, s_failed),
+<a name="l00060"></a>00060    m_obsDate(date) {}
+<a name="l00061"></a>00061 
+<a name="l00062"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a2f7c2f6248ed7ad9e404fdeb605fc72b">00062</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a6a015df8d1deed2cd713faa34abe4749" title="Constructor.">timeline::timeline</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;serv)
+<a name="l00063"></a>00063   :m_name(name), m_owner(&amp;serv), m_lastObs(name, s_failed),
+<a name="l00064"></a>00064    m_obsDate(date) {}
+<a name="l00065"></a>00065 
+<a name="l00066"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a45e2ae6bdea509886bbe6689b026af4c">00066</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a45e2ae6bdea509886bbe6689b026af4c" title="Destructor.">timeline::~timeline</a>() {
+<a name="l00067"></a>00067   <span class="comment">// maybe some clean-up to do (?)</span>
+<a name="l00068"></a>00068 }
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="comment">// observers :</span>
+<a name="l00071"></a>00071 
+<a name="l00072"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b">00072</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">timeline::look_ahead</a>()<span class="keyword"> const </span>{
+<a name="l00073"></a>00073   <span class="keywordflow">return</span> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>()?<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6" title="Get reactor look-ahead.">getLookAhead</a>():0;
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a><a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea">00076</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">timeline::latency</a>()<span class="keyword"> const </span>{
+<a name="l00077"></a>00077   <span class="keywordflow">return</span> <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>()?<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>():0;
 <a name="l00078"></a>00078 }
 <a name="l00079"></a>00079 
-<a name="l00080"></a>00080 <span class="keywordtype">bool</span> timeline::subscribe(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;r, <span class="keywordtype">bool</span> control) {
-<a name="l00081"></a>00081   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a10e49dbba3e291ae9d828e6797480657" title="Check for ownership.">owned_by</a>(r) )
-<a name="l00082"></a>00082     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00083"></a>00083   <span class="keywordflow">else</span> {
-<a name="l00084"></a>00084     std::pair&lt;client_set::iterator, bool&gt;
-<a name="l00085"></a>00085       ins = m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion.">insert</a>(std::make_pair(&amp;r, control));
-<a name="l00086"></a>00086     
-<a name="l00087"></a>00087     <span class="keywordflow">if</span>( ins.second ) 
-<a name="l00088"></a>00088       r.subscribed(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a>(<span class="keyword">this</span>, ins.first));
-<a name="l00089"></a>00089     <span class="keywordflow">else</span> <span class="keywordflow">if</span>( control )
-<a name="l00090"></a>00090       ins.first-&gt;second = <span class="keyword">true</span>;
-<a name="l00091"></a>00091     <span class="keywordflow">return</span> ins.second;
-<a name="l00092"></a>00092   }
-<a name="l00093"></a>00093 }
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095 <span class="keywordtype">void</span> timeline::unsubscribe(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a> <span class="keyword">const</span> &amp;rel) {
-<a name="l00096"></a>00096   rel.<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#aee5a433b726303b71c41fc0db664a1cb" title="client for this relation">client</a>().unsubscribed(rel);
-<a name="l00097"></a>00097   m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a8a8e97ba45f7e93791417788c701ab8b" title="Remove an element.">erase</a>(rel.m_pos);
+<a name="l00080"></a>00080 <span class="comment">// modifiers :</span>
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082 <span class="keywordtype">bool</span> timeline::assign(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;r) {
+<a name="l00083"></a>00083   <span class="keywordtype">bool</span> ret = <span class="keyword">true</span>;
+<a name="l00084"></a>00084   
+<a name="l00085"></a>00085   <span class="keywordflow">if</span>( NULL==m_owner ) {
+<a name="l00086"></a>00086     client_set::iterator pos = m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element.">find</a>(r.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>());
+<a name="l00087"></a>00087     
+<a name="l00088"></a>00088     <span class="keywordflow">if</span>( m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=pos ) {
+<a name="l00089"></a>00089       unsubscribe(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a>(<span class="keyword">this</span>, pos));
+<a name="l00090"></a>00090       ret = <span class="keyword">false</span>;
+<a name="l00091"></a>00091     }
+<a name="l00092"></a>00092     m_owner = &amp;r;
+<a name="l00093"></a>00093     r.assigned(<span class="keyword">this</span>);
+<a name="l00094"></a>00094     latency_update(0);
+<a name="l00095"></a>00095   } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( !<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a10e49dbba3e291ae9d828e6797480657" title="Check for ownership.">owned_by</a>(r) ) 
+<a name="l00096"></a>00096     <span class="keywordflow">throw</span> <a class="code" href="../../d2/d66/classTREX_1_1transaction_1_1MultipleInternals.html" title="Exception for timeline ownership conflict.">MultipleInternals</a>(r, <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>(), <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>());
+<a name="l00097"></a>00097   <span class="keywordflow">return</span> ret;
 <a name="l00098"></a>00098 }
 <a name="l00099"></a>00099 
-<a name="l00100"></a>00100 <span class="keywordtype">void</span> timeline::postObservation(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;obs) {
-<a name="l00101"></a>00101   m_obsDate = date;
-<a name="l00102"></a>00102   m_lastObs = obs;
-<a name="l00103"></a>00103 }
-<a name="l00104"></a>00104 
-<a name="l00105"></a>00105 <span class="keywordtype">void</span> timeline::request(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00106"></a>00106   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() ) {
-<a name="l00107"></a>00107     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>().str())&lt;&lt;<span class="stringliteral">&quot;Request received &quot;</span>&lt;&lt;g-&gt;predicate()&lt;&lt;<span class="charliteral">&#39;[&#39;</span>&lt;&lt;g&lt;&lt;<span class="stringliteral">&quot;].&quot;</span>;
-<a name="l00108"></a>00108     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback.">handleRequest</a>(g);
-<a name="l00109"></a>00109   }
-<a name="l00110"></a>00110 }
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112 <span class="keywordtype">void</span> timeline::recall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00113"></a>00113   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() )
-<a name="l00114"></a>00114     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1" title="Goal recall callback.">handleRecall</a>(g);
-<a name="l00115"></a>00115 }
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117 <span class="keywordtype">void</span> timeline::latency_update(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> prev) {
-<a name="l00118"></a>00118   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>()&gt;0 ) 
-<a name="l00119"></a>00119     <span class="keywordflow">for</span>(client_set::const_iterator i=m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator.">begin</a>(); m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=i; ++i) 
-<a name="l00120"></a>00120       <span class="keywordflow">if</span>( i-&gt;second )
-<a name="l00121"></a>00121        i-&gt;first-&gt;latency_updated(prev, <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">latency</a>());
-<a name="l00122"></a>00122 }
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124 <span class="comment">/*</span>
-<a name="l00125"></a>00125 <span class="comment"> * class TREX::transaction::details::relation_iter</span>
-<a name="l00126"></a>00126 <span class="comment"> */</span>
+<a name="l00100"></a>00100 <span class="keywordtype">void</span> timeline::unassign(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <span class="keywordtype">bool</span> demotion, <span class="keywordtype">bool</span> control) {
+<a name="l00101"></a>00101   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() ) {
+<a name="l00102"></a>00102     <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> *tmp = m_owner;
+<a name="l00103"></a>00103     
+<a name="l00104"></a>00104     m_owner-&gt;unassigned(<span class="keyword">this</span>);
+<a name="l00105"></a>00105     m_owner = NULL;
+<a name="l00106"></a>00106     postObservation(date, <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a>(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>(), s_failed));
+<a name="l00107"></a>00107     latency_update(tmp-&gt;<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>());
+<a name="l00108"></a>00108     <span class="keywordflow">if</span>( demotion ) 
+<a name="l00109"></a>00109       subscribe(*tmp, control);
+<a name="l00110"></a>00110   }
+<a name="l00111"></a>00111 }
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113 <span class="keywordtype">bool</span> timeline::subscribe(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;r, <span class="keywordtype">bool</span> control) {
+<a name="l00114"></a>00114   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a10e49dbba3e291ae9d828e6797480657" title="Check for ownership.">owned_by</a>(r) )
+<a name="l00115"></a>00115     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00116"></a>00116   <span class="keywordflow">else</span> {
+<a name="l00117"></a>00117     std::pair&lt;client_set::iterator, bool&gt;
+<a name="l00118"></a>00118       ins = m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion.">insert</a>(std::make_pair(&amp;r, control));
+<a name="l00119"></a>00119     
+<a name="l00120"></a>00120     <span class="keywordflow">if</span>( ins.second ) 
+<a name="l00121"></a>00121       r.subscribed(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a>(<span class="keyword">this</span>, ins.first));
+<a name="l00122"></a>00122     <span class="keywordflow">else</span> <span class="keywordflow">if</span>( control )
+<a name="l00123"></a>00123       ins.first-&gt;second = <span class="keyword">true</span>;
+<a name="l00124"></a>00124     <span class="keywordflow">return</span> ins.second;
+<a name="l00125"></a>00125   }
+<a name="l00126"></a>00126 }
 <a name="l00127"></a>00127 
-<a name="l00128"></a>00128 <a class="code" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html#aec675c917b88b0ba4104571108f98606" title="Constructor.">relation_iter::relation_iter</a>(<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a9e161ed7c782a0183af663fa8690b791" title="elements const iterator">timeline_set::const_iterator</a> <span class="keyword">const</span> &amp;it, 
-<a name="l00129"></a>00129                           <a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a9e161ed7c782a0183af663fa8690b791" title="elements const iterator">timeline_set::const_iterator</a> <span class="keyword">const</span> &amp;last)
-<a name="l00130"></a>00130   :m_pos(it), m_last(last) {
-<a name="l00131"></a>00131   <span class="keywordflow">if</span>( m_pos!=m_last ) {
-<a name="l00132"></a>00132     m_rel = (*m_pos)-&gt;begin();
-<a name="l00133"></a>00133     next_valid();
-<a name="l00134"></a>00134   }
-<a name="l00135"></a>00135 }
-<a name="l00136"></a>00136 
-<a name="l00137"></a>00137 <span class="keywordtype">void</span> relation_iter::increment() {
-<a name="l00138"></a>00138   <span class="keywordflow">if</span>( m_pos!=m_last ) {
-<a name="l00139"></a>00139     ++m_rel;
-<a name="l00140"></a>00140     next_valid();
-<a name="l00141"></a>00141   }
-<a name="l00142"></a>00142 }
-<a name="l00143"></a>00143 
+<a name="l00128"></a>00128 <span class="keywordtype">void</span> timeline::unsubscribe(<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html" title="Timeline relation.">Relation</a> <span class="keyword">const</span> &amp;rel) {
+<a name="l00129"></a>00129   rel.<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#aee5a433b726303b71c41fc0db664a1cb" title="client for this relation">client</a>().unsubscribed(rel);
+<a name="l00130"></a>00130   m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a8a8e97ba45f7e93791417788c701ab8b" title="Remove an element.">erase</a>(rel.m_pos);
+<a name="l00131"></a>00131 }
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133 <span class="keywordtype">void</span> timeline::postObservation(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> date, <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;obs) {
+<a name="l00134"></a>00134   m_obsDate = date;
+<a name="l00135"></a>00135   m_lastObs = obs;
+<a name="l00136"></a>00136 }
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138 <span class="keywordtype">void</span> timeline::request(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00139"></a>00139   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() ) {
+<a name="l00140"></a>00140     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>().str())&lt;&lt;<span class="stringliteral">&quot;Request received &quot;</span>&lt;&lt;g-&gt;predicate()&lt;&lt;<span class="charliteral">&#39;[&#39;</span>&lt;&lt;g&lt;&lt;<span class="stringliteral">&quot;].&quot;</span>;
+<a name="l00141"></a>00141     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback.">handleRequest</a>(g);
+<a name="l00142"></a>00142   }
+<a name="l00143"></a>00143 }
 <a name="l00144"></a>00144 
-<a name="l00145"></a>00145 <span class="keywordtype">void</span> relation_iter::next_valid() {
-<a name="l00146"></a>00146   <span class="keywordflow">while</span>( (*m_pos)-&gt;end()==m_rel ) {
-<a name="l00147"></a>00147     ++m_pos;
-<a name="l00148"></a>00148     <span class="keywordflow">if</span>( m_pos==m_last )
-<a name="l00149"></a>00149       <span class="keywordflow">return</span>;
-<a name="l00150"></a>00150     m_rel = (*m_pos)-&gt;begin();
-<a name="l00151"></a>00151   }
-<a name="l00152"></a>00152 }
-<a name="l00153"></a>00153 
-<a name="l00154"></a>00154 <span class="keywordtype">bool</span> relation_iter::equal(<a class="code" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html" title="Iterator for reactors relations.">relation_iter</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00155"></a>00155   <span class="keywordflow">return</span> m_pos==other.m_pos &amp;&amp; ( m_pos==m_last || m_rel==other.m_rel );
-<a name="l00156"></a>00156 }
-<a name="l00157"></a>00157 
-<a name="l00158"></a>00158 <span class="comment">/*</span>
-<a name="l00159"></a>00159 <span class="comment"> * class TREX::transaction::Relation</span>
-<a name="l00160"></a>00160 <span class="comment"> */</span>
-<a name="l00161"></a>00161 
-<a name="l00162"></a>00162 <span class="keywordtype">void</span> Relation::unsubscribe()<span class="keyword"> const </span>{
-<a name="l00163"></a>00163   <span class="keywordflow">if</span>( valid() )
-<a name="l00164"></a>00164     m_timeline-&gt;unsubscribe(*<span class="keyword">this</span>);
-<a name="l00165"></a>00165 }
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167 <span class="comment">// Observers </span>
-<a name="l00168"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1">00168</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1" title="Check if accept goal.">Relation::accept_goals</a>()<span class="keyword"> const </span>{
-<a name="l00169"></a>00169   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc" title="Check if relation active.">active</a>() &amp;&amp; m_pos-&gt;second &amp;&amp; m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>()&gt;0;
-<a name="l00170"></a>00170 }
-<a name="l00171"></a>00171 
-<a name="l00172"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a9c0bd9325737278cdd1fa9f663dd6bc2">00172</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a9c0bd9325737278cdd1fa9f663dd6bc2" title="Relation latency.">Relation::latency</a>()<span class="keyword"> const </span>{
-<a name="l00173"></a>00173   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">valid</a>()?m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">latency</a>():0;
-<a name="l00174"></a>00174 }
-<a name="l00175"></a>00175 
-<a name="l00176"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a0de19a8c047fe6aab1aebb884e5f8bf9">00176</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a0de19a8c047fe6aab1aebb884e5f8bf9" title="Timeline look ahead.">Relation::look_ahead</a>()<span class="keyword"> const </span>{
-<a name="l00177"></a>00177   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1" title="Check if accept goal.">accept_goals</a>()?m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>():0;
-<a name="l00178"></a>00178 }
-<a name="l00179"></a>00179 
-<a name="l00180"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb">00180</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">Relation::valid</a>()<span class="keyword"> const </span>{
-<a name="l00181"></a>00181   <span class="keywordflow">return</span> NULL!=m_timeline &amp;&amp; m_timeline-&gt;m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=m_pos;
-<a name="l00182"></a>00182 }
-<a name="l00183"></a>00183 
-<a name="l00184"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc">00184</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc" title="Check if relation active.">Relation::active</a>()<span class="keyword"> const </span>{
-<a name="l00185"></a>00185   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">valid</a>() &amp;&amp; m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>();
-<a name="l00186"></a>00186 }
-<a name="l00187"></a>00187 
-<a name="l00188"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#afebdf5b66d42d7a76b635eab4523f092">00188</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#afebdf5b66d42d7a76b635eab4523f092" title="Date of last observation.">Relation::lastObsDate</a>()<span class="keyword"> const </span>{
-<a name="l00189"></a>00189   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a417a324b7511a7a6b2622735f555dc1e" title="last observation date">lastObsDate</a>();
-<a name="l00190"></a>00190 }
-<a name="l00191"></a>00191 
-<a name="l00192"></a>00192 
-<a name="l00193"></a>00193 
-<a name="l00194"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a3658ceeb66045fb68857d7ece66e448f">00194</a> <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a3658ceeb66045fb68857d7ece66e448f" title="Last observation.">Relation::lastObservation</a>()<span class="keyword"> const </span>{
-<a name="l00195"></a>00195   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#ad600106e0e415f911be32118d9c8ec69" title="last observation">lastObservation</a>();
-<a name="l00196"></a>00196 }
-<a name="l00197"></a>00197 
-<a name="l00198"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#acbcf403da8418fb6bf6c61e4aeb94cb9">00198</a> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#acbcf403da8418fb6bf6c61e4aeb94cb9" title="Timeline name.">Relation::name</a>()<span class="keyword"> const </span>{
-<a name="l00199"></a>00199   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>();
-<a name="l00200"></a>00200 }
-<a name="l00201"></a>00201 
-<a name="l00202"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#ae17819843078cbfb79a757270cd0f6ba">00202</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#ae17819843078cbfb79a757270cd0f6ba" title="Timeline server.">Relation::server</a>()<span class="keyword"> const </span>{
-<a name="l00203"></a>00203   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>();
-<a name="l00204"></a>00204 }
-<a name="l00205"></a>00205 
-<a name="l00206"></a>00206 
-<a name="l00207"></a>00207 <span class="keywordtype">void</span> Relation::recall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00208"></a>00208   <span class="keywordflow">return</span> m_timeline-&gt;recall(g);
-<a name="l00209"></a>00209 }
-<a name="l00210"></a>00210 
-<a name="l00211"></a>00211 <span class="keywordtype">void</span> Relation::request(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00212"></a>00212   <span class="keywordflow">return</span> m_timeline-&gt;request(g);
-<a name="l00213"></a>00213 }
+<a name="l00145"></a>00145 <span class="keywordtype">void</span> timeline::recall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00146"></a>00146   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>() )
+<a name="l00147"></a>00147     <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>().<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1" title="Goal recall callback.">handleRecall</a>(g);
+<a name="l00148"></a>00148 }
+<a name="l00149"></a>00149 
+<a name="l00150"></a>00150 <span class="keywordtype">void</span> timeline::latency_update(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> prev) {
+<a name="l00151"></a>00151   <span class="keywordflow">if</span>( <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>()&gt;0 ) 
+<a name="l00152"></a>00152     <span class="keywordflow">for</span>(client_set::const_iterator i=m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator.">begin</a>(); m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=i; ++i) 
+<a name="l00153"></a>00153       <span class="keywordflow">if</span>( i-&gt;second )
+<a name="l00154"></a>00154        i-&gt;first-&gt;latency_updated(prev, <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">latency</a>());
+<a name="l00155"></a>00155 }
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157 <span class="comment">/*</span>
+<a name="l00158"></a>00158 <span class="comment"> * class TREX::transaction::details::relation_iter</span>
+<a name="l00159"></a>00159 <span class="comment"> */</span>
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161 <a class="code" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html#aec675c917b88b0ba4104571108f98606" title="Constructor.">relation_iter::relation_iter</a>(<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a9e161ed7c782a0183af663fa8690b791" title="elements const iterator">timeline_set::const_iterator</a> <span class="keyword">const</span> &amp;it, 
+<a name="l00162"></a>00162                           <a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a9e161ed7c782a0183af663fa8690b791" title="elements const iterator">timeline_set::const_iterator</a> <span class="keyword">const</span> &amp;last)
+<a name="l00163"></a>00163   :m_pos(it), m_last(last) {
+<a name="l00164"></a>00164   <span class="keywordflow">if</span>( m_pos!=m_last ) {
+<a name="l00165"></a>00165     m_rel = (*m_pos)-&gt;begin();
+<a name="l00166"></a>00166     next_valid();
+<a name="l00167"></a>00167   }
+<a name="l00168"></a>00168 }
+<a name="l00169"></a>00169 
+<a name="l00170"></a>00170 <span class="keywordtype">void</span> relation_iter::increment() {
+<a name="l00171"></a>00171   <span class="keywordflow">if</span>( m_pos!=m_last ) {
+<a name="l00172"></a>00172     ++m_rel;
+<a name="l00173"></a>00173     next_valid();
+<a name="l00174"></a>00174   }
+<a name="l00175"></a>00175 }
+<a name="l00176"></a>00176 
+<a name="l00177"></a>00177 
+<a name="l00178"></a>00178 <span class="keywordtype">void</span> relation_iter::next_valid() {
+<a name="l00179"></a>00179   <span class="keywordflow">while</span>( (*m_pos)-&gt;end()==m_rel ) {
+<a name="l00180"></a>00180     ++m_pos;
+<a name="l00181"></a>00181     <span class="keywordflow">if</span>( m_pos==m_last )
+<a name="l00182"></a>00182       <span class="keywordflow">return</span>;
+<a name="l00183"></a>00183     m_rel = (*m_pos)-&gt;begin();
+<a name="l00184"></a>00184   }
+<a name="l00185"></a>00185 }
+<a name="l00186"></a>00186 
+<a name="l00187"></a>00187 <span class="keywordtype">bool</span> relation_iter::equal(<a class="code" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html" title="Iterator for reactors relations.">relation_iter</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00188"></a>00188   <span class="keywordflow">return</span> m_pos==other.m_pos &amp;&amp; ( m_pos==m_last || m_rel==other.m_rel );
+<a name="l00189"></a>00189 }
+<a name="l00190"></a>00190 
+<a name="l00191"></a>00191 <span class="comment">/*</span>
+<a name="l00192"></a>00192 <span class="comment"> * class TREX::transaction::Relation</span>
+<a name="l00193"></a>00193 <span class="comment"> */</span>
+<a name="l00194"></a>00194 
+<a name="l00195"></a>00195 <span class="keywordtype">void</span> Relation::unsubscribe()<span class="keyword"> const </span>{
+<a name="l00196"></a>00196   <span class="keywordflow">if</span>( valid() )
+<a name="l00197"></a>00197     m_timeline-&gt;unsubscribe(*<span class="keyword">this</span>);
+<a name="l00198"></a>00198 }
+<a name="l00199"></a>00199 
+<a name="l00200"></a>00200 <span class="comment">// Observers </span>
+<a name="l00201"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1">00201</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1" title="Check if accept goal.">Relation::accept_goals</a>()<span class="keyword"> const </span>{
+<a name="l00202"></a>00202   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc" title="Check if relation active.">active</a>() &amp;&amp; m_pos-&gt;second &amp;&amp; m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>()&gt;0;
+<a name="l00203"></a>00203 }
+<a name="l00204"></a>00204 
+<a name="l00205"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a9c0bd9325737278cdd1fa9f663dd6bc2">00205</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a9c0bd9325737278cdd1fa9f663dd6bc2" title="Relation latency.">Relation::latency</a>()<span class="keyword"> const </span>{
+<a name="l00206"></a>00206   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">valid</a>()?m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#af1d1726b3d17abeb902eb7e1c62052ea" title="Timeline latency.">latency</a>():0;
+<a name="l00207"></a>00207 }
+<a name="l00208"></a>00208 
+<a name="l00209"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a0de19a8c047fe6aab1aebb884e5f8bf9">00209</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a0de19a8c047fe6aab1aebb884e5f8bf9" title="Timeline look ahead.">Relation::look_ahead</a>()<span class="keyword"> const </span>{
+<a name="l00210"></a>00210   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a21bdb97904da5b188435779890d50bb1" title="Check if accept goal.">accept_goals</a>()?m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead.">look_ahead</a>():0;
+<a name="l00211"></a>00211 }
+<a name="l00212"></a>00212 
+<a name="l00213"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb">00213</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">Relation::valid</a>()<span class="keyword"> const </span>{
+<a name="l00214"></a>00214   <span class="keywordflow">return</span> NULL!=m_timeline &amp;&amp; m_timeline-&gt;m_clients.<a class="code" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator.">end</a>()!=m_pos;
+<a name="l00215"></a>00215 }
+<a name="l00216"></a>00216 
+<a name="l00217"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc">00217</a> <span class="keywordtype">bool</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc" title="Check if relation active.">Relation::active</a>()<span class="keyword"> const </span>{
+<a name="l00218"></a>00218   <span class="keywordflow">return</span> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity.">valid</a>() &amp;&amp; m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned.">owned</a>();
+<a name="l00219"></a>00219 }
+<a name="l00220"></a>00220 
+<a name="l00221"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#afebdf5b66d42d7a76b635eab4523f092">00221</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#afebdf5b66d42d7a76b635eab4523f092" title="Date of last observation.">Relation::lastObsDate</a>()<span class="keyword"> const </span>{
+<a name="l00222"></a>00222   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a417a324b7511a7a6b2622735f555dc1e" title="last observation date">lastObsDate</a>();
+<a name="l00223"></a>00223 }
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225 
+<a name="l00226"></a>00226 
+<a name="l00227"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a3658ceeb66045fb68857d7ece66e448f">00227</a> <a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#a3658ceeb66045fb68857d7ece66e448f" title="Last observation.">Relation::lastObservation</a>()<span class="keyword"> const </span>{
+<a name="l00228"></a>00228   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#ad600106e0e415f911be32118d9c8ec69" title="last observation">lastObservation</a>();
+<a name="l00229"></a>00229 }
+<a name="l00230"></a>00230 
+<a name="l00231"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#acbcf403da8418fb6bf6c61e4aeb94cb9">00231</a> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#acbcf403da8418fb6bf6c61e4aeb94cb9" title="Timeline name.">Relation::name</a>()<span class="keyword"> const </span>{
+<a name="l00232"></a>00232   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name">name</a>();
+<a name="l00233"></a>00233 }
+<a name="l00234"></a>00234 
+<a name="l00235"></a><a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#ae17819843078cbfb79a757270cd0f6ba">00235</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> &amp;<a class="code" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html#ae17819843078cbfb79a757270cd0f6ba" title="Timeline server.">Relation::server</a>()<span class="keyword"> const </span>{
+<a name="l00236"></a>00236   <span class="keywordflow">return</span> m_timeline-&gt;<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner.">owner</a>();
+<a name="l00237"></a>00237 }
+<a name="l00238"></a>00238 
+<a name="l00239"></a>00239 
+<a name="l00240"></a>00240 <span class="keywordtype">void</span> Relation::recall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00241"></a>00241   <span class="keywordflow">return</span> m_timeline-&gt;recall(g);
+<a name="l00242"></a>00242 }
+<a name="l00243"></a>00243 
+<a name="l00244"></a>00244 <span class="keywordtype">void</span> Relation::request(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00245"></a>00245   <span class="keywordflow">return</span> m_timeline-&gt;request(g);
+<a name="l00246"></a>00246 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

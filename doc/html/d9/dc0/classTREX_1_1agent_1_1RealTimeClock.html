@@ -140,7 +140,7 @@ typedef <br class="typebreak"/>
 <p>This class implements a real-time clock based on <code>gettimeofday</code> primitive to be used for TREX agent.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Conor McGann &amp; Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html#l00032">32</a> of file <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html">RealTimeClock.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html#l00065">65</a> of file <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html">RealTimeClock.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a3ecbca613e277f50d06b5bfd30291d86"></a><!-- doxytag: member="TREX::agent::RealTimeClock::RealTimeClock" ref="a3ecbca613e277f50d06b5bfd30291d86" args="(double secondsPerTick)" -->
 <div class="memitem">
@@ -168,7 +168,7 @@ typedef <br class="typebreak"/>
 <p>Create a new instance with the tick duration set to <em>secondsPerTick</em> </p>
 <dl class="pre"><dt><b>Precondition:</b></dt><dd><em>secondsPerTick</em> should be greater than 0.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00039">39</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00072">72</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
 </div>
 </div>
@@ -207,9 +207,9 @@ typedef <br class="typebreak"/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00044">44</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00077">77</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
-<p>References <a class="el" href="../../d0/d92/StringExtract_8hh_source.html#l00088">TREX::utils::string_cast()</a>, and <a class="el" href="../../d5/d68/TimeUtils_8hh_source.html#l00154">TREX::utils::to_timeval()</a>.</p>
+<p>References <a class="el" href="../../d0/d92/StringExtract_8hh_source.html#l00121">TREX::utils::string_cast()</a>, and <a class="el" href="../../d5/d68/TimeUtils_8hh_source.html#l00187">TREX::utils::to_timeval()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -249,7 +249,7 @@ Here is the call graph for this function:</div>
 <p>increase the value of <em>tick</em> by 1</p>
 <dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd></dl>
 
-<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00068">TREX::agent::StepClock::getNextTick()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00101">TREX::agent::StepClock::getNextTick()</a>.</p>
 
 </div>
 </div>
@@ -272,11 +272,11 @@ Here is the call graph for this function:</div>
 <p>This method is the public interface used to start the clock.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd>void <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a0750debbce1f586b3b93d06dc6ba2582" title="Internal start method.">start()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00038">38</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">71</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00118">TREX::agent::Clock::start()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00151">TREX::agent::Clock::start()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00350">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">TREX::agent::Agent::initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -311,7 +311,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b">TREX::agent::Clock</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00068">68</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00101">101</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
 </div>
 </div>
@@ -333,7 +333,7 @@ Here is the call graph for this function:</div>
 <p>Initial tick. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the value of the initial tick </dd></dl>
 
-<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00056">56</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00089">89</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
 
 </div>
 </div>
@@ -368,7 +368,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00018">18</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00051">51</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
 </div>
 </div>
@@ -399,11 +399,11 @@ Here is the call graph for this function:</div>
 <dd>
 void <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af700a1df6b9489e9b7a1ade7ea729abc" title="Process sleep.">sleep(double)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00050">50</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">83</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00100">TREX::agent::Clock::getSleepDelay()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00133">TREX::agent::Clock::getSleepDelay()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00436">TREX::agent::Agent::doNext()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">TREX::agent::Agent::doNext()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -437,7 +437,7 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#aeff145fea225d5073d22ce9e8a0807e1">TREX::agent::Clock</a>.</p>
 
-<p>Definition at line <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html#l00074">74</a> of file <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html">RealTimeClock.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html#l00107">107</a> of file <a class="el" href="../../dd/dfa/RealTimeClock_8hh_source.html">RealTimeClock.hh</a>.</p>
 
 </div>
 </div>
@@ -446,7 +446,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:17 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

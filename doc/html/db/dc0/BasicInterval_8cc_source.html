@@ -73,63 +73,96 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>BasicInterval.cc</h1><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/* -*- C++ -*- */</span>
-<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="../../dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor.">DomainVisitor.hh</a>&quot;</span>
-<a name="l00009"></a>00009 
-<a name="l00010"></a>00010 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00011"></a>00011 
-<a name="l00012"></a>00012 <span class="comment">// modifiers </span>
-<a name="l00013"></a>00013 
-<a name="l00014"></a>00014 <span class="keywordtype">void</span> BasicInterval::completeParsing(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) {
-<a name="l00015"></a>00015   rapidxml::xml_attribute&lt;&gt; *attr = node.first_attribute(<span class="stringliteral">&quot;min&quot;</span>);
-<a name="l00016"></a>00016   <span class="keywordflow">if</span>( NULL!=attr ) {
-<a name="l00017"></a>00017     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
-<a name="l00018"></a>00018     parseLower(tmp);
-<a name="l00019"></a>00019   }
-<a name="l00020"></a>00020   attr = node.first_attribute(<span class="stringliteral">&quot;max&quot;</span>);
-<a name="l00021"></a>00021   <span class="keywordflow">if</span>( NULL!=attr ) {
-<a name="l00022"></a>00022     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
-<a name="l00023"></a>00023     parseUpper(tmp);
-<a name="l00024"></a>00024   }
-<a name="l00025"></a>00025 }
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="comment">// observers </span>
-<a name="l00028"></a>00028     
-<a name="l00029"></a>00029 std::string BasicInterval::getStringLower()<span class="keyword"> const </span>{
-<a name="l00030"></a>00030   std::ostringstream oss;
-<a name="l00031"></a>00031   print_lower(oss);
-<a name="l00032"></a>00032   <span class="keywordflow">return</span> oss.str();
-<a name="l00033"></a>00033 }
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 std::string BasicInterval::getStringUpper()<span class="keyword"> const </span>{
-<a name="l00036"></a>00036   std::ostringstream oss;
-<a name="l00037"></a>00037   print_upper(oss);
-<a name="l00038"></a>00038   <span class="keywordflow">return</span> oss.str();
-<a name="l00039"></a>00039 }
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 std::ostream &amp;BasicInterval::print_domain(std::ostream &amp;out)<span class="keyword"> const </span>{
-<a name="l00042"></a>00042   <span class="keywordflow">if</span>( <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a73e06a2475cda8bc5f77c1aeb864ca61" title="check for singleton value">isSingleton</a>() ) 
-<a name="l00043"></a>00043     <span class="keywordflow">return</span> print_lower(out);
-<a name="l00044"></a>00044   <span class="keywordflow">else</span>
-<a name="l00045"></a>00045     <span class="keywordflow">return</span> print_upper(print_lower(out&lt;&lt;<span class="charliteral">&#39;[&#39;</span>)&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>)&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
-<a name="l00046"></a>00046 }
-<a name="l00047"></a>00047 
-<a name="l00048"></a><a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d">00048</a> std::ostream &amp;<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d" title="XML conversion.">BasicInterval::toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
-<a name="l00049"></a>00049   std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
-<a name="l00050"></a>00050   out&lt;&lt;<span class="charliteral">&#39;&lt;&#39;</span>&lt;&lt;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>();
-<a name="l00051"></a>00051   <span class="keywordflow">if</span>( hasLower() )
-<a name="l00052"></a>00052     print_lower(out&lt;&lt;<span class="stringliteral">&quot; min=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
-<a name="l00053"></a>00053   <span class="keywordflow">if</span>( hasUpper() )
-<a name="l00054"></a>00054     print_upper(out&lt;&lt;<span class="stringliteral">&quot; max=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
-<a name="l00055"></a>00055   <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
-<a name="l00056"></a>00056 }
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058 <span class="comment">// manipulators</span>
+<a name="l00008"></a>00008 <span class="comment">/*********************************************************************</span>
+<a name="l00009"></a>00009 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00010"></a>00010 <span class="comment"> * </span>
+<a name="l00011"></a>00011 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00012"></a>00012 <span class="comment"> *  All rights reserved.</span>
+<a name="l00013"></a>00013 <span class="comment"> * </span>
+<a name="l00014"></a>00014 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00015"></a>00015 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00016"></a>00016 <span class="comment"> *  are met:</span>
+<a name="l00017"></a>00017 <span class="comment"> * </span>
+<a name="l00018"></a>00018 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00019"></a>00019 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00020"></a>00020 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00021"></a>00021 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00022"></a>00022 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00023"></a>00023 <span class="comment"> *     with the distribution.</span>
+<a name="l00024"></a>00024 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00025"></a>00025 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00026"></a>00026 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00027"></a>00027 <span class="comment"> * </span>
+<a name="l00028"></a>00028 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00029"></a>00029 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00030"></a>00030 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00031"></a>00031 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00032"></a>00032 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00033"></a>00033 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00034"></a>00034 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00035"></a>00035 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00036"></a>00036 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00037"></a>00037 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00038"></a>00038 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00039"></a>00039 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00040"></a>00040 <span class="comment"> */</span>
+<a name="l00041"></a>00041 <span class="preprocessor">#include &quot;<a class="code" href="../../dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor.">DomainVisitor.hh</a>&quot;</span>
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045 <span class="comment">// modifiers </span>
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047 <span class="keywordtype">void</span> BasicInterval::completeParsing(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) {
+<a name="l00048"></a>00048   rapidxml::xml_attribute&lt;&gt; *attr = node.first_attribute(<span class="stringliteral">&quot;min&quot;</span>);
+<a name="l00049"></a>00049   <span class="keywordflow">if</span>( NULL!=attr ) {
+<a name="l00050"></a>00050     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
+<a name="l00051"></a>00051     parseLower(tmp);
+<a name="l00052"></a>00052   }
+<a name="l00053"></a>00053   attr = node.first_attribute(<span class="stringliteral">&quot;max&quot;</span>);
+<a name="l00054"></a>00054   <span class="keywordflow">if</span>( NULL!=attr ) {
+<a name="l00055"></a>00055     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
+<a name="l00056"></a>00056     parseUpper(tmp);
+<a name="l00057"></a>00057   }
+<a name="l00058"></a>00058 }
 <a name="l00059"></a>00059 
-<a name="l00060"></a>00060 <span class="keywordtype">void</span> BasicInterval::accept(<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html" title="abstract domain visitor interface">DomainVisitor</a> &amp;visitor)<span class="keyword"> const </span>{
-<a name="l00061"></a>00061   <span class="keywordflow">return</span> visitor.<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html#a32821df4841468855179fa563921695a" title="Enumerated domain visit.">visit</a>(<span class="keyword">this</span>);
-<a name="l00062"></a>00062 }
+<a name="l00060"></a>00060 <span class="comment">// observers </span>
+<a name="l00061"></a>00061     
+<a name="l00062"></a>00062 std::string BasicInterval::getStringLower()<span class="keyword"> const </span>{
+<a name="l00063"></a>00063   std::ostringstream oss;
+<a name="l00064"></a>00064   print_lower(oss);
+<a name="l00065"></a>00065   <span class="keywordflow">return</span> oss.str();
+<a name="l00066"></a>00066 }
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068 std::string BasicInterval::getStringUpper()<span class="keyword"> const </span>{
+<a name="l00069"></a>00069   std::ostringstream oss;
+<a name="l00070"></a>00070   print_upper(oss);
+<a name="l00071"></a>00071   <span class="keywordflow">return</span> oss.str();
+<a name="l00072"></a>00072 }
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 std::ostream &amp;BasicInterval::print_domain(std::ostream &amp;out)<span class="keyword"> const </span>{
+<a name="l00075"></a>00075   <span class="keywordflow">if</span>( <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a73e06a2475cda8bc5f77c1aeb864ca61" title="check for singleton value">isSingleton</a>() ) 
+<a name="l00076"></a>00076     <span class="keywordflow">return</span> print_lower(out);
+<a name="l00077"></a>00077   <span class="keywordflow">else</span>
+<a name="l00078"></a>00078     <span class="keywordflow">return</span> print_upper(print_lower(out&lt;&lt;<span class="charliteral">&#39;[&#39;</span>)&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>)&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
+<a name="l00079"></a>00079 }
+<a name="l00080"></a>00080 
+<a name="l00081"></a><a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d">00081</a> std::ostream &amp;<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d" title="XML conversion.">BasicInterval::toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
+<a name="l00082"></a>00082   std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
+<a name="l00083"></a>00083   out&lt;&lt;<span class="charliteral">&#39;&lt;&#39;</span>&lt;&lt;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>();
+<a name="l00084"></a>00084   <span class="keywordflow">if</span>( hasLower() )
+<a name="l00085"></a>00085     print_lower(out&lt;&lt;<span class="stringliteral">&quot; min=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
+<a name="l00086"></a>00086   <span class="keywordflow">if</span>( hasUpper() )
+<a name="l00087"></a>00087     print_upper(out&lt;&lt;<span class="stringliteral">&quot; max=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
+<a name="l00088"></a>00088   <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
+<a name="l00089"></a>00089 }
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091 <span class="comment">// manipulators</span>
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093 <span class="keywordtype">void</span> BasicInterval::accept(<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html" title="abstract domain visitor interface">DomainVisitor</a> &amp;visitor)<span class="keyword"> const </span>{
+<a name="l00094"></a>00094   <span class="keywordflow">return</span> visitor.<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html#a32821df4841468855179fa563921695a" title="Enumerated domain visit.">visit</a>(<span class="keyword">this</span>);
+<a name="l00095"></a>00095 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -141,7 +141,7 @@ Collaboration diagram for TREX::utils::SharedVar&lt; Ty &gt;:</div>
 <code>Ty</code> must be default constructible</dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00068">68</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00101">101</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 <hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="ac9fbcf1e6fc599ee1bb474a7011fd868"></a><!-- doxytag: member="TREX::utils::SharedVar::scoped_lock" ref="ac9fbcf1e6fc599ee1bb474a7011fd868" args="" -->
 <div class="memitem">
@@ -167,7 +167,7 @@ template&lt;class Ty&gt; </div>
  }
 </pre></div><p> At the begining of this function the creation of <code>slock</code> locks the mutex associated to <code>var</code>. This alows to access to <code>var</code> on the next line. Finally, as we leave the function context <code>slock</code> will be destroyed and by doing so will release the mutex it locked during its creation. </p>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00100">100</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00133">133</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -200,7 +200,7 @@ template&lt;class Ty&gt; </div>
 <p>Create a new instance and set its value to <code>val</code> </p>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>the newly created instance is not locked </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00110">110</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00143">143</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -234,9 +234,9 @@ template&lt;class Ty&gt; </div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html#afaf914772b778bf9309e27157f155f3c" title="Unlocking method.">unlock() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00129">129</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00162">162</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00169">TREX::utils::SharedVar&lt; bool &gt;::operator=()</a>, and <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00188">TREX::utils::SharedVar&lt; bool &gt;::ownIt()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00202">TREX::utils::SharedVar&lt; bool &gt;::operator=()</a>, and <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00221">TREX::utils::SharedVar&lt; bool &gt;::ownIt()</a>.</p>
 
 </div>
 </div>
@@ -274,7 +274,7 @@ template&lt;class Ty&gt; </div>
 <dd>
 <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html#ac59938d89ff13619d9e0d5f21fdf7309" title="Access operator.">operator-&gt;()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00215">215</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00248">248</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -312,9 +312,9 @@ template&lt;class Ty&gt; </div>
 <dd>
 <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html#ac59938d89ff13619d9e0d5f21fdf7309" title="Access operator.">operator-&gt;()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00209">209</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00242">242</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00238">TREX::utils::SharedVar&lt; bool &gt;::operator-&gt;()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00271">TREX::utils::SharedVar&lt; bool &gt;::operator-&gt;()</a>.</p>
 
 </div>
 </div>
@@ -352,7 +352,7 @@ template&lt;class Ty&gt; </div>
 <dd>
 operator* () </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00242">242</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00275">275</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -390,7 +390,7 @@ template&lt;class Ty&gt; </div>
 <dd>
 operator* () </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00238">238</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00271">271</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -429,7 +429,7 @@ template&lt;class Ty&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00169">169</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00202">202</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -463,9 +463,9 @@ template&lt;class Ty&gt; </div>
 <dd>
 <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html#afaf914772b778bf9309e27157f155f3c" title="Unlocking method.">unlock() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00188">188</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00221">221</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00209">TREX::utils::SharedVar&lt; bool &gt;::operator*()</a>, and <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00146">TREX::utils::SharedVar&lt; bool &gt;::unlock()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00242">TREX::utils::SharedVar&lt; bool &gt;::operator*()</a>, and <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00179">TREX::utils::SharedVar&lt; bool &gt;::unlock()</a>.</p>
 
 </div>
 </div>
@@ -501,7 +501,7 @@ template&lt;class Ty&gt; </div>
 <dd>
 <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html#a82b1a712c5a0c3d4ee1e77343e21d3aa" title="Check for thread ownership.">ownIt() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00146">146</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d15/SharedVar_8hh_source.html#l00179">179</a> of file <a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a>.</p>
 
 </div>
 </div>
@@ -509,7 +509,7 @@ template&lt;class Ty&gt; </div>
 <li>trex/utils/<a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:19 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -126,7 +126,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>internals::LogEntry<
 </pre></div><p>We ensure that the messages "First entry ..\n still first" and "Second entry\n" won't be cut by another message. On the other hand we allow other threads to wrtie a message between these two.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/d1b/TextLog_8hh_source.html#l00060">60</a> of file <a class="el" href="../../d9/d1b/TextLog_8hh_source.html">TextLog.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d1b/TextLog_8hh_source.html#l00093">93</a> of file <a class="el" href="../../d9/d1b/TextLog_8hh_source.html">TextLog.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a3d2631171996980060e7ded06fe80db5"></a><!-- doxytag: member="TREX::utils::TextLog::TextLog" ref="a3d2631171996980060e7ded06fe80db5" args="(std::string const &amp;file, bool toSyslog=false)" -->
 <div class="memitem">
@@ -164,9 +164,9 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>internals::LogEntry<
 <p>Create a new instance connected to the file <em>file</em>. In addition, provided that <em>toSyslog</em> is true all messages will be duplicated into syslog. </p>
 <dl class="see"><dt><b>See also:</b></dt><dd>void <a class="el" href="../../d5/db0/classTREX_1_1utils_1_1TextLog.html#aa3d0f4ce8a45dece661263593a5c1013" title="open log file">open(std::string const &amp;filem, bool toSyslog)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00031">31</a> of file <a class="el" href="../../d9/dac/TextLog_8cc_source.html">TextLog.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00064">64</a> of file <a class="el" href="../../d9/dac/TextLog_8cc_source.html">TextLog.cc</a>.</p>
 
-<p>References <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00020">TREX_SYSLOG_NAME</a>.</p>
+<p>References <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00053">TREX_SYSLOG_NAME</a>.</p>
 
 </div>
 </div>
@@ -206,11 +206,11 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>internals::LogEntry<
 </dl>
 <p>Connect this entry to the log file <em>name</em>. In addition, provided that <em>toSyslog</em> is true all messages will be duplicated into syslog. </p>
 
-<p>Definition at line <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00045">45</a> of file <a class="el" href="../../d9/dac/TextLog_8cc_source.html">TextLog.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00078">78</a> of file <a class="el" href="../../d9/dac/TextLog_8cc_source.html">TextLog.cc</a>.</p>
 
-<p>References <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00020">TREX_SYSLOG_NAME</a>.</p>
+<p>References <a class="el" href="../../d9/dac/TextLog_8cc_source.html#l00053">TREX_SYSLOG_NAME</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00144">TREX::utils::LogManager::logPath()</a>.</p>
+<p>Referenced by <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00174">TREX::utils::LogManager::logPath()</a>.</p>
 
 </div>
 </div>
@@ -246,7 +246,7 @@ template&lt;typename Ty &gt; </div>
 <dd>
 void TextLog::write(std::string const &amp;text); </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/d1b/TextLog_8hh_source.html#l00194">194</a> of file <a class="el" href="../../d9/d1b/TextLog_8hh_source.html">TextLog.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d1b/TextLog_8hh_source.html#l00227">227</a> of file <a class="el" href="../../d9/d1b/TextLog_8hh_source.html">TextLog.hh</a>.</p>
 
 </div>
 </div>
@@ -255,7 +255,7 @@ void TextLog::write(std::string const &amp;text); </dd></dl>
 <li>trex/utils/<a class="el" href="../../d9/dac/TextLog_8cc_source.html">TextLog.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:19 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

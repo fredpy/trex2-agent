@@ -121,7 +121,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <p>This exception class can be used when a C error that modifies the value of <code>errno</code> is detected. It embeds both the value of <code>errno</code> and the associated message as extracted by <code>strerror</code> C primitive.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00040">40</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00073">73</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aa2147679698ec7badd22b35e34d786c7"></a><!-- doxytag: member="TREX::utils::ErrnoExcept::ErrnoExcept" ref="aa2147679698ec7badd22b35e34d786c7" args="(std::string const &amp;from)" -->
 <div class="memitem">
@@ -148,7 +148,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 </dl>
 <p>Creates a new instance with the indication that the error came from <code>from</code>. Extracts automatically the value of <code>errno</code> and its associated message to build the exception message "@p from: errno message" </p>
 
-<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00050">50</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00083">83</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
 
 </div>
 </div>
@@ -188,7 +188,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <p>Creates a new instance with the indication that the error came from <code>from</code> and the reason associated is <code>what</code>.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This constructor does not collect the <code>errno</code> value nor its associated message. Instead it considers that <code>what</code> is the correct message. This somehow defies the purpose of this exception and may change in the future. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00067">67</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00100">100</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <p>Gets associated <code>errno</code> value. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the value of <code>errno</code> when this exception was thrown </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00076">76</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html#l00109">109</a> of file <a class="el" href="../../d9/d38/ErrnoExcept_8hh_source.html">ErrnoExcept.hh</a>.</p>
 
 </div>
 </div>
@@ -243,7 +243,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 
 <p>Implements <a class="el" href="../../d2/d06/classTREX_1_1utils_1_1ostreamable.html#ab18497c33e04e7eec72edfdc9f6c79a4">TREX::utils::ostreamable</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/df7/Exception_8cc_source.html#l00023">23</a> of file <a class="el" href="../../df/df7/Exception_8cc_source.html">Exception.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/df7/Exception_8cc_source.html#l00056">56</a> of file <a class="el" href="../../df/df7/Exception_8cc_source.html">Exception.cc</a>.</p>
 
 </div>
 </div>
@@ -252,7 +252,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <li>trex/utils/<a class="el" href="../../d9/de4/ErrnoExcept_8cc_source.html">ErrnoExcept.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:18 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -110,6 +110,8 @@ std::pair&lt; EUROPA::ObjectId, <br class="typebreak"/>
 EUROPA::TokenId &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><b>convert</b> (<a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html">TREX::transaction::Predicate</a> const &amp;pred, bool fact)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EUROPA::ConstrainedVariableId&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad44a74a81f0fdda62763e4be8ba1877d">default_pred</a> (EUROPA::ObjectId const &amp;obj) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get default predicate value.  <a href="#ad44a74a81f0fdda62763e4be8ba1877d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9be56798df78a332c496b77f851e2c4c">external</a> (EUROPA::TokenId const &amp;tok) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check if external.  <a href="#a9be56798df78a332c496b77f851e2c4c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a1f7df72571c49e40593b61164bc0be24">ignore</a> (EUROPA::ObjectId const &amp;obj)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set as ignored object.  <a href="#a1f7df72571c49e40593b61164bc0be24"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a> (EUROPA::TokenId const &amp;tok) const </td></tr>
@@ -187,7 +189,7 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>resolve</b> (EUROPA::
 <p>This class connects to europa components manipulated by TREX</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Conor Mcgann &amp; Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00085">85</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00118">118</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad85bdaad47ef9278e1e2237a653c8943"></a><!-- doxytag: member="TREX::europa::Assembly::Assembly" ref="ad85bdaad47ef9278e1e2237a653c8943" args="(EuropaReactor &amp;owner)" -->
 <div class="memitem">
@@ -214,7 +216,7 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>resolve</b> (EUROPA::
 </dl>
 <p>Create a new instance associated to <code>owner</code> </p>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00122">122</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00155">155</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
 </div>
 </div>
@@ -262,7 +264,7 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>resolve</b> (EUROPA::
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The variable associated to the attribute <code>str</code> on <code>obj</code> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00219">219</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00252">252</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
 </div>
 </div>
@@ -303,9 +305,9 @@ the default predicate for <code>obj</code> is a fully specified value (ie a sing
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad44a74a81f0fdda62763e4be8ba1877d" title="Get default predicate value.">default_pred(EUROPA::ObjectId const &amp;) const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00200">200</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00233">233</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00269">default_pred()</a>.</p>
+<p>References <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00302">default_pred()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -356,9 +358,9 @@ This method has not been called before for this instance</dd></dl>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>DbSolver::DbSolver(Assembly const &amp;, EUROPA::TiXmlElement const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00379">379</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00424">424</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00406">TREX::transaction::TeleoReactor::manager()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00687">TREX::transaction::TeleoReactor::syslog()</a>, and <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00223">TREX::utils::LogManager::use()</a>.</p>
+<p>References <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00439">TREX::transaction::TeleoReactor::manager()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00720">TREX::transaction::TeleoReactor::syslog()</a>, and <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00253">TREX::utils::LogManager::use()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -389,7 +391,7 @@ Here is the call graph for this function:</div>
 <p>Get europa constraint engine. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the constraint engine associated to this class </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00205">205</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00238">238</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -426,9 +428,58 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the variable that gives the default predicate of <code>obj</code> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00269">269</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00302">302</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00200">check_default()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00233">check_default()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9be56798df78a332c496b77f851e2c4c"></a><!-- doxytag: member="TREX::europa::Assembly::external" ref="a9be56798df78a332c496b77f851e2c4c" args="(EUROPA::TokenId const &amp;tok) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Assembly::external </td>
+          <td>(</td>
+          <td class="paramtype">EUROPA::TokenId const &amp;&nbsp;</td>
+          <td class="paramname"> <em>tok</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check if external. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>tok</em>&nbsp;</td><td>A token</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>if all the possible objects for <code>tok</code> are trex <code>External</code> timelines </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>false</em>&nbsp;</td><td>otherwise </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external.">isExternal(EUROPA::ObjectId const &amp;) const</a> </dd>
+<dd>
+internal(EUROPA::ObjectId const &amp;) const </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00283">283</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00266">isExternal()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../dc/d76/classTREX_1_1europa_1_1Assembly_a9be56798df78a332c496b77f851e2c4c_cgraph.png" border="0" usemap="#dc/d76/classTREX_1_1europa_1_1Assembly_a9be56798df78a332c496b77f851e2c4c_cgraph_map" alt=""></div>
+<map name="dc/d76/classTREX_1_1europa_1_1Assembly_a9be56798df78a332c496b77f851e2c4c_cgraph_map" id="dc/d76/classTREX_1_1europa_1_1Assembly_a9be56798df78a332c496b77f851e2c4c_cgraph">
+<area shape="rect" id="node3" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external." alt="" coords="311,5,575,35"/><area shape="rect" id="node5" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline." alt="" coords="624,5,947,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -458,7 +509,7 @@ Here is the call graph for this function:</div>
 <p>Add <code>obj</code> to the object to be ignored in the plan database </p>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>all the tokens associated to <code>obj</code> will be ignored during deliberation </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00332">332</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00365">365</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -496,11 +547,11 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a285b5e653bc107813eb3614a21b8629b" title="Check if ignored.">isIgnored(EUROPA::ObjectId const &amp;) const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00250">250</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00295">295</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00427">isIgnored()</a>.</p>
+<p>References <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00472">isIgnored()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00261">in_deliberation()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00306">in_deliberation()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -545,9 +596,9 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00261">261</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00306">306</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00250">ignored()</a>.</p>
+<p>References <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00295">ignored()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -590,11 +641,13 @@ Here is the call graph for this function:</div>
   </table>
   </dd>
 </dl>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">isInternal(EUROPA::ObjectId const &amp;) const</a> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">isInternal(EUROPA::ObjectId const &amp;) const</a> </dd>
+<dd>
+external(EUROPA::ObjectId const &amp;) const </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00238">238</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00271">271</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00228">isInternal()</a>.</p>
+<p>References <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00261">isInternal()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -643,9 +696,11 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a285b5e653bc107813eb3614a21b8629b" title="Check if ignored.">isIgnored(EUROPA::ObjectId const &amp;) const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00233">233</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00266">266</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00206">TREX::transaction::TeleoReactor::isExternal()</a>.</p>
+<p>References <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00239">TREX::transaction::TeleoReactor::isExternal()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00283">external()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -695,9 +750,9 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a1f7df72571c49e40593b61164bc0be24" title="Set as ignored object.">ignore(EUROPA::ObjectId const &amp;)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00427">427</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00472">472</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00250">ignored()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00295">ignored()</a>.</p>
 
 </div>
 </div>
@@ -738,11 +793,11 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a285b5e653bc107813eb3614a21b8629b" title="Check if ignored.">isIgnored(EUROPA::ObjectId const &amp;) const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00228">228</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00261">261</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00202">TREX::transaction::TeleoReactor::isInternal()</a>.</p>
+<p>References <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00235">TREX::transaction::TeleoReactor::isInternal()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00238">internal()</a>.</p>
+<p>Referenced by <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00271">internal()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -797,7 +852,7 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a41eb2bd02904cbc8fd263ffc22016177" title="Europa ignored timelines descriptor.">IGNORE_MODE</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00254">254</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00287">287</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -819,7 +874,7 @@ Here is the call graph for this function:</div>
 <p>Get europa plan database. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the plan database associated to this class </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00212">212</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00245">245</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -865,9 +920,9 @@ The file <code>nddl</code> exist and is a valid nddl file</dd></dl>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00400">400</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00445">445</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
 
-<p>References <a class="el" href="../../d1/d5d/LogManager_8hh_source.html#l00285">TREX::utils::LogManager::begin()</a>, <a class="el" href="../../d1/d5d/LogManager_8hh_source.html#l00294">TREX::utils::LogManager::end()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00406">TREX::transaction::TeleoReactor::manager()</a>, and <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00223">TREX::utils::LogManager::use()</a>.</p>
+<p>References <a class="el" href="../../d1/d5d/LogManager_8hh_source.html#l00318">TREX::utils::LogManager::begin()</a>, <a class="el" href="../../d1/d5d/LogManager_8hh_source.html#l00327">TREX::utils::LogManager::end()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00439">TREX::transaction::TeleoReactor::manager()</a>, and <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00253">TREX::utils::LogManager::use()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -898,7 +953,7 @@ Here is the call graph for this function:</div>
 <p>Get europa rules engine. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the rule engine associated to this class </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00219">219</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00252">252</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -920,7 +975,7 @@ Here is the call graph for this function:</div>
 <p>Get europa schema. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the schema associated to this class </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00198">198</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00231">231</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -943,7 +998,7 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the solver used by this class </dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac7a07eda65e94bcdbf3926d8eba20d00" title="That plan solver configuration.">configure_solver</a>((std::string const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00295">295</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00328">328</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -974,7 +1029,7 @@ Here is the call graph for this function:</div>
 <p>Trex timelines are derived from the base class AgentTimeline in nddl; this method allows to selct of the objects that derive from this class in the plan database</p>
 <dl class="see"><dt><b>See also:</b></dt><dd>TREX_TIMELINE </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00321">321</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00354">354</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -993,7 +1048,7 @@ Here is the call graph for this function:</div>
 <p>Europa external timelines descriptor. </p>
 <p>The value used to specify a timeline as <em>External</em> in an nddl model </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00091">91</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00124">124</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1067,7 @@ Here is the call graph for this function:</div>
 <p>The value used to specify that a specific timeline is ignored by the model</p>
 <dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>This kind of timleine was used in the past when all europa reactors were loading the same model. As we now have each reactor loading their own model such feature is not really useful and may disappear in future versions </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00120">120</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00153">153</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1030,7 +1085,7 @@ Here is the call graph for this function:</div>
 <p>Europa internal timelines descriptor. </p>
 <p>The value used to specify a timeline as <em>Internal</em> in an nddl model </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00102">102</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00135">135</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1049,7 +1104,7 @@ Here is the call graph for this function:</div>
 <p>The name of the variable in the model that is used to specify the the life time of the TREX agent</p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67" title="Get final tick.">EuropaReactor::getFinalTick() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00129">129</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00162">162</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1067,7 +1122,7 @@ Here is the call graph for this function:</div>
 <p>Europa observed timelines descriptor. </p>
 <p>The value used to specify a timeline as <em>External</em> which will not accept goals in an nddl model </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00097">97</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00130">130</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1085,7 +1140,7 @@ Here is the call graph for this function:</div>
 <p>Europa private timelines descriptor. </p>
 <p>The value used to specify a timeline as private in an nddl model. Private timelines are TREX timelines that are not shared with other reactors. They behave like regular europa timelines </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00109">109</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00142">142</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1104,7 +1159,7 @@ Here is the call graph for this function:</div>
 <p>The name of the variable in the model that is used to specify the duration of a tick.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aae9a63f545390491e4721b8b74e05585" title="Tick duration.">EuropaReactor::tickDuration() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00137">137</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00170">170</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1122,7 +1177,7 @@ Here is the call graph for this function:</div>
 <p><code>undefined</code> predicate name </p>
 <p>The name of the <code>undefined</code> predicate for a TREX agent timeline. This predicate is often used whenever a new observation comes with a predicate name that is unknown by the europa model </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00145">145</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00178">178</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 
 </div>
 </div>
@@ -1131,7 +1186,7 @@ Here is the call graph for this function:</div>
 <li>extra/europa/<a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:17 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

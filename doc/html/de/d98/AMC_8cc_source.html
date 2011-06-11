@@ -73,47 +73,80 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>AMC.cc</h1><a href="../../de/d98/AMC_8cc.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;cstring&gt;</span>
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <span class="preprocessor">#include &lt;<a class="code" href="../../d8/d62/Agent_8hh.html" title="Definition of an Agent.">trex/agent/Agent.hh</a>&gt;</span>
-<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;<a class="code" href="../../dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real-time clock for TREX">trex/agent/RealTimeClock.hh</a>&gt;</span>
-<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;<a class="code" href="../../d6/db1/StepClock_8hh.html" title="definition of a pseudo clock">trex/agent/StepClock.hh</a>&gt;</span>
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="keyword">using namespace </span>TREX::agent;
-<a name="l00050"></a>00050 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00051"></a>00051 
-<a name="l00076"></a><a class="code" href="../../df/d77/group__amccmd.html#ga3c04138a5bfe5d72780bb7e82a18e627">00076</a> <span class="keywordtype">int</span> <a class="code" href="../../df/d77/group__amccmd.html#ga3c04138a5bfe5d72780bb7e82a18e627" title="Batch execution (amc) main function.">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv) {
-<a name="l00077"></a>00077   <span class="keywordflow">if</span> (argc &lt; 2 || argc &gt; 4) {
-<a name="l00078"></a>00078     std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid argument list:&quot;</span>
-<a name="l00079"></a>00079              &lt;&lt;<span class="stringliteral">&quot;\n Usage: &quot;</span>&lt;&lt;argv[0]&lt;&lt;<span class="stringliteral">&quot; configFile [-sim [steps]]&quot;</span>
-<a name="l00080"></a>00080              &lt;&lt; std::endl;
-<a name="l00081"></a>00081     <span class="keywordflow">return</span> -1;
-<a name="l00082"></a>00082   }
-<a name="l00083"></a>00083   <span class="keywordtype">char</span> *configFile = argv[1];
-<a name="l00084"></a>00084   std::auto_ptr&lt;Clock&gt; clk;
-<a name="l00085"></a>00085     
-<a name="l00086"></a>00086   <span class="keywordflow">if</span>( argc&gt;=3 ) {
-<a name="l00087"></a>00087     <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> simOption = argv[2];
-<a name="l00088"></a>00088     <span class="keywordflow">if</span>( simOption==<span class="stringliteral">&quot;-sim&quot;</span> ) {
-<a name="l00089"></a>00089       <span class="keywordtype">size_t</span> stepsPerTick = 60;
-<a name="l00090"></a>00090       
-<a name="l00091"></a>00091       <span class="keywordflow">if</span>( argc==4 )
-<a name="l00092"></a>00092        stepsPerTick = <a class="code" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type.">string_cast</a>&lt;<span class="keywordtype">size_t</span>&gt;(argv[3]);
-<a name="l00093"></a>00093       clk.reset(<span class="keyword">new</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html" title="Step based pseudo clock.">StepClock</a>(0, stepsPerTick));
-<a name="l00094"></a>00094     } <span class="keywordflow">else</span> {
-<a name="l00095"></a>00095       std::cerr&lt;&lt;<span class="stringliteral">&quot;Invalid 2nd argument &quot;</span>&lt;&lt;simOption.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()
-<a name="l00096"></a>00096               &lt;&lt;<span class="stringliteral">&quot;\nUsage: &quot;</span>&lt;&lt;argv[0]&lt;&lt;<span class="stringliteral">&quot; configFile [-sim [steps]]&quot;</span>
-<a name="l00097"></a>00097               &lt;&lt;std::endl;
-<a name="l00098"></a>00098       <span class="keywordflow">return</span> -1;
-<a name="l00099"></a>00099     }
-<a name="l00100"></a>00100   }
-<a name="l00101"></a>00101   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> agent(configFile, clk.release());
-<a name="l00102"></a>00102   agent.setClock(<span class="keyword">new</span> <a class="code" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html" title="Real time default clock for TREX.">RealTimeClock</a>(1.0));
-<a name="l00103"></a>00103   agent.run();
-<a name="l00104"></a>00104   <span class="keywordflow">return</span> 0;
-<a name="l00105"></a>00105 }
+<a name="l00043"></a>00043 <span class="comment">/*********************************************************************</span>
+<a name="l00044"></a>00044 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00045"></a>00045 <span class="comment"> * </span>
+<a name="l00046"></a>00046 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00047"></a>00047 <span class="comment"> *  All rights reserved.</span>
+<a name="l00048"></a>00048 <span class="comment"> * </span>
+<a name="l00049"></a>00049 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00050"></a>00050 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00051"></a>00051 <span class="comment"> *  are met:</span>
+<a name="l00052"></a>00052 <span class="comment"> * </span>
+<a name="l00053"></a>00053 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00054"></a>00054 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00055"></a>00055 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00056"></a>00056 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00057"></a>00057 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00058"></a>00058 <span class="comment"> *     with the distribution.</span>
+<a name="l00059"></a>00059 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00060"></a>00060 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00061"></a>00061 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00062"></a>00062 <span class="comment"> * </span>
+<a name="l00063"></a>00063 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00064"></a>00064 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00065"></a>00065 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00066"></a>00066 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00067"></a>00067 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00068"></a>00068 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00069"></a>00069 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00070"></a>00070 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00071"></a>00071 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00072"></a>00072 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00073"></a>00073 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00074"></a>00074 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00075"></a>00075 <span class="comment"> */</span>
+<a name="l00076"></a>00076 <span class="preprocessor">#include &lt;cstring&gt;</span>
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078 <span class="preprocessor">#include &lt;<a class="code" href="../../d8/d62/Agent_8hh.html" title="Definition of an Agent.">trex/agent/Agent.hh</a>&gt;</span>
+<a name="l00079"></a>00079 <span class="preprocessor">#include &lt;<a class="code" href="../../dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real-time clock for TREX">trex/agent/RealTimeClock.hh</a>&gt;</span>
+<a name="l00080"></a>00080 <span class="preprocessor">#include &lt;<a class="code" href="../../d6/db1/StepClock_8hh.html" title="definition of a pseudo clock">trex/agent/StepClock.hh</a>&gt;</span>
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082 <span class="keyword">using namespace </span>TREX::agent;
+<a name="l00083"></a>00083 <span class="keyword">using namespace </span>TREX::utils;
+<a name="l00084"></a>00084 
+<a name="l00109"></a><a class="code" href="../../df/d77/group__amccmd.html#ga3c04138a5bfe5d72780bb7e82a18e627">00109</a> <span class="keywordtype">int</span> <a class="code" href="../../df/d77/group__amccmd.html#ga3c04138a5bfe5d72780bb7e82a18e627" title="Batch execution (amc) main function.">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv) {
+<a name="l00110"></a>00110   <span class="keywordflow">if</span> (argc &lt; 2 || argc &gt; 4) {
+<a name="l00111"></a>00111     std::cerr &lt;&lt; <span class="stringliteral">&quot;Invalid argument list:&quot;</span>
+<a name="l00112"></a>00112              &lt;&lt;<span class="stringliteral">&quot;\n Usage: &quot;</span>&lt;&lt;argv[0]&lt;&lt;<span class="stringliteral">&quot; configFile [-sim [steps]]&quot;</span>
+<a name="l00113"></a>00113              &lt;&lt; std::endl;
+<a name="l00114"></a>00114     <span class="keywordflow">return</span> -1;
+<a name="l00115"></a>00115   }
+<a name="l00116"></a>00116   <span class="keywordtype">char</span> *configFile = argv[1];
+<a name="l00117"></a>00117   std::auto_ptr&lt;Clock&gt; clk;
+<a name="l00118"></a>00118     
+<a name="l00119"></a>00119   <span class="keywordflow">if</span>( argc&gt;=3 ) {
+<a name="l00120"></a>00120     <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> simOption = argv[2];
+<a name="l00121"></a>00121     <span class="keywordflow">if</span>( simOption==<span class="stringliteral">&quot;-sim&quot;</span> ) {
+<a name="l00122"></a>00122       <span class="keywordtype">size_t</span> stepsPerTick = 60;
+<a name="l00123"></a>00123       
+<a name="l00124"></a>00124       <span class="keywordflow">if</span>( argc==4 )
+<a name="l00125"></a>00125        stepsPerTick = <a class="code" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type.">string_cast</a>&lt;<span class="keywordtype">size_t</span>&gt;(argv[3]);
+<a name="l00126"></a>00126       clk.reset(<span class="keyword">new</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html" title="Step based pseudo clock.">StepClock</a>(0, stepsPerTick));
+<a name="l00127"></a>00127     } <span class="keywordflow">else</span> {
+<a name="l00128"></a>00128       std::cerr&lt;&lt;<span class="stringliteral">&quot;Invalid 2nd argument &quot;</span>&lt;&lt;simOption.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()
+<a name="l00129"></a>00129               &lt;&lt;<span class="stringliteral">&quot;\nUsage: &quot;</span>&lt;&lt;argv[0]&lt;&lt;<span class="stringliteral">&quot; configFile [-sim [steps]]&quot;</span>
+<a name="l00130"></a>00130               &lt;&lt;std::endl;
+<a name="l00131"></a>00131       <span class="keywordflow">return</span> -1;
+<a name="l00132"></a>00132     }
+<a name="l00133"></a>00133   }
+<a name="l00134"></a>00134   <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> agent(configFile, clk.release());
+<a name="l00135"></a>00135   agent.setClock(<span class="keyword">new</span> <a class="code" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html" title="Real time default clock for TREX.">RealTimeClock</a>(1.0));
+<a name="l00136"></a>00136   agent.run();
+<a name="l00137"></a>00137   <span class="keywordflow">return</span> 0;
+<a name="l00138"></a>00138 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

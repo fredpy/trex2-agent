@@ -130,7 +130,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> </p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00106">106</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00139">139</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 <hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="a349b7132f9e88bb24e3146c63a19e183"></a><!-- doxytag: member="TREX::agent::details::sync_scheduller::reactor_queue" ref="a349b7132f9e88bb24e3146c63a19e183" args="" -->
 <div class="memitem">
@@ -147,7 +147,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p>The type of the queue which is used to store the reactors in the scheduling order for synchronization.</p>
 <p>This is just a simple list which can then be iterated from the beginning in order to go in a valid order for reactors execution </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00117">117</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00150">150</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -178,7 +178,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p>Create A new instance that will put the reactor synchronization scheduling into the list referred by <code>sync_order</code> </p>
 <dl class="note"><dt><b>Note:</b></dt><dd>As boost graph library passes visitors by copy it is necessary here to have this list maintained as a reference to the list. Otherwise we would loose the information of this scheduling as soon as the search complete. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00132">132</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00165">165</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -206,7 +206,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 </dl>
 <p>Create new instance referring to the same scheduling list as <code>other</code> </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00140">140</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00173">173</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -245,7 +245,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00111">111</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00144">144</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -284,9 +284,9 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 </dl>
 <p>This method is called when the sarch encounter for the first time the reactor <code>r</code>. It calls the method <code>newTick()</code> to indicate to <code>r</code> that a new tick has started. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00154">154</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00187">187</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00130">TREX::agent::CycleDetector::is_valid()</a>.</p>
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">TREX::agent::CycleDetector::is_valid()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -334,9 +334,9 @@ Here is the call graph for this function:</div>
 </dl>
 <p>This method is called when the sarch has explored all the reactor <code>r</code> depends on. It can the insert this reactor at the end of the scheduling list ensuring that this reactor synchronization won't be executed before all the reactors it depend on have been synchronized </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00172">172</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00205">205</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00130">TREX::agent::CycleDetector::is_valid()</a>.</p>
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">TREX::agent::CycleDetector::is_valid()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -382,9 +382,9 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::garph::null_reactor() </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00130">130</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">163</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00154">discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00172">finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00070">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00187">discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00205">finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00103">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
 
 </div>
 </div>
@@ -392,7 +392,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:17 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -73,112 +73,145 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>Symbol.hh</h1><a href="../../de/d93/Symbol_8hh.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/* -*- C++ -*- */</span>
-<a name="l00018"></a>00018 <span class="preprocessor">#ifndef H_Symbol </span>
-<a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor"># define H_Symbol</span>
-<a name="l00020"></a>00020 <span class="preprocessor"></span>
-<a name="l00021"></a>00021 <span class="preprocessor"># include &lt;string&gt;</span>
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="preprocessor"># include &lt;boost/flyweight.hpp&gt;</span>
-<a name="l00024"></a>00024 <span class="preprocessor"># include &lt;boost/flyweight/no_tracking.hpp&gt;</span>
-<a name="l00025"></a>00025 <span class="preprocessor"># include &lt;boost/flyweight/intermodule_holder.hpp&gt;</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="preprocessor"># include &quot;<a class="code" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities.">IOstreamable.hh</a>&quot;</span>
-<a name="l00028"></a>00028 <span class="preprocessor"># include &quot;<a class="code" href="../../d3/db4/Hashable_8hh.html" title="TR1 hashing utilities.">Hashable.hh</a>&quot;</span>
-<a name="l00029"></a>00029 <span class="preprocessor"># include &quot;<a class="code" href="../../d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string.">StringExtract.hh</a>&quot;</span>
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="keyword">namespace </span>TREX {
-<a name="l00032"></a>00032   <span class="keyword">namespace </span>utils {
-<a name="l00033"></a>00033 
-<a name="l00050"></a>00050     <span class="keyword">template</span>&lt; <span class="keyword">class</span> CharT, <span class="keyword">class</span> Traits=std::<span class="keywordtype">char</span>_traits&lt;CharT&gt;,
-<a name="l00051"></a>00051              <span class="keyword">class</span> Alloc=std::allocator&lt;CharT&gt; &gt;
-<a name="l00052"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">00052</a>     <span class="keyword">class </span><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> :<span class="keyword">public</span> <a class="code" href="../../d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class">ostreamable</a>, <span class="keyword">public</span> <a class="code" href="../../d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class">istreamable</a>, 
-<a name="l00053"></a>00053                      <span class="keyword">public</span> <a class="code" href="../../da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash.">Hashable</a> {
-<a name="l00054"></a>00054     <span class="keyword">public</span>:
-<a name="l00056"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338">00056</a>       <span class="keyword">typedef</span> std::basic_string&lt;CharT, Traits, Alloc&gt; <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>;
-<a name="l00057"></a>00057       
-<a name="l00058"></a>00058     <span class="keyword">private</span>:
-<a name="l00070"></a>00070       <span class="keyword">typedef</span> <span class="keyword">typename</span> 
-<a name="l00071"></a>00071         boost::flyweight&lt; <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>,
-<a name="l00072"></a>00072                        boost::flyweights::no_tracking,
-<a name="l00073"></a>00073                        boost::flyweights::intermodule_holder &gt; ref_type;
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075     <span class="keyword">public</span>:
-<a name="l00082"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e">00082</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a> = <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>()) 
-<a name="l00083"></a>00083        :m_name(create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>)) {}
-<a name="l00094"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a362a2685f4bc2ee3d20bd0ce64966f45">00094</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, <span class="keywordtype">size_t</span> len =str_type::npos)
-<a name="l00095"></a>00095        :m_name(create(str, len)) {}
-<a name="l00102"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a96799f7b09bc583d98f31dd206453f65">00102</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)
-<a name="l00103"></a>00103        :m_name(other.m_name) {}
-<a name="l00105"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa086e3c16b5aab2c973ab14bd55b141c">00105</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa086e3c16b5aab2c973ab14bd55b141c" title="Destructor.">~BasicSymbol</a>() {
-<a name="l00106"></a>00106       }
+<a name="l00018"></a>00018 <span class="comment">/*********************************************************************</span>
+<a name="l00019"></a>00019 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00020"></a>00020 <span class="comment"> * </span>
+<a name="l00021"></a>00021 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00022"></a>00022 <span class="comment"> *  All rights reserved.</span>
+<a name="l00023"></a>00023 <span class="comment"> * </span>
+<a name="l00024"></a>00024 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00025"></a>00025 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00026"></a>00026 <span class="comment"> *  are met:</span>
+<a name="l00027"></a>00027 <span class="comment"> * </span>
+<a name="l00028"></a>00028 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00029"></a>00029 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00030"></a>00030 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00031"></a>00031 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00032"></a>00032 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00033"></a>00033 <span class="comment"> *     with the distribution.</span>
+<a name="l00034"></a>00034 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00035"></a>00035 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00036"></a>00036 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00037"></a>00037 <span class="comment"> * </span>
+<a name="l00038"></a>00038 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00039"></a>00039 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00040"></a>00040 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00041"></a>00041 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00042"></a>00042 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00043"></a>00043 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00044"></a>00044 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00045"></a>00045 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00046"></a>00046 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00047"></a>00047 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00048"></a>00048 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00049"></a>00049 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00050"></a>00050 <span class="comment"> */</span>
+<a name="l00051"></a>00051 <span class="preprocessor">#ifndef H_Symbol </span>
+<a name="l00052"></a>00052 <span class="preprocessor"></span><span class="preprocessor"># define H_Symbol</span>
+<a name="l00053"></a>00053 <span class="preprocessor"></span>
+<a name="l00054"></a>00054 <span class="preprocessor"># include &lt;string&gt;</span>
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="preprocessor"># include &lt;boost/flyweight.hpp&gt;</span>
+<a name="l00057"></a>00057 <span class="preprocessor"># include &lt;boost/flyweight/no_tracking.hpp&gt;</span>
+<a name="l00058"></a>00058 <span class="preprocessor"># include &lt;boost/flyweight/intermodule_holder.hpp&gt;</span>
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060 <span class="preprocessor"># include &quot;<a class="code" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities.">IOstreamable.hh</a>&quot;</span>
+<a name="l00061"></a>00061 <span class="preprocessor"># include &quot;<a class="code" href="../../d3/db4/Hashable_8hh.html" title="TR1 hashing utilities.">Hashable.hh</a>&quot;</span>
+<a name="l00062"></a>00062 <span class="preprocessor"># include &quot;<a class="code" href="../../d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string.">StringExtract.hh</a>&quot;</span>
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064 <span class="keyword">namespace </span>TREX {
+<a name="l00065"></a>00065   <span class="keyword">namespace </span>utils {
+<a name="l00066"></a>00066 
+<a name="l00083"></a>00083     <span class="keyword">template</span>&lt; <span class="keyword">class</span> CharT, <span class="keyword">class</span> Traits=std::<span class="keywordtype">char</span>_traits&lt;CharT&gt;,
+<a name="l00084"></a>00084              <span class="keyword">class</span> Alloc=std::allocator&lt;CharT&gt; &gt;
+<a name="l00085"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">00085</a>     <span class="keyword">class </span><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> :<span class="keyword">public</span> <a class="code" href="../../d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class">ostreamable</a>, <span class="keyword">public</span> <a class="code" href="../../d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class">istreamable</a>, 
+<a name="l00086"></a>00086                      <span class="keyword">public</span> <a class="code" href="../../da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash.">Hashable</a> {
+<a name="l00087"></a>00087     <span class="keyword">public</span>:
+<a name="l00089"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338">00089</a>       <span class="keyword">typedef</span> std::basic_string&lt;CharT, Traits, Alloc&gt; <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>;
+<a name="l00090"></a>00090       
+<a name="l00091"></a>00091     <span class="keyword">private</span>:
+<a name="l00103"></a>00103       <span class="keyword">typedef</span> <span class="keyword">typename</span> 
+<a name="l00104"></a>00104         boost::flyweight&lt; <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>,
+<a name="l00105"></a>00105                        boost::flyweights::no_tracking,
+<a name="l00106"></a>00106                        boost::flyweights::intermodule_holder &gt; ref_type;
 <a name="l00107"></a>00107 
-<a name="l00116"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a87c9195081bd9cb4a65e6c3871b7bab4">00116</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a87c9195081bd9cb4a65e6c3871b7bab4" title="Asignment operator.">operator= </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other) {
-<a name="l00117"></a>00117        m_name = other.m_name;
-<a name="l00118"></a>00118        <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00119"></a>00119       }
-<a name="l00120"></a>00120 
-<a name="l00131"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ae1f7369ead2e2117a117ec880739d6fe">00131</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ae1f7369ead2e2117a117ec880739d6fe" title="Eeset value.">reset</a>(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>=NULL, <span class="keywordtype">size_t</span> len=str_type::npos) {
-<a name="l00132"></a>00132        m_name = create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, len);
-<a name="l00133"></a>00133        <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00134"></a>00134       }
-<a name="l00135"></a>00135       
-<a name="l00143"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3">00143</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>()<span class="keyword"> const </span>{
-<a name="l00144"></a>00144        <span class="keywordflow">return</span> m_name.get().empty();
-<a name="l00145"></a>00145       }
-<a name="l00150"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a750a8e97657b5dbff11fcaa183a39347">00150</a>       <span class="keywordtype">size_t</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a750a8e97657b5dbff11fcaa183a39347" title="Symbol length.">length</a>()<span class="keyword"> const </span>{
-<a name="l00151"></a>00151        <span class="keywordflow">return</span> size_t(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>()?0:m_name-&gt;size());
+<a name="l00108"></a>00108     <span class="keyword">public</span>:
+<a name="l00115"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e">00115</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a> = <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a>()) 
+<a name="l00116"></a>00116        :m_name(create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>)) {}
+<a name="l00127"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a362a2685f4bc2ee3d20bd0ce64966f45">00127</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, <span class="keywordtype">size_t</span> len =str_type::npos)
+<a name="l00128"></a>00128        :m_name(create(str, len)) {}
+<a name="l00135"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a96799f7b09bc583d98f31dd206453f65">00135</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a685e3609a248dcd8312d13d6a450b85e" title="Constructor.">BasicSymbol</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)
+<a name="l00136"></a>00136        :m_name(other.m_name) {}
+<a name="l00138"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa086e3c16b5aab2c973ab14bd55b141c">00138</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa086e3c16b5aab2c973ab14bd55b141c" title="Destructor.">~BasicSymbol</a>() {
+<a name="l00139"></a>00139       }
+<a name="l00140"></a>00140 
+<a name="l00149"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a87c9195081bd9cb4a65e6c3871b7bab4">00149</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a87c9195081bd9cb4a65e6c3871b7bab4" title="Asignment operator.">operator= </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other) {
+<a name="l00150"></a>00150        m_name = other.m_name;
+<a name="l00151"></a>00151        <span class="keywordflow">return</span> *<span class="keyword">this</span>;
 <a name="l00152"></a>00152       }
-<a name="l00153"></a>00153       
-<a name="l00167"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f">00167</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f" title="Equality test.">operator==</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00168"></a>00168        <span class="keywordflow">return</span> m_name==other.m_name;
-<a name="l00169"></a>00169       }
-<a name="l00183"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a37a7c97b46819899f08e6e773c21cf4c">00183</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a37a7c97b46819899f08e6e773c21cf4c" title="Difference test.">operator!=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00184"></a>00184        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f" title="Equality test.">operator==</a>(other);
+<a name="l00153"></a>00153 
+<a name="l00164"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ae1f7369ead2e2117a117ec880739d6fe">00164</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ae1f7369ead2e2117a117ec880739d6fe" title="Eeset value.">reset</a>(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>=NULL, <span class="keywordtype">size_t</span> len=str_type::npos) {
+<a name="l00165"></a>00165        m_name = create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, len);
+<a name="l00166"></a>00166        <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00167"></a>00167       }
+<a name="l00168"></a>00168       
+<a name="l00176"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3">00176</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>()<span class="keyword"> const </span>{
+<a name="l00177"></a>00177        <span class="keywordflow">return</span> m_name.get().empty();
+<a name="l00178"></a>00178       }
+<a name="l00183"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a750a8e97657b5dbff11fcaa183a39347">00183</a>       <span class="keywordtype">size_t</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a750a8e97657b5dbff11fcaa183a39347" title="Symbol length.">length</a>()<span class="keyword"> const </span>{
+<a name="l00184"></a>00184        <span class="keywordflow">return</span> size_t(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>()?0:m_name-&gt;size());
 <a name="l00185"></a>00185       }
-<a name="l00197"></a>00197       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a16586d4d252f25bb13064474a21b3284" title="Less than test.">operator&lt; </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
-<a name="l00209"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1">00209</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1" title="Greater than test.">operator&gt; </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00210"></a>00210        <span class="keywordflow">return</span> other.operator&lt; (*this);
-<a name="l00211"></a>00211       }
-<a name="l00223"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a15e8ea83840b6cb094b12d2beef9df66">00223</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a15e8ea83840b6cb094b12d2beef9df66" title="Less or equal to test.">operator&lt;=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00224"></a>00224        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1" title="Greater than test.">operator&gt; </a>(other);
-<a name="l00225"></a>00225       }
-<a name="l00237"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa113cc2cf015dff8726594fe804cc8f5">00237</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa113cc2cf015dff8726594fe804cc8f5" title="Greater or equal to test.">operator&gt;=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00238"></a>00238        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a16586d4d252f25bb13064474a21b3284" title="Less than test.">operator&lt; </a>(other);
-<a name="l00239"></a>00239       }
-<a name="l00240"></a>00240 
-<a name="l00245"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0">00245</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()<span class="keyword"> const </span>{
-<a name="l00246"></a>00246        <span class="keywordflow">return</span> m_name.get();
-<a name="l00247"></a>00247       }
-<a name="l00248"></a>00248 
-<a name="l00249"></a>00249     <span class="keyword">private</span>:
-<a name="l00251"></a>00251       ref_type m_name;
-<a name="l00261"></a>00261       <span class="keyword">static</span> ref_type create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>);
-<a name="l00272"></a>00272       <span class="keyword">static</span> ref_type create(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, <span class="keywordtype">size_t</span> len);
+<a name="l00186"></a>00186       
+<a name="l00200"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f">00200</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f" title="Equality test.">operator==</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00201"></a>00201        <span class="keywordflow">return</span> m_name==other.m_name;
+<a name="l00202"></a>00202       }
+<a name="l00216"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a37a7c97b46819899f08e6e773c21cf4c">00216</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a37a7c97b46819899f08e6e773c21cf4c" title="Difference test.">operator!=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00217"></a>00217        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ac50a2c378b59d5da7be59f936778c63f" title="Equality test.">operator==</a>(other);
+<a name="l00218"></a>00218       }
+<a name="l00230"></a>00230       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a16586d4d252f25bb13064474a21b3284" title="Less than test.">operator&lt; </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
+<a name="l00242"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1">00242</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1" title="Greater than test.">operator&gt; </a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00243"></a>00243        <span class="keywordflow">return</span> other.operator&lt; (*this);
+<a name="l00244"></a>00244       }
+<a name="l00256"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a15e8ea83840b6cb094b12d2beef9df66">00256</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a15e8ea83840b6cb094b12d2beef9df66" title="Less or equal to test.">operator&lt;=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00257"></a>00257        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#af6fc10bc340e8fe5474401d7ce1f32d1" title="Greater than test.">operator&gt; </a>(other);
+<a name="l00258"></a>00258       }
+<a name="l00270"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa113cc2cf015dff8726594fe804cc8f5">00270</a>       <span class="keywordtype">bool</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa113cc2cf015dff8726594fe804cc8f5" title="Greater or equal to test.">operator&gt;=</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00271"></a>00271        <span class="keywordflow">return</span> !<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a16586d4d252f25bb13064474a21b3284" title="Less than test.">operator&lt; </a>(other);
+<a name="l00272"></a>00272       }
 <a name="l00273"></a>00273 
-<a name="l00274"></a>00274       std::ostream &amp;print_to(std::ostream &amp;out) <span class="keyword">const</span>;
-<a name="l00275"></a>00275       std::istream &amp;read_from(std::istream &amp;in);
-<a name="l00276"></a>00276       <span class="keywordtype">size_t</span> hash() <span class="keyword">const</span>;
-<a name="l00277"></a>00277 
-<a name="l00278"></a>00278     }; <span class="comment">// TREX::utils::BasicSymbol&lt;&gt;</span>
-<a name="l00279"></a>00279 
-<a name="l00280"></a>00280 <span class="preprocessor"># define In_H_Symbol</span>
-<a name="l00281"></a>00281 <span class="preprocessor"></span><span class="preprocessor">#  include &quot;<a class="code" href="../../da/d97/Symbol_8tcc.html" title="BasicSymbol implementation.">bits/Symbol.tcc</a>&quot;</span>
-<a name="l00282"></a>00282 <span class="preprocessor"># undef In_H_Symbol</span>
-<a name="l00283"></a>00283 <span class="preprocessor"></span>
-<a name="l00292"></a><a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043">00292</a>     <span class="keyword">typedef</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol&lt;char&gt;</a> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>;
-<a name="l00293"></a>00293 
-<a name="l00294"></a>00294     
-<a name="l00305"></a>00305     <span class="keyword">template</span>&lt;&gt;
-<a name="l00306"></a>00306     <span class="keyword">inline</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <a class="code" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type.">string_cast</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(std::string <span class="keyword">const</span> &amp;in,
-<a name="l00307"></a>00307                                   std::ios_base &amp;(*format)(std::ios_base &amp;)) {
-<a name="l00308"></a>00308       <span class="keywordflow">return</span> <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a>(in);
-<a name="l00309"></a>00309     }
-<a name="l00310"></a>00310   } <span class="comment">// TREX::utils</span>
-<a name="l00311"></a>00311 } <span class="comment">// TREX </span>
+<a name="l00278"></a><a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0">00278</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()<span class="keyword"> const </span>{
+<a name="l00279"></a>00279        <span class="keywordflow">return</span> m_name.get();
+<a name="l00280"></a>00280       }
+<a name="l00281"></a>00281 
+<a name="l00282"></a>00282     <span class="keyword">private</span>:
+<a name="l00284"></a>00284       ref_type m_name;
+<a name="l00294"></a>00294       <span class="keyword">static</span> ref_type create(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#ab19ff2ffddc78309d6ecff6f62bad338" title="equivalent string type">str_type</a> <span class="keyword">const</span> &amp;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>);
+<a name="l00305"></a>00305       <span class="keyword">static</span> ref_type create(CharT <span class="keyword">const</span> *<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>, <span class="keywordtype">size_t</span> len);
+<a name="l00306"></a>00306 
+<a name="l00307"></a>00307       std::ostream &amp;print_to(std::ostream &amp;out) <span class="keyword">const</span>;
+<a name="l00308"></a>00308       std::istream &amp;read_from(std::istream &amp;in);
+<a name="l00309"></a>00309       <span class="keywordtype">size_t</span> hash() <span class="keyword">const</span>;
+<a name="l00310"></a>00310 
+<a name="l00311"></a>00311     }; <span class="comment">// TREX::utils::BasicSymbol&lt;&gt;</span>
 <a name="l00312"></a>00312 
-<a name="l00313"></a>00313 <span class="preprocessor">#endif // H_Symbol</span>
+<a name="l00313"></a>00313 <span class="preprocessor"># define In_H_Symbol</span>
+<a name="l00314"></a>00314 <span class="preprocessor"></span><span class="preprocessor">#  include &quot;<a class="code" href="../../da/d97/Symbol_8tcc.html" title="BasicSymbol implementation.">bits/Symbol.tcc</a>&quot;</span>
+<a name="l00315"></a>00315 <span class="preprocessor"># undef In_H_Symbol</span>
+<a name="l00316"></a>00316 <span class="preprocessor"></span>
+<a name="l00325"></a><a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043">00325</a>     <span class="keyword">typedef</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol&lt;char&gt;</a> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>;
+<a name="l00326"></a>00326 
+<a name="l00327"></a>00327     
+<a name="l00338"></a>00338     <span class="keyword">template</span>&lt;&gt;
+<a name="l00339"></a>00339     <span class="keyword">inline</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <a class="code" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type.">string_cast</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(std::string <span class="keyword">const</span> &amp;in,
+<a name="l00340"></a>00340                                   std::ios_base &amp;(*format)(std::ios_base &amp;)) {
+<a name="l00341"></a>00341       <span class="keywordflow">return</span> <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a>(in);
+<a name="l00342"></a>00342     }
+<a name="l00343"></a>00343   } <span class="comment">// TREX::utils</span>
+<a name="l00344"></a>00344 } <span class="comment">// TREX </span>
+<a name="l00345"></a>00345 
+<a name="l00346"></a>00346 <span class="preprocessor">#endif // H_Symbol</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

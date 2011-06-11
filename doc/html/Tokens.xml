@@ -2457,6 +2457,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a9be56798df78a332c496b77f851e2c4c</Anchor>
+    <Abstract>Check if external.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>ignore</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>

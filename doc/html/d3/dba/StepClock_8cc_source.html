@@ -73,77 +73,110 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>StepClock.cc</h1><a href="../../d3/dba/StepClock_8cc.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00006"></a>00006 <span class="preprocessor">#include &quot;<a class="code" href="../../d6/db1/StepClock_8hh.html" title="definition of a pseudo clock">StepClock.hh</a>&quot;</span>
-<a name="l00007"></a>00007 
-<a name="l00008"></a>00008 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00009"></a>00009 <span class="keyword">using namespace </span>TREX::agent;
-<a name="l00010"></a>00010 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00011"></a>00011 
-<a name="l00012"></a>00012 <span class="keyword">namespace </span>{
-<a name="l00024"></a>00024   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">Clock::xml_factory::declare&lt;StepClock&gt;</a> <a class="code" href="../../d4/d1f/group__agent.html#ga739aaef7cd7986fd5eab307e152a0feb" title="Clock XML factor declaration for StepClock.">decl</a>(<span class="stringliteral">&quot;StepClock&quot;</span>);
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026 } <span class="comment">// ::</span>
-<a name="l00027"></a>00027 
-<a name="l00028"></a>00028 <span class="comment">/*</span>
-<a name="l00029"></a>00029 <span class="comment"> * class TREX::agent::StepClock</span>
-<a name="l00030"></a>00030 <span class="comment"> */</span>
-<a name="l00031"></a>00031 <span class="comment">// statics</span>
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033 <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;LogManager&gt;</a> StepClock::m_log;
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::selectStep(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) {
-<a name="l00036"></a>00036   <span class="keywordflow">if</span>( stepsPerTick&lt;=0 ) {
-<a name="l00037"></a>00037     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Requested an invalid number of steps per tick (&quot;</span>
-<a name="l00038"></a>00038                        &lt;&lt;stepsPerTick&lt;&lt;<span class="stringliteral">&quot;).\n\tSetting it to 50.\n&quot;</span>;
-<a name="l00039"></a>00039     stepsPerTick = 50;
-<a name="l00040"></a>00040   }
-<a name="l00041"></a>00041   <span class="keywordflow">return</span> stepsPerTick;
-<a name="l00042"></a>00042 }
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::parseStep(rapidxml::xml_attribute&lt;&gt; *steps) {
-<a name="l00045"></a>00045   <span class="keywordflow">if</span>( NULL==steps ) {
-<a name="l00046"></a>00046     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;missing steps attribute in XML definition.\n&quot;</span>
-<a name="l00047"></a>00047                        &lt;&lt;<span class="stringliteral">&quot;\tSetting it to 50.\n&quot;</span>;
-<a name="l00048"></a>00048     <span class="keywordflow">return</span> 50;
-<a name="l00049"></a>00049   } <span class="keywordflow">else</span> 
-<a name="l00050"></a>00050     <span class="keywordflow">return</span> selectStep(string_cast&lt;unsigned int&gt;(std::string(steps-&gt;value(),
-<a name="l00051"></a>00051                                                      steps-&gt;value_size())));
-<a name="l00052"></a>00052 }
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054 <span class="comment">// structors :</span>
-<a name="l00055"></a>00055 
-<a name="l00056"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70">00056</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(<span class="keywordtype">double</span> sleepSeconds, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) 
-<a name="l00057"></a>00057   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(sleepSeconds), m_tick(0), m_currentStep(0), 
-<a name="l00058"></a>00058    m_stepsPerTickDefault(selectStep(stepsPerTick)) {
-<a name="l00059"></a>00059   m_stepsPerTick = m_stepsPerTickDefault;
-<a name="l00060"></a>00060 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aa58f65660ed23f663e3124d7d73a0f11">00062</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) 
-<a name="l00063"></a>00063   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(0.0), m_tick(0), m_currentStep(0),
-<a name="l00064"></a>00064    m_stepsPerTickDefault(parseStep(node.first_attribute(<span class="stringliteral">&quot;steps&quot;</span>))) {}
+<a name="l00006"></a>00006 <span class="comment">/*********************************************************************</span>
+<a name="l00007"></a>00007 <span class="comment"> * Software License Agreement (BSD License)</span>
+<a name="l00008"></a>00008 <span class="comment"> * </span>
+<a name="l00009"></a>00009 <span class="comment"> *  Copyright (c) 2011, MBARI.</span>
+<a name="l00010"></a>00010 <span class="comment"> *  All rights reserved.</span>
+<a name="l00011"></a>00011 <span class="comment"> * </span>
+<a name="l00012"></a>00012 <span class="comment"> *  Redistribution and use in source and binary forms, with or without</span>
+<a name="l00013"></a>00013 <span class="comment"> *  modification, are permitted provided that the following conditions</span>
+<a name="l00014"></a>00014 <span class="comment"> *  are met:</span>
+<a name="l00015"></a>00015 <span class="comment"> * </span>
+<a name="l00016"></a>00016 <span class="comment"> *   * Redistributions of source code must retain the above copyright</span>
+<a name="l00017"></a>00017 <span class="comment"> *     notice, this list of conditions and the following disclaimer.</span>
+<a name="l00018"></a>00018 <span class="comment"> *   * Redistributions in binary form must reproduce the above</span>
+<a name="l00019"></a>00019 <span class="comment"> *     copyright notice, this list of conditions and the following</span>
+<a name="l00020"></a>00020 <span class="comment"> *     disclaimer in the documentation and/or other materials provided</span>
+<a name="l00021"></a>00021 <span class="comment"> *     with the distribution.</span>
+<a name="l00022"></a>00022 <span class="comment"> *   * Neither the name of the TREX Project nor the names of its</span>
+<a name="l00023"></a>00023 <span class="comment"> *     contributors may be used to endorse or promote products derived</span>
+<a name="l00024"></a>00024 <span class="comment"> *     from this software without specific prior written permission.</span>
+<a name="l00025"></a>00025 <span class="comment"> * </span>
+<a name="l00026"></a>00026 <span class="comment"> *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<a name="l00027"></a>00027 <span class="comment"> *  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<a name="l00028"></a>00028 <span class="comment"> *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<a name="l00029"></a>00029 <span class="comment"> *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<a name="l00030"></a>00030 <span class="comment"> *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<a name="l00031"></a>00031 <span class="comment"> *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<a name="l00032"></a>00032 <span class="comment"> *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<a name="l00033"></a>00033 <span class="comment"> *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<a name="l00034"></a>00034 <span class="comment"> *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<a name="l00035"></a>00035 <span class="comment"> *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<a name="l00036"></a>00036 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<a name="l00037"></a>00037 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00038"></a>00038 <span class="comment"> */</span>
+<a name="l00039"></a>00039 <span class="preprocessor">#include &quot;<a class="code" href="../../d6/db1/StepClock_8hh.html" title="definition of a pseudo clock">StepClock.hh</a>&quot;</span>
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00042"></a>00042 <span class="keyword">using namespace </span>TREX::agent;
+<a name="l00043"></a>00043 <span class="keyword">using namespace </span>TREX::utils;
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045 <span class="keyword">namespace </span>{
+<a name="l00057"></a>00057   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">Clock::xml_factory::declare&lt;StepClock&gt;</a> <a class="code" href="../../d4/d1f/group__agent.html#ga739aaef7cd7986fd5eab307e152a0feb" title="Clock XML factor declaration for StepClock.">decl</a>(<span class="stringliteral">&quot;StepClock&quot;</span>);
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 } <span class="comment">// ::</span>
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061 <span class="comment">/*</span>
+<a name="l00062"></a>00062 <span class="comment"> * class TREX::agent::StepClock</span>
+<a name="l00063"></a>00063 <span class="comment"> */</span>
+<a name="l00064"></a>00064 <span class="comment">// statics</span>
 <a name="l00065"></a>00065 
-<a name="l00066"></a>00066 <span class="comment">// modifiers :</span>
+<a name="l00066"></a>00066 <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;LogManager&gt;</a> StepClock::m_log;
 <a name="l00067"></a>00067 
-<a name="l00068"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a">00068</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a" title="get current tick date This method advances the number of steps used in current tick...">StepClock::getNextTick</a>() {
-<a name="l00069"></a>00069   <span class="keywordflow">if</span>( m_currentStep&gt;=m_stepsPerTick ) {
-<a name="l00070"></a>00070     <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d" title="increment tick value">Clock::advanceTick</a>(m_tick);
-<a name="l00071"></a>00071     m_stepsPerTick = m_stepsPerTickDefault;
-<a name="l00072"></a>00072     m_currentStep = 0;
-<a name="l00073"></a>00073   } <span class="keywordflow">else</span> 
-<a name="l00074"></a>00074     ++m_currentStep;
-<a name="l00075"></a>00075   <span class="keywordflow">return</span> m_tick;
-<a name="l00076"></a>00076 }
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078 <span class="comment">// observers :</span>
-<a name="l00079"></a>00079 
-<a name="l00080"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27">00080</a> <span class="keywordtype">void</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27" title="Change maximum number of steps for this tick.">StepClock::setMaxSteps</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nSteps)<span class="keyword"> const </span>{
-<a name="l00081"></a>00081   <span class="keywordflow">if</span>( nSteps&gt;0 ) {
-<a name="l00082"></a>00082     m_stepsPerTick = nSteps;
-<a name="l00083"></a>00083     m_currentStep = 0;
-<a name="l00084"></a>00084   }
+<a name="l00068"></a>00068 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::selectStep(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) {
+<a name="l00069"></a>00069   <span class="keywordflow">if</span>( stepsPerTick&lt;=0 ) {
+<a name="l00070"></a>00070     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Requested an invalid number of steps per tick (&quot;</span>
+<a name="l00071"></a>00071                        &lt;&lt;stepsPerTick&lt;&lt;<span class="stringliteral">&quot;).\n\tSetting it to 50.\n&quot;</span>;
+<a name="l00072"></a>00072     stepsPerTick = 50;
+<a name="l00073"></a>00073   }
+<a name="l00074"></a>00074   <span class="keywordflow">return</span> stepsPerTick;
+<a name="l00075"></a>00075 }
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::parseStep(rapidxml::xml_attribute&lt;&gt; *steps) {
+<a name="l00078"></a>00078   <span class="keywordflow">if</span>( NULL==steps ) {
+<a name="l00079"></a>00079     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;missing steps attribute in XML definition.\n&quot;</span>
+<a name="l00080"></a>00080                        &lt;&lt;<span class="stringliteral">&quot;\tSetting it to 50.\n&quot;</span>;
+<a name="l00081"></a>00081     <span class="keywordflow">return</span> 50;
+<a name="l00082"></a>00082   } <span class="keywordflow">else</span> 
+<a name="l00083"></a>00083     <span class="keywordflow">return</span> selectStep(string_cast&lt;unsigned int&gt;(std::string(steps-&gt;value(),
+<a name="l00084"></a>00084                                                      steps-&gt;value_size())));
 <a name="l00085"></a>00085 }
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087 <span class="comment">// structors :</span>
+<a name="l00088"></a>00088 
+<a name="l00089"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70">00089</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(<span class="keywordtype">double</span> sleepSeconds, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) 
+<a name="l00090"></a>00090   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(sleepSeconds), m_tick(0), m_currentStep(0), 
+<a name="l00091"></a>00091    m_stepsPerTickDefault(selectStep(stepsPerTick)) {
+<a name="l00092"></a>00092   m_stepsPerTick = m_stepsPerTickDefault;
+<a name="l00093"></a>00093 }
+<a name="l00094"></a>00094 
+<a name="l00095"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aa58f65660ed23f663e3124d7d73a0f11">00095</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) 
+<a name="l00096"></a>00096   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(0.0), m_tick(0), m_currentStep(0),
+<a name="l00097"></a>00097    m_stepsPerTickDefault(parseStep(node.first_attribute(<span class="stringliteral">&quot;steps&quot;</span>))) {}
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 <span class="comment">// modifiers :</span>
+<a name="l00100"></a>00100 
+<a name="l00101"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a">00101</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a" title="get current tick date This method advances the number of steps used in current tick...">StepClock::getNextTick</a>() {
+<a name="l00102"></a>00102   <span class="keywordflow">if</span>( m_currentStep&gt;=m_stepsPerTick ) {
+<a name="l00103"></a>00103     <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d" title="increment tick value">Clock::advanceTick</a>(m_tick);
+<a name="l00104"></a>00104     m_stepsPerTick = m_stepsPerTickDefault;
+<a name="l00105"></a>00105     m_currentStep = 0;
+<a name="l00106"></a>00106   } <span class="keywordflow">else</span> 
+<a name="l00107"></a>00107     ++m_currentStep;
+<a name="l00108"></a>00108   <span class="keywordflow">return</span> m_tick;
+<a name="l00109"></a>00109 }
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111 <span class="comment">// observers :</span>
+<a name="l00112"></a>00112 
+<a name="l00113"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27">00113</a> <span class="keywordtype">void</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27" title="Change maximum number of steps for this tick.">StepClock::setMaxSteps</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nSteps)<span class="keyword"> const </span>{
+<a name="l00114"></a>00114   <span class="keywordflow">if</span>( nSteps&gt;0 ) {
+<a name="l00115"></a>00115     m_stepsPerTick = nSteps;
+<a name="l00116"></a>00116     m_currentStep = 0;
+<a name="l00117"></a>00117   }
+<a name="l00118"></a>00118 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Jun 8 11:44:15 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>
