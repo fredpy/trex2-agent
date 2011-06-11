@@ -1,0 +1,110 @@
+#summary A simple tutorial on modeling in nddl for TREX execution
+#labels Featured,Tutorial
+
+= Introduction =
+
+In this paper we are going to look at the simple light switch model provided in TREX 0.1.4. This example is very simple but there's more than meets the eyes in it. It is largely inspired from the model featured in europa [http://code.google.com/p/europa-pso/wiki/QuickStart quick start guide] but was redesigned according to TREX philosophy and requirements. 
+
+In this page we will focus mostly in the model design walking through the nddl code and emphasizing some aspect of it relevant to TREX.
+
+= The domain specification =
+
+The domain we have here is a simple light switch along with this light which is provided by the lightswitch reactor. We want to build a reactor on top of that that can :
+ * identify whether the room is Bright or Dim according to the light state
+ * change the light state in order to make the room Bright or Dim when it is requested to do so
+We therefore define these timelines :
+<code language="java">
+// lightswitch.nddl
+#include "TREX.nddl"
+
+class Light extends AgentTimeline {
+    predicate On {}
+    predicate Off {}
+
+    Light(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class Switch extends AgentTimeline {
+    predicate Up {}
+    predicate Down {}
+
+    Switch(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class LightSwitch extends Timeline {
+    Switch controlled;
+    
+    predicate turnOff { duration = 1; }
+    predicate turnOn { duration = 1; }
+
+    LightSwitch(Switch sw) {
+	controlled = sw;
+    }
+}
+
+class Luminance extends AgentTimeline {
+    predicate Bright {}
+    predicate Dim {}
+    
+    Luminance(Mode _mode) {
+	super(_mode);
+    }
+}
+</code>
+
+First thing to note is the inclusion of TREX.nddl. This file is often required for TREX model as it specifies the AgentTimeline class that is used by TREX to idenitify timelines that will be shared with other reactors.
+
+There's in this model 3 AgentTimelines :
+ * Light    gives the light state (On  or Off)
+ * Switch gives the switch state (Up or Down)
+ * Luminance gives the room "luminance" information (Bright or Dim)
+These three classes can be shared with other reactors by being specified as Internal or External but we will speak about that later.
+
+The other  class defined here is the LightSwitch class that will allow to turn on (turnOn) or off (turnOff)  the light. Do note that this timeline ids _not_ an AgentTimeline but simply a europa Timeline. Therefore, this timeline won't be publicly available and is mostly part of the internal model of the reactor. This is an important aspect that will give to this timeline more flexibility during execution. Indeed, public timelines are tied by TREX assumption that past is monotonic, this implies that all tokens that were produced in the past becomes factual and therefore cannot be changed easily. On the other hand nothing prohibits to change the past on internal constructs of the reactor.
+
+This LightSwitch class is also tied to a specific Switch which will be the one this timeline control.
+
+We can after that design first the part of the model that will allow our reactor to deduce the Luminance of the room based on the Light and Switch states :
+<code language="java">
+Light::On {
+    starts(Switch.Down);
+    contained_by(Luminance.Bright);    
+}
+
+
+Light::Off {
+    contained_by(Luminance.Dim);
+}
+
+Switch::Up {
+    contained_by(Light.Off);
+    met_by(Down);
+}
+
+Switch::Down {
+    met_by(Up);
+}
+</code>
+
+
+<code language="java">
+LightSwitch::turnOn {
+    meets(object.controlled.Down);
+}
+
+LightSwitch::turnOff {
+    meets(object.controlled.Up);
+}
+
+Luminance::Bright {
+    met_by(LightSwitch.turnOn);
+}
+
+Luminance::Dim {
+    met_by(LightSwitch.turnOff);
+}
+</code>
