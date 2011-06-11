@@ -48,7 +48,7 @@
 
 # include <map>
 
-# include "SingletonDummy.hh"
+# include "../bits/SingletonDummy.hh"
 
 namespace TREX {
   namespace utils {
