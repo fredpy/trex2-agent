@@ -88,10 +88,14 @@ bool DeliberationFilter::test(EUROPA::EntityId const &entity) {
     else 
       token = parent;
     
+    if( m_assembly.ignored(token) ) {
+      debugMsg("trex:horizon", "excluding ignored token "<<token->toString());
+      return true;
+    }
     if( !token->isActive() ) {
       debugMsg("trex:horizon", "excluding inactive token "<<token->toString());
       return true;
-    }
+    } 
   } else 
     token = entity;
   if( m_assembly.ignored(token) ) {
