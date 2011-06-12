@@ -75,6 +75,7 @@ void DefaultSchema::registerComponents(Assembly const &assembly) {
 			    DeliberationFilter); 
   TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,isExternal,trex);
   TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,isInternal,trex);   
+  TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::Bind,bind,Default);   
 }
 
 TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
