@@ -80,6 +80,7 @@ Light::Off {
 }
 
 </code>
+
 This part of the models relates the Light states to Luminance do note the contained_by as opposed to a more strict equals constraint. This is an important aspect as we have selected a more relaxed constraint in order to have a more robust model to unexpected observations on the Light timeline.
 
 In the model we also specified extra rules that relates the Light to the Switch. As both of these timelines are meant to be External this part is not only useless in this example but restrict the model which can become problematic if this model does not capture a potential situation. This is the case for this model 
@@ -152,6 +153,7 @@ Luminance lum = new Luminance(Internal); // Internal : I will control this timel
 
 close(); // close the world
 </code> 
+
 In this file we just have created a new instance of each of our timelines and then closed the world. 
 Closing the world is important as it simplifies the inference ( the planner then assume that what is 
 not true  is false ) . If you do not close the world TREX will do it anyway with a warning message in the log.
@@ -221,7 +223,8 @@ l_on.start = 0;
 
 close();
 </code>
-And we just finished declared the model for our light simulator.
+
+And we've just finished declared the model for our light simulator.
 
 We just need to alter our mission configuration file by replacing our light reactor :
 {{{
@@ -250,4 +253,7 @@ We just need to alter our mission configuration file by replacing our light reac
       </Goal>
 </Agent>
 }}}
-And we are ready to go and simulate the mission without using our "real" light switch. Of course we do repeat that it is probably better to not use the exact same model for simulation (because obviously the chances to identify a modeling issue become close to none). But this last bit illustrated how pervasive a single model can be in the agent without too much effort.
+
+And we are ready to go and simulate the mission without using our "real" light switch. 
+
+Of course we do repeat that it is probably better to not use the exact same model for simulation (because obviously the chances to identify a modeling issue become close to none). But this last bit illustrated how pervasive a single model can be in the agent without too much effort.
