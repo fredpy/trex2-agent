@@ -41,6 +41,10 @@
 namespace TREX {
   namespace europa {
 
+    namespace details {
+      EUROPA::TokenId parent_token(EUROPA::ConstrainedVariableId const &var);
+    }
+
     class ReactorConstraint :public EUROPA::Constraint {
     public:
       ReactorConstraint(EUROPA::LabelStr const &name, 
@@ -50,11 +54,12 @@ namespace TREX {
       virtual ~ReactorConstraint() {}
       
     protected:
-      Assembly &assembly();            
-
+      Assembly &assembly();
+      
     private:
       Assembly *m_assembly;
     };
+
     
     class CheckExternal :public ReactorConstraint {
     public:
@@ -62,7 +67,6 @@ namespace TREX {
 		    EUROPA::LabelStr const &propagatorName,
 		    EUROPA::ConstraintEngineId const &cstrEngine,
 		    std::vector<EUROPA::ConstrainedVariableId> const &variables);
-      bool guardSatisfied() const;
       void handleExecute();
     private:
       EUROPA::Domain *m_test;
@@ -76,12 +80,24 @@ namespace TREX {
 		    EUROPA::LabelStr const &propagatorName,
 		    EUROPA::ConstraintEngineId const &cstrEngine,
 		    std::vector<EUROPA::ConstrainedVariableId> const &variables);
-      bool guardSatisfied() const;
       void handleExecute();
     private:
       EUROPA::Domain *m_test;
       EUROPA::Domain *m_obj;
-   };
+    };
+
+    class Bind :public EUROPA::Constraint {
+    public:
+      Bind(EUROPA::LabelStr const &name, 
+	   EUROPA::LabelStr const &propagatorName,
+	   EUROPA::ConstraintEngineId const &cstrEngine,
+	   std::vector<EUROPA::ConstrainedVariableId> const &variables);
+      bool guardSatisfied() const;
+      void handleExecute();
+    private:
+      EUROPA::Domain *m_target;
+      EUROPA::Domain *m_default;
+    }; // Bind
 
   }
 }
