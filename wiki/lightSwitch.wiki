@@ -147,11 +147,14 @@ Switch switch = new Switch(External);// External : this timeline is external and
 
 LightSwitch sw = new LightSwitch(switch);
 
-Luminance lum = new Luminance(Internal); // Internal : I will control this timeline and it will be declared as Internal to TREX
+Luminance lum = new Luminance(Internal); // Internal : I will control this timeline and it will be 
+                                                                              // declared as Internal to TREX
 
 close(); // close the world
 </code> 
-In this file we just have created a new instance of each of our timelines and then closed the world. Closing the world is important as it simplifies the inference (the planner then assume that what is not true  is false); if you do not close the world TREX will do it anyway with a warning message in the log.
+In this file we just have created a new instance of each of our timelines and then closed the world. 
+Closing the world is important as it simplifies the inference ( the planner then assume that what is 
+not true  is false ) . If you do not close the world TREX will do it anyway with a warning message in the log.
 
 In this instance we also specifies the Mode of our AgentTimelines this will be used to declare timelines as Internal or External to TREX. The mode selected for this reactor are the following :
  * light is an Observed timeline meaning that it should be provided by another reactor and our europa reactor won't be able to post goals on it
@@ -201,7 +204,7 @@ It also have a goal on the timeline lum (provided by the test reactor) to keep t
 
 We can now run the model using either amc or sim and be happy to have designed our first model inside TREX. 
 
-== Wait there's more ==
+== Wait ! There's more ==
 
 Once we have this model it can be also used to emulate our light and switch too. Just picture for example that your switch module is not available and you still need to test your agent. A quick  way to replace it is just to create a new model instance based on the model you just specified. Preferably, it should be slightly altered to reflect more the reality of the simulated plant but in our tutorial we will just use this model as it can be considered as "good enough" for our tests/tutorial.
 
