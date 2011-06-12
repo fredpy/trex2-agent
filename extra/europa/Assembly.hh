@@ -117,6 +117,12 @@ namespace TREX {
      */
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     public:
+      /** @brief TREX agent timelines
+       * 
+       * The name of the type used to specify a timeline shared in TREX
+       */
+      static EUROPA::LabelStr const TREX_TIMELINE;
+
       /** @brief Europa external timelines descriptor
        * 
        * The value used to specify a timeline as @e External in an nddl model
@@ -516,7 +522,6 @@ namespace TREX {
       static std::string const MODE_ATTR;
       static std::string const DEFAULT_ATTR;
       
-      static EUROPA::LabelStr const TREX_TIMELINE;
       
       Assembly();
     }; // TREX::europa::Assembly
@@ -538,9 +543,12 @@ namespace TREX {
   } // TREX::europa
 } // TREX
 
+
 #define TREX_REGISTER_CONSTRAINT(assembly, class_name, label, propagator)\
   {  \
     EUROPA::ConstraintEngine* ce = (EUROPA::ConstraintEngine*) assembly.getComponent("ConstraintEngine"); \
+    using EUROPA::ConcreteConstraintType; \
+    using EUROPA::LabelStr; \
     REGISTER_CONSTRAINT(ce->getCESchema(), class_name, #label, #propagator);\
   }
 
