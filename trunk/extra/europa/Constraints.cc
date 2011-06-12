@@ -33,6 +33,8 @@
  */
 #include "Constraints.hh"
 
+#include <PLASMA/Debug.hh>
+
 using namespace TREX::europa;
 
 
@@ -82,19 +84,21 @@ bool CheckExternal::guardSatisfied() const {
 
 void CheckExternal::handleExecute() {
   Assembly &r = assembly();
-  EUROPA::DataTypeId type(m_test->getDataType());
+  EUROPA::DataTypeId type(m_obj->getDataType());
   EUROPA::LabelStr name(type->getName());
   
   if( r.schema()->isType(name) &&
       r.schema()->isA(name, Assembly::TREX_TIMELINE) ) {
     if( guardSatisfied() ) {
       EUROPA::ObjectDomain const &dom=*m_obj;
-      bool external = r.isExternal(dom.getObject(dom.getSingletonValue()));
+      EUROPA::ObjectId obj = dom.getObject(dom.getSingletonValue());
+      bool external = r.isExternal(obj);
 
       m_test->intersect(external, external);
     }
-  } else 
+  } else {
     m_test->intersect(false, false);
+  }
 }
 
 /*
@@ -117,7 +121,7 @@ bool CheckInternal::guardSatisfied() const {
 
 void CheckInternal::handleExecute() {
   Assembly &r = assembly();
-  EUROPA::DataTypeId type(m_test->getDataType());
+  EUROPA::DataTypeId type(m_obj->getDataType());
   EUROPA::LabelStr name(type->getName());
   
   if( r.schema()->isType(name) &&
