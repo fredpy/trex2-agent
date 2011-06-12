@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "EuropaReactor.hh"
+#include "Constraints.hh"
 #include "bits/europa_convert.hh"
 #include "DbSolver.hh"
 
@@ -68,9 +69,12 @@ namespace {
 
 }
 
+
 void DefaultSchema::registerComponents(Assembly const &assembly) {
   TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DeliberationFilter, 
 			    DeliberationFilter); 
+  TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,isExternal,trex);
+  TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,isInternal,trex);   
 }
 
 TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
@@ -171,8 +175,8 @@ Assembly::Assembly(EuropaReactor &owner)
   m_planDatabase = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
   m_rulesEngine = ((EUROPA::RulesEngine *)getComponent("RulesEngine"))->getId();
   
-  // register the new propagator used during synchronization
-  new EUROPA::DefaultPropagator(EUROPA::LabelStr("OnCommit"), m_constraintEngine);
+  // register the new propagator used by the reactor for special constraints
+  new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_constraintEngine);
 	
   // make sure that we control when constraints are propagated
   m_constraintEngine->setAutoPropagation(false);
