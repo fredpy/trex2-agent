@@ -275,7 +275,7 @@ bool Agent::missionCompleted() {
     syslog()<<"No reactor left.";
     return true;
   }
-  return getCurrentTick()>=m_finalTick;
+  return getCurrentTick()>m_finalTick;
 }
 
 // manipulators :
