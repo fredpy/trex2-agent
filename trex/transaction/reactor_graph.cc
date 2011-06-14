@@ -90,6 +90,7 @@ void graph::clear() {
     m_reactors.front()->isolate();
     m_reactors.pop_front();
   } 
+  m_quarantined.clear();
 }
 
 long graph::index(graph::reactor_id id) const {
@@ -148,12 +149,15 @@ graph::reactor_id graph::add_reactor(graph::reactor_id r) {
 
 bool graph::kill_reactor(graph::reactor_id r) {
   if( null_reactor()!=r ) {
-    details::reactor_set::iterator pos = m_reactors.find(r->getName());
+    details::reactor_set::iterator pos = m_reactors.find(r->getName()),
+      pos_q = m_quarantined.find(r->getName());
     
     if( pos->get()==r ) {
       // clean up relations
       syslog()<<"Destroying reactor \""<<r->getName()<<"\".";
       m_reactors.erase(pos);
+      if( pos_q->get()==r )
+	m_quarantined.erase(pos_q);
       return true;
     }
   }
@@ -166,11 +170,19 @@ graph::reactor_id graph::isolate(graph::reactor_id r) const {
     if( pos->get()==r ) {
       syslog()<<"Putting reactor\""<<r->getName()<<"\" in quarantine.";
       r->isolate();
+      m_quarantined.insert(*pos);
       return r;
     }
   }
   return null_reactor();
 }
+
+size_t graph::cleanup() {
+  size_t ret =0;
+  for(; !m_quarantined.empty(); ++ret)
+    kill_reactor(m_quarantined.front().get());
+  return ret;
+}  
 
 details::timeline_set::iterator graph::get_timeline(Symbol const &tl) {
   details::timeline *cand = new details::timeline(m_currentTick, tl);

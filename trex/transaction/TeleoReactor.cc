@@ -318,16 +318,28 @@ bool TeleoReactor::postRecall(goal_id const &g) {
   return false;
 }
 
-void TeleoReactor::initialize(TICK final) {
-  if( m_inited )
-    throw ReactorException(*this, "Attempted to initialize this reactor twice.");
+bool TeleoReactor::initialize(TICK final) {
+  if( m_inited ) {
+    syslog("ERROR")<< "Attempted to initalize this reactor twice.";
+    return false;
+  }
   m_initialTick = getCurrentTick(); 
   m_finalTick   = final;
   syslog()<<"Creation tick is "<<getInitialTick();
   syslog()<<"Execution latency is "<<getExecLatency();
-  handleInit();   // allow derived class intialization
-  m_firstTick = true;
-  m_inited = true;
+  try {
+    handleInit();   // allow derived class intialization
+    m_firstTick = true;
+    m_inited = true;
+    return true;
+  } catch(TREX::utils::Exception const &e) {
+    syslog("ERROR")<<"Exception caught during init :\n"<<e;
+  } catch( std::exception const &se) {
+    syslog("ERROR")<<"C++ exception caught during init :\n"<<se.what();
+  } catch(...) {
+    syslog("ERROR")<<"Unknown exception caught during init";
+  }
+  return false;
 }
 
 void TeleoReactor::newTick() {
