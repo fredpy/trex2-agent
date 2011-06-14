@@ -50,7 +50,7 @@ namespace TREX {
       explicit DbCore(EuropaReactor &owner);
       ~DbCore();
 
-      void initialize();
+      void initialize(EUROPA::ConstrainedVariableId const &clk);
       // public reactor interfaces
       // - internal timelines
       void set_internal(EUROPA::ObjectId const &obj);
@@ -58,6 +58,7 @@ namespace TREX {
       void recall(EUROPA::eint const &key);
 
       // - external timelines
+      void set_external(EUROPA::ObjectId const &obj);
       void notify(state_map::value_type const &obs);
       bool update_externals();
       void doDispatch();      
@@ -88,6 +89,7 @@ namespace TREX {
 
       state_map m_internals;
       state_map m_externals;
+      state_map m_new_obs;
 
       bool is_goal(EUROPA::TokenId const &tok) const {
 	return m_goals.end()!=m_goals.find(tok);
@@ -97,7 +99,6 @@ namespace TREX {
 
       EUROPA::TokenSet m_goals;
       EUROPA::TokenSet m_recalled;
-      EUROPA::TokenSet m_completed_obs;
       EUROPA::TokenSet m_observations;
 
       void remove_observation(EUROPA::TokenId const &tok);
@@ -126,6 +127,8 @@ namespace TREX {
       EUROPA::TokenSet m_facts_agenda;      
       EUROPA::TokenSet m_agenda;
       EUROPA::TokenSet m_terminated;
+
+      EUROPA::ConstrainedVariableId m_clk;
     }; 
 
 

@@ -36,6 +36,7 @@
 
 # include <trex/utils/LogManager.hh>
 # include <trex/transaction/Predicate.hh>
+# include <trex/transaction/Tick.hh>
 
 # include <PLASMA/PlanDatabase.hh>
 # include <PLASMA/RulesEngineDefs.hh>
@@ -174,6 +175,9 @@ namespace TREX {
        * @sa EuropaReactor::tickDuration() const
        */
       static EUROPA::LabelStr const TICK_DURATION;
+
+      static EUROPA::LabelStr const CLOCK_VAR;
+      
       
       /** @brief @c undefined predicate name
        * 
@@ -498,6 +502,8 @@ namespace TREX {
       void mark_invalid() {
         m_state = INVALID;
       }
+
+      TREX::transaction::TICK final_tick() const;
       
       void logPlan(std::ostream &out) const;
     private:
