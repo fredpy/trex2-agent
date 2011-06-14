@@ -118,9 +118,10 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
       mode_val = type->toString(mode->getSpecifiedValue());
     }
        
-    if( Assembly::EXTERNAL_MODE==mode_val || Assembly::OBSERVE_MODE==mode_val ) 
+    if( Assembly::EXTERNAL_MODE==mode_val || Assembly::OBSERVE_MODE==mode_val ) {
       use(trex_name, Assembly::OBSERVE_MODE!=mode_val);      
-    else if( Assembly::INTERNAL_MODE==mode_val ) {
+      m_core.set_external(*it); 
+    } else if( Assembly::INTERNAL_MODE==mode_val ) {
       m_assembly.check_default(*it);
       provide(trex_name);
       if( !isInternal(trex_name) ) {
@@ -235,22 +236,35 @@ void EuropaReactor::handleRecall(goal_id const &g) {
 
 void EuropaReactor::handleInit() {
   // Now is the time to set my timing constants in the model
+  EUROPA::PlanDatabaseId db = m_assembly.plan_db();
+
+
   EUROPA::ConstrainedVariableId 
-    mission_end = m_assembly.plan_db()->getGlobalVariable(Assembly::MISSION_END),
-    tick_duration = m_assembly.plan_db()->getGlobalVariable(Assembly::TICK_DURATION);
+    mission_end = db->getGlobalVariable(Assembly::MISSION_END),
+    tick_duration = db->getGlobalVariable(Assembly::TICK_DURATION), 
+    clock_var = db->getGlobalVariable(Assembly::CLOCK_VAR);
+    
   if( mission_end.isNoId() )
-    throw ReactorException(*this, "Unable to locate "+Assembly::MISSION_END.toString()+
+    throw ReactorException(*this, "Unable to locate "+
+			   Assembly::MISSION_END.toString()+
 			   " in the model");
   if( tick_duration.isNoId() )
-    throw ReactorException(*this, "Unable to locate "+Assembly::TICK_DURATION.toString()+
+    throw ReactorException(*this, "Unable to locate "+
+			   Assembly::TICK_DURATION.toString()+
 			   " in the model");
+  if( clock_var.isNoId() )
+    syslog("WARN")<<"Unable to locate "<<Assembly::CLOCK_VAR.toString()
+		  <<"in the model";
   mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(getFinalTick(), 
 							    getFinalTick()));
   tick_duration->restrictBaseDomain(EUROPA::IntervalIntDomain(tickDuration(),
-							      tickDuration()));
-  
+							      tickDuration())
+);
+  // prepare the clock varaiable
+  clock_var->restrictBaseDomain(EUROPA::IntervalIntDomain(getInitialTick(),
+							  getFinalTick()));
   // Next thing is to process facts
-  m_core.initialize();
+  m_core.initialize(clock_var);
 }
 
 void EuropaReactor::handleTickStart() {
@@ -260,7 +274,7 @@ void EuropaReactor::handleTickStart() {
   TREX::transaction::TICK 
     deadline = getCurrentTick()+getExecLatency()+getLookAhead();
   
-  m_filter->set_horizon(getCurrentTick(), std::min(getFinalTick(), deadline));
+  m_filter->set_horizon(getCurrentTick()+1, std::min(getFinalTick(), deadline));
   m_core.doDispatch();
 }
 

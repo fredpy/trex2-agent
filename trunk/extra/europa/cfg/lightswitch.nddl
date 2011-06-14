@@ -100,10 +100,5 @@ Light::Off {
 
 Switch::Up {
     contained_by(Light.Off);
-    met_by(Down);
-}
-
-Switch::Down {
-    met_by(Up);
 }
 

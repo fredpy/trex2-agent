@@ -37,6 +37,7 @@
 #include <PLASMA/ConstrainedVariable.hh>
 #include <PLASMA/Token.hh>
 #include <PLASMA/TokenVariable.hh>
+#include <PLASMA/TemporalAdvisor.hh>
 
 #include <PLASMA/Debug.hh>
 
@@ -66,50 +67,44 @@ void DeliberationFilter::set_horizon(TICK start, TICK end) {
 bool DeliberationFilter::test(EUROPA::EntityId const &entity) {
   EUROPA::TokenId token;
 
-  debugMsg("trex:horizon", "check for "<<entity->getKey());
-  // std::cerr<<"Filtering "<<entity->toString()<<std::endl;
   if( EUROPA::ConstrainedVariableId::convertable(entity) ) {
-    EUROPA::ConstrainedVariableId var = entity;
+    EUROPA::EntityId parent = EUROPA::ConstrainedVariableId(entity)->parent();
 
-    // exclude singletons
-    if( var->lastDomain().isSingleton() ) {
-      debugMsg("trex:horizon", "excluding singleton "<<var->getName().toString());
+    if( parent.isNoId() || EUROPA::ObjectId::convertable(parent) )
       return true;
-    }
-
-    EUROPA::EntityId parent = var->parent();
-    if( parent.isNoId() || EUROPA::ObjectId::convertable(parent) ) {
-      debugMsg("trex:horizon", "global variable "<<var->getName().toString());
-      return true;
-    }
-
-    if( EUROPA::RuleInstanceId::convertable(parent) ) 
+    
+    if( EUROPA::RuleInstanceId::convertable(parent) )
       token = EUROPA::RuleInstanceId(parent)->getToken();
     else 
       token = parent;
-    
-    if( m_assembly.ignored(token) ) {
-      debugMsg("trex:horizon", "excluding ignored token "<<token->toString());
-      return true;
-    }
-    if( !token->isActive() ) {
-      debugMsg("trex:horizon", "excluding inactive token "<<token->toString());
-      return true;
-    } 
   } else 
     token = entity;
+
+  debugMsg("trex:horizon:test", "Evaluate "<<token->toLongString());
   if( m_assembly.ignored(token) ) {
-    debugMsg("trex:horizon", "excluding ignored token "<<token->toString());
+    debugMsg("trex:horizon:test", "This token is ignored");
     return true;
   }
-  EUROPA::IntervalIntDomain const &start_time = token->start()->lastDomain();
-  EUROPA::IntervalIntDomain const &end_time = token->end()->lastDomain();
+  EUROPA::IntervalIntDomain const &start_t(token->start()->lastDomain());
+  EUROPA::IntervalIntDomain const &end_t(token->end()->lastDomain());
+
+  if( end_t.getUpperBound() <= m_horizon.getLowerBound() ||
+      start_t.getLowerBound() >= m_horizon.getUpperBound() ) {
+    debugMsg("trex:horizon:test", "This token is out of the planning horizon");
+    return true;
+  }
+
+  bool in_scope = start_t.getUpperBound()< m_horizon.getUpperBound();
   
-  if( end_time.getUpperBound() < m_horizon.getLowerBound() ||
-      start_time.getLowerBound() >= m_horizon.getUpperBound() ) {
-    debugMsg("trex:horizon", "excluding out of window token "<<token->toString());
-    return true;
+  in_scope = in_scope || start_t.getUpperBound()<=m_assembly.final_tick();
+
+  if( !in_scope ) {
+    EUROPA::TokenId master = token->master();
+    if( master.isId() ) {
+      in_scope = !m_assembly.plan_db()->getTemporalAdvisor()->canPrecede(master, token);
+    }
   }
-  return false;
+  condDebugMsg(!in_scope, "trex:horizon:test", "This token is not in  scope");
+  return !in_scope;
 }
 

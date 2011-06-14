@@ -151,6 +151,7 @@ Symbol const Assembly::IGNORE_MODE("Ignore");
 
 EUROPA::LabelStr const Assembly::MISSION_END("MISSION_END");
 EUROPA::LabelStr const Assembly::TICK_DURATION("TICK_DURATION");
+EUROPA::LabelStr const Assembly::CLOCK_VAR("AGENT_CLOCK");
 
 std::string const Assembly::UNDEFINED_PRED("undefined");
 
@@ -180,7 +181,7 @@ Assembly::Assembly(EuropaReactor &owner)
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_constraintEngine);
 	
   // make sure that we control when constraints are propagated
-  m_constraintEngine->setAutoPropagation(false);
+  // m_constraintEngine->setAutoPropagation(false);
   
   // get extra features from TREX schema
   m_trexSchema->registerComponents(*this);
@@ -205,31 +206,27 @@ void Assembly::logPlan(std::ostream &out) const {
   out<<"  node[shape=\"box\"];\n";
   for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
       all_toks.end()!=i; ++i) {
-    if( !ignored(*i) ) {
-      EUROPA::eint key;
-      if( (*i)->isMerged() ) {
-	key = (*i)->getActiveToken()->getKey();
-      } else {
-	key = (*i)->getKey();
-	out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
-	   <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
-	   <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
-	   <<" state "<<(*i)->getState()->lastDomain().toString()<<"\"";
-	if( ignored(*i) || in_deliberation(*i) ) 
-	  out<<" color=grey";
-	else if( (*i)->isFact() )
-	  out<<" color=red";
-	else if( (*i)->isActive() )
-	  out<<" color=blue";
-	out<<"];\n";
-      }      
-      EUROPA::TokenId master = (*i)->master();
-      if( master.isId() ) {
-	if( master->isMerged() )
-	  master = master->getActiveToken();
-	out<<"  t"<<master->getKey()<<"->t"<<key
-	   <<"[label=\""<<(*i)->getRelation().toString()<<"\"];\n";
-      }
+    EUROPA::eint key = (*i)->getKey();
+    out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
+       <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
+       <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
+       <<" state "<<(*i)->getState()->lastDomain().toString()<<"\"";
+    if( ignored(*i) )
+      out<<" color=grey";
+    else if( in_deliberation(*i) )
+      out<<" color=blue";
+    else if( (*i)->isFact() )
+      out<<" color=red";
+    out<<"];\n";
+    
+    if( (*i)->isMerged() ) {
+      EUROPA::eint active = (*i)->getActiveToken()->getKey();
+      out<<"  t"<<key<<"->t"<<active<<"[color=grey];\n";      
+    } 
+    EUROPA::TokenId master = (*i)->master();
+    if( master.isId() ) {
+      out<<"  t"<<master->getKey()<<"->t"<<key
+	 <<"[label=\""<<(*i)->getRelation().toString()<<"\"];\n";
     }
   }
   out<<"}\n";
@@ -297,6 +294,10 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
   return true;
 }
 
+TREX::transaction::TICK Assembly::final_tick() const {
+  return m_reactor.getFinalTick();
+}
+
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
   std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
@@ -309,12 +310,31 @@ bool Assembly::ignored(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
-  if( ignored(tok) )
+  if( ignored(tok) ) {
+    debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
+	     <<" is ignored");
     return false;
-  if( tok->getState()->lastDomain().isMember(EUROPA::Token::REJECTED) )
+  }
+  if( tok->getState()->lastDomain().isMember(EUROPA::Token::REJECTED) ) {
+    debugMsg("trex:in_deliberation", "true: Token "<<tok->toString()
+	     <<" is a goal");
     return true;
-  if( !active() || tok->isCommitted() )
+  }
+  if( !active() ) {
+    debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
+	     <<" is a not active");
     return false;
+  }
+  if( tok->isFact() && 
+      tok->start()->lastDomain().getUpperBound()<=m_reactor.getCurrentTick() ) {
+    debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
+	     <<" is a past fact");
+    return false;
+  }
+  bool ret = m_solver->inDeliberation(tok);
+  debugMsg("trex:in_deliberation", (ret?"true":"false")<<": token "
+	   <<tok->toString()<<"is "
+	   <<(ret?"":"not ")<<"used by the solver.");
   return m_solver->inDeliberation(tok);
 }
 
@@ -344,12 +364,23 @@ bool Assembly::is_unit(EUROPA::TokenId const &tok, EUROPA::TokenId &cand) const 
         ++choices;
         cand = *i;
       }
-    if( choices==1 && !m_planDatabase->hasOrderingChoice(tok) )
+    if( choices==1 && !m_planDatabase->hasOrderingChoice(tok) ) {
+      debugMsg("trex:unit", "true: "<<tok->toString()
+	       <<" have 1 insertion choice");
+	     
       return true;
+    }
     if( choices==0 ) {
+      debugMsg("trex:unit", "true: "<<tok->toString()
+	       <<" have no insertion choice");
       cand = EUROPA::TokenId::noId();
       return true;
     }
+    debugMsg("trex:unit", "false: "<<tok->toString()
+	     <<" have mutliple insertion choices");
+  } else {
+    debugMsg("trex:unit", "false: "<<tok->toString()
+	     <<" object is not a singleton");
   }
   return false;
 }

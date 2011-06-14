@@ -74,8 +74,10 @@ std::string DbCore::dbg(std::string const &base) const {
 
 // modifiers 
 
-void DbCore::initialize() {
+void DbCore::initialize(EUROPA::ConstrainedVariableId const &clk) {
   TICK initial = m_reactor.getInitialTick();
+  m_clk = clk;
+
   EUROPA::TokenSet const &all = m_reactor.assembly().plan_db()->getTokens();  
   EUROPA::IntervalIntDomain mission_scope(initial, m_reactor.getFinalTick()),
     end_scope(initial+1, PLUS_INFINITY);
@@ -128,15 +130,25 @@ void DbCore::set_internal(EUROPA::ObjectId const &obj) {
   m_internals.insert(std::make_pair(obj, EUROPA::TokenId::noId()));
 }
 
+void DbCore::set_external(EUROPA::ObjectId const &obj) {
+  m_externals.insert(std::make_pair(obj, EUROPA::TokenId::noId()));
+}
+
 void DbCore::notify(state_map::value_type const &obs) {
-  std::pair<state_map::iterator, bool> ret = m_externals.insert(obs);
+  std::pair<state_map::iterator, bool> ret = m_new_obs.insert(obs);
   if( !ret.second ) {
-    EUROPA::TokenId pred = ret.first->second;
-    m_completed_obs.insert(pred);
+    if( ret.first->second.isId() ) {
+      m_reactor.log("WARN")<<"Multiple observations received on "
+			   <<obs.first->toString()
+			   <<"\n discard "<<ret.first->second->toString()
+			   <<"\n replace by "<<obs.second->toString();
+      // Only the last observation count
+      ret.first->second->discard();
+    }
     ret.first->second = obs.second;
   }
-  debugMsg(dbg("trex:token"), '['<<m_reactor.getCurrentTick()<<"] OBSERVATION "
-	   <<obs.first->toString()
+  debugMsg(dbg("trex:token"), '['<<m_reactor.getCurrentTick()
+	   <<"] OBSERVATION "<<obs.first->toString()
 	   <<'.'<<obs.second->getUnqualifiedPredicateName().toString());
   m_observations.insert(obs.second);
 }
@@ -144,38 +156,170 @@ void DbCore::notify(state_map::value_type const &obs) {
 bool DbCore::update_externals() {
   TICK cur = m_reactor.getCurrentTick();
   EUROPA::IntervalIntDomain now(cur, cur), future(cur+1, PLUS_INFINITY);
- 
-  // First terminate former observations
-  for(EUROPA::TokenSet::const_iterator i=m_completed_obs.begin();
-      m_completed_obs.end()!=i; ++i) {
-    debugMsg(dbg("trex:sync"), '['<<cur<<"] closing old observation "
-	     <<(*i)->toString()<<": "<<(*i)->getPredicateName().toString());
-    (*i)->end()->restrictBaseDomain(now); 
-    debugMsg(dbg("trex:sync"), '['<<cur<<"] end time closed :"
-	     <<"\n\tbase "<<(*i)->end()->baseDomain().toString()
-	     <<"\n\tlast "<<(*i)->end()->lastDomain().toString());
-    m_reactor.removed(*i);
-    m_terminated.insert(*i);
+  state_map::iterator i = m_externals.begin();
+  Assembly &assembly = m_reactor.assembly();
+
+  // Integrate new observations and apply inertial value assumption
+  for( ; m_externals.end()!=i; ++i) {
+    state_map::iterator ni = m_new_obs.find(i->first);
+    debugMsg(dbg("trex:sync"), " Update external "<<i->first->toString());
+    if( m_new_obs.end()!=ni ) {
+      EUROPA::TokenId obs = ni->second,
+	previous = i->second;
+      debugMsg(dbg("trex:sync"), "New observation : "
+	       <<obs->toString());
+      
+      // terminate previous observation
+      if( previous.isId() ) {
+	previous->end()->restrictBaseDomain(now);	
+	if( !assembly.propagate() ) {
+	  debugMsg(dbg("trex:sync"), "Unable to terminate past observation "
+		   <<obs->toString());
+	  m_reactor.log("ERROR")<<"Failed to terminate "
+				<<i->first->getName().toString()<<'.'
+				<<i->second->getUnqualifiedPredicateName().toString();
+	  return false;
+	}
+	m_terminated.insert(previous);
+	debugMsg(dbg("trex:sync"), "Terminating external obs "
+		 <<previous->toString());
+	if( previous->isMerged() ) {
+	  EUROPA::TokenId active = previous->getActiveToken();
+	  previous->cancel();
+	  previous->merge(active);
+	  previous = active;
+	} else if( !previous->isActive() )
+	  previous = EUROPA::TokenId::noId();
+      }
+      
+      // Find where the new observations belong
+      seq_iter pos, last;
+      boost::tie(pos, last) = find_after(i->first, cur);
+      
+      if( last!=pos && previous==*pos )
+	++pos;
+
+      if( last!=pos ) {
+	// Now lets see if I can merge it with the successor of prev
+	std::vector<EUROPA::TokenId> cands;
+	assembly.plan_db()->getCompatibleTokens(obs, cands,
+						UINT_MAX,
+						true);
+	if( cands.size()==1 ) {
+	  debugMsg(dbg("trex:sync"), "Merge observation "
+		   <<obs->toString()<<" with "<<cands[0]->toString());
+	  obs->merge(cands[0]);
+	  if( !assembly.propagate() ) {
+	    debugMsg(dbg("trex:sync"), "Unable to merge new observation "
+		     <<obs->toString()<<" with "<<cands[0]->toString());
+	    m_reactor.log("ERROR")<<"Failed to merge new observation "
+				  <<i->first->getName().toString()<<'.'
+				  <<i->second->getUnqualifiedPredicateName().toString();
+	    return false;
+	  }
+	} else {
+	  for(std::vector<EUROPA::TokenId>::const_iterator 
+		j=cands.begin(); cands.end()!=j; ++j) {
+	    if( *j==*pos ) {
+	      debugMsg(dbg("trex:sync"), " Merge observation "
+		       <<obs->toString()<<" with "
+		       <<(*pos)->toString());
+	      obs->merge(*pos);
+	      if( !assembly.propagate() ) {
+		debugMsg(dbg("trex:sync"), "Unable to merge new observation "
+			 <<obs->toString()<<" with "<<(*pos)->toString());
+		m_reactor.log("ERROR")<<"Failed to merge new observation "
+				      <<i->first->getName().toString()<<'.'
+				      <<i->second->getUnqualifiedPredicateName().toString();
+		return false;
+	      }
+	      break;
+	    }
+	  }
+	}
+      }      
+
+      // if I could not merge it just insert it right after last obs
+      if( !obs->isMerged() ) {
+	obs->activate();
+	bool inserted = false;
+	if( previous.isId() ) {
+	  debugMsg(dbg("trex:sync"), "Insert observation "
+		   <<obs->toString()<<" after "<<previous->toString());
+	  i->first->constrain(previous, obs);
+	  inserted = true;
+	} 
+	if( last!=pos ) {
+	  debugMsg(dbg("trex:sync"), "Insert observation "
+		   <<obs->toString()<<" before "<<(*pos)->toString());
+	  i->first->constrain(obs, *pos);
+	  inserted = true;
+	}
+	if( !inserted ) {
+	  debugMsg(dbg("trex:sync"), "Insert observation "
+		   <<obs->toString()<<" in "<<i->first->toString());
+	  i->first->constrain(obs, obs);
+	}
+	if( !assembly.propagate() ) {
+	  debugMsg(dbg("trex:sync"), "Unable to insert new observation "
+		   <<obs->toString());
+	  m_reactor.log("ERROR")<<"Failed to insert new observation "
+				<<i->first->getName().toString()<<'.'
+				<<i->second->getUnqualifiedPredicateName().toString();
+	  return false;
+	}
+      }
+      i->second = obs;
+      // succeeded on integrating the new observation
+      m_new_obs.erase(ni); 
+    } else {
+      debugMsg(dbg("trex:sync"), " extend duration of "
+	       <<i->first->toString());
+      i->second->end()->restrictBaseDomain(future);
+      if( i->second->isMerged() ) {
+	  EUROPA::TokenId active = i->second->getActiveToken();
+	  i->second->cancel();
+	  i->second->merge(active);
+      }
+	
+      
+      if( !assembly.propagate() ) {
+	debugMsg(dbg("trex:sync"), "Unable to apply inertial value "
+		 "assumption to "<<i->second->toString());
+	m_reactor.log("ERROR")<<"Failed to extend dutration of "
+			      <<i->first->getName().toString()<<'.'
+			      <<i->second->getUnqualifiedPredicateName().toString();
+	return false;
+      }
+    }
   }
-  m_completed_obs.clear();
   
-  // Now apply inertial value asumption on cuureent observations
-  for(state_map::const_iterator i=m_externals.begin(); m_externals.end()!=i; ++i) {
-    debugMsg(dbg("trex:sync"), '['<<cur<<"] applying inertial value assumption to "
-	     <<i->first->toString()
-	     <<'.'<<i->second->getUnqualifiedPredicateName().toString());
-    i->second->end()->restrictBaseDomain(future);    
+  for(i=m_new_obs.begin(); m_new_obs.end()!=i; ++i) {
+    if( i->second.isId() ) {
+      m_reactor.log("WARN")<<i->first->toString()<<" is not external :"
+			   <<"\n\tdiscarding observation "
+			   <<i->second->toString();
+      i->second->discard();
+    }
   }
-  debugMsg(dbg("trex:sync"), '['<<cur<<"] Propagating external state updates");
+  m_new_obs.clear();
   return propagate();
 }
 
+
 bool DbCore::synchronize() {
   size_t steps = 0;
-  
+  TICK cur = m_reactor.getCurrentTick();
+
+  // Update the clock for the planner
+  if( m_clk.isId() ) {
+    m_clk->restrictBaseDomain(EUROPA::IntervalIntDomain(cur, PLUS_INFINITY));
+  }
+
   if( resolve(steps) ) {
     if( update_internals(steps) ) {
       if( resolve(steps) ) {
+	m_reactor.logPlan("sync");
 	debugMsg(dbg("trex:sync"), "SUCESS after "<<steps<<" steps.");
 	return true;
       } else 
@@ -184,6 +328,7 @@ bool DbCore::synchronize() {
       debugMsg(dbg("trex:sync"), "FAILED to identify internal timelines state");
   } else
     debugMsg(dbg("trex:sync"), "FAILED to resolve current state");
+  m_reactor.logPlan("failed");
   return false;
 }
 
@@ -442,21 +587,30 @@ void DbCore::doNotify() {
       throw EuropaException("Unexpected missing state for internal timeline "+
 			    i->first->getName().toString());
     else if( (*p_cur)->start()->lastDomain().getUpperBound()>=cur ) {
-      // From here  I know that I have a new observation 
-      EUROPA::TokenId obs = cli->createToken((*p_cur)->getPredicateName().c_str(),
-					     NULL, false, true);
+      EUROPA::TokenId obs;
+      
+      if( (*p_cur)->isFact() ) 
+	obs = *p_cur;
+      else {
+	// From here  I know that I have a new observation 
+	obs = cli->createToken((*p_cur)->getPredicateName().c_str(),
+			       NULL, false, true);
+      }
       obs->start()->restrictBaseDomain(now);
       obs->end()->restrictBaseDomain(future);
       obs->getObject()->specify(i->first->getKey());
-      cli->merge(obs, *p_cur);
-      propagate();
-      // restrict the fact attributes to what we are going to produce
-      obs->getObject()->restrictBaseDomain(obs->getObject()->getLastDomain());
-      for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
-	    v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
-	(*v)->restrictBaseDomain((*v)->lastDomain());	            
+      if( *p_cur!=obs ) {
+	cli->merge(obs, *p_cur);	
+	m_reactor.assembly().propagate();
+	// restrict the fact attributes to what we are going to produce
+	obs->getObject()->restrictBaseDomain(obs->getObject()->getLastDomain());
+	for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
+	      v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
+	  (*v)->restrictBaseDomain((*v)->lastDomain());	            
+	m_reactor.assembly().propagate();
+      }
       m_observations.insert(obs);
-      
+	
       // check if any requested goal was completed
       EUROPA::TokenSet cands = (*p)->getMergedTokens();
       if( (*p)!=i->second ) {
@@ -484,7 +638,11 @@ void DbCore::doNotify() {
       m_reactor.notify(i->first, obs);
     }
     i->second->end()->restrictBaseDomain(future);
-  } 
+    if( i->second->master().isId() && i->second->master()->isFact() ) {
+      i->second->master()->end()->restrictBaseDomain(future);
+      i->second->master()->start()->restrictBaseDomain(i->second->start()->baseDomain());
+    }
+  }
 }
 
 void DbCore::recall(EUROPA::eint const &key) {
@@ -662,7 +820,6 @@ void DbCore::notifyRemoved(EUROPA::TokenId const &token) {
   m_pending.erase(token);
   remove_from_agenda(token);
   remove_goal(token, false);
-  m_completed_obs.erase(token);
   remove_observation(token);
   m_terminated.erase(token);
   m_recalled.erase(token);
