@@ -316,7 +316,7 @@ namespace TREX {
        * @sa getInitialTick() const
        * @sa getCurrentTick() const
        */
-      void initialize(TICK final);
+      bool initialize(TICK final);
 			
       /** @brief New tick notification callback
        *

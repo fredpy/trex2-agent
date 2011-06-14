@@ -100,9 +100,12 @@ namespace TREX {
 	 * @sa Agent::initComplete()
 	 * @sa TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)
 	 */
-	void finish_vertex(graph::reactor_id r, graph const &g) {
-	  if( is_valid(r) )
-	    r->initialize(m_final);
+	void finish_vertex(graph::reactor_id r, graph const &g) {	  
+	  if( is_valid(r) ) {
+	    if( !r->initialize(m_final) ) {
+	      g.isolate(r);
+	    }
+	  }
 	}
       protected:
 	/** @brief Final tick value
@@ -247,7 +250,22 @@ Agent::Agent(std::string const &file_name, Clock *clk)
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
-  loadConf(file_name);
+  try {
+    loadConf(file_name);
+  } catch(TREX::utils::Exception const &e) {
+    syslog("ERROR")<<"Exception caught while loading "<<file_name<<":\n"
+		   <<e;
+    throw;
+  } catch(std::exception const &se) {
+    syslog("ERROR")<<"C++ exception caught while loading "
+		   <<file_name<<":\n"
+		   <<se.what();
+    throw;
+  } catch(...) {
+    syslog("ERROR")<<"Unknown exception caught while loading "
+		   <<file_name;
+    throw;
+  }
 }
 
 Agent::Agent(rapidxml::xml_node<> &conf, Clock *clk) 
@@ -255,7 +273,20 @@ Agent::Agent(rapidxml::xml_node<> &conf, Clock *clk)
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
-  loadConf(conf);
+  try {
+    loadConf(conf);
+  } catch(TREX::utils::Exception const &e) {
+    syslog("ERROR")<<"Exception caught while loading XML:\n"
+		   <<e;
+    throw;
+  } catch(std::exception const &se) {
+    syslog("ERROR")<<"C++ exception caught while loading XML:\n"
+		   <<se.what();
+    throw;
+  } catch(...) {
+    syslog("ERROR")<<"Unknown exception caught while loading XML";
+    throw;
+  }
 }
 
 
@@ -297,7 +328,7 @@ void Agent::loadPlugin(rapidxml::xml_node<> &pg) {
 }
 
 void Agent::loadConf(rapidxml::xml_node<> &config) {
-  if( !is_tag(config, "Agent") )
+  if( !is_tag(config, "Agent") ) 
     throw XmlError(config, "Not an Agent node");
   // Extract attributes
   try {
@@ -389,6 +420,9 @@ void Agent::initComplete() {
   // Complete the init for the reactors and check that there's no cycle
   details::init_visitor init(m_finalTick);
   boost::depth_first_search(me(), boost::visitor(init));
+  size_t n_failed = cleanup();
+  if( n_failed>0 ) 
+    syslog("WARN")<<n_failed<<" reactors failed to initialize.";
   
   // Check for missing timelines 
   for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) 

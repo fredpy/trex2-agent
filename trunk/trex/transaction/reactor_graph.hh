@@ -255,6 +255,7 @@ namespace TREX {
 
       bool kill_reactor(reactor_id r);
       reactor_id isolate(reactor_id r) const;
+      size_t cleanup();
 
       TICK getCurrentTick() const {
 	return m_currentTick;
@@ -339,6 +340,8 @@ namespace TREX {
 
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       TREX::utils::SingletonUse<xml_factory>             m_factory;
+
+      mutable details::reactor_set m_quarantined;
 
       friend class TeleoReactor;
     };
