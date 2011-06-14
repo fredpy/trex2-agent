@@ -268,6 +268,8 @@ bool DbCore::update_externals() {
 				<<i->second->getUnqualifiedPredicateName().toString();
 	  return false;
 	}
+	if( obs->canBeCommitted() )
+	  obs->commit();
       }
       i->second = obs;
       // succeeded on integrating the new observation
@@ -280,7 +282,8 @@ bool DbCore::update_externals() {
 	  EUROPA::TokenId active = i->second->getActiveToken();
 	  i->second->cancel();
 	  i->second->merge(active);
-      }
+      } else if( i->second->canBeCommitted() )
+	i->second->commit();
 	
       
       if( !assembly.propagate() ) {
@@ -389,39 +392,36 @@ bool DbCore::update_internals(size_t &steps) {
   
   if( assembly.invalid() )
     return false;
-  for(state_map::const_iterator i=m_internals.begin(); m_internals.end()!=i; ++i) {
+  for(state_map::const_iterator i=m_internals.begin(); 
+      m_internals.end()!=i; ++i) {
     EUROPA::TokenId active = i->second, last_obs;
-    seq_iter p_cur, last;
-
-    if( active.isId() ) {
-      active->end()->restrictBaseDomain(future);
-      if( active->isMerged() )
-	active = active->getActiveToken();
-    }
-
-    boost::tie(p_cur, last) = find_after(i->first, cur);
-    if( p_cur!=last && (*p_cur)->start()->lastDomain().getUpperBound()<=cur ) 
-      last_obs = *p_cur;
+    seq_iter pos, last;
+    
+    if( i->second.isId() && i->second->isMerged() ) 
+      active = i->second->getActiveToken();
+    boost::tie(pos, last) = find_after(i->first, cur);
+    if( pos!=last && (*pos)->start()->lastDomain().getUpperBound()<=cur )
+      last_obs = *pos;
     else {
-      // did not find an observation for current tick
-      debugMsg(dbg("trex:sync"), '['<<cur<<"] setting "<<i->first->toString()
-	       <<" state to its default.");
+      // No observation for current tick
+      debugMsg(dbg("trex:sync"), '['<<cur<<"] setting "
+	       <<i->first->toString()<<" satte to its default.");
       if( !assembly.insert_default(i->first, last_obs, steps) ) {
-	debugMsg(dbg("trex:sync"), "FAILED to insert default value on "
-		 <<i->first->toString());
+    	debugMsg(dbg("trex:sync"), "FAILED to insert default value on "
+    		 <<i->first->toString());
 	return false;
       }
-    } 
-   
-    if( last_obs->start()->lastDomain().getUpperBound()>=cur ) {
+    }
+    if( last_obs->start()->lastDomain().getUpperBound()>=cur ) {      
       last_obs->start()->specify(cur);
-      if( last_obs!=active && active.isId() )
-	active->end()->specify(cur);    
+      if( !assembly.propagate() ) {
+	return false;
+      }
+      if( last_obs!=active && active.isId() ) 
+	active->end()->specify(cur);
     }
   }
-  if( !propagate() )
-    return false;
-  return true;
+  return propagate();
 }
 
 bool DbCore::remove_goal(EUROPA::TokenId const &tok, bool restrict) {
@@ -571,76 +571,73 @@ void DbCore::doDispatch() {
 
 void DbCore::doNotify() {
   TICK cur = m_reactor.getCurrentTick();
-  EUROPA::DbClientId cli = m_reactor.assembly().plan_db()->getClient();
+  Assembly &assembly = m_reactor.assembly();
+  EUROPA::DbClientId cli = assembly.plan_db()->getClient();
   EUROPA::IntervalIntDomain now(cur, cur), future(cur+1, PLUS_INFINITY);
 
   // Update my internal state
-  for(state_map::iterator i=m_internals.begin(); m_internals.end()!=i; ++i) {
+  for(state_map::iterator i=m_internals.begin(); 
+      m_internals.end()!=i; ++i) {
     seq_iter p, p_cur, last;
     
     boost::tie(p, last) = find_after(i->first, cur-1);
-    
     p_cur = p;
-    if( last!=p_cur && (*p_cur)->end()->lastDomain().getUpperBound()<=cur ) 
+    if( last!=p && (*p)->end()->lastDomain().getUpperBound()<=cur )
       ++p_cur;
     if( last==p_cur || (*p_cur)->start()->lastDomain().getLowerBound()>cur )
-      throw EuropaException("Unexpected missing state for internal timeline "+
+      throw EuropaException("Do not have a state for internal timeline "+
 			    i->first->getName().toString());
     else if( (*p_cur)->start()->lastDomain().getUpperBound()>=cur ) {
-      EUROPA::TokenId obs;
-      
-      if( (*p_cur)->isFact() ) 
-	obs = *p_cur;
-      else {
-	// From here  I know that I have a new observation 
+      // I have a token that can start now
+      EUROPA::TokenId 
 	obs = cli->createToken((*p_cur)->getPredicateName().c_str(),
 			       NULL, false, true);
-      }
       obs->start()->restrictBaseDomain(now);
       obs->end()->restrictBaseDomain(future);
       obs->getObject()->specify(i->first->getKey());
-      if( *p_cur!=obs ) {
-	cli->merge(obs, *p_cur);	
-	m_reactor.assembly().propagate();
-	// restrict the fact attributes to what we are going to produce
-	obs->getObject()->restrictBaseDomain(obs->getObject()->getLastDomain());
-	for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
-	      v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
-	  (*v)->restrictBaseDomain((*v)->lastDomain());	            
-	m_reactor.assembly().propagate();
-      }
+      
+      obs->merge(*p_cur);
+      assembly.propagate();
+      obs->getObject()->restrictBaseDomain(obs->getObject()->lastDomain());
+      for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
+	    v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
+	(*v)->restrictBaseDomain((*v)->lastDomain());	            
       m_observations.insert(obs);
-	
-      // check if any requested goal was completed
-      EUROPA::TokenSet cands = (*p)->getMergedTokens();
-      if( (*p)!=i->second ) {
-	if( i->second.isId() ) 
-	  cands.erase(i->second);
-	cands.insert(*p);
-      }
-      for(EUROPA::TokenSet::const_iterator it=cands.begin(); cands.end()!=it; ++it) {
-	// We assume that if a goal token is completed then
-	// the goal itself is completed
-	// - note formally it is not necessarily true as this
-	//   goal may depend on future tokens. To check that
-	//   I need to se iff this token is the master of a token
-	//   that is yet to be completed... this could be checked
-	//   in the future but for now lets try to be efficient 
-	//   instead
-	remove_goal(*it);	
-      }
-      // finally update the current state
+      // terminate the previous observation
       if( i->second.isId() ) {
 	i->second->end()->restrictBaseDomain(now);
-	m_terminated.insert(i->second);
+	m_terminated.insert(i->second);	
+
+	// check if any goal did complete 
+	EUROPA::TokenSet cands = (*p)->getMergedTokens();
+	if( (*p)!=i->second ) {
+	  cands.erase(i->second);
+	  cands.insert(*p);
+	}
+	for(EUROPA::TokenSet::const_iterator it=cands.begin();
+	    cands.end()!=it; ++it) {
+	  // We assume that if a goal token is completed then
+	  // the goal itself is completed
+	  // - note formally it is not necessarily true as this
+	  //   goal may depend on future tokens. To check that
+	  //   I need to se iff this token is the master of a token
+	  //   that is yet to be completed... this could be checked
+	  //   in the future but for now lets try to be efficient 
+	  //   instead
+	  remove_goal(*it);	
+	}
       }
-      i->second = obs;
+      i->second = obs; 
       m_reactor.notify(i->first, obs);
-    }
-    i->second->end()->restrictBaseDomain(future);
-    if( i->second->master().isId() && i->second->master()->isFact() ) {
-      i->second->master()->end()->restrictBaseDomain(future);
-      i->second->master()->start()->restrictBaseDomain(i->second->start()->baseDomain());
+    } else {
+      i->second->end()->restrictBaseDomain(future);
+      if( i->second->isMerged() ) {
+	EUROPA::TokenId active = i->second->getActiveToken();
+	i->second->cancel();
+	i->second->merge(active);      
+	assembly.propagate();
+      } // else if( i->second->canBeCommitted() )
+	// i->second->commit();
     }
   }
 }
