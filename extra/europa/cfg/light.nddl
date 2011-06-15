@@ -31,93 +31,18 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "TREX.nddl"
-
-class Light extends AgentTimeline {
-    predicate On {}
-    predicate Off {}
-
-    Light(Mode _mode) {
-	super(_mode);
-    }
-}
-
-class Switch extends AgentTimeline {
-    predicate Up {}
-    predicate Down {}
-
-    Switch(Mode _mode) {
-	super(_mode);
-    }
-}
-
-class LightSwitch extends Timeline {
-    Switch controlled;
-    
-    predicate turnOff { duration = 1; }
-    predicate turnOn { duration = 1; }
-
-    LightSwitch(Switch sw) {
-	controlled = sw;
-    }
-}
-
-class Luminance extends AgentTimeline {
-    predicate Bright {}
-    predicate Dim {}
-    
-    Luminance(Mode _mode) {
-	super(_mode);
-    }
-}
-
-
-LightSwitch::turnOn {
-    meets(object.controlled.Down);
-}
-
-LightSwitch::turnOff {
-    meets(object.controlled.Up);
-}
-
-Luminance::Bright {
-    met_by(LightSwitch.turnOn);
-}
-
-Luminance::Dim {
-    met_by(LightSwitch.turnOff);
-}
-
-Light::On {
-    starts(Switch.Down);
-    contained_by(Luminance.Bright);    
-}
-
-
-Light::Off {
-    contained_by(Luminance.Dim);
-}
-
-Switch::Up {
-    bool external;
-    contained_by(Light.Off);
-    isExternal(external);
-    if( external==false ) {
-	met_by(object.Down prev);
-	if( prev.state==MERGED || prev.state==ACTIVE ) {
-	    bind(prev.duration, 1);
-	}
-    }
-}
+#include "lightswitch.nddl"
 
 Switch::Down {
-    bool external;
-    isExternal(external);
-    if( external==false ) {
-	met_by(object.Up prev);
-	if( prev.state==MERGED || prev.state==ACTIVE ) {
-	    bind(prev.duration, 1);
-	}
-    }
+    starts(Light.On);
 }
 
+Light light = new Light(Internal);
+Switch switch = new Switch(Internal);
+
+Luminance _lum = new Luminance(Ignore);
+
+fact(light.On on);
+on.start = 0;
+
+close();

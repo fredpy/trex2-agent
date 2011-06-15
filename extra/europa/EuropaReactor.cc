@@ -181,51 +181,59 @@ bool EuropaReactor::dispatch_window(EUROPA::ObjectId const &obj,
 //  - TREX transaction callback 
 
 void EuropaReactor::notify(Observation const &o) {
-  std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
-    ret = m_assembly.convert(o, true);
+  m_assembly.setStream();
+  {
+    std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
+      ret = m_assembly.convert(o, true);
 
-  if( ret.second.isId() ) {
-    ret.second->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
+    if( ret.second.isId() ) {
+      ret.second->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick(),
 							       getCurrentTick()));
-    ret.second->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
-							     PLUS_INFINITY));
-    m_core.notify(ret);
-  } else {
-    syslog("ERROR")<<"Failed to produce observation "
-		   <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
+      ret.second->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(getCurrentTick()+1,
+								      PLUS_INFINITY));
+      m_core.notify(ret);
+    } else {
+      syslog("ERROR")<<"Failed to produce observation "
+		     <<o.object()<<'.'<<o.predicate()<<" inside europa model.";
+    }
   }
 }
 
 void EuropaReactor::handleRequest(goal_id const &g) {
-  EUROPA::TokenId tok = m_assembly.convert(*g, false).second;
-
-  if( tok.isId() ) {
-    // restrict start, duration and end
-    try {
-      details::europa_restrict(tok->start(), g->getStart());
-      details::europa_restrict(tok->duration(), g->getDuration());
-      details::europa_restrict(tok->end(), g->getEnd());
-    } catch(DomainExcept const &de) {
-      syslog("ERROR")<<"Failed to restrict goal "<<g->object()<<'.'<<g->predicate()
-		     <<'['<<g<<"] temporal attributes: "<<de;
-      return;
+  m_assembly.setStream();
+  {
+    EUROPA::TokenId tok = m_assembly.convert(*g, false).second;
+    
+    if( tok.isId() ) {
+      // restrict start, duration and end
+      try {
+	details::europa_restrict(tok->start(), g->getStart());
+	details::europa_restrict(tok->duration(), g->getDuration());
+	details::europa_restrict(tok->end(), g->getEnd());
+      } catch(DomainExcept const &de) {
+	syslog("ERROR")<<"Failed to restrict goal "<<g->object()<<'.'<<g->predicate()
+		       <<'['<<g<<"] temporal attributes: "<<de;
+	return;
+      }
+      m_internal_goals[tok->getKey()] = g;
+      if( m_assembly.inactive() )
+	m_assembly.mark_active();
+    } else {
+      syslog("WARN")<<"Ignored unknown goal "
+		    <<g->object()<<'.'<<g->predicate();
     }
-    m_internal_goals[tok->getKey()] = g;
-    if( m_assembly.inactive() )
-      m_assembly.mark_active();
-  } else {
-    syslog("WARN")<<"Ignored unknown goal "
-		  <<g->object()<<'.'<<g->predicate();
   }
 }
 
 void EuropaReactor::handleRecall(goal_id const &g) {
+  m_assembly.setStream();
+  
   for(europa_mapping::iterator i=m_internal_goals.begin(); 
       m_internal_goals.end()!=i; ++i)
     if( i->second==g ) {
       EUROPA::eint key = i->first;
       m_internal_goals.erase(i);
-
+      
       // Need to notify the europa solver
       m_core.recall(key);
       return;
@@ -235,39 +243,44 @@ void EuropaReactor::handleRecall(goal_id const &g) {
 //  - TREX execution callbacks
 
 void EuropaReactor::handleInit() {
-  // Now is the time to set my timing constants in the model
-  EUROPA::PlanDatabaseId db = m_assembly.plan_db();
-
-
-  EUROPA::ConstrainedVariableId 
-    mission_end = db->getGlobalVariable(Assembly::MISSION_END),
-    tick_duration = db->getGlobalVariable(Assembly::TICK_DURATION), 
-    clock_var = db->getGlobalVariable(Assembly::CLOCK_VAR);
+  m_assembly.setStream();
+  {
     
-  if( mission_end.isNoId() )
-    throw ReactorException(*this, "Unable to locate "+
-			   Assembly::MISSION_END.toString()+
-			   " in the model");
-  if( tick_duration.isNoId() )
-    throw ReactorException(*this, "Unable to locate "+
-			   Assembly::TICK_DURATION.toString()+
-			   " in the model");
-  if( clock_var.isNoId() )
-    syslog("WARN")<<"Unable to locate "<<Assembly::CLOCK_VAR.toString()
-		  <<"in the model";
-  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(getFinalTick(), 
+    // Now is the time to set my timing constants in the model
+    EUROPA::PlanDatabaseId db = m_assembly.plan_db();
+    
+    
+    EUROPA::ConstrainedVariableId 
+      mission_end = db->getGlobalVariable(Assembly::MISSION_END),
+      tick_duration = db->getGlobalVariable(Assembly::TICK_DURATION), 
+      clock_var = db->getGlobalVariable(Assembly::CLOCK_VAR);
+    
+    if( mission_end.isNoId() )
+      throw ReactorException(*this, "Unable to locate "+
+			     Assembly::MISSION_END.toString()+
+			     " in the model");
+    if( tick_duration.isNoId() )
+      throw ReactorException(*this, "Unable to locate "+
+			     Assembly::TICK_DURATION.toString()+
+			     " in the model");
+    if( clock_var.isNoId() )
+      syslog("WARN")<<"Unable to locate "<<Assembly::CLOCK_VAR.toString()
+		    <<"in the model";
+    mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(getFinalTick(), 
+							      getFinalTick()));
+    tick_duration->restrictBaseDomain(EUROPA::IntervalIntDomain(tickDuration(),
+								tickDuration()));
+    // prepare the clock variable
+    clock_var->restrictBaseDomain(EUROPA::IntervalIntDomain(getInitialTick(),
 							    getFinalTick()));
-  tick_duration->restrictBaseDomain(EUROPA::IntervalIntDomain(tickDuration(),
-							      tickDuration())
-);
-  // prepare the clock varaiable
-  clock_var->restrictBaseDomain(EUROPA::IntervalIntDomain(getInitialTick(),
-							  getFinalTick()));
-  // Next thing is to process facts
-  m_core.initialize(clock_var);
+    // Next thing is to process facts
+    m_core.initialize(clock_var);
+  }
 }
 
 void EuropaReactor::handleTickStart() {
+  m_assembly.setStream();
+  
   if( getCurrentTick()==getInitialTick() )
     reset_deliberation();
   m_completedThisTick = false;
@@ -279,8 +292,9 @@ void EuropaReactor::handleTickStart() {
 }
 
 bool EuropaReactor::synchronize() {
+  m_assembly.setStream();
   // m_filter->set_horizon(getCurrentTick(), getCurrentTick()+1);
-  if( !( m_core.update_externals() && m_core.synchronize() ) ) {
+  if( !m_core.synchronize()  ) {
     m_assembly.solver().reset();
     // doRecalls
     m_assembly.mark_inactive();
@@ -303,6 +317,7 @@ bool EuropaReactor::synchronize() {
 }
 
 bool EuropaReactor::hasWork() {
+  m_assembly.setStream();
   if( m_assembly.invalid() )
     return false;
   if( m_assembly.active() )
@@ -311,6 +326,7 @@ bool EuropaReactor::hasWork() {
 }
 
 void EuropaReactor::resume() {
+  m_assembly.setStream();
   // syslog()<<"step "<<m_steps;
   if( m_assembly.invalid() ) {
     syslog("ERROR")<<"Cannot resume deliberation with an invalid database.";

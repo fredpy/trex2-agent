@@ -60,7 +60,6 @@ namespace TREX {
       // - external timelines
       void set_external(EUROPA::ObjectId const &obj);
       void notify(state_map::value_type const &obs);
-      bool update_externals();
       void doDispatch();      
 
       // synchronization 
@@ -77,7 +76,8 @@ namespace TREX {
       static std::pair<seq_iter, seq_iter> find_after(EUROPA::TimelineId const &tl,
 						      TREX::transaction::TICK now);
 
-      std::string dbg(std::string const &base) const;
+      bool update_externals();
+
       bool propagate();
       bool resolve(size_t &steps);
       bool update_internals(size_t &steps);

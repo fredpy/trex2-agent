@@ -84,12 +84,8 @@ TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
 /*
  * class TREX::europa::details::Schema
  */
-std::string const Schema::EUROPA_DEBUG("Europa.log");
-
 
 Schema::Schema() {
-  m_europa_debug.open(m_log->file_name("Europa.log").c_str());
-  DebugMessage::setStream(m_europa_debug);
   bool found;
   std::string cfg_dbg = m_log->use("Debug.cfg", found);
   
@@ -98,6 +94,16 @@ Schema::Schema() {
     DebugMessage::readConfigFile(cfg);
   } else
     m_log->syslog("EUROPA")<<"No Debug.cfg keeping default europa debug verbosity.";
+}
+
+void Schema::setStream(std::ofstream &out, std::string const &name) {
+  out.open(m_log->file_name(name).c_str());
+  setStream(out);
+}
+
+
+void Schema::setStream(std::ostream &out) {
+  DebugMessage::setStream(out);
 }
 
 
@@ -160,6 +166,9 @@ std::string const Assembly::UNDEFINED_PRED("undefined");
 
 Assembly::Assembly(EuropaReactor &owner)
  :m_reactor(owner), m_solver(NULL) {
+  // Create my debug file
+  m_trexSchema->setStream(m_dbg, owner.getName().str()+".europa.log");
+  
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
   addModule((new EUROPA::ModuleConstraintLibrary())->getId());  
   addModule((new EUROPA::ModulePlanDatabase())->getId());
@@ -322,7 +331,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
   }
   if( !active() ) {
     debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
-	     <<" is a not active");
+	     <<": deliberation is a not active");
     return false;
   }
   if( tok->isFact() && 
