@@ -104,7 +104,14 @@ bool DeliberationFilter::test(EUROPA::EntityId const &entity) {
       in_scope = !m_assembly.plan_db()->getTemporalAdvisor()->canPrecede(master, token);
     }
   }
-  condDebugMsg(!in_scope, "trex:horizon:test", "This token is not in  scope");
+  if( in_scope ) {
+    debugMsg("trex:horizon:test", "Thist token is part of the planning horizon"
+	     <<"\n\tstart "<<start_t.toString()
+	     <<"\n\tend "<<end_t.toString()
+	     <<"\n\thorizon "<<m_horizon.toString());
+  } else {
+    debugMsg("trex:horizon:test", "This token is not in  scope");
+  }
   return !in_scope;
 }
 

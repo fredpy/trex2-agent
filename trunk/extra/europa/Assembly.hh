@@ -90,11 +90,12 @@ namespace TREX {
       
       class Schema :boost::noncopyable {
       public:
-	static std::string const EUROPA_DEBUG;
-
         void registerComponents(Assembly const &assembly);
         void registerPlugin(SchemaPlugin &plugin);
         void unregisterPlugin(SchemaPlugin &plugin);
+
+	void setStream(std::ostream &out);
+	void setStream(std::ofstream &out, std::string const &name);
         
       private:
         Schema();
@@ -195,6 +196,10 @@ namespace TREX {
        */
       Assembly(EuropaReactor &owner);
       ~Assembly();
+
+      void setStream() {
+	m_trexSchema->setStream(m_dbg);
+      }
 
       /** @brief Load a model
        *
@@ -522,6 +527,7 @@ namespace TREX {
       EUROPA::RulesEngineId      m_rulesEngine;
       
       TREX::utils::SingletonUse<details::Schema>         m_trexSchema;
+      std::ofstream m_dbg;
       
       EUROPA::ObjectSet m_ignore;
       

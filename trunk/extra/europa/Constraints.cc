@@ -104,6 +104,7 @@ CheckExternal::CheckExternal(EUROPA::LabelStr const &name,
 }
 
 void CheckExternal::handleExecute() {
+
   if( NULL!=m_obj ) {
     Assembly &r = assembly();
     EUROPA::DataTypeId type = m_obj->getDataType();
@@ -112,7 +113,8 @@ void CheckExternal::handleExecute() {
       EUROPA::ObjectDomain const &dom(*m_obj);
       std::list<EUROPA::ObjectId> exts, n_exts, vals = dom.makeObjectList();
 
-      for(std::list<EUROPA::ObjectId>::const_iterator i=vals.begin(); vals.end()!=i; ++i) {
+      for(std::list<EUROPA::ObjectId>::const_iterator i=vals.begin(); 
+	  vals.end()!=i; ++i) {
 	if( r.isExternal(*i) )
 	  exts.push_back(*i);
 	else 
@@ -121,6 +123,9 @@ void CheckExternal::handleExecute() {
       if( !exts.empty() ) {
 	if( n_exts.empty() ) {
 	  m_test->intersect(true, true);
+	  debugMsg("trex:cstr:external", "AFTER "
+		   <<"\n\ttest "<<m_test->toString());
+	  return;
 	} else if( m_test->isSingleton() ) {
 	  std::auto_ptr<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
@@ -128,10 +133,11 @@ void CheckExternal::handleExecute() {
 	  else 
 	    tmp.reset(new EUROPA::ObjectDomain(type, n_exts));
 	  m_obj->intersect(*tmp);
+	  return;
 	}
       }
     }
-  }
+  } 
   m_test->intersect(false, false);
 }
 
@@ -174,6 +180,7 @@ void CheckInternal::handleExecute() {
       if( !ints.empty() ) {
 	if( n_ints.empty() ) {
 	  m_test->intersect(true, true);
+	  return;
 	} else if( m_test->isSingleton() ) {
 	  std::auto_ptr<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
@@ -181,6 +188,7 @@ void CheckInternal::handleExecute() {
 	  else 
 	    tmp.reset(new EUROPA::ObjectDomain(type, n_ints));
 	  m_obj->intersect(*tmp);
+	  return;
 	}
       }
     }
