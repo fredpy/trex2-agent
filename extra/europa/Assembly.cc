@@ -190,7 +190,7 @@ Assembly::Assembly(EuropaReactor &owner)
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_constraintEngine);
 	
   // make sure that we control when constraints are propagated
-  // m_constraintEngine->setAutoPropagation(false);
+  m_constraintEngine->setAutoPropagation(false);
   
   // get extra features from TREX schema
   m_trexSchema->registerComponents(*this);
@@ -453,7 +453,7 @@ bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok,
   EUROPA::ConstrainedVariableId name = m_reactor.assembly().default_pred(obj);
   EUROPA::DataTypeId type = name->getDataType();
   std::string short_pred = type->toString(name->getSpecifiedValue()),
-  pred_name = obj->getType().toString()+"."+short_pred;
+    pred_name = obj->getType().toString()+"."+short_pred;
   EUROPA::DbClientId cli = m_planDatabase->getClient();
   
   tok = cli->createToken(pred_name.c_str(), NULL, false);

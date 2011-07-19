@@ -795,6 +795,8 @@ void DbCore::archive() {
 	if( token->canBeTerminated(cur) )
 	  token->terminate();
 
+	// This part proved to be problematic as it can relax my plan ...
+	//   - need to improve it so it won't mess up my plan
 	tokens = token->slaves();
 	bool can_discard = token->isTerminated();
 	for(EUROPA::TokenSet::const_iterator it=tokens.begin();

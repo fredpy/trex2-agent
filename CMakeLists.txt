@@ -51,7 +51,7 @@ set(CPACK_PACKAGE_VERSION_PATCH ${TREX_PATCH})
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
 message(STATUS "VERSION = ${VERSION}")
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent excutive")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent executive")
 set(CPACK_PACKAGE_VENDOR "TREX2 development team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
 set(CPACK_GENERATOR TGZ)
@@ -114,6 +114,11 @@ check_library_exists(rt shm_unlink "" LIB_RT)
 if(LIB_RT)
   set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} rt)
 endif(LIB_RT)
+
+########################################################################
+# Java JDK                                                             #
+########################################################################
+find_package(Wt)
 
 ########################################################################
 # Doxygen                                                              #
@@ -283,6 +288,16 @@ endif(${CMAKE_GENERATOR} MATCHES "Xcode")
 ########################################################################
 # lightswitch                                                          #
 ########################################################################
+if(Wt_FOUND)
+  trex_plugin(extra/witre TREXutils)
+  trex_pg(witre_pg extra/witre)
+  set_property(TARGET ${witre_pg} PROPERTY ${Wt_LIBRARIES})
+  target_link_libraries(${witre_pg} ${Wt_LIBRARIES})
+endif(Wt_FOUND)
+
+########################################################################
+# lightswitch                                                          #
+########################################################################
 trex_plugin(extra/lightswitch TREXtransaction)
 
 ########################################################################
@@ -307,6 +322,7 @@ macro(trex_cmd path)
   add_executable(${cmd_name} ${path})
   target_link_libraries(${cmd_name} TREXagent)
   add_dependencies(core ${cmd_name})
+  include_directories(${Wt_INCLUDE_DIR})
   install(TARGETS ${cmd_name} DESTINATION bin)  
 endmacro(trex_cmd)
 

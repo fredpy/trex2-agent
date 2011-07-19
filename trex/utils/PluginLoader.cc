@@ -89,7 +89,7 @@ void PluginLoader::load(Symbol const &name) {
         throw PluginError(name, "Failed to load \""+name.str()+"\"");
       plugin_fn f_init = (plugin_fn)p_dlsym(handle, "initPlugin");
       if( NULL==f_init ) {
-        PluginError err(name, "missing initPugin");
+        PluginError err(name, "missing initPlugin");
         p_dlclose(handle);
         throw err;
       }

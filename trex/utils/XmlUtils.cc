@@ -57,12 +57,11 @@ ext_iterator::file_ref ext_iterator::load(xml_attribute<> *attr) {
   if( NULL!=attr ) {
     std::string name(attr->value(), attr->value_size());
     bool found;
+    // load the file and notify LogManager that this file was used
     name = s_log->use(name, found);
     if( !found ) 
       ErrnoExcept("Unable to locate "+name);
-    // load the file and notify LogManager that this file was used
     ret.reset(new file<>(name.c_str()));
-    // TODO add the use of LogManager
   }
   return ret;
 }
