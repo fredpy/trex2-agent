@@ -353,7 +353,7 @@ namespace TREX {
       double tickDuration() const {
 	return m_clock->tickDuration();
       }
-
+      
     private:
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:

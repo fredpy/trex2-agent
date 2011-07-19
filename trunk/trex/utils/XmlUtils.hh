@@ -83,7 +83,7 @@ namespace TREX {
     /** @brief XML attribute extraction
      * @tparam Ty output type
      * @param node An XML node
-     * @param attr Attribyute name
+     * @param attr Attribute name
      *
      * This method extract attribute @a attr from @a node and parses it
      * as a @a Ty variable
