@@ -56,12 +56,33 @@ namespace TREX {
     ::s_log->syslog("plugin.witre")<<"Witre loaded."<<std::endl;
   }
 
+  namespace witre {
+    
+    WitreApplication *createWitre(Wt::WEnvironment const &e) {
+      WitreApplication *app = new WitreApplication(e);
+      // hard coded for now
+
+      bool found;
+      std::string file = s_log->use("witre_loc.xml", found);
+      
+      if( found ) {
+	file.erase(file.end()-4, file.end());
+	s_log->syslog("witre")<<"set locale to "<<file;
+	app->messageResourceBundle().use(file);
+      } else {
+	s_log->syslog("witre")<<"Did not find locale "<<file;
+      }
+      
+      return app;
+    }
+
+  } 
 } // TREX
 
 WitreApplication::WitreApplication(Wt::WEnvironment const &env) 
   :Wt::WApplication(env) {
   setTitle("witre - trex "+TREX::version::str());
-  root()->addWidget(new Wt::WText(Wt::WString::tr("This works fine")));
+  root()->addWidget(new Wt::WText(Wt::WString::tr("test")));
 }
 
 WitreApplication::~WitreApplication() {}
