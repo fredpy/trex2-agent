@@ -1,4 +1,4 @@
-<config>
+<config locale="witre_loc">
   <!-- arguments to be passed to the Wt server 
     read Wt documentation for further details
     
@@ -7,7 +7,7 @@
     way to pass parameters to Wt as if they were coming from the command 
     line
 
-    seems that I need a new line at the end otherwise the server fails 
+    Note: It seems that I need a new line at the end otherwise the server fails 
     to parse the option
     -->
   <server>--http-address=localhost --http-port=8081 --docroot=.
