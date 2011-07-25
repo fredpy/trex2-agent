@@ -32,8 +32,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Witre.hh"
+
 #include <trex/utils/TREXversion.hh>
 #include <trex/utils/Plugin.hh>
+
+#include <Wt/WContainerWidget>
+#include <Wt/WText>
 
 using namespace TREX::utils;
 using namespace TREX::witre;
@@ -57,6 +61,7 @@ namespace TREX {
 WitreApplication::WitreApplication(Wt::WEnvironment const &env) 
   :Wt::WApplication(env) {
   setTitle("witre - trex "+TREX::version::str());
+  root()->addWidget(new Wt::WText(Wt::WString::tr("This works fine")));
 }
 
 WitreApplication::~WitreApplication() {}

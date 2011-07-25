@@ -89,8 +89,10 @@ WitreServer::WitreServer():m_server(NULL) {
     if( NULL!=argv )
       delete[] argv;
 
+    m_server->addEntryPoint(Wt::Application, createWitre);
     if( !m_server->start() )
       throw Error("Unable to start the server");
+    
   } catch(Wt::WServer::Exception const &e) {
     m_log->syslog("witre.server")<<"Server initialization ERROR : "<<e.what();
     throw Error(e.what());
