@@ -41,14 +41,18 @@ namespace TREX {
     
     class WitreApplication :public Wt::WApplication {
     public:
+      WitreApplication(Wt::WEnvironment const &env);
       ~WitreApplication();
 
     private:
-      WitreApplication(Wt::WEnvironment const &env);
 
       friend class WitreServer;
     };
-    
+
+    inline WitreApplication *createWitre(Wt::WEnvironment const &e) {
+      return new WitreApplication(e);
+    }
+
   } // TREX::witre
 } // TREX
 
