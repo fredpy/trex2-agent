@@ -155,6 +155,7 @@ bool EuropaReactor::in_scope(EUROPA::TokenId const &tok) {
       ( start_t.getUpperBound() < getFinalTick() ||
 	start_t.getLowerBound() <=deadline );
   }
+  return false;
 }
 
 bool EuropaReactor::dispatch_window(EUROPA::ObjectId const &obj, 

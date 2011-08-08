@@ -335,7 +335,7 @@ bool DbCore::synchronize() {
 }
 
 bool DbCore::process_agenda(EUROPA::TokenSet agenda, size_t &steps) {
-  TICK cur = m_reactor.getCurrentTick();
+  // TICK cur = m_reactor.getCurrentTick();
   Assembly &assembly = m_reactor.assembly();
 
   for(EUROPA::TokenSet::const_iterator i=agenda.begin(); agenda.end()!=i; ++i) {
