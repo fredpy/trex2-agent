@@ -301,7 +301,7 @@ Agent::~Agent() {
 
 bool Agent::missionCompleted() {
   if( count_reactors()<=1 ) {
-    // If there's only one reactior left it is probably
+    // If there's only one reactor left it is probably
     // my AgentProxy => no real reactor available
     syslog()<<"No reactor left.";
     return true;
@@ -487,12 +487,17 @@ bool Agent::executeReactor() {
   if( m_edf.empty() )
     return false;
   else {
-    reactor_id r = m_edf.begin()->second;
+    double wr;
+    reactor_id r;
+
+    boost::tie(wr, r) = *(m_edf.begin());
+    // syslog("step")<<"Executing reactor "<<r->getName()<<" (wr="<<wr<<")";
     m_edf.erase(m_edf.begin());
     r->step();
 
-    double wr = r->workRatio();
+    wr = r->workRatio();
     if( !std::isnan(wr) ) {
+      // syslog("step")<<"New work ratio for "<<r->getName()<<" is "<<wr;
       m_edf.insert(std::make_pair(wr, r));
       return true;
     }
