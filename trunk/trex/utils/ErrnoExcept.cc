@@ -59,5 +59,5 @@ std::string ErrnoExcept::build_message(std::string const &from,
 }
   
 std::string ErrnoExcept::build_message(std::string const &from) throw() {
-  return build_message(from , strerror(errno));
+  return build_message(from, strerror(errno));
 }
