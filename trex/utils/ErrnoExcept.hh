@@ -56,7 +56,7 @@ namespace TREX {
    *
    * Normally classes and code defined here is provided by the dynamic
    * library named TREXutils.
-	 *
+   *
    * @ingroup utils
    */
   namespace utils {
@@ -76,14 +76,14 @@ namespace TREX {
        * @param[in] from Source of the error
        *
        * Creates a new instance with the indication that the error came from 
-			 * @p from. Extracts automatically the value of @c errno and its 
-			 * associated message to build the exception message 
-			 * "@p from: errno message"
+       * @p from. Extracts automatically the value of @c errno and its 
+       * associated message to build the exception message 
+       * "@p from: errno message"
        */
       explicit ErrnoExcept(std::string const &from) throw()
-			:Exception(build_message(from)), _errno(errno) {}
+	:Exception(build_message(from)), _errno(errno) {}
       /** @brief Constructor
-			 *
+       *
        * @param[in] from Source of the error
        * @param[in] what The message of associated 
        *
@@ -98,7 +98,7 @@ namespace TREX {
        * in the future.
        */
       ErrnoExcept(std::string const &from, std::string const &what) throw()
-			:Exception(build_message(from, what)), _errno(0) {}
+	:Exception(build_message(from, what)), _errno(0) {}
       /** @brief Destructor */
       virtual ~ErrnoExcept() throw() {}
       
@@ -107,14 +107,14 @@ namespace TREX {
        * @return the value of @c errno when this exception was thrown
        */
       int get_errno() const {
-				return _errno;
+	return _errno;
       }
       
     private:
       /** @brief Saved value of @c errno
-			 *
+       *
        * This attribute is used to storethe @c errno valuee collected during the 
-			 * exception construction. 
+       * exception construction. 
        */
       int _errno;
       
@@ -125,14 +125,14 @@ namespace TREX {
        * 
        * This method is used internally to create the message during
        * exception construction. 
-			 * 
-			 * @note when the @p what argument is not provided the calls collect 
-			 * directly the message constent using @c strerror standard function 
+       * 
+       * @note when the @p what argument is not provided the calls collect 
+       * directly the message constent using @c strerror standard function 
        * 
        * @{
        */
       static std::string build_message(std::string const &from, 
-																			 std::string const &what) throw();
+				       std::string const &what) throw();
       
       static std::string build_message(std::string const &from) throw();
       /** @} */
