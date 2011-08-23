@@ -105,7 +105,7 @@ namespace TREX {
     public:
       /** @brief Scoped variable locking type
        *
-       * This type cvan be used to locally lock one SharedVar based
+       * This type can be used to locally lock one SharedVar based
        * in a C++ scope.
        * A new instance of this class will lock the mutex associated
        * to the SharedVar during its whiole lifetime and release the
