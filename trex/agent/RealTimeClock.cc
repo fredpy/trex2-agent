@@ -123,6 +123,24 @@ TICK RealTimeClock::getNextTick() {
 
 // observers :
 
+TICK RealTimeClock::timeToTick(time_t &secs, suseconds_t &usecs) const {
+  timeval tv;
+  TICK current;
+  double delta;
+
+  tv.tv_sec = secs;
+  tv.tv_usec = usecs;
+  
+  {
+    mutex_type::scoped_lock guard(m_lock);
+    delta = to_double(m_nextTickDate-tv);
+    current = m_tick+1;
+  }
+  delta /= tickDuration();
+  current += std::floor(delta);
+  return current;
+}
+
 double RealTimeClock::timeLeft() const {
   timeval tv;
   getDate(tv);

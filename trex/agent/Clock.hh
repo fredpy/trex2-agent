@@ -98,6 +98,10 @@ namespace TREX {
       virtual double tickDuration() const {
 	return 1.0;
       }
+      virtual TREX::transaction::TICK timeToTick(time_t &secs, 
+						 suseconds_t &usecs) const {
+	return secs;
+      }	
       /** @brief Sleep until next tick
        *
        * This method check the time left before next tick and
