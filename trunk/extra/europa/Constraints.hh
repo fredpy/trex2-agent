@@ -95,8 +95,8 @@ namespace TREX {
       bool guardSatisfied() const;
       void handleExecute();
     private:
-      EUROPA::Domain *m_target;
-      EUROPA::Domain *m_default;
+      EUROPA::ConstrainedVariableId m_target;
+      EUROPA::ConstrainedVariableId m_default;
     }; // Bind
 
   }

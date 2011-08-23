@@ -68,13 +68,15 @@ namespace TREX {
       void archive();
 
       // deliberation
-      void step();
+      bool step();
       
     private:
       typedef std::list<EUROPA::TokenId>    sequence_type;
       typedef sequence_type::const_iterator seq_iter;
       static std::pair<seq_iter, seq_iter> find_after(EUROPA::TimelineId const &tl,
 						      TREX::transaction::TICK now);
+      void enforce_duration(EUROPA::TokenId const &tok);
+      void force_update(EUROPA::TokenId const &active, EUROPA::TokenId const &merged);
 
       bool update_externals();
 

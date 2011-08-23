@@ -512,6 +512,8 @@ namespace TREX {
       
       void logPlan(std::ostream &out) const;
     private:
+      void propagation_failure() const;
+
       enum State {
         INACTIVE = 0,
         ACTIVE, 

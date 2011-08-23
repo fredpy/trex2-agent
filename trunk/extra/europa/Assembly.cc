@@ -218,6 +218,7 @@ void Assembly::logPlan(std::ostream &out) const {
     EUROPA::eint key = (*i)->getKey();
     out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
        <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
+       <<" duration "<<(*i)->duration()->lastDomain().toString()<<"\\n"
        <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
        <<" state "<<(*i)->getState()->lastDomain().toString()<<"\"";
     if( ignored(*i) )
@@ -549,10 +550,62 @@ bool Assembly::propagate() {
     return false;
   if( !m_constraintEngine->propagate() ) {
     m_reactor.log("")<<"Inconsistent plan.";
+    propagation_failure();
     mark_invalid();
   }
   return !invalid();
 }
+
+void Assembly::propagation_failure() const {
+  std::ostringstream oss;
+  
+  if( !m_constraintEngine->constraintConsistent() ) {
+    oss<<"Constraint network is inconsistent:\n";
+    EUROPA::ConstrainedVariableSet const &vars = m_constraintEngine->getVariables();
+    EUROPA::ConstrainedVariableSet::const_iterator i=vars.begin();
+
+    for( ; vars.end()!=i; ++i) {
+      if( (*i)->lastDomain().isEmpty() && (*i)->lastDomain().isClosed() ) {
+	EUROPA::TokenId token = details::parent_token(*i);
+	std::string prefix;
+	
+	if( token.isId() ) {
+	  std::ostringstream ss;
+	  ss<<token->getName().toString()<<'('<<token->getKey()<<").";
+	  prefix = ss.str();
+	}
+	oss<<" - local context of "<<prefix<<(*i)->getName().toString()<<":\n"
+ 	   <<"   - base domain: "<<(*i)->baseDomain().toString()<<'\n'
+ 	   <<"   - derived domain: "<<(*i)->lastDomain().toString()<<'\n'
+	   <<"   - Europa explanation: "<<(*i)->getViolationExpl()<<'\n';
+	EUROPA::ConstraintSet constraints;
+	(*i)->constraints(constraints);
+	if( !constraints.empty() ) {
+	  oss<<"   - related constraints:\n";
+	  EUROPA::ConstraintSet::const_iterator c = constraints.begin();
+	  for( ; constraints.end()!=c; ++c) {
+	    std::vector<EUROPA::ConstrainedVariableId> 
+	      const &scope = (*c)->getScope();
+	    size_t idx;
+	    oss<<"     + "<<(*c)->getName().toString()<<'(';
+	    for(idx=0; idx<scope.size(); ++idx) {
+	      if( idx>0 )
+		oss<<", ";
+	      token = details::parent_token(scope[idx]);
+	      if( token.isId() )
+		oss<<token->getName().toString()<<'('<<token->getKey()<<").";
+	      oss<<scope[idx]->getName().toString()<<'='
+		 <<scope[idx]->lastDomain().toString();
+	    }
+	    oss<<")\n";
+	  }
+	}
+      }
+    }
+    debugMsg("trex:always", oss.str());
+  }
+}
+
 
 std::pair<EUROPA::ObjectId, EUROPA::TokenId> Assembly::convert(Predicate const &pred, bool fact) {
   // First we create the token

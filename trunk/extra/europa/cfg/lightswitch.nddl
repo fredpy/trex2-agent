@@ -103,9 +103,12 @@ Switch::Up {
     contained_by(Light.Off);
     isExternal(external);
     if( external==false ) {
-	met_by(object.Down prev);
-	if( prev.state==MERGED || prev.state==ACTIVE ) {
-	    bind(prev.duration, 1);
+	duration == end - start;
+	if( start<=AGENT_CLOCK ) {
+	    meets(object.Down next);
+	    if( next.state==ACTIVE || next.state==MERGED ) {
+		bind(duration, 1);
+	    }
 	}
     }
 }
@@ -114,9 +117,12 @@ Switch::Down {
     bool external;
     isExternal(external);
     if( external==false ) {
-	met_by(object.Up prev);
-	if( prev.state==MERGED || prev.state==ACTIVE ) {
-	    bind(prev.duration, 1);
+	duration == end - start;
+	if( start<=AGENT_CLOCK ) {
+	    meets(object.Up next);
+	    if( next.state==ACTIVE || next.state==MERGED ) {
+		bind(duration, 1);
+	    }
 	}
     }
 }

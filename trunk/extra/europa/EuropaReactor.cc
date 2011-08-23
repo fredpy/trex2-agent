@@ -338,7 +338,14 @@ void EuropaReactor::resume() {
     m_assembly.mark_invalid();
   }
   ++m_steps;
-  m_core.step();
+  if( !m_core.step() ) {
+    if( !m_core.relax(false) ) 
+      if( !m_core.relax(true) ) {
+	syslog("ERROR")<<"Unable to recover from a plan inconsistancy.";
+	return;
+      }
+    m_assembly.mark_active();
+  }
 }
 
 //  - Europa interface callbacks

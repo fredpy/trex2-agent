@@ -206,8 +206,8 @@ Bind::Bind(EUROPA::LabelStr const &name,
   :EUROPA::Constraint(name, propagatorName, cstrEngine, variables) {
   if( m_variables.size()!=2 )
     throw EuropaException("constraint "+name.toString()+" requires exactly 2 arguments");
-  m_target = &(getCurrentDomain(m_variables[0]));
-  m_default = &(getCurrentDomain(m_variables[1]));
+  m_target = m_variables[0];
+  m_default = m_variables[1];
   // Check that types are compatibles
   if( !m_target->getDataType()->isAssignableFrom(m_default->getDataType()) ) 
     throw EuropaException("constraint "+name.toString()
@@ -216,21 +216,29 @@ Bind::Bind(EUROPA::LabelStr const &name,
 }
 
 bool Bind::guardSatisfied() const {
-  return m_default->isSingleton() && !m_target->isSingleton();
+  return m_target->isActive() && m_default->lastDomain().isSingleton() && 
+    !m_target->lastDomain().isSingleton();
 }
 
 void Bind::handleExecute() {
   if( guardSatisfied() ) {
-    if( m_target->intersects(*m_default) )
-      m_target->intersect(*m_default);
-    else {
-      EUROPA::edouble lb, ub, val = m_default->getSingletonValue();
-      m_target->getBounds(lb, ub);
+    EUROPA::Domain &domain = getCurrentDomain(m_target);
+    debugMsg("trex:bind", "BEFORE "<<m_target->getName().toString()
+	     <<"="<<m_target->toString()
+	     <<" "<<m_default->toString());
+    if( domain.intersects(m_default->lastDomain()) ) {
+      domain.intersect(m_default->lastDomain());
+    } else {
+      EUROPA::edouble lb, ub, val = m_default->lastDomain().getSingletonValue();
+      domain.getBounds(lb, ub);
       EUROPA::edouble dlo = std::abs(lb-val), dhi = std::abs(ub-val);
       if( dhi<dlo )
-	m_target->intersect(ub, ub);
+	domain.intersect(ub, ub);
       else
-	m_target->intersect(lb, lb);
+	domain.intersect(lb, lb);
     }
+    debugMsg("trex:bind", "AFTER "<<m_target->getName().toString()
+	     <<"="<<m_target->toString()
+	     <<" "<<m_default->toString());
   }
 }
