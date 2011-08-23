@@ -38,6 +38,7 @@
 
 # include <PLASMA/Solver.hh>
 # include <PLASMA/OpenConditionManager.hh>
+# include <PLASMA/Debug.hh>
 
 namespace TREX {
   namespace europa {
@@ -52,6 +53,7 @@ namespace TREX {
       }
       void step() {
 	m_solver->step();
+	debugMsg("trex:step", m_solver->getDecisionStackAsString());
       }
 
       size_t getDepth() const {
