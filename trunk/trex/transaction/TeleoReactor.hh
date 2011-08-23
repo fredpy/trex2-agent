@@ -212,6 +212,10 @@ namespace TREX {
       double tickDuration() const {
 	return m_graph.tickDuration();
       }
+
+      TICK timeToTick(time_t &secs, suseconds_t &usecs) const {
+	return m_graph.timeToTick(secs, usecs);
+      }
       /** @brief Get current tick
        *
        * @return current tick date

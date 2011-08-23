@@ -354,6 +354,10 @@ namespace TREX {
 	return m_clock->tickDuration();
       }
       
+      TREX::transaction::TICK timeToTick(time_t &secs, suseconds_t &usecs) const {
+	return m_clock->timeToTick(secs, usecs);
+      }
+      
     private:
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:
