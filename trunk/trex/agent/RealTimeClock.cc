@@ -123,7 +123,7 @@ TICK RealTimeClock::getNextTick() {
 
 // observers :
 
-TICK RealTimeClock::timeToTick(time_t &secs, suseconds_t &usecs) const {
+TICK RealTimeClock::timeToTick(time_t secs, suseconds_t usecs) const {
   timeval tv;
   TICK current;
   double delta;

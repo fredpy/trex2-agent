@@ -213,7 +213,7 @@ namespace TREX {
 	return m_graph.tickDuration();
       }
 
-      TICK timeToTick(time_t &secs, suseconds_t &usecs) const {
+      TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return m_graph.timeToTick(secs, usecs);
       }
       /** @brief Get current tick

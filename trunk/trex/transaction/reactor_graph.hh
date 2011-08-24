@@ -263,7 +263,7 @@ namespace TREX {
       virtual double tickDuration() const {
 	return 1.0;
       }
-      virtual TICK timeToTick(time_t &secs, suseconds_t &usecs) const {
+      virtual TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return secs;
       }	
 
