@@ -108,7 +108,8 @@ namespace TREX {
 	return m_floatTick;
       }
 
-      TREX::transaction::TICK timeToTick(time_t &secs, suseconds_t &usecs) const;
+      TREX::transaction::TICK timeToTick(time_t secs, 
+					 suseconds_t usecs=0) const;
 
     private:
       /** @brief Start the clock
