@@ -60,6 +60,7 @@ if(WITH_EUROPA)
     install(DIRECTORY . DESTINATION include/trex/europa
       FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
       PATTERN "private" EXCLUDE
+      PATTERN "cfg" EXCLUDE
       PATTERN ".svn" EXCLUDE)
 
     trex_plugin(europa europa_plugin.cc)

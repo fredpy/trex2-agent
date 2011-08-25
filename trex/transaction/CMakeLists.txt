@@ -43,6 +43,7 @@ add_library(TREXtransaction SHARED
 
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain)
+trex_lib(TREXtransaction)
 
 install(DIRECTORY . DESTINATION include/trex/transaction
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

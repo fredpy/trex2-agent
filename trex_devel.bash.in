@@ -33,8 +33,8 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #####################################################################
 
-TREX_LIBS=@TREX_LIBRARY_DIRS@
-TREX_BINS=@CMAKE_BINARY_DIR@
+TREX_LIBS=@TREX_LIBRARY_DIRS@:@Boost_LIBRARY_DIRS@
+TREX_BINS=@TREX_BINARY_DIRS@
 
 platform='unknown'
 lib_path_var=LD_LIBRARY_PATH

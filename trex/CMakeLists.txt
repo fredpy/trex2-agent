@@ -55,7 +55,11 @@ target_link_libraries(amc TREXagent)
 add_dependencies(core amc)
 install(TARGETS amc DESTINATION bin)
 
+trex_cmd(amc)
+
 add_executable(sim cmds/Sim.cc)
 target_link_libraries(sim TREXagent)
 add_dependencies(core sim)
 install(TARGETS sim DESTINATION bin)
+
+trex_cmd(sim)
