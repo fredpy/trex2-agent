@@ -38,6 +38,8 @@ macro(trex_plugin name src)
   add_library(${name}_pg SHARED ${src})
   add_dependencies(plugins ${name}_pg)
   install(TARGETS ${name}_pg DESTINATION shared/trex OPTIONAL)
+  trex_cfg(cfg shared/trex)
+  trex_lib(${name}_pg)
 endmacro(trex_plugin)
 
 # the directories where plugins are located

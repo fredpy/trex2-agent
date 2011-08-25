@@ -41,6 +41,7 @@ add_library(TREXagent SHARED
 
 add_dependencies(core TREXagent)
 target_link_libraries(TREXagent TREXtransaction)
+trex_lib(TREXagent)
 
 install(DIRECTORY . DESTINATION include/trex/agent
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

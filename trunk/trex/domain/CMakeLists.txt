@@ -42,6 +42,7 @@ add_library(TREXdomain SHARED
 
 add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)
+trex_lib(TREXdomain)
 
 install(DIRECTORY . DESTINATION include/trex/domain
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

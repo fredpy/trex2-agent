@@ -48,6 +48,7 @@ add_library(TREXutils SHARED
 
 add_dependencies(core TREXutils)
 target_link_libraries(TREXutils ${SYSTEM_LIBRARIES})
+trex_lib(TREXutils)
 
 set_property(SOURCE Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
