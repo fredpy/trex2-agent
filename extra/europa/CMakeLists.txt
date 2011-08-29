@@ -55,7 +55,8 @@ if(WITH_EUROPA)
     set_property(TARGET TREXeuropa PROPERTY ${EUROPA_LIBRARIES})
     target_link_libraries(TREXeuropa ${EUROPA_LIBRARIES} TREXtransaction)
     
-    install(TARGETS TREXeuropa DESTINATION lib)    
+    install(TARGETS TREXeuropa DESTINATION lib) 
+    trex_lib(TREXeuropa)
 
     install(DIRECTORY . DESTINATION include/trex/europa
       FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
