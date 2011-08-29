@@ -268,8 +268,8 @@ bool DbCore::update_externals() {
 				<<obs->getUnqualifiedPredicateName().toString();
 	  return false;
 	}
-	if( obs->canBeCommitted() )
-	  obs->commit();
+	// if( obs->canBeCommitted() )
+	//   obs->commit();
       }
       i->second = obs;
       // succeeded on integrating the new observation
@@ -497,10 +497,11 @@ bool DbCore::relax(bool aggressive) {
 	(*i)->discard();	
     } else if( (*i)->isCommitted() ) {
       debugMsg("trex:relax", "Cancelling slaves of "<<(*i)->toString());
+
       for(EUROPA::TokenSet::const_iterator it=(*i)->slaves().begin();
-	  (*i)->slaves().end()!=it; ++it) 
-	if( !(*it)->isInactive() )
-	  (*it)->cancel();
+      	  (*i)->slaves().end()!=it; ++it) 
+      	if( (*it)->isClosed() && !(*it)->isInactive() )
+      	  (*it)->cancel();
 	  
     } else 
       (*i)->cancel();

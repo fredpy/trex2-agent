@@ -217,10 +217,14 @@ void Assembly::logPlan(std::ostream &out) const {
       all_toks.end()!=i; ++i) {
     EUROPA::eint key = (*i)->getKey();
     out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
+       <<" id "<<key<<"\\n"
        <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
        <<" duration "<<(*i)->duration()->lastDomain().toString()<<"\\n"
        <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
-       <<" state "<<(*i)->getState()->lastDomain().toString()<<"\"";
+       <<" state "<<(*i)->getState()->lastDomain().toString();
+    if( (*i)->isCommitted() )
+      out<<"\\n committed";
+    out<<"\"";
     if( ignored(*i) )
       out<<" color=grey";
     else if( in_deliberation(*i) )
@@ -665,7 +669,18 @@ std::pair<EUROPA::ObjectId, EUROPA::TokenId> Assembly::convert(Predicate const &
   return std::make_pair(timeline, tok);
 }
 
+void Assembly::mark_inactive() {
+  debugMsg("trex:delib", "set to INACTIVE");
+  m_state = INACTIVE;
+}
+
 void Assembly::mark_active() {
+  debugMsg("trex:delib", "set to ACTIVE");
   m_state = ACTIVE;
   m_reactor.reset_deliberation();
+}
+
+void Assembly::mark_invalid() {
+  debugMsg("trex:delib", "set to INVALID");
+  m_state = INVALID;
 }

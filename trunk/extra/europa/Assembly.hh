@@ -500,14 +500,9 @@ namespace TREX {
       bool invalid() const {
         return INVALID==m_state;
       }
-      void mark_inactive() {
-        m_state = INACTIVE;
-      }
+      void mark_inactive(); 
       void mark_active();
-      void mark_invalid() {
-        m_state = INVALID;
-      }
-
+      void mark_invalid();
       TREX::transaction::TICK final_tick() const;
       
       void logPlan(std::ostream &out) const;
