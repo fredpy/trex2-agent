@@ -174,7 +174,7 @@ trex_cfg(cfg shared/trex)
 add_subdirectory(extra) 
 
 # add your sub directories here if needed
-# add_subdirectory(mbari) # MBARI specific components
+add_subdirectory(mbari) # MBARI specific components
 
 ########################################################################
 # Finalize                                                             #
@@ -203,37 +203,3 @@ install(DIRECTORY log DESTINATION shared/trex/log
 # ########################################################################
 # find_package(Wt)
 
-# ########################################################################
-# # tracker                                                          #
-# ########################################################################
-# find_package(Protobuf)
-
-# if(PROTOBUF_FOUND) 
-#   add_subdirectory(mbari/tracker)
-# endif(PROTOBUF_FOUND)
-
-
-# install(DIRECTORY cfg DESTINATION shared/trex 
-#   FILES_MATCHING PATTERN "*" 
-#   PATTERN ".svn" EXCLUDE)
-
-# # create the default log directory
-# install(DIRECTORY log DESTINATION shared/trex/log
-#   DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
-#   FILES_MATCHING PATTERN "*" EXCLUDE)
-  
-# list(REMOVE_DUPLICATES Trex_LIBRARY_DIRS)
-# list(REMOVE_DUPLICATES Trex_CONFIG_DIRS)
-
-# # prepare list for bash
-# string(REPLACE ";" ":" TREX_LIBRARY_DIRS "${Trex_LIBRARY_DIRS}")
-# string(REPLACE ";" ":" TREX_CONFIG_DIRS "${Trex_CONFIG_DIRS}")
-
-# # A file just for testing inside the build directory
-# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_devel.bash.in
-#   ${CMAKE_CURRENT_BINARY_DIR}/trex_devel.bash @ONLY)
-
-# # create a default bash environement file for installed version
-# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
-#   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
