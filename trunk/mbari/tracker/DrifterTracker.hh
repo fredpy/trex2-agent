@@ -1,7 +1,7 @@
 #ifndef H_DrifterTracker 
 # define H_DrifterTracker
 
-# include <set>
+# include <map>
 
 # include "AMQP_listener.hh"
 
@@ -25,7 +25,18 @@ namespace mbari {
     std::auto_ptr<amqp::listener> m_listener;
     std::auto_ptr<boost::thread>  m_thread;
 
-    std::set<TREX::utils::Symbol>  m_drifters;
+    struct point {
+      point() 
+	:valid(false) {}
+      bool update(time_t t, double n, double e, double &sn, double &se);
+	
+      
+      bool valid;
+      time_t date;
+      double north, east;
+    };
+
+    std::map<TREX::utils::Symbol, point >  m_drifters;
     TREX::utils::Symbol            m_trexMsg;
 
     TREX::transaction::Observation trex_msg(amqp::queue::message const &msg);
