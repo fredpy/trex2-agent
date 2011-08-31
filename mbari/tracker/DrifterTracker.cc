@@ -1,33 +1,30 @@
+#include <set>
+
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 
 #include <rapidxml/rapidxml.hpp>
+#include <mbari/shared/GeoUTM.hh>
 
 #include "DrifterTracker.hh"
 
-#include "mbari/tracker/platformMessage.pb.h"
+#include "platformMessage.pb.h"
 
 using namespace mbari;
 using namespace TREX::transaction;
 
 namespace {
 
-  /** @brief TREX log entry point */
-  TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
-
   /** @brief Light reactor declaration */
   TeleoReactor::xml_factory::declare<DrifterTracker> decl("DrifterTracker");  
-}
 
-namespace TREX {
-  
-  void initPlugin() {
-    ::s_log->syslog("plugin.tracker")<<"MBARI tracker loaded."<<std::endl;
-    // ::decl;
+  int const WGS_84 = 23;
+
+  void geo_to_utm(double lat, double lon, double &north, double &east) {
+    char zone[4];
+    LLtoUTM(WGS_84, lat, lon, north, east, zone);
   }
-
-} // TREX
-
+}
 
 DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg) 
   :TeleoReactor(arg, false) {
@@ -69,7 +66,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
 	  if( exchs.insert(exch_name).second ) {
 	    m_queue->bind(exch_name, "");
 	  }	  
-	  m_drifters.insert(tl_name);
+	  m_drifters.insert(std::make_pair(tl_name, point()));
 	} else 
 	  syslog("WARN")<<"Failed to declare "<<tl_name<<" as Internal."
 			<<"\n\tI will not track this asset.";
@@ -106,21 +103,40 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
   
   if( report.ParseFromArray(msg.body(), msg.size()) ) {
     if( report.has_name() ) {
-      TREX::utils::Symbol name(report.name());
-      if( m_drifters.end()!=m_drifters.find(name) ) {
+      std::map<TREX::utils::Symbol, point>::iterator 
+	i  = m_drifters.find(report.name());
+      
+      if( m_drifters.end()!=i ) {
+	// I only accpet message that have :
+	//  -  a date
+	//  - a position 
+	time_t sec;
+	double lat, lon;
+
 	// build the Observation
-	Observation obs(name, "Msg");
+	Observation obs(i->first, "Msg");
+	
 	if( report.has_epoch_seconds() ) {
-	  time_t sec = report.epoch_seconds();
-	  suseconds_t usec = 0;
-	  TICK date = timeToTick(sec, usec);
-	  obs.restrictAttribute("tick", IntegerDomain(date));
+	  sec = report.epoch_seconds();
+	  obs.restrictAttribute("tick", IntegerDomain(timeToTick(sec)));
+	  if( report.has_latitude() ) {
+	    lat = report.latitude();
+	    obs.restrictAttribute("latitude", FloatDomain(lat));
+	 	  
+	    if( report.has_longitude() ) {
+	      lon = report.longitude();
+	      obs.restrictAttribute("longitude", FloatDomain(lon));
+
+	      double north, east, sn, se;
+	      geo_to_utm(report.latitude(), report.longitude(), north, east);
+	      if( i->second.update(sec, north, east, sn, se) ) {
+		obs.restrictAttribute("speed_north", FloatDomain(sn));
+		obs.restrictAttribute("speed_east", FloatDomain(se));
+	      }	
+	      postObservation(obs);	
+	    }
+	  }
 	}
-	if( report.has_latitude() ) 
-	  obs.restrictAttribute("latitude", FloatDomain(report.latitude()));
-	if( report.has_longitude() ) 
-	  obs.restrictAttribute("longitude", FloatDomain(report.longitude()));
-	postObservation(obs);
       }
     }
   } 
@@ -133,8 +149,26 @@ Observation DrifterTracker::trex_msg(amqp::queue::message const &msg) {
   rapidxml::xml_node<> *root = doc.first_node();
   Observation obs("MessagesFromTrex", root->name());
   time_t sec = TREX::utils::parse_attr<time_t>(*root, "utime"); 
-  suseconds_t usec = 0;
-  TICK date = timeToTick(sec, usec);
-  obs.restrictAttribute("tick", IntegerDomain(date));
+  obs.restrictAttribute("tick", IntegerDomain(timeToTick(sec)));
   return obs;
+}
+
+bool DrifterTracker::point::update(time_t t, double n, double e, double &sn, 
+				   double &se) {
+  bool ret = false;
+
+  if( valid ) {
+    long dt = t-date;
+    sn = (n-north);
+    se = (e-east);
+    sn /= dt;
+    se /= dt;
+    ret = true;
+  }
+  date = t;
+  north = n;
+  east = e;
+  valid = true;
+  
+  return ret;
 }

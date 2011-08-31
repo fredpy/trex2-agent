@@ -1,0 +1,18 @@
+#include "TREX.nddl"
+
+class Drifter extends AgentTimeline {
+    predicate Msg {
+        int tick;
+	double latitude;
+	double longitude;
+
+	double speed_north, speed_east;
+    }
+    
+    Drifter() {
+        super(Observe, "undefined");
+    }
+}
+
+    
+

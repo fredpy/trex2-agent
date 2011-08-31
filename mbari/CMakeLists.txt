@@ -32,41 +32,13 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-option(MBARI_TRACKER "Enable ODSS platform tracker." ON)
-mark_as_advanced(MBARI_TRACKER) 
+option(MBARI_ENABLED "Enable MBARI specific code." OFF) 
 
-if(MBARI_TRACKER)
-  find_package(Protobuf)
-  check_library_exists(rabbitmq amqp_new_connection "" LIB_AMQP)
-  
-  if(LIB_AMQP)
-    if(PROTOBUF_FOUND)
-      include_directories(${PROTOBUF_INCLUDE_DIRS})
-      include_directories(${CMAKE_CURRENT_BINARY_DIR})
-      protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS platformMessage.proto)
-      add_library(MBARIamqp SHARED
-	AMQP_connection.cc
-	AMQP_listener.cc
-	AMQP_queue.cc
-	${PROTO_SRCS}
-	DrifterTracker.cc)
-      target_link_libraries(MBARIamqp 
-	MBARIshared
-	TREXtransaction 
-	rabbitmq
-	${Boost_LIBRARIES}
-	${PROTOBUF_LIBRARIES})
-      install(TARGETS MBARIamqp DESTINATION lib)    
-      trex_lib(MBARIamqp)
+if(MBARI_ENABLED)
+  add_custom_target(mbari COMMENT "MBARI specific targets")
+  trex_cfg(cfg shared/trex)
+  add_subdirectory(shared)
+  add_subdirectory(tracker)
+  add_subdirectory(europa)
+endif(MBARI_ENABLED)
 
-      trex_plugin(dta tracker_plugin.cc)
-      target_link_libraries(dta_pg MBARIamqp)          
-    else(PROTOBUF_FOUND)
-      message(SEND_ERROR "Cannot compile MBARI tracker without protobuf")
-    endif(PROTOBUF_FOUND)   
-  else(LIB_AMQP)
-    message(SEND_ERROR "Cannot compile MBARI tracker without rabbitmq")
-  endif(LIB_AMQP)
-endif(MBARI_TRACKER)
-
-# install(TARGETS TREXtracker DESTINATION shared/trex/plugins OPTIONAL)
