@@ -29,6 +29,16 @@ namespace {
     return dom.intersect(_lb, _ub);
   }
 
+  class MBARIPlugin :public TREX::europa::SchemaPlugin {
+  public:
+    void registerComponents(TREX::europa::Assembly const &assembly) {
+      TREX_REGISTER_CONSTRAINT(assembly,mbari::europa::GeoUTMConstraint, 
+			       geo_to_utm, trex);
+    }
+  };
+
+  MBARIPlugin europa_extensions;
+
 }
 
 using namespace mbari::europa;
