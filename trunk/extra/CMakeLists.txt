@@ -39,6 +39,8 @@ macro(trex_plugin name src)
   add_dependencies(plugins ${name}_pg)
   install(TARGETS ${name}_pg DESTINATION shared/trex OPTIONAL)
   trex_cfg(cfg shared/trex)
+  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
+    ${CMAKE_CURRENT_BINARY_DIR})
   trex_lib(${name}_pg)
 endmacro(trex_plugin)
 
