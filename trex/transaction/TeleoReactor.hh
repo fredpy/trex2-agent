@@ -773,6 +773,7 @@ namespace TREX {
 			
       external_set m_externals;
       internal_set m_internals;
+      internal_set m_updates;
 			
       /** @brief TREX log entry point
        *

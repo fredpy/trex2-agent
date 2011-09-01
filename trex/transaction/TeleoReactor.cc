@@ -280,7 +280,8 @@ void TeleoReactor::postObservation(Observation const &obs) {
 			       obs.object().str()+" which is not Internal.");
   
   (*i)->postObservation(getCurrentTick(), obs);
-  syslog("ASSERT")<<obs;
+  m_updates.insert(*i);
+  // syslog("ASSERT")<<obs;
 }
 
 bool TeleoReactor::postGoal(goal_id const &g) {
@@ -345,7 +346,7 @@ bool TeleoReactor::initialize(TICK final) {
 void TeleoReactor::newTick() {
   if( m_firstTick ) {
     if( getCurrentTick()!=m_initialTick ) {
-      syslog("WARN")<<"Updating initiali tick from "<<m_initialTick
+      syslog("WARN")<<"Updating initial tick from "<<m_initialTick
 		    <<" to "<<getCurrentTick();
       m_initialTick = getCurrentTick();
     }
@@ -374,8 +375,13 @@ void TeleoReactor::doNotify() {
 bool TeleoReactor::doSynchronize() {
   try {
     // Update the timelines here !
-    if( synchronize() )
+    if( synchronize() ) {
+      for(internal_set::const_iterator i=m_updates.begin();
+	  m_updates.end()!=i; ++i) 
+	syslog("ASSERT")<<(*i)->lastObservation();
+      m_updates.clear();
       return true;
+    }
   } catch(Exception const &e) {
     syslog("SYNCH")<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
