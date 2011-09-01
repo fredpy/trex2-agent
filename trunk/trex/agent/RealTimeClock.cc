@@ -35,11 +35,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+#include <cmath>
+
 #include "RealTimeClock.hh"
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::agent;
+
 
 namespace {
   
@@ -133,11 +136,11 @@ TICK RealTimeClock::timeToTick(time_t secs, suseconds_t usecs) const {
   
   {
     mutex_type::scoped_lock guard(m_lock);
-    delta = to_double(m_nextTickDate-tv);
+    delta = to_double(tv-m_nextTickDate);
     current = m_tick+1;
   }
   delta /= tickDuration();
-  current += std::floor(delta);
+  current += std::floor(delta+0.5); // do a rounding to reduce precision impact
   return current;
 }
 
