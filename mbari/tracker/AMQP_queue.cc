@@ -49,7 +49,7 @@ void queue::bind(std::string const &exchange, std::string const &key) {
     exch = amqp_bytes_malloc_dup(amqp_cstring_bytes(exchange.c_str()));    
 
     amqp_queue_bind(m_conn.m_conn, m_channel, m_name, exch, k, amqp_empty_table);
-    m_conn.check_rpc_reply("bind("+exchange+", "+key+")");    
+    m_conn.check_rpc_reply("bind(\""+exchange+"\", \""+key+"\")");    
   }
 }
 

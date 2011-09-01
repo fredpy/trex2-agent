@@ -31,10 +31,12 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
   m_connection.open("messaging.shore.mbari.org", 5672);
   m_connection.login("tracking", "MBARItracking", "trackingvhost");
 
-  m_queue = m_connection.create_queue(getName().str());
+  syslog("amqp")<<"Creating queue \"trex2"<<getName()<<std::endl;
+  m_queue = m_connection.create_queue("trex2"+getName().str());
   provide("MessagesFromTrex");
   if( isInternal("MessagesFromTrex") ) {    
     // Bind to TREX messages
+    syslog("amqp")<<"Binding to TREX messages (MessagesFromTrex/SensorApp)";
     m_queue->bind("MessagesFromTrex", "SensorApp");
   } else 
     syslog("WARN")<<"MessagesFromTrex timeline already declared";
@@ -64,6 +66,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
 	provide(tl_name);
 	if( isInternal(tl_name) ) {
 	  if( exchs.insert(exch_name).second ) {
+	    syslog("amqp")<<"Binding to "<<exch_name<<"/*";
 	    m_queue->bind(exch_name, "");
 	  }	  
 	  m_drifters.insert(std::make_pair(tl_name, point()));
@@ -80,6 +83,8 @@ DrifterTracker::~DrifterTracker() {}
 
 void DrifterTracker::handleInit() {
   // It is time to start my thread 
+  syslog()<<"Initialize queue.";
+  m_queue->configure(false, true, false);
   syslog()<<"Starting the amqp queue listener.";
   m_thread.reset(new boost::thread(*m_listener));
 }
@@ -112,6 +117,7 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
 	//  - a position 
 	time_t sec;
 	double lat, lon;
+	syslog("amqp")<<"New message from "<<report.name();
 
 	// build the Observation
 	Observation obs(i->first, "Msg");
@@ -137,6 +143,8 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
 	    }
 	  }
 	}
+      } else {
+	syslog("amqp")<<"Ignoring message from "<<report.name();
       }
     }
   } 
