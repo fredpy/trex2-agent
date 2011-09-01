@@ -22,6 +22,7 @@ void listener::run() {
   m_running = true;
   try {
     while( is_running() ) {
+      // std::cerr<<"Listening to queue ... "<<std::endl;
       m_handler->handle(m_queue->consume());
       boost::thread::yield();
     }
@@ -29,6 +30,7 @@ void listener::run() {
     m_running = false;
     throw;
   }
+  // std::cerr<<"EOT"<<std::endl;
 }
 
 bool msg_buffer::empty() const {
