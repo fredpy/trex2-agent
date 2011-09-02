@@ -96,7 +96,7 @@ namespace TREX {
       bool is_goal(EUROPA::TokenId const &tok) const {
 	return m_goals.end()!=m_goals.find(tok);
       }
-      bool remove_goal(EUROPA::TokenId const &tok, bool restrict=true);
+      bool remove_goal(EUROPA::TokenId const &tok, bool doRestrict=true);
       bool reset_goal(EUROPA::TokenId const &tok, bool aggressive);
 
       EUROPA::TokenSet m_goals;
