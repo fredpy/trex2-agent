@@ -436,9 +436,9 @@ bool DbCore::update_internals(size_t &steps) {
   return propagate();
 }
 
-bool DbCore::remove_goal(EUROPA::TokenId const &tok, bool restrict) {
+bool DbCore::remove_goal(EUROPA::TokenId const &tok, bool doRestrict) {
   if( m_goals.erase(tok) ) {
-    if( restrict ) {
+    if( doRestrict ) {
       tok->restrictBaseDomains();
       // enforce_duration(tok);
     }
