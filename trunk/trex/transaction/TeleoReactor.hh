@@ -213,9 +213,38 @@ namespace TREX {
 	return m_graph.tickDuration();
       }
 
+      /** @brief unix time to tick conversion
+       * @param[in] secs Number of seconds
+       * @param[in] usecs Number of microseconds
+       *
+       * @return equivalent tick to the time @p secs.usecs
+       *
+       * This method is an utility to ease the conversion form unix time to tick
+       * it calls the agent clock corresponding method to convert the specified
+       * unix time into a tick value
+       *
+       * @note the result of the method depends on the clock implementation.
+       * For example the RealTimeClock fully support it while the StepClock
+       * will simply assume that unixtime and tick are perfeclty aligned 
+       * (as if the mission started on January 1st 1970)
+       */
       TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return m_graph.timeToTick(secs, usecs);
       }
+      /** @brief tick to unix time conversion
+       * @param[in] cur A tick value
+       *
+       * @return equivalent unix time to @p cur as a float 
+       *
+       * This method is an utility to ease the conversion form a tick to unix time 
+       * it calls the agent clock corresponding method to convert the specified
+       * tick value into unix time
+       *
+       * @note the result of the method depends on the clock implementation.
+       * For example the RealTimeClock fully support it while the StepClock
+       * will simply assume that unixtime and tick are perfeclty aligned 
+       * (as if the mission started on January 1st 1970)
+       */
       double tickToTime(TICK cur) const {
 	return m_graph.tickToTime(cur);
       }

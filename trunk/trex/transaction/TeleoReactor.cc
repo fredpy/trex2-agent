@@ -329,7 +329,7 @@ bool TeleoReactor::initialize(TICK final) {
   syslog()<<"Creation tick is "<<getInitialTick();
   syslog()<<"Execution latency is "<<getExecLatency();
   try {
-    handleInit();   // allow derived class intialization
+    handleInit();   // allow derived class initialization
     m_firstTick = true;
     m_inited = true;
     return true;
