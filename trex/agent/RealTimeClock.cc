@@ -144,6 +144,21 @@ TICK RealTimeClock::timeToTick(time_t secs, suseconds_t usecs) const {
   return current;
 }
 
+double RealTimeClock::tickToTime(TICK cur) const {
+  TICK current;
+  double next;
+  {
+    mutex_type::scoped_lock guard(m_lock);
+    next = to_double(m_nextTickDate);
+    current = m_tick+1;
+  }  
+  double d_tick = cur-current;
+  d_tick *= tickDuration();
+
+  return next+d_tick;
+}
+
+
 double RealTimeClock::timeLeft() const {
   timeval tv;
   getDate(tv);
