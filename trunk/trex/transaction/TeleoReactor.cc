@@ -194,7 +194,8 @@ TREX::utils::internals::LogEntry details::external::syslog() {
 
 
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
-  :m_inited(false), m_firstTick(true), m_graph(*(arg.second)), 
+  :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
+   m_trLog(NULL),
    m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
    m_latency(parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
@@ -204,6 +205,10 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
     rapidxml::xml_node<> &node(xml_factory::node(arg));
     Symbol tl_name;
     
+    if( parse_attr<bool>(true, node, "log") ) {
+      syslog("WARN")<<"Logging is not dsupported yet (coming soon)";
+    }
+
     for(ext_iterator iter(node, "config"); iter.valid(); ++iter) {
       if( is_tag(*iter, "External") ) {
 	tl_name = parse_attr<Symbol>(*iter, "name");
@@ -222,9 +227,14 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
    
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name, 
 			   TICK latency, TICK lookahead, bool log)
-  :m_inited(false), m_firstTick(true), m_graph(*owner), m_name(name),
+  :m_inited(false), m_firstTick(true), m_graph(*owner), m_trLog(NULL),
+   m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
-   m_nSteps(0) {}
+   m_nSteps(0) {
+  if( log ) {
+    syslog("WARN")<<"Logging is not dsupported yet (coming soon)";
+  }
+}
 
 TeleoReactor::~TeleoReactor() {
   isolate();
