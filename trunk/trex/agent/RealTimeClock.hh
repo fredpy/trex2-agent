@@ -110,6 +110,7 @@ namespace TREX {
 
       TREX::transaction::TICK timeToTick(time_t secs, 
 					 suseconds_t usecs=0) const;
+      double tickToTime(TREX::transaction::TICK cur) const;
 
     private:
       /** @brief Start the clock
