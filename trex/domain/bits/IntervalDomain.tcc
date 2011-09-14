@@ -60,7 +60,7 @@ IntervalDomain<Ty, Cmp>::bound::print_to(std::ostream &out)  const {
     out<<(m_pos?'+':'-')<<"inf";
   else {
     out.setf(std::ios::fixed);
-    out.precision(2); // 2 significant digits
+    out.precision(4); // 4 significant digits
     out<<m_value;
   }
   return out;
