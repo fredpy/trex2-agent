@@ -216,6 +216,9 @@ namespace TREX {
       TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return m_graph.timeToTick(secs, usecs);
       }
+      double tickToTime(TICK cur) const {
+	return m_graph.tickToTime(cur);
+      }
       /** @brief Get current tick
        *
        * @return current tick date

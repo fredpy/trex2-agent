@@ -266,6 +266,9 @@ namespace TREX {
       virtual TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return secs;
       }	
+      virtual double tickToTime(TICK cur) const {
+	return cur*tickDuration();
+      }
 
       size_type count_reactors() const {
 	return m_reactors.size();
