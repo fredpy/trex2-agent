@@ -231,7 +231,7 @@ void europa_domain::visit(BasicEnumerated const *dom) {
 	values.push_back(val);
     }
     if( values.empty() )
-      throw EmptyDomain(*dom, "EUROPA domain became empty.");
+      throw EmptyDomain(*dom, "EUROPA enumerated domain "+m_dom->toString()+"became empty.");
     m_dom->empty();
     m_dom->insert(values);
   } else 
@@ -245,7 +245,7 @@ void europa_domain::visit(BasicInterval const *dom) {
     tmp->intersect(m_type->createValue(dom->getStringLower()),
 		   m_type->createValue(dom->getStringUpper()));
     if( tmp->isEmpty() )
-      throw EmptyDomain(*dom, "EUROPA domain became empty.");
+      throw EmptyDomain(*dom, "EUROPA interval domain "+m_dom->toString()+"became empty.");
     m_dom->intersect(*tmp);
   } else 
     throw DomainAccess(*dom, "EUROPA domain is not an interval.");
@@ -258,7 +258,7 @@ void europa_domain::visit(DomainBase const *dom, bool) {
     EuropaDomain const &dd = dynamic_cast<EuropaDomain const &>(*dom);
     
     if( !m_dom->intersect(dd.europaDomain()) )
-      throw EmptyDomain(*dom, "EUROPA domain became empty.");
+      throw EmptyDomain(*dom, "EUROPA domain "+m_dom->toString()+" became empty.");
   } else 
     throw DomainAccess(*dom, "Don't know how to convert domain "
 		       +type.str()+" for EUROPA");

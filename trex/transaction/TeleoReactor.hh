@@ -770,7 +770,31 @@ namespace TREX {
       bool m_inited;
       bool m_firstTick;
       graph &m_graph;
-			
+
+      class Logger {
+      public:
+	Logger(std::string const &dest);
+	~Logger();
+	
+	void provide(TREX::utils::Symbol const &name);
+	void use(TREX::utils::Symbol const &name);
+
+	void unprovide(TREX::utils::Symbol const &name);
+	void unuse(TREX::utils::Symbol const &name);
+	
+	void newTick(TICK val);
+	
+	void observation(Observation const &obs);
+	void request(goal_id const &goal);
+	void recall(goal_id const &goal);
+
+      private:
+	std::ofstream &m_file;	
+	bool m_header, m_tick;
+      }; // TREX::transaction::TeleoReactor::Logger
+	
+      Logger *m_trLog;
+		
       /** @brief Reactor name
        *
        * This is the name of the reactor. It is used to idenitify the

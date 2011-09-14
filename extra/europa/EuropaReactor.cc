@@ -336,6 +336,7 @@ void EuropaReactor::resume() {
   if( m_assembly.solver().isExhausted() ) {
     syslog("WARN")<<"No plan found.";
     m_assembly.mark_invalid();
+    return;
   }
   ++m_steps;
   if( !m_core.step() ) {
