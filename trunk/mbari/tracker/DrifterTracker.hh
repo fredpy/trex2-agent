@@ -27,19 +27,33 @@ namespace mbari {
 
     struct point {
       point() 
-	:valid(false) {}
-      bool update(time_t t, double n, double e, double &sn, double &se);
-	
-      
-      bool valid;
+	:valid(false), with_speed(false) {}
+      void update(time_t t, double n, double e);
+      bool is_valid() const {
+	return valid;
+      }
+      bool has_speed() const {
+	return with_speed;
+      }
+
+      std::pair<double, double> const &speed() const {
+	return m_speed;
+      }
+      time_t last_update() const {
+	return date;
+      }
+      std::pair<double, double> position(time_t now) const;      
+
+    private:
       time_t date;
-      double north, east;
+      std::pair<double, double> m_position, m_speed;
+      bool valid, with_speed;
     };
 
     std::map<TREX::utils::Symbol, point >  m_drifters;
     TREX::utils::Symbol            m_trexMsg;
 
-    TREX::transaction::Observation trex_msg(amqp::queue::message const &msg);
+    void trex_msg(amqp::queue::message const &msg);
     void drifter_msg(amqp::queue::message const &msg);
   };
 
