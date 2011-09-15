@@ -241,11 +241,18 @@ void europa_domain::visit(BasicEnumerated const *dom) {
 void europa_domain::visit(BasicInterval const *dom) {
   if( m_dom->isInterval() ) {
     std::auto_ptr<EUROPA::Domain> tmp(m_dom->copy());
-    
-    tmp->intersect(m_type->createValue(dom->getStringLower()),
-		   m_type->createValue(dom->getStringUpper()));
+    std::string lo = dom->getStringLower(), hi = dom->getStringUpper();
+
+
+    debugMsg("trex:assign", "Attempting to intersect "<<m_dom->toString()
+	     <<" with ["<<lo<<", "<<hi<<"]");
+    EUROPA::edouble elo = m_type->createValue(lo), ehi = m_type->createValue(hi);
+    debugMsg("trex:assign", "  - converted ["<<lo<<", "<<hi
+	     <<"] into europa "<<m_type->getNameString()<<" ["<<elo<<", "<<ehi<<"]");
+    tmp->intersect(elo, ehi);
+    debugMsg("trex:assign", "  - intersection is "<<tmp->toString());
     if( tmp->isEmpty() )
-      throw EmptyDomain(*dom, "EUROPA interval domain "+m_dom->toString()+"became empty.");
+      throw EmptyDomain(*dom, "EUROPA interval domain "+m_dom->toString()+" became empty.");
     m_dom->intersect(*tmp);
   } else 
     throw DomainAccess(*dom, "EUROPA domain is not an interval.");

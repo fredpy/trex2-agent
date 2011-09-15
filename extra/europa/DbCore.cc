@@ -496,15 +496,19 @@ bool DbCore::relax(bool aggressive) {
   		 <<(*i)->getPredicateName().toString());
 	(*i)->discard();	
     } else if( (*i)->isCommitted() ) {
-      debugMsg("trex:relax", "Cancelling slaves of "<<(*i)->toString());
+      debugMsg("trex:relax", "Canceling slaves of "<<(*i)->toString());
 
       for(EUROPA::TokenSet::const_iterator it=(*i)->slaves().begin();
       	  (*i)->slaves().end()!=it; ++it) 
-      	if( (*it)->isClosed() && !(*it)->isInactive() )
+      	if( (*it)->isClosed() && !(*it)->isInactive() ) {
+	  debugMsg("trex:relax", "\t cancel "<<(*it)->toString());
       	  (*it)->cancel();
+	}
 	  
-    } else 
+    } else if( !(*i)->isInactive() ) {
+      debugMsg("trex:relax", "Canceling token "<<(*i)->toString());
       (*i)->cancel();
+    }
   }
 
   debugMsg("trex:relax", "evaluating "<<m_goals.size()
