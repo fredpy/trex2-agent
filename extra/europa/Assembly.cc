@@ -216,12 +216,16 @@ void Assembly::logPlan(std::ostream &out) const {
   for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
       all_toks.end()!=i; ++i) {
     EUROPA::eint key = (*i)->getKey();
-    out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"\\n"
-       <<" id "<<key<<"\\n"
-       <<" start "<<(*i)->start()->lastDomain().toString()<<"\\n"
-       <<" duration "<<(*i)->duration()->lastDomain().toString()<<"\\n"
-       <<" end "<<(*i)->end()->lastDomain().toString()<<"\\n"
-       <<" state "<<(*i)->getState()->lastDomain().toString();
+    out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"{\\n"
+       <<" id "<<key<<"\\n";
+    std::vector<EUROPA::ConstrainedVariableId> 
+      const &vars = (*i)->getVariables();
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator j=vars.begin();
+	vars.end()!=j; ++j) {
+      out<<(*j)->getName().toString()<<"=="<<(*j)->toString()<<"\\n";
+    }
+    out<<"}";
+	
     if( (*i)->isCommitted() )
       out<<"\\n committed";
     out<<"\"";
