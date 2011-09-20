@@ -384,6 +384,28 @@ void EuropaReactor::request(EUROPA::ObjectId const &tl,
   if( m_external_goals.end()==i ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal myGoal(name, tok->getUnqualifiedPredicateName().toString());
+
+    std::vector<EUROPA::ConstrainedVariableId> const &attr = tok->parameters();
+    
+    // Get start, duration and end
+    std::auto_ptr<TREX::transaction::DomainBase> 
+      d_start(details::trex_domain(tok->start()->lastDomain())),
+      d_duration(details::trex_domain(tok->duration()->lastDomain())),
+      d_end(details::trex_domain(tok->end()->lastDomain()));
+   
+    // I do not check the domains as I assume that they are integerdomain ... 
+    // and they should 
+    myGoal.restrictTime(*dynamic_cast<TREX::transaction::IntegerDomain *>(d_start.get()),
+			*dynamic_cast<TREX::transaction::IntegerDomain *>(d_duration.get()),
+			*dynamic_cast<TREX::transaction::IntegerDomain *>(d_end.get()));
+
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator j=attr.begin();
+	attr.end()!=j; ++j) {
+      std::auto_ptr<TREX::transaction::DomainBase> 
+	dom(details::trex_domain((*j)->lastDomain()));
+      TREX::transaction::Variable attr((*j)->getName().toString(), *dom);
+      myGoal.restrictAttribute(attr);
+   }
     
     goal_id request = postGoal(myGoal);
     if( request )
@@ -419,8 +441,15 @@ void EuropaReactor::notify(EUROPA::ObjectId const &tl,
   Observation obs(tl->getName().c_str(), 
 		  tok->getUnqualifiedPredicateName().toString());
   
+  std::vector<EUROPA::ConstrainedVariableId> const &attr = tok->parameters();
   // populate the observation 
-
+  for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator j=attr.begin();
+      attr.end()!=j; ++j) {
+    std::auto_ptr<TREX::transaction::DomainBase> 
+      dom(details::trex_domain((*j)->lastDomain()));
+    TREX::transaction::Variable attr((*j)->getName().toString(), *dom);
+    obs.restrictAttribute(attr);
+  }
   postObservation(obs);
 }
 

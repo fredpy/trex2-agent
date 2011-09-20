@@ -934,6 +934,11 @@ void DbCore::force_update(EUROPA::TokenId const &active, EUROPA::TokenId const &
   active->start()->handleBase(merged->start()->baseDomain());
   active->duration()->handleBase(merged->duration()->baseDomain());
   active->end()->handleBase(merged->end()->baseDomain());
+
+  std::vector<EUROPA::ConstrainedVariableId> const &attr = active->parameters();
+  for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator i=attr.begin();
+      attr.end()!=i; ++i) 
+    merged->getVariable((*i)->getName())->handleBase((*i)->lastDomain());
 }
 
 
