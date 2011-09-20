@@ -137,7 +137,8 @@ void timeline::postObservation(TICK date, Observation const &obs) {
 
 void timeline::request(goal_id const &g) {
   if( owned() ) {
-    owner().syslog(name().str())<<"Request received "<<g->predicate()<<'['<<g<<"].";
+    owner().syslog(name().str())<<"Request received ["<<g<<"] "
+				<<*g;
     owner().handleRequest(g);
   }
 }
