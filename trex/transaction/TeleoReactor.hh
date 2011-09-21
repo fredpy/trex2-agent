@@ -789,8 +789,8 @@ namespace TREX {
 	void recall(goal_id const &goal);
 
       private:
-	std::ofstream &m_file;	
-	bool m_header, m_tick;
+	std::ofstream m_file;	
+	bool m_tick;
       }; // TREX::transaction::TeleoReactor::Logger
 	
       Logger *m_trLog;

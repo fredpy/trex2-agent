@@ -201,13 +201,17 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
    m_maxDelay(0),
    m_lookahead(parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
    m_nSteps(0) {
+  rapidxml::xml_node<> &node(xml_factory::node(arg));
+  
+  if( parse_attr<bool>(true, node, "log") ) {
+    std::string log = manager().file_name(getName().str()+".tr.log");
+    m_trLog = new Logger(log);
+    syslog()<<"Transactions logged to "<<log;
+  }
+
   if( loadTL ) {
-    rapidxml::xml_node<> &node(xml_factory::node(arg));
     Symbol tl_name;
     
-    if( parse_attr<bool>(true, node, "log") ) {
-      syslog("WARN")<<"Logging is not dsupported yet (coming soon)";
-    }
 
     for(ext_iterator iter(node, "config"); iter.valid(); ++iter) {
       if( is_tag(*iter, "External") ) {
@@ -232,12 +236,16 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
   if( log ) {
-    syslog("WARN")<<"Logging is not dsupported yet (coming soon)";
+    std::string log = manager().file_name(getName().str()+".tr.log");
+    m_trLog = new Logger(log);
+    syslog()<<"Transactions logged to "<<log;
   }
 }
 
 TeleoReactor::~TeleoReactor() {
   isolate();
+  if( NULL!=m_trLog )
+    delete m_trLog;
 }
 
 // observers 
@@ -300,9 +308,12 @@ bool TeleoReactor::postGoal(goal_id const &g) {
 
   details::external tl(m_externals.find(g->object()), m_externals.end(), false);
   
-  if( tl.valid() )
-    return tl.post_goal(g);
-  else 
+  if( tl.valid() ) {
+    bool ret = tl.post_goal(g);
+    if( ret && NULL!=m_trLog )
+      m_trLog->request(g);
+    return ret;
+  } else 
     throw DispatchError(*this, g, "Goals can only be posted on External timelines");
 }
 
@@ -324,6 +335,8 @@ bool TeleoReactor::postRecall(goal_id const &g) {
 
   if( tl.valid() ) {
     tl.recall(g);
+    if( NULL!=m_trLog ) 
+      m_trLog->recall(g);
     return true;
   }
   return false;
@@ -362,6 +375,8 @@ void TeleoReactor::newTick() {
     }
     m_firstTick = false;
   }
+  if( NULL!=m_trLog )
+    m_trLog->newTick(getCurrentTick());
 
   handleTickStart(); // allow derived class processing
 
@@ -387,8 +402,11 @@ bool TeleoReactor::doSynchronize() {
     // Update the timelines here !
     if( synchronize() ) {
       for(internal_set::const_iterator i=m_updates.begin();
-	  m_updates.end()!=i; ++i) 
+	  m_updates.end()!=i; ++i) {
 	syslog("ASSERT")<<(*i)->lastObservation();
+	if( NULL!=m_trLog )
+	  m_trLog->observation((*i)->lastObservation());
+      }
       m_updates.clear();
       return true;
     }
@@ -438,13 +456,19 @@ void TeleoReactor::clear_externals() {
 
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
-  syslog()<<"Declared \""<<tl->name()<<"\".";
+  syslog()<<"Declared \""<<tl->name()<<"\".";  
+  if( NULL!=m_trLog ) {
+    m_trLog->provide(tl->name());
+  }
 }
 
 void TeleoReactor::unassigned(details::timeline *tl) {
   internal_set::iterator i = m_internals.find(tl);
   m_internals.erase(i);
   syslog()<<"Undeclared \""<<tl->name()<<"\".";
+  if( NULL!=m_trLog ) {
+    m_trLog->unprovide(tl->name());
+  }
 }
 
 void TeleoReactor::subscribed(Relation const &r) {
@@ -453,6 +477,9 @@ void TeleoReactor::subscribed(Relation const &r) {
   m_externals.insert(tmp);
   latency_updated(0, r.latency());
   syslog()<<"Subscribed to \""<<r.name()<<"\".";
+  if( NULL!=m_trLog ) {
+    m_trLog->use(r.name());
+  }
 }
 
 void TeleoReactor::unsubscribed(Relation const &r) {
@@ -466,6 +493,9 @@ void TeleoReactor::unsubscribed(Relation const &r) {
   // remove this relation
   m_externals.erase(i);
   syslog()<<"Unsubscribed from \""<<r.name()<<"\".";
+  if( NULL!=m_trLog ) {
+    m_trLog->unuse(r.name());
+  }
 }
 
 
@@ -494,3 +524,58 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
   }
 }
   
+/*
+ * class TREX::transaction::TeleoReactor::Logger 
+ */
+
+TeleoReactor::Logger::Logger(std::string const &file_name)
+  :m_file(file_name.c_str()), m_tick(false) {
+  m_file<<"<Log>\n  <header>"<<std::endl;
+}
+
+TeleoReactor::Logger::~Logger() {
+  if( m_tick ) 
+    m_file<<"  </tick";
+  else 
+    m_file<<"  </header";
+  m_file<<">\n</log>";
+}
+
+void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name) {
+  m_file<<"    <provide name=\""<<name<<"\"/>"<<std::endl;
+}
+
+void TeleoReactor::Logger::use(TREX::utils::Symbol const &name) {
+  m_file<<"    <unprovide name=\""<<name<<"\"/>"<<std::endl;
+}
+
+void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {
+  m_file<<"    <use name=\""<<name<<"\"/>"<<std::endl;
+}
+
+void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
+  m_file<<"    <unuse name=\""<<name<<"\"/>"<<std::endl;
+}
+
+void TeleoReactor::Logger::newTick(TICK val) {
+  if( m_tick ) 
+    m_file<<"  </tick";
+  else {
+    m_file<<"  </header";
+    m_tick = true;
+  }
+  m_file<<">\n  <tick value=\""<<val<<"\"/>"<<std::endl;
+}
+
+void TeleoReactor::Logger::observation(Observation const &obs) {
+  obs.toXml(m_file, 4)<<std::endl;
+}
+
+void TeleoReactor::Logger::request(goal_id const &goal) {
+  m_file<<"    <request id=\""<<goal<<"\">\n";
+  goal->toXml(m_file, 6)<<"\n    </request>"<<std::endl;
+}
+
+void TeleoReactor::Logger::recall(goal_id const &goal) {
+  m_file<<"    <recall id=\""<<goal<<"\"/>"<<std::endl;
+}
