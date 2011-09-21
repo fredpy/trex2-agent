@@ -47,6 +47,7 @@
 #include "FloatDomain.hh"
 #include "IntegerDomain.hh"
 #include "StringDomain.hh"
+#include "EnumDomain.hh"
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -70,12 +71,20 @@ namespace {
    * @ingroup domains
    */
   DomainBase::xml_factory::declare<StringDomain> declStr("string");  
+
+
+  /** @brief Declaration of the @c enum domain 
+   * @ingroup domains
+   */
+  DomainBase::xml_factory::declare<EnumDomain> decl_enum("enum");  
 }
 
 Symbol const BooleanDomain::type_name("bool");
 Symbol const IntegerDomain::type_name("int");
 Symbol const FloatDomain::type_name("float");
 Symbol const StringDomain::type_name("string");
+Symbol const EnumDomain::type_name("enum");
+
 
 BooleanDomain::BooleanDomain(rapidxml::xml_node<> const &node)
   :BasicInterval(node), m_full(true) {
