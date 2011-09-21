@@ -10,9 +10,8 @@
   	</OpenConditionManager>
 
   	<UnboundVariableManager defaultPriority="0">
-    		<FlawFilter var-match="start"/>
-    		<FlawFilter var-match="end"/>
-    		<FlawFilter var-match="duration"/>
+	  <!-- Block binding by the solver if varaibales are not singleton -->
+    		<FlawFilter component="Singleton"/>
     		<FlawHandler component="StandardVariableHandler"/>
   	</UnboundVariableManager>
 </Solver>
