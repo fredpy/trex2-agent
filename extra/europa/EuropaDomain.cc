@@ -38,6 +38,7 @@
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/StringDomain.hh>
+#include <trex/domain/EnumDomain.hh>
 
 #include "bits/europa_convert.hh"
 
@@ -95,6 +96,15 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   } else if( type->isEntity() ) {
     std::list<EUROPA::edouble> values;
     EuropaEntity tmp;
+    
+    dom.getValues(values);
+    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
+	values.end()!=i; ++i) 
+      tmp.add(type->toString(*i));
+    result.reset(tmp.copy());
+  } else if( type->isSymbolic() ) {
+    std::list<EUROPA::edouble> values;
+    TREX::transaction::EnumDomain tmp;
     
     dom.getValues(values);
     for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
