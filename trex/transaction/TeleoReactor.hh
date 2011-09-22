@@ -73,7 +73,7 @@ namespace TREX {
      *     reactors that declared this timline as @e External
      *
      * A reactor provide also informations about its latency and look-ahead which
-     * indicates its planning horizon and the maximum time it is expected to
+     * indicates its planning horizon and the maximum time it is exx1pected to
      * deliberate in order to produce a plan for the goals it received.
 		 
      * All these informations are used by the agent in order to schedule the
@@ -899,7 +899,7 @@ namespace TREX {
        */
       DispatchError(TeleoReactor const &r, goal_id const &g, std::string const &msg) throw()
 	:ReactorException(r, buil_msg(g, msg)) {}
-      /** @brief Desturctor */
+      /** @brief Destructor */
       ~DispatchError() throw() {}
       
     private:

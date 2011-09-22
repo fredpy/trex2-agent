@@ -39,6 +39,7 @@ add_library(TREXtransaction SHARED
   Relation.cc
   TeleoReactor.cc
   reactor_graph.cc
+  TransactionPlayer.cc
 )
 
 add_dependencies(core TREXtransaction)
