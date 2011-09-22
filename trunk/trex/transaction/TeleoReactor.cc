@@ -564,7 +564,7 @@ void TeleoReactor::Logger::newTick(TICK val) {
     m_file<<"  </header";
     m_tick = true;
   }
-  m_file<<">\n  <tick value=\""<<val<<"\"/>"<<std::endl;
+  m_file<<">\n  <tick value=\""<<val<<"\">"<<std::endl;
 }
 
 void TeleoReactor::Logger::observation(Observation const &obs) {
