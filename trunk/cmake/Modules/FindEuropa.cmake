@@ -42,12 +42,21 @@
 set(_europa_HINTS
   $ENV{EUROPA_HOME})
 
+option(EUROPA_DEBUG "Compile with Debug variant of Europa" OFF)
 
-set(_europa_VARIANT "_o") #only look for optimized 
 set(_europa_LIBRARIES ConstraintEngine Solvers NDDL System PlanDatabase 
   TemporalNetwork Resources TinyXml RulesEngine Utils)
 
-set(EUROPA_FLAGS TIXML_USE_STL;EUROPA_FAST)
+
+if(EUROPA_DEBUG)
+  set(_europa_VARIANT "_g") #only look for debug
+  set(_europa_FLAGS TIXML_USE_STL)
+else(EUROPA_DEBUG)
+  set(_europa_VARIANT "_o") #only look for optimized 
+  set(_europa_FLAGS TIXML_USE_STL;EUROPA_FAST)
+endif(EUROPA_DEBUG)
+
+set(EUROPA_FLAGS ${_europa_FLAGS} CACHE STRING "Flags to compile with Europa" FORCE)
 
 if(NOT Europa_FIND_COMPONENTS)
   # we need everything then
@@ -59,10 +68,12 @@ set(EUROPA_LIB_NAMES "")
 set(EUROPA_LIBRARIES "")
 set(EUROPA_LIBRARY_DIRS "")
 
-
-
 foreach(COMPONENT ${Europa_FIND_COMPONENTS})
   string(TOUPPER ${COMPONENT} UPPERCOMPONENT)
+  set(EUROPA_${UPPERCOMPONENT}_LIBRARY "" CACHE STRING "location of ${COMPONENT} europa lib" FORCE)
+  if(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
+    SET(EUROPA_${UPPERCOMPONENT}_LIBRARY "EUROPA_${UPPERCOMPONENT}_LIBRARY-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
+  endif(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
   find_library(EUROPA_${UPPERCOMPONENT}_LIBRARY
     NAMES ${COMPONENT}${_europa_VARIANT}
     HINTS ${_europa_HINTS}/lib
@@ -78,6 +89,10 @@ foreach(COMPONENT ${Europa_FIND_COMPONENTS})
     list(APPEND _europa_MISSING ${COMPONENT})
   endif(EUROPA_${UPPERCOMPONENT}_LIBRARY)
 endforeach(COMPONENT)
+
+if(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
+  SET(OLD_EUROPA_DBG ${EUROPA_DEBUG} CACHE INTERNAL "Former EUROPA_DEBUG value." FORCE)
+endif(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
 
 list(REMOVE_DUPLICATES EUROPA_LIBRARY_DIRS)
 
