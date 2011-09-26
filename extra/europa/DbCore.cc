@@ -562,6 +562,7 @@ bool DbCore::step() {
       assembly.mark_active();
     solver.step();
     m_reactor.logPlan("step");
+    debugMsg("trex:step", '['<<m_reactor.getCurrentTick()<<"] step done.");
     process_pending();
     if( solver.noMoreFlaws() ) {      
       debugMsg("trex:step", "No more flaws");
@@ -648,7 +649,10 @@ void DbCore::doNotify() {
 	       <<i->second->getUnqualifiedPredicateName().toString();
 	m_reactor.logPlan("failed");
       }
-      obs->getObject()->restrictBaseDomain(obs->getObject()->lastDomain());
+      debugMsg("trex:always", "WARNING : europa does not like me to restrict the object ... I won't do it then");
+      /*
+	obs->getObject()->restrictBaseDomain(obs->getObject()->lastDomain());
+      */
       for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator 
 	    v=obs->parameters().begin(); obs->parameters().end()!=v; ++v) 
 	(*v)->restrictBaseDomain((*v)->lastDomain());	            
@@ -730,7 +734,8 @@ void DbCore::process_pending() {
   std::swap(pending, m_pending);
   condDebugMsg(!pending.empty(), "trex:pending", '['<<cur<<"] "
 	       <<pending.size()<<" pending tokens");
-  for(EUROPA::TokenSet::const_iterator i=pending.begin(); pending.end()!=i; ++i) {
+  for(EUROPA::TokenSet::const_iterator i=pending.begin(); 
+      pending.end()!=i; ++i) {
     if( m_reactor.assembly().ignored(*i) ) {
       debugMsg("trex:token", '['<<cur<<"] IGNORE "<<(*i)->toString()
 	       <<": "<<(*i)->getPredicateName().toString());
@@ -740,7 +745,7 @@ void DbCore::process_pending() {
       if( master.isNoId() ) {
 	if( (*i)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED) ) {
 	  m_goals.insert(*i);
-	  // A new goal necessirly start during the mission 
+	  // A new goal necessarily starts during the mission 
 	  (*i)->start()->restrictBaseDomain(scope);
 	  // (*i)->start()->handleBase(scope);
 	  enforce_duration(*i);
@@ -753,8 +758,11 @@ void DbCore::process_pending() {
 	debugMsg("trex:token", '['<<cur<<"] FACT "<<(*i)->toString()
 		 <<": "<<(*i)->getPredicateName().toString());
       }
-      if( (*i)->isInactive() )
+      if( (*i)->isInactive() ) {
+	debugMsg("trex:token", '['<<cur<<"] added "<<(*i)->toString()
+		 <<": "<<(*i)->getPredicateName().toString()<<" to agenda");
 	add_to_agenda(*i);
+      }
     }
   }
 }

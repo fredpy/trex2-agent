@@ -52,10 +52,13 @@ DbSolver::~DbSolver() {
 // observers 
 
 bool DbSolver::noMoreFlaws() const {
-  EUROPA::IteratorId iter = m_solver->createIterator();
-  bool ret = m_solver->noMoreFlaws() && iter->done();
-  delete (EUROPA::Iterator *)iter;
-  return  ret;
+  if( m_solver->noMoreFlaws() ) {
+    EUROPA::IteratorId iter = m_solver->createIterator();
+    bool ret = m_solver->noMoreFlaws() && iter->done();
+    delete (EUROPA::Iterator *)iter;
+    return  ret;
+  }
+  return false;
 }
 
 bool DbSolver::inDeliberation(EUROPA::EntityId const &entity) const {
