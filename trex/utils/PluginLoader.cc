@@ -84,6 +84,7 @@ void PluginLoader::load(Symbol const &name) {
     bool found;
     std::string fileName = m_log->locate("lib"+name.str()+p_dlext(), found);
     if( found ) {
+      m_log->syslog("plugin")<<"Loading "<<fileName;
       void *handle = p_dlopen(fileName.c_str(), RTLD_NOW);
       if( NULL==handle )
         throw PluginError(name, "Failed to load \""+name.str()+"\"");
