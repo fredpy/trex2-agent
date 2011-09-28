@@ -1,0 +1,9 @@
+TREX version used at MBARI. 
+
+This version is slightly different from the one to google code in some aspects :
+     - google code version is so far tied to Europa and uses the most recent version of this planner 
+       while this one will try gradually to be independent from Europa.  
+     - google code version sepcifies as its core what should be a behavior (with interesting improvements) while this one abstract this aspect as for now and instead provide more flexibilty on the status of a timline (Internal/Private/External/Observe instead of Internal/External) 
+     - both are providing different way of debugging a plan execution which started to diverge in term odf diasplay and entilment to Europa (latest thing I saw was using PlanWorks which is good but may be problemeatic if we use different planners). 
+
+     To know how to install this file please read INSTALL file and feel free to update it if you discover something missing  

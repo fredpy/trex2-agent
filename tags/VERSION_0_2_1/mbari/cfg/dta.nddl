@@ -1,0 +1,77 @@
+#include "TREX.nddl"
+
+class AssetUpdate extends AgentTimeline {
+
+  predicate None {}
+  
+  predicate Msg {
+    int tick;
+    float latitude;
+    float longitude;
+    float speed_north;
+    float speed_east;
+  }
+
+  AssetUpdate(Mode _mode) {
+    super(_mode, "None");
+  }
+
+}
+
+class AssetPosition extends AgentTimeline {
+  AssetUpdate messenger;
+
+  predicate Holds {
+    float latitude;
+    float longitude;
+    
+    float northing;
+    float easting;
+
+    duration == 1;
+    geo_to_utm(latitude, longitude, northing, easting);
+  }
+
+  AssetPosition(Mode _mode, AssetUpdate msg) {
+    super(_mode);
+    messenger = msg;
+  }
+}
+
+
+AssetPosition::undefined {
+  AssetUpdate msg;
+  msg==object.messenger;
+  
+  meets(msg.Msg);
+}
+
+AssetPosition::Holds {
+  AssetUpdate src;
+  int delta_tick;
+
+  src == object.messenger;
+  contained_by(src.Msg msg);
+
+  // get last position update in UTM
+  float m_north, m_east;
+  geo_to_utm(msg.latitude, msg.longitude, m_north, m_east);
+  
+
+  // evaluate the current position
+  temporalDistance(msg.tick, delta_tick, start);
+  float delta_secs;
+  delta_secs == TICK_DURATION*delta_tick;
+
+  northing == m_north + (msg.speed_north*delta_secs);
+  easting == m_east + (msg.speed_east*delta_secs);
+
+  // look for next update
+  meets(Holds nxt);
+}
+
+
+AssetUpdate stella104 = new AssetUpdate(Observe);
+AssetPosition stella104_est = new AssetPosition(Internal, stella104);
+
+close();

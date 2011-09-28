@@ -1,0 +1,17 @@
+<Solver name="DefaultTestSolver">
+ 	<FlawFilter component="DeliberationFilter"/>
+
+  	<ThreatManager defaultPriority="10">
+    		<FlawHandler component="StandardThreatHandler"/>
+  	</ThreatManager>
+
+  	<OpenConditionManager defaultPriority="100">
+    		<FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+
+  	<UnboundVariableManager defaultPriority="0">
+	  <!-- Block binding by the solver if varaibales are not singleton -->
+    		<FlawFilter component="Singleton"/>
+    		<FlawHandler component="StandardVariableHandler"/>
+  	</UnboundVariableManager>
+</Solver>
