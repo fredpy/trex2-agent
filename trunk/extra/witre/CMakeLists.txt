@@ -32,20 +32,11 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-add_custom_target(plugins COMMENT "TREX plugins")
+option(WITH_WITRE "Enable witre plugin (require Wt)" OFF)
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION shared/trex OPTIONAL)
-  trex_cfg(cfg shared/trex)
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg)
-endmacro(trex_plugin)
-
-# the directories where plugins are located
-add_subdirectory(lightswitch)
-add_subdirectory(europa)
-
-add_subdirectory(witre)
+if(WITH_WITRE) 
+  find_package(Wt REQUIRED)
+  include_directories(${Wt_INCLUDE_DIR})
+  trex_plugin(witre WitreServer.cc Witre.cc)
+  target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
+endif(WITH_WITRE)
