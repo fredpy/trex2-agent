@@ -49,7 +49,8 @@ namespace TREX {
       friend class WitreServer;
     };
 
-    WitreApplication *createWitre(Wt::WEnvironment const &e); 
+    WitreApplication *createWitre(Wt::WEnvironment const &e);
+
   } // TREX::witre
 } // TREX
 
