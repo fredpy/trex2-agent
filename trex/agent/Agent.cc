@@ -37,12 +37,17 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "Agent.hh"
 
 #include <iostream>
 #include <iterator>
-#include <boost/graph/topological_sort.hpp>
+
+// #define below is needed in bosst 1.47 under xcode 4.2
+// overwise it fails to compile and get confused ???
+#define BOOST_EXCEPTION_DISABLE 
 #include <boost/graph/graphviz.hpp>
+#include <boost/graph/topological_sort.hpp>
 
 
 using namespace TREX::agent;
