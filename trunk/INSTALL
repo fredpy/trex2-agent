@@ -3,14 +3,6 @@ Installing TREX
 1) Third party requirements
 
 TREX uses third party utilities and libraries. Here's sa list of them :
- - rapidXML (http://rapidxml.sourceforge.net/) This is used for configuration 
-            parsing. TREX used to rely on TinyXML version embedded in Europa
-            but keeping this would have been annoying as this version was part
-            of Europa and keeping the ability to connect to Europa while using
-            a version of TinyXML which is not necessarily the Europa one would
-            have been tricky. On top of that rapidxml is really lightweight
-            (only templates defined in C++ headers) and very fast (performance
-            close to strlen).
  - boost (http://www.boost.org) This library is widely used for basic
          utilities and compatibilty with the TR1 C++0x standard.
 	 version 1.40 or above (tested against 1.40 up to 1.46) 
@@ -35,34 +27,22 @@ For europa plug-in :
                this is the core libaray used for planning on the EuropaReactor
 	       Simply install the binary distribution provided for your platform. 
 	       The version we use is europa 2.5 (binary package)
-Note:
-  rapidxml is bundled into TREX. Nothing as been changed in this libray and if
-  one prefers to use another version of this library he justs need to define 
-  the environment variable TINY_XML_ROOT with the directory where this one is 
-  before compiling TREX.
 
 2) Set your environment
 
-The devConfig bash file loads all the variables needed to be able to
-compile and execute TREX. If you are using bash you can edit your
-~/.profile (or ~/.bash_profile depending on your configuration/platform).
-Considering that you have put TREX on the directory <trex-dir> you can put 
+Both trex_devel.bash and trex_init.bash are envoironment files that help user setting their 
+environment properly for the bash shell
+  - trex_devel.bash can be sused when you want to run trex from your building 
+                    directory without installing it
+  - trex_init.bash (installed under <install_dir>/shared/trex is useful for loading a fully 
+                   installed trex
+
+If you are using bash you can edit your ~/.profile 
+(or ~/.bash_profile depending on your configuration/platform).
+Considering that you have installed TREX on the directory <install_dir> you can put 
 the following lines :
 ------------------------------------------------------------------------
-path=`pwd` 
-cd <trex-dir> 
-source devConfig 
-cd $path 
-------------------------------------------------------------------------
-
-Attention:
-  Under MacOS X you also need to define DYLD_BIND_AT_LAUNCH to allow dynamic 
-  library loading on the fly. Indeed, this version of TREX supports plug-ins 
-  allowing to define externally new reactors and components and MacOS X needs 
-  to be informed about that. To do so add the following line in your 
-  ~/.profile :
-------------------------------------------------------------------------
-export DYLD_BIND_AT_LAUNCH=YES
+source <install_dir>/shared/trex/trex_init.bash
 ------------------------------------------------------------------------
   
   In order to be able to compile europa plugin you'll also need to set your 
