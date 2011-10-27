@@ -44,9 +44,12 @@ namespace TREX {
       WitreApplication(Wt::WEnvironment const &env);
       ~WitreApplication();
 
+      
+
     private:
 
       friend class WitreServer;
+      TREX::utils::SingletonUse<WitreServer> m_server;
     };
 
     WitreApplication *createWitre(Wt::WEnvironment const &e);

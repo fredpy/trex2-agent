@@ -156,7 +156,7 @@ namespace TREX {
        * @note If no @c elem tag is defined into @e node, the domain
        * will be considered as full.
        */
-     explicit EuropaEntity(rapidxml::xml_node<> const &node)
+      explicit EuropaEntity(boost::property_tree::ptree::value_type &node)
         :base_class(node) {}
       ~EuropaEntity() {}
       

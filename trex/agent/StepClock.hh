@@ -88,7 +88,7 @@ namespace TREX {
        *
        * @throw TREX::utils::bad_string_cast unable to parse @c steps attribute
        */
-      StepClock(rapidxml::xml_node<> const &node);
+      StepClock(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
       ~StepClock() {}
 
@@ -128,7 +128,7 @@ namespace TREX {
        * and positive
        * @retval 50 otherwise
        */
-      static unsigned int parseStep(rapidxml::xml_attribute<> *steps);
+      static unsigned int parseStep(boost::property_tree::ptree &steps);
 
       /** @brief current tick date */
       TREX::transaction::TICK m_tick;

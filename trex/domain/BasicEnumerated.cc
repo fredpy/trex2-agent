@@ -39,12 +39,10 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <sstream>
-
-#include <rapidxml/rapidxml_print.hpp>
 #include "DomainVisitor.hh"
 
 using namespace TREX::transaction;
-
+namespace bpt=boost::property_tree;
 /*
  * class TREX::transaction::BasicEnumerated
  */
@@ -53,20 +51,17 @@ using namespace TREX::transaction;
 
 // modifiers :
 
-void BasicEnumerated::completeParsing(rapidxml::xml_node<> const &node) {
-  rapidxml::xml_node<> *iter = node.first_node("elem");
+void BasicEnumerated::completeParsing(bpt::ptree::value_type &node) {
+  bpt::ptree::assoc_iterator i, last;
   
-  for( ;NULL!=iter; iter=iter->next_sibling("elem") ) {
-    rapidxml::xml_attribute<> *val = iter->first_attribute("value");
-    
-    if( NULL!=val ) {
-      std::string txt(val->value(), val->value_size());
-
-      addTextValue(txt);
-    }
+  boost::tie(i, last) = node.second.equal_range("elem");
+  for(; last!=i; ++i) {
+    boost::optional<std::string> 
+      txt = TREX::utils::parse_attr< boost::optional<std::string> >( i->second, "value");
+    if( txt )
+      addTextValue(*txt);
   }
 }
-
 
 // observers :
 
@@ -98,18 +93,12 @@ std::ostream &BasicEnumerated::toXml(std::ostream &out, size_t tabs) const {
   else {
     out<<">\n";
     for( i=0 ; i<size; ++i ) {
-      std::string strVal=getStringValue(i);
-      
-      std::fill_n(pad, tabs+1, ' '); 
-      out<<"<elem value=\"";
-      if( !strVal.empty() )
-	// I know I use undocumented method but that's the easiest way to encode
-	// special chars in a correct XML format
-	rapidxml::internal::copy_and_expand_chars(strVal.c_str(), 
-						  strVal.c_str()+strVal.length(),
-						  '\0', 
-						  std::ostream_iterator<char>(out));
-      out<<"\"/>\n";
+      bpt::ptree elem;
+      elem.put("elem.<xmlattr>.value", getStringValue(i));
+      std::fill_n(pad, tabs+1, ' ');
+      // very hacky at this stage
+      write_xml_element(out, bpt::ptree::key_type(), elem, -1,
+			bpt::xml_parser::xml_writer_settings<bpt::ptree::key_type::value_type>());
     }
     std::fill_n(pad, tabs, ' '); 
     return out<<"</"<<getTypeName()<<'>';

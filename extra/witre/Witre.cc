@@ -44,8 +44,6 @@ using namespace TREX::witre;
 
 namespace {
 
-  SingletonUse<WitreServer> s_server;
-
   SingletonUse<LogManager> s_log;
 
 }
@@ -60,10 +58,9 @@ namespace TREX {
     
     WitreApplication *createWitre(Wt::WEnvironment const &e) {
       WitreApplication *app = new WitreApplication(e);
-      // hard coded for now
 
       bool found;
-      std::string file = s_log->use("witre_loc.xml", found);
+      std::string file = s_log->use("witre_loc.xml", found);      
       
       if( found ) {
 	file.erase(file.end()-4, file.end());

@@ -105,7 +105,7 @@ bool DeliberationFilter::test(EUROPA::EntityId const &entity) {
     }
   }
   if( in_scope ) {
-    debugMsg("trex:horizon:test", "Thist token is part of the planning horizon"
+    debugMsg("trex:horizon:test", "This token is part of the planning horizon"
 	     <<"\n\tstart "<<start_t.toString()
 	     <<"\n\tend "<<end_t.toString()
 	     <<"\n\thorizon "<<m_horizon.toString());

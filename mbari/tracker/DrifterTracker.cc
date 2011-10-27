@@ -6,7 +6,6 @@
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 
-#include <rapidxml/rapidxml.hpp>
 #include <mbari/shared/GeoUTM.hh>
 
 #include "DrifterTracker.hh"
@@ -53,40 +52,43 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
   } else 
     syslog("WARN")<<"MessagesFromTrex timeline already declared";
   
-  rapidxml::xml_node<> &node(xml_factory::node(arg));
+  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   TREX::utils::Symbol tl_name;
   std::string exch_name;
   std::set<std::string> exchs;
+  TREX::utils::ext_xml(node.second, "config");
 
   // Now look if I have some asset I need to track 
-  for(TREX::utils::ext_iterator iter(node, "config"); iter.valid(); ++iter) {
-    if( TREX::utils::is_tag(*iter, "Track") ) {
-      // First we try to declare it 
-      tl_name = TREX::utils::parse_attr<TREX::utils::Symbol>(*iter, "name");
-      exch_name = TREX::utils::parse_attr<std::string>(*iter, "exchange");
-      if( tl_name.empty() )
-	throw TREX::utils::XmlError(*iter, 
-				    "Unable to find the name attribute to Track");
-      if( exch_name.empty() )
-	throw TREX::utils::XmlError(*iter, 
-				    "Unable to find the exchange attribute to Track");
-      else 
-	exch_name = exch_name+"_pb";
-      if( isInternal(tl_name) )
-	syslog("WARN")<<"I have already declared "<<tl_name<<" as Internal.";
-      else { 
-	provide(tl_name);
-	provide(tl_name.str()+"_msg");
-	if( isInternal(tl_name) ) {
-	  if( exchs.insert(exch_name).second ) {
-	    syslog("amqp")<<"Binding to "<<exch_name<<"/*";
-	    m_queue->bind(exch_name, "");
-	  }	  
-	  m_drifters.insert(std::make_pair(tl_name, point()));
-	} else 
-	  syslog("WARN")<<"Failed to declare "<<tl_name<<" as Internal."
-			<<"\n\tI will not track this asset.";
-      }
+  boost::property_tree::ptree::assoc_iterator i,last;
+  boost::tie(i, last) = node.second.equal_range("Track");
+  
+  for(; last!=i; ++i) {
+    // First we try to declare it 
+    tl_name = TREX::utils::parse_attr<TREX::utils::Symbol>(*i, "name");
+    exch_name = TREX::utils::parse_attr<std::string>(*i, "exchange");
+    if( tl_name.empty() )
+      throw TREX::utils::XmlError(*i, 
+				  "Unable to find the name attribute to Track");
+    if( exch_name.empty() )
+      throw TREX::utils::XmlError(*i, 
+				  "Unable to find the exchange attribute to Track");
+    else 
+      exch_name = exch_name+"_pb";
+
+    if( isInternal(tl_name) )
+      syslog("WARN")<<"I have already declared "<<tl_name<<" as Internal.";
+    else { 
+      provide(tl_name);
+      provide(tl_name.str()+"_msg");
+      if( isInternal(tl_name) ) {
+	if( exchs.insert(exch_name).second ) {
+	  syslog("amqp")<<"Binding to "<<exch_name<<"/*";
+	  m_queue->bind(exch_name, "");
+	}	  
+	m_drifters.insert(std::make_pair(tl_name, point()));
+      } else 
+	syslog("WARN")<<"Failed to declare "<<tl_name<<" as Internal."
+		      <<"\n\tI will not track this asset.";
     }
   }
   m_listener.reset(new amqp::listener(m_queue, m_messages));
@@ -127,7 +129,8 @@ bool DrifterTracker::synchronize() {
       // obs.restrictAttribute("tick", 
       // 			    IntegerDomain(timeToTick(i->second.last_update())));
       time_t now = std::floor(tickToTime(getCurrentTick()));
-      std::pair<double, double> tmp = i->second.position(now);
+      long int dt;
+      std::pair<double, double> tmp = i->second.position(now, dt);
       obs.restrictAttribute("northing",
       			    FloatDomain(tmp.first));
       obs.restrictAttribute("easting",
@@ -138,6 +141,10 @@ bool DrifterTracker::synchronize() {
 			    FloatDomain(lat));
       obs.restrictAttribute("longitude",
 			    FloatDomain(lon));
+
+      double dtick = dt;
+      dtick /= tickDuration();
+      obs.restrictAttribute("freshness", IntegerDomain(std::floor(dtick+0.5)));
       
       // if( i->second.has_speed() ) {
       // 	tmp = i->second.speed();
@@ -160,12 +167,12 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
 	i  = m_drifters.find(report.name());
       
       if( m_drifters.end()!=i ) {
-	// I only accpet message that have :
+	// I only accept message that have :
 	//  -  a date
 	//  - a position 
 	time_t sec;
 	double lat, lon;
-	syslog("amqp")<<"New message from "<<report.name();
+	// syslog("amqp")<<"New message from "<<report.name();
 	Observation obs(i->first.str() + "_msg", "Msg");
 	
 	if( report.has_epoch_seconds() ) {
@@ -194,9 +201,9 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
 	    }
 	  }
 	}
-      } else {
+      } /* else {
 	syslog("amqp")<<"Ignoring message from "<<report.name();
-      }
+	} */
     }
   } 
 }
@@ -253,9 +260,10 @@ void DrifterTracker::point::update(time_t t, double n, double e) {
   valid = true;  
 }
 
-std::pair<double, double> DrifterTracker::point::position(time_t now) const {
+std::pair<double, double> DrifterTracker::point::position(time_t now, 
+							  long int &delta_t) const {
   std::pair<double,double> est_pos(m_position);
-  long int delta_t = now-date;
+  delta_t = now-date;
   
   est_pos.first += delta_t*m_speed.first;
   est_pos.second += delta_t*m_speed.second;

@@ -72,7 +72,7 @@ Goal::Goal(Symbol const &object, Symbol const &pred)
    m_duration(s_durationName, s_durationDomain), 
    m_end(s_endName, s_dateDomain) {}
 
-Goal::Goal(rapidxml::xml_node<> const &node)
+Goal::Goal(boost::property_tree::ptree::value_type &node)
   :Predicate(node), m_start(s_startName, s_dateDomain), 
    m_duration(s_durationName, s_durationDomain), 
    m_end(s_endName, s_dateDomain) {

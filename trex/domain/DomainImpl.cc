@@ -86,15 +86,14 @@ Symbol const StringDomain::type_name("string");
 Symbol const EnumDomain::type_name("enum");
 
 
-BooleanDomain::BooleanDomain(rapidxml::xml_node<> const &node)
+BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
   :BasicInterval(node), m_full(true) {
-  rapidxml::xml_attribute<> *value = node.first_attribute("value");
-  if( NULL!=value ) {
-    m_val = TREX::utils::string_cast<bool>(std::string(value->value(), 
-						       value->value_size()));
+  boost::optional<bool> val = parse_attr< boost::optional<bool> >(node, "value");
+  if( val ) {
+    m_val = val;
     m_full = false;
-  } else 
-    completeParsing(node); // just in case someone used min/max
+  } else
+    completeParsing(node); // to handle the case where someon used min/max attributes
 }
 
 std::ostream &BooleanDomain::toXml(std::ostream &out, 

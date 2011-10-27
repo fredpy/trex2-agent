@@ -77,16 +77,14 @@ Variable::Variable(Symbol const &name, DomainBase const &dom)
 Variable::Variable(Variable const &other) 
   :m_name(other.m_name), m_domain(clone(other.m_domain)) {}
 
-Variable::Variable(rapidxml::xml_node<> const &node)
-  :m_name(parse_attr<Symbol>(node, "name")) {
+Variable::Variable(boost::property_tree::ptree::value_type &node)
+  :m_name(parse_attr<Symbol>(node.second, "name")) {
   if( m_name.empty() )
     throw XmlError(node, "Variable name is empty.");
-  rapidxml::xml_node<> *dom_tag = node.first_node();
-  if( NULL==dom_tag ) {
+  
+  boost::property_tree::ptree::iterator i = node.second.begin();
+  if( !s_dom_factory->iter_produce(i, node.second.end(), m_domain) )
     throw XmlError(node, "Missing variable domain on XML tag"); 
-  } else {
-    m_domain = s_dom_factory->produce(*dom_tag);
-  }
 }
 
 Variable::~Variable() {}

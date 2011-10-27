@@ -338,7 +338,7 @@ namespace TREX {
        * @sa xml_factory
        * @sa Variable::Variable(rapidxml::xml_node<> const &)
        */
-      Predicate(rapidxml::xml_node<> const &node);
+      Predicate(boost::property_tree::ptree::value_type &node);
       /** @brief Constructor
        * @param other another instance
        *

@@ -36,6 +36,7 @@
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
+namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   
@@ -47,14 +48,14 @@ namespace {
  * class TREX::transaction::Player::timeline_transaction
  */ 
 
-Player::timeline_transaction::timeline_transaction(rapidxml::xml_node<> &node)
+Player::timeline_transaction::timeline_transaction(boost::property_tree::ptree::value_type &node)
   :m_name(parse_attr<Symbol>(node, "name")) {}
 
 /*
  * class TREX::transaction::Player::op_assert
  */ 
 
-Player::op_assert::op_assert(rapidxml::xml_node<> &node) 
+Player::op_assert::op_assert(boost::property_tree::ptree::value_type &node) 
   :m_obs(node) {}
 
 /*
@@ -85,16 +86,19 @@ Player::Player(TeleoReactor::xml_arg_type arg)
     syslog("ERROR")<<"Unable to locate transaction log \""<<file_name<<"\".";
     throw ReactorException(*this, "Unable to locate specified transaction log file.");
   }
-  rapidxml::xml_document<> doc;
-  rapidxml::file<> file(file_name.c_str());
+  boost::property_tree::ptree pt;
+  
+  read_xml(file_name, pt, xml::no_comments|xml::trim_whitespace);
 
-  doc.parse<0>(file.data());
-  rapidxml::xml_node<> *root = doc.first_node();
-  if( NULL==root ) {
+  if( pt.empty() ) {
     syslog("ERROR")<<"Transaction log \""<<file_name<<"\" is empty.";
-    throw ReactorException(*this, "Empty transaction file.");
+    throw ReactorException(*this, "Empty transaction file.");    
   }
-  loadTransactions(*root);
+  if( pt.size()!=1 ) {
+    syslog("ERROR")<<"Transaction log \""<<file_name<<"\" has more than 1 root.";
+    throw ReactorException(*this, "Invalid transaction file.");    
+  }
+  loadTransactions(pt.front().second);
 }
 
 Player::~Player() {
@@ -107,36 +111,33 @@ Player::~Player() {
 // modifiers 
 
 
-void Player::loadTransactions(rapidxml::xml_node<> &node) {
-  ext_iterator xlog(node), it;
+void Player::loadTransactions(boost::property_tree::ptree &properties) {
+  boost::property_tree::ptree::assoc_iterator i, last;
 
-  if( !xlog.valid() ) {
-    syslog("ERROR")<<"Transaction log has no sub-node.";
-    throw XmlError(node, "Empty transaction log file");
-  }
-  it = xlog.find_tag("header");
-  if( !it.valid() ) {
+  boost::tie(i, last) = properties.equal_range("header");
+  if( last==i )
     syslog("WARN")<<"Transaction log file does not have an header.";
-  } else {
+  else {
     Symbol tl;
-    for(it = ext_iterator(*it); it.valid(); ++it) {
-      if( is_tag(*it, "provide") ) {
-	op_provide(*it).accept(*this);
-      }  else if( is_tag(*it, "use") ) {
-	op_use(*it).accept(*this);
-      } else if( is_tag(*it, "unprovide") ) {
-	op_unprovide(*it).accept(*this);
-      }  else if( is_tag(*it, "unuse") ) {
-	op_unuse(*it).accept(*this);
+    for(;last!=i; ++i) {
+      if( is_tag(*i, "provide") ) {
+	op_provide(*i).accept(*this);
+      }  else if( is_tag(*i, "use") ) {
+	op_use(*i).accept(*this);
+      } else if( is_tag(*i, "unprovide") ) {
+	op_unprovide(*i).accept(*this);
+      }  else if( is_tag(*i, "unuse") ) {
+	op_unuse(*i).accept(*this);
       } else 
-	syslog("WARN")<<"Unexpected tag "<<it->name()<<" in transaction header.";
+	syslog("WARN")<<"Unexpected tag "<<i->first<<" in transaction header.";
     }
   }
-  for( xlog = xlog.find_tag("tick");  xlog.valid(); xlog = xlog.next("tick") ) {
-    TICK cur = parse_attr<TICK>(*xlog, "value");
+  boost::tie(i, last) = properties.equal_range("tick");
+  for( ; last!=i; ++i) {
+    TICK cur = parse_attr<TICK>(*i, "value");
     std::list<transaction *> &ops = m_exec[cur];
-
-    for( it=ext_iterator(*xlog); it.valid(); ++it) {
+    for(boost::property_tree::ptree::iterator it=i->second.begin();
+	i->second.end()!=it; ++it) {
       if( is_tag(*it, "provide") ) {
 	ops.push_back(new op_provide(*it));
       }  else if( is_tag(*it, "use") ) {
@@ -148,7 +149,7 @@ void Player::loadTransactions(rapidxml::xml_node<> &node) {
       } else if( is_tag(*it, "Observation") ) {
 	ops.push_back(new op_assert(*it));
       } else 
-	syslog("WARN")<<"Ignoring tag "<<it->name();      
+	syslog("WARN")<<"Ignoring tag "<<it->first;      
     }
   }
 }

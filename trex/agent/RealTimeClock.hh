@@ -89,7 +89,7 @@ namespace TREX {
        * @throw TREX::utils::bad_string_cast unable to parse tick attribute
        * @throw TREX::utils::Exception @c tick attribute value is less than 0
        */
-      explicit RealTimeClock(rapidxml::xml_node<> const &node);
+      explicit RealTimeClock(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
       ~RealTimeClock() {}
 

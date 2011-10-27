@@ -57,17 +57,15 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
    m_filter(NULL) {
   bool found;
   std::string nddl;
-  rapidxml::xml_node<> const &cfg = TeleoReactor::xml_factory::node(arg);
-  rapidxml::xml_attribute<> const *model = cfg.first_attribute("model");
+  boost::property_tree::ptree::value_type &cfg = TeleoReactor::xml_factory::node(arg);
+  boost::optional<std::string> model = parse_attr< boost::optional<std::string> >(cfg, "model");
 
-  if( NULL!=model ) {
-    std::string file_name(model->value(), model->value_size());
-    
-    if( file_name.empty() )
+  if( model ) {
+    if( model->empty() )
       throw XmlError(cfg, "Attribute model is empty");
-    nddl = manager().use(file_name, found);
+    nddl = manager().use(*model, found);
     if( !found ) 
-      throw XmlError(cfg, "Unable to locate model file \""+file_name+"\"");
+      throw XmlError(cfg, "Unable to locate model file \""+(*model)+"\"");
   } else {
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
@@ -184,6 +182,7 @@ bool EuropaReactor::dispatch_window(EUROPA::ObjectId const &obj,
 void EuropaReactor::notify(Observation const &o) {
   m_assembly.setStream();
   {
+    debugMsg("trex:notify", "["<<getCurrentTick()<<"] new observation "<<o);
     std::pair<EUROPA::ObjectId, EUROPA::TokenId> 
       ret = m_assembly.convert(o, true);
 
@@ -203,6 +202,7 @@ void EuropaReactor::notify(Observation const &o) {
 void EuropaReactor::handleRequest(goal_id const &g) {
   m_assembly.setStream();
   {
+    debugMsg("trex:request", "["<<getCurrentTick()<<"] new request "<<*g);
     EUROPA::TokenId tok = m_assembly.convert(*g, false).second;
     
     if( tok.isId() ) {
@@ -229,6 +229,7 @@ void EuropaReactor::handleRequest(goal_id const &g) {
 void EuropaReactor::handleRecall(goal_id const &g) {
   m_assembly.setStream();
   
+  debugMsg("trex:recall", "["<<getCurrentTick()<<"] recalled "<<*g);
   for(europa_mapping::iterator i=m_internal_goals.begin(); 
       m_internal_goals.end()!=i; ++i)
     if( i->second==g ) {
@@ -247,6 +248,7 @@ void EuropaReactor::handleInit() {
   m_assembly.setStream();
   {
     
+    debugMsg("trex:exec", "Beginning initialization");
     // Now is the time to set my timing constants in the model
     EUROPA::PlanDatabaseId db = m_assembly.plan_db();
     
@@ -276,12 +278,14 @@ void EuropaReactor::handleInit() {
 							    getFinalTick()));
     // Next thing is to process facts
     m_core.initialize(clock_var);
+    debugMsg("trex:exec", "End of initialization");
   }
 }
 
 void EuropaReactor::handleTickStart() {
   m_assembly.setStream();
   
+  debugMsg("trex:exec", "["<<getCurrentTick()<<"] Beginning tick start");
   if( getCurrentTick()==getInitialTick() )
     reset_deliberation();
   m_completedThisTick = false;
@@ -290,19 +294,24 @@ void EuropaReactor::handleTickStart() {
   
   m_filter->set_horizon(getCurrentTick()+1, std::min(getFinalTick(), deadline));
   m_core.doDispatch();
+  debugMsg("trex:exec", "["<<getCurrentTick()<<"] end of tick start");
 }
 
 bool EuropaReactor::synchronize() {
   m_assembly.setStream();
+  debugMsg("trex:exec", "["<<getCurrentTick()<<"] Beginning synchronization");
   // m_filter->set_horizon(getCurrentTick(), getCurrentTick()+1);
   if( !m_core.synchronize()  ) {
+    debugMsg("trex:exec", "["<<getCurrentTick()<<"] synchronize failed (1)");
     m_assembly.solver().reset();
     // doRecalls
     m_assembly.mark_inactive();
     if( !( m_core.relax(false) && m_core.synchronize()) ) {
+      debugMsg("trex:exec", "["<<getCurrentTick()<<"] synchronize failed (2)");
       m_assembly.mark_inactive();
       if( !(m_core.relax(true) && m_core.synchronize()) ) {
         syslog()<<"Unable to explain the current state of the world.";
+	debugMsg("trex:exec", "["<<getCurrentTick()<<"] Failed synchronization");
         return false;
       }
     }
@@ -314,16 +323,30 @@ bool EuropaReactor::synchronize() {
   m_core.doNotify();
   // m_core.archive();
   logPlan();
+  debugMsg("trex:exec", "["<<getCurrentTick()<<"] End synchronization");
   return true;
 }
 
 bool EuropaReactor::hasWork() {
   m_assembly.setStream();
-  if( m_assembly.invalid() )
+  debugMsg("trex:exec", "["<<getCurrentTick()<<"] Check for deliberation");
+  if( m_assembly.invalid() ) {
+    debugMsg("trex:exec", "["<<getCurrentTick()<<"] no deliberation (invalid)");
     return false;
-  if( m_assembly.active() )
+  }
+  if( m_assembly.active() ) {
+    debugMsg("trex:exec", "["<<getCurrentTick()<<"] need deliberation (active)");
     return true;
-  return !m_completedThisTick;
+  }
+  if( m_completedThisTick ) {
+    debugMsg("trex:exec", "["<<getCurrentTick()
+	     <<"] no deliberation (completed this tick)");
+    return false;
+  } else {
+    debugMsg("trex:exec", "["<<getCurrentTick()
+	     <<"] need deliberation (did not run on this tick)");
+    return true;
+  }
 }
 
 void EuropaReactor::resume() {

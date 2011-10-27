@@ -42,6 +42,7 @@ namespace TREX {
   namespace witre {
     
     class WitreApplication;
+    class WitreReactor;
 
     class WitreServer :boost::noncopyable {
     public:
@@ -59,16 +60,27 @@ namespace TREX {
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
       
+      bool attached() const {
+	return NULL!=m_entry;
+      }
+      WitreReactor &reactor() const {
+	return *m_entry;
+      }
     private:
       WitreServer();
       ~WitreServer();
+
+      bool attach(WitreReactor &r);
+      void detach(WitreReactor &r);
 
       // std::auto_ptr<WitreApplication> m_app;
       Wt::WServer *    m_server;
 
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      WitreReactor *m_entry;
 
       friend class TREX::utils::SingletonWrapper<WitreServer>;
+      friend class WitreReactor;
     }; // TREX::witre::WitreServer
 
   } // TREX::witre

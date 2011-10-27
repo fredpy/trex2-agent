@@ -74,14 +74,15 @@ unsigned int StepClock::selectStep(unsigned int stepsPerTick) {
   return stepsPerTick;
 }
 
-unsigned int StepClock::parseStep(rapidxml::xml_attribute<> *steps) {
-  if( NULL==steps ) {
+unsigned int StepClock::parseStep(boost::property_tree::ptree &steps) {
+  boost::optional<size_t> val = parse_attr< boost::optional<size_t> >(steps, "steps");
+  if( val ) 
+    return selectStep(*val);
+  else {
     m_log->syslog("Clock")<<"missing steps attribute in XML definition.\n"
 			  <<"\tSetting it to 50.\n";
     return 50;
-  } else 
-    return selectStep(string_cast<unsigned int>(std::string(steps->value(),
-							    steps->value_size())));
+  } 
 }
 
 // structors :
@@ -92,9 +93,9 @@ StepClock::StepClock(double sleepSeconds, unsigned int stepsPerTick)
   m_stepsPerTick = m_stepsPerTickDefault;
 }
 
-StepClock::StepClock(rapidxml::xml_node<> const &node) 
+StepClock::StepClock(boost::property_tree::ptree::value_type &node) 
   :Clock(0.0), m_tick(0), m_currentStep(0),
-   m_stepsPerTickDefault(parseStep(node.first_attribute("steps"))) {}
+   m_stepsPerTickDefault(parseStep(node.second)) {}
 
 // modifiers :
 

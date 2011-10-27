@@ -159,10 +159,10 @@ namespace TREX {
     protected:
       explicit BasicEnumerated(TREX::utils::Symbol const &type) 
 	:DomainBase(type) {}
-      explicit BasicEnumerated(rapidxml::xml_node<> const &node)
+      explicit BasicEnumerated(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}
 
-      void completeParsing(rapidxml::xml_node<> const &node);
+      void completeParsing(boost::property_tree::ptree::value_type &node);
 
       virtual void addTextValue(std::string const &val) =0;
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;

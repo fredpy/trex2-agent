@@ -65,10 +65,10 @@ graph::graph(Symbol const &name, TICK init)
   :m_name(name), m_currentTick(init) {
 }
 
-graph::graph(Symbol const &name, ext_iterator const &conf, TICK init) 
+graph::graph(Symbol const &name, boost::property_tree::ptree &conf, TICK init) 
   :m_name(name), m_currentTick(init) {
-      size_t number = add_reactors(conf);
-      syslog()<<"Created "<<number<<" reactors.";
+  size_t number = add_reactors(conf);
+  syslog()<<"Created "<<number<<" reactors.";
 }
 
 graph::~graph() {
@@ -106,26 +106,7 @@ long graph::index(graph::reactor_id id) const {
 #endif
 }
 
-size_t graph::add_reactors(ext_iterator iter) {
-  graph *me = this;
-  xml_factory::iter_type it = xml_factory::iter_traits::build(iter, me);
-  boost::shared_ptr<TeleoReactor> reactor;
-  size_t count = 0;
-  
-  while( m_factory->iter_produce(it, reactor) ) {
-    std::pair<details::reactor_set::iterator, bool> 
-      ret = m_reactors.insert(reactor);
-    if( ret.second ) 
-      syslog()<<"Reactor \""<<reactor->getName()<<"\" created.";
-    else {
-      throw MultipleReactors(*this, **(ret.first));
-    }			   
-    ++count;
-  }
-  return count;
-}
-
-graph::reactor_id graph::add_reactor(rapidxml::xml_node<> &description) {
+graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
   graph *me = this;
   TeleoReactor::xml_arg_type 
     arg = xml_factory::arg_traits::build(description, me);
@@ -134,9 +115,8 @@ graph::reactor_id graph::add_reactor(rapidxml::xml_node<> &description) {
 
   if( ret.second ) 
     syslog()<<"Reactor \""<<tmp->getName()<<"\" created.";
-  else {
-    throw MultipleReactors(*this, **(ret.first));
-  }			   
+  else
+    throw MultipleReactors(*this, **(ret.first));			   
   return ret.first->get();
 }
 

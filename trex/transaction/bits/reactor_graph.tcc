@@ -1,10 +1,4 @@
 /* -*- C++ -*- */
-/** @file "BasicInterval.hh"
- * @brief Implementation of BasicInterval
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup domains
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -38,57 +32,29 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "DomainVisitor.hh"
 
-using namespace TREX::transaction;
-namespace bpt=boost::property_tree;
+namespace TREX {
+  namespace transaction {
 
-// modifiers 
+    template<class Iter>
+    size_t graph::add_reactors(Iter from, Iter to) {
+      graph *me = this;
+      typename xml_factory::iter_traits<Iter>::type
+	it = xml_factory::iter_traits<Iter>::build(from, me);
+      boost::shared_ptr<TeleoReactor> reactor;
+      size_t count = 0;
+      
+      while( m_factory->iter_produce(it, to, reactor) ) {
+	std::pair<details::reactor_set::iterator, bool>
+	  ret = m_reactors.insert(reactor);
+	if( ret.second )
+	  syslog()<<"Reactor \""<<reactor->getName()<<"\" created.";
+	else 
+	  throw MultipleReactors(*this, **(ret.first));
+	++count;
+      }
+      return count;
+    }
 
-void BasicInterval::completeParsing(bpt::ptree::value_type &node) {
-  boost::optional< std::string >
-    lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
-    hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
-
-  if( lo ) 
-    parseLower(*lo);
-  if( hi )
-    parseUpper(*hi);
-}
-
-// observers 
-    
-std::string BasicInterval::getStringLower() const {
-  std::ostringstream oss;
-  print_lower(oss);
-  return oss.str();
-}
-
-std::string BasicInterval::getStringUpper() const {
-  std::ostringstream oss;
-  print_upper(oss);
-  return oss.str();
-}
-
-std::ostream &BasicInterval::print_domain(std::ostream &out) const {
-  if( isSingleton() ) 
-    return print_lower(out);
-  else
-    return print_upper(print_lower(out<<'[')<<", ")<<']';
-}
-
-std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
-  std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-  out<<'<'<<getTypeName();
-  if( hasLower() )
-    print_lower(out<<" min=\"")<<'\"';
-  if( hasUpper() )
-    print_upper(out<<" max=\"")<<'\"';
-  return out<<"/>";
-}
-
-// manipulators
-
-void BasicInterval::accept(DomainVisitor &visitor) const {
-  return visitor.visit(this);
+  }  
 }

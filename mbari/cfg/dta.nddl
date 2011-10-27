@@ -1,77 +1,110 @@
 #include "TREX.nddl"
 
+class AssetPosition extends AgentTimeline {
+    predicate Holds {
+	float latitude;
+	float longitude;
+	
+	float northing;
+	float easting;
+	
+	duration == 1;
+	geo_to_utm(latitude, longitude, northing, easting);
+    }
+
+    AssetPosition(Mode _mode) {
+	super(_mode);
+    }
+}
+
+
 class AssetUpdate extends AgentTimeline {
-
-  predicate None {}
-  
-  predicate Msg {
-    int tick;
-    float latitude;
-    float longitude;
-    float speed_north;
-    float speed_east;
-  }
-
-  AssetUpdate(Mode _mode) {
-    super(_mode, "None");
-  }
-
+    predicate none {}
+    
+    predicate Msg {
+	float latitude;
+	float longitude;
+	float speed_north;
+	float speed_east;
+	int tick;
+    }
+    
+    AssetUpdate() {
+	super(Mode.Observe, "none");
+    }
 }
 
 class AssetPosition extends AgentTimeline {
-  AssetUpdate messenger;
+
+  AssetUpdate source;
 
   predicate Holds {
     float latitude;
     float longitude;
-    
     float northing;
     float easting;
-
-    duration == 1;
-    geo_to_utm(latitude, longitude, northing, easting);
+    eq(duration, 1);
   }
 
-  AssetPosition(Mode _mode, AssetUpdate msg) {
-    super(_mode);
-    messenger = msg;
+  AssetPosition(AssetUpdate src) {
+    super(Mode.Observe);
+    source = src;
   }
 }
 
-
-AssetPosition::undefined {
-  AssetUpdate msg;
-  msg==object.messenger;
-  
-  meets(msg.Msg);
+class TrexCmd extends Timeline {
+    predicate sendCmd {
+	int imei;
+	duration == 1;
+    }
 }
 
-AssetPosition::Holds {
-  AssetUpdate src;
-  int delta_tick;
+class TrexMsg extends AgentTimeline {
+    TrexCmd _ctrl;
+    
+    predicate waiting {
+	int date;
+	int imei;	
+    }
 
-  src == object.messenger;
-  contained_by(src.Msg msg);
+    TrexMsg() {
+	super(Mode.Observe);
+	_ctrl = new TrexCmd();
+    }
+}
 
-  // get last position update in UTM
-  float m_north, m_east;
-  geo_to_utm(msg.latitude, msg.longitude, m_north, m_east);
-  
+TrexMsg::waiting {
+    contains(TrexCmd.sendCmd cmd);
+    cmd.object == _ctrl;
+    cmd.imei == imei;
+}
 
-  // evaluate the current position
-  temporalDistance(msg.tick, delta_tick, start);
-  float delta_secs;
-  delta_secs == TICK_DURATION*delta_tick;
-
-  northing == m_north + (msg.speed_north*delta_secs);
-  easting == m_east + (msg.speed_east*delta_secs);
-
-  // look for next update
-  meets(Holds nxt);
+class Path {
+    
 }
 
 
-AssetUpdate stella104 = new AssetUpdate(Observe);
-AssetPosition stella104_est = new AssetPosition(Internal, stella104);
+class Follow extends AgentTimeline {
+
+    predicate Active {
+	
+    }
+
+}
+
+
+TrexCmd::sendCmd {    
+}
+
+geo_to_utm(36.8017, -121.7883, mbariN, mbariE);
+
+AssetUpdate SIO_WWL_1_msg = new AssetUpdate();
+AssetPosition SIO_WWL_1 = new AssetPosition(SIO_WWL_1_msg);
+
+AssetUpdate ZEPHYR_msg = new AssetUpdate();
+AssetPosition ZEPHYR = new AssetPosition(ZEPHYR_msg);
+
+AssetUpdate dorado_msg = new AssetUpdate();
+AssetPosition dorado = new AssetPosition(dorado_msg);
 
 close();

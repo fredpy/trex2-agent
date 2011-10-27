@@ -77,13 +77,9 @@ RealTimeClock::RealTimeClock(double secondsPerTick)
    m_started(false), m_tick(0), m_floatTick(secondsPerTick),
    m_secondsPerTick(to_timeval(secondsPerTick)) {}
 
-RealTimeClock::RealTimeClock(rapidxml::xml_node<> const &node)
-  :Clock(0.001), m_started(false), m_tick(0) {
-  rapidxml::xml_attribute<> *tick = node.first_attribute("tick");
-  if( NULL==tick ) 
-    throw Exception("Missing tick attribute.");
-  m_floatTick = string_cast<double>(std::string(tick->value(),
-						tick->value_size()));
+RealTimeClock::RealTimeClock(boost::property_tree::ptree::value_type &node)
+  :Clock(0.001), m_started(false), m_tick(0),
+   m_floatTick(parse_attr<double>(node, "tick")) {
   if( m_floatTick<=0.0 )
     throw Exception("Negative duration in tick attribute.");
   m_secondsPerTick = to_timeval(m_floatTick);
