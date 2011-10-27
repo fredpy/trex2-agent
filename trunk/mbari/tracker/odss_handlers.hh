@@ -3,7 +3,7 @@
 
 # include "AMQP_listener.hh"
 
-namespace mabri {
+namespace mbari {
 
   class DrifterHandler {
   }

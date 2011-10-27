@@ -47,16 +47,18 @@ using namespace TREX::transaction;
  */ 
 // structors :
 
-Predicate::Predicate(rapidxml::xml_node<> const &node)
+Predicate::Predicate(boost::property_tree::ptree::value_type &node)
   :m_object(parse_attr<Symbol>(node, "on")),
    m_type(parse_attr<Symbol>(node, "pred")) {
   if( m_object.empty() ) 
     throw PredicateException("Empty \"on\" attribute in XML tag");
   if( m_type.empty() )
     throw PredicateException("Empty \"pred\" attribute in XML tag");
-  rapidxml::xml_node<> *iter = node.first_node("Variable");
-  for(; NULL!=iter; iter = iter->next_sibling("Variable") ) {
-    Variable var(*iter);
+  boost::property_tree::ptree::assoc_iterator i,last;
+  
+  boost::tie(i, last) = node.second.equal_range("Variable");
+  for(; last!=i; ++i) {
+    Variable var(*i);
     restrictAttribute(var);
   }
 }

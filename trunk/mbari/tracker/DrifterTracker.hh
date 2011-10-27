@@ -42,7 +42,7 @@ namespace mbari {
       time_t last_update() const {
 	return date;
       }
-      std::pair<double, double> position(time_t now) const;      
+      std::pair<double, double> position(time_t now, long int &delta) const;      
 
     private:
       time_t date;

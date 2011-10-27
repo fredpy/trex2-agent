@@ -104,10 +104,10 @@ namespace TREX {
     protected:
       explicit BasicInterval(TREX::utils::Symbol const &type) 
 	:DomainBase(type) {}
-      explicit BasicInterval(rapidxml::xml_node<> const &node)
+      explicit BasicInterval(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}
 
-      void completeParsing(rapidxml::xml_node<> const &node);
+      void completeParsing(boost::property_tree::ptree::value_type &node);
 
       virtual void parseLower(std::string const &val) =0;
       virtual void parseUpper(std::string const &val) =0;

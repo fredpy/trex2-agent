@@ -63,7 +63,7 @@ namespace TREX {
        * @ingroup utils
        */
       template<typename Ty>
-      class swrapper_factory;
+      struct swrapper_factory;
 
     } 
     
@@ -140,7 +140,7 @@ namespace TREX {
        */
       Ty m_value;
       
-      friend class internal::swrapper_factory<Ty>;
+      friend struct internal::swrapper_factory<Ty>;
     }; // TREX::utils::SingletonWrapper<>
 
   }

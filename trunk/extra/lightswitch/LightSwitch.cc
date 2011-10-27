@@ -51,6 +51,10 @@
 
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
+
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/EnumDomain.hh>
+
 #include "LightSwitch.hh"
 
 using namespace TREX::utils;
@@ -103,8 +107,11 @@ Light::Light(TeleoReactor::xml_arg_type arg)
    m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			 "state")),
    m_firstTick(true) {
+  syslog()<<"I want to own "<<lightObj;
   provide(lightObj); // declare the light timeline
+  syslog()<<"I want to own "<<switchObj;
   provide(switchObj); // declare the switch timeline 
+  syslog()<<"I am done";
 }
 
 Light::~Light() {}
@@ -120,8 +127,13 @@ void Light::setValue(bool val) {
     light_v = offPred;
     switch_v = upPred;
   }
-  postObservation(Observation(lightObj, light_v));
-  postObservation(Observation(switchObj, switch_v));
+  Observation light_state(lightObj, light_v);
+  light_state.restrictAttribute("foo", FloatDomain(2.4));
+
+  postObservation(light_state);
+  Observation switch_state(switchObj, switch_v);
+  switch_state.restrictAttribute("amp", TREX::transaction::EnumDomain("foo"));
+  postObservation(switch_state);
 } 
 
 

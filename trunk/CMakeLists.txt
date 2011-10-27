@@ -40,8 +40,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 ########################################################################
 project(trex)
 set(TREX_MAJOR 0)
-set(TREX_MINOR 2)
-set(TREX_PATCH 1)
+set(TREX_MINOR 3)
+set(TREX_PATCH 0)
 
 
 # CPack version numbers for release tarball name.

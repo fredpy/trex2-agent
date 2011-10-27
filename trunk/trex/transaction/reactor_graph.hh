@@ -231,7 +231,7 @@ namespace TREX {
        * @sa add_reactors(ext_iterator)
        */
       graph(TREX::utils::Symbol const &name, 
-	    TREX::utils::ext_iterator const &conf, 
+	    boost::property_tree::ptree &conf, 
 	    TICK init =0);
       /** @brief Destructor
        *
@@ -247,8 +247,12 @@ namespace TREX {
 	return m_reactors.empty();
       }
 
-      size_t add_reactors(TREX::utils::ext_iterator iter);
-      reactor_id add_reactor(rapidxml::xml_node<> &description); 
+      template<class Iter>
+      size_t add_reactors(Iter from, Iter to);
+      size_t add_reactors(boost::property_tree::ptree &conf) {
+	return add_reactors(conf.begin(), conf.end());
+      }
+      reactor_id add_reactor(boost::property_tree::ptree::value_type &description); 
       static reactor_id null_reactor() {
 	return reactor_id();
       }

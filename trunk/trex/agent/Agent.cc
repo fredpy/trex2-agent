@@ -53,6 +53,7 @@
 using namespace TREX::agent;
 using namespace TREX::transaction;
 using namespace TREX::utils;
+namespace xml = boost::property_tree::xml_parser;
 
 namespace TREX {
   namespace agent {
@@ -273,7 +274,7 @@ Agent::Agent(std::string const &file_name, Clock *clk)
   }
 }
 
-Agent::Agent(rapidxml::xml_node<> &conf, Clock *clk) 
+Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk) 
   :m_clock(clk) {
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
@@ -327,17 +328,17 @@ bool Agent::setClock(Clock *clock) {
   }
 }
 
-void Agent::loadPlugin(rapidxml::xml_node<> &pg) {
+void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg) {
   Symbol name = parse_attr<Symbol>(pg, "name");
   m_pg->load(name);
 }
 
-void Agent::loadConf(rapidxml::xml_node<> &config) {
+void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") ) 
     throw XmlError(config, "Not an Agent node");
   // Extract attributes
   try {
-    Symbol name = parse_attr<std::string>(config, "name");
+    Symbol name(parse_attr<std::string>(config, "name"));
     if( name.empty() )
       throw XmlError(config, "Agent name is empty.");
     set_name(name);
@@ -347,27 +348,27 @@ void Agent::loadConf(rapidxml::xml_node<> &config) {
   } catch(bad_string_cast const &e) {
     throw XmlError(config, e.what());
   }
+  // Populate with external configuration
+  ext_xml(config.second, "config");
+
+
   // Now iterate through the sub-tags 
-  ext_iterator const c_start(config, "config"); 
-  ext_iterator iter; 
-
-  if( !c_start.valid() )
-    throw XmlError(config, "Agent node do not have sub nodes.");
-
+  if( config.second.empty() )
+    throw XmlError(config, "Agent node does not have sub nodes.");
+  boost::property_tree::ptree::assoc_iterator i, last;
+  
   // First load the plugins :
   syslog()<<"Loading plug-ins...";
-  iter = c_start;
-  if( is_tag(*iter, "Plugin") )
-    loadPlugin(*iter);
-  for( iter.next("Plugin"); iter.valid(); iter.next("Plugin") )
-    loadPlugin(*iter);
+  boost::tie(i, last) = config.second.equal_range("Plugin");
+  for( ; last!=i; ++i )
+    loadPlugin(*i);
 
-  
   // Look for A clock : Note only the first clock found is used
   if( NULL==m_clock ) {
     SingletonUse<Clock::xml_factory> clk_f;
-    iter = c_start;
-    clk_f->iter_produce(iter, m_clock);
+    boost::property_tree::ptree::iterator c = config.second.begin();
+
+    clk_f->iter_produce(c, config.second.end(), m_clock);
   }
   // List the reactors available for helping the user :
   SingletonUse<xml_factory> reactor_f;
@@ -377,7 +378,7 @@ void Agent::loadConf(rapidxml::xml_node<> &config) {
 
   reactor_f->getIds(reactors_types);
   if( reactors_types.empty() ) {
-    syslog()<<"ERROR : no reactor types available.";
+    syslog("ERROR")<<"No reactor type available.";
   } else {
     // Display the list of reactor types
     std::ostringstream oss;
@@ -388,14 +389,12 @@ void Agent::loadConf(rapidxml::xml_node<> &config) {
     }
     syslog()<<"Loading reactors; available reactor types are :"<<oss.str();
 
-    iter = c_start;
-    add_reactors(iter);			  
+    add_reactors(config.second);			  
   }
   
   // Now load and post the goals 
   syslog()<<"load initial goals of the agent";
-  iter = c_start;
-  sendRequests(iter);
+  sendRequests(config.second);
 }
 
 void Agent::loadConf(std::string const &file_name) {
@@ -406,14 +405,16 @@ void Agent::loadConf(std::string const &file_name) {
     if( !found )
       throw ErrnoExcept("Unable to locate "+file_name);
   }
-  rapidxml::file<> file(name.c_str());
-  rapidxml::xml_document<> doc;
-  doc.parse<0>(file.data());
-  rapidxml::xml_node<> *root = doc.first_node();
-  if( NULL==root ) 
+  boost::property_tree::ptree agent;
+  read_xml(name, agent, xml::no_comments|xml::trim_whitespace);
+
+  if( agent.empty() )
     throw TREX::utils::Exception(std::string("Configuration file : \"")+
 				 file_name+"\" is empty.");
-  loadConf(*root);
+  if( agent.size()!=1 )
+    throw TREX::utils::Exception(std::string("Configuration file : \"")+
+				 file_name+"\" have multiple roots.");
+  loadConf(agent.front());
 }
 
 void Agent::initComplete() {
@@ -534,16 +535,19 @@ void Agent::sendRequest(goal_id const &g) {
   m_proxy->postRequest(g);
 }
 
-size_t Agent::sendRequests(ext_iterator &iter) {
+size_t Agent::sendRequests(boost::property_tree::ptree &g) {
   size_t ret = 0;
-  if( iter.valid() ) {
-    for(iter = iter.find_tag("Goal"); iter.valid(); iter = iter.next("Goal") ) {
-      sendRequest(*iter);
+  boost::property_tree::ptree::assoc_iterator i, last;
+  boost::tie(i, last) = g.equal_range("Goal");
+  if( last==i ) 
+    syslog("WARN")<<"No goal found in this file";
+  else {
+    for(; last!=i; ++i) {
+      sendRequest(*i);
       ++ret;
     }
     syslog()<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
-  } else 
-    syslog()<<"There's no tag in this file.";
+  } 
   return ret;
 }
 

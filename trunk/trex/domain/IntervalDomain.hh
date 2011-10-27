@@ -521,7 +521,7 @@ namespace TREX {
        * not correctly formatted
        * @throw TREX::transaction::EmptyDomain the resulting interval is empty
        */
-      explicit IntervalDomain(rapidxml::xml_node<> const &node)
+      explicit IntervalDomain(boost::property_tree::ptree::value_type &node)
 	:BasicInterval(node), m_lower(minus_inf), m_upper(plus_inf) {
 	completeParsing(node);
       }

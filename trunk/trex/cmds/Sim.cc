@@ -57,6 +57,7 @@
 using namespace TREX::agent;
 using namespace TREX::utils;
 using namespace TREX::transaction;
+namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   /** @brief entry point to TREX system log */
@@ -121,24 +122,22 @@ namespace {
     } else {
       try {
 	std::cout<<"Loading \""<<file<<"\"... "<<std::flush;
-	rapidxml::file<> xml_f(file.c_str());
-	rapidxml::xml_document<> doc;
-	doc.parse<0>(xml_f.data());
-	rapidxml::xml_node<> *root = doc.first_node();
-	if( NULL==root ) {
+	boost::property_tree::ptree config;
+
+	read_xml(file, config, xml::no_comments|xml::trim_whitespace);
+	
+	if( config.empty() )
 	  std::cout<<"empty file"<<std::endl;
-	} else {
+	else {
 	  std::cout<<"done\nExtracting goals:"<<std::endl;
-	  ext_iterator iter(*root);
-	  trex.sendRequests(iter);
+	  if( config.size()==1 && !is_tag(config.front(), "Goal") )
+	    config = config.front().second;
+	  trex.sendRequests(config);
 	}
 	return true;
-      }catch( rapidxml::parse_error const &xe ) {
-	std::cerr<<"XML error on "<<xe.where<char>()
-		 <<": "<<xe.what()<<std::endl;
-      }catch(Exception const &te) {
+      } catch(Exception const &te) {
 	std::cerr<<"TREX error "<<te<<std::endl;
-      }catch( std::exception const &e ) {
+      } catch( std::exception const &e ) {
 	std::cerr<<"exception: "<<e.what()<<std::endl;
       } catch(...) {
 	std::cerr<<"Unknown error"<<std::endl;

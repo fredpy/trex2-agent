@@ -106,7 +106,7 @@ namespace TREX {
        * @sa Variable::Variable(rapidxml::xml_node<> const &)
        * @sa Predicate::Predicate(rapidxml::xml_node<> const &)
        */
-      Goal(rapidxml::xml_node<> const &node);
+      Goal(boost::property_tree::ptree::value_type &node);
       /** @brief destructor */
       ~Goal() {}
 

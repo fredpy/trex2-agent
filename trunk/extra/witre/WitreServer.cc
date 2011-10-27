@@ -48,7 +48,8 @@ using namespace TREX::utils;
 
 // structors 
 
-WitreServer::WitreServer():m_server(NULL) {
+WitreServer::WitreServer():m_server(NULL),
+			   m_entry(NULL) {
   bool found;
   std::string config = m_log->use("witre.xml", found);
   if( !found ) 
@@ -129,3 +130,15 @@ Wt::WServer const &WitreServer::wt() const {
   return *m_server;
 }
 
+// Modifiers 
+
+bool WitreServer::attach(WitreReactor &r) {
+  if( NULL!=m_entry )
+    m_entry = &r;
+  return &r==m_entry;
+}
+
+void WitreServer::detach(WitreReactor &r) {
+  if( &r==m_entry ) 
+    m_entry = NULL;
+}

@@ -72,7 +72,7 @@ std::string DispatchError::buil_msg(goal_id const &g, std::string const &msg) th
  * class TREX::transaction::details::external
  */
 
-bool details::external::cmp_goals(IntegerDomain const &a, IntegerDomain const &b) {
+bool TREX::transaction::details::external::cmp_goals(IntegerDomain const &a, IntegerDomain const &b) {
   // sorting order
   //   - based on upperBound
   //   - if same upperBound : sorted base on lower bound
@@ -85,16 +85,16 @@ bool details::external::cmp_goals(IntegerDomain const &a, IntegerDomain const &b
 
 // structors
 
-details::external::external() {
+TREX::transaction::details::external::external() {
   m_pos = m_last; // may not be necessary but I just want  ot be sure ...
 }
 
-details::external::external(details::external const &other) 
+TREX::transaction::details::external::external(details::external const &other) 
   :m_pos(other.m_pos), m_last(other.m_last) {}
 
-details::external::external(details::external_set::iterator const &pos,
-			    details::external_set::iterator const &last, 
-			    bool only_active)
+TREX::transaction::details::external::external(details::external_set::iterator const &pos,
+					       details::external_set::iterator const &last, 
+					       bool only_active)
   :m_pos(pos), m_last(last) {
   if( only_active )
     next_active();
@@ -201,7 +201,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
    m_maxDelay(0),
    m_lookahead(parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
    m_nSteps(0) {
-  rapidxml::xml_node<> &node(xml_factory::node(arg));
+  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   
   if( parse_attr<bool>(true, node, "log") ) {
     std::string log = manager().file_name(getName().str()+".tr.log");
@@ -211,18 +211,20 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
 
   if( loadTL ) {
     Symbol tl_name;
+    // Add external file content
+    ext_xml(node.second, "config");
     
-
-    for(ext_iterator iter(node, "config"); iter.valid(); ++iter) {
-      if( is_tag(*iter, "External") ) {
-	tl_name = parse_attr<Symbol>(*iter, "name");
+    for(boost::property_tree::ptree::iterator i=node.second.begin();
+	node.second.end()!=i; ++i) {
+      if( is_tag(*i, "External") ) {
+	tl_name = parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*iter, "Timelines cannot have an empty name");
-	use(tl_name, parse_attr<bool>(true, *iter, "goals"));
-      } else if( is_tag(*iter, "Internal") ) {
-	tl_name = parse_attr<Symbol>(*iter, "name");
+	  throw XmlError(*i, "Timlines cannot have an empty name");
+	use(tl_name, parse_attr<bool>(true, *i, "goals"));
+      } else if( is_tag(*i, "Internal") ) {
+	tl_name = parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*iter, "Timelines cannot have an empty name");
+	  throw XmlError(*i, "Timlines cannot have an empty name");
 	provide(tl_name);
       }
     }
@@ -534,48 +536,68 @@ TeleoReactor::Logger::Logger(std::string const &file_name)
 }
 
 TeleoReactor::Logger::~Logger() {
-  if( m_tick ) 
-    m_file<<"  </tick";
-  else 
-    m_file<<"  </header";
-  m_file<<">\n</log>";
+  if( m_tick ) {
+    if( m_hasData ) 
+      m_file<<"  </tick>\n";
+  } else 
+    m_file<<"  </header>\n";
+  m_file<<"</log>";
 }
 
 void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name) {
+  openTick();
   m_file<<"    <provide name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::use(TREX::utils::Symbol const &name) {
-  m_file<<"    <unprovide name=\""<<name<<"\"/>"<<std::endl;
-}
-
-void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {
+  openTick();
   m_file<<"    <use name=\""<<name<<"\"/>"<<std::endl;
 }
 
+void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {
+  openTick();
+  m_file<<"    <unprovide name=\""<<name<<"\"/>"<<std::endl;
+}
+
 void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
+  openTick();
   m_file<<"    <unuse name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::newTick(TICK val) {
-  if( m_tick ) 
-    m_file<<"  </tick";
-  else {
-    m_file<<"  </header";
+  if( m_tick ) {
+    if( m_hasData ) 
+      m_file<<"  </tick>"<<std::endl;    
+  } else {
+    m_file<<"  </header>"<<std::endl;
     m_tick = true;
   }
-  m_file<<">\n  <tick value=\""<<val<<"\">"<<std::endl;
+  m_hasData = false;
+  m_current = val;
 }
 
+void TeleoReactor::Logger::openTick() {
+  if( m_tick ) {
+    if( !m_hasData ) {
+      m_file<<"  <tick value=\""<<m_current<<"\">\n";
+      m_hasData = true;
+    }
+  }
+}
+
+
 void TeleoReactor::Logger::observation(Observation const &obs) {
+  openTick();
   obs.toXml(m_file, 4)<<std::endl;
 }
 
 void TeleoReactor::Logger::request(goal_id const &goal) {
+  openTick();
   m_file<<"    <request id=\""<<goal<<"\">\n";
   goal->toXml(m_file, 6)<<"\n    </request>"<<std::endl;
 }
 
 void TeleoReactor::Logger::recall(goal_id const &goal) {
+  openTick();
   m_file<<"    <recall id=\""<<goal<<"\"/>"<<std::endl;
 }

@@ -113,7 +113,7 @@ namespace TREX {
        * </enum>
        *@endcode
        */
-      explicit EnumDomain(rapidxml::xml_node<> const &node) 
+      explicit EnumDomain(boost::property_tree::ptree::value_type &node) 
 	:TREX::transaction::EnumeratedDomain<TREX::utils::Symbol>(node) {}
 
       /** @brief Destructor */

@@ -265,7 +265,7 @@ namespace TREX {
        * @note If no elem tag is defined into @e node, the domain
        * will be considered as full.
        */
-      EnumeratedDomain(rapidxml::xml_node<> const &node) 
+      EnumeratedDomain(boost::property_tree::ptree::value_type &node) 
       :BasicEnumerated(node) {
         completeParsing(node);
       }

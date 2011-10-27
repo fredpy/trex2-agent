@@ -113,7 +113,7 @@ namespace TREX {
        * </string>
        *@endcode
        */
-      explicit StringDomain(rapidxml::xml_node<> const &node) 
+      explicit StringDomain(boost::property_tree::ptree::value_type &node) 
 	:TREX::transaction::EnumeratedDomain<std::string>(node) {}
 
       /** @brief Destructor */

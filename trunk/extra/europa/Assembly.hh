@@ -438,7 +438,7 @@ namespace TREX {
        * 
        * Check if @p obj is a trex @e Internal timeline.
        * 
-       * @note This checkinfg is at the reactor level -- and not simply ate the 
+       * @note This checking is at the reactor level -- and not simply at the 
        *       model level. Indeed, it may happen that a timeline has been 
        *       specified as @e Internal by the model but was already owned by 
        *       another reactor. In that case a warning message would have been 

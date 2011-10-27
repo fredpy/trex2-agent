@@ -53,10 +53,15 @@
 #include <PLASMA/Debug.hh>
 #include <PLASMA/Timeline.hh>
 
+#include <boost/algorithm/string/replace.hpp>
+
 using namespace TREX::europa;
 using namespace TREX::europa::details;
 using namespace TREX::transaction;
 using namespace TREX::utils;
+
+namespace xml = boost::property_tree::xml_parser;
+
 
 namespace {
   
@@ -506,25 +511,25 @@ bool Assembly::playTransaction(std::string const &nddl) {
     if( !found ) 
       throw ReactorException(m_reactor, "Unable to locate NDDL.cfg or temp_nddl_gen.cfg");
 		
-    // First load the config file
-    rapidxml::file<> cfg(config.c_str());
-    // parse the file content
-    rapidxml::xml_document<> cfg_xml;
-    
-    cfg_xml.parse<0>(cfg.data());
-		
-    rapidxml::xml_node<> const *xml_root = cfg_xml.first_node();
-    if( NULL== xml_root )
+
+    boost::property_tree::ptree cfg;
+    read_xml(config, cfg, xml::no_comments|xml::trim_whitespace);
+
+    if( cfg.empty() )
       throw ReactorException(m_reactor, config+" does not appear to be in XML");
+    else if( cfg.size()!=1 )
+      throw ReactorException(m_reactor, 
+			     config+" europa config have mutiple XML roots.");
 		
     // Extract include information
-    for(rapidxml::xml_node<> const *child = xml_root->first_node("include");
-	NULL!=child; child = child->next_sibling("include") ) {
-      std::string path = parse_attr<std::string>(*child, "path");
+    boost::property_tree::ptree::assoc_iterator i, last;
+    boost::tie(i, last) = cfg.front().second.equal_range("include");
+    for(; last!=i; ++i) {
+      std::string path = parse_attr<std::string>(*i, "path");
       // replace ';' by ':'
-      for(size_t pos=path.find(';'); pos<path.size(); pos=path.find(pos, ';'))
-	path[pos] = ':';
-      getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);   
+      boost::replace_all(path, ";", ":");
+      // Add this path to the nddl interpreter
+      getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);
     }
   }
   // Now add TREX_PATH to nddl include path

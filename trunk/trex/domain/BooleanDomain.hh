@@ -72,7 +72,7 @@ namespace TREX {
        * @throw TREX::utils::bad_string_cast Unable to parse value
        * attribute
        */
-      explicit BooleanDomain(rapidxml::xml_node<> const &node);
+      explicit BooleanDomain(boost::property_tree::ptree::value_type &node);
 
       /** @brief Destructor */
       ~BooleanDomain() {}

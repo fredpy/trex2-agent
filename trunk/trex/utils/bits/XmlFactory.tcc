@@ -45,9 +45,9 @@
 template<class Product, class Output, class Arg>
 Output XmlFactory<Product, Output, Arg>::produce
 (typename XmlFactory<Product, Output, Arg>::argument_type arg) {
-  rapidxml::xml_node<> const &node = arg_traits::xml(arg);
-  // The name of the tag identifies the producer
-  Symbol id(node.name(), node.name_size());
+  tree_t::value_type &node = arg_traits::xml(arg);
+  Symbol id(node.first);
+
   // Now I locate the producer for id and pass to him
   // the node and extra argument
   try {
@@ -63,30 +63,33 @@ Output XmlFactory<Product, Output, Arg>::produce
 }
 
 template<class Product, class Output, class Arg>
+template<class Iter>
 bool XmlFactory<Product, Output, Arg>::iter_produce
-(typename XmlFactory<Product, Output, Arg>::iter_type it, 
-Output &ret) {
-  ext_iterator &i = iter_traits::xml(it);
-
-  while( i.valid() ) {
-    Symbol tag(i->name(), i->name_size());
+(typename XmlFactory<Product, Output, Arg>::template iter_traits<Iter>::type it, 
+ Iter const &last,
+ Output &ret) {
+  Iter &i = iter_traits<Iter>::xml(it);
+  
+  while( last!=i ) {
+    Symbol tag(i->first);
     if( m_factory->exists(tag) ) {
-      argument_type arg = iter_traits::build_node(*i, it);
+      argument_type arg = iter_traits<Iter>::build_node(*i, it);
       try {
 	ret = m_factory->get(tag)(arg);
+	++i;
+	return true;
       } catch(std::exception const &e) {
 	// Capture any exception derived from std::exception
 	// this includes TREX exceptions as rapidxml::parse_error
-	throw XmlError(*i, e.what());
+	throw XmlError(arg_traits::xml(arg), e.what());
       }  catch(...) {
 	// capture unknown exceptions
-	throw XmlError(*i, "Unknown exception caught.");
-      }
-      ++i;
-      return true;
-    } else
+	throw XmlError(arg_traits::xml(arg), "Unknown exception caught.");
+      } 
+    } else 
       ++i;
   }
+  // No correct tag found
   return false;
 }
  

@@ -134,7 +134,7 @@ namespace TREX {
        * @throw XmlError @c domain was missing
        * @throw XmlError An error occurred while parsing the domain
        */
-      Variable(rapidxml::xml_node<> const &node);
+      Variable(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
       ~Variable();
 

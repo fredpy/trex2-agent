@@ -427,8 +427,8 @@ namespace TREX {
        * @sa std::ostream &toXml(std::ostream &out, size_t tabs) const
        * @sa xml_factory
        */
-      explicit DomainBase(rapidxml::xml_node<> const &node) 
-	:m_type(node.name(), node.name_size()) {}   
+      explicit DomainBase(boost::property_tree::ptree::value_type &node) 
+	:m_type(node.first) {}   
       /** @brief Copy constructor
        * @param other Another instance
        *

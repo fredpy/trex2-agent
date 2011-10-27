@@ -84,7 +84,7 @@ namespace TREX {
        * not correctly formatted
        * @throw EmptyDomain the resulting interval is empty
        */
-      IntegerDomain(rapidxml::xml_node<> const &node)
+      IntegerDomain(boost::property_tree::ptree::value_type &node)
 	:IntervalDomain<long>(node) {}
       /** @brief Constructor
        * @param lb A lower bound

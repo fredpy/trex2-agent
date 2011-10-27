@@ -790,7 +790,10 @@ namespace TREX {
 
       private:
 	std::ofstream m_file;	
-	bool m_tick;
+	bool m_tick, m_hasData;
+	TICK m_current;
+	
+	void openTick();
       }; // TREX::transaction::TeleoReactor::Logger
 	
       Logger *m_trLog;
@@ -911,5 +914,6 @@ namespace TREX {
 } // TREX
 
 # include "bits/bgl_support.hh"
+# include "bits/reactor_graph.tcc"
 
 #endif

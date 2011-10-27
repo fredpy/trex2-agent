@@ -220,7 +220,7 @@ namespace TREX {
        * @sa Agent::Agent(std::string const &, Clock *)
        * @sa Agent::loadConf(rapidxml::xml_node<> &)
        */
-      explicit Agent(rapidxml::xml_node<> &config, 
+      explicit Agent(boost::property_tree::ptree::value_type &config, 
 		     Clock *clock=NULL);
       /** @brief Destructor */
       ~Agent(); 
@@ -334,7 +334,7 @@ namespace TREX {
        *  @sa sendRequest(TREX::transaction::goal_id const &)
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
-      void sendRequest(rapidxml::xml_node<> &g) {
+      void sendRequest(boost::property_tree::ptree::value_type &g) {
 	TREX::transaction::goal_id tmp(new TREX::transaction::Goal(g));
 	sendRequest(tmp);
       }
@@ -348,7 +348,7 @@ namespace TREX {
        *  @sa TREX::transaction::Goal::Goal(rapidxml::xml_node<> &)
        *  @sa sendRequest(rapidxml::xml_node<> &)
        */
-      size_t sendRequests(TREX::utils::ext_iterator &g);
+      size_t sendRequests(boost::property_tree::ptree &g);
 
       double tickDuration() const {
 	return m_clock->tickDuration();
@@ -444,7 +444,7 @@ namespace TREX {
        * @sa Agent::loadPlugin(rapidxml::xml_node<> &)
        * @sa TREX::transaction::graph::add_reactors(TREX::utils::ext_iterator
        */
-      void loadConf(rapidxml::xml_node<> &conf);
+      void loadConf(boost::property_tree::ptree::value_type &conf);
       /** @brief Load agent configuration 
        *
        * @param[in] file_name A configuration file name
@@ -481,7 +481,7 @@ namespace TREX {
       
       bool executeReactor();
 
-      void loadPlugin(rapidxml::xml_node<> &pg);
+      void loadPlugin(boost::property_tree::ptree::value_type &pg);
 
       /** @brief plug-in loader entry point */
       TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;
