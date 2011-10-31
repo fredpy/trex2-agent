@@ -59,6 +59,26 @@ Player::op_assert::op_assert(boost::property_tree::ptree::value_type &node)
   :m_obs(node) {}
 
 /*
+ * class TREX::transaction::Player::op_request
+ */ 
+Player::op_request::op_request(boost::property_tree::ptree::value_type &node)
+  :m_id(parse_attr<std::string>(node, "id")) {
+  boost::property_tree::ptree::assoc_iterator i = node.second.find("Goal");
+  if( node.second.not_found()==i ) 
+    throw XmlError(node, "Unable to find Goal description");
+  m_request.reset(new Goal(*i));  
+}
+
+/*
+ * class TREX::transaction::Player::op_recall
+ */ 
+
+Player::op_recall::op_recall(boost::property_tree::ptree::value_type &node)
+  :m_id(parse_attr<std::string>(node, "id")) {
+}
+
+
+/*
  * class TREX::transaction::Player
  */
 
@@ -71,10 +91,16 @@ void Player::clear(std::list<Player::transaction *> &l) {
   l.clear();
 }
 
+TeleoReactor::xml_arg_type &Player::transform(TeleoReactor::xml_arg_type &arg) {
+  set_attr(TeleoReactor::xml_factory::node(arg), "log", 0);
+  return arg;
+}
+
+
 // structors
 
 Player::Player(TeleoReactor::xml_arg_type arg) 
-  :TeleoReactor(arg, false), m_continue(true) {
+  :TeleoReactor(transform(arg), false), m_continue(true) {
   std::string
     file_name = parse_attr<std::string>(getName().str()+".tr.log",
 					TeleoReactor::xml_factory::node(arg),
@@ -120,22 +146,26 @@ void Player::loadTransactions(boost::property_tree::ptree &properties) {
   else {
     Symbol tl;
     for(;last!=i; ++i) {
-      if( is_tag(*i, "provide") ) {
-	op_provide(*i).accept(*this);
-      }  else if( is_tag(*i, "use") ) {
-	op_use(*i).accept(*this);
-      } else if( is_tag(*i, "unprovide") ) {
-	op_unprovide(*i).accept(*this);
-      }  else if( is_tag(*i, "unuse") ) {
-	op_unuse(*i).accept(*this);
-      } else 
-	syslog("WARN")<<"Unexpected tag "<<i->first<<" in transaction header.";
+      for(boost::property_tree::ptree::iterator j=i->second.begin(); 
+	  i->second.end()!=j; ++j) {
+	if( is_tag(*j, "provide") ) {
+	  op_provide(*j).accept(*this);
+	}  else if( is_tag(*j, "use") ) {
+	  op_use(*j).accept(*this);
+	} else if( is_tag(*j, "unprovide") ) {
+	  op_unprovide(*j).accept(*this);
+	}  else if( is_tag(*j, "unuse") ) {
+	  op_unuse(*j).accept(*this);
+	} else if( !is_tag(*j, "<xmlattr>") ) //< <xmlattr> can be silently ignored 
+	  syslog("WARN")<<"Unexpected tag \""<<j->first<<"\" in transaction header.";
+      }
     }
   }
+  size_t tr_count = 0;
   boost::tie(i, last) = properties.equal_range("tick");
   for( ; last!=i; ++i) {
     TICK cur = parse_attr<TICK>(*i, "value");
-    std::list<transaction *> &ops = m_exec[cur];
+    std::list<transaction *> &ops = m_exec[cur];    
     for(boost::property_tree::ptree::iterator it=i->second.begin();
 	i->second.end()!=it; ++it) {
       if( is_tag(*it, "provide") ) {
@@ -148,11 +178,43 @@ void Player::loadTransactions(boost::property_tree::ptree &properties) {
 	ops.push_back(new op_unuse(*it));
       } else if( is_tag(*it, "Observation") ) {
 	ops.push_back(new op_assert(*it));
-      } else 
-	syslog("WARN")<<"Ignoring tag "<<it->first;      
+      } else if( is_tag(*it, "request") ) {
+	ops.push_back(new op_request(*it));
+      } else if ( is_tag(*it, "recall") ) {
+	ops.push_back(new op_recall(*it));
+      } else if( !is_tag(*it, "<xmlattr>") ) //< <xmlattr> can be silently ignored 
+	syslog("WARN")<<"Ignoring tag \""<<it->first<<'\"';	
     }
+    tr_count += ops.size();
+    // if( !ops.empty() )
+    //   syslog()<<"Loaded "<<ops.size()<<" operations for tick "<<cur;
+  }
+  if( m_exec.empty() ) 
+    syslog("WARN")<<"The log from the reactor did not do anything !";
+  else 
+    syslog()<<tr_count<<" transactions extracted from the log";
+}
+
+void Player::play_request(std::string const &id, goal_id const &g) {  
+  if( !postGoal(g) )
+    syslog("WARN")<<"Failed to post goal "<<g;
+  else
+    m_goals[id] = g;
+}
+
+void Player::play_recall(std::string const &id) {
+  std::map<std::string, goal_id>::iterator i = m_goals.find(id);
+  if( m_goals.end()==i )
+    syslog("WARN")<<"goal \""<<id<<"\" no found in my lookup table.";
+  else {
+    syslog("recall")<<"RECALL "<<i->second<<"(Log ID : "<<i->first<<").";    
+    postRecall(i->second);
+    m_goals.erase(i);
   }
 }
+
+
+// calbacks
 
 void Player::handleTickStart() {
   TICK cur = getCurrentTick();

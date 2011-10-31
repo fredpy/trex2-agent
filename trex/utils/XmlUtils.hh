@@ -148,6 +148,19 @@ namespace TREX {
       }
     }
     
+    template<typename Ty>
+    void set_attr(boost::property_tree::ptree &node,
+		  std::string const &attr, Ty const &value) {
+      node.put("<xmlattr>."+attr, value);
+    }
+
+    template<typename Ty>
+    void set_attr(boost::property_tree::ptree::value_type &node,
+		  std::string const &attr, Ty const &value) {
+      set_attr(node.second, attr, value);
+    }
+    
+
     /** @brief Optional XML attribute extraction
      * @tparam Ty output type
      * @param on_missing default value if missing
