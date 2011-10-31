@@ -93,6 +93,8 @@ namespace TREX {
       ~Player();
 
     private:
+      static TeleoReactor::xml_arg_type &transform(TeleoReactor::xml_arg_type &arg);
+
       void handleTickStart();
       bool synchronize();
       
@@ -277,7 +279,7 @@ namespace TREX {
 	~op_unuse() {}
 
 	void accept(Player &p) {
-	  p.syslog("WARN")<<"unprovide not replayable yet : I'll just do nothing.";
+	  p.syslog("WARN")<<"unuse not replayable yet : I'll just do nothing.";
 	}
       };
 
@@ -317,6 +319,34 @@ namespace TREX {
 	Observation m_obs;
       }; // TREX::transaction::Player::op_assert
 
+      class op_request :public transaction {
+      public:
+	op_request(boost::property_tree::ptree::value_type &node);
+	~op_request() {}
+	
+	void accept(Player &p) {
+	  p.play_request(m_id, m_request);
+	}
+	
+      private:
+	std::string m_id;
+	goal_id m_request;
+      }; // TREX::transaction::Player::op_request
+
+      class op_recall :public transaction {
+      public:
+	op_recall(boost::property_tree::ptree::value_type &node);
+	~op_recall() {}
+	
+	void accept(Player &p) {
+	  p.play_recall(m_id);
+	}
+	
+      private:
+	std::string m_id;
+      }; // TREX::transaction::Player::op_recall
+      
+
       /** @brief Destory a list of pointer
        * @param[in,out] l A list
        *
@@ -345,10 +375,19 @@ namespace TREX {
        * "fail" the next synchronization
        */
       bool m_continue;
+
+      std::map<std::string, goal_id> m_goals;
+
+      void play_request(std::string const &id, goal_id const &g);
+      void play_recall(std::string const &id);
       
       friend class op_provide;
       friend class op_use;
+      friend class op_unprovide;
+      friend class op_unuse;
       friend class op_assert;
+      friend class op_request;
+      friend class op_recall;
     }; // TREX::transaction::Player 
 
   } // TREX::transaction
