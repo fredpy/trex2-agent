@@ -93,6 +93,20 @@ namespace TREX {
       ~Player();
 
     private:
+      /** @brief Modifies a factory xml argument 
+       * 
+       * param[in,out] arg The argeument to modify
+       *
+       * Thsi methods modifies the teleoreactor Xml specification @p arg by forcing
+       * the log attribute to false.
+       *
+       * This operation is done as :
+       * @li the default value for log is true
+       * @li It does not really make sense to log the transactions of a
+       *     LogPlayer (as they are specified in the log file).
+       *
+       * @return @p arg after modification
+       */
       static TeleoReactor::xml_arg_type &transform(TeleoReactor::xml_arg_type &arg);
 
       void handleTickStart();
@@ -293,7 +307,7 @@ namespace TREX {
       public:
 	/** @brief Constructor
 	 *
-	 * @param[in] A xml description for an observation
+	 * @param[in] node A xml description for an observation
 	 *
 	 * Create a new instance describing the action on posting the
 	 * observation described by @p node
@@ -319,9 +333,38 @@ namespace TREX {
 	Observation m_obs;
       }; // TREX::transaction::Player::op_assert
 
+      /** @brief Request operation
+       *
+       * Describe the operation to send a request on an External timeline
+       *
+       * @relates Player
+       */
       class op_request :public transaction {
       public:
+	/** @brief Constructor
+	 *
+	 * @param[in] node A xml description for a request
+	 *
+	 * Create a new instance describing the action on requesting the
+	 * goal described by @p node
+	 *
+	 * The usual format for a request is
+	 * @code
+	 * <request id="<an id>">
+	 *   <Goal ....>
+         *     [...]
+	 *   </Goal>
+	 * </request>
+	 * @endcode 
+	 * 
+	 * @pre @p node is a valid request description
+	 *
+	 * @throw XmlError unable to parse @p node as a request
+	 *
+	 * @sa Goal::Goal(rapidxml::xml_node<> &)
+	 */
 	op_request(boost::property_tree::ptree::value_type &node);
+	/** @brief Destructor */
 	~op_request() {}
 	
 	void accept(Player &p) {
@@ -329,13 +372,50 @@ namespace TREX {
 	}
 	
       private:
+	/** @brief logged id
+	 *
+	 * This string indicates the id value extracted from the log.
+	 * This value is used in order to associate the logged id to the real
+	 * goal_id used durign this run. It is important to kee p track on that
+	 * in order to recall the proper goal if needed
+	 * 
+	 * @sa Player::op_recall
+	 */
 	std::string m_id;
+	/** @brief The goal
+	 *
+	 * This is the goal that will be effectively posted durign this execution.
+	 */
 	goal_id m_request;
       }; // TREX::transaction::Player::op_request
 
+       /** @brief Recall operation
+       *
+       * Describe the operation to recall a former request on an
+       * External timeline
+       *
+       * @relates Player
+       */
       class op_recall :public transaction {
       public:
+	/** @brief Constructor
+	 *
+	 * @param[in] node A xml description for a recall
+	 *
+	 * Create a new instance describing the action on recalling the
+	 * goal described by @p node
+	 *
+	 * The usual format for a request is
+	 * @code
+	 * <recall id="<an id>"/>
+	 * @endcode 
+	 * 
+	 * @pre @p node is a valid recall description
+	 *
+	 * @throw XmlError unable to parse @p node as a recall
+	 */
 	op_recall(boost::property_tree::ptree::value_type &node);
+	/** @brief Destructor */
 	~op_recall() {}
 	
 	void accept(Player &p) {
@@ -343,11 +423,19 @@ namespace TREX {
 	}
 	
       private:
+	/** @brief Logged id
+	 *
+	 * The id extracted from the log. This attribute will be used
+	 * during execution in order to identify the real id of the request
+	 * to recall
+	 *
+	 * @sa Player::play_recall(std::string const &)
+	 */
 	std::string m_id;
       }; // TREX::transaction::Player::op_recall
       
 
-      /** @brief Destory a list of pointer
+      /** @brief Destroy a list of pointer
        * @param[in,out] l A list
        *
        * This method delete all the elements of @p l before clearing it.
@@ -376,9 +464,41 @@ namespace TREX {
        */
       bool m_continue;
 
+      /** @brief List of "active" goals
+       *
+       * This map associetes the logged id of a goal with its real goal id.
+       * It is used by both Player::op_request and Player::op_recall in order
+       * to identify the assciation between a logged id and its real counterpart.
+       * By doing so we are sure to recall the proper goal when replaying a mission.
+       *
+       * @sa play_request(std::string const &, goal_id const &)
+       * @sa play_recall(std::string const &)
+       */
       std::map<std::string, goal_id> m_goals;
 
+      /** @brief Post a new goal
+       *
+       * @param[in] id The id of the goal from the log
+       * @param[in] g The goal to be posted
+       *
+       * This method post the goal @p g. If the operation succeddd it then
+       * associates @p g to its @p id in m_goals.
+       *
+       * Otherwise it display a warning message in TREX.log
+       *
+       * @sa play_recall(std::string const &);
+       */
       void play_request(std::string const &id, goal_id const &g);
+      /** @brief Recall a goal
+       *
+       * @param[in] id The id of the goal from the log
+       *
+       * This method attempts to recall the goal asscoaited to the log id @p id.
+       * It attempts first to find this goal in m_goals, then if it finds it it
+       * recall it. otherwise it display a warning message in TREX.log
+       * 
+       * @sa  play_request(std::string const &, goal_id const &);
+       */
       void play_recall(std::string const &id);
       
       friend class op_provide;
