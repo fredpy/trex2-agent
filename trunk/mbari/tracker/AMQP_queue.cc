@@ -18,9 +18,10 @@ queue::queue(connection &cn)
 queue::queue(connection &cn, std::string const &name)
   :m_conn(cn), m_channel(cn.new_channel()),
    m_name(amqp_bytes_malloc_dup(amqp_cstring_bytes(name.c_str()))) {
-  amqp_queue_declare_ok_t *r = amqp_queue_declare(m_conn.m_conn, m_channel,
-						  m_name, 0, 0, 0, 1,
-						  amqp_empty_table);
+     /* amqp_queue_declare_ok_t *r = */ 
+     amqp_queue_declare(m_conn.m_conn, m_channel,
+                        m_name, 0, 0, 0, 1,
+                        amqp_empty_table);
   m_conn.check_rpc_reply("Declaring queue "+name);
 }
 
