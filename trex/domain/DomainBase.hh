@@ -1,19 +1,4 @@
 /* -*- C++ -*- */
-/** @file "DomainBase.hh"
- * @brief TREX domain basic utilities
- *
- * This file defines the bases for implementing domains in TREX.
- * Domains are used for representing attributes' values for goals
- * and observations between reactors.
- *
- * @note Domains representation used to rely on Europa implementation.
- * In an effort to make TREX independent from Europa framework this
- * version of TREX provides this new implementation. Note that it can
- * evolve in the future on users request or performances requirements.
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup domains
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -46,6 +31,21 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
+ */
+/** @file "DomainBase.hh"
+ * @brief TREX domain basic utilities
+ *
+ * This file defines the bases for implementing domains in TREX.
+ * Domains are used for representing attributes' values for goals
+ * and observations between reactors.
+ *
+ * @note Domains representation used to rely on Europa implementation.
+ * In an effort to make TREX independent from Europa framework this
+ * version of TREX provides this new implementation. Note that it can
+ * evolve in the future on users request or performances requirements.
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup domains
  */
 #ifndef H_DomainBase 
 # define H_DomainBase

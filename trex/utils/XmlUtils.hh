@@ -88,13 +88,35 @@ namespace TREX {
     
     namespace internals { 
       
+      /** @brief XML attribibute parsing helper 
+       * 
+       * @tparam Ty the expected output type
+       * 
+       * This class is used internally as an helper to extract the value of an 
+       * XML attribute and parse it as a @p Ty instance 
+       * 
+       * @author Frederic Py <fpy@mbari.org>
+       */
       template<class Ty>
       struct attr_helper {
+        /** @brief Parse attribute
+         * 
+         * @param[in] pt A xml based property tree
+         * @param[in] name An attribute name
+         * 
+         * Extracts the value of the attribute @p name from the property tree 
+         * @p pt
+         * 
+         * @pre The path @c "<xmlattr>."+@p name exists
+         * @pre The value of the attribute can be parsed as a @p Ty
+         * 
+         * @return the value of this attribute
+         */
         static Ty get(boost::property_tree::ptree const &pt,
                       std::string const &name) {
           return string_cast<Ty>(pt.get<std::string>("<xmlattr>."+name));
         }
-      };
+      }; // TREX::utils::internals::attr_helper<>
       
       
       template<class Ty>
@@ -107,7 +129,7 @@ namespace TREX {
 	  else 
 	    return boost::optional<Ty>();
         }
-      };
+      }; // TREX::utils::internals::attr_helper< boost::optional<> >
       
     } // TREX::utils::internals
     
@@ -127,6 +149,7 @@ namespace TREX {
      * @return The parsed value from @a attr
      * @sa template<class Ty> Ty const &parse_attr(Ty const &, rapidxml::xml_node<> const &, std::string const &attr)
      * @ingroup utils
+     * @{
      */
     template<class Ty>
     Ty parse_attr(boost::property_tree::ptree const &node, 
@@ -147,6 +170,7 @@ namespace TREX {
         throw XmlError(node, n.what());
       }
     }
+    /** @} */
     
     template<typename Ty>
     void set_attr(boost::property_tree::ptree &node,

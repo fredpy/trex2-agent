@@ -186,7 +186,7 @@ void DrifterTracker::drifter_msg(amqp::queue::message const &msg) {
 	      lon = report.longitude();
 	      obs.restrictAttribute("longitude", FloatDomain(lon));
 
-	      double north, east, sn, se;
+	      double north, east;
 	      geo_to_utm(report.latitude(), report.longitude(), north, east);
 	      i->second.update(sec, north, east);
 	      // obs.restrictAttribute("northing", FloatDomain(north));

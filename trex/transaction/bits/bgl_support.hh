@@ -123,7 +123,7 @@ namespace boost {
     // Incidence Graph Concept
     /** @brief external relation iterator
      * 
-     * An iterator used to iterate through all the @u active external relations
+     * An iterator used to iterate through all the @e active external relations
      * of a reactor. 
      * 
      * @sa Relation::active() const
