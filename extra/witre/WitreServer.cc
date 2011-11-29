@@ -42,6 +42,8 @@
 using namespace TREX::witre;
 using namespace TREX::utils;
 
+namespace xml = boost::property_tree::xml_parser;
+
 /*
  * class TREX::witre::WitreServer 
  */
@@ -55,22 +57,31 @@ WitreServer::WitreServer():m_server(NULL),
   if( !found ) 
     throw Error("Unable to locate witre.xml server configuration");
   try {
-    // we will refine that later
-    rapidxml::file<> cfg(config.c_str());
-    rapidxml::xml_document<> doc;
-    doc.parse<0>(cfg.data());
-    rapidxml::xml_node<> *root = doc.first_node(), *child;
+    /* old code :
+     * rapidxml::file<> cfg(config.c_str());
+     * rapidxml::xml_document<> doc;
+     * doc.parse<0>(cfg.data());
+     * rapidxml::xml_node<> *root = doc.first_node(), *child;
+     *
+     * if( NULL==root ) 
+     * throw Error("Unable to parse xml content of "+config);
+     * 
+     * child = root->first_node("server");
+     * if( NULL==child ) 
+     * throw TREX::utils::XmlError(*root, "Unable to find \"server\" configuration tag");
+     *
+     * std::string arg(child->value(), child->value_size());
+     */
+    // new code 
+    boost::property_tree::ptree doc;    
+    read_xml(config, doc, xml::no_comments|xml::trim_whitespace);
     
-    if( NULL==root ) 
-      throw Error("Unable to parse xml content of "+config);
+    if( doc.empty() ) 
+      throw Error("XML document "+config+" is empty");
+    std::string arg = doc.get<std::string>("server");
+    // end new code
 
-    child = root->first_node("server");
-    if( NULL==child ) 
-      throw TREX::utils::XmlError(*root, "Unable to find \"server\" configuration tag");
-
-    std::string arg(child->value(), child->value_size());
     std::vector<std::string> args;
-
     boost::algorithm::split(args, arg, boost::algorithm::is_space());
 
     size_t argc = args.size();
