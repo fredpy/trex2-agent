@@ -95,7 +95,7 @@ namespace TREX {
 	 * @sa owned() const
 	 * @sa owner() const
 	 */
-	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv);
+	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, bool controllable);
 	/** @brief Destructor */
 	~timeline();
 
@@ -122,6 +122,7 @@ namespace TREX {
 	bool owned() const {
 	  return NULL!=m_owner;
 	}
+        
 	/** @brief Check for ownership
 	 *
 	 * @param[in] r A reactor
@@ -169,7 +170,7 @@ namespace TREX {
 	}
 	/** @brief check if no client
 	 *
-	 * Inbdicates if this timeline has no reactor that declared it
+	 * Indicates if this timeline has no reactor that declared it
 	 * as external
 	 *
 	 * @retval true if it has no client
@@ -285,7 +286,7 @@ namespace TREX {
 	 * @sa unassign(TICK,bool,bool)
 	 * @sa TeleoReactor::assigned(timeline const &)
 	 */
-	bool assign(TeleoReactor &r);
+	bool assign(TeleoReactor &r, bool controllable);
 	/** @brief Remove ownership
 	 *
 	 * @param[in] date     current tick
@@ -391,6 +392,7 @@ namespace TREX {
 
 	utils::Symbol m_name;
 	TeleoReactor *m_owner;
+        bool          m_accept_goals;
 	client_set    m_clients;
 	
 	Observation   m_lastObs;

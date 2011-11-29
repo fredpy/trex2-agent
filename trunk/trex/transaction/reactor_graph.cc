@@ -94,16 +94,12 @@ void graph::clear() {
 }
 
 long graph::index(graph::reactor_id id) const {
-#ifndef DEBUG
   size_t pos = 0;
   // not efficient at all !!!
   details::reactor_set::const_iterator i;
   for(i=m_reactors.begin();
       m_reactors.end()!=i && i->get()!=id; ++i, ++pos);
   return pos;
-#else
-  return reinterpret_cast<long>(id);
-#endif
 }
 
 graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
@@ -184,9 +180,9 @@ graph::size_type graph::count_relations() const {
 }
 
 
-bool graph::assign(graph::reactor_id r, Symbol const &timeline) {
+bool graph::assign(graph::reactor_id r, Symbol const &timeline, bool controllable) {
   details::timeline_set::iterator tl = get_timeline(timeline);
-  return (*tl)->assign(*r);
+  return (*tl)->assign(*r, controllable);
 }
 
 bool graph::subscribe(reactor_id r, Symbol const &timeline, bool control) {

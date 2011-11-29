@@ -56,11 +56,11 @@ utils::Symbol const timeline::s_failed("Failed");
 // structors :
 
 timeline::timeline(TICK date, utils::Symbol const &name)
-  :m_name(name), m_owner(NULL), m_lastObs(name, s_failed),
+  :m_name(name), m_owner(NULL), m_accept_goals(false), m_lastObs(name, s_failed),
    m_obsDate(date) {}
 
-timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv)
-  :m_name(name), m_owner(&serv), m_lastObs(name, s_failed),
+timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, bool controllable)
+  :m_name(name), m_owner(&serv), m_accept_goals(controllable), m_lastObs(name, s_failed),
    m_obsDate(date) {}
 
 timeline::~timeline() {
@@ -70,7 +70,7 @@ timeline::~timeline() {
 // observers :
 
 TICK timeline::look_ahead() const {
-  return owned()?owner().getLookAhead():0;
+  return (owned() && m_accept_goals)?owner().getLookAhead():0;
 }
 
 TICK timeline::latency() const {
@@ -79,7 +79,7 @@ TICK timeline::latency() const {
 
 // modifiers :
 
-bool timeline::assign(TeleoReactor &r) {
+bool timeline::assign(TeleoReactor &r, bool controllable) {
   bool ret = true;
   
   if( NULL==m_owner ) {
@@ -90,6 +90,7 @@ bool timeline::assign(TeleoReactor &r) {
       ret = false;
     }
     m_owner = &r;
+    m_accept_goals = controllable;
     r.assigned(this);
     latency_update(0);
   } else if( !owned_by(r) ) 
@@ -103,6 +104,7 @@ void timeline::unassign(TICK date, bool demotion, bool control) {
     
     m_owner->unassigned(this);
     m_owner = NULL;
+    m_accept_goals = false;
     postObservation(date, Observation(name(), s_failed));
     latency_update(tmp->getExecLatency());
     if( demotion ) 
