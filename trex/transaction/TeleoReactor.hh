@@ -698,9 +698,10 @@ namespace TREX {
        * @sa provide(TREX::utils::Symbol const &)
        */
       void use(TREX::utils::Symbol const &timeline, bool control=true);
-      /** @brief Intternal timeline declaration
+      /** @brief Internal timeline declaration
        *
        * @param[in] timeline a name
+       * @param[in] does this timeline accept goals
        *
        * This method is used to declare @p timeline as an @e Internal timeline.
        *
@@ -716,7 +717,7 @@ namespace TREX {
        * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &) 
        * @sa use(TREX::utils::Symbol const &, bool)
        */
-      void provide(TREX::utils::Symbol const &timeline);
+      void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
 			
       /** @brief Check for internal timeline
        *

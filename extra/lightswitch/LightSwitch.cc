@@ -108,7 +108,7 @@ Light::Light(TeleoReactor::xml_arg_type arg)
 			 "state")),
    m_firstTick(true) {
   syslog()<<"I want to own "<<lightObj;
-  provide(lightObj); // declare the light timeline
+  provide(lightObj, false); // declare the light timeline ... no goal accepted here
   syslog()<<"I want to own "<<switchObj;
   provide(switchObj); // declare the switch timeline 
   syslog()<<"I am done";

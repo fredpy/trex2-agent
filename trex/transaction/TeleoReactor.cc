@@ -438,8 +438,8 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control) {
 	      <<timeline.str()<<"\"";
 }
 
-void TeleoReactor::provide(TREX::utils::Symbol const &timeline) {
-  if( !m_graph.assign(this, timeline) )
+void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable) {
+  if( !m_graph.assign(this, timeline, controllable) )
     syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
 }
   
