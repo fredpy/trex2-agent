@@ -58,6 +58,7 @@ namespace xml = boost::property_tree::xml_parser;
 namespace TREX {
   namespace agent {
     namespace details {
+            
       /** @brief Reactors initialization visitor
        *
        * This class is a depth first search visitor that will initialize all 
@@ -224,6 +225,8 @@ namespace TREX {
 
 	sync_scheduller(); // no code in purpose
       };
+      
+      
 
     }
   }
@@ -460,6 +463,7 @@ void Agent::run() {
 void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
   details::sync_scheduller sync(queue);
+  m_edf.clear(); // Make sure that there's no one left in the schedulling
 
   // Identify synchronization order while notifying of the new tick
   boost::depth_first_search(me(), boost::visitor(sync));
