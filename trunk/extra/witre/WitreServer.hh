@@ -48,7 +48,7 @@ namespace TREX {
     class WitreApplication;
     class WitreReactor;
 
-    class WitreServer :public TREX::transaction::TeleoReactor, boost::noncopyable {
+    class WitreServer :public TREX::transaction::TeleoReactor {
     public:
 
       class Error :public TREX::utils::Exception {
