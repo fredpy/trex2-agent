@@ -32,11 +32,20 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-option(WITH_WITRE "Enable witre plugin (require Wt)" OFF)
+option(WITH_WITRE "Enable witre plugin (require Wt)" ON)
 
 if(WITH_WITRE) 
   find_package(Wt REQUIRED)
   include_directories(${Wt_INCLUDE_DIR})
-  trex_plugin(witre WitreServer.cc Witre.cc)
-  target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
+  add_library(TREXwitre SHARED
+     WitreServer.cc
+     Observations.hh
+     Popup.hh)
+  target_link_libraries(TREXwitre ${Wt_LIBRARIES} TREXtransaction)
+ 
+  trex_plugin(witre Witre.cc)
+  target_link_libraries(witre_pg TREXwitre)	
+  #include_directories(${Wt_INCLUDE_DIR})
+  #trex_plugin(witre WitreServer.cc Witre.cc)
+  #target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
 endif(WITH_WITRE)
