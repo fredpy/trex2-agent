@@ -698,6 +698,7 @@ namespace TREX {
        * @sa provide(TREX::utils::Symbol const &)
        */
       void use(TREX::utils::Symbol const &timeline, bool control=true);
+            
       /** @brief Internal timeline declaration
        *
        * @param[in] timeline a name
@@ -719,6 +720,12 @@ namespace TREX {
        */
       void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
 			
+      virtual bool failed_external(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
+        return false;
+      }
+      virtual bool failed_internal(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
+        return false;
+      }
       /** @brief Check for internal timeline
        *
        * @param[in] timeline A name

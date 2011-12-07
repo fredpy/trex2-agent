@@ -72,7 +72,8 @@ namespace TREX {
       /** @brief Destructor */
       ~MultipleReactors() throw() {}
     }; // TREX::transaction::MultipleReactors
-
+      
+    
 
     /** @brief Transactions graph
      *
@@ -117,6 +118,16 @@ namespace TREX {
        * The type used to represent a reactor in the graph
        */
       typedef details::reactor_id reactor_id;
+
+      struct timeline_failure: public ReactorException {
+      public:
+        virtual ~timeline_failure() throw() {}
+      protected:
+        timeline_failure(graph::reactor_id r, 
+                         std::string const &msg) throw()
+        :ReactorException(*r, msg) {}
+      }; // TREX::transaction::graph::timeline_failure
+      
       /** @brief reactor relation type
        *
        * The type used to represent the dependencies between reactors in
@@ -335,6 +346,9 @@ namespace TREX {
       timeline_iterator timeline_end() const {
 	return m_timelines.end();
       }
+      
+      virtual void internal_check(reactor_id r, details::timeline const &tl) {}
+      virtual void external_check(reactor_id r, details::timeline const &tl) {}
 
     private:
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,

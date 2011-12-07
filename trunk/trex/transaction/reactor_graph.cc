@@ -182,10 +182,20 @@ graph::size_type graph::count_relations() const {
 
 bool graph::assign(graph::reactor_id r, Symbol const &timeline, bool controllable) {
   details::timeline_set::iterator tl = get_timeline(timeline);
-  return (*tl)->assign(*r, controllable);
+  try {
+    internal_check(r, **tl);
+    return (*tl)->assign(*r, controllable);
+  } catch(timeline_failure const &err) {
+    return r->failed_internal(timeline, err);
+  }
 }
 
 bool graph::subscribe(reactor_id r, Symbol const &timeline, bool control) {
   details::timeline_set::iterator tl = get_timeline(timeline);
-  return (*tl)->subscribe(*r, control);
+  try {
+    external_check(r, **tl);
+    return (*tl)->subscribe(*r, control);
+  } catch(timeline_failure const &err) {
+    return r->failed_external(timeline, err);
+  }
 }
