@@ -104,7 +104,7 @@ endif(LIB_RT)
 ########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
-find_package(Boost 1.38.0 COMPONENTS thread system)
+find_package(Boost 1.41.0 COMPONENTS thread system signals)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   list(APPEND ${PROJECT_NAME}_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})
