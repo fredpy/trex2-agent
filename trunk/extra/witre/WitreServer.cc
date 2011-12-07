@@ -34,7 +34,6 @@
 #include "Witre.hh"
 
 #include <trex/utils/XmlUtils.hh>
-#include <trex/utils/Plugin.hh>
 #include <boost/algorithm/string.hpp>
 
 #include <cstring>
@@ -49,24 +48,11 @@ namespace xml = boost::property_tree::xml_parser;
  * class TREX::witre::WitreServer
  */
 
-namespace {
-    SingletonUse<LogManager> s_log;
-    TeleoReactor::xml_factory::declare<WitreServer> decl("WitreReactor");
-}
-
-namespace TREX {
-
-  void initPlugin() {
-    ::s_log->syslog("plugin.witre")<<"Witre loaded."<<std::endl;
-    // ::decl;
-  }
-
-}
 
 // structors
 
-WitreServer::WitreServer(TeleoReactor::xml_arg_type arg):m_server(NULL),
-			   m_entry(NULL), TeleoReactor(arg) {
+WitreServer::WitreServer(TeleoReactor::xml_arg_type arg):TeleoReactor(arg), m_server(NULL),
+			   m_entry(NULL) {
   bool found;
   std::string config = m_log->use("witre.xml", found);
   if( !found )
