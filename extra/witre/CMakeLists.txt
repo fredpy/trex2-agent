@@ -38,12 +38,14 @@ if(WITH_WITRE)
   find_package(Wt REQUIRED)
   include_directories(${Wt_INCLUDE_DIR})
   add_library(TREXwitre SHARED
-     WitreServer.cc
-     Observations.hh
-     Popup.hh)
-  target_link_libraries(TREXwitre ${Wt_LIBRARIES} TREXtransaction)
+     Witre.cc WitreServer.cc)
+  target_link_libraries(TREXwitre 
+    ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
+    ${Boost_THREAD_LIBRARY} 
+    ${Boost_SIGNALS_LIBRARY} 
+    TREXtransaction)
  
-  trex_plugin(witre Witre.cc)
+  trex_plugin(witre witre_pg.cc)
   target_link_libraries(witre_pg TREXwitre)	
   #include_directories(${Wt_INCLUDE_DIR})
   #trex_plugin(witre WitreServer.cc Witre.cc)
