@@ -27,9 +27,8 @@ close to strlen). The version used -- and provided -- for this package
 is 1.13.
 @li @b boost (http://www.boost.org) This library is widely used for
 basic utilities and compatibilty with the TR1 C++0x standard. As we use
-flyweight the earliest version to be used is 1.38.0 (we tested it with
-boost 1.40.0). We also use the Boost Graph Library but should support version 
-1.36.0 and above according to its latest documentation
+flyweight, boost graph and property tree the earliest version 
+to be used is 1.41.0 (we tested it with boost 1.47.0). 
 
 Others utilies are of interrest but not necessary to use TREX:
 @li @e doxygen (http://www.doxygen.org/) This utility is needed only

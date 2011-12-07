@@ -5,7 +5,7 @@ Installing TREX
 TREX uses third party utilities and libraries. Here's sa list of them :
  - boost (http://www.boost.org) This library is widely used for basic
          utilities and compatibilty with the TR1 C++0x standard.
-	 version 1.40 or above (tested against 1.40 up to 1.46) 
+	 version 1.41 or above (tested against 1.47) 
 
 Other utilies are of interrest but not necessary to use TREX:
  - doxygen (http://www.doxygen.org/) This utility is needed only if you want 
