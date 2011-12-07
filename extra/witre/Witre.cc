@@ -251,8 +251,8 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
         {
             Wt::WPanel* Gpanel = new Wt::WPanel();
             Wt::WPushButton* recall = new Wt::WPushButton("Recall");
-            recall->clicked().connect(goalid,&WitreServer::postRecall);
-            Gpanel->setCentralWidget(recall);
+            //recall->clicked().connect(goalid,&WitreServer::postRecall);
+            //Gpanel->setCentralWidget(recall);
             //Gpanel->setObjectName(goalid);
         }
 
