@@ -501,6 +501,15 @@ namespace TREX {
        */
       void play_recall(std::string const &id);
       
+      virtual bool failed_external(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
+        throw ReactorException(*this, "Failed to subscribe to external timeline "+timeline.str()+": "+err.what());
+        return false;
+      }
+      virtual bool failed_internal(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
+        throw ReactorException(*this, "Failed to create internal timeline "+timeline.str()+": "+err.what());
+        return false;
+      }
+      
       friend class op_provide;
       friend class op_use;
       friend class op_unprovide;
