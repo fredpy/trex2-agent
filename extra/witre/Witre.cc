@@ -78,7 +78,10 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
 
     //setCssTheme("Polished");
 
-    clock = new Wt::WText("",root());
+    //clock = new Wt::WText("",root());
+    new Wt::WText("Current ",root());
+    tickNum = new Wt::WText("Tick Value: 0", root());
+    tickNum->setMargin(5,Wt::Right);
     new Wt::WBreak(root());
 
     Wt::WGroupBox *tLines = new Wt::WGroupBox("Available Timelines", root());
@@ -91,10 +94,6 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
         temp->setObjectName(name);
         temp->changed().connect(this, &WitreApplication::timeLineChange);
     }
-    new Wt::WText("Current ",root());
-    tickNum = new Wt::WText("Tick Value: 0", root());
-    tickNum->setMargin(5,Wt::Right);
-    new Wt::WBreak(root());
     menu = new Wt::WComboBox(root());
     for(int i = 0; i<wServer->extTimelinesSize(); i++)
     {
@@ -105,7 +104,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
         }
     }
     input= new Wt::WLineEdit(root());
-
+    input->setMargin(5, Wt::Left);
     enter = new Wt::WPushButton("Post Goal", root());
     enter->setMargin(5,Wt::Left);
     enter->clicked().connect(this, &WitreApplication::attributePopup);
@@ -118,6 +117,18 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     popup->finished().connect(enter, &Wt::WPushButton::enable);
     popup->cancelled().connect(enter, &Wt::WPushButton::enable);
 
+    timeLineSlider = new Wt::WSlider(Wt::Horizontal, root());
+    timeLineSlider->setMargin(100, Wt::Left);
+    //timeLineSlider->setTickPosition(Wt::WSlider::TicksBothSides);
+    timeLineSlider->setTickInterval(wServer->tickDuration());
+    timeLineSlider->setRange(0, wServer->getFinalTick());
+    timeLineSlider->resize(400, 50);
+    //timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderChanged );
+    //timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderText);
+    timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderText);
+
+    sliderTime = new Wt::WText(root());
+    new Wt::WBreak(root());
     new Wt::WBreak(root());
 
     observations = wServer->receiveObs();
@@ -141,32 +152,44 @@ void WitreApplication::post()
 {
     std::string name = observations.front().getObj();
     std::string observ = observations.front().getObs();
+    std::string time = observations.front().getTime();
 
     if(name=="Tick")
     {
         updateTick(observ);
         observations.pop();
+        timeLineSlider->setValue(timeLineSlider->value()+1);
+        sliderText();
         Wt::WApplication::instance()->triggerUpdate();
         return;
     }
-    Wt::WPanel* box = new Wt::WPanel();
-    box->setCentralWidget(new Wt::WText(observ)); // Addes the most recent observation to webpage
-    box->setObjectName(name); // Names the box by the timeline
+    Wt::WPanel* panel = new Wt::WPanel();
+    panel->setCentralWidget(new Wt::WText(observ)); // Addes the most recent observation to webpage
+    panel->setObjectName(name); // Names the box by the timeline
     observations.pop(); //Pops the most recent observation
     //box->setCollapsible(true);
     //box->setTitleBar(true);
     //box->setTitle(tickNum->text());
     if(!tLineMap[name])
     {
-        box->hide();
+        panel->hide();
     }
-    insert(box);
+    insert(time, panel);
 }
 
-void WitreApplication::insert(Wt::WPanel* wid)
+void WitreApplication::insert(std::string time, Wt::WPanel* wid)
 {
-    const Wt::WAnimation animate(Wt::WAnimation::Pop, Wt::WAnimation::Ease, 10000);
-    messages->insertWidget(0, wid);
+    //const Wt::WAnimation animate(Wt::WAnimation::Fade, Wt::WAnimation::Ease, 10000);
+    //wid->setAnimation(animate);
+    if(boxPanels[time]==NULL)
+    {
+        Wt::WContainerWidget* temp = new Wt::WContainerWidget();
+        temp->setObjectName(time);
+        boxPanels[time]= temp;
+        messages->insertWidget(0, boxPanels[time]);
+    }
+    //messages->insertWidget(0, wid);
+    boxPanels[time]->insertWidget(0, wid);
     Wt::WApplication::instance()->triggerUpdate();
 }
 
@@ -177,9 +200,8 @@ void WitreApplication::updateTime()
     clock->setText(time->toString());
 }
 
-void WitreApplication::addObs(std::string obs, std::string obj)
+void WitreApplication::addObs(Observations* temp)
 {
-    Observations* temp = new Observations(obs,obj);
     observations.push(*temp);
     return;
 }
@@ -188,16 +210,21 @@ void WitreApplication::timeLineChange()
 {
     Wt::WObject* timeLine = sender();
     std::string tName = timeLine->objectName();
-    for(int i=0; i<messages->count(); i++)
+    std::map<std::string, Wt::WContainerWidget*>::iterator it;
+    for(it=boxPanels.begin(); it!=boxPanels.end(); it++)
     {
-        Wt::WWidget* temp = messages->widget(i);
-        if(temp->objectName()==tName)
+        Wt::WContainerWidget* container = (*it).second;
+        for(int i=0; i<container->count(); i++)
         {
-            if(tLineMap[tName])
+            Wt::WWidget* tempWidget = container->widget(i);
+            if(tempWidget->objectName()==tName)
             {
-                temp->hide();
-            } else {
-                temp->show();
+                if(tLineMap[tName])
+                {
+                    tempWidget->hide();
+                } else {
+                    tempWidget->show();
+                }
             }
         }
     }
@@ -231,7 +258,8 @@ void WitreApplication::attributePopup()
         popup->setVisable();
     }
     else{
-
+        Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invaild input for goal"
+                                                             , Wt::Ok);
         enter->enable();
     }
 }
@@ -250,10 +278,27 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
         if(goalid!=NULL)
         {
             Wt::WPanel* Gpanel = new Wt::WPanel();
-            Wt::WPushButton* recall = new Wt::WPushButton("Recall");
+            Gpanel->setObjectName(goalid->object().str());
+            //Wt::WPushButton* recall = new Wt::WPushButton("Recall");
+            std::stringstream oss;
+            oss<<"On Timeline <b>"<<goalid->object()<<"</b>, placed goal <b>"<<goalid->predicate()<<"</b>"
+               <<" at the time: "<<wServer->getTime_t()<<"<br />"
+               <<"Starting: "<<start<<"<br />"
+               <<"Duration: "<<duration<<"<br />"
+               <<"End: "<<end<<"<br />";
+            Wt::WText* text = new Wt::WText(oss.str());
+            Wt::WContainerWidget* container = new Wt::WContainerWidget;
+            container->addWidget(text);
+            //container->addWidget(recall);
             //recall->clicked().connect(goalid,&WitreServer::postRecall);
-            //Gpanel->setCentralWidget(recall);
-            //Gpanel->setObjectName(goalid);
+            Gpanel->setCentralWidget(container);
+            if(!tLineMap[goalid->object().str()])
+            {
+                Gpanel->hide();
+            }
+            std::stringstream time;
+            time<<wServer->getCurrentTick();
+            insert(time.str(), Gpanel);
         }
 
     }
@@ -261,3 +306,28 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
 
 }
 
+void WitreApplication::sliderChanged()
+{
+    std::stringstream value;
+    value<<timeLineSlider->value();
+    std::map<std::string, Wt::WContainerWidget*>::iterator it;
+    for(it = boxPanels.begin(); it!= boxPanels.end(); it++ )
+    {
+        if(boost::lexical_cast<int>((*it).first) > boost::lexical_cast<int>(value.str()))
+        {
+            (*it).second->hide();
+        }
+        else
+        {
+            (*it).second->show();
+        }
+    }
+}
+
+void WitreApplication::sliderText()
+{
+    std::stringstream value;
+    value<<timeLineSlider->value();
+    sliderTime->setText(value.str());
+    Wt::WApplication::instance()->triggerUpdate();
+}

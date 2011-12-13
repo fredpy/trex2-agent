@@ -183,13 +183,15 @@ void WitreServer::notify(Observation const &obs)
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
         <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\">"
         <<ctime(&now)<<": "<<obs<<"</Token>";
+    std::ostringstream time;
+    time << getCurrentTick();
     //Storing the observation
-    Observations* temp = new Observations(oss.str(), obs.object().str());
+    Observations* temp = new Observations(oss.str(), obs.object().str(), time.str());
     observations.push(*temp);
     /* This is where we notify all connected clients. */
     for (unsigned i = 0; i < connections.size(); ++i) {
         Connection& c = connections[i];
-        c.client->addObs(oss.str(), obs.object().str());
+        c.client->addObs(temp);
         Wt::WServer::instance()->post(c.sessionId, c.function);
     }
 
@@ -210,7 +212,7 @@ bool WitreServer::synchronize()
     //Notify all connected clients
     for (unsigned i = 0; i < connections.size(); ++i) {
             Connection& c = connections[i];
-            c.client->addObs(oss.str(), "Tick");
+            c.client->addObs(temp);
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
 
