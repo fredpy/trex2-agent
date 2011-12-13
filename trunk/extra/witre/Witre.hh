@@ -54,6 +54,7 @@
 #include <Wt/WDialog>
 #include <Wt/WMessageBox>
 #include <Wt/WDateTime>
+#include <Wt/WSlider>
 #include <string>
 #include <queue>
 #include <map>
@@ -71,34 +72,39 @@ namespace TREX {
 
     private:
       Wt::WText *clock;
+      Wt::WText *sliderTime;
       Wt::WLineEdit *input;
       Wt::WPushButton *enter;
       Wt::WText *tickNum;
       Wt::WContainerWidget *messages;
       Wt::WTimer *timer;
       Wt::WComboBox *menu;
+      Wt::WSlider *timeLineSlider;
       Goalpopup* popup;
       WitreServer *wServer;
 
       std::map<std::string, bool> tLineMap;
+      std::map<std::string, Wt::WContainerWidget*> boxPanels;
       std::queue<Observations> observations;
       friend class WitreServer;
+
+      void sliderChanged();
+      void sliderText();
 
     public:
       WitreApplication(Wt::WEnvironment const &env, WitreServer* Server);
       ~WitreApplication();
       void post(); //Post the observations
-      void addObs(std::string obs, std::string obj); //Adds observations to the queue
+      void addObs(Observations* temp); //Adds observations to the queue
       void updateTick(std::string tick) { tickNum->setText(tick);}; //Updates the tickNum text
       int count(){ return messages->count();}; //Returns the number of messages
       Wt::WWidget * widget(int i) {return messages->widget(i);}; //Returns the widget at variable i in messages
-      void insert(Wt::WPanel *wid); //Inserts widget at position 0
+      void insert(std::string time, Wt::WPanel *wid); //Inserts widget at position 0
       void updateTime(); //Updates the time
       void timeLineChange(); //Updates when user changes what timelines to view
       void syncObservations(); //Syncs with server observations
       void attributePopup();
       void clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end);
-      void test();
 
 
     };

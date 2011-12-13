@@ -10,11 +10,13 @@ namespace TREX {
         private:
             std::string observation;
             std::string object;
+            std::string time;
         public:
-            Observations(std::string obs, std::string obj)
-            :observation(obs), object(obj) {}
+            Observations(std::string obs, std::string obj, std::string tim="Tick")
+            :observation(obs), object(obj), time(tim) {}
             std::string getObs() { return observation; };
             std::string getObj() { return object; };
+            std::string getTime() { return time; };
 
       };
   }
