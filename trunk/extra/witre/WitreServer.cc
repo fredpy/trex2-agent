@@ -171,7 +171,7 @@ void WitreServer::disconnect(WitreApplication *client)
 void WitreServer::declared(details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) { 
     // If I did not onnect to it yet just create the connection
-    use(timeline.name());
+    use(timeline.name()); // as we do not have internal timlines this operation will always succeed
     {
       // then add it to externalTimelines
       boost::mutex::scoped_lock lock(mutex_);
