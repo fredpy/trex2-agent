@@ -1,0 +1,9 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick." alt="" coords="372,5,729,35"/>
+<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency" alt="" coords="365,59,736,88"/>
+<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a10b44ea7bbeb13a23528f82c3c7c78c3" title="reactor initial tick" alt="" coords="380,112,721,141"/>
+<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251" title="reactor initialiszation callback" alt="" coords="389,165,712,195"/>
+<area shape="rect" id="node13" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="403,219,699,248"/>
+<area shape="rect" id="node5" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick" alt="" coords="792,5,1096,35"/>
+<area shape="rect" id="node15" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="784,219,1104,248"/>
+</map>

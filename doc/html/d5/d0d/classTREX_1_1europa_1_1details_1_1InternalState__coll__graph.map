@@ -1,0 +1,11 @@
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa." alt="" coords="876,285,1063,315"/>
+<area shape="rect" id="node17" href="$d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor." alt="" coords="1273,375,1497,404"/>
+<area shape="rect" id="node20" href="$d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html" title="TREX::europa::DeliberationFilter" alt="" coords="1649,368,1889,397"/>
+<area shape="rect" id="node9" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="297,80,639,109"/>
+<area shape="rect" id="node13" href="$de/d89/classTREX_1_1europa_1_1DbSolver.html" title="TREX::europa::DbSolver" alt="" coords="5,263,189,292"/>
+<area shape="rect" id="node15" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; details::InternalStateId_id_traits \&gt;" alt="" coords="265,252,671,281"/>
+<area shape="rect" id="node24" title="STL class." alt="" coords="423,327,513,356"/>
+<area shape="rect" id="node27" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; details::Schema \&gt;" alt="" coords="303,389,633,419"/>
+<area shape="rect" id="node33" title="STL class." alt="" coords="411,523,525,552"/>
+</map>
