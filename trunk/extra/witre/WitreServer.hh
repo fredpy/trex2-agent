@@ -48,7 +48,7 @@ namespace TREX {
     class WitreApplication;
     class WitreReactor;
 
-    class WitreServer :public TREX::transaction::TeleoReactor {
+    class WitreServer :public TREX::transaction::TeleoReactor, public TREX::transaction::graph::timelines_listener {
     public:
 
       class Error :public TREX::utils::Exception {
@@ -103,6 +103,10 @@ namespace TREX {
         boost::function<void()> function;
       };
 
+      void declared(TREX::transaction::details::timeline const &timeline);
+      void undeclared(TREX::transaction::details::timeline const &timeline);
+  
+                         
       mutable boost::mutex mutex_;
       boost::thread thread_;
       std::vector<Connection> connections;
