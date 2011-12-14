@@ -720,11 +720,39 @@ namespace TREX {
        */
       void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
 			
-      virtual bool failed_external(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
-        return false;
+      /** @brief Request for external failed
+       *
+       * @param[in] timeline Symbolic name of the timeline
+       * @param[in] err Descriptor of the error
+       * 
+       * This callback is executed when an attempt to use the External timeline 
+       * @p timeline triggered an error. The reason of the failure is described by
+       * @p err.
+       * It can be derived in order to provide an alternate way to handle this failed
+       * request
+       *
+       * @sa failed_internal(TREX::utils::symbol const &, graph::timeline_failure const &)
+       */
+      virtual bool failed_external(TREX::utils::Symbol const &timeline, 
+				   graph::timeline_failure const &err) {
+        throw err;
       }
-      virtual bool failed_internal(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
-        return false;
+      /** @brief Request for internal failed
+       *
+       * @param[in] timeline Symbolic name of the timeline
+       * @param[in] err Descriptor of the error
+       * 
+       * This callback is executed when an attempt to prtovide the Internal timeline 
+       * @p timeline triggered an error. The reason of the failure is described by
+       * @p err.
+       * It can be derived in order to provide an alternate way to handle this failed
+       * request
+       *
+       * @sa failed_external(TREX::utils::symbol const &, graph::timeline_failure const &)
+       */
+      virtual bool failed_internal(TREX::utils::Symbol const &timeline, 
+				   graph::timeline_failure const &err) {
+        throw err;
       }
       /** @brief Check for internal timeline
        *

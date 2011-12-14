@@ -262,7 +262,27 @@ namespace TREX {
 	 */
 	TICK latency() const;
 
+        /** @brief Recall a goal
+         *
+         * @param[in] g A goal
+         * 
+         * This method inform the timeline (and potentially its owner) that the 
+         * previously requested goal @p g is no longer requested
+         *
+         * @sa request(goal_id const &)
+         * @sa TeleoReactor::handleRecall(goal_id const &);
+         */
 	void recall(goal_id const &g);
+        /** @brief Request a new goal
+         *
+         * @param[in] g A goal
+         * 
+         * This method inform the timeline (and potentially/eventually its owner) 
+         * that the goal @p g is requested for this timeline.
+         *
+         * @sa recall(goal_id const &)
+         * @sa TeleoReactor::handleRequest(goal_id const &);
+         */
 	void request(goal_id const &g);
 
       private:
