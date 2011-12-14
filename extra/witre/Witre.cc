@@ -258,7 +258,7 @@ void WitreApplication::attributePopup()
         popup->setVisable();
     }
     else{
-        Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invaild input for goal"
+        Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invalid input for goal"
                                                              , Wt::Ok);
         enter->enable();
     }

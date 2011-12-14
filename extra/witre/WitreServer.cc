@@ -51,8 +51,9 @@ namespace xml = boost::property_tree::xml_parser;
 
 // structors
 
-WitreServer::WitreServer(TeleoReactor::xml_arg_type arg):TeleoReactor(arg), m_server(NULL),
-			   m_entry(NULL) {
+WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg, false), graph::timelines_listener(arg),
+ m_server(NULL), m_entry(NULL) {
   bool found;
   std::string config = m_log->use("witre.xml", found);
   if( !found )
@@ -163,16 +164,21 @@ void WitreServer::disconnect(WitreApplication *client)
         assert(false);
 }
 
-void WitreServer::handleInit()
-{
-    boost::mutex::scoped_lock lock(mutex_);
-    external_iterator first(ext_begin());
-    for(;first!=ext_end(); ++first)
+void WitreServer::declared(details::timeline const &timeline) {
+  std::cerr<<"New timeline "<<timeline.name()<<std::endl;
+  if( !isExternal(timeline.name()) ) { 
+    use(timeline.name());
     {
-        externalTimelines.push_back(first->name());
+      boost::mutex::scoped_lock lock(mutex_);
+      externalTimelines.push_back(timeline.name());
     }
+  }
+}
 
-    return;
+void WitreServer::undeclared(details::timeline const &timeline) {}
+
+void WitreServer::handleInit() {
+  graph::timelines_listener::initialize();
 }
 
 void WitreServer::notify(Observation const &obs)
