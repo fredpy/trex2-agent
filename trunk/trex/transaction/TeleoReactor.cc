@@ -464,6 +464,9 @@ void TeleoReactor::assigned(details::timeline *tl) {
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name());
   }
+  for(graph::listen_set::const_iterator i=m_graph.m_listeners.begin();
+      m_graph.m_listeners.end()!=i; ++i)
+    (*i)->declared(*tl);
 }
 
 void TeleoReactor::unassigned(details::timeline *tl) {
@@ -473,6 +476,9 @@ void TeleoReactor::unassigned(details::timeline *tl) {
   if( NULL!=m_trLog ) {
     m_trLog->unprovide(tl->name());
   }
+  for(graph::listen_set::const_iterator i=m_graph.m_listeners.begin();
+      m_graph.m_listeners.end()!=i; ++i)
+    (*i)->undeclared(*tl);
 }
 
 void TeleoReactor::subscribed(Relation const &r) {
