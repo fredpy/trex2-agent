@@ -72,7 +72,7 @@ namespace TREX {
       /** @brief Destructor */
       ~MultipleReactors() throw() {}
     }; // TREX::transaction::MultipleReactors
-      
+        
     
 
     /** @brief Transactions graph
@@ -190,6 +190,32 @@ namespace TREX {
 	public virtual boost::vertex_list_graph_tag,
 	public virtual boost::edge_list_graph_tag {};
 
+      class timelines_listener {
+      public:
+        typedef timelines_listener const *id_type;
+        typedef timelines_listener base_type;
+        
+        virtual ~timelines_listener();
+
+        static id_type get_id(base_type const &me) {
+          return &me;
+        }	
+
+      protected:
+        timelines_listener(graph &g);
+        timelines_listener(graph::xml_factory::argument_type const &arg);
+        void initialize();
+        
+        virtual void declared(details::timeline const &timeline) =0;
+        virtual void undeclared(details::timeline const &timeline) =0;
+        
+      private:
+        graph &m_graph;
+        
+        friend class TeleoReactor;
+      }; // TREX::transaction::graph::timeline_listener
+
+      
       /** @brief reactors iterator
        *
        * The class used to iterate through the reactors managed by this graph
@@ -223,6 +249,7 @@ namespace TREX {
 	  :m_iter(i) {}
 	/** @brief Destructor */
 	~reactor_iterator() {}
+                                          
 	
       private:
 	friend class boost::iterator_core_access;
@@ -590,6 +617,9 @@ namespace TREX {
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
       TICK                     m_currentTick;
+      
+      typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
+      listen_set m_listeners;
 
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       TREX::utils::SingletonUse<xml_factory>             m_factory;
@@ -597,6 +627,7 @@ namespace TREX {
       mutable details::reactor_set m_quarantined;
 
       friend class TeleoReactor;
+      friend class timelines_listener;
     };
 
   }

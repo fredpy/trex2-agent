@@ -199,3 +199,31 @@ bool graph::subscribe(reactor_id r, Symbol const &timeline, bool control) {
     return r->failed_external(timeline, err);
   }
 }
+
+/*
+ * class TREX::transaction::graph::timelines_listener
+ */
+
+// structors 
+
+graph::timelines_listener::timelines_listener(graph &g)
+  :m_graph(g) {
+    m_graph.m_listeners.insert(this);
+}
+
+graph::timelines_listener::timelines_listener(graph::xml_factory::argument_type const &arg)
+  :m_graph(*(arg.second)){
+  m_graph.m_listeners.insert(this);  
+}
+
+graph::timelines_listener::~timelines_listener() {
+  m_graph.m_listeners.erase(this);
+}
+  
+// manpipulators
+void graph::timelines_listener::initialize() {
+  for(details::timeline_set::const_iterator tl=m_graph.m_timelines.begin();
+      m_graph.m_timelines.end()!=tl; ++tl)
+    declared(**tl);
+}
+
