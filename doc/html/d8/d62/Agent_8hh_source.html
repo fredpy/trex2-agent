@@ -128,7 +128,7 @@ window.onload = initDynSections;
 <a name="l00196"></a>00196       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(std::string <span class="keyword">const</span> &amp;file_name, 
 <a name="l00197"></a>00197                    <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clock = NULL);
 <a name="l00198"></a>00198       
-<a name="l00223"></a>00223       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(rapidxml::xml_node&lt;&gt; &amp;config, 
+<a name="l00223"></a>00223       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(boost::property_tree::ptree::value_type &amp;config, 
 <a name="l00224"></a>00224                    <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clock=NULL);
 <a name="l00226"></a>00226       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb" title="Destructor.">~Agent</a>(); 
 <a name="l00227"></a>00227       
@@ -141,67 +141,74 @@ window.onload = initDynSections;
 <a name="l00318"></a>00318       <span class="keywordtype">bool</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">missionCompleted</a>();
 <a name="l00319"></a>00319 
 <a name="l00326"></a>00326       <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">sendRequest</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g);
-<a name="l00337"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a285d50200ac368aef484d110e6d17217">00337</a>       <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a285d50200ac368aef484d110e6d17217" title="Post a goal from xml.">sendRequest</a>(rapidxml::xml_node&lt;&gt; &amp;g) {
+<a name="l00337"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a5b1ef6ad983000bcf6ac88e1c485eae4">00337</a>       <span class="keywordtype">void</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a5b1ef6ad983000bcf6ac88e1c485eae4" title="Post a goal from xml.">sendRequest</a>(boost::property_tree::ptree::value_type &amp;g) {
 <a name="l00338"></a>00338        <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> tmp(<span class="keyword">new</span> <a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">TREX::transaction::Goal</a>(g));
 <a name="l00339"></a>00339        <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">sendRequest</a>(tmp);
 <a name="l00340"></a>00340       }
-<a name="l00351"></a>00351       <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">sendRequests</a>(<a class="code" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html" title="XML nodes iterator through files.">TREX::utils::ext_iterator</a> &amp;g);
+<a name="l00351"></a>00351       <span class="keywordtype">size_t</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2aa127d3c9ace175e0b0d6f3cfc4519a" title="Post a goals from xml.">sendRequests</a>(boost::property_tree::ptree &amp;g);
 <a name="l00352"></a>00352 
-<a name="l00353"></a>00353       <span class="keywordtype">double</span> tickDuration()<span class="keyword"> const </span>{
+<a name="l00353"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7">00353</a>       <span class="keywordtype">double</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7" title="get tick duration">tickDuration</a>()<span class="keyword"> const </span>{
 <a name="l00354"></a>00354        <span class="keywordflow">return</span> m_clock-&gt;<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#aeff145fea225d5073d22ce9e8a0807e1" title="tick duration">tickDuration</a>();
 <a name="l00355"></a>00355       }
-<a name="l00356"></a>00356 
-<a name="l00357"></a>00357     <span class="keyword">private</span>:
-<a name="l00358"></a>00358       <span class="keyword">class </span>AgentProxy :<span class="keyword">public</span> TREX::transaction::TeleoReactor {
-<a name="l00359"></a>00359       <span class="keyword">public</span>:
-<a name="l00360"></a>00360        AgentProxy(<a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a> &amp;agent)
-<a name="l00361"></a>00361          :TREX::transaction::TeleoReactor(&amp;agent, <span class="stringliteral">&quot;&quot;</span>, 0, 0) {}
-<a name="l00362"></a>00362        ~AgentProxy() {}
-<a name="l00363"></a>00363        
-<a name="l00364"></a>00364        <span class="keywordtype">bool</span> postRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00365"></a>00365         <span class="keywordflow">if</span>( !<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(g-&gt;object()) )
-<a name="l00366"></a>00366             <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a56378773bb12cfeb1646b5910b7dbedf" title="External timeline declaration.">use</a>(g-&gt;object());
-<a name="l00367"></a>00367         <span class="keywordflow">if</span>( <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(g-&gt;object()) )
-<a name="l00368"></a>00368             <span class="keywordflow">return</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a7a7dccda4fe6c2d33067f56d234eda5b" title="Post a goal.">postGoal</a>(g);
-<a name="l00369"></a>00369         <span class="keywordflow">else</span>
-<a name="l00370"></a>00370             <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(<span class="stringliteral">&quot;ERROR&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unable to subscribe to &quot;</span>&lt;&lt;g-&gt;object();
-<a name="l00371"></a>00371         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00372"></a>00372        }
-<a name="l00373"></a>00373 
-<a name="l00374"></a>00374       <span class="keyword">private</span>:
-<a name="l00375"></a>00375        <span class="keywordtype">bool</span> synchronize() {
-<a name="l00376"></a>00376          <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00377"></a>00377        }
-<a name="l00378"></a>00378 
-<a name="l00379"></a>00379       };
-<a name="l00380"></a>00380       AgentProxy *m_proxy;
-<a name="l00381"></a>00381 
-<a name="l00382"></a>00382 
-<a name="l00440"></a>00440       <span class="keywordtype">void</span> loadConf(rapidxml::xml_node&lt;&gt; &amp;conf);
-<a name="l00465"></a>00465       <span class="keywordtype">void</span> loadConf(std::string <span class="keyword">const</span> &amp;file_name);
-<a name="l00466"></a>00466 
-<a name="l00467"></a>00467       <span class="keyword">static</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> initialTick(Clock *clk);
-<a name="l00468"></a>00468 
-<a name="l00469"></a>00469       Clock  *m_clock;  
-<a name="l00470"></a>00470       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a>    m_finalTick;
-<a name="l00471"></a>00471       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609" title="reactors deliberation scheduling queue">priority_queue</a>             m_edf;
-<a name="l00472"></a>00472 
-<a name="l00473"></a>00473       <span class="keywordtype">void</span> synchronize();
-<a name="l00474"></a>00474       
-<a name="l00475"></a>00475       <span class="keywordtype">bool</span> executeReactor();
-<a name="l00476"></a>00476 
-<a name="l00477"></a>00477       <span class="keywordtype">void</span> loadPlugin(rapidxml::xml_node&lt;&gt; &amp;pg);
-<a name="l00478"></a>00478 
-<a name="l00480"></a>00480       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::PluginLoader&gt;</a> m_pg;
-<a name="l00481"></a>00481 
-<a name="l00482"></a>00482     }; <span class="comment">// TREX::agent::Agent</span>
+<a name="l00356"></a>00356       
+<a name="l00357"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235">00357</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235" title="convert real-time into a TICK">timeToTick</a>(time_t secs, suseconds_t usecs=0)<span class="keyword"> const </span>{
+<a name="l00358"></a>00358        <span class="keywordflow">return</span> m_clock-&gt;timeToTick(secs, usecs);
+<a name="l00359"></a>00359       }
+<a name="l00360"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a31b7b2d9b4028adf7a47d67b7c1b76bf">00360</a>       <span class="keywordtype">double</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a31b7b2d9b4028adf7a47d67b7c1b76bf" title="convert a TICK into its real-time equivalent">tickToTime</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> cur)<span class="keyword"> const </span>{
+<a name="l00361"></a>00361        <span class="keywordflow">return</span> m_clock-&gt;tickToTime(cur);
+<a name="l00362"></a>00362       }
+<a name="l00363"></a>00363       
+<a name="l00364"></a>00364     <span class="keyword">private</span>:
+<a name="l00365"></a>00365       <span class="keyword">class </span>AgentProxy :<span class="keyword">public</span> TREX::transaction::TeleoReactor {
+<a name="l00366"></a>00366       <span class="keyword">public</span>:
+<a name="l00367"></a>00367        AgentProxy(<a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> &amp;agent)
+<a name="l00368"></a>00368          :TREX::transaction::TeleoReactor(&amp;agent, <span class="stringliteral">&quot;&quot;</span>, 0, 0) {}
+<a name="l00369"></a>00369        ~AgentProxy() {}
+<a name="l00370"></a>00370        
+<a name="l00371"></a>00371        <span class="keywordtype">bool</span> postRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00372"></a>00372         <span class="keywordflow">if</span>( !isExternal(g-&gt;object()) )
+<a name="l00373"></a>00373             use(g-&gt;object());
+<a name="l00374"></a>00374         <span class="keywordflow">if</span>( isExternal(g-&gt;object()) )
+<a name="l00375"></a>00375             <span class="keywordflow">return</span> postGoal(g);
+<a name="l00376"></a>00376         <span class="keywordflow">else</span>
+<a name="l00377"></a>00377             syslog(<span class="stringliteral">&quot;ERROR&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unable to subscribe to &quot;</span>&lt;&lt;g-&gt;object();
+<a name="l00378"></a>00378         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00379"></a>00379        }
+<a name="l00380"></a>00380 
+<a name="l00381"></a>00381       <span class="keyword">private</span>:
+<a name="l00382"></a>00382        <span class="keywordtype">bool</span> synchronize() {
+<a name="l00383"></a>00383          <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00384"></a>00384        }
+<a name="l00385"></a>00385 
+<a name="l00386"></a>00386       };
+<a name="l00387"></a>00387       AgentProxy *m_proxy;
+<a name="l00388"></a>00388 
+<a name="l00389"></a>00389 
+<a name="l00447"></a>00447       <span class="keywordtype">void</span> loadConf(boost::property_tree::ptree::value_type &amp;conf);
+<a name="l00472"></a>00472       <span class="keywordtype">void</span> loadConf(std::string <span class="keyword">const</span> &amp;file_name);
+<a name="l00473"></a>00473 
+<a name="l00474"></a>00474       <span class="keyword">static</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> initialTick(Clock *clk);
+<a name="l00475"></a>00475 
+<a name="l00476"></a>00476       Clock  *m_clock;  
+<a name="l00477"></a>00477       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a>    m_finalTick;
+<a name="l00478"></a>00478       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609" title="reactors deliberation scheduling queue">priority_queue</a>             m_edf;
+<a name="l00479"></a>00479 
+<a name="l00480"></a>00480       <span class="keywordtype">void</span> synchronize();
+<a name="l00481"></a>00481       
+<a name="l00482"></a>00482       <span class="keywordtype">bool</span> executeReactor();
 <a name="l00483"></a>00483 
-<a name="l00484"></a>00484   } <span class="comment">// TREX::agent</span>
-<a name="l00485"></a>00485 } <span class="comment">// TREX</span>
-<a name="l00486"></a>00486 
-<a name="l00487"></a>00487 <span class="preprocessor">#endif</span>
+<a name="l00484"></a>00484       <span class="keywordtype">void</span> loadPlugin(boost::property_tree::ptree::value_type &amp;pg);
+<a name="l00485"></a>00485 
+<a name="l00487"></a>00487       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::PluginLoader&gt;</a> m_pg;
+<a name="l00488"></a>00488 
+<a name="l00489"></a>00489     }; <span class="comment">// TREX::agent::Agent</span>
+<a name="l00490"></a>00490 
+<a name="l00491"></a>00491   } <span class="comment">// TREX::agent</span>
+<a name="l00492"></a>00492 } <span class="comment">// TREX</span>
+<a name="l00493"></a>00493 
+<a name="l00494"></a>00494 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

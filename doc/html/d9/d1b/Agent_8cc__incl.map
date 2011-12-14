@@ -1,16 +1,17 @@
 <map id="G" name="G">
-<area shape="rect" id="node4" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="48,238,325,267"/>
-<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="320,83,565,112"/>
-<area shape="rect" id="node20" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="633,238,700,267"/>
-<area shape="rect" id="node31" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1103,238,1228,267"/>
-<area shape="rect" id="node33" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="1151,83,1332,112"/>
-<area shape="rect" id="node44" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="1380,83,1569,112"/>
-<area shape="rect" id="node6" href="$d3/d2f/Observation_8hh.html" title="TREX observation definition." alt="" coords="5,315,128,344"/>
-<area shape="rect" id="node8" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="152,315,221,344"/>
-<area shape="rect" id="node11" href="$d6/dc7/id__mapper_8hh_source.html" title="trex/utils/id_mapper.hh" alt="" coords="269,315,443,344"/>
-<area shape="rect" id="node17" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="540,160,668,190"/>
-<area shape="rect" id="node23" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="119,160,255,190"/>
-<area shape="rect" id="node26" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="369,160,516,190"/>
-<area shape="rect" id="node38" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1207,160,1329,190"/>
-<area shape="rect" id="node41" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="1353,160,1508,190"/>
+<area shape="rect" id="node4" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="139,238,416,267"/>
+<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="345,83,591,112"/>
+<area shape="rect" id="node20" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="5,238,72,267"/>
+<area shape="rect" id="node33" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1212,238,1337,267"/>
+<area shape="rect" id="node35" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="1260,83,1441,112"/>
+<area shape="rect" id="node46" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="1489,83,1679,112"/>
+<area shape="rect" id="node6" href="$d3/d2f/Observation_8hh.html" title="TREX observation definition." alt="" coords="96,315,219,344"/>
+<area shape="rect" id="node8" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="243,315,312,344"/>
+<area shape="rect" id="node11" href="$d6/dc7/id__mapper_8hh_source.html" title="trex/utils/id_mapper.hh" alt="" coords="360,315,533,344"/>
+<area shape="rect" id="node17" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="33,160,161,190"/>
+<area shape="rect" id="node23" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="209,160,345,190"/>
+<area shape="rect" id="node26" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="460,160,607,190"/>
+<area shape="rect" id="node28" href="$d8/deb/reactor__graph_8tcc_source.html" title="bits/reactor_graph.tcc" alt="" coords="631,160,801,190"/>
+<area shape="rect" id="node40" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1316,160,1439,190"/>
+<area shape="rect" id="node43" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="1463,160,1617,190"/>
 </map>

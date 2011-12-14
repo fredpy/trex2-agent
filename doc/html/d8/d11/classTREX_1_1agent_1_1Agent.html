@@ -94,7 +94,7 @@ Collaboration diagram for TREX::agent::Agent:</div>
 <div class="dynsection">
 <div class="center"><img src="../../da/db7/classTREX_1_1agent_1_1Agent__coll__graph.png" border="0" usemap="#TREX_1_1agent_1_1Agent_coll__map" alt="Collaboration graph"/></div>
 <map name="TREX_1_1agent_1_1Agent_coll__map" id="TREX_1_1agent_1_1Agent_coll__map">
-<area shape="rect" id="node2" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="707,76,899,105"/><area shape="rect" id="node16" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="1007,24,1252,53"/><area shape="rect" id="node4" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; tl_ptr_id_traits \&gt;" alt="" coords="148,73,433,103"/><area shape="rect" id="node6" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; xml_factory \&gt;" alt="" coords="140,127,441,156"/><area shape="rect" id="node8" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="96,5,485,35"/><area shape="rect" id="node10" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; reactor_id_traits\&lt; boost::shared_ptr\&lt; TeleoReactor \&gt; \&gt; \&gt;" alt="" coords="7,180,575,209"/><area shape="rect" id="node20" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::PluginLoader \&gt;" alt="" coords="1401,181,1793,211"/><area shape="rect" id="node22" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html" title="plug&#45;in management class" alt="" coords="1035,181,1224,211"/><area shape="rect" id="node24" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock." alt="" coords="1520,235,1675,264"/></map>
+<area shape="rect" id="node2" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="733,101,925,131"/><area shape="rect" id="node18" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="1033,49,1279,79"/><area shape="rect" id="node4" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; tl_ptr_id_traits \&gt;" alt="" coords="152,72,437,101"/><area shape="rect" id="node6" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; xml_factory \&gt;" alt="" coords="144,125,445,155"/><area shape="rect" id="node8" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; TREX::utils::pointer_id_traits\&lt; graph::timelines_listener \&gt; \&gt;" alt="" coords="7,179,583,208"/><area shape="rect" id="node10" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="100,5,489,35"/><area shape="rect" id="node12" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; reactor_id_traits\&lt; boost::shared_ptr\&lt; TeleoReactor \&gt; \&gt; \&gt;" alt="" coords="11,241,579,271"/><area shape="rect" id="node22" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::PluginLoader \&gt;" alt="" coords="1428,207,1820,236"/><area shape="rect" id="node24" href="../../de/dff/classTREX_1_1utils_1_1PluginLoader.html" title="plug&#45;in management class" alt="" coords="1061,207,1251,236"/><area shape="rect" id="node26" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock." alt="" coords="1547,260,1701,289"/></map>
 <center><span class="legend">[<a target="top" href="../../graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="../../d2/ddb/classTREX_1_1agent_1_1Agent-members.html">List of all members.</a></p>
@@ -134,66 +134,75 @@ boost::shared_ptr<br class="typebreak"/>
 &lt; TeleoReactor &gt;, graph * &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a90b2d4174f646c2fb7e8038f0a1c6fae">xml_factory</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reactor factory.  <a href="#a90b2d4174f646c2fb7e8038f0a1c6fae"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04d7b8a65e317159fc7c641778a2c4f2"></a><!-- doxytag: member="TREX::agent::Agent::add_reactor" ref="a04d7b8a65e317159fc7c641778a2c4f2" args="(rapidxml::xml_node&lt;&gt; &amp;description)" -->
-<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>add_reactor</b> (rapidxml::xml_node&lt;&gt; &amp;description)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c23fa51bec3432f5d86c94a6c95d333"></a><!-- doxytag: member="TREX::agent::Agent::add_reactors" ref="a6c23fa51bec3432f5d86c94a6c95d333" args="(TREX::utils::ext_iterator iter)" -->
-size_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>add_reactors</b> (<a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">TREX::utils::ext_iterator</a> iter)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a8cdf0eaabc5c93221d79dae25660f326">Agent</a> (rapidxml::xml_node&lt;&gt; &amp;config, <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html">Clock</a> *clock=NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a8cdf0eaabc5c93221d79dae25660f326"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a10a1a24d6fde9b4130b6b74247e32903">add_reactor</a> (boost::property_tree::ptree::value_type &amp;description)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new reactor for this graph.  <a href="#a10a1a24d6fde9b4130b6b74247e32903"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7809737392ac3105864c6b9483a81e6e">add_reactors</a> (boost::property_tree::ptree &amp;conf)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new reactors for this graph.  <a href="#a7809737392ac3105864c6b9483a81e6e"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Iter &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5d17a2b45d8938d3a70e5e607167b1bd">add_reactors</a> (Iter from, Iter to)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Create new reactors for this graph.  <a href="#a5d17a2b45d8938d3a70e5e607167b1bd"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a1dddd9a59b553d6f97f116f5225a4a68">Agent</a> (boost::property_tree::ptree::value_type &amp;config, <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html">Clock</a> *clock=NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a1dddd9a59b553d6f97f116f5225a4a68"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad94b8e9d8de99889021df1e69ffb7aac">Agent</a> (std::string const &amp;file_name, <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html">Clock</a> *clock=NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#ad94b8e9d8de99889021df1e69ffb7aac"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a">Agent</a> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;name, <a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a> final=0, <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html">Clock</a> *clock=NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a6ed6e50dc6feafab531483629393676a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ff5d6af3653e79f87b836701453f55a"></a><!-- doxytag: member="TREX::agent::Agent::clear" ref="a9ff5d6af3653e79f87b836701453f55a" args="()" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6fb5b25c6dc6879309cf8d41006c7485"></a><!-- doxytag: member="TREX::agent::Agent::count_reactors" ref="a6fb5b25c6dc6879309cf8d41006c7485" args="() const " -->
-size_type&nbsp;</td><td class="memItemRight" valign="bottom"><b>count_reactors</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc">cleanup</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Kill all isolated reactors.  <a href="#af198f927b1a11cf65d749d726294cefc"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9ff5d6af3653e79f87b836701453f55a">clear</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Clear the graph.  <a href="#a9ff5d6af3653e79f87b836701453f55a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_type&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485">count_reactors</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Number of reactors.  <a href="#a6fb5b25c6dc6879309cf8d41006c7485"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a102c363a5402a1e5db996d882e329093"></a><!-- doxytag: member="TREX::agent::Agent::count_relations" ref="a102c363a5402a1e5db996d882e329093" args="() const " -->
 size_type&nbsp;</td><td class="memItemRight" valign="bottom"><b>count_relations</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5">doNext</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Execute for one tick.  <a href="#a42b9ac392c85a0e7ab66f82aed97edf5"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af78cd8445dd6bd70038e49fac25de7cb"></a><!-- doxytag: member="TREX::agent::Agent::empty" ref="af78cd8445dd6bd70038e49fac25de7cb" args="() const " -->
-bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>empty</b> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa96afbd1877083ce06ebbf5e8d711a83"></a><!-- doxytag: member="TREX::agent::Agent::find_reactor" ref="aa96afbd1877083ce06ebbf5e8d711a83" args="(TREX::utils::Symbol const &amp;name) const " -->
-<a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>find_reactor</b> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;name) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a300d3483bf0bcf93a143451aa8b82426"></a><!-- doxytag: member="TREX::agent::Agent::getCurrentTick" ref="a300d3483bf0bcf93a143451aa8b82426" args="() const " -->
-TICK&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCurrentTick</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb">empty</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check if empty.  <a href="#af78cd8445dd6bd70038e49fac25de7cb"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa96afbd1877083ce06ebbf5e8d711a83">find_reactor</a> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;name) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">find a reactor  <a href="#aa96afbd1877083ce06ebbf5e8d711a83"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">TICK&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426">getCurrentTick</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">get current tick  <a href="#a300d3483bf0bcf93a143451aa8b82426"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4">getName</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Graph name.  <a href="#ad28b49eeb842c27b5904ac4e8039b9f4"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7603bb9da5da1073df6f9dee0803ba6f"></a><!-- doxytag: member="TREX::agent::Agent::index" ref="a7603bb9da5da1073df6f9dee0803ba6f" args="(reactor_id r) const " -->
-long&nbsp;</td><td class="memItemRight" valign="bottom"><b>index</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7603bb9da5da1073df6f9dee0803ba6f">index</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reactor index.  <a href="#a7603bb9da5da1073df6f9dee0803ba6f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a">initComplete</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Complete agent initialization.  <a href="#ae89e4e2b888cb80d1327d2b26219fc6a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9332ebabfaac01371090d8ed5186e836"></a><!-- doxytag: member="TREX::agent::Agent::isolate" ref="a9332ebabfaac01371090d8ed5186e836" args="(reactor_id r) const " -->
-<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>isolate</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa91ce02b919c78429a54e7f7fcd2babb"></a><!-- doxytag: member="TREX::agent::Agent::kill_reactor" ref="aa91ce02b919c78429a54e7f7fcd2babb" args="(reactor_id r)" -->
-bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>kill_reactor</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836">isolate</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Isolate a reactor.  <a href="#a9332ebabfaac01371090d8ed5186e836"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb">kill_reactor</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Kill a reactor.  <a href="#aa91ce02b919c78429a54e7f7fcd2babb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02973cc410febcc5146ac091bdf30c0f"></a><!-- doxytag: member="TREX::agent::Agent::me" ref="a02973cc410febcc5146ac091bdf30c0f" args="() const " -->
 graph const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>me</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9395614d9c2166ecacf85136e1d5709"></a><!-- doxytag: member="TREX::agent::Agent::me" ref="ad9395614d9c2166ecacf85136e1d5709" args="()" -->
 graph &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>me</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130">missionCompleted</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check if mission is completed.  <a href="#ad952462eecb9ee726951ca2d48d47130"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96db7840b35ae21a6a631ad15c9622fa"></a><!-- doxytag: member="TREX::agent::Agent::reactor_begin" ref="a96db7840b35ae21a6a631ad15c9622fa" args="() const " -->
-<a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>reactor_begin</b> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a941e65892d675ebef755fc161c7243ef"></a><!-- doxytag: member="TREX::agent::Agent::reactor_end" ref="a941e65892d675ebef755fc161c7243ef" args="() const " -->
-<a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>reactor_end</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa">reactor_begin</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Beginning reactor iterator.  <a href="#a96db7840b35ae21a6a631ad15c9622fa"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef">reactor_end</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">End reactor iterator.  <a href="#a941e65892d675ebef755fc161c7243ef"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a204f04952b9225bfb46aec1abca22ca7"></a><!-- doxytag: member="TREX::agent::Agent::relation_begin" ref="a204f04952b9225bfb46aec1abca22ca7" args="() const " -->
 <a class="el" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html">edge_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>relation_begin</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53f30cee8b9ac9f83a232830a0c20260"></a><!-- doxytag: member="TREX::agent::Agent::relation_end" ref="a53f30cee8b9ac9f83a232830a0c20260" args="() const " -->
 <a class="el" href="../../db/dfd/classTREX_1_1transaction_1_1details_1_1relation__iter.html">edge_iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>relation_end</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2d3d07af39c9cac23f06ac956bf40b84">run</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">run the agent  <a href="#a2d3d07af39c9cac23f06ac956bf40b84"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a285d50200ac368aef484d110e6d17217">sendRequest</a> (rapidxml::xml_node&lt;&gt; &amp;g)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Post a goal from xml.  <a href="#a285d50200ac368aef484d110e6d17217"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a5b1ef6ad983000bcf6ac88e1c485eae4">sendRequest</a> (boost::property_tree::ptree::value_type &amp;g)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Post a goal from xml.  <a href="#a5b1ef6ad983000bcf6ac88e1c485eae4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a">sendRequest</a> (<a class="el" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45">TREX::transaction::goal_id</a> const &amp;g)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Post a goal.  <a href="#aeadcf2c5f08ec973dd400e8a2e28fa0a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80">sendRequests</a> (<a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">TREX::utils::ext_iterator</a> &amp;g)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Post a goals from xml.  <a href="#aab194a12d848e3a405495245e3f9fd80"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">size_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a2aa127d3c9ace175e0b0d6f3cfc4519a">sendRequests</a> (boost::property_tree::ptree &amp;g)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Post a goals from xml.  <a href="#a2aa127d3c9ace175e0b0d6f3cfc4519a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a744b2e4a225a427e85593d28b2dbeb88">setClock</a> (<a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html">Clock</a> *clock)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set agent clock.  <a href="#a744b2e4a225a427e85593d28b2dbeb88"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a350cb40be95b91e6385c96de0c60afa7"></a><!-- doxytag: member="TREX::agent::Agent::tickDuration" ref="a350cb40be95b91e6385c96de0c60afa7" args="() const " -->
-double&nbsp;</td><td class="memItemRight" valign="bottom"><b>tickDuration</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7">tickDuration</a> () const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">get tick duration  <a href="#a350cb40be95b91e6385c96de0c60afa7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a31b7b2d9b4028adf7a47d67b7c1b76bf">tickToTime</a> (<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a> cur) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">convert a TICK into its real-time equivalent  <a href="#a31b7b2d9b4028adf7a47d67b7c1b76bf"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235">timeToTick</a> (time_t secs, suseconds_t usecs=0) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">convert real-time into a TICK  <a href="#ab18d2490d59151ad7ab65edd62f5d235"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab8dd8d152605cf1339fed595376e83cb"></a><!-- doxytag: member="TREX::agent::Agent::~Agent" ref="ab8dd8d152605cf1339fed595376e83cb" args="()" -->
 &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab8dd8d152605cf1339fed595376e83cb">~Agent</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -207,8 +216,12 @@ details::timeline_set::const_iterator&nbsp;</td><td class="memItemRight" valign=
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3fba5be9cd9def8b261ac890673904e4"></a><!-- doxytag: member="TREX::agent::Agent::add_reactor" ref="a3fba5be9cd9def8b261ac890673904e4" args="(reactor_id r)" -->
 <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>add_reactor</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10410563e8e2a4ef51459526edc68311"></a><!-- doxytag: member="TREX::agent::Agent::external_check" ref="a10410563e8e2a4ef51459526edc68311" args="(reactor_id r, details::timeline const &amp;tl)" -->
+virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>external_check</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, details::timeline const &amp;tl)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c2b6992d13534535ae851cf647fe970"></a><!-- doxytag: member="TREX::agent::Agent::has_timeline" ref="a2c2b6992d13534535ae851cf647fe970" args="(TREX::utils::Symbol const &amp;tl) const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>has_timeline</b> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;tl) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40dcb829132eac2d19cc7a7965cef940"></a><!-- doxytag: member="TREX::agent::Agent::internal_check" ref="a40dcb829132eac2d19cc7a7965cef940" args="(reactor_id r, details::timeline const &amp;tl)" -->
+virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal_check</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, details::timeline const &amp;tl)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14ed6bd4f04a51077f4baf5b43e15c68"></a><!-- doxytag: member="TREX::agent::Agent::manager" ref="a14ed6bd4f04a51077f4baf5b43e15c68" args="() const " -->
 <a class="el" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html">TREX::utils::LogManager</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>manager</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae332d1c3aaa5a2f9102e016d8e68595b"></a><!-- doxytag: member="TREX::agent::Agent::set_name" ref="ae332d1c3aaa5a2f9102e016d8e68595b" args="(TREX::utils::Symbol const &amp;name)" -->
@@ -314,7 +327,7 @@ class <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="
 <p>reactor ID type </p>
 <p>The type used to represent a reactor in the graph </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00119">119</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00120">120</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -332,7 +345,7 @@ class <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="
 <p>reactor relation type </p>
 <p>The type used to represent the dependencies between reactors in the graph. </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00125">125</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00155">155</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -350,7 +363,7 @@ class <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="
 <p>Reactor factory. </p>
 <p>A factory used ot produce new reactor in a graph using XML input. </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00132">132</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00162">162</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -470,22 +483,33 @@ the root node of <code>file_name</code> needs to be an <a class="el" href="../..
   </table>
   </dd>
 </dl>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a8cdf0eaabc5c93221d79dae25660f326" title="Constructor.">Agent::Agent(rapidxml::xml_node&lt;&gt; &amp;, Clock *)</a> </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd>Agent::Agent(rapidxml::xml_node&lt;&gt; &amp;, Clock *) </dd>
 <dd>
 Agent::loadConf(std::string const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00245">245</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00257">257</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+
+<p>References <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00105">TREX::transaction::graph::add_reactor()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_ad94b8e9d8de99889021df1e69ffb7aac_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_ad94b8e9d8de99889021df1e69ffb7aac_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_ad94b8e9d8de99889021df1e69ffb7aac_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_ad94b8e9d8de99889021df1e69ffb7aac_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a10a1a24d6fde9b4130b6b74247e32903" title="Create new reactor for this graph." alt="" coords="264,5,547,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="595,5,800,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
-<a class="anchor" id="a8cdf0eaabc5c93221d79dae25660f326"></a><!-- doxytag: member="TREX::agent::Agent::Agent" ref="a8cdf0eaabc5c93221d79dae25660f326" args="(rapidxml::xml_node&lt;&gt; &amp;config, Clock *clock=NULL)" -->
+<a class="anchor" id="a1dddd9a59b553d6f97f116f5225a4a68"></a><!-- doxytag: member="TREX::agent::Agent::Agent" ref="a1dddd9a59b553d6f97f116f5225a4a68" args="(boost::property_tree::ptree::value_type &amp;config, Clock *clock=NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Agent::Agent </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>config</em>, </td>
         </tr>
         <tr>
@@ -529,11 +553,275 @@ Agent::loadConf(std::string const &amp;) </dd></dl>
 <dd>
 Agent::loadConf(rapidxml::xml_node&lt;&gt; &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00253">253</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00280">280</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+
+<p>References <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00105">TREX::transaction::graph::add_reactor()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a1dddd9a59b553d6f97f116f5225a4a68_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a1dddd9a59b553d6f97f116f5225a4a68_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_a1dddd9a59b553d6f97f116f5225a4a68_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a1dddd9a59b553d6f97f116f5225a4a68_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a10a1a24d6fde9b4130b6b74247e32903" title="Create new reactor for this graph." alt="" coords="264,5,547,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="595,5,800,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a10a1a24d6fde9b4130b6b74247e32903"></a><!-- doxytag: member="TREX::agent::Agent::add_reactor" ref="a10a1a24d6fde9b4130b6b74247e32903" args="(boost::property_tree::ptree::value_type &amp;description)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">graph::reactor_id graph::add_reactor </td>
+          <td>(</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
+          <td class="paramname"> <em>description</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create new reactor for this graph. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>definition</em>&nbsp;</td><td>A xml configuration tree node</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Create the reactor defined by <code>description</code> and attch it to this graph </p>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00105">105</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00257">Agent()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a10a1a24d6fde9b4130b6b74247e32903_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a10a1a24d6fde9b4130b6b74247e32903_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a10a1a24d6fde9b4130b6b74247e32903_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a10a1a24d6fde9b4130b6b74247e32903_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="336,5,541,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a7809737392ac3105864c6b9483a81e6e"></a><!-- doxytag: member="TREX::agent::Agent::add_reactors" ref="a7809737392ac3105864c6b9483a81e6e" args="(boost::property_tree::ptree &amp;conf)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t TREX::transaction::graph::add_reactors </td>
+          <td>(</td>
+          <td class="paramtype">boost::property_tree::ptree &amp;&nbsp;</td>
+          <td class="paramname"> <em>conf</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create new reactors for this graph. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>conf</em>&nbsp;</td><td>A xml configuration tree</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Create all the reactors defined in <code>conf</code> and attach them to this graph </p>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00373">373</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d8/deb/reactor__graph_8tcc_source.html#l00040">TREX::transaction::graph::add_reactors()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a7809737392ac3105864c6b9483a81e6e_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a7809737392ac3105864c6b9483a81e6e_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a7809737392ac3105864c6b9483a81e6e_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a7809737392ac3105864c6b9483a81e6e_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5d17a2b45d8938d3a70e5e607167b1bd" title="Create new reactors for this graph." alt="" coords="344,5,635,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="683,5,888,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a5d17a2b45d8938d3a70e5e607167b1bd"></a><!-- doxytag: member="TREX::agent::Agent::add_reactors" ref="a5d17a2b45d8938d3a70e5e607167b1bd" args="(Iter from, Iter to)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Iter &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t TREX::transaction::graph::add_reactors </td>
+          <td>(</td>
+          <td class="paramtype">Iter&nbsp;</td>
+          <td class="paramname"> <em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Iter&nbsp;</td>
+          <td class="paramname"> <em>to</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create new reactors for this graph. </p>
+<dl><dt><b>Template Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Iter</em>&nbsp;</td><td>An iterator type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>from</em>&nbsp;</td><td>Initial iterator </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>to</em>&nbsp;</td><td>end iterator</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="pre"><dt><b>Precondition:</b></dt><dd>The value_type of <code>Iter</code> is boost::property_tree::ptree::value_type</dd></dl>
+<p>Add all the reactor that can be parsed from thre properties referred by [<code>from</code>, <code>to</code>) to this graph </p>
+
+<p>Definition at line <a class="el" href="../../d8/deb/reactor__graph_8tcc_source.html#l00040">40</a> of file <a class="el" href="../../d8/deb/reactor__graph_8tcc_source.html">reactor_graph.tcc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00373">TREX::transaction::graph::add_reactors()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00068">TREX::transaction::graph::graph()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a5d17a2b45d8938d3a70e5e607167b1bd_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a5d17a2b45d8938d3a70e5e607167b1bd_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a5d17a2b45d8938d3a70e5e607167b1bd_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a5d17a2b45d8938d3a70e5e607167b1bd_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="344,5,549,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="af198f927b1a11cf65d749d726294cefc"></a><!-- doxytag: member="TREX::agent::Agent::cleanup" ref="af198f927b1a11cf65d749d726294cefc" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t graph::cleanup </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kill all isolated reactors. </p>
+<p>Kill all the reactors which have been explicitedly isolated in this graph</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the numeof reactor that have been killed</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor.">isolate(reactor_id) const</a> </dd>
+<dd>
+kill_reactor(reeactor_id) </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00156">156</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00126">TREX::transaction::graph::kill_reactor()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">initComplete()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_af198f927b1a11cf65d749d726294cefc_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_af198f927b1a11cf65d749d726294cefc_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_af198f927b1a11cf65d749d726294cefc_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_af198f927b1a11cf65d749d726294cefc_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="341,5,552,35"/><area shape="rect" id="node5" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor." alt="" coords="309,59,584,88"/><area shape="rect" id="node7" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a8a8e97ba45f7e93791417788c701ab8b" title="Remove an element." alt="" coords="633,32,836,61"/><area shape="rect" id="node9" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="640,85,829,115"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a9ff5d6af3653e79f87b836701453f55a"></a><!-- doxytag: member="TREX::agent::Agent::clear" ref="a9ff5d6af3653e79f87b836701453f55a" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void graph::clear </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Clear the graph. </p>
+<p>Disconnect all the reactors from this graph</p>
+<dl class="post"><dt><b>Postcondition:</b></dt><dd>The graph is empty </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00087">87</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00776">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::clear()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00302">~Agent()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00074">TREX::transaction::graph::~graph()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a9ff5d6af3653e79f87b836701453f55a_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a9ff5d6af3653e79f87b836701453f55a_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a9ff5d6af3653e79f87b836701453f55a_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a9ff5d6af3653e79f87b836701453f55a_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ac392de66f7fbb21f0537a7481de5b07f" title="clear container" alt="" coords="295,5,492,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="288,59,499,88"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a6fb5b25c6dc6879309cf8d41006c7485"></a><!-- doxytag: member="TREX::agent::Agent::count_reactors" ref="a6fb5b25c6dc6879309cf8d41006c7485" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_type TREX::transaction::graph::count_reactors </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Number of reactors. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the number of reactors in this graph </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00503">503</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00451">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::size()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">missionCompleted()</a>, and <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00340">TREX::transaction::graph::num_vertices()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a6fb5b25c6dc6879309cf8d41006c7485_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a6fb5b25c6dc6879309cf8d41006c7485_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a6fb5b25c6dc6879309cf8d41006c7485_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a6fb5b25c6dc6879309cf8d41006c7485_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a47958f2d980cded78b04c16804f09102" title="Number of element." alt="" coords="361,5,553,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="a42b9ac392c85a0e7ab66f82aed97edf5"></a><!-- doxytag: member="TREX::agent::Agent::doNext" ref="a42b9ac392c85a0e7ab66f82aed97edf5" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -571,20 +859,132 @@ Agent::loadConf(rapidxml::xml_node&lt;&gt; &amp;) </dd></dl>
 <dd>
 <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed.">missionCompleted()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">469</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">518</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b">TREX::agent::Clock::getNextTick()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00271">missionCompleted()</a>, and <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">TREX::agent::Clock::sleep()</a>.</p>
+<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00350">TREX::transaction::graph::empty()</a>, <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00441">TREX::transaction::graph::getCurrentTick()</a>, <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b">TREX::agent::Clock::getNextTick()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">missionCompleted()</a>, and <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">TREX::agent::Clock::sleep()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00413">run()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00456">run()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a42b9ac392c85a0e7ab66f82aed97edf5_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a42b9ac392c85a0e7ab66f82aed97edf5_cgraph_map" alt=""></div>
 <map name="d8/d11/classTREX_1_1agent_1_1Agent_a42b9ac392c85a0e7ab66f82aed97edf5_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a42b9ac392c85a0e7ab66f82aed97edf5_cgraph">
-<area shape="rect" id="node3" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK" alt="" coords="295,5,543,35"/><area shape="rect" id="node5" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed." alt="" coords="272,59,565,88"/><area shape="rect" id="node7" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick." alt="" coords="319,112,519,141"/><area shape="rect" id="node9" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a8e5c8220d013ea86948d2d09faaaecc2" title="Time left before next tick." alt="" coords="613,112,877,141"/></map>
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb" title="Check if empty." alt="" coords="296,5,541,35"/><area shape="rect" id="node7" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick" alt="" coords="615,84,919,113"/><area shape="rect" id="node9" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK" alt="" coords="295,109,543,139"/><area shape="rect" id="node11" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed." alt="" coords="272,163,565,192"/><area shape="rect" id="node16" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick." alt="" coords="319,216,519,245"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="661,5,872,35"/><area shape="rect" id="node13" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors." alt="" coords="615,163,919,192"/><area shape="rect" id="node18" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a8e5c8220d013ea86948d2d09faaaecc2" title="Time left before next tick." alt="" coords="635,216,899,245"/></map>
 </div>
 </p>
+
+</div>
+</div>
+<a class="anchor" id="af78cd8445dd6bd70038e49fac25de7cb"></a><!-- doxytag: member="TREX::agent::Agent::empty" ref="af78cd8445dd6bd70038e49fac25de7cb" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TREX::transaction::graph::empty </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check if empty. </p>
+<p>Checks if the graph is empty. Meanining that it has no reactor associated to it.</p>
+<dl><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>if the graph is empty </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>false</em>&nbsp;</td><td>otherwise </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00350">350</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">doNext()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">initComplete()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_af78cd8445dd6bd70038e49fac25de7cb_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_af78cd8445dd6bd70038e49fac25de7cb_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_af78cd8445dd6bd70038e49fac25de7cb_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_af78cd8445dd6bd70038e49fac25de7cb_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="301,5,512,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="aa96afbd1877083ce06ebbf5e8d711a83"></a><!-- doxytag: member="TREX::agent::Agent::find_reactor" ref="aa96afbd1877083ce06ebbf5e8d711a83" args="(TREX::utils::Symbol const &amp;name) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a> TREX::transaction::graph::find_reactor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;&nbsp;</td>
+          <td class="paramname"> <em>name</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>find a reactor </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>name</em>&nbsp;</td><td>A reactor symbolic name</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>An iterator referring to the reactor with the name <code>name</code> or <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">reactor_end()</a> if no such reactor exists</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>As the graph does not allow to have multiple reactors with the same name the solution is always unique.</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">reactor_end() const</a> </dd>
+<dd>
+<a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">TeleoReactor::getName() const</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00553">553</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_aa96afbd1877083ce06ebbf5e8d711a83_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_aa96afbd1877083ce06ebbf5e8d711a83_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_aa96afbd1877083ce06ebbf5e8d711a83_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_aa96afbd1877083ce06ebbf5e8d711a83_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="337,5,527,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a300d3483bf0bcf93a143451aa8b82426"></a><!-- doxytag: member="TREX::agent::Agent::getCurrentTick" ref="a300d3483bf0bcf93a143451aa8b82426" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TICK TREX::transaction::graph::getCurrentTick </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>get current tick </p>
+<p>This method provides the current tick being executed in the graph.</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The tick value</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This method is not usefull at the graph level and is more used by the Agent. It may be refactored in roder to keep the graph class as simple as possible. </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00441">441</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">doNext()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00259">TREX::transaction::TeleoReactor::getCurrentTick()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">missionCompleted()</a>.</p>
 
 </div>
 </div>
@@ -606,9 +1006,54 @@ Here is the call graph for this function:</div>
 <p>Graph name. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The name of the graph </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00206">206</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00298">298</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00184">TREX::transaction::TeleoReactor::getGraphName()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00184">TREX::transaction::TeleoReactor::getGraphName()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">initComplete()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7603bb9da5da1073df6f9dee0803ba6f"></a><!-- doxytag: member="TREX::agent::Agent::index" ref="a7603bb9da5da1073df6f9dee0803ba6f" args="(reactor_id r) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long graph::index </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">graph::reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>id</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reactor index. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>An arbitrary index value for <code>r</code> or <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">count_reactors()</a> if this reactor doea not belong to this graph. </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>For reactor tat belong to the graph the returned value is between 0 and <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">count_reactors()</a>-1 </dd></dl>
+<dl class="warning"><dt><b>Warning:</b></dt><dd>The index of a reactor can change whenver the graph is changed (by either adding new reactors or removing ones)</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">count_reactors() const</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00096">96</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00463">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::begin()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00474">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::end()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00481">TREX::transaction::details::graph_vertex_id_map::operator[]()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator." alt="" coords="293,5,496,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator." alt="" coords="300,59,489,88"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -646,18 +1091,115 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">383</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">423</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">TREX::agent::Clock::doStart()</a>, <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00245">TREX::utils::LogManager::file_name()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00206">TREX::transaction::graph::getName()</a>.</p>
+<p>References <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00156">TREX::transaction::graph::cleanup()</a>, <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">TREX::agent::Clock::doStart()</a>, <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00350">TREX::transaction::graph::empty()</a>, <a class="el" href="../../d7/d53/LogManager_8cc_source.html#l00245">TREX::utils::LogManager::file_name()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00298">TREX::transaction::graph::getName()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00413">run()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00456">run()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_ae89e4e2b888cb80d1327d2b26219fc6a_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_ae89e4e2b888cb80d1327d2b26219fc6a_cgraph_map" alt=""></div>
 <map name="d8/d11/classTREX_1_1agent_1_1Agent_ae89e4e2b888cb80d1327d2b26219fc6a_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_ae89e4e2b888cb80d1327d2b26219fc6a_cgraph">
-<area shape="rect" id="node3" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="339,5,552,35"/><area shape="rect" id="node7" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name" alt="" coords="315,59,576,88"/><area shape="rect" id="node11" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="312,112,579,141"/><area shape="rect" id="node5" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a0750debbce1f586b3b93d06dc6ba2582" title="Internal start method." alt="" coords="653,5,851,35"/><area shape="rect" id="node9" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#afedbc70bacf679bbd52fc7332c3fcdfa" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="628,59,876,88"/></map>
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors." alt="" coords="319,59,572,88"/><area shape="rect" id="node9" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="339,112,552,141"/><area shape="rect" id="node13" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb" title="Check if empty." alt="" coords="323,5,568,35"/><area shape="rect" id="node16" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name" alt="" coords="315,165,576,195"/><area shape="rect" id="node20" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="312,219,579,248"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="659,5,869,35"/><area shape="rect" id="node7" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor." alt="" coords="627,59,901,88"/><area shape="rect" id="node11" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a0750debbce1f586b3b93d06dc6ba2582" title="Internal start method." alt="" coords="665,112,863,141"/><area shape="rect" id="node18" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#afedbc70bacf679bbd52fc7332c3fcdfa" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="640,165,888,195"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a9332ebabfaac01371090d8ed5186e836"></a><!-- doxytag: member="TREX::agent::Agent::isolate" ref="a9332ebabfaac01371090d8ed5186e836" args="(reactor_id r) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">graph::reactor_id graph::isolate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">graph::reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Isolate a reactor. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Disconnect the ractor <code>r</code> in this graph. Disconnecting a reactor correspond to disable all timeline declarations made by this reactor inside this graph.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>After this operation the graph still belongs to the graph, it is just not connected to any other reactor anymore. </dd></dl>
+<dl><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>@p</em>&nbsp;</td><td>r or null_reactor() if <code>r</code> did not belong to this graph</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="post"><dt><b>Postcondition:</b></dt><dd>if <code>r</code> did belong to this graph it is added to the set of reactor to be killed during the next cleanup operation</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors.">cleanup()</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00143">143</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a9332ebabfaac01371090d8ed5186e836_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a9332ebabfaac01371090d8ed5186e836_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a9332ebabfaac01371090d8ed5186e836_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a9332ebabfaac01371090d8ed5186e836_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="309,5,499,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="301,59,507,88"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="aa91ce02b919c78429a54e7f7fcd2babb"></a><!-- doxytag: member="TREX::agent::Agent::kill_reactor" ref="aa91ce02b919c78429a54e7f7fcd2babb" args="(reactor_id r)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool graph::kill_reactor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">graph::reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kill a reactor. </p>
+<p>[in] r A reactor</p>
+<p>Disconnect and remove <code>r</code> from this graph</p>
+<dl><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>the reactor was successfully removed </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>false</em>&nbsp;</td><td><code>r</code> did not belong to this graph</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="post"><dt><b>Postcondition:</b></dt><dd><code>r</code> does not belong to this graph</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor.">isolate()</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00126">126</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00741">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::erase()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00156">TREX::transaction::graph::cleanup()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_aa91ce02b919c78429a54e7f7fcd2babb_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_aa91ce02b919c78429a54e7f7fcd2babb_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_aa91ce02b919c78429a54e7f7fcd2babb_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_aa91ce02b919c78429a54e7f7fcd2babb_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a8a8e97ba45f7e93791417788c701ab8b" title="Remove an element." alt="" coords="329,5,532,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="336,59,525,88"/></map>
 </div>
 </p>
 
@@ -692,9 +1234,92 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00271">271</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">311</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">doNext()</a>.</p>
+<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00503">TREX::transaction::graph::count_reactors()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00441">TREX::transaction::graph::getCurrentTick()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">doNext()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_ad952462eecb9ee726951ca2d48d47130_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_ad952462eecb9ee726951ca2d48d47130_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_ad952462eecb9ee726951ca2d48d47130_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_ad952462eecb9ee726951ca2d48d47130_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors." alt="" coords="348,5,652,35"/><area shape="rect" id="node7" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick" alt="" coords="348,59,652,88"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a47958f2d980cded78b04c16804f09102" title="Number of element." alt="" coords="703,5,895,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a96db7840b35ae21a6a631ad15c9622fa"></a><!-- doxytag: member="TREX::agent::Agent::reactor_begin" ref="a96db7840b35ae21a6a631ad15c9622fa" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a> TREX::transaction::graph::reactor_begin </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Beginning reactor iterator. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a <a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">reactor_iterator</a> pointing to the beginning of the reactors set maintained by this graph </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">reactor_end() const</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00528">528</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00463">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::begin()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00321">TREX::transaction::graph::vertices()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a96db7840b35ae21a6a631ad15c9622fa_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a96db7840b35ae21a6a631ad15c9622fa_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a96db7840b35ae21a6a631ad15c9622fa_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a96db7840b35ae21a6a631ad15c9622fa_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator." alt="" coords="349,5,552,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a941e65892d675ebef755fc161c7243ef"></a><!-- doxytag: member="TREX::agent::Agent::reactor_end" ref="a941e65892d675ebef755fc161c7243ef" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html">reactor_iterator</a> TREX::transaction::graph::reactor_end </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, inherited]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>End reactor iterator. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a <a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">reactor_iterator</a> pointing to the end of the reactors set maintained by this graph </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa" title="Beginning reactor iterator.">reactor_begin() const</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00537">537</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00474">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::end()</a>.</p>
+
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00321">TREX::transaction::graph::vertices()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a941e65892d675ebef755fc161c7243ef_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a941e65892d675ebef755fc161c7243ef_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a941e65892d675ebef755fc161c7243ef_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a941e65892d675ebef755fc161c7243ef_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator." alt="" coords="340,5,529,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -720,29 +1345,29 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick.">doNext()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00413">413</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00456">456</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">doNext()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">initComplete()</a>.</p>
+<p>References <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">doNext()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a2d3d07af39c9cac23f06ac956bf40b84_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a2d3d07af39c9cac23f06ac956bf40b84_cgraph_map" alt=""></div>
 <map name="d8/d11/classTREX_1_1agent_1_1Agent_a2d3d07af39c9cac23f06ac956bf40b84_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a2d3d07af39c9cac23f06ac956bf40b84_cgraph">
-<area shape="rect" id="node3" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick." alt="" coords="265,85,484,115"/><area shape="rect" id="node11" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization." alt="" coords="247,192,503,221"/><area shape="rect" id="node5" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK" alt="" coords="575,5,823,35"/><area shape="rect" id="node7" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed." alt="" coords="552,59,845,88"/><area shape="rect" id="node9" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick." alt="" coords="599,112,799,141"/><area shape="rect" id="node13" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="592,165,805,195"/><area shape="rect" id="node15" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name" alt="" coords="568,219,829,248"/><area shape="rect" id="node17" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="565,272,832,301"/></map>
+<area shape="rect" id="node3" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a42b9ac392c85a0e7ab66f82aed97edf5" title="Execute for one tick." alt="" coords="265,118,484,147"/><area shape="rect" id="node16" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization." alt="" coords="247,278,503,307"/><area shape="rect" id="node5" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb" title="Check if empty." alt="" coords="576,198,821,227"/><area shape="rect" id="node7" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick" alt="" coords="893,39,1197,69"/><area shape="rect" id="node9" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b" title="get time in TICK" alt="" coords="575,38,823,67"/><area shape="rect" id="node11" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ad952462eecb9ee726951ca2d48d47130" title="Check if mission is completed." alt="" coords="552,91,845,121"/><area shape="rect" id="node14" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e" title="Sleep until next tick." alt="" coords="599,145,799,174"/><area shape="rect" id="node18" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors." alt="" coords="572,251,825,281"/><area shape="rect" id="node20" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="592,305,805,334"/><area shape="rect" id="node23" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name" alt="" coords="568,358,829,387"/><area shape="rect" id="node25" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="565,411,832,441"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a285d50200ac368aef484d110e6d17217"></a><!-- doxytag: member="TREX::agent::Agent::sendRequest" ref="a285d50200ac368aef484d110e6d17217" args="(rapidxml::xml_node&lt;&gt; &amp;g)" -->
+<a class="anchor" id="a5b1ef6ad983000bcf6ac88e1c485eae4"></a><!-- doxytag: member="TREX::agent::Agent::sendRequest" ref="a5b1ef6ad983000bcf6ac88e1c485eae4" args="(boost::property_tree::ptree::value_type &amp;g)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void TREX::agent::Agent::sendRequest </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>g</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td><code> [inline]</code></td>
@@ -763,17 +1388,17 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal.">sendRequest(TREX::transaction::goal_id const &amp;)</a> </dd>
 <dd>
-<a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aab194a12d848e3a405495245e3f9fd80" title="Post a goals from xml.">sendRequests(TREX::utils::ext_iterator &amp;)</a> </dd></dl>
+sendRequests(TREX::utils::ext_iterator &amp;) </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00337">337</a> of file <a class="el" href="../../d8/d62/Agent_8hh_source.html">Agent.hh</a>.</p>
 
-<p>References <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00487">sendRequest()</a>.</p>
+<p>References <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00536">sendRequest()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
-<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a285d50200ac368aef484d110e6d17217_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a285d50200ac368aef484d110e6d17217_cgraph_map" alt=""></div>
-<map name="d8/d11/classTREX_1_1agent_1_1Agent_a285d50200ac368aef484d110e6d17217_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a285d50200ac368aef484d110e6d17217_cgraph">
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a5b1ef6ad983000bcf6ac88e1c485eae4_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a5b1ef6ad983000bcf6ac88e1c485eae4_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_a5b1ef6ad983000bcf6ac88e1c485eae4_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a5b1ef6ad983000bcf6ac88e1c485eae4_cgraph">
 <area shape="rect" id="node3" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal." alt="" coords="312,5,571,35"/></map>
 </div>
 </p>
@@ -804,20 +1429,20 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00487">487</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00536">536</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00337">sendRequest()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00493">sendRequests()</a>.</p>
+<p>Referenced by <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00337">sendRequest()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00542">sendRequests()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aab194a12d848e3a405495245e3f9fd80"></a><!-- doxytag: member="TREX::agent::Agent::sendRequests" ref="aab194a12d848e3a405495245e3f9fd80" args="(TREX::utils::ext_iterator &amp;g)" -->
+<a class="anchor" id="a2aa127d3c9ace175e0b0d6f3cfc4519a"></a><!-- doxytag: member="TREX::agent::Agent::sendRequests" ref="a2aa127d3c9ace175e0b0d6f3cfc4519a" args="(boost::property_tree::ptree &amp;g)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">size_t Agent::sendRequests </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">TREX::utils::ext_iterator</a> &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree &amp;&nbsp;</td>
           <td class="paramname"> <em>g</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -836,18 +1461,18 @@ Here is the call graph for this function:</div>
 <p>This method will insert all the goals that are acessibles by iterating through <code>g</code> </p>
 <dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::Goal::Goal(rapidxml::xml_node&lt;&gt; &amp;) </dd>
 <dd>
-<a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a285d50200ac368aef484d110e6d17217" title="Post a goal from xml.">sendRequest(rapidxml::xml_node&lt;&gt; &amp;)</a> </dd></dl>
+sendRequest(rapidxml::xml_node&lt;&gt; &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00493">493</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00542">542</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d4/d13/XmlUtils_8cc_source.html#l00128">TREX::utils::ext_iterator::find_tag()</a>, <a class="el" href="../../d4/d13/XmlUtils_8cc_source.html#l00111">TREX::utils::ext_iterator::next()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00487">sendRequest()</a>, and <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00227">TREX::utils::ext_iterator::valid()</a>.</p>
+<p>References <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00536">sendRequest()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
-<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_aab194a12d848e3a405495245e3f9fd80_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_aab194a12d848e3a405495245e3f9fd80_cgraph_map" alt=""></div>
-<map name="d8/d11/classTREX_1_1agent_1_1Agent_aab194a12d848e3a405495245e3f9fd80_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_aab194a12d848e3a405495245e3f9fd80_cgraph">
-<area shape="rect" id="node3" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a98a822361ee189e4097b3a3dde484982" title="Find element." alt="" coords="323,7,576,36"/><area shape="rect" id="node7" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#a1c18b6fa35770b231f6dc0992dbd98e5" title="advance to next node" alt="" coords="628,59,857,88"/><area shape="rect" id="node10" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal." alt="" coords="320,111,579,140"/><area shape="rect" id="node12" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#af215a9cdf4e66ddc2c91aeca8087298f" title="Check for validity." alt="" coords="335,164,564,193"/><area shape="rect" id="node5" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee" title="TREX::utils::is_tag" alt="" coords="669,5,816,35"/></map>
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a2aa127d3c9ace175e0b0d6f3cfc4519a_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a2aa127d3c9ace175e0b0d6f3cfc4519a_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_a2aa127d3c9ace175e0b0d6f3cfc4519a_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a2aa127d3c9ace175e0b0d6f3cfc4519a_cgraph">
+<area shape="rect" id="node3" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#aeadcf2c5f08ec973dd400e8a2e28fa0a" title="Post a goal." alt="" coords="320,5,579,35"/></map>
 </div>
 </p>
 
@@ -887,7 +1512,129 @@ Here is the call graph for this function:</div>
 <dl class="pre"><dt><b>Precondition:</b></dt><dd>clock has been allocated in memory using the <code>new</code> operator </dd></dl>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>the laifetime of <code>clock</code> is now taken coare by this agent. Do note that this post-condition is true no matter what value has been returned by this function. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00283">283</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00323">323</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a350cb40be95b91e6385c96de0c60afa7"></a><!-- doxytag: member="TREX::agent::Agent::tickDuration" ref="a350cb40be95b91e6385c96de0c60afa7" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double TREX::agent::Agent::tickDuration </td>
+          <td>(</td>
+          <td class="paramname"></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>get tick duration </p>
+<p>This method provides the tick duration in real-time in order to allow to convert tick varelated values into a real-time value </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The tick duration</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This method is not usefull at the graph level and is more used by the <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a>. It may be refactored in roder to keep the graph class as simple as possible. </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd>tickToTime(TICK) const </dd>
+<dd>
+<a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235" title="convert real-time into a TICK">timeToTick(time_t, suseconds_t) const</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ae59010979c7d9c7c64928566bf79adcd">TREX::transaction::graph</a>.</p>
+
+<p>Definition at line <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00353">353</a> of file <a class="el" href="../../d8/d62/Agent_8hh_source.html">Agent.hh</a>.</p>
+
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00098">TREX::agent::Clock::tickDuration()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d8/d11/classTREX_1_1agent_1_1Agent_a350cb40be95b91e6385c96de0c60afa7_cgraph.png" border="0" usemap="#d8/d11/classTREX_1_1agent_1_1Agent_a350cb40be95b91e6385c96de0c60afa7_cgraph_map" alt=""></div>
+<map name="d8/d11/classTREX_1_1agent_1_1Agent_a350cb40be95b91e6385c96de0c60afa7_cgraph_map" id="d8/d11/classTREX_1_1agent_1_1Agent_a350cb40be95b91e6385c96de0c60afa7_cgraph">
+<area shape="rect" id="node3" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#aeff145fea225d5073d22ce9e8a0807e1" title="tick duration" alt="" coords="308,5,553,35"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a31b7b2d9b4028adf7a47d67b7c1b76bf"></a><!-- doxytag: member="TREX::agent::Agent::tickToTime" ref="a31b7b2d9b4028adf7a47d67b7c1b76bf" args="(TREX::transaction::TICK cur) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double TREX::agent::Agent::tickToTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a>&nbsp;</td>
+          <td class="paramname"> <em>cur</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>convert a TICK into its real-time equivalent </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cur</em>&nbsp;</td><td>A TICK date</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This method provides an utility to convert a TICK value into its real-time equivalent</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>a float representing the date (usually in seconds) corresponding to the tTICK <code>cur</code> </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This method is not usefull at the graph level and is more used by the <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a>. It may be refactored in roder to keep the graph class as simple as possible. </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7" title="get tick duration">tickDuration() const</a> </dd>
+<dd>
+<a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235" title="convert real-time into a TICK">timeToTick(time_t, suseconds_t) const</a> </dd></dl>
+
+<p>Reimplemented from <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ab5e911ffbb716753580988c220bde88e">TREX::transaction::graph</a>.</p>
+
+<p>Definition at line <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00360">360</a> of file <a class="el" href="../../d8/d62/Agent_8hh_source.html">Agent.hh</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab18d2490d59151ad7ab65edd62f5d235"></a><!-- doxytag: member="TREX::agent::Agent::timeToTick" ref="ab18d2490d59151ad7ab65edd62f5d235" args="(time_t secs, suseconds_t usecs=0) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a> TREX::agent::Agent::timeToTick </td>
+          <td>(</td>
+          <td class="paramtype">time_t&nbsp;</td>
+          <td class="paramname"> <em>secs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">suseconds_t&nbsp;</td>
+          <td class="paramname"> <em>usecs</em> = <code>0</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>convert real-time into a TICK </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>secs</em>&nbsp;</td><td>Number of seconds </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>usecs</em>&nbsp;</td><td>Micro seconds</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This method provides an utility to convert a real-time date into a TICK value</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>the TICK equalent to the time sepresented by <code>secs</code> seconds and <code>usecs</code> microseconds</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This method is not usefull at the graph level and is more used by the <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a>. It may be refactored in roder to keep the graph class as simple as possible. </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7" title="get tick duration">tickDuration() const</a> </dd>
+<dd>
+tickToTime(TICK) const </dd></dl>
+
+<p>Reimplemented from <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7fdffec0b7157c51702fcf7f7fe50703">TREX::transaction::graph</a>.</p>
+
+<p>Definition at line <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00357">357</a> of file <a class="el" href="../../d8/d62/Agent_8hh_source.html">Agent.hh</a>.</p>
 
 </div>
 </div>
@@ -896,7 +1643,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -100,8 +100,10 @@ Collaboration diagram for TREX::utils::XmlError:</div>
 <p><a href="../../d3/d86/classTREX_1_1utils_1_1XmlError-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html#aa4899ca9663dd400a45ed97b4869c687">XmlError</a> (rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;msg)  throw ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#aa4899ca9663dd400a45ed97b4869c687"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html#a3ca724fde920874cb18c3222e1362b60">XmlError</a> (boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;msg)  throw ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a3ca724fde920874cb18c3222e1362b60"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b2f876a905a56a6980d333b0bb06a8e"></a><!-- doxytag: member="TREX::utils::XmlError::XmlError" ref="a5b2f876a905a56a6980d333b0bb06a8e" args="(std::string const &amp;msg)" -->
+&nbsp;</td><td class="memItemRight" valign="bottom"><b>XmlError</b> (std::string const &amp;msg)  throw ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6b3f5bf7f05ae4ba7b621b42b0c76f7"></a><!-- doxytag: member="TREX::utils::XmlError::~XmlError" ref="aa6b3f5bf7f05ae4ba7b621b42b0c76f7" args="()" -->
 virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html#aa6b3f5bf7f05ae4ba7b621b42b0c76f7">~XmlError</a> ()  throw ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -115,18 +117,19 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>XML parsing related errors. </p>
 <p>This exception is used for error related to XML parsing and data extraction</p>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000005">Todo:</a></b></dt><dd>As we migrate to Boost.PropertyTree the source fo the tree os not necessarily XML. Which means that I may need to rename this class.</dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00065">65</a> of file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00070">70</a> of file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa4899ca9663dd400a45ed97b4869c687"></a><!-- doxytag: member="TREX::utils::XmlError::XmlError" ref="aa4899ca9663dd400a45ed97b4869c687" args="(rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;msg)" -->
+<a class="anchor" id="a3ca724fde920874cb18c3222e1362b60"></a><!-- doxytag: member="TREX::utils::XmlError::XmlError" ref="a3ca724fde920874cb18c3222e1362b60" args="(boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;msg)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">TREX::utils::XmlError::XmlError </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; const &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type const &amp;&nbsp;</td>
           <td class="paramname"> <em>node</em>, </td>
         </tr>
         <tr>
@@ -147,14 +150,14 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <p>Constructor. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>An XML node </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>A porperty tree node </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>msg</em>&nbsp;</td><td>A message</td></tr>
   </table>
   </dd>
 </dl>
 <p>Create a new exception associated to the XML node <em>node</em> with the error message <em>msg</em> </p>
 
-<p>Definition at line <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00074">74</a> of file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00081">81</a> of file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
 
 </div>
 </div>
@@ -195,7 +198,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <li>trex/utils/<a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

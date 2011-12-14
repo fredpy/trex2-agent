@@ -199,12 +199,12 @@ window.onload = initDynSections;
 <a name="l00319"></a>00319   <span class="keyword">inline</span> std::pair&lt;<a class="code" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">TREX::transaction::graph::reactor_iterator</a>,
 <a name="l00320"></a>00320                  <a class="code" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">TREX::transaction::graph::reactor_iterator</a>&gt;
 <a name="l00321"></a><a class="code" href="../../db/db4/group__transaction.html#ga893310b800c3102fb8fe90632dd7e1f5">00321</a>   <a class="code" href="../../db/db4/group__transaction.html#ga893310b800c3102fb8fe90632dd7e1f5" title="Graph reactors.">vertices</a>(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">TREX::transaction::graph</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00322"></a>00322     <span class="keywordflow">return</span> std::make_pair(g.reactor_begin(), g.reactor_end());
+<a name="l00322"></a>00322     <span class="keywordflow">return</span> std::make_pair(g.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa" title="Beginning reactor iterator.">reactor_begin</a>(), g.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">reactor_end</a>());
 <a name="l00323"></a>00323   }
 <a name="l00324"></a>00324 
 <a name="l00339"></a>00339   <span class="keyword">inline</span> TREX::transaction::graph::size_type
 <a name="l00340"></a><a class="code" href="../../db/db4/group__transaction.html#ga275618ecd5e5b4db3fc32d1dd2d9fb5c">00340</a>   <a class="code" href="../../db/db4/group__transaction.html#ga275618ecd5e5b4db3fc32d1dd2d9fb5c" title="Number of reactors.">num_vertices</a>(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">TREX::transaction::graph</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00341"></a>00341     <span class="keywordflow">return</span> g.count_reactors();
+<a name="l00341"></a>00341     <span class="keywordflow">return</span> g.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">count_reactors</a>();
 <a name="l00342"></a>00342   }
 <a name="l00343"></a>00343 
 <a name="l00344"></a>00344   <span class="comment">/*</span>
@@ -274,7 +274,7 @@ window.onload = initDynSections;
 <a name="l00471"></a>00471          :m_g(&amp;g) {}
 <a name="l00472"></a>00472        
 <a name="l00481"></a><a class="code" href="../../d4/d0a/structTREX_1_1transaction_1_1details_1_1graph__vertex__id__map.html#a9f498117f4105ce5608cbb594d27aebf">00481</a>        value_type <a class="code" href="../../d4/d0a/structTREX_1_1transaction_1_1details_1_1graph__vertex__id__map.html#a9f498117f4105ce5608cbb594d27aebf" title="Reactor ID accessor.">operator[]</a>(key_type r)<span class="keyword"> const </span>{
-<a name="l00482"></a>00482          <span class="keywordflow">return</span> m_g-&gt;index(r);
+<a name="l00482"></a>00482          <span class="keywordflow">return</span> m_g-&gt;<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7603bb9da5da1073df6f9dee0803ba6f" title="Reactor index.">index</a>(r);
 <a name="l00483"></a>00483        }
 <a name="l00484"></a>00484       <span class="keyword">private</span>:
 <a name="l00485"></a>00485        <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> <span class="keyword">const</span> *m_g;
@@ -380,7 +380,7 @@ window.onload = initDynSections;
 <a name="l00721"></a>00721 
 <a name="l00722"></a>00722 <span class="preprocessor">#endif // H_bgl_support</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

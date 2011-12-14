@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="435,83,531,112"/>
-<area shape="rect" id="node9" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="416,160,549,189"/>
-<area shape="rect" id="node11" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="573,160,683,189"/>
-<area shape="rect" id="node13" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="707,160,829,189"/>
+<area shape="rect" id="node3" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="639,83,735,112"/>
+<area shape="rect" id="node11" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="731,160,864,189"/>
+<area shape="rect" id="node13" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="888,160,997,189"/>
+<area shape="rect" id="node15" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1021,160,1144,189"/>
 </map>

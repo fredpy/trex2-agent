@@ -105,548 +105,670 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;<a class="code" href="../../db/d1a/EuropaReactor_8hh.html" title="Definition of an europa based reactor.">EuropaReactor.hh</a>&quot;</span>
-<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;bits/europa_convert.hh&quot;</span>
-<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;DbSolver.hh&quot;</span>
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 <span class="preprocessor">#include &lt;PLASMA/ModuleConstraintEngine.hh&gt;</span>
-<a name="l00039"></a>00039 <span class="preprocessor">#include &lt;PLASMA/ModulePlanDatabase.hh&gt;</span>
-<a name="l00040"></a>00040 <span class="preprocessor">#include &lt;PLASMA/ModuleRulesEngine.hh&gt;</span>
-<a name="l00041"></a>00041 <span class="preprocessor">#include &lt;PLASMA/ModuleTemporalNetwork.hh&gt;</span>
-<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;PLASMA/ModuleSolvers.hh&gt;</span>
-<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;PLASMA/ModuleNddl.hh&gt;</span>
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <span class="preprocessor">#include &lt;PLASMA/RulesEngine.hh&gt;</span>
-<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;PLASMA/Propagators.hh&gt;</span>
-<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;PLASMA/Schema.hh&gt;</span>
-<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;PLASMA/NddlInterpreter.hh&gt;</span>
-<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="preprocessor">#include &lt;PLASMA/XMLUtils.hh&gt;</span>
-<a name="l00052"></a>00052 <span class="preprocessor">#include &lt;PLASMA/Debug.hh&gt;</span>
-<a name="l00053"></a>00053 <span class="preprocessor">#include &lt;PLASMA/Timeline.hh&gt;</span>
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 <span class="keyword">using namespace </span>TREX::europa;
-<a name="l00056"></a>00056 <span class="keyword">using namespace </span>TREX::europa::details;
-<a name="l00057"></a>00057 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00058"></a>00058 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060 <span class="keyword">namespace </span>{
-<a name="l00061"></a>00061   
-<a name="l00062"></a>00062   <span class="keyword">class </span>DefaultSchema :<span class="keyword">public</span> <a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html">SchemaPlugin</a> {
-<a name="l00063"></a>00063   <span class="keyword">public</span>:
-<a name="l00064"></a>00064     <span class="keywordtype">void</span> registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly);
-<a name="l00065"></a>00065   }; 
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067   DefaultSchema trex_schema;
-<a name="l00068"></a>00068 
-<a name="l00069"></a>00069 }
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071 <span class="keywordtype">void</span> DefaultSchema::registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly) {
-<a name="l00072"></a>00072   TREX_REGISTER_FLAW_FILTER(assembly, <a class="code" href="../../d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html">TREX::europa::DeliberationFilter</a>, 
-<a name="l00073"></a>00073                          <a class="code" href="../../d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html">DeliberationFilter</a>); 
-<a name="l00074"></a>00074 }
-<a name="l00075"></a>00075 
-<a name="l00076"></a><a class="code" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#aa36bc2aedb276959cf5318851abeb2d9">00076</a> TokenError::TokenError(EUROPA::Token <span class="keyword">const</span> &amp;tok, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
-<a name="l00077"></a>00077  :<a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(msg+<span class="stringliteral">&quot;; on\n&quot;</span>+tok.toLongString()) {}
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079 <span class="comment">/*</span>
-<a name="l00080"></a>00080 <span class="comment"> * class TREX::europa::details::Schema</span>
-<a name="l00081"></a>00081 <span class="comment"> */</span>
-<a name="l00082"></a>00082 std::string <span class="keyword">const</span> Schema::EUROPA_DEBUG(<span class="stringliteral">&quot;Europa.log&quot;</span>);
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085 Schema::Schema() {
-<a name="l00086"></a>00086   m_europa_debug.open(m_log-&gt;file_name(<span class="stringliteral">&quot;Europa.log&quot;</span>).c_str());
-<a name="l00087"></a>00087   DebugMessage::setStream(m_europa_debug);
-<a name="l00088"></a>00088   <span class="keywordtype">bool</span> found;
-<a name="l00089"></a>00089   std::string cfg_dbg = m_log-&gt;use(<span class="stringliteral">&quot;Debug.cfg&quot;</span>, found);
-<a name="l00090"></a>00090   
-<a name="l00091"></a>00091   <span class="keywordflow">if</span>( found ) {
-<a name="l00092"></a>00092     std::ifstream cfg(cfg_dbg.c_str());
-<a name="l00093"></a>00093     DebugMessage::readConfigFile(cfg);
-<a name="l00094"></a>00094   } <span class="keywordflow">else</span>
-<a name="l00095"></a>00095     m_log-&gt;syslog(<span class="stringliteral">&quot;EUROPA&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;No Debug.cfg keeping default europa debug verbosity.&quot;</span>;
-<a name="l00096"></a>00096 }
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099 <span class="comment">// modifiers</span>
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101 <span class="keywordtype">void</span> Schema::registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly) {
-<a name="l00102"></a>00102   <span class="comment">// EUROPA::ConstraintEngineId const &amp;ce=assembly.constraint_engine();</span>
-<a name="l00103"></a>00103        
-<a name="l00104"></a>00104   <span class="keywordflow">for</span>(std::set&lt;SchemaPlugin *&gt;::const_iterator i = m_plugins.begin();
-<a name="l00105"></a>00105       m_plugins.end()!=i; ++i) 
-<a name="l00106"></a>00106     (*i)-&gt;registerComponents(assembly);
+<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;EuropaReactor.hh&quot;</span>
+<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;Constraints.hh&quot;</span>
+<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;bits/europa_convert.hh&quot;</span>
+<a name="l00037"></a>00037 <span class="preprocessor">#include &quot;DbSolver.hh&quot;</span>
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039 <span class="preprocessor">#include &lt;PLASMA/ModuleConstraintEngine.hh&gt;</span>
+<a name="l00040"></a>00040 <span class="preprocessor">#include &lt;PLASMA/ModulePlanDatabase.hh&gt;</span>
+<a name="l00041"></a>00041 <span class="preprocessor">#include &lt;PLASMA/ModuleRulesEngine.hh&gt;</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;PLASMA/ModuleTemporalNetwork.hh&gt;</span>
+<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;PLASMA/ModuleSolvers.hh&gt;</span>
+<a name="l00044"></a>00044 <span class="preprocessor">#include &lt;PLASMA/ModuleNddl.hh&gt;</span>
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;PLASMA/RulesEngine.hh&gt;</span>
+<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;PLASMA/Propagators.hh&gt;</span>
+<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;PLASMA/Schema.hh&gt;</span>
+<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;PLASMA/NddlInterpreter.hh&gt;</span>
+<a name="l00050"></a>00050 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="preprocessor">#include &lt;PLASMA/XMLUtils.hh&gt;</span>
+<a name="l00053"></a>00053 <span class="preprocessor">#include &lt;PLASMA/Debug.hh&gt;</span>
+<a name="l00054"></a>00054 <span class="preprocessor">#include &lt;PLASMA/Timeline.hh&gt;</span>
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="preprocessor">#include &lt;boost/algorithm/string/replace.hpp&gt;</span>
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 <span class="keyword">using namespace </span>TREX::europa;
+<a name="l00059"></a>00059 <span class="keyword">using namespace </span>TREX::europa::details;
+<a name="l00060"></a>00060 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00061"></a>00061 <span class="keyword">using namespace </span>TREX::utils;
+<a name="l00062"></a>00062 
+<a name="l00063"></a>00063 <span class="keyword">namespace </span>xml = boost::property_tree::xml_parser;
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065 
+<a name="l00066"></a>00066 <span class="keyword">namespace </span>{
+<a name="l00067"></a>00067   
+<a name="l00068"></a>00068   <span class="keyword">class </span>DefaultSchema :<span class="keyword">public</span> <a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html" title="Europa extension &amp;quot;plug-in&amp;quot;.">SchemaPlugin</a> {
+<a name="l00069"></a>00069   <span class="keyword">public</span>:
+<a name="l00070"></a>00070     <span class="keywordtype">void</span> registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly);
+<a name="l00071"></a>00071   }; 
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073   DefaultSchema trex_schema;
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 }
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078 <span class="keywordtype">void</span> DefaultSchema::registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly) {
+<a name="l00079"></a>00079   TREX_REGISTER_FLAW_FILTER(assembly, <a class="code" href="../../d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html">TREX::europa::DeliberationFilter</a>, 
+<a name="l00080"></a>00080                          <a class="code" href="../../d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html">DeliberationFilter</a>); 
+<a name="l00081"></a>00081   TREX_REGISTER_CONSTRAINT(assembly,<a class="code" href="../../d3/d09/classTREX_1_1europa_1_1CheckExternal.html" title="Check if External.">TREX::europa::CheckExternal</a>,isExternal,trex);
+<a name="l00082"></a>00082   TREX_REGISTER_CONSTRAINT(assembly,<a class="code" href="../../db/d52/classTREX_1_1europa_1_1CheckInternal.html" title="Check if Internal.">TREX::europa::CheckInternal</a>,isInternal,trex);   
+<a name="l00083"></a>00083   TREX_REGISTER_CONSTRAINT(assembly,<a class="code" href="../../d2/d95/classTREX_1_1europa_1_1Bind.html" title="Variable binding constraint.">TREX::europa::Bind</a>,bind,Default);   
+<a name="l00084"></a>00084 }
+<a name="l00085"></a>00085 
+<a name="l00086"></a><a class="code" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#aa36bc2aedb276959cf5318851abeb2d9">00086</a> <a class="code" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#aa36bc2aedb276959cf5318851abeb2d9" title="Constructor.">TokenError::TokenError</a>(EUROPA::Token <span class="keyword">const</span> &amp;tok, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
+<a name="l00087"></a>00087  :<a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(msg+<span class="stringliteral">&quot;; on\n&quot;</span>+tok.toLongString()) {}
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089 <span class="comment">/*</span>
+<a name="l00090"></a>00090 <span class="comment"> * class TREX::europa::details::Schema</span>
+<a name="l00091"></a>00091 <span class="comment"> */</span>
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093 Schema::Schema() {
+<a name="l00094"></a>00094   <span class="keywordtype">bool</span> found;
+<a name="l00095"></a>00095   std::string cfg_dbg = m_log-&gt;use(<span class="stringliteral">&quot;Debug.cfg&quot;</span>, found);
+<a name="l00096"></a>00096   
+<a name="l00097"></a>00097   <span class="keywordflow">if</span>( found ) {
+<a name="l00098"></a>00098     std::ifstream cfg(cfg_dbg.c_str());
+<a name="l00099"></a>00099     DebugMessage::readConfigFile(cfg);
+<a name="l00100"></a>00100   } <span class="keywordflow">else</span>
+<a name="l00101"></a>00101     m_log-&gt;syslog(<span class="stringliteral">&quot;EUROPA&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;No Debug.cfg keeping default europa debug verbosity.&quot;</span>;
+<a name="l00102"></a>00102 }
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 <span class="keywordtype">void</span> Schema::setStream(std::ofstream &amp;out, std::string <span class="keyword">const</span> &amp;name) {
+<a name="l00105"></a>00105   out.open(m_log-&gt;file_name(name).c_str());
+<a name="l00106"></a>00106   setStream(out);
 <a name="l00107"></a>00107 }
 <a name="l00108"></a>00108 
-<a name="l00109"></a>00109 <span class="keywordtype">void</span> Schema::registerPlugin(<a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html">SchemaPlugin</a> &amp;pg) {
-<a name="l00110"></a>00110   m_plugins.insert(&amp;pg);
-<a name="l00111"></a>00111 }
-<a name="l00112"></a>00112 
-<a name="l00113"></a>00113 <span class="keywordtype">void</span> Schema::unregisterPlugin(<a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html">SchemaPlugin</a> &amp;pg) {
-<a name="l00114"></a>00114   m_plugins.erase(&amp;pg);
-<a name="l00115"></a>00115 }
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110 <span class="keywordtype">void</span> Schema::setStream(std::ostream &amp;out) {
+<a name="l00111"></a>00111   DebugMessage::setStream(out);
+<a name="l00112"></a>00112 }
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 <span class="comment">// modifiers</span>
 <a name="l00116"></a>00116 
-<a name="l00117"></a>00117 <span class="comment">/*</span>
-<a name="l00118"></a>00118 <span class="comment"> * class TREX::europa::SchemaPlugin</span>
-<a name="l00119"></a>00119 <span class="comment"> */</span>
-<a name="l00120"></a>00120 <span class="comment">// structors </span>
-<a name="l00121"></a>00121 
-<a name="l00122"></a>00122 SchemaPlugin::SchemaPlugin() {
-<a name="l00123"></a>00123   m_schema-&gt;registerPlugin(*<span class="keyword">this</span>);
-<a name="l00124"></a>00124 }
-<a name="l00125"></a>00125 
-<a name="l00126"></a>00126 SchemaPlugin::~SchemaPlugin() {
-<a name="l00127"></a>00127   m_schema-&gt;unregisterPlugin(*<span class="keyword">this</span>);
-<a name="l00128"></a>00128 }
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130 <span class="comment">/*</span>
-<a name="l00131"></a>00131 <span class="comment"> * class TREX::europa::Assembly</span>
-<a name="l00132"></a>00132 <span class="comment"> */</span> 
-<a name="l00133"></a>00133 
-<a name="l00134"></a>00134 <span class="comment">// statics</span>
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136 std::string <span class="keyword">const</span> Assembly::MODE_ATTR(<span class="stringliteral">&quot;mode&quot;</span>);
-<a name="l00137"></a>00137 std::string <span class="keyword">const</span> Assembly::DEFAULT_ATTR(<span class="stringliteral">&quot;defaultPredicate&quot;</span>);
-<a name="l00138"></a>00138 
-<a name="l00139"></a>00139 EUROPA::LabelStr <span class="keyword">const</span> Assembly::TREX_TIMELINE(<span class="stringliteral">&quot;AgentTimeline&quot;</span>);
-<a name="l00140"></a>00140 
-<a name="l00141"></a>00141 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a84e0bd2494dd86e886963a7b084250bd" title="Europa external timelines descriptor.">Assembly::EXTERNAL_MODE</a>(<span class="stringliteral">&quot;External&quot;</span>);
-<a name="l00142"></a>00142 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac5119cda2a9f5a8f54a543aec6aa9c25" title="Europa observed timelines descriptor.">Assembly::OBSERVE_MODE</a>(<span class="stringliteral">&quot;Observe&quot;</span>);
-<a name="l00143"></a>00143 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afe84b54a80120bb4a6d6482e9d0e7016" title="Europa internal timelines descriptor.">Assembly::INTERNAL_MODE</a>(<span class="stringliteral">&quot;Internal&quot;</span>);
-<a name="l00144"></a>00144 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad9e1e927fe9888bb3a7c67f4907e9601" title="Europa private timelines descriptor.">Assembly::PRIVATE_MODE</a>(<span class="stringliteral">&quot;Private&quot;</span>);
-<a name="l00145"></a>00145 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a41eb2bd02904cbc8fd263ffc22016177" title="Europa ignored timelines descriptor.">Assembly::IGNORE_MODE</a>(<span class="stringliteral">&quot;Ignore&quot;</span>);
-<a name="l00146"></a>00146 
-<a name="l00147"></a>00147 EUROPA::LabelStr <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac074410bcc532022496af8c34be2d63a" title="Europa mission end variable.">Assembly::MISSION_END</a>(<span class="stringliteral">&quot;MISSION_END&quot;</span>);
-<a name="l00148"></a>00148 EUROPA::LabelStr <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a76598fb68674e2c7816528a2bed573ca" title="tick duration variable">Assembly::TICK_DURATION</a>(<span class="stringliteral">&quot;TICK_DURATION&quot;</span>);
+<a name="l00117"></a>00117 <span class="keywordtype">void</span> Schema::registerComponents(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly) {
+<a name="l00118"></a>00118   <span class="comment">// EUROPA::ConstraintEngineId const &amp;ce=assembly.constraint_engine();</span>
+<a name="l00119"></a>00119        
+<a name="l00120"></a>00120   <span class="keywordflow">for</span>(std::set&lt;SchemaPlugin *&gt;::const_iterator i = m_plugins.begin();
+<a name="l00121"></a>00121       m_plugins.end()!=i; ++i) 
+<a name="l00122"></a>00122     (*i)-&gt;registerComponents(assembly);
+<a name="l00123"></a>00123 }
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125 <span class="keywordtype">void</span> Schema::registerPlugin(<a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html" title="Europa extension &amp;quot;plug-in&amp;quot;.">SchemaPlugin</a> &amp;pg) {
+<a name="l00126"></a>00126   m_plugins.insert(&amp;pg);
+<a name="l00127"></a>00127 }
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129 <span class="keywordtype">void</span> Schema::unregisterPlugin(<a class="code" href="../../d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html" title="Europa extension &amp;quot;plug-in&amp;quot;.">SchemaPlugin</a> &amp;pg) {
+<a name="l00130"></a>00130   m_plugins.erase(&amp;pg);
+<a name="l00131"></a>00131 }
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133 <span class="comment">/*</span>
+<a name="l00134"></a>00134 <span class="comment"> * class TREX::europa::SchemaPlugin</span>
+<a name="l00135"></a>00135 <span class="comment"> */</span>
+<a name="l00136"></a>00136 <span class="comment">// structors </span>
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138 SchemaPlugin::SchemaPlugin() {
+<a name="l00139"></a>00139   m_schema-&gt;registerPlugin(*<span class="keyword">this</span>);
+<a name="l00140"></a>00140 }
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142 SchemaPlugin::~SchemaPlugin() {
+<a name="l00143"></a>00143   m_schema-&gt;unregisterPlugin(*<span class="keyword">this</span>);
+<a name="l00144"></a>00144 }
+<a name="l00145"></a>00145 
+<a name="l00146"></a>00146 <span class="comment">/*</span>
+<a name="l00147"></a>00147 <span class="comment"> * class TREX::europa::Assembly</span>
+<a name="l00148"></a>00148 <span class="comment"> */</span> 
 <a name="l00149"></a>00149 
-<a name="l00150"></a>00150 std::string <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#acd32a4fcb2e48a25103954cd749813ab" title="undefined predicate name">Assembly::UNDEFINED_PRED</a>(<span class="stringliteral">&quot;undefined&quot;</span>);
+<a name="l00150"></a>00150 <span class="comment">// statics</span>
 <a name="l00151"></a>00151 
-<a name="l00152"></a>00152 
-<a name="l00153"></a>00153 <span class="comment">// structors </span>
+<a name="l00152"></a>00152 std::string <span class="keyword">const</span> Assembly::MODE_ATTR(<span class="stringliteral">&quot;mode&quot;</span>);
+<a name="l00153"></a>00153 std::string <span class="keyword">const</span> Assembly::DEFAULT_ATTR(<span class="stringliteral">&quot;defaultPredicate&quot;</span>);
 <a name="l00154"></a>00154 
-<a name="l00155"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad85bdaad47ef9278e1e2237a653c8943">00155</a> Assembly::Assembly(<a class="code" href="../../d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor.">EuropaReactor</a> &amp;owner)
-<a name="l00156"></a>00156  :m_reactor(owner), m_solver(NULL) {
-<a name="l00157"></a>00157   addModule((<span class="keyword">new</span> EUROPA::ModuleConstraintEngine())-&gt;getId());
-<a name="l00158"></a>00158   addModule((<span class="keyword">new</span> EUROPA::ModuleConstraintLibrary())-&gt;getId());  
-<a name="l00159"></a>00159   addModule((<span class="keyword">new</span> EUROPA::ModulePlanDatabase())-&gt;getId());
-<a name="l00160"></a>00160   addModule((<span class="keyword">new</span> EUROPA::ModuleRulesEngine())-&gt;getId());
-<a name="l00161"></a>00161   addModule((<span class="keyword">new</span> EUROPA::ModuleTemporalNetwork())-&gt;getId());
-<a name="l00162"></a>00162   addModule((<span class="keyword">new</span> EUROPA::ModuleSolvers())-&gt;getId());
-<a name="l00163"></a>00163   addModule((<span class="keyword">new</span> EUROPA::ModuleNddl())-&gt;getId());
-<a name="l00164"></a>00164        
-<a name="l00165"></a>00165   <span class="comment">// complete base class initialization</span>
-<a name="l00166"></a>00166   doStart();
-<a name="l00167"></a>00167        
-<a name="l00168"></a>00168   <span class="comment">// initialization europa entry points</span>
-<a name="l00169"></a>00169   m_schema = ((EUROPA::Schema *)getComponent(<span class="stringliteral">&quot;Schema&quot;</span>))-&gt;getId();
-<a name="l00170"></a>00170   m_constraintEngine = ((EUROPA::ConstraintEngine *)getComponent(<span class="stringliteral">&quot;ConstraintEngine&quot;</span>))-&gt;getId();
-<a name="l00171"></a>00171   m_planDatabase = ((EUROPA::PlanDatabase *)getComponent(<span class="stringliteral">&quot;PlanDatabase&quot;</span>))-&gt;getId();
-<a name="l00172"></a>00172   m_rulesEngine = ((EUROPA::RulesEngine *)getComponent(<span class="stringliteral">&quot;RulesEngine&quot;</span>))-&gt;getId();
-<a name="l00173"></a>00173   
-<a name="l00174"></a>00174   <span class="comment">// register the new propagator used during synchronization</span>
-<a name="l00175"></a>00175   <span class="keyword">new</span> EUROPA::DefaultPropagator(EUROPA::LabelStr(<span class="stringliteral">&quot;OnCommit&quot;</span>), m_constraintEngine);
-<a name="l00176"></a>00176        
-<a name="l00177"></a>00177   <span class="comment">// make sure that we control when constraints are propagated</span>
-<a name="l00178"></a>00178   m_constraintEngine-&gt;setAutoPropagation(<span class="keyword">false</span>);
-<a name="l00179"></a>00179   
-<a name="l00180"></a>00180   <span class="comment">// get extra features from TREX schema</span>
-<a name="l00181"></a>00181   m_trexSchema-&gt;registerComponents(*<span class="keyword">this</span>);
-<a name="l00182"></a>00182   
-<a name="l00183"></a>00183   EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);
-<a name="l00184"></a>00184 }
-<a name="l00185"></a>00185 
-<a name="l00186"></a>00186 Assembly::~Assembly() {
-<a name="l00187"></a>00187   <span class="keywordflow">if</span>( NULL!=m_solver ) {
-<a name="l00188"></a>00188     <span class="keyword">delete</span> m_solver;
-<a name="l00189"></a>00189     m_solver = NULL; <span class="comment">// just for being on the safe side ...</span>
-<a name="l00190"></a>00190   }
-<a name="l00191"></a>00191   <span class="comment">// cleanup base class</span>
-<a name="l00192"></a>00192   doShutdown();
-<a name="l00193"></a>00193 }
-<a name="l00194"></a>00194 
-<a name="l00195"></a>00195 <span class="comment">// observers </span>
-<a name="l00196"></a>00196 
-<a name="l00197"></a>00197 <span class="keywordtype">void</span> Assembly::logPlan(std::ostream &amp;out)<span class="keyword"> const </span>{
-<a name="l00198"></a>00198   EUROPA::TokenSet <span class="keyword">const</span> all_toks = m_planDatabase-&gt;getTokens();
-<a name="l00199"></a>00199   out&lt;&lt;<span class="stringliteral">&quot;digraph plan_&quot;</span>&lt;&lt;m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>()&lt;&lt;<span class="stringliteral">&quot; {\n&quot;</span>;
-<a name="l00200"></a>00200   out&lt;&lt;<span class="stringliteral">&quot;  node[shape=\&quot;box\&quot;];\n&quot;</span>;
-<a name="l00201"></a>00201   <span class="keywordflow">for</span>(EUROPA::TokenSet::const_iterator i=all_toks.begin();
-<a name="l00202"></a>00202       all_toks.end()!=i; ++i) {
-<a name="l00203"></a>00203     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(*i) ) {
-<a name="l00204"></a>00204       EUROPA::eint key;
-<a name="l00205"></a>00205       <span class="keywordflow">if</span>( (*i)-&gt;isMerged() ) {
-<a name="l00206"></a>00206        key = (*i)-&gt;getActiveToken()-&gt;getKey();
-<a name="l00207"></a>00207       } <span class="keywordflow">else</span> {
-<a name="l00208"></a>00208        key = (*i)-&gt;getKey();
-<a name="l00209"></a>00209        out&lt;&lt;<span class="stringliteral">&quot;  t&quot;</span>&lt;&lt;key&lt;&lt;<span class="stringliteral">&quot;[label=\&quot;&quot;</span>&lt;&lt;(*i)-&gt;getPredicateName().toString()&lt;&lt;<span class="stringliteral">&quot;\\n&quot;</span>
-<a name="l00210"></a>00210           &lt;&lt;<span class="stringliteral">&quot; start &quot;</span>&lt;&lt;(*i)-&gt;start()-&gt;lastDomain().toString()&lt;&lt;<span class="stringliteral">&quot;\\n&quot;</span>
-<a name="l00211"></a>00211           &lt;&lt;<span class="stringliteral">&quot; end &quot;</span>&lt;&lt;(*i)-&gt;end()-&gt;lastDomain().toString()&lt;&lt;<span class="stringliteral">&quot;\\n&quot;</span>
-<a name="l00212"></a>00212           &lt;&lt;<span class="stringliteral">&quot; state &quot;</span>&lt;&lt;(*i)-&gt;getState()-&gt;lastDomain().toString()&lt;&lt;<span class="stringliteral">&quot;\&quot;&quot;</span>;
-<a name="l00213"></a>00213        <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(*i) || <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(*i) ) 
-<a name="l00214"></a>00214          out&lt;&lt;<span class="stringliteral">&quot; color=grey&quot;</span>;
-<a name="l00215"></a>00215        <span class="keywordflow">else</span> <span class="keywordflow">if</span>( (*i)-&gt;isFact() )
-<a name="l00216"></a>00216          out&lt;&lt;<span class="stringliteral">&quot; color=red&quot;</span>;
-<a name="l00217"></a>00217        <span class="keywordflow">else</span> <span class="keywordflow">if</span>( (*i)-&gt;isActive() )
-<a name="l00218"></a>00218          out&lt;&lt;<span class="stringliteral">&quot; color=blue&quot;</span>;
-<a name="l00219"></a>00219        out&lt;&lt;<span class="stringliteral">&quot;];\n&quot;</span>;
-<a name="l00220"></a>00220       }      
-<a name="l00221"></a>00221       EUROPA::TokenId master = (*i)-&gt;master();
-<a name="l00222"></a>00222       <span class="keywordflow">if</span>( master.isId() ) {
-<a name="l00223"></a>00223        <span class="keywordflow">if</span>( master-&gt;isMerged() )
-<a name="l00224"></a>00224          master = master-&gt;getActiveToken();
-<a name="l00225"></a>00225        out&lt;&lt;<span class="stringliteral">&quot;  t&quot;</span>&lt;&lt;master-&gt;getKey()&lt;&lt;<span class="stringliteral">&quot;-&gt;t&quot;</span>&lt;&lt;key
-<a name="l00226"></a>00226           &lt;&lt;<span class="stringliteral">&quot;[label=\&quot;&quot;</span>&lt;&lt;(*i)-&gt;getRelation().toString()&lt;&lt;<span class="stringliteral">&quot;\&quot;];\n&quot;</span>;
-<a name="l00227"></a>00227       }
-<a name="l00228"></a>00228     }
-<a name="l00229"></a>00229   }
-<a name="l00230"></a>00230   out&lt;&lt;<span class="stringliteral">&quot;}\n&quot;</span>;
-<a name="l00231"></a>00231 }
-<a name="l00232"></a>00232 
-<a name="l00233"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad50cc53529886baedfa60d55e1b263a9">00233</a> <span class="keywordtype">void</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad50cc53529886baedfa60d55e1b263a9" title="Check for default predicate.">Assembly::check_default</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
-<a name="l00234"></a>00234   EUROPA::ConstrainedVariableId var = <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad44a74a81f0fdda62763e4be8ba1877d" title="Get default predicate value.">default_pred</a>(obj);
-<a name="l00235"></a>00235   std::ostringstream oss;
-<a name="l00236"></a>00236        
-<a name="l00237"></a>00237   <span class="keywordflow">if</span>( var.isNoId() || !var-&gt;isSpecified() ) {
-<a name="l00238"></a>00238     oss&lt;&lt;<span class="stringliteral">&quot;Internal timeline &quot;</span>&lt;&lt;obj-&gt;getName().toString()
-<a name="l00239"></a>00239        &lt;&lt;<span class="stringliteral">&quot; does not specify its &quot;</span>&lt;&lt;DEFAULT_ATTR;
-<a name="l00240"></a>00240     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
-<a name="l00241"></a>00241   }
-<a name="l00242"></a>00242   EUROPA::DataTypeId type = var-&gt;getDataType();
-<a name="l00243"></a>00243   std::string short_pred = type-&gt;toString(var-&gt;getSpecifiedValue()),
-<a name="l00244"></a>00244     long_pred = obj-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+short_pred;
-<a name="l00245"></a>00245   <span class="keywordflow">if</span>( !m_schema-&gt;isPredicate(long_pred.c_str()) ) {
-<a name="l00246"></a>00246     oss&lt;&lt;<span class="stringliteral">&quot;Internal timeline &quot;</span>&lt;&lt;obj-&gt;getName().toString()
-<a name="l00247"></a>00247        &lt;&lt;<span class="stringliteral">&quot; default predicate \&quot;&quot;</span>&lt;&lt;short_pred&lt;&lt;<span class="stringliteral">&quot;\&quot; does not exist&quot;</span>;
-<a name="l00248"></a>00248     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
-<a name="l00249"></a>00249   }
-<a name="l00250"></a>00250 }
-<a name="l00251"></a>00251 
-<a name="l00252"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a06b420836c583ae74b464d9985be3435">00252</a> EUROPA::ConstrainedVariableId <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a06b420836c583ae74b464d9985be3435" title="Extract an object attribute.">Assembly::attribute</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj, 
-<a name="l00253"></a>00253                                             std::string <span class="keyword">const</span> &amp;attr)<span class="keyword"> const </span>{
-<a name="l00254"></a>00254   std::string full_name = obj-&gt;getName().toString()+<span class="stringliteral">&quot;.&quot;</span>+attr;
-<a name="l00255"></a>00255   EUROPA::ConstrainedVariableId var = obj-&gt;getVariable(full_name);
-<a name="l00256"></a>00256   <span class="keywordflow">if</span>( var.isNoId() )
-<a name="l00257"></a>00257     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(<span class="stringliteral">&quot;Variable &quot;</span>+full_name+<span class="stringliteral">&quot; does not exist.&quot;</span>);
-<a name="l00258"></a>00258   <span class="keywordflow">return</span> var;
-<a name="l00259"></a>00259 }
-<a name="l00260"></a>00260 
-<a name="l00261"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057">00261</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">Assembly::isInternal</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
-<a name="l00262"></a>00262   <span class="keywordflow">return</span> m_schema-&gt;isA(obj-&gt;getType(), TREX_TIMELINE)  &amp;&amp;
-<a name="l00263"></a>00263     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline.">isInternal</a>(obj-&gt;getName().c_str());
-<a name="l00264"></a>00264 }
-<a name="l00265"></a>00265 
-<a name="l00266"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178">00266</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external.">Assembly::isExternal</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
-<a name="l00267"></a>00267   <span class="keywordflow">return</span> m_schema-&gt;isA(obj-&gt;getType(), TREX_TIMELINE)  &amp;&amp;
-<a name="l00268"></a>00268     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(obj-&gt;getName().c_str());  
-<a name="l00269"></a>00269 }
-<a name="l00270"></a>00270 
-<a name="l00271"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac97b4ad8198bbccf2c90bf0545761131">00271</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac97b4ad8198bbccf2c90bf0545761131" title="Check if internal.">Assembly::internal</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
-<a name="l00272"></a>00272   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
-<a name="l00273"></a>00273   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
-<a name="l00274"></a>00274   
-<a name="l00275"></a>00275   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
-<a name="l00276"></a>00276   
-<a name="l00277"></a>00277   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o) 
-<a name="l00278"></a>00278     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">isInternal</a>(*o) )
-<a name="l00279"></a>00279       <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00280"></a>00280   <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00281"></a>00281 }
-<a name="l00282"></a>00282 
-<a name="l00283"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9be56798df78a332c496b77f851e2c4c">00283</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9be56798df78a332c496b77f851e2c4c" title="Check if external.">Assembly::external</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
-<a name="l00284"></a>00284   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
-<a name="l00285"></a>00285   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
-<a name="l00286"></a>00286   
-<a name="l00287"></a>00287   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
-<a name="l00288"></a>00288   
-<a name="l00289"></a>00289   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o) 
-<a name="l00290"></a>00290     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external.">isExternal</a>(*o) )
-<a name="l00291"></a>00291       <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00292"></a>00292   <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00293"></a>00293 }
-<a name="l00294"></a>00294 
-<a name="l00295"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">00295</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">Assembly::ignored</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
-<a name="l00296"></a>00296   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
-<a name="l00297"></a>00297   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
-<a name="l00298"></a>00298   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
-<a name="l00299"></a>00299        
-<a name="l00300"></a>00300   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o)     
-<a name="l00301"></a>00301     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a285b5e653bc107813eb3614a21b8629b" title="Check if ignored.">isIgnored</a>(*o) )
-<a name="l00302"></a>00302       <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00303"></a>00303   <span class="keywordflow">return</span> !objs.empty();
-<a name="l00304"></a>00304 }
-<a name="l00305"></a>00305 
-<a name="l00306"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">00306</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">Assembly::in_deliberation</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
-<a name="l00307"></a>00307   <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(tok) )
-<a name="l00308"></a>00308     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00309"></a>00309   <span class="keywordflow">if</span>( tok-&gt;getState()-&gt;lastDomain().isMember(EUROPA::Token::REJECTED) )
-<a name="l00310"></a>00310     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00311"></a>00311   <span class="keywordflow">if</span>( !active() || tok-&gt;isCommitted() )
-<a name="l00312"></a>00312     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00313"></a>00313   <span class="keywordflow">return</span> m_solver-&gt;inDeliberation(tok);
-<a name="l00314"></a>00314 }
-<a name="l00315"></a>00315 
-<a name="l00316"></a>00316 <span class="keywordtype">bool</span> Assembly::overlaps_now(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
-<a name="l00317"></a>00317   <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> cur = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>();
-<a name="l00318"></a>00318 
-<a name="l00319"></a>00319   <span class="keywordflow">return</span> tok-&gt;start()-&gt;lastDomain().getUpperBound()&lt;=cur
-<a name="l00320"></a>00320   &amp;&amp; tok-&gt;end()-&gt;lastDomain().getLowerBound()&gt;=cur 
-<a name="l00321"></a>00321   &amp;&amp; tok-&gt;end()-&gt;lastDomain().getLowerBound()&gt;m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a10b44ea7bbeb13a23528f82c3c7c78c3" title="reactor initial tick">getInitialTick</a>();
+<a name="l00155"></a>00155 EUROPA::LabelStr <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad095f7f9e7d1a5cc8e25c4de95c64317" title="TREX agent timelines.">Assembly::TREX_TIMELINE</a>(<span class="stringliteral">&quot;AgentTimeline&quot;</span>);
+<a name="l00156"></a>00156 
+<a name="l00157"></a>00157 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a13aa83b10302bfe2c01125dd66d6fd5d" title="Europa external timelines descriptor.">Assembly::EXTERNAL_MODE</a>(<span class="stringliteral">&quot;External&quot;</span>);
+<a name="l00158"></a>00158 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aa9e0637444554c0d767e824d2d70b679" title="Europa observed timelines descriptor.">Assembly::OBSERVE_MODE</a>(<span class="stringliteral">&quot;Observe&quot;</span>);
+<a name="l00159"></a>00159 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac838fe61fbd03a241c3bb8b938604dbd" title="Europa internal timelines descriptor.">Assembly::INTERNAL_MODE</a>(<span class="stringliteral">&quot;Internal&quot;</span>);
+<a name="l00160"></a>00160 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ab362a13821fbd1b1dd4937c18fc1f17a" title="Europa private timelines descriptor.">Assembly::PRIVATE_MODE</a>(<span class="stringliteral">&quot;Private&quot;</span>);
+<a name="l00161"></a>00161 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a6cdc064d1e1905b64e153e5466c60fc6" title="Europa ignored timelines descriptor.">Assembly::IGNORE_MODE</a>(<span class="stringliteral">&quot;Ignore&quot;</span>);
+<a name="l00162"></a>00162 
+<a name="l00163"></a>00163 EUROPA::LabelStr <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ab4ddfc1746112972d3e1502c1c33a7b1" title="Europa mission end variable.">Assembly::MISSION_END</a>(<span class="stringliteral">&quot;MISSION_END&quot;</span>);
+<a name="l00164"></a>00164 EUROPA::LabelStr <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a53b1f48299aef37e84148306cd38bba6" title="tick duration variable">Assembly::TICK_DURATION</a>(<span class="stringliteral">&quot;TICK_DURATION&quot;</span>);
+<a name="l00165"></a>00165 EUROPA::LabelStr <span class="keyword">const</span> Assembly::CLOCK_VAR(<span class="stringliteral">&quot;AGENT_CLOCK&quot;</span>);
+<a name="l00166"></a>00166 
+<a name="l00167"></a>00167 std::string <span class="keyword">const</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a65d498ecdb1911fcf764c336c5dceae2" title="undefined predicate name">Assembly::UNDEFINED_PRED</a>(<span class="stringliteral">&quot;undefined&quot;</span>);
+<a name="l00168"></a>00168 
+<a name="l00169"></a>00169 
+<a name="l00170"></a>00170 <span class="comment">// structors </span>
+<a name="l00171"></a>00171 
+<a name="l00172"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad85bdaad47ef9278e1e2237a653c8943">00172</a> Assembly::Assembly(<a class="code" href="../../d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor.">EuropaReactor</a> &amp;owner)
+<a name="l00173"></a>00173  :m_reactor(owner), m_solver(NULL) {
+<a name="l00174"></a>00174   <span class="comment">// Create my debug file</span>
+<a name="l00175"></a>00175   m_trexSchema-&gt;setStream(m_dbg, owner.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>().<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<span class="stringliteral">&quot;.europa.log&quot;</span>);
+<a name="l00176"></a>00176   
+<a name="l00177"></a>00177   addModule((<span class="keyword">new</span> EUROPA::ModuleConstraintEngine())-&gt;getId());
+<a name="l00178"></a>00178   addModule((<span class="keyword">new</span> EUROPA::ModuleConstraintLibrary())-&gt;getId());  
+<a name="l00179"></a>00179   addModule((<span class="keyword">new</span> EUROPA::ModulePlanDatabase())-&gt;getId());
+<a name="l00180"></a>00180   addModule((<span class="keyword">new</span> EUROPA::ModuleRulesEngine())-&gt;getId());
+<a name="l00181"></a>00181   addModule((<span class="keyword">new</span> EUROPA::ModuleTemporalNetwork())-&gt;getId());
+<a name="l00182"></a>00182   addModule((<span class="keyword">new</span> EUROPA::ModuleSolvers())-&gt;getId());
+<a name="l00183"></a>00183   addModule((<span class="keyword">new</span> EUROPA::ModuleNddl())-&gt;getId());
+<a name="l00184"></a>00184        
+<a name="l00185"></a>00185   <span class="comment">// complete base class initialization</span>
+<a name="l00186"></a>00186   doStart();
+<a name="l00187"></a>00187        
+<a name="l00188"></a>00188   <span class="comment">// initialization europa entry points</span>
+<a name="l00189"></a>00189   m_schema = ((EUROPA::Schema *)getComponent(<span class="stringliteral">&quot;Schema&quot;</span>))-&gt;getId();
+<a name="l00190"></a>00190   m_constraintEngine = ((EUROPA::ConstraintEngine *)getComponent(<span class="stringliteral">&quot;ConstraintEngine&quot;</span>))-&gt;getId();
+<a name="l00191"></a>00191   m_planDatabase = ((EUROPA::PlanDatabase *)getComponent(<span class="stringliteral">&quot;PlanDatabase&quot;</span>))-&gt;getId();
+<a name="l00192"></a>00192   m_rulesEngine = ((EUROPA::RulesEngine *)getComponent(<span class="stringliteral">&quot;RulesEngine&quot;</span>))-&gt;getId();
+<a name="l00193"></a>00193   
+<a name="l00194"></a>00194   <span class="comment">// register the new propagator used by the reactor for special constraints</span>
+<a name="l00195"></a>00195   <span class="keyword">new</span> <a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html" title="TREX specific propagator.">ReactorPropagator</a>(*<span class="keyword">this</span>, EUROPA::LabelStr(<span class="stringliteral">&quot;trex&quot;</span>), m_constraintEngine);
+<a name="l00196"></a>00196        
+<a name="l00197"></a>00197   <span class="comment">// make sure that we control when constraints are propagated</span>
+<a name="l00198"></a>00198   m_constraintEngine-&gt;setAutoPropagation(<span class="keyword">false</span>);
+<a name="l00199"></a>00199   
+<a name="l00200"></a>00200   <span class="comment">// get extra features from TREX schema</span>
+<a name="l00201"></a>00201   m_trexSchema-&gt;registerComponents(*<span class="keyword">this</span>);
+<a name="l00202"></a>00202   
+<a name="l00203"></a>00203   EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);
+<a name="l00204"></a>00204 }
+<a name="l00205"></a>00205 
+<a name="l00206"></a>00206 Assembly::~Assembly() {
+<a name="l00207"></a>00207   <span class="keywordflow">if</span>( NULL!=m_solver ) {
+<a name="l00208"></a>00208     <span class="keyword">delete</span> m_solver;
+<a name="l00209"></a>00209     m_solver = NULL; <span class="comment">// just for being on the safe side ...</span>
+<a name="l00210"></a>00210   }
+<a name="l00211"></a>00211   <span class="comment">// cleanup base class</span>
+<a name="l00212"></a>00212   doShutdown();
+<a name="l00213"></a>00213 }
+<a name="l00214"></a>00214 
+<a name="l00215"></a>00215 <span class="comment">// observers </span>
+<a name="l00216"></a>00216 
+<a name="l00217"></a>00217 <span class="keywordtype">void</span> Assembly::logPlan(std::ostream &amp;out)<span class="keyword"> const </span>{
+<a name="l00218"></a>00218   EUROPA::TokenSet <span class="keyword">const</span> all_toks = m_planDatabase-&gt;getTokens();
+<a name="l00219"></a>00219   out&lt;&lt;<span class="stringliteral">&quot;digraph plan_&quot;</span>&lt;&lt;m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>()&lt;&lt;<span class="stringliteral">&quot; {\n&quot;</span>;
+<a name="l00220"></a>00220   out&lt;&lt;<span class="stringliteral">&quot;  node[shape=\&quot;box\&quot;];\n&quot;</span>;
+<a name="l00221"></a>00221   <span class="keywordflow">for</span>(EUROPA::TokenSet::const_iterator i=all_toks.begin();
+<a name="l00222"></a>00222       all_toks.end()!=i; ++i) {
+<a name="l00223"></a>00223     EUROPA::eint key = (*i)-&gt;getKey();
+<a name="l00224"></a>00224     out&lt;&lt;<span class="stringliteral">&quot;  t&quot;</span>&lt;&lt;key&lt;&lt;<span class="stringliteral">&quot;[label=\&quot;&quot;</span>&lt;&lt;(*i)-&gt;getPredicateName().toString()&lt;&lt;<span class="stringliteral">&quot;{\\n&quot;</span>
+<a name="l00225"></a>00225        &lt;&lt;<span class="stringliteral">&quot; id &quot;</span>&lt;&lt;key&lt;&lt;<span class="stringliteral">&quot;\\n&quot;</span>;
+<a name="l00226"></a>00226     std::vector&lt;EUROPA::ConstrainedVariableId&gt; 
+<a name="l00227"></a>00227       <span class="keyword">const</span> &amp;vars = (*i)-&gt;getVariables();
+<a name="l00228"></a>00228     <span class="keywordflow">for</span>(std::vector&lt;EUROPA::ConstrainedVariableId&gt;::const_iterator j=vars.begin();
+<a name="l00229"></a>00229        vars.end()!=j; ++j) {
+<a name="l00230"></a>00230       out&lt;&lt;(*j)-&gt;getName().toString()&lt;&lt;<span class="stringliteral">&quot;==&quot;</span>&lt;&lt;(*j)-&gt;toString()&lt;&lt;<span class="stringliteral">&quot;\\n&quot;</span>;
+<a name="l00231"></a>00231     }
+<a name="l00232"></a>00232     out&lt;&lt;<span class="stringliteral">&quot;}&quot;</span>;
+<a name="l00233"></a>00233        
+<a name="l00234"></a>00234     <span class="keywordflow">if</span>( (*i)-&gt;isCommitted() )
+<a name="l00235"></a>00235       out&lt;&lt;<span class="stringliteral">&quot;\\n committed&quot;</span>;
+<a name="l00236"></a>00236     out&lt;&lt;<span class="stringliteral">&quot;\&quot;&quot;</span>;
+<a name="l00237"></a>00237     <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(*i) )
+<a name="l00238"></a>00238       out&lt;&lt;<span class="stringliteral">&quot; color=grey&quot;</span>;
+<a name="l00239"></a>00239     <span class="keywordflow">else</span> <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(*i) )
+<a name="l00240"></a>00240       out&lt;&lt;<span class="stringliteral">&quot; color=blue&quot;</span>;
+<a name="l00241"></a>00241     <span class="keywordflow">else</span> <span class="keywordflow">if</span>( (*i)-&gt;isFact() )
+<a name="l00242"></a>00242       out&lt;&lt;<span class="stringliteral">&quot; color=red&quot;</span>;
+<a name="l00243"></a>00243     out&lt;&lt;<span class="stringliteral">&quot;];\n&quot;</span>;
+<a name="l00244"></a>00244     
+<a name="l00245"></a>00245     <span class="keywordflow">if</span>( (*i)-&gt;isMerged() ) {
+<a name="l00246"></a>00246       EUROPA::eint active = (*i)-&gt;getActiveToken()-&gt;getKey();
+<a name="l00247"></a>00247       out&lt;&lt;<span class="stringliteral">&quot;  t&quot;</span>&lt;&lt;key&lt;&lt;<span class="stringliteral">&quot;-&gt;t&quot;</span>&lt;&lt;active&lt;&lt;<span class="stringliteral">&quot;[color=grey];\n&quot;</span>;      
+<a name="l00248"></a>00248     } 
+<a name="l00249"></a>00249     EUROPA::TokenId master = (*i)-&gt;master();
+<a name="l00250"></a>00250     <span class="keywordflow">if</span>( master.isId() ) {
+<a name="l00251"></a>00251       out&lt;&lt;<span class="stringliteral">&quot;  t&quot;</span>&lt;&lt;master-&gt;getKey()&lt;&lt;<span class="stringliteral">&quot;-&gt;t&quot;</span>&lt;&lt;key
+<a name="l00252"></a>00252         &lt;&lt;<span class="stringliteral">&quot;[label=\&quot;&quot;</span>&lt;&lt;(*i)-&gt;getRelation().toString()&lt;&lt;<span class="stringliteral">&quot;\&quot;];\n&quot;</span>;
+<a name="l00253"></a>00253     }
+<a name="l00254"></a>00254   }
+<a name="l00255"></a>00255   out&lt;&lt;<span class="stringliteral">&quot;}\n&quot;</span>;
+<a name="l00256"></a>00256 }
+<a name="l00257"></a>00257 
+<a name="l00258"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad50cc53529886baedfa60d55e1b263a9">00258</a> <span class="keywordtype">void</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad50cc53529886baedfa60d55e1b263a9" title="Check for default predicate.">Assembly::check_default</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
+<a name="l00259"></a>00259   EUROPA::ConstrainedVariableId var = <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a47eade9aea60af20038c558d447640e2" title="Get default predicate value.">default_pred</a>(obj);
+<a name="l00260"></a>00260   std::ostringstream oss;
+<a name="l00261"></a>00261        
+<a name="l00262"></a>00262   <span class="keywordflow">if</span>( var.isNoId() || !var-&gt;isSpecified() ) {
+<a name="l00263"></a>00263     oss&lt;&lt;<span class="stringliteral">&quot;Internal timeline &quot;</span>&lt;&lt;obj-&gt;getName().toString()
+<a name="l00264"></a>00264        &lt;&lt;<span class="stringliteral">&quot; does not specify its &quot;</span>&lt;&lt;DEFAULT_ATTR;
+<a name="l00265"></a>00265     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
+<a name="l00266"></a>00266   }
+<a name="l00267"></a>00267   EUROPA::DataTypeId type = var-&gt;getDataType();
+<a name="l00268"></a>00268   std::string short_pred = type-&gt;toString(var-&gt;getSpecifiedValue()),
+<a name="l00269"></a>00269     long_pred = obj-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+short_pred;
+<a name="l00270"></a>00270   <span class="keywordflow">if</span>( !m_schema-&gt;isPredicate(long_pred.c_str()) ) {
+<a name="l00271"></a>00271     oss&lt;&lt;<span class="stringliteral">&quot;Internal timeline &quot;</span>&lt;&lt;obj-&gt;getName().toString()
+<a name="l00272"></a>00272        &lt;&lt;<span class="stringliteral">&quot; default predicate \&quot;&quot;</span>&lt;&lt;short_pred&lt;&lt;<span class="stringliteral">&quot;\&quot; does not exist&quot;</span>;
+<a name="l00273"></a>00273     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
+<a name="l00274"></a>00274   }
+<a name="l00275"></a>00275 }
+<a name="l00276"></a>00276 
+<a name="l00277"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a06b420836c583ae74b464d9985be3435">00277</a> EUROPA::ConstrainedVariableId <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a06b420836c583ae74b464d9985be3435" title="Extract an object attribute.">Assembly::attribute</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj, 
+<a name="l00278"></a>00278                                             std::string <span class="keyword">const</span> &amp;attr)<span class="keyword"> const </span>{
+<a name="l00279"></a>00279   std::string full_name = obj-&gt;getName().toString()+<span class="stringliteral">&quot;.&quot;</span>+attr;
+<a name="l00280"></a>00280   EUROPA::ConstrainedVariableId var = obj-&gt;getVariable(full_name);
+<a name="l00281"></a>00281   <span class="keywordflow">if</span>( var.isNoId() )
+<a name="l00282"></a>00282     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(<span class="stringliteral">&quot;Variable &quot;</span>+full_name+<span class="stringliteral">&quot; does not exist.&quot;</span>);
+<a name="l00283"></a>00283   <span class="keywordflow">return</span> var;
+<a name="l00284"></a>00284 }
+<a name="l00285"></a>00285 
+<a name="l00286"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057">00286</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">Assembly::isInternal</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
+<a name="l00287"></a>00287   <span class="keywordflow">return</span> m_schema-&gt;isA(obj-&gt;getType(), <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad095f7f9e7d1a5cc8e25c4de95c64317" title="TREX agent timelines.">TREX_TIMELINE</a>)  &amp;&amp;
+<a name="l00288"></a>00288     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline.">isInternal</a>(obj-&gt;getName().c_str());
+<a name="l00289"></a>00289 }
+<a name="l00290"></a>00290 
+<a name="l00291"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178">00291</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external.">Assembly::isExternal</a>(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj)<span class="keyword"> const </span>{
+<a name="l00292"></a>00292   <span class="keywordflow">return</span> m_schema-&gt;isA(obj-&gt;getType(), <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad095f7f9e7d1a5cc8e25c4de95c64317" title="TREX agent timelines.">TREX_TIMELINE</a>)  &amp;&amp;
+<a name="l00293"></a>00293     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(obj-&gt;getName().c_str());  
+<a name="l00294"></a>00294 }
+<a name="l00295"></a>00295 
+<a name="l00296"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac97b4ad8198bbccf2c90bf0545761131">00296</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac97b4ad8198bbccf2c90bf0545761131" title="Check if internal.">Assembly::internal</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
+<a name="l00297"></a>00297   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
+<a name="l00298"></a>00298   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
+<a name="l00299"></a>00299   
+<a name="l00300"></a>00300   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
+<a name="l00301"></a>00301   
+<a name="l00302"></a>00302   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o) 
+<a name="l00303"></a>00303     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#afffd4a905c450497e2818523dd264057" title="Check if internal.">isInternal</a>(*o) )
+<a name="l00304"></a>00304       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00305"></a>00305   <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00306"></a>00306 }
+<a name="l00307"></a>00307 
+<a name="l00308"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9be56798df78a332c496b77f851e2c4c">00308</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9be56798df78a332c496b77f851e2c4c" title="Check if external.">Assembly::external</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
+<a name="l00309"></a>00309   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
+<a name="l00310"></a>00310   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
+<a name="l00311"></a>00311   
+<a name="l00312"></a>00312   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
+<a name="l00313"></a>00313   
+<a name="l00314"></a>00314   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o) 
+<a name="l00315"></a>00315     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad7f0982e42c8c434e0944e7ea7ba8178" title="Check if external.">isExternal</a>(*o) )
+<a name="l00316"></a>00316       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00317"></a>00317   <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00318"></a>00318 }
+<a name="l00319"></a>00319 
+<a name="l00320"></a>00320 <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> Assembly::final_tick()<span class="keyword"> const </span>{
+<a name="l00321"></a>00321   <span class="keywordflow">return</span> m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67" title="Get final tick.">getFinalTick</a>();
 <a name="l00322"></a>00322 }
 <a name="l00323"></a>00323 
-<a name="l00324"></a>00324 <span class="keywordtype">bool</span> Assembly::in_synch_scope(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, 
-<a name="l00325"></a>00325                               EUROPA::TokenId &amp;cand)<span class="keyword"> const </span>{
-<a name="l00326"></a>00326   <span class="keywordflow">return</span> overlaps_now(tok) &amp;&amp; !( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(tok) || <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(tok) )
-<a name="l00327"></a>00327   &amp;&amp; is_unit(tok, cand);
-<a name="l00328"></a>00328 }
-<a name="l00329"></a>00329 
-<a name="l00330"></a>00330 <span class="keywordtype">bool</span> Assembly::is_unit(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId &amp;cand)<span class="keyword"> const </span>{
-<a name="l00331"></a>00331   <span class="keywordflow">if</span>( tok-&gt;getObject()-&gt;lastDomain().isSingleton() ) {
-<a name="l00332"></a>00332     std::vector&lt;EUROPA::TokenId&gt; compats;
-<a name="l00333"></a>00333     <span class="keywordtype">size_t</span> choices=0;
-<a name="l00334"></a>00334     
-<a name="l00335"></a>00335     m_planDatabase-&gt;getCompatibleTokens(tok, compats, UINT_MAX, <span class="keyword">true</span>);
-<a name="l00336"></a>00336     <span class="keywordflow">for</span>(std::vector&lt;EUROPA::TokenId&gt;::const_iterator i=compats.begin();
-<a name="l00337"></a>00337         compats.end()!=i &amp;&amp; choices&lt;=1; ++i)
-<a name="l00338"></a>00338       <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(*i) ) {
-<a name="l00339"></a>00339         ++choices;
-<a name="l00340"></a>00340         cand = *i;
-<a name="l00341"></a>00341       }
-<a name="l00342"></a>00342     <span class="keywordflow">if</span>( choices==1 &amp;&amp; !m_planDatabase-&gt;hasOrderingChoice(tok) )
-<a name="l00343"></a>00343       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00344"></a>00344     <span class="keywordflow">if</span>( choices==0 ) {
-<a name="l00345"></a>00345       cand = EUROPA::TokenId::noId();
-<a name="l00346"></a>00346       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00347"></a>00347     }
-<a name="l00348"></a>00348   }
-<a name="l00349"></a>00349   <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00350"></a>00350 }
-<a name="l00351"></a>00351 
-<a name="l00352"></a>00352 
-<a name="l00353"></a>00353 <span class="comment">// modifiers </span>
-<a name="l00354"></a>00354 
-<a name="l00355"></a>00355 <span class="keywordtype">bool</span> Assembly::merge_token(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId <span class="keyword">const</span> &amp;cand) {
-<a name="l00356"></a>00356   <span class="keywordflow">if</span>( invalid() || cand.isNoId() )
-<a name="l00357"></a>00357     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00358"></a>00358   <span class="keywordflow">if</span>( !( tok-&gt;isInactive() &amp;&amp; 
-<a name="l00359"></a>00359         tok-&gt;getState()-&gt;lastDomain().isMember(EUROPA::Token::MERGED) ) )
-<a name="l00360"></a>00360     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00361"></a>00361   tok-&gt;merge(cand);
-<a name="l00362"></a>00362   propagate();
-<a name="l00363"></a>00363   <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00364"></a>00364 }
-<a name="l00365"></a>00365 
-<a name="l00366"></a>00366 <span class="keywordtype">bool</span> Assembly::insert_token(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, <span class="keywordtype">size_t</span> &amp;steps) {
-<a name="l00367"></a>00367   <span class="keywordflow">if</span>( invalid() || <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(tok) )
-<a name="l00368"></a>00368     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00369"></a>00369   <span class="keywordflow">if</span>( tok-&gt;isInactive() )
-<a name="l00370"></a>00370     tok-&gt;activate();
-<a name="l00371"></a>00371   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;objs=tok-&gt;getObject()-&gt;lastDomain();
-<a name="l00372"></a>00372   <span class="keywordflow">if</span>( !objs.isSingleton() )
-<a name="l00373"></a>00373     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00374"></a>00374   EUROPA::ObjectId obj = objs.getObject(objs.getSingletonValue());
-<a name="l00375"></a>00375   <span class="keywordflow">if</span>( EUROPA::TimelineId::convertable(obj) ) {
-<a name="l00376"></a>00376     std::vector&lt;EUROPA::OrderingChoice&gt; choices;
-<a name="l00377"></a>00377     m_planDatabase-&gt;getOrderingChoices(tok, choices, 1);
-<a name="l00378"></a>00378     <span class="keywordflow">if</span>( choices.empty() )
-<a name="l00379"></a>00379       <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00380"></a>00380     EUROPA::TokenId p = choices[0].second.first, s = choices[0].second.second;
-<a name="l00381"></a>00381     choices[0].first-&gt;constrain(p, s);
-<a name="l00382"></a>00382   }
-<a name="l00383"></a>00383   propagate();
-<a name="l00384"></a>00384   <span class="keywordflow">for</span>(EUROPA::TokenSet::const_iterator i=tok-&gt;slaves().begin();
-<a name="l00385"></a>00385       tok-&gt;slaves().end()!=i; ++i) {
-<a name="l00386"></a>00386     <span class="keywordflow">if</span>( invalid() )
-<a name="l00387"></a>00387       <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00388"></a>00388     EUROPA::TokenId cand;
-<a name="l00389"></a>00389     <span class="keywordflow">if</span>( in_synch_scope(*i, cand) ) {
-<a name="l00390"></a>00390       ++steps;
-<a name="l00391"></a>00391       <span class="keywordflow">if</span>( !resolve(*i, cand, steps) )
-<a name="l00392"></a>00392         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00393"></a>00393     }
-<a name="l00394"></a>00394   }
-<a name="l00395"></a>00395   <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00396"></a>00396 }
-<a name="l00397"></a>00397 
-<a name="l00398"></a>00398 <span class="keywordtype">bool</span> Assembly::resolve(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId <span class="keyword">const</span> &amp;cand, <span class="keywordtype">size_t</span> &amp;steps) {
-<a name="l00399"></a>00399   <span class="keywordflow">if</span>( merge_token(tok, cand) || insert_token(tok, steps) )
-<a name="l00400"></a>00400     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00401"></a>00401   mark_invalid();
-<a name="l00402"></a>00402   <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00403"></a>00403 }
-<a name="l00404"></a>00404 
-<a name="l00405"></a>00405 <span class="keywordtype">bool</span> Assembly::insert_default(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj, EUROPA::TokenId &amp;tok, <span class="keywordtype">size_t</span> &amp;steps) {
-<a name="l00406"></a>00406   <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> cur = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>();
-<a name="l00407"></a>00407   EUROPA::IntervalIntDomain now(cur, cur);
-<a name="l00408"></a>00408   EUROPA::ConstrainedVariableId name = m_reactor.assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ad44a74a81f0fdda62763e4be8ba1877d" title="Get default predicate value.">default_pred</a>(obj);
-<a name="l00409"></a>00409   EUROPA::DataTypeId type = name-&gt;getDataType();
-<a name="l00410"></a>00410   std::string short_pred = type-&gt;toString(name-&gt;getSpecifiedValue()),
-<a name="l00411"></a>00411   pred_name = obj-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+short_pred;
-<a name="l00412"></a>00412   EUROPA::DbClientId cli = m_planDatabase-&gt;getClient();
-<a name="l00413"></a>00413   
-<a name="l00414"></a>00414   tok = cli-&gt;createToken(pred_name.c_str(), NULL, <span class="keyword">false</span>);
-<a name="l00415"></a>00415   
-<a name="l00416"></a>00416   tok-&gt;activate();
-<a name="l00417"></a>00417   tok-&gt;start()-&gt;restrictBaseDomain(now);
-<a name="l00418"></a>00418   tok-&gt;getObject()-&gt;specify(obj-&gt;getKey());
-<a name="l00419"></a>00419   <span class="keywordflow">return</span> insert_token(tok, steps);
-<a name="l00420"></a>00420 }
-<a name="l00421"></a>00421 
-<a name="l00422"></a>00422 
-<a name="l00423"></a>00423 
-<a name="l00424"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac7a07eda65e94bcdbf3926d8eba20d00">00424</a> <span class="keywordtype">void</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac7a07eda65e94bcdbf3926d8eba20d00" title="That plan solver configuration.">Assembly::configure_solver</a>(std::string <span class="keyword">const</span> &amp;cfg) {
-<a name="l00425"></a>00425   <span class="keywordflow">if</span>( NULL==m_solver ) {
-<a name="l00426"></a>00426     <span class="keywordtype">bool</span> found;
-<a name="l00427"></a>00427     std::string file = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(cfg, found);
-<a name="l00428"></a>00428     
-<a name="l00429"></a>00429     <span class="keywordflow">if</span>( !found )
-<a name="l00430"></a>00430       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to locate solver config file \&quot;&quot;</span>+
-<a name="l00431"></a>00431                           cfg+<span class="stringliteral">&quot;\&quot;.&quot;</span>);
-<a name="l00432"></a>00432     std::auto_ptr&lt;EUROPA::TiXmlElement&gt; xml(EUROPA::initXml(file.c_str()));
-<a name="l00433"></a>00433     
-<a name="l00434"></a>00434     <span class="keywordflow">if</span>( NULL==xml.get() )
-<a name="l00435"></a>00435       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to parse xml content of &quot;</span>+file);
-<a name="l00436"></a>00436     <span class="comment">// Insert the DeliberationFilter </span>
-<a name="l00437"></a>00437     <span class="comment">// EUROPA::TiXmlElement filter(&quot;FlawFilter&quot;);</span>
-<a name="l00438"></a>00438     <span class="comment">// filter.SetAttribute(&quot;component&quot;, &quot;DeliberationFilter&quot;);</span>
-<a name="l00439"></a>00439     <span class="comment">// xml-&gt;InsertBeforeChild(xml-&gt;FirstChild(), filter);</span>
-<a name="l00440"></a>00440     m_solver = <span class="keyword">new</span> <a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>(*<span class="keyword">this</span>, *xml);
-<a name="l00441"></a>00441   } <span class="keywordflow">else</span> 
-<a name="l00442"></a>00442     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Attempted to configure the solver more than once.&quot;</span>;
-<a name="l00443"></a>00443 }
-<a name="l00444"></a>00444 
-<a name="l00445"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a032b448b67f81e5f1ddc21ea5fac9ba9">00445</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a032b448b67f81e5f1ddc21ea5fac9ba9" title="Load a model.">Assembly::playTransaction</a>(std::string <span class="keyword">const</span> &amp;nddl) {
-<a name="l00446"></a>00446   <span class="keywordtype">bool</span> found;
-<a name="l00447"></a>00447   std::string config;
-<a name="l00448"></a>00448        
-<a name="l00449"></a>00449   config = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(<span class="stringliteral">&quot;NDDL.cfg&quot;</span>, found);
-<a name="l00450"></a>00450   <span class="keywordflow">if</span>( !found ) {
-<a name="l00451"></a>00451     config = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(<span class="stringliteral">&quot;temp_nddl_gen.cfg&quot;</span>, found);
-<a name="l00452"></a>00452     <span class="keywordflow">if</span>( !found ) 
-<a name="l00453"></a>00453       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to locate NDDL.cfg or temp_nddl_gen.cfg&quot;</span>);
-<a name="l00454"></a>00454               
-<a name="l00455"></a>00455     <span class="comment">// First load the config file</span>
-<a name="l00456"></a>00456     rapidxml::file&lt;&gt; cfg(config.c_str());
-<a name="l00457"></a>00457     <span class="comment">// parse the file content</span>
-<a name="l00458"></a>00458     rapidxml::xml_document&lt;&gt; cfg_xml;
-<a name="l00459"></a>00459     
-<a name="l00460"></a>00460     cfg_xml.parse&lt;0&gt;(cfg.data());
-<a name="l00461"></a>00461               
-<a name="l00462"></a>00462     rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> *xml_root = cfg_xml.first_node();
-<a name="l00463"></a>00463     <span class="keywordflow">if</span>( NULL== xml_root )
-<a name="l00464"></a>00464       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, config+<span class="stringliteral">&quot; does not appear to be in XML&quot;</span>);
-<a name="l00465"></a>00465               
-<a name="l00466"></a>00466     <span class="comment">// Extract include information</span>
-<a name="l00467"></a>00467     <span class="keywordflow">for</span>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> *child = xml_root-&gt;first_node(<span class="stringliteral">&quot;include&quot;</span>);
-<a name="l00468"></a>00468        NULL!=child; child = child-&gt;next_sibling(<span class="stringliteral">&quot;include&quot;</span>) ) {
-<a name="l00469"></a>00469       std::string path = parse_attr&lt;std::string&gt;(*child, <span class="stringliteral">&quot;path&quot;</span>);
-<a name="l00470"></a>00470       <span class="comment">// replace &#39;;&#39; by &#39;:&#39;</span>
-<a name="l00471"></a>00471       <span class="keywordflow">for</span>(<span class="keywordtype">size_t</span> pos=path.find(<span class="charliteral">&#39;;&#39;</span>); pos&lt;path.size(); pos=path.find(pos, <span class="charliteral">&#39;;&#39;</span>))
-<a name="l00472"></a>00472        path[pos] = <span class="charliteral">&#39;:&#39;</span>;
-<a name="l00473"></a>00473       getLanguageInterpreter(<span class="stringliteral">&quot;nddl&quot;</span>)-&gt;getEngine()-&gt;getConfig()-&gt;setProperty(<span class="stringliteral">&quot;nddl.includePath&quot;</span>, path);   
-<a name="l00474"></a>00474     }
-<a name="l00475"></a>00475   }
-<a name="l00476"></a>00476   <span class="comment">// Now add TREX_PATH to nddl include path</span>
-<a name="l00477"></a>00477   std::ostringstream oss;
-<a name="l00478"></a>00478   oss&lt;&lt;<span class="charliteral">&#39;.&#39;</span>;
-<a name="l00479"></a>00479   <span class="keywordflow">for</span>(<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e" title="TREX_PATH iterator.">LogManager::path_iterator</a> i=m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4" title="First path.">begin</a>(); 
-<a name="l00480"></a>00480       m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896" title="End of searh path.">end</a>()!=i; ++i)
-<a name="l00481"></a>00481     oss&lt;&lt;<span class="charliteral">&#39;:&#39;</span>&lt;&lt;*i;
-<a name="l00482"></a>00482   getLanguageInterpreter(<span class="stringliteral">&quot;nddl&quot;</span>)-&gt;getEngine()-&gt;getConfig()-&gt;setProperty(<span class="stringliteral">&quot;nddl.includePath&quot;</span>, oss.str());
-<a name="l00483"></a>00483   
-<a name="l00484"></a>00484   std::string ret;
-<a name="l00485"></a>00485   <span class="keywordflow">try</span> {
-<a name="l00486"></a>00486     ret = executeScript(<span class="stringliteral">&quot;nddl&quot;</span>, nddl, <span class="keyword">true</span>);
-<a name="l00487"></a>00487   } <span class="keywordflow">catch</span>(EUROPA::PSLanguageExceptionList <span class="keyword">const</span> &amp;le) {
-<a name="l00488"></a>00488     std::ostringstream err;
-<a name="l00489"></a>00489     err&lt;&lt;<span class="stringliteral">&quot;Error while parsing nddl file:\n&quot;</span>
-<a name="l00490"></a>00490        &lt;&lt;le;
-<a name="l00491"></a>00491     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, err.str());
-<a name="l00492"></a>00492   } <span class="keywordflow">catch</span>(Error <span class="keyword">const</span> &amp;error) {
-<a name="l00493"></a>00493     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Error while parsing nddl file: &quot;</span>+error.getMsg());
-<a name="l00494"></a>00494   }
-<a name="l00495"></a>00495   <span class="keywordflow">if</span>( !ret.empty() ) 
-<a name="l00496"></a>00496     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Error returned after parsing nddl file: &quot;</span>+ret);
-<a name="l00497"></a>00497        
-<a name="l00498"></a>00498   <span class="comment">// Model was loaded : check that the constraint network is still consistent</span>
-<a name="l00499"></a>00499   <span class="keywordflow">return</span> m_constraintEngine-&gt;constraintConsistent();
-<a name="l00500"></a>00500 }
-<a name="l00501"></a>00501 
-<a name="l00502"></a>00502 <span class="keywordtype">bool</span> Assembly::propagate() {
-<a name="l00503"></a>00503   <span class="keywordflow">if</span>( invalid() )
-<a name="l00504"></a>00504     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00505"></a>00505   <span class="keywordflow">if</span>( !m_constraintEngine-&gt;propagate() ) {
-<a name="l00506"></a>00506     m_reactor.log(<span class="stringliteral">&quot;&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Inconsistent plan.&quot;</span>;
-<a name="l00507"></a>00507     mark_invalid();
-<a name="l00508"></a>00508   }
-<a name="l00509"></a>00509   <span class="keywordflow">return</span> !invalid();
-<a name="l00510"></a>00510 }
-<a name="l00511"></a>00511 
-<a name="l00512"></a>00512 std::pair&lt;EUROPA::ObjectId, EUROPA::TokenId&gt; Assembly::convert(<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a> <span class="keyword">const</span> &amp;pred, <span class="keywordtype">bool</span> fact) {
-<a name="l00513"></a>00513   <span class="comment">// First we create the token</span>
-<a name="l00514"></a>00514   EUROPA::DbClientId cli    = m_planDatabase-&gt;getClient();
-<a name="l00515"></a>00515   EUROPA::ObjectId timeline = cli-&gt;getObject(pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>().<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>().c_str());
-<a name="l00516"></a>00516   std::string pred_name = timeline-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>().<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>();
-<a name="l00517"></a>00517   EUROPA::TokenId tok = EUROPA::TokenId::noId();
-<a name="l00518"></a>00518   <span class="comment">// if not a fact then it is rejectable</span>
-<a name="l00519"></a>00519   <span class="keywordtype">bool</span> rejectable = !fact;
-<a name="l00520"></a>00520 
-<a name="l00521"></a>00521   <span class="comment">// Check that the predicate exists </span>
-<a name="l00522"></a>00522   <span class="keywordflow">if</span>( m_schema-&gt;isPredicate(pred_name.c_str()) ) {
-<a name="l00523"></a>00523     tok = cli-&gt;createToken(pred_name.c_str(), NULL, rejectable, fact);
-<a name="l00524"></a>00524     <span class="keywordflow">if</span>( tok.isId() ) {
-<a name="l00525"></a>00525       <span class="comment">// restrict attributes </span>
-<a name="l00526"></a>00526       <span class="keywordflow">for</span>(Predicate::const_iterator i=pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ad9f7d61308503a313ed0f525c3b26192" title="beginning of the attributes set">begin</a>(); pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set">end</a>()!=i; ++i) {
-<a name="l00527"></a>00527        EUROPA::ConstrainedVariableId param = tok-&gt;getVariable(i-&gt;first.str());
-<a name="l00528"></a>00528        
-<a name="l00529"></a>00529        <span class="keywordflow">if</span>( param.isId() ) {
-<a name="l00530"></a>00530          <span class="keywordflow">try</span> {
-<a name="l00531"></a>00531            europa_restrict(param, i-&gt;second.domain());
-<a name="l00532"></a>00532          } <span class="keywordflow">catch</span>(<a class="code" href="../../db/d3a/classTREX_1_1transaction_1_1DomainExcept.html" title="Empty domain.">DomainExcept</a> <span class="keyword">const</span> &amp;e) {
-<a name="l00533"></a>00533            m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Failed to restrict attribute &quot;</span>&lt;&lt;i-&gt;first
-<a name="l00534"></a>00534                              &lt;&lt;<span class="stringliteral">&quot; on token &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()&lt;&lt;<span class="charliteral">&#39;.&#39;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()
-<a name="l00535"></a>00535                              &lt;&lt;<span class="stringliteral">&quot;: &quot;</span>&lt;&lt;e;
-<a name="l00536"></a>00536          }
-<a name="l00537"></a>00537        } <span class="keywordflow">else</span> {
-<a name="l00538"></a>00538          m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unknown attribute &quot;</span>&lt;&lt;i-&gt;first&lt;&lt;<span class="stringliteral">&quot; on token &quot;</span>
-<a name="l00539"></a>00539                             &lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()&lt;&lt;<span class="charliteral">&#39;.&#39;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>();
-<a name="l00540"></a>00540        }
-<a name="l00541"></a>00541       }
-<a name="l00542"></a>00542     } 
-<a name="l00543"></a>00543   } <span class="keywordflow">else</span> {
-<a name="l00544"></a>00544     <span class="comment">// the predicate is unknown : give a warning </span>
-<a name="l00545"></a>00545     m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unknown predicate &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()
-<a name="l00546"></a>00546                       &lt;&lt;<span class="stringliteral">&quot; for object &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>();
-<a name="l00547"></a>00547     <span class="keywordflow">if</span>( fact ) {
-<a name="l00548"></a>00548       <span class="comment">// If it is a fact I need to deal with it : set it to &quot;undefined&quot;</span>
-<a name="l00549"></a>00549       pred_name = timeline-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#acd32a4fcb2e48a25103954cd749813ab" title="undefined predicate name">UNDEFINED_PRED</a>;
-<a name="l00550"></a>00550       <span class="keywordflow">if</span>( m_schema-&gt;isPredicate(pred_name.c_str()) ) {
-<a name="l00551"></a>00551        tok = cli-&gt;createToken(pred_name.c_str(), NULL, rejectable, fact);
-<a name="l00552"></a>00552       } <span class="keywordflow">else</span> {
-<a name="l00553"></a>00553        <span class="comment">// that should never happen !!!</span>
-<a name="l00554"></a>00554        std::ostringstream oss;
-<a name="l00555"></a>00555        oss&lt;&lt;<span class="stringliteral">&quot;Unable to create special \&quot;&quot;</span>&lt;&lt;<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#acd32a4fcb2e48a25103954cd749813ab" title="undefined predicate name">UNDEFINED_PRED</a>
-<a name="l00556"></a>00556           &lt;&lt;<span class="stringliteral">&quot;\&quot; predicate on object &quot;</span>&lt;&lt;timeline-&gt;getName().toString();
-<a name="l00557"></a>00557        <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
-<a name="l00558"></a>00558       }
-<a name="l00559"></a>00559     }
-<a name="l00560"></a>00560   }
-<a name="l00561"></a>00561   <span class="keywordflow">if</span>( tok.isId() ) {
-<a name="l00562"></a>00562     <span class="comment">// Now restrict the object to timeline</span>
-<a name="l00563"></a>00563     EUROPA::ConstrainedVariableId 
-<a name="l00564"></a>00564     obj_var=tok-&gt;getObject();
-<a name="l00565"></a>00565     obj_var-&gt;specify(timeline-&gt;getKey());
-<a name="l00566"></a>00566   }
-<a name="l00567"></a>00567   <span class="keywordflow">return</span> std::make_pair(timeline, tok);
-<a name="l00568"></a>00568 }
-<a name="l00569"></a>00569 
-<a name="l00570"></a>00570 <span class="keywordtype">void</span> Assembly::mark_active() {
-<a name="l00571"></a>00571   m_state = ACTIVE;
-<a name="l00572"></a>00572   m_reactor.reset_deliberation();
-<a name="l00573"></a>00573 }
+<a name="l00324"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">00324</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">Assembly::ignored</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
+<a name="l00325"></a>00325   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;dom = tok-&gt;getObject()-&gt;lastDomain();
+<a name="l00326"></a>00326   std::list&lt;EUROPA::ObjectId&gt; objs = dom.makeObjectList();
+<a name="l00327"></a>00327   std::list&lt;EUROPA::ObjectId&gt;::const_iterator o = objs.begin();
+<a name="l00328"></a>00328        
+<a name="l00329"></a>00329   <span class="keywordflow">for</span>( ; objs.end()!=o; ++o)     
+<a name="l00330"></a>00330     <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a0b9c957c0fd4990ca285ce91657dc518" title="Check if ignored.">isIgnored</a>(*o) )
+<a name="l00331"></a>00331       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00332"></a>00332   <span class="keywordflow">return</span> !objs.empty();
+<a name="l00333"></a>00333 }
+<a name="l00334"></a>00334 
+<a name="l00335"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">00335</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">Assembly::in_deliberation</a>(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
+<a name="l00336"></a>00336   <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(tok) ) {
+<a name="l00337"></a>00337     debugMsg(<span class="stringliteral">&quot;trex:in_deliberation&quot;</span>, <span class="stringliteral">&quot;false: Token &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00338"></a>00338             &lt;&lt;<span class="stringliteral">&quot; is ignored&quot;</span>);
+<a name="l00339"></a>00339     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00340"></a>00340   }
+<a name="l00341"></a>00341   <span class="keywordflow">if</span>( tok-&gt;getState()-&gt;lastDomain().isMember(EUROPA::Token::REJECTED) ) {
+<a name="l00342"></a>00342     debugMsg(<span class="stringliteral">&quot;trex:in_deliberation&quot;</span>, <span class="stringliteral">&quot;true: Token &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00343"></a>00343             &lt;&lt;<span class="stringliteral">&quot; is a goal&quot;</span>);
+<a name="l00344"></a>00344     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00345"></a>00345   }
+<a name="l00346"></a>00346   <span class="keywordflow">if</span>( !active() ) {
+<a name="l00347"></a>00347     debugMsg(<span class="stringliteral">&quot;trex:in_deliberation&quot;</span>, <span class="stringliteral">&quot;false: Token &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00348"></a>00348             &lt;&lt;<span class="stringliteral">&quot;: deliberation is a not active&quot;</span>);
+<a name="l00349"></a>00349     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00350"></a>00350   }
+<a name="l00351"></a>00351   <span class="keywordflow">if</span>( tok-&gt;isFact() &amp;&amp; 
+<a name="l00352"></a>00352       tok-&gt;start()-&gt;lastDomain().getUpperBound()&lt;=m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>() ) {
+<a name="l00353"></a>00353     debugMsg(<span class="stringliteral">&quot;trex:in_deliberation&quot;</span>, <span class="stringliteral">&quot;false: Token &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00354"></a>00354             &lt;&lt;<span class="stringliteral">&quot; is a past fact&quot;</span>);
+<a name="l00355"></a>00355     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00356"></a>00356   }
+<a name="l00357"></a>00357   <span class="keywordtype">bool</span> ret = m_solver-&gt;inDeliberation(tok);
+<a name="l00358"></a>00358   debugMsg(<span class="stringliteral">&quot;trex:in_deliberation&quot;</span>, (ret?<span class="stringliteral">&quot;true&quot;</span>:<span class="stringliteral">&quot;false&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;: token &quot;</span>
+<a name="l00359"></a>00359           &lt;&lt;tok-&gt;toString()&lt;&lt;<span class="stringliteral">&quot;is &quot;</span>
+<a name="l00360"></a>00360           &lt;&lt;(ret?<span class="stringliteral">&quot;&quot;</span>:<span class="stringliteral">&quot;not &quot;</span>)&lt;&lt;<span class="stringliteral">&quot;used by the solver.&quot;</span>);
+<a name="l00361"></a>00361   <span class="keywordflow">return</span> m_solver-&gt;inDeliberation(tok);
+<a name="l00362"></a>00362 }
+<a name="l00363"></a>00363 
+<a name="l00364"></a>00364 <span class="keywordtype">bool</span> Assembly::overlaps_now(EUROPA::TokenId <span class="keyword">const</span> &amp;tok)<span class="keyword"> const </span>{
+<a name="l00365"></a>00365   <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> cur = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>();
+<a name="l00366"></a>00366 
+<a name="l00367"></a>00367   <span class="keywordflow">return</span> tok-&gt;start()-&gt;lastDomain().getUpperBound()&lt;=cur
+<a name="l00368"></a>00368   &amp;&amp; tok-&gt;end()-&gt;lastDomain().getLowerBound()&gt;=cur 
+<a name="l00369"></a>00369   &amp;&amp; tok-&gt;end()-&gt;lastDomain().getLowerBound()&gt;m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a10b44ea7bbeb13a23528f82c3c7c78c3" title="reactor initial tick">getInitialTick</a>();
+<a name="l00370"></a>00370 }
+<a name="l00371"></a>00371 
+<a name="l00372"></a>00372 <span class="keywordtype">bool</span> Assembly::in_synch_scope(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, 
+<a name="l00373"></a>00373                               EUROPA::TokenId &amp;cand)<span class="keyword"> const </span>{
+<a name="l00374"></a>00374   <span class="keywordflow">return</span> overlaps_now(tok) &amp;&amp; !( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(tok) || <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(tok) )
+<a name="l00375"></a>00375   &amp;&amp; is_unit(tok, cand);
+<a name="l00376"></a>00376 }
+<a name="l00377"></a>00377 
+<a name="l00378"></a>00378 <span class="keywordtype">bool</span> Assembly::is_unit(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId &amp;cand)<span class="keyword"> const </span>{
+<a name="l00379"></a>00379   <span class="keywordflow">if</span>( tok-&gt;getObject()-&gt;lastDomain().isSingleton() ) {
+<a name="l00380"></a>00380     std::vector&lt;EUROPA::TokenId&gt; compats;
+<a name="l00381"></a>00381     <span class="keywordtype">size_t</span> choices=0;
+<a name="l00382"></a>00382     
+<a name="l00383"></a>00383     m_planDatabase-&gt;getCompatibleTokens(tok, compats, UINT_MAX, <span class="keyword">true</span>);
+<a name="l00384"></a>00384     <span class="keywordflow">for</span>(std::vector&lt;EUROPA::TokenId&gt;::const_iterator i=compats.begin();
+<a name="l00385"></a>00385         compats.end()!=i &amp;&amp; choices&lt;=1; ++i)
+<a name="l00386"></a>00386       <span class="keywordflow">if</span>( !<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(*i) ) {
+<a name="l00387"></a>00387         ++choices;
+<a name="l00388"></a>00388         cand = *i;
+<a name="l00389"></a>00389       }
+<a name="l00390"></a>00390     <span class="keywordflow">if</span>( choices==1 &amp;&amp; !m_planDatabase-&gt;hasOrderingChoice(tok) ) {
+<a name="l00391"></a>00391       debugMsg(<span class="stringliteral">&quot;trex:unit&quot;</span>, <span class="stringliteral">&quot;true: &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00392"></a>00392               &lt;&lt;<span class="stringliteral">&quot; have 1 insertion choice&quot;</span>);
+<a name="l00393"></a>00393             
+<a name="l00394"></a>00394       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00395"></a>00395     }
+<a name="l00396"></a>00396     <span class="keywordflow">if</span>( choices==0 ) {
+<a name="l00397"></a>00397       debugMsg(<span class="stringliteral">&quot;trex:unit&quot;</span>, <span class="stringliteral">&quot;true: &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00398"></a>00398               &lt;&lt;<span class="stringliteral">&quot; have no insertion choice&quot;</span>);
+<a name="l00399"></a>00399       cand = EUROPA::TokenId::noId();
+<a name="l00400"></a>00400       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00401"></a>00401     }
+<a name="l00402"></a>00402     debugMsg(<span class="stringliteral">&quot;trex:unit&quot;</span>, <span class="stringliteral">&quot;false: &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00403"></a>00403             &lt;&lt;<span class="stringliteral">&quot; have mutliple insertion choices&quot;</span>);
+<a name="l00404"></a>00404   } <span class="keywordflow">else</span> {
+<a name="l00405"></a>00405     debugMsg(<span class="stringliteral">&quot;trex:unit&quot;</span>, <span class="stringliteral">&quot;false: &quot;</span>&lt;&lt;tok-&gt;toString()
+<a name="l00406"></a>00406             &lt;&lt;<span class="stringliteral">&quot; object is not a singleton&quot;</span>);
+<a name="l00407"></a>00407   }
+<a name="l00408"></a>00408   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00409"></a>00409 }
+<a name="l00410"></a>00410 
+<a name="l00411"></a>00411 
+<a name="l00412"></a>00412 <span class="comment">// modifiers </span>
+<a name="l00413"></a>00413 
+<a name="l00414"></a>00414 <span class="keywordtype">bool</span> Assembly::merge_token(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId <span class="keyword">const</span> &amp;cand) {
+<a name="l00415"></a>00415   <span class="keywordflow">if</span>( invalid() || cand.isNoId() )
+<a name="l00416"></a>00416     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00417"></a>00417   <span class="keywordflow">if</span>( !( tok-&gt;isInactive() &amp;&amp; 
+<a name="l00418"></a>00418         tok-&gt;getState()-&gt;lastDomain().isMember(EUROPA::Token::MERGED) ) )
+<a name="l00419"></a>00419     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00420"></a>00420   tok-&gt;merge(cand);
+<a name="l00421"></a>00421   propagate();
+<a name="l00422"></a>00422   <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00423"></a>00423 }
+<a name="l00424"></a>00424 
+<a name="l00425"></a>00425 <span class="keywordtype">bool</span> Assembly::insert_token(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, <span class="keywordtype">size_t</span> &amp;steps) {
+<a name="l00426"></a>00426   <span class="keywordflow">if</span>( invalid() || <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#aabbf1a7948f457d904e341b89fabadef">in_deliberation</a>(tok) )
+<a name="l00427"></a>00427     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00428"></a>00428   <span class="keywordflow">if</span>( tok-&gt;isInactive() )
+<a name="l00429"></a>00429     tok-&gt;activate();
+<a name="l00430"></a>00430   EUROPA::ObjectDomain <span class="keyword">const</span> &amp;objs=tok-&gt;getObject()-&gt;lastDomain();
+<a name="l00431"></a>00431   <span class="keywordflow">if</span>( !objs.isSingleton() )
+<a name="l00432"></a>00432     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00433"></a>00433   EUROPA::ObjectId obj = objs.getObject(objs.getSingletonValue());
+<a name="l00434"></a>00434   <span class="keywordflow">if</span>( EUROPA::TimelineId::convertable(obj) ) {
+<a name="l00435"></a>00435     std::vector&lt;EUROPA::OrderingChoice&gt; choices;
+<a name="l00436"></a>00436     m_planDatabase-&gt;getOrderingChoices(tok, choices, 1);
+<a name="l00437"></a>00437     <span class="keywordflow">if</span>( choices.empty() )
+<a name="l00438"></a>00438       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00439"></a>00439     EUROPA::TokenId p = choices[0].second.first, s = choices[0].second.second;
+<a name="l00440"></a>00440     choices[0].first-&gt;constrain(p, s);
+<a name="l00441"></a>00441   }
+<a name="l00442"></a>00442   propagate();
+<a name="l00443"></a>00443   <span class="keywordflow">for</span>(EUROPA::TokenSet::const_iterator i=tok-&gt;slaves().begin();
+<a name="l00444"></a>00444       tok-&gt;slaves().end()!=i; ++i) {
+<a name="l00445"></a>00445     <span class="keywordflow">if</span>( invalid() )
+<a name="l00446"></a>00446       <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00447"></a>00447     EUROPA::TokenId cand;
+<a name="l00448"></a>00448     <span class="keywordflow">if</span>( in_synch_scope(*i, cand) ) {
+<a name="l00449"></a>00449       ++steps;
+<a name="l00450"></a>00450       <span class="keywordflow">if</span>( !resolve(*i, cand, steps) )
+<a name="l00451"></a>00451         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00452"></a>00452     }
+<a name="l00453"></a>00453   }
+<a name="l00454"></a>00454   <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00455"></a>00455 }
+<a name="l00456"></a>00456 
+<a name="l00457"></a>00457 <span class="keywordtype">bool</span> Assembly::resolve(EUROPA::TokenId <span class="keyword">const</span> &amp;tok, EUROPA::TokenId <span class="keyword">const</span> &amp;cand, <span class="keywordtype">size_t</span> &amp;steps) {
+<a name="l00458"></a>00458   <span class="keywordflow">if</span>( merge_token(tok, cand) || insert_token(tok, steps) )
+<a name="l00459"></a>00459     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00460"></a>00460   mark_invalid();
+<a name="l00461"></a>00461   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00462"></a>00462 }
+<a name="l00463"></a>00463 
+<a name="l00464"></a>00464 <span class="keywordtype">bool</span> Assembly::insert_default(EUROPA::ObjectId <span class="keyword">const</span> &amp;obj, EUROPA::TokenId &amp;tok, <span class="keywordtype">size_t</span> &amp;steps) {
+<a name="l00465"></a>00465   <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> cur = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>();
+<a name="l00466"></a>00466   EUROPA::IntervalIntDomain now(cur, cur);
+<a name="l00467"></a>00467   EUROPA::ConstrainedVariableId name = m_reactor.assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a47eade9aea60af20038c558d447640e2" title="Get default predicate value.">default_pred</a>(obj);
+<a name="l00468"></a>00468   EUROPA::DataTypeId type = name-&gt;getDataType();
+<a name="l00469"></a>00469   std::string short_pred = type-&gt;toString(name-&gt;getSpecifiedValue()),
+<a name="l00470"></a>00470     pred_name = obj-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+short_pred;
+<a name="l00471"></a>00471   EUROPA::DbClientId cli = m_planDatabase-&gt;getClient();
+<a name="l00472"></a>00472   
+<a name="l00473"></a>00473   tok = cli-&gt;createToken(pred_name.c_str(), NULL, <span class="keyword">false</span>);
+<a name="l00474"></a>00474   
+<a name="l00475"></a>00475   tok-&gt;activate();
+<a name="l00476"></a>00476   tok-&gt;start()-&gt;restrictBaseDomain(now);
+<a name="l00477"></a>00477   tok-&gt;getObject()-&gt;specify(obj-&gt;getKey());
+<a name="l00478"></a>00478   <span class="keywordflow">return</span> insert_token(tok, steps);
+<a name="l00479"></a>00479 }
+<a name="l00480"></a>00480 
+<a name="l00481"></a>00481 
+<a name="l00482"></a>00482 
+<a name="l00483"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac7a07eda65e94bcdbf3926d8eba20d00">00483</a> <span class="keywordtype">void</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac7a07eda65e94bcdbf3926d8eba20d00" title="That plan solver configuration.">Assembly::configure_solver</a>(std::string <span class="keyword">const</span> &amp;cfg) {
+<a name="l00484"></a>00484   <span class="keywordflow">if</span>( NULL==m_solver ) {
+<a name="l00485"></a>00485     <span class="keywordtype">bool</span> found;
+<a name="l00486"></a>00486     std::string file = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(cfg, found);
+<a name="l00487"></a>00487     
+<a name="l00488"></a>00488     <span class="keywordflow">if</span>( !found )
+<a name="l00489"></a>00489       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to locate solver config file \&quot;&quot;</span>+
+<a name="l00490"></a>00490                           cfg+<span class="stringliteral">&quot;\&quot;.&quot;</span>);
+<a name="l00491"></a>00491     std::auto_ptr&lt;EUROPA::TiXmlElement&gt; xml(EUROPA::initXml(file.c_str()));
+<a name="l00492"></a>00492     
+<a name="l00493"></a>00493     <span class="keywordflow">if</span>( NULL==xml.get() )
+<a name="l00494"></a>00494       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to parse xml content of &quot;</span>+file);
+<a name="l00495"></a>00495     <span class="comment">// Insert the DeliberationFilter </span>
+<a name="l00496"></a>00496     <span class="comment">// EUROPA::TiXmlElement filter(&quot;FlawFilter&quot;);</span>
+<a name="l00497"></a>00497     <span class="comment">// filter.SetAttribute(&quot;component&quot;, &quot;DeliberationFilter&quot;);</span>
+<a name="l00498"></a>00498     <span class="comment">// xml-&gt;InsertBeforeChild(xml-&gt;FirstChild(), filter);</span>
+<a name="l00499"></a>00499     m_solver = <span class="keyword">new</span> <a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>(*<span class="keyword">this</span>, *xml);
+<a name="l00500"></a>00500   } <span class="keywordflow">else</span> 
+<a name="l00501"></a>00501     m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Attempted to configure the solver more than once.&quot;</span>;
+<a name="l00502"></a>00502 }
+<a name="l00503"></a>00503 
+<a name="l00504"></a><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a032b448b67f81e5f1ddc21ea5fac9ba9">00504</a> <span class="keywordtype">bool</span> <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a032b448b67f81e5f1ddc21ea5fac9ba9" title="Load a model.">Assembly::playTransaction</a>(std::string <span class="keyword">const</span> &amp;nddl) {
+<a name="l00505"></a>00505   <span class="keywordtype">bool</span> found;
+<a name="l00506"></a>00506   std::string config;
+<a name="l00507"></a>00507        
+<a name="l00508"></a>00508   config = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(<span class="stringliteral">&quot;NDDL.cfg&quot;</span>, found);
+<a name="l00509"></a>00509   <span class="keywordflow">if</span>( !found ) {
+<a name="l00510"></a>00510     config = m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(<span class="stringliteral">&quot;temp_nddl_gen.cfg&quot;</span>, found);
+<a name="l00511"></a>00511     <span class="keywordflow">if</span>( !found ) 
+<a name="l00512"></a>00512       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Unable to locate NDDL.cfg or temp_nddl_gen.cfg&quot;</span>);
+<a name="l00513"></a>00513               
+<a name="l00514"></a>00514 
+<a name="l00515"></a>00515     boost::property_tree::ptree cfg;
+<a name="l00516"></a>00516     read_xml(config, cfg, xml::no_comments|xml::trim_whitespace);
+<a name="l00517"></a>00517 
+<a name="l00518"></a>00518     <span class="keywordflow">if</span>( cfg.empty() )
+<a name="l00519"></a>00519       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, config+<span class="stringliteral">&quot; does not appear to be in XML&quot;</span>);
+<a name="l00520"></a>00520     <span class="keywordflow">else</span> <span class="keywordflow">if</span>( cfg.size()!=1 )
+<a name="l00521"></a>00521       <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, 
+<a name="l00522"></a>00522                           config+<span class="stringliteral">&quot; europa config have mutiple XML roots.&quot;</span>);
+<a name="l00523"></a>00523               
+<a name="l00524"></a>00524     <span class="comment">// Extract include information</span>
+<a name="l00525"></a>00525     boost::property_tree::ptree::assoc_iterator i, last;
+<a name="l00526"></a>00526     boost::tie(i, last) = cfg.front().second.equal_range(<span class="stringliteral">&quot;include&quot;</span>);
+<a name="l00527"></a>00527     <span class="keywordflow">for</span>(; last!=i; ++i) {
+<a name="l00528"></a>00528       std::string path = parse_attr&lt;std::string&gt;(*i, <span class="stringliteral">&quot;path&quot;</span>);
+<a name="l00529"></a>00529       <span class="comment">// replace &#39;;&#39; by &#39;:&#39;</span>
+<a name="l00530"></a>00530       boost::replace_all(path, <span class="stringliteral">&quot;;&quot;</span>, <span class="stringliteral">&quot;:&quot;</span>);
+<a name="l00531"></a>00531       <span class="comment">// Add this path to the nddl interpreter</span>
+<a name="l00532"></a>00532       getLanguageInterpreter(<span class="stringliteral">&quot;nddl&quot;</span>)-&gt;getEngine()-&gt;getConfig()-&gt;setProperty(<span class="stringliteral">&quot;nddl.includePath&quot;</span>, path);
+<a name="l00533"></a>00533     }
+<a name="l00534"></a>00534   }
+<a name="l00535"></a>00535   <span class="comment">// Now add TREX_PATH to nddl include path</span>
+<a name="l00536"></a>00536   std::ostringstream oss;
+<a name="l00537"></a>00537   oss&lt;&lt;<span class="charliteral">&#39;.&#39;</span>;
+<a name="l00538"></a>00538   <span class="keywordflow">for</span>(<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e" title="TREX_PATH iterator.">LogManager::path_iterator</a> i=m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4" title="First path.">begin</a>(); 
+<a name="l00539"></a>00539       m_reactor.<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>().<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896" title="End of searh path.">end</a>()!=i; ++i)
+<a name="l00540"></a>00540     oss&lt;&lt;<span class="charliteral">&#39;:&#39;</span>&lt;&lt;*i;
+<a name="l00541"></a>00541   getLanguageInterpreter(<span class="stringliteral">&quot;nddl&quot;</span>)-&gt;getEngine()-&gt;getConfig()-&gt;setProperty(<span class="stringliteral">&quot;nddl.includePath&quot;</span>, oss.str());
+<a name="l00542"></a>00542   
+<a name="l00543"></a>00543   std::string ret;
+<a name="l00544"></a>00544   <span class="keywordflow">try</span> {
+<a name="l00545"></a>00545     ret = executeScript(<span class="stringliteral">&quot;nddl&quot;</span>, nddl, <span class="keyword">true</span>);
+<a name="l00546"></a>00546   } <span class="keywordflow">catch</span>(EUROPA::PSLanguageExceptionList <span class="keyword">const</span> &amp;le) {
+<a name="l00547"></a>00547     std::ostringstream err;
+<a name="l00548"></a>00548     err&lt;&lt;<span class="stringliteral">&quot;Error while parsing nddl file:\n&quot;</span>
+<a name="l00549"></a>00549        &lt;&lt;le;
+<a name="l00550"></a>00550     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, err.str());
+<a name="l00551"></a>00551   } <span class="keywordflow">catch</span>(Error <span class="keyword">const</span> &amp;error) {
+<a name="l00552"></a>00552     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Error while parsing nddl file: &quot;</span>+error.getMsg());
+<a name="l00553"></a>00553   }
+<a name="l00554"></a>00554   <span class="keywordflow">if</span>( !ret.empty() ) 
+<a name="l00555"></a>00555     <span class="keywordflow">throw</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a>(m_reactor, <span class="stringliteral">&quot;Error returned after parsing nddl file: &quot;</span>+ret);
+<a name="l00556"></a>00556        
+<a name="l00557"></a>00557   <span class="comment">// Model was loaded : check that the constraint network is still consistent</span>
+<a name="l00558"></a>00558   <span class="keywordflow">return</span> m_constraintEngine-&gt;constraintConsistent();
+<a name="l00559"></a>00559 }
+<a name="l00560"></a>00560 
+<a name="l00561"></a>00561 <span class="keywordtype">bool</span> Assembly::propagate() {
+<a name="l00562"></a>00562   <span class="keywordflow">if</span>( invalid() )
+<a name="l00563"></a>00563     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00564"></a>00564   <span class="keywordflow">if</span>( !m_constraintEngine-&gt;propagate() ) {
+<a name="l00565"></a>00565     m_reactor.log(<span class="stringliteral">&quot;&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Inconsistent plan.&quot;</span>;
+<a name="l00566"></a>00566     propagation_failure();
+<a name="l00567"></a>00567     mark_invalid();
+<a name="l00568"></a>00568   }
+<a name="l00569"></a>00569   <span class="keywordflow">return</span> !invalid();
+<a name="l00570"></a>00570 }
+<a name="l00571"></a>00571 
+<a name="l00572"></a>00572 <span class="keywordtype">void</span> Assembly::propagation_failure()<span class="keyword"> const </span>{
+<a name="l00573"></a>00573   std::ostringstream oss;
+<a name="l00574"></a>00574   
+<a name="l00575"></a>00575   <span class="keywordflow">if</span>( !m_constraintEngine-&gt;constraintConsistent() ) {
+<a name="l00576"></a>00576     oss&lt;&lt;<span class="stringliteral">&quot;Constraint network is inconsistent:\n&quot;</span>;
+<a name="l00577"></a>00577     EUROPA::ConstrainedVariableSet <span class="keyword">const</span> &amp;vars = m_constraintEngine-&gt;getVariables();
+<a name="l00578"></a>00578     EUROPA::ConstrainedVariableSet::const_iterator i=vars.begin();
+<a name="l00579"></a>00579 
+<a name="l00580"></a>00580     <span class="keywordflow">for</span>( ; vars.end()!=i; ++i) {
+<a name="l00581"></a>00581       <span class="keywordflow">if</span>( (*i)-&gt;lastDomain().isEmpty() &amp;&amp; (*i)-&gt;lastDomain().isClosed() ) {
+<a name="l00582"></a>00582        EUROPA::TokenId token = details::parent_token(*i);
+<a name="l00583"></a>00583        std::string prefix;
+<a name="l00584"></a>00584        
+<a name="l00585"></a>00585        <span class="keywordflow">if</span>( token.isId() ) {
+<a name="l00586"></a>00586          std::ostringstream ss;
+<a name="l00587"></a>00587          ss&lt;&lt;token-&gt;getName().toString()&lt;&lt;<span class="charliteral">&#39;(&#39;</span>&lt;&lt;token-&gt;getKey()&lt;&lt;<span class="stringliteral">&quot;).&quot;</span>;
+<a name="l00588"></a>00588          prefix = ss.str();
+<a name="l00589"></a>00589        }
+<a name="l00590"></a>00590        oss&lt;&lt;<span class="stringliteral">&quot; - local context of &quot;</span>&lt;&lt;prefix&lt;&lt;(*i)-&gt;getName().toString()&lt;&lt;<span class="stringliteral">&quot;:\n&quot;</span>
+<a name="l00591"></a>00591           &lt;&lt;<span class="stringliteral">&quot;   - base domain: &quot;</span>&lt;&lt;(*i)-&gt;baseDomain().toString()&lt;&lt;<span class="charliteral">&#39;\n&#39;</span>
+<a name="l00592"></a>00592           &lt;&lt;<span class="stringliteral">&quot;   - derived domain: &quot;</span>&lt;&lt;(*i)-&gt;lastDomain().toString()&lt;&lt;<span class="charliteral">&#39;\n&#39;</span>
+<a name="l00593"></a>00593           &lt;&lt;<span class="stringliteral">&quot;   - Europa explanation: &quot;</span>&lt;&lt;(*i)-&gt;getViolationExpl()&lt;&lt;<span class="charliteral">&#39;\n&#39;</span>;
+<a name="l00594"></a>00594        EUROPA::ConstraintSet constraints;
+<a name="l00595"></a>00595        (*i)-&gt;constraints(constraints);
+<a name="l00596"></a>00596        <span class="keywordflow">if</span>( !constraints.empty() ) {
+<a name="l00597"></a>00597          oss&lt;&lt;<span class="stringliteral">&quot;   - related constraints:\n&quot;</span>;
+<a name="l00598"></a>00598          EUROPA::ConstraintSet::const_iterator c = constraints.begin();
+<a name="l00599"></a>00599          <span class="keywordflow">for</span>( ; constraints.end()!=c; ++c) {
+<a name="l00600"></a>00600            std::vector&lt;EUROPA::ConstrainedVariableId&gt; 
+<a name="l00601"></a>00601              <span class="keyword">const</span> &amp;scope = (*c)-&gt;getScope();
+<a name="l00602"></a>00602            <span class="keywordtype">size_t</span> idx;
+<a name="l00603"></a>00603            oss&lt;&lt;<span class="stringliteral">&quot;     + &quot;</span>&lt;&lt;(*c)-&gt;getName().toString()&lt;&lt;<span class="charliteral">&#39;(&#39;</span>;
+<a name="l00604"></a>00604            <span class="keywordflow">for</span>(idx=0; idx&lt;scope.size(); ++idx) {
+<a name="l00605"></a>00605              <span class="keywordflow">if</span>( idx&gt;0 )
+<a name="l00606"></a>00606               oss&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>;
+<a name="l00607"></a>00607              token = details::parent_token(scope[idx]);
+<a name="l00608"></a>00608              <span class="keywordflow">if</span>( token.isId() )
+<a name="l00609"></a>00609               oss&lt;&lt;token-&gt;getName().toString()&lt;&lt;<span class="charliteral">&#39;(&#39;</span>&lt;&lt;token-&gt;getKey()&lt;&lt;<span class="stringliteral">&quot;).&quot;</span>;
+<a name="l00610"></a>00610              oss&lt;&lt;scope[idx]-&gt;getName().toString()&lt;&lt;<span class="charliteral">&#39;=&#39;</span>
+<a name="l00611"></a>00611                &lt;&lt;scope[idx]-&gt;lastDomain().toString();
+<a name="l00612"></a>00612            }
+<a name="l00613"></a>00613            oss&lt;&lt;<span class="stringliteral">&quot;)\n&quot;</span>;
+<a name="l00614"></a>00614          }
+<a name="l00615"></a>00615        }
+<a name="l00616"></a>00616       }
+<a name="l00617"></a>00617     }
+<a name="l00618"></a>00618     debugMsg(<span class="stringliteral">&quot;trex:always&quot;</span>, oss.str());
+<a name="l00619"></a>00619   }
+<a name="l00620"></a>00620 }
+<a name="l00621"></a>00621 
+<a name="l00622"></a>00622 
+<a name="l00623"></a>00623 std::pair&lt;EUROPA::ObjectId, EUROPA::TokenId&gt; Assembly::convert(<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a> <span class="keyword">const</span> &amp;pred, <span class="keywordtype">bool</span> fact) {
+<a name="l00624"></a>00624   <span class="comment">// First we create the token</span>
+<a name="l00625"></a>00625   EUROPA::DbClientId cli    = m_planDatabase-&gt;getClient();
+<a name="l00626"></a>00626   EUROPA::ObjectId timeline = cli-&gt;getObject(pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>().<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>().c_str());
+<a name="l00627"></a>00627   std::string pred_name = timeline-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>().<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>();
+<a name="l00628"></a>00628   EUROPA::TokenId tok = EUROPA::TokenId::noId();
+<a name="l00629"></a>00629   <span class="comment">// if not a fact then it is rejectable</span>
+<a name="l00630"></a>00630   <span class="keywordtype">bool</span> rejectable = !fact;
+<a name="l00631"></a>00631 
+<a name="l00632"></a>00632   <span class="comment">// Check that the predicate exists </span>
+<a name="l00633"></a>00633   <span class="keywordflow">if</span>( m_schema-&gt;isPredicate(pred_name.c_str()) ) {
+<a name="l00634"></a>00634     tok = cli-&gt;createToken(pred_name.c_str(), NULL, rejectable, fact);
+<a name="l00635"></a>00635     <span class="keywordflow">if</span>( tok.isId() ) {
+<a name="l00636"></a>00636       <span class="comment">// restrict attributes </span>
+<a name="l00637"></a>00637       <span class="keywordflow">for</span>(Predicate::const_iterator i=pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ad9f7d61308503a313ed0f525c3b26192" title="beginning of the attributes set">begin</a>(); pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set">end</a>()!=i; ++i) {
+<a name="l00638"></a>00638        EUROPA::ConstrainedVariableId param = tok-&gt;getVariable(i-&gt;first.str());
+<a name="l00639"></a>00639        
+<a name="l00640"></a>00640        <span class="keywordflow">if</span>( param.isId() ) {
+<a name="l00641"></a>00641          <span class="keywordflow">try</span> {
+<a name="l00642"></a>00642            europa_restrict(param, i-&gt;second.domain());
+<a name="l00643"></a>00643          } <span class="keywordflow">catch</span>(<a class="code" href="../../db/d3a/classTREX_1_1transaction_1_1DomainExcept.html" title="Empty domain.">DomainExcept</a> <span class="keyword">const</span> &amp;e) {
+<a name="l00644"></a>00644            m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Failed to restrict attribute &quot;</span>&lt;&lt;i-&gt;first
+<a name="l00645"></a>00645                              &lt;&lt;<span class="stringliteral">&quot; on token &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()&lt;&lt;<span class="charliteral">&#39;.&#39;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()
+<a name="l00646"></a>00646                              &lt;&lt;<span class="stringliteral">&quot;: &quot;</span>&lt;&lt;e;
+<a name="l00647"></a>00647          }
+<a name="l00648"></a>00648        } <span class="keywordflow">else</span> {
+<a name="l00649"></a>00649          m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unknown attribute &quot;</span>&lt;&lt;i-&gt;first&lt;&lt;<span class="stringliteral">&quot; on token &quot;</span>
+<a name="l00650"></a>00650                             &lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()&lt;&lt;<span class="charliteral">&#39;.&#39;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>();
+<a name="l00651"></a>00651        }
+<a name="l00652"></a>00652       }
+<a name="l00653"></a>00653     } 
+<a name="l00654"></a>00654   } <span class="keywordflow">else</span> {
+<a name="l00655"></a>00655     <span class="comment">// the predicate is unknown : give a warning </span>
+<a name="l00656"></a>00656     m_reactor.log(<span class="stringliteral">&quot;WARN&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unknown predicate &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()
+<a name="l00657"></a>00657                       &lt;&lt;<span class="stringliteral">&quot; for object &quot;</span>&lt;&lt;pred.<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>();
+<a name="l00658"></a>00658     <span class="keywordflow">if</span>( fact ) {
+<a name="l00659"></a>00659       <span class="comment">// If it is a fact I need to deal with it : set it to &quot;undefined&quot;</span>
+<a name="l00660"></a>00660       pred_name = timeline-&gt;getType().toString()+<span class="stringliteral">&quot;.&quot;</span>+<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a65d498ecdb1911fcf764c336c5dceae2" title="undefined predicate name">UNDEFINED_PRED</a>;
+<a name="l00661"></a>00661       <span class="keywordflow">if</span>( m_schema-&gt;isPredicate(pred_name.c_str()) ) {
+<a name="l00662"></a>00662        tok = cli-&gt;createToken(pred_name.c_str(), NULL, rejectable, fact);
+<a name="l00663"></a>00663       } <span class="keywordflow">else</span> {
+<a name="l00664"></a>00664        <span class="comment">// that should never happen !!!</span>
+<a name="l00665"></a>00665        std::ostringstream oss;
+<a name="l00666"></a>00666        oss&lt;&lt;<span class="stringliteral">&quot;Unable to create special \&quot;&quot;</span>&lt;&lt;<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a65d498ecdb1911fcf764c336c5dceae2" title="undefined predicate name">UNDEFINED_PRED</a>
+<a name="l00667"></a>00667           &lt;&lt;<span class="stringliteral">&quot;\&quot; predicate on object &quot;</span>&lt;&lt;timeline-&gt;getName().toString();
+<a name="l00668"></a>00668        <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(oss.str());
+<a name="l00669"></a>00669       }
+<a name="l00670"></a>00670     }
+<a name="l00671"></a>00671   }
+<a name="l00672"></a>00672   <span class="keywordflow">if</span>( tok.isId() ) {
+<a name="l00673"></a>00673     <span class="comment">// Now restrict the object to timeline</span>
+<a name="l00674"></a>00674     EUROPA::ConstrainedVariableId 
+<a name="l00675"></a>00675     obj_var=tok-&gt;getObject();
+<a name="l00676"></a>00676     obj_var-&gt;specify(timeline-&gt;getKey());
+<a name="l00677"></a>00677   }
+<a name="l00678"></a>00678   <span class="keywordflow">return</span> std::make_pair(timeline, tok);
+<a name="l00679"></a>00679 }
+<a name="l00680"></a>00680 
+<a name="l00681"></a>00681 <span class="keywordtype">void</span> Assembly::mark_inactive() {
+<a name="l00682"></a>00682   debugMsg(<span class="stringliteral">&quot;trex:delib&quot;</span>, <span class="stringliteral">&quot;set to INACTIVE&quot;</span>);
+<a name="l00683"></a>00683   m_state = INACTIVE;
+<a name="l00684"></a>00684 }
+<a name="l00685"></a>00685 
+<a name="l00686"></a>00686 <span class="keywordtype">void</span> Assembly::mark_active() {
+<a name="l00687"></a>00687   debugMsg(<span class="stringliteral">&quot;trex:delib&quot;</span>, <span class="stringliteral">&quot;set to ACTIVE&quot;</span>);
+<a name="l00688"></a>00688   m_state = ACTIVE;
+<a name="l00689"></a>00689   m_reactor.reset_deliberation();
+<a name="l00690"></a>00690 }
+<a name="l00691"></a>00691 
+<a name="l00692"></a>00692 <span class="keywordtype">void</span> Assembly::mark_invalid() {
+<a name="l00693"></a>00693   debugMsg(<span class="stringliteral">&quot;trex:delib&quot;</span>, <span class="stringliteral">&quot;set to INVALID&quot;</span>);
+<a name="l00694"></a>00694   m_state = INVALID;
+<a name="l00695"></a>00695 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:39 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

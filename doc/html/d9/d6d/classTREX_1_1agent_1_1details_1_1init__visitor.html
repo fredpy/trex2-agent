@@ -120,13 +120,13 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p>Reactors initialization visitor. </p>
 <p>This class is a depth first search visitor that will initialize all the reactors from the least dependent to the most dependent in the graph.</p>
 <p>The initialization is done through the <code>initialize</code> call on each reactor that will in turn call handleInit callback insisde this reactor</p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab0fca413f286b61c5aec1547e4531e0c" title="Final initialization.">TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)</a> </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abdfbc3a11ed2046f2fa6a8ed707b7aab" title="Final initialization.">TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)</a> </dd>
 <dd>
 <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251" title="reactor initialiszation callback">TREX::transaction::TeleoReactor::handleInit()</a></dd></dl>
 <p><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a></p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00072">72</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00079">79</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a6c9bf8d4d5c8f730a99847e5ede4532a"></a><!-- doxytag: member="TREX::agent::details::init_visitor::init_visitor" ref="a6c9bf8d4d5c8f730a99847e5ede4532a" args="(TICK final)" -->
 <div class="memitem">
@@ -152,7 +152,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00077">77</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00084">84</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -180,7 +180,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00083">83</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00090">90</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -260,18 +260,18 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p>It will call the initialize method of <code>r</code> with a final tick value as provided by the m_finalTick attribute in order to allow this reactor to complete its initialization.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ae89e4e2b888cb80d1327d2b26219fc6a" title="Complete agent initialization.">Agent::initComplete()</a> </dd>
 <dd>
-<a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab0fca413f286b61c5aec1547e4531e0c" title="Final initialization.">TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)</a> </dd></dl>
+<a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abdfbc3a11ed2046f2fa6a8ed707b7aab" title="Final initialization.">TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00103">103</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">110</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">TREX::agent::CycleDetector::is_valid()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00113">m_final</a>.</p>
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">TREX::agent::CycleDetector::is_valid()</a>, <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00143">TREX::transaction::graph::isolate()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00123">m_final</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph.png" border="0" usemap="#d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph_map" alt=""></div>
 <map name="d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph_map" id="d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph">
-<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity." alt="" coords="392,5,669,35"/></map>
+<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity." alt="" coords="392,5,669,35"/><area shape="rect" id="node5" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor." alt="" coords="408,59,653,88"/><area shape="rect" id="node7" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="725,32,915,61"/><area shape="rect" id="node9" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="717,85,923,115"/></map>
 </div>
 </p>
 
@@ -312,7 +312,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">163</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00187">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00205">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00103">finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00197">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00215">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">finish_vertex()</a>.</p>
 
 </div>
 </div>
@@ -331,9 +331,9 @@ Here is the call graph for this function:</div>
 <p>Final tick value. </p>
 <p>Stores the final tick of the mission that will be proovided to the reactors during the depth first search execution of this visitor. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00113">113</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00123">123</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00103">finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">finish_vertex()</a>.</p>
 
 </div>
 </div>
@@ -341,7 +341,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

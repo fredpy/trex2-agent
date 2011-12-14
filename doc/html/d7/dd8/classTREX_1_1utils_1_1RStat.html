@@ -164,7 +164,7 @@ static std::string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670eaa76ea4c239c54fc0d941f46c10eec361"></a><!-- doxytag: member="children" ref="a0ef14756bd6abae9a18d15084ecf670eaa76ea4c239c54fc0d941f46c10eec361" args="" -->children</em>&nbsp;</td><td>
 <p>children statistics. </p>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000005">Bug:</a></b></dt><dd>As said in the man page of <code>getrusage</code> : <em>"There is no way to obtain information about
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000009">Bug:</a></b></dt><dd>As said in the man page of <code>getrusage</code> : <em>"There is no way to obtain information about
  a child process that has not yet terminated."</em> </dd></dl>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670ea4a2041f57905c0826e828402aa577f0d"></a><!-- doxytag: member="zeroed" ref="a0ef14756bd6abae9a18d15084ecf670ea4a2041f57905c0826e828402aa577f0d" args="" -->zeroed</em>&nbsp;</td><td>
@@ -313,8 +313,8 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <p>Maximum resident set size. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the maximum amount of resident memory used.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>It is not clear to right now what is the unity of this value. Indeed, it looks like it is given in term of memory pages. In this case we would probably need to get the page size on current system to convert into bytes. Right now I consider that this size is given in bytes.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000001">Todo:</a></b></dt><dd>This value is for resident memory size. It will be <b>less</b> or equal to the real amount of memory. I have to find out a way to have the total amount of memory used but didn't found doc about that.</dd></dl>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000004">Bug:</a></b></dt><dd>This information is not updated in real-time by the system. The update rate of your OS can be found using the command : </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000002">Todo:</a></b></dt><dd>This value is for resident memory size. It will be <b>less</b> or equal to the real amount of memory. I have to find out a way to have the total amount of memory used but didn't found doc about that.</dd></dl>
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000008">Bug:</a></b></dt><dd>This information is not updated in real-time by the system. The update rate of your OS can be found using the command : </dd></dl>
 <div class="fragment"><pre class="fragment"> sysctl kern.clockrate
 </pre></div><p> The value of <code>stathz</code> indicates the frequency of the updates (100Hz under MacOS X.4). Keep this in mind when you read the results. </p>
 
@@ -420,7 +420,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>A new stats snapshot giving the sum of current instance and <em>other</em>.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>If the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value differs form current instance and <em>other</em>, then the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value of the result will be RStat::unknown which prohibit the call to <em>reset</em>.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000003">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000004">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00125">125</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
@@ -451,7 +451,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>A new stats snapshot giving the difference between current instance and <em>other</em>.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>If the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value differs form current instance and <em>other</em>, then the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value of the result will be RStat::unknown which prohibit the call to <em>reset</em>.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000002">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000003">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00096">96</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
@@ -597,7 +597,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <li>trex/utils/<a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

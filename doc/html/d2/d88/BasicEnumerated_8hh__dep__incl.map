@@ -1,12 +1,24 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="283,83,488,112"/>
-<area shape="rect" id="node6" href="$dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor." alt="" coords="536,83,755,112"/>
-<area shape="rect" id="node20" href="$d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition" alt="" coords="969,83,1231,112"/>
+<area shape="rect" id="node3" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="2208,160,2413,189"/>
+<area shape="rect" id="node6" href="$dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor." alt="" coords="1313,83,1532,112"/>
+<area shape="rect" id="node41" href="$d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition" alt="" coords="2852,83,3113,112"/>
 <area shape="rect" id="node8" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="5,160,200,189"/>
-<area shape="rect" id="node11" href="$d4/d1a/europa__convert_8hh_source.html" title="extra/europa/bits/europa_convert.hh" alt="" coords="248,160,515,189"/>
-<area shape="rect" id="node16" href="$db/dc0/BasicInterval_8cc_source.html" title="trex/domain/BasicInterval.cc" alt="" coords="539,160,752,189"/>
-<area shape="rect" id="node18" href="$de/d44/DomainBase_8cc.html" title="Basic domain utilities implementation." alt="" coords="776,160,987,189"/>
-<area shape="rect" id="node13" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="909,237,1139,267"/>
-<area shape="rect" id="node23" href="$d2/d5c/EuropaDomain_8hh_source.html" title="extra/europa/EuropaDomain.hh" alt="" coords="1061,160,1291,189"/>
-<area shape="rect" id="node25" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="1315,160,1531,189"/>
+<area shape="rect" id="node11" href="$d4/d1a/europa__convert_8hh_source.html" title="extra/europa/bits/europa_convert.hh" alt="" coords="789,160,1056,189"/>
+<area shape="rect" id="node16" href="$d1/dde/old_2Assembly_8cc_source.html" title="extra/europa.old/Assembly.cc" alt="" coords="248,160,467,189"/>
+<area shape="rect" id="node19" href="$dd/d1d/europa_8old_2bits_2europa__types_8hh_source.html" title="extra/europa.old/bits/europa_types.hh" alt="" coords="1552,160,1829,189"/>
+<area shape="rect" id="node21" href="$df/da6/type__conversion_8hh_source.html" title="extra/europa2/bits/type_conversion.hh" alt="" coords="1853,160,2133,189"/>
+<area shape="rect" id="node23" href="$dc/d30/europa2_2EuropaDomains_8cc_source.html" title="extra/europa2/EuropaDomains.cc" alt="" coords="2525,237,2771,267"/>
+<area shape="rect" id="node26" href="$d9/d1a/_8old_2Assembly_8cc_source.html" title="extra/europa2.old/Assembly.cc" alt="" coords="515,160,741,189"/>
+<area shape="rect" id="node29" href="$d1/d76/europa2_8old_2bits_2europa__types_8hh_source.html" title="extra/europa2.old/bits/europa_types.hh" alt="" coords="3093,160,3379,189"/>
+<area shape="rect" id="node37" href="$db/dc0/BasicInterval_8cc_source.html" title="trex/domain/BasicInterval.cc" alt="" coords="1080,160,1293,189"/>
+<area shape="rect" id="node39" href="$de/d44/DomainBase_8cc.html" title="Basic domain utilities implementation." alt="" coords="1317,160,1528,189"/>
+<area shape="rect" id="node13" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="2248,237,2477,267"/>
+<area shape="rect" id="node31" href="$d9/d44/europa_8old_2EuropaDomains_8cc_source.html" title="extra/europa.old/EuropaDomains.cc" alt="" coords="2819,237,3077,267"/>
+<area shape="rect" id="node34" href="$d1/ddc/europa2_8old_2EuropaDomains_8cc_source.html" title="extra/europa2.old/EuropaDomains.cc" alt="" coords="3125,237,3392,267"/>
+<area shape="rect" id="node44" href="$d2/d5c/EuropaDomain_8hh_source.html" title="extra/europa/EuropaDomain.hh" alt="" coords="3403,160,3632,189"/>
+<area shape="rect" id="node47" href="$d7/d08/europa_8old_2EuropaEntity_8hh_source.html" title="extra/europa.old/EuropaEntity.hh" alt="" coords="3656,160,3899,189"/>
+<area shape="rect" id="node50" href="$de/d84/europa2_2EuropaEntity_8hh_source.html" title="extra/europa2/EuropaEntity.hh" alt="" coords="3923,160,4149,189"/>
+<area shape="rect" id="node53" href="$d9/dad/europa2_8old_2EuropaEntity_8hh_source.html" title="extra/europa2.old/EuropaEntity.hh" alt="" coords="4173,160,4424,189"/>
+<area shape="rect" id="node56" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="2803,160,3019,189"/>
+<area shape="rect" id="node62" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="2563,160,2779,189"/>
 </map>

@@ -1,12 +1,10 @@
 <map id="G" name="G">
 <area shape="rect" id="node3" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="5,237,165,267"/>
-<area shape="rect" id="node6" href="$d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="537,160,727,189"/>
-<area shape="rect" id="node10" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="92,83,335,112"/>
-<area shape="rect" id="node19" href="$d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="383,83,633,112"/>
-<area shape="rect" id="node23" href="$d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="784,83,995,112"/>
-<area shape="rect" id="node8" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="511,237,713,267"/>
-<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="217,160,463,189"/>
-<area shape="rect" id="node17" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="228,237,479,267"/>
-<area shape="rect" id="node25" href="$d3/d0c/TransactionLogger_8cc_source.html" title="trex/transaction/TransactionLogger.cc" alt="" coords="751,160,1028,189"/>
-<area shape="rect" id="node28" href="$d0/de8/TransactionLogger_8hh.html" title="Definition of reactors transaction logging class." alt="" coords="1076,160,1353,189"/>
+<area shape="rect" id="node6" href="$d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="611,160,800,189"/>
+<area shape="rect" id="node10" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="43,83,285,112"/>
+<area shape="rect" id="node17" href="$d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="333,83,584,112"/>
+<area shape="rect" id="node23" href="$d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="659,83,869,112"/>
+<area shape="rect" id="node8" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="408,237,611,267"/>
+<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="43,160,288,189"/>
+<area shape="rect" id="node19" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="312,160,563,189"/>
 </map>

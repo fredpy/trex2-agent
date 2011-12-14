@@ -126,24 +126,27 @@ window.onload = initDynSections;
 <a name="l00052"></a>00052 <span class="comment">// observers </span>
 <a name="l00053"></a>00053 
 <a name="l00054"></a>00054 <span class="keywordtype">bool</span> DbSolver::noMoreFlaws()<span class="keyword"> const </span>{
-<a name="l00055"></a>00055   EUROPA::IteratorId iter = m_solver-&gt;createIterator();
-<a name="l00056"></a>00056   <span class="keywordtype">bool</span> ret = m_solver-&gt;noMoreFlaws() &amp;&amp; iter-&gt;done();
-<a name="l00057"></a>00057   <span class="keyword">delete</span> (EUROPA::Iterator *)iter;
-<a name="l00058"></a>00058   <span class="keywordflow">return</span>  ret;
-<a name="l00059"></a>00059 }
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061 <span class="keywordtype">bool</span> DbSolver::inDeliberation(EUROPA::EntityId <span class="keyword">const</span> &amp;entity)<span class="keyword"> const </span>{
-<a name="l00062"></a>00062   EUROPA::SOLVERS::DecisionStack <span class="keyword">const</span> &amp;decisions = m_solver-&gt;getDecisionStack();
+<a name="l00055"></a>00055   <span class="keywordflow">if</span>( m_solver-&gt;noMoreFlaws() ) {
+<a name="l00056"></a>00056     EUROPA::IteratorId iter = m_solver-&gt;createIterator();
+<a name="l00057"></a>00057     <span class="keywordtype">bool</span> ret = m_solver-&gt;noMoreFlaws() &amp;&amp; iter-&gt;done();
+<a name="l00058"></a>00058     <span class="keyword">delete</span> (EUROPA::Iterator *)iter;
+<a name="l00059"></a>00059     <span class="keywordflow">return</span>  ret;
+<a name="l00060"></a>00060   }
+<a name="l00061"></a>00061   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00062"></a>00062 }
 <a name="l00063"></a>00063 
-<a name="l00064"></a>00064   <span class="keywordflow">for</span>(EUROPA::SOLVERS::DecisionStack::const_iterator it=decisions.begin();
-<a name="l00065"></a>00065       decisions.end()!=it; ++it) {
-<a name="l00066"></a>00066     <span class="keywordflow">if</span>( entity-&gt;getKey()==(*it)-&gt;getFlawedEntityKey() )
-<a name="l00067"></a>00067       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00068"></a>00068   }
-<a name="l00069"></a>00069   <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00070"></a>00070 }
+<a name="l00064"></a>00064 <span class="keywordtype">bool</span> DbSolver::inDeliberation(EUROPA::EntityId <span class="keyword">const</span> &amp;entity)<span class="keyword"> const </span>{
+<a name="l00065"></a>00065   EUROPA::SOLVERS::DecisionStack <span class="keyword">const</span> &amp;decisions = m_solver-&gt;getDecisionStack();
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067   <span class="keywordflow">for</span>(EUROPA::SOLVERS::DecisionStack::const_iterator it=decisions.begin();
+<a name="l00068"></a>00068       decisions.end()!=it; ++it) {
+<a name="l00069"></a>00069     <span class="keywordflow">if</span>( entity-&gt;getKey()==(*it)-&gt;getFlawedEntityKey() )
+<a name="l00070"></a>00070       <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00071"></a>00071   }
+<a name="l00072"></a>00072   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00073"></a>00073 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:39 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

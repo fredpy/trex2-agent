@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="887,48,1132,77"/>
-<area shape="rect" id="node4" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="524,48,716,77"/>
-<area shape="rect" id="node6" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="5,11,395,40"/>
-<area shape="rect" id="node8" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="483,101,757,131"/>
-<area shape="rect" id="node11" title="STL class." alt="" coords="964,103,1055,132"/>
+<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="916,80,1161,109"/>
+<area shape="rect" id="node6" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="539,124,731,153"/>
+<area shape="rect" id="node8" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="5,87,395,116"/>
+<area shape="rect" id="node10" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="497,177,772,207"/>
+<area shape="rect" id="node13" title="STL class." alt="" coords="993,135,1084,164"/>
 </map>

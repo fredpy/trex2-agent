@@ -146,86 +146,84 @@ window.onload = initDynSections;
 <a name="l00077"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a26ca7e7824f92e902175ffe928d84dfd">00077</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;other) 
 <a name="l00078"></a>00078   :m_name(other.m_name), m_domain(clone(other.m_domain)) {}
 <a name="l00079"></a>00079 
-<a name="l00080"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#ab5e9a7c6de374f7896c517310767cd1e">00080</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node)
-<a name="l00081"></a>00081   :m_name(<a class="code" href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(node, <span class="stringliteral">&quot;name&quot;</span>)) {
+<a name="l00080"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a2cc8b0f58f7e0a3fc18845aa8cffa733">00080</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(boost::property_tree::ptree::value_type &amp;node)
+<a name="l00081"></a>00081   :m_name(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(node.second, <span class="stringliteral">&quot;name&quot;</span>)) {
 <a name="l00082"></a>00082   <span class="keywordflow">if</span>( m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
 <a name="l00083"></a>00083     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(node, <span class="stringliteral">&quot;Variable name is empty.&quot;</span>);
-<a name="l00084"></a>00084   rapidxml::xml_node&lt;&gt; *dom_tag = node.first_node();
-<a name="l00085"></a>00085   <span class="keywordflow">if</span>( NULL==dom_tag ) {
-<a name="l00086"></a>00086     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(node, <span class="stringliteral">&quot;Missing variable domain on XML tag&quot;</span>); 
-<a name="l00087"></a>00087   } <span class="keywordflow">else</span> {
-<a name="l00088"></a>00088     m_domain = s_dom_factory-&gt;produce(*dom_tag);
-<a name="l00089"></a>00089   }
-<a name="l00090"></a>00090 }
+<a name="l00084"></a>00084   
+<a name="l00085"></a>00085   boost::property_tree::ptree::iterator i = node.second.begin();
+<a name="l00086"></a>00086   <span class="keywordflow">if</span>( !s_dom_factory-&gt;iter_produce(i, node.second.end(), m_domain) )
+<a name="l00087"></a>00087     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(node, <span class="stringliteral">&quot;Missing variable domain on XML tag&quot;</span>); 
+<a name="l00088"></a>00088 }
+<a name="l00089"></a>00089 
+<a name="l00090"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#acfc14d0ad77af53025f890b4d3a7745a">00090</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#acfc14d0ad77af53025f890b4d3a7745a" title="Destructor.">Variable::~Variable</a>() {}
 <a name="l00091"></a>00091 
-<a name="l00092"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#acfc14d0ad77af53025f890b4d3a7745a">00092</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#acfc14d0ad77af53025f890b4d3a7745a" title="Destructor.">Variable::~Variable</a>() {}
+<a name="l00092"></a>00092 <span class="comment">// Modifiers :</span>
 <a name="l00093"></a>00093 
-<a name="l00094"></a>00094 <span class="comment">// Modifiers :</span>
-<a name="l00095"></a>00095 
-<a name="l00096"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#af5900947928b3b8d79d48c2869160b15">00096</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#af5900947928b3b8d79d48c2869160b15" title="Assignment operator.">Variable::operator= </a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;other) {
-<a name="l00097"></a>00097   m_name = other.m_name;
-<a name="l00098"></a>00098   m_domain.reset(clone(other.m_domain));
-<a name="l00099"></a>00099   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00100"></a>00100 }
-<a name="l00101"></a>00101 
-<a name="l00102"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093">00102</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">Variable::restrict</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;dom) {
-<a name="l00103"></a>00103   <span class="keywordflow">if</span>( !m_domain )
-<a name="l00104"></a>00104     m_domain.reset(dom.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ade12e51928076cc0dc2ffe0f5b4629c1" title="Duplicate method.">copy</a>());
-<a name="l00105"></a>00105   <span class="keywordflow">else</span> 
-<a name="l00106"></a>00106     m_domain-&gt;restrictWith(dom);
-<a name="l00107"></a>00107   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00108"></a>00108 }
-<a name="l00109"></a>00109 
-<a name="l00110"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a07f5dd6eceace52eb459de14cf6cf35b">00110</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">Variable::restrict</a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;var) {
-<a name="l00111"></a>00111   <span class="keywordflow">if</span>( var.m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() ) {
-<a name="l00112"></a>00112     <span class="keywordflow">if</span>( var.m_domain )
-<a name="l00113"></a>00113       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
-<a name="l00114"></a>00114   } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() ) {
-<a name="l00115"></a>00115     <span class="keywordflow">if</span>( var.m_domain )
-<a name="l00116"></a>00116       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
-<a name="l00117"></a>00117     m_name = var.m_name;
-<a name="l00118"></a>00118   } <span class="keywordflow">else</span> {
-<a name="l00119"></a>00119     <span class="keywordflow">if</span>( m_name!=var.m_name ) {
-<a name="l00120"></a>00120       <span class="keywordflow">throw</span> <a class="code" href="../../d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception.">VariableException</a>(<span class="stringliteral">&quot;Cannot merge variables with different names.&quot;</span>);
-<a name="l00121"></a>00121     }
-<a name="l00122"></a>00122     <span class="keywordflow">if</span>( var.m_domain )
-<a name="l00123"></a>00123       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
-<a name="l00124"></a>00124   }
-<a name="l00125"></a>00125   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00126"></a>00126 }
+<a name="l00094"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#af5900947928b3b8d79d48c2869160b15">00094</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#af5900947928b3b8d79d48c2869160b15" title="Assignment operator.">Variable::operator= </a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;other) {
+<a name="l00095"></a>00095   m_name = other.m_name;
+<a name="l00096"></a>00096   m_domain.reset(clone(other.m_domain));
+<a name="l00097"></a>00097   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00098"></a>00098 }
+<a name="l00099"></a>00099 
+<a name="l00100"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093">00100</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">Variable::restrict</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;dom) {
+<a name="l00101"></a>00101   <span class="keywordflow">if</span>( !m_domain )
+<a name="l00102"></a>00102     m_domain.reset(dom.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ade12e51928076cc0dc2ffe0f5b4629c1" title="Duplicate method.">copy</a>());
+<a name="l00103"></a>00103   <span class="keywordflow">else</span> 
+<a name="l00104"></a>00104     m_domain-&gt;restrictWith(dom);
+<a name="l00105"></a>00105   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00106"></a>00106 }
+<a name="l00107"></a>00107 
+<a name="l00108"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a07f5dd6eceace52eb459de14cf6cf35b">00108</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">Variable::restrict</a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;var) {
+<a name="l00109"></a>00109   <span class="keywordflow">if</span>( var.m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() ) {
+<a name="l00110"></a>00110     <span class="keywordflow">if</span>( var.m_domain )
+<a name="l00111"></a>00111       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
+<a name="l00112"></a>00112   } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() ) {
+<a name="l00113"></a>00113     <span class="keywordflow">if</span>( var.m_domain )
+<a name="l00114"></a>00114       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
+<a name="l00115"></a>00115     m_name = var.m_name;
+<a name="l00116"></a>00116   } <span class="keywordflow">else</span> {
+<a name="l00117"></a>00117     <span class="keywordflow">if</span>( m_name!=var.m_name ) {
+<a name="l00118"></a>00118       <span class="keywordflow">throw</span> <a class="code" href="../../d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception.">VariableException</a>(<span class="stringliteral">&quot;Cannot merge variables with different names.&quot;</span>);
+<a name="l00119"></a>00119     }
+<a name="l00120"></a>00120     <span class="keywordflow">if</span>( var.m_domain )
+<a name="l00121"></a>00121       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain.">restrict</a>(*(var.m_domain));
+<a name="l00122"></a>00122   }
+<a name="l00123"></a>00123   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00124"></a>00124 }
+<a name="l00125"></a>00125 
+<a name="l00126"></a>00126 <span class="comment">// Observers :</span>
 <a name="l00127"></a>00127 
-<a name="l00128"></a>00128 <span class="comment">// Observers :</span>
-<a name="l00129"></a>00129 
-<a name="l00130"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f">00130</a> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain.">Variable::domain</a>()<span class="keyword"> const </span>{
-<a name="l00131"></a>00131   <span class="keywordflow">if</span>( !m_domain ) 
-<a name="l00132"></a>00132     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception.">VariableException</a>(<span class="stringliteral">&quot;Variable&#39;s domain cannot be accessed.&quot;</span>);
-<a name="l00133"></a>00133   <span class="keywordflow">return</span> *m_domain;
-<a name="l00134"></a>00134 } 
-<a name="l00135"></a>00135 
-<a name="l00136"></a>00136 std::ostream &amp;Variable::print_to(std::ostream &amp;out)<span class="keyword"> const </span>{
-<a name="l00137"></a>00137   <span class="keywordflow">if</span>( <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a1f39ccf658511db2ad00b08325802c51" title="Check for complete varaible definition.">isComplete</a>() ) 
-<a name="l00138"></a>00138     <span class="keywordflow">return</span> out&lt;&lt;m_name&lt;&lt;<span class="stringliteral">&quot;=&quot;</span>&lt;&lt;*m_domain;
-<a name="l00139"></a>00139   <span class="keywordflow">else</span>
-<a name="l00140"></a>00140     <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;&lt;?&quot;</span>&lt;&lt;m_name&lt;&lt;&#39;&gt;<span class="stringliteral">&#39;; </span>
-<a name="l00141"></a>00141 <span class="stringliteral">}</span>
-<a name="l00142"></a>00142 <span class="stringliteral"></span>
-<a name="l00143"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a46a1539abe5ca420376153daadee1b0c">00143</a> <span class="stringliteral">std::ostream &amp;Variable::toXml(std::ostream &amp;out, size_t tabs) const {</span>
-<a name="l00144"></a>00144 <span class="stringliteral">  std::ostream_iterator&lt;char&gt; pad(out);</span>
-<a name="l00145"></a>00145 <span class="stringliteral">  std::fill_n(pad, tabs, &#39;</span> <span class="stringliteral">&#39;);</span>
-<a name="l00146"></a>00146 <span class="stringliteral">  out&lt;&lt;&quot;&lt;Variable name=\&quot;&quot;&lt;&lt;name()&lt;&lt;&quot;\&quot;&quot;;</span>
-<a name="l00147"></a>00147 <span class="stringliteral">  if( !m_domain ) </span>
-<a name="l00148"></a>00148 <span class="stringliteral">    out&lt;&lt;&quot;/&gt;&quot;;</span>
-<a name="l00149"></a>00149 <span class="stringliteral">  else {</span>
-<a name="l00150"></a>00150 <span class="stringliteral">    out&lt;&lt;&quot;&gt;\n&quot;;</span>
-<a name="l00151"></a>00151 <span class="stringliteral">    m_domain-&gt;toXml(out, tabs+1)&lt;&lt;&#39;</span>\n<span class="stringliteral">&#39;;</span>
-<a name="l00152"></a>00152 <span class="stringliteral">    std::fill_n(pad, tabs, &#39;</span> <span class="stringliteral">&#39;);</span>
-<a name="l00153"></a>00153 <span class="stringliteral">    out&lt;&lt;&quot;&lt;/Variable&gt;&quot;;</span>
-<a name="l00154"></a>00154 <span class="stringliteral">  } </span>
-<a name="l00155"></a>00155 <span class="stringliteral">  return out;</span>
-<a name="l00156"></a>00156 <span class="stringliteral">}</span>
-<a name="l00157"></a>00157 <span class="stringliteral"></span>
+<a name="l00128"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f">00128</a> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain.">Variable::domain</a>()<span class="keyword"> const </span>{
+<a name="l00129"></a>00129   <span class="keywordflow">if</span>( !m_domain ) 
+<a name="l00130"></a>00130     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception.">VariableException</a>(<span class="stringliteral">&quot;Variable&#39;s domain cannot be accessed.&quot;</span>);
+<a name="l00131"></a>00131   <span class="keywordflow">return</span> *m_domain;
+<a name="l00132"></a>00132 } 
+<a name="l00133"></a>00133 
+<a name="l00134"></a>00134 std::ostream &amp;Variable::print_to(std::ostream &amp;out)<span class="keyword"> const </span>{
+<a name="l00135"></a>00135   <span class="keywordflow">if</span>( <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a1f39ccf658511db2ad00b08325802c51" title="Check for complete varaible definition.">isComplete</a>() ) 
+<a name="l00136"></a>00136     <span class="keywordflow">return</span> out&lt;&lt;m_name&lt;&lt;<span class="stringliteral">&quot;=&quot;</span>&lt;&lt;*m_domain;
+<a name="l00137"></a>00137   <span class="keywordflow">else</span>
+<a name="l00138"></a>00138     <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;&lt;?&quot;</span>&lt;&lt;m_name&lt;&lt;&#39;&gt;<span class="stringliteral">&#39;; </span>
+<a name="l00139"></a>00139 <span class="stringliteral">}</span>
+<a name="l00140"></a>00140 <span class="stringliteral"></span>
+<a name="l00141"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a46a1539abe5ca420376153daadee1b0c">00141</a> <span class="stringliteral">std::ostream &amp;Variable::toXml(std::ostream &amp;out, size_t tabs) const {</span>
+<a name="l00142"></a>00142 <span class="stringliteral">  std::ostream_iterator&lt;char&gt; pad(out);</span>
+<a name="l00143"></a>00143 <span class="stringliteral">  std::fill_n(pad, tabs, &#39;</span> <span class="stringliteral">&#39;);</span>
+<a name="l00144"></a>00144 <span class="stringliteral">  out&lt;&lt;&quot;&lt;Variable name=\&quot;&quot;&lt;&lt;name()&lt;&lt;&quot;\&quot;&quot;;</span>
+<a name="l00145"></a>00145 <span class="stringliteral">  if( !m_domain ) </span>
+<a name="l00146"></a>00146 <span class="stringliteral">    out&lt;&lt;&quot;/&gt;&quot;;</span>
+<a name="l00147"></a>00147 <span class="stringliteral">  else {</span>
+<a name="l00148"></a>00148 <span class="stringliteral">    out&lt;&lt;&quot;&gt;\n&quot;;</span>
+<a name="l00149"></a>00149 <span class="stringliteral">    m_domain-&gt;toXml(out, tabs+1)&lt;&lt;&#39;</span>\n<span class="stringliteral">&#39;;</span>
+<a name="l00150"></a>00150 <span class="stringliteral">    std::fill_n(pad, tabs, &#39;</span> <span class="stringliteral">&#39;);</span>
+<a name="l00151"></a>00151 <span class="stringliteral">    out&lt;&lt;&quot;&lt;/Variable&gt;&quot;;</span>
+<a name="l00152"></a>00152 <span class="stringliteral">  } </span>
+<a name="l00153"></a>00153 <span class="stringliteral">  return out;</span>
+<a name="l00154"></a>00154 <span class="stringliteral">}</span>
+<a name="l00155"></a>00155 <span class="stringliteral"></span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

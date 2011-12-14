@@ -127,8 +127,6 @@ Collaboration diagram for TREX transaction:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Synchronization related exception.  <a href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html">TREX::transaction::TeleoReactor</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> abstract interface.  <a href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d00/classTREX_1_1transaction_1_1TransactionLogger.html">TREX::transaction::TransactionLogger</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Observation/Goal logger.  <a href="../../da/d00/classTREX_1_1transaction_1_1TransactionLogger.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/namespaceTREX_1_1transaction_1_1details.html">TREX::transaction::details</a></td></tr>
 
@@ -204,11 +202,6 @@ Collaboration diagram for TREX transaction:</div>
 <tr><td class="memItemLeft" align="right" valign="top">file &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d4e/Tick_8hh.html">Tick.hh</a></td></tr>
 
 <p><tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>TREX time representation. </p>
-<br/></td></tr>
-</p>
-<tr><td class="memItemLeft" align="right" valign="top">file &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/de8/TransactionLogger_8hh.html">TransactionLogger.hh</a></td></tr>
-
-<p><tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>Definition of reactors transaction logging class. </p>
 <br/></td></tr>
 </p>
 <tr><td colspan="2"><h2>Typedefs</h2></td></tr>
@@ -619,11 +612,22 @@ graph_traits<br class="typebreak"/>
 </dl>
 <p>Indicates the number of reactors mainteind by the graph <code>g</code> </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of reactors in <code>g</code> </dd></dl>
-<dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::graph::count_reactors() const </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">TREX::transaction::graph::count_reactors() const</a> </dd>
 <dd>
 <a class="el" href="../../db/db4/group__transaction.html#ga893310b800c3102fb8fe90632dd7e1f5" title="Graph reactors.">vertices(TREX::transaction::graph const &amp;)</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00340">340</a> of file <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html">bgl_support.hh</a>.</p>
+
+<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00503">TREX::transaction::graph::count_reactors()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../db/db4/group__transaction_ga275618ecd5e5b4db3fc32d1dd2d9fb5c_cgraph.png" border="0" usemap="#db/db4/group__transaction_ga275618ecd5e5b4db3fc32d1dd2d9fb5c_cgraph_map" alt=""></div>
+<map name="db/db4/group__transaction_ga275618ecd5e5b4db3fc32d1dd2d9fb5c_cgraph_map" id="db/db4/group__transaction_ga275618ecd5e5b4db3fc32d1dd2d9fb5c_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors." alt="" coords="351,5,655,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a47958f2d980cded78b04c16804f09102" title="Number of element." alt="" coords="705,5,897,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -815,7 +819,7 @@ source(TREX::transaction::graph::relation_type const &amp;, TREX::transaction::g
 
 <p>Definition at line <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00244">244</a> of file <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html">bgl_support.hh</a>.</p>
 
-<p>References <a class="el" href="../../d6/d8a/Relation_8cc_source.html#l00217">TREX::transaction::Relation::active()</a>, and <a class="el" href="../../d6/d8a/Relation_8cc_source.html#l00235">TREX::transaction::Relation::server()</a>.</p>
+<p>References <a class="el" href="../../d6/d8a/Relation_8cc_source.html#l00220">TREX::transaction::Relation::active()</a>, and <a class="el" href="../../d6/d8a/Relation_8cc_source.html#l00238">TREX::transaction::Relation::server()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -852,18 +856,29 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 <p>Gives access to all the reactors maintined by the graph <code>g</code> </p>
-<dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::graph::reactor_begin() const </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa" title="Beginning reactor iterator.">TREX::transaction::graph::reactor_begin() const</a> </dd>
 <dd>
-TREX::transaction::graph::reactor_end() const </dd>
+<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">TREX::transaction::graph::reactor_end() const</a> </dd>
 <dd>
 <a class="el" href="../../db/db4/group__transaction.html#ga275618ecd5e5b4db3fc32d1dd2d9fb5c" title="Number of reactors.">num_vertices(TREX::transaction::graph const &amp;)</a> </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00321">321</a> of file <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html">bgl_support.hh</a>.</p>
 
+<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00528">TREX::transaction::graph::reactor_begin()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00537">TREX::transaction::graph::reactor_end()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../db/db4/group__transaction_ga893310b800c3102fb8fe90632dd7e1f5_cgraph.png" border="0" usemap="#db/db4/group__transaction_ga893310b800c3102fb8fe90632dd7e1f5_cgraph_map" alt=""></div>
+<map name="db/db4/group__transaction_ga893310b800c3102fb8fe90632dd7e1f5_cgraph_map" id="db/db4/group__transaction_ga893310b800c3102fb8fe90632dd7e1f5_cgraph">
+<area shape="rect" id="node3" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa" title="Beginning reactor iterator." alt="" coords="313,5,607,35"/><area shape="rect" id="node7" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator." alt="" coords="319,59,601,88"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator." alt="" coords="656,5,859,35"/><area shape="rect" id="node9" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator." alt="" coords="663,59,852,88"/></map>
+</div>
+</p>
+
 </div>
 </div>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:41 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:29 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

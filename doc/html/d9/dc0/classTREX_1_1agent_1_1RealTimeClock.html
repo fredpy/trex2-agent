@@ -111,14 +111,18 @@ typedef <br class="typebreak"/>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Compute tick date.  <a href="#a98c7cd40fac98bd743b4aedee26d6c59"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a2812fa34ba6dc2ef1f1a75a73b0dd95a">initialTick</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initial tick.  <a href="#a2812fa34ba6dc2ef1f1a75a73b0dd95a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html#a9eb3223e82374ec2c16da0312c5ffe59">RealTimeClock</a> (rapidxml::xml_node&lt;&gt; const &amp;node)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#a9eb3223e82374ec2c16da0312c5ffe59"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html#ad82711b2d797e667d79a7ae6c7e1a8cb">RealTimeClock</a> (boost::property_tree::ptree::value_type &amp;node)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#ad82711b2d797e667d79a7ae6c7e1a8cb"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html#a3ecbca613e277f50d06b5bfd30291d86">RealTimeClock</a> (double secondsPerTick)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a3ecbca613e277f50d06b5bfd30291d86"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e">sleep</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sleep until next tick.  <a href="#a84d05b64ba45feade7e8d01892beb21e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html#aa7488ceac61df6d3e1b0569ee2f83643">tickDuration</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">tick duration  <a href="#aa7488ceac61df6d3e1b0569ee2f83643"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdcc247176281029a1d08252d1e1c570"></a><!-- doxytag: member="TREX::agent::RealTimeClock::tickToTime" ref="acdcc247176281029a1d08252d1e1c570" args="(TREX::transaction::TICK cur) const " -->
+double&nbsp;</td><td class="memItemRight" valign="bottom"><b>tickToTime</b> (<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a> cur) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7425b0eb007b482c0bbd9d866cbb9e89"></a><!-- doxytag: member="TREX::agent::RealTimeClock::timeToTick" ref="a7425b0eb007b482c0bbd9d866cbb9e89" args="(time_t secs, suseconds_t usecs=0) const " -->
+<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>timeToTick</b> (time_t secs, suseconds_t usecs=0) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98b3a53fb0b8b7dfdda1d6330e078215"></a><!-- doxytag: member="TREX::agent::RealTimeClock::~RealTimeClock" ref="a98b3a53fb0b8b7dfdda1d6330e078215" args="()" -->
 &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html#a98b3a53fb0b8b7dfdda1d6330e078215">~RealTimeClock</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -168,18 +172,18 @@ typedef <br class="typebreak"/>
 <p>Create a new instance with the tick duration set to <em>secondsPerTick</em> </p>
 <dl class="pre"><dt><b>Precondition:</b></dt><dd><em>secondsPerTick</em> should be greater than 0.0 </dd></dl>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00072">72</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00075">75</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9eb3223e82374ec2c16da0312c5ffe59"></a><!-- doxytag: member="TREX::agent::RealTimeClock::RealTimeClock" ref="a9eb3223e82374ec2c16da0312c5ffe59" args="(rapidxml::xml_node&lt;&gt; const &amp;node)" -->
+<a class="anchor" id="ad82711b2d797e667d79a7ae6c7e1a8cb"></a><!-- doxytag: member="TREX::agent::RealTimeClock::RealTimeClock" ref="ad82711b2d797e667d79a7ae6c7e1a8cb" args="(boost::property_tree::ptree::value_type &amp;node)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">RealTimeClock::RealTimeClock </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; const &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>node</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td><code> [explicit]</code></td>
@@ -207,16 +211,16 @@ typedef <br class="typebreak"/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00077">77</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00080">80</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
-<p>References <a class="el" href="../../d0/d92/StringExtract_8hh_source.html#l00121">TREX::utils::string_cast()</a>, and <a class="el" href="../../d5/d68/TimeUtils_8hh_source.html#l00187">TREX::utils::to_timeval()</a>.</p>
+<p>References <a class="el" href="../../d5/d68/TimeUtils_8hh_source.html#l00187">TREX::utils::to_timeval()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
-<div class="center"><img src="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock_a9eb3223e82374ec2c16da0312c5ffe59_cgraph.png" border="0" usemap="#d9/dc0/classTREX_1_1agent_1_1RealTimeClock_a9eb3223e82374ec2c16da0312c5ffe59_cgraph_map" alt=""></div>
-<map name="d9/dc0/classTREX_1_1agent_1_1RealTimeClock_a9eb3223e82374ec2c16da0312c5ffe59_cgraph_map" id="d9/dc0/classTREX_1_1agent_1_1RealTimeClock_a9eb3223e82374ec2c16da0312c5ffe59_cgraph">
-<area shape="rect" id="node3" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type." alt="" coords="381,5,563,35"/><area shape="rect" id="node5" href="../../db/d81/group__utils.html#ga07c6cff84e6c0acf82a32c502d6e9052" title="conversion of a double to a timeval " alt="" coords="383,59,561,88"/></map>
+<div class="center"><img src="../../d9/dc0/classTREX_1_1agent_1_1RealTimeClock_ad82711b2d797e667d79a7ae6c7e1a8cb_cgraph.png" border="0" usemap="#d9/dc0/classTREX_1_1agent_1_1RealTimeClock_ad82711b2d797e667d79a7ae6c7e1a8cb_cgraph_map" alt=""></div>
+<map name="d9/dc0/classTREX_1_1agent_1_1RealTimeClock_ad82711b2d797e667d79a7ae6c7e1a8cb_cgraph_map" id="d9/dc0/classTREX_1_1agent_1_1RealTimeClock_ad82711b2d797e667d79a7ae6c7e1a8cb_cgraph">
+<area shape="rect" id="node3" href="../../db/d81/group__utils.html#ga07c6cff84e6c0acf82a32c502d6e9052" title="conversion of a double to a timeval " alt="" coords="381,5,560,35"/></map>
 </div>
 </p>
 
@@ -247,9 +251,9 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 <p>increase the value of <em>tick</em> by 1</p>
-<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd></dl>
 
-<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00101">TREX::agent::StepClock::getNextTick()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00102">TREX::agent::StepClock::getNextTick()</a>.</p>
 
 </div>
 </div>
@@ -274,9 +278,9 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">71</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00151">TREX::agent::Clock::start()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00159">TREX::agent::Clock::start()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">TREX::agent::Agent::initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -311,7 +315,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b">TREX::agent::Clock</a>.</p>
 
-<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00101">101</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html#l00100">100</a> of file <a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a>.</p>
 
 </div>
 </div>
@@ -401,9 +405,9 @@ void <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af700a1df
 
 <p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">83</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00133">TREX::agent::Clock::getSleepDelay()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00141">TREX::agent::Clock::getSleepDelay()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">TREX::agent::Agent::doNext()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">TREX::agent::Agent::doNext()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -446,7 +450,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../df/dda/RealTimeClock_8cc_source.html">RealTimeClock.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

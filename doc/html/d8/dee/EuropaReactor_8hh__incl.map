@@ -1,10 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d5/d24/DbCore_8hh_source.html" title="DbCore.hh" alt="" coords="321,83,414,112"/>
-<area shape="rect" id="node13" href="$df/d3b/DeliberationFilter_8hh_source.html" title="DeliberationFilter.hh" alt="" coords="524,83,681,112"/>
-<area shape="rect" id="node19" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="837,83,1082,112"/>
-<area shape="rect" id="node5" href="$d3/dd9/Assembly_8hh_source.html" title="Assembly.hh" alt="" coords="461,160,565,189"/>
-<area shape="rect" id="node7" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="512,237,693,267"/>
-<area shape="rect" id="node23" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="896,160,1024,189"/>
-<area shape="rect" id="node27" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="1072,160,1208,189"/>
-<area shape="rect" id="node29" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="1232,160,1378,189"/>
+<area shape="rect" id="node3" href="$d5/d24/DbCore_8hh_source.html" title="DbCore.hh" alt="" coords="263,83,356,112"/>
+<area shape="rect" id="node14" href="$d6/d74/old_2DeliberationFilter_8hh_source.html" title="DeliberationFilter.hh" alt="" coords="613,83,771,112"/>
+<area shape="rect" id="node18" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="908,83,1153,112"/>
+<area shape="rect" id="node5" href="$df/dad/_8old_2old_2Assembly_8hh_source.html" title="Assembly.hh" alt="" coords="5,160,109,189"/>
+<area shape="rect" id="node7" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="56,237,237,267"/>
+<area shape="rect" id="node22" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="877,160,1005,189"/>
+<area shape="rect" id="node26" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="1053,160,1189,189"/>
+<area shape="rect" id="node28" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="1213,160,1360,189"/>
+<area shape="rect" id="node30" href="$d8/deb/reactor__graph_8tcc_source.html" title="bits/reactor_graph.tcc" alt="" coords="1384,160,1555,189"/>
 </map>

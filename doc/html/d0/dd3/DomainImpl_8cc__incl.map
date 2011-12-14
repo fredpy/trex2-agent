@@ -1,6 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node8" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="260,160,391,190"/>
-<area shape="rect" id="node14" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="264,83,408,112"/>
-<area shape="rect" id="node21" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="508,160,671,190"/>
-<area shape="rect" id="node10" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="395,238,520,267"/>
+<area shape="rect" id="node8" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="481,160,612,190"/>
+<area shape="rect" id="node14" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="481,83,625,112"/>
+<area shape="rect" id="node21" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="295,160,457,190"/>
+<area shape="rect" id="node24" href="$d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition" alt="" coords="129,83,305,112"/>
+<area shape="rect" id="node10" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="399,238,524,267"/>
 </map>

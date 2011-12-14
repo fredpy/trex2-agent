@@ -181,8 +181,8 @@ window.onload = initDynSections;
 <a name="l00286"></a>00286                               <span class="keywordtype">bool</span> all=<span class="keyword">true</span>) <span class="keyword">const</span>;
 <a name="l00299"></a>00299       std::ostream &amp;toXml(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs=0) <span class="keyword">const</span>;
 <a name="l00300"></a>00300 
-<a name="l00306"></a>00306       <span class="keyword">typedef</span> <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">TREX::utils::XmlFactory</a>&lt; <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>, 
-<a name="l00307"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ad3e0e7dd3e143ade3e9a38559dfe081a">00307</a>                                    boost::shared_ptr&lt;Predicate&gt; &gt; <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">xml_factory</a>;
+<a name="l00306"></a>00306       <span class="keyword">typedef</span> <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">TREX::utils::XmlFactory</a>&lt; <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>, 
+<a name="l00307"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ad3e0e7dd3e143ade3e9a38559dfe081a">00307</a>                                    boost::shared_ptr&lt;Predicate&gt; &gt; <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">xml_factory</a>;
 <a name="l00308"></a>00308             
 <a name="l00309"></a>00309     <span class="keyword">protected</span>:
 <a name="l00320"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ab62122784fefa2a842e481bdbebd6944">00320</a>       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;obj, 
@@ -193,7 +193,7 @@ window.onload = initDynSections;
 <a name="l00325"></a>00325        <span class="keywordflow">if</span>( pred.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
 <a name="l00326"></a>00326          <span class="keywordflow">throw</span> <a class="code" href="../../d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error.">PredicateException</a>(<span class="stringliteral">&quot;Empty predicate names are not allowed&quot;</span>);  
 <a name="l00327"></a>00327       }
-<a name="l00341"></a>00341       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node);
+<a name="l00341"></a>00341       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(boost::property_tree::ptree::value_type &amp;node);
 <a name="l00347"></a>00347       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a> <span class="keyword">const</span> &amp;other);
 <a name="l00348"></a>00348 
 <a name="l00356"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c">00356</a>       iterator <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute.">find</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) {
@@ -221,7 +221,7 @@ window.onload = initDynSections;
 <a name="l00395"></a>00395 
 <a name="l00396"></a>00396 <span class="preprocessor">#endif // H_Predicate</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

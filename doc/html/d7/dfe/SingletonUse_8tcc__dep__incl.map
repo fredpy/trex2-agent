@@ -1,6 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="236,83,431,112"/>
-<area shape="rect" id="node5" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="5,160,192,189"/>
-<area shape="rect" id="node8" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="240,160,427,189"/>
-<area shape="rect" id="node10" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="308,237,489,267"/>
+<area shape="rect" id="node3" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="583,83,777,112"/>
+<area shape="rect" id="node5" href="$d1/dde/old_2Assembly_8cc_source.html" title="extra/europa.old/Assembly.cc" alt="" coords="5,237,224,267"/>
+<area shape="rect" id="node8" href="$d7/d37/europa_8old_2SchemaPlugin_8hh_source.html" title="extra/europa.old/SchemaPlugin.hh" alt="" coords="717,160,965,189"/>
+<area shape="rect" id="node10" href="$dc/dd8/europa2_2Schema_8cc_source.html" title="extra/europa2/Schema.cc" alt="" coords="272,237,467,267"/>
+<area shape="rect" id="node13" href="$d9/d1b/europa2_2SchemaPlugin_8hh_source.html" title="extra/europa2/SchemaPlugin.hh" alt="" coords="989,160,1224,189"/>
+<area shape="rect" id="node15" href="$d9/d1a/_8old_2Assembly_8cc_source.html" title="extra/europa2.old/Assembly.cc" alt="" coords="515,237,741,267"/>
+<area shape="rect" id="node18" href="$d4/d58/europa2_8old_2SchemaPlugin_8hh_source.html" title="extra/europa2.old/SchemaPlugin.hh" alt="" coords="1248,160,1504,189"/>
+<area shape="rect" id="node20" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="1528,160,1715,189"/>
+<area shape="rect" id="node23" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="405,160,592,189"/>
+<area shape="rect" id="node28" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="789,237,971,267"/>
 </map>

@@ -76,7 +76,8 @@ window.onload = initDynSections;
 <p>Helpers for xml manipulation.  
 <a href="#_details">More...</a></p>
 <code>#include &lt;boost/shared_ptr.hpp&gt;</code><br/>
-<code>#include &lt;rapidxml/rapidxml_utils.hpp&gt;</code><br/>
+<code>#include &lt;boost/property_tree/ptree.hpp&gt;</code><br/>
+<code>#include &lt;boost/property_tree/xml_parser.hpp&gt;</code><br/>
 <code>#include &quot;<a class="el" href="../../d0/d92/StringExtract_8hh_source.html">StringExtract.hh</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="../../d7/dcf/Exception_8hh_source.html">Exception.hh</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="../../d1/d5d/LogManager_8hh_source.html">LogManager.hh</a>&quot;</code><br/>
@@ -85,21 +86,22 @@ Include dependency graph for XmlUtils.hh:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d8/d12/XmlUtils_8hh__incl.png" border="0" usemap="#trex_2utils_2XmlUtils_8hh_map" alt=""/></div>
 <map name="trex_2utils_2XmlUtils_8hh_map" id="trex_2utils_2XmlUtils_8hh">
-<area shape="rect" id="node7" href="../../d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="416,83,549,112"/><area shape="rect" id="node13" href="../../d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="981,237,1091,267"/><area shape="rect" id="node19" href="../../d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="653,83,776,112"/><area shape="rect" id="node17" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1037,315,1171,344"/><area shape="rect" id="node23" href="../../d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="504,160,600,189"/><area shape="rect" id="node26" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="691,160,819,189"/><area shape="rect" id="node28" href="../../d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="843,160,949,189"/><area shape="rect" id="node31" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="973,160,1099,189"/></map>
+<area shape="rect" id="node9" href="../../d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="731,83,864,112"/><area shape="rect" id="node15" href="../../d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1296,237,1405,267"/><area shape="rect" id="node21" href="../../d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="968,83,1091,112"/><area shape="rect" id="node19" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1352,315,1485,344"/><area shape="rect" id="node25" href="../../d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="819,160,915,189"/><area shape="rect" id="node28" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1005,160,1133,189"/><area shape="rect" id="node30" href="../../d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1157,160,1264,189"/><area shape="rect" id="node33" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1288,160,1413,189"/></map>
 </div>
 <div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d1/d3f/XmlUtils_8hh__dep__incl.png" border="0" usemap="#trex_2utils_2XmlUtils_8hhdep_map" alt=""/></div>
 <map name="trex_2utils_2XmlUtils_8hhdep_map" id="trex_2utils_2XmlUtils_8hhdep">
-<area shape="rect" id="node3" href="../../d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="5,83,165,112"/></map>
+<area shape="rect" id="node3" href="../../d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="5,83,208,112"/><area shape="rect" id="node5" href="../../d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="232,83,392,112"/></map>
 </div>
 
 <p><a href="../../d5/d41/XmlUtils_8hh_source.html">Go to the source code of this file.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Classes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">TREX::utils::ext_iterator</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML nodes iterator through files.  <a href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dcf/structTREX_1_1utils_1_1internals_1_1attr__helper.html">TREX::utils::internals::attr_helper&lt; Ty &gt;</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribibute parsing helper.  <a href="../../df/dcf/structTREX_1_1utils_1_1internals_1_1attr__helper.html#_details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d8d/structTREX_1_1utils_1_1internals_1_1attr__helper_3_01boost_1_1optional_3_01Ty_01_4_01_4.html">TREX::utils::internals::attr_helper&lt; boost::optional&lt; Ty &gt; &gt;</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html">TREX::utils::XmlError</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing related errors.  <a href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Namespaces</h2></td></tr>
@@ -108,20 +110,36 @@ This graph shows which files directly or indirectly include this file:</div>
 <p><tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>TREX basic utilities. </p>
 <br/></td></tr>
 </p>
+<tr><td class="memItemLeft" align="right" valign="top">namespace &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d63/namespaceTREX_1_1utils_1_1internals.html">TREX::utils::internals</a></td></tr>
+
+<p><tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><p>utils internals </p>
+<br/></td></tr>
+</p>
 <tr><td colspan="2"><h2>Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">TREX::utils::is_tag</a> (rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;tag)</td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga1f80888fbf81f21d542f8c027b40c658">TREX::utils::parse_attr</a> (Ty const &amp;on_missing, rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;attr)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Optional XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga1f80888fbf81f21d542f8c027b40c658"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b">TREX::utils::parse_attr</a> (rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;attr)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a68d5e331477f1c4b4d943ebe9c8dcfc5"></a><!-- doxytag: member="XmlUtils.hh::xml_conf_var" ref="a68d5e331477f1c4b4d943ebe9c8dcfc5" args="(ext_iterator const &amp;conf, std::string const &amp;tag, Ty const &amp;on_missing)" -->
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab7a487c65eaffe7265598241cfb76be1"></a><!-- doxytag: member="XmlUtils.hh::ext_xml" ref="ab7a487c65eaffe7265598241cfb76be1" args="(boost::property_tree::ptree &amp;tree, std::string const &amp;conf, bool ahead=true)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>TREX::utils::ext_xml</b> (boost::property_tree::ptree &amp;tree, std::string const &amp;conf, bool ahead=true)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga3f53b52b07b15188ea2d94b36ba9f096">TREX::utils::is_tag</a> (boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;tag)</td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="aa764e59b405f6bca6202653122be1808"></a><!-- doxytag: member="XmlUtils.hh::parse_attr" ref="aa764e59b405f6bca6202653122be1808" args="(Ty const &amp;on_missing, boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)" -->
 template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>TREX::utils::xml_conf_var</b> (ext_iterator const &amp;conf, std::string const &amp;tag, Ty const &amp;on_missing)</td></tr>
-<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a028c1f7773896775b8af129cb590e91a"></a><!-- doxytag: member="XmlUtils.hh::xml_conf_var" ref="a028c1f7773896775b8af129cb590e91a" args="(ext_iterator const &amp;conf, std::string const &amp;tag)" -->
-template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>TREX::utils::xml_conf_var</b> (ext_iterator const &amp;conf, std::string const &amp;tag)</td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>TREX::utils::parse_attr</b> (Ty const &amp;on_missing, boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga87a8c1d25dac7ed849964394daf33a23">TREX::utils::parse_attr</a> (Ty const &amp;on_missing, boost::property_tree::ptree const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Optional XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga87a8c1d25dac7ed849964394daf33a23"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a6f90128dfea89c0817624b4924bee239"></a><!-- doxytag: member="XmlUtils.hh::set_attr" ref="a6f90128dfea89c0817624b4924bee239" args="(boost::property_tree::ptree::value_type &amp;node, std::string const &amp;attr, Ty const &amp;value)" -->
+template&lt;typename Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>TREX::utils::set_attr</b> (boost::property_tree::ptree::value_type &amp;node, std::string const &amp;attr, Ty const &amp;value)</td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="aebde850cd75b15a1304f1c9f7e0267ef"></a><!-- doxytag: member="XmlUtils.hh::set_attr" ref="aebde850cd75b15a1304f1c9f7e0267ef" args="(boost::property_tree::ptree &amp;node, std::string const &amp;attr, Ty const &amp;value)" -->
+template&lt;typename Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>TREX::utils::set_attr</b> (boost::property_tree::ptree &amp;node, std::string const &amp;attr, Ty const &amp;value)</td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpd41d8cd98f00b204e9800998ecf8427e"></a> </p>
+</div></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../d1/d0b/namespaceTREX_1_1utils.html#a93c6c3430226053f8d7244a441c48c1f">TREX::utils::parse_attr</a> (boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="#a93c6c3430226053f8d7244a441c48c1f"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91">TREX::utils::parse_attr</a> (boost::property_tree::ptree const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Helpers for xml manipulation. </p>
@@ -130,7 +148,7 @@ template&lt;class Ty &gt; </td></tr>
 
 <p>Definition in file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:28 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -75,21 +75,30 @@ window.onload = initDynSections;
 </dl>
 <p><a class="anchor" id="_bug000002"></a> </p>
 <dl>
+<dt>Class <a class="el" href="../../d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html">TREX::europa::EuropaProxy</a>  </dt>
+<dd><p class="startdd">Many of the methods here are actually doinfg the domain conversion under the hood and it may be worthwhile to cache such conversion instead of doing it every time one of these call is made.</p>
+<p></p>
+<p>Many of the methods here are actually doinfg the domain conversion under the hood and it may be worthwhile to cache such conversion instead of doing it every time one of these call is made.</p>
+<p class="enddd"></p>
+</dd>
+</dl>
+<p><a class="anchor" id="_bug000004"></a> </p>
+<dl>
 <dt>Member <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251">TREX::transaction::TeleoReactor::handleInit</a> () </dt>
 <dd>this function is blocking and while it is usuaally called before the clock of the agent got started if the reactor is created at the beginning of the mission. it won't be the case for a reactor created on the fly which may be problematic if the calls takes too long in comparison of the tick duration. </dd>
 </dl>
-<p><a class="anchor" id="_bug000005"></a> </p>
+<p><a class="anchor" id="_bug000009"></a> </p>
 <dl>
 <dt>Member <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a0ef14756bd6abae9a18d15084ecf670eaa76ea4c239c54fc0d941f46c10eec361">TREX::utils::RStat::children</a>  </dt>
 <dd>As said in the man page of <code>getrusage</code> : <em>"There is no way to obtain information about
  a child process that has not yet terminated."</em> </dd>
 </dl>
-<p><a class="anchor" id="_bug000004"></a> </p>
+<p><a class="anchor" id="_bug000008"></a> </p>
 <dl>
 <dt>Member <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ad84da41814c33e0b146082a32c57b1e5">TREX::utils::RStat::max_resident</a> () const  </dt>
 <dd>This information is not updated in real-time by the system. The update rate of your OS can be found using the command : </dd>
 </dl>
-<p><a class="anchor" id="_bug000003"></a> </p>
+<p><a class="anchor" id="_bug000007"></a> </p>
 <dl>
 <dt>Class <a class="el" href="../../da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html">TREX::utils::SingletonWrapper&lt; Ty &gt;</a>  </dt>
 <dd><p class="startdd">There's a potential issue with dynamic library loading on certain platforms. The resolution would be potentially to use <code>boost::flyweight</code> with <code>intermodule_holder</code> as in the BasicSymbol class. But as for now it appears to work and I don't know really how to reimplement this class and still have some guarantees that I can somehow guarantee that no intermediate class would be created.</p>
@@ -97,7 +106,7 @@ window.onload = initDynSections;
 </dd>
 </dl>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:28 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

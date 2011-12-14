@@ -157,7 +157,7 @@ template&lt;class Ty&gt; </div>
 <div class="memdoc">
 
 <p>Scoped variable locking type. </p>
-<p>This type cvan be used to locally lock one <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> based in a C++ scope. A new instance of this class will lock the mutex associated to the <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> during its whiole lifetime and release the mutex on its destruction.</p>
+<p>This type can be used to locally lock one <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> based in a C++ scope. A new instance of this class will lock the mutex associated to the <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> during its whiole lifetime and release the mutex on its destruction.</p>
 <p>This provide a simple, exception safe, way to lock a <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> during a critical section while avoiding to have it remains locked in the eventuality of an exception.</p>
 <p>For example on can implement the function <code>getval(SharedVar const &amp;)</code> that returns the value of a <a class="el" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="multi-thread shared variable">SharedVar</a> like this: </p>
 <div class="fragment"><pre class="fragment"> <span class="keyword">template</span>&lt;<span class="keyword">class</span> Ty&gt;
@@ -509,7 +509,7 @@ template&lt;class Ty&gt; </div>
 <li>trex/utils/<a class="el" href="../../d6/d15/SharedVar_8hh_source.html">SharedVar.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

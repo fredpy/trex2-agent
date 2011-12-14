@@ -1,5 +1,6 @@
 <map id="G" name="G">
 <area shape="rect" id="node3" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick." alt="" coords="377,5,735,35"/>
-<area shape="rect" id="node5" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82" title="reactor latency" alt="" coords="388,59,724,88"/>
-<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802" title="Check if need to deliberate." alt="" coords="400,112,712,141"/>
+<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82" title="reactor latency" alt="" coords="388,59,724,88"/>
+<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802" title="Check if need to deliberate." alt="" coords="400,112,712,141"/>
+<area shape="rect" id="node5" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick" alt="" coords="784,5,1088,35"/>
 </map>

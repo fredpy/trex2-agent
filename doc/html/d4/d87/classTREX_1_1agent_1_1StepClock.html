@@ -115,12 +115,16 @@ typedef <br class="typebreak"/>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Change maximum number of steps for this tick.  <a href="#adc12873b6c5585046f38fdb5ef3d0f27"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a84d05b64ba45feade7e8d01892beb21e">sleep</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sleep until next tick.  <a href="#a84d05b64ba45feade7e8d01892beb21e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aa58f65660ed23f663e3124d7d73a0f11">StepClock</a> (rapidxml::xml_node&lt;&gt; const &amp;node)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#aa58f65660ed23f663e3124d7d73a0f11"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#a129d8731ddc5f2dd18e6196354275200">StepClock</a> (boost::property_tree::ptree::value_type &amp;node)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#a129d8731ddc5f2dd18e6196354275200"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70">StepClock</a> (double sleepSeconds, unsigned int stepsPerTick)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#ab71b318fae5a417cd165823211385d70"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#aeff145fea225d5073d22ce9e8a0807e1">tickDuration</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">tick duration  <a href="#aeff145fea225d5073d22ce9e8a0807e1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33448197bb0b5d157d0649d1fa768a49"></a><!-- doxytag: member="TREX::agent::StepClock::tickToTime" ref="a33448197bb0b5d157d0649d1fa768a49" args="(TREX::transaction::TICK cur) const " -->
+virtual double&nbsp;</td><td class="memItemRight" valign="bottom"><b>tickToTime</b> (<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a> cur) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b353e9d3cf4a560d122b1a7be2c08e9"></a><!-- doxytag: member="TREX::agent::StepClock::timeToTick" ref="a0b353e9d3cf4a560d122b1a7be2c08e9" args="(time_t secs, suseconds_t usecs=0) const " -->
+virtual <a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TREX::transaction::TICK</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>timeToTick</b> (time_t secs, suseconds_t usecs=0) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba0328ec2dfccaf9048c3e873cdc395a"></a><!-- doxytag: member="TREX::agent::StepClock::~StepClock" ref="aba0328ec2dfccaf9048c3e873cdc395a" args="()" -->
 &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aba0328ec2dfccaf9048c3e873cdc395a">~StepClock</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -183,18 +187,18 @@ typedef <br class="typebreak"/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00089">89</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00090">90</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa58f65660ed23f663e3124d7d73a0f11"></a><!-- doxytag: member="TREX::agent::StepClock::StepClock" ref="aa58f65660ed23f663e3124d7d73a0f11" args="(rapidxml::xml_node&lt;&gt; const &amp;node)" -->
+<a class="anchor" id="a129d8731ddc5f2dd18e6196354275200"></a><!-- doxytag: member="TREX::agent::StepClock::StepClock" ref="a129d8731ddc5f2dd18e6196354275200" args="(boost::property_tree::ptree::value_type &amp;node)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">StepClock::StepClock </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; const &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>node</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -221,7 +225,7 @@ typedef <br class="typebreak"/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00095">95</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00096">96</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
 
 </div>
 </div>
@@ -250,9 +254,9 @@ typedef <br class="typebreak"/>
   </dd>
 </dl>
 <p>increase the value of <em>tick</em> by 1</p>
-<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd></dl>
 
-<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00101">getNextTick()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00102">getNextTick()</a>.</p>
 
 </div>
 </div>
@@ -277,9 +281,9 @@ typedef <br class="typebreak"/>
 
 <p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">71</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00151">TREX::agent::Clock::start()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00159">TREX::agent::Clock::start()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00383">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">TREX::agent::Agent::initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -313,7 +317,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a7650f3e50a6837993cc4f9b4b916b35b">TREX::agent::Clock</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00101">101</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00102">102</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
 
 <p>References <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d">TREX::agent::Clock::advanceTick()</a>.</p>
 
@@ -347,7 +351,7 @@ Here is the call graph for this function:</div>
 <p>This method indicates how much time is left before the next tick</p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>time left before next tick </dd></dl>
 
-<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00133">133</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00141">141</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">TREX::agent::Clock::sleep()</a>.</p>
 
@@ -401,7 +405,7 @@ Here is the call graph for this function:</div>
 <dl class="pre"><dt><b>Precondition:</b></dt><dd>nSteps is greater than 0</dd></dl>
 <p>Change the maximum number of steps for current tick to <em>nSteps</em> and reset the number of steps used to 0. </p>
 
-<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00113">113</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dba/StepClock_8cc_source.html#l00114">114</a> of file <a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a>.</p>
 
 </div>
 </div>
@@ -469,9 +473,9 @@ void <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af700a1df
 
 <p>Definition at line <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00083">83</a> of file <a class="el" href="../../d1/d6e/Clock_8cc_source.html">Clock.cc</a>.</p>
 
-<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00133">TREX::agent::Clock::getSleepDelay()</a>.</p>
+<p>References <a class="el" href="../../de/d89/Clock_8hh_source.html#l00141">TREX::agent::Clock::getSleepDelay()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00469">TREX::agent::Agent::doNext()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">TREX::agent::Agent::doNext()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -503,7 +507,7 @@ Here is the call graph for this function:</div>
 <p>This method is called internally by <code>doStart</code> to allow specialized initialization before starting the clock.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd>void <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock.">doStart()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00151">151</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00159">159</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d1/d6e/Clock_8cc_source.html#l00071">TREX::agent::Clock::doStart()</a>.</p>
 
@@ -532,6 +536,8 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../de/d89/Clock_8hh_source.html#l00098">98</a> of file <a class="el" href="../../de/d89/Clock_8hh_source.html">Clock.hh</a>.</p>
 
+<p>Referenced by <a class="el" href="../../d8/d62/Agent_8hh_source.html#l00353">TREX::agent::Agent::tickDuration()</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
@@ -539,7 +545,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../d3/dba/StepClock_8cc_source.html">StepClock.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

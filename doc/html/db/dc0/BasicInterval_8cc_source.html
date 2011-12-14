@@ -109,60 +109,59 @@ window.onload = initDynSections;
 <a name="l00041"></a>00041 <span class="preprocessor">#include &quot;<a class="code" href="../../dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor.">DomainVisitor.hh</a>&quot;</span>
 <a name="l00042"></a>00042 
 <a name="l00043"></a>00043 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <span class="comment">// modifiers </span>
-<a name="l00046"></a>00046 
-<a name="l00047"></a>00047 <span class="keywordtype">void</span> BasicInterval::completeParsing(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) {
-<a name="l00048"></a>00048   rapidxml::xml_attribute&lt;&gt; *attr = node.first_attribute(<span class="stringliteral">&quot;min&quot;</span>);
-<a name="l00049"></a>00049   <span class="keywordflow">if</span>( NULL!=attr ) {
-<a name="l00050"></a>00050     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
-<a name="l00051"></a>00051     parseLower(tmp);
-<a name="l00052"></a>00052   }
-<a name="l00053"></a>00053   attr = node.first_attribute(<span class="stringliteral">&quot;max&quot;</span>);
-<a name="l00054"></a>00054   <span class="keywordflow">if</span>( NULL!=attr ) {
-<a name="l00055"></a>00055     std::string tmp(attr-&gt;value(), attr-&gt;value_size());
-<a name="l00056"></a>00056     parseUpper(tmp);
-<a name="l00057"></a>00057   }
-<a name="l00058"></a>00058 }
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060 <span class="comment">// observers </span>
-<a name="l00061"></a>00061     
-<a name="l00062"></a>00062 std::string BasicInterval::getStringLower()<span class="keyword"> const </span>{
-<a name="l00063"></a>00063   std::ostringstream oss;
-<a name="l00064"></a>00064   print_lower(oss);
-<a name="l00065"></a>00065   <span class="keywordflow">return</span> oss.str();
-<a name="l00066"></a>00066 }
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068 std::string BasicInterval::getStringUpper()<span class="keyword"> const </span>{
-<a name="l00069"></a>00069   std::ostringstream oss;
-<a name="l00070"></a>00070   print_upper(oss);
-<a name="l00071"></a>00071   <span class="keywordflow">return</span> oss.str();
-<a name="l00072"></a>00072 }
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074 std::ostream &amp;BasicInterval::print_domain(std::ostream &amp;out)<span class="keyword"> const </span>{
-<a name="l00075"></a>00075   <span class="keywordflow">if</span>( <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a73e06a2475cda8bc5f77c1aeb864ca61" title="check for singleton value">isSingleton</a>() ) 
-<a name="l00076"></a>00076     <span class="keywordflow">return</span> print_lower(out);
-<a name="l00077"></a>00077   <span class="keywordflow">else</span>
-<a name="l00078"></a>00078     <span class="keywordflow">return</span> print_upper(print_lower(out&lt;&lt;<span class="charliteral">&#39;[&#39;</span>)&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>)&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
-<a name="l00079"></a>00079 }
-<a name="l00080"></a>00080 
-<a name="l00081"></a><a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d">00081</a> std::ostream &amp;<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d" title="XML conversion.">BasicInterval::toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
-<a name="l00082"></a>00082   std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
-<a name="l00083"></a>00083   out&lt;&lt;<span class="charliteral">&#39;&lt;&#39;</span>&lt;&lt;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>();
-<a name="l00084"></a>00084   <span class="keywordflow">if</span>( hasLower() )
-<a name="l00085"></a>00085     print_lower(out&lt;&lt;<span class="stringliteral">&quot; min=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
-<a name="l00086"></a>00086   <span class="keywordflow">if</span>( hasUpper() )
-<a name="l00087"></a>00087     print_upper(out&lt;&lt;<span class="stringliteral">&quot; max=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
-<a name="l00088"></a>00088   <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
-<a name="l00089"></a>00089 }
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091 <span class="comment">// manipulators</span>
-<a name="l00092"></a>00092 
-<a name="l00093"></a>00093 <span class="keywordtype">void</span> BasicInterval::accept(<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html" title="abstract domain visitor interface">DomainVisitor</a> &amp;visitor)<span class="keyword"> const </span>{
-<a name="l00094"></a>00094   <span class="keywordflow">return</span> visitor.<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html#a32821df4841468855179fa563921695a" title="Enumerated domain visit.">visit</a>(<span class="keyword">this</span>);
-<a name="l00095"></a>00095 }
+<a name="l00044"></a>00044 <span class="keyword">namespace </span>bpt=boost::property_tree;
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 <span class="comment">// modifiers </span>
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048 <span class="keywordtype">void</span> BasicInterval::completeParsing(bpt::ptree::value_type &amp;node) {
+<a name="l00049"></a>00049   boost::optional&lt; std::string &gt;
+<a name="l00050"></a>00050     lo = TREX::utils::parse_attr&lt; boost::optional&lt;std::string&gt; &gt;(node.second, <span class="stringliteral">&quot;min&quot;</span>),
+<a name="l00051"></a>00051     hi = <a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">TREX::utils::parse_attr</a>&lt; boost::optional&lt;std::string&gt; &gt;(node.second, <span class="stringliteral">&quot;max&quot;</span>);
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053   <span class="keywordflow">if</span>( lo ) 
+<a name="l00054"></a>00054     parseLower(*lo);
+<a name="l00055"></a>00055   <span class="keywordflow">if</span>( hi )
+<a name="l00056"></a>00056     parseUpper(*hi);
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <span class="comment">// observers </span>
+<a name="l00060"></a>00060     
+<a name="l00061"></a>00061 std::string BasicInterval::getStringLower()<span class="keyword"> const </span>{
+<a name="l00062"></a>00062   std::ostringstream oss;
+<a name="l00063"></a>00063   print_lower(oss);
+<a name="l00064"></a>00064   <span class="keywordflow">return</span> oss.str();
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 std::string BasicInterval::getStringUpper()<span class="keyword"> const </span>{
+<a name="l00068"></a>00068   std::ostringstream oss;
+<a name="l00069"></a>00069   print_upper(oss);
+<a name="l00070"></a>00070   <span class="keywordflow">return</span> oss.str();
+<a name="l00071"></a>00071 }
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073 std::ostream &amp;BasicInterval::print_domain(std::ostream &amp;out)<span class="keyword"> const </span>{
+<a name="l00074"></a>00074   <span class="keywordflow">if</span>( <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a73e06a2475cda8bc5f77c1aeb864ca61" title="check for singleton value">isSingleton</a>() ) 
+<a name="l00075"></a>00075     <span class="keywordflow">return</span> print_lower(out);
+<a name="l00076"></a>00076   <span class="keywordflow">else</span>
+<a name="l00077"></a>00077     <span class="keywordflow">return</span> print_upper(print_lower(out&lt;&lt;<span class="charliteral">&#39;[&#39;</span>)&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>)&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
+<a name="l00078"></a>00078 }
+<a name="l00079"></a>00079 
+<a name="l00080"></a><a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d">00080</a> std::ostream &amp;<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d" title="XML conversion.">BasicInterval::toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
+<a name="l00081"></a>00081   std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
+<a name="l00082"></a>00082   out&lt;&lt;<span class="charliteral">&#39;&lt;&#39;</span>&lt;&lt;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>();
+<a name="l00083"></a>00083   <span class="keywordflow">if</span>( hasLower() )
+<a name="l00084"></a>00084     print_lower(out&lt;&lt;<span class="stringliteral">&quot; min=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
+<a name="l00085"></a>00085   <span class="keywordflow">if</span>( hasUpper() )
+<a name="l00086"></a>00086     print_upper(out&lt;&lt;<span class="stringliteral">&quot; max=\&quot;&quot;</span>)&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
+<a name="l00087"></a>00087   <span class="keywordflow">return</span> out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
+<a name="l00088"></a>00088 }
+<a name="l00089"></a>00089 
+<a name="l00090"></a>00090 <span class="comment">// manipulators</span>
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 <span class="keywordtype">void</span> BasicInterval::accept(<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html" title="abstract domain visitor interface">DomainVisitor</a> &amp;visitor)<span class="keyword"> const </span>{
+<a name="l00093"></a>00093   <span class="keywordflow">return</span> visitor.<a class="code" href="../../d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html#a32821df4841468855179fa563921695a" title="Enumerated domain visit.">visit</a>(<span class="keyword">this</span>);
+<a name="l00094"></a>00094 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

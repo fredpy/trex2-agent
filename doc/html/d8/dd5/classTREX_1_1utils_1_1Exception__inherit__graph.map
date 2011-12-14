@@ -1,23 +1,24 @@
 <map id="G" name="G">
 <area shape="rect" id="node9" href="$dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error." alt="" coords="667,32,904,61"/>
-<area shape="rect" id="node13" href="$db/d3a/classTREX_1_1transaction_1_1DomainExcept.html" title="Empty domain." alt="" coords="659,112,912,141"/>
-<area shape="rect" id="node19" href="$dd/dcc/classTREX_1_1transaction_1_1GraphException.html" title="Graph Exception." alt="" coords="655,165,916,195"/>
-<area shape="rect" id="node27" href="$d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error." alt="" coords="641,219,929,248"/>
-<area shape="rect" id="node29" href="$d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception." alt="" coords="648,272,923,301"/>
-<area shape="rect" id="node31" href="$d5/d56/classTREX_1_1utils_1_1AccessExcept.html" title="Bad access exception." alt="" coords="684,325,887,355"/>
-<area shape="rect" id="node33" href="$d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html" title="errno handling exception" alt="" coords="691,379,880,408"/>
-<area shape="rect" id="node35" href="$d8/d78/classTREX_1_1utils_1_1FactoryException.html" title="generic Factory exception" alt="" coords="673,432,897,461"/>
-<area shape="rect" id="node41" href="$d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error." alt="" coords="697,485,873,515"/>
-<area shape="rect" id="node43" href="$d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors." alt="" coords="704,539,867,568"/>
-<area shape="rect" id="node2" title="STL class." alt="" coords="199,272,345,301"/>
-<area shape="rect" id="node4" title="STL class." alt="" coords="5,272,128,301"/>
-<area shape="rect" id="node6" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="177,325,367,355"/>
-<area shape="rect" id="node11" href="$d0/deb/classTREX_1_1europa_1_1TokenError.html" title="Token related error." alt="" coords="1021,5,1216,35"/>
-<area shape="rect" id="node15" href="$d0/d85/classTREX_1_1transaction_1_1DomainAccess.html" title="domain access error" alt="" coords="992,59,1245,88"/>
-<area shape="rect" id="node17" href="$d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain." alt="" coords="993,112,1244,141"/>
-<area shape="rect" id="node21" href="$d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception." alt="" coords="1005,165,1232,195"/>
-<area shape="rect" id="node23" href="$d7/d2a/classTREX_1_1transaction_1_1MultipleReactors.html" title="Conflicting reactor names." alt="" coords="984,219,1253,248"/>
-<area shape="rect" id="node25" href="$d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception." alt="" coords="980,272,1257,301"/>
-<area shape="rect" id="node37" href="$d1/d0d/classTREX_1_1utils_1_1MultipleFactoryDecl.html" title="Multiple producers declaration." alt="" coords="999,405,1239,435"/>
-<area shape="rect" id="node39" href="$dc/ddf/classTREX_1_1utils_1_1UnknownFactoryType.html" title="Unknown producer ID." alt="" coords="995,459,1243,488"/>
+<area shape="rect" id="node20" href="$db/d3a/classTREX_1_1transaction_1_1DomainExcept.html" title="Empty domain." alt="" coords="659,85,912,114"/>
+<area shape="rect" id="node26" href="$dd/dcc/classTREX_1_1transaction_1_1GraphException.html" title="Graph Exception." alt="" coords="655,138,916,168"/>
+<area shape="rect" id="node34" href="$d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error." alt="" coords="641,192,929,221"/>
+<area shape="rect" id="node36" href="$d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception." alt="" coords="648,245,923,274"/>
+<area shape="rect" id="node38" href="$d5/d56/classTREX_1_1utils_1_1AccessExcept.html" title="Bad access exception." alt="" coords="684,298,887,328"/>
+<area shape="rect" id="node40" href="$d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html" title="errno handling exception" alt="" coords="691,352,880,381"/>
+<area shape="rect" id="node42" href="$d8/d78/classTREX_1_1utils_1_1FactoryException.html" title="generic Factory exception" alt="" coords="673,405,897,434"/>
+<area shape="rect" id="node48" href="$d1/d83/classTREX_1_1utils_1_1PluginError.html" title="Plugin management related error." alt="" coords="697,458,873,488"/>
+<area shape="rect" id="node50" href="$d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors." alt="" coords="704,512,867,541"/>
+<area shape="rect" id="node52" href="$d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html" title="TREX::witre::WitreServer::Error" alt="" coords="668,565,903,594"/>
+<area shape="rect" id="node2" title="STL class." alt="" coords="199,165,345,194"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="5,165,128,194"/>
+<area shape="rect" id="node6" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="177,218,367,248"/>
+<area shape="rect" id="node11" href="$d0/deb/classTREX_1_1europa_1_1TokenError.html" title="Token related error." alt="" coords="1021,32,1216,61"/>
+<area shape="rect" id="node22" href="$d0/d85/classTREX_1_1transaction_1_1DomainAccess.html" title="domain access error" alt="" coords="992,85,1245,114"/>
+<area shape="rect" id="node24" href="$d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain." alt="" coords="993,138,1244,168"/>
+<area shape="rect" id="node28" href="$d0/d02/classTREX_1_1agent_1_1AgentException.html" title="Agent related exception." alt="" coords="1005,192,1232,221"/>
+<area shape="rect" id="node30" href="$d7/d2a/classTREX_1_1transaction_1_1MultipleReactors.html" title="Conflicting reactor names." alt="" coords="984,245,1253,274"/>
+<area shape="rect" id="node32" href="$d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception." alt="" coords="980,298,1257,328"/>
+<area shape="rect" id="node44" href="$d1/d0d/classTREX_1_1utils_1_1MultipleFactoryDecl.html" title="Multiple producers declaration." alt="" coords="999,378,1239,408"/>
+<area shape="rect" id="node46" href="$dc/ddf/classTREX_1_1utils_1_1UnknownFactoryType.html" title="Unknown producer ID." alt="" coords="995,432,1243,461"/>
 </map>

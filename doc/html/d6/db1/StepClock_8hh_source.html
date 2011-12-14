@@ -119,7 +119,7 @@ window.onload = initDynSections;
 <a name="l00068"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html">00068</a>     <span class="keyword">class </span><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html" title="Step based pseudo clock.">StepClock</a> :<span class="keyword">public</span> <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> {
 <a name="l00069"></a>00069     <span class="keyword">public</span>:
 <a name="l00074"></a>00074       <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock</a>(<span class="keywordtype">double</span> sleepSeconds, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick);
-<a name="l00091"></a>00091       <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node);
+<a name="l00091"></a>00091       <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock</a>(boost::property_tree::ptree::value_type &amp;node);
 <a name="l00093"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aba0328ec2dfccaf9048c3e873cdc395a">00093</a>       <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aba0328ec2dfccaf9048c3e873cdc395a" title="Destructor.">~StepClock</a>() {}
 <a name="l00094"></a>00094 
 <a name="l00105"></a>00105       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a" title="get current tick date This method advances the number of steps used in current tick...">getNextTick</a>();
@@ -127,7 +127,7 @@ window.onload = initDynSections;
 <a name="l00114"></a>00114 
 <a name="l00115"></a>00115     <span class="keyword">private</span>:
 <a name="l00121"></a>00121       <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> selectStep(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick);
-<a name="l00131"></a>00131       <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> parseStep(rapidxml::xml_attribute&lt;&gt; *steps);
+<a name="l00131"></a>00131       <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> parseStep(boost::property_tree::ptree &amp;steps);
 <a name="l00132"></a>00132 
 <a name="l00134"></a>00134       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> m_tick;
 <a name="l00136"></a>00136       <span class="keyword">mutable</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> m_currentStep;
@@ -141,7 +141,7 @@ window.onload = initDynSections;
 <a name="l00147"></a>00147 
 <a name="l00148"></a>00148 <span class="preprocessor">#endif // H_StepClock</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

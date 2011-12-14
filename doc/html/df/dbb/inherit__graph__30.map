@@ -1,3 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$da/d00/classTREX_1_1transaction_1_1TransactionLogger.html" title="Observation/Goal logger." alt="" coords="7,5,284,35"/>
+<area shape="rect" id="node1" href="$d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html" title="Reactor specifi constraint." alt="" coords="5,32,256,61"/>
+<area shape="rect" id="node3" href="$d3/d09/classTREX_1_1europa_1_1CheckExternal.html" title="Check if External." alt="" coords="305,5,527,35"/>
+<area shape="rect" id="node5" href="$db/d52/classTREX_1_1europa_1_1CheckInternal.html" title="Check if Internal." alt="" coords="307,59,525,88"/>
 </map>

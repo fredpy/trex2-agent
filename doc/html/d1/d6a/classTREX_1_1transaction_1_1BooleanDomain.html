@@ -106,8 +106,8 @@ Collaboration diagram for TREX::transaction::BooleanDomain:</div>
 boost::shared_ptr&lt; <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html">DomainBase</a> &gt; &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a839ea5f2da93a1008811ecf3a6275a0f">xml_factory</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing factory for domains.  <a href="#a839ea5f2da93a1008811ecf3a6275a0f"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a5ee79b31bcac27449e9840e9cbfeee61">BooleanDomain</a> (rapidxml::xml_node&lt;&gt; const &amp;node)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a5ee79b31bcac27449e9840e9cbfeee61"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a096bac028eb27212ea8598872dd83754">BooleanDomain</a> (boost::property_tree::ptree::value_type &amp;node)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a096bac028eb27212ea8598872dd83754"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a7f8ab3cc9c7d8272fc44217016c4c810">BooleanDomain</a> (<a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html">BooleanDomain</a> const &amp;d)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Copy constructor.  <a href="#a7f8ab3cc9c7d8272fc44217016c4c810"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a94e082782f3e84b8960bc020dd55ee3b">BooleanDomain</a> (bool val)</td></tr>
@@ -164,8 +164,8 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>hasUpper</b> () const
 <tr><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a7044e31d7b57e21b1475cabf2fedc960">type_name</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Symbolic type name for this domain.  <a href="#a7044e31d7b57e21b1475cabf2fedc960"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a049a3de55ec8c436b1ba582950b227d0"></a><!-- doxytag: member="TREX::transaction::BooleanDomain::completeParsing" ref="a049a3de55ec8c436b1ba582950b227d0" args="(rapidxml::xml_node&lt;&gt; const &amp;node)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>completeParsing</b> (rapidxml::xml_node&lt;&gt; const &amp;node)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1858cfd1e2960d84876abc2439521c67"></a><!-- doxytag: member="TREX::transaction::BooleanDomain::completeParsing" ref="a1858cfd1e2960d84876abc2439521c67" args="(boost::property_tree::ptree::value_type &amp;node)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>completeParsing</b> (boost::property_tree::ptree::value_type &amp;node)</td></tr>
 <tr><td colspan="2"><h2>Friends</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4e8df9c63e3319417e686c671ae5fa5"></a><!-- doxytag: member="TREX::transaction::BooleanDomain::std::operator&lt;&lt;" ref="ab4e8df9c63e3319417e686c671ae5fa5" args="(std::ostream &amp;out, TREX::utils::ostreamable const &amp;x)" -->
 std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::operator&lt;&lt;</b> (std::ostream &amp;out, <a class="el" href="../../d2/d06/classTREX_1_1utils_1_1ostreamable.html">TREX::utils::ostreamable</a> const &amp;x)</td></tr>
@@ -278,14 +278,14 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 
 </div>
 </div>
-<a class="anchor" id="a5ee79b31bcac27449e9840e9cbfeee61"></a><!-- doxytag: member="TREX::transaction::BooleanDomain::BooleanDomain" ref="a5ee79b31bcac27449e9840e9cbfeee61" args="(rapidxml::xml_node&lt;&gt; const &amp;node)" -->
+<a class="anchor" id="a096bac028eb27212ea8598872dd83754"></a><!-- doxytag: member="TREX::transaction::BooleanDomain::BooleanDomain" ref="a096bac028eb27212ea8598872dd83754" args="(boost::property_tree::ptree::value_type &amp;node)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">BooleanDomain::BooleanDomain </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; const &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>node</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td><code> [explicit]</code></td>
@@ -311,18 +311,7 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00080">80</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
-
-<p>References <a class="el" href="../../d0/d92/StringExtract_8hh_source.html#l00121">TREX::utils::string_cast()</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dynsection">
-<div class="center"><img src="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain_a5ee79b31bcac27449e9840e9cbfeee61_cgraph.png" border="0" usemap="#d1/d6a/classTREX_1_1transaction_1_1BooleanDomain_a5ee79b31bcac27449e9840e9cbfeee61_cgraph_map" alt=""></div>
-<map name="d1/d6a/classTREX_1_1transaction_1_1BooleanDomain_a5ee79b31bcac27449e9840e9cbfeee61_cgraph_map" id="d1/d6a/classTREX_1_1transaction_1_1BooleanDomain_a5ee79b31bcac27449e9840e9cbfeee61_cgraph">
-<area shape="rect" id="node3" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type." alt="" coords="429,5,611,35"/></map>
-</div>
-</p>
+<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00089">89</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
 
 </div>
 </div>
@@ -398,7 +387,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a29f500133a682da60d2b8163759d21c7">TREX::transaction::DomainBase</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00112">112</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00120">120</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
 
 <p>References <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html#l00223">TREX::transaction::DomainBase::getTypeName()</a>.</p>
 
@@ -590,7 +579,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html#l00223">223</a> of file <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html">DomainBase.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00329">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::equals()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00112">equals()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00300">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::intersect()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00102">intersect()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00340">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00124">restrictWith()</a>, <a class="el" href="../../db/dc0/BasicInterval_8cc_source.html#l00081">TREX::transaction::BasicInterval::toXml()</a>, <a class="el" href="../../d6/d56/BasicEnumerated_8cc_source.html#l00091">TREX::transaction::BasicEnumerated::toXml()</a>, and <a class="el" href="../../db/d28/EuropaDomain_8cc_source.html#l00254">TREX::europa::details::europa_domain::visit()</a>.</p>
+<p>Referenced by <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00329">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::equals()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00120">equals()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00300">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::intersect()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00110">intersect()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00340">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00132">restrictWith()</a>, <a class="el" href="../../db/dc0/BasicInterval_8cc_source.html#l00080">TREX::transaction::BasicInterval::toXml()</a>, <a class="el" href="../../d6/d56/BasicEnumerated_8cc_source.html#l00086">TREX::transaction::BasicEnumerated::toXml()</a>, and <a class="el" href="../../db/d28/EuropaDomain_8cc_source.html#l00271">TREX::europa::details::europa_domain::visit()</a>.</p>
 
 </div>
 </div>
@@ -631,7 +620,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff">TREX::transaction::DomainBase</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00102">102</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00110">110</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
 
 <p>References <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html#l00223">TREX::transaction::DomainBase::getTypeName()</a>.</p>
 
@@ -846,7 +835,7 @@ Here is the call graph for this function:</div>
 
 <p>Implements <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a379bc6347b36808fda94d5a3e4d3f65e">TREX::transaction::DomainBase</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00124">124</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00132">132</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
 
 <p>References <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html#l00223">TREX::transaction::DomainBase::getTypeName()</a>.</p>
 
@@ -897,13 +886,13 @@ Here is the call graph for this function:</div>
 <p>This methods writes an XML representation of the domain into the output stream <em>out</em>. The <em>tabs</em> attribute indicates the indentation level expected for the tags.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>To ensure compatibility this method should produce an xml output which is compatible with the XML parsing constructor of this domain.</dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><em>out</em> after the operation</dd></dl>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a14f9f92f7de02da5b11a899df899f2bf" title="XML parsing constructor.">DomainBase(rapidxml::xml_node&lt;&gt; const &amp;)</a> </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd>DomainBase(rapidxml::xml_node&lt;&gt; const &amp;) </dd>
 <dd>
 <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a839ea5f2da93a1008811ecf3a6275a0f" title="XML parsing factory for domains.">xml_factory</a> </dd></dl>
 
 <p>Reimplemented from <a class="el" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html#a196f8ecd565f7e20441fc9a95745f98d">TREX::transaction::BasicInterval</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00091">91</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00099">99</a> of file <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a>.</p>
 
 </div>
 </div>
@@ -931,7 +920,7 @@ Here is the call graph for this function:</div>
 <li>trex/domain/<a class="el" href="../../d4/d42/DomainImpl_8cc_source.html">DomainImpl.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:56 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

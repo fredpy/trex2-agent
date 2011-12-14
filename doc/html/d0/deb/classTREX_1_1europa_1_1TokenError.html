@@ -74,7 +74,7 @@ window.onload = initDynSections;
   </div>
 </div>
 <div class="contents">
-<h1>TREX::europa::TokenError Class Reference</h1><!-- doxytag: class="TREX::europa::TokenError" --><!-- doxytag: inherits="TREX::europa::EuropaException" -->
+<h1>TREX::europa::TokenError Class Reference</h1><!-- doxytag: class="TREX::europa::TokenError" --><!-- doxytag: inherits="TREX::europa::EuropaException,TREX::europa::EuropaException,TREX::europa::EuropaException,TREX::europa::EuropaException" -->
 <p>Token related error.  
 <a href="#_details">More...</a></p>
 
@@ -97,8 +97,17 @@ Collaboration diagram for TREX::europa::TokenError:</div>
 <p><a href="../../de/d4f/classTREX_1_1europa_1_1TokenError-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#ac3c2797a8597bd82ef8a4a4d2263fcec">TokenError</a> (EUROPA::Token const &amp;tok, std::string const &amp;msg)  throw ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#ac3c2797a8597bd82ef8a4a4d2263fcec"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3c2797a8597bd82ef8a4a4d2263fcec"></a><!-- doxytag: member="TREX::europa::TokenError::TokenError" ref="ac3c2797a8597bd82ef8a4a4d2263fcec" args="(EUROPA::Token const &amp;tok, std::string const &amp;msg)" -->
+&nbsp;</td><td class="memItemRight" valign="bottom"><b>TokenError</b> (EUROPA::Token const &amp;tok, std::string const &amp;msg)  throw ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3c2797a8597bd82ef8a4a4d2263fcec"></a><!-- doxytag: member="TREX::europa::TokenError::TokenError" ref="ac3c2797a8597bd82ef8a4a4d2263fcec" args="(EUROPA::Token const &amp;tok, std::string const &amp;msg)" -->
+&nbsp;</td><td class="memItemRight" valign="bottom"><b>TokenError</b> (EUROPA::Token const &amp;tok, std::string const &amp;msg)  throw ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#aa36bc2aedb276959cf5318851abeb2d9">TokenError</a> (EUROPA::Token const &amp;tok, std::string const &amp;msg)  throw ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#aa36bc2aedb276959cf5318851abeb2d9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2c5c279b85741ed643485b33661b7f2"></a><!-- doxytag: member="TREX::europa::TokenError::~TokenError" ref="ae2c5c279b85741ed643485b33661b7f2" args="()" -->
+virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/deb/classTREX_1_1europa_1_1TokenError.html#ae2c5c279b85741ed643485b33661b7f2">~TokenError</a> ()  throw ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d94/classTREX_1_1utils_1_1Exception.html#a20d0d2f8c830f1dacb4b42e8d129f421">print_to</a> (std::ostream &amp;out) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">output method  <a href="#a20d0d2f8c830f1dacb4b42e8d129f421"></a><br/></td></tr>
@@ -108,9 +117,11 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Token related error. </p>
-<p>This exception indicates an error related to a psecific europa token </p>
+<p>Token manipulation error.</p>
+<p>This exception indicates an error related to a psecific europa token</p>
+<p>Exception describing an error related to a token operation inside the Europa plan database </p>
 
-<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00069">69</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d3/dd9/Assembly_8hh_source.html#l00070">70</a> of file <a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aa36bc2aedb276959cf5318851abeb2d9"></a><!-- doxytag: member="TREX::europa::TokenError::TokenError" ref="aa36bc2aedb276959cf5318851abeb2d9" args="(EUROPA::Token const &amp;tok, std::string const &amp;msg)" -->
 <div class="memitem">
@@ -147,7 +158,44 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 </dl>
 <p>Creates a new instance that associates the error message <code>msg</code> to the token <code>tok</code> </p>
 
-<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00076">76</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d6/d64/Assembly_8cc_source.html#l00086">86</a> of file <a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac3c2797a8597bd82ef8a4a4d2263fcec"></a><!-- doxytag: member="TREX::europa::TokenError::TokenError" ref="ac3c2797a8597bd82ef8a4a4d2263fcec" args="(EUROPA::Token const &amp;tok, std::string const &amp;msg)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TREX::europa::TokenError::TokenError </td>
+          <td>(</td>
+          <td class="paramtype">EUROPA::Token const &amp;&nbsp;</td>
+          <td class="paramname"> <em>tok</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string const &amp;&nbsp;</td>
+          <td class="paramname"> <em>msg</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td>  throw ()</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Constructor. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>tok</em>&nbsp;</td><td>A token </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>msg</em>&nbsp;</td><td>Error message</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Create a en exception indicating that the error <code>msg</code> occured while manipulating the token <code>tok</code> </p>
 
 </div>
 </div>
@@ -186,10 +234,16 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>extra/europa/<a class="el" href="../../d3/dd9/Assembly_8hh_source.html">Assembly.hh</a></li>
+<li>extra/europa.old/<a class="el" href="../../db/d31/old_2Assembly_8hh_source.html">Assembly.hh</a></li>
+<li>extra/europa2.old/<a class="el" href="../../d1/d97/_8old_2Assembly_8hh_source.html">Assembly.hh</a></li>
+<li>extra/europa2.old/old/<a class="el" href="../../df/dad/_8old_2old_2Assembly_8hh_source.html">Assembly.hh</a></li>
 <li>extra/europa/<a class="el" href="../../d6/d64/Assembly_8cc_source.html">Assembly.cc</a></li>
+<li>extra/europa.old/<a class="el" href="../../d1/dde/old_2Assembly_8cc_source.html">Assembly.cc</a></li>
+<li>extra/europa2.old/<a class="el" href="../../d9/d1a/_8old_2Assembly_8cc_source.html">Assembly.cc</a></li>
+<li>extra/europa2.old/old/<a class="el" href="../../d0/dc8/_8old_2old_2Assembly_8cc_source.html">Assembly.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:53 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

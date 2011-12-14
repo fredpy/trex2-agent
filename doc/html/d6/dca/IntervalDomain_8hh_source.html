@@ -279,7 +279,7 @@ window.onload = initDynSections;
 <a name="l00499"></a>00499     <span class="keyword">protected</span>:
 <a name="l00505"></a><a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#acb71cb2bb7da01dfa6b853a78b6db482">00505</a>       <a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a9ca41037e0766bc0bb23c8e909c98986" title="Constructor.">IntervalDomain</a>(<a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="Interval based domains.">IntervalDomain</a> <span class="keyword">const</span> &amp;other)
 <a name="l00506"></a>00506        :<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class.">BasicInterval</a>(other), m_lower(other.m_lower), m_upper(other.m_upper) {}
-<a name="l00524"></a><a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a3e189fb4acc67bd004d03dfffd17bd87">00524</a>       <span class="keyword">explicit</span> <a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a9ca41037e0766bc0bb23c8e909c98986" title="Constructor.">IntervalDomain</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node)
+<a name="l00524"></a><a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a1ae1efeefe332a3f65e37424138cd855">00524</a>       <span class="keyword">explicit</span> <a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a9ca41037e0766bc0bb23c8e909c98986" title="Constructor.">IntervalDomain</a>(boost::property_tree::ptree::value_type &amp;node)
 <a name="l00525"></a>00525        :<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class.">BasicInterval</a>(node), m_lower(<a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a37173fb40bfbab6366f25c6182f7459d" title="Minus infinity bound.">minus_inf</a>), m_upper(<a class="code" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a7beea70b003e73bf48e902540185dfae" title="Plus infinity bound.">plus_inf</a>) {
 <a name="l00526"></a>00526        completeParsing(node);
 <a name="l00527"></a>00527       }
@@ -306,7 +306,7 @@ window.onload = initDynSections;
 <a name="l00550"></a>00550 }
 <a name="l00551"></a>00551 <span class="preprocessor">#endif // H_IntervalDomain</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

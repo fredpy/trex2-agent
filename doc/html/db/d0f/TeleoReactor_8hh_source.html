@@ -122,8 +122,8 @@ window.onload = initDynSections;
 <a name="l00088"></a>00088       <span class="keyword">typedef</span> <a class="code" href="../../db/db4/group__transaction.html#ga85e33a6d5a14bff2efc0b3832a1cf3c3" title="external timelines">details::external_set</a>                       external_set;
 <a name="l00089"></a>00089     <span class="keyword">public</span>:
 <a name="l00094"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a1df6347b2d49a9b7b5a19695a35c4a6b">00094</a>       <span class="keyword">typedef</span> <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">graph::reactor_id</a>                   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a1df6347b2d49a9b7b5a19695a35c4a6b" title="Reactor reference type.">ref_type</a>;
-<a name="l00099"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#adcb6eb0be2820aaa41073e2d2ecb0104">00099</a>       <span class="keyword">typedef</span> <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">graph::xml_factory</a>                  <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">xml_factory</a>;
-<a name="l00111"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000">00111</a>       <span class="keyword">typedef</span> <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html#abb7a34b853a748b343bc172972269f50" title="argument type for the factory">xml_factory::argument_type</a>          <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">xml_arg_type</a>;
+<a name="l00099"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#adcb6eb0be2820aaa41073e2d2ecb0104">00099</a>       <span class="keyword">typedef</span> <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">graph::xml_factory</a>                  <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">xml_factory</a>;
+<a name="l00111"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000">00111</a>       <span class="keyword">typedef</span> xml_factory::argument_type          <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">xml_arg_type</a>;
 <a name="l00112"></a>00112                      
 <a name="l00149"></a>00149       <span class="keyword">explicit</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a53fc74252cbfbc3b6703c66432a02a5f" title="XML based constructor.">TeleoReactor</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">xml_arg_type</a> &amp;arg, <span class="keywordtype">bool</span> loadTL=<span class="keyword">true</span>);  
 <a name="l00151"></a>00151       <span class="keyword">virtual</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ac19bda9c94029fff275483a25f04df2a" title="Destructor.">~TeleoReactor</a>();
@@ -142,163 +142,208 @@ window.onload = initDynSections;
 <a name="l00202"></a>00202        <span class="keywordflow">return</span> m_initialTick; 
 <a name="l00203"></a>00203       }
 <a name="l00212"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aae9a63f545390491e4721b8b74e05585">00212</a>       <span class="keywordtype">double</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aae9a63f545390491e4721b8b74e05585" title="Tick duration.">tickDuration</a>()<span class="keyword"> const </span>{
-<a name="l00213"></a>00213        <span class="keywordflow">return</span> m_graph.tickDuration();
+<a name="l00213"></a>00213        <span class="keywordflow">return</span> m_graph.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ae59010979c7d9c7c64928566bf79adcd" title="get tick duration">tickDuration</a>();
 <a name="l00214"></a>00214       }
-<a name="l00223"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535">00223</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>()<span class="keyword"> const </span>{
-<a name="l00224"></a>00224        <span class="keywordflow">return</span> m_graph.getCurrentTick();
-<a name="l00225"></a>00225       }
-<a name="l00239"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67">00239</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67" title="Get final tick.">getFinalTick</a>()<span class="keyword"> const </span>{
-<a name="l00240"></a>00240        <span class="keywordflow">return</span> m_finalTick;
-<a name="l00241"></a>00241       }
-<a name="l00252"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82">00252</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82" title="reactor latency">getLatency</a>()<span class="keyword"> const </span>{
-<a name="l00253"></a>00253        <span class="keywordflow">return</span> m_latency;
-<a name="l00254"></a>00254       }
-<a name="l00269"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c">00269</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>()<span class="keyword"> const </span>{
-<a name="l00270"></a>00270        <span class="keywordflow">return</span> m_latency+m_maxDelay;
-<a name="l00271"></a>00271       }
-<a name="l00279"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6">00279</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6" title="Get reactor look-ahead.">getLookAhead</a>()<span class="keyword"> const </span>{
-<a name="l00280"></a>00280        <span class="keywordflow">return</span> m_lookahead;
-<a name="l00281"></a>00281       }
-<a name="l00296"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a184feb70d4f444edb13fd627bd3b26be">00296</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a184feb70d4f444edb13fd627bd3b26be">notify</a>(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;obs) {}
-<a name="l00297"></a>00297                      
-<a name="l00319"></a>00319       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab0fca413f286b61c5aec1547e4531e0c" title="Final initialization.">initialize</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>);
-<a name="l00320"></a>00320                      
-<a name="l00329"></a>00329       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a0ba745d03857236a9d55c661ecaff92f" title="New tick notification callback.">newTick</a>();
-<a name="l00346"></a>00346       <span class="keywordtype">bool</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a129024145aba1e2b36f5f5c434fb4b4d" title="Synchronization callback.">doSynchronize</a>();
-<a name="l00360"></a>00360       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a39836698e96bfdfd724a60cee34d1df2" title="Request new observations.">doNotify</a>();
-<a name="l00373"></a>00373       <span class="keywordtype">double</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a94fcfd208b96e964b5503934dfa7debf" title="reactor deliberation work load">workRatio</a>();
-<a name="l00383"></a>00383       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae1f44350631b953137d17ab53efa4707" title="Deliberation step.">step</a>();
-<a name="l00384"></a>00384       
-<a name="l00390"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff">00390</a>       <span class="keyword">typedef</span> <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">details::external</a> <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">external_iterator</a>;
-<a name="l00396"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7">00396</a>       <span class="keyword">typedef</span> <span class="keywordtype">size_t</span>            <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7" title="size type">size_type</a>;
-<a name="l00397"></a>00397                      
-<a name="l00402"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a29c22ff5792359d9dd5b87373f72bc25">00402</a>       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7" title="size type">size_type</a>         <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a29c22ff5792359d9dd5b87373f72bc25" title="Number of External timelines.">count_externals</a>()<span class="keyword"> const </span>{
-<a name="l00403"></a>00403        <span class="keywordflow">return</span> m_externals.size();
-<a name="l00404"></a>00404       }
-<a name="l00411"></a>00411       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a6b169e717e60724db87abbff21fffd83" title="beginning of External timelines set">ext_begin</a>();
-<a name="l00418"></a>00418       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a74127fd53f9d89f938c7ab1273a2f59d" title="end of External timelines set">ext_end</a>();
-<a name="l00419"></a>00419                      
-<a name="l00420"></a>00420     <span class="keyword">protected</span>:
-<a name="l00432"></a>00432       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a53fc74252cbfbc3b6703c66432a02a5f" title="XML based constructor.">TeleoReactor</a>(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> *owner, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
-<a name="l00433"></a>00433                  <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> latency, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> lookahead, <span class="keywordtype">bool</span> log=<span class="keyword">false</span>);
-<a name="l00434"></a>00434                      
-<a name="l00439"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5">00439</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">TREX::utils::LogManager</a> &amp;<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>()<span class="keyword"> const </span>{
-<a name="l00440"></a>00440        <span class="keywordflow">return</span> m_graph.manager();
-<a name="l00441"></a>00441       }
-<a name="l00442"></a>00442                      
-<a name="l00460"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802">00460</a>       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802" title="Check if need to deliberate.">hasWork</a>() {
-<a name="l00461"></a>00461        <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00462"></a>00462       }
-<a name="l00463"></a>00463                      
-<a name="l00464"></a>00464                      
-<a name="l00486"></a>00486       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa9840ea85833e5e458ac215635266316" title="Produce an observation.">postObservation</a>(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;o);
-<a name="l00487"></a>00487       
-<a name="l00514"></a>00514       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a7a7dccda4fe6c2d33067f56d234eda5b" title="Post a goal.">postGoal</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g);
-<a name="l00530"></a>00530       <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a7a7dccda4fe6c2d33067f56d234eda5b" title="Post a goal.">postGoal</a>(<a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">Goal</a> <span class="keyword">const</span> &amp;g);
-<a name="l00543"></a>00543       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad21eb1f4f7dd6affb3e4b4fe1f256a93" title="Goal completion.">completedGoal</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> g);
-<a name="l00544"></a>00544                      
-<a name="l00564"></a>00564       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4e7cd4e809a411032c47e66eb09fa8d7" title="Recall a goal.">postRecall</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g);
-<a name="l00565"></a>00565                      
-<a name="l00578"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251">00578</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251" title="reactor initialiszation callback">handleInit</a>() {}
-<a name="l00590"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a84bf72ed467a7f76cec0fa3714f0df80">00590</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a84bf72ed467a7f76cec0fa3714f0df80" title="New tick callback.">handleTickStart</a>() {}
-<a name="l00591"></a>00591                      
-<a name="l00611"></a>00611       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#adc060d0fea8604e2dc9ed7a9ab37f62b" title="Synchronization callback.">synchronize</a>() =0;
-<a name="l00612"></a>00612                      
-<a name="l00621"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a2d5869fac84e5e6f9170132a47fd1d1c">00621</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a2d5869fac84e5e6f9170132a47fd1d1c" title="Deliberation step callback.">resume</a>() {}
-<a name="l00622"></a>00622       
-<a name="l00632"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c">00632</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback.">handleRequest</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {}
-<a name="l00642"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1">00642</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1" title="Goal recall callback.">handleRecall</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {}
-<a name="l00643"></a>00643                      
-<a name="l00664"></a>00664       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a56378773bb12cfeb1646b5910b7dbedf" title="External timeline declaration.">use</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline, <span class="keywordtype">bool</span> control=<span class="keyword">true</span>);
-<a name="l00683"></a>00683       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4deea395ad456b51d92f0bdbf7e282d9" title="Intternal timeline declaration.">provide</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline);
-<a name="l00684"></a>00684                      
-<a name="l00695"></a>00695       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline.">isInternal</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline) <span class="keyword">const</span>;
-<a name="l00706"></a>00706       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline) <span class="keyword">const</span>;
-<a name="l00707"></a>00707                      
-<a name="l00719"></a>00719       <a class="code" href="../../da/d38/classTREX_1_1utils_1_1internals_1_1LogEntry.html" title="Text Entry manager for TextLog.">TREX::utils::internals::LogEntry</a> 
-<a name="l00720"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b">00720</a>       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(std::string <span class="keyword">const</span> &amp;context=std::string()) {
-<a name="l00721"></a>00721        <span class="keywordflow">if</span>( context.empty() )
-<a name="l00722"></a>00722          <span class="keywordflow">return</span> m_graph.syslog(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>().str());
-<a name="l00723"></a>00723        <span class="keywordflow">else</span>
-<a name="l00724"></a>00724          <span class="keywordflow">return</span> m_graph.syslog(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>().str()+<span class="stringliteral">&quot;|&quot;</span>+context);
-<a name="l00725"></a>00725       }
-<a name="l00726"></a>00726 
-<a name="l00727"></a>00727       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> find_external(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
-<a name="l00728"></a>00728       
-<a name="l00729"></a>00729     <span class="keyword">private</span>:
-<a name="l00730"></a>00730                      
-<a name="l00731"></a>00731       <span class="keywordtype">void</span> clear_internals();
-<a name="l00732"></a>00732       <span class="keywordtype">void</span> clear_externals();
-<a name="l00733"></a>00733                      
-<a name="l00734"></a>00734       <span class="keywordtype">bool</span> m_inited;
-<a name="l00735"></a>00735       <span class="keywordtype">bool</span> m_firstTick;
-<a name="l00736"></a>00736       <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> &amp;m_graph;
-<a name="l00737"></a>00737                      
-<a name="l00745"></a>00745       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> m_name;
-<a name="l00746"></a>00746       
-<a name="l00755"></a>00755       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_latency;
-<a name="l00756"></a>00756       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_maxDelay;
-<a name="l00761"></a>00761       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_lookahead;
-<a name="l00762"></a>00762       
-<a name="l00763"></a>00763       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a>   m_initialTick;
-<a name="l00764"></a>00764       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a>   m_finalTick;
-<a name="l00765"></a>00765       
-<a name="l00766"></a>00766       
-<a name="l00767"></a>00767       <span class="keyword">mutable</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_deadline;
-<a name="l00768"></a>00768       <span class="keyword">mutable</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> m_nSteps;
-<a name="l00769"></a>00769                      
-<a name="l00770"></a>00770       external_set m_externals;
-<a name="l00771"></a>00771       internal_set m_internals;
-<a name="l00772"></a>00772                      
-<a name="l00779"></a>00779       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::LogManager&gt;</a> m_log;
-<a name="l00780"></a>00780                      
-<a name="l00781"></a>00781       <span class="keywordtype">void</span> isolate() {
-<a name="l00782"></a>00782        clear_internals();
-<a name="l00783"></a>00783        clear_externals();
-<a name="l00784"></a>00784       }
-<a name="l00785"></a>00785                      
-<a name="l00786"></a>00786       <span class="comment">// call-backs from timeline</span>
-<a name="l00787"></a>00787       <span class="keywordtype">void</span> assigned(details::timeline *tl);
-<a name="l00788"></a>00788       <span class="keywordtype">void</span> unassigned(details::timeline *tl);
-<a name="l00789"></a>00789       <span class="keywordtype">void</span> subscribed(Relation <span class="keyword">const</span> &amp;r);
-<a name="l00790"></a>00790       <span class="keywordtype">void</span> unsubscribed(Relation <span class="keyword">const</span> &amp;r);
-<a name="l00791"></a>00791       <span class="keywordtype">void</span> latency_updated(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> old_l, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> new_l);
-<a name="l00792"></a>00792       
-<a name="l00793"></a>00793       
-<a name="l00794"></a>00794       <span class="keyword">friend</span> <span class="keyword">class </span>details::timeline;
-<a name="l00795"></a>00795       <span class="keyword">friend</span> <span class="keyword">class </span>details::external;
-<a name="l00796"></a>00796       <span class="keyword">friend</span> <span class="keyword">class </span>ReactorException;
-<a name="l00797"></a>00797       <span class="keyword">friend</span> <span class="keyword">class </span>Relation;
-<a name="l00798"></a>00798                      
-<a name="l00799"></a>00799       <span class="keyword">friend</span> <span class="keyword">class </span>graph;
-<a name="l00800"></a>00800     }; <span class="comment">// TREX::transaction::TeleoReactor</span>
-<a name="l00801"></a>00801               
-<a name="l00811"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html">00811</a>     <span class="keyword">class </span><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html" title="Synchronization related exception.">SynchronizationError</a> :<span class="keyword">public</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a> {
-<a name="l00812"></a>00812     <span class="keyword">public</span>:
-<a name="l00818"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#ad3f668ce54bedd45d0a51ba8e48921ac">00818</a>       <a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#ad3f668ce54bedd45d0a51ba8e48921ac" title="Constructor.">SynchronizationError</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;r, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
-<a name="l00819"></a>00819        :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html#a9ead4c49c0d20eb2d7635ef8f8c1c16e" title="Constructor.">ReactorException</a>(r, msg) {}
-<a name="l00821"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#a0600ed58d036c5ae035ebe6bb15450dc">00821</a>       <a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#a0600ed58d036c5ae035ebe6bb15450dc" title="Desturctor.">~SynchronizationError</a>() throw() {}
-<a name="l00822"></a>00822     }; <span class="comment">// TREX::transaction::SynchronizationError</span>
-<a name="l00823"></a>00823               
-<a name="l00832"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html">00832</a>     <span class="keyword">class </span><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html" title="Goal posting error.">DispatchError</a> :<span class="keyword">public</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a> {
-<a name="l00833"></a>00833     <span class="keyword">public</span>:
-<a name="l00839"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a8ba3063e694e2e7fb5c9b49765ac89c6">00839</a>       <a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a8ba3063e694e2e7fb5c9b49765ac89c6">DispatchError</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;r, <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
-<a name="l00840"></a>00840        :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html#a9ead4c49c0d20eb2d7635ef8f8c1c16e" title="Constructor.">ReactorException</a>(r, buil_msg(g, msg)) {}
-<a name="l00842"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a81b7e6b95fb7d4cc4bd8c3a8b85e6730">00842</a>       <a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a81b7e6b95fb7d4cc4bd8c3a8b85e6730" title="Desturctor.">~DispatchError</a>() throw() {}
-<a name="l00843"></a>00843       
-<a name="l00844"></a>00844     <span class="keyword">private</span>:
-<a name="l00845"></a>00845       <span class="keyword">static</span> std::string buil_msg(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>();
-<a name="l00846"></a>00846     };
-<a name="l00847"></a>00847     
-<a name="l00848"></a>00848               
-<a name="l00849"></a>00849   } <span class="comment">// TREX::transaction</span>
-<a name="l00850"></a>00850 } <span class="comment">// TREX</span>
-<a name="l00851"></a>00851 
-<a name="l00852"></a>00852 <span class="preprocessor"># include &quot;<a class="code" href="../../d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code.">bits/bgl_support.hh</a>&quot;</span>
-<a name="l00853"></a>00853 
-<a name="l00854"></a>00854 <span class="preprocessor">#endif</span>
+<a name="l00215"></a>00215 
+<a name="l00231"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a710edd7eefe154b521e75dd42b3bf635">00231</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a710edd7eefe154b521e75dd42b3bf635" title="unix time to tick conversion">timeToTick</a>(time_t secs, suseconds_t usecs=0)<span class="keyword"> const </span>{
+<a name="l00232"></a>00232        <span class="keywordflow">return</span> m_graph.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7fdffec0b7157c51702fcf7f7fe50703" title="convert real-time into a TICK">timeToTick</a>(secs, usecs);
+<a name="l00233"></a>00233       }
+<a name="l00248"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a5ecfd6df6f39f6b6575e3853e8630fa7">00248</a>       <span class="keywordtype">double</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a5ecfd6df6f39f6b6575e3853e8630fa7" title="tick to unix time conversion">tickToTime</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> cur)<span class="keyword"> const </span>{
+<a name="l00249"></a>00249        <span class="keywordflow">return</span> m_graph.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#ab5e911ffbb716753580988c220bde88e" title="convert a TICK into its real-time equivalent">tickToTime</a>(cur);
+<a name="l00250"></a>00250       }
+<a name="l00259"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535">00259</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae8ea840f31e81735b8b0481f0608d535" title="Get current tick.">getCurrentTick</a>()<span class="keyword"> const </span>{
+<a name="l00260"></a>00260        <span class="keywordflow">return</span> m_graph.<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a300d3483bf0bcf93a143451aa8b82426" title="get current tick">getCurrentTick</a>();
+<a name="l00261"></a>00261       }
+<a name="l00275"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67">00275</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aef17ce86509d19a00792feccbcf84a67" title="Get final tick.">getFinalTick</a>()<span class="keyword"> const </span>{
+<a name="l00276"></a>00276        <span class="keywordflow">return</span> m_finalTick;
+<a name="l00277"></a>00277       }
+<a name="l00288"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82">00288</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f1b95cdfe53ed059969452c9f250e82" title="reactor latency">getLatency</a>()<span class="keyword"> const </span>{
+<a name="l00289"></a>00289        <span class="keywordflow">return</span> m_latency;
+<a name="l00290"></a>00290       }
+<a name="l00305"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c">00305</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#add69075d64568c035f0a83fc1824a57c" title="reactor execution latency">getExecLatency</a>()<span class="keyword"> const </span>{
+<a name="l00306"></a>00306        <span class="keywordflow">return</span> m_latency+m_maxDelay;
+<a name="l00307"></a>00307       }
+<a name="l00315"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6">00315</a>       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6" title="Get reactor look-ahead.">getLookAhead</a>()<span class="keyword"> const </span>{
+<a name="l00316"></a>00316        <span class="keywordflow">return</span> m_lookahead;
+<a name="l00317"></a>00317       }
+<a name="l00332"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a184feb70d4f444edb13fd627bd3b26be">00332</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a184feb70d4f444edb13fd627bd3b26be">notify</a>(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;obs) {}
+<a name="l00333"></a>00333                      
+<a name="l00355"></a>00355       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abdfbc3a11ed2046f2fa6a8ed707b7aab" title="Final initialization.">initialize</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <span class="keyword">final</span>);
+<a name="l00356"></a>00356                      
+<a name="l00365"></a>00365       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a0ba745d03857236a9d55c661ecaff92f" title="New tick notification callback.">newTick</a>();
+<a name="l00382"></a>00382       <span class="keywordtype">bool</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a129024145aba1e2b36f5f5c434fb4b4d" title="Synchronization callback.">doSynchronize</a>();
+<a name="l00396"></a>00396       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a39836698e96bfdfd724a60cee34d1df2" title="Request new observations.">doNotify</a>();
+<a name="l00409"></a>00409       <span class="keywordtype">double</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a94fcfd208b96e964b5503934dfa7debf" title="reactor deliberation work load">workRatio</a>();
+<a name="l00419"></a>00419       <span class="keywordtype">void</span>   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae1f44350631b953137d17ab53efa4707" title="Deliberation step.">step</a>();
+<a name="l00420"></a>00420       
+<a name="l00426"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff">00426</a>       <span class="keyword">typedef</span> <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">details::external</a> <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">external_iterator</a>;
+<a name="l00432"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7">00432</a>       <span class="keyword">typedef</span> <span class="keywordtype">size_t</span>            <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7" title="size type">size_type</a>;
+<a name="l00433"></a>00433                      
+<a name="l00438"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a29c22ff5792359d9dd5b87373f72bc25">00438</a>       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4a82613363d6c1dfb380d73165b888a7" title="size type">size_type</a>         <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a29c22ff5792359d9dd5b87373f72bc25" title="Number of External timelines.">count_externals</a>()<span class="keyword"> const </span>{
+<a name="l00439"></a>00439        <span class="keywordflow">return</span> m_externals.size();
+<a name="l00440"></a>00440       }
+<a name="l00447"></a>00447       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a6b169e717e60724db87abbff21fffd83" title="beginning of External timelines set">ext_begin</a>();
+<a name="l00454"></a>00454       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a74127fd53f9d89f938c7ab1273a2f59d" title="end of External timelines set">ext_end</a>();
+<a name="l00455"></a>00455                      
+<a name="l00456"></a>00456     <span class="keyword">protected</span>:
+<a name="l00468"></a>00468       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a53fc74252cbfbc3b6703c66432a02a5f" title="XML based constructor.">TeleoReactor</a>(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> *owner, <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
+<a name="l00469"></a>00469                  <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> latency, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> lookahead, <span class="keywordtype">bool</span> log=<span class="keyword">false</span>);
+<a name="l00470"></a>00470                      
+<a name="l00475"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5">00475</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">TREX::utils::LogManager</a> &amp;<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point.">manager</a>()<span class="keyword"> const </span>{
+<a name="l00476"></a>00476        <span class="keywordflow">return</span> m_graph.manager();
+<a name="l00477"></a>00477       }
+<a name="l00478"></a>00478                      
+<a name="l00496"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802">00496</a>       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9f4efc90e8e0fb488f788b921546f802" title="Check if need to deliberate.">hasWork</a>() {
+<a name="l00497"></a>00497        <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00498"></a>00498       }
+<a name="l00499"></a>00499                      
+<a name="l00500"></a>00500                      
+<a name="l00522"></a>00522       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa9840ea85833e5e458ac215635266316" title="Produce an observation.">postObservation</a>(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;o);
+<a name="l00523"></a>00523       
+<a name="l00550"></a>00550       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a7a7dccda4fe6c2d33067f56d234eda5b" title="Post a goal.">postGoal</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g);
+<a name="l00566"></a>00566       <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a7a7dccda4fe6c2d33067f56d234eda5b" title="Post a goal.">postGoal</a>(<a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">Goal</a> <span class="keyword">const</span> &amp;g);
+<a name="l00579"></a>00579       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad21eb1f4f7dd6affb3e4b4fe1f256a93" title="Goal completion.">completedGoal</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> g);
+<a name="l00580"></a>00580                      
+<a name="l00600"></a>00600       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4e7cd4e809a411032c47e66eb09fa8d7" title="Recall a goal.">postRecall</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g);
+<a name="l00601"></a>00601                      
+<a name="l00614"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251">00614</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a69980762bfeee1f1475c29e4b88a1251" title="reactor initialiszation callback">handleInit</a>() {}
+<a name="l00626"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a84bf72ed467a7f76cec0fa3714f0df80">00626</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a84bf72ed467a7f76cec0fa3714f0df80" title="New tick callback.">handleTickStart</a>() {}
+<a name="l00627"></a>00627                      
+<a name="l00647"></a>00647       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#adc060d0fea8604e2dc9ed7a9ab37f62b" title="Synchronization callback.">synchronize</a>() =0;
+<a name="l00648"></a>00648                      
+<a name="l00657"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a2d5869fac84e5e6f9170132a47fd1d1c">00657</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a2d5869fac84e5e6f9170132a47fd1d1c" title="Deliberation step callback.">resume</a>() {}
+<a name="l00658"></a>00658       
+<a name="l00668"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c">00668</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback.">handleRequest</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {}
+<a name="l00678"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1">00678</a>       <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8af8f0667a8831c6ad364850c6136ab1" title="Goal recall callback.">handleRecall</a>(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g) {}
+<a name="l00679"></a>00679                      
+<a name="l00700"></a>00700       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a56378773bb12cfeb1646b5910b7dbedf" title="External timeline declaration.">use</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline, <span class="keywordtype">bool</span> control=<span class="keyword">true</span>);
+<a name="l00701"></a>00701             
+<a name="l00721"></a>00721       <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab61882fa0e573b1e85e92f9a0aa3c921" title="Internal timeline declaration.">provide</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline, <span class="keywordtype">bool</span> controllable=<span class="keyword">true</span>);
+<a name="l00722"></a>00722                      
+<a name="l00736"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab028a1fb11c29f940332fcb3879af240">00736</a>       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab028a1fb11c29f940332fcb3879af240" title="Request for external failed.">failed_external</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline, 
+<a name="l00737"></a>00737                                <a class="code" href="../../de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html" title="Timeline relation creation failure.">graph::timeline_failure</a> <span class="keyword">const</span> &amp;err) {
+<a name="l00738"></a>00738         <span class="keywordflow">throw</span> err;
+<a name="l00739"></a>00739       }
+<a name="l00753"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae462eb24d0e453b00ff806f27f9678bd">00753</a>       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ae462eb24d0e453b00ff806f27f9678bd" title="Request for internal failed.">failed_internal</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline, 
+<a name="l00754"></a>00754                                <a class="code" href="../../de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html" title="Timeline relation creation failure.">graph::timeline_failure</a> <span class="keyword">const</span> &amp;err) {
+<a name="l00755"></a>00755         <span class="keywordflow">throw</span> err;
+<a name="l00756"></a>00756       }
+<a name="l00767"></a>00767       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline.">isInternal</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline) <span class="keyword">const</span>;
+<a name="l00778"></a>00778       <span class="keywordtype">bool</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a41d3bf0d0663f3ff4469686dc6878d01" title="Check for exeternal timeline.">isExternal</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;timeline) <span class="keyword">const</span>;
+<a name="l00779"></a>00779                      
+<a name="l00791"></a>00791       <a class="code" href="../../da/d38/classTREX_1_1utils_1_1internals_1_1LogEntry.html" title="Text Entry manager for TextLog.">TREX::utils::internals::LogEntry</a> 
+<a name="l00792"></a><a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b">00792</a>       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>(std::string <span class="keyword">const</span> &amp;context=std::string()) {
+<a name="l00793"></a>00793        <span class="keywordflow">if</span>( context.empty() )
+<a name="l00794"></a>00794          <span class="keywordflow">return</span> m_graph.syslog(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>().str());
+<a name="l00795"></a>00795        <span class="keywordflow">else</span>
+<a name="l00796"></a>00796          <span class="keywordflow">return</span> m_graph.syslog(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">getName</a>().str()+<span class="stringliteral">&quot;|&quot;</span>+context);
+<a name="l00797"></a>00797       }
+<a name="l00798"></a>00798 
+<a name="l00799"></a>00799       <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8732d422d9951bde9c8fb33c702d18ff" title="Iterator other external timelines.">external_iterator</a> find_external(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
+<a name="l00800"></a>00800       
+<a name="l00801"></a>00801     <span class="keyword">private</span>:
+<a name="l00802"></a>00802                      
+<a name="l00803"></a>00803       <span class="keywordtype">void</span> clear_internals();
+<a name="l00804"></a>00804       <span class="keywordtype">void</span> clear_externals();
+<a name="l00805"></a>00805                      
+<a name="l00806"></a>00806       <span class="keywordtype">bool</span> m_inited;
+<a name="l00807"></a>00807       <span class="keywordtype">bool</span> m_firstTick;
+<a name="l00808"></a>00808       <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a> &amp;m_graph;
+<a name="l00809"></a>00809 
+<a name="l00810"></a>00810       <span class="keyword">class </span>Logger {
+<a name="l00811"></a>00811       <span class="keyword">public</span>:
+<a name="l00812"></a>00812        Logger(std::string <span class="keyword">const</span> &amp;dest);
+<a name="l00813"></a>00813        ~Logger();
+<a name="l00814"></a>00814        
+<a name="l00815"></a>00815        <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ab61882fa0e573b1e85e92f9a0aa3c921" title="Internal timeline declaration.">provide</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
+<a name="l00816"></a>00816        <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a56378773bb12cfeb1646b5910b7dbedf" title="External timeline declaration.">use</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
+<a name="l00817"></a>00817 
+<a name="l00818"></a>00818        <span class="keywordtype">void</span> unprovide(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
+<a name="l00819"></a>00819        <span class="keywordtype">void</span> unuse(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name);
+<a name="l00820"></a>00820        
+<a name="l00821"></a>00821        <span class="keywordtype">void</span> <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a0ba745d03857236a9d55c661ecaff92f" title="New tick notification callback.">newTick</a>(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> val);
+<a name="l00822"></a>00822        
+<a name="l00823"></a>00823        <span class="keywordtype">void</span> observation(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">Observation</a> <span class="keyword">const</span> &amp;obs);
+<a name="l00824"></a>00824        <span class="keywordtype">void</span> request(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;goal);
+<a name="l00825"></a>00825        <span class="keywordtype">void</span> recall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;goal);
+<a name="l00826"></a>00826 
+<a name="l00827"></a>00827       <span class="keyword">private</span>:
+<a name="l00828"></a>00828        std::ofstream m_file;       
+<a name="l00829"></a>00829        <span class="keywordtype">bool</span> m_tick, m_hasData;
+<a name="l00830"></a>00830        <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_current;
+<a name="l00831"></a>00831        
+<a name="l00832"></a>00832        <span class="keywordtype">void</span> openTick();
+<a name="l00833"></a>00833       }; <span class="comment">// TREX::transaction::TeleoReactor::Logger</span>
+<a name="l00834"></a>00834        
+<a name="l00835"></a>00835       Logger *m_trLog;
+<a name="l00836"></a>00836               
+<a name="l00844"></a>00844       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> m_name;
+<a name="l00845"></a>00845       
+<a name="l00854"></a>00854       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_latency;
+<a name="l00855"></a>00855       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_maxDelay;
+<a name="l00860"></a>00860       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_lookahead;
+<a name="l00861"></a>00861       
+<a name="l00862"></a>00862       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a>   m_initialTick;
+<a name="l00863"></a>00863       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a>   m_finalTick;
+<a name="l00864"></a>00864       
+<a name="l00865"></a>00865       
+<a name="l00866"></a>00866       <span class="keyword">mutable</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> m_deadline;
+<a name="l00867"></a>00867       <span class="keyword">mutable</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> m_nSteps;
+<a name="l00868"></a>00868                      
+<a name="l00869"></a>00869       external_set m_externals;
+<a name="l00870"></a>00870       internal_set m_internals;
+<a name="l00871"></a>00871       internal_set m_updates;
+<a name="l00872"></a>00872                      
+<a name="l00879"></a>00879       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::LogManager&gt;</a> m_log;
+<a name="l00880"></a>00880                      
+<a name="l00881"></a>00881       <span class="keywordtype">void</span> isolate() {
+<a name="l00882"></a>00882        clear_internals();
+<a name="l00883"></a>00883        clear_externals();
+<a name="l00884"></a>00884       }
+<a name="l00885"></a>00885                      
+<a name="l00886"></a>00886       <span class="comment">// call-backs from timeline</span>
+<a name="l00887"></a>00887       <span class="keywordtype">void</span> assigned(details::timeline *tl);
+<a name="l00888"></a>00888       <span class="keywordtype">void</span> unassigned(details::timeline *tl);
+<a name="l00889"></a>00889       <span class="keywordtype">void</span> subscribed(Relation <span class="keyword">const</span> &amp;r);
+<a name="l00890"></a>00890       <span class="keywordtype">void</span> unsubscribed(Relation <span class="keyword">const</span> &amp;r);
+<a name="l00891"></a>00891       <span class="keywordtype">void</span> latency_updated(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> old_l, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> new_l);
+<a name="l00892"></a>00892       
+<a name="l00893"></a>00893       
+<a name="l00894"></a>00894       <span class="keyword">friend</span> <span class="keyword">class </span>details::timeline;
+<a name="l00895"></a>00895       <span class="keyword">friend</span> <span class="keyword">class </span>details::external;
+<a name="l00896"></a>00896       <span class="keyword">friend</span> <span class="keyword">class </span>ReactorException;
+<a name="l00897"></a>00897       <span class="keyword">friend</span> <span class="keyword">class </span>Relation;
+<a name="l00898"></a>00898                      
+<a name="l00899"></a>00899       <span class="keyword">friend</span> <span class="keyword">class </span>graph;
+<a name="l00900"></a>00900     }; <span class="comment">// TREX::transaction::TeleoReactor</span>
+<a name="l00901"></a>00901               
+<a name="l00911"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html">00911</a>     <span class="keyword">class </span><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html" title="Synchronization related exception.">SynchronizationError</a> :<span class="keyword">public</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a> {
+<a name="l00912"></a>00912     <span class="keyword">public</span>:
+<a name="l00918"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#ad3f668ce54bedd45d0a51ba8e48921ac">00918</a>       <a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#ad3f668ce54bedd45d0a51ba8e48921ac" title="Constructor.">SynchronizationError</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;r, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
+<a name="l00919"></a>00919        :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html#a9ead4c49c0d20eb2d7635ef8f8c1c16e" title="Constructor.">ReactorException</a>(r, msg) {}
+<a name="l00921"></a><a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#a0600ed58d036c5ae035ebe6bb15450dc">00921</a>       <a class="code" href="../../d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html#a0600ed58d036c5ae035ebe6bb15450dc" title="Desturctor.">~SynchronizationError</a>() throw() {}
+<a name="l00922"></a>00922     }; <span class="comment">// TREX::transaction::SynchronizationError</span>
+<a name="l00923"></a>00923               
+<a name="l00932"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html">00932</a>     <span class="keyword">class </span><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html" title="Goal posting error.">DispatchError</a> :<span class="keyword">public</span> <a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html" title="TeleoReactor related exception.">ReactorException</a> {
+<a name="l00933"></a>00933     <span class="keyword">public</span>:
+<a name="l00939"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a8ba3063e694e2e7fb5c9b49765ac89c6">00939</a>       <a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a8ba3063e694e2e7fb5c9b49765ac89c6">DispatchError</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a> <span class="keyword">const</span> &amp;r, <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>()
+<a name="l00940"></a>00940        :<a class="code" href="../../d6/d6d/classTREX_1_1transaction_1_1ReactorException.html#a9ead4c49c0d20eb2d7635ef8f8c1c16e" title="Constructor.">ReactorException</a>(r, buil_msg(g, msg)) {}
+<a name="l00942"></a><a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a81b7e6b95fb7d4cc4bd8c3a8b85e6730">00942</a>       <a class="code" href="../../d4/d2a/classTREX_1_1transaction_1_1DispatchError.html#a81b7e6b95fb7d4cc4bd8c3a8b85e6730" title="Destructor.">~DispatchError</a>() throw() {}
+<a name="l00943"></a>00943       
+<a name="l00944"></a>00944     <span class="keyword">private</span>:
+<a name="l00945"></a>00945       <span class="keyword">static</span> std::string buil_msg(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;g, std::string <span class="keyword">const</span> &amp;msg) <span class="keywordflow">throw</span>();
+<a name="l00946"></a>00946     };
+<a name="l00947"></a>00947     
+<a name="l00948"></a>00948               
+<a name="l00949"></a>00949   } <span class="comment">// TREX::transaction</span>
+<a name="l00950"></a>00950 } <span class="comment">// TREX</span>
+<a name="l00951"></a>00951 
+<a name="l00952"></a>00952 <span class="preprocessor"># include &quot;<a class="code" href="../../d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code.">bits/bgl_support.hh</a>&quot;</span>
+<a name="l00953"></a>00953 <span class="preprocessor"># include &quot;bits/reactor_graph.tcc&quot;</span>
+<a name="l00954"></a>00954 
+<a name="l00955"></a>00955 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

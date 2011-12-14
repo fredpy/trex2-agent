@@ -120,7 +120,7 @@ window.onload = initDynSections;
 <a name="l00046"></a>00046 
 <a name="l00047"></a>00047   <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;LogManager&gt;</a> s_log;
 <a name="l00048"></a>00048 
-<a name="l00049"></a>00049   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="Producer declaration.">TeleoReactor::xml_factory::declare&lt;VitreReactor&gt;</a> <a class="code" href="../../d4/d1f/group__agent.html#ga739aaef7cd7986fd5eab307e152a0feb" title="Clock XML factor declaration for StepClock.">decl</a>(<span class="stringliteral">&quot;VitreReactor&quot;</span>);
+<a name="l00049"></a>00049   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">TeleoReactor::xml_factory::declare&lt;VitreReactor&gt;</a> <a class="code" href="../../d4/d1f/group__agent.html#ga739aaef7cd7986fd5eab307e152a0feb" title="Clock XML factor declaration for StepClock.">decl</a>(<span class="stringliteral">&quot;VitreReactor&quot;</span>);
 <a name="l00050"></a>00050   
 <a name="l00051"></a>00051 }
 <a name="l00052"></a>00052 
@@ -140,10 +140,10 @@ window.onload = initDynSections;
 <a name="l00073"></a>00073 
 <a name="l00074"></a>00074 VitreReactor::VitreReactor(TeleoReactor::xml_arg_type arg)
 <a name="l00075"></a>00075   :<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a>(arg),
-<a name="l00076"></a>00076    m_host(<a class="code" href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b" title="XML attribute extraction.">parse_attr</a>&lt;std::string&gt;(<span class="stringliteral">&quot;127.0.0.1&quot;</span>, <span class="comment">// put IP instead of localhost to avoid DNS issues</span>
+<a name="l00076"></a>00076    m_host(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;std::string&gt;(<span class="stringliteral">&quot;127.0.0.1&quot;</span>, <span class="comment">// put IP instead of localhost to avoid DNS issues</span>
 <a name="l00077"></a>00077                                   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a>::xml_factory::node(arg),
 <a name="l00078"></a>00078                                   <span class="stringliteral">&quot;addr&quot;</span>)),
-<a name="l00079"></a>00079    m_port(<a class="code" href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b" title="XML attribute extraction.">parse_attr</a>&lt;std::string&gt;(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a>::xml_factory::node(arg),
+<a name="l00079"></a>00079    m_port(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;std::string&gt;(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a>::xml_factory::node(arg),
 <a name="l00080"></a>00080                                   <span class="stringliteral">&quot;port&quot;</span>)),
 <a name="l00081"></a>00081    m_socket(get_io_service()) {
 <a name="l00082"></a>00082   <a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry">syslog</a>()&lt;&lt;<span class="stringliteral">&quot;Will try to connect to &quot;</span>&lt;&lt;m_host&lt;&lt;<span class="charliteral">&#39;:&#39;</span>&lt;&lt;m_port;
@@ -210,7 +210,7 @@ window.onload = initDynSections;
 <a name="l00143"></a>00143 }
 <a name="l00144"></a>00144 
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -75,85 +75,24 @@ window.onload = initDynSections;
 </div>
 <div class="contents">
 <h1>TREX::utils::XmlFactory&lt; Product, Output, Arg &gt;::declare&lt; Ty &gt; Class Template Reference</h1><!-- doxytag: class="TREX::utils::XmlFactory::declare" -->
-<p>Producer declaration.  
-<a href="#_details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="../../d5/da2/XmlFactory_8hh_source.html">trex/utils/XmlFactory.hh</a>&gt;</code></p>
-
 <p><a href="../../d5/d10/classTREX_1_1utils_1_1XmlFactory_1_1declare-members.html">List of all members.</a></p>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr><td colspan="2"><h2>Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html#afefa68ceed1d9d2e032fa111ce6bb3d5">declare</a> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> const &amp;id)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#afefa68ceed1d9d2e032fa111ce6bb3d5"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a296d1d7f0fee689fe4e1520eb2115476"></a><!-- doxytag: member="TREX::utils::XmlFactory::declare::~declare" ref="a296d1d7f0fee689fe4e1520eb2115476" args="()" -->
-virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html#a296d1d7f0fee689fe4e1520eb2115476">~declare</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afefa68ceed1d9d2e032fa111ce6bb3d5"></a><!-- doxytag: member="TREX::utils::XmlFactory::declare::declare" ref="afefa68ceed1d9d2e032fa111ce6bb3d5" args="(Symbol const &amp;id)" -->
+&nbsp;</td><td class="memItemRight" valign="bottom"><b>declare</b> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> const &amp;id)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <h3>template&lt;class Product, class Output = Product *, class Arg = void&gt;<br/>
 template&lt;class Ty&gt;<br/>
  class TREX::utils::XmlFactory&lt; Product, Output, Arg &gt;::declare&lt; Ty &gt;</h3>
 
-<p>Producer declaration. </p>
-<dl><dt><b>Template Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>Ty</em>&nbsp;</td><td>concrete type of the product</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>This class is a producer for the <a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">XmlFactory</a> allowing the creation of <code>Ty</code> instances.</p>
-<dl class="pre"><dt><b>Precondition:</b></dt><dd><code>Ty</code> derives from <code>Product</code> </dd>
-<dd>
-<code>Ty</code> has a constructor that accepts <a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html#abb7a34b853a748b343bc172972269f50" title="argument type for the factory">XmlFactory::argument_type</a> as argument.</dd></dl>
-<dl class="see"><dt><b>See also:</b></dt><dd>class <a class="el" href="../../dc/d42/classTREX_1_1utils_1_1Factory_1_1declare.html" title="Simple producer declaration.">Factory::declare</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html#l00235">235</a> of file <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html">XmlFactory.hh</a>.</p>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="afefa68ceed1d9d2e032fa111ce6bb3d5"></a><!-- doxytag: member="TREX::utils::XmlFactory::declare::declare" ref="afefa68ceed1d9d2e032fa111ce6bb3d5" args="(Symbol const &amp;id)" -->
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class Product , class Output  = Product *, class Arg  = void&gt; </div>
-<div class="memtemplate">
-template&lt;class Ty&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">TREX::utils::XmlFactory</a>&lt; Product, Output, Arg &gt;::<a class="el" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">declare</a>&lt; Ty &gt;::<a class="el" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">declare</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> const &amp;&nbsp;</td>
-          <td class="paramname"> <em>id</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Constructor. </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>id</em>&nbsp;</td><td>An identifier</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Creates a new instance and register it to the <a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">XmlFactory</a> with the identifier <code>id</code> </p>
-<dl class="pre"><dt><b>Precondition:</b></dt><dd><code>id</code> has not been already declared in the <a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">XmlFactory</a></dd></dl>
-<dl><dt><b>Exceptions:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em><a class="el" href="../../d1/d0d/classTREX_1_1utils_1_1MultipleFactoryDecl.html" title="Multiple producers declaration.">MultipleFactoryDecl</a></em>&nbsp;</td><td><code>id</code> is alreaduy in use in the <a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html" title="Xml based factory.">XmlFactory</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html#l00249">249</a> of file <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html">XmlFactory.hh</a>.</p>
-
-</div>
-</div>
+<p>Definition at line <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html#l00128">128</a> of file <a class="el" href="../../d5/da2/XmlFactory_8hh_source.html">XmlFactory.hh</a>.</p>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>trex/utils/<a class="el" href="../../d5/da2/XmlFactory_8hh_source.html">XmlFactory.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

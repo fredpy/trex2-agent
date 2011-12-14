@@ -1,13 +1,30 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="5,237,184,267"/>
-<area shape="rect" id="node6" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="232,237,411,267"/>
-<area shape="rect" id="node13" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="712,83,901,112"/>
-<area shape="rect" id="node21" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="420,83,601,112"/>
-<area shape="rect" id="node8" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="104,315,288,344"/>
-<area shape="rect" id="node11" href="$d1/d8f/Predicate_8hh.html" title="abstract TREX predicate for transactions" alt="" coords="336,315,557,344"/>
-<area shape="rect" id="node15" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="727,160,887,189"/>
-<area shape="rect" id="node18" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="775,237,935,267"/>
-<area shape="rect" id="node24" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="548,160,703,189"/>
-<area shape="rect" id="node27" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="435,237,680,267"/>
-<area shape="rect" id="node30" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="263,160,473,189"/>
+<area shape="rect" id="node3" href="$d0/dc8/_8old_2old_2Assembly_8cc_source.html" title="extra/europa2.old/old/Assembly.cc" alt="" coords="1715,392,1965,421"/>
+<area shape="rect" id="node6" href="$df/dad/_8old_2old_2Assembly_8hh_source.html" title="extra/europa2.old/old/Assembly.hh" alt="" coords="2064,392,2315,421"/>
+<area shape="rect" id="node43" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="2987,237,3165,267"/>
+<area shape="rect" id="node46" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="2400,237,2579,267"/>
+<area shape="rect" id="node57" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="3351,83,3540,112"/>
+<area shape="rect" id="node65" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="3113,83,3295,112"/>
+<area shape="rect" id="node8" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="5,469,200,499"/>
+<area shape="rect" id="node11" href="$d5/d24/DbCore_8hh_source.html" title="extra/europa/DbCore.hh" alt="" coords="248,469,432,499"/>
+<area shape="rect" id="node13" href="$d6/d11/DbSolver_8hh_source.html" title="extra/europa/DbSolver.hh" alt="" coords="456,469,648,499"/>
+<area shape="rect" id="node15" href="$df/d3b/DeliberationFilter_8hh_source.html" title="extra/europa/DeliberationFilter.hh" alt="" coords="672,469,920,499"/>
+<area shape="rect" id="node17" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="944,469,1173,499"/>
+<area shape="rect" id="node20" href="$d9/df7/ReactorPropagator_8hh_source.html" title="extra/europa/ReactorPropagator.hh" alt="" coords="1221,469,1483,499"/>
+<area shape="rect" id="node22" href="$d1/dde/old_2Assembly_8cc_source.html" title="extra/europa.old/Assembly.cc" alt="" coords="3165,469,3384,499"/>
+<area shape="rect" id="node25" href="$d7/d20/extra_2europa_8old_2Constraints_8hh_source.html" title="extra/europa.old/Constraints.hh" alt="" coords="1507,469,1741,499"/>
+<area shape="rect" id="node27" href="$d3/d4c/old_2DeliberationFilter_8cc_source.html" title="extra/europa.old/DeliberationFilter.cc" alt="" coords="1765,469,2037,499"/>
+<area shape="rect" id="node29" href="$d9/d44/europa_8old_2EuropaDomains_8cc_source.html" title="extra/europa.old/EuropaDomains.cc" alt="" coords="3432,469,3691,499"/>
+<area shape="rect" id="node32" href="$de/dc2/old_2EuropaReactor_8hh_source.html" title="extra/europa.old/EuropaReactor.hh" alt="" coords="2061,469,2317,499"/>
+<area shape="rect" id="node34" href="$d8/d35/_8old_2DbSolver_8cc_source.html" title="extra/europa2.old/DbSolver.cc" alt="" coords="2341,469,2563,499"/>
+<area shape="rect" id="node36" href="$d1/ddc/europa2_8old_2EuropaDomains_8cc_source.html" title="extra/europa2.old/EuropaDomains.cc" alt="" coords="3739,469,4005,499"/>
+<area shape="rect" id="node39" href="$dd/dc8/TokenManager_8cc_source.html" title="extra/europa2.old/old/TokenManager.cc" alt="" coords="2587,469,2869,499"/>
+<area shape="rect" id="node41" href="$d4/dd9/Synchronizer_8hh_source.html" title="extra/europa2.old/Synchronizer.hh" alt="" coords="2893,469,3141,499"/>
+<area shape="rect" id="node48" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="2653,315,2837,344"/>
+<area shape="rect" id="node52" href="$d1/d8f/Predicate_8hh.html" title="abstract TREX predicate for transactions" alt="" coords="1997,315,2219,344"/>
+<area shape="rect" id="node59" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="3365,160,3525,189"/>
+<area shape="rect" id="node62" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="3507,237,3667,267"/>
+<area shape="rect" id="node68" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="3187,160,3341,189"/>
+<area shape="rect" id="node71" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="3213,237,3459,267"/>
+<area shape="rect" id="node74" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="2828,160,3039,189"/>
 </map>

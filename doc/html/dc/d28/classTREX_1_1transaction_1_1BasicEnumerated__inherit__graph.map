@@ -1,9 +1,10 @@
 <map id="G" name="G">
 <area shape="rect" id="node7" href="$d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html" title="TREX::transaction::EnumeratedDomain\&lt; std::string \&gt;" alt="" coords="888,5,1277,35"/>
 <area shape="rect" id="node11" href="$d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html" title="TREX::transaction::EnumeratedDomain\&lt; TREX::utils::Symbol \&gt;" alt="" coords="857,59,1308,88"/>
-<area shape="rect" id="node15" href="$d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html" title="Enumeration based domain." alt="" coords="892,112,1273,141"/>
+<area shape="rect" id="node20" href="$d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html" title="Enumeration based domain." alt="" coords="892,112,1273,141"/>
 <area shape="rect" id="node2" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition." alt="" coords="245,59,485,88"/>
 <area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="7,59,196,88"/>
 <area shape="rect" id="node9" href="$d6/d94/classTREX_1_1transaction_1_1StringDomain.html" title="String domain." alt="" coords="1357,5,1603,35"/>
 <area shape="rect" id="node13" href="$d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects." alt="" coords="1375,59,1585,88"/>
+<area shape="rect" id="node18" href="$d5/d1a/classTREX_1_1transaction_1_1EnumDomain.html" title="Enum domain." alt="" coords="1359,112,1601,141"/>
 </map>

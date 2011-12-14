@@ -110,8 +110,8 @@ Collaboration diagram for TREX::utils::SingletonWrapper&lt; Ty &gt;:</div>
 <tr><td class="memItemLeft" align="right" valign="top">static void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d1/d3e/classTREX_1_1utils_1_1internal_1_1SingletonDummy.html#ad81d6ef75226a897b8adf5d5e454b729">detach</a> (std::string const &amp;name)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">reference end notification  <a href="#ad81d6ef75226a897b8adf5d5e454b729"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Friends</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a30c1ae2537cb7fb33a9d76225d9c7a49"></a><!-- doxytag: member="TREX::utils::SingletonWrapper::internal::swrapper_factory&lt; Ty &gt;" ref="a30c1ae2537cb7fb33a9d76225d9c7a49" args="" -->
-class&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal::swrapper_factory&lt; Ty &gt;</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad49fd1e46d391069654dc81822300428"></a><!-- doxytag: member="TREX::utils::SingletonWrapper::internal::swrapper_factory&lt; Ty &gt;" ref="ad49fd1e46d391069654dc81822300428" args="" -->
+struct&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal::swrapper_factory&lt; Ty &gt;</b></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <h3>template&lt;typename Ty&gt;<br/>
@@ -126,7 +126,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal::swrapper_f
 </dl>
 <p>This class is used internally to encapsulate and control the life-time of a phoenix singleton accessed through SingletonUse&lt;Ty&gt;</p>
 <p>If one want to implement the classs <code>Sing</code> as a pure singleton -- meaning that it cannot be created otherwise -- he needs to define all its constructors (or at least its destructor) as private and than make <code>SingletonWrapper&lt;Sing&gt;</code> friend of this class.</p>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000003">Bug:</a></b></dt><dd>There's a potential issue with dynamic library loading on certain platforms. The resolution would be potentially to use <code>boost::flyweight</code> with <code>intermodule_holder</code> as in the <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> class. But as for now it appears to work and I don't know really how to reimplement this class and still have some guarantees that I can somehow guarantee that no intermediate class would be created.</dd></dl>
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000007">Bug:</a></b></dt><dd>There's a potential issue with dynamic library loading on certain platforms. The resolution would be potentially to use <code>boost::flyweight</code> with <code>intermodule_holder</code> as in the <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> class. But as for now it appears to work and I don't know really how to reimplement this class and still have some guarantees that I can somehow guarantee that no intermediate class would be created.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>The instance operator appears to be very slow sometimes. I need to find a way to improve it.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>SingletonUse&lt;Ty&gt; </dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
@@ -191,7 +191,7 @@ template&lt;typename Ty &gt; </div>
 <li>trex/utils/bits/<a class="el" href="../../da/d82/SingletonWrapper_8hh_source.html">SingletonWrapper.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

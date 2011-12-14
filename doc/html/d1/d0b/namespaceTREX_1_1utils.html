@@ -96,8 +96,6 @@ window.onload = initDynSections;
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><code>errno</code> handling exception  <a href="../../d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d94/classTREX_1_1utils_1_1Exception.html">Exception</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">TREX exception.  <a href="../../db/d94/classTREX_1_1utils_1_1Exception.html#_details">More...</a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">ext_iterator</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML nodes iterator through files.  <a href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/dd2/classTREX_1_1utils_1_1Factory.html">Factory</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Generic global factory.  <a href="../../d0/dd2/classTREX_1_1utils_1_1Factory.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/d78/classTREX_1_1utils_1_1FactoryException.html">FactoryException</a></td></tr>
@@ -143,15 +141,16 @@ window.onload = initDynSections;
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html">XmlError</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing related errors.  <a href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html#_details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">XmlFactory</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Xml based factory.  <a href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html#_details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">BasicSymbol</a>&lt; char &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043">Symbol</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">char based <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a>  <a href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga6018b6a276d38592d92c504a8104dd54">checked_string</a> (char const *str)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab7a487c65eaffe7265598241cfb76be1"></a><!-- doxytag: member="TREX::utils::ext_xml" ref="ab7a487c65eaffe7265598241cfb76be1" args="(boost::property_tree::ptree &amp;tree, std::string const &amp;conf, bool ahead=true)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>ext_xml</b> (boost::property_tree::ptree &amp;tree, std::string const &amp;conf, bool ahead=true)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a6c7cbe7935a32bbaeed42a410a9395"></a><!-- doxytag: member="TREX::utils::hash_value" ref="a2a6c7cbe7935a32bbaeed42a410a9395" args="(TREX::utils::Hashable const &amp;x)" -->
 std::size_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>hash_value</b> (<a class="el" href="../../da/d64/classTREX_1_1utils_1_1Hashable.html">TREX::utils::Hashable</a> const &amp;x)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga9056612c4e49a64165e11dba0df0f2ee">is_tag</a> (rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;tag)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga3f53b52b07b15188ea2d94b36ba9f096">is_tag</a> (boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;tag)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga2460f6f105aee416321452e4b4d40042">operator!=</a> (timeval const &amp;t1, timeval const &amp;t2)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"Not equal to" operator  <a href="../../db/d81/group__utils.html#ga2460f6f105aee416321452e4b4d40042"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">timeval&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga024a041f48f7ed703f8b478953f47e98">operator*</a> (timeval const &amp;t, long n)</td></tr>
@@ -178,12 +177,18 @@ std::size_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>hash_value</b>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"Greater than" operator  <a href="../../db/d81/group__utils.html#ga57a8badbd06cdc978142efa013afd973"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga01726bb7a940bf96cd98e0f77fd6ab63">operator&gt;=</a> (timeval const &amp;t1, timeval const &amp;t2)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">"Greater or equal to" operator  <a href="../../db/d81/group__utils.html#ga01726bb7a940bf96cd98e0f77fd6ab63"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="aa764e59b405f6bca6202653122be1808"></a><!-- doxytag: member="TREX::utils::parse_attr" ref="aa764e59b405f6bca6202653122be1808" args="(Ty const &amp;on_missing, boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)" -->
+template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>parse_attr</b> (Ty const &amp;on_missing, boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga1f80888fbf81f21d542f8c027b40c658">parse_attr</a> (Ty const &amp;on_missing, rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;attr)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Optional XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga1f80888fbf81f21d542f8c027b40c658"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b">parse_attr</a> (rapidxml::xml_node&lt;&gt; const &amp;node, std::string const &amp;attr)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga73292c42679ce601b55225eea9c0be2b"></a><br/></td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga87a8c1d25dac7ed849964394daf33a23">parse_attr</a> (Ty const &amp;on_missing, boost::property_tree::ptree const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Optional XML attribute extraction.  <a href="../../db/d81/group__utils.html#ga87a8c1d25dac7ed849964394daf33a23"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a6f90128dfea89c0817624b4924bee239"></a><!-- doxytag: member="TREX::utils::set_attr" ref="a6f90128dfea89c0817624b4924bee239" args="(boost::property_tree::ptree::value_type &amp;node, std::string const &amp;attr, Ty const &amp;value)" -->
+template&lt;typename Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>set_attr</b> (boost::property_tree::ptree::value_type &amp;node, std::string const &amp;attr, Ty const &amp;value)</td></tr>
+<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="aebde850cd75b15a1304f1c9f7e0267ef"></a><!-- doxytag: member="TREX::utils::set_attr" ref="aebde850cd75b15a1304f1c9f7e0267ef" args="(boost::property_tree::ptree &amp;node, std::string const &amp;attr, Ty const &amp;value)" -->
+template&lt;typename Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">void&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>set_attr</b> (boost::property_tree::ptree &amp;node, std::string const &amp;attr, Ty const &amp;value)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;typename Ty &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga45e5bbd4c3bbdc7947c0d64101af28a2">string_cast</a> (Ty const &amp;on_error, std::string const &amp;in, std::ios_base &amp;(*format)(std::ios_base &amp;)=std::dec)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Convert string to type.  <a href="../../db/d81/group__utils.html#ga45e5bbd4c3bbdc7947c0d64101af28a2"></a><br/></td></tr>
@@ -197,20 +202,83 @@ std::size_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>hash_value</b>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Conversion to double.  <a href="../../db/d81/group__utils.html#ga16d6219a0cdf4bc8fe85e353a106fa08"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">timeval&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#ga07c6cff84e6c0acf82a32c502d6e9052">to_timeval</a> (double v)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">conversion of a <code>double</code> to a <code>timeval</code>  <a href="../../db/d81/group__utils.html#ga07c6cff84e6c0acf82a32c502d6e9052"></a><br/></td></tr>
-<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a68d5e331477f1c4b4d943ebe9c8dcfc5"></a><!-- doxytag: member="TREX::utils::xml_conf_var" ref="a68d5e331477f1c4b4d943ebe9c8dcfc5" args="(ext_iterator const &amp;conf, std::string const &amp;tag, Ty const &amp;on_missing)" -->
-template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>xml_conf_var</b> (<a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">ext_iterator</a> const &amp;conf, std::string const &amp;tag, Ty const &amp;on_missing)</td></tr>
-<tr><td class="memTemplParams" colspan="2"><a class="anchor" id="a028c1f7773896775b8af129cb590e91a"></a><!-- doxytag: member="TREX::utils::xml_conf_var" ref="a028c1f7773896775b8af129cb590e91a" args="(ext_iterator const &amp;conf, std::string const &amp;tag)" -->
-template&lt;class Ty &gt; </td></tr>
-<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><b>xml_conf_var</b> (<a class="el" href="../../d2/d95/classTREX_1_1utils_1_1ext__iterator.html">ext_iterator</a> const &amp;conf, std::string const &amp;tag)</td></tr>
+<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="amgrpd41d8cd98f00b204e9800998ecf8427e"></a> </p>
+</div></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../d1/d0b/namespaceTREX_1_1utils.html#a93c6c3430226053f8d7244a441c48c1f">parse_attr</a> (boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="#a93c6c3430226053f8d7244a441c48c1f"></a><br/></td></tr>
+<tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
+<tr><td class="memTemplItemLeft" align="right" valign="top">Ty&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91">parse_attr</a> (boost::property_tree::ptree const &amp;node, std::string const &amp;attr)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML attribute extraction.  <a href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>TREX basic utilities. </p>
 <p>This namespace embeds different classes that are not necessarily specific to TREX but eases different implementation aspect of it.</p>
 <p>You'll find here classes providing very basic features such as thread management, exceptions, and other general design patterns.</p>
 <p>Normally classes and code defined here is provided by the dynamic library named TREXutils. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="a93c6c3430226053f8d7244a441c48c1f"></a><!-- doxytag: member="TREX::utils::parse_attr" ref="a93c6c3430226053f8d7244a441c48c1f" args="(boost::property_tree::ptree::value_type const &amp;node, std::string const &amp;attr)" -->
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class Ty &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">Ty TREX::utils::parse_attr </td>
+          <td>(</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type const &amp;&nbsp;</td>
+          <td class="paramname"> <em>node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string const &amp;&nbsp;</td>
+          <td class="paramname"> <em>attr</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:43 2011 for trex by&nbsp;
+<div class="memdoc">
+
+<p>XML attribute extraction. </p>
+<dl><dt><b>Template Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>Ty</em>&nbsp;</td><td>output type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>node</em>&nbsp;</td><td>An XML node </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>attr</em>&nbsp;</td><td>Attribute name</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This method extract attribute <em>attr</em> from <em>node</em> and parses it as a <em>Ty</em> variable</p>
+<dl class="pre"><dt><b>Precondition:</b></dt><dd><em>node</em> has the attribute <em>attr</em> </dd>
+<dd>
+the value of <em>attr</em> can be parsed into the type <em>Ty</em> </dd></dl>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em><a class="el" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a></em>&nbsp;</td><td>Unable to find attribute <em>attr</em> </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em><a class="el" href="../../df/d3e/classTREX_1_1utils_1_1bad__string__cast.html" title="Bad string cast exception.">bad_string_cast</a></em>&nbsp;</td><td>Cannot parse the value of <em>attr</em> as <em>Ty</em> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The parsed value from <em>attr</em> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd>template&lt;class Ty&gt; Ty const &amp;parse_attr(Ty const &amp;, rapidxml::xml_node&lt;&gt; const &amp;, std::string const &amp;attr) </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html#l00165">165</a> of file <a class="el" href="../../d5/d41/XmlUtils_8hh_source.html">XmlUtils.hh</a>.</p>
+
+</div>
+</div>
+</div>
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:02 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

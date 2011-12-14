@@ -131,8 +131,8 @@ typedef attr_set::iterator&nbsp;</td><td class="memItemRight" valign="bottom"><a
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get end interval.  <a href="#a22443516419c3d6bd1c17572f0f62866"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html">IntegerDomain</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a2fa4cc0ceba6cc00fcb2d5536b2de370">getStart</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get start interval.  <a href="#a2fa4cc0ceba6cc00fcb2d5536b2de370"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#ad041cf9cc60ba544c796a65fff644e37">Goal</a> (rapidxml::xml_node&lt;&gt; const &amp;node)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#ad041cf9cc60ba544c796a65fff644e37"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#ae4ced2a5df0d7880a63bb70df9226ba0">Goal</a> (boost::property_tree::ptree::value_type &amp;node)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">XML parsing constructor.  <a href="#ae4ced2a5df0d7880a63bb70df9226ba0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a7b1152365293fafbdd0b69483a5e4e96">Goal</a> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;object, <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;pred)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a7b1152365293fafbdd0b69483a5e4e96"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a32288a33c462c40aaefb0a6e98796557">Goal</a> (<a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html">Goal</a> const &amp;others)</td></tr>
@@ -291,14 +291,14 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 
 </div>
 </div>
-<a class="anchor" id="ad041cf9cc60ba544c796a65fff644e37"></a><!-- doxytag: member="TREX::transaction::Goal::Goal" ref="ad041cf9cc60ba544c796a65fff644e37" args="(rapidxml::xml_node&lt;&gt; const &amp;node)" -->
+<a class="anchor" id="ae4ced2a5df0d7880a63bb70df9226ba0"></a><!-- doxytag: member="TREX::transaction::Goal::Goal" ref="ae4ced2a5df0d7880a63bb70df9226ba0" args="(boost::property_tree::ptree::value_type &amp;node)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Goal::Goal </td>
           <td>(</td>
-          <td class="paramtype">rapidxml::xml_node&lt;&gt; const &amp;&nbsp;</td>
+          <td class="paramtype">boost::property_tree::ptree::value_type &amp;&nbsp;</td>
           <td class="paramname"> <em>node</em></td>
           <td>&nbsp;)&nbsp;</td>
           <td></td>
@@ -327,9 +327,9 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
   </table>
   </dd>
 </dl>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#ab5e9a7c6de374f7896c517310767cd1e" title="Constructor.">Variable::Variable(rapidxml::xml_node&lt;&gt; const &amp;)</a> </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd>Variable::Variable(rapidxml::xml_node&lt;&gt; const &amp;) </dd>
 <dd>
-<a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a2ac0713484456ee7aca5742e3001e877" title="Constructor.">Predicate::Predicate(rapidxml::xml_node&lt;&gt; const &amp;)</a> </dd></dl>
+Predicate::Predicate(rapidxml::xml_node&lt;&gt; const &amp;) </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00075">75</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
@@ -338,8 +338,8 @@ std::ostream &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>std::op
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
-<div class="center"><img src="../../d0/d04/classTREX_1_1transaction_1_1Goal_ad041cf9cc60ba544c796a65fff644e37_cgraph.png" border="0" usemap="#d0/d04/classTREX_1_1transaction_1_1Goal_ad041cf9cc60ba544c796a65fff644e37_cgraph_map" alt=""></div>
-<map name="d0/d04/classTREX_1_1transaction_1_1Goal_ad041cf9cc60ba544c796a65fff644e37_cgraph_map" id="d0/d04/classTREX_1_1transaction_1_1Goal_ad041cf9cc60ba544c796a65fff644e37_cgraph">
+<div class="center"><img src="../../d0/d04/classTREX_1_1transaction_1_1Goal_ae4ced2a5df0d7880a63bb70df9226ba0_cgraph.png" border="0" usemap="#d0/d04/classTREX_1_1transaction_1_1Goal_ae4ced2a5df0d7880a63bb70df9226ba0_cgraph_map" alt=""></div>
+<map name="d0/d04/classTREX_1_1transaction_1_1Goal_ae4ced2a5df0d7880a63bb70df9226ba0_cgraph_map" id="d0/d04/classTREX_1_1transaction_1_1Goal_ae4ced2a5df0d7880a63bb70df9226ba0_cgraph">
 <area shape="rect" id="node3" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set" alt="" coords="325,5,581,35"/><area shape="rect" id="node5" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute." alt="" coords="327,59,580,88"/><area shape="rect" id="node7" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="315,112,592,141"/><area shape="rect" id="node19" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a6a9c8594761ba152bb7c92ec9350348c" title="Restrict domain possible values." alt="" coords="279,165,628,195"/><area shape="rect" id="node9" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="716,5,980,35"/><area shape="rect" id="node11" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="677,59,1019,88"/><area shape="rect" id="node13" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="692,112,1004,141"/><area shape="rect" id="node15" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="715,165,981,195"/><area shape="rect" id="node17" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain." alt="" coords="695,219,1001,248"/></map>
 </div>
 </p>
@@ -393,7 +393,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00142">142</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00128">TREX::transaction::Predicate::listAttributes()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00130">TREX::transaction::Predicate::listAttributes()</a>.</p>
 
 </div>
 </div>
@@ -443,7 +443,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00154">154</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00086">TREX::transaction::Predicate::getAttribute()</a>, <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00075">Goal()</a>, <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00128">TREX::transaction::Predicate::listAttributes()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00072">TREX::transaction::Predicate::restrictAttribute()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00088">TREX::transaction::Predicate::getAttribute()</a>, <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00075">Goal()</a>, <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00130">TREX::transaction::Predicate::listAttributes()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00074">TREX::transaction::Predicate::restrictAttribute()</a>.</p>
 
 </div>
 </div>
@@ -784,7 +784,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00240">240</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00130">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a29f500133a682da60d2b8163759d21c7">TREX::transaction::DomainBase::equals()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a440713f816db16985e6f0418cf309c3b">TREX::transaction::DomainBase::isFull()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00191">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>.</p>
+<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00128">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a29f500133a682da60d2b8163759d21c7">TREX::transaction::DomainBase::equals()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a440713f816db16985e6f0418cf309c3b">TREX::transaction::DomainBase::isFull()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00191">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -818,7 +818,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00119">119</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00275">TREX::transaction::TeleoReactor::postObservation()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00106">TREX::transaction::Predicate::toXml()</a>.</p>
+<p>Referenced by <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00295">TREX::transaction::TeleoReactor::postObservation()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
 
 </div>
 </div>
@@ -882,7 +882,7 @@ template&lt;class Ty&gt; Ty const &amp;getDomain(TREX::utils::Symbol const &amp;
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00129">129</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00106">TREX::transaction::Predicate::toXml()</a>.</p>
+<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
 
 </div>
 </div>
@@ -914,9 +914,9 @@ template&lt;class Ty&gt; Ty const &amp;getDomain(TREX::utils::Symbol const &amp;
 
 <p>Implements <a class="el" href="../../d2/d06/classTREX_1_1utils_1_1ostreamable.html#ab18497c33e04e7eec72edfdc9f6c79a4">TREX::utils::ostreamable</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00093">93</a> of file <a class="el" href="../../d5/da1/Predicate_8cc_source.html">Predicate.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00095">95</a> of file <a class="el" href="../../d5/da1/Predicate_8cc_source.html">Predicate.cc</a>.</p>
 
-<p>References <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00086">TREX::transaction::Predicate::getAttribute()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00128">TREX::transaction::Predicate::listAttributes()</a>.</p>
+<p>References <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00088">TREX::transaction::Predicate::getAttribute()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00130">TREX::transaction::Predicate::listAttributes()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1227,7 +1227,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00128">128</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00130">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html#l00494">TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;::getBounds()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff">TREX::transaction::DomainBase::intersect()</a>, <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00102">TREX::transaction::Variable::restrict()</a>, and <a class="el" href="../../da/d84/Variable_8hh_source.html#l00199">TREX::transaction::Variable::typedDomain()</a>.</p>
+<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00128">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html#l00494">TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;::getBounds()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff">TREX::transaction::DomainBase::intersect()</a>, <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00100">TREX::transaction::Variable::restrict()</a>, and <a class="el" href="../../da/d84/Variable_8hh_source.html#l00199">TREX::transaction::Variable::typedDomain()</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00075">Goal()</a>, and <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00204">startsAfter()</a>.</p>
 
@@ -1371,9 +1371,9 @@ Here is the call graph for this function:</div>
 <p>The output excludes all the attributes that are not really constrained to reduce the size of this description.</p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><em>out</em> after the operation </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00106">106</a> of file <a class="el" href="../../d5/da1/Predicate_8cc_source.html">Predicate.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">108</a> of file <a class="el" href="../../d5/da1/Predicate_8cc_source.html">Predicate.cc</a>.</p>
 
-<p>References <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00086">TREX::transaction::Predicate::getAttribute()</a>, <a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a6c43ca4cb34f376a267230cce4b1c85d">TREX::transaction::Predicate::getPredTag()</a>, <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00128">TREX::transaction::Predicate::listAttributes()</a>, <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00119">TREX::transaction::Predicate::object()</a>, and <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00129">TREX::transaction::Predicate::predicate()</a>.</p>
+<p>References <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00088">TREX::transaction::Predicate::getAttribute()</a>, <a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a6c43ca4cb34f376a267230cce4b1c85d">TREX::transaction::Predicate::getPredTag()</a>, <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00130">TREX::transaction::Predicate::listAttributes()</a>, <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00119">TREX::transaction::Predicate::object()</a>, and <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00129">TREX::transaction::Predicate::predicate()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1391,7 +1391,7 @@ Here is the call graph for this function:</div>
 <li>trex/transaction/<a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:42 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:57 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

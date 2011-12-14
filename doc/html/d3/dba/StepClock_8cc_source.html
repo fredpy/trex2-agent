@@ -133,50 +133,51 @@ window.onload = initDynSections;
 <a name="l00074"></a>00074   <span class="keywordflow">return</span> stepsPerTick;
 <a name="l00075"></a>00075 }
 <a name="l00076"></a>00076 
-<a name="l00077"></a>00077 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::parseStep(rapidxml::xml_attribute&lt;&gt; *steps) {
-<a name="l00078"></a>00078   <span class="keywordflow">if</span>( NULL==steps ) {
-<a name="l00079"></a>00079     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;missing steps attribute in XML definition.\n&quot;</span>
-<a name="l00080"></a>00080                        &lt;&lt;<span class="stringliteral">&quot;\tSetting it to 50.\n&quot;</span>;
-<a name="l00081"></a>00081     <span class="keywordflow">return</span> 50;
-<a name="l00082"></a>00082   } <span class="keywordflow">else</span> 
-<a name="l00083"></a>00083     <span class="keywordflow">return</span> selectStep(string_cast&lt;unsigned int&gt;(std::string(steps-&gt;value(),
-<a name="l00084"></a>00084                                                      steps-&gt;value_size())));
-<a name="l00085"></a>00085 }
-<a name="l00086"></a>00086 
-<a name="l00087"></a>00087 <span class="comment">// structors :</span>
-<a name="l00088"></a>00088 
-<a name="l00089"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70">00089</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(<span class="keywordtype">double</span> sleepSeconds, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) 
-<a name="l00090"></a>00090   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(sleepSeconds), m_tick(0), m_currentStep(0), 
-<a name="l00091"></a>00091    m_stepsPerTickDefault(selectStep(stepsPerTick)) {
-<a name="l00092"></a>00092   m_stepsPerTick = m_stepsPerTickDefault;
-<a name="l00093"></a>00093 }
-<a name="l00094"></a>00094 
-<a name="l00095"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#aa58f65660ed23f663e3124d7d73a0f11">00095</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node) 
-<a name="l00096"></a>00096   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(0.0), m_tick(0), m_currentStep(0),
-<a name="l00097"></a>00097    m_stepsPerTickDefault(parseStep(node.first_attribute(<span class="stringliteral">&quot;steps&quot;</span>))) {}
-<a name="l00098"></a>00098 
-<a name="l00099"></a>00099 <span class="comment">// modifiers :</span>
-<a name="l00100"></a>00100 
-<a name="l00101"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a">00101</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a" title="get current tick date This method advances the number of steps used in current tick...">StepClock::getNextTick</a>() {
-<a name="l00102"></a>00102   <span class="keywordflow">if</span>( m_currentStep&gt;=m_stepsPerTick ) {
-<a name="l00103"></a>00103     <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d" title="increment tick value">Clock::advanceTick</a>(m_tick);
-<a name="l00104"></a>00104     m_stepsPerTick = m_stepsPerTickDefault;
-<a name="l00105"></a>00105     m_currentStep = 0;
-<a name="l00106"></a>00106   } <span class="keywordflow">else</span> 
-<a name="l00107"></a>00107     ++m_currentStep;
-<a name="l00108"></a>00108   <span class="keywordflow">return</span> m_tick;
-<a name="l00109"></a>00109 }
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111 <span class="comment">// observers :</span>
-<a name="l00112"></a>00112 
-<a name="l00113"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27">00113</a> <span class="keywordtype">void</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27" title="Change maximum number of steps for this tick.">StepClock::setMaxSteps</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nSteps)<span class="keyword"> const </span>{
-<a name="l00114"></a>00114   <span class="keywordflow">if</span>( nSteps&gt;0 ) {
-<a name="l00115"></a>00115     m_stepsPerTick = nSteps;
-<a name="l00116"></a>00116     m_currentStep = 0;
-<a name="l00117"></a>00117   }
-<a name="l00118"></a>00118 }
+<a name="l00077"></a>00077 <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> StepClock::parseStep(boost::property_tree::ptree &amp;steps) {
+<a name="l00078"></a>00078   boost::optional&lt;size_t&gt; val = parse_attr&lt; boost::optional&lt;size_t&gt; &gt;(steps, <span class="stringliteral">&quot;steps&quot;</span>);
+<a name="l00079"></a>00079   <span class="keywordflow">if</span>( val ) 
+<a name="l00080"></a>00080     <span class="keywordflow">return</span> selectStep(*val);
+<a name="l00081"></a>00081   <span class="keywordflow">else</span> {
+<a name="l00082"></a>00082     m_log-&gt;syslog(<span class="stringliteral">&quot;Clock&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;missing steps attribute in XML definition.\n&quot;</span>
+<a name="l00083"></a>00083                        &lt;&lt;<span class="stringliteral">&quot;\tSetting it to 50.\n&quot;</span>;
+<a name="l00084"></a>00084     <span class="keywordflow">return</span> 50;
+<a name="l00085"></a>00085   } 
+<a name="l00086"></a>00086 }
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 <span class="comment">// structors :</span>
+<a name="l00089"></a>00089 
+<a name="l00090"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70">00090</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(<span class="keywordtype">double</span> sleepSeconds, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> stepsPerTick) 
+<a name="l00091"></a>00091   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(sleepSeconds), m_tick(0), m_currentStep(0), 
+<a name="l00092"></a>00092    m_stepsPerTickDefault(selectStep(stepsPerTick)) {
+<a name="l00093"></a>00093   m_stepsPerTick = m_stepsPerTickDefault;
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095 
+<a name="l00096"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#a129d8731ddc5f2dd18e6196354275200">00096</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#ab71b318fae5a417cd165823211385d70" title="Constructor.">StepClock::StepClock</a>(boost::property_tree::ptree::value_type &amp;node) 
+<a name="l00097"></a>00097   :<a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a>(0.0), m_tick(0), m_currentStep(0),
+<a name="l00098"></a>00098    m_stepsPerTickDefault(parseStep(node.second)) {}
+<a name="l00099"></a>00099 
+<a name="l00100"></a>00100 <span class="comment">// modifiers :</span>
+<a name="l00101"></a>00101 
+<a name="l00102"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a">00102</a> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#af6a0011a9afd69ce9a9939af6271033a" title="get current tick date This method advances the number of steps used in current tick...">StepClock::getNextTick</a>() {
+<a name="l00103"></a>00103   <span class="keywordflow">if</span>( m_currentStep&gt;=m_stepsPerTick ) {
+<a name="l00104"></a>00104     <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d" title="increment tick value">Clock::advanceTick</a>(m_tick);
+<a name="l00105"></a>00105     m_stepsPerTick = m_stepsPerTickDefault;
+<a name="l00106"></a>00106     m_currentStep = 0;
+<a name="l00107"></a>00107   } <span class="keywordflow">else</span> 
+<a name="l00108"></a>00108     ++m_currentStep;
+<a name="l00109"></a>00109   <span class="keywordflow">return</span> m_tick;
+<a name="l00110"></a>00110 }
+<a name="l00111"></a>00111 
+<a name="l00112"></a>00112 <span class="comment">// observers :</span>
+<a name="l00113"></a>00113 
+<a name="l00114"></a><a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27">00114</a> <span class="keywordtype">void</span> <a class="code" href="../../d4/d87/classTREX_1_1agent_1_1StepClock.html#adc12873b6c5585046f38fdb5ef3d0f27" title="Change maximum number of steps for this tick.">StepClock::setMaxSteps</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> nSteps)<span class="keyword"> const </span>{
+<a name="l00115"></a>00115   <span class="keywordflow">if</span>( nSteps&gt;0 ) {
+<a name="l00116"></a>00116     m_stepsPerTick = nSteps;
+<a name="l00117"></a>00117     m_currentStep = 0;
+<a name="l00118"></a>00118   }
+<a name="l00119"></a>00119 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

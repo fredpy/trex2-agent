@@ -112,49 +112,51 @@ window.onload = initDynSections;
 <a name="l00038"></a>00038 
 <a name="l00039"></a>00039 <span class="preprocessor"># include &lt;PLASMA/Solver.hh&gt;</span>
 <a name="l00040"></a>00040 <span class="preprocessor"># include &lt;PLASMA/OpenConditionManager.hh&gt;</span>
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="keyword">namespace </span>TREX {
-<a name="l00043"></a>00043   <span class="keyword">namespace </span>europa {
-<a name="l00044"></a>00044     
-<a name="l00045"></a><a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">00045</a>     <span class="keyword">class </span><a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a> {
-<a name="l00046"></a>00046     <span class="keyword">public</span>:
-<a name="l00047"></a>00047       <a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly, EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg);     
-<a name="l00048"></a>00048       ~<a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>();
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050       <span class="keywordtype">bool</span> isExhausted()<span class="keyword"> const </span>{
-<a name="l00051"></a>00051        <span class="keywordflow">return</span> m_solver-&gt;isExhausted();
-<a name="l00052"></a>00052       }
-<a name="l00053"></a>00053       <span class="keywordtype">void</span> step() {
-<a name="l00054"></a>00054        m_solver-&gt;step();
-<a name="l00055"></a>00055       }
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057       <span class="keywordtype">size_t</span> getDepth()<span class="keyword"> const </span>{
-<a name="l00058"></a>00058        <span class="keywordflow">return</span> m_solver-&gt;getDepth();
-<a name="l00059"></a>00059       }
-<a name="l00060"></a>00060       <span class="keywordtype">size_t</span> getStepCount()<span class="keyword"> const </span>{
-<a name="l00061"></a>00061        <span class="keywordflow">return</span> m_solver-&gt;getStepCount();
-<a name="l00062"></a>00062       }
-<a name="l00063"></a>00063       
-<a name="l00064"></a>00064       <span class="keywordtype">bool</span> noMoreFlaws() <span class="keyword">const</span>;
-<a name="l00065"></a>00065       <span class="keywordtype">void</span> clear() {
-<a name="l00066"></a>00066        <span class="keywordflow">return</span> m_solver-&gt;clear();
-<a name="l00067"></a>00067       }
-<a name="l00068"></a>00068       <span class="keywordtype">void</span> reset() {
-<a name="l00069"></a>00069        <span class="keywordflow">return</span> m_solver-&gt;reset();
-<a name="l00070"></a>00070       }
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072       <span class="keywordtype">bool</span> inDeliberation(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) <span class="keyword">const</span>;
+<a name="l00041"></a>00041 <span class="preprocessor"># include &lt;PLASMA/Debug.hh&gt;</span>
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 <span class="keyword">namespace </span>TREX {
+<a name="l00044"></a>00044   <span class="keyword">namespace </span>europa {
+<a name="l00045"></a>00045     
+<a name="l00046"></a><a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">00046</a>     <span class="keyword">class </span><a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a> {
+<a name="l00047"></a>00047     <span class="keyword">public</span>:
+<a name="l00048"></a>00048       <a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> <span class="keyword">const</span> &amp;assembly, EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg);     
+<a name="l00049"></a>00049       ~<a class="code" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html">DbSolver</a>();
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051       <span class="keywordtype">bool</span> isExhausted()<span class="keyword"> const </span>{
+<a name="l00052"></a>00052        <span class="keywordflow">return</span> m_solver-&gt;isExhausted();
+<a name="l00053"></a>00053       }
+<a name="l00054"></a>00054       <span class="keywordtype">void</span> step() {
+<a name="l00055"></a>00055        m_solver-&gt;step();
+<a name="l00056"></a>00056        debugMsg(<span class="stringliteral">&quot;trex:step&quot;</span>, m_solver-&gt;getDecisionStackAsString());
+<a name="l00057"></a>00057       }
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059       <span class="keywordtype">size_t</span> getDepth()<span class="keyword"> const </span>{
+<a name="l00060"></a>00060        <span class="keywordflow">return</span> m_solver-&gt;getDepth();
+<a name="l00061"></a>00061       }
+<a name="l00062"></a>00062       <span class="keywordtype">size_t</span> getStepCount()<span class="keyword"> const </span>{
+<a name="l00063"></a>00063        <span class="keywordflow">return</span> m_solver-&gt;getStepCount();
+<a name="l00064"></a>00064       }
+<a name="l00065"></a>00065       
+<a name="l00066"></a>00066       <span class="keywordtype">bool</span> noMoreFlaws() <span class="keyword">const</span>;
+<a name="l00067"></a>00067       <span class="keywordtype">void</span> clear() {
+<a name="l00068"></a>00068        <span class="keywordflow">return</span> m_solver-&gt;clear();
+<a name="l00069"></a>00069       }
+<a name="l00070"></a>00070       <span class="keywordtype">void</span> reset() {
+<a name="l00071"></a>00071        <span class="keywordflow">return</span> m_solver-&gt;reset();
+<a name="l00072"></a>00072       }
 <a name="l00073"></a>00073 
-<a name="l00074"></a>00074     <span class="keyword">private</span>:
-<a name="l00075"></a>00075       EUROPA::SOLVERS::SolverId m_solver;      
-<a name="l00076"></a>00076     };
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078   } <span class="comment">// TREX::europa</span>
-<a name="l00079"></a>00079 } <span class="comment">// TREX</span>
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081 <span class="preprocessor">#endif // H_DbSolver </span>
+<a name="l00074"></a>00074       <span class="keywordtype">bool</span> inDeliberation(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) <span class="keyword">const</span>;
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076     <span class="keyword">private</span>:
+<a name="l00077"></a>00077       EUROPA::SOLVERS::SolverId m_solver;      
+<a name="l00078"></a>00078     };
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080   } <span class="comment">// TREX::europa</span>
+<a name="l00081"></a>00081 } <span class="comment">// TREX</span>
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083 <span class="preprocessor">#endif // H_DbSolver </span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:39 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

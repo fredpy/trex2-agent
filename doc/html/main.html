@@ -64,7 +64,7 @@ window.onload = initDynSections;
   </div>
 </div>
 <div class="contents">
-<h1>TREX A Teleo-Reactive Executive </h1><h3 class="version">0.1.4 </h3><p>This is the documentation of TREX codename <a href="http://www.youtube.com/watch?v=RM9o4VnfHJU&amp;feature=channel_page">barreleye</a>. This version is the first TREX version that do not rely on Europa for its core functionalities as a result one can use TREX with which ever planner he wants - as long as this one can hanlde properly the goal representation expected by TREX.</p>
+<h1>TREX A Teleo-Reactive Executive </h1><h3 class="version">0.3.0 </h3><p>This is the documentation of TREX codename <a href="http://www.youtube.com/watch?v=RM9o4VnfHJU&amp;feature=channel_page">barreleye</a>. This version is the first TREX version that do not rely on Europa for its core functionalities as a result one can use TREX with which ever planner he wants - as long as this one can hanlde properly the goal representation expected by TREX.</p>
 <h2><a class="anchor" id="install">
 Installing TREX</a></h2>
 <h3><a class="anchor" id="install-requirement">
@@ -72,7 +72,7 @@ Third party requirements</a></h3>
 <p>TREX uses third party utilities and libraries. Here's sa list of them : </p>
 <ul>
 <li><b>rapidXML</b> (<a href="http://rapidxml.sourceforge.net/">http://rapidxml.sourceforge.net/</a>) This is used for configuration parsing. TREX used to rely on TinyXML version embedded in Europa but keeping this would have been annoying as this version was part of Europa and keeping the ability to connect to Europa while using a version of TinyXML which is not necessarily the Europa one would have been tricky. On top of that rapidxml is really lightweight (only templates defined in C++ headers) and very fast (performance close to strlen). The version used -- and provided -- for this package is 1.13. </li>
-<li><b>boost</b> (<a href="http://www.boost.org">http://www.boost.org</a>) This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. As we use flyweight the earliest version to be used is 1.38.0 (we tested it with boost 1.40.0). We also use the Boost Graph Library but should support version 1.36.0 and above according to its latest documentation</li>
+<li><b>boost</b> (<a href="http://www.boost.org">http://www.boost.org</a>) This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. As we use flyweight, boost graph and property tree the earliest version to be used is 1.41.0 (we tested it with boost 1.47.0).</li>
 </ul>
 <p>Others utilies are of interrest but not necessary to use TREX: </p>
 <ul>
@@ -347,7 +347,7 @@ TREX2$
 <dd>
 At this stage this is the only mission directly available on TREX. This is due to the fact that our effort was more focused on make TREX independent from Europa than implement a large set of reactors. The porting of other reactors (Log player, europa 2.1.1 based, latest europa based, ... ) are in the process and should be available soon. </dd></dl>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:39 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

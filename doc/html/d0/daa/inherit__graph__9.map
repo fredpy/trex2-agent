@@ -1,5 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$df/dac/classTREX_1_1agent_1_1CycleDetector.html" title="Cycle detector." alt="" coords="7,32,225,61"/>
-<area shape="rect" id="node3" href="$d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html" title="Reactors initialization visitor." alt="" coords="293,5,536,35"/>
-<area shape="rect" id="node5" href="$d1/dda/classTREX_1_1agent_1_1details_1_1sync__scheduller.html" title="reactor synchronization visitor" alt="" coords="276,59,553,88"/>
+<area shape="rect" id="node1" href="$d2/dea/classmbari_1_1amqp_1_1listener.html" title="mbari::amqp::listener" alt="" coords="7,5,172,35"/>
 </map>

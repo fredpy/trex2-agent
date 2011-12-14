@@ -113,9 +113,9 @@ window.onload = initDynSections;
 <a name="l00045"></a>00045 <span class="keyword">template</span>&lt;<span class="keyword">class</span> Product, <span class="keyword">class</span> Output, <span class="keyword">class</span> Arg&gt;
 <a name="l00046"></a>00046 Output XmlFactory&lt;Product, Output, Arg&gt;::produce
 <a name="l00047"></a>00047 (<span class="keyword">typename</span> XmlFactory&lt;Product, Output, Arg&gt;::argument_type arg) {
-<a name="l00048"></a>00048   rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node = arg_traits::xml(arg);
-<a name="l00049"></a>00049   <span class="comment">// The name of the tag identifies the producer</span>
-<a name="l00050"></a>00050   <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a> id(node.name(), node.name_size());
+<a name="l00048"></a>00048   tree_t::value_type &amp;node = arg_traits::xml(arg);
+<a name="l00049"></a>00049   <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a> id(node.first);
+<a name="l00050"></a>00050 
 <a name="l00051"></a>00051   <span class="comment">// Now I locate the producer for id and pass to him</span>
 <a name="l00052"></a>00052   <span class="comment">// the node and extra argument</span>
 <a name="l00053"></a>00053   <span class="keywordflow">try</span> {
@@ -131,36 +131,39 @@ window.onload = initDynSections;
 <a name="l00063"></a>00063 }
 <a name="l00064"></a>00064 
 <a name="l00065"></a>00065 <span class="keyword">template</span>&lt;<span class="keyword">class</span> Product, <span class="keyword">class</span> Output, <span class="keyword">class</span> Arg&gt;
-<a name="l00066"></a>00066 <span class="keywordtype">bool</span> XmlFactory&lt;Product, Output, Arg&gt;::iter_produce
-<a name="l00067"></a>00067 (<span class="keyword">typename</span> XmlFactory&lt;Product, Output, Arg&gt;::iter_type it, 
-<a name="l00068"></a>00068 Output &amp;ret) {
-<a name="l00069"></a>00069   ext_iterator &amp;i = iter_traits::xml(it);
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071   <span class="keywordflow">while</span>( i.valid() ) {
-<a name="l00072"></a>00072     <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a> tag(i-&gt;name(), i-&gt;name_size());
-<a name="l00073"></a>00073     <span class="keywordflow">if</span>( m_factory-&gt;exists(tag) ) {
-<a name="l00074"></a>00074       argument_type arg = iter_traits::build_node(*i, it);
-<a name="l00075"></a>00075       <span class="keywordflow">try</span> {
-<a name="l00076"></a>00076        ret = m_factory-&gt;get(tag)(arg);
-<a name="l00077"></a>00077       } <span class="keywordflow">catch</span>(std::exception <span class="keyword">const</span> &amp;e) {
-<a name="l00078"></a>00078        <span class="comment">// Capture any exception derived from std::exception</span>
-<a name="l00079"></a>00079        <span class="comment">// this includes TREX exceptions as rapidxml::parse_error</span>
-<a name="l00080"></a>00080        <span class="keywordflow">throw</span> XmlError(*i, e.what());
-<a name="l00081"></a>00081       }  <span class="keywordflow">catch</span>(...) {
-<a name="l00082"></a>00082        <span class="comment">// capture unknown exceptions</span>
-<a name="l00083"></a>00083        <span class="keywordflow">throw</span> XmlError(*i, <span class="stringliteral">&quot;Unknown exception caught.&quot;</span>);
-<a name="l00084"></a>00084       }
-<a name="l00085"></a>00085       ++i;
-<a name="l00086"></a>00086       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00087"></a>00087     } <span class="keywordflow">else</span>
-<a name="l00088"></a>00088       ++i;
-<a name="l00089"></a>00089   }
-<a name="l00090"></a>00090   <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00091"></a>00091 }
-<a name="l00092"></a>00092  
-<a name="l00093"></a>00093 <span class="preprocessor">#endif </span>
+<a name="l00066"></a>00066 <span class="keyword">template</span>&lt;<span class="keyword">class</span> Iter&gt;
+<a name="l00067"></a>00067 <span class="keywordtype">bool</span> XmlFactory&lt;Product, Output, Arg&gt;::iter_produce
+<a name="l00068"></a>00068 (<span class="keyword">typename</span> XmlFactory&lt;Product, Output, Arg&gt;::template iter_traits&lt;Iter&gt;::type it, 
+<a name="l00069"></a>00069  Iter <span class="keyword">const</span> &amp;last,
+<a name="l00070"></a>00070  Output &amp;ret) {
+<a name="l00071"></a>00071   Iter &amp;i = iter_traits&lt;Iter&gt;::xml(it);
+<a name="l00072"></a>00072   
+<a name="l00073"></a>00073   <span class="keywordflow">while</span>( last!=i ) {
+<a name="l00074"></a>00074     <a class="code" href="../../db/d81/group__utils.html#ga49c752b1976710e461fa7e8953b50043" title="char based BasicSymbol">Symbol</a> tag(i-&gt;first);
+<a name="l00075"></a>00075     <span class="keywordflow">if</span>( m_factory-&gt;exists(tag) ) {
+<a name="l00076"></a>00076       argument_type arg = iter_traits&lt;Iter&gt;::build_node(*i, it);
+<a name="l00077"></a>00077       <span class="keywordflow">try</span> {
+<a name="l00078"></a>00078        ret = m_factory-&gt;get(tag)(arg);
+<a name="l00079"></a>00079        ++i;
+<a name="l00080"></a>00080        <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00081"></a>00081       } <span class="keywordflow">catch</span>(std::exception <span class="keyword">const</span> &amp;e) {
+<a name="l00082"></a>00082        <span class="comment">// Capture any exception derived from std::exception</span>
+<a name="l00083"></a>00083        <span class="comment">// this includes TREX exceptions as rapidxml::parse_error</span>
+<a name="l00084"></a>00084        <span class="keywordflow">throw</span> XmlError(arg_traits::xml(arg), e.what());
+<a name="l00085"></a>00085       }  <span class="keywordflow">catch</span>(...) {
+<a name="l00086"></a>00086        <span class="comment">// capture unknown exceptions</span>
+<a name="l00087"></a>00087        <span class="keywordflow">throw</span> XmlError(arg_traits::xml(arg), <span class="stringliteral">&quot;Unknown exception caught.&quot;</span>);
+<a name="l00088"></a>00088       } 
+<a name="l00089"></a>00089     } <span class="keywordflow">else</span> 
+<a name="l00090"></a>00090       ++i;
+<a name="l00091"></a>00091   }
+<a name="l00092"></a>00092   <span class="comment">// No correct tag found</span>
+<a name="l00093"></a>00093   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095  
+<a name="l00096"></a>00096 <span class="preprocessor">#endif </span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

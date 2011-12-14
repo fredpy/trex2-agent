@@ -1,14 +1,14 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="761,80,1103,109"/>
+<area shape="rect" id="node2" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="761,73,1103,103"/>
 <area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="228,5,417,35"/>
 <area shape="rect" id="node12" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate." alt="" coords="821,8,1043,37"/>
 <area shape="rect" id="node6" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="229,59,416,88"/>
 <area shape="rect" id="node8" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="240,112,405,141"/>
-<area shape="rect" id="node10" href="$de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation." alt="" coords="1237,25,1475,55"/>
-<area shape="rect" id="node15" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; client_id_traits \&gt;" alt="" coords="789,157,1075,187"/>
+<area shape="rect" id="node10" href="$de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation." alt="" coords="1237,16,1475,45"/>
+<area shape="rect" id="node15" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; client_id_traits \&gt;" alt="" coords="789,147,1075,176"/>
 <area shape="rect" id="node17" href="$dc/d45/classTREX_1_1utils_1_1id__mapper.html" title="TREX::utils::id_mapper\&lt; client_id_traits, std::less\&lt; typename client_id_traits::id_type \&gt; \&gt;" alt="" coords="5,165,640,195"/>
-<area shape="rect" id="node27" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="795,244,1069,273"/>
-<area shape="rect" id="node21" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="1233,272,1479,301"/>
-<area shape="rect" id="node23" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="836,297,1028,327"/>
-<area shape="rect" id="node25" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="128,317,517,347"/>
+<area shape="rect" id="node29" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="795,260,1069,289"/>
+<area shape="rect" id="node21" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="1233,265,1479,295"/>
+<area shape="rect" id="node25" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="836,313,1028,343"/>
+<area shape="rect" id="node27" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="128,328,517,357"/>
 </map>

@@ -129,8 +129,8 @@ window.onload = initDynSections;
 <a name="l00114"></a><a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a2abd32285530e04fc52faf9825241d17">00114</a>         <span class="keyword">typedef</span> Relation::reference    <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a1d3d7198a49a693046136aa96b8a1a9f" title="Reference type.">reference</a>;
 <a name="l00119"></a>00119         <span class="keyword">typedef</span> Relation::pointer      <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a2abd32285530e04fc52faf9825241d17" title="Pointer type.">pointer</a>;
 <a name="l00120"></a>00120         
-<a name="l00129"></a>00129         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#aa0ce730da03059b371bc6bf81e67d844" title="Default constructor.">external</a>();
-<a name="l00136"></a>00136         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#aa0ce730da03059b371bc6bf81e67d844" title="Default constructor.">external</a>(<a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">external</a> <span class="keyword">const</span> &amp;other);
+<a name="l00129"></a>00129         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a7f8938ee4da51709273a25758ca3fc07" title="Default constructor.">external</a>();
+<a name="l00136"></a>00136         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a7f8938ee4da51709273a25758ca3fc07" title="Default constructor.">external</a>(<a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">external</a> <span class="keyword">const</span> &amp;other);
 <a name="l00138"></a>00138         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a9e72cf15f4ef6d15d045677a530f8509" title="Destructor.">~external</a>() {}
 <a name="l00139"></a>00139         
 <a name="l00152"></a>00152         <span class="keywordtype">bool</span> <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#aa74bba0416c946a9f2518e3333ec027f" title="Equality test.">operator==</a>(<a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html" title="An external timeline.">external</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
@@ -152,14 +152,14 @@ window.onload = initDynSections;
 <a name="l00266"></a>00266           <span class="keywordflow">return</span> m_pos-&gt;first;
 <a name="l00267"></a>00267         }
 <a name="l00268"></a>00268         
-<a name="l00275"></a>00275         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#aa0ce730da03059b371bc6bf81e67d844" title="Default constructor.">external</a> &amp;<a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#ab1a0c022e17cecf85e087dddb344e995" title="Next external.">operator++</a>();
+<a name="l00275"></a>00275         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a7f8938ee4da51709273a25758ca3fc07" title="Default constructor.">external</a> &amp;<a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#ab1a0c022e17cecf85e087dddb344e995" title="Next external.">operator++</a>();
 <a name="l00276"></a>00276         
 <a name="l00277"></a>00277       <span class="keyword">private</span>:
 <a name="l00278"></a>00278         <a class="code" href="../../da/d38/classTREX_1_1utils_1_1internals_1_1LogEntry.html" title="Text Entry manager for TextLog.">TREX::utils::internals::LogEntry</a> syslog();
 <a name="l00279"></a>00279         
 <a name="l00280"></a>00280         external_set::iterator m_pos, m_last;
 <a name="l00281"></a>00281         
-<a name="l00282"></a>00282         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#aa0ce730da03059b371bc6bf81e67d844" title="Default constructor.">external</a>(external_set::iterator <span class="keyword">const</span> &amp;pos,
+<a name="l00282"></a>00282         <a class="code" href="../../df/d02/classTREX_1_1transaction_1_1details_1_1external.html#a7f8938ee4da51709273a25758ca3fc07" title="Default constructor.">external</a>(external_set::iterator <span class="keyword">const</span> &amp;pos,
 <a name="l00283"></a>00283                  external_set::iterator <span class="keyword">const</span> &amp;last, 
 <a name="l00284"></a>00284                  <span class="keywordtype">bool</span> only_active=<span class="keyword">true</span>);
 <a name="l00285"></a>00285         
@@ -179,7 +179,7 @@ window.onload = initDynSections;
 <a name="l00299"></a>00299 
 <a name="l00300"></a>00300 <span class="preprocessor">#endif // H_BITS_external</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

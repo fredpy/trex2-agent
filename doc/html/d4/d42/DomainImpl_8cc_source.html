@@ -113,84 +113,89 @@ window.onload = initDynSections;
 <a name="l00047"></a>00047 <span class="preprocessor">#include &quot;<a class="code" href="../../d9/d1f/FloatDomain_8hh.html" title="Float domain representation.">FloatDomain.hh</a>&quot;</span>
 <a name="l00048"></a>00048 <span class="preprocessor">#include &quot;<a class="code" href="../../df/dbf/IntegerDomain_8hh.html" title="Integer domain representation.">IntegerDomain.hh</a>&quot;</span>
 <a name="l00049"></a>00049 <span class="preprocessor">#include &quot;<a class="code" href="../../d0/d74/StringDomain_8hh.html" title="string values enumeration domain">StringDomain.hh</a>&quot;</span>
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="keyword">using namespace </span>TREX::transaction;
-<a name="l00052"></a>00052 <span class="keyword">using namespace </span>TREX::utils;
-<a name="l00053"></a>00053 
+<a name="l00050"></a>00050 <span class="preprocessor">#include &quot;<a class="code" href="../../d2/d08/EnumDomain_8hh.html" title="string values enumeration domain">EnumDomain.hh</a>&quot;</span>
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00053"></a>00053 <span class="keyword">using namespace </span>TREX::utils;
 <a name="l00054"></a>00054 
-<a name="l00055"></a>00055 <span class="keyword">namespace </span>{
-<a name="l00059"></a>00059   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="Producer declaration.">DomainBase::xml_factory::declare&lt;IntegerDomain&gt;</a> int_decl  (<span class="stringliteral">&quot;int&quot;</span>);
-<a name="l00063"></a>00063   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="Producer declaration.">DomainBase::xml_factory::declare&lt;FloatDomain&gt;</a>   float_decl(<span class="stringliteral">&quot;float&quot;</span>);
-<a name="l00067"></a>00067   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="Producer declaration.">DomainBase::xml_factory::declare&lt;BooleanDomain&gt;</a> bool_decl (<span class="stringliteral">&quot;bool&quot;</span>);
-<a name="l00068"></a>00068  
-<a name="l00072"></a>00072   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html" title="Producer declaration.">DomainBase::xml_factory::declare&lt;StringDomain&gt;</a> declStr(<span class="stringliteral">&quot;string&quot;</span>);  
-<a name="l00073"></a>00073 }
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="keyword">namespace </span>{
+<a name="l00060"></a>00060   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">DomainBase::xml_factory::declare&lt;IntegerDomain&gt;</a> int_decl  (<span class="stringliteral">&quot;int&quot;</span>);
+<a name="l00064"></a>00064   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">DomainBase::xml_factory::declare&lt;FloatDomain&gt;</a>   float_decl(<span class="stringliteral">&quot;float&quot;</span>);
+<a name="l00068"></a>00068   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">DomainBase::xml_factory::declare&lt;BooleanDomain&gt;</a> bool_decl (<span class="stringliteral">&quot;bool&quot;</span>);
+<a name="l00069"></a>00069  
+<a name="l00073"></a>00073   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">DomainBase::xml_factory::declare&lt;StringDomain&gt;</a> declStr(<span class="stringliteral">&quot;string&quot;</span>);  
 <a name="l00074"></a>00074 
-<a name="l00075"></a>00075 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> BooleanDomain::type_name(<span class="stringliteral">&quot;bool&quot;</span>);
-<a name="l00076"></a>00076 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> IntegerDomain::type_name(<span class="stringliteral">&quot;int&quot;</span>);
-<a name="l00077"></a>00077 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> FloatDomain::type_name(<span class="stringliteral">&quot;float&quot;</span>);
-<a name="l00078"></a>00078 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> StringDomain::type_name(<span class="stringliteral">&quot;string&quot;</span>);
-<a name="l00079"></a>00079 
-<a name="l00080"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a5ee79b31bcac27449e9840e9cbfeee61">00080</a> BooleanDomain::BooleanDomain(rapidxml::xml_node&lt;&gt; <span class="keyword">const</span> &amp;node)
-<a name="l00081"></a>00081   :<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class.">BasicInterval</a>(node), m_full(true) {
-<a name="l00082"></a>00082   rapidxml::xml_attribute&lt;&gt; *value = node.first_attribute(<span class="stringliteral">&quot;value&quot;</span>);
-<a name="l00083"></a>00083   <span class="keywordflow">if</span>( NULL!=value ) {
-<a name="l00084"></a>00084     m_val = <a class="code" href="../../db/d81/group__utils.html#gaace451c18c20528f988b233391ba563c" title="Convert string to type.">TREX::utils::string_cast</a>&lt;<span class="keywordtype">bool</span>&gt;(std::string(value-&gt;value(), 
-<a name="l00085"></a>00085                                                  value-&gt;value_size()));
-<a name="l00086"></a>00086     m_full = <span class="keyword">false</span>;
-<a name="l00087"></a>00087   } <span class="keywordflow">else</span> 
-<a name="l00088"></a>00088     completeParsing(node); <span class="comment">// just in case someone used min/max</span>
-<a name="l00089"></a>00089 }
-<a name="l00090"></a>00090 
-<a name="l00091"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a76362c1852b0640fdaca44209c58f1ee">00091</a> std::ostream &amp;<a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a76362c1852b0640fdaca44209c58f1ee" title="XML conversion.">BooleanDomain::toXml</a>(std::ostream &amp;out, 
-<a name="l00092"></a>00092                                <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
-<a name="l00093"></a>00093     std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
-<a name="l00094"></a>00094     out&lt;&lt;<span class="stringliteral">&quot;&lt;bool&quot;</span>;
-<a name="l00095"></a>00095     <span class="keywordflow">if</span>( !m_full )
-<a name="l00096"></a>00096         out&lt;&lt;<span class="stringliteral">&quot; value=\&quot;&quot;</span>&lt;&lt;m_val&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
-<a name="l00097"></a>00097     out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
-<a name="l00098"></a>00098     <span class="keywordflow">return</span> out;
-<a name="l00099"></a>00099 }
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101 
-<a name="l00102"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#ad28de17c54f9b128a3e69f529c6ad573">00102</a> <span class="keywordtype">bool</span> <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#ad28de17c54f9b128a3e69f529c6ad573" title="check for common values">BooleanDomain::intersect</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00103"></a>00103   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
-<a name="l00104"></a>00104     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00105"></a>00105   <span class="keywordflow">else</span> {
-<a name="l00106"></a>00106     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
-<a name="l00107"></a>00107     
-<a name="l00108"></a>00108     <span class="keywordflow">return</span> m_full || ref.m_full || m_val==ref.m_val;
-<a name="l00109"></a>00109   }
-<a name="l00110"></a>00110 }
-<a name="l00111"></a>00111 
-<a name="l00112"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a088530277717a46da30c436b774386c1">00112</a> <span class="keywordtype">bool</span> <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a088530277717a46da30c436b774386c1" title="Equality test.">BooleanDomain::equals</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00113"></a>00113   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
-<a name="l00114"></a>00114     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00115"></a>00115   <span class="keywordflow">else</span> {
-<a name="l00116"></a>00116     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
-<a name="l00117"></a>00117     <span class="keywordflow">if</span>( m_full )
-<a name="l00118"></a>00118       <span class="keywordflow">return</span> ref.m_full;
-<a name="l00119"></a>00119     <span class="keywordflow">else</span> 
-<a name="l00120"></a>00120       <span class="keywordflow">return</span> !ref.m_full &amp;&amp; m_val==ref.m_val;
-<a name="l00121"></a>00121   } 
-<a name="l00122"></a>00122 }
-<a name="l00123"></a>00123       
-<a name="l00124"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#acc3b726af58564cedc2986429184d9d9">00124</a> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> &amp;<a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#acc3b726af58564cedc2986429184d9d9" title="Restrict domain possible values.">BooleanDomain::restrictWith</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other) {
-<a name="l00125"></a>00125   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
-<a name="l00126"></a>00126     <span class="keywordflow">throw</span> <a class="code" href="../../d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain.">EmptyDomain</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Incompatible types&quot;</span>);
-<a name="l00127"></a>00127   <span class="keywordflow">else</span> {
-<a name="l00128"></a>00128     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
-<a name="l00129"></a>00129     <span class="keywordflow">if</span>( m_full ) {
-<a name="l00130"></a>00130       m_full = ref.m_full;
-<a name="l00131"></a>00131       m_val = ref.m_val;
-<a name="l00132"></a>00132     } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( !ref.m_full &amp;&amp; m_val!=ref.m_val ) 
-<a name="l00133"></a>00133       <span class="keywordflow">throw</span> <a class="code" href="../../d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain.">EmptyDomain</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;intersection is empty.&quot;</span>);
-<a name="l00134"></a>00134   }
-<a name="l00135"></a>00135   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
-<a name="l00136"></a>00136 }
-<a name="l00137"></a>00137 
+<a name="l00075"></a>00075 
+<a name="l00079"></a>00079   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">DomainBase::xml_factory::declare&lt;EnumDomain&gt;</a> decl_enum(<span class="stringliteral">&quot;enum&quot;</span>);  
+<a name="l00080"></a>00080 }
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> BooleanDomain::type_name(<span class="stringliteral">&quot;bool&quot;</span>);
+<a name="l00083"></a>00083 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> IntegerDomain::type_name(<span class="stringliteral">&quot;int&quot;</span>);
+<a name="l00084"></a>00084 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> FloatDomain::type_name(<span class="stringliteral">&quot;float&quot;</span>);
+<a name="l00085"></a>00085 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> StringDomain::type_name(<span class="stringliteral">&quot;string&quot;</span>);
+<a name="l00086"></a>00086 <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> EnumDomain::type_name(<span class="stringliteral">&quot;enum&quot;</span>);
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 
+<a name="l00089"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a096bac028eb27212ea8598872dd83754">00089</a> BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &amp;node)
+<a name="l00090"></a>00090   :<a class="code" href="../../d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class.">BasicInterval</a>(node), m_full(true) {
+<a name="l00091"></a>00091   boost::optional&lt;bool&gt; val = parse_attr&lt; boost::optional&lt;bool&gt; &gt;(node, <span class="stringliteral">&quot;value&quot;</span>);
+<a name="l00092"></a>00092   <span class="keywordflow">if</span>( val ) {
+<a name="l00093"></a>00093     m_val = val;
+<a name="l00094"></a>00094     m_full = <span class="keyword">false</span>;
+<a name="l00095"></a>00095   } <span class="keywordflow">else</span>
+<a name="l00096"></a>00096     completeParsing(node); <span class="comment">// to handle the case where someon used min/max attributes</span>
+<a name="l00097"></a>00097 }
+<a name="l00098"></a>00098 
+<a name="l00099"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a76362c1852b0640fdaca44209c58f1ee">00099</a> std::ostream &amp;<a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a76362c1852b0640fdaca44209c58f1ee" title="XML conversion.">BooleanDomain::toXml</a>(std::ostream &amp;out, 
+<a name="l00100"></a>00100                                <span class="keywordtype">size_t</span> tabs)<span class="keyword"> const </span>{
+<a name="l00101"></a>00101     std::fill_n(std::ostream_iterator&lt;char&gt;(out), tabs, <span class="charliteral">&#39; &#39;</span>);
+<a name="l00102"></a>00102     out&lt;&lt;<span class="stringliteral">&quot;&lt;bool&quot;</span>;
+<a name="l00103"></a>00103     <span class="keywordflow">if</span>( !m_full )
+<a name="l00104"></a>00104         out&lt;&lt;<span class="stringliteral">&quot; value=\&quot;&quot;</span>&lt;&lt;m_val&lt;&lt;<span class="charliteral">&#39;\&quot;&#39;</span>;
+<a name="l00105"></a>00105     out&lt;&lt;<span class="stringliteral">&quot;/&gt;&quot;</span>;
+<a name="l00106"></a>00106     <span class="keywordflow">return</span> out;
+<a name="l00107"></a>00107 }
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109 
+<a name="l00110"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#ad28de17c54f9b128a3e69f529c6ad573">00110</a> <span class="keywordtype">bool</span> <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#ad28de17c54f9b128a3e69f529c6ad573" title="check for common values">BooleanDomain::intersect</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00111"></a>00111   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
+<a name="l00112"></a>00112     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00113"></a>00113   <span class="keywordflow">else</span> {
+<a name="l00114"></a>00114     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
+<a name="l00115"></a>00115     
+<a name="l00116"></a>00116     <span class="keywordflow">return</span> m_full || ref.m_full || m_val==ref.m_val;
+<a name="l00117"></a>00117   }
+<a name="l00118"></a>00118 }
+<a name="l00119"></a>00119 
+<a name="l00120"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a088530277717a46da30c436b774386c1">00120</a> <span class="keywordtype">bool</span> <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a088530277717a46da30c436b774386c1" title="Equality test.">BooleanDomain::equals</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00121"></a>00121   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
+<a name="l00122"></a>00122     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00123"></a>00123   <span class="keywordflow">else</span> {
+<a name="l00124"></a>00124     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
+<a name="l00125"></a>00125     <span class="keywordflow">if</span>( m_full )
+<a name="l00126"></a>00126       <span class="keywordflow">return</span> ref.m_full;
+<a name="l00127"></a>00127     <span class="keywordflow">else</span> 
+<a name="l00128"></a>00128       <span class="keywordflow">return</span> !ref.m_full &amp;&amp; m_val==ref.m_val;
+<a name="l00129"></a>00129   } 
+<a name="l00130"></a>00130 }
+<a name="l00131"></a>00131       
+<a name="l00132"></a><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#acc3b726af58564cedc2986429184d9d9">00132</a> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> &amp;<a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#acc3b726af58564cedc2986429184d9d9" title="Restrict domain possible values.">BooleanDomain::restrictWith</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;other) {
+<a name="l00133"></a>00133   <span class="keywordflow">if</span>( other.<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()!=<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>() )
+<a name="l00134"></a>00134     <span class="keywordflow">throw</span> <a class="code" href="../../d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain.">EmptyDomain</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Incompatible types&quot;</span>);
+<a name="l00135"></a>00135   <span class="keywordflow">else</span> {
+<a name="l00136"></a>00136     <a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const</span> &amp;ref = <span class="keyword">dynamic_cast&lt;</span><a class="code" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html" title="Boolean domain.">BooleanDomain</a> <span class="keyword">const </span>&amp;<span class="keyword">&gt;</span>(other);
+<a name="l00137"></a>00137     <span class="keywordflow">if</span>( m_full ) {
+<a name="l00138"></a>00138       m_full = ref.m_full;
+<a name="l00139"></a>00139       m_val = ref.m_val;
+<a name="l00140"></a>00140     } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( !ref.m_full &amp;&amp; m_val!=ref.m_val ) 
+<a name="l00141"></a>00141       <span class="keywordflow">throw</span> <a class="code" href="../../d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain.">EmptyDomain</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;intersection is empty.&quot;</span>);
+<a name="l00142"></a>00142   }
+<a name="l00143"></a>00143   <span class="keywordflow">return</span> *<span class="keyword">this</span>;
+<a name="l00144"></a>00144 }
+<a name="l00145"></a>00145 
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Fri Jun 10 18:15:40 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

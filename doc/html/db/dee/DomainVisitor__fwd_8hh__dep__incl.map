@@ -1,8 +1,14 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="569,83,780,112"/>
-<area shape="rect" id="node5" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="5,160,251,189"/>
-<area shape="rect" id="node8" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="299,160,544,189"/>
-<area shape="rect" id="node10" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="568,160,781,189"/>
-<area shape="rect" id="node12" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="805,160,984,189"/>
-<area shape="rect" id="node15" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="1032,160,1211,189"/>
+<area shape="rect" id="node3" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="1497,83,1708,112"/>
+<area shape="rect" id="node5" href="$d9/d44/europa_8old_2EuropaDomains_8cc_source.html" title="extra/europa.old/EuropaDomains.cc" alt="" coords="5,160,264,189"/>
+<area shape="rect" id="node8" href="$db/d57/europa_8old_2EuropaProxy_8hh_source.html" title="extra/europa.old/EuropaProxy.hh" alt="" coords="312,160,549,189"/>
+<area shape="rect" id="node10" href="$dc/d30/europa2_2EuropaDomains_8cc_source.html" title="extra/europa2/EuropaDomains.cc" alt="" coords="573,160,819,189"/>
+<area shape="rect" id="node13" href="$d8/d36/EuropaProxyDomain_8hh_source.html" title="extra/europa2/EuropaProxyDomain.hh" alt="" coords="867,160,1141,189"/>
+<area shape="rect" id="node15" href="$d1/ddc/europa2_8old_2EuropaDomains_8cc_source.html" title="extra/europa2.old/EuropaDomains.cc" alt="" coords="1165,160,1432,189"/>
+<area shape="rect" id="node18" href="$da/d71/europa2_8old_2EuropaProxy_8hh_source.html" title="extra/europa2.old/EuropaProxy.hh" alt="" coords="1480,160,1725,189"/>
+<area shape="rect" id="node20" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="1749,160,1995,189"/>
+<area shape="rect" id="node23" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="2043,160,2288,189"/>
+<area shape="rect" id="node25" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="2312,160,2525,189"/>
+<area shape="rect" id="node27" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="2549,160,2728,189"/>
+<area shape="rect" id="node30" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="2776,160,2955,189"/>
 </map>
