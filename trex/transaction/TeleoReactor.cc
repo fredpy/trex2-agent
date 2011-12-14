@@ -440,7 +440,9 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control) {
 
 void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable) {
   if( !m_graph.assign(this, timeline, controllable) )
-    syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
+    if( isInternal(timeline) ) {
+      syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
+    }
 }
   
 void TeleoReactor::clear_internals() {

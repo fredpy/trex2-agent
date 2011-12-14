@@ -119,10 +119,29 @@ namespace TREX {
        */
       typedef details::reactor_id reactor_id;
 
+      /** @brief Timeline relation creation failure
+       * 
+       * This class is used to indicate when a timeline operation -- such as 
+       * declaring an Internal or External timeline --  in the 
+       * @c graph failed. It is used to indicate the nature of the 
+       * error and will be reported to the reactor that made the request 
+       * through failed_internal and failed_external callbacks
+       * 
+       * @relates graph
+       * @sa TeleoReactor::failed_external
+       * @sa TeleoReactor::failed_internal
+       * 
+       * @author Frederic Py <fpy@mbari.org>
+       */
       struct timeline_failure: public ReactorException {
       public:
+        /** @brief Destructor */
         virtual ~timeline_failure() throw() {}
       protected:
+        /** @brief Constructor 
+         * @param[in] r The reactor that requested the operation
+         * @param[in] msg The associated error message
+         */
         timeline_failure(graph::reactor_id r, 
                          std::string const &msg) throw()
         :ReactorException(*r, msg) {}
@@ -147,7 +166,7 @@ namespace TREX {
 
       /** @brief Graph traversal category
        *
-       * This pseudo-type is used by the boost graph libraray in order to
+       * This pseudo-type is used by the boost graph library in order to
        * know the nature of a reactor graph and how it can be manipulated.
        *
        * So far we specified that a transaction graph repect the following
@@ -159,8 +178,8 @@ namespace TREX {
        * @li Adjacency List Graph
        *     (http://www.boost.org/doc/libs/1_43_0/libs/graph/doc/AdjacencyGraph.html)
        *
-       * The number of concepts supported may grow in the future as the implementation of
-       * the transaction graph between reactors is improved.
+       * The number of concepts supported may grow in the future as the implementation
+       * of the transaction graph between reactors is improved.
        *
        * @author Frederic Py <fpy@mbari.org>
        * @relates graph
@@ -181,22 +200,57 @@ namespace TREX {
 					boost::forward_traversal_tag,
 					reactor_id > {
       public:
+	/** @brief Constructor 
+	 * 
+	 * Create a new iterator referring to no reactor
+	 */
 	reactor_iterator() {}
+	/** @brief Copy constructor
+	 * 
+	 * @param[in] other Another itinstance
+	 *
+	 * Create a copy of @p other
+	 */
 	reactor_iterator(reactor_iterator const &other)
 	  :m_iter(other.m_iter) {}
+	/** @brief Conversion constructor
+	 * 
+	 * @param[in] i An iterator to a reactor_set
+	 *
+	 * Create a new instance referring to the same element referred by @p i
+	 */
 	explicit reactor_iterator(details::reactor_set::const_iterator const &i)
 	  :m_iter(i) {}
+	/** @brief Destructor */
 	~reactor_iterator() {}
 	
       private:
 	friend class boost::iterator_core_access;
 
+	/** @brief advance iterator
+	 *
+	 * Advance the iterator to the next element
+	 *
+	 * @pre The iterator is valid (ie it refers to an existing element)
+	 */
 	void increment() {
 	  ++m_iter;
 	}
+	/** @brief Equality test
+	 *
+	 * @param[in] other Another instance
+	 *
+	 * @retval true if this instance refers to the same element as @p other 
+	 * @retval false otherwise
+	 */
 	bool equal(reactor_iterator const &other) const {
 	  return m_iter==other.m_iter;
 	}
+	/** @brief Dereference utility
+	 *
+	 * @pre The iterator is valid
+	 * @return A reactor_id to the reactor referred by this iterator
+	 */
 	reactor_id dereference() const {
 	  return m_iter->get();
 	}
@@ -251,51 +305,224 @@ namespace TREX {
        * @sa clear()
        */
       virtual ~graph();
-
+      /** @brief Clear the graph
+       * 
+       * Disconnect all the reactors from this graph
+       * 
+       * @post The graph is empty
+       */
       void clear();
-      
+      /** @brief Check if empty
+       *
+       * Checks if the graph is empty. Meanining that it has no reactor 
+       * associated to it.
+       *
+       * @retval true if the graph is empty
+       * @retval false otherwise
+       */
       bool empty() const {
 	return m_reactors.empty();
       }
 
+      /** @brief Create new reactors for this graph
+       * @tparam Iter An iterator type
+       * @param[in] from Initial iterator
+       * @param[in] to end iterator
+       * 
+       * @pre The value_type of @p Iter is boost::property_tree::ptree::value_type
+       *
+       * Add all the reactor that can be parsed from thre properties referred by 
+       * [@p from, @p to) to this graph
+       */
       template<class Iter>
       size_t add_reactors(Iter from, Iter to);
+      
+      /** @brief Create new reactors for this graph
+       * 
+       * @param[in] conf A xml configuration tree
+       *
+       * Create all the reactors defined in @p conf and attach them to this graph
+       */
       size_t add_reactors(boost::property_tree::ptree &conf) {
 	return add_reactors(conf.begin(), conf.end());
       }
+      /** @brief Create new reactor for this graph
+       * 
+       * @param[in] definition A xml configuration tree node
+       *
+       * Create the reactor defined by @p description and attch it to this graph
+       */
       reactor_id add_reactor(boost::property_tree::ptree::value_type &description); 
       static reactor_id null_reactor() {
 	return reactor_id();
       }
 
+      /** @brief Kill a reactor
+       *
+       * @pram [in] r A reactor 
+       * 
+       * Disconnect and remove @p r from this graph
+       *
+       * @retval true the reactor was successfully removed
+       * @retval false @p r did not belong to this graph
+       *
+       * @post @p r does not belong to this graph
+       *
+       * @sa isolate()
+       */
       bool kill_reactor(reactor_id r);
+      /** @brief Isolate a reactor
+       *
+       * @param[in] r A reactor
+       * 
+       * Disconnect the ractor @p r in this graph. Disconnecting a reactor 
+       * correspond to disable all timeline declarations made by this reactor
+       * inside this graph. 
+       * 
+       * @note After this operation the graph still belongs to the graph, it is 
+       *       just not connected to any other reactor anymore.
+       * @retval @p r or null_reactor() if @p r did not belong to this graph
+       *
+       * @post if @p r did belong to this graph it is added to the set of reactor 
+       *       to be killed during the next cleanup operation
+       * 
+       * @sa cleanup()
+       */
       reactor_id isolate(reactor_id r) const;
+      /** @brief Kill all isolated reactors
+       *
+       * Kill all the reactors which have been explicitedly isolated in this 
+       * graph
+       *
+       * @return the numeof reactor that have been killed
+       *
+       * @sa isolate(reactor_id) const
+       * @sa kill_reactor(reeactor_id)
+       */
       size_t cleanup();
 
+      /** @brief get current tick 
+       * 
+       * This method provides the current tick being executed in the graph.
+       *
+       * @return The tick value
+       *
+       * @note This method is not usefull at the graph level and is more used by
+       *       the Agent. It may be refactored in roder to keep the graph class 
+       *       as simple as possible.
+       */
       TICK getCurrentTick() const {
 	return m_currentTick;
       }
+      /** @brief get tick duration 
+       * 
+       * This method provides the tick duration in real-time in order to
+       * allow to convert tick varelated values into a real-time value 
+       * @return The tick duration
+       *
+       * @note This method is not usefull at the graph level and is more used by
+       *       the Agent. It may be refactored in roder to keep the graph class 
+       *       as simple as possible.
+       * @sa tickToTime(TICK) const
+       * @sa timeToTick(time_t, suseconds_t) const
+       */
       virtual double tickDuration() const {
 	return 1.0;
       }
+      /** @brief convert real-time into a TICK  
+       *
+       * @param secs Number of seconds
+       * @param usecs Micro seconds
+       * 
+       * This method provides an utility to convert a real-time date into a 
+       * TICK value 
+       *
+       * @return the TICK equalent to the time sepresented by @p secs seconds and 
+       *        @p usecs microseconds 
+       *
+       * @note This method is not usefull at the graph level and is more used by
+       *       the Agent. It may be refactored in roder to keep the graph class 
+       *       as simple as possible.
+       * @sa tickDuration() const
+       * @sa tickToTime(TICK) const
+       */
       virtual TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
 	return secs;
       }	
+      /** @brief convert a TICK into its real-time equivalent  
+       *
+       * @param cur A TICK date
+       * 
+       * This method provides an utility to convert a TICK value into its real-time 
+       * equivalent 
+       *
+       * @return a float representing the date (usually in seconds) 
+       *        corresponding to the tTICK @p cur
+       *
+       * @note This method is not usefull at the graph level and is more used by
+       *       the Agent. It may be refactored in roder to keep the graph class 
+       *       as simple as possible.
+       * @sa tickDuration() const
+       * @sa timeToTick(time_t, suseconds_t) const
+       */
       virtual double tickToTime(TICK cur) const {
 	return cur*tickDuration();
       }
 
+      /** @brief Number of reactors
+       *
+       * @return the number of reactors in this graph
+       */
       size_type count_reactors() const {
 	return m_reactors.size();
       }
+      /** @brief Reactor index
+       *
+       * @param[in] r A reactor 
+       *
+       * @return An arbitrary index value for @p r or count_reactors() if this 
+       *       reactor doea not belong to this graph.
+       * @note For reactor tat belong to the graph the returned value is between 
+       *       0 and count_reactors()-1 
+       * @warning The index of a reactor can change whenver the graph is changed 
+       *          (by either adding new reactors or removing ones)
+       * 
+       * @sa count_reactors() const
+       */
       long index(reactor_id r) const;
    
+      
+      /** @brief Beginning reactor iterator
+       *
+       * @return a reactor_iterator pointing to the beginning of the reactors 
+       *        set maintained by this graph
+       * @sa reactor_end() const
+       */
       reactor_iterator reactor_begin() const {
 	return reactor_iterator(m_reactors.begin());
       }
+      /** @brief End reactor iterator
+       *
+       * @return a reactor_iterator pointing to the end of the reactors 
+       *        set maintained by this graph
+       * @sa reactor_begin() const
+       */
       reactor_iterator reactor_end() const {
 	return reactor_iterator(m_reactors.end());
       }  
+      /** @brief find a reactor
+       *
+       * @param[in] name A reactor symbolic name
+       * 
+       * @return An iterator referring to the reactor with the name @p name
+       *         or reactor_end() if no such reactor exists
+       *
+       * @note  As the graph does not allow to have multiple reactors with the 
+       *        same name the solution is always unique. 
+       * 
+       * @sa reactor_end() const
+       * @sa TeleoReactor::getName() const
+       */
       reactor_iterator find_reactor(TREX::utils::Symbol const &name) const {
 	return reactor_iterator(m_reactors.find(name));
       }
@@ -346,6 +573,7 @@ namespace TREX {
       timeline_iterator timeline_end() const {
 	return m_timelines.end();
       }
+      
       
       virtual void internal_check(reactor_id r, details::timeline const &tl) {}
       virtual void external_check(reactor_id r, details::timeline const &tl) {}
