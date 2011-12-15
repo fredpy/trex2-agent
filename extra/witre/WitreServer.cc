@@ -166,11 +166,11 @@ void WitreServer::disconnect(WitreApplication *client)
 
 /*
  * by deriving from graph::timelines_listener I can now be informed
- * from new timeline created in the agent at any time 
+ * from new timeline created in the agent at any time
  */
 void WitreServer::declared(details::timeline const &timeline) {
-  if( !isExternal(timeline.name()) ) { 
-    // If I did not onnect to it yet just create the connection
+  if( !isExternal(timeline.name()) ) {
+    // If I did not connect to it yet just create the connection
     use(timeline.name()); // as we do not have internal timlines this operation will always succeed
     {
       // then add it to externalTimelines
@@ -181,8 +181,8 @@ void WitreServer::declared(details::timeline const &timeline) {
 }
 
 /*
- * conversely I am notified from timelines not being owned by any reactor 
- * anymore ... but we do not have that much to do here for now 
+ * conversely I am notified from timelines not being owned by any reactor
+ * anymore ... but we do not have that much to do here for now
  */
 void WitreServer::undeclared(details::timeline const &timeline) {}
 
