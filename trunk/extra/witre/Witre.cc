@@ -76,15 +76,25 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     setTitle("Witre - trex "+TREX::version::str());
     //root()->addWidget(new Wt::WText(Wt::WString::tr("test")));
 
+    //clock = new Wt::WText(root());
+    //clock->doJavaScript("function ")
+
     //setCssTheme("Polished");
+    Wt::WContainerWidget* north = new Wt::WContainerWidget();
+    Wt::WContainerWidget* center = new Wt::WContainerWidget();
+    Wt::WContainerWidget* east = new Wt::WContainerWidget();
+    east->setContentAlignment(Wt::AlignTop | Wt::AlignRight);
+    Wt::WContainerWidget* west = new Wt::WContainerWidget();
+    Wt::WContainerWidget* south = new Wt::WContainerWidget();
+    south->setContentAlignment(Wt::AlignBottom | Wt::AlignCenter);
 
-    //clock = new Wt::WText("",root());
-    new Wt::WText("Current ",root());
-    tickNum = new Wt::WText("Tick Value: 0", root());
+    //Start of North frame code
+    new Wt::WText("Current ",north);
+    tickNum = new Wt::WText("Tick Value: 0", north);
     tickNum->setMargin(5,Wt::Right);
-    new Wt::WBreak(root());
+    new Wt::WBreak(north);
 
-    Wt::WGroupBox *tLines = new Wt::WGroupBox("Available Timelines", root());
+    Wt::WGroupBox *tLines = new Wt::WGroupBox("Available Timelines", north);
     for(int i = 0; i<wServer->extTimelinesSize(); i++)
     {
         std::string name = wServer->extTimelinesName(i);
@@ -94,7 +104,10 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
         temp->setObjectName(name);
         temp->changed().connect(this, &WitreApplication::timeLineChange);
     }
-    menu = new Wt::WComboBox(root());
+    //End of North code
+
+    //Start of East code
+    menu = new Wt::WComboBox(east);
     for(int i = 0; i<wServer->extTimelinesSize(); i++)
     {
         std::string name = wServer->extTimelinesName(i);
@@ -103,43 +116,53 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
             menu->addItem(name);
         }
     }
-    input= new Wt::WLineEdit(root());
+    input= new Wt::WLineEdit(east);
     input->setMargin(5, Wt::Left);
-    enter = new Wt::WPushButton("Post Goal", root());
+    enter = new Wt::WPushButton("Post Goal", east);
     enter->setMargin(5,Wt::Left);
     enter->clicked().connect(this, &WitreApplication::attributePopup);
     enter->clicked().connect(enter, &Wt::WWidget::disable);
     input->enterPressed().connect(boost::bind(&WitreApplication::attributePopup, this));
     input->enterPressed().connect(enter, &Wt::WWidget::disable );
 
-    popup = new Goalpopup(this->root());
+    popup = new Goalpopup(east);
     popup->finished().connect(this, &WitreApplication::clientPostGoal);
     popup->finished().connect(enter, &Wt::WPushButton::enable);
     popup->cancelled().connect(enter, &Wt::WPushButton::enable);
+    //End of East Code
 
-    timeLineSlider = new Wt::WSlider(Wt::Horizontal, root());
-    timeLineSlider->setMargin(100, Wt::Left);
+    //Start of South Code
+    timeLineSlider = new Wt::WSlider(Wt::Horizontal, south);
     //timeLineSlider->setTickPosition(Wt::WSlider::TicksBothSides);
     timeLineSlider->setTickInterval(wServer->tickDuration());
     timeLineSlider->setRange(0, wServer->getFinalTick());
     timeLineSlider->resize(400, 50);
-    //timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderChanged );
+    timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderChanged );
     //timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderText);
-    timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderText);
+    timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderText);
 
-    sliderTime = new Wt::WText(root());
-    new Wt::WBreak(root());
-    new Wt::WBreak(root());
+    sliderTime = new Wt::WText(south);
+    //End of South Code
+
+    //Start of Center Code
+    messages = new Wt::WContainerWidget(center);
 
     observations = wServer->receiveObs();
     Wt::WTimer::singleShot(100, this, &WitreApplication::syncObservations); //Calls function after 100mill
 
-    messages = new Wt::WContainerWidget(root());
+    Wt::WScrollArea* centerScroll = new Wt::WScrollArea();
+    centerScroll->setWidget(center);
+    centerScroll->setHorizontalScrollBarPolicy(Wt::WScrollArea::ScrollBarAlwaysOff);
+    centerScroll->setVerticalScrollBarPolicy(Wt::WScrollArea::ScrollBarAsNeeded);
+    //End of Center Code
 
-    //timer = new Wt::WTimer();
-    //timer->setInterval(1000);
-    //timer->timeout().connect(this, &WitreApplication::updateTime);
-    //timer->start();
+    Wt::WBorderLayout* layout = new Wt::WBorderLayout(root());
+    layout->addWidget(north, Wt::WBorderLayout::North);
+    layout->addWidget(east, Wt::WBorderLayout::East);
+    layout->addWidget(west, Wt::WBorderLayout::West);
+    layout->addWidget(centerScroll, Wt::WBorderLayout::Center);
+    layout->addWidget(south, Wt::WBorderLayout::South);
+
 }
 
 WitreApplication::~WitreApplication()

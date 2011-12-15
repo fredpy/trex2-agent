@@ -55,6 +55,8 @@
 #include <Wt/WMessageBox>
 #include <Wt/WDateTime>
 #include <Wt/WSlider>
+#include <Wt/WBorderLayout>
+#include <Wt/WScrollArea>
 #include <string>
 #include <queue>
 #include <map>
