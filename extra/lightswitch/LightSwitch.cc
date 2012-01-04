@@ -106,6 +106,8 @@ Light::Light(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false), 
    m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			 "state")),
+   m_verbose(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+			      "verbose")),
    m_firstTick(true) {
   syslog()<<"I want to own "<<lightObj;
   provide(lightObj, false); // declare the light timeline ... no goal accepted here
@@ -127,19 +129,19 @@ void Light::setValue(bool val) {
     light_v = offPred;
     switch_v = upPred;
   }
-  Observation light_state(lightObj, light_v);
-  light_state.restrictAttribute("foo", FloatDomain(2.4));
-
-  postObservation(light_state);
+  m_light_state.reset(new Observation(lightObj, light_v));
+  postObservation(*m_light_state);
   Observation switch_state(switchObj, switch_v);
-  switch_state.restrictAttribute("amp", TREX::transaction::EnumDomain("foo"));
   postObservation(switch_state);
 } 
 
 
 bool Light::synchronize() {
+  bool need_post = m_verbose;
+
   if( m_firstTick ) {
     setValue(m_on);
+    need_post = false;
     m_firstTick = false;
     m_nextSwitch = getCurrentTick()+1;
   } else {
@@ -152,9 +154,10 @@ bool Light::synchronize() {
 	  if( m_pending.front()->startsBefore(cur) ) {
 	    
 	    // it can also starts before cur => it can be set to cur 
-	    if( brokenPred!=m_pending.front()->predicate() )
+	    if( brokenPred!=m_pending.front()->predicate() ) {
 	      setValue(downPred==m_pending.front()->predicate());
-	    else {
+	      need_post = false;
+	    } else {
 	      Observation obs(*m_pending.front());
 	      postObservation(obs);
 	    }
@@ -171,6 +174,9 @@ bool Light::synchronize() {
 	}
     }
   }
+  // check if I still need to post the ligh state
+  if( need_post ) 
+    postObservation(*m_light_state);
   // always succeed
   return true;
 }
