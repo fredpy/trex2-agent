@@ -73,11 +73,14 @@ namespace TREX {
        * This constructor is called to generate a Light reactor
        * based on an XML node. The expected XML format is the following:
        * @code
-       * <Light name="<name>" latency="<int>" lookahead="<int>" state="<bool>"/>
+       * <Light name="<name>" latency="<int>" lookahead="<int>" state="<bool>" 
+       *        verbose="<bool>" />
        * @endcode
-       *
-       * Where @c state is a boolean value indicating which is the initial
-       * state of the @c light timeline
+       * Where :
+       * @li @c state is a boolean value indicating which is the initial
+       *     state of the @c light timeline (default is @c true)
+       * @li @c verbose is a boolean used to indicate whther we should 
+       *     repeat the light state at every tick or not (default is @c false)
        */
       Light(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
@@ -89,7 +92,7 @@ namespace TREX {
       void handleRecall(TREX::transaction::goal_id const &g);
 
       /** @brief State of the timeline */
-      bool m_on;
+      bool m_on, m_verbose;
       TREX::transaction::TICK m_nextSwitch;
       /** @brief Is the state already posted as observation ? */
       bool m_firstTick;
@@ -97,6 +100,7 @@ namespace TREX {
       void setValue(bool val);
       
       std::list<TREX::transaction::goal_id> m_pending;
+      std::auto_ptr<TREX::transaction::Observation> m_light_state;
 
       /** @brief Name of the predicate on */
       static TREX::utils::Symbol const onPred;
