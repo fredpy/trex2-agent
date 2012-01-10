@@ -57,11 +57,15 @@
 #include <Wt/WSlider>
 #include <Wt/WBorderLayout>
 #include <Wt/WScrollArea>
+#include <Wt/WJavaScript>
 #include <string>
 #include <queue>
 #include <map>
+#include <trex/domain/IntegerDomain.hh>
+#include <trex/utils/XmlUtils.hh>
 
 #include <boost/version.hpp>
+#include <iostream>
 
 #include "WitreServer.hh"
 #include "Observations.hh"
@@ -73,7 +77,6 @@ namespace TREX {
     class WitreApplication :public Wt::WApplication {
 
     private:
-      Wt::WText *clock;
       Wt::WText *sliderTime;
       Wt::WLineEdit *input;
       Wt::WPushButton *enter;
@@ -86,7 +89,11 @@ namespace TREX {
       WitreServer *wServer;
 
       std::map<std::string, bool> tLineMap;
+      std::map<std::string, Wt::WGroupBox*> groupPanels;
       std::map<std::string, Wt::WContainerWidget*> boxPanels;
+      std::map<std::string, Wt::WPanel*> currentPanels;
+      std::map<Wt::WPanel*, boost::property_tree::ptree> panelsXML;
+      std::map<Wt::WGroupBox*, boost::property_tree::ptree> groupXML;
       std::queue<Observations> observations;
       friend class WitreServer;
 
@@ -97,17 +104,16 @@ namespace TREX {
       WitreApplication(Wt::WEnvironment const &env, WitreServer* Server);
       ~WitreApplication();
       void post(); //Post the observations
+      void reorder(); //Sorts observations
       void addObs(Observations* temp); //Adds observations to the queue
       void updateTick(std::string tick) { tickNum->setText(tick);}; //Updates the tickNum text
       int count(){ return messages->count();}; //Returns the number of messages
       Wt::WWidget * widget(int i) {return messages->widget(i);}; //Returns the widget at variable i in messages
       void insert(std::string time, Wt::WPanel *wid); //Inserts widget at position 0
-      void updateTime(); //Updates the time
       void timeLineChange(); //Updates when user changes what timelines to view
       void syncObservations(); //Syncs with server observations
       void attributePopup();
       void clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end);
-
 
     };
 

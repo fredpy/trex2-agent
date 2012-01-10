@@ -59,22 +59,6 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
   if( !found )
     throw Error("Unable to locate witre.xml server configuration");
   try {
-    /* old code :
-     * rapidxml::file<> cfg(config.c_str());
-     * rapidxml::xml_document<> doc;
-     * doc.parse<0>(cfg.data());
-     * rapidxml::xml_node<> *root = doc.first_node(), *child;
-     *
-     * if( NULL==root )
-     * throw Error("Unable to parse xml content of "+config);
-     *
-     * child = root->first_node("server");
-     * if( NULL==child )
-     * throw TREX::utils::XmlError(*root, "Unable to find \"server\" configuration tag");
-     *
-     * std::string arg(child->value(), child->value_size());
-     */
-    // new code
     boost::property_tree::ptree doc;
     read_xml(config, doc, xml::no_comments|xml::trim_whitespace);
 
@@ -197,7 +181,7 @@ void WitreServer::notify(Observation const &obs)
     std::ostringstream oss;
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
         <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\">"
-        <<ctime(&now)<<": "<<obs<<"</Token>";
+        <<obs<<"</Token>";
     std::ostringstream time;
     time << getCurrentTick();
     //Storing the observation
