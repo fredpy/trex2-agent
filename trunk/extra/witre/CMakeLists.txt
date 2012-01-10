@@ -38,7 +38,7 @@ if(WITH_WITRE)
   find_package(Wt REQUIRED)
   include_directories(${Wt_INCLUDE_DIR})
   add_library(TREXwitre SHARED
-     Witre.cc WitreServer.cc)
+     Witre.cc WitreServer.cc Popup.cc)
   target_link_libraries(TREXwitre 
     ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
     ${Boost_THREAD_LIBRARY} 
