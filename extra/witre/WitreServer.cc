@@ -35,6 +35,7 @@
 
 #include <trex/utils/XmlUtils.hh>
 #include <boost/algorithm/string.hpp>
+#include <trex/transaction/reactor_graph.hh>
 
 #include <cstring>
 
@@ -182,15 +183,12 @@ void WitreServer::notify(Observation const &obs)
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
         <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\">"
         <<obs<<"</Token>";
-    std::ostringstream time;
-    time << getCurrentTick();
     //Storing the observation
-    Observations* temp = new Observations(oss.str(), obs.object().str(), time.str());
-    observations.push(*temp);
+    observations.push(oss.str());
     /* This is where we notify all connected clients. */
     for (unsigned i = 0; i < connections.size(); ++i) {
         Connection& c = connections[i];
-        c.client->addObs(temp);
+        c.client->addObs(oss.str());
         Wt::WServer::instance()->post(c.sessionId, c.function);
     }
 
@@ -200,18 +198,15 @@ bool WitreServer::synchronize()
 {
     boost::mutex::scoped_lock lock(mutex_);
     time_t now = std::floor(tickToTime(getCurrentTick()+1));
-    //time(&now);
-    //struct tm* tnow = localtime(&now);
-    //std::cout<<timeToTick(now)<<std::endl;
     std::ostringstream oss;
-    oss<<"<Tick value=\""<<(getCurrentTick()+1)<<"\">"<<"Tick Value: "<<now<<"</Tick>";
+    oss<<"<Token tick=\""<<getCurrentTick()<<"\" on=\"Tick\" "
+       <<"value=\""<<(getCurrentTick()+1)<<"\">"<<now<<"</Token>";
     //Storing ticks
-    Observations* temp = new Observations(oss.str(), "Tick");
-    observations.push(*temp);
+    observations.push(oss.str());
     //Notify all connected clients
     for (unsigned i = 0; i < connections.size(); ++i) {
             Connection& c = connections[i];
-            c.client->addObs(temp);
+            c.client->addObs(oss.str());
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
 

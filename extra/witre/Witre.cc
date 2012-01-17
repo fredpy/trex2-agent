@@ -78,6 +78,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     setTitle("Witre - trex "+TREX::version::str());
 
     //setCssTheme("Polished");
+    //Creating the containers for layout
     Wt::WContainerWidget* north = new Wt::WContainerWidget();
     Wt::WContainerWidget* center = new Wt::WContainerWidget();
     Wt::WContainerWidget* east = new Wt::WContainerWidget();
@@ -85,10 +86,18 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     Wt::WContainerWidget* west = new Wt::WContainerWidget();
     Wt::WContainerWidget* south = new Wt::WContainerWidget();
     south->setContentAlignment(Wt::AlignBottom | Wt::AlignCenter);
+    //end of Containers
+
+    //Creating the layout
+    Wt::WBoxLayout* pagelayout = new Wt::WBoxLayout(Wt::WBoxLayout::LeftToRight, root());
+    webpage = new Wt::WStackedWidget(); //Webpage is the stackwidget that keeps one webpage visiable
+    pagelayout->addWidget(webpage);
+    Wt::WContainerWidget* basicpage = new Wt::WContainerWidget(webpage); //Basicpage is the basic layout of the website
+    //End of layout
 
     //Start of North frame code
-    new Wt::WText("Current ",north);
-    tickNum = new Wt::WText("Tick Value: 0", north);
+    new Wt::WText("Current Tick Value: ",north);
+    tickNum = new Wt::WText("0", north);
     tickNum->setMargin(5,Wt::Right);
     new Wt::WBreak(north);
 
@@ -122,12 +131,14 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     enter->clicked().connect(enter, &Wt::WWidget::disable);
     input->enterPressed().connect(boost::bind(&WitreApplication::attributePopup, this));
     input->enterPressed().connect(enter, &Wt::WWidget::disable );
+    //End of East Code
 
-    popup = new Goalpopup(east);
+    //Start of West code
+    popup = new Goalpopup(west); //Add straight to page to make the formating work
     popup->finished().connect(this, &WitreApplication::clientPostGoal);
     popup->finished().connect(enter, &Wt::WPushButton::enable);
     popup->cancelled().connect(enter, &Wt::WPushButton::enable);
-    //End of East Code
+    //End of West Code
 
     //Start of South Code
     timeLineSlider = new Wt::WSlider(Wt::Horizontal, south);
@@ -153,12 +164,18 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     centerScroll->setVerticalScrollBarPolicy(Wt::WScrollArea::ScrollBarAsNeeded);
     //End of Center Code
 
-    Wt::WBorderLayout* layout = new Wt::WBorderLayout(root());
+    //Adding containers to layout
+    Wt::WBorderLayout* layout = new Wt::WBorderLayout(basicpage);
     layout->addWidget(north, Wt::WBorderLayout::North);
     layout->addWidget(east, Wt::WBorderLayout::East);
     layout->addWidget(west, Wt::WBorderLayout::West);
     layout->addWidget(centerScroll, Wt::WBorderLayout::Center);
     layout->addWidget(south, Wt::WBorderLayout::South);
+    //end
+
+    //webpage->insertWidget(1, new Wt::WText("New page"));
+
+    WApplication::instance()->internalPathChanged().connect(this, &WitreApplication::urlPage);
 
 }
 
@@ -168,11 +185,82 @@ WitreApplication::~WitreApplication()
     enableUpdates(false);
 }
 
+void WitreApplication::urlPage(const std::string& path)
+{
+    std::string* url = parseUrl(path);
+    if(url[0]=="text")
+    {
+        Wt::WString name = Wt::WString("Name");
+        Wt::WTemplate* test = new Wt::WTemplate(webpage);
+        test->setTemplateText(Wt::WString::tr("testpage"));
+        test->bindString("friend", name, Wt::PlainText);
+        test->bindWidget("input", new Wt::WLineEdit());
+        webpage->setCurrentWidget(test);
+        return;
+    }
+    /*
+    else if(url[0]=="timeline")
+    {
+        if(url->size()>1)
+        {
+            std::string name;
+            for(int i = 0; i<wServer->extTimelinesSize(); i++)
+            {
+                if(url[1]==wServer->extTimelinesName(i))
+                {
+                    Wt::WContainerWidget* page = new Wt::WContainerWidget();
+                    name = wServer->extTimelinesName(i);
+                    std::list<Wt::WPanel*> list = allPanels[name];
+                    std::list<Wt::WPanel*>::iterator it;
+                    for(it = list.begin(); it!=list.end(); it++)
+                    {
+                        boost::property_tree::ptree doc = panelsXML[*it];
+                        std::stringstream xml;
+                        write_xml(xml, doc);
+                        page->addWidget(new Wt::WText(xml.str()));
+                        page->addWidget(new Wt::WBreak());
+                    }
+                    webpage->addWidget(page);
+                    webpage->setCurrentWidget(page);
+                    return;
+                }
+            }
+        }
+
+    }
+    */
+    webpage->setCurrentIndex(0);
+    WApplication::instance()->setInternalPath("/default");
+}
+
+std::string* WitreApplication::parseUrl(std::string url)
+{
+    int count = 0;
+    for(int i=0; i<url.length(); i++)
+    {
+        count += ((url[i]=='/')?1:0);
+    }
+    std::string* pUrl = new std::string[count];
+    for(int i=0; i<count; i++)
+    {
+        size_t pos = url.find("/");
+        url = url.substr(pos+1);
+        pUrl[i]= url.substr(0,(url.find("/")>0)?url.find("/"):url.length());
+    }
+    return pUrl;
+}
+
 void WitreApplication::post()
 {
-    std::string name = observations.front().getObj();
-    std::string observ = observations.front().getObs();
-    std::string time = observations.front().getTime();
+    std::string observ = observations.front();
+    //Getting the observation data into a ptree
+    std::stringstream xml;
+    xml<<observ;
+    boost::property_tree::ptree doc;
+    read_xml(xml, doc, xml::no_comments|xml::trim_whitespace);
+    //End of getting data
+    std::string name = doc.get<std::string>("Token.<xmlattr>.on");
+    std::string time = doc.get<std::string>("Token.<xmlattr>.tick");
 
     if(name=="Tick")
     {
@@ -180,35 +268,24 @@ void WitreApplication::post()
         observations.pop();
         timeLineSlider->setValue(timeLineSlider->value()+1);
         sliderText();
-        reorder(); // Reorder the panels after ever tick
+        reorder(time); // Reorder the panels after ever tick
         Wt::WApplication::instance()->triggerUpdate();
         return;
     }
 
-    std::stringstream xml;
-    xml<<observ;
-    boost::property_tree::ptree doc;
-    read_xml(xml, doc, xml::no_comments|xml::trim_whitespace);
-    std::string arg = doc.get<std::string>("Token");
-
-    if(currentPanels.find(name)!=currentPanels.end() && panelsXML[currentPanels[name]].get<std::string>("Token")==arg)
+    Wt::WPanel* panel = new Wt::WPanel();
+    panelsXML[panel]=doc;
+    allPanels[name].push_front(panel);
+    panel->setCentralWidget(new Wt::WText(observ+" since "+time)); // Addes the most recent observation to webpage
+    panel->setObjectName(name); // Names the box by the timeline
+    if(!tLineMap[name])
     {
-
+        panel->hide();
     }
-    else
-    {
-        Wt::WPanel* panel = new Wt::WPanel();
-        panelsXML[panel]=doc;
-        panel->setCentralWidget(new Wt::WText(observ+" since "+time)); // Addes the most recent observation to webpage
-        panel->setObjectName(name); // Names the box by the timeline
-        if(!tLineMap[name])
-        {
-            panel->hide();
-        }
-        currentPanels[name] = panel;
-    }
+    currentPanels[name] = panel;
     observations.pop(); //Pops the most recent observation
     insert(time, currentPanels[name]);
+    needsUpdated= true;
 }
 
 void WitreApplication::insert(std::string time, Wt::WPanel* wid)
@@ -236,7 +313,7 @@ void WitreApplication::insert(std::string time, Wt::WPanel* wid)
     Wt::WApplication::instance()->triggerUpdate();
 }
 
-void WitreApplication::reorder()
+void WitreApplication::reorder(std::string time)
 {
     enum placement { Top=0, Bottom=1};
     std::string name = messages->widget(Top)->objectName();
@@ -244,25 +321,31 @@ void WitreApplication::reorder()
     {
         return;
     }
+    //Arrays for data
     Wt::WContainerWidget* container[2];
     Wt::WGroupBox* pContainer[2];
+    boost::property_tree::ptree doc[2];
+    std::string lowerArg[2];
+    std::string upperArg[2];
+    //End of Arrays
     container[Top] = boxPanels[name];
     pContainer[Top] = groupPanels[name];
-    //Sets all the current panels to the top of the postings
-    std::map<std::string, Wt::WPanel*>::iterator it;
-    for(it=currentPanels.begin(); it!=currentPanels.end(); it++)
+
+    if(needsUpdated)
     {
-        container[Top]->insertWidget(Top, it->second);
+        //Sets all the current panels to the top of the postings
+        std::map<std::string, Wt::WPanel*>::iterator it;
+        for(it=currentPanels.begin(); it!=currentPanels.end(); it++)
+        {
+            container[Top]->insertWidget(Top, it->second);
+        }
     }
     //Removes the empty panels and changes the Panels title
-    if(messages->count()>1)
+    if(messages->count()>1 && needsUpdated)
     {
         name = messages->widget(Bottom)->objectName();
         container[Bottom] = boxPanels[name];
         pContainer[Bottom] = groupPanels[name];
-        boost::property_tree::ptree doc[2];
-        std::string lowerArg[2];
-        std::string upperArg[2];
         for(int i=0; i<2; i++)
         {
             doc[i] = groupXML[pContainer[i]];
@@ -274,9 +357,7 @@ void WitreApplication::reorder()
         {
             doc[Top].put("Tick.LowerTick", ((lowerArg[Bottom]!="")? lowerArg[Bottom]:upperArg[Bottom]));
             groupXML[pContainer[Top]]=doc[Top];
-            std::stringstream xml;
-            xml <<doc[Top].get<std::string>("Tick.LowerTick")<<" - "<<doc[Top].get<std::string>("Tick.UpperTick");
-            pContainer[Top]->setTitle(xml.str());
+            setXMLTitle(pContainer[Top]);
 
             //Removing the empty panel
             Wt::WWidget* deleteWidget = messages->widget(Bottom);
@@ -295,20 +376,37 @@ void WitreApplication::reorder()
             doc[Bottom].put("Tick.UpperTick", ((uBottom==uTop)?upperArg[Bottom]:upperArg[Top]));
             doc[Bottom].put("Tick.LowerTick", ((lowerArg[Bottom]!="")? lowerArg[Bottom]:(uBottom==uTop)?"":upperArg[Bottom]));
             groupXML[pContainer[Bottom]]=doc[Bottom];
-            std::stringstream xml;
-            xml <<doc[Bottom].get<std::string>("Tick.LowerTick")
-                <<((doc[Bottom].get<std::string>("Tick.LowerTick")!="")?" - ":"")
-                <<doc[Bottom].get<std::string>("Tick.UpperTick");
-            pContainer[Bottom]->setTitle(xml.str());
-
+            setXMLTitle(pContainer[Bottom]);
         }
     }
+    else
+    {
+        doc[Top] = groupXML[pContainer[Top]];
+        lowerArg[Top] = doc[Top].get<std::string>("Tick.LowerTick");
+        upperArg[Top] = doc[Top].get<std::string>("Tick.UpperTick");
+        doc[Top].put("Tick.LowerTick", ((lowerArg[Top]=="")? (upperArg[Top]==time)?"":upperArg[Top]:lowerArg[Top]));
+        doc[Top].put("Tick.UpperTick", time);
+        groupXML[pContainer[Top]]= doc[Top];
+        setXMLTitle(pContainer[Top]);
+    }
+    needsUpdated=false;
 
 }
 
-void WitreApplication::addObs(Observations* temp)
+void WitreApplication::setXMLTitle(Wt::WGroupBox *container)
 {
-    observations.push(*temp);
+    boost::property_tree::ptree doc = groupXML[container];
+    std::stringstream xml;
+    xml <<doc.get<std::string>("Tick.LowerTick")
+        <<((doc.get<std::string>("Tick.LowerTick")=="")?"":" - ")
+        <<doc.get<std::string>("Tick.UpperTick");
+    container->setTitle(xml.str());
+
+}
+
+void WitreApplication::addObs(std::string temp)
+{
+    observations.push(temp);
     return;
 }
 

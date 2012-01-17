@@ -56,11 +56,15 @@
 #include <Wt/WDateTime>
 #include <Wt/WSlider>
 #include <Wt/WBorderLayout>
+#include <Wt/WBoxLayout>
 #include <Wt/WScrollArea>
 #include <Wt/WJavaScript>
+#include <Wt/WStackedWidget>
+#include <Wt/WTemplate>
 #include <string>
 #include <queue>
 #include <map>
+#include <list>
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/utils/XmlUtils.hh>
 
@@ -68,7 +72,6 @@
 #include <iostream>
 
 #include "WitreServer.hh"
-#include "Observations.hh"
 #include "Popup.hh"
 
 namespace TREX {
@@ -77,6 +80,7 @@ namespace TREX {
     class WitreApplication :public Wt::WApplication {
 
     private:
+      Wt::WStackedWidget* webpage;
       Wt::WText *sliderTime;
       Wt::WLineEdit *input;
       Wt::WPushButton *enter;
@@ -87,25 +91,30 @@ namespace TREX {
       Wt::WSlider *timeLineSlider;
       Goalpopup* popup;
       WitreServer *wServer;
+      bool needsUpdated;
 
       std::map<std::string, bool> tLineMap;
       std::map<std::string, Wt::WGroupBox*> groupPanels;
       std::map<std::string, Wt::WContainerWidget*> boxPanels;
       std::map<std::string, Wt::WPanel*> currentPanels;
+      std::map<std::string, std::list<Wt::WPanel*> > allPanels;
       std::map<Wt::WPanel*, boost::property_tree::ptree> panelsXML;
       std::map<Wt::WGroupBox*, boost::property_tree::ptree> groupXML;
-      std::queue<Observations> observations;
+      std::queue<std::string> observations;
       friend class WitreServer;
 
       void sliderChanged();
       void sliderText();
+      void urlPage(const std::string& path);
+      std::string* parseUrl(std::string url);
 
     public:
       WitreApplication(Wt::WEnvironment const &env, WitreServer* Server);
       ~WitreApplication();
       void post(); //Post the observations
-      void reorder(); //Sorts observations
-      void addObs(Observations* temp); //Adds observations to the queue
+      void reorder(std::string time); //Sorts observations and retitles the groupPanels
+      void setXMLTitle(Wt::WGroupBox *container); //Sets title without XML formatting
+      void addObs(std::string temp); //Adds observations to the queue
       void updateTick(std::string tick) { tickNum->setText(tick);}; //Updates the tickNum text
       int count(){ return messages->count();}; //Returns the number of messages
       Wt::WWidget * widget(int i) {return messages->widget(i);}; //Returns the widget at variable i in messages

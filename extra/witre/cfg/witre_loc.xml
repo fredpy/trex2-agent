@@ -4,4 +4,7 @@
   <message id='test'>
     Can you read me?
   </message>
+  <message id="testpage">
+    <div> ${friend} with input. ${input}</div>
+  </message>	
 </messages>

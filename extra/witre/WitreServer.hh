@@ -39,7 +39,6 @@
 #include <Wt/WServer>
 #include <boost/thread.hpp>
 #include <trex/transaction/TeleoReactor.hh>
-#include "Observations.hh"
 
 
 namespace TREX {
@@ -69,7 +68,7 @@ namespace TREX {
 
       std::string extTimelinesName(int i) { return externalTimelines[i].str(); }
       int extTimelinesSize() { return externalTimelines.size(); };
-      const std::queue<Observations> receiveObs() { return observations; };
+      const std::queue<std::string> receiveObs() { return observations; };
       bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); return now; };
 
@@ -105,13 +104,13 @@ namespace TREX {
 
       void declared(TREX::transaction::details::timeline const &timeline);
       void undeclared(TREX::transaction::details::timeline const &timeline);
-  
-                         
+
+
       mutable boost::mutex mutex_;
       boost::thread thread_;
       std::vector<Connection> connections;
       std::vector<utils::Symbol> externalTimelines;
-      std::queue<Observations> observations;
+      std::queue<std::string> observations;
 
 
       bool attach(WitreReactor &r);
