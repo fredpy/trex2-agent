@@ -14,6 +14,7 @@
 #include <Wt/WDateTime>
 #include <Wt/WGroupBox>
 #include <Wt/WJavaScript>
+#include <Wt/WTemplate>
 #include <string>
 #include <iostream>
 #include <boost/version.hpp>
