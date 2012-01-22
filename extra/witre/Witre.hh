@@ -92,14 +92,12 @@ namespace TREX {
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;
+      boost::property_tree::ptree postingDoc;
 
       std::map<std::string, bool> tLineMap;
       std::map<std::string, Wt::WGroupBox*> groupPanels;
-      std::map<std::string, Wt::WContainerWidget*> boxPanels;
       std::map<std::string, Wt::WPanel*> currentPanels;
       std::map<std::string, std::list<Wt::WPanel*> > allPanels;
-      std::map<Wt::WPanel*, boost::property_tree::ptree> panelsXML;
-      std::map<Wt::WGroupBox*, boost::property_tree::ptree> groupXML;
       std::queue<std::string> observations;
       friend class WitreServer;
 

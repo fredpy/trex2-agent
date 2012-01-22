@@ -39,6 +39,7 @@
 #include <Wt/WServer>
 #include <boost/thread.hpp>
 #include <trex/transaction/TeleoReactor.hh>
+#include "WitreGraph.hh"
 
 
 namespace TREX {
@@ -46,6 +47,7 @@ namespace TREX {
 
     class WitreApplication;
     class WitreReactor;
+    class WitreGraph;
 
     class WitreServer :public TREX::transaction::TeleoReactor, public TREX::transaction::graph::timelines_listener {
     public:
@@ -87,7 +89,7 @@ namespace TREX {
     private:
       //Trex functions
       void handleInit();
-      void handTickStart() {};
+      void handleTickStart() {};
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
       //End of Trex functions
@@ -110,6 +112,7 @@ namespace TREX {
       boost::thread thread_;
       std::vector<Connection> connections;
       std::vector<utils::Symbol> externalTimelines;
+      std::map<utils::Symbol, int> rel_level;
       std::queue<std::string> observations;
 
 
