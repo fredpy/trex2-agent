@@ -36,6 +36,8 @@
 #include <trex/utils/XmlUtils.hh>
 #include <boost/algorithm/string.hpp>
 #include <trex/transaction/reactor_graph.hh>
+#include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 #include <cstring>
 
@@ -172,8 +174,11 @@ void WitreServer::declared(details::timeline const &timeline) {
 void WitreServer::undeclared(details::timeline const &timeline) {}
 
 void WitreServer::handleInit() {
-  graph::timelines_listener::initialize();
+    graph::timelines_listener::initialize();
+    WitreGraph vis(rel_level);
+    boost::depth_first_search(getGraph(), boost::visitor(vis));
 }
+
 
 void WitreServer::notify(Observation const &obs)
 {
@@ -181,8 +186,9 @@ void WitreServer::notify(Observation const &obs)
     time_t now = std::floor(tickToTime(getCurrentTick()));
     std::ostringstream oss;
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
-        <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\">"
-        <<obs<<"</Token>";
+        <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\""
+        <<" level=\""<<rel_level.find(obs.object())->second<<"\" "
+        <<">"<<obs<<"</Token>";
     //Storing the observation
     observations.push(oss.str());
     /* This is where we notify all connected clients. */

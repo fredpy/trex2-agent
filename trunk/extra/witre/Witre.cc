@@ -176,6 +176,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     //webpage->insertWidget(1, new Wt::WText("New page"));
 
     WApplication::instance()->internalPathChanged().connect(this, &WitreApplication::urlPage);
+    urlPage(WApplication::instance()->internalPath());
 
 }
 
@@ -273,18 +274,35 @@ void WitreApplication::post()
         return;
     }
 
+    if(groupPanels[time]==NULL)
+    {
+        std::stringstream xml;
+        xml<<"<Tick><LowerTick></LowerTick><UpperTick>"<<time<<"</UpperTick></Tick>";
+        boost::property_tree::ptree doc;
+        read_xml(xml, doc, xml::no_comments|xml::trim_whitespace);
+        postingDoc.add_child("Group"+time, doc);
+        //Container that holds all the panles
+        Wt::WGroupBox* box = new Wt::WGroupBox(time);
+        box->setObjectName(time);
+        groupPanels[time] = box;
+        messages->insertWidget(0, box);
+    }
+
+    postingDoc.add_child("Tick"+time+".Panel", doc);
     Wt::WPanel* panel = new Wt::WPanel();
-    panelsXML[panel]=doc;
     allPanels[name].push_front(panel);
     panel->setCentralWidget(new Wt::WText(observ+" since "+time)); // Addes the most recent observation to webpage
     panel->setObjectName(name); // Names the box by the timeline
-    if(!tLineMap[name])
+    if(!tLineMap[name] && name!="goal")
     {
         panel->hide();
     }
-    currentPanels[name] = panel;
+    if(name!="goal")
+    {
+        currentPanels[name] = panel;
+    }
     observations.pop(); //Pops the most recent observation
-    insert(time, currentPanels[name]);
+    insert(time, panel);
     needsUpdated= true;
 }
 
@@ -292,44 +310,26 @@ void WitreApplication::insert(std::string time, Wt::WPanel* wid)
 {
     //const Wt::WAnimation animate(Wt::WAnimation::Fade, Wt::WAnimation::Ease, 10000);
     //wid->setAnimation(animate);
-    if(boxPanels[time]==NULL)
-    {
-        //Groupbox that holds the container for all panels
-        std::stringstream xml;
-        xml<<"<Tick><LowerTick></LowerTick><UpperTick>"<<time<<"</UpperTick></Tick>";
-        boost::property_tree::ptree doc;
-        read_xml(xml, doc, xml::no_comments|xml::trim_whitespace);
-        Wt::WGroupBox* box = new Wt::WGroupBox(time);
-        box->setObjectName(time);
-        groupXML[box]=doc;
-        //End of Groupbox
-        //Container that holds all panels
-        Wt::WContainerWidget* temp = new Wt::WContainerWidget(box);
-        boxPanels[time]= temp;
-        groupPanels[time] = box;
-        messages->insertWidget(0, box);
-    }
-    boxPanels[time]->insertWidget(0, wid);
+    groupPanels[time]->insertWidget(0, wid);
     Wt::WApplication::instance()->triggerUpdate();
 }
 
 void WitreApplication::reorder(std::string time)
 {
     enum placement { Top=0, Bottom=1};
-    std::string name = messages->widget(Top)->objectName();
-    if(name=="")
+    std::string name[2];
+    name[Top] = messages->widget(Top)->objectName();
+    if(name[Top]=="")
     {
         return;
     }
     //Arrays for data
-    Wt::WContainerWidget* container[2];
     Wt::WGroupBox* pContainer[2];
     boost::property_tree::ptree doc[2];
     std::string lowerArg[2];
     std::string upperArg[2];
     //End of Arrays
-    container[Top] = boxPanels[name];
-    pContainer[Top] = groupPanels[name];
+    pContainer[Top] = groupPanels[name[Top]];
 
     if(needsUpdated)
     {
@@ -337,35 +337,32 @@ void WitreApplication::reorder(std::string time)
         std::map<std::string, Wt::WPanel*>::iterator it;
         for(it=currentPanels.begin(); it!=currentPanels.end(); it++)
         {
-            container[Top]->insertWidget(Top, it->second);
+            pContainer[Top]->insertWidget(Top, it->second);
         }
     }
     //Removes the empty panels and changes the Panels title
     if(messages->count()>1 && needsUpdated)
     {
-        name = messages->widget(Bottom)->objectName();
-        container[Bottom] = boxPanels[name];
-        pContainer[Bottom] = groupPanels[name];
+        name[Bottom] = messages->widget(Bottom)->objectName();
+        pContainer[Bottom] = groupPanels[name[Bottom]];
         for(int i=0; i<2; i++)
         {
-            doc[i] = groupXML[pContainer[i]];
+            doc[i] = postingDoc.get_child("Group"+name[i]);
             lowerArg[i] = doc[i].get<std::string>("Tick.LowerTick");
             upperArg[i] = doc[i].get<std::string>("Tick.UpperTick");
         }
 
-        if(container[Bottom]->count()==0)
+        if(pContainer[Bottom]->count()==0)
         {
             doc[Top].put("Tick.LowerTick", ((lowerArg[Bottom]!="")? lowerArg[Bottom]:upperArg[Bottom]));
-            groupXML[pContainer[Top]]=doc[Top];
+            postingDoc.put_child("Group"+name[Top], doc[Top]);
             setXMLTitle(pContainer[Top]);
 
             //Removing the empty panel
             Wt::WWidget* deleteWidget = messages->widget(Bottom);
             messages->removeWidget(deleteWidget);
             delete deleteWidget;
-            groupXML.erase(groupPanels[name]);
-            groupPanels.erase(name);
-            boxPanels.erase(name);
+            groupPanels.erase(name[Bottom]);
             //End of removing
         }
         else
@@ -375,18 +372,18 @@ void WitreApplication::reorder(std::string time)
             uTop--;
             doc[Bottom].put("Tick.UpperTick", ((uBottom==uTop)?upperArg[Bottom]:upperArg[Top]));
             doc[Bottom].put("Tick.LowerTick", ((lowerArg[Bottom]!="")? lowerArg[Bottom]:(uBottom==uTop)?"":upperArg[Bottom]));
-            groupXML[pContainer[Bottom]]=doc[Bottom];
+            postingDoc.put_child("Group"+name[Bottom], doc[Bottom]);
             setXMLTitle(pContainer[Bottom]);
         }
     }
     else
     {
-        doc[Top] = groupXML[pContainer[Top]];
+        doc[Top] = postingDoc.get_child("Group"+name[Top]);
         lowerArg[Top] = doc[Top].get<std::string>("Tick.LowerTick");
         upperArg[Top] = doc[Top].get<std::string>("Tick.UpperTick");
         doc[Top].put("Tick.LowerTick", ((lowerArg[Top]=="")? (upperArg[Top]==time)?"":upperArg[Top]:lowerArg[Top]));
         doc[Top].put("Tick.UpperTick", time);
-        groupXML[pContainer[Top]]= doc[Top];
+        postingDoc.put_child("Group"+name[Top], doc[Top]);
         setXMLTitle(pContainer[Top]);
     }
     needsUpdated=false;
@@ -395,7 +392,8 @@ void WitreApplication::reorder(std::string time)
 
 void WitreApplication::setXMLTitle(Wt::WGroupBox *container)
 {
-    boost::property_tree::ptree doc = groupXML[container];
+    std::string name = container->objectName();
+    boost::property_tree::ptree doc = postingDoc.get_child("Group"+name);
     std::stringstream xml;
     xml <<doc.get<std::string>("Tick.LowerTick")
         <<((doc.get<std::string>("Tick.LowerTick")=="")?"":" - ")
@@ -414,10 +412,10 @@ void WitreApplication::timeLineChange()
 {
     Wt::WObject* timeLine = sender();
     std::string tName = timeLine->objectName();
-    std::map<std::string, Wt::WContainerWidget*>::iterator it;
-    for(it=boxPanels.begin(); it!=boxPanels.end(); it++)
+    std::map<std::string, Wt::WGroupBox*>::iterator it;
+    for(it=groupPanels.begin(); it!=groupPanels.end(); it++)
     {
-        Wt::WContainerWidget* container = (*it).second;
+        Wt::WGroupBox* container = (*it).second;
         for(int i=0; i<container->count(); i++)
         {
             Wt::WWidget* tempWidget = container->widget(i);
@@ -480,28 +478,16 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
         TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
         if(goalid!=NULL)
         {
-            Wt::WPanel* Gpanel = new Wt::WPanel();
-            Gpanel->setObjectName(goalid->object().str());
-            //Wt::WPushButton* recall = new Wt::WPushButton("Recall");
             std::stringstream oss;
-            oss<<"On Timeline <b>"<<goalid->object()<<"</b>, placed goal <b>"<<goalid->predicate()<<"</b>"
-               <<" at the time: "<<wServer->getTime_t()<<"<br />"
+            oss<<"<Token on=\"goal\" tick=\""<<wServer->getCurrentTick()<<"\">"
+               <<"On Timeline <on><b>"<<goalid->object()<<"</b></on>, placed goal "
+               <<"<pred><b>"<<goalid->predicate()<<"</b></pred> "
+               <<"at the time: "<<wServer->getTime_t()<<"<br />"
                <<"Starting: "<<start<<"<br />"
                <<"Duration: "<<duration<<"<br />"
-               <<"End: "<<end<<"<br />";
-            Wt::WText* text = new Wt::WText(oss.str());
-            Wt::WContainerWidget* container = new Wt::WContainerWidget;
-            container->addWidget(text);
-            //container->addWidget(recall);
-            //recall->clicked().connect(goalid,&WitreServer::postRecall);
-            Gpanel->setCentralWidget(container);
-            if(!tLineMap[goalid->object().str()])
-            {
-                Gpanel->hide();
-            }
-            std::stringstream time;
-            time<<wServer->getCurrentTick();
-            insert(time.str(), Gpanel);
+               <<"End: "<<end<<"<br /></Token>";
+            observations.push(oss.str());
+            post();
         }
 
     }
@@ -513,8 +499,8 @@ void WitreApplication::sliderChanged()
 {
     std::stringstream value;
     value<<timeLineSlider->value();
-    std::map<std::string, Wt::WContainerWidget*>::iterator it;
-    for(it = boxPanels.begin(); it!= boxPanels.end(); it++ )
+    std::map<std::string, Wt::WGroupBox*>::iterator it;
+    for(it = groupPanels.begin(); it!= groupPanels.end(); it++ )
     {
         if(boost::lexical_cast<int>((*it).first) > boost::lexical_cast<int>(value.str()))
         {

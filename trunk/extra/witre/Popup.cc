@@ -89,7 +89,7 @@ Goalpopup::Goalpopup(Wt::WContainerWidget* parent, int current, int final)
     ok->setId("AttributesPassed");
     ok->clicked().connect(this, &Wt::WWidget::hide);
     ok->clicked().connect(this, &Goalpopup::done);
-    //ok->setMargin(10,Wt::Right);
+    ok->setMargin(10,Wt::Right);
 
     Wt::WPushButton* reject = new Wt::WPushButton("Cancel",attributes);
     reject->clicked().connect(this, &Wt::WWidget::hide);
