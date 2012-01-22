@@ -2,20 +2,20 @@
  * @brief Declares the main interface for a Teleo-Reactor
  *
  * Defines the basis to implement a Teleo-reactor
- * 
+ *
  * @author Frederic Py <fpy@mbari.org> (initial version from Conor McGann)
  * @ingroup transaction
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -25,7 +25,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -49,7 +49,7 @@
 
 namespace TREX {
   namespace transaction {
-		
+
     /** @brief TeleoReactor abstract interface
      *
      * This class provides the basic framework for a Teleo-Reactor as
@@ -61,11 +61,11 @@ namespace TREX {
      * reactors through the timeline relations it have with them. These
      * relations can be deduced from how a reactor declares the timelines it
      * manipulate:
-     * 
+     *
      * @li @e External timelines is a state variable provided by another reactor
      *     in the graph. The reactor can observe its evolution and -- even though
      *     it cannot directly control this timelien value -- it can potentially
-     *     post goals on this timeline expressing desired future value(s). 
+     *     post goals on this timeline expressing desired future value(s).
      * @li @e Internal timelines is a state varaible managed by this reactor and
      *     made publicly available in the graph. It is the repsonsibility of this
      *     reactor to provide new Observation when the value of this timeline
@@ -75,10 +75,10 @@ namespace TREX {
      * A reactor provide also informations about its latency and look-ahead which
      * indicates its planning horizon and the maximum time it is exx1pected to
      * deliberate in order to produce a plan for the goals it received.
-		 
+
      * All these informations are used by the agent in order to schedule the
      * communication between agents along with their deliberation.
-     *    
+     *
      * @author Conor McGann @& Frederic Py <fpy@mbari.org>
      * @ingroup transaction
      * @sa class graph
@@ -109,7 +109,7 @@ namespace TREX {
        * @sa TREX::transaction::graph
        */
       typedef xml_factory::argument_type          xml_arg_type;
-			
+
       /** @brief XML based constructor
        *
        *
@@ -139,17 +139,17 @@ namespace TREX {
        * @li @c @<logflag@> a flag use to indicate that observations and commands issued
        *                  from this reactor should be logged or not
        * @li @c @<config@> An optional extra file that extends the defintions of this tag
-       * 
+       *
        * If @p loadTL is true then tha class will also parse the External and Internal
        * tags in roder to declare internal and external timelines of this reactor.
        *
        * @throw TREX::utils::XmlError An error occured while extracting reactors
        *        information from the XML structure
        */
-      explicit TeleoReactor(xml_arg_type &arg, bool loadTL=true);  
+      explicit TeleoReactor(xml_arg_type &arg, bool loadTL=true);
       /** @brief Destructor */
       virtual ~TeleoReactor();
-			
+
       /** @brief Reactor name
        * @return the anme of the reactor
        */
@@ -184,7 +184,11 @@ namespace TREX {
       TREX::utils::Symbol const &getGraphName() const {
 	return m_graph.getName();
       }
-      
+
+      graph const &getGraph() const {
+     return m_graph;
+      }
+
       /** @brief reactor initial tick
        *
        * This method indicates the tick during which the reactor has been
@@ -194,12 +198,12 @@ namespace TREX {
        *
        * @return the tick during which the reactor got started
        *
-       * @sa handleInit() 
+       * @sa handleInit()
        * @sa getCurrentTick() const
        * @sa getFinalTick() const
        */
       TICK getInitialTick() const {
-	return m_initialTick; 
+	return m_initialTick;
       }
       /** @brief Tick duration
        *
@@ -225,7 +229,7 @@ namespace TREX {
        *
        * @note the result of the method depends on the clock implementation.
        * For example the RealTimeClock fully support it while the StepClock
-       * will simply assume that unixtime and tick are perfeclty aligned 
+       * will simply assume that unixtime and tick are perfeclty aligned
        * (as if the mission started on January 1st 1970)
        */
       TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
@@ -234,15 +238,15 @@ namespace TREX {
       /** @brief tick to unix time conversion
        * @param[in] cur A tick value
        *
-       * @return equivalent unix time to @p cur as a float 
+       * @return equivalent unix time to @p cur as a float
        *
-       * This method is an utility to ease the conversion form a tick to unix time 
+       * This method is an utility to ease the conversion form a tick to unix time
        * it calls the agent clock corresponding method to convert the specified
        * tick value into unix time
        *
        * @note the result of the method depends on the clock implementation.
        * For example the RealTimeClock fully support it while the StepClock
-       * will simply assume that unixtime and tick are perfeclty aligned 
+       * will simply assume that unixtime and tick are perfeclty aligned
        * (as if the mission started on January 1st 1970)
        */
       double tickToTime(TICK cur) const {
@@ -297,7 +301,7 @@ namespace TREX {
        *
        * This value is used by TREX and represent this reactor's dispatch
        * window lowe bound.
-       * 
+       *
        * @return the reactor's execution latency
        *
        * @sa getLatency() const
@@ -330,7 +334,7 @@ namespace TREX {
        * @sa synchronize()
        */
       virtual void notify(Observation const &obs) {}
-			
+
       /** @brief Final initialization
        *
        * @param[in] final   The final tick date
@@ -353,7 +357,7 @@ namespace TREX {
        * @sa getCurrentTick() const
        */
       bool initialize(TICK final);
-			
+
       /** @brief New tick notification callback
        *
        * This method is called by the agent to notify the reactor
@@ -372,16 +376,16 @@ namespace TREX {
        * @retval true synchronization successfull
        * @retval false the call to synchronize returned @c false or thew
        *                an exception
-       *                
+       *
        * @warning when this method returns @c false  this reflect a @e critical
        *          reactor failure. Therefre the agent will kill this reactor and
        *          produce the observation @c Failed on each of its @e Internal
        *          timeline.
        * @sa synchronize()
-       */      
+       */
       bool   doSynchronize();
       /** @brief Request new observations
-       * 
+       *
        * This method ids called by the agent after its synchronization in
        * order to collect new observations on the reactor's @e Internal
        * timelines. This function identifies all the timelines for which
@@ -417,7 +421,7 @@ namespace TREX {
        * @sa resume()
        */
       void   step();
-      
+
       /** @brief Iterator other external timelines
        *
        * The type used to iterate other the external timlines of a reactor.
@@ -430,7 +434,7 @@ namespace TREX {
        * of a reactor
        */
       typedef size_t            size_type;
-			
+
       /** @brief Number of @e External timelines
        *
        * @return the number of @e External timelines on this reactor
@@ -452,7 +456,7 @@ namespace TREX {
        * @sa ext_begin()
        */
       external_iterator ext_end();
-			
+
     protected:
       /** @brief Constructor
        *
@@ -467,7 +471,7 @@ namespace TREX {
        */
       TeleoReactor(graph *owner, TREX::utils::Symbol const &name,
 		   TICK latency, TICK lookahead, bool log=false);
-			
+
       /** @brief LogManager acces point
        *
        * @return the LogManager instance for this run
@@ -475,9 +479,9 @@ namespace TREX {
       TREX::utils::LogManager &manager() const {
 	return m_graph.manager();
       }
-			
+
       /** @brief Check if need to deliberate
-       * 
+       *
        * This method is called during workRatio in order to idenitfy if the reactor
        * needs to deliberate.
        *
@@ -496,8 +500,8 @@ namespace TREX {
       virtual bool hasWork() {
 	return false;
       }
-			
-			
+
+
       /** @brief Produce an observation
        *
        * @param[in] o An observation
@@ -520,7 +524,7 @@ namespace TREX {
        * @sa doNotify()
        */
       void postObservation(Observation const &o);
-      
+
       /** @brief Post a goal
        *
        * @param[in] g A goal id
@@ -558,7 +562,7 @@ namespace TREX {
        *
        * @throw DispatchError the goal wasn't on an @e External timeline
        *
-       * @return the goal_id for this goal 
+       * @return the goal_id for this goal
        *
        * @sa postGoal(goal_id const &)
        * @sa isExternal(TREX::utils::Symbol const &) const
@@ -566,7 +570,7 @@ namespace TREX {
       goal_id postGoal(Goal const &g);
       /** @brief Goal completion
        *
-       * @param[in] g A goal 
+       * @param[in] g A goal
        *
        * This method can be used from the reactor to inform the goal
        * management system that the goal @p g on one of its external
@@ -577,7 +581,7 @@ namespace TREX {
        *             complete
        */
       bool completedGoal(goal_id g);
-			
+
       /** @brief Recall a goal
        *
        * @param[in] g A goal
@@ -598,7 +602,7 @@ namespace TREX {
        * @sa isExternal(TREX::utils::Symbol const &) const
        */
       bool postRecall(goal_id const &g);
-			
+
       /** @brief reactor initialiszation callback
        *
        * This callback is called during initialize() is order to allow derived
@@ -624,9 +628,9 @@ namespace TREX {
        *          the tick duration.
        */
       virtual void handleTickStart() {}
-			
+
       /** @brief Synchronization callback
-       * 
+       *
        * This method is called in order to ask for the reactor to
        * @li resolve its current state
        * @li produce new observation on its exeternal timelines if their state
@@ -645,23 +649,23 @@ namespace TREX {
        *          the tick duration.
        */
       virtual bool synchronize() =0;
-			
+
       /** @brief Deliberation step callback
        *
        * This callback will be executed in response of hasWork returning @c true. It
        * allows the reactor to execute an atomic deliberation step.
-       * 
+       *
        * @warning the duration of this call should  be neglectable in comparison to
        *          the tick duration.
        */
       virtual void resume() {}
-      
+
       /** @brief Goal reception callback
        * @param[in] g a goal
        *
        * This method is called by the agent in roder to notify this reactor that the
        * goal @p g has been requested to him.
-       * 
+       *
        * @warning the duration of this call should  be neglectable in comparison to
        *          the tick duration.
        */
@@ -671,12 +675,12 @@ namespace TREX {
        *
        * This method is called by the agent in roder to notify this reactor that the
        * goal @p g is no logner desired.
-       * 
+       *
        * @warning the duration of this call should  be neglectable in comparison to
        *          the tick duration.
        */
       virtual void handleRecall(goal_id const &g) {}
-			
+
       /** @brief External timeline declaration
        *
        * @param[in] timeline a name
@@ -694,11 +698,11 @@ namespace TREX {
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, bool) 
+       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, bool)
        * @sa provide(TREX::utils::Symbol const &)
        */
       void use(TREX::utils::Symbol const &timeline, bool control=true);
-            
+
       /** @brief Internal timeline declaration
        *
        * @param[in] timeline a name
@@ -715,17 +719,17 @@ namespace TREX {
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &) 
+       * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &)
        * @sa use(TREX::utils::Symbol const &, bool)
        */
       void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
-			
+
       /** @brief Request for external failed
        *
        * @param[in] timeline Symbolic name of the timeline
        * @param[in] err Descriptor of the error
-       * 
-       * This callback is executed when an attempt to use the External timeline 
+       *
+       * This callback is executed when an attempt to use the External timeline
        * @p timeline triggered an error. The reason of the failure is described by
        * @p err.
        * It can be derived in order to provide an alternate way to handle this failed
@@ -733,7 +737,7 @@ namespace TREX {
        *
        * @sa failed_internal(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
-      virtual bool failed_external(TREX::utils::Symbol const &timeline, 
+      virtual bool failed_external(TREX::utils::Symbol const &timeline,
 				   graph::timeline_failure const &err) {
         throw err;
       }
@@ -741,8 +745,8 @@ namespace TREX {
        *
        * @param[in] timeline Symbolic name of the timeline
        * @param[in] err Descriptor of the error
-       * 
-       * This callback is executed when an attempt to prtovide the Internal timeline 
+       *
+       * This callback is executed when an attempt to prtovide the Internal timeline
        * @p timeline triggered an error. The reason of the failure is described by
        * @p err.
        * It can be derived in order to provide an alternate way to handle this failed
@@ -750,7 +754,7 @@ namespace TREX {
        *
        * @sa failed_external(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
-      virtual bool failed_internal(TREX::utils::Symbol const &timeline, 
+      virtual bool failed_internal(TREX::utils::Symbol const &timeline,
 				   graph::timeline_failure const &err) {
         throw err;
       }
@@ -776,7 +780,7 @@ namespace TREX {
        * @sa use(TREX::utils::Symbol const &, bool)
        */
       bool isExternal(TREX::utils::Symbol const &timeline) const;
-			
+
       /** @brief new log entry
        *
        * @param[in] context log entry prefix
@@ -788,7 +792,7 @@ namespace TREX {
        * @sa TREX::utils::LogManager
        * @sa TREX::utils::TextLog
        */
-      TREX::utils::internals::LogEntry 
+      TREX::utils::internals::LogEntry
       syslog(std::string const &context=std::string()) {
 	if( context.empty() )
 	  return m_graph.syslog(getName().str());
@@ -797,12 +801,12 @@ namespace TREX {
       }
 
       external_iterator find_external(TREX::utils::Symbol const &name);
-      
+
     private:
-			
+
       void clear_internals();
       void clear_externals();
-			
+
       bool m_inited;
       bool m_firstTick;
       graph &m_graph;
@@ -811,29 +815,29 @@ namespace TREX {
       public:
 	Logger(std::string const &dest);
 	~Logger();
-	
+
 	void provide(TREX::utils::Symbol const &name);
 	void use(TREX::utils::Symbol const &name);
 
 	void unprovide(TREX::utils::Symbol const &name);
 	void unuse(TREX::utils::Symbol const &name);
-	
+
 	void newTick(TICK val);
-	
+
 	void observation(Observation const &obs);
 	void request(goal_id const &goal);
 	void recall(goal_id const &goal);
 
       private:
-	std::ofstream m_file;	
+	std::ofstream m_file;
 	bool m_tick, m_hasData;
 	TICK m_current;
-	
+
 	void openTick();
       }; // TREX::transaction::TeleoReactor::Logger
-	
+
       Logger *m_trLog;
-		
+
       /** @brief Reactor name
        *
        * This is the name of the reactor. It is used to idenitify the
@@ -842,7 +846,7 @@ namespace TREX {
        * @sa getName() const
        */
       TREX::utils::Symbol m_name;
-      
+
       /** @brief Deliberation latency
        *
        * Identifies the maximum amount of time it takes for the reactor
@@ -858,18 +862,18 @@ namespace TREX {
        * How much ticks ahead the reactor is looking while deliberating
        */
       TICK m_lookahead;
-      
+
       TICK   m_initialTick;
       TICK   m_finalTick;
-      
-      
+
+
       mutable TICK m_deadline;
       mutable unsigned long m_nSteps;
-			
+
       external_set m_externals;
       internal_set m_internals;
       internal_set m_updates;
-			
+
       /** @brief TREX log entry point
        *
        * Used to all the configuration and logging management for this reactor
@@ -877,28 +881,28 @@ namespace TREX {
        * @sa syslog() const
        */
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-			
+
       void isolate() {
 	clear_internals();
 	clear_externals();
       }
-			
+
       // call-backs from timeline
       void assigned(details::timeline *tl);
       void unassigned(details::timeline *tl);
       void subscribed(Relation const &r);
       void unsubscribed(Relation const &r);
       void latency_updated(TICK old_l, TICK new_l);
-      
-      
+
+
       friend class details::timeline;
       friend class details::external;
       friend class ReactorException;
       friend class Relation;
-			
+
       friend class graph;
     }; // TREX::transaction::TeleoReactor
-		
+
     /** @brief Synchronization related exception
      *
      * This exception will be throwned when an operation related to
@@ -920,7 +924,7 @@ namespace TREX {
       /** @brief Desturctor */
       ~SynchronizationError() throw() {}
     }; // TREX::transaction::SynchronizationError
-		
+
     /** @brief Goal posting error
      *
      * This execption will be thrown when a goal posting was invalid
@@ -931,7 +935,7 @@ namespace TREX {
      */
     class DispatchError :public ReactorException {
     public:
-      /** brief Constructor 
+      /** brief Constructor
        * @param[in] r The reactor where the error did occur
        * @param[in] g The goal that triggered the error
        * @param[in] msg The error msg
@@ -940,12 +944,12 @@ namespace TREX {
 	:ReactorException(r, buil_msg(g, msg)) {}
       /** @brief Destructor */
       ~DispatchError() throw() {}
-      
+
     private:
       static std::string buil_msg(goal_id const &g, std::string const &msg) throw();
     };
-    
-		
+
+
   } // TREX::transaction
 } // TREX
 
