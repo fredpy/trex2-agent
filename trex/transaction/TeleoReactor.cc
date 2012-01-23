@@ -193,7 +193,8 @@ TREX::utils::internals::LogEntry details::external::syslog() {
 // structors
 
 
-TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
+TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL, 
+			   bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
    m_trLog(NULL),
    m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
@@ -203,7 +204,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL)
    m_nSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   
-  if( parse_attr<bool>(true, node, "log") ) {
+  if( parse_attr<bool>(log_default, node, "log") ) {
     std::string log = manager().file_name(getName().str()+".tr.log");
     m_trLog = new Logger(log);
     syslog()<<"Transactions logged to "<<log;

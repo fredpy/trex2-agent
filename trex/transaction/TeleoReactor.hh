@@ -117,10 +117,14 @@ namespace TREX {
        *                called this constructor
        * @param[in] loadTL A flag to allow/prohibit the parsing of Internal
        *                  and External relations gfrom the xml structure
+       * @param[in] log_default A flag to indicate what is the default logging 
+       *                        behavior for this reactor
        *
        * This constructor creates a new reactor by parsing the xml structure @p arg.
        * Ig loadTL is true it will also extract Internal and External timelines
-       * definitions from this structure.
+       * definitions from this structure. @p log_default indicates what is the 
+       * default logging behaivor of the reactor when the @c log attribute is not 
+       * given in the XML structure.
        *
        * A typical reactor  definition is as follow
        * @code
@@ -136,17 +140,21 @@ namespace TREX {
        * @li @c @<name@>  the name of the reactor
        * @li @c @<lookahead@> the reactor's look-ahead
        * @li @c @<latency@> the reactors's latency
-       * @li @c @<logflag@> a flag use to indicate that observations and commands issued
-       *                  from this reactor should be logged or not
-       * @li @c @<config@> An optional extra file that extends the defintions of this tag
+       * @li @c @<logflag@> a flag use to indicate that observations and commands 
+       *                   issued from this reactor should be logged or not 
+       *                   (default is @p log_default)
+       * @li @c @<config@> An optional extra file that extends the defintions 
+       *                    of this tag
        *
-       * If @p loadTL is true then tha class will also parse the External and Internal
-       * tags in roder to declare internal and external timelines of this reactor.
+       * If @p loadTL is true then that class will also parse the External 
+       *              and Internal tags in order to declare internal and 
+       *              external timelines of this reactor.
        *
        * @throw TREX::utils::XmlError An error occured while extracting reactors
        *        information from the XML structure
        */
-      explicit TeleoReactor(xml_arg_type &arg, bool loadTL=true);
+      explicit TeleoReactor(xml_arg_type &arg, bool loadTL=true, 
+			    bool log_default=true);
       /** @brief Destructor */
       virtual ~TeleoReactor();
 
