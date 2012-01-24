@@ -205,8 +205,7 @@ bool WitreServer::synchronize()
     boost::mutex::scoped_lock lock(mutex_);
     time_t now = std::floor(tickToTime(getCurrentTick()+1));
     std::ostringstream oss;
-    oss<<"<Token tick=\""<<getCurrentTick()<<"\" on=\"Tick\" "
-       <<"value=\""<<(getCurrentTick()+1)<<"\">"<<now<<"</Token>";
+    oss<<"<Token tick=\""<<getCurrentTick()<<"\" on=\"Tick\">"<<now<<"</Token>";
     //Storing ticks
     observations.push(oss.str());
     //Notify all connected clients
@@ -215,7 +214,6 @@ bool WitreServer::synchronize()
             c.client->addObs(oss.str());
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
-
     return true;
 }
 

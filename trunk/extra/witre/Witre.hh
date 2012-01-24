@@ -89,6 +89,7 @@ namespace TREX {
       Wt::WTimer *timer;
       Wt::WComboBox *menu;
       Wt::WSlider *timeLineSlider;
+      Wt::JSlot *orderFunction;
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;

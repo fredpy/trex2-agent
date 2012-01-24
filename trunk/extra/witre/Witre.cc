@@ -270,7 +270,7 @@ void WitreApplication::post()
         timeLineSlider->setValue(timeLineSlider->value()+1);
         sliderText();
         reorder(time); // Reorder the panels after ever tick
-        Wt::WApplication::instance()->triggerUpdate();
+        WApplication::instance()->triggerUpdate();
         return;
     }
 
@@ -288,16 +288,19 @@ void WitreApplication::post()
         messages->insertWidget(0, box);
     }
 
+    std::string level = doc.get<std::string>("Token.<xmlattr>.level");
     postingDoc.add_child("Tick"+time+".Panel", doc);
     Wt::WPanel* panel = new Wt::WPanel();
     allPanels[name].push_front(panel);
     panel->setCentralWidget(new Wt::WText(observ+" since "+time)); // Addes the most recent observation to webpage
     panel->setObjectName(name); // Names the box by the timeline
-    if(!tLineMap[name] && name!="goal")
+    panel->setAttributeValue("level", level);
+    panel->setAttributeValue("since", time);
+    if(!tLineMap[name])
     {
         panel->hide();
     }
-    if(name!="goal")
+    if(boost::lexical_cast<int>(level)>-1)
     {
         currentPanels[name] = panel;
     }
@@ -319,10 +322,7 @@ void WitreApplication::reorder(std::string time)
     enum placement { Top=0, Bottom=1};
     std::string name[2];
     name[Top] = messages->widget(Top)->objectName();
-    if(name[Top]=="")
-    {
-        return;
-    }
+    if(name[Top]=="") return;
     //Arrays for data
     Wt::WGroupBox* pContainer[2];
     boost::property_tree::ptree doc[2];
@@ -339,6 +339,16 @@ void WitreApplication::reorder(std::string time)
         {
             pContainer[Top]->insertWidget(Top, it->second);
         }
+        std::stringstream javascript;
+        javascript<<"sender = document.getElementById(\""<<pContainer[Top]->id()<<"\");"
+                  <<"var child = sender.childNodes;"
+                  <<"for(var i=1; i<child.length; i++){ var temp = child[i];"
+                  <<"for(var y=i+1; y<child.length; y++){ var temp2 = child[y];"
+                  <<"var level = temp.getAttribute(\"level\"); var level2 =temp2.getAttribute(\"level\");"
+                  <<"if(level>level2){sender.insertBefore(temp2, temp); temp=temp2; y--;}"
+                  <<"else if(level==level2){ if(temp.getAttribute(\"since\")<temp2.getAttribute(\"since\"))"
+                  <<"{sender.insertBefore(temp2, temp); temp=temp2; y--; }}}}";
+        pContainer[Top]->doJavaScript(javascript.str());
     }
     //Removes the empty panels and changes the Panels title
     if(messages->count()>1 && needsUpdated)
@@ -479,7 +489,7 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
         if(goalid!=NULL)
         {
             std::stringstream oss;
-            oss<<"<Token on=\"goal\" tick=\""<<wServer->getCurrentTick()<<"\">"
+            oss<<"<Token on=\""<<object<<"\" tick=\""<<wServer->getCurrentTick()<<"\" level=\"-1\" >"
                <<"On Timeline <on><b>"<<goalid->object()<<"</b></on>, placed goal "
                <<"<pred><b>"<<goalid->predicate()<<"</b></pred> "
                <<"at the time: "<<wServer->getTime_t()<<"<br />"
