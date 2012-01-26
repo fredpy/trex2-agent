@@ -38,6 +38,25 @@
 namespace TREX {
   namespace europa {
     
+    /** @brief TREX core extensions for europa
+     * 
+     * This classe defines all the basic extensions of europa that
+     * provide the core functionalities for the europa reactor. And are
+     * used by T_REEX to implement synchronization and execution or for
+     * the nddl modeler to acces to information that resides on T-REX in
+     * the model. These extensions include :
+     * @li @c DeliberationScope The filter that limits europa to plan only in
+     * the planning window of the reactor 
+     * [current tick, current tick+latency+lookahed]
+     * @li @c SynchronizationScope The filter used during suynchronization
+     * to limit the planning problem to only the current tick
+     * @li CheckInternal A constraint that can be used to check if a
+     * europa object is a TREX Internal timeline
+     * @li CheckExternal A constraint that can be used to check if a
+     * europa object is a TREX External timeline.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     */
     class CoreExtensions :public EuropaPlugin {
     public:
       void registerComponents(Assembly const &assembly);
@@ -49,8 +68,10 @@ namespace TREX {
       				TrexDeliberationScope); 
       TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::SynchronizationScope, 
       				TrexSynchronizationScope); 
-      TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,isExternal,trex);
-      TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,isInternal,trex); 
+      TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,
+			       isExternal,trex);
+      TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
+			       isInternal,trex); 
     }
 
     CoreExtensions trex_core;
