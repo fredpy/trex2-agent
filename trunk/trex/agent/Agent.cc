@@ -318,7 +318,21 @@ bool Agent::missionCompleted() {
   return getCurrentTick()>m_finalTick;
 }
 
+void Agent::internal_check(reactor_id r, 
+			   TREX::transaction::details::timeline const &tl) {
+  // throw timeline_failure(...) <= indicate to reactor_graph that 
+  //this connection is not allowed
+}
+
+void Agent::external_check(reactor_id r, 
+			   TREX::transaction::details::timeline const &tl) {
+  // throw timeline_failure(...) <= indicate to reactor_graph that 
+  //this connection is not allowed
+}
+
+
 // manipulators :
+
 
 bool Agent::setClock(Clock *clock) {
   if( NULL==m_clock ) {
