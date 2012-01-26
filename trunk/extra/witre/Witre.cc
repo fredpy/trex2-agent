@@ -146,8 +146,8 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     timeLineSlider->setTickInterval(wServer->tickDuration());
     timeLineSlider->setRange(0, wServer->getFinalTick());
     timeLineSlider->resize(400, 50);
-    timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderChanged );
-    timeLineSlider->valueChanged().connect(this, &WitreApplication::sliderText);
+    timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderChanged);
+    timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderText);
 
     sliderTime = new Wt::WText(south);
     //End of South Code
@@ -268,7 +268,7 @@ void WitreApplication::post()
         updateTick(observ);
         observations.pop();
         timeLineSlider->setValue(timeLineSlider->value()+1);
-        sliderText();
+        sliderText(timeLineSlider->value());
         reorder(time); // Reorder the panels after ever tick
         WApplication::instance()->triggerUpdate();
         return;
@@ -505,14 +505,12 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
 
 }
 
-void WitreApplication::sliderChanged()
+void WitreApplication::sliderChanged(int value)
 {
-    std::stringstream value;
-    value<<timeLineSlider->value();
     std::map<std::string, Wt::WGroupBox*>::iterator it;
     for(it = groupPanels.begin(); it!= groupPanels.end(); it++ )
     {
-        if(boost::lexical_cast<int>((*it).first) > boost::lexical_cast<int>(value.str()))
+        if(boost::lexical_cast<int>((*it).first) > value)
         {
             (*it).second->hide();
         }
@@ -523,10 +521,8 @@ void WitreApplication::sliderChanged()
     }
 }
 
-void WitreApplication::sliderText()
+void WitreApplication::sliderText(int value)
 {
-    std::stringstream value;
-    value<<timeLineSlider->value();
-    sliderTime->setText(value.str());
+    sliderTime->setText(boost::lexical_cast<std::string>(value));
     Wt::WApplication::instance()->triggerUpdate();
 }
