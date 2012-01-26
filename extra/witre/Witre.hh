@@ -43,8 +43,6 @@
 #include <Wt/WPushButton>
 #include <Wt/WText>
 #include <Wt/WTimer>
-#include <Wt/WBreak>
-#include <Wt/WTime>
 #include <Wt/WPanel>
 #include <Wt/WAnimation>
 #include <Wt/WFlags>
@@ -53,7 +51,6 @@
 #include <Wt/WComboBox>
 #include <Wt/WDialog>
 #include <Wt/WMessageBox>
-#include <Wt/WDateTime>
 #include <Wt/WSlider>
 #include <Wt/WBorderLayout>
 #include <Wt/WBoxLayout>
@@ -89,7 +86,6 @@ namespace TREX {
       Wt::WTimer *timer;
       Wt::WComboBox *menu;
       Wt::WSlider *timeLineSlider;
-      Wt::JSlot *orderFunction;
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;
@@ -102,8 +98,8 @@ namespace TREX {
       std::queue<std::string> observations;
       friend class WitreServer;
 
-      void sliderChanged();
-      void sliderText();
+      void sliderChanged(int value);
+      void sliderText(int value);
       void urlPage(const std::string& path);
       std::string* parseUrl(std::string url);
 

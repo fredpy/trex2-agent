@@ -2,11 +2,9 @@
 #define WITREGRAPH
 
 #include <trex/transaction/TeleoReactor.hh>
-#include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include <map>
 #include <string>
-#include <iostream>
 using namespace std;
 
 using namespace TREX::transaction;
