@@ -362,6 +362,12 @@ namespace TREX {
       }
       
     private:
+      void internal_check(reactor_id r, 
+			  TREX::transaction::details::timeline const &tl);
+      void external_check(reactor_id r, 
+			  TREX::transaction::details::timeline const &tl);
+
+
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:
 	AgentProxy(Agent &agent)

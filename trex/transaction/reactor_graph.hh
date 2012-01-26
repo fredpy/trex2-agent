@@ -601,8 +601,43 @@ namespace TREX {
 	return m_timelines.end();
       }
       
-      
+      /** @brief Check for internal timeline creation
+       * 
+       * @param[in] r A reactor
+       * @param[in] tl A timeline
+       *
+       * This method is used by the graph to check if the reactor @p r can
+       * declare the timeline @p tl as internal.
+       *
+       * It can be used by derived classes to add extra control on the creation
+       * of internal timelines. For example this is where the Agent could check
+       * if such internal timeline creation won't generate a dependency cycle.
+       *
+       * @throw timeline_failure indicates that @p tl cannot be declared as
+       * internal by @p r
+       *
+       * @sa TeleoReactor::failed_internal(Symbol const &, timeline_failure const &)
+       * @sa external_check(reactor_id r, details::timeline const &)
+       */
       virtual void internal_check(reactor_id r, details::timeline const &tl) {}
+      /** @brief Check for external timeline creation
+       * 
+       * @param[in] r A reactor
+       * @param[in] tl A timeline
+       *
+       * This method is used by the graph to check if the reactor @p r can
+       * declare the timeline @p tl as external.
+       *
+       * It can be used by derived classes to add extra control on the creation
+       * of internal timelines. For example this is where the Agent could check
+       * if such external timeline creation won't generate a dependency cycle.
+       *
+       * @throw timeline_failure indicates that @p tl cannot be declared as
+       * external by @p r
+       *
+       * @sa TeleoReactor::failed_external(Symbol const &, timeline_failure const &)
+       * @sa internal_check(reactor_id r, details::timeline const &)
+       */
       virtual void external_check(reactor_id r, details::timeline const &tl) {}
 
     private:
