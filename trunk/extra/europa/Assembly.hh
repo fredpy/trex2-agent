@@ -505,7 +505,7 @@ namespace TREX {
       void mark_invalid();
       TREX::transaction::TICK final_tick() const;
       
-      void logPlan(std::ostream &out) const;
+      void logPlan(std::ostream &out, bool expanded = false) const;
     private:
       void propagation_failure() const;
 

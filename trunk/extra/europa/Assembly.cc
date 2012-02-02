@@ -214,42 +214,50 @@ Assembly::~Assembly() {
 
 // observers 
 
-void Assembly::logPlan(std::ostream &out) const {
+void Assembly::logPlan(std::ostream &out, bool expanded) const {
   EUROPA::TokenSet const all_toks = m_planDatabase->getTokens();
   out<<"digraph plan_"<<m_reactor.getCurrentTick()<<" {\n";
   out<<"  node[shape=\"box\"];\n";
   for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
       all_toks.end()!=i; ++i) {
     EUROPA::eint key = (*i)->getKey();
-    out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"{\\n"
-       <<" id "<<key<<"\\n";
-    std::vector<EUROPA::ConstrainedVariableId> 
-      const &vars = (*i)->getVariables();
-    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator j=vars.begin();
-	vars.end()!=j; ++j) {
-      out<<(*j)->getName().toString()<<"=="<<(*j)->toString()<<"\\n";
-    }
-    out<<"}";
+
+    if( expanded || !(*i)->isMerged() ) {
+      out<<"  t"<<key<<"[label=\""<<(*i)->getPredicateName().toString()<<"("
+	 <<key<<") {\\n";
+      std::vector<EUROPA::ConstrainedVariableId> 
+	const &vars = (*i)->getVariables();
+      for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator j=vars.begin();
+	  vars.end()!=j; ++j) {
+	out<<"  "<<(*j)->getName().toString()<<"="<<(*j)->toString()<<"\\n";
+      }
+      out<<"}";
 	
-    if( (*i)->isCommitted() )
-      out<<"\\n committed";
-    out<<"\"";
-    if( ignored(*i) )
-      out<<" color=grey";
-    else if( in_deliberation(*i) )
-      out<<" color=blue";
-    else if( (*i)->isFact() )
-      out<<" color=red";
-    out<<"];\n";
-    
-    if( (*i)->isMerged() ) {
-      EUROPA::eint active = (*i)->getActiveToken()->getKey();
-      out<<"  t"<<key<<"->t"<<active<<"[color=grey];\n";      
-    } 
+      if( (*i)->isCommitted() && expanded )
+	out<<"\\n  committed";
+      out<<"\"";
+      if( ignored(*i) )
+	out<<" color=grey";
+      else if( in_deliberation(*i) )
+	out<<" color=blue";
+      else if( (*i)->isFact() )
+	out<<" color=red";
+      out<<" labeljust=r];\n";
+      
+      if( (*i)->isMerged() ) {
+	EUROPA::eint active = (*i)->getActiveToken()->getKey();
+	out<<"  t"<<key<<"->t"<<active<<"[color=grey];\n";      
+      } 
+    } else if( (*i)->isMerged() ) {
+      key = (*i)->getActiveToken()->getKey();
+    }
     EUROPA::TokenId master = (*i)->master();
     if( master.isId() ) {
       out<<"  t"<<master->getKey()<<"->t"<<key
-	 <<"[label=\""<<(*i)->getRelation().toString()<<"\"];\n";
+	 <<"[label=\""<<(*i)->getRelation().toString()<<"\"";
+      if( (*i)->isMerged() )
+	out<<" color=grey";
+      out<<"];\n";
     }
   }
   out<<"}\n";
@@ -372,7 +380,7 @@ bool Assembly::overlaps_now(EUROPA::TokenId const &tok) const {
 bool Assembly::in_synch_scope(EUROPA::TokenId const &tok, 
                               EUROPA::TokenId &cand) const {
   return overlaps_now(tok) && !( ignored(tok) || in_deliberation(tok) )
-  && is_unit(tok, cand);
+    && is_unit(tok, cand);
 }
 
 bool Assembly::is_unit(EUROPA::TokenId const &tok, EUROPA::TokenId &cand) const {
@@ -418,7 +426,7 @@ bool Assembly::merge_token(EUROPA::TokenId const &tok, EUROPA::TokenId const &ca
         tok->getState()->lastDomain().isMember(EUROPA::Token::MERGED) ) )
     return false;
   tok->merge(cand);
-  propagate();
+  // propagate();
   return true;
 }
 
