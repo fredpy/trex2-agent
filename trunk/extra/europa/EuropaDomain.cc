@@ -57,7 +57,7 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   if( type->isBool() ) {
     // boolean 
     if( dom.isSingleton() )
-      result.reset(new BooleanDomain(dom.getSingletonValue()==0.0));
+      result.reset(new BooleanDomain(dom.getSingletonValue()!=0.0));
     else 
       result.reset(new BooleanDomain());
   } else if( type->isNumeric() ) {
@@ -251,15 +251,35 @@ void europa_domain::visit(BasicEnumerated const *dom) {
 void europa_domain::visit(BasicInterval const *dom) {
   if( m_dom->isInterval() ) {
     std::auto_ptr<EUROPA::Domain> tmp(m_dom->copy());
-    std::string lo = dom->getStringLower(), hi = dom->getStringUpper();
 
+    if( m_dom->isBool() ) {
+      // Handle boolean special case : we make that assumption that the base 
+      // type of the domain can be converted into a double
+      if( dom->isSingleton() ) {
+	double val = dom->getTypedSingleton<double, true>();
+	EUROPA::edouble eval(val);
+	tmp->intersect(eval, eval);
+      } else if( !dom->isFull() ) {
+	double lo = dom->getTypedLower<double, true>(), 
+	  hi = dom->getTypedUpper<double, true>();
+	if( lo>0.0 || hi<0.0 ) {
+	  // the only case where it does not translate to the full 
+	  // domain is when 0 is not part of the interval
+	  EUROPA::eint eval(1);
+	  tmp->intersect(eval, eval);
+	}
+      }
+    } else {
+      std::string lo = dom->getStringLower(), hi = dom->getStringUpper();
 
-    debugMsg("trex:assign", "Attempting to intersect "<<m_dom->toString()
-	     <<" with ["<<lo<<", "<<hi<<"]");
-    EUROPA::edouble elo = m_type->createValue(lo), ehi = m_type->createValue(hi);
-    debugMsg("trex:assign", "  - converted ["<<lo<<", "<<hi
-	     <<"] into europa "<<m_type->getNameString()<<" ["<<elo<<", "<<ehi<<"]");
-    tmp->intersect(elo, ehi);
+      
+      debugMsg("trex:assign", "Attempting to intersect "<<m_dom->toString()
+	       <<" with ["<<lo<<", "<<hi<<"]");
+      EUROPA::edouble elo = m_type->createValue(lo), ehi = m_type->createValue(hi);
+      debugMsg("trex:assign", "  - converted ["<<lo<<", "<<hi
+	       <<"] into europa "<<m_type->getNameString()<<" ["<<elo<<", "<<ehi<<"]");
+      tmp->intersect(elo, ehi);
+    }
     debugMsg("trex:assign", "  - intersection is "<<tmp->toString());
     if( tmp->isEmpty() )
       throw EmptyDomain(*dom, "EUROPA interval domain "+m_dom->toString()+" became empty.");
