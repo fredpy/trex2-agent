@@ -40,8 +40,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 ########################################################################
 project(trex)
 set(TREX_MAJOR 0)
-set(TREX_MINOR 3)
-set(TREX_PATCH 0)
+set(TREX_MINOR 2)
+set(TREX_PATCH 2)
 
 
 # CPack version numbers for release tarball name.
@@ -68,9 +68,10 @@ set(CPACK_SOURCE_GENERATOR TGZ)
 set(CPACK_SOURCE_IGNORE_FILES
 "~$"
 "log/latest/"
-"log/[1-9][0-9]*\\\\.[1-9][0-9]*\\\\.[0-9][0-9]*/"
+"log/[1-9][0-9]*\\\\.[0-9][0-9]*\\\\.[0-9][0-9]*/"
 "/\\\\.svn/"
 "\\\\.DS_Store$"
+"extra/europa/core"
 )
 include(CPack)
 
