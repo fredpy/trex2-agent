@@ -49,6 +49,7 @@ if(WITH_EUROPA)
       DeliberationFilter.cc
       EuropaDomain.cc
       EuropaReactor.cc
+      extensions/EarliestFirstFlawManager.cc
     )
 
     set_property(TARGET TREXeuropa PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
