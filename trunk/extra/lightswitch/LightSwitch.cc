@@ -54,6 +54,7 @@
 
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/EnumDomain.hh>
+#include <trex/domain/BooleanDomain.hh>
 
 #include "LightSwitch.hh"
 
