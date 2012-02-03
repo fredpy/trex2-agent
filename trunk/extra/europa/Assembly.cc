@@ -36,6 +36,8 @@
 #include "bits/europa_convert.hh"
 #include "DbSolver.hh"
 
+#include "extensions/EarliestFirstFlawManager.hh"
+
 #include <PLASMA/ModuleConstraintEngine.hh>
 #include <PLASMA/ModulePlanDatabase.hh>
 #include <PLASMA/ModuleRulesEngine.hh>
@@ -81,6 +83,9 @@ void DefaultSchema::registerComponents(Assembly const &assembly) {
   TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,isExternal,trex);
   TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,isInternal,trex);   
   TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::Bind,bind,Default);   
+  
+  TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager, 
+			     EarliestFirst);
 }
 
 TokenError::TokenError(EUROPA::Token const &tok, std::string const &msg) throw()
