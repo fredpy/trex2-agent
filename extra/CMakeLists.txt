@@ -37,7 +37,7 @@ add_custom_target(plugins COMMENT "TREX plugins")
 macro(trex_plugin name src)
   add_library(${name}_pg SHARED ${src} ${ARGN})
   add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION shared/trex OPTIONAL)
+  install(TARGETS ${name}_pg DESTINATION shared/trex/plugins OPTIONAL)
   trex_cfg(cfg shared/trex)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
     ${CMAKE_CURRENT_BINARY_DIR})
