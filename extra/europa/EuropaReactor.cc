@@ -71,15 +71,17 @@ EuropaReactor::EuropaReactor(xml_arg_type arg)
       long_nddl = getGraphName().str()+"."+short_nddl;
     // locate nddl model 
     //   - 1st look for <agent>.<reactor>.nddl
+    syslog()<<"No model specified : attempting to load "<<long_nddl;
     nddl = manager().use(long_nddl, found);
     if( !found ) {
-      // if not found look for jsut <reactor>.nddl
+      syslog()<<long_nddl<<" not found : attempting to load "<<short_nddl;
+      // if not found look for just <reactor>.nddl
       nddl = manager().use(short_nddl, found);
       if( !found )
 	// no model found for this reactor 
 	throw ReactorException(*this, "Unable to locate \""+long_nddl+"\" or \""+
 			       short_nddl+"\"");
-    }
+    } 
   }
   // Load the model
   if( !m_assembly.playTransaction(nddl) )
