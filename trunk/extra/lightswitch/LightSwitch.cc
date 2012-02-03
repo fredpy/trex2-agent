@@ -132,6 +132,7 @@ void Light::setValue(bool val) {
   m_light_state.reset(new Observation(lightObj, light_v));
   postObservation(*m_light_state);
   Observation switch_state(switchObj, switch_v);
+  switch_state.restrictAttribute("foo", BooleanDomain(m_on));
   postObservation(switch_state);
 } 
 
