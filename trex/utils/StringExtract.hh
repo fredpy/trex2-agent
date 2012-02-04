@@ -136,7 +136,7 @@ namespace TREX {
      * @param in A string
      * @param format A format
      *
-     * @return A copy of @a in
+     * @return A copy of @p in
      * @ingroup utils
      */ 
     template<>
