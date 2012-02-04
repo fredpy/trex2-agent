@@ -120,6 +120,7 @@ namespace TREX {
       void notifyTerminated(EUROPA::TokenId const &token);
 
       void process_pending();
+      bool in_agenda(EUROPA::TokenId const &token) const;
 
       EUROPA::TokenSet m_pending;      
 

@@ -349,7 +349,7 @@ bool DbCore::process_agenda(EUROPA::TokenSet agenda, size_t &steps) {
   for(EUROPA::TokenSet::const_iterator i=agenda.begin(); agenda.end()!=i; ++i) {
     if( (*i)->getObject()->lastDomain().isSingleton() && (*i)->isInactive() ) {
       EUROPA::TokenId cand;
-            if( assembly.in_synch_scope(*i, cand) ) {
+      if( in_agenda(*i) && assembly.in_synch_scope(*i, cand) ) {
 	debugMsg("trex:agenda", "resolving "<<(*i)->toLongString());
 	++steps;
 	if( !( assembly.resolve(*i, cand, steps) && propagate() ) ) {
@@ -395,6 +395,13 @@ bool DbCore::resolve(size_t &steps) {
   } while( last_count!=steps );
   return true;
 }
+
+bool DbCore::in_agenda(EUROPA::TokenId const &token) const {
+  return token->isInactive() && 
+    ( m_facts_agenda.end()!=m_facts_agenda.find(token) ||
+      m_agenda.end()!=m_agenda.find(token) );
+}
+
 
 bool DbCore::update_internals(size_t &steps) {
   Assembly &assembly = m_reactor.assembly();
@@ -476,24 +483,27 @@ bool DbCore::relax(bool aggressive) {
   m_reactor.log("core")<<"Beginning database relax"
      		       <<(aggressive?" and forget about the past":"");
   debugMsg("trex:relax", "START "<<(aggressive?"aggressive ":"")<<"relax");
-  // recall all of my former objectives
-  m_reactor.relax();
   // Put the solver out of the way 
   assembly.solver().clear();
   assembly.mark_inactive();
+
+  // recall all of my former objectives
+  m_reactor.relax();
 
   TICK cur = m_reactor.getCurrentTick();
   
   // First pass : deal with facts produced by TREX
 
   debugMsg("trex:relax", "evaluating "<<m_observations.size()
-	   <<" observations for relax")
+	   <<" observations for relax");
   EUROPA::TokenSet relax_list = m_observations;
   for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
       relax_list.end()!=i; ++i) {
     if( aggressive && (*i)->end()->baseDomain().getUpperBound()<=cur ) {
   	debugMsg("trex:relax", "DISCARD past fact "<<(*i)->toString()
   		 <<(*i)->getPredicateName().toString());
+	if( !(*i)->isInactive() )
+	  (*i)->cancel();
 	(*i)->discard();	
     } else if( (*i)->isCommitted() ) {
       debugMsg("trex:relax", "Canceling slaves of "<<(*i)->toString());
@@ -504,7 +514,6 @@ bool DbCore::relax(bool aggressive) {
 	  debugMsg("trex:relax", "\t cancel "<<(*it)->toString());
       	  (*it)->cancel();
 	}
-	  
     } else if( !(*i)->isInactive() ) {
       debugMsg("trex:relax", "Canceling token "<<(*i)->toString());
       (*i)->cancel();
@@ -517,9 +526,11 @@ bool DbCore::relax(bool aggressive) {
   relax_list = m_goals;
   for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
       relax_list.end()!=i; ++i) 
-    if( reset_goal(*i, aggressive) ) 
+    if( reset_goal(*i, aggressive) ) {
+      if( !(*i)->isInactive() )
+	(*i)->cancel();
       (*i)->discard();
-    else {
+    } else {
       // Make sure that the domain is fully relaxed 
       std::vector<EUROPA::ConstrainedVariableId> const &vars = (*i)->getVariables();
       if( !(*i)->isInactive() )
@@ -538,6 +549,8 @@ bool DbCore::relax(bool aggressive) {
   for(EUROPA::TokenSet::const_iterator i=relax_list.begin(); 
       relax_list.end()!=i; ++i) {
     debugMsg("trex:relax", "DISCARD recalled goal "<<(*i)->toString());
+    if( !(*i)->isInactive() )
+      (*i)->cancel();
     (*i)->discard();
   }
   m_reactor.logPlan("relax");
@@ -913,6 +926,8 @@ void DbCore::archive() {
       if( (*i)->isMerged() ) {
 	active = (*i)->getActiveToken();
       }
+      if( !(*i)->isInactive() )
+	(*i)->cancel();
       (*i)->discard();
       if( active.isId() && !active->isFact() ) {
 	EUROPA::TokenSet const &slaves = active->slaves();
