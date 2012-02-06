@@ -71,7 +71,7 @@ PROJECT_NUMBER         = @TREX_MAJOR@.@TREX_MINOR@.@TREX_PATCH@
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doc
+OUTPUT_DIRECTORY       = @DOXYGEN_OUTPUT@
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 

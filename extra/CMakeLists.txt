@@ -45,8 +45,7 @@ macro(trex_plugin name src)
 endmacro(trex_plugin)
 
 # the directories where plugins are located
+
 add_subdirectory(lightswitch)
 add_subdirectory(europa)
-#add_subdirectory(europa2)
 add_subdirectory(witre)
-add_subdirectory(vitre)
