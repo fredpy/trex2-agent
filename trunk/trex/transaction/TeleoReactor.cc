@@ -253,6 +253,15 @@ TeleoReactor::~TeleoReactor() {
 
 // observers 
 
+TeleoReactor::size_type TeleoReactor::count_internal_relations() const {
+  size_type result(0);
+
+  for(internal_set::const_iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
+    result += (*i)->size();
+  return result;
+}
+
+
 bool TeleoReactor::isInternal(TREX::utils::Symbol const &timeline) const {
   return m_internals.end()!=m_internals.find(timeline);
 }
