@@ -40,6 +40,7 @@
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>
 # include <boost/graph/properties.hpp>
+# include <boost/graph/reverse_graph.hpp>
 
 namespace TREX {
   namespace transaction {
@@ -65,6 +66,7 @@ namespace TREX {
        * @param[in] g A graph 
        * @param[in] r A reactor
        *
+
        * Create a new instance indicating that multiple reactors with the same
        * name as @p r were declared in the graph @p g
        */
@@ -161,6 +163,13 @@ namespace TREX {
       typedef TREX::utils::XmlFactory<TeleoReactor, boost::shared_ptr<TeleoReactor>,
 				      graph *> xml_factory;
 
+      /** @brief Reverse of a reactor graph
+       * 
+       * This type is the one used in order to refer to this graph with 
+       * reversed relations
+       */
+      typedef boost::reverse_graph<graph, graph const &> reverse_graph;
+
       typedef boost::directed_tag            directed_category;
       typedef boost::allow_parallel_edge_tag edge_parallel_category;
 
@@ -185,7 +194,7 @@ namespace TREX {
        * @relates graph
        */
       struct traversal_category:
-	public virtual boost::incidence_graph_tag,
+	public virtual boost::bidirectional_graph_tag,
 	public virtual boost::adjacency_graph_tag,
 	public virtual boost::vertex_list_graph_tag,
 	public virtual boost::edge_list_graph_tag {};

@@ -442,7 +442,7 @@ namespace TREX {
 
       /** @brief Iterator for reactors relations
        *
-       * This class is used to iterator thought the external reelations
+       * This class is used to iterate through the external reelations
        * of a reactor. It is mostly used by the different algorithms provided
        * by the boost graph library in order to traverse the reactors graph
        *
