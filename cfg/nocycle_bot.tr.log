@@ -3,12 +3,10 @@
     <!-- create the intermadiate connection between the top and bottom reactor 
          that ways we have a graph that is slghitly more thatn the simple case 
     -->
-    <provide name="middle"/>
-    <use name="bottom"/>
-    <use name="bottom_nocycle"/>
+    <provide name="bottom_nocycle"/>
   </header>
   <tick value="0">
     <!-- Initial observation to show that we are still alive -->
-    <Observation on="middle" pred="Alive"/>
+    <Observation on="bottom_nocycle" pred="Alive"/>
   </tick>
 </Log>
