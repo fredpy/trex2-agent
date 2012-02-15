@@ -12,14 +12,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -29,7 +29,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -63,7 +63,7 @@ namespace boost {
    * @ingroup agent
    */
   template<>
-  struct graph_traits<TREX::agent::Agent> 
+  struct graph_traits<TREX::agent::Agent>
     :public graph_traits<TREX::transaction::graph> {};
 
 } // boost
@@ -82,7 +82,7 @@ namespace TREX {
      * a chicken and egg problem during xynchronization which can only
      * be reolved by computing a fixed point for synchronization of both
      * @p a and @p b which is not even guraranteed to converge.
-     * 
+     *
      * @author Frederic Py
      * @relates class Agent
      * @ingroup agent
@@ -100,7 +100,7 @@ namespace TREX {
        */
       CycleDetected(TREX::transaction::graph const &g,
 		    TREX::transaction::graph::reactor_id a,
-		    TREX::transaction::graph::reactor_id b) throw() 
+		    TREX::transaction::graph::reactor_id b) throw()
 	:AgentException(g, "Cyclic dependency between reactor \""+
 			a->getName().str()+"\" and \""+
 			b->getName().str()+"\".") {}
@@ -127,7 +127,7 @@ namespace TREX {
        *
        * @param[in] other Another instance
        */
-      CycleDetector(CycleDetector const &other) 
+      CycleDetector(CycleDetector const &other)
 	:boost::dfs_visitor<>(other) {}
       /** @brief Destructor */
       virtual ~CycleDetector() {}
@@ -145,25 +145,25 @@ namespace TREX {
 		     TREX::transaction::graph const &g) {
 	throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
       }
-      
-			   
+
+
     protected:
       /** @brief Check for node validity
        * @param[in] r A reactor reference
-       * 
-       * Check that @p r referes to an exisiting reactor. This method is 
+       *
+       * Check that @p r referes to an exisiting reactor. This method is
        * used during graph traversal to vcheck that the an edge is not pointing
        * to nothing
-       * 
+       *
        * @retval true if @p r refers to a reactor
        * @retval false otherwise
-       * 
+       *
        * @sa TREX::transaction::garph::null_reactor()
        */
       bool is_valid(TREX::transaction::graph::reactor_id r) const {
 	return TREX::transaction::graph::null_reactor()!=r;
       }
-      
+
     private:
 
     }; // TREX::agent::CycleDetector

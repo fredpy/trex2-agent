@@ -6,14 +6,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -23,7 +23,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -45,9 +45,11 @@
 
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???
-#define BOOST_EXCEPTION_DISABLE 
+#define BOOST_EXCEPTION_DISABLE
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/topological_sort.hpp>
+#include <boost/graph/depth_first_search.hpp>
+#include <boost/graph/reverse_graph.hpp>
 
 
 using namespace TREX::agent;
@@ -58,11 +60,11 @@ namespace xml = boost::property_tree::xml_parser;
 namespace TREX {
   namespace agent {
     namespace details {
-            
+
       /** @brief Reactors initialization visitor
        *
-       * This class is a depth first search visitor that will initialize all 
-       * the reactors from the least dependent to the most dependent in the 
+       * This class is a depth first search visitor that will initialize all
+       * the reactors from the least dependent to the most dependent in the
        * graph.
        *
        * The initialization is done through the @c initialize call on each
@@ -72,7 +74,7 @@ namespace TREX {
        * @sa TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)
        * @sa TREX::transaction::TeleoReactor::handleInit()
        *
-       * @relates class Agent 
+       * @relates class Agent
        * @ingroup agent
        * @author Frederic Py <fpy@mbari.org>
        */
@@ -87,13 +89,13 @@ namespace TREX {
 	 *
 	 * @param[in] other the instance to copy
 	 */
-	init_visitor(init_visitor const &other) 
+	init_visitor(init_visitor const &other)
 	  :CycleDetector(other), m_final(other.m_final) {}
 	/** @brief Destructor */
 	virtual ~init_visitor() {}
-	
+
 	/** @brief Finish vertex callback
-	 * 
+	 *
 	 * @param[in] r A reactor
 	 * @param[in] g The graph @p r is attached to
 	 *
@@ -101,13 +103,13 @@ namespace TREX {
 	 * the reactors @p r depends on have been already explored.
 	 *
 	 * It will call the initialize method of @p r with a final tick value as
-	 * provided by the m_finalTick attribute in order to allow this reactor 
+	 * provided by the m_finalTick attribute in order to allow this reactor
 	 * to complete its initialization.
 	 *
 	 * @sa Agent::initComplete()
 	 * @sa TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)
 	 */
-	void finish_vertex(graph::reactor_id r, graph const &g) {	  
+	void finish_vertex(graph::reactor_id r, graph const &g) {
 	  if( is_valid(r) ) {
 	    if( !r->initialize(m_final) ) {
 	      g.isolate(r);
@@ -141,7 +143,7 @@ namespace TREX {
        *       have yet to check and verify that such approach would be valid as it would
        *       interleave the calls of @c newTick and @c synchronize of the reactors
        *       which may -- or may not -- be problematic.
-       *       
+       *
        * @ingroup agent
        * @relates clas Agent
        * @author Frederic Py <fpy@mbari.org>
@@ -180,7 +182,7 @@ namespace TREX {
 	 *
 	 * Create new instance referring to the same scheduling list as @p other
 	 */
-	sync_scheduller(sync_scheduller const &other) 
+	sync_scheduller(sync_scheduller const &other)
 	  :CycleDetector(other), m_sync(other.m_sync) {}
 	/** @brief Destructor */
 	virtual ~sync_scheduller() {}
@@ -193,17 +195,17 @@ namespace TREX {
 	 * This method is called when the sarch encounter for the first time the
 	 * reactor @p r. It calls the method @c newTick() to indicate to @p r
 	 * that a new tick has started.
-	 */	 
+	 */
 	void discover_vertex(graph::reactor_id r, graph const &g) {
 	  // First encounter with r :
-	  //   - inform him that a new tick has started 
+	  //   - inform him that a new tick has started
 	  //        this will result on dispatching its goals if possible
 	  if( is_valid(r) )
 	    r->newTick();
 	}
-	
+
 	/** @brief Finish vertex callback
-	 * 
+	 *
 	 * @param[in] r A reactor
 	 * @param[in] g The graph @p r is attached to
 	 *
@@ -211,7 +213,7 @@ namespace TREX {
 	 * depends on. It can the insert this reactor at the end of the scheduling
 	 * list ensuring that this reactor synchronization won't be executed before
 	 * all the reactors it depend on have been synchronized
-	 */	 
+	 */
 	void finish_vertex(graph::reactor_id r, graph const &g) {
 	  // Completed all the vertex below :
 	  //   - this the next candidate to be synchronized
@@ -225,8 +227,98 @@ namespace TREX {
 
 	sync_scheduller(); // no code in purpose
       };
-      
-      
+
+      class cycle_checker : public boost::default_dfs_visitor
+      {
+          public:
+            enum Cycle_Type { internal, external };
+            struct has_cycle
+            {
+                has_cycle(bool value, std::string msg="")
+                :cycle(value), message(msg) {};
+                bool cycle;
+                std::string message;
+            };
+
+            cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, Cycle_Type type, utils::Symbol name="" )
+                : node(goal), root(root), timelineType(type), name(name) {};
+
+            void discover_vertex(graph::reactor_id r, graph const &g)
+            {
+                if(r==graph::null_reactor())
+                    return;
+                //Adding reactor name to list to store the path to the potential cycle
+                path.push_back(r->getName());
+                if(timelineType==internal)
+                {
+                    std::pair< TREX::transaction::TeleoReactor::external_iterator,
+                                TREX::transaction::TeleoReactor::external_iterator > edges = boost::out_edges(r, g);
+                    for(TREX::transaction::TeleoReactor::external_iterator temp = edges.first; temp!=edges.second; ++temp)
+                    {
+                        if(temp->name()==name)
+                        {
+                            std::stringstream msg;
+                            msg<<"Found a potential cycle going from ";
+                            for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
+                            {
+                                msg<<"["<<*it<<"]->";
+                            }
+                            msg<<"("<<name<<")";
+                            throw has_cycle(true, msg.str());
+                        }
+                    }
+                }
+            }
+
+            void examine_edge(graph::relation_type const & rel, graph const &g)
+            {
+                if(timelineType==external)
+                {
+                    if(boost::target(rel, g)==node)
+                    {
+                        std::stringstream msg;
+                        msg<<"Found a potential cycle going from ";
+                        for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
+                        {
+                            msg<<"["<<*it<<"]->";
+                        }
+                        msg<<"["<<node->getName()<<"]";
+                        throw has_cycle(true, msg.str());
+                    }
+                }
+            }
+
+            void finish_vertex(graph::reactor_id r, graph const &g)
+            {
+                switch(timelineType)
+                {
+                    case external :
+                        if(r==root)
+                        {
+                            throw has_cycle(false);
+                        }
+                        break;
+                    case internal :
+                        if(r==root)
+                        {
+                            throw has_cycle(false);
+                        }
+                        break;
+                    default :
+                        throw has_cycle(false); // Should never happen
+                }
+                //Taking off the last reactor added to the path
+                path.pop_back();
+            }
+
+          private:
+            graph::reactor_id const& root;
+            graph::reactor_id const& node;
+            utils::Symbol name;
+            std::list<utils::Symbol> path;
+            Cycle_Type timelineType;
+      };
+
 
     }
   }
@@ -237,9 +329,9 @@ AgentException::AgentException(graph const &agent, std::string const &msg) throw
 
 /*
  * class TREX::agent::Agent
- */ 
+ */
 
-// static 
+// static
 
 TICK Agent::initialTick(Clock *clk) {
   return (NULL==clk)?0:clk->initialTick();
@@ -247,14 +339,14 @@ TICK Agent::initialTick(Clock *clk) {
 
 // structors :
 
-Agent::Agent(Symbol const &name, TICK final, Clock *clk) 
-  :graph(name, initialTick(clk)), 
+Agent::Agent(Symbol const &name, TICK final, Clock *clk)
+  :graph(name, initialTick(clk)),
    m_clock(clk), m_finalTick(final) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
-Agent::Agent(std::string const &file_name, Clock *clk) 
+Agent::Agent(std::string const &file_name, Clock *clk)
   :m_clock(clk) {
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
@@ -277,7 +369,7 @@ Agent::Agent(std::string const &file_name, Clock *clk)
   }
 }
 
-Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk) 
+Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk)
   :m_clock(clk) {
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
@@ -318,16 +410,49 @@ bool Agent::missionCompleted() {
   return getCurrentTick()>m_finalTick;
 }
 
-void Agent::internal_check(reactor_id r, 
+void Agent::internal_check(reactor_id r,
 			   TREX::transaction::details::timeline const &tl) {
-  // throw timeline_failure(...) <= indicate to reactor_graph that 
-  //this connection is not allowed
+    if(index(r)==count_reactors()) return;
+    if(tl.owned())
+    {
+        std::stringstream msg;
+        msg <<"Timeline "<<tl.name()<<" already owned by "<<tl.owner().getName();
+        throw timeline_failure(r, msg.str());
+    }
+
+    details::cycle_checker checkInternal(r, r, details::cycle_checker::internal, tl.name());
+    try {
+        ///boost::make_reverse_graph(me())
+        ///std::cout<<"Checking timeline connect for "<<r->getName()<<": "<<tl.name()<<std::endl;
+        boost::depth_first_search(me(), boost::visitor(checkInternal).root_vertex(r));
+    } catch (details::cycle_checker::has_cycle check) {
+        if(check.cycle)
+        {
+            throw timeline_failure(r, check.message);
+            // throw timeline_failure(...) <= indicate to reactor_graph that
+            //this connection is not allowed
+        }
+    }
 }
 
-void Agent::external_check(reactor_id r, 
+void Agent::external_check(reactor_id r,
 			   TREX::transaction::details::timeline const &tl) {
-  // throw timeline_failure(...) <= indicate to reactor_graph that 
-  //this connection is not allowed
+    if(index(r)==count_reactors()) return;
+    if(tl.owned())
+    {
+        details::cycle_checker checkExternal(r, &(tl.owner()), details::cycle_checker::external);
+        try {
+        ///std::cout<<"Checking timeline connect for "<<r->getName()<<": "<<tl.name()<<std::endl;
+        boost::depth_first_search(me(), boost::visitor(checkExternal).root_vertex(&(tl.owner())));
+        } catch (details::cycle_checker::has_cycle check) {
+            if(check.cycle)
+            {
+                throw timeline_failure(r, check.message);
+                //throw timeline_failure(...) <= indicate to reactor_graph that
+                //this connection is not allowed
+            }
+        }
+    }
 }
 
 
@@ -351,7 +476,7 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg) {
 }
 
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
-  if( !is_tag(config, "Agent") ) 
+  if( !is_tag(config, "Agent") )
     throw XmlError(config, "Not an Agent node");
   // Extract attributes
   try {
@@ -360,7 +485,7 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
       throw XmlError(config, "Agent name is empty.");
     set_name(name);
     m_finalTick = parse_attr<TICK>(config, "finalTick");
-    if( m_finalTick<=0 ) 
+    if( m_finalTick<=0 )
       throw XmlError(config, "agent life time should be greater than 0");
   } catch(bad_string_cast const &e) {
     throw XmlError(config, e.what());
@@ -369,11 +494,11 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   ext_xml(config.second, "config");
 
 
-  // Now iterate through the sub-tags 
+  // Now iterate through the sub-tags
   if( config.second.empty() )
     throw XmlError(config, "Agent node does not have sub nodes.");
   boost::property_tree::ptree::assoc_iterator i, last;
-  
+
   // First load the plugins :
   syslog()<<"Loading plug-ins...";
   boost::tie(i, last) = config.second.equal_range("Plugin");
@@ -389,7 +514,7 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   }
   // List the reactors available for helping the user :
   SingletonUse<xml_factory> reactor_f;
-  
+
   // First look for the reactor types available
   std::list<Symbol> reactors_types;
 
@@ -406,10 +531,10 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
     }
     syslog()<<"Loading reactors; available reactor types are :"<<oss.str();
 
-    add_reactors(config.second);			  
+    add_reactors(config.second);
   }
-  
-  // Now load and post the goals 
+
+  // Now load and post the goals
   syslog()<<"load initial goals of the agent";
   sendRequests(config.second);
 }
@@ -435,7 +560,7 @@ void Agent::loadConf(std::string const &file_name) {
 }
 
 void Agent::initComplete() {
-  if( getName().empty() ) 
+  if( getName().empty() )
     throw AgentException(*this, "Agent has no name :"
 			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
@@ -444,19 +569,19 @@ void Agent::initComplete() {
   details::init_visitor init(m_finalTick);
   boost::depth_first_search(me(), boost::visitor(init));
   size_t n_failed = cleanup();
-  if( n_failed>0 ) 
+  if( n_failed>0 )
     syslog("WARN")<<n_failed<<" reactors failed to initialize.";
-  
-  // Check for missing timelines 
-  for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) 
-    if( !(*it)->owned() ) 
+
+  // Check for missing timelines
+  for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it)
+    if( !(*it)->owned() )
       syslog("WARN")<<"Timeline \""<<(*it)->name()<<"\" has no owner.";
-  
+
 
   // Create initial graph file
   std::string graph_dot = manager().file_name("reactors.dot");
   std::ofstream dotf(graph_dot.c_str());
-  
+
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
   syslog()<<"Initial graph logged in \"reactors.dot\".";
@@ -528,20 +653,20 @@ bool Agent::executeReactor() {
     return !m_edf.empty();
   }
 }
-    
+
 bool Agent::doNext() {
   if( missionCompleted() ) {
     if( empty() )
-      syslog()<<"No more reactor active.";    
+      syslog()<<"No more reactor active.";
     syslog("END")<<"\t=========================================================";
     return false;
   }
   synchronize();
-  
+
   while( m_clock->getNextTick()==getCurrentTick() && executeReactor() );
   while( m_clock->getNextTick()==getCurrentTick() )
     m_clock->sleep();
-  
+
   updateTick(m_clock->getNextTick());
 
   return true;
@@ -557,7 +682,7 @@ size_t Agent::sendRequests(boost::property_tree::ptree &g) {
   size_t ret = 0;
   boost::property_tree::ptree::assoc_iterator i, last;
   boost::tie(i, last) = g.equal_range("Goal");
-  if( last==i ) 
+  if( last==i )
     syslog("WARN")<<"No goal found in this file";
   else {
     for(; last!=i; ++i) {
@@ -565,7 +690,7 @@ size_t Agent::sendRequests(boost::property_tree::ptree &g) {
       ++ret;
     }
     syslog()<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
-  } 
+  }
   return ret;
 }
 
