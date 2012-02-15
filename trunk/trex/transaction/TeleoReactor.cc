@@ -1,19 +1,19 @@
 /** @file TeleoReactor.cc
  * @brief Provides implementation for TeleoReactor
- * 
+ *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  * @ingroup transaction
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -23,7 +23,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -48,7 +48,7 @@ using namespace TREX::utils;
 /*
  * class TREX::transaction::ReactorException
  */
-ReactorException::ReactorException(TeleoReactor const &r, 
+ReactorException::ReactorException(TeleoReactor const &r,
 				   std::string const &msg) throw()
   :GraphException(r.m_graph, r.getName().str(), msg) {}
 
@@ -56,11 +56,11 @@ ReactorException::ReactorException(TeleoReactor const &r,
 /*
  * class TREX::transaction::DispatchError
  */
-// statics 
+// statics
 std::string DispatchError::buil_msg(goal_id const &g, std::string const &msg) throw() {
   std::ostringstream oss;
   oss<<"While dispatching ";
-  if( !!g ) 
+  if( !!g )
     oss<<g->object()<<'.'<<g->predicate();
   oss<<'['<<g<<"]: "<<msg;
   return oss.str();
@@ -68,7 +68,7 @@ std::string DispatchError::buil_msg(goal_id const &g, std::string const &msg) th
 
 
 
-/* 
+/*
  * class TREX::transaction::details::external
  */
 
@@ -89,27 +89,30 @@ TREX::transaction::details::external::external() {
   m_pos = m_last; // may not be necessary but I just want  ot be sure ...
 }
 
-TREX::transaction::details::external::external(details::external const &other) 
+TREX::transaction::details::external::external(details::external const &other)
   :m_pos(other.m_pos), m_last(other.m_last) {}
 
 TREX::transaction::details::external::external(details::external_set::iterator const &pos,
-					       details::external_set::iterator const &last, 
+					       details::external_set::iterator const &last,
 					       bool only_active)
   :m_pos(pos), m_last(last) {
+  /* Took the only_active out because when traversing graph timlines
+     with no owner on the top of the list don't get discovered
   if( only_active )
-    next_active();
+    // next_active();
+  */
 }
 
 // manipulators
 
 details::goal_queue::iterator details::external::lower_bound(IntegerDomain const &dom) {
   details::goal_queue::iterator i = m_pos->second.begin();
-  
+
   for(; m_pos->second.end()!=i && cmp_goals((*i)->getStart(), dom); ++i);
   return i;
 }
 
-// modifiers 
+// modifiers
 
 bool details::external::post_goal(goal_id const &g) {
   IntegerDomain const &g_start(g->getStart());
@@ -128,7 +131,7 @@ bool details::external::post_goal(goal_id const &g) {
 void details::external::dispatch(TICK current, details::goal_queue &sent) {
   details::goal_queue::iterator i=m_pos->second.begin();
   IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
-  
+
   for( ; m_pos->second.end()!=i && (*i)->startsBefore(dispatch_w.upperBound());  ) {
     if( (*i)->startsAfter(current) ) {
       // Need to check for dispatching
@@ -137,13 +140,13 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
 	 	<<m_pos->first.name()<<"\".";
 	m_pos->first.request(*i);
 	i = m_pos->second.erase(i);
-      } else 
+      } else
 	++i;
     } else {
       syslog()<<"Goal "<<(*i)->predicate()<<'['<<(*i)<<"] is in the past !";
       i = m_pos->second.erase(i);
     }
-  } 
+  }
 }
 
 void details::external::recall(goal_id const &g) {
@@ -159,11 +162,11 @@ void details::external::recall(goal_id const &g) {
   // not found => send a recall
   m_pos->first.recall(g);
 }
- 
+
 details::external &details::external::operator++() {
   if( valid() ) {
     ++m_pos;
-    next_active();
+    // next_active();
   }
   return *this;
 }
@@ -173,12 +176,12 @@ void details::external::next_active() {
     ++m_pos;
 }
 
-// observers 
+// observers
 
 bool details::external::operator==(details::external const &other) const {
   if ( valid() )
     return m_pos == other.m_pos;
-  else 
+  else
     return !other.valid();
 }
 
@@ -193,7 +196,7 @@ TREX::utils::internals::LogEntry details::external::syslog() {
 // structors
 
 
-TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL, 
+TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 			   bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
    m_trLog(NULL),
@@ -203,7 +206,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_lookahead(parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
    m_nSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
-  
+
   if( parse_attr<bool>(log_default, node, "log") ) {
     std::string log = manager().file_name(getName().str()+".tr.log");
     m_trLog = new Logger(log);
@@ -214,7 +217,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
     Symbol tl_name;
     // Add external file content
     ext_xml(node.second, "config");
-    
+
     for(boost::property_tree::ptree::iterator i=node.second.begin();
 	node.second.end()!=i; ++i) {
       if( is_tag(*i, "External") ) {
@@ -231,8 +234,8 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
     }
   }
 }
-   
-TeleoReactor::TeleoReactor(graph *owner, Symbol const &name, 
+
+TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
 			   TICK latency, TICK lookahead, bool log)
   :m_inited(false), m_firstTick(true), m_graph(*owner), m_trLog(NULL),
    m_name(name),
@@ -251,7 +254,7 @@ TeleoReactor::~TeleoReactor() {
     delete m_trLog;
 }
 
-// observers 
+// observers
 
 TeleoReactor::size_type TeleoReactor::count_internal_relations() const {
   size_type result(0);
@@ -288,7 +291,7 @@ double TeleoReactor::workRatio() {
   if( hasWork() ) {
     double ret = m_deadline;
     ret -= getCurrentTick();
-    if( ret<=0.0 ) 
+    if( ret<=0.0 )
       ret = m_nSteps+1;
     else {
       ret += 1.0;
@@ -304,34 +307,34 @@ double TeleoReactor::workRatio() {
 
 void TeleoReactor::postObservation(Observation const &obs) {
   internal_set::iterator i = m_internals.find(obs.object());
-  
+
   if( m_internals.end()==i )
     throw SynchronizationError(*this, "attempted to post observation on "+
 			       obs.object().str()+" which is not Internal.");
-  
+
   (*i)->postObservation(getCurrentTick(), obs);
   m_updates.insert(*i);
   // syslog("ASSERT")<<obs;
 }
 
 bool TeleoReactor::postGoal(goal_id const &g) {
-  if( !g ) 
+  if( !g )
     throw DispatchError(*this, g, "Invalid goal Id");
 
   details::external tl(m_externals.find(g->object()), m_externals.end(), false);
-  
+
   if( tl.valid() ) {
     bool ret = tl.post_goal(g);
     if( ret && NULL!=m_trLog )
       m_trLog->request(g);
     return ret;
-  } else 
+  } else
     throw DispatchError(*this, g, "Goals can only be posted on External timelines");
 }
 
 goal_id TeleoReactor::postGoal(Goal const &g) {
   goal_id tmp(new Goal(g));
-  
+
   if( postGoal(tmp) )
     return tmp;
   else {
@@ -347,7 +350,7 @@ bool TeleoReactor::postRecall(goal_id const &g) {
 
   if( tl.valid() ) {
     tl.recall(g);
-    if( NULL!=m_trLog ) 
+    if( NULL!=m_trLog )
       m_trLog->recall(g);
     return true;
   }
@@ -359,7 +362,7 @@ bool TeleoReactor::initialize(TICK final) {
     syslog("ERROR")<< "Attempted to initalize this reactor twice.";
     return false;
   }
-  m_initialTick = getCurrentTick(); 
+  m_initialTick = getCurrentTick();
   m_finalTick   = final;
   syslog()<<"Creation tick is "<<getInitialTick();
   syslog()<<"Execution latency is "<<getExecLatency();
@@ -395,19 +398,19 @@ void TeleoReactor::newTick() {
   // Dispatched goals management
   details::external i = ext_begin();
   details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
-				  // I do nothing with it for now  
+				  // I do nothing with it for now
   // Manage goal dispatching
   for( ; i.valid(); ++i )
-    i.dispatch(getCurrentTick(), dispatched);  
+    i.dispatch(getCurrentTick(), dispatched);
 }
 
 void TeleoReactor::doNotify() {
   for(external_set::iterator i = m_externals.begin();
-      m_externals.end()!=i; ++i) 
+      m_externals.end()!=i; ++i)
     if( i->first.lastObsDate()==getCurrentTick() )
       notify( i->first.lastObservation() );
 }
-  
+
 
 bool TeleoReactor::doSynchronize() {
   try {
@@ -454,7 +457,7 @@ void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllabl
       syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
     }
 }
-  
+
 void TeleoReactor::clear_internals() {
   while( !m_internals.empty() ) {
     m_internals.front()->unassign(getCurrentTick());
@@ -470,7 +473,7 @@ void TeleoReactor::clear_externals() {
 
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
-  syslog()<<"Declared \""<<tl->name()<<"\".";  
+  syslog()<<"Declared \""<<tl->name()<<"\".";
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name());
   }
@@ -504,7 +507,7 @@ void TeleoReactor::subscribed(Relation const &r) {
 
 void TeleoReactor::unsubscribed(Relation const &r) {
   external_set::iterator i = m_externals.find(Relation::get_id(r));
-  // No need to control that i is valid 
+  // No need to control that i is valid
   //    - this call comes from timeline::unsubscribe so
   //      which calls it only to the client of r -> me
   if( !i->second.empty() ) {
@@ -522,10 +525,10 @@ void TeleoReactor::unsubscribed(Relation const &r) {
 void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
   TICK prev = m_maxDelay;
 
-  if( new_l>m_maxDelay )     
-    m_maxDelay = new_l;    
+  if( new_l>m_maxDelay )
+    m_maxDelay = new_l;
   else if( old_l==m_maxDelay ) {
-    // special case : the updated value is smaller and the old value is 
+    // special case : the updated value is smaller and the old value is
     //                equal to my former exec delay
     //                this means that on of the timelines that were
     //                constraining my maxDelay has just reduced its latency
@@ -539,13 +542,13 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
     // exec latency changes
     syslog()<<" Execution latency updated from "<<prev<<" to "<<m_maxDelay;
     // Notify all the reactors that depend on me
-    for(internal_set::iterator i=m_internals.begin(); m_internals.end()!=i; ++i) 
+    for(internal_set::iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
       (*i)->latency_update(getLatency()+prev);
   }
 }
-  
+
 /*
- * class TREX::transaction::TeleoReactor::Logger 
+ * class TREX::transaction::TeleoReactor::Logger
  */
 
 TeleoReactor::Logger::Logger(std::string const &file_name)
@@ -555,9 +558,9 @@ TeleoReactor::Logger::Logger(std::string const &file_name)
 
 TeleoReactor::Logger::~Logger() {
   if( m_tick ) {
-    if( m_hasData ) 
+    if( m_hasData )
       m_file<<"  </tick>\n";
-  } else 
+  } else
     m_file<<"  </header>\n";
   m_file<<"</log>";
 }
@@ -584,8 +587,8 @@ void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
 
 void TeleoReactor::Logger::newTick(TICK val) {
   if( m_tick ) {
-    if( m_hasData ) 
-      m_file<<"  </tick>"<<std::endl;    
+    if( m_hasData )
+      m_file<<"  </tick>"<<std::endl;
   } else {
     m_file<<"  </header>"<<std::endl;
     m_tick = true;
