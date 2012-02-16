@@ -93,15 +93,8 @@ TREX::transaction::details::external::external(details::external const &other)
   :m_pos(other.m_pos), m_last(other.m_last) {}
 
 TREX::transaction::details::external::external(details::external_set::iterator const &pos,
-					       details::external_set::iterator const &last,
-					       bool only_active)
-  :m_pos(pos), m_last(last) {
-  /* Took the only_active out because when traversing graph timlines
-     with no owner on the top of the list don't get discovered
-  if( only_active )
-    // next_active();
-  */
-}
+					       details::external_set::iterator const &last)
+  :m_pos(pos), m_last(last) {}
 
 // manipulators
 
@@ -163,22 +156,15 @@ void details::external::recall(goal_id const &g) {
   m_pos->first.recall(g);
 }
 
-details::external &details::external::operator++() {
+void details::external::increment() {
   if( valid() ) {
     ++m_pos;
-    // next_active();
   }
-  return *this;
-}
-
-void details::external::next_active() {
-  while( valid() && !m_pos->first.active() )
-    ++m_pos;
 }
 
 // observers
 
-bool details::external::operator==(details::external const &other) const {
+bool details::external::equal(details::external const &other) const {
   if ( valid() )
     return m_pos == other.m_pos;
   else
@@ -187,6 +173,10 @@ bool details::external::operator==(details::external const &other) const {
 
 TREX::utils::internals::LogEntry details::external::syslog() {
   return m_pos->first.client().syslog(m_pos->first.name().str());
+}
+
+Relation const &details::external::dereference() const {
+  return *(m_pos->first);
 }
 
 /*
@@ -321,7 +311,7 @@ bool TeleoReactor::postGoal(goal_id const &g) {
   if( !g )
     throw DispatchError(*this, g, "Invalid goal Id");
 
-  details::external tl(m_externals.find(g->object()), m_externals.end(), false);
+  details::external tl(m_externals.find(g->object()), m_externals.end());
 
   if( tl.valid() ) {
     bool ret = tl.post_goal(g);
@@ -533,8 +523,7 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
     //                this means that on of the timelines that were
     //                constraining my maxDelay has just reduced its latency
     m_maxDelay = new_l;
-    // I need to check what is the new maximum from there
-    for(details::external i = ext_begin(); i.valid(); ++i)
+    for(details::active_external i(ext_begin(), ext_end()), endi(ext_end()); endi!=i; ++i) 
       m_maxDelay = std::max(m_maxDelay, i->latency());
   }
   if( m_maxDelay!=prev ) {

@@ -47,6 +47,7 @@
 # include "timeline.hh"
 
 # include <boost/iterator_adaptors.hpp>
+# include <boost/iterator/filter_iterator.hpp>
 
 namespace TREX {
   namespace transaction {
@@ -99,25 +100,9 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        */
       class external 
-      :public boost::iterator_adaptor<external, external_set::iterator>{
-      public:
-        /** @brief Stored type
-         * 
-         * The type used to represent a relation
-         * @sa Relation
-         */
-        typedef Relation::value_type   value_type;
-        /** @brief Reference type
-         * 
-         * The type used to refer to the element this iterator refers to 
-         */
-        typedef Relation::reference    reference;
-        /** @brief Pointer type
-         * 
-         * The type used to point to the element this iterator refers to
-         */
-        typedef Relation::pointer      pointer;
-        
+	:public boost::iterator_facade<external, Relation const, 
+				       boost::forward_traversal_tag>{
+      public:        
         /** @brief Default constructor
          *
          * Create a new instance 
@@ -137,34 +122,6 @@ namespace TREX {
         /** @brief Destructor */
         ~external() {}
         
-        /** @brief Equality test
-         *
-         * @param[in] other Another instance
-         *
-         * @retval true if @p other is identical to this instance
-         * @retval false otherwise
-         *
-         * @note invalid instances are considered as identical
-         *
-         * @sa operator!=(external const &) const
-         * @sa valid() const
-         */
-        bool operator==(external const &other) const;
-        /** @brief Difference test
-         *
-         * @param[in] other Another instance
-         *
-         * @retval false if @p other is identical to this instance
-         * @retval true otherwise
-         * 
-         * @note invalid instances are considered as identical
-         *
-         * @sa operator==(external const &) const
-         * @sa valid() const
-         */
-        bool operator!=(external const &other) const {
-          return !operator==(other);
-        }
         /** @brief Check for validity
          *
          * Check if this instance referes to an exisiting relation
@@ -175,6 +132,17 @@ namespace TREX {
         bool valid() const {
           return m_last!=m_pos;
         }
+
+	/** @brief Check if active
+	 * 
+	 * Checks that this external iterator is both valid and points to an active relation
+	 * 
+	 * @sa external::valid() const
+	 * @sa Relation::active() const
+	 */
+	bool active() const {
+	  return valid() && dereference().active();
+	}
         
         /** @brief Goal posting
          *
@@ -236,63 +204,71 @@ namespace TREX {
          * @sa post_goal(goal_id const &)
          */
         void recall(goal_id const &g);
-        
-        /** @brief Relation access
-         *
-         * @pre This instance is valid
-         *
-         * Gives access to the timeline relation this instance refers to
-         *
-         * @sa class Relation
-         * @sa operator* () const
-         * @sa valid() const
-         */
-        pointer operator->() const {
-          return &operator* ();
-        }
-        /** @brief Relation access
-         *
-         * @pre This instance is valid
-         *
-         * Gives access to the timeline relation this instance refers to
-         *
-         * @retval A reference to the Relation referred by this instance 
-         *
-         * @sa class Relation
-         * @sa operator* () const
-         * @sa valid() const
-         */
-        reference operator* () const {
-          return m_pos->first;
-        }
-        
-        /** @brief Next external
-         *
-         * Advance this instance to the next Relation
-         *
-         * @return This instance after the operation
-         */
-        external &operator++();
-        
+                 
       private:
         TREX::utils::internals::LogEntry syslog();
         
         external_set::iterator m_pos, m_last;
         
         external(external_set::iterator const &pos,
-                 external_set::iterator const &last, 
-                 bool only_active=true);
+                 external_set::iterator const &last);
         
         
         static bool cmp_goals(IntegerDomain const &a, IntegerDomain const &b);
         
-        void next_active();
-        
         goal_queue::iterator lower_bound(IntegerDomain const &dom);
+
+	void increment();
+	bool equal(external const &other) const;
+	Relation const &dereference() const;
         
         friend class TREX::transaction::TeleoReactor;
+	friend class boost::iterator_core_access;
       }; // TREX::transaction::details::external
       
+      /** @brief Active external predicate
+       *
+       * This class is a functor acting as a predicate that checks if
+       * a @ external instance refers to an active timeline relation.
+       *
+       * It is used to implement the @c active_external class, which 
+       * using a boost filter_iterator on the @c external class in order
+       * to reproduce the past behavior of this same @c external which used
+       * to only iterate through active relations.
+       *
+       * @sa external::active() const
+       * @sa Relation::active() const
+       * @relates active_external
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       */
+      struct is_active_external {
+	/** @brief check if active
+	 *
+	 * @param r An external relation
+	 *
+	 * @retval true if @p e is active
+	 * @retval false otherwise
+	 */
+	bool operator()(TREX::transaction::Relation const &r) const {
+	  return r.active();
+	}
+      }; // struct TREX::transaction::details::is_active_external
+      
+      /** @brief Iterator though active external relations 
+       *
+       * This class provides a way to iterate though @c external while filtering
+       * out all the non active ones.
+       *
+       * It is provided mostly as the @ external class used to behave this way
+       * allowing user to easily reproduce this deprecated behavior.
+       *
+       * @relates class external
+       * @author Frederic Py <fpy@mbari.org>
+       */
+      typedef boost::filter_iterator<TREX::transaction::details::is_active_external, 
+				     TREX::transaction::details::external> active_external; 
+
     } // TREX::transaction::details
   } // TREX::transaction
 } // TREX
