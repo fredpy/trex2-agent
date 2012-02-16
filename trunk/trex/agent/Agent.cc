@@ -247,8 +247,7 @@ namespace TREX {
             {
                 if(r==graph::null_reactor())
                     return;
-                //Adding reactor name to list to store the path to the potential cycle
-                path.push_back(r->getName());
+
                 if(timelineType==internal)
                 {
                     std::pair< TREX::transaction::TeleoReactor::external_iterator,
@@ -261,13 +260,19 @@ namespace TREX {
                             msg<<"Found a potential cycle going from ";
                             for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
                             {
-                                msg<<"["<<*it<<"]->";
+                                msg<<"("<<*it<<")->";
                             }
                             msg<<"("<<name<<")";
                             throw has_cycle(true, msg.str());
                         }
                     }
                 }
+            }
+
+            void tree_edge(graph::relation_type const & rel, graph const &g)
+            {
+                //Adding reactor name to list to store the path to the potential cycle
+                path.push_back(rel->name());
             }
 
             void examine_edge(graph::relation_type const & rel, graph const &g)
@@ -277,12 +282,12 @@ namespace TREX {
                     if(boost::target(rel, g)==node)
                     {
                         std::stringstream msg;
-                        msg<<"Found a potential cycle going from ";
+                        msg<<"Found a potential cycle going from ("<<name<<")->";
                         for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
                         {
-                            msg<<"["<<*it<<"]->";
+                            msg<<"("<<*it<<")->";
                         }
-                        msg<<"["<<node->getName()<<"]";
+                        msg<<"("<<rel->name()<<")";
                         throw has_cycle(true, msg.str());
                     }
                 }
@@ -422,8 +427,6 @@ void Agent::internal_check(reactor_id r,
 
     details::cycle_checker checkInternal(r, r, details::cycle_checker::internal, tl.name());
     try {
-        ///boost::make_reverse_graph(me())
-        ///std::cout<<"Checking timeline connect for "<<r->getName()<<": "<<tl.name()<<std::endl;
         boost::depth_first_search(me(), boost::visitor(checkInternal).root_vertex(r));
     } catch (details::cycle_checker::has_cycle check) {
         if(check.cycle)
@@ -440,9 +443,8 @@ void Agent::external_check(reactor_id r,
     if(index(r)==count_reactors()) return;
     if(tl.owned())
     {
-        details::cycle_checker checkExternal(r, &(tl.owner()), details::cycle_checker::external);
+        details::cycle_checker checkExternal(r, &(tl.owner()), details::cycle_checker::external, tl.name());
         try {
-        ///std::cout<<"Checking timeline connect for "<<r->getName()<<": "<<tl.name()<<std::endl;
         boost::depth_first_search(me(), boost::visitor(checkExternal).root_vertex(&(tl.owner())));
         } catch (details::cycle_checker::has_cycle check) {
             if(check.cycle)
