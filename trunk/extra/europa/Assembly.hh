@@ -504,6 +504,11 @@ namespace TREX {
       void mark_active();
       void mark_invalid();
       TREX::transaction::TICK final_tick() const;
+      /** @brief get current tick
+       * 
+       * @return the current tick executed
+       */
+      EUROPA::eint current_tick() const;
       
       void logPlan(std::ostream &out, bool expanded = false) const;
     private:
