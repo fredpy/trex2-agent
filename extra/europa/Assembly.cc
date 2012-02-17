@@ -221,7 +221,7 @@ Assembly::~Assembly() {
 
 void Assembly::logPlan(std::ostream &out, bool expanded) const {
   EUROPA::TokenSet const all_toks = m_planDatabase->getTokens();
-  out<<"digraph plan_"<<current_tick()<<" {\n";
+  out<<"digraph plan_"<<now()<<" {\n";
   out<<"  node[shape=\"box\"];\n";
   for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
       all_toks.end()!=i; ++i) {
@@ -334,7 +334,7 @@ TREX::transaction::TICK Assembly::final_tick() const {
   return m_reactor.getFinalTick();
 }
 
-EUROPA::eint Assembly::current_tick() const {
+EUROPA::eint Assembly::now() const {
   return m_reactor.getCurrentTick();
 }
 
@@ -366,7 +366,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
     return false;
   }
   if( tok->isFact() && 
-      tok->start()->lastDomain().getUpperBound()<=current_tick() ) {
+      tok->start()->lastDomain().getUpperBound()<=now() ) {
     debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
 	     <<" is a past fact");
     return false;
@@ -379,7 +379,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::overlaps_now(EUROPA::TokenId const &tok) const {
-  EUROPA::eint cur = current_tick();
+  EUROPA::eint cur = now();
 
   return tok->start()->lastDomain().getUpperBound()<=cur
   && tok->end()->lastDomain().getLowerBound()>=cur 
@@ -479,8 +479,8 @@ bool Assembly::resolve(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand, 
 }
 
 bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok, size_t &steps) {
-  EUROPA::eint cur = current_tick();
-  EUROPA::IntervalIntDomain now(cur, cur);
+  EUROPA::eint cur = now();
+  EUROPA::IntervalIntDomain now_d(cur, cur);
   EUROPA::ConstrainedVariableId name = m_reactor.assembly().default_pred(obj);
   EUROPA::DataTypeId type = name->getDataType();
   std::string short_pred = type->toString(name->getSpecifiedValue()),
@@ -490,7 +490,7 @@ bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok,
   tok = cli->createToken(pred_name.c_str(), NULL, false);
   
   tok->activate();
-  tok->start()->restrictBaseDomain(now);
+  tok->start()->restrictBaseDomain(now_d);
   tok->getObject()->specify(obj->getKey());
   return insert_token(tok, steps);
 }

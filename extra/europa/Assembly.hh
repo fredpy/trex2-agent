@@ -508,7 +508,7 @@ namespace TREX {
        * 
        * @return the current tick executed
        */
-      EUROPA::eint current_tick() const;
+      EUROPA::eint now() const;
       
       void logPlan(std::ostream &out, bool expanded = false) const;
     private:
