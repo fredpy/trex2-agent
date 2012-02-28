@@ -42,6 +42,7 @@
 # include <PLASMA/RulesEngineDefs.hh>
 # include <PLASMA/Module.hh>
 # include <PLASMA/Engine.hh>
+# include <PLASMA/Solver.hh>
 
 # include <fstream>
 
@@ -64,6 +65,14 @@ namespace TREX {
 
     } // TREX::europa::details
 
+    /** @brief Europa to T-REX assembly
+     * 
+     * This class implements the assembly between europa framework and the
+     * T-REX europa reactor. It ties an europa engin to a reactor giving
+     * access to each framework to their basic functionalities.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     */
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     public:
       static EUROPA::LabelStr const TREX_TIMELINE;
@@ -114,6 +123,7 @@ namespace TREX {
       virtual EUROPA::IntervalIntDomain plan_scope() const =0;
       virtual EUROPA::eint initial_tick() const =0;
       virtual EUROPA::eint final_tick() const =0;
+      virtual EUROPA::edouble tick_duration() const =0;
 
       EUROPA::ConstrainedVariableId clock() const {
 	return m_clock;
@@ -128,10 +138,10 @@ namespace TREX {
 
     protected:
       EUROPA::ConstrainedVariableId mode(EUROPA::ObjectId const &obj) const {
-	return attribute(obj, DEFAULT_ATTR);
+	return attribute(obj, MODE_ATTR);
       }
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
-	return attribute(obj, MODE_ATTR);
+	return attribute(obj, DEFAULT_ATTR);
       }
       void trex_timelines(std::list<EUROPA::ObjectId> &objs) const {
 	return plan_db()->getObjectsByType(TREX_TIMELINE, objs);
@@ -147,7 +157,27 @@ namespace TREX {
       bool inactive() const;
       bool invalid() const;
 
+      void ignore(EUROPA::ObjectId const &obj) {
+	m_ignored.insert(obj);
+      }
       virtual void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs) =0;
+
+      bool have_predicate(EUROPA::ObjectId const &obj, 
+			  std::string &name) const;
+			  
+
+      EUROPA::TokenId create_token(EUROPA::ObjectId const &obj, 
+				   std::string const &name,
+				   bool fact);
+
+      EUROPA::SOLVERS::SolverId const &planner() const {
+	return m_deliberation_solver;
+      }
+      EUROPA::SOLVERS::SolverId const &synchronizer() const {
+	return m_synchronization_solver;
+      }
+
+      void init_clock_vars();
       
     private:
       enum State {
@@ -192,6 +222,9 @@ namespace TREX {
       state_iterator end() const {
 	m_agent_timelines.end();
       }
+
+      EUROPA::SOLVERS::SolverId m_deliberation_solver;
+      EUROPA::SOLVERS::SolverId m_synchronization_solver;
 
       friend class TREX::europa::details::UpdateFlawIterator;
       friend class TREX::europa::details::CurrentState;
