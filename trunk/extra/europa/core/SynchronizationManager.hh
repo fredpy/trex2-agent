@@ -99,4 +99,7 @@ namespace TREX {
   } // TREX::europa  
 } // TREX
 
+# define TREX_SYNCH_MGR      TrexSynchronizer
+# define TREX_SYNCH_HANDLER  TrexStateHandler
+
 #endif // H_trex_europa_SynchronizationManager

@@ -35,6 +35,9 @@
 #include "DeliberationFilter.hh"
 #include "ModeConstraints.hh"
 
+#include "SynchronizationManager.hh"
+#include "private/CurrentState.hh"
+
 namespace TREX {
   namespace europa {
     
@@ -64,10 +67,18 @@ namespace TREX {
     }; // TREX::europa::CoreExtensions
 
     void CoreExtensions::registerComponents(Assembly const &assembly) {
+      // T-REX core extensions
       TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DeliberationScope, 
-      				TrexDeliberationScope); 
+      				TREX_DELIB_FILT); 
       TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::SynchronizationScope, 
-      				TrexSynchronizationScope); 
+      				TREX_SYNCH_FILT); 
+      TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::SynchronizationManager,
+				 TREX_SYNCH_MGR);
+      TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::details::CurrentState::DecisionPoint,
+				 TREX_SYNCH_HANDLER);
+
+
+      // T-REX constraints
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,
 			       isExternal,trex);
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,

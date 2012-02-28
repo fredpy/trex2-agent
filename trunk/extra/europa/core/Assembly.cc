@@ -36,6 +36,8 @@
 #include "private/CurrentState.hh"
 
 #include "ReactorPropagator.hh"
+#include "DeliberationFilter.hh"
+#include "SynchronizationManager.hh"
 
 #include <PLASMA/ModuleConstraintEngine.hh>
 #include <PLASMA/ModulePlanDatabase.hh>
@@ -150,6 +152,53 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return constraint_engine()->constraintConsistent();
 }
 
+void Assembly::configure_solvers(std::string const &cfg) {
+  std::auto_ptr<EUROPA::TiXmlElement> 
+    xml_cfg(EUROPA::initXml(cfg.c_str()));
+  
+  EUROPA::TiXmlElement 
+    *filter = dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(), 
+  									      EUROPA::TiXmlElement("FlawFilter")));
+  // Setup our deliberation solver
+  filter->SetAttribute("component", TO_STRING_EVAL(TREX_DELIB_FILT));
+
+  m_deliberation_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+  
+  // Setup our synchronization solver
+  filter->SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_FILT));
+  
+  EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
+    handler("FlawManager");
+
+  handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
+  synch.InsertEndChild(handler);
+  xml_cfg->InsertEndChild(synch);
+
+  m_synchronization_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+}
+
+void Assembly::init_clock_vars() {
+  EUROPA::ConstrainedVariableId 
+    mission_end = plan_db()->getGlobalVariable(MISSION_END),
+    tick_factor = plan_db()->getGlobalVariable(TICK_DURATION),
+    clock_var = plan_db()->getGlobalVariable(CLOCK_VAR);
+
+  if( mission_end.isNoId() ) 
+    throw EuropaException("Unable to find variable "+MISSION_END.toString());
+  if( tick_factor.isNoId() ) 
+    throw EuropaException("Unable to find variable "+TICK_DURATION.toString());
+  if( clock_var.isNoId() ) 
+    throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
+
+  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
+							    final_tick()));
+  tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),
+							    tick_duration()));
+  clock_var->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
+							  final_tick()));
+}
+
+
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
 
@@ -157,7 +206,44 @@ void Assembly::notify(details::CurrentState const &state) {
     notify(obj_name, state.current());
 }
 
+EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj, 
+				       std::string const &name,
+				       bool fact) {
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  bool rejectable = !fact;
+  
+  if( !schema()->isPredicate(name.c_str()) )
+    throw EuropaException("Unknown predicate \""+name+"\" for object "
+			  +obj->getName().toString());
+  EUROPA::TokenId tok = cli->createToken(name.c_str(), NULL, rejectable, fact);
+  
+  if( !tok.isId() )
+    throw EuropaException("Failed to create token "+name);
+
+  // Restrict token domain to obj
+  EUROPA::ConstrainedVariableId obj_var = tok->getObject();
+  obj_var->specify(obj->getKey());
+  
+  return tok;
+}
+
+
 // observers
+
+bool Assembly::have_predicate(EUROPA::ObjectId const &obj, 
+			      std::string &name) const {
+  EUROPA::LabelStr obj_type = obj->getType();
+
+  if( !schema()->isPredicate(name.c_str()) ) {
+    std::string long_name = obj_type.toString()+"."+name;
+    if( schema()->isPredicate(long_name.c_str()) )
+      name = long_name;
+    else 
+      return false;
+  } 
+  return schema()->canBeAssigned(obj_type, name.c_str());
+}
+
 
 bool Assembly::internal(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();

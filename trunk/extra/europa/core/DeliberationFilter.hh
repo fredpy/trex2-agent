@@ -85,4 +85,7 @@ namespace TREX {
   } // europa
 } // TREX
 
+# define TREX_DELIB_FILT TrexDeliberationScope
+# define TREX_SYNCH_FILT TrexSynchronizationScope
+
 #endif // H_trex_europa_DeliberationFilter

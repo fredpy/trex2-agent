@@ -72,19 +72,22 @@ namespace TREX {
     REGISTER_CONSTRAINT(ce->getCESchema(), class_name, #label, #propagator);\
   }
 
-#define TREX_REGISTER_FLAW_FILTER(assembly, class_name, label) \
+# define TREX_REGISTER_FLAW_FILTER(assembly, class_name, label) \
   REGISTER_FLAW_FILTER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
 
-#define TREX_REGISTER_FLAW_HANDLER(assembly, class_name, label) \
+# define TREX_REGISTER_FLAW_HANDLER(assembly, class_name, label) \
   REGISTER_FLAW_HANDLER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
 
-#define TREX_REGISTER_FLAW_MANAGER(assembly, class_name, label) \
+# define TREX_REGISTER_FLAW_MANAGER(assembly, class_name, label) \
   REGISTER_FLAW_MANAGER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
 
-#define TREX_REGISTER_COMPONENT_FACTORY(assembly, class_name, label) \
+# define TREX_REGISTER_COMPONENT_FACTORY(assembly, class_name, label) \
   REGISTER_COMPONENT_FACTORY(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
 
-#define TREX_REGISTER_MATCH_FINDER(assembly, class_name, label) \
+# define TREX_REGISTER_MATCH_FINDER(assembly, class_name, label) \
   REGISTER_MATCH_FINDER(((EUROPA::SOLVERS::MatchFinderMgr*)assembly.getComponent("MatchFinderMgr")), class_name, label)
+
+# define TO_STRING(symbol) #symbol
+# define TO_STRING_EVAL(symbol) TO_STRING(symbol)
 
 #endif // H_trex_EuropaPlugin
