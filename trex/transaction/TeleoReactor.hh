@@ -92,7 +92,7 @@ namespace TREX {
        * The type used to refer to specific reactor
        */
       typedef graph::reactor_id                   ref_type;
-      /** @brief XML based factor
+      /** @brief XML based factory
        *
        * The type of the factory used to generate reactors from XML
        */
