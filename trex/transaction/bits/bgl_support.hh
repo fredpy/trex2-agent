@@ -454,7 +454,7 @@ namespace TREX {
 	 * @sa TREX::transaction::TeleoReactor::getName() const
 	 */
 	reference operator[](key_type r) const {
-	  static TREX::utils::Symbol const null_name;
+	  static TREX::utils::Symbol const null_name("0x0");
 
 	  if( graph::null_reactor()==r )
 	    return null_name;
