@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Witre.hh"
+#include "WitreGraph.hh"
 
 #include <trex/utils/TREXversion.hh>
 #include <trex/utils/Plugin.hh>
@@ -197,41 +198,17 @@ void WitreApplication::urlPage(const std::string& path)
         test->bindString("friend", name, Wt::PlainText);
         test->bindWidget("input", new Wt::WLineEdit());
         webpage->setCurrentWidget(test);
-        return;
     }
-    /*
-    else if(url[0]=="timeline")
+    else if(url[0]=="graph")
     {
-        if(url->size()>1)
-        {
-            std::string name;
-            for(int i = 0; i<wServer->extTimelinesSize(); i++)
-            {
-                if(url[1]==wServer->extTimelinesName(i))
-                {
-                    Wt::WContainerWidget* page = new Wt::WContainerWidget();
-                    name = wServer->extTimelinesName(i);
-                    std::list<Wt::WPanel*> list = allPanels[name];
-                    std::list<Wt::WPanel*>::iterator it;
-                    for(it = list.begin(); it!=list.end(); it++)
-                    {
-                        boost::property_tree::ptree doc = panelsXML[*it];
-                        std::stringstream xml;
-                        write_xml(xml, doc);
-                        page->addWidget(new Wt::WText(xml.str()));
-                        page->addWidget(new Wt::WBreak());
-                    }
-                    webpage->addWidget(page);
-                    webpage->setCurrentWidget(page);
-                    return;
-                }
-            }
-        }
-
+        WitreGraphContainer* image = new WitreGraphContainer(webpage, wServer->getGraph());
+        webpage->setCurrentWidget(image->getWidget());
     }
-    */
-    webpage->setCurrentIndex(0);
-    WApplication::instance()->setInternalPath("/default");
+    else
+    {
+        webpage->setCurrentIndex(0);
+        WApplication::instance()->setInternalPath("/default");
+    }
 }
 
 std::string* WitreApplication::parseUrl(std::string url)
