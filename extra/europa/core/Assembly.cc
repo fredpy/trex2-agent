@@ -244,21 +244,21 @@ void Assembly::configure_solvers(std::string const &cfg) {
 void Assembly::init_clock_vars() {
   EUROPA::ConstrainedVariableId 
     mission_end = plan_db()->getGlobalVariable(MISSION_END),
-    tick_factor = plan_db()->getGlobalVariable(TICK_DURATION),
-    clock_var = plan_db()->getGlobalVariable(CLOCK_VAR);
+    tick_factor = plan_db()->getGlobalVariable(TICK_DURATION);
+  m_clock = plan_db()->getGlobalVariable(CLOCK_VAR);
 
   if( mission_end.isNoId() ) 
     throw EuropaException("Unable to find variable "+MISSION_END.toString());
   if( tick_factor.isNoId() ) 
     throw EuropaException("Unable to find variable "+TICK_DURATION.toString());
-  if( clock_var.isNoId() ) 
+  if( m_clock.isNoId() ) 
     throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
 
   mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
 							    final_tick()));
   tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),
 							    tick_duration()));
-  clock_var->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
 							  final_tick()));
 }
 
