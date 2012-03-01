@@ -102,8 +102,8 @@ namespace TREX {
 		    TREX::transaction::graph::reactor_id a,
 		    TREX::transaction::graph::reactor_id b) throw()
 	:AgentException(g, "Cyclic dependency between reactor \""+
-			a->getName().str()+"\" and \""+
-			b->getName().str()+"\".") {}
+			boost::get(boost::get(boost::vertex_name_t(), g), a).str()+"\" and \""+
+			boost::get(boost::get(boost::vertex_name_t(), g), b).str()+"\".") {}
       /** @brief Destructor */
       ~CycleDetected() throw() {}
     };
@@ -143,7 +143,7 @@ namespace TREX {
        */
       void back_edge(TREX::transaction::graph::relation_type const &rel,
 		     TREX::transaction::graph const &g) {
-	throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
+        throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
       }
 
 
