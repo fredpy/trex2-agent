@@ -26,7 +26,7 @@ namespace TREX {
         public:
 
             WitreGraph(std::map<utils::Symbol, int> &rel)
-                :relation(rel), vertex() {};
+                :relation(rel) {};
             virtual ~WitreGraph() {};
 
             void initialize_vertex(graph::reactor_id r, graph const &g)
@@ -372,6 +372,8 @@ namespace TREX {
                         return false;
                     }
                 }
+              return false; // fpy : I added this return at the end ...
+                            //       I gueess it should return false if all the above ifs failed 
             }
 
             void drawArrow(Wt::WPainter& painter, Wt::WPointF& center, const double& slope)

@@ -32,5 +32,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-trex_plugin(lightswitch LightSwitch.cc)
+trex_plugin(lightswitch 
+  LightSwitch.cc
+  # headers
+  LightSwitch.hh
+  )
 target_link_libraries(lightswitch_pg TREXtransaction)
