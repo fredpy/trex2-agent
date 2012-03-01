@@ -1,0 +1,313 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ * 
+ *  Copyright (c) 2011, MBARI.
+ *  All rights reserved.
+ * 
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the TREX Project nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+#include "EuropaReactor.hh"
+#include "bits/europa_convert.hh"
+#include "core/private/CurrentState.hh"
+
+#include <PLASMA/Timeline.hh>
+#include <PLASMA/Token.hh>
+#include <PLASMA/TokenVariable.hh>
+
+#include <PLASMA/PlanDatabaseWriter.hh>
+
+#include <boost/scope_exit.hpp>
+
+using namespace TREX::europa;
+using namespace TREX::transaction;
+using namespace TREX::utils;
+
+/*
+ * class TREX::europa::EuropaReactor
+ */ 
+
+// structors 
+
+EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
+  :TeleoReactor(arg, false), 
+   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")) {
+  bool found;
+  std::string nddl;
+  
+  boost::property_tree::ptree::value_type &cfg = xml_factory::node(arg);
+  boost::optional<std::string> 
+    model = parse_attr< boost::optional<std::string> >(cfg, "model");
+  
+  // Load the specified model
+  if( model ) {
+    if( model->empty() ) 
+      throw XmlError(cfg, "Attribute \"model\" is empty.");
+    nddl = manager().use(*model, found);
+    if( !found )
+      throw XmlError(cfg, "Unable to locate model file \""+(*model)+"\"");
+  } else {
+    std::string short_nddl = getName().str()+".nddl",
+      long_nddl = getGraphName().str()+"."+short_nddl;
+    
+    syslog()<<"No model specified: attempting to load "<<long_nddl;
+    nddl = manager().use(long_nddl, found);
+    if( !found ) {
+      syslog()<<long_nddl<<" not found: attempting to load "<<short_nddl;
+      nddl = manager().use(short_nddl, found);
+      if( !found )
+	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
+    }
+  }
+  if( !playTransaction(nddl) ) 
+    throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
+  
+  if( !plan_db()->isClosed() ) {
+    syslog("WARN")<<"Plan database is not closed:\n\tClosing it now!!!";
+    plan_db()->close();
+  }
+
+  // Loading solver configuration 
+  std::string solver_cfg = parse_attr<std::string>(cfg, "solverConfig");
+  // boost::optional<std::string> 
+  //   synch_cfg = parse_attr< boost::optional<std::string> >(cfg, "synchCfg");
+  
+  if( solver_cfg.empty() )
+    throw XmlError(cfg, "attribute \"solverConfig\" is empty");
+  solver_cfg = manager().use(solver_cfg, found);
+  
+  if( !found ) 
+    throw ReactorException(*this, "Unable to locate solver config \""+solver_cfg+"\".");
+  
+  configure_solvers(solver_cfg);
+
+  // Create reactor connections 
+  std::list<EUROPA::ObjectId> objs;
+  
+  trex_timelines(objs);
+  syslog()<<" Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
+	  <<" declarations.";
+
+  for(std::list<EUROPA::ObjectId>::const_iterator o=objs.begin();
+      objs.end()!=o; ++o) {
+    EUROPA::LabelStr name = (*o)->getName(), mode_val;
+    Symbol trex_name(name.c_str());
+    EUROPA::ConstrainedVariableId o_mode = mode(*o);
+
+    if( !o_mode->lastDomain().isSingleton() )
+      throw ReactorException(*this, "The mode of the "+TREX_TIMELINE.toString()
+			     +" \""+trex_name.str()+"\" is not a singleton.");
+    else {
+      mode_val = o_mode->lastDomain().getSingletonValue();
+    }
+    
+    if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
+      use(trex_name, OBSERVE_MODE!=mode_val);
+      add_state_var(*o);
+    } else if( INTERNAL_MODE==mode_val ) {
+      provide(trex_name);
+      add_state_var(*o);
+    } else if( IGNORE_MODE==mode_val ) {
+      ignore(*o);
+    } else {
+      if( PRIVATE_MODE!=mode_val )
+	syslog("WARN")<<TREX_TIMELINE.toString()<<" "<<trex_name<<" mode \""
+		      <<mode_val.toString()<<"\" is unknown!!!\n"
+		      <<"\tI'll assume it is "<<PRIVATE_MODE.toString();
+    }      
+  }
+}
+
+EuropaReactor::~EuropaReactor() {}
+
+
+// callbacks
+
+//  - TREX transaction callback 
+
+void EuropaReactor::notify(Observation const &obs) {
+  setStream();
+
+  EUROPA::ObjectId obj = plan_db()->getObject(obs.object().str());
+  bool undefined;
+  std::string pred = obs.predicate().str();
+  EUROPA::TokenId fact = new_obs(obj, pred, undefined);
+
+  if( undefined ) 
+    syslog("WARN")<<"Predicate "<<obs.object()<<"."<<obs.predicate()<<" is unknown"
+		  <<"\n\t Created "<<pred<<" instead.";
+  else if( !restrict_token(fact, obs) )
+    syslog("ERROR")<<"Failed to restrict some attributes of observation "<<obs;
+}
+
+void EuropaReactor::handleRequest(goal_id const &request) {
+  setStream();
+
+  EUROPA::ObjectId obj = plan_db()->getObject(request->object().str());
+  std::string pred = request->predicate().str();
+  
+  if( !have_predicate(obj, pred) ) {
+    syslog("ERROR")<<"Ignoring Unknow token type "<<request->object()<<'.'
+		   <<request->predicate();
+  } else {
+    // Create the new fact
+    EUROPA::TokenId goal = create_token(obj, pred, false);
+
+    if( !restrict_token(goal, *request) ) {
+      syslog("ERROR")<<"Failed to restrict some attributes of request "<<*request
+		     <<"\n\t rejecting it.";
+      goal->discard();
+    } else {
+      // The goal appears to be correct so far : add it to my set of goals
+      syslog()<<"Integrated request "<<request<<" as the token with Europa ID "
+	      <<goal->getKey();
+    }
+  }
+ }
+
+void EuropaReactor::handleRecall(goal_id const &request) {
+  setStream();
+  // Remove the goal if it exists 
+}
+
+// TREX execution callbacks
+void EuropaReactor::handleInit() {
+  setStream();
+  {
+    init_clock_vars();
+  }
+}
+
+void EuropaReactor::handleTickStart() {
+  setStream();  
+}
+
+bool EuropaReactor::synchronize() {
+  setStream();
+  EuropaReactor &me = *this;
+
+  debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
+  me.logPlan("tick");
+  BOOST_SCOPE_EXIT((&me)) {
+    
+    debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
+    debugMsg("trex:synch", "Plan after synchronization:\n"
+             <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
+    me.logPlan("synch");
+  } BOOST_SCOPE_EXIT_END
+  
+  // First step : propagate external state 
+  Assembly::external_iterator ext(begin(), end()), end_ext(end(), end());
+  for( ; end_ext!=ext; ++ext) 
+    (*ext)->commit();
+  if( synchronizer()->solve() ) {
+    // Success: clean up synchronization solver
+    synchronizer()->clear();
+    // Lastly : commit on internal state
+    Assembly::internal_iterator i(begin(), end()), end_i(end(), end());
+    for(; end_i!=i; ++i) 
+      (*i)->commit();
+    return true;
+  }
+  // need to recover but we'll see later
+  return false;
+}
+
+bool EuropaReactor::hasWork() {
+  setStream();
+  // Always false for now
+  return false;
+}
+
+void EuropaReactor::resume() {
+  setStream();
+}
+
+// europa core callbacks
+
+void EuropaReactor::notify(EUROPA::LabelStr const &object, 
+			   EUROPA::TokenId const &tok) {
+  Observation obs(object.c_str(), 
+		  tok->getUnqualifiedPredicateName().toString());
+  
+  std::vector<EUROPA::ConstrainedVariableId> const &attr = tok->parameters();
+
+  for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attr.begin();
+      attr.end()!=a; ++a) {
+    std::auto_ptr<TREX::transaction::DomainBase> 
+      dom(details::trex_domain((*a)->lastDomain()));
+    TREX::transaction::Variable var((*a)->getName().toString(), *dom);
+    obs.restrictAttribute(var);
+  }
+  postObservation(obs);
+}
+
+
+// manipulators
+
+bool EuropaReactor::restrict_token(EUROPA::TokenId &tok, 
+				   Predicate const &pred) {
+  bool no_empty = true;
+  std::list<Symbol> attrs;
+  pred.listAttributes(attrs, false);
+
+  for(std::list<Symbol>::const_iterator v=attrs.begin(); attrs.end()!=v; ++v) {
+    EUROPA::ConstrainedVariableId param = tok->getVariable(v->str());
+    
+    if( param.isId() ) {
+      Variable const &var = pred[*v];
+      //syslog("INFO")<<"Apply "<<tok->toString()<<"."<<var;
+      try {        
+	details::europa_restrict(param, var.domain());
+      } catch(DomainExcept const &e) {
+	syslog("WARN")<<"Failed to restrict attribute "<<(*v)
+		      <<" on token "<<pred.object()<<'.'<<pred.predicate()
+		      <<": "<<e;
+	no_empty = false;
+      }
+    } else 
+      syslog("WARN")<<" Ignoring unknown attribute "<<pred.object()
+		    <<'.'<<pred.predicate()<<'.'<<(*v);
+  }
+  return no_empty;
+}
+
+// Observers 
+
+EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
+  EUROPA::eint scope_duration(getExecLatency()+getLookAhead());
+  return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration, 
+						   final_tick()));
+}
+
+void EuropaReactor::logPlan(std::string const &base_name) const {
+  std::string full_name = manager().file_name(getName().str()+"."+base_name+".dot");
+  std::ofstream out(full_name.c_str());
+  print_plan(out);
+}
+
+
