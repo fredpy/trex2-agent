@@ -46,7 +46,7 @@
 #ifndef H_agent_graph
 # define H_agent_graph
 
-# include "Agent_fwd.hh"
+# include "../Agent_fwd.hh"
 # include <trex/transaction/TeleoReactor.hh>
 
 # include <boost/graph/depth_first_search.hpp>
