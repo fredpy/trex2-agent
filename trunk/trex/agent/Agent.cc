@@ -241,7 +241,7 @@ namespace TREX {
             };
 
             cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, Cycle_Type type, utils::Symbol name="" )
-                : node(goal), root(root), timelineType(type), name(name) {};
+                : root(root), node(goal), name(name), timelineType(type) {};
 
             void discover_vertex(graph::reactor_id r, graph const &g)
             {
@@ -605,6 +605,7 @@ void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
   details::sync_scheduller sync(queue);
   m_edf.clear(); // Make sure that there's no one left in the schedulling
+  bool update = false;
 
   // Identify synchronization order while notifying of the new tick
   boost::depth_first_search(me(), boost::visitor(sync));
@@ -630,7 +631,20 @@ void Agent::synchronize() {
     } else {
       // r failed => kill the reactor
       kill_reactor(r);
+      update = true;
     }
+  }
+  if( update ) {
+    // Create new graph file
+    std::ostringstream name;
+    name<<"reactors."<<getCurrentTick()<<".dot";
+    
+    std::string graph_dot = manager().file_name(name.str());
+    std::ofstream dotf(graph_dot.c_str());
+    
+    graph_names_writer gn;
+    boost::write_graphviz(dotf, me(), gn, gn);
+    syslog()<<"New graph logged in \""<<name.str()<<"\".";    
   }
 }
 
