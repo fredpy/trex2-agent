@@ -38,6 +38,21 @@ add_library(TREXdomain SHARED
   BasicEnumerated.cc
   Variable.cc
   DomainImpl.cc
+  # headers 
+  DomainBase.hh
+  BasicEnumerated.hh
+  BasicInterval.hh
+  DomainVisitor_fwd.hh
+  DomainVisitor.hh
+  EnumeratedDomain.hh
+  IntervalDomain.hh
+  FloatDomain.hh
+  IntegerDomain.hh
+  EnumDomain.hh
+  StringDomain.hh
+  Variable.hh
+  # template source
+  bits/IntervalDomain.tcc
 )
 
 add_dependencies(core TREXdomain)

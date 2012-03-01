@@ -40,6 +40,21 @@ add_library(TREXtransaction SHARED
   TeleoReactor.cc
   reactor_graph.cc
   TransactionPlayer.cc
+  # headers
+  Tick.hh
+  Predicate.hh
+  Observation.hh
+  Goal.hh
+  Relation.hh
+  TeleoReactor_fwd.hh
+  TeleoReactor.hh
+  reactor_graph.hh
+  TransactionPlayer.hh
+  bits/timeline.hh
+  bits/external.hh
+  bits/bgl_support.hh
+  # template source
+  bits/reactor_graph.tcc
 )
 
 add_dependencies(core TREXtransaction)
