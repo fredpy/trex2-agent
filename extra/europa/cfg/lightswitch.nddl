@@ -89,7 +89,7 @@ Luminance::Dim {
 }
 
 Light::On {
-    starts(Switch.Down);
+    contained_by(Switch.Down);
     contained_by(Luminance.Bright);    
 }
 
@@ -102,29 +102,29 @@ Switch::Up {
     bool external;
     contained_by(Light.Off);
     foo == false;
-    isExternal(external);
-    if( external==false ) {
-	duration == end - start;
-	if( start<=AGENT_CLOCK ) {
-	    meets(object.Down next);
-	    if( next.state==ACTIVE || next.state==MERGED ) {
-		bind(duration, 1);
-	    }
-	}
-    }
+    // isExternal(external);
+    // if( external==false ) {
+    // 	duration == end - start;
+    // 	if( start<=AGENT_CLOCK ) {
+    // 	    meets(object.Down next);
+    // 	    // if( next.state==ACTIVE || next.state==MERGED ) {
+    // 	    // 	bind(duration, 1);
+    // 	    // }
+    // 	}
+    // }
 }
 
 Switch::Down {
-    bool external;
-    isExternal(external);
-    if( external==false ) {
-	duration == end - start;
-	if( start<=AGENT_CLOCK ) {
-	    meets(object.Up next);
-	    if( next.state==ACTIVE || next.state==MERGED ) {
-		bind(duration, 1);
-	    }
-	}
-    }
+    // bool external;
+    // isExternal(external);
+    // if( external==false ) {
+    // 	duration == end - start;
+    // 	if( start<=AGENT_CLOCK ) {
+    // 	    meets(object.Up next);
+    // 	    // if( next.state==ACTIVE || next.state==MERGED ) {
+    // 	    // 	bind(duration, 1);
+    // 	    // }
+    // 	}
+    // }
 }
 
