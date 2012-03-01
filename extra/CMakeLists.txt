@@ -47,7 +47,8 @@ endmacro(trex_plugin)
 # the directories where plugins are located
 
 add_subdirectory(lightswitch)
-add_subdirectory(europa)
+add_subdirectory(europa_0_2)
+# add_subdirectory(europa)
 add_subdirectory(witre)
 
 option(WITH_LSTS "Use LSTS plugin" OFF)
