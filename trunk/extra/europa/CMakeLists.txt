@@ -55,7 +55,7 @@ if(WITH_EUROPA)
 
     add_library(TREXeuropa SHARED 
       EuropaReactor.cc
-      EuropaConvert.cc
+      europa_convert.cc
       EuropaDomain.cc  
       extensions/EarliestFirstFlawManager.cc      
       # headers
