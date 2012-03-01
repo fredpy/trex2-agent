@@ -81,6 +81,8 @@ namespace TREX {
 	}
 
 	void commit();
+	bool internal() const;
+	bool external() const;
 
 	class DecisionPoint :public EUROPA::SOLVERS::DecisionPoint {
 	public:
@@ -129,8 +131,8 @@ namespace TREX {
 	void push_end(EUROPA::DbClientId const &cli);
 	void relax_end(EUROPA::DbClientId const &cli);
 
-	EUROPA::TokenId new_obs(EUROPA::DbClientId const &cli, std::string const &pred, 
-				bool insert=false);
+	EUROPA::TokenId new_obs(EUROPA::DbClientId const &cli, std::string const &pred,
+				bool insert=true);
 	void new_token(EUROPA::TokenId const &token);
 	void relax_token();
 
@@ -147,88 +149,13 @@ namespace TREX {
 	friend class TREX::europa::Assembly;
 	friend class DecisionPoint;
       }; // TREX::europa::details::CurrentState
-
-
-      /*      class CurrentState :public EUROPA::Entity {
-	      public:
-	      using namespace EUROPA; // Needed in order to use DECLARE_ENTITY_TYPE 
-	      DECLARE_ENTITY_TYPE(CurrentState);
-	      
-	      typedef EUROPA::Id<CurrentState> id_type;
-	      
-	      ~CurrentState();
-	      
-	      id_type const &egtId() const {
-	      return m_id;
-	      }
-	      
-	      EUROPA::TimelineId const timeline() const;
-	      EUROPA::eint now() const;
-	      bool identified() const;
-	      bool committed() const;
-	
-	      EUROPA::TokenId current() const;
-	      
-	      LabelStr const &default_predicate() const;
-	      std::set<LabelStr> const &predicates() const;
-	      
-	      void extend_current();
-	      void commit();
-	      
-	      class DecisionPoint :public EUROPA::SOLVERS::DecisionPoint {
-	      public:
-	      DecisionPoint(EUROPA::DbClientId const &client, 
-	      CurrentStateId const &variable,
-	      EUROPA::TiXmlElement const &cfg,
-	      EUROPA::LabelStr const &explanation="synchronization");
-	      ~DecisionPoint();
-	      
-	      std::string toString() const;
-	      std::string toShortString() const;
-	      
-	      static bool customStaticMatch(EUROPA::EntityId const &entity);
-	      
-	      private:
-	      enum Choices {
-	      EXTEND_CURRENT = 0,
-	      START_NEXT     = 1,
-	      CREATE_DEFAULT = 2,
-	      CREATE_OTHER   = 3,
-	      };
-	      std::bitset<4> choices;
-	      
-	      choices m_choices;
-	      size_t  m_prev_idx, m_idx;
-	      
-	      void handleInitialize();
-	      
-	      bool hasNext() const;
-	      void handleExecute();
-	      bool canUndo() const;
-	      void handleUndo();
-	      
-	      void advance();
-	      
-	      CurrentStateId    m_target;
-	      
-	      
-	      }; // TREX::europa::details::CurrentState::DecisionPoint
-	      
-	      private:
-	      CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline);
-	      
-	      EUROPA::TimelineId   m_timeline;
-	      EUROPA::TokenId      m_last_obs;
-	      EUROPA::ConstraintId m_cstr;
-	      
-	      id_type m_id;
-	      
-	      Assembly &m_assembly;
-	      
-	      friend class TREX::europa::Assembly;
-	      }; // TREX::europa::details::CurrentState
-	      
-      */
+      
+      class UpdateMatchFinder :public EUROPA::SOLVERS::MatchFinder {
+      public:
+        void getMatches(EUROPA::SOLVERS::MatchingEngineId const &engine,
+                        EUROPA::EntityId const &entity,
+                        std::vector<EUROPA::SOLVERS::MatchingRuleId> &result);
+      }; // TREX::europa::details::UpdateMatchFinder
 
     } // TREX::europa::details    
   } // TREX::europa

@@ -40,6 +40,43 @@
 using namespace TREX::europa;
 using namespace TREX::europa::details;
 
+namespace EUROPA {
+  namespace SOLVERS {
+    
+    template<>
+    void MatchingEngine::getMatchesInternal(TREX::europa::details::CurrentStateId const &inst, 
+                                            std::vector<MatchingRuleId> &results) {
+      trigger(inst->entityType(), m_rulesByObjectType, results);
+    }
+    
+    template<>
+    void MatchingEngine::getMatches(TREX::europa::details::CurrentStateId const &inst, 
+                                    std::vector<MatchingRuleId> &results) {
+      debugMsg("trex:synch", "Attempt to match CurrentState ("<<inst->timeline()->toString()<<')');
+      results = m_unfilteredRules;
+      getMatchesInternal(inst, results);
+    }
+    
+  } // EUROPA::SOLVERS
+} // EUROPA
+
+
+/*
+ * struct TREX::europa::details::is_external
+ */
+
+bool is_external::operator()(CurrentStateId const &timeline) const {
+  return timeline.isId() && timeline->external();
+}
+
+/*
+ * struct TREX::europa::details::is_internal
+ */
+
+bool is_internal::operator()(CurrentStateId const &timeline) const {
+  return timeline.isId() && timeline->internal();
+}
+
 /*
  * class TREX::europa::details::CurrentState
  */
@@ -47,7 +84,7 @@ using namespace TREX::europa::details;
 // structors 
 
 CurrentState::CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline)
-  :m_timeline(timeline), m_assembly(assembly), m_id(this) {
+  :m_assembly(assembly), m_timeline(timeline), m_id(this) {
   assembly.predicates(timeline, m_pred_names);
   // removed special values 
   m_pred_names.erase(Assembly::FAILED_PRED); 
@@ -93,12 +130,21 @@ bool CurrentState::committed() const {
     && current()->end()->baseDomain().getLowerBound() > now();
 }
 
+bool CurrentState::internal() const {
+  return m_assembly.internal(EUROPA::ObjectId(m_timeline));
+}
+
+bool CurrentState::external() const {
+  return m_assembly.external(EUROPA::ObjectId(m_timeline));
+}
+
 // modifiers
 
 EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string const &pred, 
 				      bool insert) {
   EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity());
 
+  debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
   m_prev_obs = m_last_obs;
   m_last_obs = cli->createToken(pred.c_str(), NULL, false, true);
   
@@ -107,10 +153,10 @@ EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string
   m_last_obs->getObject()->specify(m_timeline->getKey());
   
   if( insert ) {
+    debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
+    m_last_obs->activate();
     if( m_prev_obs.isId() )
       cli->constrain(m_timeline, m_prev_obs, m_last_obs);
-    else
-      cli->constrain(m_timeline, m_last_obs, m_last_obs);
   }
   return current();
 }
@@ -201,7 +247,7 @@ std::string CurrentState::DecisionPoint::toShortString() const {
   if( m_choices.none() )
     oss<<"EMPTY";
   else {
-    switch( m_prev_idx ) {
+    switch( m_idx ) {
     case EXTEND_CURRENT:
       oss<<"EXTEND["<<m_target->current()->toString()<<']';
       break;
@@ -285,6 +331,7 @@ void CurrentState::DecisionPoint::handleInitialize() {
   m_idx = 0;
   if( !m_choices[m_idx] ) 
     advance();
+  m_prev_idx = m_idx;
 }
 
 void CurrentState::DecisionPoint::handleExecute() {
@@ -296,7 +343,7 @@ void CurrentState::DecisionPoint::handleExecute() {
     m_target->push_end(m_client);
     break;
   case START_NEXT:
-    tok = m_target->new_obs(m_client, (*m_tok)->getPredicateName().toString());
+    tok = m_target->new_obs(m_client, (*m_tok)->getPredicateName().toString(), false);
     m_client->merge(tok, *m_tok);
     break;
   case CREATE_DEFAULT:
@@ -348,3 +395,14 @@ void CurrentState::DecisionPoint::advance() {
     ++m_idx;
   } while( m_idx<m_choices.size() && !m_choices[m_idx] );
 }
+
+/*
+ * class TREX::europa::details::UpdateMatchFinder 
+ */
+
+void UpdateMatchFinder::getMatches(EUROPA::SOLVERS::MatchingEngineId const &engine,
+                                   EUROPA::EntityId const &entity,
+                                   std::vector<EUROPA::SOLVERS::MatchingRuleId> &result) {
+  return engine->getMatches(CurrentStateId(entity), result);
+}
+
