@@ -156,6 +156,7 @@ namespace TREX {
        */
       virtual std::string getStringValue(size_t i) const;
 
+      virtual void addTextValue(std::string const &val) =0;
     protected:
       explicit BasicEnumerated(TREX::utils::Symbol const &type) 
 	:DomainBase(type) {}
@@ -164,7 +165,6 @@ namespace TREX {
 
       void completeParsing(boost::property_tree::ptree::value_type &node);
 
-      virtual void addTextValue(std::string const &val) =0;
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;
       
     private:
