@@ -49,3 +49,8 @@ endmacro(trex_plugin)
 add_subdirectory(lightswitch)
 add_subdirectory(europa)
 add_subdirectory(witre)
+
+option(WITH_LSTS "Use LSTS plugin" OFF)
+if(WITH_LSTS)
+  add_subdirectory(lsts)
+endif(WITH_LSTS)
