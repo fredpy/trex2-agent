@@ -11,7 +11,7 @@
  *
  * @ingroup utils
  */
-#include "Pdlfcn.hh"
+#include "private/Pdlfcn.hh"
 
 #if defined(__APPLE__) && (__GNUC__ < 4)   
 #include <mach-o/dyld.h>
