@@ -77,12 +77,16 @@ namespace TREX {
       TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::details::CurrentState::DecisionPoint,
 				 TREX_SYNCH_HANDLER);
 
+      // The new flaw to be matched
+      TREX_REGISTER_MATCH_FINDER(assembly, TREX::europa::details::UpdateMatchFinder, 
+                                 TREX::europa::details::CurrentState::entityTypeName());    
 
       // T-REX constraints
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckExternal,
 			       isExternal,trex);
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
 			       isInternal,trex); 
+
     }
 
     CoreExtensions trex_core;

@@ -50,25 +50,21 @@ using namespace TREX::europa;
 // structors
 
 details::UpdateFlawIterator::UpdateFlawIterator(SynchronizationManager &manager) 
-  :EUROPA::SOLVERS::FlawIterator(manager), m_assembly(*(manager.m_assembly)), 
-   m_it(manager.m_assembly->begin()) {
+  :EUROPA::SOLVERS::FlawIterator(manager), 
+   m_it(manager.m_assembly->begin(), manager.m_assembly->end()),
+   m_assembly(*(manager.m_assembly)){
   advance();
 }
 
 // modifiers
 
 EUROPA::EntityId const details::UpdateFlawIterator::nextCandidate() {
-  // Find the next candidate
-  for(;m_assembly.end()!=m_it; ++m_it) {
-    // Filter out all the agent timelines that are not internal
-    if( m_assembly.internal(**m_it) ) {
-      EUROPA::EntityId candidate = *m_it;
-      ++m_it;
-      return candidate;
-    }
-  }
-  // No candidate found
-  return EUROPA::EntityId::noId();
+  if( Assembly::internal_iterator(m_assembly.end(), m_assembly.end())!=m_it ) {
+    EUROPA::EntityId candidate = *m_it;
+    ++m_it;
+    return candidate;
+  } else 
+    return EUROPA::EntityId::noId();
 }
 
 /*

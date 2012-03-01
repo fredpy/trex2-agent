@@ -55,7 +55,7 @@ namespace TREX {
 
       private:
 	EUROPA::EntityId const nextCandidate();
-	Assembly::state_iterator m_it;
+	Assembly::internal_iterator m_it;
 	
 	Assembly &m_assembly;
       }; // TREX::europa::details::UpdateFlawIterator

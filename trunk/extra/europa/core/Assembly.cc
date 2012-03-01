@@ -60,6 +60,68 @@
 
 using namespace TREX::europa;
 
+namespace {
+  
+  struct is_not_merged {
+    is_not_merged(bool filt):m_filt(filt) {}
+    
+    bool operator()(EUROPA::TokenId const &tok) const {
+      return m_filt || !tok->isMerged();
+    }
+    
+    bool is_fact(EUROPA::TokenId const &tok) const {
+      bool ret = tok->isFact();
+      
+      if( !( ret || m_filt ) ) {
+        if( tok->isActive() ) {
+          EUROPA::TokenSet const &merged = tok->getMergedTokens();
+          for(EUROPA::TokenSet::const_iterator i=merged.begin();
+              merged.end()!=i; ++i)
+            if( (*i)->isFact() )
+              return true;
+        }
+      }
+      return ret; 
+    }
+    
+    bool is_goal(EUROPA::TokenId const &tok) const {
+      bool ret = tok->getState()->baseDomain().isMember(EUROPA::Token::REJECTED);
+        
+      if( !(ret || m_filt) ) {
+        if( tok->isActive() ) {
+          EUROPA::TokenSet const &merged = tok->getMergedTokens();
+          for(EUROPA::TokenSet::const_iterator i=merged.begin();
+              merged.end()!=i; ++i)
+            if( is_goal(*i) )
+              return true;
+        }
+      }
+      return ret;
+    }
+    
+    void merged(EUROPA::TokenId const &tok, EUROPA::TokenSet &result) {
+      if( !m_filt && tok->isActive() ) {
+        EUROPA::TokenSet const &merged = tok->getMergedTokens();
+        result.insert(merged.begin(), merged.end());
+      }
+    }
+    
+    bool const m_filt;
+  }; // struct ::is_not_merged
+  
+} // ::
+
+/*
+ * class TREX::europa::details::CurrentStateId_id_traits
+ */
+// statics 
+
+EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentStateId const &cs) {
+  if( cs.isId() ) 
+    return cs->timeline();
+  return EUROPA::TimelineId::noId();
+}
+
 /*
  * class TREX::europa::Assembly;
  */
@@ -86,7 +148,7 @@ std::string const Assembly::FAILED_PRED("Failed");
 // structors
 
 Assembly::Assembly(std::string const &name) {
-  //  reditrec log output to <name>.europa.log
+  //  redirect log output to <name>.europa.log
   m_trex_schema->setStream(m_debug, name+".europa.log");
   
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
@@ -161,6 +223,7 @@ void Assembly::configure_solvers(std::string const &cfg) {
   									      EUROPA::TiXmlElement("FlawFilter")));
   // Setup our deliberation solver
   filter->SetAttribute("component", TO_STRING_EVAL(TREX_DELIB_FILT));
+  debugMsg("trex:init", "Load planning solver with configuration:\n"<<(*xml_cfg)); 
 
   m_deliberation_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
   
@@ -168,12 +231,13 @@ void Assembly::configure_solvers(std::string const &cfg) {
   filter->SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_FILT));
   
   EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
-    handler("FlawManager");
+    handler("FlawHandler");
 
   handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
   synch.InsertEndChild(handler);
   xml_cfg->InsertEndChild(synch);
 
+  debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg)); 
   m_synchronization_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
 }
 
@@ -198,6 +262,42 @@ void Assembly::init_clock_vars() {
 							  final_tick()));
 }
 
+void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
+  EUROPA::ObjectId obj(tl);
+  
+  if( internal(obj) || external(obj) ) {
+    if( m_agent_timelines.find(tl)==m_agent_timelines.end() ) {
+      details::CurrentStateId state = (new details::CurrentState(*this, tl))->getId();
+      bool tl_internal = internal(obj);
+      
+      debugMsg("trex:timeline", "Adding State flaw manager for "<<tl->getName().toString()
+	       <<"\n\t* Current T-REX mode is "<<(tl_internal?"In":"Ex")<<"ternal.");
+      m_agent_timelines.insert(state);
+    }
+  } else {
+    debugMsg("trex:always", "WARNING attempted to create a sate falw manager for non public timeline "
+	     <<tl->getName().toString());
+  }
+}
+
+EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj, std::string &pred, 
+				  bool &undefined) {
+  if( !external(obj) ) 
+    throw EuropaException(obj->toString()+"is not an External timeline");
+  state_iterator 
+    handler = m_agent_timelines.find(EUROPA::TimelineId(obj));
+  undefined = false;
+    
+  if( !have_predicate(obj, pred) ) {
+    std::string prev = pred;
+    pred = UNDEFINED_PRED;
+    if( !have_predicate(obj, pred) )
+      throw EuropaException("Unable to create token "+prev+" or "+UNDEFINED_PRED+
+			    " for timeline "+obj->toString());
+    undefined = true;
+  }
+  return (*handler)->new_obs(plan_db()->getClient(), pred, false);
+}
 
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
@@ -298,4 +398,60 @@ EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
     throw EuropaException("Variable \""+full_name+"\" does not exist.");
   return var;
 }
+
+void Assembly::print_plan(std::ostream &out, bool expanded) const {
+  EUROPA::TokenSet const tokens = plan_db()->getTokens();
+  is_not_merged filter(expanded);
+  
+  out<<"digraph plan_"<<now()<<" {\n"
+     <<"  node[shape=\"box\"];\n\n";
+  boost::filter_iterator<is_not_merged, EUROPA::TokenSet::const_iterator>
+    it(filter, tokens.begin(), tokens.end()), 
+    endi(filter, tokens.end(), tokens.end());
+  // Iterate through plan tokens
+  for( ; endi!=it; ++it) {
+    EUROPA::eint key = (*it)->getKey();
+    // display the token as a node
+    out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
+       <<'('<<key<<") {\\n";
+    std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
+        vars.end()!=v; ++v) {
+      // print all token attributes
+      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
+    }
+    out<<"}\"";
+    if( ignored(*it) )
+      out<<" color=grey"; // ignored tokens are greyed
+    else if( filter.is_fact(*it) )
+      out<<" color=red"; // fact tokens are red
+    if( filter.is_goal(*it) )
+      out<<" style=rounded"; // goal tokens have rounded corners
+    out<<"];\n";
+    if( (*it)->isMerged() ) {
+      EUROPA::eint active = (*it)->getActiveToken()->getKey();
+      // connect the merged token to its active counterpart
+      out<<"  t"<<key<<"->t"<<active<<"[color=grey];\n"; 
+    }
+    EUROPA::TokenSet toks;
+    toks.insert(*it);
+    filter.merged(*it, toks);
+    // display the relation to the master token(s)
+    for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
+      EUROPA::TokenId master = (*t)->master();
+      
+      if( master.isId() ) {
+        if( expanded ) 
+          key = (*t)->getKey();
+        out<<"  t"<<master->getKey()<<"->t"<<key
+           <<"[label=\""<<(*t)->getRelation().toString()<<"\"";
+        if( (*it)!=(*t) )
+          out<<" color=grey";
+        out<<"];\n";
+      }
+    }
+  }
+  out<<"}"<<std::endl;
+}
+
 

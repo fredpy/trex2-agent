@@ -44,6 +44,8 @@
 # include <PLASMA/Engine.hh>
 # include <PLASMA/Solver.hh>
 
+# include <boost/iterator/filter_iterator.hpp>
+
 # include <fstream>
 
 namespace TREX {
@@ -63,6 +65,16 @@ namespace TREX {
 
       class UpdateFlawIterator;
 
+      struct is_external {
+
+	bool operator()(CurrentStateId const &timeline) const;
+      }; // TREX::europa::details::is_external
+
+      struct is_internal {
+
+	bool operator()(CurrentStateId const &timeline) const;
+      }; // TREX::europa::details::is_internal
+
     } // TREX::europa::details
 
     /** @brief Europa to T-REX assembly
@@ -74,7 +86,19 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      */
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
+    private:
+      typedef TREX::utils::list_set<details::CurrentStateId_id_traits> state_map;
+
+    protected:
+      typedef state_map::const_iterator state_iterator;
+      typedef boost::filter_iterator<TREX::europa::details::is_external,
+				     state_iterator> external_iterator;
+      typedef boost::filter_iterator<TREX::europa::details::is_internal,
+				     state_iterator> internal_iterator;
     public:
+      /** @brief TREX timeline nddl type
+       * The name of the type in nddl for a TREX timeline
+       */
       static EUROPA::LabelStr const TREX_TIMELINE;
       static EUROPA::LabelStr const EXTERNAL_MODE;
       static EUROPA::LabelStr const OBSERVE_MODE;
@@ -89,49 +113,243 @@ namespace TREX {
       static std::string const UNDEFINED_PRED;
       static std::string const FAILED_PRED;
       
+      /** @brief Constructor
+       * @param[in] name A symbolic name
+       * 
+       * Create a new instance with the associated name @p name
+       */
       Assembly(std::string const &name);
+      /** @brief Destructor 
+       */
       ~Assembly();
 
+      /** @brief Load the associated model
+       * @param[in] nddl A nddl file name
+       * 
+       * Load the nddl model described in the file @p nddl in this Assembly 
+       * plan database.
+       * 
+       * @throw EuropaException An erro occured while trying to parse the model
+       * 
+       * @retval true if the model was succesfully loaded and is consitent
+       * @retval false the loaded model generated an inconsistency
+       */
       bool playTransaction(std::string const &nddl);
+      /** @brief Configure solvers
+       * @param[in] cfg A xml solver configuration file
+       * 
+       * Create and intialize the planning and synchronization solvers for this 
+       * Assembly using @p cfg configuration file.
+       * 
+       * @note this method injects extra component in @p cfg to both solvers. 
+       * Namely:
+       * @li A @c DeliberationScope filter to the @e planniing solver; used in 
+       *     order to exclude tokens that are outside of the planning scope 
+       *     of the reactor.
+       * @li A @c SynchronizationScope filter to the @c synchronization solver;
+       *     used to restrict the synchronization to only tokens that overlaps 
+       *     the current tick
+       * @li A @c SynchronizationManager along with its @p 
+       *     CurrentState::DecisionPoint to the @c synchropnization solver; both 
+       *     used in concert to identify the current @e Internal state of the 
+       *     reactor
+       */
       void configure_solvers(std::string const &cfg);
 
+      /** @brief Get europa schema
+       * @return the Europa schema associated to this Assembly
+       */
       EUROPA::SchemaId const &schema() const {
 	return m_schema;
       }
+      
+      /** @brief Get europa constraint engine
+       * @return the Europa constraint engine associated to this Assembly
+       */
       EUROPA::ConstraintEngineId const &constraint_engine() const {
 	return m_cstr_engine;
       }
+      /** @brief Get europa plan database
+       * @return the Europa plan database associated to this Assembly
+       */
       EUROPA::PlanDatabaseId const &plan_db() const {
 	return m_plan_db;
       }
+      /** @brief Get europa rules engine
+       * @return the Europa rules engine associated to this Assembly
+       */
       EUROPA::RulesEngineId const &rules_engine() const {
 	return m_rules_engine;
       }
 
+      /** @brief Check if internal
+       * @param[in] tok A token
+       * 
+       * This method is used in order to check if the token @p tok is 
+       * necessarily associated to a T-REX @e internal timeline
+       * @retval true if all the possible objects for @p tok are T-REX 
+       *              @e internal timelines
+       * @retval false otherwise
+       *
+       * @sa internal(EUROPA::ObjectId const &) const
+       * @sa is_internal(EUROPA::LabelStr const &) const
+       * @sa external(EUROPA::TokenId const &) const
+       * @sa external(EUROPA::ObjectId const &) const
+       */
       bool internal(EUROPA::TokenId const &tok) const;
+      /** @brief Check if internal
+       * @param[in] obj An object
+       * 
+       * This method is used in order to check if the object @p obj is 
+       * a T-REX @e internal timeline
+       * @retval true if @p obj is an @e internal timeline
+       * @retval false otherwise
+       *
+       * @sa internal(EUROPA::TokenId const &) const
+       * @sa is_internal(EUROPA::LabelStr const &) const
+       * @sa external(EUROPA::TokenId const &) const
+       * @sa external(EUROPA::ObjectId const &) const
+       */
       bool internal(EUROPA::ObjectId const &obj) const;
 
+      /** @brief Check if external
+       * @param[in] tok A token
+       * 
+       * This method is used in order to check if the token @p tok is 
+       * necessarily associated to a T-REX @e external timeline
+       * @retval true if all the possible objects for @p tok are T-REX 
+       *              @e external timelines
+       * @retval false otherwise
+       *
+       * @sa external(EUROPA::ObjectId const &) const
+       * @sa is_external(EUROPA::LabelStr const &) const
+       * @sa internal(EUROPA::TokenId const &) const
+       * @sa internal(EUROPA::ObjectId const &) const
+       */
       bool external(EUROPA::TokenId const &tok) const;
+      /** @brief Check if external
+       * @param[in] obj An object
+       * 
+       * This method is used in order to check if the object @p obj is 
+       * a T-REX @e external timeline
+       * @retval true if @p obj is an @e external timeline
+       * @retval false otherwise
+       *
+       * @sa external(EUROPA::TokenId const &) const
+       * @sa is_internal(EUROPA::LabelStr const &) const
+       * @sa internal(EUROPA::TokenId const &) const
+       * @sa internal(EUROPA::ObjectId const &) const
+       */
       bool external(EUROPA::ObjectId const &obj) const;
 
+      /** @brief Check if ignored
+       * @param[in] tok A token
+       *
+       * Checks if the token @p tok is marked as being ignored by the solvers.
+       * A token is ignored when all its possible objects are ignored
+       * 
+       * @retval true if the token is marked as ignored
+       * @retval false otherwise
+       *
+       * @sa ignored(EUROPA::ObjectId const &) const
+       */
       bool ignored(EUROPA::TokenId const &tok) const;
+      /** @brief Check if ignored
+       * @param[in] obj An object
+       *
+       * Checks if the object @p obj is marked as ignored by the solvers. 
+       * 
+       * @retval true if @p is to be ignored
+       * @retval false otherwise
+       *
+       * @sa ignored(EUROPA::TokenId const &) const
+       */
       bool ignored(EUROPA::ObjectId const &obj) const {
 	return m_ignored.end()!=m_ignored.find(obj);
       }
 
+      /** @brief Execution frontier
+       * 
+       * This method is used by the Assembly in order to get the current T-REX 
+       * tick.
+       * 
+       * @return the current tick
+       */
       virtual EUROPA::eint now() const =0;
+      /** @brief Deliberation scope
+       * 
+       * This method is used by the Assembly -- or more accvurately by the 
+       * associated @c DeliberationScope -- in  order to identify the reactor 
+       * current planning scope. The planning scope is the time interval for 
+       * for which the reactor needs to deliberate
+       * 
+       * @return the planning scope 
+       */
       virtual EUROPA::IntervalIntDomain plan_scope() const =0;
+      /** @brief initial tick
+       * 
+       * Indicates this reactor initial tick. The initial tick is the first 
+       * tick this reactor started to execute.
+       * 
+       * @note It is assumed that any tick before this are not relevant for the 
+       * reactor.
+       *
+       * @return reactor initial tick
+       */
       virtual EUROPA::eint initial_tick() const =0;
+      /** @brief final tick
+       * 
+       * Indicates this reactor final tick. The final tick reflects the T-REX 
+       * agent life time. 
+       * 
+       * @note It is assumed that any tick after this are not relevant for the 
+       * reactor.
+       *
+       * @return reactor final tick
+       */
       virtual EUROPA::eint final_tick() const =0;
+      /** @brief duration of the tick
+       * 
+       * This value is used in order to convert T-REX ticks into a real-time 
+       * value. They reflect the duration -- usually in seconds -- of a single 
+       * tick as sepcified by the T-REX clock
+       * 
+       * @return the duration of a tick
+       */
       virtual EUROPA::edouble tick_duration() const =0;
 
+      /** @brief T-REX clock variable
+       * 
+       * This method give access to the varable in the model used to 
+       * represent the T-REX clock. 
+       * 
+       * @return the variable in nddl for T_REX clock
+       */
       EUROPA::ConstrainedVariableId clock() const {
 	return m_clock;
       }
 
+      /** @brief Check if T-REX timeline
+       * @param[in] obj An object
+       * 
+       * Checks if @p obj type is the type used for T-REX timelines in nddl. 
+       * Meaning that it derives from @c TREX_TIMELINE
+       * 
+       * @retval true   if @p obj is a trex timeline
+       * @retval false  otherwise
+       */
       bool is_agent_timeline(EUROPA::ObjectId const &obj) const {
 	return schema()->isA(obj->getType(), TREX_TIMELINE);
       }
+      /** @brief Check if T-REX timeline
+       * @param[in] type A europa object type
+       * 
+       * Checks if @p type is the type used for T-REX timelines in nddl. 
+       * Meaning that it derives from @c TREX_TIMELINE
+       * 
+       * @retval true   if @p type is a trex timeline
+       * @retval false  otherwise
+       */
       bool is_agent_timeline(EUROPA::DataTypeId const &type) const {
 	return schema()->isA(type->getName(), TREX_TIMELINE);
       }
@@ -178,6 +396,9 @@ namespace TREX {
       }
 
       void init_clock_vars();
+      void add_state_var(EUROPA::TimelineId const &obj);
+      
+      void print_plan(std::ostream &out, bool expanded=false) const;
       
     private:
       enum State {
@@ -211,18 +432,22 @@ namespace TREX {
       
       Assembly();
 
-      typedef TREX::utils::list_set<details::CurrentStateId_id_traits> state_map;
-      typedef state_map::const_iterator state_iterator;
 
       state_map m_agent_timelines;
 
+    protected:
       state_iterator begin() const {
-	m_agent_timelines.begin();
+	return m_agent_timelines.begin();
       }
       state_iterator end() const {
-	m_agent_timelines.end();
+	return m_agent_timelines.end();
       }
 
+      EUROPA::TokenId new_obs(EUROPA::ObjectId const &obj, 
+			      std::string &pred, 
+			      bool &undefined);
+
+    private:
       EUROPA::SOLVERS::SolverId m_deliberation_solver;
       EUROPA::SOLVERS::SolverId m_synchronization_solver;
 

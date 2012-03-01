@@ -100,6 +100,6 @@ namespace TREX {
 } // TREX
 
 # define TREX_SYNCH_MGR      TrexSynchronizer
-# define TREX_SYNCH_HANDLER  TrexStateHandler
+# define TREX_SYNCH_HANDLER  CurrentStateHandler
 
 #endif // H_trex_europa_SynchronizationManager
