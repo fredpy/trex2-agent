@@ -1,0 +1,16 @@
+<config locale="witre_loc">
+  <!-- arguments to be passed to the Wt server 
+    read Wt documentation for further details
+    
+    this is a very rough in the edges way to integrate these attributes 
+    and will be refined in the future. Right now I wanted to have a quick
+    way to pass parameters to Wt as if they were coming from the command 
+    line
+
+    Note: It seems that I need a new line at the end otherwise the server fails 
+    to parse the option
+    -->
+  <server>--http-address=localhost --http-port=8080 --docroot=. --accesslog=log2.txt
+
+  </server>	
+</config>
