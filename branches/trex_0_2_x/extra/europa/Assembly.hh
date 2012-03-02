@@ -504,6 +504,7 @@ namespace TREX {
       void mark_active();
       void mark_invalid();
       TREX::transaction::TICK final_tick() const;
+      EUROPA::eint now();
       
       void logPlan(std::ostream &out, bool expanded = false) const;
     private:

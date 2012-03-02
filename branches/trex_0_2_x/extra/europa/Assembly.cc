@@ -221,7 +221,7 @@ Assembly::~Assembly() {
 
 void Assembly::logPlan(std::ostream &out, bool expanded) const {
   EUROPA::TokenSet const all_toks = m_planDatabase->getTokens();
-  out<<"digraph plan_"<<m_reactor.getCurrentTick()<<" {\n";
+  out<<"digraph plan_"<<now()<<" {\n";
   out<<"  node[shape=\"box\"];\n";
   for(EUROPA::TokenSet::const_iterator i=all_toks.begin();
       all_toks.end()!=i; ++i) {
@@ -334,6 +334,10 @@ TREX::transaction::TICK Assembly::final_tick() const {
   return m_reactor.getFinalTick();
 }
 
+EUROPA::eint Assembly::now() const {
+  return m_reactor.getCurrentTick();
+}
+
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
   std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
@@ -362,7 +366,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
     return false;
   }
   if( tok->isFact() && 
-      tok->start()->lastDomain().getUpperBound()<=m_reactor.getCurrentTick() ) {
+      tok->start()->lastDomain().getUpperBound()<=now() ) {
     debugMsg("trex:in_deliberation", "false: Token "<<tok->toString()
 	     <<" is a past fact");
     return false;
@@ -375,7 +379,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::overlaps_now(EUROPA::TokenId const &tok) const {
-  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+  TREX::transaction::TICK cur = now();
 
   return tok->start()->lastDomain().getUpperBound()<=cur
   && tok->end()->lastDomain().getLowerBound()>=cur 
@@ -475,7 +479,7 @@ bool Assembly::resolve(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand, 
 }
 
 bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok, size_t &steps) {
-  TREX::transaction::TICK cur = m_reactor.getCurrentTick();
+  TREX::transaction::TICK cur = now();
   EUROPA::IntervalIntDomain now(cur, cur);
   EUROPA::ConstrainedVariableId name = m_reactor.assembly().default_pred(obj);
   EUROPA::DataTypeId type = name->getDataType();
