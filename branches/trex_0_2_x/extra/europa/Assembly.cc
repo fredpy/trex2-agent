@@ -379,7 +379,7 @@ bool Assembly::in_deliberation(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::overlaps_now(EUROPA::TokenId const &tok) const {
-  TREX::transaction::TICK cur = now();
+  EUROPA::eint cur = now();
 
   return tok->start()->lastDomain().getUpperBound()<=cur
   && tok->end()->lastDomain().getLowerBound()>=cur 
@@ -479,8 +479,8 @@ bool Assembly::resolve(EUROPA::TokenId const &tok, EUROPA::TokenId const &cand, 
 }
 
 bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok, size_t &steps) {
-  TREX::transaction::TICK cur = now();
-  EUROPA::IntervalIntDomain now(cur, cur);
+  EUROPA::eint cur = now();
+  EUROPA::IntervalIntDomain i_now(cur, cur);
   EUROPA::ConstrainedVariableId name = m_reactor.assembly().default_pred(obj);
   EUROPA::DataTypeId type = name->getDataType();
   std::string short_pred = type->toString(name->getSpecifiedValue()),
@@ -490,7 +490,7 @@ bool Assembly::insert_default(EUROPA::ObjectId const &obj, EUROPA::TokenId &tok,
   tok = cli->createToken(pred_name.c_str(), NULL, false);
   
   tok->activate();
-  tok->start()->restrictBaseDomain(now);
+  tok->start()->restrictBaseDomain(i_now);
   tok->getObject()->specify(obj->getKey());
   return insert_token(tok, steps);
 }
