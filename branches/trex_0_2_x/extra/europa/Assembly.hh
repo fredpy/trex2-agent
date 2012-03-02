@@ -503,8 +503,44 @@ namespace TREX {
       void mark_inactive(); 
       void mark_active();
       void mark_invalid();
-      TREX::transaction::TICK final_tick() const;
+      /** @brief Get current tick 
+       * @return the current tick value
+       */
       EUROPA::eint now() const;
+      /** @brief Get look ahead
+       * @return the reactor look ahead
+       */
+      EUROPA::eint look_ahead() const;
+      /** @brief Get latency
+       * 
+       * This methofd gives the reactor execution latency which include
+       * the latency of the reactors it depends on.
+       *
+       * @note It is important to know that this value can change as the
+       * reactor graph is modified.
+       *
+       * @return the reactor latency
+       */
+      EUROPA::eint latency() const;
+      /** @brief Mission final tick
+       * 
+       * Gives the final tick of the mission. This is the last tick 
+       * that will be executed before the agent terminates
+       * 
+       * @return the mission final tick
+       */
+      EUROPA::eint final_tick() const;
+      /** @brief deliberation planning scope
+       * 
+       * This intervals indicates the time window for which the 
+       * reactor is currently expected to deliberate
+       * 
+       * It is often the window [now(), now()+latency()+look_ahead()] 
+       * but the upper bound is restricted by final_tick()
+       * 
+       * @return the current planning window
+       */
+      EUROPA::IntervalIntDomain plan_scope() const;
       
       void logPlan(std::ostream &out, bool expanded = false) const;
     private:
