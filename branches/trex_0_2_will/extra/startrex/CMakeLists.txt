@@ -31,46 +31,21 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE      #
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
-
-option(WITH_EUROPA "Enable Europa plugin." ON) 
-
-if(WITH_EUROPA) 
-  find_package(Europa 
+find_package(Europa 
     COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
     NDDL RulesEngine Solvers System)
-  
-  if(EUROPA_FOUND)
-    include_directories(${EUROPA_INCLUDE_DIRS})
-    add_library(TREXeuropa SHARED 
-      Assembly.cc
-      Constraints.cc
-      DbCore.cc
-      DbSolver.cc
-      DeliberationFilter.cc
-      EuropaDomain.cc
-      EuropaReactor.cc
-      extensions/EarliestFirstFlawManager.cc
-      #extensions/startrex/GoalManager.cc
-      extensions/startrex/GoalManager_PR2.cc
-      extensions/startrex/Constraints.cc
-    )
+include_directories(${EUROPA_INCLUDE_DIRS})
 
-    set_property(TARGET TREXeuropa PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
-    set_property(TARGET TREXeuropa PROPERTY ${EUROPA_LIBRARIES})
-    target_link_libraries(TREXeuropa ${EUROPA_LIBRARIES} TREXtransaction)
-    
-    install(TARGETS TREXeuropa DESTINATION lib) 
-    trex_lib(TREXeuropa)
+add_library(STARFISHeuropa Constraints.cc GoalManager.cc)
 
-    install(DIRECTORY . DESTINATION include/trex/europa
-      FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-      PATTERN "private" EXCLUDE
-      PATTERN "cfg" EXCLUDE
-      PATTERN ".svn" EXCLUDE)
+set_property(TARGET STARFISHeuropa PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
+target_link_libraries(STARFISHeuropa TREXeuropa)
 
-    trex_plugin(europa europa_plugin.cc)
-    target_link_libraries(europa_pg TREXeuropa)    
-  else(EUROPA_FOUND)
-    message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
-  endif(EUROPA_FOUND)
-endif(WITH_EUROPA)
+trex_plugin(startrex StarTrex.cc)
+set(DSAAV_HINTS ~/STARFISH/dsaav/)
+include_directories(~/STARFISH/include/)
+include_directories(~/STARFISH/include/x86_64/)
+find_library(DSAAV NAMES dsaav-osx HINTS ${DSAAV_HINTS})
+target_link_libraries(startrex_pg TREXtransaction STARFISHeuropa ${DSAAV} /Users/WilliamTan/STARFISH/misc/enum2str.o-osx)
+
+# link this lib "TREXeuropa" for compilation of constraints.
