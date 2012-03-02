@@ -330,12 +330,26 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
   return true;
 }
 
-TREX::transaction::TICK Assembly::final_tick() const {
+EUROPA::eint Assembly::final_tick() const {
   return m_reactor.getFinalTick();
 }
 
 EUROPA::eint Assembly::now() const {
   return m_reactor.getCurrentTick();
+}
+
+EUROPA::eint Assembly::look_ahead() const {
+  return m_reactor.getLookAhead();
+}
+
+EUROPA::eint Assembly::latency() const {
+  return m_reactor.getExecLatency();
+}
+
+EUROPA::IntervalIntDomain Assembly::plan_scope() const {
+  EUROPA::eint scope_duration(latency()+look_ahead());
+  return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration,
+						   final_tick()));
 }
 
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
