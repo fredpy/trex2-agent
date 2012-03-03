@@ -116,6 +116,7 @@ namespace TREX {
 
       private:
 	EUROPA::TokenId m_token, m_active;
+        EUROPA::TokenSet m_merged;
       }; // TREX::europa::details::scoped_split
 
     } // TREX::europa::details

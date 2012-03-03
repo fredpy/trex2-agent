@@ -75,13 +75,22 @@ std::string TREX::europa::details::predicate_name(EUROPA::ObjectId const &obj,
 
 details::scoped_split::scoped_split(EUROPA::TokenId const &token)
   :m_token(token), m_active(token->getActiveToken()) {
-  if( m_active.isId() )
-    m_token->cancel();
+    if( m_active.isId() ) {
+      m_merged = m_active->getMergedTokens();
+      for(EUROPA::TokenSet::const_iterator i=m_merged.begin(); m_merged.end()!=i; ++i)
+        (*i)->cancel();      
+    }
 }
 
 details::scoped_split::~scoped_split() {
-  if( m_active.isId() ) 
-    m_token->merge(m_active);
+  if( m_active.isId() ) {
+//    EUROPA::TokenSet const &merged = m_active->getMergedTokens();
+//    for(EUROPA::TokenSet::const_iterator i=merged.begin(); merged.end()!=i; ++i) {
+//      (*i)->cancel(); (*i)->merge(m_active);
+//    }
+    for(EUROPA::TokenSet::const_iterator i=m_merged.begin(); m_merged.end()!=i; ++i)
+      (*i)->merge(m_active);      
+  }
 }
 
 // observers
