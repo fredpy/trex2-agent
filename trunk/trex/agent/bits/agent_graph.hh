@@ -143,7 +143,9 @@ namespace TREX {
        */
       void back_edge(TREX::transaction::graph::relation_type const &rel,
 		     TREX::transaction::graph const &g) {
-        throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
+        if( g.null_reactor()!=boost::source(rel, g) &&
+           g.null_reactor()!=boost::target(rel, g) )
+          throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
       }
 
 
