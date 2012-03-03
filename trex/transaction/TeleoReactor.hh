@@ -481,7 +481,7 @@ namespace TREX {
       }
       /** @brief Count the number of internal relations
        *
-       * This mtethods count the number of relations that this reactor have 
+       * This method count the number of relations that this reactor have 
        * with other reactors issued from its internla timelines.
        *
        * This number does not count the number of internal timelines but the 

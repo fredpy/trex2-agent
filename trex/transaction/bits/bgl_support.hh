@@ -199,7 +199,12 @@ namespace boost {
 		    TREX::transaction::TeleoReactor::external_iterator >
   out_edges(TREX::transaction::graph::reactor_id r,
 	    TREX::transaction::graph const &g) {
-    return std::make_pair(r->ext_begin(), r->ext_end());
+    if( TREX::transaction::graph::null_reactor()!=r )
+      return std::make_pair(r->ext_begin(), r->ext_end());
+    else {
+      TREX::transaction::TeleoReactor::external_iterator null;
+      return std::make_pair(null, null);
+    }
   }
   
   /** @brief source of a relation
@@ -286,6 +291,8 @@ namespace boost {
   inline TREX::transaction::TeleoReactor::size_type 
   in_degree(TREX::transaction::graph::reactor_id r, 
 	    TREX::transaction::graph const &g) {
+    if( TREX::transaction::graph::null_reactor()==r )
+      return 0;
     return r->count_internal_relations();
   }
 
