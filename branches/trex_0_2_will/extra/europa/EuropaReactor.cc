@@ -441,7 +441,7 @@ void EuropaReactor::request(EUROPA::ObjectId const &tl,
 void EuropaReactor::relax() {
   for(europa_mapping::const_iterator i=m_external_goals.begin();
       m_external_goals.end()!=i; ++i) {
-    syslog("recall")<<"RECALL "<<i->second<<"(Europa ID : "<<i->first<<").";
+    syslog("recall")<<"RECALL "<<i->second<<" (Europa ID : "<<i->first<<").";
     postRecall(i->second);    
   }
   m_external_goals.clear();  
