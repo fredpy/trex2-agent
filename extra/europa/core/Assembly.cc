@@ -358,7 +358,7 @@ void Assembly::recalled(EUROPA::TokenId const &tok) {
   tok->discard();
 }
 
-void Assembly::relax(bool destructive) {
+bool Assembly::relax(bool destructive) {
   // Clean up decisions made lastly 
   synchronizer()->reset();
   planner()->reset();
@@ -395,7 +395,7 @@ void Assembly::relax(bool destructive) {
   }
   for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
     (*t)->discard();
-  // m_cstr_engine->propagate();
+  return m_cstr_engine->propagate();
 }
 
 // observers

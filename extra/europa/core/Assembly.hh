@@ -375,10 +375,6 @@ namespace TREX {
 
       void setStream() const;
 
-      bool active() const;
-      bool inactive() const;
-      bool invalid() const;
-
       void ignore(EUROPA::ObjectId const &obj) {
 	m_ignored.insert(obj);
       }
@@ -402,18 +398,12 @@ namespace TREX {
       void init_clock_vars();
       void add_state_var(EUROPA::TimelineId const &obj);
       
-      void relax(bool destructive);
+      bool relax(bool destructive);
       virtual void do_recall() =0;
       
       void print_plan(std::ostream &out, bool expanded=false) const;
       
     private:
-      enum State {
-	INACTIVE = 0,
-	ACTIVE,
-	INVALID
-      }; 
-
       static std::string const MODE_ATTR;
       static std::string const DEFAULT_ATTR;
 
