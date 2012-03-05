@@ -36,6 +36,7 @@
 #include "bits/europa_helpers.hh"
 
 #include <PLASMA/TokenVariable.hh>
+#include <PLASMA/PlanDatabaseWriter.hh>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -160,7 +161,6 @@ EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string
   
   if( insert ) {
     debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
-    m_last_obs->activate();
     if( m_prev_obs.isId() )
       cli->constrain(m_timeline, m_prev_obs, m_last_obs);
   }
@@ -192,6 +192,7 @@ void CurrentState::relax_end(EUROPA::DbClientId const &cli) {
 }
 
 void CurrentState::commit() {  
+  debugMsg("trex:synch", "["<<now()<<"] commit "<<m_last_obs->toString()<<" on "<<timeline()->toString());
   if( m_prev_obs.isId() ) {
     EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
 
@@ -202,23 +203,35 @@ void CurrentState::commit() {
     }    
     m_prev_obs = EUROPA::TokenId::noId();
     m_assembly.notify(*this);
+    if( m_constraint.isId() ) {
+      m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
+      m_constraint = EUROPA::ConstraintId::noId();
+    }
   } else {
     EUROPA::eint start = m_last_obs->start()->getSpecifiedValue();
-    EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
-      dur(now()+1-start, std::numeric_limits<EUROPA::eint>::infinity());
-
-    {
-      scoped_split cur(m_last_obs);  
-      cur->end()->restrictBaseDomain(future);
-      cur->duration()->restrictBaseDomain(dur);
+    if( now()==start ) {
+      m_assembly.notify(*this);      
+    } else {
+      EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
+        dur(now()+1-start, std::numeric_limits<EUROPA::eint>::infinity());
+    
+      {
+        scoped_split cur(m_last_obs);  
+        cur->end()->restrictBaseDomain(future);
+        cur->duration()->restrictBaseDomain(dur);
+        m_assembly.constraint_engine()->propagate();
+        debugMsg("trex:synch", "Plan during commit["<<timeline()->toString()<<"]:\n"
+                 <<EUROPA::PlanDatabaseWriter::toString(m_assembly.plan_db()));
+      }
     }
     if( m_constraint.isId() ) {
       m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
       m_constraint = EUROPA::ConstraintId::noId();
     }
-    if( now()==start )
-      m_assembly.notify(*this);
   }
+  if( m_last_obs->canBeCommitted() )
+    m_last_obs->commit();
+  debugMsg("trex:synch", "["<<now()<<"] end commit on "<<timeline()->toString());
 }
 
 /*

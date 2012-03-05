@@ -123,6 +123,23 @@ EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentSta
 }
 
 /*
+ * class TREX::europa::Assembly::root_tokens;
+ */
+
+void Assembly::root_tokens::notifyAdded(EUROPA::TokenId const & token) {
+  if( token->master().isNoId() )
+    m_roots.insert(token);  
+}
+
+void Assembly::root_tokens::notifyRemoved(EUROPA::TokenId const & token) {
+  if( token->master().isNoId() ) {
+    m_roots.erase(token);
+    if( NULL!=m_owner )
+      m_owner->discard(token);
+  }
+}
+
+/*
  * class TREX::europa::Assembly;
  */
 
@@ -151,6 +168,7 @@ Assembly::Assembly(std::string const &name) {
   //  redirect log output to <name>.europa.log
   m_trex_schema->setStream(m_debug, name+".europa.log");
   
+  // load the differrent europa modules we need
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
   addModule((new EUROPA::ModuleConstraintLibrary())->getId());
   addModule((new EUROPA::ModulePlanDatabase())->getId());
@@ -168,11 +186,12 @@ Assembly::Assembly(std::string const &name) {
   m_plan_db = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
   m_rules_engine = ((EUROPA::RulesEngine *)getComponent("RulesEngine"))->getId();
 
+  m_roots.reset(new root_tokens(m_plan_db));
+  
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  // Make sure that we control when constraints propagate
-  m_cstr_engine->setAutoPropagation(false);
+  m_cstr_engine->setAutoPropagation(true);
 
   // Get extra europa extensions 
   m_trex_schema->registerComponents(*this);
@@ -181,6 +200,7 @@ Assembly::Assembly(std::string const &name) {
 }
 
 Assembly::~Assembly() {
+  m_roots.reset();
   // cleanup base class
   doShutdown();
 }
@@ -194,6 +214,7 @@ void Assembly::setStream() const {
 bool Assembly::playTransaction(std::string const &nddl) {
   std::string const &path = m_trex_schema->nddl_path();
   std::string ret;
+  m_roots->attach(this);
   
   // configure search path for nddl
   getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);
@@ -324,9 +345,58 @@ EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
   EUROPA::ConstrainedVariableId obj_var = tok->getObject();
   obj_var->specify(obj->getKey());
   
+  // if( tok->isIncomplete() )
+  //   tok->close();
+  
   return tok;
 }
 
+void Assembly::recalled(EUROPA::TokenId const &tok) {
+  // Very aggressive way to handle this 
+  if( !tok->isInactive() )
+    tok->cancel();
+  tok->discard();
+}
+
+void Assembly::relax(bool destructive) {
+  // Clean up decisions made lastly 
+  synchronizer()->reset();
+  planner()->reset();
+  // recall all the external requests
+  do_recall();
+  // Remove dangling token from past decisions  
+  EUROPA::TokenSet const &toks = m_roots->roots();
+  EUROPA::TokenSet to_erase;
+  
+  for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
+    bool is_past = (*t)->end()->baseDomain().getUpperBound()<=now();
+    bool is_goal = (*t)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED);
+    
+    if( is_past ) {
+      if( (*t)->isFact() ) {
+        if( destructive ) {
+          if( !(*t)->isInactive() )
+            (*t)->cancel();
+          to_erase.insert(*t);
+        } else if( (*t)->canBeCommitted() )
+          (*t)->commit();
+      } else {
+        // Removing the past goals
+        if( is_goal || destructive ) {
+          if( !(*t)->isInactive() )
+            (*t)->cancel();
+          to_erase.insert(*t);
+        }
+      }
+    } else {
+      if( !( (*t)->isInactive() || (*t)->isCommitted() ) )
+        (*t)->cancel();
+    }
+  }
+  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
+    (*t)->discard();
+  // m_cstr_engine->propagate();
+}
 
 // observers
 
@@ -414,6 +484,10 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     // display the token as a node
     out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
        <<'('<<key<<") {\\n";
+    if( (*it)->isIncomplete() ) 
+      out<<"incomplete\\n";
+    //    if( (*it)->isCommitted() ) 
+    //   out<<"commit\\n";
     std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
@@ -425,8 +499,21 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<" color=grey"; // ignored tokens are greyed
     else if( filter.is_fact(*it) )
       out<<" color=red"; // fact tokens are red
-    if( filter.is_goal(*it) )
-      out<<" style=rounded"; // goal tokens have rounded corners
+    std::ostringstream styles;
+    bool comma = false;
+    
+    if( filter.is_goal(*it) ) {
+      styles<<"rounded"; // goal have rounded corner
+      comma=true;
+    }
+    if( (*it)->isCommitted() ) {
+      if( comma )
+        styles<<',';
+      styles<<"dashed"; // commits are dashed
+      comma = true;
+    }
+    if( comma )
+      out<<" style=\""<<styles.str()<<"\" "; // display style modifiers
     out<<"];\n";
     if( (*it)->isMerged() ) {
       EUROPA::eint active = (*it)->getActiveToken()->getKey();

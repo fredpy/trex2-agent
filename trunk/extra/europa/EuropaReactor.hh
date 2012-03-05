@@ -38,11 +38,12 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 
+# include <boost/bimap.hpp>
+
 namespace TREX {
   namespace europa {
 
-    class EuropaReactor :public TREX::transaction::TeleoReactor,
-			 protected Assembly {
+    class EuropaReactor:public TREX::transaction::TeleoReactor, protected Assembly {
     public:
       explicit EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
       ~EuropaReactor();
@@ -52,16 +53,24 @@ namespace TREX {
       void notify(TREX::transaction::Observation const &obs);
       void handleRequest(TREX::transaction::goal_id const &request);
       void handleRecall(TREX::transaction::goal_id const &request);
-
+      
       // TREX execution callbacks
       bool hasWork();
-
+      
       void handleInit();
       void handleTickStart();
       bool synchronize();
       void resume();
-
-    private:      
+      
+    private:
+      void do_recall();
+      void discard(EUROPA::TokenId const &tok);
+      
+      void apply_externals();
+      bool do_synchronize();
+      void apply_internals();
+                           
+                           
       bool restrict_token(EUROPA::TokenId &tok, 
 			  TREX::transaction::Predicate const &pred);
 
@@ -89,6 +98,9 @@ namespace TREX {
       void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
                            
       void logPlan(std::string const &base_name) const;
+    
+      typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map; 
+      goal_map m_active_requests;
       
     }; // TREX::europa::EuropaReactor
 			 
