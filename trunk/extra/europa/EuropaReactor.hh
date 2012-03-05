@@ -102,6 +102,8 @@ namespace TREX {
       typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map; 
       goal_map m_active_requests;
       
+      bool m_completed_this_tick;
+      size_t m_steps;
     }; // TREX::europa::EuropaReactor
 			 
   } // TREX::europa 
