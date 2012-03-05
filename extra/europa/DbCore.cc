@@ -255,11 +255,11 @@ bool DbCore::update_externals() {
 	  i->first->constrain(obs, *pos);
 	  inserted = true;
 	}
-	if( !inserted ) {
-	  debugMsg("trex:sync", "Insert observation "
-		   <<obs->toString()<<" in "<<i->first->toString());
-	  i->first->constrain(obs, obs);
-	}
+	// if( !inserted ) {
+	//   debugMsg("trex:sync", "Insert observation "
+	// 	   <<obs->toString()<<" in "<<i->first->toString());
+	//   i->first->constrain(obs, obs);
+	// }
 	if( !assembly.propagate() ) {
 	  debugMsg("trex:sync", "Unable to insert new observation "
 		   <<obs->toString());
@@ -268,6 +268,7 @@ bool DbCore::update_externals() {
 				<<obs->getUnqualifiedPredicateName().toString();
 	  return false;
 	}
+	// m_reactor.logPlan("sync");
 	// if( obs->canBeCommitted() )
 	//   obs->commit();
       }
@@ -488,6 +489,7 @@ bool DbCore::relax(bool aggressive) {
   assembly.mark_inactive();
 
   // recall all of my former objectives
+  debugMsg("trex:relax", "Recalling all dispatched tokens");
   m_reactor.relax();
 
   TICK cur = m_reactor.getCurrentTick();
@@ -505,16 +507,7 @@ bool DbCore::relax(bool aggressive) {
 	if( !(*i)->isInactive() )
 	  (*i)->cancel();
 	(*i)->discard();	
-    } else if( (*i)->isCommitted() ) {
-      debugMsg("trex:relax", "Canceling slaves of "<<(*i)->toString());
-
-      for(EUROPA::TokenSet::const_iterator it=(*i)->slaves().begin();
-      	  (*i)->slaves().end()!=it; ++it) 
-      	if( (*it)->isClosed() && !(*it)->isInactive() ) {
-	  debugMsg("trex:relax", "\t cancel "<<(*it)->toString());
-      	  (*it)->cancel();
-	}
-    } else if( !(*i)->isInactive() ) {
+    } else if( !((*i)->isCommitted() || (*i)->isInactive()) ) {
       debugMsg("trex:relax", "Canceling token "<<(*i)->toString());
       (*i)->cancel();
     }
@@ -532,16 +525,16 @@ bool DbCore::relax(bool aggressive) {
       (*i)->discard();
     } else {
       // Make sure that the domain is fully relaxed 
-      std::vector<EUROPA::ConstrainedVariableId> const &vars = (*i)->getVariables();
+      // std::vector<EUROPA::ConstrainedVariableId> const &vars = (*i)->getVariables();
       if( !(*i)->isInactive() )
 	(*i)->cancel();
 
-      for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
-	  vars.end()!=v; ++v) {
-	if( (*v)->canBeSpecified() && (*v)->isSpecified() )
-	  (*v)->reset();
-	(*v)->relax();
-      }
+      // for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
+      // 	  vars.end()!=v; ++v) {
+      // 	if( (*v)->canBeSpecified() && (*v)->isSpecified() )
+      // 	  (*v)->reset();
+      // 	(*v)->relax();
+      // }
     }
   debugMsg("trex:relax", "removing "<<m_recalled.size()<<" recalled tokens");
   // third pass get rid of recalled goals
@@ -555,7 +548,7 @@ bool DbCore::relax(bool aggressive) {
   }
   m_reactor.logPlan("relax");
   if( propagate() ) {
-    debugMsg("trex:relax", "SUCCESS");
+    debugMsg("trex:relax", "SUCCESS");    
     return true;
   } else {
     debugMsg("trex:relax", "FAILED");
