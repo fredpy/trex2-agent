@@ -212,6 +212,11 @@ void EuropaReactor::handleTickStart() {
   setStream();  
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
+  // Prepare the reactor for next deliberation round
+  if( m_completed_this_tick ) {
+    m_steps = 0;
+    m_completed_this_tick = false;
+  }
 }
 
 namespace {
@@ -232,13 +237,9 @@ void EuropaReactor::apply_externals() {
 bool EuropaReactor::do_synchronize() {
   if( !synchronizer()->solve() ) {
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    relax(false);
-    logPlan("relax");
-    if( !synchronizer()->solve() ) {
+    if( !( relax(false) && synchronizer()->solve() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      relax(true);
-      logPlan("relax");
-      return synchronizer()->solve();
+      return relax(true) && synchronizer()->solve();
     }
   }
   return true;
@@ -290,12 +291,34 @@ void EuropaReactor::discard(EUROPA::TokenId const &tok) {
 
 bool EuropaReactor::hasWork() {
   setStream();
-  // Always false for now
-  return false;
+  if( constraint_engine()->provenInconsistent() ) {
+    syslog("ERROR")<<"Plan database is inconsistent.";
+    return false;
+  }
+  if( planner()->isExhausted() ) {
+    syslog("WARN")<<"Deliberation solver is exhausted.";
+    return false;
+  }
+  if( !m_completed_this_tick ) {
+    m_completed_this_tick = planner()->noMoreFlaws();
+    if( m_steps>0 && m_completed_this_tick ) {
+      syslog()<<"Deliberation completed in "<<m_steps<<" steps.";
+      logPlan("plan");
+    }
+  }
+  return !m_completed_this_tick;
 }
 
 void EuropaReactor::resume() {
   setStream();
+  planner()->step();
+  ++m_steps;
+  
+  if( constraint_engine()->provenInconsistent() ) {
+    if( !relax(false) )
+      if( !relax(true) ) 
+        syslog("ERROR")<<"Unable to recover from plan inconsistency.";
+  }
 }
 
 // europa core callbacks
