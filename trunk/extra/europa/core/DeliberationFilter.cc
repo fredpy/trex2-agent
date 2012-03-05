@@ -66,8 +66,8 @@ void TokenFilter::set_assembly(EUROPA::EngineComponentId const &component) {
 
 bool TokenFilter::tokenCheck(EUROPA::TokenId const &token) {
   return assembly().ignored(token) ||
-    token->start()->getLowerBound() >= assembly().final_tick() ||
-    token->end()->getUpperBound() <= assembly().initial_tick();
+    token->start()->lastDomain().getLowerBound() >= assembly().final_tick() ||
+    token->end()->lastDomain().getUpperBound() <= assembly().initial_tick();
 }
 
 bool TokenFilter::test(EUROPA::EntityId const &entity) {
@@ -81,8 +81,9 @@ bool TokenFilter::test(EUROPA::EntityId const &entity) {
     set_assembly(var->getConstraintEngine());
 
     token = details::parent_token(var);
-  }
-  return token.isId() && tokenCheck(token) && doTest(token);
+  }    
+  
+  return token.isNoId() || tokenCheck(token) || doTest(token);
 }
 
 /*
