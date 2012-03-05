@@ -301,11 +301,9 @@ void CurrentState::DecisionPoint::handleInitialize() {
   EUROPA::TokenId cur = m_target->current(), active;
   EUROPA::eint date = m_target->now();
   
-  std::cerr<<"INIT "<<m_target->timeline()->toString()<<"["<<date<<"]"<<std::endl;
 
   m_choices.reset();
   m_choices.set(CREATE_DEFAULT);
-  std::cerr<<"\tset CREATE_DEFAULT("<<CREATE_DEFAULT<<")"<<std::endl;
   
 
   if( cur.isId() ) {
@@ -316,12 +314,9 @@ void CurrentState::DecisionPoint::handleInitialize() {
     
     if( end.getLowerBound() <= date ) {
       m_choices.set(EXTEND_CURRENT, end.getUpperBound() > date);
-      std::cerr<<"\tset EXTEND_CURRENT("<<EXTEND_CURRENT<<")"<<std::endl;
     } else {
       // Already decided : extend_current
       m_choices.reset();
-      std::cerr<<"\tUNIQUE EXTEND_CURRENT("<<EXTEND_CURRENT<<"):"
-               <<end.toString()<<">="<<date<<std::endl;
       m_idx = m_choices.size();
       return;
     }
@@ -364,7 +359,6 @@ void CurrentState::DecisionPoint::handleExecute() {
   EUROPA::TokenId tok;
 
   m_prev_idx = m_idx;
-  std::cout<<"Execute choice: "<<m_idx<<" for timeline "<<m_target->timeline()->toString()<<std::endl; 
   switch(m_idx) {
   case EXTEND_CURRENT:
     m_target->push_end(m_client);
