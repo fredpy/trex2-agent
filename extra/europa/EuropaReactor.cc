@@ -185,13 +185,19 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       // The goal appears to be correct so far : add it to my set of goals
       syslog()<<"Integrated request "<<request<<" as the token with Europa ID "
 	      <<goal->getKey();
+      m_active_requests.insert(goal_map::value_type(goal, request));
     }
   }
- }
+}
 
 void EuropaReactor::handleRecall(goal_id const &request) {
   setStream();
   // Remove the goal if it exists 
+  goal_map::right_iterator i = m_active_requests.right.find(request);
+  if( m_active_requests.right.end()!=i ) {
+    m_active_requests.right.erase(i);
+    recalled(i->second);
+  }
 }
 
 // TREX execution callbacks
@@ -204,6 +210,47 @@ void EuropaReactor::handleInit() {
 
 void EuropaReactor::handleTickStart() {
   setStream();  
+  // Updating the clock
+  clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
+}
+
+namespace {
+  
+  template<class Iter>
+  void commit(Iter from, Iter const &to) {
+    for(; to!=from; ++from)
+      (*from)->commit();
+  }
+
+} // ::
+
+void EuropaReactor::apply_externals() {
+  Assembly::external_iterator from(begin(), end()), to(end(), end()); 
+  commit(from, to);
+}
+
+bool EuropaReactor::do_synchronize() {
+  if( !synchronizer()->solve() ) {
+    syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
+    relax(false);
+    logPlan("relax");
+    if( !synchronizer()->solve() ) {
+      syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
+      relax(true);
+      logPlan("relax");
+      return synchronizer()->solve();
+    }
+  }
+  return true;
+}
+
+void EuropaReactor::apply_internals() {
+  Assembly::internal_iterator from(begin(), end()), to(end(), end()); 
+  commit(from, to);
+}
+
+void EuropaReactor::do_recall() {
+  // will do the recall of requested tokens here 
 }
 
 bool EuropaReactor::synchronize() {
@@ -213,7 +260,7 @@ bool EuropaReactor::synchronize() {
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
   BOOST_SCOPE_EXIT((&me)) {
-    
+    me.synchronizer()->clear();    
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
@@ -221,21 +268,25 @@ bool EuropaReactor::synchronize() {
   } BOOST_SCOPE_EXIT_END
   
   // First step : propagate external state 
-  Assembly::external_iterator ext(begin(), end()), end_ext(end(), end());
-  for( ; end_ext!=ext; ++ext) 
-    (*ext)->commit();
-  if( synchronizer()->solve() ) {
-    // Success: clean up synchronization solver
-    synchronizer()->clear();
-    // Lastly : commit on internal state
-    Assembly::internal_iterator i(begin(), end()), end_i(end(), end());
-    for(; end_i!=i; ++i) 
-      (*i)->commit();
+  apply_externals();
+
+  if( do_synchronize() ) {
+    // clean-up decisions
+    apply_internals();
     return true;
   }
-  // need to recover but we'll see later
   return false;
 }
+
+void EuropaReactor::discard(EUROPA::TokenId const &tok) {
+  goal_map::left_iterator i = m_active_requests.left.find(tok);
+  
+  if( m_active_requests.left.end()!=i ) {
+    syslog()<<"Discarded past request "<<i->second;
+    m_active_requests.left.erase(i);
+  }
+}
+
 
 bool EuropaReactor::hasWork() {
   setStream();

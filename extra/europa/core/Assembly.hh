@@ -369,6 +369,9 @@ namespace TREX {
       
       virtual bool is_internal(EUROPA::LabelStr const &name) const =0;
       virtual bool is_external(EUROPA::LabelStr const &name) const =0;
+      
+      virtual void discard(EUROPA::TokenId const &tok) {}
+      void recalled(EUROPA::TokenId const &tok);
 
       void setStream() const;
 
@@ -399,7 +402,10 @@ namespace TREX {
       void init_clock_vars();
       void add_state_var(EUROPA::TimelineId const &obj);
       
-      void print_plan(std::ostream &out, bool expanded=true) const;
+      void relax(bool destructive);
+      virtual void do_recall() =0;
+      
+      void print_plan(std::ostream &out, bool expanded=false) const;
       
     private:
       enum State {
@@ -435,7 +441,31 @@ namespace TREX {
 
 
       state_map m_agent_timelines;
-
+      
+      class root_tokens :public EUROPA::PlanDatabaseListener {
+      public:
+        root_tokens(EUROPA::PlanDatabaseId const &db) 
+          :EUROPA::PlanDatabaseListener(db), m_owner(NULL) {}
+        ~root_tokens() {}
+        
+        EUROPA::TokenSet const &roots() const {
+          return m_roots;
+        }
+        
+        void attach(Assembly *owner) {
+          m_owner = owner;
+        }
+      private:
+        void notifyAdded(EUROPA::TokenId const & token);
+        void notifyRemoved(EUROPA::TokenId const & token);
+      
+        EUROPA::TokenSet m_roots;
+        Assembly *m_owner;
+      }; // TREX::europa::Assembly::root_tokens
+      
+      std::auto_ptr<root_tokens> m_roots;
+      
+      
     protected:
       state_iterator begin() const {
 	return m_agent_timelines.begin();
@@ -453,7 +483,8 @@ namespace TREX {
       EUROPA::SOLVERS::SolverId m_synchronization_solver;
 
       friend class TREX::europa::details::UpdateFlawIterator;
-      friend class TREX::europa::details::CurrentState;
+      friend class TREX::europa::details::CurrentState;      
+      friend class root_tokens;
     }; // TREX::europa::Assembly
 
   } // TREX::europa
