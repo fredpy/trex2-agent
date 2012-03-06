@@ -39,11 +39,20 @@
 namespace TREX {
   namespace europa {
 
+    /** @brief Europa related Exception 
+     *
+     * Exception used to inform of an eroor coming from Europa
+     * 
+     * @author Frederic Py <fpy@mbari.org>
+     */
     class EuropaException :public TREX::utils::Exception {
     public:
+      /** @brief Constructor 
+       * @param[in] msg Error message
+       */
       EuropaException(std::string const &msg) throw() 
 	:TREX::utils::Exception(msg) {}
-
+      /** @brief Destructor */ 
       virtual ~EuropaException() throw() {}
     }; // TREX::europa::EuropaException
 
