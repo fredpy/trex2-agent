@@ -1,3 +1,4 @@
+# -*- cmake -*- 
 #####################################################################
 # Software License Agreement (BSD License)
 # 
@@ -34,19 +35,35 @@
 
 # - Try to find europa-pso
 # Once done this will define
-#  EUROPA_FOUND - System has LibXml2
-#  EUROPA_INCLUDE_DIRS - The LibXml2 include directories
-#  EUROPA_LIBRARIES - The libraries needed to use LibXml2
-#  EUROPA_DEFINITIONS - Compiler switches required for using LibXml2
+#  EUROPA_FOUND        - System has europa
+#  EUROPA_INCLUDE_DIRS - The europa include directories
+#  EUROPA_LIBRARIES    - The libraries needed to use europa
+#  EUROPA_DEFINITIONS  - Compiler switches required for using europa
 
-set(_europa_HINTS
-  $ENV{EUROPA_HOME})
-
+# basic initial options
 option(EUROPA_DEBUG "Compile with Debug variant of Europa" OFF)
+set(EUROPA_HINTS $ENV{EUROPA_HOME})
+set(_europa_OPTION_CHANGED OFF CACHE
+  INTERNAL "checks options change" FORCE)
 
-set(_europa_LIBRARIES ConstraintEngine Solvers NDDL System PlanDatabase 
+# cached option values to check if any was updated
+if(NOT OLD_EUROPA_DEBUG EQUAL EUROPA_BEBUG)
+  set(OLD_EUROPA_DEBUG ${EUROPA_DEBUG} CACHE 
+    INTERNAL "Former EUROPA_DEBUG value." FORCE)
+  set(_europa_OPTION_CHANGED ON CACHE
+    INTERNAL "checks options change" FORCE)
+endif(NOT OLD_EUROPA_DEBUG EQUAL EUROPA_BEBUG)
+
+if(NOT OLD_EUROPA_HINTS EQUAL EUROPA_HINTS)
+  set(OLD_EUROPA_HINTS ${EUOPA_HINTS} CACHE 
+    INTERNAL "Former EUROPA_HINTS value." FORCE)
+  set(_europa_OPTION_CHANGED ON CACHE
+    INTERNAL "checks options change" FORCE)
+endif(NOT OLD_EUROPA_HINTS EQUAL EUROPA_HINTS)
+ 
+set(_europa_LIBRARIES 
+  ConstraintEngine Solvers NDDL System PlanDatabase
   TemporalNetwork Resources TinyXml RulesEngine Utils)
-
 
 if(EUROPA_DEBUG)
   set(_europa_VARIANT "_g") #only look for debug
@@ -56,67 +73,71 @@ else(EUROPA_DEBUG)
   set(_europa_FLAGS TIXML_USE_STL;EUROPA_FAST)
 endif(EUROPA_DEBUG)
 
-set(EUROPA_FLAGS ${_europa_FLAGS} CACHE STRING "Flags to compile with Europa" FORCE)
+set(EUROPA_FLAGS ${_europa_FLAGS} CACHE 
+  INTERNALS "Flags to compile with Europa" FORCE)
 
 if(NOT Europa_FIND_COMPONENTS)
   # we need everything then
   set(Europa_FIND_COMPONENTS ${_europa_LIBRARIES})
 endif(NOT Europa_FIND_COMPONENTS)
 
-set(_europa_MISSING "")
-set(EUROPA_LIB_NAMES "")
-set(EUROPA_LIBRARIES "")
+set(_europa_MISSING     "")
+set(EUROPA_LIB_NAMES    "")
+set(EUROPA_LIBRARIES    "")
 set(EUROPA_LIBRARY_DIRS "")
 
+# Look for the requested libraries
 foreach(COMPONENT ${Europa_FIND_COMPONENTS})
   string(TOUPPER ${COMPONENT} UPPERCOMPONENT)
-  set(EUROPA_${UPPERCOMPONENT}_LIBRARY "" CACHE STRING "location of ${COMPONENT} europa lib" FORCE)
-  if(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
-    SET(EUROPA_${UPPERCOMPONENT}_LIBRARY "EUROPA_${UPPERCOMPONENT}_LIBRARY-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
-  endif(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
+  set(EUROPA_${UPPERCOMPONENT}_LIBRARY "" CACHE 
+    STRING "location of ${COMPONENT} europa library" FORCE)
+  if(NOT OLD_EUROPA_DEBUG EQUAL EUROPA_BEBUG) 
+    set(EUROPA_${UPPERCOMPONENT}_LIBRARY 
+      "EUROPA_${UPPERCOMPONENT}_LIBRARY-NOTFOUND"
+      CACHE FILEPATH "Cleared." FORCE)
+  endif(NOT OLD_EUROPA_DEBUG EQUAL EUROPA_BEBUG)
   find_library(EUROPA_${UPPERCOMPONENT}_LIBRARY
     NAMES ${COMPONENT}${_europa_VARIANT}
-    HINTS ${_europa_HINTS}/lib
+    HINTS ${EUROPA_HINTS}/lib
     DOCS "Looking for ${COMPONENT}")
   mark_as_advanced(EUROPA_${UPPERCOMPONENT}_LIBRARY)
   if(EUROPA_${UPPERCOMPONENT}_LIBRARY)
     set(EUROPA_${UPPERCOMPONENT}_NAME ${COMPONENT}${_europa_VARIANT})
     list(APPEND EUROPA_LIBRARIES ${EUROPA_${UPPERCOMPONENT}_LIBRARY})
-    get_filename_component(_europa_my_lib_path "${EUROPA_${UPPERCOMPONENT}_LIBRARY}" 
-      PATH)
+    get_filename_component(_europa_my_lib_path 
+      "${EUROPA_${UPPERCOMPONENT}_LIBRARY}" PATH)
     list(APPEND EUROPA_LIBRARY_DIRS ${_europa_my_lib_path})
   else(EUROPA_${UPPERCOMPONENT}_LIBRARY)
     list(APPEND _europa_MISSING ${COMPONENT})
   endif(EUROPA_${UPPERCOMPONENT}_LIBRARY)
-endforeach(COMPONENT)
-
-if(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
-  SET(OLD_EUROPA_DBG ${EUROPA_DEBUG} CACHE INTERNAL "Former EUROPA_DEBUG value." FORCE)
-endif(NOT OLD_EUROPA_DBG EQUAL EUROPA_DEBUG)
+endforeach(COMPONENT ${Europa_FIND_COMPONENTS})
 
 list(REMOVE_DUPLICATES EUROPA_LIBRARY_DIRS)
-
 list(REMOVE_DUPLICATES _europa_MISSING)
 list(REMOVE_DUPLICATES EUROPA_LIBRARIES)
 
-find_path(EUROPA_INCLUDE_DIR 
-  "PSSolvers.hh" HINT ${_europa_HINTS}/include)
+set(EUROPA_INCLUDE_DIR
+  "" CACHE STRING "location of europa headers" FORCE)
+if(NOT OLD_EUROPA_HINTS EQUAL EUROPA_HINTS) 
+  set(EUROPA_INCLUDE_DIR
+    "EUROPA_INCLUDE_DIR-NOTFOUND"
+    CACHE FILEPATH "Cleared." FORCE)
+endif(NOT OLD_EUROPA_HINTS EQUAL EUROPA_HINTS)
+find_path(EUROPA_INCLUDE_DIR
+  "PSSolvers.hh" HINTS ${EUROPA_HINTS}/include) 
+set(EUROPA_INCLUDE_DIRS ${EUROPA_INCLUDE_DIR} 
+  CACHE STRING "Europa include paths" FORCE)
 
-set(EUROPA_INCLUDE_DIRS
-  ${EUROPA_INCLUDE_DIR}
-  )
-
-if(_europa_MISSING) 
+if(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)
   set(EUROPA_FOUND FALSE)
   if(Europa_FIND_REQUIRED)
-    message(SEND_ERROR "Unable to find the requested europa libraries")
+    message(SEND_ERROR "Unable to find requested europa libraries")
   endif(Europa_FIND_REQUIRED)
-  message(STATUS "Europa not found\nSet your EUROPA_HOME if you want ot compile this plugin")
-else(_europa_MISSING)
+  message(STATUS "Europa not found\nSet your EUROPA_HOME in your environment")
+else(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)
   set(EUROPA_FOUND TRUE)
   message(STATUS "Europa found : include directory is ${EUROPA_INCLUDE_DIR}")
-endif(_europa_MISSING)
-
+endif(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)
 
 mark_as_advanced(EUROPA_INCLUDE_DIR
   EUROPA_INCLUDE_DIRS
@@ -125,3 +146,4 @@ mark_as_advanced(EUROPA_INCLUDE_DIR
   EUROPA_LIB_NAMES
   EUROPA_LIBRARY_DIRS
   )
+
