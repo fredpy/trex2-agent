@@ -234,6 +234,21 @@ void CurrentState::commit() {
   debugMsg("trex:synch", "["<<now()<<"] end commit on "<<timeline()->toString());
 }
 
+// manipulators
+
+void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
+  std::list<EUROPA::TokenId>::const_iterator 
+    i = timeline()->getTokenSequence().begin(), 
+    endi = timeline()->getTokenSequence().end();
+  // skip the past tokens
+  for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb; ++i);
+
+  for( ; endi!=i && (*i)->end()->lastDomain().getLowerBound()<=ub; ++i)
+    if( !m_assembly.dispatch(timeline(), *i) )
+      break;
+}
+
+
 /*
  * class TREX::europa::details::CurrentState::DecisionPoint
  */

@@ -84,6 +84,8 @@ namespace TREX {
 	bool internal() const;
 	bool external() const;
 
+        void do_dispatch(EUROPA::eint lb, EUROPA::eint ub);
+        
 	class DecisionPoint :public EUROPA::SOLVERS::DecisionPoint {
 	public:
 	  DecisionPoint(EUROPA::DbClientId const &client, 

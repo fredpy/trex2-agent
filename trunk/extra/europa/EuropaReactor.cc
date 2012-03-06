@@ -83,9 +83,10 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
     }
   }
+  // Load the nddl model
   if( !playTransaction(nddl) ) 
     throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
-  
+    
   if( !plan_db()->isClosed() ) {
     syslog("WARN")<<"Plan database is not closed:\n\tClosing it now!!!";
     plan_db()->close();
@@ -212,10 +213,24 @@ void EuropaReactor::handleTickStart() {
   setStream();  
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
-  // Prepare the reactor for next deliberation round
   if( m_completed_this_tick ) {
-    m_steps = 0;
-    m_completed_this_tick = false;
+    Assembly::external_iterator from(begin(), end()), to(end(), end());
+    for(; to!=from; ++from) {
+      TeleoReactor::external_iterator 
+        j=find_external((*from)->timeline()->getName().c_str());
+      EUROPA::eint e_lo, e_hi;
+      
+      if( j.valid() && j->accept_goals() ) {
+        IntegerDomain window = j->dispatch_window(getCurrentTick());
+        IntegerDomain::bound lo = window.lowerBound(), hi = window.upperBound();
+        e_lo = lo.value();
+        if( hi.isInfinity() )
+          e_hi = final_tick();
+        else
+          e_hi = hi.value();
+        (*from)->do_dispatch(e_lo, e_hi);
+      }
+    }
   }
 }
 
@@ -250,8 +265,37 @@ void EuropaReactor::apply_internals() {
   commit(from, to);
 }
 
-void EuropaReactor::do_recall() {
-  // will do the recall of requested tokens here 
+bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl, 
+                             EUROPA::TokenId const &tok) {
+  if( m_dispatched.left.find(tok)==m_dispatched.left.end() ) {
+    TREX::utils::Symbol name(tl->getName().toString());
+    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());    
+    std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
+
+    // Get start, duration and end
+    std::auto_ptr<DomainBase> 
+      d_start(details::trex_domain(tok->start()->lastDomain())),
+      d_duration(details::trex_domain(tok->duration()->lastDomain())),
+      d_end(details::trex_domain(tok->end()->lastDomain()));
+    
+    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()), 
+                         *dynamic_cast<IntegerDomain *>(d_duration.get()), 
+                         *dynamic_cast<IntegerDomain *>(d_end.get()));
+
+    // Manage other aattributes
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
+        attrs.end()!=a; ++a) {
+      std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+      Variable attr((*a)->getName().toString(), *dom);
+      my_goal.restrictAttribute(attr);
+    }
+    goal_id request = postGoal(my_goal);
+    if( request ) {
+      m_dispatched.insert(goal_map::value_type(tok, request));
+    } else 
+      return false;
+  }
+  return true;
 }
 
 bool EuropaReactor::synchronize() {
@@ -274,7 +318,22 @@ bool EuropaReactor::synchronize() {
   if( do_synchronize() ) {
     // clean-up decisions
     apply_internals();
-    return true;
+    // Prepare the reactor for next deliberation round
+    if( m_completed_this_tick ) {
+      planner()->clear(); // remove the past decisions of the planner
+                        
+      Assembly::external_iterator from(begin(), end()), to(end(), end()); 
+      for( ; to!=from; ++from) {
+        EUROPA::TokenId cur = (*from)->current();
+        if( cur->isMerged() )
+          m_dispatched.left.erase(cur->getActiveToken());
+      }
+      
+      
+      m_completed_this_tick = false;
+    }
+    
+    return constraint_engine()->propagate(); // should not fail 
   }
   return false;
 }
@@ -285,9 +344,18 @@ void EuropaReactor::discard(EUROPA::TokenId const &tok) {
   if( m_active_requests.left.end()!=i ) {
     syslog()<<"Discarded past request "<<i->second;
     m_active_requests.left.erase(i);
-  }
+  } 
 }
 
+void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
+  goal_map::left_iterator i = m_dispatched.left.find(tok);
+  
+  if( m_dispatched.left.end()!=i ) {
+    syslog()<<"Recall ["<<i->second<<"]";
+    postRecall(i->second);
+    m_dispatched.left.erase(i);
+  }
+}
 
 bool EuropaReactor::hasWork() {
   setStream();
@@ -300,10 +368,13 @@ bool EuropaReactor::hasWork() {
     return false;
   }
   if( !m_completed_this_tick ) {
-    m_completed_this_tick = planner()->noMoreFlaws();
-    if( m_steps>0 && m_completed_this_tick ) {
-      syslog()<<"Deliberation completed in "<<m_steps<<" steps.";
-      logPlan("plan");
+    if( planner()->noMoreFlaws() ) {
+      size_t steps = planner()->getStepCount();
+      m_completed_this_tick = true;
+      if( steps>0 ) {
+        syslog()<<"Deliberation completed in "<<steps<<" steps.";
+        logPlan("plan");
+      }
     }
   }
   return !m_completed_this_tick;
@@ -312,9 +383,9 @@ bool EuropaReactor::hasWork() {
 void EuropaReactor::resume() {
   setStream();
   planner()->step();
-  ++m_steps;
   
   if( constraint_engine()->provenInconsistent() ) {
+    syslog("WARN")<<"Inconsitency found during planning.";
     if( !relax(false) )
       if( !relax(true) ) 
         syslog("ERROR")<<"Unable to recover from plan inconsistency.";
