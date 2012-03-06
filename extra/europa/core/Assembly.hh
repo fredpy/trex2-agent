@@ -371,6 +371,9 @@ namespace TREX {
       virtual bool is_external(EUROPA::LabelStr const &name) const =0;
       
       virtual void discard(EUROPA::TokenId const &tok) {}
+      virtual void cancel(EUROPA::TokenId const &tok) {}
+      virtual bool dispatch(EUROPA::TimelineId const &tl,
+                            EUROPA::TokenId const &tok) =0;
       void recalled(EUROPA::TokenId const &tok);
 
       void setStream() const;
@@ -399,7 +402,6 @@ namespace TREX {
       void add_state_var(EUROPA::TimelineId const &obj);
       
       bool relax(bool destructive);
-      virtual void do_recall() =0;
       
       void print_plan(std::ostream &out, bool expanded=false) const;
       
@@ -448,7 +450,8 @@ namespace TREX {
       private:
         void notifyAdded(EUROPA::TokenId const & token);
         void notifyRemoved(EUROPA::TokenId const & token);
-      
+        void notifyDeactivated(EUROPA::TokenId const & token);
+     
         EUROPA::TokenSet m_roots;
         Assembly *m_owner;
       }; // TREX::europa::Assembly::root_tokens

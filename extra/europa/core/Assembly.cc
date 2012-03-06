@@ -139,6 +139,11 @@ void Assembly::root_tokens::notifyRemoved(EUROPA::TokenId const & token) {
   }
 }
 
+void Assembly::root_tokens::notifyDeactivated(EUROPA::TokenId const &token) {
+  if( NULL!=m_owner )
+    m_owner->cancel(token);  
+}
+
 /*
  * class TREX::europa::Assembly;
  */
@@ -362,8 +367,6 @@ bool Assembly::relax(bool destructive) {
   // Clean up decisions made lastly 
   synchronizer()->reset();
   planner()->reset();
-  // recall all the external requests
-  do_recall();
   // Remove dangling token from past decisions  
   EUROPA::TokenSet const &toks = m_roots->roots();
   EUROPA::TokenSet to_erase;
