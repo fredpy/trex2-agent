@@ -1,3 +1,10 @@
+/* -*- java -*-
+ */
+/**
+ * 
+ *
+ * @author <a href="mailto:fpy@porbeagle.shore.mbari.org">Frederic Py</a>
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -31,100 +38,91 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "TREX.nddl"
+package org.trex.vitre;
 
-class Light extends AgentTimeline {
-    predicate On {}
-    predicate Off {}
+public class Tick
+{
+    private int     m_value;
+    private boolean m_isInfinity, m_isPositive;
 
-    Light(Mode _mode) {
-	super(_mode);
+    private Tick(boolean pos) {
+	m_isInfinity = true;
+	m_isPositive = pos;
     }
-}
 
-class Switch extends AgentTimeline {
-    predicate Up { bool foo; }
-    predicate Down { bool foo; }
+    public static final Tick PLUS_INF = new Tick(true);
+    public static final Tick MINUS_INF = new Tick(false);
 
-    Switch(Mode _mode) {
-	super(_mode);
+    public Tick(int value) {
+	m_isInfinity = false;
+	m_value = value;
     }
-}
 
-class LightSwitch extends Timeline {
-    Switch controlled;
-    
-    predicate turnOff { duration = 1; }
-    predicate turnOn { duration = 1; }
-
-    LightSwitch(Switch sw) {
-	controlled = sw;
+    public boolean equals(Object obj) {
+	if( this==obj )
+	    return true;
+	if( !( obj instanceof Tick ) )
+	    return false;
+	Tick other = (Tick)obj;
+	if( m_isInfinity!=other.m_isInfinity )
+	    return false;
+	if( m_isInfinity )
+	    return m_isPositive==other.m_isPositive;
+	else
+	    return m_value==other.m_value; 
     }
-}
 
-class Luminance extends AgentTimeline {
-    predicate Bright {}
-    predicate Dim {}
-    
-    Luminance(Mode _mode) {
-	super(_mode);
+    Tick next() {
+	if( m_isInfinity )
+	    return this;
+	else 
+	    return new Tick(m_value+1);
     }
-}
 
-
-LightSwitch::turnOn {
-    meets(object.controlled.Down);
-}
-
-LightSwitch::turnOff {
-    meets(object.controlled.Up);
-}
-
-Luminance::Bright {
-    met_by(LightSwitch.turnOn);
-}
-
-Luminance::Dim {
-    met_by(LightSwitch.turnOff);
-}
-
-Light::On {
-    starts(Switch.Down);
-    contained_by(Luminance.Bright);    
-}
-
-
-Light::Off {
-    contained_by(Luminance.Dim);
-}
-
-Switch::Up {
-    bool external;
-    contained_by(Light.Off);
-    foo == false;
-    isExternal(external);
-    if( external==false ) {
-	duration == end - start;
-	if( start<=AGENT_CLOCK ) {
-	    meets(object.Down next);
-	    if( next.state==ACTIVE || next.state==MERGED ) {
-		bind(duration, 1);
-	    }
-	}
+    Tick previous() {
+	if( m_isInfinity )
+	    return this;
+	else 
+	    return new Tick(m_value-1);
     }
-}
 
-Switch::Down {
-    bool external;
-    isExternal(external);
-    if( external==false ) {
-	duration == end - start;
-	if( start<=AGENT_CLOCK ) {
-	    meets(object.Up next);
-	    if( next.state==ACTIVE || next.state==MERGED ) {
-		bind(duration, 1);
-	    }
-	}
+    public int compareTo(Tick other) {
+	if( m_isInfinity ) {
+	    if( other.m_isInfinity ) {
+		if( m_isPositive )
+		    return other.m_isPositive?0:1;
+		else 
+		    return other.m_isPositive?-1:0;
+	    } else 
+		return m_isPositive?1:-1;
+	} else if( other.m_isInfinity )
+	    return other.m_isPositive?-1:1;
+	else 
+	    return m_value-other.m_value;
     }
-}
 
+    public String toString() {
+	if( m_isInfinity )
+	    if( m_isPositive )
+		return "+inf";
+	    else
+		return "-inf";
+	else 
+	    return Integer.toString(m_value);
+    }
+
+    public static Tick max(Tick a, Tick b) {
+	if( a.compareTo(b)>0 )
+	    return a;
+	else 
+	    return b;
+    }
+
+    public static Tick min(Tick a, Tick b) {
+	if( a.compareTo(b)<0 )
+	    return a;
+	else 
+	    return b;
+    }
+
+} // class Tick

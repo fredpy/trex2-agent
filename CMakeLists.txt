@@ -40,8 +40,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 ########################################################################
 project(trex)
 set(TREX_MAJOR 0)
-set(TREX_MINOR 3)
-set(TREX_PATCH 0)
+set(TREX_MINOR 2)
+set(TREX_PATCH 3)
 
 
 # CPack version numbers for release tarball name.
@@ -71,6 +71,7 @@ set(CPACK_SOURCE_IGNORE_FILES
 "log/[1-9][0-9]*\\\\.[0-9][0-9]*\\\\.[0-9][0-9]*/"
 "/\\\\.svn/"
 "\\\\.DS_Store$"
+"extra/europa/core"
 )
 include(CPack)
 
@@ -119,9 +120,6 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in 
     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doc CACHE STRING 
-    "Output directory for doxygen")
-  mark_as_advanced(DOXYGEN_OUTPUT)
   add_custom_target(doc
     ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

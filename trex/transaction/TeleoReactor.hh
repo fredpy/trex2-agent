@@ -92,7 +92,7 @@ namespace TREX {
        * The type used to refer to specific reactor
        */
       typedef graph::reactor_id                   ref_type;
-      /** @brief XML based factory
+      /** @brief XML based factor
        *
        * The type of the factory used to generate reactors from XML
        */
@@ -464,48 +464,6 @@ namespace TREX {
        * @sa ext_begin()
        */
       external_iterator ext_end();
-
-      typedef details::relation_iter internal_iterator;
-      
-      /** @brief Count the number of internal timelines
-       * 
-       * This methods indicates the number of internal timelines this reactor 
-       * currently owns
-       *
-       * @return the number of internla timleins of this reactor
-       *
-       * @sa count_internal_relations() const
-       */
-      size_type     count_internals() const {
-	return m_internals.size();
-      }
-      /** @brief Count the number of internal relations
-       *
-       * This method count the number of relations that this reactor have 
-       * with other reactors issued from its internla timelines.
-       *
-       * This number does not count the number of internal timelines but the 
-       * sum of all the reactors that are connected to this reactor through its internal 
-       * timelines
-       */
-      size_type     count_internal_relations() const;
-
-      /** @brief First internal relation iterator
-       *
-       * @sa count_internal_relations() const
-       * @sa int_end() const
-       */
-      internal_iterator int_begin() const {
-	return internal_iterator(m_internals.begin(), m_internals.end());
-      }
-      /** @brief Last internal relation iterator
-       *
-       * @sa count_internal_relations() const
-       * @sa int_begin() const
-       */
-      internal_iterator int_end() const {
-	return internal_iterator(m_internals.end(), m_internals.end());
-      }
 
     protected:
       /** @brief Constructor

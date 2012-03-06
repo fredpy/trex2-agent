@@ -1,9 +1,11 @@
 <Solver name="DefaultTestSolver">
+ 	<FlawFilter component="DeliberationFilter"/>
+
   	<ThreatManager defaultPriority="10">
     		<FlawHandler component="StandardThreatHandler"/>
   	</ThreatManager>
 
-  	<OpenConditionManager defaultPriority="100">
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
     		<FlawHandler component="StandardOpenConditionHandler"/>
   	</OpenConditionManager>
 

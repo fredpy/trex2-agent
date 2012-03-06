@@ -34,52 +34,39 @@
 
 option(WITH_EUROPA "Enable Europa plugin." ON) 
 
-
 if(WITH_EUROPA) 
   find_package(Europa 
     COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
     NDDL RulesEngine Solvers System)
+  
   if(EUROPA_FOUND)
-
-    configure_file(bits/europa_config.hh.in 
-      ${CMAKE_CURRENT_BINARY_DIR}/bits/europa_config.hh)
-    install(
-      FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/europa_config.hh 
-      DESTINATION include/trex/europa/bits
-      )
-
     include_directories(${EUROPA_INCLUDE_DIRS})
-    include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-    add_subdirectory(core)
-
     add_library(TREXeuropa SHARED 
+      Assembly.cc
+      Constraints.cc
+      DbCore.cc
+      DbSolver.cc
+      DeliberationFilter.cc
+      EuropaDomain.cc
       EuropaReactor.cc
-      europa_convert.cc
-      EuropaDomain.cc  
-      extensions/EarliestFirstFlawManager.cc      
-      # headers
-      config.hh
-      EuropaReactor.hh
-      EuropaEntity.hh
-      bits/europa_convert.hh
-      extensions/EarliestFirstFlawManager.hh
+      extensions/EarliestFirstFlawManager.cc
     )
 
-    target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
-  
+    set_property(TARGET TREXeuropa PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
+    set_property(TARGET TREXeuropa PROPERTY ${EUROPA_LIBRARIES})
+    target_link_libraries(TREXeuropa ${EUROPA_LIBRARIES} TREXtransaction)
+    
     install(TARGETS TREXeuropa DESTINATION lib) 
     trex_lib(TREXeuropa)
-  
+
     install(DIRECTORY . DESTINATION include/trex/europa
       FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
       PATTERN "private" EXCLUDE
-      PATTERN "deprecated" EXCLUDE
       PATTERN "cfg" EXCLUDE
       PATTERN ".svn" EXCLUDE)
-  
+
     trex_plugin(europa europa_plugin.cc)
-    target_link_libraries(europa_pg TREXeuropa)
+    target_link_libraries(europa_pg TREXeuropa)    
   else(EUROPA_FOUND)
     message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
   endif(EUROPA_FOUND)

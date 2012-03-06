@@ -37,13 +37,6 @@ add_library(TREXagent SHARED
     Agent.cc
     StepClock.cc
     RealTimeClock.cc
-    # headers
-    Clock.hh
-    Agent_fwd.hh
-    Agent.hh
-    RealTimeClock.hh
-    StepClock.hh
-    bits/agent_graph.hh
 )
 
 add_dependencies(core TREXagent)

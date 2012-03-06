@@ -1,3 +1,10 @@
+/* @(#)TEMPLATE.java.tpl
+ */
+/**
+ * 
+ *
+ * @author <a href="mailto:fpy@mbari1224.shore.mbari.org">Frederic Py</a>
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -31,26 +38,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_europa_GreedyFlawManager
-# define H_trex_europa_GreedyFlawManager
+package org.trex.vitre;
 
-# include <PLASMA/OpenConditionManager.hh>
+public class BadToken extends BadTickInterval
+{
+    public BadToken(String message) {
+	super(message);
+    }
 
-namespace TREX {
-  namespace europa {
-
-    class EarliestFirstFlawManager :public EUROPA::SOLVERS::OpenConditionManager {
-    public:
-      EarliestFirstFlawManager(EUROPA::TiXmlElement const &cfg);
-      
-    private:
-      bool betterThan(EUROPA::EntityId const &a, EUROPA::EntityId const &b,
-		      EUROPA::LabelStr &explanation);
-      
-    };
-
-
-  } // TREX::europa
-} // TREX
-
-#endif // H_trex_europa_GreedyFlawManager
+} // BadToken

@@ -51,7 +51,7 @@
 #ifndef H_Agent
 # define H_Agent
 
-# include "bits/agent_graph.hh"
+# include "agent_graph.hh"
 # include "Clock.hh"
 # include <trex/utils/PluginLoader.hh>
 

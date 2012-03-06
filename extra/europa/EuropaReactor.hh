@@ -31,84 +31,127 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_EuropaReactor 
-# define H_trex_EuropaReactor
+/** @file extra/europa/EuropaReactor.hh
+ * @brief Definition of an europa based reactor
+ * 
+ * This files defines the europa based deliberative reactor
+ * 
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup europa
+ */
+#ifndef H_EuropaReactor 
+# define H_EuropaReactor 
 
-# include "core/Assembly.hh"
+# include "DbCore.hh"
+# include "DeliberationFilter.hh"
 
 # include <trex/transaction/TeleoReactor.hh>
 
-# include <boost/bimap.hpp>
-
 namespace TREX {
   namespace europa {
-
-    class EuropaReactor:public TREX::transaction::TeleoReactor, protected Assembly {
+    
+    /** @brief Europa based deliberative reactor
+     * 
+     * This reactor is a reactor that is able to synchronize and deliberate 
+     * based on the europa-pso planning engine.
+     * It loads a nddl model and uses this model to deduces its internal 
+     * timelines values and post goals to its external timelines as execution 
+     * frontier advances.
+     * 
+     * Th EuropaReactor class itself is mostly a proxy that interfaces trex 
+     * callbacks with europa calls. and most of the implementation is on the 
+     * DbCore and Assembly classes
+     * 
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     * @sa DbCore
+     * @sa Assembly
+     */
+    class EuropaReactor :public TREX::transaction::TeleoReactor {
     public:
-      explicit EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
       ~EuropaReactor();
 
-    protected:
+      // EUROPA callbacks
+      void removed(EUROPA::TokenId const &tok);
+      void request(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
+      void relax();
+      void recall(EUROPA::TokenId const &tok);
+      void notify(EUROPA::ObjectId const &tl, EUROPA::TokenId const &tok);
+
+      bool in_scope(EUROPA::TokenId const &tok);
+
+      bool dispatch_window(EUROPA::ObjectId const &obj, 
+			   TREX::transaction::TICK &from, 
+			   TREX::transaction::TICK &to);
+
+      Assembly &assembly() {
+        return m_assembly;
+      }
+
+      TREX::utils::internals::LogEntry 
+      log(std::string const &context) {
+        return syslog(context);
+      }
+
+      void end_deliberation() {
+        m_assembly.mark_inactive();
+        m_completedThisTick = true;
+	if( m_steps>1 ) {
+	  syslog()<<"Deliberation completed in "<<m_steps<<" steps";
+	  m_core.archive();
+	  logPlan();
+	}
+      }
+
+      void logPlan(std::string fname=std::string()) const {
+	if( fname.empty() )
+	  fname = "plan";
+	std::string dbg_pln = manager().file_name(getName().str()+"."+fname+".dot");
+	std::ofstream of(dbg_pln.c_str());
+	m_assembly.logPlan(of);
+      }
+    private:
       // TREX transaction callbacks
-      void notify(TREX::transaction::Observation const &obs);
-      void handleRequest(TREX::transaction::goal_id const &request);
-      void handleRecall(TREX::transaction::goal_id const &request);
-      
+      void notify(TREX::transaction::Observation const &o);
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void handleRecall(TREX::transaction::goal_id const &g);
+
       // TREX execution callbacks
-      bool hasWork();
-      
       void handleInit();
       void handleTickStart();
       bool synchronize();
+      bool hasWork();
       void resume();
-      
-    private:
-      void discard(EUROPA::TokenId const &tok);
-      void cancel(EUROPA::TokenId const &tok);
-      bool dispatch(EUROPA::TimelineId const &tl, 
-                    EUROPA::TokenId const &tok);
-      
-      void apply_externals();
-      bool do_synchronize();
-      void apply_internals();
-                           
-                           
-      bool restrict_token(EUROPA::TokenId &tok, 
-			  TREX::transaction::Predicate const &pred);
 
+      typedef std::map<EUROPA::eint, TREX::transaction::goal_id> europa_mapping;
 
-      bool is_internal(EUROPA::LabelStr const &name) const {
-	return isInternal(TREX::utils::Symbol(name.c_str()));
-      }
-      bool is_external(EUROPA::LabelStr const &name) const {
-	return isExternal(TREX::utils::Symbol(name.c_str()));
-      }
+      europa_mapping m_external_goals;
+      europa_mapping m_internal_goals;
 
-      EUROPA::eint now() const {
-	return getCurrentTick();
+      Assembly m_assembly;
+      DbCore   m_core;
+
+      void reset_deliberation() {
+        m_planStart = getInitialTick();
+        m_steps = 0;
       }
-      EUROPA::IntervalIntDomain plan_scope() const;
-      EUROPA::eint initial_tick() const {
-	return getInitialTick();
+      bool deactivate_solver();
+      void set_filter(DeliberationFilter *filt) {
+	m_filter = filt;
       }
-      EUROPA::eint final_tick() const {
-	return getFinalTick();
-      }
-      EUROPA::edouble tick_duration() const {
-	return tickDuration();
-      }
-      void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
-                           
-      void logPlan(std::string const &base_name) const;
-    
-      typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map; 
-      goal_map m_active_requests;
-      goal_map m_dispatched;
       
-      bool m_completed_this_tick;
-    }; // TREX::europa::EuropaReactor
-			 
-  } // TREX::europa 
+      TREX::transaction::TICK m_planStart;
+      bool                    m_completedThisTick;
+      unsigned long           m_steps;
+
+      DeliberationFilter *m_filter;
+
+      friend class Assembly;
+      friend class DeliberationFilter;
+    }; //TREX::europa::EuropaReactor
+
+  } // TREX::europa
 } // TREX
 
-#endif // H_trex_EuropaReactor
+#endif // H_EuropaReactor

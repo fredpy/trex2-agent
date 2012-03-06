@@ -135,9 +135,6 @@ namespace boost {
      */
     typedef TREX::transaction::TeleoReactor::size_type          degree_size_type;
 
-    // Bidirectional Graph Concept
-    typedef TREX::transaction::TeleoReactor::internal_iterator in_edge_iterator;
-
     // Adjacency Graph Concept
     /** @brief Adjacency list iterator
      * 
@@ -199,12 +196,7 @@ namespace boost {
 		    TREX::transaction::TeleoReactor::external_iterator >
   out_edges(TREX::transaction::graph::reactor_id r,
 	    TREX::transaction::graph const &g) {
-    if( TREX::transaction::graph::null_reactor()!=r )
-      return std::make_pair(r->ext_begin(), r->ext_end());
-    else {
-      TREX::transaction::TeleoReactor::external_iterator null;
-      return std::make_pair(null, null);
-    }
+    return std::make_pair(r->ext_begin(), r->ext_end());
   }
   
   /** @brief source of a relation
@@ -276,29 +268,6 @@ namespace boost {
   out_degree(TREX::transaction::graph::reactor_id r,
 	     TREX::transaction::graph const &g) {
     return TREX::transaction::graph::null_reactor()==r?0:r->count_externals();
-  }
-
-  /*
-   * Bidirectional Graph Concept
-   */
-  inline std::pair<TREX::transaction::TeleoReactor::internal_iterator, 
-		   TREX::transaction::TeleoReactor::internal_iterator>   
-  in_edges(TREX::transaction::graph::reactor_id r, 
-	   TREX::transaction::graph const &g) {
-    return std::make_pair(r->int_begin(), r->int_end());
-  }
-
-  inline TREX::transaction::TeleoReactor::size_type 
-  in_degree(TREX::transaction::graph::reactor_id r, 
-	    TREX::transaction::graph const &g) {
-    if( TREX::transaction::graph::null_reactor()==r )
-      return 0;
-    return r->count_internal_relations();
-  }
-
-  inline TREX::transaction::TeleoReactor::size_type 
-  degree(TREX::transaction::graph::reactor_id r, TREX::transaction::graph const &g) {
-    return out_degree(r, g)+in_degree(r,g);
   }
   
   /*
@@ -461,7 +430,7 @@ namespace TREX {
 	 * @sa TREX::transaction::TeleoReactor::getName() const
 	 */
 	reference operator[](key_type r) const {
-	  static TREX::utils::Symbol const null_name("0x0");
+	  static TREX::utils::Symbol const null_name;
 
 	  if( graph::null_reactor()==r )
 	    return null_name;

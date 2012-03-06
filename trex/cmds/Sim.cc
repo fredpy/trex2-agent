@@ -118,14 +118,12 @@ namespace {
 
     if( !found ) {
       std::cerr<<"Unable to locate file \""<<name<<"\""<<std::endl;
-      s_log->syslog("WARN")<<"Unable to find request file \""<<name<<'\"';
       return false;
     } else {
       try {
 	std::cout<<"Loading \""<<file<<"\"... "<<std::flush;
 	boost::property_tree::ptree config;
 
-	s_log->syslog("INFO")<<"Loading request file \""<<name<<'\"';
 	read_xml(file, config, xml::no_comments|xml::trim_whitespace);
 	
 	if( config.empty() )
@@ -138,13 +136,10 @@ namespace {
 	}
 	return true;
       } catch(Exception const &te) {
-	s_log->syslog("ERROR")<<"TREX error while loading \""<<name<<"\": "<<te;
 	std::cerr<<"TREX error "<<te<<std::endl;
       } catch( std::exception const &e ) {
-	s_log->syslog("ERROR")<<"Exception while loading \""<<name<<"\": "<<e.what();
 	std::cerr<<"exception: "<<e.what()<<std::endl;
       } catch(...) {
-	s_log->syslog("ERROR")<<"Unknwon exception while loading \""<<name<<"\"";
 	std::cerr<<"Unknown error"<<std::endl;
       }
       return false;
@@ -212,7 +207,6 @@ int main(int argc, char **argv) {
   while( true ) {
     if( agent.missionCompleted() ) {
       std::cout<<"Mission completed."<<std::endl;
-      s_log->syslog("INFO")<<"Mission completed.";
       break;
     }
     TICK tick = agent.getCurrentTick();
@@ -224,7 +218,6 @@ int main(int argc, char **argv) {
     try {
       if( 'Q'==cmd ) {
 	std::cout<<"Goodbye"<<std::endl;
-	s_log->syslog("INFO")<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
 	while( agent.getCurrentTick()==tick && !agent.missionCompleted() )
@@ -282,7 +275,6 @@ int main(int argc, char **argv) {
       break;
     }
   }
-  s_log->syslog("INFO")<<"=============================== END sim ============================";
   return 0;
 }
 

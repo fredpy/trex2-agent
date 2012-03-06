@@ -278,7 +278,7 @@ namespace TREX {
        * This method is adding the list of all the attributes names defined
        * for this predicate at the end of @e attr. The @e all flag allows
        * to indicate that we want all the defined attributes even if their
-       * domain is full (meaning they are not really constrained)
+       * domain is full (meaning thay are not really constrained)
        *
        * @post attr list contains all the attributes appendded to it end
        */

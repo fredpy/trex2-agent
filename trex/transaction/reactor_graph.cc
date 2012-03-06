@@ -131,11 +131,9 @@ bool graph::kill_reactor(graph::reactor_id r) {
     if( pos->get()==r ) {
       // clean up relations
       syslog()<<"Destroying reactor \""<<r->getName()<<"\".";
+      m_reactors.erase(pos);
       if( pos_q->get()==r )
 	m_quarantined.erase(pos_q);
-      else 
-        r->isolate();
-      m_reactors.erase(pos);
       return true;
     }
   }

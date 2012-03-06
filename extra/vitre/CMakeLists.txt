@@ -32,22 +32,54 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-option(WITH_WITRE "Enable witre plugin (require Wt)" ON)
+option(WITH_VITRE "Enable Vitre plugin." ON) 
 
-if(WITH_WITRE) 
-  find_package(Wt REQUIRED)
-  include_directories(${Wt_INCLUDE_DIR})
-  add_library(TREXwitre SHARED
-     Witre.cc WitreServer.cc Popup.cc WitreGraph.hh )
-  target_link_libraries(TREXwitre 
-    ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
-    ${Boost_THREAD_LIBRARY} 
-    ${Boost_SIGNALS_LIBRARY} 
-    TREXtransaction)
- 
-  trex_plugin(witre witre_pg.cc)
-  target_link_libraries(witre_pg TREXwitre)	
-  #include_directories(${Wt_INCLUDE_DIR})
-  #trex_plugin(witre WitreServer.cc Witre.cc)
-  #target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
-endif(WITH_WITRE)
+if(WITH_VITRE)
+  find_package(Java COMPONENTS Development)
+
+  trex_plugin(vitre Vitre.cc)
+  target_link_libraries(vitre_pg TREXtransaction ${Boost_LIBRARIES})
+
+  if(${CMAKE_GENERATOR} MATCHES "Xcode")
+    message(STATUS "Will not compile Vitre.jar under Xcode")
+  else(${CMAKE_GENERATOR} MATCHES "Xcode")
+    if(Java_Development_FOUND)
+      enable_language(Java)
+      
+      # a macro to indicate to java where is the main class
+      macro(make_jar_executable target main_class)
+	get_target_property(var_loc "${target}" LOCATION)
+	add_custom_command(TARGET ${target} POST_BUILD 
+	  COMMAND ${CMAKE_Java_ARCHIVE} ufe ${var_loc} ${main_class} 
+	  COMMENT "Creating JAR entry point.")
+	UNSET(var_loc)
+      endmacro()
+
+      set(CMAKE_Java_FLAGS "-sourcepath \"${CMAKE_CURRENT_SOURCE_DIR}\"")
+
+      # following is a patch/hack to make cmake compiles jars files properly
+      # compile a Java file into an object file
+      file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.class")
+      set(CMAKE_Java_COMPILE_OBJECT
+	"<CMAKE_Java_COMPILER> <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/.class\""
+	)
+      # this is a place holder if java needed flags for javac they would go here.
+      set(CMAKE_Java_CREATE_STATIC_LIBRARY
+	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/.class\" ."
+	)
+      # end of the patch 
+      file(GLOB_RECURSE TREX_vitre_SOURCE_FILES
+	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} org/trex/vitre/*.java)
+
+      add_library(Vitre EXCLUDE_FROM_ALL ${TREX_vitre_SOURCE_FILES})
+
+      make_jar_executable(Vitre "org.trex.vitre.Vitre")
+      add_dependencies(Vitre vitre_pg)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Vitre.jar OPTIONAL 
+	DESTINATION shared/trex/java)
+      
+    else(Java_Development_FOUND)
+      message(STATUS "Will not compile Vitre.jar for lack of java compilation tools")
+    endif(Java_Development_FOUND)
+  endif(${CMAKE_GENERATOR} MATCHES "Xcode")
+endif(WITH_VITRE)

@@ -33,7 +33,6 @@
 ########################################################################
 
 add_library(TREXutils SHARED
-  # real source
   Exception.cc
   ErrnoExcept.cc
   SingletonDummy.cc
@@ -45,35 +44,6 @@ add_library(TREXutils SHARED
   Pdlfcn.cc
   PluginLoader.cc
   RStat.cc
-  # headers
-  Exception.hh
-  ErrnoExcept.hh
-  Factory.hh
-  Hashable.hh
-  IOstreamable.hh
-  LogManager.hh
-  Plugin.hh
-  PluginLoader.hh
-  RStat.hh
-  SharedVar.hh
-  SingletonUse.hh
-  StringExtract.hh
-  Symbol.hh
-  TREXversion.hh
-  TextLog.hh
-  TimeUtils.hh
-  XmlFactory.hh
-  XmlUtils.hh
-  id_mapper.hh
-  bits/SingletonDummy.hh
-  bits/SingletonServer_fwd.hh
-  bits/SingletonWrapper.hh
-  # template source code
-  bits/Factory.tcc
-  bits/SingletonUse.tcc
-  bits/SingletonWrapper.tcc
-  bits/Symbol.tcc
-  bits/XmlFactory.tcc
 )
 
 add_dependencies(core TREXutils)

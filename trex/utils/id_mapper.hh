@@ -259,7 +259,7 @@ namespace TREX {
       ~id_mapper() {}
 
 
-      /** @brief iterator comparison to a key
+      /** @brief iterator comaparison to a key
        *
        * @tparam Iter the type of iterator
        * @param[in] x   An iterator
