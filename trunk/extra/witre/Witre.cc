@@ -189,6 +189,12 @@ WitreApplication::~WitreApplication()
 
 void WitreApplication::urlPage(const std::string& path)
 {
+    if(path.empty())
+    {
+        webpage->setCurrentIndex(0);
+        WApplication::instance()->setInternalPath("/default");
+        return;
+    }
     std::string* url = parseUrl(path);
     if(url[0]=="text")
     {
