@@ -619,10 +619,7 @@ void Agent::synchronize() {
   //  exploration.
   while( !queue.empty() ) {
     reactor_id r = queue.front();
-    queue.pop_front();
-    // Update timelines for r
-    r->doNotify();
-
+    queue.pop_front();        
     // synchronization
     if( r->doSynchronize() ) {
       double wr = r->workRatio();
@@ -662,13 +659,21 @@ bool Agent::executeReactor() {
     boost::tie(wr, r) = *(m_edf.begin());
     // syslog("step")<<"Executing reactor "<<r->getName()<<" (wr="<<wr<<")";
     m_edf.erase(m_edf.begin());
-    r->step();
-
-    wr = r->workRatio();
-    if( !std::isnan(wr) ) {
-      // syslog("step")<<"New work ratio for "<<r->getName()<<" is "<<wr;
-      m_edf.insert(std::make_pair(wr, r));
-      return true;
+    try {
+      r->step();
+      
+      wr = r->workRatio();
+      if( !std::isnan(wr) ) {
+        // syslog("step")<<"New work ratio for "<<r->getName()<<" is "<<wr;
+        m_edf.insert(std::make_pair(wr, r));
+        return true;
+      }
+    } catch(Exception const &e) {
+      syslog("WARN")<<"Exception caught while executing reactor step:\n"<<e;
+    } catch(std::exception const &se) {
+      syslog("WARN")<<"C++ exception caught while executing reactor step:\n"<<se.what();      
+    } catch(...) {
+      syslog("WARN")<<"Unknown exception caught while executing reactor step.";            
     }
     return !m_edf.empty();
   }
