@@ -392,20 +392,6 @@ namespace TREX {
        * @sa synchronize()
        */
       bool   doSynchronize();
-      /** @brief Request new observations
-       *
-       * This method ids called by the agent after its synchronization in
-       * order to collect new observations on the reactor's @e Internal
-       * timelines. This function identifies all the timelines for which
-       * a postObservation has been called and will broad cast the last
-       * obserbvation produced for this tick if it exist. Resulting on
-       * notify calls on every clients
-       *
-       * @sa doSynchronize()
-       * @sa postObservation()
-       * @sa notify(Obserbvation const &)
-       */
-      void   doNotify();
       /** @brief reactor deliberation work load
        *
        * This method calls hasWork method and, depending on the returned value
@@ -885,6 +871,20 @@ namespace TREX {
 
 	void openTick();
       }; // TREX::transaction::TeleoReactor::Logger
+
+      /** @brief Request new observations
+       *
+       * This method is called at the beginnin of synchronizayion in order 
+       * for the reactor to collect its @e External observations
+       * This function identifies all the @e External timelines for which
+       * a postObservation has been called and will collect the last
+       * obserbvation produced for this tick if it exist.
+       *
+       * @sa doSynchronize()
+       * @sa postObservation()
+       * @sa notify(Obserbvation const &)
+       */
+      void   doNotify();
 
       Logger *m_trLog;
 

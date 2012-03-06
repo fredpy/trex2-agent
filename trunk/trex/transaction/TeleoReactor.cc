@@ -278,21 +278,26 @@ details::external TeleoReactor::find_external(TREX::utils::Symbol const &name) {
 // modifers/callbacks
 
 double TeleoReactor::workRatio() {
-  if( hasWork() ) {
-    double ret = m_deadline;
-    ret -= getCurrentTick();
-    if( ret<=0.0 )
-      ret = m_nSteps+1;
-    else {
-      ret += 1.0;
-      ret *= m_nSteps+1;
+  try {
+    if( hasWork() ) {
+      double ret = m_deadline;
+      ret -= getCurrentTick();
+      if( ret<=0.0 )
+        ret = m_nSteps+1;
+      else {
+        ret += 1.0;
+        ret *= m_nSteps+1;
+      }
+      return 1.0/ret;
     }
-    return 1.0/ret;
-  } else {
-    m_nSteps = 0;
-    m_deadline = getCurrentTick()+1+getLatency();
-    return NAN;
+  } catch(std::exception const &se) {
+    syslog("WARN")<<"Exception during hasWork question:"<<se.what();
+  } catch(...) {
+    syslog("WARN")<<"Unknown Exception during hasWork question";
   }
+  m_nSteps = 0;
+  m_deadline = getCurrentTick()+1+getLatency();
+  return NAN;
 }
 
 void TeleoReactor::postObservation(Observation const &obs) {
@@ -415,6 +420,9 @@ void TeleoReactor::doNotify() {
 
 bool TeleoReactor::doSynchronize() {
   try {
+    // coolect information from external timelines 
+    doNotify();
+    
     // Update the timelines here !
     if( synchronize() ) {
       for(internal_set::const_iterator i=m_updates.begin();
