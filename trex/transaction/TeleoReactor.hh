@@ -374,7 +374,7 @@ namespace TREX {
        *
        * @sa handleTickStart()
        */
-      void   newTick();
+      bool   newTick();
       /** @brief Synchronization callback
        *
        * This method is called by the agent to make the reactor execute

@@ -110,7 +110,7 @@ namespace TREX {
 	 * @sa TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)
 	 */
 	void finish_vertex(graph::reactor_id r, graph const &g) {
-	  if( is_valid(r) ) {
+	  if( is_valid(r,g) ) {
 	    if( !r->initialize(m_final) ) {
 	      g.isolate(r);
 	    }
@@ -200,8 +200,9 @@ namespace TREX {
 	  // First encounter with r :
 	  //   - inform him that a new tick has started
 	  //        this will result on dispatching its goals if possible
-	  if( is_valid(r) )
-	    r->newTick();
+	  if( is_valid(r,g) )
+	    if( !r->newTick() )
+              g.isolate(r);
 	}
 
 	/** @brief Finish vertex callback
@@ -217,7 +218,7 @@ namespace TREX {
 	void finish_vertex(graph::reactor_id r, graph const &g) {
 	  // Completed all the vertex below :
 	  //   - this the next candidate to be synchronized
-	  if( is_valid(r) )
+	  if( is_valid(r,g) )
 	    m_sync->push_back(r);
 	}
 
@@ -609,6 +610,9 @@ void Agent::synchronize() {
 
   // Identify synchronization order while notifying of the new tick
   boost::depth_first_search(me(), boost::visitor(sync));
+  size_t n_failed = cleanup();
+  if( n_failed>0 )
+    syslog("WARN")<<n_failed<<" reactors failed to start tick "<<getCurrentTick();
   // Execute synchronization
   //  - could be done with a dfs but we choose for now to do it using the
   //  output list of sync_scheduller to avoid a potentially costfull graph
