@@ -6,6 +6,7 @@
 #include<Wt/WPaintDevice>
 #include<Wt/WCanvasPaintDevice>
 #include<Wt/WPointF>
+#include <Wt/WRectArea>
 
 #include "WitreServer.hh"
 
@@ -187,6 +188,7 @@ namespace TREX {
         private:
             const graph& pGraph;
             std::map<utils::Symbol, Wt::WRectF> placement;
+            Wt::WPainter* paint;
 
         protected:
             void paintEvent(Wt::WPaintDevice* temp)
@@ -235,6 +237,8 @@ namespace TREX {
                     }
                 }
 
+                //Adds interactive areas to the graph picture
+                addInteractiveAreas();
             }
 
             double getSlope(Wt::WPointF& top, Wt::WPointF& bottom)
@@ -350,20 +354,38 @@ namespace TREX {
             {
                 if(slope!=numeric_limits<double>::infinity())
                 {
-                    double b = tCenter.y() - tCenter.x()*slope;
-                    for(int i=rect.x(); i!=rect.x()+rect.width(); i++)
+                    bool test = false;
+                    if(slope>0)
                     {
-                        int y = slope*i+b;
-                        if(rect.contains(i,y))
+                        if(rect.x()>=tCenter.x() && rect.x()+rect.width()<=bCenter.x())
                         {
-                            return true;
+                            test = true;
+                        }
+                    }
+                    else
+                    {
+                        if(rect.x()>=bCenter.x() && rect.x()+rect.width()<=tCenter.x())
+                        {
+                            test = true;
+                        }
+                    }
+                    if(test)
+                    {
+                        double b = tCenter.y() - tCenter.x()*slope;
+                        for(int i=rect.x(); i!=rect.x()+rect.width(); i++)
+                        {
+                            int y = slope*i+b;
+                            if(rect.contains(i,y))
+                            {
+                                return true;
+                            }
                         }
                     }
                     return false;
                 }
                 else
                 {
-                    if(rect.x()<=tCenter.x()&&rect.x()+rect.width()>=tCenter.x())
+                    if(rect.x()<=tCenter.x()&&rect.x()+rect.width()>=bCenter.x())
                     {
                         if(rect.y()>tCenter.y()&&rect.y()+rect.height()<bCenter.y())
                         {
@@ -372,8 +394,8 @@ namespace TREX {
                         return false;
                     }
                 }
-              return false; // fpy : I added this return at the end ...
-                            //       I gueess it should return false if all the above ifs failed 
+                return false; // fpy : I added this return at the end ...
+                              //       I gueess it should return false if all the above ifs failed
             }
 
             void drawArrow(Wt::WPainter& painter, Wt::WPointF& center, const double& slope)
@@ -408,8 +430,16 @@ namespace TREX {
                 painter.drawLine(center,line2);
             }
 
-
-
+            void addInteractiveAreas()
+            {
+                std::map<utils::Symbol, Wt::WRectF>::iterator it;
+                for(it=placement.begin(); it!=placement.end(); it++)
+                {
+                    Wt::WRectArea* area = new Wt::WRectArea((*it).second);
+                    area->setToolTip((*it).first.str());
+                    this->addArea(area);
+                }
+            }
 
         public:
             PaintedGraph(const graph& temp)
@@ -417,6 +447,7 @@ namespace TREX {
             {
                 resize(1000,1000);
             }
+
     };
 
     class WitreGraphContainer : public Wt::WContainerWidget
