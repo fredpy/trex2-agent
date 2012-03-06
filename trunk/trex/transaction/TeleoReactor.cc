@@ -371,7 +371,7 @@ bool TeleoReactor::initialize(TICK final) {
   return false;
 }
 
-void TeleoReactor::newTick() {
+bool TeleoReactor::newTick() {
   if( m_firstTick ) {
     if( getCurrentTick()!=m_initialTick ) {
       syslog("WARN")<<"Updating initial tick from "<<m_initialTick
@@ -383,15 +383,26 @@ void TeleoReactor::newTick() {
   if( NULL!=m_trLog )
     m_trLog->newTick(getCurrentTick());
 
-  handleTickStart(); // allow derived class processing
+  try {
+    handleTickStart(); // allow derived class processing
 
-  // Dispatched goals management
-  details::external i = ext_begin();
-  details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
-				  // I do nothing with it for now
-  // Manage goal dispatching
-  for( ; i.valid(); ++i )
-    i.dispatch(getCurrentTick(), dispatched);
+    // Dispatched goals management
+    details::external i = ext_begin();
+    details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
+                                    // I do nothing with it for now
+    
+    // Manage goal dispatching
+    for( ; i.valid(); ++i )
+      i.dispatch(getCurrentTick(), dispatched);
+    return true;
+  } catch(TREX::utils::Exception const &e) {
+    syslog("ERROR")<<"Exception caught during new tick:\n"<<e;
+  } catch(std::exception const &se) {
+    syslog("ERROR")<<"C++ excption caught during new tick:\n"<<se.what();    
+  } catch(...) {
+    syslog("ERROR")<<"Unknown exception caught during new tick";    
+  }
+  return false;
 }
 
 void TeleoReactor::doNotify() {

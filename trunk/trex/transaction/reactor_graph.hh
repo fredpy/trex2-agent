@@ -424,6 +424,7 @@ namespace TREX {
        * @sa cleanup()
        */
       reactor_id isolate(reactor_id r) const;
+      bool is_isolated(reactor_id r) const;
       /** @brief Kill all isolated reactors
        *
        * Kill all the reactors which have been explicitedly isolated in this
@@ -432,7 +433,7 @@ namespace TREX {
        * @return the numeof reactor that have been killed
        *
        * @sa isolate(reactor_id) const
-       * @sa kill_reactor(reeactor_id)
+       * @sa kill_reactor(reactor_id)
        */
       size_t cleanup();
 

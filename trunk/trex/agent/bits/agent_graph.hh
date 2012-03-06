@@ -143,8 +143,8 @@ namespace TREX {
        */
       void back_edge(TREX::transaction::graph::relation_type const &rel,
 		     TREX::transaction::graph const &g) {
-        if( g.null_reactor()!=boost::source(rel, g) &&
-           g.null_reactor()!=boost::target(rel, g) )
+        if( is_valid(boost::source(rel, g), g) &&
+            is_valid(boost::target(rel, g), g) )
           throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
       }
 
@@ -152,18 +152,20 @@ namespace TREX {
     protected:
       /** @brief Check for node validity
        * @param[in] r A reactor reference
+       * @param[in] g The graph supporting @p r
        *
        * Check that @p r referes to an exisiting reactor. This method is
-       * used during graph traversal to vcheck that the an edge is not pointing
-       * to nothing
+       * used during graph traversal to check that the an edge is not pointing
+       * to nothing or to a node that has been isolated
        *
        * @retval true if @p r refers to a reactor
        * @retval false otherwise
        *
        * @sa TREX::transaction::garph::null_reactor()
        */
-      bool is_valid(TREX::transaction::graph::reactor_id r) const {
-	return TREX::transaction::graph::null_reactor()!=r;
+      bool is_valid(TREX::transaction::graph::reactor_id r,
+                    TREX::transaction::graph const &g) const {
+	return TREX::transaction::graph::null_reactor()!=r &&  !g.is_isolated(r);
       }
 
     private:

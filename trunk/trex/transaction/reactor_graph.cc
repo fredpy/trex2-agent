@@ -84,6 +84,11 @@ TREX::utils::internals::LogEntry graph::syslog(std::string const &context) const
   return m_log->syslog(oss.str());
 }
 
+bool graph::is_isolated(graph::reactor_id r) const {
+  return m_quarantined.find(r->getName())!=m_quarantined.end();
+}
+
+
 void graph::clear() {
   while( !m_reactors.empty() ) {
     syslog()<<"Disconnecting \""<<m_reactors.front()->getName()<<"\" from the graph.";
