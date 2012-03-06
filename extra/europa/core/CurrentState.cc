@@ -94,12 +94,12 @@ CurrentState::CurrentState(Assembly &assembly, EUROPA::TimelineId const &timelin
   // Now extract the default predicate (if any)
   EUROPA::ConstrainedVariableId default_attr = assembly.default_pred(timeline);
   
-  // For now I keep this default behavior that prohibits to have nno default 
+  // For now I keep this default behavior that prohibits to have no default 
   // It may change in the future 
-  if( !default_attr->isSpecified() )
+  if( !default_attr->lastDomain().isSingleton() )
     throw EuropaException("Agent timeline "+timeline->getName().toString()+
 			  " does not specify its default predicate.");
-  m_pred_default = default_attr->getSpecifiedValue();
+  m_pred_default = default_attr->lastDomain().getSingletonValue();
 
   // Now I need to check that this rpedicate is valid
   if( !assembly.schema()->isPredicate(predicate_name(timeline, m_pred_default)) ) 
