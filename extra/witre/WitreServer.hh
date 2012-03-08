@@ -73,6 +73,7 @@ namespace TREX {
       const std::queue<std::string> receiveObs() { return observations; };
       bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); return now; };
+      std::string getDependencies(std::string name);
 
       TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
       TREX::transaction::Goal getGoal(std::string obs, std::string prd);
@@ -114,6 +115,7 @@ namespace TREX {
       std::vector<utils::Symbol> externalTimelines;
       std::map<utils::Symbol, int> rel_level;
       std::queue<std::string> observations;
+      WitrePaintSearch::GraphMap timelineGraph;
 
 
       bool attach(WitreReactor &r);

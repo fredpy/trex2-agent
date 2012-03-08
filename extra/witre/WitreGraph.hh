@@ -4,7 +4,6 @@
 #include<Wt/WPaintedWidget>
 #include<Wt/WPainter>
 #include<Wt/WPaintDevice>
-#include<Wt/WCanvasPaintDevice>
 #include<Wt/WPointF>
 #include <Wt/WRectArea>
 

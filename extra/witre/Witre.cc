@@ -78,6 +78,15 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
 
     setTitle("Witre - trex "+TREX::version::str());
 
+    // Javascript code for highlighting the dependencies of the timelines
+    std::stringstream highlight;
+    highlight<<"function highlight(sender, color)"
+             <<"{ var child = sender.parentNode.childNodes; var array = sender.getAttribute(\"dependencies\").split(\"&&\");"
+             <<" for(var i=0; i<child.length; i++)"
+             <<" { for(name in array) { if(array[name]==child[i].getAttribute(\"name\"))"
+             <<" { child[i].lastChild.style.backgroundColor = (color ? \"#E0FFFF\":\"white\"); }}}}";
+    this->declareJavaScriptFunction("highlight", highlight.str());
+
     //setCssTheme("Polished");
     //Creating the containers for layout
     Wt::WContainerWidget* north = new Wt::WContainerWidget();
@@ -277,8 +286,12 @@ void WitreApplication::post()
     allPanels[name].push_front(panel);
     panel->setCentralWidget(new Wt::WText(observ+" since "+time)); // Addes the most recent observation to webpage
     panel->setObjectName(name); // Names the box by the timeline
+    panel->setAttributeValue("name", name);
     panel->setAttributeValue("level", level);
     panel->setAttributeValue("since", time);
+    panel->setAttributeValue("dependencies", wServer->getDependencies(name));
+    panel->setAttributeValue("onmouseover", "Wt.highlight("+panel->jsRef()+", true)");
+    panel->setAttributeValue("onmouseout", "Wt.highlight("+panel->jsRef()+", false)");
     if(!tLineMap[name])
     {
         panel->hide();

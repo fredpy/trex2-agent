@@ -151,6 +151,26 @@ void WitreServer::disconnect(WitreApplication *client)
         assert(false);
 }
 
+std::string WitreServer::getDependencies(std::string name)
+{
+    WitrePaintSearch::GraphMap::iterator it;
+    boost::mutex::scoped_lock lock(mutex_);
+    for(it=timelineGraph.begin(); it!=timelineGraph.end(); it++)
+    {
+        if((*it).first==name)
+        {
+            std::list<utils::Symbol>::iterator connection;
+            std::stringstream msg;
+            for(connection = (*it).second.connections.begin(); connection!=(*it).second.connections.end(); connection++)
+            {
+                msg<<((connection!=(*it).second.connections.begin())?"&&":"")<<*connection;
+            }
+            return msg.str();
+        }
+    }
+    return "";
+}
+
 /*
  * by deriving from graph::timelines_listener I can now be informed
  * from new timeline created in the agent at any time
@@ -177,6 +197,9 @@ void WitreServer::handleInit() {
     graph::timelines_listener::initialize();
     WitreGraph vis(rel_level);
     boost::depth_first_search(getGraph(), boost::visitor(vis));
+    //Getting the timeline Graph dependencies
+    WitrePaintSearch vis2(timelineGraph);
+    boost::depth_first_search(getGraph(), boost::visitor(vis2));
 }
 
 
