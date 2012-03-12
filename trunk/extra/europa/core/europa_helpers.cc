@@ -38,6 +38,44 @@
 
 using namespace TREX::europa;
 
+void TREX::europa::details::restrict_base(EUROPA::TokenId const &tok, 
+                                          EUROPA::ConstrainedVariableId const &var, 
+                                          EUROPA::Domain const &dom) {
+  if( tok->isMerged() ) {
+    EUROPA::TokenId active = tok->getActiveToken();
+    EUROPA::ConstrainedVariableId avar = active->getVariable(var->getName()); 
+    
+    size_t count=0;
+    for(; !var->isActive(); ++count ) 
+      var->undoDeactivation();
+    var->restrictBaseDomain(dom);
+    for(size_t i=0; i<count; ++i)
+      var->deactivate();
+    avar->handleBase(var->baseDomain());
+  } else 
+    var->restrictBaseDomain(dom);
+}
+
+void TREX::europa::details::restrict_bases(EUROPA::TokenId const &tok) {
+  if( tok->isMerged() ) {    
+    EUROPA::TokenId active = tok->getActiveToken();
+    std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->getVariables();
+    std::vector<EUROPA::ConstrainedVariableId> const &avar = active->getVariables();
+    for(size_t i=1; i<tvar.size(); ++i) {
+      size_t count=0;
+      for(; !tvar[i]->isActive(); ++count ) 
+        tvar[i]->undoDeactivation();
+      tvar[i]->restrictBaseDomain(tvar[i]->lastDomain());
+      for(size_t j=0; j<count; ++j)
+        tvar[i]->deactivate();
+      avar[i]->handleBase(tvar[i]->baseDomain());
+    }
+  } else 
+    tok->restrictBaseDomains();
+}
+
+
+
 EUROPA::TokenId TREX::europa::details::parent_token(EUROPA::ConstrainedVariableId const &var) {
   EUROPA::EntityId ent = var->parent();
   

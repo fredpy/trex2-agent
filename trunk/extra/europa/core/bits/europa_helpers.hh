@@ -118,7 +118,12 @@ namespace TREX {
 	EUROPA::TokenId m_token, m_active;
         EUROPA::TokenSet m_merged;
       }; // TREX::europa::details::scoped_split
+      
 
+      void restrict_base(EUROPA::TokenId const &tok, EUROPA::ConstrainedVariableId const &var, 
+                         EUROPA::Domain const &dom);
+      void restrict_bases(EUROPA::TokenId const &tok);
+      
     } // TREX::europa::details
   } // TREX::europa
 } // TREX
