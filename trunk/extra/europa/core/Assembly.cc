@@ -425,8 +425,9 @@ void Assembly::archive() {
       }
     }
     
-    for(EUROPA::TokenSet::const_iterator i=(*t)->slaves().begin(); 
-        (*t)->slaves().end()!=i; ++i) {
+    EUROPA::TokenSet slaves_t = (*t)->slaves();
+    for(EUROPA::TokenSet::const_iterator i=slaves_t.begin(); 
+        slaves_t.end()!=i; ++i) {
     
       if( (*i)->isInactive() )
         to_del.insert(*i);
