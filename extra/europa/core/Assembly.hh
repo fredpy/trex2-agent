@@ -75,6 +75,13 @@ namespace TREX {
 
 	bool operator()(CurrentStateId const &timeline) const;
       }; // TREX::europa::details::is_internal
+      
+      struct token_id_traits {
+	typedef EUROPA::TokenId base_type;
+	typedef EUROPA::eint id_type;
+	
+	static id_type get_id(base_type const &t);         
+      }; // TREX::europa::details::token_id_traits 
 
     } // TREX::europa::details
 
@@ -401,9 +408,18 @@ namespace TREX {
       void init_clock_vars();
       void add_state_var(EUROPA::TimelineId const &obj);
       
+      bool relax(bool destructive, std::string const &fname) {
+        if( relax(destructive) ) {
+          std::ofstream out(fname.c_str());
+          print_plan(out);
+          return true;
+        }
+        return false;
+      }
       bool relax(bool destructive);
+      void archive();
       
-      void print_plan(std::ostream &out, bool expanded=false) const;
+      void print_plan(std::ostream &out, bool expanded=true) const;
       
     private:
       static std::string const MODE_ATTR;
@@ -443,6 +459,9 @@ namespace TREX {
         EUROPA::TokenSet const &roots() const {
           return m_roots;
         }
+        EUROPA::TokenSet const &committed() const {
+          return m_committed;
+        }
         
         void attach(Assembly *owner) {
           m_owner = owner;
@@ -451,9 +470,12 @@ namespace TREX {
         void notifyAdded(EUROPA::TokenId const & token);
         void notifyRemoved(EUROPA::TokenId const & token);
         void notifyDeactivated(EUROPA::TokenId const & token);
+        void notifyCommitted(EUROPA::TokenId const & token);
+       
      
         EUROPA::TokenSet m_roots;
-        Assembly *m_owner;
+        EUROPA::TokenSet m_committed;
+        Assembly *m_owner;        
       }; // TREX::europa::Assembly::root_tokens
       
       std::auto_ptr<root_tokens> m_roots;
@@ -472,6 +494,15 @@ namespace TREX {
 			      bool &undefined);
 
     private:
+      void terminate(EUROPA::TokenId const &token);
+      void doDiscard(EUROPA::TokenId const &tok);
+      
+      
+    
+      
+      typedef TREX::utils::list_set<details::token_id_traits> token_set; 
+      token_set m_terminated;
+      
       EUROPA::SOLVERS::SolverId m_deliberation_solver;
       EUROPA::SOLVERS::SolverId m_synchronization_solver;
 

@@ -251,10 +251,11 @@ void EuropaReactor::apply_externals() {
 
 bool EuropaReactor::do_synchronize() {
   if( !synchronizer()->solve() ) {
+    std::string full_name = manager().file_name(getName().str()+".relax.dot");
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    if( !( relax(false) && synchronizer()->solve() ) ) {
+    if( !( relax(false, full_name) && synchronizer()->solve() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      return relax(true) && synchronizer()->solve();
+      return relax(true, full_name) && synchronizer()->solve();
     }
   }
   return true;
@@ -306,10 +307,10 @@ bool EuropaReactor::synchronize() {
   me.logPlan("tick");
   BOOST_SCOPE_EXIT((&me)) {
     me.synchronizer()->clear();    
+    me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
-    me.logPlan("synch");
   } BOOST_SCOPE_EXIT_END
   
   // First step : propagate external state 
@@ -328,8 +329,7 @@ bool EuropaReactor::synchronize() {
         if( cur->isMerged() )
           m_dispatched.left.erase(cur->getActiveToken());
       }
-      
-      
+
       m_completed_this_tick = false;
     }
     
@@ -371,10 +371,13 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
+      archive();
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
-      }
+      }/* else 
+        logPlan("plan"); // log the plan anyway
+      */
     }
   }
   return !m_completed_this_tick;

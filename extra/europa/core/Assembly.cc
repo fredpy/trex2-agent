@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Assembly.hh"
+#include "bits/europa_helpers.hh"
 #include "private/Schema.hh"
 #include "private/CurrentState.hh"
 
@@ -122,6 +123,11 @@ EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentSta
   return EUROPA::TimelineId::noId();
 }
 
+EUROPA::eint details::token_id_traits::get_id(EUROPA::TokenId const &t) {
+  return t->getKey();
+}
+
+
 /*
  * class TREX::europa::Assembly::root_tokens;
  */
@@ -132,10 +138,11 @@ void Assembly::root_tokens::notifyAdded(EUROPA::TokenId const & token) {
 }
 
 void Assembly::root_tokens::notifyRemoved(EUROPA::TokenId const & token) {
+  m_committed.erase(token);
   if( token->master().isNoId() ) {
     m_roots.erase(token);
     if( NULL!=m_owner )
-      m_owner->discard(token);
+      m_owner->doDiscard(token);
   }
 }
 
@@ -143,6 +150,12 @@ void Assembly::root_tokens::notifyDeactivated(EUROPA::TokenId const &token) {
   if( NULL!=m_owner )
     m_owner->cancel(token);  
 }
+
+void Assembly::root_tokens::notifyCommitted(EUROPA::TokenId const & token) {
+  m_committed.insert(token);
+  m_roots.erase(token);
+}
+
 
 /*
  * class TREX::europa::Assembly;
@@ -356,11 +369,134 @@ EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
   return tok;
 }
 
+void Assembly::doDiscard(EUROPA::TokenId const &tok) {
+  m_terminated.erase(tok->getKey());
+  discard(tok);
+}
+
+
 void Assembly::recalled(EUROPA::TokenId const &tok) {
   // Very aggressive way to handle this 
   if( !tok->isInactive() )
     tok->cancel();
   tok->discard();
+}
+
+void Assembly::terminate(EUROPA::TokenId const &token) {
+  if( m_terminated.insert(token).second ) {
+    debugMsg("trex:token", "Terminated token "<<token->toString());
+  }
+//  if( token->canBeCommitted() ) 
+//    token->commit();
+}
+
+
+void Assembly::archive() {
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  EUROPA::TokenSet to_del;
+  
+  // Process first the already committed tokens
+  EUROPA::TokenSet::const_iterator t;
+  for(t=m_roots->committed().begin(); m_roots->committed().end()!=t; ++t) {
+    bool can_delete = true;
+    EUROPA::TokenSet merged_t = (*t)->getMergedTokens();
+    
+    
+    for(EUROPA::TokenSet::const_iterator i=merged_t.begin(); 
+        merged_t.end()!=i; ++i) {
+      EUROPA::TokenId master = (*i)->master();
+      if( master.isId() ) {
+        if( master->isCommitted() ) {
+          std::vector<EUROPA::ConstrainedVariableId> const &actives = (*t)->getVariables();
+          std::vector<EUROPA::ConstrainedVariableId> const &mergeds = (*i)->getVariables();
+          (*i)->cancel();
+          constraint_engine()->propagate();
+          for(size_t v=1; v<actives.size(); ++v)
+            actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
+          to_del.insert(*i);
+        } else 
+          can_delete=false;
+      } else {
+        if( (*i)->isFact() ) {
+          (*t)->makeFact();
+          to_del.insert(*i);
+        } else 
+          can_delete = false;
+      }
+    }
+    
+    for(EUROPA::TokenSet::const_iterator i=(*t)->slaves().begin(); 
+        (*t)->slaves().end()!=i; ++i) {
+    
+      if( (*i)->isInactive() )
+        to_del.insert(*i);
+      else {
+        bool ended;
+        can_delete = false;
+        
+        
+        if( (*i)->isActive() ) {
+          if( (*i)->isCommitted() ) {
+            (*i)->removeMaster(*t);
+            ended = true;
+          } else
+            ended = (*i)->end()->lastDomain().getUpperBound()<now();
+        } else {          
+          details::restrict_bases(*i);
+                    
+          ended = (*i)->end()->baseDomain().getUpperBound()<now();
+        }
+        if( ended )
+          m_terminated.insert(*i);
+      }
+    }
+    if( can_delete )
+      to_del.insert(*t);
+  }
+  for(t=to_del.begin(); to_del.end()!=t; ++t) {
+    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
+      m_terminated.erase((*t)->getKey());
+      if( !(*t)->isInactive() )
+        (*t)->cancel();
+      (*t)->discard();
+    }
+  }
+  to_del.clear();
+  
+  for(token_set::const_iterator t=m_terminated.begin(); m_terminated.end()!=t; ++t) {    
+    EUROPA::TokenId tok(*t);
+    
+    if( tok->isInactive() ) 
+      to_del.insert(*t); // May need some extra guard here
+    else if( tok->isMerged() ) {
+      EUROPA::TokenId active = tok->getActiveToken();
+      if( active->isCommitted() ) {
+        std::vector<EUROPA::ConstrainedVariableId> const &actives = active->getVariables();
+        std::vector<EUROPA::ConstrainedVariableId> const &mergeds = tok->getVariables();
+        tok->cancel();
+        constraint_engine()->propagate();
+        for(size_t v=1; v<actives.size(); ++v)
+          actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
+        to_del.insert(tok);        
+      } else 
+        m_terminated.insert(active);
+      continue; // would need more in here 
+    }
+    if(tok->canBeCommitted() )
+      tok->commit();
+  }
+  for(t=to_del.begin(); to_del.end()!=t; ++t) {
+    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
+      m_terminated.erase((*t)->getKey());
+      if( !(*t)->isInactive() )
+        (*t)->cancel();
+      (*t)->discard();
+    }
+  }
+  to_del.clear();
+  
+  constraint_engine()->propagate();
+  // plan_db()->archive(now()-1);
 }
 
 bool Assembly::relax(bool destructive) {
@@ -381,8 +517,7 @@ bool Assembly::relax(bool destructive) {
           if( !(*t)->isInactive() )
             (*t)->cancel();
           to_erase.insert(*t);
-        } else if( (*t)->canBeCommitted() )
-          (*t)->commit();
+        } 
       } else {
         // Removing the past goals
         if( is_goal || destructive ) {
@@ -392,12 +527,22 @@ bool Assembly::relax(bool destructive) {
         }
       }
     } else {
-      if( !( (*t)->isInactive() || (*t)->isCommitted() ) )
+      if( !( (*t)->isInactive() || (*t)->isFact() ) )
         (*t)->cancel();
     }
   }
   for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
     (*t)->discard();
+  
+  //  bool autoprop = constraint_engine()->getAutoPropagation();
+  //  constraint_engine()->setAutoPropagation(false);
+  //  for(EUROPA::TokenSet::const_iterator t=m_terminated.begin(); 
+  //      m_terminated.end()!=t; ++t) {
+  //    if( (*t)->isInactive() ) {
+  //      (*t)->activate();
+  //    }
+  //  }
+  //  constraint_engine()->setAutoPropagation(autoprop);
   return m_cstr_engine->propagate();
 }
 
@@ -489,13 +634,22 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
        <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() ) 
       out<<"incomplete\\n";
-    //    if( (*it)->isCommitted() ) 
-    //   out<<"commit\\n";
     std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
       // print all token attributes
-      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
+      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<" ("<<(*v)->baseDomain().toString()<<")\\n";
+    }
+    if( (*it)->isActive() && !expanded ) {
+      EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
+      if( !merged.empty() ) {
+        out<<"merged={";
+        EUROPA::TokenSet::const_iterator m = merged.begin();
+        out<<(*(m++))->getKey();
+        for(; merged.end()!=m; ++m)
+          out<<", "<<(*m)->getKey();
+        out<<"}\\n";
+      }
     }
     out<<"}\"";
     if( ignored(*it) )
@@ -512,7 +666,13 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     if( (*it)->isCommitted() ) {
       if( comma )
         styles<<',';
-      styles<<"dashed"; // commits are dashed
+      styles<<"bold"; // commits are bold
+      comma = true;
+    }
+    if( (*it)->isTerminated() ) {
+      if( comma )
+        styles<<',';
+      styles<<"dashed"; // terminated are dashed
       comma = true;
     }
     if( comma )
