@@ -108,12 +108,13 @@ namespace TREX {
       void declared(TREX::transaction::details::timeline const &timeline);
       void undeclared(TREX::transaction::details::timeline const &timeline);
 
+      void searchGraph();
+
 
       mutable boost::mutex mutex_;
       boost::thread thread_;
       std::vector<Connection> connections;
       std::vector<utils::Symbol> externalTimelines;
-      std::map<utils::Symbol, int> rel_level;
       std::queue<std::string> observations;
       WitrePaintSearch::GraphMap timelineGraph;
 
