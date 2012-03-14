@@ -1,0 +1,12 @@
+/* -*- C++ -*- */
+/** @defgroup plugins plug-ins
+ * @brief The set of plug-ins provided in the distribution
+ *
+ * This module list all the plug-ins provided as exemple or extensions of TREX.
+ * None of them are really required but they give an illustration on how to 
+ * implement TREX extensions or give the ability to use TREX fully with both 
+ * planning and execution without having to implement your own deliberative 
+ * reactor (@ref europa) or visual interface (@ref vitre).
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ */
