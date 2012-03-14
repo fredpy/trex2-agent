@@ -1,7 +1,10 @@
 #ifndef H_MBARI_Constraints
 # define H_MBARI_Constraints
 
-#include <extra/europa/Constraints.hh>
+#include <trex/europa/config.hh>
+
+#include <PLASMA/Constraint.hh>
+#include <PLASMA/Domain.hh>
 
 namespace mbari {
   namespace europa {
