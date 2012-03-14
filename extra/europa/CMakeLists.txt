@@ -71,7 +71,7 @@ if(WITH_EUROPA)
   trex_plugin(europa europa_plugin.cc)
   target_link_libraries(europa_pg TREXeuropa)
 
-  install(DIRECTORY trex DESTINATION include/trex/
+  install(DIRECTORY trex/ DESTINATION include/trex/
     FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
     PATTERN "private" EXCLUDE
     PATTERN ".svn" EXCLUDE)

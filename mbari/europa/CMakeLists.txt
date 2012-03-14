@@ -34,17 +34,15 @@
 #######################################################################
 
 if(WITH_EUROPA)
-  find_package(Europa 
-    COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
-    NDDL RulesEngine Solvers System)
-
   include_directories(${EUROPA_INCLUDE_DIRS})
-
+  include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
+  include_directories(${CMAKE_BINARY_DIR})
+  
   add_library(MBARIeuropa SHARED
     Constraints.cc
+    Constraints.hh
     )
 
-  set_property(TARGET MBARIeuropa PROPERTY COMPILE_DEFINITIONS ${EUROPA_FLAGS})
   target_link_libraries(MBARIeuropa
     MBARIshared
     TREXeuropa

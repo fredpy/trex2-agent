@@ -1,5 +1,9 @@
 #include "Constraints.hh"
 
+#include <trex/europa/EuropaPlugin.hh>
+#include <trex/europa/Assembly.hh>
+
+
 #include <mbari/shared/GeoUTM.hh>
 
 namespace {
@@ -29,7 +33,7 @@ namespace {
     return dom.intersect(_lb, _ub);
   }
 
-  class MBARIPlugin :public TREX::europa::SchemaPlugin {
+  class MBARIPlugin :public TREX::europa::EuropaPlugin {
   public:
     void registerComponents(TREX::europa::Assembly const &assembly) {
       TREX_REGISTER_CONSTRAINT(assembly,mbari::europa::GeoUTMConstraint, 
