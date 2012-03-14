@@ -36,6 +36,8 @@
 
 # include <bitset>
 
+# include <trex/europa/config.hh>
+
 # include <PLASMA/LabelStr.hh>
 # include <PLASMA/Entity.hh>
 # include <PLASMA/Timeline.hh>
