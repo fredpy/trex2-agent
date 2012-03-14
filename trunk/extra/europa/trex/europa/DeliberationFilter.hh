@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_DeliberationFilter 
 # define H_trex_europa_DeliberationFilter
 
-# include "../config.hh"
+# include "config.hh"
 
 # include <PLASMA/Filters.hh>
 

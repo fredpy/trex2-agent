@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "private/Schema.hh"
-#include "EuropaPlugin.hh"
+#include "trex/europa/EuropaPlugin.hh"
 
 #include <trex/utils/XmlUtils.hh>
 

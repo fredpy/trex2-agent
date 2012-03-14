@@ -34,7 +34,7 @@
 #ifndef H_trex_EuropaReactor 
 # define H_trex_EuropaReactor
 
-# include "core/Assembly.hh"
+# include <trex/europa/Assembly.hh>
 
 # include <trex/transaction/TeleoReactor.hh>
 

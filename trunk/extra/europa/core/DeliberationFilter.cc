@@ -31,9 +31,9 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "DeliberationFilter.hh"
-#include "Assembly.hh"
-#include "bits/europa_helpers.hh"
+#include "trex/europa/DeliberationFilter.hh"
+#include "trex/europa/Assembly.hh"
+#include "trex/europa/bits/europa_helpers.hh"
 
 #include <PLASMA/TokenVariable.hh>
 

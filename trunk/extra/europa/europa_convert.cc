@@ -33,7 +33,7 @@
  */
 #include "bits/europa_convert.hh"
 
-#include "core/EuropaException.hh"
+#include <trex/europa/EuropaException.hh>
 #include "EuropaEntity.hh"
 #include "private/EuropaDomain.hh"
 

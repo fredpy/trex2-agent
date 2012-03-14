@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "bits/europa_helpers.hh"
-#include "Assembly.hh"
+#include "trex/europa/bits/europa_helpers.hh"
+#include "trex/europa/Assembly.hh"
 
 #include <PLASMA/RuleInstance.hh>
 

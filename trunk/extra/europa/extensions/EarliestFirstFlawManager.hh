@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_GreedyFlawManager
 # define H_trex_europa_GreedyFlawManager
 
-# include "../config.hh"
+# include <trex/europa/config.hh>
 
 # include <PLASMA/OpenConditionManager.hh>
 

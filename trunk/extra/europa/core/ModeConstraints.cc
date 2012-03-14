@@ -31,11 +31,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ModeConstraints.hh"
-#include "Assembly.hh"
-#include "bits/europa_helpers.hh"
+#include "trex/europa/ModeConstraints.hh"
+#include "trex/europa/Assembly.hh"
+#include "trex/europa/bits/europa_helpers.hh"
 
-#include "PLASMA/TokenVariable.hh"
+#include <PLASMA/TokenVariable.hh>
 
 using namespace TREX::europa;
 
