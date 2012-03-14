@@ -104,24 +104,27 @@ namespace TREX {
                             }
                             for(TeleoReactor::external_iterator temp = r->ext_begin(); temp!=r->ext_end(); ++temp)
                             {
-                                utils::Symbol externalName = temp->name();
-                                if(!findName(graphMap.find(name)->second.connections,externalName))
+                                if(temp->active())
                                 {
-                                    graphMap.find(name)->second.addConnection(externalName);
-                                }
-                                if(graphMap.find(externalName)==graphMap.end())
-                                {
-                                    nodeObject node(externalName, graphMap.find(name)->second.level+1);
-                                    graphMap.insert(std::pair<utils::Symbol,nodeObject>(externalName, node));
-                                }
-                                else
-                                {
-                                    int oldLevel = graphMap.find(externalName)->second.level;
-                                    int newLevel = graphMap.find(name)->second.level+1;
-                                    if(newLevel>oldLevel)
+                                    utils::Symbol externalName = temp->name();
+                                    if(!findName(graphMap.find(name)->second.connections,externalName))
                                     {
-                                        int difference = newLevel-oldLevel;
-                                        upLevel(externalName, difference);
+                                        graphMap.find(name)->second.addConnection(externalName);
+                                    }
+                                    if(graphMap.find(externalName)==graphMap.end())
+                                    {
+                                        nodeObject node(externalName, graphMap.find(name)->second.level+1);
+                                        graphMap.insert(std::pair<utils::Symbol,nodeObject>(externalName, node));
+                                    }
+                                    else
+                                    {
+                                        int oldLevel = graphMap.find(externalName)->second.level;
+                                        int newLevel = graphMap.find(name)->second.level+1;
+                                        if(newLevel>oldLevel)
+                                        {
+                                            int difference = newLevel-oldLevel;
+                                            upLevel(externalName, difference);
+                                        }
                                     }
                                 }
                             }
