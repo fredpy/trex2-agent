@@ -32,8 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "private/CurrentState.hh"
-#include "Assembly.hh"
-#include "bits/europa_helpers.hh"
+#include "trex/europa/Assembly.hh"
+#include "trex/europa/bits/europa_helpers.hh"
 
 #include <PLASMA/TokenVariable.hh>
 #include <PLASMA/PlanDatabaseWriter.hh>

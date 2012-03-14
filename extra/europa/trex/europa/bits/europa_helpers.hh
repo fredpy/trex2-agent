@@ -36,7 +36,7 @@
 
 #include <string>
 
-#include "../../config.hh"
+#include "../config.hh"
 
 #include <PLASMA/Token.hh>
 #include <PLASMA/ConstrainedVariable.hh>

@@ -31,14 +31,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "Assembly.hh"
-#include "bits/europa_helpers.hh"
+#include "trex/europa/Assembly.hh"
+#include "trex/europa/bits/europa_helpers.hh"
 #include "private/Schema.hh"
 #include "private/CurrentState.hh"
 
-#include "ReactorPropagator.hh"
-#include "DeliberationFilter.hh"
-#include "SynchronizationManager.hh"
+#include "trex/europa/ReactorPropagator.hh"
+#include "trex/europa/DeliberationFilter.hh"
+#include "trex/europa/SynchronizationManager.hh"
 
 #include <PLASMA/ModuleConstraintEngine.hh>
 #include <PLASMA/ModulePlanDatabase.hh>

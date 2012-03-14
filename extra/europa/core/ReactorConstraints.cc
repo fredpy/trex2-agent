@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ReactorConstraint.hh"
-#include "bits/europa_helpers.hh"
+#include "trex/europa/ReactorConstraint.hh"
+#include "trex/europa/bits/europa_helpers.hh"
 
 using namespace TREX::europa;
 

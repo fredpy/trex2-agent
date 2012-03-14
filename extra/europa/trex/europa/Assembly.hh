@@ -35,7 +35,7 @@
 # define H_trex_europa_Assembly
 
 # include "EuropaPlugin.hh"
-# include "../config.hh"
+# include "config.hh"
 
 # include <trex/utils/id_mapper.hh>
 

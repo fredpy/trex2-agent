@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_convert
 # define H_trex_europa_convert
 
-# include "../config.hh" // set the flags for europa
+# include <trex/europa/config.hh> // set the flags for europa
 
 # include <PLASMA/Domain.hh>
 # include <PLASMA/DataType.hh>

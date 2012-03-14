@@ -114,6 +114,21 @@ else(Boost_FOUND)
 endif(Boost_FOUND)
 
 ########################################################################
+# Europa                                                               #
+########################################################################
+
+option(WITH_EUROPA "Enable Europa plugin." ON) 
+
+if(WITH_EUROPA) 
+  find_package(Europa
+    COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
+    NDDL RulesEngine Solvers System)
+  if(NOT EUROPA_FOUND)
+    message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
+  endif(NOT EUROPA_FOUND)
+endif(WITH_EUROPA)
+
+########################################################################
 # Doxygen                                                              #
 ########################################################################
 find_package(Doxygen)
@@ -202,8 +217,4 @@ install(DIRECTORY log DESTINATION shared/trex/log
    DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
    FILES_MATCHING PATTERN "*" EXCLUDE)
 
-# ########################################################################
-# # Java JDK                                                             #
-# ########################################################################
-# find_package(Wt)
 

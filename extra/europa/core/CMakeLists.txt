@@ -44,26 +44,19 @@ add_library(TREXeuropa_core SHARED
   SynchronizationManager.cc
   Assembly.cc
   # headers 
-  EuropaException.hh
-  EuropaPlugin.hh
-  ReactorConstraint.hh
-  ModeConstraints.hh
-  ReactorPropagator.hh
-  DeliberationFilter.hh
-  SynchronizationManager.hh
-  Assembly.hh
-  bits/europa_helpers.hh
+  ../trex/europa/EuropaException.hh
+  ../trex/europa/EuropaPlugin.hh
+  ../trex/europa/ReactorConstraint.hh
+  ../trex/europa/ModeConstraints.hh
+  ../trex/europa/ReactorPropagator.hh
+  ../trex/europa/DeliberationFilter.hh
+  ../trex/europa/SynchronizationManager.hh
+  ../trex/europa/Assembly.hh
+  ../trex/europa/bits/europa_helpers.hh
 )
 
-set_property(TARGET TREXeuropa_core PROPERTY ${EUROPA_LIBRARIES})
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXutils)
 
 install(TARGETS TREXeuropa_core DESTINATION lib) 
 trex_lib(TREXeuropa_core)
 
-# handled by upper level
-# install(DIRECTORY . DESTINATION include/trex/europa/core
-#   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-#   PATTERN "private" EXCLUDE
-#   PATTERN "cfg" EXCLUDE
-#   PATTERN ".svn" EXCLUDE)

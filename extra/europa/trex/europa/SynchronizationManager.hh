@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_SynchronizationManager
 # define H_trex_europa_SynchronizationManager
 
-# include "../config.hh"
+# include "config.hh"
 
 # include <PLASMA/FlawManager.hh>
 
