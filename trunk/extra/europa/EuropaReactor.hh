@@ -83,9 +83,17 @@ namespace TREX {
       bool is_external(EUROPA::LabelStr const &name) const {
 	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
+      
+
 
       EUROPA::eint now() const {
 	return getCurrentTick();
+      }
+      EUROPA::eint latency() const {
+        return getExecLatency();
+      }
+      EUROPA::eint look_ahead() const {
+        return getLookAhead(); 
       }
       EUROPA::IntervalIntDomain plan_scope() const;
       EUROPA::eint initial_tick() const {

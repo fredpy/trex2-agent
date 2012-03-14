@@ -285,6 +285,10 @@ namespace TREX {
        * @return the current tick
        */
       virtual EUROPA::eint now() const =0;
+
+      virtual EUROPA::eint latency() const =0;
+      virtual EUROPA::eint look_ahead() const =0;
+
       /** @brief Deliberation scope
        *
        * This method is used by the Assembly -- or more accvurately by the

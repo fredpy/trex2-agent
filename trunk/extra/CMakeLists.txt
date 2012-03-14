@@ -48,11 +48,16 @@ endmacro(trex_plugin)
 # the directories where plugins are located
 
 add_subdirectory(lightswitch) 
-# add_subdirectory(europa_0_2)
 add_subdirectory(europa)
 add_subdirectory(witre)
 
 option(WITH_LSTS "Use LSTS plugin" OFF)
+mark_as_advanced(WITH_LSTS)
 if(WITH_LSTS)
   add_subdirectory(lsts)
 endif(WITH_LSTS)
+
+option(WITH_NUS "Use NUS plugin" OFF)
+if(WITH_NUS)
+  add_subdirectory(starfish)
+endif(WITH_NUS)
