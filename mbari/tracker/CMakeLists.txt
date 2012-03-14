@@ -50,7 +50,14 @@ if(MBARI_TRACKER)
 	AMQP_listener.cc
 	AMQP_queue.cc
 	${PROTO_SRCS}
-	DrifterTracker.cc)
+	DrifterTracker.cc
+	#headers
+	AMQP_connection.hh
+	AMQP_listener.hh
+	AMQP_queue.hh
+	DrifterTracker.hh
+	odss_handlers.hh
+	)
       target_link_libraries(MBARIamqp 
 	MBARIshared
 	TREXtransaction 

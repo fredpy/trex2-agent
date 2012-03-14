@@ -35,6 +35,9 @@
 
 add_library(MBARIshared SHARED 
   GeoUTM.cc
+  # headers
+  GeoUTM.hh
+  GeoUTM.Constants.h
 )
 
 install(TARGETS MBARIshared DESTINATION lib) 
