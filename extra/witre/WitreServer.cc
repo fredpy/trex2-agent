@@ -184,6 +184,17 @@ void WitreServer::declared(details::timeline const &timeline) {
       boost::mutex::scoped_lock lock(mutex_);
       externalTimelines.push_back(timeline.name());
     }
+
+    searchGraph();
+    std::string name = timeline.name().str();
+    //Updates each client with the new timeline name
+    for (unsigned i = 0; i < connections.size(); ++i)
+    {
+        boost::mutex::scoped_lock lock(mutex_);
+        Connection& c = connections[i];
+        const boost::function<void(std::string)>& function(boost::bind(&WitreApplication::addTimeline, c.client, _1));
+        Wt::WServer::instance()->post(c.sessionId, boost::bind(function, name) );
+    }
   }
 }
 
@@ -191,17 +202,25 @@ void WitreServer::declared(details::timeline const &timeline) {
  * conversely I am notified from timelines not being owned by any reactor
  * anymore ... but we do not have that much to do here for now
  */
-void WitreServer::undeclared(details::timeline const &timeline) {}
+void WitreServer::undeclared(details::timeline const &timeline)
+{
 
-void WitreServer::handleInit() {
-    graph::timelines_listener::initialize();
-    WitreGraph vis(rel_level);
-    boost::depth_first_search(getGraph(), boost::visitor(vis));
-    //Getting the timeline Graph dependencies
-    WitrePaintSearch vis2(timelineGraph);
-    boost::depth_first_search(getGraph(), boost::visitor(vis2));
 }
 
+void WitreServer::handleInit()
+{
+    graph::timelines_listener::initialize();
+    searchGraph();
+}
+
+//Getting the timeline Graph dependencies
+void WitreServer::searchGraph()
+{
+    timelineGraph.clear();
+    WitrePaintSearch vis2(timelineGraph);
+    boost::mutex::scoped_lock lock(mutex_);
+    boost::depth_first_search(getGraph(), boost::visitor(vis2));
+}
 
 void WitreServer::notify(Observation const &obs)
 {
@@ -210,7 +229,7 @@ void WitreServer::notify(Observation const &obs)
     std::ostringstream oss;
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
         <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\""
-        <<" level=\""<<rel_level.find(obs.object())->second<<"\" "
+        <<" level=\""<<timelineGraph.find(obs.object())->second.level<<"\" "
         <<">"<<obs<<"</Token>";
     //Storing the observation
     observations.push(oss.str());

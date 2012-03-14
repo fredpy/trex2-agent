@@ -111,7 +111,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     tickNum->setMargin(5,Wt::Right);
     new Wt::WBreak(north);
 
-    Wt::WGroupBox *tLines = new Wt::WGroupBox("Available Timelines", north);
+    tLines = new Wt::WGroupBox("Available Timelines", north);
     for(int i = 0; i<wServer->extTimelinesSize(); i++)
     {
         std::string name = wServer->extTimelinesName(i);
@@ -276,6 +276,7 @@ void WitreApplication::post()
         //Container that holds all the panles
         Wt::WGroupBox* box = new Wt::WGroupBox(time);
         box->setObjectName(time);
+        //box->setAttributeValue("onchange","alert(\"Did it\")");
         groupPanels[time] = box;
         messages->insertWidget(0, box);
     }
@@ -521,4 +522,29 @@ void WitreApplication::sliderText(int value)
 {
     sliderTime->setText(boost::lexical_cast<std::string>(value));
     Wt::WApplication::instance()->triggerUpdate();
+}
+
+void WitreApplication::addTimeline(std::string name)
+{
+    tLineMap[name]=true;
+    Wt::WCheckBox* temp = new Wt::WCheckBox(name);
+    tLines->addWidget(temp);
+    temp->setChecked(true);//
+    temp->setObjectName(name);
+    temp->changed().connect(this, &WitreApplication::timeLineChange);
+    //Updates the combo menu
+    addMenuItems();
+}
+
+void WitreApplication::addMenuItems()
+{
+    menu->clear();
+    for(int i = 0; i<wServer->extTimelinesSize(); i++)
+    {
+        std::string name = wServer->extTimelinesName(i);
+        if(wServer->acceptsGoal(wServer->extTimelinesName(i)))
+        {
+            menu->addItem(name);
+        }
+    }
 }

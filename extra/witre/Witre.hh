@@ -85,6 +85,7 @@ namespace TREX {
       Wt::WContainerWidget *messages;
       Wt::WTimer *timer;
       Wt::WComboBox *menu;
+      Wt::WGroupBox *tLines;
       Wt::WSlider *timeLineSlider;
       Goalpopup* popup;
       WitreServer *wServer;
@@ -118,6 +119,8 @@ namespace TREX {
       void syncObservations(); //Syncs with server observations
       void attributePopup();
       void clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end);
+      void addTimeline(std::string name);
+      void addMenuItems();
 
     };
 
