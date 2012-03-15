@@ -12,7 +12,6 @@ close();
 
 
 rejectable(pc.Goto wp1);
-wp1.start >= 0;
 wp1.x = 210;
 wp1.y = 840;
 wp1.priority = 5;
@@ -20,7 +19,6 @@ wp1.depth = 0;
 wp1.thrust = 70;
 
 rejectable(pc.Goto wp2);
-wp2.start >= 0;
 wp2.x = 343;
 wp2.y = 644;
 wp2.priority = 5;
@@ -28,7 +26,6 @@ wp2.depth = 0;
 wp2.thrust = 60;
 
 rejectable(pc.Goto wp3);
-wp3.start >= 0;
 wp3.x = 355;
 wp3.y = 841;
 wp3.priority = 5;
@@ -36,7 +33,6 @@ wp3.depth = 0;
 wp3.thrust = 70;
 
 rejectable(pc.Goto wp4);
-wp4.start >= 0;
 wp4.x = 100;
 wp4.y = 800;
 wp4.priority = 5;
@@ -44,7 +40,6 @@ wp4.depth = 0;
 wp4.thrust = 90;
 
 rejectable(pc.Goto wp5);
-wp5.start >= 0;
 wp5.x = 100;
 wp5.y = 300;
 wp5.priority = 5;
@@ -52,7 +47,6 @@ wp5.depth = 0;
 wp5.thrust = 70;
 
 rejectable(pc.Goto wp6);
-wp6.start >= 0;
 wp6.x = 300;
 wp6.y = 300;
 wp6.priority = 5;
