@@ -74,6 +74,20 @@ private:
 
 };
 
+    class Bind :public EUROPA::Constraint {
+    public:
+      Bind(EUROPA::LabelStr const &name, 
+	   EUROPA::LabelStr const &propagatorName,
+	   EUROPA::ConstraintEngineId const &cstrEngine,
+	   std::vector<EUROPA::ConstrainedVariableId> const &variables);
+      bool guardSatisfied() const;
+      void handleExecute();
+    private:
+      EUROPA::ConstrainedVariableId m_target;
+      EUROPA::ConstrainedVariableId m_default;
+    }; // Bind
+
+
 }
 }
 

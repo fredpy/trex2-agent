@@ -3,7 +3,6 @@
       We work remaining flaws such that we work flaws earliest first and depth first --->
 
 <Solver name="MissionPlanner">
-  	<FlawFilter component="DeliberationFilter"/>
 
   	<ThreatManager defaultPriority="1">
     		<FlawHandler component="StandardThreatHandler"/>
