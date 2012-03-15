@@ -177,14 +177,18 @@ void CurrentState::erased(EUROPA::TokenId const &token) {
 }
 
 void CurrentState::replaced(EUROPA::TokenId const &token) {
+  EUROPA::eint t_start;
+
   if( m_last_obs==token ) {
-    EUROPA::eint start = m_last_obs->start()->getSpecifiedValue();
+    t_start = m_last_obs->start()->getSpecifiedValue();
+    restrict_bases(m_last_obs);
     m_last_obs = token->getActiveToken();
-    m_last_obs->start()->specify(start);
+    m_last_obs->start()->specify(t_start);
   } else if( m_prev_obs==token ) {
-    EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
+    t_start = m_prev_obs->start()->getSpecifiedValue();
+    restrict_bases(m_prev_obs);
     m_prev_obs = token->getActiveToken();
-    m_prev_obs->start()->specify(start);
+    m_prev_obs->start()->specify(t_start);
   }
 }
 
