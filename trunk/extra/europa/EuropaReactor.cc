@@ -213,6 +213,7 @@ void EuropaReactor::handleTickStart() {
   setStream();  
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
+  new_tick();
   if( m_completed_this_tick ) {
     Assembly::external_iterator from(begin(), end()), to(end(), end());
     for(; to!=from; ++from) {
