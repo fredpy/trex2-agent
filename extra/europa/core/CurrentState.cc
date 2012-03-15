@@ -426,6 +426,7 @@ void CurrentState::DecisionPoint::handleExecute() {
   case START_NEXT:
     tok = m_target->new_obs(m_client, (*m_tok)->getPredicateName().toString(), false);
     m_client->merge(tok, *m_tok);
+    details::restrict_attributes(tok);
     break;
   case CREATE_DEFAULT:
     tok = m_target->new_obs(m_client, 
