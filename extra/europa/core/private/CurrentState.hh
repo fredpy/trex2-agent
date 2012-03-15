@@ -142,6 +142,7 @@ namespace TREX {
 
 	void erased(EUROPA::TokenId const &token);
 	void replaced(EUROPA::TokenId const &token);
+	static void apply_base(EUROPA::TokenId &merged);
 
 	Assembly          &m_assembly;
 	EUROPA::TimelineId m_timeline;

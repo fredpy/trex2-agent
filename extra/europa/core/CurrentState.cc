@@ -176,19 +176,27 @@ void CurrentState::erased(EUROPA::TokenId const &token) {
     m_prev_obs = EUROPA::TokenId::noId();
 }
 
+void CurrentState::apply_base(EUROPA::TokenId &merged) {
+  EUROPA::TokenId active = merged->getActiveToken();
+  std::vector<EUROPA::ConstrainedVariableId> const &actives = active->getVariables();
+  std::vector<EUROPA::ConstrainedVariableId> const &mergeds = merged->getVariables();
+  
+  for(size_t v=1; v<actives.size(); ++v)
+    actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
+  merged = active;
+}
+
 void CurrentState::replaced(EUROPA::TokenId const &token) {
   EUROPA::eint t_start;
 
   if( m_last_obs==token ) {
-    t_start = m_last_obs->start()->getSpecifiedValue();
-    restrict_bases(m_last_obs);
-    m_last_obs = token->getActiveToken();
-    m_last_obs->start()->specify(t_start);
+    //    t_start = m_last_obs->start()->getSpecifiedValue();
+    apply_base(m_last_obs);
+    //m_last_obs->start()->specify(t_start);
   } else if( m_prev_obs==token ) {
-    t_start = m_prev_obs->start()->getSpecifiedValue();
-    restrict_bases(m_prev_obs);
-    m_prev_obs = token->getActiveToken();
-    m_prev_obs->start()->specify(t_start);
+    //t_start = m_prev_obs->start()->getSpecifiedValue();
+    apply_base(m_last_obs);
+    // m_prev_obs->start()->specify(t_start);
   }
 }
 
