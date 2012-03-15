@@ -140,6 +140,9 @@ namespace TREX {
 	void new_token(EUROPA::TokenId const &token);
 	void relax_token();
 
+	void erased(EUROPA::TokenId const &token);
+	void replaced(EUROPA::TokenId const &token);
+
 	Assembly          &m_assembly;
 	EUROPA::TimelineId m_timeline;
 	id_type            m_id;

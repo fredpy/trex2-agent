@@ -121,6 +121,8 @@ EUROPA::eint CurrentState::now() const {
   return m_assembly.now();
 }
 
+
+
 bool CurrentState::identified() const {
   EUROPA::TokenId cur = current();
   
@@ -166,6 +168,26 @@ EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string
   }
   return current();
 }
+
+void CurrentState::erased(EUROPA::TokenId const &token) {
+  if( m_last_obs==token )
+    m_last_obs = EUROPA::TokenId::noId();
+  else if( m_prev_obs==token )
+    m_prev_obs = EUROPA::TokenId::noId();
+}
+
+void CurrentState::replaced(EUROPA::TokenId const &token) {
+  if( m_last_obs==token ) {
+    EUROPA::eint start = m_last_obs->start()->getSpecifiedValue();
+    m_last_obs = token->getActiveToken();
+    m_last_obs->start()->specify(start);
+  } else if( m_prev_obs==token ) {
+    EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
+    m_prev_obs = token->getActiveToken();
+    m_prev_obs->start()->specify(start);
+  }
+}
+
 
 void CurrentState::new_token(EUROPA::TokenId const &token) {
   m_prev_obs = m_last_obs;
