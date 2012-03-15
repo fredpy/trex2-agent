@@ -420,6 +420,9 @@ void Assembly::archive() {
         if( (*i)->isFact() ) {
           (*t)->makeFact();
           to_del.insert(*i);
+	  for(state_map::const_iterator j=m_agent_timelines.begin();
+	      m_agent_timelines.end()!=j; ++j)
+	    (*j)->replaced(*i);
         } else 
           can_delete = false;
       }
@@ -518,6 +521,10 @@ bool Assembly::relax(bool destructive) {
           if( !(*t)->isInactive() )
             (*t)->cancel();
           to_erase.insert(*t);
+	  // notify my current states
+	  for(state_map::const_iterator i=m_agent_timelines.begin();
+	      m_agent_timelines.end()!=i; ++i)
+	    (*i)->erased(*t);
         } 
       } else {
         // Removing the past goals
@@ -639,7 +646,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
       // print all token attributes
-      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<" ("<<(*v)->baseDomain().toString()<<")\\n";
+      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
     }
     if( (*it)->isActive() && !expanded ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
