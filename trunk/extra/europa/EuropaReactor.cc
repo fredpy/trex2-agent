@@ -391,8 +391,10 @@ void EuropaReactor::resume() {
   if( constraint_engine()->provenInconsistent() ) {
     syslog("WARN")<<"Inconsitency found during planning.";
     if( !relax(false) )
-      if( !relax(true) ) 
+      if( !relax(true) ) {
         syslog("ERROR")<<"Unable to recover from plan inconsistency.";
+	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency."); 
+      }
   }
 }
 
