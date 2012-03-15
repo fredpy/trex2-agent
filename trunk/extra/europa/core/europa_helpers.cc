@@ -65,13 +65,24 @@ void TREX::europa::details::restrict_bases(EUROPA::TokenId const &tok) {
       size_t count=0;
       for(; !tvar[i]->isActive(); ++count ) 
         tvar[i]->undoDeactivation();
-      tvar[i]->restrictBaseDomain(tvar[i]->lastDomain());
+      tvar[i]->restrictBaseDomain(avar[i]->lastDomain());
       for(size_t j=0; j<count; ++j)
         tvar[i]->deactivate();
       avar[i]->handleBase(tvar[i]->baseDomain());
     }
   } else 
     tok->restrictBaseDomains();
+}
+
+void TREX::europa::details::restrict_attributes(EUROPA::TokenId const &tok) {
+  EUROPA::TokenId active = tok;
+  if( tok->isMerged() )
+    active = tok->getActiveToken();
+  
+  std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->parameters();
+  std::vector<EUROPA::ConstrainedVariableId> const &avar = active->parameters();
+  for(size_t i=0; i<tvar.size(); ++i)
+    restrict_base(tok, tvar[i], avar[i]->lastDomain());
 }
 
 

@@ -123,6 +123,7 @@ namespace TREX {
       void restrict_base(EUROPA::TokenId const &tok, EUROPA::ConstrainedVariableId const &var, 
                          EUROPA::Domain const &dom);
       void restrict_bases(EUROPA::TokenId const &tok);
+      void restrict_attributes(EUROPA::TokenId const &tok);
       
     } // TREX::europa::details
   } // TREX::europa
