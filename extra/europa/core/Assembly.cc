@@ -401,7 +401,6 @@ void Assembly::archive() {
     bool can_delete = true;
     EUROPA::TokenSet merged_t = (*t)->getMergedTokens();
     
-    
     for(EUROPA::TokenSet::const_iterator i=merged_t.begin(); 
         merged_t.end()!=i; ++i) {
       EUROPA::TokenId master = (*i)->master();
@@ -501,6 +500,22 @@ void Assembly::archive() {
   
   constraint_engine()->propagate();
   // plan_db()->archive(now()-1);
+}
+
+void Assembly::new_tick() {
+  EUROPA::TokenSet::const_iterator t;
+  for(t=m_roots->roots().begin(); m_roots->roots().end()!=t; ++t) {
+    if( (*t)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED) ) {
+      EUROPA::TokenId active = (*t);
+      if( (*t)->isMerged() )
+	active = (*t)->getActiveToken();
+      if( now()<=active->start()->lastDomain().getUpperBound() ) {
+	EUROPA::IntervalIntDomain 
+	  new_start(now(), std::numeric_limits<EUROPA::eint>::infinity());
+	details::restrict_base(*t, (*t)->start(), new_start);
+      }
+    }
+  }
 }
 
 bool Assembly::relax(bool destructive) {

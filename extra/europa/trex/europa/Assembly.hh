@@ -421,6 +421,7 @@ namespace TREX {
         }
         return false;
       }
+      void new_tick();
       bool relax(bool destructive);
       void archive();
 
