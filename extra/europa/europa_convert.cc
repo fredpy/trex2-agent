@@ -33,6 +33,7 @@
  */
 #include "bits/europa_convert.hh"
 
+
 #include <trex/europa/EuropaException.hh>
 #include "EuropaEntity.hh"
 #include "private/EuropaDomain.hh"
@@ -42,6 +43,8 @@
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/StringDomain.hh>
 #include <trex/domain/EnumDomain.hh>
+
+#include <PLASMA/Domains.hh>
 
 #include <memory>
 
@@ -142,8 +145,8 @@ void details::europa_domain::visit(BasicEnumerated const *dom) {
       throw EmptyDomain(*dom, "Europa enumerated domain "+m_dom->toString()+
 			" became empty.");
     // Apply the intersection
-    m_dom->empty();
-    m_dom->insert(values);
+    EUROPA::EnumeratedDomain tmp(m_type, values);
+    m_dom->intersect(tmp);
   } else 
     throw DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not enumerated.");
 }
