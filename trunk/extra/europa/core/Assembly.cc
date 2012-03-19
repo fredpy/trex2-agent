@@ -87,7 +87,7 @@ namespace {
     
     bool is_goal(EUROPA::TokenId const &tok) const {
       bool ret = tok->getState()->baseDomain().isMember(EUROPA::Token::REJECTED);
-        
+      
       if( !(ret || m_filt) ) {
         if( tok->isActive() ) {
           EUROPA::TokenSet const &merged = tok->getMergedTokens();
@@ -115,6 +115,7 @@ namespace {
 /*
  * class TREX::europa::details::CurrentStateId_id_traits
  */
+
 // statics 
 
 EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentStateId const &cs) {
@@ -123,42 +124,9 @@ EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentSta
   return EUROPA::TimelineId::noId();
 }
 
-EUROPA::eint details::token_id_traits::get_id(EUROPA::TokenId const &t) {
-  return t->getKey();
-}
-
 
 /*
- * class TREX::europa::Assembly::root_tokens;
- */
-
-void Assembly::root_tokens::notifyAdded(EUROPA::TokenId const & token) {
-  if( token->master().isNoId() )
-    m_roots.insert(token);  
-}
-
-void Assembly::root_tokens::notifyRemoved(EUROPA::TokenId const & token) {
-  m_committed.erase(token);
-  if( token->master().isNoId() ) {
-    m_roots.erase(token);
-    if( NULL!=m_owner )
-      m_owner->doDiscard(token);
-  }
-}
-
-void Assembly::root_tokens::notifyDeactivated(EUROPA::TokenId const &token) {
-  if( NULL!=m_owner )
-    m_owner->cancel(token);  
-}
-
-void Assembly::root_tokens::notifyCommitted(EUROPA::TokenId const & token) {
-  m_committed.insert(token);
-  m_roots.erase(token);
-}
-
-
-/*
- * class TREX::europa::Assembly;
+ * class TREX:europa::Assembly
  */
 
 // statics 
@@ -176,15 +144,14 @@ EUROPA::LabelStr const Assembly::CLOCK_VAR("AGENT_CLOCK");
 std::string const Assembly::MODE_ATTR("mode");
 std::string const Assembly::DEFAULT_ATTR("defaultPredicate");
 
-
 std::string const Assembly::UNDEFINED_PRED("undefined");
 std::string const Assembly::FAILED_PRED("Failed");
 
-// structors
+// structors 
 
-Assembly::Assembly(std::string const &name) {
+Assembly::Assembly(std::string const &name):m_name(name) {
   //  redirect log output to <name>.europa.log
-  m_trex_schema->setStream(m_debug, name+".europa.log");
+  m_trex_schema->setStream(m_debug, m_name+".europa.log");
   
   // load the differrent europa modules we need
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
@@ -194,111 +161,56 @@ Assembly::Assembly(std::string const &name) {
   addModule((new EUROPA::ModuleTemporalNetwork())->getId());
   addModule((new EUROPA::ModuleSolvers())->getId());
   addModule((new EUROPA::ModuleNddl())->getId());
-
+  
   // complete base class Initialization
   doStart();
-
+  
   // gather europa entry points
   m_schema = ((EUROPA::Schema *)getComponent("Schema"))->getId();
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
-  m_plan_db = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
-  m_rules_engine = ((EUROPA::RulesEngine *)getComponent("RulesEngine"))->getId();
-
-  m_roots.reset(new root_tokens(m_plan_db));
+  m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
+  
+  m_proxy.reset(new listener_proxy(*this));
   
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
-
-  m_cstr_engine->setAutoPropagation(true);
-
+  
+  m_cstr_engine->setAutoPropagation(false);
+  
   // Get extra europa extensions 
   m_trex_schema->registerComponents(*this);
-
-  EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);  
+  
+  EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);    
 }
 
 Assembly::~Assembly() {
-  m_roots.reset();
+  m_proxy.reset();
   // cleanup base class
   doShutdown();
 }
 
-// manipulators
-
-void Assembly::setStream() const {
-  m_trex_schema->setStream(m_debug);
-}
-
-bool Assembly::playTransaction(std::string const &nddl) {
-  std::string const &path = m_trex_schema->nddl_path();
-  std::string ret;
-  m_roots->attach(this);
-  
-  // configure search path for nddl
-  getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);
-
-  // parese nddl
-  try {
-    ret = executeScript("nddl", nddl, true);
-  } catch(EUROPA::PSLanguageExceptionList const &l_err) {
-    std::ostringstream err;
-    err<<"Error while parsing "<<nddl<<":\n"<<l_err;
-    throw EuropaException(err.str());
-  } catch(Error const &error) {
-    throw EuropaException("Error on parsing "+nddl+": "+error.getMsg());
-  }
-  if( !ret.empty() )
-    throw EuropaException("Error returned after parsing "+nddl+": "+ret);
-
-  return constraint_engine()->constraintConsistent();
-}
-
-void Assembly::configure_solvers(std::string const &cfg) {
-  std::auto_ptr<EUROPA::TiXmlElement> 
-    xml_cfg(EUROPA::initXml(cfg.c_str()));
-  
-  EUROPA::TiXmlElement 
-    *filter = dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(), 
-  									      EUROPA::TiXmlElement("FlawFilter")));
-  // Setup our deliberation solver
-  filter->SetAttribute("component", TO_STRING_EVAL(TREX_DELIB_FILT));
-  debugMsg("trex:init", "Load planning solver with configuration:\n"<<(*xml_cfg)); 
-
-  m_deliberation_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
-  
-  // Setup our synchronization solver
-  filter->SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_FILT));
-  
-  EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
-    handler("FlawHandler");
-
-  handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
-  synch.InsertEndChild(handler);
-  xml_cfg->InsertEndChild(synch);
-
-  debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg)); 
-  m_synchronization_solver = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
-}
+// modifiers
 
 void Assembly::init_clock_vars() {
   EUROPA::ConstrainedVariableId 
     mission_end = plan_db()->getGlobalVariable(MISSION_END),
     tick_factor = plan_db()->getGlobalVariable(TICK_DURATION);
-  m_clock = plan_db()->getGlobalVariable(CLOCK_VAR);
 
+  m_clock = plan_db()->getGlobalVariable(CLOCK_VAR);
+  
   if( mission_end.isNoId() ) 
     throw EuropaException("Unable to find variable "+MISSION_END.toString());
   if( tick_factor.isNoId() ) 
     throw EuropaException("Unable to find variable "+TICK_DURATION.toString());
   if( m_clock.isNoId() ) 
     throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
-
+  
   mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
 							    final_tick()));
   tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),
 							    tick_duration()));
   m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
-							  final_tick()));
+                                                        final_tick()));  
 }
 
 void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
@@ -314,19 +226,195 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
       m_agent_timelines.insert(state);
     }
   } else {
-    debugMsg("trex:always", "WARNING attempted to create a sate falw manager for non public timeline "
+    debugMsg("trex:always", "WARNING attempted to create a sate flaw manager for non public timeline "
 	     <<tl->getName().toString());
   }
 }
 
-EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj, std::string &pred, 
-				  bool &undefined) {
+void Assembly::new_tick() {  
+  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]\n");
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
+  
+  debugMsg("trex:tick", "Updating non-started goals to start after "<<now()); 
+  boost::filter_iterator<details::is_rejectable, EUROPA::TokenSet::const_iterator>
+    t(m_roots.begin(), m_roots.end()), end_t(m_roots.end(), m_roots.end());
+
+  for(; end_t!=t; ++t) {
+    EUROPA::TokenId active = (*t);
+    
+    if( (*t)->isMerged() ) 
+      active = (*t)->getActiveToken();
+    
+    if( now()<=active->start()->lastDomain().getUpperBound() ) {
+      EUROPA::IntervalIntDomain new_start(now(), 
+                                          std::numeric_limits<EUROPA::eint>::infinity());
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+      details::restrict_base(*t, (*t)->start(), new_start);
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+    }
+  }
+}
+
+void Assembly::terminate(EUROPA::TokenId const &tok) {
+  m_completed.insert(tok);
+}
+
+// manipulators
+
+void Assembly::setStream() const {
+  m_trex_schema->setStream(m_debug);
+}
+
+bool Assembly::playTransaction(std::string const &nddl) {
+  std::string const &path = m_trex_schema->nddl_path();
+  std::string ret;
+  
+  // configure search path for nddl
+  getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);
+  
+  // parse nddl
+  try {
+    ret = executeScript("nddl", nddl, true);
+  } catch(EUROPA::PSLanguageExceptionList const &l_err) {
+    std::ostringstream err;
+    err<<"Error while parsing "<<nddl<<":\n"<<l_err;
+    throw EuropaException(err.str());
+  } catch(Error const &error) {
+    throw EuropaException("Error on parsing "+nddl+": "+error.getMsg());
+  }
+  if( !ret.empty() )
+    throw EuropaException("Error returned after parsing "+nddl+": "+ret);
+  
+  return constraint_engine()->constraintConsistent();
+}
+
+void Assembly::configure_solvers(std::string const &cfg) {
+  std::auto_ptr<EUROPA::TiXmlElement> 
+  xml_cfg(EUROPA::initXml(cfg.c_str()));
+  
+  EUROPA::TiXmlElement 
+  *filter = dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(), 
+                                                                            EUROPA::TiXmlElement("FlawFilter")));
+  // Setup our deliberation solver
+  filter->SetAttribute("component", TO_STRING_EVAL(TREX_DELIB_FILT));
+  debugMsg("trex:init", "Load planning solver with configuration:\n"<<(*xml_cfg)); 
+  
+  m_planner = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+  
+  // Setup our synchronization solver
+  filter->SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_FILT));
+  
+  EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
+  handler("FlawHandler");
+  
+  handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
+  synch.InsertEndChild(handler);
+  xml_cfg->InsertEndChild(synch);
+  
+  debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg)); 
+  m_synchronizer = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();  
+}
+
+void Assembly::notify(details::CurrentState const &state) {
+  EUROPA::LabelStr obj_name = state.timeline()->getName();
+    
+  if( is_internal(obj_name) ) {
+    debugMsg("trex:notify", "Post observation "<<state.timeline()->toString()
+             <<'.'<<state.current()->getUnqualifiedPredicateName().toString()<<":\n"
+             <<state.current()->toLongString());
+    notify(obj_name, state.current());
+  }
+}
+
+bool Assembly::do_synchronize() {
+  // 1) apply external observations
+  for(external_iterator i=begin_external(); end_external()!=i; ++i) {
+    if( !(*i)->commit() ) {
+      debugMsg("trex:synch", "Failed to integrate external state of "<<(*i)->timeline()->toString());
+      return false;
+    }
+  }
+    
+  // 2) execute synchgronizer
+  if( !synchronizer()->solve() ) {
+    debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
+    return false;
+  }
+  
+  // 3) apply internal observations
+  for(internal_iterator i=begin_internal(); end_internal()!=i; ++i)
+    (*i)->commit(); // It was consistent from synchronizer => never fail
+  
+  return true;
+}
+
+bool Assembly::relax(bool aggressive) {
+  details::is_rejectable rejectable;
+  EUROPA::TokenSet to_erase;
+  
+  // Clean up decisions made by solvers 
+  synchronizer()->reset();
+  planner()->clear();
+  
+  for(EUROPA::TokenSet::const_iterator t=m_roots.begin(); m_roots.end()!=t; ++t) {
+    bool is_past = (*t)->end()->baseDomain().getUpperBound()<=now();
+    
+    if( is_past ) {
+      if( (*t)->isFact() ) {
+        if( aggressive ) {
+          if( !(*t)->isInactive() )
+            (*t)->cancel();
+          to_erase.insert(*t);
+        }
+      } else {
+        if( rejectable(*t) || aggressive ) {
+          if( !(*t)->isInactive() )
+            (*t)->cancel();
+          to_erase.insert(*t);          
+        }
+      }
+    } else {
+      if( !( (*t)->isInactive() || (*t)->isFact() ) )
+        (*t)->cancel();      
+    }
+  }
+  
+  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
+    (*t)->discard();
+  
+  return constraint_engine()->propagate();
+}
+
+EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
+                                       std::string const &name,
+                                       bool fact) {  
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  bool rejectable = !fact;
+  
+  if( !schema()->isPredicate(name.c_str()) )
+    throw EuropaException("Unknown predicate \""+name+"\" for object "
+			  +obj->getName().toString());
+  EUROPA::TokenId tok = cli->createToken(name.c_str(), NULL, rejectable, fact);
+  
+  if( !tok.isId() )
+    throw EuropaException("Failed to create token "+name);
+  
+  // Restrict token domain to obj
+  EUROPA::ConstrainedVariableId obj_var = tok->getObject();
+  obj_var->specify(obj->getKey());
+  
+  return tok;
+}
+
+EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj,
+                                  std::string &pred,
+                                  bool &undefined) {
   if( !external(obj) ) 
     throw EuropaException(obj->toString()+"is not an External timeline");
-  state_iterator 
-    handler = m_agent_timelines.find(EUROPA::TimelineId(obj));
+  state_iterator handler = m_agent_timelines.find(EUROPA::TimelineId(obj));
+
   undefined = false;
-    
+  
   if( !have_predicate(obj, pred) ) {
     std::string prev = pred;
     pred = UNDEFINED_PRED;
@@ -338,43 +426,6 @@ EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj, std::string &pred
   return (*handler)->new_obs(plan_db()->getClient(), pred, false);
 }
 
-void Assembly::notify(details::CurrentState const &state) {
-  EUROPA::LabelStr obj_name = state.timeline()->getName();
-
-  if( is_internal(obj_name) ) 
-    notify(obj_name, state.current());
-}
-
-EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj, 
-				       std::string const &name,
-				       bool fact) {
-  EUROPA::DbClientId cli = plan_db()->getClient();
-  bool rejectable = !fact;
-  
-  if( !schema()->isPredicate(name.c_str()) )
-    throw EuropaException("Unknown predicate \""+name+"\" for object "
-			  +obj->getName().toString());
-  EUROPA::TokenId tok = cli->createToken(name.c_str(), NULL, rejectable, fact);
-  
-  if( !tok.isId() )
-    throw EuropaException("Failed to create token "+name);
-
-  // Restrict token domain to obj
-  EUROPA::ConstrainedVariableId obj_var = tok->getObject();
-  obj_var->specify(obj->getKey());
-  
-  // if( tok->isIncomplete() )
-  //   tok->close();
-  
-  return tok;
-}
-
-void Assembly::doDiscard(EUROPA::TokenId const &tok) {
-  m_terminated.erase(tok->getKey());
-  discard(tok);
-}
-
-
 void Assembly::recalled(EUROPA::TokenId const &tok) {
   // Very aggressive way to handle this 
   if( !tok->isInactive() )
@@ -382,209 +433,8 @@ void Assembly::recalled(EUROPA::TokenId const &tok) {
   tok->discard();
 }
 
-void Assembly::terminate(EUROPA::TokenId const &token) {
-  if( m_terminated.insert(token).second ) {
-    debugMsg("trex:token", "Terminated token "<<token->toString());
-  }
-//  if( token->canBeCommitted() ) 
-//    token->commit();
-}
-
-
-void Assembly::archive() {
-  EUROPA::DbClientId cli = plan_db()->getClient();
-  EUROPA::TokenSet to_del;
-  
-  // Process first the already committed tokens
-  EUROPA::TokenSet::const_iterator t;
-  for(t=m_roots->committed().begin(); m_roots->committed().end()!=t; ++t) {
-    bool can_delete = true;
-    EUROPA::TokenSet merged_t = (*t)->getMergedTokens();
-    
-    for(EUROPA::TokenSet::const_iterator i=merged_t.begin(); 
-        merged_t.end()!=i; ++i) {
-      EUROPA::TokenId master = (*i)->master();
-      if( master.isId() ) {
-        if( master->isCommitted() ) {
-          std::vector<EUROPA::ConstrainedVariableId> const &actives = (*t)->getVariables();
-          std::vector<EUROPA::ConstrainedVariableId> const &mergeds = (*i)->getVariables();
-          (*i)->cancel();
-          constraint_engine()->propagate();
-          for(size_t v=1; v<actives.size(); ++v)
-            actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
-          to_del.insert(*i);
-        } else 
-          can_delete=false;
-      } else {
-        if( (*i)->isFact() ) {
-          (*t)->makeFact();
-          to_del.insert(*i);
-	  for(state_map::const_iterator j=m_agent_timelines.begin();
-	      m_agent_timelines.end()!=j; ++j)
-	    (*j)->replaced(*i);
-        } else 
-          can_delete = false;
-      }
-    }
-    
-    EUROPA::TokenSet slaves_t = (*t)->slaves();
-    for(EUROPA::TokenSet::const_iterator i=slaves_t.begin(); 
-        slaves_t.end()!=i; ++i) {
-    
-      if( (*i)->isInactive() )
-        to_del.insert(*i);
-      else {
-        bool ended;
-        can_delete = false;
-        
-        
-        if( (*i)->isActive() ) {
-          if( (*i)->isCommitted() ) {
-            (*i)->removeMaster(*t);
-            ended = true;
-          } else
-            ended = (*i)->end()->lastDomain().getUpperBound()<now();
-        } else {          
-          details::restrict_bases(*i);
-                    
-          ended = (*i)->end()->baseDomain().getUpperBound()<now();
-        }
-        if( ended )
-          m_terminated.insert(*i);
-      }
-    }
-    if( can_delete )
-      to_del.insert(*t);
-  }
-  for(t=to_del.begin(); to_del.end()!=t; ++t) {
-    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
-      m_terminated.erase((*t)->getKey());
-      if( !(*t)->isInactive() )
-        (*t)->cancel();
-      (*t)->discard();
-    }
-  }
-  to_del.clear();
-  
-  for(token_set::const_iterator t=m_terminated.begin(); m_terminated.end()!=t; ++t) {    
-    EUROPA::TokenId tok(*t);
-    
-    if( tok->isInactive() ) 
-      to_del.insert(*t); // May need some extra guard here
-    else if( tok->isMerged() ) {
-      EUROPA::TokenId active = tok->getActiveToken();
-      if( active->isCommitted() ) {
-        std::vector<EUROPA::ConstrainedVariableId> const &actives = active->getVariables();
-        std::vector<EUROPA::ConstrainedVariableId> const &mergeds = tok->getVariables();
-        tok->cancel();
-        constraint_engine()->propagate();
-        for(size_t v=1; v<actives.size(); ++v)
-          actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
-        to_del.insert(tok);        
-      } else 
-        m_terminated.insert(active);
-      continue; // would need more in here 
-    }
-    if(tok->canBeCommitted() )
-      tok->commit();
-  }
-  for(t=to_del.begin(); to_del.end()!=t; ++t) {
-    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
-      m_terminated.erase((*t)->getKey());
-      if( !(*t)->isInactive() )
-        (*t)->cancel();
-      (*t)->discard();
-    }
-  }
-  to_del.clear();
-  
-  constraint_engine()->propagate();
-  // plan_db()->archive(now()-1);
-}
-
-void Assembly::new_tick() {
-  EUROPA::TokenSet::const_iterator t;
-  for(t=m_roots->roots().begin(); m_roots->roots().end()!=t; ++t) {
-    if( (*t)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED) ) {
-      EUROPA::TokenId active = (*t);
-      if( (*t)->isMerged() )
-	active = (*t)->getActiveToken();
-      if( now()<=active->start()->lastDomain().getUpperBound() ) {
-	EUROPA::IntervalIntDomain 
-	  new_start(now(), std::numeric_limits<EUROPA::eint>::infinity());
-	details::restrict_base(*t, (*t)->start(), new_start);
-      }
-    }
-  }
-}
-
-bool Assembly::relax(bool destructive) {
-  // Clean up decisions made lastly 
-  synchronizer()->reset();
-  planner()->reset();
-  // Remove dangling token from past decisions  
-  EUROPA::TokenSet const &toks = m_roots->roots();
-  EUROPA::TokenSet to_erase;
-  
-  for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
-    bool is_past = (*t)->end()->baseDomain().getUpperBound()<=now();
-    bool is_goal = (*t)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED);
-    
-    if( is_past ) {
-      if( (*t)->isFact() ) {
-        if( destructive ) {
-          if( !(*t)->isInactive() )
-            (*t)->cancel();
-          to_erase.insert(*t);
-	  // notify my current states
-	  for(state_map::const_iterator i=m_agent_timelines.begin();
-	      m_agent_timelines.end()!=i; ++i)
-	    (*i)->erased(*t);
-        } 
-      } else {
-        // Removing the past goals
-        if( is_goal || destructive ) {
-          if( !(*t)->isInactive() )
-            (*t)->cancel();
-          to_erase.insert(*t);
-        }
-      }
-    } else {
-      if( !( (*t)->isInactive() || (*t)->isFact() ) )
-        (*t)->cancel();
-    }
-  }
-  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
-    (*t)->discard();
-  
-  //  bool autoprop = constraint_engine()->getAutoPropagation();
-  //  constraint_engine()->setAutoPropagation(false);
-  //  for(EUROPA::TokenSet::const_iterator t=m_terminated.begin(); 
-  //      m_terminated.end()!=t; ++t) {
-  //    if( (*t)->isInactive() ) {
-  //      (*t)->activate();
-  //    }
-  //  }
-  //  constraint_engine()->setAutoPropagation(autoprop);
-  return m_cstr_engine->propagate();
-}
 
 // observers
-
-bool Assembly::have_predicate(EUROPA::ObjectId const &obj, 
-			      std::string &name) const {
-  EUROPA::LabelStr obj_type = obj->getType();
-
-  if( !schema()->isPredicate(name.c_str()) ) {
-    std::string long_name = obj_type.toString()+"."+name;
-    if( schema()->isPredicate(long_name.c_str()) )
-      name = long_name;
-    else 
-      return false;
-  } 
-  return schema()->canBeAssigned(obj_type, name.c_str());
-}
-
 
 bool Assembly::internal(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
@@ -594,15 +444,11 @@ bool Assembly::internal(EUROPA::TokenId const &tok) const {
       objs.end()!=o; ++o) 
     if( !internal(*o) )
       return false;
-  return true;
-}
-
-bool Assembly::internal(details::CurrentState const &state) const {
-  return is_internal(state.timeline()->getName());
+  return true;  
 }
 
 bool Assembly::internal(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && is_internal(obj->getName());
+  return is_agent_timeline(obj) && is_internal(obj->getName());  
 }
 
 bool Assembly::external(EUROPA::TokenId const &tok) const {
@@ -613,11 +459,11 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
       objs.end()!=o; ++o) 
     if( !external(*o) )
       return false;
-  return true;
+  return true;    
 }
 
 bool Assembly::external(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && is_external(obj->getName());
+  return is_agent_timeline(obj) && is_external(obj->getName());    
 }
 
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
@@ -628,16 +474,36 @@ bool Assembly::ignored(EUROPA::TokenId const &tok) const {
       objs.end()!=o; ++o) 
     if( !ignored(*o) )
       return false;
-  return !objs.empty();
+  return !objs.empty(); // we do not ignore tokens with no possible object      
+}
+
+bool Assembly::is_agent_timeline(EUROPA::TokenId const &token) const {
+  return schema()->isA(token->getBaseObjectType(), TREX_TIMELINE);
+}
+
+
+
+bool Assembly::have_predicate(EUROPA::ObjectId const &obj,
+                              std::string &name) const {
+  EUROPA::LabelStr obj_type = obj->getType();
+  
+  if( !schema()->isPredicate(name.c_str()) ) {
+    std::string long_name = obj_type.toString()+"."+name;
+    if( schema()->isPredicate(long_name.c_str()) )
+      name = long_name;
+    else 
+      return false;
+  } 
+  return schema()->canBeAssigned(obj_type, name.c_str());  
 }
 
 EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
-						  std::string const &attr) const {
+                                                  std::string const &attr) const {
   std::string full_name = obj->getName().toString()+"."+attr;
   EUROPA::ConstrainedVariableId var = obj->getVariable(full_name);
   if( var.isNoId() )
     throw EuropaException("Variable \""+full_name+"\" does not exist.");
-  return var;
+  return var;  
 }
 
 void Assembly::print_plan(std::ostream &out, bool expanded) const {
@@ -645,16 +511,16 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
   is_not_merged filter(expanded);
   
   out<<"digraph plan_"<<now()<<" {\n"
-     <<"  node[shape=\"box\"];\n\n";
+  <<"  node[shape=\"box\"];\n\n";
   boost::filter_iterator<is_not_merged, EUROPA::TokenSet::const_iterator>
-    it(filter, tokens.begin(), tokens.end()), 
-    endi(filter, tokens.end(), tokens.end());
+  it(filter, tokens.begin(), tokens.end()), 
+  endi(filter, tokens.end(), tokens.end());
   // Iterate through plan tokens
   for( ; endi!=it; ++it) {
     EUROPA::eint key = (*it)->getKey();
     // display the token as a node
     out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
-       <<'('<<key<<") {\\n";
+    <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() ) 
       out<<"incomplete\\n";
     std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
@@ -717,7 +583,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
         if( expanded ) 
           key = (*t)->getKey();
         out<<"  t"<<master->getKey()<<"->t"<<key
-           <<"[label=\""<<(*t)->getRelation().toString()<<"\"";
+        <<"[label=\""<<(*t)->getRelation().toString()<<"\"";
         if( (*it)!=(*t) )
           out<<" color=grey";
         out<<"];\n";
@@ -727,4 +593,339 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
   out<<"}"<<std::endl;
 }
 
+
+/*
+ * class TREX::europa::Assembly::listener_proxy
+ */
+
+void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
+  EUROPA::TokenId master = token->master();
+  
+  if( master.isNoId() ) {
+    m_owner.m_roots.insert(token);
+  } 
+}
+
+void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
+  m_owner.m_roots.erase(token);
+  m_owner.m_completed.erase(token);
+  if( token->isFact() && m_owner.is_agent_timeline(token) ) {  
+    // Not very efficient bu  it should do for now ...
+    for (Assembly::state_iterator i=m_owner.m_agent_timelines.begin(); 
+         m_owner.m_agent_timelines.end()!=i; ++i)
+      (*i)->erased(token);
+  }
+}
+
+void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyRejected(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyCommitted(EUROPA::TokenId const &token) {
+  
+}
+
+void Assembly::listener_proxy::notifyTerminated(EUROPA::TokenId const &token) {
+  
+}
+
+
+/*
+
+// statics 
+
+EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentStateId const &cs) {
+  if( cs.isId() ) 
+    return cs->timeline();
+  return EUROPA::TimelineId::noId();
+}
+
+EUROPA::eint details::token_id_traits::get_id(EUROPA::TokenId const &t) {
+  return t->getKey();
+}
+
+
+
+void Assembly::root_tokens::notifyAdded(EUROPA::TokenId const & token) {
+  if( token->master().isNoId() )
+    m_roots.insert(token);  
+}
+
+void Assembly::root_tokens::notifyRemoved(EUROPA::TokenId const & token) {
+  m_committed.erase(token);
+  if( token->master().isNoId() ) {
+    m_roots.erase(token);
+    if( NULL!=m_owner )
+      m_owner->doDiscard(token);
+  }
+}
+
+void Assembly::root_tokens::notifyDeactivated(EUROPA::TokenId const &token) {
+  if( NULL!=m_owner )
+    m_owner->cancel(token);  
+}
+
+void Assembly::root_tokens::notifyCommitted(EUROPA::TokenId const & token) {
+  m_committed.insert(token);
+  m_roots.erase(token);
+}
+
+
+
+// manipulators
+
+
+EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj, std::string &pred, 
+				  bool &undefined) {
+  if( !external(obj) ) 
+    throw EuropaException(obj->toString()+"is not an External timeline");
+  state_iterator 
+    handler = m_agent_timelines.find(EUROPA::TimelineId(obj));
+  undefined = false;
+    
+  if( !have_predicate(obj, pred) ) {
+    std::string prev = pred;
+    pred = UNDEFINED_PRED;
+    if( !have_predicate(obj, pred) )
+      throw EuropaException("Unable to create token "+prev+" or "+UNDEFINED_PRED+
+			    " for timeline "+obj->toString());
+    undefined = true;
+  }
+  return (*handler)->new_obs(plan_db()->getClient(), pred, false);
+}
+
+EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj, 
+				       std::string const &name,
+				       bool fact) {
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  bool rejectable = !fact;
+  
+  if( !schema()->isPredicate(name.c_str()) )
+    throw EuropaException("Unknown predicate \""+name+"\" for object "
+			  +obj->getName().toString());
+  EUROPA::TokenId tok = cli->createToken(name.c_str(), NULL, rejectable, fact);
+  
+  if( !tok.isId() )
+    throw EuropaException("Failed to create token "+name);
+
+  // Restrict token domain to obj
+  EUROPA::ConstrainedVariableId obj_var = tok->getObject();
+  obj_var->specify(obj->getKey());
+  
+  // if( tok->isIncomplete() )
+  //   tok->close();
+  
+  return tok;
+}
+
+void Assembly::doDiscard(EUROPA::TokenId const &tok) {
+  m_terminated.erase(tok->getKey());
+  discard(tok);
+}
+
+
+void Assembly::recalled(EUROPA::TokenId const &tok) {
+  // Very aggressive way to handle this 
+  if( !tok->isInactive() )
+    tok->cancel();
+  tok->discard();
+}
+
+void Assembly::terminate(EUROPA::TokenId const &token) {
+  if( m_terminated.insert(token).second ) {
+    debugMsg("trex:token", "Terminated token "<<token->toString());
+  }
+//  if( token->canBeCommitted() ) 
+//    token->commit();
+}
+
+
+void Assembly::archive() {
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  EUROPA::TokenSet to_del;
+  
+  debugMsg("trex:archive", '['<<now()<<"] ============= START archiving ============");
+  
+  // Process first the already committed tokens
+  EUROPA::TokenSet::const_iterator t;
+  for(t=m_roots->committed().begin(); m_roots->committed().end()!=t; ++t) {
+    bool can_delete = true;
+    debugMsg("trex:archive", "Evaluating committed token "<<(*t)->toString());
+    
+    EUROPA::TokenSet merged_t = (*t)->getMergedTokens();
+    
+    for(EUROPA::TokenSet::const_iterator i=merged_t.begin(); 
+        merged_t.end()!=i; ++i) {
+      EUROPA::TokenId master = (*i)->master();
+      if( master.isId() ) {
+        if( master->isCommitted() ) {
+          std::vector<EUROPA::ConstrainedVariableId> const &actives = (*t)->getVariables();
+          std::vector<EUROPA::ConstrainedVariableId> const &mergeds = (*i)->getVariables();
+          // constraint_engine()->propagate();
+          for(size_t v=1; v<actives.size(); ++v)
+            actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
+          debugMsg("trex:archive", "Removing merged token "<<(*i)->toString()
+                   <<':'<<(*i)->start()->lastDomain().toString()<<"->"<<(*i)->end()->lastDomain().toString());
+          cli->cancel(*i);
+          to_del.insert(*i);
+        } else {
+          debugMsg("trex:archive", "Cannot cancel  "<<(*t)->toString()
+                   <<":\n\t"<<(*i)->toString()<<"'s master is not commmitted");
+          can_delete=false;
+        }
+      } else {
+        if( (*i)->isFact() ) {
+          debugMsg("trex:archive", "Collapsing committed token "<<(*t)->toString()
+                   <<" with fact "<<(*i)->toString());
+          (*t)->makeFact();
+          to_del.insert(*i);
+	  for(state_map::const_iterator j=m_agent_timelines.begin();
+	      m_agent_timelines.end()!=j; ++j)
+	    (*j)->replaced(*i);
+        } else {
+          debugMsg("trex:archive", "Cannot cancel  "<<(*t)->toString()
+                   <<":\n\t non factual merged token "<<(*i)->toString()<<" is in the way");
+          can_delete = false;
+        }
+      }
+    }
+    
+    EUROPA::TokenSet slaves_t = (*t)->slaves();
+    for(EUROPA::TokenSet::const_iterator i=slaves_t.begin(); 
+        slaves_t.end()!=i; ++i) {
+    
+      if( (*i)->isInactive() ) {
+        debugMsg("trex:archive", "Removing inactive slave "<<(*i)->toString()
+                 <<':'<<(*i)->start()->lastDomain().toString()<<"->"<<(*i)->end()->lastDomain().toString());
+        to_del.insert(*i);
+      } else {
+        bool ended;
+        
+        
+        if( (*i)->isActive() ) {
+          if( (*i)->isCommitted() ) {
+            (*i)->removeMaster(*t);
+            debugMsg("trex:archive", "Disconnect comitted token "<<(*i)->toString()
+                     <<" from its master");
+            ended = true;
+          } else {
+            ended = (*i)->end()->lastDomain().getUpperBound()<now();
+            can_delete = false;
+          }
+        } else {          
+          details::restrict_bases(*i);
+                    
+          ended = (*i)->end()->baseDomain().getUpperBound()<now();
+          can_delete = false;
+        }
+        if( ended && !(*i)->isCommitted() ) {
+          m_terminated.insert(*i);
+          debugMsg("trex:archive", "Mark "<<(*i)->toString()
+                   <<" as finished");
+        }
+      }
+    }
+    if( can_delete ) {
+      debugMsg("trex:archive", "Removing committed token "<<(*t)->toString()
+               <<':'<<(*t)->start()->lastDomain().toString()<<"->"<<(*t)->end()->lastDomain().toString());
+      to_del.insert(*t);
+    }
+  }
+  debugMsg("trex:archive", "Deleting "<<to_del.size()<<" token(s).");
+  for(t=to_del.begin(); to_del.end()!=t; ++t) {
+    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
+      m_terminated.erase((*t)->getKey());
+      if( !(*t)->isInactive() )
+        cli->cancel(*t);
+      debugMsg("trex:archive", "Discard "<<(*t)->toString());
+      (*t)->discard();
+    }
+  }
+  to_del.clear();
+  
+  debugMsg("trex:archive", "Looking for terminated token(s).");
+  for(token_set::const_iterator t=m_terminated.begin(); m_terminated.end()!=t; ++t) {    
+    EUROPA::TokenId tok(*t);
+    
+    if( tok->isInactive() ) {
+      debugMsg("trex:archive", "Removing inactive past token "<<(*t)->toString());
+      to_del.insert(*t); // May need some extra guard here
+    } else if( tok->isMerged() ) {
+      EUROPA::TokenId active = tok->getActiveToken();
+      if( active->isCommitted() ) {
+        std::vector<EUROPA::ConstrainedVariableId> const &actives = active->getVariables();
+        std::vector<EUROPA::ConstrainedVariableId> const &mergeds = tok->getVariables();
+        debugMsg("trex:archive", "Removing merged token "<<(*t)->toString());
+        for(size_t v=1; v<actives.size(); ++v)
+          actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
+        cli->cancel(tok);
+        to_del.insert(tok);        
+      } else 
+        m_terminated.insert(active);
+      continue; 
+    }
+    if(tok->canBeCommitted() ) {
+      debugMsg("trex:archive", "Mark "<<tok->toString()<<" as commmitted.");
+      tok->commit();
+    }
+  }
+  debugMsg("trex:archive", "Deleting "<<to_del.size()<<" token(s).");
+  for(t=to_del.begin(); to_del.end()!=t; ++t) {
+    if( !(t->isInvalid() || (*t)->isDeleted()) ) {
+      m_terminated.erase((*t)->getKey());
+      if( !(*t)->isInactive() )
+        cli->cancel(*t);
+      debugMsg("trex:archive", "Discard "<<(*t)->toString());
+      (*t)->discard();
+    }
+  }
+  to_del.clear();
+  
+  constraint_engine()->propagate();
+  debugMsg("trex:archive", '['<<now()<<"] ============= END archiving ============");
+
+  // plan_db()->archive(now()-1);
+}
+
+void Assembly::new_tick() {
+  EUROPA::TokenSet::const_iterator t;
+  for(t=m_roots->roots().begin(); m_roots->roots().end()!=t; ++t) {
+    if( (*t)->getState()->baseDomain().isMember(EUROPA::Token::REJECTED) ) {
+      EUROPA::TokenId active = (*t);
+      if( (*t)->isMerged() )
+	active = (*t)->getActiveToken();
+      if( now()<=active->start()->lastDomain().getUpperBound() ) {
+	EUROPA::IntervalIntDomain 
+	  new_start(now(), std::numeric_limits<EUROPA::eint>::infinity());
+	details::restrict_base(*t, (*t)->start(), new_start);
+      }
+    }
+  }
+}
+
+// observers
+
+
+
+*/
 

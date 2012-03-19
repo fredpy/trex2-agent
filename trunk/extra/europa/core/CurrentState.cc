@@ -139,6 +139,13 @@ bool CurrentState::committed() const {
     && current()->end()->baseDomain().getLowerBound() > now();
 }
 
+bool CurrentState::check_committed() const {
+  return committed() && m_prev_obs.isNoId() 
+    && current()->start()->isSpecified() 
+    && current()->start()->getSpecifiedValue()!=now();
+}
+
+
 bool CurrentState::internal() const {
   return m_assembly.internal(EUROPA::ObjectId(m_timeline));
 }
@@ -189,15 +196,10 @@ void CurrentState::apply_base(EUROPA::TokenId &merged) {
 void CurrentState::replaced(EUROPA::TokenId const &token) {
   EUROPA::eint t_start;
 
-  if( m_last_obs==token ) {
-    //    t_start = m_last_obs->start()->getSpecifiedValue();
+  if( m_last_obs==token )
     apply_base(m_last_obs);
-    //m_last_obs->start()->specify(t_start);
-  } else if( m_prev_obs==token ) {
-    //t_start = m_prev_obs->start()->getSpecifiedValue();
+  else if( m_prev_obs==token )
     apply_base(m_last_obs);
-    // m_prev_obs->start()->specify(t_start);
-  }
 }
 
 
@@ -225,58 +227,66 @@ void CurrentState::relax_end(EUROPA::DbClientId const &cli) {
   m_constraint = EUROPA::ConstraintId::noId();
 }
 
-void CurrentState::commit() {  
-  debugMsg("trex:synch", "["<<now()<<"] commit "<<m_last_obs->toString()<<" on "<<timeline()->toString());
-  if( m_prev_obs.isId() ) {
-    debugMsg("trex:synch", "Terminating "<<m_prev_obs->toString()<<'('<<m_prev_obs->getKey()<<")");
-    EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
+bool CurrentState::commit() { 
+  if( check_committed() )
+    return true; 
+  else {
+    EUROPA::eint start_time;
+    
+    if( m_prev_obs.isId() ) {
+      EUROPA::TokenId active = m_prev_obs;
+      EUROPA::IntervalIntDomain i_now(now());
+      
+      debugMsg("trex:commit", "Terminating "<<timeline()->toString()<<'.'
+               <<m_prev_obs->getUnqualifiedPredicateName().toString()<<'('<<m_prev_obs->getKey()<<')');
 
-//    {
-//      scoped_split prev(m_prev_obs);
-//      prev->end()->restrictBaseDomain(EUROPA::IntervalIntDomain(now()));
-//      prev->duration()->restrictBaseDomain(EUROPA::IntervalIntDomain(now()-start));
-//    }
-    restrict_base(m_prev_obs, m_prev_obs->end(), EUROPA::IntervalIntDomain(now()));
-    restrict_base(m_prev_obs, m_prev_obs->duration(), EUROPA::IntervalIntDomain(now()-start));
-
-    m_assembly.terminate(m_prev_obs);
-    m_prev_obs = EUROPA::TokenId::noId();
-    restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
-    m_assembly.notify(*this);
-    if( m_constraint.isId() ) {
-      m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
-      m_constraint = EUROPA::ConstraintId::noId();
-    }
-  } else {
-    EUROPA::eint start = m_last_obs->start()->getSpecifiedValue();
-    if( now()==start ) {
+      if( m_prev_obs->isMerged() )
+        active=m_prev_obs->getActiveToken();
+      
+      if( active->end()->lastDomain().intersects(i_now) ) {
+        EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
+        
+        restrict_base(m_prev_obs, m_prev_obs->end(), EUROPA::IntervalIntDomain(now()));
+        restrict_base(m_prev_obs, m_prev_obs->duration(), EUROPA::IntervalIntDomain(now()-start));
+        
+        m_assembly.terminate(m_prev_obs);
+        m_prev_obs = EUROPA::TokenId::noId();        
+      } else {
+        debugMsg("trex:always", "Unexpected termination of token "<<m_prev_obs->toString());
+        return false;
+      }
+      debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
+               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
+      restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
+      m_assembly.notify(*this);
+      if( m_constraint.isId() ) {
+        m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
+        m_constraint = EUROPA::ConstraintId::noId();
+      }
+      start_time = now();
+    } else
+      start_time = m_last_obs->start()->getSpecifiedValue();
+      
+    if( now()==start_time ) {
+      debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
+               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
       restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
       m_assembly.notify(*this);      
     } else {
       EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
-        dur(now()+1-start, std::numeric_limits<EUROPA::eint>::infinity());
+        dur(now()+1-start_time, std::numeric_limits<EUROPA::eint>::infinity());
     
-//      {
-//        scoped_split cur(m_last_obs);  
-//        
-//        cur->end()->restrictBaseDomain(future);
-//        cur->duration()->restrictBaseDomain(dur);
-//        m_assembly.constraint_engine()->propagate();
-//        debugMsg("trex:synch", "Plan during commit["<<timeline()->toString()<<"]:\n"
-//                 <<EUROPA::PlanDatabaseWriter::toString(m_assembly.plan_db()));
-//      }
+      debugMsg("trex:commit", "Extend duration of"<<timeline()->toString()<<'.'
+               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
       restrict_base(m_last_obs, m_last_obs->end(), future);
       restrict_base(m_last_obs, m_last_obs->duration(), dur);
-      m_assembly.constraint_engine()->propagate();
     }
     if( m_constraint.isId() ) {
       m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
       m_constraint = EUROPA::ConstraintId::noId();
     }
+    return m_assembly.constraint_engine()->propagate();
   }
-  // if( m_last_obs->canBeCommitted() )
-  //   m_last_obs->commit();
-  debugMsg("trex:synch", "["<<now()<<"] end commit on "<<timeline()->toString());
 }
 
 // manipulators
