@@ -35,6 +35,7 @@
 #include "trex/europa/Assembly.hh"
 
 #include <PLASMA/RuleInstance.hh>
+#include <PLASMA/TokenVariable.hh>
 
 using namespace TREX::europa;
 
@@ -153,4 +154,12 @@ EUROPA::TokenId details::scoped_split::active() const {
 	
 EUROPA::Token *details::scoped_split::operator->() const {
   return m_token.operator->();
+}
+
+/*
+ * struct TREX::europa::details::is_rejectable
+ */
+
+bool details::is_rejectable::operator()(EUROPA::TokenId const &tok) const {
+  return tok->getState()->baseDomain().isMember(EUROPA::Token::REJECTED);
 }

@@ -82,7 +82,7 @@ namespace TREX {
 	  return m_pred_default;
 	}
 
-	void commit();
+	bool commit();
 	bool internal() const;
 	bool external() const;
 
@@ -139,6 +139,8 @@ namespace TREX {
 				bool insert=true);
 	void new_token(EUROPA::TokenId const &token);
 	void relax_token();
+        
+        bool check_committed() const;
 
 	void erased(EUROPA::TokenId const &token);
 	void replaced(EUROPA::TokenId const &token);

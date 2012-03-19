@@ -105,19 +105,19 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
 
 bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::eint cur = assembly().now();
-  debugMsg("trex:synch", "Checking if "<<tok->toString()<<" overlaps "<<cur);
+  // debugMsg("trex:filt:synch", "Checking if "<<tok->toString()<<" overlaps "<<cur);
   
   if( tok->start()->lastDomain().getLowerBound() > cur ) {
-    debugMsg("trex:synch", "start="<<tok->start()->lastDomain().toString()
+    debugMsg("trex:filt:synch", tok->toString()<<".start="<<tok->start()->lastDomain().toString()
              <<" after "<<cur<<" => EXCLUDE"); 
     return true;
   }
   if( tok->end()->lastDomain().getUpperBound() < cur ) {
-    debugMsg("trex:synch", "end="<<tok->end()->lastDomain().toString()
+    debugMsg("trex:filt:synch", tok->toString()<<".end="<<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 
     return true;
   }
-  debugMsg("trex:synch", tok->toString()<<" overlaps "<<cur<<" => OK");
+//  debugMsg("trex:filt:synch", tok->toString()<<" overlaps "<<cur<<" => OK");
   return false;
 }
 
