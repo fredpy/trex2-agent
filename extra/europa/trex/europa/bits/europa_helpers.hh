@@ -125,6 +125,10 @@ namespace TREX {
       void restrict_bases(EUROPA::TokenId const &tok);
       void restrict_attributes(EUROPA::TokenId const &tok);
       
+      struct is_rejectable {
+        bool operator()(EUROPA::TokenId const &tok) const;
+      }; 
+      
     } // TREX::europa::details
   } // TREX::europa
 } // TREX
