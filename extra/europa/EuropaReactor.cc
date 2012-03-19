@@ -235,38 +235,6 @@ void EuropaReactor::handleTickStart() {
   }
 }
 
-namespace {
-  
-  template<class Iter>
-  void commit(Iter from, Iter const &to) {
-    for(; to!=from; ++from)
-      (*from)->commit();
-  }
-
-} // ::
-
-void EuropaReactor::apply_externals() {
-  Assembly::external_iterator from(begin(), end()), to(end(), end()); 
-  commit(from, to);
-}
-
-bool EuropaReactor::do_synchronize() {
-  if( !synchronizer()->solve() ) {
-    std::string full_name = manager().file_name(getName().str()+".relax.dot");
-    syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    if( !( relax(false, full_name) && synchronizer()->solve() ) ) {
-      syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      return relax(true, full_name) && synchronizer()->solve();
-    }
-  }
-  return true;
-}
-
-void EuropaReactor::apply_internals() {
-  Assembly::internal_iterator from(begin(), end()), to(end(), end()); 
-  commit(from, to);
-}
-
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl, 
                              EUROPA::TokenId const &tok) {
   if( m_dispatched.left.find(tok)==m_dispatched.left.end() ) {
@@ -284,7 +252,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
                          *dynamic_cast<IntegerDomain *>(d_duration.get()), 
                          *dynamic_cast<IntegerDomain *>(d_end.get()));
 
-    // Manage other aattributes
+    // Manage other attributes
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
         attrs.end()!=a; ++a) {
       std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
@@ -313,30 +281,33 @@ bool EuropaReactor::synchronize() {
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
   } BOOST_SCOPE_EXIT_END
+
   
-  // First step : propagate external state 
-  apply_externals();
-
-  if( do_synchronize() ) {
-    // clean-up decisions
-    apply_internals();
-    // Prepare the reactor for next deliberation round
-    if( m_completed_this_tick ) {
-      planner()->clear(); // remove the past decisions of the planner
-                        
-      Assembly::external_iterator from(begin(), end()), to(end(), end()); 
-      for( ; to!=from; ++from) {
-        EUROPA::TokenId cur = (*from)->current();
-        if( cur->isMerged() )
-          m_dispatched.left.erase(cur->getActiveToken());
-      }
-
-      m_completed_this_tick = false;
+  if( !do_synchronize() ) {
+    std::string full_name = manager().file_name(getName().str()+".relax.dot");
+    m_completed_this_tick = false;
+    syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
+    if( !( relax(false) && do_synchronize() ) ) {
+      syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
+      if( !( relax(true) && do_synchronize() ) ) 
+        return false;
+    }
+  }
+  // Prepare the reactor for next deliberation round
+  if( m_completed_this_tick ) {
+    planner()->clear(); // remove the past decisions of the planner
+    
+    Assembly::external_iterator from(begin(), end()), to(end(), end()); 
+    for( ; to!=from; ++from) {
+      EUROPA::TokenId cur = (*from)->current();
+      if( cur->isMerged() )
+        m_dispatched.left.erase(cur->getActiveToken());
     }
     
-    return constraint_engine()->propagate(); // should not fail 
+    m_completed_this_tick = false;
   }
-  return false;
+    
+  return constraint_engine()->propagate(); // should not fail 
 }
 
 void EuropaReactor::discard(EUROPA::TokenId const &tok) {
@@ -372,13 +343,12 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
-      archive();
+      planner()->clear();
+      // archive();
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
-      }/* else 
-        logPlan("plan"); // log the plan anyway
-      */
+      }
     }
   }
   return !m_completed_this_tick;
@@ -386,7 +356,12 @@ bool EuropaReactor::hasWork() {
 
 void EuropaReactor::resume() {
   setStream();
-  planner()->step();
+  
+  if( constraint_engine()->pending() )
+    constraint_engine()->propagate();
+  
+  if( constraint_engine()->constraintConsistent() )
+    planner()->step();
   
   if( constraint_engine()->provenInconsistent() ) {
     syslog("WARN")<<"Inconsitency found during planning.";

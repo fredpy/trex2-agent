@@ -67,15 +67,9 @@ namespace TREX {
       void cancel(EUROPA::TokenId const &tok);
       bool dispatch(EUROPA::TimelineId const &tl, 
                     EUROPA::TokenId const &tok);
-      
-      void apply_externals();
-      bool do_synchronize();
-      void apply_internals();
-                           
-                           
+                                 
       bool restrict_token(EUROPA::TokenId &tok, 
 			  TREX::transaction::Predicate const &pred);
-
 
       bool is_internal(EUROPA::LabelStr const &name) const {
 	return isInternal(TREX::utils::Symbol(name.c_str()));
