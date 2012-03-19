@@ -185,6 +185,7 @@ Assembly::Assembly(std::string const &name):m_name(name) {
 
 Assembly::~Assembly() {
   setStream();
+  debugMsg("trex:end", "Destroying "<<m_name);
   m_proxy.reset();
   // cleanup base class
   doShutdown();
