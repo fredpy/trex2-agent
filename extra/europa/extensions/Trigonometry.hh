@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2012, MBARI.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,42 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "lightswitch.nddl"
+#ifndef H_trex_europa_Trignometry
+# define H_trex_europa_Trignometry
 
-class Trigo extends AgentTimeline {
-  predicate Holds {
-    float sin_t, cos_t;
-    duration < 180;
-  }
+# include <trex/europa/config.hh>
 
-  Trigo() {
-    super(Internal, "Holds");
-  }
-}
+# include <PLASMA/Constraint.hh>
 
-Trigo::Holds {
-  if( start<=AGENT_CLOCK ) {
-    duration == 1;
-    meets(Holds);
-  }
-  sin(end, sin_t);
-  cos(end, cos_t);
-}
+namespace TREX {
+  namespace europa {
 
-Light light = new Light(Observe);
-Switch switch = new Switch(External);
-LightSwitch sw = new LightSwitch(switch);
+    class CosineConstraint :public EUROPA::Constraint {
+    public:
+      CosineConstraint(EUROPA::LabelStr const &name,
+			EUROPA::LabelStr const &propagatorName,
+			EUROPA::ConstraintEngineId const &cstrEngine,
+			std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_angle;
+      EUROPA::Domain &m_cos;
+    }; // TREX::europa::CosineConstraint
 
-Luminance lum = new Luminance(Internal);
-Trigo     time_sin = new Trigo();
+    class SineConstraint :public EUROPA::Constraint {
+    public:
+      SineConstraint(EUROPA::LabelStr const &name,
+		     EUROPA::LabelStr const &propagatorName,
+		     EUROPA::ConstraintEngineId const &cstrEngine,
+		     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_angle;
+      EUROPA::Domain &m_sin;
+    }; // TREX::europa::SineConstraint
+  } // TREX::europa
+} // TREX
 
-close();
+#endif // H_trex_europa_Trignometry

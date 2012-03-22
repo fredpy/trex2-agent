@@ -34,6 +34,7 @@
 #include <trex/europa/Assembly.hh>
 
 #include "EarliestFirstFlawManager.hh"
+#include "Trigonometry.hh"
 
 #include <PLASMA/Token.hh>
 #include <PLASMA/TokenVariable.hh>
@@ -44,6 +45,8 @@ namespace {
       void registerComponents(TREX::europa::Assembly const &assembly) {
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cos, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint, sin, trex);
       }
       
     }; // ::Extensions
