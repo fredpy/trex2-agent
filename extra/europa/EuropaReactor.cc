@@ -268,6 +268,14 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
   return true;
 }
 
+bool EuropaReactor::do_relax(bool full) {
+  logPlan("failed");
+  bool ret = relax(full);
+  logPlan("relax");
+  return ret;
+}
+
+
 bool EuropaReactor::synchronize() {
   setStream();
   EuropaReactor &me = *this;
@@ -287,9 +295,10 @@ bool EuropaReactor::synchronize() {
     std::string full_name = manager().file_name(getName().str()+".relax.dot");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    if( !( relax(false) && do_synchronize() ) ) {
+    
+    if( !( do_relax(false) && do_synchronize() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      if( !( relax(true) && do_synchronize() ) ) 
+      if( !( do_relax(true) && do_synchronize() ) ) 
         return false;
     }
   }
@@ -310,23 +319,25 @@ bool EuropaReactor::synchronize() {
   return constraint_engine()->propagate(); // should not fail 
 }
 
-void EuropaReactor::discard(EUROPA::TokenId const &tok) {
+bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_active_requests.left.find(tok);
   
   if( m_active_requests.left.end()!=i ) {
-    syslog()<<"Discarded past request "<<i->second;
+    syslog()<<"Discarded past request ["<<i->second<<"]";
     m_active_requests.left.erase(i);
+    return true;
   } 
+  return false;
 }
 
 void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_dispatched.left.find(tok);
-  
+    
   if( m_dispatched.left.end()!=i ) {
     syslog()<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
     m_dispatched.left.erase(i);
-  }
+  } 
 }
 
 bool EuropaReactor::hasWork() {
@@ -344,7 +355,7 @@ bool EuropaReactor::hasWork() {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
       planner()->clear();
-      // archive();
+      archive();
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
@@ -363,9 +374,21 @@ void EuropaReactor::resume() {
   if( constraint_engine()->constraintConsistent() )
     planner()->step();
   
+  bool should_relax = false;
+  
   if( constraint_engine()->provenInconsistent() ) {
     syslog("WARN")<<"Inconsitency found during planning.";
+    should_relax = true;
+  }
+  if( planner()->isExhausted() ) {
+    syslog("WARN")<<"Deliberation solver is exhausted.";
+    should_relax = true;
+  }
+  
+  if( should_relax ) {
+    syslog("WARN")<<"Relax database after "<<planner()->getStepCount()<<" steps."; 
     if( !relax(false) )
+      syslog("WARN")<<"Failed to relax => forgetting past."; 
       if( !relax(true) ) {
         syslog("ERROR")<<"Unable to recover from plan inconsistency.";
 	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency."); 
