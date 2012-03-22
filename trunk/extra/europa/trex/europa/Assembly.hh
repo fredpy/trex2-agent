@@ -373,6 +373,8 @@ namespace TREX {
       
       virtual void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs) =0;
       virtual bool dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok) =0;
+      virtual bool discard(EUROPA::TokenId const &tok) { return false; }
+      virtual void cancel(EUROPA::TokenId const &tok) {}
       
       /** @brief Iterator through TREX state variables
        *
@@ -499,6 +501,7 @@ namespace TREX {
       
       bool do_synchronize();
       bool relax(bool aggressive);
+      void archive();
 
       void print_plan(std::ostream &out, bool expanded=false) const;
     private:
