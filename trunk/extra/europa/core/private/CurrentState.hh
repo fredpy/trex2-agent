@@ -132,10 +132,10 @@ namespace TREX {
       private:
 	CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline);
 
-	void push_end(EUROPA::DbClientId const &cli);
-	void relax_end(EUROPA::DbClientId const &cli);
+	void push_end();
+	void relax_end();
 
-	EUROPA::TokenId new_obs(EUROPA::DbClientId const &cli, std::string const &pred,
+	EUROPA::TokenId new_obs(std::string const &pred,
 				bool insert=true);
 	void new_token(EUROPA::TokenId const &token);
 	void relax_token();
@@ -147,6 +147,7 @@ namespace TREX {
 	static void apply_base(EUROPA::TokenId &merged);
 
 	Assembly          &m_assembly;
+        EUROPA::DbClientId m_client;
 	EUROPA::TimelineId m_timeline;
 	id_type            m_id;
 

@@ -85,7 +85,8 @@ bool is_internal::operator()(CurrentStateId const &timeline) const {
 // structors 
 
 CurrentState::CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline)
-  :m_assembly(assembly), m_timeline(timeline), m_id(this) {
+  :m_assembly(assembly), m_client(assembly.plan_db()->getClient()), 
+   m_timeline(timeline), m_id(this) {
   assembly.predicates(timeline, m_pred_names);
   // removed special values 
   m_pred_names.erase(Assembly::FAILED_PRED); 
@@ -156,13 +157,13 @@ bool CurrentState::external() const {
 
 // modifiers
 
-EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string const &pred, 
+EUROPA::TokenId CurrentState::new_obs(std::string const &pred, 
 				      bool insert) {
   EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity());
 
   debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
   m_prev_obs = m_last_obs;
-  m_last_obs = cli->createToken(pred.c_str(), NULL, false, true);
+  m_last_obs = m_client->createToken(pred.c_str(), NULL, false, true);
   
   m_last_obs->start()->specify(now());
   m_last_obs->end()->restrictBaseDomain(future);
@@ -171,7 +172,7 @@ EUROPA::TokenId CurrentState::new_obs(EUROPA::DbClientId const &cli, std::string
   if( insert ) {
     debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
     if( m_prev_obs.isId() )
-      cli->constrain(m_timeline, m_prev_obs, m_last_obs);
+      m_client->constrain(m_timeline, m_prev_obs, m_last_obs);
   }
   return current();
 }
@@ -199,7 +200,7 @@ void CurrentState::replaced(EUROPA::TokenId const &token) {
   if( m_last_obs==token )
     apply_base(m_last_obs);
   else if( m_prev_obs==token )
-    apply_base(m_last_obs);
+    apply_base(m_prev_obs);
 }
 
 
@@ -209,21 +210,21 @@ void CurrentState::new_token(EUROPA::TokenId const &token) {
 }
 
 void CurrentState::relax_token() {
-  m_last_obs->discard();
+  m_client->deleteToken(m_last_obs);
   m_last_obs = m_prev_obs;
   m_prev_obs = EUROPA::TokenId::noId();
 }
 
-void CurrentState::push_end(EUROPA::DbClientId const &cli) {
+void CurrentState::push_end() {
   std::vector<EUROPA::ConstrainedVariableId> lt_scope(2);
 
   lt_scope[0] = m_assembly.clock();
   lt_scope[1] = m_last_obs->end();
-  m_constraint = cli->createConstraint("lt", lt_scope, "Inertial value asumption");
+  m_constraint = m_client->createConstraint("lt", lt_scope, "Inertial value asumption");
 }
 
-void CurrentState::relax_end(EUROPA::DbClientId const &cli) {
-  cli->deleteConstraint(m_constraint);
+void CurrentState::relax_end() {
+  m_client->deleteConstraint(m_constraint);
   m_constraint = EUROPA::ConstraintId::noId();
 }
 
@@ -260,7 +261,7 @@ bool CurrentState::commit() {
       restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
       m_assembly.notify(*this);
       if( m_constraint.isId() ) {
-        m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
+        m_client->deleteConstraint(m_constraint);
         m_constraint = EUROPA::ConstraintId::noId();
       }
       start_time = now();
@@ -295,12 +296,15 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
   std::list<EUROPA::TokenId>::const_iterator 
     i = timeline()->getTokenSequence().begin(), 
     endi = timeline()->getTokenSequence().end();
+  
   // skip the past tokens
   for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb; ++i);
 
-  for( ; endi!=i && (*i)->end()->lastDomain().getLowerBound()<=ub; ++i)
+  for( ; endi!=i && (*i)->start()->lastDomain().getLowerBound()<=ub; ++i) {
+    // TODO: need to check if it is guarded first ... in such cas I won't dispatch it
     if( !m_assembly.dispatch(timeline(), *i) )
       break;
+  }
 }
 
 
@@ -431,21 +435,19 @@ void CurrentState::DecisionPoint::handleExecute() {
   m_prev_idx = m_idx;
   switch(m_idx) {
   case EXTEND_CURRENT:
-    m_target->push_end(m_client);
+    m_target->push_end();
     break;
   case START_NEXT:
-    tok = m_target->new_obs(m_client, (*m_tok)->getPredicateName().toString(), false);
+    tok = m_target->new_obs((*m_tok)->getPredicateName().toString(), false);
     m_client->merge(tok, *m_tok);
     details::restrict_attributes(tok);
     break;
   case CREATE_DEFAULT:
-    tok = m_target->new_obs(m_client, 
-			    details::predicate_name(m_target->timeline(), m_target->default_pred()),
+    tok = m_target->new_obs(details::predicate_name(m_target->timeline(), m_target->default_pred()),
 			    true);
     break;
   case CREATE_OTHER:
-    tok = m_target->new_obs(m_client, 
-			    details::predicate_name(m_target->timeline(), *m_next_pred),
+    tok = m_target->new_obs(details::predicate_name(m_target->timeline(), *m_next_pred),
 			    true);
     break;
   default:
@@ -457,7 +459,7 @@ void CurrentState::DecisionPoint::handleExecute() {
 void CurrentState::DecisionPoint::handleUndo() {
   switch(m_idx) {
   case EXTEND_CURRENT:
-    m_target->relax_end(m_client);
+    m_target->relax_end();
     advance();
     break;
   case START_NEXT:

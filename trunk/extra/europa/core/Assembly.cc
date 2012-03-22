@@ -175,7 +175,7 @@ Assembly::Assembly(std::string const &name):m_name(name) {
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
   
-  m_cstr_engine->setAutoPropagation(false);
+  m_cstr_engine->setAutoPropagation(true);
   
   // Get extra europa extensions 
   m_trex_schema->registerComponents(*this);
@@ -240,7 +240,9 @@ void Assembly::new_tick() {
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now()); 
   boost::filter_iterator<details::is_rejectable, EUROPA::TokenSet::const_iterator>
     t(m_roots.begin(), m_roots.end()), end_t(m_roots.end(), m_roots.end());
-
+  EUROPA::IntervalIntDomain future(now(), 
+                                   std::numeric_limits<EUROPA::eint>::infinity());
+  
   for(; end_t!=t; ++t) {
     EUROPA::TokenId active = (*t);
     
@@ -248,17 +250,43 @@ void Assembly::new_tick() {
       active = (*t)->getActiveToken();
     
     if( now()<=active->start()->lastDomain().getUpperBound() ) {
-      EUROPA::IntervalIntDomain new_start(now(), 
-                                          std::numeric_limits<EUROPA::eint>::infinity());
       debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
-      details::restrict_base(*t, (*t)->start(), new_start);
+      details::restrict_base(*t, (*t)->start(), future);
+      details::restrict_base(*t, (*t)->end(), EUROPA::IntervalIntDomain(now()+1, 
+                                                                        std::numeric_limits<EUROPA::eint>::infinity()));
       debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+    } else if( now()<=active->end()->lastDomain().getUpperBound() ) {
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
+      details::restrict_base(*t, (*t)->end(), future);
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
     }
   }
 }
 
 void Assembly::terminate(EUROPA::TokenId const &tok) {
+  details::is_rejectable rejectable;
+  EUROPA::TokenId active = tok;
+
   m_completed.insert(tok);
+  
+  // I assume here that if a goals ends time iis in the past then the goal is completed
+  
+  if( tok->isMerged() ) {
+    active = tok->getActiveToken();
+    if( rejectable(active) && discard(active) ) {
+      details::restrict_base(active, active->end(), tok->end()->baseDomain());
+      details::restrict_base(active, active->start(), tok->start()->baseDomain());
+      m_completed.insert(active);
+    }
+  }
+  for(EUROPA::TokenSet::const_iterator i=active->getMergedTokens().begin(); 
+      active->getMergedTokens().end()!=i; ++i) {
+    if( rejectable(*i) && discard(*i) ) {
+      details::restrict_base(*i, (*i)->end(), tok->end()->baseDomain());
+      details::restrict_base(*i, (*i)->start(), tok->start()->baseDomain());
+      m_completed.insert(*i);
+    }
+  }
 }
 
 // manipulators
@@ -337,7 +365,7 @@ bool Assembly::do_synchronize() {
     }
   }
     
-  // 2) execute synchgronizer
+  // 2) execute synchronizer
   if( !synchronizer()->solve() ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
     return false;
@@ -356,7 +384,7 @@ bool Assembly::relax(bool aggressive) {
   
   // Clean up decisions made by solvers 
   synchronizer()->reset();
-  planner()->clear();
+  planner()->reset();
   
   for(EUROPA::TokenSet::const_iterator t=m_roots.begin(); m_roots.end()!=t; ++t) {
     bool is_past = (*t)->end()->baseDomain().getUpperBound()<=now();
@@ -365,27 +393,32 @@ bool Assembly::relax(bool aggressive) {
       if( (*t)->isFact() ) {
         if( aggressive ) {
           if( !(*t)->isInactive() )
-            (*t)->cancel();
+            plan_db()->getClient()->cancel(*t);
           to_erase.insert(*t);
         }
       } else {
         if( rejectable(*t) || aggressive ) {
           if( !(*t)->isInactive() )
-            (*t)->cancel();
+            plan_db()->getClient()->cancel(*t);
           to_erase.insert(*t);          
         }
       }
     } else {
       if( !( (*t)->isInactive() || (*t)->isFact() ) )
-        (*t)->cancel();      
+        plan_db()->getClient()->cancel(*t);      
     }
   }
   
   for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
-    (*t)->discard();
+    plan_db()->getClient()->deleteToken(*t);
   
   return constraint_engine()->propagate();
 }
+
+void Assembly::archive() {
+  plan_db()->archive(now()-1);  
+}
+
 
 EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
                                        std::string const &name,
@@ -425,14 +458,19 @@ EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj,
 			    " for timeline "+obj->toString());
     undefined = true;
   }
-  return (*handler)->new_obs(plan_db()->getClient(), pred, false);
+  return (*handler)->new_obs(pred, false);
 }
 
 void Assembly::recalled(EUROPA::TokenId const &tok) {
   // Very aggressive way to handle this 
-  if( !tok->isInactive() )
-    tok->cancel();
-  tok->discard();
+  debugMsg("trex:recall", "Goal "<<tok->toString()<<" recalled.");
+  
+  if( !tok->isInactive() ) {
+    debugMsg("trex:recall", "Cancelling "<<tok->toString());
+    plan_db()->getClient()->cancel(tok);
+  }
+  debugMsg("trex:recall", "Destroying "<<tok->toString());
+  plan_db()->getClient()->deleteToken(tok);
 }
 
 
@@ -611,11 +649,15 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
   m_owner.m_roots.erase(token);
   m_owner.m_completed.erase(token);
-  if( token->isFact() && m_owner.is_agent_timeline(token) ) {  
-    // Not very efficient bu  it should do for now ...
-    for (Assembly::state_iterator i=m_owner.m_agent_timelines.begin(); 
-         m_owner.m_agent_timelines.end()!=i; ++i)
-      (*i)->erased(token);
+  
+  if( m_owner.is_agent_timeline(token) ) {
+    if( token->isFact() ) {  
+      // Not very efficient bu  it should do for now ...
+      for (Assembly::state_iterator i=m_owner.m_agent_timelines.begin(); 
+           m_owner.m_agent_timelines.end()!=i; ++i)
+        (*i)->erased(token);
+    }
+    m_owner.discard(token);
   }
 }
 
@@ -624,7 +666,8 @@ void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
-  
+  if( m_owner.is_agent_timeline(token) )
+    m_owner.cancel(token);
 }
 
 void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
