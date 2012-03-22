@@ -63,7 +63,7 @@ namespace TREX {
       void resume();
       
     private:
-      void discard(EUROPA::TokenId const &tok);
+      bool discard(EUROPA::TokenId const &tok);
       void cancel(EUROPA::TokenId const &tok);
       bool dispatch(EUROPA::TimelineId const &tl, 
                     EUROPA::TokenId const &tok);
@@ -78,7 +78,7 @@ namespace TREX {
 	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
       
-
+      bool do_relax(bool full);
 
       EUROPA::eint now() const {
 	return getCurrentTick();
