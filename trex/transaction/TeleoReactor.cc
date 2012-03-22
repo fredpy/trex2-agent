@@ -57,7 +57,7 @@ ReactorException::ReactorException(TeleoReactor const &r,
  * class TREX::transaction::DispatchError
  */
 // statics
-std::string DispatchError::buil_msg(goal_id const &g, std::string const &msg) throw() {
+std::string DispatchError::build_msg(goal_id const &g, std::string const &msg) throw() {
   std::ostringstream oss;
   oss<<"While dispatching ";
   if( !!g )
@@ -194,7 +194,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_latency(parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
    m_lookahead(parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
-   m_nSteps(0) {
+   m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
   if( parse_attr<bool>(log_default, node, "log") ) {
@@ -277,26 +277,45 @@ details::external TeleoReactor::find_external(TREX::utils::Symbol const &name) {
 
 // modifers/callbacks
 
+void TeleoReactor::reset_deadline() {
+  // initialize the deliberation parameters
+  m_deadline = getCurrentTick()+1+getLatency();
+  m_nSteps = 0;  
+  m_past_deadline = false;
+}
+
+
+
 double TeleoReactor::workRatio() {
   try {
     if( hasWork() ) {
       double ret = m_deadline;
       ret -= getCurrentTick();
-      if( ret<=0.0 )
+      if( ret<=0.0 ) {
+        if( !m_past_deadline ) {
+          m_past_deadline = true;
+          m_validSteps = m_nSteps;
+          syslog("WARN")<<" Reactor is now exceeding its deliberation latency ("
+          <<getLatency()<<')';
+        }
         ret = m_nSteps+1;
-      else {
+      } else {
         ret += 1.0;
         ret *= m_nSteps+1;
       }
       return 1.0/ret;
     }
   } catch(std::exception const &se) {
-    syslog("WARN")<<"Exception during hasWork question:"<<se.what();
+    syslog("WARN")<<"Exception during hasWork question: "<<se.what();
   } catch(...) {
     syslog("WARN")<<"Unknown Exception during hasWork question";
   }
-  m_nSteps = 0;
-  m_deadline = getCurrentTick()+1+getLatency();
+  if( m_past_deadline ) {
+    syslog("WARN")<<"Reactor needed to deliberate "<<(m_nSteps-m_validSteps)
+                  <<" steps spread other "<<(getCurrentTick()-m_deadline)
+                  <<" ticks after its latency."; 
+  }
+  reset_deadline();
   return NAN;
 }
 
@@ -309,7 +328,6 @@ void TeleoReactor::postObservation(Observation const &obs) {
 
   (*i)->postObservation(getCurrentTick(), obs);
   m_updates.insert(*i);
-  // syslog("ASSERT")<<obs;
 }
 
 bool TeleoReactor::postGoal(goal_id const &g) {
@@ -383,6 +401,7 @@ bool TeleoReactor::newTick() {
 		    <<" to "<<getCurrentTick();
       m_initialTick = getCurrentTick();
     }
+    reset_deadline();
     m_firstTick = false;
   }
   if( NULL!=m_trLog )
