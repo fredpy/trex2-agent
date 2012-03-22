@@ -218,7 +218,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
       } else if( is_tag(*i, "Internal") ) {
 	tl_name = parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*i, "Timlines cannot have an empty name");
+	  throw XmlError(*i, "Timelines cannot have an empty name");
 	provide(tl_name);
       }
     }
