@@ -81,6 +81,16 @@ bool EarliestFirstFlawManager::betterThan(EUROPA::EntityId const &a,
     explanation = "b.lb<a";
     return false;
   }
+  if( t_a->isFact() ) {
+    if( !t_b->isFact() ) {
+      explanation = "a.isFact";
+      return true;
+    }
+  } else if( t_b->isFact() ) {
+    explanation = "b.isFact";
+    return false;
+  }
+  
   bool ret = start_a.getUpperBound() < start_b.getUpperBound();
   
   if( ret ) {
