@@ -296,7 +296,7 @@ double TeleoReactor::workRatio() {
           m_past_deadline = true;
           m_validSteps = m_nSteps;
           syslog("WARN")<<" Reactor is now exceeding its deliberation latency ("
-          <<getLatency()<<')';
+          <<getLatency()<<")\n\tNumber of steps within its latency: "<<m_validSteps;
         }
         ret = m_nSteps+1;
       } else {
@@ -312,7 +312,7 @@ double TeleoReactor::workRatio() {
   }
   if( m_past_deadline ) {
     syslog("WARN")<<"Reactor needed to deliberate "<<(m_nSteps-m_validSteps)
-                  <<" steps spread other "<<(getCurrentTick()-m_deadline)
+                  <<" extra steps spread other "<<(getCurrentTick()-m_deadline)
                   <<" ticks after its latency."; 
   }
   reset_deadline();
