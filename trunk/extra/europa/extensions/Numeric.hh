@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2012, MBARI.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,30 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "lightswitch.nddl"
+#ifndef H_trex_europa_Numeric
+# define H_trex_europa_Numeric
 
-class Trigo extends AgentTimeline {
-  predicate Holds {
-    float sin_t, cos_t;
-    duration < 180;
-  }
+# include <trex/europa/config.hh>
 
-  Trigo() {
-    super(Internal, "Holds");
-  }
-}
+# include <PLASMA/Constraint.hh>
 
-Trigo::Holds {
-  if( start<=AGENT_CLOCK ) {
-    duration == 1;
-    meets(Holds);
-  }
-  sinEq(end, sin_t);
-  cosEq(end, cos_t);
-}
+namespace TREX {
+  namespace europa {
 
-Light light = new Light(Observe);
-Switch switch = new Switch(External);
-LightSwitch sw = new LightSwitch(switch);
+    class AbsValConstraint :public EUROPA::Constraint {
+    public:
+     AbsValConstraint(EUROPA::LabelStr const &name,
+		      EUROPA::LabelStr const &propagatorName,
+		      EUROPA::ConstraintEngineId const &cstrEngine,
+		      std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_abs;
+      EUROPA::Domain &m_val;
+    }; // TREX::europa::AbsValConstraint
 
-Luminance lum = new Luminance(Internal);
-Trigo     time_sin = new Trigo();
+  } // TREX::europa
+} // TREX
 
-close();
+#endif // H_trex_europa_Numeric

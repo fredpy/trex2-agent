@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2012, MBARI.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,51 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "lightswitch.nddl"
+#include "Numeric.hh"
 
-class Trigo extends AgentTimeline {
-  predicate Holds {
-    float sin_t, cos_t;
-    duration < 180;
-  }
+#include <PLASMA/ConstrainedVariable.hh>
 
-  Trigo() {
-    super(Internal, "Holds");
-  }
+
+using namespace TREX::europa;
+
+AbsValConstraint::AbsValConstraint(EUROPA::LabelStr const &name,
+				   EUROPA::LabelStr const &propagatorName,
+				   EUROPA::ConstraintEngineId const &cstrEngine,
+				   std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
+ m_abs(getCurrentDomain(vars[1])), 
+ m_val(getCurrentDomain(vars[0])) {
+  checkError(vars.size()==2, "Exactly 2 parameters required.");
 }
 
-Trigo::Holds {
-  if( start<=AGENT_CLOCK ) {
-    duration == 1;
-    meets(Holds);
+
+void AbsValConstraint::handleExecute() {
+  EUROPA::edouble a_lb, a_ub, v_lb, v_ub;
+  // restrict m_abs based on m_val
+  m_val.getBounds(v_lb, v_ub);
+  
+  if( v_lb>=0.0 ) {
+    a_lb = v_lb;
+    a_ub = v_ub;
+  } else {
+    if( v_ub>=0.0 )
+      a_lb = 0.0;
+    else 
+      a_lb = std::min(std::abs(v_lb), std::abs(v_ub));
+    a_ub = std::max(std::abs(v_lb), std::abs(v_ub));
   }
-  sinEq(end, sin_t);
-  cosEq(end, cos_t);
+  m_abs.intersect(a_lb, a_ub);
+
+  // constrain m_val based on m_abs
+  m_abs.getBounds(a_lb, a_ub);
+
+  if( a_lb==0.0 && m_val.isMember(-a_ub) && m_val.isMember(a_ub) )
+    m_val.intersect(-a_ub, a_ub);
+  if( ( m_val.isMember(a_lb) || m_val.isMember(a_ub) ) &&
+      ( m_val.isMember(-a_lb) || m_val.isMember(-a_ub) ) )
+    return;
+  if( m_val.isMember(a_lb) || m_val.isMember(a_ub) )
+    m_val.intersect(a_lb, a_ub);
+  if( m_val.isMember(-a_lb) || m_val.isMember(-a_ub) )
+    m_val.intersect(-a_ub, -a_lb);     
 }
-
-Light light = new Light(Observe);
-Switch switch = new Switch(External);
-LightSwitch sw = new LightSwitch(switch);
-
-Luminance lum = new Luminance(Internal);
-Trigo     time_sin = new Trigo();
-
-close();
