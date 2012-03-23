@@ -55,14 +55,17 @@ if(WITH_EUROPA)
     EuropaReactor.cc
     europa_convert.cc
     EuropaDomain.cc  
+    extensions/extensions.cc
     extensions/EarliestFirstFlawManager.cc
     extensions/Trigonometry.cc
+    extensions/Numeric.cc
     # headers
     EuropaReactor.hh
     EuropaEntity.hh
     bits/europa_convert.hh
     extensions/EarliestFirstFlawManager.hh
     extensions/Trigonometry.hh
+    extensions/Numeric.hh
   )
 
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)

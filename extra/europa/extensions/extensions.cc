@@ -31,33 +31,25 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "lightswitch.nddl"
+#include <trex/europa/Assembly.hh>
 
-class Trigo extends AgentTimeline {
-  predicate Holds {
-    float sin_t, cos_t;
-    duration < 180;
-  }
+#include "EarliestFirstFlawManager.hh"
+#include "Trigonometry.hh"
+#include "Numeric.hh"
 
-  Trigo() {
-    super(Internal, "Holds");
-  }
+
+namespace {
+  class Extensions :public TREX::europa::EuropaPlugin {
+    public:
+      void registerComponents(TREX::europa::Assembly const &assembly) {
+	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
+			EarliestFirst);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosEq, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint,   sinEq, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absEq, trex);
+      }
+      
+    }; // ::Extensions
+
+  Extensions s_extra;
 }
-
-Trigo::Holds {
-  if( start<=AGENT_CLOCK ) {
-    duration == 1;
-    meets(Holds);
-  }
-  sinEq(end, sin_t);
-  cosEq(end, cos_t);
-}
-
-Light light = new Light(Observe);
-Switch switch = new Switch(External);
-LightSwitch sw = new LightSwitch(switch);
-
-Luminance lum = new Luminance(Internal);
-Trigo     time_sin = new Trigo();
-
-close();
