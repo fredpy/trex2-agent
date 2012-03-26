@@ -54,6 +54,20 @@ namespace TREX {
       EUROPA::Domain &m_val;
     }; // TREX::europa::AbsValConstraint
 
+    class SqrtConstraint :public EUROPA::Constraint {
+    public:
+      SqrtConstraint(EUROPA::LabelStr const &name,
+                     EUROPA::LabelStr const &propagatorName,
+                     EUROPA::ConstraintEngineId const &cstrEngine,
+                     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_sqrt;
+      EUROPA::Domain &m_val;
+    }; // TREX::europa::SqrtConstraint
+    
+    
   } // TREX::europa
 } // TREX
 

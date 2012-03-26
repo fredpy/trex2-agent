@@ -47,6 +47,7 @@ namespace {
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosEq, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint,   sinEq, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absEq, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtEq, trex);
       }
       
     }; // ::Extensions
