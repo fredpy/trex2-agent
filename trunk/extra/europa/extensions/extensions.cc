@@ -36,6 +36,7 @@
 #include "EarliestFirstFlawManager.hh"
 #include "Trigonometry.hh"
 #include "Numeric.hh"
+#include "DoNotMatchFilter.hh"
 
 
 namespace {
@@ -45,6 +46,8 @@ namespace {
    * A bunch of extensions provided that, while not specific to TREX, comes handy 
    * to design models.
    * The additions are :
+   * @li the @c doNotMatch flaw filter that excludes all the flaws relasting to an 
+   *     entity that does not match a set of possible names
    * @li the @c EarliestFirst flaw manager that resolve open conditions by picking 
    *     first the on which start the earliest
    * @li the @c cosEq constraint that compute the cosine of an angle in degree
@@ -62,6 +65,8 @@ namespace {
   class Extensions :public TREX::europa::EuropaPlugin {
     public:
       void registerComponents(TREX::europa::Assembly const &assembly) {
+        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DoNotMatchFilter, doNotMatch);
+        
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosEq, trex);
