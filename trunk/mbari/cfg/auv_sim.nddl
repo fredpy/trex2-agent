@@ -1,0 +1,79 @@
+#include "TREX.nddl"
+#include "auv.nddl"
+
+
+class NavigationCmd extends Timeline {
+  predicate Holds {
+    SPEED  speed;
+    DEGREE heading;
+    PITCH  pitch;
+  }
+
+  NavigationCmd() {
+    super();
+  }
+}
+
+SetPoint::Active {
+  contained_by(condition NavigationCmd.Holds cmd);
+  cmd.speed == speed;
+  cmd.heading == heading;
+  cmd.pitch == pitch;
+}
+
+VehicleState::Holds {
+  contained_by(NavigationCmd.Holds cmd);
+  meets(VehicleState.Holds next);
+
+  // compute the distance in m/tick
+  float tick_speed, speed;
+  speed == cmd.speed; // need to do this in order to avoid europa complaining
+  tick_speed == speed * TICK_DURATION;
+  
+  float delta_z;
+
+  float tmp_x, tmp_y, tmp_z, nxt_x, nxt_y, nxt_z;
+
+  tmp_x == x;
+  tmp_y == y;
+  tmp_z == z;
+
+  // handle specific cases for dz 
+  if( tmp_z<0.0 ) {
+    // if at surface => stay there
+    delta_z == 0.0 - tmp_z;
+  } else {
+    if( cmd.speed<=0.1 ) {
+      // to slow => slowly rise to the surface
+      delta_z == -0.05 * TICK_DURATION;
+    } else {
+      float sin_pitch;
+      sinEq(cmd.pitch, sin_pitch);
+      delta_z == 0.0 - (tick_speed * sin_pitch);
+    }
+  }
+  
+  float cos_pitch, abs_cos_pitch, horizontal_dist;
+  
+  // compute the horizontal distance covered during this tick
+  cosEq(cmd.pitch, cos_pitch);
+  absEq(cos_pitch, abs_cos_pitch);
+  horizontal_dist == abs_cos_pitch*tick_speed;
+  
+  // Now transpose this displacemnt in the northing/easting axises
+  float sin_heading, cos_heading, dx_nav, dy_nav;
+  sinEq(cmd.heading, sin_heading);
+  cosEq(cmd.heading, cos_heading);
+  dx_nav == horizontal_dist*cos_heading;
+  dy_nav == horizontal_dist*sin_heading;
+
+ 
+  // Compute the next position
+  nxt_x == tmp_x+dx_nav;
+  nxt_y == tmp_y+dy_nav;
+  nxt_z == tmp_z+delta_z;
+
+  next.x == nxt_x;
+  next.y == nxt_y;
+  next.z == nxt_z;
+}
