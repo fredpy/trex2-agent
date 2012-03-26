@@ -291,7 +291,7 @@ double TeleoReactor::workRatio() {
     if( hasWork() ) {
       double ret = m_deadline;
       ret -= getCurrentTick();
-      if( ret<=0.0 ) {
+      if( ret<=0.0 && m_nSteps>0 ) {
         if( !m_past_deadline ) {
           m_past_deadline = true;
           m_validSteps = m_nSteps;
