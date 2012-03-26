@@ -1,0 +1,22 @@
+<Solver name="DefaultTestSolver">
+  	<ThreatManager defaultPriority="10">
+	  <FlawHandler component="StandardThreatHandler"/>
+  	</ThreatManager>
+
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
+	  <FlawFilter class-match="VehicleState"/>
+	  <FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+
+  	<UnboundVariableManager defaultPriority="200">
+	  <FlawFilter component="doNotMatch">
+	    <Choice name="start"/>
+	  </FlawFilter>
+	  <FlawHandler component="StandardVariableHandler"/>
+  	</UnboundVariableManager>
+
+
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="210">
+	  <FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+</Solver>
