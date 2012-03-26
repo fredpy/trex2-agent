@@ -59,6 +59,7 @@ if(WITH_EUROPA)
     extensions/EarliestFirstFlawManager.cc
     extensions/Trigonometry.cc
     extensions/Numeric.cc
+    extensions/DoNotMatchFilter.cc
     # headers
     EuropaReactor.hh
     EuropaEntity.hh
@@ -66,6 +67,7 @@ if(WITH_EUROPA)
     extensions/EarliestFirstFlawManager.hh
     extensions/Trigonometry.hh
     extensions/Numeric.hh
+    extensions/DoNotMatchFilter.hh
   )
 
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
