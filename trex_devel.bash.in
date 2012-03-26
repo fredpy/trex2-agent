@@ -39,7 +39,7 @@ TREX_BINS=@TREX_BINARY_DIRS@
 platform='unknown'
 lib_path_var=LD_LIBRARY_PATH
 unamestr=`uname`
-if [[ "$unamestr" == 'Darwin' ]]; then
+if [ "$unamestr" = 'Darwin' ]; then
     if [ -n "${DYLD_FALLBACK_LIBRARY_PATH+x}" ]; then
 	export DYLD_FALLBACK_LIBRARY_PATH=${TREX_LIBS}:${DYLD_FALLBACK_LIBRARY_PATH}
     else
