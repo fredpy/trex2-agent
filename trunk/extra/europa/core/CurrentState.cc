@@ -171,8 +171,13 @@ EUROPA::TokenId CurrentState::new_obs(std::string const &pred,
   
   if( insert ) {
     debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
-    if( m_prev_obs.isId() )
-      m_client->constrain(m_timeline, m_prev_obs, m_last_obs);
+    m_client->activate(m_last_obs);
+    if( m_prev_obs.isId() ) {
+      EUROPA::TokenId active = m_prev_obs;
+      if( m_prev_obs->isMerged() )
+        active = m_prev_obs->getActiveToken();
+      m_client->constrain(m_timeline, active, m_last_obs);
+    }
   }
   return current();
 }
