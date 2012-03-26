@@ -39,6 +39,26 @@
 
 
 namespace {
+  
+  /** @brief TREX extra europa extensions
+   *
+   * A bunch of extensions provided that, while not specific to TREX, comes handy 
+   * to design models.
+   * The additions are :
+   * @li the @c EarliestFirst flaw manager that resolve open conditions by picking 
+   *     first the on which start the earliest
+   * @li the @c cosEq constraint that compute the cosine of an angle in degree
+   * @li the @c sinEq constraint that compute the sine of an angle in degree
+   * @li the @c absEq constraint that ensures that that its second argument 
+   *     is the absolute value of its first
+   * @li the @c sqrtEq constraint that censures that its second argument is the 
+   *     square root of its first
+   * 
+   * @author Frederic Py <fpy@mbari.org>
+   * @note While these extensions are for now included by deault in the europa 
+   *      plugin, we may decide in the futrue to provide them as an extr plugin 
+   *      are none of them are critical.  
+   */
   class Extensions :public TREX::europa::EuropaPlugin {
     public:
       void registerComponents(TREX::europa::Assembly const &assembly) {
