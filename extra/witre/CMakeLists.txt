@@ -55,7 +55,15 @@ if(WITH_WITRE)
     TREXtransaction)
  
   trex_plugin(witre witre_pg.cc)
-  target_link_libraries(witre_pg TREXwitre)	
+  target_link_libraries(witre_pg TREXwitre)
+
+  # generate the witre.xml configuration file with a doocroot pointing to witre
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/witre.xml.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml DESTINATION shared/trex/cfg)
+  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
+    ${CMAKE_CURRENT_BINARY_DIR}/cfg)
+ 
   #include_directories(${Wt_INCLUDE_DIR})
   #trex_plugin(witre WitreServer.cc Witre.cc)
   #target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
