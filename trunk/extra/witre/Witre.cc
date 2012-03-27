@@ -87,10 +87,11 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
              <<" { child[i].lastChild.style.backgroundColor = (color ? \"#E0FFFF\":\"white\"); }}}}";
     this->declareJavaScriptFunction("highlight", highlight.str());
 
-    //setCssTheme("Polished");
+    //setCssTheme("polished");
     //Creating the containers for layout
     Wt::WContainerWidget* north = new Wt::WContainerWidget();
     Wt::WContainerWidget* center = new Wt::WContainerWidget();
+    center->setAttributeValue("name", "center");
     Wt::WContainerWidget* east = new Wt::WContainerWidget();
     east->setContentAlignment(Wt::AlignTop | Wt::AlignRight);
     Wt::WContainerWidget* west = new Wt::WContainerWidget();
@@ -116,10 +117,10 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     {
         std::string name = wServer->extTimelinesName(i);
         tLineMap[name]=true;
-        Wt::WCheckBox* temp = new Wt::WCheckBox(name, tLines);
-        temp->setChecked(true);//
+        Wt::WPushButton* temp = new Wt::WPushButton(name, tLines);
+        temp->setMargin(10,Wt::Right);
         temp->setObjectName(name);
-        temp->changed().connect(this, &WitreApplication::timeLineChange);
+        temp->clicked().connect(this, &WitreApplication::timeLineChange);
     }
     //End of North code
 
@@ -276,6 +277,7 @@ void WitreApplication::post()
         //Container that holds all the panles
         Wt::WGroupBox* box = new Wt::WGroupBox(time);
         box->setObjectName(time);
+        box->setAttributeValue("time", time);
         //box->setAttributeValue("onchange","alert(\"Did it\")");
         groupPanels[time] = box;
         messages->insertWidget(0, box);
@@ -419,6 +421,10 @@ void WitreApplication::timeLineChange()
 {
     Wt::WObject* timeLine = sender();
     std::string tName = timeLine->objectName();
+    std::stringstream javascript;
+    javascript<<"document.getElementById(\""<<timeLine->id()<<"\").style.backgroundColor ="
+              <<"("<<tLineMap[tName]<<")?'white':'';";
+    this->doJavaScript(javascript.str());
     std::map<std::string, Wt::WGroupBox*>::iterator it;
     for(it=groupPanels.begin(); it!=groupPanels.end(); it++)
     {
@@ -527,11 +533,20 @@ void WitreApplication::sliderText(int value)
 void WitreApplication::addTimeline(std::string name)
 {
     tLineMap[name]=true;
-    Wt::WCheckBox* temp = new Wt::WCheckBox(name);
-    tLines->addWidget(temp);
-    temp->setChecked(true);//
+    Wt::WPushButton* temp = new Wt::WPushButton(name, tLines);
+    temp->setMargin(10,Wt::Right);
     temp->setObjectName(name);
-    temp->changed().connect(this, &WitreApplication::timeLineChange);
+    temp->clicked().connect(this, &WitreApplication::timeLineChange);
+    Wt::WDialog* popup = new Wt::WDialog("New Timeline: <b>"+name+"</b>");
+    popup->setModal(false);
+    popup->show();
+    std::stringstream javascript;
+    javascript<<"setTimeout(\""<<popup->jsRef()<<".style.top = \'5px\';"
+              <<popup->jsRef()<<".id=\'header\';\",100)";
+    std::stringstream javascript2;
+    javascript2<<"setTimeout(\"var n=document.getElementById(\'header\'); n.parentNode.removeChild(n)\",30000)";
+    this->doJavaScript(javascript.str());
+    this->doJavaScript(javascript2.str());
     //Updates the combo menu
     addMenuItems();
 }
