@@ -33,6 +33,7 @@
  */
 #include "private/Schema.hh"
 #include "trex/europa/EuropaPlugin.hh"
+#include "trex/europa/Assembly.hh"
 
 #include <trex/utils/XmlUtils.hh>
 
@@ -121,6 +122,9 @@ std::string const &details::Schema::nddl_path() {
   return m_path;
 }
 
+void details::Schema::registerFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
+  assembly.constraint_engine()->getCESchema()->registerCFunction(fn->getId());
+}
 
 // modifiers
 
@@ -145,3 +149,10 @@ EuropaPlugin::EuropaPlugin() {
 EuropaPlugin::~EuropaPlugin() {
   m_schema->unregisterPlugin(*this);
 }
+
+// manipulators
+
+void EuropaPlugin::declareFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
+  m_schema->registerFunction(assembly, fn);
+}
+
