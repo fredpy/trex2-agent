@@ -68,9 +68,12 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   } else if( type->isNumeric() ) {
     EUROPA::edouble e_lb, e_ub;
     
-    if( dom.isSingleton() ) 
+    if( dom.isSingleton() ) {
+      // We need to handle specifically singletons as in europa some singletons 
+      // do not have the same lower bound and upper bound (if the lower bound is
+      // close enough to the upper bound europa mark it as a singleton)
       e_lb = e_ub = dom.getSingletonValue();
-    else 
+    } else 
       dom.getBounds(e_lb, e_ub);
     
     if( 1.0==type->minDelta() ) {
