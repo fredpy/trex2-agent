@@ -35,27 +35,19 @@ class VehicleState extends AgentTimeline {
 class Behavior extends AgentTimeline {
   predicate Inactive {}
   
-  action Active {}
+  predicate Active {}
 
   Behavior(Mode _mode) {
     super(_mode, "Inactive");
   }
 }
 
-class Mutex extends Timeline {
-  predicate InUse {
-    Behavior _owner;
-  }
-
-  Mutex() {
-    super();
-  }
-}
+class Mutex;
 
 class SequentialBehavior extends Behavior {
   Mutex _mtx;
   
-  action Active {}
+  predicate Active {}
   
   SequentialBehavior(Mode _mode, Mutex mtx) {
     super(_mode);
@@ -63,6 +55,23 @@ class SequentialBehavior extends Behavior {
   }
 }
 
+class Mutex extends Timeline {
+  action InUse {
+    SequentialBehavior _owner;
+  }
+
+  Mutex() {
+    super();
+  }
+}
+
+// do not work on europa 2.6
+// Mutex::InUse {
+//   _owner._mtx == object;
+//   equals(condition _owner.Active);
+// }
+
+// Have to do it this way instead
 SequentialBehavior::Active {
   equals(object._mtx.InUse lock);
   lock._owner == object;
