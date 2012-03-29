@@ -68,7 +68,11 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   } else if( type->isNumeric() ) {
     EUROPA::edouble e_lb, e_ub;
     
-    dom.getBounds(e_lb, e_ub);
+    if( dom.isSingleton() ) 
+      e_lb = e_ub = dom.getSingletonValue();
+    else 
+      dom.getBounds(e_lb, e_ub);
+    
     if( 1.0==type->minDelta() ) {
       // integer
       EUROPA::eint i_lb(e_lb), i_ub(e_ub);
