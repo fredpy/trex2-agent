@@ -51,7 +51,7 @@ namespace TREX {
       
       std::set<EUROPA::LabelStr> m_names;
     }; // TREX::europa::DoNotMatchFilter 
-    
+        
   } // TREX::europa
 } // TREX
 

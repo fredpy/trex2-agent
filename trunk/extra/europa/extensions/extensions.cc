@@ -33,11 +33,30 @@
  */
 #include <trex/europa/Assembly.hh>
 
+#include <PLASMA/CFunctions.hh>
+
 #include "EarliestFirstFlawManager.hh"
 #include "Trigonometry.hh"
 #include "Numeric.hh"
 #include "DoNotMatchFilter.hh"
 
+
+namespace TREX {
+  namespace europa {
+
+    using namespace EUROPA;
+    
+    DECLARE_FUNCTION_TYPE(AbsValConstraint, abs, 
+                          "absf", EUROPA::FloatDT, 1); 
+    DECLARE_FUNCTION_TYPE(SqrtConstraint, sqrt, 
+                          "sqrtf", EUROPA::FloatDT, 1); 
+    DECLARE_FUNCTION_TYPE(SineConstraint, sin, 
+                          "sinf", EUROPA::FloatDT, 1); 
+    DECLARE_FUNCTION_TYPE(CosineConstraint, cos, 
+                          "cosf", EUROPA::FloatDT, 1); 
+    
+  }
+}
 
 namespace {
   
@@ -69,10 +88,15 @@ namespace {
         
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
-        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosEq, trex);
-        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint,   sinEq, trex);
-        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absEq, trex);
-        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtEq, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosf, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint,   sinf, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absf, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtf, trex);
+        
+        declareFunction(assembly, new TREX::europa::SineConstraintFunction());
+        declareFunction(assembly, new TREX::europa::CosineConstraintFunction());
+        declareFunction(assembly, new TREX::europa::AbsValConstraintFunction());
+        declareFunction(assembly, new TREX::europa::SqrtConstraintFunction());
       }
       
     }; // ::Extensions

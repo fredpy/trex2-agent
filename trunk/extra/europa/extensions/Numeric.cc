@@ -48,8 +48,8 @@ AbsValConstraint::AbsValConstraint(EUROPA::LabelStr const &name,
 				   EUROPA::ConstraintEngineId const &cstrEngine,
 				   std::vector<EUROPA::ConstrainedVariableId> const &vars)
 :EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
- m_abs(getCurrentDomain(vars[1])), 
- m_val(getCurrentDomain(vars[0])) {
+ m_abs(getCurrentDomain(vars[0])), 
+ m_val(getCurrentDomain(vars[1])) {
   checkError(vars.size()==2, "Exactly 2 parameters required.");
 }
 
@@ -94,8 +94,8 @@ SqrtConstraint::SqrtConstraint(EUROPA::LabelStr const &name,
                                EUROPA::ConstraintEngineId const &cstrEngine,
                                std::vector<EUROPA::ConstrainedVariableId> const &vars)
 :EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
-m_sqrt(getCurrentDomain(vars[1])), 
-m_val(getCurrentDomain(vars[0])) {
+m_sqrt(getCurrentDomain(vars[0])), 
+m_val(getCurrentDomain(vars[1])) {
   checkError(vars.size()==2, "Exactly 2 parameters required.");
 }
 

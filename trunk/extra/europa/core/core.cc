@@ -38,8 +38,18 @@
 #include <trex/europa/SynchronizationManager.hh>
 #include "private/CurrentState.hh"
 
+#include <PLASMA/CFunctions.hh>
+#include <PLASMA/DataTypes.hh>
+
+
 namespace TREX {
   namespace europa {
+
+    using namespace EUROPA;
+    DECLARE_FUNCTION_TYPE(CheckExternal, external, 
+                          "isExternal", EUROPA::BoolDT, 1); 
+    DECLARE_FUNCTION_TYPE(CheckInternal, internal, 
+                          "isInternal", EUROPA::BoolDT, 1); 
     
     /** @brief TREX core extensions for europa
      * 
@@ -86,7 +96,9 @@ namespace TREX {
 			       isExternal,trex);
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
 			       isInternal,trex); 
-
+      
+      declareFunction(assembly, new CheckExternalFunction());
+      declareFunction(assembly, new CheckInternalFunction());
     }
 
     CoreExtensions trex_core;

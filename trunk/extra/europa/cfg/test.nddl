@@ -49,8 +49,12 @@ Trigo::Holds {
     duration == 1;
     meets(Holds);
   }
-  sinEq(end, sin_t);
-  cosEq(end, cos_t);
+  float date;
+
+  date == end - 1;
+
+  sin_t == sin(date);
+  cos_t == cos(date);
 }
 
 Light light = new Light(Observe);
