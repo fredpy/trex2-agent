@@ -41,11 +41,11 @@ int   MISSION_END;
 int   AGENT_CLOCK;
 
 enum Mode {
-  External, // Synchronize observations and dispatch goals
-  Observe,  // No goal dispatching 
-  Internal, // Publish updates and accept goals
-  Private,  // Not visible externally 
-  Ignore    // Not used at all
+  External,   // Synchronize observations and dispatch goals
+  Observe,    // No goal dispatching 
+  Internal,   // Publish updates and accept goals
+  Private,    // Not visible externally 
+  Ignore      // Not used at all
 }
 
 class AgentTimeline extends Timeline {

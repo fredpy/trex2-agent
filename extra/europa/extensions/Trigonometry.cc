@@ -76,8 +76,8 @@ CosineConstraint::CosineConstraint(EUROPA::LabelStr const &name,
 				   EUROPA::ConstraintEngineId const &cstrEngine,
 				   std::vector<EUROPA::ConstrainedVariableId> const &vars)
 :EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
- m_angle(getCurrentDomain(vars[0])), 
- m_cos(getCurrentDomain(vars[1])) {
+ m_angle(getCurrentDomain(vars[1])), 
+ m_cos(getCurrentDomain(vars[0])) {
    checkError(vars.size()==2, "Exactly 2 parameters required.");
 }
 
@@ -96,8 +96,8 @@ SineConstraint::SineConstraint(EUROPA::LabelStr const &name,
 			       EUROPA::ConstraintEngineId const &cstrEngine,
 			       std::vector<EUROPA::ConstrainedVariableId> const &vars) 
 :EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
-m_angle(getCurrentDomain(vars[0])), 
-m_sin(getCurrentDomain(vars[1])) {
+m_angle(getCurrentDomain(vars[1])), 
+m_sin(getCurrentDomain(vars[0])) {
   checkError(vars.size()==2, "Exactly 2 parameters required.");
 }
 
