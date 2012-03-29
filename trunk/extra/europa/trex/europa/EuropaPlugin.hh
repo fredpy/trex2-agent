@@ -37,6 +37,9 @@
 # include <trex/utils/SingletonUse.hh>
 
 # include "EuropaException.hh"
+# include "config.hh"
+
+# include <PLASMA/CFunction.hh>
 
 namespace TREX {
   namespace europa {
@@ -78,6 +81,7 @@ namespace TREX {
     protected:
       EuropaPlugin();
       virtual void registerComponents(Assembly const &assembly) =0;
+      void declareFunction(Assembly const &assembly, EUROPA::CFunction *fn);
 
     private:
       TREX::utils::SingletonUse<details::Schema> m_schema;
@@ -159,6 +163,7 @@ namespace TREX {
  */
 # define TREX_REGISTER_MATCH_FINDER(assembly, class_name, label) \
   REGISTER_MATCH_FINDER(((EUROPA::SOLVERS::MatchFinderMgr*)assembly.getComponent("MatchFinderMgr")), class_name, label)
+
 
 /** @brief Convert A C++ litterate to a string
  * 

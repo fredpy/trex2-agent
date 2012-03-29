@@ -557,6 +557,7 @@ namespace TREX {
       void terminate(EUROPA::TokenId const &tok);
 
       
+      friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;
       friend class TREX::europa::details::CurrentState;
       friend class listener_proxy;
