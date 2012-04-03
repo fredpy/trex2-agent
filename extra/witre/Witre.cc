@@ -293,8 +293,8 @@ void WitreApplication::post()
     panel->setAttributeValue("level", level);
     panel->setAttributeValue("since", time);
     panel->setAttributeValue("dependencies", wServer->getDependencies(name));
-    panel->setAttributeValue("onmouseover", "Wt.highlight("+panel->jsRef()+", true)");
-    panel->setAttributeValue("onmouseout", "Wt.highlight("+panel->jsRef()+", false)");
+    panel->setAttributeValue("onmouseover", javaScriptClass()+".highlight("+panel->jsRef()+", true)");
+    panel->setAttributeValue("onmouseout", javaScriptClass()+".highlight("+panel->jsRef()+", false)");
     if(!tLineMap[name])
     {
         panel->hide();
@@ -478,16 +478,24 @@ void WitreApplication::attributePopup()
     }
 }
 
-void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end)
+void WitreApplication::clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
+                                        std::map<string,transaction::FloatDomain> attributes)
 {
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
     if(!object.empty() && !predicate.empty())
     {
         TREX::transaction::Goal goal = wServer->getGoal(object,predicate);
-        goal.restrictStart(start);
-        goal.restrictDuration(duration);
-        goal.restrictEnd(end);
+        goal.restrictStart(standards.find("Start")->second);
+        goal.restrictDuration(standards.find("Duration")->second);
+        goal.restrictEnd(standards.find("End")->second);
+
+        std::map<string,transaction::FloatDomain>::iterator etc;
+        for(etc = attributes.begin(); etc!=attributes.end(); etc++)
+        {
+            transaction::Variable temp(etc->first, etc->second);
+            goal.restrictAttribute(temp);
+        }
         TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
         if(goalid!=NULL)
         {
@@ -496,9 +504,13 @@ void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transact
                <<"On Timeline <on><b>"<<goalid->object()<<"</b></on>, placed goal "
                <<"<pred><b>"<<goalid->predicate()<<"</b></pred> "
                <<"at the time: "<<wServer->getTime_t()<<"<br />"
-               <<"Starting: "<<start<<"<br />"
-               <<"Duration: "<<duration<<"<br />"
-               <<"End: "<<end<<"<br /></Token>";
+               <<"Starting: "<<standards.find("Start")->second<<"  Duration: "<<standards.find("Duration")->second
+               <<"  End: "<<standards.find("End")->second<<"<br />";
+               for(etc = attributes.begin(); etc!=attributes.end(); etc++)
+               {
+                   oss<<etc->first<<": "<<etc->second<<"  ";
+               }
+            oss<<"</Token>";
             observations.push(oss.str());
             post();
         }

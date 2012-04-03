@@ -63,6 +63,8 @@
 #include <map>
 #include <list>
 #include <trex/domain/IntegerDomain.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/Variable.hh>
 #include <trex/utils/XmlUtils.hh>
 
 #include <boost/version.hpp>
@@ -118,7 +120,8 @@ namespace TREX {
       void timeLineChange(); //Updates when user changes what timelines to view
       void syncObservations(); //Syncs with server observations
       void attributePopup();
-      void clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end);
+      void clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
+                            std::map<string,transaction::FloatDomain> attributes);
       void addTimeline(std::string name);
       void addMenuItems();
 
