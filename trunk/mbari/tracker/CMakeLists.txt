@@ -56,7 +56,7 @@ if(MBARI_TRACKER)
 	AMQP_listener.hh
 	AMQP_queue.hh
 	DrifterTracker.hh
-	odss_handlers.hh
+	MessageHandler.hh
 	)
       target_link_libraries(MBARIamqp 
 	MBARIshared
