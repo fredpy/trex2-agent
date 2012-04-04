@@ -465,13 +465,55 @@ void WitreApplication::attributePopup()
 {
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
-    if(!object.empty() && !predicate.empty())
+    bool found;
+    string file = s_log->locate(predicate, found);
+    if(found)
+    {
+        stringstream err;
+        s_log->use(file,found);
+        try
+        {
+            stringstream msg;
+            boost::property_tree::ptree config;
+            read_xml(file,config,xml::no_comments|xml::trim_whitespace);
+            if(!config.empty())
+            {
+                int count=0;
+                if( config.size()==1 && !TREX::utils::is_tag(config.front(), "Goal") )
+                    config = config.front().second;
+                boost::property_tree::ptree::assoc_iterator i, last;
+                boost::tie(i, last) = config.equal_range("Goal");
+                msg<<"alert(\"";
+                for(; last!=i; ++i, count++)
+                {
+                    TREX::transaction::Goal goal(*i);
+                    TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
+                    msg<<"Goal: "<<goal<<"\\n";
+                }
+                msg<<"\");";
+                doJavaScript(msg.str());
+            } else {
+            doJavaScript("alert('File ("+file+") is empty!');");
+            }
+        } catch(Exception const &te) {
+            err<<"alert('TREX error ("<<te<<")');";
+            doJavaScript(err.str());
+        } catch( std::exception const &e ) {
+            err<<"alert('Exception: ("<<e.what()<<")');";
+            doJavaScript(err.str());
+        } catch(...) {
+            doJavaScript("alert('Unknown error');");
+        }
+        input->setText("");
+        enter->enable();
+    }
+    else if(!object.empty() && !predicate.empty())
     {
         popup->setPosition(input);
         popup->valRange(wServer->getCurrentTick(),wServer->getFinalTick());
         popup->setVisable();
     }
-    else{
+    else {
         Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invalid input for goal"
                                                              , Wt::Ok);
         enter->enable();
