@@ -4,6 +4,7 @@
 # include <map>
 
 # include "AMQP_listener.hh"
+# include "MessageHandler.hh"
 
 # include <trex/transaction/TeleoReactor.hh>
 
@@ -53,6 +54,9 @@ namespace mbari {
     std::map<TREX::utils::Symbol, point >  m_drifters;
     TREX::utils::Symbol            m_trexMsg;
 
+    TREX::utils::SingletonUse<MessageHandler::factory> m_msg_factory;
+    
+    
     void trex_msg(amqp::queue::message const &msg);
     void drifter_msg(amqp::queue::message const &msg);
   };
