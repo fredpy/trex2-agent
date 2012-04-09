@@ -15,6 +15,7 @@ namespace mbari {
 
   private:
     bool handleMessage(amqp::queue::message &msg);
+    bool handleRequest(TREX::transaction::goal_id const &g);
     bool synchronize();
 
     typedef std::map<std::string, double> sensor_data;

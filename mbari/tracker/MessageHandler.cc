@@ -11,9 +11,14 @@ MessageHandler::MessageHandler(MessageHandler::xml_arg const &arg)
    m_route(TREX::utils::parse_attr<std::string>("", factory::node(arg), "route")),
    m_tracker(*(arg.second)) {}
 
-bool MessageHandler::provide(std::string const &timeline) {
-  m_tracker.provide(timeline);
-  return m_tracker.isInternal(timeline);
+bool MessageHandler::provide(std::string const &timeline, bool control) {
+  m_tracker.provide(timeline, control);
+  if( m_tracker.isInternal(timeline) ) {
+    if( control )
+      m_tracker.goalHandler(timeline, this);
+    return true;
+  }
+  return false;
 }
 
 void MessageHandler::notify(TREX::transaction::Observation const &obs) {
