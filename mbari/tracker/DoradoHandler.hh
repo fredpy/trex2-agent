@@ -1,6 +1,8 @@
 #ifndef H_DoradoHandler 
 # define H_DoradoHandler
 
+# include <string>
+
 # include "MessageHandler.hh"
 # include "serie.hh"
 
@@ -15,9 +17,9 @@ namespace mbari {
     bool handleMessage(amqp::queue::message &msg);
     bool synchronize();
 
-    typedef point<4> sensor_data;
+    typedef std::map<std::string, double> sensor_data;
     serie<sensor_data> m_serie;
-
+    bool m_updated;
   }; // mbari::DoradoHandler
 
 } // mbari

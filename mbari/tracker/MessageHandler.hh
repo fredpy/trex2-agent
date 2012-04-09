@@ -19,6 +19,9 @@ namespace mbari {
     std::string const &exchange() const {
       return m_exchange;
     }
+    std::string const &route() const {
+      return m_route;
+    }
 
     MessageHandler(xml_arg const &arg);
     ~MessageHandler() {}
@@ -37,6 +40,7 @@ namespace mbari {
     void notify(TREX::transaction::Observation const &obs);
 
     std::string m_exchange;
+    std::string m_route;
 
   private:
     DrifterTracker &m_tracker;

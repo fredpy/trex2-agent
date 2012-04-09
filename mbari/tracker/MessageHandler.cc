@@ -8,6 +8,7 @@ using namespace mbari;
 MessageHandler::MessageHandler(MessageHandler::xml_arg const &arg) 
   :m_exchange(TREX::utils::parse_attr<std::string>(factory::node(arg), 
 						   "exchange")),
+   m_route(TREX::utils::parse_attr<std::string>("", factory::node(arg), "route")),
    m_tracker(*(arg.second)) {}
 
 bool MessageHandler::provide(std::string const &timeline) {
