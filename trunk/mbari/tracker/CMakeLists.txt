@@ -62,6 +62,7 @@ if(MBARI_TRACKER)
 	DrifterTracker.hh
 	point.hh
 	location.hh
+	serie.hh
 	MessageHandler.hh
 	PositionHandler.hh
 	DoradoHandler.hh
