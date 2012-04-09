@@ -47,7 +47,8 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
 
   syslog("amqp")<<"Creating queue \"trex2"<<getName()<<std::endl;
   m_queue = m_connection.create_queue("trex2"+getName().str());
-  provide("MessagesFromTrex");
+  provide("MessagesFromTrex", false);
+  postObservation(TREX::transaction::Observation("MessagesFromTrex", "undefined"));
   if( isInternal("MessagesFromTrex") ) {    
     // Bind to TREX messages
     syslog("amqp")<<"Binding to TREX messages (MessagesFromTrex/TrackingApp)";
@@ -73,7 +74,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
     // bind to this exchange
     m_queue->bind(handler->exchange(), handler->route());
     // add the handler
-    m_handlers.insert(std::make_pair(handler->exchange(), handler));
+    m_message_handlers.insert(std::make_pair(handler->exchange(), handler));
   }
 
   m_listener.reset(new amqp::listener(m_queue, m_messages));
@@ -88,6 +89,25 @@ void DrifterTracker::handleInit() {
   syslog()<<"Starting the amqp queue listener.";
   m_thread.reset(new boost::thread(*m_listener));
 }
+
+void DrifterTracker::goalHandler(std::string const &timeline, 
+                                 MessageHandler *handle) {
+  m_goal_handlers.insert(std::make_pair(timeline, handle));
+}
+
+void DrifterTracker::handleRequest(TREX::transaction::goal_id const &g) {
+  std::map<std::string, MessageHandler *>::const_iterator from, to;
+  
+  boost::tie(from, to) = m_goal_handlers.equal_range(g->object().str());
+  for( ; to!=from; ++from) 
+    if( from->second->handleRequest(g) )
+      return;
+}
+
+void DrifterTracker::handleRecall(TREX::transaction::goal_id const &g) {
+  syslog("WARN")<<" No support for goal recall yet.";
+}
+
 
 bool DrifterTracker::synchronize() {
   handle_map::const_iterator from, to;
@@ -104,14 +124,14 @@ bool DrifterTracker::synchronize() {
       } catch(...) {}
     } 
 
-    boost::tie(from, to) = m_handlers.equal_range(msg->exchange());
+    boost::tie(from, to) = m_message_handlers.equal_range(msg->exchange());
     for( ; to!=from; ++from) {
       if( from->second->handleMessage(*msg) )
 	syslog()<<"AMQP message "<<msg->key()<<" handled.";
     }
   }
 
-  for(from=m_handlers.begin(); m_handlers.end()!=from; ++from) 
+  for(from=m_message_handlers.begin(); m_message_handlers.end()!=from; ++from) 
     if( !from->second->synchronize() ) {
       syslog("ERROR")<<" Handler on exchange "<<from->second<<" failed to synchronize";
       return false;

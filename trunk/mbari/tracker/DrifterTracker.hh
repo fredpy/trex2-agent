@@ -21,6 +21,10 @@ namespace mbari {
   private:
     void handleInit();
     bool synchronize();
+    void handleRequest(TREX::transaction::goal_id const &g);
+    void handleRecall(TREX::transaction::goal_id const &g);
+    
+    void goalHandler(std::string const &timeline, MessageHandler *handle);
     
     // Basic AMQP message handling
     amqp::connection              m_connection;
@@ -31,7 +35,8 @@ namespace mbari {
 
     typedef std::multimap<std::string, 
 			  boost::shared_ptr<MessageHandler> > handle_map;
-    handle_map m_handlers;
+    handle_map m_message_handlers;
+    std::multimap<std::string, MessageHandler *> m_goal_handlers;
 
     // std::map<TREX::utils::Symbol, point >  m_drifters;
     TREX::utils::Symbol            m_trexMsg;

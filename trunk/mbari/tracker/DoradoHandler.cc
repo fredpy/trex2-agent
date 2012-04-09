@@ -5,6 +5,7 @@
 #include <trex/domain/FloatDomain.hh>
 
 # define DATA_TL "trex_data"
+# define MBFD_TL "mbfd"
 
 using namespace mbari;
 using namespace TREX::transaction;
@@ -17,7 +18,15 @@ DoradoHandler::DoradoHandler(MessageHandler::xml_arg const &arg)
   :MessageHandler(arg), m_updated(false) {
   provide(DATA_TL);
   notify(TREX::transaction::Observation(DATA_TL, "undefined"));
+  provide(MBFD_TL, true);
+  notify(TREX::transaction::Observation(MBFD_TL, "Inactive"));
 }
+
+bool DoradoHandler::handleRequest(TREX::transaction::goal_id const &g) {
+  // I need to process the goal or at least initiate some processing 
+  return g->object()==MBFD_TL; 
+}
+
 
 bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
   org::mbari::trex::SensorMessage data;

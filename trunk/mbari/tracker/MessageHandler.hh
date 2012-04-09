@@ -4,7 +4,7 @@
 # include "AMQP_queue.hh"
 # include <trex/utils/XmlFactory.hh>
 # include <trex/transaction/Observation.hh>
-# include <trex/transaction/Tick.hh>
+# include <trex/transaction/Goal.hh>
 
 namespace mbari {
 
@@ -28,6 +28,9 @@ namespace mbari {
 
   protected:    
     virtual bool handleMessage(amqp::queue::message &message) =0;
+    virtual bool handleRequest(TREX::transaction::goal_id const &g) {
+      return false;
+    }
     virtual bool synchronize() {
       return true;
     }
@@ -36,7 +39,7 @@ namespace mbari {
     double tickToTime(TREX::transaction::TICK date) const;
     double tickDuration() const;
 
-    bool provide(std::string const &timeline);
+    bool provide(std::string const &timeline, bool control=false);
     void notify(TREX::transaction::Observation const &obs);
 
     std::string m_exchange;
