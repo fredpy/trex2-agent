@@ -51,12 +51,20 @@ if(MBARI_TRACKER)
 	AMQP_queue.cc
 	${PROTO_SRCS}
 	DrifterTracker.cc
+	location.cc
+	MessageHandler.cc
+	PositionHandler.cc
+	DoradoHandler.cc
 	#headers
 	AMQP_connection.hh
 	AMQP_listener.hh
 	AMQP_queue.hh
 	DrifterTracker.hh
+	point.hh
+	location.hh
 	MessageHandler.hh
+	PositionHandler.hh
+	DoradoHandler.hh
 	)
       target_link_libraries(MBARIamqp 
 	MBARIshared

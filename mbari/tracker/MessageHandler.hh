@@ -2,7 +2,9 @@
 # define H_MessageHandler
 
 # include "AMQP_queue.hh"
-# include <trex/utils/Factory.hh>
+# include <trex/utils/XmlFactory.hh>
+# include <trex/transaction/Observation.hh>
+# include <trex/transaction/Tick.hh>
 
 namespace mbari {
 
@@ -10,16 +12,34 @@ namespace mbari {
 
   class MessageHandler {
   public:
-    typedef TREX::utils::Factory<MessageHandler, std::string, 
-				 DrifterTracker const &> factory;
+    typedef TREX::utils::XmlFactory<MessageHandler, boost::shared_ptr<MessageHandler>, 
+				    DrifterTracker *> factory;
+    typedef factory::argument_type  xml_arg;
+    
+    std::string const &exchange() const {
+      return m_exchange;
+    }
 
-    MessageHandler(DrifterTracker const &tracker):m_tracker(tracker) {}
+    MessageHandler(xml_arg const &arg);
     ~MessageHandler() {}
 
-  protected:
+  protected:    
     virtual bool handleMessage(amqp::queue::message &message) =0;
+    virtual bool synchronize() {
+      return true;
+    }
 
-    DrifterTracker const &m_tracker;
+    TREX::transaction::TICK now() const;
+    double tickToTime(TREX::transaction::TICK date) const;
+    double tickDuration() const;
+
+    bool provide(std::string const &timeline);
+    void notify(TREX::transaction::Observation const &obs);
+
+    std::string m_exchange;
+
+  private:
+    DrifterTracker &m_tracker;
 
     friend class DrifterTracker;
   }; // mbari::MessageHandler
