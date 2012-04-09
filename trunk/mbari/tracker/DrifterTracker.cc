@@ -71,7 +71,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
 
   while( m_msg_factory->iter_produce(it, node.second.end(), handler) ) {
     // bind to this exchange
-    m_queue->bind(handler->exchange(), "");
+    m_queue->bind(handler->exchange(), handler->route());
     // add the handler
     m_handlers.insert(std::make_pair(handler->exchange(), handler));
   }

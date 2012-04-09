@@ -2,6 +2,8 @@
 # define H_mbari_serie
 
 # include <map>
+# include <vector>
+# include <functional>
 
 # include <sys/time.h>
 
