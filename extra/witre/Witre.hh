@@ -103,8 +103,8 @@ namespace TREX {
 
       void sliderChanged(int value);
       void sliderText(int value);
+      void searchLog(Wt::WLineEdit* sender);
       void urlPage(const std::string& path);
-      std::string* parseUrl(std::string url);
 
     public:
       WitreApplication(Wt::WEnvironment const &env, WitreServer* Server);
