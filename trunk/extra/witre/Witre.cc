@@ -37,8 +37,7 @@
 #include <trex/utils/TREXversion.hh>
 #include <trex/utils/Plugin.hh>
 
-#include <Wt/WContainerWidget>
-#include <Wt/WText>
+#include <Wt/WFileResource>
 
 using namespace TREX::utils;
 using namespace TREX::witre;
@@ -142,6 +141,22 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     enter->clicked().connect(enter, &Wt::WWidget::disable);
     input->enterPressed().connect(boost::bind(&WitreApplication::attributePopup, this));
     input->enterPressed().connect(enter, &Wt::WWidget::disable );
+    new Wt::WBreak(east);
+    new Wt::WBreak(east);
+    //links in the east box
+    Wt::WGroupBox* links = new Wt::WGroupBox("Links",east);
+    links->setList(true);
+    Wt::WAnchor* lgraph = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/graph"), "Graph", links);
+    new Wt::WBreak(links);
+    Wt::WAnchor* ltrex = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/log/TREX.log"), "Trex log", links);
+    new Wt::WBreak(links);
+    new Wt::WBreak(links);
+    Wt::WSignalMapper<Wt::WLineEdit*> *logmap = new Wt::WSignalMapper<Wt::WLineEdit*>(this);
+    logmap->mapped().connect(this, &WitreApplication::searchLog);
+    Wt::WLineEdit* log = new Wt::WLineEdit(links);
+    log->setEmptyText("Search");
+    logmap->mapConnect(log->enterPressed(), log);
+    //End of links
     //End of East Code
 
     //Start of West code
@@ -184,8 +199,6 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     layout->addWidget(south, Wt::WBorderLayout::South);
     //end
 
-    //webpage->insertWidget(1, new Wt::WText("New page"));
-
     WApplication::instance()->internalPathChanged().connect(this, &WitreApplication::urlPage);
     urlPage(WApplication::instance()->internalPath());
 
@@ -199,49 +212,62 @@ WitreApplication::~WitreApplication()
 
 void WitreApplication::urlPage(const std::string& path)
 {
+    Wt::WWidget* temp = webpage->currentWidget();
     if(path.empty())
     {
         webpage->setCurrentIndex(0);
         WApplication::instance()->setInternalPath("/default");
-        return;
     }
-    std::string* url = parseUrl(path);
-    if(url[0]=="text")
-    {
-        Wt::WString name = Wt::WString("Name");
-        Wt::WTemplate* test = new Wt::WTemplate(webpage);
-        test->setTemplateText(Wt::WString::tr("testpage"));
-        test->bindString("friend", name, Wt::PlainText);
-        test->bindWidget("input", new Wt::WLineEdit());
-        webpage->setCurrentWidget(test);
-    }
-    else if(url[0]=="graph")
+    else if(internalPathMatches("/graph"))
     {
         WitreGraphContainer* image = new WitreGraphContainer(webpage, wServer->getGraph());
         webpage->setCurrentWidget(image->getWidget());
+    }
+    else if(internalPathMatches("/log") && !internalPathNextPart("/log/").empty())
+    {
+        bool found;
+        string path = internalPathNextPart("/log/");
+        string file = s_log->locate(s_log->logPath()+"/"+path, found);
+        if(found)
+        {
+            file = s_log->locate(file, found);
+            Wt::WFileResource* log = new Wt::WFileResource(file, this);
+            std::stringstream output;
+            log->write(output);
+            std::stringstream webout;
+            string line;
+            while(getline(output,line))
+            {
+                webout<<line<<"<br />";
+            }
+            Wt::WContainerWidget* holder = new Wt::WContainerWidget(webpage);
+            holder->setOverflow(Wt::WContainerWidget::OverflowAuto, Wt::Vertical);
+            Wt::WText* text = new Wt::WText(webout.str(), Wt::XHTMLText, holder);
+            webpage->setCurrentWidget(holder);
+        }
+        else
+        {
+            this->doJavaScript("alert('Did not find "+path+"')");
+            WApplication::instance()->setInternalPath("/default");
+        }
     }
     else
     {
         webpage->setCurrentIndex(0);
         WApplication::instance()->setInternalPath("/default");
     }
+    //Checking if the old webpage needs to be deleted
+    if(webpage->currentIndex()==0 && temp!=webpage->currentWidget())
+    {
+        webpage->removeWidget(temp);
+        delete temp;
+    }
 }
 
-std::string* WitreApplication::parseUrl(std::string url)
+void WitreApplication::searchLog(Wt::WLineEdit* sender)
 {
-    int count = 0;
-    for(int i=0; i<url.length(); i++)
-    {
-        count += ((url[i]=='/')?1:0);
-    }
-    std::string* pUrl = new std::string[count];
-    for(int i=0; i<count; i++)
-    {
-        size_t pos = url.find("/");
-        url = url.substr(pos+1);
-        pUrl[i]= url.substr(0,(url.find("/")>0)?url.find("/"):url.length());
-    }
-    return pUrl;
+    WApplication::instance()->setInternalPath("/log/"+sender->text().toUTF8(),true);
+    sender->setText("");
 }
 
 void WitreApplication::post()
