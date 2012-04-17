@@ -79,6 +79,26 @@ Player::op_recall::op_recall(boost::property_tree::ptree::value_type &node)
 
 
 /*
+ * class TREX::transaction::Player::op_token
+ */ 
+Player::op_token::op_token(boost::property_tree::ptree::value_type &node)
+:m_id(parse_attr<std::string>(node, "id")) {
+  boost::property_tree::ptree::assoc_iterator i = node.second.find("Goal");
+  if( node.second.not_found()==i ) 
+    throw XmlError(node, "Unable to find Goal description");
+  m_token.reset(new Goal(*i));  
+}
+
+/*
+ * class TREX::transaction::Player::op_recall
+ */ 
+
+Player::op_cancel::op_cancel(boost::property_tree::ptree::value_type &node)
+:m_id(parse_attr<std::string>(node, "id")) {
+}
+
+
+/*
  * class TREX::transaction::Player
  */
 
@@ -182,6 +202,10 @@ void Player::loadTransactions(boost::property_tree::ptree &properties) {
 	ops.push_back(new op_request(*it));
       } else if ( is_tag(*it, "recall") ) {
 	ops.push_back(new op_recall(*it));
+      } else if( is_tag(*it, "token") ) {
+	ops.push_back(new op_token(*it));
+      } else if ( is_tag(*it, "cancel") ) {
+	ops.push_back(new op_cancel(*it));
       } else if( !is_tag(*it, "<xmlattr>") ) //< <xmlattr> can be silently ignored 
 	syslog("WARN")<<"Ignoring tag \""<<it->first<<'\"';	
     }
@@ -205,10 +229,28 @@ void Player::play_request(std::string const &id, goal_id const &g) {
 void Player::play_recall(std::string const &id) {
   std::map<std::string, goal_id>::iterator i = m_goals.find(id);
   if( m_goals.end()==i )
-    syslog("WARN")<<"goal \""<<id<<"\" no found in my lookup table.";
+    syslog("WARN")<<"goal \""<<id<<"\" not found in my lookup table.";
   else {
-    syslog("recall")<<"RECALL "<<i->second<<"(Log ID : "<<i->first<<").";    
+    syslog("recall")<<"RECALL "<<i->second<<" (Log ID: "<<i->first<<").";    
     postRecall(i->second);
+    m_goals.erase(i);
+  }
+}
+
+void Player::play_token(std::string const &id, goal_id const &g) {
+  if( !postPlanToken(g) )
+    syslog("WARN")<<"Failed to post plan token "<<g;
+  else
+    m_goals[id] = g;  
+}
+
+void Player::play_cancel(std::string const &id) {
+  std::map<std::string, goal_id>::iterator i = m_goals.find(id);
+  if( m_goals.end()==i )
+    syslog("WARN")<<"token \""<<id<<"\" not found in lookup table.";
+  else {
+    syslog("cancel")<<"CANCEL "<<i->second<<" (Log ID: "<<i->first<<").";
+    cancelPlanToken(i->second);
     m_goals.erase(i);
   }
 }

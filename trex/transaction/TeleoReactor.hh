@@ -192,9 +192,15 @@ namespace TREX {
       TREX::utils::Symbol const &getGraphName() const {
 	return m_graph.getName();
       }
-
+      /** @brief Get graph 
+       * 
+       * This methods gives a reference to the graph that manage this reactor 
+       *
+       * @return the graph
+       * @sa getGraphName() const 
+       */
       graph const &getGraph() const {
-     return m_graph;
+        return m_graph;
       }
 
       /** @brief reactor initial tick
@@ -618,6 +624,47 @@ namespace TREX {
        */
       bool completedGoal(goal_id g);
 
+      /** @brief Post a planned token
+       *
+       * @param[in] g A goal id
+       *
+       * Inform that the token @p g is now part of the plan of the reactor
+       *
+       * @pre g is a valid goal_id (i.e. not NULL)
+       * @pre g->object() is an @e Internal timeline of this reactor
+       *
+       * @throw DispatchError The token was not valid or was not on an internal
+       *        timeline of this reactor
+       *
+       * @return true the token has been correctly integrated.
+       * @return false this token id is already broadcasted or its end time is 
+       *         in the past
+       *
+       * @sa isInternal(TREX::utils::Symbol const &) const
+       * @sa cancelPlanToken(goal_id const &)
+       */
+      bool postPlanToken(goal_id const &g);
+      /** @brief Post a planned token
+       *
+       * @param[in] g A goal
+       *
+       * This method is just an overload of postPlanToken(goal_d const &) for user facility
+       *
+       * @pre g.object() is an @e Internal timeline of this reactor
+       *
+       * @throw DispatchError The token was not on an internal
+       *        timeline of this reactor
+       *
+       * @returnthe goal_id for the token posted. This id is invalid if the token was 
+       *           not posted  
+       *
+       * @sa isInternal(TREX::utils::Symbol const &) const
+       * @sa postPlanToken(goal_id const &)
+       */
+      goal_id postPlanToken(Goal const &g);
+      void cancelPlanToken(goal_id const &g);
+      
+      
       /** @brief Recall a goal
        *
        * @param[in] g A goal
@@ -716,6 +763,9 @@ namespace TREX {
        *          the tick duration.
        */
       virtual void handleRecall(goal_id const &g) {}
+      
+      virtual void newPlanToken(goal_id const &t) {}
+      virtual void cancelledPlanToken(goal_id const &t) {}
 
       /** @brief External timeline declaration
        *
@@ -928,6 +978,10 @@ namespace TREX {
          * @param[in] goal the goal recalled
          */
 	void recall(goal_id const &goal);
+        
+        void notifyPlan(goal_id const &t);
+        void cancelPlan(goal_id const &t);
+
 
       private:
         /** @brief Output file
