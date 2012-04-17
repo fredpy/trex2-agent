@@ -249,7 +249,6 @@ void Player::play_cancel(std::string const &id) {
   if( m_goals.end()==i )
     syslog("WARN")<<"token \""<<id<<"\" not found in lookup table.";
   else {
-    syslog("cancel")<<"CANCEL "<<i->second<<" (Log ID: "<<i->first<<").";
     cancelPlanToken(i->second);
     m_goals.erase(i);
   }
