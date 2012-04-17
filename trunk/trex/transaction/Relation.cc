@@ -150,6 +150,17 @@ void timeline::recall(goal_id const &g) {
     owner().handleRecall(g);
 }
 
+bool timeline::notifyPlan(goal_id const &t) {
+  // need some more here
+  return true; 
+}
+
+bool timeline::cancelPlan(goal_id const &t) {
+  // need some more here
+  return true;
+}
+
+
 void timeline::latency_update(TICK prev) {
   if( look_ahead()>0 ) 
     for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i) 

@@ -407,6 +407,9 @@ namespace TREX {
 	 * @sa lastObsDate() const
 	 */
 	void postObservation(TICK date, Observation const &obs);
+        
+        bool notifyPlan(goal_id const &t);
+        bool cancelPlan(goal_id const &t);
 
 	void latency_update(TICK prev);
 

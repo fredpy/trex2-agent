@@ -304,7 +304,20 @@ double TeleoReactor::workRatio() {
         ret *= m_nSteps+1;
       }
       return 1.0/ret;
-    }
+    } /* Folowing code would be usefull only if I'd allow a reactor to re-ask for working 
+	 time in a tick ... may happen in the future
+	else {
+	// Dispatched goals management
+	details::external i = ext_begin();
+	details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
+	// I do nothing with it for now
+	
+	// Manage goal dispatching
+	for( ; i.valid(); ++i )
+	i.dispatch(getCurrentTick()+1, dispatched);
+	
+	}
+      */
   } catch(std::exception const &se) {
     syslog("WARN")<<"Exception during hasWork question: "<<se.what();
   } catch(...) {
@@ -369,6 +382,43 @@ bool TeleoReactor::postRecall(goal_id const &g) {
   }
   return false;
 }
+
+bool TeleoReactor::postPlanToken(goal_id const &t) {
+  if( !t )
+    throw DispatchError(*this, t, "Invalid token id");
+  
+  // Look for the internal timeline
+  internal_set::const_iterator tl = m_internals.find(t->object());
+  if( m_internals.end()==tl )
+    throw DispatchError(*this, t, "plan tokens can only be posted on Internal timelines.");
+  else if( t->getEnd().upperBound() > getCurrentTick() ) {
+    bool ret = (*tl)->notifyPlan(t);
+    if( ret && NULL!=m_trLog )
+      m_trLog->notifyPlan(t);
+  }
+  return false;
+}
+
+goal_id TeleoReactor::postPlanToken(Goal const &g) {
+  goal_id tmp(new Goal(g));
+  
+  if( postPlanToken(tmp) )
+    return tmp;
+  else 
+    return goal_id();
+}
+
+void TeleoReactor::cancelPlanToken(goal_id const &g) {
+  if( g ) {
+    internal_set::const_iterator tl = m_internals.find(g->object());
+    if( m_internals.end()!=tl ) {
+      // do something 
+      if( (*tl)->cancelPlan(g) && NULL!=m_trLog ) 
+        m_trLog->cancelPlan(g);
+    }
+  }
+}
+
 
 bool TeleoReactor::initialize(TICK final) {
   if( m_inited ) {
@@ -649,3 +699,15 @@ void TeleoReactor::Logger::recall(goal_id const &goal) {
   openTick();
   m_file<<"    <recall id=\""<<goal<<"\"/>"<<std::endl;
 }
+
+void TeleoReactor::Logger::notifyPlan(goal_id const &t) {
+  openTick();
+  m_file<<"    <token id=\""<<t<<"\">\n";
+  t->toXml(m_file, 6)<<"\n    </token>"<<std::endl;  
+}
+
+void TeleoReactor::Logger::cancelPlan(goal_id const &t) {
+  openTick();
+  m_file<<"    <cancel id=\""<<t<<"\"/>"<<std::endl;  
+}
+
