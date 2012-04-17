@@ -151,12 +151,23 @@ void timeline::recall(goal_id const &g) {
 }
 
 bool timeline::notifyPlan(goal_id const &t) {
-  // need some more here
-  return true; 
+  if( owned() ) {
+    owner().syslog("plan.INFO")<<"added ["<<t<<"] "<<*t;
+    // need some more here
+    return true; 
+  } else {
+    // should never happen
+  }
+  return false;
 }
 
 bool timeline::cancelPlan(goal_id const &t) {
-  // need some more here
+  if( owned() ) {
+    owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object();
+    // need some more here    
+  } else {
+    // normally I should not end up here
+  }
   return true;
 }
 

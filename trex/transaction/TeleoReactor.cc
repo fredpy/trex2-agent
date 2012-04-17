@@ -395,6 +395,7 @@ bool TeleoReactor::postPlanToken(goal_id const &t) {
     bool ret = (*tl)->notifyPlan(t);
     if( ret && NULL!=m_trLog )
       m_trLog->notifyPlan(t);
+    return ret;
   }
   return false;
 }
@@ -472,7 +473,7 @@ bool TeleoReactor::newTick() {
   } catch(TREX::utils::Exception const &e) {
     syslog("ERROR")<<"Exception caught during new tick:\n"<<e;
   } catch(std::exception const &se) {
-    syslog("ERROR")<<"C++ excption caught during new tick:\n"<<se.what();    
+    syslog("ERROR")<<"C++ exception caught during new tick:\n"<<se.what();    
   } catch(...) {
     syslog("ERROR")<<"Unknown exception caught during new tick";    
   }
