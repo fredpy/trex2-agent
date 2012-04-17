@@ -97,6 +97,7 @@ namespace mbari {
     point &operator *=(double factor) {
       for(unsigned i=0; i<Dim; ++i)
 	m_value[i] *= factor;
+      return *this;
     }
     point operator* (double factor) const {
       return point<Dim>(*this).operator*=(factor);
@@ -104,6 +105,7 @@ namespace mbari {
     point &operator /=(double factor) {
       for(unsigned i=0; i<Dim; ++i)
 	m_value[i] /= factor;
+      return *this;
     }
     point operator/ (double factor) const {
       return point<Dim>(*this).operator/=(factor);
