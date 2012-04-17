@@ -1,3 +1,5 @@
+<?xml version="1.0"?>
+
 <Log>
   <header>
     <!-- start by just provinding the bottom timeline -->
@@ -6,10 +8,20 @@
   <tick value="0">
     <!-- Post initial observation that will remain the dsame until this reactor fails -->
     <Observation on="bottom" pred="Alive"/>
+    <token id="0x20404">
+      <Goal on="bottom" pred="Dead">
+	<Variable name="start"><int min="10" max="50"/></Variable>
+	<Variable name="end"><int min="11" max="110"/></Variable>
+      </Goal>		 
+    </token>
+  </tick>
+  <tick value="6">
+    <cancel id="0x20404"/>
   </tick>
   <tick value="10">
     <!-- attempt to create a loop by subscribing to the top timeline -->
     <use name="top"/>
+    <cancel id="0x20404"/>
   </tick>
   <tick value="15">
     <!-- Prepare the second failure by using the yet to exist ground timeline -->
