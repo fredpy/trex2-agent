@@ -46,6 +46,7 @@ if(MBARI_TRACKER)
       include_directories(${CMAKE_CURRENT_BINARY_DIR})
       protobuf_generate_cpp(TRACKER_PROTO_SRCS TRACKER_PROTO_HDRS platformMessage.proto)
       protobuf_generate_cpp(SENSOR_PROTO_SRCS SENSOR_PROTO_HDRS sensor.proto)
+      protobuf_generate_cpp(TREX_PROTO_SRCS TREX_PROTO_HDRS trex.proto)
 
       add_library(MBARIamqp SHARED
 	AMQP_connection.cc
@@ -53,6 +54,7 @@ if(MBARI_TRACKER)
 	AMQP_queue.cc
 	${TRACKER_PROTO_SRCS}
 	${SENSOR_PROTO_SRCS}
+	${TREX_PROTO_SRCS}
 	DrifterTracker.cc
 	location.cc
 	MessageHandler.cc
