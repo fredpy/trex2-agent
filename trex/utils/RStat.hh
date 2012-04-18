@@ -362,7 +362,7 @@ namespace TREX {
     /** @brief Stop-watch for RStat
      *
      * This class is an helper to measure the delta between two
-     * time points. the tow timepoints are given bytthe date of
+     * time points. the tow timepoints are given by the date of
      * creation and destruction of this class instance and addded
      * on a RStat instance given as attribute.
      *
@@ -390,7 +390,7 @@ namespace TREX {
 	RStat end(m_start.who());
 	m_output = m_output+(end-m_start);
       }
-      
+            
     private:
       RStat &m_output; //!< Reference to the output variable
       RStat m_start;   //!< Stats collected on this instance creation

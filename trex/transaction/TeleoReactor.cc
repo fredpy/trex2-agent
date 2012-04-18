@@ -40,7 +40,10 @@
 #include <utility>
 #include <cmath>
 
+#include <boost/chrono/clock_string.hpp>
+
 #include "TeleoReactor.hh"
+#include <trex/domain/FloatDomain.hh>
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -185,7 +188,6 @@ Relation const &details::external::dereference() const {
 
 // structors
 
-
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 			   bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
@@ -197,10 +199,13 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
+  std::string fname = manager().file_name(getName().str()+".stat.csv");
+  m_stat_log.open(fname.c_str());
+     
   if( parse_attr<bool>(log_default, node, "log") ) {
-    std::string log = manager().file_name(getName().str()+".tr.log");
-    m_trLog = new Logger(log);
-    syslog()<<"Transactions logged to "<<log;
+    fname = manager().file_name(getName().str()+".tr.log");
+    m_trLog = new Logger(fname);
+    syslog()<<"Transactions logged to "<<fname;
   }
 
   if( loadTL ) {
@@ -232,10 +237,14 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
+  std::string fname = manager().file_name(getName().str()+".stat.csv");
+  m_stat_log.open(fname.c_str());
+     
   if( log ) {
-    std::string log = manager().file_name(getName().str()+".tr.log");
-    m_trLog = new Logger(log);
-    syslog()<<"Transactions logged to "<<log;
+    fname = manager().file_name(getName().str()+".tr.log");
+    m_trLog = new Logger(fname);
+    syslog()<<"Transactions logged to "<<fname;
+
   }
 }
 
@@ -431,6 +440,7 @@ bool TeleoReactor::initialize(TICK final) {
   m_finalTick   = final;
   syslog()<<"Creation tick is "<<getInitialTick();
   syslog()<<"Execution latency is "<<getExecLatency();
+  syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
   try {
     handleInit();   // allow derived class initialization
     m_firstTick = true;
@@ -455,7 +465,14 @@ bool TeleoReactor::newTick() {
     }
     reset_deadline();
     m_firstTick = false;
-  }
+  } else 
+    m_stat_log<<(getCurrentTick()-1)<<", "
+              <<m_synch_usage.count()
+              <<", "<<m_deliberation_usage.count()<<std::endl;
+  
+  if( m_deliberation_usage > stat_duration::zero() )
+    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
+  m_deliberation_usage = stat_duration::zero();
   if( NULL!=m_trLog )
     m_trLog->newTick(getCurrentTick());
 
@@ -491,20 +508,25 @@ void TeleoReactor::doNotify() {
 
 bool TeleoReactor::doSynchronize() {
   try {
-    // coolect information from external timelines 
-    doNotify();
-    
-    // Update the timelines here !
-    if( synchronize() ) {
+    bool success;
+    {
+      stat_clock::time_point start = stat_clock::now();
+      // collect information from external timelines 
+      doNotify();
+      success = synchronize();
+      
+      m_synch_usage = stat_clock::now()-start;
+    }
+    if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
-	  m_updates.end()!=i; ++i) {
-	syslog("ASSERT")<<(*i)->lastObservation();
-	if( NULL!=m_trLog )
-	  m_trLog->observation((*i)->lastObservation());
+          m_updates.end()!=i; ++i) {
+        syslog("ASSERT")<<(*i)->lastObservation();
+        if( NULL!=m_trLog )
+          m_trLog->observation((*i)->lastObservation());
       }
       m_updates.clear();
-      return true;
     }
+    return success;
   } catch(Exception const &e) {
     syslog("SYNCH")<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
@@ -517,7 +539,9 @@ bool TeleoReactor::doSynchronize() {
 }
 
 void TeleoReactor::step() {
+  stat_clock::time_point start = stat_clock::now();
   resume();
+  m_deliberation_usage += stat_clock::now()-start;
   m_nSteps += 1;
 }
 
