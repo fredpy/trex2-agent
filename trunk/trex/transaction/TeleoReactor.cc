@@ -583,7 +583,8 @@ void TeleoReactor::subscribed(Relation const &r) {
   tmp.first = r;
   m_externals.insert(tmp);
   latency_updated(0, r.latency());
-  syslog()<<"Subscribed to \""<<r.name()<<"\".";
+  syslog()<<"Subscribed to \""<<r.name()<<'\"'
+     <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
   if( NULL!=m_trLog ) {
     m_trLog->use(r.name());
   }

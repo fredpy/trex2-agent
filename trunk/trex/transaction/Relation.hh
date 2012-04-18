@@ -170,6 +170,8 @@ namespace TREX {
        * @sa Relation::server() const
        */
       bool accept_goals() const;
+      
+      bool accept_plan_tokens() const;
 
       void recall(goal_id const &g);
       void request(goal_id const &g);
