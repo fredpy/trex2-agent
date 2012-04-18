@@ -98,32 +98,41 @@ bool timeline::assign(TeleoReactor &r, bool controllable) {
   return ret;
 }
 
-void timeline::unassign(TICK date, bool demotion, bool control) {
+TeleoReactor *timeline::unassign(TICK date) {
+  TeleoReactor *ret = NULL;
   if( owned() ) {
-    TeleoReactor *tmp = m_owner;
+    ret = m_owner;
     
     m_owner->unassigned(this);
     m_owner = NULL;
     m_accept_goals = false;
     postObservation(date, Observation(name(), s_failed));
-    latency_update(tmp->getExecLatency());
-    if( demotion ) 
-      subscribe(*tmp, control);
+    latency_update(ret->getExecLatency());
   }
+  return ret;
 }
 
-bool timeline::subscribe(TeleoReactor &r, bool control) {
+void timeline::demote(TICK date, transaction_flags const &flags) {
+  TeleoReactor *r = unassign(date);
+  if( NULL!=r )
+    subscribe(*r, flags);
+}
+
+bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
   if( owned_by(r) )
     return false;
   else {
-    std::pair<client_set::iterator, bool>
-      ins = m_clients.insert(std::make_pair(&r, control));
+    bool inserted;
+    client_set::iterator pos;
     
-    if( ins.second ) 
-      r.subscribed(Relation(this, ins.first));
-    else if( control )
-      ins.first->second = true;
-    return ins.second;
+    boost::tie(pos, inserted) = m_clients.insert(std::make_pair(&r, flags));
+    
+    if( inserted ) 
+      r.subscribed(Relation(this, pos));
+    else 
+      pos->second = flags; 
+
+    return inserted;
   }
 }
 
@@ -175,7 +184,7 @@ bool timeline::cancelPlan(goal_id const &t) {
 void timeline::latency_update(TICK prev) {
   if( look_ahead()>0 ) 
     for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i) 
-      if( i->second )
+      if( i->second[0] )
 	i->first->latency_updated(prev, latency());
 }
 
@@ -224,7 +233,7 @@ void Relation::unsubscribe() const {
 
 // Observers 
 bool Relation::accept_goals() const {
-  return active() && m_pos->second && m_timeline->look_ahead()>0;
+  return active() && m_pos->second[0] && m_timeline->look_ahead()>0;
 }
 
 TICK Relation::latency() const {

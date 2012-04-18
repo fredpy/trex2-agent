@@ -653,7 +653,7 @@ namespace TREX {
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
                   bool controllable);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
-		     bool control);
+		     details::transaction_flags const &flags);
 
       details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
 

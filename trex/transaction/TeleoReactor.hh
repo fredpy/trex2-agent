@@ -771,10 +771,13 @@ namespace TREX {
        *
        * @param[in] timeline a name
        * @param[in] control  goal dispatching flag
+       * @param[in] plan_listen plan listening flag 
+       * 
        *
        * This method is used to declare @p timeline as an @e External timeline.
        * The optional @p control flag prohibits goal dispatching to this timeline when
-       * @c false.
+       * @c false. The @p plan_listen flag aloow the reactor to be notified whenever the 
+       * owner of this timeline does give the current tokens it has in his future plan
        *
        * @pre The timleine is not already @e Internal
        *
@@ -784,10 +787,10 @@ namespace TREX {
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, bool)
+       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, details::transaction_flag const &)
        * @sa provide(TREX::utils::Symbol const &)
        */
-      void use(TREX::utils::Symbol const &timeline, bool control=true);
+      void use(TREX::utils::Symbol const &timeline, bool control=true, bool plan_listen=false);
 
       /** @brief Internal timeline declaration
        *

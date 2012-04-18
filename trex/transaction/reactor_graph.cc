@@ -197,11 +197,11 @@ bool graph::assign(graph::reactor_id r, Symbol const &timeline, bool controllabl
   }
 }
 
-bool graph::subscribe(reactor_id r, Symbol const &timeline, bool control) {
+bool graph::subscribe(reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     external_check(r, **tl);
-    return (*tl)->subscribe(*r, control);
+    return (*tl)->subscribe(*r, flags);
   } catch(timeline_failure const &err) {
     return r->failed_external(timeline, err);
   }

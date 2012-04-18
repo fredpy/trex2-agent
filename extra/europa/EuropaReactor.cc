@@ -127,7 +127,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     }
     
     if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
-      use(trex_name, OBSERVE_MODE!=mode_val);
+      use(trex_name, OBSERVE_MODE!=mode_val, false);
       add_state_var(*o);
     } else if( INTERNAL_MODE==mode_val ) {
       provide(trex_name);
@@ -186,6 +186,16 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       // The goal appears to be correct so far : add it to my set of goals
       syslog()<<"Integrated request "<<request<<" as the token with Europa ID "
 	      <<goal->getKey();
+      debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
+      
+//      debugMsg("trex:request", "Type "<<schema()->getTokenType(goal->getFullTokenType()->getSignature().toString());
+//      std::vector<EUROPA::TokenTypeId> supporters = schema()->getTypeSupporters(schema()->getTokenType(goal->getFullTokenType()));
+//                                                                                
+//      debugMsg("trex:request", supporters.size()<<" supporter(s): ");
+//      for( std::vector<EUROPA::TokenTypeId>::const_iterator i=supporters.begin(); 
+//          supporters.end()!=i; ++i) 
+//        debugMsg("trex:request", "   - "<<(*i)->getSignature().toString());
+               
       m_active_requests.insert(goal_map::value_type(goal, request));
     }
   }
@@ -283,11 +293,19 @@ bool EuropaReactor::synchronize() {
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
   BOOST_SCOPE_EXIT((&me)) {
+    std::ostringstream oss;
+    EUROPA::SOLVERS::DecisionStack const & ds = me.synchronizer()->getDecisionStack();
+    
+    
+    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
+      oss<<" -> "<<(*i)->toLongString()<<'\n';
+    
     me.synchronizer()->clear();    
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
+        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END
 
   

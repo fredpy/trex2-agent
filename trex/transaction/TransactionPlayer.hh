@@ -234,7 +234,7 @@ namespace TREX {
 	~op_use() {}
 
 	void accept(Player &p) {
-	  p.use(name());
+	  p.use(name(), true, false); // potential post goals but do not listen to timeline plan
 	}
       }; // TREX::transaction::Player::op_use
 

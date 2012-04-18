@@ -161,6 +161,15 @@ namespace TREX {
       typedef utils::list_set<
 	reactor_id_traits< boost::shared_ptr<TeleoReactor> > > reactor_set;      
       
+      /** @brief Reactor transaction flags
+       *
+       * This type contains the different flags used to handle a reactor 
+       * transaction for a specific timeline. The flags are as follow :
+       * @li @c 0 indicates if the timeline accept goals otr not
+       * @li @c 1 indicates if the timeline should broadcast plan tokens 
+       *     to the reactor
+       */
+      typedef std::bitset<2> transaction_flags;
       
       /** @brief timeline client helper
        *
@@ -184,7 +193,7 @@ namespace TREX {
        * @sa class TREX::utils::relation
        * @sa TREX::utils::relation::accept_goals() const
        */
-      typedef utils::map_id_traits<reactor_id_traits<>, bool> client_id_traits;
+      typedef utils::map_id_traits<reactor_id_traits<>, transaction_flags> client_id_traits;
 
       /** @brief Set of clients
        *
