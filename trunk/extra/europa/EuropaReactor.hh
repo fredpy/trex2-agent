@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_EuropaReactor 
+#ifndef H_trex_EuropaReactor
 # define H_trex_EuropaReactor
 
 # include <trex/europa/Assembly.hh>
@@ -53,22 +53,25 @@ namespace TREX {
       void notify(TREX::transaction::Observation const &obs);
       void handleRequest(TREX::transaction::goal_id const &request);
       void handleRecall(TREX::transaction::goal_id const &request);
-      
+
       // TREX execution callbacks
       bool hasWork();
-      
+
       void handleInit();
       void handleTickStart();
       bool synchronize();
       void resume();
-      
+
     private:
       bool discard(EUROPA::TokenId const &tok);
       void cancel(EUROPA::TokenId const &tok);
-      bool dispatch(EUROPA::TimelineId const &tl, 
+      bool dispatch(EUROPA::TimelineId const &tl,
                     EUROPA::TokenId const &tok);
-                                 
-      bool restrict_token(EUROPA::TokenId &tok, 
+
+      void plan_dispatch(EUROPA::TimelineId const &tl,
+                         EUROPA::TokenId const &tok);
+
+      bool restrict_token(EUROPA::TokenId &tok,
 			  TREX::transaction::Predicate const &pred);
 
       bool is_internal(EUROPA::LabelStr const &name) const {
@@ -77,7 +80,7 @@ namespace TREX {
       bool is_external(EUROPA::LabelStr const &name) const {
 	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
-      
+
       bool do_relax(bool full);
 
       EUROPA::eint now() const {
@@ -87,7 +90,7 @@ namespace TREX {
         return getExecLatency();
       }
       EUROPA::eint look_ahead() const {
-        return getLookAhead(); 
+        return getLookAhead();
       }
       EUROPA::IntervalIntDomain plan_scope() const;
       EUROPA::eint initial_tick() const {
@@ -100,17 +103,17 @@ namespace TREX {
 	return tickDuration();
       }
       void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
-                           
+
       void logPlan(std::string const &base_name) const;
-    
-      typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map; 
+
+      typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map;
       goal_map m_active_requests;
       goal_map m_dispatched;
-      
+
       bool m_completed_this_tick;
     }; // TREX::europa::EuropaReactor
-			 
-  } // TREX::europa 
+
+  } // TREX::europa
 } // TREX
 
 #endif // H_trex_EuropaReactor

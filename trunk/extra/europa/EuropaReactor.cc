@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -49,23 +49,23 @@ using namespace TREX::utils;
 
 /*
  * class TREX::europa::EuropaReactor
- */ 
+ */
 
-// structors 
+// structors
 
 EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false), 
+  :TeleoReactor(arg, false),
    Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")) {
   bool found;
   std::string nddl;
-  
+
   boost::property_tree::ptree::value_type &cfg = xml_factory::node(arg);
-  boost::optional<std::string> 
+  boost::optional<std::string>
     model = parse_attr< boost::optional<std::string> >(cfg, "model");
-  
+
   // Load the specified model
   if( model ) {
-    if( model->empty() ) 
+    if( model->empty() )
       throw XmlError(cfg, "Attribute \"model\" is empty.");
     nddl = manager().use(*model, found);
     if( !found )
@@ -73,7 +73,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   } else {
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
-    
+
     syslog()<<"No model specified: attempting to load "<<long_nddl;
     nddl = manager().use(long_nddl, found);
     if( !found ) {
@@ -84,31 +84,31 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     }
   }
   // Load the nddl model
-  if( !playTransaction(nddl) ) 
+  if( !playTransaction(nddl) )
     throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
-    
+
   if( !plan_db()->isClosed() ) {
     syslog("WARN")<<"Plan database is not closed:\n\tClosing it now!!!";
     plan_db()->close();
   }
 
-  // Loading solver configuration 
+  // Loading solver configuration
   std::string solver_cfg = parse_attr<std::string>(cfg, "solverConfig");
-  // boost::optional<std::string> 
+  // boost::optional<std::string>
   //   synch_cfg = parse_attr< boost::optional<std::string> >(cfg, "synchCfg");
-  
+
   if( solver_cfg.empty() )
     throw XmlError(cfg, "attribute \"solverConfig\" is empty");
   solver_cfg = manager().use(solver_cfg, found);
-  
-  if( !found ) 
+
+  if( !found )
     throw ReactorException(*this, "Unable to locate solver config \""+solver_cfg+"\".");
-  
+
   configure_solvers(solver_cfg);
 
-  // Create reactor connections 
+  // Create reactor connections
   std::list<EUROPA::ObjectId> objs;
-  
+
   trex_timelines(objs);
   syslog()<<" Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
 	  <<" declarations.";
@@ -125,7 +125,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     else {
       mode_val = o_mode->lastDomain().getSingletonValue();
     }
-    
+
     if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
       use(trex_name, OBSERVE_MODE!=mode_val, false);
       add_state_var(*o);
@@ -139,7 +139,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 	syslog("WARN")<<TREX_TIMELINE.toString()<<" "<<trex_name<<" mode \""
 		      <<mode_val.toString()<<"\" is unknown!!!\n"
 		      <<"\tI'll assume it is "<<PRIVATE_MODE.toString();
-    }      
+    }
   }
 }
 
@@ -148,7 +148,7 @@ EuropaReactor::~EuropaReactor() {}
 
 // callbacks
 
-//  - TREX transaction callback 
+//  - TREX transaction callback
 
 void EuropaReactor::notify(Observation const &obs) {
   setStream();
@@ -158,7 +158,7 @@ void EuropaReactor::notify(Observation const &obs) {
   std::string pred = obs.predicate().str();
   EUROPA::TokenId fact = new_obs(obj, pred, undefined);
 
-  if( undefined ) 
+  if( undefined )
     syslog("WARN")<<"Predicate "<<obs.object()<<"."<<obs.predicate()<<" is unknown"
 		  <<"\n\t Created "<<pred<<" instead.";
   else if( !restrict_token(fact, obs) )
@@ -170,7 +170,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 
   EUROPA::ObjectId obj = plan_db()->getObject(request->object().str());
   std::string pred = request->predicate().str();
-  
+
   if( !have_predicate(obj, pred) ) {
     syslog("ERROR")<<"Ignoring Unknow token type "<<request->object()<<'.'
 		   <<request->predicate();
@@ -187,15 +187,15 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       syslog()<<"Integrated request "<<request<<" as the token with Europa ID "
 	      <<goal->getKey();
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
-      
+
 //      debugMsg("trex:request", "Type "<<schema()->getTokenType(goal->getFullTokenType()->getSignature().toString());
 //      std::vector<EUROPA::TokenTypeId> supporters = schema()->getTypeSupporters(schema()->getTokenType(goal->getFullTokenType()));
-//                                                                                
+//
 //      debugMsg("trex:request", supporters.size()<<" supporter(s): ");
-//      for( std::vector<EUROPA::TokenTypeId>::const_iterator i=supporters.begin(); 
-//          supporters.end()!=i; ++i) 
+//      for( std::vector<EUROPA::TokenTypeId>::const_iterator i=supporters.begin();
+//          supporters.end()!=i; ++i)
 //        debugMsg("trex:request", "   - "<<(*i)->getSignature().toString());
-               
+
       m_active_requests.insert(goal_map::value_type(goal, request));
     }
   }
@@ -203,7 +203,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 
 void EuropaReactor::handleRecall(goal_id const &request) {
   setStream();
-  // Remove the goal if it exists 
+  // Remove the goal if it exists
   goal_map::right_iterator i = m_active_requests.right.find(request);
   if( m_active_requests.right.end()!=i ) {
     m_active_requests.right.erase(i);
@@ -220,17 +220,17 @@ void EuropaReactor::handleInit() {
 }
 
 void EuropaReactor::handleTickStart() {
-  setStream();  
+  setStream();
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
   if( m_completed_this_tick ) {
     Assembly::external_iterator from(begin(), end()), to(end(), end());
     for(; to!=from; ++from) {
-      TeleoReactor::external_iterator 
+      TeleoReactor::external_iterator
         j=find_external((*from)->timeline()->getName().c_str());
       EUROPA::eint e_lo, e_hi;
-      
+
       if( j.valid() && j->accept_goals() ) {
         IntegerDomain window = j->dispatch_window(getCurrentTick());
         IntegerDomain::bound lo = window.lowerBound(), hi = window.upperBound();
@@ -245,21 +245,21 @@ void EuropaReactor::handleTickStart() {
   }
 }
 
-bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl, 
+bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
                              EUROPA::TokenId const &tok) {
   if( m_dispatched.left.find(tok)==m_dispatched.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
-    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());    
+    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
     // Get start, duration and end
-    std::auto_ptr<DomainBase> 
+    std::auto_ptr<DomainBase>
       d_start(details::trex_domain(tok->start()->lastDomain())),
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
-    
-    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()), 
-                         *dynamic_cast<IntegerDomain *>(d_duration.get()), 
+
+    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
+                         *dynamic_cast<IntegerDomain *>(d_duration.get()),
                          *dynamic_cast<IntegerDomain *>(d_end.get()));
 
     // Manage other attributes
@@ -272,10 +272,36 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     goal_id request = postGoal(my_goal);
     if( request ) {
       m_dispatched.insert(goal_map::value_type(tok, request));
-    } else 
+    } else
       return false;
   }
   return true;
+}
+
+void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok)
+{
+    TREX::utils::Symbol name(tl->getName().toString());
+    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
+    std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
+
+    // Get start, duration and end
+    std::auto_ptr<DomainBase>
+      d_start(details::trex_domain(tok->start()->lastDomain())),
+      d_duration(details::trex_domain(tok->duration()->lastDomain())),
+      d_end(details::trex_domain(tok->end()->lastDomain()));
+
+    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
+                         *dynamic_cast<IntegerDomain *>(d_duration.get()),
+                         *dynamic_cast<IntegerDomain *>(d_end.get()));
+
+    // Manage other attributes
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
+        attrs.end()!=a; ++a) {
+      std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+      Variable attr((*a)->getName().toString(), *dom);
+      my_goal.restrictAttribute(attr);
+    }
+    goal_id request = postPlanToken(my_goal);
 }
 
 bool EuropaReactor::do_relax(bool full) {
@@ -295,12 +321,12 @@ bool EuropaReactor::synchronize() {
   BOOST_SCOPE_EXIT((&me)) {
     std::ostringstream oss;
     EUROPA::SOLVERS::DecisionStack const & ds = me.synchronizer()->getDecisionStack();
-    
-    
+
+
     for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
       oss<<" -> "<<(*i)->toLongString()<<'\n';
-    
-    me.synchronizer()->clear();    
+
+    me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
@@ -308,54 +334,54 @@ bool EuropaReactor::synchronize() {
         debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END
 
-  
+
   if( !do_synchronize() ) {
     std::string full_name = manager().file_name(getName().str()+".relax.dot");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    
+
     if( !( do_relax(false) && do_synchronize() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      if( !( do_relax(true) && do_synchronize() ) ) 
+      if( !( do_relax(true) && do_synchronize() ) )
         return false;
     }
   }
   // Prepare the reactor for next deliberation round
   if( m_completed_this_tick ) {
     planner()->clear(); // remove the past decisions of the planner
-    
-    Assembly::external_iterator from(begin(), end()), to(end(), end()); 
+
+    Assembly::external_iterator from(begin(), end()), to(end(), end());
     for( ; to!=from; ++from) {
       EUROPA::TokenId cur = (*from)->current();
       if( cur->isMerged() )
         m_dispatched.left.erase(cur->getActiveToken());
     }
-    
+
     m_completed_this_tick = false;
   }
-    
-  return constraint_engine()->propagate(); // should not fail 
+
+  return constraint_engine()->propagate(); // should not fail
 }
 
 bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_active_requests.left.find(tok);
-  
+
   if( m_active_requests.left.end()!=i ) {
     syslog()<<"Discarded past request ["<<i->second<<"]";
     m_active_requests.left.erase(i);
     return true;
-  } 
+  }
   return false;
 }
 
 void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_dispatched.left.find(tok);
-    
+
   if( m_dispatched.left.end()!=i ) {
     syslog()<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
     m_dispatched.left.erase(i);
-  } 
+  }
 }
 
 bool EuropaReactor::hasWork() {
@@ -377,6 +403,7 @@ bool EuropaReactor::hasWork() {
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
+        getFuturePlan();
       }
     }
   }
@@ -385,15 +412,15 @@ bool EuropaReactor::hasWork() {
 
 void EuropaReactor::resume() {
   setStream();
-  
+
   if( constraint_engine()->pending() )
     constraint_engine()->propagate();
-  
+
   if( constraint_engine()->constraintConsistent() )
     planner()->step();
-  
+
   bool should_relax = false;
-  
+
   if( constraint_engine()->provenInconsistent() ) {
     syslog("WARN")<<"Inconsitency found during planning.";
     should_relax = true;
@@ -402,30 +429,30 @@ void EuropaReactor::resume() {
     syslog("WARN")<<"Deliberation solver is exhausted.";
     should_relax = true;
   }
-  
+
   if( should_relax ) {
-    syslog("WARN")<<"Relax database after "<<planner()->getStepCount()<<" steps."; 
+    syslog("WARN")<<"Relax database after "<<planner()->getStepCount()<<" steps.";
     if( !relax(false) )
-      syslog("WARN")<<"Failed to relax => forgetting past."; 
+      syslog("WARN")<<"Failed to relax => forgetting past.";
       if( !relax(true) ) {
         syslog("ERROR")<<"Unable to recover from plan inconsistency.";
-	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency."); 
+	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
       }
   }
 }
 
 // europa core callbacks
 
-void EuropaReactor::notify(EUROPA::LabelStr const &object, 
+void EuropaReactor::notify(EUROPA::LabelStr const &object,
 			   EUROPA::TokenId const &tok) {
-  Observation obs(object.c_str(), 
+  Observation obs(object.c_str(),
 		  tok->getUnqualifiedPredicateName().toString());
-  
+
   std::vector<EUROPA::ConstrainedVariableId> const &attr = tok->parameters();
 
   for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attr.begin();
       attr.end()!=a; ++a) {
-    std::auto_ptr<TREX::transaction::DomainBase> 
+    std::auto_ptr<TREX::transaction::DomainBase>
       dom(details::trex_domain((*a)->lastDomain()));
     TREX::transaction::Variable var((*a)->getName().toString(), *dom);
     obs.restrictAttribute(var);
@@ -436,7 +463,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
 
 // manipulators
 
-bool EuropaReactor::restrict_token(EUROPA::TokenId &tok, 
+bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 				   Predicate const &pred) {
   bool no_empty = true;
   std::list<Symbol> attrs;
@@ -444,11 +471,11 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 
   for(std::list<Symbol>::const_iterator v=attrs.begin(); attrs.end()!=v; ++v) {
     EUROPA::ConstrainedVariableId param = tok->getVariable(v->str());
-    
+
     if( param.isId() ) {
       Variable const &var = pred[*v];
       //syslog("INFO")<<"Apply "<<tok->toString()<<"."<<var;
-      try {        
+      try {
 	details::europa_restrict(param, var.domain());
       } catch(DomainExcept const &e) {
 	syslog("WARN")<<"Failed to restrict attribute "<<(*v)
@@ -456,18 +483,18 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 		      <<": "<<e;
 	no_empty = false;
       }
-    } else 
+    } else
       syslog("WARN")<<" Ignoring unknown attribute "<<pred.object()
 		    <<'.'<<pred.predicate()<<'.'<<(*v);
   }
   return no_empty;
 }
 
-// Observers 
+// Observers
 
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
   EUROPA::eint scope_duration(getExecLatency()+getLookAhead());
-  return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration, 
+  return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration,
 						   final_tick()));
 }
 
