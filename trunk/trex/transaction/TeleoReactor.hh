@@ -47,6 +47,9 @@
 # include "bits/external.hh"
 # include "reactor_graph.hh"
 
+# include <boost/chrono.hpp>
+# include <boost/chrono/thread_clock.hpp>
+
 namespace TREX {
   namespace transaction {
 
@@ -86,6 +89,7 @@ namespace TREX {
     class TeleoReactor :boost::noncopyable {
       typedef details::timeline_set                       internal_set;
       typedef details::external_set                       external_set;
+ 
     public:
       /** @brief Reactor reference type
        *
@@ -899,6 +903,15 @@ namespace TREX {
       external_iterator find_external(TREX::utils::Symbol const &name);
 
     private:
+# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+      typedef boost::chrono::thread_clock stat_clock;
+# else 
+      typedef boost::chrono::process_user_cpu_clock stat_clock;        
+# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+      typedef stat_clock::duration stat_duration; 
+      stat_duration m_synch_usage, m_deliberation_usage;
+      
+      std::ofstream m_stat_log;
 
       void clear_internals();
       void clear_externals();

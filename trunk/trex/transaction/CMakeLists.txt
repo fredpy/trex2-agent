@@ -59,7 +59,8 @@ add_library(TREXtransaction SHARED
 )
 
 add_dependencies(core TREXtransaction)
-target_link_libraries(TREXtransaction TREXdomain)
+target_link_libraries(TREXtransaction TREXdomain 
+  ${Boost_CHRONO_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 trex_lib(TREXtransaction)
 
 install(DIRECTORY . DESTINATION include/trex/transaction
