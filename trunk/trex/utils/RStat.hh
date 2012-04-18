@@ -6,6 +6,7 @@
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
+ * @deprecated The RStat* classes are now replaced by Boost.Chrono library.
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -51,7 +52,7 @@
 namespace TREX {
   namespace utils {
 
-    /** @brief Ressource usage stats management class.
+    /** @brief Resource usage stats management class.
      *
      * This class offer a simple and basic access to resource usage
      * statistics for processes.
@@ -62,6 +63,7 @@ namespace TREX {
      * not yet offer all the interfaces to access data given by this
      * function.
      * @ingroup utils
+     * @deprecated The RStat class is now replaced by Boost.Chrono library.
      */  
     class RStat {
     public:
@@ -368,6 +370,7 @@ namespace TREX {
      *
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
+     * @deprecated The RStatLap class is now replaced by Boost.Chrono library.
      */
     class RStatLap {
     public:
