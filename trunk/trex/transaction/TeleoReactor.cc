@@ -213,8 +213,9 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
       if( is_tag(*i, "External") ) {
 	tl_name = parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*i, "Timlines cannot have an empty name");
-	use(tl_name, parse_attr<bool>(true, *i, "goals"));
+	  throw XmlError(*i, "Timelines cannot have an empty name");
+	use(tl_name, parse_attr<bool>(true, *i, "goals"),
+            parse_attr<bool>(false, *i, "listen"));
       } else if( is_tag(*i, "Internal") ) {
 	tl_name = parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
@@ -520,8 +521,12 @@ void TeleoReactor::step() {
   m_nSteps += 1;
 }
 
-void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control) {
-  if( !m_graph.subscribe(this, timeline, control) )
+void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
+  details::transaction_flags flag; // initialize all the flags to 0
+  flag.set(0,control);        // update the control flag
+  flag.set(1,plan_listen);    // update the plan_listen flag 
+  
+  if( !m_graph.subscribe(this, timeline, flag) )
     if( isInternal(timeline) )
       syslog("WARN")<<"External declaration of the Internal timeline \""
 	      <<timeline.str()<<"\"";

@@ -178,7 +178,9 @@ std::string WitreServer::getDependencies(std::string name)
 void WitreServer::declared(details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) {
     // If I did not connect to it yet just create the connection
-    use(timeline.name()); // as we do not have internal timlines this operation will always succeed
+    use(timeline.name(), true, false); // as we do not have internal timlines this operation will always succeed
+                                       //  the first boolean means that we may want to post goals
+                                       //  the second boolean indicate if we want to be notified on plan updates 
     {
       // then add it to externalTimelines
       boost::mutex::scoped_lock lock(mutex_);
