@@ -129,9 +129,10 @@ bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
     
     if( inserted ) 
       r.subscribed(Relation(this, pos));
-    else 
+    else if( pos->second!=flags ) {
+      r.syslog("WARN")<<"Updated transaction flags for external timeline "<<name();
       pos->second = flags; 
-
+    }
     return inserted;
   }
 }
@@ -162,7 +163,9 @@ void timeline::recall(goal_id const &g) {
 bool timeline::notifyPlan(goal_id const &t) {
   if( owned() ) {
     owner().syslog("plan.INFO")<<"added ["<<t<<"] "<<*t;
-    // need some more here
+    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
+      if( i->second.test(1) )
+        i->first->newPlanToken(t);
     return true; 
   } else {
     // should never happen
@@ -173,7 +176,9 @@ bool timeline::notifyPlan(goal_id const &t) {
 bool timeline::cancelPlan(goal_id const &t) {
   if( owned() ) {
     owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object();
-    // need some more here    
+    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
+      if( i->second.test(1) )
+        i->first->cancelPlanToken(t);
   } else {
     // normally I should not end up here
   }
@@ -184,7 +189,7 @@ bool timeline::cancelPlan(goal_id const &t) {
 void timeline::latency_update(TICK prev) {
   if( look_ahead()>0 ) 
     for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i) 
-      if( i->second[0] )
+      if( i->second.test(0) )
 	i->first->latency_updated(prev, latency());
 }
 
@@ -233,8 +238,13 @@ void Relation::unsubscribe() const {
 
 // Observers 
 bool Relation::accept_goals() const {
-  return active() && m_pos->second[0] && m_timeline->look_ahead()>0;
+  return active() && m_pos->second.test(0) && m_timeline->look_ahead()>0;
 }
+
+bool Relation::accept_plan_tokens() const {
+  return m_pos->second.test(1);
+}
+
 
 TICK Relation::latency() const {
   return valid()?m_timeline->latency():0;
