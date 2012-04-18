@@ -181,6 +181,7 @@ void WitreServer::declared(details::timeline const &timeline) {
     use(timeline.name(), true, false); // as we do not have internal timlines this operation will always succeed
                                        //  the first boolean means that we may want to post goals
                                        //  the second boolean indicate if we want to be notified on plan updates 
+                                       //      (false for now)
     {
       // then add it to externalTimelines
       boost::mutex::scoped_lock lock(mutex_);
