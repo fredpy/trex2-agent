@@ -345,7 +345,7 @@ bool EuropaReactor::synchronize() {
 
 
   if( !do_synchronize() ) {
-    std::string full_name = manager().file_name(getName().str()+".relax.dot");
+    //    LogManager::path_type full_name = manager().file_name(getName().str()+".relax.dot");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
 
@@ -508,7 +508,7 @@ EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
 }
 
 void EuropaReactor::logPlan(std::string const &base_name) const {
-  std::string full_name = manager().file_name(getName().str()+"."+base_name+".dot");
+  LogManager::path_type full_name = manager().file_name(getName().str()+"."+base_name+".dot");
   std::ofstream out(full_name.c_str());
   print_plan(out);
 }

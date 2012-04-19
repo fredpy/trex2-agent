@@ -199,12 +199,12 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
-  std::string fname = manager().file_name(getName().str()+".stat.csv");
+  LogManager::path_type fname = manager().file_name(getName().str()+".stat.csv");
   m_stat_log.open(fname.c_str());
      
   if( parse_attr<bool>(log_default, node, "log") ) {
     fname = manager().file_name(getName().str()+".tr.log");
-    m_trLog = new Logger(fname);
+    m_trLog = new Logger(fname.string());
     syslog()<<"Transactions logged to "<<fname;
   }
 
@@ -237,12 +237,12 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
-  std::string fname = manager().file_name(getName().str()+".stat.csv");
+  LogManager::path_type fname = manager().file_name(getName().str()+".stat.csv");
   m_stat_log.open(fname.c_str());
      
   if( log ) {
     fname = manager().file_name(getName().str()+".tr.log");
-    m_trLog = new Logger(fname);
+    m_trLog = new Logger(fname.string());
     syslog()<<"Transactions logged to "<<fname;
 
   }

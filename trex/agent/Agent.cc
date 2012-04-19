@@ -582,7 +582,7 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  std::string graph_dot = manager().file_name("reactors.dot");
+  LogManager::path_type graph_dot = manager().file_name("reactors.dot");
   std::ofstream dotf(graph_dot.c_str());
 
   graph_names_writer gn;
@@ -640,7 +640,7 @@ void Agent::synchronize() {
     std::ostringstream name;
     name<<"reactors."<<getCurrentTick()<<".dot";
     
-    std::string graph_dot = manager().file_name(name.str());
+    LogManager::path_type graph_dot = manager().file_name(name.str());
     std::ofstream dotf(graph_dot.c_str());
     
     graph_names_writer gn;

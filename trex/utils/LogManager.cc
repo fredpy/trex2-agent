@@ -38,8 +38,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include<boost/tokenizer.hpp>
 
@@ -51,59 +49,7 @@
 #include "TREXversion.hh"
 
 using namespace TREX::utils; 
-
-namespace {
-
-  /** @brief Check for file exitsance
-   * @param file A file name
-   * @param mask Type of the file
-   *
-   * This method checks if @a file exists and if its type is consisistent
-   * with @a mask. Mask is based on the @c stat  @c st_mode prodvided
-   * attribute. The values can be a binary composition of the following
-   * masks :
-   * @li @c S_IFMT (default) any file type
-   * @li @c S_IFIFO  named pipe (fifo) 
-   * @li @c S_IFCHR  character special
-   * @li @c S_IFDIR  directory
-   * @li @c S_IFBLK  block special
-   * @li @c S_IFREG  regular
-   * @li @c S_IFLNK  symbolic link
-   * @li @c S_IFSOCK socket
-   * @li @c S_IFWHT  whiteout
-   * For more details llook at the man stat(2)
-   *
-   * @retval true if @a file exists and is compaitible with @a mask
-   * @retval false otherwise
-   *
-   * @author Frederic Py <fpy@mbari.org>
-   * @relates class TREX::utils::LogManager
-   */
-  bool file_check(std::string const &file, mode_t mask = S_IFMT) {
-    struct stat st;
-    return 0==stat(file.c_str(), &st) && (mask&st.st_mode);
-  }
-  /** @brief short file name
-   * @param file_name A sym,bolic file name
-   *
-   * This function gets rid of all the charcaters before the last @c '/'
-   * of @a file_name. It is handy to get a short name or a file for
-   * further manipulation.
-   *
-   * @return The remaining characters after the last @c '/' of @a file_name
-   *
-   * @author Frederic Py <fpy@mbari.org>
-   * @relates class TREX::utils::LogManager
-   */
-  std::string short_name(std::string const &file_name) {
-    size_t slash = file_name.find_last_of('/');
-    
-    if( std::string::npos!=slash )
-      return std::string(file_name, slash+1);
-    return file_name;
-  }
-
-}
+using namespace boost::filesystem;
 
 
 /*
@@ -121,29 +67,42 @@ LogManager::~LogManager() {
 // methods :
 
 
-std::string LogManager::locate(std::string const &file, bool &found) const {
+LogManager::path_type LogManager::locate(std::string const &file, bool &found) const {
+  path_type ret(file);
+  
   if( file.empty() )
     found = false;
   else {
-    found = file_check(file);
-    if( !found && '/'!=file[0] ) {
-      std::list<std::string>::const_iterator i = m_searchPath.begin();
+    ret.make_preferred();
+    
+    found = is_regular_file(ret);
+    
+    if( !found && ret.is_relative() ) {
+      path_iterator i = m_searchPath.begin();
       for(; m_searchPath.end()!=i; ++i ) {
-	std::string loc = *i+'/'+file;
-	found = file_check(loc);
+        path loc(*i);
+        loc /= ret; 
+        path real_loc(loc);
+        if( is_symlink(loc) )
+          real_loc = read_symlink(loc);
+        
+        found = is_regular_file(real_loc);
 	if( found )
 	  return loc;
       }
     }
   }
-  return file;
+  return ret;
 }
 
 bool LogManager::addSearchPath(std::string const &path) {
   if( !path.empty() ) {
-    if( '.'==path[0] || file_check(path, S_IFDIR) ) {
-      // This is a directory -> add it to the path
-      m_searchPath.push_back(path);
+    path_type p(path);
+    p.make_preferred();
+    
+    if( p.is_relative() || is_directory(p) ||
+       ( is_symlink(p) && is_directory(read_symlink(p)) ) ) {
+      m_searchPath.push_back(p);
       return true;
     }
   }
@@ -171,23 +130,22 @@ void LogManager::loadSearchPath() {
   }
 }
 
-std::string const &LogManager::logPath() {
+LogManager::path_type const &LogManager::logPath() {
   SharedVar<bool>::scoped_lock lock(m_inited);
 
   if( !*m_inited ) {
     if( m_path.empty() ) {
       createLatest();
-    } else if( !file_check(m_path) ) { 
-      int ret = mkdir(m_path.c_str(), 0777);
-      if( 0==ret ) {
-	throw ErrnoExcept("LogManager: Unable to create log directory :");
-      }
+    } else if( !is_directory(m_path) ) { 
+      create_directory(m_path);
     }
-    std::string cfg = m_path+"/cfg";
-    int ret = mkdir(cfg.c_str(), 0777);
-    if( 0!=ret && EEXIST!=errno )
-      throw ErrnoExcept("LogManager: error while creating cfg dir");
-    m_syslog.open(m_path+'/'+TREX_LOG_FILE);
+    path_type cfg(m_path), trex_log(m_path);
+    cfg /= "cfg";
+    create_directory(cfg);
+    
+    trex_log /= TREX_LOG_FILE;
+    
+    m_syslog.open(trex_log.c_str());
     m_syslog<<"TREX version "<<TREX::version::str();
     loadSearchPath();
     *m_inited = true;
@@ -196,78 +154,82 @@ std::string const &LogManager::logPath() {
 }
 
 void LogManager::createLatest() {
-  char *base_dir = getenv(LOG_DIR_ENV);
-  char dated_dir[17];
+  char *base_dir_name = getenv(LOG_DIR_ENV);
+  char dated_dir[16];
   
-  if( NULL==base_dir ) {
+  if( NULL==base_dir_name ) {
     throw ErrnoExcept("LogManager: $"LOG_DIR_ENV" is not set");
   }
-  dated_dir[16] = '\0';
-
+  path_type base_dir(base_dir_name);
+  base_dir.make_preferred();
+  
+  // compute the base name using YYYY.jjj format
+  dated_dir[15] = '\0';
   time_t cur_time;
   time(&cur_time);
-  strftime(dated_dir, 16, "/%Y.%j.", gmtime(&cur_time));
+  strftime(dated_dir, 15, "%Y.%j", gmtime(&cur_time));
+  std::string dir_base(dated_dir);
   
-  std::string latest = base_dir;
-  std::string cur_basis = base_dir;
-  size_t len = latest.length()+30;
-  char *buf = new char[len+1];
-  std::memset(buf, 0, len+1);
-  latest = latest+'/'+LATEST_DIR;
-  cur_basis += dated_dir;
-  int ret = readlink(latest.c_str(), buf, len-1);
+  path_type latest(base_dir);
   size_t last = 0;
-  if( ret>0 ) {
-    // latest link exists and point to something
-    size_t b_len = cur_basis.length();
-    if( 0==cur_basis.compare(0, b_len, buf, b_len) ) {
-      std::istringstream iss(std::string(buf, b_len));
+  
+  latest /= LATEST_DIR;
+  if( exists(latest) ) {
+    // I assume that lates is a symlink
+    path_type real = read_symlink(latest).filename();
+    if( real.stem().string()==dir_base ) {
+      std::istringstream iss(std::string(real.extension().string(), 1));
       iss>>last;
     }
-    unlink(latest.c_str());
+    remove(latest);
   }
-  delete[] buf;
   for(unsigned i=1; i<MAX_LOG_ATTEMPT; ++i) {
     std::ostringstream oss;
-    oss<<cur_basis<<std::setw(2)<<std::setfill('0')<<(last+i);
-    int ret = mkdir(oss.str().c_str(), 0777);
-    if( 0==ret ) {
-      m_path = oss.str();
-      symlink(m_path.c_str(), latest.c_str());
+    m_path = base_dir;
+    oss<<dir_base<<'.'<<std::setw(2)<<std::setfill('0')<<(last+i);
+    
+    m_path /= oss.str();
+    if( !exists(m_path) ) {
+      create_directory(m_path);
+      create_directory_symlink(m_path, latest);
       return;
-    } else if( EEXIST!=errno )
-      throw ErrnoExcept("LogManager: error while trying to create log dir");
+    }
   }
   throw ErrnoExcept("LogManager", "Too many attempts ... clean up your "
 		    "log directory");
 }
 
-std::string LogManager::file_name(std::string const &short_name) {
-  return logPath()+'/'+short_name;
+LogManager::path_type LogManager::file_name(std::string const &short_name) {
+  path_type ret(logPath());
+  ret /= short_name;
+  ret.make_preferred();
+  return ret;
 }
 
-std::string LogManager::getCfgPath() {
-  return file_name("cfg/");
+LogManager::path_type LogManager::getCfgPath() {
+  return file_name("cfg");
 }
 
 std::string LogManager::use(std::string const &file_name, bool &found) {
-  std::string dest_name = getCfgPath()+short_name(file_name);
-
-  std::string located = locate(file_name, found);
+  path_type located = locate(file_name, found);
   if( found ) {
-    std::ifstream src(located.c_str(), std::ios::binary);
-  
-    if( !!src ) {
-      syslog()<<"- Using file "<<located;
-      std::ofstream dest(dest_name.c_str(), std::ios::binary);
-
-      dest<<src.rdbuf();
-      src.close();
-      dest.close();
-    } else
-      throw ErrnoExcept("File \""+located+'\"');
+    path_type dest(getCfgPath()), tmp(file_name), src(located);
+    if( tmp.is_relative() ) 
+      dest /= tmp;
+    else dest /= src.filename();
+    
+    syslog()<<"- Using file "<<located;
+    if( exists(dest) )
+      syslog("WARN")<<"A file with this name already exists in the cfg log."
+                    <<"\n\tI won't overwrite the previous file.";
+    else {
+      if( is_symlink(located) ) 
+        src = read_symlink(located);
+      create_directories(dest.parent_path());
+      copy(src, dest);
+    }
   }
-  return located;
+  return located.string();
 }
 
 TextLog &LogManager::syslog() {

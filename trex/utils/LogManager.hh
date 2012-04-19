@@ -44,6 +44,7 @@
 # define H_LogManager
 
 # include <list>
+# include <boost/filesystem.hpp>
 
 # include "TextLog.hh"
 # include "SingletonUse.hh"
@@ -177,6 +178,7 @@ namespace TREX {
 				LogNormal,   //!< Normal level
 				LogExtensive //!< High verbosity (usually for debugging)
       };
+      typedef boost::filesystem::path path_type;
 			
       /** @brief Logging path
        * This method indicates in which directory log files
@@ -189,7 +191,7 @@ namespace TREX {
        *
        * @return a string with the full name of the log directory
        */
-      std::string const &logPath();
+      path_type const &logPath();
       /** @brief log file complete name
        * @param[in] short_name A short file name
        *
@@ -204,7 +206,7 @@ namespace TREX {
        *
        * @sa logPath()
        */
-      std::string file_name(std::string const &short_name);
+      path_type file_name(std::string const &short_name);
       /** @brief Configuration files management
        * @param[in] file_name A configuration file name
        * @param[out] found Indicate if the file was found
@@ -308,7 +310,7 @@ namespace TREX {
        * 
        * @sa locate(std::string const &,bool &) const
        */
-      typedef std::list<std::string>::const_iterator path_iterator;
+      typedef std::list<path_type>::const_iterator path_iterator;
       /** @brief First path
        * 
        * @return An iterator refering to the first element of TREX_PATH
@@ -344,16 +346,16 @@ namespace TREX {
        * @sa bool addSearchPath(std::string const &path)
        * @sa std::string use(std::string const &, bool &)
        */
-      std::string locate(std::string const &file, bool &found) const;
+      path_type locate(std::string const &file, bool &found) const;
       
       /** @brief Get directory where cfg files should be stored
        *
        * @sa use(std::string const &)
        */
-      std::string getCfgPath();
+      path_type getCfgPath();
     private:
       /** @brief Log directory path */
-      std::string     m_path;
+      path_type m_path;
 			
       /** @brief Initialisation flag
        * This flag is set to true as soon as the log manager is
@@ -400,7 +402,7 @@ namespace TREX {
        *
        * @sa std::string locate(std::string const &file, bool &found) const
        */
-      std::list<std::string> m_searchPath;
+      std::list<path_type> m_searchPath;
       
       friend class SingletonWrapper<LogManager>;
     }; // TREX::utils::LogManager

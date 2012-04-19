@@ -227,10 +227,10 @@ void WitreApplication::urlPage(const std::string& path)
     {
         bool found;
         string path = internalPathNextPart("/log/");
-        string file = s_log->locate(s_log->logPath()+"/"+path, found);
+        std::string file = s_log->locate(s_log->file_name(path).string(), found).string();
         if(found)
         {
-            file = s_log->locate(file, found);
+          // file = s_log->locate(file, found).string();
             Wt::WFileResource* log = new Wt::WFileResource(file, this);
             std::stringstream output;
             log->write(output);
@@ -492,7 +492,7 @@ void WitreApplication::attributePopup()
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
     bool found;
-    string file = s_log->locate(predicate, found);
+    std::string file = s_log->locate(predicate, found).string();
     if(found)
     {
         stringstream err;
