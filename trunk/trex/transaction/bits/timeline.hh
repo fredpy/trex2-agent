@@ -96,7 +96,7 @@ namespace TREX {
 	 * @sa owner() const
 	 */
 	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, 
-                 bool controllable);
+                 transaction_flags const &flags);
 	/** @brief Destructor */
 	~timeline();
 
@@ -182,6 +182,8 @@ namespace TREX {
 	bool no_client() const {
 	  return m_clients.empty();
 	}
+        bool should_publish() const;
+        
 	/** @brief Number of clients
 	 *
 	 * Indicates the number of reactors that declared this timline as external
@@ -262,7 +264,7 @@ namespace TREX {
 	 * @sa TeleoReactor::getExecLatency() const
 	 */
 	TICK latency() const;
-
+        
         /** @brief Recall a goal
          *
          * @param[in] g A goal
@@ -309,7 +311,7 @@ namespace TREX {
 	 * @sa unassign(TICK)
 	 * @sa TeleoReactor::assigned(timeline const &)
 	 */
-	bool assign(TeleoReactor &r, bool controllable);
+	bool assign(TeleoReactor &r, transaction_flags const &flags);
         
         /** @brief Remove ownership
          *
@@ -441,7 +443,8 @@ namespace TREX {
          * or not. No request will be transmitted to the owner of this timeline 
          * as long as this flag is @c false.
          */
-        bool          m_accept_goals;
+        transaction_flags m_transactions;
+        size_t            m_plan_listeners;
         /** @brief Clients of the timeline
          *
          * The set of reactors that subscribe to this timeline. This structure 
