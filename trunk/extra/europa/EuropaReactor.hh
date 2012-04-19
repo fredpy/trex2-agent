@@ -54,6 +54,9 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &request);
       void handleRecall(TREX::transaction::goal_id const &request);
 
+      void newPlanToken(TREX::transaction::goal_id const &t);
+      void cancelledPlanToken(TREX::transaction::goal_id const &t);
+      
       // TREX execution callbacks
       bool hasWork();
 
