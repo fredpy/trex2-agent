@@ -189,11 +189,11 @@ bool timeline::notifyPlan(goal_id const &t) {
 
 bool timeline::cancelPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object();
+    owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object()<<" to the "<<m_plan_listeners<<" plan clients.";
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
-          i->first->cancelPlanToken(t);
+          i->first->cancelledPlanToken(t);
     }
   } 
   return true;
