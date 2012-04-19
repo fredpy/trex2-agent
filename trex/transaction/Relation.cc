@@ -56,12 +56,12 @@ utils::Symbol const timeline::s_failed("Failed");
 // structors :
 
 timeline::timeline(TICK date, utils::Symbol const &name)
-  :m_name(name), m_owner(NULL), m_accept_goals(false), m_lastObs(name, s_failed),
-   m_obsDate(date) {}
+  :m_name(name), m_owner(NULL), m_plan_listeners(0),
+   m_lastObs(name, s_failed), m_obsDate(date) {}
 
-timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, bool controllable)
-  :m_name(name), m_owner(&serv), m_accept_goals(controllable), m_lastObs(name, s_failed),
-   m_obsDate(date) {}
+timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
+  :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
+   m_lastObs(name, s_failed), m_obsDate(date)  {}
 
 timeline::~timeline() {
   // maybe some clean-up to do (?)
@@ -69,8 +69,13 @@ timeline::~timeline() {
 
 // observers :
 
+bool timeline::should_publish() const {
+  return m_transactions.test(1) && (0 < m_plan_listeners);
+}
+
+
 TICK timeline::look_ahead() const {
-  return (owned() && m_accept_goals)?owner().getLookAhead():0;
+  return (owned() && m_transactions.test(0))?owner().getLookAhead():0;
 }
 
 TICK timeline::latency() const {
@@ -79,7 +84,7 @@ TICK timeline::latency() const {
 
 // modifiers :
 
-bool timeline::assign(TeleoReactor &r, bool controllable) {
+bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
   bool ret = true;
   
   if( NULL==m_owner ) {
@@ -90,7 +95,7 @@ bool timeline::assign(TeleoReactor &r, bool controllable) {
       ret = false;
     }
     m_owner = &r;
-    m_accept_goals = controllable;
+    m_transactions = flags;
     r.assigned(this);
     latency_update(0);
   } else if( !owned_by(r) ) 
@@ -105,7 +110,7 @@ TeleoReactor *timeline::unassign(TICK date) {
     
     m_owner->unassigned(this);
     m_owner = NULL;
-    m_accept_goals = false;
+    m_transactions.reset();
     postObservation(date, Observation(name(), s_failed));
     latency_update(ret->getExecLatency());
   }
@@ -127,10 +132,17 @@ bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
     
     boost::tie(pos, inserted) = m_clients.insert(std::make_pair(&r, flags));
     
-    if( inserted ) 
+    if( inserted ) {
+      if( flags.test(1) )
+        m_plan_listeners += 1;
       r.subscribed(Relation(this, pos));
-    else if( pos->second!=flags ) {
+    } else if( pos->second!=flags ) {
       r.syslog("WARN")<<"Updated transaction flags for external timeline "<<name();
+      if( flags.test(1) ) {
+        if( !pos->second.test(1) )
+          m_plan_listeners += 1;
+      } else if( pos->second.test(1) )
+        m_plan_listeners -= 1;
       pos->second = flags; 
     }
     return inserted;
@@ -138,6 +150,8 @@ bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
 }
 
 void timeline::unsubscribe(Relation const &rel) {
+  if( rel.accept_plan_tokens() )
+    m_plan_listeners -= 1;
   rel.client().unsubscribed(rel);
   m_clients.erase(rel.m_pos);
 }
@@ -161,27 +175,27 @@ void timeline::recall(goal_id const &g) {
 }
 
 bool timeline::notifyPlan(goal_id const &t) {
-  if( owned() ) {
+  if( m_transactions.test(1) && owned() ) {
     owner().syslog("plan.INFO")<<"added ["<<t<<"] "<<*t;
-    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
-      if( i->second.test(1) )
-        i->first->newPlanToken(t);
+    if( m_plan_listeners>0 ) {
+      for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
+        if( i->second.test(1) )
+          i->first->newPlanToken(t);
+    }
     return true; 
-  } else {
-    // should never happen
-  }
+  } 
   return false;
 }
 
 bool timeline::cancelPlan(goal_id const &t) {
-  if( owned() ) {
+  if( m_transactions.test(1) && owned() ) {
     owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object();
-    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
-      if( i->second.test(1) )
-        i->first->cancelPlanToken(t);
-  } else {
-    // normally I should not end up here
-  }
+    if( m_plan_listeners>0 ) {
+      for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
+        if( i->second.test(1) )
+          i->first->cancelPlanToken(t);
+    }
+  } 
   return true;
 }
 

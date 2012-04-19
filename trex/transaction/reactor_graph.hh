@@ -651,7 +651,7 @@ namespace TREX {
 
     private:
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
-                  bool controllable);
+                  details::transaction_flags const &flags);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
 		     details::transaction_flags const &flags);
 

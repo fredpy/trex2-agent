@@ -187,11 +187,11 @@ graph::size_type graph::count_relations() const {
 }
 
 
-bool graph::assign(graph::reactor_id r, Symbol const &timeline, bool controllable) {
+bool graph::assign(graph::reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     internal_check(r, **tl);
-    return (*tl)->assign(*r, controllable);
+    return (*tl)->assign(*r, flags);
   } catch(timeline_failure const &err) {
     return r->failed_internal(timeline, err);
   }

@@ -799,7 +799,8 @@ namespace TREX {
       /** @brief Internal timeline declaration
        *
        * @param[in] timeline a name
-       * @param[in] does this timeline accept goals
+       * @param[in] controlable does this timeline accept goals
+       * @param[in] publish does this timeline will publish its plan
        *
        * This method is used to declare @p timeline as an @e Internal timeline.
        *
@@ -815,7 +816,7 @@ namespace TREX {
        * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &)
        * @sa use(TREX::utils::Symbol const &, bool)
        */
-      void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
+      void provide(TREX::utils::Symbol const &timeline, bool controllable=true, bool publish=false);
 
       /** @brief Request for external failed
        *

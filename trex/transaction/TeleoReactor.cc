@@ -40,7 +40,7 @@
 #include <utility>
 #include <cmath>
 
-#include <boost/chrono/clock_string.hpp>
+// #include <boost/chrono/clock_string.hpp>
 
 #include "TeleoReactor.hh"
 #include <trex/domain/FloatDomain.hh>
@@ -78,7 +78,7 @@ std::string DispatchError::build_msg(goal_id const &g, std::string const &msg) t
 bool TREX::transaction::details::external::cmp_goals(IntegerDomain const &a, IntegerDomain const &b) {
   // sorting order
   //   - based on upperBound
-  //   - if same upperBound : sorted base on lower bound
+  //   - if same upperBound : sorted based on lower bound
   //
   // this way I can safely update lower bounds without impacting tokens order
   return a.upperBound()<b.upperBound() ||
@@ -440,7 +440,7 @@ bool TeleoReactor::initialize(TICK final) {
   m_finalTick   = final;
   syslog()<<"Creation tick is "<<getInitialTick();
   syslog()<<"Execution latency is "<<getExecLatency();
-  syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
+  // syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
   try {
     handleInit();   // allow derived class initialization
     m_firstTick = true;
@@ -470,8 +470,8 @@ bool TeleoReactor::newTick() {
               <<m_synch_usage.count()
               <<", "<<m_deliberation_usage.count()<<std::endl;
   
-  if( m_deliberation_usage > stat_duration::zero() )
-    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
+//  if( m_deliberation_usage > stat_duration::zero() )
+//    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
   m_deliberation_usage = stat_duration::zero();
   if( NULL!=m_trLog )
     m_trLog->newTick(getCurrentTick());
@@ -559,8 +559,11 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
 	      <<timeline.str()<<"\"";
 }
 
-void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable) {
-  if( !m_graph.assign(this, timeline, controllable) )
+void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable, bool publish) {
+  details::transaction_flags flag;
+  flag.set(0, controllable);
+  flag.set(1, publish);
+  if( !m_graph.assign(this, timeline, flag) )
     if( isInternal(timeline) ) {
       syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
     }
