@@ -61,7 +61,9 @@ PluginError::PluginError(Symbol const &name,
 
 PluginLoader::~PluginLoader() {
   /*
-   * Unloading plug-ins at destruction appeared to be a bad idea
+   * Unloading plug-ins at destruction appeared to be a bad idea.
+   * Indeed I have no guarantee that objects from ythe loaded 
+   * library are dangling. 
    */
   // handle_map::iterator i;
   
