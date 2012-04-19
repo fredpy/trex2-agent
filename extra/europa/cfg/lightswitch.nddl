@@ -67,7 +67,7 @@ class Luminance extends AgentTimeline {
     predicate Dim {}
     
     Luminance(Mode _mode) {
-	super(_mode);
+	super(_mode, true);
     }
 }
 

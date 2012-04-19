@@ -91,6 +91,7 @@ namespace TREX {
       typedef TREX::utils::list_set<details::CurrentStateId_id_traits> state_map;
       static std::string const MODE_ATTR;
       static std::string const DEFAULT_ATTR;
+      static std::string const PLAN_ATTR;
 
     public:
       static EUROPA::LabelStr const TREX_TIMELINE;
@@ -361,6 +362,7 @@ namespace TREX {
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
         return attribute(obj, DEFAULT_ATTR);
       }
+      bool with_plan(EUROPA::ObjectId const &obj) const;
       void trex_timelines(std::list<EUROPA::ObjectId> &timelines) const {
         plan_db()->getObjectsByType(TREX_TIMELINE, timelines);
       }

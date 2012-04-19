@@ -143,6 +143,7 @@ EUROPA::LabelStr const Assembly::CLOCK_VAR("AGENT_CLOCK");
 
 std::string const Assembly::MODE_ATTR("mode");
 std::string const Assembly::DEFAULT_ATTR("defaultPredicate");
+std::string const Assembly::PLAN_ATTR("with_plan");
 
 std::string const Assembly::UNDEFINED_PRED("undefined");
 std::string const Assembly::FAILED_PRED("Failed");
@@ -475,6 +476,16 @@ void Assembly::recalled(EUROPA::TokenId const &tok) {
 
 
 // observers
+
+bool Assembly::with_plan(EUROPA::ObjectId const &obj) const {
+  if( is_agent_timeline(obj) ) {
+    EUROPA::ConstrainedVariableId var = attribute(obj, PLAN_ATTR);
+    if( var.isId() && var->lastDomain().isSingleton() )
+      return var->lastDomain().getSingletonValue()!=0.0;
+  }
+  return false;
+}
+
 
 bool Assembly::internal(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();

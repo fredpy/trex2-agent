@@ -127,10 +127,10 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     }
 
     if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
-      use(trex_name, OBSERVE_MODE!=mode_val, false);
+      use(trex_name, OBSERVE_MODE!=mode_val, with_plan(*o));
       add_state_var(*o);
     } else if( INTERNAL_MODE==mode_val ) {
-      provide(trex_name);
+      provide(trex_name, true, with_plan(*o));
       add_state_var(*o);
     } else if( IGNORE_MODE==mode_val ) {
       ignore(*o);
@@ -210,6 +210,15 @@ void EuropaReactor::handleRecall(goal_id const &request) {
     recalled(i->second);
   }
 }
+
+void EuropaReactor::newPlanToken(goal_id const &t) {
+  syslog()<<"Receive token ["<<t<<"] on timeline "<<t->object();
+}
+
+void EuropaReactor::cancelledPlanToken(goal_id const &t) {
+  syslog()<<"Receive cancel for token ["<<t<<"]";  
+}
+
 
 // TREX execution callbacks
 void EuropaReactor::handleInit() {
