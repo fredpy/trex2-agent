@@ -78,7 +78,9 @@ add_library(TREXutils SHARED
 )
 
 add_dependencies(core TREXutils)
-target_link_libraries(TREXutils ${SYSTEM_LIBRARIES})
+target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
+  ${Boost_FILESYSTEM_LIBRARY} 
+  ${Boost_SYSTEM_LIBRARY})
 trex_lib(TREXutils)
 
 set_property(SOURCE Pdlfcn.cc 

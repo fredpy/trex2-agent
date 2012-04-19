@@ -92,7 +92,7 @@ std::string const &details::Schema::nddl_path() {
     opath<<'.';
 
     for(LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i)
-      opath<<':'<<*i;
+      opath<<':'<<i->string();
     
     // Now extract infotmnation for NDDL config file
     config = m_log->use("NDDL.cfg", found);
