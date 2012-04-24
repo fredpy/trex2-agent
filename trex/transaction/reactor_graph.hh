@@ -391,6 +391,20 @@ namespace TREX {
       static reactor_id null_reactor() {
 	return reactor_id();
       }
+      
+      /** @brief Check if part of the graph 
+       * @param[in] r A reactor
+       * 
+       * Checks if @p r is currently part of this graph or not. 
+       * A reactor is not part of the graph if it has been isolated or killed
+       *
+       * @retval true if the reactor is still part of this graph
+       * @retvals false otherwise
+       *
+       * @sa kill_reactor(reactor_id)
+       * @sa isolate(reactor_id)
+       */
+      bool is_member(reactor_id r) const;
 
       /** @brief Kill a reactor
        *
