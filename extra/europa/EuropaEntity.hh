@@ -38,7 +38,13 @@
 
 namespace TREX {
   namespace europa {
-
+    
+    /** @brief Europa entity domain proxy
+     *
+     * This class is used to represent europa entities such as objects. It 
+     * represent the set of possible values as an enumeration of the name of all 
+     * the possible instances.  
+     */
     class EuropaEntity 
       :public TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> {
       typedef TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> base_class;
