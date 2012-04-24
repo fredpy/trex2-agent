@@ -128,6 +128,14 @@ graph::reactor_id graph::add_reactor(graph::reactor_id r) {
   return ret.first->get();
 }
 
+bool graph::is_member(graph::reactor_id r) const {
+  for(details::reactor_set::const_iterator i=m_reactors.begin();
+      m_reactors.end()!=i; ++i)
+    if( i->get() == r )
+      return true;
+  return false;
+}
+
 bool graph::kill_reactor(graph::reactor_id r) {
   if( null_reactor()!=r ) {
     details::reactor_set::iterator pos = m_reactors.find(r->getName()),
