@@ -197,6 +197,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 //        debugMsg("trex:request", "   - "<<(*i)->getSignature().toString());
 
       m_active_requests.insert(goal_map::value_type(goal, request));
+      m_completed_this_tick = false;
     }
   }
 }
@@ -208,15 +209,20 @@ void EuropaReactor::handleRecall(goal_id const &request) {
   if( m_active_requests.right.end()!=i ) {
     m_active_requests.right.erase(i);
     recalled(i->second);
+    m_completed_this_tick = false;
   }
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
   syslog()<<"Receive token ["<<t<<"] on timeline "<<t->object();
+  // treat it as a request for now
+  handleRequest(t);
 }
 
 void EuropaReactor::cancelledPlanToken(goal_id const &t) {
-  syslog()<<"Receive cancel for token ["<<t<<"]";  
+  syslog()<<"Receive cancel for token ["<<t<<"]";
+  // treat it as a recall for now
+  handleRecall(t);
 }
 
 
@@ -374,13 +380,19 @@ bool EuropaReactor::synchronize() {
 
 bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_active_requests.left.find(tok);
+  bool ret = false;
 
   if( m_active_requests.left.end()!=i ) {
     syslog()<<"Discarded past request ["<<i->second<<"]";
     m_active_requests.left.erase(i);
-    return true;
+    ret = true;
   }
-  return false;
+  i = m_dispatched.left.find(tok);
+  if( m_dispatched.left.end()!=i ) {
+    m_dispatched.left.erase(i);
+    ret = true;
+  }
+  return ret;
 }
 
 void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
