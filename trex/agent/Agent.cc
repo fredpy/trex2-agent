@@ -606,6 +606,7 @@ void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
   details::sync_scheduller sync(queue);
   m_edf.clear(); // Make sure that there's no one left in the schedulling
+  m_idle.clear();
   bool update = false;
 
   // Identify synchronization order while notifying of the new tick
@@ -628,7 +629,8 @@ void Agent::synchronize() {
 	// this reactor has deliberation :
 	//   - add it to the edf scheduler
 	m_edf.insert(std::make_pair(wr, r));
-      }
+      } else 
+        m_idle.push_front(r);
     } else {
       // r failed => kill the reactor
       kill_reactor(r);
@@ -659,14 +661,23 @@ bool Agent::executeReactor() {
     boost::tie(wr, r) = *(m_edf.begin());
     // syslog("step")<<"Executing reactor "<<r->getName()<<" (wr="<<wr<<")";
     m_edf.erase(m_edf.begin());
+    m_idle.push_back(r);
     try {
       r->step();
       
-      wr = r->workRatio();
-      if( !std::isnan(wr) ) {
-        // syslog("step")<<"New work ratio for "<<r->getName()<<" is "<<wr;
-        m_edf.insert(std::make_pair(wr, r));
-        return true;
+      std::list<reactor_id>::iterator i = m_idle.begin();
+      
+      while( m_idle.end()!=i ) {
+        // Check if the reactor is still valid 
+        if( is_member(*i) ) {
+          wr = r->workRatio();
+          if( !std::isnan(wr) ) {
+            m_edf.insert(std::make_pair(wr, r));
+            i = m_idle.erase(i);
+          } else 
+            ++i;
+        } else 
+          i = m_idle.erase(i);
       }
     } catch(Exception const &e) {
       syslog("WARN")<<"Exception caught while executing reactor step:\n"<<e;

@@ -482,6 +482,7 @@ namespace TREX {
       Clock  *m_clock;  
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
+      std::list<reactor_id>      m_idle;
 
       void synchronize();
       
