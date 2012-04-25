@@ -89,6 +89,7 @@ namespace TREX {
       Wt::WComboBox *menu;
       Wt::WGroupBox *tLines;
       Wt::WSlider *timeLineSlider;
+      Wt::WGroupBox* future;
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;
@@ -124,6 +125,7 @@ namespace TREX {
                             std::map<string,transaction::FloatDomain> attributes);
       void addTimeline(std::string name);
       void addMenuItems();
+      void newPlanToken(const WitreServer::timed_goal& t);
 
     };
 

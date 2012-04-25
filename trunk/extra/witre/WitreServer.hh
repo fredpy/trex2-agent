@@ -53,14 +53,16 @@ namespace TREX {
     public:
 
       class Error :public TREX::utils::Exception {
-      public:
-	Error(std::string const &what) throw()
-	  :TREX::utils::Exception(what) {}
-	virtual ~Error() throw() {}
+            public:
+                Error(std::string const &what) throw()
+                    :TREX::utils::Exception(what) {}
+                virtual ~Error() throw() {}
       };
 
       // WitreApplication const &app() const;
       // WitreApplication &app();
+
+      typedef std::list< std::pair<double, goal_id> > timed_goal;
 
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
@@ -93,6 +95,8 @@ namespace TREX {
       void handleTickStart() {};
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
+      void newPlanToken(goal_id const &t);
+      void cancelledPlanToken(goal_id const &t);
       //End of Trex functions
 
       struct Connection {
@@ -116,6 +120,8 @@ namespace TREX {
       std::vector<Connection> connections;
       std::vector<utils::Symbol> externalTimelines;
       std::queue<std::string> observations;
+      timed_goal pastTokens;
+      timed_goal planTokens;
       WitrePaintSearch::GraphMap timelineGraph;
 
 
