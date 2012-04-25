@@ -76,6 +76,7 @@ namespace TREX {
       bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); return now; };
       std::string getDependencies(std::string name);
+      const timed_goal& plan() { return planTokens; };
 
       TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
       TREX::transaction::Goal getGoal(std::string obs, std::string prd);

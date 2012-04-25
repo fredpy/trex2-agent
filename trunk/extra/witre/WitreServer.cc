@@ -265,7 +265,7 @@ bool WitreServer::synchronize()
 void WitreServer::newPlanToken(goal_id const &t)
 {
     double ctime = getCurrentTick();
-    planTokens.push_front(std::make_pair(ctime,t));
+    planTokens.push_back(std::make_pair(ctime,t));
     string name = t->object().str();
 
     std::list<timed_goal::iterator> eraselist;
