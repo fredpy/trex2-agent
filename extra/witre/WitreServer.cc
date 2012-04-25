@@ -178,9 +178,9 @@ std::string WitreServer::getDependencies(std::string name)
 void WitreServer::declared(details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) {
     // If I did not connect to it yet just create the connection
-    use(timeline.name(), true, false); // as we do not have internal timlines this operation will always succeed
+    use(timeline.name(), true, true); // as we do not have internal timlines this operation will always succeed
                                        //  the first boolean means that we may want to post goals
-                                       //  the second boolean indicate if we want to be notified on plan updates 
+                                       //  the second boolean indicate if we want to be notified on plan updates
                                        //      (false for now)
     {
       // then add it to externalTimelines
@@ -260,6 +260,43 @@ bool WitreServer::synchronize()
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
     return true;
+}
+
+void WitreServer::newPlanToken(goal_id const &t)
+{
+    double ctime = getCurrentTick();
+    planTokens.push_front(std::make_pair(ctime,t));
+    string name = t->object().str();
+
+    std::list<timed_goal::iterator> eraselist;
+    timed_goal::iterator plan;
+    for(plan = planTokens.begin(); plan!=planTokens.end(); ++plan)
+    {
+        double ptime = plan->first;
+        if(ptime<ctime && plan->second->object()==name)
+        {
+            pastTokens.push_front((*plan));
+            eraselist.push_back(plan);
+        }
+    }
+    while(!eraselist.empty())
+    {
+        planTokens.erase(eraselist.front());
+        eraselist.pop_front();
+    }
+
+    boost::mutex::scoped_lock lock(mutex_);
+    for (unsigned i = 0; i < connections.size(); ++i) {
+        Connection& c = connections[i];
+        const boost::function<void(const timed_goal&)>& function(boost::bind(&WitreApplication::newPlanToken, c.client, _1));
+        Wt::WServer::instance()->post(c.sessionId, boost::bind(function, planTokens) );
+    }
+
+}
+
+void WitreServer::cancelledPlanToken(goal_id const &t)
+{
+
 }
 
 goal_id WitreServer::clientGoalPost(Goal const &g)

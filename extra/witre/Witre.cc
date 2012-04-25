@@ -179,6 +179,8 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     //End of South Code
 
     //Start of Center Code
+    future = new Wt::WGroupBox("Future",center);
+
     messages = new Wt::WContainerWidget(center);
 
     observations = wServer->receiveObs();
@@ -641,5 +643,31 @@ void WitreApplication::addMenuItems()
         {
             menu->addItem(name);
         }
+    }
+}
+
+void WitreApplication::newPlanToken(const WitreServer::timed_goal& plan)
+{
+    future->clear();
+    WitreServer::timed_goal::const_iterator t;
+    for(t = plan.begin(); t!=plan.end(); ++t)
+    {
+        const goal_id& goal = t->second;
+        std::ostringstream planStr;
+        planStr <<"<Token timeline=\'"<<goal->object()<<"\' pred=\'"<<goal->predicate()
+             <<"\' value=\'"<<goal<<"\'>"
+             <<"["<<goal->object()<<"."<<goal->predicate()<<"] plan: "
+             <<"Start = "<<goal->getStart()<<" Duration = "<<goal->getDuration()<<" End = "<<goal->getEnd()
+             <<"</Token>";
+        ostringstream stime;
+        stime<< wServer->getCurrentTick();
+        string time = stime.str();
+        string name = goal->object().str();
+        Wt::WPanel* panel = new Wt::WPanel();
+        panel->setCentralWidget(new Wt::WText(planStr.str()));
+        panel->setObjectName(name);
+        panel->setAttributeValue("name", name);
+        panel->setAttributeValue("tick", time);
+        future->insertWidget(0,panel);
     }
 }
