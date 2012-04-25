@@ -646,24 +646,20 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
 
 void Assembly::getFuturePlan()
 {
-    std::list<EUROPA::ObjectId> objs;
-    trex_timelines(objs);
-    for(std::list<EUROPA::ObjectId>::iterator object = objs.begin();
-        object!=objs.end(); ++object)
+    internal_iterator it = begin_internal(), end = end_internal();
+    for(; it!=end; ++it)
     {
-        if(internal(*object))
+        EUROPA::TimelineId timeline((*it)->timeline());
+        const std::list<EUROPA::TokenId>& tokens = timeline->getTokenSequence();
+        for(std::list<EUROPA::TokenId>::const_iterator token = tokens.begin();
+        token!=tokens.end(); ++token)
         {
-             EUROPA::TimelineId timeline(*object);
-             std::list<EUROPA::TokenId> tokens = timeline->getTokenSequence();
-             for(std::list<EUROPA::TokenId>::iterator token = tokens.begin();
-                token!=tokens.end(); ++token)
+             if((*token)->end()->lastDomain().getLowerBound()>now()+1)
              {
-                 if((*token)->start()->lastDomain().getLowerBound()>now())
-                    plan_dispatch(timeline,*token);
+                 plan_dispatch(timeline,*token);
              }
         }
     }
-    return;
 }
 
 /*

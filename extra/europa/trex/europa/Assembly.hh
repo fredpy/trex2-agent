@@ -503,7 +503,7 @@ namespace TREX {
       }
       /** @brief Gets the Future plan
        *
-       * For now it prints the furture plan
+       * Dispatches the plan to the plan_dispatch function
        *
        */
       void getFuturePlan();
