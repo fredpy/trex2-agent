@@ -487,6 +487,7 @@ void WitreApplication::syncObservations()
     {
         this->post();
     }
+    newPlanToken(wServer->plan());
 }
 
 void WitreApplication::attributePopup()
