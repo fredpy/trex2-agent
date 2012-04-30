@@ -109,7 +109,7 @@ namespace TREX {
 
       void logPlan(std::string const &base_name) const;
 
-      typedef boost::bimap<EUROPA::TokenId, TREX::transaction::goal_id> goal_map;
+      typedef boost::bimap<EUROPA::eint, TREX::transaction::goal_id> goal_map;
       goal_map m_active_requests;
       goal_map m_dispatched;
       goal_map m_plan_tokens;

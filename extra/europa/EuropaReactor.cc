@@ -196,7 +196,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 //          supporters.end()!=i; ++i)
 //        debugMsg("trex:request", "   - "<<(*i)->getSignature().toString());
 
-      m_active_requests.insert(goal_map::value_type(goal, request));
+      m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
       m_completed_this_tick = false;
     }
   }
@@ -208,7 +208,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
   goal_map::right_iterator i = m_active_requests.right.find(request);
   if( m_active_requests.right.end()!=i ) {
     m_active_requests.right.erase(i);
-    recalled(i->second);
+    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(i->second));
     m_completed_this_tick = false;
   }
 }
@@ -269,7 +269,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 //    oss<<i->first<<" ";
 //  syslog()<<"Current tokens: { "<<oss.str()<<"}";
   
-  if( m_dispatched.left.find(tok)==m_dispatched.left.end() ) {
+  if( m_dispatched.left.find(tok->getKey())==m_dispatched.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
@@ -293,7 +293,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     }
     goal_id request = postGoal(my_goal);
     if( request ) {
-      m_dispatched.insert(goal_map::value_type(tok, request));
+      m_dispatched.insert(goal_map::value_type(tok->getKey(), request));
     } else
       return false;
   }
@@ -302,7 +302,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 
 void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok)
 {
-  if( m_plan_tokens.left.find(tok) == m_plan_tokens.left.end() ) {
+  if( m_plan_tokens.left.find(tok->getKey()) == m_plan_tokens.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
@@ -326,7 +326,7 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
     }
     goal_id request = postPlanToken(my_goal);
     if( request )
-      m_plan_tokens.insert(goal_map::value_type(tok, request));
+      m_plan_tokens.insert(goal_map::value_type(tok->getKey(), request));
   }
 }
 
@@ -351,7 +351,9 @@ bool EuropaReactor::synchronize() {
 
     for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
       oss<<" -> "<<(*i)->toLongString()<<'\n';
-
+    if( me.synchronizer()->getStepCount()>0 )
+      me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
+                       <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
@@ -365,11 +367,16 @@ bool EuropaReactor::synchronize() {
     //    LogManager::path_type full_name = manager().file_name(getName().str()+".relax.dot");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
+    syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
 
     if( !( do_relax(false) && do_synchronize() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      if( !( do_relax(true) && do_synchronize() ) )
+      syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
+      if( !( do_relax(true) && do_synchronize() ) ) {
+        syslog("ERROR")<<"Failed to synchronize(3) : killing reactor";
+        syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
         return false;
+      }
     }
   }
   // Prepare the reactor for next deliberation round
@@ -380,7 +387,7 @@ bool EuropaReactor::synchronize() {
     for( ; to!=from; ++from) {
       EUROPA::TokenId cur = (*from)->previous();
       if( cur.isId() && cur->isMerged() )
-        m_dispatched.left.erase(cur->getActiveToken());
+        m_dispatched.left.erase(cur->getActiveToken()->getKey());
     }
 
     m_completed_this_tick = false;
@@ -390,7 +397,7 @@ bool EuropaReactor::synchronize() {
 }
 
 bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
-  goal_map::left_iterator i = m_active_requests.left.find(tok);
+  goal_map::left_iterator i = m_active_requests.left.find(tok->getKey());
   bool ret = false;
 
   if( m_active_requests.left.end()!=i ) {
@@ -398,21 +405,22 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
     m_active_requests.left.erase(i);
     ret = true;
   }
-  i = m_dispatched.left.find(tok);
+  i = m_dispatched.left.find(tok->getKey());
   if( m_dispatched.left.end()!=i ) {
     syslog()<<"Discarded past goal ["<<i->second<<"]";
     m_dispatched.left.erase(i);
     ret = true;
   }
-  i = m_plan_tokens.left.find(tok);
+  i = m_plan_tokens.left.find(tok->getKey());
   if( m_plan_tokens.left.end()!=i ) {
     m_dispatched.left.erase(i);
+    ret = true;
   }
   return ret;
 }
 
 void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
-  goal_map::left_iterator i = m_dispatched.left.find(tok);
+  goal_map::left_iterator i = m_dispatched.left.find(tok->getKey());
 
   if( m_dispatched.left.end()!=i ) {
     syslog()<<"Recall ["<<i->second<<"]";
@@ -420,10 +428,10 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
     m_dispatched.left.erase(i);
   }
 
-  i = m_plan_tokens.left.find(tok);
+  i = m_plan_tokens.left.find(tok->getKey());
   if( m_plan_tokens.left.end()!=i ) {
     cancelPlanToken(i->second);
-    m_dispatched.left.erase(i);
+    m_plan_tokens.left.erase(i);
   }
 }
 
