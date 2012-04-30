@@ -303,11 +303,13 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     endi = timeline()->getTokenSequence().end();
   
   // skip the past tokens
-  for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb; ++i);
+  for( ; endi!=i && (*i)->end()->lastDomain().getLowerBound()<=(lb+1); ++i);
+
 
   for( ; endi!=i && (*i)->start()->lastDomain().getLowerBound()<=ub; ++i) {
     // TODO: need to check if it is guarded first ... in such cas I won't dispatch it
-    if( !m_assembly.dispatch(timeline(), *i) )
+    if( !m_assembly.dispatch(timeline(), *i) 
+       && (*i)->start()->lastDomain().getLowerBound()>=lb )
       break;
   }
 }
