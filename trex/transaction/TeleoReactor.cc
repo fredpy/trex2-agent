@@ -129,7 +129,7 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
   IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
 
   for( ; m_pos->second.end()!=i && (*i)->startsBefore(dispatch_w.upperBound());  ) {
-    if( (*i)->startsAfter(current) ) {
+    if( (*i)->startsAfter(current) || (*i)->endsAfter(current+1) ) {
       // Need to check for dispatching
       if( m_pos->first.accept_goals() ) {
 	syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
@@ -139,7 +139,7 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
       } else
 	++i;
     } else {
-      syslog()<<"Goal "<<(*i)->predicate()<<'['<<(*i)<<"] is in the past !";
+      syslog()<<"Goal "<<(*i)->predicate()<<'['<<(*i)<<"] is in the past !\n\t"<<(**i);
       i = m_pos->second.erase(i);
     }
   }
@@ -314,20 +314,17 @@ double TeleoReactor::workRatio() {
         ret *= m_nSteps+1;
       }
       return 1.0/ret;
-    } /* Folowing code would be usefull only if I'd allow a reactor to re-ask for working 
-	 time in a tick ... may happen in the future
-	else {
-	// Dispatched goals management
-	details::external i = ext_begin();
-	details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
-	// I do nothing with it for now
-	
-	// Manage goal dispatching
-	for( ; i.valid(); ++i )
+    } else {
+      // Dispatched goals management
+      details::external i = ext_begin();
+      details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
+                                      // I do nothing with it for now
+      
+      // Manage goal dispatching
+      for( ; i.valid(); ++i )
 	i.dispatch(getCurrentTick()+1, dispatched);
 	
-	}
-      */
+    }
   } catch(std::exception const &se) {
     syslog("WARN")<<"Exception during hasWork question: "<<se.what();
   } catch(...) {
