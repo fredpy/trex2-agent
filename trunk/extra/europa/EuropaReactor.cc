@@ -239,29 +239,36 @@ void EuropaReactor::handleTickStart() {
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
-  if( m_completed_this_tick ) {
-    Assembly::external_iterator from(begin(), end()), to(end(), end());
-    for(; to!=from; ++from) {
-      TeleoReactor::external_iterator
-        j=find_external((*from)->timeline()->getName().c_str());
-      EUROPA::eint e_lo, e_hi;
-
-      if( j.valid() && j->accept_goals() ) {
-        IntegerDomain window = j->dispatch_window(getCurrentTick());
-        IntegerDomain::bound lo = window.lowerBound(), hi = window.upperBound();
-        e_lo = lo.value();
-        if( hi.isInfinity() )
-          e_hi = final_tick();
-        else
-          e_hi = hi.value();
-        (*from)->do_dispatch(e_lo, e_hi);
-      }
-    }
-  }
+//  if( m_completed_this_tick ) {
+//    Assembly::external_iterator from(begin(), end()), to(end(), end());
+//    for(; to!=from; ++from) {
+//      TeleoReactor::external_iterator
+//        j=find_external((*from)->timeline()->getName().c_str());
+//      EUROPA::eint e_lo, e_hi;
+//
+//      if( j.valid() && j->accept_goals() ) {
+//        IntegerDomain window = j->dispatch_window(getCurrentTick());
+//        IntegerDomain::bound lo = window.lowerBound(), hi = window.upperBound();
+//        e_lo = lo.value();
+//        if( hi.isInfinity() )
+//          e_hi = final_tick();
+//        else
+//          e_hi = hi.value();
+//        (*from)->do_dispatch(e_lo, e_hi);
+//      }
+//    }
+//  }
 }
 
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
                              EUROPA::TokenId const &tok) {
+//  syslog()<<"Looking for token "<<tok<<":"<<tok->getKey()<<": "<<tl->getName().toString()
+//          <<"."<<tok->getUnqualifiedPredicateName().toString();
+//  std::ostringstream oss;
+//  for(goal_map::left_iterator i=m_dispatched.left.begin(); m_dispatched.left.end()!=i; ++i) 
+//    oss<<i->first<<" ";
+//  syslog()<<"Current tokens: { "<<oss.str()<<"}";
+  
   if( m_dispatched.left.find(tok)==m_dispatched.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
@@ -295,6 +302,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 
 void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok)
 {
+  if( m_plan_tokens.left.find(tok) == m_plan_tokens.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
@@ -317,6 +325,9 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
       my_goal.restrictAttribute(attr);
     }
     goal_id request = postPlanToken(my_goal);
+    if( request )
+      m_plan_tokens.insert(goal_map::value_type(tok, request));
+  }
 }
 
 bool EuropaReactor::do_relax(bool full) {
@@ -367,8 +378,8 @@ bool EuropaReactor::synchronize() {
 
     Assembly::external_iterator from(begin(), end()), to(end(), end());
     for( ; to!=from; ++from) {
-      EUROPA::TokenId cur = (*from)->current();
-      if( cur->isMerged() )
+      EUROPA::TokenId cur = (*from)->previous();
+      if( cur.isId() && cur->isMerged() )
         m_dispatched.left.erase(cur->getActiveToken());
     }
 
@@ -389,8 +400,13 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   }
   i = m_dispatched.left.find(tok);
   if( m_dispatched.left.end()!=i ) {
+    syslog()<<"Discarded past goal ["<<i->second<<"]";
     m_dispatched.left.erase(i);
     ret = true;
+  }
+  i = m_plan_tokens.left.find(tok);
+  if( m_plan_tokens.left.end()!=i ) {
+    m_dispatched.left.erase(i);
   }
   return ret;
 }
@@ -401,6 +417,12 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   if( m_dispatched.left.end()!=i ) {
     syslog()<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
+    m_dispatched.left.erase(i);
+  }
+
+  i = m_plan_tokens.left.find(tok);
+  if( m_plan_tokens.left.end()!=i ) {
+    cancelPlanToken(i->second);
     m_dispatched.left.erase(i);
   }
 }
@@ -425,6 +447,22 @@ bool EuropaReactor::hasWork() {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
         getFuturePlan();
+      }
+      Assembly::external_iterator from(begin(), end()), to(end(), end());
+      for(; to!=from; ++from) {
+        TeleoReactor::external_iterator
+        j=find_external((*from)->timeline()->getName().c_str());
+        EUROPA::eint e_lo, e_hi;
+        if( j.valid() && j->accept_goals() ) {
+          IntegerDomain window = j->dispatch_window(getCurrentTick());
+          IntegerDomain::bound lo = window.lowerBound(), hi = window.upperBound();
+          e_lo = lo.value();
+          if( hi.isInfinity() )
+            e_hi = final_tick();
+          else
+            e_hi = hi.value();
+          (*from)->do_dispatch(e_lo, e_hi);
+        }
       }
     }
   }

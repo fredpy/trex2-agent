@@ -74,6 +74,9 @@ namespace TREX {
 	EUROPA::TokenId current() const {
 	  return m_last_obs;
 	}
+        EUROPA::TokenId previous() const {
+          return m_prev_obs;
+        }
 	std::set<LabelStr> const &predicates() const {
 	  return m_pred_names;
 	}
