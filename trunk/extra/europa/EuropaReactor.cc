@@ -351,9 +351,9 @@ bool EuropaReactor::synchronize() {
 
     for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
       oss<<" -> "<<(*i)->toLongString()<<'\n';
-    if( me.synchronizer()->getStepCount()>0 )
-      me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
-                       <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
+//    if( me.synchronizer()->getStepCount()>0 )
+//      me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
+//                       <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
