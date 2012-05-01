@@ -265,10 +265,10 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 //  syslog()<<"Looking for token "<<tok<<":"<<tok->getKey()<<": "<<tl->getName().toString()
 //          <<"."<<tok->getUnqualifiedPredicateName().toString();
 //  std::ostringstream oss;
-//  for(goal_map::left_iterator i=m_dispatched.left.begin(); m_dispatched.left.end()!=i; ++i) 
+//  for(goal_map::left_iterator i=m_dispatched.left.begin(); m_dispatched.left.end()!=i; ++i)
 //    oss<<i->first<<" ";
 //  syslog()<<"Current tokens: { "<<oss.str()<<"}";
-  
+
   if( m_dispatched.left.find(tok->getKey())==m_dispatched.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
@@ -413,7 +413,7 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   }
   i = m_plan_tokens.left.find(tok->getKey());
   if( m_plan_tokens.left.end()!=i ) {
-    m_dispatched.left.erase(i);
+    m_plan_tokens.left.erase(i);
     ret = true;
   }
   return ret;
