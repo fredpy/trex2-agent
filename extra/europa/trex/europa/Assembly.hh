@@ -117,6 +117,20 @@ namespace TREX {
       /** @brief Destructor */
       virtual ~Assembly();
 
+      /** @brief Test if goal
+       *
+       * @param[in] tok A token
+       *
+       * Test if @p tok is a goal token menaing that it is rejectable and 
+       * associated to an internal timeline.
+       *
+       * @retval true if @p tok is a goal
+       * @retval false otherwise
+       *
+       * @sa internal(EUROPA::TokenId const &) const
+       */
+      bool is_goal(EUROPA::TokenId const &tok) const;
+      
       /** @brief Check if internal
        * @param[in] tok A token
        *

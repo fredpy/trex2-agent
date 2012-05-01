@@ -486,6 +486,10 @@ bool Assembly::with_plan(EUROPA::ObjectId const &obj) const {
   return false;
 }
 
+bool Assembly::is_goal(EUROPA::TokenId const &tok) const {
+  EUROPA::StateDomain const &state = tok->getState()->baseDomain();
+  return state.isMember(EUROPA::Token::REJECTED) && internal(tok);
+}
 
 bool Assembly::internal(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
