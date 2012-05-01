@@ -56,7 +56,7 @@ namespace TREX {
 
       void newPlanToken(TREX::transaction::goal_id const &t);
       void cancelledPlanToken(TREX::transaction::goal_id const &t);
-      
+
       // TREX execution callbacks
       bool hasWork();
 
@@ -73,6 +73,9 @@ namespace TREX {
 
       void plan_dispatch(EUROPA::TimelineId const &tl,
                          EUROPA::TokenId const &tok);
+
+      void restrict_goal(TREX::transaction::Goal& goal,
+                             EUROPA::TokenId const &tok);
 
       bool restrict_token(EUROPA::TokenId &tok,
 			  TREX::transaction::Predicate const &pred);

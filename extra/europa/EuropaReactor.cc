@@ -305,29 +305,36 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
   if( m_plan_tokens.left.find(tok->getKey()) == m_plan_tokens.left.end() ) {
     TREX::utils::Symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
-    std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
+    restrict_goal(my_goal, tok);
 
-    // Get start, duration and end
-    std::auto_ptr<DomainBase>
-      d_start(details::trex_domain(tok->start()->lastDomain())),
-      d_duration(details::trex_domain(tok->duration()->lastDomain())),
-      d_end(details::trex_domain(tok->end()->lastDomain()));
-
-    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
-                         *dynamic_cast<IntegerDomain *>(d_duration.get()),
-                         *dynamic_cast<IntegerDomain *>(d_end.get()));
-
-    // Manage other attributes
-    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
-        attrs.end()!=a; ++a) {
-      std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
-      Variable attr((*a)->getName().toString(), *dom);
-      my_goal.restrictAttribute(attr);
-    }
     goal_id request = postPlanToken(my_goal);
     if( request )
       m_plan_tokens.insert(goal_map::value_type(tok->getKey(), request));
   }
+  else {
+    restrict_goal(*(m_plan_tokens.left.at(tok->getKey())),tok);
+  }
+}
+
+void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
+{
+    std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
+    std::auto_ptr<DomainBase>
+        d_start(details::trex_domain(tok->start()->lastDomain())),
+        d_duration(details::trex_domain(tok->duration()->lastDomain())),
+        d_end(details::trex_domain(tok->end()->lastDomain()));
+
+    goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
+                       *dynamic_cast<IntegerDomain *>(d_duration.get()),
+                       *dynamic_cast<IntegerDomain *>(d_end.get()));
+
+    // Manage other attributes
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
+        attrs.end()!=a; ++a) {
+            std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+            Variable attr((*a)->getName().toString(), *dom);
+            goal.restrictAttribute(attr);
+    }
 }
 
 bool EuropaReactor::do_relax(bool full) {
