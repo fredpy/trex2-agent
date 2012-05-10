@@ -1,0 +1,8 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a6489c365527c7b31b57bbbb94dbe6a8a" title="singleton value" alt="" coords="459,30,800,58"/>
+<area shape="rect" id="node9" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#aa434ee34ab65d336bf058c96f08df0a5" title="singleton value" alt="" coords="437,81,821,109"/>
+<area shape="rect" id="node14" href="$db/d81/group__utils.html#ga90fbb5df9db1b71d063b02451264a491" title="Convert string to type." alt="" coords="536,131,723,159"/>
+<area shape="rect" id="node5" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a73e06a2475cda8bc5f77c1aeb864ca61" title="check for singleton value" alt="" coords="884,55,1215,83"/>
+<area shape="rect" id="node7" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#aeff31f237fcd24d0cb5207ffa236f5cb" title="singleton value This method is called by getSingleton() to get the actual value of a singleton domain..." alt="" coords="891,5,1208,33"/>
+<area shape="rect" id="node12" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a3c295f09da6125974b1bb43b386a7695" title="singleton text representation This method is called by getStringSingleton() to get the actual value o..." alt="" coords="869,106,1229,134"/>
+</map>
