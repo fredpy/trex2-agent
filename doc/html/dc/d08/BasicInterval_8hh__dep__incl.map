@@ -1,13 +1,14 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dc/daf/BooleanDomain_8hh.html" title="Boolean domain representation." alt="" coords="819,160,1051,189"/>
-<area shape="rect" id="node11" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="1560,160,1765,189"/>
-<area shape="rect" id="node14" href="$dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor." alt="" coords="529,83,748,112"/>
-<area shape="rect" id="node23" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="1148,83,1377,112"/>
-<area shape="rect" id="node5" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="868,237,1105,267"/>
-<area shape="rect" id="node8" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="1259,237,1496,267"/>
-<area shape="rect" id="node16" href="$d4/d1a/europa__convert_8hh_source.html" title="extra/europa/bits/europa_convert.hh" alt="" coords="5,160,272,189"/>
-<area shape="rect" id="node19" href="$db/dc0/BasicInterval_8cc_source.html" title="trex/domain/BasicInterval.cc" alt="" coords="296,160,509,189"/>
-<area shape="rect" id="node21" href="$de/d44/DomainBase_8cc.html" title="Basic domain utilities implementation." alt="" coords="533,160,744,189"/>
-<area shape="rect" id="node26" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="1325,160,1536,189"/>
-<area shape="rect" id="node30" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="1075,160,1301,189"/>
+<area shape="rect" id="node3" href="$dc/d1f/DomainVisitor_8hh.html" title="Definition of DomainVisitor." alt="" coords="1056,83,1280,111"/>
+<area shape="rect" id="node15" href="$dc/daf/BooleanDomain_8hh.html" title="Boolean domain representation." alt="" coords="8,161,243,189"/>
+<area shape="rect" id="node22" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="380,83,609,111"/>
+<area shape="rect" id="node5" href="$d4/d1a/europa__convert_8hh_source.html" title="extra/europa/bits/europa_convert.hh" alt="" coords="755,161,1021,189"/>
+<area shape="rect" id="node9" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="1045,161,1291,189"/>
+<area shape="rect" id="node11" href="$db/dc0/BasicInterval_8cc_source.html" title="trex/domain/BasicInterval.cc" alt="" coords="1315,161,1531,189"/>
+<area shape="rect" id="node13" href="$de/d44/DomainBase_8cc.html" title="Basic domain utilities implementation." alt="" coords="1555,161,1765,189"/>
+<area shape="rect" id="node7" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="499,238,736,266"/>
+<area shape="rect" id="node18" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="5,238,245,266"/>
+<area shape="rect" id="node20" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="269,238,475,266"/>
+<area shape="rect" id="node24" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="267,161,480,189"/>
+<area shape="rect" id="node29" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="504,161,731,189"/>
 </map>

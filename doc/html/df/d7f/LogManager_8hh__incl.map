@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node7" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="385,83,481,112"/>
-<area shape="rect" id="node17" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1111,83,1239,112"/>
-<area shape="rect" id="node21" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="609,83,716,112"/>
-<area shape="rect" id="node30" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="912,83,1037,112"/>
-<area shape="rect" id="node19" href="$dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="1141,160,1307,189"/>
-<area shape="rect" id="node28" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="920,160,1029,189"/>
+<area shape="rect" id="node7" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="381,83,480,111"/>
+<area shape="rect" id="node17" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1116,83,1249,111"/>
+<area shape="rect" id="node21" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="607,83,719,111"/>
+<area shape="rect" id="node30" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="917,83,1043,111"/>
+<area shape="rect" id="node19" href="$dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="1149,161,1317,189"/>
+<area shape="rect" id="node28" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="925,161,1035,189"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node18" href="$da/d82/SingletonWrapper_8hh.html" title="Defintion of the SingletonWrapper class." alt="" coords="884,83,1041,112"/>
-<area shape="rect" id="node24" href="$dd/d23/SingletonServer__fwd_8hh.html" title="Forward declaration of SingletonServer class." alt="" coords="1016,160,1195,190"/>
+<area shape="rect" id="node17" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="997,83,1131,111"/>
+<area shape="rect" id="node21" href="$d1/d12/Factory_8tcc.html" title="Factory class implementation." alt="" coords="1155,83,1285,111"/>
+<area shape="rect" id="node19" href="$dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="980,161,1148,189"/>
 </map>

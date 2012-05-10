@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="319,32,567,61"/>
-<area shape="rect" id="node5" href="$d5/db0/classTREX_1_1utils_1_1TextLog.html#aa3d0f4ce8a45dece661263593a5c1013" title="open log file" alt="" coords="617,5,820,35"/>
-<area shape="rect" id="node7" href="$da/d2f/structTREX_1_1version.html#ab73e4a7f436e23f58cbabb507d7eed47" title="Human readable version." alt="" coords="647,59,791,88"/>
+<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed. It also manage the ..." alt="" coords="325,30,584,58"/>
+<area shape="rect" id="node5" href="$d5/db0/classTREX_1_1utils_1_1TextLog.html#aa3d0f4ce8a45dece661263593a5c1013" title="open log file" alt="" coords="632,5,843,33"/>
+<area shape="rect" id="node7" href="$da/d2f/structTREX_1_1version.html#ab73e4a7f436e23f58cbabb507d7eed47" title="Human readable version." alt="" coords="663,55,812,83"/>
 </map>

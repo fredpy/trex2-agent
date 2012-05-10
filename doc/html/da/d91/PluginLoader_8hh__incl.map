@@ -1,11 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="739,83,829,112"/>
-<area shape="rect" id="node22" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1515,83,1637,112"/>
-<area shape="rect" id="node15" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="835,160,968,189"/>
-<area shape="rect" id="node17" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="992,160,1093,189"/>
-<area shape="rect" id="node19" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1117,160,1251,189"/>
-<area shape="rect" id="node28" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="1528,160,1624,189"/>
-<area shape="rect" id="node30" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1648,160,1776,189"/>
-<area shape="rect" id="node32" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1800,160,1907,189"/>
-<area shape="rect" id="node34" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1931,160,2056,189"/>
+<area shape="rect" id="node5" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="872,83,963,111"/>
+<area shape="rect" id="node23" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1685,83,1811,111"/>
+<area shape="rect" id="node15" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="851,161,984,189"/>
+<area shape="rect" id="node17" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="1008,161,1112,189"/>
+<area shape="rect" id="node19" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1136,161,1269,189"/>
+<area shape="rect" id="node21" href="$da/d97/Symbol_8tcc.html" title="BasicSymbol implementation." alt="" coords="1293,161,1419,189"/>
+<area shape="rect" id="node29" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="1699,161,1797,189"/>
+<area shape="rect" id="node31" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1821,161,1955,189"/>
+<area shape="rect" id="node33" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1979,161,2091,189"/>
+<area shape="rect" id="node35" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="2115,161,2240,189"/>
 </map>

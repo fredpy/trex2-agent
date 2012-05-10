@@ -1,11 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="163,83,323,112"/>
-<area shape="rect" id="node11" href="$d1/d6e/Clock_8cc.html" title="Clock class implementation." alt="" coords="800,83,955,112"/>
-<area shape="rect" id="node13" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="979,83,1197,112"/>
-<area shape="rect" id="node16" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="557,83,776,112"/>
-<area shape="rect" id="node19" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="1245,83,1432,112"/>
-<area shape="rect" id="node22" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="347,83,533,112"/>
-<area shape="rect" id="node5" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="5,160,264,189"/>
-<area shape="rect" id="node7" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="451,160,597,189"/>
-<area shape="rect" id="node9" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="288,160,427,189"/>
+<area shape="rect" id="node3" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="291,83,448,111"/>
+<area shape="rect" id="node13" href="$d1/d6e/Clock_8cc.html" title="Clock class implementation." alt="" coords="472,83,627,111"/>
+<area shape="rect" id="node15" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="861,83,1080,111"/>
+<area shape="rect" id="node20" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="651,83,837,111"/>
+<area shape="rect" id="node5" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="5,161,267,189"/>
+<area shape="rect" id="node7" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="291,161,448,189"/>
+<area shape="rect" id="node9" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="635,161,779,189"/>
+<area shape="rect" id="node11" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="472,161,611,189"/>
+<area shape="rect" id="node17" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="1013,161,1232,189"/>
+<area shape="rect" id="node22" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="803,161,989,189"/>
 </map>

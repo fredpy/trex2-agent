@@ -1,9 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="1127,83,1308,112"/>
-<area shape="rect" id="node44" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="1356,83,1521,112"/>
-<area shape="rect" id="node18" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1748,237,1881,267"/>
-<area shape="rect" id="node20" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="973,160,1083,189"/>
-<area shape="rect" id="node22" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1107,160,1229,189"/>
-<area shape="rect" id="node26" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1153,237,1281,267"/>
-<area shape="rect" id="node40" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="2163,160,2253,189"/>
+<area shape="rect" id="node5" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="159,83,343,111"/>
+<area shape="rect" id="node20" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="367,83,537,111"/>
+<area shape="rect" id="node11" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="141,161,240,189"/>
+<area shape="rect" id="node13" href="$d4/d82/Factory_8hh.html" title="Factory class definition." alt="" coords="264,161,357,189"/>
+<area shape="rect" id="node16" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="381,161,472,189"/>
+<area shape="rect" id="node18" href="$d1/dcd/XmlFactory_8tcc.html" title="XmlFactory implementation." alt="" coords="496,161,651,189"/>
 </map>

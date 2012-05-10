@@ -1,19 +1,16 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$d1/dac/Plugin_8hh.html" title="Plugin header." alt="" coords="281,83,428,112"/>
-<area shape="rect" id="node7" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="452,83,639,112"/>
-<area shape="rect" id="node21" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="663,83,873,112"/>
-<area shape="rect" id="node28" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="897,83,1113,112"/>
-<area shape="rect" id="node32" href="$dc/daf/BooleanDomain_8hh.html" title="Boolean domain representation." alt="" coords="1137,83,1369,112"/>
-<area shape="rect" id="node36" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="1545,83,1791,112"/>
-<area shape="rect" id="node13" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="259,160,355,190"/>
-<area shape="rect" id="node15" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="379,160,507,190"/>
-<area shape="rect" id="node17" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="531,160,637,190"/>
-<area shape="rect" id="node19" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="661,160,787,190"/>
-<area shape="rect" id="node23" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="811,160,955,190"/>
-<area shape="rect" id="node25" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="984,238,1115,267"/>
-<area shape="rect" id="node30" href="$d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition" alt="" coords="1003,160,1179,190"/>
-<area shape="rect" id="node40" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="1344,160,1472,190"/>
-<area shape="rect" id="node43" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="1520,160,1656,190"/>
-<area shape="rect" id="node49" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="2091,160,2237,190"/>
-<area shape="rect" id="node51" href="$d8/deb/reactor__graph_8tcc_source.html" title="bits/reactor_graph.tcc" alt="" coords="2261,160,2432,190"/>
+<area shape="rect" id="node5" href="$d1/dac/Plugin_8hh.html" title="Plugin header." alt="" coords="224,83,373,111"/>
+<area shape="rect" id="node7" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="397,83,589,111"/>
+<area shape="rect" id="node21" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="613,83,827,111"/>
+<area shape="rect" id="node27" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="851,83,1064,111"/>
+<area shape="rect" id="node31" href="$dc/daf/BooleanDomain_8hh.html" title="Boolean domain representation." alt="" coords="1088,83,1323,111"/>
+<area shape="rect" id="node34" href="$db/df2/LightSwitch_8hh.html" title="lightswitch plug&#45;in utilities" alt="" coords="1347,83,1469,111"/>
+<area shape="rect" id="node13" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="261,161,360,189"/>
+<area shape="rect" id="node15" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="384,161,517,189"/>
+<area shape="rect" id="node17" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="541,161,653,189"/>
+<area shape="rect" id="node19" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="677,161,803,189"/>
+<area shape="rect" id="node23" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="827,161,971,189"/>
+<area shape="rect" id="node25" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="987,238,1117,266"/>
+<area shape="rect" id="node29" href="$d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition" alt="" coords="995,161,1168,189"/>
+<area shape="rect" id="node36" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="1283,161,1533,189"/>
 </map>

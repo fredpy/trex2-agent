@@ -1,9 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node14" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="920,238,1075,267"/>
-<area shape="rect" id="node31" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="553,83,679,112"/>
-<area shape="rect" id="node24" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="860,315,993,344"/>
-<area shape="rect" id="node26" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="1017,315,1119,344"/>
-<area shape="rect" id="node28" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="393,315,527,344"/>
-<area shape="rect" id="node35" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="427,160,608,190"/>
-<area shape="rect" id="node42" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="795,160,960,190"/>
+<area shape="rect" id="node7" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="364,83,460,111"/>
+<area shape="rect" id="node15" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="520,161,675,189"/>
+<area shape="rect" id="node17" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="699,161,824,189"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="5,83,152,112"/>
-<area shape="rect" id="node5" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="176,83,315,112"/>
+<area shape="rect" id="node3" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="5,83,192,111"/>
+<area shape="rect" id="node5" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="216,83,360,111"/>
+<area shape="rect" id="node7" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="384,83,523,111"/>
 </map>

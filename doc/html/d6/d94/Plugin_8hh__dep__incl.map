@@ -1,9 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="5,83,229,112"/>
-<area shape="rect" id="node6" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="277,83,515,112"/>
-<area shape="rect" id="node9" href="$d8/d83/starfish__plugin_8cc_source.html" title="extra/starfish/starfish_plugin.cc" alt="" coords="563,83,795,112"/>
-<area shape="rect" id="node11" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="819,83,976,112"/>
-<area shape="rect" id="node14" href="$dc/da3/witre__pg_8cc_source.html" title="extra/witre/witre_pg.cc" alt="" coords="1024,83,1203,112"/>
-<area shape="rect" id="node16" href="$d5/d7d/plugin_8cc_source.html" title="mbari/europa/plugin.cc" alt="" coords="1227,83,1397,112"/>
-<area shape="rect" id="node18" href="$d2/dfd/tracker__plugin_8cc_source.html" title="mbari/tracker/tracker_plugin.cc" alt="" coords="1421,83,1651,112"/>
+<area shape="rect" id="node3" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="5,83,232,111"/>
+<area shape="rect" id="node5" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="256,83,496,111"/>
+<area shape="rect" id="node7" href="$d8/d83/starfish__plugin_8cc_source.html" title="extra/starfish/starfish_plugin.cc" alt="" coords="520,83,760,111"/>
+<area shape="rect" id="node9" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="784,83,939,111"/>
+<area shape="rect" id="node11" href="$dc/da3/witre__pg_8cc_source.html" title="extra/witre/witre_pg.cc" alt="" coords="963,83,1139,111"/>
+<area shape="rect" id="node13" href="$d5/d7d/plugin_8cc_source.html" title="mbari/europa/plugin.cc" alt="" coords="1163,83,1339,111"/>
+<area shape="rect" id="node15" href="$d2/dfd/tracker__plugin_8cc_source.html" title="mbari/tracker/tracker_plugin.cc" alt="" coords="1363,83,1597,111"/>
+<area shape="rect" id="node17" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="1621,83,1819,111"/>
 </map>

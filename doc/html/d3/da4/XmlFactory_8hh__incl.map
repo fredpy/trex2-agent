@@ -1,12 +1,14 @@
 <map id="G" name="G">
-<area shape="rect" id="node14" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1048,160,1181,190"/>
-<area shape="rect" id="node20" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="465,238,575,267"/>
-<area shape="rect" id="node27" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="696,83,819,112"/>
-<area shape="rect" id="node36" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="896,160,1024,190"/>
-<area shape="rect" id="node58" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="1173,83,1264,112"/>
-<area shape="rect" id="node24" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1152,315,1285,344"/>
-<area shape="rect" id="node33" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="709,160,805,190"/>
-<area shape="rect" id="node38" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="192,160,299,190"/>
-<area shape="rect" id="node45" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="560,160,685,190"/>
-<area shape="rect" id="node69" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="1824,160,1925,190"/>
+<area shape="rect" id="node7" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="864,83,963,111"/>
+<area shape="rect" id="node28" href="$d4/d82/Factory_8hh.html" title="Factory class definition." alt="" coords="1021,161,1115,189"/>
+<area shape="rect" id="node45" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="1828,83,1919,111"/>
+<area shape="rect" id="node61" href="$d1/dcd/XmlFactory_8tcc.html" title="XmlFactory implementation." alt="" coords="1943,83,2097,111"/>
+<area shape="rect" id="node15" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1272,161,1405,189"/>
+<area shape="rect" id="node17" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1139,161,1248,189"/>
+<area shape="rect" id="node22" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="141,161,267,189"/>
+<area shape="rect" id="node19" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1556,238,1689,266"/>
+<area shape="rect" id="node26" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="339,238,472,266"/>
+<area shape="rect" id="node43" href="$d1/d12/Factory_8tcc.html" title="Factory class implementation." alt="" coords="1140,238,1271,266"/>
+<area shape="rect" id="node56" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="2189,161,2293,189"/>
+<area shape="rect" id="node59" href="$da/d97/Symbol_8tcc.html" title="BasicSymbol implementation." alt="" coords="2317,161,2443,189"/>
 </map>

@@ -1,25 +1,16 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d3/d18/DoradoHandler_8cc_source.html" title="mbari/tracker/DoradoHandler.cc" alt="" coords="403,83,637,112"/>
-<area shape="rect" id="node6" href="$d2/d63/MessageHandler_8hh_source.html" title="mbari/tracker/MessageHandler.hh" alt="" coords="685,83,931,112"/>
-<area shape="rect" id="node21" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="1427,83,1587,112"/>
-<area shape="rect" id="node24" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="1635,83,1789,112"/>
-<area shape="rect" id="node40" href="$d6/d56/BasicEnumerated_8cc_source.html" title="trex/domain/BasicEnumerated.cc" alt="" coords="2424,160,2669,189"/>
-<area shape="rect" id="node43" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="3183,83,3393,112"/>
-<area shape="rect" id="node8" href="$d7/d09/DoradoHandler_8hh_source.html" title="mbari/tracker/DoradoHandler.hh" alt="" coords="5,160,240,189"/>
-<area shape="rect" id="node10" href="$db/dea/DrifterTracker_8cc_source.html" title="mbari/tracker/DrifterTracker.cc" alt="" coords="264,160,493,189"/>
-<area shape="rect" id="node13" href="$d7/d42/DrifterTracker_8hh_source.html" title="mbari/tracker/DrifterTracker.hh" alt="" coords="541,160,771,189"/>
-<area shape="rect" id="node15" href="$d0/d29/PositionHandler_8cc_source.html" title="mbari/tracker/PositionHandler.cc" alt="" coords="613,237,851,267"/>
-<area shape="rect" id="node19" href="$d7/df0/PositionHandler_8hh_source.html" title="mbari/tracker/PositionHandler.hh" alt="" coords="845,160,1083,189"/>
-<area shape="rect" id="node26" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="1107,160,1267,189"/>
-<area shape="rect" id="node28" href="$d1/d6e/Clock_8cc.html" title="Clock class implementation." alt="" coords="1291,160,1445,189"/>
-<area shape="rect" id="node30" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="1469,160,1688,189"/>
-<area shape="rect" id="node33" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="1736,160,1955,189"/>
-<area shape="rect" id="node35" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="1979,160,2165,189"/>
-<area shape="rect" id="node38" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="2213,160,2400,189"/>
-<area shape="rect" id="node45" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="2717,160,2955,189"/>
-<area shape="rect" id="node48" href="$d2/d5c/EuropaDomain_8hh_source.html" title="extra/europa/private/EuropaDomain.hh" alt="" coords="3003,160,3285,189"/>
-<area shape="rect" id="node51" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="3309,160,3555,189"/>
-<area shape="rect" id="node53" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="3579,160,3792,189"/>
-<area shape="rect" id="node55" href="$dd/db5/Variable_8cc.html" title="Variable class implementation." alt="" coords="3816,160,3995,189"/>
-<area shape="rect" id="node58" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="4043,160,4221,189"/>
+<area shape="rect" id="node3" href="$d2/d63/MessageHandler_8hh_source.html" title="mbari/tracker/MessageHandler.hh" alt="" coords="399,83,649,111"/>
+<area shape="rect" id="node11" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="1092,83,1247,111"/>
+<area shape="rect" id="node21" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="1943,83,2153,111"/>
+<area shape="rect" id="node5" href="$d7/d09/DoradoHandler_8hh_source.html" title="mbari/tracker/DoradoHandler.hh" alt="" coords="5,161,248,189"/>
+<area shape="rect" id="node7" href="$d7/d42/DrifterTracker_8hh_source.html" title="mbari/tracker/DrifterTracker.hh" alt="" coords="272,161,509,189"/>
+<area shape="rect" id="node9" href="$d7/df0/PositionHandler_8hh_source.html" title="mbari/tracker/PositionHandler.hh" alt="" coords="533,161,781,189"/>
+<area shape="rect" id="node13" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="805,161,963,189"/>
+<area shape="rect" id="node15" href="$d1/d6e/Clock_8cc.html" title="Clock class implementation." alt="" coords="987,161,1141,189"/>
+<area shape="rect" id="node17" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="1165,161,1384,189"/>
+<area shape="rect" id="node19" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="1408,161,1595,189"/>
+<area shape="rect" id="node23" href="$d2/d5c/EuropaDomain_8hh_source.html" title="extra/europa/private/EuropaDomain.hh" alt="" coords="1619,161,1901,189"/>
+<area shape="rect" id="node25" href="$df/dee/BasicEnumerated_8hh.html" title="Implementation of BasicEnumerated." alt="" coords="1925,161,2171,189"/>
+<area shape="rect" id="node27" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="2195,161,2411,189"/>
+<area shape="rect" id="node29" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="2435,161,2616,189"/>
 </map>

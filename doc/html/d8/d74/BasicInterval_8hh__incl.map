@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="172,83,297,112"/>
-<area shape="rect" id="node7" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="144,160,325,189"/>
-<area shape="rect" id="node10" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="373,160,539,189"/>
+<area shape="rect" id="node3" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="176,83,301,111"/>
+<area shape="rect" id="node7" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="147,161,331,189"/>
+<area shape="rect" id="node9" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="355,161,525,189"/>
 </map>

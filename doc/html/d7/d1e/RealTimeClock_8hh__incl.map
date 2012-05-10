@@ -1,9 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="436,83,513,112"/>
-<area shape="rect" id="node16" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1007,237,1140,267"/>
-<area shape="rect" id="node18" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="187,237,309,267"/>
-<area shape="rect" id="node21" href="$d5/d68/TimeUtils_8hh.html" title="C++ utilities for timeval." alt="" coords="831,83,999,112"/>
-<area shape="rect" id="node7" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="384,160,565,189"/>
-<area shape="rect" id="node9" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="235,315,360,344"/>
-<area shape="rect" id="node11" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="589,160,771,189"/>
+<area shape="rect" id="node5" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="323,83,403,111"/>
+<area shape="rect" id="node15" href="$d5/d68/TimeUtils_8hh.html" title="C++ utilities for timeval." alt="" coords="580,83,753,111"/>
+<area shape="rect" id="node24" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="427,83,552,111"/>
+<area shape="rect" id="node27" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="777,83,911,111"/>
+<area shape="rect" id="node7" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="5,161,192,189"/>
+<area shape="rect" id="node9" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="424,161,549,189"/>
+<area shape="rect" id="node11" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="216,161,400,189"/>
 </map>

@@ -1,34 +1,20 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/trex/europa/Assembly.hh" alt="" coords="2055,83,2332,112"/>
-<area shape="rect" id="node40" href="$d3/dd7/EuropaPlugin_8hh_source.html" title="extra/europa/trex/europa/EuropaPlugin.hh" alt="" coords="3377,83,3679,112"/>
-<area shape="rect" id="node44" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="4236,83,4423,112"/>
-<area shape="rect" id="node47" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="5004,83,5191,112"/>
-<area shape="rect" id="node82" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="6736,160,6917,189"/>
-<area shape="rect" id="node5" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/core/Assembly.cc" alt="" coords="3237,160,3467,189"/>
-<area shape="rect" id="node8" href="$dd/de7/core_8cc_source.html" title="extra/europa/core/core.cc" alt="" coords="288,160,485,189"/>
-<area shape="rect" id="node10" href="$df/d29/CurrentState_8cc_source.html" title="extra/europa/core/CurrentState.cc" alt="" coords="509,160,768,189"/>
-<area shape="rect" id="node12" href="$d2/dc9/DeliberationFilter_8cc_source.html" title="extra/europa/core/DeliberationFilter.cc" alt="" coords="792,160,1075,189"/>
-<area shape="rect" id="node14" href="$d3/d41/europa__helpers_8cc_source.html" title="extra/europa/core/europa_helpers.cc" alt="" coords="1099,160,1368,189"/>
-<area shape="rect" id="node16" href="$d6/dc5/ModeConstraints_8cc_source.html" title="extra/europa/core/ModeConstraints.cc" alt="" coords="1392,160,1675,189"/>
-<area shape="rect" id="node18" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="3640,237,3861,267"/>
-<area shape="rect" id="node20" href="$d8/d37/SynchronizationManager_8cc_source.html" title="extra/europa/core/SynchronizationManager.cc" alt="" coords="1699,160,2029,189"/>
-<area shape="rect" id="node23" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="3565,160,3789,189"/>
-<area shape="rect" id="node26" href="$db/d1a/EuropaReactor_8hh_source.html" title="extra/europa/EuropaReactor.hh" alt="" coords="2077,160,2309,189"/>
-<area shape="rect" id="node28" href="$d5/da7/extensions_8cc_source.html" title="extra/europa/extensions/extensions.cc" alt="" coords="2333,160,2619,189"/>
-<area shape="rect" id="node32" href="$d5/d3d/extra_2starfish_2Constraints_8cc_source.html" title="extra/starfish/Constraints.cc" alt="" coords="2667,160,2880,189"/>
-<area shape="rect" id="node35" href="$d6/d1b/GoalManager__PR2_8hh_source.html" title="extra/starfish/GoalManager_PR2.hh" alt="" coords="5,160,264,189"/>
-<area shape="rect" id="node37" href="$da/d4f/mbari_2europa_2Constraints_8cc_source.html" title="mbari/europa/Constraints.cc" alt="" coords="2979,160,3189,189"/>
-<area shape="rect" id="node50" href="$d3/dc6/Schema_8hh_source.html" title="extra/europa/core/private/Schema.hh" alt="" coords="3837,160,4109,189"/>
-<area shape="rect" id="node54" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="4979,160,5216,189"/>
-<area shape="rect" id="node57" href="$d8/d83/starfish__plugin_8cc_source.html" title="extra/starfish/starfish_plugin.cc" alt="" coords="5264,160,5496,189"/>
-<area shape="rect" id="node59" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="5543,237,5700,267"/>
-<area shape="rect" id="node62" href="$de/dca/WitreServer_8hh_source.html" title="extra/witre/WitreServer.hh" alt="" coords="5520,160,5723,189"/>
-<area shape="rect" id="node65" href="$d5/d7d/plugin_8cc_source.html" title="mbari/europa/plugin.cc" alt="" coords="5797,160,5968,189"/>
-<area shape="rect" id="node67" href="$df/dda/RealTimeClock_8cc.html" title="RealTimeClock class implementation." alt="" coords="5992,160,6211,189"/>
-<area shape="rect" id="node70" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="6259,160,6477,189"/>
-<area shape="rect" id="node72" href="$d3/dba/StepClock_8cc.html" title="StepClock class implementation." alt="" coords="6501,160,6688,189"/>
-<area shape="rect" id="node75" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="4133,160,4320,189"/>
-<area shape="rect" id="node77" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="4344,160,4533,189"/>
-<area shape="rect" id="node80" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="4581,160,4771,189"/>
-<area shape="rect" id="node85" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="4795,160,4955,189"/>
+<area shape="rect" id="node3" href="$d3/dd7/EuropaPlugin_8hh_source.html" title="extra/europa/trex/europa/EuropaPlugin.hh" alt="" coords="109,83,413,111"/>
+<area shape="rect" id="node13" href="$d4/d82/Factory_8hh.html" title="Factory class definition." alt="" coords="2333,83,2493,111"/>
+<area shape="rect" id="node17" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1557,83,1749,111"/>
+<area shape="rect" id="node5" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="300,238,519,266"/>
+<area shape="rect" id="node7" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/trex/europa/Assembly.hh" alt="" coords="35,161,312,189"/>
+<area shape="rect" id="node10" href="$da/d4f/mbari_2europa_2Constraints_8cc_source.html" title="mbari/europa/Constraints.cc" alt="" coords="5,238,221,266"/>
+<area shape="rect" id="node15" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="2432,238,2616,266"/>
+<area shape="rect" id="node19" href="$d3/dc6/Schema_8hh_source.html" title="extra/europa/core/private/Schema.hh" alt="" coords="387,161,656,189"/>
+<area shape="rect" id="node22" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="2181,161,2408,189"/>
+<area shape="rect" id="node24" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="2432,161,2672,189"/>
+<area shape="rect" id="node26" href="$d8/d83/starfish__plugin_8cc_source.html" title="extra/starfish/starfish_plugin.cc" alt="" coords="2696,161,2936,189"/>
+<area shape="rect" id="node28" href="$de/dca/WitreServer_8hh_source.html" title="extra/witre/WitreServer.hh" alt="" coords="680,161,880,189"/>
+<area shape="rect" id="node30" href="$d5/d7d/plugin_8cc_source.html" title="mbari/europa/plugin.cc" alt="" coords="904,161,1080,189"/>
+<area shape="rect" id="node32" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="1104,161,1323,189"/>
+<area shape="rect" id="node34" href="$d6/db1/StepClock_8hh.html" title="definition of a pseudo clock" alt="" coords="1347,161,1533,189"/>
+<area shape="rect" id="node36" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="1557,161,1749,189"/>
+<area shape="rect" id="node38" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="1773,161,1971,189"/>
+<area shape="rect" id="node40" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="1995,161,2157,189"/>
 </map>

@@ -1,5 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition." alt="" coords="23,181,263,211"/>
-<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="87,5,276,35"/>
-<area shape="rect" id="node6" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="159,85,500,115"/>
+<area shape="rect" id="node2" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition." alt="" coords="23,83,265,111"/>
+<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="47,6,241,34"/>
 </map>

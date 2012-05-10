@@ -1,9 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node14" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="224,83,357,112"/>
-<area shape="rect" id="node26" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="1891,83,2013,112"/>
-<area shape="rect" id="node41" href="$d5/dee/Pdlfcn_8hh_source.html" title="private/Pdlfcn.hh" alt="" coords="1645,83,1779,112"/>
-<area shape="rect" id="node32" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="2184,160,2280,190"/>
-<area shape="rect" id="node35" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="2304,160,2432,190"/>
-<area shape="rect" id="node37" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1651,160,1757,190"/>
-<area shape="rect" id="node39" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1781,160,1907,190"/>
+<area shape="rect" id="node3" href="$d4/d27/PluginLoader_8hh.html" title="plug&#45;in loading utility" alt="" coords="244,83,377,111"/>
+<area shape="rect" id="node13" href="$d5/dee/Pdlfcn_8hh_source.html" title="private/Pdlfcn.hh" alt="" coords="439,83,575,111"/>
+<area shape="rect" id="node18" href="$d1/dac/Plugin_8hh.html" title="Plugin header." alt="" coords="599,83,681,111"/>
+<area shape="rect" id="node7" href="$de/d93/Symbol_8hh.html" title="Symbol.hh" alt="" coords="229,161,320,189"/>
+<area shape="rect" id="node11" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="344,161,469,189"/>
 </map>

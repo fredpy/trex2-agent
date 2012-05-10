@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="427,5,688,35"/>
-<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="763,111,1083,140"/>
-<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point." alt="" coords="400,109,715,139"/>
-<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="409,163,705,192"/>
-<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="799,5,1047,35"/>
+<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="437,5,707,33"/>
+<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="783,106,1105,134"/>
+<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point." alt="" coords="411,106,733,134"/>
+<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="419,157,725,185"/>
+<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed. It also manage the ..." alt="" coords="815,5,1073,33"/>
 </map>

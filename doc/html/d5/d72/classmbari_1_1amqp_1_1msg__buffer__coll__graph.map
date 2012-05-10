@@ -1,6 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$d9/d2d/classmbari_1_1amqp_1_1listener_1_1handler.html" title="mbari::amqp::listener::handler" alt="" coords="5,101,232,131"/>
-<area shape="rect" id="node4" href="$de/d9c/classTREX_1_1utils_1_1SharedVar.html" title="TREX::utils::SharedVar\&lt; queue_type \&gt;" alt="" coords="256,101,539,131"/>
-<area shape="rect" id="node6" href="$df/d91/classboost_1_1noncopyable.html" title="boost::noncopyable" alt="" coords="241,5,396,35"/>
-<area shape="rect" id="node8" title="STL class." alt="" coords="420,5,532,35"/>
+<area shape="rect" id="node2" href="$d9/d2d/classmbari_1_1amqp_1_1listener_1_1handler.html" title="mbari::amqp::listener::handler" alt="" coords="5,6,235,34"/>
 </map>

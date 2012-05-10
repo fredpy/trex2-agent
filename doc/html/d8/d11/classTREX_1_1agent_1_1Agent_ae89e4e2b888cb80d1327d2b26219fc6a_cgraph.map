@@ -1,11 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors." alt="" coords="319,59,572,88"/>
-<area shape="rect" id="node9" href="$de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="339,112,552,141"/>
-<area shape="rect" id="node13" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb" title="Check if empty." alt="" coords="323,5,568,35"/>
-<area shape="rect" id="node16" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="315,165,576,195"/>
-<area shape="rect" id="node20" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="312,219,579,248"/>
-<area shape="rect" id="node5" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="659,5,869,35"/>
-<area shape="rect" id="node7" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor." alt="" coords="627,59,901,88"/>
-<area shape="rect" id="node11" href="$de/d50/classTREX_1_1agent_1_1Clock.html#a0750debbce1f586b3b93d06dc6ba2582" title="Internal start method." alt="" coords="665,112,863,141"/>
-<area shape="rect" id="node18" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="640,165,888,195"/>
+<area shape="rect" id="node3" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors." alt="" coords="319,5,577,33"/>
+<area shape="rect" id="node9" href="$de/d50/classTREX_1_1agent_1_1Clock.html#af0bf500c9e5a32f2e8908b9a1ef1e06b" title="Start the clock." alt="" coords="337,55,559,83"/>
+<area shape="rect" id="node11" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#af78cd8445dd6bd70038e49fac25de7cb" title="Check if empty." alt="" coords="324,106,572,134"/>
+<area shape="rect" id="node14" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="313,157,583,185"/>
+<area shape="rect" id="node18" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#ad28b49eeb842c27b5904ac4e8039b9f4" title="Graph name." alt="" coords="313,207,583,235"/>
+<area shape="rect" id="node5" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="671,81,881,109"/>
+<area shape="rect" id="node7" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor." alt="" coords="633,5,919,33"/>
+<area shape="rect" id="node16" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed. It also manage the ..." alt="" coords="647,157,905,185"/>
 </map>

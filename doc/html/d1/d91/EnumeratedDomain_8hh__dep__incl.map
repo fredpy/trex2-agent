@@ -1,10 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="501,160,739,189"/>
-<area shape="rect" id="node6" href="$df/db0/EuropaEntity_8hh_source.html" title="extra/europa/EuropaEntity.hh" alt="" coords="11,83,229,112"/>
-<area shape="rect" id="node10" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="304,83,509,112"/>
-<area shape="rect" id="node13" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="797,83,1013,112"/>
-<area shape="rect" id="node22" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="557,83,773,112"/>
-<area shape="rect" id="node8" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="5,160,235,189"/>
-<area shape="rect" id="node16" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="787,160,1024,189"/>
-<area shape="rect" id="node19" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="1072,160,1267,189"/>
+<area shape="rect" id="node3" href="$df/db0/EuropaEntity_8hh_source.html" title="extra/europa/EuropaEntity.hh" alt="" coords="143,83,361,111"/>
+<area shape="rect" id="node9" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="385,83,604,111"/>
+<area shape="rect" id="node14" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="628,83,841,111"/>
+<area shape="rect" id="node5" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="259,161,496,189"/>
+<area shape="rect" id="node7" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="5,161,235,189"/>
+<area shape="rect" id="node12" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="520,161,725,189"/>
+<area shape="rect" id="node17" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="971,161,1211,189"/>
+<area shape="rect" id="node19" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="749,161,947,189"/>
 </map>

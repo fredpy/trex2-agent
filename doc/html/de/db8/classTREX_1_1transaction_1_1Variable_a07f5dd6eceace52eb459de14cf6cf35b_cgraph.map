@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness." alt="" coords="335,5,580,35"/>
-<area shape="rect" id="node5" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="324,59,591,88"/>
-<area shape="rect" id="node7" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ade12e51928076cc0dc2ffe0f5b4629c1" title="Duplicate method." alt="" coords="640,59,923,88"/>
+<area shape="rect" id="node3" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness." alt="" coords="345,5,593,33"/>
+<area shape="rect" id="node5" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="332,55,607,83"/>
+<area shape="rect" id="node7" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ade12e51928076cc0dc2ffe0f5b4629c1" title="Duplicate method." alt="" coords="657,55,943,83"/>
 </map>

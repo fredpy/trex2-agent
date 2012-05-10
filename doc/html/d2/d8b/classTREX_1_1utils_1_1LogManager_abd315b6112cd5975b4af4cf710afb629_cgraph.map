@@ -1,6 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a94da0ea064ed2311226164bfcd4b0c3d" title="Get directory where cfg files should be stored." alt="" coords="277,5,555,35"/>
-<area shape="rect" id="node7" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2ae36d73e0d96ef8bf878643308ce11c" title="Locate a file." alt="" coords="296,59,536,88"/>
-<area shape="rect" id="node9" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry." alt="" coords="297,112,535,141"/>
-<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="604,5,865,35"/>
+<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a94da0ea064ed2311226164bfcd4b0c3d" title="Get directory where cfg files should be stored." alt="" coords="284,5,567,33"/>
+<area shape="rect" id="node7" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2ae36d73e0d96ef8bf878643308ce11c" title="Locate a file." alt="" coords="301,55,549,83"/>
+<area shape="rect" id="node9" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry." alt="" coords="300,106,551,134"/>
+<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="617,5,887,33"/>
 </map>

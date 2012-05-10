@@ -1,8 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="5,83,227,112"/>
-<area shape="rect" id="node5" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="251,83,408,112"/>
-<area shape="rect" id="node8" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="456,83,613,112"/>
-<area shape="rect" id="node12" href="$d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="549,160,752,189"/>
-<area shape="rect" id="node15" href="$d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="688,83,848,112"/>
-<area shape="rect" id="node10" href="$dc/da3/witre__pg_8cc_source.html" title="extra/witre/witre_pg.cc" alt="" coords="347,160,525,189"/>
+<area shape="rect" id="node3" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="107,83,325,111"/>
+<area shape="rect" id="node5" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="349,83,504,111"/>
+<area shape="rect" id="node11" href="$d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="384,161,584,189"/>
+<area shape="rect" id="node14" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="641,83,825,111"/>
+<area shape="rect" id="node22" href="$d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="849,83,1012,111"/>
+<area shape="rect" id="node7" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="5,161,160,189"/>
+<area shape="rect" id="node9" href="$dc/da3/witre__pg_8cc_source.html" title="extra/witre/witre_pg.cc" alt="" coords="184,161,360,189"/>
+<area shape="rect" id="node16" href="$d2/d63/MessageHandler_8hh_source.html" title="mbari/tracker/MessageHandler.hh" alt="" coords="608,161,859,189"/>
+<area shape="rect" id="node18" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="883,161,1037,189"/>
+<area shape="rect" id="node20" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="1061,161,1272,189"/>
 </map>

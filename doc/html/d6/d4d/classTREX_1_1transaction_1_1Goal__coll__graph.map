@@ -1,8 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate." alt="" coords="1181,14,1403,43"/>
-<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="7,51,196,81"/>
-<area shape="rect" id="node8" href="$de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation." alt="" coords="317,51,523,81"/>
-<area shape="rect" id="node11" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="249,163,591,193"/>
-<area shape="rect" id="node16" href="$d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain." alt="" coords="743,251,999,281"/>
-<area shape="rect" id="node18" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="TREX::transaction::IntervalDomain\&lt; long \&gt;" alt="" coords="263,261,577,290"/>
+<area shape="rect" id="node2" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate." alt="" coords="5,86,229,114"/>
+<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="93,6,288,34"/>
+<area shape="rect" id="node6" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="253,86,611,114"/>
+<area shape="rect" id="node9" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="324,6,513,34"/>
+<area shape="rect" id="node11" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="537,6,708,34"/>
 </map>

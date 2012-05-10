@@ -1,8 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d1/d80/classmbari_1_1DrifterTracker.html" title="mbari::DrifterTracker" alt="" coords="344,5,507,35"/>
-<area shape="rect" id="node7" href="$d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="TREX::europa::EuropaReactor" alt="" coords="313,112,537,141"/>
-<area shape="rect" id="node9" href="$d0/d59/classTREX_1_1lightswitch_1_1Light.html" title="Light reactor definition." alt="" coords="333,165,517,195"/>
-<area shape="rect" id="node11" href="$dc/d0a/classTREX_1_1startrex_1_1Auv.html" title="Auv reactor definition." alt="" coords="347,219,504,248"/>
-<area shape="rect" id="node13" href="$de/d10/classTREX_1_1transaction_1_1Player.html" title="Log transaction player." alt="" coords="327,272,524,301"/>
-<area shape="rect" id="node15" href="$db/d97/classTREX_1_1witre_1_1WitreServer.html" title="TREX::witre::WitreServer" alt="" coords="328,325,523,355"/>
+<area shape="rect" id="node5" href="$d1/d80/classmbari_1_1DrifterTracker.html" title="mbari::DrifterTracker" alt="" coords="501,5,672,33"/>
+<area shape="rect" id="node9" href="$d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="TREX::europa::EuropaReactor" alt="" coords="472,106,701,134"/>
+<area shape="rect" id="node11" href="$d0/d59/classTREX_1_1lightswitch_1_1Light.html" title="Light reactor definition." alt="" coords="492,157,681,185"/>
+<area shape="rect" id="node13" href="$dc/d0a/classTREX_1_1startrex_1_1Auv.html" title="Auv reactor definition." alt="" coords="507,207,667,235"/>
+<area shape="rect" id="node15" href="$de/d10/classTREX_1_1transaction_1_1Player.html" title="Log transaction player." alt="" coords="487,258,687,286"/>
+<area shape="rect" id="node17" href="$db/d97/classTREX_1_1witre_1_1WitreServer.html" title="TREX::witre::WitreServer" alt="" coords="489,309,684,337"/>
+<area shape="rect" id="node2" href="$df/d91/classboost_1_1noncopyable.html" title="noncopyable" alt="" coords="5,157,112,185"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="117,83,248,112"/>
-<area shape="rect" id="node7" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="120,160,245,190"/>
+<area shape="rect" id="node5" href="$d7/dff/BasicInterval_8hh.html" title="Implementation of BasicInterval." alt="" coords="96,83,227,111"/>
+<area shape="rect" id="node9" href="$d0/de4/IntervalDomain_8tcc.html" title="IntervalDomain class implemetation." alt="" coords="251,83,429,111"/>
+<area shape="rect" id="node7" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="99,161,224,189"/>
 </map>

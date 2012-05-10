@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="5,5,251,35"/>
-<area shape="rect" id="node4" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="TREX::europa::Assembly" alt="" coords="275,5,461,35"/>
+<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="5,83,259,111"/>
+<area shape="rect" id="node4" href="$df/d91/classboost_1_1noncopyable.html" title="noncopyable" alt="" coords="201,6,308,34"/>
+<area shape="rect" id="node6" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="TREX::europa::Assembly" alt="" coords="283,83,475,111"/>
 </map>

@@ -1,9 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" id="node9" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="757,237,912,267"/>
-<area shape="rect" id="node26" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="389,83,515,112"/>
-<area shape="rect" id="node19" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="697,315,831,344"/>
-<area shape="rect" id="node21" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="855,315,956,344"/>
-<area shape="rect" id="node23" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="231,315,364,344"/>
-<area shape="rect" id="node30" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="264,160,445,189"/>
-<area shape="rect" id="node37" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="632,160,797,189"/>
+<area shape="rect" id="node9" href="$de/d93/Symbol_8hh.html" title="trex/utils/Symbol.hh" alt="" coords="721,238,876,266"/>
+<area shape="rect" id="node27" href="$d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities." alt="" coords="787,83,912,111"/>
+<area shape="rect" id="node19" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="851,315,984,343"/>
+<area shape="rect" id="node21" href="$d3/db4/Hashable_8hh.html" title="TR1 hashing utilities." alt="" coords="1008,315,1112,343"/>
+<area shape="rect" id="node23" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="1136,315,1269,343"/>
+<area shape="rect" id="node25" href="$da/d97/Symbol_8tcc.html" title="BasicSymbol implementation." alt="" coords="1293,315,1419,343"/>
+<area shape="rect" id="node31" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="843,161,1027,189"/>
+<area shape="rect" id="node34" href="$de/dc3/DomainVisitor__fwd_8hh.html" title="Forward declaration of DomainVisitor class." alt="" coords="1051,161,1221,189"/>
 </map>

@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="133,83,203,112"/>
-<area shape="rect" id="node10" href="$da/d84/Variable_8hh.html" title="TREX variable representation." alt="" coords="147,160,325,189"/>
-<area shape="rect" id="node12" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="349,160,576,189"/>
+<area shape="rect" id="node3" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="77,83,152,111"/>
+<area shape="rect" id="node5" href="$d1/d8f/Predicate_8hh.html" title="abstract TREX predicate for transactions" alt="" coords="5,161,112,189"/>
+<area shape="rect" id="node7" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="136,161,208,189"/>
 </map>

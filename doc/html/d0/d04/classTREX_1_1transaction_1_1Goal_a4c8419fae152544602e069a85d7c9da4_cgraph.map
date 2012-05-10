@@ -1,7 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4" title="Variable name." alt="" coords="391,5,644,35"/>
-<area shape="rect" id="node5" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a8033243fde1dd12d0d3a8db0274c26db" title="Restrict duration domain." alt="" coords="367,59,668,88"/>
-<area shape="rect" id="node7" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a123ed3e20398b699459406170b93c7d7" title="Restrict end domain." alt="" coords="383,112,652,141"/>
-<area shape="rect" id="node9" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a20d5db505ee6f086e2f11f368c506d65" title="Restrict start time domain." alt="" coords="377,165,657,195"/>
-<area shape="rect" id="node11" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain." alt="" coords="364,219,671,248"/>
+<area shape="rect" id="node3" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4" title="Variable name." alt="" coords="395,5,653,33"/>
+<area shape="rect" id="node5" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a8033243fde1dd12d0d3a8db0274c26db" title="Restrict duration domain." alt="" coords="368,55,680,83"/>
+<area shape="rect" id="node9" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#aa1ef7a57b12c0fc81e205f2d187a3a08" title="Variable domain." alt="" coords="1065,170,1377,198"/>
+<area shape="rect" id="node11" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a123ed3e20398b699459406170b93c7d7" title="Restrict end domain." alt="" coords="385,106,663,134"/>
+<area shape="rect" id="node14" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a20d5db505ee6f086e2f11f368c506d65" title="Restrict start time domain." alt="" coords="380,157,668,185"/>
+<area shape="rect" id="node7" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="729,131,1015,159"/>
 </map>

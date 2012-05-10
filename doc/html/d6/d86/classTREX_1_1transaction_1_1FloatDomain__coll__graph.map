@@ -1,6 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="TREX::transaction::IntervalDomain\&lt; double \&gt;" alt="" coords="524,49,855,79"/>
-<area shape="rect" id="node4" href="$d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class." alt="" coords="84,5,327,35"/>
-<area shape="rect" id="node6" href="$df/db6/classTREX_1_1transaction_1_1IntervalDomain_1_1bound.html" title="interval bounds extension of Ty " alt="" coords="5,95,405,124"/>
-<area shape="rect" id="node8" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="519,103,860,132"/>
+<area shape="rect" id="node2" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html" title="TREX::transaction::IntervalDomain\&lt; double \&gt;" alt="" coords="768,99,1101,127"/>
+<area shape="rect" id="node4" href="$d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class." alt="" coords="328,139,576,167"/>
+<area shape="rect" id="node6" href="$df/db6/classTREX_1_1transaction_1_1IntervalDomain_1_1bound.html" title="interval bounds extension of Ty " alt="" coords="251,89,653,117"/>
+<area shape="rect" id="node8" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="8,63,197,91"/>
+<area shape="rect" id="node12" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="273,38,631,66"/>
+<area shape="rect" id="node10" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="5,130,200,158"/>
+<area shape="rect" id="node16" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="17,5,188,33"/>
 </map>

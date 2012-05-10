@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback." alt="" coords="383,5,740,35"/>
-<area shape="rect" id="node5" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name" alt="" coords="405,59,717,88"/>
-<area shape="rect" id="node7" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned." alt="" coords="403,112,720,141"/>
-<area shape="rect" id="node9" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner." alt="" coords="404,165,719,195"/>
-<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="413,219,709,248"/>
-<area shape="rect" id="node13" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="789,219,1109,248"/>
+<area shape="rect" id="node3" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad168ea32ebb729f0c866c16d37462c9c" title="Goal reception callback." alt="" coords="387,5,752,33"/>
+<area shape="rect" id="node5" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#acd800b60601a532154e8fb3527c1ca4d" title="timeline name" alt="" coords="412,55,727,83"/>
+<area shape="rect" id="node7" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned." alt="" coords="408,106,731,134"/>
+<area shape="rect" id="node9" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner." alt="" coords="409,157,729,185"/>
+<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="416,207,723,235"/>
+<area shape="rect" id="node13" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="801,207,1124,235"/>
 </map>

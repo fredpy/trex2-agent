@@ -1,5 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node5" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal." alt="" coords="5,160,189,189"/>
-<area shape="rect" id="node7" href="$de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation." alt="" coords="213,160,451,189"/>
-<area shape="rect" id="node2" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="120,5,309,35"/>
+<area shape="rect" id="node5" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal." alt="" coords="5,161,195,189"/>
+<area shape="rect" id="node7" href="$de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation." alt="" coords="219,161,461,189"/>
+<area shape="rect" id="node2" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="123,6,317,34"/>
 </map>

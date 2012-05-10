@@ -1,21 +1,15 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="5,83,243,112"/>
-<area shape="rect" id="node6" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="291,83,485,112"/>
-<area shape="rect" id="node9" href="$d8/d29/Popup_8cc_source.html" title="extra/witre/Popup.cc" alt="" coords="533,83,696,112"/>
-<area shape="rect" id="node12" href="$df/de2/Popup_8hh_source.html" title="extra/witre/Popup.hh" alt="" coords="795,83,957,112"/>
-<area shape="rect" id="node14" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="645,160,803,189"/>
-<area shape="rect" id="node17" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="851,160,1008,189"/>
-<area shape="rect" id="node21" href="$d3/d18/DoradoHandler_8cc_source.html" title="mbari/tracker/DoradoHandler.cc" alt="" coords="1083,160,1317,189"/>
-<area shape="rect" id="node24" href="$db/dea/DrifterTracker_8cc_source.html" title="mbari/tracker/DrifterTracker.cc" alt="" coords="1320,237,1549,267"/>
-<area shape="rect" id="node27" href="$d0/d29/PositionHandler_8cc_source.html" title="mbari/tracker/PositionHandler.cc" alt="" coords="1827,237,2064,267"/>
-<area shape="rect" id="node30" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="1547,83,1731,112"/>
-<area shape="rect" id="node48" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="2583,83,2764,112"/>
-<area shape="rect" id="node33" href="$d2/d63/MessageHandler_8hh_source.html" title="mbari/tracker/MessageHandler.hh" alt="" coords="1664,160,1909,189"/>
-<area shape="rect" id="node37" href="$d8/d48/Goal_8cc.html" title="Goal implementation." alt="" coords="1933,160,2117,189"/>
-<area shape="rect" id="node40" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="1365,160,1616,189"/>
-<area shape="rect" id="node43" href="$d3/dbf/TeleoReactor__fwd_8hh.html" title="Forward decalrions for TeleoReactor." alt="" coords="2141,160,2419,189"/>
-<area shape="rect" id="node45" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="2272,237,2515,267"/>
-<area shape="rect" id="node50" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="2544,160,2803,189"/>
-<area shape="rect" id="node52" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="2827,160,2987,189"/>
-<area shape="rect" id="node55" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="3035,160,3189,189"/>
+<area shape="rect" id="node3" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="5,83,243,111"/>
+<area shape="rect" id="node5" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="267,83,464,111"/>
+<area shape="rect" id="node7" href="$df/de2/Popup_8hh_source.html" title="extra/witre/Popup.hh" alt="" coords="488,83,648,111"/>
+<area shape="rect" id="node11" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="608,161,763,189"/>
+<area shape="rect" id="node14" href="$d3/d18/DoradoHandler_8cc_source.html" title="mbari/tracker/DoradoHandler.cc" alt="" coords="723,83,965,111"/>
+<area shape="rect" id="node16" href="$db/dea/DrifterTracker_8cc_source.html" title="mbari/tracker/DrifterTracker.cc" alt="" coords="989,83,1227,111"/>
+<area shape="rect" id="node18" href="$d0/d29/PositionHandler_8cc_source.html" title="mbari/tracker/PositionHandler.cc" alt="" coords="1251,83,1499,111"/>
+<area shape="rect" id="node20" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="1523,83,1728,111"/>
+<area shape="rect" id="node22" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="1752,83,1939,111"/>
+<area shape="rect" id="node9" href="$d8/d29/Popup_8cc_source.html" title="extra/witre/Popup.cc" alt="" coords="424,161,584,189"/>
+<area shape="rect" id="node24" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="1483,161,1744,189"/>
+<area shape="rect" id="node26" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="1768,161,1923,189"/>
+<area shape="rect" id="node28" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="1947,161,2133,189"/>
 </map>

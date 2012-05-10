@@ -1,8 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="327,139,604,168"/>
-<area shape="rect" id="node13" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain." alt="" coords="671,219,977,248"/>
-<area shape="rect" id="node5" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="692,5,956,35"/>
-<area shape="rect" id="node7" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="653,59,995,88"/>
-<area shape="rect" id="node9" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="668,112,980,141"/>
-<area shape="rect" id="node11" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="691,165,957,195"/>
+<area shape="rect" id="node3" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a39390ef87f8e11acfa7fc1d993b837cb" title="check for common values" alt="" coords="333,69,667,97"/>
+<area shape="rect" id="node5" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="357,119,643,147"/>
+<area shape="rect" id="node15" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#aa1ef7a57b12c0fc81e205f2d187a3a08" title="Variable domain." alt="" coords="732,207,1044,235"/>
+<area shape="rect" id="node7" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="1109,106,1384,134"/>
+<area shape="rect" id="node9" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="715,55,1061,83"/>
+<area shape="rect" id="node11" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="731,106,1045,134"/>
+<area shape="rect" id="node13" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="751,157,1025,185"/>
 </map>

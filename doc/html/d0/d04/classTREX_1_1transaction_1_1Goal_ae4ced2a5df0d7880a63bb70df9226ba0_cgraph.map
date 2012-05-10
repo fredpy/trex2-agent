@@ -1,11 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set" alt="" coords="325,5,581,35"/>
-<area shape="rect" id="node5" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute." alt="" coords="327,59,580,88"/>
-<area shape="rect" id="node7" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="315,112,592,141"/>
-<area shape="rect" id="node19" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a6a9c8594761ba152bb7c92ec9350348c" title="Restrict domain possible values." alt="" coords="279,165,628,195"/>
-<area shape="rect" id="node9" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="716,5,980,35"/>
-<area shape="rect" id="node11" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="677,59,1019,88"/>
-<area shape="rect" id="node13" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="692,112,1004,141"/>
-<area shape="rect" id="node15" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="715,165,981,195"/>
-<area shape="rect" id="node17" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain." alt="" coords="695,219,1001,248"/>
+<area shape="rect" id="node3" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set" alt="" coords="336,5,595,33"/>
+<area shape="rect" id="node5" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute." alt="" coords="335,55,596,83"/>
+<area shape="rect" id="node7" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables." alt="" coords="323,106,608,134"/>
+<area shape="rect" id="node20" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a6a9c8594761ba152bb7c92ec9350348c" title="Restrict domain possible values." alt="" coords="288,157,643,185"/>
+<area shape="rect" id="node9" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#a12d061140612cd58fe4994b58735c84f" title="Variable domain." alt="" coords="1085,55,1360,83"/>
+<area shape="rect" id="node11" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#ab800e37b5e479d06899d83bb314e71ff" title="check for common values" alt="" coords="707,55,1021,83"/>
+<area shape="rect" id="node13" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#aa1ef7a57b12c0fc81e205f2d187a3a08" title="Variable domain." alt="" coords="708,106,1020,134"/>
+<area shape="rect" id="node16" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a70241bdbe20eb862e9559709b15d8588" title="Get interval bounds." alt="" coords="691,157,1037,185"/>
+<area shape="rect" id="node18" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#adea189218f70a9e09412d558b6f53093" title="Restrict Variable domain." alt="" coords="727,207,1001,235"/>
 </map>

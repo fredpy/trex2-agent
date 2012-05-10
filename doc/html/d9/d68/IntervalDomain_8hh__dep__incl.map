@@ -1,18 +1,15 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="433,83,639,112"/>
-<area shape="rect" id="node6" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="1699,83,1909,112"/>
-<area shape="rect" id="node40" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="687,83,913,112"/>
-<area shape="rect" id="node8" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="805,160,1043,189"/>
-<area shape="rect" id="node11" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="2184,160,2421,189"/>
-<area shape="rect" id="node14" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="1368,160,1563,189"/>
-<area shape="rect" id="node17" href="$d8/d29/Popup_8cc_source.html" title="extra/witre/Popup.cc" alt="" coords="595,160,757,189"/>
-<area shape="rect" id="node20" href="$df/de2/Popup_8hh_source.html" title="extra/witre/Popup.hh" alt="" coords="1611,160,1773,189"/>
-<area shape="rect" id="node22" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="1511,237,1668,267"/>
-<area shape="rect" id="node25" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="1716,237,1873,267"/>
-<area shape="rect" id="node29" href="$d3/d18/DoradoHandler_8cc_source.html" title="mbari/tracker/DoradoHandler.cc" alt="" coords="236,237,471,267"/>
-<area shape="rect" id="node32" href="$db/dea/DrifterTracker_8cc_source.html" title="mbari/tracker/DrifterTracker.cc" alt="" coords="1091,160,1320,189"/>
-<area shape="rect" id="node35" href="$d0/d29/PositionHandler_8cc_source.html" title="mbari/tracker/PositionHandler.cc" alt="" coords="1797,160,2035,189"/>
-<area shape="rect" id="node38" href="$d7/d2c/TeleoReactor_8cc.html" title="Provides implementation for TeleoReactor." alt="" coords="2469,160,2715,189"/>
-<area shape="rect" id="node51" href="$d2/d84/Goal_8hh.html" title="TREX goal definition." alt="" coords="261,160,445,189"/>
-<area shape="rect" id="node55" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="5,160,187,189"/>
+<area shape="rect" id="node3" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="1180,83,1393,111"/>
+<area shape="rect" id="node26" href="$df/dbf/IntegerDomain_8hh.html" title="Integer domain representation." alt="" coords="796,83,1023,111"/>
+<area shape="rect" id="node5" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="235,161,472,189"/>
+<area shape="rect" id="node7" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="1981,161,2221,189"/>
+<area shape="rect" id="node9" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="496,161,693,189"/>
+<area shape="rect" id="node11" href="$df/de2/Popup_8hh_source.html" title="extra/witre/Popup.hh" alt="" coords="717,161,877,189"/>
+<area shape="rect" id="node13" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="720,238,875,266"/>
+<area shape="rect" id="node16" href="$d3/d18/DoradoHandler_8cc_source.html" title="mbari/tracker/DoradoHandler.cc" alt="" coords="901,161,1144,189"/>
+<area shape="rect" id="node18" href="$db/dea/DrifterTracker_8cc_source.html" title="mbari/tracker/DrifterTracker.cc" alt="" coords="1168,161,1405,189"/>
+<area shape="rect" id="node20" href="$d0/d29/PositionHandler_8cc_source.html" title="mbari/tracker/PositionHandler.cc" alt="" coords="1429,161,1677,189"/>
+<area shape="rect" id="node22" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="1701,161,1907,189"/>
+<area shape="rect" id="node24" href="$d7/d2c/TeleoReactor_8cc.html" title="Provides implementation for TeleoReactor." alt="" coords="2245,161,2496,189"/>
+<area shape="rect" id="node36" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="24,161,211,189"/>
 </map>

@@ -1,9 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node8" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="471,83,548,112"/>
-<area shape="rect" id="node19" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="5,238,139,267"/>
-<area shape="rect" id="node21" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="448,238,571,267"/>
-<area shape="rect" id="node24" href="$d5/d68/TimeUtils_8hh.html" title="C++ utilities for timeval." alt="" coords="749,83,917,112"/>
-<area shape="rect" id="node10" href="$d9/d4e/Tick_8hh.html" title="TREX time representation." alt="" coords="213,160,395,190"/>
-<area shape="rect" id="node12" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="280,315,405,344"/>
-<area shape="rect" id="node14" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="419,160,600,190"/>
+<area shape="rect" id="node5" href="$dd/dfa/RealTimeClock_8hh.html" title="definition of a system based real&#45;time clock for TREX" alt="" coords="349,83,493,111"/>
+<area shape="rect" id="node9" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="306,161,386,189"/>
+<area shape="rect" id="node11" href="$d5/d68/TimeUtils_8hh.html" title="C++ utilities for timeval." alt="" coords="410,161,584,189"/>
+<area shape="rect" id="node14" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="608,161,733,189"/>
+<area shape="rect" id="node16" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="757,161,890,189"/>
 </map>
