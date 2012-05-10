@@ -1,0 +1,13 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness." alt="" coords="435,5,680,35"/>
+<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name" alt="" coords="427,59,688,88"/>
+<area shape="rect" id="node9" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name." alt="" coords="1131,137,1451,167"/>
+<area shape="rect" id="node11" href="$db/d81/group__utils.html#ga3f53b52b07b15188ea2d94b36ba9f096" title="TREX::utils::is_tag" alt="" coords="484,320,631,349"/>
+<area shape="rect" id="node13" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point." alt="" coords="400,373,715,403"/>
+<area shape="rect" id="node15" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a3dc486c5b78514e5ae601c2b8147d497" title="Internal timeline declaration." alt="" coords="405,213,709,243"/>
+<area shape="rect" id="node21" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abde1d28e37984ab0a0ae71a6023bcd8b" title="new log entry" alt="" coords="775,163,1071,192"/>
+<area shape="rect" id="node25" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a4c6dc39a343f4413b5bd8acd8213e740" title="External timeline declaration." alt="" coords="417,267,697,296"/>
+<area shape="rect" id="node7" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed..." alt="" coords="799,59,1047,88"/>
+<area shape="rect" id="node17" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a9d8c2a89f8940138216a1f7821adfb04" title="Check for internal timeline." alt="" coords="764,269,1081,299"/>
+<area shape="rect" id="node19" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value." alt="" coords="813,216,1032,245"/>
+</map>
