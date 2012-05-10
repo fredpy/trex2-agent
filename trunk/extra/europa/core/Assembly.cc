@@ -578,6 +578,16 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
+#ifdef EUROPA_HAVE_EFFECT
+    out<<"type: ";
+    if( (*it)->hasAttributes(EUROPA::PSTokenType::ACTION) ) 
+      out<<"ACTION";
+    else if( (*it)->hasAttributes(EUROPA::PSTokenType::PREDICATE) )
+      out<<"PREDICATE";
+    else 
+      out<<"???";
+    out<<"\\n";
+#endif // EUROPA_HAVE_EFFECT
     std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
@@ -607,18 +617,15 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       styles<<"rounded"; // goal have rounded corner
       comma=true;
     }
-    if( (*it)->isCommitted() ) {
+#ifdef EUROPA_HAVE_EFFECT
+    if( (*it)->hasAttributes(EUROPA::PSTokenType::ACTION) ) {
       if( comma )
-        styles<<',';
-      styles<<"bold"; // commits are bold
-      comma = true;
+        styles.put(',');
+      else
+        comma = true;
+      styles<<"bold";
     }
-    if( (*it)->isTerminated() ) {
-      if( comma )
-        styles<<',';
-      styles<<"dashed"; // terminated are dashed
-      comma = true;
-    }
+#endif // EUROPA_HAVE_EFFECT
     if( comma )
       out<<" style=\""<<styles.str()<<"\" "; // display style modifiers
     out<<"];\n";
@@ -638,7 +645,14 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
         if( expanded )
           key = (*t)->getKey();
         out<<"  t"<<master->getKey()<<"->t"<<key
-        <<"[label=\""<<(*t)->getRelation().toString()<<"\"";
+           <<"[label=\""<<(*t)->getRelation().toString();
+#ifdef EUROPA_HAVE_EFFECT
+        if( (*t)->hasAttributes(EUROPA::PSTokenType::EFFECT) )
+          out<<"\\n(effect)";
+        if( (*t)->hasAttributes(EUROPA::PSTokenType::CONDITION) )
+          out<<"\\n(condition)";
+#endif // EUROPA_HAVE_EFFECT
+        out<<"\"";
         if( (*it)!=(*t) )
           out<<" color=grey";
         out<<"];\n";

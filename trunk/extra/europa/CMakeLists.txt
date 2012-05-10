@@ -36,6 +36,10 @@
 
 
 if(WITH_EUROPA) 
+  if(NOT EUROPA_HAVE_EFFECT)
+    message(WARNING "Your europa version appears to be older than 2.6\n"
+      "Some new trex features have been disabled.")
+  endif(NOT EUROPA_HAVE_EFFECT)
   # put the europa flags under trex/europa/bits
   configure_file(bits/europa_config.hh.in 
     ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
