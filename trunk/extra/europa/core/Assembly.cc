@@ -623,7 +623,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
         styles.put(',');
       else
         comma = true;
-      styles<<"bold";
+      styles<<"filled";
     }
 #endif // EUROPA_HAVE_EFFECT
     if( comma )
