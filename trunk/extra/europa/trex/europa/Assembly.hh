@@ -116,12 +116,89 @@ namespace TREX {
       Assembly(std::string const &name);
       /** @brief Destructor */
       virtual ~Assembly();
+      
+      /** @brief Check for support of actions
+       *
+       * This method checks if this europa plugin have been 
+       * compiled with support of actions.
+       * It is equivalent to check if the preprocessing macro 
+       * EUROPA_HAVE_EFFECT exists
+       *
+       * @note if you use europa 2.6 or above this method should return true
+       *
+       * @retval true if support actions
+       * @retval false otherwise
+       */
+      static bool actions_supported();
+      
+      /** @brief Check if action
+       * @param[in] tok A token
+       *
+       * Check if @p tok is an action token.
+       * 
+       * @note if actions are not supported then this method will always 
+       * return @c false
+       *
+       * @retval true if @p tok is an action
+       * @retval false otherwise
+       * @sa is_predicate(EUROPA::TokenId const &) const
+       * @sa actions_supported()
+       */
+      bool is_action(EUROPA::TokenId const &tok) const;
+      /** @brief Check if predicate
+       * @param[in] tok A token
+       *
+       * Check if @p tok is a predicate token
+       * 
+       * @note if actions are not supported then this method will always 
+       * return @c true
+       *
+       * @retval true if @p tok is an action
+       * @retval false otherwise
+       * @sa is_action(EUROPA::TokenId const &) const
+       * @sa actions_supported()
+       */
+      bool is_predicate(EUROPA::TokenId const &tok) const;
+
+      /** @brief Check for condition attribute
+       * @param[in] tok A token
+       *
+       * Check if @p tok is a condition token. An effect token means that this 
+       * token is semantically a condition necessary for "executing" its master 
+       * (which usually will be an action)
+       * 
+       * @note if actions are not supported then this method will always 
+       * return @c false
+       *
+       * @retval true if @p tok is a condition 
+       * @retval false otherwise
+       * @sa is_effect(EUROPA::TokenId const &) const
+       * @sa actions_supported()
+       */
+      bool is_condition(EUROPA::TokenId const &tok) const;
+      /** @brief Check for effect attribute
+       * @param[in] tok A token
+       *
+       * Check if @p tok is an effect token. An effect token means that this 
+       * token is semantically yhe resulting effect of "executing" its master 
+       * (which usually will be an action)
+       * 
+       * @note if actions are not supported then this method will always 
+       * return @c false
+       *
+       * @retval true if @p tok is an effect 
+       * @retval false otherwise
+       * @sa is_condition(EUROPA::TokenId const &) const
+       * @sa actions_supported()
+       */
+      bool is_effect(EUROPA::TokenId const &tok) const;
+
 
       /** @brief Test if goal
        *
        * @param[in] tok A token
        *
-       * Test if @p tok is a goal token menaing that it is rejectable and 
+       * Test if @p tok is a goal token meaning that it is rejectable and 
        * associated to an internal timeline.
        *
        * @retval true if @p tok is a goal
