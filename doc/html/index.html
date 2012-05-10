@@ -230,31 +230,23 @@ Linking CXX executable sim
 <div class="fragment"><pre class="fragment">&gt; make doc
 </pre></div><h2><a class="anchor" id="Running"></a>
 an example</h2>
-<p>So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch, vitre and europa plug-ins. To use it you first need to compile your source and also the extra Vitre.jar program : </p>
+<p>So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch, vitre and europa plug-ins. To use it you first need to compile your source : </p>
 <div class="fragment"><pre class="fragment">~$ cd trex2.build 
 trex2.build$ make 
-[...]
-trex2.build$ make Vitre 
 [...]
 trex.build$
 </pre></div><p>After having compile you can either install the binaries or set-up your enviroment to run the code from the build directory. For the later we generate locally the trex-devel.bash file that can be sourced </p>
 <div class="fragment"><pre class="fragment">trex2.build$ <a class="code" href="db/db4/group__transaction.html#ga2a1b6a59562d365f2260fad40f037a67" title="source of a relation">source</a> trex_devel.bash
-@encode
-
-
-You can now start the simulation but beforehand we are going to give a look at 
-the configuration files on $TREX_HOME/cfg used <span class="keywordflow">for</span> <span class="keyword">this</span> <span class="keywordtype">short</span> test. 
-We are going to use 3 of them :
-@li @c sample.cfg Is the mission config file
-@li @c lighton.req and @c lightoff.req are files describing goals 
-    that one can post interactivelly through the sim interface
-
-The content of @c sample.cfg should looks similar to <span class="keyword">this</span> :
-@code  
-&lt;Agent name=<span class="stringliteral">&quot;sample&quot;</span> finalTick=<span class="stringliteral">&quot;100&quot;</span> &gt;
-       &lt;Plugin name=<span class="stringliteral">&quot;TREXvitre&quot;</span>/&gt;
-       &lt;Plugin name=<span class="stringliteral">&quot;TREXlightswitch&quot;</span>/&gt;
-       &lt;Plugin name=<span class="stringliteral">&quot;TREXeuropa&quot;</span>/&gt;
+</pre></div><p>You can now start the simulation but beforehand we are going to give a look at the configuration files on $TREX_HOME/cfg used for this short test. We are going to use 3 of them : </p>
+<ul>
+<li><code>sample.cfg</code> Is the mission config file </li>
+<li><code>lighton.req</code> and <code>lightoff.req</code> are files describing goals that one can post interactivelly through the sim interface</li>
+</ul>
+<p>The content of <code>sample.cfg</code> should looks similar to this : </p>
+<div class="fragment"><pre class="fragment">&lt;Agent name=<span class="stringliteral">&quot;sample&quot;</span> finalTick=<span class="stringliteral">&quot;100&quot;</span> &gt;
+       &lt;Plugin name=<span class="stringliteral">&quot;witre_pg&quot;</span>/&gt;
+       &lt;Plugin name=<span class="stringliteral">&quot;lightswitch_pg&quot;</span>/&gt;
+       &lt;Plugin name=<span class="stringliteral">&quot;europa_pg&quot;</span>/&gt;
 
        &lt;Light name=<span class="stringliteral">&quot;light&quot;</span> latency=<span class="stringliteral">&quot;0&quot;</span> lookahead=<span class="stringliteral">&quot;1&quot;</span> log=<span class="stringliteral">&quot;1&quot;</span> state=<span class="stringliteral">&quot;1&quot;</span>/&gt;
 
@@ -263,16 +255,16 @@ The content of @c sample.cfg should looks similar to <span class="keyword">this<
        &lt;EuropaReactor name=<span class="stringliteral">&quot;test2&quot;</span> lookahead=<span class="stringliteral">&quot;20&quot;</span> latency=<span class="stringliteral">&quot;3&quot;</span> 
                     solverConfig=<span class="stringliteral">&quot;test.solver.xml&quot;</span> /&gt;
 
-       &lt;VitreReactor name=<span class="stringliteral">&quot;switchView&quot;</span> latency=<span class="stringliteral">&quot;0&quot;</span> lookahead=<span class="stringliteral">&quot;0&quot;</span>
-                     log=<span class="stringliteral">&quot;0&quot;</span> port=<span class="stringliteral">&quot;31415&quot;</span>&gt;
+       &lt;WitreReactor name=<span class="stringliteral">&quot;switchView&quot;</span> latency=<span class="stringliteral">&quot;0&quot;</span> lookahead=<span class="stringliteral">&quot;0&quot;</span>
+                     log=<span class="stringliteral">&quot;0&quot;</span>&gt;
          &lt;External name=<span class="stringliteral">&quot;light&quot;</span> goals=<span class="stringliteral">&quot;0&quot;</span>/&gt;
          &lt;External name=<span class="stringliteral">&quot;switch&quot;</span> goals=<span class="stringliteral">&quot;0&quot;</span>/&gt;
          &lt;External name=<span class="stringliteral">&quot;lum&quot;</span> goals=<span class="stringliteral">&quot;0&quot;</span>/&gt;
          &lt;External name=<span class="stringliteral">&quot;lum2&quot;</span> goals=<span class="stringliteral">&quot;0&quot;</span>/&gt;
-       &lt;/VitreReactor&gt;
+       &lt;/WitreReactor&gt;
 
       &lt;Goal on=<span class="stringliteral">&quot;lum&quot;</span> pred=<span class="stringliteral">&quot;Bright&quot;</span>&gt;
-        &lt;Variable name=<span class="stringliteral">&quot;end&quot;</span>&gt;&lt;<span class="keywordtype">int</span> min=<span class="stringliteral">&quot;10000&quot;</span>/&gt;&lt;/Variable&gt;
+        &lt;Variable name=<span class="stringliteral">&quot;end&quot;</span>&gt;&lt;<span class="keywordtype">int</span> min=<span class="stringliteral">&quot;50&quot;</span>/&gt;&lt;/Variable&gt;
       &lt;/Goal&gt;
 
       &lt;Goal on=<span class="stringliteral">&quot;lum2&quot;</span> pred=<span class="stringliteral">&quot;Dim&quot;</span>&gt;
@@ -281,17 +273,15 @@ The content of @c sample.cfg should looks similar to <span class="keyword">this<
       &lt;/Goal&gt;
 &lt;/Agent&gt;
 </pre></div><p> The <code>Agent</code> tag declare the global agent with its <code>name</code> and <code>finalTick</code> both of them can be freely modified.</p>
-<p>The <code>Plugin</code> tag indicates that this mission need to load the <code>TREXlightswitch</code> plug-in. Based on that <code>sim</code> will automatically look on local directory and <code>TREX_PATH</code> to locate this plug-in.</p>
-<p>The <code>Light</code> declare a reactor which is implemented in <code>TREXlightswitch</code>. This one starts with a <code>state</code> of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.</p>
-<p>The <code>EuropaReactor</code> declare a reactor which is implemented in <code>TREXeuropa</code>. These two reactors are keeping track on the light to know if the luminance is bright or dark. and can switch the light on the desired state according to their objectives.</p>
-<p>The <code>VitreReactor</code> declare a reactor that will connect to the Vitre.jar graphic interface in order to visualize the state of each timeline. The "External" tags specifies which timelines this reactor needs to look at. Feel free to change these.</p>
+<p>The <code>Plugin</code> tag indicates that this mission need to load the <code>lightswitch_pg</code> plug-in. Based on that <code>sim</code> will automatically look on local directory and <code>TREX_PATH</code> to locate this plug-in.</p>
+<p>The <code>Light</code> declare a reactor which is implemented in <code>lightswitch_pg</code>. This one starts with a <code>state</code> of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.</p>
+<p>The <code>EuropaReactor</code> declare a reactor which is implemented in <code>europa_pg</code>. These two reactors are keeping track on the light to know if the luminance is bright or dark. and can switch the light on the desired state according to their objectives.</p>
+<p>The <code>WitreReactor</code> declare a reactor that will create a web server providing an interface to TREX in order to track the observations from the dirfferent timelines in the agent, post goals, ... The "External" tags specifies which timelines this reactor needs to look at. Feel free to change these.</p>
 <p>Finally the two Goal at the end gives the objectives for each EuropaReactor. Quickly stated : <code>test</code> will want to be on a Bright state at the end of the mission while <code>test2</code> will want to be Dim at the end of the mission starting from the tick 20</p>
 <h3><a class="anchor" id="start"></a>
 the @c sample mission</h3>
 <p>To start the sample mission you can do the following : </p>
 <ul>
-<li>start Vitre java application <div class="fragment"><pre class="fragment">trex2.build$ java -jar Vitre.jar
-</pre></div> </li>
 <li>start the simulation in "debug" mode : <div class="fragment"><pre class="fragment">trex2.build$ sim sample
 This is TREX v0.1.3
 Options:
@@ -305,7 +295,8 @@ Options:
 [sample:0]&gt; 
 </pre></div> The mission is loaded and the prompt indicate the name of the agent (sample) and the current tick value 0. You can use commands to interact with the agent by advancing of one tick (N), go to a given tick in the future (G) or post a request described in a file (P)</li>
 </ul>
-<p>you can also in an alternate terminal look on the activity of the agent redicrected in <code>$TREX_LOG_DIR/latest/TREX</code>.log </p>
+<p>You can already look at this agent by typing the url <a href="http://localhost:8080/witre">http://localhost:8080/witre</a> which should display a web page with the current tick value, a set of buttons llowing to show hid the different timelines of the agent, few links to other informations pages for this agent. This specific page will display a stream of all the observations received -- displayed in text form.</p>
+<p>you can also in an alternate terminal look on the activity of the agent redirected in <code>$TREX_LOG_DIR/latest/TREX</code>.log </p>
 <div class="fragment"><pre class="fragment">~$ cd $TREX_LOG_DIR
 log$ tail -F latest/TREX.log
 [lightswitch] LightSwitch loaded.
@@ -335,14 +326,12 @@ Extracting goals:
 [sample:11]&gt; g1000
 Mission completed.
 TREX2$
-</pre></div><dl class="section note"><dt>Note:</dt><dd>The ticks are not in real-time in <code>sim</code>. This is related to the fact that <code>sim</code> needs to be able to interrupt the clock and restart it. We plan to implement a pseudo real-time clakc but most of the time the we use <code>sim</code> to replay a past mission (using a LogPlayer reactor which is not provided yet on this version) and as these can be long (hours) the fast sim clock is a better fit.</dd>
-<dd>
-At this stage this is the only mission directly available on TREX. This is due to the fact that our effort was more focused on make TREX independent from Europa than implement a large set of reactors. The porting of other reactors (Log player, europa 2.1.1 based, latest europa based, ... ) are in the process and should be available soon. </dd></dl>
+</pre></div><dl class="section note"><dt>Note:</dt><dd>The ticks are not in real-time in <code>sim</code>. This is related to the fact that <code>sim</code> needs to be able to interrupt the clock and restart it. We plan to implement a pseudo real-time clakc but most of the time the we use <code>sim</code> to replay a past mission (using a LogPlayer reactor which is not provided yet on this version) and as these can be long (hours) the fast sim clock is a better fit. </dd></dl>
 </div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 10 2012 11:09:57 for trex by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 10 2012 13:11:32 for trex by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
