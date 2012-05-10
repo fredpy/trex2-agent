@@ -1,6 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="5,83,165,112"/>
-<area shape="rect" id="node6" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="213,83,373,112"/>
-<area shape="rect" id="node8" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="136,160,283,189"/>
-<area shape="rect" id="node10" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="307,160,445,189"/>
+<area shape="rect" id="node3" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="73,83,233,112"/>
+<area shape="rect" id="node6" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="281,83,441,112"/>
+<area shape="rect" id="node8" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="5,160,264,189"/>
+<area shape="rect" id="node10" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="288,160,435,189"/>
+<area shape="rect" id="node12" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="459,160,597,189"/>
 </map>

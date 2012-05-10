@@ -1,7 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="953,112,1199,141"/>
-<area shape="rect" id="node6" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="539,124,731,153"/>
-<area shape="rect" id="node8" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="5,87,395,116"/>
-<area shape="rect" id="node10" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="497,177,772,207"/>
-<area shape="rect" id="node19" title="STL class." alt="" coords="589,284,680,313"/>
+<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="956,132,1201,161"/>
+<area shape="rect" id="node4" title="Transaction logger." alt="" coords="487,53,788,83"/>
+<area shape="rect" id="node6" title="STL class." alt="" coords="143,16,257,45"/>
+<area shape="rect" id="node8" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="541,172,733,201"/>
+<area shape="rect" id="node10" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="5,133,395,163"/>
+<area shape="rect" id="node12" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="500,225,775,255"/>
+<area shape="rect" id="node22" title="STL class." alt="" coords="592,332,683,361"/>
 </map>

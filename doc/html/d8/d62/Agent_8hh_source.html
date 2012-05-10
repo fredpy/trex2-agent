@@ -109,7 +109,7 @@ window.onload = initDynSections;
 <a name="l00051"></a>00051 <span class="preprocessor">#ifndef H_Agent</span>
 <a name="l00052"></a>00052 <span class="preprocessor"></span><span class="preprocessor"># define H_Agent</span>
 <a name="l00053"></a>00053 <span class="preprocessor"></span>
-<a name="l00054"></a>00054 <span class="preprocessor"># include &quot;<a class="code" href="../../d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management">agent_graph.hh</a>&quot;</span>
+<a name="l00054"></a>00054 <span class="preprocessor"># include &quot;bits/agent_graph.hh&quot;</span>
 <a name="l00055"></a>00055 <span class="preprocessor"># include &quot;<a class="code" href="../../de/d89/Clock_8hh.html" title="TREX Clock.">Clock.hh</a>&quot;</span>
 <a name="l00056"></a>00056 <span class="preprocessor"># include &lt;<a class="code" href="../../d4/d27/PluginLoader_8hh.html" title="plug-in loading utility">trex/utils/PluginLoader.hh</a>&gt;</span>
 <a name="l00057"></a>00057 
@@ -122,7 +122,7 @@ window.onload = initDynSections;
 <a name="l00109"></a>00109       <span class="keyword">typedef</span> std::multimap&lt; double, <a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a>,
 <a name="l00110"></a><a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609">00110</a>                           std::greater&lt;double&gt; &gt; <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609" title="reactors deliberation scheduling queue">priority_queue</a>;
 <a name="l00111"></a>00111 
-<a name="l00123"></a>00123       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
+<a name="l00123"></a>00123       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
 <a name="l00124"></a>00124                    <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> <span class="keyword">final</span> = 0,
 <a name="l00125"></a>00125                    <a class="code" href="../../de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock.">Clock</a> *clock = NULL);
 <a name="l00196"></a>00196       <span class="keyword">explicit</span> <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a6ed6e50dc6feafab531483629393676a" title="Constructor.">Agent</a>(std::string <span class="keyword">const</span> &amp;file_name, 
@@ -159,56 +159,63 @@ window.onload = initDynSections;
 <a name="l00362"></a>00362       }
 <a name="l00363"></a>00363       
 <a name="l00364"></a>00364     <span class="keyword">private</span>:
-<a name="l00365"></a>00365       <span class="keyword">class </span>AgentProxy :<span class="keyword">public</span> TREX::transaction::TeleoReactor {
-<a name="l00366"></a>00366       <span class="keyword">public</span>:
-<a name="l00367"></a>00367        AgentProxy(<a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> &amp;agent)
-<a name="l00368"></a>00368          :TREX::transaction::TeleoReactor(&amp;agent, <span class="stringliteral">&quot;&quot;</span>, 0, 0) {}
-<a name="l00369"></a>00369        ~AgentProxy() {}
-<a name="l00370"></a>00370        
-<a name="l00371"></a>00371        <span class="keywordtype">bool</span> postRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g) {
-<a name="l00372"></a>00372         <span class="keywordflow">if</span>( !isExternal(g-&gt;object()) )
-<a name="l00373"></a>00373             use(g-&gt;object());
-<a name="l00374"></a>00374         <span class="keywordflow">if</span>( isExternal(g-&gt;object()) )
-<a name="l00375"></a>00375             <span class="keywordflow">return</span> postGoal(g);
-<a name="l00376"></a>00376         <span class="keywordflow">else</span>
-<a name="l00377"></a>00377             syslog(<span class="stringliteral">&quot;ERROR&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unable to subscribe to &quot;</span>&lt;&lt;g-&gt;object();
-<a name="l00378"></a>00378         <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00379"></a>00379        }
-<a name="l00380"></a>00380 
-<a name="l00381"></a>00381       <span class="keyword">private</span>:
-<a name="l00382"></a>00382        <span class="keywordtype">bool</span> synchronize() {
-<a name="l00383"></a>00383          <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00384"></a>00384        }
-<a name="l00385"></a>00385 
-<a name="l00386"></a>00386       };
-<a name="l00387"></a>00387       AgentProxy *m_proxy;
-<a name="l00388"></a>00388 
-<a name="l00389"></a>00389 
-<a name="l00447"></a>00447       <span class="keywordtype">void</span> loadConf(boost::property_tree::ptree::value_type &amp;conf);
-<a name="l00472"></a>00472       <span class="keywordtype">void</span> loadConf(std::string <span class="keyword">const</span> &amp;file_name);
-<a name="l00473"></a>00473 
-<a name="l00474"></a>00474       <span class="keyword">static</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> initialTick(Clock *clk);
-<a name="l00475"></a>00475 
-<a name="l00476"></a>00476       Clock  *m_clock;  
-<a name="l00477"></a>00477       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a>    m_finalTick;
-<a name="l00478"></a>00478       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609" title="reactors deliberation scheduling queue">priority_queue</a>             m_edf;
+<a name="l00365"></a>00365       <span class="keywordtype">void</span> internal_check(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r, 
+<a name="l00366"></a>00366                        <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;tl);
+<a name="l00367"></a>00367       <span class="keywordtype">void</span> external_check(<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2" title="reactor ID type">reactor_id</a> r, 
+<a name="l00368"></a>00368                        <a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;tl);
+<a name="l00369"></a>00369 
+<a name="l00370"></a>00370 
+<a name="l00371"></a>00371       <span class="keyword">class </span>AgentProxy :<span class="keyword">public</span> TREX::transaction::TeleoReactor {
+<a name="l00372"></a>00372       <span class="keyword">public</span>:
+<a name="l00373"></a>00373        AgentProxy(<a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a> &amp;agent)
+<a name="l00374"></a>00374          :TREX::transaction::TeleoReactor(&amp;agent, <span class="stringliteral">&quot;&quot;</span>, 0, 0) {}
+<a name="l00375"></a>00375        ~AgentProxy() {}
+<a name="l00376"></a>00376        
+<a name="l00377"></a>00377        <span class="keywordtype">bool</span> postRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g) {
+<a name="l00378"></a>00378         <span class="keywordflow">if</span>( !isExternal(g-&gt;object()) )
+<a name="l00379"></a>00379             use(g-&gt;object());
+<a name="l00380"></a>00380         <span class="keywordflow">if</span>( isExternal(g-&gt;object()) )
+<a name="l00381"></a>00381             <span class="keywordflow">return</span> postGoal(g);
+<a name="l00382"></a>00382         <span class="keywordflow">else</span>
+<a name="l00383"></a>00383             syslog(<span class="stringliteral">&quot;ERROR&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Unable to subscribe to &quot;</span>&lt;&lt;g-&gt;object();
+<a name="l00384"></a>00384         <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00385"></a>00385        }
+<a name="l00386"></a>00386 
+<a name="l00387"></a>00387       <span class="keyword">private</span>:
+<a name="l00388"></a>00388        <span class="keywordtype">bool</span> synchronize() {
+<a name="l00389"></a>00389          <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00390"></a>00390        }
+<a name="l00391"></a>00391 
+<a name="l00392"></a>00392       };
+<a name="l00393"></a>00393       AgentProxy *m_proxy;
+<a name="l00394"></a>00394 
+<a name="l00395"></a>00395 
+<a name="l00453"></a>00453       <span class="keywordtype">void</span> loadConf(boost::property_tree::ptree::value_type &amp;conf);
+<a name="l00478"></a>00478       <span class="keywordtype">void</span> loadConf(std::string <span class="keyword">const</span> &amp;file_name);
 <a name="l00479"></a>00479 
-<a name="l00480"></a>00480       <span class="keywordtype">void</span> synchronize();
-<a name="l00481"></a>00481       
-<a name="l00482"></a>00482       <span class="keywordtype">bool</span> executeReactor();
-<a name="l00483"></a>00483 
-<a name="l00484"></a>00484       <span class="keywordtype">void</span> loadPlugin(boost::property_tree::ptree::value_type &amp;pg);
-<a name="l00485"></a>00485 
-<a name="l00487"></a>00487       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::PluginLoader&gt;</a> m_pg;
-<a name="l00488"></a>00488 
-<a name="l00489"></a>00489     }; <span class="comment">// TREX::agent::Agent</span>
+<a name="l00480"></a>00480       <span class="keyword">static</span> <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> initialTick(Clock *clk);
+<a name="l00481"></a>00481 
+<a name="l00482"></a>00482       Clock  *m_clock;  
+<a name="l00483"></a>00483       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a>    m_finalTick;
+<a name="l00484"></a>00484       <a class="code" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a752eb819094e8a8af4912f189fa3a609" title="reactors deliberation scheduling queue">priority_queue</a>             m_edf;
+<a name="l00485"></a>00485       std::list&lt;reactor_id&gt;      m_idle;
+<a name="l00486"></a>00486 
+<a name="l00487"></a>00487       <span class="keywordtype">void</span> synchronize();
+<a name="l00488"></a>00488       
+<a name="l00489"></a>00489       <span class="keywordtype">bool</span> executeReactor();
 <a name="l00490"></a>00490 
-<a name="l00491"></a>00491   } <span class="comment">// TREX::agent</span>
-<a name="l00492"></a>00492 } <span class="comment">// TREX</span>
-<a name="l00493"></a>00493 
-<a name="l00494"></a>00494 <span class="preprocessor">#endif</span>
+<a name="l00491"></a>00491       <span class="keywordtype">void</span> loadPlugin(boost::property_tree::ptree::value_type &amp;pg);
+<a name="l00492"></a>00492 
+<a name="l00494"></a>00494       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::PluginLoader&gt;</a> m_pg;
+<a name="l00495"></a>00495 
+<a name="l00496"></a>00496     }; <span class="comment">// TREX::agent::Agent</span>
+<a name="l00497"></a>00497 
+<a name="l00498"></a>00498   } <span class="comment">// TREX::agent</span>
+<a name="l00499"></a>00499 } <span class="comment">// TREX</span>
+<a name="l00500"></a>00500 
+<a name="l00501"></a>00501 <span class="preprocessor">#endif</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

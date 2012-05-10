@@ -22,6 +22,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>active_external</Name>
+      <APILanguage>c</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>d3/d7b/external_8hh.html</Path>
+    <Anchor>a3fce9d19835440e5270bf7c82167be02</Anchor>
+    <Abstract>Iterator though active external relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>external_set</Name>
       <APILanguage>c</APILanguage>
       <Type>tdef</Type>
@@ -67,7 +77,7 @@
       <Type>tdef</Type>
     </TokenIdentifier>
     <Path>dd/df5/namespaceTREX_1_1transaction_1_1details.html</Path>
-    <Anchor>a7bb1b72d9a849eabc974d7ff61cfddb4</Anchor>
+    <Anchor>a9e0da3a1c31b424d2c668ce167b6f4ff</Anchor>
     <Abstract>timeline client helper</Abstract>
   </Token>
   <Token>
@@ -89,6 +99,16 @@
     <Path>dd/df5/namespaceTREX_1_1transaction_1_1details.html</Path>
     <Anchor>a3ba22bd07cc3aca3060eafa8b6ae62c8</Anchor>
     <Abstract>A set of reactors.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>transaction_flags</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>dd/df5/namespaceTREX_1_1transaction_1_1details.html</Path>
+    <Anchor>ad90f9cc77944af41a229429158d6f85d</Anchor>
+    <Abstract>Reactor transaction flags.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -189,56 +209,6 @@
     <Path>d1/d5d/LogManager_8hh.html</Path>
     <Anchor>a67a7e4219ac5d30ea132c5f5aefe9f3e</Anchor>
     <Abstract>Default verbosity level.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>p_dlclose</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>db/d81/group__utils.html</Path>
-    <Anchor>gaf461c22af8a134ad93eb912bb3871b30</Anchor>
-    <Abstract>Close a dynamic library.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>p_dlerror</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>db/d81/group__utils.html</Path>
-    <Anchor>gaf785ca09d263e0eb84990305a3efd172</Anchor>
-    <Abstract>dynamic library error messages</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>p_dlext</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>db/d81/group__utils.html</Path>
-    <Anchor>gacf8ed29050e73a10bf7fc4bd3c358fcf</Anchor>
-    <Abstract>Dynamic library extension helper.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>p_dlopen</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>db/d81/group__utils.html</Path>
-    <Anchor>ga8b756aa2ec5e6f7028c7aba2110f1250</Anchor>
-    <Abstract>dynamic library load</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>p_dlsym</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>db/d81/group__utils.html</Path>
-    <Anchor>gad59cc820c06c31cbfa785db5bba5ed10</Anchor>
-    <Abstract>dynamic library symbol access</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -1444,7 +1414,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -1458,13 +1428,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -1538,6 +1518,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -1598,12 +1588,32 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>newTick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -1697,23 +1707,13 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>handleRecall</Name>
+      <Name>find_external</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a8af8f0667a8831c6ad364850c6136ab1</Anchor>
-    <Abstract>Goal recall callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleRequest</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ad168ea32ebb729f0c866c16d37462c9c</Anchor>
-    <Abstract>Goal reception callback.</Abstract>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -1797,6 +1797,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -1812,7 +1832,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -1842,8 +1862,116 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>compute</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>clm</Type>
+    </TokenIdentifier>
+    <Path>d7/d1e/classstarfish_1_1europa_1_1CalcDistanceConstraint.html</Path>
+    <Anchor>a185afaa59116a897c5a0fa26844e099e</Anchor>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>compute</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>clm</Type>
+    </TokenIdentifier>
+    <Path>d7/d1e/classstarfish_1_1europa_1_1CalcDistanceConstraint.html</Path>
+    <Anchor>ab8252482dfc11e4f2573007e21b77227</Anchor>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>SOLUTION</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>d7/d6c/classstarfish_1_1europa_1_1GoalManager.html</Path>
+    <Anchor>a964df307fc6794386c42a5afcc053514</Anchor>
+    <Abstract>Solution is a sequence of goal tokens. None can be rejected.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>createIterator</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d7/d6c/classstarfish_1_1europa_1_1GoalManager.html</Path>
+    <Anchor>aa5508c71cbcc498d0db99f538cd6dcb1</Anchor>
+    <Abstract>Handles the iteration. Will always impose a limit of the next goal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>SOLUTION</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>a0cc2353fafdff523a51a85f38e956ffb</Anchor>
+    <Abstract>Solution is a sequence of tokens. None can be rejected. Each has a 2d position.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>GoalManager_PR2</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>a3a77eb0362398e874e01396396003696</Anchor>
+    <Abstract>Uses standard constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>isNextToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>a8e6af7a4a43cb70433842cc7701f0c00</Anchor>
+    <Abstract>True if the token is the next in the plan.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>noMoreFlaws</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>aa0832919fd4ab16e261dcf16286dbbfb</Anchor>
+    <Abstract>True if the planner has no more work to do.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>reset</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>af511a58952d49863a81ac6b98329a725</Anchor>
+    <Abstract>Resets internal state.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>step</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>a801f2d3916fe17d11f0081f2dbf732ce</Anchor>
+    <Abstract>Steps the solver.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>~GoalManager_PR2</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+    <Anchor>aaaa31112b1845885dfae7fa02515f098</Anchor>
+    <Abstract>Destructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -1944,6 +2072,16 @@
     <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
     <Anchor>a98fd97db251ac6a8a6ab96502f14609f</Anchor>
     <Abstract>reactor relation type</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>reverse_graph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a505757bffa2e4376460ae2779b050f9b</Anchor>
+    <Abstract>Reverse of a reactor graph.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -2114,6 +2252,16 @@
     <Path>d8/d11/classTREX_1_1agent_1_1Agent.html</Path>
     <Anchor>ae89e4e2b888cb80d1327d2b26219fc6a</Anchor>
     <Abstract>Complete agent initialization.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_member</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a90f081ae6bc728fc76528b842e7f8607</Anchor>
+    <Abstract>Check if part of the graph.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -2602,7 +2750,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/dac/classTREX_1_1agent_1_1CycleDetector.html</Path>
-    <Anchor>a97e67bea3f14dad816fcc4b0984cc774</Anchor>
+    <Anchor>a39f21c7a8198ccb594caf9115cd0e097</Anchor>
     <Abstract>Check for node validity.</Abstract>
   </Token>
   <Token>
@@ -2932,7 +3080,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/dac/classTREX_1_1agent_1_1CycleDetector.html</Path>
-    <Anchor>a97e67bea3f14dad816fcc4b0984cc774</Anchor>
+    <Anchor>a39f21c7a8198ccb594caf9115cd0e097</Anchor>
     <Abstract>Check for node validity.</Abstract>
   </Token>
   <Token>
@@ -3021,128 +3169,38 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/dac/classTREX_1_1agent_1_1CycleDetector.html</Path>
-    <Anchor>a97e67bea3f14dad816fcc4b0984cc774</Anchor>
+    <Anchor>a39f21c7a8198ccb594caf9115cd0e097</Anchor>
     <Abstract>Check for node validity.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>active</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a06a7fc25af16fe49b59dea9559f34b42</Anchor>
-    <Abstract>Check if active.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
       <Name>Assembly</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a256ae8035fb2dc4484d3d9bea6cf88a4</Anchor>
+    <Anchor>aaca7d272416f554e7378f09334dd57c3</Anchor>
     <Abstract>Constructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>Assembly</Name>
+      <Name>clock</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ad85bdaad47ef9278e1e2237a653c8943</Anchor>
-    <Abstract>Constructor.</Abstract>
+    <Anchor>ac52dad47bc04ad7208a9b9849016d2e0</Anchor>
+    <Abstract>Clock variable.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>attribute</Name>
+      <Name>external</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a06b420836c583ae74b464d9985be3435</Anchor>
-    <Abstract>Extract an object attribute.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>check_default</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ad50cc53529886baedfa60d55e1b263a9</Anchor>
-    <Abstract>Check for default predicate.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>clock_advance</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a05015598a38e2d3c9b2f7e338f907e93</Anchor>
-    <Abstract>Update clock.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>configure_solver</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>af72bd4eff5f180baf6f3eeb31d213c33</Anchor>
-    <Abstract>Load solver configuration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>configure_solver</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ac7a07eda65e94bcdbf3926d8eba20d00</Anchor>
-    <Abstract>That plan solver configuration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>constraint_engine</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a69e1a30221899727e82ceea6e0e1deb5</Anchor>
-    <Abstract>Get europa constraint engine.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>convert</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ab9b68611039f8389693d0c04f946203a</Anchor>
-    <Abstract>Convert TREX ptredicate into an europa token.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>default_pred</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ad44a74a81f0fdda62763e4be8ba1877d</Anchor>
-    <Abstract>Access object default predicate.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>default_pred</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a47eade9aea60af20038c558d447640e2</Anchor>
-    <Abstract>Get default predicate value.</Abstract>
+    <Anchor>a79546dff7b5c70b6d0a10a37873a52eb</Anchor>
+    <Abstract>Check if external.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -3156,33 +3214,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>ignore</Name>
+      <Name>final_tick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ae4276ef25edd0337481b9eb0457781e5</Anchor>
-    <Abstract>Ignore a token.</Abstract>
+    <Anchor>a9a216b700755407ae9d4421db6276673</Anchor>
+    <Abstract>Final tick of the mission.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>ignore</Name>
+      <Name>ignored</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1f7df72571c49e40593b61164bc0be24</Anchor>
-    <Abstract>Ignore an object.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>ignore</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a6d82ffc764606b37fce35a1d77fa9f18</Anchor>
-    <Abstract>Set as ignored object.</Abstract>
+    <Anchor>ae6320dfee5592f8fce1203585c050519</Anchor>
+    <Abstract>Check if ignored.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -3192,25 +3240,27 @@
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
     <Anchor>a50dee9c17a7edef03f5147483fb86314</Anchor>
+    <Abstract>Check if ignored.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>in_deliberation</Name>
+      <Name>initial_tick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aabbf1a7948f457d904e341b89fabadef</Anchor>
+    <Anchor>a74ca23dcc0e3cac991e0f0dc068dd458</Anchor>
+    <Abstract>Initial mission tick.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>inactive</Name>
+      <Name>internal</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a3ec11a709786e251e678b5454723263a</Anchor>
-    <Abstract>Check if inactive.</Abstract>
+    <Anchor>a5e4295733216739ad3bb26098b40cb00</Anchor>
+    <Abstract>Check if internal.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -3224,183 +3274,223 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>invalid</Name>
+      <Name>is_action</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a5f644eb2642a31461ced2be13067aaca</Anchor>
-    <Abstract>Check if invalid.</Abstract>
+    <Anchor>a9087016f76d62cb6f02cb0d84a80bca8</Anchor>
+    <Abstract>Check if action.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isAgentTimeline</Name>
+      <Name>is_condition</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1b34155e61dcaafd908d9e7ebe7b6ceb</Anchor>
-    <Abstract>Check if TREX timeline.</Abstract>
+    <Anchor>ab3dcdea2b5ab10571acff2792e7504c4</Anchor>
+    <Abstract>Check for condition attribute.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isAgentTimeline</Name>
+      <Name>is_effect</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a880436661177dea4a6311aa73b17e6c2</Anchor>
-    <Abstract>Check if TREX timeline.</Abstract>
+    <Anchor>a827dfe87169891c05eae7e0716b7a093</Anchor>
+    <Abstract>Check for effect attribute.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isExternal</Name>
+      <Name>is_goal</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aeaeb737366e629ad14cf070bd3d7427f</Anchor>
-    <Abstract>Check if External.</Abstract>
+    <Anchor>a7f158edf20830f6217c5425d0e620904</Anchor>
+    <Abstract>Test if goal.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isExternal</Name>
+      <Name>is_predicate</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ad7f0982e42c8c434e0944e7ea7ba8178</Anchor>
-    <Abstract>Check if external.</Abstract>
+    <Anchor>aa495d4f8ca26acdc6d127554efcdf8a6</Anchor>
+    <Abstract>Check if predicate.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isIgnored</Name>
+      <Name>latency</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a410d0943f70bf2ca8f2228e5fbc524b0</Anchor>
-    <Abstract>Check if ignored.</Abstract>
+    <Anchor>a667fbd5f18de46938a7af1b21f112f0d</Anchor>
+    <Abstract>execution latency</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isIgnored</Name>
+      <Name>look_ahead</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a285b5e653bc107813eb3614a21b8629b</Anchor>
-    <Abstract>Check if ignored.</Abstract>
+    <Anchor>a141db6749ec008dcbce413a82f2a029f</Anchor>
+    <Abstract>planning look ahead</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isIgnored</Name>
+      <Name>now</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a0b9c957c0fd4990ca285ce91657dc518</Anchor>
-    <Abstract>Check if ignored.</Abstract>
+    <Anchor>a18e6f3bc95f0e5676dfc52fe88a047cb</Anchor>
+    <Abstract>Current tick.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isInternal</Name>
+      <Name>plan_scope</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aa365f8177a134b4428d9561dee71adea</Anchor>
-    <Abstract>Check if Internal.</Abstract>
+    <Anchor>ac121806cbf6079f8f99a5a61a8ca8d2e</Anchor>
+    <Abstract>Current scope of the plan.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>isInternal</Name>
+      <Name>tick_duration</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>afffd4a905c450497e2818523dd264057</Anchor>
-    <Abstract>Check if internal.</Abstract>
+    <Anchor>ad3327fd61d30247f21d83c28d54fb669</Anchor>
+    <Abstract>Tick duration.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>log</Name>
+      <Name>~Assembly</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a446590bdaafbb69f95bbfdc5309cc5f3</Anchor>
-    <Abstract>New log entry.</Abstract>
+    <Anchor>a1a99a3f361a192641db6fcda9488a067</Anchor>
+    <Abstract>Destructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>log</Name>
+      <Name>actions_supported</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>clm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a0b55b90ff316db2264004f2131f09d20</Anchor>
-    <Abstract>Log TREX message.</Abstract>
+    <Anchor>a22e07ba5b11936f48ee69e611560a83f</Anchor>
+    <Abstract>Check for support of actions.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>mode</Name>
+      <Name>external_iterator</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>tdef</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a07229b85c06d59fa55dad23ad4ef0efa</Anchor>
-    <Abstract>Access object mode.</Abstract>
+    <Anchor>a139a1e3090b9a38e9fb1f2647389e937</Anchor>
+    <Abstract>Iterator through TREX external state variables.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>mode</Name>
+      <Name>internal_iterator</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>tdef</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a07229b85c06d59fa55dad23ad4ef0efa</Anchor>
-    <Abstract>Get timeline mode.</Abstract>
+    <Anchor>a14090f7517b93599d78e0461ff4e11c3</Anchor>
+    <Abstract>Iterator through TREX internal state variables.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>name</Name>
+      <Name>state_iterator</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>tdef</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1c108d9676e517069a7903bec0fe037c</Anchor>
-    <Abstract>Assembly/reactor name.</Abstract>
+    <Anchor>a4f446f642143f9e20ac8dd41692ca509</Anchor>
+    <Abstract>Iterator through TREX state variables.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>plan_db</Name>
+      <Name>add_state_var</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a4b1156d1afeaaa97638ba63025b1ff02</Anchor>
-    <Abstract>Plan database access.</Abstract>
+    <Anchor>ad2a2c79037f0ff068fbdeadbed447b7e</Anchor>
+    <Abstract>Add TREX state variable.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>plan_db</Name>
+      <Name>configure_solvers</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a4b1156d1afeaaa97638ba63025b1ff02</Anchor>
-    <Abstract>Get europa plan database.</Abstract>
+    <Anchor>afeb090b44cfe4ac353c892ddde8716e3</Anchor>
+    <Abstract>Configure solvers.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>playTransaction</Name>
+      <Name>getFuturePlan</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ab8f2215bdbec4211af9a190809b5c7a5</Anchor>
-    <Abstract>Load nddl model.</Abstract>
+    <Anchor>acc44d81887914043f871a20ee3b1cbed</Anchor>
+    <Abstract>Gets the Future plan.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ignore</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a1f7df72571c49e40593b61164bc0be24</Anchor>
+    <Abstract>Mark as ignored.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>init_clock_vars</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a6f1c6fa50059a81142cb70686f62c6ca</Anchor>
+    <Abstract>Initialize plan clock varaiables.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>new_tick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a878795804ac5e3931818295b2bd754a9</Anchor>
+    <Abstract>New tick notification.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>planner</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a2548557a2c6801f1508ffe2699f6c07b</Anchor>
+    <Abstract>Planner.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -3414,493 +3504,93 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>rules_engine</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a4197a26e985b695f13d5e367987c095b</Anchor>
-    <Abstract>Get europa rules engine.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>schema</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>acefaf2dd910ec5609ad7c682649507f9</Anchor>
-    <Abstract>Get europa schema This method gives a direct acces to the schema used by euroopa...</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>schema</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>acefaf2dd910ec5609ad7c682649507f9</Anchor>
-    <Abstract>Get europa schema.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>set_filter</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a261f8d11cebaa3c75ef9f787ec855383</Anchor>
-    <Abstract>Set deliberation filter.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>setFinalTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ac60bbbf3170e277bcaf0690589f56002</Anchor>
-    <Abstract>Set final tick.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
       <Name>setStream</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a03f1deb2bbc433ef9f4dd768041ccb6c</Anchor>
-    <Abstract>Switch europa debug stream.</Abstract>
+    <Anchor>a88e7b55c84b0566537f107e64b3c52d9</Anchor>
+    <Abstract>Set debug output stream.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>setStream</Name>
+      <Name>synchronizer</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a03f1deb2bbc433ef9f4dd768041ccb6c</Anchor>
-    <Abstract>Reset Europa debug output stream.</Abstract>
+    <Anchor>a27044bded11488f2de4b4d8370895b1b</Anchor>
+    <Abstract>Synchronizer.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>setTickFactor</Name>
+      <Name>TREX_REGISTER_COMPONENT_FACTORY</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a0328e90f7b4ffaa5cf2d9635f3b77ae0</Anchor>
+    <Abstract>Add new component type to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>TREX_REGISTER_CONSTRAINT</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a889ce9f4d6a85417b8b26f3af8afcee4</Anchor>
+    <Abstract>Add new constraint type to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>TREX_REGISTER_FLAW_FILTER</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>ae6264ceacdb2b5c96cfd29b70126d909</Anchor>
+    <Abstract>Add new flaw filter to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>TREX_REGISTER_FLAW_HANDLER</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a2fee23b3586d54fb98aec3a7c6299592</Anchor>
+    <Abstract>Add new flaw handler to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>TREX_REGISTER_FLAW_MANAGER</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a4e51a2a424635f2a5367913326a3eba7</Anchor>
+    <Abstract>Add new flaw manager to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>TREX_REGISTER_MATCH_FINDER</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>macro</Type>
+    </TokenIdentifier>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>ae22878569d6da93f54c34f09c60c7b74</Anchor>
+    <Abstract>Add new Match finder to an Assembly.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>CosineConstraint</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a4114f61586ade4269babbfc9cb86a3dc</Anchor>
-    <Abstract>Set tick duration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>solver</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1f28e61dc187fce2ba1950e3a179acf9</Anchor>
-    <Abstract>Get solver.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>solver</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1f28e61dc187fce2ba1950e3a179acf9</Anchor>
-    <Abstract>Get the solver.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>trex_timelines</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a3b4c82d6666a840e68fb14b43babbecb</Anchor>
-    <Abstract>TREX timelines.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>trex_timelines</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a89f8c5ced5458f76a4a0b3000d16c9df</Anchor>
-    <Abstract>Get trex timelines.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~Assembly</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a746fbc70252262c1f230810bd1e65f38</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>EXTERNAL_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a1bb94252e07fce7c91de062ff240b2d6</Anchor>
-    <Abstract>Nddl external mode value.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>EXTERNAL_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a13aa83b10302bfe2c01125dd66d6fd5d</Anchor>
-    <Abstract>Europa external timelines descriptor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>IGNORE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aa41dbd82f0d68824fda003ead91ffb5a</Anchor>
-    <Abstract>Nddl ignored mode value.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>IGNORE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a6cdc064d1e1905b64e153e5466c60fc6</Anchor>
-    <Abstract>Europa ignored timelines descriptor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>INTERNAL_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a20193c9d7078a4b036113f921835135f</Anchor>
-    <Abstract>Nddl internal mode value.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>INTERNAL_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ac838fe61fbd03a241c3bb8b938604dbd</Anchor>
-    <Abstract>Europa internal timelines descriptor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>MISSION_END</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ab4ddfc1746112972d3e1502c1c33a7b1</Anchor>
-    <Abstract>Europa mission end variable.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>OBSERVE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aecb256042151445bb8864170962918d6</Anchor>
-    <Abstract>Nddl observed mode value.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>OBSERVE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>aa9e0637444554c0d767e824d2d70b679</Anchor>
-    <Abstract>Europa observed timelines descriptor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>PRIVATE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a4fe31b298875a6ba2967329daae73a08</Anchor>
-    <Abstract>Nddl private mode value.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>PRIVATE_MODE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ab362a13821fbd1b1dd4937c18fc1f17a</Anchor>
-    <Abstract>Europa private timelines descriptor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TICK_DURATION</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a53b1f48299aef37e84148306cd38bba6</Anchor>
-    <Abstract>tick duration variable</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_TIMELINE</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>ad095f7f9e7d1a5cc8e25c4de95c64317</Anchor>
-    <Abstract>TREX agent timelines.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>UNDEFINED_PRED</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
-    <Anchor>a65d498ecdb1911fcf764c336c5dceae2</Anchor>
-    <Abstract>undefined predicate name</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>CheckExternal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d3/d09/classTREX_1_1europa_1_1CheckExternal.html</Path>
-    <Anchor>a31ff97509805b78eb80b70be0d9e3af1</Anchor>
+    <Path>d6/da1/classTREX_1_1europa_1_1CosineConstraint.html</Path>
+    <Anchor>a512dcf601003d9f84517bc5d1483a369</Anchor>
     <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleExecute</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d3/d09/classTREX_1_1europa_1_1CheckExternal.html</Path>
-    <Anchor>a5b4c922ee0ff0bd25df5616b15e09b99</Anchor>
-    <Abstract>Constraint propagation.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>assembly</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html</Path>
-    <Anchor>a7fbd10497be4eba673913cf9f86f6a4b</Anchor>
-    <Abstract>Reactor Assembly.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>CheckInternal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>db/d52/classTREX_1_1europa_1_1CheckInternal.html</Path>
-    <Anchor>a402103ec01410bdf29ced4b680bfbcd0</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleExecute</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>db/d52/classTREX_1_1europa_1_1CheckInternal.html</Path>
-    <Anchor>ad159f2bbfa52943c25b379874cd4d848</Anchor>
-    <Abstract>Constraint propagation.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>assembly</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html</Path>
-    <Anchor>a7fbd10497be4eba673913cf9f86f6a4b</Anchor>
-    <Abstract>Reactor Assembly.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>xml_factory</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a839ea5f2da93a1008811ecf3a6275a0f</Anchor>
-    <Abstract>XML parsing factory for domains.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>accept</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>aceb7f9b063a5e0ef39db444f7af8516a</Anchor>
-    <Abstract>Visiting method.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>copy</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a996fbf0ebe5f9f5f995ea9bd373d6203</Anchor>
-    <Abstract>Duplicate method.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>equals</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a9ea4c43a2ad8f45b52be68f2697409aa</Anchor>
-    <Abstract>Equality test.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a6489c365527c7b31b57bbbb94dbe6a8a</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getStringSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>aa434ee34ab65d336bf058c96f08df0a5</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getTypedSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>af19d5e0a90239b23f9a700033b19fb7e</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getTypeName</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a75838b2548bf9907ed06d22099620500</Anchor>
-    <Abstract>type of the domain</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>intersect</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a57fa8a9f822f3b5bf981bea40db8ee83</Anchor>
-    <Abstract>check for common values</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isEnumerated</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a8ad13cb8121a9a9ca1cb49de90be5819</Anchor>
-    <Abstract>Check for enumerated domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isFull</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a788953125459faf2c69a902e552d9aaa</Anchor>
-    <Abstract>check for full domain</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isInterval</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>aa910caf56e359315b92aba443bac1a7b</Anchor>
-    <Abstract>Check for interval domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>af2e46a6798072c7cf17c02bb9a852fb2</Anchor>
-    <Abstract>check for singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator*=</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a5889e87988292d61174d54e1aac872e9</Anchor>
-    <Abstract>Restrict domain possible values.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>restrictWith</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a9b4c6142262b6a93870a21e687fed585</Anchor>
-    <Abstract>Restrict domain possible values.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>toXml</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-    <Anchor>a2a00b51fdab8e3b2ea48b83908973cdb</Anchor>
-    <Abstract>XML conversion.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -3974,36 +3664,6 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>copy</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>a1fb711699a9dcdff9715e617214fa61a</Anchor>
-    <Abstract>Duplicate method.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>copy</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>a1fb711699a9dcdff9715e617214fa61a</Anchor>
-    <Abstract>Duplicate method.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>copy</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>a1fb711699a9dcdff9715e617214fa61a</Anchor>
-    <Abstract>Duplicate method.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
       <Name>end</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4021,36 +3681,6 @@
     <Path>d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html</Path>
     <Anchor>aa7ca1fd449d6da49e946a21ebbf55852</Anchor>
     <Abstract>Equality test.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>EuropaEntity</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>a9562935034133c6389619ce7a9229b10</Anchor>
-    <Abstract>XML parsing constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>EuropaEntity</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>abbfa6dad2acdf49a487d8406a56a5abe</Anchor>
-    <Abstract>Singleont instance.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>EuropaEntity</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>a88cc44c2c4dc9f9bb74106b0d5b4cfe9</Anchor>
-    <Abstract>Constructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4214,16 +3844,6 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>type_name</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>data</Type>
-    </TokenIdentifier>
-    <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-    <Anchor>ad43b9d232353b076257ba9cb5d29095f</Anchor>
-    <Abstract>Type name.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
       <Name>EuropaException</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4231,16 +3851,6 @@
     <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
     <Anchor>a12aed8e766cdab56fae131db55ddd289</Anchor>
     <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~EuropaException</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
-    <Anchor>aaeb793f3884dbe912936411686da8164</Anchor>
-    <Abstract>Destructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4264,253 +3874,63 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>xml_factory</Name>
+      <Name>TREX_REGISTER_COMPONENT_FACTORY</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a839ea5f2da93a1008811ecf3a6275a0f</Anchor>
-    <Abstract>XML parsing factory for domains.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a0328e90f7b4ffaa5cf2d9635f3b77ae0</Anchor>
+    <Abstract>Add new component type to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>accept</Name>
+      <Name>TREX_REGISTER_CONSTRAINT</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>aceb7f9b063a5e0ef39db444f7af8516a</Anchor>
-    <Abstract>Visiting method.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a889ce9f4d6a85417b8b26f3af8afcee4</Anchor>
+    <Abstract>Add new constraint type to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>copy</Name>
+      <Name>TREX_REGISTER_FLAW_FILTER</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a193ffd38f5c05901a6bdb34fd5b290c3</Anchor>
-    <Abstract>Duplicate method.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>ae6264ceacdb2b5c96cfd29b70126d909</Anchor>
+    <Abstract>Add new flaw filter to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>copy</Name>
+      <Name>TREX_REGISTER_FLAW_HANDLER</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>aed716c4e5561ddc671ce74516e4d616e</Anchor>
-    <Abstract>Duplicate method.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a2fee23b3586d54fb98aec3a7c6299592</Anchor>
+    <Abstract>Add new flaw handler to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>equals</Name>
+      <Name>TREX_REGISTER_FLAW_MANAGER</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>aa03d5a7aa5401b98023ded00c4e452c4</Anchor>
-    <Abstract>Equality test.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>a4e51a2a424635f2a5367913326a3eba7</Anchor>
+    <Abstract>Add new flaw manager to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>equals</Name>
+      <Name>TREX_REGISTER_MATCH_FINDER</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
+      <Type>macro</Type>
     </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a6fe3fe7f989e3934d0b4a1ba6b1a698a</Anchor>
-    <Abstract>Equality test.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a6489c365527c7b31b57bbbb94dbe6a8a</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getStringSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>aa434ee34ab65d336bf058c96f08df0a5</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getTypedSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>af19d5e0a90239b23f9a700033b19fb7e</Anchor>
-    <Abstract>singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getTypeName</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a75838b2548bf9907ed06d22099620500</Anchor>
-    <Abstract>type of the domain</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>intersect</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>ac2cab40119e76c61e5d845d0ba14b1bb</Anchor>
-    <Abstract>check for common values</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>intersect</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>abdf6520fbbd2d58e64b30115f6c43be1</Anchor>
-    <Abstract>check for common values</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isEnumerated</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a5358ef4bc3979ce62b2374decdd6e36b</Anchor>
-    <Abstract>Check for enumerated domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isEnumerated</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a5358ef4bc3979ce62b2374decdd6e36b</Anchor>
-    <Abstract>Check for enumerated domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isFull</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a28971a7c73ccf6a936aa0a20fab37250</Anchor>
-    <Abstract>check for full domain</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isFull</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a0f9765349070033c97471726af49d728</Anchor>
-    <Abstract>check for full domain</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isInterval</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>ab12a60d2718a943c66c8caa290b67340</Anchor>
-    <Abstract>Check for interval domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isInterval</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>ab12a60d2718a943c66c8caa290b67340</Anchor>
-    <Abstract>Check for interval domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a9eac132fe5d532a609dce9499c919f60</Anchor>
-    <Abstract>check for singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isSingleton</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a9eac132fe5d532a609dce9499c919f60</Anchor>
-    <Abstract>check for singleton value</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator*=</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>a5889e87988292d61174d54e1aac872e9</Anchor>
-    <Abstract>Restrict domain possible values.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>restrictWith</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a2dd2d5f5741aab8baa58202a5ed679e7</Anchor>
-    <Abstract>Restrict domain possible values.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>restrictWith</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a8a34ce25bc2d079cf36385429c831252</Anchor>
-    <Abstract>Restrict domain possible values.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>toXml</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>a466bb7fad0d916404e108828d90b2fa5</Anchor>
-    <Abstract>XML conversion.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>toXml</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-    <Anchor>abc6a4a236b1d5564cebb78c3b93b9abe</Anchor>
-    <Abstract>XML conversion.</Abstract>
+    <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+    <Anchor>ae22878569d6da93f54c34f09c60c7b74</Anchor>
+    <Abstract>Add new Match finder to an Assembly.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4560,7 +3980,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4574,13 +3994,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4654,6 +4084,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4714,12 +4154,32 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>newTick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -4774,6 +4234,56 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>external_iterator</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a139a1e3090b9a38e9fb1f2647389e937</Anchor>
+    <Abstract>Iterator through TREX external state variables.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>internal_iterator</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a14090f7517b93599d78e0461ff4e11c3</Anchor>
+    <Abstract>Iterator through TREX internal state variables.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>state_iterator</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a4f446f642143f9e20ac8dd41692ca509</Anchor>
+    <Abstract>Iterator through TREX state variables.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>add_state_var</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>ad2a2c79037f0ff068fbdeadbed447b7e</Anchor>
+    <Abstract>Add TREX state variable.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>clock</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>ac52dad47bc04ad7208a9b9849016d2e0</Anchor>
+    <Abstract>Clock variable.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>completedGoal</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4781,6 +4291,236 @@
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>ad21eb1f4f7dd6affb3e4b4fe1f256a93</Anchor>
     <Abstract>Goal completion.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>configure_solvers</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>afeb090b44cfe4ac353c892ddde8716e3</Anchor>
+    <Abstract>Configure solvers.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a79546dff7b5c70b6d0a10a37873a52eb</Anchor>
+    <Abstract>Check if external.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a9be56798df78a332c496b77f851e2c4c</Anchor>
+    <Abstract>Check if external.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>failed_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ab028a1fb11c29f940332fcb3879af240</Anchor>
+    <Abstract>Request for external failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>failed_internal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ae462eb24d0e453b00ff806f27f9678bd</Anchor>
+    <Abstract>Request for internal failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getFuturePlan</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>acc44d81887914043f871a20ee3b1cbed</Anchor>
+    <Abstract>Gets the Future plan.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>handleInit</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a0dc3f1541b93b79ecc88f5aca63c2b8e</Anchor>
+    <Abstract>reactor initialiszation callback</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>handleRecall</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a58a5315bb67e641c10ffb37dc8c6a330</Anchor>
+    <Abstract>Goal recall callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>handleRequest</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a414a23ef61e5447ba964c7ab30ccde8c</Anchor>
+    <Abstract>Goal reception callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>handleTickStart</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a254bf341624b6e3342fc0de2115338b3</Anchor>
+    <Abstract>New tick callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>hasWork</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>ac3768314965a8d80f0f734da98da0010</Anchor>
+    <Abstract>Check if need to deliberate.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ignore</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a1f7df72571c49e40593b61164bc0be24</Anchor>
+    <Abstract>Mark as ignored.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ignored</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>ae6320dfee5592f8fce1203585c050519</Anchor>
+    <Abstract>Check if ignored.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ignored</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a50dee9c17a7edef03f5147483fb86314</Anchor>
+    <Abstract>Check if ignored.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>init_clock_vars</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a6f1c6fa50059a81142cb70686f62c6ca</Anchor>
+    <Abstract>Initialize plan clock varaiables.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>internal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a5e4295733216739ad3bb26098b40cb00</Anchor>
+    <Abstract>Check if internal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>internal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>ac97b4ad8198bbccf2c90bf0545761131</Anchor>
+    <Abstract>Check if internal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_action</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a9087016f76d62cb6f02cb0d84a80bca8</Anchor>
+    <Abstract>Check if action.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_condition</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>ab3dcdea2b5ab10571acff2792e7504c4</Anchor>
+    <Abstract>Check for condition attribute.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_effect</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a827dfe87169891c05eae7e0716b7a093</Anchor>
+    <Abstract>Check for effect attribute.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_goal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a7f158edf20830f6217c5425d0e620904</Anchor>
+    <Abstract>Test if goal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>is_predicate</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>aa495d4f8ca26acdc6d127554efcdf8a6</Anchor>
+    <Abstract>Check if predicate.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4814,6 +4554,45 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>new_tick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a878795804ac5e3931818295b2bd754a9</Anchor>
+    <Abstract>New tick notification.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>notify</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a7c194a5304a2e1a12a566b667e6b92c5</Anchor>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>planner</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a2548557a2c6801f1508ffe2699f6c07b</Anchor>
+    <Abstract>Planner.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>playTransaction</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a032b448b67f81e5f1ddc21ea5fac9ba9</Anchor>
+    <Abstract>Load a model.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postGoal</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4844,6 +4623,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -4859,8 +4658,48 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>resume</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a214cd67eb4ae44ad6902632206014598</Anchor>
+    <Abstract>Deliberation step callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>setStream</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a88e7b55c84b0566537f107e64b3c52d9</Anchor>
+    <Abstract>Set debug output stream.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>synchronize</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+    <Anchor>a2732ec555fbe8f2b8782c77cec76e97b</Anchor>
+    <Abstract>Synchronization callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>synchronizer</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a27044bded11488f2de4b4d8370895b1b</Anchor>
+    <Abstract>Synchronizer.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4879,8 +4718,128 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>actions_supported</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>clm</Type>
+    </TokenIdentifier>
+    <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+    <Anchor>a22e07ba5b11936f48ee69e611560a83f</Anchor>
+    <Abstract>Check for support of actions.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>SineConstraint</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d04/classTREX_1_1europa_1_1SineConstraint.html</Path>
+    <Anchor>a91c2f4348a879b82fa6edbe39146adda</Anchor>
+    <Abstract>Constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>europa_domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a05cc8c1cbcdfd39978ccf777e2078793</Anchor>
+    <Abstract>Copy constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>europa_domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a74b206a56449a32c2ae99036b7db1ca0</Anchor>
+    <Abstract>Constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>europa_domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a6d68f73d82afaf3902391845872e9e7d</Anchor>
+    <Abstract>Constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>europa_domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>ad0d57a7971b38b0bcf2e8994f209315d</Anchor>
+    <Abstract>Constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>visit</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a697e2c669addfd5aa24caa82c1906f19</Anchor>
+    <Abstract>Default visit.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>visit</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>afa72131195772c1d65518fc5a821dd55</Anchor>
+    <Abstract>Interval domain visit.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>visit</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>ab52ad0157f570210e90ce0804dd03f0d</Anchor>
+    <Abstract>Enumerated domain visit.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>~europa_domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a6dc19ab6b90b6732cdf536eb4ee7bc78</Anchor>
+    <Abstract>destructor</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a123cece913227188c271b67d2835cbff</Anchor>
+    <Abstract>Get europa domain.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>domain</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
+    <Anchor>a7b8be749bf654fc908e734a0e3933547</Anchor>
+    <Abstract>Get europa domain.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -4908,8 +4867,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a6507733c48969b5214a6cc0c4d47f853</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a9ab04b1905d844ee16949e5e4da2a84c</Anchor>
     <Abstract>Duplicate method.</Abstract>
   </Token>
   <Token>
@@ -4918,8 +4877,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a19bcdc05c641fbfd36f4a14ab882f379</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>ac3f3c9430cb90a227a0759fbd160aa99</Anchor>
     <Abstract>Equality test.</Abstract>
   </Token>
   <Token>
@@ -4968,8 +4927,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
-    <Anchor>ab800e37b5e479d06899d83bb314e71ff</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a297fc1650cc5742fc485593f537b0cb6</Anchor>
     <Abstract>check for common values</Abstract>
   </Token>
   <Token>
@@ -4978,8 +4937,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a0dd4baf13c3492565af0d421630da440</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>afbfbdb73989b40d4a412e89e19f93f76</Anchor>
     <Abstract>Check for enumerated domain.</Abstract>
   </Token>
   <Token>
@@ -4988,8 +4947,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a48118871612acab9b24b167bc10c6b42</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a5d80cdf245c3a532095231c2ac149acd</Anchor>
     <Abstract>check for full domain</Abstract>
   </Token>
   <Token>
@@ -4998,8 +4957,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a0416aadfa37d2a5664c1ab5677ef1313</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>aa042936b534d0f7b7a1faa8b1b6cdc54</Anchor>
     <Abstract>Check for interval domain.</Abstract>
   </Token>
   <Token>
@@ -5008,8 +4967,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a0e8361b1d9428c593968bc6247ab02e9</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a16e47d94a20ed646afd36609c1c9e07e</Anchor>
     <Abstract>check for singleton value</Abstract>
   </Token>
   <Token>
@@ -5028,8 +4987,8 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>a6400a853fc2eb047a5a27990b6566c31</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a904ec26283efa214f4f7c61b55ec9a95</Anchor>
     <Abstract>Restrict domain possible values.</Abstract>
   </Token>
   <Token>
@@ -5038,409 +4997,39 @@
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
-    <Anchor>ab5ee6fd5ded1e41dfc3e7b46e55c4b5a</Anchor>
+    <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
+    <Anchor>a98a5147445d59cb8bf2ed501ae853ae9</Anchor>
     <Abstract>XML conversion.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>ReactorConstraint</Name>
+      <Name>active</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html</Path>
-    <Anchor>ad3374c78378fde455ba18a884b678034</Anchor>
+    <Path>d4/d94/classTREX_1_1europa_1_1details_1_1scoped__split.html</Path>
+    <Anchor>abe3a55ba4c5549c9c90486f343e253b5</Anchor>
+    <Abstract>Get active token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>scoped_split</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d4/d94/classTREX_1_1europa_1_1details_1_1scoped__split.html</Path>
+    <Anchor>a77c4404137b73771c5b24366c226ff67</Anchor>
     <Abstract>Constructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>~ReactorConstraint</Name>
+      <Name>~scoped_split</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
-    <Path>d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html</Path>
-    <Anchor>a3629049c7d06c9d449f251c4a7bd012c</Anchor>
+    <Path>d4/d94/classTREX_1_1europa_1_1details_1_1scoped__split.html</Path>
+    <Anchor>ac8f1d429a4fc0a620ad6afaa2648f612</Anchor>
     <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>assembly</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html</Path>
-    <Anchor>a7fbd10497be4eba673913cf9f86f6a4b</Anchor>
-    <Abstract>Reactor Assembly.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~ReactorPropagator</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html</Path>
-    <Anchor>af9172be4a08e8374b12d41553a7c56cf</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~ReactorPropagator</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html</Path>
-    <Anchor>af9172be4a08e8374b12d41553a7c56cf</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>registerComponents</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a33c44fe49d9f175022f38e0f7df85d47</Anchor>
-    <Abstract>New compoentnet registration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>registerComponents</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a33c44fe49d9f175022f38e0f7df85d47</Anchor>
-    <Abstract>New compoentnet registration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~SchemaPlugin</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>aef16e68ceeead91eb107726f3987478a</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~SchemaPlugin</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>aef16e68ceeead91eb107726f3987478a</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>SchemaPlugin</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a4cfb438f62243d50ef2fbf5ef2a80be6</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>SchemaPlugin</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a4cfb438f62243d50ef2fbf5ef2a80be6</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_REGISTER_COMPONENT_FACTORY</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>macro</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a0328e90f7b4ffaa5cf2d9635f3b77ae0</Anchor>
-    <Abstract>register a new component factory</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_REGISTER_CONSTRAINT</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>macro</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a889ce9f4d6a85417b8b26f3af8afcee4</Anchor>
-    <Abstract>register a new constraint</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_REGISTER_FLAW_FILTER</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>macro</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>ae6264ceacdb2b5c96cfd29b70126d909</Anchor>
-    <Abstract>register a new flaw filter</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_REGISTER_FLAW_HANDLER</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>macro</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a2fee23b3586d54fb98aec3a7c6299592</Anchor>
-    <Abstract>register a new flaw handler</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TREX_REGISTER_FLAW_MANAGER</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>macro</Type>
-    </TokenIdentifier>
-    <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
-    <Anchor>a4e51a2a424635f2a5367913326a3eba7</Anchor>
-    <Abstract>register a new flaw manager</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TokenError</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-    <Anchor>ac3c2797a8597bd82ef8a4a4d2263fcec</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>TokenError</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-    <Anchor>aa36bc2aedb276959cf5318851abeb2d9</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>~TokenError</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-    <Anchor>ae2c5c279b85741ed643485b33661b7f2</Anchor>
-    <Abstract>Destructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>print_to</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>db/d94/classTREX_1_1utils_1_1Exception.html</Path>
-    <Anchor>a20d0d2f8c830f1dacb4b42e8d129f421</Anchor>
-    <Abstract>output method</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>europa_domain</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a74b206a56449a32c2ae99036b7db1ca0</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>europa_domain</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a6d68f73d82afaf3902391845872e9e7d</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>europa_domain</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>ad0d57a7971b38b0bcf2e8994f209315d</Anchor>
-    <Abstract>Constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a23a8558c96e7c8d2d062f0c8313e47e3</Anchor>
-    <Abstract>Default visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a76759e678dbc51cb2909ad23ada17351</Anchor>
-    <Abstract>Interval domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a63dda805f979c298e88bec929b8d46d1</Anchor>
-    <Abstract>Enumerated domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a23a8558c96e7c8d2d062f0c8313e47e3</Anchor>
-    <Abstract>Default visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a76759e678dbc51cb2909ad23ada17351</Anchor>
-    <Abstract>Interval domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a63dda805f979c298e88bec929b8d46d1</Anchor>
-    <Abstract>Enumerated domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a6b37b0040005d51f63af450a11eef724</Anchor>
-    <Abstract>Default visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>ad9e3ef769a199055ebcf4e66909c41c3</Anchor>
-    <Abstract>Interval domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>visit</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a2bae2c98783c176d45c6e25214f6f3f8</Anchor>
-    <Abstract>Enumerated domain visit.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>domain</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a123cece913227188c271b67d2835cbff</Anchor>
-    <Abstract>Get domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>domain</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-    <Anchor>a7b8be749bf654fc908e734a0e3933547</Anchor>
-    <Abstract>Get domain.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>registerComponents</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>ac1a57d4ba47f0feaafa3447805d5d18a</Anchor>
-    <Abstract>europa extensions injection</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>registerComponents</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>ac1a57d4ba47f0feaafa3447805d5d18a</Anchor>
-    <Abstract>europa extensions injection</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>setStream</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>aa346a5000208e5970f64101ccdb61563</Anchor>
-    <Abstract>Create Debug output stream.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>setStream</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>ad3eac1173caef3b2bd5a8e9859ac70f2</Anchor>
-    <Abstract>Set Debug output stream.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>setStream</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>aa346a5000208e5970f64101ccdb61563</Anchor>
-    <Abstract>Create Debug output stream.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>setStream</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
-    <Anchor>ad3eac1173caef3b2bd5a8e9859ac70f2</Anchor>
-    <Abstract>Set Debug output stream.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -5490,7 +5079,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -5504,13 +5093,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -5584,6 +5183,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -5644,6 +5253,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>Light</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -5659,7 +5288,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -5763,6 +5392,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>handleInit</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -5853,6 +5492,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -5868,7 +5527,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -5898,7 +5557,526 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
+    <Abstract>External timeline declaration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>external_iterator</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a8732d422d9951bde9c8fb33c702d18ff</Anchor>
+    <Abstract>Iterator other external timelines.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ref_type</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a1df6347b2d49a9b7b5a19695a35c4a6b</Anchor>
+    <Abstract>Reactor reference type.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>size_type</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a4a82613363d6c1dfb380d73165b888a7</Anchor>
+    <Abstract>size type</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>xml_arg_type</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a220daced8bfd779d72905a7d28276000</Anchor>
+    <Abstract>XML construction info.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>xml_factory</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
+    <Abstract>XML based factory.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>Auv</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d0a/classTREX_1_1startrex_1_1Auv.html</Path>
+    <Anchor>aa56e910fe744eb0fb12e29c4f22b5ccb</Anchor>
+    <Abstract>XML constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_externals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a29c22ff5792359d9dd5b87373f72bc25</Anchor>
+    <Abstract>Number of External timelines.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internal_relations</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>doSynchronize</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a129024145aba1e2b36f5f5c434fb4b4d</Anchor>
+    <Abstract>Synchronization callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ext_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a6b169e717e60724db87abbff21fffd83</Anchor>
+    <Abstract>beginning of External timelines set</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>ext_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a74127fd53f9d89f938c7ab1273a2f59d</Anchor>
+    <Abstract>end of External timelines set</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getAgentName</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a94f89daf3b2f2e58380ecf7d543f1d04</Anchor>
+    <Abstract>get &quot;agent&quot; name</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getCurrentTick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ae8ea840f31e81735b8b0481f0608d535</Anchor>
+    <Abstract>Get current tick.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getExecLatency</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>add69075d64568c035f0a83fc1824a57c</Anchor>
+    <Abstract>reactor execution latency</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getFinalTick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aef17ce86509d19a00792feccbcf84a67</Anchor>
+    <Abstract>Get final tick.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getGraphName</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ab4a83407c7ad5fc27cc9ab70a0c5d630</Anchor>
+    <Abstract>Get graph name.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getInitialTick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a10b44ea7bbeb13a23528f82c3c7c78c3</Anchor>
+    <Abstract>reactor initial tick</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getLatency</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a9f1b95cdfe53ed059969452c9f250e82</Anchor>
+    <Abstract>reactor latency</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getLookAhead</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa85f8e0c6f77b4f9eff83d829fe3dba6</Anchor>
+    <Abstract>Get reactor look-ahead.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>getName</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a8facf8e8ea1ba386fa07bffb25881379</Anchor>
+    <Abstract>Reactor name.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>initialize</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>abdfbc3a11ed2046f2fa6a8ed707b7aab</Anchor>
+    <Abstract>Final initialization.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>newTick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
+    <Abstract>New tick notification callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>notify</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a184feb70d4f444edb13fd627bd3b26be</Anchor>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>step</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ae1f44350631b953137d17ab53efa4707</Anchor>
+    <Abstract>Deliberation step.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>tickDuration</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aae9a63f545390491e4721b8b74e05585</Anchor>
+    <Abstract>Tick duration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>tickToTime</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5ecfd6df6f39f6b6575e3853e8630fa7</Anchor>
+    <Abstract>tick to unix time conversion</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>timeToTick</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a710edd7eefe154b521e75dd42b3bf635</Anchor>
+    <Abstract>unix time to tick conversion</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>workRatio</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a94fcfd208b96e964b5503934dfa7debf</Anchor>
+    <Abstract>reactor deliberation work load</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>~Auv</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>dc/d0a/classTREX_1_1startrex_1_1Auv.html</Path>
+    <Anchor>a2e033642108d882005df96b090665397</Anchor>
+    <Abstract>Destructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>completedGoal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ad21eb1f4f7dd6affb3e4b4fe1f256a93</Anchor>
+    <Abstract>Goal completion.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>failed_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ab028a1fb11c29f940332fcb3879af240</Anchor>
+    <Abstract>Request for external failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>failed_internal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ae462eb24d0e453b00ff806f27f9678bd</Anchor>
+    <Abstract>Request for internal failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>handleTickStart</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a84bf72ed467a7f76cec0fa3714f0df80</Anchor>
+    <Abstract>New tick callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>hasWork</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a9f4efc90e8e0fb488f788b921546f802</Anchor>
+    <Abstract>Check if need to deliberate.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>isExternal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a41d3bf0d0663f3ff4469686dc6878d01</Anchor>
+    <Abstract>Check for exeternal timeline.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>isInternal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a9d8c2a89f8940138216a1f7821adfb04</Anchor>
+    <Abstract>Check for internal timeline.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>manager</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a975231dd2846e0a806833f93d79dabb5</Anchor>
+    <Abstract>LogManager acces point.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postGoal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>ad804655ec0e631ec942761efabb45e34</Anchor>
+    <Abstract>Post a goal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postGoal</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7a7dccda4fe6c2d33067f56d234eda5b</Anchor>
+    <Abstract>Post a goal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postObservation</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9840ea85833e5e458ac215635266316</Anchor>
+    <Abstract>Produce an observation.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postRecall</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a4e7cd4e809a411032c47e66eb09fa8d7</Anchor>
+    <Abstract>Recall a goal.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>provide</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
+    <Abstract>Internal timeline declaration.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>resume</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a2d5869fac84e5e6f9170132a47fd1d1c</Anchor>
+    <Abstract>Deliberation step callback.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>syslog</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>abde1d28e37984ab0a0ae71a6023bcd8b</Anchor>
+    <Abstract>new log entry</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>use</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -8152,6 +8330,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>reverse_graph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>tdef</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a505757bffa2e4376460ae2779b050f9b</Anchor>
+    <Abstract>Reverse of a reactor graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>xml_factory</Name>
       <APILanguage>cpp</APILanguage>
       <Type>tdef</Type>
@@ -8292,6 +8480,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>is_member</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a90f081ae6bc728fc76528b842e7f8607</Anchor>
+    <Abstract>Check if part of the graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>isolate</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -8369,6 +8567,26 @@
     <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
     <Anchor>aeb62eaf197cdcb4800fa016eebc3d55a</Anchor>
     <Abstract>Destructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>external_check</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a10410563e8e2a4ef51459526edc68311</Anchor>
+    <Abstract>Check for external timeline creation.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>internal_check</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>d5/d45/classTREX_1_1transaction_1_1graph.html</Path>
+    <Anchor>a40dcb829132eac2d19cc7a7965cef940</Anchor>
+    <Abstract>Check for internal timeline creation.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -8532,6 +8750,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>timeline_failure</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>func</Type>
+    </TokenIdentifier>
+    <Path>de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html</Path>
+    <Anchor>a89e12bd4abb7829cb42ba0b7c2416344</Anchor>
+    <Abstract>Constructor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>~timeline_failure</Name>
       <APILanguage>cpp</APILanguage>
       <Type>func</Type>
@@ -8549,16 +8777,6 @@
     <Path>db/d94/classTREX_1_1utils_1_1Exception.html</Path>
     <Anchor>a20d0d2f8c830f1dacb4b42e8d129f421</Anchor>
     <Abstract>output method</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>timeline_failure</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>func</Type>
-    </TokenIdentifier>
-    <Path>de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html</Path>
-    <Anchor>a89e12bd4abb7829cb42ba0b7c2416344</Anchor>
-    <Abstract>Constructor.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -9722,7 +9940,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -9736,13 +9954,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -9816,6 +10044,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -9876,12 +10114,32 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>newTick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -9971,6 +10229,16 @@
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>ad21eb1f4f7dd6affb3e4b4fe1f256a93</Anchor>
     <Abstract>Goal completion.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -10074,6 +10342,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -10089,7 +10377,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -10119,7 +10407,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -11010,7 +11298,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -11024,13 +11312,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -11104,6 +11402,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -11164,12 +11472,32 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>newTick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -11198,7 +11526,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a53fc74252cbfbc3b6703c66432a02a5f</Anchor>
+    <Anchor>a8499db1d82809eb0703f9a6741b35186</Anchor>
     <Abstract>XML based constructor.</Abstract>
   </Token>
   <Token>
@@ -11280,6 +11608,16 @@
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>ae462eb24d0e453b00ff806f27f9678bd</Anchor>
     <Abstract>Request for internal failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -11393,6 +11731,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -11408,7 +11766,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -11458,7 +11816,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -11648,7 +12006,7 @@
       <Type>tdef</Type>
     </TokenIdentifier>
     <Path>dd/df5/namespaceTREX_1_1transaction_1_1details.html</Path>
-    <Anchor>a7bb1b72d9a849eabc974d7ff61cfddb4</Anchor>
+    <Anchor>a9e0da3a1c31b424d2c668ce167b6f4ff</Anchor>
     <Abstract>timeline client helper</Abstract>
   </Token>
   <Token>
@@ -11663,33 +12021,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>pointer</Name>
+      <Name>transaction_flags</Name>
       <APILanguage>cpp</APILanguage>
       <Type>tdef</Type>
     </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>a2abd32285530e04fc52faf9825241d17</Anchor>
-    <Abstract>Pointer type.</Abstract>
+    <Path>dd/df5/namespaceTREX_1_1transaction_1_1details.html</Path>
+    <Anchor>ad90f9cc77944af41a229429158d6f85d</Anchor>
+    <Abstract>Reactor transaction flags.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>reference</Name>
+      <Name>active</Name>
       <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
+      <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>a1d3d7198a49a693046136aa96b8a1a9f</Anchor>
-    <Abstract>Reference type.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>value_type</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>a2951bb661bf8f4d1f7e3186688525bc6</Anchor>
-    <Abstract>Stored type.</Abstract>
+    <Anchor>a77ec31aa293500a978ce4c4348d64491</Anchor>
+    <Abstract>Check if active.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -11720,56 +12068,6 @@
     <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
     <Anchor>a7f8938ee4da51709273a25758ca3fc07</Anchor>
     <Abstract>Default constructor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator!=</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>ab6fe75f1798b3d346090cd13e181adab</Anchor>
-    <Abstract>Difference test.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator*</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>ad5c0b7cb4165538cae6c08726a66cec7</Anchor>
-    <Abstract>Relation access.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator++</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>ab1a0c022e17cecf85e087dddb344e995</Anchor>
-    <Abstract>Next external.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator-&gt;</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>a3160f4265aa71ae9711edaac924aad2b</Anchor>
-    <Abstract>Relation access.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>operator==</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d02/classTREX_1_1transaction_1_1details_1_1external.html</Path>
-    <Anchor>aa74bba0416c946a9f2518e3333ec027f</Anchor>
-    <Abstract>Equality test.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -11850,6 +12148,16 @@
     <Path>d8/de6/structTREX_1_1transaction_1_1details_1_1graph__vertex__name__map.html</Path>
     <Anchor>ad62c943ece6c5583b2ae1b05cf1e492f</Anchor>
     <Abstract>Reactor name accessor.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>operator()</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>func</Type>
+    </TokenIdentifier>
+    <Path>d1/d99/structTREX_1_1transaction_1_1details_1_1is__active__external.html</Path>
+    <Anchor>a2dc5caebf1a07ecb46dbef0566077ab4</Anchor>
+    <Abstract>check if active</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -12058,7 +12366,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html</Path>
-    <Anchor>a1caad9d3d7556d3da81d98e7b48ba6e8</Anchor>
+    <Anchor>a69892bf6f13832fb79cb326e59594ecb</Anchor>
     <Abstract>Constructor.</Abstract>
   </Token>
   <Token>
@@ -13017,7 +13325,7 @@
     </TokenIdentifier>
     <Path>dc/d45/classTREX_1_1utils_1_1id__mapper.html</Path>
     <Anchor>ab540192d8580b66c54bcd13f4b5b4bb6</Anchor>
-    <Abstract>iterator comaparison to a key</Abstract>
+    <Abstract>iterator comparison to a key</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -13445,7 +13753,7 @@
       <Type>tdef</Type>
     </TokenIdentifier>
     <Path>d2/d8b/classTREX_1_1utils_1_1LogManager.html</Path>
-    <Anchor>ac9e33406d5d59fa8be27922e9d0d2e9e</Anchor>
+    <Anchor>a30a8088cafcd5c7f6d08819b62a21b61</Anchor>
     <Abstract>TREX_PATH iterator.</Abstract>
   </Token>
   <Token>
@@ -13485,7 +13793,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>d2/d8b/classTREX_1_1utils_1_1LogManager.html</Path>
-    <Anchor>a2e145a13f52c4fbf19dbf9b0e0ca3e55</Anchor>
+    <Anchor>a8ba32d8ecda2cb17d745de164c4f157f</Anchor>
     <Abstract>log file complete name</Abstract>
   </Token>
   <Token>
@@ -13495,7 +13803,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>d2/d8b/classTREX_1_1utils_1_1LogManager.html</Path>
-    <Anchor>a6d68266424040e03590698d380a46740</Anchor>
+    <Anchor>a94da0ea064ed2311226164bfcd4b0c3d</Anchor>
     <Abstract>Get directory where cfg files should be stored.</Abstract>
   </Token>
   <Token>
@@ -13515,7 +13823,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>d2/d8b/classTREX_1_1utils_1_1LogManager.html</Path>
-    <Anchor>a61321a663bb542278be8092efb7e0a90</Anchor>
+    <Anchor>a2ae36d73e0d96ef8bf878643308ce11c</Anchor>
     <Abstract>Locate a file.</Abstract>
   </Token>
   <Token>
@@ -13525,7 +13833,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>d2/d8b/classTREX_1_1utils_1_1LogManager.html</Path>
-    <Anchor>afedbc70bacf679bbd52fc7332c3fcdfa</Anchor>
+    <Anchor>a8e71c6753feccc271093c8e95fb3a97a</Anchor>
     <Abstract>Logging path This method indicates in which directory log files should be placed...</Abstract>
   </Token>
   <Token>
@@ -14575,7 +14883,7 @@
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
+    <Abstract>XML based factory.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -14589,13 +14897,23 @@
   </Token>
   <Token>
     <TokenIdentifier>
-      <Name>doNotify</Name>
+      <Name>count_internal_relations</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
+    <Anchor>a7e3964ee4535693c734e8fd4ea813343</Anchor>
+    <Abstract>Count the number of internal relations.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>count_internals</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>acca6022515bb765ef0843759cbfb2e67</Anchor>
+    <Abstract>Count the number of internal timelines.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -14669,6 +14987,16 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>getGraph</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a349b50099b6434604d311a1dd99c748c</Anchor>
+    <Abstract>Get graph.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>getGraphName</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -14729,12 +15057,32 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>int_begin</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>aa9e8953c7f983b01c5841cb8289a3a9d</Anchor>
+    <Abstract>First internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>int_end</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a7f104cbecbcd6b55ca411dbc9addc2f7</Anchor>
+    <Abstract>Last internal relation iterator.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>newTick</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
+    <Anchor>a7efd36a98191a8fbb3fac34220684c2f</Anchor>
     <Abstract>New tick notification callback.</Abstract>
   </Token>
   <Token>
@@ -14816,6 +15164,16 @@
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
     <Anchor>ae462eb24d0e453b00ff806f27f9678bd</Anchor>
     <Abstract>Request for internal failed.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>find_external</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a839223057c856427799bf087f60c670b</Anchor>
+    <Abstract>Find an external timeline.</Abstract>
   </Token>
   <Token>
     <TokenIdentifier>
@@ -14909,6 +15267,26 @@
   </Token>
   <Token>
     <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a5d3254596992861f285d06cc163ce4a2</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
+      <Name>postPlanToken</Name>
+      <APILanguage>cpp</APILanguage>
+      <Type>instm</Type>
+    </TokenIdentifier>
+    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
+    <Anchor>a07ae5287e1383b9f2f2730899a3c6a15</Anchor>
+    <Abstract>Post a planned token.</Abstract>
+  </Token>
+  <Token>
+    <TokenIdentifier>
       <Name>postRecall</Name>
       <APILanguage>cpp</APILanguage>
       <Type>instm</Type>
@@ -14924,7 +15302,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
+    <Anchor>a3dc486c5b78514e5ae601c2b8147d497</Anchor>
     <Abstract>Internal timeline declaration.</Abstract>
   </Token>
   <Token>
@@ -14954,447 +15332,7 @@
       <Type>instm</Type>
     </TokenIdentifier>
     <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
-    <Abstract>External timeline declaration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>external_iterator</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a8732d422d9951bde9c8fb33c702d18ff</Anchor>
-    <Abstract>Iterator other external timelines.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>ref_type</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a1df6347b2d49a9b7b5a19695a35c4a6b</Anchor>
-    <Abstract>Reactor reference type.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>size_type</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a4a82613363d6c1dfb380d73165b888a7</Anchor>
-    <Abstract>size type</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>xml_arg_type</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a220daced8bfd779d72905a7d28276000</Anchor>
-    <Abstract>XML construction info.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>xml_factory</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>tdef</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>adcb6eb0be2820aaa41073e2d2ecb0104</Anchor>
-    <Abstract>XML based factor.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>count_externals</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a29c22ff5792359d9dd5b87373f72bc25</Anchor>
-    <Abstract>Number of External timelines.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>doNotify</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a39836698e96bfdfd724a60cee34d1df2</Anchor>
-    <Abstract>Request new observations.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>doSynchronize</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a129024145aba1e2b36f5f5c434fb4b4d</Anchor>
-    <Abstract>Synchronization callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>ext_begin</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a6b169e717e60724db87abbff21fffd83</Anchor>
-    <Abstract>beginning of External timelines set</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>ext_end</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a74127fd53f9d89f938c7ab1273a2f59d</Anchor>
-    <Abstract>end of External timelines set</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getAgentName</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a94f89daf3b2f2e58380ecf7d543f1d04</Anchor>
-    <Abstract>get &quot;agent&quot; name</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getCurrentTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ae8ea840f31e81735b8b0481f0608d535</Anchor>
-    <Abstract>Get current tick.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getExecLatency</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>add69075d64568c035f0a83fc1824a57c</Anchor>
-    <Abstract>reactor execution latency</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getFinalTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>aef17ce86509d19a00792feccbcf84a67</Anchor>
-    <Abstract>Get final tick.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getGraphName</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab4a83407c7ad5fc27cc9ab70a0c5d630</Anchor>
-    <Abstract>Get graph name.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getInitialTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a10b44ea7bbeb13a23528f82c3c7c78c3</Anchor>
-    <Abstract>reactor initial tick</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getLatency</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a9f1b95cdfe53ed059969452c9f250e82</Anchor>
-    <Abstract>reactor latency</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getLookAhead</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>aa85f8e0c6f77b4f9eff83d829fe3dba6</Anchor>
-    <Abstract>Get reactor look-ahead.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>getName</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a8facf8e8ea1ba386fa07bffb25881379</Anchor>
-    <Abstract>Reactor name.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>initialize</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>abdfbc3a11ed2046f2fa6a8ed707b7aab</Anchor>
-    <Abstract>Final initialization.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>newTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a0ba745d03857236a9d55c661ecaff92f</Anchor>
-    <Abstract>New tick notification callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>step</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ae1f44350631b953137d17ab53efa4707</Anchor>
-    <Abstract>Deliberation step.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>tickDuration</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>aae9a63f545390491e4721b8b74e05585</Anchor>
-    <Abstract>Tick duration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>tickToTime</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a5ecfd6df6f39f6b6575e3853e8630fa7</Anchor>
-    <Abstract>tick to unix time conversion</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>timeToTick</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a710edd7eefe154b521e75dd42b3bf635</Anchor>
-    <Abstract>unix time to tick conversion</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>workRatio</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a94fcfd208b96e964b5503934dfa7debf</Anchor>
-    <Abstract>reactor deliberation work load</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>completedGoal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ad21eb1f4f7dd6affb3e4b4fe1f256a93</Anchor>
-    <Abstract>Goal completion.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>failed_external</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab028a1fb11c29f940332fcb3879af240</Anchor>
-    <Abstract>Request for external failed.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>failed_internal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ae462eb24d0e453b00ff806f27f9678bd</Anchor>
-    <Abstract>Request for internal failed.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleRecall</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a8af8f0667a8831c6ad364850c6136ab1</Anchor>
-    <Abstract>Goal recall callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleRequest</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ad168ea32ebb729f0c866c16d37462c9c</Anchor>
-    <Abstract>Goal reception callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>handleTickStart</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a84bf72ed467a7f76cec0fa3714f0df80</Anchor>
-    <Abstract>New tick callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>hasWork</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a9f4efc90e8e0fb488f788b921546f802</Anchor>
-    <Abstract>Check if need to deliberate.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isExternal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a41d3bf0d0663f3ff4469686dc6878d01</Anchor>
-    <Abstract>Check for exeternal timeline.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>isInternal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a9d8c2a89f8940138216a1f7821adfb04</Anchor>
-    <Abstract>Check for internal timeline.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>manager</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a975231dd2846e0a806833f93d79dabb5</Anchor>
-    <Abstract>LogManager acces point.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>postGoal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ad804655ec0e631ec942761efabb45e34</Anchor>
-    <Abstract>Post a goal.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>postGoal</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a7a7dccda4fe6c2d33067f56d234eda5b</Anchor>
-    <Abstract>Post a goal.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>postObservation</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>aa9840ea85833e5e458ac215635266316</Anchor>
-    <Abstract>Produce an observation.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>postRecall</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a4e7cd4e809a411032c47e66eb09fa8d7</Anchor>
-    <Abstract>Recall a goal.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>provide</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>ab61882fa0e573b1e85e92f9a0aa3c921</Anchor>
-    <Abstract>Internal timeline declaration.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>resume</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a2d5869fac84e5e6f9170132a47fd1d1c</Anchor>
-    <Abstract>Deliberation step callback.</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>syslog</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>abde1d28e37984ab0a0ae71a6023bcd8b</Anchor>
-    <Abstract>new log entry</Abstract>
-  </Token>
-  <Token>
-    <TokenIdentifier>
-      <Name>use</Name>
-      <APILanguage>cpp</APILanguage>
-      <Type>instm</Type>
-    </TokenIdentifier>
-    <Path>df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html</Path>
-    <Anchor>a56378773bb12cfeb1646b5910b7dbedf</Anchor>
+    <Anchor>a4c6dc39a343f4413b5bd8acd8213e740</Anchor>
     <Abstract>External timeline declaration.</Abstract>
   </Token>
   <Token>

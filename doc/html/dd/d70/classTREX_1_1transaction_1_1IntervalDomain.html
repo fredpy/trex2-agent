@@ -534,7 +534,7 @@ template&lt;typename Ty, class Comp = std::less&lt;Ty&gt;&gt; </div>
 <p>Create a new instance which is identical to current instance value. This instance is usually created using the <code>new</code> operator and it is up to the caller to de-allocate it when not needed.</p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The newly created instance </dd></dl>
 
-<p>Implemented in <a class="el" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a996fbf0ebe5f9f5f995ea9bd373d6203">TREX::europa::EuropaDomain</a>, <a class="el" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">TREX::europa::EuropaEntity</a>, <a class="el" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">TREX::europa::EuropaEntity</a>, <a class="el" href="../../d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html#aed716c4e5561ddc671ce74516e4d616e">TREX::europa::EuropaProxy</a>, <a class="el" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">TREX::europa::EuropaEntity</a>, <a class="el" href="../../de/da6/classTREX_1_1europa_1_1ProxyDomain.html#a6507733c48969b5214a6cc0c4d47f853">TREX::europa::ProxyDomain</a>, <a class="el" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">TREX::europa::EuropaEntity</a>, <a class="el" href="../../d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html#a193ffd38f5c05901a6bdb34fd5b290c3">TREX::europa::EuropaProxy</a>, <a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a9d8a75737166d5f3cceef1841aaa6dbd">TREX::transaction::BooleanDomain</a>, <a class="el" href="../../d5/d1a/classTREX_1_1transaction_1_1EnumDomain.html#a467c0f31905c4f71ea6688265b66bd56">TREX::transaction::EnumDomain</a>, <a class="el" href="../../d3/da8/classTREX_1_1transaction_1_1FloatDomain.html#a6b28aedfc3ddf6bbeeb39ad49fde8e32">TREX::transaction::FloatDomain</a>, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html#a6d5caa7f37b63a83517d406ce84ad64a">TREX::transaction::IntegerDomain</a>, and <a class="el" href="../../d6/d94/classTREX_1_1transaction_1_1StringDomain.html#a87a65c6d0282db8751105ce8ce1c0e4e">TREX::transaction::StringDomain</a>.</p>
+<p>Implemented in <a class="el" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">TREX::europa::EuropaEntity</a>, <a class="el" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a9ab04b1905d844ee16949e5e4da2a84c">TREX::europa::details::EuropaDomain</a>, <a class="el" href="../../d1/d6a/classTREX_1_1transaction_1_1BooleanDomain.html#a9d8a75737166d5f3cceef1841aaa6dbd">TREX::transaction::BooleanDomain</a>, <a class="el" href="../../d5/d1a/classTREX_1_1transaction_1_1EnumDomain.html#a467c0f31905c4f71ea6688265b66bd56">TREX::transaction::EnumDomain</a>, <a class="el" href="../../d3/da8/classTREX_1_1transaction_1_1FloatDomain.html#a6b28aedfc3ddf6bbeeb39ad49fde8e32">TREX::transaction::FloatDomain</a>, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html#a6d5caa7f37b63a83517d406ce84ad64a">TREX::transaction::IntegerDomain</a>, and <a class="el" href="../../d6/d94/classTREX_1_1transaction_1_1StringDomain.html#a87a65c6d0282db8751105ce8ce1c0e4e">TREX::transaction::StringDomain</a>.</p>
 
 <p>Referenced by <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00100">TREX::transaction::Variable::restrict()</a>.</p>
 
@@ -774,6 +774,8 @@ the type of the value manip[ulated by this domain should be convertible to <em>T
 
 <p>References <a class="el" href="../../d0/d92/StringExtract_8hh_source.html#l00121">TREX::utils::string_cast()</a>.</p>
 
+<p>Referenced by <a class="el" href="../../da/dbd/europa__convert_8cc_source.html#l00161">TREX::europa::details::europa_domain::visit()</a>.</p>
+
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
@@ -806,7 +808,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html#l00223">223</a> of file <a class="el" href="../../d1/d8c/DomainBase_8hh_source.html">DomainBase.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00329">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::equals()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00120">TREX::transaction::BooleanDomain::equals()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00300">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::intersect()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00110">TREX::transaction::BooleanDomain::intersect()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00340">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00132">TREX::transaction::BooleanDomain::restrictWith()</a>, <a class="el" href="../../db/dc0/BasicInterval_8cc_source.html#l00080">TREX::transaction::BasicInterval::toXml()</a>, <a class="el" href="../../d6/d56/BasicEnumerated_8cc_source.html#l00086">TREX::transaction::BasicEnumerated::toXml()</a>, and <a class="el" href="../../db/d28/EuropaDomain_8cc_source.html#l00271">TREX::europa::details::europa_domain::visit()</a>.</p>
+<p>Referenced by <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00329">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::equals()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00120">TREX::transaction::BooleanDomain::equals()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00300">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::intersect()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00110">TREX::transaction::BooleanDomain::intersect()</a>, <a class="el" href="../../d9/da0/EnumeratedDomain_8hh_source.html#l00340">TREX::transaction::EnumeratedDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d4/d42/DomainImpl_8cc_source.html#l00132">TREX::transaction::BooleanDomain::restrictWith()</a>, <a class="el" href="../../db/dc0/BasicInterval_8cc_source.html#l00080">TREX::transaction::BasicInterval::toXml()</a>, <a class="el" href="../../d6/d56/BasicEnumerated_8cc_source.html#l00086">TREX::transaction::BasicEnumerated::toXml()</a>, and <a class="el" href="../../da/dbd/europa__convert_8cc_source.html#l00195">TREX::europa::details::europa_domain::visit()</a>.</p>
 
 </div>
 </div>
@@ -914,6 +916,8 @@ template&lt;typename Ty, class Comp = std::less&lt;Ty&gt;&gt; </div>
 
 <p>Definition at line <a class="el" href="../../d7/dff/BasicInterval_8hh_source.html#l00077">77</a> of file <a class="el" href="../../d7/dff/BasicInterval_8hh_source.html">BasicInterval.hh</a>.</p>
 
+<p>Referenced by <a class="el" href="../../da/dbd/europa__convert_8cc_source.html#l00161">TREX::europa::details::europa_domain::visit()</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a5a028a3e6f6ad2250bf792f9598a0db2"></a><!-- doxytag: member="TREX::transaction::IntervalDomain::isInterval" ref="a5a028a3e6f6ad2250bf792f9598a0db2" args="() const " -->
@@ -1005,6 +1009,8 @@ template&lt;typename Ty, class Comp = std::less&lt;Ty&gt;&gt; </div>
 void getBounds(bound &amp;, bound&amp;) vonst </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html#l00450">450</a> of file <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html">IntervalDomain.hh</a>.</p>
+
+<p>Referenced by <a class="el" href="../../db/d0f/EuropaReactor_8cc_source.html#l00445">TREX::europa::EuropaReactor::hasWork()</a>.</p>
 
 </div>
 </div>
@@ -1221,6 +1227,8 @@ void getBounds(bound &amp;, bound&amp;) vonst </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html#l00459">459</a> of file <a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html">IntervalDomain.hh</a>.</p>
 
+<p>Referenced by <a class="el" href="../../db/d0f/EuropaReactor_8cc_source.html#l00445">TREX::europa::EuropaReactor::hasWork()</a>.</p>
+
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
@@ -1268,7 +1276,7 @@ template&lt;typename Ty, class Comp = std::less&lt;Ty&gt;&gt; </div>
 <li>trex/domain/<a class="el" href="../../d6/dca/IntervalDomain_8hh_source.html">IntervalDomain.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:59 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:14 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -1,11 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$d8/d0f/classTREX_1_1europa_1_1StateListener.html" title="TREX::europa::StateListener" alt="" coords="57,5,276,35"/>
-<area shape="rect" id="node3" href="$d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor." alt="" coords="377,5,601,35"/>
-<area shape="rect" id="node4" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="44,139,289,168"/>
-<area shape="rect" id="node6" href="$d1/d80/classmbari_1_1DrifterTracker.html" title="mbari::DrifterTracker" alt="" coords="408,59,571,88"/>
-<area shape="rect" id="node9" href="$d0/d59/classTREX_1_1lightswitch_1_1Light.html" title="Light reactor definition." alt="" coords="397,112,581,141"/>
-<area shape="rect" id="node11" href="$de/d10/classTREX_1_1transaction_1_1Player.html" title="Log transaction player." alt="" coords="391,165,588,195"/>
-<area shape="rect" id="node13" href="$d1/d57/classTREX_1_1vitre_1_1VitreReactor.html" title="The vitre interface reactor." alt="" coords="391,219,588,248"/>
-<area shape="rect" id="node15" href="$db/d97/classTREX_1_1witre_1_1WitreServer.html" title="TREX::witre::WitreServer" alt="" coords="392,272,587,301"/>
-<area shape="rect" id="node16" href="$d3/d69/classTREX_1_1transaction_1_1graph_1_1timelines__listener.html" title="TREX::transaction::graph::timelines_listener" alt="" coords="5,272,328,301"/>
+<area shape="rect" id="node1" href="$de/da9/structTREX_1_1europa_1_1details_1_1token__id__traits.html" title="TREX::europa::details::token_id_traits" alt="" coords="5,5,285,35"/>
 </map>

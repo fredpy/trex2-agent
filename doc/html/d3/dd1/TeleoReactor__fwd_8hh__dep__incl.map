@@ -1,10 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="5,237,165,267"/>
-<area shape="rect" id="node6" href="$d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="611,160,800,189"/>
-<area shape="rect" id="node10" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="43,83,285,112"/>
-<area shape="rect" id="node17" href="$d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="333,83,584,112"/>
-<area shape="rect" id="node23" href="$d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="659,83,869,112"/>
-<area shape="rect" id="node8" href="$d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="408,237,611,267"/>
-<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="43,160,288,189"/>
-<area shape="rect" id="node19" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="312,160,563,189"/>
+<area shape="rect" id="node3" href="$d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="5,83,195,112"/>
+<area shape="rect" id="node5" href="$d8/d9c/agent__graph_8hh_source.html" title="trex/agent/bits/agent_graph.hh" alt="" coords="196,237,428,267"/>
+<area shape="rect" id="node10" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="269,83,512,112"/>
+<area shape="rect" id="node16" href="$d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="560,83,811,112"/>
+<area shape="rect" id="node24" href="$d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="835,83,1045,112"/>
+<area shape="rect" id="node7" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="232,315,392,344"/>
+<area shape="rect" id="node13" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="269,160,515,189"/>
+<area shape="rect" id="node18" href="$d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="561,160,764,189"/>
+<area shape="rect" id="node20" href="$d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="788,160,1039,189"/>
 </map>

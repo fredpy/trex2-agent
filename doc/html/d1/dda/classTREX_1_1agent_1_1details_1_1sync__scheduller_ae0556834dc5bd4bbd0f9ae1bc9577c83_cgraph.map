@@ -1,3 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity." alt="" coords="453,5,731,35"/>
+<area shape="rect" id="node3" href="$df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097" title="Check for node validity." alt="" coords="453,5,731,35"/>
+<area shape="rect" id="node5" href="$d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor." alt="" coords="469,59,715,88"/>
+<area shape="rect" id="node7" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="787,32,976,61"/>
+<area shape="rect" id="node9" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="779,85,984,115"/>
 </map>

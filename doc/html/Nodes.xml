@@ -96,14 +96,14 @@
             </Subnodes>
            </Node>
            <Node>
-            <Name>The lightswitch plug-in</Name>
-            <Path>d4/db0/group__lightswitch.html</Path>
+            <Name>The StarTrex plug-in</Name>
+            <Path>d6/d93/group__startrex.html</Path>
             <Subnodes>
             </Subnodes>
            </Node>
            <Node>
-            <Name>Vitre graphic interface</Name>
-            <Path>d6/d0a/group__vitre.html</Path>
+            <Name>The lightswitch plug-in</Name>
+            <Path>d4/db0/group__lightswitch.html</Path>
             <Subnodes>
             </Subnodes>
            </Node>
@@ -115,6 +115,10 @@
         <Name>Class List</Name>
         <Path>annotated.html</Path>
         <Subnodes>
+         <Node>
+          <Name>TREX::europa::AbsValConstraint</Name>
+          <Path>d1/d8e/classTREX_1_1europa_1_1AbsValConstraint.html</Path>
+         </Node>
          <Node>
           <Name>TREX::utils::AccessExcept</Name>
           <Path>d5/d56/classTREX_1_1utils_1_1AccessExcept.html</Path>
@@ -140,6 +144,10 @@
           <Path>d8/d8d/structTREX_1_1utils_1_1internals_1_1attr__helper_3_01boost_1_1optional_3_01Ty_01_4_01_4.html</Path>
          </Node>
          <Node>
+          <Name>TREX::startrex::Auv</Name>
+          <Path>dc/d0a/classTREX_1_1startrex_1_1Auv.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::bad_string_cast</Name>
           <Path>df/d3e/classTREX_1_1utils_1_1bad__string__cast.html</Path>
          </Node>
@@ -156,8 +164,8 @@
           <Path>dc/de0/classTREX_1_1utils_1_1BasicSymbol.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::Bind</Name>
-          <Path>d2/d95/classTREX_1_1europa_1_1Bind.html</Path>
+          <Name>starfish::europa::Bind</Name>
+          <Path>d9/d22/classstarfish_1_1europa_1_1Bind.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::BooleanDomain</Name>
@@ -166,6 +174,10 @@
          <Node>
           <Name>TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;::bound</Name>
           <Path>df/db6/classTREX_1_1transaction_1_1IntervalDomain_1_1bound.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::CalcDistanceConstraint</Name>
+          <Path>d7/d1e/classstarfish_1_1europa_1_1CalcDistanceConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::CheckExternal</Name>
@@ -184,8 +196,28 @@
           <Path>da/d6f/classmbari_1_1amqp_1_1connection.html</Path>
          </Node>
          <Node>
+          <Name>TREX::europa::CoreExtensions</Name>
+          <Path>d7/d02/classTREX_1_1europa_1_1CoreExtensions.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::CosineConstraint</Name>
+          <Path>d6/da1/classTREX_1_1europa_1_1CosineConstraint.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::CostEstimator</Name>
+          <Path>d1/db3/classstarfish_1_1europa_1_1CostEstimator.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::europa::details::CurrentState</Name>
           <Path>d2/d04/classTREX_1_1europa_1_1details_1_1CurrentState.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::CurrentStateId_id_traits</Name>
+          <Path>d9/da9/structTREX_1_1europa_1_1details_1_1CurrentStateId__id__traits.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::agent::details::cycle_checker</Name>
+          <Path>d2/dbe/classTREX_1_1agent_1_1details_1_1cycle__checker.html</Path>
          </Node>
          <Node>
           <Name>TREX::agent::CycleDetected</Name>
@@ -196,16 +228,8 @@
           <Path>df/dac/classTREX_1_1agent_1_1CycleDetector.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::DbCore</Name>
-          <Path>d7/d8a/classTREX_1_1europa_1_1DbCore.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::DbSolver</Name>
-          <Path>de/d89/classTREX_1_1europa_1_1DbSolver.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::details::InternalState::DecisionPoint</Name>
-          <Path>d4/d24/classTREX_1_1europa_1_1details_1_1InternalState_1_1DecisionPoint.html</Path>
+          <Name>TREX::europa::details::CurrentState::DecisionPoint</Name>
+          <Path>d4/d5d/classTREX_1_1europa_1_1details_1_1CurrentState_1_1DecisionPoint.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::Factory&lt; AbstractProduct, Id, ConsArg, ProductRef, IdComp &gt;::declare&lt; Product &gt;</Name>
@@ -216,8 +240,8 @@
           <Path>d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::DeliberationFilter</Name>
-          <Path>d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html</Path>
+          <Name>TREX::europa::DeliberationScope</Name>
+          <Path>d8/da3/classTREX_1_1europa_1_1DeliberationScope.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::DispatchError</Name>
@@ -240,12 +264,20 @@
           <Path>d6/dd6/classTREX_1_1transaction_1_1DomainVisitor.html</Path>
          </Node>
          <Node>
-          <Name>mbari::DrifterHandler</Name>
-          <Path>d0/def/classmbari_1_1DrifterHandler.html</Path>
+          <Name>TREX::europa::DoNotMatchFilter</Name>
+          <Path>d3/d2f/classTREX_1_1europa_1_1DoNotMatchFilter.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::DoradoHandler</Name>
+          <Path>db/ddb/classmbari_1_1DoradoHandler.html</Path>
          </Node>
          <Node>
           <Name>mbari::DrifterTracker</Name>
           <Path>d1/d80/classmbari_1_1DrifterTracker.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::EarliestFirstFlawManager</Name>
+          <Path>d0/d9c/classTREX_1_1europa_1_1EarliestFirstFlawManager.html</Path>
          </Node>
          <Node>
           <Name>Ellipsoid</Name>
@@ -268,20 +300,24 @@
           <Path>d7/deb/classTREX_1_1utils_1_1ErrnoExcept.html</Path>
          </Node>
          <Node>
+          <Name>mbari::amqp::connection::error</Name>
+          <Path>d1/dad/classmbari_1_1amqp_1_1connection_1_1error.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::witre::WitreServer::Error</Name>
           <Path>d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html</Path>
          </Node>
          <Node>
-          <Name>mbari::amqp::connection::error</Name>
-          <Path>d1/dad/classmbari_1_1amqp_1_1connection_1_1error.html</Path>
+          <Name>starfish::europa::EuclideanCostEstimator</Name>
+          <Path>d5/d4a/classstarfish_1_1europa_1_1EuclideanCostEstimator.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::details::europa_domain</Name>
           <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::EuropaDomain</Name>
-          <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
+          <Name>TREX::europa::details::EuropaDomain</Name>
+          <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::EuropaEntity</Name>
@@ -292,8 +328,8 @@
           <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::EuropaProxy</Name>
-          <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
+          <Name>TREX::europa::EuropaPlugin</Name>
+          <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::EuropaReactor</Name>
@@ -324,12 +360,28 @@
           <Path>db/d76/classmbari_1_1europa_1_1GeoUTMConstraint.html</Path>
          </Node>
          <Node>
+          <Name>starfish::europa::GeoUTMConstraint</Name>
+          <Path>dd/da3/classstarfish_1_1europa_1_1GeoUTMConstraint.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::transaction::Goal</Name>
           <Path>d0/d04/classTREX_1_1transaction_1_1Goal.html</Path>
          </Node>
          <Node>
+          <Name>starfish::europa::GoalManager</Name>
+          <Path>d7/d6c/classstarfish_1_1europa_1_1GoalManager.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::GoalManager_PR2</Name>
+          <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::witre::Goalpopup</Name>
           <Path>d6/dd8/classTREX_1_1witre_1_1Goalpopup.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::GoalsOnlyFilter</Name>
+          <Path>df/d8f/classstarfish_1_1europa_1_1GoalsOnlyFilter.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::graph</Name>
@@ -368,6 +420,10 @@
           <Path>d9/d2d/classmbari_1_1amqp_1_1listener_1_1handler.html</Path>
          </Node>
          <Node>
+          <Name>TREX::agent::details::cycle_checker::has_cycle</Name>
+          <Path>d9/db0/structTREX_1_1agent_1_1details_1_1cycle__checker_1_1has__cycle.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::Hashable</Name>
           <Path>da/d64/classTREX_1_1utils_1_1Hashable.html</Path>
          </Node>
@@ -380,6 +436,10 @@
           <Path>dc/d45/classTREX_1_1utils_1_1id__mapper.html</Path>
          </Node>
          <Node>
+          <Name>mbari::details::identity&lt; Ty &gt;</Name>
+          <Path>d8/d78/structmbari_1_1details_1_1identity.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::agent::details::init_visitor</Name>
           <Path>d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html</Path>
          </Node>
@@ -388,16 +448,28 @@
           <Path>d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::details::InternalState</Name>
-          <Path>df/dda/classTREX_1_1europa_1_1details_1_1InternalState.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::details::InternalStateId_id_traits</Name>
-          <Path>d7/d51/structTREX_1_1europa_1_1details_1_1InternalStateId__id__traits.html</Path>
-         </Node>
-         <Node>
           <Name>TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;</Name>
           <Path>dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::IridiumSender</Name>
+          <Path>d7/d8c/classmbari_1_1IridiumSender.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::transaction::details::is_active_external</Name>
+          <Path>d1/d99/structTREX_1_1transaction_1_1details_1_1is__active__external.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_external</Name>
+          <Path>df/d03/structTREX_1_1europa_1_1details_1_1is__external.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_internal</Name>
+          <Path>d1/df8/structTREX_1_1europa_1_1details_1_1is__internal.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_rejectable</Name>
+          <Path>de/d01/structTREX_1_1europa_1_1details_1_1is__rejectable.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::istreamable</Name>
@@ -406,6 +478,10 @@
          <Node>
           <Name>TREX::utils::XmlFactory&lt; Product, Output, Arg &gt;::iter_traits&lt; Iter &gt;</Name>
           <Path>db/d14/structTREX_1_1utils_1_1XmlFactory_1_1iter__traits.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::kalman_filter_fn</Name>
+          <Path>dd/de6/structmbari_1_1kalman__filter__fn.html</Path>
          </Node>
          <Node>
           <Name>TREX::lightswitch::Light</Name>
@@ -418,6 +494,10 @@
          <Node>
           <Name>mbari::amqp::listener</Name>
           <Path>d2/dea/classmbari_1_1amqp_1_1listener.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::location</Name>
+          <Path>df/de0/classmbari_1_1location.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internals::LogEntry</Name>
@@ -436,6 +516,10 @@
           <Path>df/db9/classmbari_1_1amqp_1_1queue_1_1message.html</Path>
          </Node>
          <Node>
+          <Name>mbari::MessageHandler</Name>
+          <Path>df/de8/classmbari_1_1MessageHandler.html</Path>
+         </Node>
+         <Node>
           <Name>mbari::amqp::msg_buffer</Name>
           <Path>d6/def/classmbari_1_1amqp_1_1msg__buffer.html</Path>
          </Node>
@@ -452,6 +536,14 @@
           <Path>d7/d2a/classTREX_1_1transaction_1_1MultipleReactors.html</Path>
          </Node>
          <Node>
+          <Name>TREX::witre::WitrePaintSearch::nodeObject</Name>
+          <Path>da/d2e/classTREX_1_1witre_1_1WitrePaintSearch_1_1nodeObject.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::NoGoalsFilter</Name>
+          <Path>df/db9/classstarfish_1_1europa_1_1NoGoalsFilter.html</Path>
+         </Node>
+         <Node>
           <Name>noncopyable</Name>
           <Path>df/d91/classboost_1_1noncopyable.html</Path>
          </Node>
@@ -460,12 +552,12 @@
           <Path>de/d8d/classTREX_1_1transaction_1_1Observation.html</Path>
          </Node>
          <Node>
-          <Name>TREX::witre::Observations</Name>
-          <Path>dc/d7f/classTREX_1_1witre_1_1Observations.html</Path>
-         </Node>
-         <Node>
           <Name>TREX::utils::ostreamable</Name>
           <Path>d2/d06/classTREX_1_1utils_1_1ostreamable.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::PaintedGraph</Name>
+          <Path>d4/d63/classTREX_1_1witre_1_1PaintedGraph.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::Player</Name>
@@ -480,8 +572,20 @@
           <Path>de/dff/classTREX_1_1utils_1_1PluginLoader.html</Path>
          </Node>
          <Node>
+          <Name>mbari::point&lt; Dim &gt;</Name>
+          <Path>dc/dff/classmbari_1_1point.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::pointer_id_traits&lt; IdTraits, Ptr &gt;</Name>
           <Path>db/dd4/structTREX_1_1utils_1_1pointer__id__traits.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::Position</Name>
+          <Path>d4/d01/structstarfish_1_1europa_1_1Position.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::PositionHandler</Name>
+          <Path>d8/db2/classmbari_1_1PositionHandler.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::Predicate</Name>
@@ -514,10 +618,6 @@
          <Node>
           <Name>boost::property_map&lt; TREX::transaction::graph::relation_type, TREX::transaction::details::graph_edge_name_map &gt;</Name>
           <Path>d8/d8e/structboost_1_1property__map_3_01TREX_1_1transaction_1_1graph_1_1relation__type_00_01TREX_1_1tra312dce48c7d046958be7033a6c5bab8e.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::ProxyDomain</Name>
-          <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
          </Node>
          <Node>
           <Name>mbari::amqp::queue</Name>
@@ -568,16 +668,24 @@
           <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::SchemaPlugin</Name>
-          <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
+          <Name>TREX::europa::details::scoped_split</Name>
+          <Path>d4/d94/classTREX_1_1europa_1_1details_1_1scoped__split.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internal::sdummy_factory</Name>
           <Path>da/d1f/structTREX_1_1utils_1_1internal_1_1sdummy__factory.html</Path>
          </Node>
          <Node>
+          <Name>mbari::serie&lt; Ty &gt;</Name>
+          <Path>dc/dfe/classmbari_1_1serie.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::SharedVar&lt; Ty &gt;</Name>
           <Path>de/d9c/classTREX_1_1utils_1_1SharedVar.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::SineConstraint</Name>
+          <Path>df/d04/classTREX_1_1europa_1_1SineConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internal::SingletonDummy</Name>
@@ -596,8 +704,8 @@
           <Path>da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::StateListener</Name>
-          <Path>d8/d0f/classTREX_1_1europa_1_1StateListener.html</Path>
+          <Name>TREX::europa::SqrtConstraint</Name>
+          <Path>d6/d9b/classTREX_1_1europa_1_1SqrtConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::agent::StepClock</Name>
@@ -616,16 +724,12 @@
           <Path>d8/dfd/classTREX_1_1transaction_1_1SynchronizationError.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::SynchronizationFilter</Name>
-          <Path>da/da2/classTREX_1_1europa_1_1SynchronizationFilter.html</Path>
-         </Node>
-         <Node>
           <Name>TREX::europa::SynchronizationManager</Name>
           <Path>de/d79/classTREX_1_1europa_1_1SynchronizationManager.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::Synchronizer</Name>
-          <Path>db/de9/classTREX_1_1europa_1_1Synchronizer.html</Path>
+          <Name>TREX::europa::SynchronizationScope</Name>
+          <Path>d1/d89/classTREX_1_1europa_1_1SynchronizationScope.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::TeleoReactor</Name>
@@ -652,20 +756,12 @@
           <Path>d3/d69/classTREX_1_1transaction_1_1graph_1_1timelines__listener.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::TokenError</Name>
-          <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
+          <Name>TREX::europa::details::token_id_traits</Name>
+          <Path>de/da9/structTREX_1_1europa_1_1details_1_1token__id__traits.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::TokenFilter</Name>
           <Path>d3/d0d/classTREX_1_1europa_1_1TokenFilter.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::TokenManager</Name>
-          <Path>d6/d70/classTREX_1_1europa_1_1TokenManager.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::Assembly::TokenProcessor</Name>
-          <Path>da/da1/classTREX_1_1europa_1_1Assembly_1_1TokenProcessor.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::graph::traversal_category</Name>
@@ -676,8 +772,12 @@
           <Path>dc/ddf/classTREX_1_1utils_1_1UnknownFactoryType.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::details::UpdateIterator</Name>
-          <Path>d3/da8/classTREX_1_1europa_1_1details_1_1UpdateIterator.html</Path>
+          <Name>TREX::europa::details::UpdateFlawIterator</Name>
+          <Path>db/d6a/classTREX_1_1europa_1_1details_1_1UpdateFlawIterator.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::UpdateMatchFinder</Name>
+          <Path>df/d3d/classTREX_1_1europa_1_1details_1_1UpdateMatchFinder.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::Variable</Name>
@@ -692,12 +792,20 @@
           <Path>da/d2f/structTREX_1_1version.html</Path>
          </Node>
          <Node>
-          <Name>TREX::vitre::VitreReactor</Name>
-          <Path>d1/d57/classTREX_1_1vitre_1_1VitreReactor.html</Path>
-         </Node>
-         <Node>
           <Name>TREX::witre::WitreApplication</Name>
           <Path>d1/dcc/classTREX_1_1witre_1_1WitreApplication.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitreGraph</Name>
+          <Path>d5/ddb/classTREX_1_1witre_1_1WitreGraph.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitreGraphContainer</Name>
+          <Path>df/d1b/classTREX_1_1witre_1_1WitreGraphContainer.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitrePaintSearch</Name>
+          <Path>d1/d58/classTREX_1_1witre_1_1WitrePaintSearch.html</Path>
          </Node>
          <Node>
           <Name>TREX::witre::WitreServer</Name>
@@ -726,8 +834,18 @@
         <Path>hierarchy.html</Path>
         <Subnodes>
          <Node>
+          <Name>TREX::europa::AbsValConstraint</Name>
+          <Path>d1/d8e/classTREX_1_1europa_1_1AbsValConstraint.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::europa::Assembly</Name>
           <Path>dc/d76/classTREX_1_1europa_1_1Assembly.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>TREX::europa::EuropaReactor</Name>
+            <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
+           </Node>
+          </Subnodes>
          </Node>
          <Node>
           <Name>TREX::utils::internals::attr_helper&lt; Ty &gt;</Name>
@@ -742,8 +860,12 @@
           <Path>df/d3e/classTREX_1_1utils_1_1bad__string__cast.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::Bind</Name>
-          <Path>d2/d95/classTREX_1_1europa_1_1Bind.html</Path>
+          <Name>starfish::europa::Bind</Name>
+          <Path>d9/d22/classstarfish_1_1europa_1_1Bind.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::CalcDistanceConstraint</Name>
+          <Path>d7/d1e/classstarfish_1_1europa_1_1CalcDistanceConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::agent::Clock</Name>
@@ -764,8 +886,30 @@
           <Path>da/d6f/classmbari_1_1amqp_1_1connection.html</Path>
          </Node>
          <Node>
+          <Name>TREX::europa::CosineConstraint</Name>
+          <Path>d6/da1/classTREX_1_1europa_1_1CosineConstraint.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::CostEstimator</Name>
+          <Path>d1/db3/classstarfish_1_1europa_1_1CostEstimator.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>starfish::europa::EuclideanCostEstimator</Name>
+            <Path>d5/d4a/classstarfish_1_1europa_1_1EuclideanCostEstimator.html</Path>
+           </Node>
+          </Subnodes>
+         </Node>
+         <Node>
           <Name>TREX::europa::details::CurrentState</Name>
           <Path>d2/d04/classTREX_1_1europa_1_1details_1_1CurrentState.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::CurrentStateId_id_traits</Name>
+          <Path>d9/da9/structTREX_1_1europa_1_1details_1_1CurrentStateId__id__traits.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::agent::details::cycle_checker</Name>
+          <Path>d2/dbe/classTREX_1_1agent_1_1details_1_1cycle__checker.html</Path>
          </Node>
          <Node>
           <Name>TREX::agent::CycleDetector</Name>
@@ -782,16 +926,8 @@
           </Subnodes>
          </Node>
          <Node>
-          <Name>TREX::europa::DbCore</Name>
-          <Path>d7/d8a/classTREX_1_1europa_1_1DbCore.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::DbSolver</Name>
-          <Path>de/d89/classTREX_1_1europa_1_1DbSolver.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::details::InternalState::DecisionPoint</Name>
-          <Path>d4/d24/classTREX_1_1europa_1_1details_1_1InternalState_1_1DecisionPoint.html</Path>
+          <Name>TREX::europa::details::CurrentState::DecisionPoint</Name>
+          <Path>d4/d5d/classTREX_1_1europa_1_1details_1_1CurrentState_1_1DecisionPoint.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::XmlFactory&lt; Product, Output, Arg &gt;::declare&lt; Ty &gt;</Name>
@@ -805,23 +941,15 @@
             <Name>TREX::europa::details::europa_domain</Name>
             <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
            </Node>
-           <Node>
-            <Name>TREX::europa::details::europa_domain</Name>
-            <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-           </Node>
-           <Node>
-            <Name>TREX::europa::details::europa_domain</Name>
-            <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-           </Node>
-           <Node>
-            <Name>TREX::europa::details::europa_domain</Name>
-            <Path>dd/d1f/classTREX_1_1europa_1_1details_1_1europa__domain.html</Path>
-           </Node>
           </Subnodes>
          </Node>
          <Node>
-          <Name>mbari::DrifterHandler</Name>
-          <Path>d0/def/classmbari_1_1DrifterHandler.html</Path>
+          <Name>TREX::europa::DoNotMatchFilter</Name>
+          <Path>d3/d2f/classTREX_1_1europa_1_1DoNotMatchFilter.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::EarliestFirstFlawManager</Name>
+          <Path>d0/d9c/classTREX_1_1europa_1_1EarliestFirstFlawManager.html</Path>
          </Node>
          <Node>
           <Name>Ellipsoid</Name>
@@ -830,6 +958,16 @@
          <Node>
           <Name>mbari::amqp::connection::error</Name>
           <Path>d1/dad/classmbari_1_1amqp_1_1connection_1_1error.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::EuropaPlugin</Name>
+          <Path>d3/dd1/classTREX_1_1europa_1_1EuropaPlugin.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>TREX::europa::CoreExtensions</Name>
+            <Path>d7/d02/classTREX_1_1europa_1_1CoreExtensions.html</Path>
+           </Node>
+          </Subnodes>
          </Node>
          <Node>
           <Name>TREX::transaction::details::external</Name>
@@ -844,8 +982,24 @@
           <Path>db/d76/classmbari_1_1europa_1_1GeoUTMConstraint.html</Path>
          </Node>
          <Node>
+          <Name>starfish::europa::GeoUTMConstraint</Name>
+          <Path>dd/da3/classstarfish_1_1europa_1_1GeoUTMConstraint.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::GoalManager</Name>
+          <Path>d7/d6c/classstarfish_1_1europa_1_1GoalManager.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::GoalManager_PR2</Name>
+          <Path>d8/d67/classstarfish_1_1europa_1_1GoalManager__PR2.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::witre::Goalpopup</Name>
           <Path>d6/dd8/classTREX_1_1witre_1_1Goalpopup.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::GoalsOnlyFilter</Name>
+          <Path>df/d8f/classstarfish_1_1europa_1_1GoalsOnlyFilter.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction::graph</Name>
@@ -894,6 +1048,10 @@
           </Subnodes>
          </Node>
          <Node>
+          <Name>TREX::agent::details::cycle_checker::has_cycle</Name>
+          <Path>d9/db0/structTREX_1_1agent_1_1details_1_1cycle__checker_1_1has__cycle.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::Hashable</Name>
           <Path>da/d64/classTREX_1_1utils_1_1Hashable.html</Path>
           <Subnodes>
@@ -912,12 +1070,28 @@
           <Path>dc/d45/classTREX_1_1utils_1_1id__mapper.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::details::InternalState</Name>
-          <Path>df/dda/classTREX_1_1europa_1_1details_1_1InternalState.html</Path>
+          <Name>mbari::details::identity&lt; Ty &gt;</Name>
+          <Path>d8/d78/structmbari_1_1details_1_1identity.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::details::InternalStateId_id_traits</Name>
-          <Path>d7/d51/structTREX_1_1europa_1_1details_1_1InternalStateId__id__traits.html</Path>
+          <Name>mbari::IridiumSender</Name>
+          <Path>d7/d8c/classmbari_1_1IridiumSender.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::transaction::details::is_active_external</Name>
+          <Path>d1/d99/structTREX_1_1transaction_1_1details_1_1is__active__external.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_external</Name>
+          <Path>df/d03/structTREX_1_1europa_1_1details_1_1is__external.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_internal</Name>
+          <Path>d1/df8/structTREX_1_1europa_1_1details_1_1is__internal.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::is_rejectable</Name>
+          <Path>de/d01/structTREX_1_1europa_1_1details_1_1is__rejectable.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::istreamable</Name>
@@ -934,12 +1108,20 @@
           </Subnodes>
          </Node>
          <Node>
+          <Name>mbari::kalman_filter_fn</Name>
+          <Path>dd/de6/structmbari_1_1kalman__filter__fn.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::list_set&lt; IdTraits, Cmp &gt;</Name>
           <Path>dc/d8c/classTREX_1_1utils_1_1list__set.html</Path>
          </Node>
          <Node>
           <Name>mbari::amqp::listener</Name>
           <Path>d2/dea/classmbari_1_1amqp_1_1listener.html</Path>
+         </Node>
+         <Node>
+          <Name>mbari::location</Name>
+          <Path>df/de0/classmbari_1_1location.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internals::LogEntry</Name>
@@ -958,12 +1140,30 @@
           <Path>df/db9/classmbari_1_1amqp_1_1queue_1_1message.html</Path>
          </Node>
          <Node>
-          <Name>noncopyable</Name>
-          <Path>df/d91/classboost_1_1noncopyable.html</Path>
+          <Name>mbari::MessageHandler</Name>
+          <Path>df/de8/classmbari_1_1MessageHandler.html</Path>
+          <Subnodes>
+           <Node>
+            <Name>mbari::DoradoHandler</Name>
+            <Path>db/ddb/classmbari_1_1DoradoHandler.html</Path>
+           </Node>
+           <Node>
+            <Name>mbari::PositionHandler</Name>
+            <Path>d8/db2/classmbari_1_1PositionHandler.html</Path>
+           </Node>
+          </Subnodes>
          </Node>
          <Node>
-          <Name>TREX::witre::Observations</Name>
-          <Path>dc/d7f/classTREX_1_1witre_1_1Observations.html</Path>
+          <Name>TREX::witre::WitrePaintSearch::nodeObject</Name>
+          <Path>da/d2e/classTREX_1_1witre_1_1WitrePaintSearch_1_1nodeObject.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::NoGoalsFilter</Name>
+          <Path>df/db9/classstarfish_1_1europa_1_1NoGoalsFilter.html</Path>
+         </Node>
+         <Node>
+          <Name>noncopyable</Name>
+          <Path>df/d91/classboost_1_1noncopyable.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::ostreamable</Name>
@@ -974,20 +1174,8 @@
             <Path>d1/dc6/classTREX_1_1transaction_1_1DomainBase.html</Path>
             <Subnodes>
              <Node>
-              <Name>TREX::europa::EuropaDomain</Name>
-              <Path>d6/d48/classTREX_1_1europa_1_1EuropaDomain.html</Path>
-             </Node>
-             <Node>
-              <Name>TREX::europa::EuropaProxy</Name>
-              <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-             </Node>
-             <Node>
-              <Name>TREX::europa::EuropaProxy</Name>
-              <Path>d0/dcf/classTREX_1_1europa_1_1EuropaProxy.html</Path>
-             </Node>
-             <Node>
-              <Name>TREX::europa::ProxyDomain</Name>
-              <Path>de/da6/classTREX_1_1europa_1_1ProxyDomain.html</Path>
+              <Name>TREX::europa::details::EuropaDomain</Name>
+              <Path>dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html</Path>
              </Node>
              <Node>
               <Name>TREX::transaction::BasicEnumerated</Name>
@@ -1007,18 +1195,6 @@
                 <Name>TREX::transaction::EnumeratedDomain&lt; TREX::utils::Symbol &gt;</Name>
                 <Path>d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html</Path>
                 <Subnodes>
-                 <Node>
-                  <Name>TREX::europa::EuropaEntity</Name>
-                  <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-                 </Node>
-                 <Node>
-                  <Name>TREX::europa::EuropaEntity</Name>
-                  <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-                 </Node>
-                 <Node>
-                  <Name>TREX::europa::EuropaEntity</Name>
-                  <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
-                 </Node>
                  <Node>
                   <Name>TREX::europa::EuropaEntity</Name>
                   <Path>d8/df7/classTREX_1_1europa_1_1EuropaEntity.html</Path>
@@ -1101,40 +1277,6 @@
             <Name>TREX::utils::Exception</Name>
             <Path>db/d94/classTREX_1_1utils_1_1Exception.html</Path>
             <Subnodes>
-             <Node>
-              <Name>TREX::europa::EuropaException</Name>
-              <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
-              <Subnodes>
-               <Node>
-                <Name>TREX::europa::TokenError</Name>
-                <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-               </Node>
-               <Node>
-                <Name>TREX::europa::TokenError</Name>
-                <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-               </Node>
-               <Node>
-                <Name>TREX::europa::TokenError</Name>
-                <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-               </Node>
-               <Node>
-                <Name>TREX::europa::TokenError</Name>
-                <Path>d0/deb/classTREX_1_1europa_1_1TokenError.html</Path>
-               </Node>
-              </Subnodes>
-             </Node>
-             <Node>
-              <Name>TREX::europa::EuropaException</Name>
-              <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
-             </Node>
-             <Node>
-              <Name>TREX::europa::EuropaException</Name>
-              <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
-             </Node>
-             <Node>
-              <Name>TREX::europa::EuropaException</Name>
-              <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
-             </Node>
              <Node>
               <Name>TREX::europa::EuropaException</Name>
               <Path>dd/d3e/classTREX_1_1europa_1_1EuropaException.html</Path>
@@ -1242,12 +1384,24 @@
           </Subnodes>
          </Node>
          <Node>
+          <Name>TREX::witre::PaintedGraph</Name>
+          <Path>d4/d63/classTREX_1_1witre_1_1PaintedGraph.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::PluginLoader</Name>
           <Path>de/dff/classTREX_1_1utils_1_1PluginLoader.html</Path>
          </Node>
          <Node>
+          <Name>mbari::point&lt; Dim &gt;</Name>
+          <Path>dc/dff/classmbari_1_1point.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::pointer_id_traits&lt; IdTraits, Ptr &gt;</Name>
           <Path>db/dd4/structTREX_1_1utils_1_1pointer__id__traits.html</Path>
+         </Node>
+         <Node>
+          <Name>starfish::europa::Position</Name>
+          <Path>d4/d01/structstarfish_1_1europa_1_1Position.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::Factory&lt; AbstractProduct, Id, ConsArg, ProductRef, IdComp &gt;::producer</Name>
@@ -1300,14 +1454,6 @@
             <Path>d3/d09/classTREX_1_1europa_1_1CheckExternal.html</Path>
            </Node>
            <Node>
-            <Name>TREX::europa::CheckExternal</Name>
-            <Path>d3/d09/classTREX_1_1europa_1_1CheckExternal.html</Path>
-           </Node>
-           <Node>
-            <Name>TREX::europa::CheckInternal</Name>
-            <Path>db/d52/classTREX_1_1europa_1_1CheckInternal.html</Path>
-           </Node>
-           <Node>
             <Name>TREX::europa::CheckInternal</Name>
             <Path>db/d52/classTREX_1_1europa_1_1CheckInternal.html</Path>
            </Node>
@@ -1338,16 +1484,24 @@
           <Path>d4/d44/classTREX_1_1europa_1_1details_1_1Schema.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::SchemaPlugin</Name>
-          <Path>d9/dab/classTREX_1_1europa_1_1SchemaPlugin.html</Path>
+          <Name>TREX::europa::details::scoped_split</Name>
+          <Path>d4/d94/classTREX_1_1europa_1_1details_1_1scoped__split.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internal::sdummy_factory</Name>
           <Path>da/d1f/structTREX_1_1utils_1_1internal_1_1sdummy__factory.html</Path>
          </Node>
          <Node>
+          <Name>mbari::serie&lt; Ty &gt;</Name>
+          <Path>dc/dfe/classmbari_1_1serie.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::utils::SharedVar&lt; Ty &gt;</Name>
           <Path>de/d9c/classTREX_1_1utils_1_1SharedVar.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::SineConstraint</Name>
+          <Path>df/d04/classTREX_1_1europa_1_1SineConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internal::SingletonDummy</Name>
@@ -1368,14 +1522,8 @@
           <Path>d1/dd0/structTREX_1_1utils_1_1SingletonUse.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::StateListener</Name>
-          <Path>d8/d0f/classTREX_1_1europa_1_1StateListener.html</Path>
-          <Subnodes>
-           <Node>
-            <Name>TREX::europa::EuropaReactor</Name>
-            <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
-           </Node>
-          </Subnodes>
+          <Name>TREX::europa::SqrtConstraint</Name>
+          <Path>d6/d9b/classTREX_1_1europa_1_1SqrtConstraint.html</Path>
          </Node>
          <Node>
           <Name>TREX::europa::SynchronizationManager</Name>
@@ -1394,24 +1542,16 @@
             <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
            </Node>
            <Node>
-            <Name>TREX::europa::EuropaReactor</Name>
-            <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
-           </Node>
-           <Node>
-            <Name>TREX::europa::EuropaReactor</Name>
-            <Path>d5/dba/classTREX_1_1europa_1_1EuropaReactor.html</Path>
-           </Node>
-           <Node>
             <Name>TREX::lightswitch::Light</Name>
             <Path>d0/d59/classTREX_1_1lightswitch_1_1Light.html</Path>
            </Node>
            <Node>
-            <Name>TREX::transaction::Player</Name>
-            <Path>de/d10/classTREX_1_1transaction_1_1Player.html</Path>
+            <Name>TREX::startrex::Auv</Name>
+            <Path>dc/d0a/classTREX_1_1startrex_1_1Auv.html</Path>
            </Node>
            <Node>
-            <Name>TREX::vitre::VitreReactor</Name>
-            <Path>d1/d57/classTREX_1_1vitre_1_1VitreReactor.html</Path>
+            <Name>TREX::transaction::Player</Name>
+            <Path>de/d10/classTREX_1_1transaction_1_1Player.html</Path>
            </Node>
            <Node>
             <Name>TREX::witre::WitreServer</Name>
@@ -1442,30 +1582,20 @@
           </Subnodes>
          </Node>
          <Node>
+          <Name>TREX::europa::details::token_id_traits</Name>
+          <Path>de/da9/structTREX_1_1europa_1_1details_1_1token__id__traits.html</Path>
+         </Node>
+         <Node>
           <Name>TREX::europa::TokenFilter</Name>
           <Path>d3/d0d/classTREX_1_1europa_1_1TokenFilter.html</Path>
           <Subnodes>
            <Node>
-            <Name>TREX::europa::DeliberationFilter</Name>
-            <Path>d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html</Path>
+            <Name>TREX::europa::DeliberationScope</Name>
+            <Path>d8/da3/classTREX_1_1europa_1_1DeliberationScope.html</Path>
            </Node>
            <Node>
-            <Name>TREX::europa::SynchronizationFilter</Name>
-            <Path>da/da2/classTREX_1_1europa_1_1SynchronizationFilter.html</Path>
-           </Node>
-          </Subnodes>
-         </Node>
-         <Node>
-          <Name>TREX::europa::TokenManager</Name>
-          <Path>d6/d70/classTREX_1_1europa_1_1TokenManager.html</Path>
-         </Node>
-         <Node>
-          <Name>TREX::europa::Assembly::TokenProcessor</Name>
-          <Path>da/da1/classTREX_1_1europa_1_1Assembly_1_1TokenProcessor.html</Path>
-          <Subnodes>
-           <Node>
-            <Name>TREX::europa::Synchronizer</Name>
-            <Path>db/de9/classTREX_1_1europa_1_1Synchronizer.html</Path>
+            <Name>TREX::europa::SynchronizationScope</Name>
+            <Path>d1/d89/classTREX_1_1europa_1_1SynchronizationScope.html</Path>
            </Node>
           </Subnodes>
          </Node>
@@ -1474,8 +1604,12 @@
           <Path>dd/dfc/structTREX_1_1transaction_1_1graph_1_1traversal__category.html</Path>
          </Node>
          <Node>
-          <Name>TREX::europa::details::UpdateIterator</Name>
-          <Path>d3/da8/classTREX_1_1europa_1_1details_1_1UpdateIterator.html</Path>
+          <Name>TREX::europa::details::UpdateFlawIterator</Name>
+          <Path>db/d6a/classTREX_1_1europa_1_1details_1_1UpdateFlawIterator.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::europa::details::UpdateMatchFinder</Name>
+          <Path>df/d3d/classTREX_1_1europa_1_1details_1_1UpdateMatchFinder.html</Path>
          </Node>
          <Node>
           <Name>TREX::version</Name>
@@ -1484,6 +1618,18 @@
          <Node>
           <Name>TREX::witre::WitreApplication</Name>
           <Path>d1/dcc/classTREX_1_1witre_1_1WitreApplication.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitreGraph</Name>
+          <Path>d5/ddb/classTREX_1_1witre_1_1WitreGraph.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitreGraphContainer</Name>
+          <Path>df/d1b/classTREX_1_1witre_1_1WitreGraphContainer.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::witre::WitrePaintSearch</Name>
+          <Path>d1/d58/classTREX_1_1witre_1_1WitrePaintSearch.html</Path>
          </Node>
          <Node>
           <Name>TREX::utils::internals::xml_arg_helper&lt; Base, Extra &gt;</Name>
@@ -1522,12 +1668,20 @@
         <Path>namespaces.html</Path>
         <Subnodes>
          <Node>
+          <Name>starfish</Name>
+          <Path>d3/d27/namespacestarfish.html</Path>
+         </Node>
+         <Node>
           <Name>std</Name>
           <Path>d8/dcc/namespacestd.html</Path>
          </Node>
          <Node>
           <Name>TREX::lightswitch</Name>
           <Path>d8/d59/namespaceTREX_1_1lightswitch.html</Path>
+         </Node>
+         <Node>
+          <Name>TREX::startrex</Name>
+          <Path>d2/df4/namespaceTREX_1_1startrex.html</Path>
          </Node>
          <Node>
           <Name>TREX::transaction</Name>
@@ -1556,10 +1710,6 @@
         <Path>files.html</Path>
         <Subnodes>
          <Node>
-          <Name>extra/europa/EuropaReactor.hh</Name>
-          <Path>db/d1a/EuropaReactor_8hh.html</Path>
-         </Node>
-         <Node>
           <Name>extra/lightswitch/LightSwitch.cc</Name>
           <Path>d6/d6a/LightSwitch_8cc.html</Path>
          </Node>
@@ -1568,16 +1718,16 @@
           <Path>db/df2/LightSwitch_8hh.html</Path>
          </Node>
          <Node>
+          <Name>extra/starfish/StarTrex.cc</Name>
+          <Path>dc/d97/StarTrex_8cc.html</Path>
+         </Node>
+         <Node>
           <Name>trex/agent/Agent.cc</Name>
           <Path>d1/d37/Agent_8cc.html</Path>
          </Node>
          <Node>
           <Name>trex/agent/Agent.hh</Name>
           <Path>d8/d62/Agent_8hh.html</Path>
-         </Node>
-         <Node>
-          <Name>trex/agent/agent_graph.hh</Name>
-          <Path>d8/d9c/agent__graph_8hh.html</Path>
          </Node>
          <Node>
           <Name>trex/agent/Clock.cc</Name>
@@ -1768,10 +1918,6 @@
           <Path>dc/dc7/Pdlfcn_8cc.html</Path>
          </Node>
          <Node>
-          <Name>trex/utils/Pdlfcn.hh</Name>
-          <Path>d5/dee/Pdlfcn_8hh.html</Path>
-         </Node>
-         <Node>
           <Name>trex/utils/Plugin.hh</Name>
           <Path>d1/dac/Plugin_8hh.html</Path>
          </Node>
@@ -1895,64 +2041,46 @@
               <Subnodes>
               </Subnodes>
              </Node>
-            </Subnodes>
-           </Node>
-           <Node>
-            <Name>europa.old</Name>
-            <Path>dir_80459b0a003dc04346b74f24a0706bee.html</Path>
-            <Subnodes>
              <Node>
-              <Name>bits</Name>
-              <Path>dir_d880226c5c324e7696bb66fb899b097c.html</Path>
+              <Name>core</Name>
+              <Path>dir_caf30660ae4679c1670c7e61e370b97e.html</Path>
+              <Subnodes>
+               <Node>
+                <Name>private</Name>
+                <Path>dir_f020341b523d8d00e61691eb0300f98a.html</Path>
+                <Subnodes>
+                </Subnodes>
+               </Node>
+              </Subnodes>
+             </Node>
+             <Node>
+              <Name>extensions</Name>
+              <Path>dir_faf62e3ddc3d8d7989372c9705c0ef4d.html</Path>
               <Subnodes>
               </Subnodes>
              </Node>
              <Node>
               <Name>private</Name>
-              <Path>dir_6dcd478c15379d65a885680b4f9ee5fb.html</Path>
-              <Subnodes>
-              </Subnodes>
-             </Node>
-            </Subnodes>
-           </Node>
-           <Node>
-            <Name>europa2</Name>
-            <Path>dir_39ed9d2449d002c8a83577cd9ed5c199.html</Path>
-            <Subnodes>
-             <Node>
-              <Name>bits</Name>
-              <Path>dir_e39be84e54b2d5062ac4d48f7312abff.html</Path>
+              <Path>dir_6b515154adeb603b5dd640e8d98c913b.html</Path>
               <Subnodes>
               </Subnodes>
              </Node>
              <Node>
-              <Name>private</Name>
-              <Path>dir_53c0760b53f589b6a163ec8cc3471950.html</Path>
+              <Name>trex</Name>
+              <Path>dir_92fac9275a1e9003853299a74f2c62d0.html</Path>
               <Subnodes>
-              </Subnodes>
-             </Node>
-            </Subnodes>
-           </Node>
-           <Node>
-            <Name>europa2.old</Name>
-            <Path>dir_aadc07d4d9c472d12b4c06eadec554c7.html</Path>
-            <Subnodes>
-             <Node>
-              <Name>bits</Name>
-              <Path>dir_58634fb89959c0c98e9b24ad8e64e166.html</Path>
-              <Subnodes>
-              </Subnodes>
-             </Node>
-             <Node>
-              <Name>old</Name>
-              <Path>dir_3c0f2fdc9174b5a6a5f9f08926374db1.html</Path>
-              <Subnodes>
-              </Subnodes>
-             </Node>
-             <Node>
-              <Name>private</Name>
-              <Path>dir_4c48fe4157930057b982946984494268.html</Path>
-              <Subnodes>
+               <Node>
+                <Name>europa</Name>
+                <Path>dir_cf3c58dc80b2cc8beff8a8b3eefcf8b3.html</Path>
+                <Subnodes>
+                 <Node>
+                  <Name>bits</Name>
+                  <Path>dir_6f23bc71e8ee9cf0d6057746ada9bd7c.html</Path>
+                  <Subnodes>
+                  </Subnodes>
+                 </Node>
+                </Subnodes>
+               </Node>
               </Subnodes>
              </Node>
             </Subnodes>
@@ -1964,8 +2092,8 @@
             </Subnodes>
            </Node>
            <Node>
-            <Name>vitre</Name>
-            <Path>dir_dafd9d1bf7eb992ca988c8f65ebeb1e5.html</Path>
+            <Name>starfish</Name>
+            <Path>dir_9ba68b7c684255f333ecc3e383b21f34.html</Path>
             <Subnodes>
             </Subnodes>
            </Node>
@@ -1984,6 +2112,12 @@
            <Node>
             <Name>europa</Name>
             <Path>dir_f8752a942d8645d9aa5c2d3e6d7c3f08.html</Path>
+            <Subnodes>
+            </Subnodes>
+           </Node>
+           <Node>
+            <Name>iridium</Name>
+            <Path>dir_1ef46fdc70cedcb208dc1a1e6b9058da.html</Path>
             <Subnodes>
             </Subnodes>
            </Node>
@@ -2009,6 +2143,12 @@
             <Name>agent</Name>
             <Path>dir_32a2a965c2e3de3622b34226dddfef9a.html</Path>
             <Subnodes>
+             <Node>
+              <Name>bits</Name>
+              <Path>dir_a556d346d0cd88fa0bb983787ca7ae0c.html</Path>
+              <Subnodes>
+              </Subnodes>
+             </Node>
             </Subnodes>
            </Node>
            <Node>

@@ -81,7 +81,7 @@ window.onload = initDynSections;
 <p>Cycle detector.  
 <a href="#_details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">trex/agent/agent_graph.hh</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">trex/agent/bits/agent_graph.hh</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for TREX::agent::CycleDetector:</div>
 <div class="dynsection">
@@ -104,8 +104,8 @@ Inheritance diagram for TREX::agent::CycleDetector:</div>
 virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a64d9e4f7da5d59a4381e2117b7a204b7">~CycleDetector</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774">is_valid</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a> r) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for node validity.  <a href="#a97e67bea3f14dad816fcc4b0984cc774"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097">is_valid</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a> r, <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">TREX::transaction::graph</a> const &amp;g) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for node validity.  <a href="#a39f21c7a8198ccb594caf9115cd0e097"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Cycle detector. </p>
@@ -180,9 +180,20 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 
 <p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00144">144</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00166">is_valid()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph.png" border="0" usemap="#df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph_map" alt=""></div>
+<map name="df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph_map" id="df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph">
+<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097" title="Check for node validity." alt="" coords="357,5,635,35"/></map>
+</div>
+</p>
+
 </div>
 </div>
-<a class="anchor" id="a97e67bea3f14dad816fcc4b0984cc774"></a><!-- doxytag: member="TREX::agent::CycleDetector::is_valid" ref="a97e67bea3f14dad816fcc4b0984cc774" args="(TREX::transaction::graph::reactor_id r) const " -->
+<a class="anchor" id="a39f21c7a8198ccb594caf9115cd0e097"></a><!-- doxytag: member="TREX::agent::CycleDetector::is_valid" ref="a39f21c7a8198ccb594caf9115cd0e097" args="(TREX::transaction::graph::reactor_id r, TREX::transaction::graph const &amp;g) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -190,9 +201,18 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
           <td class="memname">bool TREX::agent::CycleDetector::is_valid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a>&nbsp;</td>
-          <td class="paramname"> <em>r</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline, protected]</code></td>
+          <td class="paramname"> <em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">TREX::transaction::graph</a> const &amp;&nbsp;</td>
+          <td class="paramname"> <em>g</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline, protected]</code></td>
         </tr>
       </table>
 </div>
@@ -201,11 +221,12 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p>Check for node validity. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor reference</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor reference </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>g</em>&nbsp;</td><td>The graph supporting <code>r</code> </td></tr>
   </table>
   </dd>
 </dl>
-<p>Check that <code>r</code> referes to an exisiting reactor. This method is used during graph traversal to vcheck that the an edge is not pointing to nothing</p>
+<p>Check that <code>r</code> referes to an exisiting reactor. This method is used during graph traversal to check that the an edge is not pointing to nothing or to a node that has been isolated</p>
 <dl><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>if <code>r</code> refers to a reactor </td></tr>
@@ -215,17 +236,17 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::garph::null_reactor() </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">163</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00166">166</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00197">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00215">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00144">back_edge()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00199">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00218">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00112">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>trex/agent/<a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a></li>
+<li>trex/agent/bits/<a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:12 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

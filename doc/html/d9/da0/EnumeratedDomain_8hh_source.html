@@ -126,17 +126,17 @@ window.onload = initDynSections;
 <a name="l00098"></a>00098     <span class="keyword">public</span>:
 <a name="l00100"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a290153d8d995f5a238159eb13432c7c0">00100</a>       <span class="keyword">typedef</span> <span class="keyword">typename</span> container_type::const_iterator <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a290153d8d995f5a238159eb13432c7c0" title="Possible values iterator.">iterator</a>;
 <a name="l00101"></a>00101       
-<a name="l00108"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b">00108</a>       <span class="keyword">explicit</span> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type)
+<a name="l00108"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b">00108</a>       <span class="keyword">explicit</span> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type)
 <a name="l00109"></a>00109       :<a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class.">BasicEnumerated</a>(type) {}
 <a name="l00124"></a>00124       <span class="keyword">template</span>&lt;<span class="keyword">class</span> Iter&gt;
-<a name="l00125"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#aa91e580609726691430422c675adf536">00125</a>       <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type,
+<a name="l00125"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#aa91e580609726691430422c675adf536">00125</a>       <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type,
 <a name="l00126"></a>00126                        Iter from, Iter to)
 <a name="l00127"></a>00127       :<a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class.">BasicEnumerated</a>(type), m_elements(from, to) {
 <a name="l00128"></a>00128         <span class="keywordflow">if</span>( m_elements.empty() )
 <a name="l00129"></a>00129           <span class="keywordflow">throw</span> <a class="code" href="../../d5/deb/classTREX_1_1transaction_1_1EmptyDomain.html" title="Empty domain.">EmptyDomain</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;Newly created EnumeratedDomain is empty.&quot;</span>);
 <a name="l00130"></a>00130       }
 <a name="l00131"></a>00131       
-<a name="l00139"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a4907834d3a2da4347deda3eae24f35b9">00139</a>       <span class="keyword">explicit</span> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type,
+<a name="l00139"></a><a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a4907834d3a2da4347deda3eae24f35b9">00139</a>       <span class="keyword">explicit</span> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a39d2f3a9d4ad08b2b1653827cfc2d07b" title="Constructor.">EnumeratedDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type,
 <a name="l00140"></a>00140                                 Ty <span class="keyword">const</span> &amp;val)
 <a name="l00141"></a>00141       :<a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class.">BasicEnumerated</a>(type) {
 <a name="l00142"></a>00142         <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html#a55dd3550c3db5ded6ab96f2baeab82c9" title="Add an element to the domain.">add</a>(val);
@@ -269,7 +269,7 @@ window.onload = initDynSections;
 <a name="l00360"></a>00360 
 <a name="l00361"></a>00361 <span class="preprocessor">#endif // H_EnumeratedDomain</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

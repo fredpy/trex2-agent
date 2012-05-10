@@ -113,7 +113,7 @@ window.onload = initDynSections;
 <a name="l00039"></a>00039 <span class="preprocessor">#include &lt;Wt/WServer&gt;</span>
 <a name="l00040"></a>00040 <span class="preprocessor">#include &lt;boost/thread.hpp&gt;</span>
 <a name="l00041"></a>00041 <span class="preprocessor">#include &lt;<a class="code" href="../../db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo-Reactor.">trex/transaction/TeleoReactor.hh</a>&gt;</span>
-<a name="l00042"></a>00042 <span class="preprocessor">#include &quot;Observations.hh&quot;</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &quot;WitreGraph.hh&quot;</span>
 <a name="l00043"></a>00043 
 <a name="l00044"></a>00044 
 <a name="l00045"></a>00045 <span class="keyword">namespace </span>TREX {
@@ -121,92 +121,104 @@ window.onload = initDynSections;
 <a name="l00047"></a>00047 
 <a name="l00048"></a>00048     <span class="keyword">class </span>WitreApplication;
 <a name="l00049"></a>00049     <span class="keyword">class </span>WitreReactor;
-<a name="l00050"></a>00050 
-<a name="l00051"></a><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">00051</a>     <span class="keyword">class </span><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a> :<span class="keyword">public</span> TREX::transaction::TeleoReactor, <span class="keyword">public</span> TREX::transaction::graph::timelines_listener {
-<a name="l00052"></a>00052     <span class="keyword">public</span>:
-<a name="l00053"></a>00053 
-<a name="l00054"></a><a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">00054</a>       <span class="keyword">class </span><a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a> :<span class="keyword">public</span> TREX::utils::Exception {
-<a name="l00055"></a>00055       <span class="keyword">public</span>:
-<a name="l00056"></a>00056        <a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a>(std::string <span class="keyword">const</span> &amp;what) <span class="keywordflow">throw</span>()
-<a name="l00057"></a>00057          :<a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html#a7a974afaa4993e796ec0c118bc4296cf" title="Constructor.">TREX::utils::Exception</a>(what) {}
-<a name="l00058"></a>00058        <span class="keyword">virtual</span> ~<a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a>() <span class="keywordflow">throw</span>() {}
-<a name="l00059"></a>00059       };
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061       <span class="comment">// WitreApplication const &amp;app() const;</span>
-<a name="l00062"></a>00062       <span class="comment">// WitreApplication &amp;app();</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064       Wt::WServer <span class="keyword">const</span> &amp;wt() <span class="keyword">const</span>;
-<a name="l00065"></a>00065       Wt::WServer &amp;wt();
+<a name="l00050"></a>00050     <span class="keyword">class </span>WitreGraph;
+<a name="l00051"></a>00051 
+<a name="l00052"></a><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">00052</a>     <span class="keyword">class </span><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a> :<span class="keyword">public</span> TREX::transaction::<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface.">TeleoReactor</a>, <span class="keyword">public</span> TREX::transaction::<a class="code" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph.">graph</a>::timelines_listener {
+<a name="l00053"></a>00053     <span class="keyword">public</span>:
+<a name="l00054"></a>00054 
+<a name="l00055"></a><a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">00055</a>       <span class="keyword">class </span><a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a> :<span class="keyword">public</span> TREX::utils::Exception {
+<a name="l00056"></a>00056             <span class="keyword">public</span>:
+<a name="l00057"></a>00057                 <a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a>(std::string <span class="keyword">const</span> &amp;what) <span class="keywordflow">throw</span>()
+<a name="l00058"></a>00058                     :<a class="code" href="../../db/d94/classTREX_1_1utils_1_1Exception.html#a7a974afaa4993e796ec0c118bc4296cf" title="Constructor.">TREX::utils::Exception</a>(what) {}
+<a name="l00059"></a>00059                 <span class="keyword">virtual</span> ~<a class="code" href="../../d2/d75/classTREX_1_1witre_1_1WitreServer_1_1Error.html">Error</a>() <span class="keywordflow">throw</span>() {}
+<a name="l00060"></a>00060       };
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062       <span class="comment">// WitreApplication const &amp;app() const;</span>
+<a name="l00063"></a>00063       <span class="comment">// WitreApplication &amp;app();</span>
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065       <span class="keyword">typedef</span> std::list&lt; std::pair&lt;double, goal_id&gt; &gt; timed_goal;
 <a name="l00066"></a>00066 
-<a name="l00067"></a>00067       <span class="keywordtype">void</span> connect(<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *client, <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; function);
-<a name="l00068"></a>00068       <span class="keywordtype">void</span> disconnect(<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *client);
+<a name="l00067"></a>00067       Wt::WServer <span class="keyword">const</span> &amp;wt() <span class="keyword">const</span>;
+<a name="l00068"></a>00068       Wt::WServer &amp;wt();
 <a name="l00069"></a>00069 
-<a name="l00070"></a>00070       std::string extTimelinesName(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> externalTimelines[i].str(); }
-<a name="l00071"></a>00071       <span class="keywordtype">int</span> extTimelinesSize() { <span class="keywordflow">return</span> externalTimelines.size(); };
-<a name="l00072"></a>00072       <span class="keyword">const</span> std::queue&lt;Observations&gt; receiveObs() { <span class="keywordflow">return</span> observations; };
-<a name="l00073"></a>00073       <span class="keywordtype">bool</span> acceptsGoal(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) { <span class="keywordflow">return</span> find_external(name)-&gt;accept_goals(); }
-<a name="l00074"></a>00074       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); <span class="keywordflow">return</span> now; };
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076       <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> clientGoalPost(<a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">TREX::transaction::Goal</a> <span class="keyword">const</span> &amp;g);
-<a name="l00077"></a>00077       <a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">TREX::transaction::Goal</a> getGoal(std::string obs, std::string prd);
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079       WitreServer(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">TREX::transaction::TeleoReactor::xml_arg_type</a> arg);
-<a name="l00080"></a>00080       ~WitreServer();
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082       <span class="keywordtype">bool</span> attached()<span class="keyword"> const </span>{
-<a name="l00083"></a>00083        <span class="keywordflow">return</span> NULL!=m_entry;
-<a name="l00084"></a>00084       }
-<a name="l00085"></a>00085       WitreReactor &amp;reactor()<span class="keyword"> const </span>{
-<a name="l00086"></a>00086        <span class="keywordflow">return</span> *m_entry;
-<a name="l00087"></a>00087       }
-<a name="l00088"></a>00088     <span class="keyword">private</span>:
-<a name="l00089"></a>00089       <span class="comment">//Trex functions</span>
-<a name="l00090"></a>00090       <span class="keywordtype">void</span> handleInit();
-<a name="l00091"></a>00091       <span class="keywordtype">void</span> handTickStart() {};
-<a name="l00092"></a>00092       <span class="keywordtype">void</span> notify(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">TREX::transaction::Observation</a> <span class="keyword">const</span> &amp;obs);
-<a name="l00093"></a>00093       <span class="keywordtype">bool</span> synchronize();
-<a name="l00094"></a>00094       <span class="comment">//End of Trex functions</span>
-<a name="l00095"></a>00095 
-<a name="l00096"></a>00096       <span class="keyword">struct </span>Connection {
-<a name="l00097"></a>00097         Connection(<span class="keyword">const</span> std::string&amp; <span class="keywordtype">id</span>, WitreApplication *c, <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; f)
-<a name="l00098"></a>00098           : sessionId(id), client(c), function(f)
-<a name="l00099"></a>00099         { }
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101         std::string sessionId;
-<a name="l00102"></a>00102         WitreApplication *client;
-<a name="l00103"></a>00103         boost::function&lt;void()&gt; function;
-<a name="l00104"></a>00104       };
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106       <span class="keywordtype">void</span> declared(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;timeline);
-<a name="l00107"></a>00107       <span class="keywordtype">void</span> undeclared(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;timeline);
-<a name="l00108"></a>00108   
-<a name="l00109"></a>00109                          
-<a name="l00110"></a>00110       <span class="keyword">mutable</span> boost::mutex mutex_;
-<a name="l00111"></a>00111       boost::thread thread_;
-<a name="l00112"></a>00112       std::vector&lt;Connection&gt; connections;
-<a name="l00113"></a>00113       std::vector&lt;utils::Symbol&gt; externalTimelines;
-<a name="l00114"></a>00114       std::queue&lt;Observations&gt; observations;
+<a name="l00070"></a>00070       <span class="keywordtype">void</span> connect(<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *client, <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; function);
+<a name="l00071"></a>00071       <span class="keywordtype">void</span> disconnect(<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *client);
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073       std::string extTimelinesName(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> externalTimelines[i].str(); }
+<a name="l00074"></a>00074       <span class="keywordtype">int</span> extTimelinesSize() { <span class="keywordflow">return</span> externalTimelines.size(); };
+<a name="l00075"></a>00075       <span class="keyword">const</span> std::queue&lt;std::string&gt; receiveObs() { <span class="keywordflow">return</span> observations; };
+<a name="l00076"></a>00076       <span class="keywordtype">bool</span> acceptsGoal(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) { <span class="keywordflow">return</span> find_external(name)-&gt;accept_goals(); }
+<a name="l00077"></a>00077       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); <span class="keywordflow">return</span> now; };
+<a name="l00078"></a>00078       std::string getDependencies(std::string name);
+<a name="l00079"></a>00079       <span class="keyword">const</span> timed_goal&amp; plan() { <span class="keywordflow">return</span> planTokens; };
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081       <a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> clientGoalPost(<a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">TREX::transaction::Goal</a> <span class="keyword">const</span> &amp;g);
+<a name="l00082"></a>00082       <a class="code" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html" title="TREX goal.">TREX::transaction::Goal</a> getGoal(std::string obs, std::string prd);
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084       WitreServer(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">TREX::transaction::TeleoReactor::xml_arg_type</a> arg);
+<a name="l00085"></a>00085       ~WitreServer();
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087       <span class="keywordtype">bool</span> attached()<span class="keyword"> const </span>{
+<a name="l00088"></a>00088        <span class="keywordflow">return</span> NULL!=m_entry;
+<a name="l00089"></a>00089       }
+<a name="l00090"></a>00090       WitreReactor &amp;reactor()<span class="keyword"> const </span>{
+<a name="l00091"></a>00091        <span class="keywordflow">return</span> *m_entry;
+<a name="l00092"></a>00092       }
+<a name="l00093"></a>00093     <span class="keyword">private</span>:
+<a name="l00094"></a>00094       <span class="comment">//Trex functions</span>
+<a name="l00095"></a>00095       <span class="keywordtype">void</span> handleInit();
+<a name="l00096"></a>00096       <span class="keywordtype">void</span> handleTickStart() {};
+<a name="l00097"></a>00097       <span class="keywordtype">void</span> notify(<a class="code" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html" title="Reactor observation.">TREX::transaction::Observation</a> <span class="keyword">const</span> &amp;obs);
+<a name="l00098"></a>00098       <span class="keywordtype">bool</span> synchronize();
+<a name="l00099"></a>00099       <span class="keywordtype">void</span> newPlanToken(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;t);
+<a name="l00100"></a>00100       <span class="keywordtype">void</span> cancelledPlanToken(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">goal_id</a> <span class="keyword">const</span> &amp;t);
+<a name="l00101"></a>00101       <span class="comment">//End of Trex functions</span>
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103       <span class="keyword">struct </span>Connection {
+<a name="l00104"></a>00104         Connection(<span class="keyword">const</span> std::string&amp; <span class="keywordtype">id</span>, WitreApplication *c, <span class="keyword">const</span> boost::function&lt;<span class="keywordtype">void</span>()&gt;&amp; f)
+<a name="l00105"></a>00105           : sessionId(id), client(c), function(f)
+<a name="l00106"></a>00106         { }
+<a name="l00107"></a>00107 
+<a name="l00108"></a>00108         std::string sessionId;
+<a name="l00109"></a>00109         WitreApplication *client;
+<a name="l00110"></a>00110         boost::function&lt;void()&gt; function;
+<a name="l00111"></a>00111       };
+<a name="l00112"></a>00112 
+<a name="l00113"></a>00113       <span class="keywordtype">void</span> declared(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;timeline);
+<a name="l00114"></a>00114       <span class="keywordtype">void</span> undeclared(<a class="code" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html" title="TREX timeline representation.">TREX::transaction::details::timeline</a> <span class="keyword">const</span> &amp;timeline);
 <a name="l00115"></a>00115 
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117       <span class="keywordtype">bool</span> attach(WitreReactor &amp;r);
-<a name="l00118"></a>00118       <span class="keywordtype">void</span> detach(WitreReactor &amp;r);
-<a name="l00119"></a>00119 
-<a name="l00120"></a>00120       <span class="comment">// std::auto_ptr&lt;WitreApplication&gt; m_app;</span>
-<a name="l00121"></a>00121       Wt::WServer *    m_server;
-<a name="l00122"></a>00122 
-<a name="l00123"></a>00123       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::LogManager&gt;</a> m_log;
-<a name="l00124"></a>00124       WitreReactor *m_entry;
-<a name="l00125"></a>00125 
-<a name="l00126"></a>00126       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html" title="Phoenix singleton wrapper.">TREX::utils::SingletonWrapper</a>&lt;WitreServer&gt;;
-<a name="l00127"></a>00127       <span class="keyword">friend</span> <span class="keyword">class </span>WitreReactor;
-<a name="l00128"></a>00128     }; <span class="comment">// TREX::witre::WitreServer</span>
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130   } <span class="comment">// TREX::witre</span>
-<a name="l00131"></a>00131 } <span class="comment">// TREX</span>
-<a name="l00132"></a>00132 
-<a name="l00133"></a>00133 <span class="preprocessor">#endif // H_WitreServer</span>
+<a name="l00116"></a>00116       <span class="keywordtype">void</span> searchGraph();
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118 
+<a name="l00119"></a>00119       <span class="keyword">mutable</span> boost::mutex mutex_;
+<a name="l00120"></a>00120       boost::thread thread_;
+<a name="l00121"></a>00121       std::vector&lt;Connection&gt; connections;
+<a name="l00122"></a>00122       std::vector&lt;utils::Symbol&gt; externalTimelines;
+<a name="l00123"></a>00123       std::queue&lt;std::string&gt; observations;
+<a name="l00124"></a>00124       timed_goal pastTokens;
+<a name="l00125"></a>00125       timed_goal planTokens;
+<a name="l00126"></a>00126       WitrePaintSearch::GraphMap timelineGraph;
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129       <span class="keywordtype">bool</span> attach(WitreReactor &amp;r);
+<a name="l00130"></a>00130       <span class="keywordtype">void</span> detach(WitreReactor &amp;r);
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132       <span class="comment">// std::auto_ptr&lt;WitreApplication&gt; m_app;</span>
+<a name="l00133"></a>00133       Wt::WServer *    m_server;
+<a name="l00134"></a>00134 
+<a name="l00135"></a>00135       <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">TREX::utils::SingletonUse&lt;TREX::utils::LogManager&gt;</a> m_log;
+<a name="l00136"></a>00136       WitreReactor *m_entry;
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html" title="Phoenix singleton wrapper.">TREX::utils::SingletonWrapper</a>&lt;WitreServer&gt;;
+<a name="l00139"></a>00139       <span class="keyword">friend</span> <span class="keyword">class </span>WitreReactor;
+<a name="l00140"></a>00140     }; <span class="comment">// TREX::witre::WitreServer</span>
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142   } <span class="comment">// TREX::witre</span>
+<a name="l00143"></a>00143 } <span class="comment">// TREX</span>
+<a name="l00144"></a>00144 
+<a name="l00145"></a>00145 <span class="preprocessor">#endif // H_WitreServer</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

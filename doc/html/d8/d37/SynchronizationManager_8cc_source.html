@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>trex: extra/europa.old/SynchronizationManager.cc Source File</title>
+<title>trex: extra/europa/core/SynchronizationManager.cc Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@ window.onload = initDynSections;
       <li><a href="../../globals.html"><span>File&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_80459b0a003dc04346b74f24a0706bee.html">europa.old</a>
+  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_caf30660ae4679c1670c7e61e370b97e.html">core</a>
   </div>
 </div>
 <div class="contents">
@@ -105,246 +105,85 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;SynchronizationManager.hh&quot;</span>
-<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;private/UpdateIterator.hh&quot;</span>
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037 <span class="preprocessor">#include &lt;PLASMA/Timeline.hh&gt;</span>
-<a name="l00038"></a>00038 <span class="preprocessor">#include &lt;PLASMA/Token.hh&gt;</span>
-<a name="l00039"></a>00039 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 <span class="keyword">using namespace </span>TREX::europa;
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 <span class="comment">/*</span>
-<a name="l00044"></a>00044 <span class="comment"> * class TREX::europa::details::UpdateIterator</span>
-<a name="l00045"></a>00045 <span class="comment"> */</span>
-<a name="l00046"></a>00046 
-<a name="l00047"></a>00047 TREX::europa::details::UpdateIterator::UpdateIterator(<a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">SynchronizationManager</a> &amp;manager, <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> &amp;assembly)
-<a name="l00048"></a>00048 :EUROPA::SOLVERS::FlawIterator(manager), m_assembly(assembly), m_it(assembly.internal_begin()), m_synch(manager) {
-<a name="l00049"></a>00049   advance();
-<a name="l00050"></a>00050 }
+<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;trex/europa/SynchronizationManager.hh&quot;</span>
+<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;trex/europa/Assembly.hh&quot;</span>
+<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;trex/europa/bits/europa_helpers.hh&quot;</span>
+<a name="l00037"></a>00037 <span class="preprocessor">#include &quot;private/UpdateFlawIterator.hh&quot;</span>
+<a name="l00038"></a>00038 <span class="preprocessor">#include &quot;private/CurrentState.hh&quot;</span>
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040 <span class="preprocessor">#include &lt;PLASMA/Timeline.hh&gt;</span>
+<a name="l00041"></a>00041 <span class="preprocessor">#include &lt;PLASMA/Token.hh&gt;</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044 <span class="keyword">using namespace </span>TREX::europa;
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046 <span class="comment">/*</span>
+<a name="l00047"></a>00047 <span class="comment"> * class TREX::europa::details::UpdateFlawIterator</span>
+<a name="l00048"></a>00048 <span class="comment"> */</span>
+<a name="l00049"></a>00049 
+<a name="l00050"></a>00050 <span class="comment">// structors</span>
 <a name="l00051"></a>00051 
-<a name="l00052"></a>00052 EUROPA::EntityId <span class="keyword">const</span> TREX::europa::details::UpdateIterator::nextCandidate() {
-<a name="l00053"></a>00053   EUROPA::EntityId candidate;
-<a name="l00054"></a>00054     
-<a name="l00055"></a>00055   <span class="keywordflow">if</span>( m_assembly.internal_end()!=m_it ) {
-<a name="l00056"></a>00056     candidate = *m_it;
-<a name="l00057"></a>00057     ++m_it;
-<a name="l00058"></a>00058   }
-<a name="l00059"></a>00059   <span class="keywordflow">return</span> candidate;
-<a name="l00060"></a>00060 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="comment">/*</span>
-<a name="l00063"></a>00063 <span class="comment"> * class TREX::europa::details::InternalState::DecisionPoint</span>
-<a name="l00064"></a>00064 <span class="comment"> */</span>
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066 <span class="comment">// statics </span>
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068 <span class="keywordtype">bool</span> TREX::europa::details::InternalState::DecisionPoint::customStaticMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
-<a name="l00069"></a>00069   <span class="keywordflow">return</span> InternalStateId::convertable(entity);
-<a name="l00070"></a>00070 }
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072 <span class="comment">// structors</span>
-<a name="l00073"></a>00073 
-<a name="l00074"></a>00074 TREX::europa::details::InternalState::DecisionPoint::DecisionPoint(EUROPA::DbClientId <span class="keyword">const</span> &amp;client, 
-<a name="l00075"></a>00075                                                                    TREX::europa::details::InternalStateId <span class="keyword">const</span> &amp;timeline,
-<a name="l00076"></a>00076                                                                    EUROPA::TiXmlElement <span class="keyword">const</span> &amp;config, 
-<a name="l00077"></a>00077                                                                    EUROPA::LabelStr <span class="keyword">const</span> &amp;explanation)
-<a name="l00078"></a>00078 :EUROPA::SOLVERS::DecisionPoint(client, timeline-&gt;getKey(), explanation),
-<a name="l00079"></a>00079  m_target(timeline), m_predicates(timeline-&gt;predicates()) { 
-<a name="l00080"></a>00080 }
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082 std::string TREX::europa::details::InternalState::DecisionPoint::toString()<span class="keyword"> const </span>{
-<a name="l00083"></a>00083   <span class="keywordflow">return</span> toShortString();
-<a name="l00084"></a>00084 }
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 std::string TREX::europa::details::InternalState::DecisionPoint::toShortString()<span class="keyword"> const </span>{
-<a name="l00087"></a>00087   std::ostringstream oss;
-<a name="l00088"></a>00088  
-<a name="l00089"></a>00089   oss&lt;&lt;<span class="stringliteral">&quot;trex_&quot;</span>;
-<a name="l00090"></a>00090   
-<a name="l00091"></a>00091   <span class="keywordflow">if</span>( m_choices.none() ) 
-<a name="l00092"></a>00092     oss&lt;&lt;<span class="stringliteral">&quot;EMPTY&quot;</span>;
-<a name="l00093"></a>00093   <span class="keywordflow">else</span> {
-<a name="l00094"></a>00094     <span class="keywordflow">switch</span>( m_prev_idx ) {
-<a name="l00095"></a>00095       <span class="keywordflow">case</span> EXTEND_CURRENT:
-<a name="l00096"></a>00096         oss&lt;&lt;<span class="stringliteral">&quot;EXTEND[&quot;</span>&lt;&lt;m_target-&gt;m_last-&gt;toString()&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
-<a name="l00097"></a>00097         <span class="keywordflow">break</span>;
-<a name="l00098"></a>00098       <span class="keywordflow">case</span> START_NEXT:
-<a name="l00099"></a>00099         oss&lt;&lt;<span class="stringliteral">&quot;START[&quot;</span>&lt;&lt;(*m_tok)-&gt;toString()&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
-<a name="l00100"></a>00100         <span class="keywordflow">break</span>;
-<a name="l00101"></a>00101       <span class="keywordflow">case</span> CREATE_DEFAULT:
-<a name="l00102"></a>00102         oss&lt;&lt;<span class="stringliteral">&quot;DEFAULT&quot;</span>;
-<a name="l00103"></a>00103         <span class="keywordflow">break</span>;
-<a name="l00104"></a>00104       <span class="keywordflow">case</span> CREATE_OTHER:
-<a name="l00105"></a>00105         oss&lt;&lt;<span class="stringliteral">&quot;CREATE[&quot;</span>&lt;&lt;m_pred-&gt;toString()&lt;&lt;<span class="charliteral">&#39;]&#39;</span>;
-<a name="l00106"></a>00106         <span class="keywordflow">break</span>;
-<a name="l00107"></a>00107       <span class="keywordflow">default</span>:
-<a name="l00108"></a>00108         oss&lt;&lt;<span class="stringliteral">&quot;ERROR&quot;</span>; <span class="comment">// this is bad !!!</span>
-<a name="l00109"></a>00109     }
-<a name="l00110"></a>00110   }
-<a name="l00111"></a>00111   oss&lt;&lt;<span class="charliteral">&#39;(&#39;</span>&lt;&lt;m_target-&gt;getTimeline()-&gt;toString()&lt;&lt;<span class="charliteral">&#39;[&#39;</span>&lt;&lt;m_target-&gt;getTime()&lt;&lt;<span class="stringliteral">&quot;])&quot;</span>;
-<a name="l00112"></a>00112   <span class="keywordflow">return</span> oss.str();  
-<a name="l00113"></a>00113 }
-<a name="l00114"></a>00114 
-<a name="l00115"></a>00115 
-<a name="l00116"></a>00116 <span class="keywordtype">bool</span> TREX::europa::details::InternalState::DecisionPoint::hasNext()<span class="keyword"> const </span>{
-<a name="l00117"></a>00117   <span class="keywordflow">return</span> m_idx&lt;m_choices.size();
-<a name="l00118"></a>00118 }
-<a name="l00119"></a>00119 
-<a name="l00120"></a>00120 <span class="keywordtype">bool</span> TREX::europa::details::InternalState::DecisionPoint::canUndo()<span class="keyword"> const </span>{
-<a name="l00121"></a>00121   <span class="keywordflow">return</span> EUROPA::SOLVERS::DecisionPoint::canUndo();
-<a name="l00122"></a>00122 }
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124 <span class="keywordtype">void</span> TREX::europa::details::InternalState::DecisionPoint::advance() {
-<a name="l00125"></a>00125   <span class="comment">// Go to the next possible global choice</span>
-<a name="l00126"></a>00126   <span class="keywordflow">do</span> {
-<a name="l00127"></a>00127     ++m_idx;
-<a name="l00128"></a>00128   } <span class="keywordflow">while</span>(m_idx&lt;m_choices.size() &amp;&amp; !m_choices[m_idx]);
-<a name="l00129"></a>00129 }
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131 <span class="keywordtype">void</span> TREX::europa::details::InternalState::DecisionPoint::handleInitialize() {
-<a name="l00132"></a>00132   m_choices.reset(); <span class="comment">// Just to be safe  </span>
-<a name="l00133"></a>00133   m_choices.set(CREATE_DEFAULT);
-<a name="l00134"></a>00134   
-<a name="l00135"></a>00135   
-<a name="l00136"></a>00136   <span class="comment">// Check If I have an observation I can extend</span>
-<a name="l00137"></a>00137   <span class="keywordflow">if</span>( m_target-&gt;m_last.isId() ) {
-<a name="l00138"></a>00138     EUROPA::IntervalIntDomain <span class="keyword">const</span> &amp;end = m_target-&gt;m_last-&gt;getActiveToken()-&gt;end()-&gt;lastDomain();
-<a name="l00139"></a>00139     <span class="keywordflow">if</span>( end.getLowerBound()&lt;=m_target-&gt;getTime() )
-<a name="l00140"></a>00140       m_choices.set(EXTEND_CURRENT, end.getUpperBound()&gt;m_target-&gt;getTime());
-<a name="l00141"></a>00141     <span class="keywordflow">else</span> { 
-<a name="l00142"></a>00142       <span class="comment">// Already decided</span>
-<a name="l00143"></a>00143       m_choices.reset();
-<a name="l00144"></a>00144       <span class="keywordflow">return</span>;
-<a name="l00145"></a>00145     }
-<a name="l00146"></a>00146   }
-<a name="l00147"></a>00147   
-<a name="l00148"></a>00148   <span class="comment">// Check if there&#39;s any token that can become the new observation</span>
-<a name="l00149"></a>00149   boost::tie(m_from, m_to) = m_target-&gt;getActiveCandidates();
-<a name="l00150"></a>00150   <span class="keywordflow">if</span>( m_from!=m_to ) {
-<a name="l00151"></a>00151     m_choices.set(START_NEXT, m_from!=m_to);
-<a name="l00152"></a>00152     
-<a name="l00153"></a>00153     <span class="comment">// Now look for the things I can get rid of on other choices</span>
-<a name="l00154"></a>00154     <span class="keywordflow">for</span>(sequence::const_iterator i=m_from; m_to!=i; ++i) {
-<a name="l00155"></a>00155       <span class="keywordflow">if</span>( m_target-&gt;default_pred()== (*i)-&gt;getUnqualifiedPredicateName() )
-<a name="l00156"></a>00156         m_choices.reset(CREATE_DEFAULT);
-<a name="l00157"></a>00157       <span class="keywordflow">else</span> 
-<a name="l00158"></a>00158         m_predicates.erase((*i)-&gt;getUnqualifiedPredicateName());
-<a name="l00159"></a>00159     }
-<a name="l00160"></a>00160     m_tok = m_from;
-<a name="l00161"></a>00161   }
-<a name="l00162"></a>00162   
-<a name="l00163"></a>00163   <span class="comment">// The last flag is to create alternate tokens (other than default)</span>
-<a name="l00164"></a>00164   m_choices.set(CREATE_OTHER, !m_predicates.empty());
-<a name="l00165"></a>00165   m_pred = m_predicates.begin();
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167   <span class="comment">// initialize m_idx to the first bit which is true</span>
-<a name="l00168"></a>00168   <span class="keywordflow">for</span>(m_idx=0; m_idx&lt;m_choices.size() &amp;&amp; !m_choices[m_idx]; ++m_idx);
-<a name="l00169"></a>00169   m_prev_idx = m_idx;
-<a name="l00170"></a>00170 }
-<a name="l00171"></a>00171 
-<a name="l00172"></a>00172 <span class="keywordtype">void</span> TREX::europa::details::InternalState::DecisionPoint::handleExecute() {
-<a name="l00173"></a>00173   EUROPA::TokenId tok;
-<a name="l00174"></a>00174   
-<a name="l00175"></a>00175   m_prev_idx = m_idx; 
-<a name="l00176"></a>00176   <span class="keywordflow">switch</span>(m_idx) {
-<a name="l00177"></a>00177     <span class="keywordflow">case</span> EXTEND_CURRENT:
-<a name="l00178"></a>00178       m_target-&gt;push_end(m_client);
-<a name="l00179"></a>00179       <span class="keywordflow">break</span>;
-<a name="l00180"></a>00180     <span class="keywordflow">case</span> START_NEXT:
-<a name="l00181"></a>00181       tok = m_target-&gt;newToken(m_client, (*m_tok)-&gt;getPredicateName().toString());
-<a name="l00182"></a>00182       m_client-&gt;merge(tok, *m_tok);
-<a name="l00183"></a>00183       <span class="keywordflow">break</span>;
-<a name="l00184"></a>00184     <span class="keywordflow">case</span> CREATE_DEFAULT:
-<a name="l00185"></a>00185       tok = m_target-&gt;newToken(m_client, m_target-&gt;predicate_name(m_target-&gt;default_pred()), <span class="keyword">true</span>);
-<a name="l00186"></a>00186       <span class="keywordflow">break</span>;
-<a name="l00187"></a>00187     <span class="keywordflow">case</span> CREATE_OTHER:
-<a name="l00188"></a>00188       tok = m_target-&gt;newToken(m_client, m_target-&gt;predicate_name(*m_pred), <span class="keyword">true</span>);
-<a name="l00189"></a>00189       <span class="keywordflow">break</span>;
-<a name="l00190"></a>00190     <span class="keywordflow">default</span>:
-<a name="l00191"></a>00191       <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(<span class="stringliteral">&quot;Unknown synchronization decision for timeline &quot;</span>+m_target-&gt;getTimeline()-&gt;toString());
-<a name="l00192"></a>00192   }
-<a name="l00193"></a>00193 }
-<a name="l00194"></a>00194 
-<a name="l00195"></a>00195 <span class="keywordtype">void</span> TREX::europa::details::InternalState::DecisionPoint::handleUndo() {
-<a name="l00196"></a>00196   <span class="comment">// this is where we select the next choice</span>
-<a name="l00197"></a>00197   <span class="keywordflow">switch</span>(m_idx) {
-<a name="l00198"></a>00198     <span class="keywordflow">case</span> EXTEND_CURRENT:
-<a name="l00199"></a>00199       m_target-&gt;release_end(m_client);
-<a name="l00200"></a>00200       advance();
-<a name="l00201"></a>00201       <span class="keywordflow">break</span>;
-<a name="l00202"></a>00202     <span class="keywordflow">case</span> START_NEXT:      
-<a name="l00203"></a>00203       m_target-&gt;removeToken();
-<a name="l00204"></a>00204       ++m_tok;
-<a name="l00205"></a>00205       <span class="keywordflow">if</span>( m_to==m_tok )
-<a name="l00206"></a>00206         advance();
-<a name="l00207"></a>00207       <span class="keywordflow">break</span>;
-<a name="l00208"></a>00208     <span class="keywordflow">case</span> CREATE_DEFAULT:
-<a name="l00209"></a>00209       m_target-&gt;removeToken();
-<a name="l00210"></a>00210       advance();
-<a name="l00211"></a>00211       <span class="keywordflow">break</span>;
-<a name="l00212"></a>00212     <span class="keywordflow">case</span> CREATE_OTHER:
-<a name="l00213"></a>00213       m_target-&gt;removeToken();
-<a name="l00214"></a>00214       ++m_pred;
-<a name="l00215"></a>00215       <span class="keywordflow">if</span>( m_predicates.end()==m_pred )
-<a name="l00216"></a>00216         advance();
-<a name="l00217"></a>00217       <span class="keywordflow">break</span>;
-<a name="l00218"></a>00218     <span class="keywordflow">default</span>:
-<a name="l00219"></a>00219       <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related error.">EuropaException</a>(<span class="stringliteral">&quot;Unknown synchronization decision for timeline &quot;</span>+m_target-&gt;getTimeline()-&gt;toString());
-<a name="l00220"></a>00220   }
-<a name="l00221"></a>00221 }
-<a name="l00222"></a>00222 
-<a name="l00223"></a>00223 <span class="comment">/*</span>
-<a name="l00224"></a>00224 <span class="comment"> * class TREX:::europa::SynchronizationManager </span>
-<a name="l00225"></a>00225 <span class="comment"> */</span>
-<a name="l00226"></a>00226 
-<a name="l00227"></a>00227 <span class="comment">// structors </span>
-<a name="l00228"></a>00228 
-<a name="l00229"></a>00229 SynchronizationManager::SynchronizationManager(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg) 
-<a name="l00230"></a>00230 :EUROPA::SOLVERS::FlawManager(cfg) {}
-<a name="l00231"></a>00231 
-<a name="l00232"></a>00232 SynchronizationManager::~SynchronizationManager() {}
-<a name="l00233"></a>00233   
-<a name="l00234"></a>00234 <span class="comment">// manipulators </span>
-<a name="l00235"></a>00235 
-<a name="l00236"></a>00236 <span class="keywordtype">void</span> SynchronizationManager::handleInitialize() {
-<a name="l00237"></a>00237   m_assembly = &amp;details::assembly(getPlanDatabase());
-<a name="l00238"></a>00238 }
-<a name="l00239"></a>00239 
-<a name="l00240"></a>00240 <span class="keywordtype">bool</span> SynchronizationManager::staticMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
-<a name="l00241"></a>00241   <span class="keywordflow">return</span> !details::InternalStateId::convertable(entity);
-<a name="l00242"></a>00242 }
-<a name="l00243"></a>00243 
-<a name="l00244"></a>00244 <span class="keywordtype">bool</span> SynchronizationManager::dynamicMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
-<a name="l00245"></a>00245   <span class="keywordflow">if</span>( staticMatch(entity) )
-<a name="l00246"></a>00246     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00247"></a>00247   <span class="keywordflow">else</span> {
-<a name="l00248"></a>00248     details::InternalStateId state(entity);
-<a name="l00249"></a>00249     <span class="keywordflow">if</span>( state-&gt;lastObservation().isId() ) {
-<a name="l00250"></a>00250       <span class="keywordflow">return</span> state-&gt;lastObservation()-&gt;getActiveToken()-&gt;end()-&gt;lastDomain().getLowerBound()&gt;state-&gt;getTime();
-<a name="l00251"></a>00251     }
-<a name="l00252"></a>00252     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00253"></a>00253   }
-<a name="l00254"></a>00254 }
-<a name="l00255"></a>00255 
-<a name="l00256"></a>00256 
-<a name="l00257"></a>00257 EUROPA::IteratorId SynchronizationManager::createIterator() {
-<a name="l00258"></a>00258   <span class="keywordflow">return</span> (<span class="keyword">new</span> <a class="code" href="../../d3/da8/classTREX_1_1europa_1_1details_1_1UpdateIterator.html">details::UpdateIterator</a>(*<span class="keyword">this</span>, *m_assembly))-&gt;getId();
-<a name="l00259"></a>00259 }
-<a name="l00260"></a>00260 
-<a name="l00261"></a>00261 <span class="comment">// observers </span>
-<a name="l00262"></a>00262   
-<a name="l00263"></a>00263 std::string SynchronizationManager::toString(EUROPA::EntityId <span class="keyword">const</span> &amp;entity)<span class="keyword"> const </span>{
-<a name="l00264"></a>00264   details::InternalStateId update(entity);
-<a name="l00265"></a>00265   std::ostringstream oss;
-<a name="l00266"></a>00266   oss&lt;&lt;<span class="stringliteral">&quot;trex.STATE[&quot;</span>&lt;&lt;update-&gt;getTime()&lt;&lt;<span class="stringliteral">&quot;]: &quot;</span>&lt;&lt;update-&gt;getTimeline()-&gt;toString();
-<a name="l00267"></a>00267   
-<a name="l00268"></a>00268   <span class="keywordflow">return</span> oss.str();
-<a name="l00269"></a>00269 }
-<a name="l00270"></a>00270 
-<a name="l00271"></a>00271 
+<a name="l00052"></a>00052 details::UpdateFlawIterator::UpdateFlawIterator(<a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html" title="TREX synchronization flaws manager.">SynchronizationManager</a> &amp;manager) 
+<a name="l00053"></a>00053   :EUROPA::SOLVERS::FlawIterator(manager), 
+<a name="l00054"></a>00054    m_it(manager.m_assembly-&gt;begin(), manager.m_assembly-&gt;end()),
+<a name="l00055"></a>00055    m_assembly(*(manager.m_assembly)){
+<a name="l00056"></a>00056   advance();
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <span class="comment">// modifiers</span>
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061 EUROPA::EntityId <span class="keyword">const</span> details::UpdateFlawIterator::nextCandidate() {
+<a name="l00062"></a>00062   <span class="keywordflow">if</span>( <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a14090f7517b93599d78e0461ff4e11c3" title="Iterator through TREX internal state variables.">Assembly::internal_iterator</a>(m_assembly.end(), m_assembly.end())!=m_it ) {
+<a name="l00063"></a>00063     EUROPA::EntityId candidate = *m_it;
+<a name="l00064"></a>00064     ++m_it;
+<a name="l00065"></a>00065     <span class="keywordflow">return</span> candidate;
+<a name="l00066"></a>00066   } <span class="keywordflow">else</span> 
+<a name="l00067"></a>00067     <span class="keywordflow">return</span> EUROPA::EntityId::noId();
+<a name="l00068"></a>00068 }
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="comment">/*</span>
+<a name="l00071"></a>00071 <span class="comment"> * class TREX::europa::SynchronizationManager</span>
+<a name="l00072"></a>00072 <span class="comment"> */</span>
+<a name="l00073"></a>00073 <span class="comment">// structors </span>
+<a name="l00074"></a>00074 
+<a name="l00075"></a>00075 SynchronizationManager::SynchronizationManager(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg)
+<a name="l00076"></a>00076   :EUROPA::SOLVERS::FlawManager(cfg) {}
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078 <span class="comment">// manipulators</span>
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080 <span class="keywordtype">void</span> SynchronizationManager::handleInitialize() {
+<a name="l00081"></a>00081   <span class="comment">// Extract the TREX assembly I am connected to </span>
+<a name="l00082"></a>00082   m_assembly = &amp;details::assembly_of(getPlanDatabase());
+<a name="l00083"></a>00083 }
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085 <span class="keywordtype">bool</span> SynchronizationManager::staticMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
+<a name="l00086"></a>00086   <span class="keywordflow">return</span> !details::CurrentStateId::convertable(entity);
+<a name="l00087"></a>00087 }
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089 <span class="keywordtype">bool</span> SynchronizationManager::dynamicMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
+<a name="l00090"></a>00090   <span class="keywordflow">if</span>( staticMatch(entity) )
+<a name="l00091"></a>00091     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00092"></a>00092   <span class="keywordflow">else</span> {
+<a name="l00093"></a>00093     details::CurrentStateId state(entity);
+<a name="l00094"></a>00094     <span class="keywordflow">return</span> state-&gt;identified();
+<a name="l00095"></a>00095   }
+<a name="l00096"></a>00096 }
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098 EUROPA::IteratorId SynchronizationManager::createIterator() {
+<a name="l00099"></a>00099   <span class="keywordflow">return</span> (<span class="keyword">new</span> <a class="code" href="../../db/d6a/classTREX_1_1europa_1_1details_1_1UpdateFlawIterator.html" title="Synchronization flaws iterator.">details::UpdateFlawIterator</a>(*<span class="keyword">this</span>))-&gt;getId();
+<a name="l00100"></a>00100 }
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102 <span class="comment">// observers</span>
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 std::string SynchronizationManager::toString(EUROPA::EntityId <span class="keyword">const</span> &amp;entity)<span class="keyword"> const </span>{
+<a name="l00105"></a>00105   details::CurrentStateId update(entity);
+<a name="l00106"></a>00106   std::ostringstream oss;
+<a name="l00107"></a>00107   
+<a name="l00108"></a>00108   oss&lt;&lt;<span class="stringliteral">&quot;trex.STATE[&quot;</span>&lt;&lt;update-&gt;now()&lt;&lt;<span class="stringliteral">&quot;]: &quot;</span>&lt;&lt;update-&gt;timeline()-&gt;toString();
+<a name="l00109"></a>00109   <span class="keywordflow">return</span> oss.str();
+<a name="l00110"></a>00110 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

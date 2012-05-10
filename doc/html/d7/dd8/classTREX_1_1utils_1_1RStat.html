@@ -78,7 +78,7 @@ window.onload = initDynSections;
 <small>
 [<a class="el" href="../../db/d81/group__utils.html">Basic utilities</a>]</small>
 </h1><!-- doxytag: class="TREX::utils::RStat" -->
-<p>Ressource usage stats management class.  
+<p>Resource usage stats management class.  
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="../../d2/dd9/RStat_8hh_source.html">trex/utils/RStat.hh</a>&gt;</code></p>
@@ -138,12 +138,13 @@ static std::string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Output write operator.  <a href="../../db/d81/group__utils.html#gaf87481ca601e358e309ccdaf36ffff3f"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Ressource usage stats management class. </p>
+<p>Resource usage stats management class. </p>
 <p>This class offer a simple and basic access to resource usage statistics for processes.</p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt;</dd></dl>
-<dl class="note"><dt><b>Note:</b></dt><dd>This class is based on POSIX C function <code>getrusage</code>. It does not yet offer all the interfaces to access data given by this function. </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>This class is based on POSIX C function <code>getrusage</code>. It does not yet offer all the interfaces to access data given by this function.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>The <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> class is now replaced by Boost.Chrono library. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00066">66</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00068">68</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 <hr/><h2>Member Enumeration Documentation</h2>
 <a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670e"></a><!-- doxytag: member="TREX::utils::RStat::who_type" ref="a0ef14756bd6abae9a18d15084ecf670e" args="" -->
 <div class="memitem">
@@ -157,25 +158,25 @@ static std::string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="
 <div class="memdoc">
 
 <p>stats about who </p>
-<p>This type is used by <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> to specify what processes are described on statisitics. </p>
+<p>This type is used by <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> to specify what processes are described on statisitics. </p>
 <dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
 <tr><td valign="top"><em><a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670ea49cb6833a7f901f504d3ba36a9ff2b04"></a><!-- doxytag: member="self" ref="a0ef14756bd6abae9a18d15084ecf670ea49cb6833a7f901f504d3ba36a9ff2b04" args="" -->self</em>&nbsp;</td><td>
 <p>self statisitics. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670eaa76ea4c239c54fc0d941f46c10eec361"></a><!-- doxytag: member="children" ref="a0ef14756bd6abae9a18d15084ecf670eaa76ea4c239c54fc0d941f46c10eec361" args="" -->children</em>&nbsp;</td><td>
 <p>children statistics. </p>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000009">Bug:</a></b></dt><dd>As said in the man page of <code>getrusage</code> : <em>"There is no way to obtain information about
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000006">Bug:</a></b></dt><dd>As said in the man page of <code>getrusage</code> : <em>"There is no way to obtain information about
  a child process that has not yet terminated."</em> </dd></dl>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a0ef14756bd6abae9a18d15084ecf670ea4a2041f57905c0826e828402aa577f0d"></a><!-- doxytag: member="zeroed" ref="a0ef14756bd6abae9a18d15084ecf670ea4a2041f57905c0826e828402aa577f0d" args="" -->zeroed</em>&nbsp;</td><td>
 <p>Unknown statisitics. </p>
-<p>This occur when you make operation with <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> instances having different <code>who_type</code>. </p>
+<p>This occur when you make operation with <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> instances having different <code>who_type</code>. </p>
 </td></tr>
 </table>
 </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00073">73</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00075">75</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -256,11 +257,11 @@ Here is the call graph for this function:</div>
 </pre></div><dl class="return"><dt><b>Returns:</b></dt><dd><em>out</em> after the operation</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>std::ostream &amp;<a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#addd52fa85c1b162797f668c7ac63b178" title="Long stats description.">long_desc(std::ostream &amp;) const</a> </dd>
 <dd>
-std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> const &amp;) </dd></dl>
+std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> const &amp;) </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00247">247</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00318">operator&lt;&lt;()</a>.</p>
+<p>Referenced by <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00320">operator&lt;&lt;()</a>.</p>
 
 </div>
 </div>
@@ -313,12 +314,12 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <p>Maximum resident set size. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the maximum amount of resident memory used.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>It is not clear to right now what is the unity of this value. Indeed, it looks like it is given in term of memory pages. In this case we would probably need to get the page size on current system to convert into bytes. Right now I consider that this size is given in bytes.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000002">Todo:</a></b></dt><dd>This value is for resident memory size. It will be <b>less</b> or equal to the real amount of memory. I have to find out a way to have the total amount of memory used but didn't found doc about that.</dd></dl>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000008">Bug:</a></b></dt><dd>This information is not updated in real-time by the system. The update rate of your OS can be found using the command : </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000005">Todo:</a></b></dt><dd>This value is for resident memory size. It will be <b>less</b> or equal to the real amount of memory. I have to find out a way to have the total amount of memory used but didn't found doc about that.</dd></dl>
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000005">Bug:</a></b></dt><dd>This information is not updated in real-time by the system. The update rate of your OS can be found using the command : </dd></dl>
 <div class="fragment"><pre class="fragment"> sysctl kern.clockrate
 </pre></div><p> The value of <code>stathz</code> indicates the frequency of the updates (100Hz under MacOS X.4). Keep this in mind when you read the results. </p>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00186">186</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00188">188</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -340,7 +341,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <p>Number of page faults. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The number of page faults </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00201">201</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00203">203</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -362,7 +363,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <p>Number of page reclaims. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The number of page reclaimed </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00194">194</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00196">196</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -420,7 +421,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>A new stats snapshot giving the sum of current instance and <em>other</em>.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>If the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value differs form current instance and <em>other</em>, then the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value of the result will be RStat::unknown which prohibit the call to <em>reset</em>.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000004">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000007">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00125">125</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
@@ -451,7 +452,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>A new stats snapshot giving the difference between current instance and <em>other</em>.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>If the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value differs form current instance and <em>other</em>, then the <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> value of the result will be RStat::unknown which prohibit the call to <em>reset</em>.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000003">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="../../dd/da0/todo.html#_todo000006">Todo:</a></b></dt><dd>It may be preferable to throw an exception if <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#ade5b4b5e4b541c6c35ad60dfeada0af8" title="Type of process stats.">who()</a> types differs. </dd></dl>
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00096">96</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
@@ -516,7 +517,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 
 <p>Definition at line <a class="el" href="../../de/d73/RStat_8cc_source.html#l00079">79</a> of file <a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a>.</p>
 
-<p>References <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00089">zeroed</a>.</p>
+<p>References <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00091">zeroed</a>.</p>
 
 <p>Referenced by <a class="el" href="../../de/d73/RStat_8cc_source.html#l00072">RStat()</a>.</p>
 
@@ -541,7 +542,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <dl class="return"><dt><b>Returns:</b></dt><dd>The amount of time spent on system execution space. The system time correspond to the time spent on system calls.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a1d56471e4b4d710ede50d75c364ca176" title="User time.">user_time() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00156">156</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00158">158</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -564,7 +565,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <dl class="return"><dt><b>Returns:</b></dt><dd>The amount of time spent on user execution space. The user time correspond to the non system calls.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a28613697d474155406feeca0dbae29df" title="System time.">system_time() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00144">144</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00146">146</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -586,9 +587,9 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <p>Type of process stats. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the type of processes the stats are depicting. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00132">132</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00134">134</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00389">TREX::utils::RStatLap::~RStatLap()</a>.</p>
+<p>Referenced by <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00392">TREX::utils::RStatLap::~RStatLap()</a>.</p>
 
 </div>
 </div>
@@ -597,7 +598,7 @@ std::ostream &amp;operation&lt;&lt;(std::ostream &amp;, <a class="el" href="../.
 <li>trex/utils/<a class="el" href="../../de/d73/RStat_8cc_source.html">RStat.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:16 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

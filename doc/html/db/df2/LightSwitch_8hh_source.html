@@ -116,38 +116,39 @@ window.onload = initDynSections;
 <a name="l00058"></a>00058 
 <a name="l00068"></a><a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html">00068</a>     <span class="keyword">class </span><a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html" title="Light reactor definition.">Light</a> :<span class="keyword">public</span> TREX::transaction::TeleoReactor {
 <a name="l00069"></a>00069     <span class="keyword">public</span>:
-<a name="l00082"></a>00082       <a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html#a19c37ff170fcc376251bc5909399ddfb" title="XML constructor.">Light</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">TREX::transaction::TeleoReactor::xml_arg_type</a> arg);
-<a name="l00084"></a>00084       <a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html#ad0e59fad13bb6cfadc25b2c477e9ddc7" title="Destructor.">~Light</a>();      
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086     <span class="keyword">private</span>:
-<a name="l00087"></a>00087       <span class="keywordtype">bool</span> synchronize();
-<a name="l00088"></a>00088       <span class="keywordtype">void</span> handleRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g);
-<a name="l00089"></a>00089       <span class="keywordtype">void</span> handleRecall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g);
-<a name="l00090"></a>00090 
-<a name="l00092"></a>00092       <span class="keywordtype">bool</span> m_on;
-<a name="l00093"></a>00093       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> m_nextSwitch;
-<a name="l00095"></a>00095       <span class="keywordtype">bool</span> m_firstTick;
-<a name="l00096"></a>00096 
-<a name="l00097"></a>00097       <span class="keywordtype">void</span> setValue(<span class="keywordtype">bool</span> val);
-<a name="l00098"></a>00098       
-<a name="l00099"></a>00099       std::list&lt;TREX::transaction::goal_id&gt; m_pending;
-<a name="l00100"></a>00100 
-<a name="l00102"></a>00102       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> onPred;
-<a name="l00104"></a>00104       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> offPred;
-<a name="l00106"></a>00106       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> upPred;
-<a name="l00108"></a>00108       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> downPred;
-<a name="l00110"></a>00110       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> brokenPred;
-<a name="l00111"></a>00111 
-<a name="l00113"></a>00113       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> lightObj;
-<a name="l00115"></a>00115       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> switchObj;
-<a name="l00116"></a>00116     };
-<a name="l00117"></a>00117 
-<a name="l00118"></a>00118   }
-<a name="l00119"></a>00119 }
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121 <span class="preprocessor">#endif // H_LightSwitch</span>
+<a name="l00085"></a>00085       <a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html#a19c37ff170fcc376251bc5909399ddfb" title="XML constructor.">Light</a>(<a class="code" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a220daced8bfd779d72905a7d28276000" title="XML construction info.">TREX::transaction::TeleoReactor::xml_arg_type</a> arg);
+<a name="l00087"></a>00087       <a class="code" href="../../d0/d59/classTREX_1_1lightswitch_1_1Light.html#ad0e59fad13bb6cfadc25b2c477e9ddc7" title="Destructor.">~Light</a>();      
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089     <span class="keyword">private</span>:
+<a name="l00090"></a>00090       <span class="keywordtype">bool</span> synchronize();
+<a name="l00091"></a>00091       <span class="keywordtype">void</span> handleRequest(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g);
+<a name="l00092"></a>00092       <span class="keywordtype">void</span> handleRecall(<a class="code" href="../../db/db4/group__transaction.html#ga12f8cf7d56f88a24ecf3be17dca87d45" title="A goal identifier.">TREX::transaction::goal_id</a> <span class="keyword">const</span> &amp;g);
+<a name="l00093"></a>00093 
+<a name="l00095"></a>00095       <span class="keywordtype">bool</span> m_on, m_verbose;
+<a name="l00096"></a>00096       <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> m_nextSwitch;
+<a name="l00098"></a>00098       <span class="keywordtype">bool</span> m_firstTick;
+<a name="l00099"></a>00099 
+<a name="l00100"></a>00100       <span class="keywordtype">void</span> setValue(<span class="keywordtype">bool</span> val);
+<a name="l00101"></a>00101       
+<a name="l00102"></a>00102       std::list&lt;TREX::transaction::goal_id&gt; m_pending;
+<a name="l00103"></a>00103       std::auto_ptr&lt;TREX::transaction::Observation&gt; m_light_state;
+<a name="l00104"></a>00104 
+<a name="l00106"></a>00106       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> onPred;
+<a name="l00108"></a>00108       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> offPred;
+<a name="l00110"></a>00110       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> upPred;
+<a name="l00112"></a>00112       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> downPred;
+<a name="l00114"></a>00114       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> brokenPred;
+<a name="l00115"></a>00115 
+<a name="l00117"></a>00117       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> lightObj;
+<a name="l00119"></a>00119       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> switchObj;
+<a name="l00120"></a>00120     };
+<a name="l00121"></a>00121 
+<a name="l00122"></a>00122   }
+<a name="l00123"></a>00123 }
+<a name="l00124"></a>00124 
+<a name="l00125"></a>00125 <span class="preprocessor">#endif // H_LightSwitch</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

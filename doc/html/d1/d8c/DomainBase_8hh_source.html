@@ -153,7 +153,7 @@ window.onload = initDynSections;
 <a name="l00200"></a>00200       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> isInterval() <span class="keyword">const</span> =0;
 <a name="l00212"></a>00212       <span class="keyword">virtual</span> <span class="keywordtype">bool</span> isEnumerated() <span class="keyword">const</span> =0;
 <a name="l00213"></a>00213       
-<a name="l00223"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500">00223</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()<span class="keyword"> const </span>{
+<a name="l00223"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500">00223</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a75838b2548bf9907ed06d22099620500" title="type of the domain">getTypeName</a>()<span class="keyword"> const </span>{
 <a name="l00224"></a>00224        <span class="keywordflow">return</span> m_type;
 <a name="l00225"></a>00225       }
 <a name="l00226"></a>00226 
@@ -187,7 +187,7 @@ window.onload = initDynSections;
 <a name="l00403"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a839ea5f2da93a1008811ecf3a6275a0f">00403</a>                                   boost::shared_ptr&lt;DomainBase&gt; &gt; <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">xml_factory</a>;
 <a name="l00404"></a>00404 
 <a name="l00405"></a>00405     <span class="keyword">protected</span>:
-<a name="l00412"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a7321a8d7b03fb78d35b4edd06378549e">00412</a>       <span class="keyword">explicit</span> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type)
+<a name="l00412"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a7321a8d7b03fb78d35b4edd06378549e">00412</a>       <span class="keyword">explicit</span> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type)
 <a name="l00413"></a>00413        :m_type(type) {}
 <a name="l00430"></a><a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#aa7bb8a2a8346e6bd9b01322f4f8ee666">00430</a>       <span class="keyword">explicit</span> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a>(boost::property_tree::ptree::value_type &amp;node) 
 <a name="l00431"></a>00431        :m_type(node.first) {}   
@@ -200,7 +200,7 @@ window.onload = initDynSections;
 <a name="l00480"></a>00480       <span class="keyword">virtual</span> std::string stringSingleton() <span class="keyword">const</span> =0;
 <a name="l00481"></a>00481 
 <a name="l00482"></a>00482     <span class="keyword">private</span>:
-<a name="l00484"></a>00484       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> m_type;
+<a name="l00484"></a>00484       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> m_type;
 <a name="l00485"></a>00485 
 <a name="l00492"></a>00492       std::ostream &amp;print_to(std::ostream &amp;out)<span class="keyword"> const </span>{
 <a name="l00493"></a>00493        <span class="keywordflow">if</span>( isFull() )
@@ -219,7 +219,7 @@ window.onload = initDynSections;
 <a name="l00506"></a>00506 
 <a name="l00507"></a>00507 <span class="preprocessor">#endif // H_DomainBase</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

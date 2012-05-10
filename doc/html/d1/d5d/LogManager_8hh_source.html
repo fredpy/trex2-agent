@@ -110,89 +110,91 @@ window.onload = initDynSections;
 <a name="l00044"></a>00044 <span class="preprocessor"></span><span class="preprocessor"># define H_LogManager</span>
 <a name="l00045"></a>00045 <span class="preprocessor"></span>
 <a name="l00046"></a>00046 <span class="preprocessor"># include &lt;list&gt;</span>
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048 <span class="preprocessor"># include &quot;<a class="code" href="../../d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class.">TextLog.hh</a>&quot;</span>
-<a name="l00049"></a>00049 <span class="preprocessor"># include &quot;<a class="code" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton.">SingletonUse.hh</a>&quot;</span>
-<a name="l00050"></a>00050 <span class="preprocessor"># include &quot;<a class="code" href="../../d6/d15/SharedVar_8hh.html" title="utilities for multi-thread shared variable">SharedVar.hh</a>&quot;</span>
-<a name="l00051"></a>00051 <span class="preprocessor"># include &quot;<a class="code" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition.">ErrnoExcept.hh</a>&quot;</span>
-<a name="l00052"></a>00052 
-<a name="l00061"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#ab573e07d8fb7b43a78b0c4886a1fbc4a">00061</a> <span class="preprocessor"># define TREX_LOG_FILE &quot;TREX.log&quot;</span>
-<a name="l00062"></a>00062 <span class="preprocessor"></span>
-<a name="l00074"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a78a8bf6a9f3d8d9770c9be00a4011914">00074</a> <span class="preprocessor"># define TREX_ENV    &quot;TREX_HOME&quot;</span>
-<a name="l00075"></a>00075 <span class="preprocessor"></span>
-<a name="l00086"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#adc74e9acab5db0a45394c6796f751946">00086</a> <span class="preprocessor"># define SEARCH_ENV  &quot;TREX_PATH&quot;</span>
-<a name="l00087"></a>00087 <span class="preprocessor"></span>
-<a name="l00096"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#ab3ce970731714c7895e6cac1b0a2fdd2">00096</a> <span class="preprocessor"># define LOG_DIR_ENV &quot;TREX_LOG_DIR&quot;</span>
-<a name="l00097"></a>00097 <span class="preprocessor"></span>
-<a name="l00106"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a2c19bd3f2d99d0c4bd53f74d6239159c">00106</a> <span class="preprocessor"># define LATEST_DIR &quot;latest&quot;</span>
-<a name="l00107"></a>00107 <span class="preprocessor"></span>
-<a name="l00122"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a960703fc3327c76cba0659a7a56afd1c">00122</a> <span class="preprocessor"># define MAX_LOG_ATTEMPT 1024</span>
-<a name="l00123"></a>00123 <span class="preprocessor"></span>
-<a name="l00131"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a67a7e4219ac5d30ea132c5f5aefe9f3e">00131</a> <span class="preprocessor"># define TREX_LOG_LEVEL LogNormal</span>
-<a name="l00132"></a>00132 <span class="preprocessor"></span>
-<a name="l00133"></a>00133 <span class="keyword">namespace </span>TREX {
-<a name="l00134"></a>00134   <span class="keyword">namespace </span>utils {
-<a name="l00135"></a>00135               
-<a name="l00171"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html">00171</a>     <span class="keyword">class </span><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a> :boost::<a class="code" href="../../df/d91/classboost_1_1noncopyable.html">noncopyable</a> {
-<a name="l00172"></a>00172     <span class="keyword">public</span>:
-<a name="l00173"></a>00173       
-<a name="l00175"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd">00175</a>       <span class="keyword">enum</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> {
-<a name="l00176"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaa7ef7cab648431bb7ec92b41fabe9117">00176</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaa7ef7cab648431bb7ec92b41fabe9117" title="Minimum verbosity.">LogMin</a> = 0,  
-<a name="l00177"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaf2c14531dccd919238d2330b933303f5">00177</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaf2c14531dccd919238d2330b933303f5" title="Normal level.">LogNormal</a>,   
-<a name="l00178"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dda7662b49da5cff9c1f0395418757ae73a">00178</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dda7662b49da5cff9c1f0395418757ae73a" title="High verbosity (usually for debugging).">LogExtensive</a> 
-<a name="l00179"></a>00179       };
-<a name="l00180"></a>00180                      
-<a name="l00192"></a>00192       std::string <span class="keyword">const</span> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#afedbc70bacf679bbd52fc7332c3fcdfa" title="Logging path This method indicates in which directory log files should be placed...">logPath</a>();
-<a name="l00207"></a>00207       std::string <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name">file_name</a>(std::string <span class="keyword">const</span> &amp;short_name);
-<a name="l00231"></a>00231       std::string <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(std::string <span class="keyword">const</span> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2e145a13f52c4fbf19dbf9b0e0ca3e55" title="log file complete name">file_name</a>, <span class="keywordtype">bool</span> &amp;found);
-<a name="l00232"></a>00232                      
-<a name="l00244"></a>00244       <a class="code" href="../../da/d38/classTREX_1_1utils_1_1internals_1_1LogEntry.html" title="Text Entry manager for TextLog.">internals::LogEntry</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry.">syslog</a>(std::string <span class="keyword">const</span> &amp;who);
-<a name="l00245"></a>00245       <a class="code" href="../../d5/db0/classTREX_1_1utils_1_1TextLog.html" title="Thread safe text logging.">TextLog</a> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry.">syslog</a>();
-<a name="l00252"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a08b62080f406c666ddacb239a79ddb84">00252</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a08b62080f406c666ddacb239a79ddb84" title="Current verbosity level.">getLogLevel</a>()<span class="keyword"> const </span>{
-<a name="l00253"></a>00253                             <span class="keywordflow">return</span> m_level;
-<a name="l00254"></a>00254       }
-<a name="l00270"></a>00270       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a0109e48f7e1a0831fe1a01475b899b6e" title="Set verbosity level.">setLogLevel</a>(<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> lvl);
-<a name="l00285"></a>00285       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ae29bac21202518c8aa5b3b4b42f30402" title="Set log path.">setLogPath</a>(std::string <span class="keyword">const</span> &amp;path);
-<a name="l00286"></a>00286                      
-<a name="l00302"></a>00302       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ad9cd8cb552233272adb36291e2737d1d" title="add a directory to the search path">addSearchPath</a>(std::string <span class="keyword">const</span> &amp;path);
-<a name="l00303"></a>00303       
-<a name="l00311"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e">00311</a>       <span class="keyword">typedef</span> std::list&lt;std::string&gt;::const_iterator <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e" title="TREX_PATH iterator.">path_iterator</a>;
-<a name="l00318"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4">00318</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e" title="TREX_PATH iterator.">path_iterator</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4" title="First path.">begin</a>()<span class="keyword"> const </span>{
-<a name="l00319"></a>00319         <span class="keywordflow">return</span> m_searchPath.begin();
-<a name="l00320"></a>00320       }
-<a name="l00327"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896">00327</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ac9e33406d5d59fa8be27922e9d0d2e9e" title="TREX_PATH iterator.">path_iterator</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896" title="End of searh path.">end</a>()<span class="keyword"> const </span>{
-<a name="l00328"></a>00328         <span class="keywordflow">return</span> m_searchPath.end();
-<a name="l00329"></a>00329       }
-<a name="l00330"></a>00330                      
-<a name="l00347"></a>00347       std::string <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a61321a663bb542278be8092efb7e0a90" title="Locate a file.">locate</a>(std::string <span class="keyword">const</span> &amp;file, <span class="keywordtype">bool</span> &amp;found) <span class="keyword">const</span>;
-<a name="l00348"></a>00348       
-<a name="l00353"></a>00353       std::string <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a6d68266424040e03590698d380a46740" title="Get directory where cfg files should be stored.">getCfgPath</a>();
-<a name="l00354"></a>00354     <span class="keyword">private</span>:
-<a name="l00356"></a>00356       std::string     m_path;
-<a name="l00357"></a>00357                      
-<a name="l00362"></a>00362       <a class="code" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html">SharedVar&lt;bool&gt;</a> m_inited;
-<a name="l00364"></a>00364       <a class="code" href="../../d5/db0/classTREX_1_1utils_1_1TextLog.html" title="Thread safe text logging.">TextLog</a>     m_syslog;
-<a name="l00366"></a>00366       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a>    m_level;
-<a name="l00367"></a>00367                      
-<a name="l00369"></a>00369       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>();
-<a name="l00371"></a>00371       ~<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>();
-<a name="l00372"></a>00372                      
-<a name="l00382"></a>00382       <span class="keywordtype">void</span> createLatest();
-<a name="l00383"></a>00383       
-<a name="l00393"></a>00393       <span class="keywordtype">void</span> loadSearchPath();
-<a name="l00394"></a>00394                      
-<a name="l00403"></a>00403       std::list&lt;std::string&gt; m_searchPath;
-<a name="l00404"></a>00404       
-<a name="l00405"></a>00405       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html" title="Phoenix singleton wrapper.">SingletonWrapper</a>&lt;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>&gt;;
-<a name="l00406"></a>00406     }; <span class="comment">// TREX::utils::LogManager</span>
-<a name="l00407"></a>00407               
-<a name="l00408"></a>00408   } <span class="comment">// TREX::utils </span>
-<a name="l00409"></a>00409 } <span class="comment">// TREX</span>
-<a name="l00410"></a>00410 
-<a name="l00411"></a>00411 <span class="preprocessor">#endif // H_LogManager</span>
-<a name="l00412"></a>00412 <span class="preprocessor"></span>
+<a name="l00047"></a>00047 <span class="preprocessor"># include &lt;boost/filesystem.hpp&gt;</span>
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049 <span class="preprocessor"># include &quot;<a class="code" href="../../d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class.">TextLog.hh</a>&quot;</span>
+<a name="l00050"></a>00050 <span class="preprocessor"># include &quot;<a class="code" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton.">SingletonUse.hh</a>&quot;</span>
+<a name="l00051"></a>00051 <span class="preprocessor"># include &quot;<a class="code" href="../../d6/d15/SharedVar_8hh.html" title="utilities for multi-thread shared variable">SharedVar.hh</a>&quot;</span>
+<a name="l00052"></a>00052 <span class="preprocessor"># include &quot;<a class="code" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition.">ErrnoExcept.hh</a>&quot;</span>
+<a name="l00053"></a>00053 
+<a name="l00062"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#ab573e07d8fb7b43a78b0c4886a1fbc4a">00062</a> <span class="preprocessor"># define TREX_LOG_FILE &quot;TREX.log&quot;</span>
+<a name="l00063"></a>00063 <span class="preprocessor"></span>
+<a name="l00075"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a78a8bf6a9f3d8d9770c9be00a4011914">00075</a> <span class="preprocessor"># define TREX_ENV    &quot;TREX_HOME&quot;</span>
+<a name="l00076"></a>00076 <span class="preprocessor"></span>
+<a name="l00087"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#adc74e9acab5db0a45394c6796f751946">00087</a> <span class="preprocessor"># define SEARCH_ENV  &quot;TREX_PATH&quot;</span>
+<a name="l00088"></a>00088 <span class="preprocessor"></span>
+<a name="l00097"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#ab3ce970731714c7895e6cac1b0a2fdd2">00097</a> <span class="preprocessor"># define LOG_DIR_ENV &quot;TREX_LOG_DIR&quot;</span>
+<a name="l00098"></a>00098 <span class="preprocessor"></span>
+<a name="l00107"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a2c19bd3f2d99d0c4bd53f74d6239159c">00107</a> <span class="preprocessor"># define LATEST_DIR &quot;latest&quot;</span>
+<a name="l00108"></a>00108 <span class="preprocessor"></span>
+<a name="l00123"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a960703fc3327c76cba0659a7a56afd1c">00123</a> <span class="preprocessor"># define MAX_LOG_ATTEMPT 1024</span>
+<a name="l00124"></a>00124 <span class="preprocessor"></span>
+<a name="l00132"></a><a class="code" href="../../d1/d5d/LogManager_8hh.html#a67a7e4219ac5d30ea132c5f5aefe9f3e">00132</a> <span class="preprocessor"># define TREX_LOG_LEVEL LogNormal</span>
+<a name="l00133"></a>00133 <span class="preprocessor"></span>
+<a name="l00134"></a>00134 <span class="keyword">namespace </span>TREX {
+<a name="l00135"></a>00135   <span class="keyword">namespace </span>utils {
+<a name="l00136"></a>00136               
+<a name="l00172"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html">00172</a>     <span class="keyword">class </span><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a> :boost::<a class="code" href="../../df/d91/classboost_1_1noncopyable.html">noncopyable</a> {
+<a name="l00173"></a>00173     <span class="keyword">public</span>:
+<a name="l00174"></a>00174       
+<a name="l00176"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd">00176</a>       <span class="keyword">enum</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> {
+<a name="l00177"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaa7ef7cab648431bb7ec92b41fabe9117">00177</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaa7ef7cab648431bb7ec92b41fabe9117" title="Minimum verbosity.">LogMin</a> = 0,  
+<a name="l00178"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaf2c14531dccd919238d2330b933303f5">00178</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847ddaf2c14531dccd919238d2330b933303f5" title="Normal level.">LogNormal</a>,   
+<a name="l00179"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dda7662b49da5cff9c1f0395418757ae73a">00179</a>                             <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dda7662b49da5cff9c1f0395418757ae73a" title="High verbosity (usually for debugging).">LogExtensive</a> 
+<a name="l00180"></a>00180       };
+<a name="l00181"></a>00181       <span class="keyword">typedef</span> boost::filesystem::path path_type;
+<a name="l00182"></a>00182                      
+<a name="l00194"></a>00194       path_type <span class="keyword">const</span> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8e71c6753feccc271093c8e95fb3a97a" title="Logging path This method indicates in which directory log files should be placed...">logPath</a>();
+<a name="l00209"></a>00209       path_type <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name">file_name</a>(std::string <span class="keyword">const</span> &amp;short_name);
+<a name="l00233"></a>00233       std::string <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management.">use</a>(std::string <span class="keyword">const</span> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a8ba32d8ecda2cb17d745de164c4f157f" title="log file complete name">file_name</a>, <span class="keywordtype">bool</span> &amp;found);
+<a name="l00234"></a>00234                      
+<a name="l00246"></a>00246       <a class="code" href="../../da/d38/classTREX_1_1utils_1_1internals_1_1LogEntry.html" title="Text Entry manager for TextLog.">internals::LogEntry</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry.">syslog</a>(std::string <span class="keyword">const</span> &amp;who);
+<a name="l00247"></a>00247       <a class="code" href="../../d5/db0/classTREX_1_1utils_1_1TextLog.html" title="Thread safe text logging.">TextLog</a> &amp;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry.">syslog</a>();
+<a name="l00254"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a08b62080f406c666ddacb239a79ddb84">00254</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a08b62080f406c666ddacb239a79ddb84" title="Current verbosity level.">getLogLevel</a>()<span class="keyword"> const </span>{
+<a name="l00255"></a>00255                             <span class="keywordflow">return</span> m_level;
+<a name="l00256"></a>00256       }
+<a name="l00272"></a>00272       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a0109e48f7e1a0831fe1a01475b899b6e" title="Set verbosity level.">setLogLevel</a>(<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a> lvl);
+<a name="l00287"></a>00287       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ae29bac21202518c8aa5b3b4b42f30402" title="Set log path.">setLogPath</a>(std::string <span class="keyword">const</span> &amp;path);
+<a name="l00288"></a>00288                      
+<a name="l00304"></a>00304       <span class="keywordtype">bool</span> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#ad9cd8cb552233272adb36291e2737d1d" title="add a directory to the search path">addSearchPath</a>(std::string <span class="keyword">const</span> &amp;path);
+<a name="l00305"></a>00305       
+<a name="l00313"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a30a8088cafcd5c7f6d08819b62a21b61">00313</a>       <span class="keyword">typedef</span> std::list&lt;path_type&gt;::const_iterator <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a30a8088cafcd5c7f6d08819b62a21b61" title="TREX_PATH iterator.">path_iterator</a>;
+<a name="l00320"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4">00320</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a30a8088cafcd5c7f6d08819b62a21b61" title="TREX_PATH iterator.">path_iterator</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4" title="First path.">begin</a>()<span class="keyword"> const </span>{
+<a name="l00321"></a>00321         <span class="keywordflow">return</span> m_searchPath.begin();
+<a name="l00322"></a>00322       }
+<a name="l00329"></a><a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896">00329</a>       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a30a8088cafcd5c7f6d08819b62a21b61" title="TREX_PATH iterator.">path_iterator</a> <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896" title="End of searh path.">end</a>()<span class="keyword"> const </span>{
+<a name="l00330"></a>00330         <span class="keywordflow">return</span> m_searchPath.end();
+<a name="l00331"></a>00331       }
+<a name="l00332"></a>00332                      
+<a name="l00349"></a>00349       path_type <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a2ae36d73e0d96ef8bf878643308ce11c" title="Locate a file.">locate</a>(std::string <span class="keyword">const</span> &amp;file, <span class="keywordtype">bool</span> &amp;found) <span class="keyword">const</span>;
+<a name="l00350"></a>00350       
+<a name="l00355"></a>00355       path_type <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a94da0ea064ed2311226164bfcd4b0c3d" title="Get directory where cfg files should be stored.">getCfgPath</a>();
+<a name="l00356"></a>00356     <span class="keyword">private</span>:
+<a name="l00358"></a>00358       path_type m_path;
+<a name="l00359"></a>00359                      
+<a name="l00364"></a>00364       <a class="code" href="../../de/d9c/classTREX_1_1utils_1_1SharedVar.html">SharedVar&lt;bool&gt;</a> m_inited;
+<a name="l00366"></a>00366       <a class="code" href="../../d5/db0/classTREX_1_1utils_1_1TextLog.html" title="Thread safe text logging.">TextLog</a>     m_syslog;
+<a name="l00368"></a>00368       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67e15f9907e6dc6cba8c44d09fb847dd" title="Log verbosity level.">LogLevel</a>    m_level;
+<a name="l00369"></a>00369                      
+<a name="l00371"></a>00371       <a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>();
+<a name="l00373"></a>00373       ~<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>();
+<a name="l00374"></a>00374                      
+<a name="l00384"></a>00384       <span class="keywordtype">void</span> createLatest();
+<a name="l00385"></a>00385       
+<a name="l00395"></a>00395       <span class="keywordtype">void</span> loadSearchPath();
+<a name="l00396"></a>00396                      
+<a name="l00405"></a>00405       std::list&lt;path_type&gt; m_searchPath;
+<a name="l00406"></a>00406       
+<a name="l00407"></a>00407       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../da/d5f/classTREX_1_1utils_1_1SingletonWrapper.html" title="Phoenix singleton wrapper.">SingletonWrapper</a>&lt;<a class="code" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html" title="Centralized logging and files management.">LogManager</a>&gt;;
+<a name="l00408"></a>00408     }; <span class="comment">// TREX::utils::LogManager</span>
+<a name="l00409"></a>00409               
+<a name="l00410"></a>00410   } <span class="comment">// TREX::utils </span>
+<a name="l00411"></a>00411 } <span class="comment">// TREX</span>
+<a name="l00412"></a>00412 
+<a name="l00413"></a>00413 <span class="preprocessor">#endif // H_LogManager</span>
+<a name="l00414"></a>00414 <span class="preprocessor"></span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:12 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:09 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

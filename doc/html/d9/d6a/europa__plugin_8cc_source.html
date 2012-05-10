@@ -118,20 +118,23 @@ window.onload = initDynSections;
 <a name="l00044"></a>00044 
 <a name="l00045"></a>00045   <a class="code" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html">SingletonUse&lt;LogManager&gt;</a> s_log;
 <a name="l00046"></a>00046 
-<a name="l00047"></a>00047   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">TeleoReactor::xml_factory::declare&lt;EuropaReactor&gt;</a> <a class="code" href="../../d4/d1f/group__agent.html#ga739aaef7cd7986fd5eab307e152a0feb" title="Clock XML factor declaration for StepClock.">decl</a>(<span class="stringliteral">&quot;EuropaReactor&quot;</span>);
+<a name="l00047"></a>00047   <a class="code" href="../../d4/dad/classTREX_1_1utils_1_1XmlFactory_1_1declare.html">TeleoReactor::xml_factory::declare&lt;EuropaReactor&gt;</a> decl(<span class="stringliteral">&quot;EuropaReactor&quot;</span>);
 <a name="l00048"></a>00048 
 <a name="l00049"></a>00049 }
 <a name="l00050"></a>00050 
 <a name="l00051"></a>00051 <span class="keyword">namespace </span>TREX {
 <a name="l00052"></a>00052 
 <a name="l00053"></a>00053   <span class="keywordtype">void</span> <a class="code" href="../../d4/db0/group__lightswitch.html#gaac42bad09a4dd774d71b32819cb1fe0e" title="Plug-in initialisation.">initPlugin</a>() {
-<a name="l00054"></a>00054     ::s_log-&gt;syslog(<span class="stringliteral">&quot;plugin.europa&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Europa loaded.&quot;</span>&lt;&lt;std::endl;
-<a name="l00055"></a>00055     <span class="comment">// ::decl;</span>
-<a name="l00056"></a>00056   }  
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058 }
+<a name="l00054"></a>00054     <span class="keywordflow">if</span>( !Assembly::actions_supported() )
+<a name="l00055"></a>00055       ::s_log-&gt;syslog(<span class="stringliteral">&quot;WARNING&quot;</span>)&lt;&lt;<span class="stringliteral">&quot; This version of europa plugin was compiled without Europa 2.6 action support!&quot;</span>; 
+<a name="l00056"></a>00056     
+<a name="l00057"></a>00057     ::s_log-&gt;syslog(<span class="stringliteral">&quot;plugin.europa&quot;</span>)&lt;&lt;<span class="stringliteral">&quot;Europa loaded.&quot;</span>&lt;&lt;std::endl;
+<a name="l00058"></a>00058     <span class="comment">// ::decl;</span>
+<a name="l00059"></a>00059   }  
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

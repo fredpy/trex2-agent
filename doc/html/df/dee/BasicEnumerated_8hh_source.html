@@ -148,15 +148,15 @@ window.onload = initDynSections;
 <a name="l00143"></a>00143            
 <a name="l00157"></a>00157       <span class="keyword">virtual</span> std::string <a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html#ad7d4dacc93505ab2b97a44f1cde8ee2b" title="Get element textual value.">getStringValue</a>(<span class="keywordtype">size_t</span> i) <span class="keyword">const</span>;
 <a name="l00158"></a>00158 
-<a name="l00159"></a>00159     <span class="keyword">protected</span>:
-<a name="l00160"></a>00160       <span class="keyword">explicit</span> <a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class.">BasicEnumerated</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type) 
-<a name="l00161"></a>00161        :<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a>(type) {}
-<a name="l00162"></a>00162       <span class="keyword">explicit</span> BasicEnumerated(boost::property_tree::ptree::value_type &amp;node)
-<a name="l00163"></a>00163        :DomainBase(node) {}
-<a name="l00164"></a>00164 
-<a name="l00165"></a>00165       <span class="keywordtype">void</span> completeParsing(boost::property_tree::ptree::value_type &amp;node);
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167       <span class="keyword">virtual</span> <span class="keywordtype">void</span> addTextValue(std::string <span class="keyword">const</span> &amp;val) =0;
+<a name="l00159"></a>00159       <span class="keyword">virtual</span> <span class="keywordtype">void</span> addTextValue(std::string <span class="keyword">const</span> &amp;val) =0;
+<a name="l00160"></a>00160     <span class="keyword">protected</span>:
+<a name="l00161"></a>00161       <span class="keyword">explicit</span> <a class="code" href="../../d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class.">BasicEnumerated</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;type) 
+<a name="l00162"></a>00162        :<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a>(type) {}
+<a name="l00163"></a>00163       <span class="keyword">explicit</span> BasicEnumerated(boost::property_tree::ptree::value_type &amp;node)
+<a name="l00164"></a>00164        :DomainBase(node) {}
+<a name="l00165"></a>00165 
+<a name="l00166"></a>00166       <span class="keywordtype">void</span> completeParsing(boost::property_tree::ptree::value_type &amp;node);
+<a name="l00167"></a>00167 
 <a name="l00168"></a>00168       <span class="keyword">virtual</span> std::ostream &amp;print_value(std::ostream &amp;out, <span class="keywordtype">size_t</span> i) <span class="keyword">const</span> =0;
 <a name="l00169"></a>00169       
 <a name="l00170"></a>00170     <span class="keyword">private</span>:
@@ -177,7 +177,7 @@ window.onload = initDynSections;
 <a name="l00185"></a>00185 
 <a name="l00186"></a>00186 <span class="preprocessor">#endif // H_BasicEnumerated</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

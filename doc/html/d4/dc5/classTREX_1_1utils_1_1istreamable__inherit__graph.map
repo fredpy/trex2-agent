@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$df/db6/classTREX_1_1transaction_1_1IntervalDomain_1_1bound.html" title="interval bounds extension of Ty " alt="" coords="240,5,640,35"/>
-<area shape="rect" id="node5" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="269,59,611,88"/>
+<area shape="rect" id="node3" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="TREX::utils::BasicSymbol\&lt; char \&gt;" alt="" coords="316,5,564,35"/>
+<area shape="rect" id="node5" href="$df/db6/classTREX_1_1transaction_1_1IntervalDomain_1_1bound.html" title="interval bounds extension of Ty " alt="" coords="240,59,640,88"/>
+<area shape="rect" id="node7" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="269,112,611,141"/>
 </map>

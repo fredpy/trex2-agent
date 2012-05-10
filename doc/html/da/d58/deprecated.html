@@ -66,54 +66,61 @@ window.onload = initDynSections;
 <div class="contents">
 
 
-<h1><a class="anchor" id="deprecated">Deprecated List </a></h1><p><a class="anchor" id="_deprecated000004"></a> </p>
+<h1><a class="anchor" id="deprecated">Deprecated List </a></h1><p><a class="anchor" id="_deprecated000002"></a> </p>
 <dl>
 <dt>File <a class="el" href="../../d2/d84/Goal_8hh.html">Goal.hh</a>  </dt>
 <dd><p class="startdd">the current implementation of goals is not as flexible and transparent as desired and may change drastically in the future</p>
 <p class="enddd"></p>
 </dd>
 </dl>
-<p><a class="anchor" id="_deprecated000005"></a> </p>
+<p><a class="anchor" id="_deprecated000003"></a> </p>
 <dl>
 <dt>File <a class="el" href="../../d3/d2f/Observation_8hh.html">Observation.hh</a>  </dt>
 <dd><p class="startdd">the current implementation of observations is not as flexible and transparent as desired and may change drastically in the future</p>
 <p class="enddd"></p>
 </dd>
 </dl>
-<p><a class="anchor" id="_deprecated000003"></a> </p>
+<p><a class="anchor" id="_deprecated000007"></a> </p>
+<dl>
+<dt>File <a class="el" href="../../d2/dd9/RStat_8hh.html">RStat.hh</a>  </dt>
+<dd>The RStat* classes are now replaced by Boost.Chrono library. </dd>
+</dl>
+<p><a class="anchor" id="_deprecated000001"></a> </p>
 <dl>
 <dt>Member <a class="el" href="../../de/d50/classTREX_1_1agent_1_1Clock.html#a4588702fda485ba458145b2e6661770d">TREX::agent::Clock::advanceTick</a> (<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TREX::transaction::TICK</a> &amp;tick) </dt>
 <dd>This method was used for computing extra stats. We need to find a better approach. Specifically it would be relevant to have the tick variable located on this class. </dd>
 </dl>
-<p><a class="anchor" id="_deprecated000002"></a> </p>
-<dl>
-<dt>Member <a class="el" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a6cdc064d1e1905b64e153e5466c60fc6">TREX::europa::Assembly::IGNORE_MODE</a>  </dt>
-<dd><p class="startdd">While such feature was necessary in past versions of TREX (as all reactors were loading the same domain with only a differenc in its instanciation) the utility of such feature on this version is still not clear. Still we keep such construct for backward compatibility.</p>
-<p></p>
-<p class="enddd">This kind of timleine was used in the past when all europa reactors were loading the same model. As we now have each reactor loading their own model such feature is not really useful and may disappear in future versions </p>
-</dd>
-</dl>
-<p><a class="anchor" id="_deprecated000006"></a> </p>
+<p><a class="anchor" id="_deprecated000004"></a> </p>
 <dl>
 <dt>Class <a class="el" href="../../de/d8d/classTREX_1_1transaction_1_1Observation.html">TREX::transaction::Observation</a>  </dt>
 <dd><p class="startdd">the current implementation of observations is not as flexible and transparent as desired and may change drastically in the future</p>
 <p class="enddd"></p>
 </dd>
 </dl>
-<p><a class="anchor" id="_deprecated000008"></a> </p>
+<p><a class="anchor" id="_deprecated000006"></a> </p>
 <dl>
 <dt>Member <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#ad21eb1f4f7dd6affb3e4b4fe1f256a93">TREX::transaction::TeleoReactor::completedGoal</a> (goal_id g) </dt>
 <dd>This method should become useless as the goal management system is much more able to identify that a goal did complete </dd>
 </dl>
-<p><a class="anchor" id="_deprecated000007"></a> </p>
+<p><a class="anchor" id="_deprecated000005"></a> </p>
 <dl>
 <dt>Member <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a94f89daf3b2f2e58380ecf7d543f1d04">TREX::transaction::TeleoReactor::getAgentName</a> () const  </dt>
 <dd><p class="startdd">reactors are now manipulated by a graph. The agent uses this graph to trigger reactor's callbacks based on graph traversal algorithms. A graph is a more general concept thatn an agent (for example a graph could allow to have cyclic dependencies between reactors ...) to reflect this change this method has been replaced by getGraphName() and kept for backward compatibility.</p>
 <p class="enddd"></p>
 </dd>
 </dl>
+<p><a class="anchor" id="_deprecated000008"></a> </p>
+<dl>
+<dt>Class <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html">TREX::utils::RStat</a>  </dt>
+<dd>The RStat class is now replaced by Boost.Chrono library. </dd>
+</dl>
+<p><a class="anchor" id="_deprecated000009"></a> </p>
+<dl>
+<dt>Class <a class="el" href="../../dd/dda/classTREX_1_1utils_1_1RStatLap.html">TREX::utils::RStatLap</a>  </dt>
+<dd>The RStatLap class is now replaced by Boost.Chrono library. </dd>
+</dl>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:28 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:09 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

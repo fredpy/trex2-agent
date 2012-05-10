@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>trex: extra/europa/DeliberationFilter.cc Source File</title>
+<title>trex: extra/europa/core/DeliberationFilter.cc Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@ window.onload = initDynSections;
       <li><a href="../../globals.html"><span>File&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>
+  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_caf30660ae4679c1670c7e61e370b97e.html">core</a>
   </div>
 </div>
 <div class="contents">
@@ -105,92 +105,99 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;EuropaReactor.hh&quot;</span>
-<a name="l00035"></a>00035 
-<a name="l00036"></a>00036 <span class="preprocessor">#include &lt;PLASMA/RuleInstance.hh&gt;</span>
-<a name="l00037"></a>00037 <span class="preprocessor">#include &lt;PLASMA/ConstrainedVariable.hh&gt;</span>
-<a name="l00038"></a>00038 <span class="preprocessor">#include &lt;PLASMA/Token.hh&gt;</span>
-<a name="l00039"></a>00039 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
-<a name="l00040"></a>00040 <span class="preprocessor">#include &lt;PLASMA/TemporalAdvisor.hh&gt;</span>
+<a name="l00034"></a>00034 <span class="preprocessor">#include &quot;trex/europa/DeliberationFilter.hh&quot;</span>
+<a name="l00035"></a>00035 <span class="preprocessor">#include &quot;trex/europa/Assembly.hh&quot;</span>
+<a name="l00036"></a>00036 <span class="preprocessor">#include &quot;trex/europa/bits/europa_helpers.hh&quot;</span>
+<a name="l00037"></a>00037 
+<a name="l00038"></a>00038 <span class="preprocessor">#include &lt;PLASMA/TokenVariable.hh&gt;</span>
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040 <span class="keyword">using namespace </span>TREX::europa;
 <a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;PLASMA/Debug.hh&gt;</span>
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044 <span class="keyword">using namespace </span>TREX::europa;
-<a name="l00045"></a>00045 <span class="keyword">using namespace </span>TREX::transaction;
+<a name="l00042"></a>00042 <span class="comment">/*</span>
+<a name="l00043"></a>00043 <span class="comment"> * class TREX::europa::TokenFilter</span>
+<a name="l00044"></a>00044 <span class="comment"> */</span>
+<a name="l00045"></a>00045 <span class="comment">// structors</span>
 <a name="l00046"></a>00046 
-<a name="l00047"></a>00047 <a class="code" href="../../d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor.">EuropaReactor</a> *DeliberationFilter::s_current = NULL;
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="keywordtype">void</span> DeliberationFilter::set_current(<a class="code" href="../../d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor.">EuropaReactor</a> *me) {
-<a name="l00050"></a>00050   s_current = me;
-<a name="l00051"></a>00051 }
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 DeliberationFilter::DeliberationFilter(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg)
-<a name="l00054"></a>00054   :EUROPA::SOLVERS::FlawFilter(cfg, true), m_assembly(s_current-&gt;assembly()) {
-<a name="l00055"></a>00055   <span class="comment">// TREX::utils::SingletonUse&lt;details::Schema&gt; schema;</span>
-<a name="l00056"></a>00056   debugMsg(<span class="stringliteral">&quot;trex:horizon&quot;</span>, <span class="stringliteral">&quot;Created for reactor &quot;</span>&lt;&lt;s_current-&gt;getName()
-<a name="l00057"></a>00057           &lt;&lt;<span class="stringliteral">&quot;\nid is &quot;</span>&lt;&lt;getId());
-<a name="l00058"></a>00058   setExpression(toString()+<span class="stringliteral">&quot;:horizon_&quot;</span>+s_current-&gt;getName().str());
-<a name="l00059"></a>00059   s_current-&gt;set_filter(<span class="keyword">this</span>);  
-<a name="l00060"></a>00060 }
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="keywordtype">void</span> DeliberationFilter::set_horizon(<a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> start, <a class="code" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada" title="TREX unit of time.">TICK</a> end) {
-<a name="l00063"></a>00063   debugMsg(<span class="stringliteral">&quot;trex:horizon&quot;</span>, <span class="stringliteral">&quot;horizon set to [&quot;</span>&lt;&lt;start&lt;&lt;<span class="stringliteral">&quot;, &quot;</span>&lt;&lt;end&lt;&lt;<span class="stringliteral">&quot;)&quot;</span>);;
-<a name="l00064"></a>00064   m_horizon = EUROPA::IntervalIntDomain(start, end);
-<a name="l00065"></a>00065 }
+<a name="l00047"></a>00047 TokenFilter::TokenFilter(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg)
+<a name="l00048"></a>00048   :EUROPA::SOLVERS::FlawFilter(cfg, true), m_assembly(NULL) {}
+<a name="l00049"></a>00049 
+<a name="l00050"></a>00050 <span class="comment">// observers</span>
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html">Assembly</a> <span class="keyword">const</span> &amp;TokenFilter::assembly()<span class="keyword"> const </span>{
+<a name="l00053"></a>00053   <span class="keywordflow">if</span>( !have_assembly() )
+<a name="l00054"></a>00054     <span class="keywordflow">throw</span> <a class="code" href="../../dd/d3e/classTREX_1_1europa_1_1EuropaException.html" title="Europa related Exception.">EuropaException</a>(<span class="stringliteral">&quot;TokenFilter not attached to a TREX assembly.&quot;</span>);
+<a name="l00055"></a>00055   <span class="keywordflow">return</span> *m_assembly;
+<a name="l00056"></a>00056 }
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058 <span class="comment">// modifiers</span>
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060 <span class="keywordtype">void</span> TokenFilter::set_assembly(EUROPA::EngineComponentId <span class="keyword">const</span> &amp;component) {
+<a name="l00061"></a>00061   <span class="keywordflow">if</span>( !have_assembly() &amp;&amp; component.isId() ) 
+<a name="l00062"></a>00062     m_assembly = &amp;(details::assembly_of(component));
+<a name="l00063"></a>00063 }
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065 <span class="comment">// manipulators</span>
 <a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="keywordtype">bool</span> DeliberationFilter::test(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
-<a name="l00068"></a>00068   EUROPA::TokenId token;
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070   <span class="keywordflow">if</span>( EUROPA::ConstrainedVariableId::convertable(entity) ) {
-<a name="l00071"></a>00071     EUROPA::EntityId parent = EUROPA::ConstrainedVariableId(entity)-&gt;parent();
+<a name="l00067"></a>00067 <span class="keywordtype">bool</span> TokenFilter::tokenCheck(EUROPA::TokenId <span class="keyword">const</span> &amp;token) {
+<a name="l00068"></a>00068   <span class="keywordflow">return</span> assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314" title="Check if ignored.">ignored</a>(token) ||
+<a name="l00069"></a>00069     token-&gt;start()-&gt;lastDomain().getLowerBound() &gt;= assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a9a216b700755407ae9d4421db6276673" title="Final tick of the mission.">final_tick</a>() ||
+<a name="l00070"></a>00070     token-&gt;end()-&gt;lastDomain().getUpperBound() &lt;= assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a74ca23dcc0e3cac991e0f0dc068dd458" title="Initial mission tick.">initial_tick</a>();
+<a name="l00071"></a>00071 }
 <a name="l00072"></a>00072 
-<a name="l00073"></a>00073     <span class="keywordflow">if</span>( parent.isNoId() || EUROPA::ObjectId::convertable(parent) )
-<a name="l00074"></a>00074       <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00075"></a>00075     
-<a name="l00076"></a>00076     <span class="keywordflow">if</span>( EUROPA::RuleInstanceId::convertable(parent) )
-<a name="l00077"></a>00077       token = EUROPA::RuleInstanceId(parent)-&gt;getToken();
-<a name="l00078"></a>00078     <span class="keywordflow">else</span> 
-<a name="l00079"></a>00079       token = parent;
-<a name="l00080"></a>00080   } <span class="keywordflow">else</span> 
-<a name="l00081"></a>00081     token = entity;
+<a name="l00073"></a>00073 <span class="keywordtype">bool</span> TokenFilter::test(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) {
+<a name="l00074"></a>00074   EUROPA::TokenId token;
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076   <span class="keywordflow">if</span>( EUROPA::TokenId::convertable(entity)  ) {
+<a name="l00077"></a>00077     token = EUROPA::TokenId(entity);
+<a name="l00078"></a>00078     set_assembly(token-&gt;getPlanDatabase());
+<a name="l00079"></a>00079   } <span class="keywordflow">else</span> <span class="keywordflow">if</span>( EUROPA::ConstrainedVariableId::convertable(entity) ) {
+<a name="l00080"></a>00080     EUROPA::ConstrainedVariableId var(entity);
+<a name="l00081"></a>00081     set_assembly(var-&gt;getConstraintEngine());
 <a name="l00082"></a>00082 
-<a name="l00083"></a>00083   debugMsg(<span class="stringliteral">&quot;trex:horizon:test&quot;</span>, <span class="stringliteral">&quot;Evaluate &quot;</span>&lt;&lt;token-&gt;toLongString());
-<a name="l00084"></a>00084   <span class="keywordflow">if</span>( m_assembly.<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a50dee9c17a7edef03f5147483fb86314">ignored</a>(token) ) {
-<a name="l00085"></a>00085     debugMsg(<span class="stringliteral">&quot;trex:horizon:test&quot;</span>, <span class="stringliteral">&quot;This token is ignored&quot;</span>);
-<a name="l00086"></a>00086     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00087"></a>00087   }
-<a name="l00088"></a>00088   EUROPA::IntervalIntDomain <span class="keyword">const</span> &amp;start_t(token-&gt;start()-&gt;lastDomain());
-<a name="l00089"></a>00089   EUROPA::IntervalIntDomain <span class="keyword">const</span> &amp;end_t(token-&gt;end()-&gt;lastDomain());
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091   <span class="keywordflow">if</span>( end_t.getUpperBound() &lt;= m_horizon.getLowerBound() ||
-<a name="l00092"></a>00092       start_t.getLowerBound() &gt;= m_horizon.getUpperBound() ) {
-<a name="l00093"></a>00093     debugMsg(<span class="stringliteral">&quot;trex:horizon:test&quot;</span>, <span class="stringliteral">&quot;This token is out of the planning horizon&quot;</span>);
-<a name="l00094"></a>00094     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00095"></a>00095   }
-<a name="l00096"></a>00096 
-<a name="l00097"></a>00097   <span class="keywordtype">bool</span> in_scope = start_t.getUpperBound()&lt; m_horizon.getUpperBound();
-<a name="l00098"></a>00098   
-<a name="l00099"></a>00099   in_scope = in_scope || start_t.getUpperBound()&lt;=m_assembly.final_tick();
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101   <span class="keywordflow">if</span>( !in_scope ) {
-<a name="l00102"></a>00102     EUROPA::TokenId master = token-&gt;master();
-<a name="l00103"></a>00103     <span class="keywordflow">if</span>( master.isId() ) {
-<a name="l00104"></a>00104       in_scope = !m_assembly.<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a4b1156d1afeaaa97638ba63025b1ff02" title="Get europa plan database.">plan_db</a>()-&gt;getTemporalAdvisor()-&gt;canPrecede(master, token);
-<a name="l00105"></a>00105     }
-<a name="l00106"></a>00106   }
-<a name="l00107"></a>00107   <span class="keywordflow">if</span>( in_scope ) {
-<a name="l00108"></a>00108     debugMsg(<span class="stringliteral">&quot;trex:horizon:test&quot;</span>, <span class="stringliteral">&quot;This token is part of the planning horizon&quot;</span>
-<a name="l00109"></a>00109             &lt;&lt;<span class="stringliteral">&quot;\n\tstart &quot;</span>&lt;&lt;start_t.toString()
-<a name="l00110"></a>00110             &lt;&lt;<span class="stringliteral">&quot;\n\tend &quot;</span>&lt;&lt;end_t.toString()
-<a name="l00111"></a>00111             &lt;&lt;<span class="stringliteral">&quot;\n\thorizon &quot;</span>&lt;&lt;m_horizon.toString());
-<a name="l00112"></a>00112   } <span class="keywordflow">else</span> {
-<a name="l00113"></a>00113     debugMsg(<span class="stringliteral">&quot;trex:horizon:test&quot;</span>, <span class="stringliteral">&quot;This token is not in  scope&quot;</span>);
+<a name="l00083"></a>00083     token = details::parent_token(var);
+<a name="l00084"></a>00084   }    
+<a name="l00085"></a>00085   
+<a name="l00086"></a>00086   <span class="keywordflow">return</span> token.isNoId() || tokenCheck(token) || doTest(token);
+<a name="l00087"></a>00087 }
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089 <span class="comment">/*</span>
+<a name="l00090"></a>00090 <span class="comment"> * class TREX::europa::DeliberationScope</span>
+<a name="l00091"></a>00091 <span class="comment"> */</span>
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093 <span class="keywordtype">bool</span> DeliberationScope::doTest(EUROPA::TokenId <span class="keyword">const</span> &amp;tok) {
+<a name="l00094"></a>00094   EUROPA::IntervalIntDomain <span class="keyword">const</span> &amp;t_start(tok-&gt;start()-&gt;lastDomain());
+<a name="l00095"></a>00095   EUROPA::IntervalIntDomain <span class="keyword">const</span> &amp;t_end(tok-&gt;start()-&gt;lastDomain());
+<a name="l00096"></a>00096   EUROPA::IntervalIntDomain horizon = assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#ac121806cbf6079f8f99a5a61a8ca8d2e" title="Current scope of the plan.">plan_scope</a>();
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098   <span class="keywordflow">return</span> t_start.getLowerBound() &gt;= horizon.getUpperBound() ||
+<a name="l00099"></a>00099     t_end.getUpperBound() &lt; horizon.getLowerBound();
+<a name="l00100"></a>00100 }
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102 <span class="comment">/*</span>
+<a name="l00103"></a>00103 <span class="comment"> * class TREX::europa::SynchronizationScope</span>
+<a name="l00104"></a>00104 <span class="comment"> */</span>
+<a name="l00105"></a>00105 
+<a name="l00106"></a>00106 <span class="keywordtype">bool</span> SynchronizationScope::doTest(EUROPA::TokenId <span class="keyword">const</span> &amp;tok) {
+<a name="l00107"></a>00107   EUROPA::eint cur = assembly().<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html#a18e6f3bc95f0e5676dfc52fe88a047cb" title="Current tick.">now</a>();
+<a name="l00108"></a>00108   <span class="comment">// debugMsg(&quot;trex:filt:synch&quot;, &quot;Checking if &quot;&lt;&lt;tok-&gt;toString()&lt;&lt;&quot; overlaps &quot;&lt;&lt;cur);</span>
+<a name="l00109"></a>00109   
+<a name="l00110"></a>00110   <span class="keywordflow">if</span>( tok-&gt;start()-&gt;lastDomain().getLowerBound() &gt; cur ) {
+<a name="l00111"></a>00111     debugMsg(<span class="stringliteral">&quot;trex:filt:synch&quot;</span>, tok-&gt;toString()&lt;&lt;<span class="stringliteral">&quot;.start=&quot;</span>&lt;&lt;tok-&gt;start()-&gt;lastDomain().toString()
+<a name="l00112"></a>00112              &lt;&lt;<span class="stringliteral">&quot; after &quot;</span>&lt;&lt;cur&lt;&lt;<span class="stringliteral">&quot; =&gt; EXCLUDE&quot;</span>); 
+<a name="l00113"></a>00113     <span class="keywordflow">return</span> <span class="keyword">true</span>;
 <a name="l00114"></a>00114   }
-<a name="l00115"></a>00115   <span class="keywordflow">return</span> !in_scope;
-<a name="l00116"></a>00116 }
-<a name="l00117"></a>00117 
+<a name="l00115"></a>00115   <span class="keywordflow">if</span>( tok-&gt;end()-&gt;lastDomain().getUpperBound() &lt; cur ) {
+<a name="l00116"></a>00116     debugMsg(<span class="stringliteral">&quot;trex:filt:synch&quot;</span>, tok-&gt;toString()&lt;&lt;<span class="stringliteral">&quot;.end=&quot;</span>&lt;&lt;tok-&gt;end()-&gt;lastDomain().toString()
+<a name="l00117"></a>00117              &lt;&lt;<span class="stringliteral">&quot; before &quot;</span>&lt;&lt;cur&lt;&lt;<span class="stringliteral">&quot; =&gt; EXCLUDE&quot;</span>); 
+<a name="l00118"></a>00118     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00119"></a>00119   }
+<a name="l00120"></a>00120 <span class="comment">//  debugMsg(&quot;trex:filt:synch&quot;, tok-&gt;toString()&lt;&lt;&quot; overlaps &quot;&lt;&lt;cur&lt;&lt;&quot; =&gt; OK&quot;);</span>
+<a name="l00121"></a>00121   <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00122"></a>00122 }
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124 
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

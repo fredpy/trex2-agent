@@ -132,7 +132,7 @@ window.onload = initDynSections;
 <a name="l00090"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html">00090</a>     <span class="keyword">class </span><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> :<span class="keyword">public</span> TREX::utils::ostreamable {
 <a name="l00091"></a>00091     <span class="keyword">public</span>:
 <a name="l00101"></a>00101       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>();
-<a name="l00111"></a>00111       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
+<a name="l00111"></a>00111       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
 <a name="l00112"></a>00112               <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;domain);
 <a name="l00118"></a>00118       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;var);
 <a name="l00137"></a>00137       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(boost::property_tree::ptree::value_type &amp;node);
@@ -144,7 +144,7 @@ window.onload = initDynSections;
 <a name="l00152"></a>00152       
 <a name="l00162"></a>00162       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> &amp;operator= (<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;other);
 <a name="l00163"></a>00163       
-<a name="l00168"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4">00168</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4" title="Variable name.">name</a>()<span class="keyword"> const </span>{
+<a name="l00168"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4">00168</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a856eac66eedd07bdb24581098cd7f4f4" title="Variable name.">name</a>()<span class="keyword"> const </span>{
 <a name="l00169"></a>00169        <span class="keywordflow">return</span> m_name;
 <a name="l00170"></a>00170       }
 <a name="l00171"></a>00171 
@@ -173,7 +173,7 @@ window.onload = initDynSections;
 <a name="l00280"></a>00280        
 <a name="l00281"></a>00281     <span class="keyword">private</span>:
 <a name="l00282"></a>00282       <span class="keyword">typedef</span> DomainBase::xml_factory::returned_type domain_ptr;
-<a name="l00284"></a>00284       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> m_name;
+<a name="l00284"></a>00284       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> m_name;
 <a name="l00286"></a>00286       domain_ptr m_domain;
 <a name="l00287"></a>00287 
 <a name="l00288"></a>00288       std::ostream &amp;print_to(std::ostream &amp;out) <span class="keyword">const</span>;
@@ -182,7 +182,7 @@ window.onload = initDynSections;
 <a name="l00292"></a>00292 
 <a name="l00299"></a>00299       <span class="keyword">static</span> <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> *clone(boost::call_traits&lt;Variable::domain_ptr&gt;::param_type dom);
 <a name="l00300"></a>00300       
-<a name="l00308"></a>00308       <span class="keyword">explicit</span> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
+<a name="l00308"></a>00308       <span class="keyword">explicit</span> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name,
 <a name="l00309"></a>00309                      <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> *domain = NULL);
 <a name="l00310"></a>00310       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>;
 <a name="l00311"></a>00311    }; <span class="comment">// class TREX::transaction::Variable</span>
@@ -192,7 +192,7 @@ window.onload = initDynSections;
 <a name="l00315"></a>00315 
 <a name="l00316"></a>00316 <span class="preprocessor">#endif // H_Variable</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

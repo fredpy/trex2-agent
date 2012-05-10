@@ -1,3 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$d2/d04/classTREX_1_1europa_1_1details_1_1CurrentState.html" title="TREX::europa::details::CurrentState" alt="" coords="7,5,276,35"/>
+<area shape="rect" id="node1" href="$d1/db3/classstarfish_1_1europa_1_1CostEstimator.html" title="starfish::europa::CostEstimator" alt="" coords="5,5,243,35"/>
+<area shape="rect" id="node3" href="$d5/d4a/classstarfish_1_1europa_1_1EuclideanCostEstimator.html" title="starfish::europa::EuclideanCostEstimator" alt="" coords="291,5,592,35"/>
 </map>

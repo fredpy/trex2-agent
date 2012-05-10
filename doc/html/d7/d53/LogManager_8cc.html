@@ -76,14 +76,13 @@ window.onload = initDynSections;
 <p>LogManager implementation.  
 <a href="#_details">More...</a></p>
 <code>#include &lt;time.h&gt;</code><br/>
-<code>#include &lt;sys/types.h&gt;</code><br/>
-<code>#include &lt;sys/stat.h&gt;</code><br/>
 <code>#include &lt;boost/tokenizer.hpp&gt;</code><br/>
 <code>#include &lt;cerrno&gt;</code><br/>
 <code>#include &lt;cstring&gt;</code><br/>
 <code>#include &lt;iomanip&gt;</code><br/>
 <code>#include &quot;<a class="el" href="../../d7/d53/LogManager_8cc_source.html">LogManager.hh</a>&quot;</code><br/>
 <code>#include &lt;list&gt;</code><br/>
+<code>#include &lt;boost/filesystem.hpp&gt;</code><br/>
 <code>#include &lt;fstream&gt;</code><br/>
 <code>#include &lt;memory&gt;</code><br/>
 <code>#include &lt;sstream&gt;</code><br/>
@@ -99,7 +98,7 @@ Include dependency graph for LogManager.cc:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d0/de0/LogManager_8cc__incl.png" border="0" usemap="#trex_2utils_2LogManager_8cc_map" alt=""/></div>
 <map name="trex_2utils_2LogManager_8cc_map" id="trex_2utils_2LogManager_8cc">
-<area shape="rect" id="node28" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="509,83,637,112"/><area shape="rect" id="node36" href="../../d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1937,160,2047,190"/><area shape="rect" id="node42" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1880,83,2005,112"/><area shape="rect" id="node30" href="../../dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="491,160,656,190"/><area shape="rect" id="node40" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1993,238,2127,267"/></map>
+<area shape="rect" id="node26" href="../../dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1880,83,2008,112"/><area shape="rect" id="node34" href="../../d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1540,160,1649,190"/><area shape="rect" id="node40" href="../../d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1344,83,1469,112"/><area shape="rect" id="node28" href="../../dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="1861,160,2027,190"/><area shape="rect" id="node38" href="../../d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1596,238,1729,267"/></map>
 </div>
 <div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
@@ -116,7 +115,7 @@ This graph shows which files directly or indirectly include this file:</div>
 
 <p>Definition in file <a class="el" href="../../d7/d53/LogManager_8cc_source.html">LogManager.cc</a>.</p>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:23 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:09 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

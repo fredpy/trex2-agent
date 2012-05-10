@@ -134,10 +134,10 @@ window.onload = initDynSections;
 <a name="l00065"></a>00065 
 <a name="l00066"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2">00066</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>() {}
 <a name="l00067"></a>00067 
-<a name="l00068"></a>00068 <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> *dom)
+<a name="l00068"></a>00068 <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> *dom)
 <a name="l00069"></a>00069   :m_name(name), m_domain(dom) {}
 <a name="l00070"></a>00070 
-<a name="l00071"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#aecb8f2c858f4a5d0313e05d1f903bcc3">00071</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;dom) 
+<a name="l00071"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#aecb8f2c858f4a5d0313e05d1f903bcc3">00071</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> <span class="keyword">const</span> &amp;name, <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;dom) 
 <a name="l00072"></a>00072   :m_name(name), m_domain(dom.copy()) {
 <a name="l00073"></a>00073   <span class="keywordflow">if</span>( m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
 <a name="l00074"></a>00074     <span class="keywordflow">throw</span> <a class="code" href="../../d0/d1c/classTREX_1_1transaction_1_1VariableException.html" title="Variable related exception.">VariableException</a>(<span class="stringliteral">&quot;Empty variable names are not allowed&quot;</span>);
@@ -147,7 +147,7 @@ window.onload = initDynSections;
 <a name="l00078"></a>00078   :m_name(other.m_name), m_domain(clone(other.m_domain)) {}
 <a name="l00079"></a>00079 
 <a name="l00080"></a><a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a2cc8b0f58f7e0a3fc18845aa8cffa733">00080</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2" title="Constructor.">Variable::Variable</a>(boost::property_tree::ptree::value_type &amp;node)
-<a name="l00081"></a>00081   :m_name(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(node.second, <span class="stringliteral">&quot;name&quot;</span>)) {
+<a name="l00081"></a>00081   :m_name(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a>&gt;(node.second, <span class="stringliteral">&quot;name&quot;</span>)) {
 <a name="l00082"></a>00082   <span class="keywordflow">if</span>( m_name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
 <a name="l00083"></a>00083     <span class="keywordflow">throw</span> <a class="code" href="../../d5/d18/classTREX_1_1utils_1_1XmlError.html" title="XML parsing related errors.">XmlError</a>(node, <span class="stringliteral">&quot;Variable name is empty.&quot;</span>);
 <a name="l00084"></a>00084   
@@ -223,7 +223,7 @@ window.onload = initDynSections;
 <a name="l00154"></a>00154 <span class="stringliteral">}</span>
 <a name="l00155"></a>00155 <span class="stringliteral"></span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>trex: extra/europa/EuropaDomain.hh Source File</title>
+<title>trex: extra/europa/private/EuropaDomain.hh Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@ window.onload = initDynSections;
       <li><a href="../../globals.html"><span>File&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>
+  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_6b515154adeb603b5dd640e8d98c913b.html">private</a>
   </div>
 </div>
 <div class="contents">
@@ -105,84 +105,63 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_EuropaDomain </span>
-<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_EuropaDomain</span>
+<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_trex_europa_EuropaDomain</span>
+<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_trex_europa_EuropaDomain</span>
 <a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 <span class="preprocessor"># include &lt;<a class="code" href="../../d9/da0/EnumeratedDomain_8hh.html" title="enumeration based domain definition">trex/domain/EnumeratedDomain.hh</a>&gt;</span>
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 <span class="preprocessor"># include &lt;PLASMA/Domain.hh&gt;</span>
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 <span class="keyword">namespace </span>TREX {
-<a name="l00042"></a>00042   <span class="keyword">namespace </span>europa {
-<a name="l00043"></a>00043     
-<a name="l00055"></a><a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html">00055</a>     <span class="keyword">class </span><a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html" title="Proxy between trex and europa domains.">EuropaDomain</a> :<span class="keyword">public</span> TREX::transaction::DomainBase {
-<a name="l00056"></a>00056     <span class="keyword">public</span>:
-<a name="l00057"></a>00057       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> type_name;
-<a name="l00058"></a>00058       
-<a name="l00059"></a>00059       <span class="keyword">explicit</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html" title="Proxy between trex and europa domains.">EuropaDomain</a>(EUROPA::Domain <span class="keyword">const</span> &amp;dom);
-<a name="l00060"></a>00060       <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html" title="Proxy between trex and europa domains.">EuropaDomain</a>(<a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html" title="Proxy between trex and europa domains.">EuropaDomain</a> <span class="keyword">const</span> &amp;other);
-<a name="l00061"></a>00061       ~<a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html" title="Proxy between trex and europa domains.">EuropaDomain</a>();
-<a name="l00062"></a>00062       
-<a name="l00063"></a>00063       <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> *<a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a996fbf0ebe5f9f5f995ea9bd373d6203" title="Duplicate method.">copy</a>() <span class="keyword">const</span>;
-<a name="l00064"></a>00064       std::ostream &amp;<a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a2a00b51fdab8e3b2ea48b83908973cdb" title="XML conversion.">toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs) <span class="keyword">const</span>;
-<a name="l00065"></a>00065       
-<a name="l00066"></a><a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#aa910caf56e359315b92aba443bac1a7b">00066</a>       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#aa910caf56e359315b92aba443bac1a7b" title="Check for interval domain.">isInterval</a>()<span class="keyword"> const </span>{
-<a name="l00067"></a>00067         <span class="keywordflow">return</span> m_dom-&gt;isInterval();
-<a name="l00068"></a>00068       }
-<a name="l00069"></a><a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a8ad13cb8121a9a9ca1cb49de90be5819">00069</a>       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a8ad13cb8121a9a9ca1cb49de90be5819" title="Check for enumerated domain.">isEnumerated</a>()<span class="keyword"> const </span>{
-<a name="l00070"></a>00070         <span class="keywordflow">return</span> m_dom-&gt;isEnumerated();
-<a name="l00071"></a>00071       }
-<a name="l00072"></a>00072       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a788953125459faf2c69a902e552d9aaa" title="check for full domain">isFull</a>() <span class="keyword">const</span>;  
-<a name="l00073"></a><a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#af2e46a6798072c7cf17c02bb9a852fb2">00073</a>       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#af2e46a6798072c7cf17c02bb9a852fb2" title="check for singleton value">isSingleton</a>()<span class="keyword"> const </span>{
-<a name="l00074"></a>00074         <span class="keywordflow">return</span> m_dom-&gt;isSingleton();
-<a name="l00075"></a>00075       }
-<a name="l00076"></a>00076       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a57fa8a9f822f3b5bf981bea40db8ee83" title="check for common values">intersect</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
-<a name="l00077"></a>00077       <span class="keywordtype">bool</span> <a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a9ea4c43a2ad8f45b52be68f2697409aa" title="Equality test.">equals</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
-<a name="l00078"></a>00078       
-<a name="l00079"></a>00079       <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> &amp;<a class="code" href="../../d6/d48/classTREX_1_1europa_1_1EuropaDomain.html#a9b4c6142262b6a93870a21e687fed585" title="Restrict domain possible values.">restrictWith</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other);
-<a name="l00080"></a>00080       
-<a name="l00081"></a>00081       EUROPA::Domain <span class="keyword">const</span> &amp;europaDomain()<span class="keyword"> const </span>{
-<a name="l00082"></a>00082         <span class="keywordflow">return</span> *m_dom;
-<a name="l00083"></a>00083       }
-<a name="l00084"></a>00084       
-<a name="l00085"></a>00085     <span class="keyword">private</span>:
-<a name="l00086"></a>00086       EUROPA::Domain *m_dom;
-<a name="l00087"></a>00087       
-<a name="l00088"></a>00088       <span class="keyword">static</span> EUROPA::Domain *safe_copy(EUROPA::Domain *dom);
-<a name="l00089"></a>00089       
-<a name="l00090"></a>00090       std::ostream &amp;print_domain(std::ostream &amp;out) <span class="keyword">const</span>;
-<a name="l00091"></a>00091       boost::any singleton() <span class="keyword">const</span>;
-<a name="l00092"></a>00092       std::string stringSingleton() <span class="keyword">const</span>; 
-<a name="l00093"></a>00093       
-<a name="l00094"></a>00094     }; <span class="comment">// TREX::europa::EuropaDomain</span>
-<a name="l00095"></a>00095     
-<a name="l00103"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html">00103</a>     <span class="keyword">class </span><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a> :<span class="keyword">public</span> TREX::transaction::EnumeratedDomain&lt;TREX::utils::Symbol&gt; {
-<a name="l00104"></a>00104       <span class="keyword">typedef</span> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">TREX::transaction::EnumeratedDomain&lt;TREX::utils::Symbol&gt;</a> <a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">base_class</a>;
-<a name="l00105"></a>00105     <span class="keyword">public</span>:
-<a name="l00111"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#ad43b9d232353b076257ba9cb5d29095f">00111</a>       <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#ad43b9d232353b076257ba9cb5d29095f" title="Type name.">type_name</a>;
-<a name="l00112"></a>00112       
-<a name="l00113"></a>00113       <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>()
-<a name="l00114"></a>00114         :<a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">base_class</a>(<a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#ad43b9d232353b076257ba9cb5d29095f" title="Type name.">type_name</a>) {}
-<a name="l00128"></a>00128       <span class="keyword">template</span>&lt;<span class="keyword">class</span> Iter&gt;
-<a name="l00129"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a88cc44c2c4dc9f9bb74106b0d5b4cfe9">00129</a>       <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>(Iter from , Iter to) 
-<a name="l00130"></a>00130         :<a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">base_class</a>(<a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#ad43b9d232353b076257ba9cb5d29095f" title="Type name.">type_name</a>, from, to) {}
-<a name="l00137"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#abbfa6dad2acdf49a487d8406a56a5abe">00137</a>       <span class="keyword">explicit</span> <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;val) 
-<a name="l00138"></a>00138         :<a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">base_class</a>(<a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#ad43b9d232353b076257ba9cb5d29095f" title="Type name.">type_name</a>, val) {}
-<a name="l00159"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a9562935034133c6389619ce7a9229b10">00159</a>       <span class="keyword">explicit</span> <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>(boost::property_tree::ptree::value_type &amp;node)
-<a name="l00160"></a>00160         :<a class="code" href="../../d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html">base_class</a>(node) {}
-<a name="l00161"></a>00161       ~<a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>() {}
-<a name="l00162"></a>00162       
-<a name="l00163"></a><a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a">00163</a>       <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> *<a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html#a1fb711699a9dcdff9715e617214fa61a" title="Duplicate method.">copy</a>()<span class="keyword"> const </span>{
-<a name="l00164"></a>00164         <span class="keywordflow">return</span> <span class="keyword">new</span> <a class="code" href="../../d8/df7/classTREX_1_1europa_1_1EuropaEntity.html" title="Domain for europa objects.">EuropaEntity</a>(*<span class="keyword">this</span>);
-<a name="l00165"></a>00165       }
-<a name="l00166"></a>00166     }; <span class="comment">// TREX::europa::EuropaEntity</span>
-<a name="l00167"></a>00167     
-<a name="l00168"></a>00168   } <span class="comment">// TREX::europa</span>
-<a name="l00169"></a>00169 } <span class="comment">// TREX</span>
-<a name="l00170"></a>00170 
-<a name="l00171"></a>00171 <span class="preprocessor">#endif // H_EuropaDomain</span>
+<a name="l00037"></a>00037 <span class="preprocessor"># include &lt;<a class="code" href="../../d1/d8c/DomainBase_8hh.html" title="TREX domain basic utilities.">trex/domain/DomainBase.hh</a>&gt;</span>
+<a name="l00038"></a>00038 <span class="preprocessor"># include &lt;PLASMA/Domain.hh&gt;</span>
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040 <span class="keyword">namespace </span>TREX {
+<a name="l00041"></a>00041   <span class="keyword">namespace </span>europa {
+<a name="l00042"></a>00042     <span class="keyword">namespace </span>details {
+<a name="l00043"></a>00043 
+<a name="l00054"></a><a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html">00054</a>       <span class="keyword">class </span><a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html" title="Proxy between TREX and Europa domains.">EuropaDomain</a> :<span class="keyword">public</span> TREX::transaction::DomainBase {
+<a name="l00055"></a>00055       <span class="keyword">public</span>:
+<a name="l00056"></a>00056        <span class="keyword">static</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> type_name;
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058        <span class="keyword">explicit</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html" title="Proxy between TREX and Europa domains.">EuropaDomain</a>(EUROPA::Domain <span class="keyword">const</span> &amp;dom);
+<a name="l00059"></a>00059        <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html" title="Proxy between TREX and Europa domains.">EuropaDomain</a>(<a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html" title="Proxy between TREX and Europa domains.">EuropaDomain</a> <span class="keyword">const</span> &amp;other);
+<a name="l00060"></a>00060        ~<a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html" title="Proxy between TREX and Europa domains.">EuropaDomain</a>();
+<a name="l00061"></a>00061        
+<a name="l00062"></a>00062        <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> *<a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a9ab04b1905d844ee16949e5e4da2a84c" title="Duplicate method.">copy</a>() <span class="keyword">const</span>;
+<a name="l00063"></a>00063        std::ostream &amp;<a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a98a5147445d59cb8bf2ed501ae853ae9" title="XML conversion.">toXml</a>(std::ostream &amp;out, <span class="keywordtype">size_t</span> tabs) <span class="keyword">const</span>;
+<a name="l00064"></a>00064        
+<a name="l00065"></a><a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#aa042936b534d0f7b7a1faa8b1b6cdc54">00065</a>        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#aa042936b534d0f7b7a1faa8b1b6cdc54" title="Check for interval domain.">isInterval</a>()<span class="keyword"> const </span>{
+<a name="l00066"></a>00066          <span class="keywordflow">return</span> m_dom-&gt;isInterval();
+<a name="l00067"></a>00067        }
+<a name="l00068"></a><a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#afbfbdb73989b40d4a412e89e19f93f76">00068</a>        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#afbfbdb73989b40d4a412e89e19f93f76" title="Check for enumerated domain.">isEnumerated</a>()<span class="keyword"> const </span>{
+<a name="l00069"></a>00069          <span class="keywordflow">return</span> m_dom-&gt;isEnumerated();
+<a name="l00070"></a>00070        }
+<a name="l00071"></a>00071        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a5d80cdf245c3a532095231c2ac149acd" title="check for full domain">isFull</a>() <span class="keyword">const</span>;
+<a name="l00072"></a><a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a16e47d94a20ed646afd36609c1c9e07e">00072</a>        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a16e47d94a20ed646afd36609c1c9e07e" title="check for singleton value">isSingleton</a>()<span class="keyword"> const </span>{
+<a name="l00073"></a>00073          <span class="keywordflow">return</span> m_dom-&gt;isSingleton();
+<a name="l00074"></a>00074        }
+<a name="l00075"></a>00075        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a297fc1650cc5742fc485593f537b0cb6" title="check for common values">intersect</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
+<a name="l00076"></a>00076        <span class="keywordtype">bool</span> <a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#ac3f3c9430cb90a227a0759fbd160aa99" title="Equality test.">equals</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other) <span class="keyword">const</span>;
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078        <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> &amp;<a class="code" href="../../dd/df4/classTREX_1_1europa_1_1details_1_1EuropaDomain.html#a904ec26283efa214f4f7c61b55ec9a95" title="Restrict domain possible values.">restrictWith</a>(<a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">TREX::transaction::DomainBase</a> <span class="keyword">const</span> &amp;other);
+<a name="l00079"></a>00079        EUROPA::Domain <span class="keyword">const</span> &amp;europaDomain()<span class="keyword"> const </span>{
+<a name="l00080"></a>00080          <span class="keywordflow">return</span> *m_dom;
+<a name="l00081"></a>00081        }
+<a name="l00082"></a>00082        
+<a name="l00083"></a>00083       <span class="keyword">private</span>:
+<a name="l00084"></a>00084        EUROPA::Domain *m_dom;
+<a name="l00085"></a>00085        
+<a name="l00086"></a>00086        <span class="keyword">static</span> EUROPA::Domain *safe_copy(EUROPA::Domain *dom);
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088        std::ostream &amp;print_domain(std::ostream &amp;out) <span class="keyword">const</span>;
+<a name="l00089"></a>00089        boost::any singleton() <span class="keyword">const</span>;
+<a name="l00090"></a>00090        std::string stringSingleton() <span class="keyword">const</span>;
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092       }; <span class="comment">// TREX::europa::details::EuropaDomain</span>
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094     } <span class="comment">// TREX::europa::details</span>
+<a name="l00095"></a>00095   } <span class="comment">// TREX::europa</span>
+<a name="l00096"></a>00096 } <span class="comment">// TREX</span>
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098 <span class="preprocessor">#endif // H_trex_europa_EuropaDomain</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

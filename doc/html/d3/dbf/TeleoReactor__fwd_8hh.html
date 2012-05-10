@@ -78,6 +78,7 @@ window.onload = initDynSections;
 <code>#include &quot;<a class="el" href="../../d3/d2f/Observation_8hh_source.html">Observation.hh</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>&quot;</code><br/>
 <code>#include &lt;trex/utils/id_mapper.hh&gt;</code><br/>
+<code>#include &lt;bitset&gt;</code><br/>
 <div class="dynheader">
 Include dependency graph for TeleoReactor_fwd.hh:</div>
 <div class="dynsection">
@@ -90,7 +91,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d3/dd1/TeleoReactor__fwd_8hh__dep__incl.png" border="0" usemap="#trex_2transaction_2TeleoReactor__fwd_8hhdep_map" alt=""/></div>
 <map name="trex_2transaction_2TeleoReactor__fwd_8hhdep_map" id="trex_2transaction_2TeleoReactor__fwd_8hhdep">
-<area shape="rect" id="node3" href="../../d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="5,237,165,267"/><area shape="rect" id="node6" href="../../d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="611,160,800,189"/><area shape="rect" id="node10" href="../../d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="43,83,285,112"/><area shape="rect" id="node17" href="../../d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="333,83,584,112"/><area shape="rect" id="node23" href="../../d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="659,83,869,112"/><area shape="rect" id="node8" href="../../d8/d9c/agent__graph_8hh.html" title="utilities for TREX agen reactor graph management" alt="" coords="408,237,611,267"/><area shape="rect" id="node13" href="../../db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="43,160,288,189"/><area shape="rect" id="node19" href="../../d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="312,160,563,189"/></map>
+<area shape="rect" id="node3" href="../../d8/d12/Agent__fwd_8hh_source.html" title="trex/agent/Agent_fwd.hh" alt="" coords="5,83,195,112"/><area shape="rect" id="node5" href="../../d8/d9c/agent__graph_8hh_source.html" title="trex/agent/bits/agent_graph.hh" alt="" coords="196,237,428,267"/><area shape="rect" id="node10" href="../../d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="269,83,512,112"/><area shape="rect" id="node16" href="../../d2/d09/reactor__graph_8hh_source.html" title="trex/transaction/reactor_graph.hh" alt="" coords="560,83,811,112"/><area shape="rect" id="node24" href="../../d7/d18/Relation_8hh_source.html" title="trex/transaction/Relation.hh" alt="" coords="835,83,1045,112"/><area shape="rect" id="node7" href="../../d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="232,315,392,344"/><area shape="rect" id="node13" href="../../db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="269,160,515,189"/><area shape="rect" id="node18" href="../../d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="561,160,764,189"/><area shape="rect" id="node20" href="../../d7/d79/reactor__graph_8cc_source.html" title="trex/transaction/reactor_graph.cc" alt="" coords="788,160,1039,189"/></map>
 </div>
 
 <p><a href="../../d3/dbf/TeleoReactor__fwd_8hh_source.html">Go to the source code of this file.</a></p>
@@ -115,8 +116,9 @@ This graph shows which files directly or indirectly include this file:</div>
 </p>
 <tr><td colspan="2"><h2>Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef utils::map_id_traits<br class="typebreak"/>
-&lt; reactor_id_traits&lt;&gt;, bool &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/namespaceTREX_1_1transaction_1_1details.html#a7bb1b72d9a849eabc974d7ff61cfddb4">TREX::transaction::details::client_id_traits</a></td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">timeline client helper  <a href="#a7bb1b72d9a849eabc974d7ff61cfddb4"></a><br/></td></tr>
+&lt; reactor_id_traits<br class="typebreak"/>
+&lt;&gt;, transaction_flags &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/namespaceTREX_1_1transaction_1_1details.html#a9e0da3a1c31b424d2c668ce167b6f4ff">TREX::transaction::details::client_id_traits</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">timeline client helper  <a href="#a9e0da3a1c31b424d2c668ce167b6f4ff"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef utils::list_set<br class="typebreak"/>
 &lt; client_id_traits &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../db/db4/group__transaction.html#ga3aae4bcec6edf7015a766245756cfc9f">client_set</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set of clients.  <a href="../../db/db4/group__transaction.html#ga3aae4bcec6edf7015a766245756cfc9f"></a><br/></td></tr>
@@ -128,6 +130,8 @@ reactor_id_traits::base_type&nbsp;</td><td class="memItemRight" valign="bottom">
 &lt; boost::shared_ptr<br class="typebreak"/>
 &lt; TeleoReactor &gt; &gt; &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/namespaceTREX_1_1transaction_1_1details.html#a3ba22bd07cc3aca3060eafa8b6ae62c8">TREX::transaction::details::reactor_set</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">A set of reactors.  <a href="#a3ba22bd07cc3aca3060eafa8b6ae62c8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef std::bitset&lt; 2 &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/df5/namespaceTREX_1_1transaction_1_1details.html#ad90f9cc77944af41a229429158d6f85d">TREX::transaction::details::transaction_flags</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reactor transaction flags.  <a href="#ad90f9cc77944af41a229429158d6f85d"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <p>Forward decalrions for TeleoReactor. </p>
@@ -138,7 +142,7 @@ reactor_id_traits::base_type&nbsp;</td><td class="memItemRight" valign="bottom">
 
 <p>Definition in file <a class="el" href="../../d3/dbf/TeleoReactor__fwd_8hh_source.html">TeleoReactor_fwd.hh</a>.</p>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:21 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:09 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

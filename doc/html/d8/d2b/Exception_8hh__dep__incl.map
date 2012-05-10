@@ -1,32 +1,35 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d0/dc8/_8old_2old_2Assembly_8cc_source.html" title="extra/europa2.old/old/Assembly.cc" alt="" coords="3527,83,3777,112"/>
-<area shape="rect" id="node6" href="$df/dad/_8old_2old_2Assembly_8hh_source.html" title="extra/europa2.old/old/Assembly.hh" alt="" coords="2132,160,2383,189"/>
-<area shape="rect" id="node43" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="3927,83,4116,112"/>
-<area shape="rect" id="node50" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="3405,160,3592,189"/>
-<area shape="rect" id="node57" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="4104,237,4285,267"/>
-<area shape="rect" id="node62" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="4333,237,4493,267"/>
-<area shape="rect" id="node69" href="$df/df7/Exception_8cc.html" title="TREX Exception implementation." alt="" coords="4393,83,4567,112"/>
-<area shape="rect" id="node72" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="4591,83,4764,112"/>
-<area shape="rect" id="node8" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/Assembly.cc" alt="" coords="3861,237,4056,267"/>
-<area shape="rect" id="node11" href="$d5/d24/DbCore_8hh_source.html" title="extra/europa/DbCore.hh" alt="" coords="2285,237,2469,267"/>
-<area shape="rect" id="node13" href="$d6/d11/DbSolver_8hh_source.html" title="extra/europa/DbSolver.hh" alt="" coords="2493,237,2685,267"/>
-<area shape="rect" id="node15" href="$df/d3b/DeliberationFilter_8hh_source.html" title="extra/europa/DeliberationFilter.hh" alt="" coords="2709,237,2957,267"/>
-<area shape="rect" id="node17" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="2981,237,3211,267"/>
-<area shape="rect" id="node20" href="$d9/df7/ReactorPropagator_8hh_source.html" title="extra/europa/ReactorPropagator.hh" alt="" coords="3259,237,3520,267"/>
-<area shape="rect" id="node22" href="$d1/dde/old_2Assembly_8cc_source.html" title="extra/europa.old/Assembly.cc" alt="" coords="3544,237,3763,267"/>
-<area shape="rect" id="node25" href="$d7/d20/extra_2europa_8old_2Constraints_8hh_source.html" title="extra/europa.old/Constraints.hh" alt="" coords="5,237,240,267"/>
-<area shape="rect" id="node27" href="$d3/d4c/old_2DeliberationFilter_8cc_source.html" title="extra/europa.old/DeliberationFilter.cc" alt="" coords="264,237,536,267"/>
-<area shape="rect" id="node29" href="$d9/d44/europa_8old_2EuropaDomains_8cc_source.html" title="extra/europa.old/EuropaDomains.cc" alt="" coords="560,237,819,267"/>
-<area shape="rect" id="node32" href="$de/dc2/old_2EuropaReactor_8hh_source.html" title="extra/europa.old/EuropaReactor.hh" alt="" coords="867,237,1123,267"/>
-<area shape="rect" id="node34" href="$d8/d35/_8old_2DbSolver_8cc_source.html" title="extra/europa2.old/DbSolver.cc" alt="" coords="1147,237,1368,267"/>
-<area shape="rect" id="node36" href="$d1/ddc/europa2_8old_2EuropaDomains_8cc_source.html" title="extra/europa2.old/EuropaDomains.cc" alt="" coords="1392,237,1659,267"/>
-<area shape="rect" id="node39" href="$dd/dc8/TokenManager_8cc_source.html" title="extra/europa2.old/old/TokenManager.cc" alt="" coords="1707,237,1989,267"/>
-<area shape="rect" id="node41" href="$d4/dd9/Synchronizer_8hh_source.html" title="extra/europa2.old/Synchronizer.hh" alt="" coords="2013,237,2261,267"/>
-<area shape="rect" id="node45" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="3971,315,4131,344"/>
-<area shape="rect" id="node48" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="4261,315,4416,344"/>
-<area shape="rect" id="node53" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="4056,160,4243,189"/>
-<area shape="rect" id="node64" href="$de/d73/RStat_8cc.html" title="RStat implementation." alt="" coords="3861,160,4008,189"/>
-<area shape="rect" id="node67" href="$d2/dd9/RStat_8hh.html" title="Definition of RStat." alt="" coords="3640,160,3787,189"/>
-<area shape="rect" id="node74" href="$dd/d96/AMQP__listener_8cc_source.html" title="mbari/tracker/AMQP_listener.cc" alt="" coords="4756,160,4991,189"/>
-<area shape="rect" id="node77" href="$d8/dd0/AMQP__listener_8hh_source.html" title="mbari/tracker/AMQP_listener.hh" alt="" coords="4497,160,4732,189"/>
+<area shape="rect" id="node3" href="$d3/dd9/Assembly_8hh_source.html" title="extra/europa/trex/europa/Assembly.hh" alt="" coords="2067,160,2344,189"/>
+<area shape="rect" id="node40" href="$d2/d63/EuropaException_8hh_source.html" title="extra/europa/trex/europa/EuropaException.hh" alt="" coords="824,83,1155,112"/>
+<area shape="rect" id="node56" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="3699,83,3888,112"/>
+<area shape="rect" id="node63" href="$d7/d53/LogManager_8cc.html" title="LogManager implementation." alt="" coords="3435,160,3621,189"/>
+<area shape="rect" id="node70" href="$d5/da2/XmlFactory_8hh.html" title="Factory based XML parsing utilities." alt="" coords="4067,237,4248,267"/>
+<area shape="rect" id="node75" href="$d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation." alt="" coords="3832,237,3992,267"/>
+<area shape="rect" id="node83" href="$df/df7/Exception_8cc.html" title="TREX Exception implementation." alt="" coords="4355,83,4528,112"/>
+<area shape="rect" id="node86" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="4552,83,4725,112"/>
+<area shape="rect" id="node5" href="$d6/d64/Assembly_8cc_source.html" title="extra/europa/core/Assembly.cc" alt="" coords="3555,237,3784,267"/>
+<area shape="rect" id="node8" href="$dd/de7/core_8cc_source.html" title="extra/europa/core/core.cc" alt="" coords="616,237,813,267"/>
+<area shape="rect" id="node10" href="$df/d29/CurrentState_8cc_source.html" title="extra/europa/core/CurrentState.cc" alt="" coords="2643,237,2901,267"/>
+<area shape="rect" id="node12" href="$d2/dc9/DeliberationFilter_8cc_source.html" title="extra/europa/core/DeliberationFilter.cc" alt="" coords="2925,237,3208,267"/>
+<area shape="rect" id="node14" href="$d3/d41/europa__helpers_8cc_source.html" title="extra/europa/core/europa_helpers.cc" alt="" coords="837,237,1107,267"/>
+<area shape="rect" id="node16" href="$d6/dc5/ModeConstraints_8cc_source.html" title="extra/europa/core/ModeConstraints.cc" alt="" coords="309,237,592,267"/>
+<area shape="rect" id="node18" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="3135,315,3356,344"/>
+<area shape="rect" id="node20" href="$d8/d37/SynchronizationManager_8cc_source.html" title="extra/europa/core/SynchronizationManager.cc" alt="" coords="1131,237,1461,267"/>
+<area shape="rect" id="node23" href="$d9/d6a/europa__plugin_8cc_source.html" title="extra/europa/europa_plugin.cc" alt="" coords="3283,237,3507,267"/>
+<area shape="rect" id="node26" href="$db/d1a/EuropaReactor_8hh_source.html" title="extra/europa/EuropaReactor.hh" alt="" coords="1509,237,1741,267"/>
+<area shape="rect" id="node28" href="$d5/da7/extensions_8cc_source.html" title="extra/europa/extensions/extensions.cc" alt="" coords="1765,237,2051,267"/>
+<area shape="rect" id="node32" href="$d5/d3d/extra_2starfish_2Constraints_8cc_source.html" title="extra/starfish/Constraints.cc" alt="" coords="2099,237,2312,267"/>
+<area shape="rect" id="node35" href="$d6/d1b/GoalManager__PR2_8hh_source.html" title="extra/starfish/GoalManager_PR2.hh" alt="" coords="2360,237,2619,267"/>
+<area shape="rect" id="node37" href="$da/d4f/mbari_2europa_2Constraints_8cc_source.html" title="mbari/europa/Constraints.cc" alt="" coords="51,237,261,267"/>
+<area shape="rect" id="node42" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="1184,160,1421,189"/>
+<area shape="rect" id="node45" href="$d3/dd7/EuropaPlugin_8hh_source.html" title="extra/europa/trex/europa/EuropaPlugin.hh" alt="" coords="5,160,307,189"/>
+<area shape="rect" id="node49" href="$dc/db3/ModeConstraints_8hh_source.html" title="extra/europa/trex/europa/ModeConstraints.hh" alt="" coords="440,160,771,189"/>
+<area shape="rect" id="node54" href="$de/d0c/ReactorConstraint_8hh_source.html" title="extra/europa/trex/europa/ReactorConstraint.hh" alt="" coords="819,160,1160,189"/>
+<area shape="rect" id="node58" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="3968,315,4128,344"/>
+<area shape="rect" id="node61" href="$de/d89/Clock_8hh.html" title="TREX Clock." alt="" coords="4213,315,4368,344"/>
+<area shape="rect" id="node66" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="4085,160,4272,189"/>
+<area shape="rect" id="node78" href="$de/d73/RStat_8cc.html" title="RStat implementation." alt="" coords="3720,160,3867,189"/>
+<area shape="rect" id="node81" href="$d2/dd9/RStat_8hh.html" title="Definition of RStat." alt="" coords="3915,160,4061,189"/>
+<area shape="rect" id="node88" href="$dd/d96/AMQP__listener_8cc_source.html" title="mbari/tracker/AMQP_listener.cc" alt="" coords="4480,160,4715,189"/>
+<area shape="rect" id="node91" href="$d8/dd0/AMQP__listener_8hh_source.html" title="mbari/tracker/AMQP_listener.hh" alt="" coords="4763,160,4997,189"/>
 </map>

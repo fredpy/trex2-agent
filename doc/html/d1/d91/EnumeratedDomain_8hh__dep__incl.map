@@ -1,14 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="597,160,827,189"/>
-<area shape="rect" id="node6" href="$d2/d5c/EuropaDomain_8hh_source.html" title="extra/europa/EuropaDomain.hh" alt="" coords="1185,83,1415,112"/>
-<area shape="rect" id="node8" href="$d9/d44/europa_8old_2EuropaDomains_8cc_source.html" title="extra/europa.old/EuropaDomains.cc" alt="" coords="5,160,264,189"/>
-<area shape="rect" id="node11" href="$d7/d08/europa_8old_2EuropaEntity_8hh_source.html" title="extra/europa.old/EuropaEntity.hh" alt="" coords="1439,83,1681,112"/>
-<area shape="rect" id="node13" href="$dc/d30/europa2_2EuropaDomains_8cc_source.html" title="extra/europa2/EuropaDomains.cc" alt="" coords="1189,160,1435,189"/>
-<area shape="rect" id="node16" href="$de/d84/europa2_2EuropaEntity_8hh_source.html" title="extra/europa2/EuropaEntity.hh" alt="" coords="1705,83,1932,112"/>
-<area shape="rect" id="node18" href="$d1/ddc/europa2_8old_2EuropaDomains_8cc_source.html" title="extra/europa2.old/EuropaDomains.cc" alt="" coords="875,160,1141,189"/>
-<area shape="rect" id="node21" href="$d9/dad/europa2_8old_2EuropaEntity_8hh_source.html" title="extra/europa2.old/EuropaEntity.hh" alt="" coords="1956,83,2207,112"/>
-<area shape="rect" id="node23" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="2231,83,2436,112"/>
-<area shape="rect" id="node26" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="604,83,820,112"/>
-<area shape="rect" id="node35" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="844,83,1060,112"/>
-<area shape="rect" id="node32" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="312,160,549,189"/>
+<area shape="rect" id="node3" href="$da/dbd/europa__convert_8cc_source.html" title="extra/europa/europa_convert.cc" alt="" coords="501,160,739,189"/>
+<area shape="rect" id="node6" href="$df/db0/EuropaEntity_8hh_source.html" title="extra/europa/EuropaEntity.hh" alt="" coords="11,83,229,112"/>
+<area shape="rect" id="node10" href="$d4/d42/DomainImpl_8cc.html" title="Various domains implementation." alt="" coords="304,83,509,112"/>
+<area shape="rect" id="node13" href="$d2/d08/EnumDomain_8hh.html" title="string values enumeration domain" alt="" coords="797,83,1013,112"/>
+<area shape="rect" id="node22" href="$d0/d74/StringDomain_8hh.html" title="string values enumeration domain" alt="" coords="557,83,773,112"/>
+<area shape="rect" id="node8" href="$db/d28/EuropaDomain_8cc_source.html" title="extra/europa/EuropaDomain.cc" alt="" coords="5,160,235,189"/>
+<area shape="rect" id="node16" href="$d6/d6a/LightSwitch_8cc.html" title="lightswitch plugin implementation" alt="" coords="787,160,1024,189"/>
+<area shape="rect" id="node19" href="$dc/d97/StarTrex_8cc.html" title="startrex plugin implementation" alt="" coords="1072,160,1267,189"/>
 </map>

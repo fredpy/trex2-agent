@@ -126,7 +126,7 @@ struct&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal::swrapper_
 </dl>
 <p>This class is used internally to encapsulate and control the life-time of a phoenix singleton accessed through SingletonUse&lt;Ty&gt;</p>
 <p>If one want to implement the classs <code>Sing</code> as a pure singleton -- meaning that it cannot be created otherwise -- he needs to define all its constructors (or at least its destructor) as private and than make <code>SingletonWrapper&lt;Sing&gt;</code> friend of this class.</p>
-<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000007">Bug:</a></b></dt><dd>There's a potential issue with dynamic library loading on certain platforms. The resolution would be potentially to use <code>boost::flyweight</code> with <code>intermodule_holder</code> as in the <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> class. But as for now it appears to work and I don't know really how to reimplement this class and still have some guarantees that I can somehow guarantee that no intermediate class would be created.</dd></dl>
+<dl class="bug"><dt><b><a class="el" href="../../de/da5/bug.html#_bug000004">Bug:</a></b></dt><dd>There's a potential issue with dynamic library loading on certain platforms. The resolution would be potentially to use <code>boost::flyweight</code> with <code>intermodule_holder</code> as in the <a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">BasicSymbol</a> class. But as for now it appears to work and I don't know really how to reimplement this class and still have some guarantees that I can somehow guarantee that no intermediate class would be created.</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>The instance operator appears to be very slow sometimes. I need to find a way to improve it.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>SingletonUse&lt;Ty&gt; </dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
@@ -191,7 +191,7 @@ template&lt;typename Ty &gt; </div>
 <li>trex/utils/bits/<a class="el" href="../../da/d82/SingletonWrapper_8hh_source.html">SingletonWrapper.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:16 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

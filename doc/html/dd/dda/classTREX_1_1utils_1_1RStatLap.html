@@ -78,7 +78,7 @@ window.onload = initDynSections;
 <small>
 [<a class="el" href="../../db/d81/group__utils.html">Basic utilities</a>]</small>
 </h1><!-- doxytag: class="TREX::utils::RStatLap" -->
-<p>Stop-watch for <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a>.  
+<p>Stop-watch for <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a>.  
 <a href="#_details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="../../d2/dd9/RStat_8hh_source.html">trex/utils/RStat.hh</a>&gt;</code></p>
@@ -87,7 +87,7 @@ Collaboration diagram for TREX::utils::RStatLap:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d1/d93/classTREX_1_1utils_1_1RStatLap__coll__graph.png" border="0" usemap="#TREX_1_1utils_1_1RStatLap_coll__map" alt="Collaboration graph"/></div>
 <map name="TREX_1_1utils_1_1RStatLap_coll__map" id="TREX_1_1utils_1_1RStatLap_coll__map">
-<area shape="rect" id="node2" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class." alt="" coords="17,5,164,35"/></map>
+<area shape="rect" id="node2" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class." alt="" coords="17,5,164,35"/></map>
 <center><span class="legend">[<a target="top" href="../../graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="../../d0/d99/classTREX_1_1utils_1_1RStatLap-members.html">List of all members.</a></p>
@@ -99,11 +99,12 @@ Collaboration diagram for TREX::utils::RStatLap:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor.  <a href="#a0ef928ad075234383c2a6335b2b339ac"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
-<p>Stop-watch for <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a>. </p>
-<p>This class is an helper to measure the delta between two time points. the tow timepoints are given bytthe date of creation and destruction of this class instance and addded on a <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> instance given as attribute.</p>
-<dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
+<p>Stop-watch for <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a>. </p>
+<p>This class is an helper to measure the delta between two time points. the tow timepoints are given by the date of creation and destruction of this class instance and addded on a <a class="el" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> instance given as attribute.</p>
+<dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt;</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="../../da/d58/deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>The <a class="el" href="../../dd/dda/classTREX_1_1utils_1_1RStatLap.html" title="Stop-watch for RStat.">RStatLap</a> class is now replaced by Boost.Chrono library. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00372">372</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00375">375</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a13ad1217e83c52968385033b573e93e3"></a><!-- doxytag: member="TREX::utils::RStatLap::RStatLap" ref="a13ad1217e83c52968385033b573e93e3" args="(RStat &amp;output, RStat::who_type who)" -->
 <div class="memitem">
@@ -140,7 +141,7 @@ Collaboration diagram for TREX::utils::RStatLap:</div>
 </dl>
 <p>Starts the timer on <em>who</em> stats. The resulted will be added to <em>output</em> when this instance will be destroyed. </p>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00381">381</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00384">384</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
 </div>
 </div>
@@ -162,9 +163,9 @@ Collaboration diagram for TREX::utils::RStatLap:</div>
 <p>Destructor. </p>
 <p>get the delta between current stats and the sats on this instance creation and add the result to the referred <em>output</em> </p>
 
-<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00389">389</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00392">392</a> of file <a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a>.</p>
 
-<p>References <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00132">TREX::utils::RStat::who()</a>.</p>
+<p>References <a class="el" href="../../d2/dd9/RStat_8hh_source.html#l00134">TREX::utils::RStat::who()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -181,7 +182,7 @@ Here is the call graph for this function:</div>
 <li>trex/utils/<a class="el" href="../../d2/dd9/RStat_8hh_source.html">RStat.hh</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:41:04 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:16 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

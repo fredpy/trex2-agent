@@ -1,5 +1,5 @@
 <map id="structs" name="structs">
 <area shape="rect" id="node1" href="$d4/db0/group__lightswitch.html" title="A simple plug&#45;in providing a light&#45;switch reactor." alt="" coords="129,5,300,35"/>
-<area shape="rect" id="node2" href="$d8/de3/group__europa.html" title="Europa plug&#45;in" alt="" coords="157,59,272,88"/>
-<area shape="rect" id="node3" href="$d6/d0a/group__vitre.html" title="A simple visual interface for TREX." alt="" coords="128,112,301,141"/>
+<area shape="rect" id="node2" href="$d6/d93/group__startrex.html" title="A bridge client between the STARFISH AUV and Trex reactor." alt="" coords="137,59,292,88"/>
+<area shape="rect" id="node3" href="$d8/de3/group__europa.html" title="Europa plug&#45;in" alt="" coords="157,112,272,141"/>
 </map>

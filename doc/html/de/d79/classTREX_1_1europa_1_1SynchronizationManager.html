@@ -74,12 +74,17 @@ window.onload = initDynSections;
   </div>
 </div>
 <div class="contents">
-<h1>TREX::europa::SynchronizationManager Class Reference</h1><!-- doxytag: class="TREX::europa::SynchronizationManager" --><div class="dynheader">
+<h1>TREX::europa::SynchronizationManager Class Reference</h1><!-- doxytag: class="TREX::europa::SynchronizationManager" -->
+<p>TREX synchronization flaws manager.  
+<a href="#_details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html">extra/europa/trex/europa/SynchronizationManager.hh</a>&gt;</code></p>
+<div class="dynheader">
 Collaboration diagram for TREX::europa::SynchronizationManager:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d0/d25/classTREX_1_1europa_1_1SynchronizationManager__coll__graph.png" border="0" usemap="#TREX_1_1europa_1_1SynchronizationManager_coll__map" alt="Collaboration graph"/></div>
 <map name="TREX_1_1europa_1_1SynchronizationManager_coll__map" id="TREX_1_1europa_1_1SynchronizationManager_coll__map">
-<area shape="rect" id="node2" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa." alt="" coords="855,267,1041,296"/><area shape="rect" id="node17" href="../../d5/dba/classTREX_1_1europa_1_1EuropaReactor.html" title="Europa based deliberative reactor." alt="" coords="1212,359,1436,388"/><area shape="rect" id="node20" href="../../d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html" title="TREX::europa::DeliberationFilter" alt="" coords="1588,352,1828,381"/><area shape="rect" id="node9" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="297,80,639,109"/><area shape="rect" id="node13" href="../../de/d89/classTREX_1_1europa_1_1DbSolver.html" title="TREX::europa::DbSolver" alt="" coords="5,215,189,244"/><area shape="rect" id="node15" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; details::InternalStateId_id_traits \&gt;" alt="" coords="265,305,671,335"/><area shape="rect" id="node24" title="STL class." alt="" coords="423,381,513,411"/><area shape="rect" id="node27" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; details::Schema \&gt;" alt="" coords="303,447,633,476"/><area shape="rect" id="node33" title="STL class." alt="" coords="411,529,525,559"/></map>
+<area shape="rect" id="node2" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="TREX::europa::Assembly" alt="" coords="593,205,780,235"/><area shape="rect" id="node4" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; details::CurrentStateId_id_traits \&gt;" alt="" coords="7,17,412,47"/><area shape="rect" id="node8" title="STL class." alt="" coords="164,203,255,232"/><area shape="rect" id="node10" href="../../d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; details::Schema \&gt;" alt="" coords="44,256,375,285"/><area shape="rect" id="node12" title="STL class." alt="" coords="152,309,267,339"/></map>
 <center><span class="legend">[<a target="top" href="../../graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="../../d4/dc1/classTREX_1_1europa_1_1SynchronizationManager-members.html">List of all members.</a></p>
@@ -95,16 +100,29 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>staticMatch</b> (EURO
 &nbsp;</td><td class="memItemRight" valign="bottom"><b>SynchronizationManager</b> (EUROPA::TiXmlElement const &amp;cfg)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0bba087c9df39bfba1ad92c3f229ea0d"></a><!-- doxytag: member="TREX::europa::SynchronizationManager::toString" ref="a0bba087c9df39bfba1ad92c3f229ea0d" args="(EUROPA::EntityId const &amp;entity) const " -->
 std::string&nbsp;</td><td class="memItemRight" valign="bottom"><b>toString</b> (EUROPA::EntityId const &amp;entity) const </td></tr>
+<tr><td colspan="2"><h2>Friends</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acbf08f79df5276124c1da10062a40be3"></a><!-- doxytag: member="TREX::europa::SynchronizationManager::TREX::europa::details::UpdateFlawIterator" ref="acbf08f79df5276124c1da10062a40be3" args="" -->
+class&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html#acbf08f79df5276124c1da10062a40be3">TREX::europa::details::UpdateFlawIterator</a></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
+<p>TREX synchronization flaws manager. </p>
+<p>A class that identifies and manage the new flaws specific to a reactor synchronization.</p>
+<p>Indeed synchronization introduce a new kind of flaw that requires the reactor to identifies its state at the current tick. This implies that for all its internal timelines it requires to resolve what is the token that will hold for this tick (ie ending at least 1 tick in the future).</p>
+<p>This class will manage this new kind of flaw and will ba automatically injected by the reactor for its solver dedicated to synchronization.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>In past versions we used to do this by hand which presented many issues: <ul>
+<li>trex was messing directly with the plan database which is painfull to implement at best and often resulted on bugs diffcult to understand/capture as we were tapping in non public europa interfaces </li>
+<li>these decision where not embedded in any decision stack which made it difficult to relax them. In fact we used a griddy approach whihc assumed that the first possible choice for a timeline will not impact the choices for others. This kind of worked in practice (for the domains we were using) but can easily be demonstrated as an invalid assumption in the general case (just need to have a model instance with two internal timelines having interdependent state). This new way to handle synchronization is cleaner both theoretically (we can now backtrack on these choices) and practically (connection with europa is less hacky).</li>
+</ul>
+</dd></dl>
+<dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html#l00044">44</a> of file <a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html">SynchronizationManager.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html#l00081">81</a> of file <a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html">SynchronizationManager.hh</a>.</p>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>extra/europa.old/<a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html">SynchronizationManager.hh</a></li>
-<li>extra/europa.old/<a class="el" href="../../d8/d37/SynchronizationManager_8cc_source.html">SynchronizationManager.cc</a></li>
+<li>extra/europa/trex/europa/<a class="el" href="../../db/d5e/SynchronizationManager_8hh_source.html">SynchronizationManager.hh</a></li>
+<li>extra/europa/core/<a class="el" href="../../d8/d37/SynchronizationManager_8cc_source.html">SynchronizationManager.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:52 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:13 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

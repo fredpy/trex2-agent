@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>trex: extra/europa.old/SynchronizationManager.hh Source File</title>
+<title>trex: extra/europa/trex/europa/SynchronizationManager.hh Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@ window.onload = initDynSections;
       <li><a href="../../globals.html"><span>File&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_80459b0a003dc04346b74f24a0706bee.html">europa.old</a>
+  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_92fac9275a1e9003853299a74f2c62d0.html">trex</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_cf3c58dc80b2cc8beff8a8b3eefcf8b3.html">europa</a>
   </div>
 </div>
 <div class="contents">
@@ -105,39 +105,51 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_SynchronizationManager </span>
-<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_SynchronizationManager</span>
+<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_trex_europa_SynchronizationManager</span>
+<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_trex_europa_SynchronizationManager</span>
 <a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 <span class="preprocessor"># include &lt;PLASMA/FlawManager.hh&gt;</span>
+<a name="l00037"></a>00037 <span class="preprocessor"># include &quot;config.hh&quot;</span>
 <a name="l00038"></a>00038 
-<a name="l00039"></a>00039 <span class="keyword">namespace </span>TREX {
-<a name="l00040"></a>00040   <span class="keyword">namespace </span>europa {
-<a name="l00041"></a>00041    
-<a name="l00042"></a>00042     <span class="keyword">class </span>Assembly;
-<a name="l00043"></a>00043         
-<a name="l00044"></a><a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">00044</a>     <span class="keyword">class </span><a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">SynchronizationManager</a> :<span class="keyword">public</span> EUROPA::SOLVERS::FlawManager {
-<a name="l00045"></a>00045     <span class="keyword">public</span>:
-<a name="l00046"></a>00046       <a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">SynchronizationManager</a>(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg) ;
-<a name="l00047"></a>00047       ~<a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">SynchronizationManager</a>();
-<a name="l00048"></a>00048       
-<a name="l00049"></a>00049       <span class="keywordtype">bool</span> staticMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity);
-<a name="l00050"></a>00050       <span class="keywordtype">bool</span> dynamicMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity);
-<a name="l00051"></a>00051       EUROPA::IteratorId createIterator();
-<a name="l00052"></a>00052       
-<a name="l00053"></a>00053       std::string toString(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) <span class="keyword">const</span>;
-<a name="l00054"></a>00054       
-<a name="l00055"></a>00055     <span class="keyword">private</span>:
-<a name="l00056"></a>00056       <span class="keywordtype">void</span> handleInitialize();
-<a name="l00057"></a>00057       
-<a name="l00058"></a>00058       <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> *m_assembly;
-<a name="l00059"></a>00059     }; 
-<a name="l00060"></a>00060   
-<a name="l00061"></a>00061   } <span class="comment">// TREX::europa</span>
-<a name="l00062"></a>00062 } <span class="comment">// TREX</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 <span class="preprocessor">#endif // H_SynchronizationManager</span>
+<a name="l00039"></a>00039 <span class="preprocessor"># include &lt;PLASMA/FlawManager.hh&gt;</span>
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 <span class="keyword">namespace </span>TREX {
+<a name="l00042"></a>00042   <span class="keyword">namespace </span>europa {
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044     <span class="keyword">class </span>Assembly;
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046     <span class="keyword">namespace </span>details {
+<a name="l00047"></a>00047       <span class="keyword">class </span>UpdateFlawIterator;
+<a name="l00048"></a>00048     } <span class="comment">// TREX::europa::details</span>
+<a name="l00049"></a>00049     
+<a name="l00081"></a><a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html">00081</a>     <span class="keyword">class </span><a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html" title="TREX synchronization flaws manager.">SynchronizationManager</a> :<span class="keyword">public</span> EUROPA::SOLVERS::FlawManager {
+<a name="l00082"></a>00082     <span class="keyword">public</span>:
+<a name="l00083"></a>00083       <a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html" title="TREX synchronization flaws manager.">SynchronizationManager</a>(EUROPA::TiXmlElement <span class="keyword">const</span> &amp;cfg);
+<a name="l00084"></a>00084       ~<a class="code" href="../../de/d79/classTREX_1_1europa_1_1SynchronizationManager.html" title="TREX synchronization flaws manager.">SynchronizationManager</a>() {}
+<a name="l00085"></a>00085       
+<a name="l00086"></a>00086       <span class="keywordtype">bool</span> staticMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity);
+<a name="l00087"></a>00087       <span class="keywordtype">bool</span> dynamicMatch(EUROPA::EntityId <span class="keyword">const</span> &amp;entity);
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089       EUROPA::IteratorId createIterator();
+<a name="l00090"></a>00090       
+<a name="l00091"></a>00091       std::string toString(EUROPA::EntityId <span class="keyword">const</span> &amp;entity) <span class="keyword">const</span>;
+<a name="l00092"></a>00092       
+<a name="l00093"></a>00093     <span class="keyword">private</span>:
+<a name="l00094"></a>00094       <span class="keywordtype">void</span> handleInitialize();
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096       <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html">Assembly</a> *m_assembly;
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../db/d6a/classTREX_1_1europa_1_1details_1_1UpdateFlawIterator.html" title="Synchronization flaws iterator.">TREX::europa::details::UpdateFlawIterator</a>;
+<a name="l00099"></a>00099     }; <span class="comment">// TREX::europa::SynchronizationManager</span>
+<a name="l00100"></a>00100     
+<a name="l00101"></a>00101   } <span class="comment">// TREX::europa  </span>
+<a name="l00102"></a>00102 } <span class="comment">// TREX</span>
+<a name="l00103"></a>00103 
+<a name="l00104"></a>00104 <span class="preprocessor"># define TREX_SYNCH_MGR      TrexSynchronizer</span>
+<a name="l00105"></a>00105 <span class="preprocessor"></span><span class="preprocessor"># define TREX_SYNCH_HANDLER  CurrentStateHandler</span>
+<a name="l00106"></a>00106 <span class="preprocessor"></span>
+<a name="l00107"></a>00107 <span class="preprocessor">#endif // H_trex_europa_SynchronizationManager</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

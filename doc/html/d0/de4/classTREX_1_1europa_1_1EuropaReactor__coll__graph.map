@@ -1,16 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" id="node21" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa." alt="" coords="2076,408,2263,437"/>
-<area shape="rect" id="node45" href="$d6/dc0/classTREX_1_1europa_1_1DeliberationFilter.html" title="TREX::europa::DeliberationFilter" alt="" coords="2425,585,2665,615"/>
-<area shape="rect" id="node51" href="$d7/d8a/classTREX_1_1europa_1_1DbCore.html" title="TREX::europa::DbCore" alt="" coords="2083,685,2256,715"/>
-<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="992,645,1237,675"/>
-<area shape="rect" id="node6" title="STL class." alt="" coords="143,537,257,567"/>
-<area shape="rect" id="node8" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="541,616,733,645"/>
-<area shape="rect" id="node10" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="5,647,395,676"/>
-<area shape="rect" id="node12" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="500,672,775,701"/>
-<area shape="rect" id="node15" href="$d8/d0f/classTREX_1_1europa_1_1StateListener.html" title="TREX::europa::StateListener" alt="" coords="1005,703,1224,732"/>
-<area shape="rect" id="node28" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="1519,91,1860,120"/>
-<area shape="rect" id="node32" href="$de/d89/classTREX_1_1europa_1_1DbSolver.html" title="TREX::europa::DbSolver" alt="" coords="1023,413,1207,443"/>
-<area shape="rect" id="node34" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; details::InternalStateId_id_traits \&gt;" alt="" coords="1487,257,1892,287"/>
-<area shape="rect" id="node37" title="STL class." alt="" coords="1644,340,1735,369"/>
-<area shape="rect" id="node40" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; details::Schema \&gt;" alt="" coords="1524,393,1855,423"/>
+<area shape="rect" id="node2" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html" title="TeleoReactor abstract interface." alt="" coords="1025,419,1271,448"/>
+<area shape="rect" id="node4" title="Transaction logger." alt="" coords="593,397,895,427"/>
+<area shape="rect" id="node6" title="STL class." alt="" coords="152,335,267,364"/>
+<area shape="rect" id="node16" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html" title="TREX::europa::Assembly" alt="" coords="651,219,837,248"/>
+<area shape="rect" id="node8" href="$d5/d45/classTREX_1_1transaction_1_1graph.html" title="Transactions graph." alt="" coords="648,504,840,533"/>
+<area shape="rect" id="node10" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; TREX::utils::LogManager \&gt;" alt="" coords="15,535,404,564"/>
+<area shape="rect" id="node12" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="List based generalized set." alt="" coords="607,451,881,480"/>
+<area shape="rect" id="node18" href="$dc/d8c/classTREX_1_1utils_1_1list__set.html" title="TREX::utils::list_set\&lt; details::CurrentStateId_id_traits \&gt;" alt="" coords="7,7,412,36"/>
+<area shape="rect" id="node22" title="STL class." alt="" coords="164,192,255,221"/>
+<area shape="rect" id="node24" href="$d1/dd0/structTREX_1_1utils_1_1SingletonUse.html" title="TREX::utils::SingletonUse\&lt; details::Schema \&gt;" alt="" coords="44,245,375,275"/>
 </map>

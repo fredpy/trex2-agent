@@ -136,10 +136,10 @@ window.onload = initDynSections;
 <a name="l00107"></a>00107 
 <a name="l00109"></a>00109       <span class="keyword">virtual</span> ~<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>() =0;
 <a name="l00110"></a>00110 
-<a name="l00119"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c">00119</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()<span class="keyword"> const </span>{
+<a name="l00119"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c">00119</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e18c7846b0bfe674ccf60b5cf98aa9c" title="Predicate object.">object</a>()<span class="keyword"> const </span>{
 <a name="l00120"></a>00120        <span class="keywordflow">return</span> m_object;
 <a name="l00121"></a>00121       }
-<a name="l00129"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a">00129</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()<span class="keyword"> const </span>{
+<a name="l00129"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a">00129</a>       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a028ede642074b939f4d3b2a27ca2c47a" title="predicate type">predicate</a>()<span class="keyword"> const </span>{
 <a name="l00130"></a>00130        <span class="keywordflow">return</span> m_type;
 <a name="l00131"></a>00131       }
 <a name="l00132"></a>00132 
@@ -156,24 +156,24 @@ window.onload = initDynSections;
 <a name="l00179"></a>00179        <span class="keywordflow">return</span> m_vars.end();
 <a name="l00180"></a>00180       }
 <a name="l00181"></a>00181 
-<a name="l00193"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a627a6a8fed7012b78bad164d07b17072">00193</a>       <span class="keywordtype">void</span> restrictAttribute(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name, 
+<a name="l00193"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a627a6a8fed7012b78bad164d07b17072">00193</a>       <span class="keywordtype">void</span> restrictAttribute(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name, 
 <a name="l00194"></a>00194                           <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;domain) {
 <a name="l00195"></a>00195        <span class="keywordflow">return</span> restrictAttribute(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a>(name, domain));
 <a name="l00196"></a>00196       }
 <a name="l00207"></a>00207       <span class="keyword">virtual</span> <span class="keywordtype">void</span> restrictAttribute(<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;var);
-<a name="l00224"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a864ef398650f0b39a79b79a616c6c510">00224</a>       <span class="keywordtype">bool</span> <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a864ef398650f0b39a79b79a616c6c510" title="Check for constrained attribute.">hasAttribute</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
+<a name="l00224"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a864ef398650f0b39a79b79a616c6c510">00224</a>       <span class="keywordtype">bool</span> <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a864ef398650f0b39a79b79a616c6c510" title="Check for constrained attribute.">hasAttribute</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
 <a name="l00225"></a>00225        <span class="keywordflow">return</span> end()!=m_vars.find(name);
 <a name="l00226"></a>00226       }
-<a name="l00235"></a>00235       <span class="keyword">virtual</span> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;getAttribute(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) 
+<a name="l00235"></a>00235       <span class="keyword">virtual</span> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;getAttribute(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) 
 <a name="l00236"></a>00236        <span class="keyword">const</span>;
 <a name="l00252"></a>00252       <span class="keyword">template</span>&lt;<span class="keyword">class</span> Ty&gt; 
-<a name="l00253"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aba94950e88a59f630c821f340a83ad38">00253</a>       Ty <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aba94950e88a59f630c821f340a83ad38" title="Attribute domain access.">getDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
+<a name="l00253"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aba94950e88a59f630c821f340a83ad38">00253</a>       Ty <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aba94950e88a59f630c821f340a83ad38" title="Attribute domain access.">getDomain</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
 <a name="l00254"></a>00254        BOOST_STATIC_ASSERT((boost::is_convertible&lt;Ty <span class="keyword">const</span> &amp;, 
 <a name="l00255"></a>00255                           <a class="code" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition.">DomainBase</a> <span class="keyword">const</span> &amp;&gt;::value));
 <a name="l00256"></a>00256        <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;attr = getAttribute(name);
 <a name="l00257"></a>00257        <span class="keywordflow">return</span> attr.<a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html#ac3642bd7c8a989ccff185a8bbe407b40" title="Variable domain.">typedDomain</a>&lt;Ty&gt;();
 <a name="l00258"></a>00258       }
-<a name="l00268"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a4c8932afa21bbeafbf70cb21ebf8feb1">00268</a>       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a4c8932afa21bbeafbf70cb21ebf8feb1" title="Attribute access.">operator[]</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
+<a name="l00268"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a4c8932afa21bbeafbf70cb21ebf8feb1">00268</a>       <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a4c8932afa21bbeafbf70cb21ebf8feb1" title="Attribute access.">operator[]</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
 <a name="l00269"></a>00269        <span class="keywordflow">return</span> getAttribute(name);
 <a name="l00270"></a>00270       }
 <a name="l00271"></a>00271     
@@ -185,8 +185,8 @@ window.onload = initDynSections;
 <a name="l00307"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ad3e0e7dd3e143ade3e9a38559dfe081a">00307</a>                                    boost::shared_ptr&lt;Predicate&gt; &gt; <a class="code" href="../../dc/d78/classTREX_1_1utils_1_1XmlFactory.html">xml_factory</a>;
 <a name="l00308"></a>00308             
 <a name="l00309"></a>00309     <span class="keyword">protected</span>:
-<a name="l00320"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ab62122784fefa2a842e481bdbebd6944">00320</a>       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;obj, 
-<a name="l00321"></a>00321               <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;pred)
+<a name="l00320"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ab62122784fefa2a842e481bdbebd6944">00320</a>       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;obj, 
+<a name="l00321"></a>00321               <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;pred)
 <a name="l00322"></a>00322        :m_object(obj), m_type(pred) {
 <a name="l00323"></a>00323        <span class="keywordflow">if</span>( obj.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
 <a name="l00324"></a>00324          <span class="keywordflow">throw</span> <a class="code" href="../../d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error.">PredicateException</a>(<span class="stringliteral">&quot;Empty predicate&#39;s object names are not allowed&quot;</span>);
@@ -196,19 +196,19 @@ window.onload = initDynSections;
 <a name="l00341"></a>00341       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(boost::property_tree::ptree::value_type &amp;node);
 <a name="l00347"></a>00347       <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a>(<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate.">Predicate</a> <span class="keyword">const</span> &amp;other);
 <a name="l00348"></a>00348 
-<a name="l00356"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c">00356</a>       iterator <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute.">find</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) {
+<a name="l00356"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c">00356</a>       iterator <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#ae2ca5706aa8a08f2378ee3696abb0f6c" title="Search for attribute.">find</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;name) {
 <a name="l00357"></a>00357        <span class="keywordflow">return</span> m_vars.find(name);
 <a name="l00358"></a>00358       }
 <a name="l00364"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5fcb8d8059628ddb4db01e9b12f66d37">00364</a>       <span class="keywordtype">void</span> <span class="keyword">remove</span>(iterator <span class="keyword">const</span> &amp;i) {
 <a name="l00365"></a>00365        m_vars.erase(i);
 <a name="l00366"></a>00366       }
 <a name="l00367"></a>00367 
-<a name="l00377"></a>00377       <span class="keyword">virtual</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;getPredTag() <span class="keyword">const</span> = 0;
+<a name="l00377"></a>00377       <span class="keyword">virtual</span> <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> <span class="keyword">const</span> &amp;getPredTag() <span class="keyword">const</span> = 0;
 <a name="l00378"></a>00378       <span class="keyword">virtual</span> std::ostream &amp;print_to(std::ostream &amp;out) <span class="keyword">const</span>;
 <a name="l00379"></a>00379       
 <a name="l00380"></a>00380     <span class="keyword">private</span>:
-<a name="l00382"></a>00382       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> m_object;
-<a name="l00384"></a>00384       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">TREX::utils::Symbol</a> m_type;
+<a name="l00382"></a>00382       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> m_object;
+<a name="l00384"></a>00384       <a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> m_type;
 <a name="l00386"></a>00386       attr_set m_vars;
 <a name="l00387"></a>00387 
 <a name="l00388"></a>00388       <span class="comment">// No code for following methods</span>
@@ -221,7 +221,7 @@ window.onload = initDynSections;
 <a name="l00395"></a>00395 
 <a name="l00396"></a>00396 <span class="preprocessor">#endif // H_Predicate</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

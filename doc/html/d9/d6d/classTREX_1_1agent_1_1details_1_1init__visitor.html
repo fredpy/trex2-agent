@@ -110,8 +110,8 @@ Collaboration diagram for TREX::agent::details::init_visitor:</div>
 virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#ad622ef9674e4b0262c6cb4576c69431d">~init_visitor</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Destructor. <br/></td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774">is_valid</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a> r) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for node validity.  <a href="#a97e67bea3f14dad816fcc4b0984cc774"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097">is_valid</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a> r, <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">TREX::transaction::graph</a> const &amp;g) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for node validity.  <a href="#a39f21c7a8198ccb594caf9115cd0e097"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">TICK&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor.html#a76d50bf941cd3da1ef1367b6c999c5e8">m_final</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Final tick value.  <a href="#a76d50bf941cd3da1ef1367b6c999c5e8"></a><br/></td></tr>
@@ -126,7 +126,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <p><a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html" title="TREX agent.">Agent</a></p>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00079">79</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00081">81</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a6c9bf8d4d5c8f730a99847e5ede4532a"></a><!-- doxytag: member="TREX::agent::details::init_visitor::init_visitor" ref="a6c9bf8d4d5c8f730a99847e5ede4532a" args="(TICK final)" -->
 <div class="memitem">
@@ -152,7 +152,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00084">84</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00086">86</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -180,7 +180,7 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00090">90</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00092">92</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
 </div>
 </div>
@@ -220,6 +220,17 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 </dl>
 
 <p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00144">144</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
+
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00166">TREX::agent::CycleDetector::is_valid()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph.png" border="0" usemap="#df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph_map" alt=""></div>
+<map name="df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph_map" id="df/dac/classTREX_1_1agent_1_1CycleDetector_a225b3d0da32d220887a1f843ca3f01e0_cgraph">
+<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097" title="Check for node validity." alt="" coords="357,5,635,35"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -262,22 +273,22 @@ virtual&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href=".
 <dd>
 <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#abdfbc3a11ed2046f2fa6a8ed707b7aab" title="Final initialization.">TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">110</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00112">112</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">TREX::agent::CycleDetector::is_valid()</a>, <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00143">TREX::transaction::graph::isolate()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00123">m_final</a>.</p>
+<p>References <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00166">TREX::agent::CycleDetector::is_valid()</a>, <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00158">TREX::transaction::graph::isolate()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00125">m_final</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dynsection">
 <div class="center"><img src="../../d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph.png" border="0" usemap="#d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph_map" alt=""></div>
 <map name="d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph_map" id="d9/d6d/classTREX_1_1agent_1_1details_1_1init__visitor_a1a68bce0e21cc0d6851731deb6979a2f_cgraph">
-<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a97e67bea3f14dad816fcc4b0984cc774" title="Check for node validity." alt="" coords="392,5,669,35"/><area shape="rect" id="node5" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor." alt="" coords="408,59,653,88"/><area shape="rect" id="node7" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="725,32,915,61"/><area shape="rect" id="node9" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="717,85,923,115"/></map>
+<area shape="rect" id="node3" href="../../df/dac/classTREX_1_1agent_1_1CycleDetector.html#a39f21c7a8198ccb594caf9115cd0e097" title="Check for node validity." alt="" coords="392,5,669,35"/><area shape="rect" id="node5" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor." alt="" coords="408,59,653,88"/><area shape="rect" id="node7" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a2dc4e08f77a9e520044e7e60464ddfba" title="Find element." alt="" coords="725,32,915,61"/><area shape="rect" id="node9" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#ae0fb33f2c280c6dffd438715d795731d" title="Element insertion." alt="" coords="717,85,923,115"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a97e67bea3f14dad816fcc4b0984cc774"></a><!-- doxytag: member="TREX::agent::details::init_visitor::is_valid" ref="a97e67bea3f14dad816fcc4b0984cc774" args="(TREX::transaction::graph::reactor_id r) const " -->
+<a class="anchor" id="a39f21c7a8198ccb594caf9115cd0e097"></a><!-- doxytag: member="TREX::agent::details::init_visitor::is_valid" ref="a39f21c7a8198ccb594caf9115cd0e097" args="(TREX::transaction::graph::reactor_id r, TREX::transaction::graph const &amp;g) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -285,9 +296,18 @@ Here is the call graph for this function:</div>
           <td class="memname">bool TREX::agent::CycleDetector::is_valid </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">TREX::transaction::graph::reactor_id</a>&nbsp;</td>
-          <td class="paramname"> <em>r</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline, protected, inherited]</code></td>
+          <td class="paramname"> <em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">TREX::transaction::graph</a> const &amp;&nbsp;</td>
+          <td class="paramname"> <em>g</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline, protected, inherited]</code></td>
         </tr>
       </table>
 </div>
@@ -296,11 +316,12 @@ Here is the call graph for this function:</div>
 <p>Check for node validity. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor reference</td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor reference </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>g</em>&nbsp;</td><td>The graph supporting <code>r</code> </td></tr>
   </table>
   </dd>
 </dl>
-<p>Check that <code>r</code> referes to an exisiting reactor. This method is used during graph traversal to vcheck that the an edge is not pointing to nothing</p>
+<p>Check that <code>r</code> referes to an exisiting reactor. This method is used during graph traversal to check that the an edge is not pointing to nothing or to a node that has been isolated</p>
 <dl><dt><b>Return values:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>if <code>r</code> refers to a reactor </td></tr>
@@ -310,9 +331,9 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd>TREX::transaction::garph::null_reactor() </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00163">163</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00166">166</a> of file <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html">agent_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00197">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00215">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d8/d9c/agent__graph_8hh_source.html#l00144">TREX::agent::CycleDetector::back_edge()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00199">TREX::agent::details::sync_scheduller::discover_vertex()</a>, <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00218">TREX::agent::details::sync_scheduller::finish_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00112">finish_vertex()</a>.</p>
 
 </div>
 </div>
@@ -331,9 +352,9 @@ Here is the call graph for this function:</div>
 <p>Final tick value. </p>
 <p>Stores the final tick of the mission that will be proovided to the reactors during the depth first search execution of this visitor. </p>
 
-<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00123">123</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00125">125</a> of file <a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00112">finish_vertex()</a>.</p>
 
 </div>
 </div>
@@ -341,7 +362,7 @@ Here is the call graph for this function:</div>
 <li>trex/agent/<a class="el" href="../../d1/d37/Agent_8cc_source.html">Agent.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:45 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:12 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

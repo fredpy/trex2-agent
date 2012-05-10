@@ -117,79 +117,99 @@ window.onload = initDynSections;
 <a name="l00043"></a>00043 <span class="preprocessor">#include &lt;Wt/WPushButton&gt;</span>
 <a name="l00044"></a>00044 <span class="preprocessor">#include &lt;Wt/WText&gt;</span>
 <a name="l00045"></a>00045 <span class="preprocessor">#include &lt;Wt/WTimer&gt;</span>
-<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;Wt/WBreak&gt;</span>
-<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;Wt/WTime&gt;</span>
-<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;Wt/WPanel&gt;</span>
-<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;Wt/WAnimation&gt;</span>
-<a name="l00050"></a>00050 <span class="preprocessor">#include &lt;Wt/WFlags&gt;</span>
-<a name="l00051"></a>00051 <span class="preprocessor">#include &lt;Wt/WGroupBox&gt;</span>
-<a name="l00052"></a>00052 <span class="preprocessor">#include &lt;Wt/WCheckBox&gt;</span>
-<a name="l00053"></a>00053 <span class="preprocessor">#include &lt;Wt/WComboBox&gt;</span>
-<a name="l00054"></a>00054 <span class="preprocessor">#include &lt;Wt/WDialog&gt;</span>
-<a name="l00055"></a>00055 <span class="preprocessor">#include &lt;Wt/WMessageBox&gt;</span>
-<a name="l00056"></a>00056 <span class="preprocessor">#include &lt;Wt/WDateTime&gt;</span>
-<a name="l00057"></a>00057 <span class="preprocessor">#include &lt;Wt/WSlider&gt;</span>
-<a name="l00058"></a>00058 <span class="preprocessor">#include &lt;string&gt;</span>
-<a name="l00059"></a>00059 <span class="preprocessor">#include &lt;queue&gt;</span>
-<a name="l00060"></a>00060 <span class="preprocessor">#include &lt;map&gt;</span>
-<a name="l00061"></a>00061 
-<a name="l00062"></a>00062 <span class="preprocessor">#include &lt;boost/version.hpp&gt;</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 <span class="preprocessor">#include &quot;WitreServer.hh&quot;</span>
-<a name="l00065"></a>00065 <span class="preprocessor">#include &quot;Observations.hh&quot;</span>
-<a name="l00066"></a>00066 <span class="preprocessor">#include &quot;Popup.hh&quot;</span>
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068 <span class="keyword">namespace </span>TREX {
-<a name="l00069"></a>00069   <span class="keyword">namespace </span>witre {
-<a name="l00070"></a>00070 
-<a name="l00071"></a><a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">00071</a>     <span class="keyword">class </span><a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> :<span class="keyword">public</span> Wt::WApplication {
+<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;Wt/WPanel&gt;</span>
+<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;Wt/WAnimation&gt;</span>
+<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;Wt/WFlags&gt;</span>
+<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;Wt/WGroupBox&gt;</span>
+<a name="l00050"></a>00050 <span class="preprocessor">#include &lt;Wt/WCheckBox&gt;</span>
+<a name="l00051"></a>00051 <span class="preprocessor">#include &lt;Wt/WComboBox&gt;</span>
+<a name="l00052"></a>00052 <span class="preprocessor">#include &lt;Wt/WDialog&gt;</span>
+<a name="l00053"></a>00053 <span class="preprocessor">#include &lt;Wt/WMessageBox&gt;</span>
+<a name="l00054"></a>00054 <span class="preprocessor">#include &lt;Wt/WSlider&gt;</span>
+<a name="l00055"></a>00055 <span class="preprocessor">#include &lt;Wt/WBorderLayout&gt;</span>
+<a name="l00056"></a>00056 <span class="preprocessor">#include &lt;Wt/WBoxLayout&gt;</span>
+<a name="l00057"></a>00057 <span class="preprocessor">#include &lt;Wt/WScrollArea&gt;</span>
+<a name="l00058"></a>00058 <span class="preprocessor">#include &lt;Wt/WJavaScript&gt;</span>
+<a name="l00059"></a>00059 <span class="preprocessor">#include &lt;Wt/WStackedWidget&gt;</span>
+<a name="l00060"></a>00060 <span class="preprocessor">#include &lt;Wt/WTemplate&gt;</span>
+<a name="l00061"></a>00061 <span class="preprocessor">#include &lt;string&gt;</span>
+<a name="l00062"></a>00062 <span class="preprocessor">#include &lt;queue&gt;</span>
+<a name="l00063"></a>00063 <span class="preprocessor">#include &lt;map&gt;</span>
+<a name="l00064"></a>00064 <span class="preprocessor">#include &lt;list&gt;</span>
+<a name="l00065"></a>00065 <span class="preprocessor">#include &lt;<a class="code" href="../../df/dbf/IntegerDomain_8hh.html" title="Integer domain representation.">trex/domain/IntegerDomain.hh</a>&gt;</span>
+<a name="l00066"></a>00066 <span class="preprocessor">#include &lt;<a class="code" href="../../d9/d1f/FloatDomain_8hh.html" title="Float domain representation.">trex/domain/FloatDomain.hh</a>&gt;</span>
+<a name="l00067"></a>00067 <span class="preprocessor">#include &lt;<a class="code" href="../../da/d84/Variable_8hh.html" title="TREX variable representation.">trex/domain/Variable.hh</a>&gt;</span>
+<a name="l00068"></a>00068 <span class="preprocessor">#include &lt;<a class="code" href="../../d5/d41/XmlUtils_8hh.html" title="Helpers for xml manipulation.">trex/utils/XmlUtils.hh</a>&gt;</span>
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="preprocessor">#include &lt;boost/version.hpp&gt;</span>
+<a name="l00071"></a>00071 <span class="preprocessor">#include &lt;iostream&gt;</span>
 <a name="l00072"></a>00072 
-<a name="l00073"></a>00073     <span class="keyword">private</span>:
-<a name="l00074"></a>00074       Wt::WText *clock;
-<a name="l00075"></a>00075       Wt::WText *sliderTime;
-<a name="l00076"></a>00076       Wt::WLineEdit *input;
-<a name="l00077"></a>00077       Wt::WPushButton *enter;
-<a name="l00078"></a>00078       Wt::WText *tickNum;
-<a name="l00079"></a>00079       Wt::WContainerWidget *messages;
-<a name="l00080"></a>00080       Wt::WTimer *timer;
-<a name="l00081"></a>00081       Wt::WComboBox *menu;
-<a name="l00082"></a>00082       Wt::WSlider *timeLineSlider;
-<a name="l00083"></a>00083       <a class="code" href="../../d6/dd8/classTREX_1_1witre_1_1Goalpopup.html">Goalpopup</a>* popup;
-<a name="l00084"></a>00084       <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a> *wServer;
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086       std::map&lt;std::string, bool&gt; tLineMap;
-<a name="l00087"></a>00087       std::map&lt;std::string, Wt::WContainerWidget*&gt; boxPanels;
-<a name="l00088"></a>00088       std::queue&lt;Observations&gt; observations;
-<a name="l00089"></a>00089       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>;
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091       <span class="keywordtype">void</span> sliderChanged();
-<a name="l00092"></a>00092       <span class="keywordtype">void</span> sliderText();
-<a name="l00093"></a>00093 
-<a name="l00094"></a>00094     <span class="keyword">public</span>:
-<a name="l00095"></a>00095       <a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a>(Wt::WEnvironment <span class="keyword">const</span> &amp;env, <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>* Server);
-<a name="l00096"></a>00096       ~<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a>();
-<a name="l00097"></a>00097       <span class="keywordtype">void</span> post(); <span class="comment">//Post the observations</span>
-<a name="l00098"></a>00098       <span class="keywordtype">void</span> addObs(<a class="code" href="../../dc/d7f/classTREX_1_1witre_1_1Observations.html">Observations</a>* temp); <span class="comment">//Adds observations to the queue</span>
-<a name="l00099"></a>00099       <span class="keywordtype">void</span> updateTick(std::string tick) { tickNum-&gt;setText(tick);}; <span class="comment">//Updates the tickNum text</span>
-<a name="l00100"></a>00100       <span class="keywordtype">int</span> count(){ <span class="keywordflow">return</span> messages-&gt;count();}; <span class="comment">//Returns the number of messages</span>
-<a name="l00101"></a>00101       Wt::WWidget * widget(<span class="keywordtype">int</span> i) {<span class="keywordflow">return</span> messages-&gt;widget(i);}; <span class="comment">//Returns the widget at variable i in messages</span>
-<a name="l00102"></a>00102       <span class="keywordtype">void</span> insert(std::string time, Wt::WPanel *wid); <span class="comment">//Inserts widget at position 0</span>
-<a name="l00103"></a>00103       <span class="keywordtype">void</span> updateTime(); <span class="comment">//Updates the time</span>
-<a name="l00104"></a>00104       <span class="keywordtype">void</span> timeLineChange(); <span class="comment">//Updates when user changes what timelines to view</span>
-<a name="l00105"></a>00105       <span class="keywordtype">void</span> syncObservations(); <span class="comment">//Syncs with server observations</span>
-<a name="l00106"></a>00106       <span class="keywordtype">void</span> attributePopup();
-<a name="l00107"></a>00107       <span class="keywordtype">void</span> clientPostGoal(<a class="code" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">transaction::IntegerDomain</a> start, <a class="code" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">transaction::IntegerDomain</a> duration, <a class="code" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">transaction::IntegerDomain</a> end);
-<a name="l00108"></a>00108 
+<a name="l00073"></a>00073 <span class="preprocessor">#include &quot;WitreServer.hh&quot;</span>
+<a name="l00074"></a>00074 <span class="preprocessor">#include &quot;Popup.hh&quot;</span>
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076 <span class="keyword">namespace </span>TREX {
+<a name="l00077"></a>00077   <span class="keyword">namespace </span>witre {
+<a name="l00078"></a>00078 
+<a name="l00079"></a><a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">00079</a>     <span class="keyword">class </span><a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> :<span class="keyword">public</span> Wt::WApplication {
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081     <span class="keyword">private</span>:
+<a name="l00082"></a>00082       Wt::WStackedWidget* webpage;
+<a name="l00083"></a>00083       Wt::WText *sliderTime;
+<a name="l00084"></a>00084       Wt::WLineEdit *input;
+<a name="l00085"></a>00085       Wt::WPushButton *enter;
+<a name="l00086"></a>00086       Wt::WText *tickNum;
+<a name="l00087"></a>00087       Wt::WContainerWidget *messages;
+<a name="l00088"></a>00088       Wt::WTimer *timer;
+<a name="l00089"></a>00089       Wt::WComboBox *menu;
+<a name="l00090"></a>00090       Wt::WGroupBox *tLines;
+<a name="l00091"></a>00091       Wt::WSlider *timeLineSlider;
+<a name="l00092"></a>00092       Wt::WGroupBox* future;
+<a name="l00093"></a>00093       <a class="code" href="../../d6/dd8/classTREX_1_1witre_1_1Goalpopup.html">Goalpopup</a>* popup;
+<a name="l00094"></a>00094       <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a> *wServer;
+<a name="l00095"></a>00095       <span class="keywordtype">bool</span> needsUpdated;
+<a name="l00096"></a>00096       boost::property_tree::ptree postingDoc;
+<a name="l00097"></a>00097 
+<a name="l00098"></a>00098       std::map&lt;std::string, bool&gt; tLineMap;
+<a name="l00099"></a>00099       std::map&lt;std::string, Wt::WGroupBox*&gt; groupPanels;
+<a name="l00100"></a>00100       std::map&lt;std::string, Wt::WPanel*&gt; currentPanels;
+<a name="l00101"></a>00101       std::map&lt;std::string, std::list&lt;Wt::WPanel*&gt; &gt; allPanels;
+<a name="l00102"></a>00102       std::queue&lt;std::string&gt; observations;
+<a name="l00103"></a>00103       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>;
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105       <span class="keywordtype">void</span> sliderChanged(<span class="keywordtype">int</span> value);
+<a name="l00106"></a>00106       <span class="keywordtype">void</span> sliderText(<span class="keywordtype">int</span> value);
+<a name="l00107"></a>00107       <span class="keywordtype">void</span> searchLog(Wt::WLineEdit* sender);
+<a name="l00108"></a>00108       <span class="keywordtype">void</span> urlPage(<span class="keyword">const</span> std::string&amp; path);
 <a name="l00109"></a>00109 
-<a name="l00110"></a>00110     };
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112     <a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *createWitre(Wt::WEnvironment <span class="keyword">const</span> &amp;e, <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>* Server);
-<a name="l00113"></a>00113   } <span class="comment">// TREX::witre</span>
-<a name="l00114"></a>00114 } <span class="comment">// TREX</span>
-<a name="l00115"></a>00115 
-<a name="l00116"></a>00116 <span class="preprocessor">#endif // H_Witre</span>
+<a name="l00110"></a>00110     <span class="keyword">public</span>:
+<a name="l00111"></a>00111       <a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a>(Wt::WEnvironment <span class="keyword">const</span> &amp;env, <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>* Server);
+<a name="l00112"></a>00112       ~<a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a>();
+<a name="l00113"></a>00113       <span class="keywordtype">void</span> post(); <span class="comment">//Post the observations</span>
+<a name="l00114"></a>00114       <span class="keywordtype">void</span> reorder(std::string time); <span class="comment">//Sorts observations and retitles the groupPanels</span>
+<a name="l00115"></a>00115       <span class="keywordtype">void</span> setXMLTitle(Wt::WGroupBox *container); <span class="comment">//Sets title without XML formatting</span>
+<a name="l00116"></a>00116       <span class="keywordtype">void</span> addObs(std::string temp); <span class="comment">//Adds observations to the queue</span>
+<a name="l00117"></a>00117       <span class="keywordtype">void</span> updateTick(std::string tick) { tickNum-&gt;setText(tick);}; <span class="comment">//Updates the tickNum text</span>
+<a name="l00118"></a>00118       <span class="keywordtype">int</span> count(){ <span class="keywordflow">return</span> messages-&gt;count();}; <span class="comment">//Returns the number of messages</span>
+<a name="l00119"></a>00119       Wt::WWidget * widget(<span class="keywordtype">int</span> i) {<span class="keywordflow">return</span> messages-&gt;widget(i);}; <span class="comment">//Returns the widget at variable i in messages</span>
+<a name="l00120"></a>00120       <span class="keywordtype">void</span> insert(std::string time, Wt::WPanel *wid); <span class="comment">//Inserts widget at position 0</span>
+<a name="l00121"></a>00121       <span class="keywordtype">void</span> timeLineChange(); <span class="comment">//Updates when user changes what timelines to view</span>
+<a name="l00122"></a>00122       <span class="keywordtype">void</span> syncObservations(); <span class="comment">//Syncs with server observations</span>
+<a name="l00123"></a>00123       <span class="keywordtype">void</span> attributePopup();
+<a name="l00124"></a>00124       <span class="keywordtype">void</span> clientPostGoal(std::map&lt;string, transaction::IntegerDomain&gt; standards,
+<a name="l00125"></a>00125                             std::map&lt;string,transaction::FloatDomain&gt; attributes);
+<a name="l00126"></a>00126       <span class="keywordtype">void</span> addTimeline(std::string name);
+<a name="l00127"></a>00127       <span class="keywordtype">void</span> addMenuItems();
+<a name="l00128"></a>00128       <span class="keywordtype">void</span> newPlanToken(<span class="keyword">const</span> WitreServer::timed_goal&amp; t);
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130     };
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132     <a class="code" href="../../d1/dcc/classTREX_1_1witre_1_1WitreApplication.html">WitreApplication</a> *createWitre(Wt::WEnvironment <span class="keyword">const</span> &amp;e, <a class="code" href="../../db/d97/classTREX_1_1witre_1_1WitreServer.html">WitreServer</a>* Server);
+<a name="l00133"></a>00133   } <span class="comment">// TREX::witre</span>
+<a name="l00134"></a>00134 } <span class="comment">// TREX</span>
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136 <span class="preprocessor">#endif // H_Witre</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

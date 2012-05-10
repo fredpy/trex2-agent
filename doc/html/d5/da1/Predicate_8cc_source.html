@@ -117,8 +117,8 @@ window.onload = initDynSections;
 <a name="l00048"></a>00048 <span class="comment">// structors :</span>
 <a name="l00049"></a>00049 
 <a name="l00050"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#af55ad6fbc1334a7a638a8b50a2d153fc">00050</a> Predicate::Predicate(boost::property_tree::ptree::value_type &amp;node)
-<a name="l00051"></a>00051   :m_object(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(node, <span class="stringliteral">&quot;on&quot;</span>)),
-<a name="l00052"></a>00052    m_type(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a>&gt;(node, <span class="stringliteral">&quot;pred&quot;</span>)) {
+<a name="l00051"></a>00051   :m_object(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a>&gt;(node, <span class="stringliteral">&quot;on&quot;</span>)),
+<a name="l00052"></a>00052    m_type(<a class="code" href="../../db/d81/group__utils.html#gaeca9aa6858dbfb19722187072a9d5c91" title="XML attribute extraction.">parse_attr</a>&lt;<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a>&gt;(node, <span class="stringliteral">&quot;pred&quot;</span>)) {
 <a name="l00053"></a>00053   <span class="keywordflow">if</span>( m_object.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() ) 
 <a name="l00054"></a>00054     <span class="keywordflow">throw</span> <a class="code" href="../../d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error.">PredicateException</a>(<span class="stringliteral">&quot;Empty \&quot;on\&quot; attribute in XML tag&quot;</span>);
 <a name="l00055"></a>00055   <span class="keywordflow">if</span>( m_type.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#a66f1273dae1d4a52bb0030aa57fbcdf3" title="Check for emptyness.">empty</a>() )
@@ -154,7 +154,7 @@ window.onload = initDynSections;
 <a name="l00085"></a>00085 
 <a name="l00086"></a>00086 <span class="comment">// observers :</span>
 <a name="l00087"></a>00087 
-<a name="l00088"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5c95a65096a77817368e1a88110886f2">00088</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5c95a65096a77817368e1a88110886f2" title="Attribute access.">Predicate::getAttribute</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class">Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
+<a name="l00088"></a><a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5c95a65096a77817368e1a88110886f2">00088</a> <a class="code" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html" title="TREX variable representation.">Variable</a> <span class="keyword">const</span> &amp;<a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5c95a65096a77817368e1a88110886f2" title="Attribute access.">Predicate::getAttribute</a>(<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">Symbol</a> <span class="keyword">const</span> &amp;name)<span class="keyword"> const </span>{
 <a name="l00089"></a>00089   <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aef5dec6a3b0830bff5ae783fb2e14211" title="Predicate attributes&amp;#39; const iterator.">const_iterator</a> pos = m_vars.find(name);
 <a name="l00090"></a>00090   <span class="keywordflow">if</span>( <a class="code" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43" title="end of the attributes set">end</a>()==pos ) 
 <a name="l00091"></a>00091     <span class="keywordflow">throw</span> <a class="code" href="../../d2/d7d/classTREX_1_1transaction_1_1PredicateException.html" title="Predicate manipulation error.">PredicateException</a>(<span class="stringliteral">&quot;Attribute \&quot;&quot;</span>+name.<a class="code" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html#aa1d5585755293b04022fda519ebb25c0" title="String value.">str</a>()+<span class="stringliteral">&quot;\&quot; is unknown&quot;</span>);
@@ -206,7 +206,7 @@ window.onload = initDynSections;
 <a name="l00137"></a>00137       attrs.push_back(i-&gt;first);
 <a name="l00138"></a>00138 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:11 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:08 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

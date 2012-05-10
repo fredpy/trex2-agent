@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>trex: extra/europa/ReactorPropagator.hh Source File</title>
+<title>trex: extra/europa/trex/europa/ReactorPropagator.hh Source File</title>
 <link href="../../tabs.css" rel="stylesheet" type="text/css"/>
 <link href="../../doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -68,7 +68,7 @@ window.onload = initDynSections;
       <li><a href="../../globals.html"><span>File&nbsp;Members</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>
+  <div class="navpath"><a class="el" href="../../dir_a032f23e96409494e74a59edbe6bc8e5.html">extra</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_87a5a2744e8367b0765f2469e092e78d.html">europa</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_92fac9275a1e9003853299a74f2c62d0.html">trex</a>&nbsp;&raquo;&nbsp;<a class="el" href="../../dir_cf3c58dc80b2cc8beff8a8b3eefcf8b3.html">europa</a>
   </div>
 </div>
 <div class="contents">
@@ -105,39 +105,40 @@ window.onload = initDynSections;
 <a name="l00031"></a>00031 <span class="comment"> *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
 <a name="l00032"></a>00032 <span class="comment"> *  POSSIBILITY OF SUCH DAMAGE.</span>
 <a name="l00033"></a>00033 <span class="comment"> */</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_ReactorPropagator </span>
-<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_ReactorPropagator</span>
+<a name="l00034"></a>00034 <span class="preprocessor">#ifndef H_trex_europa_ReactorPropagator </span>
+<a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor"># define H_trex_europa_ReactorPropagator</span>
 <a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 <span class="preprocessor"># include &quot;Assembly.hh&quot;</span>
+<a name="l00037"></a>00037 <span class="preprocessor"># include &quot;config.hh&quot;</span>
 <a name="l00038"></a>00038 
 <a name="l00039"></a>00039 <span class="preprocessor"># include &lt;PLASMA/Propagators.hh&gt;</span>
 <a name="l00040"></a>00040 
 <a name="l00041"></a>00041 <span class="keyword">namespace </span>TREX {
 <a name="l00042"></a>00042   <span class="keyword">namespace </span>europa {
 <a name="l00043"></a>00043 
-<a name="l00044"></a>00044     <span class="keyword">class </span>ReactorConstraint;
-<a name="l00045"></a>00045 
-<a name="l00046"></a><a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html">00046</a>     <span class="keyword">class </span><a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html" title="TREX specific propagator.">ReactorPropagator</a> :<span class="keyword">public</span> EUROPA::DefaultPropagator {
-<a name="l00047"></a>00047     <span class="keyword">public</span>:
-<a name="l00048"></a>00048       ~<a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html" title="TREX specific propagator.">ReactorPropagator</a>() {}
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050     <span class="keyword">private</span>:
-<a name="l00051"></a>00051       <a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html" title="TREX specific propagator.">ReactorPropagator</a>(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> &amp;assembly, EUROPA::LabelStr <span class="keyword">const</span> &amp;name,
-<a name="l00052"></a>00052                      EUROPA::ConstraintEngineId <span class="keyword">const</span> &amp;cstrEngine) 
-<a name="l00053"></a>00053        :EUROPA::DefaultPropagator(name, cstrEngine), m_assembly(&amp;assembly) {}
-<a name="l00054"></a>00054       
-<a name="l00055"></a>00055       <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a> *m_assembly;
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html" title="Interface toward europa.">Assembly</a>;
-<a name="l00058"></a>00058       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html" title="Reactor specifi constraint.">ReactorConstraint</a>;
-<a name="l00059"></a>00059     }; <span class="comment">// TREX::europa::ReactorPropagator</span>
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061   } <span class="comment">// TREX::europa</span>
-<a name="l00062"></a>00062 } <span class="comment">// TREX</span>
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064 <span class="preprocessor">#endif // H_ReactorPropagator</span>
+<a name="l00044"></a>00044     <span class="keyword">class </span>Assembly;
+<a name="l00045"></a>00045     <span class="keyword">class </span>ReactorConstraint;
+<a name="l00046"></a>00046 
+<a name="l00047"></a><a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html">00047</a>     <span class="keyword">class </span><a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html">ReactorPropagator</a> :<span class="keyword">public</span> EUROPA::DefaultPropagator {
+<a name="l00048"></a>00048     <span class="keyword">public</span>:
+<a name="l00049"></a>00049       <span class="keyword">virtual</span> ~<a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html">ReactorPropagator</a>() {}
+<a name="l00050"></a>00050       
+<a name="l00051"></a>00051     <span class="keyword">protected</span>:
+<a name="l00052"></a>00052       <a class="code" href="../../d9/da5/classTREX_1_1europa_1_1ReactorPropagator.html">ReactorPropagator</a>(<a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html">Assembly</a> &amp;assembly, EUROPA::LabelStr <span class="keyword">const</span> &amp;name, 
+<a name="l00053"></a>00053                      EUROPA::ConstraintEngineId <span class="keyword">const</span> &amp;cstrEngine)
+<a name="l00054"></a>00054        :EUROPA::DefaultPropagator(name, cstrEngine), m_assembly(assembly) {}
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056       <a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html">Assembly</a> &amp;m_assembly;
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../dc/d76/classTREX_1_1europa_1_1Assembly.html">Assembly</a>;
+<a name="l00059"></a>00059       <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="../../d5/d38/classTREX_1_1europa_1_1ReactorConstraint.html">ReactorConstraint</a>;
+<a name="l00060"></a>00060     }; <span class="comment">// TREX::europa::ReactorPropagator</span>
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062   } <span class="comment">// TREX::europa</span>
+<a name="l00063"></a>00063 } <span class="comment">// TREX</span>
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065 <span class="preprocessor">#endif // H_trex_europa_ReactorPropagator</span>
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:10 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:07 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

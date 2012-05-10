@@ -121,6 +121,9 @@ typedef boost::edge_name_t&nbsp;</td><td class="memItemRight" valign="bottom"><b
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">reactor ID type  <a href="#a5ff47dd2421381f5c3d0a45f5543dee2"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="../../df/de9/classTREX_1_1transaction_1_1Relation.html">Relation</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a98fd97db251ac6a8a6ab96502f14609f">relation_type</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">reactor relation type  <a href="#a98fd97db251ac6a8a6ab96502f14609f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef boost::reverse_graph<br class="typebreak"/>
+&lt; <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">graph</a>, <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">graph</a> const &amp; &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a505757bffa2e4376460ae2779b050f9b">reverse_graph</a></td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reverse of a reactor graph.  <a href="#a505757bffa2e4376460ae2779b050f9b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0109cf09583e270793760e3aed16294c"></a><!-- doxytag: member="TREX::transaction::graph::size_type" ref="a0109cf09583e270793760e3aed16294c" args="" -->
 typedef <br class="typebreak"/>
 details::reactor_set::size_type&nbsp;</td><td class="memItemRight" valign="bottom"><b>size_type</b></td></tr>
@@ -162,6 +165,10 @@ size_type&nbsp;</td><td class="memItemRight" valign="bottom"><b>count_relations<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Constructor.  <a href="#a68cb3881d61a403e47863d6887cd5d49"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">long&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a7603bb9da5da1073df6f9dee0803ba6f">index</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Reactor index.  <a href="#a7603bb9da5da1073df6f9dee0803ba6f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a310ce92d7c8f1e680edbfe94c7f18aff"></a><!-- doxytag: member="TREX::transaction::graph::is_isolated" ref="a310ce92d7c8f1e680edbfe94c7f18aff" args="(reactor_id r) const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>is_isolated</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a90f081ae6bc728fc76528b842e7f8607">is_member</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check if part of the graph.  <a href="#a90f081ae6bc728fc76528b842e7f8607"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836">isolate</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Isolate a reactor.  <a href="#a9332ebabfaac01371090d8ed5186e836"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb">kill_reactor</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r)</td></tr>
@@ -196,12 +203,12 @@ typedef <br class="typebreak"/>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3fba5be9cd9def8b261ac890673904e4"></a><!-- doxytag: member="TREX::transaction::graph::add_reactor" ref="a3fba5be9cd9def8b261ac890673904e4" args="(reactor_id r)" -->
 <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td><td class="memItemRight" valign="bottom"><b>add_reactor</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10410563e8e2a4ef51459526edc68311"></a><!-- doxytag: member="TREX::transaction::graph::external_check" ref="a10410563e8e2a4ef51459526edc68311" args="(reactor_id r, details::timeline const &amp;tl)" -->
-virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>external_check</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, <a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;tl)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a10410563e8e2a4ef51459526edc68311">external_check</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, <a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;tl)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for external timeline creation.  <a href="#a10410563e8e2a4ef51459526edc68311"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c2b6992d13534535ae851cf647fe970"></a><!-- doxytag: member="TREX::transaction::graph::has_timeline" ref="a2c2b6992d13534535ae851cf647fe970" args="(TREX::utils::Symbol const &amp;tl) const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>has_timeline</b> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;tl) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40dcb829132eac2d19cc7a7965cef940"></a><!-- doxytag: member="TREX::transaction::graph::internal_check" ref="a40dcb829132eac2d19cc7a7965cef940" args="(reactor_id r, details::timeline const &amp;tl)" -->
-virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>internal_check</b> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, <a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;tl)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a40dcb829132eac2d19cc7a7965cef940">internal_check</a> (<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a> r, <a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;tl)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Check for internal timeline creation.  <a href="#a40dcb829132eac2d19cc7a7965cef940"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14ed6bd4f04a51077f4baf5b43e15c68"></a><!-- doxytag: member="TREX::transaction::graph::manager" ref="a14ed6bd4f04a51077f4baf5b43e15c68" args="() const " -->
 <a class="el" href="../../d2/d8b/classTREX_1_1utils_1_1LogManager.html">TREX::utils::LogManager</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><b>manager</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae332d1c3aaa5a2f9102e016d8e68595b"></a><!-- doxytag: member="TREX::transaction::graph::set_name" ref="ae332d1c3aaa5a2f9102e016d8e68595b" args="(TREX::utils::Symbol const &amp;name)" -->
@@ -268,7 +275,7 @@ graph_traits<br class="typebreak"/>
 </ul>
 <dl class="author"><dt><b>Author:</b></dt><dd>Frederic Py &lt;<a href="mailto:fpy@mbari.org">fpy@mbari.org</a>&gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00114">114</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00116">116</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 <hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="a5ff47dd2421381f5c3d0a45f5543dee2"></a><!-- doxytag: member="TREX::transaction::graph::reactor_id" ref="a5ff47dd2421381f5c3d0a45f5543dee2" args="" -->
 <div class="memitem">
@@ -284,7 +291,7 @@ graph_traits<br class="typebreak"/>
 <p>reactor ID type </p>
 <p>The type used to represent a reactor in the graph </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00120">120</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00122">122</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -302,7 +309,25 @@ graph_traits<br class="typebreak"/>
 <p>reactor relation type </p>
 <p>The type used to represent the dependencies between reactors in the graph. </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00155">155</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00156">156</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a505757bffa2e4376460ae2779b050f9b"></a><!-- doxytag: member="TREX::transaction::graph::reverse_graph" ref="a505757bffa2e4376460ae2779b050f9b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef boost::reverse_graph&lt;<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">graph</a>, <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html">graph</a> const &amp;&gt; <a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a505757bffa2e4376460ae2779b050f9b">TREX::transaction::graph::reverse_graph</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reverse of a reactor graph. </p>
+<p>This type is the one used in order to refer to this graph with reversed relations </p>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00170">170</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -320,7 +345,7 @@ graph_traits<br class="typebreak"/>
 <p>Reactor factory. </p>
 <p>A factory used ot produce new reactor in a graph using XML input. </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00162">162</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00163">163</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -450,7 +475,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00074">74</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
-<p>References <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00087">clear()</a>.</p>
+<p>References <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00092">clear()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -489,11 +514,11 @@ Here is the call graph for this function:</div>
 </dl>
 <p>Create the reactor defined by <code>description</code> and attch it to this graph </p>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00105">105</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00110">110</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00257">TREX::agent::Agent::Agent()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00355">TREX::agent::Agent::Agent()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -531,7 +556,7 @@ Here is the call graph for this function:</div>
 </dl>
 <p>Create all the reactors defined in <code>conf</code> and attach them to this graph </p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00373">373</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00381">381</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d8/deb/reactor__graph_8tcc_source.html#l00040">add_reactors()</a>.</p>
 
@@ -594,7 +619,7 @@ template&lt;class Iter &gt; </div>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00373">add_reactors()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00068">graph()</a>.</p>
+<p>Referenced by <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00381">add_reactors()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00068">graph()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -627,13 +652,13 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the numeof reactor that have been killed</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor.">isolate(reactor_id) const</a> </dd>
 <dd>
-kill_reactor(reeactor_id) </dd></dl>
+<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor.">kill_reactor(reactor_id)</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00156">156</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00171">171</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
-<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00126">kill_reactor()</a>.</p>
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00139">kill_reactor()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00565">TREX::agent::Agent::initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -665,11 +690,11 @@ Here is the call graph for this function:</div>
 <p>Disconnect all the reactors from this graph</p>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>The graph is empty </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00087">87</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00092">92</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00776">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::clear()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00302">TREX::agent::Agent::~Agent()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00074">~graph()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00400">TREX::agent::Agent::~Agent()</a>, and <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00074">~graph()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -700,11 +725,11 @@ Here is the call graph for this function:</div>
 <p>Number of reactors. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>the number of reactors in this graph </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00503">503</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00526">526</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00451">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::size()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">TREX::agent::Agent::missionCompleted()</a>, and <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00340">num_vertices()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00409">TREX::agent::Agent::missionCompleted()</a>, and <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00371">num_vertices()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -742,11 +767,11 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00350">350</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00358">358</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00443">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::empty()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">TREX::agent::Agent::doNext()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00693">TREX::agent::Agent::doNext()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00565">TREX::agent::Agent::initComplete()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -756,6 +781,55 @@ Here is the call graph for this function:</div>
 <area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a4f41379c2a9de6fcf22e4c8c6975e79b" title="Check if empty." alt="" coords="301,5,512,35"/></map>
 </div>
 </p>
+
+</div>
+</div>
+<a class="anchor" id="a10410563e8e2a4ef51459526edc68311"></a><!-- doxytag: member="TREX::transaction::graph::external_check" ref="a10410563e8e2a4ef51459526edc68311" args="(reactor_id r, details::timeline const &amp;tl)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void TREX::transaction::graph::external_check </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;&nbsp;</td>
+          <td class="paramname"> <em>tl</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline, protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check for external timeline creation. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>tl</em>&nbsp;</td><td>A timeline</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This method is used by the graph to check if the reactor <code>r</code> can declare the timeline <code>tl</code> as external.</p>
+<p>It can be used by derived classes to add extra control on the creation of internal timelines. For example this is where the Agent could check if such external timeline creation won't generate a dependency cycle.</p>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em><a class="el" href="../../de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html" title="Timeline relation creation failure.">timeline_failure</a></em>&nbsp;</td><td>indicates that <code>tl</code> cannot be declared as external by <code>r</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd>TeleoReactor::failed_external(Symbol const &amp;, timeline_failure const &amp;) </dd>
+<dd>
+<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a40dcb829132eac2d19cc7a7965cef940" title="Check for internal timeline creation.">internal_check(reactor_id r, details::timeline const &amp;)</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00664">664</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 </div>
 </div>
@@ -788,7 +862,7 @@ Here is the call graph for this function:</div>
 <dd>
 <a class="el" href="../../df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a8facf8e8ea1ba386fa07bffb25881379" title="Reactor name.">TeleoReactor::getName() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00553">553</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00576">576</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>.</p>
 
@@ -823,9 +897,9 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The tick value</dd></dl>
 <dl class="note"><dt><b>Note:</b></dt><dd>This method is not usefull at the graph level and is more used by the Agent. It may be refactored in roder to keep the graph class as simple as possible. </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00441">441</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00464">464</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00518">TREX::agent::Agent::doNext()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00259">TREX::transaction::TeleoReactor::getCurrentTick()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00311">TREX::agent::Agent::missionCompleted()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00693">TREX::agent::Agent::doNext()</a>, <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00281">TREX::transaction::TeleoReactor::getCurrentTick()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00409">TREX::agent::Agent::missionCompleted()</a>.</p>
 
 </div>
 </div>
@@ -847,9 +921,9 @@ Here is the call graph for this function:</div>
 <p>Graph name. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The name of the graph </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00298">298</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00306">306</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00184">TREX::transaction::TeleoReactor::getGraphName()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00423">TREX::agent::Agent::initComplete()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00196">TREX::transaction::TeleoReactor::getGraphName()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00565">TREX::agent::Agent::initComplete()</a>.</p>
 
 </div>
 </div>
@@ -881,11 +955,11 @@ Here is the call graph for this function:</div>
 <dl class="warning"><dt><b>Warning:</b></dt><dd>The index of a reactor can change whenver the graph is changed (by either adding new reactors or removing ones)</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a6fb5b25c6dc6879309cf8d41006c7485" title="Number of reactors.">count_reactors() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00096">96</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00101">101</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00463">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::begin()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00474">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::end()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00481">TREX::transaction::details::graph_vertex_id_map::operator[]()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00512">TREX::transaction::details::graph_vertex_id_map::operator[]()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -893,6 +967,104 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph_map" alt=""></div>
 <map name="d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a7603bb9da5da1073df6f9dee0803ba6f_cgraph">
 <area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator." alt="" coords="293,5,496,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator." alt="" coords="300,59,489,88"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a40dcb829132eac2d19cc7a7965cef940"></a><!-- doxytag: member="TREX::transaction::graph::internal_check" ref="a40dcb829132eac2d19cc7a7965cef940" args="(reactor_id r, details::timeline const &amp;tl)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void TREX::transaction::graph::internal_check </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="../../d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html">details::timeline</a> const &amp;&nbsp;</td>
+          <td class="paramname"> <em>tl</em></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline, protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check for internal timeline creation. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor </td></tr>
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>tl</em>&nbsp;</td><td>A timeline</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This method is used by the graph to check if the reactor <code>r</code> can declare the timeline <code>tl</code> as internal.</p>
+<p>It can be used by derived classes to add extra control on the creation of internal timelines. For example this is where the Agent could check if such internal timeline creation won't generate a dependency cycle.</p>
+<dl><dt><b>Exceptions:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em><a class="el" href="../../de/dc9/structTREX_1_1transaction_1_1graph_1_1timeline__failure.html" title="Timeline relation creation failure.">timeline_failure</a></em>&nbsp;</td><td>indicates that <code>tl</code> cannot be declared as internal by <code>r</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd>TeleoReactor::failed_internal(Symbol const &amp;, timeline_failure const &amp;) </dd>
+<dd>
+<a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a10410563e8e2a4ef51459526edc68311" title="Check for external timeline creation.">external_check(reactor_id r, details::timeline const &amp;)</a> </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00645">645</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a90f081ae6bc728fc76528b842e7f8607"></a><!-- doxytag: member="TREX::transaction::graph::is_member" ref="a90f081ae6bc728fc76528b842e7f8607" args="(reactor_id r) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool graph::is_member </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a5ff47dd2421381f5c3d0a45f5543dee2">graph::reactor_id</a>&nbsp;</td>
+          <td class="paramname"> <em>r</em></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check if part of the graph. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"><tt>[in]</tt>&nbsp;</td><td valign="top"><em>r</em>&nbsp;</td><td>A reactor</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Checks if <code>r</code> is currently part of this graph or not. A reactor is not part of the graph if it has been isolated or killed</p>
+<dl><dt><b>Return values:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>true</em>&nbsp;</td><td>if the reactor is still part of this graph  false otherwise</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#aa91ce02b919c78429a54e7f7fcd2babb" title="Kill a reactor.">kill_reactor(reactor_id)</a> </dd>
+<dd>
+isolate(reactor_id) </dd></dl>
+
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00131">131</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+
+<p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00463">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::begin()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00474">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::end()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dynsection">
+<div class="center"><img src="../../d5/d45/classTREX_1_1transaction_1_1graph_a90f081ae6bc728fc76528b842e7f8607_cgraph.png" border="0" usemap="#d5/d45/classTREX_1_1transaction_1_1graph_a90f081ae6bc728fc76528b842e7f8607_cgraph_map" alt=""></div>
+<map name="d5/d45/classTREX_1_1transaction_1_1graph_a90f081ae6bc728fc76528b842e7f8607_cgraph_map" id="d5/d45/classTREX_1_1transaction_1_1graph_a90f081ae6bc728fc76528b842e7f8607_cgraph">
+<area shape="rect" id="node3" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#a816dc88801468d522c01fde8e4aa513c" title="Beginning iterator." alt="" coords="331,5,533,35"/><area shape="rect" id="node5" href="../../dc/d8c/classTREX_1_1utils_1_1list__set.html#aed83139d9f67a23c84e6760a4cac081e" title="End iterator." alt="" coords="337,59,527,88"/></map>
 </div>
 </p>
 
@@ -932,11 +1104,11 @@ Here is the call graph for this function:</div>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>if <code>r</code> did belong to this graph it is added to the set of reactor to be killed during the next cleanup operation</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#af198f927b1a11cf65d749d726294cefc" title="Kill all isolated reactors.">cleanup()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00143">143</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00158">158</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00667">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::insert()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00110">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
+<p>Referenced by <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00199">TREX::agent::details::sync_scheduller::discover_vertex()</a>, and <a class="el" href="../../d1/d37/Agent_8cc_source.html#l00112">TREX::agent::details::init_visitor::finish_vertex()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -978,11 +1150,11 @@ Here is the call graph for this function:</div>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd><code>r</code> does not belong to this graph</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a9332ebabfaac01371090d8ed5186e836" title="Isolate a reactor.">isolate()</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00126">126</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
+<p>Definition at line <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00139">139</a> of file <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00741">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::erase()</a>, and <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00693">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::find()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00156">cleanup()</a>.</p>
+<p>Referenced by <a class="el" href="../../d7/d79/reactor__graph_8cc_source.html#l00171">cleanup()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1014,11 +1186,11 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a <a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">reactor_iterator</a> pointing to the beginning of the reactors set maintained by this graph </dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a941e65892d675ebef755fc161c7243ef" title="End reactor iterator.">reactor_end() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00528">528</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00551">551</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00463">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::begin()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00321">vertices()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00352">vertices()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1050,11 +1222,11 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>a <a class="el" href="../../dc/dcf/classTREX_1_1transaction_1_1graph_1_1reactor__iterator.html" title="reactors iterator">reactor_iterator</a> pointing to the end of the reactors set maintained by this graph </dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d5/d45/classTREX_1_1transaction_1_1graph.html#a96db7840b35ae21a6a631ad15c9622fa" title="Beginning reactor iterator.">reactor_begin() const</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00537">537</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00560">560</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
 <p>References <a class="el" href="../../d6/dc7/id__mapper_8hh_source.html#l00474">TREX::utils::list_set&lt; IdTraits, Cmp &gt;::end()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00321">vertices()</a>.</p>
+<p>Referenced by <a class="el" href="../../d3/dfa/bgl__support_8hh_source.html#l00352">vertices()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1092,9 +1264,9 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented in <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a350cb40be95b91e6385c96de0c60afa7">TREX::agent::Agent</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00456">456</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00479">479</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00212">TREX::transaction::TeleoReactor::tickDuration()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00495">tickToTime()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00234">TREX::transaction::TeleoReactor::tickDuration()</a>, and <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00518">tickToTime()</a>.</p>
 
 </div>
 </div>
@@ -1130,11 +1302,11 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented in <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#a31b7b2d9b4028adf7a47d67b7c1b76bf">TREX::agent::Agent</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00495">495</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00518">518</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00456">tickDuration()</a>.</p>
+<p>References <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00479">tickDuration()</a>.</p>
 
-<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00248">TREX::transaction::TeleoReactor::tickToTime()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00270">TREX::transaction::TeleoReactor::tickToTime()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1189,9 +1361,9 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented in <a class="el" href="../../d8/d11/classTREX_1_1agent_1_1Agent.html#ab18d2490d59151ad7ab65edd62f5d235">TREX::agent::Agent</a>.</p>
 
-<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00476">476</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html#l00499">499</a> of file <a class="el" href="../../d2/d09/reactor__graph_8hh_source.html">reactor_graph.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00231">TREX::transaction::TeleoReactor::timeToTick()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/TeleoReactor_8hh_source.html#l00253">TREX::transaction::TeleoReactor::timeToTick()</a>.</p>
 
 </div>
 </div>
@@ -1202,7 +1374,7 @@ Here is the call graph for this function:</div>
 <li>trex/transaction/<a class="el" href="../../d7/d79/reactor__graph_8cc_source.html">reactor_graph.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:58 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:14 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

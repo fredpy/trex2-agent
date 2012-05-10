@@ -1,4 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="5,83,208,112"/>
-<area shape="rect" id="node5" href="$d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="232,83,392,112"/>
+<area shape="rect" id="node3" href="$d8/d6d/Schema_8cc_source.html" title="extra/europa/core/Schema.cc" alt="" coords="5,83,227,112"/>
+<area shape="rect" id="node5" href="$d9/d69/Witre_8cc_source.html" title="extra/witre/Witre.cc" alt="" coords="251,83,408,112"/>
+<area shape="rect" id="node8" href="$d6/dca/Witre_8hh_source.html" title="extra/witre/Witre.hh" alt="" coords="456,83,613,112"/>
+<area shape="rect" id="node12" href="$d9/ddc/WitreServer_8cc_source.html" title="extra/witre/WitreServer.cc" alt="" coords="549,160,752,189"/>
+<area shape="rect" id="node15" href="$d4/d13/XmlUtils_8cc.html" title="XML utilities implmentation." alt="" coords="688,83,848,112"/>
+<area shape="rect" id="node10" href="$dc/da3/witre__pg_8cc_source.html" title="extra/witre/witre_pg.cc" alt="" coords="347,160,525,189"/>
 </map>

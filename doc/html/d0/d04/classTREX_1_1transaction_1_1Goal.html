@@ -120,6 +120,8 @@ typedef attr_set::iterator&nbsp;</td><td class="memItemRight" valign="bottom"><a
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">end of the attributes set  <a href="#ab48792a7d625ac005db1cee4678cfdb1"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#abcfef497ab9e8ccd2f44c02b6f5f765b">iterator</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#aa07342c1309d0fbaa5db219e83af3e43">end</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">end of the attributes set  <a href="#aa07342c1309d0fbaa5db219e83af3e43"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc6799b062c98583c6241d21ac7fcfcf"></a><!-- doxytag: member="TREX::transaction::Goal::endsAfter" ref="acc6799b062c98583c6241d21ac7fcfcf" args="(TICK date) const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>endsAfter</b> (<a class="el" href="../../db/db4/group__transaction.html#ga71ccb7c46d43d3d538c401886b341ada">TICK</a> date) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../de/db8/classTREX_1_1transaction_1_1Variable.html">Variable</a> const &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a2252be612bf5dc47849986ab4c25701d">getAttribute</a> (<a class="el" href="../../dc/de0/classTREX_1_1utils_1_1BasicSymbol.html">TREX::utils::Symbol</a> const &amp;name) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Attribute access.  <a href="#a2252be612bf5dc47849986ab4c25701d"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class Ty &gt; </td></tr>
@@ -333,7 +335,7 @@ Predicate::Predicate(rapidxml::xml_node&lt;&gt; const &amp;) </dd></dl>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00075">75</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00154">TREX::transaction::Predicate::end()</a>, <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00356">TREX::transaction::Predicate::find()</a>, <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00128">restrictTime()</a>, <a class="el" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a6a9c8594761ba152bb7c92ec9350348c">TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00191">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>.</p>
+<p>References <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00154">TREX::transaction::Predicate::end()</a>, <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00356">TREX::transaction::Predicate::find()</a>, <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00128">restrictTime()</a>, <a class="el" href="../../dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#a6a9c8594761ba152bb7c92ec9350348c">TREX::transaction::IntervalDomain&lt; Ty, Comp &gt;::restrictWith()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00194">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00196">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00192">s_startName</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -522,7 +524,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00216">216</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00191">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>.</p>
+<p>References <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00194">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00196">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00192">s_startName</a>.</p>
 
 </div>
 </div>
@@ -777,14 +779,14 @@ Here is the call graph for this function:</div>
 <div class="memdoc">
 
 <p>List predicate's attributes. </p>
-<p>attr A varaible to store the attribute names all A flag used to indicate whether it should list all existing attributes or only the ones with restricted domains (ie not full) This method is adding the list of all the attributes names defined for this predicate at the end of <em>attr</em>. The <em>all</em> flag allows to indicate that we want all the defined attributes even if their domain is full (meaning thay are not really constrained)</p>
+<p>attr A varaible to store the attribute names all A flag used to indicate whether it should list all existing attributes or only the ones with restricted domains (ie not full) This method is adding the list of all the attributes names defined for this predicate at the end of <em>attr</em>. The <em>all</em> flag allows to indicate that we want all the defined attributes even if their domain is full (meaning they are not really constrained)</p>
 <dl class="post"><dt><b>Postcondition:</b></dt><dd>attr list contains all the attributes appendded to it end </dd></dl>
 
 <p>Reimplemented from <a class="el" href="../../d4/db5/classTREX_1_1transaction_1_1Predicate.html#a5e1568626b85ce324ad7ae6185605f8f">TREX::transaction::Predicate</a>.</p>
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00240">240</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00128">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a29f500133a682da60d2b8163759d21c7">TREX::transaction::DomainBase::equals()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a440713f816db16985e6f0418cf309c3b">TREX::transaction::DomainBase::isFull()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00191">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>.</p>
+<p>References <a class="el" href="../../dd/db5/Variable_8cc_source.html#l00128">TREX::transaction::Variable::domain()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a29f500133a682da60d2b8163759d21c7">TREX::transaction::DomainBase::equals()</a>, <a class="el" href="../../d1/dc6/classTREX_1_1transaction_1_1DomainBase.html#a440713f816db16985e6f0418cf309c3b">TREX::transaction::DomainBase::isFull()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00194">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00196">s_endName</a>, and <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00192">s_startName</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -818,7 +820,7 @@ Here is the call graph for this function:</div>
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00119">119</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00295">TREX::transaction::TeleoReactor::postObservation()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/EuropaReactor_8cc_source.html#l00153">TREX::europa::EuropaReactor::notify()</a>, <a class="el" href="../../d7/d2c/TeleoReactor_8cc_source.html#l00342">TREX::transaction::TeleoReactor::postObservation()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
 
 </div>
 </div>
@@ -882,7 +884,7 @@ template&lt;class Ty&gt; Ty const &amp;getDomain(TREX::utils::Symbol const &amp;
 
 <p>Definition at line <a class="el" href="../../d1/d8f/Predicate_8hh_source.html#l00129">129</a> of file <a class="el" href="../../d1/d8f/Predicate_8hh_source.html">Predicate.hh</a>.</p>
 
-<p>Referenced by <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
+<p>Referenced by <a class="el" href="../../db/d0f/EuropaReactor_8cc_source.html#l00153">TREX::europa::EuropaReactor::notify()</a>, and <a class="el" href="../../d5/da1/Predicate_8cc_source.html#l00108">TREX::transaction::Predicate::toXml()</a>.</p>
 
 </div>
 </div>
@@ -1047,7 +1049,7 @@ if var refers to one temporal varaibale (<code>start</code>, <code>duration</cod
 
 <p>Definition at line <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00115">115</a> of file <a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a>.</p>
 
-<p>References <a class="el" href="../../da/d84/Variable_8hh_source.html#l00168">TREX::transaction::Variable::name()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00244">restrictDuration()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00260">restrictEnd()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00228">restrictStart()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00189">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00187">s_startName</a>, and <a class="el" href="../../da/d84/Variable_8hh_source.html#l00199">TREX::transaction::Variable::typedDomain()</a>.</p>
+<p>References <a class="el" href="../../da/d84/Variable_8hh_source.html#l00168">TREX::transaction::Variable::name()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00249">restrictDuration()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00265">restrictEnd()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00233">restrictStart()</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00194">s_durationName</a>, <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00192">s_startName</a>, and <a class="el" href="../../da/d84/Variable_8hh_source.html#l00199">TREX::transaction::Variable::typedDomain()</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1092,7 +1094,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables.">restrictTime</a>(<a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00244">244</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00249">249</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00115">restrictAttribute()</a>.</p>
 
@@ -1130,7 +1132,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables.">restrictTime</a>(<a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00260">260</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00265">265</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00115">restrictAttribute()</a>.</p>
 
@@ -1168,7 +1170,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="../../d0/d04/classTREX_1_1transaction_1_1Goal.html#a92689ff35c96b90d3828cce0a7b03b4f" title="Restrict time variables.">restrictTime</a>(<a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;, <a class="el" href="../../d0/dd4/classTREX_1_1transaction_1_1IntegerDomain.html" title="Integer domain.">IntegerDomain</a> const &amp;) </dd></dl>
 
-<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00228">228</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
+<p>Definition at line <a class="el" href="../../d2/d84/Goal_8hh_source.html#l00233">233</a> of file <a class="el" href="../../d2/d84/Goal_8hh_source.html">Goal.hh</a>.</p>
 
 <p>Referenced by <a class="el" href="../../d8/d48/Goal_8cc_source.html#l00115">restrictAttribute()</a>.</p>
 
@@ -1391,7 +1393,7 @@ Here is the call graph for this function:</div>
 <li>trex/transaction/<a class="el" href="../../d8/d48/Goal_8cc_source.html">Goal.cc</a></li>
 </ul>
 </div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:57 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:14 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

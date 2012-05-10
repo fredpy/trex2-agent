@@ -1,10 +1,10 @@
 <map id="G" name="G">
 <area shape="rect" id="node9" href="$d0/d92/StringExtract_8hh.html" title="Utilities for values extraction from string." alt="" coords="731,83,864,112"/>
-<area shape="rect" id="node15" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1296,237,1405,267"/>
-<area shape="rect" id="node21" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="968,83,1091,112"/>
-<area shape="rect" id="node19" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1352,315,1485,344"/>
-<area shape="rect" id="node25" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="819,160,915,189"/>
-<area shape="rect" id="node28" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1005,160,1133,189"/>
-<area shape="rect" id="node30" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1157,160,1264,189"/>
-<area shape="rect" id="node33" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1288,160,1413,189"/>
+<area shape="rect" id="node15" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1435,237,1544,267"/>
+<area shape="rect" id="node21" href="$d1/d5d/LogManager_8hh.html" title="LogManager class definition." alt="" coords="977,83,1100,112"/>
+<area shape="rect" id="node19" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1491,315,1624,344"/>
+<area shape="rect" id="node27" href="$d9/d1b/TextLog_8hh.html" title="Definition of the TextLog class." alt="" coords="771,160,867,189"/>
+<area shape="rect" id="node30" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1144,160,1272,189"/>
+<area shape="rect" id="node32" href="$d6/d15/SharedVar_8hh.html" title="utilities for multi&#45;thread shared variable" alt="" coords="1296,160,1403,189"/>
+<area shape="rect" id="node35" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1427,160,1552,189"/>
 </map>

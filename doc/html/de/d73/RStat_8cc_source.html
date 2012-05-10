@@ -161,8 +161,8 @@ window.onload = initDynSections;
 <a name="l00093"></a>00093 
 <a name="l00094"></a>00094 <span class="comment">// Manipulators :</span>
 <a name="l00095"></a>00095 
-<a name="l00096"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a7d159f5d2db22a8c0d5f98d73da5c33c">00096</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a7d159f5d2db22a8c0d5f98d73da5c33c" title="Difference between stats.">RStat::operator- </a>(<a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00097"></a>00097   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> result(_kind==other._kind?_kind:unknown, <span class="keyword">false</span>);
+<a name="l00096"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a7d159f5d2db22a8c0d5f98d73da5c33c">00096</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a7d159f5d2db22a8c0d5f98d73da5c33c" title="Difference between stats.">RStat::operator- </a>(<a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00097"></a>00097   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> result(_kind==other._kind?_kind:unknown, <span class="keyword">false</span>);
 <a name="l00098"></a>00098   
 <a name="l00099"></a>00099   result._snapshot.ru_utime = _snapshot.ru_utime-other._snapshot.ru_utime;
 <a name="l00100"></a>00100   result._snapshot.ru_stime = _snapshot.ru_stime-other._snapshot.ru_stime;
@@ -190,8 +190,8 @@ window.onload = initDynSections;
 <a name="l00122"></a>00122   <span class="keywordflow">return</span> result;
 <a name="l00123"></a>00123 }
 <a name="l00124"></a>00124 
-<a name="l00125"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#aad9e897a10e3b1abca0ff5332aaf88b7">00125</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#aad9e897a10e3b1abca0ff5332aaf88b7" title="Addition of stats.">RStat::operator+ </a>(<a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
-<a name="l00126"></a>00126   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> result(_kind==other._kind?_kind:unknown, <span class="keyword">false</span>);
+<a name="l00125"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#aad9e897a10e3b1abca0ff5332aaf88b7">00125</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#aad9e897a10e3b1abca0ff5332aaf88b7" title="Addition of stats.">RStat::operator+ </a>(<a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <span class="keyword">const</span> &amp;other)<span class="keyword"> const </span>{
+<a name="l00126"></a>00126   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> result(_kind==other._kind?_kind:unknown, <span class="keyword">false</span>);
 <a name="l00127"></a>00127   
 <a name="l00128"></a>00128   result._snapshot.ru_utime = _snapshot.ru_utime+other._snapshot.ru_utime;
 <a name="l00129"></a>00129   result._snapshot.ru_stime = _snapshot.ru_stime+other._snapshot.ru_stime;
@@ -219,8 +219,8 @@ window.onload = initDynSections;
 <a name="l00151"></a>00151   <span class="keywordflow">return</span> result;
 <a name="l00152"></a>00152 }
 <a name="l00153"></a>00153 
-<a name="l00154"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a813fc583be5917d68aba49694680f570">00154</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a813fc583be5917d68aba49694680f570" title="Multiplication.">RStat::operator* </a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{
-<a name="l00155"></a>00155   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> result(_kind, <span class="keyword">false</span>);
+<a name="l00154"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a813fc583be5917d68aba49694680f570">00154</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a813fc583be5917d68aba49694680f570" title="Multiplication.">RStat::operator* </a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{
+<a name="l00155"></a>00155   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> result(_kind, <span class="keyword">false</span>);
 <a name="l00156"></a>00156   
 <a name="l00157"></a>00157   result._snapshot.ru_utime = _snapshot.ru_utime*n;
 <a name="l00158"></a>00158   result._snapshot.ru_stime = _snapshot.ru_stime*n;
@@ -248,8 +248,8 @@ window.onload = initDynSections;
 <a name="l00180"></a>00180   <span class="keywordflow">return</span> result;
 <a name="l00181"></a>00181 }
 <a name="l00182"></a>00182 
-<a name="l00183"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a978f7e43f53e8d5297e3180a3a504ba3">00183</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a978f7e43f53e8d5297e3180a3a504ba3" title="Division.">RStat::operator/ </a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{
-<a name="l00184"></a>00184   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Ressource usage stats management class.">RStat</a> result(_kind, <span class="keyword">false</span>);
+<a name="l00183"></a><a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a978f7e43f53e8d5297e3180a3a504ba3">00183</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html#a978f7e43f53e8d5297e3180a3a504ba3" title="Division.">RStat::operator/ </a>(<span class="keywordtype">long</span> n)<span class="keyword"> const </span>{
+<a name="l00184"></a>00184   <a class="code" href="../../d7/dd8/classTREX_1_1utils_1_1RStat.html" title="Resource usage stats management class.">RStat</a> result(_kind, <span class="keyword">false</span>);
 <a name="l00185"></a>00185   
 <a name="l00186"></a>00186   result._snapshot.ru_utime = _snapshot.ru_utime/n;
 <a name="l00187"></a>00187   result._snapshot.ru_stime = _snapshot.ru_stime/n;
@@ -320,7 +320,7 @@ window.onload = initDynSections;
 <a name="l00252"></a>00252   <span class="keywordflow">return</span> out;
 <a name="l00253"></a>00253 }
 </pre></div></div>
-<hr class="footer"/><address style="text-align: right;"><small>Generated on Wed Dec 14 14:40:12 2011 for trex by&nbsp;
+<hr class="footer"/><address style="text-align: right;"><small>Generated on Thu May 10 10:29:09 2012 for trex by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/></a> 1.6.3 </small></address>
 </body>

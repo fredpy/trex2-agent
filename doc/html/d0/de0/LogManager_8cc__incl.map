@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" id="node28" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="509,83,637,112"/>
-<area shape="rect" id="node36" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1937,160,2047,190"/>
-<area shape="rect" id="node42" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1880,83,2005,112"/>
-<area shape="rect" id="node30" href="$dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="491,160,656,190"/>
-<area shape="rect" id="node40" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1993,238,2127,267"/>
+<area shape="rect" id="node26" href="$dc/dfc/SingletonUse_8hh.html" title="Define the access class to a phoenix singleton." alt="" coords="1880,83,2008,112"/>
+<area shape="rect" id="node34" href="$d7/dcf/Exception_8hh.html" title="TREX exception base." alt="" coords="1540,160,1649,190"/>
+<area shape="rect" id="node40" href="$d9/d38/ErrnoExcept_8hh.html" title="ErrnoExcept definition." alt="" coords="1344,83,1469,112"/>
+<area shape="rect" id="node28" href="$dd/d17/SingletonUse_8tcc.html" title="SingletonUse implementation." alt="" coords="1861,160,2027,190"/>
+<area shape="rect" id="node38" href="$d2/d90/IOstreamable_8hh.html" title="Standard streams support utilities." alt="" coords="1596,238,1729,267"/>
 </map>

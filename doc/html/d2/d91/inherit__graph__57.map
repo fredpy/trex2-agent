@@ -1,3 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$df/d4d/classTREX_1_1utils_1_1internal_1_1SingletonServer.html" title="Singleton central manager." alt="" coords="7,5,279,35"/>
+<area shape="rect" id="node1" href="$d3/d0d/classTREX_1_1europa_1_1TokenFilter.html" title="TREX::europa::TokenFilter" alt="" coords="7,32,204,61"/>
+<area shape="rect" id="node3" href="$d8/da3/classTREX_1_1europa_1_1DeliberationScope.html" title="TREX::europa::DeliberationScope" alt="" coords="267,5,512,35"/>
+<area shape="rect" id="node5" href="$d1/d89/classTREX_1_1europa_1_1SynchronizationScope.html" title="TREX::europa::SynchronizationScope" alt="" coords="255,59,524,88"/>
 </map>
