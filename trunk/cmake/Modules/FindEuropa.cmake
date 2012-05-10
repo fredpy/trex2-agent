@@ -42,6 +42,9 @@
 
 # basic initial options
 option(EUROPA_DEBUG "Compile with Debug variant of Europa" OFF)
+option(EUROPA_FORCE_EFFECT 
+  "Force the effect support flag for Europa (Usefull when the try_compile is failing even if the europa version is greater than 2.6)" OFF)
+mark_as_advanced(EUROPA_FORCE_EFFECT)
 set(EUROPA_HINTS $ENV{EUROPA_HOME} CACHE PATH
   "Hint to Europa location (usually $EUROPA_HOME)")
 
@@ -123,6 +126,29 @@ find_path(EUROPA_INCLUDE_DIR
 set(EUROPA_INCLUDE_DIRS ${EUROPA_INCLUDE_DIR} 
   CACHE STRING "Europa include paths" FORCE)
 
+if(EUROPA_FORCE_EFFECT)
+  set(EUROPA_HAVE_EFFECT TRUE)
+else(EUROPA_FORCE_EFFECT)
+  # Check if this version support actions
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/europa_26.cc "#include <PLASMA/Token.hh>
+
+bool isEffect(EUROPA::TokenId const &tok) {
+  return tok->hasAttributes(EUROPA::PSTokenType::EFFECT);
+}
+
+int main() { return 0;}
+")
+
+
+  try_compile(EUROPA_HAVE_EFFECT "${CMAKE_CURRENT_BINARY_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}/europa_26.cc"
+    COMPILE_DEFINITIONS -I${EUROPA_INCLUDE_DIR} ${EUROPA_LIBRARIES}
+    OUTPUT_VARIABLE OUT)
+  if(NOT EUROPA_HAVE_EFFECT)
+    message(WARNING "Unable to compile europa_26.cxx. Output is:\n${OUT}")
+  endif(NOT EUROPA_HAVE_EFFECT)
+endif(EUROPA_FORCE_EFFECT)
+
 if(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)
   set(EUROPA_FOUND FALSE)
   if(Europa_FIND_REQUIRED)
@@ -140,5 +166,6 @@ mark_as_advanced(EUROPA_INCLUDE_DIR
   EUROPA_FLAGS
   EUROPA_LIB_NAMES
   EUROPA_LIBRARY_DIRS
+  EUROPA_HAVE_EFFECT
   )
 
