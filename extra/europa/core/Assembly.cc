@@ -148,6 +148,15 @@ std::string const Assembly::PLAN_ATTR("with_plan");
 std::string const Assembly::UNDEFINED_PRED("undefined");
 std::string const Assembly::FAILED_PRED("Failed");
 
+bool Assembly::actions_supported() {
+#ifdef EUROPA_HAVE_EFFECT
+  return true;
+#else
+  return false;
+#endif
+}
+
+
 // structors
 
 Assembly::Assembly(std::string const &name):m_name(name) {
@@ -486,6 +495,40 @@ bool Assembly::with_plan(EUROPA::ObjectId const &obj) const {
   return false;
 }
 
+bool Assembly::is_action(EUROPA::TokenId const &tok) const {
+#ifdef EUROPA_HAVE_EFFECT
+  return tok->hasAttributes(EUROPA::PSTokenType::ACTION);
+#else
+  return false;
+#endif
+}
+
+bool Assembly::is_predicate(EUROPA::TokenId const &tok) const {
+#ifdef EUROPA_HAVE_EFFECT
+  return tok->hasAttributes(EUROPA::PSTokenType::PREDICATE);
+#else
+  return true;
+#endif  
+}
+
+
+bool Assembly::is_condition(EUROPA::TokenId const &tok) const {
+#ifdef EUROPA_HAVE_EFFECT
+  return tok->hasAttributes(EUROPA::PSTokenType::CONDITION);
+#else
+  return false;
+#endif  
+}
+
+bool Assembly::is_effect(EUROPA::TokenId const &tok) const {
+#ifdef EUROPA_HAVE_EFFECT
+  return tok->hasAttributes(EUROPA::PSTokenType::EFFECT);
+#else
+  return false;
+#endif    
+}
+
+
 bool Assembly::is_goal(EUROPA::TokenId const &tok) const {
   EUROPA::StateDomain const &state = tok->getState()->baseDomain();
   return state.isMember(EUROPA::Token::REJECTED) && internal(tok);
@@ -580,9 +623,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<"incomplete\\n";
 #ifdef EUROPA_HAVE_EFFECT
     out<<"type: ";
-    if( (*it)->hasAttributes(EUROPA::PSTokenType::ACTION) ) 
+    if( is_action(*it) )
       out<<"ACTION";
-    else if( (*it)->hasAttributes(EUROPA::PSTokenType::PREDICATE) )
+    else if( is_predicate(*it) )
       out<<"PREDICATE";
     else 
       out<<"???";
@@ -618,12 +661,12 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       comma=true;
     }
 #ifdef EUROPA_HAVE_EFFECT
-    if( (*it)->hasAttributes(EUROPA::PSTokenType::ACTION) ) {
+    if( is_action(*it) ) {
       if( comma )
         styles.put(',');
       else
         comma = true;
-      styles<<"filled";
+      styles<<"filled"; // actions are filled
     }
 #endif // EUROPA_HAVE_EFFECT
     if( comma )
@@ -647,9 +690,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
         out<<"  t"<<master->getKey()<<"->t"<<key
            <<"[label=\""<<(*t)->getRelation().toString();
 #ifdef EUROPA_HAVE_EFFECT
-        if( (*t)->hasAttributes(EUROPA::PSTokenType::EFFECT) )
+        if( is_effect(*t) )
           out<<"\\n(effect)";
-        if( (*t)->hasAttributes(EUROPA::PSTokenType::CONDITION) )
+        if( is_condition(*t) )
           out<<"\\n(condition)";
 #endif // EUROPA_HAVE_EFFECT
         out<<"\"";
