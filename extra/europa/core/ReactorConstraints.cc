@@ -62,7 +62,7 @@ Assembly &ReactorConstraint::assembly() {
       EUROPA::Id<ReactorPropagator> r_prop(prop);
       m_assembly = &(r_prop->m_assembly);
     } else {
-      throw EuropaException("Constraint "+getName().toString()+" id attached to "+
+      throw EuropaException("Constraint "+getName().toString()+" is attached to "+
 			    prop->getName().toString()+
 			    " which is not a reactor propagator.");
     }

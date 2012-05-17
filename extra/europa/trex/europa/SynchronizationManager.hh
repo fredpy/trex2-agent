@@ -60,6 +60,9 @@ namespace TREX {
      * This class will manage this new kind of flaw and will ba automatically 
      * injected by the reactor for its solver dedicated to synchronization.
      *
+     * @note This flaw manager is automatically added to the synchronizer of 
+     *       an Assembly. 
+     *    
      * @note In past versions we used to do this by hand which presented many 
      *       issues:
      *       @li trex was messing directly with the plan database which is painfull 
@@ -77,20 +80,60 @@ namespace TREX {
      * europa is less hacky).
      *
      * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     * @relates Assembly
      */
     class SynchronizationManager :public EUROPA::SOLVERS::FlawManager {
     public:
+      /** @brief Constructor
+       * @param[in] cfg The XML config 
+       */
       SynchronizationManager(EUROPA::TiXmlElement const &cfg);
+      /** @brief Destructor */
       ~SynchronizationManager() {}
       
+      /** @brief Entity static Match
+       *
+       * @param[in] entity A europa entity
+       *
+       * @retval true if @p entity is A CurrentState
+       * @retval false otherwise
+       */
       bool staticMatch(EUROPA::EntityId const &entity);
+      /** @brief Entity synamic Match
+       *
+       * @param[in] entity A europa entity
+       *
+       * @retval true if @p entity is A CurrentState and its current state 
+       *         is not yet identified
+       * @retval false otherwise
+       */
       bool dynamicMatch(EUROPA::EntityId const &entity);
 
+      /** @brief Decisions iterator
+       *
+       * @return An iterator through all the possible solution for this flaw
+       */
       EUROPA::IteratorId createIterator();
       
+      /** @brief String display
+       *
+       * @param[in] entity A flawed entity
+       *
+       * @pre @p entity is a CurrentState instance
+       *
+       * @return A string describing the flaw for @p entity
+       */
       std::string toString(EUROPA::EntityId const &entity) const;
       
     private:
+      /** @brief Initialization
+       *
+       * Complete this handler initialization
+       *
+       * @pre The plan database for this manager is created by an Assembly 
+       * @throw EuropaException THe plan database is not associated to an Assembly
+       */
       void handleInitialize();
 
       Assembly *m_assembly;
@@ -101,7 +144,17 @@ namespace TREX {
   } // TREX::europa  
 } // TREX
 
+/** @brief Name of the synchronization manager
+ *
+ * The name of the synchronization manager as used on solver configuration file
+ * @relates TREX::europa::SynchronizationManager
+ */
 # define TREX_SYNCH_MGR      TrexSynchronizer
+/** @brief Name of the synchronization flaws handler
+ *
+ * The name of the synchronization handler as used on solver configuration file
+ * @relates TREX::europa::details::CurrentState::DecisionPoint
+ */
 # define TREX_SYNCH_HANDLER  CurrentStateHandler
 
 #endif // H_trex_europa_SynchronizationManager

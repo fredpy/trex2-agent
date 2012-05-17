@@ -73,14 +73,37 @@ namespace TREX {
      * the specific Assembly passed as argument.
      * 
      * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
      */ 
     class EuropaPlugin {
     public:
+      /** @brief Destructor */
       virtual ~EuropaPlugin();
 
     protected:
+      /** @brief Constructor */
       EuropaPlugin();
+      /** @brief plugin registration to an Assembly
+       *
+       * @param[in,out] assembly A europa assembly
+       *
+       * This callback is called whenever a new Assembly @p assembly is 
+       * created during the liufetime of this instance. I tallows programmer 
+       * through this call to inject Europa extension within this assembly.
+       */
       virtual void registerComponents(Assembly const &assembly) =0;
+      /** @brief Declare a function ot Europa
+       *
+       * @param[in,out] assembly The target assembly
+       * @param[in] fn A pointer to the function object
+       *
+       * An utility to ease the decalration of a new Europa function @p fn to
+       * the Assembly @p assembly. A europa function is a syntactic sugar for 
+       * nddl that allows a constraint preficate to be mapped as a function
+       * 
+       * @post The function @p fn is now understood by the constraint engine 
+       * of @p assembly
+       */
       void declareFunction(Assembly const &assembly, EUROPA::CFunction *fn);
 
     private:
@@ -100,6 +123,7 @@ namespace TREX {
  * @param[in] propagator The propagator that will handle this constraint
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 #define TREX_REGISTER_CONSTRAINT(assembly, class_name, label, propagator)\
   {  \
@@ -116,6 +140,7 @@ namespace TREX {
  * @param[in] label      The name used for this filter
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 # define TREX_REGISTER_FLAW_FILTER(assembly, class_name, label) \
   REGISTER_FLAW_FILTER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
@@ -127,6 +152,7 @@ namespace TREX {
  * @param[in] label      The name used for this handler
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 # define TREX_REGISTER_FLAW_HANDLER(assembly, class_name, label) \
   REGISTER_FLAW_HANDLER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
@@ -138,6 +164,7 @@ namespace TREX {
  * @param[in] label      The name used for this manager
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 # define TREX_REGISTER_FLAW_MANAGER(assembly, class_name, label) \
   REGISTER_FLAW_MANAGER(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
@@ -149,6 +176,7 @@ namespace TREX {
  * @param[in] label      The name used for this component
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 # define TREX_REGISTER_COMPONENT_FACTORY(assembly, class_name, label) \
   REGISTER_COMPONENT_FACTORY(((EUROPA::SOLVERS::ComponentFactoryMgr*)assembly.getComponent("ComponentFactoryMgr")), class_name, label);
@@ -160,6 +188,7 @@ namespace TREX {
  * @param[in] label      The name used for this component
  * 
  * @relates TREX::europa::EuropaPlugin
+ * @ingroup europa
  */
 # define TREX_REGISTER_MATCH_FINDER(assembly, class_name, label) \
   REGISTER_MATCH_FINDER(((EUROPA::SOLVERS::MatchFinderMgr*)assembly.getComponent("MatchFinderMgr")), class_name, label)
@@ -170,6 +199,7 @@ namespace TREX {
  * @param[in] symbol   A C++ litterate
  * @return the string corresponding to @p symbol
  * @sa TO_STRING_EVAL
+ * @ingroup europa
  */
 # define TO_STRING(symbol) #symbol
 /** @brief Convert A C++ litterate to a string
@@ -178,6 +208,7 @@ namespace TREX {
  * @return the string corresponding to @p symbol after cpp macro expansion of 
  *         @p symbol
  * @sa TO_STRING
+ * @ingroup europa
  */
 # define TO_STRING_EVAL(symbol) TO_STRING(symbol)
 

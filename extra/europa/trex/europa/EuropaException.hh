@@ -44,6 +44,7 @@ namespace TREX {
      * Exception used to inform of an eroor coming from Europa
      * 
      * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa 
      */
     class EuropaException :public TREX::utils::Exception {
     public:

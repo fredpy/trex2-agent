@@ -41,8 +41,24 @@
 namespace TREX {
   namespace europa {
 
+    /** @brief Absolute Value Constraint
+     *
+     * This class implements the absolute value constraint within europa
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class AbsValConstraint :public EUROPA::Constraint {
     public:
+      /** @brief Constructor
+       * @param[in] name the name of the constraint
+       * @param[in] propagatorName The name of the propagator handling this constraint
+       * @param[in] cstrEngine the constraint engine for this instance
+       * @param[in] vars the list of arguments
+       *
+       * @pre @p vars size is @e exactly 2
+       * @pre All the element of @p vars are IntervalDomain instances
+       */
      AbsValConstraint(EUROPA::LabelStr const &name,
 		      EUROPA::LabelStr const &propagatorName,
 		      EUROPA::ConstraintEngineId const &cstrEngine,
@@ -54,8 +70,24 @@ namespace TREX {
       EUROPA::Domain &m_val;
     }; // TREX::europa::AbsValConstraint
 
+    /** @brief Square root Constraint
+     *
+     * This class implements the square root constraint within europa
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class SqrtConstraint :public EUROPA::Constraint {
     public:
+      /** @brief Constructor
+       * @param[in] name the name of the constraint
+       * @param[in] propagatorName The name of the propagator handling this constraint
+       * @param[in] cstrEngine the constraint engine for this instance
+       * @param[in] vars the list of arguments
+       *
+       * @pre @p vars size is @e exactly 2
+       * @pre All the element of @p vars are IntervalDomain instances
+       */
       SqrtConstraint(EUROPA::LabelStr const &name,
                      EUROPA::LabelStr const &propagatorName,
                      EUROPA::ConstraintEngineId const &cstrEngine,
