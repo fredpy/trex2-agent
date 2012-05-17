@@ -41,9 +41,37 @@
 namespace TREX {
   namespace europa {
 
+    /** @brief Negative filter for variables
+     *
+     * THis filter exclude all the europa entities except the ones ones  with a 
+     * name that matches a defined set.
+     * It is usefull to use a unbound variable manager to a specific set 
+     * of variables
+     *
+     * @bug Thhis filter is purely experimental and should be repaced by a more 
+     * general version in the future
+     * @ingroup europa
+     * @author Frederic Py 
+     */
     class DoNotMatchFilter :public EUROPA::SOLVERS::FlawFilter {
     public:
+      /** @brief Constructor
+       *
+       * @param[in] cfg XML configuration
+       *
+       * Create  an ew instance The format of @p cfg is expected to be :
+       * @code
+       * <FlawFilter component="doNotMatch">
+       *   <Choice name="var1"/>
+       *   <Choice name="var2"/>
+       *   [...]
+       * </FlawFilter>
+       * @endcode
+       * Where all the @c vari are the names of the varibales we do not want to 
+       * be excluded by this filter
+       */
       DoNotMatchFilter(EUROPA::TiXmlElement const &cfg);
+      /** @brief Destructor */
       ~DoNotMatchFilter() {}
       
     private:

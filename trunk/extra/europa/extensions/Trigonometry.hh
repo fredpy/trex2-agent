@@ -52,6 +52,7 @@ namespace TREX {
      *       the domain of the cosine will be restricted even though the angle 
      *       is not a singleton (ie cos([0 90], var) will restrict var to [0 1])  
      * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
      */
     class CosineConstraint :public EUROPA::Constraint {
     public:
@@ -91,6 +92,7 @@ namespace TREX {
      *       the domain of the sine will be restricted even though the angle 
      *       is not a singleton (ie sin([0 90], var) will restrict var to [0 1])  
      * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
      */
     class SineConstraint :public EUROPA::Constraint {
     public:

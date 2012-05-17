@@ -43,9 +43,49 @@
 namespace TREX {
   namespace europa {
 
+    /** @brief Europa reactor
+     *
+     * This class implement the europa based reactor. This reactor interfaces between 
+     * T-REX and europa through its Assembly mother class in order to plan execute 
+     * actions in the agent using the Europa solver.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class EuropaReactor:public TREX::transaction::TeleoReactor, protected Assembly {
     public:
+      /** @brief XML constructor
+       *
+       * @param[in] arg XML informations
+       *
+       * Create a new instance using the information provide by @p arg
+       * The XML format for this reactor is as follow :
+       * @code
+       *  <EuropaReactor name="<name>" latency="<int>" lookahead="<int>"
+       *                 solverConfig="<cfg-file>" />
+       * @endcode 
+       *
+       * The reactor will then load a nddl model named @c <agent-name>.<name>.nddl
+       * -- or @c <name>.nddl if the former fle does not exist -- and configure its 
+       * solvers using <cfg-file> as the basis. 
+       *
+       * Optionally one can specify the model file to be used if he does not want 
+       * to used the same name for the reactor as the name of the model file. 
+       * Then the xml will be as follow :
+       * @code
+       *  <EuropaReactor name="<name>" latency="<int>" lookahead="<int>"
+       *                 solverConfig="<cfg-file>" model="<nddl-file>" />
+       * @endcode 
+       *
+       * @pre <cfg-file> is a valid XML europa solver configuration file
+       * @pre the specified or deduced nddl file name exists and is a valid ndddl file
+       *
+       * @throw TREX::utils::XmlError An error occured while trying to pars the XML definition of this reactor
+       * @throw TREX::transaction::ReactorException An error occured while trying to intialize this reactor
+       * @throw EuropaException europa related error while trying to load the model or solver configuration
+       */
       explicit EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      /** @brief Destructor */
       ~EuropaReactor();
 
     protected:

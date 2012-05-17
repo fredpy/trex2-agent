@@ -58,34 +58,112 @@ namespace TREX {
 
       typedef EUROPA::Id<CurrentState> CurrentStateId;
 
+      /** @brief list set accessor for CurrentStateId
+       *
+       * This class is used in order to idenitfy how to organize CurrentState
+       * europa Id intpo a list_set. All of them are identified by the timeline 
+       * their relate to.
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup europa
+       * @relates CurrentState
+       */
       struct CurrentStateId_id_traits {
 	typedef CurrentStateId     base_type;
 	typedef EUROPA::TimelineId id_type;
 
+        /** @brief Key accessor
+         *
+         * @param[in] cs A CurrentState instance
+         * @return the timeline associated to @p cs
+         */
 	static id_type get_id(base_type const &cs);
       }; // TREX::europa::details::CurrentStateId_id_traits
 
       class UpdateFlawIterator;
 
+      /** @brief External timeline predicate
+       *
+       * A functor that tests if a CurrentState instance refers to T-REX 
+       * External timeline
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup europa 
+       * @relates CurrentState
+       * @sa is_internal
+       */
       struct is_external {
-
+        /** @brief Test operator
+         *
+         * @param[in] timeline a CurrentState instance
+         *
+         * @retavl true if the timleine of @p timeline is currently a T-REX External timeline
+         * @retval false oterhwise
+         */
 	bool operator()(CurrentStateId const &timeline) const;
       }; // TREX::europa::details::is_external
 
+      /** @brief Internal timeline predicate
+       *
+       * A functor that tests if a CurrentState instance refers to T-REX 
+       * Internal timeline
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup europa 
+       * @relates CurrentState
+       * @sa is_external
+       */
       struct is_internal {
 
+        /** @brief Test operator
+         *
+         * @param[in] timeline a CurrentState instance
+         *
+         * @retavl true if the timleine of @p timeline is currently a T-REX Internal timeline
+         * @retval false oterhwise
+         */
 	bool operator()(CurrentStateId const &timeline) const;
       }; // TREX::europa::details::is_internal
 
+      /** @brief Token key extractor
+       *
+       * This class is used in order to implement a list_set that store europa 
+       * Tokens sorted by their key
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup europa
+       */
       struct token_id_traits {
 	typedef EUROPA::TokenId base_type;
 	typedef EUROPA::eint id_type;
 
+        /** @brief Key accessor
+         *
+         * @param[in] t A token
+         * @return The key of @p t
+         */
 	static id_type get_id(base_type const &t);
       }; // TREX::europa::details::token_id_traits
 
     } // TREX::europa::details
 
+    /** @brief T-REX/europa Deliberation/execution assembly
+     *
+     * This class bridges the gap between T-REX and Europa. While it does not 
+     * uses directly the representation from T-REX for Tokens, timelines, ... 
+     * and focuses on the europa internal representations; it provides an abstract 
+     * view of the core europa extensions required in order to implement a reactor 
+     * that handles to europa solvers for planning and synchronization. 
+     * As result the EuropaReactor class that derives from this class is mostly 
+     * a wrapper that handle T-REX execution and connection within an agent through 
+     * calls provided by this class which abstract most of the europa manipulations
+     * required.
+     *
+     * In that sense, one can see this class as the core engine of the EuropaReactor.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     private:
       typedef TREX::utils::list_set<details::CurrentStateId_id_traits> state_map;
@@ -94,18 +172,81 @@ namespace TREX {
       static std::string const PLAN_ATTR;
 
     public:
+      /** @brief T-REX timeline type name
+       *
+       * The symbolic name in NDDL for timelines that are meant to be shared 
+       * with other reactors
+       */
       static EUROPA::LabelStr const TREX_TIMELINE;
+      /** @brief External T-REX timeline name
+       *
+       * The symbolic name in NDDL used to declare T-REX timelines as External
+       */
       static EUROPA::LabelStr const EXTERNAL_MODE;
+      /** @brief Observe T-REX timeline name
+       *
+       * The symbolic name in NDDL used to declare T-REX timelines as Observer. 
+       * An observer timeline is an External timeline that do not accept goal. 
+       */
       static EUROPA::LabelStr const OBSERVE_MODE;
+      /** @brief Internal T-REX timeline name
+       *
+       * The symbolic name in NDDL used to declare T-REX timelines as Internal
+       */
       static EUROPA::LabelStr const INTERNAL_MODE;
+      /** @brief Private "T-REX" timeline name
+       *
+       * The symbolic name in NDDL used to declare T-REX timelines as Private. 
+       * This allow to use a  T-REX timeline in the model while not sharing it
+       * with the other reactors. 
+       */
       static EUROPA::LabelStr const PRIVATE_MODE;
+      /** @brief Ignored "T-REX" timeline name
+       *
+       * The symbolic name in NDDL used to declare T-REX timelines as Ignored. 
+       *
+       * @deprecated This cvonstrauct is inherited from older versions of T-REX
+       * where all the reactors where loading the same model instantianted 
+       * differently. For this reason the Ignored timelines where aloowing to 
+       * filter out some part of the rules. Now every europa reactor can load a 
+       * different model which made this construct useless appart for backward 
+       * compatibility. 
+       */
       static EUROPA::LabelStr const IGNORE_MODE;
 
+      /** @brief Mission end model variable
+       *
+       * The name of the variable in the model that is used by T-REX to indicate 
+       * the agent mission end tick. 
+       */
       static EUROPA::LabelStr const MISSION_END;
+      /** @brief Tick duration model variable
+       *
+       * The name of the variable in the model that is used by T-REX to indicate 
+       * the agent tick duration. This varaiable can be used by the agent to 
+       * convert ticks into a real-time value by a simple multiplication. 
+       */
       static EUROPA::LabelStr const TICK_DURATION;
+      /** @brief T-REX Clock model variable
+       *
+       * The name of the variable in the model that is used by T-REX to indicate 
+       * the advance of time. This varaiable lower bound is updated by T-REX to 
+       * be always greater or equal to the current tick. 
+       */
       static EUROPA::LabelStr const CLOCK_VAR;
 
+      /** @brief undefined predicate
+       *
+       * This is the name of the predicate T-REX will use when it is unable to 
+       * translate an observation into its europa equivalent.
+       */
       static std::string const UNDEFINED_PRED;
+      /** @brief Failed predicate
+       *
+       * This is the name of the predicate T_REX will use to indicate that the 
+       * owner of a timeline Failed to synchtonize. Such observation often 
+       * reflects that this timeline  is not owned by any reactor at this point.        
+       */
       static std::string const FAILED_PRED;
 
       /** @brief Constructor
@@ -280,12 +421,40 @@ namespace TREX {
         return m_ignored.end()!=m_ignored.find(obj);
       }
 
+      /** @brief Check if T-REX timeline
+       *
+       * @param[in] obj An europa object
+       *
+       * Check if @p obj is a T-REX timeline. This timeline can be shared with 
+       * other reactors or not.
+       *
+       * @retval true  if @p obj is a T-REX timeline.
+       * @retval false otherwise
+       */
       bool is_agent_timeline(EUROPA::ObjectId const &obj) const {
         return schema()->isA(obj->getType(), TREX_TIMELINE);
       }
+      /** @brief Check if T-REX timeline
+       *
+       * @param[in] type An europa object type
+       *
+       * Check if @p type is a T-REX timeline type.
+       *
+       * @retval true  if @p type is a T-REX timeline 
+       * @retval false otherwise
+       */
       bool is_agent_timeline(EUROPA::DataTypeId const &type) const {
         return schema()->isA(type->getName(), TREX_TIMELINE);
       }
+      /** @brief Check if T-REX timeline
+       *
+       * @param[in] toke An europa token
+       *
+       * Check if @p tok belongs to a T-REX timeline. 
+       *
+       * @retval true  if @p tok belongs to a T-REX timeline.
+       * @retval false otherwise
+       */
       bool is_agent_timeline(EUROPA::TokenId const &token) const;
 
       /** @brief Current tick
@@ -415,12 +584,57 @@ namespace TREX {
        */
       void add_state_var(EUROPA::TimelineId const &obj);
 
+      /** @brief Create a token
+       * @param[in] obj  A europa object
+       * @param[in] name A predicate name
+       * @param[in] fact A boolean flag
+       *
+       * Create a new token with the predicate type @p name and associate it 
+       * to the object @p obj. If @p fact is @c true this token will be created 
+       * as a fact, otherwise it swill be a rejectable goal.
+       *
+       * @pre The predicate @p name should exists for the object @p obj
+       *
+       * @throw EuropaException Failed to create the token. Probaly due to the 
+       * fact that @p obj does not decalre a predicate type @p name
+       *
+       * @return the newly created token
+       */
       EUROPA::TokenId create_token(EUROPA::ObjectId const &obj,
 				   std::string const &name,
 				   bool fact);
+      /** @brief Create a new observation
+       *
+       * @param[in] obj A europa object
+       * @param[in] pred A predciate name
+       * @param[out] undefined undefined predicate indicator
+       * 
+       * Attempt to create the observation @p pred for the object @p obj as 
+       * a fact. If the predicate @p pred does not exists then is will create 
+       * the special observation @c undefined and set @p undefined to @c true 
+       * (otherwise @p undefined is set to false)
+       *
+       *
+       * @pre @p obj is a T-REX External timeline.
+       *
+       * @throw EuropaException @p obj is not External
+       * @throw EuropaException failed to create the new token
+       *
+       * @return The newly created token
+       * @sa create_token(EUROPA::ObjectId const &, std::string const &, bool)
+       */
       EUROPA::TokenId new_obs(EUROPA::ObjectId const &obj,
 			      std::string &pred,
 			      bool &undefined);
+      /** @brief Goal recall notification
+       *
+       * @param[in] tok A goal token
+       *
+       * This method is used by the EuropaReactor to notify europa that the 
+       * token @p tok is not areuqested anymore. 
+       *
+       * @post @p tok is removed from the plan and deleted
+       */
       void recalled(EUROPA::TokenId const &tok);
 
 
@@ -437,37 +651,181 @@ namespace TREX {
         m_ignored.insert(obj);
       }
 
+      /** @brief Get europa schema
+       *
+       * Gives access to the Europa schema associated to this plan database. 
+       * The Europa schema is usefull to directly manipulate tokens within the 
+       * plan
+       *
+       * @return The europa schema for this plan database
+       */
       EUROPA::SchemaId           const &schema() const {
         return m_schema;
       }
+      /** @brief Get europa plan database
+       *
+       * Gives access to the europa plan database maintined by this instance
+       *
+       * @return The europa plan database
+       */
       EUROPA::PlanDatabaseId     const &plan_db() const {
         return m_plan;
       }
+      /** @brief Constraint engine
+       *
+       * Gives access to the europa constraint engine for this instance
+       *
+       * @return The constraint engine
+       */
       EUROPA::ConstraintEngineId const &constraint_engine() const {
         return m_cstr_engine;
       }
 
+      /** @brief Get declared mode of a T-REX timeline
+       *
+       * @param[in] obj An europa object
+       *
+       * Extract the variable that indicate the declared mode for @p obj 
+       * timeline. This method is used in order to identify what was the desired 
+       * mode for the T-REX timeline @p obj
+       *
+       * @pre @p obj is a T-REX timeline
+       * @return The variable defining the mode of the timleine @p obj
+       * @sa is_agent_timeline(EUROPA::ObjectId const &obj) const
+       */
       EUROPA::ConstrainedVariableId mode(EUROPA::ObjectId const &obj) const {
         return attribute(obj, MODE_ATTR);
       }
+      /** @brief Get default token type of a T-REX timeline
+       *
+       * @param[in] obj An europa object
+       *
+       * Extract the variable that indicates the declared defaul predicate for @p obj 
+       * timeline. This method is used in order to identify what was the desired 
+       * default predicate value for the T-REX timeline @p obj. When the reactor 
+       * is not able to identify it directly
+       *
+       * @pre @p obj is a T-REX timeline
+       * @return The variable defining the default predciate of the timleine @p obj
+       * @sa is_agent_timeline(EUROPA::ObjectId const &obj) const
+       *
+       * @note While in past T-REX version the default predicate was the only 
+       * choice evaluated during synchronization whan a Internal timeline did not 
+       * have a current state, this is now a less restrictive choice. Indeed our 
+       * solver will evaluate this default predicate first in such case but still 
+       * allow to evaluate other predicates (except Failed) if this solution was 
+       * still not valid.   
+       */
       EUROPA::ConstrainedVariableId default_pred(EUROPA::ObjectId const &obj) const {
         return attribute(obj, DEFAULT_ATTR);
       }
+      /** @brief Check for plan publication/subscription
+       *
+       * @param[in] obj An object.
+       *
+       * This method check for the new feature currently under experimenation. Indeed,
+       * since version 0.3.4 we allow timelines to publish their future to the 
+       * T-REX agent. Ths method chacks if the corresponbding T-REX timeline class 
+       * in europa is flagged as willing to publish/subscribe (depending if it is Internal/External)
+       * to this future plan.
+       *
+       * @retval true If @p obj is a T-REX timeline with its plan attribute set to @c true
+       * @retval false otherwise
+       */
       bool with_plan(EUROPA::ObjectId const &obj) const;
+      /** @brief Get T-REX timelines
+       *
+       * @param[out] timelines A list of europa objects
+       *
+       * Get all the T-REX timelines declared in the europa plan database and append 
+       * them at the end of @p timelines
+       */
       void trex_timelines(std::list<EUROPA::ObjectId> &timelines) const {
         plan_db()->getObjectsByType(TREX_TIMELINE, timelines);
       }
+      /** @brief Check for token type
+       *
+       * @param[in] obj A europa object
+       * @param[in] name A predciate name
+       *
+       * @retval true if @p name is a valid ptoken type for @p obj
+       * @retval false otherwise
+       */
       bool have_predicate(EUROPA::ObjectId const &obj,
 			  std::string &name) const;
 
 
+      /** @brief Check for internal timeline
+       *
+       * @param[in] name A timeline name
+       *
+       * This virtual method allow the assembly to ask to T-REX if the timeline
+       * @p name is currently declared as Internal by this reactor
+       *
+       * @retval true if @p name is currently Internal to this reactor
+       * @retval false otherwise
+       * @sa is_external(EUROPA::LabelStr const &) const
+       */
       virtual bool is_internal(EUROPA::LabelStr const &name) const =0;
+      /** @brief Check for external timeline
+       *
+       * @param[in] name A timeline name
+       *
+       * This virtual method allow the assembly to ask to T-REX if the timeline
+       * @p name is currently declared as External by this reactor
+       *
+       * @retval true if @p name is currently External to this reactor
+       * @retval false otherwise
+       * @sa is_internal(EUROPA::LabelStr const &) const
+       */
       virtual bool is_external(EUROPA::LabelStr const &name) const =0;
 
+      /** @brief New internal state notification
+       *
+       * @param[in] object The name of a timeline
+       * @param[in] obs A europa token
+       *
+       * This method is used as a callback to notify the reactor that the Internal 
+       * timeline @p object has changed its state to @p obs
+       */
       virtual void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs) =0;
+      /** @brief New external goal request
+       *
+       * @param[in] tl The name of a timeline
+       * @param[in] tok A europa token
+       *
+       * This method is used as a callback to notify the reactor that the token 
+       * @p tok is a new future goal for the External timeline @p tl 
+       */
       virtual bool dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok) =0;
+      /** @brief Token destruction notification
+       * @param[in] tok A token
+       *
+       * A callback that notifies the reactor that the token @p tok. Is now marked as 
+       * completed in the past.
+       *
+       * @retval true @p tok was part of the reactor requested goals
+       * @retval false @p tok is not known by the reactor 
+       */
       virtual bool discard(EUROPA::TokenId const &tok) { return false; }
+      /** @brief Token cancleation notification
+       * @param[in] tok A token
+       *
+       * A callback that notifies the reactor that the token @p tok has been 
+       * canceled from the plan. If @p tok had be dispatched it is then the 
+       * responsibility of the reactor to recall it.  
+       */
       virtual void cancel(EUROPA::TokenId const &tok) {}
+      /** @brief New Internal plan future
+       *
+       * @param[in] tl An Internal timeline
+       * @param[in] tok A token
+       *
+       * Notifies the reactor that the token @p tok is now part of the future 
+       * plan of timeline @p tl.
+       * This is used in order to implement our new faeture where reactors are 
+       * able to publish their plan whenever they are done planning.
+       */
       virtual void plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok) =0;
 
       /** @brief Iterator through TREX state variables
@@ -503,21 +861,89 @@ namespace TREX {
        */
       typedef boost::filter_iterator<details::is_internal, state_iterator> internal_iterator;
 
+      /** @brief T-REX timelines start iterator
+       *
+       * @return An iterator that points to the firrs element of the T-REX 
+       * timelines for this reactor. This set include all the timelines that 
+       * are presently shared by the reactor in T-REX.
+       *
+       * @sa end() const
+       * @sa begin_external() const
+       * @sa end_external() const
+       * @sa begin_internal() const
+       * @sa end_internal() const
+       */
       state_iterator begin() const {
         return m_agent_timelines.begin();
       }
+      /** @brief T-REX timelines end iterator
+       *
+       * @return An iterator that points to the end of the T-REX 
+       * timelines set for this reactor. This set include all the timelines that 
+       * are presently shared by the reactor in T-REX.
+       *
+       * @sa begin() const
+       * @sa begin_external() const
+       * @sa end_external() const
+       * @sa begin_internal() const
+       * @sa end_internal() const
+       */
       state_iterator end() const {
         return m_agent_timelines.end();
       }
+      /** @brief T-REX external timelines start iterator
+       *
+       * @return An iterator that points to the first element of the T-REX 
+       * external timelines for this reactor. 
+       *
+       * @sa end_external() const
+       * @sa begin() const
+       * @sa end() const
+       * @sa begin_internal() const
+       * @sa end_internal() const
+       */
       external_iterator begin_external() const {
         return external_iterator(begin(), end());
       }
+      /** @brief T-REX external timelines end iterator
+       *
+       * @return An iterator that points to the end of the T-REX external
+       * timelines set for this reactor. 
+       *
+       * @sa begin_external() const
+       * @sa begin() const
+       * @sa end() const
+       * @sa begin_internal() const
+       * @sa end_internal() const
+       */
       external_iterator end_external() const {
         return external_iterator(end(), end());
       }
+      /** @brief T-REX internal timelines start iterator
+       *
+       * @return An iterator that points to the first element of the T-REX 
+       * internal timelines for this reactor. 
+       *
+       * @sa end_internal() const
+       * @sa begin() const
+       * @sa end() const
+       * @sa begin_external() const
+       * @sa end_external() const
+       */
       internal_iterator begin_internal() const {
         return internal_iterator(begin(), end());
       }
+      /** @brief T-REX internal timelines end iterator
+       *
+       * @return An iterator that points to the end of the T-REX internal
+       * timelines set for this reactor. 
+       *
+       * @sa begin_internal() const
+       * @sa begin() const
+       * @sa end() const
+       * @sa begin_external() const
+       * @sa end_external() const
+       */
       internal_iterator end_internal() const {
         return internal_iterator(end(), end());
       }
@@ -599,61 +1025,277 @@ namespace TREX {
        */
       void getFuturePlan();
 
+      /** @brief Execute synchronization solver
+       *
+       * This method execute all the basic steps for a simple synchronization.
+       * The synchronization steps are sequenced as follow:
+       * @li Enforce current external state value; by either inserting new 
+       * observations or extending the duration of the previous observation)
+       * @li Execute the synchronization solver, this solver also identifies the 
+       * current state value of each of the internal timelines
+       * @li commit on the new state of each Internal timelines
+       *
+       * @pre The plan databse is in a consistent state
+       * @retval true This synchronization was sucessful
+       * @retval false One of the two first steps above did fail and the plan 
+       * database is potetntially in an inconsitent state. In any case, if the 
+       * returned value is @c false the synchronization failed to be resolved 
+       * and the reactor need to recover from this failure in order to succeed 
+       * its synchronization (often by calling relax)
+       *
+       * @sa relax(bool)
+       */
       bool do_synchronize();
+      /** @brief relax plan database
+       *
+       * @param[in] aggressive A boolean flag
+       *
+       * Relax the plan database constraints in order to bring back the plan in 
+       * a consitent state. If @p aggressive is @c true then this method will in 
+       * addition remove from the plan all the tokens that necessarily end in the
+       * past (ie before now())
+       *
+       * @retval true The plan database is consistent after relaxation
+       * @retval false The plan database is still inconsitent
+       */
       bool relax(bool aggressive);
+      /** @brief Archival of the past
+       *
+       * This method is called in order to allow the plan database to forget
+       * about the past and by doing so reduce the tokens to the solvers and 
+       * constraint engine manipulate. Such operation is necessaary as europa 
+       * operations complexity is driectly linked to the number of tokens to the 
+       * plan.
+       *
+       * @note As of today the approach used in this implementation (based on the 
+       * Europa archive method) does not appear to be efficient on cleaning the 
+       * plan
+       */
       void archive();
 
+      /** @brief Log the plan structure
+       *
+       * @param[in,out] out An output stream
+       * @param[in] expanded A flag 
+       *
+       * Write the current plan in the plan database in a graphviz format to the 
+       * output stream @p out. @p expended flag indicates whether the display should be 
+       * "compact" -- where all the merged tokens are seen as one -- or expanded
+       */
       void print_plan(std::ostream &out, bool expanded=false) const;
     private:
+      /** @brief Token manipulation event listener
+       *
+       * @relates Assembly
+       *
+       * This class is used by Assembly in order to listen to the token 
+       * manipulation events from the europa plan database.
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       */
       class listener_proxy :public EUROPA::PlanDatabaseListener {
       public:
-        listener_proxy(Assembly &owner):EUROPA::PlanDatabaseListener(owner.plan_db()), m_owner(owner) {}
+        /** @brief Constructor
+         * @param[in] owner the creator Assembly
+         */
+        listener_proxy(Assembly &owner)
+          :EUROPA::PlanDatabaseListener(owner.plan_db()), m_owner(owner) {}
+        /** @brief Destructor 
+         */
         ~listener_proxy() {}
 
       private:
+        /** @brief Token addition callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been created 
+         * in the plan database
+         */
         void notifyAdded(EUROPA::TokenId const &token);
+        /** @brief Token destruction callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been removed from 
+         * the plan database
+         */
         void notifyRemoved(EUROPA::TokenId const &token);
 
+        /** @brief Token activation callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been made active in the 
+         * plan.
+         */
         void notifyActivated(EUROPA::TokenId const &token);
+        /** @brief Token deactivation callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been deactivated from the 
+         * plan.
+         */
         void notifyDeactivated(EUROPA::TokenId const &token);
 
+        /** @brief Merged token callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been merged with an active 
+         * token from the plan.
+         */
         void notifyMerged(EUROPA::TokenId const &token);
+        /** @brief Split token callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been split from an active 
+         * token from the plan.
+         */
         void notifySplit(EUROPA::TokenId const &token);
 
+        /** @brief Token rejection callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token has just been rejected from the plan.
+         */
         void notifyRejected(EUROPA::TokenId const &token);
+        /** @brief Token reinstatiation callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token is no longer rejected from the plan.
+         */
         void notifyReinstated(EUROPA::TokenId const &token);
 
+        /** @brief Token commitment callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token is now committed. A committed token 
+         * is considered as fully proved and allow constraint propagation to 
+         * stop. 
+         */
         void notifyCommitted(EUROPA::TokenId const &token);
+        /** @brief Token termination callback
+         * @param[in] token A Token
+         *
+         * Notifies that the token @p token is now terminated. A terminated token 
+         * is a good candidate to be archived by the europa archive() primitive
+         */
         void notifyTerminated(EUROPA::TokenId const &token);
 
         Assembly &m_owner;
       };
 
+      /** @brief Token Listner proxy
+       * 
+       * A pointter to a plan database listener notifying events related 
+       * to token manipulation. This proxy is used for the assembly to update 
+       * the current status of specific tokens of the plan.
+       *
+       * @sa listener_proxy
+       */
       std::auto_ptr<listener_proxy> m_proxy;
+      /** @brief name of the Assembly
+       *
+       * This is the name of the assembly which should be the name of the 
+       * reactor within T-REX.
+       */
       std::string m_name;
+      /** @brief europa plugins/logging schema
+       *
+       * A reference to the Schema class. This class is used for basic 
+       * manipulation within europa. Such as :
+       * @li loading Europa extension though EuropaPlugin exisiting instances
+       * @li switching the europa debug log file
+       */
       TREX::utils::SingletonUse<details::Schema> m_trex_schema;
 
       EUROPA::SchemaId           m_schema;
       EUROPA::PlanDatabaseId     m_plan;
       EUROPA::ConstraintEngineId m_cstr_engine;
 
+      /** @brief Deliberation solver
+       *
+       * The solver used by the reactor during deliberation steps
+       */
       EUROPA::SOLVERS::SolverId m_planner;
+      /** @brief Synchronization solver
+       *
+       * The solver used by the reactor during its synchronization
+       */
       EUROPA::SOLVERS::SolverId m_synchronizer;
 
       // Plan database special objects
+      /** @brief clock variable
+       *
+       * The variable within the model used to represent the T-REX clock as 
+       * it advance
+       */
       EUROPA::ConstrainedVariableId m_clock;
+      /** @brief Ignored objects
+       *
+       * A set of al the objects in the plan database that are ignored 
+       * by the solvers
+       */
       EUROPA::ObjectSet m_ignored;
+      /** @rbrief T-REX shared timelines
+       *
+       * The set of all the T-REX timelines that are either Internal or External 
+       * to the reactor
+       */
       state_map         m_agent_timelines;
-      EUROPA::TokenSet  m_roots, m_completed;
+      /** @brief Root tokens
+       *
+       * The set of all the tokens which have no master. Often these tokens 
+       * correspond to T-REX tokens such as the goals or observations received 
+       * from other reactor or produced to the agent.
+       */
+      EUROPA::TokenSet  m_roots;
+      /** @brief Completed tokens 
+       *
+       * The set of all the tokens which have been identifed as completed before 
+       * the current tick
+       */
+      EUROPA::TokenSet  m_completed;
 
+      /** @brief Europa debug file
+       *
+       * The file this assembly will use for europa debug log messages.
+       */
       mutable std::ofstream m_debug;
 
+      /** @brief Object attroibute extraction
+       * @param[in] obj An object
+       * @param[in] attr The name of an aattribute
+       *
+       * Extract the variable representing the attribute @p attr of @p obj
+       *
+       * @pre @p obj has an attribute named @p attr
+       * @throe EuropaException Failed to extract the attribute @p attr from @p obj
+       *
+       * @return The variable for the attribute @p attr of @p obj
+       */
       EUROPA::ConstrainedVariableId attribute(EUROPA::ObjectId const &obj,
                                               std::string const &attr) const;
+      /** @brief Object predicates
+       *
+       * @param[in] obj An object
+       * @param[out] pred A set
+       *
+       * Store all the possible predicates of @p obj in the set @p pred
+       */
       void predicates(EUROPA::ObjectId const &obj, std::set<EUROPA::LabelStr> &pred) const {
         return schema()->getPredicates(obj->getObjectType(), pred);
       }
+      /** @brief New observation notification
+       *
+       * @param[in] state A timeline maintainer
+       *
+       * Notifies the assembly that the timeline referred by @p state just started 
+       * a new token for this tick.
+       */
       void notify(details::CurrentState const &state);
+      /** @brief token termination
+       *
+       * @param[in] tok A token
+       * Notifies that the token @p tok has a end  time which is before the current tick
+       */
       void terminate(EUROPA::TokenId const &tok);
 
 
@@ -662,65 +1304,6 @@ namespace TREX {
       friend class TREX::europa::details::CurrentState;
       friend class listener_proxy;
     }; // TREX::europa::Assembly
-
-
-/*    class Assembly_old :public EUROPA::EngineBase, boost::noncopyable {
-
-
-
-
-      virtual void discard(EUROPA::TokenId const &tok) {}
-      virtual void cancel(EUROPA::TokenId const &tok) {}
-      virtual bool dispatch(EUROPA::TimelineId const &tl,
-                            EUROPA::TokenId const &tok) =0;
-      void recalled(EUROPA::TokenId const &tok);
-
-
-      virtual void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs) =0;
-
-
-
-      EUROPA::TokenId create_token(EUROPA::ObjectId const &obj,
-				   std::string const &name,
-				   bool fact);
-
-
-      bool relax(bool destructive, std::string const &fname) {
-        if( relax(destructive) ) {
-          std::ofstream out(fname.c_str());
-          print_plan(out);
-          return true;
-        }
-        return false;
-      }
-      bool relax(bool destructive);
-      void archive();
-
-      void print_plan(std::ostream &out, bool expanded=true) const;
-
-    private:
-
-
-      bool internal(details::CurrentState const &state) const;
-      void notify(details::CurrentState const &state);
-
-      EUROPA::RulesEngineId      m_rules_engine;
-
-
-
-
-
-    protected:
-
-      EUROPA::TokenId new_obs(EUROPA::ObjectId const &obj,
-			      std::string &pred,
-			      bool &undefined);
-
-    private:
-      void doDiscard(EUROPA::TokenId const &tok);
-
-    }; // TREX::europa::Assembly
- */
 
   } // TREX::europa
 } // TREX

@@ -42,15 +42,47 @@
 namespace TREX {
   namespace europa {
     
+    /** @brief Reactor information constraints
+     *
+     * This abstract class allows to implement a constraint that have access
+     * to all the public methods of the Assembly it is tied too. By doing so one 
+     * can implement constraints in europa that can manipulate information of
+     * the reactor within the T-REX agent or the agent itself.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup europa
+     */
     class ReactorConstraint :public EUROPA::Constraint {
     public:
+      /** @brief Constructor
+       *
+       * @param[in] name symbolic name of the constraint
+       * @param[in] propagatorName symbolic name of the propagator that handle this constraint
+       * @param[in] cstrEngine A constraint engine
+       * @param[in] vars The list of argument passed as argument to this constraint
+       *
+       * The standard signature for a ceuropa constraint constructor as expected from 
+       * the constraint factory from europa
+       *
+       * @pre The propagator @p propagatorName should be a ReactorPropagator. Every Assembly instance 
+       * often create the propagator @c "trex" which is of this type
+       *
+       * @sa ReactorPropagator
+       */
       ReactorConstraint(EUROPA::LabelStr const &name,
 			EUROPA::LabelStr const &propagatorName,
 			EUROPA::ConstraintEngineId const &cstrEngine,
 			std::vector<EUROPA::ConstrainedVariableId> const &vars);
+      /** @brief Destructor */
       virtual ~ReactorConstraint() {}
       
     protected:
+      /** @brief Get the attached assembly
+       *
+       * @pre this constraint instance was created by an Assembly
+       * @throw EuropaException The propagator for this constraint is not a ReactorPropagator
+       * @return the Assembly that manipulate this constraint
+       */
       Assembly &assembly();
       
     private:

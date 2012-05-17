@@ -44,24 +44,61 @@ namespace TREX {
      * This class is used to represent europa entities such as objects. It 
      * represent the set of possible values as an enumeration of the name of all 
      * the possible instances.  
+     *
+     * @author Frederic Py
+     * @ingroup europa
      */
     class EuropaEntity 
-      :public TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> {
+    :public TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> {
       typedef TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> base_class;
     public:
       static TREX::utils::Symbol const type_name;
       
+      /** @brief Constructor
+       *
+       * Creates a full domain
+       */
       EuropaEntity()
 	:base_class(type_name) {}
+      /** @brief Constructor
+       *
+       * @tparam Iter An iterator type
+       * @param[in] from Intial iterator
+       * @param[in] to End iterator
+       *
+       * Create a new domain that contains all the values pointed by the 
+       * [@p from, @p to) iterator interval
+       */
       template<class Iter>
       EuropaEntity(Iter from, Iter to)
 	:base_class(type_name, from, to) {}
+      /** @brief singleton constructor
+       *
+       * @param[in] val A value
+       *
+       * Create the domain with the single value @p val
+       */
       explicit EuropaEntity(TREX::utils::Symbol const &val) 
 	:base_class(type_name, val) {}
+      /** @brief XML constructor 
+       * @param[in] node XML decsciption of the domain
+       *
+       * Creat a new domain based on the XML description in @p node. The XML 
+       * format for this domain is :
+       * @code
+       * <europa_object>
+       *   <elem value="<val1>" />
+       *   <elem value="<val2>" />
+       *   [...]
+       * </europa_object>
+       * @endcode
+       */
       explicit EuropaEntity(boost::property_tree::ptree::value_type &node)
 	:base_class(node) {}
+      /** @brief Destructor */
       ~EuropaEntity() {}
 
+       
       TREX::transaction::DomainBase *copy() const {
 	return new EuropaEntity(*this);
       }      

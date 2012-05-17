@@ -105,6 +105,24 @@ namespace TREX {
     } // TREX::utils::details
 
 
+    /** @brief A Generic XML based factory
+     *
+     * @tparam Product The base type for the factory products
+     * @tparam Output  The type returned by the factory
+     * @tparam Arg     Optional extra type to be given with the Xml tree
+     *
+     * This template class implments a factory that can create new @p Product 
+     * based on an XML description -- represented as a Boost.PropertyTree -- and 
+     * an optional extra object of type @p Arg.
+     *
+     * It is a wrapper of the template class Factory that ease both the declaration 
+     * and provides extra utilities that takes benefit of the XML structure.
+     *
+     * @sa Factory
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup utils
+     */
     template<class Product, class Output=Product *, class Arg=void>
     class XmlFactory :boost::noncopyable {
       typedef boost::property_tree::ptree tree_t;

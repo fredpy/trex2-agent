@@ -44,6 +44,10 @@ using namespace TREX::europa::details;
 namespace EUROPA {
   namespace SOLVERS {
     
+    /*
+     * Specializations of getMatches* in the europa matching engine in order to
+     * be able to manage our new CurrentState flaws
+     */ 
     template<>
     void MatchingEngine::getMatchesInternal(TREX::europa::details::CurrentStateId const &inst, 
                                             std::vector<MatchingRuleId> &results) {

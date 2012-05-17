@@ -1,11 +1,3 @@
-/** @file "AuvSwitch.hh"
- *  @brief lightswitch plug-in utilities
- *
- *  This file defines the utilities provided by the lightswitch plug-in. 
- *  
- *  @ingroup lightswitch
- *  @author Frederic Py <fpy@mbari.org>
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -38,6 +30,14 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
+ */
+/** @file "StarTrex.hh"
+ *  @brief lightswitch plug-in utilities
+ *
+ *  This file defines the utilities provided by the lightswitch plug-in. 
+ *  
+ *  @ingroup startrex
+ *  @author William Tan
  */
 #ifndef H_StarTrex
 # define H_StarTrex

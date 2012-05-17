@@ -46,12 +46,40 @@ namespace TREX {
 
     using namespace EUROPA;
     
+    /** @brief absf NDDL function
+     *
+     * Declare the absolute value function within nddl language
+     *
+     * @relates AbsValConstraint
+     * @ingroup europa
+     */
     DECLARE_FUNCTION_TYPE(AbsValConstraint, abs, 
                           "absf", EUROPA::FloatDT, 1); 
+    /** @brief sqrtf NDDL function
+     *
+     * Declare the square root function within nddl language
+     *
+     * @relates SqrtConstraint
+     * @ingroup europa
+     */
     DECLARE_FUNCTION_TYPE(SqrtConstraint, sqrt, 
                           "sqrtf", EUROPA::FloatDT, 1); 
+    /** @brief sinf NDDL function
+     *
+     * Declare the sine function within nddl language
+     *
+     * @relates SineConstraint
+     * @ingroup europa
+     */
     DECLARE_FUNCTION_TYPE(SineConstraint, sin, 
                           "sinf", EUROPA::FloatDT, 1); 
+    /** @brief cosf NDDL function
+     *
+     * Declare the cosine function within nddl language
+     *
+     * @relates CosineConstraint
+     * @ingroup europa
+     */
     DECLARE_FUNCTION_TYPE(CosineConstraint, cos, 
                           "cosf", EUROPA::FloatDT, 1); 
     
@@ -80,6 +108,7 @@ namespace {
    * @note While these extensions are for now included by deault in the europa 
    *      plugin, we may decide in the futrue to provide them as an extr plugin 
    *      are none of them are critical.  
+   * @ingroup europa
    */
   class Extensions :public TREX::europa::EuropaPlugin {
     public:
