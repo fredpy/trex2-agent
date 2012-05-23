@@ -77,15 +77,6 @@ of the head.
 
 TREX uses third party utilities and libraries. Here's sa list of them
 : 
-@li @b rapidXML (http://rapidxml.sourceforge.net/) This is used for
-configuration parsing.  TREX used to rely on TinyXML version embedded
-in Europa but keeping this would have been annoying as this version
-was part of Europa and keeping the ability to connect to Europa while
-using a version of TinyXML which is not necessarily the Europa one
-would have been tricky. On top of that rapidxml is really lightweight
-(only templates defined in C++ headers) and very fast (performance
-close to strlen). The version used -- and provided -- for this package
-is 1.13.
 @li @b boost (http://www.boost.org) This library is widely used for
 basic utilities and compatibilty with the TR1 C++0x standard. As we use
 flyweight, boost graph and property tree the earliest version 
@@ -98,14 +89,17 @@ if you want  to generate this documentation.
 documentation but it may also be used for plan visualization by
 showing tokens and their relations as a graph.
 
-@note rapidxml is bundled into TREX. Nothing as been changed in this
-libray and if one prefers to use another version of this library he
-justs need to define the environment variable @c TINY_XML_ROOT with
-the directory where this one is before compiling TREX.
-
 To compile trex libraries there's currently one approach supported:
 @li @b cmake (http://www.cmake.org/) newly added which -- among other things --
    allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+
+We also provide two plug-ins in the extr directory that are set o be compiled by default. While none 
+of these 2 are part of the core of T-REX they are providing an inital set of features that makes T-REX more practical.
+These two plug-ins require the following libraries :
+@li the @e europa plug-in requires @b europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above. It provides a reactor 
+  that uses europa planner to plan and execute within trex
+@li the @e witre plug-in requires @b Wt library (http://www.webtoolkit.eu/wt) version 3.2.0 or above. It provides a reactor that acts 
+as a web interface to the agent showing observations exchanged between reactors and allowing to pos new goals.
 
 @section install-cmake Compiling with cmake
 
@@ -141,15 +135,26 @@ directory)
 -- Check for working CXX compiler: /usr/bin/c++ -- works
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- Boost version: 1.46.1
--- Found the following Boost libraries:
---   system
--- Looking for pthread_self in pthread
--- Looking for pthread_self in pthread - found
--- Looking for clock_gettime in rt
--- Looking for clock_gettime in rt - not found
+-- trex VERSION = 0.3.3
 -- Looking for dlopen in dl
 -- Looking for dlopen in dl - found
+-- Looking for pthread_self in pthread
+-- Looking for pthread_self in pthread - found
+-- Looking for shm_unlink in rt
+-- Looking for shm_unlink in rt - not found
+-- Boost version: 1.49.0
+-- Found the following Boost libraries:
+--   thread
+--   system
+--   signals
+--   chrono
+--   filesystem
+-- Europa found : include directory is /Users/fpy/Coding/europa-2/include
+-- Found Doxygen: /opt/local/bin/doxygen 
+-- Found the Wt libraries at /usr/local/lib/libwt.dylib;/usr/local/lib/libwtext.dylib;/usr/local/lib/libwthttp.dylib;/usr/local/lib/libwtdbo.dylib;/usr/local/lib/libwtdbosqlite3.dylib;/usr/local/lib/libwtfcgi.dylib
+-- Found the Wt headers at /usr/local/include
+-- Found the Wt debug libraries at /usr/local/lib/libwt.dylib;/usr/local/lib/libwtext.dylib;/usr/local/lib/libwthttp.dylib;/usr/local/lib/libwtdbo.dylib;/usr/local/lib/libwtdbosqlite3.dylib;/usr/local/lib/libwtfcgi.dylib
+-- Found the Wt debug headers at /usr/local/include
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /Users/fpy/Coding/trex2.build

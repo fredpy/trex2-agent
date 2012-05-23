@@ -643,8 +643,7 @@ RECURSIVE              = YES
 
 EXCLUDE                = .svn/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/ \
-                         @CMAKE_CURRENT_SOURCE_DIR@/log/ \
-			 @CMAKE_CURRENT_SOURCE_DIR@/rapidxml/ 
+                         @CMAKE_CURRENT_SOURCE_DIR@/log/ 
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
@@ -728,7 +727,7 @@ FILTER_SOURCE_FILES    = NO
 # Note: To get rid of all source code in the generated output, make sure also 
 # VERBATIM_HEADERS is set to NO.
 
-SOURCE_BROWSER         = YES
+SOURCE_BROWSER         = NO
 
 # Setting the INLINE_SOURCES tag to YES will include the body 
 # of functions and classes directly in the documentation.
