@@ -270,6 +270,10 @@ namespace TREX {
       double tickToTime(TICK cur) const {
 	return m_graph.tickToTime(cur);
       }
+      std::string date_str(TICK cur) const {
+        return m_graph.date_str(cur);      
+      }
+
       /** @brief Get current tick
        *
        * @return current tick date

@@ -519,6 +519,9 @@ namespace TREX {
 	return cur*tickDuration();
       }
 
+      virtual std::string date_str(TICK cur) const;
+
+      
       /** @brief Number of reactors
        *
        * @return the number of reactors in this graph

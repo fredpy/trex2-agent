@@ -36,12 +36,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cmath>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "RealTimeClock.hh"
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::agent;
+
+namespace bt = boost::posix_time;
 
 
 namespace {
@@ -184,3 +187,11 @@ double RealTimeClock::getSleepDelay() const {
     return Clock::getSleepDelay();
 }
   
+std::string RealTimeClock::date_str(TICK &tick) const {
+  timeval tv;
+  getDate(tv);
+  bt::ptime date = bt::from_time_t(tv.tv_sec) + bt::microsec(tv.tv_usec);
+  std::ostringstream oss;
+  oss<<date;
+  return oss.str();
+}
