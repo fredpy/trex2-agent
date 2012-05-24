@@ -15,9 +15,9 @@ namespace mbari {
     bool handleMessage(amqp::queue::message &msg);
     bool synchronize();
 
-    bool        m_fresh;
-    std::string m_asset;
-    location    m_position;
+    typedef std::pair<bool, location> asset_info;
+    typedef std::map<std::string, asset_info> asset_map;
+    asset_map m_assets;
   }; // mbari::PositionHandler
 
 } // mbari 
