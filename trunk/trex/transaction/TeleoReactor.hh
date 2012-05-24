@@ -783,7 +783,7 @@ namespace TREX {
        * @c false. The @p plan_listen flag aloow the reactor to be notified whenever the 
        * owner of this timeline does give the current tokens it has in his future plan
        *
-       * @pre The timleine is not already @e Internal
+       * @pre The timeline is not already @e Internal
        *
        * @warning The type of a timeline can change during reactor execution and this
        * is the reason why this methods give no feedback. It is always recommend to
@@ -793,6 +793,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, details::transaction_flag const &)
        * @sa provide(TREX::utils::Symbol const &)
+       * @sa unuse(TREX::utils::Symbol const &)
        */
       void use(TREX::utils::Symbol const &timeline, bool control=true, bool plan_listen=false);
 
@@ -808,15 +809,51 @@ namespace TREX {
        * is the reason why this methods give no feedback. It is always recommend to
        * check the success/failure of this operation using isInternal
        *
-       * @note If the timlien was @p External and is not woned yet by any reactor, this
+       * @note If the timeline was @p External and is not owned yet by any reactor, this
        *       call will promote it as @p Internal
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &)
        * @sa use(TREX::utils::Symbol const &, bool)
+       * @sa unprovide(TREX::utils::Symbol const &)
        */
       void provide(TREX::utils::Symbol const &timeline, bool controllable=true, bool publish=false);
+      
+      /** @brief External timeline unsubscription
+       *
+       * @param[in] timeline A timeline name
+       *
+       * Remove the External declaration of @p timeline from this reactor
+       *
+       * @retval true operation succeeded
+       * @retval false @p timeline was probably not External to this reactor
+       *
+       * @post @p timeline is not External to this reactor
+       *
+       * @sa isExternal(TREX::utils::Symbol const &) const
+       * @sa use(TREX::utils::Symbol const &, bool)
+       * @sa unprovide(TREX::utils::Symbol const &)
+       * @sa isolate()
+       */
+      bool unuse(TREX::utils::Symbol const &timeline);
+      /** @brief Internal timeline unsubscription
+       *
+       * @param[in] timeline A timeline name
+       *
+       * Remove the Internal declaration of @p timeline from this reactor
+       *
+       * @retval true operation succeeded
+       * @retval false @p timeline was probably not Internal to this reactor
+       *
+       * @post @p timeline is not Internal to this reactor
+       *
+       * @sa isInternal(TREX::utils::Symbol const &) const
+       * @sa unuse(TREX::utils::Symbol const &)
+       * @sa provide(TREX::utils::Symbol const &, bool, bool)
+       * @sa isolate()
+       */
+      bool unprovide(TREX::utils::Symbol const &timeline);
 
       /** @brief Request for external failed
        *

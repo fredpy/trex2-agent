@@ -668,7 +668,7 @@ namespace TREX {
                   details::transaction_flags const &flags);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
 		     details::transaction_flags const &flags);
-
+      
       details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
 
       utils::Symbol            m_name;
