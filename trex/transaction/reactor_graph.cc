@@ -88,6 +88,12 @@ bool graph::is_isolated(graph::reactor_id r) const {
   return m_quarantined.find(r->getName())!=m_quarantined.end();
 }
 
+std::string graph::date_str(TICK cur) const {
+  std::ostringstream oss;
+  oss<<cur;
+  return oss.str();
+}
+
 
 void graph::clear() {
   while( !m_reactors.empty() ) {

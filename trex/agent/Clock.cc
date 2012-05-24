@@ -83,3 +83,11 @@ void Clock::advanceTick(TICK &tick) {
 void Clock::sleep() const {
   sleep(getSleepDelay());
 }
+
+// observers :
+
+std::string Clock::date_str(TICK &tick) const {
+  std::ostringstream oss;
+  oss<<tick;
+  return oss.str();
+}

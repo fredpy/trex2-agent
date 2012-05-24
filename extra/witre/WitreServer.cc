@@ -248,9 +248,11 @@ void WitreServer::notify(Observation const &obs)
 bool WitreServer::synchronize()
 {
     boost::mutex::scoped_lock lock(mutex_);
-    time_t now = std::floor(tickToTime(getCurrentTick()+1));
+  TREX::transaction::TICK date = getCurrentTick();
+    std::string now = date_str(date+1);
+  // time_t now = std::floor(tickToTime(getCurrentTick()+1));
     std::ostringstream oss;
-    oss<<"<Token tick=\""<<getCurrentTick()<<"\" on=\"Tick\">"<<now<<"</Token>";
+    oss<<"<Token tick=\""<<date<<"\" on=\"Tick\">"<<now<<" ("<<(date+1)<<")</Token>";
     //Storing ticks
     observations.push(oss.str());
     //Notify all connected clients

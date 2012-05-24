@@ -360,6 +360,9 @@ namespace TREX {
       double tickToTime(TREX::transaction::TICK cur) const {
 	return m_clock->tickToTime(cur);
       }
+      std::string date_str(TREX::transaction::TICK cur) const {
+        return m_clock->date_str(cur);
+      }
       
     private:
       void internal_check(reactor_id r, 

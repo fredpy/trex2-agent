@@ -126,6 +126,15 @@ namespace TREX {
        * @throw ErrnoExcept An error occurred while trying to sleep
        */
       static void sleep(double sleepDuration);
+      /** @brief Get tick string
+       *
+       * @param[in] tick A tick
+       * 
+       * Display @p tick in human readable format. 
+       *
+       * @return A string representation for @p tick
+       */
+      virtual std::string date_str(TREX::transaction::TICK &tick) const;
 
       /** @brief XML factory for clocks. */
       typedef TREX::utils::XmlFactory<Clock> xml_factory;
@@ -167,6 +176,7 @@ namespace TREX {
        * relevant to have the tick variable located on this class.
        */
       void advanceTick(TREX::transaction::TICK &tick);
+      
 
     private:
       double const m_sleepSeconds;
