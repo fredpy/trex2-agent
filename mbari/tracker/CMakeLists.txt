@@ -41,72 +41,53 @@ if(MBARI_TRACKER)
   find_package(Protobuf)
   # Check for rabbitmq
   check_library_exists(rabbitmq amqp_new_connection "" LIB_AMQP)
-  # Check for Poco
-  find_path(POCO_INCLUDE_DIR Poco/Poco.h 
-    PATHS /usr/local/include 
-          /usr/include 
-          /opt/local/include
-	  )
-  find_library(POCO_NET_LIBRARY
-    NAMES PocoNet
-    PATHS /usr/local/lib 
-          /usr/lib 
-	  /opt/local/lib
-	  )
 
   
   if(LIB_AMQP)
     if(PROTOBUF_FOUND)
-      if(POCO_NET_LIBRARY)
-	include_directories(${PROTOBUF_INCLUDE_DIRS})
-	include_directories(${CMAKE_CURRENT_BINARY_DIR})
-	protobuf_generate_cpp(TRACKER_PROTO_SRCS TRACKER_PROTO_HDRS platformMessage.proto)
-	protobuf_generate_cpp(SENSOR_PROTO_SRCS SENSOR_PROTO_HDRS sensor.proto)
-	protobuf_generate_cpp(TREX_PROTO_SRCS TREX_PROTO_HDRS trex.proto)
+      include_directories(${PROTOBUF_INCLUDE_DIRS})
+      include_directories(${CMAKE_CURRENT_BINARY_DIR})
+      protobuf_generate_cpp(TRACKER_PROTO_SRCS TRACKER_PROTO_HDRS platformMessage.proto)
+      protobuf_generate_cpp(SENSOR_PROTO_SRCS SENSOR_PROTO_HDRS sensor.proto)
+      protobuf_generate_cpp(TREX_PROTO_SRCS TREX_PROTO_HDRS trex.proto)
+      
 
-	include_directories(${POCO_INCLUDE_DIR})
+      add_library(MBARIamqp SHARED
+	AMQP_connection.cc
+	AMQP_listener.cc
+	AMQP_queue.cc
+	${TRACKER_PROTO_SRCS}
+	${SENSOR_PROTO_SRCS}
+	${TREX_PROTO_SRCS}
+	DrifterTracker.cc
+	location.cc
+	MessageHandler.cc
+	PositionHandler.cc
+	DoradoHandler.cc
+	#headers
+	AMQP_connection.hh
+	AMQP_listener.hh
+	AMQP_queue.hh
+	DrifterTracker.hh
+	point.hh
+	location.hh
+	serie.hh
+	MessageHandler.hh
+	PositionHandler.hh
+	DoradoHandler.hh
+	)
+      target_link_libraries(MBARIamqp 
+	MBARIshared
+	TREXtransaction 
+	rabbitmq
+	${Boost_LIBRARIES}
+	${PROTOBUF_LIBRARIES})
+      install(TARGETS MBARIamqp DESTINATION lib)    
+      trex_lib(MBARIamqp)
 
-	add_library(MBARIamqp SHARED
-	  AMQP_connection.cc
-	  AMQP_listener.cc
-	  AMQP_queue.cc
-	  ${TRACKER_PROTO_SRCS}
-	  ${SENSOR_PROTO_SRCS}
-	  ${TREX_PROTO_SRCS}
-	  DrifterTracker.cc
-	  location.cc
-	  MessageHandler.cc
-	  PositionHandler.cc
-	  DoradoHandler.cc
-	  SbdMailer.cc
-	  #headers
-	  AMQP_connection.hh
-	  AMQP_listener.hh
-	  AMQP_queue.hh
-	  DrifterTracker.hh
-	  point.hh
-	  location.hh
-	  serie.hh
-	  MessageHandler.hh
-	  PositionHandler.hh
-	  DoradoHandler.hh
-	  SbdMailer.hh
-	  )
-	target_link_libraries(MBARIamqp 
-	  MBARIshared
-	  TREXtransaction 
-	  rabbitmq
-	  ${Boost_LIBRARIES}
-	  ${PROTOBUF_LIBRARIES}
-	  ${POCO_NET_LIBRARY})
-	install(TARGETS MBARIamqp DESTINATION lib)    
-	trex_lib(MBARIamqp)
+      trex_plugin(dta tracker_plugin.cc)
+      target_link_libraries(dta_pg MBARIamqp)
 
-	trex_plugin(dta tracker_plugin.cc)
-	target_link_libraries(dta_pg MBARIamqp)
-      else(POCO_NET_LIBRARY)
-	message(SEND_ERROR "Cannot compile MBARI tracker without Poco")
-      endif(POCO_NET_LIBRARY)
     else(PROTOBUF_FOUND)
       message(SEND_ERROR "Cannot compile MBARI tracker without protobuf")
     endif(PROTOBUF_FOUND)   
