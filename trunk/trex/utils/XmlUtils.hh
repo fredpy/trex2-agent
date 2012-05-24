@@ -94,8 +94,12 @@ namespace TREX {
        * 
        * This class is used internally as an helper to extract the value of an 
        * XML attribute and parse it as a @p Ty instance 
+       *
+       * It is used by the parse_attr methods in order to extract and parse an 
+       * attribute from an XML tag.
        * 
        * @author Frederic Py <fpy@mbari.org>
+       * @ingroup utils
        */
       template<class Ty>
       struct attr_helper {
@@ -118,9 +122,34 @@ namespace TREX {
         }
       }; // TREX::utils::internals::attr_helper<>
       
-      
+      /** @brief attr_helper specialization for optional attributes
+       *
+       * This class is just a specialization of attr_helper to handle optional 
+       * attributes.
+       *
+       * Whenever we have a attr_helper that have a boost::optional as a template 
+       * argument, we assume that this XML attribute is optional. Therefore, if 
+       * the attribute does not exists we retruned an empty optional instance. 
+       * Otherwise this class behaves the same as the basic attr_helper
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @sa attr_helper
+       * @ingroup utils
+       */
       template<class Ty>
       struct attr_helper< boost::optional<Ty> > {
+        /** @brief Parse attribute
+         * 
+         * @param[in] pt A xml based property tree
+         * @param[in] name An attribute name
+         * 
+         * Extracts the value of the attribute @p name from the property tree 
+         * @p pt if it exists
+         * 
+         * @pre The value of the attribute can be parsed as a @p Ty
+         * 
+         * @return the value of this attribute or an empty boost::optional if this attribute does not exist.
+         */
         static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
                                       std::string const &name) {
 	  boost::optional<std::string> tmp = pt.get_optional<std::string>("<xmlattr>."+name);
@@ -149,6 +178,7 @@ namespace TREX {
      * @return The parsed value from @a attr
      * @sa template<class Ty> Ty const &parse_attr(Ty const &, rapidxml::xml_node<> const &, std::string const &attr)
      * @ingroup utils
+     * @author Frederic Py
      * @{
      */
     template<class Ty>
@@ -172,6 +202,20 @@ namespace TREX {
     }
     /** @} */
     
+    /** @brief XML attribute insertion
+     * @tparam Ty value type
+     * @param[in,out] node An XML node
+     * @param[in] attr Attribute name
+     * @param[in] value A value
+     *
+     * Add the attribute @p attr to the xml node @p node with the value @p value
+     *
+     * @pre Ty is a type that supports standard output streams 
+     * 
+     * @ingroup utils
+     * @author Frederic Py
+     * @{
+     */
     template<typename Ty>
     void set_attr(boost::property_tree::ptree &node,
 		  std::string const &attr, Ty const &value) {
@@ -183,7 +227,7 @@ namespace TREX {
 		  std::string const &attr, Ty const &value) {
       set_attr(node.second, attr, value);
     }
-    
+    /** @} */
 
     /** @brief Optional XML attribute extraction
      * @tparam Ty output type
@@ -203,6 +247,9 @@ namespace TREX {
      * 
      * @sa template<class Ty> Ty const &parse_attr(rapidxml::xml_node<> const &, std::string const &attr)
      * @ingroup utils
+     * @author Frederic Py 
+     * @sa parse_attr(boost::property_tree::ptree const &, std::string const &)
+     * @{
      */
     template<class Ty>
     Ty parse_attr(Ty const &on_missing, 
@@ -218,12 +265,9 @@ namespace TREX {
     Ty parse_attr(Ty const &on_missing, 
 		  boost::property_tree::ptree::value_type const &node, 
 		  std::string const &attr) {
-      try {
-        return parse_attr<Ty>(on_missing, node.second, attr);
-      } catch(XmlError const &n) {
-        throw XmlError(node, n.what());
-      }
+      return parse_attr<Ty>(on_missing, node.second, attr);
     }
+    /** @} */
 
 
     /** brief Check for XML tag name
@@ -238,6 +282,57 @@ namespace TREX {
       return tag==node.first;
     }
 
+    /** @brief Extend XML tree with extra file
+     *
+     * @param[in, out] tree A XML tree
+     * @param[in] conf External configuration attribute
+     * @param[in] ahead Position flag
+     *
+     * Add tha content of the fille referred by the attribute @p conf to @p tree.
+     *
+     * This methods parse the XML file referred by the attribute @p vconf of @p tree 
+     * and add its content as sub tags of @p tree. If @p ahead is @c true this content 
+     * will be added before the @p tree sub tags, otherwise it will be added after them.
+     * 
+     * @note If @p conf is not an attribute of @p tree then @p tree is not modified
+     *
+     * @pre if @p conf is an attribute of @p tree its value should be the name of a file 
+     *   that can be located by LogManager and is a valid XML file
+     *
+     * @throw XmlError the @p conf file is not a valid XML file or is empty
+     * @throw ErrnoExcept Failed to locate the @p conf file
+     * 
+     * @post If @p conf was an attribute of @p tree then @p tree hass been modified to include the content of  
+     * @p conf file
+     *
+     * Illustration.
+     *
+     * Assume that we have a @p tree with this XML content :
+     * @code 
+     * <Root file="foo.xml">
+     *   <Son/>
+     * </Root>
+     * @endcode
+     *
+     * And the file @c foo.xml has the following content:
+     * @code 
+     *  <Daughter/>
+     *  <Cousin/>
+     * @endcode
+     *
+     * By calling @c ext_xml(tree,"file") we will modify @p tree as follow:
+     * @code
+     * <Root file="foo.xml">
+     *   <Daughter/>
+     *   <Cousin/>
+     *   <Son/>
+     * </Root>
+     * @endcode
+     * 
+     * @author Frederic Py 
+     * @ingroup utils
+     * @sa LogManager
+     */ 
     void ext_xml(boost::property_tree::ptree &tree,
 		 std::string const &conf, bool ahead=true);
     
