@@ -1,7 +1,6 @@
 #include "TREX.nddl"
 #include "auv.nddl"
 
-
 class NavigationCmd extends Timeline {
   predicate Holds {
     SPEED  speed;
@@ -15,6 +14,23 @@ class NavigationCmd extends Timeline {
     super();
   }
 }
+
+class DepthControl extends Timeline {
+  action onAbove {
+    SequentialBehavior behavior;
+    DEPTH depth;
+  }
+
+  action onBelow {
+    SequentialBehavior behavior;
+    DEPTH depth;
+  }
+
+  DepthControl() {
+    super();
+  }
+}
+
 
 NavigationCmd::Holds {
   float cos_pitch, tick_speed, my_speed;
@@ -43,6 +59,29 @@ SetPoint::Active {
   cmd.speed == speed;
   cmd.heading == heading;
   cmd.pitch == pitch;
+  meets(Inactive);
+}
+
+
+Ascend::Active {
+  contained_by(NavigationCmd.Holds cmd);
+  cmd.speed == speed;
+  cmd.heading == heading;
+  cmd.pitch == pitch;  
+
+  start + duration == end;
+  starts(VehicleState.Holds vs);
+  if( vs.z > targetDepth ) {
+    float delta_z, min_ticks, dur;
+    delta_z == targetDepth - vs.z;
+    min_ticks * cmd.z_rate == delta_z;
+    
+    
+    dur == min(duration, min_ticks);
+    duration >= dur;
+  } else {
+    concurrent(end, vs.end);
+  }
 }
 
 

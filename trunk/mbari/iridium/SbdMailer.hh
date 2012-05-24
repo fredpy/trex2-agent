@@ -36,7 +36,8 @@ namespace mbari {
       bool has_recipient(std::string const &address) const;
       void remove_recipient(std::string const &address);
       
-      void send(std::string imei, char const *data, size_t size);
+      void send(std::string imei, char const *data, size_t size,
+                std::string const &comment = "");
 
       static std::string const s_iridium_address;
 

@@ -2,6 +2,7 @@
 
 #include <Poco/Net/MailMessage.h>
 #include <Poco/Net/FilePartSource.h>
+#include <Poco/Net/StringPartSource.h>
 
 using namespace mbari::iridium;
 
@@ -66,7 +67,8 @@ void SbdMailer::close() {
 
 
 
-void SbdMailer::send(std::string imei, char const *data, size_t size) {
+void SbdMailer::send(std::string imei, char const *data, size_t size,
+                     std::string const &comment) {
   Poco::Net::MailMessage msg;
   msg.setSubject(imei);
   for(std::set<std::string>::const_iterator i=m_recipients.begin();
@@ -75,13 +77,17 @@ void SbdMailer::send(std::string imei, char const *data, size_t size) {
     msg.addRecipient(to);
   }
   msg.setSender(sender());
+  if( comment.size() > 0 ) {
+    Poco::Net::StringPartSource *text = new Poco::Net::StringPartSource(comment);
+    msg.addContent(text);
+  }
   std::string fname = new_file(), full_name;
   full_name = m_log->file_name(fname).string();
   std::ofstream out(full_name.c_str(), std::ios::binary);
   out.write(data, size);
   out.close();
-  Poco::Net::FilePartSource attachment(full_name);
-  msg.addAttachment(fname, &attachment);
+  Poco::Net::FilePartSource *attachment = new Poco::Net::FilePartSource(full_name);
+  msg.addAttachment(fname, attachment);
   m_server.sendMessage(msg);
 }
 

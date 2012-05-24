@@ -79,7 +79,7 @@ SequentialBehavior::Active {
 
 
 class SetPoint extends SequentialBehavior {
-  action Active {
+  predicate Active {
     SPEED  speed;
     DEGREE heading;
     PITCH  pitch;
@@ -88,4 +88,18 @@ class SetPoint extends SequentialBehavior {
   SetPoint(Mode _mode, Mutex mtx) {
     super(_mode, mtx);
   }
+}
+
+class Ascend extends SequentialBehavior {
+  predicate Active {
+    SPEED  speed;
+    DEGREE heading;
+    PITCH  pitch;
+    DEPTH  targetDepth;
+    pitch > 0.0;
+  }
+
+  Ascend(Mode _mode, Mutex mtx) {
+    super(_mode, mtx);
+ }
 }
