@@ -7,7 +7,7 @@ int main(int argc, char *arg[]) {
   SbdMailer mailer("mbarimail.mbari.org");
   
   std::cout<<"Login ... "<<std::endl;
-  mailer.login(); // Poco::Net::SMTPClientSession::AUTH_NONE, "fpy", "t0bapny.");
+  mailer.login();
   
   std::cout<<"Configure ... "<<std::endl;
   mailer.add_recipient("fpy@mbari.org");
