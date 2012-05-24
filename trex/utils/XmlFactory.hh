@@ -57,6 +57,19 @@ namespace TREX {
 
     namespace internals {
 
+      /** @brief XmlFactory argument helper
+       *
+       * @tparam Base The argument bmain type. This type is often a 
+       *   Boost.PropertyTree or a type including such tree
+       * @tparam Extra Extra information type. The type emebedding no XML information
+       *
+       * This class is used by XmlDFactory as an helper to extract information from 
+       * the factory production argument.  
+       * 
+       * @relates TREX::utils::XmlFactory
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup utils
+       */
       template<class Base, class Extra>
       struct xml_arg_helper {
       private:
@@ -64,16 +77,53 @@ namespace TREX {
 	typedef std::pair<boost::property_tree::ptree::value_type *, Extra> computed_node;
 
       public:
+        /** @brief Deduced argument type
+         * The type used to compose @p Base and @p Extra. 
+         * If @p Extra is @c void then this type is @p Base,
+         * otherwise it would be a pair of the two types
+         */
 	typedef computed_type argument_type;
+        /** @brief Deduced node type
+         * The type used to compose a Boost.PropertyTree and @p Extra. 
+         * This type is often the same as @c xml_arg_helper<boost::property_tree::ptree::value_type, Extra>
+         */
 	typedef computed_node node_proxy;
 
+        /** @brief Extract xml information
+         *
+         * @param[in] arg An argument structure
+         *
+         * This method allows to extract the @p Base component of @p arg. As @p Base 
+         * is often related to a Boost.PropertyTree, we assume that this part is the XML 
+         * part of the argument
+         *
+         * @return The @p Base comsponent of @p arg
+         */
 	static Base &xml(argument_type &arg) {
 	  return *(arg.first);
 	}
+        /** @brief Build new element 
+         *
+         * @param[in] n A @p Base instance 
+         * @param[in] e A @p Extra instance 
+         *
+         * Create a new argument
+         *
+         * @return the newly created argument that composes @p n and @p e 
+         */
 	static argument_type build(Base &n, Extra &e) {
 	  return std::make_pair(&n, e);
 	}
 
+        /** @brief Build new node 
+         *
+         * @param[in] n A Boost.PropertyTree 
+         * @param[in] b An  
+         *
+         * Create a new xml node
+         *
+         * @return the newly created node that composes @p n and the @p Extra part of @p b 
+         */
 	static node_proxy build_node(boost::property_tree::ptree::value_type &n,
 				     argument_type &b) {
 	  boost::property_tree::ptree::value_type *p = &n;
@@ -82,6 +132,15 @@ namespace TREX {
       }; // TREX::utils::internals::xml_arg_helper<>
 
       
+      /** @brief sml_arg_helper special case
+       *
+       * This is a specialization of the template class xml_arg_helper handling 
+       * the case in which the Extra type is @c void. In that case there's no extra 
+       * argument and the argument_type is just the xml structure
+       *
+       * @relates xml_arg_helper
+       * @ingroup utils
+       */
       template<class Base>
       struct xml_arg_helper<Base, void> {
 	typedef Base                                    &argument_type;
@@ -99,7 +158,7 @@ namespace TREX {
 				     argument_type b) {
 	  return n;
 	}
-      }; // TREX::utils::internals::xml_arg_helper<>
+      }; // TREX::utils::internals::xml_arg_helper<,void>
       
 
     } // TREX::utils::details
@@ -130,13 +189,24 @@ namespace TREX {
     public:
       typedef internals::xml_arg_helper<tree_t::value_type, Arg> arg_traits;
       
+      /** @brief Production iterator traits
+       *
+       * The traits used to identify the type of a production iterator for this 
+       * factory based on a property_tree iterator
+       *
+       * @relates XmlFactory
+       */
       template<class Iter>
       struct iter_traits :public internals::xml_arg_helper<Iter, Arg> {
 	typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
-      };
+      }; // TREX::utils::XmlFactory<>::iter_traits<>
 
       typedef typename arg_traits::argument_type argument_type;
       
+      /** @brief Subjacent factory
+       *
+       * The factory used underneath to implement this XmlFactory
+       */
       typedef Factory<Product, Symbol, argument_type, Output> factory_type;
       typedef typename factory_type::returned_type returned_type;
       
@@ -145,23 +215,86 @@ namespace TREX {
 	return arg_traits::xml(arg);
       }
 
+      /** @brief Simple producer declaration
+       *
+       * @tparam Ty the real product type
+       *
+       * This class allows to declare new producers for a XmlFactory and is based on 
+       * Factory::declare implemetation.
+       * The production is simply calling the constructor of @p Ty
+       * accepting XmlFactory::argument_type as an argument.
+       *
+       * This producer wil be available in the Factory during its full lifetime
+       * and will automatically unregister on destruction.
+       *
+       * @pre @p Ty has a constructor that accepts @p XmlFactory::argument_type has an argument
+       * @pre @p Ty derives from @p Product
+       * @pre @p Ty is a concrete class (no pure virtual method)
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @relates XmlFactory
+       * @sa Factory::declare
+       * @ingroup utils
+       */
       template<class Ty>
       class declare :public XmlFactory::factory_type::template declare<Ty> {
       public:
+        /** @brief Constructor
+         * @param[in] id A tag name
+         *
+         * Declare the new producer that will create a class Ty whenever the 
+         * XmlFactory encounters an XML tag @p id
+         */
 	declare(Symbol const &id) 
 	  :factory_type::template declare<Ty>(id) {}
+        /** @brief Destructor 
+         *
+         * Undeclare this producer
+         */
 	virtual ~declare() {}
       }; // TREX::utils::XmlFactory<>::declare<>
 
+      /** @brief Production operator
+       *
+       * @param[in] arg An XML argument
+       *
+       * Create a new instance based on @p arg
+       * @{
+       */
       Output operator()(argument_type arg) {
 	return produce(arg);
       }
       Output produce(argument_type arg);
-
+      /** @} */
+       
+      /** @brief Recognized XML tags
+       *
+       * @param[out] ids A list
+       *
+       * Store all the currently recognized XML tags for this factory in @p ids
+       */
       void getIds(std::list<Symbol> &ids) const {
 	m_factory->getIds(ids);
       }
 
+      /** @brief iterator based production
+       *
+       * @param[in,out] it   A production iterator
+       * @param[in] last An end iterator
+       * @param[out] ret product palcaholder 
+       *
+       * This method allow to create producats by iteratating through a single 
+       * level of the XML structure.
+       *
+       * It advances @p it until a recognized tag is found or it reaches @p end.
+       * If a recognized tag is found it the produces a new product and strores 
+       * it in @p ret
+       *
+       * @throw XmlError captured an exception while trying to create a new product.
+       *
+       * @retval true if a production tag was found and @p ret has been updated
+       * @retval false if @p it reached @p last without recognizing any tags
+       */
       template<class Iter>
       bool iter_produce(typename iter_traits<Iter>::type it, 
 			Iter const &last, Output &ret);

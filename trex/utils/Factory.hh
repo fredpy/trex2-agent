@@ -358,6 +358,8 @@ namespace TREX {
        * @pre @p Product is a concrete class (no pute virtual method)
        *
        * @author Frederic Py <fpy@mbari.org>
+       * @relates Factory
+       * @ingroup utils
        */
       template<class Product>
       class declare :public producer {
