@@ -556,6 +556,7 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
 	      <<timeline.str()<<"\"";
 }
 
+
 void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable, bool publish) {
   details::transaction_flags flag;
   flag.set(0, controllable);
@@ -565,6 +566,26 @@ void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllabl
       syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
     }
 }
+
+bool TeleoReactor::unuse(TREX::utils::Symbol const &timeline) {
+  external_set::iterator i = m_externals.find(timeline);
+  if( m_externals.end()!=i ) {
+    Relation r = i->first;
+    r.unsubscribe();
+    return true;
+  }
+  return false;
+}
+
+bool TeleoReactor::unprovide(TREX::utils::Symbol const &timeline) {
+  internal_set::iterator i = m_internals.find(timeline);
+  if( m_internals.end()!=i ) {
+    (*i)->unassign(getCurrentTick());
+    return true;
+  }
+  return false;
+}
+
 
 void TeleoReactor::clear_internals() {
   while( !m_internals.empty() ) {
