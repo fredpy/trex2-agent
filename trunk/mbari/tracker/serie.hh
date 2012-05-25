@@ -52,7 +52,7 @@ namespace mbari {
    * just serve the implementation of the mbari components
    *
    * @author Frederic Py
-   * @ingroup tracker
+   * @ingroup mbari
    */
   namespace details {
     
@@ -65,6 +65,7 @@ namespace mbari {
      * current values from a container
      *
      * @author Frederic Py
+     * @ingroup mbari
      */
     template<typename Ty>
     struct identity :public std::unary_function<Ty, Ty> {
