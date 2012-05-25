@@ -1,3 +1,36 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ * 
+ *  Copyright (c) 2011, MBARI.
+ *  All rights reserved.
+ * 
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the TREX Project nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <set>
 
 #include <boost/algorithm/string/classification.hpp>
@@ -47,21 +80,12 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
 
   syslog("amqp")<<"Creating queue \"trex2"<<getName()<<std::endl;
   m_queue = m_connection.create_queue("trex2"+getName().str());
-  provide("MessagesFromTrex", false);
-  postObservation(TREX::transaction::Observation("MessagesFromTrex", "undefined"));
-  if( isInternal("MessagesFromTrex") ) {    
-    // Bind to TREX messages
-    syslog("amqp")<<"Binding to TREX messages (MessagesFromTrex/TrackingApp)";
-    m_queue->bind("MessagesFromTrex", "TrackingApp");
-  } else 
-    syslog("WARN")<<"MessagesFromTrex timeline already declared";
   
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   TREX::utils::Symbol tl_name;
   std::string exch_name;
   std::set<std::string> exchs;
   TREX::utils::ext_xml(node.second, "config");
-
 
   // Now parse the sub tags
   boost::property_tree::ptree::iterator initial = node.second.begin();
@@ -118,12 +142,6 @@ bool DrifterTracker::synchronize() {
     syslog()<<"New message["<<msg->key()<<"]: "<<msg->size()<<" bytes from \""
             <<msg->exchange()<<"\"";
 
-    if( msg->exchange()=="MessagesFromTrex" ) {
-      try {
-	trex_msg(*msg);
-      } catch(...) {}
-    } 
-
     boost::tie(from, to) = m_message_handlers.equal_range(msg->exchange());
     for( ; to!=from; ++from) {
       if( from->second->handleMessage(*msg) )
@@ -137,40 +155,4 @@ bool DrifterTracker::synchronize() {
       return false;
     }
   return true;
-}
-  
-void DrifterTracker::trex_msg(amqp::queue::message const &msg) {
-   std::string txt(static_cast<char const *>(msg.body()), msg.size());
-   syslog("amqp")<<"Parsing TREX message : \""<<txt<<"\".";
-
-  /* Former code when I was expecting to recive what TREX actually sent */
-  // rapidxml::xml_document<> doc;
-  // doc.parse<0>(const_cast<char *>(txt.c_str()));
-  // rapidxml::xml_node<> *root = doc.first_node();
-  // Observation obs("MessagesFromTrex", root->name());
-  // time_t sec = TREX::utils::parse_attr<time_t>(*root, "utime"); 
-  // obs.restrictAttribute("tick", IntegerDomain(timeToTick(sec)));
-  /*
-    string str1("hello abc-*-ABC-*-aBc goodbye");
-
-    typedef vector< iterator_range<string::iterator> > find_vector_type;
-    
-    find_vector_type FindVec; // #1: Search for separators
-    ifind_all( FindVec, str1, "abc" ); // FindVec == { [abc],[ABC],[aBc] }
-
-    typedef vector< string > split_vector_type;
-    
-    split_vector_type SplitVec; // #2: Search for tokens
-    split( SplitVec, str1, is_any_of("-*"), token_compress_on ); // SplitVec == { "hello abc","ABC","aBc goodbye" }
-  */
-   std::vector< std::string > tokens;
-   boost::split(tokens, txt, boost::is_any_of(","), boost::token_compress_on);
-   if( tokens.size()==3 ) { 
-     Observation obs("MessagesFromTrex", tokens[0]);
-     obs.restrictAttribute("tick", 
-			   IntegerDomain(timeToTick(TREX::utils::string_cast<time_t>(tokens[1]))));
-     obs.restrictAttribute("imei", 
-			   IntegerDomain(TREX::utils::string_cast<unsigned long>(tokens[2])));
-     postObservation(obs);
-   }
 }
