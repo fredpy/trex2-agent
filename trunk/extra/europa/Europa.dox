@@ -1,6 +1,34 @@
 /* -*- C++ -*- */
 /** @defgroup europa Europa plug-in
  *
+ * This module defines the europ plug-in which implements the
+ * europa based reactor. This reactor uses Europa planner to
+ * deliberate and executes its plan. 
+ *
+ * While not a core part of trex it is definitely a core effort 
+ * within trex; this europa based reactor allow to use automated 
+ * planning and plan execution all across an agent allowing for 
+ * advanced model-based decision. As the europa planner is 
+ * encapsulated within the reactor it also allow to distribute 
+ * the complexity of the global planning problem by using 
+ * multiple EuropaReactor instances interacting though their 
+ * Internal and External timelines
+ *
  * @author Frederic Py <fpy@mbari.org> @& Conor McGann
  * @ingroup plugins 
+ *
+ * @section Requirements 
+ *
+ * The only requirement for this extension is the Europa planner 
+ * (http://code.google.com/p/europa-pso/). While TREX sghould still 
+ * support anterior versions, we recommend to use Europa 2.6 or 
+ * later.
+ *
+ * @section Using the europa reactor 
+ * 
+ * @note To be developed
+ *
+ * @section Extending Europa within TREX
+ *
+ * @note To be developed
  */
