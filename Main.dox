@@ -309,7 +309,7 @@ Finally the two Goal at the end gives the objectives for each EuropaReactor.
 Quickly stated : @c test will want to be on a Bright state at the end of the mission 
 while @c test2 will want to be Dim at the end of the mission starting from the tick 20
 
-@section sample_run the @c sample mission
+@section sample_run the sample mission
 
 To start the sample mission you can do the following :
 @li start the simulation in "debug" mode :
