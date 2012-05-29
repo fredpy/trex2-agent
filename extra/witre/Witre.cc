@@ -653,7 +653,7 @@ void WitreApplication::newPlanToken(const WitreServer::timed_goal& plan)
     WitreServer::timed_goal::const_iterator t;
     for(t = plan.begin(); t!=plan.end(); ++t)
     {
-        const goal_id& goal = t->second;
+        const goal_id& goal = (*t);
         std::ostringstream planStr;
         planStr <<"<Token timeline=\'"<<goal->object()<<"\' pred=\'"<<goal->predicate()
              <<"\' value=\'"<<goal<<"\'>"

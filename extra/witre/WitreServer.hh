@@ -62,7 +62,7 @@ namespace TREX {
       // WitreApplication const &app() const;
       // WitreApplication &app();
 
-      typedef std::list< std::pair<double, goal_id> > timed_goal;
+      typedef std::list<goal_id> timed_goal;
 
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
@@ -114,6 +114,7 @@ namespace TREX {
       void undeclared(TREX::transaction::details::timeline const &timeline);
 
       void searchGraph();
+      void dispatchPlanTokens();
 
 
       mutable boost::mutex mutex_;
