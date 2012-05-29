@@ -261,21 +261,31 @@ bool WitreServer::synchronize()
             c.client->addObs(oss.str());
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
+    //Notify all connected clients of plan
+    dispatchPlanTokens();
     return true;
 }
 
 void WitreServer::newPlanToken(goal_id const &t)
 {
-    double ctime = getCurrentTick();
-    planTokens.push_back(std::make_pair(ctime,t));
-    string name = t->object().str();
+    planTokens.remove(t);
+    planTokens.push_back(t);
+    dispatchPlanTokens();
+}
 
+void WitreServer::cancelledPlanToken(goal_id const &t)
+{
+
+}
+
+void WitreServer::dispatchPlanTokens()
+{
     std::list<timed_goal::iterator> eraselist;
     timed_goal::iterator plan;
     for(plan = planTokens.begin(); plan!=planTokens.end(); ++plan)
     {
-        double ptime = plan->first;
-        if(ptime<ctime && plan->second->object()==name)
+        goal_id const& t = (*plan);
+        if(t->getEnd().upperBound()<getCurrentTick())
         {
             pastTokens.push_front((*plan));
             eraselist.push_back(plan);
@@ -286,19 +296,11 @@ void WitreServer::newPlanToken(goal_id const &t)
         planTokens.erase(eraselist.front());
         eraselist.pop_front();
     }
-
-    boost::mutex::scoped_lock lock(mutex_);
     for (unsigned i = 0; i < connections.size(); ++i) {
         Connection& c = connections[i];
         const boost::function<void(const timed_goal&)>& function(boost::bind(&WitreApplication::newPlanToken, c.client, _1));
         Wt::WServer::instance()->post(c.sessionId, boost::bind(function, planTokens) );
     }
-
-}
-
-void WitreServer::cancelledPlanToken(goal_id const &t)
-{
-
 }
 
 goal_id WitreServer::clientGoalPost(Goal const &g)
