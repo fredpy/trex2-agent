@@ -95,6 +95,7 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       if( samp.has_chfl() ) 
 	values.insert(sensor_data::value_type("ch_fl", samp.chfl()));
       m_serie.add(date, pos, values);
+      m_updated = true;
     }
     if( data.has_gps_fix() ) {
       org::mbari::trex::SensorMessage_GpsError const &fix = data.gps_fix();
@@ -103,7 +104,7 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       error_rate[1] = fix.easting_error_rate();
       m_serie.align(fix.from_time(), fix.to_time(), error_rate);
     }
-    for(size_t i=0; i<data.observations_size(); ++i) {
+    for(size_t i=0; i<data.observations_size(); ++i) {      
       org::mbari::trex::Predicate const &pred(data.observations(i));
       if( TREX_TL==pred.object() ) {
         time_t date = pred.start();
@@ -142,34 +143,35 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       }
     }
     
-    m_updated = true;
     return true;
   }
   return false;
 }
 
 bool DoradoHandler::synchronize() {
+  double delta_t;
+  
   if( m_updated ) {
     // Set all the 
     TREX::transaction::Observation obs(DATA_TL, "Received");
-    double delta_t = std::floor(tickToTime(now()));
+    delta_t = std::floor(tickToTime(now()));
     delta_t -= m_serie.newest();
     delta_t /= tickDuration();
     obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
     obs.restrictAttribute("nsamples", IntegerDomain(m_serie.size()));
     notify(obs);
-    
-    if( m_obs_fresh ) {
-      // Received an observcation from trex/dorado
-      delta_t = std::floor(tickToTime(now()));
-      delta_t -= m_since;
-      delta_t /= tickDuration();
-      // indicate how aold this observation is in term of ticks
-      m_last_obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
-      notify(m_last_obs);
-      m_obs_fresh = false;
-    }
+    m_updated = false;
   }
-  m_updated = false;
+    
+  if( m_obs_fresh ) {
+    // Received an observcation from trex/dorado
+    delta_t = std::floor(tickToTime(now()));
+    delta_t -= m_since;
+    delta_t /= tickDuration();
+    // indicate how aold this observation is in term of ticks
+    m_last_obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
+    notify(m_last_obs);
+    m_obs_fresh = false;
+  }
   return true;
 }
