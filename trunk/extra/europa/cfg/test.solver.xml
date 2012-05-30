@@ -7,7 +7,7 @@
     		<FlawHandler component="StandardOpenConditionHandler"/>
   	</OpenConditionManager>
 
-  	<UnboundVariableManager defaultPriority="0">
+  	<UnboundVariableManager defaultPriority="10000">
 	  <!-- Block binding by the solver if varaibales are not singleton -->
     		<FlawFilter component="Singleton"/>
     		<FlawHandler component="StandardVariableHandler"/>
