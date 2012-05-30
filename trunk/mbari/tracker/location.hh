@@ -116,6 +116,7 @@ namespace mbari {
      *
      * @param[in]  now     A date
      * @param[out] delta   update freshness
+     * @param[in]  projected Estimation flag
      *
      * @pre is_valid()
      * @pre @p now is posterior or equal to the date of the last update 
@@ -123,7 +124,7 @@ namespace mbari {
      * This method estimates the position of this location at the date @p now 
      * and indicates how far in the past was the last update
      * The estimation is done as follow :
-     * @li if @c have_speed() then project the last update to @p now using the speed vector
+     * @li if @c have_speed() and @p projected then project the last update to @p now using the speed vector
      * @li otherwise just give the last update position
      *
      * @return A point giving the estimated position for this location
@@ -132,7 +133,7 @@ namespace mbari {
      * @sa have_speed() const
      * @sa update(time_t,double, double)
      */
-    point<2> position(time_t now, long int &delta) const; 
+    point<2> position(time_t now, long int &delta, bool projected=true) const; 
 
   private:
     time_t   m_date;

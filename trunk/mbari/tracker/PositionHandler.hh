@@ -70,6 +70,7 @@ namespace mbari {
     typedef std::pair<bool, location> asset_info;
     typedef std::map<std::string, asset_info> asset_map;
     asset_map m_assets;
+    bool m_should_project;
   }; // mbari::PositionHandler
 
 } // mbari 

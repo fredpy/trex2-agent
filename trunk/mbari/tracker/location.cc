@@ -53,10 +53,10 @@ void location::update(time_t date, double north, double east) {
   m_valid = true;
 }
 
-point<2> location::position(time_t now, long int &delta_t) const {
+point<2> location::position(time_t now, long int &delta_t, bool projected) const {
   point<2> estimate(m_last_pos);
   delta_t = now-m_date;
-  if( have_speed() )
+  if( projected && have_speed() )
     estimate += m_speed*delta_t;
   return estimate;
 }

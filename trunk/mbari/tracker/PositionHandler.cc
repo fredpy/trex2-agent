@@ -48,7 +48,8 @@ namespace {
 }
 
 PositionHandler::PositionHandler(PositionHandler::xml_arg const &arg)
-:MessageHandler(arg) { 
+:MessageHandler(arg), 
+ m_should_project(parse_attr<bool>(true, MessageHandler::factory::node(arg), "projected")) { 
   m_exchange += "_pb";
 }
 
@@ -98,10 +99,10 @@ bool PositionHandler::synchronize() {
   time_t now_t = std::floor(tickToTime(now()));
   
   for(asset_map::iterator i=m_assets.begin(); m_assets.end()!=i; ++i) {
-    if( i->second.first || i->second.second.have_speed() ) {
+    if( i->second.first || (m_should_project && i->second.second.have_speed()) ) {
       TREX::transaction::Observation obs(i->first, "Holds");
       long int dt;
-      point<2> vect(i->second.second.position(now_t, dt));
+      point<2> vect(i->second.second.position(now_t, dt, m_should_project));
       double lat, lon;
     
       i->second.first = false;
