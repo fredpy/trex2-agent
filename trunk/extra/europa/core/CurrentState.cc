@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -43,25 +43,25 @@ using namespace TREX::europa::details;
 
 namespace EUROPA {
   namespace SOLVERS {
-    
+
     /*
      * Specializations of getMatches* in the europa matching engine in order to
      * be able to manage our new CurrentState flaws
-     */ 
+     */
     template<>
-    void MatchingEngine::getMatchesInternal(TREX::europa::details::CurrentStateId const &inst, 
+    void MatchingEngine::getMatchesInternal(TREX::europa::details::CurrentStateId const &inst,
                                             std::vector<MatchingRuleId> &results) {
       trigger(inst->entityType(), m_rulesByObjectType, results);
     }
-    
+
     template<>
-    void MatchingEngine::getMatches(TREX::europa::details::CurrentStateId const &inst, 
+    void MatchingEngine::getMatches(TREX::europa::details::CurrentStateId const &inst,
                                     std::vector<MatchingRuleId> &results) {
       debugMsg("trex:synch", "Attempt to match CurrentState ("<<inst->timeline()->toString()<<')');
       results = m_unfilteredRules;
       getMatchesInternal(inst, results);
     }
-    
+
   } // EUROPA::SOLVERS
 } // EUROPA
 
@@ -86,28 +86,28 @@ bool is_internal::operator()(CurrentStateId const &timeline) const {
  * class TREX::europa::details::CurrentState
  */
 
-// structors 
+// structors
 
 CurrentState::CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline)
-  :m_assembly(assembly), m_client(assembly.plan_db()->getClient()), 
+  :m_assembly(assembly), m_client(assembly.plan_db()->getClient()),
    m_timeline(timeline), m_id(this) {
   assembly.predicates(timeline, m_pred_names);
-  // removed special values 
-  m_pred_names.erase(Assembly::FAILED_PRED); 
+  // removed special values
+  m_pred_names.erase(Assembly::FAILED_PRED);
   m_pred_names.erase(Assembly::UNDEFINED_PRED);
 
   // Now extract the default predicate (if any)
   EUROPA::ConstrainedVariableId default_attr = assembly.default_pred(timeline);
-  
-  // For now I keep this default behavior that prohibits to have no default 
-  // It may change in the future 
+
+  // For now I keep this default behavior that prohibits to have no default
+  // It may change in the future
   if( !default_attr->lastDomain().isSingleton() )
     throw EuropaException("Agent timeline "+timeline->getName().toString()+
 			  " does not specify its default predicate.");
   m_pred_default = default_attr->lastDomain().getSingletonValue();
 
   // Now I need to check that this rpedicate is valid
-  if( !assembly.schema()->isPredicate(predicate_name(timeline, m_pred_default)) ) 
+  if( !assembly.schema()->isPredicate(predicate_name(timeline, m_pred_default)) )
     throw EuropaException("Agent timeline "+timeline->getName().toString()+
 			  " default predicate \""+m_pred_default.toString()
 			  +"\" does not exists.");
@@ -118,7 +118,7 @@ CurrentState::CurrentState(Assembly &assembly, EUROPA::TimelineId const &timelin
 // observers
 
 bool CurrentState::has_default() const {
-  return true; // for now it always have a default 
+  return true; // for now it always have a default
                //  (required at construction ... see above)
 }
 
@@ -130,7 +130,7 @@ EUROPA::eint CurrentState::now() const {
 
 bool CurrentState::identified() const {
   EUROPA::TokenId cur = current();
-  
+
   if( cur.isId() ) {
     if( cur->isMerged() )
       cur = cur->getActiveToken();
@@ -145,8 +145,8 @@ bool CurrentState::committed() const {
 }
 
 bool CurrentState::check_committed() const {
-  return committed() && m_prev_obs.isNoId() 
-    && current()->start()->isSpecified() 
+  return committed() && m_prev_obs.isNoId()
+    && current()->start()->isSpecified()
     && current()->start()->getSpecifiedValue()!=now();
 }
 
@@ -161,18 +161,18 @@ bool CurrentState::external() const {
 
 // modifiers
 
-EUROPA::TokenId CurrentState::new_obs(std::string const &pred, 
+EUROPA::TokenId CurrentState::new_obs(std::string const &pred,
 				      bool insert) {
   EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity());
 
   debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
   m_prev_obs = m_last_obs;
   m_last_obs = m_client->createToken(pred.c_str(), NULL, false, true);
-  
+
   m_last_obs->start()->specify(now());
   m_last_obs->end()->restrictBaseDomain(future);
   m_last_obs->getObject()->specify(m_timeline->getKey());
-  
+
   if( insert ) {
     debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());
     m_client->activate(m_last_obs);
@@ -197,7 +197,7 @@ void CurrentState::apply_base(EUROPA::TokenId &merged) {
   EUROPA::TokenId active = merged->getActiveToken();
   std::vector<EUROPA::ConstrainedVariableId> const &actives = active->getVariables();
   std::vector<EUROPA::ConstrainedVariableId> const &mergeds = merged->getVariables();
-  
+
   for(size_t v=1; v<actives.size(); ++v)
     actives[v]->restrictBaseDomain(mergeds[v]->lastDomain());
   merged = active;
@@ -237,30 +237,30 @@ void CurrentState::relax_end() {
   m_constraint = EUROPA::ConstraintId::noId();
 }
 
-bool CurrentState::commit() { 
+bool CurrentState::commit() {
   if( check_committed() )
-    return true; 
+    return true;
   else {
     EUROPA::eint start_time;
-    
+
     if( m_prev_obs.isId() ) {
       EUROPA::TokenId active = m_prev_obs;
       EUROPA::IntervalIntDomain i_now(now());
-      
+
       debugMsg("trex:commit", "Terminating "<<timeline()->toString()<<'.'
                <<m_prev_obs->getUnqualifiedPredicateName().toString()<<'('<<m_prev_obs->getKey()<<')');
 
       if( m_prev_obs->isMerged() )
         active=m_prev_obs->getActiveToken();
-      
+
       if( active->end()->lastDomain().intersects(i_now) ) {
         EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
-        
+
         restrict_base(m_prev_obs, m_prev_obs->end(), EUROPA::IntervalIntDomain(now()));
         restrict_base(m_prev_obs, m_prev_obs->duration(), EUROPA::IntervalIntDomain(now()-start));
-        
+
         m_assembly.terminate(m_prev_obs);
-        m_prev_obs = EUROPA::TokenId::noId();        
+        m_prev_obs = EUROPA::TokenId::noId();
       } else {
         debugMsg("trex:always", "Unexpected termination of token "<<m_prev_obs->toString());
         return false;
@@ -276,16 +276,16 @@ bool CurrentState::commit() {
       start_time = now();
     } else
       start_time = m_last_obs->start()->getSpecifiedValue();
-      
+
     if( now()==start_time ) {
       debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
                <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
       restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
-      m_assembly.notify(*this);      
+      m_assembly.notify(*this);
     } else {
       EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
         dur(now()+1-start_time, std::numeric_limits<EUROPA::eint>::infinity());
-    
+
       debugMsg("trex:commit", "Extend duration of"<<timeline()->toString()<<'.'
                <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
       restrict_base(m_last_obs, m_last_obs->end(), future);
@@ -302,20 +302,126 @@ bool CurrentState::commit() {
 // manipulators
 
 void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
-  std::list<EUROPA::TokenId>::const_iterator 
-    i = timeline()->getTokenSequence().begin(), 
+  std::list<EUROPA::TokenId>::const_iterator
+    i = timeline()->getTokenSequence().begin(),
     endi = timeline()->getTokenSequence().end();
-  
+
   // skip the past tokens
   for( ; endi!=i && (*i)->end()->lastDomain().getLowerBound()<=(lb+1); ++i);
 
 
   for( ; endi!=i && (*i)->start()->lastDomain().getLowerBound()<=ub; ++i) {
+    EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
+    if(nowGoal.isId())
+        m_assembly.dispatch(timeline(),*i);
+    /*
+    ///Old code for dispatching tokens
     // TODO: need to check if it is guarded first ... in such cas I won't dispatch it
-    if( !m_assembly.dispatch(timeline(), *i) 
+    if( !m_assembly.dispatch(timeline(), *i)
        && (*i)->start()->lastDomain().getLowerBound()>=lb )
       break;
+    */
   }
+}
+
+EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub)
+{
+    EUROPA::TokenSet actions, condActions, merged;
+    EUROPA::TokenSet::iterator it, end;
+    ///Gets all of the tokens merged with @token
+    merged = getAllTokens(token);
+
+    ///Tests to see if any of the tokens are fact and then @returns noId()
+    ///and gets the masters of all the merged tokens
+    for(it = merged.begin(), end = merged.end(); it!=end; it++)
+    {
+        if((*it)->isFact())
+            return EUROPA::Id<EUROPA::Token>::noId();
+
+        EUROPA::TokenId master = (*it)->master();
+        if(master.isId())
+        {
+            if(m_assembly.is_effect((*it)) && m_assembly.is_action(master))
+                actions.insert(master);
+            else if(m_assembly.is_condition((*it))
+                     || (!m_assembly.is_condition((*it)) && !master->isFact()))
+                condActions.insert(master);
+        }
+    }
+
+    EUROPA::TokenId goal = searchGoal(actions);
+    if(goal.isId() && goal->start()->lastDomain().getLowerBound()<=ub)
+        return goal;
+    else
+    {
+        goal = searchGoal(condActions);
+        if(goal.isId() && goal->start()->lastDomain().getLowerBound()<=ub)
+            return goal;
+    }
+    return EUROPA::Id<EUROPA::Token>::noId();
+}
+
+EUROPA::TokenId CurrentState::searchGoal(EUROPA::TokenSet actions)
+{
+    EUROPA::TokenSet effects,conditions, merged, slaves;
+    EUROPA::TokenSet::iterator it, end, mergedIt, slave;
+    for(it=actions.begin(), end=actions.end(); it!=end; it++)
+    {
+        merged = getAllTokens((*it));
+        for(mergedIt=merged.begin(); mergedIt!=merged.end(); mergedIt++)
+        {
+            slaves = (*mergedIt)->slaves();
+            for(slave=slaves.begin();slave!=slaves.end(); slave++)
+            {
+                if(!m_assembly.is_condition((*slave)))
+                    effects.insert((*slave));
+                else
+                    conditions.insert((*slave));
+            }
+        }
+        std::list<EUROPA::TokenId> search;
+        if(!effects.empty())
+            search.insert(search.end(), effects.begin(), effects.end());
+        std::list<EUROPA::TokenId>::iterator sToken = search.begin();
+        while(sToken != search.end())
+        {
+            if(m_assembly.is_goal((*sToken)))
+            {
+                return *sToken;
+            }
+            else if((*sToken)->isActive())
+            {
+                merged = (*sToken)->getMergedTokens();
+                if(!merged.empty())
+                    search.insert(search.end(), merged.begin(), merged.end());
+            }
+            slaves = (*sToken)->slaves();
+            if(!slaves.empty())
+                search.insert(search.end(), slaves.begin(), slaves.end());
+            sToken++;
+        }
+    }
+    return EUROPA::Id<EUROPA::Token>::noId();
+}
+
+EUROPA::TokenSet CurrentState::getAllTokens(const EUROPA::TokenId& token)
+{
+    EUROPA::TokenSet merged;
+    if(token.isId())
+    {
+        ///Gets all of the tokens merged with @token
+        if(token->isActive())
+        {
+            merged = token->getMergedTokens();
+            merged.insert(token);
+        }
+        else
+        {
+            merged = token->getActiveToken()->getMergedTokens();
+            merged.insert(token->getActiveToken());
+        }
+    }
+    return merged;
 }
 
 
@@ -329,16 +435,16 @@ bool CurrentState::DecisionPoint::customStaticMatch(EUROPA::EntityId const &enti
   return CurrentStateId::convertable(entity);
 }
 
-// structors 
+// structors
 
-CurrentState::DecisionPoint::DecisionPoint(EUROPA::DbClientId const &client, 
+CurrentState::DecisionPoint::DecisionPoint(EUROPA::DbClientId const &client,
 					   CurrentStateId const &timeline,
-					   EUROPA::TiXmlElement const &config, 
+					   EUROPA::TiXmlElement const &config,
 					   EUROPA::LabelStr const &explanation)
-  :EUROPA::SOLVERS::DecisionPoint(client, timeline->getKey(), explanation), 
+  :EUROPA::SOLVERS::DecisionPoint(client, timeline->getKey(), explanation),
    m_target(timeline) {}
 
-// observers 
+// observers
 
 std::string CurrentState::DecisionPoint::toString() const {
   return toShortString();
@@ -380,23 +486,23 @@ bool CurrentState::DecisionPoint::canUndo() const {
   return EUROPA::SOLVERS::DecisionPoint::canUndo();
 }
 
-// modifiers 
+// modifiers
 
 void CurrentState::DecisionPoint::handleInitialize() {
   EUROPA::TokenId cur = m_target->current(), active;
   EUROPA::eint date = m_target->now();
-  
+
 
   m_choices.reset();
   m_choices.set(CREATE_DEFAULT);
-  
+
 
   if( cur.isId() ) {
     active = cur->getActiveToken();
     if( active.isNoId() )
       active = cur;
     EUROPA::IntervalIntDomain const &end = active->end()->lastDomain();
-    
+
     if( end.getLowerBound() <= date ) {
       m_choices.set(EXTEND_CURRENT, end.getUpperBound() > date);
     } else {
@@ -410,7 +516,7 @@ void CurrentState::DecisionPoint::handleInitialize() {
   std::list<EUROPA::TokenId> const &sequence = m_target->timeline()->getTokenSequence();
   std::list<EUROPA::TokenId>::const_iterator i=sequence.begin();
   if( active.isId() ) {
-    // Last observation is active => find it 
+    // Last observation is active => find it
     for(; sequence.end()!=i && active!=*i; ++i);
     // Then make the next token in the sequence the candidate
     if( sequence.end()!=i )
@@ -429,13 +535,13 @@ void CurrentState::DecisionPoint::handleInitialize() {
   // <m_cand_from, m_cand_to> reflects all the tokens in the sequence that can potentially overlap now
   m_choices.set(START_NEXT, m_cand_from!=m_cand_to);
   m_tok = m_cand_from;
-  
+
   m_choices.set(CREATE_OTHER, !m_target->m_pred_names.empty());
   m_next_pred = m_target->m_pred_names.begin();
-    
+
   // Initialize the decision index
   m_idx = 0;
-  if( !m_choices[m_idx] ) 
+  if( !m_choices[m_idx] )
     advance();
   m_prev_idx = m_idx;
 }
@@ -476,7 +582,7 @@ void CurrentState::DecisionPoint::handleUndo() {
   case START_NEXT:
     m_target->relax_token();
     ++m_tok;
-    if( m_cand_to==m_tok ) 
+    if( m_cand_to==m_tok )
       advance();
     break;
   case CREATE_DEFAULT:
@@ -492,7 +598,7 @@ void CurrentState::DecisionPoint::handleUndo() {
   default:
     throw EuropaException("Unknown Synchronization decision for timeline "+
 			  m_target->timeline()->toString());
-  } 
+  }
 }
 
 void CurrentState::DecisionPoint::advance() {
@@ -502,7 +608,7 @@ void CurrentState::DecisionPoint::advance() {
 }
 
 /*
- * class TREX::europa::details::UpdateMatchFinder 
+ * class TREX::europa::details::UpdateMatchFinder
  */
 
 void UpdateMatchFinder::getMatches(EUROPA::SOLVERS::MatchingEngineId const &engine,
