@@ -145,7 +145,7 @@ int main() { return 0;}
     COMPILE_DEFINITIONS -I${EUROPA_INCLUDE_DIR} ${EUROPA_LIBRARIES}
     OUTPUT_VARIABLE OUT)
   if(NOT EUROPA_HAVE_EFFECT)
-    message(WARNING "Unable to compile europa_26.cxx. Output is:\n${OUT}")
+    message(WARNING "Unable to compile europa_26.cxx.")
   endif(NOT EUROPA_HAVE_EFFECT)
 endif(EUROPA_FORCE_EFFECT)
 
