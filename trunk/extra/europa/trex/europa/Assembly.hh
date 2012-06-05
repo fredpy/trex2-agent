@@ -1085,29 +1085,49 @@ namespace TREX {
       void print_plan(std::ostream &out, bool expanded=false) const;
     private:
       
-      void synch_violation(EUROPA::ConstraintId const &cstr);
+      void backtracking(EUROPA::SOLVERS::DecisionPointId &dp);
       
-      class violation_proxy :public EUROPA::ConstraintEngineListener {
+      class synchronization_listener :public EUROPA::SOLVERS::SearchListener {
       public:
-        violation_proxy(Assembly &owner)
-          :EUROPA::ConstraintEngineListener(owner.m_cstr_engine), m_owner(owner), m_in_synch(false) {}
+        synchronization_listener(Assembly &owner)
+          :m_owner(owner), m_progress(true) {}
+        ~synchronization_listener() {}
         
-        void set_synch(bool flag=true) {
-          m_in_synch = flag;
+        void notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp) {
+          m_progress = true;
         }
         
-        void notifyViolationAdded(EUROPA::ConstraintId const& constraint){
-          //if( m_in_synch )
-            m_owner.synch_violation(constraint);
+        void notifyDeleted(EUROPA::SOLVERS::DecisionPointId& dp) {}
+        
+        void notifyStepSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
+          m_progress = true;
         }
-
-      protected:
+        
+        void notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp) {}
+        
+        void notifyUndone(EUROPA::SOLVERS::DecisionPointId &dp) {}
+        
+        void notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
+          m_progress = true;
+          debugMsg("trex:always", "Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+        }
+        
+        void notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp) {
+          if( m_progress ) {
+            m_progress = false;
+            debugMsg("trex:always", "start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+            m_owner.backtracking(dp);
+          }
+        }
+        
+      private:
         Assembly &m_owner;
-        bool m_in_synch;
-      };
+        bool m_progress;
+      }; 
       
-      friend class violation_proxy;
-      EUROPA::Id<violation_proxy> m_violationListen;
+      friend class synchronization_listener;
+      EUROPA::SOLVERS::SearchListenerId m_synchListener;
+      
       
       /** @brief Token manipulation event listener
        *

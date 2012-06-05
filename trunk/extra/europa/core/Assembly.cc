@@ -195,7 +195,7 @@ Assembly::Assembly(std::string const &name):m_name(name) {
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
   
-  m_violationListen = (new violation_proxy(*this))->getId();
+  m_synchListener = (new synchronization_listener(*this))->getId();
 
   EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);
 }
@@ -360,6 +360,7 @@ void Assembly::configure_solvers(std::string const &cfg) {
 
   debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg));
   m_synchronizer = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+  m_synchronizer->addListener(m_synchListener);
 }
 
 void Assembly::notify(details::CurrentState const &state) {
@@ -383,10 +384,7 @@ bool Assembly::do_synchronize() {
   }
 
   // 2) execute synchronizer
-  m_violationListen->set_synch(true);
-  bool ret = synchronizer()->solve();
-  m_violationListen->set_synch(false);
-  if( !ret ) {
+  if( !synchronizer()->solve() ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
     return false;
   }
@@ -733,11 +731,31 @@ void Assembly::getFuturePlan()
     }
 }
 
-
-void Assembly::synch_violation(EUROPA::ConstraintId const &cstr) {
-  debugMsg("trex:always", "constraint violation detect dudring synchronization:"
-           <<"\n\t"<<cstr->toString());
+void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
+  // Try to locate the empty vraiables ... we do it the hard way 
+  EUROPA::ConstrainedVariableSet const &vars = m_cstr_engine->getVariables();
+  EUROPA::ConstrainedVariableSet::const_iterator v = vars.begin();
+  std::ostringstream out;
+  
+  for(; vars.end()!=v; ++v) {
+    if( (*v)->lastDomain().isEmpty() && (*v)->lastDomain().isClosed() ) {
+      // Found an empty variable : give its local context
+      EUROPA::TokenId tok = details::parent_token(*v);
+      std::string prefix;
+      if( tok.isId() ) {
+        std::ostringstream oss;
+        
+        oss<<tok->getName().toString()<<'('<<tok->getKey()<<").";
+        prefix = oss.str();
+      }
+      out<<"Local context for "<<prefix<<(*v)->getName().toString()<<'('<<(*v)->getKey()<<"):\n";
+      out<<"\t- base domain: "<<(*v)->baseDomain().toString();
+      out<<"\n\t- Europa violation explnation: "<<(*v)->getViolationExpl();
+      // More to come
+    }
+  }
 }
+
 
 
 
