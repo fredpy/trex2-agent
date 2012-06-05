@@ -352,21 +352,21 @@ bool EuropaReactor::synchronize() {
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
   BOOST_SCOPE_EXIT((&me)) {
-    std::ostringstream oss;
-    EUROPA::SOLVERS::DecisionStack const & ds = me.synchronizer()->getDecisionStack();
-
-
-    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
-      oss<<" -> "<<(*i)->toLongString()<<'\n';
-//    if( me.synchronizer()->getStepCount()>0 )
-//      me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
-//                       <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
+//    std::ostringstream oss;
+//    EUROPA::SOLVERS::DecisionStack const & ds = me.synchronizer()->getDecisionStack();
+//
+//
+//    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
+//      oss<<" -> "<<(*i)->toLongString()<<'\n';
+    if( me.synchronizer()->getStepCount()>0 )
+        me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
+                        <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
-        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
+//        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END
 
 
