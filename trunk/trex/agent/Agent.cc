@@ -681,12 +681,12 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  LogManager::path_type graph_dot = manager().file_name("reactors.dot");
+  LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   std::ofstream dotf(graph_dot.c_str());
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
-  syslog()<<"Initial graph logged in \"reactors.dot\".";
+  syslog()<<"Initial graph logged in \"reactors.gv\".";
 
 
   // start the clock
@@ -739,7 +739,7 @@ void Agent::synchronize() {
   if( update ) {
     // Create new graph file
     std::ostringstream name;
-    name<<"reactors."<<getCurrentTick()<<".dot";
+    name<<"reactors."<<getCurrentTick()<<".gv";
     
     LogManager::path_type graph_dot = manager().file_name(name.str());
     std::ofstream dotf(graph_dot.c_str());

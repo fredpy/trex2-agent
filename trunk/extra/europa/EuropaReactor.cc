@@ -358,9 +358,14 @@ bool EuropaReactor::synchronize() {
 //
 //    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
 //      oss<<" -> "<<(*i)->toLongString()<<'\n';
-    if( me.synchronizer()->getStepCount()>0 )
+    if( me.synchronizer()->getStepCount()>0 ) {
         me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
                         <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
+      std::ostringstream oss;
+      oss<<"synchronization: steps="<<me.synchronizer()->getStepCount()
+         <<", depth="<<me.synchronizer()->getDepth();
+      me.tr_info(oss.str());
+    }
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
@@ -371,7 +376,7 @@ bool EuropaReactor::synchronize() {
 
 
   if( !do_synchronize() ) {
-    //    LogManager::path_type full_name = manager().file_name(getName().str()+".relax.dot");
+    //    LogManager::path_type full_name = manager().file_name(getName().str()+".relax.gv");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
     syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
@@ -573,7 +578,7 @@ EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
 }
 
 void EuropaReactor::logPlan(std::string const &base_name) const {
-  LogManager::path_type full_name = manager().file_name(getName().str()+"."+base_name+".dot");
+  LogManager::path_type full_name = manager().file_name(getName().str()+"."+base_name+".gv");
   std::ofstream out(full_name.c_str());
   print_plan(out);
 }
