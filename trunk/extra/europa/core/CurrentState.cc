@@ -256,7 +256,10 @@ bool CurrentState::commit() {
       if( active->end()->lastDomain().intersects(i_now) ) {
         EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
 
+        debugMsg("trex:commit", "Set end="<<m_prev_obs->end()->lastDomain().toString()<<" to "<<now());
         restrict_base(m_prev_obs, m_prev_obs->end(), EUROPA::IntervalIntDomain(now()));
+        debugMsg("trex:commit", "Update duration="<<m_prev_obs->end()->lastDomain().toString()<<" to "<<now()<<"-"<<start);
+        
         restrict_base(m_prev_obs, m_prev_obs->duration(), EUROPA::IntervalIntDomain(now()-start));
 
         m_assembly.terminate(m_prev_obs);
@@ -311,16 +314,19 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 
 
   for( ; endi!=i && (*i)->start()->lastDomain().getLowerBound()<=ub; ++i) {
+#ifdef  EUROPA_HAVE_EFFECT
+    // New code from Philip 
+    // Check if next candidate is goal dependent ... needs to be refined I think
     EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
     if(nowGoal.isId())
         m_assembly.dispatch(timeline(),*i);
-    /*
+#else 
     ///Old code for dispatching tokens
-    // TODO: need to check if it is guarded first ... in such cas I won't dispatch it
+    // very dumb but work with europa 2.5
     if( !m_assembly.dispatch(timeline(), *i)
        && (*i)->start()->lastDomain().getLowerBound()>=lb )
       break;
-    */
+#endif // EUROPA_HAVE_EFFECT
   }
 }
 
@@ -491,54 +497,72 @@ bool CurrentState::DecisionPoint::canUndo() const {
 void CurrentState::DecisionPoint::handleInitialize() {
   EUROPA::TokenId cur = m_target->current(), active;
   EUROPA::eint date = m_target->now();
-
-
+  
+  debugMsg("trex:current", "Determining state choices for "<<m_target->timeline()->getName().toString()<<" at tick "<<date);
   m_choices.reset();
+  debugMsg("trex:current", "Adding SET_DEFAULT by default");
   m_choices.set(CREATE_DEFAULT);
-
-
+  
   if( cur.isId() ) {
     active = cur->getActiveToken();
     if( active.isNoId() )
       active = cur;
-    EUROPA::IntervalIntDomain const &end = active->end()->lastDomain();
-
-    if( end.getLowerBound() <= date ) {
-      m_choices.set(EXTEND_CURRENT, end.getUpperBound() > date);
+    EUROPA::IntervalIntDomain const &end_cur = active->end()->lastDomain();
+    
+    debugMsg("trex:current", "Checking if last observation can end after "<<date<<" (end="<<end_cur.toString()<<").");
+    if( end_cur.getLowerBound()<=date ) {
+      bool long_enough = ( end_cur.getUpperBound()>date );
+      m_choices.set(EXTEND_CURRENT, long_enough);
+      if( long_enough ) {
+        debugMsg("trex:current", "Adding EXTEND_CURRENT as possible choice");
+      } else {
+        debugMsg("trex:current", "Cannot EXTEND_CURRENT for this timeline");
+      }
     } else {
-      // Already decided : extend_current
       m_choices.reset();
+      m_choices.set(EXTEND_CURRENT);
       m_idx = m_choices.size();
+      debugMsg("trex:current", "EXTEND_CURRENT is the only choice");
       return;
     }
   }
-  // try to find the potential candidates
   std::list<EUROPA::TokenId> const &sequence = m_target->timeline()->getTokenSequence();
-  std::list<EUROPA::TokenId>::const_iterator i=sequence.begin();
+  std::list<EUROPA::TokenId>::const_iterator i = sequence.begin();
+  
   if( active.isId() ) {
-    // Last observation is active => find it
+    debugMsg("trex:current", "Look for successor of last observation.");
     for(; sequence.end()!=i && active!=*i; ++i);
-    // Then make the next token in the sequence the candidate
     if( sequence.end()!=i )
       ++i;
-    m_cand_from = i;
-    if( sequence.end()!=i )
+    m_cand_to = m_cand_from = i;
+    if( sequence.end()!=m_cand_from ) {
+      EUROPA::TokenId tok = *m_cand_from;
       ++i;
-    m_cand_to = i;
+      if( tok->start()->lastDomain().isMember(date) ) {
+        m_cand_to = i;
+        m_choices.set(START_NEXT);
+        debugMsg("trex:current", "successor "<<tok->getPredicateName().toString()<<"("<<tok->getKey()<<") can be started (start="
+                 <<tok->start()->lastDomain().toString()<<").");
+      } else {
+        debugMsg("trex:current", "No active successor starting over "<<date);
+      }
+    } else 
+      debugMsg("trex:curent", "No active successor");
   } else {
-    // No last observation active => search for tokens that can start now
-    for(; sequence.end()!=i && (*i)->end()->lastDomain().getUpperBound()<=date; ++i);
+    debugMsg("trex:current", "No active observation => find potential observation in the plan.");
+    // skip tokens that necessarily start in the past 
+    for( ; sequence.end()!=i && (*i)->start()->lastDomain().getUpperBound()<date; ++i);
     m_cand_from = i;
-    for(; sequence.end()!=i && (*i)->start()->lastDomain().getUpperBound()<=date; ++i);
+    for( ; sequence.end()!=i && (*i)->start()->lastDomain().isMember(date); ++i) {
+      debugMsg("trex:current", "Could start "<<(*i)->getPredicateName().toString()<<"("<<(*i)->getKey()<<").");
+    }
     m_cand_to = i;
+    m_choices.set(START_NEXT, m_cand_from!=m_cand_to);
   }
-  // <m_cand_from, m_cand_to> reflects all the tokens in the sequence that can potentially overlap now
-  m_choices.set(START_NEXT, m_cand_from!=m_cand_to);
   m_tok = m_cand_from;
 
   m_choices.set(CREATE_OTHER, !m_target->m_pred_names.empty());
   m_next_pred = m_target->m_pred_names.begin();
-
   // Initialize the decision index
   m_idx = 0;
   if( !m_choices[m_idx] )
@@ -551,25 +575,29 @@ void CurrentState::DecisionPoint::handleExecute() {
 
   m_prev_idx = m_idx;
   switch(m_idx) {
-  case EXTEND_CURRENT:
-    m_target->push_end();
-    break;
-  case START_NEXT:
-    tok = m_target->new_obs((*m_tok)->getPredicateName().toString(), false);
-    m_client->merge(tok, *m_tok);
-    details::restrict_attributes(tok);
-    break;
-  case CREATE_DEFAULT:
-    tok = m_target->new_obs(details::predicate_name(m_target->timeline(), m_target->default_pred()),
-			    true);
-    break;
-  case CREATE_OTHER:
-    tok = m_target->new_obs(details::predicate_name(m_target->timeline(), *m_next_pred),
-			    true);
-    break;
-  default:
-    throw EuropaException("Unknown synchronization decision for timeline "+
-			  m_target->timeline()->toString());
+    case EXTEND_CURRENT:
+      debugMsg("trex:current", "Execute decision EXTEND_END");
+      m_target->push_end();
+      break;
+    case START_NEXT:
+      debugMsg("trex:current", "Execute decision START_NEXT "<<(*m_tok)->getPredicateName().toString()<<".start="<<(*m_tok)->start()->lastDomain().toString());
+      tok = m_target->new_obs((*m_tok)->getPredicateName().toString(), false);      
+      details::restrict_attributes(tok, *m_tok);
+      m_client->merge(tok, *m_tok);
+      break;
+    case CREATE_DEFAULT:
+      debugMsg("trex:current", "Execute decision CREATE "<<m_target->default_pred().toString());
+      tok = m_target->new_obs(details::predicate_name(m_target->timeline(), m_target->default_pred()),
+                              true);
+      break;
+    case CREATE_OTHER:
+      debugMsg("trex:current", "Execute decision CREATE "<<m_next_pred->toString());
+      tok = m_target->new_obs(details::predicate_name(m_target->timeline(), *m_next_pred),
+                              true);
+      break;
+    default:
+      throw EuropaException("Unknown synchronization decision for timeline "+
+                            m_target->timeline()->toString());
   }
 }
 
