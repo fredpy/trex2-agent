@@ -44,6 +44,7 @@
 
 #include "TeleoReactor.hh"
 #include <trex/domain/FloatDomain.hh>
+#include <trex/utils/chrono_helper.hh>
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -509,14 +510,16 @@ bool TeleoReactor::doSynchronize() {
     {
       stat_clock::time_point start = stat_clock::now();
       // collect information from external timelines 
-      tr_info("Receive notification");
+      //tr_info("Receive notification");
       doNotify();
-      tr_info("Start synchronization");
+      //tr_info("Start synchronization");
       success = synchronize();      
       m_synch_usage = stat_clock::now()-start;
       if( NULL!=m_trLog ) {
         std::ostringstream oss;   
-        boost::chrono::duration_short(oss)<<"Synchronization completed in "<<m_synch_usage;
+	display(oss<<"Synchronization completed in ", m_synch_usage);
+	if( !success )
+	  tr_info("Failed to synchronize !!!");
         tr_info(oss.str());
       }
     }
@@ -552,7 +555,7 @@ void TeleoReactor::step() {
   stat_clock::duration delta = stat_clock::now()-start;
   if( NULL!=m_trLog ) {
     oss.str("");
-    boost::chrono::duration_short(oss)<<"step completed in "<<delta;
+    display(oss<<"Step completed in ", delta);
     tr_info(oss.str());
   }
   m_deliberation_usage += delta;
