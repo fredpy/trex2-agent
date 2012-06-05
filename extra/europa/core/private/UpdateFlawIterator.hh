@@ -36,9 +36,9 @@
 
 namespace TREX {
   namespace europa {
-        
+    
     namespace details {
-
+      
       /** @brief Synchronization flaws iterator
        * 
        * A class used by Synchronization to iterator through all the TREX internal 
@@ -50,16 +50,16 @@ namespace TREX {
        */
       class UpdateFlawIterator :public EUROPA::SOLVERS::FlawIterator {
       public:
-	UpdateFlawIterator(SynchronizationManager &manager);
-	~UpdateFlawIterator() {}
-
+        UpdateFlawIterator(SynchronizationManager &manager);
+        ~UpdateFlawIterator() {}
+        
       private:
-	EUROPA::EntityId const nextCandidate();
-	Assembly::internal_iterator m_it;
-	
-	Assembly &m_assembly;
+        EUROPA::EntityId const nextCandidate();
+        Assembly::internal_iterator m_it;
+        
+        Assembly &m_assembly;
       }; // TREX::europa::details::UpdateFlawIterator
-
+      
     } // TREX::europa::details
   } // TREX::europa
 } // TREX
