@@ -240,7 +240,8 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        */
       void restrict_attributes(EUROPA::TokenId const &tok);
-      
+      void restrict_attributes(EUROPA::TokenId const &tok, EUROPA::TokenId const &other);
+     
       /** @brief rejectable test functor
        *
        * This functor test if a token is rejectable or not. A rejectable token 
