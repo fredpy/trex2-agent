@@ -55,6 +55,11 @@
 #include <PLASMA/Timeline.hh>
 #include <PLASMA/TokenVariable.hh>
 
+#include <PLASMA/PlanDatabaseWriter.hh>
+
+
+#include <PLASMA/Context.hh>
+
 #include <PLASMA/XMLUtils.hh>
 #include <PLASMA/Debug.hh>
 
@@ -189,6 +194,8 @@ Assembly::Assembly(std::string const &name):m_name(name) {
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
+  
+  m_violationListen = (new violation_proxy(*this))->getId();
 
   EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);
 }
@@ -376,7 +383,10 @@ bool Assembly::do_synchronize() {
   }
 
   // 2) execute synchronizer
-  if( !synchronizer()->solve() ) {
+  m_violationListen->set_synch(true);
+  bool ret = synchronizer()->solve();
+  m_violationListen->set_synch(false);
+  if( !ret ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
     return false;
   }
@@ -722,6 +732,14 @@ void Assembly::getFuturePlan()
         }
     }
 }
+
+
+void Assembly::synch_violation(EUROPA::ConstraintId const &cstr) {
+  debugMsg("trex:always", "constraint violation detect dudring synchronization:"
+           <<"\n\t"<<cstr->toString());
+}
+
+
 
 /*
  * class TREX::europa::Assembly::listener_proxy
