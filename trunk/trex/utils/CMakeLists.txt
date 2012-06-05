@@ -66,6 +66,7 @@ add_library(TREXutils SHARED
   XmlFactory.hh
   XmlUtils.hh
   id_mapper.hh
+  chrono_helper.hh
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh
