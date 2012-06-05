@@ -509,10 +509,16 @@ bool TeleoReactor::doSynchronize() {
     {
       stat_clock::time_point start = stat_clock::now();
       // collect information from external timelines 
+      tr_info("Receive notification");
       doNotify();
-      success = synchronize();
-      
+      tr_info("Start synchronization");
+      success = synchronize();      
       m_synch_usage = stat_clock::now()-start;
+      if( NULL!=m_trLog ) {
+        std::ostringstream oss;   
+        boost::chrono::duration_short(oss)<<"Synchronization completed in "<<m_synch_usage;
+        tr_info(oss.str());
+      }
     }
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
@@ -536,9 +542,20 @@ bool TeleoReactor::doSynchronize() {
 }
 
 void TeleoReactor::step() {
+  std::ostringstream oss;
+  if( NULL!=m_trLog ) {
+    oss<<"Starting deliberation step "<<(m_nSteps+1);  
+    tr_info(oss.str());
+  }
   stat_clock::time_point start = stat_clock::now();
   resume();
-  m_deliberation_usage += stat_clock::now()-start;
+  stat_clock::duration delta = stat_clock::now()-start;
+  if( NULL!=m_trLog ) {
+    oss.str("");
+    boost::chrono::duration_short(oss)<<"step completed in "<<delta;
+    tr_info(oss.str());
+  }
+  m_deliberation_usage += delta;
   m_nSteps += 1;
 }
 
@@ -566,6 +583,13 @@ void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllabl
       syslog("WARN")<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
     }
 }
+
+void TeleoReactor::tr_info(std::string const &msg) {
+  if( NULL!=m_trLog ) {
+    m_trLog->comment(msg);
+  }
+}
+
 
 bool TeleoReactor::unuse(TREX::utils::Symbol const &timeline) {
   external_set::iterator i = m_externals.find(timeline);
@@ -713,6 +737,12 @@ void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
   openTick();
   m_file<<"    <unuse name=\""<<name<<"\"/>"<<std::endl;
 }
+
+void TeleoReactor::Logger::comment(std::string const &msg) {
+  openTick();
+  m_file<<"    <!-- "<<msg<<" -->"<<std::endl;
+}
+
 
 void TeleoReactor::Logger::newTick(TICK val) {
   if( m_tick ) {

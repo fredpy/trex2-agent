@@ -824,6 +824,14 @@ namespace TREX {
        */
       void provide(TREX::utils::Symbol const &timeline, bool controllable=true, bool publish=false);
       
+      /** Add comment on transaction log 
+       * @param[in] msg A message
+       *
+       * Adds the message @p msg in the transaction log. This message will be 
+       * produced only if the reactor is logging its transactions.
+       */
+      void tr_info(std::string const &msg);
+      
       /** @brief External timeline unsubscription
        *
        * @param[in] timeline A timeline name
@@ -1036,6 +1044,8 @@ namespace TREX {
          * @param[in] goal the goal recalled
          */
 	void recall(goal_id const &goal);
+        
+        void comment(std::string const &msg);
         
         void notifyPlan(goal_id const &t);
         void cancelPlan(goal_id const &t);
