@@ -99,6 +99,49 @@ namespace TREX {
       EUROPA::Domain &m_val;
     }; // TREX::europa::SqrtConstraint
     
+    class CeilConstraint :public EUROPA::Constraint {
+    public:
+      /** @brief Constructor
+       * @param[in] name the name of the constraint
+       * @param[in] propagatorName The name of the propagator handling this constraint
+       * @param[in] cstrEngine the constraint engine for this instance
+       * @param[in] vars the list of arguments
+       *
+       * @pre @p vars size is @e exactly 2
+       * @pre All the element of @p vars are IntervalDomain instances
+       */
+      CeilConstraint(EUROPA::LabelStr const &name,
+                     EUROPA::LabelStr const &propagatorName,
+                     EUROPA::ConstraintEngineId const &cstrEngine,
+                     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_ceil;
+      EUROPA::Domain &m_val;      
+    }; // TREX::europa::CeilConstraint 
+    
+    class FloorConstraint :public EUROPA::Constraint {
+    public:
+      /** @brief Constructor
+       * @param[in] name the name of the constraint
+       * @param[in] propagatorName The name of the propagator handling this constraint
+       * @param[in] cstrEngine the constraint engine for this instance
+       * @param[in] vars the list of arguments
+       *
+       * @pre @p vars size is @e exactly 2
+       * @pre All the element of @p vars are IntervalDomain instances
+       */
+      FloorConstraint(EUROPA::LabelStr const &name,
+                     EUROPA::LabelStr const &propagatorName,
+                     EUROPA::ConstraintEngineId const &cstrEngine,
+                     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+      EUROPA::Domain &m_floor;
+      EUROPA::Domain &m_val;      
+    }; // TREX::europa::FloorConstraint 
     
   } // TREX::europa
 } // TREX

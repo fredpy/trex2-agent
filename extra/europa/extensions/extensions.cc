@@ -64,6 +64,12 @@ namespace TREX {
      */
     DECLARE_FUNCTION_TYPE(SqrtConstraint, sqrt, 
                           "sqrtf", EUROPA::FloatDT, 1); 
+
+    DECLARE_FUNCTION_TYPE(CeilConstraint, ceil, 
+                          "ceilf", EUROPA::IntDT, 1); 
+    DECLARE_FUNCTION_TYPE(FloorConstraint, floor, 
+                          "floorf", EUROPA::IntDT, 1); 
+    
     /** @brief sinf NDDL function
      *
      * Declare the sine function within nddl language
@@ -118,14 +124,18 @@ namespace {
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosf, trex);
-        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint,   sinf, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint, sinf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtf, trex);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CeilConstraint, ceilf, Default);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::FloorConstraint, floorf, Default);
         
         declareFunction(assembly, new TREX::europa::SineConstraintFunction());
         declareFunction(assembly, new TREX::europa::CosineConstraintFunction());
         declareFunction(assembly, new TREX::europa::AbsValConstraintFunction());
         declareFunction(assembly, new TREX::europa::SqrtConstraintFunction());
+        declareFunction(assembly, new TREX::europa::CeilConstraintFunction());
+        declareFunction(assembly, new TREX::europa::FloorConstraintFunction());
       }
       
     }; // ::Extensions
