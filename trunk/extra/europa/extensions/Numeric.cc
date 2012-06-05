@@ -182,3 +182,95 @@ void SqrtConstraint::handleExecute() {
     }
   }
 }
+
+/*
+ * class TREX::europa::CeillConstraint
+ */
+
+CeilConstraint::CeilConstraint(EUROPA::LabelStr const &name,
+                                 EUROPA::LabelStr const &propagatorName,
+                                 EUROPA::ConstraintEngineId const &cstrEngine,
+                                 std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
+  m_ceil(getCurrentDomain(vars[0])), 
+  m_val(getCurrentDomain(vars[1])) {
+  checkError(vars.size()==2, "Exactly 2 parameters required.");
+}
+
+
+void CeilConstraint::handleExecute() {
+  EUROPA::edouble c_lb, c_ub, v_lb, v_ub;
+  // restrict m_abs based on m_val
+  m_val.getBounds(v_lb, v_ub);
+  
+  if( v_lb<=std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+    c_lb = std::numeric_limits<EUROPA::eint>::minus_infinity();
+  else
+    c_lb = std::ceil(v_lb); 
+  if( v_ub>=std::numeric_limits<EUROPA::edouble>::infinity() )
+    c_ub = std::numeric_limits<EUROPA::eint>::infinity();
+  else
+    c_ub = std::ceil(v_ub);
+  
+  m_ceil.intersect(c_lb, c_ub);
+  
+  // constrain m_val based on m_abs
+  m_ceil.getBounds(c_lb, c_ub);
+  
+  if( c_lb<=std::numeric_limits<EUROPA::eint>::minus_infinity() )
+    v_lb = std::numeric_limits<EUROPA::edouble>::minus_infinity();
+  else if( (c_lb-1.0)<v_lb )
+    v_lb = c_lb-1.0;
+  if( c_ub>=std::numeric_limits<EUROPA::eint>::infinity() )
+    v_ub = std::numeric_limits<EUROPA::edouble>::infinity();
+  else if( v_ub>c_ub )
+    v_ub = c_ub;
+  m_val.intersect(v_lb, v_ub);
+}
+
+/*
+ * class TREX::europa::FloorConstraint
+ */
+
+FloorConstraint::FloorConstraint(EUROPA::LabelStr const &name,
+                               EUROPA::LabelStr const &propagatorName,
+                               EUROPA::ConstraintEngineId const &cstrEngine,
+                               std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
+m_floor(getCurrentDomain(vars[0])), 
+m_val(getCurrentDomain(vars[1])) {
+  checkError(vars.size()==2, "Exactly 2 parameters required.");
+}
+
+
+void FloorConstraint::handleExecute() {
+  EUROPA::edouble f_lb, f_ub, v_lb, v_ub;
+  // restrict m_abs based on m_val
+  m_val.getBounds(v_lb, v_ub);
+  
+  if( v_lb<=std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+    f_lb = std::numeric_limits<EUROPA::eint>::minus_infinity();
+  else
+    f_lb = std::floor(v_lb);
+  if( v_ub>=std::numeric_limits<EUROPA::edouble>::infinity() )
+    f_ub = std::numeric_limits<EUROPA::eint>::infinity();
+  else
+    f_ub = std::floor(v_ub);
+  
+  m_floor.intersect(f_lb, f_ub);
+  
+  // constrain m_val based on m_abs
+  m_floor.getBounds(f_lb, f_ub);
+  
+  if( f_lb<=std::numeric_limits<EUROPA::eint>::minus_infinity() )
+    v_lb = std::numeric_limits<EUROPA::edouble>::minus_infinity();
+  else if( f_lb>v_lb )
+    v_lb = f_lb;
+  if( f_ub>=std::numeric_limits<EUROPA::eint>::infinity() )
+    v_ub = std::numeric_limits<EUROPA::edouble>::infinity();
+  else if( v_ub>(f_ub+1.0) )
+    v_ub = f_ub+1.0;
+  m_val.intersect(v_lb, v_ub);
+}
+
+
