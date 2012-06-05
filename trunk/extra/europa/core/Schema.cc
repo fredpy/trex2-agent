@@ -153,6 +153,7 @@ EuropaPlugin::~EuropaPlugin() {
 // manipulators
 
 void EuropaPlugin::declareFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
+  debugMsg("trex:declare", "New function "<<fn->getName().toString()<<" declared");
   m_schema->registerFunction(assembly, fn);
 }
 
