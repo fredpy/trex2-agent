@@ -1084,13 +1084,42 @@ namespace TREX {
        */
       void print_plan(std::ostream &out, bool expanded=false) const;
     private:
-      
+      /** @brief Synchronization backtrack
+       *
+       * This method is called when synchronization_listener identifies that 
+       * synchronization search is backtracking.
+       *
+       * @param[in] dp The decision point that caused the backtrack
+       *
+       * @sa synchronization_listener
+       */
       void backtracking(EUROPA::SOLVERS::DecisionPointId &dp);
       
+      /** @brief synchronization search events listener
+       *
+       * A search listener used by the Assembly to keep track of search events 
+       * occuring during synchronization 
+       *
+       * @relates Assembly
+       * @ingroup europa
+       * @author Frederic Py
+       *
+       * @note This listener is meant to detect backtracks during synchronization 
+       * The issue is that -- up to europa 2.6 -- notifyStepFailed was not called 
+       * by the solver. As an alternate solution we use the ce_listener to detect 
+       * emptied domains.
+       *
+       * @sa class Assembly::ce_listener
+       */
       class synchronization_listener :public EUROPA::SOLVERS::SearchListener {
       public:
+        /** @brief Constructor 
+         *
+         * @param[in] owner The creator of this instance
+         */
         synchronization_listener(Assembly &owner)
           :m_owner(owner), m_progress(true) {}
+        /** @brief Destructor. */
         ~synchronization_listener() {}
         
         void notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp);
@@ -1106,11 +1135,40 @@ namespace TREX {
       private:
         Assembly &m_owner;
         bool m_progress;
-      }; 
+      }; // class TREX::europa::Assembly::synchronization_listener 
       
       friend class synchronization_listener;
       EUROPA::SOLVERS::SearchListenerId m_synchListener;
       
+      void print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const;
+    
+      class ce_listener :public EUROPA::ConstraintEngineListener {
+      public:
+        ce_listener(Assembly &owner);
+        ~ce_listener() {}
+         
+        void notifyPropagationPreempted();
+        void notifyRemoved(EUROPA::ConstrainedVariableId const &var) {
+          m_empty_vars.erase(var);
+        }
+        void notifyChanged(EUROPA::ConstrainedVariableId const &variable,
+                           EUROPA::DomainListener::ChangeType const& changeType) {
+          if( changeType==EUROPA::DomainListener::EMPTIED )
+            m_empty_vars.insert(variable);
+          else if( !variable->lastDomain().isEmpty() )
+            m_empty_vars.erase(variable);
+        }
+
+      private:
+        Assembly &m_owner;
+        EUROPA::ConstrainedVariableSet m_empty_vars;
+        
+      }; // class TREX::europa::Assembly::ce_listener
+      
+      friend class ce_listener;
+      EUROPA::ConstraintEngineListenerId m_ce_listener;
+      
+      bool m_in_synchronization;
       
       /** @brief Token manipulation event listener
        *
