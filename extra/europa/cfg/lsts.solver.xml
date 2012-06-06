@@ -3,13 +3,12 @@
     		<FlawHandler component="StandardThreatHandler"/>
   	</ThreatManager>
 
-  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
+  	<OpenConditionManager defaultPriority="100">
     		<FlawHandler component="StandardOpenConditionHandler"/>
   	</OpenConditionManager>
 
-  	<UnboundVariableManager defaultPriority="0">
-	  <!-- Block binding by the solver if variables are not singleton -->
+  	<!-- UnboundVariableManager defaultPriority="0">
     		<FlawFilter component="Singleton"/>
     		<FlawHandler component="StandardVariableHandler"/>
-  	</UnboundVariableManager>
+  	</UnboundVariableManager -->
 </Solver>
