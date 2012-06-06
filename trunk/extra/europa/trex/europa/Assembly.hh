@@ -1093,32 +1093,15 @@ namespace TREX {
           :m_owner(owner), m_progress(true) {}
         ~synchronization_listener() {}
         
-        void notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp) {
-          m_progress = true;
-        }
+        void notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp);
+        void notifyDeleted(EUROPA::SOLVERS::DecisionPointId& dp);
         
-        void notifyDeleted(EUROPA::SOLVERS::DecisionPointId& dp) {}
+        void notifyStepSucceeded(EUROPA::SOLVERS::DecisionPointId& dp);
+        void notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp);
         
-        void notifyStepSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
-          m_progress = true;
-        }
-        
-        void notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp) {}
-        
-        void notifyUndone(EUROPA::SOLVERS::DecisionPointId &dp) {}
-        
-        void notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
-          m_progress = true;
-          debugMsg("trex:always", "Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
-        }
-        
-        void notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp) {
-          if( m_progress ) {
-            m_progress = false;
-            debugMsg("trex:always", "start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
-            m_owner.backtracking(dp);
-          }
-        }
+        void notifyUndone(EUROPA::SOLVERS::DecisionPointId &dp);
+        void notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp);
+        void notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp);
         
       private:
         Assembly &m_owner;

@@ -732,32 +732,47 @@ void Assembly::getFuturePlan()
 }
 
 void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
-  // Try to locate the empty vraiables ... we do it the hard way 
-  EUROPA::ConstrainedVariableSet const &vars = m_cstr_engine->getVariables();
-  EUROPA::ConstrainedVariableSet::const_iterator v = vars.begin();
-  std::ostringstream out;
-  
-  for(; vars.end()!=v; ++v) {
-    if( (*v)->lastDomain().isEmpty() && (*v)->lastDomain().isClosed() ) {
-      // Found an empty variable : give its local context
-      EUROPA::TokenId tok = details::parent_token(*v);
-      std::string prefix;
-      if( tok.isId() ) {
-        std::ostringstream oss;
-        
-        oss<<tok->getName().toString()<<'('<<tok->getKey()<<").";
-        prefix = oss.str();
-      }
-      out<<"Local context for "<<prefix<<(*v)->getName().toString()<<'('<<(*v)->getKey()<<"):\n";
-      out<<"\t- base domain: "<<(*v)->baseDomain().toString();
-      out<<"\n\t- Europa violation explnation: "<<(*v)->getViolationExpl();
-      // More to come
-    }
-  }
+  debugMsg("trex:always", "Last decision : "<<m_synchronizer->getLastExecutedDecision());
 }
 
+/*
+ * class TREX::europa::Assembly::synchronization_listener
+ */
 
+void Assembly::synchronization_listener::notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp) {
+  debugMsg("trex:synch:search", "New decision point ["<<dp->getKey()<<"]:" <<dp->toString());
+  m_progress = true;
+}
 
+void Assembly::synchronization_listener::notifyDeleted(EUROPA::SOLVERS::DecisionPointId& dp) {
+  debugMsg("trex:synch:search", "Delete decision point ["<<dp->getKey()<<"](backtrack)");
+}
+
+void Assembly::synchronization_listener::notifyStepSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
+  debugMsg("trex:synch:search", "Executed decision point ["<<dp->getKey()<<"]: "<<dp->toString());
+  m_progress = true;
+}
+
+void Assembly::synchronization_listener::notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp) {
+  debugMsg("trex:synch:search", "Failed decision point ["<<dp->getKey()<<"]: "<<dp->toString());
+}
+
+void Assembly::synchronization_listener::notifyUndone(EUROPA::SOLVERS::DecisionPointId &dp) {
+  debugMsg("trex:synch:search", "Undid decision point ["<<dp->getKey()<<"]");
+}
+
+void Assembly::synchronization_listener::notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
+  m_progress = true;
+  debugMsg("trex:always", "Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+}
+
+void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp) {
+  if( m_progress ) {
+    m_progress = false;
+    debugMsg("trex:always", "start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+    m_owner.backtracking(dp);
+  }
+}
 
 /*
  * class TREX::europa::Assembly::listener_proxy
