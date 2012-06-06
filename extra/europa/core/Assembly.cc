@@ -63,6 +63,8 @@
 #include <PLASMA/XMLUtils.hh>
 #include <PLASMA/Debug.hh>
 
+#include <boost/scope_exit.hpp>
+
 
 using namespace TREX::europa;
 
@@ -164,7 +166,8 @@ bool Assembly::actions_supported() {
 
 // structors
 
-Assembly::Assembly(std::string const &name):m_name(name) {
+Assembly::Assembly(std::string const &name)
+  :m_in_synchronization(false), m_name(name) {
   //  redirect log output to <name>.europa.log
   m_trex_schema->setStream(m_debug, m_name+".europa.log");
 
@@ -375,6 +378,12 @@ void Assembly::notify(details::CurrentState const &state) {
 }
 
 bool Assembly::do_synchronize() {
+  m_in_synchronization = true;
+  
+  BOOST_SCOPE_EXIT((&m_in_synchronization)) {
+    m_in_synchronization = false;
+  } BOOST_SCOPE_EXIT_END
+  
   // 1) apply external observations
   for(external_iterator i=begin_external(); end_external()!=i; ++i) {
     if( !(*i)->commit() ) {
@@ -735,6 +744,58 @@ void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
   debugMsg("trex:always", "Last decision : "<<m_synchronizer->getLastExecutedDecision());
 }
 
+void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const {
+  EUROPA::TokenId tok = details::parent_token(v);
+  details::var_print(out<<"Local context for ", v)<<":\n";
+  out<<"  - base domain: "<<v->baseDomain().toString()
+  <<"\n  - last domain: "<<v->lastDomain().toString()
+  <<"\n  - europa violation explanation: "<<v->getViolationExpl()<<'\n';
+  EUROPA::ConstraintSet constraints;
+  v->constraints(constraints);
+  if( !constraints.empty() ) {
+    out<<"  - related constraints:\n";
+    for(EUROPA::ConstraintSet::const_iterator c=constraints.begin(); constraints.end()!=c; ++c) {
+      EUROPA::ConstraintId cstr = *c;
+      std::vector<EUROPA::ConstrainedVariableId> const &scope = cstr->getScope();
+      size_t i, end_i = scope.size();
+      
+      out<<"\t+ "<<cstr->getName().toString()<<'(';
+      for(i=0; i<end_i; ++i) {
+        if( i>0 )
+          out<<", ";
+        details::var_print(out, scope[i]);
+        if( scope[i]!=v )
+          out<<"="<<scope[i]->lastDomain().toString();
+      }
+      out<<")\n";
+    }
+  }
+}
+
+/*
+ * class TREX::europa::Assembly::ce_listener 
+ */
+
+Assembly::ce_listener::ce_listener(Assembly &owner) 
+:EUROPA::ConstraintEngineListener(owner.m_cstr_engine), m_owner(owner) {}
+
+void Assembly::ce_listener::notifyPropagationPreempted() {
+  if( m_owner.m_in_synchronization ) {
+    debugMsg("trex:always", "search preempted during synchronization");
+    
+    if( !m_empty_vars.empty() ) {
+      debugMsg("trex:always", "======================================================================");
+      debugMsg("trex:always", m_empty_vars.size()<<" variables are empty:");
+      for(EUROPA::ConstrainedVariableSet::const_iterator v=m_empty_vars.begin(); m_empty_vars.end()!=v; ++v) {
+        std::ostringstream oss; 
+        m_owner.print_context(oss, *v);
+        debugMsg("trex:always", oss.str()<<"\n");
+      }
+      debugMsg("trex:always", "======================================================================");
+    }
+  }
+}
+
 /*
  * class TREX::europa::Assembly::synchronization_listener
  */
@@ -754,6 +815,8 @@ void Assembly::synchronization_listener::notifyStepSucceeded(EUROPA::SOLVERS::De
 }
 
 void Assembly::synchronization_listener::notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp) {
+  // This callback is not active yet but is the one I want
+  // ... should be availabele on europa 2.7 (or any version number after 2.6)
   debugMsg("trex:synch:search", "Failed decision point ["<<dp->getKey()<<"]: "<<dp->toString());
 }
 

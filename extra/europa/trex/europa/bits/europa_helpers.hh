@@ -82,6 +82,9 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        */
       EUROPA::TokenId parent_token(EUROPA::ConstrainedVariableId const &var);
+      
+      std::ostream &var_print(std::ostream &out, EUROPA::ConstrainedVariableId const &var);
+      
       /** @brief Extract Assembly
        *
        * @param[in] component A europa component
