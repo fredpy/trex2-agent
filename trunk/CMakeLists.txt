@@ -41,16 +41,18 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 ########################################################################
 project(trex)
 set(TREX_MAJOR 0)
-set(TREX_MINOR 3)
-set(TREX_PATCH 3)
-
-
-# CPack version numbers for release tarball name.
-set(CPACK_PACKAGE_VERSION_MAJOR ${TREX_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${TREX_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${TREX_PATCH})
+set(TREX_MINOR 4)
+set(TREX_PATCH 0)
+set(TREX_RC 1)
 
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
+if(TREX_RC GREATER 0)
+  set(VERSION "${VERSION}-rc${TREX_RC}")
+endif(TREX_RC GREATER 0)
+
+# CPack version numbers for release tarball name.
+set(CPACK_PACKAGE_VERSION ${VERSION})
+
 message(STATUS "${PROJECT_NAME} VERSION = ${VERSION}")
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent executive")

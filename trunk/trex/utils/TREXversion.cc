@@ -49,6 +49,15 @@ unsigned short TREX::version::release() {
   return TREX_PATCH;
 }
 
+bool TREX::version::is_release_candidate() {
+  return rc_number()>0;
+}
+
+unsigned TREX::version::rc_number() {
+  return TREX_RC;
+}
+
+
 unsigned long TREX::version::number() {
   unsigned long version = major();
   version = 100*version + minor();
@@ -57,7 +66,5 @@ unsigned long TREX::version::number() {
 }
 
 std::string TREX::version::str() {
-  std::ostringstream oss;
-  oss<<major()<<'.'<<minor()<<'.'<<release();
-  return oss.str();
+  return TREX_VERSION;
 }
