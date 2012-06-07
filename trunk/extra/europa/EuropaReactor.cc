@@ -359,8 +359,6 @@ bool EuropaReactor::synchronize() {
 //    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
 //      oss<<" -> "<<(*i)->toLongString()<<'\n';
     if( me.synchronizer()->getStepCount()>0 ) {
-        me.syslog("stat")<<"synchronization in "<<me.synchronizer()->getStepCount()
-                        <<" steps (depth="<<me.synchronizer()->getDepth()<<")";
       std::ostringstream oss;
       oss<<"synchronization: steps="<<me.synchronizer()->getStepCount()
          <<", depth="<<me.synchronizer()->getDepth();

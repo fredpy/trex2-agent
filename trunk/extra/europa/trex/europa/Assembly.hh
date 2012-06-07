@@ -1166,7 +1166,7 @@ namespace TREX {
       }; // class TREX::europa::Assembly::ce_listener
       
       friend class ce_listener;
-      EUROPA::ConstraintEngineListenerId m_ce_listener;
+      std::auto_ptr<ce_listener> m_ce_listener;
       
       bool m_in_synchronization;
       

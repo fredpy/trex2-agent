@@ -187,7 +187,8 @@ Assembly::Assembly(std::string const &name)
   m_schema = ((EUROPA::Schema *)getComponent("Schema"))->getId();
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
   m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
-
+    
+  m_ce_listener.reset(new ce_listener(*this));
   m_proxy.reset(new listener_proxy(*this));
 
   // Register the new propagator used for reactor related constraints
