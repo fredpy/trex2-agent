@@ -521,7 +521,8 @@ void CurrentState::DecisionPoint::handleInitialize() {
     } else {
       m_choices.reset();
       m_choices.set(EXTEND_CURRENT);
-      m_idx = m_choices.size();
+      m_prev_idx= m_idx = EXTEND_CURRENT;
+    
       debugMsg("trex:current", "EXTEND_CURRENT is the only choice");
       return;
     }
@@ -563,6 +564,10 @@ void CurrentState::DecisionPoint::handleInitialize() {
 
   m_choices.set(CREATE_OTHER, !m_target->m_pred_names.empty());
   m_next_pred = m_target->m_pred_names.begin();
+  
+  if( m_choices.none() )
+    debugMsg("trex:always", "No choices for current state flaw of timeline "<<m_target->timeline()->getName().toString());
+  
   // Initialize the decision index
   m_idx = 0;
   if( !m_choices[m_idx] )
