@@ -67,7 +67,7 @@ class Luminance extends AgentTimeline {
     predicate Dim {}
     
     Luminance(Mode _mode) {
-	super(_mode, true);
+	super(_mode);
     }
 }
 
@@ -99,8 +99,32 @@ Light::Off {
 }
 
 Switch::Up {
+    bool external;
     contained_by(Light.Off);
     foo == false;
+    // isExternal(external);
+    // if( external==false ) {
+    // 	duration == end - start;
+    // 	if( start<=AGENT_CLOCK ) {
+    // 	    meets(object.Down next);
+    // 	    // if( next.state==ACTIVE || next.state==MERGED ) {
+    // 	    // 	bind(duration, 1);
+    // 	    // }
+    // 	}
+    // }
 }
 
+Switch::Down {
+    // bool external;
+    // isExternal(external);
+    // if( external==false ) {
+    // 	duration == end - start;
+    // 	if( start<=AGENT_CLOCK ) {
+    // 	    meets(object.Up next);
+    // 	    // if( next.state==ACTIVE || next.state==MERGED ) {
+    // 	    // 	bind(duration, 1);
+    // 	    // }
+    // 	}
+    // }
+}
 

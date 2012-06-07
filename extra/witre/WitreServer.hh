@@ -53,16 +53,14 @@ namespace TREX {
     public:
 
       class Error :public TREX::utils::Exception {
-            public:
-                Error(std::string const &what) throw()
-                    :TREX::utils::Exception(what) {}
-                virtual ~Error() throw() {}
+      public:
+	Error(std::string const &what) throw()
+	  :TREX::utils::Exception(what) {}
+	virtual ~Error() throw() {}
       };
 
       // WitreApplication const &app() const;
       // WitreApplication &app();
-
-      typedef std::list<goal_id> timed_goal;
 
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
@@ -76,7 +74,6 @@ namespace TREX {
       bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
       time_t getTime_t() { time_t now = std::floor(tickToTime(getCurrentTick())); return now; };
       std::string getDependencies(std::string name);
-      const timed_goal& plan() { return planTokens; };
 
       TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
       TREX::transaction::Goal getGoal(std::string obs, std::string prd);
@@ -96,8 +93,6 @@ namespace TREX {
       void handleTickStart() {};
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
-      void newPlanToken(goal_id const &t);
-      void cancelledPlanToken(goal_id const &t);
       //End of Trex functions
 
       struct Connection {
@@ -114,7 +109,6 @@ namespace TREX {
       void undeclared(TREX::transaction::details::timeline const &timeline);
 
       void searchGraph();
-      void dispatchPlanTokens();
 
 
       mutable boost::mutex mutex_;
@@ -122,8 +116,6 @@ namespace TREX {
       std::vector<Connection> connections;
       std::vector<utils::Symbol> externalTimelines;
       std::queue<std::string> observations;
-      timed_goal pastTokens;
-      timed_goal planTokens;
       WitrePaintSearch::GraphMap timelineGraph;
 
 

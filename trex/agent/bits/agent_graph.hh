@@ -1,4 +1,4 @@
-/** @file agent_graph.hh
+/** @file trex/agent/agent_graph.hh
  *
  * @brief utilities for TREX agen reactor graph management
  *

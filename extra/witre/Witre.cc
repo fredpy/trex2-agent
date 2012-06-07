@@ -37,7 +37,8 @@
 #include <trex/utils/TREXversion.hh>
 #include <trex/utils/Plugin.hh>
 
-#include <Wt/WFileResource>
+#include <Wt/WContainerWidget>
+#include <Wt/WText>
 
 using namespace TREX::utils;
 using namespace TREX::witre;
@@ -86,11 +87,10 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
              <<" { child[i].lastChild.style.backgroundColor = (color ? \"#E0FFFF\":\"white\"); }}}}";
     this->declareJavaScriptFunction("highlight", highlight.str());
 
-    //setCssTheme("polished");
+    //setCssTheme("Polished");
     //Creating the containers for layout
     Wt::WContainerWidget* north = new Wt::WContainerWidget();
     Wt::WContainerWidget* center = new Wt::WContainerWidget();
-    center->setAttributeValue("name", "center");
     Wt::WContainerWidget* east = new Wt::WContainerWidget();
     east->setContentAlignment(Wt::AlignTop | Wt::AlignRight);
     Wt::WContainerWidget* west = new Wt::WContainerWidget();
@@ -116,10 +116,10 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     {
         std::string name = wServer->extTimelinesName(i);
         tLineMap[name]=true;
-        Wt::WPushButton* temp = new Wt::WPushButton(name, tLines);
-        temp->setMargin(10,Wt::Right);
+        Wt::WCheckBox* temp = new Wt::WCheckBox(name, tLines);
+        temp->setChecked(true);//
         temp->setObjectName(name);
-        temp->clicked().connect(this, &WitreApplication::timeLineChange);
+        temp->changed().connect(this, &WitreApplication::timeLineChange);
     }
     //End of North code
 
@@ -141,22 +141,6 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     enter->clicked().connect(enter, &Wt::WWidget::disable);
     input->enterPressed().connect(boost::bind(&WitreApplication::attributePopup, this));
     input->enterPressed().connect(enter, &Wt::WWidget::disable );
-    new Wt::WBreak(east);
-    new Wt::WBreak(east);
-    //links in the east box
-    Wt::WGroupBox* links = new Wt::WGroupBox("Links",east);
-    links->setList(true);
-    Wt::WAnchor* lgraph = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/graph"), "Graph", links);
-    new Wt::WBreak(links);
-    Wt::WAnchor* ltrex = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/log/TREX.log"), "Trex log", links);
-    new Wt::WBreak(links);
-    new Wt::WBreak(links);
-    Wt::WSignalMapper<Wt::WLineEdit*> *logmap = new Wt::WSignalMapper<Wt::WLineEdit*>(this);
-    logmap->mapped().connect(this, &WitreApplication::searchLog);
-    Wt::WLineEdit* log = new Wt::WLineEdit(links);
-    log->setEmptyText("Search");
-    logmap->mapConnect(log->enterPressed(), log);
-    //End of links
     //End of East Code
 
     //Start of West code
@@ -179,8 +163,6 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     //End of South Code
 
     //Start of Center Code
-    future = new Wt::WGroupBox("Future",center);
-
     messages = new Wt::WContainerWidget(center);
 
     observations = wServer->receiveObs();
@@ -201,6 +183,8 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     layout->addWidget(south, Wt::WBorderLayout::South);
     //end
 
+    //webpage->insertWidget(1, new Wt::WText("New page"));
+
     WApplication::instance()->internalPathChanged().connect(this, &WitreApplication::urlPage);
     urlPage(WApplication::instance()->internalPath());
 
@@ -214,62 +198,49 @@ WitreApplication::~WitreApplication()
 
 void WitreApplication::urlPage(const std::string& path)
 {
-    Wt::WWidget* temp = webpage->currentWidget();
     if(path.empty())
     {
         webpage->setCurrentIndex(0);
         WApplication::instance()->setInternalPath("/default");
+        return;
     }
-    else if(internalPathMatches("/graph"))
+    std::string* url = parseUrl(path);
+    if(url[0]=="text")
+    {
+        Wt::WString name = Wt::WString("Name");
+        Wt::WTemplate* test = new Wt::WTemplate(webpage);
+        test->setTemplateText(Wt::WString::tr("testpage"));
+        test->bindString("friend", name, Wt::PlainText);
+        test->bindWidget("input", new Wt::WLineEdit());
+        webpage->setCurrentWidget(test);
+    }
+    else if(url[0]=="graph")
     {
         WitreGraphContainer* image = new WitreGraphContainer(webpage, wServer->getGraph());
         webpage->setCurrentWidget(image->getWidget());
-    }
-    else if(internalPathMatches("/log") && !internalPathNextPart("/log/").empty())
-    {
-        bool found;
-        string path = internalPathNextPart("/log/");
-        std::string file = s_log->locate(s_log->file_name(path).string(), found).string();
-        if(found)
-        {
-          // file = s_log->locate(file, found).string();
-            Wt::WFileResource* log = new Wt::WFileResource(file, this);
-            std::stringstream output;
-            log->write(output);
-            std::stringstream webout;
-            string line;
-            while(getline(output,line))
-            {
-                webout<<line<<"<br />";
-            }
-            Wt::WContainerWidget* holder = new Wt::WContainerWidget(webpage);
-            holder->setOverflow(Wt::WContainerWidget::OverflowAuto, Wt::Vertical);
-            Wt::WText* text = new Wt::WText(webout.str(), Wt::XHTMLText, holder);
-            webpage->setCurrentWidget(holder);
-        }
-        else
-        {
-            this->doJavaScript("alert('Did not find "+path+"')");
-            WApplication::instance()->setInternalPath("/default");
-        }
     }
     else
     {
         webpage->setCurrentIndex(0);
         WApplication::instance()->setInternalPath("/default");
     }
-    //Checking if the old webpage needs to be deleted
-    if(webpage->currentIndex()==0 && temp!=webpage->currentWidget())
-    {
-        webpage->removeWidget(temp);
-        delete temp;
-    }
 }
 
-void WitreApplication::searchLog(Wt::WLineEdit* sender)
+std::string* WitreApplication::parseUrl(std::string url)
 {
-    WApplication::instance()->setInternalPath("/log/"+sender->text().toUTF8(),true);
-    sender->setText("");
+    int count = 0;
+    for(int i=0; i<url.length(); i++)
+    {
+        count += ((url[i]=='/')?1:0);
+    }
+    std::string* pUrl = new std::string[count];
+    for(int i=0; i<count; i++)
+    {
+        size_t pos = url.find("/");
+        url = url.substr(pos+1);
+        pUrl[i]= url.substr(0,(url.find("/")>0)?url.find("/"):url.length());
+    }
+    return pUrl;
 }
 
 void WitreApplication::post()
@@ -305,7 +276,6 @@ void WitreApplication::post()
         //Container that holds all the panles
         Wt::WGroupBox* box = new Wt::WGroupBox(time);
         box->setObjectName(time);
-        box->setAttributeValue("time", time);
         //box->setAttributeValue("onchange","alert(\"Did it\")");
         groupPanels[time] = box;
         messages->insertWidget(0, box);
@@ -321,8 +291,8 @@ void WitreApplication::post()
     panel->setAttributeValue("level", level);
     panel->setAttributeValue("since", time);
     panel->setAttributeValue("dependencies", wServer->getDependencies(name));
-    panel->setAttributeValue("onmouseover", javaScriptClass()+".highlight("+panel->jsRef()+", true)");
-    panel->setAttributeValue("onmouseout", javaScriptClass()+".highlight("+panel->jsRef()+", false)");
+    panel->setAttributeValue("onmouseover", "Wt.highlight("+panel->jsRef()+", true)");
+    panel->setAttributeValue("onmouseout", "Wt.highlight("+panel->jsRef()+", false)");
     if(!tLineMap[name])
     {
         panel->hide();
@@ -449,10 +419,6 @@ void WitreApplication::timeLineChange()
 {
     Wt::WObject* timeLine = sender();
     std::string tName = timeLine->objectName();
-    std::stringstream javascript;
-    javascript<<"document.getElementById(\""<<timeLine->id()<<"\").style.backgroundColor ="
-              <<"("<<tLineMap[tName]<<")?'white':'';";
-    this->doJavaScript(javascript.str());
     std::map<std::string, Wt::WGroupBox*>::iterator it;
     for(it=groupPanels.begin(); it!=groupPanels.end(); it++)
     {
@@ -487,86 +453,35 @@ void WitreApplication::syncObservations()
     {
         this->post();
     }
-    newPlanToken(wServer->plan());
 }
 
 void WitreApplication::attributePopup()
 {
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
-    bool found;
-    std::string file = s_log->locate(predicate, found).string();
-    if(found)
-    {
-        stringstream err;
-        s_log->use(file,found);
-        try
-        {
-            stringstream msg;
-            boost::property_tree::ptree config;
-            read_xml(file,config,xml::no_comments|xml::trim_whitespace);
-            if(!config.empty())
-            {
-                int count=0;
-                if( config.size()==1 && !TREX::utils::is_tag(config.front(), "Goal") )
-                    config = config.front().second;
-                boost::property_tree::ptree::assoc_iterator i, last;
-                boost::tie(i, last) = config.equal_range("Goal");
-                msg<<"alert(\"";
-                for(; last!=i; ++i, count++)
-                {
-                    TREX::transaction::Goal goal(*i);
-                    TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
-                    msg<<"Goal: "<<goal<<"\\n";
-                }
-                msg<<"\");";
-                doJavaScript(msg.str());
-            } else {
-            doJavaScript("alert('File ("+file+") is empty!');");
-            }
-        } catch(Exception const &te) {
-            err<<"alert('TREX error ("<<te<<")');";
-            doJavaScript(err.str());
-        } catch( std::exception const &e ) {
-            err<<"alert('Exception: ("<<e.what()<<")');";
-            doJavaScript(err.str());
-        } catch(...) {
-            doJavaScript("alert('Unknown error');");
-        }
-        input->setText("");
-        enter->enable();
-    }
-    else if(!object.empty() && !predicate.empty())
+    if(!object.empty() && !predicate.empty())
     {
         popup->setPosition(input);
         popup->valRange(wServer->getCurrentTick(),wServer->getFinalTick());
         popup->setVisable();
     }
-    else {
+    else{
         Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invalid input for goal"
                                                              , Wt::Ok);
         enter->enable();
     }
 }
 
-void WitreApplication::clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
-                                        std::map<string,transaction::FloatDomain> attributes)
+void WitreApplication::clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end)
 {
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
     if(!object.empty() && !predicate.empty())
     {
         TREX::transaction::Goal goal = wServer->getGoal(object,predicate);
-        goal.restrictStart(standards.find("Start")->second);
-        goal.restrictDuration(standards.find("Duration")->second);
-        goal.restrictEnd(standards.find("End")->second);
-
-        std::map<string,transaction::FloatDomain>::iterator etc;
-        for(etc = attributes.begin(); etc!=attributes.end(); etc++)
-        {
-            transaction::Variable temp(etc->first, etc->second);
-            goal.restrictAttribute(temp);
-        }
+        goal.restrictStart(start);
+        goal.restrictDuration(duration);
+        goal.restrictEnd(end);
         TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
         if(goalid!=NULL)
         {
@@ -575,13 +490,9 @@ void WitreApplication::clientPostGoal(std::map<string, transaction::IntegerDomai
                <<"On Timeline <on><b>"<<goalid->object()<<"</b></on>, placed goal "
                <<"<pred><b>"<<goalid->predicate()<<"</b></pred> "
                <<"at the time: "<<wServer->getTime_t()<<"<br />"
-               <<"Starting: "<<standards.find("Start")->second<<"  Duration: "<<standards.find("Duration")->second
-               <<"  End: "<<standards.find("End")->second<<"<br />";
-               for(etc = attributes.begin(); etc!=attributes.end(); etc++)
-               {
-                   oss<<etc->first<<": "<<etc->second<<"  ";
-               }
-            oss<<"</Token>";
+               <<"Starting: "<<start<<"<br />"
+               <<"Duration: "<<duration<<"<br />"
+               <<"End: "<<end<<"<br /></Token>";
             observations.push(oss.str());
             post();
         }
@@ -616,20 +527,11 @@ void WitreApplication::sliderText(int value)
 void WitreApplication::addTimeline(std::string name)
 {
     tLineMap[name]=true;
-    Wt::WPushButton* temp = new Wt::WPushButton(name, tLines);
-    temp->setMargin(10,Wt::Right);
+    Wt::WCheckBox* temp = new Wt::WCheckBox(name);
+    tLines->addWidget(temp);
+    temp->setChecked(true);//
     temp->setObjectName(name);
-    temp->clicked().connect(this, &WitreApplication::timeLineChange);
-    Wt::WDialog* popup = new Wt::WDialog("New Timeline: <b>"+name+"</b>");
-    popup->setModal(false);
-    popup->show();
-    std::stringstream javascript;
-    javascript<<"setTimeout(\""<<popup->jsRef()<<".style.top = \'5px\';"
-              <<popup->jsRef()<<".id=\'header\';\",100)";
-    std::stringstream javascript2;
-    javascript2<<"setTimeout(\"var n=document.getElementById(\'header\'); n.parentNode.removeChild(n)\",30000)";
-    this->doJavaScript(javascript.str());
-    this->doJavaScript(javascript2.str());
+    temp->changed().connect(this, &WitreApplication::timeLineChange);
     //Updates the combo menu
     addMenuItems();
 }
@@ -644,31 +546,5 @@ void WitreApplication::addMenuItems()
         {
             menu->addItem(name);
         }
-    }
-}
-
-void WitreApplication::newPlanToken(const WitreServer::timed_goal& plan)
-{
-    future->clear();
-    WitreServer::timed_goal::const_iterator t;
-    for(t = plan.begin(); t!=plan.end(); ++t)
-    {
-        const goal_id& goal = (*t);
-        std::ostringstream planStr;
-        planStr <<"<Token timeline=\'"<<goal->object()<<"\' pred=\'"<<goal->predicate()
-             <<"\' value=\'"<<goal<<"\'>"
-             <<"["<<goal->object()<<"."<<goal->predicate()<<"] plan: "
-             <<"Start = "<<goal->getStart()<<" Duration = "<<goal->getDuration()<<" End = "<<goal->getEnd()
-             <<"</Token>";
-        ostringstream stime;
-        stime<< wServer->getCurrentTick();
-        string time = stime.str();
-        string name = goal->object().str();
-        Wt::WPanel* panel = new Wt::WPanel();
-        panel->setCentralWidget(new Wt::WText(planStr.str()));
-        panel->setObjectName(name);
-        panel->setAttributeValue("name", name);
-        panel->setAttributeValue("tick", time);
-        future->insertWidget(0,panel);
     }
 }

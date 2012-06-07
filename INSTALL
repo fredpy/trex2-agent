@@ -5,7 +5,7 @@ Installing TREX
 TREX uses third party utilities and libraries. Here's sa list of them :
  - boost (http://www.boost.org) This library is widely used for basic
          utilities and compatibilty with the TR1 C++0x standard.
-	 version 1.47 or above (tested against 1.47 and 1.49.0) 
+	 version 1.41 or above (tested against 1.47) 
 
 Other utilies are of interrest but not necessary to use TREX:
  - doxygen (http://www.doxygen.org/) This utility is needed only if you want 
@@ -17,11 +17,16 @@ To compile trex linbraries there's currently one approach supported:
  - cmake (http://www.cmake.org/) newly added which -- among other things -- allows to 
        integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
 
+Note:
+    We used ato also support jam (http://www.perforce.com/jam/jam.html) for historical 
+    reason. Still this tool became more and more problematic ofr the overal maintenance 
+    of the project. We have now decided to modev fully to cmake.
+
 For europa plug-in :
   - europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above.
                this is the core libaray used for planning on the EuropaReactor
 	       Simply install the binary distribution provided for your platform. 
-	       The version we use is europa 2.6 (binary package)
+	       The version we use is europa 2.5 (binary package)
 
 2) Set your environment
 

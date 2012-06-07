@@ -35,7 +35,6 @@
 # define H_trex_europa_config
 
 #cmakedefine EUROPA_DEBUG
-#cmakedefine EUROPA_HAVE_EFFECT
 
 # define TIXML_USE_STL
 

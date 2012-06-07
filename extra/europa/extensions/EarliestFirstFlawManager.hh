@@ -41,40 +41,11 @@
 namespace TREX {
   namespace europa {
 
-    /** @brief earliest first open condition manager
-     *
-     * This class implement an open condition manager -- which deals with token 
-     * to be inserted to the plan and the order in which they need to be evaluated
-     * -- that will eveluates the earliest tokens first.
-     *
-     * It orders tokens based on their start time by picking first the one that 
-     * should start the earlier.
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup europa
-     */
     class EarliestFirstFlawManager :public EUROPA::SOLVERS::OpenConditionManager {
     public:
-      /** @brief Constructor
-       *
-       * @param[in] cfg XML configuration
-       */
       EarliestFirstFlawManager(EUROPA::TiXmlElement const &cfg);
       
     private:
-      /** @brief Flaw sorter
-       *
-       * @param[in] a An entity
-       * @param[in] b An entity
-       * @param[out] explanation A string
-       *
-       * This method allow the solver to sort the open condition flaws based on 
-       * their start and potetnially end domains. It indicates whther @p a should 
-       * be evaluated before @p b and give a textual explanation in @p explanation
-       *
-       * @retval true if @p a should be evaluated before @p b
-       * @retval false otherwise
-       */
       bool betterThan(EUROPA::EntityId const &a, EUROPA::EntityId const &b,
 		      EUROPA::LabelStr &explanation);
       

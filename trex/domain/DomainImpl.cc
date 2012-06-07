@@ -43,8 +43,6 @@
 #include <iterator>
 #include <algorithm>
 
-#include <cmath>
-
 #include "BooleanDomain.hh"
 #include "FloatDomain.hh"
 #include "IntegerDomain.hh"
@@ -86,21 +84,6 @@ Symbol const IntegerDomain::type_name("int");
 Symbol const FloatDomain::type_name("float");
 Symbol const StringDomain::type_name("string");
 Symbol const EnumDomain::type_name("enum");
-
-double TREX::transaction::round(double d, size_t places) {
-  double factor = pow(10, places);
-  return ::round(d*factor)/factor;
-}
-
-double TREX::transaction::floor(double d, size_t places) {
-  double factor = pow(10, places);
-  return std::floor(d*factor)/factor;  
-}
-
-double TREX::transaction::ceil(double d, size_t places) {
-  double factor = pow(10, places);
-  return std::ceil(d*factor)/factor;  
-}
 
 
 BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)

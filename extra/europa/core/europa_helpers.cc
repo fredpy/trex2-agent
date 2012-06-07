@@ -75,19 +75,17 @@ void TREX::europa::details::restrict_bases(EUROPA::TokenId const &tok) {
     tok->restrictBaseDomains();
 }
 
-void TREX::europa::details::restrict_attributes(EUROPA::TokenId const &tok, EUROPA::TokenId const &other) {
-  std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->parameters();
-  std::vector<EUROPA::ConstrainedVariableId> const &avar = other->parameters();
-  for(size_t i=0; i<tvar.size(); ++i)
-    restrict_base(tok, tvar[i], avar[i]->lastDomain());
-}
-
 void TREX::europa::details::restrict_attributes(EUROPA::TokenId const &tok) {
   EUROPA::TokenId active = tok;
   if( tok->isMerged() )
     active = tok->getActiveToken();
-  restrict_attributes(tok, active);
+  
+  std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->parameters();
+  std::vector<EUROPA::ConstrainedVariableId> const &avar = active->parameters();
+  for(size_t i=0; i<tvar.size(); ++i)
+    restrict_base(tok, tvar[i], avar[i]->lastDomain());
 }
+
 
 
 EUROPA::TokenId TREX::europa::details::parent_token(EUROPA::ConstrainedVariableId const &var) {
@@ -105,14 +103,6 @@ EUROPA::TokenId TREX::europa::details::parent_token(EUROPA::ConstrainedVariableI
   // No parent token
   return EUROPA::TokenId::noId();
 }
-
-std::ostream &TREX::europa::details::var_print(std::ostream &out, EUROPA::ConstrainedVariableId const &var) {
-  EUROPA::TokenId tok = parent_token(var);
-  if( tok.isId() )
-    out<<tok->getName().toString()<<'('<<tok->getKey()<<").";
-  return out<<var->getName().toString()<<'('<<var->getKey()<<')';
-}
-
 
 Assembly &TREX::europa::details::assembly_of(EUROPA::EngineComponentId const &component) {
   EUROPA::EngineId engine = component->getEngine();

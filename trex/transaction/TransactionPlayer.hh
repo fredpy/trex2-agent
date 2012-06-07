@@ -234,7 +234,7 @@ namespace TREX {
 	~op_use() {}
 
 	void accept(Player &p) {
-	  p.use(name(), true, false); // potential post goals but do not listen to timeline plan
+	  p.use(name());
 	}
       }; // TREX::transaction::Player::op_use
 
@@ -433,110 +433,7 @@ namespace TREX {
 	 */
 	std::string m_id;
       }; // TREX::transaction::Player::op_recall
-    
-    
-      /** @brief Internal token broadcast operation
-       *
-       * Describe the operation to notify of a new plan token on an internal 
-       * timeline
-       *
-       * @relates Player
-       */
-      class op_token :public transaction {
-      public:
-	/** @brief Constructor
-	 *
-	 * @param[in] node A xml description for a request
-	 *
-	 * Create a new instance describing the action on requesting the
-	 * goal described by @p node
-	 *
-	 * The usual format for a request is
-	 * @code
-	 * <token id="<an id>">
-	 *   <Goal ....>
-         *     [...]
-	 *   </Goal>
-	 * </token>
-	 * @endcode 
-	 * 
-	 * @pre @p node is a valid request description
-	 *
-	 * @throw XmlError unable to parse @p node as a request
-	 *
-	 * @sa Goal::Goal(rapidxml::xml_node<> &)
-	 */
-	op_token(boost::property_tree::ptree::value_type &node);
-	/** @brief Destructor */
-	~op_token() {}
-	
-	void accept(Player &p) {
-	  p.play_token(m_id, m_token);
-	}
-	
-      private:
-	/** @brief logged id
-	 *
-	 * This string indicates the id value extracted from the log.
-	 * This value is used in order to associate the logged id to the real
-	 * goal_id used durign this run. It is important to kee p track on that
-	 * in order to recall the proper goal if needed
-	 * 
-	 * @sa Player::op_recall
-	 */
-	std::string m_id;
-	/** @brief The goal
-	 *
-	 * This is the goal that will be effectively posted durign this execution.
-	 */
-	goal_id m_token;
-      }; // TREX::transaction::Player::op_request
       
-      /** @brief Cancel operation
-       *
-       * Describe the operation to cancle a former plan token on an
-       * Internal timeline
-       *
-       * @relates Player
-       */
-      class op_cancel :public transaction {
-      public:
-	/** @brief Constructor
-	 *
-	 * @param[in] node A xml description for a recall
-	 *
-	 * Create a new instance describing the action on cancelling the
-	 * plan token described by @p node
-	 *
-	 * The usual format for a request is
-	 * @code
-	 * <cancel id="<an id>"/>
-	 * @endcode 
-	 * 
-	 * @pre @p node is a valid cancel description
-	 *
-	 * @throw XmlError unable to parse @p node as a cancel
-	 */
-	op_cancel(boost::property_tree::ptree::value_type &node);
-	/** @brief Destructor */
-	~op_cancel() {}
-	
-	void accept(Player &p) {
-	  p.play_cancel(m_id);
-	}
-	
-      private:
-	/** @brief Logged id
-	 *
-	 * The id extracted from the log. This attribute will be used
-	 * during execution in order to identify the real id of the request
-	 * to recall
-	 *
-	 * @sa Player::play_recall(std::string const &)
-	 */
-	std::string m_id;
-      }; // TREX::transaction::Player::op_recall
-
 
       /** @brief Destroy a list of pointer
        * @param[in,out] l A list
@@ -604,9 +501,6 @@ namespace TREX {
        */
       void play_recall(std::string const &id);
       
-      void play_token(std::string const &id, goal_id const &g);
-      void play_cancel(std::string const &id);
- 
       virtual bool failed_external(TREX::utils::Symbol const &timeline, graph::timeline_failure const &err) {
         throw ReactorException(*this, "Failed to subscribe to external timeline "+timeline.str()+": "+err.what());
         return false;
@@ -623,8 +517,6 @@ namespace TREX {
       friend class op_assert;
       friend class op_request;
       friend class op_recall;
-      friend class op_token;
-      friend class op_cancel;
     }; // TREX::transaction::Player 
 
   } // TREX::transaction

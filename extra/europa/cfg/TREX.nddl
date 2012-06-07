@@ -41,17 +41,16 @@ int   MISSION_END;
 int   AGENT_CLOCK;
 
 enum Mode {
-  External,   // Synchronize observations and dispatch goals
-  Observe,    // No goal dispatching 
-  Internal,   // Publish updates and accept goals
-  Private,    // Not visible externally 
-  Ignore      // Not used at all
+  External, // Synchronize observations and dispatch goals
+  Observe,  // No goal dispatching 
+  Internal, // Publish updates and accept goals
+  Private,  // Not visible externally 
+  Ignore    // Not used at all
 }
 
 class AgentTimeline extends Timeline {
   Mode   mode;
   string defaultPredicate;
-  bool   with_plan;
 
   predicate undefined {};
 
@@ -59,24 +58,11 @@ class AgentTimeline extends Timeline {
 
   AgentTimeline(Mode _mode) {
     mode = _mode;
-    with_plan = false;
     defaultPredicate = "undefined";
   }
-  AgentTimeline(Mode _mode, bool _plan) {
-    mode = _mode;
-    with_plan = _plan;
-    defaultPredicate = "undefined";
-  }
-  
   
   AgentTimeline(Mode _mode, string _default) {
     mode = _mode;
-    with_plan = false;
-    defaultPredicate = _default;
-  }
-  AgentTimeline(Mode _mode, string _default, bool _plan) {
-    mode = _mode;
-    with_plan = _plan;
     defaultPredicate = _default;
   }
 }

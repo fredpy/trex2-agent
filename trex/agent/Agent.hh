@@ -360,9 +360,6 @@ namespace TREX {
       double tickToTime(TREX::transaction::TICK cur) const {
 	return m_clock->tickToTime(cur);
       }
-      std::string date_str(TREX::transaction::TICK cur) const {
-        return m_clock->date_str(cur);
-      }
       
     private:
       void internal_check(reactor_id r, 
@@ -485,7 +482,6 @@ namespace TREX {
       Clock  *m_clock;  
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
-      std::list<reactor_id>      m_idle;
 
       void synchronize();
       

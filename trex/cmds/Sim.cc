@@ -107,7 +107,7 @@ namespace {
    */
   bool parseGoals(Agent &trex, std::string const &name) {
     bool found;
-    std::string file = s_log->locate(name, found).string();
+    std::string file = s_log->locate(name, found);
 
     if( !found ) {
       // try to add the .req extension

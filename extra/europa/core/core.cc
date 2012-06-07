@@ -31,20 +31,6 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-/** @file core.cc
- * @brief T-REX core extensions for europa
- * 
- * This file declares the core extensions used  by T-REX within europa. The code 
- * found here handle to inject these extensions for each TREX::europa::Assembly
- * created within an agent. The extensions includes :
- * @li New set of constraints of functions for NDDL
- * @li The filters used by the planner and synchronizer of an Assembly
- * @li The new flaw manager and handler used by the synchronizer to identify Internal 
- * timeline state at every execution tick
- * 
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup europa
- */
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/DeliberationFilter.hh"
 #include "trex/europa/ModeConstraints.hh"
@@ -52,37 +38,8 @@
 #include <trex/europa/SynchronizationManager.hh>
 #include "private/CurrentState.hh"
 
-#include <PLASMA/CFunctions.hh>
-#include <PLASMA/DataTypes.hh>
-
-
 namespace TREX {
   namespace europa {
-
-    using namespace EUROPA;
-    
-    /** @brief isExternal NDLL function declaration
-     *
-     * Declare to europa the new function @c isExternal that checks if the 
-     * current token is a T-REX External timeline.
-     *
-     * @author Frederic Py
-     * @relates CheckExternal
-     * @ingroup europa
-     */
-    DECLARE_FUNCTION_TYPE(CheckExternal, external, 
-                          "isExternal", EUROPA::BoolDT, 1); 
-    /** @brief isInternal NDLL function declaration
-     *
-     * Declare to europa the new function @c isInternal that checks if the 
-     * current token is a T-REX Internal timeline.
-     *
-     * @author Frederic Py
-     * @relates CheckInternal
-     * @ingroup europa
-     */
-    DECLARE_FUNCTION_TYPE(CheckInternal, internal, 
-                          "isInternal", EUROPA::BoolDT, 1); 
     
     /** @brief TREX core extensions for europa
      * 
@@ -102,7 +59,6 @@ namespace TREX {
      * europa object is a TREX External timeline.
      *
      * @author Frederic Py <fpy@mbari.org>
-     * @ingroup europa
      */
     class CoreExtensions :public EuropaPlugin {
     public:
@@ -130,9 +86,7 @@ namespace TREX {
 			       isExternal,trex);
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
 			       isInternal,trex); 
-      
-      declareFunction(assembly, new CheckExternalFunction());
-      declareFunction(assembly, new CheckInternalFunction());
+
     }
 
     CoreExtensions trex_core;

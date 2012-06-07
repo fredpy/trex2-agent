@@ -44,29 +44,11 @@ namespace TREX {
     class Assembly;
     class ReactorConstraint;
 
-    /** @brief Europa propagator with access to T-REX
-     *
-     * This class provide a simple europa propagator that allow its clients to
-     * easily access to the Assembly that created it and by doing so extract 
-     * information from the reactor that executes this europa solver such as 
-     * AgentTimelines' type in T-REX or current tick, timeline latencies and 
-     * look-ahead, ...
-     *
-     * @ingroup europa
-     * @author Frederic Py <fpy@mbari.org>
-     */
     class ReactorPropagator :public EUROPA::DefaultPropagator {
     public:
-      /** @brief Destructor */
       virtual ~ReactorPropagator() {}
       
     protected:
-      /** @brief Constructor
-       *
-       * @param[in] assembly The assebmly that created this instance
-       * @param[in] name The symbolic name associated to this instance
-       * @param[in] cstrEngine The constraint engine 
-       */
       ReactorPropagator(Assembly &assembly, EUROPA::LabelStr const &name, 
 			EUROPA::ConstraintEngineId const &cstrEngine)
 	:EUROPA::DefaultPropagator(name, cstrEngine), m_assembly(assembly) {}

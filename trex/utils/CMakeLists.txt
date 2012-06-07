@@ -66,7 +66,6 @@ add_library(TREXutils SHARED
   XmlFactory.hh
   XmlUtils.hh
   id_mapper.hh
-  chrono_helper.hh
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh
@@ -79,9 +78,7 @@ add_library(TREXutils SHARED
 )
 
 add_dependencies(core TREXutils)
-target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
-  ${Boost_FILESYSTEM_LIBRARY} 
-  ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(TREXutils ${SYSTEM_LIBRARIES})
 trex_lib(TREXutils)
 
 set_property(SOURCE Pdlfcn.cc 

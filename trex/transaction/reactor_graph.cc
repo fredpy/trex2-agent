@@ -88,12 +88,6 @@ bool graph::is_isolated(graph::reactor_id r) const {
   return m_quarantined.find(r->getName())!=m_quarantined.end();
 }
 
-std::string graph::date_str(TICK cur) const {
-  std::ostringstream oss;
-  oss<<cur;
-  return oss.str();
-}
-
 
 void graph::clear() {
   while( !m_reactors.empty() ) {
@@ -132,14 +126,6 @@ graph::reactor_id graph::add_reactor(graph::reactor_id r) {
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
   // As it is an internal call make is silent for now ...
   return ret.first->get();
-}
-
-bool graph::is_member(graph::reactor_id r) const {
-  for(details::reactor_set::const_iterator i=m_reactors.begin();
-      m_reactors.end()!=i; ++i)
-    if( i->get() == r )
-      return true;
-  return false;
 }
 
 bool graph::kill_reactor(graph::reactor_id r) {
@@ -201,21 +187,21 @@ graph::size_type graph::count_relations() const {
 }
 
 
-bool graph::assign(graph::reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::assign(graph::reactor_id r, Symbol const &timeline, bool controllable) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     internal_check(r, **tl);
-    return (*tl)->assign(*r, flags);
+    return (*tl)->assign(*r, controllable);
   } catch(timeline_failure const &err) {
     return r->failed_internal(timeline, err);
   }
 }
 
-bool graph::subscribe(reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::subscribe(reactor_id r, Symbol const &timeline, bool control) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     external_check(r, **tl);
-    return (*tl)->subscribe(*r, flags);
+    return (*tl)->subscribe(*r, control);
   } catch(timeline_failure const &err) {
     return r->failed_external(timeline, err);
   }

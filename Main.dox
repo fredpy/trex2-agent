@@ -9,15 +9,86 @@ its core functionalities as a result one can use TREX with which ever
 planner he wants - as long as this one can hanlde properly the goal 
 representation expected by TREX.
 
-@section start Getting started
-@li @ref general : Presents the how T-REX software is organized 
-@li @ref install : A quick view on how to install T-REX on your pltafrom along 
-  with the thrid party liabries you'll need to download
-@li @ref tutorial : Walks you through a simple mission where to europa based 
-  reactors are fighting other a light state.
+
+@section install Installing TREX
+
+@subsection install-requirement Third party requirements
+
+TREX uses third party utilities and libraries. Here's sa list of them
+: 
+@li @b rapidXML (http://rapidxml.sourceforge.net/) This is used for
+configuration parsing.  TREX used to rely on TinyXML version embedded
+in Europa but keeping this would have been annoying as this version
+was part of Europa and keeping the ability to connect to Europa while
+using a version of TinyXML which is not necessarily the Europa one
+would have been tricky. On top of that rapidxml is really lightweight
+(only templates defined in C++ headers) and very fast (performance
+close to strlen). The version used -- and provided -- for this package
+is 1.13.
+@li @b boost (http://www.boost.org) This library is widely used for
+basic utilities and compatibilty with the TR1 C++0x standard. As we use
+flyweight, boost graph and property tree the earliest version 
+to be used is 1.41.0 (we tested it with boost 1.47.0). 
+
+Others utilies are of interrest but not necessary to use TREX:
+@li @e doxygen (http://www.doxygen.org/) This utility is needed only
+if you want  to generate this documentation.
+@li @e graphviz (http://www.graphviz.org/) Recommended for
+documentation but it may also be used for plan visualization by
+showing tokens and their relations as a graph.
+
+@note rapidxml is bundled into TREX. Nothing as been changed in this
+libray and if one prefers to use another version of this library he
+justs need to define the environment variable @c TINY_XML_ROOT with
+the directory where this one is before compiling TREX.
+
+To compile trex libraries there's currently one approach supported:
+@li @b cmake (http://www.cmake.org/) newly added which -- among other things --
+   allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+
+@warning  We used to also support jam (http://www.perforce.com/jam/jam.html) 
+       for historical reasonS. Still this tool became more and more problematic 
+       for the overal maintenance of the project. We have now decided to move 
+       fully to cmake.
 
 
-@page general TREX general structure 
+@subsection install-env Set your environment
+
+The @c devConfig @c bash file loads all the variables needed to be
+able to compile and execute TREX. If you are using bash you can edit
+your @c ~/.profile (or @c ~/.bash_profile depending on your
+configuration/platform). Considering that you have put TREX on the
+directory @c @<trex-dir@> you can put the following lines : 
+@code
+path=`pwd` 
+cd <trex-dir> 
+source devConfig 
+cd $path 
+@endcode
+@attention Under MacOS X you also need to define @c DYLD_BIND_AT_LAUNCH to
+allow dynamic library loading on the fly. Indeed, this version of
+TREX supports plugin allowing to define externally new reactors and 
+components and MacOS X needs to be informed about that. To do so add
+the following line in your @c ~/.profile :
+@code
+export DYLD_BIND_AT_LAUNCH=YES
+@endcode
+
+In order to be able to compile europa plugin you'll also need to set your 
+EUROPA_HOME to the directory where europa is installed. For example
+@code
+export EUROPA_HOME=${HOME}/europa
+@endcode
+The expected structure from cmake is the following :
+@code
+$EUROPA_HOME
+  + lib        # europa libraries (we use the _o versions)
+  + include    # PS*.hh headers
+    + PLASMA   # plasma headers
+@endcode
+This should be the case if you installed the binary package of europa
+
+@subsection install-main TREX general structure 
 
 @image html SWarchi.png "TREX Software architecture" width=10cm
 
@@ -71,37 +142,8 @@ set of scripts and utilities to help the processing  of TREX logs.
 of the head.
 @li <b> Configurations files </b> Usually under @c cfg. A set of configuration files that can be used to define new agents and/or reactors.
 
-@page install Installing TREX
 
-@section install-requirement Third party requirements
-
-TREX uses third party utilities and libraries. Here's sa list of them
-: 
-@li @b boost (http://www.boost.org) This library is widely used for
-basic utilities and compatibilty with the TR1 C++0x standard. As we use
-flyweight, boost graph and property tree the earliest version 
-to be used is 1.47.0 (we tested it with boost 1.47.0 and 1.49.0). 
-
-Others utilies are of interrest but not necessary to use TREX:
-@li @e doxygen (http://www.doxygen.org/) This utility is needed only
-if you want  to generate this documentation.
-@li @e graphviz (http://www.graphviz.org/) Recommended for
-documentation but it may also be used for plan visualization by
-showing tokens and their relations as a graph.
-
-To compile trex libraries there's currently one approach supported:
-@li @b cmake (http://www.cmake.org/) newly added which -- among other things --
-   allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
-
-We also provide two plug-ins in the extr directory that are set o be compiled by default. While none 
-of these 2 are part of the core of T-REX they are providing an inital set of features that makes T-REX more practical.
-These two plug-ins require the following libraries :
-@li the @e europa plug-in requires @b europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above. It provides a reactor 
-  that uses europa planner to plan and execute within trex
-@li the @e witre plug-in requires @b Wt library (http://www.webtoolkit.eu/wt) version 3.2.0 or above. It provides a reactor that acts 
-as a web interface to the agent showing observations exchanged between reactors and allowing to pos new goals.
-
-@section install-cmake Compiling with cmake
+@subsection install-cmake Compiling with cmake
 
 More details can be found on cmake <a href="http://www.cmake.org/cmake/help/runningcmake.html">
  official documentation</a>. But here's a quick tutorial to use make as the end
@@ -135,26 +177,15 @@ directory)
 -- Check for working CXX compiler: /usr/bin/c++ -- works
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- trex VERSION = 0.3.3
--- Looking for dlopen in dl
--- Looking for dlopen in dl - found
+-- Boost version: 1.46.1
+-- Found the following Boost libraries:
+--   system
 -- Looking for pthread_self in pthread
 -- Looking for pthread_self in pthread - found
--- Looking for shm_unlink in rt
--- Looking for shm_unlink in rt - not found
--- Boost version: 1.49.0
--- Found the following Boost libraries:
---   thread
---   system
---   signals
---   chrono
---   filesystem
--- Europa found : include directory is /Users/fpy/Coding/europa-2/include
--- Found Doxygen: /opt/local/bin/doxygen 
--- Found the Wt libraries at /usr/local/lib/libwt.dylib;/usr/local/lib/libwtext.dylib;/usr/local/lib/libwthttp.dylib;/usr/local/lib/libwtdbo.dylib;/usr/local/lib/libwtdbosqlite3.dylib;/usr/local/lib/libwtfcgi.dylib
--- Found the Wt headers at /usr/local/include
--- Found the Wt debug libraries at /usr/local/lib/libwt.dylib;/usr/local/lib/libwtext.dylib;/usr/local/lib/libwthttp.dylib;/usr/local/lib/libwtdbo.dylib;/usr/local/lib/libwtdbosqlite3.dylib;/usr/local/lib/libwtfcgi.dylib
--- Found the Wt debug headers at /usr/local/include
+-- Looking for clock_gettime in rt
+-- Looking for clock_gettime in rt - not found
+-- Looking for dlopen in dl
+-- Looking for dlopen in dl - found
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /Users/fpy/Coding/trex2.build
@@ -220,6 +251,10 @@ Linking CXX executable sim
 [100%] Built target sim
 @endcode 
 
+@note right now camke integrates as much plug-ins as possible into the all target
+      ther's no easy way to deactivate a plug-in in the compilation -- except 
+      editing CmakeLists.txt. We will probably change that in the future
+
 You can install the output using the usual :
 @code 
 > make install
@@ -234,12 +269,14 @@ Finally, if you want ot generate this doc just do :
 > make doc
 @endcode
 
-@page tutorial Running a simple example
+@section Running an example
 
-So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch, vitre and europa plug-ins. To use it you first need to compile your source :
+So far this version of TREX do not provide that much illustrations but at least a simple one exist with the lightswitch, vitre and europa plug-ins. To use it you first need to compile your source and also the extra Vitre.jar program :
 @code 
 ~$ cd trex2.build 
 trex2.build$ make 
+[...]
+trex2.build$ make Vitre 
 [...]
 trex.build$
 @endcode
@@ -249,7 +286,7 @@ to run the code from the build directory. For the later we generate locally the
 trex-devel.bash file that can be sourced
 @code 
 trex2.build$ source trex_devel.bash
-@endcode
+@encode
 
 
 You can now start the simulation but beforehand we are going to give a look at 
@@ -262,9 +299,9 @@ We are going to use 3 of them :
 The content of @c sample.cfg should looks similar to this :
 @code  
 <Agent name="sample" finalTick="100" >
-       <Plugin name="witre_pg"/>
-       <Plugin name="lightswitch_pg"/>
-       <Plugin name="europa_pg"/>
+       <Plugin name="TREXvitre"/>
+       <Plugin name="TREXlightswitch"/>
+       <Plugin name="TREXeuropa"/>
 
        <Light name="light" latency="0" lookahead="1" log="1" state="1"/>
 
@@ -273,16 +310,16 @@ The content of @c sample.cfg should looks similar to this :
        <EuropaReactor name="test2" lookahead="20" latency="3" 
 		      solverConfig="test.solver.xml" />
 
-       <WitreReactor name="switchView" latency="0" lookahead="0"
-                     log="0">
+       <VitreReactor name="switchView" latency="0" lookahead="0"
+                     log="0" port="31415">
          <External name="light" goals="0"/>
          <External name="switch" goals="0"/>
          <External name="lum" goals="0"/>
          <External name="lum2" goals="0"/>
-       </WitreReactor>
+       </VitreReactor>
 
       <Goal on="lum" pred="Bright">
-        <Variable name="end"><int min="50"/></Variable>
+        <Variable name="end"><int min="10000"/></Variable>
       </Goal>
 
       <Goal on="lum2" pred="Dim">
@@ -293,25 +330,29 @@ The content of @c sample.cfg should looks similar to this :
 @endcode
 The @c Agent tag declare the global agent with its @c name and @c finalTick both of them can be freely modified.
 
-The @c Plugin tag indicates that this mission need to load the @c lightswitch_pg plug-in. Based on that @c sim will automatically look on local directory and @c TREX_PATH to locate this plug-in.
+The @c Plugin tag indicates that this mission need to load the @c TREXlightswitch plug-in. Based on that @c sim will automatically look on local directory and @c TREX_PATH to locate this plug-in.
 
-The @c Light declare a reactor which is implemented in @c lightswitch_pg. This one starts with a @c state of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.
+The @c Light declare a reactor which is implemented in @c TREXlightswitch. This one starts with a @c state of 1 which mean that its light is on. You can change it to 0 if you want to start with the light off.
 
-The @c EuropaReactor declare a reactor which is implemented in @c europa_pg. These 
+The @c EuropaReactor declare a reactor which is implemented in @c TREXeuropa. These 
 two reactors are keeping track on the light to know if the luminance is bright or 
 dark. and can switch the light on the desired state according to their objectives.
 
-The @c WitreReactor declare a reactor that will create a web server providing an 
-interface to TREX in order to track the observations from the dirfferent timelines in the agent, post goals, ... The "External" tags 
+The @c VitreReactor declare a reactor that will connect to the Vitre.jar graphic 
+interface in order to visualize the state of each timeline. The "External" tags 
 specifies which timelines this reactor needs to look at. Feel free to change these.
 
 Finally the two Goal at the end gives the objectives for each EuropaReactor. 
 Quickly stated : @c test will want to be on a Bright state at the end of the mission 
 while @c test2 will want to be Dim at the end of the mission starting from the tick 20
 
-@section sample_run the sample mission
+@subsection start the @c sample mission
 
 To start the sample mission you can do the following :
+@li start Vitre java application
+@code 
+trex2.build$ java -jar Vitre.jar
+@endcode 
 @li start the simulation in "debug" mode :
 @code 
 trex2.build$ sim sample
@@ -329,9 +370,7 @@ Options:
 The mission is loaded and the prompt indicate the name of the agent (sample) and
 the current tick value 0. You can use commands to interact with the agent by advancing of one tick (N), go to a given tick in the future (G) or post a request described in a file (P)
 
-You can already look at this agent by typing the url http://localhost:8080/witre which should display a web page with the current tick value, a set of buttons llowing to show hid the different timelines of the agent, few links to other informations pages for this agent. This specific page will display a stream of all the observations received -- displayed in text form.
-
-you can also in an alternate terminal look on the activity of the agent redirected
+you can also in an alternate terminal look on the activity of the agent redicrected
 in @c $TREX_LOG_DIR/latest/TREX.log
 @code 
 ~$ cd $TREX_LOG_DIR
@@ -375,6 +414,7 @@ TREX2$
 @c sim needs to be able to interrupt the clock and restart it. We plan to implement a
 pseudo real-time clakc but most of the time the we use @c sim to replay a past mission (using a LogPlayer reactor which is not provided yet on this version) and as these can be long (hours) the fast sim clock is a better fit.
 
+@note At this stage this is the only mission directly available on TREX. This is due to the fact that our effort was more focused on make TREX independent from Europa than implement a large set of reactors. The porting of other reactors (Log player, europa 2.1.1 based, latest europa based, ... ) are in the process and should be available soon.
 */
 
 

@@ -391,20 +391,6 @@ namespace TREX {
       static reactor_id null_reactor() {
 	return reactor_id();
       }
-      
-      /** @brief Check if part of the graph 
-       * @param[in] r A reactor
-       * 
-       * Checks if @p r is currently part of this graph or not. 
-       * A reactor is not part of the graph if it has been isolated or killed
-       *
-       * @retval true if the reactor is still part of this graph
-       * @retvals false otherwise
-       *
-       * @sa kill_reactor(reactor_id)
-       * @sa isolate(reactor_id)
-       */
-      bool is_member(reactor_id r) const;
 
       /** @brief Kill a reactor
        *
@@ -519,9 +505,6 @@ namespace TREX {
 	return cur*tickDuration();
       }
 
-      virtual std::string date_str(TICK cur) const;
-
-      
       /** @brief Number of reactors
        *
        * @return the number of reactors in this graph
@@ -668,10 +651,10 @@ namespace TREX {
 
     private:
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
-                  details::transaction_flags const &flags);
+                  bool controllable);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
-		     details::transaction_flags const &flags);
-      
+		     bool control);
+
       details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
 
       utils::Symbol            m_name;

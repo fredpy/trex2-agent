@@ -134,11 +134,6 @@ namespace TREX {
       bool startsBefore(IntegerDomain::bound const &date) const {
 	return getStart().lowerBound()<=date;
       }
-      
-      bool endsAfter(TICK date) const {
-        return getEnd().lowerBound()>date;
-      }
-    
 
       /** @brief Get start interval
        *

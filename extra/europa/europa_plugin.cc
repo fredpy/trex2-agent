@@ -51,9 +51,6 @@ namespace {
 namespace TREX {
 
   void initPlugin() {
-    if( !Assembly::actions_supported() )
-      ::s_log->syslog("WARNING")<<" This version of europa plugin was compiled without Europa 2.6 action support!"; 
-    
     ::s_log->syslog("plugin.europa")<<"Europa loaded."<<std::endl;
     // ::decl;
   }  

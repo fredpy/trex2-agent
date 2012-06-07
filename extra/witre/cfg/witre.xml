@@ -10,7 +10,7 @@
     Note: It seems that I need a new line at the end otherwise the server fails 
     to parse the option
     -->
-  <server>--http-address=localhost --http-port=8080 --deploy-path=/witre --docroot=@Wt_INCLUDE_DIR@/../share/Wt --access-log=WitreLog.txt
+  <server>--http-address=localhost --http-port=8080 --docroot=. --accesslog=log2.txt
 
-  </server>
+  </server>	
 </config>

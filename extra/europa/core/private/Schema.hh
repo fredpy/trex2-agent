@@ -40,9 +40,6 @@
 
 # include <trex/utils/LogManager.hh>
 
-# include <trex/europa/config.hh>
-# include <PLASMA/CFunction.hh>
-
 namespace TREX {
   namespace europa {
     
@@ -77,8 +74,6 @@ namespace TREX {
 
 	void registerPlugin(EuropaPlugin &pg);
 	void unregisterPlugin(EuropaPlugin &pg);
-        
-        void registerFunction(Assembly const &assembly, EUROPA::CFunction *fn);
 
 	std::set<EuropaPlugin *> m_plugins;
 	std::ofstream            m_europa_debug;

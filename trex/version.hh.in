@@ -37,8 +37,5 @@
 # define TREX_MAJOR @TREX_MAJOR@
 # define TREX_MINOR @TREX_MINOR@
 # define TREX_PATCH @TREX_PATCH@
-# define TREX_RC    @TREX_RC@
-
-# define TREX_VERSION "@VERSION@"
 
 #endif // H_trex_version

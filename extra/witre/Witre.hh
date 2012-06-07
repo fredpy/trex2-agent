@@ -63,8 +63,6 @@
 #include <map>
 #include <list>
 #include <trex/domain/IntegerDomain.hh>
-#include <trex/domain/FloatDomain.hh>
-#include <trex/domain/Variable.hh>
 #include <trex/utils/XmlUtils.hh>
 
 #include <boost/version.hpp>
@@ -89,7 +87,6 @@ namespace TREX {
       Wt::WComboBox *menu;
       Wt::WGroupBox *tLines;
       Wt::WSlider *timeLineSlider;
-      Wt::WGroupBox* future;
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;
@@ -104,8 +101,8 @@ namespace TREX {
 
       void sliderChanged(int value);
       void sliderText(int value);
-      void searchLog(Wt::WLineEdit* sender);
       void urlPage(const std::string& path);
+      std::string* parseUrl(std::string url);
 
     public:
       WitreApplication(Wt::WEnvironment const &env, WitreServer* Server);
@@ -121,11 +118,9 @@ namespace TREX {
       void timeLineChange(); //Updates when user changes what timelines to view
       void syncObservations(); //Syncs with server observations
       void attributePopup();
-      void clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
-                            std::map<string,transaction::FloatDomain> attributes);
+      void clientPostGoal(transaction::IntegerDomain start, transaction::IntegerDomain duration, transaction::IntegerDomain end);
       void addTimeline(std::string name);
       void addMenuItems();
-      void newPlanToken(const WitreServer::timed_goal& t);
 
     };
 

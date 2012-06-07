@@ -36,10 +36,6 @@
 
 
 if(WITH_EUROPA) 
-  if(NOT EUROPA_HAVE_EFFECT)
-    message(WARNING "Your europa version appears to be older than 2.6\n"
-      "Some new trex features have been disabled.")
-  endif(NOT EUROPA_HAVE_EFFECT)
   # put the europa flags under trex/europa/bits
   configure_file(bits/europa_config.hh.in 
     ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
@@ -59,19 +55,12 @@ if(WITH_EUROPA)
     EuropaReactor.cc
     europa_convert.cc
     EuropaDomain.cc  
-    extensions/extensions.cc
-    extensions/EarliestFirstFlawManager.cc
-    extensions/Trigonometry.cc
-    extensions/Numeric.cc
-    extensions/DoNotMatchFilter.cc
+    extensions/EarliestFirstFlawManager.cc      
     # headers
     EuropaReactor.hh
     EuropaEntity.hh
     bits/europa_convert.hh
     extensions/EarliestFirstFlawManager.hh
-    extensions/Trigonometry.hh
-    extensions/Numeric.hh
-    extensions/DoNotMatchFilter.hh
   )
 
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)

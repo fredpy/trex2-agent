@@ -229,199 +229,100 @@ namespace TREX {
 	sync_scheduller(); // no code in purpose
       };
 
-      /** @brief Potential Graph cycle detector
-       *
-       * This class is a graph visitor that looks for potential dependency cycles between 
-       * 2 reactors within an Agent. It is used whenever a reactor attempts to 
-       * declare an Internal or External timeline in order to check that this 
-       * new connection won't generate a cyclic dependecny between this reactor 
-       * and the reactor it would connect to. 
-       *
-       * @author Philip Cooksey
-       * @ingroup agent
-       * @relates Agent
-       */
       class cycle_checker : public boost::default_dfs_visitor
       {
-      public:
-        /** @brief Conncetion type
-         * THis type is used to describe the type of connection attempted
-         */
-        enum Cycle_Type { 
-          internal, //@< internal timeline creation  
-          external  //@< external timleine creation
-        };
-        /** @brief End of search for cycle exception
-         *
-         * This class is used in order to complete the cycle detection search.
-         * Its boolean @c cycle attribute indicate whether the search did 
-         * identify a potential cycle or not.
-         *
-         * @relates cycle_checker
-         * @author Philip Cooksey
-         * @ingroup agent
-         */
-        struct has_cycle {
-          /** @brief Constructor
-           *
-           * @param[in] value Cycle detetced flag
-           * @param[in] msg Addition text message
-           *
-           * Create a new instance indicating if a cycle was detected or not through @p value. 
-           * If @p value is @c true, then @m msg should describe the potential cycle detected.
-           */
-          has_cycle(bool value, std::string msg="")
-            :cycle(value), message(msg) {};
-          bool cycle; //@< Cycle detection output
-          std::string message; //@< Cycle description
-        };
+          public:
+            enum Cycle_Type { internal, external };
+            struct has_cycle
+            {
+                has_cycle(bool value, std::string msg="")
+                :cycle(value), message(msg) {};
+                bool cycle;
+                std::string message;
+            };
 
-        /** @brief Constructor 
-         * @param[in] goal The goal reactor
-         * @param[in] root The reactor declaring the timeline requested as Internal
-         * @param[in] type The type of the connection
-         * @param[in] name Name of the timeline supporting the connection
-         *
-         * Create a new instance that checks if @p root can connect to goal @p goal
-         * by declaring the timeline @p name as @p type.
-         */
-        cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, 
-                      Cycle_Type type, utils::Symbol name="" )
-        :root(root), node(goal), name(name), timelineType(type) {};
+            cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, Cycle_Type type, utils::Symbol name="" )
+                : root(root), node(goal), name(name), timelineType(type) {};
 
-        /** @brief New reactor discovered 
-         *
-         * @param[in] r The reactor discovered
-         * @param[in] g The graph discovered
-         *
-         * The code to be executed when @p r is discovered on the depth 
-         * first search of @p g. 
-         * If @p r is a valid reactor and if the connection attempt is @c internal, this 
-         * method will check that none of the external timelines of @p r are the timeline
-         * we try to create.
-         *
-         * @throw has_cycle A cycle has been detected
-         */
-        void discover_vertex(graph::reactor_id r, graph const &g) {
-          if(r==graph::null_reactor())
-            return;
+            void discover_vertex(graph::reactor_id r, graph const &g)
+            {
+                if(r==graph::null_reactor())
+                    return;
 
-          if(timelineType==internal) {
-            std::pair< TREX::transaction::TeleoReactor::external_iterator,
-            TREX::transaction::TeleoReactor::external_iterator > edges = boost::out_edges(r, g);
-            
-            for(TREX::transaction::TeleoReactor::external_iterator temp = edges.first; temp!=edges.second; ++temp) {
-              if(temp->name()==name) {
-                std::stringstream msg;
-                
-                msg<<"Found a potential cycle going from ";
-                for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
-                  msg<<"("<<*it<<")->";
+                if(timelineType==internal)
+                {
+                    std::pair< TREX::transaction::TeleoReactor::external_iterator,
+                                TREX::transaction::TeleoReactor::external_iterator > edges = boost::out_edges(r, g);
+                    for(TREX::transaction::TeleoReactor::external_iterator temp = edges.first; temp!=edges.second; ++temp)
+                    {
+                        if(temp->name()==name)
+                        {
+                            std::stringstream msg;
+                            msg<<"Found a potential cycle going from ";
+                            for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
+                            {
+                                msg<<"("<<*it<<")->";
+                            }
+                            msg<<"("<<name<<")";
+                            throw has_cycle(true, msg.str());
+                        }
+                    }
                 }
-                msg<<"("<<name<<")";
-                throw has_cycle(true, msg.str());
-              }
             }
-          }
-        }
 
-        /** @brief Tree edge traversed
-         *
-         * @param[in] rel A timeline relation
-         * @param[in] g The graph
-         *
-         * The code to be executed when depth first search travers a timeline relation that is not looping.
-         * This method update he potential cycle path by adding the timeline @p rel as part of the potential 
-         * cycle
-         */
-        void tree_edge(graph::relation_type const & rel, graph const &g) {
-          //Adding reactor name to list to store the path to the potential cycle
-          path.push_back(rel->name());
-        }
-
-        /** @brief Examinge an edge
-         *
-         * @param[in] rel A timeline relation
-         * @param[in] g The graph
-         *
-         * The code to be executed when depth first search examine one of the timeline realtions.
-         * If @p rel points to our target goal reactor and the connection type is External, this 
-         * indicate that a cycle has been detected.
-         *
-         * @throw has_cycle potential cycle detected. 
-         */
-        void examine_edge(graph::relation_type const & rel, graph const &g) {
-          if(timelineType==external) {
-            if(boost::target(rel, g)==node) {
-              std::stringstream msg;
-              msg<<"Found a potential cycle going from ("<<name<<")->";
-              for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
-                msg<<"("<<*it<<")->";
-              }
-              msg<<"("<<rel->name()<<")";
-              throw has_cycle(true, msg.str());
+            void tree_edge(graph::relation_type const & rel, graph const &g)
+            {
+                //Adding reactor name to list to store the path to the potential cycle
+                path.push_back(rel->name());
             }
-          }
-        }
 
-        /** @brief End of traversal of a node
-         *
-         * @param[in] r A reactor
-         * @param[in] g The graph traversed
-         *
-         * This method is called when the depth first search finished the 
-         * traversal of the node @p r. If @p r is the root of the relation this 
-         * means that there's no potential cycle and we can complete the search 
-         * prematurely. Otherwise we remove the last timeline/edge traversed from 
-         * the potential cycle description. 
-         *
-         * @throw has_cycle No potential cycle detected
-         */
-        void finish_vertex(graph::reactor_id r, graph const &g) {
-          switch(timelineType) {
-            case external :
-              if(r==root) {
-                throw has_cycle(false);
-              }
-              break;
-            case internal :
-              if(r==root) {
-                throw has_cycle(false);
-              }
-              break;
-            default :
-              throw has_cycle(false); // Should never happen
-          }
-          //Taking off the last reactor added to the path
-          path.pop_back();
-        }
+            void examine_edge(graph::relation_type const & rel, graph const &g)
+            {
+                if(timelineType==external)
+                {
+                    if(boost::target(rel, g)==node)
+                    {
+                        std::stringstream msg;
+                        msg<<"Found a potential cycle going from ("<<name<<")->";
+                        for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++)
+                        {
+                            msg<<"("<<*it<<")->";
+                        }
+                        msg<<"("<<rel->name()<<")";
+                        throw has_cycle(true, msg.str());
+                    }
+                }
+            }
 
-      private:
-        /** @brief Timeline owner
-         *
-         * The owner or future owner of the timeline node attempts to connect to. 
-         * If the relation is Internal it should be the same as node.
-         */
-        graph::reactor_id const& root;
-        /** @brief Creator of the connection
-         *
-         * The reactor that initiales this connection
-         */
-        graph::reactor_id const& node;
-        /** @brief Timeline involved in the connection
-         *
-         * The name of the timeline the reactor node attempts to declare
-         */
-        utils::Symbol name;
-        /** @brief current timelines path
-         *
-         * The list of all the timlines currently traversed by the search. 
-         * If a cycle is detected this path describes it.
-         */
-        std::list<utils::Symbol> path;
-        /** @brief Type of attempted connection
-         */
-        Cycle_Type timelineType;
+            void finish_vertex(graph::reactor_id r, graph const &g)
+            {
+                switch(timelineType)
+                {
+                    case external :
+                        if(r==root)
+                        {
+                            throw has_cycle(false);
+                        }
+                        break;
+                    case internal :
+                        if(r==root)
+                        {
+                            throw has_cycle(false);
+                        }
+                        break;
+                    default :
+                        throw has_cycle(false); // Should never happen
+                }
+                //Taking off the last reactor added to the path
+                path.pop_back();
+            }
+
+          private:
+            graph::reactor_id const& root;
+            graph::reactor_id const& node;
+            utils::Symbol name;
+            std::list<utils::Symbol> path;
+            Cycle_Type timelineType;
       };
 
 
@@ -681,12 +582,12 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  LogManager::path_type graph_dot = manager().file_name("reactors.gv");
+  std::string graph_dot = manager().file_name("reactors.dot");
   std::ofstream dotf(graph_dot.c_str());
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
-  syslog()<<"Initial graph logged in \"reactors.gv\".";
+  syslog()<<"Initial graph logged in \"reactors.dot\".";
 
 
   // start the clock
@@ -705,7 +606,6 @@ void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
   details::sync_scheduller sync(queue);
   m_edf.clear(); // Make sure that there's no one left in the schedulling
-  m_idle.clear();
   bool update = false;
 
   // Identify synchronization order while notifying of the new tick
@@ -728,8 +628,7 @@ void Agent::synchronize() {
 	// this reactor has deliberation :
 	//   - add it to the edf scheduler
 	m_edf.insert(std::make_pair(wr, r));
-      } else 
-        m_idle.push_front(r);
+      }
     } else {
       // r failed => kill the reactor
       kill_reactor(r);
@@ -739,9 +638,9 @@ void Agent::synchronize() {
   if( update ) {
     // Create new graph file
     std::ostringstream name;
-    name<<"reactors."<<getCurrentTick()<<".gv";
+    name<<"reactors."<<getCurrentTick()<<".dot";
     
-    LogManager::path_type graph_dot = manager().file_name(name.str());
+    std::string graph_dot = manager().file_name(name.str());
     std::ofstream dotf(graph_dot.c_str());
     
     graph_names_writer gn;
@@ -760,23 +659,14 @@ bool Agent::executeReactor() {
     boost::tie(wr, r) = *(m_edf.begin());
     // syslog("step")<<"Executing reactor "<<r->getName()<<" (wr="<<wr<<")";
     m_edf.erase(m_edf.begin());
-    m_idle.push_back(r);
     try {
       r->step();
       
-      std::list<reactor_id>::iterator i = m_idle.begin();
-      
-      while( m_idle.end()!=i ) {
-        // Check if the reactor is still valid 
-        if( is_member(*i) ) {
-          wr = r->workRatio();
-          if( !std::isnan(wr) ) {
-            m_edf.insert(std::make_pair(wr, r));
-            i = m_idle.erase(i);
-          } else 
-            ++i;
-        } else 
-          i = m_idle.erase(i);
+      wr = r->workRatio();
+      if( !std::isnan(wr) ) {
+        // syslog("step")<<"New work ratio for "<<r->getName()<<" is "<<wr;
+        m_edf.insert(std::make_pair(wr, r));
+        return true;
       }
     } catch(Exception const &e) {
       syslog("WARN")<<"Exception caught while executing reactor step:\n"<<e;

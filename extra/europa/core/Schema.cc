@@ -33,7 +33,6 @@
  */
 #include "private/Schema.hh"
 #include "trex/europa/EuropaPlugin.hh"
-#include "trex/europa/Assembly.hh"
 
 #include <trex/utils/XmlUtils.hh>
 
@@ -92,7 +91,7 @@ std::string const &details::Schema::nddl_path() {
     opath<<'.';
 
     for(LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i)
-      opath<<':'<<i->string();
+      opath<<':'<<*i;
     
     // Now extract infotmnation for NDDL config file
     config = m_log->use("NDDL.cfg", found);
@@ -122,9 +121,6 @@ std::string const &details::Schema::nddl_path() {
   return m_path;
 }
 
-void details::Schema::registerFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
-  assembly.constraint_engine()->getCESchema()->registerCFunction(fn->getId());
-}
 
 // modifiers
 
@@ -149,11 +145,3 @@ EuropaPlugin::EuropaPlugin() {
 EuropaPlugin::~EuropaPlugin() {
   m_schema->unregisterPlugin(*this);
 }
-
-// manipulators
-
-void EuropaPlugin::declareFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
-  debugMsg("trex:declare", "New function "<<fn->getName().toString()<<" declared");
-  m_schema->registerFunction(assembly, fn);
-}
-

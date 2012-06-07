@@ -31,11 +31,25 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+#include <trex/europa/Assembly.hh>
 
 #include "EarliestFirstFlawManager.hh"
 
 #include <PLASMA/Token.hh>
 #include <PLASMA/TokenVariable.hh>
+
+namespace {
+  class Extensions :public TREX::europa::EuropaPlugin {
+    public:
+      void registerComponents(TREX::europa::Assembly const &assembly) {
+	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
+			EarliestFirst);
+      }
+      
+    }; // ::Extensions
+
+  Extensions s_extra;
+}
 
 using namespace TREX::europa;
 

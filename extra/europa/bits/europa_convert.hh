@@ -59,7 +59,6 @@ namespace TREX {
        *
        * @author Frederic Py <fpy@mbari.org>
        * @sa europa_domain
-       * @ingroup europa
        */
       TREX::transaction::DomainBase *trex_domain(EUROPA::Domain const &dom);
 
@@ -74,7 +73,6 @@ namespace TREX {
        *
        * @author Frederic Py <fpy@mbari.org>
        * @sa trex_domain(EUROPA::Domain const &)
-       * @ingroup europa
        */
       class europa_domain :public TREX::transaction::DomainVisitor {
       public:
@@ -151,24 +149,10 @@ namespace TREX {
 	    delete m_dom;
 	}
 
-        /** @brief Conversion visitors
-         * @param[in] dom A T-REX domain
-         *
-         * Attempt to restrict the underlying europa domain with @p dom
-         *
-         * @pre @p dom type is compatible with the type of the europa domain
-         *
-         * @throw TREX::transaction::DomainAccess The types of @p dom is not 
-         * compatible with the type of the europa domain
-         * @throw TREX::transaction::EmptyDomain The intersection of @p dom and 
-         * the europa domain is empty
-         * @{
-         */
 	void visit(TREX::transaction::BasicEnumerated const *dom);
 	void visit(TREX::transaction::BasicInterval const *dom);
 	void visit(TREX::transaction::DomainBase const *dom, bool);
-        /** @} */
-        
+
 	/** @brief Get europa domain 
 	 *
 	 * @return the reuropa domain amnipulated by this visitor
@@ -190,7 +174,7 @@ namespace TREX {
 	bool               m_temporary;
 	/** @brief Europa domain
 	 *
-	 * The pointer to the domain to be restricted every time this instance
+	 * The pointer to the ddomain to be restricted every time this instance
 	 * visits a TREX domain
 	 */
 	EUROPA::Domain    *m_dom;
@@ -204,22 +188,6 @@ namespace TREX {
 	europa_domain(); 
       }; // TREX::europa::details::europa_domain
 
-      /** @brief T-REX to europa domain
-       *
-       * @param[in] var A europa variable
-       * @param[in] dom A T-REX domain
-       *
-       * Restrict the base domain of @p var with @p dom
-       *
-       * @pre the type of @p dom can be converted to the type of @p var
-       *
-       * @throw TREX::transaction::DomainAccess The types of @p dom and @p var 
-       * are incompatibles
-       * @throw TREX::transaction::EmptyDomain The intersection of @p var and 
-       * @p dom would be empty
-       * @relates europa_domain
-       * @ingroup europa
-       */
       inline void europa_restrict(EUROPA::ConstrainedVariableId &var,
 				  TREX::transaction::DomainBase const &dom) {
 	europa_domain convert(var->lastDomain());

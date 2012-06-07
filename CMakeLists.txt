@@ -41,18 +41,16 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 ########################################################################
 project(trex)
 set(TREX_MAJOR 0)
-set(TREX_MINOR 4)
-set(TREX_PATCH 0)
-set(TREX_RC 1)
+set(TREX_MINOR 3)
+set(TREX_PATCH 2)
 
-set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
-if(TREX_RC GREATER 0)
-  set(VERSION "${VERSION}-rc${TREX_RC}")
-endif(TREX_RC GREATER 0)
 
 # CPack version numbers for release tarball name.
-set(CPACK_PACKAGE_VERSION ${VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${TREX_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${TREX_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${TREX_PATCH})
 
+set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
 message(STATUS "${PROJECT_NAME} VERSION = ${VERSION}")
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent executive")
@@ -107,7 +105,7 @@ endif(LIB_RT)
 ########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
-find_package(Boost 1.47.0 COMPONENTS thread system signals chrono filesystem)
+find_package(Boost 1.41.0 COMPONENTS thread system signals)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   list(APPEND ${PROJECT_NAME}_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})

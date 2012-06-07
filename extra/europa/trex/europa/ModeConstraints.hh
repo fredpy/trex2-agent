@@ -39,33 +39,6 @@
 namespace TREX {
   namespace europa {
     
-    /** @brief Check if Internal timeline
-     *
-     * This europa constraint check if a NDDL object is an Internal timeline 
-     * of the associated reactor.
-     * 
-     * This constraint is usually used within a NDDL rule and support the 
-     * following syntaxes:
-     * @li @c isInternal(bool, obj) where @c bool domain is restricted whenever 
-     *    all the possible values of @c obj are either necessarily @e Internal 
-     *    timelines or necessarily not
-     * @li @c isInternal(bool) behaving as above but the object is the one for 
-     *    which the rule apply
-     *
-     * We also support the functional form of these constraints which return the 
-     * boolean: 
-     * @li @c isInternal(obj)
-     * @li @c isInternal()
-     * @note While one vcould directly test the @c mode of an @c AgentTimeline, 
-     * using this @c isInternal constraints is highly recommended as it asks 
-     * directly to the reactor the mode of the timline and is therefore robust 
-     * to timeline promotion/demotion from/to @e External when the timeline was 
-     * already owned by another reactor
-     *
-     * @sa CheckExternal
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup europa
-     */
     class CheckInternal :public ReactorConstraint {
     public:
       CheckInternal(EUROPA::LabelStr const &name, 
@@ -78,33 +51,6 @@ namespace TREX {
       EUROPA::Domain *m_obj;
     }; // TREX::europa::CheckInternal
 
-    /** @brief Check if External timeline
-     *
-     * This europa constraint check if a NDDL object is an External timeline 
-     * of the associated reactor.
-     * 
-     * This constraint is usually used within a NDDL rule and support the 
-     * following syntaxes:
-     * @li @c isExternal(bool, obj) where @c bool domain is restricted whenever 
-     *    all the possible values of @c obj are either necessarily @e External 
-     *    timelines or necessarily not
-     * @li @c isExternal(bool) behaving as above but the object is the one for 
-     *    which the rule apply
-     *
-     * We also support the functional form of these constraints which return the 
-     * boolean: 
-     * @li @c isExternal(obj)
-     * @li @c isExternal()
-     * @note While one vcould directly test the @c mode of an @c AgentTimeline, 
-     * using this @c isInternal constraints is highly recommended as it asks 
-     * directly to the reactor the mode of the timline and is therefore robust 
-     * to timeline demotion/promotion from/to @e Internal when the timeline was 
-     * already owned by another reactor
-     *
-     * @sa CheckInternal
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup europa
-     */
     class CheckExternal :public ReactorConstraint {
     public:
       CheckExternal(EUROPA::LabelStr const &name, 

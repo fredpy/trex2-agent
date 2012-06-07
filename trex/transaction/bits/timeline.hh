@@ -95,8 +95,7 @@ namespace TREX {
 	 * @sa owned() const
 	 * @sa owner() const
 	 */
-	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, 
-                 transaction_flags const &flags);
+	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, bool controllable);
 	/** @brief Destructor */
 	~timeline();
 
@@ -182,8 +181,6 @@ namespace TREX {
 	bool no_client() const {
 	  return m_clients.empty();
 	}
-        bool should_publish() const;
-        
 	/** @brief Number of clients
 	 *
 	 * Indicates the number of reactors that declared this timline as external
@@ -264,7 +261,7 @@ namespace TREX {
 	 * @sa TeleoReactor::getExecLatency() const
 	 */
 	TICK latency() const;
-        
+
         /** @brief Recall a goal
          *
          * @param[in] g A goal
@@ -290,11 +287,9 @@ namespace TREX {
 
       private:
 	/** @brief Create ownership
-	 * @param[in] r            A reactor
-         * @param[in] controllable Flag for goal acceptance
+	 * @param[in] r A reactor
 	 *
-	 * Make @p r the owner of this timeline. If @p controlable is @c false 
-         *      then this timeline will be marked as not accepting goals 
+	 * Make @p r the owner of this timeline
 	 *
 	 * @pre this timline is not owned or is already owned by @p r
 	 *
@@ -308,45 +303,37 @@ namespace TREX {
 	 *       of its new ownership through the method TeleoReactor::assigned
 	 *
 	 * @sa owned() const
-	 * @sa unassign(TICK)
+	 * @sa unassign(TICK,bool,bool)
 	 * @sa TeleoReactor::assigned(timeline const &)
 	 */
-	bool assign(TeleoReactor &r, transaction_flags const &flags);
-        
-        /** @brief Remove ownership
-         *
-         * @param[in] date the current tick
-         *
-         * Indicates that the current owner of this timeline is giving up its 
-         * ownership. At the current date @p date
-         * If no reactor is currently owning this timeline nothing will happen, 
-         * otherwise the current owner will be notified of not owning this 
-         * timeline anymore and the Failed observation will be prepapred to be 
-         * posted. 
-         * 
-         * @return The reactor that was owning this timeline or @c NULL if this 
-         *         timeline was owned by nobody
-         * @post This timeline is not owned anymore
-         * @sa owned() const
-         * @sa assign(TeleoReactor &, bool)
-         * @sa TeleoReactor::unassigned(timeline const &)
-         */
-        TeleoReactor *unassign(TICK date);
-        /** @brief timeline demotion
-         *
-         * @param[in] date the current tick
-         * @param[in] flags subscribtion flags
-         *
-         * Indicates that the current owner of the timeline demote this timeline 
-         * from internal to external
-         * 
-         * @post This timeline is not owned anymore
-         * @post if this taimeline had an owner then this owner has now became 
-         *       a client to the timeline with the indicated flags.
-         * @sa unassign(TICK)
-         * @sa subscribe(TeleoReactor &r, transaction_flags const &)
-         */
-        void demote(TICK date, transaction_flags const &flags);
+	bool assign(TeleoReactor &r, bool controllable);
+	/** @brief Remove ownership
+	 *
+	 * @param[in] date     current tick
+	 * @param[in] demotion demotion flag
+	 * @param[in] control  goal posting flag
+	 *
+	 * This method iindicate that the current owner of this timeline
+	 * is giving up its ownership at the ticjk @p date.
+	 *
+	 * If @p demotion is @c true it indicates that this reactor demoted
+	 * this timeline from @e Internal to @e External and the
+	 * @p control argument will then be used as described in the
+	 * @c subscribe method
+	 *
+	 * As a side effect the special observation @c Failed will be produced for
+	 * the tick @p date until another reactor takes ownership of this timeline
+	 *
+	 * @post the timeline is not owned anymore
+	 * @note the owner of this timline is notified of this operation through
+	 *       the TeleoReactor::unassigned(timeline const &) callback
+	 *
+	 * @sa owned() const
+	 * @sa subscribe(TeleoReactor &,bool)
+	 * @sa assign(TeleoReactor &)
+	 * @sa TeleoReactor::unassigned(timeline const &)
+	 */
+	void unassign(TICK date, bool demotion=false, bool control=true);
 	/** @brief Add a new client
 	 *
 	 * @param[in] r       A reactor
@@ -375,7 +362,7 @@ namespace TREX {
 	 * @sa unsubscribe(Relation const &)
 	 * @sa TeleoReactor::subscribed(Relation const &)
 	 */
-	bool subscribe(TeleoReactor &r, transaction_flags const &flags);
+	bool subscribe(TeleoReactor &r, bool control);
 	/** @brief Remove a relation
 	 *
 	 * @param[in] rel A relation
@@ -420,48 +407,15 @@ namespace TREX {
 	 * @sa lastObsDate() const
 	 */
 	void postObservation(TICK date, Observation const &obs);
-        
-        bool notifyPlan(goal_id const &t);
-        bool cancelPlan(goal_id const &t);
 
 	void latency_update(TICK prev);
 
-        /** @brief Name of the timeline
-         * 
-         * The name identifier for this timeline. 
-         */
 	utils::Symbol m_name;
-        /** @brief owner of the timeline 
-         *
-         * A pointer to the reactor currently decalring this timeline as 
-         * Internal or @c NULL if this timeline is currently not owned
-         */
 	TeleoReactor *m_owner;
-        /** @brief Request acceptance flag
-         * 
-         * A flag that indicates if the timeline is currently accepting request 
-         * or not. No request will be transmitted to the owner of this timeline 
-         * as long as this flag is @c false.
-         */
-        transaction_flags m_transactions;
-        size_t            m_plan_listeners;
-        /** @brief Clients of the timeline
-         *
-         * The set of reactors that subscribe to this timeline. This structure 
-         * also embed extra information such as whether this reactor will post 
-         * goals on this timeline and is expecting to receive plan broadcast.
-         */
+        bool          m_accept_goals;
 	client_set    m_clients;
 	
-        /** @brief Last observation posted
-         * 
-         * The value of the last observation posted to this timeline.
-         */
 	Observation   m_lastObs;
-        /** @brief last observation posting date.
-         * 
-         * The tick date when the last observation was posted
-         */
 	TICK          m_obsDate;
 	
 	/** @brief Name of the special @c Failed observation

@@ -6,7 +6,6 @@
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
- * @deprecated The RStat* classes are now replaced by Boost.Chrono library.
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -52,7 +51,7 @@
 namespace TREX {
   namespace utils {
 
-    /** @brief Resource usage stats management class.
+    /** @brief Ressource usage stats management class.
      *
      * This class offer a simple and basic access to resource usage
      * statistics for processes.
@@ -63,7 +62,6 @@ namespace TREX {
      * not yet offer all the interfaces to access data given by this
      * function.
      * @ingroup utils
-     * @deprecated The RStat class is now replaced by Boost.Chrono library.
      */  
     class RStat {
     public:
@@ -364,13 +362,12 @@ namespace TREX {
     /** @brief Stop-watch for RStat
      *
      * This class is an helper to measure the delta between two
-     * time points. the tow timepoints are given by the date of
+     * time points. the tow timepoints are given bytthe date of
      * creation and destruction of this class instance and addded
      * on a RStat instance given as attribute.
      *
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
-     * @deprecated The RStatLap class is now replaced by Boost.Chrono library.
      */
     class RStatLap {
     public:
@@ -393,7 +390,7 @@ namespace TREX {
 	RStat end(m_start.who());
 	m_output = m_output+(end-m_start);
       }
-            
+      
     private:
       RStat &m_output; //!< Reference to the output variable
       RStat m_start;   //!< Stats collected on this instance creation

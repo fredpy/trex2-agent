@@ -38,23 +38,8 @@ option(MBARI_ENABLED "Enable MBARI specific code." OFF)
 if(MBARI_ENABLED)
   add_custom_target(mbari COMMENT "MBARI specific targets")
   trex_cfg(cfg shared/trex)
-
   add_subdirectory(shared)
   add_subdirectory(tracker)
-  add_subdirectory(iridium)
   add_subdirectory(europa)
-
-  #set(POCO_HINT "" CACHE FILEPATH "Hint to find Poco libraries")
-  #find_library(POCO_NET_LIBRARIES
-  #  NAMES PocoNet 
-  #  HINTS ${POCO_HINT}
-  #  DOCS "Looking for Poco library")
-  #find_path(POCO_INCLUDE "Poco/Poco.h" HINTS ${POCO_HINT})
-  #if(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-  #  set(POCO_FOUND ON)
-  #else(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-  #  message(WARNING "Unable to find Poco libraries: disabling iridium plugin")
-  #  set(POCO_FOUND OFF)
-  #endif(POCO_NET_LIBRARIES AND POCO_INCLUDE)
 endif(MBARI_ENABLED)
 

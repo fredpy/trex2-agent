@@ -178,10 +178,7 @@ std::string WitreServer::getDependencies(std::string name)
 void WitreServer::declared(details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) {
     // If I did not connect to it yet just create the connection
-    use(timeline.name(), true, true); // as we do not have internal timlines this operation will always succeed
-                                       //  the first boolean means that we may want to post goals
-                                       //  the second boolean indicate if we want to be notified on plan updates
-                                       //      (false for now)
+    use(timeline.name()); // as we do not have internal timlines this operation will always succeed
     {
       // then add it to externalTimelines
       boost::mutex::scoped_lock lock(mutex_);
@@ -248,11 +245,9 @@ void WitreServer::notify(Observation const &obs)
 bool WitreServer::synchronize()
 {
     boost::mutex::scoped_lock lock(mutex_);
-  TREX::transaction::TICK date = getCurrentTick();
-    std::string now = date_str(date+1);
-  // time_t now = std::floor(tickToTime(getCurrentTick()+1));
+    time_t now = std::floor(tickToTime(getCurrentTick()+1));
     std::ostringstream oss;
-    oss<<"<Token tick=\""<<date<<"\" on=\"Tick\">"<<now<<" ("<<(date+1)<<")</Token>";
+    oss<<"<Token tick=\""<<getCurrentTick()<<"\" on=\"Tick\">"<<now<<"</Token>";
     //Storing ticks
     observations.push(oss.str());
     //Notify all connected clients
@@ -261,46 +256,7 @@ bool WitreServer::synchronize()
             c.client->addObs(oss.str());
             Wt::WServer::instance()->post(c.sessionId, c.function );
     }
-    //Notify all connected clients of plan
-    dispatchPlanTokens();
     return true;
-}
-
-void WitreServer::newPlanToken(goal_id const &t)
-{
-    planTokens.remove(t);
-    planTokens.push_back(t);
-    dispatchPlanTokens();
-}
-
-void WitreServer::cancelledPlanToken(goal_id const &t)
-{
-
-}
-
-void WitreServer::dispatchPlanTokens()
-{
-    std::list<timed_goal::iterator> eraselist;
-    timed_goal::iterator plan;
-    for(plan = planTokens.begin(); plan!=planTokens.end(); ++plan)
-    {
-        goal_id const& t = (*plan);
-        if(t->getEnd().upperBound()<getCurrentTick())
-        {
-            pastTokens.push_front((*plan));
-            eraselist.push_back(plan);
-        }
-    }
-    while(!eraselist.empty())
-    {
-        planTokens.erase(eraselist.front());
-        eraselist.pop_front();
-    }
-    for (unsigned i = 0; i < connections.size(); ++i) {
-        Connection& c = connections[i];
-        const boost::function<void(const timed_goal&)>& function(boost::bind(&WitreApplication::newPlanToken, c.client, _1));
-        Wt::WServer::instance()->post(c.sessionId, boost::bind(function, planTokens) );
-    }
 }
 
 goal_id WitreServer::clientGoalPost(Goal const &g)

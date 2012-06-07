@@ -47,9 +47,6 @@
 # include "bits/external.hh"
 # include "reactor_graph.hh"
 
-# include <boost/chrono.hpp>
-# include <boost/chrono/thread_clock.hpp>
-
 namespace TREX {
   namespace transaction {
 
@@ -89,7 +86,6 @@ namespace TREX {
     class TeleoReactor :boost::noncopyable {
       typedef details::timeline_set                       internal_set;
       typedef details::external_set                       external_set;
- 
     public:
       /** @brief Reactor reference type
        *
@@ -196,15 +192,9 @@ namespace TREX {
       TREX::utils::Symbol const &getGraphName() const {
 	return m_graph.getName();
       }
-      /** @brief Get graph 
-       * 
-       * This methods gives a reference to the graph that manage this reactor 
-       *
-       * @return the graph
-       * @sa getGraphName() const 
-       */
+
       graph const &getGraph() const {
-        return m_graph;
+     return m_graph;
       }
 
       /** @brief reactor initial tick
@@ -270,10 +260,6 @@ namespace TREX {
       double tickToTime(TICK cur) const {
 	return m_graph.tickToTime(cur);
       }
-      std::string date_str(TICK cur) const {
-        return m_graph.date_str(cur);      
-      }
-
       /** @brief Get current tick
        *
        * @return current tick date
@@ -632,47 +618,6 @@ namespace TREX {
        */
       bool completedGoal(goal_id g);
 
-      /** @brief Post a planned token
-       *
-       * @param[in] g A goal id
-       *
-       * Inform that the token @p g is now part of the plan of the reactor
-       *
-       * @pre g is a valid goal_id (i.e. not NULL)
-       * @pre g->object() is an @e Internal timeline of this reactor
-       *
-       * @throw DispatchError The token was not valid or was not on an internal
-       *        timeline of this reactor
-       *
-       * @return true the token has been correctly integrated.
-       * @return false this token id is already broadcasted or its end time is 
-       *         in the past
-       *
-       * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa cancelPlanToken(goal_id const &)
-       */
-      bool postPlanToken(goal_id const &g);
-      /** @brief Post a planned token
-       *
-       * @param[in] g A goal
-       *
-       * This method is just an overload of postPlanToken(goal_d const &) for user facility
-       *
-       * @pre g.object() is an @e Internal timeline of this reactor
-       *
-       * @throw DispatchError The token was not on an internal
-       *        timeline of this reactor
-       *
-       * @returnthe goal_id for the token posted. This id is invalid if the token was 
-       *           not posted  
-       *
-       * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa postPlanToken(goal_id const &)
-       */
-      goal_id postPlanToken(Goal const &g);
-      void cancelPlanToken(goal_id const &g);
-      
-      
       /** @brief Recall a goal
        *
        * @param[in] g A goal
@@ -771,23 +716,17 @@ namespace TREX {
        *          the tick duration.
        */
       virtual void handleRecall(goal_id const &g) {}
-      
-      virtual void newPlanToken(goal_id const &t) {}
-      virtual void cancelledPlanToken(goal_id const &t) {}
 
       /** @brief External timeline declaration
        *
        * @param[in] timeline a name
        * @param[in] control  goal dispatching flag
-       * @param[in] plan_listen plan listening flag 
-       * 
        *
        * This method is used to declare @p timeline as an @e External timeline.
        * The optional @p control flag prohibits goal dispatching to this timeline when
-       * @c false. The @p plan_listen flag aloow the reactor to be notified whenever the 
-       * owner of this timeline does give the current tokens it has in his future plan
+       * @c false.
        *
-       * @pre The timeline is not already @e Internal
+       * @pre The timleine is not already @e Internal
        *
        * @warning The type of a timeline can change during reactor execution and this
        * is the reason why this methods give no feedback. It is always recommend to
@@ -795,17 +734,15 @@ namespace TREX {
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, details::transaction_flag const &)
+       * @sa graph::subscribe(graph::reactor_id, TREX::utils::Symbol const &, bool)
        * @sa provide(TREX::utils::Symbol const &)
-       * @sa unuse(TREX::utils::Symbol const &)
        */
-      void use(TREX::utils::Symbol const &timeline, bool control=true, bool plan_listen=false);
+      void use(TREX::utils::Symbol const &timeline, bool control=true);
 
       /** @brief Internal timeline declaration
        *
        * @param[in] timeline a name
-       * @param[in] controlable does this timeline accept goals
-       * @param[in] publish does this timeline will publish its plan
+       * @param[in] does this timeline accept goals
        *
        * This method is used to declare @p timeline as an @e Internal timeline.
        *
@@ -813,59 +750,15 @@ namespace TREX {
        * is the reason why this methods give no feedback. It is always recommend to
        * check the success/failure of this operation using isInternal
        *
-       * @note If the timeline was @p External and is not owned yet by any reactor, this
+       * @note If the timlien was @p External and is not woned yet by any reactor, this
        *       call will promote it as @p Internal
        *
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa graph::assign(graph::reactor_id, TREX::utils::Symbol const &)
        * @sa use(TREX::utils::Symbol const &, bool)
-       * @sa unprovide(TREX::utils::Symbol const &)
        */
-      void provide(TREX::utils::Symbol const &timeline, bool controllable=true, bool publish=false);
-      
-      /** Add comment on transaction log 
-       * @param[in] msg A message
-       *
-       * Adds the message @p msg in the transaction log. This message will be 
-       * produced only if the reactor is logging its transactions.
-       */
-      void tr_info(std::string const &msg);
-      
-      /** @brief External timeline unsubscription
-       *
-       * @param[in] timeline A timeline name
-       *
-       * Remove the External declaration of @p timeline from this reactor
-       *
-       * @retval true operation succeeded
-       * @retval false @p timeline was probably not External to this reactor
-       *
-       * @post @p timeline is not External to this reactor
-       *
-       * @sa isExternal(TREX::utils::Symbol const &) const
-       * @sa use(TREX::utils::Symbol const &, bool)
-       * @sa unprovide(TREX::utils::Symbol const &)
-       * @sa isolate()
-       */
-      bool unuse(TREX::utils::Symbol const &timeline);
-      /** @brief Internal timeline unsubscription
-       *
-       * @param[in] timeline A timeline name
-       *
-       * Remove the Internal declaration of @p timeline from this reactor
-       *
-       * @retval true operation succeeded
-       * @retval false @p timeline was probably not Internal to this reactor
-       *
-       * @post @p timeline is not Internal to this reactor
-       *
-       * @sa isInternal(TREX::utils::Symbol const &) const
-       * @sa unuse(TREX::utils::Symbol const &)
-       * @sa provide(TREX::utils::Symbol const &, bool, bool)
-       * @sa isolate()
-       */
-      bool unprovide(TREX::utils::Symbol const &timeline);
+      void provide(TREX::utils::Symbol const &timeline, bool controllable=true);
 
       /** @brief Request for external failed
        *
@@ -943,25 +836,9 @@ namespace TREX {
 	  return m_graph.syslog(getName().str()+"|"+context);
       }
 
-      /** @brief Find an external timeline 
-       * 
-       * @param[in] name hte name of the timeline 
-       * 
-       * @return An iterator refering to the @e external timeline @p name or 
-       *        @c ext_end() if this reactor does not subscribe to @p name
-       */
       external_iterator find_external(TREX::utils::Symbol const &name);
 
     private:
-# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-      typedef boost::chrono::thread_clock stat_clock;
-# else 
-      typedef boost::chrono::process_user_cpu_clock stat_clock;        
-# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
-      typedef stat_clock::duration stat_duration; 
-      stat_duration m_synch_usage, m_deliberation_usage;
-      
-      std::ofstream m_stat_log;
 
       void clear_internals();
       void clear_externals();
@@ -970,115 +847,28 @@ namespace TREX {
       bool m_firstTick;
       graph &m_graph;
 
-      /** @brief Transaction logger
-       * 
-       * This class is used by TeleoReactor to log all the transactions 
-       * events produced by this reactor. The transaction events are:
-       * @li declaration of an @p Internal timeline
-       * @li subscription to an @p External timeline
-       * @li observation produced on an @p Internal timeline
-       * @li goal request on an @p External timeline 
-       * @li goal recall on an @p External timeline
-       * @li unsubsiption to an @p External timeline 
-       * @li undecalration of an @p Internal timeline 
-       * All these events are produced in a file given during subscription using 
-       * an xml format that can be parsed from TransactionPlayer 
-       *
-       * @relates TeleoReactor
-       * @author Frederic Py <fpy@mbari.org>
-       * @sa TransactionPlayer
-       */
       class Logger {
       public:
-        /** @brief Constructor 
-         * @param[in] dest A filename
-         * 
-         * Create a new insttance that will redirect all the transaction events 
-         * to the file @p dest
-         */
 	Logger(std::string const &dest);
-        /** @brief Destructor
-         * 
-         * Destroy the instance  and properly close the file maintained by 
-         * closing all the xml tags that remains open.
-         */
 	~Logger();
-        
-        /** @brief Internal timeline declaration
-         *
-         * @param[in] name the name of the timeline 
-         */
+
 	void provide(TREX::utils::Symbol const &name);
-        /** @brief External timeline subsription
-         *
-         * @param[in] name the name of the timeline 
-         */
 	void use(TREX::utils::Symbol const &name);
 
-        /** @brief undeclaration of an Internal timeline
-         *
-         * @param[in] name the name of the timeline 
-         */
 	void unprovide(TREX::utils::Symbol const &name);
-        /** @brief unsbscription of an Internal timeline
-         *
-         * @param[in] name the name of the timeline 
-         */
 	void unuse(TREX::utils::Symbol const &name);
 
-        /** @brief New tick event
-         * 
-         * @param[in] val the new tick date
-         */
 	void newTick(TICK val);
 
-        /** @brief New observation 
-         * @param[in] obs the observation
-         */
 	void observation(Observation const &obs);
-        /** @brief New request 
-         * @param[in] goal the goal requested
-         */
 	void request(goal_id const &goal);
-        /** @brief New recall 
-         * @param[in] goal the goal recalled
-         */
 	void recall(goal_id const &goal);
-        
-        void comment(std::string const &msg);
-        
-        void notifyPlan(goal_id const &t);
-        void cancelPlan(goal_id const &t);
-
 
       private:
-        /** @brief Output file
-         */
 	std::ofstream m_file;
-        /** @brief In tick flag
-         * 
-         * A boolean flag used to identify if newTick was called at least once
-         */
-	bool m_tick;
-        /** @brief Pending data flag
-         *
-         * This flag is used to indicate that events did occur on the 
-         * previous tick. Indicating that the previous tick tag needs 
-         * to be closed
-         */
-        bool m_hasData;
-        /** @brief Current tick
-         * 
-         * the current tick value as provided by newTick call. This value is 
-         * valid only if m_tickj is @c true 
-         */
+	bool m_tick, m_hasData;
 	TICK m_current;
 
-        /** @brief Open new tick xml tag
-         *
-         * This method is called whenever new events are produced and oepn the 
-         * new tick xml tag for this tick if it was not previously opened
-         */
 	void openTick();
       }; // TREX::transaction::TeleoReactor::Logger
 
@@ -1096,19 +886,7 @@ namespace TREX {
        */
       void   doNotify();
 
-      /** @brief Transaction logger
-       * 
-       * A pointer to the transaction logger for this reactor. If the pointer 
-       * is not @c NULL. The this reactor will log all the transaction events 
-       * it produces during its lifetime in an output file named 
-       * <reactor>.tr.log. 
-       * Such file can be used by a TransactionPlayer to reproduce this reactor 
-       * behavior inside the agent.
-       * 
-       * @sa Logger
-       * @sa TransactionPlayer
-       */
-       Logger *m_trLog;
+      Logger *m_trLog;
 
       /** @brief Reactor name
        *
@@ -1135,51 +913,12 @@ namespace TREX {
        */
       TICK m_lookahead;
 
-      /** @brief Initial tick value
-       *
-       * The tick date when this reactor started to execute (typically 0)
-       */
       TICK   m_initialTick;
-      /** @brief Final tick value
-       *
-       * The tick date when the reactor will end. THis value often reflects 
-       * the same value as the agent end time 
-       */
       TICK   m_finalTick;
 
 
-      void reset_deadline();
-      /** @brief Deliberation deadline
-       *
-       * This value indicates when this reactor is expected to complete 
-       * its current deliberation. This deadline is computed every tick  
-       * m_nSteps is equal to 0. The value is then set to the current tick plus 
-       * the latency of this reactor.   
-       * 
-       * This value is then used by workRatio in order to compute the reactor 
-       * priority level based on how close this reactor is close to  its deadline 
-       * 
-       * @sa workRatio()
-       * @sa hasWork() 
-       * @sa m_nSteps
-       */
       mutable TICK m_deadline;
-      /** @brief Number of successive deliberation steps
-       *
-       * Count the number of steps of deliberation this reactor did execute 
-       * without declaring that it was done deliberating. As soon as 
-       * hasWork() return false this counter will be reset to 0    
-       * 
-       * This value is then used by workRatio in order to compute the reactor 
-       * priority level based on how close this reactor is close to  its deadline 
-       * 
-       * @sa workRatio()
-       * @sa hasWork() 
-       * @sa m_deadline
-       */
       mutable unsigned long m_nSteps;
-      mutable bool m_past_deadline;
-      mutable unsigned long m_validSteps;
 
       external_set m_externals;
       internal_set m_internals;
@@ -1252,18 +991,12 @@ namespace TREX {
        * @param[in] msg The error msg
        */
       DispatchError(TeleoReactor const &r, goal_id const &g, std::string const &msg) throw()
-	:ReactorException(r, build_msg(g, msg)) {}
+	:ReactorException(r, buil_msg(g, msg)) {}
       /** @brief Destructor */
       ~DispatchError() throw() {}
 
     private:
-      /** @brief Construct the error message
-       * @param[in] g   A goal
-       * @param[in] msg An error message
-       * 
-       * @return A string that depicts that the error @p msg did occur with the goal @p g
-       */
-      static std::string build_msg(goal_id const &g, std::string const &msg) throw();
+      static std::string buil_msg(goal_id const &g, std::string const &msg) throw();
     };
 
 

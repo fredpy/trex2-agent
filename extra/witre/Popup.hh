@@ -19,7 +19,6 @@
 #include <iostream>
 #include <boost/version.hpp>
 #include <trex/domain/IntegerDomain.hh>
-#include <trex/domain/FloatDomain.hh>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
@@ -31,30 +30,32 @@ namespace TREX {
             private:
             Wt::WContainerWidget* attributes;
             Wt::WCompositeWidget* root;
+            Wt::WLineEdit* start;
+            Wt::WLineEdit* startEnd;
+            Wt::WLineEdit* duration;
+            Wt::WLineEdit* durationEnd;
+            Wt::WLineEdit* end;
+            Wt::WLineEdit* endEnd;
             Wt::WPushButton* ok;
             Wt::WIntValidator* numRange;
             Wt::WIntValidator* middleRange;
-            Wt::Signal<std::map<string, transaction::IntegerDomain>,
-                        std::map<string,transaction::FloatDomain> > finished_;
+            Wt::Signal<transaction::IntegerDomain, transaction::IntegerDomain, transaction::IntegerDomain> finished_;
             Wt::Signal< > cancelled_;
             Wt::JSlot* script;
             Wt::JSlot* disableScript;
-
-            Wt::WContainerWidget* inputs;
-            std::map<string, std::pair<Wt::WLineEdit*,Wt::WLineEdit*> > standards;
-            std::list<std::pair<Wt::WInPlaceEdit*, Wt::WLineEdit*> > additions;
-            Wt::JSignal<string, string, string> delSignal_;
+            //Validators of information
+            Wt::WValidationStatus* valS;
+            Wt::WValidationStatus* valD;
+            Wt::WValidationStatus* valE;
 
             void cancel() { cancelled_.emit(); };
+            void okStatus(bool val) { if(valS->valid()&&valD->valid()&&valE->valid()) ok->enable(); else  ok->disable(); };
             void done();
-            void addAttribute();
-            void deleteAttribute(string container, string name, string input);
+            void validateEndinputs();
 
             public:
-            Wt::Signal<std::map<string, transaction::IntegerDomain>,
-                        std::map<string,transaction::FloatDomain> >& finished() { return finished_; };
+            Wt::Signal<transaction::IntegerDomain, transaction::IntegerDomain, transaction::IntegerDomain>& finished() { return finished_; };
             Wt::Signal< >& cancelled() { return cancelled_; };
-            Wt::JSignal<string, string, string>& delSignal() { return delSignal_; };
             void setPosition(Wt::WWidget* input) { this->positionAt(input, Wt::Vertical); };
             const void setHide() { this->setHidden(true); };
             const void setVisable() { this->setHidden(false); };

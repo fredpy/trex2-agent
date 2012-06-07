@@ -14,14 +14,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -31,7 +31,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -51,7 +51,6 @@
 # include "Observation.hh"
 # include "Goal.hh"
 # include <trex/utils/id_mapper.hh>
-# include <bitset>
 
 namespace TREX {
   namespace transaction {
@@ -70,10 +69,10 @@ namespace TREX {
     class GraphException :public TREX::utils::Exception {
     public:
       GraphException(graph const &g, std::string const &msg) throw();
-      virtual ~GraphException() throw() {}
+      virtual ~GraphException() throw() {}	
 
     protected:
-      GraphException(graph const &g, std::string const &who,
+      GraphException(graph const &g, std::string const &who, 
 		     std::string const &msg) throw();
     }; // TREX::transaction::GraphException
 
@@ -117,7 +116,7 @@ namespace TREX {
      * @ingroup transaction
      */
     namespace details {
-
+      
       /** @brief ID traits for TeleoReactor
        *
        * Gives a way to acces to the name of a reactor
@@ -126,11 +125,11 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup transaction
        */
-      template<class PtrType = TeleoReactor *>
+      template<class PtrType = TeleoReactor *> 
       struct reactor_id_traits {
 	typedef PtrType base_type;
 	typedef utils::Symbol id_type;
-
+	
 	/** @brief ID extraction function
 	 *
 	 * @param[in] A reference to a TeleoReactor
@@ -156,22 +155,13 @@ namespace TREX {
       /** @brief A set of reactors
        *
        * This type stores reactors in an list ordered by reactor names
-       *
+       * 
        * @sa class TREX::utils::list_set
        */
       typedef utils::list_set<
-	reactor_id_traits< boost::shared_ptr<TeleoReactor> > > reactor_set;
-
-      /** @brief Reactor transaction flags
-       *
-       * This type contains the different flags used to handle a reactor
-       * transaction for a specific timeline. The flags are as follow :
-       * @li @c 0 indicates if the timeline accept goals otr not
-       * @li @c 1 indicates if the timeline should broadcast plan tokens
-       *     to the reactor
-       */
-      typedef std::bitset<2> transaction_flags;
-
+	reactor_id_traits< boost::shared_ptr<TeleoReactor> > > reactor_set;      
+      
+      
       /** @brief timeline client helper
        *
        * An helper used to define a set of timeline clients.
@@ -194,7 +184,7 @@ namespace TREX {
        * @sa class TREX::utils::relation
        * @sa TREX::utils::relation::accept_goals() const
        */
-      typedef utils::map_id_traits<reactor_id_traits<>, transaction_flags> client_id_traits;
+      typedef utils::map_id_traits<reactor_id_traits<>, bool> client_id_traits;
 
       /** @brief Set of clients
        *
@@ -207,7 +197,7 @@ namespace TREX {
       typedef utils::list_set<client_id_traits> client_set;
 
     } // TREX::transaction::details
-
+    
   } // TREX::transaction
 } // TREX
 
