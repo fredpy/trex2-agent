@@ -48,6 +48,10 @@
 namespace TREX {
   namespace transaction {
     
+    double round(double d, size_t places);
+    double floor(double d, size_t places);
+    double ceil(double d, size_t places); 
+    
     /** @brief Float domain
      *
      * This class implements a domain used to describe floats.
