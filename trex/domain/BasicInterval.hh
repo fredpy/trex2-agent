@@ -85,18 +85,28 @@ namespace TREX {
 
       template<class Ty, bool Safe>
       Ty getTypedLower() const {
-	if( Safe ) 
-	  return TREX::utils::string_cast<Ty>(getStringLower());
-	else 
-	  return boost::any_cast<Ty>(getLower());
+        boost::any val = getLower();
+	if( Safe ) {
+          Ty *ret = boost::any_cast<Ty>(&val);
+          if( NULL!=ret )
+            return *ret;
+          else
+            return TREX::utils::string_cast<Ty>(getStringLower());
+	} else 
+	  return boost::any_cast<Ty>(val);
       }
            
       template<class Ty, bool Safe>
       Ty getTypedUpper() const {
-	if( Safe ) 
-	  return TREX::utils::string_cast<Ty>(getStringUpper());
-	else 
-	  return boost::any_cast<Ty>(getUpper());
+        boost::any val = getUpper();
+	if( Safe ) { 
+          Ty *ret = boost::any_cast<Ty>(&val);
+          if( NULL!=ret )
+            return *ret;
+          else
+            return TREX::utils::string_cast<Ty>(getStringUpper());
+	} else 
+	  return boost::any_cast<Ty>(val);
       }
            
       virtual std::string getStringLower() const;
