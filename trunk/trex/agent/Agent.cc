@@ -444,15 +444,16 @@ TICK Agent::initialTick(Clock *clk) {
 
 // structors :
 
-Agent::Agent(Symbol const &name, TICK final, Clock *clk)
-  :graph(name, initialTick(clk)),
+Agent::Agent(Symbol const &name, TICK final, Clock *clk, bool verbose)
+  :graph(name, initialTick(clk), verbose),
    m_clock(clk), m_finalTick(final) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
-Agent::Agent(std::string const &file_name, Clock *clk)
+Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
   :m_clock(clk) {
+  set_verbose(verbose);
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
@@ -474,8 +475,9 @@ Agent::Agent(std::string const &file_name, Clock *clk)
   }
 }
 
-Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk)
+Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool verbose)
   :m_clock(clk) {
+  set_verbose(verbose);
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);

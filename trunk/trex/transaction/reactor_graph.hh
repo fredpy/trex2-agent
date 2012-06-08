@@ -315,7 +315,7 @@ namespace TREX {
        *
        * @post the graph is empty
        */
-      explicit graph(TREX::utils::Symbol const &name, TICK init =0);
+      explicit graph(TREX::utils::Symbol const &name, TICK init =0, bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -332,7 +332,7 @@ namespace TREX {
        */
       graph(TREX::utils::Symbol const &name,
 	    boost::property_tree::ptree &conf,
-	    TICK init =0);
+	    TICK init =0, bool verbose=false);
       /** @brief Destructor
        *
        * Destroy the graph along with all the reactors attached to it.
@@ -597,6 +597,26 @@ namespace TREX {
 	return *this;
       }
 
+      /** @brief Check for verbosity level
+       *
+       * Checks if this graph is set as verbose or not.
+       * This value will be the default verbosity leve lof reactors handled by 
+       * this graph
+       *
+       * @sa set_verbose(bool)
+       * @sa TeleoReactor::reset_verbose()
+       */
+     bool is_verbose() const {
+        return m_verbose;
+      }
+      /** @brief Set default verbosity level
+       * @param[in] flag verbosity flag
+       * @sa is_verbose() const
+       */
+      void set_verbose(bool flag=true) {
+        m_verbose = flag;
+      }
+      
     protected:
       reactor_id add_reactor(reactor_id r);
 
@@ -682,6 +702,7 @@ namespace TREX {
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
       listen_set m_listeners;
 
+      bool m_verbose;
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       TREX::utils::SingletonUse<xml_factory>             m_factory;
 

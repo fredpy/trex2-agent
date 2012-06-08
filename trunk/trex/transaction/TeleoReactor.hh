@@ -133,7 +133,7 @@ namespace TREX {
        * A typical reactor  definition is as follow
        * @code
        * < <RType> name="<name>" lookahead="<lookahead>" latency="<latency>"
-       *           config="<config>" log="<logflag>" >
+       *           config="<config>" log="<logflag>" verbose="<verbflag>" >
        *      <External name="<ename>" goals="<post goal flag>" />
        *      <Internal name="<iname>" />
        * </ <RType> >
@@ -144,11 +144,14 @@ namespace TREX {
        * @li @c @<name@>  the name of the reactor
        * @li @c @<lookahead@> the reactor's look-ahead
        * @li @c @<latency@> the reactors's latency
-       * @li @c @<logflag@> a flag use to indicate that observations and commands 
+       * @li @c @<logflag@> An optional flag used to indicate that observations and commands 
        *                   issued from this reactor should be logged or not 
        *                   (default is @p log_default)
        * @li @c @<config@> An optional extra file that extends the defintions 
        *                    of this tag
+       * @li @c @<verbflag@> An optional flag to indicates wheether this reactor 
+       *                     should be verbose in TREX.log or not. Defulat is 
+       *                     graph::is_verbose()
        *
        * If @p loadTL is true then that class will also parse the External 
        *              and Internal tags in order to declare internal and 
@@ -528,6 +531,40 @@ namespace TREX {
        */
       TREX::utils::LogManager &manager() const {
 	return m_graph.manager();
+      }
+      /** @brief Check for verbosity level
+       *
+       * Checks if this reactor is set as verbose or not.
+       * As for now a non verbose reactor will not display its 
+       * observations in TREX.log if it is logging them.
+       *
+       * @retval true if the reactor is verbose
+       * @retval false otherwise
+       * @sa set_verbose(bool)
+       * @sa reset_verbose()
+       */
+      bool is_verbose() const {
+        return m_verbose;
+      }
+      /** @brief set verbosity level
+       * @param[in] falg verbosity flag
+       *
+       * Sets verbosity level of this reactor
+       * @sa is_verbose() const
+       * @sa reset_verbose()
+       */
+      void set_verbose(bool flag=true) {
+        m_verbose = flag;
+      }
+      /** @brief reset verbosity level
+       * Set verbosity leve lof this reactor to its graph verbosity level
+       * 
+       * @sa is_verbose() const
+       * @sa set_verbose(bool)
+       * @sa graph::is_verbose() const
+       */
+      void reset_verbose() {
+        m_verbose = m_graph.is_verbose();
       }
 
       /** @brief Check if need to deliberate
@@ -1049,8 +1086,8 @@ namespace TREX {
         
         void notifyPlan(goal_id const &t);
         void cancelPlan(goal_id const &t);
-
-
+        
+        
       private:
         /** @brief Output file
          */
@@ -1095,6 +1132,8 @@ namespace TREX {
        * @sa notify(Obserbvation const &)
        */
       void   doNotify();
+      
+      bool m_verbose;
 
       /** @brief Transaction logger
        * 
