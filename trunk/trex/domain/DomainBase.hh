@@ -366,10 +366,15 @@ namespace TREX {
        */
       template<class Ty, bool Safe>
       Ty getTypedSingleton() const {
-	if( Safe )
-	  return TREX::utils::string_cast<Ty>(getStringSingleton());
-	else 
-	  return boost::any_cast<Ty>(getSingleton());
+        boost::any val = getSingleton();
+	if( Safe ) {
+          Ty *ret = boost::any_cast<Ty *>(val);
+          if( NULL!=ret )
+            return *ret;
+          else 
+            return TREX::utils::string_cast<Ty>(getStringSingleton());
+	} else 
+	  return boost::any_cast<Ty>(val);
       }
 
 
