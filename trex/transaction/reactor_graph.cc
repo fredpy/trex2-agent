@@ -61,12 +61,12 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 // structors :
 
-graph::graph(Symbol const &name, TICK init) 
-  :m_name(name), m_currentTick(init) {
+graph::graph(Symbol const &name, TICK init, bool verbose) 
+  :m_name(name), m_currentTick(init), m_verbose(verbose) {
 }
 
-graph::graph(Symbol const &name, boost::property_tree::ptree &conf, TICK init) 
-  :m_name(name), m_currentTick(init) {
+graph::graph(Symbol const &name, boost::property_tree::ptree &conf, TICK init, bool verbose) 
+  :m_name(name), m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
   syslog()<<"Created "<<number<<" reactors.";
 }

@@ -133,8 +133,9 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
     if( (*i)->startsAfter(current) || (*i)->endsAfter(current+1) ) {
       // Need to check for dispatching
       if( m_pos->first.accept_goals() ) {
-	syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
-	 	<<m_pos->first.name()<<"\".";
+        if( m_pos->first.client().is_verbose() )
+          syslog()<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
+                  <<m_pos->first.name()<<"\".";
 	m_pos->first.request(*i);
 	i = m_pos->second.erase(i);
       } else
@@ -192,6 +193,7 @@ Relation const &details::external::dereference() const {
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 			   bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
+   m_verbose(parse_attr<bool>(arg.second->is_verbose(), xml_factory::node(arg), "verbose")), 
    m_trLog(NULL),
    m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
    m_latency(parse_attr<TICK>(xml_factory::node(arg), "latency")),
@@ -234,8 +236,8 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
 			   TICK latency, TICK lookahead, bool log)
-  :m_inited(false), m_firstTick(true), m_graph(*owner), m_trLog(NULL),
-   m_name(name),
+  :m_inited(false), m_firstTick(true), m_graph(*owner), 
+   m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
   LogManager::path_type fname = manager().file_name(getName().str()+".stat.csv");
@@ -526,7 +528,8 @@ bool TeleoReactor::doSynchronize() {
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
-        syslog("ASSERT")<<(*i)->lastObservation();
+        if( is_verbose() || NULL==m_trLog )
+          syslog("ASSERT")<<(*i)->lastObservation();
         if( NULL!=m_trLog )
           m_trLog->observation((*i)->lastObservation());
       }
@@ -629,7 +632,8 @@ void TeleoReactor::clear_externals() {
 
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
-  syslog()<<"Declared \""<<tl->name()<<"\".";
+  if( is_verbose() )
+    syslog()<<"Declared \""<<tl->name()<<"\".";
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name());
   }
@@ -641,7 +645,8 @@ void TeleoReactor::assigned(details::timeline *tl) {
 void TeleoReactor::unassigned(details::timeline *tl) {
   internal_set::iterator i = m_internals.find(tl);
   m_internals.erase(i);
-  syslog()<<"Undeclared \""<<tl->name()<<"\".";
+  if( is_verbose() )
+    syslog()<<"Undeclared \""<<tl->name()<<"\".";
   if( NULL!=m_trLog ) {
     m_trLog->unprovide(tl->name());
   }
@@ -655,8 +660,9 @@ void TeleoReactor::subscribed(Relation const &r) {
   tmp.first = r;
   m_externals.insert(tmp);
   latency_updated(0, r.latency());
-  syslog()<<"Subscribed to \""<<r.name()<<'\"'
-     <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
+  if( is_verbose() )
+    syslog()<<"Subscribed to \""<<r.name()<<'\"'
+            <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
   if( NULL!=m_trLog ) {
     m_trLog->use(r.name());
   }
@@ -672,7 +678,8 @@ void TeleoReactor::unsubscribed(Relation const &r) {
   }
   // remove this relation
   m_externals.erase(i);
-  syslog()<<"Unsubscribed from \""<<r.name()<<"\".";
+  if( is_verbose() ) 
+    syslog()<<"Unsubscribed from \""<<r.name()<<"\".";
   if( NULL!=m_trLog ) {
     m_trLog->unuse(r.name());
   }

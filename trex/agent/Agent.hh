@@ -122,7 +122,7 @@ namespace TREX {
        */
       explicit Agent(TREX::utils::Symbol const &name,
 		     TREX::transaction::TICK final = 0,
-		     Clock *clock = NULL);
+		     Clock *clock = NULL, bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] file_name A configuration file name
@@ -194,7 +194,7 @@ namespace TREX {
        * @sa Agent::loadConf(std::string const &)
        */
       explicit Agent(std::string const &file_name, 
-		     Clock *clock = NULL);
+		     Clock *clock = NULL, bool verbose=false);
       
       /** @brief Constructor
        *
@@ -221,7 +221,7 @@ namespace TREX {
        * @sa Agent::loadConf(rapidxml::xml_node<> &)
        */
       explicit Agent(boost::property_tree::ptree::value_type &config, 
-		     Clock *clock=NULL);
+		     Clock *clock=NULL, bool verbose=false);
       /** @brief Destructor */
       ~Agent(); 
       
