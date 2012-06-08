@@ -95,6 +95,7 @@ Variable const &Predicate::getAttribute(Symbol const &name) const {
 std::ostream &Predicate::print_to(std::ostream &out) const {
   std::list<Symbol> vars;
   out<<m_object<<'.'<<m_type;
+  out.precision(6);
   listAttributes(vars, false);
   if( !vars.empty() ) {
     out<<'{'<<getAttribute(vars.front());

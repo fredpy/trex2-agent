@@ -58,11 +58,8 @@ std::ostream &
 IntervalDomain<Ty, Cmp>::bound::print_to(std::ostream &out)  const {
   if( m_inf )
     out<<(m_pos?'+':'-')<<"inf";
-  else {
-    out.setf(std::ios::fixed);
-    out.precision(4); // 4 significant digits
+  else 
     out<<m_value;
-  }
   return out;
 }
 

@@ -60,17 +60,22 @@ void BasicInterval::completeParsing(bpt::ptree::value_type &node) {
     
 std::string BasicInterval::getStringLower() const {
   std::ostringstream oss;
+  oss.precision(16);
+  oss.setf(oss.fixed);
   print_lower(oss);
   return oss.str();
 }
 
 std::string BasicInterval::getStringUpper() const {
   std::ostringstream oss;
+  oss.precision(16);
+  oss.setf(oss.fixed);
   print_upper(oss);
   return oss.str();
 }
 
 std::ostream &BasicInterval::print_domain(std::ostream &out) const {
+  //out.setf(out.fixed);
   if( isSingleton() ) 
     return print_lower(out);
   else
@@ -80,6 +85,8 @@ std::ostream &BasicInterval::print_domain(std::ostream &out) const {
 std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
   std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
   out<<'<'<<getTypeName();
+  out.precision(16);
+  out.setf(out.fixed);
   if( hasLower() )
     print_lower(out<<" min=\"")<<'\"';
   if( hasUpper() )
