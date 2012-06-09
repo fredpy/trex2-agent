@@ -84,8 +84,10 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     }
   }
   // Load the nddl model
-  if( !playTransaction(nddl) )
+  if( !playTransaction(nddl) ) {
+    syslog("ERROR")<<"Model is inconsistent.";
     throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
+  }
 
   if( !plan_db()->isClosed() ) {
     syslog("WARN")<<"Plan database is not closed:\n\tClosing it now!!!";
@@ -97,50 +99,62 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   // boost::optional<std::string>
   //   synch_cfg = parse_attr< boost::optional<std::string> >(cfg, "synchCfg");
 
-  if( solver_cfg.empty() )
+  if( solver_cfg.empty() ) {
+    syslog("ERROR")<<"You need to specify the solverConfig as a file";
     throw XmlError(cfg, "attribute \"solverConfig\" is empty");
+  }
   solver_cfg = manager().use(solver_cfg, found);
 
-  if( !found )
-    throw ReactorException(*this, "Unable to locate solver config \""+solver_cfg+"\".");
+  if( !found ) {
+    syslog("ERROR")<<"file "<<solver_cfg<<" was not found in my path";
+    throw ReactorException(*this, 
+			   "Unable to locate solver config \""+solver_cfg+"\".");
+  }
 
-  configure_solvers(solver_cfg);
+  try {
+    configure_solvers(solver_cfg);
+  } catch(std::exception const &e) {
+    syslog("ERROR")<<" exception during solver cfg: "<<e.what();
+    throw;
+  }
 
   // Create reactor connections
   std::list<EUROPA::ObjectId> objs;
 
   trex_timelines(objs);
-  syslog()<<" Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
-	  <<" declarations.";
-
-  for(std::list<EUROPA::ObjectId>::const_iterator o=objs.begin();
-      objs.end()!=o; ++o) {
-    EUROPA::LabelStr name = (*o)->getName(), mode_val;
-    Symbol trex_name(name.c_str());
-    EUROPA::ConstrainedVariableId o_mode = mode(*o);
-
-    if( !o_mode->lastDomain().isSingleton() )
-      throw ReactorException(*this, "The mode of the "+TREX_TIMELINE.toString()
-			     +" \""+trex_name.str()+"\" is not a singleton.");
-    else {
-      mode_val = o_mode->lastDomain().getSingletonValue();
+  if( !objs.empty() ) {
+    syslog()<<"Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
+	    <<" declarations.";
+    for(std::list<EUROPA::ObjectId>::const_iterator o=objs.begin();
+	objs.end()!=o; ++o) {
+      EUROPA::LabelStr name = (*o)->getName(), mode_val;
+      Symbol trex_name(name.c_str());
+      EUROPA::ConstrainedVariableId o_mode = mode(*o);
+      
+      if( !o_mode->lastDomain().isSingleton() )
+	throw ReactorException(*this, "The mode of the "+TREX_TIMELINE.toString()
+			       +" \""+trex_name.str()+"\" is not a singleton.");
+      else {
+	mode_val = o_mode->lastDomain().getSingletonValue();
+      }
+      
+      if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
+	use(trex_name, OBSERVE_MODE!=mode_val, with_plan(*o));
+	add_state_var(*o);
+      } else if( INTERNAL_MODE==mode_val ) {
+	provide(trex_name, true, with_plan(*o));
+	add_state_var(*o);
+      } else if( IGNORE_MODE==mode_val ) {
+	ignore(*o);
+      } else {
+	if( PRIVATE_MODE!=mode_val )
+	  syslog("WARN")<<TREX_TIMELINE.toString()<<" "<<trex_name<<" mode \""
+			<<mode_val.toString()<<"\" is unknown!!!\n"
+			<<"\tI'll assume it is "<<PRIVATE_MODE.toString();
+      }
     }
-
-    if( EXTERNAL_MODE==mode_val || OBSERVE_MODE==mode_val ) {
-      use(trex_name, OBSERVE_MODE!=mode_val, with_plan(*o));
-      add_state_var(*o);
-    } else if( INTERNAL_MODE==mode_val ) {
-      provide(trex_name, true, with_plan(*o));
-      add_state_var(*o);
-    } else if( IGNORE_MODE==mode_val ) {
-      ignore(*o);
-    } else {
-      if( PRIVATE_MODE!=mode_val )
-	syslog("WARN")<<TREX_TIMELINE.toString()<<" "<<trex_name<<" mode \""
-		      <<mode_val.toString()<<"\" is unknown!!!\n"
-		      <<"\tI'll assume it is "<<PRIVATE_MODE.toString();
-    }
-  }
+  } else
+    syslog("WARNING")<<"No TREX "<<TREX_TIMELINE.toString()<<" found in the model.";
 }
 
 EuropaReactor::~EuropaReactor() {}
