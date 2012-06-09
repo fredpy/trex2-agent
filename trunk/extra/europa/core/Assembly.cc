@@ -188,8 +188,6 @@ Assembly::Assembly(std::string const &name)
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
   m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
     
-  m_ce_listener.reset(new ce_listener(*this));
-  m_proxy.reset(new listener_proxy(*this));
 
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
@@ -199,7 +197,9 @@ Assembly::Assembly(std::string const &name)
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
   
-  m_synchListener = (new synchronization_listener(*this))->getId();
+  m_synchListener.reset(new synchronization_listener(*this));
+  m_ce_listener.reset(new ce_listener(*this));
+  m_proxy.reset(new listener_proxy(*this));
 
   EUROPA::DomainComparator::setComparator((EUROPA::Schema *)m_schema);
 }
@@ -208,6 +208,8 @@ Assembly::~Assembly() {
   setStream();
   debugMsg("trex:end", "Destroying "<<m_name);
   m_proxy.reset();
+  m_ce_listener.reset();
+  m_synchListener.reset();
   // cleanup base class
   doShutdown();
 }
@@ -364,7 +366,7 @@ void Assembly::configure_solvers(std::string const &cfg) {
 
   debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg));
   m_synchronizer = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
-  m_synchronizer->addListener(m_synchListener);
+  m_synchronizer->addListener(m_synchListener->getId());
 }
 
 void Assembly::notify(details::CurrentState const &state) {
