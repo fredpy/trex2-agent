@@ -1138,7 +1138,7 @@ namespace TREX {
       }; // class TREX::europa::Assembly::synchronization_listener 
       
       friend class synchronization_listener;
-      EUROPA::SOLVERS::SearchListenerId m_synchListener;
+      std::auto_ptr<synchronization_listener> m_synchListener;
       
       void print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const;
     
