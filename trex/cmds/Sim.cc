@@ -203,25 +203,27 @@ int main(int argc, char **argv) {
   char *configFile = argv[1];
   std::auto_ptr<Clock> clk;
 
-  if( argc>=3 )
-    clk.reset(new StepClock(0, string_cast<size_t>(argv[2])));
-  Agent agent(configFile, clk.release(), true);
-  agent.setClock(new StepClock(0, 60));
-  agent.initComplete();
-  printHelp();
-  while( true ) {
-    if( agent.missionCompleted() ) {
-      std::cout<<"Mission completed."<<std::endl;
-      s_log->syslog("INFO")<<"Mission completed.";
-      break;
-    }
-    TICK tick = agent.getCurrentTick();
-    std::cout<<'['<<agent.getName()<<':'<<tick<<"]> ";
-    std::string cmdString;
-    std::cin>>cmdString;
+  int ret = 0;
+  try {
+    if( argc>=3 )
+      clk.reset(new StepClock(0, string_cast<size_t>(argv[2])));
 
-    char const cmd = std::toupper(cmdString[0]);
-    try {
+    Agent agent(configFile, clk.release(), true);
+    agent.setClock(new StepClock(0, 60));
+    agent.initComplete();
+    printHelp();
+    while( true ) {
+      if( agent.missionCompleted() ) {
+	std::cout<<"Mission completed."<<std::endl;
+	s_log->syslog("INFO")<<"Mission completed.";
+	break;
+      }
+      TICK tick = agent.getCurrentTick();
+      std::cout<<'['<<agent.getName()<<':'<<tick<<"]> ";
+      std::string cmdString;
+      std::cin>>cmdString;
+
+      char const cmd = std::toupper(cmdString[0]);
       if( 'Q'==cmd ) {
 	std::cout<<"Goodbye"<<std::endl;
 	s_log->syslog("INFO")<<"User requested exit.";
@@ -235,7 +237,7 @@ int main(int argc, char **argv) {
 	  
 	  if( targetTick<=tick ) 
 	    std::cout<<"Tick "<<targetTick<<" is in the past."
-		     // <<"\nYou can use W to wrap the agent to its initial tick."
+	      // <<"\nYou can use W to wrap the agent to its initial tick."
 		     <<std::endl;
 	  else {
 	    while( agent.getCurrentTick()<targetTick &&
@@ -274,15 +276,21 @@ int main(int argc, char **argv) {
 	}
       } else 
 	printHelp();
-    } catch( std::exception const & e) {
-      std::cout<<"Caught an exception :"<<e.what()<<std::endl;
-      break;
-    } catch( ... ) {
-      std::cout<<"Caught an unknown exception"<<std::endl;
-      break;
     }
+  } catch(Exception const &e) {
+    std::cerr<<"Caught a TREX exception: "<<e<<std::endl;
+    s_log->syslog("ERROR")<<"Exception caught: "<<e;
+    ret = -2;
+  } catch(std::exception const &se) {
+    std::cerr<<"Caught a C++ exception: "<<se.what()<<std::endl;
+    s_log->syslog("ERROR")<<"C++ exception caught: "<<se.what();
+    ret = -2;
+  } catch(...) {
+    std::cerr<<"Caught an unknown execption"<<std::endl;
+    s_log->syslog("ERROR")<<"Unknow exception exception caught";
+    ret = -4;
   }
   s_log->syslog("INFO")<<"=============================== END sim ============================";
-  return 0;
+  return ret;
 }
 
