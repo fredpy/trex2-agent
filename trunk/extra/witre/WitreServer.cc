@@ -57,36 +57,52 @@ namespace xml = boost::property_tree::xml_parser;
 WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false), graph::timelines_listener(arg),
  m_server(NULL), m_entry(NULL) {
-  bool found;
-  std::string config = m_log->use("witre.xml", found);
+   // Attempt to locate wt_config.xml first
+   bool found;
+   boost::filesystem::path config = m_log->use("wt_config.xml", found), 
+     path = m_log->file_name(getName().str()+".Wt.log");
+   
+   if( found ) {
+     boost::property_tree::ptree cfg;
+     read_xml(config.string(), cfg);
+     if( cfg.empty() )
+       throw Error("XML document "+config.string()+" is empty.");
+     cfg.put("server.application-settings.log-file", path.string());
+     config = m_log->file_name("cfg/wt_trex.xml");
+     write_xml(config.string(), cfg);
+     
+     m_server = new Wt::WServer("", config.string());
+   } else {
+     m_server = new Wt::WServer("");
+   }
+   // set server configuration arguments
+   config = m_log->use("witre.xml", found);
+   
   if( !found )
     throw Error("Unable to locate witre.xml server configuration");
   try {
     boost::property_tree::ptree doc;
-    read_xml(config, doc, xml::no_comments|xml::trim_whitespace);
+    read_xml(config.string(), doc, xml::no_comments|xml::trim_whitespace);
 
     if( doc.empty() )
-      throw Error("XML document "+config+" is empty");
+      throw Error("XML document "+config.string()+" is empty");
     std::string arg = doc.get<std::string>("config.server");
-    // end new code
 
     std::vector<std::string> args;
     boost::algorithm::split(args, arg, boost::algorithm::is_space());
+    args.push_back("--accesslog="+m_log->file_name("wt_access.log").string());
 
     size_t argc = args.size();
     char **argv = NULL;
     argv = new char*[argc+1];
-    argv[0] = strdup(config.c_str());
-
+    argv[0] = strdup(getName().str().c_str());
+    
     for(size_t i=0; i<argc; ++i) {
-      m_log->syslog("witre.server")<<"args["<<i<<"] "<<args[i];
       argv[i+1] = strdup(args[i].c_str());
-      m_log->syslog("witre.server")<<"argv["<<i<<"] "<<argv[i+1];
+      m_log->syslog("witre.server")<<"argv["<<(i+1)<<"] "<<argv[i+1];
     }
-
-    m_server = new Wt::WServer(config);
-
     m_server->setServerConfiguration(argc, argv);
+
     if( NULL!=argv )
       delete[] argv;
 
