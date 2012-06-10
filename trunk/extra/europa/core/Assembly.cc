@@ -65,6 +65,9 @@
 
 #include <boost/scope_exit.hpp>
 
+#include <algorithm>
+#include <iterator>
+
 
 using namespace TREX::europa;
 
@@ -439,14 +442,51 @@ bool Assembly::relax(bool aggressive) {
     }
   }
 
-  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); to_erase.end()!=t;++t)
+  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); 
+      to_erase.end()!=t;++t)
     plan_db()->getClient()->deleteToken(*t);
 
   return constraint_engine()->propagate();
 }
 
 void Assembly::archive() {
+#ifdef TREX_ARCHIVE_Greedy
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  EUROPA::TokenSet to_commit;
+  is_not_merged test(true);
+  
+  debugMsg("trex:archive", 
+	   '['<<now()<<"] ============= START archiving ============");
+  
+  // 1st process the completed token
+  debugMsg("trex:archive", "Processing "<<m_completed.size()
+	   <<" completed tokens");
+  for(EUROPA::TokenSet::const_iterator i=m_completed.begin(); 
+      m_completed.end()!=i; ++i) {
+    if( (*i)->isFact() )  {
+      if( (*i)->isMerged() ) {
+	// Check if I can tranfert this token to its active 
+	// counterpart
+      } else if( (*i)->isActive() ) 
+	to_commit.insert(*i);
+    }
+  }
+  for(EUROPA::TokenSet::const_iterator i=to_commit.begin();
+      to_commit.end()!=i; ++i) {
+    debugMsg("trex:archive", "commit "<<(*i)->toString());
+    (*i)->commit();
+  }
+
   plan_db()->archive(now()-1);
+  debugMsg("trex:archive", 
+	   '['<<now()<<"] ============= END archiving ============");
+
+#else // TREX_ARCHIVE_EuropaDefault  
+
+  // Just rely on the europa archival : safe but inefficient 
+  plan_db()->archive(now()-1);
+
+#endif
 }
 
 
@@ -638,7 +678,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     EUROPA::eint key = (*it)->getKey();
     // display the token as a node
     out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
-    <<'('<<key<<") {\\n";
+       <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
 #ifdef EUROPA_HAVE_EFFECT
@@ -673,6 +713,8 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<" color=grey"; // ignored tokens are greyed
     else if( filter.is_fact(*it) )
       out<<" color=red"; // fact tokens are red
+    if( (*it)->isCommitted() )
+      out<<" fontcolor=red";
     std::ostringstream styles;
     bool comma = false;
 
@@ -893,7 +935,8 @@ void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyCommitted(EUROPA::TokenId const &token) {
-
+  m_owner.m_roots.erase(token);
+  m_owner.m_completed.erase(token);
 }
 
 void Assembly::listener_proxy::notifyTerminated(EUROPA::TokenId const &token) {

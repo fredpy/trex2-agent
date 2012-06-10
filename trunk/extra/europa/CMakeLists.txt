@@ -37,9 +37,34 @@
 
 if(WITH_EUROPA) 
   if(NOT EUROPA_HAVE_EFFECT)
-    message(WARNING "Your europa version appears to be older than 2.6\n"
+    message(WARNING "Your europa version appears to be older than 2.6."
       "Some new trex features have been disabled.")
   endif(NOT EUROPA_HAVE_EFFECT)
+  
+  # plan archival options
+  
+  set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy")
+
+  set(EUROPA_ARCHIVAL "EuropaDefault" CACHE STRING
+    "Europa archival technique used (${EUROPA_ARCHIVALValues})")
+
+
+  set_property(CACHE EUROPA_ARCHIVAL 
+    PROPERTY STRINGS ${EUROPA_ARCHIVALValues})
+
+  mark_as_advanced(EUROPA_ARCHIVAL)
+
+  # Check if valid option
+  list(FIND EUROPA_ARCHIVALValues ${EUROPA_ARCHIVAL} 
+    EUROPA_ARCHIVAL_VALID)
+
+  if(EUROPA_ARCHIVAL_VALID LESS 0) 
+    message(ERROR "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}' is not a valid option.\n"
+      "Please select one of : ${EUROPA_ARCHIVALValues}")
+  else(EUROPA_ARCHIVAL_VALID LESS 0)
+    message(STATUS "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}'")
+  endif(EUROPA_ARCHIVAL_VALID LESS 0)
+
   # put the europa flags under trex/europa/bits
   configure_file(bits/europa_config.hh.in 
     ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
@@ -47,6 +72,7 @@ if(WITH_EUROPA)
     FILES ${CMAKE_BINARY_DIR}/bits/europa_config.hh 
     DESTINATION include/trex/europa/bits
     )
+  
 
   
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
