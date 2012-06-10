@@ -144,9 +144,9 @@ int main() { return 0;}
     "${CMAKE_CURRENT_BINARY_DIR}/europa_26.cc"
     COMPILE_DEFINITIONS -I${EUROPA_INCLUDE_DIR} ${EUROPA_LIBRARIES}
     OUTPUT_VARIABLE OUT)
-  if(NOT EUROPA_HAVE_EFFECT)
-    message(WARNING "Unable to compile europa_26.cxx.")
-  endif(NOT EUROPA_HAVE_EFFECT)
+#  if(NOT EUROPA_HAVE_EFFECT)
+#    message(WARNING "Unable to compile europa_26.cxx.")
+#  endif(NOT EUROPA_HAVE_EFFECT)
 endif(EUROPA_FORCE_EFFECT)
 
 if(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)
