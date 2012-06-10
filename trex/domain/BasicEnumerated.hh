@@ -135,10 +135,15 @@ namespace TREX {
        */
       template< class Ty, bool Safe >
       Ty getTypedElement(size_t n) const {
-	if( Safe ) 
-	  return TREX::utils::string_cast<Ty>(getStringValue(n));
-	else 
-	  return boost::any_cast<Ty>(getElement(n));
+        boost::any val = getElement(n);
+	if( Safe ) {
+          Ty *ret = boost::any_cast<Ty>(&val);
+          if( NULL!=ret )
+            return *ret;
+          else
+            return TREX::utils::string_cast<Ty>(getStringValue(n));
+	} else 
+	  return boost::any_cast<Ty>(val);
       }
            
       /** @brief Get element textual value
