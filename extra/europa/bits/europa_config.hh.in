@@ -34,6 +34,12 @@
 #ifndef H_trex_europa_config
 # define H_trex_europa_config
 
+// archival technique used 
+//  - TREX_ARCHIVE_EuropaDefault : uses the archive from europa 
+//  - TREX_ARCHIVE_Greedy : similar approach to what was done in 
+//                   trex-autonomy
+#define TREX_ARCHIVE_@EUROPA_ARCHIVAL@
+
 #cmakedefine EUROPA_DEBUG
 #cmakedefine EUROPA_HAVE_EFFECT
 
