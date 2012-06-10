@@ -368,7 +368,7 @@ namespace TREX {
       Ty getTypedSingleton() const {
         boost::any val = getSingleton();
 	if( Safe ) {
-          Ty *ret = boost::any_cast<Ty *>(&val);
+          Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else 
