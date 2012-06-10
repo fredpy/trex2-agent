@@ -293,16 +293,20 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   details::is_rejectable rejectable;
   EUROPA::TokenId active = tok;
 
-  m_completed.insert(tok);
+  if( tok->canBeCommitted() )
+    tok->commit();
+  else if( !tok->isCommitted() )
+    m_completed.insert(tok);
 
-  // I assume here that if a goals ends time iis in the past then the goal is completed
+  // I assume here that if a goals ends time is in the past then the goal is completed
 
   if( tok->isMerged() ) {
     active = tok->getActiveToken();
     if( rejectable(active) && discard(active) ) {
       details::restrict_base(active, active->end(), tok->end()->baseDomain());
       details::restrict_base(active, active->start(), tok->start()->baseDomain());
-      m_completed.insert(active);
+      if( !active->isCommitted() )
+        m_completed.insert(active);
     }
   }
   for(EUROPA::TokenSet::const_iterator i=active->getMergedTokens().begin();
@@ -310,7 +314,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
     if( rejectable(*i) && discard(*i) ) {
       details::restrict_base(*i, (*i)->end(), tok->end()->baseDomain());
       details::restrict_base(*i, (*i)->start(), tok->start()->baseDomain());
-      m_completed.insert(*i);
+      if( !(*i)->isCommitted() )
+        m_completed.insert(*i);
     }
   }
 }
@@ -465,11 +470,10 @@ void Assembly::archive() {
       m_completed.end()!=i; ++i) {
     if( (*i)->isFact() )  {
       if( (*i)->isMerged() ) {
-	// Check if I can tranfert this token to its active 
-	// counterpart
+        // transfer the fact to 
       } else if( (*i)->isActive() ) 
 	to_commit.insert(*i);
-    }
+    } 
   }
   for(EUROPA::TokenSet::const_iterator i=to_commit.begin();
       to_commit.end()!=i; ++i) {
@@ -897,6 +901,7 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
   m_owner.m_roots.erase(token);
   m_owner.m_completed.erase(token);
+  m_owner.m_committed.erase(token);
 
   if( m_owner.is_agent_timeline(token) ) {
     if( token->isFact() ) {
@@ -935,8 +940,8 @@ void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyCommitted(EUROPA::TokenId const &token) {
-  m_owner.m_roots.erase(token);
   m_owner.m_completed.erase(token);
+  m_owner.m_committed.insert(token);
 }
 
 void Assembly::listener_proxy::notifyTerminated(EUROPA::TokenId const &token) {

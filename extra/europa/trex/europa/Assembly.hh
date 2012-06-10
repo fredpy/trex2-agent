@@ -1336,9 +1336,19 @@ namespace TREX {
       /** @brief Completed tokens 
        *
        * The set of all the tokens which have been identifed as completed before 
-       * the current tick
+       * the current tick and are not yet committed
+       *
+       * @sa m_committed
        */
       EUROPA::TokenSet  m_completed;
+      
+      /** @brief Committed tokens 
+       *
+       * The set of all the tokens which have been committed
+       *
+       * @sa m_completed
+       */
+      EUROPA::TokenSet m_committed;
       
       /** @brief Europa debug file
        *
