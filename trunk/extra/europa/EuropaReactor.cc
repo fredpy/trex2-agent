@@ -567,7 +567,7 @@ EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
 void EuropaReactor::logPlan(std::string const &base_name) const {
   LogManager::path_type full_name = manager().file_name(getName().str()+"."+base_name+".gv");
   std::ofstream out(full_name.c_str());
-  print_plan(out);
+  print_plan(out/*, true*/);
 }
 
 

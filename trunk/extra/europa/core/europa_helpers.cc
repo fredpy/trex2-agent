@@ -57,21 +57,30 @@ void TREX::europa::details::restrict_base(EUROPA::TokenId const &tok,
     var->restrictBaseDomain(dom);
 }
 
+void TREX::europa::details::restrict_bases(EUROPA::TokenId const &dest, 
+                                           EUROPA::TokenId const &src) {
+  std::vector<EUROPA::ConstrainedVariableId> const &dest_v = dest->getVariables();
+  std::vector<EUROPA::ConstrainedVariableId> const &src_v = src->getVariables();
+  EUROPA::TokenId active = dest;
+  if( dest->isMerged() )
+    active = dest->getActiveToken();
+  
+  for(size_t i=1; i<dest_v.size(); ++i) {
+    size_t count = 0;
+    for(; !dest_v[i]->isActive(); ++count)
+      dest_v[i]->undoDeactivation();
+    dest_v[i]->restrictBaseDomain(src_v[i]->lastDomain());
+    for(size_t j=0; j<count; ++j)
+      dest_v[i]->deactivate();
+    if( active!=dest )
+      active->getVariables()[i]->handleBase(dest_v[i]->baseDomain());
+  }
+}
+
 void TREX::europa::details::restrict_bases(EUROPA::TokenId const &tok) {
-  if( tok->isMerged() ) {    
-    EUROPA::TokenId active = tok->getActiveToken();
-    std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->getVariables();
-    std::vector<EUROPA::ConstrainedVariableId> const &avar = active->getVariables();
-    for(size_t i=1; i<tvar.size(); ++i) {
-      size_t count=0;
-      for(; !tvar[i]->isActive(); ++count ) 
-        tvar[i]->undoDeactivation();
-      tvar[i]->restrictBaseDomain(avar[i]->lastDomain());
-      for(size_t j=0; j<count; ++j)
-        tvar[i]->deactivate();
-      avar[i]->handleBase(tvar[i]->baseDomain());
-    }
-  } else 
+  if( tok->isMerged() )
+    restrict_bases(tok, tok->getActiveToken());
+  else 
     tok->restrictBaseDomains();
 }
 

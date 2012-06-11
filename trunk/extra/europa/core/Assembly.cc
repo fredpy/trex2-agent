@@ -416,40 +416,50 @@ bool Assembly::do_synchronize() {
   return true;
 }
 
+void Assembly::erase(EUROPA::TokenSet &set, EUROPA::TokenId const &tok) {
+  EUROPA::TokenSet::iterator i = set.find(tok);
+  if( set.end()!=i ) {
+    if( m_iter==i )
+      ++m_iter;
+    set.erase(i);
+  }
+}
+
+
 bool Assembly::relax(bool aggressive) {
   details::is_rejectable rejectable;
-  EUROPA::TokenSet to_erase;
+  EUROPA::DbClientId cli = plan_db()->getClient();
 
   // Clean up decisions made by solvers
   synchronizer()->reset();
   planner()->reset();
 
-  for(EUROPA::TokenSet::const_iterator t=m_roots.begin(); m_roots.end()!=t; ++t) {
-    bool is_past = (*t)->end()->baseDomain().getUpperBound()<=now();
-
-    if( is_past ) {
-      if( (*t)->isFact() ) {
+  // Use m_iter for robust iteration 
+  m_iter = m_roots.begin();
+  
+  while( m_roots.end()!=m_iter ) {
+    EUROPA::TokenId tok = *(m_iter++);
+    
+    if( tok->end()->baseDomain().getUpperBound()<=now() ) {
+      if( tok->isFact() ) {
         if( aggressive ) {
-          if( !(*t)->isInactive() )
-            plan_db()->getClient()->cancel(*t);
-          to_erase.insert(*t);
+          if( !tok->isInactive() )
+            cli->cancel(tok);
+          cli->deleteToken(tok);
         }
       } else {
-        if( rejectable(*t) || aggressive ) {
-          if( !(*t)->isInactive() )
-            plan_db()->getClient()->cancel(*t);
-          to_erase.insert(*t);
+        if( rejectable(tok) || aggressive ) {
+          if( !tok->isInactive() )
+            cli->cancel(tok);
+          cli->deleteToken(tok);
         }
       }
     } else {
-      if( !( (*t)->isInactive() || (*t)->isFact() ) )
-        plan_db()->getClient()->cancel(*t);
+      if( !( tok->isInactive() || tok->isFact() ) )
+        cli->cancel(tok);
     }
+    
   }
-
-  for(EUROPA::TokenSet::const_iterator t=to_erase.begin(); 
-      to_erase.end()!=t;++t)
-    plan_db()->getClient()->deleteToken(*t);
 
   return constraint_engine()->propagate();
 }
@@ -457,31 +467,146 @@ bool Assembly::relax(bool aggressive) {
 void Assembly::archive() {
 #ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
-  EUROPA::TokenSet to_commit;
   is_not_merged test(true);
   
   debugMsg("trex:archive", 
 	   '['<<now()<<"] ============= START archiving ============");
-  
-  // 1st process the completed token
-  debugMsg("trex:archive", "Processing "<<m_completed.size()
-	   <<" completed tokens");
-  for(EUROPA::TokenSet::const_iterator i=m_completed.begin(); 
-      m_completed.end()!=i; ++i) {
-    if( (*i)->isFact() )  {
-      if( (*i)->isMerged() ) {
-        // transfer the fact to 
-      } else if( (*i)->isActive() ) 
-	to_commit.insert(*i);
-    } 
-  }
-  for(EUROPA::TokenSet::const_iterator i=to_commit.begin();
-      to_commit.end()!=i; ++i) {
-    debugMsg("trex:archive", "commit "<<(*i)->toString());
-    (*i)->commit();
+  // Use m_iter for robust iteration through m_completed
+  debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
+  m_iter = m_completed.begin();
+  while( m_completed.end()!=m_iter ) {
+    EUROPA::TokenId tok = *(m_iter++);
+    
+    if( tok->canBeCommitted() ) {
+      debugMsg("trex:archive", "Committing "<<tok->toString());
+      tok->commit();
+    } else if( tok->isInactive() ) {
+      // Maybe I shoudl check isf its master is committed first ?
+      debugMsg("trex:archive", "Archive inactive token "<<tok->toString());
+      tok->cancel();
+    } else {
+      // it should be merged here
+      EUROPA::TokenId active = tok->getActiveToken();
+      EUROPA::TokenId master = tok->master();
+      if( master.isNoId() || master->isCommitted() ) {
+        debugMsg("trex:archive", "Colapsing token "<<tok->toString()
+                 <<" with is active counterpart ("<<active->getKey()
+                 <<')');
+        details::restrict_bases(active, tok);
+        if( tok->isFact() )
+          active->makeFact();
+        if( active->canBeCommitted() ) 
+          active->commit();
+        cli->cancel(tok);
+        tok->discard();
+      }
+    }
   }
 
-  plan_db()->archive(now()-1);
+  // Use m_iter for robust iteration through committed tokens
+  debugMsg("trex:archive", "Evaluating "<<m_committed.size()<<" committed tokens.");
+  m_iter = m_committed.begin();
+  while( m_committed.end()!=m_iter ) {
+    EUROPA::TokenId tok = *(m_iter++);
+    bool can_delete = true;
+    // Check merged tokens
+    EUROPA::TokenSet merged_t = tok->getMergedTokens();
+    
+    for(EUROPA::TokenSet::const_iterator t=merged_t.begin();
+        merged_t.end()!=t; ++t) {
+      EUROPA::TokenId master = (*t)->master();
+      if( master.isId() ) {
+        if( master->isCommitted() ) {
+          details::restrict_bases(tok, *t);
+          (*t)->cancel();
+          details::restrict_bases(*t, tok);
+        } else if( can_delete ) {
+          debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                   <<" as one merged token ("<<(*t)->getKey()
+                   <<") has a master which is not committed."); 
+          can_delete = false;
+        }
+      } else {
+        if( (*t)->isFact() ) {
+          debugMsg("trex:archive", "Collapsing committed token "
+                   <<tok->toString()<<" with fact "<<(*t)->getKey());
+          tok->makeFact();
+          for(state_map::const_iterator i=m_agent_timelines.begin();
+              m_agent_timelines.end()!=i; ++i)
+            (*i)->replaced(*t);
+          if( !(*t)->isInactive() )
+            cli->cancel(*t);
+          (*t)->discard();
+        } else if( can_delete ) {
+          debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                   <<" as one merged token ("<<(*t)->getKey()
+                   <<") is non factual.");
+          can_delete = false;
+        }
+      }
+    }
+    // Check slaves 
+    EUROPA::TokenSet slaves_t = tok->slaves();
+    for(EUROPA::TokenSet::const_iterator s=slaves_t.begin();
+        slaves_t.end()!=s; ++s) {
+      if( (*s)->isInactive() ) {
+        if( (*s)->end()->lastDomain().getUpperBound()>now() &&
+           !ignored(*s) ) {
+          if( can_delete ) {
+            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                     <<" as one of its slave "<<(*s)->getKey()
+                     <<" ends in the future.");
+            can_delete = false;
+          }
+        } 
+      } else {
+        bool ended;
+        if( (*s)->isActive() ) {
+          if( (*s)->isCommitted() ) {
+            (*s)->removeMaster(tok);
+            ended = true;
+          } else {
+            ended = (*s)->end()->lastDomain().getUpperBound()<=now();
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                       <<" as one of its slave "<<(*s)->getKey()
+                       <<" is not committed yet.");
+              can_delete = false;
+            }
+          }
+        } else {
+          details::restrict_bases(*s);
+          ended = (*s)->end()->baseDomain().getUpperBound()<=now();
+          
+          if( can_delete ) {
+            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                     <<" as one of its slave "<<(*s)->getKey()
+                     <<" is not committed yet.");
+            can_delete = false;
+          }
+        }
+        if( ended && !(*s)->isCommitted() ) {
+          debugMsg("trex:archive", "Mark "<<(*s)->toString()
+                   <<" as completed.");
+          if( (*s)->canBeCommitted() ) {
+            details::restrict_bases(*s);
+            (*s)->commit();
+            (*s)->removeMaster(tok);
+          } else {
+            m_completed.insert(*s); 
+            can_delete = false;
+          }
+        }
+      }
+    }
+    if( can_delete ) {
+      debugMsg("trex:archive", "Archiving "<<tok->toString());
+      tok->discard();
+    }
+  }
+  
+  
+  
   debugMsg("trex:archive", 
 	   '['<<now()<<"] ============= END archiving ============");
 
@@ -726,6 +851,13 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       styles<<"rounded"; // goal have rounded corner
       comma=true;
     }
+    if( m_completed.end()!=m_completed.find(*it) ) {
+      if( comma )
+        styles.put(',');
+      else
+        comma = true;
+      styles<<"dashed";
+    }
 #ifdef EUROPA_HAVE_EFFECT
     if( is_action(*it) ) {
       if( comma )
@@ -899,9 +1031,9 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
-  m_owner.m_roots.erase(token);
-  m_owner.m_completed.erase(token);
-  m_owner.m_committed.erase(token);
+  m_owner.erase(m_owner.m_roots, token);
+  m_owner.erase(m_owner.m_completed, token);
+  m_owner.erase(m_owner.m_committed, token);
 
   if( m_owner.is_agent_timeline(token) ) {
     if( token->isFact() ) {
@@ -940,7 +1072,7 @@ void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyCommitted(EUROPA::TokenId const &token) {
-  m_owner.m_completed.erase(token);
+  m_owner.erase(m_owner.m_completed, token);
   m_owner.m_committed.insert(token);
 }
 
