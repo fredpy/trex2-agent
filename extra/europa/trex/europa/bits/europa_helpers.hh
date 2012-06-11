@@ -214,6 +214,9 @@ namespace TREX {
        */
       void restrict_base(EUROPA::TokenId const &tok, EUROPA::ConstrainedVariableId const &var, 
                          EUROPA::Domain const &dom);
+      
+      void restrict_bases(EUROPA::TokenId const &dest, EUROPA::TokenId const &src);
+
       /** @brief Restrict base domains 
        *
        * @param[in] tok A token

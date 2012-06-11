@@ -1350,6 +1350,21 @@ namespace TREX {
        */
       EUROPA::TokenSet m_committed;
       
+      /** @brief Current iterator
+       *
+       * This iterator is used to iterate through the diverse TokenSet 
+       * mainteined by this class. It cvan be dynamically modified whenever 
+       * a callback modifies one of these tokenset ensuring that this iterator
+       * will not point to the element removed from the set when it occurs
+       *
+       * @sa archive()
+       * @sa relax()
+       * @sa erase(EUROPA::TokenSet &, 
+       */
+      EUROPA::TokenSet::const_iterator m_iter;
+      
+      void erase(EUROPA::TokenSet &set, EUROPA::TokenId const &tok);
+      
       /** @brief Europa debug file
        *
        * The file this assembly will use for europa debug log messages.
