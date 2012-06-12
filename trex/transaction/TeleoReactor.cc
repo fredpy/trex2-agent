@@ -304,7 +304,7 @@ double TeleoReactor::workRatio() {
     if( hasWork() ) {
       double ret = m_deadline;
       ret -= getCurrentTick();
-      if( ret<=0.0 && m_nSteps>0 ) {
+      if( ret<0.0 && m_nSteps>0 ) {
         if( !m_past_deadline ) {
           m_past_deadline = true;
           m_validSteps = m_nSteps;
@@ -468,7 +468,9 @@ bool TeleoReactor::newTick() {
   } else 
     m_stat_log<<(getCurrentTick()-1)<<", "
               <<m_synch_usage.count()
-              <<", "<<m_deliberation_usage.count()<<std::endl;
+              <<", "<<m_deliberation_usage.count()
+              <<", "<<m_tick_steps<<std::endl;
+  m_tick_steps = 0;
   
 //  if( m_deliberation_usage > stat_duration::zero() )
 //    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
@@ -563,6 +565,7 @@ void TeleoReactor::step() {
   }
   m_deliberation_usage += delta;
   m_nSteps += 1;
+  m_tick_steps +=1;
 }
 
 void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
