@@ -82,6 +82,20 @@ namespace TREX {
        * @return current tick value
        */
       virtual TREX::transaction::TICK getNextTick() =0;
+      /** @brief Check if clock free
+       *
+       * Check if the clock is currently free. A free clock 
+       * allow reactors to execute steps. If the clock is not 
+       * free the agent will stop to attempt to insert new 
+       * deliberation steps for this tick
+       *
+       * @retval true if free
+       * @retval false otherwise
+       */
+      virtual bool free() const {
+        return true;
+      }
+      
       /** @brief Initial tick
        *
        * @return the value of the initial tick

@@ -75,17 +75,43 @@ void RealTimeClock::getDate(timeval &date) {
 
 // structors :
 
-RealTimeClock::RealTimeClock(double secondsPerTick) 
+RealTimeClock::RealTimeClock(double secondsPerTick, double ratio) 
   :Clock(secondsPerTick/1000),
    m_started(false), m_tick(0), m_floatTick(secondsPerTick),
-   m_secondsPerTick(to_timeval(secondsPerTick)) {}
+   m_freeRatio(ratio),
+   m_secondsPerTick(to_timeval(secondsPerTick)),
+   m_freeDuration(to_timeval(ratio*secondsPerTick)) {
+  std::ostringstream oss;
+  
+  oss<<"[clock] Sleep ratio of "<<ratio;
+  if( ratio*secondsPerTick <=0.0 ) {
+    oss<<" resulted on a delay before sleep of 0 or less";
+    throw Exception(oss.str());
+  } else if( ratio>1.0 ) {
+    oss<<" is greater than 1.0";
+    throw Exception(oss.str());
+  }
+}
 
 RealTimeClock::RealTimeClock(boost::property_tree::ptree::value_type &node)
   :Clock(0.001), m_started(false), m_tick(0),
-   m_floatTick(parse_attr<double>(node, "tick")) {
+   m_floatTick(parse_attr<double>(node, "tick")),
+   m_freeRatio(parse_attr<double>(0.9, node, "tick")) {
   if( m_floatTick<=0.0 )
-    throw Exception("Negative duration in tick attribute.");
+    throw Exception("[clock] Negative duration in tick attribute.");
   m_secondsPerTick = to_timeval(m_floatTick);
+  double slp_s = m_freeRatio*m_floatTick;
+  std::ostringstream oss;
+  
+  oss<<"[clock] Sleep ratio of "<<m_freeRatio;
+  if( slp_s <=0.0 ) {
+    oss<<" resulted on a delay before sleep of 0 or less";
+    throw Exception(oss.str());
+  } else if( m_freeRatio>1.0 ) {
+    oss<<" is greater than 1.0";
+    throw Exception(oss.str());
+  }
+  m_freeDuration = to_timeval(slp_s);
 }
 
 // modifiers :
@@ -98,6 +124,7 @@ void RealTimeClock::start() {
 
 void RealTimeClock::setNextTickDate(unsigned factor) {
   m_nextTickDate += m_secondsPerTick*factor;
+  m_endFreeDate = m_nextTickDate + m_freeDuration;
 }
 
 TICK RealTimeClock::getNextTick() {
@@ -157,6 +184,11 @@ double RealTimeClock::tickToTime(TICK cur) const {
   return next+d_tick;
 }
 
+bool RealTimeClock::free() const {
+  timeval tv;
+  getDate(tv);
+  return tv <= m_endFreeDate;
+}
 
 double RealTimeClock::timeLeft() const {
   timeval tv;

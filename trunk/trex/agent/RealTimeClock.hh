@@ -72,7 +72,8 @@ namespace TREX {
        *
        * @pre @a secondsPerTick should be greater than 0.0
        */
-      explicit RealTimeClock(double secondsPerTick);
+      explicit RealTimeClock(double secondsPerTick,
+                             double free_ratio = 0.9);
       /** @brief XML parsing constructor
        * @param node A XML clock definition
        *
@@ -104,6 +105,8 @@ namespace TREX {
        */
       TREX::transaction::TICK getNextTick();
 
+      bool free() const;
+      
       double tickDuration() const {
 	return m_floatTick;
       }
@@ -157,12 +160,15 @@ namespace TREX {
        * @sa m_secondsPerTick
        */
       double m_floatTick;
+      double m_freeRatio;
       /** @brief Tick duration as a @c timeval
        * @sa m_floatTick
        */
       timeval m_secondsPerTick;
+      timeval m_freeDuration;
       /** @brief Tick deadline */
       timeval m_nextTickDate;
+      timeval m_endFreeDate;
       
       typedef boost::recursive_mutex mutex_type;
 

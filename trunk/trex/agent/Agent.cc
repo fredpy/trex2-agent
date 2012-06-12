@@ -800,7 +800,9 @@ bool Agent::doNext() {
   }
   synchronize();
 
-  while( m_clock->getNextTick()==getCurrentTick() && executeReactor() );
+  while( m_clock->getNextTick()==getCurrentTick()
+        && m_clock->free() 
+        && executeReactor() );
   while( m_clock->getNextTick()==getCurrentTick() )
     m_clock->sleep();
 
