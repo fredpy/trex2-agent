@@ -1217,6 +1217,7 @@ namespace TREX {
        * @sa m_deadline
        */
       mutable unsigned long m_nSteps;
+      mutable unsigned long m_tick_steps;
       mutable bool m_past_deadline;
       mutable unsigned long m_validSteps;
 
