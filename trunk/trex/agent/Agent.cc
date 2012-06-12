@@ -730,8 +730,9 @@ void Agent::synchronize() {
 	// this reactor has deliberation :
 	//   - add it to the edf scheduler
 	m_edf.insert(std::make_pair(wr, r));
-      } else 
+      } else { 
         m_idle.push_front(r);
+      }
     } else {
       // r failed => kill the reactor
       kill_reactor(r);
@@ -760,7 +761,6 @@ bool Agent::executeReactor() {
     reactor_id r;
 
     boost::tie(wr, r) = *(m_edf.begin());
-    // syslog("step")<<"Executing reactor "<<r->getName()<<" (wr="<<wr<<")";
     m_edf.erase(m_edf.begin());
     m_idle.push_back(r);
     try {
@@ -771,9 +771,9 @@ bool Agent::executeReactor() {
       while( m_idle.end()!=i ) {
         // Check if the reactor is still valid 
         if( is_member(*i) ) {
-          wr = r->workRatio();
+          wr = (*i)->workRatio();
           if( !std::isnan(wr) ) {
-            m_edf.insert(std::make_pair(wr, r));
+            m_edf.insert(std::make_pair(wr, *i));
             i = m_idle.erase(i);
           } else 
             ++i;

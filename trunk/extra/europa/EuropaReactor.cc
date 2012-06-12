@@ -204,16 +204,11 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 	      <<goal->getKey();
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
 
-//      debugMsg("trex:request", "Type "<<schema()->getTokenType(goal->getFullTokenType()->getSignature().toString());
-//      std::vector<EUROPA::TokenTypeId> supporters = schema()->getTypeSupporters(schema()->getTokenType(goal->getFullTokenType()));
-//
-//      debugMsg("trex:request", supporters.size()<<" supporter(s): ");
-//      for( std::vector<EUROPA::TokenTypeId>::const_iterator i=supporters.begin();
-//          supporters.end()!=i; ++i)
-//        debugMsg("trex:request", "   - "<<(*i)->getSignature().toString());
-
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
-      m_completed_this_tick = false;
+      if( m_completed_this_tick ) {
+        debugMsg("trex:resume", "[ "<<now()<<"] Resume deliberation due to a request.");
+        m_completed_this_tick = false;
+      }
     }
   }
 }
@@ -225,7 +220,10 @@ void EuropaReactor::handleRecall(goal_id const &request) {
   if( m_active_requests.right.end()!=i ) {
     m_active_requests.right.erase(i);
     recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(i->second));
-    m_completed_this_tick = false;
+    if( m_completed_this_tick ) {
+      debugMsg("trex:resume", "[ "<<now()<<"] Resume deliberation due to a recall.");
+      m_completed_this_tick = false;
+    }
   }
 }
 
@@ -364,7 +362,6 @@ bool EuropaReactor::synchronize() {
 
 
   if( !do_synchronize() ) {
-    //    LogManager::path_type full_name = manager().file_name(getName().str()+".relax.gv");
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
     syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
@@ -458,6 +455,7 @@ bool EuropaReactor::hasWork() {
         display(oss<<"Archiving completed in ", arch_d);
         tr_info(oss.str());
       }
+      debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
@@ -481,7 +479,7 @@ bool EuropaReactor::hasWork() {
         }
       }
     }
-  }
+  }  
   return !m_completed_this_tick;
 }
 

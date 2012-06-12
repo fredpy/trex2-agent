@@ -316,6 +316,9 @@ double TeleoReactor::workRatio() {
         ret += 1.0;
         ret *= m_nSteps+1;
       }
+//      std::ostringstream oss;
+//      oss<<"work-ratio="<<(1.0/ret);
+//      tr_info(oss.str());
       return 1.0/ret;
     } else {
       // Dispatched goals management
@@ -339,6 +342,7 @@ double TeleoReactor::workRatio() {
                   <<" ticks after its latency."; 
   }
   reset_deadline();
+  // tr_info("work-ratio=NaN (No work)");
   return NAN;
 }
 
