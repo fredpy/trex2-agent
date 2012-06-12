@@ -35,6 +35,8 @@
 #include "bits/europa_convert.hh"
 #include "core/private/CurrentState.hh"
 
+#include <trex/utils/chrono_helper.hh>
+
 #include <PLASMA/Timeline.hh>
 #include <PLASMA/Token.hh>
 #include <PLASMA/TokenVariable.hh>
@@ -447,8 +449,15 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
-      planner()->clear();
-      archive();
+      { // mesure archiving time 
+        stat_clock::time_point start = stat_clock::now();
+        planner()->clear();
+        archive();
+        stat_clock::duration arch_d = stat_clock::now()-start;
+        std::ostringstream oss;
+        display(oss<<"Archiving completed in ", arch_d);
+        tr_info(oss.str());
+      }
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
