@@ -466,15 +466,25 @@ bool Assembly::relax(bool aggressive) {
 
 void Assembly::archive() {
 #ifdef TREX_ARCHIVE_Greedy
+
+# ifdef EUROPA_HAVE_EFFECT
+  /*
+   * As of now Greedy works badly with actions on 2.6. It is not really able to 
+   * get rid of them when they are not part of an Internal or External timeline
+   * What is needed is to annalyze for efficeintly for each action :
+   *
+   * If all the conditions are committed and all the effects completed then the 
+   * action is completed ... but how do we consider relations that are not 
+   * conditions or actions ?
+   */
+#  warning "Greedy plan archiving is not efficient with action tokens."
+# endif // EUROPA_HAVE_EFFECT
   EUROPA::DbClientId cli = plan_db()->getClient();
   is_not_merged test(true);
   size_t deleted = 0;
   
   debugMsg("trex:archive", 
 	   '['<<now()<<"] ============= START archiving ============");
-# ifdef EUROPA_HAVE_EFFECT
-  
-# endif // EUROPA_HAVE_EFFECT
   
   // Use m_iter for robust iteration through m_completed
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
