@@ -468,9 +468,14 @@ void Assembly::archive() {
 #ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
   is_not_merged test(true);
+  size_t deleted = 0;
   
   debugMsg("trex:archive", 
 	   '['<<now()<<"] ============= START archiving ============");
+# ifdef EUROPA_HAVE_EFFECT
+  
+# endif // EUROPA_HAVE_EFFECT
+  
   // Use m_iter for robust iteration through m_completed
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
   m_iter = m_completed.begin();
@@ -481,17 +486,17 @@ void Assembly::archive() {
       debugMsg("trex:archive", "Committing "<<tok->toString());
       tok->commit();
     } else if( tok->isInactive() ) {
-      // Maybe I shoudl check isf its master is committed first ?
+      // Maybe I shoudl check if its master is committed first ?
       debugMsg("trex:archive", "Archive inactive token "<<tok->toString());
-      tok->cancel();
+      tok->discard();
+      ++deleted;
     } else {
       // it should be merged here
       EUROPA::TokenId active = tok->getActiveToken();
       EUROPA::TokenId master = tok->master();
       if( master.isNoId() || master->isCommitted() ) {
         debugMsg("trex:archive", "Colapsing token "<<tok->toString()
-                 <<" with is active counterpart ("<<active->getKey()
-                 <<')');
+                 <<" with is active counterpart "<<active->toString());
         details::restrict_bases(active, tok);
         if( tok->isFact() )
           active->makeFact();
@@ -499,6 +504,7 @@ void Assembly::archive() {
           active->commit();
         cli->cancel(tok);
         tok->discard();
+        ++deleted;
       }
     }
   }
@@ -518,18 +524,25 @@ void Assembly::archive() {
       if( master.isId() ) {
         if( master->isCommitted() ) {
           details::restrict_bases(tok, *t);
-          (*t)->cancel();
+          cli->cancel(*t);
           details::restrict_bases(*t, tok);
-        } else if( can_delete ) {
-          debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                   <<" as one merged token ("<<(*t)->getKey()
-                   <<") has a master which is not committed."); 
-          can_delete = false;
+          (*t)->removeMaster(master);
+          (*t)->discard();
+          ++deleted;
+        } else {
+          if( master->end()->lastDomain().getUpperBound()<now() )
+            m_completed.insert(master);
+          if( can_delete ) {
+            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+                     <<" as one merged token "<<(*t)->toString()
+                     <<" has a master which is not committed."); 
+            can_delete = false;
+          }
         }
       } else {
         if( (*t)->isFact() ) {
           debugMsg("trex:archive", "Collapsing committed token "
-                   <<tok->toString()<<" with fact "<<(*t)->getKey());
+                   <<tok->toString()<<" with fact "<<(*t)->toString());
           tok->makeFact();
           for(state_map::const_iterator i=m_agent_timelines.begin();
               m_agent_timelines.end()!=i; ++i)
@@ -537,10 +550,11 @@ void Assembly::archive() {
           if( !(*t)->isInactive() )
             cli->cancel(*t);
           (*t)->discard();
+          ++deleted;
         } else if( can_delete ) {
           debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                   <<" as one merged token ("<<(*t)->getKey()
-                   <<") is non factual.");
+                   <<" as one merged token "<<(*t)->toString()
+                   <<" is non factual.");
           can_delete = false;
         }
       }
@@ -554,7 +568,7 @@ void Assembly::archive() {
            !ignored(*s) ) {
           if( can_delete ) {
             debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                     <<" as one of its slave "<<(*s)->getKey()
+                     <<" as one of its slave "<<(*s)->toString()
                      <<" ends in the future.");
             can_delete = false;
           }
@@ -569,7 +583,7 @@ void Assembly::archive() {
             ended = (*s)->end()->lastDomain().getUpperBound()<=now();
             if( can_delete ) {
               debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                       <<" as one of its slave "<<(*s)->getKey()
+                       <<" as one of its slave "<<(*s)->toString()
                        <<" is not committed yet.");
               can_delete = false;
             }
@@ -580,7 +594,7 @@ void Assembly::archive() {
           
           if( can_delete ) {
             debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                     <<" as one of its slave "<<(*s)->getKey()
+                     <<" as one of its slave "<<(*s)->toString()
                      <<" is not committed yet.");
             can_delete = false;
           }
@@ -602,11 +616,12 @@ void Assembly::archive() {
     if( can_delete ) {
       debugMsg("trex:archive", "Archiving "<<tok->toString());
       tok->discard();
+      ++deleted;
     }
   }
   
   
-  
+  debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
   debugMsg("trex:archive", 
 	   '['<<now()<<"] ============= END archiving ============");
 
@@ -997,7 +1012,7 @@ void Assembly::synchronization_listener::notifyStepSucceeded(EUROPA::SOLVERS::De
 
 void Assembly::synchronization_listener::notifyStepFailed(EUROPA::SOLVERS::DecisionPointId &dp) {
   // This callback is not active yet but is the one I want
-  // ... should be availabele on europa 2.7 (or any version number after 2.6)
+  // ... should be available on europa 2.7 (or any version number after 2.6)
   debugMsg("trex:synch:search", "Failed decision point ["<<dp->getKey()<<"]: "<<dp->toString());
 }
 
@@ -1046,18 +1061,14 @@ void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
   }
 }
 
-void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token) {
-
-}
+void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token) {}
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   if( m_owner.is_agent_timeline(token) )
     m_owner.cancel(token);
 }
 
-void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
-
-}
+void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {}
 
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
 
