@@ -39,6 +39,7 @@ add_library(TREXeuropa_core SHARED
   Schema.cc
   ReactorConstraints.cc
   ModeConstraints.cc
+  TimeConstraints.cc
   DeliberationFilter.cc
   CurrentState.cc
   SynchronizationManager.cc
@@ -48,6 +49,7 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/EuropaPlugin.hh
   ../trex/europa/ReactorConstraint.hh
   ../trex/europa/ModeConstraints.hh
+  ../trex/europa/TimeConstraints.hh
   ../trex/europa/ReactorPropagator.hh
   ../trex/europa/DeliberationFilter.hh
   ../trex/europa/SynchronizationManager.hh

@@ -509,6 +509,29 @@ namespace TREX {
        */
       virtual EUROPA::edouble tick_duration() const =0;
       
+      /** @brief Tick to date
+       * @param[in] tick A Europa tick
+       * 
+       * Convert @p tick to real-time date as provided by the clock
+       *
+       * @return the date for @p tick
+       *
+       * @note While the conversion is highly dependent on the Clock used by 
+       * the agent. This conversion is often into a unix time tag format.
+       */  
+      virtual EUROPA::edouble tick_to_date(EUROPA::eint tick) const =0;
+      /** @brief Date to tick
+       * @param[in] date A real-time date
+       * 
+       * Convert @p date to a Euroap tick as provided by the clock
+       *
+       * @return the tick for @p date
+       *
+       * @note While the conversion is highly dependent on the Clock used by 
+       * the agent. This conversion is often from a unix time tag format.
+       */  
+      virtual EUROPA::eint date_to_tick(EUROPA::edouble date) const =0;
+      
       /** @brief Clock variable
        *
        * This method gives an easy access to the varaiable used in the model to
