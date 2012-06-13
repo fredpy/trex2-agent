@@ -565,6 +565,13 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 
 // Observers
 
+EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
+  return tickToTime(EUROPA::cast_basis(tick));
+}
+EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
+  return timeToTick(cast_basis(date));
+}
+
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
   EUROPA::eint scope_duration(getExecLatency()+getLookAhead());
   return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration,

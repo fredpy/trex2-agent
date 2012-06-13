@@ -4,7 +4,7 @@
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
  *
- *  Redistribution and use in source and binary forms, with or without
+ *  Redistribution and use in source and binary forms, with or without 
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
@@ -138,6 +138,11 @@ namespace TREX {
       EUROPA::eint look_ahead() const {
         return getLookAhead();
       }
+      EUROPA::edouble tick_to_date(EUROPA::eint tick) const;
+      EUROPA::eint date_to_tick(EUROPA::edouble date) const;
+
+
+
       EUROPA::IntervalIntDomain plan_scope() const;
       EUROPA::eint initial_tick() const {
 	return getInitialTick();

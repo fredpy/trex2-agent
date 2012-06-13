@@ -48,6 +48,7 @@
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/DeliberationFilter.hh"
 #include "trex/europa/ModeConstraints.hh"
+#include "trex/europa/TimeConstraints.hh"
 
 #include <trex/europa/SynchronizationManager.hh>
 #include "private/CurrentState.hh"
@@ -83,6 +84,9 @@ namespace TREX {
      */
     DECLARE_FUNCTION_TYPE(CheckInternal, internal, 
                           "isInternal", EUROPA::BoolDT, 1); 
+                          
+    DECLARE_FUNCTION_TYPE(TickFromDate, to_tick, 
+                          "tick_date", EUROPA::IntDT, 1);
     
     /** @brief TREX core extensions for europa
      * 
@@ -130,9 +134,12 @@ namespace TREX {
 			       isExternal,trex);
       TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::CheckInternal,
 			       isInternal,trex); 
+      TREX_REGISTER_CONSTRAINT(assembly,TREX::europa::TickFromDate, 
+                               tick_date, trex)
       
       declareFunction(assembly, new CheckExternalFunction());
       declareFunction(assembly, new CheckInternalFunction());
+      declareFunction(assembly, new TickFromDateFunction());
     }
 
     CoreExtensions trex_core;
