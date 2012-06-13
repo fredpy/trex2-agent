@@ -206,12 +206,14 @@ double RealTimeClock::getSleepDelay() const {
       tick = m_tick;
     }
     if( delay<0.0 ) {
-      // If we are already late log it
-      std::ostringstream oss;
-      oss<<"Clock]["<<tick;
-      m_log->syslog(oss.str())<<(-delay)
-			      <<" secs late before sleep."
-			      <<std::endl;
+      if( (-delay)>0.05*tickDuration() ) {
+        // If we are already late log it
+        std::ostringstream oss;
+        oss<<"Clock]["<<tick;
+        m_log->syslog(oss.str())<<(-delay)
+                                <<" secs late before sleep."
+                                <<std::endl;
+      }
       delay = 0.0;
     }
     return delay;
