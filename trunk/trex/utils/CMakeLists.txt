@@ -45,7 +45,6 @@ add_library(TREXutils SHARED
   LogManager.cc
   Pdlfcn.cc
   PluginLoader.cc
-  RStat.cc
   # headers
   Exception.hh
   ErrnoExcept.hh
@@ -55,7 +54,6 @@ add_library(TREXutils SHARED
   LogManager.hh
   Plugin.hh
   PluginLoader.hh
-  RStat.hh
   SharedVar.hh
   SingletonUse.hh
   StringExtract.hh
