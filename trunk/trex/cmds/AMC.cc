@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
     }
   }
   Agent agent(configFile, clk.release());
-  agent.setClock(new RealTimeClock(1.0));
+  agent.setClock(new RealTimeClock(boost::chrono::seconds(1)));
   agent.run();
   return 0;
 }

@@ -51,134 +51,107 @@
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/StringExtract.hh>
 
+# include <trex/utils/tick_clock.hh>
+
 namespace TREX {
   namespace agent {
+  
+    template<class Period, class Clk = boost::chrono::high_resolution_clock>
+    struct rt_clock :public Clock {      
+    public:
+      typedef TREX::utils::tick_clock<Period, Clk> clock_type;
+      typedef typename clock_type::duration        tick_rate;
+      typedef typename clock_type::rep             rep;
     
-    /** @brief Real time default clock for TREX
-     *
-     * This class implements a real-time clock based on @c gettimeofday
-     * primitive to be used for TREX agent.
-     *
-     * @author Conor McGann & Frederic Py <fpy@mbari.org>
-     * @ingroup agent
-     */
-    class RealTimeClock :public Clock {
-    public: 
-      /** @brief Constructor
-       * @param secondsPerTick tick duration in seconds
-       *
-       * Create a new instance with the tick duration set to
-       * @a secondsPerTick
-       *
-       * @pre @a secondsPerTick should be greater than 0.0
-       */
-      explicit RealTimeClock(double secondsPerTick,
-                             double free_ratio = 0.9);
-      /** @brief XML parsing constructor
-       * @param node A XML clock definition
-       *
-       * Create a new instance based on the constent of @a node.
-       * The expected structure of node is 
-       * @code
-       * <RealTime tick="<duration>"/>
-       * @endcode
-       *
-       * where @c @<duration@> is a float giving the number
-       * of seconds per tick.
-       *
-       * @throw TREX::utils::Exception @c tick attribute missing
-       * @throw TREX::utils::bad_string_cast unable to parse tick attribute
-       * @throw TREX::utils::Exception @c tick attribute value is less than 0
-       */
-      explicit RealTimeClock(boost::property_tree::ptree::value_type &node);
-      /** @brief Destructor */
-      ~RealTimeClock() {}
-
-      /** @brief Compute tick date
-       *
-       * This method get the system time and identify what is the current tick
-       *
-       * @return current time in tick
-       *
-       * @note If more than one tick duration happened between the last
-       * call and this one. This method will display it in the TREX log.
-       */
-      TREX::transaction::TICK getNextTick();
-
-      bool free() const;
+      explicit rt_clock(rep const &period)
+        :Clock(0.0), m_period(period) {
+        check_tick();
+      }
+      
+      explicit rt_clock(tick_rate const &period)
+        :Clock(0.0), m_period(period) {
+        check_tick();
+      }
+      
+      explicit rt_clock(boost::property_tree::ptree::value_type &node) 
+        :Clock(0.0), 
+         m_period(utils::parse_attr<rep>(node, "tick")) {
+        check_tick();
+      }
+      
+      ~rt_clock() {}
+      
+      transaction::TICK getNextTick() {
+        typename mutex_type::scoped_lock guard(m_lock);
+        if( NULL!=m_clock.get() ) {
+          typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
+          if( how_late > clock_type::base_duration::zero() ) {
+            // TODO diaply a warning
+          }
+          return m_tick.time_since_epoch().count()/m_period.count();
+        } else 
+          return 0;
+      }
+      
+      bool free() const {
+        return true;
+      }
       
       double tickDuration() const {
-	return m_floatTick;
+        return boost::chrono::duration_cast< boost::chrono::duration<double> >(m_period).count();
       }
-
-      TREX::transaction::TICK timeToTick(time_t secs, 
-					 suseconds_t usecs=0) const;
-      double tickToTime(TREX::transaction::TICK cur) const;
-      std::string date_str(TREX::transaction::TICK &tick) const;
-
-    private:
-      /** @brief Start the clock
-       * initialize the clock based on current system time
-       */
-      void start();
-      /** @brief get time left
-       * @return time left before next tick in seconds
-       * @note if the time left is negative it will display a message
-       * in TREX log and return 0
-       */
-      double getSleepDelay() const;
       
-      /** @brief get real-time date
-       * @param val output variable
-       * Gets system time and store it in @a val
-       */
-      static void getDate(timeval &val);
-      /** @brief Compute next deadline
-       *
-       * @param factor tick increment
-       *
-       * This method increments the deadline by @a factor multiplied
-       * by the tick duration.
-       *
-       * @note @a factor is used in case the clock missed several ticks
-       */
-      void setNextTickDate(unsigned factor=1);
-      /** @brief time left before next tick
-       * @return number of seconds left before the next tick
-       *
-       * @sa double getSleepDelay() const
-       */
-      double timeLeft() const;
-
-      /** @brief Clock status flag
-       * Indicates whether the clack has been started or not
-       */
-      bool m_started;
-      /** @brief Current tick date */
-      TREX::transaction::TICK m_tick;
-      /** @brief Tick duration as a @c float
-       * @sa m_secondsPerTick
-       */
-      double m_floatTick;
-      double m_freeRatio;
-      /** @brief Tick duration as a @c timeval
-       * @sa m_floatTick
-       */
-      timeval m_secondsPerTick;
-      timeval m_freeDuration;
-      /** @brief Tick deadline */
-      timeval m_nextTickDate;
-      timeval m_endFreeDate;
+      transaction::TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
+        // TODO implement this
+        return Clock::timeToTick(secs, usecs);
+      }
+      double tickToTime(TREX::transaction::TICK cur) const {
+        // TODO implement this
+        return Clock::tickToTime(cur);
+      }
+      std::string date_str(TREX::transaction::TICK &tick) const {
+        // TODO implement this
+        return Clock::date_str(tick);
+      }
+      
+    private:
+      void start() {
+        typename mutex_type::scoped_lock guard(m_lock);
+        m_clock.reset(new clock_type);
+        m_tick -= m_tick.time_since_epoch();
+      }
+      double getSleepDelay() const {
+        typename mutex_type::scoped_lock guard(m_lock);
+        if( NULL!=m_clock.get() ) {
+          typename clock_type::time_point target = m_tick + m_period;
+          typename clock_type::base_duration left = m_clock->left(target);
+          if( left >= clock_type::base_duration::zero() )
+            return boost::chrono::duration_cast< boost::chrono::duration<double> >(left).count();
+          else {
+            // TODO warn that we ran late ...
+            return 0.0;
+          }
+        } else 
+          return Clock::getSleepDelay();
+      }
+    
+      void check_tick() const {
+        if( m_period <= tick_rate::zero() )
+          throw TREX::utils::Exception("[clock] tick rate must be greater than 0");
+      }
       
       typedef boost::recursive_mutex mutex_type;
-
-      /** @brief mutex for basic clock calls */
-      mutable mutex_type m_lock;
-      /** @brief TREX log entry point */
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       
-    }; // TREX::agent::RealTimeClock
-
+      mutable mutex_type        m_lock;
+      tick_rate                 m_period;
+      std::auto_ptr<clock_type> m_clock;
+      
+      typename clock_type::time_point m_tick;
+    }; 
+    
+    typedef rt_clock<boost::nano> RealTimeClock;
+  
+    
   } // TREX::agent 
 } // TREX
 

@@ -206,11 +206,40 @@ namespace TREX {
       time_point now(duration const &tick, base_duration &remain) const {
 	remain = Clock::now()-epoch();                                     // Get duration since epoch
 	duration n_ticks = boost::chrono::duration_cast<duration>(remain), // round to our Period
-          extra = m_ticks%tick;                                            // get the module of tick
+          extra = n_ticks%tick;                                            // get the module of tick
         n_ticks -= extra;                                                  // round to a multiple of tick
 	remain -= n_ticks;                                                 // get sub tick time
 	return time_point(n_ticks);
       }
+      
+      
+      base_duration to_next(time_point &date, duration const &tick) const {
+        base_duration ret = Clock::now()-epoch();
+        duration extra(boost::chrono::duration_cast<duration>(ret));
+        time_point cur(extra);
+        extra %= tick; 
+        cur -= extra;
+        if( cur > date ) {
+          ret -= date.time_since_epoch()+tick;
+          date = cur;
+          return ret;
+        } else 
+          return base_duration::zero();
+      }
+          
+      
+      /** @brief time left 
+       * 
+       * @param[in] target A date
+       *
+       * @return the duration until target
+       */ 
+      base_duration left(time_point const &target) const {
+        base_time_point real_target = epoch()+boost::chrono::duration_cast<base_duration>(target.time_since_epoch());
+        return real_target-Clock::now();
+      }
+      
+      
 
     private:
       base_time_point const m_epoch;
