@@ -1,0 +1,20 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+
+class VehicleControl;
+
+class Estimator extends AgentTimeline {
+	
+	Estimator(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {}
+	
+	predicate At {
+		float latitude, longitude, lat_deg, lon_deg, depth, tolerance;
+		int secs;
+		secs >= 0;
+		tolerance >= 0;		
+	}
+}

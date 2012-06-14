@@ -1,0 +1,34 @@
+#include "maneuver.nddl"
+
+class Vehicle extends AgentTimeline {
+	
+	Maneuver maneuver;
+	
+	predicate Boot {};			// initialization
+	predicate Service {};		// vehicle is ready to execute maneuvers
+	predicate Calibration {};	// vehicle is doing calibration
+	predicate Error {};			// vehicle is error mode
+	predicate Maneuver {};		// vehicle is executing a maneuver
+	predicate External {};		// an external controller is commanding the vehicle
+		
+	Vehicle(Mode _mode) {
+		super(_mode, "Boot");
+	}
+};
+
+Vehicle::Service {
+	after(Vehicle.Boot);
+	contains(maneuver.Idle);		
+}
+
+Vehicle::Calibration {	
+	contains(maneuver.Idle);		
+}
+
+Vehicle::Error {	
+	contains(maneuver.Idle);		
+}
+
+Vehicle::Maneuver {
+	after(Vehicle.Service);
+}
