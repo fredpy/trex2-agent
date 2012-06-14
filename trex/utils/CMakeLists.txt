@@ -61,6 +61,7 @@ add_library(TREXutils SHARED
   TREXversion.hh
   TextLog.hh
   TimeUtils.hh
+  tick_clock.hh
   XmlFactory.hh
   XmlUtils.hh
   id_mapper.hh
