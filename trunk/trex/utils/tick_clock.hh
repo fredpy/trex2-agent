@@ -158,8 +158,8 @@ namespace TREX {
        * @sa now(duration const &, base_duration &) const
        */
       time_point now() const {
-	base_duration delta = Clock::now()-epoch(); 
-	return time_point(boost::chrono::duration_cast<duration>(delta));
+	base_duration delta = Clock::now()-epoch();                       // Get duration since epoch
+	return time_point(boost::chrono::duration_cast<duration>(delta)); // round to our Period
       }
       /** @brief Accurate current date
        *
@@ -177,9 +177,9 @@ namespace TREX {
        * @sa now(duration const &, base_duration &) const
        */
       time_point now(base_duration &remain) const {
-	remain = Clock::now()-epoch();
-	duration n_ticks = boost::chrono::duration_cast<duration>(remain);
-	remain -= n_ticks;
+	remain = Clock::now()-epoch();                                     // Get duration since epoch
+	duration n_ticks = boost::chrono::duration_cast<duration>(remain); // round to our Period
+	remain -= n_ticks;                                                 // get sub Period time
 	return time_point(n_ticks);
       }
       /** @brief Accurate current date 
@@ -204,12 +204,12 @@ namespace TREX {
        * @sa now(base_duration &) const
        */
       time_point now(duration const &tick, base_duration &remain) const {
-	time_point date = now(remain);
-	duration extra = date.time_since_epoch();
-	extra %= tick;
-	date -= extra;
-	remain += extra;
-	return date;
+	remain = Clock::now()-epoch();                                     // Get duration since epoch
+	duration n_ticks = boost::chrono::duration_cast<duration>(remain), // round to our Period
+          extra = m_ticks%tick;                                            // get the module of tick
+        n_ticks -= extra;                                                  // round to a multiple of tick
+	remain -= n_ticks;                                                 // get sub tick time
+	return time_point(n_ticks);
       }
 
     private:
