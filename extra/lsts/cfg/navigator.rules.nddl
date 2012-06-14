@@ -1,0 +1,51 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+#include "platform.nddl"
+
+VehicleState::Boot {
+    contained_by(Navigator.Idle);
+}
+
+Navigator::Going {
+	
+	int travel_dist;
+	int completion_time;
+	float dist;
+	float my_speed;
+	
+	completion_time <= end;
+	
+	starts_during(VehicleState.Ready ready);
+	contains(VehicleState.Exec exec);
+	ready meets exec;
+			
+	
+	if( ready.start<=AGENT_CLOCK ) {
+	  met_by(EstimatedState.Position ini);
+	
+	  contains(VehicleCommand.Maneuver maneuver);
+	  latitude == maneuver.latitude;
+	  longitude == maneuver.longitude;
+	  depth == maneuver.depth;
+	  maneuver.secs == 0;
+	  speed == maneuver.speed;
+	  completion_time == maneuver.end;
+		float how_long;
+		how_long == ll_distance(ini.latitude, ini.longitude, latitude, longitude);
+		
+	}
+	if( completion_time<=AGENT_CLOCK ) {	
+	    meets(EstimatedState.Position dest);
+		dist == ll_distance(dest.latitude, dest.longitude, latitude, longitude);	   
+	  	dist < 20;
+	}
+
+
+  	start + duration == end;
+	my_speed >= 0.0;
+	dist>=0.0;
+	speed <= 10.0; // At most 10m/s
+	my_speed == speed * TICK_DURATION;
+	duration >= floor(dist * my_speed);
+	
+}

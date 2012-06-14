@@ -1,0 +1,30 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+#include "navigator.nddl"
+#include "estimator.nddl"
+
+EstimatedState::Position {
+	duration == 1;
+}
+
+VehicleState::Boot {
+	contained_by(VehicleCommand.Idle);
+	meets(VehicleState.Ready);
+}
+
+VehicleState::Exec {
+	contains(VehicleCommand.Maneuver);
+	meets(VehicleState.Ready);
+}
+
+VehicleCommand::Maneuver {
+	
+    met_by(VehicleState.Ready); 
+	
+    contained_by (OperationalLimits.Limits limits);
+    depth 	<= 	limits.maxDepth;
+    depth 	>= 	limits.minDepth;
+    speed 	<= 	limits.maxSpeed;
+    speed 	>= 	limits.minSpeed;	
+    
+}

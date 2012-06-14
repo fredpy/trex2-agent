@@ -1,0 +1,22 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+
+class Navigator extends AgentTimeline {
+	
+	Navigator(Mode _mode) {
+		super(_mode, "Idle");
+	}
+	
+	predicate Idle {}
+	
+	predicate Going {
+		float latitude, longitude, depth, speed;
+	}
+	
+	predicate Staying {
+		float latitude, longitude, depth;
+		int secs;
+	}
+}
+
+
