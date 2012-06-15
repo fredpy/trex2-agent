@@ -50,11 +50,11 @@ public:
 
 private:
 
-	EUROPA::Domain &m_lat1;
+	EUROPA::Domain &m_dist;
+ 	EUROPA::Domain &m_lat1;
 	EUROPA::Domain &m_lon1;
 	EUROPA::Domain &m_lat2;
 	EUROPA::Domain &m_lon2;
-	EUROPA::Domain &m_dist;
 
 	enum indexes {
 		DIST = 0,
