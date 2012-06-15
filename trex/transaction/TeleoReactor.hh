@@ -91,6 +91,8 @@ namespace TREX {
       typedef details::external_set                       external_set;
  
     public:
+      typedef graph::duration_type duration_type;
+      typedef graph::date_type     date_type;
       /** @brief Reactor reference type
        *
        * The type used to refer to specific reactor
@@ -234,7 +236,7 @@ namespace TREX {
        *
        * @return the duration of a single tick
        */
-      double tickDuration() const {
+      duration_type tickDuration() const {
 	return m_graph.tickDuration();
       }
 
@@ -253,8 +255,8 @@ namespace TREX {
        * will simply assume that unixtime and tick are perfeclty aligned
        * (as if the mission started on January 1st 1970)
        */
-      TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
-	return m_graph.timeToTick(secs, usecs);
+      TICK timeToTick(date_type const &date) const {
+	return m_graph.timeToTick(date);
       }
       /** @brief tick to unix time conversion
        * @param[in] cur A tick value
@@ -270,7 +272,7 @@ namespace TREX {
        * will simply assume that unixtime and tick are perfeclty aligned
        * (as if the mission started on January 1st 1970)
        */
-      double tickToTime(TICK cur) const {
+      date_type tickToTime(TICK cur) const {
 	return m_graph.tickToTime(cur);
       }
       std::string date_str(TICK cur) const {

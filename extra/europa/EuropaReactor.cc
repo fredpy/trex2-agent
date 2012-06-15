@@ -566,10 +566,14 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 // Observers
 
 EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
-  return tickToTime(EUROPA::cast_basis(tick));
+  typedef chrono_posix_convert< boost::chrono::duration<EUROPA::edouble::basis_type> > convert;
+  return convert::to_chrono(tickToTime(EUROPA::cast_basis(tick))-boost::posix_time::from_time_t(0)).count();
 }
+
 EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
-  return timeToTick(cast_basis(date));
+  typedef chrono_posix_convert< boost::chrono::duration<EUROPA::edouble::basis_type> > convert;
+  convert::chrono_duration rdate(EUROPA::cast_basis(date));
+  return timeToTick(boost::posix_time::from_time_t(0)+convert::to_posix(rdate));
 }
 
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {

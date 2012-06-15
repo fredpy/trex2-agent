@@ -206,10 +206,10 @@ int main(int argc, char **argv) {
   int ret = 0;
   try {
     if( argc>=3 )
-      clk.reset(new StepClock(0, string_cast<size_t>(argv[2])));
+      clk.reset(new StepClock(Clock::duration_type(0), string_cast<size_t>(argv[2])));
 
     Agent agent(configFile, clk.release(), true);
-    agent.setClock(new StepClock(0, 60));
+    agent.setClock(new StepClock(Clock::duration_type(0), 60));
     agent.initComplete();
     printHelp();
     while( true ) {

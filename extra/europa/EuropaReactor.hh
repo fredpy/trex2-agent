@@ -151,7 +151,7 @@ namespace TREX {
 	return getFinalTick();
       }
       EUROPA::edouble tick_duration() const {
-	return tickDuration();
+	return boost::chrono::duration<EUROPA::edouble::basis_type>(tickDuration()).count();
       }
       void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
 
