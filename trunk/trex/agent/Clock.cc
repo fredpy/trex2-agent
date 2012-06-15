@@ -48,21 +48,18 @@ using namespace TREX::utils;
  */
 
 // statics :
-void Clock::sleep(double sleepDuration){
-  if( sleepDuration>0.0 ) {
-    struct timespec tv;
-    tv.tv_sec = (time_t) sleepDuration;
-    tv.tv_nsec = (long) ((sleepDuration - tv.tv_sec) * 1e+9);
-      
-    while( tv.tv_sec>0 || tv.tv_nsec>0 ){
-      int rval = nanosleep(&tv, &tv);
-	
-      if(rval == 0) // We are done sleeping
-	return;
-
+void Clock::sleep(Clock::duration_type const &delay){
+  if( delay > Clock::duration_type::zero() ) {
+    timespec tv;
+    tv.tv_sec = delay.count()/1000000000l;
+    tv.tv_nsec = delay.count()%1000000000l;
+    
+    while( tv.tv_sec>0 || tv.tv_nsec>0 ) {
+      if( 0==nanosleep(&tv, &tv) )
+        return;
       if( EINTR!=errno )
-	throw ErrnoExcept("Clock::sleep");
-    }
+        throw ErrnoExcept("Clock:sleep");
+    } 
   }
 }
 
@@ -86,7 +83,7 @@ void Clock::sleep() const {
 
 // observers :
 
-std::string Clock::date_str(TICK &tick) const {
+std::string Clock::date_str(TICK const &tick) const {
   std::ostringstream oss;
   oss<<tick;
   return oss.str();

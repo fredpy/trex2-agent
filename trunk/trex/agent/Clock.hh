@@ -44,9 +44,13 @@
 #ifndef H_Clock
 #define H_Clock
 
+# include "bits/agent_graph.hh"
+
 # include <trex/transaction/Tick.hh>
 # include <trex/utils/ErrnoExcept.hh>
 # include <trex/utils/XmlFactory.hh>
+
+# include <trex/utils/TimeUtils.hh>
 
 namespace TREX {
   namespace agent {
@@ -60,7 +64,11 @@ namespace TREX {
      * @ingroup agent
      */
     class Clock {
-    public:
+    public:    
+      typedef transaction::graph::duration_type          duration_type;
+      typedef utils::chrono_posix_convert<duration_type> dur_converter;
+      typedef transaction::graph::date_type              date_type;
+    
       /** @brief Destructor */
       virtual ~Clock() {}
 
@@ -103,21 +111,25 @@ namespace TREX {
       virtual TREX::transaction::TICK initialTick() const {
 	return 0;
       }
+      
+      virtual date_type epoch() const {
+        return boost::posix_time::from_time_t(initialTick()); 
+      }
+      
       /** @brief tick duration
        *
        * This methods return the TICK duration. It is expected to be in seconds
        *
        * @return tick duration
        */
-      virtual double tickDuration() const {
-	return 1.0;
+      virtual duration_type tickDuration() const {
+	return boost::chrono::seconds(1);
       }
-      virtual TREX::transaction::TICK timeToTick(time_t secs, 
-						 suseconds_t usecs=0) const {
-	return secs;
+      virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
+        return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
       }	
-      virtual double tickToTime(TREX::transaction::TICK cur) const {
-	return cur*tickDuration();
+      virtual date_type tickToTime(TREX::transaction::TICK cur) const {
+        return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
       }
 
       /** @brief Sleep until next tick
@@ -139,7 +151,7 @@ namespace TREX {
        *
        * @throw ErrnoExcept An error occurred while trying to sleep
        */
-      static void sleep(double sleepDuration);
+      static void sleep(duration_type const &sleepDuration);
       /** @brief Get tick string
        *
        * @param[in] tick A tick
@@ -148,7 +160,7 @@ namespace TREX {
        *
        * @return A string representation for @p tick
        */
-      virtual std::string date_str(TREX::transaction::TICK &tick) const;
+      virtual std::string date_str(TREX::transaction::TICK const &tick) const;
 
       /** @brief XML factory for clocks. */
       typedef TREX::utils::XmlFactory<Clock> xml_factory;
@@ -161,16 +173,16 @@ namespace TREX {
        *
        * @return time left before next tick
        */
-      virtual double getSleepDelay() const {
-	return m_sleepSeconds;
+      virtual duration_type getSleepDelay() const {
+	return m_sleep;
       }
       /** @brief Constructor
        * @param sleepSeconds A default sleep delay
        * Create a new instance with the default sleeping delay set to
        * @a sleepSeconds
        */
-      explicit Clock(double sleepSeconds)
-	:m_sleepSeconds(sleepSeconds) {}
+      explicit Clock(duration_type const &sleep)
+	:m_sleep(sleep) {}
 
       /** @brief Internal start method
        *
@@ -193,7 +205,7 @@ namespace TREX {
       
 
     private:
-      double const m_sleepSeconds;
+      duration_type const m_sleep;
 
     }; // TREX::agent::Clock
 

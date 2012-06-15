@@ -87,14 +87,14 @@ unsigned int StepClock::parseStep(boost::property_tree::ptree &steps) {
 
 // structors :
 
-StepClock::StepClock(double sleepSeconds, unsigned int stepsPerTick) 
+StepClock::StepClock(StepClock::duration_type const &sleepSeconds, unsigned int stepsPerTick) 
   :Clock(sleepSeconds), m_tick(0), m_currentStep(0), 
    m_stepsPerTickDefault(selectStep(stepsPerTick)) {
   m_stepsPerTick = m_stepsPerTickDefault;
 }
 
 StepClock::StepClock(boost::property_tree::ptree::value_type &node) 
-  :Clock(0.0), m_tick(0), m_currentStep(0),
+  :Clock(Clock::duration_type(0)), m_tick(0), m_currentStep(0),
    m_stepsPerTickDefault(parseStep(node.second)) {}
 
 // modifiers :

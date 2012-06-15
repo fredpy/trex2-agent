@@ -1,51 +1,41 @@
 #ifndef H_DuneClock
 # define H_DuneClock
 
-# include <trex/agent/Clock.hh>
-
-# include <boost/thread/recursive_mutex.hpp>
-
+# include <trex/agent/RealTimeClock.hh>
 
 namespace TREX {
   namespace LSTS {
   
-    class DuneClock :public TREX::agent::Clock {
+    class dune_posix_clock {
     public:
-      explicit DuneClock(boost::property_tree::ptree::value_type &node);
-      ~DuneClock();
-      
-      TREX::transaction::TICK getNextTick();
-      bool free() const;
-      double tickDuration() const {
-        return m_floatTick;
-      }
-      
-      TREX::transaction::TICK timeToTick(time_t secs, suseconds_t usec=0) const;
-      double  tickToTime(TREX::transaction::TICK cur) const;
-      std::string date_str(TREX::transaction::TICK &tick) const;
-        
-    private:
-      void start();
-      double getSleepDelay() const;
+      typedef boost::chrono::nanoseconds duration;
+      typedef duration::rep              rep;
+      typedef duration::period           period;
+      typedef boost::chrono::time_point<dune_posix_clock> time_point;
 
-      double timeLeft() const;
+      static const bool is_steady = false;
       
-      void setNextTickDate(unsigned factor);
-      
-      double get() const;
-      
-      double m_floatTick;
-      
-      typedef boost::recursive_mutex mutex_type;
-      mutable mutex_type m_lock;
-      
-      bool m_started;
-      TREX::transaction::TICK m_tick;
-      double m_nextTickDate;
-
-    }; // TREX::LSTS::DuneClock
-  
+      static time_point now();
+            
+    }; // TREX::LSTS::dune_posix_clock
     
+    typedef agent::rt_clock<boost::nano, dune_posix_clock> posix_clock;
+
+    class dune_steady_clock {
+    public:
+      typedef boost::chrono::nanoseconds                   duration;
+      typedef duration::rep                                rep;
+      typedef duration::period                             period;
+      typedef boost::chrono::time_point<dune_steady_clock> time_point;
+
+      static const bool is_steady = true;
+      
+      static time_point now();
+      
+    }; // TREX::LSTS::dune_steady_clock  
+
+    typedef agent::rt_clock<boost::nano, dune_steady_clock> steady_clock;
+
   } // TREX::LSTS
 } // TREX
 

@@ -169,7 +169,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     //Start of South Code
     timeLineSlider = new Wt::WSlider(Wt::Horizontal, south);
     //timeLineSlider->setTickPosition(Wt::WSlider::TicksBothSides);
-    timeLineSlider->setTickInterval(wServer->tickDuration());
+    timeLineSlider->setTickInterval(boost::chrono::duration_cast< boost::chrono::duration<double> >(wServer->tickDuration()).count());
     timeLineSlider->setRange(0, wServer->getFinalTick());
     timeLineSlider->resize(400, 50);
     timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderChanged);

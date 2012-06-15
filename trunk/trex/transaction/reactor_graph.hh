@@ -37,10 +37,14 @@
 # include "TeleoReactor_fwd.hh"
 # include "bits/timeline.hh"
 
+# include <trex/utils/TimeUtils.hh>
+
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>
 # include <boost/graph/properties.hpp>
 # include <boost/graph/reverse_graph.hpp>
+
+
 
 namespace TREX {
   namespace transaction {
@@ -115,6 +119,9 @@ namespace TREX {
      */
     class graph :boost::noncopyable {
     public:
+      typedef boost::chrono::nanoseconds duration_type;
+      typedef boost::posix_time::ptime   date_type;
+    
       /** @brief reactor ID type
        *
        * The type used to represent a reactor in the graph
@@ -476,8 +483,8 @@ namespace TREX {
        * @sa tickToTime(TICK) const
        * @sa timeToTick(time_t, suseconds_t) const
        */
-      virtual double tickDuration() const {
-	return 1.0;
+      virtual duration_type tickDuration() const {
+	return boost::chrono::seconds(1);
       }
       /** @brief convert real-time into a TICK
        *
@@ -496,8 +503,9 @@ namespace TREX {
        * @sa tickDuration() const
        * @sa tickToTime(TICK) const
        */
-      virtual TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
-	return secs;
+      virtual TICK timeToTick(date_type const &date) const {
+        typedef utils::chrono_posix_convert<duration_type> convert;
+	return convert::to_chrono(date-boost::posix_time::from_time_t(0)).count()/tickDuration().count();
       }
       /** @brief convert a TICK into its real-time equivalent
        *
@@ -515,10 +523,11 @@ namespace TREX {
        * @sa tickDuration() const
        * @sa timeToTick(time_t, suseconds_t) const
        */
-      virtual double tickToTime(TICK cur) const {
-	return cur*tickDuration();
+      virtual date_type tickToTime(TICK cur) const {
+        typedef utils::chrono_posix_convert<duration_type> convert;
+        return boost::posix_time::from_time_t(0)+convert::to_posix(tickDuration()*cur);
       }
-
+  
       virtual std::string date_str(TICK cur) const;
 
       

@@ -103,7 +103,7 @@ namespace TREX {
        *
        * The type used to represent time points for this clock
        */
-      typedef boost::chrono::time_point<tick_clock>  time_point;
+      typedef boost::chrono::time_point<tick_clock, duration>  time_point;
 
       static bool const is_steady = base_clock::is_steady;
 
@@ -220,7 +220,8 @@ namespace TREX {
         extra %= tick; 
         cur -= extra;
         if( cur > date ) {
-          ret -= date.time_since_epoch()+tick;
+          ret -= date.time_since_epoch();
+          ret -= tick;
           date = cur;
           return ret;
         } else 
@@ -235,12 +236,10 @@ namespace TREX {
        * @return the duration until target
        */ 
       base_duration left(time_point const &target) const {
-        base_time_point real_target = epoch()+boost::chrono::duration_cast<base_duration>(target.time_since_epoch());
+        duration t_dur = target.time_since_epoch();
+        base_time_point real_target = epoch()+boost::chrono::duration_cast<base_duration>(t_dur);
         return real_target-Clock::now();
       }
-      
-      
-
     private:
       base_time_point const m_epoch;
       

@@ -51,7 +51,6 @@
 #ifndef H_Agent
 # define H_Agent
 
-# include "bits/agent_graph.hh"
 # include "Clock.hh"
 # include <trex/utils/PluginLoader.hh>
 
@@ -350,14 +349,14 @@ namespace TREX {
        */
       size_t sendRequests(boost::property_tree::ptree &g);
 
-      double tickDuration() const {
+      duration_type tickDuration() const {
 	return m_clock->tickDuration();
       }
       
-      TREX::transaction::TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
-	return m_clock->timeToTick(secs, usecs);
+      TREX::transaction::TICK timeToTick(date_type const &date) const {
+	return m_clock->timeToTick(date);
       }
-      double tickToTime(TREX::transaction::TICK cur) const {
+      date_type tickToTime(TREX::transaction::TICK cur) const {
 	return m_clock->tickToTime(cur);
       }
       std::string date_str(TREX::transaction::TICK cur) const {

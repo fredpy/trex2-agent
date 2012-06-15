@@ -71,7 +71,8 @@ namespace TREX {
        * @param sleepSeconds how long should the process sleep
        * @param stepsPerTick default maximum number of steps per tick
        */
-      StepClock(double sleepSeconds, unsigned int stepsPerTick);
+      StepClock(duration_type const &slp, 
+                unsigned int stepsPerTick);
       /** @brief XML parsing constructor
        * @param node A XML clock definition
        *

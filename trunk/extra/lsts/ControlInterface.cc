@@ -59,6 +59,9 @@ ControlInterface::ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type
 ControlInterface::~ControlInterface() {
   stop();
   destroy_fifo();
+  if( NULL!=m_thread.get() ) {
+    m_thread->join();
+  }
 }
 
 // observers

@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
       
       if( argc==4 )
 	stepsPerTick = string_cast<size_t>(argv[3]);
-      clk.reset(new StepClock(0, stepsPerTick));
+      clk.reset(new StepClock(Clock::duration_type(0), stepsPerTick));
     } else {
       std::cerr<<"Invalid 2nd argument "<<simOption.str()
 	       <<"\nUsage: "<<argv[0]<<" configFile [-sim [steps]]"

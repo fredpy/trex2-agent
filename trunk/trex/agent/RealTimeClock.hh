@@ -44,7 +44,6 @@
 #ifndef H_RealTimeClock
 # define H_RealTimeClock
 
-# include <boost/thread/recursive_mutex.hpp>
 
 # include "Clock.hh"
 # include <trex/utils/TimeUtils.hh>
@@ -53,29 +52,75 @@
 
 # include <trex/utils/tick_clock.hh>
 
+# include <boost/thread/recursive_mutex.hpp>
+# include <boost/date_time/posix_time/posix_time_io.hpp>
+
 namespace TREX {
   namespace agent {
   
     template<class Period, class Clk = boost::chrono::high_resolution_clock>
     struct rt_clock :public Clock {      
     public:
+      using typename Clock::duration_type;
+      using typename Clock::date_type;
+    
       typedef TREX::utils::tick_clock<Period, Clk> clock_type;
       typedef typename clock_type::duration        tick_rate;
       typedef typename clock_type::rep             rep;
     
       explicit rt_clock(rep const &period)
-        :Clock(0.0), m_period(period) {
+        :Clock(duration_type::zero()), m_period(period) {
         check_tick();
       }
       
       explicit rt_clock(tick_rate const &period)
-        :Clock(0.0), m_period(period) {
+        :Clock(duration_type::zero()), m_period(period) {
         check_tick();
       }
       
       explicit rt_clock(boost::property_tree::ptree::value_type &node) 
-        :Clock(0.0), 
-         m_period(utils::parse_attr<rep>(node, "tick")) {
+        :Clock(duration_type::zero()) {
+        boost::optional<rep> 
+          tick = utils::parse_attr< boost::optional<rep> >(node, "tick");
+        if( tick ) {
+          m_period = tick_rate(*tick);
+        } else {
+          boost::chrono::nanoseconds ns_tick = boost::chrono::nanoseconds::zero();
+          typedef boost::optional< typename boost::chrono::nanoseconds::rep >
+            value_type;
+          value_type value;
+
+          // Get nanoseconds
+          value = utils::parse_attr<value_type>(node, "nanos");
+          if( value )
+            ns_tick += boost::chrono::nanoseconds(*value);
+          
+          // Get microseconds
+          value = utils::parse_attr<value_type>(node, "micros");
+          if( value )
+            ns_tick += boost::chrono::microseconds(*value);
+            
+          // Get milliseconds
+          value = utils::parse_attr<value_type>(node, "millis");
+          if( value )
+            ns_tick += boost::chrono::milliseconds(*value);
+            
+          // Get seconds
+          value = utils::parse_attr<value_type>(node, "seconds");
+          if( value )
+            ns_tick += boost::chrono::seconds(*value);
+          
+          // Get minutes
+          value = utils::parse_attr<value_type>(node, "minutes");
+          if( value )
+            ns_tick += boost::chrono::minutes(*value);
+          
+          // Get hours
+          value = utils::parse_attr<value_type>(node, "hours");
+          if( value )
+            ns_tick += boost::chrono::hours(*value);
+          m_period = boost::chrono::duration_cast<tick_rate>(ns_tick);
+        } 
         check_tick();
       }
       
@@ -97,39 +142,50 @@ namespace TREX {
         return true;
       }
       
-      double tickDuration() const {
-        return boost::chrono::duration_cast< boost::chrono::duration<double> >(m_period).count();
+      date_type epoch() const {
+        typename mutex_type::scoped_lock guard(m_lock);
+        if( NULL!=m_clock.get() )
+          return m_epoch;
+        else 
+          return Clock::epoch();
+      }
+
+      duration_type tickDuration() const {
+        return boost::chrono::duration_cast<duration_type>(m_period);
       }
       
-      transaction::TICK timeToTick(time_t secs, suseconds_t usecs=0) const {
-        // TODO implement this
-        return Clock::timeToTick(secs, usecs);
+      transaction::TICK timeToTick(date_type const &date) const {
+        typedef utils::chrono_posix_convert<tick_rate> convert;
+        return initialTick()+(convert::to_chrono(date-epoch()).count()/m_period.count());
       }
-      double tickToTime(TREX::transaction::TICK cur) const {
-        // TODO implement this
-        return Clock::tickToTime(cur);
+      date_type tickToTime(TREX::transaction::TICK cur) const {
+        typedef utils::chrono_posix_convert<tick_rate> convert;
+        return epoch()+convert::to_posix(m_period*(cur-initialTick()));
       }
-      std::string date_str(TREX::transaction::TICK &tick) const {
-        // TODO implement this
-        return Clock::date_str(tick);
+      std::string date_str(TREX::transaction::TICK const &tick) const {
+        std::ostringstream oss;
+        oss<<tickToTime(tick)<<" ("<<tick<<')';
+        return oss.str();
       }
       
     private:
       void start() {
         typename mutex_type::scoped_lock guard(m_lock);
         m_clock.reset(new clock_type);
+        m_epoch = boost::posix_time::microsec_clock::universal_time();
         m_tick -= m_tick.time_since_epoch();
       }
-      double getSleepDelay() const {
+      
+      duration_type getSleepDelay() const {
         typename mutex_type::scoped_lock guard(m_lock);
         if( NULL!=m_clock.get() ) {
           typename clock_type::time_point target = m_tick + m_period;
           typename clock_type::base_duration left = m_clock->left(target);
           if( left >= clock_type::base_duration::zero() )
-            return boost::chrono::duration_cast< boost::chrono::duration<double> >(left).count();
+            return boost::chrono::duration_cast<duration_type>(left);
           else {
             // TODO warn that we ran late ...
-            return 0.0;
+            return duration_type(0);
           }
         } else 
           return Clock::getSleepDelay();
@@ -145,6 +201,7 @@ namespace TREX {
       mutable mutex_type        m_lock;
       tick_rate                 m_period;
       std::auto_ptr<clock_type> m_clock;
+      date_type                 m_epoch;
       
       typename clock_type::time_point m_tick;
     }; 
