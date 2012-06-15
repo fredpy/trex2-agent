@@ -243,7 +243,7 @@ namespace TREX {
       typename clock_type::time_point m_tick;
     }; 
     
-    typedef rt_clock<boost::nano> RealTimeClock;
+    typedef rt_clock<boost::milli> RealTimeClock;
   
     
   } // TREX::agent 

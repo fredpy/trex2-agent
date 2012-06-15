@@ -19,7 +19,7 @@ namespace TREX {
             
     }; // TREX::LSTS::dune_posix_clock
     
-    typedef agent::rt_clock<boost::nano, dune_posix_clock> posix_clock;
+    typedef agent::rt_clock<boost::milli, dune_posix_clock> posix_clock;
 
     class dune_steady_clock {
     public:
@@ -34,7 +34,7 @@ namespace TREX {
       
     }; // TREX::LSTS::dune_steady_clock  
 
-    typedef agent::rt_clock<boost::nano, dune_steady_clock> steady_clock;
+    typedef agent::rt_clock<boost::milli, dune_steady_clock> steady_clock;
 
   } // TREX::LSTS
 } // TREX
