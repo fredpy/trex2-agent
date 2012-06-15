@@ -48,7 +48,6 @@
 
 # include <trex/transaction/Tick.hh>
 # include <trex/utils/ErrnoExcept.hh>
-# include <trex/utils/XmlFactory.hh>
 
 # include <trex/utils/TimeUtils.hh>
 
@@ -165,6 +164,15 @@ namespace TREX {
       /** @brief XML factory for clocks. */
       typedef TREX::utils::XmlFactory<Clock> xml_factory;
       
+      /** @brief Clock basic information 
+       *
+       * Give basixc information of the clock used. This information 
+       * will be displayed. when the clock will be started by the agent.
+       *
+       * @return A string describing this clock
+       */
+      virtual std::string info() const =0;
+      
     protected:
       /** @brief Time left before next tick
        *
@@ -203,10 +211,11 @@ namespace TREX {
        */
       void advanceTick(TREX::transaction::TICK &tick);
       
+      utils::internals::LogEntry syslog(std::string const &context=std::string()) const;
 
     private:
       duration_type const m_sleep;
-
+      utils::SingletonUse<utils::LogManager> m_log;
     }; // TREX::agent::Clock
 
   } // TREX::agent   

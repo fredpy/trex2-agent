@@ -51,9 +51,12 @@
 # include <trex/utils/StringExtract.hh>
 
 # include <trex/utils/tick_clock.hh>
+# include <trex/utils/chrono_helper.hh>
 
 # include <boost/thread/recursive_mutex.hpp>
 # include <boost/date_time/posix_time/posix_time_io.hpp>
+
+# include <boost/math/common_factor_rt.hpp>
 
 namespace TREX {
   namespace agent {
@@ -131,7 +134,14 @@ namespace TREX {
         if( NULL!=m_clock.get() ) {
           typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
           if( how_late > clock_type::base_duration::zero() ) {
-            // TODO diaply a warning
+            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(how_late).count();
+            ratio /= m_period.count();
+            if( ratio>=0.1 ) {
+              // more than 10% of a tick late => display a warning
+              std::ostringstream oss;
+              utils::display(oss, how_late);
+              syslog("WARN")<<" clock is "<<oss.str()<<" late.";
+            } 
           }
           return m_tick.time_since_epoch().count()/m_period.count();
         } else 
@@ -167,6 +177,26 @@ namespace TREX {
         oss<<tickToTime(tick)<<" ("<<tick<<')';
         return oss.str();
       }
+      std::string info() const {
+        std::ostringstream oss;
+        oss<<"rt_clock based on "
+          <<boost::chrono::clock_string<Clk, char>::name();
+        utils::display(oss<<"\n\ttick period: ", m_period);
+        oss<<"\n\tfrequency: ";
+        
+        boost::math::gcd_evaluator<rep> gcdf;
+        rep factor = gcdf(m_period.count()*Period::num, Period::den),
+          num = (Period::num*m_period.count())/factor,
+          den = Period::den/factor;
+        if( 1==num ) 
+          oss<<den<<"Hz";
+        else {
+          long double hz = den;
+          hz /= num;
+          oss<<hz<<"Hz ("<<den<<"/"<<num<<")";
+        }
+        return oss.str();
+      }
       
     private:
       void start() {
@@ -184,7 +214,14 @@ namespace TREX {
           if( left >= clock_type::base_duration::zero() )
             return boost::chrono::duration_cast<duration_type>(left);
           else {
-            // TODO warn that we ran late ...
+            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(-left).count();
+            ratio /= m_period.count();
+            if( ratio>=0.05 ) {
+              // more than 5% of a tick late => display a warning
+              std::ostringstream oss;
+              utils::display(oss, -left);
+              syslog("WARN")<<" clock is "<<oss.str()<<" late before sleeping.";
+            } 
             return duration_type(0);
           }
         } else 
