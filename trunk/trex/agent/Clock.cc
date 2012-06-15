@@ -39,6 +39,8 @@
  */
 #include "Clock.hh"
 
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 using namespace TREX::agent;
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -67,6 +69,8 @@ void Clock::sleep(Clock::duration_type const &delay){
 
 void Clock::doStart() {
   start();
+  syslog("INFO")<<"Clock started at "<<epoch()
+    <<"\n\t"<<info();
 }
 
 
@@ -80,6 +84,15 @@ void Clock::advanceTick(TICK &tick) {
 void Clock::sleep() const {
   sleep(getSleepDelay());
 }
+
+internals::LogEntry Clock::syslog(std::string const &context) const {
+  std::ostringstream oss;
+  oss<<"clock";
+  if( !context.empty() )
+    oss<<"]["<<context;
+  return m_log->syslog(oss.str());
+}
+
 
 // observers :
 

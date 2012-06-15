@@ -112,8 +112,15 @@ namespace TREX {
        * @a nSteps and reset the number of steps used to 0.
        */
       void setMaxSteps(unsigned int nSteps) const;
+      std::string info() const {
+        std::ostringstream oss;
+        oss<<"Simulated clock with "<<m_stepsPerTickDefault
+          <<" deliberation steps per tick.";
+        return oss.str();
+      }
 
     private:
+      
       /** @brief step value filter
        * @param stepsPerTick desired number of steps per tick
        * @retval @a stepsPerTick if this value is greater than 0
