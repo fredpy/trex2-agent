@@ -61,16 +61,56 @@
 namespace TREX {
   namespace agent {
   
+    /** @brief High accuracy tick clock
+     *
+     * @tparam Param period The tick period base type
+     * @tparam Clk a clock definition based on boost::chrono 
+     *
+     * This is the clock inmplementation that allows to implement a clock 
+     * with precise tick frequency based on a clock. This clock will allow 
+     * to implement any tick which is a multiple of @p Period and will rely on 
+     * @p Clk to measure time 
+     * 
+     * It uses boost::chrono library to measure time and allow to ensure that 
+     * the tick value is always as accurate as @p Clk allow
+     *
+     * For exampel if one desire to  implement a clock running a &Hz or any of 
+     * its multiple (3.5Hz, 7/3 Hz, ...) he just neads to decalre a clock using 
+     * the following type:
+     * @code 
+     *  typedef rt_clock< boost::ratio<1,7> > seven_hz_clk;
+     * @endcode
+     *
+     * @author Frederic Py
+     * @ingroup agent
+     */
     template<class Period, class Clk = boost::chrono::high_resolution_clock>
     struct rt_clock :public Clock {      
     public:
       using typename Clock::duration_type;
       using typename Clock::date_type;
     
+      /** @brief Subjacent clock type
+       *
+       * The clock used to measure time
+       */
       typedef TREX::utils::tick_clock<Period, Clk> clock_type;
+      /** @brief Basis tick representation
+       *
+       * The  duration represent using Period as a core tick value
+       */
       typedef typename clock_type::duration        tick_rate;
       typedef typename clock_type::rep             rep;
     
+      /** @brief Constructor
+       *
+       * @param[in] period The tick period
+       *
+       * Create a new clock with a tick duration of @p period where the unit 
+       * of @p period is @t Period
+       *
+       * @{
+       */
       explicit rt_clock(rep const &period)
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
@@ -80,7 +120,24 @@ namespace TREX {
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
       }
-      
+      /** @} */
+      /** @brief XML constrauctor
+       *
+       * @param[in] node An xml definition
+       *
+       * Create a new instance using the XML definition @p node
+       *
+       * The XML definition either defines a number of @p Period for the tick:
+       * @code 
+       *  <ClockName tick="2"/>
+       * @endcode
+       * Or can specify the tick in term of @c hours, @c minutes, @c seconds, 
+       * @c millis, @c micros, @c nanos :
+       * @code
+       *  <ClockName minutes="2" seconds="20" micros="20000" /> 
+       * @endcode
+       * All attributes on either definition are expected to be integer.
+       */  
       explicit rt_clock(boost::property_tree::ptree::value_type &node) 
         :Clock(duration_type::zero()) {
         boost::optional<rep> 
@@ -126,7 +183,7 @@ namespace TREX {
         } 
         check_tick();
       }
-      
+      /** @brief Destructor */
       ~rt_clock() {}
       
       transaction::TICK getNextTick() {
