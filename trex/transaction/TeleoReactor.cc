@@ -383,6 +383,11 @@ goal_id TeleoReactor::postGoal(Goal const &g) {
   }
 }
 
+goal_id TeleoReactor::parse_goal(boost::property_tree::ptree::value_type const &g) {
+  return getGraph().parse_goal(g);
+}
+
+
 bool TeleoReactor::postRecall(goal_id const &g) {
   if( !g )
     return false;

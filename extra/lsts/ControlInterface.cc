@@ -233,7 +233,7 @@ void ControlInterface::proccess_message(std::string const &msg) {
   else {
     for( ; last!=i; ++i) {
       try {
-        goal_id tmp(new Goal(*i));
+        goal_id tmp = parse_goal(*i);
         add_goal(tmp);
       } catch(TREX::utils::Exception const &e) {
         syslog("INFO")<<"Exception while building new goal: "<<e; 

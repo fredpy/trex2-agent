@@ -319,6 +319,15 @@ void WitreServer::dispatchPlanTokens()
     }
 }
 
+goal_id WitreServer::clientGoalPost(boost::property_tree::ptree::value_type const &xml) {
+  boost::mutex::scoped_lock lock(mutex_);
+  goal_id g = parse_goal(xml);
+  if( postGoal(g) )
+    return g;
+  return goal_id();
+}
+
+
 goal_id WitreServer::clientGoalPost(Goal const &g)
 {
     boost::mutex::scoped_lock lock(mutex_);

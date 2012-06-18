@@ -470,11 +470,11 @@ bool EuropaReactor::hasWork() {
           IntegerDomain window = j->dispatch_window(getCurrentTick());
           IntegerDomain::bound lo = window.lowerBound(), 
 	    hi = window.upperBound();
-          e_lo = lo.value();
+          e_lo = static_cast<EUROPA::eint::basis_type>(lo.value());
           if( hi.isInfinity() )
             e_hi = final_tick();
           else
-            e_hi = hi.value();
+            e_hi = static_cast<EUROPA::eint::basis_type>(hi.value());
           (*from)->do_dispatch(e_lo, e_hi);
         }
       }
@@ -573,11 +573,11 @@ EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
 EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
   typedef chrono_posix_convert< boost::chrono::duration<EUROPA::edouble::basis_type> > convert;
   convert::chrono_duration rdate(EUROPA::cast_basis(date));
-  return timeToTick(boost::posix_time::from_time_t(0)+convert::to_posix(rdate));
+  return static_cast<EUROPA::eint::basis_type>(timeToTick(boost::posix_time::from_time_t(0)+convert::to_posix(rdate)));
 }
 
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
-  EUROPA::eint scope_duration(getExecLatency()+getLookAhead());
+  EUROPA::eint scope_duration(static_cast<EUROPA::eint::basis_type>(getExecLatency()+getLookAhead()));
   return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration,
 						   final_tick()));
 }

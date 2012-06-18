@@ -515,9 +515,10 @@ void WitreApplication::attributePopup()
                 msg<<"alert(\"";
                 for(; last!=i; ++i, count++)
                 {
-                    TREX::transaction::Goal goal(*i);
-                    TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
-                    msg<<"Goal: "<<goal<<"\\n";
+                  TREX::transaction::goal_id 
+                    g = wServer->clientGoalPost(*i);
+                  if( g )
+                    msg<<"Goal: "<<*g<<"\\n";
                 }
                 msg<<"\");";
                 doJavaScript(msg.str());
