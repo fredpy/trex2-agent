@@ -21,29 +21,92 @@ namespace TREX {
      */
     class ControlInterface :public TREX::transaction::TeleoReactor {
     public:
+      /** @brief Constructor 
+       *
+       * @param[in] arg XML reactor definition
+       *
+       * XML format :
+       * @code 
+       *  <GoalPipe name="<reactorname>" lookahead="<lookahead>" 
+       *            latency="<latency>" log="<logflag>" />
+       * @endcode 
+       *
+       * @note As this reactor does not provide internal timelin
+       *   the lookahaded and latency are meaningless and can be
+       *   set to 0.
+       */
       ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      /** @brief Destructor 
+       *
+       * Terminates the listener thread, and destory this 
+       * instance. As a resulult the FIFO unqix pipe should be 
+       * destroyed.  
+       */
       ~ControlInterface();
       
+      /** @brief Test if running
+       *
+       * Check if the listener thread of this reactor is 
+       * currently running.
+       *
+       * @retval true I f the thread is running
+       * @retval false otherwise
+       */
       bool is_running() const;
+      /** @brief Stop the listener thread
+       *
+       * Stops the thread listenning to messages.
+       */
       void stop();
       
-      /** @brief Porcess new message(s)
+      /** @brief Process new message(s)
        *
        * @param[in] msg A message
        *
-       * Parse the contetn of @p msg and queue any goal extracted from it.
+       * Parse the content of @p msg and queue any goal extracted 
+       * from it.
        */
       void proccess_message(std::string const &msg);
 
     private:
+      /** @brief Message listeenign thread.
+       *
+       * The thread that listen and gather  messages coming 
+       * from the fifo queue.
+       *
+       * @relates ControlInterface
+       * @uathor Frederic Py 
+       */ 
       class thread_proxy {
       public:
+        /** @brief Copy constructor
+         *
+         * @param[in] other Another instance.
+         *
+         * Create a copy of @p other that refers to the same
+         * ControlInterface. This constructor is necessary as 
+         * boost thread passes thread execution class by value
+         */ 
         thread_proxy(thread_proxy const &other);
+        /** @brief Destructor */
         ~thread_proxy();
         
+        /** @brief Thread execution method
+         *
+         * The code executed by the thread. This method is just a
+         * proxy to ControlInterface::run() 
+         *
+         * @sa ControlInterface::run()
+         */ 
         void operator()();
         
       private:
+        /** @brief Constructor
+         *
+         * @param[in] me A pointer to the caller
+         *
+         * Create a new instance that refers to @p me
+         */
         thread_proxy(ControlInterface *me);
                      
         ControlInterface *m_reactor;
@@ -53,13 +116,47 @@ namespace TREX {
       
       friend class thread_proxy;
       
+      /** @brief Reactor initialization
+       *
+       * Initialize the reactor within the agent. This call will:
+       * @li create the fifo queue to listen to
+       * @li spawn a thread listening to this queue
+       * @li set the agent ControlInterface singleton to this 
+       *    instance 
+       */ 
       void handleInit();
       void handleTickStart();
       bool synchronize();
       
+      /** @brief Add a goal
+       *
+       * @param[in] g A goal 
+       * 
+       * Add @p g to the pending goals queue
+       *
+       * @post the pending goal queue is not empty
+       */
       void add_goal(TREX::transaction::goal_id const &g);
+      /** @brief Get next pending goal
+       *
+       * @param[out] g A goal placeholder
+       *
+       * Gets the next goal in the pending goal queue (if any) 
+       * and copy it to @p g
+       *
+       * @retval true if the queue was not empty and @p g was 
+       *   updated
+       * @retval false otherwise
+       */  
       bool next_goal(TREX::transaction::goal_id &g);
       
+      /** @brief Thead listening execution loop
+       *
+       * The loop executed by the queue listening thread. This 
+       * loop ewaits for new message in the fifo, parse them as 
+       * goals and stor the resulting goal in the pending goals 
+       * queue
+       */
       void run();
       
       /** @brief Name of the fifo pipe
@@ -72,10 +169,15 @@ namespace TREX {
        *
        * Create the new fifo pipe and open it. 
        *
-       * @trow TREX::utils::ErrnoExcept system error while creating the 
-       * fifo pipe.
+       * @trow TREX::utils::ErrnoExcept system error while creating 
+       * the fifo pipe.
        */
       void create_fifo();
+      /** @brief Destroy fifo queue
+       *
+       * Close the fifo queue created by this reactor and destroy
+       * it
+       */ 
       void destroy_fifo();
       bool is_open() const;
       

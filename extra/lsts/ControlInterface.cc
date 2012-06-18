@@ -58,10 +58,10 @@ ControlInterface::ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type
 
 ControlInterface::~ControlInterface() {
   stop();
-  destroy_fifo();
   if( NULL!=m_thread.get() ) {
     m_thread->join();
   }
+  destroy_fifo();
 }
 
 // observers
@@ -170,6 +170,7 @@ void ControlInterface::destroy_fifo() {
   }
   
   if( 0<fid ) {
+    syslog()<<"Destroying the fifo "<<fifo_name();
     close(fid);
     // remove the queue from the file system
     bfs::path fpath(fifo_name());
