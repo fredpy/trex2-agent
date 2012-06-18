@@ -428,11 +428,18 @@ namespace TREX {
        * @li Plugin information allowing TREX to load external plugins. These
        *     XML tags have the following syntax :
        *     @code
-       *     <Plugin name="TREXvitre" />
+       *     <Plugin name="witre_pg">
+       *       <!-- plugin loading -->
+       *       <!-- clock definition -->
+       *       <!-- reactors definition -->
+       *       <!-- goals -->
+       *       [ <Else message="on fail"> ... </Else>  ]
+       *     </Plugin>
        *     @endcode
-       *     and will result on the  attempting to load the dynamic libray @e TREXvitre
-       *     as a TREX plugin. These need to be loaded firast as oner plugin can defines
-       *     new clocks or reactors types used by this agent
+       *     and will result on the  attempting to load the dynamic libray @e witre_pg
+       *     as a TREX plugin. If it succeed it will parse the content of this node as 
+       *     it did for the agent root oteherwise it will either throw an exception or 
+       *     pparse the Else node  
        * @li Clock definition. These will be parsed only if a clock is not defined and as
        *     a result only the first clock definition may be parsed in this configuration
        *     The tag of the XML depends on the way the clock class declared itself inside
