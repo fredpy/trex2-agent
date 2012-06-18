@@ -495,6 +495,13 @@ namespace TREX {
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
       std::list<reactor_id>      m_idle;
+      
+      mutable utils::SharedVar<bool> m_valid;
+      
+      bool valid() const {
+        utils::SharedVar<bool>::scoped_lock lck(m_valid);
+        return *m_valid;
+      }
 
       void synchronize();
       

@@ -51,6 +51,8 @@
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/reverse_graph.hpp>
 
+#include <boost/thread.hpp>
+
 
 using namespace TREX::agent;
 using namespace TREX::transaction;
@@ -430,7 +432,7 @@ namespace TREX {
 }
 
 AgentException::AgentException(graph const &agent, std::string const &msg) throw()
- :GraphException(agent, msg) {}
+  :GraphException(agent, msg) {}
 
 /*
  * class TREX::agent::Agent
@@ -446,13 +448,13 @@ TICK Agent::initialTick(Clock *clk) {
 
 Agent::Agent(Symbol const &name, TICK final, Clock *clk, bool verbose)
   :graph(name, initialTick(clk), verbose),
-   m_clock(clk), m_finalTick(final) {
+   m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
 Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
-  :m_clock(clk) {
+  :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
@@ -476,7 +478,7 @@ Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
 }
 
 Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool verbose)
-  :m_clock(clk) {
+  :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock));
   m_proxy = new AgentProxy(*this);
@@ -499,6 +501,8 @@ Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool ver
 
 
 Agent::~Agent() {
+  m_valid = false;
+    
   m_proxy = NULL;
   clear();
   if( NULL!=m_clock )
@@ -508,6 +512,10 @@ Agent::~Agent() {
 // observers :
 
 bool Agent::missionCompleted() {
+  if( !valid() ) {
+    syslog()<<"Agent destroyed.";
+    return true;
+  }
   if( count_reactors()<=1 ) {
     // If there's only one reactor left it is probably
     // my AgentProxy => no real reactor available
@@ -842,14 +850,15 @@ bool Agent::doNext() {
   synchronize();
 
   while( m_clock->getNextTick()==getCurrentTick()
-        && m_clock->free() 
+        && m_clock->free() && valid() 
         && executeReactor() );
-  while( m_clock->getNextTick()==getCurrentTick() )
+  while( valid() && m_clock->getNextTick()==getCurrentTick() )
     m_clock->sleep();
 
-  updateTick(m_clock->getNextTick());
+  if( valid() )
+    updateTick(m_clock->getNextTick());
 
-  return true;
+  return valid();
 }
 
 void Agent::sendRequest(goal_id const &g) {

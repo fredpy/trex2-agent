@@ -46,18 +46,19 @@
  * Where :
  * @li @c @<mission@> is the name of a mission configuration file.
  * There should be a file named @c @<mission@>.cfg in the @c TREX_PATH
- * that describes an agent in XML format
+ * that describes an agent in XML format:
  * @li @c -sim indicates that we want to use StepClock instead of the
  * default clock. Otherwise it loads the clock loaded by
  * @c @<mission@>.cfg or RealTimeClock if none was required
- * @c @<steps@> indicates the maximum number of deliberation steps per tick
- * StepClock should allow.
+ * @c @<steps@> indicates the maximum number of deliberation steps per 
+ * tick StepClock should allow.
  *
- * The programs locate the file @c <mission> int TREX_PATH -- or @c <mission>.cfg
- * if @c <mission> is not found -- parse its XML content in order to initialize
- * the rset of reactors loaded and the potential clock defined and execute it
- * until completion. If no clock is provided the command uses a default real-time
- * clock with a tick duration of 1 second.
+ * The programs locate the file @c <mission> in TREX_PATH -- or 
+ * @c <mission>.cfg if @c <mission> is not found -- parse its XML content 
+ * in order to initialize the rset of reactors loaded and the potential 
+ * clock defined and execute it until completion. If no clock is provided 
+ * the command uses a default real-time clock with a tick duration of 1 
+ * second.
  *
  * @sa TREX::agent::Agent::Agent(std::string const &, Clock *) 
  *
@@ -74,6 +75,7 @@
  * @ingroup amccmd
  */
 #include <cstring>
+#include <signal.h>
 
 #include <trex/agent/Agent.hh>
 #include <trex/agent/RealTimeClock.hh>
@@ -81,6 +83,26 @@
 
 using namespace TREX::agent;
 using namespace TREX::utils;
+
+namespace {
+
+  std::auto_ptr<Agent> my_agent;
+  SingletonUse<LogManager> amc_log;
+  
+}
+
+extern "C" {
+
+  void amc_cleanup(int sig) {
+    amc_log->syslog("amc")<<"============================================";
+    amc_log->syslog("amc")<<"Received signal "<<sig; 
+    amc_log->syslog("amc")<<"============================================";
+    my_agent.reset();
+    exit(1);
+  }
+
+}
+
 
 /** @brief Batch execution (amc) main function
  * @param argc Number of arguments
@@ -131,8 +153,15 @@ int main(int argc, char **argv) {
       return -1;
     }
   }
-  Agent agent(configFile, clk.release());
-  agent.setClock(new RealTimeClock(boost::chrono::seconds(1)));
-  agent.run();
+  // Clean-up the agent on interruptions
+  signal(SIGINT, amc_cleanup);
+  signal(SIGTERM, amc_cleanup);
+  signal(SIGQUIT, amc_cleanup);
+  signal(SIGKILL, amc_cleanup);
+  
+  my_agent.reset(new Agent(configFile, clk.release()));
+  // Use a 1Hz clock by default
+  my_agent->setClock(new RealTimeClock(boost::chrono::seconds(1)));
+  my_agent->run();
   return 0;
 }
