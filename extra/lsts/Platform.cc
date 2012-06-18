@@ -65,9 +65,9 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                        		TeleoReactor(arg, false), m_on(
-                        				parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(
-                        						true)
+                        				TeleoReactor(arg, false), m_on(
+                        						parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(
+                        								true)
 {
 
 	duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
@@ -90,12 +90,13 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
 	std::cout << "listening on port " << localport << "...\n";
 
-	provide("estate"); // declare the state command timeline
-	provide("vstate"); // declare the state command timeline
-	provide("command"); // declare the command timeline
-	provide("oplimits"); // declare the oplimits timeline
+	provide("estate"); 		// declare the state command timeline
+	provide("vstate"); 		// declare the state command timeline
+	provide("command"); 	// declare the command timeline
+	provide("oplimits"); 	// declare the oplimits timeline
 	provide("control");
 	provide("maneuver");
+	provide("supervision"); // declare the trex command timeline
 
 	IMC::CacheControl m;
 	m.op = IMC::CacheControl::COP_LOAD;
@@ -151,13 +152,37 @@ Platform::synchronize()
 				}
 			}
 
-			if (msg->getId() == IMC::TrexGoal::getIdStatic())
+			if (msg->getId() == IMC::TrexCommand::getIdStatic())
 			{
-				IMC::TrexGoal * goal = dynamic_cast<IMC::TrexGoal *>(msg);
-				syslog("LSTS") << "received a new goal (" << goal->goalid << "): " << goal->goalxml;
-				if (controlInterfaceInstance) {
-					controlInterfaceInstance->proccess_message(goal->goalxml);
+				IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
+
+
+				switch (command->command)
+				{
+				case IMC::TrexCommand::OP_POST_GOAL:
+					syslog("LSTS") << "received a new goal (" << command->goalid << "): " << command->goalxml;
+					if (controlInterfaceInstance) {
+						controlInterfaceInstance->proccess_message(command->goalxml);
+					}
+					break;
+				case IMC::TrexCommand::OP_ENABLE:
+					syslog("LSTS") << "Enable TREX command received";
+					// post active observation ...
+					postObservation(Observation("supervision", "Active"));
+					break;
+				case IMC::TrexCommand::OP_DISABLE:
+					syslog("LSTS") << "Disable TREX command received";
+					// post blocked observation ...
+					postObservation(Observation("supervision", "Blocked"));
+					break;
 				}
+			}
+
+			if (msg->getId() == IMC::Abort::getIdStatic())
+			{
+				syslog("LSTS") << "Abort received";
+				// post blocked observation ...
+				postObservation(Observation("supervision", "Blocked"));
 			}
 		}
 
@@ -281,9 +306,9 @@ Platform::processState()
 		if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
 			WGS84::displace(msg->x, msg->y, &lat, &lon);
 
-			obs.restrictAttribute("latitude", FloatDomain(lat));
-			obs.restrictAttribute("longitude", FloatDomain(lon));
-			obs.restrictAttribute("depth", FloatDomain(msg->z));
+		obs.restrictAttribute("latitude", FloatDomain(lat));
+		obs.restrictAttribute("longitude", FloatDomain(lon));
+		obs.restrictAttribute("depth", FloatDomain(msg->z));
 
 		if (aggregate.count(IMC::NavigationUncertainty::getIdStatic()))
 		{

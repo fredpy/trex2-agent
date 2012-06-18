@@ -8,8 +8,14 @@
 
 # include <Dune/Dune.hpp>
 
+# include <boost/polygon/polygon.hpp>
+
+
 namespace TREX {
 namespace LSTS {
+
+typedef boost::polygon::polygon_data<double> Polygon;
+typedef boost::polygon::polygon_traits<Polygon>::point_type Point;
 
 class LatLonToOffset :public EUROPA::Constraint {
 public:
@@ -51,7 +57,7 @@ public:
 private:
 
 	EUROPA::Domain &m_dist;
- 	EUROPA::Domain &m_lat1;
+	EUROPA::Domain &m_lat1;
 	EUROPA::Domain &m_lon1;
 	EUROPA::Domain &m_lat2;
 	EUROPA::Domain &m_lon2;
@@ -65,24 +71,54 @@ private:
 		NARGS = 5
 	};
 };
-    
-    class RadDeg :public EUROPA::Constraint {
-    public:
-      RadDeg(EUROPA::LabelStr const &name,
-             EUROPA::LabelStr const &propagator,
-             EUROPA::ConstraintEngineId const &engine,
-             std::vector<EUROPA::ConstrainedVariableId> const &vars);
-      void handleExecute();
-    private:
-      EUROPA::Domain &m_deg;
-      EUROPA::Domain &m_rad;
-      
-      enum indexes {
-        RADIANS = 0,
-        DEGREES = 1,
-        NARGS   = 2
-      };
-    }; // TREX::LSTS::RadDeg
+
+class InsideOpLimits :public EUROPA::Constraint {
+public:
+	InsideOpLimits(EUROPA::LabelStr const &name,
+			EUROPA::LabelStr const &propagator,
+			EUROPA::ConstraintEngineId const &cstrEngine,
+			std::vector<EUROPA::ConstrainedVariableId> const &vars);
+
+	void handleExecute();
+
+
+
+	static void set_oplimits(Dune::IMC::OperationalLimits *oplimits);
+
+private:
+	static Dune::IMC::OperationalLimits * s_oplimits;
+
+	Polygon * computeOpLimitsPolygon();
+
+	EUROPA::Domain &m_lat;
+	EUROPA::Domain &m_lon;
+	EUROPA::Domain &m_depth;
+
+	enum indexes {
+		LAT = 0,
+		LON = 1,
+		DEPTH = 2,
+		NARGS = 3
+	};
+};
+
+class RadDeg :public EUROPA::Constraint {
+public:
+	RadDeg(EUROPA::LabelStr const &name,
+			EUROPA::LabelStr const &propagator,
+			EUROPA::ConstraintEngineId const &engine,
+			std::vector<EUROPA::ConstrainedVariableId> const &vars);
+	void handleExecute();
+private:
+	EUROPA::Domain &m_deg;
+	EUROPA::Domain &m_rad;
+
+	enum indexes {
+		RADIANS = 0,
+		DEGREES = 1,
+		NARGS   = 2
+	};
+}; // TREX::LSTS::RadDeg
 
 }
 }

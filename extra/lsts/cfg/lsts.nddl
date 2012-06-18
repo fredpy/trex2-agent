@@ -10,8 +10,10 @@ EstimatedState estate = new EstimatedState(Observe);
 VehicleState vstate = new VehicleState(Observe);
 VehicleCommand command = new VehicleCommand(External);
 OperationalLimits oplimits = new OperationalLimits(Observe);
+TrexSupervision supervision = new TrexSupervision(Observe);
 Navigator navigator = new Navigator(Internal);
 Estimator estimator = new Estimator(Internal);
+
 
 close();
 
