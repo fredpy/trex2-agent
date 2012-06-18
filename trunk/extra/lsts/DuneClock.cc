@@ -6,8 +6,33 @@ using namespace TREX::LSTS;
 using TREX::agent::Clock;
 
 namespace {
+  /** @brief Dune steady clock definition
+   *
+   * Definition of the steady dune clock for TREX
+   * The XML definition in a mission file would be as follow:
+   * @code 
+   *  <DuneClock seconds="1" />
+   * @endcode
+   * Or for a 2Hz clock and using the alternate tag
+   * @code
+   *  <DuneSteady millis="500" /> 
+   * @endcode 
+   * @relates TREX::LSTS::steady_clock
+   * @{
+   */
   Clock::xml_factory::declare<steady_clock> default_decl("DuneClock");
   Clock::xml_factory::declare<steady_clock> steady_decl("DuneSteady");
+  /** @} */
+  
+  /** @brief Dune posix clock definition
+   *
+   * Definition of the posix dune clock for TREX
+   * The XML definition in a mission file would be as follow:
+   * @code 
+   *  <DunePosix seconds="1" />
+   * @endcode
+   * @relates TREX::LSTS::steady_clock
+   */
   Clock::xml_factory::declare<posix_clock> posix_decl("DunePosix"); 
 }
 
