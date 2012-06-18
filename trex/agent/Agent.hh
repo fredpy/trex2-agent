@@ -439,7 +439,7 @@ namespace TREX {
        *     and will result on the  attempting to load the dynamic libray @e witre_pg
        *     as a TREX plugin. If it succeed it will parse the content of this node as 
        *     it did for the agent root oteherwise it will either throw an exception or 
-       *     pparse the Else node  
+       *     parse the Else node  
        * @li Clock definition. These will be parsed only if a clock is not defined and as
        *     a result only the first clock definition may be parsed in this configuration
        *     The tag of the XML depends on the way the clock class declared itself inside
