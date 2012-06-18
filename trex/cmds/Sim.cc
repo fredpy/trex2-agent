@@ -60,6 +60,9 @@ using namespace TREX::transaction;
 namespace xml = boost::property_tree::xml_parser;
 
 namespace {
+
+  std::auto_ptr<Agent> my_agent;
+
   /** @brief entry point to TREX system log */
   SingletonUse<LogManager> s_log;
 
@@ -152,6 +155,20 @@ namespace {
   }
 }
 
+extern "C" {
+  void sin_cleanup(int sig) {
+    s_log->syslog("sim")<<"============================================";
+    s_log->syslog("sim")<<"Received signal "<<sig; 
+    s_log->syslog("sim")<<"============================================";
+    std::cout<<"Received signal "<<sig<<std::endl;
+    my_agent.reset();
+    std::cout<<"Goodbye"<<std::endl;
+    exit(1);
+  }
+
+}
+
+
 /** @brief Interactive execution (sim) main function
  * @param argc Number of arguments
  * @param argv command line arguments
@@ -208,18 +225,18 @@ int main(int argc, char **argv) {
     if( argc>=3 )
       clk.reset(new StepClock(Clock::duration_type(0), string_cast<size_t>(argv[2])));
 
-    Agent agent(configFile, clk.release(), true);
-    agent.setClock(new StepClock(Clock::duration_type(0), 60));
-    agent.initComplete();
+    my_agent.reset(new Agent(configFile, clk.release(), true));
+    my_agent->setClock(new StepClock(Clock::duration_type(0), 60));
+    my_agent->initComplete();
     printHelp();
     while( true ) {
-      if( agent.missionCompleted() ) {
+      if( my_agent->missionCompleted() ) {
 	std::cout<<"Mission completed."<<std::endl;
 	s_log->syslog("INFO")<<"Mission completed.";
 	break;
       }
-      TICK tick = agent.getCurrentTick();
-      std::cout<<'['<<agent.getName()<<':'<<tick<<"]> ";
+      TICK tick = my_agent->getCurrentTick();
+      std::cout<<'['<<my_agent->getName()<<':'<<tick<<"]> ";
       std::string cmdString;
       std::cin>>cmdString;
 
@@ -229,8 +246,8 @@ int main(int argc, char **argv) {
 	s_log->syslog("INFO")<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
-	while( agent.getCurrentTick()==tick && !agent.missionCompleted() )
-	  agent.doNext();
+	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() )
+	  my_agent->doNext();
       } else if( 'G'==cmd ) {
 	try {
 	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
@@ -240,9 +257,9 @@ int main(int argc, char **argv) {
 	      // <<"\nYou can use W to wrap the agent to its initial tick."
 		     <<std::endl;
 	  else {
-	    while( agent.getCurrentTick()<targetTick &&
-		   !agent.missionCompleted() )
-	      agent.doNext();
+	    while( my_agent->getCurrentTick()<targetTick &&
+		   !my_agent->missionCompleted() )
+	      my_agent->doNext();
 	  }  
 	}catch(bad_string_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;
@@ -255,7 +272,7 @@ int main(int argc, char **argv) {
 	if( file.empty() ) {
 	  std::cerr<<"Missing file name"<<std::endl;
 	  printHelp();
-	} else if( !parseGoals(agent, file) ) 
+	} else if( !parseGoals(*my_agent, file) ) 
 	  printHelp();
       } else if( 'K'==cmd ) {
 	std::string name;
@@ -266,11 +283,11 @@ int main(int argc, char **argv) {
 	  std::cerr<<"Missing reactor name"<<std::endl;
 	  printHelp();
 	} else {
-	  Agent::reactor_iterator pos = agent.find_reactor(name);
-	  if( agent.reactor_end()==pos ) 
+	  Agent::reactor_iterator pos = my_agent->find_reactor(name);
+	  if( my_agent->reactor_end()==pos ) 
 	    std::cerr<<"Reactor \""<<name<<"\" not found."<<std::endl;
 	  else {
-	    agent.kill_reactor(*pos);
+	    my_agent->kill_reactor(*pos);
 	    std::cout<<"Reactor \""<<name<<"\" killed."<<std::endl;
 	  }
 	}
