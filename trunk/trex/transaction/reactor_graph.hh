@@ -615,7 +615,7 @@ namespace TREX {
        * @sa set_verbose(bool)
        * @sa TeleoReactor::reset_verbose()
        */
-     bool is_verbose() const {
+      bool is_verbose() const {
         return m_verbose;
       }
       /** @brief Set default verbosity level
@@ -626,6 +626,8 @@ namespace TREX {
         m_verbose = flag;
       }
       
+      goal_id parse_goal(boost::property_tree::ptree::value_type goal) const;
+            
     protected:
       reactor_id add_reactor(reactor_id r);
 

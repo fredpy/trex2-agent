@@ -69,7 +69,7 @@ void Clock::sleep(Clock::duration_type const &delay){
 
 void Clock::doStart() {
   start();
-  syslog("INFO")<<"Clock started at "<<epoch()
+  syslog("INFO")<<"Clock started at "<<epoch()<<' '<<epoch().zone_name()
     <<"\n\t"<<info();
 }
 

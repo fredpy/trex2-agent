@@ -130,13 +130,13 @@ namespace TREX {
       bool do_relax(bool full);
 
       EUROPA::eint now() const {
-	return getCurrentTick();
+	return static_cast<EUROPA::eint::basis_type>(getCurrentTick());
       }
       EUROPA::eint latency() const {
-        return getExecLatency();
+        return static_cast<EUROPA::eint::basis_type>(getExecLatency());
       }
       EUROPA::eint look_ahead() const {
-        return getLookAhead();
+        return static_cast<EUROPA::eint::basis_type>(getLookAhead());
       }
       EUROPA::edouble tick_to_date(EUROPA::eint tick) const;
       EUROPA::eint date_to_tick(EUROPA::edouble date) const;
@@ -145,10 +145,10 @@ namespace TREX {
 
       EUROPA::IntervalIntDomain plan_scope() const;
       EUROPA::eint initial_tick() const {
-	return getInitialTick();
+	return static_cast<EUROPA::eint::basis_type>(getInitialTick());
       }
       EUROPA::eint final_tick() const {
-	return getFinalTick();
+	return static_cast<EUROPA::eint::basis_type>(getFinalTick());
       }
       EUROPA::edouble tick_duration() const {
 	return boost::chrono::duration<EUROPA::edouble::basis_type>(tickDuration()).count();

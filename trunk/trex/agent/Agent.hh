@@ -334,7 +334,7 @@ namespace TREX {
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
       void sendRequest(boost::property_tree::ptree::value_type &g) {
-	TREX::transaction::goal_id tmp(new TREX::transaction::Goal(g));
+	TREX::transaction::goal_id tmp = parse_goal(g);
 	sendRequest(tmp);
       }
       /** @brief Post a goals from xml 

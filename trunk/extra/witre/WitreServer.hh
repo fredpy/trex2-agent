@@ -81,6 +81,7 @@ namespace TREX {
       std::string getDependencies(std::string name);
       const timed_goal& plan() { return planTokens; };
 
+      TREX::transaction::goal_id clientGoalPost(boost::property_tree::ptree::value_type const &xml);
       TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
       TREX::transaction::Goal getGoal(std::string obs, std::string prd);
 

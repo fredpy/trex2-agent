@@ -34,8 +34,90 @@
 #include "reactor_graph.hh"
 #include "TeleoReactor.hh"
 
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 using namespace TREX::transaction;
 using namespace TREX::utils;
+
+
+namespace {
+
+
+
+  class DateHandler :public DomainBase::xml_factory::factory_type::producer {
+    typedef DomainBase::xml_factory::factory_type::producer base_class;
+   
+  public:
+    typedef graph::date_type date_type;
+  
+    ~DateHandler() {} 
+    
+    DateHandler(Symbol const &tag, graph const &owner)
+      :base_class(tag), m_owner(owner) {
+      base_class::notify();
+    }
+    
+  private:  
+    base_class::result_type produce(base_class::argument_type arg) const {
+      boost::optional<date_type> 
+	min = parse_attr< boost::optional<date_type> >(arg.second, "min"),
+	max = parse_attr< boost::optional<date_type> >(arg.second, "max");
+      IntegerDomain::bound lo(IntegerDomain::minus_inf), 
+	hi(IntegerDomain::plus_inf);
+      boost::posix_time::ptime date;
+      if( min )
+        lo = m_owner.timeToTick(*min);
+      if( max )
+	hi = m_owner.timeToTick(*max);
+      return result_type(new IntegerDomain(lo, hi));
+    }
+    
+    graph const &m_owner;
+
+    friend class TREX::transaction::graph;
+  }; // DateHandler
+
+  class DurationHandler :public DomainBase::xml_factory::factory_type::producer {
+    typedef DomainBase::xml_factory::factory_type::producer base_class;
+   
+  public:
+    ~DurationHandler() {} 
+    
+    DurationHandler(Symbol const &tag, graph const &owner)
+      :base_class(tag), m_owner(owner) {
+      base_class::notify();
+    }
+    
+  private:
+    base_class::result_type produce(base_class::argument_type arg) const {
+      boost::optional<boost::posix_time::time_duration> 
+	min = parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
+	max = parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
+      IntegerDomain::bound lo(IntegerDomain::minus_inf), 
+        hi(IntegerDomain::plus_inf);
+      boost::chrono::duration<double> 
+        ratio = m_owner.tickDuration();
+      typedef TREX::utils::chrono_posix_convert< boost::chrono::duration<double> > cvt;
+      if( min ) {
+        boost::chrono::duration<double> min_s(cvt::to_chrono(*min));
+
+        double value = min_s.count()/ratio.count();
+        lo = static_cast<long long>(std::floor(value));
+      } if( max ) {
+        boost::chrono::duration<double> max_s(cvt::to_chrono(*max));
+        
+        double value = max_s.count()/ratio.count();
+	hi = static_cast<long long>(std::ceil(value));
+      }
+      return result_type(new IntegerDomain(lo, hi));
+    }
+    
+    graph const &m_owner;
+
+    friend class TREX::transaction::graph;
+  }; // DurationHandler
+
+}
 
 /*
  * class TREX::transaction::GraphException
@@ -220,6 +302,14 @@ bool graph::subscribe(reactor_id r, Symbol const &timeline, details::transaction
     return r->failed_external(timeline, err);
   }
 }
+
+goal_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
+  DateHandler date_parser("date", *this);
+  DurationHandler duration_parser("duration", *this);
+  
+  return goal_id(new Goal(goal));
+}
+
 
 /*
  * class TREX::transaction::graph::timelines_listener

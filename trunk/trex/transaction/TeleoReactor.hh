@@ -512,7 +512,7 @@ namespace TREX {
 	return internal_iterator(m_internals.end(), m_internals.end());
       }
 
-    protected:
+    protected:    
       /** @brief Constructor
        *
        * @param[in] owner The graph that creates and will own this insatnce
@@ -657,6 +657,16 @@ namespace TREX {
        * @sa isExternal(TREX::utils::Symbol const &) const
        */
       goal_id postGoal(Goal const &g);
+      
+      goal_id postGoal(boost::property_tree::ptree::value_type const &g) {
+        goal_id gl=parse_goal(g); 
+        if( postGoal(gl) )
+          return gl;
+        return goal_id();
+      }
+      
+      goal_id parse_goal(boost::property_tree::ptree::value_type const &g);
+      
       /** @brief Goal completion
        *
        * @param[in] g A goal
