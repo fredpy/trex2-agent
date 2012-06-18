@@ -80,6 +80,17 @@ class VehicleCommand extends AgentTimeline {
 	};
 };
 
+
+class TrexSupervision extends AgentTimeline {
+
+	TrexSupervision(Mode _mode) {
+		super(_mode, "Blocked");
+	}
+	
+	predicate Blocked {};
+	predicate Active  {};
+}
+
 class ManType {
 	int id;
 	

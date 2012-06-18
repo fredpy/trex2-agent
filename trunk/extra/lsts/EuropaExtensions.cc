@@ -8,6 +8,8 @@
 #include <Dune/Math/Angles.hpp>
 #include <Dune/Coordinates/WGS84.hpp>
 
+# include <boost/polygon/polygon.hpp>
+
 /**
  * DIST == ll_dist(lat1, lon1, lat2, lon2)
  * ll_offset(LAT, LON, ?NORTHING, ?EASTING)
@@ -16,6 +18,8 @@ namespace TREX {
 namespace LSTS {
 
 using namespace EUROPA;
+using namespace boost::polygon::operators;
+using namespace boost::polygon;
 
 DECLARE_FUNCTION_TYPE(RadDeg, to_rad,
 		"deg_to_rad", FloatDT, 1);
@@ -40,6 +44,8 @@ bool intersect(EUROPA::Domain& dom,
 
 	return dom.intersect(lb, ub);
 }
+
+
 class LSTSPlugin :public TREX::europa::EuropaPlugin {
 public:
 	void registerComponents(TREX::europa::Assembly const &assembly) {
@@ -75,12 +81,15 @@ using Dune::Coordinates::WGS84;
 // statics
 
 Dune::IMC::HomeRef *LatLonToOffset::s_home = NULL;
+Dune::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
 
 void LatLonToOffset::set_home(Dune::IMC::HomeRef *home) { 
 	s_home = home;
 	debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
 }
 
+
+//LATLONDIST STARTS ...
 
 LatLonDist::LatLonDist(EUROPA::LabelStr const &name,
 		EUROPA::LabelStr const &propagator,
@@ -123,7 +132,108 @@ void LatLonDist::handleExecute() {
 	return;
 }
 
+//LATLONDIST ENDS ...
 
+
+//INSIDEOPLIMITS STARTS ...
+
+InsideOpLimits::InsideOpLimits(EUROPA::LabelStr const &name,
+		EUROPA::LabelStr const &propagator,
+		EUROPA::ConstraintEngineId const &cstrEngine,
+		std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagator, cstrEngine, vars),
+ m_lat(getCurrentDomain(m_variables[InsideOpLimits::LAT])),
+ m_lon(getCurrentDomain(m_variables[InsideOpLimits::LON])),
+ m_depth(getCurrentDomain(m_variables[InsideOpLimits::DEPTH]))
+{
+}
+
+Polygon * InsideOpLimits::computeOpLimitsPolygon()
+{
+	double lat, lon;
+	double corners[4][2];
+	int i;
+	Point pts[4];
+
+	if (s_oplimits == NULL || !(s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_AREA))
+		return NULL;
+
+	corners[0][0] = +s_oplimits->length/2;
+	corners[1][0] = +s_oplimits->length/2;
+	corners[2][0] = -s_oplimits->length/2;
+	corners[3][0] = -s_oplimits->length/2;
+
+	corners[0][1] = -s_oplimits->width/2;
+	corners[1][1] = +s_oplimits->width/2;
+	corners[2][1] = +s_oplimits->width/2;
+	corners[3][1] = -s_oplimits->width/2;
+
+	for (i = 0; i < 4; i++)
+	{
+		Angles::rotate(s_oplimits->orientation, true, corners[i][0], corners[i][1]);
+		pts[i] = boost::polygon::construct<Point>(corners[i][0], corners[i][1]);
+	}
+
+	Polygon * p = new Polygon();
+
+	return p;
+};
+
+void InsideOpLimits::handleExecute() {
+
+	double lat, lon, depth;
+
+	if (s_oplimits == NULL)
+		return;
+
+
+	Point p;
+
+	/*
+	if (m_lat.isSingleton())
+		lat = cast_basis(m_lat.getSingletonValue());
+	else
+		return;
+	if (m_lon.isSingleton())
+		lon = cast_basis(m_lon.getSingletonValue());
+	else
+		return;
+	 */
+
+	if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_AREA)
+	{
+		double max_lat = s_oplimits->lat;
+		double max_lon = s_oplimits->lon;
+		lat = s_oplimits->lat;
+		lon = s_oplimits->lon;
+
+		WGS84::displace(s_oplimits->length/2, s_oplimits->width/2, &lat, &lon);
+
+
+	}
+	/*
+
+	      if (msg->ref != DuneIMC::EstimatedState::RM_LLD_ONLY)
+	      {
+	        x += msg->x;
+	        y += msg->y;
+	      }
+
+	      Angles::rotate(m_ol.orientation, true, x, y);
+
+	      double d2limits =
+	        std::max(std::fabs(x) - 0.5 * m_ol.length, std::fabs(y) - 0.5 * m_ol.width);
+	      test(Dune::IMC::OperationalLimits::OPL_AREA, "Operational Area", d2limits, 0);*/
+
+	if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_MAX_DEPTH)
+		intersect(m_depth, 0, s_oplimits->max_depth, 0);
+	else
+		intersect(m_depth, 0, m_depth.getUpperBound(), 0);
+
+	return;
+}
+
+//LATLONDIST ENDS ...
 
 // structors
 
