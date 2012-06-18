@@ -608,22 +608,43 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
 void Agent::subConf(boost::property_tree::ptree &conf, 
                     std::string const &path) {
   boost::property_tree::ptree::assoc_iterator i, last;
+  SingletonUse<Clock::xml_factory> clk_f;
+  
+  if( path.empty() ) {
+    // On the root we need to load plug-ins before the clock 
+    // so we are bacward compatible
 
-  // check if need/can load a new clock
-  if( NULL==m_clock ) {
-    syslog(path)<<"Check for clock definition...";
-    SingletonUse<Clock::xml_factory> clk_f;
-    boost::property_tree::ptree::iterator c = conf.begin();
-    clk_f->iter_produce(c, conf.end(), m_clock);
-  }
+    // Looks for plug-ins at this level
+    boost::tie(i, last) = conf.equal_range("Plugin");
+    if( last!=i ) {
+      // Produce new reactors
+      syslog(path)<<"Loading plug-ins...";
+      for(; last!=i; ++i) 
+        loadPlugin(*i, path);
+    }
 
-  // Looks for plug-ins at this level
-  boost::tie(i, last) = conf.equal_range("Plugin");
-  if( last!=i ) {
-    // Produce new reactors
-    syslog(path)<<"Loading plug-ins...";
-    for(; last!=i; ++i) 
-      loadPlugin(*i, path);
+    // check if need/can load a new clock
+    if( NULL==m_clock ) {
+      syslog(path)<<"Check for clock definition...";
+      boost::property_tree::ptree::iterator c = conf.begin();
+      clk_f->iter_produce(c, conf.end(), m_clock);
+    }
+  } else {
+    // check if need/can load a new clock
+    if( NULL==m_clock ) {
+      syslog(path)<<"Check for clock definition...";
+      boost::property_tree::ptree::iterator c = conf.begin();
+      clk_f->iter_produce(c, conf.end(), m_clock);
+    }
+
+    // Looks for plug-ins at this level
+    boost::tie(i, last) = conf.equal_range("Plugin");
+    if( last!=i ) {
+      // Produce new reactors
+      syslog(path)<<"Loading plug-ins...";
+      for(; last!=i; ++i) 
+        loadPlugin(*i, path);
+    }
   }
     
   // Produce new reactors
