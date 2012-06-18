@@ -393,7 +393,10 @@ namespace TREX {
 
       };
       AgentProxy *m_proxy;
+            
 
+      void subConf(boost::property_tree::ptree &conf,
+                   std::string const &path);
 
       /** @brief Load agent configuration 
        *
@@ -490,7 +493,8 @@ namespace TREX {
       
       bool executeReactor();
 
-      void loadPlugin(boost::property_tree::ptree::value_type &pg);
+      void loadPlugin(boost::property_tree::ptree::value_type &pg,     
+                      std::string path);
 
       /** @brief plug-in loader entry point */
       TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;

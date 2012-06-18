@@ -574,10 +574,66 @@ bool Agent::setClock(Clock *clock) {
   }
 }
 
-void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg) {
-  Symbol name = parse_attr<Symbol>(pg, "name");
-  m_pg->load(name);
+void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
+                       std::string path) {
+  std::string name = parse_attr<std::string>(pg, "name");
+  boost::optional<boost::property_tree::ptree &> else_tree = pg.second.get_child_optional("Else");
+  boost::property_tree::ptree *sub = NULL;
+  
+  if( m_pg->load(name, !else_tree) ) {
+    // Sucessfully loaded the plug-in 
+    //   => sub tree is teis tree
+    sub = &(pg.second);
+  } else {
+    // Failed to loacate the plug-in
+    //   => sub tree is <Else /> 
+    std::string msg = parse_attr<std::string>("", *else_tree, "message");
+    if( msg.empty() )
+      syslog(path+"|INFO")<<"Failed to locate plug-in "<<name;
+    else
+      syslog(path+"|INFO")<<"Failed to locate plug-in "
+        <<name<<"\n\t"<<msg;
+    
+    name = "(!"+name+")";
+    sub = &(*else_tree); 
+  }
+  // Traverse the sub tree 
+  if( path.empty() )
+    path = name;
+  else 
+    path += "."+name;
+  subConf(*sub, path);
 }
+
+void Agent::subConf(boost::property_tree::ptree &conf, 
+                    std::string const &path) {
+  boost::property_tree::ptree::assoc_iterator i, last;
+
+  // check if need/can load a new clock
+  if( NULL==m_clock ) {
+    syslog(path)<<"Check for clock definition...";
+    SingletonUse<Clock::xml_factory> clk_f;
+    boost::property_tree::ptree::iterator c = conf.begin();
+    clk_f->iter_produce(c, conf.end(), m_clock);
+  }
+
+  // Looks for plug-ins at this level
+  boost::tie(i, last) = conf.equal_range("Plugin");
+  if( last!=i ) {
+    // Produce new reactors
+    syslog(path)<<"Loading plug-ins...";
+    for(; last!=i; ++i) 
+      loadPlugin(*i, path);
+  }
+    
+  // Produce new reactors
+  syslog(path)<<"Loading reactors...";
+  add_reactors(conf);
+
+  // Now load and post the goals
+  syslog(path)<<"loading goals....";
+  sendRequests(conf);
+} 
 
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") )
@@ -585,9 +641,11 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   // Extract attributes
   try {
     Symbol name(parse_attr<std::string>(config, "name"));
+
     if( name.empty() )
       throw XmlError(config, "Agent name is empty.");
     set_name(name);
+    
     m_finalTick = parse_attr<TICK>(config, "finalTick");
     if( m_finalTick<=0 )
       throw XmlError(config, "agent life time should be greater than 0");
@@ -597,50 +655,12 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   // Populate with external configuration
   ext_xml(config.second, "config");
 
-
   // Now iterate through the sub-tags
   if( config.second.empty() )
     throw XmlError(config, "Agent node does not have sub nodes.");
-  boost::property_tree::ptree::assoc_iterator i, last;
 
-  // First load the plugins :
-  syslog()<<"Loading plug-ins...";
-  boost::tie(i, last) = config.second.equal_range("Plugin");
-  for( ; last!=i; ++i )
-    loadPlugin(*i);
-
-  // Look for A clock : Note only the first clock found is used
-  if( NULL==m_clock ) {
-    SingletonUse<Clock::xml_factory> clk_f;
-    boost::property_tree::ptree::iterator c = config.second.begin();
-
-    clk_f->iter_produce(c, config.second.end(), m_clock);
-  }
-  // List the reactors available for helping the user :
-  SingletonUse<xml_factory> reactor_f;
-
-  // First look for the reactor types available
-  std::list<Symbol> reactors_types;
-
-  reactor_f->getIds(reactors_types);
-  if( reactors_types.empty() ) {
-    syslog("ERROR")<<"No reactor type available.";
-  } else {
-    // Display the list of reactor types
-    std::ostringstream oss;
-
-    while( !reactors_types.empty() ) {
-      oss<<"\n\t- "<<reactors_types.front();
-      reactors_types.pop_front();
-    }
-    syslog()<<"Loading reactors; available reactor types are :"<<oss.str();
-
-    add_reactors(config.second);
-  }
-
-  // Now load and post the goals
-  syslog()<<"load initial goals of the agent";
-  sendRequests(config.second);
+  subConf(config.second, "");
+  syslog()<<"End of init.";
 }
 
 void Agent::loadConf(std::string const &file_name) {
@@ -821,15 +841,11 @@ size_t Agent::sendRequests(boost::property_tree::ptree &g) {
   size_t ret = 0;
   boost::property_tree::ptree::assoc_iterator i, last;
   boost::tie(i, last) = g.equal_range("Goal");
-  if( last==i )
-    syslog("WARN")<<"No goal found in this file";
-  else {
-    for(; last!=i; ++i) {
-      sendRequest(*i);
-      ++ret;
-    }
-    syslog()<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
+  for(; last!=i; ++i) {
+    sendRequest(*i);
+    ++ret;
   }
+  syslog()<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
   return ret;
 }
 

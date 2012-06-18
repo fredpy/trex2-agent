@@ -80,7 +80,8 @@ PluginLoader::~PluginLoader() {
 
 // Modifiers :
 
-void PluginLoader::load(Symbol const &name) {
+bool PluginLoader::load(Symbol const &name, 
+                        bool fail_on_locate) {
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()==i ) {
     bool found;
@@ -100,11 +101,15 @@ void PluginLoader::load(Symbol const &name) {
       // call to f_init : may throw an exception but
       //                  it is too be avoided
       f_init();
-    } else 
-      throw Exception("Unable to locate plugin "+name.str());
+    } else {
+      if( fail_on_locate )
+        throw Exception("Unable to locate plugin "+name.str());
+      return false;
+    }
   } else {
     i->second.second += 1;
   }
+  return true;
 }
 
 bool PluginLoader::unload(Symbol const &name) {
