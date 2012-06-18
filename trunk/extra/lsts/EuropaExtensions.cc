@@ -15,59 +15,60 @@
  * ll_offset(LAT, LON, ?NORTHING, ?EASTING)
  */
 namespace TREX {
-namespace LSTS {
+  namespace LSTS {
 
-using namespace EUROPA;
-using namespace boost::polygon::operators;
-using namespace boost::polygon;
+    using namespace EUROPA;
+    using namespace boost::polygon::operators;
+    namespace poly = boost::polygon;
 
-DECLARE_FUNCTION_TYPE(RadDeg, to_rad,
-		"deg_to_rad", FloatDT, 1);
+    DECLARE_FUNCTION_TYPE(RadDeg, to_rad,
+                    "deg_to_rad", FloatDT, 1);
 
-DECLARE_FUNCTION_TYPE(LatLonDist, ll_distance,
-		"ll_dist", FloatDT, 4);
+    DECLARE_FUNCTION_TYPE(LatLonDist, ll_distance,
+                    "ll_dist", FloatDT, 4);
 
-}
+  }
 }
 
 namespace {
-bool intersect(EUROPA::Domain& dom,
-		EUROPA::edouble lb, EUROPA::edouble ub,
-		double precision_error){
 
-	if( ub > dom.getUpperBound()
-			&& ub < std::numeric_limits<EUROPA::edouble>::infinity() )
-		ub -= precision_error;
-	if( lb < dom.getLowerBound()
-			&& std::numeric_limits<EUROPA::edouble>::minus_infinity() < lb )
-		lb += precision_error;
+  bool intersect(EUROPA::Domain& dom,
+                 EUROPA::edouble lb, EUROPA::edouble ub,
+                 double precision_error) {
+    if( ub > dom.getUpperBound()
+        && ub < std::numeric_limits<EUROPA::edouble>::infinity() )
+      ub -= precision_error;
+      
+    if( lb < dom.getLowerBound()
+        && std::numeric_limits<EUROPA::edouble>::minus_infinity() < lb )
+      lb += precision_error;
 
-	return dom.intersect(lb, ub);
-}
+    return dom.intersect(lb, ub);
+  }
 
 
-class LSTSPlugin :public TREX::europa::EuropaPlugin {
-public:
-	void registerComponents(TREX::europa::Assembly const &assembly) {
-		TREX_REGISTER_CONSTRAINT(assembly,TREX::LSTS::LatLonToOffset,
-				ll_offset, trex);
-		TREX_REGISTER_CONSTRAINT(assembly,TREX::LSTS::LatLonDist,
-				ll_dist, trex);
-		TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::RadDeg,
-				deg_to_rad, trex);
+  class LSTSPlugin :public TREX::europa::EuropaPlugin {
+  public:
+    void registerComponents(TREX::europa::Assembly const &assembly) {
+      TREX_REGISTER_CONSTRAINT(assembly,TREX::LSTS::LatLonToOffset,
+                               ll_offset, trex);
+      TREX_REGISTER_CONSTRAINT(assembly,TREX::LSTS::LatLonDist,
+                               ll_dist, trex);
+      TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::RadDeg,
+                               deg_to_rad, trex);
 
-		declareFunction(assembly, new TREX::LSTS::RadDegFunction());
-		declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
+      declareFunction(assembly, new TREX::LSTS::RadDegFunction());
+      declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
 
-	}
-};
+    }
+  };
 
-LSTSPlugin europa_extensions;
+  LSTSPlugin europa_extensions;
 
-double const deg_precision(0.000001);
-double const dist_precision(0.5);
+  double const deg_precision(0.000001);
+  double const dist_precision(0.5);
 
-}
+} // ::
 
 
 using namespace TREX::LSTS;
@@ -84,52 +85,50 @@ Dune::IMC::HomeRef *LatLonToOffset::s_home = NULL;
 Dune::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
 
 void LatLonToOffset::set_home(Dune::IMC::HomeRef *home) { 
-	s_home = home;
-	debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
+  s_home = home;
+  debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
 }
 
 
 //LATLONDIST STARTS ...
 
 LatLonDist::LatLonDist(EUROPA::LabelStr const &name,
-		EUROPA::LabelStr const &propagator,
-		EUROPA::ConstraintEngineId const &cstrEngine,
-		std::vector<EUROPA::ConstrainedVariableId> const &vars)
+                       EUROPA::LabelStr const &propagator,
+                       EUROPA::ConstraintEngineId const &cstrEngine,
+                      std::vector<EUROPA::ConstrainedVariableId> const &vars)
 :EUROPA::Constraint(name, propagator, cstrEngine, vars),
  m_dist(getCurrentDomain(m_variables[LatLonDist::DIST])),
  m_lat1(getCurrentDomain(m_variables[LatLonDist::LAT1])),
  m_lon1(getCurrentDomain(m_variables[LatLonDist::LON1])),
  m_lat2(getCurrentDomain(m_variables[LatLonDist::LAT2])),
  m_lon2(getCurrentDomain(m_variables[LatLonDist::LON2]))
-{
-}
+{}
 
 void LatLonDist::handleExecute() {
+  double lat1, lon1, lat2, lon2;
 
-	double lat1, lon1, lat2, lon2, dist;
+  if (m_lat1.isSingleton())
+    lat1 = cast_basis(m_lat1.getSingletonValue());
+  else
+    return;
+  if (m_lon1.isSingleton())
+    lon1 = cast_basis(m_lon1.getSingletonValue());
+  else
+    return;
 
-	if (m_lat1.isSingleton())
-		lat1 = cast_basis(m_lat1.getSingletonValue());
-	else
-		return;
-	if (m_lon1.isSingleton())
-		lon1 = cast_basis(m_lon1.getSingletonValue());
-	else
-		return;
+  if (m_lat2.isSingleton())
+    lat2 = cast_basis(m_lat2.getSingletonValue());
+  else
+    return;
+  if (m_lon2.isSingleton())
+    lon2 = cast_basis(m_lon2.getSingletonValue());
+  else
+    return;
 
-	if (m_lat2.isSingleton())
-		lat2 = cast_basis(m_lat2.getSingletonValue());
-	else
-		return;
-	if (m_lon2.isSingleton())
-		lon2 = cast_basis(m_lon2.getSingletonValue());
-	else
-		return;
+  EUROPA::edouble 
+    dist = WGS84::distance(lat1, lon1, 0, lat2, lon2, 0);
 
-	dist = WGS84::distance(lat1, lon1, 0, lat2, lon2, 0);
-
-	intersect(m_dist, dist, dist, 0.5);
-	return;
+  intersect(m_dist, dist, dist, 0.5);
 }
 
 //LATLONDIST ENDS ...
