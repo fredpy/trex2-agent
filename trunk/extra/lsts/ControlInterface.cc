@@ -328,7 +328,7 @@ void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 	if (NULL != m_env->getPlatformReactor())
 	{
 		std::ostringstream ss;
-		ss << "Token added: "*t;
+		ss << "Token added: " << *t;
 		m_env->getPlatformReactor()->reportToDune(ss.str());
 	}
 }

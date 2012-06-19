@@ -16,6 +16,8 @@ Navigator::Going {
 	completion_time <= end;
 	
 	starts_during(VehicleState.Ready ready);
+	starts_during(TrexSupervision.Active active);
+	
 	contains(VehicleState.Exec exec);
 	ready meets exec;
 			

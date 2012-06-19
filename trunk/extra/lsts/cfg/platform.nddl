@@ -27,9 +27,10 @@ class EstimatedState extends AgentTimeline {
 };
 
 class VehicleState extends AgentTimeline {
-	predicate Exec {};
+	predicate Exec  {};
 	predicate Ready {};
-	predicate Boot {};
+	predicate Boot  {};
+	predicate Error {};
 		
 	VehicleState(Mode _mode) {
 		super(_mode, "Boot");
