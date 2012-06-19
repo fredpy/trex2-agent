@@ -534,6 +534,12 @@ namespace TREX {
       TREX::utils::LogManager &manager() const {
 	return m_graph.manager();
       }
+      typedef utils::LogManager::path_type path_type;
+      
+      path_type file_name(std::string const &short_name) const {
+        return manager().file_name(getName().str()+"/"+short_name);
+      }
+      
       /** @brief Check for verbosity level
        *
        * Checks if this reactor is set as verbose or not.

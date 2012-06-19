@@ -9,6 +9,10 @@ class Estimator extends AgentTimeline {
 		super(_mode, "Boot");
 	}
 	
+    Estimator(Mode _mode, bool plan) {
+	super(_mode, "Boot", plan);
+	}
+
 	predicate Boot {}
 	
 	predicate At {

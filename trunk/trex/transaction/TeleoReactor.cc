@@ -202,7 +202,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
-  LogManager::path_type fname = manager().file_name(getName().str()+".stat.csv");
+  LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
      
   if( parse_attr<bool>(log_default, node, "log") ) {
@@ -240,7 +240,7 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
-  LogManager::path_type fname = manager().file_name(getName().str()+".stat.csv");
+  LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
      
   if( log ) {

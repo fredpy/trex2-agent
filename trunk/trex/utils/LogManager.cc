@@ -203,6 +203,7 @@ LogManager::path_type LogManager::file_name(std::string const &short_name) {
   path_type ret(logPath());
   ret /= short_name;
   ret.make_preferred();
+  create_directories(ret.parent_path());
   return ret;
 }
 

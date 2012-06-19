@@ -60,7 +60,7 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
    // Attempt to locate wt_config.xml first
    bool found;
    boost::filesystem::path config = m_log->use("wt_config.xml", found), 
-     path = m_log->file_name(getName().str()+".Wt.log");
+     path = file_name("Wt.log");
    
    if( found ) {
      boost::property_tree::ptree cfg;
