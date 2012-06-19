@@ -90,13 +90,13 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
 	std::cout << "listening on port " << localport << "...\n";
 
-	provide("estate"); 		// declare the state command timeline
-	provide("vstate"); 		// declare the state command timeline
+	provide("estate", false); 		// declare the state command timeline
+	provide("vstate", false); 		// declare the state command timeline
 	provide("command"); 	// declare the command timeline
-	provide("oplimits"); 	// declare the oplimits timeline
-	provide("control");
-	provide("maneuver");
-	provide("supervision"); // declare the trex command timeline
+	provide("oplimits", false); 	// declare the oplimits timeline
+	// provide("control");
+	provide("maneuver", false);
+	provide("supervision", false); // declare the trex command timeline
 
 	IMC::CacheControl m;
 	m.op = IMC::CacheControl::COP_LOAD;
