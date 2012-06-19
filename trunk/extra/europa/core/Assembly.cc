@@ -947,7 +947,7 @@ void Assembly::getFuturePlan()
 }
 
 void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
-  debugMsg("trex:always", "Last decision : "<<m_synchronizer->getLastExecutedDecision());
+  debugMsg("trex:always", "["<<now()<<"] Last decision : "<<m_synchronizer->getLastExecutedDecision());
 }
 
 void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const {
@@ -987,11 +987,11 @@ Assembly::ce_listener::ce_listener(Assembly &owner)
 
 void Assembly::ce_listener::notifyPropagationPreempted() {
   if( m_owner.m_in_synchronization ) {
-    debugMsg("trex:always", "search preempted during synchronization");
+    debugMsg("trex:always", "["<<m_owner.now()<<"] search preempted during synchronization");
     
     if( !m_empty_vars.empty() ) {
       debugMsg("trex:always", "======================================================================");
-      debugMsg("trex:always", m_empty_vars.size()<<" variables are empty:");
+      debugMsg("trex:always", "["<<m_owner.now()<<"] "<<m_empty_vars.size()<<" variables are empty:");
       for(EUROPA::ConstrainedVariableSet::const_iterator v=m_empty_vars.begin(); m_empty_vars.end()!=v; ++v) {
         std::ostringstream oss; 
         m_owner.print_context(oss, *v);
@@ -1032,13 +1032,13 @@ void Assembly::synchronization_listener::notifyUndone(EUROPA::SOLVERS::DecisionP
 
 void Assembly::synchronization_listener::notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
   m_progress = true;
-  debugMsg("trex:always", "Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+  debugMsg("trex:always", "["<<m_owner.now()<<"] Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
 }
 
 void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp) {
   if( m_progress ) {
     m_progress = false;
-    debugMsg("trex:always", "start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+    debugMsg("trex:always", "["<<m_owner.now()<<"] start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
     m_owner.backtracking(dp);
   }
 }
