@@ -46,13 +46,13 @@
 
 namespace TREX {
   namespace europa {
-    
+
     class Assembly;
-    
+
     namespace details {
       using EUROPA::LabelStr; // Needed in order to use DECLARE_ENTITY_TYPE
-      
-            
+
+
       /** @brief Current state flaw handler
        *
        * This class is used to keep track and resolve the current state of all
@@ -69,19 +69,19 @@ namespace TREX {
       class CurrentState :public EUROPA::Entity {
       public:
         DECLARE_ENTITY_TYPE(CurrentState);
-        
+
         typedef EUROPA::Id<CurrentState> id_type;
-        
+
         /** @brief Destructor */
         ~CurrentState() {}
-        
+
         /** @brief Get europa Id
          * @return An Id referring to this instance
          */
         id_type const &getId() const {
           return m_id;
         }
-        
+
         /** @brief Timeline
          *
          * Give access to the timeline managed by this instance
@@ -116,7 +116,7 @@ namespace TREX {
          * @retval false otherwise
          */
         bool committed() const;
-        
+
         /** @brief Current state
          *
          * @return The Token reflecting the current state
@@ -164,7 +164,7 @@ namespace TREX {
         LabelStr default_pred() const {
           return m_pred_default;
         }
-        
+
         /** @brief Commmit last decision
          *
          * Enforce that the currently identified state for this timeline will
@@ -189,7 +189,7 @@ namespace TREX {
          * @sa internal() const
          */
         bool external() const;
-        
+
         /** @brief Dispatch exisiting plan
          *
          * @param[in] lb A tick
@@ -205,11 +205,12 @@ namespace TREX {
          * are guarded by uncontrolable conditions.
          */
         void do_dispatch(EUROPA::eint lb, EUROPA::eint ub);
-        
+
+        bool dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub);
         EUROPA::TokenId getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub);
         EUROPA::TokenId searchGoal(EUROPA::TokenSet actions);
         EUROPA::TokenSet getAllTokens(const EUROPA::TokenId& token);
-        
+
         /** @brief Current state decision point
          *
          * This class implements the heuristic to resolve the current state of
@@ -234,7 +235,7 @@ namespace TREX {
                         EUROPA::LabelStr const &explanation = "synchronization");
           /** @brief Destructor */
           ~DecisionPoint() {}
-          
+
           /** @brief string display
            *
            * @return A string describing this decision point
@@ -246,7 +247,7 @@ namespace TREX {
            * @sa toString() const
            */
           std::string toShortString() const;
-          
+
           /** @brief Check for entity
            *
            * @param[in] entity A europa entity
@@ -257,7 +258,7 @@ namespace TREX {
            * @retval false otherwise
            */
           static bool customStaticMatch(EUROPA::EntityId const &entity);
-          
+
         private:
           /** @brief Decision choices
            *
@@ -265,7 +266,7 @@ namespace TREX {
            * for this decision point.
            */
           typedef std::bitset<4> choices;
-          
+
           /** @brief High level choices types
            *
            * This enum gives all the possible high level choices to resolve a
@@ -298,17 +299,17 @@ namespace TREX {
              */
             CREATE_OTHER =3
           }; // TREX::europa::details::CurrentState::DecisionPoint::Choice
-          
+
           choices m_choices;
           size_t  m_prev_idx, m_idx;
-          
+
           /** @brief Initialization
            *
            * Initialize the decision point by identifyin all the choices that are
            * relevant for the current flaw.
            */
           void handleInitialize();
-          
+
           /** @brief Check for remaining choices
            *
            * @retval true if there's a possible decision left
@@ -323,7 +324,7 @@ namespace TREX {
            * @throw EuropaExcetionnoo decision choice available
            */
           void handleExecute();
-          
+
           /** @brief Check if last decision can be undone
            *
            * @pre A decision has been executed and not undone for this instance
@@ -341,12 +342,12 @@ namespace TREX {
            * @pre hasNext() is true
            */
           void advance();
-          
+
           EUROPA::Id<CurrentState> m_target;
           std::list<EUROPA::TokenId>::const_iterator m_cand_from, m_tok, m_cand_to;
           std::set<EUROPA::LabelStr>::const_iterator m_next_pred;
         }; // TREX::europa::details::CurrentState::DecisionPoint
-        
+
       private:
         /** @brief Constructor
          * @param[in] assembly The creator Assembly
@@ -355,7 +356,7 @@ namespace TREX {
          * Create a new instance associated to @p timeline
          */
         CurrentState(Assembly &assembly, EUROPA::TimelineId const &timeline);
-        
+
         /** @brief push end time
          *
          * Apply a constraint that enforces that the end time of the current
@@ -371,7 +372,7 @@ namespace TREX {
          * @sa push_end()
          */
         void relax_end();
-        
+
         /** @brief New observation
          *
          * @param[in] pred A predicate name
@@ -403,7 +404,7 @@ namespace TREX {
          * Destroy the current observation and replace it by the previous one.
          */
         void relax_token();
-        
+
         /** @brief Check if committed
          *
          * Check if the current observation is properly committed or not. This
@@ -414,7 +415,7 @@ namespace TREX {
          * @retval false otherwise
          */
         bool check_committed() const;
-        
+
         /** @brief Erased token notification
          *
          * @param[in] token A token
@@ -448,22 +449,22 @@ namespace TREX {
          * @sa replaced(EUROPA::TokenId const &)
          */
         static void apply_base(EUROPA::TokenId &merged);
-        
+
         Assembly          &m_assembly;
         EUROPA::DbClientId m_client;
         EUROPA::TimelineId m_timeline;
         id_type            m_id;
-        
+
         EUROPA::LabelStr           m_pred_default;
         std::set<EUROPA::LabelStr> m_pred_names;
-        
+
         EUROPA::TokenId       m_last_obs, m_prev_obs;
         EUROPA::ConstraintId  m_constraint;
-        
+
         friend class TREX::europa::Assembly;
         friend class DecisionPoint;
       }; // TREX::europa::details::CurrentState
-      
+
       /** @brief Current state flaw handler finder
        *
        * This class is used internally by europa to associate CurrentState
@@ -479,7 +480,7 @@ namespace TREX {
                         EUROPA::EntityId const &entity,
                         std::vector<EUROPA::SOLVERS::MatchingRuleId> &result);
       }; // TREX::europa::details::UpdateMatchFinder
-      
+
     } // TREX::europa::details
   } // TREX::europa
 } // TREX
