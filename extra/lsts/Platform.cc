@@ -65,9 +65,9 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                        				TeleoReactor(arg, false), m_on(
-                        						parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(
-                        								true)
+                        						TeleoReactor(arg, false), m_on(
+                        								parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(
+                        										true)
 {
 
 	m_env->setPlatformReactor(this);
@@ -94,11 +94,10 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
 	provide("estate", false); 		// declare the state command timeline
 	provide("vstate", false); 		// declare the state command timeline
-	provide("command"); 	// declare the command timeline
+	provide("command"); 			// declare the command timeline
 	provide("oplimits", false); 	// declare the oplimits timeline
-	// provide("control");
 	provide("maneuver", false);
-	provide("supervision", false); // declare the trex command timeline
+	provide("supervision", false); 		// declare the trex command timeline
 
 	IMC::CacheControl m;
 	m.op = IMC::CacheControl::COP_LOAD;
@@ -392,8 +391,15 @@ Platform::processState()
 		case IMC::VehicleState::VS_EXTERNAL:
 			mode = "Boot";
 			break;
+		case IMC::VehicleState::VS_ERROR:
+			mode = "Error";
+			break;
 		default:
-			mode = "Boot";
+			std::ostringstream ss;
+			ss << "Unknown vehicle mode: " << msg->op_mode;
+			reportToDune(ss.str());
+			syslog("WARN") << ss.str();
+			mode = "undefined";
 			break;
 		}
 		if (last_vstate != msg->op_mode)
@@ -519,9 +525,6 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
 		msg.serialize(bb);
 		send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
 				Address(ip.c_str()), port);
-
-		//if (debug)
-			//msg.toText(std::cerr);
 	}
 	catch (std::runtime_error& e)
 	{
@@ -536,8 +539,6 @@ Platform::sendMsg(Message& msg)
 {
 	return sendMsg(msg, duneip, duneport);
 }
-
-
 
 bool Platform::commandManeuver(IMC::Message * maneuver) {
 	IMC::PlanControl pcontrol;// = new IMC::PlanControl;
@@ -559,7 +560,8 @@ bool Platform::reportToDune(const std::string &message)
 	IMC::LogBookEntry entry;
 	entry.text = message;
 	entry.context = "Autonomy.TREX";
-	sendMsg(entry);
+	entry.htime = Time::Clock::getSinceEpoch();
+	return sendMsg(entry);
 }
 
 bool

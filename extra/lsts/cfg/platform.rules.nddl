@@ -3,18 +3,18 @@
 #include "navigator.nddl"
 #include "estimator.nddl"
 
-EstimatedState::Position {
-	duration == 1;
-}
+//EstimatedState::Position {
+//	duration == 1;
+//}
 
 VehicleState::Boot {
 	contained_by(VehicleCommand.Idle);
-	meets(VehicleState.Ready);
+	//meets(VehicleState.Ready);
 }
 
 VehicleState::Exec {
 	contains(VehicleCommand.Maneuver);
-	meets(VehicleState.Ready);
+	met_by(VehicleState.Ready);
 }
 
 VehicleCommand::Maneuver {
