@@ -87,26 +87,48 @@ bool ControlInterface::is_open() const {
 
 // manipulators
 
-void ControlInterface::add_goal(goal_id const &g) {
+void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> const &id) {
   {
-    scoped_lock cs;
-    m_pending_goals.push_back(g);
+    scoped_lock cs(m_mutex);
+    m_pending_goals.insert(g);
+    if( id && !id->empty() ) {
+      goal_map::iterator pos;
+      bool inserted;
+      
+      boost::tie(pos, inserted) = m_goals.insert(goal_map::value_type(*id, g));
+      if( !inserted ) {
+        syslog("WARN")<<"Hiding previous goal with id \""<<*id<<'\"';
+        m_goals.erase(pos);  
+        m_goals.insert(goal_map::value_type(*id, g));
+      }
+    }
   }
   syslog()<<"Goal ["<<g<<"] added to pending queue :\n\t"<<*g;
 }
 
-
-bool ControlInterface::next_goal(goal_id &g) {
+void ControlInterface::add_recall(std::string const &id) {
   scoped_lock cs(m_mutex);
-  if( m_pending_goals.empty() )
+  goal_map::left_iterator i = m_goals.left.find(id);
+  if( m_goals.left.end()!=i ) {
+    goal_id g = i->second;
+    m_goals.left.erase(i);
+    if( 0==m_pending_goals.erase(g) )
+      m_pending_recalls.insert(g);
+  } else 
+    syslog("WARN")<<"No goal to recall with id \""<<id<<'\"';
+}
+
+bool ControlInterface::next(std::set<goal_id> &l, goal_id &g) {
+  scoped_lock cs(m_mutex);
+  std::set<goal_id>::iterator i=l.begin(); 
+  if( l.end()==i )
     return false;
   else {
-    g = m_pending_goals.front();
-    m_pending_goals.pop_front();
+    g = *i;
+    l.erase(i);
     return true;
   }
 }
-
 
 std::string ControlInterface::log_message(std::string const &content) {
   std::ostringstream name;
@@ -226,20 +248,30 @@ void ControlInterface::proccess_message(std::string const &msg) {
   
   // Load all the <Goal>
   boost::property_tree::ptree::assoc_iterator i, last;
+  bool had_cmd = false;
   
   boost::tie(i,last) = xml_tree.equal_range("Goal");
-  if( last==i ) 
-    syslog("WARN")<<"No <Goal> in "<<msg_id;
-  else {
-    for( ; last!=i; ++i) {
-      try {
-        goal_id tmp = parse_goal(*i);
-        add_goal(tmp);
-      } catch(TREX::utils::Exception const &e) {
-        syslog("INFO")<<"Exception while building new goal: "<<e; 
-      }
+  for( ; last!=i; ++i) {
+    try {
+      goal_id tmp = parse_goal(*i);
+      add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
+      had_cmd = true;
+    } catch(TREX::utils::Exception const &e) {
+      syslog("WARN")<<"Exception while building new goal: "<<e; 
     }
   }
+  
+  boost::tie(i, last) = xml_tree.equal_range("Recall");
+  for( ; last!=i; ++i) {
+    try {
+      add_recall(TREX::utils::parse_attr<std::string>(*i, "id"));
+      had_cmd = true;
+    } catch(TREX::utils::Exception const &e) {
+      syslog("WARN")<<"Exception while building recall: "<<e; 
+    }
+  }
+  if( !had_cmd )
+    syslog("WARN")<<"No valid Goal or Recall found.";
 }
 
 void ControlInterface::stop() {
@@ -260,8 +292,13 @@ void ControlInterface::handleInit() {
 void ControlInterface::handleTickStart() {
   goal_id g;
   
+  // get pending recalls
+  while( next(m_pending_recalls, g) ) {
+    postRecall(g);
+  }
+
   // get pending goals
-  while( next_goal(g) ) {
+  while( next(m_pending_goals, g) ) {
     // First attempt to subscribe to the timeline
     if( !isExternal(g->object()) )
       use(g->object());

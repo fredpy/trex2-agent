@@ -6,6 +6,10 @@
 # include <boost/thread.hpp>
 # include <boost/thread/recursive_mutex.hpp>
 
+# include <boost/bimap.hpp>
+
+# include <set>
+
 namespace TREX {
   namespace LSTS {
     
@@ -136,19 +140,13 @@ namespace TREX {
        *
        * @post the pending goal queue is not empty
        */
-      void add_goal(TREX::transaction::goal_id const &g);
-      /** @brief Get next pending goal
-       *
-       * @param[out] g A goal placeholder
-       *
-       * Gets the next goal in the pending goal queue (if any) 
-       * and copy it to @p g
-       *
-       * @retval true if the queue was not empty and @p g was 
-       *   updated
-       * @retval false otherwise
-       */  
-      bool next_goal(TREX::transaction::goal_id &g);
+      void add_goal(TREX::transaction::goal_id const &g,
+                    boost::optional<std::string> const &id);
+      void add_recall(std::string const &id);
+
+      bool next(std::set<TREX::transaction::goal_id> &l,
+                TREX::transaction::goal_id &g);
+
       
       /** @brief Thead listening execution loop
        *
@@ -202,7 +200,11 @@ namespace TREX {
       
       
       bool m_running;
-      std::list<TREX::transaction::goal_id> m_pending_goals;
+      std::set<TREX::transaction::goal_id> m_pending_goals,
+        m_pending_recalls;
+      
+      typedef boost::bimap<std::string, TREX::transaction::goal_id> goal_map; 
+      goal_map m_goals;
       
       /** @brief fifo pipe file descriptor
        *
@@ -213,6 +215,8 @@ namespace TREX {
       
       std::string log_message(std::string const &content);
       static TREX::utils::SharedVar<size_t> s_id;
+      
+      // TODO : put a bimap to associate goals to their id
 
     }; // TREX::LSTS::ControlInterface
     
