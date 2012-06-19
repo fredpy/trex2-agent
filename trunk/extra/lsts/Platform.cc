@@ -57,7 +57,7 @@ std::map<uint16_t, IMC::Message *> received;
 std::map<uint16_t, IMC::Message *> aggregate;
 //std::map<uint8_t, IMC::EntityState> entityStates;
 IMC::VehicleCommand lastCommand;
-bool estate_posted = false, oplimits_posted = false, was_idle = false;
+bool estate_posted = false, oplimits_posted = false, was_idle = false, supervision_posted = false;
 int last_vstate = -1;
 int remote_id = 0;
 
@@ -70,6 +70,8 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
                         								true)
 {
 
+	m_env->setPlatformReactor(this);
+
 	duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
 			"duneport");
 
@@ -78,7 +80,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
 	debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "debug");
 
-	std::cout << "Connecting to dune on " << duneip << ":" << duneport << "\n";
+	syslog("LSTS") << "Connecting to dune on " << duneip << ":" << duneport;
 
 	// start listening for dune in a new thread
 	localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
@@ -88,7 +90,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 	receive.bind(localport, Address::Any, true);
 	receive.addToPoll(iom);
 
-	std::cout << "listening on port " << localport << "...\n";
+	syslog("LSTS") << "listening on port " << localport << "...";
 
 	provide("estate", false); 		// declare the state command timeline
 	provide("vstate", false); 		// declare the state command timeline
@@ -147,15 +149,14 @@ Platform::synchronize()
 				if (cmd->type == IMC::VehicleCommand::VC_REQUEST)
 				{
 					lastCommand = *cmd;
-					if (!cmd->maneuver.isNull())
-						cmd->maneuver->toText(std::cout);
+					//if (!cmd->maneuver.isNull())
+					//	cmd->maneuver->toText(std::cout);
 				}
 			}
 
 			if (msg->getId() == IMC::TrexCommand::getIdStatic())
 			{
 				IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
-
 
 				switch (command->command)
 				{
@@ -194,6 +195,11 @@ Platform::synchronize()
 			aggregate[it->first] = it->second;
 
 		processState();
+
+		if (!supervision_posted) {
+			postObservation(Observation("supervision", "Active"));
+			supervision_posted = true;
+		}
 
 		// send an heartbeat to Dune
 		IMC::Heartbeat hb;
@@ -495,7 +501,7 @@ Platform::sendMsg(Message& msg, Address &dest)
 	}
 	catch (std::runtime_error& e)
 	{
-		std::cerr << "ERROR: " << e.what() << std::endl;
+		syslog("LSTS") << "ERROR: " << e.what();
 		return false;
 	}
 	return true;
@@ -514,12 +520,12 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
 		send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
 				Address(ip.c_str()), port);
 
-		if (debug)
-			msg.toText(std::cerr);
+		//if (debug)
+			//msg.toText(std::cerr);
 	}
 	catch (std::runtime_error& e)
 	{
-		std::cerr << "ERROR: " << e.what() << std::endl;
+		syslog("LSTS") << "ERROR: " << e.what();
 		return false;
 	}
 	return true;
@@ -548,6 +554,13 @@ bool Platform::commandManeuver(IMC::Message * maneuver) {
 	return sendMsg(pcontrol);
 }
 
+bool Platform::reportToDune(const std::string &message)
+{
+	IMC::LogBookEntry entry;
+	entry.text = message;
+	entry.context = "Autonomy.TREX";
+	sendMsg(entry);
+}
 
 bool
 Platform::commandGoto(double lat, double lon, double depth, double speed)

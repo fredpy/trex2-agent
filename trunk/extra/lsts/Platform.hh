@@ -11,6 +11,8 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <Dune/Dune.hpp>
 # include <extra/lsts/ControlInterface.hh>
+# include "SharedEnvironment.hh"
+
 using DUNE_NAMESPACES;
 
 
@@ -49,6 +51,7 @@ public:
 	~Platform();
 
 	static void setControlInterface(TREX::LSTS::ControlInterface * itf);
+	bool reportToDune(const std::string &message);
 private:
 	bool synchronize();
 	void handleRequest(TREX::transaction::goal_id const &g);
@@ -57,6 +60,7 @@ private:
 	bool sendMsg(Message& msg, Address &dest);
 	bool sendMsg(Message& msg);
 	bool commandManeuver(IMC::Message * maneuver);
+
 	bool commandGoto(double lat, double lon, double depth, double speed);
 	bool commandLoiter(double lat, double lon, double depth, double radius, double speed, int seconds);
 	bool commandStationKeeping(double lat, double lon, double speed, int seconds);
@@ -69,6 +73,8 @@ private:
 	TREX::transaction::Observation estate(IMC::EstimatedState &msg);
 	TREX::transaction::Observation vstate(IMC::VehicleState &msg);
 	TREX::transaction::Observation mstate(IMC::ManeuverControlState &msg);
+	TREX::utils::SingletonUse<SharedEnvironment> m_env;
+
 
 	static ControlInterface * controlInterfaceInstance;
 
