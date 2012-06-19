@@ -104,6 +104,7 @@ if(WITH_EUROPA)
     extensions/Trigonometry.cc
     extensions/Numeric.cc
     extensions/DoNotMatchFilter.cc
+    extensions/Bind.cc
     # headers
     EuropaReactor.hh
     EuropaEntity.hh
@@ -112,6 +113,7 @@ if(WITH_EUROPA)
     extensions/Trigonometry.hh
     extensions/Numeric.hh
     extensions/DoNotMatchFilter.hh
+    extensions/Bind.hh
   )
 
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
