@@ -1,0 +1,51 @@
+#include "navigator.nddl"
+#include "estimator.nddl"
+
+class VolumeController extends AgentTimeline {
+    predicate Idle {}
+    
+    predicate Going {
+	float lat, lon;
+	float depth;
+    }
+    
+    VolumeController() {
+	super(Internal, "Idle");
+    }
+}
+
+VolumeController::Going {
+    
+    met_by(Navigator.Idle idle);
+    if( AGENT_CLOCK >= idle.start ) {
+	meets(Estimator.At waypoint);
+	waypoint.lat_deg == lat;
+	waypoint.lon_deg == lon;
+	waypoint.depth == depth; 
+    }
+
+}
+
+Navigator::Idle {
+    contained_by(VolumeController.Idle);
+}
+
+VolumeController volume = new VolumeController();
+Navigator navigator = new Navigator(Observe);
+Estimator estimator = new  Estimator(External);
+
+close();
+
+rejectable(volume.Going go1);
+go1.lat.specify(41.185279);
+go1.lon.specify(-8.705758);
+go1.depth.specify(2);
+
+rejectable(volume.Going go2);
+go2.lat.specify(41.185379);
+go2.lon.specify(-8.705758);
+go2.depth.specify(0);
+
+go2 after go1;
+
+
