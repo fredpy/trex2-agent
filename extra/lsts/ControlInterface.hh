@@ -10,6 +10,8 @@
 
 # include <set>
 
+# include "SharedEnvironment.hh"
+
 namespace TREX {
   namespace LSTS {
     
@@ -131,6 +133,8 @@ namespace TREX {
       void handleInit();
       void handleTickStart();
       bool synchronize();
+      void newPlanToken(TREX::transaction::goal_id const &t);
+      void cancelledPlanToken(TREX::transaction::goal_id const &t);
       
       /** @brief Add a goal
        *
@@ -213,6 +217,11 @@ namespace TREX {
        */
       int m_fifo;
       
+      /**
+       * @brief pointer to singleton class
+       */
+      TREX::utils::SingletonUse<SharedEnvironment> m_env;
+
       std::string log_message(std::string const &content);
       static TREX::utils::SharedVar<size_t> s_id;
       
