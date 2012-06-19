@@ -1,8 +1,12 @@
 #include "navigator.nddl"
 #include "estimator.nddl"
+#include "platform.nddl"
 
 class VolumeController extends AgentTimeline {
-    predicate Idle {}
+    predicate Idle {
+	float lat, lon;
+	float depth;
+    }
     
     predicate Going {
 	float lat, lon;
@@ -10,29 +14,49 @@ class VolumeController extends AgentTimeline {
     }
     
     VolumeController() {
-	super(Internal, "Idle");
+	super(Internal);
     }
 }
 
 VolumeController::Going {
-    
     met_by(Navigator.Idle idle);
+    starts_during(OperationalLimits.Limits limits);
+    float cmd_depth;
+    cmd_depth <= limits.maxDepth;
+    cmd_depth >= limits.minDepth;
+    
     if( AGENT_CLOCK >= idle.start ) {
+	bind(cmd_depth, depth); // sslect closest valid depth
 	meets(Estimator.At waypoint);
 	waypoint.lat_deg == lat;
 	waypoint.lon_deg == lon;
-	waypoint.depth == depth; 
+	waypoint.depth == cmd_depth;
     }
 
 }
 
+VolumeController::Idle {
+    starts(EstimatedState.Position vpos);
+    vpos.latitude == to_rad(lat);
+    vpos.longitude == to_rad(lon);
+    vpos.depth == depth;
+}
+
 Navigator::Idle {
-    contained_by(VolumeController.Idle);
+    ends(VolumeController.Idle);
+}
+
+EstimatedState::Boot {
+    contained_by(VolumeController.undefined boot);
+    boot.end == end;
 }
 
 VolumeController volume = new VolumeController();
+
 Navigator navigator = new Navigator(Observe);
 Estimator estimator = new  Estimator(External);
+OperationalLimits oplimits = new OperationalLimits(Observe);
+EstimatedState estate = new EstimatedState(Observe);
 
 close();
 
