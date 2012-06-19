@@ -39,6 +39,7 @@
 #include "Trigonometry.hh"
 #include "Numeric.hh"
 #include "DoNotMatchFilter.hh"
+#include "Bind.hh"
 
 
 namespace TREX {
@@ -129,6 +130,7 @@ namespace {
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CeilConstraint, ceilf, Default);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::FloorConstraint, floorf, Default);
+	TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::Bind, bind, trex);
         
         declareFunction(assembly, new TREX::europa::SineConstraintFunction());
         declareFunction(assembly, new TREX::europa::CosineConstraintFunction());
