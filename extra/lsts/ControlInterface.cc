@@ -139,7 +139,7 @@ std::string ControlInterface::log_message(std::string const &content) {
     name<<(++(*s_id))<<".rcvd";
   }
   // Log the message
-  std::string full_name = manager().file_name(name.str()).string();
+  std::string full_name = file_name(name.str()).string();
   std::ofstream out(full_name.c_str(), std::ofstream::binary);
   out.write(content.c_str(), content.length());
   return name.str();
@@ -301,7 +301,7 @@ void ControlInterface::handleTickStart() {
   while( next(m_pending_goals, g) ) {
     // First attempt to subscribe to the timeline
     if( !isExternal(g->object()) )
-      use(g->object());
+      use(g->object(), true);
     if( isExternal(g->object()) )
       postGoal(g);
     else 

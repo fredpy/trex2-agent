@@ -171,8 +171,8 @@ bool Assembly::actions_supported() {
 
 Assembly::Assembly(std::string const &name)
   :m_in_synchronization(false), m_name(name) {
-  //  redirect log output to <name>.europa.log
-  m_trex_schema->setStream(m_debug, m_name+".europa.log");
+  //  redirect log output to <name>/europa.log
+  m_trex_schema->setStream(m_debug, m_name+"/europa.log");
 
   // load the differrent europa modules we need
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
