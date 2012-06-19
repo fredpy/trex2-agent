@@ -8,9 +8,9 @@ namespace TREX {
   
     /** @brief dune posix clock
      *
-     * The interface to dune implementation of the posix clock. This interface
-     * respect the boost::chrono definition allowing user to define their own 
-     * rt_clock for TREX
+     * The interface to dune implementation of the posix clock. 
+     * This interface respect the boost::chrono definition 
+     * allowing user to define their own rt_clock for TREX
      *
      * @sa TREX::agent::rt_clock
      * @sa dune_steady_clock
@@ -36,15 +36,17 @@ namespace TREX {
       typedef duration::period           period;
       /** @brief Clock time point
        *
-       * The type to represent a time point (or date) for this clock.
+       * The type to represent a time point (or date) for this
+       * clock.
        */
       typedef boost::chrono::time_point<dune_posix_clock> time_point;
 
       /** @brief Steadyness flag
        *
-       * The flag that indicate if this clock is steady or not. A non steady 
-       * clock do not guarantee that all the timepoints will be ordered (for 
-       * example when the clock time is reset to an anterior date).  
+       * The flag that indicate if this clock is steady or not. 
+       * A non steady clock do not guarantee that all the 
+       * timepoints will be ordered (for example when the clock 
+       * time is reset to an anterior date).  
        */
       static const bool is_steady = false;
       
@@ -58,10 +60,11 @@ namespace TREX {
     
     /** @brief TREX dune posix clock
      *
-     * The default TREX implemenation for the dune posix clock. The period of 
-     * this clock is set to 1000Hz to allow some flexibility on the duration of 
-     * a tick while not using to much precision (There's no need to run TREX at 
-     * a tick rate higher than 1000Hz  
+     * The default TREX implemenation for the dune posix clock. 
+     * The period of this clock is set to 1000Hz to allow some 
+     * flexibility on the duration of a tick while not using to 
+     * much precision (There's no need to run TREX at a tick rate
+     * higher than 1000Hz  
      *
      * @relates dune_posix_clock
      * @sa steady_clock
@@ -70,9 +73,9 @@ namespace TREX {
 
     /** @brief dune steady clock
      *
-     * The interface to dune implementation of the steady clock. This interface
-     * respect the boost::chrono definition allowing user to define their own 
-     * rt_clock for TREX
+     * The interface to dune implementation of the steady clock. 
+     * This interface respect the boost::chrono definition allowing 
+     * user to define their own rt_clock for TREX
      *
      * @sa TREX::agent::rt_clock
      * @sa dune_posix_clock
@@ -104,9 +107,10 @@ namespace TREX {
 
       /** @brief Steadyness flag
        *
-       * The flag that indicate if this clock is steady or not. A non steady 
-       * clock do not guarantee that all the timepoints will be ordered (for 
-       * example when the clock time is reset to an anterior date).  
+       * The flag that indicate if this clock is steady or not. 
+       * A non steady clock do not guarantee that all the 
+       * timepoints will be ordered (for example when the clock
+       * time is reset to an anterior date).  
        */
       static const bool is_steady = true;
       
@@ -120,10 +124,11 @@ namespace TREX {
 
     /** @brief TREX dune steady clock
      *
-     * The default TREX implemenation for the dune steady clock. The period of 
-     * this clock is set to 1000Hz to allow some flexibility on the duration of 
-     * a tick while not using to much precision (There's no need to run TREX at 
-     * a tick rate higher than 1000Hz  
+     * The default TREX implemenation for the dune steady clock. 
+     * The period of this clock is set to 1000Hz to allow some 
+     * flexibility on the duration of a tick while not using to 
+     * much precision (There's no need to run TREX at a tick rate
+     * higher than 1000Hz  
      *
      * @relates dune_steady_clock
      * @sa posix_clock
