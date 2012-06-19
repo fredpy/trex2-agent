@@ -190,7 +190,7 @@ Assembly::Assembly(std::string const &name)
   m_schema = ((EUROPA::Schema *)getComponent("Schema"))->getId();
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
   m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
-    
+
 
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
@@ -199,7 +199,7 @@ Assembly::Assembly(std::string const &name)
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
-  
+
   m_synchListener.reset(new synchronization_listener(*this));
   m_ce_listener.reset(new ce_listener(*this));
   m_proxy.reset(new listener_proxy(*this));
@@ -390,11 +390,11 @@ void Assembly::notify(details::CurrentState const &state) {
 
 bool Assembly::do_synchronize() {
   m_in_synchronization = true;
-  
+
   BOOST_SCOPE_EXIT((&m_in_synchronization)) {
     m_in_synchronization = false;
   } BOOST_SCOPE_EXIT_END
-  
+
   // 1) apply external observations
   for(external_iterator i=begin_external(); end_external()!=i; ++i) {
     if( !(*i)->commit() ) {
@@ -434,12 +434,12 @@ bool Assembly::relax(bool aggressive) {
   synchronizer()->reset();
   planner()->reset();
 
-  // Use m_iter for robust iteration 
+  // Use m_iter for robust iteration
   m_iter = m_roots.begin();
-  
+
   while( m_roots.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    
+
     if( tok->end()->baseDomain().getUpperBound()<=now() ) {
       if( tok->isFact() ) {
         if( aggressive ) {
@@ -458,7 +458,7 @@ bool Assembly::relax(bool aggressive) {
       if( !( tok->isInactive() || tok->isFact() ) )
         cli->cancel(tok);
     }
-    
+
   }
 
   return constraint_engine()->propagate();
@@ -469,12 +469,12 @@ void Assembly::archive() {
 
 # ifdef EUROPA_HAVE_EFFECT
   /*
-   * As of now Greedy works badly with actions on 2.6. It is not really able to 
+   * As of now Greedy works badly with actions on 2.6. It is not really able to
    * get rid of them when they are not part of an Internal or External timeline
    * What is needed is to annalyze for efficeintly for each action :
    *
-   * If all the conditions are committed and all the effects completed then the 
-   * action is completed ... but how do we consider relations that are not 
+   * If all the conditions are committed and all the effects completed then the
+   * action is completed ... but how do we consider relations that are not
    * conditions or actions ?
    */
 #  warning "Greedy plan archiving is not efficient with action tokens."
@@ -482,16 +482,16 @@ void Assembly::archive() {
   EUROPA::DbClientId cli = plan_db()->getClient();
   is_not_merged test(true);
   size_t deleted = 0;
-  
-  debugMsg("trex:archive", 
+
+  debugMsg("trex:archive",
 	   '['<<now()<<"] ============= START archiving ============");
-  
+
   // Use m_iter for robust iteration through m_completed
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    
+
     if( tok->canBeCommitted() ) {
       debugMsg("trex:archive", "Committing "<<tok->toString());
       tok->commit();
@@ -510,7 +510,7 @@ void Assembly::archive() {
         details::restrict_bases(active, tok);
         if( tok->isFact() )
           active->makeFact();
-        if( active->canBeCommitted() ) 
+        if( active->canBeCommitted() )
           active->commit();
         cli->cancel(tok);
         tok->discard();
@@ -527,7 +527,7 @@ void Assembly::archive() {
     bool can_delete = true;
     // Check merged tokens
     EUROPA::TokenSet merged_t = tok->getMergedTokens();
-    
+
     for(EUROPA::TokenSet::const_iterator t=merged_t.begin();
         merged_t.end()!=t; ++t) {
       EUROPA::TokenId master = (*t)->master();
@@ -545,7 +545,7 @@ void Assembly::archive() {
           if( can_delete ) {
             debugMsg("trex:archive", "Cannot archive "<<tok->toString()
                      <<" as one merged token "<<(*t)->toString()
-                     <<" has a master which is not committed."); 
+                     <<" has a master which is not committed.");
             can_delete = false;
           }
         }
@@ -569,7 +569,7 @@ void Assembly::archive() {
         }
       }
     }
-    // Check slaves 
+    // Check slaves
     EUROPA::TokenSet slaves_t = tok->slaves();
     for(EUROPA::TokenSet::const_iterator s=slaves_t.begin();
         slaves_t.end()!=s; ++s) {
@@ -582,7 +582,7 @@ void Assembly::archive() {
                      <<" ends in the future.");
             can_delete = false;
           }
-        } 
+        }
       } else {
         bool ended;
         if( (*s)->isActive() ) {
@@ -601,7 +601,7 @@ void Assembly::archive() {
         } else {
           details::restrict_bases(*s);
           ended = (*s)->end()->baseDomain().getUpperBound()<=now();
-          
+
           if( can_delete ) {
             debugMsg("trex:archive", "Cannot archive "<<tok->toString()
                      <<" as one of its slave "<<(*s)->toString()
@@ -617,7 +617,7 @@ void Assembly::archive() {
             (*s)->commit();
             (*s)->removeMaster(tok);
           } else {
-            m_completed.insert(*s); 
+            m_completed.insert(*s);
             can_delete = false;
           }
         }
@@ -629,15 +629,15 @@ void Assembly::archive() {
       ++deleted;
     }
   }
-  
-  
+
+
   debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
-  debugMsg("trex:archive", 
+  debugMsg("trex:archive",
 	   '['<<now()<<"] ============= END archiving ============");
 
-#else // TREX_ARCHIVE_EuropaDefault  
+#else // TREX_ARCHIVE_EuropaDefault
 
-  // Just rely on the europa archival : safe but inefficient 
+  // Just rely on the europa archival : safe but inefficient
   plan_db()->archive(now()-1);
 
 #endif
@@ -722,7 +722,7 @@ bool Assembly::is_predicate(EUROPA::TokenId const &tok) const {
   return tok->hasAttributes(EUROPA::PSTokenType::PREDICATE);
 #else
   return true;
-#endif  
+#endif
 }
 
 
@@ -731,7 +731,7 @@ bool Assembly::is_condition(EUROPA::TokenId const &tok) const {
   return tok->hasAttributes(EUROPA::PSTokenType::CONDITION);
 #else
   return false;
-#endif  
+#endif
 }
 
 bool Assembly::is_effect(EUROPA::TokenId const &tok) const {
@@ -739,7 +739,7 @@ bool Assembly::is_effect(EUROPA::TokenId const &tok) const {
   return tok->hasAttributes(EUROPA::PSTokenType::EFFECT);
 #else
   return false;
-#endif    
+#endif
 }
 
 
@@ -841,7 +841,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<"ACTION";
     else if( is_predicate(*it) )
       out<<"PREDICATE";
-    else 
+    else
       out<<"???";
     out<<"\\n";
 #endif // EUROPA_HAVE_EFFECT
@@ -964,7 +964,7 @@ void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId co
       EUROPA::ConstraintId cstr = *c;
       std::vector<EUROPA::ConstrainedVariableId> const &scope = cstr->getScope();
       size_t i, end_i = scope.size();
-      
+
       out<<"\t+ "<<cstr->getName().toString()<<'(';
       for(i=0; i<end_i; ++i) {
         if( i>0 )
@@ -979,21 +979,21 @@ void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId co
 }
 
 /*
- * class TREX::europa::Assembly::ce_listener 
+ * class TREX::europa::Assembly::ce_listener
  */
 
-Assembly::ce_listener::ce_listener(Assembly &owner) 
+Assembly::ce_listener::ce_listener(Assembly &owner)
 :EUROPA::ConstraintEngineListener(owner.m_cstr_engine), m_owner(owner) {}
 
 void Assembly::ce_listener::notifyPropagationPreempted() {
   if( m_owner.m_in_synchronization ) {
     debugMsg("trex:always", "["<<m_owner.now()<<"] search preempted during synchronization");
-    
+
     if( !m_empty_vars.empty() ) {
       debugMsg("trex:always", "======================================================================");
       debugMsg("trex:always", "["<<m_owner.now()<<"] "<<m_empty_vars.size()<<" variables are empty:");
       for(EUROPA::ConstrainedVariableSet::const_iterator v=m_empty_vars.begin(); m_empty_vars.end()!=v; ++v) {
-        std::ostringstream oss; 
+        std::ostringstream oss;
         m_owner.print_context(oss, *v);
         debugMsg("trex:always", oss.str()<<"\n");
       }
@@ -1032,13 +1032,13 @@ void Assembly::synchronization_listener::notifyUndone(EUROPA::SOLVERS::DecisionP
 
 void Assembly::synchronization_listener::notifyRetractSucceeded(EUROPA::SOLVERS::DecisionPointId& dp) {
   m_progress = true;
-  debugMsg("trex:always", "["<<m_owner.now()<<"] Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+  debugMsg("trex:always", "["<<m_owner.now()<<"] Backtrack completed (depth="<<m_owner.synchronizer()->getDepth()<<")");
 }
 
 void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::DecisionPointId& dp) {
   if( m_progress ) {
     m_progress = false;
-    debugMsg("trex:always", "["<<m_owner.now()<<"] start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")"); 
+    debugMsg("trex:always", "["<<m_owner.now()<<"] start to backtrack (depth="<<m_owner.synchronizer()->getDepth()<<")");
     m_owner.backtracking(dp);
   }
 }
@@ -1071,17 +1071,55 @@ void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
   }
 }
 
-void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token) {}
+void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token)
+{
+    // Check if the token is a goal and add it to m_goals
+    if(m_owner.is_goal(token)) {
+        m_owner.m_goals.insert(token);
+        // Checking for goal->effect->action relation if it is then the action
+        // becomes an action goal in the m_goals
+        if(m_owner.actionEffect(token))
+            m_owner.m_goals.insert(token->master());
+    }
+}
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
+  // Checks and erases the token if it was considered a goal
+  m_owner.m_goals.erase(token);
+
   if( m_owner.is_agent_timeline(token) )
     m_owner.cancel(token);
 }
 
-void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {}
+void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token)
+{
+    // Check to find if the tokens active token is in m_goal
+    // If it is it gets added to m_goals
+    if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())
+    {
+        m_owner.m_goals.insert(token);
+        // Checking for goal->effect->action relation if it is then the action
+        // becomes an action goal in the m_goals
+        if(m_owner.actionEffect(token))
+            m_owner.m_goals.insert(token->master());
+    }
+    // Check if the token is a goal and adds it to m_goals
+    // Also insert the active token as that is the token we most often check against
+    else if(m_owner.is_goal(token)) {
+        m_owner.m_goals.insert(token);
+        m_owner.m_goals.insert(token->getActiveToken());
+        // Checking for goal->effect->action relation if it is then the action
+        // becomes an action goal in the m_goals
+        if(m_owner.actionEffect(token))
+            m_owner.m_goals.insert(token->master());
+        if(m_owner.actionEffect(token->getActiveToken()))
+            m_owner.m_goals.insert(token->getActiveToken()->master());
+    }
+}
 
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
-
+    // Checks and erases the token if it was considered a goal
+    m_owner.m_goals.erase(token);
 }
 
 void Assembly::listener_proxy::notifyRejected(EUROPA::TokenId const &token) {
@@ -1101,6 +1139,17 @@ void Assembly::listener_proxy::notifyTerminated(EUROPA::TokenId const &token) {
 
 }
 
+//Listener_proxy helper functions
+bool Assembly::actionEffect(const EUROPA::TokenId& token)
+{
+    EUROPA::TokenId master = token->master();
+    if(master.isId())
+    {
+        if(is_action(master) && is_effect(token))
+            return true;
+    }
+    return false;
+}
 
 /*
 
