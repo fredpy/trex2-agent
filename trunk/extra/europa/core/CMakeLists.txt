@@ -34,27 +34,27 @@
 #######################################################################
 
 add_library(TREXeuropa_core SHARED
-  core.cc
-  europa_helpers.cc
-  Schema.cc
-  ReactorConstraints.cc
-  ModeConstraints.cc
-  TimeConstraints.cc
-  DeliberationFilter.cc
-  CurrentState.cc
-  SynchronizationManager.cc
   Assembly.cc
+  core.cc
+  CurrentState.cc
+  DeliberationFilter.cc
+  europa_helpers.cc
+  ModeConstraints.cc
+  ReactorConstraints.cc
+  Schema.cc
+  SynchronizationManager.cc
+  TimeConstraints.cc
   # headers 
-  ../trex/europa/EuropaException.hh
-  ../trex/europa/EuropaPlugin.hh
-  ../trex/europa/ReactorConstraint.hh
-  ../trex/europa/ModeConstraints.hh
-  ../trex/europa/TimeConstraints.hh
-  ../trex/europa/ReactorPropagator.hh
-  ../trex/europa/DeliberationFilter.hh
-  ../trex/europa/SynchronizationManager.hh
   ../trex/europa/Assembly.hh
+  ../trex/europa/DeliberationFilter.hh
+  ../trex/europa/EuropaException.hh
   ../trex/europa/bits/europa_helpers.hh
+  ../trex/europa/EuropaPlugin.hh
+  ../trex/europa/ModeConstraints.hh
+  ../trex/europa/ReactorConstraint.hh
+  ../trex/europa/ReactorPropagator.hh
+  ../trex/europa/SynchronizationManager.hh
+  ../trex/europa/TimeConstraints.hh
 )
 
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXutils 

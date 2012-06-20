@@ -96,24 +96,24 @@ if(WITH_EUROPA)
   add_subdirectory(core)
 
   add_library(TREXeuropa SHARED 
-    EuropaReactor.cc
     europa_convert.cc
     EuropaDomain.cc  
+    EuropaReactor.cc
+    extensions/Bind.cc
+    extensions/DoNotMatchFilter.cc
     extensions/extensions.cc
     extensions/EarliestFirstFlawManager.cc
-    extensions/Trigonometry.cc
     extensions/Numeric.cc
-    extensions/DoNotMatchFilter.cc
-    extensions/Bind.cc
+    extensions/Trigonometry.cc
     # headers
-    EuropaReactor.hh
-    EuropaEntity.hh
     bits/europa_convert.hh
-    extensions/EarliestFirstFlawManager.hh
-    extensions/Trigonometry.hh
-    extensions/Numeric.hh
-    extensions/DoNotMatchFilter.hh
+    EuropaEntity.hh
+    EuropaReactor.hh
     extensions/Bind.hh
+    extensions/DoNotMatchFilter.hh
+    extensions/EarliestFirstFlawManager.hh
+    extensions/Numeric.hh
+    extensions/Trigonometry.hh
   )
 
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
