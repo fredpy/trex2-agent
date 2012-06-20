@@ -14,7 +14,5 @@ Estimator::At {
 	    g.longitude == longitude;
 	    g.depth == depth;
 	    
-	latitude == to_rad(lat_deg); 	
-    longitude == to_rad(lon_deg);
 }
 
