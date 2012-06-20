@@ -970,6 +970,8 @@ namespace TREX {
       internal_iterator end_internal() const {
         return internal_iterator(end(), end());
       }
+      
+      bool locate_nddl(std::string &nddl) const;
 
       /** @brief Load a model
        * @param[in] nddl A nddl model file

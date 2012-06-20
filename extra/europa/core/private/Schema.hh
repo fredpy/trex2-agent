@@ -70,10 +70,13 @@ namespace TREX {
 	void setStream(std::ostream &out);
 	
 	std::string const &nddl_path();
-
+        std::string use(std::string file, bool &found);
+        
       private:
 	Schema();
 	~Schema() {}
+
+        static std::set<std::string> includes(std::istream &input);
 
 	void registerPlugin(EuropaPlugin &pg);
 	void unregisterPlugin(EuropaPlugin &pg);
@@ -85,7 +88,11 @@ namespace TREX {
 	std::string              m_path;
 
 	TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-	
+	typedef std::map<std::string, boost::filesystem::path> 
+          include_map;
+        include_map m_includes;
+        
+        
 	friend class TREX::utils::SingletonWrapper<Schema>;
 	friend class TREX::europa::EuropaPlugin;
       }; // TREX::europa::details::Schema

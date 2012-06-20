@@ -69,19 +69,19 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   if( model ) {
     if( model->empty() )
       throw XmlError(cfg, "Attribute \"model\" is empty.");
-    nddl = manager().use(*model, found);
-    if( !found )
+    nddl = *model;
+    if( !locate_nddl(nddl) )
       throw XmlError(cfg, "Unable to locate model file \""+(*model)+"\"");
   } else {
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
 
     syslog()<<"No model specified: attempting to load "<<long_nddl;
-    nddl = manager().use(long_nddl, found);
-    if( !found ) {
+    nddl = long_nddl;
+    if( !locate_nddl(nddl) ) {
       syslog()<<long_nddl<<" not found: attempting to load "<<short_nddl;
-      nddl = manager().use(short_nddl, found);
-      if( !found )
+      nddl = short_nddl;
+      if( !locate_nddl(nddl) )
 	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
     }
   }
