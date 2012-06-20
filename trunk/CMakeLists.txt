@@ -219,4 +219,8 @@ install(DIRECTORY log DESTINATION shared/trex/log
    DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
    FILES_MATCHING PATTERN "*" EXCLUDE)
 
+include(CMakePackageConfigHelpers)
+# Note I need to do a real version checking
+write_basic_package_version_file(trexConfigVersion.cmake VERSION ${VERSION} COMPATIBILITY AnyNewerVersion)
+
 

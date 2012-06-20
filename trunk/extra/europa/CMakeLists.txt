@@ -96,9 +96,9 @@ if(WITH_EUROPA)
   add_subdirectory(core)
 
   add_library(TREXeuropa SHARED 
+    EuropaReactor.cc
     europa_convert.cc
     EuropaDomain.cc  
-    EuropaReactor.cc
     extensions/Bind.cc
     extensions/DoNotMatchFilter.cc
     extensions/extensions.cc
@@ -107,9 +107,9 @@ if(WITH_EUROPA)
     extensions/Numeric.cc
     extensions/Trigonometry.cc
     # headers
+    EuropaReactor.hh
     bits/europa_convert.hh
     EuropaEntity.hh
-    EuropaReactor.hh
     extensions/Bind.hh
     extensions/DoNotMatchFilter.hh
     extensions/EarliestFirstFlawManager.hh

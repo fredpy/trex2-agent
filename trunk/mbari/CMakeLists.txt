@@ -33,9 +33,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-option(MBARI_ENABLED "Enable MBARI specific code." OFF) 
+option(WITH_MBARI "Enable MBARI specific code." OFF) 
 
-if(MBARI_ENABLED)
+if(WITH_MBARI)
   add_custom_target(mbari COMMENT "MBARI specific targets")
   trex_cfg(cfg shared/trex)
 
@@ -56,5 +56,5 @@ if(MBARI_ENABLED)
   #  message(WARNING "Unable to find Poco libraries: disabling iridium plugin")
   #  set(POCO_FOUND OFF)
   #endif(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-endif(MBARI_ENABLED)
+endif(WITH_MBARI)
 
