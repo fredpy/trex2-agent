@@ -36,35 +36,38 @@
 option(WITH_WITRE "Enable witre plugin (require Wt)" ON)
 
 if(WITH_WITRE) 
-  find_package(Wt REQUIRED)
-  include_directories(${Wt_INCLUDE_DIR})
-  add_library(TREXwitre SHARED
-     Popup.cc 
-     Witre.cc 
-     WitreServer.cc 
-     # headers
-     Popup.hh
-     Witre.hh
-     WitreGraph.hh
-     WitreServer.hh
-  )
-  target_link_libraries(TREXwitre 
-    ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
-    ${Boost_THREAD_LIBRARY} 
-    ${Boost_SIGNALS_LIBRARY} 
-    TREXtransaction)
- 
-  trex_plugin(witre witre_pg.cc)
-  target_link_libraries(witre_pg TREXwitre)
+  find_package(Wt)
 
-  # generate the witre.xml configuration file with a doocroot pointing to witre
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/witre.xml.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml DESTINATION shared/trex/cfg)
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR}/cfg)
+  if(Wt_FOUND) 
+    include_directories(${Wt_INCLUDE_DIR})
+    add_library(TREXwitre SHARED
+       Popup.cc 
+       Witre.cc 
+       WitreServer.cc 
+       # headers
+       Popup.hh
+       Witre.hh
+       WitreGraph.hh
+       WitreServer.hh
+     )
+   target_link_libraries(TREXwitre 
+     ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
+     ${Boost_THREAD_LIBRARY} 
+     ${Boost_SIGNALS_LIBRARY} 
+     TREXtransaction
+   )
  
-  #include_directories(${Wt_INCLUDE_DIR})
-  #trex_plugin(witre WitreServer.cc Witre.cc)
-  #target_link_libraries(witre_pg TREXtransaction ${Wt_LIBRARIES})
+   trex_plugin(witre witre_pg.cc)
+   target_link_libraries(witre_pg TREXwitre)
+
+    # generate the witre.xml configuration file with a doocroot pointing to witre
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/witre.xml.in
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml DESTINATION shared/trex/cfg)
+    set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg)
+  else(Wt_FOUND)
+    message(WARNING "Unable to find Wt!!! Disabling witre plugin")
+    set(WITH_WITRE OFF CACHE BOOL "Disabled for the lack of Wt" FORCE)
+  endif(Wt_FOUND)
 endif(WITH_WITRE)

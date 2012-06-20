@@ -38,6 +38,12 @@ TREX_LIBS=@CMAKE_INSTALL_PREFIX@/lib:@Boost_LIBRARY_DIRS@
 TREX_BINS=@CMAKE_INSTALL_PREFIX@/bin
 TREX_SHARED=@CMAKE_INSTALL_PREFIX@/shared/trex
 
+EUROPA_HOME=@EUROPA_HOME@
+
+if [ -n "${EUROPA_HOME}" ]; then 
+    TREX_LIBS=${TREX_LIBS}:@EUROPA_LIBRARY_DIRS@
+fi
+
 platform='unknown'
 lib_path_var=LD_LIBRARY_PATH
 unamestr=`uname`
