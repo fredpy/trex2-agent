@@ -8,46 +8,40 @@ VehicleState::Boot {
 
 Navigator::Going {
 	
-	int travel_dist;
-	int completion_time;
-	float dist;
-	float my_speed;
-	
-	completion_time <= end;
-	
 	starts_during(VehicleState.Ready ready);
+	ready.end <= end;
 	starts_during(TrexSupervision.Active active);
 	
-	contains(VehicleState.Exec exec);
-	ready meets exec;
-			
+	int maneuver_end;
 	
 	if( ready.start<=AGENT_CLOCK ) {
+	  float distance;
+	  int estimated_duration;
+	  
 	  met_by(EstimatedState.Position ini);
-	
 	  contains(VehicleCommand.Maneuver maneuver);
 	  latitude == maneuver.latitude;
 	  longitude == maneuver.longitude;
 	  depth == maneuver.depth;
 	  maneuver.secs == 0;
 	  speed == maneuver.speed;
-	  completion_time == maneuver.end;
-		float how_long;
-		how_long == ll_distance(ini.latitude, ini.longitude, latitude, longitude);
-		
+	  maneuver_end == maneuver.end;
+	  distance == ll_distance(ini.latitude, ini.longitude, latitude, longitude);	  
+	  estimated_duration == floor(distance * speed * TICK_DURATION); 
+	  
+	  if (distance > 30) {
+	  	maneuver.duration * 2 >= estimated_duration;
+	  }
+	  
+	  maneuver.duration <= estimated_duration * 2;
+	  
 	}
-	if( completion_time<=AGENT_CLOCK ) {	
-	    meets(EstimatedState.Position dest);
-		dist == ll_distance(dest.latitude, dest.longitude, latitude, longitude);	   
-	  	dist < 20;
-	}
-
-
-  	start + duration == end;
-	my_speed >= 0.0;
-	dist>=0.0;
-	speed <= 10.0; // At most 10m/s
-	my_speed == speed * TICK_DURATION;
-	duration >= floor(dist * my_speed);
 	
+	
+	//if( maneuver_end <= AGENT_CLOCK ) {
+	//    float dist;
+	//    ends(EstimatedState.Position dest);
+	//	dist == ll_distance(dest.latitude, dest.longitude, latitude, longitude);	   
+	//  	dist < 20;
+	//}
 }

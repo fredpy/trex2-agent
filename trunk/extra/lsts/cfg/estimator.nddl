@@ -20,5 +20,7 @@ class Estimator extends AgentTimeline {
 		int secs;
 		secs >= 0;
 		tolerance >= 0;		
+		latitude == to_rad(lat_deg); 	
+    	longitude == to_rad(lon_deg);
 	}
 }

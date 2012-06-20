@@ -51,7 +51,9 @@ public:
 	~Platform();
 
 	static void setControlInterface(TREX::LSTS::ControlInterface * itf);
+	bool reportToDune(int type, const std::string &message);
 	bool reportToDune(const std::string &message);
+	bool reportErrorToDune(const std::string &message);
 private:
 	bool synchronize();
 	void handleRequest(TREX::transaction::goal_id const &g);
@@ -59,13 +61,13 @@ private:
 	bool sendMsg(Message& msg, std::string ip, int port);
 	bool sendMsg(Message& msg, Address &dest);
 	bool sendMsg(Message& msg);
-	bool commandManeuver(IMC::Message * maneuver);
+	bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
 
-	bool commandGoto(double lat, double lon, double depth, double speed);
-	bool commandLoiter(double lat, double lon, double depth, double radius, double speed, int seconds);
-	bool commandStationKeeping(double lat, double lon, double speed, int seconds);
-	bool commandIdle();
-	bool commandCalibration();
+	IMC::Message * commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed);
+	IMC::Message * commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
+	IMC::Message * commandStationKeeping(const std::string &man_name, double lat, double lon, double speed, int seconds);
+	IMC::Message * commandIdle(const std::string &man_name);
+	//IMC::Message commandCalibration();
 	void convertToAbsolute(double northing, double easting, double &lat, double &lon);
 	void convertToRelative(double lat, double lon, double &x, double &y);
 	void processState();
