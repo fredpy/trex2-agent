@@ -40,6 +40,8 @@
 #include <PLASMA/Debug.hh>
 
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/regex.hpp>
+
 
 using namespace TREX::europa;
 using namespace TREX::utils;
@@ -49,6 +51,29 @@ namespace xml = boost::property_tree::xml_parser;
 /*
  * class TREX::europa::details::Schema
  */
+
+// statics
+
+
+
+std::set<std::string> details::Schema::includes(std::istream &is) {
+  boost::regex inc_exp("# *include +(?:(?:<([^>]+)>)|(?:\"([^\"]+)\"))");
+  std::set<std::string> result;
+  std::string line;
+  
+  while( std::getline(is, line) ) {
+    boost::match_results<std::string::const_iterator> 
+      matches;
+    if( boost::regex_match(line, matches, inc_exp) ) {
+      if( matches[1].matched )
+        result.insert(matches[1]); // was a <>
+      else if( matches[2].matched )
+        result.insert(matches[2]); // was a ""
+    }
+  }
+  return result;
+}
+
 
 // structors 
 
@@ -124,6 +149,29 @@ std::string const &details::Schema::nddl_path() {
 
 void details::Schema::registerFunction(Assembly const &assembly, EUROPA::CFunction *fn) {
   assembly.constraint_engine()->getCESchema()->registerCFunction(fn->getId());
+}
+
+std::string details::Schema::use(std::string file, bool &found) {
+  include_map::iterator i = m_includes.find(file);
+  if( m_includes.end()==i ) {
+    boost::filesystem::path p = m_log->use(file, found);
+    if( found ) {
+      m_includes.insert(include_map::value_type(file, p));
+      
+      std::ifstream cif(p.string().c_str());
+      std::set<std::string> incs = includes(cif);
+      cif.close();
+      for(std::set<std::string>::const_iterator f=incs.begin();
+        incs.end()!=f; ++f) {
+        bool fincl;
+        use(*f, fincl);
+      }
+    }
+    return p.string();
+  } else {
+    found = true;
+    return i->second.string();
+  }
 }
 
 // modifiers

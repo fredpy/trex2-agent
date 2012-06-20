@@ -107,7 +107,7 @@ endif(LIB_RT)
 ########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
-find_package(Boost 1.47.0 COMPONENTS thread system signals chrono filesystem date_time)
+find_package(Boost 1.47.0 COMPONENTS thread system regex signals chrono filesystem date_time)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   list(APPEND ${PROJECT_NAME}_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})

@@ -326,10 +326,16 @@ void Assembly::setStream() const {
   m_trex_schema->setStream(m_debug);
 }
 
+bool Assembly::locate_nddl(std::string &nddl) const {
+  bool found;
+  nddl = m_trex_schema->use(nddl, found);
+  return found;
+}
+
 bool Assembly::playTransaction(std::string const &nddl) {
   std::string const &path = m_trex_schema->nddl_path();
   std::string ret;
-
+  
   // configure search path for nddl
   getLanguageInterpreter("nddl")->getEngine()->getConfig()->setProperty("nddl.includePath", path);
 
