@@ -55,9 +55,21 @@ include_directories(${DUNE_INCLUDE_DIR})
 include_directories(${EUROPA_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
 
-trex_plugin(platform Platform.cc ControlInterface.cc EuropaExtensions.cc DuneClock.cc
-  Platform.hh ControlInterface.hh EuropaExtensions.hh DuneClock.hh)
+trex_plugin(platform 
+  # source
+  ControlInterface.cc 
+  DuneClock.cc
+  EuropaExtensions.cc 
+  Platform.cc 
+  # headers
+  ControlInterface.hh 
+  DuneClock.hh
+  EuropaExtensions.hh 
+  Platform.hh 
+)
+
 target_link_libraries(platform_pg TREXagent
   TREXeuropa_core
   ${Boost_LIBRARIES}
-  ${DUNE_CORE_LIB})
+  ${DUNE_CORE_LIB}
+)

@@ -34,22 +34,22 @@
 #######################################################################
 
 add_library(TREXdomain SHARED
-  DomainBase.cc
   BasicInterval.cc
   BasicEnumerated.cc
-  Variable.cc
+  DomainBase.cc
   DomainImpl.cc
+  Variable.cc
   # headers 
-  DomainBase.hh
   BasicEnumerated.hh
   BasicInterval.hh
+  DomainBase.hh
   DomainVisitor_fwd.hh
   DomainVisitor.hh
+  EnumDomain.hh
   EnumeratedDomain.hh
-  IntervalDomain.hh
   FloatDomain.hh
   IntegerDomain.hh
-  EnumDomain.hh
+  IntervalDomain.hh
   StringDomain.hh
   Variable.hh
   # template source

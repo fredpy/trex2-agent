@@ -34,26 +34,26 @@
 #######################################################################
 
 add_library(TREXtransaction SHARED
-  Predicate.cc
-  Observation.cc
   Goal.cc
+  Observation.cc
+  Predicate.cc
+  reactor_graph.cc
   Relation.cc
   TeleoReactor.cc
-  reactor_graph.cc
   TransactionPlayer.cc
   # headers
-  Tick.hh
-  Predicate.hh
-  Observation.hh
+  bits/bgl_support.hh
+  bits/external.hh
   Goal.hh
+  Observation.hh
+  Predicate.hh
+  reactor_graph.hh
   Relation.hh
   TeleoReactor_fwd.hh
   TeleoReactor.hh
-  reactor_graph.hh
-  TransactionPlayer.hh
+  Tick.hh
   bits/timeline.hh
-  bits/external.hh
-  bits/bgl_support.hh
+  TransactionPlayer.hh
   # template source
   bits/reactor_graph.tcc
 )

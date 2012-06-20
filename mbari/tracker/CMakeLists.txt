@@ -56,25 +56,25 @@ if(MBARI_TRACKER)
 	AMQP_connection.cc
 	AMQP_listener.cc
 	AMQP_queue.cc
-	${TRACKER_PROTO_SRCS}
-	${SENSOR_PROTO_SRCS}
-	${TREX_PROTO_SRCS}
+	DoradoHandler.cc
 	DrifterTracker.cc
 	location.cc
 	MessageHandler.cc
+	${TRACKER_PROTO_SRCS}
 	PositionHandler.cc
-	DoradoHandler.cc
+	${SENSOR_PROTO_SRCS}
+	${TREX_PROTO_SRCS}
 	#headers
 	AMQP_connection.hh
 	AMQP_listener.hh
 	AMQP_queue.hh
-	DrifterTracker.hh
-	point.hh
-	location.hh
-	serie.hh
-	MessageHandler.hh
-	PositionHandler.hh
 	DoradoHandler.hh
+	DrifterTracker.hh
+	location.hh
+	MessageHandler.hh
+	point.hh
+	PositionHandler.hh
+	serie.hh
 	)
       target_link_libraries(MBARIamqp 
 	MBARIshared
