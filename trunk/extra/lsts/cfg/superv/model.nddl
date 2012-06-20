@@ -26,7 +26,7 @@ VolumeController::Going {
     cmd_depth >= limits.minDepth;
     
     if( AGENT_CLOCK >= idle.start ) {
-	bind(cmd_depth, depth); // sslect closest valid depth
+	bind(cmd_depth, depth); // select closest valid depth
 	meets(Estimator.At waypoint);
 	waypoint.lat_deg == lat;
 	waypoint.lon_deg == lon;
@@ -49,6 +49,13 @@ Navigator::Idle {
 EstimatedState::Boot {
     contained_by(VolumeController.undefined boot);
     boot.end == end;
+}
+
+Navigator::Going {
+    contained_by(VolumeController.Going go);
+    latitude == to_rad(go.lat);
+    longitude == to_rad(go.lon);
+    bind(go.depth, depth);
 }
 
 VolumeController volume = new VolumeController();
