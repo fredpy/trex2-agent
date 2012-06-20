@@ -313,7 +313,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     <<"]\n\t"<<timeline()->getTokenSequence().size()<<" tokens to check.");
 
   // skip the past tokens
-  for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb; ++i) {
+  for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb && (*i)->end()->lastDomain().getLowerBound()<=lb+1; ++i) {
     debugMsg("trex:dispatch", "skipping "<<(*i)->toString()<<" as it ends to early (end="
       <<(*i)->end()->lastDomain().toString()<<"<="<<(lb+1));
   }
