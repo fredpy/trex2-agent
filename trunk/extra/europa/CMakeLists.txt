@@ -103,6 +103,7 @@ if(WITH_EUROPA)
     extensions/DoNotMatchFilter.cc
     extensions/extensions.cc
     extensions/EarliestFirstFlawManager.cc
+    extensions/GoalFilter.cc
     extensions/Numeric.cc
     extensions/Trigonometry.cc
     # headers
@@ -112,6 +113,7 @@ if(WITH_EUROPA)
     extensions/Bind.hh
     extensions/DoNotMatchFilter.hh
     extensions/EarliestFirstFlawManager.hh
+    extensions/GoalFilter.hh
     extensions/Numeric.hh
     extensions/Trigonometry.hh
   )
