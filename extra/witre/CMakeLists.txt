@@ -39,14 +39,14 @@ if(WITH_WITRE)
   find_package(Wt REQUIRED)
   include_directories(${Wt_INCLUDE_DIR})
   add_library(TREXwitre SHARED
+     Popup.cc 
      Witre.cc 
      WitreServer.cc 
-     Popup.cc 
      # headers
-     Witre.hh
-     WitreServer.hh
-     WitreGraph.hh
      Popup.hh
+     Witre.hh
+     WitreGraph.hh
+     WitreServer.hh
   )
   target_link_libraries(TREXwitre 
     ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}

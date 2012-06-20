@@ -70,12 +70,39 @@ namespace TREX {
 	void setStream(std::ostream &out);
 	
 	std::string const &nddl_path();
+        /** @brief recursive use for nddl
+         * 
+         * @param[in] file A file name
+         * @param[out] found found indication flag
+         *
+         * This method locate the file @p file using TREX::utils::LogManager::use 
+         * if the file was found it sets @p found to @c true and also try to 
+         * locate all the files included by this file recursively and copy them 
+         * in the @c cfg/ log directory 
+         *
+         * @retval The real path name of @p file if @p found is @c true 
+         * @retval @p file oherwise
+         *
+         * @sa TREX::utils::LogManager::use
+         * @sa include(std::istream &)
+         */
         std::string use(std::string file, bool &found);
         
       private:
 	Schema();
 	~Schema() {}
 
+        /** @brief Include files extraction
+         * @param[in] input an input stream
+         *
+         * Extract all the file names included using a C like @c #include 
+         * directive in @a input
+         *
+         * @return The set of all the file names included 
+         *
+         * @bug This is a simple implementation that do not check in depth 
+         * if the @c #include is commented or not
+         */ 
         static std::set<std::string> includes(std::istream &input);
 
 	void registerPlugin(EuropaPlugin &pg);

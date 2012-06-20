@@ -209,7 +209,7 @@ Assembly::Assembly(std::string const &name)
 
 Assembly::~Assembly() {
   setStream();
-  debugMsg("trex:end", "Destroying "<<m_name);
+  // debugMsg("trex:end", "Destroying "<<m_name);
   m_proxy.reset();
   m_ce_listener.reset();
   m_synchListener.reset();
@@ -373,6 +373,8 @@ void Assembly::configure_solvers(std::string const &cfg) {
 
   EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
   handler("FlawHandler");
+  
+  synch.SetAttribute("defaultPriority", 2000);
 
   handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
   synch.InsertEndChild(handler);

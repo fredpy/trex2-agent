@@ -39,6 +39,7 @@
 #include "Trigonometry.hh"
 #include "Numeric.hh"
 #include "DoNotMatchFilter.hh"
+#include "GoalFilter.hh"
 #include "Bind.hh"
 
 
@@ -121,6 +122,9 @@ namespace {
     public:
       void registerComponents(TREX::europa::Assembly const &assembly) {
         TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DoNotMatchFilter, doNotMatch);
+        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::GoalFilter, goals);
+        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::NotGoalFilter, notGoals);
+        
         
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
