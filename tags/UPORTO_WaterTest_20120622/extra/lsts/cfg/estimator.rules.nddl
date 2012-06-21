@@ -1,0 +1,18 @@
+#include "declarations.nddl"
+#include "estimator.nddl"
+#include "platform.nddl"
+#include "navigator.nddl"
+
+VehicleState::Boot {
+    contained_by(Estimator.Boot);
+}
+
+Estimator::At {
+
+	met_by(Navigator.Going g);
+	    g.latitude == latitude;
+	    g.longitude == longitude;
+	    g.depth == depth;
+	    
+}
+

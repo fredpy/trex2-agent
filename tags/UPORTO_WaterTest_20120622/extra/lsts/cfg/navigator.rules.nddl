@@ -1,0 +1,48 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+#include "platform.nddl"
+
+VehicleState::Boot {
+    contained_by(Navigator.Idle);
+}
+
+Navigator::Going {
+	
+	starts_during(VehicleState.Ready ready);
+	ready.end <= end;
+	starts_during(TrexSupervision.Active active);
+	
+	int maneuver_end;
+	
+	if( ready.start<=AGENT_CLOCK ) {
+	  float distance;
+	  int estimated_duration;
+	  
+	  met_by(EstimatedState.Position ini);
+	  contains(VehicleCommand.Maneuver maneuver);
+	  maneuver.end == end;
+	  latitude == maneuver.latitude;
+	  longitude == maneuver.longitude;
+	  depth == maneuver.depth;
+	  maneuver.secs == 0;
+	  speed == maneuver.speed;
+	  maneuver_end == maneuver.end;
+	  distance == ll_distance(ini.latitude, ini.longitude, latitude, longitude);	  
+	  estimated_duration == floor(distance * speed * TICK_DURATION); 
+	  
+	  if (distance > 30) {
+	  	maneuver.duration * 2 >= estimated_duration;
+	  }
+	  
+	  maneuver.duration <= estimated_duration * 2;
+	  
+	}
+	
+	
+	//if( maneuver_end <= AGENT_CLOCK ) {
+	//    float dist;
+	//    ends(EstimatedState.Position dest);
+	//	dist == ll_distance(dest.latitude, dest.longitude, latitude, longitude);	   
+	//  	dist < 20;
+	//}
+}

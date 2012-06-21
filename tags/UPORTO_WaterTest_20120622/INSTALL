@@ -1,0 +1,129 @@
+Installing TREX
+
+1) Third party requirements
+
+TREX uses third party utilities and libraries. Here's sa list of them :
+ - boost (http://www.boost.org) This library is widely used for basic
+         utilities and compatibilty with the TR1 C++0x standard.
+	 version 1.47 or above (tested against 1.47 and 1.49.0) 
+
+Other utilies are of interrest but not necessary to use TREX:
+ - doxygen (http://www.doxygen.org/) This utility is needed only if you want 
+           to generate this documentation.
+ - graphviz (http://www.graphviz.org/) Recommended for documentation but it 
+            may also be used for plan visualization by showing tokens and 
+            their relations as a graph.
+To compile trex linbraries there's currently one approach supported:
+ - cmake (http://www.cmake.org/) newly added which -- among other things -- allows to 
+       integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+
+For europa plug-in :
+  - europa-pso (http://code.google.com/p/europa-pso/) version 2.4 or above.
+               this is the core libaray used for planning on the EuropaReactor
+	       Simply install the binary distribution provided for your platform. 
+	       The version we use is europa 2.6 (binary package)
+
+2) Set your environment
+
+Both trex_devel.bash and trex_init.bash are envoironment files that help user setting their 
+environment properly for the bash shell
+  - trex_devel.bash can be sused when you want to run trex from your building 
+                    directory without installing it
+  - trex_init.bash (installed under <install_dir>/shared/trex is useful for loading a fully 
+                   installed trex
+
+If you are using bash you can edit your ~/.profile 
+(or ~/.bash_profile depending on your configuration/platform).
+Considering that you have installed TREX on the directory <install_dir> you can put 
+the following lines :
+------------------------------------------------------------------------
+source <install_dir>/shared/trex/trex_init.bash
+------------------------------------------------------------------------
+  
+  In order to be able to compile europa plugin you'll also need to set your 
+  EUROPA_HOME to the directory where europa is installed. For example
+------------------------------------------------------------------------
+export EUROPA_HOME=${HOME}/europa
+------------------------------------------------------------------------
+  The expected structure from cmake is the following :
+  $EUROPA_HOME
+    + lib        # europa libraries (we use the _o versions)
+    + include    # PS*.hh headers
+      + PLASMA   # plasma headers
+
+  This should be the case if you installed the binary package of europa
+	
+3) TREX general structure
+
+This version of TREX is composed of multiples libraries and components which
+are organized as follow (see doc/fig/SWarchi.png):
+  - Main libraries: They are also called module. All of them are compiled into 
+        the lib directory. There's 4 of them described more in detail in this 
+        document :
+	 * TREXutils : A set of classes that represent basic functionalities 
+              that are used by TREX but are more based on generic programming 
+              paradigms and design patterns that could be used for other 
+              programs.
+         * TREXdomains : Definition of domains and variables as manipulated by 
+              TREX for information exchange between reactors. A variable is 
+              defined by a name and a domain. A domain is a typed, possibly 
+              continuous, set of possible values for this varaible. A domain 
+              cannot be empty and can only be restricted.
+         * TREXtransaction : This library define the reactors which is the 
+              basic component that can be composed inside TREX. It defines 
+              also Obsevations and Goals which are data that can be exchanged 
+              between reactors.
+         * TREXagent : Defines the TREX agent. The agent is the main entity 
+              that manages the loading and execution of the reactors as their 
+              interaction.
+         * TREX commands: A set of simple commands that can be used to execute 
+              a TREX agent. They are compiled into the bin directory. There is
+              two generic commands that gives a simple illustration on how one 
+              can create and manipulate an Agent :
+	        - amc : This program takes a configuration file as argument. 
+                        Provided that this file defines correctly an Agent it 
+                        will execute this agent until its end.
+		- sim : This program takes similar argument as amc. The 
+                        difference here is that it provides a simple interface 
+                        to run the agent in an interactive way allowing to 
+                        step through clock ticks.
+  - TREX plug-ins: These are optionnally compiled and the source is usually 
+        located under extra/<name>. You can comile them by calling jam <name>. 
+        The result will be put under the plugin directory as a dynamic library 
+        named TREX<name>.
+  - TREX documentation: Generated from the source using jam doc. It will be 
+        installed on the doc directory.
+  - TREX logs: Usually generated under the log directory after any run of a 
+        TREX agent.
+  - TREX utilities and scripts: Under offboard. Provides a set of scripts and 
+        utilities to help the processing of TREX logs.
+  - nightly build: Under nightly,. Used to run nightly builds of the head.
+  - Configurations files Usually under cfg. A set of configuration files that 
+        can be used to define new agents and/or reactors.
+
+==============================================================================
+Compiling with cmake
+------------------------------------------------------------------------------
+
+More details can be found on cmake official documentation 
+(http://www.cmake.org/cmake/help/runningcmake.html). 
+But here's a quick tutorial to use make as the end compilation tool :
+
+Create your working directory :
+> mkdir trex2.build
+> cd trex2.build
+
+run cmake by passing the location of the source tree as argument (we'll assume 
+that trex2.build is ate the same level as trex2-agent source directory)
+> cmake ../trex2-agent/
+
+If no error occured, you can just run make as usual
+> make
+
+Note :
+     Right now camke compiles everything by default. This is a first integration 
+     and we will make sure in the future that the behavior is closer to what we 
+     have with jam where plug-ins are only compiled on demand.
+
+Finally you can generate the documentation from doxygen using :
+> make doc
