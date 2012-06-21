@@ -2,63 +2,118 @@
 #include "estimator.nddl"
 #include "platform.nddl"
 
-class VolumeController extends AgentTimeline {
-    predicate Idle {
+class NavigationState extends AgentTimeline {
+    predicate At {
 	float lat, lon;
+	float depth;
+	bool requested;
+    }
+    predicate Moving {
+	float target_lat;
+	float target_lon;
+	float depth;
+    }
+
+    NavigationState(Mode _mode) {
+	super(_mode, false);
+    }
+    
+}
+
+class SurveyController extends AgentTimeline {
+    predicate Active {}
+    predicate Transect{
+	float lat_from, lon_from;
+	float lat_to, lon_to;
 	float depth;
     }
     
-    predicate Going {
-	float lat, lon;
-	float depth;
-    }
-    
-    VolumeController() {
-	super(Internal);
+    SurveyController(Mode _mode) {
+	super(_mode, true);
     }
 }
 
-VolumeController::Going {
+class Actions {
+    predicate Go {}
+
+    Actions() {
+	super();
+    }
+}
+
+
+SurveyController::Transect {
+    starts(NavigationState.At dest);
+    dest.lat == lat_to;
+    dest.lon == lon_to;
+    dest.depth == depth;
+    dest.requested == true;
+    
+    met_by(Active survey);
+    met_by(NavigationState.Moving go);
+    go.target_lat == dest.lat;
+    go.target_lon == dest.lon;
+    go.depth == dest.depth;
+    
+    after(NavigationState.At src);
+    src meets go;
+    src contained_by survey;
+    src.lat == lat_from;
+    src.lon == lon_from;
+    src.depth == depth;
+    src.requested == true;
+}
+
+NavigationState::At {
+    if( requested==true ) {
+	met_by(Actions.Go);
+    }
+}
+
+Actions::Go {
     met_by(Navigator.Idle idle);
-    starts_during(OperationalLimits.Limits limits);
-    float cmd_depth;
-    cmd_depth <= limits.maxDepth;
-    cmd_depth >= limits.minDepth;
-    
-    if( AGENT_CLOCK >= idle.start ) {
-	bind(cmd_depth, depth); // select closest valid depth
-	meets(Estimator.At waypoint);
-	waypoint.lat_deg == lat;
-	waypoint.lon_deg == lon;
-	waypoint.depth == cmd_depth;
+    meets(NavigationState.At);
+    if( idle.start <= AGENT_CLOCK ) {
+	meets(Estimator.At requested);
+	requested.tolerance <= 10.0;
+
+	equals(Navigator.Going go);
+	go.latitude == requested.latitude;
+	go.longitude == requested.longitude;
+	go.depth == requested.depth;
     }
-
 }
 
-VolumeController::Idle {
-    starts(EstimatedState.Position vpos);
-    vpos.latitude == to_rad(lat);
-    vpos.longitude == to_rad(lon);
-    vpos.depth == depth;
+//Estimator::Boot {
+//    ends(NavigationState.undefined);
+//}
+
+Estimator::At {
+    contained_by(NavigationState.At pos);
+    lat_deg == pos.lat;
+    lon_deg == pos.lon;
+    depth == pos.depth;
 }
 
-Navigator::Idle {
-    ends(VolumeController.Idle);
-}
-
-EstimatedState::Boot {
-    contained_by(VolumeController.undefined boot);
-    boot.end == end;
+Navigator::Staying {
+    contained_by(NavigationState.At pos);
+    latitude == to_rad(pos.lat);
+    longitude == to_rad(pos.lon);
+    depth == pos.depth;
 }
 
 Navigator::Going {
-    contained_by(VolumeController.Going go);
-    latitude == to_rad(go.lat);
-    longitude == to_rad(go.lon);
-    bind(go.depth, depth);
+    contained_by(NavigationState.Moving go);
+    latitude == to_rad(go.target_lat);
+    longitude == to_rad(go.target_lon);
+    depth == go.depth;
 }
 
-VolumeController volume = new VolumeController();
+
+NavigationState nav = new NavigationState(Internal);
+SurveyController surveys = new SurveyController(Internal);
+
+Actions actions = new Actions();
 
 Navigator navigator = new Navigator(Observe);
 Estimator estimator = new  Estimator(External);
@@ -67,16 +122,13 @@ EstimatedState estate = new EstimatedState(Observe);
 
 close();
 
-//rejectable(volume.Going go1);
-//go1.lat.specify(41.185279);
-//go1.lon.specify(-8.705758);
-//go1.depth.specify(2);
+// rejectable(surveys.Transect transect);
+// transect.lat_from.specify(41.185279);
+// transect.lon_from.specify(-8.705758);
+// transect.lat_to.specify(41.185379);
+// transect.lon_to.specify(-8.705758);
+// transect.depth.specify(0);
 
-//rejectable(volume.Going go2);
-//go2.lat.specify(41.185379);
-//go2.lon.specify(-8.705758);
-//go2.depth.specify(0);
 
-//go2 after go1;
 
 
