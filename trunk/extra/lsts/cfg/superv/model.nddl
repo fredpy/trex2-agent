@@ -6,7 +6,7 @@ class NavigationState extends AgentTimeline {
     predicate At {
 	float lat, lon;
 	float depth;
-	bool requested;
+	bool  requested;
     }
     predicate Moving {
 	float target_lat;
@@ -26,8 +26,7 @@ class SurveyController extends AgentTimeline {
 	float lat_from, lon_from;
 	float lat_to, lon_to;
 	float depth;
-    }
-    
+    }	    
     SurveyController(Mode _mode) {
 	super(_mode, true);
     }
@@ -56,12 +55,25 @@ SurveyController::Transect {
     go.depth == dest.depth;
     
     after(NavigationState.At src);
-    src meets go;
-    src contained_by survey;
+    src meets survey;
     src.lat == lat_from;
     src.lon == lon_from;
     src.depth == depth;
     src.requested == true;
+
+    // estimate a minimum duration
+    float distance, speed;
+    int estimated_duration;
+    // hard coded for now ... I need a way to request a speed !!!
+    speed >= 0.5;
+    speed <= 3.0;
+    distance == ll_distance(to_rad(lat_from), to_rad(lon_from), 
+			    to_rad(lat_to), to_rad(lon_to));
+    estimated_duration == floor(distance * speed * TICK_DURATION);
+    if( distance>30 ) {
+	survey.duration >= estimated_duration;
+    }
+
 }
 
 NavigationState::At {
@@ -71,8 +83,14 @@ NavigationState::At {
 }
 
 Actions::Go {
+    // high level plan
+    meets(NavigationState.At requester);
+    contained_by(NavigationState.Moving my_go);
+    eq(my_go.target_lat, requester.lat);
+    eq(my_go.target_lon, requester.lon);
+    eq(my_go.depth, requester.depth);
+
     met_by(Navigator.Idle idle);
-    meets(NavigationState.At);
     if( idle.start <= AGENT_CLOCK ) {
 	meets(Estimator.At requested);
 	requested.tolerance <= 10.0;
@@ -117,8 +135,8 @@ Actions actions = new Actions();
 
 Navigator navigator = new Navigator(Observe);
 Estimator estimator = new  Estimator(External);
-OperationalLimits oplimits = new OperationalLimits(Observe);
-EstimatedState estate = new EstimatedState(Observe);
+// OperationalLimits oplimits = new OperationalLimits(Observe);
+// EstimatedState estate = new EstimatedState(Observe);
 
 close();
 
