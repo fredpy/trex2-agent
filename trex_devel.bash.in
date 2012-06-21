@@ -39,7 +39,7 @@ TREX_BINS=@TREX_BINARY_DIRS@
 
 EUROPA_HOME=@EUROPA_HOME@
 
-if [ -n "${EUROPA_HOME}" ]; then 
+if [ -d "${EUROPA_HOME}" ]; then 
     TREX_LIBS=${TREX_LIBS}:@EUROPA_LIBRARY_DIRS@
 fi
 
