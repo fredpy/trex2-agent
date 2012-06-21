@@ -124,8 +124,8 @@ Platform::synchronize()
 	{
 		Address addr;
 		int msg_count = 0;
-		bool estate_changed = false, vstate_changed = false, oplimits_changed =
-				false, gpsfix_changed = false;
+		//bool estate_changed = false, vstate_changed = false, oplimits_changed =
+		// 		false, gpsfix_changed = false;
 
 		//entityStates.clear();
 		received.clear();
@@ -293,7 +293,7 @@ Platform::convertToRelative(double lat, double lon, double &x, double &y)
 void
 Platform::convertToAbsolute(double northing, double easting, double &lat, double &lon)
 {
-	double tmp = 0;
+	// double tmp = 0;
 	if (lat == 0 && lon == 0) {
 		if (!aggregate.count(IMC::HomeRef::getIdStatic()))
 			return;
@@ -442,7 +442,8 @@ Platform::processState()
 
 	/* VEHICLE_COMMAND */
 
-	int eta = pow(2, 16) - 1;
+        int eta = std::numeric_limits<int>::max();
+        
 	if (received.count(IMC::VehicleState::getIdStatic()))
 	{
 		IMC::VehicleState *lastState =
@@ -470,7 +471,7 @@ Platform::processState()
 			{
 
 				IMC::Loiter * m = dynamic_cast<IMC::Loiter *>(man);
-				double n, e;
+				//double n, e;
 				obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
 				obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
 				obs.restrictAttribute("depth", FloatDomain(m->z));
@@ -480,7 +481,7 @@ Platform::processState()
 			else if (man->getId() == IMC::StationKeeping::getIdStatic())
 			{
 				IMC::StationKeeping * m = dynamic_cast<IMC::StationKeeping *>(man);
-				double n, e;
+				//double n, e;
 				obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
 				obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
 				obs.restrictAttribute("depth", FloatDomain(0));
@@ -492,7 +493,7 @@ Platform::processState()
 				//  obs.restrictAttribute("type", TREX::europa::EuropaEntity("teleop"));
 				IMC::EstimatedState * msg =
 						dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
-				double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
+				//double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
 				obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
 				obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
 				obs.restrictAttribute("depth", FloatDomain(0));

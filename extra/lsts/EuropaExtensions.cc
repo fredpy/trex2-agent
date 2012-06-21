@@ -149,7 +149,7 @@ InsideOpLimits::InsideOpLimits(EUROPA::LabelStr const &name,
 
 Polygon * InsideOpLimits::computeOpLimitsPolygon()
 {
-	double lat, lon;
+	//double lat, lon;
 	double corners[4][2];
 	int i;
 	Point pts[4];
@@ -180,7 +180,8 @@ Polygon * InsideOpLimits::computeOpLimitsPolygon()
 
 void InsideOpLimits::handleExecute() {
 
-	double lat, lon, depth;
+	double lat, lon;
+        // double depth;
 
 	if (s_oplimits == NULL)
 		return;
@@ -201,8 +202,8 @@ void InsideOpLimits::handleExecute() {
 
 	if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_AREA)
 	{
-		double max_lat = s_oplimits->lat;
-		double max_lon = s_oplimits->lon;
+		// double max_lat = s_oplimits->lat;
+		// double max_lon = s_oplimits->lon;
 		lat = s_oplimits->lat;
 		lon = s_oplimits->lon;
 
