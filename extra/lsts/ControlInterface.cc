@@ -316,10 +316,20 @@ void ControlInterface::handleTickStart() {
 	}
 }
 
+void ControlInterface::notify(TREX::transaction::Observation const &obs)
+{
+	if (obs.predicate() == "Failed")
+	{
+		m_env->getPlatformReactor()->reportErrorToDune("Timeline failed: '"+obs.object().str()+"'");
+	}
+}
+
 bool ControlInterface::synchronize() {
 	// Nothing to do here
 	return true;
 }
+
+
 
 void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 {

@@ -20,6 +20,7 @@ Navigator::Going {
 	  
 	  met_by(EstimatedState.Position ini);
 	  contains(VehicleCommand.Maneuver maneuver);
+	  maneuver.end == end;
 	  latitude == maneuver.latitude;
 	  longitude == maneuver.longitude;
 	  depth == maneuver.depth;

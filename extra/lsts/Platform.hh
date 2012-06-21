@@ -54,13 +54,13 @@ public:
 	bool reportToDune(int type, const std::string &message);
 	bool reportToDune(const std::string &message);
 	bool reportErrorToDune(const std::string &message);
+	bool sendMsg(Message& msg);
 private:
 	bool synchronize();
 	void handleRequest(TREX::transaction::goal_id const &g);
 	void handleRecall(TREX::transaction::goal_id const &g);
 	bool sendMsg(Message& msg, std::string ip, int port);
 	bool sendMsg(Message& msg, Address &dest);
-	bool sendMsg(Message& msg);
 	bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
 
 	IMC::Message * commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed);

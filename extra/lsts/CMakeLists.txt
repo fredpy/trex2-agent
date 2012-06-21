@@ -61,11 +61,14 @@ trex_plugin(platform
   DuneClock.cc
   EuropaExtensions.cc 
   Platform.cc 
+  SafetyBug.cc
+
   # headers
   ControlInterface.hh 
   DuneClock.hh
   EuropaExtensions.hh 
   Platform.hh 
+  SafetyBug.hh
 )
 
 target_link_libraries(platform_pg TREXagent

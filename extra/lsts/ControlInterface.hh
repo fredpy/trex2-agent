@@ -75,6 +75,9 @@ namespace TREX {
       void proccess_message(std::string const &msg);
 
     private:
+
+      void notify(TREX::transaction::Observation const &obs);
+
       /** @brief Message listeenign thread.
        *
        * The thread that listen and gather  messages coming 
@@ -114,7 +117,8 @@ namespace TREX {
          * Create a new instance that refers to @p me
          */
         thread_proxy(ControlInterface *me);
-                     
+
+
         ControlInterface *m_reactor;
         
         friend class ControlInterface;
@@ -136,6 +140,7 @@ namespace TREX {
       void newPlanToken(TREX::transaction::goal_id const &t);
       void cancelledPlanToken(TREX::transaction::goal_id const &t);
       
+
       /** @brief Add a goal
        *
        * @param[in] g A goal 
