@@ -214,10 +214,15 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
 
-# create the default log directory
-install(DIRECTORY log DESTINATION shared/trex/log
-   DIRECTORY_PERMISSIONS WORLD_READ WORLD_WRITE
-   FILES_MATCHING PATTERN "*" EXCLUDE)
+# create the default log directory ... everybody can read/write/exec
+install(DIRECTORY log DESTINATION shared/trex
+   DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+    GROUP_READ GROUP_WRITE GROUP_EXECUTE
+    WORLD_READ WORLD_WRITE WORLD_EXECUTE
+   FILES_MATCHING PATTERN ".empty_file"
+   PATTERN "*" EXCLUDE
+   PATTERN ".svn" EXCLUDE
+   PATTERN "????.???.*" EXCLUDE)
 
 #include(CMakePackageConfigHelpers)
 # Note I need to do a real version checking
