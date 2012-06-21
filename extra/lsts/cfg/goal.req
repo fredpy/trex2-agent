@@ -1,25 +1,31 @@
 <?xml version="1.0"?>
 
-<Goal on="estimator" pred="At">
-  <Variable name="start">
-    <!-- Example of a date range. Dates are specified in the format
+<Goal on="surveys" pred="Transect">
+   <!-- Example of a date range. Dates are specified in the format
          YYYY-MMM-DD HH:MM:SS.mmm 
 	 and are always UTC -->
+  <!-- Variable name="start">
     <date min="2011-Jul-10 10:00:00.500-05:00" max="2020-Jul-10 22:00:00.500" />
-  </Variable>
-  <Variable name="lat_deg">
+  </Variable -->
+  <Variable name="lat_from">
     <float min="41.185279" max="41.185279" />
   </Variable>
-  <Variable name="lon_deg">
+  <Variable name="lon_from">
+    <float min="-8.705758" max="-8.705758" />
+  </Variable>
+  <Variable name="lat_to">
+    <float min="41.183279" max="41.183279" />
+  </Variable>
+  <Variable name="lon_to">
     <float min="-8.705758" max="-8.705758" />
   </Variable>
   <Variable name="depth">
     <float min="2" max="2"/>
   </Variable>
-  <Variable name="secs">
     <!-- Example of duration. Dates are specified using the format 
          HH:MM:SS.mmm
     -->
+  <!-- Variable name="secs">
     <duration min="0:00:05.3" max="1:00:00" />
-  </Variable>
+  </Variable -->
 </Goal>
