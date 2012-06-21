@@ -437,39 +437,75 @@ void Assembly::erase(EUROPA::TokenSet &set, EUROPA::TokenId const &tok) {
 bool Assembly::relax(bool aggressive) {
   details::is_rejectable rejectable;
   EUROPA::DbClientId cli = plan_db()->getClient();
+  std::string relax_name = "RELAX";
+  if( aggressive )
+    relax_name = "AGGRESSIVE "+relax_name;
 
+  debugMsg("trex:relax", "["<<now()<<"] =================== START "<<relax_name<<" =================");
   // Clean up decisions made by solvers
+  debugMsg("trex:relax", "Cancelling current decisions");
   synchronizer()->reset();
   planner()->reset();
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
+  debugMsg("trex:relax", "Evaluating "<<m_roots.size()<<" root tokens.");
 
   while( m_roots.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
+    
+    debugMsg("trex:relax", "Evaluating relaxation of "<<tok->toString()
+      <<"\n\tPredicate: "<<tok->getPredicateName().toString()
+      <<"\n\tObjects: "<<tok->getObject()->toString()
+      <<"\n\tstart: "<<tok->start()->lastDomain().toString()
+      <<"\n\tend: "<<tok->end()->lastDomain().toString());
 
     if( tok->end()->baseDomain().getUpperBound()<=now() ) {
+      debugMsg("trex:relax", "\t- "<<tok->getKey()<<" necessarily ends in the past");
       if( tok->isFact() ) {
+        debugMsg("trex:relax", "\t- "<<tok->getKey()<<" is a fact");
         if( aggressive ) {
+          debugMsg("trex:relax", "\t- destroying "<<tok->getKey()<<" (aggressive)");
           if( !tok->isInactive() )
             cli->cancel(tok);
           cli->deleteToken(tok);
         }
       } else {
-        if( rejectable(tok) || aggressive ) {
+        bool can_reject = rejectable(tok);
+        
+        if( can_reject || aggressive ) {
+          if( can_reject ) {
+            debugMsg("trex:relax", "\t- destroying the goal "<<tok->getKey());
+          } else {
+            debugMsg("trex:relax", "\t- destroying past token "<<tok->getKey()<<" (aggressive)");
+          }
           if( !tok->isInactive() )
             cli->cancel(tok);
           cli->deleteToken(tok);
         }
       }
     } else {
-      if( !( tok->isInactive() || tok->isFact() ) )
+      if( tok->isFact() ) {
+        if( tok->isMerged() ) {
+          debugMsg("trex:relax", "\t- give room for fact "<<tok->getKey()<<" (cancel active="<<tok->getActiveToken()->getKey()<<")");
+          cli->cancel(tok->getActiveToken());
+          if( !aggressive ) {
+            debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
+            cli->activate(tok);
+          }
+        }
+      } else if( !tok->isInactive() ) {
+        debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
         cli->cancel(tok);
+      }
     }
-
   }
 
-  return constraint_engine()->propagate();
+  debugMsg("trex:relax", "["<<now()<<"] =================== END "<<relax_name<<" =================");
+  bool ret = constraint_engine()->propagate();
+  if( !ret )
+    debugMsg("trex:relax", "RELAX FAILURE !!!!");
+  return ret;
 }
 
 void Assembly::archive() {
