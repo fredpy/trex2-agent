@@ -80,7 +80,7 @@ Clock::~Clock() {
 void Clock::doStart() {
   start();
   m_data.open(m_log->file_name("clock.xml").c_str());
-  m_data<<"<Clock epoch=\""<<epoch()<<"\" rate=\""<<tickDuration()<<"\" >"<<std::endl;
+  m_data<<"<Clock epoch=\""<<epoch()<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
   m_first = true;
   syslog("INFO")<<"Clock started at "<<epoch()<<' '<<epoch().zone_name()
     <<"\n\t"<<info();
@@ -125,9 +125,9 @@ internals::LogEntry Clock::syslog(std::string const &context) const {
 
 // observers :
 
-bool Clock::is_free() const {
+bool Clock::is_free() const {  
   if( !free() ) {
-    m_free_count = m_count-1;
+    m_free_count = m_count;
     return false;
   }
   return true;
@@ -135,9 +135,11 @@ bool Clock::is_free() const {
 
 void Clock::log_tick() const {
   if( m_data.is_open() ) {
-    m_count -= m_free_count;
-    m_data<<"  <tick value=\""<<m_last<<"\" free=\""<<m_free_count
-      <<"\" sleep=\""<<m_count<<"\" />"<<std::endl;
+    m_data<<"  <tick value=\""<<m_last<<"\" count=\""<<m_count
+      <<"\"";
+    if( m_free_count>0 && m_free_count<m_count )
+      m_data<<" free=\""<<m_free_count<<"\"";
+    m_data<<" />"<<std::endl;
     m_free_count = 0;
     m_count = 0;
   }
