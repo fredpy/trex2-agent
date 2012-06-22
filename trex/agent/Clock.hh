@@ -69,7 +69,7 @@ namespace TREX {
       typedef transaction::graph::date_type              date_type;
     
       /** @brief Destructor */
-      virtual ~Clock() {}
+      virtual ~Clock();
 
       /** @brief Start the clock
        *
@@ -80,28 +80,9 @@ namespace TREX {
        */
       void doStart();
 
-      /** @brief get time in TICK
-       *
-       * This method is used to compute the current time.
-       * This is where one specialization of clock will identify
-       * whether the TICK value has advanced or not
-       *
-       * @return current tick value
-       */
-      virtual TREX::transaction::TICK getNextTick() =0;
-      /** @brief Check if clock free
-       *
-       * Check if the clock is currently free. A free clock 
-       * allow reactors to execute steps. If the clock is not 
-       * free the agent will stop to attempt to insert new 
-       * deliberation steps for this tick
-       *
-       * @retval true if free
-       * @retval false otherwise
-       */
-      virtual bool free() const {
-        return true;
-      }
+      TREX::transaction::TICK tick();
+      bool is_free() const;
+
       
       /** @brief Initial tick
        *
@@ -174,6 +155,29 @@ namespace TREX {
       virtual std::string info() const =0;
       
     protected:
+      /** @brief Check if clock free
+       *
+       * Check if the clock is currently free. A free clock 
+       * allow reactors to execute steps. If the clock is not 
+       * free the agent will stop to attempt to insert new 
+       * deliberation steps for this tick
+       *
+       * @retval true if free
+       * @retval false otherwise
+       */
+      virtual bool free() const {
+        return true;
+      }
+      /** @brief get time in TICK
+       *
+       * This method is used to compute the current time.
+       * This is where one specialization of clock will identify
+       * whether the TICK value has advanced or not
+       *
+       * @return current tick value
+       */
+      virtual TREX::transaction::TICK getNextTick() =0;
+ 
       /** @brief Time left before next tick
        *
        * This method indicates how much time is left before the
@@ -216,6 +220,14 @@ namespace TREX {
     private:
       duration_type const m_sleep;
       utils::SingletonUse<utils::LogManager> m_log;
+      
+      void log_tick() const ;
+      
+      // Logging related attributes
+      mutable bool   m_first;
+      mutable transaction::TICK  m_last;
+      mutable size_t  m_free_count, m_count;
+      mutable std::ofstream m_data;
     }; // TREX::agent::Clock
 
   } // TREX::agent   
