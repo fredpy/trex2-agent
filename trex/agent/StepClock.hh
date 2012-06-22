@@ -93,17 +93,6 @@ namespace TREX {
       /** @brief Destructor */
       ~StepClock() {}
 
-      /** @brief get current tick date
-       * This method advances the number of steps used in current
-       * tick by 1. If this number is greater or equal to the
-       * maximum number of steps allowed for this tick, then the tick
-       * date is incremented
-       *
-       * @return current tick date
-       *
-       * @sa setMaxSteps(unsigned int) const
-       */
-      TREX::transaction::TICK getNextTick();
       /** @brief Change maximum number of steps for this tick
        * @param nSteps New maximum number of steps
        * @pre nSteps is greater than 0
@@ -120,6 +109,17 @@ namespace TREX {
       }
 
     private:
+      /** @brief get current tick date
+       * This method advances the number of steps used in current
+       * tick by 1. If this number is greater or equal to the
+       * maximum number of steps allowed for this tick, then the tick
+       * date is incremented
+       *
+       * @return current tick date
+       *
+       * @sa setMaxSteps(unsigned int) const
+       */
+      TREX::transaction::TICK getNextTick();
       
       /** @brief step value filter
        * @param stepsPerTick desired number of steps per tick

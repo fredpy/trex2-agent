@@ -63,7 +63,14 @@ namespace TREX {
      * @ingroup agent
      */
     class Clock {
-    public:    
+    public:
+      class Error :public TREX::utils::Exception {
+      public:
+        Error(std::string const &msg) throw()
+          :TREX::utils::Exception(msg) {}
+        ~Error() throw() {}
+      };
+            
       typedef transaction::graph::duration_type          duration_type;
       typedef utils::chrono_posix_convert<duration_type> dur_converter;
       typedef transaction::graph::date_type              date_type;

@@ -849,14 +849,19 @@ bool Agent::doNext() {
   }
   synchronize();
 
-  while( m_clock->tick()==getCurrentTick()
-        && m_clock->is_free() && valid() 
-        && executeReactor() );
-  while( valid() && m_clock->tick()==getCurrentTick() )
-    m_clock->sleep();
+  try {
+    while( m_clock->tick()==getCurrentTick()
+          && m_clock->is_free() && valid() 
+          && executeReactor() );
+    while( valid() && m_clock->tick()==getCurrentTick() )
+      m_clock->sleep();
 
-  if( valid() )
-    updateTick(m_clock->tick());
+    if( valid() )
+      updateTick(m_clock->tick());
+  } catch(Clock::Error const &err) {
+    syslog("ERROR")<<"error from the clock: "<<err;
+    m_valid = false;
+  } 
 
   return valid();
 }

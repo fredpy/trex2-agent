@@ -127,7 +127,8 @@ internals::LogEntry Clock::syslog(std::string const &context) const {
 
 bool Clock::is_free() const {  
   if( !free() ) {
-    m_free_count = m_count;
+    if( 0==m_free_count )
+      m_free_count = m_count;
     return false;
   }
   return true;
