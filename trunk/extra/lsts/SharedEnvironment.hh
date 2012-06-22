@@ -40,7 +40,9 @@ public:
 
 	void setPlatformReactor(TREX::LSTS::Platform * platf)
 	{
-		m_platform = platf;
+            if( NULL!=platf && NULL!=m_platform )
+              throw TREX::utils::Exception("Attempt to have more than one platform.");
+            m_platform = platf;
 	}
 
 	TREX::LSTS::ControlInterface * getControlInterfaceReactor()

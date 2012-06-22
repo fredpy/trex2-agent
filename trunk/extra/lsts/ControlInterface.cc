@@ -64,6 +64,7 @@ ControlInterface::ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type
 }
 
 ControlInterface::~ControlInterface() {
+	m_env->setControlInterfaceReactor(0);
 	stop();
 	if( NULL!=m_thread.get() ) {
 		m_thread->join();
@@ -320,7 +321,9 @@ void ControlInterface::notify(TREX::transaction::Observation const &obs)
 {
 	if (obs.predicate() == "Failed")
 	{
-		m_env->getPlatformReactor()->reportErrorToDune("Timeline failed: '"+obs.object().str()+"'");
+          Platform *r = m_env->getPlatformReactor();
+          if( NULL!=r )
+            r->reportErrorToDune("Timeline failed: '"+obs.object().str()+"'");
 	}
 }
 
@@ -335,11 +338,12 @@ void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 {
 	syslog() << "new plan token: " << *t;
 
-	if (NULL != m_env->getPlatformReactor())
+        Platform *r = m_env->getPlatformReactor();
+	if (NULL != r )
 	{
 		std::ostringstream ss;
 		ss << "Token added: " << *t;
-		m_env->getPlatformReactor()->reportToDune(ss.str());
+		r->reportToDune(ss.str());
 	}
 }
 
@@ -347,11 +351,12 @@ void ControlInterface::cancelledPlanToken(TREX::transaction::goal_id const &t)
 {
 	syslog() << "token has been canceled: " << *t;
 
-	if (NULL != m_env->getPlatformReactor())
+        Platform *r = m_env->getPlatformReactor();
+	if (NULL != r)
 	{
 		std::ostringstream ss;
 		ss << "Token removed: " << *t;
-		m_env->getPlatformReactor()->reportToDune(ss.str());
+		r->reportToDune(ss.str());
 	}
 }
 
