@@ -109,7 +109,9 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
 Platform::~Platform()
 {
-	delete[] bfr;
+	m_env->setPlatformReactor(NULL);
+        if( NULL!=bfr )
+          delete[] bfr;
 }
 void
 Platform::setControlInterface(ControlInterface * itf)

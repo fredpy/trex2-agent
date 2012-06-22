@@ -34,9 +34,12 @@ void SafetyBug::notify(TREX::transaction::Observation const &obs)
 {
 	if (obs.predicate() == "Failed" && !aborted)
 	{
-		Abort ab;
-		m_env->getPlatformReactor()->sendMsg(ab);
-		m_env->getPlatformReactor()->reportErrorToDune("Sent abort due to " + obs.object().str() + " failure.");
+                Platform *r = m_env->getPlatformReactor();
+                if( NULL!=r ) {
+                  Abort ab;
+                  r->sendMsg(ab);
+                  r->reportErrorToDune("Sent abort due to " + obs.object().str() + " failure.");
+                }
 		syslog("ERROR") << "Sent abort due to " << obs.object() << " failure.";
 		aborted = true;
 	}
