@@ -65,10 +65,23 @@ void Clock::sleep(Clock::duration_type const &delay){
   }
 }
 
+// structors :
+
+Clock::~Clock() {
+  if( m_data.is_open() ) {
+    log_tick();
+    m_data<<"</Clock>\n";
+    m_data.close();
+  }
+}
+
 // modifiers :
 
 void Clock::doStart() {
   start();
+  m_data.open(m_log->file_name("clock.xml").c_str());
+  m_data<<"<Clock epoch=\""<<epoch()<<"\" rate=\""<<tickDuration()<<"\" >"<<std::endl;
+  m_first = true;
   syslog("INFO")<<"Clock started at "<<epoch()<<' '<<epoch().zone_name()
     <<"\n\t"<<info();
 }
@@ -80,6 +93,22 @@ void Clock::advanceTick(TICK &tick) {
 
 
 // manipulators :
+
+TICK Clock::tick() {
+  TICK ret = tick();
+  if( m_first ) {
+    m_first = false;
+    m_last = ret;
+    m_free_count = 0;
+    m_count = 0;
+  } else if( ret!=m_last ) {
+    log_tick();    
+    m_last = ret;
+  }
+  ++m_count;
+  return ret;
+}
+
 
 void Clock::sleep() const {
   sleep(getSleepDelay());
@@ -95,6 +124,25 @@ internals::LogEntry Clock::syslog(std::string const &context) const {
 
 
 // observers :
+
+bool Clock::is_free() const {
+  if( !free() ) {
+    m_free_count = m_count-1;
+    return false;
+  }
+  return true;
+}
+
+void Clock::log_tick() const {
+  if( m_data.is_open() ) {
+    m_count -= m_free_count;
+    m_data<<"  <tick value=\""<<m_last<<"\" free=\""<<m_free_count
+      <<"\" sleep=\""<<m_count<<"\" />"<<std::endl;
+    m_free_count = 0;
+    m_count = 0;
+  }
+}
+
 
 std::string Clock::date_str(TICK const &tick) const {
   std::ostringstream oss;

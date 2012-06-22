@@ -111,14 +111,22 @@ namespace TREX {
        *
        * @{
        */
-      explicit rt_clock(rep const &period)
+      explicit rt_clock(rep const &period, unsigned percent_use=100)
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
+        if( percent_use<5 || percent_use>100 )
+          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
+        m_sleep_watchdog = percent_use*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog /= 100;
       }
       
-      explicit rt_clock(tick_rate const &period)
+      explicit rt_clock(tick_rate const &period, unsigned percent_use=100)
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
+        if( percent_use<5 || percent_use>100 )
+          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
+        m_sleep_watchdog = percent_use*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog /= 100;
       }
       /** @} */
       /** @brief XML constrauctor
@@ -182,15 +190,26 @@ namespace TREX {
           m_period = boost::chrono::duration_cast<tick_rate>(ns_tick);
         } 
         check_tick();
+        unsigned sleep_ratio = utils::parse_attr<unsigned>(100, node, "percent_use");
+        if( sleep_ratio<5 || sleep_ratio>100 )
+          throw utils::Exception("Only accept clock precent_use between 5 and 100%");
+        m_sleep_watchdog = sleep_ratio*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog /= 100;
       }
       /** @brief Destructor */
       ~rt_clock() {}
+      
+      void update_sleep() {
+          m_sleep = m_clock->epoch();
+          m_sleep += boost::chrono::duration_cast<typename clock_type::base_duration>(m_tick.time_since_epoch());
+          m_sleep += m_sleep_watchdog;
+      }
       
       transaction::TICK getNextTick() {
         typename mutex_type::scoped_lock guard(m_lock);
         if( NULL!=m_clock.get() ) {
           typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
-          if( how_late > clock_type::base_duration::zero() ) {
+          if( how_late >=clock_type::base_duration::zero() ) {
             double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(how_late).count();
             ratio /= m_period.count();
             if( ratio>=0.1 ) {
@@ -199,6 +218,7 @@ namespace TREX {
               utils::display(oss, how_late);
               syslog("WARN")<<" clock is "<<oss.str()<<" late.";
             } 
+            update_sleep();
           }
           return m_tick.time_since_epoch().count()/m_period.count();
         } else 
@@ -206,6 +226,15 @@ namespace TREX {
       }
       
       bool free() const {
+        if( NULL!=m_clock.get() ) {
+          typename clock_type::base_time_point t = clock_type::base_clock::now();
+          if( t>=m_sleep ) {
+            std::ostringstream oss;
+            utils::display(oss, t-m_sleep);
+            syslog("INFO")<<"Sleep forced by clock ("<<oss.str()<<" after watchdog)";
+            return false;
+          }
+        }
         return true;
       }
       
@@ -252,6 +281,7 @@ namespace TREX {
           hz /= num;
           oss<<hz<<"Hz ("<<den<<"/"<<num<<")";
         }
+        utils::display(oss<<"\n\tsleep timer:", m_sleep_watchdog);
         return oss.str();
       }
       
@@ -261,6 +291,7 @@ namespace TREX {
         m_clock.reset(new clock_type);
         m_epoch = boost::posix_time::microsec_clock::universal_time();
         m_tick -= m_tick.time_since_epoch();
+        update_sleep();
       }
       
       duration_type getSleepDelay() const {
@@ -296,6 +327,10 @@ namespace TREX {
       tick_rate                 m_period;
       std::auto_ptr<clock_type> m_clock;
       date_type                 m_epoch;
+      
+      typename clock_type::base_duration    m_sleep_watchdog;
+      typename clock_type::base_time_point m_sleep;
+      
       
       typename clock_type::time_point m_tick;
     }; 
