@@ -95,7 +95,7 @@ void Clock::advanceTick(TICK &tick) {
 // manipulators :
 
 TICK Clock::tick() {
-  TICK ret = tick();
+  TICK ret = getNextTick();
   if( m_first ) {
     m_first = false;
     m_last = ret;
