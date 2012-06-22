@@ -205,38 +205,6 @@ namespace TREX {
           m_sleep += m_sleep_watchdog;
       }
       
-      transaction::TICK getNextTick() {
-        typename mutex_type::scoped_lock guard(m_lock);
-        if( NULL!=m_clock.get() ) {
-          typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
-          if( how_late >=clock_type::base_duration::zero() ) {
-            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(how_late).count();
-            ratio /= m_period.count();
-            if( ratio>=0.1 ) {
-              // more than 10% of a tick late => display a warning
-              std::ostringstream oss;
-              utils::display(oss, how_late);
-              syslog("WARN")<<" clock is "<<oss.str()<<" late.";
-            } 
-            update_sleep();
-          }
-          return m_tick.time_since_epoch().count()/m_period.count();
-        } else 
-          return 0;
-      }
-      
-      bool free() const {
-        if( NULL!=m_clock.get() ) {
-          typename clock_type::base_time_point t = clock_type::base_clock::now();
-          if( t>=m_sleep ) {
-            std::ostringstream oss;
-            utils::display(oss, t-m_sleep);
-            syslog("INFO")<<"Sleep forced by clock ("<<oss.str()<<" after watchdog)";
-            return false;
-          }
-        }
-        return true;
-      }
       
       date_type epoch() const {
         typename mutex_type::scoped_lock guard(m_lock);
@@ -292,6 +260,39 @@ namespace TREX {
         m_epoch = boost::posix_time::microsec_clock::universal_time();
         m_tick -= m_tick.time_since_epoch();
         update_sleep();
+      }
+      
+      transaction::TICK getNextTick() {
+        typename mutex_type::scoped_lock guard(m_lock);
+        if( NULL!=m_clock.get() ) {
+          typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
+          if( how_late >=clock_type::base_duration::zero() ) {
+            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(how_late).count();
+            ratio /= m_period.count();
+            if( ratio>=0.1 ) {
+              // more than 10% of a tick late => display a warning
+              std::ostringstream oss;
+              utils::display(oss, how_late);
+              syslog("WARN")<<" clock is "<<oss.str()<<" late.";
+            } 
+            update_sleep();
+          }
+          return m_tick.time_since_epoch().count()/m_period.count();
+        } else 
+          return 0;
+      }
+      
+      bool free() const {
+        if( NULL!=m_clock.get() ) {
+          typename clock_type::base_time_point t = clock_type::base_clock::now();
+          if( t>=m_sleep ) {
+            std::ostringstream oss;
+            utils::display(oss, t-m_sleep);
+            syslog("INFO")<<"Sleep forced by clock ("<<oss.str()<<" after watchdog)";
+            return false;
+          }
+        }
+        return true;
       }
       
       duration_type getSleepDelay() const {
