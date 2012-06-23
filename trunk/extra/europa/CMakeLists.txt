@@ -59,7 +59,7 @@ if(WITH_EUROPA)
   
   set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy")
 
-  set(EUROPA_ARCHIVAL "EuropaDefault" CACHE STRING
+  set(EUROPA_ARCHIVAL "Greedy" CACHE STRING
     "Europa archival technique used (${EUROPA_ARCHIVALValues})")
 
 
