@@ -582,13 +582,14 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
   flag.set(0,control);        // update the control flag
   flag.set(1,plan_listen);    // update the plan_listen flag 
   
-  if( !m_graph.subscribe(this, timeline, flag) )
-    if( isInternal(timeline) )
+  if( !m_graph.subscribe(this, timeline, flag) ) {
+    if( isInternal(timeline) ) 
       syslog("WARN")<<"External declaration of the Internal timeline \""
 	      <<timeline.str()<<"\"";
     else
       syslog("WARN")<<"Multiple External declarations of timeline \""
 	      <<timeline.str()<<"\"";
+  }
 }
 
 
