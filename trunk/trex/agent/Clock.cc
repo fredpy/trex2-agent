@@ -99,18 +99,23 @@ TICK Clock::tick() {
   if( m_first ) {
     m_first = false;
     m_last = ret;
-    m_free_count = 0;
+    m_free = true;
     m_count = 0;
   } else if( ret!=m_last ) {
     log_tick();    
     m_last = ret;
   }
-  ++m_count;
+  if( m_free )
+    ++m_count;
   return ret;
 }
 
+void Clock::sleep() {
+  m_free = false;
+  doSleep();
+}
 
-void Clock::sleep() const {
+void Clock::doSleep() {
   sleep(getSleepDelay());
 }
 
@@ -126,23 +131,16 @@ internals::LogEntry Clock::syslog(std::string const &context) const {
 // observers :
 
 bool Clock::is_free() const {  
-  if( !free() ) {
-    if( 0==m_free_count )
-      m_free_count = m_count;
-    return false;
-  }
-  return true;
+  m_free = free();
+  return m_free;
 }
 
 void Clock::log_tick() const {
   if( m_data.is_open() ) {
     m_data<<"  <tick value=\""<<m_last<<"\" count=\""<<m_count
-      <<"\"";
-    if( m_free_count>0 && m_free_count<m_count )
-      m_data<<" free=\""<<m_free_count<<"\"";
-    m_data<<" />"<<std::endl;
-    m_free_count = 0;
+	  <<"\"/>"<<std::endl;
     m_count = 0;
+    m_free = true;
   }
 }
 

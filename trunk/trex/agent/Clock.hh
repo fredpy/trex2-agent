@@ -118,7 +118,7 @@ namespace TREX {
       virtual date_type tickToTime(TREX::transaction::TICK cur) const {
         return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
       }
-
+      
       /** @brief Sleep until next tick
        *
        * This method check the time left before next tick and
@@ -129,7 +129,9 @@ namespace TREX {
        * @sa double getSleepDelay() const
        * @sa void sleep(double)
        */
-      virtual void sleep() const;
+      void sleep();
+
+
       /** @brief Process sleep
        * @param sleepDuration number of seconds to sleep
        *
@@ -162,6 +164,9 @@ namespace TREX {
       virtual std::string info() const =0;
       
     protected:
+       virtual void doSleep();
+
+
       /** @brief Check if clock free
        *
        * Check if the clock is currently free. A free clock 
@@ -233,7 +238,8 @@ namespace TREX {
       // Logging related attributes
       mutable bool   m_first;
       mutable transaction::TICK  m_last;
-      mutable size_t  m_free_count, m_count;
+      mutable bool               m_free;
+      mutable size_t             m_count;
       mutable std::ofstream m_data;
     }; // TREX::agent::Clock
 
