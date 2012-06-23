@@ -491,6 +491,15 @@ namespace TREX {
 
       static TREX::transaction::TICK initialTick(Clock *clk);
 
+# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK) 
+      typedef boost::chrono::thread_clock stat_clock;
+# else 
+      typedef boost::chrono::process_user_cpu_clock stat_clock;
+# endif  
+      typedef stat_clock::duration stat_duration;
+
+      std::ofstream m_stat_log;
+
       Clock  *m_clock;  
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
