@@ -54,16 +54,16 @@ namespace TREX {
       std::string info() const;
      
     private:
+      void doSleep();
       TREX::transaction::TICK getNextTick();
       bool free() const;
-      
       
       struct tick_info {
         tick_info(boost::property_tree::ptree::value_type const &node);
         ~tick_info() {}
         
         TREX::transaction::TICK const date;
-        size_t const count, free;
+        size_t const count;
       }; // TREX::agent::LogClock::tick_info
       
       date_type     m_epoch;

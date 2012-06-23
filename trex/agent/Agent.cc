@@ -867,8 +867,9 @@ bool Agent::doNext() {
   try {  
     while( m_clock->tick()==getCurrentTick()
 	   && m_clock->is_free() && valid() 
-	   && executeReactor() ) 
+	   && executeReactor() ) {
       ++count;
+    }
     completed = true;
     delib = stat_clock::now()-start_delib;
       

@@ -55,11 +55,7 @@ namespace {
 
 LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
   :date(parse_attr<TICK>(node, "value")),
-   count(parse_attr<size_t>(node, "count")),
-   free(parse_attr<size_t>(count, node, "free")) {
-  if( free>count )
-    throw XmlError(node, "Cannot have free greater than count");
-}
+   count(parse_attr<size_t>(node, "count")) {}
 
 /*
  * class TREX::agent::LogClock 
@@ -106,26 +102,27 @@ LogClock::LogClock(bpt::ptree::value_type &node)
 // manipulators
 
 TICK LogClock::getNextTick() {
+  if( m_ticks.empty() ) {
+    syslog("ERROR")<<"no more tick to play.";
+    throw Clock::Error("clock has no more tick to play.");
+  } 
+
   tick_info const &tck = m_ticks.front();
-  if( m_counter >= tck.count ) {
-    m_last = tck.date+1;
-    m_ticks.pop_front();
-    if( m_ticks.empty() ) {
-      syslog("ERROR")<<"no more tick to play.";
-      throw Clock::Error("clock has no more tick to play.");
-    }
-    m_counter = 1;
-    return m_ticks.front().date;
-  } else {
+  if( m_counter<tck.count )
     ++m_counter;
-    return tck.date;
-  }
+  return tck.date;
 }
 
 // observers
 
 bool LogClock::free() const {
-  return !m_ticks.empty() && m_counter < m_ticks.front().free;
+  return !m_ticks.empty() && m_counter < m_ticks.front().count;
+}
+
+void LogClock::doSleep() {
+  // advance to next tick
+  m_ticks.pop_front();
+  m_counter = 0;
 }
 
 std::string LogClock::info() const {
