@@ -45,7 +45,7 @@
 
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???
-#define BOOST_EXCEPTION_DISABLE
+// #define BOOST_EXCEPTION_DISABLE
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/depth_first_search.hpp>
@@ -504,9 +504,11 @@ Agent::~Agent() {
   m_valid = false;
     
   m_proxy = NULL;
-  clear();
+  if( m_stat_log.is_open() )
+    m_stat_log.close();
   if( NULL!=m_clock )
     delete m_clock;
+  clear();
 }
 
 // observers :
@@ -718,7 +720,8 @@ void Agent::initComplete() {
 			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
     throw AgentException(*this, "Agent is not connected to a clock");
-  // Complete the init for the reactors and check that there's no cycle
+  // Complete the init for the reactors and check that there's 
+  // no cycle
   details::init_visitor init(m_finalTick);
   boost::depth_first_search(me(), boost::visitor(init));
   size_t n_failed = cleanup();
@@ -734,6 +737,8 @@ void Agent::initComplete() {
   // Create initial graph file
   LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   std::ofstream dotf(graph_dot.c_str());
+  m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
+  m_stat_log<<"tick, synch_ns, delib_ns, steps"<<std::endl;
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
@@ -755,9 +760,12 @@ void Agent::run() {
 void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
   details::sync_scheduller sync(queue);
+
   m_edf.clear(); // Make sure that there's no one left in the schedulling
   m_idle.clear();
   bool update = false;
+
+  stat_clock::time_point synch_start = stat_clock::now();
 
   // Identify synchronization order while notifying of the new tick
   boost::depth_first_search(me(), boost::visitor(sync));
@@ -788,6 +796,9 @@ void Agent::synchronize() {
       update = true;
     }
   }
+  m_stat_log<<getCurrentTick()
+	    <<", "<<(stat_clock::now()-synch_start).count()
+	    <<std::flush;
   if( update ) {
     // Create new graph file
     std::ostringstream name;
@@ -848,11 +859,19 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
+  size_t count = 0;
+  bool completed = false;
+  stat_clock::time_point start_delib = stat_clock::now();
+  stat_duration delib;
 
-  try {
+  try {  
     while( m_clock->tick()==getCurrentTick()
-          && m_clock->is_free() && valid() 
-          && executeReactor() );
+	   && m_clock->is_free() && valid() 
+	   && executeReactor() ) 
+      ++count;
+    completed = true;
+    delib = stat_clock::now()-start_delib;
+      
     while( valid() && m_clock->tick()==getCurrentTick() )
       m_clock->sleep();
 
@@ -861,7 +880,10 @@ bool Agent::doNext() {
   } catch(Clock::Error const &err) {
     syslog("ERROR")<<"error from the clock: "<<err;
     m_valid = false;
+    if( !completed )
+      delib = stat_clock::now()-start_delib;
   } 
+  m_stat_log<<", "<<delib.count()<<", "<<count<<std::endl;
 
   return valid();
 }
