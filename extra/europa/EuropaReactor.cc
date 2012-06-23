@@ -376,7 +376,8 @@ bool EuropaReactor::synchronize() {
       }
     }
   }
-  // Prepare the reactor for next deliberation round
+
+  // Prepare the reactor for next deliberation round 
   if( m_completed_this_tick ) {
     planner()->clear(); // remove the past decisions of the planner
 
@@ -386,8 +387,16 @@ bool EuropaReactor::synchronize() {
       if( cur.isId() && cur->isMerged() )
         m_dispatched.left.erase(cur->getActiveToken()->getKey());
     }
-
     m_completed_this_tick = false;
+  } 
+  // Necessary in case the planner did not run on previous tick
+  if( planner()->getStepCount()==0 ) {
+    stat_clock::time_point start = stat_clock::now();
+    archive();
+    stat_clock::duration arch_d = stat_clock::now()-start;
+    std::ostringstream oss;
+    display(oss<<"Archiving completed in ", arch_d);
+    tr_info(oss.str());
   }
 
   return constraint_engine()->propagate(); // should not fail
