@@ -379,7 +379,7 @@ bool EuropaReactor::synchronize() {
   EuropaReactor &me = *this;
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
-  BOOST_SCOPE_EXIT((&me)(&start)) {
+  BOOST_SCOPE_EXIT((&me)) {
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
