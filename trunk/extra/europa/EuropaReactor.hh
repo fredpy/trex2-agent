@@ -128,6 +128,7 @@ namespace TREX {
       }
 
       bool do_relax(bool full);
+      bool synch();
 
       EUROPA::eint now() const {
 	return static_cast<EUROPA::eint::basis_type>(getCurrentTick());
