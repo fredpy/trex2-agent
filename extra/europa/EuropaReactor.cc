@@ -175,9 +175,13 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     }
   } else
     syslog("WARNING")<<"No TREX "<<TREX_TIMELINE.toString()<<" found in the model.";
+  m_stats.open(file_name("europa_stat.csv").c_str());
+  m_stats<<"tick , what, dur_ns, tokens, steps, depth\n";
 }
 
-EuropaReactor::~EuropaReactor() {}
+EuropaReactor::~EuropaReactor() {
+  m_stats.close();
+}
 
 
 // callbacks
@@ -343,9 +347,20 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
     }
 }
 
+void EuropaReactor::print_stats(std::string const &what, 
+				size_t steps, size_t depth,
+				EuropaReactor::stat_clock::duration const &dur) {
+  m_stats<<now()<<", "<<what<<", "<<dur.count()
+	 <<", "<<plan_db()->getTokens().size()
+	 <<", "<<steps<<", "<<depth<<std::endl;
+}
+
+
 bool EuropaReactor::do_relax(bool full) {
   logPlan("failed");
+  stat_clock::time_point start = stat_clock::now();
   bool ret = relax(full);
+  print_stats("relax", 0, 0, stat_clock::now()-start);
   logPlan("relax");
   return ret;
 }
@@ -354,22 +369,13 @@ bool EuropaReactor::do_relax(bool full) {
 bool EuropaReactor::synchronize() {
   setStream();
   EuropaReactor &me = *this;
-
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
-  BOOST_SCOPE_EXIT((&me)) {
-//    std::ostringstream oss;
-//    EUROPA::SOLVERS::DecisionStack const & ds = me.synchronizer()->getDecisionStack();
-//
-//
-//    for(EUROPA::SOLVERS::DecisionStack::const_iterator i=ds.begin(); ds.end()!=i; ++i)
-//      oss<<" -> "<<(*i)->toLongString()<<'\n';
-    if( me.synchronizer()->getStepCount()>0 ) {
-      std::ostringstream oss;
-      oss<<"synchronization: steps="<<me.synchronizer()->getStepCount()
-         <<", depth="<<me.synchronizer()->getDepth();
-      me.tr_info(oss.str());
-    }
+  stat_clock::time_point start = stat_clock::now();
+  BOOST_SCOPE_EXIT((&me)(&start)) {
+    me.print_stats("synch", me.synchronizer()->getStepCount(), 
+		   me.synchronizer()->getDepth(), 
+		   stat_clock::now()-start);
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
@@ -381,14 +387,11 @@ bool EuropaReactor::synchronize() {
   if( !do_synchronize() ) {
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
-    syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
 
     if( !( do_relax(false) && do_synchronize() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
       if( !( do_relax(true) && do_synchronize() ) ) {
         syslog("ERROR")<<"Failed to synchronize(3) : killing reactor";
-        syslog("stat")<<"synchronization failed  after "<<me.synchronizer()->getStepCount()<<" steps (depth="<<me.synchronizer()->getDepth()<<")";
         return false;
       }
     }
@@ -411,10 +414,7 @@ bool EuropaReactor::synchronize() {
     if( planner()->getStepCount()==0 ) {
       stat_clock::time_point start = stat_clock::now();
       archive();
-      stat_clock::duration arch_d = stat_clock::now()-start;
-      std::ostringstream oss;
-      display(oss<<"Archiving completed in ", arch_d);
-      tr_info(oss.str());
+      print_stats("archive", 0, 0, stat_clock::now()-start);
     }
 #endif 
   }
@@ -479,10 +479,7 @@ bool EuropaReactor::hasWork() {
         stat_clock::time_point start = stat_clock::now();
         planner()->clear();
         archive();
-        stat_clock::duration arch_d = stat_clock::now()-start;
-        std::ostringstream oss;
-        display(oss<<"Archiving completed in ", arch_d);
-        tr_info(oss.str());
+	print_stats("archive", 0, 0, stat_clock::now()-start);
       }
 #endif // Europa_Archive_OLD
       debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
@@ -516,6 +513,8 @@ bool EuropaReactor::hasWork() {
 void EuropaReactor::resume() {
   setStream();
 
+  stat_clock::time_point start = stat_clock::now();
+
   if( constraint_engine()->pending() )
     constraint_engine()->propagate();
 
@@ -542,6 +541,8 @@ void EuropaReactor::resume() {
 	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
       }
   }
+  print_stats("archive", planner()->getStepCount(), 
+	      planner()->getDepth(), stat_clock::now()-start);
 }
 
 // europa core callbacks
