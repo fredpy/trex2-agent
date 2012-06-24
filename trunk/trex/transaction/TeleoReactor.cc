@@ -204,6 +204,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
   LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
+  m_stat_log<<"tick, synch_ns, delib_ns, n_steps\n";
      
   if( parse_attr<bool>(log_default, node, "log") ) {
     fname = manager().file_name(getName().str()+".tr.log");
@@ -316,9 +317,6 @@ double TeleoReactor::workRatio() {
         ret += 1.0;
         ret *= m_nSteps+1;
       }
-//      std::ostringstream oss;
-//      oss<<"work-ratio="<<(1.0/ret);
-//      tr_info(oss.str());
       return 1.0/ret;
     } else {
       // Dispatched goals management
@@ -342,7 +340,6 @@ double TeleoReactor::workRatio() {
                   <<" ticks after its latency."; 
   }
   reset_deadline();
-  // tr_info("work-ratio=NaN (No work)");
   return NAN;
 }
 
@@ -521,20 +518,9 @@ bool TeleoReactor::doSynchronize() {
   try {
     bool success;
     {
-      stat_clock::time_point start = stat_clock::now();
       // collect information from external timelines 
-      //tr_info("Receive notification");
       doNotify();
-      //tr_info("Start synchronization");
       success = synchronize();      
-      m_synch_usage = stat_clock::now()-start;
-      if( NULL!=m_trLog ) {
-        std::ostringstream oss;   
-	display(oss<<"Synchronization completed in ", m_synch_usage);
-	if( !success )
-	  tr_info("Failed to synchronize !!!");
-        tr_info(oss.str());
-      }
     }
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
@@ -559,19 +545,9 @@ bool TeleoReactor::doSynchronize() {
 }
 
 void TeleoReactor::step() {
-  std::ostringstream oss;
-  if( NULL!=m_trLog ) {
-    oss<<"Starting deliberation step "<<(m_nSteps+1);  
-    tr_info(oss.str());
-  }
   stat_clock::time_point start = stat_clock::now();
   resume();
   stat_clock::duration delta = stat_clock::now()-start;
-  if( NULL!=m_trLog ) {
-    oss.str("");
-    display(oss<<"Step completed in ", delta);
-    tr_info(oss.str());
-  }
   m_deliberation_usage += delta;
   m_nSteps += 1;
   m_tick_steps +=1;

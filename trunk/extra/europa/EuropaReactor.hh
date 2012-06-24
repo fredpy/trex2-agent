@@ -163,6 +163,10 @@ namespace TREX {
       goal_map m_plan_tokens;
 
       bool m_completed_this_tick;
+      
+      void print_stats(std::string const &what, size_t steps, size_t depth,
+		       stat_clock::duration const &dur);
+      std::ofstream m_stats;
     }; // TREX::europa::EuropaReactor
 
   } // TREX::europa
