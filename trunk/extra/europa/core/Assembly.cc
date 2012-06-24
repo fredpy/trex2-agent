@@ -355,33 +355,46 @@ bool Assembly::playTransaction(std::string const &nddl) {
   return constraint_engine()->constraintConsistent();
 }
 
-void Assembly::configure_solvers(std::string const &cfg) {
+void Assembly::configure_solvers(std::string const &synchronizer,
+				 std::string const &planner) {
+  debugMsg("trex:init", "Loading planner configuration from \""<<planner<<"\".");
   std::auto_ptr<EUROPA::TiXmlElement>
-  xml_cfg(EUROPA::initXml(cfg.c_str()));
+    xml_cfg(EUROPA::initXml(planner.c_str()));
+  
+  debugMsg("trex:init", "Injecting global filter for planning horizon");
+  EUROPA::TiXmlElement 
+    *filter=dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(),
+									    EUROPA::TiXmlElement("FlawFilter")));
 
-  EUROPA::TiXmlElement
-  *filter = dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(),
-                                                                            EUROPA::TiXmlElement("FlawFilter")));
-  // Setup our deliberation solver
   filter->SetAttribute("component", TO_STRING_EVAL(TREX_DELIB_FILT));
-  debugMsg("trex:init", "Load planning solver with configuration:\n"<<(*xml_cfg));
-
+  debugMsg("trex:init", "Configuring europa planner with xml:\n"<<(*xml_cfg));
   m_planner = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+  
+  if( synchronizer!=planner ) {
+    debugMsg("trex:init", "Loading synchronizer configuration from \""<<planner<<"\".");
+    xml_cfg.reset(EUROPA::initXml(synchronizer.c_str()));
+    debugMsg("trex:init", "Injecting global filter for synchronizer horizon");
+    filter = dynamic_cast<EUROPA::TiXmlElement *>(xml_cfg->InsertBeforeChild(xml_cfg->FirstChild(),
+									     EUROPA::TiXmlElement("FlawFilter")));
+  } else {
+    debugMsg("trex:init", "Altering planner config for synchronizer");
+    debugMsg("trex:init", "Altering global filter for synchronizer horizon");
+  }
 
-  // Setup our synchronization solver
   filter->SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_FILT));
+  debugMsg("trex:init", "Injecting current state flaws manager with priority of "<<TREX_SYNCH_PRIORITY);
 
   EUROPA::TiXmlElement synch(TO_STRING_EVAL(TREX_SYNCH_MGR)),
-  handler("FlawHandler");
-  
-  synch.SetAttribute("defaultPriority", 2000);
-
+    handler("FlawHandler");
+  synch.SetAttribute("defaultPriority", TREX_SYNCH_PRIORITY);
   handler.SetAttribute("component", TO_STRING_EVAL(TREX_SYNCH_HANDLER));
   synch.InsertEndChild(handler);
   xml_cfg->InsertEndChild(synch);
 
-  debugMsg("trex:init", "Load synchronization solver with configuration:\n"<<(*xml_cfg));
+  debugMsg("trex:init", "Configuring europa synchronizer with xml:\n"<<(*xml_cfg));
   m_synchronizer = (new EUROPA::SOLVERS::Solver(plan_db(), *xml_cfg))->getId();
+
+  debugMsg("trex:init", "Adding synchronizer activity listener");
   m_synchronizer->addListener(m_synchListener->getId());
 }
 

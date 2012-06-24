@@ -150,6 +150,12 @@ namespace TREX {
  * @relates TREX::europa::SynchronizationManager
  */
 # define TREX_SYNCH_MGR      TrexSynchronizer
+/** @brief Priority of the synchronization manager 
+ *
+ * The priority given to europa for the synchronization flaws
+ * @relates TREX::europa::SynchronizationManager
+ */
+# define TREX_SYNCH_PRIORITY 2000
 /** @brief Name of the synchronization flaws handler
  *
  * The name of the synchronization handler as used on solver configuration file
