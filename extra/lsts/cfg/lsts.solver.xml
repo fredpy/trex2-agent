@@ -1,19 +1,17 @@
-<Solver name="LstsSolverCfg">
-  	<ThreatManager defaultPriority="10">
-    		<FlawHandler component="StandardThreatHandler"/>
-  	</ThreatManager>
+<Solver name="LstsPlanCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="StandardThreatHandler"/>
+  </ThreatManager>
 
-  	<OpenConditionManager defaultPriority="100">
-	  <FlawFilter component="goals"/>
-    		<FlawHandler component="StandardOpenConditionHandler"/>
-  	</OpenConditionManager>
+  <!-- resolve non goal first -->
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
 
-  	<OpenConditionManager defaultPriority="2500">
-	  <FlawFilter component="notGoals"/>
-    		<FlawHandler component="StandardOpenConditionHandler"/>
-  	</OpenConditionManager>
-  	<!-- UnboundVariableManager defaultPriority="0">
-    		<FlawFilter component="Singleton"/>
-    		<FlawHandler component="StandardVariableHandler"/>
-  	</UnboundVariableManager -->
+  <!-- then resolve new goals -->
+  <OpenConditionManager defaultPriority="2500">
+    <FlawFilter component="notGoals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
 </Solver>
