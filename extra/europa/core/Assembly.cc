@@ -451,6 +451,15 @@ bool Assembly::relax(bool aggressive) {
   details::is_rejectable rejectable;
   EUROPA::DbClientId cli = plan_db()->getClient();
   std::string relax_name = "RELAX";
+  bool auto_prop = m_cstr_engine->getAutoPropagation();
+  
+  m_cstr_engine->setAutoPropagation(false);
+  
+  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
+    m_cstr_engine->setAutoPropagation(auto_prop);
+  } BOOST_SCOPE_EXIT_END
+
+
   if( aggressive )
     relax_name = "AGGRESSIVE "+relax_name;
 
@@ -479,8 +488,15 @@ bool Assembly::relax(bool aggressive) {
         debugMsg("trex:relax", "\t- "<<tok->getKey()<<" is a fact");
         if( aggressive ) {
           debugMsg("trex:relax", "\t- destroying "<<tok->getKey()<<" (aggressive)");
-          if( !tok->isInactive() )
-            cli->cancel(tok);
+          if( !tok->isInactive() ) {
+	    EUROPA::TokenSet slaves = tok->slaves();
+	    for(EUROPA::TokenSet::const_iterator s=slaves.begin();
+		slaves.end()!=s; ++s) {
+	      if( !(*s)->isInactive() )
+		cli->cancel(*s);
+	    }
+            cli->cancel(tok); 
+	  }
           cli->deleteToken(tok);
         }
       } else {
@@ -627,6 +643,7 @@ void Assembly::archive() {
       }
     }
     // Check slaves
+
     EUROPA::TokenSet slaves_t = tok->slaves();
     for(EUROPA::TokenSet::const_iterator s=slaves_t.begin();
         slaves_t.end()!=s; ++s) {
@@ -644,6 +661,7 @@ void Assembly::archive() {
         bool ended;
         if( (*s)->isActive() ) {
           if( (*s)->isCommitted() ) {
+	    debugMsg("trex:archive", "Removing committed token "<<(*s)->getKey()<<" from "<<tok->getKey()<<" slaves.");
             (*s)->removeMaster(tok);
             ended = true;
           } else {
