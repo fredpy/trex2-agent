@@ -986,22 +986,55 @@ namespace TREX {
        * @retval false  the plan database is now inconsistent
        */
       bool playTransaction(std::string const &nddl);
+
       /** @brief Configure solvers
-       * @param[in] cfg A XML solver configuration file name
+       * @param[in] synchronizer A XML solver configuration file name
+       * @param[in] planner A XML solver configuration file name
        *
        * Configure both the planner and synchronizer solvers using the
-       * file @p cfg as a basis
+       * file @p planner and @c synchronizer files as respective basis
        *
-       * @pre @p cfg is a valid XML solver configuration file
-       * @post bothe the planner and synchronizer solvers are configured using
-       *      @p cfg as a basis with the addition of their dedicated filters
-       *      and flawmanagers
+       * @pre @p planner is a valid XML solver configuration file
+       * @pre @p synchronizer is a valid XML solver configuration file
+       * @post both the planner and synchronizer solvers are configured using
+       *      their repective configuration file as a basis with the addition 
+       *      of their dedicated filters and flawmanagers
+       *
+       * @par What does trex inject in the configuration files ?
+       *
+       * In order to handle properly both synchronization and deliberation, 
+       * trex needs to add extra components to the solver. These allow to 
+       * focus the europa solver to only the flaws that are relevant to the 
+       * current problem Firo this reason the first thing that is injected
+       * is a planning horizon filter acting as follow:
+       * @li for the @p synchronizer the filter accepts only tokens that 
+       *     may overlap the current tick (ie start can be less or equal 
+       *     to current tick and @p end can be greater or equal to current 
+       *     tick)
+       * @li for the @p planner the filter accept all the tokens that can 
+       *     overlap the window [current, current+latency+lookahead]
+       * 
+       * @par
+       *
+       * In addition the @p synchronizer needs to introduce a new type of 
+       *    flaw called current state flaw that enforces the planner to identify 
+       *    for each of its @e Internal tokens their state at the current tick.
        *
        * @sa DeliberationFilter
        * @sa SynchronizationFilter
        * @sa SynchronizationManager
        */
-      void configure_solvers(std::string const &cfg);
+      void configure_solvers(std::string const &synchronizer, 
+			     std::string const &planner);
+      /** @brief Configure solvers
+       * @param[in] cfg A XML solver configuration file name
+       * @overload configure_solvers(std::string const &, std::stribng const &)
+       *
+       * A legacy method that allows to configure both solvers using @p cfg as a basis.
+       */
+      void configure_solvers(std::string const &cfg) {
+	configure_solvers(cfg, cfg);
+      }
 
       /** @brief New tick notification
        *

@@ -45,6 +45,8 @@
 
 #include <boost/scope_exit.hpp>
 
+// #undef Europa_Archive_OLD
+
 using namespace TREX::europa;
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -96,27 +98,43 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     plan_db()->close();
   }
 
-  // Loading solver configuration
-  std::string solver_cfg = parse_attr<std::string>(cfg, "solverConfig");
-  // boost::optional<std::string>
-  //   synch_cfg = parse_attr< boost::optional<std::string> >(cfg, "synchCfg");
-
-  if( solver_cfg.empty() ) {
-    syslog("ERROR")<<"You need to specify the solverConfig as a file";
-    throw XmlError(cfg, "attribute \"solverConfig\" is empty");
+  // Getting planner configuration
+  std::string attr = "plan_cfg", planner_cfg, synch_cfg;
+  boost::optional<std::string> tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
+ 
+  if( !tmp ) {
+    syslog("WARN")<<"Did not find planner_cfg attribute. Looking for legacy solverCfg instead.";
+    attr = "solverCfg";
+    tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
+    if( !tmp )
+      throw XmlError(cfg, "Missing plan_cfg file attribute");
   }
-  solver_cfg = manager().use(solver_cfg, found);
-
+  if( tmp->empty() ) {
+    syslog("ERROR")<<"planner config file name is empty.";
+    throw XmlError(cfg, "Attribute "+attr+" is not a valid file name.");
+  }
+  planner_cfg = manager().use(*tmp, found);
   if( !found ) {
-    syslog("ERROR")<<"file "<<solver_cfg<<" was not found in my path";
-    throw ReactorException(*this, 
-			   "Unable to locate solver config \""+solver_cfg+"\".");
+    syslog("ERROR")<<"unable to locate planner cfg file \""<<*tmp<<"\"";
+    throw ReactorException(*this, "Unable to locate planner cfg \""+(*tmp)+"\"");
   }
-
+  // Getting synchronizer configuration
+  tmp = parse_attr< boost::optional<std::string> >(cfg, "synch_cfg");
+  if( !tmp ) {
+    syslog("WARN")<<"Did not find synch_cfg attribute. Will use planner_cfg instead.";
+    synch_cfg = planner_cfg;
+  } else {
+    synch_cfg = manager().use(*tmp, found);
+    if( !found ) {
+      syslog("ERROR")<<"unable to locate synch cfg file \""<<*tmp<<"\"";
+      throw ReactorException(*this, "Unable to locate synch cfg \""+(*tmp)+"\"");
+    }
+  }
+    
   try {
-    configure_solvers(solver_cfg);
+    configure_solvers(synch_cfg, planner_cfg);
   } catch(std::exception const &e) {
-    syslog("ERROR")<<" exception during solver cfg: "<<e.what();
+    syslog("ERROR")<<" exception during solvers configuration: "<<e.what();
     throw;
   }
 
@@ -360,7 +378,6 @@ bool EuropaReactor::synchronize() {
 //        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END
 
-
   if( !do_synchronize() ) {
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
@@ -375,30 +392,32 @@ bool EuropaReactor::synchronize() {
         return false;
       }
     }
-  }
+  } else { // things to do when everything went fine:
 
-  // Prepare the reactor for next deliberation round 
-  if( m_completed_this_tick ) {
-    planner()->clear(); // remove the past decisions of the planner
+    // Prepare the reactor for next deliberation round 
+    if( m_completed_this_tick ) {
+      planner()->clear(); // remove the past decisions of the planner
 
-    Assembly::external_iterator from(begin(), end()), to(end(), end());
-    for( ; to!=from; ++from) {
-      EUROPA::TokenId cur = (*from)->previous();
-      if( cur.isId() && cur->isMerged() )
-        m_dispatched.left.erase(cur->getActiveToken()->getKey());
+      Assembly::external_iterator from(begin(), end()), to(end(), end());
+      for( ; to!=from; ++from) {
+	EUROPA::TokenId cur = (*from)->previous();
+	if( cur.isId() && cur->isMerged() )
+	  m_dispatched.left.erase(cur->getActiveToken()->getKey());
+      }
+      m_completed_this_tick = false;
+    } 
+#ifndef Europa_Archive_OLD
+    // Necessary in case the planner did not run on previous tick
+    if( planner()->getStepCount()==0 ) {
+      stat_clock::time_point start = stat_clock::now();
+      archive();
+      stat_clock::duration arch_d = stat_clock::now()-start;
+      std::ostringstream oss;
+      display(oss<<"Archiving completed in ", arch_d);
+      tr_info(oss.str());
     }
-    m_completed_this_tick = false;
-  } 
-  // Necessary in case the planner did not run on previous tick
-  if( planner()->getStepCount()==0 ) {
-    stat_clock::time_point start = stat_clock::now();
-    archive();
-    stat_clock::duration arch_d = stat_clock::now()-start;
-    std::ostringstream oss;
-    display(oss<<"Archiving completed in ", arch_d);
-    tr_info(oss.str());
+#endif 
   }
-
   return constraint_engine()->propagate(); // should not fail
 }
 
@@ -455,6 +474,7 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
+#ifdef Europa_Archive_OLD
       { // mesure archiving time 
         stat_clock::time_point start = stat_clock::now();
         planner()->clear();
@@ -464,6 +484,7 @@ bool EuropaReactor::hasWork() {
         display(oss<<"Archiving completed in ", arch_d);
         tr_info(oss.str());
       }
+#endif // Europa_Archive_OLD
       debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
       if( steps>0 ) {
         syslog()<<"Deliberation completed in "<<steps<<" steps.";
@@ -514,9 +535,9 @@ void EuropaReactor::resume() {
 
   if( should_relax ) {
     syslog("WARN")<<"Relax database after "<<planner()->getStepCount()<<" steps.";
-    if( !relax(false) )
+    if( !do_relax(false) )
       syslog("WARN")<<"Failed to relax => forgetting past.";
-      if( !relax(true) ) {
+      if( !do_relax(true) ) {
         syslog("ERROR")<<"Unable to recover from plan inconsistency.";
 	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
       }
