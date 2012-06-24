@@ -365,17 +365,21 @@ bool EuropaReactor::do_relax(bool full) {
   return ret;
 }
 
+bool EuropaReactor::synch() {
+  stat_clock::time_point start = stat_clock::now();
+  bool ret = do_synchronize();
+  print_stats("synch", synchronizer()->getStepCount(), 
+	      synchronizer()->getDepth(), 
+	      stat_clock::now()-start);
+  return ret;
+}
 
 bool EuropaReactor::synchronize() {
   setStream();
   EuropaReactor &me = *this;
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
-  stat_clock::time_point start = stat_clock::now();
   BOOST_SCOPE_EXIT((&me)(&start)) {
-    me.print_stats("synch", me.synchronizer()->getStepCount(), 
-		   me.synchronizer()->getDepth(), 
-		   stat_clock::now()-start);
     me.synchronizer()->clear();
     me.logPlan("synch");
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
@@ -384,13 +388,13 @@ bool EuropaReactor::synchronize() {
 //        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END
 
-  if( !do_synchronize() ) {
+  if( !synch() ) {
     m_completed_this_tick = false;
     syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
 
-    if( !( do_relax(false) && do_synchronize() ) ) {
+    if( !( do_relax(false) && synch() ) ) {
       syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
-      if( !( do_relax(true) && do_synchronize() ) ) {
+      if( !( do_relax(true) && synch() ) ) {
         syslog("ERROR")<<"Failed to synchronize(3) : killing reactor";
         return false;
       }
