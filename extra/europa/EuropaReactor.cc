@@ -45,7 +45,7 @@
 
 #include <boost/scope_exit.hpp>
 
-// #undef Europa_Archive_OLD
+// define Europa_Archive_OLD
 
 using namespace TREX::europa;
 using namespace TREX::transaction;
@@ -541,7 +541,7 @@ void EuropaReactor::resume() {
 	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
       }
   }
-  print_stats("archive", planner()->getStepCount(), 
+  print_stats("delib", planner()->getStepCount(), 
 	      planner()->getDepth(), stat_clock::now()-start);
 }
 
