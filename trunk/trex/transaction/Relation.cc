@@ -70,16 +70,16 @@ timeline::~timeline() {
 // observers :
 
 bool timeline::should_publish() const {
-  return m_transactions.test(1) && (0 < m_plan_listeners);
+  return publish_plan() && (0 < m_plan_listeners);
 }
 
 
 TICK timeline::look_ahead() const {
-  return (owned() && m_transactions.test(0))?owner().getLookAhead():0;
+  return (accept_goals())?owner().getLookAhead():0;
 }
 
 TICK timeline::latency() const {
-  return owned()?owner().getExecLatency():0;
+  return accept_goals()?owner().getExecLatency():0;
 }
 
 // modifiers :
@@ -98,8 +98,16 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
     m_transactions = flags;
     r.assigned(this);
     latency_update(0);
-  } else if( !owned_by(r) ) 
+  } else if( owned_by(r) ) {
+    TICK update = 0;
+    if( !flags.test(0) )
+      update = r.getExecLatency();
+    m_transactions = flags;
+    r.assigned(this);
+    latency_update(update);
+  } else {
     throw MultipleInternals(r, name(), owner());
+  }
   return ret;
 }
 

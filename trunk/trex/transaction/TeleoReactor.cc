@@ -648,7 +648,7 @@ void TeleoReactor::assigned(details::timeline *tl) {
   if( is_verbose() )
     syslog()<<"Declared \""<<tl->name()<<"\".";
   if( NULL!=m_trLog ) {
-    m_trLog->provide(tl->name());
+    m_trLog->provide(tl->name(), tl->accept_goals(), tl->publish_plan());
   }
   for(graph::listen_set::const_iterator i=m_graph.m_listeners.begin();
       m_graph.m_listeners.end()!=i; ++i)
@@ -677,7 +677,7 @@ void TeleoReactor::subscribed(Relation const &r) {
     syslog()<<"Subscribed to \""<<r.name()<<'\"'
             <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
   if( NULL!=m_trLog ) {
-    m_trLog->use(r.name());
+    m_trLog->use(r.name(), r.accept_goals(), r.accept_plan_tokens());
   }
 }
 
@@ -739,14 +739,20 @@ TeleoReactor::Logger::~Logger() {
   m_file.close();
 }
 
-void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name) {
+void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name, 
+				   bool goals, bool plan) {
   open_phase();
-  m_file<<"      <provide name=\""<<name<<"\"/>"<<std::endl;
+  m_file<<"      <provide name=\""<<name
+	<<"\" goals=\""<<goals
+	<<"\" plan=\""<<plan<<"\"/>"<<std::endl;
 }
 
-void TeleoReactor::Logger::use(TREX::utils::Symbol const &name) {
+void TeleoReactor::Logger::use(TREX::utils::Symbol const &name, 
+			       bool goals, bool plan) {
   open_phase();
-  m_file<<"      <use name=\""<<name<<"\"/>"<<std::endl;
+  m_file<<"      <use name=\""<<name
+	<<"\" goals=\""<<goals
+	<<"\" plan=\""<<plan<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {

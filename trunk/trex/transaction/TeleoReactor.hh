@@ -1049,7 +1049,7 @@ namespace TREX {
         /** @brief Constructor 
          * @param[in] dest A filename
          * 
-         * Create a new insttance that will redirect all the transaction events 
+         * Create a new instance that will redirect all the transaction events 
          * to the file @p dest
          */
 	Logger(std::string const &dest);
@@ -1064,12 +1064,12 @@ namespace TREX {
          *
          * @param[in] name the name of the timeline 
          */
-	void provide(TREX::utils::Symbol const &name);
+	void provide(TREX::utils::Symbol const &name, bool goals, bool plan);
         /** @brief External timeline subsription
          *
          * @param[in] name the name of the timeline 
          */
-	void use(TREX::utils::Symbol const &name);
+	void use(TREX::utils::Symbol const &name, bool goals, bool plan);
 
         /** @brief undeclaration of an Internal timeline
          *

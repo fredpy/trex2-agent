@@ -70,9 +70,9 @@ namespace TREX {
       void set_work(bool val) {
 	m_work = val;
       }
-      void play_use(utils::Symbol const &tl);
+      void play_use(utils::Symbol const &tl, bool goals, bool plan);
       void play_unuse(utils::Symbol const &tl);
-      void play_provide(utils::Symbol const &tl);
+      void play_provide(utils::Symbol const &tl, bool goals, bool plan);
       void play_unprovide(utils::Symbol const &tl);
       void play_obs(Observation const &obs);
       void play_request(goal_id const &g);
