@@ -32,34 +32,59 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "TransactionPlayer.hh"
+
+#include <trex/utils/Plugin.hh>
+
 #include <set>
 
 using namespace TREX::transaction;
+using namespace TREX::backward;
 using namespace TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   
-  TeleoReactor::xml_factory::declare<Player> decl("LogPlayer");
+  /** @brief TREX log entry point */
+  SingletonUse<LogManager> s_log;
+
+  TeleoReactor::xml_factory::declare<Player> decl("OldLogPlayer");
 
 } // ::
 
+namespace TREX {
+  
+  /** @brief Plug-in initialisation
+   *
+   * This function is called by TREX after loading the lighswitch plug-in.
+   * It manage the initialisation of this plug-in
+   *
+   * @ingroup lightswitch
+   */
+  void initPlugin() {
+    ::s_log->syslog("plugin.backward")<<"Backward compatibility plugin loaded."
+				      <<std::endl;
+    // ::decl;
+  }
+
+} // TREX
+
+
 /*
- * class TREX::transaction::Player::timeline_transaction
+ * class TREX::backward::Player::timeline_transaction
  */ 
 
 Player::timeline_transaction::timeline_transaction(boost::property_tree::ptree::value_type &node)
   :m_name(parse_attr<Symbol>(node, "name")) {}
 
 /*
- * class TREX::transaction::Player::op_assert
+ * class TREX::backward::Player::op_assert
  */ 
 
 Player::op_assert::op_assert(boost::property_tree::ptree::value_type &node) 
   :m_obs(node) {}
 
 /*
- * class TREX::transaction::Player::op_request
+ * class TREX::backward::Player::op_request
  */ 
 Player::op_request::op_request(boost::property_tree::ptree::value_type &node)
   :m_id(parse_attr<std::string>(node, "id")) {
@@ -70,7 +95,7 @@ Player::op_request::op_request(boost::property_tree::ptree::value_type &node)
 }
 
 /*
- * class TREX::transaction::Player::op_recall
+ * class TREX::backward::Player::op_recall
  */ 
 
 Player::op_recall::op_recall(boost::property_tree::ptree::value_type &node)
@@ -79,7 +104,7 @@ Player::op_recall::op_recall(boost::property_tree::ptree::value_type &node)
 
 
 /*
- * class TREX::transaction::Player::op_token
+ * class TREX::backward::Player::op_token
  */ 
 Player::op_token::op_token(boost::property_tree::ptree::value_type &node)
 :m_id(parse_attr<std::string>(node, "id")) {
@@ -90,7 +115,7 @@ Player::op_token::op_token(boost::property_tree::ptree::value_type &node)
 }
 
 /*
- * class TREX::transaction::Player::op_recall
+ * class TREX::backward::Player::op_recall
  */ 
 
 Player::op_cancel::op_cancel(boost::property_tree::ptree::value_type &node)
@@ -99,7 +124,7 @@ Player::op_cancel::op_cancel(boost::property_tree::ptree::value_type &node)
 
 
 /*
- * class TREX::transaction::Player
+ * class TREX::backward::Player
  */
 
 // statics
