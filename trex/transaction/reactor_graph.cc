@@ -180,7 +180,7 @@ std::string graph::date_str(TICK cur) const {
 void graph::clear() {
   while( !m_reactors.empty() ) {
     syslog()<<"Disconnecting \""<<m_reactors.front()->getName()<<"\" from the graph.";
-    m_reactors.front()->isolate();
+    m_reactors.front()->isolate(false);
     m_reactors.pop_front();
   } 
   m_quarantined.clear();

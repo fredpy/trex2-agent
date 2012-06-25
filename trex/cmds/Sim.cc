@@ -308,6 +308,7 @@ int main(int argc, char **argv) {
     ret = -4;
   }
   s_log->syslog("INFO")<<"=============================== END sim ============================";
+  my_agent.reset();
   return ret;
 }
 

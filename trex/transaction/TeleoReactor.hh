@@ -901,7 +901,7 @@ namespace TREX {
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa use(TREX::utils::Symbol const &, bool)
        * @sa unprovide(TREX::utils::Symbol const &)
-       * @sa isolate()
+       * @sa isolate(bool)
        */
       bool unuse(TREX::utils::Symbol const &timeline);
       /** @brief Internal timeline unsubscription
@@ -918,7 +918,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa unuse(TREX::utils::Symbol const &)
        * @sa provide(TREX::utils::Symbol const &, bool, bool)
-       * @sa isolate()
+       * @sa isolate(bool)
        */
       bool unprovide(TREX::utils::Symbol const &timeline);
 
