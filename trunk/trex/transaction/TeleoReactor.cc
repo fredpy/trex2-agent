@@ -212,8 +212,14 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
     std::string base = getName().str()+".tr.log";
     fname = manager().file_name(base);
     m_trLog = new Logger(fname.string());
-    LogManager::path_type lnk = manager().file_name("cfg/"+base);
-    create_symlink(fname, lnk);
+    LogManager::path_type cfg = manager().file_name("cfg"), 
+      pwd = boost::filesystem::current_path(), 
+      short_name(base), location("../"+base);
+    boost::filesystem::current_path(cfg);
+    try {
+      create_symlink(location, short_name);
+    } catch(...) {}
+    boost::filesystem::current_path(pwd);
     syslog()<<"Transactions logged to "<<fname;
   }
 
