@@ -162,6 +162,12 @@ int main(int argc, char **argv) {
   my_agent.reset(new Agent(configFile, clk.release()));
   // Use a 1Hz clock by default
   my_agent->setClock(new RealTimeClock(boost::chrono::seconds(1)));
-  my_agent->run();
-  return 0;
+  try {
+    my_agent->run(); 
+    my_agent.reset();
+    return 0;
+  } catch(...) {
+    my_agent.reset();
+    throw;
+  }
 }

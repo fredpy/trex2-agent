@@ -287,9 +287,13 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
 		   <<"\" has multiple xml trees.";
     throw ReactorException(*this, "Invalid transaction log file.");
   }
+  if( pt.front().first!="Log" )
+    syslog("WARN")<<"root tag \""<<pt.front().first<<"\" is not Log.";
+  pt = pt.front().second;
+
   // Play the header
   boost::property_tree::ptree::assoc_iterator i, last;
-  boost::tie(i, last) = xml_factory::node(arg).second.equal_range("header");
+  boost::tie(i, last) = pt.equal_range("header");
   if( last!=i ) {
     typedef details::tr_event::factory                  tr_fact;
     typedef boost::property_tree::ptree::iterator iter;
@@ -304,7 +308,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   }
   
   // Load the ticks
-  boost::tie(i, last) = xml_factory::node(arg).second.equal_range("tick");
+  boost::tie(i, last) = pt.equal_range("tick");
   bool first = true;
   for( ; last!=i; ++i) {
     TICK cur = parse_attr<TICK>(*i, "value");    
@@ -316,8 +320,9 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
       } else if( s_new_tick!=j->first &&
 		 s_synchronize!=j->first &&
 		 s_has_work!=j->first &&
-		 s_step!=j->first ) {
-	syslog("WARN")<<"Skiping unknown phase \""<<j->first<<"\".";
+		 s_step!=j->first &&
+		 "<xmlattr>"!=j->first ) {
+	syslog("WARN")<<"Skipping unknown phase \""<<j->first<<"\".";
 	continue;
       }	
       first = false;
@@ -325,6 +330,11 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
       m_log.push_back(std::make_pair(cur, p));
     }
   }
+  if( m_log.empty() )
+    syslog("WARN")<<" this reactor has no event to play.";
+  else 
+    syslog("INFO")<<"Loaded "<<m_log.size()<<" phases from tick "<<m_log.front().first<<" to tick "<<m_log.back().first;
+  m_goal_map.clear();
 }
 
 LogPlayer::~LogPlayer() {
