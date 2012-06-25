@@ -1282,8 +1282,12 @@ namespace TREX {
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
       void isolate(bool failed=true) {
-	if( NULL!=m_trLog && failed )
-	  m_trLog->failed();
+	if( NULL!=m_trLog && failed ) {
+	  Logger *tmp = NULL;
+	  std::swap(tmp, m_trLog);
+	  tmp->failed();
+	  delete tmp;
+	}
 	clear_internals();
 	clear_externals();
       }
