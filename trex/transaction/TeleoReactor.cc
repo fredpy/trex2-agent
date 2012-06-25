@@ -209,8 +209,11 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
   m_stat_log<<"tick, synch_ns, delib_ns, n_steps\n";
      
   if( parse_attr<bool>(log_default, node, "log") ) {
-    fname = manager().file_name(getName().str()+".tr.log");
+    std::string base = getName().str()+".tr.log";
+    fname = manager().file_name(base);
     m_trLog = new Logger(fname.string());
+    LogManager::path_type lnk = manager().file_name("cfg/"+base);
+    create_symlink(fname, lnk);
     syslog()<<"Transactions logged to "<<fname;
   }
 
