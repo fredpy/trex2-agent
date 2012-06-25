@@ -210,7 +210,7 @@ Assembly::Assembly(std::string const &name)
 Assembly::~Assembly() {
   setStream();
   // debugMsg("trex:end", "Destroying "<<m_name);
-  m_proxy.reset();
+  // m_proxy.reset(); // <- this generate a crash on my mac
   m_ce_listener.reset();
   m_synchListener.reset();
   // cleanup base class
