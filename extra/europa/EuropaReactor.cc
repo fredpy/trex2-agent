@@ -103,8 +103,8 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   boost::optional<std::string> tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
  
   if( !tmp ) {
-    syslog("WARN")<<"Did not find planner_cfg attribute. Looking for legacy solverCfg instead.";
-    attr = "solverCfg";
+    syslog("WARN")<<"Did not find planner_cfg attribute. Looking for legacy solverConfig instead.";
+    attr = "solverConfig";
     tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
     if( !tmp )
       throw XmlError(cfg, "Missing plan_cfg file attribute");
@@ -121,7 +121,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   // Getting synchronizer configuration
   tmp = parse_attr< boost::optional<std::string> >(cfg, "synch_cfg");
   if( !tmp ) {
-    syslog("WARN")<<"Did not find synch_cfg attribute. Will use planner_cfg instead.";
+    syslog("WARN")<<"Did not find synch_cfg attribute. Will use plan_cfg instead.";
     synch_cfg = planner_cfg;
   } else {
     synch_cfg = manager().use(*tmp, found);
