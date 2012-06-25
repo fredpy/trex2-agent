@@ -263,7 +263,7 @@ TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg
 // structors 
 
 LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false) {
+  :TeleoReactor(arg, false, false) {
   std::string 
     file_name = parse_attr<std::string>(getName().str()+".tr.log",
 					xml_factory::node(arg),
