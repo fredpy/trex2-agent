@@ -719,7 +719,8 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
  */
 
 TeleoReactor::Logger::Logger(std::string const &file_name)
-  :m_file(file_name.c_str()), m_tick(false), m_header(true) {
+  :m_file(file_name.c_str()), m_header(true), m_tick(false), 
+   m_tick_opened(false), m_in_phase(false), m_hasData(false) {
   m_file<<"<Log>\n  <header>"<<std::endl;
 }
 

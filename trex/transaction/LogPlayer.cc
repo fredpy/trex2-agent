@@ -254,6 +254,12 @@ Symbol const LogPlayer::s_synchronize("synchronize");
 Symbol const LogPlayer::s_has_work("has_work");
 Symbol const LogPlayer::s_step("step");
 
+TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg) {
+  // force logging to false
+  set_attr(xml_factory::node(arg), "log", false);
+  return arg;
+}
+
 // structors 
 
 LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)

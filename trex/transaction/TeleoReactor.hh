@@ -1137,7 +1137,6 @@ namespace TREX {
          * to be closed
          */
         bool m_hasData;
-	size_t m_indent;
         /** @brief Current tick
          * 
          * the current tick value as provided by newTick call. This value is 
