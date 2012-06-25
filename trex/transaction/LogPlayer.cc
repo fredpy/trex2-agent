@@ -47,8 +47,15 @@ namespace TREX {
 	utils::Symbol const &timeline() const {
 	  return m_timeline;
 	}
+	bool goals() const {
+	  return m_goals;
+	}
+	bool plan() const {
+	  return m_plan;
+	}
       private:
 	utils::Symbol m_timeline;
+	bool m_goals, m_plan;
       }; // TREX::transaction::details::tl_event
       
       class tr_use:public tl_event {
@@ -58,7 +65,7 @@ namespace TREX {
 	~tr_use() {}
       private:
 	void play() {
-	  m_reactor.play_use(timeline());
+	  m_reactor.play_use(timeline(), goals(), plan());
 	}
       }; // TREX::transaction::details::tr_use
 
@@ -80,7 +87,7 @@ namespace TREX {
 	~tr_provide() {}
       private:
 	void play() {
-	  m_reactor.play_provide(timeline());
+	  m_reactor.play_provide(timeline(), goals(), plan());
 	}
       }; // TREX::transaction::details::tr_provide
 
@@ -401,16 +408,16 @@ void LogPlayer::resume() {
 
 
 // events 
-void LogPlayer::play_use(utils::Symbol const &tl) {
-  use(tl);
+void LogPlayer::play_use(utils::Symbol const &tl, bool goals, bool plan) {
+  use(tl, goals, plan);
 }
  
 void LogPlayer::play_unuse(utils::Symbol const &tl) {
   unuse(tl);
 }
 
-void LogPlayer::play_provide(utils::Symbol const &tl) {
-  provide(tl);
+void LogPlayer::play_provide(utils::Symbol const &tl, bool goals, bool plan) {
+  provide(tl, goals, plan);
 }
 
 void LogPlayer::play_unprovide(utils::Symbol const &tl) {
@@ -474,7 +481,9 @@ void tr_event::set_goal(std::string const &key, goal_id const &g) {
 
 tl_event::tl_event(tl_event::factory::argument_type const &arg) 
   :tr_event(arg), 
-   m_timeline(parse_attr<std::string>(factory::node(arg), "name")) {}
+   m_timeline(parse_attr<std::string>(factory::node(arg), "name")),
+   m_goals(parse_attr<bool>(true, factory::node(arg), "goals")),
+   m_plan(parse_attr<bool>(true, factory::node(arg), "plan")) {}
 
 /*
  * class TREX::transaction::details::tr_goal_event

@@ -288,6 +288,13 @@ namespace TREX {
          */
 	void request(goal_id const &g);
 
+	bool accept_goals() const {
+	  return owned() && m_transactions.test(0); 
+	}
+	bool publish_plan() const {
+	  return owned() && m_transactions.test(1);
+	}
+
       private:
 	/** @brief Create ownership
 	 * @param[in] r            A reactor
