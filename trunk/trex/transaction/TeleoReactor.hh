@@ -393,7 +393,7 @@ namespace TREX {
        *
        * @sa handleTickStart()
        */
-      bool   newTick();
+      bool newTick();
       /** @brief Synchronization callback
        *
        * This method is called by the agent to make the reactor execute
@@ -1082,11 +1082,17 @@ namespace TREX {
          */
 	void unuse(TREX::utils::Symbol const &name);
 
+	void init(TICK val);
         /** @brief New tick event
          * 
          * @param[in] val the new tick date
          */
 	void newTick(TICK val);
+	void synchronize();
+	void failed();
+	void has_work();
+	void work(bool ret);
+	void step();
 
         /** @brief New observation 
          * @param[in] obs the observation
@@ -1111,11 +1117,19 @@ namespace TREX {
         /** @brief Output file
          */
 	std::ofstream m_file;
+
         /** @brief In tick flag
          * 
          * A boolean flag used to identify if newTick was called at least once
          */
-	bool m_tick;
+	bool m_header, m_tick, m_tick_opened;
+	/** @brief In phase flag,
+	 *
+	 * A boolean flag to indicate that a new phase callback has been called
+	 * since last update
+	 */
+	bool m_in_phase;
+	
         /** @brief Pending data flag
          *
          * This flag is used to indicate that events did occur on the 
@@ -1123,12 +1137,28 @@ namespace TREX {
          * to be closed
          */
         bool m_hasData;
+	size_t m_indent;
         /** @brief Current tick
          * 
          * the current tick value as provided by newTick call. This value is 
          * valid only if m_tickj is @c true 
          */
 	TICK m_current;
+
+	enum tick_phase {
+	  in_init = 0,
+	  in_new_tick,
+	  in_synchronize,
+	  in_work,
+	  in_step
+	};
+
+	tick_phase m_phase;
+
+	void open_tick();
+	void open_phase();
+	void close_phase();
+	void close_tick();
 
         /** @brief Open new tick xml tag
          *
@@ -1252,7 +1282,9 @@ namespace TREX {
        */
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
-      void isolate() {
+      void isolate(bool failed=true) {
+	if( NULL!=m_trLog && failed )
+	  m_trLog->failed();
 	clear_internals();
 	clear_externals();
       }

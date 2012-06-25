@@ -40,7 +40,7 @@ add_library(TREXtransaction SHARED
   reactor_graph.cc
   Relation.cc
   TeleoReactor.cc
-  TransactionPlayer.cc
+  LogPlayer.cc
   # headers
   bits/bgl_support.hh
   bits/external.hh
@@ -53,7 +53,7 @@ add_library(TREXtransaction SHARED
   TeleoReactor.hh
   Tick.hh
   bits/timeline.hh
-  TransactionPlayer.hh
+  LogPlayer.hh
   # template source
   bits/reactor_graph.tcc
 )

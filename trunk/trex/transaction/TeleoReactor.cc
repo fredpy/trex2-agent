@@ -46,6 +46,8 @@
 #include <trex/domain/FloatDomain.hh>
 #include <trex/utils/chrono_helper.hh>
 
+#include <boost/scope_exit.hpp>
+
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
@@ -253,7 +255,7 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
 }
 
 TeleoReactor::~TeleoReactor() {
-  isolate();
+  isolate(false);
   if( NULL!=m_trLog )
     delete m_trLog;
 }
@@ -301,8 +303,15 @@ void TeleoReactor::reset_deadline() {
 
 
 double TeleoReactor::workRatio() {
+  bool ret = false;
+  if( NULL!=m_trLog ) 
+    m_trLog->has_work();
   try {
-    if( hasWork() ) {
+    ret = hasWork();
+    if( NULL!=m_trLog )
+      m_trLog->work(ret);
+
+    if( ret ) {
       double ret = m_deadline;
       ret -= getCurrentTick();
       if( ret<0.0 && m_nSteps>0 ) {
@@ -448,6 +457,8 @@ bool TeleoReactor::initialize(TICK final) {
   syslog()<<"Execution latency is "<<getExecLatency();
   // syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
   try {
+    if( NULL!=m_trLog )
+      m_trLog->init(m_initialTick);
     handleInit();   // allow derived class initialization
     m_firstTick = true;
     m_inited = true;
@@ -515,6 +526,8 @@ void TeleoReactor::doNotify() {
 
 
 bool TeleoReactor::doSynchronize() {
+  if( NULL!=m_trLog )
+    m_trLog->synchronize();
   try {
     bool success;
     {
@@ -545,6 +558,8 @@ bool TeleoReactor::doSynchronize() {
 }
 
 void TeleoReactor::step() {
+  if( NULL!=m_trLog )
+    m_trLog->step();
   stat_clock::time_point start = stat_clock::now();
   resume();
   stat_clock::duration delta = stat_clock::now()-start;
@@ -704,91 +719,190 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
  */
 
 TeleoReactor::Logger::Logger(std::string const &file_name)
-  :m_file(file_name.c_str()), m_tick(false) {
+  :m_file(file_name.c_str()), m_tick(false), m_header(true) {
   m_file<<"<Log>\n  <header>"<<std::endl;
 }
 
 TeleoReactor::Logger::~Logger() {
-  if( m_tick ) {
-    if( m_hasData )
-      m_file<<"  </tick>\n";
-  } else
-    m_file<<"  </header>\n";
-  m_file<<"</log>";
+  close_tick();
+  m_file<<"</Log>\n";
+  m_file.close();
 }
 
 void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name) {
-  openTick();
-  m_file<<"    <provide name=\""<<name<<"\"/>"<<std::endl;
+  open_phase();
+  m_file<<"      <provide name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::use(TREX::utils::Symbol const &name) {
-  openTick();
-  m_file<<"    <use name=\""<<name<<"\"/>"<<std::endl;
+  open_phase();
+  m_file<<"      <use name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {
-  openTick();
-  m_file<<"    <unprovide name=\""<<name<<"\"/>"<<std::endl;
+  open_phase();
+  m_file<<"      <unprovide name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
-  openTick();
-  m_file<<"    <unuse name=\""<<name<<"\"/>"<<std::endl;
+  open_phase();
+  m_file<<"      <unuse name=\""<<name<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::comment(std::string const &msg) {
-  openTick();
+  open_phase();
   m_file<<"    <!-- "<<msg<<" -->"<<std::endl;
 }
 
+void TeleoReactor::Logger::init(TICK val) {
+  close_tick();
+  m_tick = true;
+  m_current = val;
+  m_in_phase = true;
+  m_phase = in_init;
+}
 
 void TeleoReactor::Logger::newTick(TICK val) {
-  if( m_tick ) {
-    if( m_hasData )
-      m_file<<"  </tick>"<<std::endl;
-  } else {
-    m_file<<"  </header>"<<std::endl;
-    m_tick = true;
-  }
-  m_hasData = false;
+  close_tick();
+  m_tick = true;
   m_current = val;
+  m_in_phase = true;
+  m_phase = in_new_tick;
 }
 
-void TeleoReactor::Logger::openTick() {
+void TeleoReactor::Logger::synchronize() {
+  close_phase();
+  m_in_phase = true;
+  m_phase = in_synchronize;
+}
+
+void TeleoReactor::Logger::failed() {
+  open_phase();
+  m_file<<"      <failed/>"<<std::endl;
+}
+
+
+void TeleoReactor::Logger::has_work() {
+  close_phase();
+  m_in_phase = true;
+  m_phase = in_work;
+}
+
+void TeleoReactor::Logger::work(bool ret) {
+  open_phase();
+  m_file<<"      <work value=\""<<ret<<"\"/>"<<std::endl;
+}
+
+
+void TeleoReactor::Logger::step() {
+  close_phase();
+  m_in_phase = true;
+  m_phase = in_step;
+}
+
+void TeleoReactor::Logger::open_tick() {
   if( m_tick ) {
-    if( !m_hasData ) {
+    if( !m_tick_opened ) {
       m_file<<"  <tick value=\""<<m_current<<"\">\n";
-      m_hasData = true;
-    }
+      m_tick_opened = true;
+    } 
   }
 }
 
+void TeleoReactor::Logger::open_phase() {
+  if( m_in_phase && !m_hasData ) {
+    open_tick(); 
+  
+    switch(m_phase) {
+      case in_init:
+	m_file<<"    <init>"<<std::endl;
+	break;
+      case in_new_tick:
+	m_file<<"    <start>"<<std::endl;
+	break;
+      case in_synchronize:
+	m_file<<"    <synchronize>"<<std::endl;
+	break;
+      case in_work:
+	m_file<<"    <has_work>"<<std::endl;
+	break;
+      case in_step:
+	m_file<<"    <step>"<<std::endl;
+	break;
+      default:
+	m_file<<"    <unknown>"<<std::endl;      
+    }
+    m_hasData = true;
+  }
+}
+
+void TeleoReactor::Logger::close_phase() {
+  if( m_in_phase ) {
+    if( m_hasData ) {
+      switch(m_phase) {
+      case in_init:
+	m_file<<"    </init>"<<std::endl;
+	break;
+      case in_new_tick:
+	m_file<<"    </start>"<<std::endl;
+	break;
+      case in_synchronize:
+	m_file<<"    </synchronize>"<<std::endl;
+	break;
+      case in_work:
+	m_file<<"    </has_work>"<<std::endl;
+	break;
+      case in_step:
+	m_file<<"    </step>"<<std::endl;
+	break;
+      default:
+	m_file<<"    </unknown>"<<std::endl;
+      }
+      m_hasData = false;
+    } 
+    m_in_phase = false;
+  }
+}
+
+void TeleoReactor::Logger::close_tick() {
+  if( m_tick ) {
+    if( m_tick_opened ) {
+      close_phase();
+      m_file<<"  </tick>"<<std::endl;
+    }
+  } else if( m_header ) {
+    m_file<<"  </header>"<<std::endl;
+    m_header = false;
+    m_in_phase = false;
+  }
+  m_tick = false;
+  m_tick_opened = false;
+}
 
 void TeleoReactor::Logger::observation(Observation const &obs) {
-  openTick();
-  obs.toXml(m_file, 4)<<std::endl;
+  open_phase();
+  obs.toXml(m_file, 6)<<std::endl;
 }
 
 void TeleoReactor::Logger::request(goal_id const &goal) {
-  openTick();
-  m_file<<"    <request id=\""<<goal<<"\">\n";
-  goal->toXml(m_file, 6)<<"\n    </request>"<<std::endl;
+  open_phase();
+  m_file<<"      <request id=\""<<goal<<"\">\n";
+  goal->toXml(m_file, 8)<<"\n      </request>"<<std::endl;
 }
 
 void TeleoReactor::Logger::recall(goal_id const &goal) {
-  openTick();
-  m_file<<"    <recall id=\""<<goal<<"\"/>"<<std::endl;
+  open_phase();
+  m_file<<"      <recall id=\""<<goal<<"\"/>"<<std::endl;
 }
 
 void TeleoReactor::Logger::notifyPlan(goal_id const &t) {
-  openTick();
-  m_file<<"    <token id=\""<<t<<"\">\n";
-  t->toXml(m_file, 6)<<"\n    </token>"<<std::endl;  
+  open_phase();
+  m_file<<"      <token id=\""<<t<<"\">\n";
+  t->toXml(m_file, 8)<<"\n      </token>"<<std::endl;  
 }
 
 void TeleoReactor::Logger::cancelPlan(goal_id const &t) {
-  openTick();
-  m_file<<"    <cancel id=\""<<t<<"\"/>"<<std::endl;  
+  open_phase();
+  m_file<<"      <cancel id=\""<<t<<"\"/>"<<std::endl;  
 }
 
