@@ -56,7 +56,7 @@ namespace TREX {
    * @ingroup lightswitch
    */
   void initPlugin() {
-    ::s_log->syslog("plugin.startrex")<<"StarTrex loaded."<<std::endl;
+    ::s_log->syslog("plugin.startrex", info)<<"StarTrex loaded.";
     // ::decl;
     
     //pthread_t tid;

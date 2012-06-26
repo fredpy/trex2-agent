@@ -137,14 +137,14 @@ namespace TREX {
     /** @brief Centralized logging and files management.
      * 
      * This class is a core component on TREX logging and file management. 
-		 * It provides a transparent one-stop shopping to :
-		 * @li Locate and load files
-		 * @li produce text log messages toward a singfle log directory
-		 * This class manages in a cntral way all this while ensuring that files 
-		 * that are used by an agent are easily accessed and stored in a single log 
-		 * directory giving the ability to knbow exactly what files were used on a 
-		 * specific run. 
-		 *
+     * It provides a transparent one-stop shopping to :
+     * @li Locate and load files
+     * @li produce text log messages toward a singfle log directory
+     * This class manages in a cntral way all this while ensuring 
+     * that files that are used by an agent are easily accessed and stored 
+     * in a single log directory giving the ability to knbow exactly what 
+     * files were used on a specific run. 
+     *
      * It provides utilities that will create a log directory and the
      * default TextLog file so other components can produce messages
      * seamlessly.
@@ -231,22 +231,12 @@ namespace TREX {
        * @sa std::string locate(std::string const &, bool &) const
        */
       std::string use(std::string const &file_name, bool &found);
-			
-      /** @brief Named text entry
-       * @param[in] who The name of the source
-       *
-       * This method create a new text entry on the TREX log.
-       * If @p who is provided the entry will start with the
-       * text @c [@p who].
-       *
-       * @return The text entry to be used with classical @c @<@<
-       * output stream operator.
-			 * @{
-       */
-      internals::LogEntry syslog(std::string const &who);
-      TextLog &syslog();
-			/** @} */
-      
+	
+      internals::LogEntry syslog(Symbol const &who, 
+				 Symbol const &kind) {
+	return m_syslog(who, kind);
+      }
+            
       /** @brief Current verbosity level
        * @return the current verbosity level
        * @sa setLogLevel(LogLevel)
@@ -364,6 +354,7 @@ namespace TREX {
       SharedVar<bool> m_inited;
       /** @brief syslog text log file */
       TextLog     m_syslog;
+      log_file    m_trex_log;
       /** @brief verbosity level */
       LogLevel    m_level;
 			

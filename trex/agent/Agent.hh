@@ -55,8 +55,7 @@
 # include <trex/utils/PluginLoader.hh>
 
 namespace TREX {
-  namespace agent {
-    
+  namespace agent {    
     
     /** @brief TREX agent
      *
@@ -382,7 +381,7 @@ namespace TREX {
         if( isExternal(g->object()) )
             return postGoal(g);
         else
-            syslog("ERROR")<<"Unable to subscribe to "<<g->object();
+	  syslog(null, error)<<"Unable to subscribe to "<<g->object();
         return false;
 	}
 

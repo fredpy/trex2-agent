@@ -78,7 +78,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
   m_connection.open("messaging.shore.mbari.org", 5672);
   m_connection.login("tracking", "MBARItracking", "trackingvhost");
 
-  syslog("amqp")<<"Creating queue \"trex2"<<getName()<<std::endl;
+  syslog("amqp", info)<<"Creating queue \"trex2"<<getName()<<std::endl;
   m_queue = m_connection.create_queue("trex2"+getName().str());
   
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));

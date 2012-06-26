@@ -145,7 +145,8 @@ bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
         m_plan_listeners += 1;
       r.subscribed(Relation(this, pos));
     } else if( pos->second!=flags ) {
-      r.syslog("WARN")<<"Updated transaction flags for external timeline "<<name();
+      r.syslog(null, warn)<<"Updated transaction flags for external timeline "
+			  <<name();
       if( flags.test(1) ) {
         if( !pos->second.test(1) )
           m_plan_listeners += 1;
@@ -171,7 +172,7 @@ void timeline::postObservation(TICK date, Observation const &obs) {
 
 void timeline::request(goal_id const &g) {
   if( owned() ) {
-    owner().syslog(name().str())<<"Request received ["<<g<<"] "
+    owner().syslog(null, info)<<"Request received ["<<g<<"] "
 				<<*g;
     owner().handleRequest(g);
   }
@@ -184,7 +185,7 @@ void timeline::recall(goal_id const &g) {
 
 bool timeline::notifyPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog("plan.INFO")<<"added ["<<t<<"] "<<*t;
+    owner().syslog(null, "PLAN")<<"Added ["<<t<<"] "<<*t;
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
@@ -197,7 +198,9 @@ bool timeline::notifyPlan(goal_id const &t) {
 
 bool timeline::cancelPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog("plan.CANCEL")<<"Removed ["<<t<<"] from "<<t->object()<<" to the "<<m_plan_listeners<<" plan clients.";
+    owner().syslog(null, "PLAN")<<"Removed ["<<t<<"] from "
+				<<t->object()<<" to the "
+				<<m_plan_listeners<<" plan clients.";
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )

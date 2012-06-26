@@ -48,7 +48,7 @@ namespace TREX {
 	std::pair<details::reactor_set::iterator, bool>
 	  ret = m_reactors.insert(reactor);
 	if( ret.second )
-	  syslog()<<"Reactor \""<<reactor->getName()<<"\" created.";
+	  syslog(null, info)<<"Reactor \""<<reactor->getName()<<"\" created.";
 	else 
 	  throw MultipleReactors(*this, **(ret.first));
 	++count;

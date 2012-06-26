@@ -150,20 +150,21 @@ graph::graph(Symbol const &name, TICK init, bool verbose)
 graph::graph(Symbol const &name, boost::property_tree::ptree &conf, TICK init, bool verbose) 
   :m_name(name), m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
-  syslog()<<"Created "<<number<<" reactors.";
+  syslog(null, info)<<"Created "<<number<<" reactors.";
 }
 
 graph::~graph() {
   clear();
 }
 
-TREX::utils::internals::LogEntry graph::syslog(std::string const &context) const {
+TREX::utils::internals::LogEntry graph::syslog(Symbol const &context, 
+					       Symbol const &kind) const {
   std::ostringstream oss;
   oss<<m_currentTick<<"]["<<m_name.str();
   if( !context.empty() )
     oss<<"."<<context;
 
-  return m_log->syslog(oss.str());
+  return m_log->syslog(oss.str(), kind);
 }
 
 bool graph::is_isolated(graph::reactor_id r) const {
@@ -179,7 +180,7 @@ std::string graph::date_str(TICK cur) const {
 
 void graph::clear() {
   while( !m_reactors.empty() ) {
-    syslog()<<"Disconnecting \""<<m_reactors.front()->getName()<<"\" from the graph.";
+    syslog(null, info)<<"Disconnecting \""<<m_reactors.front()->getName()<<"\" from the graph.";
     m_reactors.front()->isolate(false);
     m_reactors.pop_front();
   } 
@@ -203,7 +204,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
   if( ret.second ) 
-    syslog()<<"Reactor \""<<tmp->getName()<<"\" created.";
+    syslog(null, info)<<"Reactor \""<<tmp->getName()<<"\" created.";
   else
     throw MultipleReactors(*this, **(ret.first));			   
   return ret.first->get();
@@ -231,7 +232,7 @@ bool graph::kill_reactor(graph::reactor_id r) {
     
     if( pos->get()==r ) {
       // clean up relations
-      syslog()<<"Destroying reactor \""<<r->getName()<<"\".";
+      syslog(null, info)<<"Destroying reactor \""<<r->getName()<<"\".";
       if( pos_q->get()==r )
 	m_quarantined.erase(pos_q);
       else 
@@ -247,7 +248,7 @@ graph::reactor_id graph::isolate(graph::reactor_id r) const {
   if( null_reactor()!=r ) {
     details::reactor_set::const_iterator pos = m_reactors.find(r->getName());
     if( pos->get()==r ) {
-      syslog()<<"Putting reactor\""<<r->getName()<<"\" in quarantine.";
+      syslog(null, info)<<"Putting reactor\""<<r->getName()<<"\" in quarantine.";
       r->isolate();
       m_quarantined.insert(*pos);
       return r;
@@ -268,7 +269,7 @@ details::timeline_set::iterator graph::get_timeline(Symbol const &tl) {
   std::pair<details::timeline_set::iterator, bool>
     ret = m_timelines.insert(cand);
   if( ret.second ) 
-    syslog()<<"Timeline \""<<tl.str()<<"\" created.";
+    syslog(null, info)<<"Timeline \""<<tl.str()<<"\" created.";
   else
     delete cand;
   return ret.first;

@@ -505,7 +505,8 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   bool found;
   file_name = manager().use(file_name, found);
   if( !found ) {
-    syslog("ERROR")<<"Unable to locate transaction log \""<<file_name<<"\".";
+    syslog(null, error)<<"Unable to locate transaction log \""
+		       <<file_name<<"\".";
     throw ReactorException(*this, 
 			   "Unable to locate specified transaction log file.");
   }
@@ -513,16 +514,16 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   read_xml(file_name, pt, xml::no_comments|xml::trim_whitespace);
   
   if( pt.empty() ) {
-    syslog("ERROR")<<"Transaction log \""<<file_name<<"\" is empty.";
+    syslog(null, error)<<"Transaction log \""<<file_name<<"\" is empty.";
     throw ReactorException(*this, "Empty transaction log file.");
   }
   if( pt.size()!=1 ) {
-    syslog("ERROR")<<"Transaction log \""<<file_name
-		   <<"\" has multiple xml trees.";
+    syslog(null, error)<<"Transaction log \""<<file_name
+		       <<"\" has multiple xml trees.";
     throw ReactorException(*this, "Invalid transaction log file.");
   }
   if( pt.front().first!="Log" )
-    syslog("WARN")<<"root tag \""<<pt.front().first<<"\" is not Log.";
+    syslog(null, warn)<<"root tag \""<<pt.front().first<<"\" is not Log.";
   pt = pt.front().second;
 
   // Play the header
@@ -556,7 +557,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
 		 s_has_work!=j->first &&
 		 s_step!=j->first &&
 		 "<xmlattr>"!=j->first ) {
-	syslog("WARN")<<"Skipping unknown phase \""<<j->first<<"\".";
+	syslog(null, warn)<<"Skipping unknown phase \""<<j->first<<"\".";
 	continue;
       }	
       first = false;
@@ -565,9 +566,11 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
     }
   }
   if( m_log.empty() )
-    syslog("WARN")<<" this reactor has no event to play.";
+    syslog(null, warn)<<" this reactor has no event to play.";
   else 
-    syslog("INFO")<<"Loaded "<<m_log.size()<<" phases from tick "<<m_log.front().first<<" to tick "<<m_log.back().first;
+    syslog(null, info)<<"Loaded "<<m_log.size()<<" phases from tick "
+		      <<m_log.front().first<<" to tick "
+		      <<m_log.back().first;
   m_goal_map.clear();
 }
 
@@ -604,7 +607,7 @@ void LogPlayer::handleTickStart() {
       ++skipped;
     }
     if( skipped>0 ) {
-      syslog("WARN")<<"Skipped "<<skipped<<" past events !!!";
+      syslog(null, warn)<<"Skipped "<<skipped<<" past events !!!";
       m_inited = true;
       next_phase(getCurrentTick(), s_new_tick);
     } 
@@ -621,7 +624,7 @@ bool LogPlayer::synchronize() {
 bool LogPlayer::hasWork() {
   if( !next_phase(getCurrentTick(), s_has_work) ) {
     if( m_inited )
-      syslog("WARN")<<"next logged phase is not has_work !!!";
+      syslog(null, warn)<<"Next logged phase is not has_work !!!";
     m_work = false;
   } else 
     m_inited = true;

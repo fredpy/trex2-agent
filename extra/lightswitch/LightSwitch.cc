@@ -82,7 +82,7 @@ namespace TREX {
    * @ingroup lightswitch
    */
   void initPlugin() {
-    ::s_log->syslog("plugin.lightswitch")<<"LightSwitch loaded."<<std::endl;
+    ::s_log->syslog("plugin.lightswitch", info)<<"LightSwitch loaded."<<std::endl;
     // ::decl;
   }
 
@@ -110,11 +110,11 @@ Light::Light(TeleoReactor::xml_arg_type arg)
    m_verbose(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			      "verbose")),
    m_firstTick(true) {
-  syslog()<<"I want to own "<<lightObj;
+  syslog(null, info)<<"I want to own "<<lightObj;
   provide(lightObj, false); // declare the light timeline ... no goal accepted here
-  syslog()<<"I want to own "<<switchObj;
+  syslog(null, info)<<"I want to own "<<switchObj;
   provide(switchObj); // declare the switch timeline 
-  syslog()<<"I am done";
+  syslog(null, info)<<"I am done";
 }
 
 Light::~Light() {}

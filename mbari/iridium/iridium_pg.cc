@@ -15,7 +15,7 @@ namespace {
 namespace TREX {
   
   void initPlugin() {
-    ::s_log->syslog("plugin.iridium")<<"MBARI iridium mailer loaded."<<std::endl;
+    ::s_log->syslog("plugin.iridium", info)<<"MBARI iridium mailer loaded.";
   }
 
 } // TREX

@@ -99,7 +99,7 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
     
     for(size_t i=0; i<argc; ++i) {
       argv[i+1] = strdup(args[i].c_str());
-      m_log->syslog("witre.server")<<"argv["<<(i+1)<<"] "<<argv[i+1];
+      m_log->syslog("witre.server", null)<<"argv["<<(i+1)<<"] "<<argv[i+1];
     }
     m_server->setServerConfiguration(argc, argv);
 
@@ -111,19 +111,20 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
       throw Error("Unable to start the server");
 
   } catch(Wt::WServer::Exception const &e) {
-    m_log->syslog("witre.server")<<"Server initialization ERROR : "<<e.what();
+    m_log->syslog("witre.server", error)<<"Server initialization ERROR : "
+					<<e.what();
     throw Error(e.what());
   }
 }
 
 WitreServer::~WitreServer() {
-  std::cerr<<"Deleting the server ???"<<std::endl;
+  // std::cerr<<"Deleting the server ???"<<std::endl;
   try {
     // destroy the server
     if( NULL!=m_server )
       delete m_server;
   } catch(Wt::WServer::Exception const &e) {
-    m_log->syslog("WitreServer")<<"Error during shutdown : "<<e.what();
+    m_log->syslog("witre.server", error)<<"Error during shutdown : "<<e.what();
     throw Error(e.what());
   }
 }

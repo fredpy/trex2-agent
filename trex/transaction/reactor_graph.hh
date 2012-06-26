@@ -49,6 +49,11 @@
 namespace TREX {
   namespace transaction {
 
+    using utils::null;
+    using utils::info;
+    using utils::warn;
+    using utils::error;
+
     /** @brief Conflicting reactor names
      *
      * This mthod is throwned when multiple reactors in a graph have the
@@ -640,7 +645,8 @@ namespace TREX {
 	m_name = name;
       }
 
-      TREX::utils::internals::LogEntry syslog(std::string const &context=std::string()) const;
+      TREX::utils::internals::LogEntry syslog(utils::Symbol const &context, 
+					      utils::Symbol const &kind) const;
       TREX::utils::LogManager &manager() const {
 	return *m_log;
       }

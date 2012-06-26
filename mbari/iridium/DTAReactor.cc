@@ -31,13 +31,13 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
   postObservation(Observation(STATE_TL, "Nothing"));
   use(TREX_TL, false);
   m_iridium.set_sender(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "from"));
-  syslog("INFO")<<"Mail sender set to "<<m_iridium.sender();
+  syslog(info)<<"Mail sender set to "<<m_iridium.sender();
 
   bool use_iridium = parse_attr<bool>(true, TeleoReactor::xml_factory::node(arg), 
 				      "iridium");
   if( use_iridium ) {
     m_iridium.add_recipient(SbdMailer::s_iridium_address);
-    syslog("INFO")<<"Adding iridium to the recipients";
+    syslog(info)<<"Adding iridium to the recipients";
   }
   std::string to = parse_attr<std::string>("", TeleoReactor::xml_factory::node(arg),
 					   "to");
@@ -46,12 +46,12 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
   for(boost::tokenizer<>::iterator i=tok.begin(); tok.end()!=i; ++i) {
     if( !i->empty() ) {
       m_iridium.add_recipient(*i);
-      syslog("INFO")<<"Adding "<<*i<<" to the recipients";
+      syslog(info)<<"Adding "<<*i<<" to the recipients";
     }
   }
-  syslog("INFO")<<"SMTP connection to "<<parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host"); 
+  syslog(info)<<"SMTP connection to "<<parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host"); 
   m_iridium.login();
-  syslog("INFO")<<"SMTP connection succeeded."; 
+  syslog(info)<<"SMTP connection succeeded."; 
 }
 
 DTAReactor::~DTAReactor() {}
@@ -159,13 +159,13 @@ void DTAReactor::notify(Observation const &obs) {
     }
   } else if( obs.object()==TREX_TL ) {
     if( obs.predicate()=="undefined" || obs.predicate()=="Failed" ) {
-      syslog("WARN")<<"No info from dorado";
+      syslog(warn)<<"No info from dorado";
       m_trex_state = UNKNOWN;
     } else if( obs.predicate()=="Inactive" ) {
-      syslog("INFO")<<"dorado waits for a new goal !!!";
+      syslog(info)<<"dorado waits for a new goal !!!";
       m_trex_state = WAITING;
     } else if( RUNNING!=m_trex_state ) {
-      syslog("INFO")<<"dorado execute a goal !!!";
+      syslog(info)<<"dorado execute a goal !!!";
       m_trex_state = RUNNING;
       if( m_active )
       postObservation(Observation(STATE_TL, "Wait"));

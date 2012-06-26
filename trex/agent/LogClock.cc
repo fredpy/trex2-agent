@@ -76,11 +76,11 @@ LogClock::LogClock(bpt::ptree::value_type &node)
   // parse the log
   read_xml(file, tks, xml::no_comments|xml::trim_whitespace);
   if( tks.empty() ) {
-    syslog("ERROR")<<"clock log \""<<file<<"\" is empty.";
+    syslog(error)<<"clock log \""<<file<<"\" is empty.";
     throw XmlError(node, "Empty clock log file.");
   }
   if( tks.size()!=1 ) {
-    syslog("ERROR")<<"clock log \""<<file<<"\" has more than 1 root.";
+    syslog(error)<<"clock log \""<<file<<"\" has more than 1 root.";
     throw XmlError(node, "Invalid clock log file");
   }
   tks = tks.get_child("Clock");
@@ -93,7 +93,7 @@ LogClock::LogClock(bpt::ptree::value_type &node)
     if( tck.count>0 ) 
       m_ticks.push_back(tck);
     else 
-      syslog("WARN")<<"Skipping tick "<<tck.date<<" with 0 count.";
+      syslog(warn)<<"Skipping tick "<<tck.date<<" with 0 count.";
   }
   if( m_ticks.empty() )
     throw XmlError(node, "clock log has no valid tick.");
@@ -103,7 +103,7 @@ LogClock::LogClock(bpt::ptree::value_type &node)
 
 TICK LogClock::getNextTick() {
   if( m_ticks.empty() ) {
-    syslog("ERROR")<<"no more tick to play.";
+    syslog(error)<<"no more tick to play.";
     throw Clock::Error("clock has no more tick to play.");
   } 
 

@@ -82,7 +82,8 @@ void Clock::doStart() {
   m_data.open(m_log->file_name("clock.xml").c_str());
   m_data<<"<Clock epoch=\""<<epoch()<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
   m_first = true;
-  syslog("INFO")<<"Clock started at "<<epoch()<<' '<<epoch().zone_name()
+  syslog(TREX::utils::info)<<"Clock started at "<<epoch()
+			   <<' '<<epoch().zone_name()
     <<"\n\t"<<info();
 }
 
@@ -119,12 +120,8 @@ void Clock::doSleep() {
   sleep(getSleepDelay());
 }
 
-internals::LogEntry Clock::syslog(std::string const &context) const {
-  std::ostringstream oss;
-  oss<<"clock";
-  if( !context.empty() )
-    oss<<"]["<<context;
-  return m_log->syslog(oss.str());
+internals::LogEntry Clock::syslog(utils::Symbol const &kind) const {
+  return m_log->syslog("clock", kind);
 }
 
 

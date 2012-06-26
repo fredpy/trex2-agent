@@ -113,19 +113,26 @@ void Auv::bridgeSetup(Rpc* rpc) {
 	//printf("here\n");
 	//initialize all the sentuator's to send commands to the chucky
 	sPos = cfg->getSentuator("Position");
-	if (sPos == NULL) syslog()<<"Position sensor not found";
+	if (sPos == NULL) 
+	  syslog(error)<<"Position sensor not found";
 	sAlti = cfg->getSentuator("Altitude");
-	if (sAlti == NULL) syslog()<<"Altitude sensor not found";
+	if (sAlti == NULL) 
+	  syslog(error)<<"Altitude sensor not found";
 	sDepth = cfg->getSentuator("Depth");
-	if (sDepth == NULL) syslog()<<"Depth sensor not found";
+	if (sDepth == NULL) 
+	  syslog(error)<<"Depth sensor not found";
 	sAtt = cfg->getSentuator("Attitude");
-	if (sAtt == NULL) syslog()<<"Attitude sensor not found";
+	if (sAtt == NULL) 
+	  syslog(error)<<"Attitude sensor not found";
 	sEng = cfg->getSentuator("EngineRoom");
-	if (sEng == NULL) syslog()<<"EngineRoom Actuator not found";
+	if (sEng == NULL) 
+	  syslog(error)<<"EngineRoom Actuator not found";
 	sHelm = cfg->getSentuator("Helmsman");
-	if (sHelm == NULL) syslog()<<"Helmsman actuator not found";
+	if (sHelm == NULL) 
+	  syslog(error)<<"Helmsman actuator not found";
 	sDiv = cfg->getSentuator("DivingOfficer");
-	if (sDiv == NULL) syslog()<<"DivingOfficer Actuator not found";
+	if (sDiv == NULL) 
+	  syslog(error)<<"DivingOfficer Actuator not found";
 }
 
 void Auv::getVehicleStates() {
@@ -155,7 +162,8 @@ void Auv::getVehicleStates() {
 		roll = m->get(MQ_ROLL);
 		yaw = m->get(MQ_YAW);
 		bearing = m->get(MQ_BEARING,0);
-		syslog()<<"roll is "<<roll/PI*180<<" yaw is "<<yaw/PI*180<<" bearing="<<bearing;
+		syslog()<<"roll is "<<roll/PI*180<<" yaw is "
+			<<yaw/PI*180<<" bearing="<<bearing;
 	}
 
 }
@@ -164,7 +172,7 @@ void Auv::handleInit() {
 
 	vCmdState = wp_inactive;
 	roll = yaw = bearing = depth = xpos = ypos = ux = uy = uw = alt = xSP = ySP = zSP = thrustSP = bearingSP = 0.0;
-	syslog()<<"Trying establish connection with STARFISH";
+	syslog(info)<<"Trying establish connection with STARFISH";
 
 	//////////////////////////////////////////////
 	//handle starfish stuffs
@@ -181,7 +189,7 @@ void Auv::handleInit() {
 	rpc = new Rpc(ic);
 	bridgeSetup(rpc);
 
-	syslog()<<"Init completed ! ";
+	syslog(info)<<"Init completed ! ";
 }
 
 
@@ -231,40 +239,40 @@ bool Auv::synchronize() {
 		TICK cur = getCurrentTick();
 
 		if( m_nextCmd<=cur ) {
-			if( !m_pending.empty() && vCmdState == wp_inactive)
-				if( m_pending.front()->startsAfter(cur) ) {
-					// it can start after cur
-					if( m_pending.front()->startsBefore(cur) ) {
-						//record current executing goal
-						currentGoal = m_pending.front();
-						syslog()<<"goal id bef="<<currentGoal; //debug
-						// it can also starts before cur => it can be set to cur
-						vCmdState = m_pending.front()->predicate();
-						Variable const* var = &(*m_pending.front())["x"];
-						float x = var->domain().getTypedSingleton<float,true>(); //check for existence and singleton
-						var = &(*m_pending.front())["y"];
-						float y = var->domain().getTypedSingleton<float,true>();
-						var = &(*m_pending.front())["depth"];
-						float z = var->domain().getTypedSingleton<float,true>();
-						setWP(x,y,z);
-						var = &(*m_pending.front())["thrust"];
-						int thrust = var->domain().getTypedSingleton<int,true>();
-						thrustSP = thrust;
-						//calculate the timing for the next command.
-						m_nextCmd = cur+m_pending.front()->getDuration().lowerBound().value();
-						m_pending.pop_front();
-						syslog()<<"goal id aft="<<currentGoal; //debug
-						//post state
-						vCmdState = wp_active;
-						// only post when there is a change of cmd state. !!!
-						//post vehicle state
-						Observation cmd_state(vWP_Bhv,vCmdState);
-						postObservation(cmd_state);
-					}
-				} else {
-					// too late to execute => remove it
-					m_pending.pop_front();
-				}
+		  if( !m_pending.empty() && vCmdState == wp_inactive)
+		    if( m_pending.front()->startsAfter(cur) ) {
+		      // it can start after cur
+		      if( m_pending.front()->startsBefore(cur) ) {
+			//record current executing goal
+			currentGoal = m_pending.front();
+			syslog()<<"goal id bef="<<currentGoal; //debug
+			// it can also starts before cur => it can be set to cur
+			vCmdState = m_pending.front()->predicate();
+			Variable const* var = &(*m_pending.front())["x"];
+			float x = var->domain().getTypedSingleton<float,true>(); //check for existence and singleton
+			var = &(*m_pending.front())["y"];
+			float y = var->domain().getTypedSingleton<float,true>();
+			var = &(*m_pending.front())["depth"];
+			float z = var->domain().getTypedSingleton<float,true>();
+			setWP(x,y,z);
+			var = &(*m_pending.front())["thrust"];
+			int thrust = var->domain().getTypedSingleton<int,true>();
+			thrustSP = thrust;
+			//calculate the timing for the next command.
+			m_nextCmd = cur+m_pending.front()->getDuration().lowerBound().value();
+			m_pending.pop_front();
+			syslog()<<"goal id aft="<<currentGoal; //debug
+			//post state
+			vCmdState = wp_active;
+			// only post when there is a change of cmd state. !!!
+			//post vehicle state
+			Observation cmd_state(vWP_Bhv,vCmdState);
+			postObservation(cmd_state);
+		      }
+		    } else {
+		      // too late to execute => remove it
+		      m_pending.pop_front();
+		    }
 		}
 	}
 
@@ -357,7 +365,7 @@ bool Auv::navigate() {
 }
 
 void Auv::stop() {
-	syslog()<<"Vehicle Stop signal received, stopping...";
+	syslog(info)<<"Vehicle Stop signal received, stopping...";
 	setThrust(0);
 	setDepth(VAL_DISABLE);
 	setBearing(VAL_DISABLE);
@@ -371,28 +379,28 @@ void Auv::setWP(float x, float y, float z) {
 
 void Auv::setThrust(float t) {
 	if(sEng != NULL)
-		sEng->set(AT_THRUST,t);
+	  sEng->set(AT_THRUST,t);
 	else
-		syslog()<<"sEng is NULL";
+	  syslog(error)<<"sEng is NULL";
 }
 
 void Auv::setDepth(float d) {
 	if(sDiv != NULL)
-		sDiv->set(AT_DEPTH,d);
+	  sDiv->set(AT_DEPTH,d);
 	else
-		syslog()<<"sDiv is NULL";
+	  syslog(error)<<"sDiv is NULL";
 }
 
 void Auv::setBearing(float b) {
 	if(sHelm != NULL)
-		sHelm->set(AT_BEARING,b);
+	  sHelm->set(AT_BEARING,b);
 	else
-		syslog()<<"sHelm is NULL";
+	  syslog(error)<<"sHelm is NULL";
 }
 
 
 float Auv::dist2D(float xStart, float yStart, float xEnd, float yEnd) {
-	return sqrt(pow((xStart-xEnd),2)+pow((yStart-yEnd),2));
+  return sqrt(pow((xStart-xEnd),2)+pow((yStart-yEnd),2));
 }
 
 float Auv::calDesiredBearing(float xStart, float yStart, float xEnd, float yEnd) {

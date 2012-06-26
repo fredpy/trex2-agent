@@ -54,6 +54,11 @@
 namespace TREX {
   namespace agent {
 
+    using utils::null;
+    using utils::info;
+    using utils::warn;
+    using utils::error;
+
     /** @brief TREX clock
      *
      * This class defines the abstract interface to the Clock that
@@ -227,7 +232,7 @@ namespace TREX {
        */
       void advanceTick(TREX::transaction::TICK &tick);
       
-      utils::internals::LogEntry syslog(std::string const &context=std::string()) const;
+      utils::internals::LogEntry syslog(utils::Symbol const &kind) const;
 
     private:
       duration_type const m_sleep;

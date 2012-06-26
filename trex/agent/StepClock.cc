@@ -67,8 +67,8 @@ SingletonUse<LogManager> StepClock::m_log;
 
 unsigned int StepClock::selectStep(unsigned int stepsPerTick) {
   if( stepsPerTick<=0 ) {
-    m_log->syslog("Clock")<<"Requested an invalid number of steps per tick ("
-			  <<stepsPerTick<<").\n\tSetting it to 50.\n";
+    m_log->syslog("clock", error)<<"Requested an invalid number of steps per tick ("
+		 <<stepsPerTick<<").\n\tSetting it to 50.\n";
     stepsPerTick = 50;
   }
   return stepsPerTick;
@@ -79,8 +79,8 @@ unsigned int StepClock::parseStep(boost::property_tree::ptree &steps) {
   if( val ) 
     return selectStep(*val);
   else {
-    m_log->syslog("Clock")<<"missing steps attribute in XML definition.\n"
-			  <<"\tSetting it to 50.\n";
+    m_log->syslog("clock", warn)<<"missing steps attribute in XML definition.\n"
+				<<"\tSetting it to 50.\n";
     return 50;
   } 
 }
