@@ -108,9 +108,9 @@ DrifterTracker::~DrifterTracker() {}
 
 void DrifterTracker::handleInit() {
   // It is time to start my thread 
-  syslog()<<"Initialize queue.";
+  syslog("amqp", null)<<"Initialize queue.";
   m_queue->configure(false, true, false);
-  syslog()<<"Starting the amqp queue listener.";
+  syslog("amqp", null)<<"Starting the amqp queue listener.";
   m_thread.reset(new boost::thread(*m_listener));
 }
 
@@ -129,7 +129,7 @@ void DrifterTracker::handleRequest(TREX::transaction::goal_id const &g) {
 }
 
 void DrifterTracker::handleRecall(TREX::transaction::goal_id const &g) {
-  syslog("WARN")<<" No support for goal recall yet.";
+  syslog(warn)<<" No support for goal recall yet.";
 }
 
 
@@ -139,19 +139,21 @@ bool DrifterTracker::synchronize() {
 
   while( !m_messages.empty() ) {
     boost::shared_ptr<amqp::queue::message> msg = m_messages.pop();
-    syslog()<<"New message["<<msg->key()<<"]: "<<msg->size()<<" bytes from \""
-            <<msg->exchange()<<"\"";
+    syslog(info)<<"New message["<<msg->key()<<"]: "<<msg->size()
+		<<" bytes from \""
+		<<msg->exchange()<<"\"";
 
     boost::tie(from, to) = m_message_handlers.equal_range(msg->exchange());
     for( ; to!=from; ++from) {
       if( from->second->handleMessage(*msg) )
-	syslog()<<"AMQP message "<<msg->key()<<" handled.";
+	syslog("amqp", null)<<"AMQP message "<<msg->key()<<" handled.";
     }
   }
 
   for(from=m_message_handlers.begin(); m_message_handlers.end()!=from; ++from) 
     if( !from->second->synchronize() ) {
-      syslog("ERROR")<<" Handler on exchange "<<from->second<<" failed to synchronize";
+      syslog(error)<<" Handler on exchange "<<from->second
+		   <<" failed to synchronize";
       return false;
     }
   return true;
