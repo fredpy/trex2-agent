@@ -111,6 +111,19 @@ namespace TREX {
 
     }; // TREX::transaction::Observation
 
+    /** @brief An observation id
+     * 
+     * A type (not yet) used to refer to a specific observation. 
+     * This class is part of a long term plan t orefactor observations
+     * in a similar way goals are manipulated in ucrrent trex version. 
+     * While there is not plan yet on when this will be done, we do 
+     * believe  that this refactoring would be benefitial for further 
+     * evolutions of the framework such as allowing to post/refine 
+     * observations in the past.
+     *
+     * @relates class Observation
+     * @sa goal_id
+     */
     typedef boost::shared_ptr<Observation> observation_id;
 
   } // TREX::transaction
