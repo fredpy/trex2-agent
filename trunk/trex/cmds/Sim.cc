@@ -121,14 +121,14 @@ namespace {
 
     if( !found ) {
       std::cerr<<"Unable to locate file \""<<name<<"\""<<std::endl;
-      s_log->syslog("WARN")<<"Unable to find request file \""<<name<<'\"';
+      s_log->syslog("sim", warn)<<"Unable to find request file \""<<name<<'\"';
       return false;
     } else {
       try {
 	std::cout<<"Loading \""<<file<<"\"... "<<std::flush;
 	boost::property_tree::ptree config;
 
-	s_log->syslog("INFO")<<"Loading request file \""<<name<<'\"';
+	s_log->syslog("sim", info)<<"Loading request file \""<<name<<'\"';
 	read_xml(file, config, xml::no_comments|xml::trim_whitespace);
 	
 	if( config.empty() )
@@ -141,13 +141,16 @@ namespace {
 	}
 	return true;
       } catch(Exception const &te) {
-	s_log->syslog("ERROR")<<"TREX error while loading \""<<name<<"\": "<<te;
+	s_log->syslog("sim", error)<<"TREX error while loading \""<<name
+				   <<"\": "<<te;
 	std::cerr<<"TREX error "<<te<<std::endl;
       } catch( std::exception const &e ) {
-	s_log->syslog("ERROR")<<"Exception while loading \""<<name<<"\": "<<e.what();
+	s_log->syslog("sim", error)<<"Exception while loading \""<<name
+				   <<"\": "<<e.what();
 	std::cerr<<"exception: "<<e.what()<<std::endl;
       } catch(...) {
-	s_log->syslog("ERROR")<<"Unknwon exception while loading \""<<name<<"\"";
+	s_log->syslog("sim", error)<<"Unknwon exception while loading \""
+				   <<name<<"\"";
 	std::cerr<<"Unknown error"<<std::endl;
       }
       return false;
@@ -157,9 +160,9 @@ namespace {
 
 extern "C" {
   void sin_cleanup(int sig) {
-    s_log->syslog("sim")<<"============================================";
-    s_log->syslog("sim")<<"Received signal "<<sig; 
-    s_log->syslog("sim")<<"============================================";
+    s_log->syslog("sim", info)<<"============================================";
+    s_log->syslog("sim", info)<<"Received signal "<<sig; 
+    s_log->syslog("sim", info)<<"============================================";
     std::cout<<"Received signal "<<sig<<std::endl;
     my_agent.reset();
     std::cout<<"Goodbye"<<std::endl;
@@ -232,7 +235,7 @@ int main(int argc, char **argv) {
     while( true ) {
       if( my_agent->missionCompleted() ) {
 	std::cout<<"Mission completed."<<std::endl;
-	s_log->syslog("INFO")<<"Mission completed.";
+	s_log->syslog("sim", info)<<"Mission completed.";
 	break;
       }
       TICK tick = my_agent->getCurrentTick();
@@ -243,7 +246,7 @@ int main(int argc, char **argv) {
       char const cmd = std::toupper(cmdString[0]);
       if( 'Q'==cmd ) {
 	std::cout<<"Goodbye"<<std::endl;
-	s_log->syslog("INFO")<<"User requested exit.";
+	s_log->syslog("sim", info)<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
 	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() )
@@ -296,18 +299,18 @@ int main(int argc, char **argv) {
     }
   } catch(Exception const &e) {
     std::cerr<<"Caught a TREX exception: "<<e<<std::endl;
-    s_log->syslog("ERROR")<<"Exception caught: "<<e;
+    s_log->syslog("sim", error)<<"Exception caught: "<<e;
     ret = -2;
   } catch(std::exception const &se) {
     std::cerr<<"Caught a C++ exception: "<<se.what()<<std::endl;
-    s_log->syslog("ERROR")<<"C++ exception caught: "<<se.what();
+    s_log->syslog("sim", error)<<"C++ exception caught: "<<se.what();
     ret = -2;
   } catch(...) {
     std::cerr<<"Caught an unknown execption"<<std::endl;
-    s_log->syslog("ERROR")<<"Unknow exception exception caught";
+    s_log->syslog("sim", error)<<"Unknow exception exception caught";
     ret = -4;
   }
-  s_log->syslog("INFO")<<"=============================== END sim ============================";
+  s_log->syslog("sim", info)<<"=============================== END sim ============================";
   my_agent.reset();
   return ret;
 }

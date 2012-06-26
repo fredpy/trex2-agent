@@ -273,7 +273,7 @@ namespace TREX {
               // more than 10% of a tick late => display a warning
               std::ostringstream oss;
               utils::display(oss, how_late);
-              syslog("WARN")<<" clock is "<<oss.str()<<" late.";
+              syslog(warn)<<" clock is "<<oss.str()<<" late.";
             } 
             update_sleep();
           }
@@ -288,7 +288,8 @@ namespace TREX {
           if( t>=m_sleep ) {
             std::ostringstream oss;
             utils::display(oss, t-m_sleep);
-            syslog("INFO")<<"Sleep forced by clock ("<<oss.str()<<" after watchdog)";
+            syslog(TREX::utils::info)<<"Sleep forced by clock ("
+				     <<oss.str()<<" after watchdog)";
             return false;
           }
         }
@@ -309,7 +310,7 @@ namespace TREX {
               // more than 5% of a tick late => display a warning
               std::ostringstream oss;
               utils::display(oss, -left);
-              syslog("WARN")<<" clock is "<<oss.str()<<" late before sleeping.";
+              syslog(warn)<<" clock is "<<oss.str()<<" late before sleeping.";
             } 
             return duration_type(0);
           }

@@ -59,10 +59,10 @@ TREX::witre::WitreApplication *TREX::witre::createWitre(Wt::WEnvironment const &
 
       if( found ) {
             file.erase(file.end()-4, file.end());
-            s_log->syslog("witre")<<"set locale to "<<file;
+            s_log->syslog("witre", info)<<"set locale to "<<file;
             app->messageResourceBundle().use(file);
       } else {
-            s_log->syslog("witre")<<"Did not find locale "<<file;
+	s_log->syslog("witre", info)<<"Did not find locale "<<file;
       }
 
       return app;

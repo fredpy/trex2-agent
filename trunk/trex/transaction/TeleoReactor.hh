@@ -991,11 +991,15 @@ namespace TREX {
        * @sa TREX::utils::TextLog
        */
       TREX::utils::internals::LogEntry
-      syslog(std::string const &context=std::string()) {
+      syslog(utils::Symbol const &context, utils::Symbol const &kind) {
 	if( context.empty() )
-	  return m_graph.syslog(getName().str());
+	  return m_graph.syslog(getName(), kind);
 	else
-	  return m_graph.syslog(getName().str()+"|"+context);
+	  return m_graph.syslog(getName().str()+"."+context.str(), kind);
+      }
+      TREX::utils::internals::LogEntry 
+      syslog(utils::Symbol const &kind=TREX::utils::null) {
+	return m_graph.syslog(getName(), kind);
       }
 
       /** @brief Find an external timeline 

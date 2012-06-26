@@ -38,91 +38,80 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <syslog.h>
-
 #include "TextLog.hh"
 
-/** @brief syslog identifier
- *
- * This identifier is usd when the log is sent to syslog. It is
- * the name given as the source of the message
- *
- * @relates TREX::utils::TextLog
- * @ingroup utils
- */
-#define TREX_SYSLOG_NAME "trex"
+namespace TREX {
+  namespace utils {
+
+    Symbol const null;
+    Symbol const info("INFO");
+    Symbol const warn("WARN");
+    Symbol const error("ERROR");
+
+  }
+}
 
 using namespace TREX::utils;
+
 /*
- * class TextLog
- */ 
+ * class TREX::utils::internals::entry
+ */
+// structors 
 
-// structors :
-
-TextLog::TextLog():m_syslog(false) {}
-
-TextLog::TextLog(std::string const &name, bool toSyslog)
-  :m_log(name.c_str()), m_syslog(toSyslog) {
-  if( m_syslog ) {
-    ::openlog(TREX_SYSLOG_NAME, LOG_CONS, 0);
+internals::entry::~entry() {
+  // filter out empty messages
+  if( !m_msg.empty() ) {
+    // add trailing \n
+    if( '\n'!=m_msg[m_msg.length()-1] )
+      m_msg.push_back('\n');
+    m_dest.send(m_source, m_kind, m_msg);
   }
 }
 
-TextLog::~TextLog() {
-  if( m_syslog )
-    ::closelog();
-}
-
-// Manipulators :
-
-void TextLog::open(std::string const &name, bool toSyslog) {
-  lock_type locker(m_lock);
-  
-  m_log.open(name.c_str());
-  if( toSyslog!=m_syslog ) {
-    m_syslog = toSyslog;
-    if( m_syslog ) 
-      ::openlog(TREX_SYSLOG_NAME, LOG_CONS, 0);
-    else
-      ::closelog();
-  }
-}
-
-void TextLog::write(std::string const &text) {
-  lock_type locker(m_lock);
-  char const *str = text.c_str();
-  size_t len = text.length();
-
-  m_log.write(str, len);
-  if( m_syslog ) 
-    ::syslog(LOG_ERR, "%s", str);
-  else
-    m_log.flush();
-//   m_log<<text<<std::flush;
-}
-
-/* 
- * class LogEntry 
+/*
+ * class TREX::utils::TextLog::handler
  */
 
+// manipulators
 
-// structors :
-
-internals::LogEntry::LogEntry(TREX::utils::TextLog &owner)
-  :m_owner(owner), m_buff(new std::ostringstream) {
-}
-
-internals::LogEntry::LogEntry(internals::LogEntry const &other) 
-  :m_owner(other.m_owner), m_buff(other.m_buff) {
-}
-
-internals::LogEntry::~LogEntry() {
-  if( 0!=m_buff.get() ) {
-    std::string to_log = m_buff->str();
-    if( !to_log.empty() ) {
-      if( '\n'!=to_log[to_log.length()-1] )
-	to_log.push_back('\n');
-      m_owner.write(to_log);
-    }
+void TextLog::handler::detach() {
+  if( NULL!=m_log ) {
+    TextLog::scoped_lock lock(m_log->m_lock);
+    m_log->m_handlers.erase(this);
+    m_log = NULL;
   }
+}
+
+/*
+ * class TREX::utils::TextLog
+ */
+
+// structors
+
+TextLog::~TextLog() {
+  scoped_lock lock(m_lock);
+  for(std::set<handler *>::const_iterator i=m_handlers.begin();
+      m_handlers.end()!=i; ++i) 
+    (*i)->m_log = NULL;
+  m_handlers.clear();
+}
+
+// manipulators 
+
+bool TextLog::add_handler(TextLog::handler &handle) {
+  if( NULL==handle.m_log ) {
+    scoped_lock lock(m_lock);
+    handle.m_log = this;
+    m_handlers.insert(&handle);
+    return true;
+  }
+  return false;
+}
+
+void TextLog::send(TextLog::id_type const &who, TextLog::id_type const &type, 
+		   TextLog::msg_type const &what) {
+  scoped_lock lock(m_lock);
+  for(std::set<handler *>::const_iterator i=m_handlers.begin(); 
+      m_handlers.end()!=i; ++i)
+    (*i)->message(who, type, what);
 }

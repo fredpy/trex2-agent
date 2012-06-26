@@ -13,7 +13,7 @@ namespace {
 namespace TREX {
   
   void initPlugin() {
-    ::s_log->syslog("plugin.dta")<<"MBARI assets tracker loaded."<<std::endl;
+    ::s_log->syslog("plugin.dta", info)<<"MBARI assets tracker loaded.";
   }
 
 } // TREX

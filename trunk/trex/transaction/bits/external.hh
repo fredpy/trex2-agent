@@ -206,7 +206,7 @@ namespace TREX {
         void recall(goal_id const &g);
                  
       private:
-        TREX::utils::internals::LogEntry syslog();
+        TREX::utils::internals::LogEntry syslog(utils::Symbol const &kind);
         
         external_set::iterator m_pos, m_last;
         

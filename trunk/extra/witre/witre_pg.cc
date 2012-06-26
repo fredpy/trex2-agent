@@ -46,7 +46,7 @@ namespace {
 namespace TREX {
 
   void initPlugin() {
-    ::s_log->syslog("plugin.witre")<<"Witre loaded."<<std::endl;
+    ::s_log->syslog("plugin.witre", info)<<"Witre loaded."<<std::endl;
     // ::decl;
   }
 

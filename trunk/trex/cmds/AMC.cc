@@ -94,9 +94,9 @@ namespace {
 extern "C" {
 
   void amc_cleanup(int sig) {
-    amc_log->syslog("amc")<<"============================================";
-    amc_log->syslog("amc")<<"Received signal "<<sig; 
-    amc_log->syslog("amc")<<"============================================";
+    amc_log->syslog("amc", info)<<"============================================";
+    amc_log->syslog("amc", info)<<"Received signal "<<sig; 
+    amc_log->syslog("amc", info)<<"============================================";
     my_agent.reset();
     exit(1);
   }

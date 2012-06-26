@@ -78,10 +78,11 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
 
-    syslog()<<"No model specified: attempting to load "<<long_nddl;
+    syslog(null, info)<<"No model specified: attempting to load "<<long_nddl;
     nddl = long_nddl;
     if( !locate_nddl(nddl) ) {
-      syslog()<<long_nddl<<" not found: attempting to load "<<short_nddl;
+      syslog(null, info)<<long_nddl<<" not found: attempting to load "
+			<<short_nddl;
       nddl = short_nddl;
       if( !locate_nddl(nddl) )
 	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
@@ -89,12 +90,12 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   }
   // Load the nddl model
   if( !playTransaction(nddl) ) {
-    syslog("ERROR")<<"Model is inconsistent.";
+    syslog(null,error)<<"Model is inconsistent.";
     throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
   }
 
   if( !plan_db()->isClosed() ) {
-    syslog("WARN")<<"Plan database is not closed:\n\tClosing it now!!!";
+    syslog(null, warn)<<"Plan database is not closed:\n\tClosing it now!!!";
     plan_db()->close();
   }
 
@@ -103,30 +104,30 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   boost::optional<std::string> tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
  
   if( !tmp ) {
-    syslog("WARN")<<"Did not find planner_cfg attribute. Looking for legacy solverConfig instead.";
+    syslog(null, warn)<<"Did not find planner_cfg attribute. Looking for legacy solverConfig instead.";
     attr = "solverConfig";
     tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
     if( !tmp )
       throw XmlError(cfg, "Missing plan_cfg file attribute");
   }
   if( tmp->empty() ) {
-    syslog("ERROR")<<"planner config file name is empty.";
+    syslog(null, error)<<"Planner config file name is empty.";
     throw XmlError(cfg, "Attribute "+attr+" is not a valid file name.");
   }
   planner_cfg = manager().use(*tmp, found);
   if( !found ) {
-    syslog("ERROR")<<"unable to locate planner cfg file \""<<*tmp<<"\"";
+    syslog(null, error)<<"Unable to locate planner cfg file \""<<*tmp<<"\"";
     throw ReactorException(*this, "Unable to locate planner cfg \""+(*tmp)+"\"");
   }
   // Getting synchronizer configuration
   tmp = parse_attr< boost::optional<std::string> >(cfg, "synch_cfg");
   if( !tmp ) {
-    syslog("WARN")<<"Did not find synch_cfg attribute. Will use plan_cfg instead.";
+    syslog(null, warn)<<"Did not find synch_cfg attribute. Will use plan_cfg instead.";
     synch_cfg = planner_cfg;
   } else {
     synch_cfg = manager().use(*tmp, found);
     if( !found ) {
-      syslog("ERROR")<<"unable to locate synch cfg file \""<<*tmp<<"\"";
+      syslog(null, error)<<"Unable to locate synch cfg file \""<<*tmp<<"\"";
       throw ReactorException(*this, "Unable to locate synch cfg \""+(*tmp)+"\"");
     }
   }
@@ -134,7 +135,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   try {
     configure_solvers(synch_cfg, planner_cfg);
   } catch(std::exception const &e) {
-    syslog("ERROR")<<" exception during solvers configuration: "<<e.what();
+    syslog(null, error)<<" exception during solvers configuration: "<<e.what();
     throw;
   }
 
@@ -143,8 +144,8 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 
   trex_timelines(objs);
   if( !objs.empty() ) {
-    syslog()<<"Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
-	    <<" declarations.";
+    syslog(null, info)<<"Found "<<objs.size()<<" TREX "<<TREX_TIMELINE.toString()
+		      <<" declarations.";
     for(std::list<EUROPA::ObjectId>::const_iterator o=objs.begin();
 	objs.end()!=o; ++o) {
       EUROPA::LabelStr name = (*o)->getName(), mode_val;
@@ -168,13 +169,15 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 	ignore(*o);
       } else {
 	if( PRIVATE_MODE!=mode_val )
-	  syslog("WARN")<<TREX_TIMELINE.toString()<<" "<<trex_name<<" mode \""
-			<<mode_val.toString()<<"\" is unknown!!!\n"
-			<<"\tI'll assume it is "<<PRIVATE_MODE.toString();
+	  syslog(null, warn)<<TREX_TIMELINE.toString()<<" "<<trex_name
+			    <<" mode \""
+			    <<mode_val.toString()<<"\" is unknown!!!\n"
+			    <<"\tI'll assume it is "<<PRIVATE_MODE.toString();
       }
     }
   } else
-    syslog("WARNING")<<"No TREX "<<TREX_TIMELINE.toString()<<" found in the model.";
+    syslog(null, warn)<<"No TREX "<<TREX_TIMELINE.toString()
+		      <<" found in the model.";
   m_stats.open(file_name("europa_stat.csv").c_str());
   m_stats<<"tick , what, dur_ns, tokens, steps, depth\n";
 }
@@ -197,10 +200,11 @@ void EuropaReactor::notify(Observation const &obs) {
   EUROPA::TokenId fact = new_obs(obj, pred, undefined);
 
   if( undefined )
-    syslog("WARN")<<"Predicate "<<obs.object()<<"."<<obs.predicate()<<" is unknown"
-		  <<"\n\t Created "<<pred<<" instead.";
+    syslog(null, warn)<<"Predicate "<<obs.object()<<"."<<obs.predicate()
+		      <<" is unknown"<<"\n\t Created "<<pred<<" instead.";
   else if( !restrict_token(fact, obs) )
-    syslog("ERROR")<<"Failed to restrict some attributes of observation "<<obs;
+    syslog(null, error)<<"Failed to restrict some attributes of observation "
+		       <<obs;
 }
 
 void EuropaReactor::handleRequest(goal_id const &request) {
@@ -210,20 +214,21 @@ void EuropaReactor::handleRequest(goal_id const &request) {
   std::string pred = request->predicate().str();
 
   if( !have_predicate(obj, pred) ) {
-    syslog("ERROR")<<"Ignoring Unknow token type "<<request->object()<<'.'
-		   <<request->predicate();
+    syslog(null, error)<<"Ignoring Unknow token type "<<request->object()<<'.'
+		       <<request->predicate();
   } else {
     // Create the new fact
     EUROPA::TokenId goal = create_token(obj, pred, false);
 
     if( !restrict_token(goal, *request) ) {
-      syslog("ERROR")<<"Failed to restrict some attributes of request "<<*request
-		     <<"\n\t rejecting it.";
+      syslog(null, error)<<"Failed to restrict some attributes of request "
+			 <<*request<<"\n\t rejecting it.";
       goal->discard();
     } else {
       // The goal appears to be correct so far : add it to my set of goals
-      syslog()<<"Integrated request "<<request<<" as the token with Europa ID "
-	      <<goal->getKey();
+      syslog(null, info)<<"Integrated request "<<request
+			<<" as the token with Europa ID "
+			<<goal->getKey();
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
 
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
@@ -250,13 +255,13 @@ void EuropaReactor::handleRecall(goal_id const &request) {
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
-  syslog()<<"Receive token ["<<t<<"] on timeline "<<t->object();
+  syslog(null, info)<<"Receive token ["<<t<<"] on timeline "<<t->object();
   // treat it as a request for now
   handleRequest(t);
 }
 
 void EuropaReactor::cancelledPlanToken(goal_id const &t) {
-  syslog()<<"Receive cancel for token ["<<t<<"]";
+  syslog(null, info)<<"Receive cancel for token ["<<t<<"]";
   // treat it as a recall for now
   handleRecall(t);
 }
@@ -390,12 +395,12 @@ bool EuropaReactor::synchronize() {
 
   if( !synch() ) {
     m_completed_this_tick = false;
-    syslog("WARN")<<"Failed to synchronize : relaxing current plan.";
+    syslog(null, warn)<<"Failed to synchronize : relaxing current plan.";
 
     if( !( do_relax(false) && synch() ) ) {
-      syslog("WARN")<<"Failed to synchronize(2) : forgetting past.";
+      syslog(null, warn)<<"Failed to synchronize(2) : forgetting past.";
       if( !( do_relax(true) && synch() ) ) {
-        syslog("ERROR")<<"Failed to synchronize(3) : killing reactor";
+        syslog(null, error)<<"Failed to synchronize(3) : killing reactor";
         return false;
       }
     }
@@ -430,13 +435,13 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   bool ret = false;
 
   if( m_active_requests.left.end()!=i ) {
-    syslog()<<"Discarded past request ["<<i->second<<"]";
+    syslog(null, info)<<"Discarded completed request ["<<i->second<<"]";
     m_active_requests.left.erase(i);
     ret = true;
   }
   i = m_dispatched.left.find(tok->getKey());
   if( m_dispatched.left.end()!=i ) {
-    syslog()<<"Discarded past goal ["<<i->second<<"]";
+    // syslog(null, info)<<"Discarded past goal ["<<i->second<<"]";
     m_dispatched.left.erase(i);
     ret = true;
   }
@@ -452,7 +457,7 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_dispatched.left.find(tok->getKey());
 
   if( m_dispatched.left.end()!=i ) {
-    syslog()<<"Recall ["<<i->second<<"]";
+    syslog(null, info)<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
     m_dispatched.left.erase(i);
   }
@@ -467,11 +472,11 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
 bool EuropaReactor::hasWork() {
   setStream();
   if( constraint_engine()->provenInconsistent() ) {
-    syslog("ERROR")<<"Plan database is inconsistent.";
+    syslog(null, error)<<"Plan database is inconsistent.";
     return false;
   }
   if( planner()->isExhausted() ) {
-    syslog("WARN")<<"Deliberation solver is exhausted.";
+    syslog(null, warn)<<"Deliberation solver is exhausted.";
     return false;
   }
   if( !m_completed_this_tick ) {
@@ -488,7 +493,7 @@ bool EuropaReactor::hasWork() {
 #endif // Europa_Archive_OLD
       debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
       if( steps>0 ) {
-        syslog()<<"Deliberation completed in "<<steps<<" steps.";
+        syslog(null, info)<<"Deliberation completed in "<<steps<<" steps.";
         logPlan("plan");
         getFuturePlan();
       }
@@ -528,20 +533,21 @@ void EuropaReactor::resume() {
   bool should_relax = false;
 
   if( constraint_engine()->provenInconsistent() ) {
-    syslog("WARN")<<"Inconsitency found during planning.";
+    syslog(null, warn)<<"Inconsitency found during planning.";
     should_relax = true;
   }
   if( planner()->isExhausted() ) {
-    syslog("WARN")<<"Deliberation solver is exhausted.";
+    syslog(null, warn)<<"Deliberation solver is exhausted.";
     should_relax = true;
   }
 
   if( should_relax ) {
-    syslog("WARN")<<"Relax database after "<<planner()->getStepCount()<<" steps.";
+    syslog(null, warn)<<"Relax database after "<<planner()->getStepCount()
+		      <<" steps.";
     if( !do_relax(false) )
-      syslog("WARN")<<"Failed to relax => forgetting past.";
+      syslog(null, warn)<<"Failed to relax => forgetting past.";
       if( !do_relax(true) ) {
-        syslog("ERROR")<<"Unable to recover from plan inconsistency.";
+        syslog(null, error)<<"Unable to recover from plan inconsistency.";
 	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
       }
   }
@@ -586,13 +592,13 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
       try {
 	details::europa_restrict(param, var.domain());
       } catch(DomainExcept const &e) {
-	syslog("WARN")<<"Failed to restrict attribute "<<(*v)
+	syslog(null, warn)<<"Failed to restrict attribute "<<(*v)
 		      <<" on token "<<pred.object()<<'.'<<pred.predicate()
 		      <<": "<<e;
 	no_empty = false;
       }
     } else
-      syslog("WARN")<<" Ignoring unknown attribute "<<pred.object()
+      syslog(null, warn)<<" Ignoring unknown attribute "<<pred.object()
 		    <<'.'<<pred.predicate()<<'.'<<(*v);
   }
   return no_empty;

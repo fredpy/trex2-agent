@@ -462,17 +462,17 @@ Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
   try {
     loadConf(file_name);
   } catch(TREX::utils::Exception const &e) {
-    syslog("ERROR")<<"Exception caught while loading "<<file_name<<":\n"
-		   <<e;
+    syslog(null, error)<<"Exception caught while loading "<<file_name<<":\n"
+		       <<e;
     throw;
   } catch(std::exception const &se) {
-    syslog("ERROR")<<"C++ exception caught while loading "
-		   <<file_name<<":\n"
-		   <<se.what();
+    syslog(null, error)<<"C++ exception caught while loading "
+		       <<file_name<<":\n"
+		       <<se.what();
     throw;
   } catch(...) {
-    syslog("ERROR")<<"Unknown exception caught while loading "
-		   <<file_name;
+    syslog(null, error)<<"Unknown exception caught while loading "
+		       <<file_name;
     throw;
   }
 }
@@ -486,15 +486,15 @@ Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool ver
   try {
     loadConf(conf);
   } catch(TREX::utils::Exception const &e) {
-    syslog("ERROR")<<"Exception caught while loading XML:\n"
-		   <<e;
+    syslog(null, error)<<"Exception caught while loading XML:\n"
+		       <<e;
     throw;
   } catch(std::exception const &se) {
-    syslog("ERROR")<<"C++ exception caught while loading XML:\n"
-		   <<se.what();
+    syslog(null, error)<<"C++ exception caught while loading XML:\n"
+		       <<se.what();
     throw;
   } catch(...) {
-    syslog("ERROR")<<"Unknown exception caught while loading XML";
+    syslog(null, error)<<"Unknown exception caught while loading XML";
     throw;
   }
 }
@@ -515,13 +515,13 @@ Agent::~Agent() {
 
 bool Agent::missionCompleted() {
   if( !valid() ) {
-    syslog()<<"Agent destroyed.";
+    syslog(null, null)<<"Agent destroyed.";
     return true;
   }
   if( count_reactors()<=1 ) {
     // If there's only one reactor left it is probably
     // my AgentProxy => no real reactor available
-    syslog()<<"No reactor left.";
+    syslog(null, info)<<"No reactor left.";
     return true;
   }
   return getCurrentTick()>m_finalTick;
@@ -599,9 +599,9 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
     //   => sub tree is <Else /> 
     std::string msg = parse_attr<std::string>("", *else_tree, "message");
     if( msg.empty() )
-      syslog(path+"|INFO")<<"Failed to locate plug-in "<<name;
+      syslog(path, info)<<"Failed to locate plug-in "<<name;
     else
-      syslog(path+"|INFO")<<"Failed to locate plug-in "
+      syslog(path, info)<<"Failed to locate plug-in "
         <<name<<"\n\t"<<msg;
     
     name = "(!"+name+")";
@@ -628,21 +628,21 @@ void Agent::subConf(boost::property_tree::ptree &conf,
     boost::tie(i, last) = conf.equal_range("Plugin");
     if( last!=i ) {
       // Produce new reactors
-      syslog(path)<<"Loading plug-ins...";
+      syslog(path, info)<<"Loading plug-ins...";
       for(; last!=i; ++i) 
         loadPlugin(*i, path);
     }
 
     // check if need/can load a new clock
     if( NULL==m_clock ) {
-      syslog(path)<<"Check for clock definition...";
+      syslog(path, info)<<"Check for clock definition...";
       boost::property_tree::ptree::iterator c = conf.begin();
       clk_f->iter_produce(c, conf.end(), m_clock);
     }
   } else {
     // check if need/can load a new clock
     if( NULL==m_clock ) {
-      syslog(path)<<"Check for clock definition...";
+      syslog(path, info)<<"Check for clock definition...";
       boost::property_tree::ptree::iterator c = conf.begin();
       clk_f->iter_produce(c, conf.end(), m_clock);
     }
@@ -651,18 +651,18 @@ void Agent::subConf(boost::property_tree::ptree &conf,
     boost::tie(i, last) = conf.equal_range("Plugin");
     if( last!=i ) {
       // Produce new reactors
-      syslog(path)<<"Loading plug-ins...";
+      syslog(path, info)<<"Loading plug-ins...";
       for(; last!=i; ++i) 
         loadPlugin(*i, path);
     }
   }
     
   // Produce new reactors
-  syslog(path)<<"Loading reactors...";
+  syslog(path, info)<<"Loading reactors...";
   add_reactors(conf);
 
   // Now load and post the goals
-  syslog(path)<<"loading goals....";
+  syslog(path, info)<<"loading goals....";
   sendRequests(conf);
 } 
 
@@ -691,7 +691,7 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
     throw XmlError(config, "Agent node does not have sub nodes.");
 
   subConf(config.second, "");
-  syslog()<<"End of init.";
+  syslog(null, info)<<"End of init.";
 }
 
 void Agent::loadConf(std::string const &file_name) {
@@ -726,12 +726,12 @@ void Agent::initComplete() {
   boost::depth_first_search(me(), boost::visitor(init));
   size_t n_failed = cleanup();
   if( n_failed>0 )
-    syslog("WARN")<<n_failed<<" reactors failed to initialize.";
+    syslog(null, warn)<<n_failed<<" reactors failed to initialize.";
 
   // Check for missing timelines
   for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it)
     if( !(*it)->owned() )
-      syslog("WARN")<<"Timeline \""<<(*it)->name()<<"\" has no owner.";
+      syslog(null, warn)<<"Timeline \""<<(*it)->name()<<"\" has no owner.";
 
 
   // Create initial graph file
@@ -742,18 +742,18 @@ void Agent::initComplete() {
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
-  syslog()<<"Initial graph logged in \"reactors.gv\".";
+  syslog(null, info)<<"Initial graph logged in \"reactors.gv\".";
 
 
   // start the clock
   m_clock->doStart();
-  syslog("START")<<"\t=========================================================";
+  syslog(null, "START")<<"\t=========================================================";
 }
 
 void Agent::run() {
   initComplete();
   while( doNext() );
-  syslog()<<"Mission completed."<<std::endl;
+  syslog(null, info)<<"Mission completed."<<std::endl;
 }
 
 
@@ -771,7 +771,8 @@ void Agent::synchronize() {
   boost::depth_first_search(me(), boost::visitor(sync));
   size_t n_failed = cleanup();
   if( n_failed>0 )
-    syslog("WARN")<<n_failed<<" reactors failed to start tick "<<getCurrentTick();
+    syslog(null, warn)<<n_failed<<" reactors failed to start tick "
+		      <<getCurrentTick();
   // Execute synchronization
   //  - could be done with a dfs but we choose for now to do it using the
   //  output list of sync_scheduller to avoid a potentially costfull graph
@@ -809,7 +810,7 @@ void Agent::synchronize() {
     
     graph_names_writer gn;
     boost::write_graphviz(dotf, me(), gn, gn);
-    syslog()<<"New graph logged in \""<<name.str()<<"\".";    
+    syslog(null, info)<<"New graph logged in \""<<name.str()<<"\".";    
   }
 }
 
@@ -841,11 +842,12 @@ bool Agent::executeReactor() {
           i = m_idle.erase(i);
       }
     } catch(Exception const &e) {
-      syslog("WARN")<<"Exception caught while executing reactor step:\n"<<e;
+      syslog(null, warn)<<"Exception caught while executing reactor step:\n"<<e;
     } catch(std::exception const &se) {
-      syslog("WARN")<<"C++ exception caught while executing reactor step:\n"<<se.what();      
+      syslog(null, warn)<<"C++ exception caught while executing reactor step:\n"
+			<<se.what();      
     } catch(...) {
-      syslog("WARN")<<"Unknown exception caught while executing reactor step.";            
+      syslog(null, warn)<<"Unknown exception caught while executing reactor step.";            
     }
     return !m_edf.empty();
   }
@@ -854,8 +856,8 @@ bool Agent::executeReactor() {
 bool Agent::doNext() {
   if( missionCompleted() ) {
     if( empty() )
-      syslog()<<"No more reactor active.";
-    syslog("END")<<"\t=========================================================";
+      syslog(null, info)<<"No more reactor active.";
+    syslog(null, "END")<<"\t=========================================================";
     return false;
   }
   synchronize();
@@ -879,7 +881,7 @@ bool Agent::doNext() {
     if( valid() )
       updateTick(m_clock->tick());
   } catch(Clock::Error const &err) {
-    syslog("ERROR")<<"error from the clock: "<<err;
+    syslog(null, error)<<"error from the clock: "<<err;
     m_valid = false;
     if( !completed )
       delib = stat_clock::now()-start_delib;
@@ -891,7 +893,8 @@ bool Agent::doNext() {
 
 void Agent::sendRequest(goal_id const &g) {
   if( !has_timeline(g->object()) )
-    syslog("WARN")<<"Posting goal on a unknnown timeline \""<<g->object()<<"\".";
+    syslog(null, warn)<<"Posting goal on a unknnown timeline \""
+		      <<g->object()<<"\".";
   m_proxy->postRequest(g);
 }
 
@@ -903,7 +906,7 @@ size_t Agent::sendRequests(boost::property_tree::ptree &g) {
     sendRequest(*i);
     ++ret;
   }
-  syslog()<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
+  syslog(null, info)<<ret<<" goal"<<(ret>1?"s":"")<<" loaded.";
   return ret;
 }
 

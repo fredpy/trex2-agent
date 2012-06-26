@@ -144,9 +144,10 @@ LogManager::path_type const &LogManager::logPath() {
     create_directory(cfg);
     
     trex_log /= TREX_LOG_FILE;
-    
-    m_syslog.open(trex_log.c_str());
-    m_syslog<<"TREX version "<<TREX::version::str();
+
+    m_trex_log.open(trex_log.string());
+    m_syslog.add_handler(m_trex_log);
+    syslog("", null)<<"TREX version "<<TREX::version::str();
     loadSearchPath();
     *m_inited = true;
   }
@@ -219,10 +220,10 @@ std::string LogManager::use(std::string const &file_name, bool &found) {
       dest /= tmp;
     else dest /= src.filename();
     
-    syslog()<<"- Using file "<<located;
+    syslog("", info)<<" - Using file "<<located;
     if( exists(dest) )
-      syslog("WARN")<<"A file with this name already exists in the cfg log."
-                    <<"\n\tI won't overwrite the previous file.";
+      syslog("", warn)<<"A file with this name already exists in the cfg log."
+		      <<"\n\tI won't overwrite the previous file.";
     else {
       if( is_symlink(located) ) 
         src = read_symlink(located);
@@ -233,21 +234,13 @@ std::string LogManager::use(std::string const &file_name, bool &found) {
   return located.string();
 }
 
-TextLog &LogManager::syslog() {
-  return m_syslog;
-}
-
-internals::LogEntry LogManager::syslog(std::string const &txt) {
-  return m_syslog<<('['+txt+"] ");
-}
-
 bool LogManager::setLogLevel(LogLevel lvl) {
   SharedVar<bool>::scoped_lock guard(m_inited);
   if( !*m_inited ) {
     m_level = lvl;
     return true;
   }
-  syslog("LogManager")<<"Cannot change verbosity level after init."<<std::endl;
+  syslog("", error)<<"Cannot change verbosity level after init."<<std::endl;
   return false;
 }
 
@@ -257,7 +250,7 @@ bool LogManager::setLogPath(std::string const &path) {
     m_path = path;
     return true;
   }
-  syslog("LogManager")<<"Cannot change log path after init."<<std::endl;
+  syslog("", error)<<"Cannot change log path after init."<<std::endl;
   return false;
 }
 
