@@ -39,17 +39,58 @@ namespace TREX {
   namespace transaction {
     namespace details {
 
+      /** @brief timeline related event
+       *
+       * The base class for all the log events related to timeline 
+       * subscription/creation
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       */
       class tl_event :public tr_event {
       protected:
+	/** @brief Constructor
+	 *
+	 * @param[in] arg A xml descriptor
+	 *
+	 *  Create a new instance based on the xml information 
+	 * embedded in @p arg. The XML format expected is:
+	 * @code 
+	 * < <op_type> name="<timeline>" goals="<goals>" plan="<plan>" />
+	 * @endcode
+	 * Where:
+	 * @li @c <op_type> is the type of operation
+	 * @li @c <name> is the tinmeline it applies to
+	 * @li @c <goals> indicates whether the timelien will accept/post goals
+	 * @li @c <plan> indicates whether the timellin will publish/subscribe 
+	 *     to its internal plan
+	 * Both @c <goals> and @c <plan> are optional and will be set to 1 if 
+	 * absent.
+	 */
 	tl_event(factory::argument_type const &arg);
+	/** @brief Destructor */
 	virtual ~tl_event() {}
 	
+	/** @brief timeline
+	 *
+	 * @return the name of the timeline this operation applies to
+	 */
 	utils::Symbol const &timeline() const {
 	  return m_timeline;
 	}
+	/** @brief goal flag
+	 *
+	 * @return a flag indicating if this timeline accept/post goals
+	 */
 	bool goals() const {
 	  return m_goals;
 	}
+	/** @brief plan
+	 *
+	 * @return A flag that indicate if this timleine publish/listen to 
+	 * its @e Internal plan
+	 */
 	bool plan() const {
 	  return m_plan;
 	}
@@ -58,6 +99,16 @@ namespace TREX {
 	bool m_goals, m_plan;
       }; // TREX::transaction::details::tl_event
       
+      /** @brief timeline use operation
+       *
+       * This class describe an External timeline declaration operation 
+       * extracted from the log 
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       * @sa class tr_unuse
+       */
       class tr_use:public tl_event {
       public:
 	tr_use(factory::argument_type const &arg)
@@ -69,6 +120,16 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_use
 
+      /** @brief timeline unuse operation
+       *
+       * This class describe an External timeline undeclaration operation 
+       * extracted from the log 
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       * @sa class tr_use
+       */
       class tr_unuse:public tl_event {
       public:
 	tr_unuse(factory::argument_type const &arg)
@@ -80,6 +141,16 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_unuse
       
+      /** @brief timeline provide operation
+       *
+       * This class describe an Internal timeline declaration operation 
+       * extracted from the log 
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       * @sa class tr_unprovide
+       */
       class tr_provide:public tl_event {
       public:
 	tr_provide(factory::argument_type const &arg)
@@ -91,6 +162,16 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_provide
 
+      /** @brief timeline unprovide operation
+       *
+       * This class describe an Internal timeline undeclaration operation 
+       * extracted from the log 
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       * @sa class tr_provide
+       */
       class tr_unprovide:public tl_event {
       public:
 	tr_unprovide(factory::argument_type const &arg)
@@ -102,10 +183,31 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_unprovide
 
+      /** @brief Reactor failure
+       *
+       * This class describe a reactor failure from the log. The 
+       * execution of it wil lresult on the LogPLayer throwing an 
+       * exception which will then destroy this reactor within the 
+       * agent.
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       */
       class tr_fail :public tr_event {
       public:
+	/** @brief Constructor 
+	 *
+	 * @param[in] arg A xml descriptor
+	 *
+	 * Create a new instance. The XML is:
+	 * @code
+	 * <failed/>
+	 * @endcode
+	 */
 	tr_fail(factory::argument_type const &arg) 
 	  :tr_event(arg) {}
+	/** @brief destructor */
 	~tr_fail() {}
       private:
 	void play() {
@@ -113,10 +215,28 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_fail
 
+      /** @brief New observation event 
+       *
+       * Describe an observation posting event from the log
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       */
       class tr_notify :public tr_event {
       public:
+	/** @brief Constructor 
+	 * @param[in] arg A XML descriptor
+	 *
+	 * Create anew instance based on the observation described in @p arg. 
+	 * The XML is an XML desciptor for an observation as accepted by 
+	 * the XML constructor of the Observation class.
+	 *
+	 * @sa Observation::Observation(boost::property_tree::ptree::value_type &)
+	 */
 	tr_notify(factory::argument_type const &arg)
 	  :tr_event(arg), m_obs(factory::node(arg)) {}
+	/** @brief Destructor */
 	~tr_notify() {}
       private:
 	void play() {
@@ -125,11 +245,57 @@ namespace TREX {
 	Observation m_obs;
       }; // TREX::transaction::details::tr_notify
 
+      /** @brief Goal related event base class
+       *
+       * This class is the base for all the events ambedding a goal_id
+       * as an argaument. This includes request/recall events but also
+       * plan publication/cancelation
+       * 
+       * It extract the goal from the log and associate goals created in this 
+       * agent to their former id as described by the log allowing to replay 
+       * the same goal excahnges despite the goal_id changing at every run.
+       *
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py
+       */
       class tr_goal_event :public tr_event {
       protected:
+	/** @brief Constructor 
+	 * @param[in] arg A xml descriptor
+	 * @param[in] build goal parsing flag
+	 * 
+	 * Create the new goal event using the XML tag in @p arg. Depending 
+	 * on @p build the XML structure will differ.
+	 * @li if @p build is @c true the structure is:
+	 * @code 
+	 * < <op_type> id="<log_id>" >
+	 * <!-- goal_descriptor -->
+	 * </ <op_type> >
+	 * @endcode 
+	 * And the constructor wil create a new goal using the 
+	 * @c goal_descriptor as defined for  the XML constrauctor of the 
+	 * class Goal and will then associate to the pseudo id @c <log_id>
+	 * @li if @p build is false the structure is just 
+	 * @code 
+	 * < <op_type> id="<log_id>" />
+	 * @endcode
+	 * And the constructor will look for the formerly createdted goal
+	 * associated to the pseudo id @c <log_id>
+	 *
+	 * In both cases the @c <op_type> defines the type of operation
+	 * and will be assciated to one concrete descendant of this class.
+	 *
+	 * @sa Goal::Goal(boost::property_tree::ptree::value_type &)
+	 */
 	tr_goal_event(factory::argument_type const &arg, bool build);
+	/** @brief Destructor */
 	virtual ~tr_goal_event() {}
 
+	/** @brief goal
+	 *
+	 * @return the goal associated to this operation
+	 */
 	goal_id const &goal() const {
 	  return m_goal;
 	}
@@ -137,6 +303,15 @@ namespace TREX {
 	goal_id m_goal;
       }; // TREX::transaction::details::tr_goal_event
 
+      /** @brief Request event
+       *
+       * The event of producing a request
+       * 
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py 
+       * @sa tr_recall
+       */
       class tr_request :public tr_goal_event {
       public:
 	tr_request(factory::argument_type const &arg) 
@@ -148,6 +323,15 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_request
 
+      /** @brief Recall event
+       *
+       * The event of recalling a request
+       * 
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py 
+       * @sa tr_request
+       */
       class tr_recall :public tr_goal_event {
       public:
 	tr_recall(factory::argument_type const &arg) 
@@ -159,6 +343,15 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_recall
 
+      /** @brief Plan notification event
+       *
+       * The event of publishing a plan token
+       * 
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py 
+       * @sa tr_plan_cancel
+       */
       class tr_plan_add :public tr_goal_event {
       public:
 	tr_plan_add(factory::argument_type const &arg) 
@@ -170,6 +363,15 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_plan_add
 
+      /** @brief Plan cancelation event
+       *
+       * The event of cancelling a formerly published plan token
+       * 
+       * @relates LogPlayer
+       * @ingroup transaction
+       * @author Frederic Py 
+       * @sa tr_plan_add
+       */
       class tr_plan_cancel :public tr_goal_event {
       public:
 	tr_plan_cancel(factory::argument_type const &arg) 
@@ -181,11 +383,36 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_plan_cancel
 
+      /** @brief Work status update event
+       *
+       * This event is used to emulate the work requests from 
+       * the reactor. It will set the work flag of the reactor 
+       * to the corresponding value allowing it to "consume" 
+       * the same deliberation steps as the reactor it replaying.
+       * 
+       * @ingroup transaction
+       * @relates LogPlayer
+       * @uthor Frederic Py
+       */
       class tr_work :public tr_event {
       public:
+	/** @brief Constructor 
+	 * 
+	 * @param[in] arg A XML descriptor
+	 * 
+	 * Create a new instance using the XML emebedded in @p arg. 
+	 * The XML format is:
+	 * @code 
+	 *  <work value="<bool>" />
+	 * @endcode 
+	 * Where @c <bool> indiacates the value to which the reactor log 
+	 * flag should be set to (@c 1 if it needs to request for work, 
+	 * @c 0 otherwise 
+	 */
 	tr_work(factory::argument_type const &arg)
 	  :tr_event(arg), 
 	   m_work(utils::parse_attr<bool>(factory::node(arg), "value")) {}
+	/** @brief Destructor */
 	~tr_work() {}
       private:
 	void play() {
