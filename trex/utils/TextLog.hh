@@ -174,15 +174,19 @@ namespace TREX {
       template<class Handler>
       void add_handler(Handler const &handle) {
         std::auto_ptr<handler> h(new Handler(handle));
+	bool first = false;
         h->m_log = this;
-	bool first;
         {
           scoped_lock guard(m_lock);
-	  first = m_handlers.empty() && NULL==m_thread.get();
+	  first = !m_running;
+	  m_running = true; // ensure that no one will try to create a thread
           m_handlers.insert(h.release());
         }
-	if( first )
+	if( first ) {
+	  if( NULL!=m_thread.get() )
+	    m_thread->join();
 	  m_thread.reset(new boost::thread(thread_proxy(this)));
+	}
       }
     
       stream_type msg(id_type const &from, id_type const &kind=null) {
@@ -212,7 +216,9 @@ namespace TREX {
 	  :m_log(NULL) {}
 	handler(handler const &other) 
 	  :m_log(NULL) {}
-	virtual ~handler() {}
+	virtual ~handler() {
+	  detach();
+	}
 
       protected:
 	bool is_attached() {

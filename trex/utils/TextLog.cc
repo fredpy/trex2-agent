@@ -137,6 +137,8 @@ void TextLog::thread_proxy::operator()() {
 	TextLog::packet msg;
 	if( next(msg) ) {
 	  TextLog::scoped_lock guard(m_log->m_lock);
+	  if( m_log->m_handlers.empty() )
+	    break; // do not run if no listeners
 	  for(TextLog::handler_set::const_iterator i=m_log->m_handlers.begin();
 	      m_log->m_handlers.end()!=i; ++i)
 	    (*i)->message(msg.get<0>(), msg.get<1>(), 
