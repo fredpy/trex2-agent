@@ -372,7 +372,7 @@ void ControlInterface::run() {
     char buff[4096];
     size_t const max_len(4096);
     size_t len;
-    int timer = 20; // wait 20 us
+    int timer = 200; // wait 200 us
 
     while( is_running() && is_open() ) {
       // I'll assume that data is a string with no '\0' in between
@@ -390,7 +390,7 @@ void ControlInterface::run() {
 	proccess_message(msg);
       }
       // sleep a little
-      boost::thread::yield();
+      boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
   } catch(TREX::utils::Exception const &te) {
     syslog(null, error)<<"In fifo listener thread: "<<te;

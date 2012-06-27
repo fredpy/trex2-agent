@@ -65,10 +65,12 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-  TeleoReactor(arg, false), m_on(
-				 parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(
-														      true)
+  TeleoReactor(arg, false), m_active_proxy(NULL),
+  m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
 {
+
+  manager().add_handler(log_proxy(*this));
+  syslog(warn)<<"This message should appeear in stderr";
 
   m_env->setPlatformReactor(this);
 
@@ -80,7 +82,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
   debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "debug");
 
-  syslog(null, info) << "Connecting to dune on " << duneip << ":" 
+  syslog(info) << "Connecting to dune on " << duneip << ":" 
 		     << duneport;
 
   // start listening for dune in a new thread
@@ -91,7 +93,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   receive.bind(localport, Address::Any, true);
   receive.addToPoll(iom);
 
-  syslog(null, info) << "listening on port " << localport << "...";
+  syslog(info) << "listening on port " << localport << "...";
 
   provide("estate", false); 		// declare the state command timeline
   provide("vstate", false); 		// declare the state command timeline
@@ -113,6 +115,9 @@ Platform::~Platform()
   m_env->setPlatformReactor(NULL);
   if( NULL!=bfr )
     delete[] bfr;
+  // some clean up may not be very safe though
+  if( NULL!=m_active_proxy )
+    delete m_active_proxy;
 }
 void
 Platform::setControlInterface(ControlInterface * itf)
@@ -163,20 +168,20 @@ Platform::synchronize()
 	      switch (command->command)
 		{
 		case IMC::TrexCommand::OP_POST_GOAL:
-		  syslog(null, info) << "received a new goal (" << command->goalid << "): " << command->goalxml;
+		  syslog(info) << "received a new goal (" << command->goalid << "): " << command->goalxml;
 		  if (controlInterfaceInstance) {
 		    controlInterfaceInstance->proccess_message(command->goalxml);
 		  }
 		  break;
 		case IMC::TrexCommand::OP_ENABLE:
-		  syslog(null, warn) << "Enable TREX command received";
+		  syslog(warn) << "Enable TREX command received";
 		  // post active observation ...
 		  postObservation(Observation("supervision", "Active"));
 		  reportToDune("Activate TREX command received");
 
 		  break;
 		case IMC::TrexCommand::OP_DISABLE:
-		  syslog(null, warn) << "Disable TREX command received";
+		  syslog(warn) << "Disable TREX command received";
 		  // post blocked observation ...
 		  postObservation(Observation("supervision", "Blocked"));
 		  reportToDune("Disable TREX command received");
@@ -186,7 +191,7 @@ Platform::synchronize()
 
 	  if (msg->getId() == IMC::Abort::getIdStatic())
 	    {
-	      syslog(null, warn) << "Abort received";
+	      syslog(warn) << "Abort received";
 	      // post blocked observation ...
 	      postObservation(Observation("supervision", "Blocked"));
 	      reportToDune("Disabling TREX due to abort detection");
@@ -209,7 +214,7 @@ Platform::synchronize()
       IMC::Heartbeat hb;
       sendMsg(hb);
 
-      syslog(null,info) << "processed " << msg_count << " messages\n";
+      syslog(info) << "processed " << msg_count << " messages\n";
       std::cout << "processed " << msg_count << " messages\n";
     }
   catch (std::runtime_error& e)
@@ -232,7 +237,7 @@ Platform::handleRequest(goal_id const &g)
   std::string gname = (goal->object()).str();
   std::string gpred = (goal->predicate()).str();
   std::string man_name;
-  syslog(null, info) << "handleRequest(" << gname << "." << gpred << ")\n";
+  syslog(info) << "handleRequest(" << gname << "." << gpred << ")\n";
 
   std::ostringstream ss;
   ss << "TREX_goal_" << g;
@@ -271,7 +276,7 @@ Platform::handleRequest(goal_id const &g)
 	  }
       }
       else {
-	syslog(null, error) << "variables are not singletons!\n";
+	syslog(error) << "variables are not singletons!\n";
       }
     }
 }
@@ -279,7 +284,7 @@ Platform::handleRequest(goal_id const &g)
 void
 Platform::handleRecall(goal_id const &g)
 {
-  syslog(null, error) << "handleRecall(" << g << ")";
+  syslog(error) << "handleRecall(" << g << ")";
 }
 
 void
@@ -413,7 +418,7 @@ Platform::processState()
 	  std::ostringstream ss;
 	  ss << "Unknown vehicle mode: " << msg->op_mode;
 	  reportToDune(ss.str());
-	  syslog(null, warn) << ss.str();
+	  syslog(warn) << ss.str();
 	  mode = "undefined";
 	  break;
 	}
@@ -655,4 +660,33 @@ Platform::commandIdle(const std::string &man_name)
   else
     return NULL;
 }
+
+/*
+ * class TREX::LSTS::Platform::log_proxy
+ */
+
+// structors 
+
+Platform::log_proxy::~log_proxy() {
+  if( this==m_platform->m_active_proxy ) {
+    m_platform->m_active_proxy = NULL;
+  }
+}
+
+// callback
+
+void Platform::log_proxy::message
+(boost::optional<Platform::log_proxy::date_type> const &date,
+ Platform::log_proxy::id_type const &who, 
+ Platform::log_proxy::id_type const &kind, 
+ Platform::log_proxy::msg_type const &what) {
+  m_platform->m_active_proxy = this;
+  // Example that display error/warnings on std::cerr
+  if( warn==kind || error==kind ) {
+    if( date )
+      std::cerr<<date<<' ';
+    std::cerr<<'['<<who<<']'<<kind<<": "<<what<<std::flush;
+  }
+}
+
 
