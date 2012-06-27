@@ -74,12 +74,16 @@ internals::entry::~entry() {
 
 // manipulators
 
-void TextLog::handler::detach() {
+bool TextLog::handler::detach() {
   if( NULL!=m_log ) {
-    TextLog::scoped_lock lock(m_log->m_lock);
-    m_log->m_handlers.erase(this);
-    m_log = NULL;
+    if( m_log->m_primary.get()!=this ) {
+      TextLog::scoped_lock guard(m_log->m_lock);
+      m_log->m_handlers.erase(this);
+      m_log = NULL;
+      return true;
+    }
   }
+  return false;
 }
 
 /*
@@ -89,53 +93,69 @@ void TextLog::handler::detach() {
 // structors
 
 TextLog::~TextLog() {
-  scoped_lock lock(m_lock);
-  for(std::set<handler *>::const_iterator i=m_handlers.begin();
-      m_handlers.end()!=i; ++i) 
-    (*i)->m_log = NULL;
-  m_handlers.clear();
+  stop();
+  if( NULL!=m_thread.get() ) {
+    m_thread->join();
+  }
+  {
+    scoped_lock guard(m_lock);
+    while( !m_handlers.empty() ) {
+      std::set<handler *>::iterator i = m_handlers.begin();
+      std::auto_ptr<handler> tmp(*i);
+      tmp->m_log = NULL;
+      m_handlers.erase(i);
+    }
+  }
 }
 
 // manipulators 
 
-bool TextLog::add_handler(TextLog::handler &handle) {
-  if( NULL==handle.m_log ) {
-    scoped_lock lock(m_lock);
-    handle.m_log = this;
-    m_handlers.insert(&handle);
+void TextLog::send(boost::optional<TextLog::date_type> const &when,
+		   TextLog::id_type const &who, TextLog::id_type const &type, 
+		   TextLog::msg_type const &what) {
+  if( NULL!=m_primary.get() )
+    m_primary->message(when, who, type, what);
+  if( is_running() ) {
+    queue_type::scoped_lock guard(m_queue);
+    m_queue->push_back(packet(when, who, type, what));
+  }
+} 
+
+/*
+ *  class TREX::utils::TextLog::thread_proxy
+ */
+
+void TextLog::thread_proxy::operator()() {
+  if( NULL!=m_log ) {
+    {
+      TextLog::scoped_lock guard(m_log->m_lock);
+      m_log->m_running = true;
+    }
+    try {
+      while( m_log->is_running() ) {
+	boost::thread::yield(); 
+	TextLog::packet msg;
+	if( next(msg) ) {
+	  TextLog::scoped_lock guard(m_log->m_lock);
+	  for(TextLog::handler_set::const_iterator i=m_log->m_handlers.begin();
+	      m_log->m_handlers.end()!=i; ++i)
+	    (*i)->message(msg.get<0>(), msg.get<1>(), 
+			  msg.get<2>(), msg.get<3>()); 
+	}
+      }
+    } catch(...) {}
+    m_log->stop();
+  }
+}
+
+bool TextLog::thread_proxy::next(TextLog::packet &msg) {
+  queue_type::scoped_lock guard(m_log->m_queue);
+  if( !m_log->m_queue->empty() ) {
+    msg = m_log->m_queue->front();
+    m_log->m_queue->pop_front();
     return true;
   }
   return false;
 }
 
-void TextLog::send(boost::optional<TextLog::date_type> const &when,
-		   TextLog::id_type const &who, TextLog::id_type const &type, 
-		   TextLog::msg_type const &what) {
-  scoped_lock lock(m_lock);
-  for(std::set<handler *>::const_iterator i=m_handlers.begin(); 
-      m_handlers.end()!=i; ++i)
-    (*i)->message(when, who, type, what);
-}
 
-/*
- * class TREX::utils::log_file
- */
-void log_file::message(boost::optional<log_file::date_type> const &date,
-		       log_file::id_type const &who, 
-		       log_file::id_type const &kind, 
-		       log_file::msg_type const &what) {
-  bool pfx = false;
-  if( date ) {
-    m_file<<'['<<*date<<']';
-    pfx = true;
-  }   
-  if( !who.empty() ) {
-    m_file<<'['<<who<<']';
-    pfx = true;
-  }  
-  if( null!=kind && info!=kind ) {
-    m_file<<kind<<": ";
-  } else if( pfx )
-    m_file.put(' ');
-  m_file<<what<<std::flush;
-}

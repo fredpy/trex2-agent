@@ -241,6 +241,11 @@ namespace TREX {
 				 Symbol const &kind=null) {
 	return m_syslog(when, who, kind);
       }
+
+      template<class Handler>
+      void add_handler(Handler const &x) {
+	m_syslog.add_handler(new Handler(x));
+      }
             
       /** @brief Current verbosity level
        * @return the current verbosity level
@@ -359,7 +364,6 @@ namespace TREX {
       SharedVar<bool> m_inited;
       /** @brief syslog text log file */
       TextLog     m_syslog;
-      log_file    m_trex_log;
       /** @brief verbosity level */
       LogLevel    m_level;
 			
