@@ -65,8 +65,8 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-  TeleoReactor(arg, false), m_active_proxy(NULL),
-  m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
+          TeleoReactor(arg, false), m_active_proxy(NULL),
+          m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -75,19 +75,19 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   m_env->setPlatformReactor(this);
 
   duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
-			     "duneport");
+                             "duneport");
 
   duneip = parse_attr<std::string>("127.0.0.1", TeleoReactor::xml_factory::node(arg),
-				   "duneip");
+                                   "duneip");
 
   debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "debug");
 
   syslog(info) << "Connecting to dune on " << duneip << ":" 
-		     << duneport;
+      << duneport;
 
   // start listening for dune in a new thread
   localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
-			      "localport");
+                              "localport");
 
   bfr = new uint8_t[65535];
   receive.bind(localport, Address::Any, true);
@@ -129,99 +129,99 @@ bool
 Platform::synchronize()
 {
   try
+  {
+    Address addr;
+    int msg_count = 0;
+    //bool estate_changed = false, vstate_changed = false, oplimits_changed =
+    // 		false, gpsfix_changed = false;
+
+    //entityStates.clear();
+    received.clear();
+
+    while (iom.poll(0))
     {
-      Address addr;
-      int msg_count = 0;
-      //bool estate_changed = false, vstate_changed = false, oplimits_changed =
-      // 		false, gpsfix_changed = false;
+      msg_count++;
+      uint16_t rv = receive.read((char*)bfr, 65535, &addr);
+      IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
+      if (remote_id == 0)
+        remote_id = msg->getSource();
 
-      //entityStates.clear();
-      received.clear();
+      if (received.count(msg->getId()))
+        delete received[msg->getId()];
+      received[msg->getId()] = msg;
 
-      while (iom.poll(0))
-	{
-	  msg_count++;
-	  uint16_t rv = receive.read((char*)bfr, 65535, &addr);
-	  IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
-	  if (remote_id == 0)
-	    remote_id = msg->getSource();
-
-	  if (received.count(msg->getId()))
-	    delete received[msg->getId()];
-	  received[msg->getId()] = msg;
-
-	  if (msg->getId() == IMC::VehicleCommand::getIdStatic())
-	    {
-	      IMC::VehicleCommand * cmd = dynamic_cast<IMC::VehicleCommand *>(msg);
-	      if (cmd->type == IMC::VehicleCommand::VC_REQUEST)
-		{
-		  lastCommand = *cmd;
-		  //if (!cmd->maneuver.isNull())
-		  //	cmd->maneuver->toText(std::cout);
-		}
-	    }
-
-	  if (msg->getId() == IMC::TrexCommand::getIdStatic())
-	    {
-	      IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
-
-	      switch (command->command)
-		{
-		case IMC::TrexCommand::OP_POST_GOAL:
-		  syslog(info) << "received a new goal (" << command->goalid << "): " << command->goalxml;
-		  if (controlInterfaceInstance) {
-		    controlInterfaceInstance->proccess_message(command->goalxml);
-		  }
-		  break;
-		case IMC::TrexCommand::OP_ENABLE:
-		  syslog(warn) << "Enable TREX command received";
-		  // post active observation ...
-		  postObservation(Observation("supervision", "Active"));
-		  reportToDune("Activate TREX command received");
-
-		  break;
-		case IMC::TrexCommand::OP_DISABLE:
-		  syslog(warn) << "Disable TREX command received";
-		  // post blocked observation ...
-		  postObservation(Observation("supervision", "Blocked"));
-		  reportToDune("Disable TREX command received");
-		  break;
-		}
-	    }
-
-	  if (msg->getId() == IMC::Abort::getIdStatic())
-	    {
-	      syslog(warn) << "Abort received";
-	      // post blocked observation ...
-	      postObservation(Observation("supervision", "Blocked"));
-	      reportToDune("Disabling TREX due to abort detection");
-	    }
-	}
-
-      std::map<uint16_t, IMC::Message *>::iterator it;
-
-      for (it = received.begin(); it != received.end(); it++)
-	aggregate[it->first] = it->second;
-
-      processState();
-
-      if (!supervision_posted) {
-	postObservation(Observation("supervision", "Active"));
-	supervision_posted = true;
+      if (msg->getId() == IMC::VehicleCommand::getIdStatic())
+      {
+        IMC::VehicleCommand * cmd = dynamic_cast<IMC::VehicleCommand *>(msg);
+        if (cmd->type == IMC::VehicleCommand::VC_REQUEST)
+        {
+          lastCommand = *cmd;
+          //if (!cmd->maneuver.isNull())
+          //	cmd->maneuver->toText(std::cout);
+        }
       }
 
-      // send an heartbeat to Dune
-      IMC::Heartbeat hb;
-      sendMsg(hb);
+      if (msg->getId() == IMC::TrexCommand::getIdStatic())
+      {
+        IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
 
-      syslog(info) << "processed " << msg_count << " messages\n";
-      std::cout << "processed " << msg_count << " messages\n";
+        switch (command->command)
+        {
+          case IMC::TrexCommand::OP_POST_GOAL:
+            syslog(info) << "received a new goal (" << command->goalid << "): " << command->goalxml;
+            if (controlInterfaceInstance) {
+              controlInterfaceInstance->proccess_message(command->goalxml);
+            }
+            break;
+          case IMC::TrexCommand::OP_ENABLE:
+            syslog(warn) << "Enable TREX command received";
+            // post active observation ...
+            postObservation(Observation("supervision", "Active"));
+            reportToDune("Activate TREX command received");
+
+            break;
+          case IMC::TrexCommand::OP_DISABLE:
+            syslog(warn) << "Disable TREX command received";
+            // post blocked observation ...
+            postObservation(Observation("supervision", "Blocked"));
+            reportToDune("Disable TREX command received");
+            break;
+        }
+      }
+
+      if (msg->getId() == IMC::Abort::getIdStatic())
+      {
+        syslog(warn) << "Abort received";
+        // post blocked observation ...
+        postObservation(Observation("supervision", "Blocked"));
+        reportToDune("Disabling TREX due to abort detection");
+      }
     }
+
+    std::map<uint16_t, IMC::Message *>::iterator it;
+
+    for (it = received.begin(); it != received.end(); it++)
+      aggregate[it->first] = it->second;
+
+    processState();
+
+    if (!supervision_posted) {
+      postObservation(Observation("supervision", "Active"));
+      supervision_posted = true;
+    }
+
+    // send an heartbeat to Dune
+    IMC::Heartbeat hb;
+    sendMsg(hb);
+
+    syslog(info) << "processed " << msg_count << " messages\n";
+    std::cout << "processed " << msg_count << " messages\n";
+  }
   catch (std::runtime_error& e)
-    {
-      std::cerr << e.what();
-      return false;
-    }
+  {
+    std::cerr << e.what();
+    return false;
+  }
 
   return true;
 }
@@ -249,36 +249,36 @@ Platform::handleRequest(goal_id const &g)
     return;
   }
   if (gname.compare("command") == 0 && gpred.compare("Maneuver") == 0)
-    {
+  {
 
-      Variable latitude = goal->getAttribute("latitude");
-      Variable longitude = goal->getAttribute("longitude");
-      Variable depth = goal->getAttribute("depth");
-      Variable secs = goal->getAttribute("secs");
+    Variable latitude = goal->getAttribute("latitude");
+    Variable longitude = goal->getAttribute("longitude");
+    Variable depth = goal->getAttribute("depth");
+    Variable secs = goal->getAttribute("secs");
 
-      if (latitude.domain().isSingleton() && longitude.domain().isSingleton()
-	  && depth.domain().isSingleton()) {
-	double lat = latitude.domain().getTypedSingleton<double, false>();// latitude.domain().getSingleton());// atof(northing.domain().getStringSingleton().c_str());
-	double lon = longitude.domain().getTypedSingleton<double, false>();
+    if (latitude.domain().isSingleton() && longitude.domain().isSingleton()
+        && depth.domain().isSingleton()) {
+      double lat = latitude.domain().getTypedSingleton<double, false>();// latitude.domain().getSingleton());// atof(northing.domain().getStringSingleton().c_str());
+      double lon = longitude.domain().getTypedSingleton<double, false>();
 
-	double dep_v = depth.domain().getTypedSingleton<double, false>();//atof(depth.domain().getStringSingleton().c_str());
+      double dep_v = depth.domain().getTypedSingleton<double, false>();//atof(depth.domain().getStringSingleton().c_str());
 
-	if (secs.domain().isSingleton()
-	    && secs.domain().getStringSingleton().compare("0") == 0)
-	  future_goals[g] = commandGoto(man_name, lat, lon, dep_v, 1.5);
-	else if (secs.domain().isSingleton())
-	  {
-	    double dur = secs.domain().getTypedSingleton<double, false>();//atof(secs.domain().getStringSingleton().c_str());
-	    if (dep_v > 0)
-	      future_goals[g] = commandLoiter(man_name, lat, lon, dep_v, 15.0, 1.5, (int)dur);
-	    else
-	      future_goals[g] = commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
-	  }
-      }
-      else {
-	syslog(error) << "variables are not singletons!\n";
+      if (secs.domain().isSingleton()
+          && secs.domain().getStringSingleton().compare("0") == 0)
+        future_goals[g] = commandGoto(man_name, lat, lon, dep_v, 1.5);
+      else if (secs.domain().isSingleton())
+      {
+        double dur = secs.domain().getTypedSingleton<double, false>();//atof(secs.domain().getStringSingleton().c_str());
+        if (dep_v > 0)
+          future_goals[g] = commandLoiter(man_name, lat, lon, dep_v, 15.0, 1.5, (int)dur);
+        else
+          future_goals[g] = commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
       }
     }
+    else {
+      syslog(error) << "variables are not singletons!\n";
+    }
+  }
 }
 
 void
@@ -294,7 +294,7 @@ Platform::convertToRelative(double lat, double lon, double &x, double &y)
     return;
 
   IMC::HomeRef * homeRef =
-    dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
+      dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
   WGS84::displacement(homeRef->lat, homeRef->lon, 0, lat, lon, 0, &x, &y);
 }
 
@@ -322,197 +322,197 @@ Platform::processState()
   /* ESTIMATED_STATE */
 
   if (received.count(IMC::EstimatedState::getIdStatic()))
+  {
+    IMC::EstimatedState * msg =
+        dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
+
+    Observation obs("estate", "Position");
+    double lat = msg->lat, lon = msg->lon;//, hae = 0.0;//, northing = msg->x, easting = msg->y;
+    if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
+      WGS84::displace(msg->x, msg->y, &lat, &lon);
+
+    obs.restrictAttribute("latitude", FloatDomain(lat));
+    obs.restrictAttribute("longitude", FloatDomain(lon));
+    obs.restrictAttribute("depth", FloatDomain(msg->z));
+
+    if (aggregate.count(IMC::NavigationUncertainty::getIdStatic()))
     {
-      IMC::EstimatedState * msg =
-	dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
-
-      Observation obs("estate", "Position");
-      double lat = msg->lat, lon = msg->lon;//, hae = 0.0;//, northing = msg->x, easting = msg->y;
-      if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
-	WGS84::displace(msg->x, msg->y, &lat, &lon);
-
-      obs.restrictAttribute("latitude", FloatDomain(lat));
-      obs.restrictAttribute("longitude", FloatDomain(lon));
-      obs.restrictAttribute("depth", FloatDomain(msg->z));
-
-      if (aggregate.count(IMC::NavigationUncertainty::getIdStatic()))
-	{
-	  IMC::NavigationUncertainty * navUnc =
-	    dynamic_cast<IMC::NavigationUncertainty *>(aggregate[IMC::NavigationUncertainty::getIdStatic()]);
-	  obs.restrictAttribute("uncertainty",
-				FloatDomain(std::max(navUnc->x, navUnc->y)));
-	}
-      estate_posted = true;
-      postObservation(obs);
+      IMC::NavigationUncertainty * navUnc =
+          dynamic_cast<IMC::NavigationUncertainty *>(aggregate[IMC::NavigationUncertainty::getIdStatic()]);
+      obs.restrictAttribute("uncertainty",
+                            FloatDomain(std::max(navUnc->x, navUnc->y)));
     }
+    estate_posted = true;
+    postObservation(obs);
+  }
   else if (!estate_posted)
-    {
-      postObservation(
-		      Observation("estate", "undefined"));
-    }
+  {
+    postObservation(
+        Observation("estate", "undefined"));
+    estate_posted = true;
+  }
 
   /* OPERATIONAL_LIMITS */
 
   if (received.count(IMC::OperationalLimits::getIdStatic()))
-    {
-      IMC::OperationalLimits * msg =
-	dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
-      Observation obs("oplimits", "Limits");
+  {
+    IMC::OperationalLimits * msg =
+        dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
+    Observation obs("oplimits", "Limits");
 
-      if (msg->mask & IMC::OperationalLimits::OPL_MAX_DEPTH)
-	obs.restrictAttribute("maxDepth", FloatDomain(msg->max_depth));
+    if (msg->mask & IMC::OperationalLimits::OPL_MAX_DEPTH)
+      obs.restrictAttribute("maxDepth", FloatDomain(msg->max_depth));
 
-      if ((msg->mask & IMC::OperationalLimits::OPL_MAX_ALT))
-	obs.restrictAttribute("maxAltitude", FloatDomain(msg->max_depth));
-      if(msg->mask & IMC::OperationalLimits::OPL_MIN_ALT)
-	obs.restrictAttribute("minAltitude", FloatDomain(msg->min_altitude));
+    if ((msg->mask & IMC::OperationalLimits::OPL_MAX_ALT))
+      obs.restrictAttribute("maxAltitude", FloatDomain(msg->max_depth));
+    if(msg->mask & IMC::OperationalLimits::OPL_MIN_ALT)
+      obs.restrictAttribute("minAltitude", FloatDomain(msg->min_altitude));
 
-      if (msg->mask & IMC::OperationalLimits::OPL_MAX_SPEED)
-	obs.restrictAttribute("maxSpeed", FloatDomain(msg->max_speed));
-      if (msg->mask & IMC::OperationalLimits::OPL_MIN_SPEED)
-	obs.restrictAttribute("minSpeed", FloatDomain(msg->min_speed));
+    if (msg->mask & IMC::OperationalLimits::OPL_MAX_SPEED)
+      obs.restrictAttribute("maxSpeed", FloatDomain(msg->max_speed));
+    if (msg->mask & IMC::OperationalLimits::OPL_MIN_SPEED)
+      obs.restrictAttribute("minSpeed", FloatDomain(msg->min_speed));
 
-      oplimits_posted = true;
-      postObservation(obs);
-    }
+    oplimits_posted = true;
+    postObservation(obs);
+  }
   else
-    {
+  {
 
-      if (!oplimits_posted)
-	postObservation(
-			Observation("oplimits", "undefined"));
-
-      if (!aggregate.count(IMC::OperationalLimits::getIdStatic()))
-	{
-	  IMC::GetOperationalLimits get;
-	  sendMsg(get);
-	}
-
+    if (!oplimits_posted) {
+      postObservation(Observation("oplimits", "undefined"));
+      oplimits_posted = true;
     }
+    if (!aggregate.count(IMC::OperationalLimits::getIdStatic()))
+    {
+      IMC::GetOperationalLimits get;
+      sendMsg(get);
+    }
+
+  }
 
   /* VEHICLE_STATE */
 
   if (received.count(IMC::VehicleState::getIdStatic()))
+  {
+    IMC::VehicleState * msg =
+        dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
+    std::string mode;
+    switch (msg->op_mode)
     {
-      IMC::VehicleState * msg =
-	dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
-      std::string mode;
-      switch (msg->op_mode)
-	{
-	case IMC::VehicleState::VS_MANEUVER:
-	  mode = "Exec";
-	  break;
-	case IMC::VehicleState::VS_SERVICE:
-	  mode = "Ready";
-	  break;
-	case IMC::VehicleState::VS_CALIBRATION:
-	  mode = "Boot";
-	  break;
-	case IMC::VehicleState::VS_EXTERNAL:
-	  mode = "Boot";
-	  break;
-	case IMC::VehicleState::VS_ERROR:
-	  mode = "Error";
-	  break;
-	default:
-	  std::ostringstream ss;
-	  ss << "Unknown vehicle mode: " << msg->op_mode;
-	  reportToDune(ss.str());
-	  syslog(warn) << ss.str();
-	  mode = "undefined";
-	  break;
-	}
-      if (last_vstate != msg->op_mode)
-	{
-	  postObservation(Observation("vstate", mode));
-	  if (msg->op_mode != IMC::VehicleState::VS_MANEUVER && !was_idle)
-	    {
-	      postObservation(Observation("maneuver", "Idle"));
-	      postObservation(Observation("command", "Idle"));
-	      was_idle = true;
-	    }
-	  else
-	    was_idle = false;
-	}
-      last_vstate = msg->op_mode;
+      case IMC::VehicleState::VS_MANEUVER:
+        mode = "Exec";
+        break;
+      case IMC::VehicleState::VS_SERVICE:
+        mode = "Ready";
+        break;
+      case IMC::VehicleState::VS_CALIBRATION:
+        mode = "Boot";
+        break;
+      case IMC::VehicleState::VS_EXTERNAL:
+        mode = "Boot";
+        break;
+      case IMC::VehicleState::VS_ERROR:
+        mode = "Error";
+        break;
+      default:
+        std::ostringstream ss;
+        ss << "Unknown vehicle mode: " << msg->op_mode;
+        reportToDune(ss.str());
+        syslog(warn) << ss.str();
+        mode = "undefined";
+        break;
     }
+    if (last_vstate != msg->op_mode)
+    {
+      postObservation(Observation("vstate", mode));
+      if (msg->op_mode != IMC::VehicleState::VS_MANEUVER && !was_idle)
+      {
+        postObservation(Observation("maneuver", "Idle"));
+        postObservation(Observation("command", "Idle"));
+        was_idle = true;
+      }
+      else
+        was_idle = false;
+    }
+    last_vstate = msg->op_mode;
+  }
   else if (last_vstate == -1)
+  {
+    if (!was_idle)
     {
-      postObservation(
-		      Observation("vstate", "Boot"));
-      if (!was_idle)
-	{
-	  postObservation(Observation("maneuver", "Idle"));
-	  postObservation(Observation("command", "Idle"));
-	  was_idle = true;
-	}
+      postObservation(Observation("vstate", "Boot"));
+      postObservation(Observation("maneuver", "Idle"));
+      postObservation(Observation("command", "Idle"));
+      was_idle = true;
     }
+  }
 
   /* VEHICLE_COMMAND */
 
   int eta = std::numeric_limits<int>::max();
-        
+
   if (received.count(IMC::VehicleState::getIdStatic()))
+  {
+    IMC::VehicleState *lastState =
+        dynamic_cast<IMC::VehicleState*>(aggregate[IMC::VehicleState::getIdStatic()]);
+    eta = lastState->maneuver_eta;
+    if (lastState->op_mode == IMC::VehicleState::VS_MANEUVER
+        && !lastCommand.maneuver.isNull())
     {
-      IMC::VehicleState *lastState =
-	dynamic_cast<IMC::VehicleState*>(aggregate[IMC::VehicleState::getIdStatic()]);
-      eta = lastState->maneuver_eta;
-      if (lastState->op_mode == IMC::VehicleState::VS_MANEUVER
-	  && !lastCommand.maneuver.isNull())
-	{
 
-	  Observation obs("command", "Maneuver");
-	  IMC::Message * man = lastCommand.maneuver.get();
+      Observation obs("command", "Maneuver");
+      IMC::Message * man = lastCommand.maneuver.get();
 
-	  obs.restrictAttribute("eta", IntegerDomain(eta));
+      obs.restrictAttribute("eta", IntegerDomain(eta));
 
-	  if (man->getId() == IMC::Goto::getIdStatic())
-	    {
-	      IMC::Goto * m = dynamic_cast<IMC::Goto *>(man);
-	      obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-	      obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-	      obs.restrictAttribute("depth", FloatDomain(m->z));
-	      obs.restrictAttribute("speed", FloatDomain(m->speed));
-	      obs.restrictAttribute("secs", IntegerDomain(0));
-	    }
-	  else if (man->getId() == IMC::Loiter::getIdStatic())
-	    {
+      if (man->getId() == IMC::Goto::getIdStatic())
+      {
+        IMC::Goto * m = dynamic_cast<IMC::Goto *>(man);
+        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+        obs.restrictAttribute("depth", FloatDomain(m->z));
+        obs.restrictAttribute("speed", FloatDomain(m->speed));
+        obs.restrictAttribute("secs", IntegerDomain(0));
+      }
+      else if (man->getId() == IMC::Loiter::getIdStatic())
+      {
 
-	      IMC::Loiter * m = dynamic_cast<IMC::Loiter *>(man);
-	      //double n, e;
-	      obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-	      obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-	      obs.restrictAttribute("depth", FloatDomain(m->z));
-	      obs.restrictAttribute("speed", FloatDomain(m->speed));
-	      obs.restrictAttribute("secs", IntegerDomain(m->duration));
-	    }
-	  else if (man->getId() == IMC::StationKeeping::getIdStatic())
-	    {
-	      IMC::StationKeeping * m = dynamic_cast<IMC::StationKeeping *>(man);
-	      //double n, e;
-	      obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-	      obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-	      obs.restrictAttribute("depth", FloatDomain(0));
-	      obs.restrictAttribute("speed", FloatDomain(m->speed));
-	      obs.restrictAttribute("secs", IntegerDomain(m->duration));
-	    }
-	  else if (man->getId() == IMC::Teleoperation::getIdStatic())
-	    {
-	      //  obs.restrictAttribute("type", TREX::europa::EuropaEntity("teleop"));
-	      IMC::EstimatedState * msg =
-		dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
-	      //double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
-	      obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
-	      obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
-	      obs.restrictAttribute("depth", FloatDomain(0));
-	      obs.restrictAttribute("speed", FloatDomain(0));
-	      obs.restrictAttribute("secs", IntegerDomain(0));
-	    }
-	  lastCommand.maneuver = IMC::InlineMessage();
-	  postObservation(obs);
+        IMC::Loiter * m = dynamic_cast<IMC::Loiter *>(man);
+        //double n, e;
+        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+        obs.restrictAttribute("depth", FloatDomain(m->z));
+        obs.restrictAttribute("speed", FloatDomain(m->speed));
+        obs.restrictAttribute("secs", IntegerDomain(m->duration));
+      }
+      else if (man->getId() == IMC::StationKeeping::getIdStatic())
+      {
+        IMC::StationKeeping * m = dynamic_cast<IMC::StationKeeping *>(man);
+        //double n, e;
+        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+        obs.restrictAttribute("depth", FloatDomain(0));
+        obs.restrictAttribute("speed", FloatDomain(m->speed));
+        obs.restrictAttribute("secs", IntegerDomain(m->duration));
+      }
+      else if (man->getId() == IMC::Teleoperation::getIdStatic())
+      {
+        //  obs.restrictAttribute("type", TREX::europa::EuropaEntity("teleop"));
+        IMC::EstimatedState * msg =
+            dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
+        //double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
+        obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
+        obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
+        obs.restrictAttribute("depth", FloatDomain(0));
+        obs.restrictAttribute("speed", FloatDomain(0));
+        obs.restrictAttribute("secs", IntegerDomain(0));
+      }
+      lastCommand.maneuver = IMC::InlineMessage();
+      postObservation(obs);
 
-	}
     }
+  }
 }
 
 bool
@@ -520,17 +520,17 @@ Platform::sendMsg(Message& msg, Address &dest)
 {
   Dune::Utils::ByteBuffer bb;
   try
-    {
-      msg.setTimeStamp();
-      msg.serialize(bb);
-      send.write((const char*)bb.getBuffer(), msg.getSerializationSize(), dest,
-		 duneport);
-    }
+  {
+    msg.setTimeStamp();
+    msg.serialize(bb);
+    send.write((const char*)bb.getBuffer(), msg.getSerializationSize(), dest,
+               duneport);
+  }
   catch (std::runtime_error& e)
-    {
-      syslog("LSTS", error)<< e.what();
-      return false;
-    }
+  {
+    syslog("LSTS", error)<< e.what();
+    return false;
+  }
   return true;
 }
 
@@ -539,19 +539,19 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
 {
   Dune::Utils::ByteBuffer bb;
   try
-    {
-      msg.setTimeStamp();
-      msg.setSource(65000);
-      msg.setDestination(remote_id);
-      msg.serialize(bb);
-      send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
-		 Address(ip.c_str()), port);
-    }
+  {
+    msg.setTimeStamp();
+    msg.setSource(65000);
+    msg.setDestination(remote_id);
+    msg.serialize(bb);
+    send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
+               Address(ip.c_str()), port);
+  }
   catch (std::runtime_error& e)
-    {
-      syslog("LSTS", error)<< e.what();
-      return false;
-    }
+  {
+    syslog("LSTS", error)<< e.what();
+    return false;
+  }
   return true;
 }
 
@@ -613,7 +613,7 @@ Platform::commandGoto(const std::string &man_name, double lat, double lon, doubl
 
 IMC::Message *
 Platform::commandStationKeeping(const std::string &man_name, double lat, double lon, double speed,
-				int seconds)
+    int seconds)
 {
   IMC::StationKeeping * msg = new IMC::StationKeeping();
   msg->lat = lat;
@@ -631,7 +631,7 @@ Platform::commandStationKeeping(const std::string &man_name, double lat, double 
 
 IMC::Message *
 Platform::commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius,
-			double speed, int seconds)
+    double speed, int seconds)
 {
   IMC::Loiter * msg = new IMC::Loiter();
   msg->lat = lat;
@@ -677,14 +677,14 @@ Platform::log_proxy::~log_proxy() {
 
 void Platform::log_proxy::message
 (boost::optional<Platform::log_proxy::date_type> const &date,
- Platform::log_proxy::id_type const &who, 
- Platform::log_proxy::id_type const &kind, 
- Platform::log_proxy::msg_type const &what) {
+    Platform::log_proxy::id_type const &who,
+    Platform::log_proxy::id_type const &kind,
+    Platform::log_proxy::msg_type const &what) {
   m_platform->m_active_proxy = this;
   // Example that display error/warnings on std::cerr
   if( warn==kind || error==kind ) {
     if( date )
-      std::cerr<<date<<' ';
+      std::cerr<<(*date)<<' ';
     std::cerr<<'['<<who<<']'<<kind<<": "<<what<<std::flush;
   }
 }
