@@ -72,13 +72,26 @@ internals::entry::~entry() {
  * class TREX::utils::TextLog::handler
  */
 
+TextLog::handler::~handler() {
+  detach(true);
+}
+
 // manipulators
 
 bool TextLog::handler::detach() {
+  return detach(false);
+}
+
+bool TextLog::handler::detach(bool force) {
   if( NULL!=m_log ) {
     if( m_log->m_primary.get()!=this ) {
       TextLog::scoped_lock guard(m_log->m_lock);
       m_log->m_handlers.erase(this);
+      m_log = NULL;
+      return true;
+    } else if( force ) {
+      // Not thread safe
+      m_log->m_primary.release();
       m_log = NULL;
       return true;
     }
@@ -113,8 +126,10 @@ TextLog::~TextLog() {
 void TextLog::send(boost::optional<TextLog::date_type> const &when,
 		   TextLog::id_type const &who, TextLog::id_type const &type, 
 		   TextLog::msg_type const &what) {
+  // Not thread safe
   if( NULL!=m_primary.get() )
     m_primary->message(when, who, type, what);
+  // end not thread safe
   if( is_running() ) {
     {
       queue_type::scoped_lock guard(m_queue);
