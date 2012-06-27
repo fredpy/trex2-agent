@@ -456,7 +456,7 @@ Agent::Agent(Symbol const &name, TICK final, Clock *clk, bool verbose)
 Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
   :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  updateTick(initialTick(m_clock));
+  updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
@@ -480,7 +480,7 @@ Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
 Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool verbose)
   :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  updateTick(initialTick(m_clock));
+  updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
@@ -576,7 +576,7 @@ void Agent::external_check(reactor_id r,
 bool Agent::setClock(Clock *clock) {
   if( NULL==m_clock ) {
     m_clock = clock;
-    updateTick(initialTick(m_clock));
+    updateTick(initialTick(m_clock), false);
     return true;
   } else {
     delete clock;
@@ -748,6 +748,8 @@ void Agent::initComplete() {
   // start the clock
   m_clock->doStart();
   syslog(null, "START")<<"\t=========================================================";
+  updateTick(m_clock->tick());
+
 }
 
 void Agent::run() {
