@@ -51,6 +51,7 @@ public:
 	~Platform();
 
 	static void setControlInterface(TREX::LSTS::ControlInterface * itf);
+	bool reportToDune(int type, const std::string &context, const std::string &text);
 	bool reportToDune(int type, const std::string &message);
 	bool reportToDune(const std::string &message);
 	bool reportErrorToDune(const std::string &message);
