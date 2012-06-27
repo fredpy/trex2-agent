@@ -244,7 +244,7 @@ namespace TREX {
 
       template<class Handler>
       void add_handler(Handler const &x) {
-	m_syslog.add_handler(new Handler(x));
+	m_syslog.add_handler(x);
       }
             
       /** @brief Current verbosity level
