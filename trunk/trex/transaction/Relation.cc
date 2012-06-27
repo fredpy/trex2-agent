@@ -185,7 +185,7 @@ void timeline::recall(goal_id const &g) {
 
 bool timeline::notifyPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog(null, "PLAN")<<"Added ["<<t<<"] "<<*t;
+    owner().syslog(TeleoReactor::plan)<<"Added ["<<t<<"] "<<*t;
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
@@ -198,9 +198,9 @@ bool timeline::notifyPlan(goal_id const &t) {
 
 bool timeline::cancelPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog(null, "PLAN")<<"Removed ["<<t<<"] from "
-				<<t->object()<<" to the "
-				<<m_plan_listeners<<" plan clients.";
+    owner().syslog(TeleoReactor::plan)<<"Removed ["<<t<<"] from "
+				      <<t->object()<<" to the "
+				      <<m_plan_listeners<<" plan clients.";
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )

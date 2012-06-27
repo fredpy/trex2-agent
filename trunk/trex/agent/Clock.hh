@@ -211,7 +211,7 @@ namespace TREX {
        * @a sleepSeconds
        */
       explicit Clock(duration_type const &sleep)
-	:m_sleep(sleep) {}
+      :m_sleep(sleep), m_started(false) {}
 
       /** @brief Internal start method
        *
@@ -232,7 +232,8 @@ namespace TREX {
        */
       void advanceTick(TREX::transaction::TICK &tick);
       
-      utils::internals::LogEntry syslog(utils::Symbol const &kind) const;
+      utils::internals::LogEntry syslog(utils::Symbol const &kind=utils::null) 
+	const;
 
     private:
       duration_type const m_sleep;
@@ -242,6 +243,7 @@ namespace TREX {
       
       // Logging related attributes
       mutable bool   m_first;
+      mutable bool   m_started;
       mutable transaction::TICK  m_last;
       mutable bool               m_free;
       mutable size_t             m_count;

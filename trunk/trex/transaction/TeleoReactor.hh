@@ -91,6 +91,9 @@ namespace TREX {
       typedef details::external_set                       external_set;
  
     public:
+      static utils::Symbol const obs;
+      static utils::Symbol const plan;
+
       typedef graph::duration_type duration_type;
       typedef graph::date_type     date_type;
       /** @brief Reactor reference type

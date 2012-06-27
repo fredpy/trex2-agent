@@ -101,6 +101,7 @@ TICK Clock::tick() {
     m_first = false;
     m_last = ret;
     m_free = true;
+    m_started = true;
     m_count = 0;
   } else if( ret!=m_last ) {
     log_tick();    
@@ -121,7 +122,10 @@ void Clock::doSleep() {
 }
 
 internals::LogEntry Clock::syslog(utils::Symbol const &kind) const {
-  return m_log->syslog("clock", kind);
+  if( m_started )
+    return m_log->syslog(m_last, "clock", kind);
+  else 
+    return m_log->syslog("clock", kind);
 }
 
 
