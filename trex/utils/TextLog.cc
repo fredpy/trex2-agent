@@ -64,7 +64,7 @@ internals::entry::~entry() {
     // add trailing \n
     if( '\n'!=m_msg[m_msg.length()-1] )
       m_msg.push_back('\n');
-    m_dest.send(m_source, m_kind, m_msg);
+    m_dest.send(m_date, m_source, m_kind, m_msg);
   }
 }
 
@@ -108,10 +108,34 @@ bool TextLog::add_handler(TextLog::handler &handle) {
   return false;
 }
 
-void TextLog::send(TextLog::id_type const &who, TextLog::id_type const &type, 
+void TextLog::send(boost::optional<TextLog::date_type> const &when,
+		   TextLog::id_type const &who, TextLog::id_type const &type, 
 		   TextLog::msg_type const &what) {
   scoped_lock lock(m_lock);
   for(std::set<handler *>::const_iterator i=m_handlers.begin(); 
       m_handlers.end()!=i; ++i)
-    (*i)->message(who, type, what);
+    (*i)->message(when, who, type, what);
+}
+
+/*
+ * class TREX::utils::log_file
+ */
+void log_file::message(boost::optional<log_file::date_type> const &date,
+		       log_file::id_type const &who, 
+		       log_file::id_type const &kind, 
+		       log_file::msg_type const &what) {
+  bool pfx = false;
+  if( date ) {
+    m_file<<'['<<*date<<']';
+    pfx = true;
+  }   
+  if( !who.empty() ) {
+    m_file<<'['<<who<<']';
+    pfx = true;
+  }  
+  if( null!=kind && info!=kind ) {
+    m_file<<kind<<": ";
+  } else if( pfx )
+    m_file.put(' ');
+  m_file<<what<<std::flush;
 }

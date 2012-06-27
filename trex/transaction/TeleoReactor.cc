@@ -191,6 +191,10 @@ Relation const &details::external::dereference() const {
  * class TREX::transaction::TeleoReactor
  */
 
+Symbol const TeleoReactor::obs("ASSERT");
+Symbol const TeleoReactor::plan("PLAN");
+
+
 // structors
 
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
@@ -221,7 +225,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
       create_symlink(location, short_name);
     } catch(...) {}
     boost::filesystem::current_path(pwd);
-    syslog(null, info)<<"Transactions logged to "<<fname;
+    syslog(info)<<"Transactions logged to "<<fname;
   }
 
   if( loadTL ) {
@@ -259,7 +263,7 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
   if( log ) {
     fname = manager().file_name(getName().str()+".tr.log");
     m_trLog = new Logger(fname.string());
-    syslog(null, info)<<"Transactions logged to "<<fname;
+    syslog(info)<<"Transactions logged to "<<fname;
 
   }
 }
@@ -328,7 +332,7 @@ double TeleoReactor::workRatio() {
         if( !m_past_deadline ) {
           m_past_deadline = true;
           m_validSteps = m_nSteps;
-          syslog(null, warn)<<" Reactor is now exceeding its deliberation latency ("
+          syslog(warn)<<" Reactor is now exceeding its deliberation latency ("
           <<getLatency()<<")\n\tNumber of steps within its latency: "<<m_validSteps;
         }
         ret = m_nSteps+1;
@@ -349,12 +353,12 @@ double TeleoReactor::workRatio() {
 	
     }
   } catch(std::exception const &se) {
-    syslog(null, warn)<<"Exception during hasWork question: "<<se.what();
+    syslog(warn)<<"Exception during hasWork question: "<<se.what();
   } catch(...) {
-    syslog(null, warn)<<"Unknown Exception during hasWork question";
+    syslog(warn)<<"Unknown Exception during hasWork question";
   }
   if( m_past_deadline ) {
-    syslog(null, warn)<<"Reactor needed to deliberate "<<(m_nSteps-m_validSteps)
+    syslog(warn)<<"Reactor needed to deliberate "<<(m_nSteps-m_validSteps)
 		      <<" extra steps spread other "
 		      <<(getCurrentTick()-m_deadline)
 		      <<" ticks after its latency."; 
@@ -459,13 +463,13 @@ void TeleoReactor::cancelPlanToken(goal_id const &g) {
 
 bool TeleoReactor::initialize(TICK final) {
   if( m_inited ) {
-    syslog(null, error)<< "Attempted to initalize this reactor twice.";
+    syslog(error)<< "Attempted to initalize this reactor twice.";
     return false;
   }
   m_initialTick = getCurrentTick();
   m_finalTick   = final;
-  syslog(null, info)<<"Creation tick is "<<getInitialTick();
-  syslog(null, info)<<"Execution latency is "<<getExecLatency();
+  syslog(info)<<"Creation tick is "<<getInitialTick();
+  syslog(info)<<"Execution latency is "<<getExecLatency();
   // syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
   try {
     if( NULL!=m_trLog )
@@ -475,11 +479,11 @@ bool TeleoReactor::initialize(TICK final) {
     m_inited = true;
     return true;
   } catch(TREX::utils::Exception const &e) {
-    syslog(null, error)<<"Exception caught during init :\n"<<e;
+    syslog(error)<<"Exception caught during init :\n"<<e;
   } catch( std::exception const &se) {
-    syslog(null, error)<<"C++ exception caught during init :\n"<<se.what();
+    syslog(error)<<"C++ exception caught during init :\n"<<se.what();
   } catch(...) {
-    syslog(null, error)<<"Unknown exception caught during init";
+    syslog(error)<<"Unknown exception caught during init";
   }
   return false;
 }
@@ -487,7 +491,7 @@ bool TeleoReactor::initialize(TICK final) {
 bool TeleoReactor::newTick() {
   if( m_firstTick ) {
     if( getCurrentTick()!=m_initialTick ) {
-      syslog(null, warn)<<"Updating initial tick from "<<m_initialTick
+      syslog(warn)<<"Updating initial tick from "<<m_initialTick
 		    <<" to "<<getCurrentTick();
       m_initialTick = getCurrentTick();
     }
@@ -519,11 +523,11 @@ bool TeleoReactor::newTick() {
       i.dispatch(getCurrentTick(), dispatched);
     return true;
   } catch(TREX::utils::Exception const &e) {
-    syslog(null, error)<<"Exception caught during new tick:\n"<<e;
+    syslog(error)<<"Exception caught during new tick:\n"<<e;
   } catch(std::exception const &se) {
-    syslog(null, error)<<"C++ exception caught during new tick:\n"<<se.what();
+    syslog(error)<<"C++ exception caught during new tick:\n"<<se.what();
   } catch(...) {
-    syslog(null, error)<<"Unknown exception caught during new tick";    
+    syslog(error)<<"Unknown exception caught during new tick";    
   }
   return false;
 }
@@ -550,7 +554,7 @@ bool TeleoReactor::doSynchronize() {
       for(internal_set::const_iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
         if( is_verbose() || NULL==m_trLog )
-          syslog(null, "ASSERT")<<(*i)->lastObservation();
+          syslog(obs)<<(*i)->lastObservation();
         if( NULL!=m_trLog )
           m_trLog->observation((*i)->lastObservation());
       }
@@ -558,13 +562,13 @@ bool TeleoReactor::doSynchronize() {
     }
     return success;
   } catch(Exception const &e) {
-    syslog(null, error)<<"Exception caught: "<<e;
+    syslog(error)<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
-    syslog(null, error)<<"C++ exception caught: "<<se.what();
+    syslog(error)<<"C++ exception caught: "<<se.what();
   } catch(...) {
-    syslog(null, error)<<"Unknown exception caught.";
+    syslog(error)<<"Unknown exception caught.";
   }
-  syslog(null, error)<<"Failed to synchronize.";
+  syslog(error)<<"Failed to synchronize.";
   return false;
 }
 

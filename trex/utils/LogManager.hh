@@ -233,8 +233,13 @@ namespace TREX {
       std::string use(std::string const &file_name, bool &found);
 	
       internals::LogEntry syslog(Symbol const &who, 
-				 Symbol const &kind) {
+				 Symbol const &kind=null) {
 	return m_syslog(who, kind);
+      }
+      internals::LogEntry syslog(TextLog::date_type const &when,
+				 Symbol const &who, 
+				 Symbol const &kind=null) {
+	return m_syslog(when, who, kind);
       }
             
       /** @brief Current verbosity level

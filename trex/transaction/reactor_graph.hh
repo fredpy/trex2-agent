@@ -636,9 +636,14 @@ namespace TREX {
     protected:
       reactor_id add_reactor(reactor_id r);
 
-      graph() {}
+      graph():m_tick_valid(false) {}
+
+      bool hasTick() const {
+	return m_tick_valid;
+      }
 
       void updateTick(TICK value) {
+	m_tick_valid = true;
 	m_currentTick = value;
       }
       void set_name(TREX::utils::Symbol const &name) {
@@ -647,6 +652,10 @@ namespace TREX {
 
       TREX::utils::internals::LogEntry syslog(utils::Symbol const &context, 
 					      utils::Symbol const &kind) const;
+      TREX::utils::internals::LogEntry syslog(utils::Symbol const &kind=utils::null) const {
+	return syslog(utils::null, kind);
+      }
+      
       TREX::utils::LogManager &manager() const {
 	return *m_log;
       }
@@ -714,6 +723,7 @@ namespace TREX {
       utils::Symbol            m_name;
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
+      bool                     m_tick_valid;
       TICK                     m_currentTick;
 
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;

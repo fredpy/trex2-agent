@@ -50,6 +50,7 @@
 
 # include <boost/thread/recursive_mutex.hpp>
 # include <boost/iostreams/stream.hpp>
+# include <boost/optional.hpp>
 
 namespace TREX {
   namespace utils {
@@ -62,6 +63,7 @@ namespace TREX {
       public:
 	typedef Symbol                id_type;
 	typedef std::string           msg_type;
+	typedef unsigned long long    date_type;
 	typedef msg_type::value_type  char_type;
 	typedef msg_type::size_type   size_type;
 	
@@ -72,12 +74,16 @@ namespace TREX {
 	}
       private:
 	TextLog &m_dest;
+	boost::optional<date_type> m_date;
 	Symbol m_source;
 	Symbol m_kind;
 	std::string m_msg;
 	
 	entry(TextLog &dest, Symbol const &src, Symbol const &kind) 
 	  :m_dest(dest), m_source(src), m_kind(kind) {}
+	entry(TextLog &dest, date_type const &date,
+	      Symbol const &src, Symbol const &kind)
+	  :m_dest(dest), m_date(date), m_source(src), m_kind(kind) {}
 
 	friend class TextLog;
       }; 
@@ -141,9 +147,10 @@ namespace TREX {
     
     class TextLog {
     public:
-      typedef internals::entry::id_type  id_type;
-      typedef internals::entry::msg_type msg_type;
-      typedef internals::LogEntry        stream_type;
+      typedef internals::entry::id_type   id_type;
+      typedef internals::entry::msg_type  msg_type;
+      typedef internals::entry::date_type date_type;
+      typedef internals::LogEntry         stream_type;
   
       TextLog() {}
       ~TextLog();
@@ -151,15 +158,25 @@ namespace TREX {
       stream_type msg(id_type const &from, id_type const &kind=null) {
 	return stream_type(new internals::entry(*this, from, kind));
       }
+      stream_type msg(date_type const &when, 
+		      id_type const &from, id_type const &kind=null) {
+	return stream_type(new internals::entry(*this, when, from, kind));
+      }
       stream_type operator()(id_type const &from, 
 			     id_type const &kind=null) {
 	return msg(from, kind);
       }
+      stream_type operator()(long long when,
+			     id_type const &from, 
+			     id_type const &kind=null) {
+	return msg(when, from, kind);
+      }
 
       class handler {
       public:
-	typedef TextLog::id_type  id_type;
-	typedef TextLog::msg_type msg_type;
+	typedef TextLog::id_type   id_type;
+	typedef TextLog::msg_type  msg_type;
+	typedef TextLog::date_type date_type;
 
 	handler()
 	  :m_log(NULL) {}
@@ -173,7 +190,8 @@ namespace TREX {
 	void detach();
 
       protected:
-	virtual void message(id_type const &who, id_type const &kind, 
+	virtual void message(boost::optional<date_type> const &date,
+			     id_type const &who, id_type const &kind, 
 			     msg_type const &what) =0;
 
       private:	
@@ -195,7 +213,8 @@ namespace TREX {
       typedef boost::recursive_mutex  mutex_type;
       typedef mutex_type::scoped_lock scoped_lock;
 
-      void send(id_type const &who, id_type const &type, 
+      void send(boost::optional<date_type> const &when,
+		id_type const &who, id_type const &type, 
 		msg_type const &what);
 
       mutex_type m_lock;
@@ -217,18 +236,9 @@ namespace TREX {
       }
 
     private:
-      void message(id_type const &who, id_type const &kind, 
-		   msg_type const &what) {
-	if( null==kind || info==kind )  {
-	  if( !who.empty() )
-	    m_file<<'['<<who<<"] ";
- 	} else {
-	  if( !who.empty() )
-	    m_file<<'['<<who<<']';
-	  m_file<<kind<<": ";
-	}       
-	m_file<<what<<std::flush;
-      }
+      void message(boost::optional<date_type> const &date,
+		   id_type const &who, id_type const &kind, 
+		   msg_type const &what);
       std::ofstream m_file;
     }; // TREX::utils::log_file    
     
