@@ -56,6 +56,24 @@ public:
 	bool reportErrorToDune(const std::string &message);
 	bool sendMsg(Message& msg);
 private:
+  class log_proxy :public TREX::utils::TextLog::handler {
+  public: 
+    explicit log_proxy(Platform &me)
+      :m_platform(&me) {}
+    log_proxy(log_proxy const &other)
+      :m_platform(other.m_platform) {}
+    ~log_proxy();
+    
+  private:
+    void message(boost::optional<date_type> const &date,
+		 id_type const &who, id_type const &kind, 
+		 msg_type const &what);
+    Platform *m_platform;
+  };
+  log_proxy *m_active_proxy;
+
+  
+
 	bool synchronize();
 	void handleRequest(TREX::transaction::goal_id const &g);
 	void handleRecall(TREX::transaction::goal_id const &g);
