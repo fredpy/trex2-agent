@@ -143,6 +143,9 @@ void TextLog::thread_proxy::operator()() {
 	      m_log->m_handlers.end()!=i; ++i)
 	    (*i)->message(msg.get<0>(), msg.get<1>(), 
 			  msg.get<2>(), msg.get<3>()); 
+	} else {
+	  // sleep a little every 50ms is more than enough
+	  boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 	}
       }
     } catch(...) {}
