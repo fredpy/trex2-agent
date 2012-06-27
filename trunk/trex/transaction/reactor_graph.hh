@@ -642,8 +642,8 @@ namespace TREX {
 	return m_tick_valid;
       }
 
-      void updateTick(TICK value) {
-	m_tick_valid = true;
+      void updateTick(TICK value, bool started=true) {
+	m_tick_valid = started;
 	m_currentTick = value;
       }
       void set_name(TREX::utils::Symbol const &name) {
