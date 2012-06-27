@@ -65,8 +65,8 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-          TeleoReactor(arg, false), m_active_proxy(NULL),
-          m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
+                  TeleoReactor(arg, false), m_active_proxy(NULL),
+                  m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -326,6 +326,8 @@ Platform::processState()
     IMC::EstimatedState * msg =
         dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
 
+    msg->toText(std::cerr);
+
     Observation obs("estate", "Position");
     double lat = msg->lat, lon = msg->lon;//, hae = 0.0;//, northing = msg->x, easting = msg->y;
     if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
@@ -574,16 +576,21 @@ bool Platform::commandManeuver(const std::string &man_name, IMC::Message * maneu
   return sendMsg(pcontrol);
 }
 
+bool Platform::reportToDune(int type, const std::string &message)
+{
+  return reportToDune(IMC::LogBookEntry::LBET_INFO, "Autonomy.TREX", message);
+}
+
 bool Platform::reportToDune(const std::string &message)
 {
   return reportToDune(IMC::LogBookEntry::LBET_INFO, message);
 }
 
-bool Platform::reportToDune(int type, const std::string &message)
+bool Platform::reportToDune(int type,  const std::string &context, const std::string &text)
 {
   IMC::LogBookEntry entry;
-  entry.text = message;
-  entry.context = "Autonomy.TREX";
+  entry.text = text;
+  entry.context = context;
   entry.htime = Time::Clock::getSinceEpoch();
   entry.type = type;
   return sendMsg(entry);
@@ -682,11 +689,19 @@ void Platform::log_proxy::message
     Platform::log_proxy::msg_type const &what) {
   m_platform->m_active_proxy = this;
   // Example that display error/warnings on std::cerr
-  if( warn==kind || error==kind ) {
-    if( date )
-      std::cerr<<(*date)<<' ';
-    std::cerr<<'['<<who<<']'<<kind<<": "<<what<<std::flush;
-  }
+
+  std::ostringstream ss;
+  if( date )
+    ss<<'@'<<(*date)<<' ';
+
+  ss<<what;
+
+  if( warn==kind )
+    m_platform->reportToDune(IMC::LogBookEntry::LBET_WARNING, who.str(), ss.str());
+  else if (error==kind)
+    m_platform->reportToDune(IMC::LogBookEntry::LBET_ERROR, who.str(), ss.str());
+  else if (TeleoReactor::obs==kind)
+    m_platform->reportToDune(IMC::LogBookEntry::LBET_INFO, who.str(), ss.str());
 }
 
 
