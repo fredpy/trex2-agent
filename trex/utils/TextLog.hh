@@ -44,13 +44,17 @@
 # define H_trex_utils_TextLog
 
 # include "Symbol.hh"
+# include "SharedVar.hh"
 
 # include <memory>
 # include <set>
+# include <list>
 
+# include <boost/thread/thread.hpp>
 # include <boost/thread/recursive_mutex.hpp>
 # include <boost/iostreams/stream.hpp>
 # include <boost/optional.hpp>
+# include <boost/tuple/tuple.hpp>
 
 namespace TREX {
   namespace utils {
@@ -153,8 +157,34 @@ namespace TREX {
       typedef internals::LogEntry         stream_type;
   
       TextLog() {}
+      template<class Handler>
+      TextLog(Handler const &primary)
+         :m_primary(new Handler(primary)) {}
       ~TextLog();
-
+            
+      template<class Handler>
+      bool set_primary(Handler const &primary) {
+        if( NULL==m_primary.get() ) {
+          m_primary.reset(new Handler(primary));
+          return true;
+        }
+        return false;
+      }
+      
+      template<class Handler>
+      void add_handler(Handler const &handle) {
+        std::auto_ptr<handler> h(new Handler(handle));
+        h->m_log = this;
+	bool first;
+        {
+          scoped_lock guard(m_lock);
+	  first = m_handlers.empty() && NULL==m_thread.get();
+          m_handlers.insert(h.release());
+        }
+	if( first )
+	  m_thread.reset(new boost::thread(thread_proxy(this)));
+      }
+    
       stream_type msg(id_type const &from, id_type const &kind=null) {
 	return stream_type(new internals::entry(*this, from, kind));
       }
@@ -171,7 +201,7 @@ namespace TREX {
 			     id_type const &kind=null) {
 	return msg(when, from, kind);
       }
-
+      
       class handler {
       public:
 	typedef TextLog::id_type   id_type;
@@ -180,16 +210,16 @@ namespace TREX {
 
 	handler()
 	  :m_log(NULL) {}
-	virtual ~handler() {
-	  detach();
-	}
-
-	bool is_attached() const {
-	  return NULL!=m_log;
-	}
-	void detach();
+	handler(handler const &other) 
+	  :m_log(NULL) {}
+	virtual ~handler() {}
 
       protected:
+	bool is_attached() {
+	  return NULL!=m_log;
+	}
+	bool detach();
+
 	virtual void message(boost::optional<date_type> const &date,
 			     id_type const &who, id_type const &kind, 
 			     msg_type const &what) =0;
@@ -200,16 +230,32 @@ namespace TREX {
 	friend class TextLog;
       }; // TREX::utils::TextLog::handler
 
-      bool add_handler(handler &handle);
-      bool remove_handler(handler &handle) {
-	if( this==handle.m_log ) {
-	  handle.detach();
-	  return true;
-	}
-	return false;
-      }	  
-	
     private:
+      typedef boost::tuple< boost::optional<date_type>,
+			    id_type, id_type,
+			    msg_type > packet;
+      typedef SharedVar< std::list<packet> > queue_type;
+      typedef std::set<handler *> handler_set;
+
+      class thread_proxy {
+      public:
+	thread_proxy(thread_proxy const &other)
+	  :m_log(other.m_log) {}
+	~thread_proxy() {}
+
+	void operator()();
+
+      private:
+	bool next(TextLog::packet &msg);
+
+	thread_proxy(TextLog *me)
+	  :m_log(me) {}
+	
+	TextLog *m_log;
+	friend class TextLog;
+      };
+      friend class thread_proxy;
+     
       typedef boost::recursive_mutex  mutex_type;
       typedef mutex_type::scoped_lock scoped_lock;
 
@@ -217,31 +263,96 @@ namespace TREX {
 		id_type const &who, id_type const &type, 
 		msg_type const &what);
 
-      mutex_type m_lock;
-      std::set<handler *> m_handlers; 
+      std::auto_ptr<handler> m_primary;
+      
+      queue_type m_queue;
+
+      bool is_running() const {
+	scoped_lock guard(m_lock);
+	return m_running;
+      }
+      bool stop() {
+	bool ret = false;
+	{
+	  scoped_lock guard(m_lock);
+	  std::swap(m_running, ret);
+	}
+	return ret;
+      }
+
+      std::auto_ptr<boost::thread> m_thread;
+
+      mutable mutex_type m_lock;
+      bool       m_running;
+      handler_set m_handlers; 
 
       friend class handler;
       friend class internals::entry;      
     }; // TREX::utils::TextLog
 
-    class log_file :public TextLog::handler {
-    public:
-      log_file() {}
-      log_file(std::string const &file)
-	:m_file(file.c_str()) {} 
-      ~log_file() {}
+    namespace internals {
+      
+      template<bool Reentrant>
+      struct optional_mtx {
+	void lock() {}
+	void unlock() {}
+      };
 
-      void open(std::string const &file) {
-	m_file.open(file.c_str());
-      }
+      template<>
+      struct optional_mtx<true> {
+	void lock() {
+	  m_mtx.lock();
+	}
+	void unlock() {
+	  m_mtx.unlock();
+	}
+	
+      private:
+	boost::recursive_mutex m_mtx;
+      };
+
+    } // TREX::
+
+    template<bool Reentrant>
+    class basic_log_file :public TextLog::handler {
+      typedef internals::optional_mtx<Reentrant> mutex_type;
+      typedef boost::lock_guard<mutex_type>      lock_type;
+    public:
+      basic_log_file() {}
+      basic_log_file(std::string const &file)
+	:m_file(new std::ofstream(file.c_str())) {}
+      basic_log_file(basic_log_file const &other)
+        :m_file(other.m_file) {}
+      ~basic_log_file() {}
 
     private:
       void message(boost::optional<date_type> const &date,
 		   id_type const &who, id_type const &kind, 
-		   msg_type const &what);
-      std::ofstream m_file;
+		   msg_type const &what) {
+	if( NULL!=m_file.get() ) {
+	  std::ostringstream oss;
+	  if( date )
+	    oss<<'['<<(*date)<<']';
+	  if( !who.empty() )
+	    oss<<'['<<who<<']';
+	  if( null!=kind && info!=kind )
+	    oss<<kind<<": ";
+	  else if( !oss.str().empty() ) 
+	    oss.put(' ');
+	  oss<<what;
+	  {
+	    lock_type guard(m_mtx);
+	    m_file->write(oss.str().c_str(), oss.str().size());
+	    m_file->flush();
+	  }
+	}
+      }
+
+      mutable std::auto_ptr<std::ofstream> m_file;
+      mutex_type m_mtx;
     }; // TREX::utils::log_file    
     
+    typedef basic_log_file<false> log_file;
 
   } // TREX::utils
 } // TREX

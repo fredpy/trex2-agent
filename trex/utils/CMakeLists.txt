@@ -82,7 +82,8 @@ target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY} 
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
-  ${Boost_DATE_TIME_LIBRARY})
+  ${Boost_DATE_TIME_LIBRARY}
+  ${Boost_THREAD_LIBRARY})
 trex_lib(TREXutils)
 
 set_property(SOURCE Pdlfcn.cc 

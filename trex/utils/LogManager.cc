@@ -145,8 +145,7 @@ LogManager::path_type const &LogManager::logPath() {
     
     trex_log /= TREX_LOG_FILE;
 
-    m_trex_log.open(trex_log.string());
-    m_syslog.add_handler(m_trex_log);
+    m_syslog.set_primary(basic_log_file<true>(trex_log.string()));
     syslog("", null)<<"TREX version "<<TREX::version::str();
     loadSearchPath();
     *m_inited = true;
