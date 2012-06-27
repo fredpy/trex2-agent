@@ -116,8 +116,11 @@ void TextLog::send(boost::optional<TextLog::date_type> const &when,
   if( NULL!=m_primary.get() )
     m_primary->message(when, who, type, what);
   if( is_running() ) {
-    queue_type::scoped_lock guard(m_queue);
-    m_queue->push_back(packet(when, who, type, what));
+    {
+      queue_type::scoped_lock guard(m_queue);
+      m_queue->push_back(packet(when, who, type, what));
+    }
+    m_have_message.notify_one();
   }
 } 
 
@@ -143,10 +146,10 @@ void TextLog::thread_proxy::operator()() {
 	      m_log->m_handlers.end()!=i; ++i)
 	    (*i)->message(msg.get<0>(), msg.get<1>(), 
 			  msg.get<2>(), msg.get<3>()); 
-	} else {
+	}/* else {
 	  // sleep a little every 50ms is more than enough
 	  boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-	}
+	  } */
       }
     } catch(...) {}
     m_log->stop();
@@ -154,13 +157,16 @@ void TextLog::thread_proxy::operator()() {
 }
 
 bool TextLog::thread_proxy::next(TextLog::packet &msg) {
-  queue_type::scoped_lock guard(m_log->m_queue);
-  if( !m_log->m_queue->empty() ) {
-    msg = m_log->m_queue->front();
-    m_log->m_queue->pop_front();
-    return true;
+  boost::unique_lock<queue_type> lock(m_log->m_queue);
+  
+  while( m_log->m_queue->empty() ) {
+    m_log->m_have_message.wait(lock);
+    if( !m_log->is_running() )
+      return false;
   }
-  return false;
+  msg = m_log->m_queue->front();
+  m_log->m_queue->pop_front();
+  return true;
 }
 
 

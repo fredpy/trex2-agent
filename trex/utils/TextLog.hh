@@ -52,6 +52,7 @@
 
 # include <boost/thread/thread.hpp>
 # include <boost/thread/recursive_mutex.hpp>
+# include <boost/thread/condition_variable.hpp>
 # include <boost/iostreams/stream.hpp>
 # include <boost/optional.hpp>
 # include <boost/tuple/tuple.hpp>
@@ -75,7 +76,8 @@ namespace TREX {
         size_type write(char_type const *s, size_type n) {
           m_msg.append(s, n);
           return n;
-        }
+	}
+        
       private:
         TextLog &m_dest;
         boost::optional<date_type> m_date;
@@ -271,6 +273,7 @@ namespace TREX {
 
       std::auto_ptr<handler> m_primary;
 
+      boost::condition_variable_any m_have_message;
       queue_type m_queue;
 
       bool is_running() const {
@@ -283,6 +286,7 @@ namespace TREX {
           scoped_lock guard(m_lock);
           std::swap(m_running, ret);
         }
+	m_have_message.notify_one();
         return ret;
       }
 
