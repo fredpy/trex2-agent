@@ -24,7 +24,7 @@ Navigator::Going {
 	  latitude == maneuver.latitude;
 	  longitude == maneuver.longitude;
 	  depth == maneuver.depth;
-	  maneuver.secs == 0;
+	  maneuver.secs == secs;
 	  speed == maneuver.speed;
 	  maneuver_end == maneuver.end;
 	  distance == ll_distance(ini.latitude, ini.longitude, latitude, longitude);	  
