@@ -146,7 +146,7 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
 	++i;
     } else if( !future ) {
       syslog(warn)<<"Goal "<<(*i)->predicate()<<'['<<(*i)
-		  <<"] is in the past: ignoring it\n\t"<<(**i);
+		  <<"] is in the past: removing it\n\t"<<(**i);
       i = m_pos->second.erase(i);
     }
   }
