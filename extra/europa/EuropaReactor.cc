@@ -51,6 +51,12 @@ using namespace TREX::europa;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+namespace {
+  std::string const implicit_var("implicit_var_");
+}
+
+
+
 /*
  * class TREX::europa::EuropaReactor
  */
@@ -302,9 +308,13 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     // Manage other attributes
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
         attrs.end()!=a; ++a) {
-      std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
-      Variable attr((*a)->getName().toString(), *dom);
-      my_goal.restrictAttribute(attr);
+      // Exclude "implicit_var_*"
+      if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
+						implicit_var) ) {
+	std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	Variable attr((*a)->getName().toString(), *dom);
+	my_goal.restrictAttribute(attr);
+      }
     }
     goal_id request = postGoal(my_goal);
     if( request ) {
@@ -346,9 +356,13 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
     // Manage other attributes
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
         attrs.end()!=a; ++a) {
-            std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
-            Variable attr((*a)->getName().toString(), *dom);
-            goal.restrictAttribute(attr);
+      // ignore implicit_var
+      if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
+						implicit_var)) {
+	std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	Variable attr((*a)->getName().toString(), *dom);
+	goal.restrictAttribute(attr);
+      }
     }
 }
 
@@ -566,10 +580,14 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
 
   for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attr.begin();
       attr.end()!=a; ++a) {
-    std::auto_ptr<TREX::transaction::DomainBase>
-      dom(details::trex_domain((*a)->lastDomain()));
-    TREX::transaction::Variable var((*a)->getName().toString(), *dom);
-    obs.restrictAttribute(var);
+    // ignore implicit_var
+    if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
+					      implicit_var) ) {
+      std::auto_ptr<TREX::transaction::DomainBase>
+	dom(details::trex_domain((*a)->lastDomain()));
+      TREX::transaction::Variable var((*a)->getName().toString(), *dom);
+      obs.restrictAttribute(var);
+    }
   }
   postObservation(obs);
 }
