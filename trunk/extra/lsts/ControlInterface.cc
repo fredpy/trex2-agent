@@ -312,10 +312,11 @@ void ControlInterface::handleTickStart() {
     // First attempt to subscribe to the timeline
     if( !isExternal(g->object()) )
       use(g->object(), true, true);
-    if( isExternal(g->object()) )
-      postGoal(g);
-    else
-      syslog(null, warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
+    if( isExternal(g->object()) ) {
+      if( !postGoal(g) )
+	syslog(warn)<<"["<<g<<"] was already posted ... ?";
+    } else
+      syslog(warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
   }
 }
 
