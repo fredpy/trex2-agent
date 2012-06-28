@@ -172,15 +172,17 @@ void timeline::postObservation(TICK date, Observation const &obs) {
 
 void timeline::request(goal_id const &g) {
   if( owned() ) {
-    owner().syslog(null, info)<<"Request received ["<<g<<"] "
+    owner().syslog(info)<<"Request received ["<<g<<"] "
 				<<*g;
     owner().handleRequest(g);
   }
 }
 
 void timeline::recall(goal_id const &g) {
-  if( owned() )
+  if( owned() ) {
+    owner().syslog(info)<<"Recall received ["<<g<<"]";
     owner().handleRecall(g);
+  }
 }
 
 bool timeline::notifyPlan(goal_id const &t) {
