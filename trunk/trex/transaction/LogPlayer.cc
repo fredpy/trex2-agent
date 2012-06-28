@@ -552,11 +552,12 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
       if( s_init==j->first ) {
 	if( !first ) 
 	  throw XmlError(*j, s_init.str()+" tag can only be the first phase.");
-      } else if( s_new_tick!=j->first &&
-		 s_synchronize!=j->first &&
-		 s_has_work!=j->first &&
-		 s_step!=j->first &&
-		 "<xmlattr>"!=j->first ) {
+      } else if( "<xmlattr>"==j->first )
+	continue;
+      else if( s_new_tick!=j->first &&
+	       s_synchronize!=j->first &&
+	       s_has_work!=j->first &&
+	       s_step!=j->first ) {
 	syslog(null, warn)<<"Skipping unknown phase \""<<j->first<<"\".";
 	continue;
       }	
@@ -580,14 +581,19 @@ LogPlayer::~LogPlayer() {
 // manipulators
 
 bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
-  if( !m_log.empty() && m_log.front().first==tck  ) {
-    boost::shared_ptr<phase> nxt = m_log.front().second;
-    if( nxt->type()==kind ) {
-      m_log.pop_front();
-      nxt->execute();
-      return true;
-    }
-  }
+  if( !m_log.empty() ) {
+    if( m_log.front().first==tck  ) {
+      boost::shared_ptr<phase> nxt = m_log.front().second;
+      if( nxt->type()==kind ) {
+	m_log.pop_front();
+	nxt->execute();
+	return true;
+      } else 
+	syslog(warn)<<"Next phase ("<<nxt->type()<<") is not "<<kind; 
+    } else 
+      syslog(warn)<<"No more phase in tick "<<tck<<" (next="<<m_log.front().first<<')';
+  } else
+    syslog(warn)<<"No more phase to replay (tick ="<<tck<<')';
   return false;
 }
 
