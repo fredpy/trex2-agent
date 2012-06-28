@@ -232,9 +232,9 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       goal->discard();
     } else {
       // The goal appears to be correct so far : add it to my set of goals
-      syslog(null, info)<<"Integrated request "<<request
-			<<" as the token with Europa ID "
-			<<goal->getKey();
+      syslog(info)<<"Integrated request "<<request
+		  <<" as the token with Europa ID "
+		  <<goal->getKey();
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
 
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
@@ -251,10 +251,15 @@ void EuropaReactor::handleRecall(goal_id const &request) {
   // Remove the goal if it exists
   goal_map::right_iterator i = m_active_requests.right.find(request);
   if( m_active_requests.right.end()!=i ) {
+    EUROPA::eint key = i->second;
     m_active_requests.right.erase(i);
-    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(i->second));
+    
+    syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";
+    
+    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
     if( m_completed_this_tick ) {
-      debugMsg("trex:resume", "[ "<<now()<<"] Resume deliberation due to a recall.");
+      debugMsg("trex:resume", 
+	       "[ "<<now()<<"] Resume deliberation due to a recall.");
       m_completed_this_tick = false;
     }
   }

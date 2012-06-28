@@ -761,15 +761,19 @@ EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj,
 }
 
 void Assembly::recalled(EUROPA::TokenId const &tok) {
-  // Very aggressive way to handle this
-  debugMsg("trex:recall", "Goal "<<tok->toString()<<" recalled.");
-
-  if( !tok->isInactive() ) {
-    debugMsg("trex:recall", "Cancelling "<<tok->toString());
-    plan_db()->getClient()->cancel(tok);
-  }
-  debugMsg("trex:recall", "Destroying "<<tok->toString());
-  plan_db()->getClient()->deleteToken(tok);
+  if( tok.isId() ) {
+    // Very aggressive way to handle this
+    debugMsg("trex:recall", "Goal "<<tok->toString()<<" recalled.");
+    
+    if( !tok->isInactive() ) {
+      debugMsg("trex:recall", "Cancelling "<<tok->toString());
+      plan_db()->getClient()->cancel(tok);
+    }
+    debugMsg("trex:recall", "Destroying "<<tok->toString());
+    plan_db()->getClient()->deleteToken(tok);
+  } else 
+    debugMsg("trex:always", 
+	     "["<<now()<<"] Attempted to recall an invalid token.");
 }
 
 
