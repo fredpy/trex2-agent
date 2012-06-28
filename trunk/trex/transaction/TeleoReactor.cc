@@ -107,7 +107,7 @@ TREX::transaction::details::external::external(details::external_set::iterator c
 details::goal_queue::iterator details::external::lower_bound(IntegerDomain const &dom) {
   details::goal_queue::iterator i = m_pos->second.begin();
 
-  for(; m_pos->second.end()!=i && cmp_goals((*i)->getStart(), dom); ++i);
+  for(; m_pos->second.end()!=i && cmp_goals(i->first->getStart(), dom); ++i);
   return i;
 }
 
@@ -119,11 +119,11 @@ bool details::external::post_goal(goal_id const &g) {
   details::goal_queue::iterator i = lower_bound(g_start);
 
   // check that it is not already posted
-  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, (*i)->getStart()); ++i)
-    if( g==(*i) )
+  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->getStart()); ++i)
+    if( g==i->first )
       return false;
   // insert the new goal
-  m_pos->second.insert(i, g);
+  m_pos->second.insert(i, std::make_pair(g, true));
   return true;
 }
 
@@ -131,37 +131,63 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
   details::goal_queue::iterator i=m_pos->second.begin();
   IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
 
-  for( ; m_pos->second.end()!=i && (*i)->startsBefore(dispatch_w.upperBound());  ) {
-    bool future = (*i)->startsAfter(current);
+  for( ; m_pos->second.end()!=i && i->first->startsBefore(dispatch_w.upperBound());  ) {
+    bool future = i->first->startsAfter(current);
 
-    if( future || (*i)->endsAfter(current+1) ) {
+    if( future || i->first->endsAfter(current+1) ) {
       // Need to check for dispatching
-      if( m_pos->first.accept_goals() ) {
-        if( m_pos->first.client().is_verbose() )
-          syslog(info)<<"Dispatching "<<(*i)->predicate()<<'['<<(*i)<<"] on \""
-		      <<m_pos->first.name()<<"\".";
-	m_pos->first.request(*i);
-	i = m_pos->second.erase(i);
-      } else
-	++i;
+	if( i->second && m_pos->first.accept_goals() ) {
+	  if( m_pos->first.client().is_verbose() )
+	    syslog(info)<<"Dispatching "<<i->first->predicate()
+			<<'['<<(i->first)<<"] on \""
+			<<m_pos->first.name()<<"\".";
+	  bool posted = false;
+	  try {
+	    m_pos->first.request(i->first);
+	    posted = true;
+	    i = m_pos->second.erase(i);
+	  } catch(Exception const &e) {
+	    syslog(warn)<<"Exception received while sending request: "<<e;
+	  } catch(std::exception const &se) {
+	    syslog(warn)<<"C++ exception received while sending request: "
+			<<se.what();
+	  } catch(...) {
+	    syslog(warn)<<"Unknown exception received while sending request.";
+	  }
+	  if( !posted ) {
+	    syslog(warn)<<"Marking goal as non-postable.";
+	    i->second = false;
+	  }
+	} else
+	  ++i;
     } else if( !future ) {
-      syslog(warn)<<"Goal "<<(*i)->predicate()<<'['<<(*i)
-		  <<"] is in the past: removing it\n\t"<<(**i);
+      syslog(warn)<<"Goal "<<i->first->predicate()<<'['<<(i->first)
+		  <<"] is in the past: removing it\n\t"<<(*(i->first));
       i = m_pos->second.erase(i);
-    }
+    } else if( !m_pos->first.accept_goals() )
+      break; // no need to  look further ... this guy do not accept goals
   }
+}
+
+void details::external::unblock() {
+  // just mark all the 
+  for(details::goal_queue::iterator i=m_pos->second.begin();
+      m_pos->second.end()!=i; ++i) 
+    i->second = true;
 }
 
 void details::external::recall(goal_id const &g) {
   IntegerDomain const &g_start(g->getStart());
   // locate goal position
   details::goal_queue::iterator i = lower_bound(g_start);
-  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, (*i)->getStart()); ++i)
-    if( g==(*i) ) {
+  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->getStart()); 
+       ++i) {
+    if( g==i->first ) {
       // was still pending => just remove it
       m_pos->second.erase(i);
       return;
     }
+  }
   // not found => send a recall
   m_pos->first.recall(g);
 }
@@ -346,7 +372,8 @@ double TeleoReactor::workRatio() {
     } else {
       // Dispatched goals management
       details::external i = ext_begin();
-      details::goal_queue dispatched; // store the goals that got dispatched on this tick ...
+      details::goal_queue dispatched; // store the goals that got dispatched 
+                                      // on this tick ...
                                       // I do nothing with it for now
       
       // Manage goal dispatching
@@ -536,9 +563,10 @@ bool TeleoReactor::newTick() {
 
 void TeleoReactor::doNotify() {
   for(external_set::iterator i = m_externals.begin();
-      m_externals.end()!=i; ++i)
+      m_externals.end()!=i; ++i) {
     if( i->first.lastObsDate()==getCurrentTick() )
       notify( i->first.lastObservation() );
+  }
 }
 
 
@@ -713,24 +741,28 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
   if( new_l>m_maxDelay )
     m_maxDelay = new_l;
   else if( old_l==m_maxDelay ) {
-    // special case : the updated value is smaller and the old value is
-    //                equal to my former exec delay
-    //                this means that on of the timelines that were
-    //                constraining my maxDelay has just reduced its latency
     m_maxDelay = new_l;
-    for(details::active_external i(ext_begin(), ext_end()), endi(ext_end()); endi!=i; ++i) 
+    for(details::active_external i(ext_begin(), ext_end()), endi(ext_end());
+	endi!=i; ++i) 
       m_maxDelay = std::max(m_maxDelay, i->latency());
   }
   if( m_maxDelay!=prev ) {
     // It may be anoying on the long run but for now I will log when this
     // exec latency changes
-    syslog(null, info)<<" Execution latency updated from "<<prev<<" to "
-		      <<m_maxDelay;
+    syslog(info)<<" Execution latency updated from "<<prev<<" to "
+		<<m_maxDelay;
     // Notify all the reactors that depend on me
     for(internal_set::iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
       (*i)->latency_update(getLatency()+prev);
   }
 }
+
+void TeleoReactor::unblock(Symbol const &name) {
+  details::external e=find_external(name);  
+  if( e.active() )
+    e.unblock();
+}
+
 
 /*
  * class TREX::transaction::TeleoReactor::Logger

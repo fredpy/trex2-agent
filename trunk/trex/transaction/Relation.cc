@@ -97,7 +97,7 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
     m_owner = &r;
     m_transactions = flags;
     r.assigned(this);
-    latency_update(0);
+    latency_update(0);    
   } else if( owned_by(r) ) {
     TICK update = 0;
     if( !flags.test(0) )
@@ -173,7 +173,7 @@ void timeline::postObservation(TICK date, Observation const &obs) {
 void timeline::request(goal_id const &g) {
   if( owned() ) {
     owner().syslog(info)<<"Request received ["<<g<<"] "
-				<<*g;
+				<<*g;    
     owner().handleRequest(g);
   }
 }
@@ -215,9 +215,13 @@ bool timeline::cancelPlan(goal_id const &t) {
 
 void timeline::latency_update(TICK prev) {
   if( look_ahead()>0 ) 
-    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i) 
-      if( i->second.test(0) )
+    for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; 
+	++i) {
+      if( i->second.test(0) ) {
 	i->first->latency_updated(prev, latency());
+	i->first->unblock(name());
+      }
+    }
 }
 
 /*
