@@ -588,13 +588,15 @@ bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
 	m_log.pop_front();
 	nxt->execute();
 	return true;
-      } /*else 
-	  syslog(warn)<<"Next phase ("<<nxt->type()<<") is not "<<kind; */
-    } /* else 
-	 syslog(warn)<<"No more phase in tick "<<tck<<" (next="<<m_log.front().first<<')'; */
+      } 
+    }
   } else
     syslog(warn)<<"No more phase to replay (tick="<<tck<<')';
   return false;
+}
+
+bool LogPlayer::in_tick(TICK tck) const {
+  return !m_log.empty() && m_log.front().first==tck;
 }
 
 // callbacks
@@ -628,8 +630,10 @@ bool LogPlayer::synchronize() {
 }
 
 bool LogPlayer::hasWork() {
-  if( !next_phase(getCurrentTick(), s_has_work) ) {
-    if( m_inited )
+  TICK cur = getCurrentTick(), logged;
+  
+  if( !next_phase(cur, s_has_work) ) {
+    if( m_inited && in_tick(cur) )
       syslog(null, warn)<<"Next logged phase is not has_work !!!";
     m_work = false;
   } else 
