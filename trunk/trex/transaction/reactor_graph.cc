@@ -184,7 +184,8 @@ std::string graph::date_str(TICK cur) const {
 
 void graph::clear() {
   while( !m_reactors.empty() ) {
-    syslog(info)<<"Disconnecting \""<<m_reactors.front()->getName()<<"\" from the graph.";
+    syslog(info)<<"Disconnecting \""<<m_reactors.front()->getName()
+		<<"\" from the graph.";
     m_reactors.front()->isolate(false);
     m_reactors.pop_front();
   } 
@@ -236,7 +237,7 @@ bool graph::kill_reactor(graph::reactor_id r) {
     
     if( pos->get()==r ) {
       // clean up relations
-      syslog(info)<<"Destroying reactor \""<<r->getName()<<"\".";
+      syslog(warn)<<"Destroying reactor \""<<r->getName()<<"\".";
       if( pos_q->get()==r )
 	m_quarantined.erase(pos_q);
       else 
