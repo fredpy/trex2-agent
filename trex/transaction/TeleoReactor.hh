@@ -1305,6 +1305,7 @@ namespace TREX {
       void subscribed(Relation const &r);
       void unsubscribed(Relation const &r);
       void latency_updated(TICK old_l, TICK new_l);
+      void unblock(utils::Symbol const &name);
 
 
       friend class details::timeline;

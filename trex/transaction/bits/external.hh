@@ -62,7 +62,7 @@ namespace TREX {
        * @ingroup transaction
        * @relates class external
        */
-      typedef std::list<goal_id>                           goal_queue;
+      typedef std::list< std::pair<goal_id, bool> >  goal_queue;
       /** @brief A external timeline proxy
        *
        * This type by a external class to represent an external timeline
@@ -204,6 +204,14 @@ namespace TREX {
          * @sa post_goal(goal_id const &)
          */
         void recall(goal_id const &g);
+
+	/** @brief releas all blocked goals 
+	 *
+	 * Mark all ther bgoal that wer blocked by an exception as free 
+	 * for dispatch. This is done whenever the timeline is owned by 
+	 * a new reactor
+	 */
+	void unblock();
                  
       private:
         TREX::utils::internals::LogEntry syslog(utils::Symbol const &kind);
