@@ -522,7 +522,7 @@ bool EuropaReactor::hasWork() {
         j=find_external((*from)->timeline()->getName().c_str());
         EUROPA::eint e_lo, e_hi;
         if( j.valid() && j->accept_goals() ) {
-          IntegerDomain window = j->dispatch_window(getCurrentTick());
+          IntegerDomain window = j->dispatch_window(getCurrentTick()+1);
           IntegerDomain::bound lo = window.lowerBound(), 
 	    hi = window.upperBound();
           e_lo = static_cast<EUROPA::eint::basis_type>(lo.value());
