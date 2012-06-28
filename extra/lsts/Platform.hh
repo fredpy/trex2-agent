@@ -80,7 +80,7 @@ namespace TREX {
       bool sendMsg(Message& msg, Address &dest);
       bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
 
-      IMC::Message * commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed);
+      IMC::Message * commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout);
       IMC::Message * commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
       IMC::Message * commandStationKeeping(const std::string &man_name, double lat, double lon, double speed, int seconds);
       IMC::Message * commandIdle(const std::string &man_name);

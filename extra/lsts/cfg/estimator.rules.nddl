@@ -13,6 +13,6 @@ Estimator::At {
 	    g.latitude == latitude;
 	    g.longitude == longitude;
 	    g.depth == depth;
-	    
+	    g.secs == secs;
 }
 
