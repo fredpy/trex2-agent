@@ -385,10 +385,9 @@ bool TeleoReactor::postGoal(goal_id const &g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
 
   if( tl.valid() ) {
-    bool ret = tl.post_goal(g);
-    if( ret && NULL!=m_trLog )
+    if( NULL!=m_trLog )
       m_trLog->request(g);
-    return ret;
+    return tl.post_goal(g);
   } else
     throw DispatchError(*this, g, "Goals can only be posted on External timelines");
 }
@@ -415,9 +414,9 @@ bool TeleoReactor::postRecall(goal_id const &g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
 
   if( tl.valid() ) {
-    tl.recall(g);
     if( NULL!=m_trLog )
       m_trLog->recall(g);
+    tl.recall(g);
     return true;
   }
   return false;
@@ -432,10 +431,9 @@ bool TeleoReactor::postPlanToken(goal_id const &t) {
   if( m_internals.end()==tl )
     throw DispatchError(*this, t, "plan tokens can only be posted on Internal timelines.");
   else if( t->getEnd().upperBound() > getCurrentTick() ) {
-    bool ret = (*tl)->notifyPlan(t);
-    if( ret && NULL!=m_trLog )
+    if( NULL!=m_trLog )
       m_trLog->notifyPlan(t);
-    return ret;
+    return (*tl)->notifyPlan(t);
   }
   return false;
 }
@@ -454,8 +452,10 @@ void TeleoReactor::cancelPlanToken(goal_id const &g) {
     internal_set::const_iterator tl = m_internals.find(g->object());
     if( m_internals.end()!=tl ) {
       // do something 
-      if( (*tl)->cancelPlan(g) && NULL!=m_trLog ) 
-        m_trLog->cancelPlan(g);
+      if( NULL!=m_trLog )
+	m_trLog->cancelPlan(g);
+            
+      (*tl)->cancelPlan(g);
     }
   }
 }
