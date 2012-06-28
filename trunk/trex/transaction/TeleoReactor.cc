@@ -132,7 +132,9 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
   IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
 
   for( ; m_pos->second.end()!=i && (*i)->startsBefore(dispatch_w.upperBound());  ) {
-    if( (*i)->startsAfter(current) || (*i)->endsAfter(current+1) ) {
+    bool future = (*i)->startsAfter(current);
+
+    if( future || (*i)->endsAfter(current+1) ) {
       // Need to check for dispatching
       if( m_pos->first.accept_goals() ) {
         if( m_pos->first.client().is_verbose() )
@@ -142,9 +144,9 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
 	i = m_pos->second.erase(i);
       } else
 	++i;
-    } else {
+    } else if( !future ) {
       syslog(warn)<<"Goal "<<(*i)->predicate()<<'['<<(*i)
-		  <<"] is in the past !\n\t"<<(**i);
+		  <<"] is in the past: ignoring it\n\t"<<(**i);
       i = m_pos->second.erase(i);
     }
   }
