@@ -65,8 +65,8 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                  TeleoReactor(arg, false), m_active_proxy(NULL),
-                  m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
+                          TeleoReactor(arg, false), m_active_proxy(NULL),
+                          m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -227,8 +227,8 @@ Platform::synchronize()
 }
 
 
-std::map<goal_id, IMC::Message *> future_goals;
-goal_id current_maneuver;
+std::map<std::string, IMC::Message *> future_goals;
+std::string current_goal;
 
 void
 Platform::handleRequest(goal_id const &g)
@@ -245,7 +245,7 @@ Platform::handleRequest(goal_id const &g)
 
   if (gname.compare("command") == 0 && gpred.compare("Idle") == 0) {
 
-    future_goals[g] = commandIdle(man_name);
+    future_goals[gname] = commandIdle(man_name);
     return;
   }
   if (gname.compare("command") == 0 && gpred.compare("Maneuver") == 0)
@@ -265,15 +265,16 @@ Platform::handleRequest(goal_id const &g)
 
       if (secs.domain().isSingleton()
           && secs.domain().getStringSingleton().compare("0") == 0)
-        future_goals[g] = commandGoto(man_name, lat, lon, dep_v, 1.5);
+        future_goals[gname] = commandGoto(man_name, lat, lon, dep_v, 1.5);
       else if (secs.domain().isSingleton())
       {
         double dur = secs.domain().getTypedSingleton<double, false>();//atof(secs.domain().getStringSingleton().c_str());
         if (dep_v > 0)
-          future_goals[g] = commandLoiter(man_name, lat, lon, dep_v, 15.0, 1.5, (int)dur);
+          future_goals[gname] = commandLoiter(man_name, lat, lon, dep_v, 15.0, 1.5, (int)dur);
         else
-          future_goals[g] = commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
+          future_goals[gname] = commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
       }
+      current_goal = gname;
     }
     else {
       syslog(error) << "variables are not singletons!\n";
@@ -284,7 +285,25 @@ Platform::handleRequest(goal_id const &g)
 void
 Platform::handleRecall(goal_id const &g)
 {
-  syslog(error) << "handleRecall(" << g << ")";
+  if (future_goals.find(current_goal) == future_goals.end())
+  {
+    syslog("WARN") << "recall " << g.get()->object().str();
+    return;
+  }
+  if (current_goal == g.get()->object().str()) {
+    switch(future_goals[current_goal]->getId()) {
+      case (452): //goto
+      case (455): //loiter
+      case (464): //skeeping
+      commandIdle("TREX recalled maneuver execution");
+      break;
+      case (456):
+      break;
+    }
+  }
+  syslog(error) << "handleRecall(" << current_goal << ")";
+  if (future_goals.find(current_goal) != future_goals.end())
+    delete future_goals[current_goal];
 }
 
 void
@@ -546,8 +565,10 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
     msg.setSource(65000);
     msg.setDestination(remote_id);
     msg.serialize(bb);
+    m_mutex.lock();
     send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
                Address(ip.c_str()), port);
+    m_mutex.unlock();
   }
   catch (std::runtime_error& e)
   {
