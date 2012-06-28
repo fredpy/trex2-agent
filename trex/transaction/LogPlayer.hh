@@ -308,6 +308,8 @@ namespace TREX {
       std::map<std::string, goal_id> m_goal_map;
 
       bool next_phase(TICK tck, utils::Symbol const &kind); 
+      bool in_tick(TICK tck) const;
+      
       static TeleoReactor::xml_arg_type &alter_cfg(TeleoReactor::xml_arg_type &arg);
 
       bool m_work, m_inited;
