@@ -20,7 +20,7 @@
     <float min="-8.705758" max="-8.705758" />
   </Variable>
   <Variable name="depth">
-    <float min="2" max="2"/>
+    <float min="0" max="0"/>
   </Variable>
     <!-- Example of duration. Dates are specified using the format 
          HH:MM:SS.mmm

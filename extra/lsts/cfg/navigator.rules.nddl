@@ -8,7 +8,7 @@ VehicleState::Boot {
 
 Navigator::Going {
 	
-	starts_during(VehicleState.Ready ready);
+	met_by(VehicleState.Ready ready);
 	ready.end <= end;
 	starts_during(TrexSupervision.Active active);
 	
