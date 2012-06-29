@@ -233,6 +233,11 @@ namespace TREX {
 	Observation const &lastObservation() const {
 	  return m_lastObs;
 	}
+	Observation const &lastObservation(bool &print) {
+	  print = m_shouldPrint;
+	  m_shouldPrint = false;
+	  return m_lastObs;
+	}
 
 	/** @brief Timeline look ahead
 	 *
@@ -426,7 +431,8 @@ namespace TREX {
 	 * @sa lastObservation() const
 	 * @sa lastObsDate() const
 	 */
-	void postObservation(TICK date, Observation const &obs);
+	void postObservation(TICK date, Observation const &obs, 
+			     bool verbose = false);
         
         bool notifyPlan(goal_id const &t);
         bool cancelPlan(goal_id const &t);
@@ -470,6 +476,7 @@ namespace TREX {
          * The tick date when the last observation was posted
          */
 	TICK          m_obsDate;
+	bool          m_shouldPrint;
 	
 	/** @brief Name of the special @c Failed observation
 	 *

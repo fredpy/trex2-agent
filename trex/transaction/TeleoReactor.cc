@@ -396,14 +396,14 @@ double TeleoReactor::workRatio() {
   return NAN;
 }
 
-void TeleoReactor::postObservation(Observation const &obs) {
+void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
   internal_set::iterator i = m_internals.find(obs.object());
 
   if( m_internals.end()==i )
     throw SynchronizationError(*this, "attempted to post observation on "+
 			       obs.object().str()+" which is not Internal.");
 
-  (*i)->postObservation(getCurrentTick(), obs);
+  (*i)->postObservation(getCurrentTick(), obs, verbose);
   m_updates.insert(*i);
 }
 
@@ -583,10 +583,13 @@ bool TeleoReactor::doSynchronize() {
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
-        if( is_verbose() || NULL==m_trLog )
-          syslog(obs)<<(*i)->lastObservation();
-        if( NULL!=m_trLog )
-          m_trLog->observation((*i)->lastObservation());
+	bool echo;
+	Observation const &observ = (*i)->lastObservation(echo);
+	
+	if( echo || is_verbose() || NULL==m_trLog )
+	  syslog(obs)<<observ;
+	if( NULL!=m_trLog )
+          m_trLog->observation(observ);
       }
       m_updates.clear();
     }
