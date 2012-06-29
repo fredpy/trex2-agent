@@ -438,7 +438,7 @@ Platform::processState()
     }
     if (last_vstate != msg->op_mode)
     {
-      postObservation(Observation("vstate", mode));
+      postObservation(Observation("vstate", mode), true);
       if (msg->op_mode != IMC::VehicleState::VS_MANEUVER && !was_idle)
       {
         postObservation(Observation("maneuver", "Idle"));
@@ -454,9 +454,9 @@ Platform::processState()
   {
     if (!was_idle)
     {
-      postObservation(Observation("vstate", "Boot"));
-      postObservation(Observation("maneuver", "Idle"));
-      postObservation(Observation("command", "Idle"));
+      postObservation(Observation("vstate", "Boot"), true);
+      postObservation(Observation("maneuver", "Idle"), true);
+      postObservation(Observation("command", "Idle"), true);
       was_idle = true;
     }
   }
@@ -522,7 +522,7 @@ Platform::processState()
         obs.restrictAttribute("secs", IntegerDomain(0));
       }
       lastCommand.maneuver = IMC::InlineMessage();
-      postObservation(obs);
+      postObservation(obs, true);
 
     }
   }
