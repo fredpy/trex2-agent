@@ -621,7 +621,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa doNotify()
        */
-      void postObservation(Observation const &o);
+      void postObservation(Observation const &o, bool verbose=false);
 
       /** @brief Post a goal
        *
