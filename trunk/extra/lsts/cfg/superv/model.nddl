@@ -62,7 +62,7 @@ Navigator::Staying {
 }
 
 Navigator::Going {
-    contained_by(NavigationState.Moving go);
+    ends(NavigationState.Moving go);
     latitude == to_rad(go.target_lat);
     longitude == to_rad(go.target_lon);
     depth == go.depth;
@@ -98,17 +98,17 @@ Actions::Go {
 }
 
 SurveyController::Transit {
-    meets(NavigationState.At point);
+    ends(NavigationState.At point);
     contains(NavigationState.Moving go);
     go.target_lat == point.lat;
     go.target_lon == point.lon;
     go.depth == point.depth;
-    go.end == end;
+    go meets point;
 }
 
 SurveyController::Surveying {
     met_by(Transit);
-    starts(NavigationState.At initial);
+    met_by(NavigationState.At initial);
     initial.lat == lat_from;
     initial.lon == lon_from;
     initial.depth == depth;
@@ -125,16 +125,23 @@ SurveyController::Transect {
     int estimated_duration;
     distance == ll_distance(to_rad(lat_from), to_rad(lon_from),
 			    to_rad(lat_to), to_rad(lon_to));
-    speed >= 0.5;
-    speed <= 6.0;
+    // speed >= 0.5;
+    // speed <= 6.0;
 
-    delta_t * speed == distance * TICK_DURATION;
+    // delta_t * speed == distance * TICK_DURATION;
     
-    if( distance>30.0 )
-	survey.duration >= floor(delta_t);
+    // if( distance>30.0 )
+    // 	survey.duration >= floor(delta_t);
 
     // Later I will have to put the extra details
-    
+    starts(NavigationState.At dest);
+    dest.lat == lat_to;
+    dest.lon == lon_to;
+    dest.depth == depth;
+    // may need a protection here ...
+    dest.requested == true;
+    met_by(NavigationState.Moving go);
+    // go equals survey;
 }
 
 
