@@ -214,11 +214,13 @@ Platform::synchronize()
     IMC::Heartbeat hb;
     sendMsg(hb);
 
-    syslog(info) << "processed " << msg_count << " messages\n";
+    if( msg_count<1 )
+      syslog(warn) << "processed " << msg_count << " messages\n";
     std::cout << "processed " << msg_count << " messages\n";
   }
   catch (std::runtime_error& e)
   {
+    syslog(error)<<"Error during message processing: "<<e.what();
     std::cerr << e.what();
     return false;
   }
@@ -275,10 +277,10 @@ Platform::handleRequest(goal_id const &g)
       else if (secs.domain().isSingleton())
       {
         long long dur = secs.domain().getTypedSingleton<long long, true>();
-        //if (dep_v > 0)
+        if (dep_v > 0)
           commandLoiter(man_name, lat, lon, dep_v, 10.0, 1.5, (int)dur);
-        //else
-         commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
+        else
+	  commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
       }
       current_goal = g;
     }
