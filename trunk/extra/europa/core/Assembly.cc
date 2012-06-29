@@ -516,7 +516,8 @@ bool Assembly::relax(bool aggressive) {
     } else {
       if( tok->isFact() ) {
         if( tok->isMerged() ) {
-          debugMsg("trex:relax", "\t- give room for fact "<<tok->getKey()<<" (cancel active="<<tok->getActiveToken()->getKey()<<")");
+          debugMsg("trex:relax", "\t- give room for fact "<<tok->getKey()
+		   <<" (cancel active="<<tok->getActiveToken()->getKey()<<")");
           cli->cancel(tok->getActiveToken());
           if( !aggressive ) {
             debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
@@ -577,6 +578,7 @@ void Assembly::archive() {
       // it should be merged here
       EUROPA::TokenId active = tok->getActiveToken();
       EUROPA::TokenId master = tok->master();
+
       if( master.isNoId() || master->isCommitted() ) {
         debugMsg("trex:archive", "Colapsing token "<<tok->toString()
                  <<" with is active counterpart "<<active->toString());
@@ -585,9 +587,9 @@ void Assembly::archive() {
           active->makeFact();
         if( active->canBeCommitted() )
           active->commit();
-        cli->cancel(tok);
-        tok->discard();
-        ++deleted;
+        //cli->cancel(tok);
+        //tok->discard();
+        //++deleted;
       }
     }
   }
@@ -699,12 +701,32 @@ void Assembly::archive() {
       }
     }
     if( can_delete ) {
-      debugMsg("trex:archive", "Archiving "<<tok->toString());
-      tok->discard();
-      ++deleted;
+      // Lastly check the state of its master ....
+      EUROPA::TokenId master = tok->master();
+      if( master.isId() ) {
+	if( master->end()->lastDomain().getUpperBound()<now() ) {
+	  if( master->isCommitted() ) {
+	    tok->removeMaster(master);
+	    debugMsg("trex:archive", "Archiving "<<tok->toString());
+	    tok->discard();
+	    ++deleted;
+	  } else {
+	    m_completed.insert(master);
+	    debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+		     <<" as its master is not committed.");
+	  }
+	} else {
+	  debugMsg("trex:archive", "Cannot archive "<<tok->toString()
+		   <<" as its master is not finished.");
+	}
+      } else {
+	debugMsg("trex:archive", "Archiving "<<tok->toString());
+	tok->discard();
+	++deleted;
+      }  
     }
   }
-
+  constraint_engine()->propagate();
 
   debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
   debugMsg("trex:archive",
@@ -1166,8 +1188,11 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   // Checks and erases the token if it was considered a goal
   m_owner.m_goals.erase(token);
 
-  if( m_owner.is_agent_timeline(token) )
+  if( m_owner.is_agent_timeline(token) ) {
+    debugMsg("trex:archive", "cancel "<<token->getPredicateName().toString()
+	     <<'('<<token->getKey()<<')');
     m_owner.cancel(token);
+  }
 }
 
 void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token)
