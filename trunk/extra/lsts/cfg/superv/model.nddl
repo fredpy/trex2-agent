@@ -20,7 +20,10 @@ class NavigationState extends AgentTimeline {
 }
 
 class SurveyController extends AgentTimeline {
-    predicate Active {
+    predicate Transit {}
+    predicate Surveying {
+	float lat_from, lon_from;
+	float depth;
     }
     predicate Transect{
 	float lat_from, lon_from;
@@ -32,7 +35,7 @@ class SurveyController extends AgentTimeline {
     }
 }
 
-class Actions {
+class Actions extends Timeline {
     predicate Go {}
 
     Actions() {
@@ -50,6 +53,7 @@ Estimator::At {
     depth == pos.depth;
 }
 
+
 Navigator::Staying {
     contained_by(NavigationState.At pos);
     latitude == to_rad(pos.lat);
@@ -65,12 +69,6 @@ Navigator::Going {
 }
 
 
-// Planning
-
-SurveyController::Active {
-    starts(NavigationState.At);
-}
-
 NavigationState::At {
     if( requested==true ) {
 	met_by(Actions.Go);
@@ -85,10 +83,12 @@ Actions::Go {
     eq(my_go.target_lon, requester.lon);
     eq(my_go.depth, requester.depth);
 
+    // refinement in the actions
     met_by(Navigator.Idle idle);
     if( idle.start <= AGENT_CLOCK ) {
 	meets(Estimator.At requested);
-	requested.tolerance <= 10.0;
+	requested.tolerance == 10.0;
+	requested.secs == 0;
 
 	equals(Navigator.Going go);
 	go.latitude == requested.latitude;
@@ -97,56 +97,45 @@ Actions::Go {
     }
 }
 
-SurveyController::Transect {
-    met_by(Active exec);
-    after(NavigationState.At src);
-    exec starts src;
-    src.lat == lat_from;
-    src.lon == lon_from;
-    src.depth == depth;
-    src.requested == true;
-    // TBC
+SurveyController::Transit {
+    meets(NavigationState.At point);
+    contains(NavigationState.Moving go);
+    go.target_lat == point.lat;
+    go.target_lon == point.lon;
+    go.depth == point.depth;
+    go.end == end;
 }
 
+SurveyController::Surveying {
+    met_by(Transit);
+    starts(NavigationState.At initial);
+    initial.lat == lat_from;
+    initial.lon == lon_from;
+    initial.depth == depth;
+    initial.requested == true;
+}
 
-
-
-// SurveyController::Transect {
-//     starts(NavigationState.At dest);
-//     dest.lat == lat_to;
-//     dest.lon == lon_to;
-//     dest.depth == depth;
-//     dest.requested == true;
+SurveyController::Transect {
+    met_by(Surveying survey);
+    survey.lat_from == lat_from;
+    survey.lon_from == lon_from;
+    survey.depth == depth;
     
-//     met_by(Active survey);
-//     met_by(NavigationState.Moving go);
-//     go.target_lat == dest.lat;
-//     go.target_lon == dest.lon;
-//     go.depth == dest.depth;
+    float distance, speed, delta_t;
+    int estimated_duration;
+    distance == ll_distance(to_rad(lat_from), to_rad(lon_from),
+			    to_rad(lat_to), to_rad(lon_to));
+    speed >= 0.5;
+    speed <= 6.0;
+
+    delta_t * speed == distance * TICK_DURATION;
     
-//     after(NavigationState.At src);
-//     src meets survey;
-//     src.lat == lat_from;
-//     src.lon == lon_from;
-//     src.depth == depth;
-//     src.requested == true;
+    if( distance>30.0 )
+	survey.duration >= floor(delta_t);
 
-//     // estimate a minimum duration
-//     float distance, speed;
-//     int estimated_duration;
-//     // hard coded for now ... I need a way to request a speed !!!
-//     speed >= 0.5;
-//     speed <= 3.0;
-//     distance == ll_distance(to_rad(lat_from), to_rad(lon_from), 
-// 			    to_rad(lat_to), to_rad(lon_to));
-//     estimated_duration == floor(distance * speed * TICK_DURATION);
-//     if( distance>30 ) {
-// 	survey.duration >= estimated_duration;
-//     }
-
-// }
-
-
+    // Later I will have to put the extra details
+    
+}
 
 
 NavigationState nav = new NavigationState(Internal);
