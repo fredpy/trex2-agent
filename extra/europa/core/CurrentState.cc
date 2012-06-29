@@ -247,8 +247,9 @@ bool CurrentState::commit() {
       EUROPA::TokenId active = m_prev_obs;
       EUROPA::IntervalIntDomain i_now(now());
 
-      debugMsg("trex:commit", "Terminating "<<timeline()->toString()<<'.'
-               <<m_prev_obs->getUnqualifiedPredicateName().toString()<<'('<<m_prev_obs->getKey()<<')');
+      debugMsg("trex:commit", "Terminating "<<timeline()->toString()
+	       <<'.'<<m_prev_obs->getUnqualifiedPredicateName().toString()
+	       <<'('<<m_prev_obs->getKey()<<')');
 
       if( m_prev_obs->isMerged() )
         active=m_prev_obs->getActiveToken();
@@ -256,22 +257,26 @@ bool CurrentState::commit() {
       if( active->end()->lastDomain().intersects(i_now) ) {
         EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
 
-        debugMsg("trex:commit", "Set end="<<m_prev_obs->end()->lastDomain().toString()<<" to "<<now());
-        restrict_base(m_prev_obs, m_prev_obs->end(), EUROPA::IntervalIntDomain(now()));
-        debugMsg("trex:commit", "Update duration="<<m_prev_obs->end()->lastDomain().toString()<<" to "<<now()<<"-"<<start);
+        debugMsg("trex:commit", "Set end="
+		 <<m_prev_obs->end()->lastDomain().toString()<<" to "<<now());
+        restrict_base(m_prev_obs, m_prev_obs->end(), 
+		      EUROPA::IntervalIntDomain(now()));
+        debugMsg("trex:commit", "Update duration="
+		 <<m_prev_obs->end()->lastDomain().toString()<<" to "
+		 <<now()<<"-"<<start);
         
-        restrict_base(m_prev_obs, m_prev_obs->duration(), EUROPA::IntervalIntDomain(now()-start));
+        restrict_base(m_prev_obs, m_prev_obs->duration(), 
+		      EUROPA::IntervalIntDomain(now()-start));
 
         m_assembly.terminate(m_prev_obs);
         m_prev_obs = EUROPA::TokenId::noId();
       } else {
-        debugMsg("trex:always", "Unexpected termination of token "<<m_prev_obs->toString());
+        debugMsg("trex:always", "["<<now()<<"] Unexpected termination of token "
+		 <<timeline()->toString()
+		 <<'.'<<m_prev_obs->getUnqualifiedPredicateName().toString()
+		 <<'('<<m_prev_obs->getKey()<<')');
         return false;
       }
-      debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
-               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
-      restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
-      m_assembly.notify(*this);
       if( m_constraint.isId() ) {
         m_client->deleteConstraint(m_constraint);
         m_constraint = EUROPA::ConstraintId::noId();
@@ -282,15 +287,19 @@ bool CurrentState::commit() {
 
     if( now()==start_time ) {
       debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
-               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
-      restrict_base(m_last_obs, m_last_obs->start(), EUROPA::IntervalIntDomain(now()));
+               <<m_last_obs->getUnqualifiedPredicateName().toString()
+	       <<'('<<m_last_obs->getKey()<<')');
+      restrict_base(m_last_obs, m_last_obs->start(), 
+		    EUROPA::IntervalIntDomain(now()));
       m_assembly.notify(*this);
     } else {
-      EUROPA::IntervalIntDomain future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
+      EUROPA::IntervalIntDomain 
+	future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
         dur(now()+1-start_time, std::numeric_limits<EUROPA::eint>::infinity());
 
       debugMsg("trex:commit", "Extend duration of"<<timeline()->toString()<<'.'
-               <<m_last_obs->getUnqualifiedPredicateName().toString()<<'('<<m_last_obs->getKey()<<')');
+               <<m_last_obs->getUnqualifiedPredicateName().toString()
+	       <<'('<<m_last_obs->getKey()<<')');
       restrict_base(m_last_obs, m_last_obs->end(), future);
       restrict_base(m_last_obs, m_last_obs->duration(), dur);
     }
