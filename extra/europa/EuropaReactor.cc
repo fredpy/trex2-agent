@@ -266,13 +266,13 @@ void EuropaReactor::handleRecall(goal_id const &request) {
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
-  syslog(null, info)<<"Receive token ["<<t<<"] on timeline "<<t->object();
+  syslog(info)<<"Receive token ["<<t<<"] on timeline "<<t->object();
   // treat it as a request for now
   handleRequest(t);
 }
 
 void EuropaReactor::cancelledPlanToken(goal_id const &t) {
-  syslog(null, info)<<"Receive cancel for token ["<<t<<"]";
+  syslog(info)<<"Receive cancel for token ["<<t<<"]";
   // treat it as a recall for now
   handleRecall(t);
 }
@@ -410,8 +410,9 @@ bool EuropaReactor::synchronize() {
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
 //        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
-  } BOOST_SCOPE_EXIT_END
+  } BOOST_SCOPE_EXIT_END;
 
+  tr_info("resolve state");
   if( !synch() ) {
     m_completed_this_tick = false;
     syslog(null, warn)<<"Failed to synchronize : relaxing current plan.";
@@ -427,8 +428,10 @@ bool EuropaReactor::synchronize() {
 
     // Prepare the reactor for next deliberation round 
     if( m_completed_this_tick ) {
+      tr_info("clean-up plan solver");
       planner()->clear(); // remove the past decisions of the planner
 
+      tr_info("remove completed requests");
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for( ; to!=from; ++from) {
 	EUROPA::TokenId cur = (*from)->previous();
@@ -438,6 +441,7 @@ bool EuropaReactor::synchronize() {
       m_completed_this_tick = false;
     } 
 #ifndef Europa_Archive_OLD
+    tr_info("archive");
     // Necessary in case the planner did not run on previous tick
     if( planner()->getStepCount()==0 ) {
       stat_clock::time_point start = stat_clock::now();
@@ -446,6 +450,7 @@ bool EuropaReactor::synchronize() {
     }
 #endif 
   }
+  tr_info("end of synch");
   return constraint_engine()->propagate(); // should not fail
 }
 
@@ -476,7 +481,7 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_dispatched.left.find(tok->getKey());
 
   if( m_dispatched.left.end()!=i ) {
-    syslog(null, info)<<"Recall ["<<i->second<<"]";
+    syslog(info)<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
     m_dispatched.left.erase(i);
   }
