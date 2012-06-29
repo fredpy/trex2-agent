@@ -176,14 +176,14 @@ Platform::synchronize()
           case IMC::TrexCommand::OP_ENABLE:
             syslog(warn) << "Enable TREX command received";
             // post active observation ...
-            postObservation(Observation("supervision", "Active"));
+            postObservation(Observation("supervision", "Active"), true);
             reportToDune("Activate TREX command received");
 
             break;
           case IMC::TrexCommand::OP_DISABLE:
             syslog(warn) << "Disable TREX command received";
             // post blocked observation ...
-            postObservation(Observation("supervision", "Blocked"));
+            postObservation(Observation("supervision", "Blocked"), true);
             reportToDune("Disable TREX command received");
             break;
         }
@@ -193,7 +193,7 @@ Platform::synchronize()
       {
         syslog(warn) << "Abort received";
         // post blocked observation ...
-        postObservation(Observation("supervision", "Blocked"));
+        postObservation(Observation("supervision", "Blocked"), true);
         reportToDune("Disabling TREX due to abort detection");
       }
     }
@@ -206,7 +206,7 @@ Platform::synchronize()
     processState();
 
     if (!supervision_posted) {
-      postObservation(Observation("supervision", "Active"));
+      postObservation(Observation("supervision", "Active"), true);
       supervision_posted = true;
     }
 
