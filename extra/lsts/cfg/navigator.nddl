@@ -14,7 +14,7 @@ class Navigator extends AgentTimeline {
 	
 	predicate Going {
 		float latitude, longitude, depth, speed;
-		int secs;
+		int secs, estimated_duration, duration_interval;
 	}
 	
 	predicate Staying {

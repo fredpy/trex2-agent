@@ -14,7 +14,7 @@ VehicleState::Boot {
 
 VehicleState::Exec {
 	contains(VehicleCommand.Maneuver);
-	met_by(VehicleState.Ready);
+	met_by(VehicleState.Ready); 
 }
 
 VehicleCommand::Maneuver {
