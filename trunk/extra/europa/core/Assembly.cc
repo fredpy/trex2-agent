@@ -148,6 +148,7 @@ EUROPA::LabelStr const Assembly::INTERNAL_MODE("Internal");
 EUROPA::LabelStr const Assembly::PRIVATE_MODE("Private");
 EUROPA::LabelStr const Assembly::IGNORE_MODE("Ignore");
 EUROPA::LabelStr const Assembly::MISSION_END("MISSION_END");
+EUROPA::LabelStr const Assembly::MISSION_START("MISSION_START");
 EUROPA::LabelStr const Assembly::TICK_DURATION("TICK_DURATION");
 EUROPA::LabelStr const Assembly::CLOCK_VAR("AGENT_CLOCK");
 
@@ -210,7 +211,7 @@ Assembly::Assembly(std::string const &name)
 Assembly::~Assembly() {
   setStream();
   // debugMsg("trex:end", "Destroying "<<m_name);
-  // m_proxy.reset(); // <- this generate a crash on my mac
+  m_proxy.reset(); 
   m_ce_listener.reset();
   m_synchListener.reset();
   // cleanup base class
@@ -222,17 +223,22 @@ Assembly::~Assembly() {
 void Assembly::init_clock_vars() {
   EUROPA::ConstrainedVariableId
     mission_end = plan_db()->getGlobalVariable(MISSION_END),
+    mission_start = plan_db()->getGlobalVariable(MISSION_START),
     tick_factor = plan_db()->getGlobalVariable(TICK_DURATION);
 
   m_clock = plan_db()->getGlobalVariable(CLOCK_VAR);
 
   if( mission_end.isNoId() )
     throw EuropaException("Unable to find variable "+MISSION_END.toString());
+  if( mission_start.isNoId() )
+    throw EuropaException("Unable to find variable "+MISSION_START.toString());
   if( tick_factor.isNoId() )
     throw EuropaException("Unable to find variable "+TICK_DURATION.toString());
   if( m_clock.isNoId() )
     throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
 
+  mission_start->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
+							      initial_tick()));
   mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
 							    final_tick()));
   tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),

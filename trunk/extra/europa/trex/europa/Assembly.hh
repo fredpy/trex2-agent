@@ -220,6 +220,13 @@ namespace TREX {
        * the agent mission end tick.
        */
       static EUROPA::LabelStr const MISSION_END;
+
+      /** @brief Mission start model variable
+       *
+       * The name of the variable in the model that is used by T-REX to indicate
+       * the reactor initial tick.
+       */
+      static EUROPA::LabelStr const MISSION_START;
       /** @brief Tick duration model variable
        *
        * The name of the variable in the model that is used by T-REX to indicate

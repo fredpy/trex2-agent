@@ -39,6 +39,7 @@
 float TICK_DURATION;
 int   MISSION_END;
 int   AGENT_CLOCK;
+int   MISSION_START;
 
 enum Mode {
   External,   // Synchronize observations and dispatch goals
