@@ -559,173 +559,154 @@ void Assembly::archive() {
 
   debugMsg("trex:archive",
 	   '['<<now()<<"] ============= START archiving ============");
-
-  // Use m_iter for robust iteration through m_completed
+  
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-
+    
     if( tok->canBeCommitted() ) {
-      debugMsg("trex:archive", "Committing "<<tok->toString());
-      tok->commit();
+      debugMsg("trex:archive", "Committing "<<tok->getPredicateName().toString()
+	       <<'('<<tok->getKey()<<").");
+      details::restrict_bases(tok);
+      tok->commit(); 
     } else if( tok->isInactive() ) {
-      // Maybe I shoudl check if its master is committed first ?
-      debugMsg("trex:archive", "Archive inactive token "<<tok->toString());
-      tok->discard();
-      ++deleted;
+      EUROPA::TokenId master = tok->master(); 
+      if( master.isNoId() ) {
+	debugMsg("trex:archive", "Discarding inactive orphan token "
+		 <<tok->getPredicateName().toString() 
+		 <<'('<<tok->getKey()<<").");
+	tok->discard();
+	debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+
+      } else if( master->end()->lastDomain().getUpperBound()<=now() ) {
+	if( master->isCommitted() ) {
+	  debugMsg("trex:archive", "Ignoring inactive justified token "
+		   <<tok->getPredicateName().toString()
+		   <<'('<<tok->getKey()<<").");
+	  m_completed.erase(tok);
+	} else if( master->canBeCommitted() ) {
+	  details::restrict_bases(master);
+	  master->commit();
+	  debugMsg("trex:archive", "Ignoring inactive freshly justified token "
+		   <<tok->getPredicateName().toString()
+		   <<'('<<tok->getKey()<<").");
+	  m_completed.erase(tok);
+	} 
+      }	
     } else {
-      // it should be merged here
+      // token is merged
       EUROPA::TokenId active = tok->getActiveToken();
       EUROPA::TokenId master = tok->master();
 
+      if( master.isId() ) {
+	if( master->end()->lastDomain().getUpperBound()<=now() ) {
+	  if( master->canBeCommitted() ) {
+	    details::restrict_bases(master);
+	    master->commit();
+	  }
+	}
+      }
       if( master.isNoId() || master->isCommitted() ) {
-        debugMsg("trex:archive", "Colapsing token "<<tok->toString()
-                 <<" with is active counterpart "<<active->toString());
-        details::restrict_bases(active, tok);
-        if( tok->isFact() )
-          active->makeFact();
-        if( active->canBeCommitted() )
-          active->commit();
-        //cli->cancel(tok);
-        //tok->discard();
-        //++deleted;
+	debugMsg("trex:archive", "Collapsing "
+		 <<tok->getPredicateName().toString()<<'('<<tok->getKey()
+		 <<") with its active counterpart "<<active->getKey());
+	details::restrict_bases(active, tok);
+	if( tok->isFact() ) 
+	  active->makeFact();
+	if( active->canBeCommitted() )
+	  active->commit();
+	if( master.isNoId() ) {
+	  debugMsg("trex:archive", "Discarding the redundant token "
+		   <<tok->getPredicateName().toString() 
+		   <<'('<<tok->getKey()<<").");
+	  cli->cancel(tok);
+	  tok->discard();
+	  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+
+	  ++deleted;
+	}
       }
     }
   }
 
-  // Use m_iter for robust iteration through committed tokens
   debugMsg("trex:archive", "Evaluating "<<m_committed.size()<<" committed tokens.");
   m_iter = m_committed.begin();
+  
   while( m_committed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
+    EUROPA::TokenSet slaves_t = tok->slaves();
     bool can_delete = true;
-    // Check merged tokens
+    
+    for(EUROPA::TokenSet::const_iterator t=slaves_t.begin();
+        slaves_t.end()!=t; ++t) {
+      if( !(*t)->isCommitted() ) {
+        if( (*t)->end()->lastDomain().getUpperBound()<=now() ) {
+          if( (*t)->canBeCommitted() ) {
+	    debugMsg("trex:archive", "Committing slave "
+		     <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
+		     <<") from master "<<tok->getPredicateName().toString()<<'('
+		     <<tok->getKey()<<").");
+            details::restrict_bases(*t);
+            (*t)->commit();
+          } else if( (*t)->isMerged() ) {
+	    EUROPA::TokenId active = (*t)->getActiveToken();
+	    if( active->canBeCommitted() ) 
+	      active->commit();
+	    debugMsg("trex:archive", "Collapsing explained slave "
+		     <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
+		     <<") with its active coutnerpart "<<active->getKey());
+	    details::restrict_bases(active, (*t));
+          } else if( !(*t)->isInactive() ) {
+	    debugMsg("trex:archive", "Cannot delete "<<
+		     tok->getPredicateName().toString()<<'('<<tok->getKey()
+		     <<") as one of its slave is not active,merged or "
+		     <<"inactive ???");
+	    can_delete = false;
+	  }
+        } else {
+	  debugMsg("trex:archive", "Cannot delete "<<
+		   tok->getPredicateName().toString()<<'('<<tok->getKey()
+		   <<") as one of its slave is not completed");
+          can_delete = false;
+	}
+      }
+    }
+    
     EUROPA::TokenSet merged_t = tok->getMergedTokens();
+    merged_t.insert(tok);
 
     for(EUROPA::TokenSet::const_iterator t=merged_t.begin();
-        merged_t.end()!=t; ++t) {
+      merged_t.end()!=t; ++t) {
       EUROPA::TokenId master = (*t)->master();
+      bool restrict = false;
       if( master.isId() ) {
-        if( master->isCommitted() ) {
-          details::restrict_bases(tok, *t);
-          cli->cancel(*t);
-          details::restrict_bases(*t, tok);
-          (*t)->removeMaster(master);
-          (*t)->discard();
-          ++deleted;
-        } else {
-          if( master->end()->lastDomain().getUpperBound()<now() )
-            m_completed.insert(master);
-          if( can_delete ) {
-            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                     <<" as one merged token "<<(*t)->toString()
-                     <<" has a master which is not committed.");
-            can_delete = false;
-          }
-        }
-      } else {
-        if( (*t)->isFact() ) {
-          debugMsg("trex:archive", "Collapsing committed token "
-                   <<tok->toString()<<" with fact "<<(*t)->toString());
-          tok->makeFact();
-          for(state_map::const_iterator i=m_agent_timelines.begin();
-              m_agent_timelines.end()!=i; ++i)
-            (*i)->replaced(*t);
-          if( !(*t)->isInactive() )
-            cli->cancel(*t);
-          (*t)->discard();
-          ++deleted;
-        } else if( can_delete ) {
-          debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                   <<" as one merged token "<<(*t)->toString()
-                   <<" is non factual.");
-          can_delete = false;
-        }
-      }
-    }
-    // Check slaves
-
-    EUROPA::TokenSet slaves_t = tok->slaves();
-    for(EUROPA::TokenSet::const_iterator s=slaves_t.begin();
-        slaves_t.end()!=s; ++s) {
-      if( (*s)->isInactive() ) {
-        if( (*s)->end()->lastDomain().getUpperBound()>now() &&
-           !ignored(*s) ) {
-          if( can_delete ) {
-            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                     <<" as one of its slave "<<(*s)->toString()
-                     <<" ends in the future.");
-            can_delete = false;
-          }
-        }
-      } else {
-        bool ended;
-        if( (*s)->isActive() ) {
-          if( (*s)->isCommitted() ) {
-	    debugMsg("trex:archive", "Removing committed token "<<(*s)->getKey()<<" from "<<tok->getKey()<<" slaves.");
-            (*s)->removeMaster(tok);
-            ended = true;
-          } else {
-            ended = (*s)->end()->lastDomain().getUpperBound()<=now();
-            if( can_delete ) {
-              debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                       <<" as one of its slave "<<(*s)->toString()
-                       <<" is not committed yet.");
-              can_delete = false;
-            }
-          }
-        } else {
-          details::restrict_bases(*s);
-          ended = (*s)->end()->baseDomain().getUpperBound()<=now();
-
-          if( can_delete ) {
-            debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-                     <<" as one of its slave "<<(*s)->toString()
-                     <<" is not committed yet.");
-            can_delete = false;
-          }
-        }
-        if( ended && !(*s)->isCommitted() ) {
-          debugMsg("trex:archive", "Mark "<<(*s)->toString()
-                   <<" as completed.");
-          if( (*s)->canBeCommitted() ) {
-            details::restrict_bases(*s);
-            (*s)->commit();
-            (*s)->removeMaster(tok);
-          } else {
-            m_completed.insert(*s);
-            can_delete = false;
-          }
-        }
-      }
+	if( master->end()->lastDomain().getUpperBound()<=now() ) {
+	  if( master->canBeCommitted() )
+	    master->commit();
+	  restrict = true;
+	} else { 
+	  debugMsg("trex:archive", "Cannot delete "<<
+		   tok->getPredicateName().toString()<<'('<<tok->getKey()
+		   <<") as one of its masters is not completed");
+	  can_delete = false;
+	}
+      } else 
+	restrict = true;
+      if( restrict ) 
+	details::restrict_bases(tok, *t);
     }
     if( can_delete ) {
-      // Lastly check the state of its master ....
-      EUROPA::TokenId master = tok->master();
-      if( master.isId() ) {
-	if( master->end()->lastDomain().getUpperBound()<now() ) {
-	  if( master->isCommitted() ) {
-	    tok->removeMaster(master);
-	    debugMsg("trex:archive", "Archiving "<<tok->toString());
-	    tok->discard();
-	    ++deleted;
-	  } else {
-	    m_completed.insert(master);
-	    debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-		     <<" as its master is not committed.");
-	  }
-	} else {
-	  debugMsg("trex:archive", "Cannot archive "<<tok->toString()
-		   <<" as its master is not finished.");
-	}
-      } else {
-	debugMsg("trex:archive", "Archiving "<<tok->toString());
-	tok->discard();
-	++deleted;
-      }  
-    }
+      debugMsg("trex:archive", "Archiving "<<
+	       tok->getPredicateName().toString()<<'('<<tok->getKey()
+	       <<") all its slaves and masters are committed");
+      cli->cancel(tok);
+      tok->discard();
+      debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+      ++deleted;
+    }      
   }
+
   constraint_engine()->propagate();
 
   debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
