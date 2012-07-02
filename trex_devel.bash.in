@@ -71,5 +71,5 @@ fi
 
 export TREX_PATH=@TREX_CONFIG_DIRS@
 
-export TREX_LOG_DIR=@CMAKE_SOURCE_DIR@/log
+export TREX_LOG_DIR=@CMAKE_BINARY_DIR@/log
 
