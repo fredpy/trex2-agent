@@ -23,7 +23,6 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::LSTS;
 
-
 namespace
 {
 
@@ -63,10 +62,10 @@ bool supervision_blocked = false;
 
 ControlInterface * Platform::controlInterfaceInstance = 0;
 
-
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                              TeleoReactor(arg, false), m_active_proxy(NULL),
-                              m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true)
+      TeleoReactor(arg, false), m_active_proxy(NULL),
+      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
+      sent_command(NULL)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -81,6 +80,22 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
                                    "duneip");
 
   debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "debug");
+
+
+  m_rpm_speed_factor = parse_attr<double>(-1, TeleoReactor::xml_factory::node(arg),
+                                          "rpm_speed_factor");
+
+  if (m_rpm_speed_factor != -1)
+    m_use_rpm = true;
+  else
+    m_use_rpm = false;
+
+
+  m_loiter_radius = parse_attr<double>(15, TeleoReactor::xml_factory::node(arg),
+                                       "loiter_radius");
+
+  m_skeeping_radius = parse_attr<double>(7.5, TeleoReactor::xml_factory::node(arg),
+                                         "skeeping_radius");
 
   syslog(info) << "Connecting to dune on " << duneip << ":" 
       << duneport;
@@ -156,8 +171,6 @@ Platform::synchronize()
         if (cmd->type == IMC::VehicleCommand::VC_REQUEST)
         {
           lastCommand = *cmd;
-          //if (!cmd->maneuver.isNull())
-          //	cmd->maneuver->toText(std::cout);
         }
       }
 
@@ -229,13 +242,13 @@ Platform::synchronize()
 }
 
 
-//std::map<goal_id, IMC::Message *> future_goals;
 goal_id current_goal;
 
 void
 Platform::handleRequest(goal_id const &g)
 {
   Goal * goal = g.get();
+
   std::string gname = (goal->object()).str();
   std::string gpred = (goal->predicate()).str();
   std::string man_name;
@@ -246,10 +259,10 @@ Platform::handleRequest(goal_id const &g)
   man_name = ss.str();
 
   if (gname.compare("command") == 0 && gpred.compare("Idle") == 0) {
-
     commandIdle(man_name);
     return;
   }
+
   if (gname.compare("command") == 0 && gpred.compare("Maneuver") == 0)
   {
     boost::optional<long long> timeout;
@@ -262,26 +275,40 @@ Platform::handleRequest(goal_id const &g)
     Variable longitude = goal->getAttribute("longitude");
     Variable depth = goal->getAttribute("depth");
     Variable secs = goal->getAttribute("secs");
+    Variable speed = goal->getAttribute("speed");
 
     if (latitude.domain().isSingleton() && longitude.domain().isSingleton()
         && depth.domain().isSingleton()) {
       double lat = latitude.domain().getTypedSingleton<double, true>();// latitude.domain().getSingleton());// atof(northing.domain().getStringSingleton().c_str());
       double lon = longitude.domain().getTypedSingleton<double, true>();
-
       double dep_v = depth.domain().getTypedSingleton<double, true>();//atof(depth.domain().getStringSingleton().c_str());
+      double speed_mps = 1.5;
 
+      if (speed.domain().isSingleton())
+      {
+        speed_mps = speed.domain().getTypedSingleton<double, true>();
+      }
+      else {
+        //FIXME
+        speed_mps = 1.5;
+      }
       if (secs.domain().isSingleton()
           && secs.domain().getStringSingleton().compare("0") == 0)
-        commandGoto(man_name, lat, lon, dep_v, 1.5, timeout);
+        sent_command = commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout);
 
       else if (secs.domain().isSingleton())
       {
         long long dur = secs.domain().getTypedSingleton<long long, true>();
         if (dep_v > 0)
-          commandLoiter(man_name, lat, lon, dep_v, 10.0, 1.5, (int)dur);
+          sent_command = commandLoiter(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur);
         else
-	  commandStationKeeping(man_name, lat, lon, 1.5, (int)dur);
+          sent_command = commandStationKeeping(man_name, lat, lon, speed_mps, (int)dur);
       }
+
+      Observation obs = Observation(*goal);
+      obs.restrictAttribute("speed", FloatDomain(speed_mps));
+      obs.restrictAttribute("eta", IntegerDomain(0, IntegerDomain::plus_inf));
+
       current_goal = g;
     }
     else {
@@ -391,7 +418,6 @@ Platform::processState()
   }
   else
   {
-
     if (!oplimits_posted) {
       postObservation(Observation("oplimits", "undefined"));
       oplimits_posted = true;
@@ -401,7 +427,6 @@ Platform::processState()
       IMC::GetOperationalLimits get;
       sendMsg(get);
     }
-
   }
 
   /* VEHICLE_STATE */
@@ -436,6 +461,7 @@ Platform::processState()
         mode = "undefined";
         break;
     }
+
     if (last_vstate != msg->op_mode)
     {
       postObservation(Observation("vstate", mode), true);
@@ -462,7 +488,6 @@ Platform::processState()
   }
 
   /* VEHICLE_COMMAND */
-
   int eta = std::numeric_limits<int>::max();
 
   if (received.count(IMC::VehicleState::getIdStatic()))
@@ -470,13 +495,13 @@ Platform::processState()
     IMC::VehicleState *lastState =
         dynamic_cast<IMC::VehicleState*>(aggregate[IMC::VehicleState::getIdStatic()]);
     eta = lastState->maneuver_eta;
-    if (lastState->op_mode == IMC::VehicleState::VS_MANEUVER
-        && !lastCommand.maneuver.isNull())
+    if ((lastState->op_mode == IMC::VehicleState::VS_MANEUVER
+        && !lastCommand.maneuver.isNull()))
     {
 
       Observation obs("command", "Maneuver");
-      IMC::Message * man = lastCommand.maneuver.get();
-
+      IMC::Message * man = NULL;
+      man = lastCommand.maneuver.get();
       obs.restrictAttribute("eta", IntegerDomain(eta));
 
       if (man->getId() == IMC::Goto::getIdStatic())
@@ -485,7 +510,15 @@ Platform::processState()
         obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
         obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(m->z));
-        obs.restrictAttribute("speed", FloatDomain(m->speed));
+
+        if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+        {
+          obs.restrictAttribute("speed", FloatDomain(m->speed));
+        }
+        else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+        {
+          obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
+        }
         obs.restrictAttribute("secs", IntegerDomain(0));
       }
       else if (man->getId() == IMC::Loiter::getIdStatic())
@@ -506,7 +539,14 @@ Platform::processState()
         obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
         obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(0));
-        obs.restrictAttribute("speed", FloatDomain(m->speed));
+        if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+        {
+          obs.restrictAttribute("speed", FloatDomain(m->speed));
+        }
+        else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+        {
+          obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
+        }
         obs.restrictAttribute("secs", IntegerDomain(m->duration));
       }
       else if (man->getId() == IMC::Teleoperation::getIdStatic())
@@ -518,12 +558,11 @@ Platform::processState()
         obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
         obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(0));
-        obs.restrictAttribute("speed", FloatDomain(0));
+        obs.restrictAttribute("speed", FloatDomain(msg->v));
         obs.restrictAttribute("secs", IntegerDomain(0));
       }
       lastCommand.maneuver = IMC::InlineMessage();
       postObservation(obs, true);
-
     }
   }
 }
@@ -541,7 +580,7 @@ Platform::sendMsg(Message& msg, Address &dest)
   }
   catch (std::runtime_error& e)
   {
-    syslog("LSTS", error)<< e.what();
+    syslog("ERROR", error)<< e.what();
     return false;
   }
   return true;
@@ -557,6 +596,7 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
     msg.setSource(65000);
     msg.setDestination(remote_id);
     msg.serialize(bb);
+
     m_mutex.lock();
     send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
                Address(ip.c_str()), port);
@@ -564,7 +604,7 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
   }
   catch (std::runtime_error& e)
   {
-    syslog("LSTS", error)<< e.what();
+    syslog("ERROR", error)<< e.what();
     return false;
   }
   return true;
@@ -585,6 +625,14 @@ bool Platform::commandManeuver(const std::string &man_name, IMC::Message * maneu
   pcontrol.type = IMC::PlanControl::PC_REQUEST;
   pcontrol.plan_id = man_name;
   pcontrol.flags = 0;
+
+  if (debug)
+  {
+    std::ostringstream oss;
+    pcontrol.toText(oss);
+    pcontrol.toText(std::cout);
+    syslog("DEBUG") << "Sent command: " << oss.str();
+  }
 
   return sendMsg(pcontrol);
 }
@@ -618,16 +666,29 @@ IMC::Message *
 Platform::commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout)
 {
   IMC::Goto * msg = new IMC::Goto();
+  IMC::Message * ret;
+
   msg->lat = lat;
   msg->lon = lon;
   msg->z = depth;
-  msg->speed = speed;
+
+  if (m_use_rpm)
+  {
+    msg->speed = speed * m_rpm_speed_factor;
+    msg->speed_units = IMC::Goto::SUNITS_RPM;
+  }
+  else
+  {
+    msg->speed = speed;
+    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+  }
+
   if (timeout)
     msg->timeout = *timeout;
-  msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+  ret = msg->clone();
 
   if (commandManeuver(man_name, msg))
-    return msg;
+    return ret;
   else
     return NULL;
 }
@@ -638,15 +699,25 @@ Platform::commandStationKeeping(const std::string &man_name, double lat, double 
     int seconds)
 {
   IMC::StationKeeping * msg = new IMC::StationKeeping();
+  IMC::Message * ret;
+
   msg->lat = lat;
   msg->lon = lon;
   msg->duration = seconds;
-  msg->radius = 7.5;
-  msg->speed = speed;
-  msg->speed_units = IMC::StationKeeping::SUNITS_METERS_PS;
-
+  msg->radius = m_skeeping_radius;
+  if (m_use_rpm)
+  {
+    msg->speed = speed * m_rpm_speed_factor;
+    msg->speed_units = IMC::Goto::SUNITS_RPM;
+  }
+  else
+  {
+    msg->speed = speed;
+    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+  }
+  ret = msg->clone();
   if (commandManeuver(man_name, msg))
-    return msg;
+    return ret;
   else
     return NULL;
 }
@@ -656,17 +727,28 @@ Platform::commandLoiter(const std::string &man_name, double lat, double lon, dou
     double speed, int seconds)
 {
   IMC::Loiter * msg = new IMC::Loiter();
+  IMC::Message * ret;
+
   msg->lat = lat;
   msg->lon = lon;
   msg->z = depth;
   msg->duration = seconds;
-  msg->radius = radius;
+  msg->radius = m_loiter_radius;
   msg->direction = IMC::Loiter::LD_CLOCKW;
-  msg->speed = speed;
-  msg->speed_units = IMC::Loiter::SUNITS_METERS_PS;
+  if (m_use_rpm)
+  {
+    msg->speed = speed * m_rpm_speed_factor;
+    msg->speed_units = IMC::Goto::SUNITS_RPM;
+  }
+  else
+  {
+    msg->speed = speed;
+    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+  }
 
+  ret = msg->clone();
   if (commandManeuver(man_name, msg))
-    return msg;
+    return ret;
   else
     return NULL;
 }
@@ -674,14 +756,14 @@ Platform::commandLoiter(const std::string &man_name, double lat, double lon, dou
 IMC::Message *
 Platform::commandIdle(const std::string &man_name)
 {
-    IMC::PlanControl pcontrol;
+  IMC::PlanControl pcontrol;
 
-    pcontrol.info = "Idle request by TREX";
-    pcontrol.op = IMC::PlanControl::PC_STOP;
-    pcontrol.type = IMC::PlanControl::PC_REQUEST;
-    pcontrol.flags = 0;
+  pcontrol.info = "Idle request by TREX";
+  pcontrol.op = IMC::PlanControl::PC_STOP;
+  pcontrol.type = IMC::PlanControl::PC_REQUEST;
+  pcontrol.flags = 0;
 
-    return NULL;
+  return NULL;
 }
 
 /*

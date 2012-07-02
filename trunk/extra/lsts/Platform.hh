@@ -124,6 +124,19 @@ namespace TREX {
       bool debug;
 
 
+      /** @brief whether to use RPM speeds or not */
+      bool m_use_rpm;
+
+      /** @brief value of conversion between m/s to RPM speeds */
+      double m_rpm_speed_factor;
+
+      /** @brief Default station keeping radius */
+      double m_skeeping_radius;
+
+      /** @brief Default loiter radius */
+      double m_loiter_radius;
+
+      IMC::Message * sent_command;
 
       void setValue(bool val);
 

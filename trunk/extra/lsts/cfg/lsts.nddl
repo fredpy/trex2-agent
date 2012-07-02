@@ -12,8 +12,8 @@ VehicleCommand command = new VehicleCommand(External);
 OperationalLimits oplimits = new OperationalLimits(Observe);
 TrexSupervision supervision = new TrexSupervision(Observe);
 
-Navigator navigator = new Navigator(Internal, true);
-Estimator estimator = new Estimator(Internal, true);
+Navigator navigator = new Navigator(Internal);//, true);
+Estimator estimator = new Estimator(Internal);//,true);
 
 
 close();

@@ -16,26 +16,33 @@ Navigator::Going {
 	
 	if( ready.start<=AGENT_CLOCK ) {
 	  float distance;
-	  int estimated_duration;
 	  
 	  met_by(EstimatedState.Position ini);
-	  contains(VehicleCommand.Maneuver maneuver);
-	  maneuver.end == end;
-	  latitude == maneuver.latitude;
-	  longitude == maneuver.longitude;
-	  depth == maneuver.depth;
-	  maneuver.secs == secs;
-	  speed == maneuver.speed;
-	  maneuver_end == maneuver.end;
+	  
 	  distance == ll_distance(ini.latitude, ini.longitude, latitude, longitude);	  
-	  estimated_duration == floor(distance * speed * TICK_DURATION); 
 	  
-	  if (distance > 30) {
-	  	maneuver.duration * 2 >= estimated_duration;
-	  }
+	  if (distance <= 10 && secs <= 1) {
+	  	bind(duration, 1);
+	  } 
+	  else {
 	  
-	  maneuver.duration <= estimated_duration * 2;
-	  
+		  contains(VehicleCommand.Maneuver maneuver);
+		  maneuver.end == end;
+		  latitude == maneuver.latitude;
+		  longitude == maneuver.longitude;
+		  depth == maneuver.depth;
+		  maneuver.secs == secs;
+		  speed == maneuver.speed;
+		  maneuver_end == maneuver.end;
+		  estimated_duration == floor(distance * speed * TICK_DURATION) - [5, 15]; 
+		  
+		  if (distance > 30) {
+		  	maneuver.duration * 3 >= estimated_duration;
+		  }
+		  
+		  maneuver.duration <= estimated_duration * 2;
+		  duration_interval == maneuver.duration; 
+	   }
 	}
 	
 	
