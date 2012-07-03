@@ -3,13 +3,8 @@
 #include "navigator.nddl"
 #include "estimator.nddl"
 
-//EstimatedState::Position {
-//	duration == 1;
-//}
-
 VehicleState::Boot {
 	contained_by(VehicleCommand.Idle);
-	//meets(VehicleState.Ready);
 }
 
 VehicleState::Exec {
@@ -20,11 +15,10 @@ VehicleState::Exec {
 VehicleCommand::Maneuver {
 	
     met_by(VehicleState.Ready); 
-	
-    contained_by (OperationalLimits.Limits limits);
+   	
+	contained_by (OperationalLimits.Limits limits);
     depth 	<= 	limits.maxDepth;
     depth 	>= 	limits.minDepth;
     speed 	<= 	limits.maxSpeed;
-    speed 	>= 	limits.minSpeed;	
-    
+    speed 	>= 	limits.minSpeed;
 }

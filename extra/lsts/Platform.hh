@@ -84,6 +84,8 @@ namespace TREX {
       IMC::Message * commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
       IMC::Message * commandStationKeeping(const std::string &man_name, double lat, double lon, double speed, int seconds);
       IMC::Message * commandIdle(const std::string &man_name);
+      IMC::Message * commandElevator(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout);
+
       //IMC::Message commandCalibration();
       void convertToAbsolute(double northing, double easting, double &lat, double &lon);
       void convertToRelative(double lat, double lon, double &x, double &y);
@@ -136,7 +138,12 @@ namespace TREX {
       /** @brief Default loiter radius */
       double m_loiter_radius;
 
+      /** @brief current vehicle position */
+      double m_latitude, m_longitude, m_depth;
+
       IMC::Message * sent_command;
+
+      bool m_blocked;
 
       void setValue(bool val);
 

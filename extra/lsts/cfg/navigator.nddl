@@ -1,6 +1,19 @@
 #include "declarations.nddl"
 #include "platform.nddl"
 
+class VehicleDepth extends AgentTimeline {
+    
+    predicate Surface {
+    }
+    
+    predicate Underwater {
+    }
+
+    VehicleDepth(Mode _mode) {
+		super(_mode);
+    }   
+}
+
 class Navigator extends AgentTimeline {
 	
 	Navigator(Mode _mode) {
