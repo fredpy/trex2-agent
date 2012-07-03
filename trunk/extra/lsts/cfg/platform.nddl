@@ -3,6 +3,20 @@
 
 //place here all the Observations from the Platform reactor
 
+class ManType {
+	int id;
+	
+	Mantype(int type) {
+		id = type;
+	}
+}  
+
+ManType goto = new ManType(0);
+ManType loiter = new ManType(1);
+ManType skeeping = new ManType(2);
+ManType idle = new ManType(3);
+ManType teleop = new ManType(4);
+
 class EstimatedState extends AgentTimeline {
 
 	EstimatedState(Mode _mode) {
@@ -17,12 +31,7 @@ class EstimatedState extends AgentTimeline {
 		float depth;
 		float uncertainty;
 		
-		//float northing;
-		//float easting;
 		uncertainty >= 0.0;
-
-		//ll_offset(latitude, longitude, northing, easting);
-		
 	};
 };
 
@@ -77,7 +86,7 @@ class VehicleCommand extends AgentTimeline {
 		int secs;
 		int eta;
 				
-		secs >= 0;			
+		secs >= 0;					
 	};
 };
 
@@ -91,18 +100,4 @@ class TrexSupervision extends AgentTimeline {
 	predicate Blocked {};
 	predicate Active  {};
 }
-
-class ManType {
-	int id;
-	
-	Mantype(int type) {
-		id = type;
-	}
-}  
-
-ManType goto = new ManType(0);
-ManType loiter = new ManType(1);
-ManType skeeping = new ManType(2);
-ManType idle = new ManType(3);
-ManType teleop = new ManType(4);
 

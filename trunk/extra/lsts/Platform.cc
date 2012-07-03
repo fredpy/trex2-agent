@@ -14,6 +14,7 @@
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/StringDomain.hh>
 #include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/EnumDomain.hh>
 
 #include <Dune/Math/Angles.hpp>
 #include <Dune/Coordinates/WGS84.hpp>
@@ -63,13 +64,13 @@ bool supervision_blocked = false;
 ControlInterface * Platform::controlInterfaceInstance = 0;
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-      TeleoReactor(arg, false), m_active_proxy(NULL),
-      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
-      sent_command(NULL)
+                      TeleoReactor(arg, false), m_active_proxy(NULL),
+                      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
+                      sent_command(NULL), m_blocked(false)
 {
 
   manager().add_handler(log_proxy(*this));
-  syslog(warn)<<"This message should appeear in stderr";
+  //syslog(warn)<<"This message should appeear in stderr";
 
   m_env->setPlatformReactor(this);
 
@@ -175,6 +176,8 @@ Platform::synchronize()
       }
 
       if (msg->getId() == IMC::TrexCommand::getIdStatic())
+
+      if (msg->getId() == IMC::TrexCommand::getIdStatic())
       {
         IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
 
@@ -191,6 +194,7 @@ Platform::synchronize()
             // post active observation ...
             postObservation(Observation("supervision", "Active"), true);
             reportToDune("Activate TREX command received");
+            m_blocked = false;
 
             break;
           case IMC::TrexCommand::OP_DISABLE:
@@ -198,6 +202,7 @@ Platform::synchronize()
             // post blocked observation ...
             postObservation(Observation("supervision", "Blocked"), true);
             reportToDune("Disable TREX command received");
+            m_blocked = true;
             break;
         }
       }
@@ -283,6 +288,10 @@ Platform::handleRequest(goal_id const &g)
       double lon = longitude.domain().getTypedSingleton<double, true>();
       double dep_v = depth.domain().getTypedSingleton<double, true>();//atof(depth.domain().getStringSingleton().c_str());
       double speed_mps = 1.5;
+      long long duration = 0;
+
+      if (secs.domain().isSingleton())
+        duration = secs.domain().getTypedSingleton<long long, true>();
 
       if (speed.domain().isSingleton())
       {
@@ -292,10 +301,12 @@ Platform::handleRequest(goal_id const &g)
         //FIXME
         speed_mps = 1.5;
       }
-      if (secs.domain().isSingleton()
-          && secs.domain().getStringSingleton().compare("0") == 0)
-        sent_command = commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout);
-
+      if (duration == 0) {
+        if (WGS84::distance(lat, lon, 0, m_latitude, m_longitude, 0) < 10)
+          sent_command = commandElevator(man_name, lat, lon, dep_v, speed_mps, timeout);
+        else
+          sent_command = commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout);
+      }
       else if (secs.domain().isSingleton())
       {
         long long dur = secs.domain().getTypedSingleton<long long, true>();
@@ -359,6 +370,13 @@ void
 Platform::processState()
 {
 
+  /* Abort */
+
+  if (received.count(IMC::Abort::getIdStatic()))
+  {
+    m_blocked = true;
+  }
+
   /* ESTIMATED_STATE */
 
   if (received.count(IMC::EstimatedState::getIdStatic()))
@@ -367,13 +385,17 @@ Platform::processState()
         dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
 
     Observation obs("estate", "Position");
-    double lat = msg->lat, lon = msg->lon;//, hae = 0.0;//, northing = msg->x, easting = msg->y;
+    m_latitude = msg->lat;
+    m_longitude = msg->lon;
+    m_depth = msg->z;
     if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
-      WGS84::displace(msg->x, msg->y, &lat, &lon);
+      WGS84::displace(msg->x, msg->y, &m_latitude, &m_longitude);
 
-    obs.restrictAttribute("latitude", FloatDomain(lat));
-    obs.restrictAttribute("longitude", FloatDomain(lon));
+    obs.restrictAttribute("latitude", FloatDomain(m_latitude));
+    obs.restrictAttribute("longitude", FloatDomain(m_longitude));
     obs.restrictAttribute("depth", FloatDomain(msg->z));
+
+
 
     if (aggregate.count(IMC::NavigationUncertainty::getIdStatic()))
     {
@@ -412,6 +434,8 @@ Platform::processState()
       obs.restrictAttribute("maxSpeed", FloatDomain(msg->max_speed));
     if (msg->mask & IMC::OperationalLimits::OPL_MIN_SPEED)
       obs.restrictAttribute("minSpeed", FloatDomain(msg->min_speed));
+
+    InsideOpLimits::set_oplimits(msg);
 
     oplimits_posted = true;
     postObservation(obs);
@@ -510,6 +534,7 @@ Platform::processState()
         obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
         obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(m->z));
+        //  obs.restrictAttribute("type", EnumDomain("goto"));
 
         if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
         {
@@ -531,6 +556,7 @@ Platform::processState()
         obs.restrictAttribute("depth", FloatDomain(m->z));
         obs.restrictAttribute("speed", FloatDomain(m->speed));
         obs.restrictAttribute("secs", IntegerDomain(m->duration));
+        //obs.restrictAttribute("type", EnumDomain("loiter"));
       }
       else if (man->getId() == IMC::StationKeeping::getIdStatic())
       {
@@ -539,6 +565,7 @@ Platform::processState()
         obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
         obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(0));
+        //obs.restrictAttribute("type", EnumDomain("skeeping"));
         if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
         {
           obs.restrictAttribute("speed", FloatDomain(m->speed));
@@ -559,6 +586,16 @@ Platform::processState()
         obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
         obs.restrictAttribute("depth", FloatDomain(0));
         obs.restrictAttribute("speed", FloatDomain(msg->v));
+        obs.restrictAttribute("secs", IntegerDomain(0));
+        //obs.restrictAttribute("type", EnumDomain("teleop"));
+      }
+      else if (man->getId() == IMC::Elevator::getIdStatic())
+      {
+        IMC::Elevator * msg =
+            dynamic_cast<IMC::Elevator *>(man);
+        obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+        obs.restrictAttribute("longitude", FloatDomain(msg->lon ));
+        obs.restrictAttribute("depth", FloatDomain(msg->end_z));
         obs.restrictAttribute("secs", IntegerDomain(0));
       }
       lastCommand.maneuver = IMC::InlineMessage();
@@ -626,12 +663,20 @@ bool Platform::commandManeuver(const std::string &man_name, IMC::Message * maneu
   pcontrol.plan_id = man_name;
   pcontrol.flags = 0;
 
+
+
   if (debug)
   {
     std::ostringstream oss;
     pcontrol.toText(oss);
     pcontrol.toText(std::cout);
     syslog("DEBUG") << "Sent command: " << oss.str();
+  }
+
+  if (m_blocked)
+  {
+    syslog(error) << "Maneuver not start because TREX is currently blocked";
+    return false;
   }
 
   return sendMsg(pcontrol);
@@ -693,6 +738,39 @@ Platform::commandGoto(const std::string &man_name, double lat, double lon, doubl
     return NULL;
 }
 
+IMC::Message *
+Platform::commandElevator(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout)
+{
+  IMC::Elevator * msg = new IMC::Elevator();
+  IMC::Message * ret;
+
+  msg->lat = lat;
+  msg->lon = lon;
+  msg->end_z = target_depth;
+
+  if (m_use_rpm)
+  {
+    msg->speed = speed * m_rpm_speed_factor;
+    msg->speed_units = IMC::Goto::SUNITS_RPM;
+  }
+  else
+  {
+    msg->speed = speed;
+    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+  }
+
+  msg->pitch = Angles::radians(15);
+  msg->radius = m_loiter_radius;
+
+  if (timeout)
+    msg->timeout = *timeout;
+  ret = msg->clone();
+
+  if (commandManeuver(man_name, msg))
+    return ret;
+  else
+    return NULL;
+}
 
 IMC::Message *
 Platform::commandStationKeeping(const std::string &man_name, double lat, double lon, double speed,
