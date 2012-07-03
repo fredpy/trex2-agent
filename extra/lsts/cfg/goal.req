@@ -8,34 +8,34 @@
     <date min="2011-Jul-10 10:00:00.500-05:00" max="2020-Jul-10 22:00:00.500" />
   </Variable -->
   <Variable name="lat_0">
-    <float min="41.185279" max="41.185279" />
+    <float value="41.185279"/>
   </Variable>
   <Variable name="lon_0">
-    <float min="-8.705758" max="-8.705758" />
+    <float value="-8.705758" />
   </Variable>
   <Variable name="lat_1">
-    <float min="41.183779" max="41.183779" />
+    <float value="41.183779" />
   </Variable>
   <Variable name="lon_1">
-    <float min="-8.705758" max="-8.705758" />
+    <float value="-8.705758" />
   </Variable>
   <Variable name="lat_2">
-    <float min="41.185279" max="41.185279" />
+    <float value="41.185279" />
   </Variable>
   <Variable name="lon_2">
-    <float min="-8.706758" max="-8.706758" />
+    <float value="-8.706758" />
   </Variable>
   <Variable name="lat_3">
-    <float min="41.183779" max="41.183779" />
+    <float value="41.183779" />
   </Variable>
   <Variable name="lon_3">
-    <float min="-8.706758" max="-8.706758" />
+    <float value="-8.706758" />
   </Variable>
   <Variable name="n_slices">
-    <int min="3" max="3"/>
+    <int value="3"/>
   </Variable>
   <Variable name="depth">
-    <float min="0" max="0"/>
+    <float value="0"/>
   </Variable>
     <!-- Example of duration. Dates are specified using the format 
          HH:MM:SS.mmm
