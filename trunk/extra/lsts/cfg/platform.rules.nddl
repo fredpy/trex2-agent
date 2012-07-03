@@ -21,4 +21,7 @@ VehicleCommand::Maneuver {
     depth 	>= 	limits.minDepth;
     speed 	<= 	limits.maxSpeed;
     speed 	>= 	limits.minSpeed;
+    
+    sane == sane_pos(latitude, longitude, depth);
+    sane == true;
 }

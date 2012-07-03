@@ -85,6 +85,7 @@ class VehicleCommand extends AgentTimeline {
 		float speed;		
 		int secs;
 		int eta;
+		bool sane;
 				
 		secs >= 0;					
 	};
