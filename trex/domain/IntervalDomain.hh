@@ -532,6 +532,7 @@ namespace TREX {
       /** @brief interval upper bound */
       bound m_upper;
 
+      void parseSingleton(std::string const &val);
       void parseLower(std::string const &val);
       void parseUpper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const {

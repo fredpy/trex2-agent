@@ -46,14 +46,21 @@ namespace bpt=boost::property_tree;
 // modifiers 
 
 void BasicInterval::completeParsing(bpt::ptree::value_type &node) {
-  boost::optional< std::string >
-    lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
-    hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
+  // Try for a singleton first 
+  boost::optional<std::string> 
+    val = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "value");
+  if( val ) {
+    parseSingleton(*val);
+  } else {
+    boost::optional< std::string >
+      lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
+      hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
 
-  if( lo ) 
-    parseLower(*lo);
-  if( hi )
-    parseUpper(*hi);
+    if( lo ) 
+      parseLower(*lo);
+    if( hi )
+      parseUpper(*hi);
+  }
 }
 
 // observers 
@@ -87,10 +94,14 @@ std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
   out<<'<'<<getTypeName();
   out.precision(16);
   out.setf(out.fixed);
-  if( hasLower() )
-    print_lower(out<<" min=\"")<<'\"';
-  if( hasUpper() )
-    print_upper(out<<" max=\"")<<'\"';
+  if( isSingleton() ) 
+    print_singleton(out<<" value=\"")<<'\"';
+  else { 
+    if( hasLower() )
+      print_lower(out<<" min=\"")<<'\"';
+    if( hasUpper() )
+      print_upper(out<<" max=\"")<<'\"';
+  }
   return out<<"/>";
 }
 
