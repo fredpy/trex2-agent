@@ -43,6 +43,10 @@ Estimator::At {
     depth == pos.depth;
 }
 
+Estimator::Boot {
+    starts(NavigationState.undefined);
+}
+
 Navigator::Staying {
     contained_by(NavigationState.At pos);
     latitude == to_rad(pos.lat);
@@ -157,7 +161,7 @@ SurveyActions::Transect {
     initial.depth == depth;
     initial.requested == true;
 
-    starts(object.owner.DoTransect exec);
+    equals(object.owner.DoTransect exec);
     exec.end == completion_point;
     exec.since == transit.start;
 
@@ -167,7 +171,7 @@ SurveyActions::Transect {
     transect.target_lon == lon_to;
     transect.depth == depth;
 
-    ends(object.ctrl.At dest);
+    meets(object.ctrl.At dest);
     completion_point == dest.start;
     dest.lat == lat_to;
     dest.lon == lon_to;
@@ -188,7 +192,7 @@ Survey::Transit {
 }
 
 Survey::Transect {
-    contained_by(object.ctrl.Transect transect);
+    met_by(object.ctrl.Transect transect);
     met_by(DoTransect);
     start == transect.completion_point;
     transect.lat_from == lat_from;
@@ -233,7 +237,7 @@ Survey::LawnMower {
 	pred.lon_to == lon_0;
     }
     
-    contained_by(object.ctrl.Transect transect);
+    met_by(object.ctrl.Transect transect);
     transect starts exec;
     start == transect.completion_point;
     transect.lat_from == lat_2;
