@@ -322,6 +322,8 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       }
     }
     goal_id request = postGoal(my_goal);
+    syslog(info)<<"Request ["<<request<<"] created from europa token "
+		<<tok->getKey();
     if( request ) {
       m_dispatched.insert(goal_map::value_type(tok->getKey(), request));
     } else

@@ -560,7 +560,6 @@ void Assembly::archive() {
 #  warning "Greedy plan archiving is not efficient with action tokens."
 # endif // EUROPA_HAVE_EFFECT
   EUROPA::DbClientId cli = plan_db()->getClient();
-  details::is_rejectable rejectable;
   size_t deleted = 0;
 
   debugMsg("trex:archive",
@@ -583,8 +582,7 @@ void Assembly::archive() {
 	debugMsg("trex:archive", "Discarding inactive orphan token "
 		 <<tok->getPredicateName().toString() 
 		 <<'('<<tok->getKey()<<").");
-	if( rejectable(tok) )
-	  discard(tok);
+	discard(tok);
 	tok->discard();
 	// constraint_engine()->propagate();
 	debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
@@ -633,9 +631,7 @@ void Assembly::archive() {
 	  debugMsg("trex:archive", "Discarding the redundant token "
 		   <<tok->getPredicateName().toString() 
 		   <<'('<<tok->getKey()<<").");
-	  if( rejectable(tok) )
-	    discard(tok);
-
+	  discard(tok);
 	  cli->cancel(tok);
 	  tok->discard();
 	  // constraint_engine()->propagate();
@@ -725,8 +721,6 @@ void Assembly::archive() {
 	}
       } else { 
 	restrict = true;
-	if( rejectable(tok) )
-	  discard(tok);
       }
       if( restrict ) 
 	details::restrict_bases(tok, *t);
@@ -735,6 +729,7 @@ void Assembly::archive() {
       debugMsg("trex:archive", "Archiving "<<
 	       tok->getPredicateName().toString()<<'('<<tok->getKey()
 	       <<") all its slaves and masters are committed");
+      discard(tok);
       cli->cancel(tok);
       // constraint_engine()->propagate();
       tok->discard();
