@@ -33,33 +33,14 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_custom_target(plugins COMMENT "TREX plugins")
+add_library(TREXrover SHARED
+	Rover.cc
+	#headers
+	Rover.hh
+	)
+target_link_libraries(TREXrover
+	TREXtransaction
+	)
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION shared/trex/plugins OPTIONAL)
-  trex_cfg(cfg shared/trex)
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg)
-endmacro(trex_plugin)
-
-# the directories where plugins are located
-
-add_subdirectory(backward)
-add_subdirectory(lightswitch) 
-add_subdirectory(europa)
-add_subdirectory(witre)
-add_subdirectory(rover)
-
-option(WITH_LSTS "Use LSTS plugin" OFF)
-# mark_as_advanced(WITH_LSTS)
-if(WITH_LSTS)
-  add_subdirectory(lsts)
-endif(WITH_LSTS)
-
-option(WITH_NUS "Use NUS plugin" OFF)
-if(WITH_NUS)
-  add_subdirectory(starfish)
-endif(WITH_NUS)
+trex_plugin(rover rover_pg.cc)
+target_link_libraries(rover_pg TREXrover)
