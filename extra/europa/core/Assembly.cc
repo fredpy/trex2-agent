@@ -560,7 +560,7 @@ void Assembly::archive() {
 #  warning "Greedy plan archiving is not efficient with action tokens."
 # endif // EUROPA_HAVE_EFFECT
   EUROPA::DbClientId cli = plan_db()->getClient();
-  is_not_merged test(true);
+  details::is_rejectable rejectable;
   size_t deleted = 0;
 
   debugMsg("trex:archive",
@@ -575,6 +575,7 @@ void Assembly::archive() {
       debugMsg("trex:archive", "Committing "<<tok->getPredicateName().toString()
 	       <<'('<<tok->getKey()<<").");
       details::restrict_bases(tok);
+      // constraint_engine()->propagate();
       tok->commit(); 
     } else if( tok->isInactive() ) {
       EUROPA::TokenId master = tok->master(); 
@@ -582,7 +583,10 @@ void Assembly::archive() {
 	debugMsg("trex:archive", "Discarding inactive orphan token "
 		 <<tok->getPredicateName().toString() 
 		 <<'('<<tok->getKey()<<").");
+	if( rejectable(tok) )
+	  discard(tok);
 	tok->discard();
+	// constraint_engine()->propagate();
 	debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
 
       } else if( master->end()->lastDomain().getUpperBound()<=now() ) {
@@ -593,6 +597,7 @@ void Assembly::archive() {
 	  m_completed.erase(tok);
 	} else if( master->canBeCommitted() ) {
 	  details::restrict_bases(master);
+	  // constraint_engine()->propagate();
 	  master->commit();
 	  debugMsg("trex:archive", "Ignoring inactive freshly justified token "
 		   <<tok->getPredicateName().toString()
@@ -609,6 +614,7 @@ void Assembly::archive() {
 	if( master->end()->lastDomain().getUpperBound()<=now() ) {
 	  if( master->canBeCommitted() ) {
 	    details::restrict_bases(master);
+	    // constraint_engine()->propagate();
 	    master->commit();
 	  }
 	}
@@ -618,6 +624,7 @@ void Assembly::archive() {
 		 <<tok->getPredicateName().toString()<<'('<<tok->getKey()
 		 <<") with its active counterpart "<<active->getKey());
 	details::restrict_bases(active, tok);
+	// constraint_engine()->propagate();
 	if( tok->isFact() ) 
 	  active->makeFact();
 	if( active->canBeCommitted() )
@@ -626,8 +633,12 @@ void Assembly::archive() {
 	  debugMsg("trex:archive", "Discarding the redundant token "
 		   <<tok->getPredicateName().toString() 
 		   <<'('<<tok->getKey()<<").");
+	  if( rejectable(tok) )
+	    discard(tok);
+
 	  cli->cancel(tok);
 	  tok->discard();
+	  // constraint_engine()->propagate();
 	  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
 
 	  ++deleted;
@@ -654,15 +665,27 @@ void Assembly::archive() {
 		     <<") from master "<<tok->getPredicateName().toString()<<'('
 		     <<tok->getKey()<<").");
             details::restrict_bases(*t);
+	    // constraint_engine()->propagate();
             (*t)->commit();
           } else if( (*t)->isMerged() ) {
 	    EUROPA::TokenId active = (*t)->getActiveToken();
-	    if( active->canBeCommitted() ) 
+	    if( active->canBeCommitted() ) {
+	      debugMsg("trex:archive", "Collapsing explained slave "
+		       <<(*t)->getPredicateName().toString()<<'('
+		       <<(*t)->getKey()
+		       <<") with its active counterpart "<<active->getKey());
+	      details::restrict_bases(active, *t);
+	      // constraint_engine()->propagate();
 	      active->commit();
-	    debugMsg("trex:archive", "Collapsing explained slave "
-		     <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
-		     <<") with its active coutnerpart "<<active->getKey());
-	    details::restrict_bases(active, (*t));
+	    } else {
+	      debugMsg("trex:archive", "Collapsing explained slave "
+		       <<(*t)->getPredicateName().toString()<<'('
+		       <<(*t)->getKey()
+		       <<") with its committed active counterpart "
+		       <<active->getKey());
+	      details::restrict_bases(active, *t);
+	      // constraint_engine()->propagate();
+	    }
           } else if( !(*t)->isInactive() ) {
 	    debugMsg("trex:archive", "Cannot delete "<<
 		     tok->getPredicateName().toString()<<'('<<tok->getKey()
@@ -688,8 +711,11 @@ void Assembly::archive() {
       bool restrict = false;
       if( master.isId() ) {
 	if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	  if( master->canBeCommitted() )
+	  if( master->canBeCommitted() ) {
+	    details::restrict_bases(master);
+	    // constraint_engine()->propagate();
 	    master->commit();
+	  }
 	  restrict = true;
 	} else { 
 	  debugMsg("trex:archive", "Cannot delete "<<
@@ -697,8 +723,11 @@ void Assembly::archive() {
 		   <<") as one of its masters is not completed");
 	  can_delete = false;
 	}
-      } else 
+      } else { 
 	restrict = true;
+	if( rejectable(tok) )
+	  discard(tok);
+      }
       if( restrict ) 
 	details::restrict_bases(tok, *t);
     }
@@ -707,13 +736,13 @@ void Assembly::archive() {
 	       tok->getPredicateName().toString()<<'('<<tok->getKey()
 	       <<") all its slaves and masters are committed");
       cli->cancel(tok);
+      // constraint_engine()->propagate();
       tok->discard();
       debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
       ++deleted;
     }      
   }
 
-  constraint_engine()->propagate();
 
   debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
   debugMsg("trex:archive",
