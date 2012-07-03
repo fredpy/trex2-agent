@@ -1,8 +1,22 @@
 #include "navigator.nddl"
 #include "estimator.nddl"
-#include "platform.nddl"
+// #include "platform.nddl"
+
+class NavigationState;
+
+class NavActions extends Timeline {
+    NavigationState owner;
+
+    predicate Go {}
+
+    NavActions(NavigationState me) {
+	owner = me;
+    }
+}
 
 class NavigationState extends AgentTimeline {
+    NavActions ctrl;
+
     predicate At {
 	float lat, lon;
 	float depth;
@@ -16,35 +30,11 @@ class NavigationState extends AgentTimeline {
 
     NavigationState(Mode _mode) {
 	super(_mode, false);
+	ctrl = new NavActions(this);
     }   
 }
 
-class SurveyController extends AgentTimeline {
-    predicate Transit {}
-    predicate Surveying {
-	float lat_from, lon_from;
-	float depth;
-    }
-    predicate Transect{
-	float lat_from, lon_from;
-	float lat_to, lon_to;
-	float depth;
-    }	    
-    SurveyController(Mode _mode) {
-	super(_mode, true);
-    }
-}
-
-class Actions extends Timeline {
-    predicate Go {}
-
-    Actions() {
-	super();
-    }
-}
-
-
-// synchronization rules
+// Synchronization
 
 Estimator::At {
     starts(NavigationState.At pos);
@@ -52,7 +42,6 @@ Estimator::At {
     lon_deg == pos.lon;
     depth == pos.depth;
 }
-
 
 Navigator::Staying {
     contained_by(NavigationState.At pos);
@@ -68,102 +57,196 @@ Navigator::Going {
     depth == go.depth;
 }
 
+// Action triggering
 
 NavigationState::At {
     if( requested==true ) {
-	met_by(Actions.Go);
+	met_by(object.ctrl.Go cmd);
     }
 }
 
-Actions::Go {
-    // high level plan
-    meets(NavigationState.At requester);
-    contained_by(NavigationState.Moving my_go);
-    eq(my_go.target_lat, requester.lat);
-    eq(my_go.target_lon, requester.lon);
-    eq(my_go.depth, requester.depth);
-
-    // refinement in the actions
+NavActions::Go {
+    meets(object.owner.At dest);
+    contained_by(object.owner.Moving my_go);
+    my_go.target_lat == dest.lat;
+    my_go.target_lon == dest.lon;
+    my_go.depth == dest.depth;
+    
     met_by(Navigator.Idle idle);
-    if( idle.start <= AGENT_CLOCK ) {
+    equals(Navigator.Going obs_go);
+    obs_go.depth == dest.depth;
+    if( idle.start<=AGENT_CLOCK ) {
 	meets(Estimator.At requested);
 	requested.tolerance == 10.0;
 	requested.secs == 0;
-
-	equals(Navigator.Going go);
-	go.latitude == requested.latitude;
-	go.longitude == requested.longitude;
-	go.depth == requested.depth;
+	obs_go.latitude == requested.latitude;
+	obs_go.longitude == requested.longitude;
     }
 }
 
-SurveyController::Transit {
-    ends(NavigationState.At point);
-    contains(NavigationState.Moving go);
-    go.target_lat == point.lat;
-    go.target_lon == point.lon;
-    go.depth == point.depth;
-    go meets point;
+class Survey;
+
+class SurveyActions extends Timeline {
+    Survey          owner;
+    NavigationState ctrl;
+
+    predicate Transect {
+	float lat_from, lon_from;
+	float lat_to, lon_to;
+	float depth;
+	int   completion_point;
+	start >= MISSION_START;
+	start <= MISSION_END;
+	start <= completion_point;
+	completion_point <= end;
+    }
+
+    SurveyActions(Survey me, NavigationState c) {
+	owner = me;
+	ctrl = c;
+    }
 }
 
-SurveyController::Surveying {
-    met_by(Transit);
-    met_by(NavigationState.At initial);
+class Survey extends AgentTimeline {
+    SurveyActions ctrl;
+
+    predicate Transit {
+	float lat, lon;
+	float depth;
+	NavigationState controlled;
+    }
+
+    predicate DoTransect {
+	int since;
+	since >= MISSION_START;
+	since <= start;
+    }
+
+    predicate Transect {
+	float lat_from, lon_from;
+	float lat_to, lon_to;
+	float depth;
+    }
+
+    predicate LawnMower {
+	float lat_0, lon_0;
+	float lat_1, lon_1;
+	float lat_2, lon_2;
+	float lat_3, lon_3;
+	float depth;
+	int n_slices;
+	n_slices >= 2;
+    }
+
+    Survey(Mode mode, NavigationState c) {
+	super(mode);
+	ctrl = new SurveyActions(this, c);
+    }
+}
+
+SurveyActions::Transect {
+    met_by(object.owner.Transit transit);
+    transit.lat == lat_from;
+    transit.lon == lon_from;
+    transit.depth == depth;
+    transit.controlled == object.ctrl;
+
+    met_by(object.ctrl.At initial);
     initial.lat == lat_from;
     initial.lon == lon_from;
     initial.depth == depth;
     initial.requested == true;
-}
 
-SurveyController::Transect {
-    met_by(Surveying survey);
-    survey.lat_from == lat_from;
-    survey.lon_from == lon_from;
-    survey.depth == depth;
-    
-    float distance, speed, delta_t;
-    int estimated_duration;
-    distance == ll_distance(to_rad(lat_from), to_rad(lon_from),
-			    to_rad(lat_to), to_rad(lon_to));
-    // speed >= 0.5;
-    // speed <= 6.0;
+    starts(object.owner.DoTransect exec);
+    exec.end == completion_point;
+    exec.since == transit.start;
 
-    // delta_t * speed == distance * TICK_DURATION;
-    
-    // if( distance>30.0 )
-    // 	survey.duration >= floor(delta_t);
+    starts(object.ctrl.Moving transect);
+    transect.end == completion_point;
+    transect.target_lat == lat_to;
+    transect.target_lon == lon_to;
+    transect.depth == depth;
 
-    // Later I will have to put the extra details
-    starts(NavigationState.At dest);
+    ends(object.ctrl.At dest);
+    completion_point == dest.start;
     dest.lat == lat_to;
     dest.lon == lon_to;
     dest.depth == depth;
-    // may need a protection here ...
     dest.requested == true;
-    met_by(NavigationState.Moving go);
-    // go equals survey;
 }
 
+Survey::DoTransect {
+    met_by(Transit transit);
+    since == transit.start;
+}
+
+Survey::Transit {
+    starts(controlled.Moving my_go);
+    my_go.target_lat == lat;
+    my_go.target_lon == lon;
+    my_go.depth == depth;
+}
+
+Survey::Transect {
+    contained_by(object.ctrl.Transect transect);
+    met_by(DoTransect);
+    start == transect.completion_point;
+    transect.lat_from == lat_from;
+    transect.lon_from == lon_from;
+    transect.lat_to == lat_to;
+    transect.lon_to == lon_to;
+    transect.depth == depth;
+}
+
+Survey::LawnMower {
+    float fl_n, ratio;
+    float lat_0_2, lon_0_2, lat_1_3, lon_1_3;
+    fl_n == n_slices;
+    ratio * fl_n == fl_n - 1.0;
+    lat_0_2 == ratio * (lat_2 - lat_0);
+    lon_0_2 == ratio * (lon_2 - lon_0);
+    lat_1_3 == ratio * (lat_3 - lat_1);
+    lon_1_3 == ratio * (lon_3 - lon_1);
+
+    met_by(DoTransect exec);
+    
+    if( n_slices>=3 ) {
+	after(LawnMower pred);
+	pred.end == exec.since;
+	pred.n_slices == n_slices - 1;
+	pred.depth == depth;
+	pred.lat_0 == lat_1;
+	pred.lon_0 == lon_1;
+	pred.lat_1 == lat_0;
+	pred.lon_1 == lon_0;
+	pred.lat_2 == lat_1 + lat_1_3;
+	pred.lon_2 == lon_1 + lon_1_3;
+	pred.lat_3 == lat_0 + lat_0_2;
+	pred.lon_3 == lon_0 + lon_0_2;
+    } else {
+	after(Transect pred);
+	pred.end == exec.since;
+	pred.depth == depth;
+	pred.lat_from == lat_1;
+	pred.lon_from == lon_1;
+	pred.lat_to == lat_0;
+	pred.lon_to == lon_0;
+    }
+    
+    contained_by(object.ctrl.Transect transect);
+    transect starts exec;
+    start == transect.completion_point;
+    transect.lat_from == lat_2;
+    transect.lon_from == lon_2;
+    transect.lat_to == lat_3;
+    transect.lon_to == lon_3;
+    transect.depth == depth;
+}
 
 NavigationState nav = new NavigationState(Internal);
-SurveyController surveys = new SurveyController(Internal);
-
-Actions actions = new Actions();
+Survey surveys = new Survey(Internal, nav);
 
 Navigator navigator = new Navigator(Observe);
 Estimator estimator = new  Estimator(External);
-// OperationalLimits oplimits = new OperationalLimits(Observe);
-// EstimatedState estate = new EstimatedState(Observe);
 
 close();
-
-// rejectable(surveys.Transect transect);
-// transect.lat_from.specify(41.185279);
-// transect.lon_from.specify(-8.705758);
-// transect.lat_to.specify(41.185379);
-// transect.lon_to.specify(-8.705758);
-// transect.depth.specify(0);
-
-
-
-

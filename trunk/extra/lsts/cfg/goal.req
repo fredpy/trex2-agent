@@ -1,23 +1,38 @@
 <?xml version="1.0"?>
 
-<Goal on="surveys" pred="Transect">
+<Goal on="surveys" pred="LawnMower">
    <!-- Example of a date range. Dates are specified in the format
          YYYY-MMM-DD HH:MM:SS.mmm 
 	 and are always UTC -->
   <!-- Variable name="start">
     <date min="2011-Jul-10 10:00:00.500-05:00" max="2020-Jul-10 22:00:00.500" />
   </Variable -->
-  <Variable name="lat_from">
+  <Variable name="lat_0">
     <float min="41.185279" max="41.185279" />
   </Variable>
-  <Variable name="lon_from">
+  <Variable name="lon_0">
     <float min="-8.705758" max="-8.705758" />
   </Variable>
-  <Variable name="lat_to">
-    <float min="41.183279" max="41.183279" />
+  <Variable name="lat_1">
+    <float min="41.183779" max="41.183779" />
   </Variable>
-  <Variable name="lon_to">
+  <Variable name="lon_1">
     <float min="-8.705758" max="-8.705758" />
+  </Variable>
+  <Variable name="lat_2">
+    <float min="41.185279" max="41.185279" />
+  </Variable>
+  <Variable name="lon_2">
+    <float min="-8.704758" max="-8.704758" />
+  </Variable>
+  <Variable name="lat_3">
+    <float min="41.183779" max="41.183779" />
+  </Variable>
+  <Variable name="lon_3">
+    <float min="-8.704758" max="-8.704758" />
+  </Variable>
+  <Variable name="n_slices">
+    <int min="3" max="3"/>
   </Variable>
   <Variable name="depth">
     <float min="0" max="0"/>
