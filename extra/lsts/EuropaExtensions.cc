@@ -61,7 +61,7 @@ namespace {
 
       declareFunction(assembly, new TREX::LSTS::RadDegFunction());
       declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
-
+      declareFunction(assembly, new TREX::LSTS::InsideOpLimitsFunction());
     }
   };
 
@@ -182,10 +182,15 @@ void InsideOpLimits::handleExecute() {
 
     double d2limits =
         std::max(std::fabs(x) - 0.5 * s_oplimits->length, std::fabs(y) - 0.5 * s_oplimits->width);
+
+   // std::cerr << "d2limits: " << d2limits << "\n";
     inside = d2limits < 0;
   }
 
-  m_inside.intersect(inside, inside);
+  //s_oplimits->toText(std::cerr);
+  //std::cerr << "inside: " << inside << "\n";
+
+  m_inside.intersect(!!inside, !!inside);
 
   return;
 }

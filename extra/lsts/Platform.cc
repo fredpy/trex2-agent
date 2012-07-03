@@ -118,9 +118,15 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   provide("maneuver", false);
   provide("supervision", false); 		// declare the trex command timeline
 
+  IMC::LoggingControl startLog;
+  startLog.op = IMC::LoggingControl::COP_REQUEST_START;
+  startLog.name = "TREX";
+  sendMsg(startLog);
+
   IMC::CacheControl m;
   m.op = IMC::CacheControl::COP_LOAD;
   sendMsg(m);
+
 
   sleep(3);
 
@@ -302,7 +308,7 @@ Platform::handleRequest(goal_id const &g)
         speed_mps = 1.5;
       }
       if (duration == 0) {
-        if (WGS84::distance(lat, lon, 0, m_latitude, m_longitude, 0) < 10)
+        if (fabs(m_depth - dep_v) > 5 /* && WGS84::distance(lat, lon, 0, m_latitude, m_longitude, 0) < 10 */)
           sent_command = commandElevator(man_name, lat, lon, dep_v, speed_mps, timeout);
         else
           sent_command = commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout);
