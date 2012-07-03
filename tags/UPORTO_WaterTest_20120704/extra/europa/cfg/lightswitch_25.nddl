@@ -1,0 +1,106 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ * 
+ *  Copyright (c) 2011, MBARI.
+ *  All rights reserved.
+ * 
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the TREX Project nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+#include "TREX.nddl"
+
+class Light extends AgentTimeline {
+    predicate On {}
+    predicate Off {}
+
+    Light(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class Switch extends AgentTimeline {
+    predicate Up { bool foo; }
+    predicate Down { bool foo; }
+
+    Switch(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class LightSwitch extends Timeline {
+    Switch controlled;
+    
+    predicate turnOff { duration = 1; }
+    predicate turnOn { duration = 1; }
+
+    LightSwitch(Switch sw) {
+	controlled = sw;
+    }
+}
+
+class Luminance extends AgentTimeline {
+    predicate Bright {}
+    predicate Dim {}
+    
+    Luminance(Mode _mode) {
+	super(_mode, true);
+    }
+}
+
+
+LightSwitch::turnOn {
+    meets(object.controlled.Down);
+}
+
+LightSwitch::turnOff {
+    meets(object.controlled.Up);
+}
+
+Luminance::Bright {
+    met_by(LightSwitch.turnOn);
+}
+
+Luminance::Dim {
+    met_by(LightSwitch.turnOff);
+}
+
+Light::On {
+    contained_by(Switch.Down);
+    contained_by(Luminance.Bright);    
+}
+
+
+Light::Off {
+    contained_by(Luminance.Dim);
+}
+
+Switch::Up {
+    contained_by(Light.Off);
+    foo == false;
+}
+
+

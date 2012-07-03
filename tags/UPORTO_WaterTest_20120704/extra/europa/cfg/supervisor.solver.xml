@@ -1,0 +1,9 @@
+<Solver name="DefaultSupervisorSolver">
+  	<ThreatManager defaultPriority="10">
+    		<FlawHandler component="StandardThreatHandler"/>
+  	</ThreatManager>
+
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
+    		<FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+</Solver>
