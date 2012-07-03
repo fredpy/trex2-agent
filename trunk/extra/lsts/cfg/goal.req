@@ -23,13 +23,13 @@
     <float min="41.185279" max="41.185279" />
   </Variable>
   <Variable name="lon_2">
-    <float min="-8.704758" max="-8.704758" />
+    <float min="-8.706758" max="-8.706758" />
   </Variable>
   <Variable name="lat_3">
     <float min="41.183779" max="41.183779" />
   </Variable>
   <Variable name="lon_3">
-    <float min="-8.704758" max="-8.704758" />
+    <float min="-8.706758" max="-8.706758" />
   </Variable>
   <Variable name="n_slices">
     <int min="3" max="3"/>
