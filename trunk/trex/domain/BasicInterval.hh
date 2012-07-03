@@ -121,6 +121,10 @@ namespace TREX {
 
       virtual void parseLower(std::string const &val) =0;
       virtual void parseUpper(std::string const &val) =0;
+      virtual void parseSingleton(std::string const &val) =0;
+      std::ostream &print_singleton(std::ostream &out) const {
+	return print_lower(out);
+      }
       virtual std::ostream &print_lower(std::ostream &out) const =0;
       virtual std::ostream &print_upper(std::ostream &out) const =0;
       

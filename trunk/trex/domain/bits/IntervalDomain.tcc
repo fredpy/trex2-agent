@@ -170,6 +170,17 @@ bool IntervalDomain<Ty, Cmp>::equals(DomainBase const &other) const {
 
 
 // modifiers :
+
+template<typename Ty, class Cmp>
+void IntervalDomain<Ty, Cmp>::parseSingleton(std::string const &val) {
+  bound tmp = TREX::utils::string_cast<bound>(val);
+  if( tmp.isInfinity() )
+    throw EmptyDomain(*this, "trying to set domain to an infinity singleton.");
+  m_lower = tmp;
+  m_upper = tmp;
+}
+
+
 template<typename Ty, class Cmp>
 void IntervalDomain<Ty, Cmp>::parseLower(std::string const &val) {
   bound tmp = TREX::utils::string_cast<bound>(val);
