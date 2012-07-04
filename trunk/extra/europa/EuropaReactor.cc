@@ -65,7 +65,9 @@ namespace {
 
 EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false),
-   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")) {
+   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")),
+   m_old_plan_style(parse_attr<bool>(false, xml_factory::node(arg), 
+				     "relation_gv")) {
   bool found;
   std::string nddl;
 
@@ -656,7 +658,7 @@ EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
 void EuropaReactor::logPlan(std::string const &base_name) const {
   LogManager::path_type full_name = file_name(base_name+".gv");
   std::ofstream out(full_name.c_str());
-  print_plan(out/*, true*/);
+  print_plan(out, m_old_plan_style);
 }
 
 

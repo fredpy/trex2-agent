@@ -150,6 +150,8 @@ namespace TREX {
  * @relates TREX::europa::SynchronizationManager
  */
 # define TREX_SYNCH_MGR      TrexSynchronizer
+
+# define TREX_THREAT_HANDLER TrexThreatHandler
 /** @brief Priority of the synchronization manager 
  *
  * The priority given to europa for the synchronization flaws

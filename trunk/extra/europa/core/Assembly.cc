@@ -932,16 +932,19 @@ EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
 
 void Assembly::print_plan(std::ostream &out, bool expanded) const {
   EUROPA::TokenSet const tokens = plan_db()->getTokens();
-  is_not_merged filter(expanded);
+  is_not_merged filter(false);
+  std::set<EUROPA::eint> instants;
 
   out<<"digraph plan_"<<now()<<" {\n"
-  <<"  node[shape=\"box\"];\n\n";
+     <<"  node[shape=\"box\"];\n\n";
+  if( !expanded ) 
+    out<<"  graph[rankdir=\"LR\"];\n";
   boost::filter_iterator<is_not_merged, EUROPA::TokenSet::const_iterator>
   it(filter, tokens.begin(), tokens.end()),
   endi(filter, tokens.end(), tokens.end());
   // Iterate through plan tokens
   for( ; endi!=it; ++it) {
-    EUROPA::eint key = (*it)->getKey();
+    EUROPA::eint key = (*it)->getKey(); 
     // display the token as a node
     out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
        <<'('<<key<<") {\\n";
@@ -963,7 +966,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       // print all token attributes
       out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
     }
-    if( (*it)->isActive() && !expanded ) {
+    if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
       if( !merged.empty() ) {
         out<<"merged={";
@@ -1012,30 +1015,76 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       // connect the merged token to its active counterpart
       out<<"  t"<<key<<"->t"<<active<<"[color=grey];\n";
     }
-    EUROPA::TokenSet toks;
-    toks.insert(*it);
-    filter.merged(*it, toks);
-    // display the relation to the master token(s)
-    for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
-      EUROPA::TokenId master = (*t)->master();
-
-      if( master.isId() ) {
-        if( expanded )
-          key = (*t)->getKey();
-        out<<"  t"<<master->getKey()<<"->t"<<key
-           <<"[label=\""<<(*t)->getRelation().toString();
+    if( expanded ) {
+      EUROPA::TokenSet toks;
+      toks.insert(*it);
+      filter.merged(*it, toks);
+      // display the relation to the master token(s)
+      for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
+	EUROPA::TokenId master = (*t)->master();
+	
+	if( master.isId() ) {
+	  out<<"  t"<<master->getKey()<<"->t"<<key
+	     <<"[label=\""<<(*t)->getRelation().toString();
 #ifdef EUROPA_HAVE_EFFECT
-        if( is_effect(*t) )
-          out<<"\\n(effect)";
-        if( is_condition(*t) )
-          out<<"\\n(condition)";
+	  if( is_effect(*t) )
+	    out<<"\\n(effect)";
+	  if( is_condition(*t) )
+	    out<<"\\n(condition)";
 #endif // EUROPA_HAVE_EFFECT
-        out<<"\"";
-        if( (*it)!=(*t) )
-          out<<" color=grey";
-        out<<"];\n";
+	  out<<"\"";
+	  // if( (*it)!=(*t) )
+	  //   out<<" color=grey";
+	  out<<" constraint=false];\n";
+	}
+      }
+    } else {
+      EUROPA::eint lb, ub;
+      lb = (*it)->start()->lastDomain().getLowerBound();
+      // ub = (*it)->start()->lastDomain().getUpperBound();
+      
+      if( lb>std::numeric_limits<EUROPA::eint>::minus_infinity() ) {
+	if( instants.insert(lb).second ) 
+	  out<<"  \"i"<<lb<<"\"[shape=point, label=\""<<lb<<"\"];\n";
+	out<<"  \"i"<<lb<<"\"->t"<<(*it)->getKey()<<"[color=grey style=dashed weight=1000];\n";
+      }
+      // if( ub<std::numeric_limits<EUROPA::eint>::infinity() ) {
+      //   if( instants.insert(ub).second ) 
+      // 	out<<"  i"<<ub<<"[shape=point, label=\""<<ub<<"\"];\n";
+      //   out<<"  t"<<(*it)->getKey()<<"->i"<<ub"[weight=10.0];\n";
+      // }
+      
+      // lb = (*it)->start()->lastDomain().getLowerBound();
+      ub = (*it)->end()->lastDomain().getUpperBound();
+      
+      // if( lb>std::numeric_limits<EUROPA::eint>::minus_infinity() ) {
+      //   if( instants.insert(lb).second ) 
+      // 	out<<"  i"<<lb<<"[shape=point, label=\""<<lb<<"\"];\n";
+      //   out<<"  i"<<lb<<"->t"<<(*it)->getKey()<<"[weight=10.0];\n";
+      // }
+      if( ub<std::numeric_limits<EUROPA::eint>::infinity() ) {
+	if( instants.insert(ub).second ) 
+	  out<<"  \"i"<<ub<<"\"[shape=point, label=\""<<ub<<"\"];\n";
+	out<<"  t"<<(*it)->getKey()<<"->\"i"<<ub<<"\"[color=grey style=dashed weight=1000];\n";
       }
     }
+  }
+  if( !instants.empty() ) {
+    std::set<EUROPA::eint>::const_iterator i=instants.begin(); 
+    EUROPA::eint pred = *(i++);
+    EUROPA::eint max = 100+(*instants.rbegin())-pred;
+    out<<"  subgraph instants_cluster {\n"
+       <<"   node[shape=point];\n"
+       <<"   edge[color=none];\n"
+       <<"   \"i"<<pred<<"\"[label=\""<<pred<<"\"];\n";
+        
+    for(;instants.end()!=i; ++i) {
+      out<<"   \"i"<<pred<<"\"->\"i"<<(*i)<<"\"[weight=\""
+	 <<(max-((*i)-pred))<<"\"];\n";
+      pred = *i;
+      out<<"   \"i"<<pred<<"\"[label=\""<<pred<<"\"];\n";
+    }
+    out<<"  }\n";
   }
   out<<"}"<<std::endl;
 }

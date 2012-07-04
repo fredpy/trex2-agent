@@ -52,6 +52,7 @@
 
 #include <trex/europa/SynchronizationManager.hh>
 #include "private/CurrentState.hh"
+#include "private/TrexThreatDecisionPoint.hh"
 
 #include <PLASMA/CFunctions.hh>
 #include <PLASMA/DataTypes.hh>
@@ -124,6 +125,8 @@ namespace TREX {
 				 TREX_SYNCH_MGR);
       TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::details::CurrentState::DecisionPoint,
 				 TREX_SYNCH_HANDLER);
+      TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::TrexThreatDecisionPoint,
+				 TREX_THREAT_HANDLER)
 
       // The new flaw to be matched
       TREX_REGISTER_MATCH_FINDER(assembly, TREX::europa::details::UpdateMatchFinder, 
