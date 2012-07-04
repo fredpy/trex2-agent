@@ -37,6 +37,7 @@ add_library(TREXeuropa_core SHARED
   Assembly.cc
   core.cc
   CurrentState.cc
+  TrexThreatDecisionPoint.cc
   DeliberationFilter.cc
   europa_helpers.cc
   ModeConstraints.cc
