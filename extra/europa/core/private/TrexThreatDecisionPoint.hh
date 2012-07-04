@@ -26,7 +26,6 @@ namespace TREX {
       EUROPA::ConstrainedVariableId m_clock;
     }; // TREX::europa::TrexThreatDecisionPoint
 
-
   } // TREX::europa
 } // TREX
 
