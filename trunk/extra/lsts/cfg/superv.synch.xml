@@ -1,0 +1,28 @@
+<Solver name="SupervPlanCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+  <!-- resolve non goal first -->
+  <OpenConditionManager defaultPriority="20">
+    <FlawFilter class-match="NavigationState"/>
+    <FlawFilter class-match="Survey"/>
+    <FlawFilter class-match="NavActions"/>
+    <FlawFilter class-match="SurveyActions"/>
+    <FlawFilter component="goals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <OpenConditionManager defaultPriority="40">
+    <FlawFilter class-match="NavActions"/>
+    <FlawFilter class-match="SurveyActions"/>
+    <FlawFilter component="goals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <OpenConditionManager defaultPriority="100" >
+    <FlawFilter component="goals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+			
+</Solver>
