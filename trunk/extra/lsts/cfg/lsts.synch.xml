@@ -1,6 +1,6 @@
 <Solver name="LstsSynchCfg">
   <ThreatManager defaultPriority="10">
-    <FlawHandler component="StandardThreatHandler"/>
+    <FlawHandler component="TrexThreatHandler"/>
   </ThreatManager>
 
   <OpenConditionManager defaultPriority="100">

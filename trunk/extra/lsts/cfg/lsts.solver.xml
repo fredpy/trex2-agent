@@ -1,6 +1,6 @@
 <Solver name="LstsPlanCfg">
   <ThreatManager defaultPriority="10">
-    <FlawHandler component="StandardThreatHandler"/>
+    <FlawHandler component="TrexThreatHandler"/>
   </ThreatManager>
 
   <!-- resolve non goal first -->
