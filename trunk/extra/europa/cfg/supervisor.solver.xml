@@ -1,6 +1,6 @@
 <Solver name="DefaultSupervisorSolver">
   	<ThreatManager defaultPriority="10">
-    		<FlawHandler component="StandardThreatHandler"/>
+    		<FlawHandler component="TrexThreatHandler"/>
   	</ThreatManager>
 
   	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
