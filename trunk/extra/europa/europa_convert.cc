@@ -101,31 +101,42 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
       result.reset(new FloatDomain(t_lb, t_ub));
     }
   } else {
-    // It should be an enumerated domain 
     std::list<EUROPA::edouble> values;
     BasicEnumerated *tmp = NULL;
     
-    if( type->isString() ) {
-      // A bag of strings
-      tmp = new StringDomain();
-    } else if( type->isEntity() ) {
-      // A set of europa objects
+    if( type->isEntity() ) {
       tmp = new EuropaEntity();
-    } else if( type->isSymbolic() ) {
-      // A set of symbols/an enum
-      tmp = new EnumDomain();
+      result.reset(tmp);
+      dom.getValues(values);
+      for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
+	  values.end()!=i; ++i) {
+	std::string str = type->toString(*i);
+	// remove the (id) at the end
+	if( str[str.length()-1]==')' ) 
+	  str = str.substr(0, str.rfind('('));
+	tmp->addTextValue(str);
+      }
     } else {
-      // don't know what it is
-      throw EuropaException("Don't know how to convert Europa type "+
-			    type->getName().toString()+
-			    " to an equivalent TREX domain.");
+      // It should be an enumerated domain 
+      if( type->isString() ) {
+	// A bag of strings
+	tmp = new StringDomain();
+      } else if( type->isSymbolic() ) {
+	// A set of symbols/an enum
+	tmp = new EnumDomain();
+      } else {
+	// don't know what it is
+	throw EuropaException("Don't know how to convert Europa type "+
+			      type->getName().toString()+
+			      " to an equivalent TREX domain.");
+      }
+      // If I reached this point tmp should be an EnumeratedDomain
+      result.reset(tmp);
+      dom.getValues(values);
+      for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
+	  values.end()!=i; ++i) 
+	tmp->addTextValue(type->toString(*i));
     }
-    // If I reached this point tmp should be an EnumeratedDomain
-    result.reset(tmp);
-    dom.getValues(values);
-    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
-	values.end()!=i; ++i) 
-      tmp->addTextValue(type->toString(*i));
   }
   return result.release(); // release the resulting domain
 }
