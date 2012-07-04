@@ -1,6 +1,6 @@
 <Solver name="SupervPlanCfg">
   <ThreatManager defaultPriority="10">
-    <FlawHandler component="StandardThreatHandler"/>
+    <FlawHandler component="TrexThreatHandler"/>
   </ThreatManager>
 
   <!-- resolve non goal first -->
@@ -11,12 +11,14 @@
     <FlawFilter component="goals"/>
     <FlawHandler component="StandardOpenConditionHandler"/>
   </OpenConditionManager>
+
   <OpenConditionManager defaultPriority="40">
     <FlawFilter class-match="Estimator"/>
     <FlawFilter class-match="Navigator"/>
     <FlawFilter component="goals"/>
     <FlawHandler component="StandardOpenConditionHandler"/>
   </OpenConditionManager>
+
   <OpenConditionManager defaultPriority="100" component="EarliestFirst" >
     <FlawFilter component="goals"/>
     <FlawHandler component="StandardOpenConditionHandler"/>
