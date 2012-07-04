@@ -66,17 +66,24 @@ void TrexThreatDecisionPoint::handleInitialize() {
 	  continue;
 	}	
       }
+      debugMsg("trex:threat", "keeping choice ("<<i->second.first->getKey()<<"<"
+	       <<i->second.second->getKey()
+	       <<")\n\t- first from : "<<i->second.first->start()->lastDomain().toString()
+	       <<" to "<<i->second.first->end()->lastDomain().toString()
+	       <<")\n\t- second from : "<<i->second.second->start()->lastDomain().toString()
+	       <<" to "<<i->second.second->end()->lastDomain().toString());
       ++i;
     }
   } else {
     debugMsg("trex:threat", m_tokenToOrder->getKey()<<" start="
 	     <<m_tokenToOrder->start()->lastDomain().toString()
 	     <<" is before "<<now()<<"\n\tdo keep its options open.");
-    // Mayebe we should exclude all choices that do not put start 
+    // Maybe we should exclude all choices that do not put start 
     // in the past ? ... it should have been already done by the 
     // other guy
   }
   m_choiceCount = m_choices.size();
+  debugMsg("trex:threat", "Number of choices for "<<m_tokenToOrder->getKey()<<": "<<m_choiceCount);
 }
 
 // observers
