@@ -66,7 +66,7 @@ namespace {
 EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false),
    Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")),
-   m_old_plan_style(parse_attr<bool>(false, xml_factory::node(arg), 
+   m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
 				     "relation_gv")) {
   bool found;
   std::string nddl;
@@ -408,18 +408,19 @@ bool EuropaReactor::synch() {
 bool EuropaReactor::synchronize() {
   setStream();
   EuropaReactor &me = *this;
+  std::string stage = "synch";
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
   me.logPlan("tick");
-  BOOST_SCOPE_EXIT((&me)) {
+  BOOST_SCOPE_EXIT((&me)(&stage)) {
     me.synchronizer()->clear();
-    me.logPlan("synch");
+    me.logPlan(stage);
     debugMsg("trex:synch", "["<<me.now()<<"] END synchronization =======================================");
     debugMsg("trex:synch", "Plan after synchronization:\n"
              <<EUROPA::PlanDatabaseWriter::toString(me.plan_db()));
 //        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END;
 
-  tr_info("resolve state");
+  // tr_info("resolve state");
   if( !synch() ) {
     m_completed_this_tick = false;
     syslog(null, warn)<<"Failed to synchronize : relaxing current plan.";
@@ -435,10 +436,10 @@ bool EuropaReactor::synchronize() {
 
     // Prepare the reactor for next deliberation round 
     if( m_completed_this_tick ) {
-      tr_info("clean-up plan solver");
+      //tr_info("clean-up plan solver");
       planner()->clear(); // remove the past decisions of the planner
 
-      tr_info("remove completed requests");
+      //tr_info("remove completed requests");
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for( ; to!=from; ++from) {
 	EUROPA::TokenId cur = (*from)->previous();
@@ -448,16 +449,18 @@ bool EuropaReactor::synchronize() {
       m_completed_this_tick = false;
     } 
 #ifndef Europa_Archive_OLD
-    tr_info("archive");
+    //tr_info("archive");
     // Necessary in case the planner did not run on previous tick
-    if( planner()->getStepCount()==0 ) {
+    if( planner()->getStepCount()==0 ) {      
       stat_clock::time_point start = stat_clock::now();
+      logPlan(stage);
       archive();
+      stage = "archive";
       print_stats("archive", 0, 0, stat_clock::now()-start);
     }
 #endif 
   }
-  tr_info("end of synch");
+  // tr_info("end of synch");
   return constraint_engine()->propagate(); // should not fail
 }
 
