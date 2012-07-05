@@ -50,7 +50,17 @@ add_subdirectory(transaction)
 add_subdirectory(agent)
 
 # utility commands 
+include(CheckFunctionExists)
 
+check_function_exists(setpriority HAVE_SETPRIORITY)
+if(NOT HAVE_SETPRIORITY)
+  check_function_exists(nice HAVE_NICE)
+endif(NOT HAVE_SETPRIORITY)
+
+configure_file(cmds/nice_flags.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/nice_flags.h @ONLY)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(amc cmds/AMC.cc)
 target_link_libraries(amc TREXagent)
 add_dependencies(core amc)
