@@ -1090,6 +1090,8 @@ namespace TREX {
        */
       void getFuturePlan();
 
+      bool commit_externals();
+      
       /** @brief Execute synchronization solver
        *
        * This method execute all the basic steps for a simple synchronization.
