@@ -328,6 +328,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 		<<tok->getKey();
     if( request ) {
       m_dispatched.insert(goal_map::value_type(tok->getKey(), request));
+      setStream();
     } else
       return false;
   }
@@ -342,8 +343,10 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
     restrict_goal(my_goal, tok);
 
     goal_id request = postPlanToken(my_goal);
-    if( request )
+    if( request ) {
       m_plan_tokens.insert(goal_map::value_type(tok->getKey(), request));
+      setStream();
+    }
   }
   else {
     restrict_goal(*(m_plan_tokens.left.at(tok->getKey())),tok);
@@ -483,18 +486,23 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
 
 void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_dispatched.left.find(tok->getKey());
+  bool sent_cmd = false;
 
   if( m_dispatched.left.end()!=i ) {
     syslog(info)<<"Recall ["<<i->second<<"]";
     postRecall(i->second);
+    sent_cmd = true;
     m_dispatched.left.erase(i);
   }
 
   i = m_plan_tokens.left.find(tok->getKey());
   if( m_plan_tokens.left.end()!=i ) {
     cancelPlanToken(i->second);
+    sent_cmd = true;
     m_plan_tokens.left.erase(i);
   }
+  if( sent_cmd )
+    setStream();
 }
 
 bool EuropaReactor::hasWork() {
