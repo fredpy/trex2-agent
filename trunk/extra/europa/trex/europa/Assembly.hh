@@ -69,8 +69,8 @@ namespace TREX {
        * @relates CurrentState
        */
       struct CurrentStateId_id_traits {
-        typedef CurrentStateId     base_type;
-        typedef EUROPA::TimelineId id_type;
+        typedef CurrentStateId base_type;
+        typedef EUROPA::eint   id_type;
 
         /** @brief Key accessor
          *
