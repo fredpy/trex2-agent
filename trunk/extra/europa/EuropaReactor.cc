@@ -398,7 +398,12 @@ bool EuropaReactor::do_relax(bool full) {
 
 bool EuropaReactor::synch() {
   stat_clock::time_point start = stat_clock::now();
-  bool ret = do_synchronize();
+  bool ret = false;
+  if( commit_externals() ) {
+    logPlan("externals");
+    ret = do_synchronize();
+  }
+
   print_stats("synch", synchronizer()->getStepCount(), 
 	      synchronizer()->getDepth(), 
 	      stat_clock::now()-start);
