@@ -127,6 +127,10 @@ namespace TREX {
       std::string toString(EUROPA::EntityId const &entity) const;
       
     private:
+     bool betterThan(const EUROPA::EntityId& a, 
+		     const EUROPA::EntityId& b, 
+		     EUROPA::LabelStr& explanation);
+
       /** @brief Initialization
        *
        * Complete this handler initialization

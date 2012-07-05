@@ -99,6 +99,18 @@ EUROPA::IteratorId SynchronizationManager::createIterator() {
   return (new details::UpdateFlawIterator(*this))->getId();
 }
 
+bool SynchronizationManager::betterThan(const EUROPA::EntityId& a, 
+					const EUROPA::EntityId& b, 
+					EUROPA::LabelStr& explanation){
+  if( a.isId() && b.isId() ) {
+    details::CurrentStateId c_a(a), c_b(b);
+    explanation = "Lowest timeline key";
+    return c_a->timeline()->getKey()<c_b->timeline()->getKey();
+  } else {
+    explanation = "isNoId";
+    return b.isNoId();
+  } 
+}
 // observers
 
 std::string SynchronizationManager::toString(EUROPA::EntityId const &entity) const {
@@ -108,3 +120,5 @@ std::string SynchronizationManager::toString(EUROPA::EntityId const &entity) con
   oss<<"trex.STATE["<<update->now()<<"]: "<<update->timeline()->toString();
   return oss.str();
 }
+
+
