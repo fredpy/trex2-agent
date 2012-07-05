@@ -296,12 +296,27 @@ bool CurrentState::commit() {
       EUROPA::IntervalIntDomain 
 	future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
         dur(now()+1-start_time, std::numeric_limits<EUROPA::eint>::infinity());
+      EUROPA::TokenId active = m_last_obs;
 
-      debugMsg("trex:commit", "Extend duration of"<<timeline()->toString()<<'.'
-               <<m_last_obs->getUnqualifiedPredicateName().toString()
-	       <<'('<<m_last_obs->getKey()<<')');
-      restrict_base(m_last_obs, m_last_obs->end(), future);
-      restrict_base(m_last_obs, m_last_obs->duration(), dur);
+      if( m_last_obs->isMerged() ) 
+	active = m_last_obs->getActiveToken();
+      
+      if( active->end()->lastDomain().intersects(future) &&
+	  active->duration()->lastDomain().intersects(dur) ) {
+	debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
+		 <<m_last_obs->getUnqualifiedPredicateName().toString()
+		 <<'('<<m_last_obs->getKey()<<"):\n  BEFORE\n\tend="
+		 <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
+		 <<m_last_obs->duration()->baseDomain().toString()<<'\n');      
+	restrict_base(m_last_obs, m_last_obs->end(), future);
+	restrict_base(m_last_obs, m_last_obs->duration(), dur);
+	debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
+		 <<m_last_obs->getUnqualifiedPredicateName().toString()
+		 <<'('<<m_last_obs->getKey()<<"):\n  AFTER\n\tend="
+		 <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
+		 <<m_last_obs->duration()->baseDomain().toString()<<'\n');
+      } else 
+	return false;	
     }
     if( m_constraint.isId() ) {
       m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);

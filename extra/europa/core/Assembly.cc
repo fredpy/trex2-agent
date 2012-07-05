@@ -415,6 +415,17 @@ void Assembly::notify(details::CurrentState const &state) {
   }
 }
 
+bool Assembly::commit_externals() {
+  for(external_iterator i=begin_external(); end_external()!=i; ++i) {
+    if( !(*i)->commit() ) {
+      debugMsg("trex:always", "["<<now()<<"] failed to integrate state of external timeline "
+	       <<(*i)->timeline()->getName().toString());
+      return false;
+    }
+  }
+  return true;
+}
+
 bool Assembly::do_synchronize() {
   m_in_synchronization = true;
 
@@ -422,21 +433,10 @@ bool Assembly::do_synchronize() {
     m_in_synchronization = false;
   } BOOST_SCOPE_EXIT_END
 
-  // 1) apply external observations
-  for(external_iterator i=begin_external(); end_external()!=i; ++i) {
-    if( !(*i)->commit() ) {
-      debugMsg("trex:synch", "Failed to integrate external state of "<<(*i)->timeline()->toString());
-      return false;
-    }
-  }
-
-  // 2) execute synchronizer
   if( !synchronizer()->solve() ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
     return false;
-  }
-
-  // 3) apply internal observations
+  } 
   for(internal_iterator i=begin_internal(); end_internal()!=i; ++i)
     (*i)->commit(); // It was consistent from synchronizer => never fail
 
@@ -1032,10 +1032,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
 	  if( is_condition(*t) )
 	    out<<"\\n(condition)";
 #endif // EUROPA_HAVE_EFFECT
-	  out<<"\"";
-	  // if( (*it)!=(*t) )
+	  out<<"\"];\n";
+ 	  // if( (*it)!=(*t) )
 	  //   out<<" color=grey";
-	  out<<" constraint=false];\n";
 	}
       }
     } else {
