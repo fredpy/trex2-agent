@@ -53,7 +53,7 @@ details::UpdateFlawIterator::UpdateFlawIterator(SynchronizationManager &manager)
   :EUROPA::SOLVERS::FlawIterator(manager), 
    m_it(manager.m_assembly->begin(), manager.m_assembly->end()),
    m_assembly(*(manager.m_assembly)){
-  advance();
+  // advance();
 }
 
 // modifiers
