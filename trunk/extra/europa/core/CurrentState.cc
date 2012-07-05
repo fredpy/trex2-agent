@@ -315,8 +315,12 @@ bool CurrentState::commit() {
 		 <<'('<<m_last_obs->getKey()<<"):\n  AFTER\n\tend="
 		 <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
 		 <<m_last_obs->duration()->baseDomain().toString()<<'\n');
-      } else 
+      } else { 
+	debugMsg("trex:always", "["<<now()<<"] Failed to extend external observation "
+		 <<timeline()->toString()<<"."<<m_last_obs->getUnqualifiedPredicateName().toString()
+		 <<'('<<m_last_obs->getKey()<<").");
 	return false;	
+      }
     }
     if( m_constraint.isId() ) {
       m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);

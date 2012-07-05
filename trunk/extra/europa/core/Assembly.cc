@@ -128,10 +128,10 @@ namespace {
 
 // statics
 
-EUROPA::TimelineId details::CurrentStateId_id_traits::get_id(details::CurrentStateId const &cs) {
+EUROPA::eint details::CurrentStateId_id_traits::get_id(details::CurrentStateId const &cs) {
   if( cs.isId() )
-    return cs->timeline();
-  return EUROPA::TimelineId::noId();
+    return cs->timeline()->getKey();
+  return std::numeric_limits<EUROPA::eint>::minus_infinity();
 }
 
 
@@ -251,7 +251,7 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
   EUROPA::ObjectId obj(tl);
 
   if( internal(obj) || external(obj) ) {
-    if( m_agent_timelines.find(tl)==m_agent_timelines.end() ) {
+    if( m_agent_timelines.find(tl->getKey())==m_agent_timelines.end() ) {
       details::CurrentStateId state = (new details::CurrentState(*this, tl))->getId();
       bool tl_internal = internal(obj);
 
@@ -778,7 +778,7 @@ EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj,
                                   bool &undefined) {
   if( !external(obj) )
     throw EuropaException(obj->toString()+"is not an External timeline");
-  state_iterator handler = m_agent_timelines.find(EUROPA::TimelineId(obj));
+  state_iterator handler = m_agent_timelines.find(obj->getKey());
 
   undefined = false;
 
