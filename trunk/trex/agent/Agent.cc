@@ -738,7 +738,7 @@ void Agent::initComplete() {
   LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   std::ofstream dotf(graph_dot.c_str());
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
-  m_stat_log<<"tick, synch_ns, delib_ns, steps"<<std::endl;
+  m_stat_log<<"tick, synch_ns, delib_ns, steps, sleep_ns, sleeps"<<std::endl;
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
@@ -863,10 +863,11 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
-  size_t count = 0;
+  size_t count = 0, slp_count = 0;
   bool completed = false;
   stat_clock::time_point start_delib = stat_clock::now();
-  stat_duration delib;
+  stat_duration delib, sleep_time;
+  bool print_delib = true;
 
   try {  
     while( m_clock->tick()==getCurrentTick()
@@ -877,8 +878,16 @@ bool Agent::doNext() {
     completed = true;
     delib = stat_clock::now()-start_delib;
       
-    while( valid() && m_clock->tick()==getCurrentTick() )
+    m_stat_log<<", "<<delib.count()<<", "<<count<<", "<<std::flush;
+    print_delib = false;
+    
+    
+    rt_clock::time_point start_sleep = rt_clock::now();
+    while( valid() && m_clock->tick()==getCurrentTick() ) {
       m_clock->sleep();
+      ++slp_count;
+    }
+    sleep_time = rt_clock::now()-start_sleep;
 
     if( valid() )
       updateTick(m_clock->tick());
@@ -888,7 +897,9 @@ bool Agent::doNext() {
     if( !completed )
       delib = stat_clock::now()-start_delib;
   } 
-  m_stat_log<<", "<<delib.count()<<", "<<count<<std::endl;
+  if( print_delib )
+    m_stat_log<<", "<<delib.count()<<", "<<count<<", ";
+  m_stat_log<<sleep_time.count()<<", "<<slp_count<<std::endl;
 
   return valid();
 }

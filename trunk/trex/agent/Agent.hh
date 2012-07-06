@@ -496,6 +496,7 @@ namespace TREX {
       typedef boost::chrono::process_user_cpu_clock stat_clock;
 # endif  
       typedef stat_clock::duration stat_duration;
+      typedef boost::chrono::steady_clock  rt_clock;
 
       std::ofstream m_stat_log;
 
