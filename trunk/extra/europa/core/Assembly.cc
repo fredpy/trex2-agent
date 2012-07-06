@@ -472,8 +472,9 @@ bool Assembly::relax(bool aggressive) {
   debugMsg("trex:relax", "["<<now()<<"] =================== START "<<relax_name<<" =================");
   // Clean up decisions made by solvers
   debugMsg("trex:relax", "Cancelling current decisions");
-  synchronizer()->reset();
-  planner()->reset();
+  // We can just clear them as we just goinfg to do the cleaning ourselve
+  synchronizer()->clear();
+  planner()->clear();
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
