@@ -168,7 +168,8 @@ namespace TREX {
       void print_stats(std::string const &what, size_t steps, size_t depth,
 		       stat_clock::duration const &dur);
       std::ofstream m_stats;
-      bool m_old_plan_style;
+      bool m_old_plan_style, m_full_log;
+      mutable size_t m_plan_counter;
     }; // TREX::europa::EuropaReactor
 
   } // TREX::europa
