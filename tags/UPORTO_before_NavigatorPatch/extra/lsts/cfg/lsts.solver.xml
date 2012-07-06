@@ -1,0 +1,17 @@
+<Solver name="LstsPlanCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+  <!-- resolve non goal first -->
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <!-- then resolve new goals -->
+  <OpenConditionManager defaultPriority="2500">
+    <FlawFilter component="notGoals"/>
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+</Solver>

@@ -1,0 +1,27 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+#include "navigator.nddl"
+#include "estimator.nddl"
+
+VehicleState::Boot {
+	contained_by(VehicleCommand.Idle);
+}
+
+VehicleState::Exec {
+	contains(VehicleCommand.Maneuver);
+	met_by(VehicleState.Ready); 
+}
+
+VehicleCommand::Maneuver {
+	
+    met_by(VehicleState.Ready); 
+   	
+	contained_by (OperationalLimits.Limits limits);
+    depth 	<= 	limits.maxDepth;
+    depth 	>= 	limits.minDepth;
+    speed 	<= 	limits.maxSpeed;
+    speed 	>= 	limits.minSpeed;
+    
+    // sane == sane_pos(latitude, longitude, depth);
+    // sane == true;
+}

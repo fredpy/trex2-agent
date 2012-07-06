@@ -1,0 +1,104 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+
+//place here all the Observations from the Platform reactor
+
+class ManType {
+	int id;
+	
+	Mantype(int type) {
+		id = type;
+	}
+}  
+
+ManType goto = new ManType(0);
+ManType loiter = new ManType(1);
+ManType skeeping = new ManType(2);
+ManType idle = new ManType(3);
+ManType teleop = new ManType(4);
+
+class EstimatedState extends AgentTimeline {
+
+	EstimatedState(Mode _mode) {
+		super(_mode, "Boot");
+	};
+	
+	predicate Boot {};
+	
+	predicate Position {
+		float latitude;
+		float longitude;
+		float depth;
+		float uncertainty;
+		
+		uncertainty >= 0.0;
+	};
+};
+
+class VehicleState extends AgentTimeline {
+	predicate Exec  {};
+	predicate Ready {};
+	predicate Boot  {};
+	predicate Error {};
+		
+	VehicleState(Mode _mode) {
+		super(_mode, "Boot");
+	}
+};
+
+class OperationalLimits extends AgentTimeline {
+
+	OperationalLimits(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+
+	predicate Limits {
+		float minDepth;
+		float maxDepth;
+		float minAltitude;
+		float maxAltitude;		
+		float minSpeed;
+		float maxSpeed;
+		
+		maxDepth >= minDepth; 
+		maxSpeed >= minSpeed;
+		maxAltitude >= minAltitude;		
+	};
+};
+	
+class VehicleCommand extends AgentTimeline {
+	
+	VehicleCommand(Mode _mode) {
+		super(_mode, "Idle");
+	}
+	
+	predicate Idle {};
+	
+	predicate Maneuver {
+		
+		//ManType type;
+		float latitude;
+		float longitude;
+		float depth;
+		float speed;		
+		int secs;
+		int eta;
+		bool sane;
+				
+		secs >= 0;					
+	};
+};
+
+
+class TrexSupervision extends AgentTimeline {
+
+	TrexSupervision(Mode _mode) {
+		super(_mode, "Blocked");
+	}
+	
+	predicate Blocked {};
+	predicate Active  {};
+}
+

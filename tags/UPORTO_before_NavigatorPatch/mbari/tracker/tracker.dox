@@ -1,0 +1,19 @@
+/* -*- C++ -*- */
+/** @defgroup tracker Shore-side assets tracking
+ *
+ * The code used to implement our shore side tracker reactor.
+ * This reactor 
+ * 
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup mbari
+ */
+/** @defgroup amqp AMQP server connection utilities
+ *
+ * Utilities to connect and gather messages from an AMQP server.
+ * This module contains a generic (yet incompltete) implementation 
+ * for an amqp client. This allow to gather assets updates from our 
+ * server such as sensor data or vehicles position.
+ * 
+ * @author Frederic Py <fpy@mbari.org> 
+ * @ingroup tracker 
+ */

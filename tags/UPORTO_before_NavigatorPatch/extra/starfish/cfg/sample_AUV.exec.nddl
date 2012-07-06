@@ -1,0 +1,16 @@
+#include "TREX.nddl"
+#include "declaration.nddl"
+#include "declaration.auv.nddl"
+#include "rule.auv.nddl"
+
+//Internal Timeline of TaskOfficer
+PathController pcc = new PathController(Private);
+Path pc = new Path(Internal);
+
+// External Timelines - all part of the VCS
+VehicleState vehicleState = new VehicleState(Observe);
+WayPoint wp = new WayPoint(External);
+
+
+close();
+
