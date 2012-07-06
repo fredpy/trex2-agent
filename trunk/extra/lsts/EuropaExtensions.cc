@@ -109,6 +109,14 @@ LatLonDist::LatLonDist(EUROPA::LabelStr const &name,
 void LatLonDist::handleExecute() {
   double lat1, lon1, lat2, lon2;
 
+  if( m_dist.isSingleton() ) {
+    // While generally incomplete this approach avoid to
+    // compute the same distance other and other again ... and 
+    // it should work as long as nobody constraints dist 
+    // otherwise
+    return; 
+  }
+
   if (m_lat1.isSingleton())
     lat1 = cast_basis(m_lat1.getSingletonValue());
   else
