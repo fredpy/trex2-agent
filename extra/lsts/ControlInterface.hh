@@ -215,6 +215,7 @@ namespace TREX {
       typedef boost::bimap<std::string, TREX::transaction::goal_id> goal_map; 
       goal_map m_goals;
       
+      bool m_need_fifo;
       /** @brief fifo pipe file descriptor
        *
        * The file descriptor of the fifo pipe this reactor listen to or 
