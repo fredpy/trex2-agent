@@ -56,8 +56,8 @@ Navigator::Staying {
 
 Navigator::Going {
     ends(NavigationState.Moving go);
-    latitude == to_rad(go.target_lat);
-    longitude == to_rad(go.target_lon);
+    latitude == go.target_lat;
+    longitude == go.target_lon;
     depth == go.depth;
 }
 
@@ -83,8 +83,8 @@ NavActions::Go {
 	meets(Estimator.At requested);
 	requested.tolerance == 10.0;
 	requested.secs == 0;
-	obs_go.latitude == requested.latitude;
-	obs_go.longitude == requested.longitude;
+	obs_go.latitude == requested.lat_deg;
+	obs_go.longitude == requested.lon_deg;
     }
 }
 

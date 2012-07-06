@@ -25,3 +25,44 @@ VehicleCommand::Maneuver {
     // sane == sane_pos(latitude, longitude, depth);
     // sane == true;
 }
+
+TrexSupervision::Active {
+    vehicle == object.vehicle;
+}
+
+// rule that enables the maneuver dispatch
+
+ManeuverController::Maneuver {
+    starts_during(OperationalLimits.Limits lim);
+    depth <= lim.maxDepth;
+    lim.minDepth <= depth;
+    speed <= lim.maxSpeed;
+    lim.maxSpeed <= speed;
+
+    contained_by(TrexSupervision.Active free);
+    VehicleCommand cmd;
+    cmd == free.vehicle;
+    met_by(VehicleState.Ready);
+    contained_by(VehicleState.Exec);    
+
+    // Wait free to be started so we do not spam 
+    // Platform when Blocked 
+    if( free.start < AGENT_CLOCK ) {
+	
+	equals(cmd.Maneuver request);
+	request.latitude == lat_rad;
+	request.longitude == lon_rad;
+	request.depth == depth;
+	request.speed == speed;
+	request.secs == secs;
+
+    }
+
+    tolerance <= 10.0; // hard coded to 10. m for now 
+
+    if( end <= AGENT_CLOCK ) {
+	meets(EstimatedState.Position pos);
+	ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude) <= tolerance;
+	// if it fails replanning should be able to correct it
+    }
+}

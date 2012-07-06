@@ -10,8 +10,8 @@ VehicleState::Boot {
 Estimator::At {
 
 	met_by(Navigator.Going g);
-	    g.latitude == latitude;
-	    g.longitude == longitude;
+	    g.latitude == lat_deg;
+	    g.longitude == lon_deg;
 	    g.depth == depth;
 	    g.secs == secs;
 }
