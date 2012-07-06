@@ -53,14 +53,16 @@ SharedVar<size_t> ControlInterface::s_id;
 
 // structors 
 
-ControlInterface::ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg, false), m_running(false), m_fifo(0)
-{
+ControlInterface::ControlInterface(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg, false), m_running(false),
+ m_need_fifo(utils::parse_attr<bool>(false, 
+				     TeleoReactor::xml_factory::node(arg), 
+				     "local_queue")),
+ m_fifo(0) {
   use("estimator", true, true);
   use("navigator", true, true);
 
   m_env->setControlInterfaceReactor(this);
-
 }
 
 ControlInterface::~ControlInterface() {
@@ -92,7 +94,6 @@ bool ControlInterface::is_open() const {
   return 0<m_fifo;
 }
 
-
 // manipulators
 
 void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> const &id) {
@@ -105,7 +106,7 @@ void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> c
 
       boost::tie(pos, inserted) = m_goals.insert(goal_map::value_type(*id, g));
       if( !inserted ) {
-        syslog(null, warn)<<"Hiding previous goal with id \""
+        syslog(warn)<<"New goal hiding previous goal with id \""
             <<*id<<'\"';
         m_goals.erase(pos);
         m_goals.insert(goal_map::value_type(*id, g));
@@ -166,22 +167,22 @@ void ControlInterface::create_fifo() {
 
   if( 0==fid ) {
     std::string queue_name = fifo_name();
-    syslog(null, info)<<"Creating fifo pipe \""<<queue_name<<"\" ...";
+    syslog(info)<<"Creating fifo pipe \""<<queue_name<<"\" ...";
     int ret = mkfifo(queue_name.c_str(), S_IWUSR|S_IWGRP|S_IRUSR|S_IRGRP);
 
     if( 0!=ret ) {
       if( EEXIST==errno ) {
-        syslog(null, warn)<<"A file with this name did already exist !!!"
+        syslog(warn)<<"A file with this name did already exist !!!"
             <<"\n\tI'll assume it is a unix pipe.";
       } else {
-        syslog(null, error)<<"Failed to create fifo";
+        syslog(error)<<"Failed to create fifo";
         throw TREX::utils::ErrnoExcept("mkfifo("+queue_name+")");
       }
     }
-    syslog(null, info)<<"Opening the pipe...";
+    syslog(info)<<"Opening the pipe...";
     fid = open(queue_name.c_str(), O_RDONLY|O_NONBLOCK);
     if( fid<0 ) {
-      syslog(null, error)<<"Failed to open fifo";
+      syslog(error)<<"Failed to open fifo";
       throw TREX::utils::ErrnoExcept("open("+queue_name+")");
     } else { // critical section
       scoped_lock cs(m_mutex);
@@ -244,14 +245,14 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
 void ControlInterface::proccess_message(std::string const &msg) {  
   // First log the message
   std::string msg_id = log_message(msg);
-  syslog(null, info)<<"Received message "<<msg_id;
+  syslog(info)<<"Received message "<<msg_id;
 
   boost::property_tree::ptree xml_tree;
   try {
     std::istringstream is(msg);
     read_xml(is, xml_tree, xml::no_comments|xml::trim_whitespace);
   } catch(xml::xml_parser_error const &e) {
-    syslog(null, warn)<<"Xml error while parsing "<<msg_id<<":\n\t"
+    syslog(warn)<<"Xml error while parsing "<<msg_id<<":\n\t"
         <<e.what();
     return;
   }
@@ -267,7 +268,7 @@ void ControlInterface::proccess_message(std::string const &msg) {
       add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
-      syslog(null, warn)<<"Exception while building new goal: "<<e;
+      syslog(warn)<<"Exception while building new goal: "<<e;
     }
   }
 
@@ -277,11 +278,11 @@ void ControlInterface::proccess_message(std::string const &msg) {
       add_recall(TREX::utils::parse_attr<std::string>(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
-      syslog(null, warn)<<"Exception while building recall: "<<e;
+      syslog(warn)<<"Exception while building recall: "<<e;
     }
   }
   if( !had_cmd )
-    syslog(null, warn)<<"No valid Goal or Recall found.";
+    syslog(warn)<<"No valid Goal or Recall found.";
 }
 
 void ControlInterface::stop() {
@@ -293,9 +294,11 @@ void ControlInterface::stop() {
 
 void ControlInterface::handleInit() {
   // Create the new fifo queue
-  create_fifo();
-  // spawn my listener thread
-  m_thread.reset(new boost::thread(thread_proxy(this)));
+  if( m_need_fifo ) {
+    create_fifo();
+    // spawn my listener thread
+    m_thread.reset(new boost::thread(thread_proxy(this)));
+  }
   Platform::setControlInterface(this);
 }
 
@@ -339,7 +342,7 @@ bool ControlInterface::synchronize() {
 
 void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 {
-  syslog(null, info) << "new plan token: " << *t;
+  syslog(info) << "new plan token: " << *t;
 
   Platform *r = m_env->getPlatformReactor();
   if (NULL != r )
@@ -352,7 +355,7 @@ void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 
 void ControlInterface::cancelledPlanToken(TREX::transaction::goal_id const &t)
 {
-  syslog(null, info) << "token has been canceled: " << *t;
+  syslog(info) << "token has been canceled: " << *t;
 
   Platform *r = m_env->getPlatformReactor();
   if (NULL != r)
@@ -387,18 +390,18 @@ void ControlInterface::run() {
 
       // check if any data received
       if( !msg.empty() ) {
-        syslog(null, info)<<"Received "<<msg.size()<<" bytes.";
+        syslog(info)<<"Received "<<msg.size()<<" bytes.";
         proccess_message(msg);
       }
       // sleep a little
       boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
   } catch(TREX::utils::Exception const &te) {
-    syslog(null, error)<<"In fifo listener thread: "<<te;
+    syslog(error)<<"In fifo listener thread: "<<te;
   } catch(std::exception const &se) {
-    syslog(null, error)<<"In fifo listener thread: "<<se.what();
+    syslog(error)<<"In fifo listener thread: "<<se.what();
   } catch(...) {
-    syslog(null, error)<<"In fifo listener thread: Unknown exception caught";
+    syslog(error)<<"In fifo listener thread: Unknown exception caught";
   }
   { // critical section : ensure that running is false
     scoped_lock cs(m_mutex);
