@@ -408,7 +408,7 @@ bool EuropaReactor::synch() {
   stat_clock::time_point start = stat_clock::now();
   bool ret = false;
   if( commit_externals() ) {
-    logPlan("externals");
+    // logPlan("externals");
     ret = do_synchronize();
   }
 
@@ -423,7 +423,7 @@ bool EuropaReactor::synchronize() {
   EuropaReactor &me = *this;
   std::string stage = "synch";
   debugMsg("trex:synch", "["<<now()<<"] BEGIN synchronization =====================================");
-  me.logPlan("tick");
+  // me.logPlan("tick");
   BOOST_SCOPE_EXIT((&me)(&stage)) {
     me.synchronizer()->clear();
     me.logPlan(stage);
