@@ -54,18 +54,23 @@ void TrexThreatDecisionPoint::handleInitialize() {
 	    }
 	  }
 	} 
-      } else {
-	// m_tokenToOrder is inserted after i->second.first 
-	// check that i->second.first ends after now()
-	if( i->second.first->end()->lastDomain().getUpperBound()<now() ) {
-	  debugMsg("trex:threat", "remove ("<<i->second.first->getKey()<<"<*"
-		   <<m_tokenToOrder->getKey()<<"*)\n\tthe former end="
-		   <<i->second.second->end()->lastDomain().toString()
-		   <<" is before "<<now());
-	  i = m_choices.erase(i);
-	  continue;
-	}	
-      }
+      } /* 
+	   This code is no good ... need to tinker it but for now 
+	   we disable it
+	   
+	   else {
+	   // m_tokenToOrder is inserted after i->second.first 
+	   // check that i->second.first ends after now()
+	   if( i->second.first->end()->lastDomain().getUpperBound()<now() ) {
+	   debugMsg("trex:threat", "remove ("<<i->second.first->getKey()<<"<*"
+	   <<m_tokenToOrder->getKey()<<"*)\n\tthe former end="
+	   <<i->second.second->end()->lastDomain().toString()
+	   <<" is before "<<now());
+	   i = m_choices.erase(i);
+	   continue;
+	   }	
+	   }
+	*/
       debugMsg("trex:threat", "keeping choice ("<<i->second.first->getKey()<<"<"
 	       <<i->second.second->getKey()
 	       <<")\n\t- first from : "<<i->second.first->start()->lastDomain().toString()

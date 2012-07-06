@@ -640,6 +640,10 @@ void Assembly::archive() {
 
 	  ++deleted;
 	}
+      } else {
+	debugMsg("trex:archive", "Cannot commit "<<tok->getPredicateName().toString()
+		 <<'('<<tok->getKey()<<") as its master "<<master->getPredicateName().toString()
+		 <<'('<<master->getKey()<<") is not terminated yet.");
       }
     }
   }
