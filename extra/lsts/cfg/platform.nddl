@@ -67,8 +67,11 @@ class OperationalLimits extends AgentTimeline {
 		maxAltitude >= minAltitude;		
 	};
 };
+
 	
 class VehicleCommand extends AgentTimeline {
+
+    
 	
 	VehicleCommand(Mode _mode) {
 		super(_mode, "Idle");
@@ -94,11 +97,34 @@ class VehicleCommand extends AgentTimeline {
 
 class TrexSupervision extends AgentTimeline {
 
-	TrexSupervision(Mode _mode) {
-		super(_mode, "Blocked");
-	}
-	
-	predicate Blocked {};
-	predicate Active  {};
+    VehicleCommand vehicle;
+
+    TrexSupervision(Mode _mode, VehicleCommand me) {
+	super(_mode, "Blocked");
+	vehicle = me;
+    }
+    
+    predicate Blocked {};
+    predicate Active  { 
+	VehicleCommand vehicle;
+    };
 }
+
+class ManeuverController extends Timeline {
+    predicate Maneuver {
+	float lat_deg, lat_rad;
+	float lon_deg, lon_rad;
+	float depth;
+	float speed;		
+	int secs;
+
+	float tolerance;
+
+	secs >= 0;
+	speed > 0.0;
+	// need to rename this constraint ...
+	deg_to_rad(lat_rad, lat_deg);
+	deg_to_rad(lon_rad, lon_deg);
+    }
+};
 
