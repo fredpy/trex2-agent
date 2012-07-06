@@ -58,13 +58,13 @@ message(STATUS "${PROJECT_NAME} VERSION = ${VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent executive")
 set(CPACK_PACKAGE_VENDOR "TREX2 development team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
-set(CPACK_GENERATOR TGZ)
+set(CPACK_GENERATOR "TGZ" CACHE STRING "Packaging method for binary")
 set(
 CPACK_SOURCE_PACKAGE_FILE_NAME
 "${CMAKE_PROJECT_NAME}-${VERSION}"
 CACHE INTERNAL "tarball basename"
 )
-set(CPACK_SOURCE_GENERATOR TGZ)
+set(CPACK_SOURCE_GENERATOR "TGZ" CACHE STRING "Packaging method for source")
 # The following components are regex's to match anywhere (unless anchored)
 # in absolute path + filename to find files or directories to be excluded
 # from source tarball.
