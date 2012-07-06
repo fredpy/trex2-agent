@@ -67,13 +67,20 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false),
    Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
-				     "relation_gv")) {
+				     "relation_gv")),
+   m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
+			       "all_plans")) {
   bool found;
   std::string nddl;
+
 
   boost::property_tree::ptree::value_type &cfg = xml_factory::node(arg);
   boost::optional<std::string>
     model = parse_attr< boost::optional<std::string> >(cfg, "model");
+
+  if( m_full_log )
+    syslog(warn)<<"I will log all my plans as they are produced."
+		<<"\n\tThis can be very costful in term of disk space.";
 
   // Load the specified model
   if( model ) {
@@ -290,6 +297,7 @@ void EuropaReactor::handleInit() {
 
 void EuropaReactor::handleTickStart() {
   setStream();
+  m_plan_counter = 0;
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
@@ -570,9 +578,13 @@ void EuropaReactor::resume() {
 
   if( constraint_engine()->pending() )
     constraint_engine()->propagate();
+  size_t nsteps = planner()->getStepCount();
 
-  if( constraint_engine()->constraintConsistent() )
+  if( constraint_engine()->constraintConsistent() ) {
     planner()->step();
+    if( m_full_log && planner()->getStepCount()>nsteps )
+      logPlan("step");
+  }
 
   bool should_relax = false;
 
@@ -672,9 +684,24 @@ EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
 }
 
 void EuropaReactor::logPlan(std::string const &base_name) const {
-  LogManager::path_type full_name = file_name(base_name+".gv");
-  std::ofstream out(full_name.c_str());
+  std::string name;
+
+  if( m_full_log ) {
+    std::ostringstream oss;
+    oss<<"tick."<<now()<<"/"<<(m_plan_counter++)<<'.'<<base_name;
+    name = oss.str();    
+  } else 
+    name = base_name;
+  
+  LogManager::path_type full_name = file_name(name+".gv");
+  std::ofstream out(full_name.c_str());  
   print_plan(out, m_old_plan_style);
+  if( m_full_log ) {
+    LogManager::path_type link_name = file_name(base_name+".gv");
+    if( exists(link_name) ) 
+      remove(link_name);
+    create_symlink(full_name, link_name);
+  }
 }
 
 
