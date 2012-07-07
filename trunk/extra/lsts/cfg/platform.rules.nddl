@@ -7,24 +7,33 @@ VehicleState::Boot {
 	contained_by(VehicleCommand.Idle);
 }
 
-VehicleState::Exec {
-	contains(VehicleCommand.Maneuver);
-	met_by(VehicleState.Ready); 
-}
+/*
+ * superfluous now :
+ *
+ * It is all checked by our controller ... as long as nobody uses 
+ * VheicleCommand directly we do not need these extra rules
+ */ 
+// VehicleState::Exec {
+// 	contains(VehicleCommand.Maneuver);
+// 	met_by(VehicleState.Ready); 
+// }
 
-VehicleCommand::Maneuver {
+// VehicleCommand::Maneuver {
 	
-    met_by(VehicleState.Ready); 
+//     met_by(VehicleState.Ready); 
    	
-	contained_by (OperationalLimits.Limits limits);
-    depth 	<= 	limits.maxDepth;
-    depth 	>= 	limits.minDepth;
-    speed 	<= 	limits.maxSpeed;
-    speed 	>= 	limits.minSpeed;
+// 	contained_by (OperationalLimits.Limits limits);
+//     depth 	<= 	limits.maxDepth;
+//     depth 	>= 	limits.minDepth;
+//     speed 	<= 	limits.maxSpeed;
+//     speed 	>= 	limits.minSpeed;
     
-    // sane == sane_pos(latitude, longitude, depth);
-    // sane == true;
-}
+//     // sane == sane_pos(latitude, longitude, depth);
+//     // sane == true;
+// }
+/*
+ * end of superfuous
+ */
 
 TrexSupervision::Active {
     vehicle == object.vehicle;
@@ -42,12 +51,15 @@ ManeuverController::Maneuver {
     contained_by(TrexSupervision.Active free);
     VehicleCommand cmd;
     cmd == free.vehicle;
-    met_by(VehicleState.Ready);
+    met_by(VehicleState.Ready ready);
     contained_by(VehicleState.Exec);    
+    
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
-    if( free.start < AGENT_CLOCK ) {
+    // Apparently the commands doers not goes though 
+    // if I am not ready (?!!)
+    if( free.start <= AGENT_CLOCK && ready.start<=AGENT_CLOCK ) {
 	
 	equals(cmd.Maneuver request);
 	request.latitude == lat_rad;
