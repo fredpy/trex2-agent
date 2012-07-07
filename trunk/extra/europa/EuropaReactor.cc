@@ -705,3 +705,14 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
 }
 
 
+size_t EuropaReactor::look_ahead(EUROPA::LabelStr const &name) {
+  if( isInternal(name.toString()) )
+    return getLookAhead();
+  else {
+    TeleoReactor::external_iterator pos = find_external(name.toString());
+    if( ext_end()==pos || !( pos.active() && (*pos)->accept_goals() ) )
+      return 0;
+    else 
+      return (*pos)->look_ahead();
+  }
+}

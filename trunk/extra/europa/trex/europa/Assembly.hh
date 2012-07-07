@@ -402,7 +402,9 @@ namespace TREX {
        * @sa is_agent_timeline(EUROPA::ObjectId const &) const
        */
       bool external(EUROPA::ObjectId const &obj) const;
-      /** @brief Check if ignored
+
+      size_t look_ahead(EUROPA::ObjectId const &obj);
+      /** @Brief Check if ignored
        * @param[in] tok A token
        *
        * Checks if the token @p tok does necessarily belong to an
@@ -809,6 +811,7 @@ namespace TREX {
        * @sa is_internal(EUROPA::LabelStr const &) const
        */
       virtual bool is_external(EUROPA::LabelStr const &name) const =0;
+      virtual size_t look_ahead(EUROPA::LabelStr const &name) =0;
 
       /** @brief New internal state notification
        *
