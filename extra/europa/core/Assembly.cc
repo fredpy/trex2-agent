@@ -702,7 +702,7 @@ void Assembly::archive() {
 	    EUROPA::ObjectId obj = dom.makeObjectList().front();
 	    state_iterator i = m_agent_timelines.find(obj->getKey());
 	    if( m_agent_timelines.end()!=i ) {
-	      protect = (*i)->external() && 0==look_ahead(obj);
+	      protect = !((*i)->external() && 0==look_ahead(obj));
 	    }	 
 	  }
 	  if( protect ) {
