@@ -126,6 +126,7 @@ namespace TREX {
       bool is_external(EUROPA::LabelStr const &name) const {
 	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
+      size_t look_ahead(EUROPA::LabelStr const &name); 
 
       bool do_relax(bool full);
       bool synch();

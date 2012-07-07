@@ -695,10 +695,22 @@ void Assembly::archive() {
 	    can_delete = false;
 	  }
         } else {
-	  debugMsg("trex:archive", "Cannot delete "<<
-		   tok->getPredicateName().toString()<<'('<<tok->getKey()
-		   <<") as one of its slave is not completed");
-          can_delete = false;
+	  bool protect = true;
+ 	  if( (*t)->start()->lastDomain().getUpperBound()<now() 
+	      && (*t)->isMerged() ) {
+	    EUROPA::ObjectDomain const &dom = (*t)->getObject()->lastDomain();
+	    EUROPA::ObjectId obj = dom.makeObjectList().front();
+	    state_iterator i = m_agent_timelines.find(obj->getKey());
+	    if( m_agent_timelines.end()!=i ) {
+	      protect = (*i)->external() && 0==look_ahead(obj);
+	    }	 
+	  }
+	  if( protect ) {
+	    debugMsg("trex:archive", "Cannot delete "<<
+		     tok->getPredicateName().toString()<<'('<<tok->getKey()
+		     <<") as one of its slave is not completed");
+	    can_delete = false;
+	  }
 	}
       }
     }
@@ -894,6 +906,13 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
 bool Assembly::external(EUROPA::ObjectId const &obj) const {
   return is_agent_timeline(obj) && is_external(obj->getName());
 }
+
+size_t Assembly::look_ahead(EUROPA::ObjectId const &obj) {
+  if( !is_agent_timeline(obj) )
+    return 0;
+  return look_ahead(obj->getName());
+}
+
 
 bool Assembly::ignored(EUROPA::TokenId const &tok) const {
   EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
