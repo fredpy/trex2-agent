@@ -13,15 +13,18 @@ VehicleState::Boot {
     contained_by(Navigator.Idle);
 }
 
-
 Navigator::Going {
-    starts_during(TrexSupervision.Active);
-    contains(ManeuverController.Maneuver command);
-    command.lat_deg == latitude;
-    command.lon_deg == longitude;
-    command.depth == depth;
-    command.speed == speed;
-    command.secs == secs;
-    command.end == end;
+  contained_by(TrexSupervision.Active);
+}
+
+ManeuverController::Maneuver {
+    ends(Navigator.Going go);
+    go.start <= start;
+
+    lat_deg == go.latitude;
+    lon_deg == go.longitude;
+    depth == go.depth;
+    speed == go.speed;
+    secs == go.secs;
 }
 

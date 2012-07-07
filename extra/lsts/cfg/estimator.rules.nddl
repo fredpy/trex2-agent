@@ -8,11 +8,13 @@ VehicleState::Boot {
 }
 
 Estimator::At {
-
-	met_by(Navigator.Going g);
-	    g.latitude == lat_deg;
-	    g.longitude == lon_deg;
-	    g.depth == depth;
-	    g.secs == secs;
+    met_by(ManeuverController.Maneuver maneuver);
+    maneuver.lat_deg == lat_deg;
+    maneuver.lon_deg == lon_deg;
+    maneuver.lat_rad == latitude;
+    maneuver.lon_rad == longitude;
+    maneuver.depth == depth;
+    maneuver.secs == secs;
+    maneuver.tolerance <= tolerance;
 }
 
