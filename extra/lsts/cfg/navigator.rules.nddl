@@ -13,8 +13,14 @@ VehicleState::Boot {
     contained_by(Navigator.Idle);
 }
 
-Navigator::Going {
-  contained_by(TrexSupervision.Active);
+// Navigator::Going {
+//   contained_by(TrexSupervision.Active);
+// }
+
+TrexSupervision::Blocked {
+    // better then above as it will allow some cleaning 
+    // during archiving
+    contained_by(Navigator.Idle);
 }
 
 ManeuverController::Maneuver {
