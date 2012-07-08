@@ -696,19 +696,26 @@ void Assembly::archive() {
 	  }
         } else {
 	  bool protect = true;
- 	  if( (*t)->start()->lastDomain().getUpperBound()<now() 
-	      && (*t)->isMerged() ) {
-	    EUROPA::ObjectDomain const &dom = (*t)->getObject()->lastDomain();
-	    EUROPA::ObjectId obj = dom.makeObjectList().front();
-	    state_iterator i = m_agent_timelines.find(obj->getKey());
-	    if( m_agent_timelines.end()!=i ) {
-	      protect = !((*i)->external() && 0==look_ahead(obj));
-	    }	 
+	  if( (*t)->isMerged() ) {
+	    EUROPA::TokenId active = (*t)->getActiveToken();
+	    
+	    if( active->start()->lastDomain().getUpperBound()<now() ) {
+	      EUROPA::ObjectDomain const &dom = active->getObject()->lastDomain();
+	      EUROPA::ObjectId obj = dom.makeObjectList().front();
+	    
+	      debugMsg("trex:archive", "Checking if object "<<obj->toString()
+		       <<" of slave "<<(*t)->getKey()<<" is only an Observe timeline.");
+
+	      state_iterator i = m_agent_timelines.find(obj->getKey());
+	      if( m_agent_timelines.end()!=i ) {
+		protect = !((*i)->external() && 0==look_ahead(obj));
+	      } 
+	    }
 	  }
 	  if( protect ) {
 	    debugMsg("trex:archive", "Cannot delete "<<
 		     tok->getPredicateName().toString()<<'('<<tok->getKey()
-		     <<") as one of its slave is not completed");
+		     <<") as one of its slave ("<<(*t)->getKey()<<") is not completed");
 	    can_delete = false;
 	  }
 	}
@@ -1272,7 +1279,7 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   m_owner.m_goals.erase(token);
 
   if( m_owner.is_agent_timeline(token) ) {
-    debugMsg("trex:archive", "cancel "<<token->getPredicateName().toString()
+    debugMsg("trex:token", "cancel "<<token->getPredicateName().toString()
 	     <<'('<<token->getKey()<<')');
     m_owner.cancel(token);
   }
