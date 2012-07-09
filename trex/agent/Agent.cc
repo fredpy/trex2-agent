@@ -623,6 +623,14 @@ void Agent::subConf(boost::property_tree::ptree &conf,
   if( path.empty() ) {
     // On the root we need to load plug-ins before the clock 
     // so we are bacward compatible
+    
+    // Look for Use directives
+    boost::tie(i, last) = conf.equal_range("Use");
+    for(; last!=i; ++i) {
+      bool found;
+      manager().use(parse_attr<std::string>(*i, "file"), found);
+    }
+
 
     // Looks for plug-ins at this level
     boost::tie(i, last) = conf.equal_range("Plugin");
