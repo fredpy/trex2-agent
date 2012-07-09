@@ -45,14 +45,14 @@
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup europa
  */
-#include "trex/europa/Assembly.hh"
-#include "trex/europa/DeliberationFilter.hh"
-#include "trex/europa/ModeConstraints.hh"
-#include "trex/europa/TimeConstraints.hh"
-
+#include <trex/europa/Assembly.hh>
+#include <trex/europa/DeliberationFilter.hh>
+#include <trex/europa/ModeConstraints.hh>
+#include <trex/europa/TimeConstraints.hh>
 #include <trex/europa/SynchronizationManager.hh>
+#include <trex/europa/TrexThreatDecisionPoint.hh>
+
 #include "private/CurrentState.hh"
-#include "private/TrexThreatDecisionPoint.hh"
 
 #include <PLASMA/CFunctions.hh>
 #include <PLASMA/DataTypes.hh>

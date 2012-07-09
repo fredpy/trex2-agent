@@ -56,6 +56,7 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/ReactorPropagator.hh
   ../trex/europa/SynchronizationManager.hh
   ../trex/europa/TimeConstraints.hh
+  ../trex/europa/TrexThreatDecisionPoint.hh
 )
 
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXutils 
