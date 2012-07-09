@@ -73,7 +73,7 @@ ManeuverController::Maneuver {
 
     }
 
-    tolerance <= 10.0; // hard coded to 10. m for now 
+    //tolerance <= 10.0; // hard coded to 10. m for now 
 
     if( end <= AGENT_CLOCK ) {
 	meets(EstimatedState.Position pos);

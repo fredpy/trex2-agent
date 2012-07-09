@@ -80,6 +80,7 @@ namespace TREX {
       bool sendMsg(Message& msg, std::string ip, int port);
       bool sendMsg(Message& msg, Address &dest);
 //      bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
+      TREX::transaction::Observation maneuverObservation(IMC::Message * man);
       IMC::Message * getManeuverCommand(const std::string &man_name, IMC::Message * maneuver);
 
       IMC::Message * gotoCommand(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout);
@@ -156,7 +157,7 @@ namespace TREX {
       std::map<uint16_t, IMC::Message *> aggregate;
       IMC::VehicleCommand lastCommand;
 
-      IMC::Message * commandToBePosted;
+      IMC::Message * commandToBePosted, * postedCommand;
 
       void setValue(bool val);
 
