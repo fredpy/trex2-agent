@@ -297,11 +297,16 @@ MaxConstraint::MaxConstraint(EUROPA::LabelStr const &name,
 
 void MaxConstraint::handleExecute() {
   EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
-  EUROPA::edouble lb, ub;
+  EUROPA::edouble lb, ub, cur_max;
+  cur_max = result.getUpperBound();
+  
   for(int i=1; i<m_variables.size(); ++i) {
-    EUROPA::Domain const &arg = getCurrentDomain(m_variables[i]);
+    EUROPA::Domain &arg = getCurrentDomain(m_variables[i]);
     EUROPA::edouble ilb, iub;
     arg.getBounds(ilb, iub);
+    arg.intersect(ilb, cur_max);
+    if( arg.isEmpty() )
+      return;
     if( 1==i ) {
       lb = ilb;
       ub = iub;
@@ -328,11 +333,16 @@ MinConstraint::MinConstraint(EUROPA::LabelStr const &name,
 
 void MinConstraint::handleExecute() {
   EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
-  EUROPA::edouble lb, ub;
+  EUROPA::edouble lb, ub, cur_min;
+  cur_min = result.getLowerBound();
+
   for(int i=1; i<m_variables.size(); ++i) {
-    EUROPA::Domain const &arg = getCurrentDomain(m_variables[i]);
+    EUROPA::Domain &arg = getCurrentDomain(m_variables[i]);
     EUROPA::edouble ilb, iub;
     arg.getBounds(ilb, iub);
+    arg.intersect(cur_min, iub);
+    if( arg.isEmpty() )
+      return;
     if( 1==i ) {
       lb = ilb;
       ub = iub;
