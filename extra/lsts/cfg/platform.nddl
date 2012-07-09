@@ -118,6 +118,7 @@ class ManeuverController extends Timeline {
 	float speed;		
 	int secs;
 
+	float requested_tolerance;
 	float tolerance;
 
 	secs >= 0;

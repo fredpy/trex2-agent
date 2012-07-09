@@ -60,8 +60,6 @@ ManeuverController::Maneuver {
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
-    // Apparently the commands doers not goes though 
-    // if I am not ready (?!!)
     if( free.start <= AGENT_CLOCK ) {
 	
 	equals(cmd.Maneuver request);
@@ -72,6 +70,13 @@ ManeuverController::Maneuver {
 	request.secs == secs;
 
     }
+
+    // Instead of rejecting the goal I will silently select
+    // a more realistic tolerance
+    float min_tolerance;
+    min_tolerance <= speed*6.0;
+    tolerance == max(min_tolerance, requested_tolerance);
+    
 
     //tolerance <= 10.0; // hard coded to 10. m for now 
 
