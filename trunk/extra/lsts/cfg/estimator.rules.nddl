@@ -15,6 +15,6 @@ Estimator::At {
     maneuver.lon_rad == longitude;
     maneuver.depth == depth;
     maneuver.secs == secs;
-    maneuver.tolerance <= tolerance;
+    maneuver.requested_tolerance <= tolerance;
 }
 
