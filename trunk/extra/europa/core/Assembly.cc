@@ -1317,14 +1317,14 @@ void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyRejected(EUROPA::TokenId const &token) {
-  debugMsg("trex:always", "["<<now()<<"] Token "
+  debugMsg("trex:always", "["<<m_owner.now()<<"] Token "
 	   <<token->getPredicateName().toString()<<'('
 	   <<token->getKey()<<") is rejected.");
   m_owner.rejected(token);
 }
 
 void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
-  debugMsg("trex:always", "["<<now()<<"] Token "
+  debugMsg("trex:always", "["<<m_owner.now()<<"] Token "
 	   <<token->getPredicateName().toString()<<'('
 	   <<token->getKey()<<") is no longer rejected.");
 }
