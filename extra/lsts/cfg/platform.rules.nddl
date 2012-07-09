@@ -48,18 +48,21 @@ ManeuverController::Maneuver {
     speed <= lim.maxSpeed;
     lim.maxSpeed <= speed;
 
-    contained_by(TrexSupervision.Active free);
+    starts_during(TrexSupervision.Active free);
     VehicleCommand cmd;
     cmd == free.vehicle;
     met_by(VehicleState.Ready ready);
     contained_by(VehicleState.Exec);    
     
+    int earliest_start;
+    
+    earliest_start == max(free.start, ready.start);
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
     // Apparently the commands doers not goes though 
     // if I am not ready (?!!)
-    if( free.start <= AGENT_CLOCK && ready.start<=AGENT_CLOCK ) {
+    if( earliest_start <= AGENT_CLOCK ) {
 	
 	equals(cmd.Maneuver request);
 	request.latitude == lat_rad;
