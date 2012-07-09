@@ -123,7 +123,7 @@ EUROPA::TokenId TREX::europa::details::parent_token(EUROPA::ConstrainedVariableI
 std::ostream &TREX::europa::details::var_print(std::ostream &out, EUROPA::ConstrainedVariableId const &var) {
   EUROPA::TokenId tok = parent_token(var);
   if( tok.isId() )
-    out<<tok->getName().toString()<<'('<<tok->getKey()<<").";
+    out<<tok->getPredicateName().toString()<<'('<<tok->getKey()<<").";
   return out<<var->getName().toString()<<'('<<var->getKey()<<')';
 }
 
