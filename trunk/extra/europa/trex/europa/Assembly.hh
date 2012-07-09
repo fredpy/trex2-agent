@@ -834,21 +834,32 @@ namespace TREX {
       /** @brief Token destruction notification
        * @param[in] tok A token
        *
-       * A callback that notifies the reactor that the token @p tok. Is now marked as
-       * completed in the past.
+       * A callback that notifies the reactor that the token @p
+       * tok. Is now marked as completed in the past.
        *
        * @retval true @p tok was part of the reactor requested goals
        * @retval false @p tok is not known by the reactor
        */
       virtual bool discard(EUROPA::TokenId const &tok) { return false; }
-      /** @brief Token cancleation notification
+      /** @brief Token cancelation notification
        * @param[in] tok A token
        *
        * A callback that notifies the reactor that the token @p tok has been
-       * canceled from the plan. If @p tok had be dispatched it is then the
+       * cancelled from the plan. If @p tok had be dispatched it is then the
        * responsibility of the reactor to recall it.
        */
       virtual void cancel(EUROPA::TokenId const &tok) {}
+
+      /* @brief Goal rejection notfication 
+       *
+       * @param[in] tok A token
+       *
+       * A callback that notifies that the token @p tok is currently
+       * rejected. For now the only interrest of this is to indicate
+       * through a message that the corresponding trex request has
+       * been rejected it may do more in the future.
+       */
+      virtual void rejected(EUROPA::TokenId const &tok) {}
       /** @brief New Internal plan future
        *
        * @param[in] tl An Internal timeline
