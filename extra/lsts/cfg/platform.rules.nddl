@@ -54,15 +54,15 @@ ManeuverController::Maneuver {
     met_by(VehicleState.Ready ready);
     contained_by(VehicleState.Exec);    
     
-    int earliest_start;
+    //int earliest_start;
     
-    earliest_start == max(free.start, ready.start);
+    //earliest_start == max(free.start, ready.start);
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
     // Apparently the commands doers not goes though 
     // if I am not ready (?!!)
-    if( earliest_start <= AGENT_CLOCK ) {
+    if( free.start <= AGENT_CLOCK ) {
 	
 	equals(cmd.Maneuver request);
 	request.latitude == lat_rad;

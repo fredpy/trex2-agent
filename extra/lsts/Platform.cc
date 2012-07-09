@@ -53,20 +53,18 @@ namespace TREX
 
 } // TREX
 
-std::map<uint16_t, IMC::Message *> received;
-std::map<uint16_t, IMC::Message *> aggregate;
-IMC::VehicleCommand lastCommand;
 bool estate_posted = false, oplimits_posted = false, was_idle = false, supervision_posted = false;
 int last_vstate = -1;
 int remote_id = 0;
 bool supervision_blocked = false;
-
+std::string current_goal, next_goal;
 ControlInterface * Platform::controlInterfaceInstance = 0;
 
+
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                      TeleoReactor(arg, false), m_active_proxy(NULL),
-                      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
-                      sent_command(NULL), m_blocked(false)
+                              TeleoReactor(arg, false), m_active_proxy(NULL),
+                              m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
+                              sent_command(NULL), m_blocked(false), commandToBePosted(NULL)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -111,12 +109,12 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
 
   syslog(info) << "listening on port " << localport << "...";
 
-  provide("estate", false); 		// declare the state command timeline
-  provide("vstate", false); 		// declare the state command timeline
-  provide("command"); 			// declare the command timeline
-  provide("oplimits", false); 	// declare the oplimits timeline
-  provide("maneuver", false);
-  provide("supervision", false); 		// declare the trex command timeline
+  provide("estate", false); 		  // declare the state command timeline
+  provide("vstate", false); 		  // declare the vstate command timeline
+  provide("command"); 			      // declare the command timeline
+  provide("oplimits", false); 	  // declare the oplimits timeline
+  provide("maneuver", false);     // declare the maneuver timeline
+  provide("supervision", false);  // declare the supervision timeline
 
   IMC::LoggingControl startLog;
   startLog.op = IMC::LoggingControl::COP_REQUEST_START;
@@ -127,9 +125,38 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   m.op = IMC::CacheControl::COP_LOAD;
   sendMsg(m);
 
-
   sleep(3);
 
+}
+
+void Platform::handleTickStart()
+{
+  // if vehicle is idle and has a new maneuver...
+  // post it
+  if (m_blocked)
+    return;
+
+  if (commandToBePosted != NULL)
+  {
+    IMC::VehicleState * msg =
+        dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
+
+    if (msg != NULL && msg->op_mode == IMC::VehicleState::VS_SERVICE)
+    {
+      if (sendMsg(*commandToBePosted)) {
+        reportToDune("Maneuver dispatched");
+        syslog(warn) << "Dispatched maneuver:";
+        commandToBePosted->toText(syslog(warn));
+        delete commandToBePosted;
+        commandToBePosted = NULL;
+        current_goal = next_goal;
+        next_goal = "";
+      }
+      else {
+        syslog(error) << "Unable to send message";
+      }
+    }
+  }
 }
 
 Platform::~Platform()
@@ -183,35 +210,35 @@ Platform::synchronize()
 
       if (msg->getId() == IMC::TrexCommand::getIdStatic())
 
-      if (msg->getId() == IMC::TrexCommand::getIdStatic())
-      {
-        IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
-
-        switch (command->command)
+        if (msg->getId() == IMC::TrexCommand::getIdStatic())
         {
-          case IMC::TrexCommand::OP_POST_GOAL:
-            syslog(info) << "received (" << command->goalid << "): " << command->goalxml;
-            if (controlInterfaceInstance) {
-              controlInterfaceInstance->proccess_message(command->goalxml);
-            }
-            break;
-          case IMC::TrexCommand::OP_ENABLE:
-            syslog(warn) << "Enable TREX command received";
-            // post active observation ...
-            postObservation(Observation("supervision", "Active"), true);
-            reportToDune("Activate TREX command received");
-            m_blocked = false;
+          IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
 
-            break;
-          case IMC::TrexCommand::OP_DISABLE:
-            syslog(warn) << "Disable TREX command received";
-            // post blocked observation ...
-            postObservation(Observation("supervision", "Blocked"), true);
-            reportToDune("Disable TREX command received");
-            m_blocked = true;
-            break;
+          switch (command->command)
+          {
+            case IMC::TrexCommand::OP_POST_GOAL:
+              syslog(info) << "received (" << command->goalid << "): " << command->goalxml;
+              if (controlInterfaceInstance) {
+                controlInterfaceInstance->proccess_message(command->goalxml);
+              }
+              break;
+            case IMC::TrexCommand::OP_ENABLE:
+              syslog(warn) << "Enable TREX command received";
+              // post active observation ...
+              postObservation(Observation("supervision", "Active"), true);
+              reportToDune("Activate TREX command received");
+              m_blocked = false;
+
+              break;
+            case IMC::TrexCommand::OP_DISABLE:
+              syslog(warn) << "Disable TREX command received";
+              // post blocked observation ...
+              postObservation(Observation("supervision", "Blocked"), true);
+              reportToDune("Disable TREX command received");
+              m_blocked = true;
+              break;
+          }
         }
-      }
 
       if (msg->getId() == IMC::Abort::getIdStatic())
       {
@@ -252,12 +279,12 @@ Platform::synchronize()
   return true;
 }
 
-
-goal_id current_goal;
-
 void
 Platform::handleRequest(goal_id const &g)
 {
+
+
+
   Goal * goal = g.get();
 
   std::string gname = (goal->object()).str();
@@ -270,11 +297,11 @@ Platform::handleRequest(goal_id const &g)
   man_name = ss.str();
 
   if (gname.compare("command") == 0 && gpred.compare("Idle") == 0) {
-    commandIdle(man_name);
+    commandToBePosted = idleCommand(man_name);
     return;
   }
 
-  if (gname.compare("command") == 0 && gpred.compare("Maneuver") == 0)
+  if (gname.compare("command") == 0 && gpred.compare("Maneuver") == 0 && commandToBePosted == NULL)
   {
     boost::optional<long long> timeout;
 
@@ -307,26 +334,27 @@ Platform::handleRequest(goal_id const &g)
         //FIXME
         speed_mps = 1.5;
       }
-      if (duration == 0) {
-        if (fabs(m_depth - dep_v) > 5 /* && WGS84::distance(lat, lon, 0, m_latitude, m_longitude, 0) < 10 */)
-          sent_command = commandElevator(man_name, lat, lon, dep_v, speed_mps, timeout);
-        else
-          sent_command = commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout);
-      }
+      if (duration == 0)
+        commandToBePosted = gotoCommand(man_name, lat, lon, dep_v, speed_mps, timeout);
       else if (secs.domain().isSingleton())
       {
         long long dur = secs.domain().getTypedSingleton<long long, true>();
+        //sent_command.reset(commandLoiter(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur));
+        //sent_command.reset(commandStationKeeping(man_name, lat, lon, speed_mps, (int)dur));
+        //sent_command.reset(commandElevator(man_name, lat, lon, dep_v, speed_mps, timeout));
+        //sent_command.reset(commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout));
         if (dep_v > 0)
-          sent_command = commandLoiter(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur);
+          commandToBePosted = loiterCommand(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur);
+
         else
-          sent_command = commandStationKeeping(man_name, lat, lon, speed_mps, (int)dur);
+          commandToBePosted = skeepingCommand(man_name, lat, lon, speed_mps, (int)dur);
       }
 
       Observation obs = Observation(*goal);
       obs.restrictAttribute("speed", FloatDomain(speed_mps));
       obs.restrictAttribute("eta", IntegerDomain(0, IntegerDomain::plus_inf));
 
-      current_goal = g;
+      next_goal = g.get()->object().str();
     }
     else {
       syslog(error) << "variables are not singletons!\n";
@@ -339,9 +367,19 @@ Platform::handleRecall(goal_id const &g)
 {
   syslog(warn) << "handleRecall(" << current_goal << ")";
 
-  if (current_goal == g)
-    commandIdle("TREX recalled maneuver execution");
-
+  if (current_goal == g.get()->object().str())
+  {
+    IMC::Message * cmd = idleCommand("TREX recalled maneuver execution");
+    sendMsg(*cmd);
+    delete cmd;
+  }
+  else if (next_goal == g.get()->object().str())
+  {
+    IMC::Message * copy = commandToBePosted;
+    next_goal = g.get()->object().str();
+    delete commandToBePosted;
+    commandToBePosted = NULL;
+  }
 }
 
 void
@@ -659,33 +697,18 @@ Platform::sendMsg(Message& msg)
   return sendMsg(msg, duneip, duneport);
 }
 
-bool Platform::commandManeuver(const std::string &man_name, IMC::Message * maneuver) {
-  IMC::PlanControl pcontrol;
+IMC::Message * Platform::getManeuverCommand(const std::string &man_name, IMC::Message * maneuver)
+{
+  IMC::PlanControl * pcontrol = new IMC::PlanControl();
 
-  pcontrol.arg.set(maneuver);
-  pcontrol.info = "Maneuver initiated from TREX";
-  pcontrol.op = IMC::PlanControl::PC_START;
-  pcontrol.type = IMC::PlanControl::PC_REQUEST;
-  pcontrol.plan_id = man_name;
-  pcontrol.flags = 0;
+  pcontrol->arg.set(maneuver);
+  pcontrol->info = "Maneuver initiated from TREX";
+  pcontrol->op = IMC::PlanControl::PC_START;
+  pcontrol->type = IMC::PlanControl::PC_REQUEST;
+  pcontrol->plan_id = man_name;
+  pcontrol->flags = 0;
 
-
-
-  if (debug)
-  {
-    std::ostringstream oss;
-    pcontrol.toText(oss);
-    pcontrol.toText(std::cout);
-    syslog("DEBUG") << "Sent command: " << oss.str();
-  }
-
-  if (m_blocked)
-  {
-    syslog(error) << "Maneuver not start because TREX is currently blocked";
-    return false;
-  }
-
-  return sendMsg(pcontrol);
+  return pcontrol;
 }
 
 bool Platform::reportToDune(int type, const std::string &message)
@@ -714,10 +737,9 @@ bool Platform::reportErrorToDune(const std::string &message)
 }
 
 IMC::Message *
-Platform::commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout)
+Platform::gotoCommand(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout)
 {
   IMC::Goto * msg = new IMC::Goto();
-  IMC::Message * ret;
 
   msg->lat = lat;
   msg->lon = lon;
@@ -736,19 +758,14 @@ Platform::commandGoto(const std::string &man_name, double lat, double lon, doubl
 
   if (timeout)
     msg->timeout = *timeout;
-  ret = msg->clone();
 
-  if (commandManeuver(man_name, msg))
-    return ret;
-  else
-    return NULL;
+  return getManeuverCommand(man_name, msg);
 }
 
 IMC::Message *
-Platform::commandElevator(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout)
+Platform::elevatorCommand(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout)
 {
   IMC::Elevator * msg = new IMC::Elevator();
-  IMC::Message * ret;
 
   msg->lat = lat;
   msg->lon = lon;
@@ -770,20 +787,15 @@ Platform::commandElevator(const std::string &man_name, double lat, double lon, d
 
   if (timeout)
     msg->timeout = *timeout;
-  ret = msg->clone();
 
-  if (commandManeuver(man_name, msg))
-    return ret;
-  else
-    return NULL;
+  return getManeuverCommand(man_name, msg);
 }
 
 IMC::Message *
-Platform::commandStationKeeping(const std::string &man_name, double lat, double lon, double speed,
+Platform::skeepingCommand(const std::string &man_name, double lat, double lon, double speed,
     int seconds)
 {
   IMC::StationKeeping * msg = new IMC::StationKeeping();
-  IMC::Message * ret;
 
   msg->lat = lat;
   msg->lon = lon;
@@ -799,15 +811,12 @@ Platform::commandStationKeeping(const std::string &man_name, double lat, double 
     msg->speed = speed;
     msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
   }
-  ret = msg->clone();
-  if (commandManeuver(man_name, msg))
-    return ret;
-  else
-    return NULL;
+
+  return getManeuverCommand(man_name, msg);
 }
 
 IMC::Message *
-Platform::commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius,
+Platform::loiterCommand(const std::string &man_name, double lat, double lon, double depth, double radius,
     double speed, int seconds)
 {
   IMC::Loiter * msg = new IMC::Loiter();
@@ -830,24 +839,20 @@ Platform::commandLoiter(const std::string &man_name, double lat, double lon, dou
     msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
   }
 
-  ret = msg->clone();
-  if (commandManeuver(man_name, msg))
-    return ret;
-  else
-    return NULL;
+  return getManeuverCommand(man_name, msg);
 }
 
 IMC::Message *
-Platform::commandIdle(const std::string &man_name)
+Platform::idleCommand(const std::string &man_name)
 {
-  IMC::PlanControl pcontrol;
+  IMC::PlanControl * pcontrol = new IMC::PlanControl();
 
-  pcontrol.info = "Idle request by TREX";
-  pcontrol.op = IMC::PlanControl::PC_STOP;
-  pcontrol.type = IMC::PlanControl::PC_REQUEST;
-  pcontrol.flags = 0;
+  pcontrol->info = "Idle request by TREX";
+  pcontrol->op = IMC::PlanControl::PC_STOP;
+  pcontrol->type = IMC::PlanControl::PC_REQUEST;
+  pcontrol->flags = 0;
 
-  return NULL;
+  return pcontrol;
 }
 
 /*

@@ -76,15 +76,17 @@ namespace TREX {
       bool synchronize();
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
+      void handleTickStart();
       bool sendMsg(Message& msg, std::string ip, int port);
       bool sendMsg(Message& msg, Address &dest);
-      bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
+//      bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
+      IMC::Message * getManeuverCommand(const std::string &man_name, IMC::Message * maneuver);
 
-      IMC::Message * commandGoto(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout);
-      IMC::Message * commandLoiter(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
-      IMC::Message * commandStationKeeping(const std::string &man_name, double lat, double lon, double speed, int seconds);
-      IMC::Message * commandIdle(const std::string &man_name);
-      IMC::Message * commandElevator(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout);
+      IMC::Message * gotoCommand(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout);
+      IMC::Message * loiterCommand(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
+      IMC::Message * skeepingCommand(const std::string &man_name, double lat, double lon, double speed, int seconds);
+      IMC::Message * idleCommand(const std::string &man_name);
+      IMC::Message * elevatorCommand(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout);
 
       //IMC::Message commandCalibration();
       void convertToAbsolute(double northing, double easting, double &lat, double &lon);
@@ -141,9 +143,20 @@ namespace TREX {
       /** @brief current vehicle position */
       double m_latitude, m_longitude, m_depth;
 
-      IMC::Message * sent_command;
+      /** @brief last sent command (Maneuver message) */
+      std::auto_ptr <IMC::Message> sent_command;
 
+      /** @brief whether TREX is currently blocked or not */
       bool m_blocked;
+
+      /** @brief map of received messages       */
+      std::map<uint16_t, IMC::Message *> received;
+
+      /** @brief map of received messages (aggregated) */
+      std::map<uint16_t, IMC::Message *> aggregate;
+      IMC::VehicleCommand lastCommand;
+
+      IMC::Message * commandToBePosted;
 
       void setValue(bool val);
 
