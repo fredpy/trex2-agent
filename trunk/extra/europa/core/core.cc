@@ -111,6 +111,17 @@ namespace TREX {
      */
     class CoreExtensions :public EuropaPlugin {
     public:
+      /** @brief Register core extensions
+       *
+       * @param[in] assembly A trex Assembly
+       *
+       * Register all the europa core extensions used in the wuropa
+       * solver to interract with @p assembly. These extensions are
+       * extra solver extensions (such as the TrexThreatHandler, the
+       * horizon filters for synchronization and planning and the
+       * current state flaw). But also utility constraints (sucha as
+       * isExternal, isInternal or tick_date)
+       */
       void registerComponents(Assembly const &assembly);
       
     }; // TREX::europa::CoreExtensions
