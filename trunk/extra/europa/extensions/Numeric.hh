@@ -142,6 +142,28 @@ namespace TREX {
       EUROPA::Domain &m_floor;
       EUROPA::Domain &m_val;      
     }; // TREX::europa::FloorConstraint 
+
+    class MaxConstraint :public EUROPA::Constraint {
+    public:
+      MaxConstraint(EUROPA::LabelStr const &name,
+                     EUROPA::LabelStr const &propagatorName,
+                     EUROPA::ConstraintEngineId const &cstrEngine,
+                     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+   }; // class TREX::europa::MaxConstraint
+
+    class MinConstraint :public EUROPA::Constraint {
+    public:
+      MinConstraint(EUROPA::LabelStr const &name,
+                     EUROPA::LabelStr const &propagatorName,
+                     EUROPA::ConstraintEngineId const &cstrEngine,
+                     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      void handleExecute();
+      
+   }; // class TREX::europa::MaxConstraint
     
   } // TREX::europa
 } // TREX

@@ -91,6 +91,8 @@ namespace TREX {
     DECLARE_FUNCTION_TYPE(CosineConstraint, cos, 
                           "cosf", EUROPA::FloatDT, 1); 
     
+    DECLARE_FUNCTION_TYPE(MaxConstraint, max, "maxf", EUROPA::FloatDT, 2);
+    DECLARE_FUNCTION_TYPE(MinConstraint, min, "minf", EUROPA::FloatDT, 2);
   }
 }
 
@@ -134,6 +136,10 @@ namespace {
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SqrtConstraint,  sqrtf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CeilConstraint, ceilf, Default);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::FloorConstraint, floorf, Default);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::MaxConstraint, 
+				 maxf, Default);
+        TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::MinConstraint, 
+				 minf, Default);
 	TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::Bind, bind, trex);
         
         declareFunction(assembly, new TREX::europa::SineConstraintFunction());
@@ -142,6 +148,8 @@ namespace {
         declareFunction(assembly, new TREX::europa::SqrtConstraintFunction());
         declareFunction(assembly, new TREX::europa::CeilConstraintFunction());
         declareFunction(assembly, new TREX::europa::FloorConstraintFunction());
+        declareFunction(assembly, new TREX::europa::MaxConstraintFunction());
+        declareFunction(assembly, new TREX::europa::MinConstraintFunction());
       }
       
     }; // ::Extensions
