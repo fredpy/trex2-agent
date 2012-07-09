@@ -17,11 +17,11 @@ VehicleState::Boot {
 //   contained_by(TrexSupervision.Active);
 // }
 
-TrexSupervision::Blocked {
-    // better then above as it will allow some cleaning 
-    // during archiving
-    contained_by(Navigator.Idle);
-}
+// TrexSupervision::Blocked {
+//     // better then above as it will allow some cleaning 
+//     // during archiving
+//     contained_by(Navigator.Idle);
+// }
 
 ManeuverController::Maneuver {
     ends(Navigator.Going go);
