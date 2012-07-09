@@ -62,9 +62,9 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                              TeleoReactor(arg, false), m_active_proxy(NULL),
-                              m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
-                              sent_command(NULL), m_blocked(false), commandToBePosted(NULL)
+                                      TeleoReactor(arg, false), m_active_proxy(NULL),
+                                      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
+                                      sent_command(NULL), m_blocked(false), commandToBePosted(NULL), postedCommand(NULL)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -147,7 +147,9 @@ void Platform::handleTickStart()
         reportToDune("Maneuver dispatched");
         syslog(warn) << "Dispatched maneuver:";
         commandToBePosted->toText(syslog(warn));
-        delete commandToBePosted;
+
+        postedCommand = commandToBePosted;
+        //delete commandToBePosted;
         commandToBePosted = NULL;
         current_goal = next_goal;
         next_goal = "";
@@ -208,37 +210,37 @@ Platform::synchronize()
         }
       }
 
+
+
       if (msg->getId() == IMC::TrexCommand::getIdStatic())
+      {
+        IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
 
-        if (msg->getId() == IMC::TrexCommand::getIdStatic())
+        switch (command->command)
         {
-          IMC::TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(msg);
+          case IMC::TrexCommand::OP_POST_GOAL:
+            syslog(info) << "received (" << command->goalid << "): " << command->goalxml;
+            if (controlInterfaceInstance) {
+              controlInterfaceInstance->proccess_message(command->goalxml);
+            }
+            break;
+          case IMC::TrexCommand::OP_ENABLE:
+            syslog(warn) << "Enable TREX command received";
+            // post active observation ...
+            postObservation(Observation("supervision", "Active"), true);
+            reportToDune("Activate TREX command received");
+            m_blocked = false;
 
-          switch (command->command)
-          {
-            case IMC::TrexCommand::OP_POST_GOAL:
-              syslog(info) << "received (" << command->goalid << "): " << command->goalxml;
-              if (controlInterfaceInstance) {
-                controlInterfaceInstance->proccess_message(command->goalxml);
-              }
-              break;
-            case IMC::TrexCommand::OP_ENABLE:
-              syslog(warn) << "Enable TREX command received";
-              // post active observation ...
-              postObservation(Observation("supervision", "Active"), true);
-              reportToDune("Activate TREX command received");
-              m_blocked = false;
-
-              break;
-            case IMC::TrexCommand::OP_DISABLE:
-              syslog(warn) << "Disable TREX command received";
-              // post blocked observation ...
-              postObservation(Observation("supervision", "Blocked"), true);
-              reportToDune("Disable TREX command received");
-              m_blocked = true;
-              break;
-          }
+            break;
+          case IMC::TrexCommand::OP_DISABLE:
+            syslog(warn) << "Disable TREX command received";
+            // post blocked observation ...
+            postObservation(Observation("supervision", "Blocked"), true);
+            reportToDune("Disable TREX command received");
+            m_blocked = true;
+            break;
         }
+      }
 
       if (msg->getId() == IMC::Abort::getIdStatic())
       {
@@ -499,7 +501,7 @@ Platform::processState()
 
   /* VEHICLE_STATE */
 
-  if (received.count(IMC::VehicleState::getIdStatic()))
+  if (postedCommand == NULL && received.count(IMC::VehicleState::getIdStatic()))
   {
     IMC::VehicleState * msg =
         dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
@@ -558,7 +560,17 @@ Platform::processState()
   /* VEHICLE_COMMAND */
   int eta = std::numeric_limits<int>::max();
 
-  if (received.count(IMC::VehicleState::getIdStatic()))
+  if (postedCommand != NULL)
+  {
+    IMC::PlanControl * posted =  dynamic_cast<IMC::PlanControl*>(postedCommand);
+    IMC::Message * maneuver = posted->arg.get()->clone();
+
+    Observation obs = maneuverObservation(maneuver);
+    postObservation(obs, true);
+    delete postedCommand;
+    postedCommand = NULL;
+  }
+  else if (received.count(IMC::VehicleState::getIdStatic()))
   {
     IMC::VehicleState *lastState =
         dynamic_cast<IMC::VehicleState*>(aggregate[IMC::VehicleState::getIdStatic()]);
@@ -567,85 +579,93 @@ Platform::processState()
         && !lastCommand.maneuver.isNull()))
     {
 
-      Observation obs("command", "Maneuver");
       IMC::Message * man = NULL;
       man = lastCommand.maneuver.get();
+      Observation obs = maneuverObservation(man);
       obs.restrictAttribute("eta", IntegerDomain(eta));
-
-      if (man->getId() == IMC::Goto::getIdStatic())
-      {
-        IMC::Goto * m = dynamic_cast<IMC::Goto *>(man);
-        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-        obs.restrictAttribute("depth", FloatDomain(m->z));
-        //  obs.restrictAttribute("type", EnumDomain("goto"));
-
-        if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
-        {
-          obs.restrictAttribute("speed", FloatDomain(m->speed));
-        }
-        else if (m->speed_units == IMC::Goto::SUNITS_RPM)
-        {
-          obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
-        }
-        obs.restrictAttribute("secs", IntegerDomain(0));
-      }
-      else if (man->getId() == IMC::Loiter::getIdStatic())
-      {
-
-        IMC::Loiter * m = dynamic_cast<IMC::Loiter *>(man);
-        //double n, e;
-        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-        obs.restrictAttribute("depth", FloatDomain(m->z));
-        obs.restrictAttribute("speed", FloatDomain(m->speed));
-        obs.restrictAttribute("secs", IntegerDomain(m->duration));
-        //obs.restrictAttribute("type", EnumDomain("loiter"));
-      }
-      else if (man->getId() == IMC::StationKeeping::getIdStatic())
-      {
-        IMC::StationKeeping * m = dynamic_cast<IMC::StationKeeping *>(man);
-        //double n, e;
-        obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
-        obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
-        obs.restrictAttribute("depth", FloatDomain(0));
-        //obs.restrictAttribute("type", EnumDomain("skeeping"));
-        if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
-        {
-          obs.restrictAttribute("speed", FloatDomain(m->speed));
-        }
-        else if (m->speed_units == IMC::Goto::SUNITS_RPM)
-        {
-          obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
-        }
-        obs.restrictAttribute("secs", IntegerDomain(m->duration));
-      }
-      else if (man->getId() == IMC::Teleoperation::getIdStatic())
-      {
-        //  obs.restrictAttribute("type", TREX::europa::EuropaEntity("teleop"));
-        IMC::EstimatedState * msg =
-            dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
-        //double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
-        obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
-        obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
-        obs.restrictAttribute("depth", FloatDomain(0));
-        obs.restrictAttribute("speed", FloatDomain(msg->v));
-        obs.restrictAttribute("secs", IntegerDomain(0));
-        //obs.restrictAttribute("type", EnumDomain("teleop"));
-      }
-      else if (man->getId() == IMC::Elevator::getIdStatic())
-      {
-        IMC::Elevator * msg =
-            dynamic_cast<IMC::Elevator *>(man);
-        obs.restrictAttribute("latitude", FloatDomain(msg->lat));
-        obs.restrictAttribute("longitude", FloatDomain(msg->lon ));
-        obs.restrictAttribute("depth", FloatDomain(msg->end_z));
-        obs.restrictAttribute("secs", IntegerDomain(0));
-      }
       lastCommand.maneuver = IMC::InlineMessage();
       postObservation(obs, true);
     }
   }
+}
+
+
+Observation Platform::maneuverObservation(IMC::Message * man)
+{
+  Observation obs("command", "Maneuver");
+
+  if (man->getId() == IMC::Goto::getIdStatic())
+  {
+    IMC::Goto * m = dynamic_cast<IMC::Goto *>(man);
+    obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+    obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+    obs.restrictAttribute("depth", FloatDomain(m->z));
+    //  obs.restrictAttribute("type", EnumDomain("goto"));
+
+    if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed));
+    }
+    else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
+    }
+    obs.restrictAttribute("secs", IntegerDomain(0));
+  }
+  else if (man->getId() == IMC::Loiter::getIdStatic())
+  {
+
+    IMC::Loiter * m = dynamic_cast<IMC::Loiter *>(man);
+    //double n, e;
+    obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+    obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+    obs.restrictAttribute("depth", FloatDomain(m->z));
+    obs.restrictAttribute("speed", FloatDomain(m->speed));
+    obs.restrictAttribute("secs", IntegerDomain(m->duration));
+    //obs.restrictAttribute("type", EnumDomain("loiter"));
+  }
+  else if (man->getId() == IMC::StationKeeping::getIdStatic())
+  {
+    IMC::StationKeeping * m = dynamic_cast<IMC::StationKeeping *>(man);
+    //double n, e;
+    obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
+    obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
+    obs.restrictAttribute("depth", FloatDomain(0));
+    //obs.restrictAttribute("type", EnumDomain("skeeping"));
+    if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed));
+    }
+    else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
+    }
+    obs.restrictAttribute("secs", IntegerDomain(m->duration));
+  }
+  else if (man->getId() == IMC::Teleoperation::getIdStatic())
+  {
+    //  obs.restrictAttribute("type", TREX::europa::EuropaEntity("teleop"));
+    IMC::EstimatedState * msg =
+        dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
+    //double lat = msg->lat, lon = msg->lon, hae = 0.0, northing, easting;
+    obs.restrictAttribute("latitude", FloatDomain(msg->lat /*floor(n,2), ceil(n,2)*/));
+    obs.restrictAttribute("longitude", FloatDomain(msg->lon /*floor(e,2), ceil(e,2)*/));
+    obs.restrictAttribute("depth", FloatDomain(0));
+    obs.restrictAttribute("speed", FloatDomain(msg->v));
+    obs.restrictAttribute("secs", IntegerDomain(0));
+    //obs.restrictAttribute("type", EnumDomain("teleop"));
+  }
+  else if (man->getId() == IMC::Elevator::getIdStatic())
+  {
+    IMC::Elevator * msg =
+        dynamic_cast<IMC::Elevator *>(man);
+    obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+    obs.restrictAttribute("longitude", FloatDomain(msg->lon ));
+    obs.restrictAttribute("depth", FloatDomain(msg->end_z));
+    obs.restrictAttribute("secs", IntegerDomain(0));
+  }
+
+  return obs;
 }
 
 bool
