@@ -274,3 +274,92 @@ void FloorConstraint::handleExecute() {
 }
 
 
+// Europa messes with me ...
+#ifdef max
+# undef max 
+#endif // max
+
+#ifdef min
+# undef min 
+#endif // max
+
+/*
+ * class TREX:europa::MaxConstraint
+ */
+MaxConstraint::MaxConstraint(EUROPA::LabelStr const &name,
+			     EUROPA::LabelStr const &propagatorName,
+			     EUROPA::ConstraintEngineId const &cstrEngine,
+			     std::vector<EUROPA::ConstrainedVariableId> 
+			     const &vars)
+ :EUROPA::Constraint(name, propagatorName, cstrEngine, vars) {
+  //  TODO need to check that arguments are correct
+}
+
+void MaxConstraint::handleExecute() {
+  EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
+  EUROPA::edouble lb, ub;
+  for(int i=1; i<m_variables.size(); ++i) {
+    EUROPA::Domain const &arg = getCurrentDomain(m_variables[i]);
+    EUROPA::edouble ilb, iub;
+    arg.getBounds(ilb, iub);
+    if( 1==i ) {
+      lb = ilb;
+      ub = iub;
+    } else {
+      using std::max;
+      lb = max(lb, ilb);
+      ub = max(ub, iub);
+    }
+  }
+  result.intersect(lb, ub);
+}
+
+/*
+ * class TREX:europa::MinConstraint
+ */
+MinConstraint::MinConstraint(EUROPA::LabelStr const &name,
+			     EUROPA::LabelStr const &propagatorName,
+			     EUROPA::ConstraintEngineId const &cstrEngine,
+			     std::vector<EUROPA::ConstrainedVariableId> 
+			     const &vars)
+ :EUROPA::Constraint(name, propagatorName, cstrEngine, vars) {
+  //  TODO need to check that arguments are correct
+}
+
+void MinConstraint::handleExecute() {
+  EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
+  EUROPA::edouble lb, ub;
+  for(int i=1; i<m_variables.size(); ++i) {
+    EUROPA::Domain const &arg = getCurrentDomain(m_variables[i]);
+    EUROPA::edouble ilb, iub;
+    arg.getBounds(ilb, iub);
+    if( 1==i ) {
+      lb = ilb;
+      ub = iub;
+    } else {
+      using std::min;
+      lb = min(lb, ilb);
+      ub = min(ub, iub);
+    }
+  }
+  result.intersect(lb, ub);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
