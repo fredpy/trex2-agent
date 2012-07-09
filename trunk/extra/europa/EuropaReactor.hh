@@ -108,6 +108,7 @@ namespace TREX {
     private:
       bool discard(EUROPA::TokenId const &tok);
       void cancel(EUROPA::TokenId const &tok);
+      void rejected(EUROPA::TokenId const &tok);
       bool dispatch(EUROPA::TimelineId const &tl,
                     EUROPA::TokenId const &tok);
 

@@ -248,7 +248,8 @@ void EuropaReactor::handleRequest(goal_id const &request) {
 
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
       if( m_completed_this_tick ) {
-        debugMsg("trex:resume", "[ "<<now()<<"] Resume deliberation due to a request.");
+        debugMsg("trex:resume", "[ "<<now()
+		 <<"] Resume deliberation due to a request.");
         m_completed_this_tick = false;
       }
     }
@@ -520,6 +521,14 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
   if( sent_cmd )
     setStream();
 }
+
+void EuropaReactor::rejected(EUROPA::TokenId const &tok) {
+  goal_map::left_iterator i = m_active_requests.left.find(tok->getKey());
+  if( m_active_requests.left.end()!=i )
+    syslog(warn)<<"Request ["<<i->second<<"] is currently REJECTED:\n\t"
+		<<*i->second;
+}
+
 
 bool EuropaReactor::hasWork() {
   setStream();
