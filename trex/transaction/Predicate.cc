@@ -137,3 +137,26 @@ void Predicate::listAttributes(std::list<TREX::utils::Symbol> &attrs,
 	( all || !i->second.domain().isFull() ) )
       attrs.push_back(i->first);
 }
+
+
+bool Predicate::consistentWith(Predicate const &other) const {
+  if( object()!=other.object() 
+      || predicate()!=other.predicate() )
+    return false;
+  else {
+    const_iterator i = begin(), j=other.begin();
+    while( end()!=i && other.end()!=j ) {
+      if( i->first < j->first )
+	i = m_vars.lower_bound(j->first);
+      else if( j->first < i->first )
+	j = other.m_vars.lower_bound(i->first);
+      else {
+	if( !i->second.domain().intersect(j->second.domain()) )
+	  return false;
+	++i;
+	++j;
+      }
+    }
+    return true;
+  }
+}
