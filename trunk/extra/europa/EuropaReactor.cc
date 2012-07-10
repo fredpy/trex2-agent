@@ -69,7 +69,8 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
 				     "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
-			       "all_plans")) {
+			       "all_plans")),
+   m_completed_this_tick(false) {
   bool found;
   std::string nddl;
 
