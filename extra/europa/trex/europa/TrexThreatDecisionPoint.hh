@@ -57,6 +57,10 @@ namespace TREX {
        */
       EUROPA::eint now() const;
       
+      virtual std::string toString() const;
+      virtual std::string toShortString() const;
+
+
     private:
       EUROPA::ConstrainedVariableId m_clock;
     }; // TREX::europa::TrexThreatDecisionPoint
