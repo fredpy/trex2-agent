@@ -10,7 +10,7 @@ class Estimator extends AgentTimeline {
 	}
 	
     Estimator(Mode _mode, bool plan) {
-	super(_mode, "Boot", plan);
+	super(_mode, plan);
 	}
 
 	predicate Boot {}
@@ -26,6 +26,6 @@ class Estimator extends AgentTimeline {
     	// need to rename this constraint ...
 		//deg_to_rad(latitude, lat_deg);
 		//deg_to_rad(longitude, lon_deg);
-    
+    	duration == 1;
 	}
 }

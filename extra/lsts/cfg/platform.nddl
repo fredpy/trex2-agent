@@ -111,11 +111,14 @@ class TrexSupervision extends AgentTimeline {
 }
 
 class ManeuverController extends Timeline {
+	predicate Idle {}
+
     predicate Maneuver {
 	float lat_deg, lat_rad;
 	float lon_deg, lon_rad;
 	float depth;
-	float speed;		
+	float speed;
+	float distance;		
 	int secs;
 
 	float requested_tolerance;

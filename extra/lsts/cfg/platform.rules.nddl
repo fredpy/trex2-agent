@@ -47,20 +47,22 @@ ManeuverController::Maneuver {
     lim.minDepth <= depth;
     speed <= lim.maxSpeed;
     lim.maxSpeed <= speed;
+    
+   // met_by(Idle ready);
 
     starts_during(TrexSupervision.Active free);
     VehicleCommand cmd;
     cmd == free.vehicle;
-   // met_by(VehicleState.Ready ready);
+    met_by(VehicleState.Ready ready);
     //contained_by(VehicleState.Exec);    
     
-    //int earliest_start;
+    int earliest_start;
     
-    //earliest_start == max(free.start, ready.start);
+    earliest_start == max(free.start, ready.start);
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
-    if( free.start <= AGENT_CLOCK ) {
+    if( earliest_start <= AGENT_CLOCK ) {
 	
 	equals(cmd.Maneuver request);
 	request.latitude == lat_rad;
@@ -86,10 +88,11 @@ ManeuverController::Maneuver {
     
 
     //tolerance <= 10.0; // hard coded to 10. m for now 
-
+	
     if( end <= AGENT_CLOCK ) {
 	meets(EstimatedState.Position pos);
-	ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude) <= tolerance;
+	distance == ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude);
+	distance <= tolerance;
 	// if it fails replanning should be able to correct it
     }
 }
