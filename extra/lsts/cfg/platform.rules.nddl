@@ -51,8 +51,8 @@ ManeuverController::Maneuver {
     starts_during(TrexSupervision.Active free);
     VehicleCommand cmd;
     cmd == free.vehicle;
-    met_by(VehicleState.Ready ready);
-    contained_by(VehicleState.Exec);    
+   // met_by(VehicleState.Ready ready);
+    //contained_by(VehicleState.Exec);    
     
     //int earliest_start;
     
@@ -73,8 +73,15 @@ ManeuverController::Maneuver {
 
     // Instead of rejecting the goal I will silently select
     // a more realistic tolerance
+    
     float min_tolerance;
-    min_tolerance <= speed*6.0;
+    if (secs == 0)
+    	min_tolerance <= speed*6.0;
+    else if (depth > 0)
+    	min_tolerance == 20.0;
+    else
+    	min_tolerance == 15.0;
+    	
     tolerance == max(min_tolerance, requested_tolerance);
     
 

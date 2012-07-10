@@ -93,6 +93,9 @@ namespace TREX {
       void convertToAbsolute(double northing, double easting, double &lat, double &lon);
       void convertToRelative(double lat, double lon, double &x, double &y);
       void processState();
+      bool uniqueObservation(TREX::transaction::Observation obs);
+      typedef std::map<std::string, boost::shared_ptr<TREX::transaction::Observation> > obs_map;
+      obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
       TREX::transaction::Observation estate(IMC::EstimatedState &msg);
       TREX::transaction::Observation vstate(IMC::VehicleState &msg);
