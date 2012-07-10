@@ -138,6 +138,7 @@ void LatLonDist::handleExecute() {
   EUROPA::edouble 
   dist = WGS84::distance(lat1, lon1, 0, lat2, lon2, 0);
 
+  debugMsg("trex:always", m_dist.toString() << " == " << dist);
   intersect(m_dist, dist, dist, 0.5);
 }
 
@@ -281,6 +282,9 @@ RadDeg::RadDeg(EUROPA::LabelStr const &name,
 
 void RadDeg::handleExecute() {
   EUROPA::edouble d_lo, d_hi, r_lo, r_hi, tmp;
+
+  if (m_rad.isSingleton() && m_deg.isSingleton())
+    return;
 
   m_rad.getBounds(r_lo, r_hi);
   m_deg.getBounds(d_lo, d_hi);

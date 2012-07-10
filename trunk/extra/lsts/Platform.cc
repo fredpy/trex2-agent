@@ -460,7 +460,6 @@ Platform::processState()
     obs.restrictAttribute("depth", FloatDomain(msg->z));
 
 
-
     if (aggregate.count(IMC::NavigationUncertainty::getIdStatic()))
     {
       IMC::NavigationUncertainty * navUnc =
