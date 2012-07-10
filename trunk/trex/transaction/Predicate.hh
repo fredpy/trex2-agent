@@ -305,6 +305,25 @@ namespace TREX {
        */
       typedef TREX::utils::XmlFactory< Predicate, 
 				       boost::shared_ptr<Predicate> > xml_factory;
+
+      /** @brief Check for predicate compatibility
+       *
+       * @param[in] other Another predicate 
+       *
+       * test if @p other can be merged with this instance. Which means that both
+       * tokens shares the same domain and predicate and the intersection of all 
+       * their domains is not empty.
+       *
+       
+
+       * @retval true if @p other can be merged 
+       * @retval false otherwise
+       *
+       * @note This method do not check the temporal attributes (start,
+       * duration and end).
+       */
+      bool consistentWith(Predicate const &other) const;
+      
             
     protected:
       /** @brief Constructor
