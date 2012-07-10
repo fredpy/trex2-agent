@@ -126,7 +126,27 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   sendMsg(m);
 
   sleep(3);
+}
 
+bool Platform::uniqueObservation(TREX::transaction::Observation obs)
+{
+  std::string timeline = obs.object().str();
+  obs_map::iterator it = postedObservations.find(timeline);
+
+  //std::cerr << "Observation tested: \"" << timeline << "\" -- " << obs << " at " << getCurrentTick() << std::endl;
+
+  if (it == postedObservations.end() || !it->second->consistentWith(obs)) {
+    postedObservations[timeline].reset(new Observation(obs));
+    //std::cerr << "Observation posted: \"" << timeline << "\" -- " << obs << " at " << getCurrentTick() << std::endl;
+
+    postObservation(obs, true);
+    return true;
+  }
+  else {
+    if (debug)
+      syslog("debug") << "Found repeated observations:\n" << obs << "\n" << *it->second;
+  }
+  return false;
 }
 
 void Platform::handleTickStart()
@@ -227,7 +247,7 @@ Platform::synchronize()
           case IMC::TrexCommand::OP_ENABLE:
             syslog(warn) << "Enable TREX command received";
             // post active observation ...
-            postObservation(Observation("supervision", "Active"), true);
+            uniqueObservation(Observation("supervision", "Active"));
             reportToDune("Activate TREX command received");
             m_blocked = false;
 
@@ -235,7 +255,7 @@ Platform::synchronize()
           case IMC::TrexCommand::OP_DISABLE:
             syslog(warn) << "Disable TREX command received";
             // post blocked observation ...
-            postObservation(Observation("supervision", "Blocked"), true);
+            uniqueObservation(Observation("supervision", "Blocked"));
             reportToDune("Disable TREX command received");
             m_blocked = true;
             break;
@@ -246,7 +266,7 @@ Platform::synchronize()
       {
         syslog(warn) << "Abort received";
         // post blocked observation ...
-        postObservation(Observation("supervision", "Blocked"), true);
+        uniqueObservation(Observation("supervision", "Blocked"));
         reportToDune("Disabling TREX due to abort detection");
       }
     }
@@ -259,7 +279,7 @@ Platform::synchronize()
     processState();
 
     if (!supervision_posted) {
-      postObservation(Observation("supervision", "Active"), true);
+      uniqueObservation(Observation("supervision", "Active"));
       supervision_posted = true;
     }
 
@@ -284,8 +304,6 @@ Platform::synchronize()
 void
 Platform::handleRequest(goal_id const &g)
 {
-
-
 
   Goal * goal = g.get();
 
@@ -484,12 +502,12 @@ Platform::processState()
     InsideOpLimits::set_oplimits(msg);
 
     oplimits_posted = true;
-    postObservation(obs);
+    uniqueObservation(obs);
   }
   else
   {
     if (!oplimits_posted) {
-      postObservation(Observation("oplimits", "undefined"));
+      uniqueObservation(Observation("oplimits", "undefined"));
       oplimits_posted = true;
     }
     if (!aggregate.count(IMC::OperationalLimits::getIdStatic()))
@@ -534,11 +552,11 @@ Platform::processState()
 
     if (last_vstate != msg->op_mode)
     {
-      postObservation(Observation("vstate", mode), true);
+      uniqueObservation(Observation("vstate", mode));
       if (msg->op_mode != IMC::VehicleState::VS_MANEUVER && !was_idle)
       {
-        postObservation(Observation("maneuver", "Idle"));
-        postObservation(Observation("command", "Idle"));
+        uniqueObservation(Observation("maneuver", "Idle"));
+        uniqueObservation(Observation("command", "Idle"));
         was_idle = true;
       }
       else
@@ -550,9 +568,9 @@ Platform::processState()
   {
     if (!was_idle)
     {
-      postObservation(Observation("vstate", "Boot"), true);
-      postObservation(Observation("maneuver", "Idle"), true);
-      postObservation(Observation("command", "Idle"), true);
+      uniqueObservation(Observation("vstate", "Boot"));
+      uniqueObservation(Observation("maneuver", "Idle"));
+      uniqueObservation(Observation("command", "Idle"));
       was_idle = true;
     }
   }
@@ -567,6 +585,8 @@ Platform::processState()
 
     Observation obs = maneuverObservation(maneuver);
     postObservation(obs, true);
+    postedObservations[obs.object().str()].reset(new Observation(obs));
+    uniqueObservation(Observation("vstate", "Exec"));
     delete postedCommand;
     postedCommand = NULL;
   }
@@ -584,7 +604,7 @@ Platform::processState()
       Observation obs = maneuverObservation(man);
       obs.restrictAttribute("eta", IntegerDomain(eta));
       lastCommand.maneuver = IMC::InlineMessage();
-      postObservation(obs, true);
+      uniqueObservation(obs);
     }
   }
 }
@@ -697,6 +717,9 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
     msg.setSource(65000);
     msg.setDestination(remote_id);
     msg.serialize(bb);
+
+    if (debug)
+      msg.toText(syslog("debug") << "sending message:\n");
 
     m_mutex.lock();
     send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),

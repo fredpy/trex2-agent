@@ -95,7 +95,7 @@ Variable const &Predicate::getAttribute(Symbol const &name) const {
 std::ostream &Predicate::print_to(std::ostream &out) const {
   std::list<Symbol> vars;
   out<<m_object<<'.'<<m_type;
-  out.precision(6);
+  out.precision(10);
   listAttributes(vars, false);
   if( !vars.empty() ) {
     out<<'{'<<getAttribute(vars.front());
@@ -147,14 +147,17 @@ bool Predicate::consistentWith(Predicate const &other) const {
     const_iterator i = begin(), j=other.begin();
     while( end()!=i && other.end()!=j ) {
       if( i->first < j->first )
-	i = m_vars.lower_bound(j->first);
+        i = m_vars.lower_bound(j->first);
       else if( j->first < i->first )
-	j = other.m_vars.lower_bound(i->first);
+        j = other.m_vars.lower_bound(i->first);
       else {
-	if( !i->second.domain().intersect(j->second.domain()) )
-	  return false;
-	++i;
-	++j;
+        if( !i->second.domain().intersect(j->second.domain()) ) {
+          //std::cerr << i->second << " != " << j->second << std::endl;
+          return false;
+        }
+
+        ++i;
+        ++j;
       }
     }
     return true;
