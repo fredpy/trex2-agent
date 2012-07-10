@@ -129,3 +129,22 @@ EUROPA::eint TrexThreatDecisionPoint::now() const {
   return m_clock->lastDomain().getLowerBound();
 }
 
+std::string TrexThreatDecisionPoint::toString() const {
+  // check the border coniditions
+  if( m_choices.empty() )
+    return "THREAT:EMPTY "+m_tokenToOrder->toString();
+  if( m_index>=m_choiceCount )
+    return "THREAT:EXHAUSTED "+m_tokenToOrder->toString();
+  // Now let ThreatDecisionPoint do its buggy work
+  return EUROPA::SOLVERS::ThreatDecisionPoint::toString();
+}
+
+std::string TrexThreatDecisionPoint::toShortString() const {
+  // check the border coniditions 
+  if( m_choices.empty() )
+    return "THR:EMPTY("+m_tokenToOrder->toString()+")";
+  if( m_index>=m_choiceCount )
+    return "THR:EXHAUSTED+("+m_tokenToOrder->toString()+")";
+  // Now let ThreatDecisionPoint do its buggy work
+  return EUROPA::SOLVERS::ThreatDecisionPoint::toShortString();
+}
