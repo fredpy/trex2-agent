@@ -35,6 +35,7 @@
 # define H_trex_europa_Numeric
 
 # include <trex/europa/config.hh>
+# include <trex/europa/EuropaException.hh>
 
 # include <PLASMA/Constraint.hh>
 

@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Numeric.hh"
+#include <trex/europa/bits/europa_helpers.hh>
 
 #include <PLASMA/ConstrainedVariable.hh>
 #include <PLASMA/Domains.hh>
@@ -292,7 +293,25 @@ MaxConstraint::MaxConstraint(EUROPA::LabelStr const &name,
 			     std::vector<EUROPA::ConstrainedVariableId> 
 			     const &vars)
  :EUROPA::Constraint(name, propagatorName, cstrEngine, vars) {
-  //  TODO need to check that arguments are correct
+  if( vars.size()<2 )
+    throw EuropaException("Constraint "+name.toString()
+			  +" requires at least 2 arguments.");
+  else {
+    EUROPA::DataTypeId ret_type, arg_type;
+    ret_type = vars[0]->getDataType();
+    if( !ret_type->isNumeric() )
+      throw EuropaException("Constraint "+name.toString()
+			    +" return type is not numeric.");
+    for(size_t i=1; i<vars.size(); ++i) {
+      arg_type = vars[i]->getDataType();
+      if( !arg_type->isNumeric() ) {
+	std::ostringstream oss;
+	details::var_print(oss<<"Argument "<<i<<" [", vars[i])
+	  <<"] of constraint "<<name.toString()<<" is not numeric.";
+	throw EuropaException(oss.str());
+      }
+    }
+  }
 }
 
 void MaxConstraint::handleExecute() {
@@ -328,7 +347,25 @@ MinConstraint::MinConstraint(EUROPA::LabelStr const &name,
 			     std::vector<EUROPA::ConstrainedVariableId> 
 			     const &vars)
  :EUROPA::Constraint(name, propagatorName, cstrEngine, vars) {
-  //  TODO need to check that arguments are correct
+  if( vars.size()<2 )
+    throw EuropaException("Constraint "+name.toString()
+			  +" requires at least 2 arguments.");
+  else {
+    EUROPA::DataTypeId ret_type, arg_type;
+    ret_type = vars[0]->getDataType();
+    if( !ret_type->isNumeric() )
+      throw EuropaException("Constraint "+name.toString()
+			    +" return type is not numeric.");
+    for(size_t i=1; i<vars.size(); ++i) {
+      arg_type = vars[i]->getDataType();
+      if( !arg_type->isNumeric() ) {
+	std::ostringstream oss;
+	details::var_print(oss<<"Argument "<<i<<" [", vars[i])
+	  <<"] of constraint "<<name.toString()<<" is not numeric.";
+	throw EuropaException(oss.str());
+      }
+    }
+  }
 }
 
 void MinConstraint::handleExecute() {
@@ -339,6 +376,8 @@ void MinConstraint::handleExecute() {
   for(int i=1; i<m_variables.size(); ++i) {
     EUROPA::Domain &arg = getCurrentDomain(m_variables[i]);
     EUROPA::edouble ilb, iub;
+    // All the parameters should have a lower bound which is greater or
+    // equal to cur_min
     arg.getBounds(ilb, iub);
     arg.intersect(cur_min, iub);
     if( arg.isEmpty() )
