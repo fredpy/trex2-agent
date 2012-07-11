@@ -5,7 +5,7 @@
 
   <OpenConditionManager defaultPriority="100">
     <FlawFilter component="goals"/>
-    <FlawHandler component="StandardOpenConditionHandler"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
   
   <!-- any mgr with a priority above 2000 will happen 

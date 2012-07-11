@@ -42,6 +42,7 @@
 #include <PLASMA/TokenVariable.hh>
 
 #include <PLASMA/PlanDatabaseWriter.hh>
+#include <PLASMA/ThreatDecisionPoint.hh>
 
 #include <boost/scope_exit.hpp>
 
@@ -586,26 +587,48 @@ void EuropaReactor::resume() {
 
   stat_clock::time_point start = stat_clock::now();
 
-  if( constraint_engine()->pending() )
-    constraint_engine()->propagate();
   size_t nsteps = planner()->getStepCount();
+  bool should_relax = false, should_continue;
+  size_t count = 0;
+  
+  do {
+    if( constraint_engine()->pending() )
+      constraint_engine()->propagate();
+    if( constraint_engine()->constraintConsistent() ) { 
+      planner()->step();
+      if( m_full_log && planner()->getStepCount()>nsteps )
+	logPlan("step");
+    }
 
-  if( constraint_engine()->constraintConsistent() ) {
-    planner()->step();
-    if( m_full_log && planner()->getStepCount()>nsteps )
-      logPlan("step");
-  }
 
-  bool should_relax = false;
+    if( constraint_engine()->provenInconsistent() ) {
+      syslog(null, warn)<<"Inconsitency found during planning.";
+      should_relax = true;
+      break;
+    }
+    if( planner()->isExhausted() ) {
+      syslog(null, warn)<<"Deliberation solver is exhausted.";
+      should_relax = true;
+      break;
+    }
 
-  if( constraint_engine()->provenInconsistent() ) {
-    syslog(null, warn)<<"Inconsitency found during planning.";
-    should_relax = true;
-  }
-  if( planner()->isExhausted() ) {
-    syslog(null, warn)<<"Deliberation solver is exhausted.";
-    should_relax = true;
-  }
+    // As long as I see a Threat I will continue to do steps 
+    // this assume that threats have the highest priority
+    EUROPA::IteratorId flaws = planner()->createIterator();
+    should_continue = false;
+    while( !flaws->done() ) {
+      EUROPA::EntityId flaw = flaws->next();
+      if( EUROPA::TokenId::convertable(flaw) 
+	  && EUROPA::TokenId(flaw)->isActive() ) {
+	debugMsg("trex:step", "["<<now()<<"] Found one threat in the stack:\n"
+		 <<planner()->printOpenDecisions()
+		 <<"\n\t *** Resuming deliberation ***");
+
+	should_continue = true;
+	break;
+      }
+    }
+  } while(should_continue);
 
   if( should_relax ) {
     syslog(null, warn)<<"Relax database after "<<planner()->getStepCount()

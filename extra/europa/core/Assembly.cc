@@ -196,7 +196,7 @@ Assembly::Assembly(std::string const &name)
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  m_cstr_engine->setAutoPropagation(false);
+  m_cstr_engine->setAutoPropagation(true);
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);

@@ -107,6 +107,7 @@ void details::Schema::setStream(std::ofstream &out, std::string const &name) {
 void details::Schema::setStream(std::ostream &out) {
   Error::doThrowExceptions();
   DebugMessage::setStream(out);
+  Error::setStream(out);
 }
 
 std::string const &details::Schema::nddl_path() {

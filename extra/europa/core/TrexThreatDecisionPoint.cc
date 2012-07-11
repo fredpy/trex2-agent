@@ -119,6 +119,9 @@ void TrexThreatDecisionPoint::handleInitialize() {
     // in the past ? ... it should have been already done by the 
     // other guy
   }
+  // invert the order or merging decisions
+  std::reverse(m_choices.begin(), m_choices.end());
+
   m_choiceCount = m_choices.size();
   debugMsg("trex:threat", "Number of choices for "<<m_tokenToOrder->getKey()<<": "<<m_choiceCount);
 }
