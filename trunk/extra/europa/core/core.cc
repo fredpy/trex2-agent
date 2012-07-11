@@ -56,6 +56,7 @@
 
 #include <PLASMA/CFunctions.hh>
 #include <PLASMA/DataTypes.hh>
+#include <PLASMA/OpenConditionDecisionPoint.hh>
 
 
 namespace TREX {
@@ -126,6 +127,31 @@ namespace TREX {
       
     }; // TREX::europa::CoreExtensions
 
+
+    class TrexOpenConditionDP 
+      :public EUROPA::SOLVERS::OpenConditionDecisionPoint {
+    public:
+      TrexOpenConditionDP(EUROPA::DbClientId const &client,
+			  EUROPA::TokenId const &flawed,
+			  EUROPA::TiXmlElement const &configData,
+			  EUROPA::LabelStr const &explanation = "trex")
+	:EUROPA::SOLVERS::OpenConditionDecisionPoint(client, flawed,
+						     configData, 
+						     explanation) {}
+      ~TrexOpenConditionDP() {}
+
+    private:
+      void handleInitialize() {
+	EUROPA::SOLVERS::OpenConditionDecisionPoint::handleInitialize();
+	// invert the order or merging decisions
+	std::reverse(m_compatibleTokens.begin(), 
+		     m_compatibleTokens.end());
+      }
+    }; // TREX::europa::TrexOpenConditionDP
+
+# define TREX_OC_HANDLER TrexOpenConditionHandler
+
+
     void CoreExtensions::registerComponents(Assembly const &assembly) {
       // T-REX core extensions
       TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DeliberationScope, 
@@ -137,7 +163,10 @@ namespace TREX {
       TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::details::CurrentState::DecisionPoint,
 				 TREX_SYNCH_HANDLER);
       TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::TrexThreatDecisionPoint,
-				 TREX_THREAT_HANDLER)
+				 TREX_THREAT_HANDLER);
+      TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::TrexOpenConditionDP,
+				 TREX_OC_HANDLER);
+				 
 
       // The new flaw to be matched
       TREX_REGISTER_MATCH_FINDER(assembly, TREX::europa::details::UpdateMatchFinder, 
