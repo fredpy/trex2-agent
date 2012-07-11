@@ -16,16 +16,10 @@ class Estimator extends AgentTimeline {
 	predicate Boot {}
 	
 	predicate At {
-		float latitude, longitude, lat_deg, lon_deg, depth, tolerance;
+		float latitude, longitude, lat_deg, lon_deg, depth, tolerance, speed;
 		int secs;
 		secs >= 0;
-		tolerance >= 0;		
-		//latitude == to_rad(lat_deg); 	
-    	//longitude == to_rad(lon_deg);
-    	
-    	// need to rename this constraint ...
-		//deg_to_rad(latitude, lat_deg);
-		//deg_to_rad(longitude, lon_deg);
+		tolerance >= 0;
     	duration == 1;
 	}
 }

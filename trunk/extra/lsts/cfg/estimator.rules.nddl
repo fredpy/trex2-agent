@@ -13,6 +13,7 @@ Estimator::At {
     maneuver.lon_deg == lon_deg;
     maneuver.lat_rad == latitude;
     maneuver.lon_rad == longitude;
+    maneuver.speed == speed;
     maneuver.depth == depth;
     maneuver.secs == secs;
     maneuver.requested_tolerance <= tolerance;

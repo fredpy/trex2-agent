@@ -25,8 +25,6 @@ namespace TREX {
     DECLARE_FUNCTION_TYPE(LatLonDist, ll_distance,
         "ll_dist", FloatDT, 4);
 
-    DECLARE_FUNCTION_TYPE(InsideOpLimits, sane_pos,
-            "sane_pos", FloatDT, 4);
   }
 }
 
@@ -61,7 +59,6 @@ namespace {
 
       declareFunction(assembly, new TREX::LSTS::RadDegFunction());
       declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
-      declareFunction(assembly, new TREX::LSTS::InsideOpLimitsFunction());
     }
   };
 
@@ -152,7 +149,6 @@ InsideOpLimits::InsideOpLimits(EUROPA::LabelStr const &name,
     EUROPA::ConstraintEngineId const &cstrEngine,
     std::vector<EUROPA::ConstrainedVariableId> const &vars)
 :EUROPA::Constraint(name, propagator, cstrEngine, vars),
- m_inside(getCurrentDomain(m_variables[InsideOpLimits::INSIDE])),
  m_lat(getCurrentDomain(m_variables[InsideOpLimits::LAT])),
  m_lon(getCurrentDomain(m_variables[InsideOpLimits::LON])),
  m_depth(getCurrentDomain(m_variables[InsideOpLimits::DEPTH]))
@@ -180,7 +176,8 @@ void InsideOpLimits::handleExecute() {
     depth = cast_basis(m_depth.getSingletonValue());
 
   if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_MAX_DEPTH)
-    inside = inside && depth < s_oplimits->max_depth;
+    if (depth >= s_oplimits->max_depth)
+      m_depth.empty();
 
   if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_AREA)
   {
@@ -192,14 +189,13 @@ void InsideOpLimits::handleExecute() {
     double d2limits =
         std::max(std::fabs(x) - 0.5 * s_oplimits->length, std::fabs(y) - 0.5 * s_oplimits->width);
 
-   // std::cerr << "d2limits: " << d2limits << "\n";
-    inside = d2limits < 0;
+    debugMsg("trex:always", "dist2oplimits: " << d2limits);
+    if (!(d2limits < 0))
+    {
+      debugMsg("trex:always", "Outside op limits! " << lat << ", " << lon << ", " << depth);
+      m_lat.empty();
+    }
   }
-
-  //s_oplimits->toText(std::cerr);
-  //std::cerr << "inside: " << inside << "\n";
-
-  m_inside.intersect(!!inside, !!inside);
 
   return;
 }

@@ -86,17 +86,15 @@ public:
 private:
 	static Dune::IMC::OperationalLimits * s_oplimits;
 
-	EUROPA::Domain &m_inside;
 	EUROPA::Domain &m_lat;
 	EUROPA::Domain &m_lon;
 	EUROPA::Domain &m_depth;
 
 	enum indexes {
-		INSIDE = 0,
-	  LAT = 1,
-		LON = 2,
-		DEPTH = 3,
-		NARGS = 4
+	  LAT = 0,
+		LON = 1,
+		DEPTH = 2,
+		NARGS = 3
 	};
 };
 

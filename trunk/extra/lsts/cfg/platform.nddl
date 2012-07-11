@@ -126,9 +126,14 @@ class ManeuverController extends Timeline {
 
 	secs >= 0;
 	speed > 0.0;
+	speed <= 2.0;
+	
+	
 	// need to rename this constraint ...
 	deg_to_rad(lat_rad, lat_deg);
 	deg_to_rad(lon_rad, lon_deg);
+	
+	sane_pos(lat_rad, lon_rad, depth);
     }
 };
 
