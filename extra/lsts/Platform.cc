@@ -639,7 +639,15 @@ Observation Platform::maneuverObservation(IMC::Message * man)
     obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
     obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
     obs.restrictAttribute("depth", FloatDomain(m->z));
-    obs.restrictAttribute("speed", FloatDomain(m->speed));
+    if (m->speed_units == IMC::Loiter::SUNITS_METERS_PS)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed));
+    }
+    else if (m->speed_units == IMC::Loiter::SUNITS_RPM)
+    {
+      obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
+    }
+
     obs.restrictAttribute("secs", IntegerDomain(m->duration));
     //obs.restrictAttribute("type", EnumDomain("loiter"));
   }
@@ -651,11 +659,11 @@ Observation Platform::maneuverObservation(IMC::Message * man)
     obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
     obs.restrictAttribute("depth", FloatDomain(0));
     //obs.restrictAttribute("type", EnumDomain("skeeping"));
-    if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+    if (m->speed_units == IMC::StationKeeping::SUNITS_METERS_PS)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed));
     }
-    else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+    else if (m->speed_units == IMC::StationKeeping::SUNITS_RPM)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
     }

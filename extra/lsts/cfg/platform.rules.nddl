@@ -54,6 +54,9 @@ ManeuverController::Maneuver {
     VehicleCommand cmd;
     cmd == free.vehicle;
     met_by(VehicleState.Ready ready);
+    met_by(Idle idle);
+    ready contained_by idle;
+
     //contained_by(VehicleState.Exec);    
     
     int earliest_start;
