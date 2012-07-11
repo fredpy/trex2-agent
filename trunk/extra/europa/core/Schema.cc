@@ -38,6 +38,7 @@
 #include <trex/utils/XmlUtils.hh>
 
 #include <PLASMA/Debug.hh>
+#include <PLASMA/Error.hh>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>
@@ -104,6 +105,7 @@ void details::Schema::setStream(std::ofstream &out, std::string const &name) {
 }
 
 void details::Schema::setStream(std::ostream &out) {
+  Error::doThrowExceptions();
   DebugMessage::setStream(out);
 }
 

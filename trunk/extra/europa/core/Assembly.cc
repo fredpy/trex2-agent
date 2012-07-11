@@ -196,7 +196,7 @@ Assembly::Assembly(std::string const &name)
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  m_cstr_engine->setAutoPropagation(true);
+  m_cstr_engine->setAutoPropagation(false);
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
@@ -412,7 +412,13 @@ void Assembly::notify(details::CurrentState const &state) {
              <<'.'<<state.current()->getUnqualifiedPredicateName().toString()<<":\n"
              <<state.current()->toLongString());
     notify(obj_name, state.current());
-  }
+  } // else if( is_external(obj_name) ) {
+    // EUROPA::TokenId cur = state.current();
+    // if( cur->isInactive() ) {
+  /* Do not do thaT !!! it breaks the plan */ 
+    //   plan_db()->getClient()->activate(cur);
+    // }
+  // }
 }
 
 bool Assembly::commit_externals() {
