@@ -46,7 +46,7 @@ ManeuverController::Maneuver {
     depth <= lim.maxDepth;
     lim.minDepth <= depth;
     speed <= lim.maxSpeed;
-    lim.maxSpeed <= speed;
+    lim.minSpeed <= speed;
     
    // met_by(Idle ready);
 
