@@ -53,6 +53,7 @@
 #include <trex/utils/TREXversion.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/agent/StepClock.hh>
+#include <signal.h>
 
 using namespace TREX::agent;
 using namespace TREX::utils;
