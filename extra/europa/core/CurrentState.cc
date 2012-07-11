@@ -172,6 +172,7 @@ EUROPA::TokenId CurrentState::new_obs(std::string const &pred,
   m_last_obs->start()->specify(now());
   m_last_obs->end()->restrictBaseDomain(future);
   m_last_obs->getObject()->specify(m_timeline->getKey());
+  m_last_obs->incRefCount();
 
   if( insert ) {
     debugMsg("trex:state", "["<<now()<<"] Creating new observation "<<pred<<" on "<<timeline()->toString());

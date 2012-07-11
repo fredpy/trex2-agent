@@ -123,9 +123,11 @@ namespace {
   class Extensions :public TREX::europa::EuropaPlugin {
     public:
       void registerComponents(TREX::europa::Assembly const &assembly) {
-        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DoNotMatchFilter, doNotMatch);
+        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::DoNotMatchFilter, 
+				  doNotMatch);
         TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::GoalFilter, goals);
-        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::NotGoalFilter, notGoals);
+        TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::NotGoalFilter, 
+				  notGoals);
         
         
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,

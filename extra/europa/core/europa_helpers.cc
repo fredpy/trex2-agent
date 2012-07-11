@@ -48,8 +48,10 @@ void TREX::europa::details::restrict_base(EUROPA::TokenId const &tok,
     
     size_t count=0;
     for(; !var->isActive(); ++count ) 
-      var->undoDeactivation();
-    var->restrictBaseDomain(dom);
+      var->undoDeactivation(); 
+    try {
+      var->restrictBaseDomain(dom);
+    } catch(Error) {}
     avar->handleBase(var->baseDomain());
     if( var->isSpecified() )
       avar->handleSpecified(var->lastDomain().getSingletonValue());
@@ -71,7 +73,9 @@ void TREX::europa::details::restrict_bases(EUROPA::TokenId const &dest,
     size_t count = 0;
     for(; !dest_v[i]->isActive(); ++count)
       dest_v[i]->undoDeactivation();
-    dest_v[i]->restrictBaseDomain(src_v[i]->lastDomain());
+    try {
+      dest_v[i]->restrictBaseDomain(src_v[i]->lastDomain());
+    } catch(Error) {}
     if( active!=dest ) {
       active->getVariables()[i]->handleBase(dest_v[i]->baseDomain());
       if( dest->getVariables()[i]->isSpecified() )

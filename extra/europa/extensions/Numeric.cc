@@ -316,26 +316,29 @@ MaxConstraint::MaxConstraint(EUROPA::LabelStr const &name,
 
 void MaxConstraint::handleExecute() {
   EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
-  EUROPA::edouble lb, ub, cur_max;
-  cur_max = result.getUpperBound();
+  EUROPA::edouble lb, ub, mlb, mub;
+  result.getBounds(mlb, mub);
   
   for(int i=1; i<m_variables.size(); ++i) {
     EUROPA::Domain &arg = getCurrentDomain(m_variables[i]);
     EUROPA::edouble ilb, iub;
     arg.getBounds(ilb, iub);
-    arg.intersect(ilb, cur_max);
+    if( mub<iub )
+      arg.intersect(ilb, mub);
     if( arg.isEmpty() )
       return;
     if( 1==i ) {
       lb = ilb;
       ub = iub;
     } else {
-      using std::max;
-      lb = max(lb, ilb);
-      ub = max(ub, iub);
+      if( ilb>lb )
+	lb = ilb;
+      if( iub>ub )
+	ub = iub;
     }
   }
-  result.intersect(lb, ub);
+  if( mlb<lb || ub<mub )
+    result.intersect(lb, ub);
 }
 
 /*
@@ -370,8 +373,8 @@ MinConstraint::MinConstraint(EUROPA::LabelStr const &name,
 
 void MinConstraint::handleExecute() {
   EUROPA::Domain &result = getCurrentDomain(m_variables[0]);
-  EUROPA::edouble lb, ub, cur_min;
-  cur_min = result.getLowerBound();
+  EUROPA::edouble lb, ub, mlb, mub;
+  result.getBounds(mlb, mub);
 
   for(int i=1; i<m_variables.size(); ++i) {
     EUROPA::Domain &arg = getCurrentDomain(m_variables[i]);
@@ -379,7 +382,8 @@ void MinConstraint::handleExecute() {
     // All the parameters should have a lower bound which is greater or
     // equal to cur_min
     arg.getBounds(ilb, iub);
-    arg.intersect(cur_min, iub);
+    if( mlb>ilb )
+      arg.intersect(mlb, iub);
     if( arg.isEmpty() )
       return;
     if( 1==i ) {
@@ -391,7 +395,8 @@ void MinConstraint::handleExecute() {
       ub = min(ub, iub);
     }
   }
-  result.intersect(lb, ub);
+  if( mlb<lb || ub<mub )
+    result.intersect(lb, ub);
 }
 
 
