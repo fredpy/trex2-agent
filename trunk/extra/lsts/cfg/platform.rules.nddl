@@ -89,10 +89,10 @@ ManeuverController::Maneuver {
 
     //tolerance <= 10.0; // hard coded to 10. m for now 
 	
-    if( end <= AGENT_CLOCK ) {
+    // if( end <= AGENT_CLOCK ) {
 	meets(EstimatedState.Position pos);
 	distance == ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude);
 	distance <= tolerance;
 	// if it fails replanning should be able to correct it
-    }
+	// }
 }
