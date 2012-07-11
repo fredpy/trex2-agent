@@ -159,7 +159,7 @@ namespace {
 }
 
 extern "C" {
-  void sin_cleanup(int sig) {
+  void sim_cleanup(int sig) {
     s_log->syslog("sim", info)<<"============================================";
     s_log->syslog("sim", info)<<"Received signal "<<sig; 
     s_log->syslog("sim", info)<<"============================================";
@@ -168,6 +168,14 @@ extern "C" {
     std::cout<<"Goodbye"<<std::endl;
     exit(1);
   }
+
+
+  void sim_abort(int) {
+    s_log->syslog("sim", error)<<"============================================";
+    s_log->syslog("sim", error)<<"Received SIGABRT"; 
+    s_log->syslog("sim", error)<<"============================================";
+    std::cout<<"Received abort."<<std::endl;
+  } 
 
 }
 
@@ -227,6 +235,13 @@ int main(int argc, char **argv) {
   try {
     if( argc>=3 )
       clk.reset(new StepClock(Clock::duration_type(0), string_cast<size_t>(argv[2])));
+    
+    // Clean-up the agent on interruptions
+    signal(SIGINT, sim_cleanup);
+    signal(SIGTERM, sim_cleanup);
+    signal(SIGQUIT, sim_cleanup);
+    signal(SIGKILL, sim_cleanup);
+    signal(SIGABRT, sim_abort);
 
     my_agent.reset(new Agent(configFile, clk.release(), true));
     my_agent->setClock(new StepClock(Clock::duration_type(0), 60));
