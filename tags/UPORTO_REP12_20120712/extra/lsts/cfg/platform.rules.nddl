@@ -1,0 +1,101 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+#include "navigator.nddl"
+#include "estimator.nddl"
+
+VehicleState::Boot {
+	contained_by(VehicleCommand.Idle);
+}
+
+/*
+ * superfluous now :
+ *
+ * It is all checked by our controller ... as long as nobody uses 
+ * VheicleCommand directly we do not need these extra rules
+ */ 
+// VehicleState::Exec {
+// 	contains(VehicleCommand.Maneuver);
+// 	met_by(VehicleState.Ready); 
+// }
+
+// VehicleCommand::Maneuver {
+	
+//     met_by(VehicleState.Ready); 
+   	
+// 	contained_by (OperationalLimits.Limits limits);
+//     depth 	<= 	limits.maxDepth;
+//     depth 	>= 	limits.minDepth;
+//     speed 	<= 	limits.maxSpeed;
+//     speed 	>= 	limits.minSpeed;
+    
+//     // sane == sane_pos(latitude, longitude, depth);
+//     // sane == true;
+// }
+/*
+ * end of superfuous
+ */
+
+TrexSupervision::Active {
+    vehicle == object.vehicle;
+}
+
+// rule that enables the maneuver dispatch
+
+ManeuverController::Maneuver {
+    starts_during(OperationalLimits.Limits lim);
+    depth <= lim.maxDepth;
+    lim.minDepth <= depth;
+    speed <= lim.maxSpeed;
+    lim.minSpeed <= speed;
+    
+   // met_by(Idle ready);
+
+    starts_during(TrexSupervision.Active free);
+    VehicleCommand cmd;
+    cmd == free.vehicle;
+    met_by(VehicleState.Ready ready);
+    met_by(Idle idle);
+    ready contained_by idle;
+
+    //contained_by(VehicleState.Exec);    
+    
+    int earliest_start;
+    
+    earliest_start == max(free.start, ready.start);
+
+    // Wait free to be started so we do not spam 
+    // Platform when Blocked 
+    if( earliest_start <= AGENT_CLOCK ) {
+	
+	equals(cmd.Maneuver request);
+	request.latitude == lat_rad;
+	request.longitude == lon_rad;
+	request.depth == depth;
+	request.speed == speed;
+	request.secs == secs;
+
+    }
+
+    // Instead of rejecting the goal I will silently select
+    // a more realistic tolerance
+    
+    float min_tolerance;
+    if (secs == 0)
+    	min_tolerance <= speed*6.0;
+    else if (depth > 0)
+    	min_tolerance == 20.0;
+    else
+    	min_tolerance == 15.0;
+    	
+    tolerance == max(min_tolerance, requested_tolerance);
+    
+
+    //tolerance <= 10.0; // hard coded to 10. m for now 
+	
+    // if( end <= AGENT_CLOCK ) {
+	meets(EstimatedState.Position pos);
+	distance == ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude);
+	distance <= tolerance;
+	// if it fails replanning should be able to correct it
+	// }
+}

@@ -1,0 +1,62 @@
+/****************************************************************************************
+ * Author: WilliamTan
+ * Declares all data types for the STARFISH agent application.
+ * Status: In Progress
+ ****************************************************************************************/
+ 
+ // Generic typedefs
+typedef int [0 +inf] PINT;
+typedef float [0.0 +inff] PFLOAT;
+typedef int [-1 0] FLAG;
+
+// AUV types
+typedef float [-90.0, 90.0] LATITUDE; // Range for latitude values
+typedef float [-126.0, -120.0001] LONGITUDE; // Range for longitude values. Keep in zone 10, UTM
+typedef float [0.0 6000000.0] YPOS; // Range for YPOS (6000 km)
+typedef float [0.0 6000000.0] XPOS; // Range for XPOS (6000 km)
+typedef float [-10.0 100.0] DEPTH; // Range for depth. Based on rated values of the vehicle. Account for some sensor/simulation error.
+typedef float [0.0 100.0] TEMPERATURE; // Celsius - freezing to boiling
+typedef float [0.0 100.0] ALTITUDE;  // The deepest point in the ocean is Challenger Deep, 11 km.
+typedef float [-30.0, +30.0] PITCH; // Range for pitch angles for the tailcone
+typedef float [0.0, 3.0] SPEED; // Range for speed through the water.
+typedef int [0, 100] THRUST; //Range for AUV thrust
+typedef int [0, 5] PRIORITY; //priority for the path
+
+ /**
+ * A constant for the upper bound on timing uncertainty for integration with
+ * layered control events
+ */
+int TIMING_UNCERTAINTY_BOUND = 2;
+
+/**
+ * A constant defining the nominal speed through the water for the vehicle.
+ * For now, speed a fixed value globally. Will eventuall adapt it for each traverse and possibly
+ * for each commanded behavior it may change.
+ */
+SPEED DEFAULT_SPEED = 1.5; // Meters per second
+
+/**
+ * Vehicle's maximum speed achievable. including under the effect of current
+ *
+ */
+SPEED VEC_MAX_SPEED = 13; //meter per second
+
+
+/**
+ * A constant defining the nominal thrust for the AUV navigating in the water. 
+ */
+THRUST DEFAULT_THRUST = 70; //percentage of thrust
+
+/**
+ * A constant defining the nominal thrust for the AUV navigating in the water. 
+ */
+DEPTH DEFAULT_DEPTH = 0; //percentage of thrust
+
+
+
+/**
+ * A constant defining the minimum altitude for the AUV, mission will be aborted 
+ * if the altitude of the AUV is less than this number
+ */
+ALTITUDE DEFAULT_MIN_ALTI= 1.0;
+

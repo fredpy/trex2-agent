@@ -1,0 +1,39 @@
+#include "declarations.nddl"
+#include "platform.nddl"
+
+class VehicleDepth extends AgentTimeline {
+    
+    predicate Surface {
+    }
+    
+    predicate Underwater {
+    }
+
+    VehicleDepth(Mode _mode) {
+		super(_mode);
+    }   
+}
+
+class Navigator extends AgentTimeline {
+	
+	Navigator(Mode _mode) {
+		super(_mode, "Idle");
+	}
+        Navigator(Mode _mode, bool plan) {
+	    super(_mode, "Idle", plan);
+        }
+	
+	predicate Idle {}
+	
+	predicate Going {
+		float latitude, longitude, depth, speed;
+		int secs, estimated_duration, duration_interval;
+	}
+	
+	predicate Staying {
+		float latitude, longitude, depth;
+		int secs;
+	}
+}
+
+

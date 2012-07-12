@@ -1,0 +1,40 @@
+<Solver name="LstsPlanCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+<!-- 
+EstimatedState estate = new EstimatedState(Observe);
+VehicleState vstate = new VehicleState(Observe);
+VehicleCommand command = new VehicleCommand(External);
+OperationalLimits oplimits = new OperationalLimits(Observe);
+TrexSupervision supervision = new TrexSupervision(Observe, command);
+
+ManeuverController control = new ManeuverController();
+
+Navigator navigator = new Navigator(Internal);//, true);
+Estimator estimator = new Estimator(Internal);//,true);
+-->
+  <!-- resolve non goal first -->
+  <!-- OpenConditionManager defaultPriority="50">
+    <FlawFilter class-match="ManeuverController"/>
+    <FlawFilter class-match="VehicleState"/>
+    <FlawFilter class-match="TrexSupervision"/>
+    <FlawFilter class-match="OperationalLimits"/>
+    <FlawFilter component="goals"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager -->
+
+  <!-- resolve non goal first -->
+
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <!-- then resolve new goals -->
+  <OpenConditionManager defaultPriority="2500">
+    <FlawFilter component="notGoals"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+</Solver>

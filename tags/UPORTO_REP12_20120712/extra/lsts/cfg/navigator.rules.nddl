@@ -1,0 +1,36 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+#include "platform.nddl"
+
+VehicleDepth::Surface {
+	met_by(EstimatedState.Position bef);
+	meets(EstimatedState.Position aft);
+	bef.depth >= 0.2;
+	aft.depth <= 0.1;
+}
+
+VehicleState::Boot {
+    contained_by(Navigator.Idle);
+}
+
+// Navigator::Going {
+//   contained_by(TrexSupervision.Active);
+// }
+
+// TrexSupervision::Blocked {
+//     // better then above as it will allow some cleaning 
+//     // during archiving
+//     contained_by(Navigator.Idle);
+// }
+
+ManeuverController::Maneuver {
+    ends(Navigator.Going go);
+    go.start <= start;
+
+    lat_deg == go.latitude;
+    lon_deg == go.longitude;
+    depth == go.depth;
+    speed == go.speed;
+    secs == go.secs;
+}
+

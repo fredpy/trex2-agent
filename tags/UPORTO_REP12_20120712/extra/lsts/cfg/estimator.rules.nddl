@@ -1,0 +1,21 @@
+#include "declarations.nddl"
+#include "estimator.nddl"
+#include "platform.nddl"
+#include "navigator.nddl"
+
+VehicleState::Boot {
+    contained_by(Estimator.Boot);
+}
+
+Estimator::At {
+    met_by(ManeuverController.Maneuver maneuver);
+    maneuver.lat_deg == lat_deg;
+    maneuver.lon_deg == lon_deg;
+    maneuver.lat_rad == latitude;
+    maneuver.lon_rad == longitude;
+    maneuver.speed == speed;
+    maneuver.depth == depth;
+    maneuver.secs == secs;
+    maneuver.requested_tolerance <= tolerance;
+}
+

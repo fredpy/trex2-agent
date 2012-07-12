@@ -1,0 +1,146 @@
+float WP_DURATION_BOUND = 600;
+
+
+/////////////////////////////////////////////////////////
+////////// WayPoint  ///////////////////////////////////
+///////////////////////////////////////////////////////
+
+WayPoint::Active {
+	bool external;
+	isExternal(external);
+	if( external == false ) {
+		meets(Inactive);
+		met_by(Inactive);
+	}
+
+	addEq(start,duration,end);
+}
+
+WayPoint::Inactive {
+	bool external;
+	isExternal(external);
+	if( external == false ) {
+		meets(Active);
+	}
+	
+	bool first;
+	testLEQ(first, start, 0);
+	if (first == false) {
+		//met_by(Active);
+		meets(Active);
+	}
+	
+	starts(PathController.Holds pc);
+	if(status == SUCCESS) {
+		eq(pc.finished, true);
+		eq(pc.at_goal, true);
+		eq(pc.active, true);
+		//bind(pc.end, start);
+	}
+	
+	
+}
+
+/////////////////////////////////////////////////////////
+////////// Path ////////////////////////////////////////
+///////////////////////////////////////////////////////
+
+Path::Inactive {
+	bool first;
+	testLEQ(first, start, 0);
+	if (first != false) {
+		starts(VehicleState.Holds pos);
+		eq(pos.x, x);
+		eq(pos.y, y);
+		eq(pos.depth, depth);
+	}
+	
+	//bool external;
+	//isExternal(external);
+	//if(external == false) {
+		meets(Goto);
+		//met_by(Goto);
+	//}
+	
+}
+
+Path::Goto {
+
+	starts(PathController.Holds pc);
+	eq(pc.active, true);
+	eq(pc.finished, false);
+	
+	//bool external;
+	//isExternal(external);
+	//if(external == false) {
+		met_by(Inactive bf);
+		
+		float distance;
+		
+		calcDistance(distance,x,y,bf.x,bf.y);
+		
+		// Applies a very conservative lower bound to avoid to dispatch
+  		// too much to exec
+  		float minDuration;
+  		bool longEnough;
+  		mulEq(VEC_MAX_SPEED, minDuration, distance);
+  		testLEQ(longEnough, 5, minDuration);
+  		if( longEnough==true ) {
+    		leq(minDuration, duration);
+    		addEq(start, duration, end);
+  		}
+		
+		
+		meets(Inactive aft);
+		eq(aft.x, x);
+		eq(aft.y, y);
+	//}
+}
+
+/////////////////////////////////////////////////////////
+////////// PathController ///////////////////////////////
+///////////////////////////////////////////////////////
+
+PathController::Holds {
+	
+	bool external;
+	isExternal(external);
+	if (external == false) {
+		if(active == false) {
+			eq(at_goal,false);
+			eq(finished, false);
+		}
+  	
+  		if(active == true) {
+  			if(finished == true) {
+  				meets(Path.Inactive p_inactive);
+  				bind(duration, 1);
+  				meets(Holds s);
+  				bind(s.active, false);
+  			
+  				if(at_goal == true) {
+  					eq(p_inactive.status, SUCCESS);
+  				}
+  				else {
+  					eq(p_inactive.status, ABORTED);
+  				}
+  				
+  				
+  			}
+  			else {
+  				contained_by(Path.Goto g);
+  				contains(WayPoint.Active wp);
+  				concurrent(wp.end, end);
+  				leq(wp.end,g.end);
+  				leq(wp.duration, WP_DURATION_BOUND);
+  				eq(wp.x, g.x);
+  				eq(wp.y, g.y);
+  				eq(wp.depth, g.depth);
+  				eq(wp.thrust, g.thrust);
+  			}
+  		}
+  		else {
+  			contained_by(Path.Inactive);
+  		}
+  	}
+}
