@@ -201,6 +201,13 @@ add_subdirectory(mbari) # MBARI specific components
 # Finalize                                                             #
 ########################################################################
 
+install(DIRECTORY scripts DESTINATION bin OPTIONAL
+  FILES_MATCHING PATTERN "*"
+  PATTERN ".svn" EXCLUDE)
+set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
+
+
 bash_path(TREX_CONFIG_DIRS ${PROJECT_NAME}_CFGS)
 bash_path(TREX_LIBRARY_DIRS ${PROJECT_NAME}_LIBS)
 bash_path(TREX_BINARY_DIRS ${PROJECT_NAME}_CMDS)
@@ -214,6 +221,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
 
+
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)
 file(WRITE ${CMAKE_BINARY_DIR}/log/.empty_file " ") # Not really empty ... it is just to force tar to use it
 
@@ -224,6 +232,7 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/log DESTINATION shared/trex
     WORLD_READ WORLD_WRITE WORLD_EXECUTE
    FILES_MATCHING PATTERN "latest" EXCLUDE
    PATTERN "????.???.*" EXCLUDE
+   PATTERN "archives" EXCLUDE
    PATTERN ".empty_file")
 
 #include(CMakePackageConfigHelpers)
