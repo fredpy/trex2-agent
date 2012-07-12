@@ -201,7 +201,7 @@ add_subdirectory(mbari) # MBARI specific components
 # Finalize                                                             #
 ########################################################################
 
-install(DIRECTORY scripts DESTINATION bin OPTIONAL
+install(DIRECTORY scripts/ DESTINATION bin OPTIONAL
   FILES_MATCHING PATTERN "*"
   PATTERN ".svn" EXCLUDE)
 set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
