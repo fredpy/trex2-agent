@@ -875,7 +875,7 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
-  size_t count = 0, slp_count = 0;
+  size_t count = 0; //slp_count = 0;
   bool completed = false;
   stat_clock::time_point start_delib = stat_clock::now();
   rt_clock::time_point start_delib_rt = rt_clock::now();
@@ -901,7 +901,7 @@ bool Agent::doNext() {
     rt_clock::time_point start_sleep = rt_clock::now();
     while( valid() && m_clock->tick()==getCurrentTick() ) {
       m_clock->sleep();
-      ++slp_count;
+      // ++slp_count;
     }
     sleep_time = rt_clock::now()-start_sleep;
 
