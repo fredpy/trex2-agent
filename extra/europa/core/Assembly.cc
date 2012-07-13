@@ -552,6 +552,13 @@ bool Assembly::relax(bool aggressive) {
 }
 
 void Assembly::archive() {
+  bool auto_prop = m_cstr_engine->getAutoPropagation();
+  
+  m_cstr_engine->setAutoPropagation(false);
+  
+  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
+    m_cstr_engine->setAutoPropagation(auto_prop);
+  } BOOST_SCOPE_EXIT_END
 #ifdef TREX_ARCHIVE_Greedy
 
 # ifdef EUROPA_HAVE_EFFECT
