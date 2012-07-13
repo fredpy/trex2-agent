@@ -915,7 +915,7 @@ bool Agent::doNext() {
   } 
   if( print_delib )
     m_stat_log<<", "<<delib.count()<<", "<<count<<", ";
-  m_stat_log<<sleep_time.count()<<", "<<slp_count<<std::endl;
+  m_stat_log<<sleep_time.count()<<std::endl;
 
   return valid();
 }
