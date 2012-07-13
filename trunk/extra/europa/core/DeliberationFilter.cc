@@ -94,9 +94,11 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::IntervalIntDomain const &t_start(tok->start()->lastDomain());
   EUROPA::IntervalIntDomain const &t_end(tok->start()->lastDomain());
   EUROPA::IntervalIntDomain horizon = assembly().plan_scope();
+  EUROPA::eint initial = assembly().initial_tick();
 
   return t_start.getLowerBound() >= horizon.getUpperBound() ||
-    t_end.getUpperBound() < horizon.getLowerBound();
+    // t_end.getUpperBound() < horizon.getLowerBound();
+    t_end.getUpperBound()<=initial;
 }
 
 /*
@@ -104,7 +106,9 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
  */
 
 bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
-  EUROPA::eint cur = assembly().now();
+  EUROPA::eint cur = assembly().now(), 
+    initial = assembly().initial_tick();
+    
   // debugMsg("trex:filt:synch", "Checking if "<<tok->toString()<<" overlaps "<<cur);
   
   if( tok->start()->lastDomain().getLowerBound() > cur ) {
@@ -112,7 +116,7 @@ bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
              <<" after "<<cur<<" => EXCLUDE"); 
     return true;
   }
-  if( tok->end()->lastDomain().getUpperBound() < cur ) {
+  if( tok->end()->lastDomain().getUpperBound() <= initial ) {
     debugMsg("trex:filt:synch", tok->toString()<<".end="<<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 
     return true;

@@ -436,7 +436,11 @@ bool EuropaReactor::synchronize() {
 //        debugMsg("trex:synch", "Detailed decision stack:\n"<<oss.str());
   } BOOST_SCOPE_EXIT_END;
 
+  
   // tr_info("resolve state");
+  debugMsg("trex:synch", "clean up planner active decision");
+  planner()->reset(0);
+  debugMsg("trex:synch", "start synchronization");
   if( !synch() ) {
     m_completed_this_tick = false;
     syslog(null, warn)<<"Failed to synchronize : relaxing current plan.";
