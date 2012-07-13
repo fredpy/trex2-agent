@@ -746,7 +746,9 @@ void Agent::initComplete() {
   LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   std::ofstream dotf(graph_dot.c_str());
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
-  m_stat_log<<"tick, synch_ns, delib_ns, steps, sleep_ns, sleeps"<<std::endl;
+  m_stat_log<<"tick, synch_ns, synch_rt_ns,"
+    " delib_ns, delib_rt_ns, delib_steps,"
+    " sleep_ns"<<std::endl;
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
@@ -776,6 +778,7 @@ void Agent::synchronize() {
   bool update = false;
 
   stat_clock::time_point synch_start = stat_clock::now();
+  rt_clock::time_point synch_start_rt = rt_clock::now();
 
   // Identify synchronization order while notifying of the new tick
   boost::depth_first_search(me(), boost::visitor(sync));
@@ -808,7 +811,8 @@ void Agent::synchronize() {
     }
   }
   m_stat_log<<getCurrentTick()
-	    <<", "<<(stat_clock::now()-synch_start).count()
+	    <<", "<<(stat_clock::now()-synch_start).count()	    
+	    <<", "<<(rt_clock::now()-synch_start_rt).count()
 	    <<std::flush;
   if( update ) {
     // Create new graph file
@@ -874,7 +878,9 @@ bool Agent::doNext() {
   size_t count = 0, slp_count = 0;
   bool completed = false;
   stat_clock::time_point start_delib = stat_clock::now();
-  stat_duration delib, sleep_time;
+  rt_clock::time_point start_delib_rt = rt_clock::now();
+  stat_duration delib;
+  rt_clock::duration delib_rt, sleep_time;
   bool print_delib = true;
 
   try {  
@@ -885,8 +891,10 @@ bool Agent::doNext() {
     }
     completed = true;
     delib = stat_clock::now()-start_delib;
+    delib_rt = rt_clock::now()-start_delib_rt;
       
-    m_stat_log<<", "<<delib.count()<<", "<<count<<", "<<std::flush;
+    m_stat_log<<", "<<delib.count()<<", "<<delib_rt.count()
+	      <<", "<<count<<", "<<std::flush;
     print_delib = false;
     
     
