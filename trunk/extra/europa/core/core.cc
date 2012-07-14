@@ -140,6 +140,11 @@ namespace TREX {
 						     explanation) {}
       ~TrexOpenConditionDP() {}
 
+      std::string toString() const {
+	// Just make it compact for now as the toStringdid carsh at times
+	return toShortString();
+      }
+
     private:
       void handleInitialize() {
 	EUROPA::SOLVERS::OpenConditionDecisionPoint::handleInitialize();
