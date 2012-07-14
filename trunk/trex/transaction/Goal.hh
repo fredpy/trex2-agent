@@ -128,11 +128,11 @@ namespace TREX {
       /** @brief Check for possible early start
        * @param[in] date A date
        *
-       * @retval true if @c start can be less of equal to @a date
+       * @retval true if @c start can be less to @a date
        * @retval false otherwise
        */
       bool startsBefore(IntegerDomain::bound const &date) const {
-	return getStart().lowerBound()<=date;
+	return getStart().lowerBound()<date;
       }
       
       bool endsAfter(TICK date) const {
