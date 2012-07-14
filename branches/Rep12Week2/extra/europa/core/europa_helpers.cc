@@ -55,6 +55,7 @@ void TREX::europa::details::restrict_base(EUROPA::TokenId const &tok,
     avar->handleBase(var->baseDomain());
     if( var->isSpecified() )
       avar->handleSpecified(var->lastDomain().getSingletonValue());
+    avar->touch();
     for(size_t i=0; i<count; ++i)
       var->deactivate();
   } else 

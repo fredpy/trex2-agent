@@ -278,10 +278,6 @@ bool CurrentState::commit() {
 		 <<'('<<m_prev_obs->getKey()<<')');
         return false;
       }
-      if( m_constraint.isId() ) {
-        m_client->deleteConstraint(m_constraint);
-        m_constraint = EUROPA::ConstraintId::noId();
-      }
       start_time = now();
     } else
       start_time = m_last_obs->start()->getSpecifiedValue();
@@ -323,11 +319,14 @@ bool CurrentState::commit() {
 	return false;	
       }
     }
-    if( m_constraint.isId() ) {
-      m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
-      m_constraint = EUROPA::ConstraintId::noId();
+    if( m_assembly.constraint_engine()->propagate() ) {
+      // if( m_constraint.isId() ) {
+      // 	m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
+      // 	m_constraint = EUROPA::ConstraintId::noId();
+      // }      
+      return true;
     }
-    return m_assembly.constraint_engine()->propagate();
+    return false;
   }
 }
 

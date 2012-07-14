@@ -423,16 +423,17 @@ void Assembly::notify(details::CurrentState const &state) {
 
 bool Assembly::commit_externals() {
   bool auto_prop = m_cstr_engine->getAutoPropagation();
-
+  
   m_cstr_engine->setAutoPropagation(false);
-
+  
   BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
     m_cstr_engine->setAutoPropagation(auto_prop);
   } BOOST_SCOPE_EXIT_END
 
   for(external_iterator i=begin_external(); end_external()!=i; ++i) {
     if( !(*i)->commit() ) {
-      debugMsg("trex:always", "["<<now()<<"] failed to integrate state of external timeline "
+      debugMsg("trex:always", "["<<now()
+	       <<"] failed to integrate state of external timeline "
 	       <<(*i)->timeline()->getName().toString());
       return false;
     } else {
@@ -443,7 +444,7 @@ bool Assembly::commit_externals() {
         plan_db()->getClient()->merge(cur, act);
       }
     }
-
+    
   }
   return true;
 }
@@ -1024,7 +1025,20 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
       // print all token attributes
-      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
+      out<<"  "<<(*v)->getName().toString()<<'=';
+      if( (*v)->isNull() ) 
+	out<<"NULL";
+      else {
+	EUROPA::DataTypeId type = (*v)->getDataType();
+	EUROPA::Domain const &dom = (*v)->lastDomain();
+	if( dom.isSingleton() ) 
+	  out<<type->toString(dom.getSingletonValue());
+	else if( dom.isInterval() ) 
+	  out<<dom;
+	else
+	  out<<(*v)->toString();
+      }
+      out<<"\\n";
     }
     if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
@@ -1274,6 +1288,9 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
   if( master.isNoId() ) {
     m_owner.m_roots.insert(token);
   }
+  // This is fucking weird but I have to do this for now ... 
+  // otherwise some tokens gets deleted prematurely ?
+  token->incRefCount();
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
