@@ -1,0 +1,33 @@
+<!--- This solver is used to plan the mission. It is driven by a set of science and operator goals. The basic
+      search strategy releases goals one at a time, and makes sure each goal is fully planned before releasing another.
+      We work remaining flaws such that we work flaws earliest first and depth first --->
+
+<Solver name="MissionPlanner">
+
+  	<ThreatManager defaultPriority="1">
+    		<FlawHandler component="StandardThreatHandler"/>
+  	</ThreatManager>
+
+    	<!--- This flaw manager is responsible for path and survey refinement --->
+  	<OpenConditionManager component="EarliestFirst">
+  			<!-- token filter -->
+    		<FlawFilter component="NoGoals"/>
+    		<FlawHandler component="StandardOpenConditionHandler" maxChoices="1" priority="10"/>
+    		
+    		<FlawHandler class-match="MissionStatus" component="StandardOpenConditionHandler" priority="20"/>
+  	</OpenConditionManager>
+
+  	<UnboundVariableManager defaultPriority="1000">
+    		<!--- Only allow variables to be bound when singletons -->
+    		<FlawFilter component="Singleton"/>
+    		<FlawHandler component="StandardVariableHandler"/>
+  	</UnboundVariableManager>
+
+	<!--- Specialized plug-in uses a local search method select subset of feasible goals --->
+  	<OpenConditionManager component="GoalManager" defaultPriority="10000" 
+  							maxIterations="1000" plateau="1000" positionSource="vehicleState">
+    		<!--- Exclude everything but goals that a user wants to accomplish--->
+    		<FlawFilter component="GoalsOnly"/>
+    		<FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+</Solver>

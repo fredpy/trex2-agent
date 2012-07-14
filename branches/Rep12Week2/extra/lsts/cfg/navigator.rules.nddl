@@ -1,0 +1,31 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+#include "platform.nddl"
+
+
+SurfaceController::Underwater {
+	if( requested==true ) { 
+		duration <= 30; // replace by time to surface...
+		after(VehicleCommand.Maneuver surface);
+		surface.depth == 0;
+		surface.end + [8,12] == start;
+	}
+}
+
+//SurfaceController::Surface {			
+//}
+
+VehicleState::Boot {
+    contained_by(Navigator.Idle);
+}
+
+ManeuverController::Maneuver {
+    ends(Navigator.Going go);
+    go.start <= start;
+
+    lat_deg == go.latitude;
+    lon_deg == go.longitude;
+    depth == go.depth;
+    speed == go.speed;
+    secs == go.secs;
+}
