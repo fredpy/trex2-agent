@@ -299,9 +299,10 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   details::is_rejectable rejectable;
   EUROPA::TokenId active = tok;
 
-  if( tok->canBeCommitted() )
-    tok->commit();
-  else if( !tok->isCommitted() )
+  // if( tok->canBeCommitted() )
+  //   tok->commit();
+  // else 
+  if( !tok->isCommitted() )
     m_completed.insert(tok);
 
   // I assume here that if a goals ends time is in the past then the goal is completed
@@ -403,6 +404,28 @@ void Assembly::configure_solvers(std::string const &synchronizer,
   debugMsg("trex:init", "Adding synchronizer activity listener");
   m_synchronizer->addListener(m_synchListener->getId());
 }
+
+EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
+  std::ostringstream oss;
+  oss<<"__trex_tick_"<<now();
+  EUROPA::LabelStr name(oss.str());
+  EUROPA::DataTypeId type = m_clock->getDataType();  
+  
+  if( m_tick_const.isNoId() || m_tick_const->getName()!=name ) {
+    std::auto_ptr<EUROPA::Domain> base(type->baseDomain().copy());
+    base->set(now());
+
+    debugMsg("trex:always", "Creating const "<<name.toString());
+    m_tick_const = m_cstr_engine->createVariable(type->getName().c_str(), 
+						 *base, true, true, 
+						 name.c_str());
+    m_tick_const->incRefCount();
+  }
+  debugMsg("trex:always", "Current tick : "<<m_tick_const->getName().toString()
+	   <<'='<<m_tick_const->toString());
+  return m_tick_const;
+}
+
 
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
@@ -548,11 +571,14 @@ bool Assembly::relax(bool aggressive) {
         if( tok->isMerged() ) {
           debugMsg("trex:relax", "\t- give room for fact "<<tok->getKey()
 		   <<" (cancel active="<<tok->getActiveToken()->getKey()<<")");
-          cli->cancel(tok->getActiveToken());
+	  EUROPA::TokenId active = tok->getActiveToken();
+	  active->incRefCount();
+          cli->cancel(active);
           if( !aggressive ) {
             debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
             cli->activate(tok);
-          }
+          } 
+	  active->decRefCount();
         }
       } else if( !tok->isInactive() ) {
         debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
@@ -602,11 +628,34 @@ void Assembly::archive() {
     EUROPA::TokenId tok = *(m_iter++);
     
     if( tok->canBeCommitted() ) {
-      debugMsg("trex:archive", "Committing "<<tok->getPredicateName().toString()
-	       <<'('<<tok->getKey()<<").");
-      details::restrict_bases(tok);
+      // details::restrict_bases(tok);
       // constraint_engine()->propagate();
-      tok->commit(); 
+      EUROPA::TokenId master = tok->master();
+ 
+      if( master.isId() ) {
+	if( master->isCommitted() ) {
+	  debugMsg("trex:archive", 
+		   "Committing "<<tok->getPredicateName().toString()
+		   <<'('<<tok->getKey()<<") as its master is committed.");
+	  tok->commit();
+	} else if( master->isFact() && 
+		   master->start()->lastDomain().getUpperBound()<now() ) {
+	  debugMsg("trex:archive", 
+		   "Committing "<<tok->getPredicateName().toString()
+		   <<'('<<tok->getKey()<<") as its master is a past fact.");
+	  tok->commit();
+	} else {
+	  debugMsg("trex:archive", "Cannot commit "
+		   <<tok->getPredicateName().toString()
+		   <<'('<<tok->getKey()<<") as its master is neither a fact "
+		   <<"or committed.");
+	}
+      } else {
+	debugMsg("trex:archive", 
+		 "Committing "<<tok->getPredicateName().toString()
+		 <<'('<<tok->getKey()<<") as it is a root token.");
+	tok->commit(); 
+      }
     } else if( tok->isInactive() ) {
       EUROPA::TokenId master = tok->master(); 
       if( master.isNoId() ) {
@@ -624,15 +673,8 @@ void Assembly::archive() {
 		   <<tok->getPredicateName().toString()
 		   <<'('<<tok->getKey()<<").");
 	  m_completed.erase(tok);
-	} else if( master->canBeCommitted() ) {
-	  details::restrict_bases(master);
-	  // constraint_engine()->propagate();
-	  master->commit();
-	  debugMsg("trex:archive", "Ignoring inactive freshly justified token "
-		   <<tok->getPredicateName().toString()
-		   <<'('<<tok->getKey()<<").");
-	  m_completed.erase(tok);
-	} 
+	} else 
+	  m_completed.insert(master);
       }	
     } else {
       // token is merged
@@ -641,11 +683,8 @@ void Assembly::archive() {
 
       if( master.isId() ) {
 	if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	  if( master->canBeCommitted() ) {
-	    details::restrict_bases(master);
-	    // constraint_engine()->propagate();
-	    master->commit();
-	  }
+	  if( !master->isCommitted() ) 
+	    m_completed.insert(master);
 	}
       }
       if( master.isNoId() || master->isCommitted() ) {
@@ -656,8 +695,8 @@ void Assembly::archive() {
 	// constraint_engine()->propagate();
 	if( tok->isFact() ) 
 	  active->makeFact();
-	if( active->canBeCommitted() )
-	  active->commit();
+	if( active->canBeCommitted() ) 
+	  m_completed.insert(active);
 	if( master.isNoId() ) {
 	  debugMsg("trex:archive", "Discarding the redundant token "
 		   <<tok->getPredicateName().toString() 
@@ -695,7 +734,7 @@ void Assembly::archive() {
 		     <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
 		     <<") from master "<<tok->getPredicateName().toString()<<'('
 		     <<tok->getKey()<<").");
-            details::restrict_bases(*t);
+            // details::restrict_bases(*t);
 	    // constraint_engine()->propagate();
             (*t)->commit();
           } else if( (*t)->isMerged() ) {
@@ -705,7 +744,7 @@ void Assembly::archive() {
 		       <<(*t)->getPredicateName().toString()<<'('
 		       <<(*t)->getKey()
 		       <<") with its active counterpart "<<active->getKey());
-	      details::restrict_bases(active, *t);
+	      //details::restrict_bases(active, *t);
 	      // constraint_engine()->propagate();
 	      active->commit();
 	    } else {
@@ -714,7 +753,7 @@ void Assembly::archive() {
 		       <<(*t)->getKey()
 		       <<") with its committed active counterpart "
 		       <<active->getKey());
-	      details::restrict_bases(active, *t);
+	      //details::restrict_bases(active, *t);
 	      // constraint_engine()->propagate();
 	    }
           } else if( !(*t)->isInactive() ) {
@@ -761,12 +800,10 @@ void Assembly::archive() {
       bool restrict = false;
       if( master.isId() ) {
 	if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	  if( master->canBeCommitted() ) {
-	    details::restrict_bases(master);
-	    // constraint_engine()->propagate();
-	    master->commit();
-	  }
-	  restrict = true;
+	  if( master->isCommitted() )
+	    restrict = true;
+	  else 
+	    m_completed.insert(master);
 	} else { 
 	  debugMsg("trex:archive", "Cannot delete "<<
 		   tok->getPredicateName().toString()<<'('<<tok->getKey()
@@ -1283,14 +1320,14 @@ void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::D
 
 void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
   EUROPA::TokenId master = token->master();
-  token->incRefCount();
+  // token->incRefCount();
 
   if( master.isNoId() ) {
     m_owner.m_roots.insert(token);
   }
   // This is fucking weird but I have to do this for now ... 
   // otherwise some tokens gets deleted prematurely ?
-  token->incRefCount();
+  // token->incRefCount();
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {

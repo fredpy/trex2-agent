@@ -97,7 +97,7 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::eint initial = assembly().initial_tick();
 
   return t_start.getLowerBound() >= horizon.getUpperBound() ||
-      t_end.getUpperBound() < horizon.getLowerBound() ||
+    // t_end.getUpperBound() < horizon.getLowerBound() ||
       t_end.getUpperBound() <= initial;
 }
 
@@ -116,7 +116,7 @@ bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
              <<" after "<<cur<<" => EXCLUDE"); 
     return true;
   }
-  if( tok->end()->lastDomain().getUpperBound() <= initial ) {
+  if( tok->end()->lastDomain().getUpperBound() <= cur ) {
     debugMsg("trex:filt:synch", tok->toString()<<".end="<<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 
     return true;

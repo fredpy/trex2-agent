@@ -222,6 +222,7 @@ void EuropaReactor::notify(Observation const &obs) {
   else if( !restrict_token(fact, obs) )
     syslog(null, error)<<"Failed to restrict some attributes of observation "
 		       <<obs;
+  logPlan("notify");
 }
 
 void EuropaReactor::handleRequest(goal_id const &request) {
@@ -256,6 +257,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       }
     }
   }
+  logPlan("request");
 }
 
 void EuropaReactor::handleRecall(goal_id const &request) {
@@ -275,6 +277,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
       m_completed_this_tick = false;
     }
   }
+  logPlan("recall");
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
@@ -304,6 +307,7 @@ void EuropaReactor::handleTickStart() {
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
+  logPlan("tick");
 }
 
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
