@@ -404,6 +404,8 @@ bool EuropaReactor::do_relax(bool full) {
   bool ret = relax(full);
   print_stats("relax", 0, 0, stat_clock::now()-start);
   logPlan("relax");
+  m_dispatched.clear(); // need this in case we have the same
+			// token coming back
   return ret;
 }
 

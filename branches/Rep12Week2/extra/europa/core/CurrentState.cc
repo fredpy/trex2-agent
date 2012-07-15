@@ -336,37 +336,46 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
   std::list<EUROPA::TokenId>::const_iterator
     i = timeline()->getTokenSequence().begin(),
     endi = timeline()->getTokenSequence().end();
+  std::string tl = timeline()->toString();
 
-  debugMsg("trex:dispatch", "Checking dispatch for "<<timeline()->toString()<<" ["<<lb<<", "<<ub
+  debugMsg("trex:dispatch", "Checking dispatch for "<<tl<<" ["<<lb<<", "<<ub
     <<"]\n\t"<<timeline()->getTokenSequence().size()<<" tokens to check.");
 
   // skip the past tokens
   for( ; endi!=i && (*i)->start()->lastDomain().getUpperBound()<lb && (*i)->end()->lastDomain().getLowerBound()<=lb+1; ++i) {
-    debugMsg("trex:dispatch", "skipping "<<(*i)->toString()<<" as it ends to early (end="
-      <<(*i)->end()->lastDomain().toString()<<"<="<<(lb+1));
+    debugMsg("trex:dispatch", "skipping "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()<<'('<<(*i)->getKey()
+	     <<") as it ends to early (end="
+	     <<(*i)->end()->lastDomain().toString()<<"<="<<(lb+1));
   }
   if( i!=endi )
-    debugMsg("trex:dispatch", "First token is "<<(*i)->toString()<<" start="<<(*i)->start()->lastDomain().toString());
+    debugMsg("trex:dispatch", "First token is "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()<<'('
+	     <<(*i)->getKey()<<") start="<<(*i)->start()->lastDomain().toString());
 
   for( ; endi!=i && (*i)->start()->lastDomain().getLowerBound()<=ub; ++i) {
 #ifdef  EUROPA_HAVE_EFFECT
-    debugMsg("trex:dispatch", "Checking if token "<<(*i)->toString()
-        <<" overlaps ["<<lb<<", "<<ub<<"] as a goal (start="<<(*i)->start()->lastDomain().toString()); 
+    debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
+	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
+	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString()); 
     // New code from Philip 
     // Check if next candidate is goal dependent ... needs to be refined I think
     EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
     if(nowGoal.isId())
         m_assembly.dispatch(timeline(),*i);
 #else 
-    debugMsg("trex:dispatch", "Checking if token "<<(*i)->toString()
-        <<" overlaps ["<<lb<<", "<<ub<<"] (start="<<(*i)->start()->lastDomain().toString()); 
+    debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
+	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
+	     <<"] (start="<<(*i)->start()->lastDomain().toString()); 
     ///Old code for dispatching tokens
     // very dumb but work with europa 2.5
     if( !m_assembly.dispatch(timeline(), *i)
        && (*i)->start()->lastDomain().getLowerBound()>=lb ) {
-      debugMsg("trex:dispatch", "Token "<<(*i)->toString()<<" cannot be dispatched and starts after "
-        <<lb<<"\n\t=>stopping dispatch for "<<timeline()->toString());
+      debugMsg("trex:dispatch", "Token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()<<'('
+	       <<(*i)->getKey()<<") cannot be dispatched and starts after "
+	       <<lb<<"\n\t=>stopping dispatch for "<<timeline()->toString());
       break;
+    } else {
+      debugMsg("trex:dispatch", "Token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()<<'('
+	       <<(*i)->getKey()<<") dispatched");
     }
 #endif // EUROPA_HAVE_EFFECT
   }
