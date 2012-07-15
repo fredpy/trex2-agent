@@ -1507,6 +1507,9 @@ namespace TREX {
        */
       void terminate(EUROPA::TokenId const &tok);
 
+      EUROPA::ConstrainedVariableId get_tick_const();
+
+      EUROPA::ConstrainedVariableId m_tick_const;
 
       friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;
