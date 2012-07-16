@@ -444,8 +444,8 @@ bool EuropaReactor::synchronize() {
 
   
   // tr_info("resolve state");
-  debugMsg("trex:synch", "clean up planner active decision");
-  planner()->reset(0);
+  // debugMsg("trex:synch", "clean up planner active decision");
+  // planner()->reset(0);
   debugMsg("trex:synch", "start synchronization");
   if( !synch() ) {
     m_completed_this_tick = false;
@@ -605,9 +605,12 @@ void EuropaReactor::resume() {
     if( constraint_engine()->pending() )
       constraint_engine()->propagate();
     if( constraint_engine()->constraintConsistent() ) { 
-      planner()->step();
+      size_t depth = planner()->getDepth();
+      planner()->step();      
       if( m_full_log && planner()->getStepCount()>nsteps )
 	logPlan("step");
+      if( planner()->getDepth() < depth )
+	planner()->reset(0);
     }
 
 
@@ -615,8 +618,7 @@ void EuropaReactor::resume() {
       syslog(null, warn)<<"Inconsitency found during planning.";
       should_relax = true;
       break;
-    }
-    if( planner()->isExhausted() ) {
+    }if( planner()->isExhausted() ) {
       syslog(null, warn)<<"Deliberation solver is exhausted.";
       should_relax = true;
       break;

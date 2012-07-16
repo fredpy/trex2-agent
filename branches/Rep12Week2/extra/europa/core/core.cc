@@ -143,10 +143,10 @@ namespace TREX {
       // std::string toShortString() const {
       //     return "europa sucks";
       // }
-      // std::string toString() const {
-      // 	// Just make it compact for now as the toStringdid carsh at times
-      // 	return toShortString();
-      // }
+      std::string toString() const {
+      	// Just make it compact for now as the toStringdid carsh at times
+      	return toShortString();
+      }
 
     private:
       void handleInitialize() {
