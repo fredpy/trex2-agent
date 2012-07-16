@@ -137,8 +137,12 @@ namespace TREX {
 			  EUROPA::LabelStr const &explanation = "trex")
 	:EUROPA::SOLVERS::OpenConditionDecisionPoint(client, flawed,
 						     configData, 
-						     explanation) {}
-      ~TrexOpenConditionDP() {}
+						     explanation) {
+        flawed->incRefCount();
+      }
+      ~TrexOpenConditionDP() {
+        m_flawedToken->decRefCount();
+      }
 
       // std::string toShortString() const {
       //     return "europa sucks";

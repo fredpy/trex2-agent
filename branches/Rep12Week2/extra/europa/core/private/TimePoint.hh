@@ -54,6 +54,7 @@ namespace TREX {
 	bool set_date(EUROPA::eint now);
 	void relax_date();
 	bool commit_date(EUROPA::eint now);
+        bool commit_end(EUROPA::eint now);
 
 	void setToken(EUROPA::TokenId tok);
 	EUROPA::TokenId const &token() const {

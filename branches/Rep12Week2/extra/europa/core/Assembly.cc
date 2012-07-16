@@ -1377,17 +1377,17 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
 	     <<'('<<token->getKey()<<')');
     m_owner.cancel(token);
   }
-  EUROPA::TokenSet slaves = token->slaves();
-  for(EUROPA::TokenSet::const_iterator i=slaves.begin();
-      slaves.end()!=i; ++i) {
-    (*i)->decRefCount();
-  }
+  // EUROPA::TokenSet slaves = token->slaves();
+  // for(EUROPA::TokenSet::const_iterator i=slaves.begin();
+  //     slaves.end()!=i; ++i) {
+  //   (*i)->decRefCount();
+  // }
 }
 
 void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
-  EUROPA::TokenId master = token->master();
-  if( master.isId() && token->refCount()==1 )
-    token->incRefCount();
+  // EUROPA::TokenId master = token->master();
+  // if( master.isId() && token->refCount()==1 )
+  //   token->incRefCount();
   
   
   // Check to find if the tokens active token is in m_goal

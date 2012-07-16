@@ -58,6 +58,11 @@ TrexThreatDecisionPoint::TrexThreatDecisionPoint
     throw EuropaException("Unable to find clock variable \""
 			  +Assembly::CLOCK_VAR.toString()+"\"");
   m_clock = client->getGlobalVariable(Assembly::CLOCK_VAR);
+  m_tokenToOrder->incRefCount();
+}
+
+TrexThreatDecisionPoint::~TrexThreatDecisionPoint() {
+  m_tokenToOrder->decRefCount();
 }
 
 // manipulators

@@ -256,39 +256,20 @@ bool CurrentState::commit() {
     EUROPA::eint start_time;
 
     if( m_prev_obs.isId() ) {
-      EUROPA::TokenId active = m_prev_obs;
-      EUROPA::IntervalIntDomain i_now(now());
-
+      assert(m_prev_frontier.isId());
       debugMsg("trex:commit", "Terminating "<<timeline()->toString()
 	       <<'.'<<m_prev_obs->getUnqualifiedPredicateName().toString()
 	       <<'('<<m_prev_obs->getKey()<<')');
-
-      if( m_prev_obs->isMerged() )
-	active=m_prev_obs->getActiveToken();
-
-      if( active->end()->lastDomain().intersects(i_now) ) {
-	EUROPA::eint start = m_prev_obs->start()->getSpecifiedValue();
-
-	debugMsg("trex:commit", "Set end="
-		 <<m_prev_obs->end()->lastDomain().toString()<<" to "<<now());
-	restrict_base(m_prev_obs, m_prev_obs->end(), 
-		      EUROPA::IntervalIntDomain(now()));
-	debugMsg("trex:commit", "Update duration="
-		 <<m_prev_obs->end()->lastDomain().toString()<<" to "
-		 <<now()<<"-"<<start);
-        
-	restrict_base(m_prev_obs, m_prev_obs->duration(), 
-		      EUROPA::IntervalIntDomain(now()-start));
-
-	m_assembly.terminate(m_prev_obs);
-	m_prev_obs = EUROPA::TokenId::noId();
-      } else {
-	debugMsg("trex:always", "["<<now()<<"] Unexpected termination of token "
-		 <<timeline()->toString()
-		 <<'.'<<m_prev_obs->getUnqualifiedPredicateName().toString()
-		 <<'('<<m_prev_obs->getKey()<<')');
-	return false;
-      }
+      if( !m_prev_frontier->commit_end(now()) ) {
+        debugMsg("trex:always", "["<<now()<<"] Failed to terminate observation "
+                 <<timeline()->toString()<<'.'
+                 <<m_prev_obs->getUnqualifiedPredicateName().toString()
+                 <<'('<<m_prev_obs->getKey()<<')');
+        return false;     
+      }        
+      m_assembly.terminate(m_prev_obs);
+      m_prev_obs = EUROPA::TokenId::noId();
+      m_prev_frontier = EUROPA::Id<TimePoint>::noId();
       start_time = now();
     } else
       start_time = m_last_obs->start()->getSpecifiedValue();
@@ -300,49 +281,30 @@ bool CurrentState::commit() {
       restrict_base(m_last_obs, m_last_obs->start(), 
 		    EUROPA::IntervalIntDomain(now()));
       m_assembly.notify(*this);
-    } else {
-      EUROPA::IntervalIntDomain 
-	future(now()+1, std::numeric_limits<EUROPA::eint>::infinity()),
-	dur(now()+1-start_time, std::numeric_limits<EUROPA::eint>::infinity());
-      EUROPA::TokenId active = m_last_obs;
-
-      if( m_last_obs->isMerged() ) 
-	active = m_last_obs->getActiveToken();
-      
-      if( active->end()->lastDomain().intersects(future) &&
-	  active->duration()->lastDomain().intersects(dur) ) {
-	debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
-		 <<m_last_obs->getUnqualifiedPredicateName().toString()
-		 <<'('<<m_last_obs->getKey()<<"):\n  BEFORE\n\tend="
-		 <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
-		 <<m_last_obs->duration()->baseDomain().toString()<<'\n');
-	m_frontier->commit_date(now());
-	restrict_base(m_last_obs, m_last_obs->end(), future);
-	restrict_base(m_last_obs, m_last_obs->duration(), dur);
-	debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
-		 <<m_last_obs->getUnqualifiedPredicateName().toString()
-		 <<'('<<m_last_obs->getKey()<<"):\n  AFTER\n\tend="
-		 <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
-		 <<m_last_obs->duration()->baseDomain().toString()<<'\n');
-      } else { 
-	debugMsg("trex:always", "["<<now()<<"] Failed to extend external observation "
-		 <<timeline()->toString()<<"."<<m_last_obs->getUnqualifiedPredicateName().toString()
-		 <<'('<<m_last_obs->getKey()<<").");
-	return false;	
-      }
+    } 
+    debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
+             <<m_last_obs->getUnqualifiedPredicateName().toString()
+             <<'('<<m_last_obs->getKey()<<"):\n  BEFORE\n\tend="
+             <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
+             <<m_last_obs->duration()->baseDomain().toString()<<'\n');   
+    if( !m_frontier->commit_date(now()) ) {
+      debugMsg("trex:always", "["<<now()
+               <<"] Failed to extend external observation "
+               <<timeline()->toString()
+               <<"."<<m_last_obs->getUnqualifiedPredicateName().toString()
+               <<'('<<m_last_obs->getKey()<<").");
+      return false;	
     }
-    if( m_assembly.constraint_engine()->propagate() ) {
-      // if( m_constraint.isId() && m_constraint->isActive() ) {
-      // 	m_assembly.constraint_engine()->deleteConstraint(m_constraint);
-      // 	m_constraint = EUROPA::ConstraintId::noId();
-      // 	// m_constraint->deactivate();
-      // 	// m_assembly.plan_db()->getClient()->deleteConstraint(m_constraint);
-      //  	// m_constraint = EUROPA::ConstraintId::noId();
-      // }      
-      return true;
-    }
-    return false;
   }
+  if( m_assembly.constraint_engine()->propagate() )
+    return true;
+  debugMsg("trex:always", "["<<now()
+           <<"] Inconsitency detected after applying observation "
+           <<timeline()->toString()<<"."
+           <<m_last_obs->getUnqualifiedPredicateName().toString()
+           <<'('<<m_last_obs->getKey()<<").");
+
+  return false;
 }
 
 // manipulators
@@ -776,6 +738,16 @@ bool TimePoint::commit_date(EUROPA::eint now) {
   }
 }
 
+bool TimePoint::commit_end(EUROPA::eint now) {
+  if( lastDomain().getUpperBound()<now ||
+      lastDomain().getLowerBound()>now )
+    return false;
+  else {
+    restrictBaseDomain(EUROPA::IntervalIntDomain(now));
+    return true;
+  }
+}
+
 void TimePoint::setToken(EUROPA::TokenId tok) {
   if( m_tok!=tok ) {
     std::swap(tok, m_tok);
@@ -798,27 +770,7 @@ void TimePoint::create_constraint() {
     // m_tok->addStandardConstraint(m_constraint);    
     // m_constraint->undoDeactivation();
   } else {
-    debugMsg("trex:TimePoint", getName().toString()<<'('<<getKey()<<") is not associated to a token");
+    debugMsg("trex:TimePoint", getName().toString()
+             <<'('<<getKey()<<") is not associated to a token");
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
