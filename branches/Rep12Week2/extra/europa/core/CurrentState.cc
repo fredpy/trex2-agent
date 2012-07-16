@@ -209,6 +209,8 @@ void CurrentState::apply_base(EUROPA::TokenId &merged,
 
   if( frontier.isId() )
     frontier->setToken(active);
+  active->incRefCount();
+  merged->decRefCount();
   merged = active;
 }
 
@@ -226,6 +228,7 @@ void CurrentState::new_token(EUROPA::TokenId const &token) {
   m_prev_obs = m_last_obs;
   m_prev_frontier = m_frontier;
   m_last_obs = token;
+  m_last_obs->incRefCount();
   m_frontier = (new TimePoint(m_last_obs, now(), "__trex_frontier"))->getId();
 }
 
@@ -656,12 +659,12 @@ void CurrentState::DecisionPoint::handleExecute() {
   case CREATE_DEFAULT:
     debugMsg("trex:current", "Execute decision CREATE "<<m_target->default_pred().toString());
     tok = m_target->new_obs(details::predicate_name(m_target->timeline(), m_target->default_pred()),
-			    true);
+			    false);
     break;
   case CREATE_OTHER:
     debugMsg("trex:current", "Execute decision CREATE "<<m_next_pred->toString());
     tok = m_target->new_obs(details::predicate_name(m_target->timeline(), *m_next_pred),
-			    true);
+			    false);
     break;
   default:
     throw EuropaException("Unknown synchronization decision for timeline "+

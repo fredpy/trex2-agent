@@ -601,7 +601,7 @@ void EuropaReactor::resume() {
   bool should_relax = false, should_continue;
   size_t count = 0;
   
-  do {
+  // do {
     if( constraint_engine()->pending() )
       constraint_engine()->propagate();
     if( constraint_engine()->constraintConsistent() ) { 
@@ -609,38 +609,47 @@ void EuropaReactor::resume() {
       planner()->step();      
       if( m_full_log && planner()->getStepCount()>nsteps )
 	logPlan("step");
-      if( planner()->getDepth() < depth )
-	planner()->reset(0);
+      if( !planner()->isValid() ) {
+        syslog(warn)<<"Planner is not valid !!!";
+      }
+      syslog(info)<<"Depth = "<<planner()->getDepth()
+                  <<"\n\tlast decision: "
+                  <<planner()->getLastExecutedDecision();
+      // if( planner()->getDepth() < depth )
+      //   planner()->reset(0);
     }
-
+    if( constraint_engine()->pending() )
+      constraint_engine()->propagate();
+    
+    
 
     if( constraint_engine()->provenInconsistent() ) {
       syslog(null, warn)<<"Inconsitency found during planning.";
       should_relax = true;
-      break;
-    }if( planner()->isExhausted() ) {
+    }
+    if( planner()->isExhausted() ) {
       syslog(null, warn)<<"Deliberation solver is exhausted.";
       should_relax = true;
-      break;
+      //break;
     }
 
     // As long as I see a Threat I will continue to do steps 
     // this assume that threats have the highest priority
-    EUROPA::IteratorId flaws = planner()->createIterator();
-    should_continue = false;
-    while( !flaws->done() ) {
-      EUROPA::EntityId flaw = flaws->next();
-      if( EUROPA::TokenId::convertable(flaw) 
-	  && EUROPA::TokenId(flaw)->isActive() ) {
-	debugMsg("trex:step", "["<<now()<<"] Found one threat in the stack:\n"
-		 <<planner()->printOpenDecisions()
-		 <<"\n\t *** Resuming deliberation ***");
+  //   EUROPA::IteratorId flaws = planner()->createIterator();
+  //   should_continue = false;
+  //   while( !flaws->done() ) {
+  //     EUROPA::EntityId flaw = flaws->next();
+  //     if( EUROPA::TokenId::convertable(flaw) 
+  //         && EUROPA::TokenId(flaw)->isActive() ) {
+  //       debugMsg("trex:step", "["<<now()<<"] Found one threat in the stack:\n"
+  //       	 <<planner()->printOpenDecisions()
+  //       	 <<"\n\t *** Resuming deliberation ***");
 
-	should_continue = true;
-	break;
-      }
-    }
-  } while(should_continue);
+  //       should_continue = true;
+  //       break;
+  //     }
+  //   }
+  // } while(should_continue);
 
   if( should_relax ) {
     syslog(null, warn)<<"Relax database after "<<planner()->getStepCount()

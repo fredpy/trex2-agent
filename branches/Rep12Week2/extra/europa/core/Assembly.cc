@@ -196,7 +196,7 @@ Assembly::Assembly(std::string const &name)
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  m_cstr_engine->setAutoPropagation(true);
+  m_cstr_engine->setAutoPropagation(false);
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
@@ -520,7 +520,7 @@ bool Assembly::relax(bool aggressive) {
   debugMsg("trex:relax", "Cancelling current decisions");
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
-  planner()->clear();
+  planner()->reset();
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
@@ -551,6 +551,16 @@ bool Assembly::relax(bool aggressive) {
             cli->cancel(tok); 
 	  }
           cli->deleteToken(tok);
+        } else if( tok->isMerged() ) { 
+          
+ 	  EUROPA::TokenId active = tok->getActiveToken();
+	  active->incRefCount();
+          cli->cancel(active);
+          if( !aggressive ) {
+            debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
+            // cli->activate(tok);
+          } 
+	  active->decRefCount();
         }
       } else {
         bool can_reject = rejectable(tok);
@@ -576,10 +586,12 @@ bool Assembly::relax(bool aggressive) {
           cli->cancel(active);
           if( !aggressive ) {
             debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
-            cli->activate(tok);
+            // cli->activate(tok);
           } 
 	  active->decRefCount();
-        }
+        } /*else if( tok->isActive() ) {
+          cli->cancel(tok);
+          }*/
       } else if( !tok->isInactive() ) {
         debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
         cli->cancel(tok);
@@ -1048,6 +1060,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
        <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
+    out<<"nref="<<(*it)->refCount()<<"\\n";
 #ifdef EUROPA_HAVE_EFFECT
     out<<"type: ";
     if( is_action(*it) )
@@ -1082,9 +1095,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       if( !merged.empty() ) {
         out<<"merged={";
         EUROPA::TokenSet::const_iterator m = merged.begin();
-        out<<(*(m++))->getKey();
-        for(; merged.end()!=m; ++m)
-          out<<", "<<(*m)->getKey();
+        out<<(*m)->getKey()<<'['<<(*m)->refCount()<<']';
+        for(++m; merged.end()!=m; ++m)
+          out<<", "<<(*m)->getKey()<<'['<<(*m)->refCount()<<']';
         out<<"}\\n";
       }
     }
@@ -1278,7 +1291,7 @@ void Assembly::ce_listener::notifyPropagationPreempted() {
  */
 
 void Assembly::synchronization_listener::notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp) {
-  debugMsg("trex:synch:search", "New decision point ["<<dp->getKey()<<"]:" <<dp->toString());
+  debugMsg("trex:synch:search", "New decision point ["<<dp->getKey()<<"]");
   m_progress = true;
 }
 
@@ -1320,14 +1333,11 @@ void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::D
 
 void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
   EUROPA::TokenId master = token->master();
-  // token->incRefCount();
 
   if( master.isNoId() ) {
     m_owner.m_roots.insert(token);
-  }
-  // This is fucking weird but I have to do this for now ... 
-  // otherwise some tokens gets deleted prematurely ?
-  // token->incRefCount();
+    // token->incRefCount();
+  } 
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
@@ -1367,37 +1377,49 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
 	     <<'('<<token->getKey()<<')');
     m_owner.cancel(token);
   }
+  EUROPA::TokenSet slaves = token->slaves();
+  for(EUROPA::TokenSet::const_iterator i=slaves.begin();
+      slaves.end()!=i; ++i) {
+    (*i)->decRefCount();
+  }
 }
 
-void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token)
-{
-    // Check to find if the tokens active token is in m_goal
-    // If it is it gets added to m_goals
-    if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())
+void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
+  EUROPA::TokenId master = token->master();
+  if( master.isId() && token->refCount()==1 )
+    token->incRefCount();
+  
+  
+  // Check to find if the tokens active token is in m_goal
+  // If it is it gets added to m_goals
+  if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())
     {
-        m_owner.m_goals.insert(token);
-        // Checking for goal->effect->action relation if it is then the action
-        // becomes an action goal in the m_goals
-        if(m_owner.actionEffect(token))
-            m_owner.m_goals.insert(token->master());
+      m_owner.m_goals.insert(token);
+      // Checking for goal->effect->action relation if it is then the action
+      // becomes an action goal in the m_goals
+      if(m_owner.actionEffect(token))
+        m_owner.m_goals.insert(token->master());
     }
-    // Check if the token is a goal and adds it to m_goals
-    // Also insert the active token as that is the token we most often check against
-    else if(m_owner.is_goal(token)) {
-        m_owner.m_goals.insert(token);
-        m_owner.m_goals.insert(token->getActiveToken());
-        // Checking for goal->effect->action relation if it is then the action
-        // becomes an action goal in the m_goals
-        if(m_owner.actionEffect(token))
-            m_owner.m_goals.insert(token->master());
-        if(m_owner.actionEffect(token->getActiveToken()))
-            m_owner.m_goals.insert(token->getActiveToken()->master());
-    }
+  // Check if the token is a goal and adds it to m_goals
+  // Also insert the active token as that is the token we most often check against
+  else if(m_owner.is_goal(token)) {
+    m_owner.m_goals.insert(token);
+    m_owner.m_goals.insert(token->getActiveToken());
+    // Checking for goal->effect->action relation if it is then the action
+    // becomes an action goal in the m_goals
+    if(m_owner.actionEffect(token))
+      m_owner.m_goals.insert(token->master());
+    if(m_owner.actionEffect(token->getActiveToken()))
+      m_owner.m_goals.insert(token->getActiveToken()->master());
+  }
 }
 
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
     // Checks and erases the token if it was considered a goal
-    m_owner.m_goals.erase(token);
+  m_owner.m_goals.erase(token);
+  // EUROPA::TokenId master = token->master();
+  // if( master.isId() )
+  //   token->decRefCount();
 }
 
 void Assembly::listener_proxy::notifyRejected(EUROPA::TokenId const &token) {
