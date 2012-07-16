@@ -743,8 +743,8 @@ TimePoint::TimePoint(EUROPA::TokenId const &tok,
 }
 
 TimePoint::~TimePoint() {
-  if( m_tok.isId() )
-    m_tok->removeLocalVariable(getId());
+  // if( m_tok.isId() )
+  //   m_tok->removeLocalVariable(getId());
 }
  
 // modifiers 
