@@ -612,9 +612,9 @@ void EuropaReactor::resume() {
       if( !planner()->isValid() ) {
         syslog(warn)<<"Planner is not valid !!!";
       }
-      syslog(info)<<"Depth = "<<planner()->getDepth()
-                  <<"\n\tlast decision: "
-                  <<planner()->getLastExecutedDecision();
+      // syslog(info)<<"Depth = "<<planner()->getDepth()
+      //             <<"\n\tlast decision: "
+      //             <<planner()->getLastExecutedDecision();
       // if( planner()->getDepth() < depth )
       //   planner()->reset(0);
     }
