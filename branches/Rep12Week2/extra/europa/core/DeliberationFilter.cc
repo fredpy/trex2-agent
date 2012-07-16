@@ -119,7 +119,7 @@ bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
 
   EUROPA::eint max_end = tok->end()->lastDomain().getUpperBound();
 
-  if( max_end < (tok->isFact()?cur:(cur+1)) ) {
+  if( max_end <= initial || max_end < (tok->isFact()?cur:(cur+1)) ) {
     debugMsg("trex:filt:synch", tok->toString()<<".end="
 	     <<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 

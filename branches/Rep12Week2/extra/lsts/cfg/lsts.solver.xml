@@ -29,6 +29,7 @@ Estimator estimator = new Estimator(Internal);//,true);
 
   <OpenConditionManager defaultPriority="100">
     <FlawFilter component="goals"/>
+    
     <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
 

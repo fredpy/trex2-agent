@@ -115,6 +115,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   provide("oplimits", false); 	  // declare the oplimits timeline
   provide("maneuver", false);     // declare the maneuver timeline
   provide("supervision", false);  // declare the supervision timeline
+  provide("gps", false);
 
   IMC::LoggingControl startLog;
   startLog.op = IMC::LoggingControl::COP_REQUEST_START;
@@ -494,6 +495,17 @@ Platform::processState()
     postObservation(
         Observation("estate", "undefined"));
     estate_posted = true;
+  }
+
+  if (received.count(IMC::GpsFix::getIdStatic()))
+  {
+    IMC::GpsFix * fix = dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
+
+    if ((fix->validity & IMC::GpsFix::GFV_VALID_POS) != 0)
+      uniqueObservation(Observation("gps", "Valid"));
+    else
+      uniqueObservation(Observation("gps", "Invalid"));
+
   }
 
   /* OPERATIONAL_LIMITS */

@@ -4,16 +4,24 @@
 
 
 SurfaceController::Underwater {
-	if( requested==true ) { 
-		duration <= 30; // replace by time to surface...
-		after(VehicleCommand.Maneuver surface);
-		surface.depth == 0;
-		surface.end + [8,12] == start;
+
+	int speriod;
+	subsetOf(speriod, object.surface_period);
+
+	if (requested == true) {
+		met_by(Surface surf);
+		
+		earliest_start == surf.start;
+		latest_end <= earliest_start + speriod; 
+		latest_end > start;
+		
+		if (start < AGENT_CLOCK) {
+			contains_start(VehicleCommand.Maneuver man);
+				man.depth == 0;
+				man.start >= latest_end;
+		}			
 	}
 }
-
-//SurfaceController::Surface {			
-//}
 
 VehicleState::Boot {
     contained_by(Navigator.Idle);

@@ -7,48 +7,29 @@ VehicleState::Boot {
 	contained_by(VehicleCommand.Idle);
 }
 
+//VehicleCommand::Maneuver {
 
-VehicleCommand::Maneuver {
+	//if (depth > 0) {
+	//	contained_by(SurfaceController.Underwater);	
+	//}
+	//else {
+	//	contained_by(SurfaceController.Surface);
+	//}
+//}
 
-	if (depth > 0) {
-		contained_by(SurfaceController.Underwater);	
-	}
-	else {
-		contained_by(SurfaceController.Surface);
-	}
-}
-
-/*
- * superfluous now :
- *
- * It is all checked by our controller ... as long as nobody uses 
- * VheicleCommand directly we do not need these extra rules
- */ 
-// VehicleState::Exec {
-// 	contains(VehicleCommand.Maneuver);
-// 	met_by(VehicleState.Ready); 
-// }
-
-// VehicleCommand::Maneuver {
-	
-//     met_by(VehicleState.Ready); 
-   	
-// 	contained_by (OperationalLimits.Limits limits);
-//     depth 	<= 	limits.maxDepth;
-//     depth 	>= 	limits.minDepth;
-//     speed 	<= 	limits.maxSpeed;
-//     speed 	>= 	limits.minSpeed;
-    
-//     // sane == sane_pos(latitude, longitude, depth);
-//     // sane == true;
-// }
-/*
- * end of superfuous
- */
 
 TrexSupervision::Active {
     vehicle == object.vehicle;
 }
+
+Gps::Valid {
+	contains(SurfaceController.Surface);
+}
+
+Gps::Invalid {
+	contains(SurfaceController.Underwater);
+}
+
 
 // rule that enables the maneuver dispatch
 
@@ -69,23 +50,28 @@ ManeuverController::Maneuver {
     // met_by(VehicleState.Ready ready);
     met_by(Idle idle);
     //ready contained_by idle;
+    int min_start;
+    min_start <= start;
 	if (depth > 0) {
 		//met_by(Idle idle);
 		if(idle.start <= AGENT_CLOCK ) {
-		  contained_by(SurfaceController.Underwater under);
-		  under.requested == true;
+		  ends_before(SurfaceController.Underwater under);
+		  	min_start == under.earliest_start;
+		  	under.requested == true;
+		  	end <= under.latest_end;
 		}
 	}
 
     int earliest_start;
     
-    earliest_start == max(free.start, idle.start);
+    earliest_start == max(free.start, idle.start, min_start);
 
     // Wait free to be started so we do not spam 
     // Platform when Blocked 
     if( earliest_start <= AGENT_CLOCK ) {
 		
 		equals(cmd.Maneuver request);
+		
 		request.latitude == lat_rad;
 		request.longitude == lon_rad;
 		request.depth == depth;

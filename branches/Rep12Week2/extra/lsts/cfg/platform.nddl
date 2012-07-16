@@ -135,3 +135,16 @@ class ManeuverController extends Timeline {
     }
 };
 
+class Gps extends AgentTimeline {
+
+	Gps(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+	
+	predicate Valid {}
+	
+	predicate Invalid {}
+}
+

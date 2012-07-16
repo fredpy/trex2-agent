@@ -1,11 +1,26 @@
 #include "declarations.nddl"
 #include "platform.nddl"
 
-class SurfaceController extends Timeline {	
-    predicate Surface {};
+class SurfaceController extends AgentTimeline {	
+    int surface_delay;
+    int surface_period;
+    
+        
+    SurfaceController(int delay, int period) {
+    	super(Internal);
+    	surface_delay = delay;
+    	surface_period = period;
+    }
+        
+    predicate Surface {
+    	start >= 0;
+    }
+    
     predicate Underwater {
+    	int earliest_start;
+    	int latest_end;
     	bool requested;
-    };
+    }
 }
 
 class Navigator extends AgentTimeline {
@@ -13,9 +28,10 @@ class Navigator extends AgentTimeline {
 	Navigator(Mode _mode) {
 		super(_mode, "Idle");
 	}
-        Navigator(Mode _mode, bool plan) {
+    
+    Navigator(Mode _mode, bool plan) {
 	    super(_mode, "Idle", plan);
-        }
+    }
 	
 	predicate Idle {}
 	

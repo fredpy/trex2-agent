@@ -8,6 +8,7 @@
 
 EstimatedState estate = new EstimatedState(Observe);
 VehicleState vstate = new VehicleState(Observe);
+Gps gps = new Gps(Observe);
 VehicleCommand command = new VehicleCommand(External);
 OperationalLimits oplimits = new OperationalLimits(Observe);
 TrexSupervision supervision = new TrexSupervision(Observe, command);
@@ -16,7 +17,10 @@ ManeuverController control = new ManeuverController();
 
 Navigator navigator = new Navigator(Internal);//, true);
 Estimator estimator = new Estimator(Internal);//,true);
-SurfaceController surfacer = new SurfaceController();
+
+// arg1 -> delay at surface, arg2 -> period between surfaces
+SurfaceController surfacer = new SurfaceController([8,12], 30);
+
 
 
 close();
