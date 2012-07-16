@@ -116,8 +116,12 @@ bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
              <<" after "<<cur<<" => EXCLUDE"); 
     return true;
   }
-  if( tok->end()->lastDomain().getUpperBound() <= cur ) {
-    debugMsg("trex:filt:synch", tok->toString()<<".end="<<tok->end()->lastDomain().toString()
+
+  EUROPA::eint max_end = tok->end()->lastDomain().getUpperBound();
+
+  if( max_end < (tok->isFact()?cur:(cur+1)) ) {
+    debugMsg("trex:filt:synch", tok->toString()<<".end="
+	     <<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 
     return true;
   }
