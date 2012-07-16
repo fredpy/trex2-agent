@@ -33,7 +33,7 @@ Estimator estimator = new Estimator(Internal);//,true);
   </OpenConditionManager>
 
   <!-- then resolve new goals -->
-  <OpenConditionManager defaultPriority="2500">
+  <OpenConditionManager defaultPriority="2500" component="EarliestFirst" >
     <FlawFilter component="notGoals"/>
     <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
