@@ -23,11 +23,11 @@ TrexSupervision::Active {
 }
 
 Gps::Valid {
-	contains(SurfaceController.Surface);
+	contained_by(SurfaceController.Surface);
 }
 
 Gps::Invalid {
-	contains(SurfaceController.Underwater);
+	contained_by(SurfaceController.Underwater);
 }
 
 
@@ -57,6 +57,7 @@ ManeuverController::Maneuver {
 		if(idle.start <= AGENT_CLOCK ) {
 		  ends_before(SurfaceController.Underwater under);
 		  	min_start == under.earliest_start;
+		  	duration <= under.speriod;
 		  	under.requested == true;
 		  	end <= under.latest_end;
 		}

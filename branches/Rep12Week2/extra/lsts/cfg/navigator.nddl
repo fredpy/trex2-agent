@@ -14,9 +14,11 @@ class SurfaceController extends AgentTimeline {
         
     predicate Surface {
     	start >= 0;
+    	bool requested;
     }
     
     predicate Underwater {
+    	int speriod;
     	int earliest_start;
     	int latest_end;
     	bool requested;

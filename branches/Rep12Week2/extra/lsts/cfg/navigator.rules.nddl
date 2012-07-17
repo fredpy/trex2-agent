@@ -5,21 +5,27 @@
 
 SurfaceController::Underwater {
 
-	int speriod;
 	subsetOf(speriod, object.surface_period);
 
 	if (requested == true) {
 		met_by(Surface surf);
-		
+		surf.requested == true;
 		earliest_start == surf.start;
-		latest_end <= earliest_start + speriod; 
+		latest_end <= start + speriod; 
 		latest_end > start;
 		
-		if (start < AGENT_CLOCK) {
-			contains_start(VehicleCommand.Maneuver man);
+		if (latest_end < AGENT_CLOCK && latest_end < end) {
+			starts_before(VehicleCommand.Maneuver man);
 				man.depth == 0;
 				man.start >= latest_end;
-		}			
+		}
+	}
+}
+
+SurfaceController::Surface {
+	if (requested == true) {
+		met_by(Underwater und);
+			und.requested == true;
 	}
 }
 

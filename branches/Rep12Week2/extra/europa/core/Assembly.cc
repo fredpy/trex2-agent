@@ -832,7 +832,15 @@ void Assembly::archive() {
       debugMsg("trex:archive", "Archiving "<<
 	       tok->getPredicateName().toString()<<'('<<tok->getKey()
 	       <<") all its slaves and masters are committed");
+
       discard(tok);
+      EUROPA::TokenSet slaves = tok->slaves();
+      for(EUROPA::TokenSet::iterator i=slaves.begin(); slaves.end()!=i; ++i)
+          if( (*i)->isMerged() ) {
+            details::restrict_attributes((*i)->getActiveToken(), *i);
+            // constraint_engine()->propagate();
+            cli->cancel(*i);
+          }
       cli->cancel(tok);
       // constraint_engine()->propagate();
       tok->discard();
