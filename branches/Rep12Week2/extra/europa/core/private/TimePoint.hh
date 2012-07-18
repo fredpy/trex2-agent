@@ -60,12 +60,18 @@ namespace TREX {
 	EUROPA::TokenId const &token() const {
 	  return m_tok;
 	}
+        void pending_discard();
+
       private:
+        void notifyDiscarded(Entity const *entity);
+        
 	static EUROPA::IntervalIntDomain future(EUROPA::eint now);
 	void create_constraint();
+        void detach(bool cstr=true);
 
-	EUROPA::ConstraintId m_constraint;
+	EUROPA::ConstraintId m_dur_cstr, m_end_cstr;
 	EUROPA::TokenId      m_tok;
+        bool m_pending;
 
       }; // TREX::europa::details::TimePoint
 

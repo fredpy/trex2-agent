@@ -212,8 +212,10 @@ namespace TREX {
          */
         void do_dispatch(EUROPA::eint lb, EUROPA::eint ub);
 
-        bool dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub);
-        EUROPA::TokenId getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub);
+        bool dispatch_token(const EUROPA::TokenId& token,
+                            EUROPA::eint lb, EUROPA::eint ub);
+        EUROPA::TokenId getGoal(const EUROPA::TokenId& token, 
+                                EUROPA::eint lb, EUROPA::eint ub);
         EUROPA::TokenId searchGoal(EUROPA::TokenSet actions);
         EUROPA::TokenSet getAllTokens(const EUROPA::TokenId& token);
 
@@ -353,7 +355,8 @@ namespace TREX {
           void advance();
 
           EUROPA::Id<CurrentState> m_target;
-          std::list<EUROPA::TokenId>::const_iterator m_cand_from, m_tok, m_cand_to;
+          std::list<EUROPA::TokenId>::const_iterator 
+            m_cand_from, m_tok, m_cand_to;
           std::set<EUROPA::LabelStr>::const_iterator m_next_pred;
         }; // TREX::europa::details::CurrentState::DecisionPoint
 
@@ -368,16 +371,16 @@ namespace TREX {
 
         /** @brief push end time
          *
-         * Apply a constraint that enforces that the end time of the current
-         * token is greater than the current tick
+         * Apply a constraint that enforces that the end time of the
+         * current token is greater than the current tick
          *
          * @sa relax_end()
          */
         void push_end();
         /** @brief relax end time
          *
-         * Relax the constraint that enforce that the current token end time is
-         * greater than the curren tick
+         * Relax the constraint that enforce that the current token
+         * end time is greater than the curren tick
          * @sa push_end()
          */
         void relax_end();
@@ -392,10 +395,11 @@ namespace TREX {
          *
          * @pre @p pred is a valid predicate name for this timeline
          *
-         * @return The newly created token with its start time restricted to
-         * the current tick
+         * @return The newly created token with its start time
+         * restricted to the current tick
          *
-         * @post The current observation for this instance is the newly created token
+         * @post The current observation for this instance is the
+         * newly created token
          */
         EUROPA::TokenId new_obs(std::string const &pred,
                                 bool insert=true);
@@ -410,17 +414,19 @@ namespace TREX {
         void new_token(EUROPA::TokenId const &token);
         /** @brief Relax last observation
          *
-         * Destroy the current observation and replace it by the previous one.
+         * Destroy the current observation and replace it by the
+         * previous one.
          */
         void relax_token();
 
         /** @brief Check if committed
          *
-         * Check if the current observation is properly committed or not. This
-         * test goes more in depth than the committed() method.
+         * Check if the current observation is properly committed or
+         * not. This test goes more in depth than the committed()
+         * method.
          *
-         * @retval true if the current observation is committed and necessarily
-         *    overlaps current tick
+         * @retval true if the current observation is committed and
+         *    necessarily overlaps current tick
          * @retval false otherwise
          */
         bool check_committed() const;
@@ -429,32 +435,34 @@ namespace TREX {
          *
          * @param[in] token A token
          *
-         * Notifies this instance that the token @p token has been erased from the
-         * plan database.
-         *
-         * If this token correspond to any tokens maintained by this instance, this method
-         * will make the proper cleanup.
+         * Notifies this instance that the token @p token has been
+         * erased from the plan database.  If this token correspond to
+         * any tokens maintained by this instance, this method will
+         * make the proper cleanup.
          */
         void erased(EUROPA::TokenId const &token);
         /** @brief Replace token notification
          *
          * @param[in] token A token
          *
-         * Notifies that the token @p token should now be repaced by its active counterpart.
-         * If this token is miainitned by this instance, this call will ensure that :
-         * @li the base domains of the active token are the same as the ones of @p token
-         * @li the reference of @p token in this insstance is repaced by its active counterpart
-         *
-         * @post After this operation @p token can be safely deleted from the plan.
+         * Notifies that the token @p token should now be repaced by
+         * its active counterpart.  If this token is miainitned by
+         * this instance, this call will ensure that : @li the base
+         * domains of the active token are the same as the ones of @p
+         * token @li the reference of @p token in this insstance is
+         * repaced by its active counterpart @post After this
+         * operation @p token can be safely deleted from the plan.
          */
         void replaced(EUROPA::TokenId const &token);
         /** @brief Base domains propagation
          *
          * @param[in,out] merged A merged token
          *
-         * Restrict al the based domains of the active token of @p merged by the base domains
-         * of @p merged and repaced @p merged by this active token.
-         * This method is used in order to update current and past observation during the repaced call
+         * Restrict al the based domains of the active token of @p
+         * merged by the base domains of @p merged and repaced @p
+         * merged by this active token.  This method is used in order
+         * to update current and past observation during the repaced
+         * call
          * @sa replaced(EUROPA::TokenId const &)
          */
         static void apply_base(EUROPA::TokenId &merged,

@@ -94,7 +94,8 @@ void TREX::europa::details::restrict_bases(EUROPA::TokenId const &tok) {
     tok->restrictBaseDomains();
 }
 
-void TREX::europa::details::restrict_attributes(EUROPA::TokenId const &tok, EUROPA::TokenId const &other) {
+void TREX::europa::details::restrict_attributes(EUROPA::TokenId const &tok, 
+                                                EUROPA::TokenId const &other) {
   std::vector<EUROPA::ConstrainedVariableId> const &tvar = tok->parameters();
   std::vector<EUROPA::ConstrainedVariableId> const &avar = other->parameters();
   for(size_t i=0; i<tvar.size(); ++i)

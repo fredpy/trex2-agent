@@ -188,10 +188,12 @@ EUROPA::TokenId CurrentState::new_obs(std::string const &pred,
 void CurrentState::erased(EUROPA::TokenId const &token) {
   if( m_last_obs==token ) {
     m_last_obs = EUROPA::TokenId::noId();
+    m_frontier->pending_discard();
     m_frontier = EUROPA::ConstrainedVariableId::noId();
   } 
   else if( m_prev_obs==token ) {
     m_prev_obs = EUROPA::TokenId::noId();
+    m_prev_frontier->pending_discard();
     m_prev_frontier = EUROPA::ConstrainedVariableId::noId();
   }
 }
@@ -223,18 +225,32 @@ void CurrentState::replaced(EUROPA::TokenId const &token) {
     apply_base(m_prev_obs, m_prev_frontier);
 }
 
+namespace {
+  std::string new_frontier() {
+    static size_t count = 0;
+    std::ostringstream oss;
+    oss<<"__trex_frontier_"<<(count++);
+    return oss.str();
+  }
+}
+
 
 void CurrentState::new_token(EUROPA::TokenId const &token) {
   m_prev_obs = m_last_obs;
+  if( m_prev_frontier.isId() ) 
+    m_prev_frontier->pending_discard();
   m_prev_frontier = m_frontier;
   m_last_obs = token;
   m_last_obs->incRefCount();
-  m_frontier = (new TimePoint(m_last_obs, now(), "__trex_frontier"))->getId();
+  m_frontier = (new TimePoint(m_last_obs, now(), new_frontier()))->getId();
 }
 
 void CurrentState::relax_token() {
   m_client->deleteToken(m_last_obs);
   m_last_obs = m_prev_obs;
+  if( m_frontier.isId() ) {
+    m_frontier->pending_discard();
+  }
   m_frontier = m_prev_frontier;
   m_prev_obs = EUROPA::TokenId::noId();
   m_prev_frontier = EUROPA::TokenId::noId();
@@ -269,6 +285,8 @@ bool CurrentState::commit() {
       }        
       m_assembly.terminate(m_prev_obs);
       m_prev_obs = EUROPA::TokenId::noId();
+      if( m_prev_frontier.isId() ) 
+        m_prev_frontier->pending_discard();
       m_prev_frontier = EUROPA::Id<TimePoint>::noId();
       start_time = now();
     } else
@@ -296,15 +314,18 @@ bool CurrentState::commit() {
       return false;	
     }
   }
-  if( m_assembly.constraint_engine()->propagate() )
+  
+  if( !m_assembly.constraint_engine()->isPropagating() ) {
+    if( m_assembly.constraint_engine()->propagate() )
+      return true;
+    debugMsg("trex:always", "["<<now()
+             <<"] Inconsitency detected after applying observation "
+             <<timeline()->toString()<<"."
+             <<m_last_obs->getUnqualifiedPredicateName().toString()
+             <<'('<<m_last_obs->getKey()<<").");
+    return false;
+  } else 
     return true;
-  debugMsg("trex:always", "["<<now()
-           <<"] Inconsitency detected after applying observation "
-           <<timeline()->toString()<<"."
-           <<m_last_obs->getUnqualifiedPredicateName().toString()
-           <<'('<<m_last_obs->getKey()<<").");
-
-  return false;
 }
 
 // manipulators
@@ -696,20 +717,26 @@ TimePoint::TimePoint(EUROPA::TokenId const &tok,
   :EUROPA::Variable<EUROPA::IntervalIntDomain>
    (tok->getPlanDatabase()->getConstraintEngine(), 
     future(now), true, true, name),
-   m_tok(tok) {
-  debugMsg("trex:TimePoint", "Create "<<name.toString()<<" for token "<<m_tok->getPredicateName()
+   m_tok(tok), m_pending(false) {
+  debugMsg("trex:synch:tp", "Create "<<name.toString()<<" for token "<<m_tok->getPredicateName().toString()
 	   <<"("<<m_tok->getKey()<<")");
+  // incRefCount();
   if( m_tok.isId() ) {
-    debugMsg("trex:TimePoint", "make local to token "<<m_tok->getPredicateName()
+    debugMsg("trex:synch:tp", getKey()<<" made local to token "
+             <<m_tok->getPredicateName().toString()
 	   <<"("<<m_tok->getKey()<<")");
-    m_tok->addLocalVariable(getId());
+    // m_tok->addLocalVariable(getId());
+    m_tok->addDependent(this);
     create_constraint();
   }
+  debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<baseDomain().toString()
+           <<" CREATED.");
 }
 
 TimePoint::~TimePoint() {
-  // if( m_tok.isId() )
-  //   m_tok->removeLocalVariable(getId());
+  debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<baseDomain().toString()
+           <<" DESTROYED.");
+  detach(false);
 }
  
 // modifiers 
@@ -718,59 +745,134 @@ bool TimePoint::set_date(EUROPA::eint now) {
   EUROPA::Domain &dom = *m_derivedDomain;
 
   dom.intersect(future(now));
-  if( derivedDomain().isEmpty() )
+  if( lastDomain().isEmpty() ) {
+      debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<" emptied by ["<<now+1<<", +inf]");
+    // touch();
     return false;
-  touch();
+  }
+  debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"*["<<now+1<<", +inf] = "
+           <<lastDomain().toString());
+  // touch();
   return true;
 }
 
 void TimePoint::relax_date() {
   m_derivedDomain->relax(baseDomain()); 
+  debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<" relaxed to "<<lastDomain().toString());
+  // touch();
 }
 
 bool TimePoint::commit_date(EUROPA::eint now) {
-
-  if( lastDomain().getUpperBound()<=now )
+  if( lastDomain().getUpperBound()<=now ) {
+    debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
+             <<" cannot be committed to ["<<now+1<<", +inf]");
     return false;
-  else {
+  } else {
     restrictBaseDomain(future(now));
+    // touch();
+    debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
+             <<" after commit to ["<<now+1<<", +inf]");
     return true;
   }
 }
 
 bool TimePoint::commit_end(EUROPA::eint now) {
   if( lastDomain().getUpperBound()<now ||
-      lastDomain().getLowerBound()>now )
+      lastDomain().getLowerBound()>now ) {
+    debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
+             <<" cannot be committed to {"<<now<<"}");
     return false;
-  else {
+  } else {
     restrictBaseDomain(EUROPA::IntervalIntDomain(now));
+    // touch();
+    debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
+             <<" after commit to {"<<now<<"}");
     return true;
   }
 }
 
 void TimePoint::setToken(EUROPA::TokenId tok) {
   if( m_tok!=tok ) {
-    std::swap(tok, m_tok);
+    detach();
+    m_tok = tok;
     if( m_tok.isId() ) {
-      m_tok->addLocalVariable(getId());
+      // m_tok->addLocalVariable(getId());
+      m_tok->addDependent(this);
       create_constraint();
+      debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<" associated to token "
+               <<tok->getPredicateName().toString()<<'('<<tok->getKey()<<')');
     }
   }
 }
 
 void TimePoint::create_constraint() {
   if( m_tok.isId() ) {
-    debugMsg("trex:TimePoint", "Adding "<<getName().toString()<<'('
-	     <<getKey()<<")=="<<m_tok->getPredicateName()<<'('
+    debugMsg("trex:synch:tp", "Adding "<<getName().toString()<<'('
+	     <<getKey()<<")=="<<m_tok->getPredicateName().toString()<<'('
 	     <<m_tok->getKey()<<")");
-    std::vector<EUROPA::ConstrainedVariableId> scope(2);
-    scope[0] = getId();
-    scope[1] = m_tok->end();
-    m_constraint = m_tok->getPlanDatabase()->getClient()->createConstraint("concurrent", scope, "trex inertial value");
-    // m_tok->addStandardConstraint(m_constraint);    
-    // m_constraint->undoDeactivation();
+    std::vector<EUROPA::ConstrainedVariableId> end_scope(2),
+      dur_scope(3);
+    EUROPA::DbClientId cli = m_tok->getPlanDatabase()->getClient();
+    end_scope[0] = getId();
+    end_scope[1] = m_tok->end();
+    m_end_cstr = cli->createConstraint("concurrent", end_scope, 
+                                       "trex inertial value");
+    dur_scope[0] = m_tok->start();
+    dur_scope[1] = m_tok->duration();
+    dur_scope[2] = getId();
+    m_dur_cstr = cli->createConstraint("temporalDistance", 
+                                       dur_scope, 
+                                       "trex inertial value");
   } else {
-    debugMsg("trex:TimePoint", getName().toString()
+    debugMsg("trex:synch:tp", getName().toString()
              <<'('<<getKey()<<") is not associated to a token");
   }
 }
+
+void TimePoint::detach(bool cstr) {
+  if( m_tok.isId() ) {
+    debugMsg("trex:synch:tp", "Detaching timepoint "<<getKey()<<" from token "
+             <<m_tok->getPredicateName().toString()<<'('<<m_tok->getKey()<<')');
+    if( m_dur_cstr.isId() ) {      
+      EUROPA::DbClientId cli = m_tok->getPlanDatabase()->getClient();
+      if( cstr ) 
+      cli->deleteConstraint(m_dur_cstr);
+      
+      m_dur_cstr = EUROPA::ConstraintId::noId();
+      if( m_end_cstr.isId() ) {
+        if( cstr ) 
+          cli->deleteConstraint(m_end_cstr);
+        m_end_cstr = EUROPA::ConstraintId::noId();
+      }
+
+    }
+    // m_tok->removeLocalVariable(getId());
+    if( cstr ) 
+      m_tok->removeDependent(this);
+    m_tok = EUROPA::TokenId::noId();
+  }
+}
+
+void TimePoint::pending_discard() {
+  m_pending = true;
+  if( m_tok.isNoId() ) {
+    debugMsg("trex:synch:tp", "Discard tp "<<getKey()
+             <<" as it is no longer required.");
+    // decRefCount();
+  }
+}
+
+
+void TimePoint::notifyDiscarded(Entity const *entity) {
+  if( m_tok.isId() ) {
+    if( entity->getKey()==m_tok->getKey() ) {
+      debugMsg("trex:synch:tp", "token "<<m_tok->getPredicateName().toString()
+               <<'('<<m_tok->getKey()<<") discarded => detach it from tp "
+               <<getKey());
+      detach(false);
+      if( m_pending ) 
+        decRefCount();
+    }
+  }
+}
+

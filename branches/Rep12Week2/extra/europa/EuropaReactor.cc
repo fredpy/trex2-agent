@@ -66,7 +66,9 @@ namespace {
 
 EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false),
-   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")),
+   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name"),
+            parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
+            parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
 				     "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
@@ -268,14 +270,17 @@ void EuropaReactor::handleRecall(goal_id const &request) {
     EUROPA::eint key = i->second;
     m_active_requests.right.erase(i);
     
-    syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";
-    
-    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
     if( m_completed_this_tick ) {
       debugMsg("trex:resume", 
 	       "[ "<<now()<<"] Resume deliberation due to a recall.");
       m_completed_this_tick = false;
+    } else if( planner()->getStepCount()>0 ) {
+      debugMsg("trex:resume",
+               "["<<now()<<"] reset curretn planning due to a recall.");
+      planner()->reset();
     }
+    syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
+    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
   logPlan("recall");
 }
@@ -459,7 +464,6 @@ bool EuropaReactor::synchronize() {
       }
     }
   } else { // things to do when everything went fine:
-
     // Prepare the reactor for next deliberation round 
     if( m_completed_this_tick ) {
       //tr_info("clean-up plan solver");
@@ -473,11 +477,9 @@ bool EuropaReactor::synchronize() {
 	  m_dispatched.left.erase(cur->getActiveToken()->getKey());
       }
       m_completed_this_tick = false;
-    } 
+    }
 #ifndef Europa_Archive_OLD
-    //tr_info("archive");
-    // Necessary in case the planner did not run on previous tick
-    if( planner()->getStepCount()==0 ) {      
+    if( 0==planner()->getStepCount() ) {
       stat_clock::time_point start = stat_clock::now();
       logPlan(stage);
       archive();
