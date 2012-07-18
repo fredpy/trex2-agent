@@ -22,6 +22,9 @@ class SurfaceController extends AgentTimeline {
     	int earliest_start;
     	int latest_end;
     	bool requested;
+        bool surface; 
+        latest_end <= start + speriod;
+        latest_end >= start + 1;
     }
 }
 
