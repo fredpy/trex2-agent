@@ -97,7 +97,7 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::eint initial = assembly().initial_tick();
 
   return t_start.getLowerBound() >= horizon.getUpperBound() ||
-    // t_end.getUpperBound() < horizon.getLowerBound() ||
+      t_end.getUpperBound() < horizon.getLowerBound() ||
       t_end.getUpperBound() <= initial;
 }
 

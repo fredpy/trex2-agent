@@ -422,7 +422,6 @@ bool EuropaReactor::synch() {
   stat_clock::time_point start = stat_clock::now();
   bool ret = false;
   if( commit_externals() ) {
-    // logPlan("externals");
     ret = do_synchronize();
   }
 
@@ -478,15 +477,13 @@ bool EuropaReactor::synchronize() {
       }
       m_completed_this_tick = false;
     }
-#ifndef Europa_Archive_OLD
     if( 0==planner()->getStepCount() ) {
       stat_clock::time_point start = stat_clock::now();
       logPlan(stage);
       archive();
       stage = "archive";
       print_stats("archive", 0, 0, stat_clock::now()-start);
-    }
-#endif 
+    } 
   }
   // tr_info("end of synch");
   return constraint_engine()->propagate(); // should not fail
@@ -558,14 +555,6 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
-#ifdef Europa_Archive_OLD
-      { // mesure archiving time 
-        stat_clock::time_point start = stat_clock::now();
-        planner()->clear();
-        archive();
-	print_stats("archive", 0, 0, stat_clock::now()-start);
-      }
-#endif // Europa_Archive_OLD
       debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
       if( steps>0 ) {
         syslog(null, info)<<"Deliberation completed in "<<steps<<" steps.";

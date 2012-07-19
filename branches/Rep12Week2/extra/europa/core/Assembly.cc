@@ -318,12 +318,12 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   details::is_rejectable rejectable;
   EUROPA::TokenId active = tok;
 
-  // if( tok->canBeCommitted() )
-  //   tok->commit();
-  // else 
-  if( !tok->isCommitted() )
+  if( !tok->isCommitted() &&
+      m_committed.find(tok)==m_committed.end() )
     m_completed.insert(tok);
-
+  
+  details::restrict_base(tok, tok->end(), 
+                         details::active(tok)->end()->lastDomain());
   // I assume here that if a goals ends time is in the past then the goal is completed
 
   if( tok->isMerged() ) {
@@ -500,6 +500,13 @@ bool Assembly::do_synchronize() {
 
   if( !synchronizer()->solve(m_synchSteps, m_synchDepth) ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
+    if( synchronizer()->getStepCount()>m_synchSteps ) {
+      debugMsg("trex:always", "synchronization did exceed its maximum steps ("
+               <<m_synchSteps<<')');
+    } else if( synchronizer()->getDepth()>m_synchDepth ) {
+      debugMsg("trex:always", "synchronization did exceed its maximum depth ("
+               <<m_synchDepth<<')');
+    }
     return false;
   } 
   for(internal_iterator i=begin_internal(); end_internal()!=i; ++i)
@@ -634,7 +641,8 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
   if( !tok->isMerged() ) 
     throw EuropaException("Attempted to replace a non merged token.");
 
-  EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
+  EUROPA::ObjectDomain 
+    const &dom = details::active(tok)->getObject()->lastDomain();
   std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
   // Find the CurrentState if any 
   state_iterator pos = m_agent_timelines.find(objs.front()->getKey());
@@ -652,7 +660,7 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
   tok->start()->restrictBaseDomain(active->start()->lastDomain());
 }
 
-void Assembly::archive() {
+void Assembly::archive(EUROPA::eint date) {
   bool auto_prop = m_cstr_engine->getAutoPropagation();
   EUROPA::eint cur = now();
     
@@ -675,9 +683,9 @@ void Assembly::archive() {
   m_iter = m_roots.begin();
   while( m_roots.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    if( tok->end()->lastDomain().getUpperBound() <= now() 
+    if( details::active(tok)->end()->lastDomain().getUpperBound() <= date 
         && m_committed.end()!=m_committed.find(tok) ) 
-      m_completed.insert(tok);
+      terminate(tok);
   }
 
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()
@@ -685,11 +693,13 @@ void Assembly::archive() {
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-
-    if( tok->end()->lastDomain().getUpperBound()>cur ) {
-      debugMsg("trex:always", "WARNING: Token "
+    
+    if( details::upperBound(details::active(tok)->end()) > cur ) {
+      debugMsg("trex:always", "WARNING: Token " 
                <<tok->getPredicateName().toString()<<'('<<tok->getKey()
-               <<") is no longer completed (end="<<tok->end()->toString()<<')');
+               <<") is no longer completed (end=["
+               <<details::lowerBound(details::active(tok)->end())<<", "
+               <<details::upperBound(details::active(tok)->end())<<"])");
       m_completed.erase(tok);
       continue;
     } else {
@@ -714,7 +724,7 @@ void Assembly::archive() {
             tok->discard();
             ++deleted;
           } else if( m_completed.find(active)==m_completed.end() )
-            m_completed.insert(active);
+            terminate(active);
         } else if( tok->isActive() ) {
           debugMsg("trex:archive", "Commit ROOT active completed token "
                    <<tok->getPredicateName().toString()<<'('
@@ -731,13 +741,13 @@ void Assembly::archive() {
                      <<tok->getKey()<<')');
             replace(tok);
           } else if( m_completed.find(active)==m_completed.end() )
-            m_completed.insert(active);
+            terminate(active);
         } else if( tok->isActive() ) {
           m_committed.insert(tok);
           m_completed.erase(tok);
         }
-      } else if( master->end()->lastDomain().getUpperBound()<=cur ) {
-        m_completed.insert(master);
+      } else if( details::upperBound(master->end())<=cur ) {
+        terminate(master);
       }
     }
   }
@@ -756,9 +766,15 @@ void Assembly::archive() {
         EUROPA::TokenId master = (*i)->master();
         if( master.isId() ) {
           if( m_committed.find(master)==m_committed.end() ) {
-            can_delete = false;
-            if( master->end()->lastDomain().getUpperBound()<=now() ) 
-              m_completed.insert(master);
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its master is not yet committed");
+              can_delete = false;
+            }
+            if( details::upperBound(master->end())<=date ) 
+              terminate(master);
           }
         }
       }
@@ -767,37 +783,61 @@ void Assembly::archive() {
         
       for(EUROPA::TokenSet::const_iterator i=tmp.begin();
           tmp.end()!=i; ++i) {
-        if( (*i)->end()->lastDomain().getUpperBound()<=now() ) {
+        if( details::upperBound(details::active(*i)->end())<=date ) {
           if( !(*i)->isInactive() ) {
-            can_delete = false;
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its slaves is part of the plan"); 
+              can_delete = false;
+            }
             if( m_committed.find(*i)==m_committed.end() &&
                 m_completed.find(*i)==m_completed.end() )
               // could do better but lets keep it cool for now
-              m_completed.insert(*i);
+              terminate(*i);
           }
-        } else if( (*i)->start()->getUpperBound()<now() ) {
+        } else if( details::upperBound(details::active(*i)->start())<date ) {
           EUROPA::ObjectDomain const &dom = (*i)->getObject()->lastDomain();
           EUROPA::ObjectId obj = dom.makeObjectList().front();
           state_iterator pos = m_agent_timelines.find(obj->getKey());
           if( m_agent_timelines.end()==pos ||
-              !((*pos)->external() && 0==look_ahead(obj)) )
+              !((*pos)->external() && 0==look_ahead(obj)) ) {
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its slaves is not finished yet.");
+              can_delete = false;
+            }
+          }
+        } else {
+          if( can_delete ) {
+            debugMsg("trex:archive", "Cannot delete "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()
+                     <<"): one of its slaves is not yet started.");
             can_delete = false;
-        } else 
-          can_delete = false;
+          }
+        }
       }
       if( can_delete ) {
         debugMsg("trex:archive", "Destroy token "
                  <<tok->getPredicateName().toString()<<'('<<tok->getKey()
-                 <<") as all its slaves are now inactives and in the past.");            discard(tok);
+                 <<") as all its slaves are now inactives and in the past.");        
+        discard(tok);    
+        tok->start()->restrictBaseDomain(tok->start()->lastDomain());
+        tok->end()->restrictBaseDomain(tok->end()->lastDomain());
         cli->cancel(tok);
-        tok->discard();
+        if( tok->master().isNoId() )
+          tok->discard();
         ++deleted;
       }
     } else {
       debugMsg("trex:archive", "Token "<<tok->getPredicateName().toString()
                <<'('<<tok->getKey()<<") is not active.\n\tSet it complete.");
-      m_completed.insert(tok);
       m_committed.erase(tok);
+      terminate(tok);
     }
   }
 
@@ -810,7 +850,7 @@ void Assembly::archive() {
 #else // TREX_ARCHIVE_EuropaDefault
 
   // Just rely on the europa archival : safe but inefficient
-  plan_db()->archive(now()-1);
+  plan_db()->archive(date-1);
 
 #endif
 }
