@@ -173,7 +173,8 @@ bool Assembly::actions_supported() {
 Assembly::Assembly(std::string const &name, size_t steps, 
                    size_t depth)
   :m_in_synchronization(false), m_name(name),
-   m_synchSteps(steps), m_synchDepth(depth) {
+   m_synchSteps(steps), m_synchDepth(depth),
+   m_archiving(false) {
   //  redirect log output to <name>/europa.log
   m_trex_schema->setStream(m_debug, m_name+"/europa.log");
   if( m_synchSteps==0 ) 
@@ -633,7 +634,7 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
   if( !tok->isMerged() ) 
     throw EuropaException("Attempted to replace a non merged token.");
 
-  EUROPA::ObjectDomain const &dom = tok->getState()->baseDomain();
+  EUROPA::ObjectDomain const &dom = tok->getObject()->lastDomain();
   std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
   // Find the CurrentState if any 
   state_iterator pos = m_agent_timelines.find(objs.front()->getKey());
@@ -656,13 +657,15 @@ void Assembly::archive() {
   EUROPA::eint cur = now();
     
   m_cstr_engine->setAutoPropagation(false);
+  m_archiving = true;
   debugMsg("trex:archive",
 	   '['<<cur<<"] ============= START archiving ============");
   
-  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)(&cur)) {
+  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)(&cur)(&m_archiving)) {
     debugMsg("trex:archive",
              '['<<cur<<"] ============= END archiving ============");
     m_cstr_engine->setAutoPropagation(auto_prop);
+    m_archiving = false;
   } BOOST_SCOPE_EXIT_END;
 #ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
@@ -785,7 +788,7 @@ void Assembly::archive() {
       if( can_delete ) {
         debugMsg("trex:archive", "Destroy token "
                  <<tok->getPredicateName().toString()<<'('<<tok->getKey()
-                 <<") as all its slaves are now inactives and in the past.");                 
+                 <<") as all its slaves are now inactives and in the past.");            discard(tok);
         cli->cancel(tok);
         tok->discard();
         ++deleted;
@@ -1334,21 +1337,12 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   if( m_owner.is_agent_timeline(token) ) {
     debugMsg("trex:token", "cancel "<<token->getPredicateName().toString()
              <<'('<<token->getKey()<<')');
-    m_owner.cancel(token);
+    if( !m_owner.m_archiving )
+      m_owner.cancel(token); // do not recall during archiving !!!!
   }
-  // EUROPA::TokenSet slaves = token->slaves();
-  // for(EUROPA::TokenSet::const_iterator i=slaves.begin();
-  //     slaves.end()!=i; ++i) {
-  //   (*i)->decRefCount();
-  // }
 }
 
 void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
-  // EUROPA::TokenId master = token->master();
-  // if( master.isId() && token->refCount()==1 )
-  //   token->incRefCount();
-  
-  
   // Check to find if the tokens active token is in m_goal
   // If it is it gets added to m_goals
   if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())

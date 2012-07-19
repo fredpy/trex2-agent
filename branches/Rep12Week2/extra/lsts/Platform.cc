@@ -157,7 +157,9 @@ void Platform::handleTickStart()
   if (m_blocked)
     return;
 
-  if (commandToBePosted != NULL && tickWhenToPost <= getCurrentTick())
+  IMC::VehicleState *curState = dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
+
+  if (commandToBePosted != NULL && tickWhenToPost <= getCurrentTick() && curState->op_mode == IMC::VehicleState::VS_SERVICE)
   {
 
     IMC::VehicleState * msg =

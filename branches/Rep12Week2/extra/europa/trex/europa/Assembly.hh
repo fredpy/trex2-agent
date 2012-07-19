@@ -1534,6 +1534,7 @@ namespace TREX {
 
       EUROPA::ConstrainedVariableId m_tick_const;
       size_t m_synchSteps, m_synchDepth;
+      bool m_archiving;
       
       friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;
