@@ -126,6 +126,29 @@ namespace TREX {
       }
       /** @} */
 
+      inline EUROPA::TokenId const &active(EUROPA::TokenId const &tok) {
+        if( tok->isMerged() ) 
+          return tok->getActiveToken();
+        return tok;
+      }
+
+      inline EUROPA::edouble upperBound(EUROPA::ConstrainedVariableId const &var) {
+        if( var->isSpecified() )
+          return var->getSpecifiedValue();
+        else if( var->isSingleton() )
+          return var->getSingletonValue().asDouble();
+        else 
+          return var->lastDomain().getUpperBound();
+      }
+
+      inline EUROPA::edouble lowerBound(EUROPA::ConstrainedVariableId const &var) {
+        if( var->isSpecified() )
+          return var->getSpecifiedValue();
+        else if( var->isSingleton() )
+          return var->getSingletonValue().asDouble();
+        else 
+          return var->lastDomain().getLowerBound();
+      }
       /** @brief Scoped token split
        *
        * This class allows to split a merged token for its existence

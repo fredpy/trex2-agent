@@ -1172,7 +1172,10 @@ namespace TREX {
        * Europa archive method) does not appear to be efficient on cleaning the
        * plan
        */
-      void archive();
+      void archive() {
+        archive(now());
+      }
+      void archive(EUROPA::eint date);
 
       /** @brief Log the plan structure
        *
