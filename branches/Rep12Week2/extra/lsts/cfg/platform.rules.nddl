@@ -7,6 +7,12 @@ VehicleState::Boot {
   contained_by(VehicleCommand.Idle);
 }
 
+VehicleCommand::Idle {
+    // helps the planner remember its controller 
+    // is idling
+    contained_by(ManeuverController.Idle);
+}
+
 //VehicleCommand::Maneuver {
 
 //if (depth > 0) {
@@ -49,6 +55,7 @@ ManeuverController::Maneuver {
   cmd == free.vehicle;
   // met_by(VehicleState.Ready ready);
   met_by(Idle idle);
+  // Need this to avoid aggressive archiving
   //ready contained_by idle;
   int min_start;
   min_start <= start;
