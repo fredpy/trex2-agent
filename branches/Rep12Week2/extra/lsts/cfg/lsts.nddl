@@ -19,7 +19,7 @@ Navigator navigator = new Navigator(Internal);//, true);
 Estimator estimator = new Estimator(Internal);//,true);
 
 // arg1 -> delay at surface, arg2 -> period between surfaces
-SurfaceController surfacer = new SurfaceController([8,12], 30);
+SurfaceController surfacer = new SurfaceController([8,12], 300);
 
 
 
