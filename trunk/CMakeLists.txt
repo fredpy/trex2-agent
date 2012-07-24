@@ -43,7 +43,7 @@ project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 4)
 set(TREX_PATCH 0)
-set(TREX_RC 1)
+set(TREX_RC 0)
 
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
 if(TREX_RC GREATER 0)
