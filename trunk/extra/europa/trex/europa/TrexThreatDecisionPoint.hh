@@ -35,6 +35,7 @@ namespace TREX {
 			      EUROPA::TokenId const &tokenToOrder,
 			      EUROPA::TiXmlElement const &configData,
 			      EUROPA::LabelStr const &explanation = "trex");
+      virtual ~TrexThreatDecisionPoint();
             
     protected:
       /** @brief initialize decision choices

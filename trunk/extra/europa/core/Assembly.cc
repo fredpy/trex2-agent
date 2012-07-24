@@ -170,10 +170,24 @@ bool Assembly::actions_supported() {
 
 // structors
 
-Assembly::Assembly(std::string const &name)
-  :m_in_synchronization(false), m_name(name) {
+Assembly::Assembly(std::string const &name, size_t steps, 
+                   size_t depth)
+  :m_in_synchronization(false), m_name(name),
+   m_synchSteps(steps), m_synchDepth(depth),
+   m_archiving(false) {
   //  redirect log output to <name>/europa.log
   m_trex_schema->setStream(m_debug, m_name+"/europa.log");
+  if( m_synchSteps==0 ) 
+    m_synchSteps = std::numeric_limits<unsigned int>::max();
+  else 
+    debugMsg("trex:always", "Limiting synchronization to "
+             <<m_synchSteps<<" steps"); 
+  if( m_synchDepth==0 )
+    m_synchDepth = m_synchSteps;
+  else if( m_synchDepth<m_synchSteps )
+    debugMsg("trex:always", "Limiting synchronization depth to "
+             <<m_synchDepth);
+  
 
   // load the differrent europa modules we need
   addModule((new EUROPA::ModuleConstraintEngine())->getId());
@@ -252,15 +266,19 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
 
   if( internal(obj) || external(obj) ) {
     if( m_agent_timelines.find(tl->getKey())==m_agent_timelines.end() ) {
-      details::CurrentStateId state = (new details::CurrentState(*this, tl))->getId();
+      details::CurrentStateId 
+        state = (new details::CurrentState(*this, tl))->getId();
       bool tl_internal = internal(obj);
 
-      debugMsg("trex:timeline", "Adding State flaw manager for "<<tl->getName().toString()
-	       <<"\n\t* Current T-REX mode is "<<(tl_internal?"In":"Ex")<<"ternal.");
+      debugMsg("trex:timeline", "Adding State flaw manager for "
+               <<tl->getName().toString()
+	       <<"\n\t* Current T-REX mode is "
+               <<(tl_internal?"In":"Ex")<<"ternal.");
       m_agent_timelines.insert(state);
     }
   } else {
-    debugMsg("trex:always", "WARNING attempted to create a sate flaw manager for non public timeline "
+    debugMsg("trex:always", "WARNING attempted to create a sate"
+             <<" flaw manager for non public timeline "
 	     <<tl->getName().toString());
   }
 }
@@ -270,7 +288,8 @@ void Assembly::new_tick() {
   m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
 
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now());
-  boost::filter_iterator<details::is_rejectable, EUROPA::TokenSet::const_iterator>
+  boost::filter_iterator<details::is_rejectable, 
+                         EUROPA::TokenSet::const_iterator>
     t(m_roots.begin(), m_roots.end()), end_t(m_roots.end(), m_roots.end());
   EUROPA::IntervalIntDomain future(now(),
                                    std::numeric_limits<EUROPA::eint>::infinity());
@@ -299,11 +318,12 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   details::is_rejectable rejectable;
   EUROPA::TokenId active = tok;
 
-  if( tok->canBeCommitted() )
-    tok->commit();
-  else if( !tok->isCommitted() )
+  if( !tok->isCommitted() &&
+      m_committed.find(tok)==m_committed.end() )
     m_completed.insert(tok);
-
+  
+  details::restrict_base(tok, tok->end(), 
+                         details::active(tok)->end()->lastDomain());
   // I assume here that if a goals ends time is in the past then the goal is completed
 
   if( tok->isMerged() ) {
@@ -404,6 +424,28 @@ void Assembly::configure_solvers(std::string const &synchronizer,
   m_synchronizer->addListener(m_synchListener->getId());
 }
 
+EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
+  std::ostringstream oss;
+  oss<<"__trex_tick_"<<now();
+  EUROPA::LabelStr name(oss.str());
+  EUROPA::DataTypeId type = m_clock->getDataType();  
+  
+  if( m_tick_const.isNoId() || m_tick_const->getName()!=name ) {
+    std::auto_ptr<EUROPA::Domain> base(type->baseDomain().copy());
+    base->set(now());
+
+    debugMsg("trex:always", "Creating const "<<name.toString());
+    m_tick_const = m_cstr_engine->createVariable(type->getName().c_str(), 
+						 *base, true, true, 
+						 name.c_str());
+    m_tick_const->incRefCount();
+  }
+  debugMsg("trex:always", "Current tick : "<<m_tick_const->getName().toString()
+	   <<'='<<m_tick_const->toString());
+  return m_tick_const;
+}
+
+
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
 
@@ -416,18 +458,35 @@ void Assembly::notify(details::CurrentState const &state) {
     // EUROPA::TokenId cur = state.current();
     // if( cur->isInactive() ) {
   /* Do not do thaT !!! it breaks the plan */ 
-    //   plan_db()->getClient()->activate(cur);
-    // }
+  //   plan_db()->getClient()->activate(cur);
+  // }
   // }
 }
 
 bool Assembly::commit_externals() {
+  bool auto_prop = m_cstr_engine->getAutoPropagation();
+  
+  m_cstr_engine->setAutoPropagation(false);
+  
+  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
+    m_cstr_engine->setAutoPropagation(auto_prop);
+  } BOOST_SCOPE_EXIT_END;
+
   for(external_iterator i=begin_external(); end_external()!=i; ++i) {
     if( !(*i)->commit() ) {
-      debugMsg("trex:always", "["<<now()<<"] failed to integrate state of external timeline "
-	       <<(*i)->timeline()->getName().toString());
+      debugMsg("trex:always", "["<<now()
+               <<"] failed to integrate state of external timeline "
+               <<(*i)->timeline()->getName().toString());
       return false;
+    } else {
+      EUROPA::TokenId cur = (*i)->current();
+      if(cur->isMerged()) {
+        EUROPA::TokenId act = cur->getActiveToken();
+        cur->cancel();
+        plan_db()->getClient()->merge(cur, act);
+      }
     }
+    
   }
   return true;
 }
@@ -437,15 +496,22 @@ bool Assembly::do_synchronize() {
 
   BOOST_SCOPE_EXIT((&m_in_synchronization)) {
     m_in_synchronization = false;
-  } BOOST_SCOPE_EXIT_END
+  } BOOST_SCOPE_EXIT_END;
 
-  if( !synchronizer()->solve() ) {
+  if( !synchronizer()->solve(m_synchSteps, m_synchDepth) ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
+    if( synchronizer()->getStepCount()>m_synchSteps ) {
+      debugMsg("trex:always", "synchronization did exceed its maximum steps ("
+               <<m_synchSteps<<')');
+    } else if( synchronizer()->getDepth()>m_synchDepth ) {
+      debugMsg("trex:always", "synchronization did exceed its maximum depth ("
+               <<m_synchDepth<<')');
+    }
     return false;
   } 
   for(internal_iterator i=begin_internal(); end_internal()!=i; ++i)
     (*i)->commit(); // It was consistent from synchronizer => never fail
-
+  
   return true;
 }
 
@@ -469,18 +535,19 @@ bool Assembly::relax(bool aggressive) {
   
   BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
     m_cstr_engine->setAutoPropagation(auto_prop);
-  } BOOST_SCOPE_EXIT_END
+  } BOOST_SCOPE_EXIT_END;
 
-
+  
   if( aggressive )
     relax_name = "AGGRESSIVE "+relax_name;
-
-  debugMsg("trex:relax", "["<<now()<<"] =================== START "<<relax_name<<" =================");
+  
+  debugMsg("trex:relax", "["<<now()
+           <<"] =================== START "<<relax_name<<" =================");
   // Clean up decisions made by solvers
   debugMsg("trex:relax", "Cancelling current decisions");
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
-  planner()->clear();
+  planner()->reset();
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
@@ -490,17 +557,19 @@ bool Assembly::relax(bool aggressive) {
     EUROPA::TokenId tok = *(m_iter++);
     
     debugMsg("trex:relax", "Evaluating relaxation of "<<tok->toString()
-      <<"\n\tPredicate: "<<tok->getPredicateName().toString()
-      <<"\n\tObjects: "<<tok->getObject()->toString()
-      <<"\n\tstart: "<<tok->start()->lastDomain().toString()
-      <<"\n\tend: "<<tok->end()->lastDomain().toString());
+             <<"\n\tPredicate: "<<tok->getPredicateName().toString()
+             <<"\n\tObjects: "<<tok->getObject()->toString()
+             <<"\n\tstart: "<<tok->start()->lastDomain().toString()
+             <<"\n\tend: "<<tok->end()->lastDomain().toString());
 
     if( tok->end()->baseDomain().getUpperBound()<=now() ) {
-      debugMsg("trex:relax", "\t- "<<tok->getKey()<<" necessarily ends in the past");
+      debugMsg("trex:relax", "\t- "<<tok->getKey()
+               <<" necessarily ends in the past");
       if( tok->isFact() ) {
         debugMsg("trex:relax", "\t- "<<tok->getKey()<<" is a fact");
         if( aggressive ) {
-          debugMsg("trex:relax", "\t- destroying "<<tok->getKey()<<" (aggressive)");
+          debugMsg("trex:relax", "\t- destroying "<<tok->getKey()
+                   <<" (aggressive)");
           if( !tok->isInactive() ) {
 	    EUROPA::TokenSet slaves = tok->slaves();
 	    for(EUROPA::TokenSet::const_iterator s=slaves.begin();
@@ -511,6 +580,16 @@ bool Assembly::relax(bool aggressive) {
             cli->cancel(tok); 
 	  }
           cli->deleteToken(tok);
+        } else if( tok->isMerged() ) { 
+          
+ 	  EUROPA::TokenId active = tok->getActiveToken();
+	  active->incRefCount();
+          cli->cancel(active);
+          if( !aggressive ) {
+            debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
+            // cli->activate(tok);
+          } 
+	  active->decRefCount();
         }
       } else {
         bool can_reject = rejectable(tok);
@@ -519,7 +598,8 @@ bool Assembly::relax(bool aggressive) {
           if( can_reject ) {
             debugMsg("trex:relax", "\t- destroying the goal "<<tok->getKey());
           } else {
-            debugMsg("trex:relax", "\t- destroying past token "<<tok->getKey()<<" (aggressive)");
+            debugMsg("trex:relax", "\t- destroying past token "<<tok->getKey()
+                     <<" (aggressive)");
           }
           if( !tok->isInactive() )
             cli->cancel(tok);
@@ -531,12 +611,17 @@ bool Assembly::relax(bool aggressive) {
         if( tok->isMerged() ) {
           debugMsg("trex:relax", "\t- give room for fact "<<tok->getKey()
 		   <<" (cancel active="<<tok->getActiveToken()->getKey()<<")");
-          cli->cancel(tok->getActiveToken());
+	  EUROPA::TokenId active = tok->getActiveToken();
+	  active->incRefCount();
+          cli->cancel(active);
           if( !aggressive ) {
             debugMsg("trex:relax", "\t- activate fact "<<tok->getKey());
-            cli->activate(tok);
-          }
-        }
+            // cli->activate(tok);
+          } 
+	  active->decRefCount();
+        } /*else if( tok->isActive() ) {
+            cli->cancel(tok);
+            }*/
       } else if( !tok->isInactive() ) {
         debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
         cli->cancel(tok);
@@ -544,246 +629,228 @@ bool Assembly::relax(bool aggressive) {
     }
   }
 
-  debugMsg("trex:relax", "["<<now()<<"] =================== END "<<relax_name<<" =================");
+  debugMsg("trex:relax", "["<<now()<<"] =================== END "
+           <<relax_name<<" =================");
   bool ret = constraint_engine()->propagate();
   if( !ret )
     debugMsg("trex:relax", "RELAX FAILURE !!!!");
   return ret;
 }
 
-void Assembly::archive() {
-  bool auto_prop = m_cstr_engine->getAutoPropagation();
-  
-  m_cstr_engine->setAutoPropagation(false);
-  
-  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)) {
-    m_cstr_engine->setAutoPropagation(auto_prop);
-  } BOOST_SCOPE_EXIT_END
-#ifdef TREX_ARCHIVE_Greedy
+void Assembly::replace(EUROPA::TokenId const &tok) {
+  if( !tok->isMerged() ) 
+    throw EuropaException("Attempted to replace a non merged token.");
 
-# ifdef EUROPA_HAVE_EFFECT
-  /*
-   * As of now Greedy works badly with actions on 2.6. It is not really able to
-   * get rid of them when they are not part of an Internal or External timeline
-   * What is needed is to annalyze for efficeintly for each action :
-   *
-   * If all the conditions are committed and all the effects completed then the
-   * action is completed ... but how do we consider relations that are not
-   * conditions or actions ?
-   */
-#  warning "Greedy plan archiving is not efficient with action tokens."
-# endif // EUROPA_HAVE_EFFECT
+  EUROPA::ObjectDomain 
+    const &dom = details::active(tok)->getObject()->lastDomain();
+  std::list<EUROPA::ObjectId> objs = dom.makeObjectList();
+  // Find the CurrentState if any 
+  state_iterator pos = m_agent_timelines.find(objs.front()->getKey());
+  EUROPA::TokenId active = tok->getActiveToken();
+  
+  if( m_agent_timelines.end()!=pos ) {
+    (*pos)->replaced(tok);
+    tok->cancel();
+  } else { 
+    details::restrict_bases(active, tok);
+    tok->cancel();
+  }
+  // Make dsure that this guy will stay on the current spot
+  tok->end()->restrictBaseDomain(active->end()->lastDomain());
+  tok->start()->restrictBaseDomain(active->start()->lastDomain());
+}
+
+void Assembly::archive(EUROPA::eint date) {
+  bool auto_prop = m_cstr_engine->getAutoPropagation();
+  EUROPA::eint cur = now();
+    
+  m_cstr_engine->setAutoPropagation(false);
+  m_archiving = true;
+  debugMsg("trex:archive",
+	   '['<<cur<<"] ============= START archiving ============");
+  
+  BOOST_SCOPE_EXIT((&auto_prop)(&m_cstr_engine)(&cur)(&m_archiving)) {
+    debugMsg("trex:archive",
+             '['<<cur<<"] ============= END archiving ============");
+    m_cstr_engine->setAutoPropagation(auto_prop);
+    m_archiving = false;
+  } BOOST_SCOPE_EXIT_END;
+#ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
   size_t deleted = 0;
 
-  debugMsg("trex:archive",
-	   '['<<now()<<"] ============= START archiving ============");
-  
-  debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
+  debugMsg("trex:archive", "Checking for completed root tokens");
+  m_iter = m_roots.begin();
+  while( m_roots.end()!=m_iter ) {
+    EUROPA::TokenId tok = *(m_iter++);
+    if( details::active(tok)->end()->lastDomain().getUpperBound() <= date 
+        && m_committed.end()!=m_committed.find(tok) ) 
+      terminate(tok);
+  }
+
+  debugMsg("trex:archive", "Evaluating "<<m_completed.size()
+           <<" completed tokens.");
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
     
-    if( tok->canBeCommitted() ) {
-      debugMsg("trex:archive", "Committing "<<tok->getPredicateName().toString()
-	       <<'('<<tok->getKey()<<").");
-      details::restrict_bases(tok);
-      // constraint_engine()->propagate();
-      tok->commit(); 
-    } else if( tok->isInactive() ) {
-      EUROPA::TokenId master = tok->master(); 
-      if( master.isNoId() ) {
-	debugMsg("trex:archive", "Discarding inactive orphan token "
-		 <<tok->getPredicateName().toString() 
-		 <<'('<<tok->getKey()<<").");
-	discard(tok);
-	tok->discard();
-	// constraint_engine()->propagate();
-	debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
-
-      } else if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	if( master->isCommitted() ) {
-	  debugMsg("trex:archive", "Ignoring inactive justified token "
-		   <<tok->getPredicateName().toString()
-		   <<'('<<tok->getKey()<<").");
-	  m_completed.erase(tok);
-	} else if( master->canBeCommitted() ) {
-	  details::restrict_bases(master);
-	  // constraint_engine()->propagate();
-	  master->commit();
-	  debugMsg("trex:archive", "Ignoring inactive freshly justified token "
-		   <<tok->getPredicateName().toString()
-		   <<'('<<tok->getKey()<<").");
-	  m_completed.erase(tok);
-	} 
-      }	
+    if( details::upperBound(details::active(tok)->end()) > cur ) {
+      debugMsg("trex:always", "WARNING: Token " 
+               <<tok->getPredicateName().toString()<<'('<<tok->getKey()
+               <<") is no longer completed (end=["
+               <<details::lowerBound(details::active(tok)->end())<<", "
+               <<details::upperBound(details::active(tok)->end())<<"])");
+      m_completed.erase(tok);
+      continue;
     } else {
-      // token is merged
-      EUROPA::TokenId active = tok->getActiveToken();
       EUROPA::TokenId master = tok->master();
 
-      if( master.isId() ) {
-	if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	  if( master->canBeCommitted() ) {
-	    details::restrict_bases(master);
-	    // constraint_engine()->propagate();
-	    master->commit();
-	  }
-	}
-      }
-      if( master.isNoId() || master->isCommitted() ) {
-	debugMsg("trex:archive", "Collapsing "
-		 <<tok->getPredicateName().toString()<<'('<<tok->getKey()
-		 <<") with its active counterpart "<<active->getKey());
-	details::restrict_bases(active, tok);
-	// constraint_engine()->propagate();
-	if( tok->isFact() ) 
-	  active->makeFact();
-	if( active->canBeCommitted() )
-	  active->commit();
-	if( master.isNoId() ) {
-	  debugMsg("trex:archive", "Discarding the redundant token "
-		   <<tok->getPredicateName().toString() 
-		   <<'('<<tok->getKey()<<").");
-	  discard(tok);
-	  cli->cancel(tok);
-	  tok->discard();
-	  // constraint_engine()->propagate();
-	  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
-
-	  ++deleted;
-	}
-      } else {
-	debugMsg("trex:archive", "Cannot commit "<<tok->getPredicateName().toString()
-		 <<'('<<tok->getKey()<<") as its master "<<master->getPredicateName().toString()
-		 <<'('<<master->getKey()<<") is not terminated yet.");
+      if( master.isNoId() ) {
+        if( tok->isInactive() ) {
+          debugMsg("trex:archive", "Discard ROOT inactive completed token "
+                   <<tok->getPredicateName().toString()<<'('
+                   <<tok->getKey()<<')');
+          discard(tok);
+          tok->discard();
+          ++deleted;
+        } else if( tok->isMerged() ) {
+          EUROPA::TokenId active = tok->getActiveToken();
+          if( m_committed.find(active)!=m_committed.end() ) {
+            debugMsg("trex:archive", "Discard ROOT merged completed token "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()<<')');
+            replace(tok);
+            discard(tok);
+            tok->discard();
+            ++deleted;
+          } else if( m_completed.find(active)==m_completed.end() )
+            terminate(active);
+        } else if( tok->isActive() ) {
+          debugMsg("trex:archive", "Commit ROOT active completed token "
+                   <<tok->getPredicateName().toString()<<'('
+                   <<tok->getKey()<<')');
+          m_committed.insert(tok);
+          m_completed.erase(tok);
+        }
+      } else if( m_committed.end()!=m_committed.find(master) ) {
+        if( tok->isMerged() ) {
+          EUROPA::TokenId active = tok->getActiveToken();
+          if( m_committed.find(active)!=m_committed.end() ) {
+            debugMsg("trex:archive", "Cancel merged completed token "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()<<')');
+            replace(tok);
+          } else if( m_completed.find(active)==m_completed.end() )
+            terminate(active);
+        } else if( tok->isActive() ) {
+          m_committed.insert(tok);
+          m_completed.erase(tok);
+        }
+      } else if( details::upperBound(master->end())<=cur ) {
+        terminate(master);
       }
     }
   }
 
-  debugMsg("trex:archive", "Evaluating "<<m_committed.size()<<" committed tokens.");
+  debugMsg("trex:archive", "Evaluate "<<m_committed.size()
+           <<" committed tokens");
   m_iter = m_committed.begin();
-  
   while( m_committed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    EUROPA::TokenSet slaves_t = tok->slaves();
-    bool can_delete = true;
-    
-    for(EUROPA::TokenSet::const_iterator t=slaves_t.begin();
-        slaves_t.end()!=t; ++t) {
-      if( !(*t)->isCommitted() ) {
-        if( (*t)->end()->lastDomain().getUpperBound()<=now() ) {
-          if( (*t)->canBeCommitted() ) {
-	    debugMsg("trex:archive", "Committing slave "
-		     <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
-		     <<") from master "<<tok->getPredicateName().toString()<<'('
-		     <<tok->getKey()<<").");
-            details::restrict_bases(*t);
-	    // constraint_engine()->propagate();
-            (*t)->commit();
-          } else if( (*t)->isMerged() ) {
-	    EUROPA::TokenId active = (*t)->getActiveToken();
-	    if( active->canBeCommitted() ) {
-	      debugMsg("trex:archive", "Collapsing explained slave "
-		       <<(*t)->getPredicateName().toString()<<'('
-		       <<(*t)->getKey()
-		       <<") with its active counterpart "<<active->getKey());
-	      details::restrict_bases(active, *t);
-	      // constraint_engine()->propagate();
-	      active->commit();
-	    } else {
-	      debugMsg("trex:archive", "Collapsing explained slave "
-		       <<(*t)->getPredicateName().toString()<<'('
-		       <<(*t)->getKey()
-		       <<") with its committed active counterpart "
-		       <<active->getKey());
-	      details::restrict_bases(active, *t);
-	      // constraint_engine()->propagate();
-	    }
-          } else if( !(*t)->isInactive() ) {
-	    debugMsg("trex:archive", "Cannot delete "<<
-		     tok->getPredicateName().toString()<<'('<<tok->getKey()
-		     <<") as one of its slave is not active,merged or "
-		     <<"inactive ???");
-	    can_delete = false;
-	  }
+    if( tok->isActive() ) {
+      bool can_delete = true;
+      EUROPA::TokenSet tmp = tok->getMergedTokens();
+      // Check that all masters are committed
+      for(EUROPA::TokenSet::const_iterator i=tmp.begin();
+          tmp.end()!=i; ++i) {
+        EUROPA::TokenId master = (*i)->master();
+        if( master.isId() ) {
+          if( m_committed.find(master)==m_committed.end() ) {
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its master is not yet committed");
+              can_delete = false;
+            }
+            if( details::upperBound(master->end())<=date ) 
+              terminate(master);
+          }
+        }
+      }
+      // Check its slaves 
+      tmp = tok->slaves();
+        
+      for(EUROPA::TokenSet::const_iterator i=tmp.begin();
+          tmp.end()!=i; ++i) {
+        if( details::upperBound(details::active(*i)->end())<=date ) {
+          if( !(*i)->isInactive() ) {
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its slaves is part of the plan"); 
+              can_delete = false;
+            }
+            if( m_committed.find(*i)==m_committed.end() &&
+                m_completed.find(*i)==m_completed.end() )
+              // could do better but lets keep it cool for now
+              terminate(*i);
+          }
+        } else if( details::upperBound(details::active(*i)->start())<date ) {
+          EUROPA::ObjectDomain const &dom = (*i)->getObject()->lastDomain();
+          EUROPA::ObjectId obj = dom.makeObjectList().front();
+          state_iterator pos = m_agent_timelines.find(obj->getKey());
+          if( m_agent_timelines.end()==pos ||
+              !((*pos)->external() && 0==look_ahead(obj)) ) {
+            if( can_delete ) {
+              debugMsg("trex:archive", "Cannot delete "
+                       <<tok->getPredicateName().toString()<<'('
+                       <<tok->getKey()
+                       <<"): one of its slaves is not finished yet.");
+              can_delete = false;
+            }
+          }
         } else {
-	  bool protect = true;
-	  if( (*t)->isMerged() ) {
-	    EUROPA::TokenId active = (*t)->getActiveToken();
-	    
-	    if( active->start()->lastDomain().getUpperBound()<now() ) {
-	      EUROPA::ObjectDomain const &dom = active->getObject()->lastDomain();
-	      EUROPA::ObjectId obj = dom.makeObjectList().front();
-	    
-	      debugMsg("trex:archive", "Checking if object "<<obj->toString()
-		       <<" of slave "<<(*t)->getKey()<<" is only an Observe timeline.");
-
-	      state_iterator i = m_agent_timelines.find(obj->getKey());
-	      if( m_agent_timelines.end()!=i ) {
-		protect = !((*i)->external() && 0==look_ahead(obj));
-	      } 
-	    }
-	  }
-	  if( protect ) {
-	    debugMsg("trex:archive", "Cannot delete "<<
-		     tok->getPredicateName().toString()<<'('<<tok->getKey()
-		     <<") as one of its slave ("<<(*t)->getKey()<<") is not completed");
-	    can_delete = false;
-	  }
-	}
+          if( can_delete ) {
+            debugMsg("trex:archive", "Cannot delete "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()
+                     <<"): one of its slaves is not yet started.");
+            can_delete = false;
+          }
+        }
       }
-    }
-    
-    EUROPA::TokenSet merged_t = tok->getMergedTokens();
-    merged_t.insert(tok);
-
-    for(EUROPA::TokenSet::const_iterator t=merged_t.begin();
-      merged_t.end()!=t; ++t) {
-      EUROPA::TokenId master = (*t)->master();
-      bool restrict = false;
-      if( master.isId() ) {
-	if( master->end()->lastDomain().getUpperBound()<=now() ) {
-	  if( master->canBeCommitted() ) {
-	    details::restrict_bases(master);
-	    // constraint_engine()->propagate();
-	    master->commit();
-	  }
-	  restrict = true;
-	} else { 
-	  debugMsg("trex:archive", "Cannot delete "<<
-		   tok->getPredicateName().toString()<<'('<<tok->getKey()
-		   <<") as one of its masters is not completed");
-	  can_delete = false;
-	}
-      } else { 
-	restrict = true;
+      if( can_delete ) {
+        debugMsg("trex:archive", "Destroy token "
+                 <<tok->getPredicateName().toString()<<'('<<tok->getKey()
+                 <<") as all its slaves are now inactives and in the past.");        
+        discard(tok);    
+        tok->start()->restrictBaseDomain(tok->start()->lastDomain());
+        tok->end()->restrictBaseDomain(tok->end()->lastDomain());
+        cli->cancel(tok);
+        if( tok->master().isNoId() )
+          tok->discard();
+        ++deleted;
       }
-      if( restrict ) 
-	details::restrict_bases(tok, *t);
+    } else {
+      debugMsg("trex:archive", "Token "<<tok->getPredicateName().toString()
+               <<'('<<tok->getKey()<<") is not active.\n\tSet it complete.");
+      m_committed.erase(tok);
+      terminate(tok);
     }
-    if( can_delete ) {
-      debugMsg("trex:archive", "Archiving "<<
-	       tok->getPredicateName().toString()<<'('<<tok->getKey()
-	       <<") all its slaves and masters are committed");
-      discard(tok);
-      cli->cancel(tok);
-      // constraint_engine()->propagate();
-      tok->discard();
-      debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
-      ++deleted;
-    }      
   }
 
+  // Needf 
+  debugMsg("trex:archive", "Archived "<<deleted<<" tokens.");
+  constraint_engine()->propagate();
 
-  debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
-  debugMsg("trex:archive",
-	   '['<<now()<<"] ============= END archiving ============");
-
+  // plan_db()->archive(now()-1);
+           
 #else // TREX_ARCHIVE_EuropaDefault
 
   // Just rely on the europa archival : safe but inefficient
-  plan_db()->archive(now()-1);
+  plan_db()->archive(date-1);
 
 #endif
 }
@@ -797,7 +864,7 @@ EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
 
   if( !schema()->isPredicate(name.c_str()) )
     throw EuropaException("Unknown predicate \""+name+"\" for object "
-			  +obj->getName().toString());
+                          +obj->getName().toString());
   EUROPA::TokenId tok = cli->createToken(name.c_str(), NULL, rejectable, fact);
 
   if( !tok.isId() )
@@ -824,7 +891,7 @@ EUROPA::TokenId Assembly::new_obs(EUROPA::ObjectId const &obj,
     pred = UNDEFINED_PRED;
     if( !have_predicate(obj, pred) )
       throw EuropaException("Unable to create token "+prev+" or "+UNDEFINED_PRED+
-			    " for timeline "+obj->toString());
+                            " for timeline "+obj->toString());
     undefined = true;
   }
   return (*handler)->new_obs(pred, false);
@@ -843,7 +910,7 @@ void Assembly::recalled(EUROPA::TokenId const &tok) {
     plan_db()->getClient()->deleteToken(tok);
   } else 
     debugMsg("trex:always", 
-	     "["<<now()<<"] Attempted to recall an invalid token.");
+             "["<<now()<<"] Attempted to recall an invalid token.");
 }
 
 
@@ -984,8 +1051,8 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
   if( !expanded ) 
     out<<"  graph[rankdir=\"LR\"];\n";
   boost::filter_iterator<is_not_merged, EUROPA::TokenSet::const_iterator>
-  it(filter, tokens.begin(), tokens.end()),
-  endi(filter, tokens.end(), tokens.end());
+    it(filter, tokens.begin(), tokens.end()),
+    endi(filter, tokens.end(), tokens.end());
   // Iterate through plan tokens
   for( ; endi!=it; ++it) {
     EUROPA::eint key = (*it)->getKey(); 
@@ -994,6 +1061,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
        <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
+    out<<"nref="<<(*it)->refCount()<<"\\n";
 #ifdef EUROPA_HAVE_EFFECT
     out<<"type: ";
     if( is_action(*it) )
@@ -1008,16 +1076,29 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
         vars.end()!=v; ++v) {
       // print all token attributes
-      out<<"  "<<(*v)->getName().toString()<<'='<<(*v)->toString()<<"\\n";
+      out<<"  "<<(*v)->getName().toString()<<'=';
+      if( (*v)->isNull() ) 
+        out<<"NULL";
+      else {
+        EUROPA::DataTypeId type = (*v)->getDataType();
+        EUROPA::Domain const &dom = (*v)->lastDomain();
+        if( dom.isSingleton() ) 
+          out<<type->toString(dom.getSingletonValue());
+        else if( dom.isInterval() ) 
+          out<<dom;
+        else
+          out<<(*v)->toString();
+      }
+      out<<"\\n";
     }
     if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
       if( !merged.empty() ) {
         out<<"merged={";
         EUROPA::TokenSet::const_iterator m = merged.begin();
-        out<<(*(m++))->getKey();
-        for(; merged.end()!=m; ++m)
-          out<<", "<<(*m)->getKey();
+        out<<(*m)->getKey()<<'['<<(*m)->refCount()<<']';
+        for(++m; merged.end()!=m; ++m)
+          out<<", "<<(*m)->getKey()<<'['<<(*m)->refCount()<<']';
         out<<"}\\n";
       }
     }
@@ -1026,7 +1107,8 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<" color=grey"; // ignored tokens are greyed
     else if( filter.is_fact(*it) )
       out<<" color=red"; // fact tokens are red
-    if( (*it)->isCommitted() )
+    if( (*it)->isCommitted() ||
+        m_committed.find(*it)!=m_committed.end() )
       out<<" fontcolor=red";
     std::ostringstream styles;
     bool comma = false;
@@ -1065,21 +1147,21 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       filter.merged(*it, toks);
       // display the relation to the master token(s)
       for(EUROPA::TokenSet::const_iterator t=toks.begin(); toks.end()!=t; ++t) {
-	EUROPA::TokenId master = (*t)->master();
+        EUROPA::TokenId master = (*t)->master();
 	
-	if( master.isId() ) {
-	  out<<"  t"<<master->getKey()<<"->t"<<key
-	     <<"[label=\""<<(*t)->getRelation().toString();
+        if( master.isId() ) {
+          out<<"  t"<<master->getKey()<<"->t"<<key
+             <<"[label=\""<<(*t)->getRelation().toString();
 #ifdef EUROPA_HAVE_EFFECT
-	  if( is_effect(*t) )
-	    out<<"\\n(effect)";
-	  if( is_condition(*t) )
-	    out<<"\\n(condition)";
+          if( is_effect(*t) )
+            out<<"\\n(effect)";
+          if( is_condition(*t) )
+            out<<"\\n(condition)";
 #endif // EUROPA_HAVE_EFFECT
-	  out<<"\"];\n";
- 	  // if( (*it)!=(*t) )
-	  //   out<<" color=grey";
-	}
+          out<<"\"];\n";
+          // if( (*it)!=(*t) )
+          //   out<<" color=grey";
+        }
       }
     } else {
       EUROPA::eint lb, ub;
@@ -1087,9 +1169,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       // ub = (*it)->start()->lastDomain().getUpperBound();
       
       if( lb>std::numeric_limits<EUROPA::eint>::minus_infinity() ) {
-	if( instants.insert(lb).second ) 
-	  out<<"  \"i"<<lb<<"\"[shape=point, label=\""<<lb<<"\"];\n";
-	out<<"  \"i"<<lb<<"\"->t"<<(*it)->getKey()<<"[color=grey style=dashed weight=1000];\n";
+        if( instants.insert(lb).second ) 
+          out<<"  \"i"<<lb<<"\"[shape=point, label=\""<<lb<<"\"];\n";
+        out<<"  \"i"<<lb<<"\"->t"<<(*it)->getKey()<<"[color=grey style=dashed weight=1000];\n";
       }
       // if( ub<std::numeric_limits<EUROPA::eint>::infinity() ) {
       //   if( instants.insert(ub).second ) 
@@ -1106,9 +1188,9 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       //   out<<"  i"<<lb<<"->t"<<(*it)->getKey()<<"[weight=10.0];\n";
       // }
       if( ub<std::numeric_limits<EUROPA::eint>::infinity() ) {
-	if( instants.insert(ub).second ) 
-	  out<<"  \"i"<<ub<<"\"[shape=point, label=\""<<ub<<"\"];\n";
-	out<<"  t"<<(*it)->getKey()<<"->\"i"<<ub<<"\"[color=grey style=dashed weight=1000];\n";
+        if( instants.insert(ub).second ) 
+          out<<"  \"i"<<ub<<"\"[shape=point, label=\""<<ub<<"\"];\n";
+        out<<"  t"<<(*it)->getKey()<<"->\"i"<<ub<<"\"[color=grey style=dashed weight=1000];\n";
       }
     }
   }
@@ -1123,7 +1205,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
         
     for(;instants.end()!=i; ++i) {
       out<<"   \"i"<<pred<<"\"->\"i"<<(*i)<<"\"[weight=\""
-	 <<(max-((*i)-pred))<<"\"];\n";
+         <<(max-((*i)-pred))<<"\"];\n";
       pred = *i;
       out<<"   \"i"<<pred<<"\"[label=\""<<pred<<"\"];\n";
     }
@@ -1134,18 +1216,18 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
 
 void Assembly::getFuturePlan()
 {
-    internal_iterator it = begin_internal(), end = end_internal();
-    for(; it!=end; ++it)
+  internal_iterator it = begin_internal(), end = end_internal();
+  for(; it!=end; ++it)
     {
-        EUROPA::TimelineId timeline((*it)->timeline());
-        const std::list<EUROPA::TokenId>& tokens = timeline->getTokenSequence();
-        for(std::list<EUROPA::TokenId>::const_iterator token = tokens.begin();
-        token!=tokens.end(); ++token)
+      EUROPA::TimelineId timeline((*it)->timeline());
+      const std::list<EUROPA::TokenId>& tokens = timeline->getTokenSequence();
+      for(std::list<EUROPA::TokenId>::const_iterator token = tokens.begin();
+          token!=tokens.end(); ++token)
         {
-             if((*token)->end()->lastDomain().getLowerBound()>now()+1)
-             {
-                 plan_dispatch(timeline,*token);
-             }
+          if((*token)->end()->lastDomain().getLowerBound()>now()+1)
+            {
+              plan_dispatch(timeline,*token);
+            }
         }
     }
 }
@@ -1158,8 +1240,8 @@ void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId co
   EUROPA::TokenId tok = details::parent_token(v);
   details::var_print(out<<"Local context for ", v)<<":\n";
   out<<"  - base domain: "<<v->baseDomain().toString()
-  <<"\n  - last domain: "<<v->lastDomain().toString()
-  <<"\n  - europa violation explanation: "<<v->getViolationExpl()<<'\n';
+     <<"\n  - last domain: "<<v->lastDomain().toString()
+     <<"\n  - europa violation explanation: "<<v->getViolationExpl()<<'\n';
   EUROPA::ConstraintSet constraints;
   v->constraints(constraints);
   if( !constraints.empty() ) {
@@ -1187,7 +1269,7 @@ void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId co
  */
 
 Assembly::ce_listener::ce_listener(Assembly &owner)
-:EUROPA::ConstraintEngineListener(owner.m_cstr_engine), m_owner(owner) {}
+  :EUROPA::ConstraintEngineListener(owner.m_cstr_engine), m_owner(owner) {}
 
 void Assembly::ce_listener::notifyPropagationPreempted() {
   if( m_owner.m_in_synchronization ) {
@@ -1211,7 +1293,7 @@ void Assembly::ce_listener::notifyPropagationPreempted() {
  */
 
 void Assembly::synchronization_listener::notifyCreated(EUROPA::SOLVERS::DecisionPointId& dp) {
-  debugMsg("trex:synch:search", "New decision point ["<<dp->getKey()<<"]:" <<dp->toString());
+  debugMsg("trex:synch:search", "New decision point ["<<dp->getKey()<<"]");
   m_progress = true;
 }
 
@@ -1256,7 +1338,8 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 
   if( master.isNoId() ) {
     m_owner.m_roots.insert(token);
-  }
+    // token->incRefCount();
+  } 
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
@@ -1277,14 +1360,14 @@ void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
 
 void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token)
 {
-    // Check if the token is a goal and add it to m_goals
-    if(m_owner.is_goal(token)) {
-        m_owner.m_goals.insert(token);
-        // Checking for goal->effect->action relation if it is then the action
-        // becomes an action goal in the m_goals
-        if(m_owner.actionEffect(token))
-            m_owner.m_goals.insert(token->master());
-    }
+  // Check if the token is a goal and add it to m_goals
+  if(m_owner.is_goal(token)) {
+    m_owner.m_goals.insert(token);
+    // Checking for goal->effect->action relation if it is then the action
+    // becomes an action goal in the m_goals
+    if(m_owner.actionEffect(token))
+      m_owner.m_goals.insert(token->master());
+  }
 }
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
@@ -1293,53 +1376,56 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
 
   if( m_owner.is_agent_timeline(token) ) {
     debugMsg("trex:token", "cancel "<<token->getPredicateName().toString()
-	     <<'('<<token->getKey()<<')');
-    m_owner.cancel(token);
+             <<'('<<token->getKey()<<')');
+    if( !m_owner.m_archiving )
+      m_owner.cancel(token); // do not recall during archiving !!!!
   }
 }
 
-void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token)
-{
-    // Check to find if the tokens active token is in m_goal
-    // If it is it gets added to m_goals
-    if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())
+void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
+  // Check to find if the tokens active token is in m_goal
+  // If it is it gets added to m_goals
+  if(m_owner.m_goals.find(token->getActiveToken())!=m_owner.m_goals.end())
     {
-        m_owner.m_goals.insert(token);
-        // Checking for goal->effect->action relation if it is then the action
-        // becomes an action goal in the m_goals
-        if(m_owner.actionEffect(token))
-            m_owner.m_goals.insert(token->master());
+      m_owner.m_goals.insert(token);
+      // Checking for goal->effect->action relation if it is then the action
+      // becomes an action goal in the m_goals
+      if(m_owner.actionEffect(token))
+        m_owner.m_goals.insert(token->master());
     }
-    // Check if the token is a goal and adds it to m_goals
-    // Also insert the active token as that is the token we most often check against
-    else if(m_owner.is_goal(token)) {
-        m_owner.m_goals.insert(token);
-        m_owner.m_goals.insert(token->getActiveToken());
-        // Checking for goal->effect->action relation if it is then the action
-        // becomes an action goal in the m_goals
-        if(m_owner.actionEffect(token))
-            m_owner.m_goals.insert(token->master());
-        if(m_owner.actionEffect(token->getActiveToken()))
-            m_owner.m_goals.insert(token->getActiveToken()->master());
-    }
+  // Check if the token is a goal and adds it to m_goals
+  // Also insert the active token as that is the token we most often check against
+  else if(m_owner.is_goal(token)) {
+    m_owner.m_goals.insert(token);
+    m_owner.m_goals.insert(token->getActiveToken());
+    // Checking for goal->effect->action relation if it is then the action
+    // becomes an action goal in the m_goals
+    if(m_owner.actionEffect(token))
+      m_owner.m_goals.insert(token->master());
+    if(m_owner.actionEffect(token->getActiveToken()))
+      m_owner.m_goals.insert(token->getActiveToken()->master());
+  }
 }
 
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
-    // Checks and erases the token if it was considered a goal
-    m_owner.m_goals.erase(token);
+  // Checks and erases the token if it was considered a goal
+  m_owner.m_goals.erase(token);
+  // EUROPA::TokenId master = token->master();
+  // if( master.isId() )
+  //   token->decRefCount();
 }
 
 void Assembly::listener_proxy::notifyRejected(EUROPA::TokenId const &token) {
   debugMsg("trex:always", "["<<m_owner.now()<<"] Token "
-	   <<token->getPredicateName().toString()<<'('
-	   <<token->getKey()<<") is rejected.");
+           <<token->getPredicateName().toString()<<'('
+           <<token->getKey()<<") is rejected.");
   m_owner.rejected(token);
 }
 
 void Assembly::listener_proxy::notifyReinstated(EUROPA::TokenId const &token) {
   debugMsg("trex:always", "["<<m_owner.now()<<"] Token "
-	   <<token->getPredicateName().toString()<<'('
-	   <<token->getKey()<<") is no longer rejected.");
+           <<token->getPredicateName().toString()<<'('
+           <<token->getKey()<<") is no longer rejected.");
 }
 
 void Assembly::listener_proxy::notifyCommitted(EUROPA::TokenId const &token) {
@@ -1352,14 +1438,243 @@ void Assembly::listener_proxy::notifyTerminated(EUROPA::TokenId const &token) {
 }
 
 //Listener_proxy helper functions
-bool Assembly::actionEffect(const EUROPA::TokenId& token)
-{
-    EUROPA::TokenId master = token->master();
-    if(master.isId())
-    {
-        if(is_action(master) && is_effect(token))
-            return true;
-    }
-    return false;
+bool Assembly::actionEffect(const EUROPA::TokenId& token) {
+  EUROPA::TokenId master = token->master();
+  if(master.isId()) {
+    if(is_action(master) && is_effect(token))
+      return true;
+  }
+  return false;
 }
 
+/*
+  # ifdef EUROPA_HAVE_EFFECT
+  #  warning "Greedy plan archiving is not efficient with action tokens."
+  # endif // EUROPA_HAVE_EFFECT
+  EUROPA::DbClientId cli = plan_db()->getClient();
+  size_t deleted = 0;
+
+  debugMsg("trex:archive",
+  '['<<now()<<"] ============= START archiving ============");
+  
+  debugMsg("trex:archive", "Evaluating "<<m_completed.size()<<" completed tokens.");
+  m_iter = m_completed.begin();
+  while( m_completed.end()!=m_iter ) {
+  EUROPA::TokenId tok = *(m_iter++);
+    
+  if( tok->canBeCommitted() ) {
+  // details::restrict_bases(tok);
+  // constraint_engine()->propagate();
+  EUROPA::TokenId master = tok->master();
+ 
+  if( master.isId() ) {
+  if( master->isCommitted() ) {
+  debugMsg("trex:archive", 
+  "Committing "<<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<") as its master is committed.");
+  tok->commit();
+  } else if( master->isFact() && 
+  master->start()->lastDomain().getUpperBound()<now() ) {
+  debugMsg("trex:archive", 
+  "Committing "<<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<") as its master is a past fact.");
+  tok->commit();
+  } else {
+  debugMsg("trex:archive", "Cannot commit "
+  <<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<") as its master is neither a fact "
+  <<"or committed.");
+  }
+  } else {
+  debugMsg("trex:archive", 
+  "Committing "<<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<") as it is a root token.");
+  tok->commit(); 
+  }
+  } else if( tok->isInactive() ) {
+  EUROPA::TokenId master = tok->master(); 
+  if( master.isNoId() ) {
+  debugMsg("trex:archive", "Discarding inactive orphan token "
+  <<tok->getPredicateName().toString() 
+  <<'('<<tok->getKey()<<").");
+  discard(tok);
+  tok->discard();
+  // constraint_engine()->propagate();
+  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+
+  } else if( master->end()->lastDomain().getUpperBound()<=now() ) {
+  if( master->isCommitted() ) {
+  debugMsg("trex:archive", "Ignoring inactive justified token "
+  <<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<").");
+  m_completed.erase(tok);
+  } else 
+  m_completed.insert(master);
+  }	
+  } else {
+  // token is merged
+  EUROPA::TokenId active = tok->getActiveToken();
+  EUROPA::TokenId master = tok->master();
+
+  if( master.isId() ) {
+  if( master->end()->lastDomain().getUpperBound()<=now() ) {
+  if( !master->isCommitted() ) 
+  m_completed.insert(master);
+  }
+  }
+  if( master.isNoId() || master->isCommitted() ) {
+  debugMsg("trex:archive", "Collapsing "
+  <<tok->getPredicateName().toString()<<'('<<tok->getKey()
+  <<") with its active counterpart "<<active->getKey());
+  details::restrict_bases(active, tok);
+  // constraint_engine()->propagate();
+  if( tok->isFact() ) 
+  active->makeFact();
+  if( active->canBeCommitted() ) 
+  m_completed.insert(active);
+  if( master.isNoId() ) {
+  debugMsg("trex:archive", "Discarding the redundant token "
+  <<tok->getPredicateName().toString() 
+  <<'('<<tok->getKey()<<").");
+  discard(tok);
+  cli->cancel(tok);
+  tok->discard();
+  // constraint_engine()->propagate();
+  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+
+  ++deleted;
+  }
+  } else {
+  debugMsg("trex:archive", "Cannot commit "<<tok->getPredicateName().toString()
+  <<'('<<tok->getKey()<<") as its master "<<master->getPredicateName().toString()
+  <<'('<<master->getKey()<<") is not terminated yet.");
+  }
+  }
+  }
+
+  debugMsg("trex:archive", "Evaluating "<<m_committed.size()<<" committed tokens.");
+  m_iter = m_committed.begin();
+  
+  while( m_committed.end()!=m_iter ) {
+  EUROPA::TokenId tok = *(m_iter++);
+  EUROPA::TokenSet slaves_t = tok->slaves();
+  bool can_delete = true;
+    
+  for(EUROPA::TokenSet::const_iterator t=slaves_t.begin();
+  slaves_t.end()!=t; ++t) {
+  if( !(*t)->isCommitted() ) {
+  if( (*t)->end()->lastDomain().getUpperBound()<=now() ) {
+  if( (*t)->canBeCommitted() ) {
+  debugMsg("trex:archive", "Committing slave "
+  <<(*t)->getPredicateName().toString()<<'('<<(*t)->getKey()
+  <<") from master "<<tok->getPredicateName().toString()<<'('
+  <<tok->getKey()<<").");
+  // details::restrict_bases(*t);
+  // constraint_engine()->propagate();
+  (*t)->commit();
+  } else if( (*t)->isMerged() ) {
+  EUROPA::TokenId active = (*t)->getActiveToken();
+  if( active->canBeCommitted() ) {
+  debugMsg("trex:archive", "Collapsing explained slave "
+  <<(*t)->getPredicateName().toString()<<'('
+  <<(*t)->getKey()
+  <<") with its active counterpart "<<active->getKey());
+  //details::restrict_bases(active, *t);
+  // constraint_engine()->propagate();
+  active->commit();
+  } else {
+  debugMsg("trex:archive", "Collapsing explained slave "
+  <<(*t)->getPredicateName().toString()<<'('
+  <<(*t)->getKey()
+  <<") with its committed active counterpart "
+  <<active->getKey());
+  //details::restrict_bases(active, *t);
+  // constraint_engine()->propagate();
+  }
+  } else if( !(*t)->isInactive() ) {
+  debugMsg("trex:archive", "Cannot delete "<<
+  tok->getPredicateName().toString()<<'('<<tok->getKey()
+  <<") as one of its slave is not active,merged or "
+  <<"inactive ???");
+  can_delete = false;
+  }
+  } else {
+  bool protect = true;
+  if( (*t)->isMerged() ) {
+  EUROPA::TokenId active = (*t)->getActiveToken();
+	    
+  if( active->start()->lastDomain().getUpperBound()<now() ) {
+  EUROPA::ObjectDomain const &dom = active->getObject()->lastDomain();
+  EUROPA::ObjectId obj = dom.makeObjectList().front();
+	    
+  debugMsg("trex:archive", "Checking if object "<<obj->toString()
+  <<" of slave "<<(*t)->getKey()<<" is only an Observe timeline.");
+
+  state_iterator i = m_agent_timelines.find(obj->getKey());
+  if( m_agent_timelines.end()!=i ) {
+  protect = !((*i)->external() && 0==look_ahead(obj));
+  } 
+  }
+  }
+  if( protect ) {
+  debugMsg("trex:archive", "Cannot delete "<<
+  tok->getPredicateName().toString()<<'('<<tok->getKey()
+  <<") as one of its slave ("<<(*t)->getKey()<<") is not completed");
+  can_delete = false;
+  }
+  }
+  }
+  }
+    
+  EUROPA::TokenSet merged_t = tok->getMergedTokens();
+  merged_t.insert(tok);
+
+  for(EUROPA::TokenSet::const_iterator t=merged_t.begin();
+  merged_t.end()!=t; ++t) {
+  EUROPA::TokenId master = (*t)->master();
+  bool restrict = false;
+  if( master.isId() ) {
+  if( master->end()->lastDomain().getUpperBound()<=now() ) {
+  if( master->isCommitted() )
+  restrict = true;
+  else 
+  m_completed.insert(master);
+  } else { 
+  debugMsg("trex:archive", "Cannot delete "<<
+  tok->getPredicateName().toString()<<'('<<tok->getKey()
+  <<") as one of its masters is not completed");
+  can_delete = false;
+  }
+  } else { 
+  restrict = true;
+  }
+  if( restrict ) 
+  details::restrict_bases(tok, *t);
+  }
+  if( can_delete ) {
+  debugMsg("trex:archive", "Archiving "<<
+  tok->getPredicateName().toString()<<'('<<tok->getKey()
+  <<") all its slaves and masters are committed");
+
+  discard(tok);
+  EUROPA::TokenSet slaves = tok->slaves();
+  for(EUROPA::TokenSet::iterator i=slaves.begin(); slaves.end()!=i; ++i)
+  if( (*i)->isMerged() ) {
+  // details::restrict_attributes((*i)->getActiveToken(), *i);
+  // constraint_engine()->propagate();
+  cli->cancel(*i);
+  }
+  cli->cancel(tok);
+  // constraint_engine()->propagate();
+  tok->discard();
+  debugMsg("trex:archive", EUROPA::PlanDatabaseWriter::toString(plan_db()));
+  ++deleted;
+  }      
+  }
+
+
+  debugMsg("trex:archive", "Archived "<<deleted<<" token(s)");
+  debugMsg("trex:archive",
+  '['<<now()<<"] ============= END archiving ============");
+
+*/

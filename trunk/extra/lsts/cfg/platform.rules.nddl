@@ -4,98 +4,104 @@
 #include "estimator.nddl"
 
 VehicleState::Boot {
-	contained_by(VehicleCommand.Idle);
+  contained_by(VehicleCommand.Idle);
 }
 
-/*
- * superfluous now :
- *
- * It is all checked by our controller ... as long as nobody uses 
- * VheicleCommand directly we do not need these extra rules
- */ 
-// VehicleState::Exec {
-// 	contains(VehicleCommand.Maneuver);
-// 	met_by(VehicleState.Ready); 
-// }
+VehicleCommand::Idle {
+    // helps the planner remember its controller 
+    // is idling
+    contained_by(ManeuverController.Idle);
+}
 
-// VehicleCommand::Maneuver {
-	
-//     met_by(VehicleState.Ready); 
-   	
-// 	contained_by (OperationalLimits.Limits limits);
-//     depth 	<= 	limits.maxDepth;
-//     depth 	>= 	limits.minDepth;
-//     speed 	<= 	limits.maxSpeed;
-//     speed 	>= 	limits.minSpeed;
-    
-//     // sane == sane_pos(latitude, longitude, depth);
-//     // sane == true;
-// }
-/*
- * end of superfuous
- */
+//VehicleCommand::Maneuver {
+
+//if (depth > 0) {
+//	contained_by(SurfaceController.Underwater);	
+//}
+//else {
+//	contained_by(SurfaceController.Surface);
+//}
+//}
+
 
 TrexSupervision::Active {
-    vehicle == object.vehicle;
+  vehicle == object.vehicle;
 }
+
+Gps::Valid {
+  contained_by(SurfaceController.Surface);
+}
+
+Gps::Invalid {
+  contained_by(SurfaceController.Underwater);
+}
+
 
 // rule that enables the maneuver dispatch
 
+ManeuverController::Idle {
+  met_by(Maneuver);
+}
+
 ManeuverController::Maneuver {
-    starts_during(OperationalLimits.Limits lim);
-    depth <= lim.maxDepth;
-    lim.minDepth <= depth;
-    speed <= lim.maxSpeed;
-    lim.minSpeed <= speed;
+  starts_during(OperationalLimits.Limits lim);
+  depth <= lim.maxDepth;
+  lim.minDepth <= depth;
+  speed <= lim.maxSpeed;
+  lim.minSpeed <= speed;
     
-   // met_by(Idle ready);
-
-    starts_during(TrexSupervision.Active free);
-    VehicleCommand cmd;
-    cmd == free.vehicle;
-    met_by(VehicleState.Ready ready);
-    met_by(Idle idle);
-    ready contained_by idle;
-
-    //contained_by(VehicleState.Exec);    
-    
-    int earliest_start;
-    
-    earliest_start == max(free.start, ready.start);
-
-    // Wait free to be started so we do not spam 
-    // Platform when Blocked 
-    if( earliest_start <= AGENT_CLOCK ) {
-	
-	equals(cmd.Maneuver request);
-	request.latitude == lat_rad;
-	request.longitude == lon_rad;
-	request.depth == depth;
-	request.speed == speed;
-	request.secs == secs;
-
+  starts_during(TrexSupervision.Active free);
+  VehicleCommand cmd;
+  cmd == free.vehicle;
+  // met_by(VehicleState.Ready ready);
+  met_by(Idle idle);
+  // Need this to avoid aggressive archiving
+  //ready contained_by idle;
+  int min_start;
+  min_start <= start;
+  if (depth > 0) {
+    //met_by(Idle idle);
+    if(idle.start <= AGENT_CLOCK ) {      
+      ends_before(SurfaceController.Underwater under);
+      min_start == under.earliest_start;
+      duration <= under.speriod;
+      under.requested == true;
+      end <= under.latest_end;
     }
+  }
 
-    // Instead of rejecting the goal I will silently select
-    // a more realistic tolerance
+  int earliest_start;
     
-    float min_tolerance;
-    if (secs == 0)
-    	min_tolerance <= speed*6.0;
-    else if (depth > 0)
-    	min_tolerance == 20.0;
-    else
-    	min_tolerance == 15.0;
+  earliest_start == max(free.start, idle.start, min_start);
+
+  // Wait free to be started so we do not spam 
+  // Platform when Blocked 
+  if( earliest_start <= AGENT_CLOCK ) {
+		
+    equals(cmd.Maneuver request);
+		
+    request.latitude == lat_rad;
+    request.longitude == lon_rad;
+    request.depth == depth;
+    request.speed == speed;
+    request.secs == secs;
+
+  }
+
+  float min_tolerance;
+  if (secs == 0)
+    min_tolerance <= speed*6.0;
+  else if (depth > 0)
+    min_tolerance == 20.0;
+  else
+    min_tolerance == 15.0;
     	
-    tolerance == max(min_tolerance, requested_tolerance);
+  tolerance == max(min_tolerance, requested_tolerance);
     
-
-    //tolerance <= 10.0; // hard coded to 10. m for now 
+  meets(EstimatedState.Position pos);
+  distance == ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude);
+  distance <= tolerance;
 	
-    // if( end <= AGENT_CLOCK ) {
-	meets(EstimatedState.Position pos);
-	distance == ll_distance(lat_rad, lon_rad, pos.latitude, pos.longitude);
-	distance <= tolerance;
-	// if it fails replanning should be able to correct it
-	// }
+
+	
 }
