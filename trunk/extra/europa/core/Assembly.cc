@@ -723,8 +723,12 @@ void Assembly::archive(EUROPA::eint date) {
             discard(tok);
             tok->discard();
             ++deleted;
-          } else if( m_completed.find(active)==m_completed.end() )
+          } else if( m_completed.find(active)==m_completed.end() ) {
+            details::restrict_base(tok, tok->start(), 
+                                   tok->start()->lastDomain());
+            details::restrict_base(tok, tok->end(), tok->end()->lastDomain());
             terminate(active);
+          }
         } else if( tok->isActive() ) {
           debugMsg("trex:archive", "Commit ROOT active completed token "
                    <<tok->getPredicateName().toString()<<'('
