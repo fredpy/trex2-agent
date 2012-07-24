@@ -66,7 +66,9 @@ namespace {
 
 EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false),
-   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name")),
+   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name"),
+            parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
+            parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
 				     "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
@@ -222,6 +224,7 @@ void EuropaReactor::notify(Observation const &obs) {
   else if( !restrict_token(fact, obs) )
     syslog(null, error)<<"Failed to restrict some attributes of observation "
 		       <<obs;
+  logPlan("notify");
 }
 
 void EuropaReactor::handleRequest(goal_id const &request) {
@@ -256,6 +259,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       }
     }
   }
+  logPlan("request");
 }
 
 void EuropaReactor::handleRecall(goal_id const &request) {
@@ -266,15 +270,19 @@ void EuropaReactor::handleRecall(goal_id const &request) {
     EUROPA::eint key = i->second;
     m_active_requests.right.erase(i);
     
-    syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";
-    
-    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
     if( m_completed_this_tick ) {
       debugMsg("trex:resume", 
 	       "[ "<<now()<<"] Resume deliberation due to a recall.");
       m_completed_this_tick = false;
+    } else if( planner()->getStepCount()>0 ) {
+      debugMsg("trex:resume",
+               "["<<now()<<"] reset curretn planning due to a recall.");
+      planner()->reset();
     }
+    syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
+    recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
+  logPlan("recall");
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
@@ -304,6 +312,7 @@ void EuropaReactor::handleTickStart() {
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
+  logPlan("tick");
 }
 
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
@@ -404,6 +413,8 @@ bool EuropaReactor::do_relax(bool full) {
   bool ret = relax(full);
   print_stats("relax", 0, 0, stat_clock::now()-start);
   logPlan("relax");
+  m_dispatched.clear(); // need this in case we have the same
+			// token coming back
   return ret;
 }
 
@@ -411,7 +422,6 @@ bool EuropaReactor::synch() {
   stat_clock::time_point start = stat_clock::now();
   bool ret = false;
   if( commit_externals() ) {
-    // logPlan("externals");
     ret = do_synchronize();
   }
 
@@ -438,8 +448,8 @@ bool EuropaReactor::synchronize() {
 
   
   // tr_info("resolve state");
-  debugMsg("trex:synch", "clean up planner active decision");
-  planner()->reset(0);
+  // debugMsg("trex:synch", "clean up planner active decision");
+  // planner()->reset(0);
   debugMsg("trex:synch", "start synchronization");
   if( !synch() ) {
     m_completed_this_tick = false;
@@ -453,7 +463,6 @@ bool EuropaReactor::synchronize() {
       }
     }
   } else { // things to do when everything went fine:
-
     // Prepare the reactor for next deliberation round 
     if( m_completed_this_tick ) {
       //tr_info("clean-up plan solver");
@@ -467,18 +476,14 @@ bool EuropaReactor::synchronize() {
 	  m_dispatched.left.erase(cur->getActiveToken()->getKey());
       }
       m_completed_this_tick = false;
-    } 
-#ifndef Europa_Archive_OLD
-    //tr_info("archive");
-    // Necessary in case the planner did not run on previous tick
-    if( planner()->getStepCount()==0 ) {      
+    }
+    if( 0==planner()->getStepCount() ) {
       stat_clock::time_point start = stat_clock::now();
       logPlan(stage);
       archive();
       stage = "archive";
       print_stats("archive", 0, 0, stat_clock::now()-start);
-    }
-#endif 
+    } 
   }
   // tr_info("end of synch");
   return constraint_engine()->propagate(); // should not fail
@@ -550,14 +555,6 @@ bool EuropaReactor::hasWork() {
     if( planner()->noMoreFlaws() ) {
       size_t steps = planner()->getStepCount();
       m_completed_this_tick = true;
-#ifdef Europa_Archive_OLD
-      { // mesure archiving time 
-        stat_clock::time_point start = stat_clock::now();
-        planner()->clear();
-        archive();
-	print_stats("archive", 0, 0, stat_clock::now()-start);
-      }
-#endif // Europa_Archive_OLD
       debugMsg("trex:resume", "[ "<<now()<<"] Deliberation completed after "<<steps<<" steps.");
       if( steps>0 ) {
         syslog(null, info)<<"Deliberation completed in "<<steps<<" steps.";
@@ -595,44 +592,55 @@ void EuropaReactor::resume() {
   bool should_relax = false, should_continue;
   size_t count = 0;
   
-  do {
+  // do {
     if( constraint_engine()->pending() )
       constraint_engine()->propagate();
     if( constraint_engine()->constraintConsistent() ) { 
-      planner()->step();
+      size_t depth = planner()->getDepth();
+      planner()->step();      
       if( m_full_log && planner()->getStepCount()>nsteps )
 	logPlan("step");
+      if( !planner()->isValid() ) {
+        syslog(warn)<<"Planner is not valid !!!";
+      }
+      // syslog(info)<<"Depth = "<<planner()->getDepth()
+      //             <<"\n\tlast decision: "
+      //             <<planner()->getLastExecutedDecision();
+      // if( planner()->getDepth() < depth )
+      //   planner()->reset(0);
     }
-
+    if( constraint_engine()->pending() )
+      constraint_engine()->propagate();
+    
+    
 
     if( constraint_engine()->provenInconsistent() ) {
       syslog(null, warn)<<"Inconsitency found during planning.";
       should_relax = true;
-      break;
     }
     if( planner()->isExhausted() ) {
       syslog(null, warn)<<"Deliberation solver is exhausted.";
       should_relax = true;
-      break;
+      //break;
     }
 
     // As long as I see a Threat I will continue to do steps 
     // this assume that threats have the highest priority
-    EUROPA::IteratorId flaws = planner()->createIterator();
-    should_continue = false;
-    while( !flaws->done() ) {
-      EUROPA::EntityId flaw = flaws->next();
-      if( EUROPA::TokenId::convertable(flaw) 
-	  && EUROPA::TokenId(flaw)->isActive() ) {
-	debugMsg("trex:step", "["<<now()<<"] Found one threat in the stack:\n"
-		 <<planner()->printOpenDecisions()
-		 <<"\n\t *** Resuming deliberation ***");
+  //   EUROPA::IteratorId flaws = planner()->createIterator();
+  //   should_continue = false;
+  //   while( !flaws->done() ) {
+  //     EUROPA::EntityId flaw = flaws->next();
+  //     if( EUROPA::TokenId::convertable(flaw) 
+  //         && EUROPA::TokenId(flaw)->isActive() ) {
+  //       debugMsg("trex:step", "["<<now()<<"] Found one threat in the stack:\n"
+  //       	 <<planner()->printOpenDecisions()
+  //       	 <<"\n\t *** Resuming deliberation ***");
 
-	should_continue = true;
-	break;
-      }
-    }
-  } while(should_continue);
+  //       should_continue = true;
+  //       break;
+  //     }
+  //   }
+  // } while(should_continue);
 
   if( should_relax ) {
     syslog(null, warn)<<"Relax database after "<<planner()->getStepCount()

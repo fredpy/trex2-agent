@@ -97,8 +97,8 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::eint initial = assembly().initial_tick();
 
   return t_start.getLowerBound() >= horizon.getUpperBound() ||
-    // t_end.getUpperBound() < horizon.getLowerBound();
-    t_end.getUpperBound()<=initial;
+      t_end.getUpperBound() < horizon.getLowerBound() ||
+      t_end.getUpperBound() <= initial;
 }
 
 /*
@@ -116,8 +116,12 @@ bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
              <<" after "<<cur<<" => EXCLUDE"); 
     return true;
   }
-  if( tok->end()->lastDomain().getUpperBound() <= initial ) {
-    debugMsg("trex:filt:synch", tok->toString()<<".end="<<tok->end()->lastDomain().toString()
+
+  EUROPA::eint max_end = tok->end()->lastDomain().getUpperBound();
+
+  if( max_end <= initial || max_end < (tok->isFact()?cur:(cur+1)) ) {
+    debugMsg("trex:filt:synch", tok->toString()<<".end="
+	     <<tok->end()->lastDomain().toString()
              <<" before "<<cur<<" => EXCLUDE"); 
     return true;
   }

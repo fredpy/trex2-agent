@@ -2,35 +2,43 @@
 #include "navigator.nddl"
 #include "platform.nddl"
 
-VehicleDepth::Surface {
-	met_by(EstimatedState.Position bef);
-	meets(EstimatedState.Position aft);
-	bef.depth >= 0.2;
-	aft.depth <= 0.1;
+SurfaceController::Underwater {
+
+  subsetOf(speriod, object.surface_period);
+  
+  if (requested == true) {
+    surface == true; 
+    met_by(Surface surf);
+    surf.requested == true;
+    earliest_start == surf.start;
+  }
+  if( surface==true ) {
+    if (latest_end < AGENT_CLOCK && latest_end < end) {
+      starts_before(VehicleCommand.Maneuver man);
+      man.depth == 0;
+      man.start >= latest_end;
+    }
+  }
+}
+
+SurfaceController::Surface {
+  if (requested == true) {
+    met_by(Underwater und);
+    und.surface == true;
+  }
 }
 
 VehicleState::Boot {
-    contained_by(Navigator.Idle);
+  contained_by(Navigator.Idle);
 }
-
-// Navigator::Going {
-//   contained_by(TrexSupervision.Active);
-// }
-
-// TrexSupervision::Blocked {
-//     // better then above as it will allow some cleaning 
-//     // during archiving
-//     contained_by(Navigator.Idle);
-// }
 
 ManeuverController::Maneuver {
-    ends(Navigator.Going go);
-    go.start <= start;
+  ends(Navigator.Going go);
+  go.start <= start;
 
-    lat_deg == go.latitude;
-    lon_deg == go.longitude;
-    depth == go.depth;
-    speed == go.speed;
-    secs == go.secs;
+  lat_deg == go.latitude;
+  lon_deg == go.longitude;
+  depth == go.depth;
+  speed == go.speed;
+  secs == go.secs;
 }
-

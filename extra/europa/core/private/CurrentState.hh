@@ -34,6 +34,8 @@
 #ifndef H_trex_europa_CurrentState
 # define H_trex_europa_CurrentState
 
+# include "TimePoint.hh"
+
 # include <bitset>
 
 # include <trex/europa/config.hh>
@@ -55,11 +57,12 @@ namespace TREX {
 
       /** @brief Current state flaw handler
        *
-       * This class is used to keep track and resolve the current state of all
-       * the reactor T-REX timelines. It is also the way we implement the
-       * synchronization as a set of new flaws to be resolved by the synchronizer.
-       * The nature of these flaws is to ensure that all the Internal timelines
-       * of a reactor have a fully defined state for the current tick
+       * This class is used to keep track and resolve the current
+       * state of all the reactor T-REX timelines. It is also the way
+       * we implement the synchronization as a set of new flaws to be
+       * resolved by the synchronizer.  The nature of these flaws is
+       * to ensure that all the Internal timelines of a reactor have a
+       * fully defined state for the current tick
        *
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup europa
@@ -97,22 +100,24 @@ namespace TREX {
         EUROPA::eint now() const;
         /** @brief Check for current state
          *
-         * Checks if this timeline have already a fully determined state for
-         * the current date
+         * Checks if this timeline have already a fully determined
+         * state for the current date
          *
-         * @retval true if there's one and only one token on this timeline that
-         *         necessarily overlaps the current tick.
+         * @retval true if there's one and only one token on this
+         *         timeline that necessarily overlaps the current
+         *         tick.
          * @retval false otherwise
          */
         bool identified() const;
         /** @brief Check for current state
          *
-         * Checks if this tiemline have already a fully determined state for
-         * the current date and have its start and end base domains are
-         * already set to enforce this.
+         * Checks if this tiemline have already a fully determined
+         * state for the current date and have its start and end base
+         * domains are already set to enforce this.
          *
-         * @retval true if there's one and only one token on this timeline that
-         *         necessarily overlaps the current tick even when fully relaxed.
+         * @retval true if there's one and only one token on this
+         *         timeline that necessarily overlaps the current tick
+         *         even when fully relaxed.
          * @retval false otherwise
          */
         bool committed() const;
@@ -137,15 +142,16 @@ namespace TREX {
         }
         /** @brief Posible predicates
          *
-         * @return The set of all the possible predicate names that can be
-         *         created for this timeline
+         * @return The set of all the possible predicate names that
+         *         can be created for this timeline
          */
         std::set<LabelStr> const &predicates() const {
           return m_pred_names;
         }
         /** @brief Check for default predicate
          *
-         * @retval true if this timeline provide a valid default predicate
+         * @retval true if this timeline provide a valid default
+         *         predicate
          * @retval false otherwise
          *
          * @sa default_pred() const
@@ -155,9 +161,10 @@ namespace TREX {
          *
          * @pre has_default() is @c true
          *
-         * Gives the name of the defaultp predicate. The default predicate of
-         * a timeline is the first predicate to be attempted to be created if no
-         * exisiting token allow to resolve the current state of this timeline.
+         * Gives the name of the defaultp predicate. The default
+         * predicate of a timeline is the first predicate to be
+         * attempted to be created if no exisiting token allow to
+         * resolve the current state of this timeline.
          *
          * @return The name of the default predicate for this timeline
          */
@@ -167,9 +174,9 @@ namespace TREX {
 
         /** @brief Commmit last decision
          *
-         * Enforce that the currently identified state for this timeline will
-         * not be relaxed in the future by restricting its start end end base
-         * domains
+         * Enforce that the currently identified state for this
+         * timeline will not be relaxed in the future by restricting
+         * its start end end base domains
          *
          * @pre identified() is @c true
          * @post committed() is @c true
@@ -197,24 +204,25 @@ namespace TREX {
          *
          * @pre external() is @c true
          *
-         * Dispatch all the exisiting tokens of the plan for this timeline overlapping
-         * the window [@p lb, @p ub]
-         *
-         * @note The algorihtm for dispatching is slightly more complex as we need
-         * to avoid to dispatch tokens that are not necessary to the plan goals or
-         * are guarded by uncontrolable conditions.
+         * Dispatch all the exisiting tokens of the plan for this
+         * timeline overlapping the window [@p lb, @p ub] @note The
+         * algorihtm for dispatching is slightly more complex as we
+         * need to avoid to dispatch tokens that are not necessary to
+         * the plan goals or are guarded by uncontrolable conditions.
          */
         void do_dispatch(EUROPA::eint lb, EUROPA::eint ub);
 
-        bool dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub);
-        EUROPA::TokenId getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub);
+        bool dispatch_token(const EUROPA::TokenId& token,
+                            EUROPA::eint lb, EUROPA::eint ub);
+        EUROPA::TokenId getGoal(const EUROPA::TokenId& token, 
+                                EUROPA::eint lb, EUROPA::eint ub);
         EUROPA::TokenId searchGoal(EUROPA::TokenSet actions);
         EUROPA::TokenSet getAllTokens(const EUROPA::TokenId& token);
 
         /** @brief Current state decision point
          *
-         * This class implements the heuristic to resolve the current state of
-         * a T-REX timeline within an europa solver.
+         * This class implements the heuristic to resolve the current
+         * state of a T-REX timeline within an europa solver.
          *
          * @ingroup europa
          * @author Frederic Py <fpy@mbari.org>
@@ -243,7 +251,8 @@ namespace TREX {
           std::string toString() const;
           /** @brief short string display
            *
-           * @return A string giving a short description of this decision point
+           * @return A string giving a short description of this
+           *    decision point
            * @sa toString() const
            */
           std::string toShortString() const;
@@ -252,8 +261,9 @@ namespace TREX {
            *
            * @param[in] entity A europa entity
            *
-           * This method is used by europa to check if @p entity can ba handled
-           * by this class.
+           * This method is used by europa to check if @p entity can
+           * be handled by this class.
+	   *
            * @retval true if @p entity is a CurrentState
            * @retval false otherwise
            */
@@ -262,40 +272,40 @@ namespace TREX {
         private:
           /** @brief Decision choices
            *
-           * This set maintins all the possible high level choices possible
+           * This set maintains all the possible high level choices
            * for this decision point.
            */
           typedef std::bitset<4> choices;
 
           /** @brief High level choices types
            *
-           * This enum gives all the possible high level choices to resolve a
-           * CurrentState flaw.
+           * This enum gives all the possible high level choices to
+           * resolve a CurrentState flaw.
            */
           enum Choice {
             /** @brief extend current observation
              *
-             * This choice will attempt to extend the curren observation so it
-             * ends after the current tick
+             * This choice will attempt to extend the curren
+             * observation so it ends after the current tick
              */
             EXTEND_CURRENT = 0,
             /** @brief Start next token
              *
-             * This choice will attempt to start the token directly following the
-             * last observation produced
+             * This choice will attempt to start the token directly
+             * following the last observation produced
              */
             START_NEXT =1,
             /** @brief Create default token
              *
-             * This choice will attempt to create the default predicate and starts
-             * it a current tick
+             * This choice will attempt to create the default
+             * predicate and starts it a current tick
              */
             CREATE_DEFAULT =2,
             /** @brief Create a token
              *
-             * This choice will attempt to create any possible tokens (except the
-             * default predicate otr thje Failed token) and start it at the current
-             * tick.
+             * This choice will attempt to create any possible tokens
+             * (except the default predicate otr thje Failed token)
+             * and start it at the current tick.
              */
             CREATE_OTHER =3
           }; // TREX::europa::details::CurrentState::DecisionPoint::Choice
@@ -305,8 +315,8 @@ namespace TREX {
 
           /** @brief Initialization
            *
-           * Initialize the decision point by identifyin all the choices that are
-           * relevant for the current flaw.
+           * Initialize the decision point by identifyin all the
+           * choices that are relevant for the current flaw.
            */
           void handleInitialize();
 
@@ -327,7 +337,8 @@ namespace TREX {
 
           /** @brief Check if last decision can be undone
            *
-           * @pre A decision has been executed and not undone for this instance
+           * @pre A decision has been executed and not undone for this
+           *      instance
            * @retval true If the last decision can be undone
            * @retval false otherwise
            */
@@ -344,7 +355,8 @@ namespace TREX {
           void advance();
 
           EUROPA::Id<CurrentState> m_target;
-          std::list<EUROPA::TokenId>::const_iterator m_cand_from, m_tok, m_cand_to;
+          std::list<EUROPA::TokenId>::const_iterator 
+            m_cand_from, m_tok, m_cand_to;
           std::set<EUROPA::LabelStr>::const_iterator m_next_pred;
         }; // TREX::europa::details::CurrentState::DecisionPoint
 
@@ -359,16 +371,16 @@ namespace TREX {
 
         /** @brief push end time
          *
-         * Apply a constraint that enforces that the end time of the current
-         * token is greater than the current tick
+         * Apply a constraint that enforces that the end time of the
+         * current token is greater than the current tick
          *
          * @sa relax_end()
          */
         void push_end();
         /** @brief relax end time
          *
-         * Relax the constraint that enforce that the current token end time is
-         * greater than the curren tick
+         * Relax the constraint that enforce that the current token
+         * end time is greater than the curren tick
          * @sa push_end()
          */
         void relax_end();
@@ -383,10 +395,11 @@ namespace TREX {
          *
          * @pre @p pred is a valid predicate name for this timeline
          *
-         * @return The newly created token with its start time restricted to
-         * the current tick
+         * @return The newly created token with its start time
+         * restricted to the current tick
          *
-         * @post The current observation for this instance is the newly created token
+         * @post The current observation for this instance is the
+         * newly created token
          */
         EUROPA::TokenId new_obs(std::string const &pred,
                                 bool insert=true);
@@ -401,17 +414,19 @@ namespace TREX {
         void new_token(EUROPA::TokenId const &token);
         /** @brief Relax last observation
          *
-         * Destroy the current observation and replace it by the previous one.
+         * Destroy the current observation and replace it by the
+         * previous one.
          */
         void relax_token();
 
         /** @brief Check if committed
          *
-         * Check if the current observation is properly committed or not. This
-         * test goes more in depth than the committed() method.
+         * Check if the current observation is properly committed or
+         * not. This test goes more in depth than the committed()
+         * method.
          *
-         * @retval true if the current observation is committed and necessarily
-         *    overlaps current tick
+         * @retval true if the current observation is committed and
+         *    necessarily overlaps current tick
          * @retval false otherwise
          */
         bool check_committed() const;
@@ -420,35 +435,38 @@ namespace TREX {
          *
          * @param[in] token A token
          *
-         * Notifies this instance that the token @p token has been erased from the
-         * plan database.
-         *
-         * If this token correspond to any tokens maintained by this instance, this method
-         * will make the proper cleanup.
+         * Notifies this instance that the token @p token has been
+         * erased from the plan database.  If this token correspond to
+         * any tokens maintained by this instance, this method will
+         * make the proper cleanup.
          */
         void erased(EUROPA::TokenId const &token);
         /** @brief Replace token notification
          *
          * @param[in] token A token
          *
-         * Notifies that the token @p token should now be repaced by its active counterpart.
-         * If this token is miainitned by this instance, this call will ensure that :
-         * @li the base domains of the active token are the same as the ones of @p token
-         * @li the reference of @p token in this insstance is repaced by its active counterpart
-         *
-         * @post After this operation @p token can be safely deleted from the plan.
+         * Notifies that the token @p token should now be repaced by
+         * its active counterpart.  If this token is miainitned by
+         * this instance, this call will ensure that : @li the base
+         * domains of the active token are the same as the ones of @p
+         * token @li the reference of @p token in this insstance is
+         * repaced by its active counterpart @post After this
+         * operation @p token can be safely deleted from the plan.
          */
         void replaced(EUROPA::TokenId const &token);
         /** @brief Base domains propagation
          *
          * @param[in,out] merged A merged token
          *
-         * Restrict al the based domains of the active token of @p merged by the base domains
-         * of @p merged and repaced @p merged by this active token.
-         * This method is used in order to update current and past observation during the repaced call
+         * Restrict al the based domains of the active token of @p
+         * merged by the base domains of @p merged and repaced @p
+         * merged by this active token.  This method is used in order
+         * to update current and past observation during the repaced
+         * call
          * @sa replaced(EUROPA::TokenId const &)
          */
-        static void apply_base(EUROPA::TokenId &merged);
+        static void apply_base(EUROPA::TokenId &merged,
+			       EUROPA::Id<TimePoint> &frontier);
 
         Assembly          &m_assembly;
         EUROPA::DbClientId m_client;
@@ -459,7 +477,7 @@ namespace TREX {
         std::set<EUROPA::LabelStr> m_pred_names;
 
         EUROPA::TokenId       m_last_obs, m_prev_obs;
-        EUROPA::ConstraintId  m_constraint;
+	EUROPA::Id<TimePoint>  m_frontier, m_prev_frontier;
 
         friend class TREX::europa::Assembly;
         friend class DecisionPoint;

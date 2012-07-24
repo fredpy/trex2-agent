@@ -62,9 +62,9 @@ ControlInterface * Platform::controlInterfaceInstance = 0;
 
 
 Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                                      TeleoReactor(arg, false), m_active_proxy(NULL),
-                                      m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
-                                      sent_command(NULL), m_blocked(false), commandToBePosted(NULL), postedCommand(NULL)
+                                              TeleoReactor(arg, false), m_active_proxy(NULL),
+                                              m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg), "state")), m_firstTick(true),
+                                              sent_command(NULL), m_blocked(false), commandToBePosted(NULL), postedCommand(NULL)
 {
 
   manager().add_handler(log_proxy(*this));
@@ -115,6 +115,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   provide("oplimits", false); 	  // declare the oplimits timeline
   provide("maneuver", false);     // declare the maneuver timeline
   provide("supervision", false);  // declare the supervision timeline
+  provide("gps", false);
 
   IMC::LoggingControl startLog;
   startLog.op = IMC::LoggingControl::COP_REQUEST_START;
@@ -156,13 +157,17 @@ void Platform::handleTickStart()
   if (m_blocked)
     return;
 
-  if (commandToBePosted != NULL)
+  //IMC::VehicleState *curState = dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
+
+  if (commandToBePosted != NULL && tickWhenToPost <= getCurrentTick() /*&& curState->op_mode == IMC::VehicleState::VS_SERVICE*/)
   {
+
     IMC::VehicleState * msg =
         dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
 
     if (msg != NULL && msg->op_mode == IMC::VehicleState::VS_SERVICE)
     {
+      syslog(warn) << "handling at tick " << getCurrentTick();
       if (sendMsg(*commandToBePosted)) {
         reportToDune("Maneuver dispatched");
         syslog(warn) << "Dispatched maneuver:";
@@ -171,6 +176,7 @@ void Platform::handleTickStart()
         postedCommand = commandToBePosted;
         //delete commandToBePosted;
         commandToBePosted = NULL;
+
         current_goal = next_goal;
         next_goal = "";
       }
@@ -178,6 +184,9 @@ void Platform::handleTickStart()
         syslog(error) << "Unable to send message";
       }
     }
+  }
+  else if (commandToBePosted != NULL){
+    syslog(warn) << "Not handling right now... waiting for tick " << tickWhenToPost;
   }
 }
 
@@ -316,6 +325,8 @@ Platform::handleRequest(goal_id const &g)
   ss << "TREX_goal_" << g;
   man_name = ss.str();
 
+  tickWhenToPost = g.get()->getStart().getTypedLower<long long, true>();
+
   if (gname.compare("command") == 0 && gpred.compare("Idle") == 0) {
     commandToBePosted = idleCommand(man_name);
     return;
@@ -326,7 +337,13 @@ Platform::handleRequest(goal_id const &g)
     boost::optional<long long> timeout;
 
     if (g->getDuration().hasUpper()) {
+
       timeout = g->getDuration().getTypedUpper<long long, true>();
+
+      if (*timeout > 2)
+        (*timeout) -= 2;
+      else
+        timeout = 1;
     }
 
     Variable latitude = goal->getAttribute("latitude");
@@ -335,7 +352,15 @@ Platform::handleRequest(goal_id const &g)
     Variable secs = goal->getAttribute("secs");
     Variable speed = goal->getAttribute("speed");
 
-    if (latitude.domain().isSingleton() && longitude.domain().isSingleton()
+    if (!latitude.domain().isSingleton() && !longitude.domain().isSingleton()
+        && depth.domain().isSingleton()) {
+      double dep_v = depth.domain().getTypedSingleton<double, true>();
+
+      //surface!!!
+      commandToBePosted = elevatorCommand(man_name, dep_v, timeout);
+
+    }
+    else if (latitude.domain().isSingleton() && longitude.domain().isSingleton()
         && depth.domain().isSingleton()) {
       double lat = latitude.domain().getTypedSingleton<double, true>();// latitude.domain().getSingleton());// atof(northing.domain().getStringSingleton().c_str());
       double lon = longitude.domain().getTypedSingleton<double, true>();
@@ -359,10 +384,6 @@ Platform::handleRequest(goal_id const &g)
       else if (secs.domain().isSingleton())
       {
         long long dur = secs.domain().getTypedSingleton<long long, true>();
-        //sent_command.reset(commandLoiter(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur));
-        //sent_command.reset(commandStationKeeping(man_name, lat, lon, speed_mps, (int)dur));
-        //sent_command.reset(commandElevator(man_name, lat, lon, dep_v, speed_mps, timeout));
-        //sent_command.reset(commandGoto(man_name, lat, lon, dep_v, speed_mps, timeout));
         if (dep_v > 0)
           commandToBePosted = loiterCommand(man_name, lat, lon, dep_v, m_loiter_radius, speed_mps, (int)dur);
 
@@ -370,15 +391,16 @@ Platform::handleRequest(goal_id const &g)
           commandToBePosted = skeepingCommand(man_name, lat, lon, speed_mps, (int)dur);
       }
 
-      Observation obs = Observation(*goal);
-      obs.restrictAttribute("speed", FloatDomain(speed_mps));
-      obs.restrictAttribute("eta", IntegerDomain(0, IntegerDomain::plus_inf));
+      //      Observation obs = Observation(*goal);
+      //      obs.restrictAttribute("speed", FloatDomain(speed_mps));
+      //      obs.restrictAttribute("eta", IntegerDomain(0, IntegerDomain::plus_inf));
 
-      next_goal = g.get()->object().str();
     }
     else {
       syslog(error) << "variables are not singletons!\n";
+      return;
     }
+    next_goal = g.get()->object().str();
   }
 }
 
@@ -477,6 +499,17 @@ Platform::processState()
     estate_posted = true;
   }
 
+  if (received.count(IMC::GpsFix::getIdStatic()))
+  {
+    IMC::GpsFix * fix = dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
+
+    if ((fix->validity & IMC::GpsFix::GFV_VALID_POS) != 0)
+      uniqueObservation(Observation("gps", "Valid"));
+    else
+      uniqueObservation(Observation("gps", "Invalid"));
+
+  }
+
   /* OPERATIONAL_LIMITS */
 
   if (received.count(IMC::OperationalLimits::getIdStatic()))
@@ -518,7 +551,7 @@ Platform::processState()
 
   /* VEHICLE_STATE */
 
-  if (postedCommand == NULL && received.count(IMC::VehicleState::getIdStatic()))
+  if ((postedCommand == NULL || tickWhenToPost > getCurrentTick()) && received.count(IMC::VehicleState::getIdStatic()))
   {
     IMC::VehicleState * msg =
         dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
@@ -577,7 +610,7 @@ Platform::processState()
   /* VEHICLE_COMMAND */
   int eta = std::numeric_limits<int>::max();
 
-  if (postedCommand != NULL)
+  if (postedCommand != NULL && tickWhenToPost <= getCurrentTick())
   {
     IMC::PlanControl * posted =  dynamic_cast<IMC::PlanControl*>(postedCommand);
     IMC::Message * maneuver = posted->arg.get()->clone();
@@ -813,6 +846,38 @@ Platform::gotoCommand(const std::string &man_name, double lat, double lon, doubl
 }
 
 IMC::Message *
+Platform::elevatorCommand(const std::string &man_name, double target_depth, boost::optional<long long> timeout)
+{
+  IMC::Elevator * msg = new IMC::Elevator();
+
+  IMC::EstimatedState *state = dynamic_cast<IMC::EstimatedState*>(aggregate[IMC::EstimatedState::getIdStatic()]);
+
+
+
+  msg->lat = state->lat;
+  msg->lon = state->lon;
+  msg->end_z = target_depth;
+
+  if (state->ref == IMC::EstimatedState::RM_NED_LLD)
+    WGS84::displace(state->x, state->y, &msg->lat, &msg->lon);
+
+  msg->flags = IMC::Elevator::FLG_CURR_POS;
+
+  msg->speed = 1000;
+  msg->speed_units = IMC::Elevator::SUNITS_RPM;
+
+  msg->pitch = Angles::radians(15);
+  msg->radius = m_loiter_radius;
+
+
+
+  if (timeout)
+    msg->timeout = *timeout;
+
+  return getManeuverCommand(man_name, msg);
+}
+
+IMC::Message *
 Platform::elevatorCommand(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout)
 {
   IMC::Elevator * msg = new IMC::Elevator();
@@ -824,12 +889,12 @@ Platform::elevatorCommand(const std::string &man_name, double lat, double lon, d
   if (m_use_rpm)
   {
     msg->speed = speed * m_rpm_speed_factor;
-    msg->speed_units = IMC::Goto::SUNITS_RPM;
+    msg->speed_units = IMC::Elevator::SUNITS_RPM;
   }
   else
   {
     msg->speed = speed;
-    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+    msg->speed_units = IMC::Elevator::SUNITS_METERS_PS;
   }
 
   msg->pitch = Angles::radians(15);

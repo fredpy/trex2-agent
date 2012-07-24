@@ -71,8 +71,6 @@ class OperationalLimits extends AgentTimeline {
 	
 class VehicleCommand extends AgentTimeline {
 
-    
-	
 	VehicleCommand(Mode _mode) {
 		super(_mode, "Idle");
 	}
@@ -136,4 +134,17 @@ class ManeuverController extends Timeline {
 	sane_pos(lat_rad, lon_rad, depth);
     }
 };
+
+class Gps extends AgentTimeline {
+
+	Gps(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+	
+	predicate Valid {}
+	
+	predicate Invalid {}
+}
 

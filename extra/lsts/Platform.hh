@@ -88,6 +88,7 @@ namespace TREX {
       IMC::Message * skeepingCommand(const std::string &man_name, double lat, double lon, double speed, int seconds);
       IMC::Message * idleCommand(const std::string &man_name);
       IMC::Message * elevatorCommand(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout);
+      IMC::Message * elevatorCommand(const std::string &man_name, double target_depth, boost::optional<long long> timeout);
 
       //IMC::Message commandCalibration();
       void convertToAbsolute(double northing, double easting, double &lat, double &lon);
@@ -161,6 +162,8 @@ namespace TREX {
       IMC::VehicleCommand lastCommand;
 
       IMC::Message * commandToBePosted, * postedCommand;
+      long long tickWhenToPost;
+      long long tickWhenToStop;
 
       void setValue(bool val);
 
