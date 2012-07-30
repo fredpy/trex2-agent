@@ -630,7 +630,7 @@ bool LogPlayer::synchronize() {
 }
 
 bool LogPlayer::hasWork() {
-  TICK cur = getCurrentTick(), logged;
+  TICK cur = getCurrentTick();
   
   if( !next_phase(cur, s_has_work) ) {
     if( m_inited && in_tick(cur) )
