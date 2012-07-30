@@ -56,7 +56,7 @@ namespace TREX {
      *
      *  one_hz_clock my_clock; // starts the clock
      *  one_hz_clock::time_point date = my_clock.now(); // get current second since started
-     * @end_code
+     * @endcode
      *
      * @note While apparently similiar to a chrono clock, this class 
      * is not really one as its @c now() method is not static.
