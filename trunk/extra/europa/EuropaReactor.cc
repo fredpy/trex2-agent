@@ -71,9 +71,9 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
 				     "relation_gv")),
+   m_completed_this_tick(false),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
-			       "all_plans")),
-   m_completed_this_tick(false) {
+			       "all_plans")) {
   bool found;
   std::string nddl;
 
@@ -596,7 +596,7 @@ void EuropaReactor::resume() {
     if( constraint_engine()->pending() )
       constraint_engine()->propagate();
     if( constraint_engine()->constraintConsistent() ) { 
-      size_t depth = planner()->getDepth();
+      // size_t depth = planner()->getDepth();
       planner()->step();      
       if( m_full_log && planner()->getStepCount()>nsteps )
 	logPlan("step");

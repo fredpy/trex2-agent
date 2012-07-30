@@ -237,7 +237,8 @@ namespace TREX {
        */ 
       base_duration left(time_point const &target) const {
         duration t_dur = target.time_since_epoch();
-        base_time_point real_target = epoch()+boost::chrono::duration_cast<base_duration>(t_dur);
+        base_time_point 
+           real_target = epoch()+boost::chrono::duration_cast<base_duration>(t_dur);
         return real_target-Clock::now();
       }
     private:

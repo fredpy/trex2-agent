@@ -11,7 +11,7 @@ namespace {
 namespace TREX {
   
   void initPlugin() {
-    ::s_log->syslog("plugin.mabri.europa")<<"Europa with MBARI extensiosn loaded."
+    ::s_log->syslog("plugin.mabri.europa")<<"Europa with MBARI extensions loaded."
 					  <<std::endl;
   }
 
