@@ -78,7 +78,9 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
     int samples = data.sample_size();
     for(int i=0; i<samples; ++i) {
       org::mbari::trex::SensorMessage_Sample const &samp = data.sample(i);
-      time_t date = samp.utime();
+      boost::posix_time::ptime 
+        date = boost::posix_time::from_time_t(samp.utime());
+      
       point<3> pos;
       sensor_data values;
       
@@ -98,16 +100,19 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       m_updated = true;
     }
     if( data.has_gps_fix() ) {
-      org::mbari::trex::SensorMessage_GpsError const &fix = data.gps_fix();
+      org::mbari::trex::SensorMessage_GpsError 
+        const &fix = data.gps_fix();
       point<2> error_rate;
       error_rate[0] = fix.northing_error_rate();
       error_rate[1] = fix.easting_error_rate();
-      m_serie.align(fix.from_time(), fix.to_time(), error_rate);
+      m_serie.align(boost::posix_time::from_time_t(fix.from_time()), 
+                    boost::posix_time::from_time_t(fix.to_time()), 
+                    error_rate);
     }
     for(size_t i=0; i<data.observations_size(); ++i) {      
       org::mbari::trex::Predicate const &pred(data.observations(i));
       if( TREX_TL==pred.object() ) {
-        time_t date = pred.start();
+        date_type date = boost::posix_time::from_time_t(pred.start());
         
         if( m_obs_fresh && m_since>date )
           continue; // ignore old observations
@@ -150,24 +155,26 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
 
 bool DoradoHandler::synchronize() {
   double delta_t;
+  typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
   
   if( m_updated ) {
-    // Set all the 
     TREX::transaction::Observation obs(DATA_TL, "Received");
-    delta_t = std::floor(tickToTime(now()));
-    delta_t -= m_serie.newest();
-    delta_t /= tickDuration();
-    obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
+    
+    duration_type 
+       delta = cvt::to_chrono(tickToTime(now())-m_serie.newest());
+    delta_t= delta.count();
+    delta_t /= tickDuration().count();
+    obs.restrictAttribute("freshness", 
+                         IntegerDomain(std::floor(delta_t+0.5)));    
     obs.restrictAttribute("nsamples", IntegerDomain(m_serie.size()));
     notify(obs);
     m_updated = false;
   }
     
   if( m_obs_fresh ) {
-    // Received an observcation from trex/dorado
-    delta_t = std::floor(tickToTime(now()));
-    delta_t -= m_since;
-    delta_t /= tickDuration();
+    duration_type delta = cvt::to_chrono(tickToTime(now())-m_since);
+    delta_t = delta.count();
+    delta_t /= tickDuration().count();
     // indicate how aold this observation is in term of ticks
     m_last_obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
     notify(m_last_obs);

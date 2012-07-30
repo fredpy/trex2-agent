@@ -105,7 +105,7 @@ namespace mbari {
     
     TREX::transaction::Observation m_last_obs;
     bool m_obs_fresh;
-    time_t m_since;
+    date_type m_since;
     
     
     std::map<std::string, kalman_filter_fn> m_filters;

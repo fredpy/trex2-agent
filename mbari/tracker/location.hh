@@ -35,7 +35,7 @@
 # define H_mbari_location
 
 # include "point.hh"
-# include <sys/time.h>
+# include <boost/date_time/posix_time/ptime.hpp>
 
 namespace mbari {
 
@@ -51,6 +51,9 @@ namespace mbari {
    */
   class location {
   public:
+    typedef boost::posix_time::ptime         date_type;
+    typedef boost::posix_time::time_duration duration_type;
+    
     /** @brief Constructor
      *
      * @create a new instance with no location set
@@ -100,7 +103,7 @@ namespace mbari {
      * @sa is_valid() const
      * @sa have_speed() const
      */
-    void update(time_t date, double north, double east);
+    void update(date_type const &date, double north, double east);
     /** @brief speed of the location
      *
      * @pre have_speed()
@@ -133,12 +136,13 @@ namespace mbari {
      * @sa have_speed() const
      * @sa update(time_t,double, double)
      */
-    point<2> position(time_t now, long int &delta, bool projected=true) const; 
+    point<2> position(date_type const &now, duration_type &delta, 
+                      bool projected=true) const; 
 
   private:
-    time_t   m_date;
-    bool     m_valid, m_have_speed;
-    point<2> m_last_pos, m_speed;
+    date_type   m_date;
+    bool        m_valid, m_have_speed;
+    point<2>    m_last_pos, m_speed;
   }; 
 
 } // mbari

@@ -38,7 +38,7 @@
 # include <vector>
 # include <functional>
 
-# include <sys/time.h>
+# include <boost/date_time/posix_time/ptime.hpp>
 
 # include "point.hh"
 
@@ -60,9 +60,9 @@ namespace mbari {
      *
      * @tparam Ty the argument type
      *
-     * A functor that will returns its argument. This fuynctor can be usefull 
-     * to use some standard STL algorithms when we just want to extract the 
-     * current values from a container
+     * A functor that will returns its argument. This functor can be
+     * useful in conjunction with standard STL algorithms when we 
+     * just want to extract the current values from a container.
      *
      * @author Frederic Py
      * @ingroup mbari
@@ -83,12 +83,12 @@ namespace mbari {
   /** @brief Time serie
    * @tparam Ty A value type
    * 
-   * This class is used to maintain a spacially located time serie with the 
-   * samples of type @p Ty. 
+   * This class is used to maintain a spacially located time serie 
+   * with the samples of type @p Ty. 
    *
-   * Each sample is associated to a date -- used as the key -- and a 3-D 
-   * location (northing, easting, depth). All the smaples are soreted accroding 
-   * to their date 
+   * Each sample is associated to a date -- used as the key -- and a 
+   * 3-D location (northing, easting, depth). All the samples are
+   * sorted accroding to their date 
    *
    * @author Frederic Py <fpy@mbari.org>
    * @ingroup tracker
@@ -97,18 +97,21 @@ namespace mbari {
   class serie {
   public:
     /** @brief Date type
-     * The type of the date which is also used as a unique key for the samples
+     * The type of the date which is also used as a unique key 
+     * for the samples
      */
-    typedef time_t                          key_type;
+    typedef boost::posix_time::ptime                  key_type;
     /** @brief sample type
      *
-     * The type used for the sample. This tyape is a pair with the @c first element 
-     * being the sample location and the @c second being the sample value
+     * The type used for the sample. This tyape is a pair with 
+     * the @c first element being the sample location and the 
+     * @c second being the sample value
      */
     typedef std::pair<point<3>, Ty>         sample_type;
     /** @brief container type
      *
-     * The type used to store and map samples and their location to the sampling date
+     * The type used to store and map samples and their location 
+     * to the sampling date
      */
     typedef std::map<key_type, sample_type> container_type;
 
@@ -176,12 +179,12 @@ namespace mbari {
      * @param[in] where A location
      * @param[in] what  A sample value
      *
-     * Adds the sample @p what on location @p where at the date @p date. 
-     * If a ssample for @p date already did exists this operation will be 
-     * ignored
+     * Adds the sample @p what on location @p where at the date @p 
+     * date. If a sample for @p date already did exists this 
+     * operation will be ignored.
      *
-     * @retval true The new sample has been added and the serie size has 
-     * increased by 1
+     * @retval true The new sample has been added and the serie size 
+     * has increased by 1
      * @retval false A sample for @p date already exists
      *
      * @post The serie is not empty
@@ -212,7 +215,8 @@ namespace mbari {
      * @sa clear()
      */
     void clear(key_type date) {
-      typename container_type::iterator pos = m_samples.lower_bound(date);
+      typename container_type::iterator 
+         pos = m_samples.lower_bound(date);
       m_samples.erase(m_samples.begin(), pos);
     }
     /** @brief Correct sample position
@@ -229,15 +233,16 @@ namespace mbari {
      * @code 
      * pos[i] += fix[i] * date - from
      * @endcode
-     * This aloow to back-propagate a position error identified later on by, 
-     * for example, the AUV getting a new GPS fix after being underwater.
+     * This allow to back-propagate a position error identified 
+     * later on by, for example, the AUV getting a new GPS fix 
+     * after being underwater.
      */
     void align(key_type from, key_type to, point<2> const &fix) {
       point<3> fix3(fix);
       typename container_type::iterator i=m_samples.upper_bound(from),
 	end_i = m_samples.lower_bound(to);
       for(; end_i!=i; ++i)
-	i->second.first += fix3 * (i->first-from);
+	i->second.first += fix3 * (i->first-from).seconds();
     }
      
     /** @brief Get sample interval
@@ -245,8 +250,8 @@ namespace mbari {
      * @param[in] from Start date
      * @param[in] to End date
      *
-     * @return A pair of iterators demarking the range of all the samples within 
-     * the time interval [@p from, @p to]
+     * @return A pair of iterators demarking the range of all the 
+     * samples within the time interval [@p from, @p to]
      */
     std::pair<iterator, iterator> between(key_type from ,key_type to) const {
       return std::make_pair(m_samples.lower_bound(from),
@@ -260,16 +265,20 @@ namespace mbari {
      * @pre @p from and @p to are valid iterator for this serie
      * @pre @p from is before @p to in the serie
      *
-     * Project sample locations into the travel coordinates within the time 
-     * interval referred by [@p from, @p to). Travel coordinates are computing 
-     * the travel distance between all the samples in the (northing, easting) 
-     * plane with the second diemension being the depth of sample.
+     * Project sample locations into the travel coordinates within 
+     * the time interval referred by [@p from, @p to). Travel
+     * coordinates are computing the travel distance between all the
+     * samples in the (northing, easting) plane with the second
+     * dimension being the depth of sample.
      *
-     * This is usefull to interpolate or display samples within a curtain plot 
-     * with x being the travel distanbce of the vehicle and y being the depth. 
-     * Such plot is often used in oceanography to show mobile assets data.  
+     * This is usefull to interpolate or display samples within a
+     * curtain plot with x being the travel distanbce of the vehicle 
+     * and y being the depth. 
+     * Such plot is often used in oceanography to show mobile assets
+     * data.  
      *
-     * @return the travel distance corrdinates of each samples in [@p from, @p to)
+     * @return the travel distance corrdinates of each samples in 
+     *         [@p from, @p to)
      */
     std::vector< point<2> > travel_pts(iterator from, iterator to) const {
       std::vector< point<2> > result;
@@ -304,9 +313,11 @@ namespace mbari {
      * @pre @p from and @p to are valid iterator for this serie
      * @pre @p from precede @p to
      *
-     * Applies @p fn to all the element of the serie within [@p from, @p to)
+     * Applies @p fn to all the element of the serie within 
+     * [@p from, @p to)
      *
-     * @return The results of @p fn applied to all the elements of [@p from, @p to)
+     * @return The results of @p fn applied to all the elements of 
+     * [@p from, @p to)
      *
      * @sa get(iterator, iterator) const
      */
@@ -325,7 +336,8 @@ namespace mbari {
      * @pre @p from and @p to are valid iterator for this serie
      * @pre @p from precede @p to
      * 
-     * Extract the sample data for all the elements within [@p from, @p to)
+     * Extract the sample data for all the elements within 
+     * [@p from, @p to)
      *
      * @return The samples values extracted
      *
