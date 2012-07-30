@@ -45,10 +45,10 @@ namespace TREX {
      * @tparam Period tick period
      * @tparam Clock  a clock
      *
-     * This class implements a clock with a tick rate of @p Period based on the 
-     * subjacent clock @p Clock.
-     * The epoch of the clock is set at construction time and cannot be changed
-     * allowing to maintain the steadiness of the subjacent @p Clock.
+     * This class implements a clock with a tick rate of @p Period 
+     * based on the subjacent clock @p Clock. The epoch of the clock 
+     * is set at construction time and cannot be changed allowing to
+     * maintain the steadiness of the subjacent @p Clock.
      *
      * For example, one can implement a 1Hz clock as follow:
      * @code 
@@ -58,9 +58,9 @@ namespace TREX {
      *  one_hz_clock::time_point date = my_clock.now(); // get current second since started
      * @end_code
      *
+     * @note While apparently similiar to a chrono clock, this class 
+     * is not really one as its @c now() method is not static.
      *
-     * @note While apparently similiar to a chrono clock, this class is not really 
-     *  one as its @c now() method is not static
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
      */

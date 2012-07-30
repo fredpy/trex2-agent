@@ -51,8 +51,8 @@ namespace TREX {
      * @param[in,out] out An output stream
      * @param[in] d A duration
      *
-     * Serialize the value of the duration @p d into @p out as an "human readable" 
-     * value.
+     * Serialize the value of the duration @p d into @p out as an 
+     * "human readable" value.
      *
      * @return @p out after the operation
      */
