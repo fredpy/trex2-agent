@@ -62,11 +62,11 @@ TREX::transaction::TICK MessageHandler::now() const {
   return m_tracker.getCurrentTick();
 }
 
-double MessageHandler::tickToTime(TREX::transaction::TICK date) const {
+MessageHandler::date_type MessageHandler::tickToTime(TREX::transaction::TICK date) const {
   return m_tracker.tickToTime(date);
 }
 
-double MessageHandler::tickDuration() const {
+MessageHandler::duration_type MessageHandler::tickDuration() const {
   return m_tracker.tickDuration();
 }
 

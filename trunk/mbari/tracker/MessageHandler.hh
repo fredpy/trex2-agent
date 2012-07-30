@@ -36,8 +36,7 @@
 
 # include "AMQP_queue.hh"
 # include <trex/utils/XmlFactory.hh>
-# include <trex/transaction/Observation.hh>
-# include <trex/transaction/Goal.hh>
+# include <trex/transaction/TeleoReactor.hh> 
 
 namespace mbari {
 
@@ -56,13 +55,16 @@ namespace mbari {
    */
   class MessageHandler {
   public:
+    typedef TREX::transaction::TeleoReactor::duration_type duration_type; 
+    typedef TREX::transaction::TeleoReactor::date_type     date_type;
+    
     /** @brief XML parsing factory
      *
      * The factory used by DrifterTracker to create new MessageHandler
      */
     typedef TREX::utils::XmlFactory<MessageHandler, boost::shared_ptr<MessageHandler>, 
 				    DrifterTracker *> factory;
-    /** @brief XMLA factory argument
+    /** @brief XML factory argument
      * The type of the argeument provided by the factory while constructing  a 
      * new instance.
      */
@@ -156,12 +158,12 @@ namespace mbari {
      *
      * @return real date for @p date
      */    
-    double tickToTime(TREX::transaction::TICK date) const;
+    date_type tickToTime(TREX::transaction::TICK date) const;
     /** @brief TREX tick duration
      *
      * @retyurn the duration of a TREX tick (often in seconds)
      */
-    double tickDuration() const;
+    duration_type tickDuration() const;
 
     /** @brief Declare new timeline
      *

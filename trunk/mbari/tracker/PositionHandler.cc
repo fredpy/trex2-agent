@@ -59,11 +59,11 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
   if( report.ParseFromArray(msg.body(), msg.size()) ) {
     if( report.has_name() ) {
       std::string asset = report.name();      
-      time_t secs;
+      date_type secs;
       double lat, lon;
       
       if( report.has_epoch_seconds() )
-        secs = report.epoch_seconds();
+        secs = boost::posix_time::from_time_t(report.epoch_seconds());
       else
         return false;
       
@@ -96,21 +96,25 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
 }
 
 bool PositionHandler::synchronize() {
-  time_t now_t = std::floor(tickToTime(now()));
+  date_type now_t = tickToTime(now());
+  typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
   
   for(asset_map::iterator i=m_assets.begin(); m_assets.end()!=i; ++i) {
     if( i->second.first || (m_should_project && i->second.second.have_speed()) ) {
       TREX::transaction::Observation obs(i->first, "Holds");
-      long int dt;
+      location::duration_type dt;
       point<2> vect(i->second.second.position(now_t, dt, m_should_project));
+      duration_type delta_t = cvt::to_chrono(dt); 
       double lat, lon;
     
       i->second.first = false;
 
-      double dtick = dt;
-      dtick /= tickDuration();
+      
+      long double dtick = delta_t.count();
+      dtick /= tickDuration().count();
     
-      obs.restrictAttribute("freshness", IntegerDomain(std::floor(dtick+0.5)));
+      obs.restrictAttribute("freshness", 
+                            IntegerDomain(std::floor(dtick+0.5)));
 
       obs.restrictAttribute("northing", FloatDomain(vect[0]));
       obs.restrictAttribute("easting", FloatDomain(vect[1]));
