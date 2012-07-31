@@ -268,11 +268,13 @@ void WitreServer::log_proxy::message(boost::optional<WitreServer::log_proxy::dat
                                      WitreServer::log_proxy::id_type const &who, 
                                      WitreServer::log_proxy::id_type const &kind,
                                      WitreServer::log_proxy::msg_type const &what) {  
-  boost::mutex::scoped_lock lock(me.mutex_);
-  for(unsigned i=0; i<me.connections.size(); ++i) {
-    Connection &c = me.connections[i];
-    c.client->addLog(date, who.str(), kind.str(), what);
-    // Wt::WServer::instance()->post(c.sessionId, c.function);
+  if( kind!=null ) {
+    boost::mutex::scoped_lock lock(me.mutex_);
+    for(unsigned i=0; i<me.connections.size(); ++i) {
+      Connection &c = me.connections[i];
+      c.client->addLog(date, who.str(), kind.str(), what);
+      // Wt::WServer::instance()->post(c.sessionId, c.function);
+    }
   }
 }
 
