@@ -49,7 +49,9 @@ namespace TREX {
     class WitreReactor;
     class WitreGraph;
 
-    class WitreServer :public TREX::transaction::TeleoReactor, public TREX::transaction::graph::timelines_listener {
+    class WitreServer :public TREX::transaction::TeleoReactor, 
+    public TREX::transaction::graph::timelines_listener {
+    
     public:
 
       class Error :public TREX::utils::Exception {
@@ -130,6 +132,23 @@ namespace TREX {
       timed_goal planTokens;
       WitrePaintSearch::GraphMap timelineGraph;
 
+      typedef TREX::utils::TextLog::handler::date_type log_date;
+      typedef TREX::utils::TextLog::handler::id_type   log_id;
+      
+      // Notification on log events 
+      class log_proxy: public TREX::utils::TextLog::handler{
+      public:
+        log_proxy(WitreServer &caller):me(caller) {}
+        
+      private:
+        void message(boost::optional<date_type> const &date,
+                     id_type const &who, id_type const &kind,
+                     msg_type const &what);
+        
+        WitreServer &me;
+      };
+      
+      friend class log_proxy;
 
       bool attach(WitreReactor &r);
       void detach(WitreReactor &r);
