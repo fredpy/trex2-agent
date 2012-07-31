@@ -58,6 +58,9 @@
 #include <Wt/WJavaScript>
 #include <Wt/WStackedWidget>
 #include <Wt/WTemplate>
+#include <Wt/WStandardItemModel>
+#include <Wt/WTableView>
+
 #include <string>
 #include <queue>
 #include <map>
@@ -79,8 +82,10 @@ namespace TREX {
     class WitreApplication :public Wt::WApplication {
 
     private:
+      
+      
       Wt::WStackedWidget* webpage;
-      Wt::WText *sliderTime;
+      // Wt::WText *sliderTime;
       Wt::WLineEdit *input;
       Wt::WPushButton *enter;
       Wt::WText *tickNum;
@@ -88,8 +93,14 @@ namespace TREX {
       Wt::WTimer *timer;
       Wt::WComboBox *menu;
       Wt::WGroupBox *tLines;
-      Wt::WSlider *timeLineSlider;
+      // Wt::WSlider *timeLineSlider;
       Wt::WGroupBox* future;
+      
+      Wt::WStandardItemModel *logModel;
+      Wt::WTableView *logTable;
+      
+      
+      
       Goalpopup* popup;
       WitreServer *wServer;
       bool needsUpdated;
@@ -100,6 +111,12 @@ namespace TREX {
       std::map<std::string, Wt::WPanel*> currentPanels;
       std::map<std::string, std::list<Wt::WPanel*> > allPanels;
       std::queue<std::string> observations;
+
+      typedef std::vector<Wt::WStandardItem *> entry;
+      typedef TREX::utils::SharedVar< std::queue<entry> > log_queue;
+      
+      log_queue m_logs;
+      
       friend class WitreServer;
 
       void sliderChanged(int value);
@@ -114,6 +131,9 @@ namespace TREX {
       void reorder(std::string time); //Sorts observations and retitles the groupPanels
       void setXMLTitle(Wt::WGroupBox *container); //Sets title without XML formatting
       void addObs(std::string temp); //Adds observations to the queue
+      void addLog(boost::optional<unsigned long long> date,
+                  std::string const &who, std::string const &what,
+                  std::string const &msg);
       void updateTick(std::string tick) { tickNum->setText(tick);}; //Updates the tickNum text
       int count(){ return messages->count();}; //Returns the number of messages
       Wt::WWidget * widget(int i) {return messages->widget(i);}; //Returns the widget at variable i in messages

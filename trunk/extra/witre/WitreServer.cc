@@ -109,6 +109,8 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
     m_server->addEntryPoint(Wt::Application, boost::bind(createWitre, _1, this));
     if( !m_server->start() )
       throw Error("Unable to start the server");
+    
+    manager().add_handler(log_proxy(*this));
 
   } catch(Wt::WServer::Exception const &e) {
     m_log->syslog("witre.server", error)<<"Server initialization ERROR : "
@@ -261,6 +263,19 @@ void WitreServer::notify(Observation const &obs)
     }
 
 }
+
+void WitreServer::log_proxy::message(boost::optional<WitreServer::log_proxy::date_type> const &date,
+                                     WitreServer::log_proxy::id_type const &who, 
+                                     WitreServer::log_proxy::id_type const &kind,
+                                     WitreServer::log_proxy::msg_type const &what) {  
+  boost::mutex::scoped_lock lock(me.mutex_);
+  for(unsigned i=0; i<me.connections.size(); ++i) {
+    Connection &c = me.connections[i];
+    c.client->addLog(date, who.str(), kind.str(), what);
+    // Wt::WServer::instance()->post(c.sessionId, c.function);
+  }
+}
+
 
 bool WitreServer::synchronize()
 {

@@ -38,6 +38,7 @@
 #include <trex/utils/Plugin.hh>
 
 #include <Wt/WFileResource>
+#include <Wt/WStandardItem>
 
 using namespace TREX::utils;
 using namespace TREX::witre;
@@ -70,7 +71,7 @@ TREX::witre::WitreApplication *TREX::witre::createWitre(Wt::WEnvironment const &
 
 
 WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Server)
-  :Wt::WApplication(env) {
+  :Wt::WApplication(env), logModel(NULL) {
     wServer = Server;
     wServer->connect(this, boost::bind(&WitreApplication::post, this));
     enableUpdates(true);
@@ -166,7 +167,29 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     popup->cancelled().connect(enter, &Wt::WPushButton::enable);
     //End of West Code
 
+
     //Start of South Code
+    
+    // log table model
+    logModel = new Wt::WStandardItemModel(south);
+    logModel->insertColumns(logModel->columnCount(), 4);
+    // headers
+    logModel->setHeaderData(0, Wt::WString("Tick"));
+    logModel->setHeaderData(1, Wt::WString("Source"));
+    logModel->setHeaderData(2, Wt::WString("Kind"));
+    logModel->setHeaderData(3, Wt::WString("Message"));
+    
+    logTable = new Wt::WTableView(south);
+    logTable->setSortingEnabled(false);
+    logTable->setModel(logModel);
+    logTable->setRowHeight(22);
+    logTable->setColumnWidth(0, 50);
+    logTable->setColumnWidth(3, Wt::WLength(75, Wt::WLength::Percentage));
+    logTable->resize(Wt::WLength(100, Wt::WLength::Percentage), 100);
+    
+    
+    
+#if 0    
     timeLineSlider = new Wt::WSlider(Wt::Horizontal, south);
     //timeLineSlider->setTickPosition(Wt::WSlider::TicksBothSides);
     timeLineSlider->setTickInterval(boost::chrono::duration_cast< boost::chrono::duration<double> >(wServer->tickDuration()).count());
@@ -176,6 +199,7 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     timeLineSlider->sliderMoved().connect(this, &WitreApplication::sliderText);
 
     sliderTime = new Wt::WText(south);
+#endif
     //End of South Code
 
     //Start of Center Code
@@ -288,8 +312,8 @@ void WitreApplication::post()
     {
         updateTick(observ);
         observations.pop();
-        timeLineSlider->setValue(timeLineSlider->value()+1);
-        sliderText(timeLineSlider->value());
+      //timeLineSlider->setValue(timeLineSlider->value()+1);
+      //sliderText(timeLineSlider->value());
         reorder(time); // Reorder the panels after ever tick
         WApplication::instance()->triggerUpdate();
         return;
@@ -334,6 +358,17 @@ void WitreApplication::post()
     observations.pop(); //Pops the most recent observation
     insert(time, panel);
     needsUpdated= true;
+  for(;;) {
+    entry next;
+    {
+      log_queue::scoped_lock lock(m_logs);
+      if( m_logs->empty() )
+        return;
+      next = m_logs->front();
+      m_logs->pop();
+    }
+    logModel->insertRow(0, next);
+  }
 }
 
 void WitreApplication::insert(std::string time, Wt::WPanel* wid)
@@ -445,6 +480,28 @@ void WitreApplication::addObs(std::string temp)
     return;
 }
 
+void WitreApplication::addLog(boost::optional<unsigned long long> date,
+                              std::string const &who, std::string const &what,
+                              std::string const &msg) {
+  std::vector<Wt::WStandardItem *> entry(4);
+  
+  if( date ) {
+    std::ostringstream str_date;
+    str_date<<(*date);
+    entry[0] = new Wt::WStandardItem(Wt::WString(str_date.str()));
+  } else
+    entry[0] = new Wt::WStandardItem;
+  entry[1] = new Wt::WStandardItem(Wt::WString(who));
+  entry[2] = new Wt::WStandardItem(Wt::WString(what));
+  entry[3] = new Wt::WStandardItem(Wt::WString(msg));
+  
+  {
+    log_queue::scoped_lock lock(m_logs);
+    m_logs->push(entry);
+  }
+}
+
+
 void WitreApplication::timeLineChange()
 {
     Wt::WObject* timeLine = sender();
@@ -483,11 +540,13 @@ void WitreApplication::timeLineChange()
 
 void WitreApplication::syncObservations()
 {
-    while(!observations.empty())
-    {
-        this->post();
-    }
-    newPlanToken(wServer->plan());
+  while(!observations.empty())
+  {
+    this->post();
+  }  
+  
+  newPlanToken(wServer->plan());
+  
 }
 
 void WitreApplication::attributePopup()
@@ -610,7 +669,7 @@ void WitreApplication::sliderChanged(int value)
 
 void WitreApplication::sliderText(int value)
 {
-    sliderTime->setText(boost::lexical_cast<std::string>(value));
+  //sliderTime->setText(boost::lexical_cast<std::string>(value));
     Wt::WApplication::instance()->triggerUpdate();
 }
 
