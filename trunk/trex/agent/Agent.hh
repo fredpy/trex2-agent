@@ -362,6 +362,35 @@ namespace TREX {
         return m_clock->date_str(cur);
       }
       
+      class AgentProxy :public TREX::transaction::TeleoReactor {
+      public:
+	AgentProxy(Agent &agent)
+          :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
+	~AgentProxy() {}
+	
+	bool postRequest(TREX::transaction::goal_id const &g) {
+          if( !isExternal(g->object()) )
+            use(g->object());
+          if( isExternal(g->object()) )
+            return postGoal(g);
+          else
+            syslog(null, error)<<"Unable to subscribe to "<<g->object();
+          return false;
+	}
+        
+      protected:
+	bool synchronize() {
+	  return true;
+        }
+      };
+      
+      void set_proxy(AgentProxy *proxy) {
+        if( NULL!=m_proxy )
+          kill_reactor(m_proxy);
+        m_proxy = proxy;
+        add_reactor(m_proxy);
+      }
+      
     private:
       void internal_check(reactor_id r, 
 			  TREX::transaction::details::timeline const &tl);
@@ -369,28 +398,6 @@ namespace TREX {
 			  TREX::transaction::details::timeline const &tl);
 
 
-      class AgentProxy :public TREX::transaction::TeleoReactor {
-      public:
-	AgentProxy(Agent &agent)
-	  :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
-	~AgentProxy() {}
-	
-	bool postRequest(TREX::transaction::goal_id const &g) {
-        if( !isExternal(g->object()) )
-            use(g->object());
-        if( isExternal(g->object()) )
-            return postGoal(g);
-        else
-	  syslog(null, error)<<"Unable to subscribe to "<<g->object();
-        return false;
-	}
-
-      private:
-	bool synchronize() {
-	  return true;
-	}
-
-      };
       AgentProxy *m_proxy;
             
 
