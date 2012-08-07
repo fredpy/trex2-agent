@@ -38,7 +38,7 @@
 
 namespace TREX {
     
-  /** @brief Core libraies version information
+  /** @brief Core libraries version information
    * 
    * This simple class lows to access to information about the current TREX 
    * version of TREX core libararies
