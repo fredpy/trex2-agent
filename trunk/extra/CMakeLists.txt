@@ -47,10 +47,13 @@ endmacro(trex_plugin)
 
 # the directories where plugins are located
 
+add_subdirectory(witre.old)
+# add_subdirectory(witre)
+
+
 add_subdirectory(backward)
 add_subdirectory(lightswitch) 
 add_subdirectory(europa)
-add_subdirectory(witre)
 add_subdirectory(rover)
 
 option(WITH_LSTS "Use LSTS plugin" OFF)
