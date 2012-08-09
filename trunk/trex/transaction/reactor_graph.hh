@@ -210,6 +210,23 @@ namespace TREX {
 	public virtual boost::vertex_list_graph_tag,
 	public virtual boost::edge_list_graph_tag {};
 
+      /** @brief timelines and relations listener
+       *
+       * This abstarct class allows user to implement a listener to all the 
+       * timeline connection events within a reactor graph. The operations are:
+       * @li creation of a new internal timeline
+       * @li undeclaration of an internal timeline
+       * @li decalration of connection through an external timeline
+       * @li undeclaration of connection througn an external timeline
+       *
+       * All of these operation trelates to the alteration of the agent graph 
+       * structure and give user the ability to tack when the reactor is altering 
+       * itself.
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup transaction
+       * @relates graph
+       */
       class timelines_listener {
       public:
         typedef timelines_listener const *id_type;
@@ -226,8 +243,11 @@ namespace TREX {
         timelines_listener(graph::xml_factory::argument_type const &arg);
         void initialize();
 
-        virtual void declared(details::timeline const &timeline) =0;
-        virtual void undeclared(details::timeline const &timeline) =0;
+        virtual void declared(details::timeline const &timeline) {}
+        virtual void undeclared(details::timeline const &timeline) {}
+        
+        virtual void connected(Relation const &r) {}
+        virtual void disconnected(Relation const &r) {}
 
       private:
         graph &m_graph;

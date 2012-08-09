@@ -338,9 +338,15 @@ graph::timelines_listener::~timelines_listener() {
 }
   
 // manpipulators
+
 void graph::timelines_listener::initialize() {
   for(details::timeline_set::const_iterator tl=m_graph.m_timelines.begin();
-      m_graph.m_timelines.end()!=tl; ++tl)
+      m_graph.m_timelines.end()!=tl; ++tl) {
+    // declare the timeline 
     declared(**tl);
+    // declare its connections
+    for(Relation r=(*tl)->begin(); (*tl)->end()!=r; ++r) 
+      connected(r);
+  }
 }
 

@@ -718,6 +718,9 @@ void TeleoReactor::subscribed(Relation const &r) {
   if( NULL!=m_trLog ) {
     m_trLog->use(r.name(), r.accept_goals(), r.accept_plan_tokens());
   }
+  for(graph::listen_set::const_iterator i=m_graph.m_listeners.begin();
+      m_graph.m_listeners.end()!=i; ++i) 
+    (*i)->connected(r);
 }
 
 void TeleoReactor::unsubscribed(Relation const &r) {
@@ -735,6 +738,9 @@ void TeleoReactor::unsubscribed(Relation const &r) {
   if( NULL!=m_trLog ) {
     m_trLog->unuse(r.name());
   }
+  for(graph::listen_set::const_iterator i=m_graph.m_listeners.begin();
+      m_graph.m_listeners.end()!=i; ++i) 
+    (*i)->disconnected(r);
 }
 
 
