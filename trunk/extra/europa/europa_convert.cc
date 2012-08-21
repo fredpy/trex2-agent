@@ -151,13 +151,11 @@ void details::europa_domain::visit(BasicEnumerated const *dom) {
   if( m_dom->isEnumerated() ) {
     std::list<EUROPA::edouble> values;
     
-    // convert all the values of *dom in their europa form
+    EUROPA::edouble val;
+    
     for(size_t i=0; i<dom->getSize(); ++i) {
-      EUROPA::edouble val = m_type->createValue(dom->getStringValue(i));
-      
-      if( m_dom->isMember(val) ) 
-	// insert only the values that are already in the europa domain
-	values.push_back(val);
+      if( m_dom->convertToMemberValue(dom->getStringValue(i), val) )
+        values.push_back(val);
     }
     if( values.empty() ) // the intersection is empty
       throw EmptyDomain(*dom, "Europa enumerated domain "+m_dom->toString()+
