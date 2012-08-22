@@ -1383,6 +1383,13 @@ namespace TREX {
        * effect of an action. Returns true if it is and false otherwises
        */
       bool actionEffect(const EUROPA::TokenId& token);
+      /** @brief Checks if token is a condition to a goal
+       *
+       * Checks to see if the token is a condition to an action which
+       * has some effect that is a goal or subgoal. Returns true if it
+       * is, false otherwise.
+       */
+      bool conditionOfGoal(const EUROPA::TokenId& token);
       /** @brief Returns all conditions of a token
        *
        * Used to return conditions of a token and its merged tokens

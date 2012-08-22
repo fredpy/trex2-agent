@@ -397,7 +397,7 @@ bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, 
         return true;
     }
     //Wait to dispatch the token until the last moment
-    else if(token->end()->lastDomain().getUpperBound()<=ub)
+    else if(token->start()->lastDomain().getUpperBound()<=ub)
     {
         return true;
     }

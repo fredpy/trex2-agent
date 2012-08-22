@@ -1090,8 +1090,6 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     else
       out<<"???";
     out<<"\\n";
-    if(m_goals.find(*it)!=m_goals.end())
-      out<<"Marked Goal \\n";
 #endif // EUROPA_HAVE_EFFECT
     print_domain(out<<"  start=", (*it)->start());
     print_domain(out<<"\\n  duration=", (*it)->duration());
@@ -1119,6 +1117,8 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<" color=grey"; // ignored tokens are greyed
     else if( filter.is_fact(*it) )
       out<<" color=red"; // fact tokens are red
+    else if(m_goals.find(*it)!=m_goals.end())
+      out<<" color=blue";
     if( (*it)->isCommitted() ||
         m_committed.find(*it)!=m_committed.end() )
       out<<" fontcolor=red";
@@ -1385,13 +1385,25 @@ void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token)
         tokens.insert(token);
         // Searchs for and adds all subgoals
         m_owner.subgoalSearch(tokens);
+    } else {
+        if(m_owner.conditionOfGoal(token))
+        {
+            EUROPA::TokenSet tokens;
+            tokens.insert(token);
+            m_owner.subgoalSearch(tokens);
+        }
     }
 }
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   // Checks and erases the token if it was considered a goal
   if(!m_owner.is_goal(token))
-    m_owner.m_goals.erase(token);
+  {
+    if(!m_owner.conditionOfGoal(token))
+    {
+        m_owner.m_goals.erase(token);
+    }
+  }
 
   if( m_owner.is_agent_timeline(token) ) {
     debugMsg("trex:token", "cancel "<<token->getPredicateName().toString()
@@ -1423,7 +1435,12 @@ void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
   // Checks and erases the token if it was considered a goal
   if(!m_owner.is_goal(token))
-    m_owner.m_goals.erase(token);
+  {
+    if(!m_owner.conditionOfGoal(token))
+    {
+        m_owner.m_goals.erase(token);
+    }
+  }
 
   // EUROPA::TokenId master = token->master();
   // if( master.isId() )
@@ -1462,6 +1479,24 @@ bool Assembly::actionEffect(const EUROPA::TokenId& token) {
       return true;
   }
   return false;
+}
+
+bool Assembly::conditionOfGoal(const EUROPA::TokenId& token)
+{
+    if(token->master().isId())
+        if(is_action(token->master()) && is_condition(token))
+        {
+            EUROPA::TokenSet slaves = token->master()->slaves();
+            EUROPA::TokenSet::iterator it = slaves.begin(), end = slaves.end();
+            for(; it!=end; it++)
+            {
+                if(is_effect(*it) && is_subgoal(*it))
+                {
+                    return true;
+                }
+            }
+        }
+    return false;
 }
 
 EUROPA::TokenSet Assembly::conditions(const EUROPA::TokenId& token)
