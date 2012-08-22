@@ -21,36 +21,16 @@ Agent agent = new Agent(Internal);
 // Indicate that the database is closed - no new objects can be created
 close();
 
-
-// Goal token for starting at home at the beginning
-// (alternatively require it to precede all Buy tokens)
-// rejectable(location.At start);
-// start.loc.specify(Home);
-// start.start.specify(0);
-
-// Goal tokens for all purchases
-// rejectable(agent.Own buy1);
-// rejectable(agent.Own buy2);
-// rejectable(agent.Own buy3);
-
-// buy1.product.specify(Milk);
-// buy2.product.specify(Banana);
-// buy3.product.specify(Drill);
-
 // Goal token for ending at home after all purchases
-goal(agent.Go finish);
-finish.to.specify(Home);
-finish.end.specify(horizonEnd);
+// goal(agent.Go finish);
+// finish.to.specify(Home);
+// finish.end.specify(horizonEnd);
 
-// buy1 after start;
-// buy2 after start;
-// buy3 after start;
+goal(location.At finish);
+finish.loc.specify(Home);
+finish.start >= 1;
+finish.start <= 99;
+finish.duration >= 10;
+finish.end.specify(100);
 
-// buy1 before finish;
-// buy2 before finish;
-// buy3 before finish;
-
-// Force things to happen within our horizon:
-// leq(0, start.start);
-// leq(finish.end, horizonEnd);
 // The planner should take it form here!
