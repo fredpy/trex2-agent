@@ -168,7 +168,7 @@ namespace TREX {
      */
     class Assembly :public EUROPA::EngineBase, boost::noncopyable {
     private:
-      typedef TREX::utils::list_set<details::CurrentStateId_id_traits> 
+      typedef TREX::utils::list_set<details::CurrentStateId_id_traits>
         state_map;
       static std::string const MODE_ATTR;
       static std::string const DEFAULT_ATTR;
@@ -270,9 +270,9 @@ namespace TREX {
        *
        * Create a new instance named @p name
        */
-      Assembly(std::string const &name, 
-               size_t maxSynchSteps = 0, 
-               size_t maxSynchDepth = 0);      
+      Assembly(std::string const &name,
+               size_t maxSynchSteps = 0,
+               size_t maxSynchDepth = 0);
       /** @brief Destructor */
       virtual ~Assembly();
 
@@ -867,7 +867,7 @@ namespace TREX {
        */
       virtual void cancel(EUROPA::TokenId const &tok) {}
 
-      /* @brief Goal rejection notfication 
+      /* @brief Goal rejection notfication
        *
        * @param[in] tok A token
        *
@@ -887,7 +887,7 @@ namespace TREX {
        * This is used in order to implement our new faeture where reactors are
        * able to publish their plan whenever they are done planning.
        */
-      virtual void plan_dispatch(EUROPA::TimelineId const &tl, 
+      virtual void plan_dispatch(EUROPA::TimelineId const &tl,
                                  EUROPA::TokenId const &tok) =0;
 
       /** @brief Iterator through TREX state variables
@@ -911,7 +911,7 @@ namespace TREX {
        * @sa internal_iterator
        * @sa TREX::europa::details::CurrentState
        */
-      typedef boost::filter_iterator<details::is_external, 
+      typedef boost::filter_iterator<details::is_external,
                                      state_iterator> external_iterator;
       /** @brief Iterator through TREX internal state variables
        *
@@ -922,7 +922,7 @@ namespace TREX {
        * @sa state_iterator
        * @sa TREX::europa::details::CurrentState
        */
-      typedef boost::filter_iterator<details::is_internal, 
+      typedef boost::filter_iterator<details::is_internal,
                                      state_iterator> internal_iterator;
 
       /** @brief T-REX timelines start iterator
@@ -1011,7 +1011,7 @@ namespace TREX {
       internal_iterator end_internal() const {
         return internal_iterator(end(), end());
       }
-      
+
       bool locate_nddl(std::string &nddl) const;
 
       /** @brief Load a model
@@ -1038,34 +1038,34 @@ namespace TREX {
        * @pre @p planner is a valid XML solver configuration file
        * @pre @p synchronizer is a valid XML solver configuration file
        * @post both the planner and synchronizer solvers are configured using
-       *      their repective configuration file as a basis with the addition 
+       *      their repective configuration file as a basis with the addition
        *      of their dedicated filters and flawmanagers
        *
        * @par What does trex inject in the configuration files ?
        *
-       * In order to handle properly both synchronization and deliberation, 
-       * trex needs to add extra components to the solver. These allow to 
-       * focus the europa solver to only the flaws that are relevant to the 
+       * In order to handle properly both synchronization and deliberation,
+       * trex needs to add extra components to the solver. These allow to
+       * focus the europa solver to only the flaws that are relevant to the
        * current problem Firo this reason the first thing that is injected
        * is a planning horizon filter acting as follow:
-       * @li for the @p synchronizer the filter accepts only tokens that 
-       *     may overlap the current tick (ie start can be less or equal 
-       *     to current tick and @p end can be greater or equal to current 
+       * @li for the @p synchronizer the filter accepts only tokens that
+       *     may overlap the current tick (ie start can be less or equal
+       *     to current tick and @p end can be greater or equal to current
        *     tick)
-       * @li for the @p planner the filter accept all the tokens that can 
+       * @li for the @p planner the filter accept all the tokens that can
        *     overlap the window [current, current+latency+lookahead]
-       * 
+       *
        * @par
        *
-       * In addition the @p synchronizer needs to introduce a new type of 
-       *    flaw called current state flaw that enforces the planner to identify 
+       * In addition the @p synchronizer needs to introduce a new type of
+       *    flaw called current state flaw that enforces the planner to identify
        *    for each of its @e Internal tokens their state at the current tick.
        *
        * @sa DeliberationFilter
        * @sa SynchronizationFilter
        * @sa SynchronizationManager
        */
-      void configure_solvers(std::string const &synchronizer, 
+      void configure_solvers(std::string const &synchronizer,
 			     std::string const &planner);
       /** @brief Configure solvers
        * @param[in] cfg A XML solver configuration file name
@@ -1125,7 +1125,7 @@ namespace TREX {
       void getFuturePlan();
 
       bool commit_externals();
-      
+
       /** @brief Execute synchronization solver
        *
        * This method execute all the basic steps for a simple synchronization.
@@ -1381,6 +1381,28 @@ namespace TREX {
        * effect of an action. Returns true if it is and false otherwises
        */
       bool actionEffect(const EUROPA::TokenId& token);
+      /** @brief Returns all conditions of a token
+       *
+       * Used to return conditions of a token and its merged tokens
+       * Mostly used for an action token
+       */
+      EUROPA::TokenSet conditions(const EUROPA::TokenId& token);
+      /** @brief Checks if token is a subgoal
+       *
+       * Checks to see if the token is related to a goal or is a
+       * goal itself by checking if it is in m_goals returns true
+       * if it is in the set, false otherwise
+       */
+      bool is_subgoal(const EUROPA::TokenId& token);
+      /** @brief Searchs plan and adds tokens as subgoals
+       *
+       * Input is a tokenset, which gets added as subgoals. The search starts by
+       * testing each token to see if it is an effect of an action and then
+       * adds all of the conditions to that action as subgoals, then repeating
+       * the search on the new tokens. Allowing for recursive effect->action->condition.
+       */
+      void subgoalSearch(EUROPA::TokenSet& tokens);
+
 
       /** @brief Token Listner proxy
        *
@@ -1538,7 +1560,7 @@ namespace TREX {
       EUROPA::ConstrainedVariableId m_tick_const;
       size_t m_synchSteps, m_synchDepth;
       bool m_archiving;
-      
+
       friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;
       friend class TREX::europa::details::CurrentState;

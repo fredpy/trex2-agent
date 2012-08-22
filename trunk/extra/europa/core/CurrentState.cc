@@ -190,7 +190,7 @@ void CurrentState::erased(EUROPA::TokenId const &token) {
     m_last_obs = EUROPA::TokenId::noId();
     m_frontier->pending_discard();
     m_frontier = EUROPA::ConstrainedVariableId::noId();
-  } 
+  }
   else if( m_prev_obs==token ) {
     m_prev_obs = EUROPA::TokenId::noId();
     m_prev_frontier->pending_discard();
@@ -201,9 +201,9 @@ void CurrentState::erased(EUROPA::TokenId const &token) {
 void CurrentState::apply_base(EUROPA::TokenId &merged,
 			      EUROPA::Id<TimePoint> &frontier) {
   EUROPA::TokenId active = merged->getActiveToken();
-  std::vector<EUROPA::ConstrainedVariableId> const 
+  std::vector<EUROPA::ConstrainedVariableId> const
     &actives = active->getVariables();
-  std::vector<EUROPA::ConstrainedVariableId> const 
+  std::vector<EUROPA::ConstrainedVariableId> const
     &mergeds = merged->getVariables();
 
   for(size_t v=1; v<actives.size(); ++v)
@@ -237,7 +237,7 @@ namespace {
 
 void CurrentState::new_token(EUROPA::TokenId const &token) {
   m_prev_obs = m_last_obs;
-  if( m_prev_frontier.isId() ) 
+  if( m_prev_frontier.isId() )
     m_prev_frontier->pending_discard();
   m_prev_frontier = m_frontier;
   m_last_obs = token;
@@ -265,7 +265,7 @@ void CurrentState::relax_end() {
 }
 
 bool CurrentState::commit() {
-  
+
   if( check_committed() )
     return true;
   else {
@@ -281,11 +281,11 @@ bool CurrentState::commit() {
                  <<timeline()->toString()<<'.'
                  <<m_prev_obs->getUnqualifiedPredicateName().toString()
                  <<'('<<m_prev_obs->getKey()<<')');
-        return false;     
-      }        
+        return false;
+      }
       m_assembly.terminate(m_prev_obs);
       m_prev_obs = EUROPA::TokenId::noId();
-      if( m_prev_frontier.isId() ) 
+      if( m_prev_frontier.isId() )
         m_prev_frontier->pending_discard();
       m_prev_frontier = EUROPA::Id<TimePoint>::noId();
       start_time = now();
@@ -296,25 +296,25 @@ bool CurrentState::commit() {
       debugMsg("trex:commit", "Starting "<<timeline()->toString()<<'.'
 	       <<m_last_obs->getUnqualifiedPredicateName().toString()
 	       <<'('<<m_last_obs->getKey()<<')');
-      restrict_base(m_last_obs, m_last_obs->start(), 
+      restrict_base(m_last_obs, m_last_obs->start(),
 		    EUROPA::IntervalIntDomain(now()));
       m_assembly.notify(*this);
-    } 
+    }
     debugMsg("trex:commit", "Extend duration of "<<timeline()->toString()<<'.'
              <<m_last_obs->getUnqualifiedPredicateName().toString()
              <<'('<<m_last_obs->getKey()<<"):\n  BEFORE\n\tend="
              <<m_last_obs->end()->baseDomain().toString()<<"\n\tduration="
-             <<m_last_obs->duration()->baseDomain().toString()<<'\n');   
+             <<m_last_obs->duration()->baseDomain().toString()<<'\n');
     if( !m_frontier->commit_date(now()) ) {
       debugMsg("trex:always", "["<<now()
                <<"] Failed to extend external observation "
                <<timeline()->toString()
                <<"."<<m_last_obs->getUnqualifiedPredicateName().toString()
                <<'('<<m_last_obs->getKey()<<").");
-      return false;	
+      return false;
     }
   }
-  
+
   if( !m_assembly.constraint_engine()->isPropagating() ) {
     if( m_assembly.constraint_engine()->propagate() )
       return true;
@@ -324,7 +324,7 @@ bool CurrentState::commit() {
              <<m_last_obs->getUnqualifiedPredicateName().toString()
              <<'('<<m_last_obs->getKey()<<").");
     return false;
-  } else 
+  } else
     return true;
 }
 
@@ -353,16 +353,27 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 #ifdef  EUROPA_HAVE_EFFECT
     debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
-	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString()); 
-    // New code from Philip 
+	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString());
+    // Old code from Philip
     // Check if next candidate is goal dependent ... needs to be refined I think
+    /*
     EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
     if(nowGoal.isId())
-      m_assembly.dispatch(timeline(),*i);
-#else 
+        m_assembly.dispatch(timeline(),*i);
+    */
+    /** @brief Dispatching function with the help of listener_proxy
+    *   Using this code will allow for the token to be tested if it is a subgoal or goal itself
+    *   for dispatching. Must have a goal<-effect<-action->condition->token relationship in
+    *   the model to take advantage of this dispatching method.
+    */
+    if(dispatch_token(*i,lb,ub))
+    {
+         m_assembly.dispatch(timeline(),(*i));
+    }
+#else
     debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
-	     <<"] (start="<<(*i)->start()->lastDomain().toString()); 
+	     <<"] (start="<<(*i)->start()->lastDomain().toString());
     ///Old code for dispatching tokens
     // very dumb but work with europa 2.5
     if( !m_assembly.dispatch(timeline(), *i)
@@ -377,6 +388,20 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     }
 #endif // EUROPA_HAVE_EFFECT
   }
+}
+
+bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub)
+{
+    if(m_assembly.is_subgoal(token))
+    {
+        return true;
+    }
+    //Wait to dispatch the token until the last moment
+    else if(token->end()->lastDomain().getUpperBound()<=ub)
+    {
+        return true;
+    }
+    return false;
 }
 
 EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub)
@@ -546,18 +571,18 @@ bool CurrentState::DecisionPoint::canUndo() const {
 void CurrentState::DecisionPoint::handleInitialize() {
   EUROPA::TokenId cur = m_target->current(), active;
   EUROPA::eint date = m_target->now();
-  
+
   debugMsg("trex:current", "Determining state choices for "<<m_target->timeline()->getName().toString()<<" at tick "<<date);
   m_choices.reset();
   debugMsg("trex:current", "Adding SET_DEFAULT by default");
   m_choices.set(CREATE_DEFAULT);
-  
+
   if( cur.isId() ) {
     active = cur->getActiveToken();
     if( active.isNoId() )
       active = cur;
     EUROPA::IntervalIntDomain const &end_cur = active->end()->lastDomain();
-    
+
     debugMsg("trex:current", "Checking if last observation can end after "<<date<<" (end="<<end_cur.toString()<<").");
     if( end_cur.getLowerBound()<=date ) {
       bool long_enough = ( end_cur.getUpperBound()>date );
@@ -571,14 +596,14 @@ void CurrentState::DecisionPoint::handleInitialize() {
       m_choices.reset();
       m_choices.set(EXTEND_CURRENT);
       m_prev_idx= m_idx = EXTEND_CURRENT;
-    
+
       debugMsg("trex:current", "EXTEND_CURRENT is the only choice");
       return;
     }
   }
   std::list<EUROPA::TokenId> const &sequence = m_target->timeline()->getTokenSequence();
   std::list<EUROPA::TokenId>::const_iterator i = sequence.begin();
-  
+
   if( active.isId() ) {
     debugMsg("trex:current", "Look for successor of last observation.");
     for(; sequence.end()!=i && active!=*i; ++i);
@@ -596,11 +621,11 @@ void CurrentState::DecisionPoint::handleInitialize() {
       } else {
 	debugMsg("trex:current", "No active successor starting over "<<date);
       }
-    } else 
+    } else
       debugMsg("trex:curent", "No active successor");
   } else {
     debugMsg("trex:current", "No active observation => find potential observation in the plan.");
-    // skip tokens that necessarily start in the past 
+    // skip tokens that necessarily start in the past
     for( ; sequence.end()!=i && (*i)->start()->lastDomain().getUpperBound()<date; ++i);
     m_cand_from = i;
     for( ; sequence.end()!=i && (*i)->start()->lastDomain().isMember(date); ++i) {
@@ -613,10 +638,10 @@ void CurrentState::DecisionPoint::handleInitialize() {
 
   m_choices.set(CREATE_OTHER, !m_target->m_pred_names.empty());
   m_next_pred = m_target->m_pred_names.begin();
-  
+
   if( m_choices.none() )
     debugMsg("trex:always", "No choices for current state flaw of timeline "<<m_target->timeline()->getName().toString());
-  
+
   // Initialize the decision index
   m_idx = 0;
   if( !m_choices[m_idx] )
@@ -635,7 +660,7 @@ void CurrentState::DecisionPoint::handleExecute() {
     break;
   case START_NEXT:
     debugMsg("trex:current", "Execute decision START_NEXT "<<(*m_tok)->getPredicateName().toString()<<".start="<<(*m_tok)->start()->lastDomain().toString());
-    tok = m_target->new_obs((*m_tok)->getPredicateName().toString(), false);      
+    tok = m_target->new_obs((*m_tok)->getPredicateName().toString(), false);
     details::restrict_attributes(tok, *m_tok);
     m_client->merge(tok, *m_tok);
     break;
@@ -704,18 +729,18 @@ void UpdateMatchFinder::getMatches(EUROPA::SOLVERS::MatchingEngineId const &engi
  */
 
 EUROPA::IntervalIntDomain TimePoint::future(EUROPA::eint now) {
-  return 
-    EUROPA::IntervalIntDomain(now+1, 
+  return
+    EUROPA::IntervalIntDomain(now+1,
 			      std::numeric_limits<EUROPA::eint>::infinity());
 }
 
-// structors 
- 
+// structors
+
 TimePoint::TimePoint(EUROPA::TokenId const &tok,
 		     EUROPA::eint now,
-		     EUROPA::LabelStr const &name) 
+		     EUROPA::LabelStr const &name)
   :EUROPA::Variable<EUROPA::IntervalIntDomain>
-   (tok->getPlanDatabase()->getConstraintEngine(), 
+   (tok->getPlanDatabase()->getConstraintEngine(),
     future(now), true, true, name),
    m_tok(tok), m_pending(false) {
   debugMsg("trex:synch:tp", "Create "<<name.toString()<<" for token "<<m_tok->getPredicateName().toString()
@@ -738,8 +763,8 @@ TimePoint::~TimePoint() {
            <<" DESTROYED.");
   detach(false);
 }
- 
-// modifiers 
+
+// modifiers
 
 bool TimePoint::set_date(EUROPA::eint now) {
   EUROPA::Domain &dom = *m_derivedDomain;
@@ -757,7 +782,7 @@ bool TimePoint::set_date(EUROPA::eint now) {
 }
 
 void TimePoint::relax_date() {
-  m_derivedDomain->relax(baseDomain()); 
+  m_derivedDomain->relax(baseDomain());
   debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<" relaxed to "<<lastDomain().toString());
   // touch();
 }
@@ -815,13 +840,13 @@ void TimePoint::create_constraint() {
     EUROPA::DbClientId cli = m_tok->getPlanDatabase()->getClient();
     end_scope[0] = getId();
     end_scope[1] = m_tok->end();
-    m_end_cstr = cli->createConstraint("concurrent", end_scope, 
+    m_end_cstr = cli->createConstraint("concurrent", end_scope,
                                        "trex inertial value");
     dur_scope[0] = m_tok->start();
     dur_scope[1] = m_tok->duration();
     dur_scope[2] = getId();
-    m_dur_cstr = cli->createConstraint("temporalDistance", 
-                                       dur_scope, 
+    m_dur_cstr = cli->createConstraint("temporalDistance",
+                                       dur_scope,
                                        "trex inertial value");
   } else {
     debugMsg("trex:synch:tp", getName().toString()
@@ -833,21 +858,21 @@ void TimePoint::detach(bool cstr) {
   if( m_tok.isId() ) {
     debugMsg("trex:synch:tp", "Detaching timepoint "<<getKey()<<" from token "
              <<m_tok->getPredicateName().toString()<<'('<<m_tok->getKey()<<')');
-    if( m_dur_cstr.isId() ) {      
+    if( m_dur_cstr.isId() ) {
       EUROPA::DbClientId cli = m_tok->getPlanDatabase()->getClient();
-      if( cstr ) 
+      if( cstr )
       cli->deleteConstraint(m_dur_cstr);
-      
+
       m_dur_cstr = EUROPA::ConstraintId::noId();
       if( m_end_cstr.isId() ) {
-        if( cstr ) 
+        if( cstr )
           cli->deleteConstraint(m_end_cstr);
         m_end_cstr = EUROPA::ConstraintId::noId();
       }
 
     }
     // m_tok->removeLocalVariable(getId());
-    if( cstr ) 
+    if( cstr )
       m_tok->removeDependent(this);
     m_tok = EUROPA::TokenId::noId();
   }
@@ -870,7 +895,7 @@ void TimePoint::notifyDiscarded(Entity const *entity) {
                <<'('<<m_tok->getKey()<<") discarded => detach it from tp "
                <<getKey());
       detach(false);
-      if( m_pending ) 
+      if( m_pending )
         decRefCount();
     }
   }
