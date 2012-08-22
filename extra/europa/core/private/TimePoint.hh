@@ -64,6 +64,7 @@ namespace TREX {
 
       private:
         void notifyDiscarded(Entity const *entity);
+        void updateBase(EUROPA::IntervalIntDomain const &dom);
         
 	static EUROPA::IntervalIntDomain future(EUROPA::eint now);
 	void create_constraint();
