@@ -1177,6 +1177,8 @@ namespace TREX {
       }
       void archive(EUROPA::eint date);
 
+      std::ostream &print_domain(std::ostream &out, 
+                                 EUROPA::ConstrainedVariableId const &var) const;
       /** @brief Log the plan structure
        *
        * @param[in,out] out An output stream
