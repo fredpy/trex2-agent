@@ -1045,6 +1045,21 @@ EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
   return var;
 }
 
+std::ostream &Assembly::print_domain(std::ostream &out, 
+                            EUROPA::ConstrainedVariableId const &var) const {
+  EUROPA::Domain const &dom = var->lastDomain();
+  
+  if( dom.isSingleton() ) {
+    EUROPA::DataTypeId type = var->getDataType();
+    return out<<type->toString(dom.getSingletonValue());
+  } else if( dom.isInterval() ) {
+    return out<<dom;
+  } else {
+    return out<<dom.toString();
+  }
+}
+
+
 void Assembly::print_plan(std::ostream &out, bool expanded) const {
   EUROPA::TokenSet const tokens = plan_db()->getTokens();
   is_not_merged filter(false);
@@ -1078,25 +1093,16 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     if(m_goals.find(*it)!=m_goals.end())
       out<<"Marked Goal \\n";
 #endif // EUROPA_HAVE_EFFECT
-    std::vector<EUROPA::ConstrainedVariableId> const &vars = (*it)->getVariables();
-    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator v=vars.begin();
-        vars.end()!=v; ++v) {
-      // print all token attributes
-      out<<"  "<<(*v)->getName().toString()<<'=';
-      if( (*v)->isNull() )
-        out<<"NULL";
-      else {
-        EUROPA::DataTypeId type = (*v)->getDataType();
-        EUROPA::Domain const &dom = (*v)->lastDomain();
-        if( dom.isSingleton() )
-          out<<type->toString(dom.getSingletonValue());
-        else if( dom.isInterval() )
-          out<<dom;
-        else
-          out<<(*v)->toString();
-      }
-      out<<"\\n";
-    }
+    print_domain(out<<"  start=", (*it)->start());
+    print_domain(out<<"\\n  duration=", (*it)->duration());
+    print_domain(out<<"\\n  end=", (*it)->end())<<"\\n";
+    
+    std::vector<EUROPA::ConstrainedVariableId> const &attrs = (*it)->parameters();
+    
+    for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
+        attrs.end()!=a; ++a)
+      print_domain(out<<"  "<<(*a)->getName().toString()<<'=', *a)<<"\\n";
+    
     if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
       if( !merged.empty() ) {

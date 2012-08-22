@@ -734,7 +734,7 @@ EUROPA::IntervalIntDomain TimePoint::future(EUROPA::eint now) {
 			      std::numeric_limits<EUROPA::eint>::infinity());
 }
 
-// structors
+// structors 
 
 TimePoint::TimePoint(EUROPA::TokenId const &tok,
 		     EUROPA::eint now,
@@ -795,6 +795,7 @@ bool TimePoint::commit_date(EUROPA::eint now) {
   } else {
     restrictBaseDomain(future(now));
     // touch();
+    
     debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
              <<" after commit to ["<<now+1<<", +inf]");
     return true;
@@ -900,4 +901,14 @@ void TimePoint::notifyDiscarded(Entity const *entity) {
     }
   }
 }
+
+void TimePoint::updateBase(EUROPA::IntervalIntDomain const &dom) {
+  restrictBaseDomain(dom);
+  touch();
+  if( m_tok.isId() ) {
+    m_tok->duration()->touch();
+    m_tok->end()->touch();
+  }
+}
+
 
