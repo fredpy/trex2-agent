@@ -10,8 +10,6 @@ class Location {
   }
 } */
 
-enum Location { Home, SuperMarket, HardwareStore };
-
 /* 
 class Product {
   string name;
@@ -19,6 +17,8 @@ class Product {
     name = _name;
   }
 } */
+
+enum Location {Home, SuperMarket, HardwareStore};
 
 enum Product {Banana, Milk, Drill};
 
@@ -30,6 +30,16 @@ class ProductLocation {
     location = _location;
     product = _product;
   }
+}
+
+class Path {
+   Location from;
+   Location to;
+   
+   Path(Location _from, Location _to){
+     from = _from;
+     to = _to;
+   }
 }
 
 // Use built-in Timeline functionality to enforce that an agent:
@@ -52,13 +62,23 @@ class AgentLocation extends AgentTimeline{
   }
 }
 
+// Used to as object so that the agent can own multiple products
+class AgentStorage {
+
+  predicate Own {
+    Product product;
+  }
+}
+
 // In addition to a timeline, the agent can buy things.  Note that Buy can
 // (must, in fact) be simultaneous with an At token and the Buy predicate
 // therefore cannot be defined as part of the AgentTimeline.
 class Agent extends AgentTimeline {
+  AgentStorage backpack;
 
   Agent(Mode _mode) {
     super(_mode, true);
+    backpack = new AgentStorage();
   }
 
   action Go {
@@ -70,12 +90,16 @@ class Agent extends AgentTimeline {
     Product product;
   }
 
-  predicate Own {
+  action Eat {
+    Product product;
+    Location at;
+  }
+
+  predicate Want {
     Product product;
   }
 
 }
-
 
 // Define the rules for AgentLocation
 
@@ -89,9 +113,14 @@ AgentLocation::At {
 
 AgentLocation::Go {
   met_by(At originToken);
-  eq(from, originToken.loc);
   meets(At destinationToken);
-  eq(to, destinationToken.loc);
+
+  Path paths;
+  eq(originToken.loc, paths.from);
+  eq(destinationToken.loc, paths.to);
+
+  eq(from, paths.from);
+  eq(to, paths.to);
 
 }
 
@@ -123,13 +152,26 @@ Agent::Buy {
   contained_by(condition AgentLocation.At currLocation);
   eq(currLocation.loc, possibleStores.location);
   
-  meets(effect Own purchase);
+  meets(effect Want purchase);
   eq(purchase.product,product);
 
   // A Buy takes 10 time units
   eq(10, duration);
 }
 
-Agent::Own {
+Agent::Eat {
+  contained_by(condition AgentLocation.At location);
+  eq(location.loc, at);
+
+  ends(effect object.backpack.Own food2);
+  eq(food2.product, product);
+
+  eq(5, duration);
+
+}
+
+Agent::Want {
   eq(1, duration);
+  starts(effect object.backpack.Own backpack);
+  eq(backpack.product, product);
 }

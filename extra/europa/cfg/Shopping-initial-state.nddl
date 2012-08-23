@@ -15,16 +15,16 @@ ProductLocation bananaLocation = new ProductLocation(SuperMarket, Banana);
 ProductLocation milkLocation = new ProductLocation(SuperMarket, Milk);
 ProductLocation drillLocation = new ProductLocation(HardwareStore, Drill);
 
+Path street1 = new Path(Home, HardwareStore);
+Path street2 = new Path(Home, SuperMarket);
+Path street3 = new Path(HardwareStore, Home);
+Path street4 = new Path(SuperMarket, Home);
+
 AgentLocation location = new AgentLocation(External);
 Agent agent = new Agent(Internal);
 
 // Indicate that the database is closed - no new objects can be created
 close();
-
-// Goal token for ending at home after all purchases
-// goal(agent.Go finish);
-// finish.to.specify(Home);
-// finish.end.specify(horizonEnd);
 
 goal(location.At finish);
 finish.loc.specify(Home);
