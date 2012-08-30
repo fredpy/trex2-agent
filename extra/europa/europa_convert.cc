@@ -45,6 +45,8 @@
 #include <trex/domain/EnumDomain.hh>
 
 #include <PLASMA/Domains.hh>
+#include <PLASMA/Object.hh>
+#include <PLASMA/PlanDatabase.hh>
 
 #include <memory>
 
@@ -148,7 +150,39 @@ DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
 // manipulators
 
 void details::europa_domain::visit(BasicEnumerated const *dom) {
-  if( m_dom->isEnumerated() ) {
+  if( m_dom->isEntity() ) {
+    // I assume that only objects are entity ... should be fine I think
+    EUROPA::ObjectDomain *o_dom = dynamic_cast<EUROPA::ObjectDomain *>(m_dom);
+    std::list<EUROPA::edouble> values;
+    EUROPA::edouble val;
+        
+    if( NULL==o_dom )
+      throw DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is an entity but not an object.\nDo not know how to handle this.");
+    else {
+      EUROPA::ObjectId obj; 
+      EUROPA::PlanDatabaseId p_db; 
+      
+      // Need to identify the plan database 
+      std::list<EUROPA::ObjectId> objs = o_dom->makeObjectList();
+      if( objs.empty() )
+        throw DomainAccess(*dom, "Europa domain "+o_dom->toString()+" was empty before the operation");
+      else
+        p_db = objs.front()->getPlanDatabase();
+      objs.clear();
+      
+      for(size_t i=0; i<dom->getSize(); ++i) {
+        obj = p_db->getObject(dom->getStringValue(i));
+        if( obj.isId() && o_dom->isMember(obj) )
+          objs.push_back(obj);
+      }
+      if( objs.empty() ) // the intersection is empty
+        throw EmptyDomain(*dom, "Europa object domain "+m_dom->toString()+
+                          " became empty.");
+      EUROPA::ObjectDomain tmp(m_type, objs);
+      m_dom->intersect(tmp);
+    }
+    
+  } else if( m_dom->isEnumerated() ) {
     std::list<EUROPA::edouble> values;
     
     EUROPA::edouble val;
