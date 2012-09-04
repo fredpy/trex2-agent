@@ -1050,8 +1050,14 @@ std::ostream &Assembly::print_domain(std::ostream &out,
   EUROPA::Domain const &dom = var->lastDomain();
   
   if( dom.isSingleton() ) {
-    EUROPA::DataTypeId type = var->getDataType();
-    return out<<type->toString(dom.getSingletonValue());
+    EUROPA::edouble val = dom.getSingletonValue();
+    
+    if( m_schema->isObjectType(dom.getTypeName()) )
+      return out<<dom.toString();
+    else {
+      EUROPA::DataTypeId type = var->getDataType();
+      return out<<type->toString(val);
+    }
   } else if( dom.isInterval() ) {
     return out<<dom;
   } else {
@@ -1089,17 +1095,17 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
       out<<"PREDICATE";
     else
       out<<"???";
-    out<<"\\n";
+    out<<"\\n"<<std::flush;
 #endif // EUROPA_HAVE_EFFECT
-    print_domain(out<<"  start=", (*it)->start());
-    print_domain(out<<"\\n  duration=", (*it)->duration());
-    print_domain(out<<"\\n  end=", (*it)->end())<<"\\n";
+    print_domain(out<<"  start="<<std::flush, (*it)->start());
+    print_domain(out<<"\\n  duration="<<std::flush, (*it)->duration());
+    print_domain(out<<"\\n  end="<<std::flush, (*it)->end())<<"\\n"<<std::flush;
     
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = (*it)->parameters();
     
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
         attrs.end()!=a; ++a)
-      print_domain(out<<"  "<<(*a)->getName().toString()<<'=', *a)<<"\\n";
+      print_domain(out<<"  "<<(*a)->getName().toString()<<'='<<std::flush, *a)<<"\\n";
     
     if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
@@ -1147,7 +1153,7 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
 #endif // EUROPA_HAVE_EFFECT
     if( comma )
       out<<" style=\""<<styles.str()<<"\" "; // display style modifiers
-    out<<"];\n";
+    out<<"];"<<std::endl;
     if( (*it)->isMerged() ) {
       EUROPA::eint active = (*it)->getActiveToken()->getKey();
       // connect the merged token to its active counterpart
