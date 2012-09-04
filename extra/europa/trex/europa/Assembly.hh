@@ -419,6 +419,18 @@ namespace TREX {
        */
       bool external(EUROPA::ObjectId const &obj) const;
 
+      /** @brief planning look-ahead
+       *
+       * @param[in] obj A plan database object
+       *
+       * Identifies the look-ahaed of the object @p obj. 
+       * This look-ahead is relevant only for objects thart are 
+       * @e External aganet timelines and is used to identify when 
+       * a token can be dispatched for @p obj
+       *
+       * @retval 0 if @p obj is not @pExternal or do not accept goals
+       * @retval the look-ahead of the owner of @p obj otherwise 
+       */
       size_t look_ahead(EUROPA::ObjectId const &obj);
       /** @Brief Check if ignored
        * @param[in] tok A token
@@ -828,6 +840,16 @@ namespace TREX {
        * @sa is_internal(EUROPA::LabelStr const &) const
        */
       virtual bool is_external(EUROPA::LabelStr const &name) const =0;
+      /** @brief planning look-ahead
+       *
+       * @param[in] name A agent timeline name
+       *
+       * Identifies the look-ahaed to the trex timeline named @p name
+       *
+       * @pre @p name is a valid @p External timeline 
+       *
+       * @return the look-ahead of the owner of @p name
+       */
       virtual size_t look_ahead(EUROPA::LabelStr const &name) =0;
 
       /** @brief New internal state notification
@@ -1011,7 +1033,19 @@ namespace TREX {
       internal_iterator end_internal() const {
         return internal_iterator(end(), end());
       }
-
+      /** @brief locate a @p nddl file
+       *
+       * @param nddl[in,out] A file name
+       *
+       * This method attempts to locate the file @p nddl in @c TREX_PATH 
+       * along with all the files it includes.
+       *
+       * If @p nddl is found its value is updated to a fully qualified path
+       *
+       * @retval true if @p nddl was found
+       * @retval false totherwise
+       * @sa TREX::europa::details::Schema::use(std::string,bool &)
+       */
       bool locate_nddl(std::string &nddl) const;
 
       /** @brief Load a model
