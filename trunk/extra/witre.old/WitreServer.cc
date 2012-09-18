@@ -196,11 +196,13 @@ std::string WitreServer::getDependencies(std::string name)
  */
 void WitreServer::declared(details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) {
-    // If I did not connect to it yet just create the connection
-    use(timeline.name(), true, true); // as we do not have internal timlines this operation will always succeed
-                                       //  the first boolean means that we may want to post goals
-                                       //  the second boolean indicate if we want to be notified on plan updates
-                                       //      (false for now)
+    pendingTimelines.insert(timeline.name());
+
+ //    // If I did not connect to it yet just create the connection
+//     use(timeline.name(), true, true); // as we do not have internal timlines this operation will always succeed
+//                                        //  the first boolean means that we may want to post goals
+//                                        //  the second boolean indicate if we want to be notified on plan updates
+//                                        //      (false for now)
     {
       // then add it to externalTimelines
       boost::mutex::scoped_lock lock(mutex_);
@@ -226,13 +228,23 @@ void WitreServer::declared(details::timeline const &timeline) {
  */
 void WitreServer::undeclared(details::timeline const &timeline)
 {
-
+  pendingTimelines.erase(timeline.name());
 }
 
 void WitreServer::handleInit()
 {
     graph::timelines_listener::initialize();
     searchGraph();
+}
+
+void WitreServer::handleTickStart() {
+  std::set<utils::Symbol> subscribe;
+  std::swap(subscribe, pendingTimelines);
+
+  for(std::set<utils::Symbol>::const_iterator i=subscribe.begin(); 
+      subscribe.end()!=i; ++i) 
+    use(*i, true, true);
+
 }
 
 //Getting the timeline Graph dependencies

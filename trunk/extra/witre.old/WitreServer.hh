@@ -99,7 +99,7 @@ namespace TREX {
     private:
       //Trex functions
       void handleInit();
-      void handleTickStart() {};
+      void handleTickStart();
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
       void newPlanToken(goal_id const &t);
@@ -126,6 +126,7 @@ namespace TREX {
       mutable boost::mutex mutex_;
       boost::thread thread_;
       std::vector<Connection> connections;
+      std::set<utils::Symbol> pendingTimelines;
       std::vector<utils::Symbol> externalTimelines;
       std::queue<std::string> observations;
       timed_goal pastTokens;
