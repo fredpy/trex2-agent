@@ -71,10 +71,14 @@ bool DTAReactor::synchronize() {
 	       <<"  <Assert name=\"centerLon\"><value type=\"LONGITUDE\" name=\""<<m_pos.second<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"path\"><object value=\""<<m_path<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"size\"><value type=\"float\" name=\""<<m_factor<<"\" /></Assert>\n"
-	       <<"  <Assert name=\"lagrangian\"><value type=\"bool\" name=\"false\" /></Assert>\n"
+	       <<"  <Assert name=\"lagrangian\"><value type=\"bool\" name=\""<<(m_lagrangian?"true":"false")<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"speedNorth\"><value type=\"float\" name=\""<<m_speed.first<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"speedEast\"><value type=\"float\" name=\""<<m_speed.second<<"\" /></Assert>\n"
 	       <<"</Goal>";
+      if( m_lagrangian )
+        info<<"Lagrangian ";
+      else
+        info<<"world frame ";
       info<<m_path<<" of "<<m_factor<<"m around ("<<m_pos.first<<", "<<m_pos.second
 	  <<")\n\t direction : "<<m_speed.first<<"N, "<<m_speed.second<<"E\n\n";
       syslog()<<"Sending new SBD goal:\n\t"<<info.str();
@@ -120,14 +124,19 @@ void DTAReactor::handleRequest(goal_id const &g) {
 	factor = g->getAttribute("size").domain().getTypedSingleton<double, true>();
       else
 	return;
-      // Will need to add lagrangian flag ... 
+
+      if( g->hasAttribute("lagrangian") )
+        m_lagrangian = g->getAttribute("lagrangian").domain().getTypedSingleton<bool, true>();
+      else 
+        m_lagrangian = false;
+
       if( m_active ) {
 	if( m_drifter!=drifter ) {
 	  unuse(m_drifter);
 	  m_drifter = drifter;
 	  use(m_drifter, false);
 	}
-      } else {
+     } else {
 	m_drifter = drifter;
 	use(m_drifter, false);
 	m_active = true;

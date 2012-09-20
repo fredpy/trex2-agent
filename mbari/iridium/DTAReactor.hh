@@ -21,6 +21,7 @@ namespace mbari {
       TREX::utils::Symbol m_drifter;
       TREX::utils::Symbol m_path;
       double              m_factor;
+      bool                m_lagrangian;
       
       std::pair<double, double> m_pos, m_speed;
       bool m_have_pos, m_have_speed;
