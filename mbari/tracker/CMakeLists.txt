@@ -96,4 +96,4 @@ if(MBARI_TRACKER)
   endif(LIB_AMQP)
 endif(MBARI_TRACKER)
 
-# install(TARGETS TREXtracker DESTINATION shared/trex/plugins OPTIONAL)
+# install(TARGETS TREXtracker DESTINATION ${TREX_SHARED}/plugins OPTIONAL)

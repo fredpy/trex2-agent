@@ -187,9 +187,11 @@ endmacro(bash_path)
 # TREX sub directories                                                 #
 ########################################################################
 
+set(TREX_SHARED share/trex)
+
 # core libraries 
 add_subdirectory(trex)
-trex_cfg(cfg shared/trex)
+trex_cfg(cfg ${TREX_SHARED})
 
 # include extra/plugins
 add_subdirectory(extra) 
@@ -219,14 +221,14 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_devel.bash.in
 # create a default bash environement file for installed version
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION shared/trex)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION ${TREX_SHARED})
 
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)
 file(WRITE ${CMAKE_BINARY_DIR}/log/.empty_file " ") # Not really empty ... it is just to force tar to use it
 
 # create the default log directory ... everybody can read/write/exec
-install(DIRECTORY ${CMAKE_BINARY_DIR}/log DESTINATION shared/trex
+install(DIRECTORY ${CMAKE_BINARY_DIR}/log DESTINATION ${TREX_SHARED}
    DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
     GROUP_READ GROUP_WRITE GROUP_EXECUTE
     WORLD_READ WORLD_WRITE WORLD_EXECUTE

@@ -64,7 +64,7 @@ if(WITH_WITRE)
     # generate the witre.xml configuration file with a doocroot pointing to witre
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/witre.xml.in
       ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml DESTINATION shared/trex/cfg)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/witre.xml DESTINATION ${TREX_SHARED}/cfg)
     set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
       ${CMAKE_CURRENT_BINARY_DIR}/cfg)
   else(Wt_FOUND)
