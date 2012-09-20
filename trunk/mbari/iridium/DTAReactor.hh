@@ -25,7 +25,7 @@ namespace mbari {
       
       std::pair<double, double> m_pos, m_speed;
       bool m_have_pos, m_have_speed;
-      bool m_waiting;
+      bool m_waiting, m_use_iridium;
 
       enum vehicle_mode {
 	UNKNOWN =0,

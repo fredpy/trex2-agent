@@ -13,6 +13,7 @@ using namespace TREX::utils;
 #define SURVEY_TL "dorado_survey"
 #define STATE_TL "dorado_state"
 #define TREX_TL "drifterFollow"
+#define IRIDIUM_TL "iridium"
 
 /*
  * class DTAReactor
@@ -33,12 +34,18 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
   m_iridium.set_sender(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "from"));
   syslog(info)<<"Mail sender set to "<<m_iridium.sender();
 
-  bool use_iridium = parse_attr<bool>(true, TeleoReactor::xml_factory::node(arg), 
+  m_use_iridium = parse_attr<bool>(true, TeleoReactor::xml_factory::node(arg), 
 				      "iridium");
-  if( use_iridium ) {
+     
+  if( m_use_iridium ) {
     m_iridium.add_recipient(SbdMailer::s_iridium_address);
     syslog(info)<<"Adding iridium to the recipients";
+  } else {
+    syslog(info)<<"No iridium: providing timeline to activate it";
+    provide(IRIDIUM_TL);
+    postObservation(Observation(IRIDIUM_TL, "Inactive"));
   }
+    
   std::string to = parse_attr<std::string>("", TeleoReactor::xml_factory::node(arg),
 					   "to");
   boost::char_delimiters_separator<char> sep(false, "", ",");
@@ -146,6 +153,13 @@ void DTAReactor::handleRequest(goal_id const &g) {
       m_factor = factor;
       postObservation(*g);
       postObservation(Observation(STATE_TL, "Wait"));
+    }
+  } else if( g->object()==IRIDIUM_TL && !m_use_iridium ) {
+    if( g->predicate()=="Active" ) {
+      m_use_iridium =true;
+      m_iridium.add_recipient(SbdMailer::s_iridium_address);
+      syslog(info)<<"Adding iridium to the recipients";
+      postObservation(*g);
     }
   }
 }
