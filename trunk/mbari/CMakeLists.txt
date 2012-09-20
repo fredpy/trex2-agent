@@ -37,7 +37,7 @@ option(WITH_MBARI "Enable MBARI specific code." OFF)
 
 if(WITH_MBARI)
   add_custom_target(mbari COMMENT "MBARI specific targets")
-  trex_cfg(cfg shared/trex)
+  trex_cfg(cfg ${TREX_SHARED})
 
   add_subdirectory(shared)
   add_subdirectory(tracker)

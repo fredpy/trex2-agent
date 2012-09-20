@@ -51,7 +51,7 @@ if(WITH_EUROPA)
 
   # install lightswitch.nddl
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl
-    DESTINATION shared/trex/cfg)
+    DESTINATION ${TREX_SHARED}/cfg)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
     ${CMAKE_CURRENT_BINARY_DIR}/cfg)
   
