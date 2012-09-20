@@ -57,11 +57,28 @@ Trigo::Holds {
   cos_t == cos(date);
 }
 
+class Tracker extends AgentTimeline {
+  predicate Holds {
+    Trigo obj;
+  }
+  Tracker() {
+    super(Internal, "Holds");
+  }
+}
+
+Tracker::Holds {
+  if( obj ) {
+    equals(obj.Holds nxt);
+  }
+}
+
 Light light = new Light(Observe);
 Switch switch = new Switch(External);
 LightSwitch sw = new LightSwitch(switch);
 
 Luminance lum = new Luminance(Internal);
-Trigo     time_sin = new Trigo();
+Trigo     time_a = new Trigo();
+Trigo     time_b = new Trigo();
+Tracker   tracker = new Tracker();
 
 close();
