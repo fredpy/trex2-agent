@@ -57,7 +57,7 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
     }
   }
   syslog(info)<<"SMTP connection to "<<parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host"); 
-  m_iridium.login();
+  m_iridium.login(SbdMailer::AUTH_LOGIN, "fpy", "t0bapny.");
   syslog(info)<<"SMTP connection succeeded."; 
 }
 
