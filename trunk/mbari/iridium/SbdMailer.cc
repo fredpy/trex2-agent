@@ -88,6 +88,7 @@ void SbdMailer::send(std::string imei, char const *data, size_t size,
   out.close();
   Poco::Net::FilePartSource *attachment = new Poco::Net::FilePartSource(full_name);
   msg.addAttachment(fname, attachment);
+  m_server.login();
   m_server.sendMessage(msg);
 }
 
