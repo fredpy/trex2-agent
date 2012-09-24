@@ -26,7 +26,11 @@ std::string SbdMailer::new_file() {
 // structors 
 
 SbdMailer::SbdMailer(std::string const &host, Poco::UInt16 port)
-  :m_server(host, port) {}
+  :m_host(host), m_port(port) {
+  Poco::Net::SMTPClientSession session(m_host, m_port);
+  session.login();
+  session.close();
+}
 
 SbdMailer::~SbdMailer() {}
 
@@ -52,18 +56,18 @@ void SbdMailer::remove_recipient(std::string const &address) {
 
 // manipulators
 
-void SbdMailer::login() {
-  m_server.login();
-}
+// void SbdMailer::login() {
+//   // m_server.login(m_host);
+// }
 
-void SbdMailer::login(LoginMethod method, std::string const &user_name, 
-		      std::string const &password) {
-  m_server.login(method, user_name, password);
-}
+// void SbdMailer::login(LoginMethod method, std::string const &user_name, 
+// 		      std::string const &password) {
+//   m_server.login(method, user_name, password);
+// }
 
-void SbdMailer::close() {
-  m_server.close();
-}
+// void SbdMailer::close() {
+//   m_server.close();
+// }
 
 
 
@@ -88,9 +92,11 @@ void SbdMailer::send(std::string imei, char const *data, size_t size,
   out.close();
   Poco::Net::FilePartSource *attachment = new Poco::Net::FilePartSource(full_name);
   msg.addAttachment(fname, attachment);
-  m_server.login();
-  m_server.sendMessage(msg);
-  m_server.close();
+  
+   Poco::Net::SMTPClientSession session(m_host, m_port);
+  session.login();
+  session.sendMessage(msg);
+  session.close();
 }
 
 
