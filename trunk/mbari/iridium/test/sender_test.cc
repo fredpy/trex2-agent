@@ -6,8 +6,8 @@ int main(int argc, char *arg[]) {
   std::cout<<"Server ... "<<std::endl;
   SbdMailer mailer("mbarimail.mbari.org");
   
-  std::cout<<"Login ... "<<std::endl;
-  mailer.login();
+  // std::cout<<"Login ... "<<std::endl;
+  // mailer.login();
   
   std::cout<<"Configure ... "<<std::endl;
   mailer.add_recipient("fpy@mbari.org");

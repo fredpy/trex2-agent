@@ -19,10 +19,10 @@ namespace mbari {
 		Poco::UInt16 port = Poco::Net::SMTPClientSession::SMTP_PORT);
       ~SbdMailer();
 
-      void login();
-      void login(LoginMethod method, std::string const &user_name, 
-		 std::string const &password);
-      void close();
+      // void login();
+      // void login(LoginMethod method, std::string const &user_name, 
+      // std::string const &password);
+      // void close();
 
       std::string const &sender() const {
 	return m_sender;
@@ -42,7 +42,10 @@ namespace mbari {
       static std::string const s_iridium_address;
 
     private:
-      Poco::Net::SMTPClientSession m_server;
+      std::string  m_host;
+      Poco::UInt16 m_port;
+
+      // Poco::Net::SMTPClientSession m_server;
       std::set<std::string> m_recipients;
       std::string m_sender;
 

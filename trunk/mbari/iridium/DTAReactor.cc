@@ -56,10 +56,10 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
       syslog(info)<<"Adding "<<*i<<" to the recipients";
     }
   }
-  syslog(info)<<"SMTP connection to "<<parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host"); 
-  m_iridium.login();
-  // m_iridium.close();
-  syslog(info)<<"SMTP connection succeeded."; 
+//   syslog(info)<<"SMTP connection to "<<parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host"); 
+//   m_iridium.login();
+//   m_iridium.close();
+//   syslog(info)<<"SMTP connection succeeded."; 
 }
 
 DTAReactor::~DTAReactor() {}
@@ -155,12 +155,19 @@ void DTAReactor::handleRequest(goal_id const &g) {
       postObservation(*g);
       postObservation(Observation(STATE_TL, "Wait"));
     }
-  } else if( g->object()==IRIDIUM_TL && !m_use_iridium ) {
-    if( g->predicate()=="Active" ) {
-      m_use_iridium =true;
-      m_iridium.add_recipient(SbdMailer::s_iridium_address);
-      syslog(info)<<"Adding iridium to the recipients";
-      postObservation(*g);
+  } else if( g->object()==IRIDIUM_TL ) {
+    if( g->predicate()=="Ping" ) {
+      std::ostringstream msg;
+      msg<<*g;
+      std::string str = msg.str();
+      m_iridium.send(m_imei, str.c_str(), str.length(), "Ping");
+    } if( !m_use_iridium ) {
+      if( g->predicate()=="Active" ) {
+	m_use_iridium =true;
+	m_iridium.add_recipient(SbdMailer::s_iridium_address);
+	syslog(info)<<"Adding iridium to the recipients";
+	postObservation(*g);
+      }
     }
   }
 }
