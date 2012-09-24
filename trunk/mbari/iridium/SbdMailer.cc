@@ -90,6 +90,7 @@ void SbdMailer::send(std::string imei, char const *data, size_t size,
   msg.addAttachment(fname, attachment);
   m_server.login();
   m_server.sendMessage(msg);
+  m_server.close();
 }
 
 
