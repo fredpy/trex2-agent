@@ -70,3 +70,7 @@ MessageHandler::duration_type MessageHandler::tickDuration() const {
   return m_tracker.tickDuration();
 }
 
+TREX::utils::internals::LogEntry 
+MessageHandler::syslog(TREX::utils::Symbol const &kind) {
+   return m_tracker.syslog(route(), kind);
+}
