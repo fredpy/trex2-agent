@@ -139,14 +139,15 @@ bool DrifterTracker::synchronize() {
 
   while( !m_messages.empty() ) {
     boost::shared_ptr<amqp::queue::message> msg = m_messages.pop();
-    syslog(info)<<"New message["<<msg->key()<<"]: "<<msg->size()
-		<<" bytes from \""
-		<<msg->exchange()<<"\"";
+    // syslog(info)<<"New message["<<msg->key()<<"]: "<<msg->size()
+    // 		<<" bytes from \""
+    // 		<<msg->exchange()<<"\"";
 
     boost::tie(from, to) = m_message_handlers.equal_range(msg->exchange());
     for( ; to!=from; ++from) {
-      if( from->second->handleMessage(*msg) )
-	syslog("amqp", null)<<"AMQP message "<<msg->key()<<" handled.";
+      if( from->second->handleMessage(*msg) ) {
+	// syslog("amqp", null)<<"AMQP message "<<msg->key()<<" handled.";
+      }
     }
   }
 

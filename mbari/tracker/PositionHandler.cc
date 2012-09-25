@@ -37,6 +37,8 @@
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 #include "platformMessage.pb.h"
 
 using namespace mbari;
@@ -83,6 +85,9 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
       double north, east;
       
       geo_to_utm(lat, lon, north, east);
+
+      syslog(info)<<"New position update from "<<asset<<" ("<<lat<<", "<<lon<<")"
+		  <<" at "<<secs;
 
       boost::tie(pos, inserted) = m_assets.insert(asset_map::value_type(asset, base));
       pos->second.second.update(secs, north, east);

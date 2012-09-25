@@ -34,6 +34,8 @@
 #include "DoradoHandler.hh"
 #include "sensor.pb.h"
 
+#include <trex/utils/chrono_helper.hh>
+
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/BooleanDomain.hh>
@@ -116,6 +118,7 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
         
         if( m_obs_fresh && m_since>date )
           continue; // ignore old observations
+	syslog(info)<<"Creating new observation "<<pred.object()<<"."<<pred.predicate();
         m_last_obs = Observation(pred.object(), pred.predicate());
         m_obs_fresh = true;
         m_since = date;
@@ -132,6 +135,10 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
               lo = dom.min_v();
             if( dom.has_max_v() )
               hi = dom.max_v();
+	    if( lo>hi ) {
+	      syslog(warn)<<" domain ["<<lo<<", "<<hi<<"] is empty ignoing attribute "<<name;
+	      continue;
+	    }
             m_last_obs.restrictAttribute(name, FloatDomain(lo, hi));
           } else if( var.has_bool_d() ) {
             m_last_obs.restrictAttribute(name, BooleanDomain(var.bool_d()));
@@ -167,16 +174,19 @@ bool DoradoHandler::synchronize() {
     obs.restrictAttribute("freshness", 
                          IntegerDomain(std::floor(delta_t+0.5)));    
     obs.restrictAttribute("nsamples", IntegerDomain(m_serie.size()));
+
+    TREX::utils::display(syslog(info)<<"New trex samples freshness is ", delta)
+      <<"\n\total samples "<<m_serie.size();
     notify(obs);
     m_updated = false;
   }
     
   if( m_obs_fresh ) {
-    duration_type delta = cvt::to_chrono(tickToTime(now())-m_since);
-    delta_t = delta.count();
-    delta_t /= tickDuration().count();
-    // indicate how aold this observation is in term of ticks
-    m_last_obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
+    // duration_type delta = cvt::to_chrono(tickToTime(now())-m_since);
+    // delta_t = delta.count();
+    // delta_t /= tickDuration().count();
+    // // indicate how aold this observation is in term of ticks
+    // m_last_obs.restrictAttribute("freshness", IntegerDomain(std::floor(delta_t+0.5)));
     notify(m_last_obs);
     m_obs_fresh = false;
   }
