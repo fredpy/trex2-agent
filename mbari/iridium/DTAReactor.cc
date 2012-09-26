@@ -74,6 +74,7 @@ bool DTAReactor::synchronize() {
 	m_speed.first = 0.0;
 	m_speed.second = 0.0;
       }
+      trex_goal.precision(8);
       trex_goal<<"<Goal on=\""<<TREX_TL<<"\" predicate=\"DrifterFollow.Survey\">\n"
 	       <<"  <Assert name=\"centerLat\"><value type=\"LATITUDE\" name=\""<<m_pos.first<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"centerLon\"><value type=\"LONGITUDE\" name=\""<<m_pos.second<<"\" /></Assert>\n"
@@ -83,6 +84,7 @@ bool DTAReactor::synchronize() {
 	       <<"  <Assert name=\"speedNorth\"><value type=\"float\" name=\""<<m_speed.first<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"speedEast\"><value type=\"float\" name=\""<<m_speed.second<<"\" /></Assert>\n"
 	       <<"</Goal>";
+      info.precision(8);
       if( m_lagrangian )
         info<<"Lagrangian ";
       else
