@@ -67,7 +67,8 @@ namespace TREX {
        * The XML structure is as follow:
        * @code 
        * <DoradoReactor name="<name>" log="<bool>" vcs_host="<address>" 
-       *                vcs_port="<port>" port="<port>" config="<file>" >
+       *                vcs_port="<port>" port="<port>" imitial_plan="<file>"
+      *                 config="<file>" >
        *   <Timeline name="<name>" sequential="<bool>" alias="<name>" />
        *   ...
        * </DoradoReactor>
@@ -79,6 +80,8 @@ namespace TREX {
        * @li @p vcs_port is the TCP port number vcsServer is listening (default is 8004)
        * @li @p port is the UDP post number this reactor listens for state updates 
        *    (default is 8002)
+       * @li @p initial_plan The initial stack of behaviors to send to the vcs (default is
+       *     auv_init.cfg)
        * @li @p config is an optional poitner to another config file that will help 
        *   populate this node. For example where all the timelines and port are specified.
        *
