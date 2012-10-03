@@ -58,9 +58,7 @@ namespace TREX {
      * @ingroup mbari
      */
     class DoradoReactor :public transaction::TeleoReactor {
-    public:
-      using transaction::TeleoReactor::xml_arg_type;
-      
+    public:      
       /** @brief Constructor 
        *
        * @param[in] arg A xml node defintion
@@ -94,7 +92,7 @@ namespace TREX {
        * @note This reactor does not havw latency or lookahead parameters. 
        * Indeed they are hard-coded  as repectively 0 and 1.
        */
-      DoradoReactor(xml_arg_type &arg);
+      DoradoReactor(transaction::TeleoReactor::xml_arg_type arg);
       ~DoradoReactor();
       
     private:

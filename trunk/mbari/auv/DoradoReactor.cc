@@ -46,6 +46,10 @@ using namespace TREX::mbari;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+namespace {
+  TeleoReactor::xml_factory::declare<DoradoReactor> decl("DoradoReactor");
+} // ::
+
 namespace ip=boost::asio::ip;
 
 /*
@@ -63,7 +67,7 @@ IntegerDomain::bound const DoradoReactor::s_temporal_uncertainty(2);
 
 // structors 
 
-DoradoReactor::DoradoReactor(DoradoReactor::xml_arg_type &arg)
+DoradoReactor::DoradoReactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
               0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")), 
 m_sp_socket(DoradoReactor::s_io_service),
