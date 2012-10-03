@@ -88,9 +88,11 @@ if(WITH_DORADO)
     # source
     StatePacket_xdr.c
     DoradoReactor.cc
+    DownlinkReactor.cc
     # headers 
     StatePacket.h
-    DoradoReactor.hh)
+    DoradoReactor.hh
+    DownlinkReactor.hh)
 
   target_link_libraries(MBARIdorado TREXtransaction)
   add_dependencies(mbari MBARIdorado)
