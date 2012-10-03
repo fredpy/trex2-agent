@@ -61,6 +61,39 @@ namespace TREX {
     public:
       using transaction::TeleoReactor::xml_arg_type;
       
+      /** @brief Constructor 
+       *
+       * @param[in] arg A xml node defintion
+       *
+       * Create a new instance based on the XML definition provided by @p arg
+       * The XML structure is as follow:
+       * @code 
+       * <DoradoReactor name="<name>" log="<bool>" vcs_host="<address>" 
+       *                vcs_port="<port>" port="<port>" config="<file>" >
+       *   <Timeline name="<name>" sequential="<bool>" alias="<name>" />
+       *   ...
+       * </DoradoReactor>
+       * @endcode
+       * Where
+       * @li @p name is the name of the reactor
+       * @li @p log indicates if the reactor logs its transaction (default is true)
+       * @li @p vcs_host is the host address where vcsServer is running
+       * @li @p vcs_port is the TCP port number vcsServer is listening (default is 8004)
+       * @li @p port is the UDP post number this reactor listens for state updates 
+       *    (default is 8002)
+       * @li @p config is an optional poitner to another config file that will help 
+       *   populate this node. For example where all the timelines and port are specified.
+       *
+       * The timeline sub-tags indicates the behaviors provided by this reactor. Each 
+       * of them have the following attributes
+       * @li name The name of the timeline
+       * @li sequential an optional flag to indicate that the corresponding behavior 
+       *     is sequential or not (default is true)
+       * @li alias real name of the behavior for vcs (default is the same value as @p name)
+       *
+       * @note This reactor does not havw latency or lookahead parameters. 
+       * Indeed they are hard-coded  as repectively 0 and 1.
+       */
       DoradoReactor(xml_arg_type &arg);
       ~DoradoReactor();
       
