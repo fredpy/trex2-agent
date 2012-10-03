@@ -71,7 +71,8 @@ m_vcs_server(ip::address_v4::from_string(parse_attr<std::string>(xml_factory::no
                                                                  "remoteName")), 
              parse_attr<unsigned short>(xml_factory::node(arg), "remotePort")),
 m_vcs_socket(DoradoReactor::s_io_service), 
-m_sp_buff(NULL), m_xdr_buff_size(sizeof(uint16_t)+2*sizeof(StatePacket)) {
+m_sp_buff(NULL), m_xdr_buff_size(sizeof(uint16_t)+2*sizeof(StatePacket)),
+m_behavior_count(0), m_sequential_count(0), m_sequential_execute(true) {
   
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
@@ -365,7 +366,7 @@ void DoradoReactor::send_request(transaction::goal_id const &g) {
     duration_type dur = time_out.value()*tickDuration();
     
     oss<<"duration="
-       <<boost::chrono::duration_cast<boost::chrono::seconds>(dur).count()<<"; ";
+       <<boost::chrono::duration_cast<boost::chrono::seconds>(dur)<<"; ";
   } else
     syslog(warn)<<"Goal "<<g<<" has no maximum duration.";
   
@@ -478,6 +479,7 @@ void DoradoReactor::get_behavior() {
       m_behavior_count = std::max(1ul, m_behavior_count)-1;
       if( m_behaviors[i->second.first->object()].first ) {
         m_sequential_count = std::max(1ul, m_sequential_count)-1;
+        m_sequential_execute = (0==m_sequential_count);
         process_pendings();
       }
       m_sent_cmd.erase(i);
@@ -485,6 +487,10 @@ void DoradoReactor::get_behavior() {
       if( !i->second.second ) {
         syslog(info)<<i->second.first->object()<<"[id="<<behavior_id<<"] STARTED.";
         queue_obs(*(i->second.first));
+        if( m_behaviors[i->second.first->object()].first ) {
+          m_sequential_execute = (1==m_sequential_count);
+          process_pendings();
+        }
         i->second.second = true;
       } else {
         syslog(warn)<<"Ignoring multiple starts for behavior "<<behavior_id;
@@ -537,12 +543,13 @@ void DoradoReactor::queue_obs(Observation const &obs) {
 }
 
 void DoradoReactor::process_pendings() {
-  if( 0==m_sequential_count ) {
+  if( m_sequential_execute || 0==m_sequential_count ) {
     if( !m_pending.empty() ) {
       goal_id next(m_pending.front());
       m_pending.pop_front();
       // TODO: Check if this goal is executable (ie can be started on next tick) 
       m_sequential_count += 1;
+      m_sequential_execute = false;
       send_request(next);
     }
   }
