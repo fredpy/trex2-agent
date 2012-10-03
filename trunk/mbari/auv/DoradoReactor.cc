@@ -111,7 +111,8 @@ m_behavior_count(0), m_sequential_count(0), m_sequential_execute(true) {
   
   bool found;
   
-  m_init_plan = manager().use(parse_attr<std::string>(node, "initial_plan"), found);
+  m_init_plan = manager().use(parse_attr<std::string>("auv_init.cfg", 
+                                                      node, "initial_plan"), found);
   if( !found )
     throw XmlError(node, 
                    "Unable to locate initial vcs plan file \""+m_init_plan.string()+"\"");
