@@ -44,6 +44,8 @@ if(WITH_MBARI)
   add_subdirectory(iridium)
   add_subdirectory(europa)
 
+  add_subdirectory(auv)
+
   #set(POCO_HINT "" CACHE FILEPATH "Hint to find Poco libraries")
   #find_library(POCO_NET_LIBRARIES
   #  NAMES PocoNet 
