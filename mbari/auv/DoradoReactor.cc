@@ -64,17 +64,17 @@ IntegerDomain::bound const DoradoReactor::s_temporal_uncertainty(2);
 // structors 
 
 DoradoReactor::DoradoReactor(DoradoReactor::xml_arg_type &arg)
-:TeleoReactor(arg, false), 
+:TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
+              0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")), 
 m_sp_socket(DoradoReactor::s_io_service),
 m_sp_timer(DoradoReactor::s_io_service),
-m_vcs_server(ip::address_v4::from_string(parse_attr<std::string>(xml_factory::node(arg), 
-                                                                 "remoteName")), 
-             parse_attr<unsigned short>(xml_factory::node(arg), "remotePort")),
 m_vcs_socket(DoradoReactor::s_io_service), 
 m_sp_buff(NULL), m_xdr_buff_size(sizeof(uint16_t)+2*sizeof(StatePacket)),
 m_behavior_count(0), m_sequential_count(0), m_sequential_execute(true) {
   
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
+  // Populate node with external XML config
+  TREX::utils::ext_xml(node.second, "config");
 
   m_vcs_server.address(ip::address_v4::from_string(parse_attr<std::string>(node, "vcs_host")));
   m_vcs_server.port(parse_attr<unsigned short>(8004, node, "vcs_port"));
@@ -89,7 +89,7 @@ m_behavior_count(0), m_sequential_count(0), m_sequential_execute(true) {
         throw XmlError(*i, "Timeline cannot have an empty name");
       provide(name);
       boost::optional<Symbol> alias =parse_attr< boost::optional<Symbol> >(*i, "alias");
-      bool sequential = parse_attr<bool>(false, *i, "sequential");
+      bool sequential = parse_attr<bool>(true, *i, "sequential");
       if( alias ) {
         syslog(info)<<"Timeline "<<name<<" aliased to command "<<alias;
         m_behaviors[name] = std::make_pair(sequential, *alias);
