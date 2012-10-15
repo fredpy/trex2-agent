@@ -43,14 +43,20 @@ if(WITH_WITREAPP)
 
     add_executable(witre 
       # source 
-      WitreMain.cc
-      WitreApp.cc
-      WitreServer.cc
+      LogProxy.cc
       TREXLogWidget.cc
+      WitreApp.cc
+      WitreMain.cc
+      WitreReactor.cc
+      WitreServer.cc
+      Popup.cc
       # headers
-      WitreServer.hh
-      WitreApp.hh
+      LogProxy.hh
       TREXLogWidget.hh
+      WitreApp.hh
+      WitreReactor.hh
+      WitreServer.hh
+      Popup.hh
     )
     target_link_libraries(witre
       ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} 
@@ -58,6 +64,7 @@ if(WITH_WITREAPP)
       ${Boost_THREAD_LIBRARY} ${Boost_SIGNALS_LIBRARY}
       TREXagent)
     trex_cmd(witre)
+    trex_cfg(cfg ${TREX_SHARED})
   else(Wt_FOUND)
     message(WARNING "Unable to find Wt. Disabling witre application")
     set(WITH_WITREAPP OFF CACHE BOOL "Disabled due to the lack of Wt" FORCE)

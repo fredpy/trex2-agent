@@ -31,36 +31,38 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "WitreApp.hh"
+#ifndef H_TREX_witre_popup
+# define H_TREX_witre_popup
 
-#include <trex/utils/TREXversion.hh>
+# include <Wt/WContainerWidget>
+# include <Wt/WText>
 
+namespace TREX {
+  namespace witre {
+    
+    class Popup : public Wt::WContainerWidget {
+    public:
+      Popup(Wt::WWidget *content, std::string const &id);
+      ~Popup() {}
 
-using namespace TREX::witre;
-
-Wt::WApplication *createApplication(Wt::WEnvironment const &env, 
-                                    WitreServer &serv) {
-  return new WitreApp(env, serv);
-}
-
-int main(int argc, char **argv) {
-  Wt::WServer server(argv[0]);
-  WitreServer witre(server);
-  
-  server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-  
-  server.addEntryPoint(Wt::Application, 
-                       boost::bind(createApplication, _1, 
-                                   boost::ref(witre)), "/");
-  
-  std::cout<<"TREX witre v"<<TREX::version::str()<<std::endl;
-  
-  if( server.start() ) {
-    int sig = Wt::WServer::waitForShutdown();
-    std::cerr << "Shutting down witre server: (signal="<<sig<<')'<<std::endl;
-    server.stop();
-  }
-  return 0;
-}
+      void setName(Wt::WString const &name);
+    private:
+      Wt::WString m_name;
+      Wt::WText *m_title;
+      Wt::WWidget *m_bar;
+      Wt::WWidget *m_content;
+      
+      bool m_minimized;
+      
+      void toggleSize();
+      
+      bool minimized() const {
+	return m_minimized;
+      }
+    }; // TREX::witre::Popup
 
 
+  } // TREX::witre
+} // TREX
+
+#endif // H_TREX_witre_popup

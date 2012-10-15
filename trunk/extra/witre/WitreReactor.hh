@@ -31,36 +31,57 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "WitreApp.hh"
+#ifndef H_TREX_witre_reactor 
+# define H_TREX_witre_reactor 
 
-#include <trex/utils/TREXversion.hh>
-
-
-using namespace TREX::witre;
-
-Wt::WApplication *createApplication(Wt::WEnvironment const &env, 
-                                    WitreServer &serv) {
-  return new WitreApp(env, serv);
-}
-
-int main(int argc, char **argv) {
-  Wt::WServer server(argv[0]);
-  WitreServer witre(server);
-  
-  server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-  
-  server.addEntryPoint(Wt::Application, 
-                       boost::bind(createApplication, _1, 
-                                   boost::ref(witre)), "/");
-  
-  std::cout<<"TREX witre v"<<TREX::version::str()<<std::endl;
-  
-  if( server.start() ) {
-    int sig = Wt::WServer::waitForShutdown();
-    std::cerr << "Shutting down witre server: (signal="<<sig<<')'<<std::endl;
-    server.stop();
-  }
-  return 0;
-}
+#include <trex/agent/Agent.hh>
+#include <Wt/WObject>
 
 
+namespace TREX {
+  namespace witre {
+        
+//    class WitreReactor :public agent::Agent::AgentProxy,
+//    public transaction::graph::timelines_listener,
+//    public Wt::WObject {
+//    public:
+//      WitreReactor(agent::Agent &a);
+//      ~WitreReactor();
+//      
+//      Wt::Signal<TREX::transaction::> newTick();
+//      
+//    private:
+//      Wt::Signal<transaction::TICK>
+//      
+//    }; 
+//    
+//    
+//
+//    class WitreReactor :public agent::Agent::AgentProxy, 
+//    public transaction::graph::timelines_listener {
+//    public:
+//      WitreReactor(Server &server, agent::Agent &a);
+//      ~WitreReactor();
+//      
+//    private:
+//      void handleInit();
+//      void handleTickStart();
+//      void notify(transaction::Observation const &obs);
+//      bool synchronize();
+//      
+//      void newPlanToken(transaction::goal_id const &t);
+//      void cancelledPlanToken(transaction::goal_id const &t);
+//      
+//      void declared(transaction::details::timeline const &tl);
+//      void undeclared(transaction::details::timeline const &tl);
+//      void connected(transaction::Relation const &r);
+//      void disconnected(transaction::Relation const &r);
+//      
+//      std::set<utils::Symbol> m_timelines;
+//      Server &m_server;
+//    }; // TREX::witre::WitreReactor
+
+  } // TREX::witre
+} // TREX
+
+#endif // H_TREX_witre_reactor

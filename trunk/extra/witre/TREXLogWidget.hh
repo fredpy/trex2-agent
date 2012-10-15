@@ -36,25 +36,43 @@
 
 # include "WitreServer.hh"
 
-# include <Wt/WPanel>
-# include <Wt/WTableView>
+# include <Wt/WContainerWidget>
+# include <Wt/WPopupMenu>
+# include <Wt/WText>
+// # include <Wt/WCssStyleSheet>
 
 namespace TREX {
   namespace witre {
     
-    class TREXLogWidget :public Wt::WPanel {
+    class TREXLogWidget :public Wt::WContainerWidget {
     public:
-      TREXLogWidget(Server &server, Wt::WContainerWidget *parent =0);
+      TREXLogWidget(WitreServer &server, 
+                    Wt::WContainerWidget *parent =0);
       virtual ~TREXLogWidget();
       
-      void updated();
+      void new_msg(std::string type, boost::optional<long long> date,
+                   std::string src, std::string content);
+      
     private:
-      Server                            &m_server;
-      Wt::WTableView                    *m_table;
-      Wt::Dbo::QueryModel<Server::entry_fields> *m_req;
+      void show_hide(Wt::WPopupMenuItem *item);
+      
+      class Entry :public Wt::WText {
+      public:
+        Entry(boost::optional<long long> date, 
+              std::string src, std::string content,
+              TREXLogWidget *parent = NULL);
+        ~Entry() {}
+      };
+      
+      void add_msg(std::string type, boost::optional<long long> date,
+                   std::string src, std::string content);
+      
+      
+      std::map<std::string, Wt::WCssTemplateRule *> m_types;
+      Wt::WPopupMenu m_type_select;
     }; // TREX::witre::TREXLogWidget
+     
     
- 
     
   } // TREX::witre
 } // TREX

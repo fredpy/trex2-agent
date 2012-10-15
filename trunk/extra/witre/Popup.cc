@@ -31,36 +31,58 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "WitreApp.hh"
-
-#include <trex/utils/TREXversion.hh>
-
+#include "Popup.hh"
 
 using namespace TREX::witre;
 
-Wt::WApplication *createApplication(Wt::WEnvironment const &env, 
-                                    WitreServer &serv) {
-  return new WitreApp(env, serv);
+/*
+ * class TREX::witre::Popup
+ */
+
+// structors 
+
+Popup::Popup(Wt::WWidget *content, std::string const &id) {
+  setId(id);
+  implementJavaScript(&Popup::toggleSize,
+		      "{"
+		      """var s = $('#"+ id +"');"
+		      """s.toggleClass('popup-maximized popup-minimized');"
+		      "}");
+  m_minimized = true;
+  setStyleClass("witre-popup popup-minimized");
+  clear();
+  
+  
+  Wt::WContainerWidget *bar = new Wt::WContainerWidget;
+  
+  bar->setStyleClass("popup-title");
+  
+  Wt::WText *toggle = new Wt::WText("+");
+  toggle->setInline(false);
+  toggle->setStyleClass("popup-minmax");
+  
+  bar->clicked().connect(this, &Popup::toggleSize); 
+  bar->addWidget(toggle);
+  
+  m_title = new Wt::WText(bar);
+  m_bar = bar;
+  addWidget(m_bar);
+
+  m_content = content;
+  // m_content->setHidden(true);
+  addWidget(content);
 }
 
-int main(int argc, char **argv) {
-  Wt::WServer server(argv[0]);
-  WitreServer witre(server);
-  
-  server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-  
-  server.addEntryPoint(Wt::Application, 
-                       boost::bind(createApplication, _1, 
-                                   boost::ref(witre)), "/");
-  
-  std::cout<<"TREX witre v"<<TREX::version::str()<<std::endl;
-  
-  if( server.start() ) {
-    int sig = Wt::WServer::waitForShutdown();
-    std::cerr << "Shutting down witre server: (signal="<<sig<<')'<<std::endl;
-    server.stop();
-  }
-  return 0;
+// modifiers
+
+void Popup::setName(Wt::WString const &name) {
+  if( !name.empty() )
+    m_name = name;
 }
 
+
+void Popup::toggleSize() {
+  m_minimized = !m_minimized;
+  // m_content->setHidden(m_minimized);
+}
 
