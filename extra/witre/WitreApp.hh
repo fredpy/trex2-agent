@@ -35,45 +35,34 @@
 # define H_TREX_witre_WitreApp
 
 # include "TREXLogWidget.hh"
-# include "WitreServer.hh"
 
 # include <Wt/WApplication>
-# include <Wt/WPopupMenu>
+# include <Wt/WDialog>
 
 namespace TREX {
   namespace witre {
-
+    
     class WitreApp :public Wt::WApplication {
     public:
-      WitreApp(Wt::WEnvironment const &env, Server &server);
+      WitreApp(Wt::WEnvironment const &env, WitreServer &server);
       ~WitreApp();
       
-      void agent_updated();
-      void log_updated();
-      
     private:
-      void about();
-      void updateAgentState();
+      void setup();
+      void createHome();
       
-      void start_agent();
-      void stop_agent();
       
-      void ping();
-      
-      void process_updates();
-      
-      Server &m_server;
-      TREXLogWidget      *m_log;
-      Wt::WPopupMenu     m_menu;
-      Wt::WPopupMenuItem *m_start;
-      Wt::WPopupMenuItem *m_stop;
-      
-      Wt::WTimer *m_refresh;
-      
-      bool   m_agent_updated;
-      size_t m_log_count;
-    }; // TREX::witre::WitreApp
+      Wt::WString tr(char const *key) {
+        return Wt::WString::tr(key);
+      }
 
+      void about();
+      
+      Wt::WWidget *m_home;
+
+      utils::SingletonUse<utils::LogManager> m_log;
+    }; // TREX::witre::WitreApp
+  
   }
 }
 

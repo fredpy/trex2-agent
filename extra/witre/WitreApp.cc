@@ -32,130 +32,92 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "WitreApp.hh"
+#include "Popup.hh"
 
 #include <trex/utils/TREXversion.hh>
 
-#include <Wt/WMessageBox>
-#include <Wt/WText>
+#include <Wt/WVBoxLayout>
+#include <Wt/WFileResource>
 #include <Wt/WEnvironment>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
-#include <Wt/WTimer>
-
-#include <boost/scope_exit.hpp>
+#include <Wt/WTemplate>
+#include <Wt/WMenu>
+#include <Wt/WSubMenuItem>
+#include <Wt/WMessageBox>
 
 using namespace TREX::witre;
 
 /*
  * class TREX::witre::WitreApp
  */
-WitreApp::WitreApp(Wt::WEnvironment const &env, Server &server) 
-:Wt::WApplication(env), m_server(server), m_agent_updated(true), 
-m_log_count(0) {  
-  // Menu
-  Wt::WText *menu_t = new Wt::WText("Menu");
-  menu_t->addStyleClass("menu");
-  root()->addWidget(menu_t);
-  menu_t->clicked().connect(&m_menu, &Wt::WPopupMenu::popup);
-  m_menu.triggered().connect(this, &WitreApp::updateAgentState);
-  
-  m_start = m_menu.addItem("Start ...", this, &WitreApp::start_agent);
-  m_stop = m_menu.addItem("Stop", this, &WitreApp::stop_agent);
-  m_menu.addItem("Ping", this, &WitreApp::ping);
-  updateAgentState();
-  
-  m_menu.addSeparator();
-  m_menu.addItem("About ...", this, &WitreApp::about);
 
-  m_log = new TREXLogWidget(m_server, root());
-  m_server.connect(this);
-  
-  m_refresh = new Wt::WTimer(this);
-  m_refresh->setInterval(1000); // refresh every 1s
-  m_refresh->timeout().connect(this, &WitreApp::process_updates);
-  m_refresh->start();
+// structors
+
+WitreApp::WitreApp(Wt::WEnvironment const &env, WitreServer &server) 
+:Wt::WApplication(env), m_home(NULL) {
+  setTitle("T-REX");
+  boost::filesystem::path file = server.locales("witre_loc.xml");
+
+  if( file.empty() ) {
+    m_log->syslog("witre", TREX::utils::error)<<"Unable to find locale files";
+  } else {
+    messageResourceBundle().use(file.string());
+  }
+                              
+  m_log->syslog("witre")<<"New session from "<<env.userAgent();
+  setup();
 }
 
 WitreApp::~WitreApp() {
-  if( m_refresh->isActive() )
-    m_refresh->stop();
-  m_server.disconnect(this);
 }
 
-void WitreApp::process_updates() {
-  if( m_agent_updated )
-    updateAgentState();
-  if( m_log_count>0 ) {
-    m_log_count = 0;
-    m_log->updated();
+// modifiers 
+
+
+void WitreApp::setup() {
+  if( NULL==m_home ) {
+    createHome();
   }
 }
 
-void WitreApp::start_agent() {
-  if( m_server.reserve() ) {
-    WitreApp &me = *this;
-    BOOST_SCOPE_EXIT((&me)) {
-      me.m_server.reserve(false);
-      me.updateAgentState();
-    } BOOST_SCOPE_EXIT_END;
-    Wt::WDialog ask_name("Create Agent");
-    new Wt::WText("Enter agent name: ", ask_name.contents());
-    Wt::WLineEdit name(ask_name.contents());
-    new Wt::WBreak(ask_name.contents());
-    
-    Wt::WPushButton ok("OK", ask_name.contents());
-    
-    name.enterPressed().connect(&ask_name, &Wt::WDialog::accept);
-    ok.clicked().connect(&ask_name, &Wt::WDialog::accept);
-    
-    if( ask_name.exec()==Wt::WDialog::Accepted ) {
-      // Do something
-      std::string agent_name = name.text().toUTF8();
-      try {
-        m_server.create_agent(agent_name);
-      } catch(std::exception const &e) {
-        Wt::WMessageBox::show("Error", e.what(), Wt::Cancel);
-      }
-    }
-  } else 
-    updateAgentState();
+void WitreApp::createHome() {
+  Wt::WTemplate *view = new Wt::WTemplate(root()); 
+  m_home = view;
+  // setLocale("fr");
+  view->addFunction("tr", &Wt::WTemplate::Functions::tr);
+  view->setTemplateText(tr("agent_info"));
+                        
+  Wt::WMenu *menu = new Wt::WMenu(Wt::Vertical, root());
+  menu->setRenderAsList(true);
+  Wt::WSubMenuItem *admin = new Wt::WSubMenuItem(tr("admin"), NULL); 
+  Wt::WMenu *trex_menu = new Wt::WMenu(Wt::Vertical, root());
+  trex_menu->setRenderAsList(true);
+  trex_menu->addItem(tr("new_agent"), NULL);
+  trex_menu->addItem(tr("kill_agent"), NULL);
+  
+  admin->setSubMenu(trex_menu);
+  menu->addItem(admin);
+  
+  view->bindString("count", 
+                   Wt::WString::trn("agent", menu->items().size()-1).arg((int)menu->items().size()-1));
+  view->bindWidget("agents", menu);
+  Wt::WText *about = new Wt::WText(tr("about"), root());
+  about->clicked().connect(this, &WitreApp::about);
+  view->bindWidget("about", about);
 }
-
-void WitreApp::stop_agent() {
-  if( Wt::WMessageBox::show("Stop", "Do you really want to stop the agent ?",
-                            Wt::Ok|Wt::Cancel)==Wt::Ok ) {
-    // Need to do something
-    m_server.info()<<"Agent termination requested by witre user.";
-  }
-}
-
-void WitreApp::log_updated() {
-  ++m_log_count;
-}
-
-
-void WitreApp::agent_updated() {
-  m_agent_updated = true; 
-}
-
-
-void WitreApp::ping() {
-  m_server.info()<<"Ping from "<<environment().userAgent();
-}
-
-
-void WitreApp::updateAgentState() {
-  if( m_agent_updated ) {
-    setTitle("T-REX - "+m_server.name());
-    m_start->setDisabled(m_server.reserved());
-    m_stop->setDisabled(m_server.completed());
-    m_agent_updated = false;
-  }
-}
-
 
 void WitreApp::about() {
-  Wt::WMessageBox::show("About", "This is witre for T-REX "+TREX::version::str(),
-                        Wt::Ok);
+  Wt::WTemplate about;
+  about.setTemplateText(tr("about_text"));
+  about.bindString("trex_version", TREX::version::str());
+  std::ostringstream oss;
+  about.htmlText(oss);
+  
+  m_log->syslog("witre")<<oss.str();
+  Wt::WMessageBox::show(tr("about"), oss.str(), Wt::Ok);
 }
+
+
+
+
+
 

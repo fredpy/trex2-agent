@@ -31,36 +31,76 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "WitreApp.hh"
-
-#include <trex/utils/TREXversion.hh>
-
+#include "WitreReactor.hh"
 
 using namespace TREX::witre;
+using namespace TREX::agent;
+using namespace TREX::transaction;
 
-Wt::WApplication *createApplication(Wt::WEnvironment const &env, 
-                                    WitreServer &serv) {
-  return new WitreApp(env, serv);
-}
+/*
+ * class TREX::witre::WitreReactor
+ */
 
-int main(int argc, char **argv) {
-  Wt::WServer server(argv[0]);
-  WitreServer witre(server);
-  
-  server.setServerConfiguration(argc, argv, WTHTTP_CONFIGURATION);
-  
-  server.addEntryPoint(Wt::Application, 
-                       boost::bind(createApplication, _1, 
-                                   boost::ref(witre)), "/");
-  
-  std::cout<<"TREX witre v"<<TREX::version::str()<<std::endl;
-  
-  if( server.start() ) {
-    int sig = Wt::WServer::waitForShutdown();
-    std::cerr << "Shutting down witre server: (signal="<<sig<<')'<<std::endl;
-    server.stop();
-  }
-  return 0;
-}
+// structors 
 
-
+//WitreReactor::WitreReactor(Server &server, Agent &a)
+//:Agent::AgentProxy(a), graph::timelines_listener(a), m_server(server) {
+//}
+//
+//WitreReactor::~WitreReactor() {
+//}
+//
+//// TREX execution callbacks 
+//
+//void WitreReactor::handleInit() {
+//  graph::timelines_listener::initialize();
+//}
+//
+//void WitreReactor::handleTickStart() {
+//  
+//}
+//
+//void WitreReactor::notify(Observation const &obs) {
+//  
+//}
+//
+//bool WitreReactor::synchronize() {
+//  return true;
+//}
+//
+//void WitreReactor::newPlanToken(goal_id const &t) {
+//  
+//}
+//
+//void WitreReactor::cancelledPlanToken(goal_id const &t) {
+//  
+//}
+//
+//// TREX timelines callbacks
+//
+//void WitreReactor::declared(details::timeline const &tl) {
+//  if( !isExternal(tl.name()) ) {
+//    use(tl.name(), true, true);
+//    m_timelines.insert(tl.name());
+//    m_server.new_timeline(getAgentName(), tl.name());
+//  }
+//}
+//
+//void WitreReactor::undeclared(details::timeline const &tl) {
+//  m_server.graph_updated(getAgentName());  
+//}
+//
+//void WitreReactor::connected(Relation const &r) {
+//  if( this!=&(r.client()) ) {
+//    m_server.graph_updated(getAgentName());    
+//  }
+//}
+//
+//void WitreReactor::disconnected(Relation const &r) {
+//  if( this!=&(r.client()) ) {
+//    m_server.graph_updated(getAgentName());    
+//  }  
+//}
+//
+//
+//

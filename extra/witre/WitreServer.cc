@@ -31,225 +31,135 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "WitreApp.hh"
-
-#include <trex/agent/RealTimeClock.hh>
+#include "WitreServer.hh"
 
 using namespace TREX::witre;
-
-namespace {
-  
-  typedef long long tick_type;
-  
-  class Msg;
-  
-  class MsgType {
-  public:
-    std::string identifier;
-    Wt::Dbo::collection< Wt::Dbo::ptr<Msg> > messages;
-    
-    template<class Action>
-    void persist(Action &a) {
-      Wt::Dbo::field(a, identifier, "name");
-      Wt::Dbo::hasMany(a, messages, Wt::Dbo::ManyToOne, "type");
-    }
-    
-  };
-  
-  class Source {
-  public:
-    std::string name;
-    Wt::Dbo::collection< Wt::Dbo::ptr<Msg> > messages;
-    
-    template<class Action>
-    void persist(Action &a) {
-      Wt::Dbo::field(a, name, "name");
-      Wt::Dbo::hasMany(a, messages, Wt::Dbo::ManyToOne, "source");
-    }
-  };
-  
-  class Msg {
-  public:
-    // Wyt::Dbo does not like unsigneds ...
-    boost::optional<tick_type> date;
-    Wt::Dbo::ptr<Source> source;
-    Wt::Dbo::ptr<MsgType> type;
-    std::string content; 
-    
-    template<class Action>
-    void persist(Action &a) {
-      Wt::Dbo::field(a, date, "tick");
-      Wt::Dbo::belongsTo(a, source, "source");
-      Wt::Dbo::belongsTo(a, type, "type");
-      Wt::Dbo::field(a, content, "content");
-    }
-  };
-  
-  
-}
+using namespace TREX::utils;
 
 /*
- * class TREX::witre::Server
+ * class TREX::witre::WitreServer
  */
 
-// structors 
+// structors
 
-Server::Server(Wt::WServer &server)
-:m_server(server), m_log_db(":memory:"), m_reserved(false), m_stop(false) {
-  // for debugging purpose
-  m_log_db.setProperty("show-queries", "true");
-
-  // create our session
+WitreServer::WitreServer(Wt::WServer &server)
+:m_server(server), m_log_proxy(NULL), m_log_db(":memory:") {
   init_session();
-  // ensure that log is initialized
-  m_log->add_handler(log_proxy(*this));
-  m_log->logPath();
-  
-  m_log->syslog("witre", TREX::utils::info)<<"witre server loaded.\n\tWelcome to T-REX";
+  m_log->add_handler(LogProxy(*this)); // produce signals on new log entry
+  m_log->logPath(); // initialize TREX log directory
+  m_log->syslog("witre", info)<<"Witre server created.";
+
+  // Get the cfg directory
+  m_locales = m_log->file_name("cfg");
 }
 
-Server::~Server() {
-}
-
-// observers
-
-std::string Server::name() const {
-  boost::recursive_mutex::scoped_lock lck(m_mutex);
-  if( NULL!=m_agent.get() ) {
-    return m_agent->getName().str();
-  } 
-  return "";
-}
-
-Wt::Dbo::QueryModel<Server::entry_fields> *Server::log_model() {
-  Wt::Dbo::Query<entry_fields>
-    rq = m_log_session.query<entry_fields>("select L.tick, S.name, T.name, L.content from log_msg L, log_src S, log_type T").where("L.source_id = S.id").where("L.type_id = T.id").orderBy("L.id DESC");
-  Wt::Dbo::QueryModel<entry_fields> *query = new  Wt::Dbo::QueryModel<entry_fields>;
-      
-  query->setQuery(rq);
-  query->addAllFieldsAsColumns();
-  
-  return query;
-}
-
-bool Server::reserved() const {
-  boost::recursive_mutex::scoped_lock lck(m_mutex);
-  return m_reserved || NULL!=m_agent.get();
-}
-
-bool Server::completed() const {
-  boost::recursive_mutex::scoped_lock lck(m_mutex);
-  return NULL==m_agent.get();
+WitreServer::~WitreServer() {
+  m_log->syslog("witre", warn)<<"Witre server destroyed.";
 }
 
 // modifiers
 
-void Server::init_session() {
+void WitreServer::init_session() {
+  m_log_db.setProperty("show-queries", "true");  
+  
   m_log_session.setConnection(m_log_db);
-  m_log_session.mapClass<Source>("log_src");
-  m_log_session.mapClass<MsgType>("log_type");
-  m_log_session.mapClass<Msg>("log_msg");
+  m_log_session.mapClass<dbo::Msg>("log_msg");
+  m_log_session.mapClass<dbo::MsgType>("log_type");
   m_log_session.createTables();
+  
+  
 }
 
-void Server::log_entry(boost::optional<long long> const &tick,
-                       std::string const &src, std::string const &type,
-                       std::string const &msg) {
-  /*
-   * Note: as this is a log message handler DO NOT put syslog calls in here 
-   * otherwise it would result on this handler producing an infinite amount 
-   * of messages.
-   */
-  try {
-    Wt::Dbo::ptr<Source>  src_db;
-    Wt::Dbo::ptr<MsgType> type_db;
-    {
-      Wt::Dbo::Transaction transaction(m_log_session);
-    
-      // Check or create the source 
-      src_db = m_log_session.find<Source>().where("name = ?").bind(src);
-      if( !src_db ) {
-        Source *src_v = new Source;
-        src_v->name = src;
-        src_db = m_log_session.add(src_v);
-      }
-      transaction.commit();
-    }
-  
-    {
-      Wt::Dbo::Transaction transaction(m_log_session);
+void WitreServer::reset_log(LogProxy *ref) {
+  m_log_proxy = ref; 
+}
 
-      // Check or create type
-      type_db = m_log_session.find<MsgType>().where("name = ?").bind(type);
-      if( !type_db ) {
-        MsgType *type_v = new MsgType;
-        type_v->identifier = type;
-        type_db = m_log_session.add(type_v);
+// manipulators
+
+LogProxy::log_signal &WitreServer::new_log() {
+  return m_log_proxy->new_entry();
+}
+
+boost::filesystem::path WitreServer::locales(std::string const &default_file) {
+  bool found;
+  boost::filesystem::path file = m_log->locate(default_file, found);
+  
+  if( !found ) {
+    m_log->syslog("witre", error)<<"Unable to locate \""<<default_file<<"\"";
+    // TODO throw an exception 
+    return boost::filesystem::path();
+  } else {
+    boost::filesystem::path log_dir = locale_path(default_file);
+    if( !exists(log_dir/file.filename()) ) {
+      m_log->syslog("witre", info)<<"Copying locales based on "<<default_file
+      <<" to "<<log_dir;
+      copy_file(file, log_dir/file.filename());
+      std::string loc_base = file.stem().string()+"_";
+      
+      for(boost::filesystem::directory_iterator it(file.parent_path()), endit;
+          endit!=it; ++it) {
+        boost::filesystem::path tmp = it->path();
+        if( 0==tmp.stem().string().compare(0, loc_base.length(), loc_base) &&
+           tmp.extension()==file.extension() ) {
+          m_log->syslog("witre", info)<<"\tAdding locale ["
+                    <<tmp.stem().string().substr(loc_base.length())<<"]";
+          copy_file(tmp, log_dir/tmp.filename());
+        }
       }
-      transaction.commit();
     }
-    Wt::Dbo::ptr<Msg> msg_db;
-    {
-      Wt::Dbo::Transaction transaction(m_log_session);
-      // Now I can add the new message
-      Msg *entry = new Msg;
-      entry->date = tick;
-      entry->source = src_db;
-      entry->type = type_db;
-      entry->content = msg;
-      msg_db = m_log_session.add(entry);
-    
-      transaction.commit();
-    }
-    emit(&WitreApp::log_updated);
-  } catch(Wt::Dbo::Exception const &e) {
-    std::cerr<<" >>> Dbo exception: "<<e.what()<<std::endl;
+    return log_dir/file.stem();
   }
 }
 
-bool Server::stop() const {
-  boost::recursive_mutex::scoped_lock lck(m_mutex);
-  return m_stop;
+boost::filesystem::path WitreServer::locale_path(std::string const &file) {
+  boost::filesystem::path p(file);
+  
+  if( p.has_parent_path() ) {
+    p = m_locales/p.parent_path();
+    p.make_preferred();
+    create_directories(p);
+    return p;
+  } else
+    return m_locales;
 }
 
 
-bool Server::reserve(bool flag) {
+
+// observers
+
+size_t WitreServer::log_types(std::set<std::string> &types) {
+  typedef Wt::Dbo::collection< Wt::Dbo::ptr<dbo::MsgType> > Types;
+  Types msg_types;
+  size_t ret = 0;
   {
-    boost::recursive_mutex::scoped_lock lck(m_mutex);
-    if( m_reserved==flag ) 
-      return false;
-    
-    m_reserved = flag;
-  }
-  emit(boost::bind(&WitreApp::agent_updated, _1));
-  return true;
-}
-
-void Server::create_agent(std::string const &cfg) {
-  if( cfg.empty() )
-    throw TREX::utils::Exception("Empty config file name.");
-  else {
-    if( NULL!=m_agent_thread.get() ) {
-      m_agent_thread->join();
-    }
-    
-    m_agent.reset(new agent::Agent(cfg));
-    m_agent->setClock(new agent::RealTimeClock(boost::chrono::seconds(1)));
-    
-    // Last thing to do is to spawn a new thread to run this agent
-    m_agent_thread.reset(new boost::thread(agent_runner(this)));
-  }
-}
-
-bool Server::connect(WitreApp *cli) {
-  connect_map::scoped_lock lock(m_connections);
+    Wt::Dbo::Transaction tr(m_log_session);
+    msg_types = m_log_session.find<dbo::MsgType>();
   
-  Connection tmp(Wt::WApplication::instance()->sessionId());
-  return m_connections->insert(std::make_pair(cli, tmp)).second;
+    
+    for(Types::const_iterator i=msg_types.begin(); 
+        i!=msg_types.end(); ++i) {
+      if( types.insert((*i)->identifier).second )
+        ++ret;
+    }
+    tr.commit();
+  }
+  
+  return ret;
 }
 
-void Server::disconnect(WitreApp *cli) {
-  connect_map::scoped_lock lock(m_connections);
-  m_connections->erase(cli);
+WitreServer::msg_set WitreServer::last_messages(size_t count) {
+  msg_set ret;
+  std::cerr<<">>>> Get "<<count<<" messages."<<std::endl; 
+  {
+    Wt::Dbo::Transaction tr(m_log_session);
+    Wt::Dbo::collection< Wt::Dbo::ptr<dbo::Msg> > 
+      req = m_log_session.find<dbo::Msg>().orderBy("id DESC").limit(count);
+    for(Wt::Dbo::collection< Wt::Dbo::ptr<dbo::Msg> >::const_iterator i=req.begin();
+        i!=req.end();++i) {
+      ret.push_back(msg((*i)->type->identifier, (*i)->date, (*i)->source, (*i)->content));
+    }
+    tr.commit();
+  }
+  return ret;
 }
 

@@ -33,6 +33,8 @@
  */
 #include "TREXLogWidget.hh"
 
+#include <Wt/WText>
+
 using namespace TREX::witre;
 
 /*
@@ -41,35 +43,95 @@ using namespace TREX::witre;
 
 // structors 
 
-TREXLogWidget::TREXLogWidget(Server &server, 
+TREXLogWidget::TREXLogWidget(WitreServer &server, 
                              Wt::WContainerWidget *parent)
-  :Wt::WPanel(parent), m_server(server), 
-   m_req(server.log_model()) {
-     
-  m_table = new Wt::WTableView;
-  m_table->setModel(m_req);
-  m_table->setAlternatingRowColors(true);
-  m_table->setColumnWidth(0, 50);
-  m_table->setColumnWidth(3, 500);
-  m_table->setHeight(100);
-  m_table->setWidth(Wt::WLength::Auto);
-  m_table->setSortingEnabled(false);
+:Wt::WContainerWidget(parent) {
+  std::set<std::string> types;
+  server.log_types(types);
   
-  setTitle("TREX log");
-  setCollapsible(true);
-  setCollapsed(true);
-  setCentralWidget(m_table);
-  addStyleClass("trex-log");
-  setPositionScheme(Wt::Fixed);
-  setOffsets(0, Wt::Bottom | Wt::Left | Wt::Right);
+  Wt::WCssStyleSheet &style = Wt::WApplication::instance()->styleSheet();
+  
+ 
+  // Populate the menu
+  for(std::set<std::string>::const_iterator i=types.begin();
+      types.end()!=i; ++i) {
+    Wt::WPopupMenuItem *item = m_type_select.addItem(*i);
+    item->setCheckable(true);
+    item->setChecked(true);
+    item->triggered().connect(this, &TREXLogWidget::show_hide);
+
+    m_types[*i] = style.addRule("."+(*i), Wt::WCssDecorationStyle());
+    m_types[*i]->templateWidget()->show();
+  }
+    
+  // Populate the logs with last 100 messages
+  WitreServer::msg_set log = server.last_messages(100);
+  for(WitreServer::msg_set::const_iterator i=log.begin();
+      i!=log.end(); ++i) 
+    add_msg(i->get<0>(), i->get<1>(), i->get<2>(), i->get<3>());
+  
+  clicked().connect(&m_type_select, &Wt::WPopupMenu::popup);
+  Wt::WApplication::instance()->enableUpdates(true);
 }
 
 TREXLogWidget::~TREXLogWidget() {
-  delete m_req;
+  
 }
 
-void TREXLogWidget::updated() {
-  m_req->reload();
+// signal callbacks
+
+
+void TREXLogWidget::new_msg(std::string type, boost::optional<long long> date,
+                            std::string src, std::string content) {
+  add_msg(type, date, src, content);
+  Wt::WApplication::instance()->triggerUpdate();
 }
 
+
+void TREXLogWidget::add_msg(std::string type, boost::optional<long long> date,
+                            std::string src, std::string content) {
+  std::map<std::string, Wt::WCssTemplateRule *>::iterator pos;
+  bool inserted;
+  Wt::WCssStyleSheet &style = Wt::WApplication::instance()->styleSheet();
+  
+  boost::tie(pos, inserted) = m_types.insert(std::map<std::string, Wt::WCssTemplateRule *>::value_type(type, NULL));
+  if( inserted ) {
+    Wt::WPopupMenuItem *item = m_type_select.addItem(type);
+    item->setCheckable(true);
+    item->setChecked(true);
+    item->triggered().connect(this, &TREXLogWidget::show_hide);
+
+    pos->second = style.addRule("."+type, Wt::WCssDecorationStyle());
+    pos->second->templateWidget()->show();
+  }
+  Entry *entry = new Entry(date, src, content);
+  insertWidget(0, entry);
+  entry->setStyleClass(type);
+  entry->setToolTip(type);
+}
+
+void TREXLogWidget::show_hide(Wt::WPopupMenuItem *item) {
+  std::map<std::string, Wt::WCssTemplateRule *>::iterator 
+    pos = m_types.find(item->text().toUTF8());
+  if( pos!=m_types.end() ) {
+    pos->second->templateWidget()->setHidden(item->isChecked());
+  }
+}
+
+
+/*
+ *
+ */
+TREXLogWidget::Entry::Entry(boost::optional<long long> date, 
+                            std::string src, std::string content,
+                            TREXLogWidget *parent)
+:Wt::WText(parent) {
+  std::ostringstream oss;
+  oss<<"<span class=\"trex_tick\">";
+  if( date )
+    oss<<(*date);
+  oss<<"</span><span class=\"trex_src\">["<<src
+     <<"] </span><span class=\"trex_msg\">"<<content<<"</span>";
+  setText(oss.str());
+}
 
