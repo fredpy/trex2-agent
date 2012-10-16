@@ -659,12 +659,45 @@ namespace TREX {
 
     namespace internals {
 
+      /** @brief Optional mutex
+       *
+       * @tparam Reentrant mutex enabling flag
+       *
+       * This template class is an helper to make the thread safety of code being 
+       * parametrized during compilation. Indeed depending on the value of @p Reentrant
+       * this class can be either a true mutex or a fake one doing nothing when requested 
+       * to be locked or unlocked. Its interface is compatible with boost mutex 
+       * implementation.
+       * 
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup utils
+       */
       template<bool Reentrant>
       struct optional_mtx {
+        /** @brief Mutex lock
+         *
+         * This method increased the locking level of the current thread. 
+         * In the case that the mutex is not currently locked by the calling 
+         * thread, the call will block untils this thread can take ownership 
+         * of this mutex  
+         *
+         * @post the mutex is locked
+         *
+         * @note If @p Reentrant is @c false this call will do nothing 
+         */
         void lock() {}
+        /** @brief Mutex release
+         *
+         * Release the blocked mutex. This decrease the level of ownership of 
+         * this mutex by the calling thread. If the level reaches 0 then the 
+         * thread is set free for other threads to lock it
+         *
+         * @note If @p Reentrant is @c false this call will do nothing         
+         */
         void unlock() {}
-      };
+      }; // TREX::utils::details::optional_mtx<>
 
+#ifndef DOXYGEN      
       template<>
       struct optional_mtx<true> {
         void lock() {
@@ -676,12 +709,33 @@ namespace TREX {
 
       private:
         boost::recursive_mutex m_mtx;
-      };
+      }; // TREX::utils::details::optional_mtx<true>
+#endif // DOXYGEN
 
     } // TREX::
 
+    /** @brief log file messsage handler
+     *
+     * @tparam Reentrant thread safety flag
+     *
+     * This template class implements a log message handler that redirect 
+     * all the messages produced into an output log file.
+     *
+     * @p Reentrant is  boolean indicating whther the handler need to be 
+     * thread safe or not. The non reentrant instance of this template allows 
+     * for faster execution (as its mutex is a dummy) at the risk of unexpected 
+     * behavior if executed by multiple thread instances.  
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * ingroup utils
+     */
     template<bool Reentrant>
     class basic_log_file :public TextLog::handler {
+      /** @brief mutex type
+       *
+       * The type of the mutex for tread safety. If @p Reentrant is false
+       * this would be a dummy mutex doing nothing.
+       */
       typedef internals::optional_mtx<Reentrant> mutex_type;
       typedef boost::lock_guard<mutex_type>      lock_type;
     public:
@@ -719,6 +773,13 @@ namespace TREX {
       mutex_type m_mtx;
     }; // TREX::utils::log_file    
 
+    /** @brief Default `basic_log_file` specialization
+     *
+     * A specialization of `basic_log_file` set up to not being reentrant. 
+     * 
+     * @ingroup utils
+     * @relates basic_log_files
+     */
     typedef basic_log_file<false> log_file;
 
   } // TREX::utils

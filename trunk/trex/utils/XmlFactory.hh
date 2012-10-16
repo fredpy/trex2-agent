@@ -73,9 +73,10 @@ namespace TREX {
       template<class Base, class Extra>
       struct xml_arg_helper {
       private:
+#ifndef DOXYGEN
 	typedef std::pair<Base *, Extra> computed_type;
 	typedef std::pair<boost::property_tree::ptree::value_type *, Extra> computed_node;
-
+#endif 
       public:
         /** @brief Deduced argument type
          * The type used to compose @p Base and @p Extra. 
@@ -85,7 +86,7 @@ namespace TREX {
 	typedef computed_type argument_type;
         /** @brief Deduced node type
          * The type used to compose a Boost.PropertyTree and @p Extra. 
-         * This type is often the same as @c xml_arg_helper<boost::property_tree::ptree::value_type, Extra>
+         * This type is the one that the `XmlFactory` will pass to its producers   
          */
 	typedef computed_node node_proxy;
 
@@ -131,16 +132,7 @@ namespace TREX {
 	}
       }; // TREX::utils::internals::xml_arg_helper<>
 
-      
-      /** @brief sml_arg_helper special case
-       *
-       * This is a specialization of the template class xml_arg_helper handling 
-       * the case in which the Extra type is @c void. In that case there's no extra 
-       * argument and the argument_type is just the xml structure
-       *
-       * @relates xml_arg_helper
-       * @ingroup utils
-       */
+#ifndef DOXYGEN
       template<class Base>
       struct xml_arg_helper<Base, void> {
 	typedef Base                                    &argument_type;
@@ -159,7 +151,7 @@ namespace TREX {
 	  return n;
 	}
       }; // TREX::utils::internals::xml_arg_helper<,void>
-      
+#endif // DOXYGEN    
 
     } // TREX::utils::details
 

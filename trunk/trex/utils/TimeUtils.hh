@@ -54,6 +54,8 @@
 namespace TREX {
   namespace utils {
   
+# ifndef DOXYGEN
+
     template<class ChronoDuration>
     struct chrono_posix_convert;
   
@@ -74,14 +76,64 @@ namespace TREX {
           nsecs = ns%1000000000l;
           
           return boost::posix_time::seconds(static_cast<long long>(secs))+
-# ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
+#  ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
             boost::posix_time::nanoseconds(nsecs);
-# else 
+#  else 
             boost::posix_time::microseconds((nsecs+500)/1000);
-#endif // BOOST_DATE_TIME_HAS_NANOSECONDS
+#  endif // BOOST_DATE_TIME_HAS_NANOSECONDS
       }
       
     }; // TREX::utils::chrono_posix_convert
+
+# else // DOXYGEN
+
+    /** @brief Boost chrono to POSIX duration conversion
+     *
+     * @tparam ChronoDuration A boost chrono duration type
+     *
+     * An helper to convert back and forth POSIX durations to/from their 
+     * @p ChronoDuration equivalent.
+     *
+     * This helper exists as in Boost posix dates and duration  are not 
+     * represented using boost chrono which is used in trex to describe 
+     * a tick duration.Therefore, in order ot relate trex ticks to human-readable 
+     * real-time values, we needed simple way to go back anf forth between the 
+     * two representaions  
+     *
+     * @note Depending omn  the system we are running on and the precision of 
+     * @p ChronoDuration these conversions can result on rounding errors.
+     *
+     * @ingroup utils
+     */
+    template<class ChronoDuration>
+    struct chrono_posix_convert {
+      /** @brief Type used for chrono duration
+       */
+      typedef ChronoDuration                   chrono_duration;
+      /** @brief Type used to represent posix duration 
+       */
+      typedef boost::posix_time::time_duration posix_duration;
+      
+      /** @brief Conversion from posix to chrono
+       *
+       * @param[in] pd A duration in POSIX representation
+       * @return The equivalent of @p pd as a `chrono_duration`
+       *
+       * @sa to_posix(chrono_duration const &)
+       */
+      static chrono_duration to_chrono(posix_duration const &pd);
+      /** @brief Conversion from chrono to posix
+       *
+       * @param[in] cd A duration as a `chrono_duyration`
+       * @return The equivalent of @p cd as a posix duration
+       *
+       * @sa to_chrono(posix_duration const &)
+       */
+      static posix_duration  to_posix(chrono_duration const &cd);
+       
+    };
+   
+# endif // DOXYGEN
 
   } // utils 
 } // TREX

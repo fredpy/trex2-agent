@@ -100,6 +100,8 @@ namespace TREX {
       EUROPA::Domain &m_val;
     }; // TREX::europa::SqrtConstraint
     
+    /** @brief Ceil rounding constraint
+     */
     class CeilConstraint :public EUROPA::Constraint {
     public:
       /** @brief Constructor
@@ -121,7 +123,8 @@ namespace TREX {
       EUROPA::Domain &m_ceil;
       EUROPA::Domain &m_val;      
     }; // TREX::europa::CeilConstraint 
-    
+    /** @rbief Floor rounding constraint
+     */
     class FloorConstraint :public EUROPA::Constraint {
     public:
       /** @brief Constructor

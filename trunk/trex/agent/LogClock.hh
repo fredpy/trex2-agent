@@ -39,6 +39,17 @@
 namespace TREX {
   namespace agent {
   
+    /** @brief Log replaying clock
+     *
+     * A pseudo clock that reproduces the behavior of a previously ran clock as 
+     * indicated in a log file. 
+     *
+     * This cock allow to accurately replay a mission by giving as many atomic 
+     * call steps for each tcj as it really occured during the replayed mission.
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup agent
+     */
     class LogClock :public Clock {
     public:
       LogClock(boost::property_tree::ptree::value_type &node);
