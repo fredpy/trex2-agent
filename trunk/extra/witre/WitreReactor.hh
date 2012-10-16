@@ -45,38 +45,38 @@ namespace TREX {
     public transaction::graph::timelines_listener, 
     public Wt::WObject {
     public:
+      typedef agent::Agent const *agent_ref;
+      
       WitreReactor(agent::Agent &a);
       ~WitreReactor();
 
-      Wt::Signal<agent::Agent const *, transaction::TICK> &tick() {
+      Wt::Signal<agent_ref, transaction::TICK> &tick() {
         return m_tick;
       }
-      Wt::Signal<agent::Agent const *, utils::Symbol> &new_timeline() {
+      Wt::Signal<agent_ref, utils::Symbol> &new_timeline() {
         return m_new_tl;
       }
-      Wt::Signal<agent::Agent const *, utils::Symbol> &failed_timeline() {
+      Wt::Signal<agent_ref, utils::Symbol> &failed_timeline() {
         return m_failed_tl;
       }
-      Wt::Signal<agent::Agent const *, transaction::Observation> &observation() {
+      Wt::Signal<agent_ref, transaction::Observation> &observation() {
         return m_obs;
       }
       
     private:
-      agent::Agent const *agent() const {
-        return dynamic_cast<agent::Agent const *>(&getGraph());
+      agent_ref agent() const {
+        return dynamic_cast<agent_ref>(&getGraph());
       }
-      
       
       void handleTickStart();
       void declared(transaction::details::timeline const &timeline);
       void undeclared(transaction::details::timeline const &timeline);
       void notify(transaction::Observation const &obs);
       
-      
-      Wt::Signal<agent::Agent const *, transaction::TICK> m_tick;
-      Wt::Signal<agent::Agent const *, utils::Symbol> m_new_tl;
-      Wt::Signal<agent::Agent const *, utils::Symbol> m_failed_tl;
-      Wt::Signal<agent::Agent const *, transaction::Observation> m_obs;
+      Wt::Signal<agent_ref, transaction::TICK> m_tick;
+      Wt::Signal<agent_ref, utils::Symbol> m_new_tl;
+      Wt::Signal<agent_ref, utils::Symbol> m_failed_tl;
+      Wt::Signal<agent_ref, transaction::Observation> m_obs;
     }; // TREX::witre::WitreReactor
                
   } // TREX::witre
