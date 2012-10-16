@@ -42,6 +42,8 @@
 # error "tcc files cannot be included outside of their corresponding header"
 #else 
 
+# ifndef DOXYGEN
+
 template<class Product, class Output, class Arg>
 Output XmlFactory<Product, Output, Arg>::produce
 (typename XmlFactory<Product, Output, Arg>::argument_type arg) {
@@ -92,5 +94,7 @@ bool XmlFactory<Product, Output, Arg>::iter_produce
   // No correct tag found
   return false;
 }
+
+# endif // DOXYGEN
  
 #endif 
