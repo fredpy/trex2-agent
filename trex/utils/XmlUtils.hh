@@ -111,10 +111,15 @@ namespace TREX {
          * Extracts the value of the attribute @p name from the property tree 
          * @p pt
          * 
-         * @pre The path @c "<xmlattr>."+@p name exists
+         * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a boost::optional
          * @pre The value of the attribute can be parsed as a @p Ty
          * 
          * @return the value of this attribute
+         * @note if @p Ty is a boost::optional and the attribute @p name does 
+         *       not exists the returned value is an empty optional  
+         *
+         * @throw bad_string_cast Failed to convert the attribute 
+         *     @p name into a @p Ty value
          */
         static Ty get(boost::property_tree::ptree const &pt,
                       std::string const &name) {
@@ -122,34 +127,9 @@ namespace TREX {
         }
       }; // TREX::utils::internals::attr_helper<>
       
-      /** @brief attr_helper specialization for optional attributes
-       *
-       * This class is just a specialization of attr_helper to handle optional 
-       * attributes.
-       *
-       * Whenever we have a attr_helper that have a boost::optional as a template 
-       * argument, we assume that this XML attribute is optional. Therefore, if 
-       * the attribute does not exists we retruned an empty optional instance. 
-       * Otherwise this class behaves the same as the basic attr_helper
-       *
-       * @author Frederic Py <fpy@mbari.org>
-       * @sa attr_helper
-       * @ingroup utils
-       */
+#ifndef DOXYGEN
       template<class Ty>
       struct attr_helper< boost::optional<Ty> > {
-        /** @brief Parse attribute
-         * 
-         * @param[in] pt A xml based property tree
-         * @param[in] name An attribute name
-         * 
-         * Extracts the value of the attribute @p name from the property tree 
-         * @p pt if it exists
-         * 
-         * @pre The value of the attribute can be parsed as a @p Ty
-         * 
-         * @return the value of this attribute or an empty boost::optional if this attribute does not exist.
-         */
         static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
                                       std::string const &name) {
 	  boost::optional<std::string> tmp = pt.get_optional<std::string>("<xmlattr>."+name);
@@ -159,6 +139,7 @@ namespace TREX {
 	    return boost::optional<Ty>();
         }
       }; // TREX::utils::internals::attr_helper< boost::optional<> >
+#endif // DOXYGEN
       
     } // TREX::utils::internals
     

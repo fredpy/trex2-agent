@@ -209,7 +209,7 @@ namespace TREX {
 	public virtual boost::adjacency_graph_tag,
 	public virtual boost::vertex_list_graph_tag,
 	public virtual boost::edge_list_graph_tag {};
-
+      
       /** @brief timelines and relations listener
        *
        * This abstarct class allows user to implement a listener to all the 

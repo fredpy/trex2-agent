@@ -362,6 +362,17 @@ namespace TREX {
         return m_clock->date_str(cur);
       }
       
+      /** @brief Agent interraction proxy
+       *
+       * This reactor class is used by the agent as a proxy to interract with 
+       * its reactors. The main use is for the Agent to transparently post goals
+       * or recall them using the same interface as other reactors. It can also 
+       * be extended to provide an interface with the other reactors that -- for example 
+       * -- observe their timelines in order to display it to an end user.
+       *
+       * @ingroup agent
+       * @author Frederic Py <fpy@mbari.org>
+       */
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:
 	AgentProxy(Agent &agent)

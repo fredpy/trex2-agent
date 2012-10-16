@@ -69,12 +69,27 @@ namespace TREX {
      */
     class Clock {
     public:
+      /** @brief Clock error
+       *
+       * The basic exception thrown by a clock when an error occurs
+       * 
+       * @author Frederic Py <fpy@mbari.org>
+       * @relates Clock
+       * @ingroup agent
+       */
       class Error :public TREX::utils::Exception {
       public:
+        /** @brief Constructor
+         *
+         * @param[in] msg An erro message
+         *
+         * Create a new instance  withe associated message @p msg
+         */
         Error(std::string const &msg) throw()
           :TREX::utils::Exception(msg) {}
+        /** @brief Destructor */
         ~Error() throw() {}
-      };
+      }; // TREX::agent::Clock::Error
             
       typedef transaction::graph::duration_type          duration_type;
       typedef utils::chrono_posix_convert<duration_type> dur_converter;

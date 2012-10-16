@@ -68,7 +68,7 @@ namespace TREX {
    * reactors.
    *
    * @author Frederic Py <fpy@mbari.org>
-   * @note This namespace is hared between @ref domains and
+   * @note This namespace is shared between @ref domains and
    * @ref transaction This should change in the future
    */
   namespace transaction {      
