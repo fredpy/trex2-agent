@@ -42,16 +42,49 @@ namespace TREX {
   namespace witre {
     
     
+    /** @brief Witre web interface server
+     *
+     * This class implements the server entry point for the witre application. 
+     * It gives access to the web clients (via WitreApp) to basic intercation 
+     * for creating and manipulating/observing agents within the server. This 
+     * also handle basic functionalityies such a page localization etc
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup witre
+     */
     class WitreServer :boost::noncopyable {
     public:      
+      /** @brief Constructor
+       *
+       * @param[in] server A Wt server entry point
+       *
+       * Create a new instance atteched to the server @p server
+       */
       WitreServer(Wt::WServer &server);
+      /** @brief Destructor */
       ~WitreServer();
+      
+      /** @brief New TREX log entry
+       *
+       * @param[in] kind An entry type
+       *
+       * Creates a new log entry for witre evrer related messages
+       *
+       * @return The stream representing this entry
+       */
+      utils::internals::LogEntry log(utils::Symbol const &kind=utils::null) {
+        return m_log->syslog("witre", kind);
+      }
+      
+      utils::internals::LogEntry log(std::string const &src, utils::Symbol const &kind) {
+        return m_log->syslog("witre("+src+")", kind);
+      }
       
       LogProxy::log_signal &new_log();
       /** @brief Collect log types
        * @param[out] types A set of message types
        *
-       * This method extract from the trex log database all the exisiting
+       * This method extract from the trex log database all the existing
        * messages types and insert them in @p types
        *
        * @return The number of new elements added to @p types
@@ -67,7 +100,23 @@ namespace TREX {
         return m_server;
       }
       
+      /** @brief Look for localization files
+       *
+       * @brief default_file short name for the default locale description file
+       *
+       * This method locate the file @p default_file along with all its 
+       * corresponding localized specialization (which name is 
+       * @c stem(default_file)_<locale>.ext(default_file)), make local copy of 
+       * these in the trex log directory and return the base name to be used in 
+       * Wt for localization for the newly copied files.
+       *
+       * @return the Wt base name as a path for localization or an empty path if 
+       * it failed to locate @p file_name
+       *
+       * @sa TREX::utils::LogManage::use
+       */
       boost::filesystem::path locales(std::string const &default_file);
+      
        
     private:
       boost::filesystem::path locale_path(std::string const &file);

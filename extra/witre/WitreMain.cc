@@ -51,9 +51,7 @@ int main(int argc, char **argv) {
   
   server.addEntryPoint(Wt::Application, 
                        boost::bind(createApplication, _1, 
-                                   boost::ref(witre)), "/");
-  
-  std::cout<<"TREX witre v"<<TREX::version::str()<<std::endl;
+                                   boost::ref(witre)));
   
   if( server.start() ) {
     int sig = Wt::WServer::waitForShutdown();

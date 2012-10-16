@@ -1,30 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<messages nplurals="2"
-	  plural="n&gt;1" >
-  <message id="agent">
-    <plural case="0">{1} agent</plural>
-    <plural case="1">{1} agents</plural>
-  </message>
-    
-    
-
-  <message id="agent_info">
-    ${count} en cours d'execution:<br/>
-    ${agents}
-    ${about}
-  </message>
-
-  <message id="admin">Administration</message>
-  <message id="new_agent">Nouveau agent</message>
-  <message id="kill_agent">Terminer agent</message>
-
-  <message id="about">A propos</message>
-  <message id="about_text">
-    Witre pour T-REX v${trex_version}<br/>
-    Contributeurs:<ul>
-    <li> Philip Cooksey </li>
-    <li> Frederic Py </li>
-  </ul>
+<messages>
+  <message id="trex">T-REX v. {1}</message>
+  <message id="about">&#192; propos</message>
+  <message id="add">Nouvel agent</message>
+  <message id="kill">Terminer</message>
+  <message id="plugin_load">Charger un plug-in</message>
+  <message id="request">Nouveau but</message>
+  <message id="recall">Annuler un but</message>
+  <message id="warn">Attention</message>
+  <message id="error">Erreur</message>
+  <message id="about_dialog"> 
+    <p>
+    Interface web Witre pour T-REX {1}.
+    </p>
+    Collaborateurs:
+    <ul>
+      <li>Philip Cooksey</li>
+      <li>Fr&#233;d&#233;ric Py</li>
+    </ul>
   </message>
 </messages>

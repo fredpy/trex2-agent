@@ -37,7 +37,6 @@
 # include "TREXLogWidget.hh"
 
 # include <Wt/WApplication>
-# include <Wt/WDialog>
 
 namespace TREX {
   namespace witre {
@@ -46,21 +45,22 @@ namespace TREX {
     public:
       WitreApp(Wt::WEnvironment const &env, WitreServer &server);
       ~WitreApp();
-      
-    private:
-      void setup();
-      void createHome();
-      
-      
-      Wt::WString tr(char const *key) {
-        return Wt::WString::tr(key);
+ 
+      utils::internals::LogEntry log(utils::Symbol const &kind=utils::null) {
+        return m_server.log(sessionId(), kind);
       }
 
-      void about();
+    private:
+      Wt::WString tr(std::string const &msg) {
+        return Wt::WString::tr(msg);
+      }
       
-      Wt::WWidget *m_home;
-
-      utils::SingletonUse<utils::LogManager> m_log;
+      void init();
+      void path_changed(std::string const &path);
+      
+      
+      WitreServer &m_server;
+    
     }; // TREX::witre::WitreApp
   
   }

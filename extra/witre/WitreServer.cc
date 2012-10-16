@@ -47,14 +47,14 @@ WitreServer::WitreServer(Wt::WServer &server)
   init_session();
   m_log->add_handler(LogProxy(*this)); // produce signals on new log entry
   m_log->logPath(); // initialize TREX log directory
-  m_log->syslog("witre", info)<<"Witre server created.";
+  log(info)<<"Witre server created.";
 
   // Get the cfg directory
   m_locales = m_log->file_name("cfg");
 }
 
 WitreServer::~WitreServer() {
-  m_log->syslog("witre", warn)<<"Witre server destroyed.";
+  log(warn)<<"Witre server destroyed.";
 }
 
 // modifiers
@@ -85,13 +85,13 @@ boost::filesystem::path WitreServer::locales(std::string const &default_file) {
   boost::filesystem::path file = m_log->locate(default_file, found);
   
   if( !found ) {
-    m_log->syslog("witre", error)<<"Unable to locate \""<<default_file<<"\"";
+    log(error)<<"Unable to locate \""<<default_file<<"\"";
     // TODO throw an exception 
     return boost::filesystem::path();
   } else {
     boost::filesystem::path log_dir = locale_path(default_file);
     if( !exists(log_dir/file.filename()) ) {
-      m_log->syslog("witre", info)<<"Copying locales based on "<<default_file
+      log(info)<<"Copying locales based on "<<default_file
       <<" to "<<log_dir;
       copy_file(file, log_dir/file.filename());
       std::string loc_base = file.stem().string()+"_";
@@ -101,7 +101,7 @@ boost::filesystem::path WitreServer::locales(std::string const &default_file) {
         boost::filesystem::path tmp = it->path();
         if( 0==tmp.stem().string().compare(0, loc_base.length(), loc_base) &&
            tmp.extension()==file.extension() ) {
-          m_log->syslog("witre", info)<<"\tAdding locale ["
+          log(info)<<"\tAdding locale ["
                     <<tmp.stem().string().substr(loc_base.length())<<"]";
           copy_file(tmp, log_dir/tmp.filename());
         }
@@ -149,7 +149,6 @@ size_t WitreServer::log_types(std::set<std::string> &types) {
 
 WitreServer::msg_set WitreServer::last_messages(size_t count) {
   msg_set ret;
-  std::cerr<<">>>> Get "<<count<<" messages."<<std::endl; 
   {
     Wt::Dbo::Transaction tr(m_log_session);
     Wt::Dbo::collection< Wt::Dbo::ptr<dbo::Msg> > 
