@@ -36,6 +36,7 @@
 using namespace TREX::witre;
 using namespace TREX::agent;
 using namespace TREX::transaction;
+using namespace TREX::transaction::details;
 
 /*
  * class TREX::witre::WitreReactor
@@ -43,64 +44,31 @@ using namespace TREX::transaction;
 
 // structors 
 
-//WitreReactor::WitreReactor(Server &server, Agent &a)
-//:Agent::AgentProxy(a), graph::timelines_listener(a), m_server(server) {
-//}
-//
-//WitreReactor::~WitreReactor() {
-//}
-//
-//// TREX execution callbacks 
-//
-//void WitreReactor::handleInit() {
-//  graph::timelines_listener::initialize();
-//}
-//
-//void WitreReactor::handleTickStart() {
-//  
-//}
-//
-//void WitreReactor::notify(Observation const &obs) {
-//  
-//}
-//
-//bool WitreReactor::synchronize() {
-//  return true;
-//}
-//
-//void WitreReactor::newPlanToken(goal_id const &t) {
-//  
-//}
-//
-//void WitreReactor::cancelledPlanToken(goal_id const &t) {
-//  
-//}
-//
-//// TREX timelines callbacks
-//
-//void WitreReactor::declared(details::timeline const &tl) {
-//  if( !isExternal(tl.name()) ) {
-//    use(tl.name(), true, true);
-//    m_timelines.insert(tl.name());
-//    m_server.new_timeline(getAgentName(), tl.name());
-//  }
-//}
-//
-//void WitreReactor::undeclared(details::timeline const &tl) {
-//  m_server.graph_updated(getAgentName());  
-//}
-//
-//void WitreReactor::connected(Relation const &r) {
-//  if( this!=&(r.client()) ) {
-//    m_server.graph_updated(getAgentName());    
-//  }
-//}
-//
-//void WitreReactor::disconnected(Relation const &r) {
-//  if( this!=&(r.client()) ) {
-//    m_server.graph_updated(getAgentName());    
-//  }  
-//}
-//
-//
-//
+WitreReactor::WitreReactor(agent::Agent &a) 
+:Agent::AgentProxy(a), graph::timelines_listener(a), 
+ m_tick(this), m_new_tl(this), m_failed_tl(this), m_obs(this) {
+  
+}
+
+WitreReactor::~WitreReactor() {}
+
+// T-REX callbacks
+
+void WitreReactor::handleTickStart() {
+  m_tick(agent(), getCurrentTick());
+}
+
+void WitreReactor::declared(timeline const &tl) {
+  if( !isInternal(tl.name()) ) {
+    use(tl.name());
+    m_new_tl(agent(), tl.name());
+  }
+}
+
+void WitreReactor::undeclared(timeline const &tl) {
+  m_failed_tl(agent(), tl.name());
+}
+
+void WitreReactor::notify(Observation const &obs) {
+  m_obs(agent(), obs);
+}
