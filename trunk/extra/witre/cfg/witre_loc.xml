@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<messages nplurals="2"
-	  plural="n&gt;1">
-
-  <message id="agent">
-    <plural case="0">{1} agent</plural>
-    <plural case="1">{1} agents</plural>
-  </message>
-    
-  <message id="running">
-    executed
-  </message>
-
-  <message id="agent_info">
-    ${count} ${tr:running}:<br/>
-    ${agents}
-    ${about}
-  </message>
-
-  <message id="admin">Admin</message>
-  <message id="new_agent">New agent</message>
-  <message id="kill_agent">Kill agent</message>
-
+<messages>
+  <message id="trex">T-REX v. {1}</message>
   <message id="about">About</message>
-  <message id="about_text">
-    Witre for T-REX v${trex_version}<br/>
-    Contributors:<ul>
-    <li> Philip Cooksey </li>
-    <li> Frederic Py </li>
-  </ul>
+  <message id="add">New agent</message>
+  <message id="kill">Kill</message>
+  <message id="plugin">Load plug-in</message>
+  <message id="warn">Warning</message>
+  <message id="error">Error</message>
+  <message id="about_dialog"> 
+    <p>
+    Witre web interface for T-REX v. {1}.
+    </p>
+    Contributors:
+    <ul>
+      <li>Philip Cooksey</li>
+      <li>Fr&#233;d&#233;ric Py</li>
+    </ul>
   </message>
-
 </messages>

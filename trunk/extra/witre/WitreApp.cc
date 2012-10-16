@@ -39,10 +39,10 @@
 #include <Wt/WVBoxLayout>
 #include <Wt/WFileResource>
 #include <Wt/WEnvironment>
-#include <Wt/WTemplate>
-#include <Wt/WMenu>
-#include <Wt/WSubMenuItem>
+
 #include <Wt/WMessageBox>
+#include <Wt/WHBoxLayout>
+#include <Wt/WTemplate>
 
 using namespace TREX::witre;
 
@@ -53,68 +53,32 @@ using namespace TREX::witre;
 // structors
 
 WitreApp::WitreApp(Wt::WEnvironment const &env, WitreServer &server) 
-:Wt::WApplication(env), m_home(NULL) {
-  setTitle("T-REX");
-  boost::filesystem::path file = server.locales("witre_loc.xml");
+:Wt::WApplication(env), m_server(server) {
+  boost::filesystem::path file = m_server.locales("witre_loc.xml");
 
   if( file.empty() ) {
-    m_log->syslog("witre", TREX::utils::error)<<"Unable to find locale files";
+    log(TREX::utils::error)<<"Unable to find locale files";
   } else {
     messageResourceBundle().use(file.string());
   }
                               
-  m_log->syslog("witre")<<"New session from "<<env.userAgent();
-  setup();
+  m_server.log()<<"New session from ["<<sessionId()<<"]\n\tclient locale is "
+  <<env.locale();
+  setTitle(tr("trex").arg(TREX::version::str()));
+  internalPathChanged().connect(this, &WitreApp::path_changed);
+  
+  Wt::WMessageBox::show(tr("about"), 
+                        tr("about_dialog").arg(TREX::version::str()), 
+                        Wt::Ok);
 }
 
 WitreApp::~WitreApp() {
 }
 
-// modifiers 
-
-
-void WitreApp::setup() {
-  if( NULL==m_home ) {
-    createHome();
-  }
+void WitreApp::path_changed(std::string const &path) {
+  log(TREX::utils::info)<<"Client ["<<sessionId()<<"] changed path to "<<path;
 }
 
-void WitreApp::createHome() {
-  Wt::WTemplate *view = new Wt::WTemplate(root()); 
-  m_home = view;
-  // setLocale("fr");
-  view->addFunction("tr", &Wt::WTemplate::Functions::tr);
-  view->setTemplateText(tr("agent_info"));
-                        
-  Wt::WMenu *menu = new Wt::WMenu(Wt::Vertical, root());
-  menu->setRenderAsList(true);
-  Wt::WSubMenuItem *admin = new Wt::WSubMenuItem(tr("admin"), NULL); 
-  Wt::WMenu *trex_menu = new Wt::WMenu(Wt::Vertical, root());
-  trex_menu->setRenderAsList(true);
-  trex_menu->addItem(tr("new_agent"), NULL);
-  trex_menu->addItem(tr("kill_agent"), NULL);
-  
-  admin->setSubMenu(trex_menu);
-  menu->addItem(admin);
-  
-  view->bindString("count", 
-                   Wt::WString::trn("agent", menu->items().size()-1).arg((int)menu->items().size()-1));
-  view->bindWidget("agents", menu);
-  Wt::WText *about = new Wt::WText(tr("about"), root());
-  about->clicked().connect(this, &WitreApp::about);
-  view->bindWidget("about", about);
-}
-
-void WitreApp::about() {
-  Wt::WTemplate about;
-  about.setTemplateText(tr("about_text"));
-  about.bindString("trex_version", TREX::version::str());
-  std::ostringstream oss;
-  about.htmlText(oss);
-  
-  m_log->syslog("witre")<<oss.str();
-  Wt::WMessageBox::show(tr("about"), oss.str(), Wt::Ok);
-}
 
 
 
