@@ -35,52 +35,50 @@
 # define H_TREX_witre_reactor 
 
 #include <trex/agent/Agent.hh>
-#include <Wt/WObject>
+#include <Wt/WSignal>
 
 
 namespace TREX {
   namespace witre {
-        
-//    class WitreReactor :public agent::Agent::AgentProxy,
-//    public transaction::graph::timelines_listener,
-//    public Wt::WObject {
-//    public:
-//      WitreReactor(agent::Agent &a);
-//      ~WitreReactor();
-//      
-//      Wt::Signal<TREX::transaction::> newTick();
-//      
-//    private:
-//      Wt::Signal<transaction::TICK>
-//      
-//    }; 
-//    
-//    
-//
-//    class WitreReactor :public agent::Agent::AgentProxy, 
-//    public transaction::graph::timelines_listener {
-//    public:
-//      WitreReactor(Server &server, agent::Agent &a);
-//      ~WitreReactor();
-//      
-//    private:
-//      void handleInit();
-//      void handleTickStart();
-//      void notify(transaction::Observation const &obs);
-//      bool synchronize();
-//      
-//      void newPlanToken(transaction::goal_id const &t);
-//      void cancelledPlanToken(transaction::goal_id const &t);
-//      
-//      void declared(transaction::details::timeline const &tl);
-//      void undeclared(transaction::details::timeline const &tl);
-//      void connected(transaction::Relation const &r);
-//      void disconnected(transaction::Relation const &r);
-//      
-//      std::set<utils::Symbol> m_timelines;
-//      Server &m_server;
-//    }; // TREX::witre::WitreReactor
+    
+    class WitreReactor :public agent::Agent::AgentProxy,
+    public transaction::graph::timelines_listener, 
+    public Wt::WObject {
+    public:
+      WitreReactor(agent::Agent &a);
+      ~WitreReactor();
 
+      Wt::Signal<agent::Agent const *, transaction::TICK> &tick() {
+        return m_tick;
+      }
+      Wt::Signal<agent::Agent const *, utils::Symbol> &new_timeline() {
+        return m_new_tl;
+      }
+      Wt::Signal<agent::Agent const *, utils::Symbol> &failed_timeline() {
+        return m_failed_tl;
+      }
+      Wt::Signal<agent::Agent const *, transaction::Observation> &observation() {
+        return m_obs;
+      }
+      
+    private:
+      agent::Agent const *agent() const {
+        return dynamic_cast<agent::Agent const *>(&getGraph());
+      }
+      
+      
+      void handleTickStart();
+      void declared(transaction::details::timeline const &timeline);
+      void undeclared(transaction::details::timeline const &timeline);
+      void notify(transaction::Observation const &obs);
+      
+      
+      Wt::Signal<agent::Agent const *, transaction::TICK> m_tick;
+      Wt::Signal<agent::Agent const *, utils::Symbol> m_new_tl;
+      Wt::Signal<agent::Agent const *, utils::Symbol> m_failed_tl;
+      Wt::Signal<agent::Agent const *, transaction::Observation> m_obs;
+    }; // TREX::witre::WitreReactor
+               
   } // TREX::witre
 } // TREX
 
