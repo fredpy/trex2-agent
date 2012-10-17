@@ -190,7 +190,14 @@ namespace TREX {
        */
       template<class Iter>
       struct iter_traits :public internals::xml_arg_helper<Iter, Arg> {
-	typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
+        using typename internals::xml_arg_helper<Iter, Arg>::argument_type; 
+        
+        /** @brief iteration proxy type
+         *
+         * An alias to the type XmlFactory will use to iter_produce using 
+         * @p Iter as a property iterator
+         */
+	typedef argument_type type;
       }; // TREX::utils::XmlFactory<>::iter_traits<>
 
       typedef typename arg_traits::argument_type argument_type;
@@ -229,7 +236,12 @@ namespace TREX {
        * @ingroup utils
        */
       template<class Ty>
-      class declare :public XmlFactory::factory_type::template declare<Ty> {
+#ifndef DOXYGEN
+      class declare :public XmlFactory::factory_type::template declare<Ty> 
+#else 
+      class declare :public factory_type::declare<Ty> 
+#endif 
+      {
       public:
         /** @brief Constructor
          * @param[in] id A tag name
