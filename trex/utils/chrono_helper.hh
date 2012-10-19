@@ -61,7 +61,7 @@ namespace TREX {
                                                boost::chrono::duration<Rep, Period> d) {
       if( d < boost::chrono::duration<Rep, Period>(0) ) {
         d = -d;
-        out<<'-';
+        out.put('-');
       }
       boost::chrono::seconds 
         s = boost::chrono::duration_cast<boost::chrono::seconds>(d);
@@ -80,7 +80,7 @@ namespace TREX {
             m -= h;
             out<<h.count()<<':';
             if( m < boost::chrono::minutes(10) )
-              out<<'0';
+              out.put('0');
           }
           out<<m;
           if( s < boost::chrono::seconds(10) )
