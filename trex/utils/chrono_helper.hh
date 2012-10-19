@@ -86,11 +86,11 @@ namespace TREX {
                         // Display as hours:MM:SS.XXXX
                         out<<h.count()<<':';
                         if( m < boost::chrono::minutes(10) )
-                            out.put('0');
+                            out.put('0'); // Need 2 digits
                     }
                     out<<m<<':';
                     if( s < boost::chrono::seconds(10) )
-                        out.put('0');
+                        out.put('0'); // Need 2 digits
                 }
             } 
             typedef boost::chrono::duration<long double> f_secs;
