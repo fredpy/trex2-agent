@@ -40,60 +40,66 @@
 # include <iostream>
 
 namespace TREX {
-  namespace utils {
-
-    /** @brief Human readable duration display
-     * @tparam CharT stream char type
-     * @tparam Traits stream char traits
-     * @tparam Rep duration base type
-     * @tparam Period duration precision period
-     *
-     * @param[in,out] out An output stream
-     * @param[in] d A duration
-     *
-     * Serialize the value of the duration @p d into @p out as an 
-     * "human readable" value.
-     *
-     * @return @p out after the operation
-     */
-    template <class CharT, class Traits, class Rep, class Period>
-    std::basic_ostream<CharT, Traits> &display(std::basic_ostream<CharT, Traits> &out,
-                                               boost::chrono::duration<Rep, Period> d) {
-      if( d < boost::chrono::duration<Rep, Period>(0) ) {
-        d = -d;
-        out.put('-');
-      }
-      boost::chrono::seconds 
-        s = boost::chrono::duration_cast<boost::chrono::seconds>(d);
-      
-      if( s>boost::chrono::seconds::zero() ) {
-        d -= s;
-        boost::chrono::minutes 
-          m = boost::chrono::duration_cast<boost::chrono::minutes>(s);
+    namespace utils {
         
-        if( m > boost::chrono::minutes::zero() ) {
-          s -= m;
-          boost::chrono::hours 
-            h = boost::chrono::duration_cast<boost::chrono::hours>(m);
-          
-          if( h > boost::chrono::hours::zero() ) {
-            m -= h;
-            out<<h.count()<<':';
-            if( m < boost::chrono::minutes(10) )
-              out.put('0');
-          }
-          out<<m;
-          if( s < boost::chrono::seconds(10) )
-            out<<s;
+        /** @brief Human readable duration display
+         * @tparam CharT stream char type
+         * @tparam Traits stream char traits
+         * @tparam Rep duration base type
+         * @tparam Period duration precision period
+         *
+         * @param[in,out] out An output stream
+         * @param[in] d A duration
+         *
+         * Serialize the value of the duration @p d into @p out as an
+         * "human readable" value.
+         *
+         * @return @p out after the operation
+         */
+        template <class CharT, class Traits, class Rep, class Period>
+        std::basic_ostream<CharT, Traits> &display(std::basic_ostream<CharT, Traits> &out,
+                                                   boost::chrono::duration<Rep, Period> d) {
+            if( d < boost::chrono::duration<Rep, Period>::zero() ) {
+                d = -d;
+                out.put('-');
+            }
+            // Extract the number of seconds
+            boost::chrono::seconds
+            s = boost::chrono::duration_cast<boost::chrono::seconds>(d);
+            
+            if( s>boost::chrono::seconds::zero() ) {
+                d -= s;
+                
+                // Extract number of minutes
+                boost::chrono::minutes
+                m = boost::chrono::duration_cast<boost::chrono::minutes>(s);
+                
+                if( m > boost::chrono::minutes::zero() ) {
+                    s -= m;
+                    
+                    // Extract the number of hours
+                    boost::chrono::hours
+                    h = boost::chrono::duration_cast<boost::chrono::hours>(m);
+                    
+                    if( h > boost::chrono::hours::zero() ) {
+                        m -= h;
+                        // Display as hours:MM:SS.XXXX
+                        out<<h.count()<<':';
+                        if( m < boost::chrono::minutes(10) )
+                            out.put('0');
+                    }
+                    out<<m<<':';
+                    if( s < boost::chrono::seconds(10) )
+                        out.put('0');
+                }
+            } 
+            typedef boost::chrono::duration<long double> f_secs;
+            f_secs ss = boost::chrono::duration_cast<f_secs>(s);
+            ss += d;
+            return boost::chrono::duration_short(out)<<ss;
         }
-      } 
-      typedef boost::chrono::duration<long double> f_secs;
-      f_secs ss = boost::chrono::duration_cast<f_secs>(s);
-      ss += d;
-      return boost::chrono::duration_short(out)<<ss;
-    }
-
-  } // TREX::utils
+        
+    } // TREX::utils
 } // TREX 
 
 #endif // H_trex_utils_chrono_helper
