@@ -3,18 +3,18 @@
  * @brief SingletonWrapper implementation
  *
  * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils 
+ * @ingroup utils
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -24,7 +24,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,53 +40,53 @@
  */
 #ifndef In_H_SingletonWrapper
 # error "Cannot include tcc file outside of its corresponding header"
-#else 
+#else
 
 #include <typeinfo>
 
 namespace TREX {
   namespace utils {
-
+    
     namespace internal {
-
+      
       template<typename Ty>
       struct swrapper_factory :public sdummy_factory {
-	SingletonDummy *create() const {
-	  return new SingletonWrapper<Ty>;
-	}
-      }; 
-
+        SingletonDummy *create() const {
+          return new SingletonWrapper<Ty>;
+        }
+      };
+      
     }
-
+    
     // statics :
     
     template<typename Ty>
     Ty *SingletonWrapper<Ty>::attach() {
       SingletonWrapper<Ty> *
-	me = static_cast<SingletonWrapper<Ty> *>(internal::SingletonDummy::attach(name(), 
-                                                                                  internal::swrapper_factory<Ty>()));
+      me = static_cast<SingletonWrapper<Ty> *>(internal::SingletonDummy::attach(name(),
+                                                                                internal::swrapper_factory<Ty>()));
       return &(me->m_value);
     }
-
+    
     template<typename Ty>
     void SingletonWrapper<Ty>::detach() {
       internal::SingletonDummy::detach(name());
     }
-
+    
     template<typename Ty>
     std::string SingletonWrapper<Ty>::name() {
       return typeid(Ty).name();
     }
-
+    
     // structors :
-
+    
     template<typename Ty>
     SingletonWrapper<Ty>::SingletonWrapper() {}
-
+    
     template<typename Ty>
     SingletonWrapper<Ty>::~SingletonWrapper() {}
-
+    
   }
 }
 
-#endif  
+#endif
