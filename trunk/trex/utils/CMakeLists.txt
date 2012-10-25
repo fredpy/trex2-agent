@@ -45,6 +45,7 @@ add_library(TREXutils SHARED
   TextLog.cc
   TREXversion.cc
   XmlUtils.cc
+  asio_runner.cc
   # headers
   chrono_helper.hh
   ErrnoExcept.hh
@@ -69,6 +70,7 @@ add_library(TREXutils SHARED
   TREXversion.hh
   XmlFactory.hh
   XmlUtils.hh
+  asio_runner.hh
   # template source code
   bits/Factory.tcc
   bits/SingletonUse.tcc

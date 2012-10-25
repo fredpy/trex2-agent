@@ -59,7 +59,7 @@ namespace TREX {
 
       /** @brief XmlFactory argument helper
        *
-       * @tparam Base The argument bmain type. This type is often a 
+      * @tparam Base The argument bmain type. This type is often a 
        *   Boost.PropertyTree or a type including such tree
        * @tparam Extra Extra information type. The type emebedding no XML information
        *
@@ -190,14 +190,19 @@ namespace TREX {
        */
       template<class Iter>
       struct iter_traits :public internals::xml_arg_helper<Iter, Arg> {
-        using typename internals::xml_arg_helper<Iter, Arg>::argument_type; 
-        
+#ifdef DOXYGEN
+        // This is C++0x ... most compiler do not support it yet 
+        //  for now we just put it for DOXYGEN asthis code is more parsable for it
+        using argument_type = typename internals::xml_arg_helper<Iter, Arg>::argument_type;
         /** @brief iteration proxy type
          *
          * An alias to the type XmlFactory will use to iter_produce using 
          * @p Iter as a property iterator
          */
-	typedef argument_type type;
+        typedef argument_type type; 
+#else 
+	typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
+#endif
       }; // TREX::utils::XmlFactory<>::iter_traits<>
 
       typedef typename arg_traits::argument_type argument_type;
