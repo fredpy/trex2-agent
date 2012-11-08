@@ -191,8 +191,8 @@ namespace mbari {
     std::string m_exchange;
     std::string m_route;
 
-    TREX::utils::internals::LogEntry 
-    syslog(TREX::utils::Symbol const &kind = TREX::utils::null);
+    TREX::utils::log::stream
+    syslog(TREX::utils::Symbol const &kind = TREX::utils::log::null);
   private:
     DrifterTracker &m_tracker;
 

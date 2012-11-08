@@ -33,30 +33,17 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-option(WITH_MBARI "Enable MBARI specific code." OFF) 
+add_subdirectory(mbari) # MBARI specific components
 
-if(WITH_MBARI)
-  add_custom_target(mbari COMMENT "MBARI specific targets")
-  trex_cfg(cfg ${TREX_SHARED})
+# LSTS AUV component
+option(WITH_LSTS "Use LSTS plugin" OFF)
+# mark_as_advanced(WITH_LSTS)
+if(WITH_LSTS)
+  add_subdirectory(lsts)
+endif(WITH_LSTS)
 
-  add_subdirectory(shared)
-  add_subdirectory(tracker)
-  add_subdirectory(iridium)
-  add_subdirectory(europa)
-
-  add_subdirectory(auv)
-
-  #set(POCO_HINT "" CACHE FILEPATH "Hint to find Poco libraries")
-  #find_library(POCO_NET_LIBRARIES
-  #  NAMES PocoNet 
-  #  HINTS ${POCO_HINT}
-  #  DOCS "Looking for Poco library")
-  #find_path(POCO_INCLUDE "Poco/Poco.h" HINTS ${POCO_HINT})
-  #if(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-  #  set(POCO_FOUND ON)
-  #else(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-  #  message(WARNING "Unable to find Poco libraries: disabling iridium plugin")
-  #  set(POCO_FOUND OFF)
-  #endif(POCO_NET_LIBRARIES AND POCO_INCLUDE)
-endif(WITH_MBARI)
-
+# NUS AUV component
+option(WITH_NUS "Use NUS plugin" OFF)
+if(WITH_NUS)
+  add_subdirectory(starfish)
+endif(WITH_NUS)
