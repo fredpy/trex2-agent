@@ -50,12 +50,12 @@ add_subdirectory(witre.old)
 # add_subdirectory(witre)
 add_subdirectory(europa)
 
-
+# examples 
 add_subdirectory(examples)
-add_subdirectory(backward)
-add_subdirectory(lightswitch) 
-add_subdirectory(rover)
-add_subdirectory(shopping)
 
+# 3rd party plug-ins
 add_subdirectory(third_party)
+
+# backward compatibility stuff
+add_subdirectory(backward)
 
