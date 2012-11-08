@@ -43,7 +43,7 @@ using namespace boost::asio;
 // structors 
 
 asio_runner::asio_runner() {
-  // Create a work for our maintining our service 
+  // Create a work for maintaining our service 
   m_active.reset(new io_service::work(m_io));
   // spawn a first thread that manages our service
   spawn(1);
