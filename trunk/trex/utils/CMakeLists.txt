@@ -46,6 +46,8 @@ add_library(TREXutils SHARED
   TREXversion.cc
   XmlUtils.cc
   asio_runner.cc
+  log/entry.cc
+  log/text_log.cc
   # headers
   chrono_helper.hh
   ErrnoExcept.hh
@@ -71,7 +73,47 @@ add_library(TREXutils SHARED
   XmlFactory.hh
   XmlUtils.hh
   asio_runner.hh
+  log/log_fwd.hh
+  log/entry.hh
+  log/stream.hh
+  log/bits/log_stream.hh
+  log/bits/log_sig.hh
+  log/text_log.hh
+  log/out_file.hh
   # template source code
+  bits/Factory.tcc
+  bits/SingletonUse.tcc
+  bits/SingletonWrapper.tcc
+  bits/Symbol.tcc
+  bits/XmlFactory.tcc
+)
+
+# map ditectory structure for XCode 
+source_group("Source\ Files\\log" FILES 
+  log/entry.cc
+  log/text_log.cc
+)
+
+source_group("Header\ Files\\bits" FILES 
+  bits/SingletonDummy.hh
+  bits/SingletonServer_fwd.hh
+  bits/SingletonWrapper.hh
+)
+
+source_group("Header\ Files\\log" FILES 
+  log/log_fwd.hh
+  log/entry.hh
+  log/stream.hh
+  log/text_log.hh
+  log/out_file.hh
+)
+
+source_group("Header\ Files\\log\\bits" FILES 
+  log/bits/log_stream.hh
+  log/bits/log_sig.hh
+)
+
+source_group("Template Files\\bits" FILES  
   bits/Factory.tcc
   bits/SingletonUse.tcc
   bits/SingletonWrapper.tcc
