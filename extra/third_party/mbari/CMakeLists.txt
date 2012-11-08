@@ -33,29 +33,32 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_custom_target(plugins COMMENT "TREX plugins")
+option(WITH_MBARI "Enable MBARI specific code." OFF) 
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION ${TREX_SHARED}/plugins OPTIONAL)
+if(WITH_MBARI)
+  add_custom_target(mbari COMMENT "MBARI specific targets")
   trex_cfg(cfg ${TREX_SHARED})
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg)
-endmacro(trex_plugin)
 
-# the directories where plugins are located
+  include_directories(${CMAKE_SOURCE_DIR}/extra/third_party)
 
-add_subdirectory(witre.old)
-# add_subdirectory(witre)
+  add_subdirectory(shared)
+  add_subdirectory(tracker)
+  add_subdirectory(iridium)
+  add_subdirectory(europa)
 
+  add_subdirectory(auv)
 
-add_subdirectory(backward)
-add_subdirectory(lightswitch) 
-add_subdirectory(europa)
-add_subdirectory(rover)
-add_subdirectory(shopping)
-
-add_subdirectory(third_party)
+  #set(POCO_HINT "" CACHE FILEPATH "Hint to find Poco libraries")
+  #find_library(POCO_NET_LIBRARIES
+  #  NAMES PocoNet 
+  #  HINTS ${POCO_HINT}
+  #  DOCS "Looking for Poco library")
+  #find_path(POCO_INCLUDE "Poco/Poco.h" HINTS ${POCO_HINT})
+  #if(POCO_NET_LIBRARIES AND POCO_INCLUDE)
+  #  set(POCO_FOUND ON)
+  #else(POCO_NET_LIBRARIES AND POCO_INCLUDE)
+  #  message(WARNING "Unable to find Poco libraries: disabling iridium plugin")
+  #  set(POCO_FOUND OFF)
+  #endif(POCO_NET_LIBRARIES AND POCO_INCLUDE)
+endif(WITH_MBARI)
 

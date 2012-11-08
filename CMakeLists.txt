@@ -196,9 +196,6 @@ trex_cfg(cfg ${TREX_SHARED})
 # include extra/plugins
 add_subdirectory(extra) 
 
-# add your sub directories here if needed
-add_subdirectory(mbari) # MBARI specific components
-
 ########################################################################
 # Finalize                                                             #
 ########################################################################
