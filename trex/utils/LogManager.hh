@@ -258,7 +258,16 @@ namespace TREX {
         return m_syslog.connect(fn,s);
       }
       
-      
+      size_t thread_count() const {
+	return m_io.thread_count();
+      }
+      size_t thread_count(size_t n, bool override_hw=false) {
+	return m_io.thread_count(n, override_hw);
+      }
+      boost::asio::io_service &service() {
+	return m_io.service();
+      }
+
       
       /** @brief Current verbosity level
        * @return the current verbosity level
