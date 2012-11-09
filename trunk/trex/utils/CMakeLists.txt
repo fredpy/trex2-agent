@@ -42,7 +42,6 @@ add_library(TREXutils SHARED
   PluginLoader.cc
   SingletonDummy.cc
   SingletonServer.cc
-  TextLog.cc
   TREXversion.cc
   XmlUtils.cc
   asio_runner.cc
@@ -67,7 +66,6 @@ add_library(TREXutils SHARED
   StringExtract.hh
   Symbol.hh
   tick_clock.hh
-  TextLog.hh
   TimeUtils.hh
   TREXversion.hh
   XmlFactory.hh

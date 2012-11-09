@@ -87,8 +87,8 @@ details::Schema::Schema() {
     std::ifstream cfg(cfg_dbg.c_str());
     DebugMessage::readConfigFile(cfg);
   } else 
-    m_log->syslog("europa", warn)<<"No europa Debug.cfg found:\n\t"
-				 <<"Keeping default europa verbosity level.";
+    m_log->syslog("europa", log::warn)<<"No europa Debug.cfg found:\n\t"
+    <<"Keeping default europa verbosity level.";
 }
 
 // manipulators

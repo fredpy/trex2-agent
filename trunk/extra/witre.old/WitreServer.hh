@@ -133,22 +133,22 @@ namespace TREX {
       timed_goal planTokens;
       WitrePaintSearch::GraphMap timelineGraph;
 
-      typedef TREX::utils::TextLog::handler::date_type log_date;
-      typedef TREX::utils::TextLog::handler::id_type   log_id;
+      typedef TREX::utils::log::entry::date_type log_date;
+      typedef TREX::utils::log::id_type          log_id;
       
-      // Notification on log events 
-      class log_proxy: public TREX::utils::TextLog::handler{
+      class log_proxy {
       public:
+        typedef void result_type;
+        typedef TREX::utils::log::entry::pointer argument_type;
+        
         log_proxy(WitreServer &caller):me(caller) {}
         
-      private:
-        void message(boost::optional<date_type> const &date,
-                     id_type const &who, id_type const &kind,
-                     msg_type const &what);
+        void operator()(argument_type msg);
         
+      private:
         WitreServer &me;
-      };
-      
+      };      
+     
       friend class log_proxy;
 
       bool attach(WitreReactor &r);
