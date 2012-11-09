@@ -202,6 +202,7 @@ add_subdirectory(extra)
 
 install(DIRECTORY scripts/ DESTINATION bin OPTIONAL
   FILES_MATCHING PATTERN "*"
+  PATTERN "*.in" EXCLUDE
   PATTERN ".svn" EXCLUDE)
 set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
   ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
@@ -212,11 +213,11 @@ bash_path(TREX_LIBRARY_DIRS ${PROJECT_NAME}_LIBS)
 bash_path(TREX_BINARY_DIRS ${PROJECT_NAME}_CMDS)
 
 # A file just for testing inside the build directory
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_devel.bash.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/trex_devel.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_devel.bash @ONLY)
 
 # create a default bash environement file for installed version
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trex_init.bash.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION ${TREX_SHARED})
 
