@@ -135,7 +135,7 @@ endif(WITH_EUROPA)
 ########################################################################
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in 
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in 
     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
   set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doc CACHE STRING 
     "Output directory for doxygen")
