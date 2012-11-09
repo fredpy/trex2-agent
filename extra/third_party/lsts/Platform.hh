@@ -57,16 +57,20 @@ namespace TREX {
       bool reportErrorToDune(const std::string &message);
       bool sendMsg(Message& msg);
     private:
-      class log_proxy :public TREX::utils::TextLog::handler {
+      class log_proxy {
       public:
+	typedef void                               result_type;
+	typedef ::TREX::utils::log::entry::pointer argument_type;
+
         explicit log_proxy(Platform &me)
         :m_platform(&me) {}
         log_proxy(log_proxy const &other)
         :m_platform(other.m_platform) {}
         ~log_proxy();
 
+	void operator()(argument_type msg);
+
       private:
-        void message(boost::optional<date_type> const &date, id_type const &who, id_type const &kind, msg_type const &what);
         Platform *m_platform;
       };
       log_proxy *m_active_proxy;
