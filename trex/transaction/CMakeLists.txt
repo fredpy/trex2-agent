@@ -58,6 +58,15 @@ add_library(TREXtransaction SHARED
   bits/reactor_graph.tcc
 )
 
+source_group("Template Files\\bits" FILES
+  bits/reactor_graph.tcc)
+
+source_group("Header\ Files\\bits" FILES 
+  bits/bgl_support.hh
+  bits/external.hh
+  bits/timeline.hh
+)
+
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain 
   ${Boost_CHRONO_LIBRARY})

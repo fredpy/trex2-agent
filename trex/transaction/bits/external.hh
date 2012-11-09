@@ -214,7 +214,7 @@ namespace TREX {
 	void unblock();
                  
       private:
-        TREX::utils::internals::LogEntry syslog(utils::Symbol const &kind);
+        utils::log::stream syslog(utils::log::id_type const &kind);
         
         external_set::iterator m_pos, m_last;
         

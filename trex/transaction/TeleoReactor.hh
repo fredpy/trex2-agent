@@ -993,15 +993,15 @@ namespace TREX {
        * @sa TREX::utils::LogManager
        * @sa TREX::utils::TextLog
        */
-      TREX::utils::internals::LogEntry
-      syslog(utils::Symbol const &context, utils::Symbol const &kind) {
+      utils::log::stream
+      syslog(utils::log::id_type const &context, utils::log::id_type const &kind) {
 	if( context.empty() )
 	  return m_graph.syslog(getName(), kind);
 	else
 	  return m_graph.syslog(getName().str()+"."+context.str(), kind);
       }
-      TREX::utils::internals::LogEntry 
-      syslog(utils::Symbol const &kind=TREX::utils::null) {
+      utils::log::stream
+      syslog(utils::log::id_type const &kind=null) {
 	return m_graph.syslog(getName(), kind);
       }
 

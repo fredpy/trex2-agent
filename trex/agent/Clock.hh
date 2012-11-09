@@ -54,10 +54,10 @@
 namespace TREX {
   namespace agent {
 
-    using utils::null;
-    using utils::info;
-    using utils::warn;
-    using utils::error;
+    using utils::log::null;
+    using utils::log::info;
+    using utils::log::warn;
+    using utils::log::error;
 
     /** @brief TREX clock
      *
@@ -247,7 +247,7 @@ namespace TREX {
        */
       void advanceTick(TREX::transaction::TICK &tick);
       
-      utils::internals::LogEntry syslog(utils::Symbol const &kind=utils::null) 
+      utils::log::stream syslog(utils::log::id_type const &kind=utils::log::null) 
 	const;
 
     private:

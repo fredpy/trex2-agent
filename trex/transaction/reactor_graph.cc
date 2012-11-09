@@ -160,8 +160,8 @@ graph::~graph() {
   clear();
 }
 
-TREX::utils::internals::LogEntry graph::syslog(Symbol const &context, 
-					       Symbol const &kind) const {
+TREX::utils::log::stream graph::syslog(Symbol const &context, 
+                                        Symbol const &kind) const {
   utils::Symbol who = m_name;
   if( !context.empty() )
     who = who.str()+"."+context.str();

@@ -46,7 +46,10 @@
 # include <list>
 # include <boost/filesystem.hpp>
 
-# include "TextLog.hh"
+# include "log/text_log.hh"
+# include "log/out_file.hh"
+# include "asio_runner.hh"
+
 # include "SingletonUse.hh"
 # include "SharedVar.hh"
 # include "ErrnoExcept.hh"
@@ -133,7 +136,7 @@
 
 namespace TREX {
   namespace utils {
-		
+    
     /** @brief Centralized logging and files management.
      * 
      * This class is a core component on TREX logging and file management. 
@@ -174,12 +177,12 @@ namespace TREX {
       
       /** @brief Log verbosity level */
       enum LogLevel {
-				LogMin = 0,  //!< Minimum verbosity
-				LogNormal,   //!< Normal level
-				LogExtensive //!< High verbosity (usually for debugging)
+        LogMin = 0,  //!< Minimum verbosity
+        LogNormal,   //!< Normal level
+        LogExtensive //!< High verbosity (usually for debugging)
       };
       typedef boost::filesystem::path path_type;
-			
+      
       /** @brief Logging path
        * This method indicates in which directory log files
        * should be placed. It also manage the creation of
@@ -231,34 +234,44 @@ namespace TREX {
        * @sa std::string locate(std::string const &, bool &) const
        */
       std::string use(std::string const &file_name, bool &found);
-	
-      internals::LogEntry syslog(Symbol const &who, 
-				 Symbol const &kind=null) {
+      
+      log::text_log &syslog() {
+        return m_syslog;
+      }
+      log::stream syslog(log::id_type const &who, 
+                         log::id_type const &kind=log::null) {
 	return m_syslog(who, kind);
       }
-      internals::LogEntry syslog(TextLog::date_type const &when,
-				 Symbol const &who, 
-				 Symbol const &kind=null) {
+      log::stream syslog(log::entry::date_type const &when,
+                         log::id_type const &who, 
+                         log::id_type const &kind=log::null) {
 	return m_syslog(when, who, kind);
       }
-
-      template<class Handler>
-      void add_handler(Handler const &x) {
-	m_syslog.add_handler(x);
+      
+      template<typename Handler>
+      boost::signals2::connection on_new_log(Handler fn) {
+        return m_syslog.connect(fn);
       }
-            
+      template<typename Handler>
+      boost::signals2::connection on_new_log(Handler fn,
+                                             boost::asio::io_service::strand &s) {
+        return m_syslog.connect(fn,s);
+      }
+      
+      
+      
       /** @brief Current verbosity level
        * @return the current verbosity level
        * @sa setLogLevel(LogLevel)
        */
       LogLevel getLogLevel() const {
-				return m_level;
+        return m_level;
       }
       /** @brief Set verbosity level
        * @param[in] lvl current verbosity level
        *
        * Sets the verbosity level to @p lvl
-			 *
+       *
        * @pre The verbosity level cannot be changed after the
        * LogManager has been fully initialized
        *
@@ -274,7 +287,7 @@ namespace TREX {
        * @param[in] path A path
        *
        * Sets the  log directory to @p path
-			 *
+       *
        * @pre The verbosity level cannot be changed after the
        * LogManager has been fully initialized
        *
@@ -285,7 +298,7 @@ namespace TREX {
        * @sa setLogLevel(LogLevel)
        */
       bool setLogPath(std::string const &path);
-			
+      
       /** @brief add a directory to the search path
        * @param path A directory
        *
@@ -329,7 +342,7 @@ namespace TREX {
       path_iterator end() const {
         return m_searchPath.end();
       }
-			
+      
       /** @brief Locate a file 
        * @param[in] file   A file name
        * @param[out] found Indicator of success/failure
@@ -340,7 +353,7 @@ namespace TREX {
        * it iterates through the search path and tries to locate the file.
        * 
        * @retval @p file if @a found is @c false which indicates that it was 
-			 *         unable to locate this file
+       *         unable to locate this file
        * @retval A valid symbolic name for @a file if @a found is @c true
        *
        * @sa bool addSearchPath(std::string const &path)
@@ -356,22 +369,26 @@ namespace TREX {
     private:
       /** @brief Log directory path */
       path_type m_path;
-			
+      
       /** @brief Initialisation flag
        * This flag is set to true as soon as the log manager is
        * fully initialized
        */
       SharedVar<bool> m_inited;
+      
+      asio_runner     m_io;
       /** @brief syslog text log file */
-      TextLog     m_syslog;
+      log::text_log   m_syslog;
+      boost::shared_ptr<log::out_file> m_trex_log;
+      
       /** @brief verbosity level */
       LogLevel    m_level;
-			
+      
       /** @brief Constructor */
       LogManager();
       /** @brief Destructor */
       ~LogManager();
-			
+      
       /** @brief latest symbolic link creation.
        * 
        * This method creates a symbolic link with the
@@ -393,7 +410,7 @@ namespace TREX {
        * @sa void addSearchPath(std::string const &)
        */
       void loadSearchPath();
-			
+      
       /** @brief Search path
        *
        * This varisble is built using @c TREX_ENV and @c SEARCH_ENV
@@ -406,7 +423,7 @@ namespace TREX {
       
       friend class SingletonWrapper<LogManager>;
     }; // TREX::utils::LogManager
-		
+    
   } // TREX::utils 
 } // TREX
 

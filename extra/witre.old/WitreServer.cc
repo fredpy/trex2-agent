@@ -110,8 +110,8 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
     if( !m_server->start() )
       throw Error("Unable to start the server");
     
-    manager().add_handler(log_proxy(*this));
-
+    manager().on_new_log(log_proxy(*this));
+    
   } catch(Wt::WServer::Exception const &e) {
     m_log->syslog("witre.server", error)<<"Server initialization ERROR : "
 					<<e.what();
@@ -276,20 +276,21 @@ void WitreServer::notify(Observation const &obs)
 
 }
 
-void WitreServer::log_proxy::message(boost::optional<WitreServer::log_proxy::date_type> const &date,
-                                     WitreServer::log_proxy::id_type const &who, 
-                                     WitreServer::log_proxy::id_type const &kind,
-                                     WitreServer::log_proxy::msg_type const &what) {  
-  if( kind!=null ) {
+void WitreServer::log_proxy::operator()(log::entry::pointer msg) {
+  if( msg->kind()!=log::null ) {
     boost::mutex::scoped_lock lock(me.mutex_);
+    boost::optional<unsigned long long> date;
+    if( msg->is_dated() ) 
+      date = msg->date();
     for(unsigned i=0; i<me.connections.size(); ++i) {
       Connection &c = me.connections[i];
-      c.client->addLog(date, who.str(), kind.str(), what);
+      c.client->addLog(date, msg->source().str(), msg->kind().str(), 
+                       msg->content());
       // Wt::WServer::instance()->post(c.sessionId, c.function);
     }
   }
+  
 }
-
 
 bool WitreServer::synchronize()
 {

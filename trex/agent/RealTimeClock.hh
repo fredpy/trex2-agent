@@ -288,7 +288,7 @@ namespace TREX {
           if( t>=m_sleep ) {
             std::ostringstream oss;
             utils::display(oss, t-m_sleep);
-            syslog(TREX::utils::info)<<"Sleep forced by clock ("
+            syslog(TREX::utils::log::info)<<"Sleep forced by clock ("
 				     <<oss.str()<<" after watchdog)";
             return false;
           }

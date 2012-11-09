@@ -49,10 +49,10 @@
 namespace TREX {
   namespace transaction {
 
-    using utils::null;
-    using utils::info;
-    using utils::warn;
-    using utils::error;
+    using utils::log::null;
+    using utils::log::info;
+    using utils::log::warn;
+    using utils::log::error;
 
     /** @brief Conflicting reactor names
      *
@@ -670,10 +670,10 @@ namespace TREX {
 	m_name = name;
       }
 
-      TREX::utils::internals::LogEntry syslog(utils::Symbol const &context, 
-					      utils::Symbol const &kind) const;
-      TREX::utils::internals::LogEntry syslog(utils::Symbol const &kind=utils::null) const {
-	return syslog(utils::null, kind);
+      utils::log::stream syslog(utils::log::id_type const &context, 
+                                utils::log::id_type const &kind) const;
+      utils::log::stream syslog(utils::log::id_type const &kind=null) const {
+	return syslog(null, kind);
       }
       
       TREX::utils::LogManager &manager() const {

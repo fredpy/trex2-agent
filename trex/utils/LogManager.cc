@@ -58,7 +58,7 @@ using namespace boost::filesystem;
 
 // structors :
 
-LogManager::LogManager():m_inited(false), m_level(TREX_LOG_LEVEL) {
+LogManager::LogManager():m_inited(false), m_syslog(m_io.service()), m_level(TREX_LOG_LEVEL) {
 }
 
 LogManager::~LogManager() {
@@ -144,9 +144,10 @@ LogManager::path_type const &LogManager::logPath() {
     create_directory(cfg);
     
     trex_log /= TREX_LOG_FILE;
-
-    m_syslog.set_primary(basic_log_file<true>(trex_log.string()));
-    syslog("", null)<<"TREX version "<<TREX::version::str();
+    m_trex_log.reset(new log::out_file(trex_log.string()));
+    m_syslog.connect(m_syslog.wrap(*m_trex_log).track(m_trex_log));
+    
+    syslog("", log::null)<<"TREX version "<<TREX::version::str();
     loadSearchPath();
     *m_inited = true;
   }
@@ -219,9 +220,9 @@ std::string LogManager::use(std::string const &file_name, bool &found) {
       dest /= tmp;
     else dest /= src.filename();
     
-    syslog("", info)<<" - Using file "<<located;
+    syslog("", log::info)<<" - Using file "<<located;
     if( exists(dest) )
-      syslog("", warn)<<"A file with this name already exists in the cfg log."
+      syslog("", log::warn)<<"A file with this name already exists in the cfg log."
 		      <<"\n\tI won't overwrite the previous file.";
     else {
       if( is_symlink(located) ) 
@@ -239,7 +240,7 @@ bool LogManager::setLogLevel(LogLevel lvl) {
     m_level = lvl;
     return true;
   }
-  syslog("", error)<<"Cannot change verbosity level after init."<<std::endl;
+  syslog("", log::error)<<"Cannot change verbosity level after init."<<std::endl;
   return false;
 }
 
@@ -249,7 +250,7 @@ bool LogManager::setLogPath(std::string const &path) {
     m_path = path;
     return true;
   }
-  syslog("", error)<<"Cannot change log path after init."<<std::endl;
+  syslog("", log::error)<<"Cannot change log path after init."<<std::endl;
   return false;
 }
 

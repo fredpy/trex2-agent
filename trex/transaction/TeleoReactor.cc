@@ -207,7 +207,7 @@ bool details::external::equal(details::external const &other) const {
     return !other.valid();
 }
 
-TREX::utils::internals::LogEntry details::external::syslog(utils::Symbol const &kind) {
+TREX::utils::log::stream details::external::syslog(utils::Symbol const &kind) {
   return m_pos->first.client().syslog(m_pos->first.name(), kind);
 }
 
