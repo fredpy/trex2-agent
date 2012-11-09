@@ -48,7 +48,7 @@ namespace TREX
   void
   initPlugin()
   {
-    ::s_log->syslog("plugin.platform", info) << "Platform loaded.";
+    ::s_log->syslog("plugin.platform", log::info) << "Platform loaded.";
   }
 
 } // TREX
@@ -67,8 +67,8 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
                                               sent_command(NULL), m_blocked(false), commandToBePosted(NULL), postedCommand(NULL)
 {
 
-  manager().add_handler(log_proxy(*this));
-  //syslog(warn)<<"This message should appeear in stderr";
+  manager().on_new_log(log_proxy(*this));
+  //syslog(log::warn)<<"This message should appeear in stderr";
 
   m_env->setPlatformReactor(this);
 
@@ -96,7 +96,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   m_skeeping_radius = parse_attr<double>(7.5, TeleoReactor::xml_factory::node(arg),
                                          "skeeping_radius");
 
-  syslog(info) << "Connecting to dune on " << duneip << ":" 
+  syslog(log::info) << "Connecting to dune on " << duneip << ":" 
       << duneport;
 
   // start listening for dune in a new thread
@@ -107,7 +107,7 @@ Platform::Platform(TeleoReactor::xml_arg_type arg) :
   receive.bind(localport, Address::Any, true);
   receive.addToPoll(iom);
 
-  syslog(info) << "listening on port " << localport << "...";
+  syslog(log::info) << "listening on port " << localport << "...";
 
   provide("estate", false); 		  // declare the state command timeline
   provide("vstate", false); 		  // declare the vstate command timeline
@@ -167,10 +167,10 @@ void Platform::handleTickStart()
 
     if (msg != NULL && msg->op_mode == IMC::VehicleState::VS_SERVICE)
     {
-      syslog(warn) << "handling at tick " << getCurrentTick();
+      syslog(log::warn) << "handling at tick " << getCurrentTick();
       if (sendMsg(*commandToBePosted)) {
         reportToDune("Maneuver dispatched");
-        syslog(warn) << "Dispatched maneuver:";
+        syslog(log::warn) << "Dispatched maneuver:";
         commandToBePosted->toText(syslog(warn));
 
         postedCommand = commandToBePosted;
@@ -181,12 +181,12 @@ void Platform::handleTickStart()
         next_goal = "";
       }
       else {
-        syslog(error) << "Unable to send message";
+        syslog(log::error) << "Unable to send message";
       }
     }
   }
   else if (commandToBePosted != NULL){
-    syslog(warn) << "Not handling right now... waiting for tick " << tickWhenToPost;
+    syslog(log::warn) << "Not handling right now... waiting for tick " << tickWhenToPost;
   }
 }
 
@@ -248,13 +248,13 @@ Platform::synchronize()
         switch (command->command)
         {
           case IMC::TrexCommand::OP_POST_GOAL:
-            syslog(info) << "received (" << command->goalid << "): " << command->goalxml;
+            syslog(log::info) << "received (" << command->goalid << "): " << command->goalxml;
             if (controlInterfaceInstance) {
               controlInterfaceInstance->proccess_message(command->goalxml);
             }
             break;
           case IMC::TrexCommand::OP_ENABLE:
-            syslog(warn) << "Enable TREX command received";
+            syslog(log::warn) << "Enable TREX command received";
             // post active observation ...
             uniqueObservation(Observation("supervision", "Active"));
             reportToDune("Activate TREX command received");
@@ -262,7 +262,7 @@ Platform::synchronize()
 
             break;
           case IMC::TrexCommand::OP_DISABLE:
-            syslog(warn) << "Disable TREX command received";
+            syslog(log::warn) << "Disable TREX command received";
             // post blocked observation ...
             uniqueObservation(Observation("supervision", "Blocked"));
             reportToDune("Disable TREX command received");
@@ -273,7 +273,7 @@ Platform::synchronize()
 
       if (msg->getId() == IMC::Abort::getIdStatic())
       {
-        syslog(warn) << "Abort received";
+        syslog(log::warn) << "Abort received";
         // post blocked observation ...
         uniqueObservation(Observation("supervision", "Blocked"));
         reportToDune("Disabling TREX due to abort detection");
@@ -297,12 +297,12 @@ Platform::synchronize()
     sendMsg(hb);
 
     if( msg_count<1 )
-      syslog(warn) << "processed " << msg_count << " messages\n";
+      syslog(log::warn) << "processed " << msg_count << " messages\n";
     std::cout << "processed " << msg_count << " messages\n";
   }
   catch (std::runtime_error& e)
   {
-    syslog(error)<<"Error during message processing: "<<e.what();
+    syslog(log::error)<<"Error during message processing: "<<e.what();
     std::cerr << e.what();
     return false;
   }
@@ -319,7 +319,7 @@ Platform::handleRequest(goal_id const &g)
   std::string gname = (goal->object()).str();
   std::string gpred = (goal->predicate()).str();
   std::string man_name;
-  syslog(info) << "handleRequest(" << gname << "." << gpred << ")\n";
+  syslog(log::info) << "handleRequest(" << gname << "." << gpred << ")\n";
 
   std::ostringstream ss;
   ss << "TREX_goal_" << g;
@@ -397,7 +397,7 @@ Platform::handleRequest(goal_id const &g)
 
     }
     else {
-      syslog(error) << "variables are not singletons!\n";
+      syslog(log::error) << "variables are not singletons!\n";
       return;
     }
     next_goal = g.get()->object().str();
@@ -407,7 +407,7 @@ Platform::handleRequest(goal_id const &g)
 void
 Platform::handleRecall(goal_id const &g)
 {
-  syslog(warn) << "handleRecall(" << current_goal << ")";
+  syslog(log::warn) << "handleRecall(" << current_goal << ")";
 
   if (current_goal == g.get()->object().str())
   {
@@ -577,7 +577,7 @@ Platform::processState()
         std::ostringstream ss;
         ss << "Unknown vehicle mode: " << msg->op_mode;
         reportToDune(ss.str());
-        syslog(warn) << ss.str();
+        syslog(log::warn) << ss.str();
         mode = "undefined";
         break;
     }
@@ -741,7 +741,7 @@ Platform::sendMsg(Message& msg, Address &dest)
   }
   catch (std::runtime_error& e)
   {
-    syslog("ERROR", error)<< e.what();
+    syslog("ERROR", log::error)<< e.what();
     return false;
   }
   return true;
@@ -768,7 +768,7 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
   }
   catch (std::runtime_error& e)
   {
-    syslog("ERROR", error)<< e.what();
+    syslog("ERROR", log::error)<< e.what();
     return false;
   }
   return true;
@@ -984,25 +984,21 @@ Platform::log_proxy::~log_proxy() {
 
 // callback
 
-void Platform::log_proxy::message
-(boost::optional<Platform::log_proxy::date_type> const &date,
-    Platform::log_proxy::id_type const &who,
-    Platform::log_proxy::id_type const &kind,
-    Platform::log_proxy::msg_type const &what) {
+void Platform::log_proxy::operator()(log::entry::pointer msg) {
   m_platform->m_active_proxy = this;
   // Example that display error/warnings on std::cerr
 
   std::ostringstream ss;
-  if( date )
-    ss<<'@'<<(*date)<<' ';
+  if( msg->is_dated() )
+    ss<<'@'<<msg->date()<<' ';
 
-  ss<<what;
+  ss<<msg->content();
 
-  if( warn==kind )
+  if( log::warn==msg->kind() )
     m_platform->reportToDune(IMC::LogBookEntry::LBET_WARNING, who.str(), ss.str());
-  else if (error==kind)
+  else if ( log::error==msg->kind() )
     m_platform->reportToDune(IMC::LogBookEntry::LBET_ERROR, who.str(), ss.str());
-  else if (TeleoReactor::obs==kind)
+  else if (TeleoReactor::obs==msg->kind() )
     m_platform->reportToDune(IMC::LogBookEntry::LBET_INFO, who.str(), ss.str());
 }
 
