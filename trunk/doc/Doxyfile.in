@@ -221,8 +221,10 @@ TAB_SIZE               = 7
 # put the command \sideeffect (or @sideeffect) in the documentation, which 
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
-
-ALIASES                = 
+""
+ALIASES                = "boost{2}=<a href=\"http://www.boost.org.doc/libs/1_47_0/doc/html/\1\">Boost.\2</a>" \
+		         "asio=@boost{boost_asio.html,Asio}" \
+			 "signals2=@boost{signals2.html,Signals2}"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
