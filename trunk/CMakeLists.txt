@@ -105,9 +105,24 @@ if(LIB_RT)
 endif(LIB_RT)
 
 ########################################################################
+# C++11 capabilities                                                   #
+########################################################################
+
+include(${PROJECT_SOURCE_DIR}/cmake/cpp11/cpp11.cmake)
+
+set(BOOST_REQUIRED_VERSION 1.46.1)
+if(NOT CPP11_HAS_CHRONO)
+  message(STATUS "c++11 chrono not found replacing it by boost chrono")
+  set(BOOST_REQUIRED_VERSION 1.47.0)
+  set(BOOST_COMPONENTS chrono)
+endif(NOT CPP11_HAS_CHRONO)
+
+
+########################################################################
 # Boost C++ Libraries                                                  #
 ########################################################################
-find_package(Boost 1.47.0 COMPONENTS thread system regex signals chrono filesystem date_time)
+find_package(Boost ${BOOST_REQUIRED_VERSION} 
+  COMPONENTS thread system regex signals filesystem date_time ${BOOST_COMPONENTS})
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
   list(APPEND ${PROJECT_NAME}_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})
