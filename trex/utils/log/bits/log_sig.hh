@@ -37,7 +37,7 @@
 
 # include "../entry.hh"
 
-# include <boost/signals2.hpp>
+# include <boost/signals2/signal.hpp>
 # include <boost/asio.hpp>
 
 namespace TREX {

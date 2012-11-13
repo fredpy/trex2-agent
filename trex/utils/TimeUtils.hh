@@ -46,7 +46,8 @@
 #ifndef H_TimeUtils
 # define H_TimeUtils
 
-# include <boost/chrono/duration.hpp>
+# include "bits/chrono.hh"
+
 # include <boost/date_time/posix_time/ptime.hpp>
 # include <boost/config.hpp>
 
@@ -60,18 +61,18 @@ namespace TREX {
     struct chrono_posix_convert;
   
     template<typename Rep, typename Period>
-    struct chrono_posix_convert< boost::chrono::duration<Rep, Period> > {
-      typedef boost::chrono::duration<Rep, Period> chrono_duration;
+    struct chrono_posix_convert< CHRONO::duration<Rep, Period> > {
+      typedef CHRONO::duration<Rep, Period> chrono_duration;
       typedef boost::posix_time::time_duration     posix_duration;
 
-      typedef boost::chrono::nanoseconds ns_duration;
+      typedef CHRONO::nanoseconds ns_duration;
       
       static chrono_duration to_chrono(posix_duration const &pd) {
-        return boost::chrono::duration_cast<chrono_duration>(ns_duration(pd.total_nanoseconds()));
+        return CHRONO::duration_cast<chrono_duration>(ns_duration(pd.total_nanoseconds()));
       }
       
       static posix_duration to_posix(chrono_duration const &cd) {
-        typename ns_duration::rep ns = boost::chrono::duration_cast<ns_duration>(cd).count(),
+        typename ns_duration::rep ns = CHRONO::duration_cast<ns_duration>(cd).count(),
           secs = ns/1000000000l,
           nsecs = ns%1000000000l;
           

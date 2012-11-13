@@ -47,8 +47,11 @@
 # include "bits/external.hh"
 # include "reactor_graph.hh"
 
-# include <boost/chrono.hpp>
-# include <boost/chrono/thread_clock.hpp>
+# include <trex/utils/TimeUtils.hh>
+
+# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+#  include <boost/chrono/thread_clock.hpp>
+# endif 
 
 namespace TREX {
   namespace transaction {
@@ -91,6 +94,19 @@ namespace TREX {
       typedef details::external_set                       external_set;
  
     public:
+# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+      typedef CHRONO::thread_clock stat_clock;
+# else
+#  if defined(CPP11_HAS_CHRONO)
+      // standard do not support processing time AFAIK
+      typedef CHRONO::high_resolution_clock stat_clock;
+#  else
+      // boost does on the other hand
+      typedef CHRONO::process_user_cpu_clock stat_clock;
+#  endif
+# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+      typedef stat_clock::duration stat_duration; 
+
       static utils::Symbol const obs;
       static utils::Symbol const plan;
 
@@ -1014,12 +1030,6 @@ namespace TREX {
        */
       external_iterator find_external(TREX::utils::Symbol const &name);
 
-# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-      typedef boost::chrono::thread_clock stat_clock;
-# else 
-      typedef boost::chrono::process_user_cpu_clock stat_clock;        
-# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
-      typedef stat_clock::duration stat_duration; 
 
     private:
       stat_duration m_synch_usage, m_deliberation_usage;

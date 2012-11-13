@@ -204,6 +204,8 @@ endmacro(bash_path)
 
 set(TREX_SHARED share/trex)
 
+include_directories(${CMAKE_BINARY_DIR})
+
 # core libraries 
 add_subdirectory(trex)
 trex_cfg(cfg ${TREX_SHARED})

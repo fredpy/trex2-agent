@@ -95,16 +95,16 @@ namespace {
 	max = parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
         hi(IntegerDomain::plus_inf);
-      boost::chrono::duration<double> 
+      CHRONO::duration<double> 
         ratio = m_owner.tickDuration();
-      typedef TREX::utils::chrono_posix_convert< boost::chrono::duration<double> > cvt;
+      typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
       if( min ) {
-        boost::chrono::duration<double> min_s(cvt::to_chrono(*min));
+        CHRONO::duration<double> min_s(cvt::to_chrono(*min));
 
         double value = min_s.count()/ratio.count();
         lo = static_cast<long long>(std::floor(value));
       } if( max ) {
-        boost::chrono::duration<double> max_s(cvt::to_chrono(*max));
+        CHRONO::duration<double> max_s(cvt::to_chrono(*max));
         
         double value = max_s.count()/ratio.count();
 	hi = static_cast<long long>(std::ceil(value));

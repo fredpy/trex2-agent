@@ -37,6 +37,7 @@
 #include "bits/log_stream.hh" 
 
 #include <boost/smart_ptr.hpp>
+#include <boost/signals2/shared_connection_block.hpp>
 
 namespace TREX {
   namespace utils {
@@ -108,7 +109,7 @@ void text_log::post(entry::pointer const &msg) {
  */
 
 out_file::out_file(std::string const &name)
-:m_file(boost::make_shared<std::ofstream>(name.c_str())) {}
+ :m_file(new std::ofstream(name.c_str())) {} // should use make_shared instead but clash when boost used with gcc with c++11 support
 
 void out_file::operator()(entry::pointer msg) {
   if( m_file && *m_file) {

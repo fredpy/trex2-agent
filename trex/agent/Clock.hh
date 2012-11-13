@@ -130,7 +130,7 @@ namespace TREX {
        * @return tick duration
        */
       virtual duration_type tickDuration() const {
-	return boost::chrono::seconds(1);
+	return CHRONO::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
         return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());

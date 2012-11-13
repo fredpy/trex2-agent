@@ -38,10 +38,12 @@
 
 # ifdef CPP11_HAS_CHRONO
 #  include <chrono>
-#  define CHRONO std::chrono
+#  define CHRONO_NS std
 # else
 #  include <boost/chrono.hpp>
-#  define CHRONO boost::chrono
+#  define CHRONO_NS boost
 # endif 
+
+# define CHRONO CHRONO_NS::chrono
 
 #endif // H_trex_cpp11
