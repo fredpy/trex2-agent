@@ -35,8 +35,12 @@
 
 configure_file(version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/version.hh @ONLY)
+configure_file(chrono.hh.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/cpp11.hh)
+
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/version.hh 
+  ${CMAKE_CURRENT_BINARY_DIR}/chrono.hh
   DESTINATION include/trex
 )
 
