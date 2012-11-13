@@ -64,14 +64,14 @@ namespace TREX {
     /** @brief High accuracy tick clock
      *
      * @tparam Param period The tick period base type
-     * @tparam Clk a clock definition based on boost::chrono 
+     * @tparam Clk a clock definition based on CHRONO 
      *
      * This is the clock inmplementation that allows to implement a clock 
      * with precise tick frequency based on a clock. This clock will allow 
      * to implement any tick which is a multiple of @p Period and will rely on 
      * @p Clk to measure time 
      * 
-     * It uses boost::chrono library to measure time and allow to ensure that 
+     * It uses CHRONO library to measure time and allow to ensure that 
      * the tick value is always as accurate as @p Clk allow
      *
      * For exampel if one desire to  implement a clock running a &Hz or any of 
@@ -84,7 +84,7 @@ namespace TREX {
      * @author Frederic Py
      * @ingroup agent
      */
-    template<class Period, class Clk = boost::chrono::high_resolution_clock>
+    template<class Period, class Clk = CHRONO::high_resolution_clock>
     struct rt_clock :public Clock {      
     public:
       using typename Clock::duration_type;
@@ -116,7 +116,7 @@ namespace TREX {
         check_tick();
         if( percent_use<5 || percent_use>100 )
           throw utils::Exception("Only accept clock percent_use between 5 and 100%");
-        m_sleep_watchdog = percent_use*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog = percent_use*CHRONO::duration_cast<duration_type>(m_period);
         m_sleep_watchdog /= 100;
       }
       
@@ -125,7 +125,7 @@ namespace TREX {
         check_tick();
         if( percent_use<5 || percent_use>100 )
           throw utils::Exception("Only accept clock percent_use between 5 and 100%");
-        m_sleep_watchdog = percent_use*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
       /** @} */
@@ -153,47 +153,48 @@ namespace TREX {
         if( tick ) {
           m_period = tick_rate(*tick);
         } else {
-          boost::chrono::nanoseconds ns_tick = boost::chrono::nanoseconds::zero();
-          typedef boost::optional< typename boost::chrono::nanoseconds::rep >
+          CHRONO::nanoseconds ns_tick = CHRONO::nanoseconds::zero();
+          typedef boost::optional< typename CHRONO::nanoseconds::rep >
             value_type;
           value_type value;
 
           // Get nanoseconds
           value = utils::parse_attr<value_type>(node, "nanos");
           if( value )
-            ns_tick += boost::chrono::nanoseconds(*value);
+            ns_tick += CHRONO::nanoseconds(*value);
           
           // Get microseconds
           value = utils::parse_attr<value_type>(node, "micros");
           if( value )
-            ns_tick += boost::chrono::microseconds(*value);
+            ns_tick += CHRONO::microseconds(*value);
             
           // Get milliseconds
           value = utils::parse_attr<value_type>(node, "millis");
           if( value )
-            ns_tick += boost::chrono::milliseconds(*value);
+            ns_tick += CHRONO::milliseconds(*value);
             
           // Get seconds
           value = utils::parse_attr<value_type>(node, "seconds");
           if( value )
-            ns_tick += boost::chrono::seconds(*value);
+            ns_tick += CHRONO::seconds(*value);
           
           // Get minutes
           value = utils::parse_attr<value_type>(node, "minutes");
           if( value )
-            ns_tick += boost::chrono::minutes(*value);
+            ns_tick += CHRONO::minutes(*value);
           
           // Get hours
           value = utils::parse_attr<value_type>(node, "hours");
           if( value )
-            ns_tick += boost::chrono::hours(*value);
-          m_period = boost::chrono::duration_cast<tick_rate>(ns_tick);
+            ns_tick += CHRONO::hours(*value);
+          m_period = CHRONO::duration_cast<tick_rate>(ns_tick);
         } 
         check_tick();
         unsigned sleep_ratio = utils::parse_attr<unsigned>(100, node, "percent_use");
         if( sleep_ratio<5 || sleep_ratio>100 )
           throw utils::Exception("Only accept clock precent_use between 5 and 100%");
-        m_sleep_watchdog = sleep_ratio*boost::chrono::duration_cast<duration_type>(m_period);
+        m_sleep_watchdog = 
+	  sleep_ratio*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
       /** @brief Destructor */
@@ -201,7 +202,7 @@ namespace TREX {
       
       void update_sleep() {
           m_sleep = m_clock->epoch();
-          m_sleep += boost::chrono::duration_cast<typename clock_type::base_duration>(m_tick.time_since_epoch());
+          m_sleep += CHRONO::duration_cast<typename clock_type::base_duration>(m_tick.time_since_epoch());
           m_sleep += m_sleep_watchdog;
       }
       
@@ -215,7 +216,7 @@ namespace TREX {
       }
 
       duration_type tickDuration() const {
-        return boost::chrono::duration_cast<duration_type>(m_period);
+        return CHRONO::duration_cast<duration_type>(m_period);
       }
       
       transaction::TICK timeToTick(date_type const &date) const {
@@ -233,8 +234,12 @@ namespace TREX {
       }
       std::string info() const {
         std::ostringstream oss;
+# ifndef CPP11_HAS_CHRONO
         oss<<"rt_clock based on "
-          <<boost::chrono::clock_string<Clk, char>::name();
+          <<CHRONO::clock_string<Clk, char>::name();
+# else 
+	oss<<"rt_clock";
+# endif 
         utils::display(oss<<"\n\ttick period: ", m_period);
         oss<<"\n\tfrequency: ";
         
@@ -267,7 +272,7 @@ namespace TREX {
         if( NULL!=m_clock.get() ) {
           typename clock_type::base_duration how_late = m_clock->to_next(m_tick, m_period);
           if( how_late >=clock_type::base_duration::zero() ) {
-            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(how_late).count();
+            double ratio = CHRONO::duration_cast< CHRONO::duration<double, Period> >(how_late).count();
             ratio /= m_period.count();
             if( ratio>=0.1 ) {
               // more than 10% of a tick late => display a warning
@@ -302,9 +307,9 @@ namespace TREX {
           typename clock_type::time_point target = m_tick + m_period;
           typename clock_type::base_duration left = m_clock->left(target);
           if( left >= clock_type::base_duration::zero() )
-            return boost::chrono::duration_cast<duration_type>(left);
+            return CHRONO::duration_cast<duration_type>(left);
           else {
-            double ratio = boost::chrono::duration_cast< boost::chrono::duration<double, Period> >(-left).count();
+            double ratio = CHRONO::duration_cast< CHRONO::duration<double, Period> >(-left).count();
             ratio /= m_period.count();
             if( ratio>=0.05 ) {
               // more than 5% of a tick late => display a warning
@@ -337,7 +342,7 @@ namespace TREX {
       typename clock_type::time_point m_tick;
     }; 
     
-    typedef rt_clock<boost::milli> RealTimeClock;
+    typedef rt_clock<CHRONO_NS::milli> RealTimeClock;
   
     
   } // TREX::agent 

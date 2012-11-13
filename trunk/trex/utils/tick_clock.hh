@@ -34,7 +34,7 @@
 #ifndef H_TREX_utils_tick_clock
 # define H_TREX_utils_tick_clock
 
-# include <boost/chrono.hpp>
+# include "bits/chrono.hh"
 # include "Exception.hh"
 
 namespace TREX {
@@ -52,7 +52,7 @@ namespace TREX {
      *
      * For example, one can implement a 1Hz clock as follow:
      * @code 
-     *  typedef tick_clock<boost::chrono::seconds> one_hz_clock;
+     *  typedef tick_clock<CHRONO::seconds> one_hz_clock;
      *
      *  one_hz_clock my_clock; // starts the clock
      *  one_hz_clock::time_point date = my_clock.now(); // get current second since started
@@ -64,7 +64,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
      */
-    template<typename Period, class Clock=boost::chrono::high_resolution_clock>
+    template<typename Period, class Clock=CHRONO::high_resolution_clock>
     class tick_clock {
     public:
       /** @brief Subjacent clock type 
@@ -98,12 +98,12 @@ namespace TREX {
        *
        * The type used to represent durations for this clock
        */
-      typedef boost::chrono::duration<rep, period>   duration;
+      typedef CHRONO::duration<rep, period>   duration;
       /** @brief time point type 
        *
        * The type used to represent time points for this clock
        */
-      typedef boost::chrono::time_point<tick_clock, duration>  time_point;
+      typedef CHRONO::time_point<tick_clock, duration>  time_point;
 
       static bool const is_steady = base_clock::is_steady;
 
@@ -159,7 +159,7 @@ namespace TREX {
        */
       time_point now() const {
 	base_duration delta = Clock::now()-epoch();                       // Get duration since epoch
-	return time_point(boost::chrono::duration_cast<duration>(delta)); // round to our Period
+	return time_point(CHRONO::duration_cast<duration>(delta)); // round to our Period
       }
       /** @brief Accurate current date
        *
@@ -178,7 +178,7 @@ namespace TREX {
        */
       time_point now(base_duration &remain) const {
 	remain = Clock::now()-epoch();                                     // Get duration since epoch
-	duration n_ticks = boost::chrono::duration_cast<duration>(remain); // round to our Period
+	duration n_ticks = CHRONO::duration_cast<duration>(remain); // round to our Period
 	remain -= n_ticks;                                                 // get sub Period time
 	return time_point(n_ticks);
       }
@@ -205,7 +205,7 @@ namespace TREX {
        */
       time_point now(duration const &tick, base_duration &remain) const {
 	remain = Clock::now()-epoch();                                     // Get duration since epoch
-	duration n_ticks = boost::chrono::duration_cast<duration>(remain), // round to our Period
+	duration n_ticks = CHRONO::duration_cast<duration>(remain), // round to our Period
           extra = n_ticks%tick;                                            // get the module of tick
         n_ticks -= extra;                                                  // round to a multiple of tick
 	remain -= n_ticks;                                                 // get sub tick time
@@ -215,7 +215,7 @@ namespace TREX {
       
       base_duration to_next(time_point &date, duration const &tick) const {
         base_duration ret = Clock::now()-epoch();
-        duration extra(boost::chrono::duration_cast<duration>(ret));
+        duration extra(CHRONO::duration_cast<duration>(ret));
         time_point cur(extra);
         extra %= tick; 
         cur -= extra;
@@ -238,7 +238,7 @@ namespace TREX {
       base_duration left(time_point const &target) const {
         duration t_dur = target.time_since_epoch();
         base_time_point 
-           real_target = epoch()+boost::chrono::duration_cast<base_duration>(t_dur);
+           real_target = epoch()+CHRONO::duration_cast<base_duration>(t_dur);
         return real_target-Clock::now();
       }
     private:

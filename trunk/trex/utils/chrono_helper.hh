@@ -34,7 +34,10 @@
 #ifndef H_trex_utils_chrono_helper
 # define H_trex_utils_chrono_helper
 
-# include <boost/chrono/chrono_io.hpp>
+# include "bits/chrono.hh"
+# ifndef CPP11_HAS_CHRONO
+#  include <boost/chrono/chrono_io.hpp>
+# endif // CPP11_HAS_CHRONO
 
 # include <ostream>
 # include <iostream>
@@ -58,45 +61,49 @@ namespace TREX {
      */
     template <class CharT, class Traits, class Rep, class Period>
     std::basic_ostream<CharT, Traits> &display(std::basic_ostream<CharT, Traits> &out,
-                                               boost::chrono::duration<Rep, Period> d) {
-      if( d < boost::chrono::duration<Rep, Period>::zero() ) {
+                                               CHRONO::duration<Rep, Period> d) {
+      if( d < CHRONO::duration<Rep, Period>::zero() ) {
         d = -d;
         out.put('-');
       }
       // Extract the number of seconds
-      boost::chrono::seconds
-      s = boost::chrono::duration_cast<boost::chrono::seconds>(d);
+      CHRONO::seconds
+      s = CHRONO::duration_cast<CHRONO::seconds>(d);
       
-      if( s>boost::chrono::seconds::zero() ) {
+      if( s>CHRONO::seconds::zero() ) {
         d -= s;
         
         // Extract number of minutes
-        boost::chrono::minutes
-        m = boost::chrono::duration_cast<boost::chrono::minutes>(s);
+        CHRONO::minutes
+        m = CHRONO::duration_cast<CHRONO::minutes>(s);
         
-        if( m > boost::chrono::minutes::zero() ) {
+        if( m > CHRONO::minutes::zero() ) {
           s -= m;
           
           // Extract the number of hours
-          boost::chrono::hours
-          h = boost::chrono::duration_cast<boost::chrono::hours>(m);
+          CHRONO::hours
+          h = CHRONO::duration_cast<CHRONO::hours>(m);
           
-          if( h > boost::chrono::hours::zero() ) {
+          if( h > CHRONO::hours::zero() ) {
             m -= h;
             // Display as hours:MM:SS.XXXX
             out<<h.count()<<':';
-            if( m < boost::chrono::minutes(10) )
+            if( m < CHRONO::minutes(10) )
               out.put('0'); // Need 2 digits
           }
-          out<<m<<':';
-          if( s < boost::chrono::seconds(10) )
+          out<<m.count()<<':';
+          if( s < CHRONO::seconds(10) )
             out.put('0'); // Need 2 digits
         }
       }
-      typedef boost::chrono::duration<long double> f_secs;
-      f_secs ss = boost::chrono::duration_cast<f_secs>(s);
+      typedef CHRONO::duration<long double> f_secs;
+      f_secs ss = CHRONO::duration_cast<f_secs>(s);
       ss += d;
-      return boost::chrono::duration_short(out)<<ss;
+# ifndef CPP11_HAS_CHRONO
+      return CHRONO::duration_short(out)<<ss;
+# else
+      return out<<ss.count()<<" s";
+# endif
     }
     
   } // TREX::utils

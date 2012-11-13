@@ -124,7 +124,7 @@ namespace TREX {
      */
     class graph :boost::noncopyable {
     public:
-      typedef boost::chrono::nanoseconds duration_type;
+      typedef CHRONO::nanoseconds duration_type;
       typedef boost::posix_time::ptime   date_type;
     
       /** @brief reactor ID type
@@ -509,7 +509,7 @@ namespace TREX {
        * @sa timeToTick(time_t, suseconds_t) const
        */
       virtual duration_type tickDuration() const {
-	return boost::chrono::seconds(1);
+	return CHRONO::seconds(1);
       }
       /** @brief convert real-time into a TICK
        *

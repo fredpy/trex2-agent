@@ -33,6 +33,14 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+configure_file(chrono.hh.in 
+  ${CMAKE_BINARY_DIR}/bits/chrono.hh)
+
+install(
+  FILES ${CMAKE_BINARY_DIR}/bits/chrono.hh 
+  DESTINATION include/trex/utils/bits
+)
+
 add_library(TREXutils SHARED
   # real source
   ErrnoExcept.cc
