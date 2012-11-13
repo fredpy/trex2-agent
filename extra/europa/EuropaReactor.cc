@@ -712,12 +712,12 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 // Observers
 
 EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
-  typedef chrono_posix_convert< boost::chrono::duration<EUROPA::edouble::basis_type> > convert;
+  typedef chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
   return convert::to_chrono(tickToTime(EUROPA::cast_basis(tick))-boost::posix_time::from_time_t(0)).count();
 }
 
 EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
-  typedef chrono_posix_convert< boost::chrono::duration<EUROPA::edouble::basis_type> > convert;
+  typedef chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
   convert::chrono_duration rdate(EUROPA::cast_basis(date));
   return static_cast<EUROPA::eint::basis_type>(timeToTick(boost::posix_time::from_time_t(0)+convert::to_posix(rdate)));
 }
