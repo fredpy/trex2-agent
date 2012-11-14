@@ -32,31 +32,47 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
+cmake_minimum_required(VERSION 2.8)
 
-# Try to locate ROS 
+# locate ROS
+set(ROS_ROOT $ENV{ROS_ROOT} CACHE PATH 
+  "root path for ROS")
 
-set(ROS_ROOT $ENV{ROS_ROOT} CACHE PATH
-  "Location of ros in the system")
-
-
-# Search for ROS
 if(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
-  find_file(ros_cmake rosbuild.cmake HINTS $ROS_ROOT/core/rosbuild)
-  if(ros_cmake) 
-    set(ROS_BUILD ${ros_cmake} CACHE FILE "ROS cmake build file")
-  else(ros_cmake)
+  find_file(ROS_CMAKE rosbuild.cmake HINTS ${ROS_ROOT}/core/rosbuild)
+  mark_as_advanced(ROS_CMAKE)
+  if(ROS_CMAKE)
+    set(ROS_CFG ${ROS_CMAKE} CACHE FILE "ROS configuration file" FORCE)
+    mark_as_advanced(ROS_CFG)
+    message(STATUS "ROS config found: ${ROS_CFG}")
+  else(ROS_CMAKE)
     message(SEND_ERROR "Unable to find rosbuild.cmake")
-  endif(ros_cmake)
-  set(OLD_ROS_ROOT ${ROS_ROOT} CACHE INTERNAL "former ROS_ROOT value." FORCE)
+  endif(ROS_CMAKE)
+  set(OLD_ROS_ROOT ${ROS_ROOT} CACHE INTERNAL "former ROS_ROOT value" FORCE)
 endif(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
 
-if(ROS_BUILD)
-  include($ROS_BUILD)
-  rosbuild_init()
-  
-  rosbuild_add_library(TREXros ros_reactor.cc ros_reactor.hh)
-  target_link_libraries(TREXros TREXtransaction)
-  
-  trex_plugin(ros ros_plugin.cc)
-  target_link_libraries(ros_pg TREXros)
-endif(ROS_BUILD)
+if(ROS_CFG)
+  include(${ROS_CFG})
+  # Now I need to check all the things I need  
+  rosbuild_find_ros_package(roscpp)
+  if(roscpp_PACKAGE_PATH)
+    message(STATUS "Looking for roscpp: ${roscpp_PACKAGE_PATH}")
+    # gets compilation information
+    rosbuild_invoke_rospack(roscpp roscpp INCLUDE_DIRS cflags-only-I)
+    rosbuild_invoke_rospack(roscpp roscpp CFLAGS cflags-only-other)
+    rosbuild_invoke_rospack(roscpp roscpp LINK_PATH libs-only-L)
+    rosbuild_invoke_rospack(roscpp roscpp LINK_LIBS libs-only-l)
+    rosbuild_invoke_rospack(roscpp roscpp LINK_FLAGS libs-only-other)
+
+    include_directories(${roscpp_INCLUDE_DIRS})
+    add_definitions(${roscpp_CFLAGS})
+    add_library(TREXros ros_reactor.cc ros_reactor.hh)    
+    target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
+      -L${roscpp_LINK_PATH} 
+      ${roscpp_LINK_LIBS} TREXtransaction)
+
+  else(roscpp_PACKAGE_PATH)
+    message(SEND_ERROR "Failed to locate roscpp ROS package")
+  endif(roscpp_PACKAGE_PATH)
+endif(ROS_CFG)
+
