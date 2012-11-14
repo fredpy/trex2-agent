@@ -35,7 +35,6 @@
 # define H_trex_ros_ros_reactor
 
 # include <ros/ros.h>
-# include <ros/node.h>
 
 # include <trex/transaction/TeleoReactor.hh>
 
