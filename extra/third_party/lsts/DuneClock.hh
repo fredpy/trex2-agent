@@ -69,7 +69,7 @@ namespace TREX {
      * @relates dune_posix_clock
      * @sa steady_clock
      */
-    typedef agent::rt_clock<boost::milli, dune_posix_clock> posix_clock;
+    typedef agent::rt_clock<CHRONO_NS::milli, dune_posix_clock> posix_clock;
 
     /** @brief dune steady clock
      *
