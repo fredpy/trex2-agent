@@ -64,12 +64,19 @@ if(ROS_CFG)
     rosbuild_invoke_rospack(roscpp roscpp LINK_LIBS libs-only-l)
     rosbuild_invoke_rospack(roscpp roscpp LINK_FLAGS libs-only-other)
 
+    # General library
     include_directories(${roscpp_INCLUDE_DIRS})
     add_definitions(${roscpp_CFLAGS})
-    add_library(TREXros ros_reactor.cc ros_reactor.hh)    
+    add_library(TREXros SHARED
+      ros_reactor.cc ros_reactor.hh)    
     target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
       -L${roscpp_LINK_PATH} 
       ${roscpp_LINK_LIBS} TREXtransaction)
+    install(TARGETS TREXros DESTINATION lib)
+    
+    # The plugin placeholder : also initialize ros on load
+    trex_plugin(ros ros_init.cc)
+    target_link_libraries(ros_pg TREXros)
 
   else(roscpp_PACKAGE_PATH)
     message(SEND_ERROR "Failed to locate roscpp ROS package")
