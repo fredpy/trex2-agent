@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2012, MBARI.
+ *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,32 +31,28 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_ros_reactor
-# define H_trex_ros_ros_reactor
+#include "ros_reactor.hh"
 
-# include <ros/ros.h>
+#include <trex/utils/Plugin.hh>
+#include <trex/utils/LogManager.hh>
 
-# include <trex/transaction/TeleoReactor.hh>
+using namespace TREX::utils;
+using namespace TREX::transaction;
+using namespace TREX::ROS;
+
+namespace {
+  SingletonUse<LogManager> s_log;
+
+  TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSREactor");
+}
 
 namespace TREX {
-  namespace ROS {
-    
-    class ros_reactor:public TREX::transaction::TeleoReactor {
-    public:
-      ros_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
 
-    private:
-      void handleInit();
-      bool synchronize();
-      
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
+  void initPlugin() {
+    int argc = 0;
+    char **argv = NULL;
+    ros::init(argc, argv, "trex2", ros::init_options::AnonymousName);
+    s_log->syslog("ros", log::info)<<"ROS initialized";
+  }
 
-      ::ros::NodeHandle m_ros;
-    }; // TREX::ros::ros_reactor
-
-  } // TREX::ros
-} // TREX
-
-#endif // H_trex_ros_ros_reactor
+}

@@ -32,3 +32,27 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_reactor.hh"
+
+using namespace TREX::ROS;
+using namespace TREX::transaction;
+
+ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
+  :TeleoReactor(arg, false) {
+  // Need to parse the timelines  
+}
+    
+ros_reactor::~ros_reactor() {
+}
+
+void ros_reactor::handleInit() {
+}
+
+bool ros_reactor::synchronize() {
+  return ::ros::ok();
+}
+      
+void ros_reactor::handleRequest(goal_id const &g) {
+}
+
+void ros_reactor::handleRecall(goal_id const &g) {
+}
