@@ -68,10 +68,16 @@ if(ROS_CFG)
     include_directories(${roscpp_INCLUDE_DIRS})
     add_definitions(${roscpp_CFLAGS})
     add_library(TREXros SHARED
-      ros_reactor.cc ros_reactor.hh)    
+      # source 
+      ros_reactor.cc 
+      ros_clock.cc
+      # header
+      ros_reactor.hh
+      ros_clock.hh)
+    
     target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
       -L${roscpp_LINK_PATH} 
-      ${roscpp_LINK_LIBS} TREXtransaction)
+      ${roscpp_LINK_LIBS} TREXagent)
     install(TARGETS TREXros DESTINATION lib)
     
     # The plugin placeholder : also initialize ros on load

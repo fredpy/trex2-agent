@@ -31,42 +31,18 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ros_reactor.hh"
- 
+#include "ros_clock.hh"
+
+#include <ros/time.h>
+
+
+namespace {
+  TREX::agent::Clock::xml_factory::declare<TREX::ROS::clock> 
+    decl("ROSClock");
+}
+
 using namespace TREX::ROS;
-using namespace TREX::transaction;
-using namespace TREX::utils; 
 
-ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false) {
-  // Need to parse the timelines
-  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
-  // embeds external configuration
-  ext_xml(node.second, "config");
- 
-  for(boost::property_tree::ptree::iterator i=node.second.begin();
-      node.second.end()!=i; ++i) {
-    if( is_tag(*i, "Observe") ) {
-      // Do something to get the data
-    } else if( is_tag(*i, "Service") ) {
-      // Do something to both allow requests and collect feedback
-    } else
-      syslog(log::warn)<<"Ignoring XML tag "<<i->first;
-  }
-}
-    
-ros_reactor::~ros_reactor() {
-}
-
-void ros_reactor::handleInit() { 
-}
-
-bool ros_reactor::synchronize() {
-  return ::ros::ok();
-}
-      
-void ros_reactor::handleRequest(goal_id const &g) {
-}
-
-void ros_reactor::handleRecall(goal_id const &g) {
+ros_clock::time_point ros_clock::now() {
+  return time_point(duration(ros::Time::now().toNSec()));
 }

@@ -31,42 +31,31 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ros_reactor.hh"
- 
-using namespace TREX::ROS;
-using namespace TREX::transaction;
-using namespace TREX::utils; 
+#ifndef H_trex_ros_ros_clock
+# define H_trex_ros_ros_clock
 
-ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false) {
-  // Need to parse the timelines
-  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
-  // embeds external configuration
-  ext_xml(node.second, "config");
- 
-  for(boost::property_tree::ptree::iterator i=node.second.begin();
-      node.second.end()!=i; ++i) {
-    if( is_tag(*i, "Observe") ) {
-      // Do something to get the data
-    } else if( is_tag(*i, "Service") ) {
-      // Do something to both allow requests and collect feedback
-    } else
-      syslog(log::warn)<<"Ignoring XML tag "<<i->first;
-  }
-}
-    
-ros_reactor::~ros_reactor() {
-}
+# include <trex/agent/RealTimeClock.hh>
 
-void ros_reactor::handleInit() { 
-}
+namespace TREX {
+  namespace ROS {
 
-bool ros_reactor::synchronize() {
-  return ::ros::ok();
-}
-      
-void ros_reactor::handleRequest(goal_id const &g) {
-}
+    class ros_clock {
+    public:
+      typedef CHRONO::nanoseconds           duration;
+      typedef duration::rep                 rep;
+      typedef duration::period              period;
+      typedef CHRONO::time_point<ros_clock>  time_point;
 
-void ros_reactor::handleRecall(goal_id const &g) {
-}
+      // which I knew if the clock is steady or not 
+      // for now lets just assume it is not
+      static const bool is_steady = false; 
+
+      static time_point now();
+    }; // TREX::ROS::ros_clock
+
+    typedef agent::rt_clock<CHRONO_NS::milli, ros_clock> clock;
+
+  } // TREX::ROS
+} // TREX
+
+#endif // H_trex_ros_ros_clock
