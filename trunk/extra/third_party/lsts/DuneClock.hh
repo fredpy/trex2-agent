@@ -23,7 +23,7 @@ namespace TREX {
        * 
        * The type used to for duration by this clock
        */
-      typedef boost::chrono::nanoseconds duration;
+      typedef CHRONO::nanoseconds duration;
       /** @brief duration storage type
        * 
        * The type used to count ticks by this clock
@@ -39,7 +39,7 @@ namespace TREX {
        * The type to represent a time point (or date) for this
        * clock.
        */
-      typedef boost::chrono::time_point<dune_posix_clock> time_point;
+      typedef CHRONO::time_point<dune_posix_clock> time_point;
 
       /** @brief Steadyness flag
        *
@@ -88,7 +88,7 @@ namespace TREX {
        * 
        * The type used to for duration by this clock
        */
-      typedef boost::chrono::nanoseconds                   duration;
+      typedef CHRONO::nanoseconds                   duration;
       /** @brief duration storage type
        * 
        * The type used to count ticks by this clock
@@ -103,7 +103,7 @@ namespace TREX {
        *
        * The type to represent a time point (or date) for this clock.
        */
-      typedef boost::chrono::time_point<dune_steady_clock> time_point;
+      typedef CHRONO::time_point<dune_steady_clock> time_point;
 
       /** @brief Steadyness flag
        *
@@ -133,10 +133,12 @@ namespace TREX {
      * @relates dune_steady_clock
      * @sa posix_clock
      */
-    typedef agent::rt_clock<boost::milli, dune_steady_clock> steady_clock;
+    typedef agent::rt_clock<CHRONO_NS::milli, dune_steady_clock> steady_clock;
 
   } // TREX::LSTS
 } // TREX
+
+#ifndef CPP11_HAS_CHRONO
 
 namespace boost {
   namespace chrono {
@@ -191,8 +193,9 @@ namespace boost {
         static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
         return str;
       }
-    }; // boost::chrono::clock_string<TREX::LSTS::dune_posix_clock, >
-  } // boost::chrono
+    }; //boost::chrono::clock_string<TREX::LSTS::dune_posix_clock, >
+  } //boost::chrono
 } // boost
+#endif // !CPP11_HAS_CHRONO
 
 #endif // H_DuneClock
