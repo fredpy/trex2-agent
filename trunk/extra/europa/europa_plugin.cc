@@ -54,7 +54,7 @@ namespace TREX {
     if( !Assembly::actions_supported() )
       ::s_log->syslog("plugin.europa", warn)<<"This version of europa plugin"
 	  " was compiled without Europa 2.6 action support!"; 
-    ::s_log->syslog("plugin.europa", info)<<"Europa loaded.";
+    ::s_log->syslog("plugin.europa", log::info)<<"Europa loaded.";
     // ::decl;
   }  
 

@@ -52,7 +52,7 @@ namespace TREX {
     int argc = 0;
     char **argv = NULL;
     ros::init(argc, argv, "trex2", ros::init_options::AnonymousName);
-    s_log->syslog("ros", log::info)<<"ROS initialized";
+    s_log->syslog("ros.plugin", log::info)<<"ROS initialized";
   }
 
 }
