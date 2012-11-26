@@ -37,6 +37,7 @@
 
 # include "log_fwd.hh"
 # include "bits/log_stream.hh"
+# include "../platform/memory.hh"
 
 # include <iostream>
 # include <memory>
@@ -91,7 +92,7 @@ namespace TREX {
          * 
          * Tranfert the entry ownership from @p other to this ne instance
          */
-        stream(stream const &other):m_out(other.m_out) {}
+        stream(stream const &other):m_out(STD_MOVE(other.m_out)) {}
         /** @brief Destructor */
         ~stream() {}
         
@@ -129,7 +130,7 @@ namespace TREX {
       private:
         explicit stream(details::entry_sink const &dest);
         
-        mutable std::auto_ptr<details::stream_impl> m_out;
+        mutable UNIQ_PTR<details::stream_impl> m_out;
         
         friend class text_log;
 # ifndef DOXYGEN

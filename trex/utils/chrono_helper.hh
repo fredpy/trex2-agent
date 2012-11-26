@@ -34,11 +34,7 @@
 #ifndef H_trex_utils_chrono_helper
 # define H_trex_utils_chrono_helper
 
-# include "bits/chrono.hh"
-# ifndef CPP11_HAS_CHRONO
-#  include <boost/chrono/chrono_io.hpp>
-# endif // CPP11_HAS_CHRONO
-
+# include "platform/chrono.hh"
 # include <ostream>
 # include <iostream>
 

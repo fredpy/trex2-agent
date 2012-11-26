@@ -33,13 +33,14 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-configure_file(chrono.hh.in 
-  ${CMAKE_BINARY_DIR}/bits/chrono.hh)
+configure_file(platform/bits/cpp11.hh.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
 
 install(
-  FILES ${CMAKE_BINARY_DIR}/bits/chrono.hh 
-  DESTINATION include/trex/utils/bits
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh 
+  DESTINATION include/trex/utils/platform/bits
 )
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(TREXutils SHARED
   # real source
@@ -86,6 +87,8 @@ add_library(TREXutils SHARED
   log/bits/log_sig.hh
   log/text_log.hh
   log/out_file.hh
+  platform/chrono.hh 
+  platform/memory.hh
   # template source code
   bits/Factory.tcc
   bits/SingletonUse.tcc
@@ -104,6 +107,11 @@ source_group("Header\ Files\\bits" FILES
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh
+)
+
+source_group("Header\ Files\\platform" FILES
+  platform/chrono.hh 
+  platform/memory.hh
 )
 
 source_group("Header\ Files\\log" FILES 

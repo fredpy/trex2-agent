@@ -80,6 +80,8 @@ include(CPack)
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
+  # Need this for config generated files
+  ${CMAKE_BINARY_DIR}/trex/utils
   )
 
 ########################################################################
@@ -104,31 +106,74 @@ if(LIB_RT)
   set(SYSTEM_LIBRARIES ${SYSTEM_LIBRARIES} rt)
 endif(LIB_RT)
 
+
+
+########################################################################
+# Boost C++ general requirement
+########################################################################
+
+#set(Boost_USE_STATIC_LIBS        ON)
+#set(Boost_USE_MULTITHREADED      ON)
+#set(Boost_USE_STATIC_RUNTIME    OFF)
+
+option(WITH_CPP11 "Compile with C++11 support" OFF)
+
+# The minimum requirement 
+find_package(Boost 1.46.1 COMPONENTS system filesystem thread regex signals date_time)
+
+if(NOT Boost_FOUND) 
+  message(ERROR "Unable to find Boost (>=1.46.1) library")
+endif(NOT Boost_FOUND)
+
+include_directories(${Boost_INCLUDE_DIRS})
+find_package(Boost QUIET COMPONENTS chrono)
+message(STATUS "Checking for Boost.Chrono: ${Boost_CHRONO_LIBRARY}")
+
+
+if(Boost_CHRONO_FOUND)
+  set(CHRONO_LIB ${Boost_CHRONO_LIBRARY})
+else(Boost_CHRONO_FOUND)
+  message(WARNING "Boost.Chrono was not found
+    Checking for C++11 equivalent instead")
+  set(WITH_CPP11 ON CACHE BOOL "C++11 required for lack of Boost.Chrono" FORCE)
+endif(Boost_CHRONO_FOUND)
+
 ########################################################################
 # C++11 capabilities                                                   #
 ########################################################################
+if(WITH_CPP11) 
+  include(${PROJECT_SOURCE_DIR}/cmake/cpp11/cpp11.cmake)
 
-include(${PROJECT_SOURCE_DIR}/cmake/cpp11/cpp11.cmake)
+  if(NOT CHRONO_LIB)
+    cpp11_feature_detection(CHRONO)
+    if(NOT CPP11_HAS_CHRONO)
+      message(ERROR "Did not find required chrono support")
+    endif(NOT CPP11_HAS_CHRONO)
+  endif(NOT CHRONO_LIB)
+  cpp11_feature_detection(UNIQUE_PTR)
 
-set(BOOST_REQUIRED_VERSION 1.46.1)
-if(NOT CPP11_HAS_CHRONO)
-  message(STATUS "c++11 chrono not found replacing it by boost chrono")
-  set(BOOST_REQUIRED_VERSION 1.47.0)
-  set(BOOST_COMPONENTS chrono)
-endif(NOT CPP11_HAS_CHRONO)
+  if(CPP11_ENABLED) 
+    set(boost_flags -L${Boost_LIBRARY_DIRS} -l${Boost_DATE_TIME})
+    # A simple date_time program : will fail to compile if boost 
+    # was linked to a non c++11 compatible standard library
+    #   this handle Clang that links against different lib*c++ depending 
+    #   on c++11 flags
+    cpp11_lib_support(Boost "#include <boost/date_time/posix_time/posix_time.hpp>
+#include <iostream>
 
+using namespace boost::posix_time\;
 
-########################################################################
-# Boost C++ Libraries                                                  #
-########################################################################
-find_package(Boost ${BOOST_REQUIRED_VERSION} 
-  COMPONENTS thread system regex signals filesystem date_time ${BOOST_COMPONENTS})
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-  list(APPEND ${PROJECT_NAME}_LIBRARY_DIRS ${Boost_LIBRARY_DIRS})
-else(Boost_FOUND)
-  message(FATAL_ERROR "TREX requires Boost C++ libraries")
-endif(Boost_FOUND)
+int main(int argc, char *argv[]) {
+  ptime today(second_clock::local_time())\;
+  std::cout<<today<<std::endl\;
+  return 0\;
+}" ${boost_flags})
+    if(NOT ${CPP11_SUPPORT_Boost})
+      message(ERROR " Boost library cannot be used with C++11")
+    endif(NOT ${CPP11_SUPPORT_Boost})
+    add_definitions(${CPP11_COMPILER_SWITCH})
+  endif(CPP11_ENABLED)
+endif(WITH_CPP11)
 
 ########################################################################
 # Europa                                                               #
@@ -140,9 +185,28 @@ if(WITH_EUROPA)
   find_package(Europa
     COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
     NDDL RulesEngine Solvers System)
-  if(NOT EUROPA_FOUND)
+  if(EUROPA_FOUND)
+    if(CPP11_ENABLED)
+      set(europa_flags -D${EUROPA_FLAGS} -I${EUROPA_INCLUDE_DIR} 
+	-l${EUROPA_SYSTEM_LIBRARY})
+      cpp11_support_boost(EUROPA "#include <PLASMA/LabelStr.hh>
+#include <iostream>
+
+using namespace EUROPA\;
+
+int main(int argc, char *argv[]) {
+  LabelStr test(\"Test\")\;
+  std::cout<<test.toString()<<std::endl\;
+  size_t len = test.getSize()\;
+  return 4==len?0:len+1\;
+}" ${europa_flags})
+      if(NOT CPP11_SUPPORT_EUROPA)
+	message(ERROR "Europa Libaries cannot be used with C++11") 
+      endif(NOT CPP11_SUPPORT_EUROPA)
+    endif(CPP11_ENABLED)
+  else(EUROPA_FOUND)
     message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
-  endif(NOT EUROPA_FOUND)
+  endif(EUROPA_FOUND)
 endif(WITH_EUROPA)
 
 ########################################################################
@@ -150,16 +214,16 @@ endif(WITH_EUROPA)
 ########################################################################
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in 
-    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doc CACHE STRING 
-    "Output directory for doxygen")
-  mark_as_advanced(DOXYGEN_OUTPUT)
-  add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
+   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in 
+     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+   set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doc CACHE STRING 
+     "Output directory for doxygen")
+   mark_as_advanced(DOXYGEN_OUTPUT)
+   add_custom_target(doc
+     ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+     COMMENT "Generating API documentation with Doxygen" VERBATIM
+     )
 endif(DOXYGEN_FOUND)
 
 ########################################################################

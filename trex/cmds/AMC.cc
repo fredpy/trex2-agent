@@ -88,7 +88,7 @@ using namespace TREX::utils;
 
 namespace {
 
-  std::auto_ptr<Agent> my_agent;
+  UNIQ_PTR<Agent> my_agent;
   SingletonUse<LogManager> amc_log;
   
 }
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
     return -1;
   }
   char *configFile = argv[1];
-  std::auto_ptr<Clock> clk;
+  UNIQ_PTR<Clock> clk;
     
   if( argc>=3 ) {
     Symbol simOption = argv[2];

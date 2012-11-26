@@ -152,18 +152,14 @@ bool isEffect(EUROPA::TokenId const &tok) {
   return tok->hasAttributes(EUROPA::PSTokenType::EFFECT);
 }
 
-int main() { return 0;}
+int main() { return 0; }
 ")
-
 
   try_compile(EUROPA_HAVE_EFFECT "${CMAKE_CURRENT_BINARY_DIR}"
     "${CMAKE_CURRENT_BINARY_DIR}/europa_26.cc"
-    COMPILE_DEFINITIONS -I${EUROPA_INCLUDE_DIR} ${EUROPA_LIBRARIES}
+    COMPILE_DEFINITIONS -I${EUROPA_INCLUDE_DIR}
     OUTPUT_VARIABLE OUT)
-   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/europa_26.cc.log "${OUT}")
-#  if(NOT EUROPA_HAVE_EFFECT)
-#    message(WARNING "Unable to compile europa_26.cxx.")
-#  endif(NOT EUROPA_HAVE_EFFECT)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/europa_26.log "${OUT}")
 endif(EUROPA_FORCE_EFFECT)
 
 if(_europa_MISSING OR NOT EUROPA_INCLUDE_DIR)

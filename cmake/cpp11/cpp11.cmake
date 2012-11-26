@@ -6,13 +6,19 @@
 
 # we need C++11
 if(${CMAKE_COMPILER_IS_GNUCXX})
-  set(CPP11_COMPILER_SWITCH -std=c++0x)
+  set(CPP11_flags -std=c++0x)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CPP11_COMPILER_SWITCH -std=c++0x -stdlib=libc++ -DCPP11_NO_NOEXCEPT=1)
+  set(CPP11_flags -std=c++0x -stdlib=libc++ -DCPP11_NO_NOEXCEPT=1)
 endif()
+
+set(CPP11_COMPILER_SWITCH ${CPP11_flags} CACHE LIST "C++ compiler flags")
+mark_as_advanced(CPP11_COMPILER_SWITCH)
+
+
+
 # TODO add support for other compilers
  
-add_definitions(${CPP11_COMPILER_SWITCH})
+#add_definitions(${CPP11_COMPILER_SWITCH})
 
 function(cpp11_feature_detection FEATURE_NAME)
   configure_file(
@@ -30,11 +36,28 @@ function(cpp11_feature_detection FEATURE_NAME)
   message(STATUS "Detecting support for c++11 feature '${FEATURE_NAME}': ${CPP11_HAS_${FEATURE_NAME}}")
   if(CPP11_HAS_${FEATURE_NAME})
     set(CPP11_HAS_${FEATURE_NAME} TRUE PARENT_SCOPE)
+    set(CPP11_ENABLED TRUE PARENT_SCOPE)
   else()
     set(CPP11_HAS_${FEATURE_NAME} FALSE PARENT_SCOPE)
     file(WRITE ${PROJECT_BINARY_DIR}/cpp11/has_${FEATURE_NAME}.out ${OUT})
   endif()
   unset(CPP11_HAS_${FEATURE_NAME})
+endfunction()
+
+function(cpp11_lib_support NAME CODE DEFINITIONS)
+  set(FLAGS ${CPP11_COMPILER_SWITCH} ${DEFINITIONS})
+  set(test_file ${CMAKE_BINARY_DIR}/cpp11/supported_by_${NAME})
+  file(WRITE  ${test_file}.cc ${CODE})
+  try_compile(success
+    ${CMAKE_BINARY_DIR}
+    ${test_file}.cc
+    COMPILE_DEFINITIONS ${FLAGS}
+    OUTPUT_VARIABLE OUT)
+  message(STATUS "Checking c++11 compatibility for '${NAME}': ${success}")
+  set(CPP11_SUPPORT_${NAME} ${success} PARENT_SCOPE)
+  if(NOT success)
+    file(WRITE ${test_file}.out ${OUT})
+  endif(NOT success)
 endfunction()
 
 #cpp11_feature_detection(SCOPED_ENUMS)
@@ -51,14 +74,7 @@ endfunction()
 #cpp11_feature_detection(LAMBDAS)
 #cpp11_feature_detection(NULLPTR)
 
-cpp11_feature_detection(CHRONO)
-cpp11_feature_detection(UNIQUE_PTR)
-
-# explicit configuration
-if(
-    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    )
-  set(CPP11_NO_CHRONO TRUE)
-endif()
+#cpp11_feature_detection(CHRONO)
+#cpp11_feature_detection(UNIQUE_PTR)
 
 unset(CPP11_COMPILER_SWITCH)

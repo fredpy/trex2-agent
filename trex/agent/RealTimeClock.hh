@@ -46,6 +46,9 @@
 
 
 # include "Clock.hh"
+
+# include <trex/utils/platform/memory.hh>
+
 # include <trex/utils/TimeUtils.hh>
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/StringExtract.hh>
@@ -330,10 +333,10 @@ namespace TREX {
       
       typedef boost::recursive_mutex mutex_type;
       
-      mutable mutex_type        m_lock;
-      tick_rate                 m_period;
-      std::auto_ptr<clock_type> m_clock;
-      date_type                 m_epoch;
+      mutable mutex_type   m_lock;
+      tick_rate            m_period;
+      UNIQ_PTR<clock_type> m_clock;
+      date_type            m_epoch;
       
       typename clock_type::base_duration    m_sleep_watchdog;
       typename clock_type::base_time_point m_sleep;
