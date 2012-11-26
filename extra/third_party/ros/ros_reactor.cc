@@ -41,7 +41,7 @@ using namespace TREX::utils;
  * class TREX::ROS::details::ros_timeline
  */
 
-::ros::NodeHandle &details::ros_timeline::node() const {
+::ros::NodeHandle &::TREX::ROS::details::ros_timeline::node() {
   return m_reactor.m_ros;
 }
 
