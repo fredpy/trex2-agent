@@ -108,14 +108,14 @@ bool details::EuropaDomain::equals(DomainBase const &other) const {
 boost::any details::EuropaDomain::singleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  std::auto_ptr<DomainBase> tmp(copy());
+  UNIQ_PTR<DomainBase> tmp(copy());
   return tmp->getSingleton();
 }
 
 std::string details::EuropaDomain::stringSingleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  std::auto_ptr<DomainBase> tmp(copy());
+  UNIQ_PTR<DomainBase> tmp(copy());
   return tmp->getStringSingleton();
 }
 
@@ -129,14 +129,14 @@ DomainBase *details::EuropaDomain::copy() const {
 std::ostream &details::EuropaDomain::toXml(std::ostream &out, size_t tabs) const {
   // this copy can be costfull but guarantees that the output can be
   // parsed by TREX
-  std::auto_ptr<DomainBase> tmp(copy());
+  UNIQ_PTR<DomainBase> tmp(copy());
   return tmp->toXml(out, tabs);
 }
 
 std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
   // this copy is costfiull and we may want to avoid this
   // (so we see that the output is from europa)
-  std::auto_ptr<DomainBase> tmp(copy());
+  UNIQ_PTR<DomainBase> tmp(copy());
   return out<<(*tmp);
 }
 
