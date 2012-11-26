@@ -31,54 +31,51 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_ros_reactor
-# define H_trex_ros_ros_reactor
-
-# include "bits/ros_timeline.hh"
+#ifndef H_trex_ros_bits_ros_timeline
+# define H_trex_ros_bits_ros_timeline
 
 # include <ros/ros.h>
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/Symbol.hh>
+# include <trex/transaction/Observation.hh>
 
 namespace TREX {
   namespace ROS {
 
+    class ros_reactor;
 
-    template<typename Message>
-    class ros_subscriber :public details::ros_timeline {
-    public:
-      virtual ~ros_subscriber() {}
-    protected:
-      ros_subscriber(utils::Symbol const &tl):details::ros_timeline(tl, false) {}
+    namespace details {
       
-      void message(boost::shared_ptr<Message const> const msg) {
-	
-      }
-
-    private:
-      ros::Subscriber m_sub;
-    };
-    
-    class ros_reactor:public TREX::transaction::TeleoReactor {
-    public:
-      ros_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
-
-    protected:
+      class ros_timeline :boost::noncopyable {
+      public:
+        virtual ~ros_timeline() {}
+        
+        utils::Symbol const &name() const {
+          return m_name;
+        }
+        bool controlable() const {
+          return m_controlable;
+        }
+      protected:
+        ros_timeline(ros_reactor &r, utils::Symbol const &tl, bool control)
+        :m_reactor(r), m_name(tl), m_controlable(control) {}
+        
+        ::ros::NodeHandle &node();
+        
+        transaction::Observation obs(utils::Symbol const &pred) {
+          return transaction::Observation(name(), pred);
+        }
+        void notify(transaction::Observation const &obs);
+      private:
+        ros_reactor &m_reactor;
+        utils::Symbol const m_name;
+        bool const m_controlable;
+        
+        friend class ros_reactor;
+      }; // TREX:ROS::details::ros_timeline 
       
-    private:
-      void handleInit();
-      bool synchronize();
-      
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
-
-      ::ros::NodeHandle m_ros;
-
-      friend class details::ros_timeline;
-    }; // TREX::ros::ros_reactor
-
-  } // TREX::ros
+    } // TREX::ROS::details
+  } // TREX::ROS
 } // TREX
 
-#endif // H_trex_ros_ros_reactor
+#endif // H_trex_ros_bits_ros_timeline
