@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
   return 0\;
 }" ${boost_flags})
     if(NOT ${CPP11_SUPPORT_Boost})
-      message(ERROR " Boost library cannot be used with C++11")
+      message(FATAL_ERROR " Boost library cannot be used with C++11")
     endif(NOT ${CPP11_SUPPORT_Boost})
     add_definitions(${CPP11_COMPILER_SWITCH})
   endif(CPP11_ENABLED)
@@ -185,28 +185,9 @@ if(WITH_EUROPA)
   find_package(Europa
     COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
     NDDL RulesEngine Solvers System)
-  if(EUROPA_FOUND)
-    if(CPP11_ENABLED)
-      set(europa_flags -D${EUROPA_FLAGS} -I${EUROPA_INCLUDE_DIR} 
-	-l${EUROPA_SYSTEM_LIBRARY})
-      cpp11_lib_support(EUROPA "#include <PLASMA/LabelStr.hh>
-#include <iostream>
-
-using namespace EUROPA\;
-
-int main(int argc, char *argv[]) {
-  LabelStr test(\"Test\")\;
-  std::cout<<test.toString()<<std::endl\;
-  size_t len = test.getSize()\;
-  return 4==len?0:len+1\;
-}" "${europa_flags}")
-      if(NOT CPP11_SUPPORT_EUROPA)
-	message(ERROR "Europa Libaries cannot be used with C++11") 
-      endif(NOT CPP11_SUPPORT_EUROPA)
-    endif(CPP11_ENABLED)
-  else(EUROPA_FOUND)
+  if(NOT EUROPA_FOUND)
     message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
-  endif(EUROPA_FOUND)
+  endif(NOT EUROPA_FOUND)
 endif(WITH_EUROPA)
 
 ########################################################################
