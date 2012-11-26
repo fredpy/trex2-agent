@@ -323,7 +323,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
     // Get start, duration and end
-    std::auto_ptr<DomainBase>
+    UNIQ_PTR<DomainBase>
       d_start(details::trex_domain(tok->start()->lastDomain())),
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
@@ -376,7 +376,7 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
 void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 {
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
-    std::auto_ptr<DomainBase>
+    UNIQ_PTR<DomainBase>
         d_start(details::trex_domain(tok->start()->lastDomain())),
         d_duration(details::trex_domain(tok->duration()->lastDomain())),
         d_end(details::trex_domain(tok->end()->lastDomain()));
@@ -391,7 +391,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
       // ignore implicit_var
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var)) {
-	std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	goal.restrictAttribute(attr);
       }
@@ -670,7 +670,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
     // ignore implicit_var
     if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 					      implicit_var) ) {
-      std::auto_ptr<TREX::transaction::DomainBase>
+      UNIQ_PTR<TREX::transaction::DomainBase>
 	dom(details::trex_domain((*a)->lastDomain()));
       TREX::transaction::Variable var((*a)->getName().toString(), *dom);
       obs.restrictAttribute(var);
