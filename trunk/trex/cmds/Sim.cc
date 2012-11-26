@@ -62,7 +62,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
 
-  std::auto_ptr<Agent> my_agent;
+  UNIQ_PTR<Agent> my_agent;
 
   /** @brief entry point to TREX system log */
   SingletonUse<LogManager> s_log;
@@ -230,7 +230,7 @@ int main(int argc, char **argv) {
     return -1;
   }
   char *configFile = argv[1];
-  std::auto_ptr<Clock> clk;
+  UNIQ_PTR<Clock> clk;
 
   int ret = 0;
   try {

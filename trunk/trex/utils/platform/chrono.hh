@@ -31,19 +31,25 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#ifndef H_trex_utils_platform_chrono
+# define H_trex_utils_platform_chrono
 
-#cmakedefine CPP11_HAS_CHRONO
+# include "bits/cpp11.hh"
 
 # ifdef CPP11_HAS_CHRONO
+/*
+ * Use the standard C++11 chrono header
+ */
 #  include <chrono>
 #  define CHRONO_NS std
-# else
+# else // !CPP11_HAS_CHRONO
+/*
+ * Use boost chrono as a replacement
+ */
 #  include <boost/chrono.hpp>
 #  define CHRONO_NS boost
-# endif 
+# endif
 
 # define CHRONO CHRONO_NS::chrono
 
-#endif // H_trex_cpp11
+#endif // H_trex_utils_platform_chrono

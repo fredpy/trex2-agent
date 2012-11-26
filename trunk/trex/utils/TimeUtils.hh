@@ -46,7 +46,7 @@
 #ifndef H_TimeUtils
 # define H_TimeUtils
 
-# include "bits/chrono.hh"
+# include "platform/chrono.hh"
 
 # include <boost/date_time/posix_time/ptime.hpp>
 # include <boost/config.hpp>
