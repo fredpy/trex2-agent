@@ -69,7 +69,7 @@ source_group("Header\ Files\\bits" FILES
 
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain 
-  ${Boost_CHRONO_LIBRARY})
+  ${CHRONO_LIB})
 trex_lib(TREXtransaction)
 
 install(DIRECTORY . DESTINATION include/trex/transaction

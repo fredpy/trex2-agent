@@ -189,7 +189,7 @@ if(WITH_EUROPA)
     if(CPP11_ENABLED)
       set(europa_flags -D${EUROPA_FLAGS} -I${EUROPA_INCLUDE_DIR} 
 	-l${EUROPA_SYSTEM_LIBRARY})
-      cpp11_support_boost(EUROPA "#include <PLASMA/LabelStr.hh>
+      cpp11_lib_support(EUROPA "#include <PLASMA/LabelStr.hh>
 #include <iostream>
 
 using namespace EUROPA\;
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
   std::cout<<test.toString()<<std::endl\;
   size_t len = test.getSize()\;
   return 4==len?0:len+1\;
-}" ${europa_flags})
+}" "${europa_flags}")
       if(NOT CPP11_SUPPORT_EUROPA)
 	message(ERROR "Europa Libaries cannot be used with C++11") 
       endif(NOT CPP11_SUPPORT_EUROPA)
