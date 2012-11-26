@@ -29,9 +29,9 @@ namespace TREX {
                 void setValue(TREX::transaction::goal_id const &g);
 
                 std::list<TREX::transaction::goal_id> m_pending;
-                std::auto_ptr<TREX::transaction::Observation> m_navigator_state;
-                std::auto_ptr<TREX::transaction::Observation> m_InstrumentLocation_state;
-                std::auto_ptr<TREX::transaction::Observation> m_Instrument_state;
+                UNIQ_PTR<TREX::transaction::Observation> m_navigator_state;
+                UNIQ_PTR<TREX::transaction::Observation> m_InstrumentLocation_state;
+                UNIQ_PTR<TREX::transaction::Observation> m_Instrument_state;
 
                 /** Timeline Navigator */
                 static TREX::utils::Symbol const navigatorObj;
