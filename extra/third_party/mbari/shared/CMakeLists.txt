@@ -41,4 +41,4 @@ add_library(MBARIshared SHARED
 )
 
 install(TARGETS MBARIshared DESTINATION lib) 
-trex_lib(MBARIshared)
+trex_lib(MBARIshared extra)

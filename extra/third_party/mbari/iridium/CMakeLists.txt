@@ -59,7 +59,7 @@ if(POCO_NET_LIBRARY)
     ${POCO_NET_LIBRARY})
 
   install(TARGETS MBARIiridium DESTINATION lib)    
-  trex_lib(MBARIiridium)
+  trex_lib(MBARIiridium extra)
 
   trex_plugin(iridium iridium_pg.cc)
   target_link_libraries(iridium_pg MBARIiridium)
