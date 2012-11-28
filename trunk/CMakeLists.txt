@@ -226,27 +226,35 @@ function(trex_lib target kind)
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
-  unset(tmp)
 
   # message(STATUS "${target}: ${i_incs}")
+  # transmit directory include to target include for older cmake
+  get_property(tmp DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+  set_property(TARGET ${target} APPEND PROPERTY INCLUDE_DIRECTORIES ${tmp})
+  unset(tmp)
   
   if(kind) 
     # update global include path for installed trex
+
     get_property(incs TARGET ${target} PROPERTY INCLUDE_DIRECTORIES)
-    # cleanup
-    list(REMOVE_DUPLICATES incs)
-    set(i_incs ${CMAKE_INSTALL_PREFIX}/include)
-    foreach(i ${incs})
-      if(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
-	if(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
-	  list(APPEND i_incs ${i})
-	endif(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
-      endif(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
-    endforeach()
-    list(REMOVE_DUPLICATES i_incs)
-    unset(incs)
-    set_property(GLOBAL APPEND PROPERTY TREX_INCLUDES ${i_incs})
-    unset(i_incs)
+    if(incs)
+      # cleanup 
+      list(REMOVE_DUPLICATES incs)
+      set(i_incs ${CMAKE_INSTALL_PREFIX}/include)
+      foreach(i ${incs})
+	if(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
+	  if(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
+	    list(APPEND i_incs ${i})
+	  endif(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
+	endif(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
+      endforeach()
+      if(i_incs)
+	list(REMOVE_DUPLICATES i_incs)
+      endif(i_incs)
+      unset(incs)
+      set_property(GLOBAL APPEND PROPERTY TREX_INCLUDES ${i_incs})
+      unset(i_incs)
+    endif(incs)
 
     # message(STATUS "trex-${kind} += ${target}")
     install(TARGETS ${target} DESTINATION lib 
