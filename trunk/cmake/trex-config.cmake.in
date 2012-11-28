@@ -32,4 +32,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-set(trex_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include @Boost_INCLUDE_DIRS@)
+set(trex_INCLUDE_DIRS @TREX_INCS@)
+
+# Import core libraries
+include(imports/trex-core.cmake)
+set(trex_LIBRARIES @trex-core@)
+
+include(imports/trex-extra.cmake)
+set(trex_extra_LIBRARIES @trex-extra@)
+
+# Not sure if needed 
+include(imports/trex-plugins.cmake)
