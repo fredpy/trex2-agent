@@ -41,6 +41,7 @@ add_library(TREXrover SHARED
 target_link_libraries(TREXrover
 	TREXtransaction
 	)
+trex_lib(TREXrover extra)
 
 trex_plugin(rover rover_pg.cc)
 target_link_libraries(rover_pg TREXrover)

@@ -32,33 +32,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-
-add_library(TREXagent SHARED
-    Agent.cc
-    Clock.cc
-    LogClock.cc
-    RealTimeClock.cc
-    StepClock.cc
-    # headers
-    bits/agent_graph.hh
-    Agent_fwd.hh
-    Agent.hh
-    LogClock.hh
-    Clock.hh
-    RealTimeClock.hh
-    StepClock.hh
-)
-
-source_group("Header\ Files\\bits" FILES 
-    bits/agent_graph.hh
-)  
-
-add_dependencies(core TREXagent)
-target_link_libraries(TREXagent TREXtransaction)
-trex_lib(TREXagent core)
-
-install(DIRECTORY . DESTINATION include/trex/agent
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN "deprecated" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+set(PACKAGE_VERSION @VERSION@)
+if("${PACKAGE_FIND_VERSION_MAJOR}" EQUAL @TREX_MAJOR@)
+  if("${PACKAGE_FIND_VERSION_MINOR}" EQUAL @TREX_MINOR@)
+    set(PACKAGE_VERSION_COMPATIBLE TRUE) # compatible with any xx.yy.*
+    if( "${PACKAGE_FIND_VERSION_PATCH}" EQUAL @TREX_PATCH@)
+      set(PACKAGE_VERSION_EXACT TRUE) # exact match (? <- the RC is not taken into account here)
+    endif( "${PACKAGE_FIND_VERSION_PATCH}" EQUAL @TREX_PATCH@)
+  endif("${PACKAGE_FIND_VERSION_MINOR}" EQUAL @TREX_MINOR@)
+endif("${PACKAGE_FIND_VERSION_MAJOR}" EQUAL @TREX_MAJOR@)

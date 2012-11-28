@@ -41,6 +41,7 @@ add_library(TREXAgentLocation SHARED
 target_link_libraries(TREXAgentLocation
 	TREXtransaction
 	)
+trex_lib(TREXAgentLocation extra)
 
 trex_plugin(agentlocation agentlocation_pg.cc)
 target_link_libraries(agentlocation_pg TREXAgentLocation)

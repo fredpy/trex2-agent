@@ -70,12 +70,10 @@ source_group("Header\ Files\\bits" FILES
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain 
   ${CHRONO_LIB})
-trex_lib(TREXtransaction)
+trex_lib(TREXtransaction core)
 
 install(DIRECTORY . DESTINATION include/trex/transaction
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
   PATTERN "private" EXCLUDE
   PATTERN "deprecated" EXCLUDE
   PATTERN ".svn" EXCLUDE)
-
-install(TARGETS TREXtransaction DESTINATION lib)
