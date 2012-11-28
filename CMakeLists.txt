@@ -227,9 +227,31 @@ function(trex_lib target kind)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
   unset(tmp)
+
+  # message(STATUS "${target}: ${i_incs}")
+  
   if(kind) 
+    # update global include path for installed trex
+    get_property(incs TARGET ${target} PROPERTY INCLUDE_DIRECTORIES)
+    # cleanup
+    list(REMOVE_DUPLICATES incs)
+    set(i_incs ${CMAKE_INSTALL_PREFIX}/include)
+    foreach(i ${incs})
+      if(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
+	if(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
+	  list(APPEND i_incs ${i})
+	endif(NOT ${i} MATCHES ${CMAKE_BINARY_DIR})
+      endif(NOT ${i} MATCHES ${CMAKE_SOURCE_DIR})
+    endforeach()
+    list(REMOVE_DUPLICATES i_incs)
+    unset(incs)
+    set_property(GLOBAL APPEND PROPERTY TREX_INCLUDES ${i_incs})
+    unset(i_incs)
+
     # message(STATUS "trex-${kind} += ${target}")
-    install(TARGETS ${target} DESTINATION lib EXPORT trex-${kind})
+    install(TARGETS ${target} DESTINATION lib 
+      EXPORT trex-${kind})
+    set_property(GLOBAL APPEND PROPERTY trex-${kind} ${target})
   endif(kind)
 endfunction(trex_lib)
 
@@ -294,8 +316,19 @@ configure_file(cmake/trex-config-version.cmake.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config-version.cmake 
   DESTINATION share/trex/cmake)
 
-install(EXPORT trex-core DESTINATION share/trex/cmake/imports)
-install(EXPORT trex-extra DESTINATION share/trex/cmake/imports)
+
+get_property(TREX_INCS GLOBAL PROPERTY TREX_INCLUDES)
+get_property(trex-core GLOBAL PROPERTY trex-core)
+get_property(trex-extra GLOBAL PROPERTY trex-extra)
+list(REMOVE_DUPLICATES TREX_INCS)
+configure_file(cmake/trex-config.cmake.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake 
+  DESTINATION share/trex/cmake)
+unset(TREX_INCS)
+
+install(EXPORT trex-core DESTINATION share/trex/cmake/imports COMPONENT dev)
+install(EXPORT trex-extra DESTINATION share/trex/cmake/imports COMPONENT dev)
 install(EXPORT trex-plugins DESTINATION share/trex/cmake/imports)
 
 
