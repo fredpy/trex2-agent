@@ -83,7 +83,7 @@ if(MBARI_TRACKER)
 	${Boost_LIBRARIES}
 	${PROTOBUF_LIBRARIES})
       install(TARGETS MBARIamqp DESTINATION lib)    
-      trex_lib(MBARIamqp)
+      trex_lib(MBARIamqp extra)
 
       trex_plugin(dta tracker_plugin.cc)
       target_link_libraries(dta_pg MBARIamqp)

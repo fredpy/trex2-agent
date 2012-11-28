@@ -48,7 +48,7 @@ if(WITH_EUROPA)
     TREXeuropa
     )
   install(TARGETS MBARIeuropa DESTINATION lib) 
-  trex_lib(MBARIeuropa)
+  trex_lib(MBARIeuropa extra)
 
   trex_plugin(mbari_europa plugin.cc)
   target_link_libraries(mbari_europa_pg MBARIeuropa)    

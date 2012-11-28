@@ -98,7 +98,7 @@ target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
   -L${roscpp_LINK_PATH} 
   ${roscpp_LINK_LIBS} TREXagent)
 install(TARGETS TREXros DESTINATION lib)
-trex_lib(TREXros)
+trex_lib(TREXros extra)
 
 # The plugin placeholder : also initialize ros on load
 trex_plugin(ros ros_init.cc)
