@@ -121,7 +121,7 @@ if(WITH_EUROPA)
   target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
   
   install(TARGETS TREXeuropa DESTINATION lib) 
-  trex_lib(TREXeuropa)
+  trex_lib(TREXeuropa extra)
   
   trex_plugin(europa europa_plugin.cc)
   target_link_libraries(europa_pg TREXeuropa)

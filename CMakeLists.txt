@@ -46,6 +46,7 @@ set(TREX_PATCH 0)
 set(TREX_RC 0)
 
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
+
 if(TREX_RC GREATER 0)
   set(VERSION "${VERSION}-rc${TREX_RC}")
 endif(TREX_RC GREATER 0)
@@ -133,8 +134,8 @@ message(STATUS "Checking for Boost.Chrono: ${Boost_CHRONO_LIBRARY}")
 if(Boost_CHRONO_FOUND)
   set(CHRONO_LIB ${Boost_CHRONO_LIBRARY})
 else(Boost_CHRONO_FOUND)
-  message(WARNING "Boost.Chrono was not found
-    Checking for C++11 equivalent instead")
+  message(WARNING "Boost.Chrono was not found."
+    "Checking for C++11 equivalent instead")
   set(WITH_CPP11 ON CACHE BOOL "C++11 required for lack of Boost.Chrono" FORCE)
 endif(Boost_CHRONO_FOUND)
 
@@ -218,14 +219,19 @@ macro(trex_cfg dir dest)
     ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 endmacro(trex_cfg)
 
-macro(trex_lib target)
+function(trex_lib target kind)
+  # message(STATUS "trex-lib(${target} ${kind})")
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${CMAKE_CURRENT_BINARY_DIR})
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
   unset(tmp)
-endmacro(trex_lib)
+  if(kind) 
+    # message(STATUS "trex-${kind} += ${target}")
+    install(TARGETS ${target} DESTINATION lib EXPORT trex-${kind})
+  endif(kind)
+endfunction(trex_lib)
 
 macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
@@ -282,6 +288,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/trex_devel.bash.in
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/trex_init.bash.in
   ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/trex_init.bash DESTINATION ${TREX_SHARED})
+
+configure_file(cmake/trex-config-version.cmake.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config-version.cmake @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config-version.cmake 
+  DESTINATION share/trex/cmake)
+
+install(EXPORT trex-core DESTINATION share/trex/cmake/imports)
+install(EXPORT trex-extra DESTINATION share/trex/cmake/imports)
+install(EXPORT trex-plugins DESTINATION share/trex/cmake/imports)
+
 
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)

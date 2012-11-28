@@ -32,33 +32,4 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-
-add_library(TREXagent SHARED
-    Agent.cc
-    Clock.cc
-    LogClock.cc
-    RealTimeClock.cc
-    StepClock.cc
-    # headers
-    bits/agent_graph.hh
-    Agent_fwd.hh
-    Agent.hh
-    LogClock.hh
-    Clock.hh
-    RealTimeClock.hh
-    StepClock.hh
-)
-
-source_group("Header\ Files\\bits" FILES 
-    bits/agent_graph.hh
-)  
-
-add_dependencies(core TREXagent)
-target_link_libraries(TREXagent TREXtransaction)
-trex_lib(TREXagent core)
-
-install(DIRECTORY . DESTINATION include/trex/agent
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN "deprecated" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+set(trex_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include @Boost_INCLUDE_DIRS@)

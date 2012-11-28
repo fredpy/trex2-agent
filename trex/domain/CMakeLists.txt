@@ -61,11 +61,9 @@ source_group("Template Files\\bits" FILES
 
 add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)
-trex_lib(TREXdomain)
+trex_lib(TREXdomain core)
 
 install(DIRECTORY . DESTINATION include/trex/domain
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
-
-install(TARGETS TREXdomain DESTINATION lib)

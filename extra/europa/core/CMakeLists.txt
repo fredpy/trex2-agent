@@ -62,6 +62,5 @@ add_library(TREXeuropa_core SHARED
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXutils 
   ${Boost_REGEX_LIBRARY})
 
-install(TARGETS TREXeuropa_core DESTINATION lib) 
-trex_lib(TREXeuropa_core)
+trex_lib(TREXeuropa_core extra)
 

@@ -142,7 +142,7 @@ target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${CHRONO_LIB}
   ${Boost_DATE_TIME_LIBRARY}
   ${Boost_THREAD_LIBRARY})
-trex_lib(TREXutils)
+trex_lib(TREXutils core)
 
 set_property(SOURCE Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
@@ -151,5 +151,3 @@ install(DIRECTORY . DESTINATION include/trex/utils
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
-
-install(TARGETS TREXutils DESTINATION lib)

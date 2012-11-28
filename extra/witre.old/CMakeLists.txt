@@ -56,7 +56,7 @@ if(WITH_WITRE)
      ${Boost_SIGNALS_LIBRARY} 
      TREXtransaction
    ) 
-   install(TARGETS TREXwitre DESTINATION lib)
+   trex_lib(TREXwitre extra)
 
    trex_plugin(witre witre_pg.cc)
    target_link_libraries(witre_pg TREXwitre)
