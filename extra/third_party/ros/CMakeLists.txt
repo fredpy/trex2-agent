@@ -92,6 +92,7 @@ add_library(TREXros SHARED
   # header
   ros_reactor.hh
   trex/ros/ros_clock.hh
+  trex/ros/ros_subscriber.hh
   trex/ros/bits/ros_timeline.hh)
 
 source_group("Header\ Files\\bits" FILES 
