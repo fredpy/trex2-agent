@@ -37,9 +37,6 @@ set(trex_INCLUDE_DIRS @TREX_INCS@)
 # Import core libraries
 include(imports/trex-core.cmake)
 set(trex_LIBRARIES @trex-core@)
-
-include(imports/trex-extra.cmake)
 set(trex_extra_LIBRARIES @trex-extra@)
 
-# Not sure if needed 
-include(imports/trex-plugins.cmake)
+# Note the plugin are not included ... should work on that later
