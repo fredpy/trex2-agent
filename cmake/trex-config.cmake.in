@@ -41,3 +41,5 @@ set(trex_LIBRARIES @trex-core@ CACHE STRING "trex core libraries" FORCE)
 set(trex_extra_LIBRARIES @trex-extra@ CACHE STRING "trex extensions for plugins" FORCE)
 
 # Note the plugin are not included ... should work on that later
+
+set(trex_CPPFLAGS @trex_FLAGS@)
