@@ -31,36 +31,43 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_ros_reactor
-# define H_trex_ros_ros_reactor
+#ifndef H_trex_ros_ros_subscriber
+# define H_trex_ros_ros_subscriber
 
-# include "ros_subscriber.hh"
-
-# include <trex/transaction/TeleoReactor.hh>
+# include "bits/ros_timeline.hh"
 
 namespace TREX {
   namespace ROS {
     
-    class ros_reactor:public TREX::transaction::TeleoReactor {
+    /** @brief Observing timeline interface
+     *
+     * @tparam Message A ROS message type
+     *
+     * This class acts as an abstract adapter between a ROS subscriber receiving
+     * messages of type @p Message and converting them into a timeline.
+     *
+     * As it is not easy in ROS C++ API to handle this in a generic way we just 
+     * provide this class and it is the responsibility of the implementer to 
+     * specialize its message handling callback based on the structure of 
+     * Message
+     *
+     * @ingroup ros
+     * @author Frederic Py <fpy@mbari.org>
+     */
+    template<typename Message>
+    class ros_subscriber :public details::ros_timeline {
     public:
-      ros_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
-
+      virtual ~ros_subscriber() {}
+      
     protected:
+      void message(boost::shared_ptr<Message const> const &msg);
       
     private:
-      void handleInit();
-      bool synchronize();
+      ros::Subscriber m_sub;
       
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
-
-      ::ros::NodeHandle m_ros;
-
-      friend class details::ros_timeline;
-    }; // TREX::ros::ros_reactor
-
-  } // TREX::ros
+    }; // TREX::ROS::ros_subscriber<>
+    
+  } // TREX::ROS
 } // TREX
 
-#endif // H_trex_ros_ros_reactor
+#endif // H_trex_ros_ros_subscriber
