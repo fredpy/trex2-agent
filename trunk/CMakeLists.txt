@@ -329,6 +329,9 @@ get_property(TREX_INCS GLOBAL PROPERTY TREX_INCLUDES)
 get_property(trex-core GLOBAL PROPERTY trex-core)
 get_property(trex-extra GLOBAL PROPERTY trex-extra)
 list(REMOVE_DUPLICATES TREX_INCS)
+if(CPP11_ENABLED)
+  set(trex_FLAGS ${CPP11_COMPILER_SWITCH})
+endif(CPP11_ENABLED)
 configure_file(cmake/trex-config.cmake.in 
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake 
