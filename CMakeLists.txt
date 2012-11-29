@@ -151,7 +151,9 @@ if(WITH_CPP11)
       message(ERROR "Did not find required chrono support")
     endif(NOT CPP11_HAS_CHRONO)
   endif(NOT CHRONO_LIB)
+  # Helpers to rfine the code when cpp11 enabled
   cpp11_feature_detection(UNIQUE_PTR)
+  cpp11_feature_detection(DELETED_FUNCTIONS)
 
   if(CPP11_ENABLED) 
     set(boost_flags -L${Boost_LIBRARY_DIRS} -l${Boost_DATE_TIME})

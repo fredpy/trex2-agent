@@ -31,11 +31,20 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#ifndef H_trex_cpp11_deleted
+# define H_trex_cpp11_deleted
 
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
+# include "bits/cpp11.hh"
 
-#endif // H_trex_cpp11
+# ifdef CPP11_HAS_DELETED_FUNCTIONS
+
+# define DELETED =delete
+
+# else // CPP11_HAS_DELETED_FUNCTIONS
+
+# define DELETED
+
+# endif // CPP11_HAS_DELETED_FUNCTIONS
+
+#endif  // H_trex_cpp11_deleted
+
