@@ -32,14 +32,18 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
+# include directories used by trex libraries
 set(trex_INCLUDE_DIRS @TREX_INCS@ CACHE STRING "include paths for trex" FORCE)
+# flags required to use trex : mostly the ones related to c++11 support when enabled
+set(trex_CPPFLAGS @trex_FLAGS@ CACHE STRING "trex extra C++ flags" FORCE)
 
 get_filename_component(TREX_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-# Import core libraries
+# Import trex libraries
 include(${TREX_CMAKE_DIR}/imports/trex-targets.cmake)
+# the set of core libraries targets
 set(trex_LIBRARIES @trex-core@ CACHE STRING "trex core libraries" FORCE)
+# the set of extra libraries (such as europa extensions, ros, ...)
 set(trex_extra_LIBRARIES @trex-extra@ CACHE STRING "trex extensions for plugins" FORCE)
 
 # Note the plugin are not included ... should work on that later
 
-set(trex_CPPFLAGS @trex_FLAGS@)
