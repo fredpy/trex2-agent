@@ -258,7 +258,7 @@ function(trex_lib target kind)
 
     # message(STATUS "trex-${kind} += ${target}")
     install(TARGETS ${target} DESTINATION lib 
-      EXPORT trex-${kind})
+      EXPORT trex-targets)
     set_property(GLOBAL APPEND PROPERTY trex-${kind} ${target})
   endif(kind)
 endfunction(trex_lib)
@@ -335,11 +335,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake
   DESTINATION share/trex/cmake)
 unset(TREX_INCS)
 
-install(EXPORT trex-core DESTINATION share/trex/cmake/imports COMPONENT dev)
-install(EXPORT trex-extra DESTINATION share/trex/cmake/imports COMPONENT dev)
-install(EXPORT trex-plugins DESTINATION share/trex/cmake/imports)
-
-
+# All the packages are mixed together so older version of cmake are not confused
+install(EXPORT trex-targets DESTINATION share/trex/cmake/imports)
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)
 file(WRITE ${CMAKE_BINARY_DIR}/log/.empty_file " ") # Not really empty ... it is just to force tar to use it
