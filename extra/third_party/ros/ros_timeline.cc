@@ -31,63 +31,30 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_bits_ros_timeline
-# define H_trex_ros_bits_ros_timeline
+#include "bits/ros_timeline.hh"
+#include "ros_reactor.hh"
 
-# include <ros/ros.h>
+using namespace TREX::ROS;
+using namespace TREX::utils;
 
-# include <trex/utils/platform/cpp11_deleted.hh>
-# include <trex/utils/Symbol.hh>
-# include <trex/utils/XmlFactory.hh>
-# include <trex/transaction/Observation.hh>
 
-namespace TREX {
-  namespace ROS {
 
-    class ros_reactor;
+/*
+ * class TREX::ROS::details::ros_timeline
+ */
+details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
+:m_reactor(*arg.second), m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
+m_controlable(control) {
+  // Need to do something like this
+  m_reactor.provide(m_name);
+}
 
-    namespace details {
-      
-      class ros_timeline :boost::noncopyable {
-      public:
-        typedef boost::shared_ptr<ros_timeline> pointer;
-        
-        typedef TREX::utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
-        typedef xml_factory::argeument_type                                   xml_arg;
-        
-        
-        virtual ~ros_timeline() {}
-        
-        utils::Symbol const &name() const {
-          return m_name;
-        }
-        bool controlable() const {
-          return m_controlable;
-        }
-      protected:
-        ros_timeline(xml_arg arg, bool control);
-        ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool control);
-        
-        ::ros::NodeHandle &node();
-        
-        transaction::Observation obs(utils::Symbol const &pred) {
-          return transaction::Observation(name(), pred);
-        }
-        void notify(transaction::Observation const &obs);
-      private:
-        ros_reactor &m_reactor;
-        utils::Symbol const m_name;
-        bool const m_controlable;
-        
-# ifndef DOXYGEN
-        ros_timeline() DELETED; // Non default constrcutible
-# endif // DOXYGEN
-        
-        friend class ros_reactor;
-      }; // TREX:ROS::details::ros_timeline 
-      
-    } // TREX::ROS::details
-  } // TREX::ROS
-} // TREX
+details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control)
+:m_reactor(*r), m_name(tl), m_controlable(control) {
+  // see above
+  m_reactor.provide(m_name);
+}
 
-#endif // H_trex_ros_bits_ros_timeline
+::ros::NodeHandle &details::ros_timeline::node() {
+  return m_reactor.m_ros;
+}

@@ -57,14 +57,16 @@ namespace TREX {
     template<typename Message>
     class ros_subscriber :public details::ros_timeline {
     public:
+      ros_subscriber(
       virtual ~ros_subscriber() {}
       
     protected:
       void message(boost::shared_ptr<Message const> const &msg);
       
     private:
-      ros::Subscriber m_sub;
+                     ::ros::Subscriber m_sub;
       
+                    
     }; // TREX::ROS::ros_subscriber<>
     
   } // TREX::ROS

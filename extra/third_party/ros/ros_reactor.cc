@@ -38,14 +38,6 @@ using namespace TREX::transaction;
 using namespace TREX::utils; 
 
 /*
- * class TREX::ROS::details::ros_timeline
- */
-
-::ros::NodeHandle &::TREX::ROS::details::ros_timeline::node() {
-  return m_reactor.m_ros;
-}
-
-/*
  * class TREX::ROS::ros_reactor
  */
 
