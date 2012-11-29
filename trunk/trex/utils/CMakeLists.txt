@@ -112,6 +112,7 @@ source_group("Header\ Files\\bits" FILES
 source_group("Header\ Files\\platform" FILES
   platform/chrono.hh 
   platform/memory.hh
+  platform/cpp11_deleted.hh
 )
 
 source_group("Header\ Files\\log" FILES 
