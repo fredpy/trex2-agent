@@ -82,6 +82,9 @@ if(ROS_CFG)
   endif(roscpp_PACKAGE_PATH)
 endif(ROS_CFG)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
+
 add_library(TREXros SHARED
   # source 
   ros_reactor.cc 
@@ -89,16 +92,23 @@ add_library(TREXros SHARED
   # header
   ros_reactor.hh
   ros_clock.hh
-  bits/ros_timeline.hh)
+  trex/ros/bits/ros_timeline.hh)
 
 source_group("Header\ Files\\bits" FILES 
-  bits/ros_timeline.hh)
+  trex/ros/bits/ros_timeline.hh)
 
+install(DIRECTORY trex/ DESTINATION include/trex/
+  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+  PATTERN "private" EXCLUDE
+  PATTERN ".svn" EXCLUDE)
+  
 target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
   -L${roscpp_LINK_PATH} 
   ${roscpp_LINK_LIBS} TREXagent)
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
+
+
 
 # The plugin placeholder : also initialize ros on load
 trex_plugin(ros ros_init.cc)
