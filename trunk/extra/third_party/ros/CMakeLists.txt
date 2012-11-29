@@ -89,6 +89,7 @@ add_library(TREXros SHARED
   # source 
   ros_reactor.cc 
   ros_clock.cc
+  ros_timeline.cc
   # header
   ros_reactor.hh
   trex/ros/ros_clock.hh
