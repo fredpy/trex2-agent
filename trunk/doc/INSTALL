@@ -6,6 +6,10 @@ TREX uses third party utilities and libraries. Here's sa list of them :
  - boost (http://www.boost.org) This library is widely used for basic
          utilities and compatibilty with the TR1 C++0x standard.
 	 version 1.47 or above (tested against 1.47 and 1.49.0) 
+     *note: boost 1.46.1 is also supported provided that your c++
+            library provided that std::chrono class provided in 
+	    c++11 (which is present in most of the recent compilers
+	    as of 2012)
 
 Other utilies are of interrest but not necessary to use TREX:
  - doxygen (http://www.doxygen.org/) This utility is needed only if

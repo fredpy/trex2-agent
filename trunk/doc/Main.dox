@@ -78,9 +78,11 @@ of the head.
 TREX uses third party utilities and libraries. Here's sa list of them
 : 
 @li @b boost (http://www.boost.org) This library is widely used for
-basic utilities and compatibilty with the TR1 C++0x standard. As we use
+basic utilities and compatibility with C++11 standard. As we use
 flyweight, boost graph and property tree the earliest version 
 to be used is 1.47.0 (we tested it with boost 1.47.0 and 1.49.0). 
+We also support boost 1.46.1 provided that the c++ compiler support some 
+c++11 impovement (especially the chrono classes) are supported.
 
 Others utilies are of interrest but not necessary to use TREX:
 @li @e doxygen (http://www.doxygen.org/) This utility is needed only
