@@ -36,7 +36,7 @@ set(trex_INCLUDE_DIRS @TREX_INCS@ CACHE STRING "include paths for trex" FORCE)
 
 get_filename_component(TREX_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 # Import core libraries
-include(${TREX_CMAKE_DIR}/imports/trex-core.cmake)
+include(${TREX_CMAKE_DIR}/imports/trex-targets.cmake)
 set(trex_LIBRARIES @trex-core@ CACHE STRING "trex core libraries" FORCE)
 set(trex_extra_LIBRARIES @trex-extra@ CACHE STRING "trex extensions for plugins" FORCE)
 
