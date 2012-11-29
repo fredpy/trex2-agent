@@ -87,8 +87,10 @@ add_library(TREXutils SHARED
   log/bits/log_sig.hh
   log/text_log.hh
   log/out_file.hh
+  # platform specific information 
   platform/chrono.hh 
   platform/memory.hh
+  platform/cpp11_deleted.hh
   # template source code
   bits/Factory.tcc
   bits/SingletonUse.tcc

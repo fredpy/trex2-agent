@@ -41,6 +41,7 @@
 # include "stream.hh"
 
 # include "bits/log_sig.hh"
+# include "../platform/cpp11_deleted.hh"
 
 namespace TREX {
   namespace utils {
@@ -219,7 +220,7 @@ namespace TREX {
        
         friend class TREX::utils::log::details::entry_sink;
 # ifndef DOXYGEN
-        text_log(); // Non default constructible
+        text_log() DELETED; // Non default constructible
 # endif
       }; // class TREX::utils::log::text_log
       
