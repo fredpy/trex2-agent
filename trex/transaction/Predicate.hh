@@ -404,8 +404,10 @@ namespace TREX {
       /** @brief Associated attributes */
       attr_set m_vars;
 
+# ifndef DOXYGEN
       // No code for following methods
-      Predicate();
+      Predicate() DELETED;
+# endif
 
     }; // TREX::transaction::Predicate
 

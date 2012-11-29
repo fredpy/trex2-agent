@@ -51,7 +51,10 @@
 # define H_DomainBase
 
 # include <boost/any.hpp>
+
 # include <trex/utils/XmlFactory.hh>
+# include <trex/utils/platform/cpp11_deleted.hh>
+
 # include "DomainVisitor_fwd.hh"
 
 namespace TREX {
@@ -501,8 +504,10 @@ namespace TREX {
 	  return print_domain(out);
       }
 
+# ifndef DOXYGEN
       // Following method have no code
-      DomainBase() {}
+      DomainBase() DELETED;
+# endif
     }; // TREX::transaction::DomainBase
 
 

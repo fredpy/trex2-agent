@@ -38,6 +38,7 @@
 # include "log_fwd.hh"
 # include "bits/log_stream.hh"
 # include "../platform/memory.hh"
+# include "../platform/cpp11_deleted.hh"
 
 # include <iostream>
 # include <memory>
@@ -134,7 +135,7 @@ namespace TREX {
         
         friend class text_log;
 # ifndef DOXYGEN
-        stream(); // Non default constructible
+        stream() DELETED; // Non default constructible
 # endif // DOXYGEN
       };
 
