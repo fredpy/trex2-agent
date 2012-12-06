@@ -71,7 +71,10 @@ namespace TREX {
       }
       virtual ~ros_subscriber() {}
       
-      void message(message_ptr const &msg); // To be implemented for each instance
+      void message(message_ptr const &msg) {
+        // To be implemented for each instance : default just log a warning
+        syslog(TREX::utils::warn)<<"This ros subscriber handler is not implemented";
+      }
       
     private:
       TREX::utils::Symbol m_service;
