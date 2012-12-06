@@ -87,8 +87,6 @@ if(WITH_EUROPA)
     DESTINATION include/trex/europa/bits
     )
   
-
-  
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
   include_directories(${EUROPA_INCLUDE_DIRS})
   include_directories(${CMAKE_BINARY_DIR})
