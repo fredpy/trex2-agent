@@ -90,8 +90,10 @@ add_library(TREXros SHARED
   ros_reactor.cc 
   ros_clock.cc
   ros_timeline.cc
+  ros_client.cc
   # header
   ros_reactor.hh
+  ros_client.hh
   trex/ros/ros_clock.hh
   trex/ros/ros_subscriber.hh
   trex/ros/bits/ros_timeline.hh)

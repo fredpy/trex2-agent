@@ -67,7 +67,7 @@ namespace TREX {
         m_service = TREX::utils::parse_attr<TREX::utils::Symbol>(xml, "ros_service");
         // subscibr to the service qith a queue of 10 ... may change this to be configurable in the future
         m_sub = node().subscribe(m_service.str(), 10,
-                                 boost::bind(&ros_subscriber<Message>::message, this, _1));
+                                 &ros_subscriber<Message>::message, this);
       }
       virtual ~ros_subscriber() {}
       
