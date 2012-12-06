@@ -34,6 +34,7 @@
 #ifndef H_trex_ros_ros_subscriber
 # define H_trex_ros_ros_subscriber
 
+# include <boost/bind.hpp>
 # include "bits/ros_timeline.hh"
 
 namespace TREX {
@@ -57,16 +58,21 @@ namespace TREX {
     template<typename Message>
     class ros_subscriber :public details::ros_timeline {
     public:
-      ros_subscriber(
+      ros_subscriber(details::ros_timeline::xml_arg arg):details::ros_timeline(arg, false) {
+        boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
+        
+        m_service = TREX::utils::parse_attr<TREX::utils::Symbol>(node, "ros_service");
+        // subscibr to the service qith a queue of 10 ... may change this to be configurable in the future
+        m_sub = node().subscribe(m_service.str(), 10,
+                                 boost::bind(&ros_subscriber::message, this, _1));
+      }
       virtual ~ros_subscriber() {}
       
-    protected:
-      void message(boost::shared_ptr<Message const> const &msg);
+      void message(boost::shared_ptr<Message const> const &msg); // To be implemented for each instance
       
     private:
-                     ::ros::Subscriber m_sub;
-      
-                    
+      TREX::utils::Symbol m_service;
+      ::ros::Subscriber m_sub;
     }; // TREX::ROS::ros_subscriber<>
     
   } // TREX::ROS

@@ -37,8 +37,9 @@
 # include <ros/ros.h>
 
 # include <trex/utils/platform/cpp11_deleted.hh>
-# include <trex/utils/Symbol.hh>
 # include <trex/utils/XmlFactory.hh>
+# include <trex/utils/log/stream.hh>
+
 # include <trex/transaction/Observation.hh>
 
 namespace TREX {
@@ -53,7 +54,7 @@ namespace TREX {
         typedef boost::shared_ptr<ros_timeline> pointer;
         
         typedef TREX::utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
-        typedef xml_factory::argeument_type                                   xml_arg;
+        typedef xml_factory::argument_type                                    xml_arg;
         
         
         virtual ~ros_timeline() {}
@@ -74,13 +75,15 @@ namespace TREX {
           return transaction::Observation(name(), pred);
         }
         void notify(transaction::Observation const &obs);
+        TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
+        
       private:
         ros_reactor &m_reactor;
         utils::Symbol const m_name;
         bool const m_controlable;
         
 # ifndef DOXYGEN
-        ros_timeline() DELETED; // Non default constrcutible
+        ros_timeline() DELETED; // Non default constructible
 # endif // DOXYGEN
         
         friend class ros_reactor;

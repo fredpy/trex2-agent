@@ -31,12 +31,59 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/** @file "trex/utils/platform/cpp11_deleted.hh"
+ *
+ * @brief Support of C++11 "=delete" keyword.
+ *
+ * This header provide macro to support the "=delete" keyword on methods when 
+ * compiled with C++11 standard cpompiler.
+ *
+ * The "=delete" method modifier allow to specify that a method of a class has 
+ * no implementation and inform the compiler to not try to create provide a 
+ * default implementation for it. 
+ *
+ * This is especially usefull when we ndo not want the compiler to generate a 
+ * default or copy contstructor for this class. 
+ */
 #ifndef H_trex_cpp11_deleted
 # define H_trex_cpp11_deleted
 
 # include "bits/cpp11.hh"
 
-# ifdef CPP11_HAS_DELETED_FUNCTIONS
+# ifdef DOXYGEN
+
+/** @brief mfunction deletion macro
+ *
+ * This macro is used to define how the compiler handle function deletion. 
+ * If the compiler support C++11 it will be replaced by 
+ * @code
+ *  =delete
+ * @endcode
+ * for older compiler it will just silently ignore it.
+ *
+ * For example if one person want to have a class foo with no default 
+ * constructor it can write it as follow:
+ * @code 
+ * #include <trex/utils/platform/cpp11_deleted.hh>
+ *
+ * class foo {
+ * public:
+ *   foo(int val);
+ *
+ * private:
+ *   foo() DELETED;
+ * };
+ * @endcode
+ * And not implement the foo() constructor. On a C++11 compiler DELETED will 
+ * indicate explicitely that this constructor has no code which will allow 
+ * earlier detection (at compile time vs link time) of unauthorized call of this 
+ * constructor.
+ * @author Frederic Py
+ * @ingroup utils
+ */
+# define DELETED platform-dependent
+
+# elseif defined(CPP11_HAS_DELETED_FUNCTIONS)
 
 # define DELETED =delete
 
