@@ -66,6 +66,7 @@ void ros_reactor::handleInit() {
 }
 
 bool ros_reactor::synchronize() {
+  // fail synchronization when unable to connect to ros
   return ::ros::ok();
 }
       

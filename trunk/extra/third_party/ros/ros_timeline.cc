@@ -38,12 +38,11 @@ using namespace TREX::ROS;
 using namespace TREX::utils;
 
 
-
 /*
  * class TREX::ROS::details::ros_timeline
  */
 details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
-:m_reactor(*arg.second), m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
+:m_reactor(*arg.second), m_name(parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
 m_controlable(control) {
   // Need to do something like this
   m_reactor.provide(m_name);
@@ -57,4 +56,17 @@ details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool contr
 
 ::ros::NodeHandle &details::ros_timeline::node() {
   return m_reactor.m_ros;
+}
+
+void details::ros_timeline::notify(transaction::Observation const &obs) {
+  if( obs.object()!=m_name ) {
+    syslog(log::error)<<"Attempted to post an observation which does not belong to "<<m_name<<":\n\t"<<obs;
+  } else {
+    // Probably need to be protected by some mutex.
+    m_reactor.postObservation(obs);
+  }
+}
+
+log::stream details::ros_timeline::syslog(Symbol const &kind) {
+  return m_reactor.syslog(m_name, kind);
 }
