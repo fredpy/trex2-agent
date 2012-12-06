@@ -47,29 +47,23 @@
 
 if(POCO_NET_LIBRARY)
   include_directories(${POCO_INCLUDE_DIR})
-  add_library(MBARIiridium SHARED
+
+  trex_plugin(iridium iridium_pg.cc
     SbdMailer.cc
     DTAReactor.cc
     #headers 
     SbdMailer.hh
     DTAReactor.hh
     )
-  target_link_libraries(MBARIiridium 
-    TREXtransaction
+  target_link_libraries(iridium_pg TREXtransaction
     ${POCO_NET_LIBRARY})
-
-  install(TARGETS MBARIiridium DESTINATION lib)    
-  trex_lib(MBARIiridium extra)
-
-  trex_plugin(iridium iridium_pg.cc)
-  target_link_libraries(iridium_pg MBARIiridium)
 
 
   # A test program
-  add_executable(sender_test test/sender_test.cc)
-  target_link_libraries(sender_test MBARIiridium)
-  add_custom_target(test COMMENT "Simple tests programs")
-  add_dependencies(test sender_test)
+  #add_executable(sender_test test/sender_test.cc)
+  #target_link_libraries(sender_test MBARIiridium)
+  #add_custom_target(test COMMENT "Simple tests programs")
+  #add_dependencies(test sender_test)
   
 else(POCO_NET_LIBRARY)
   message(SEND_ERROR "Cannot compile MBARI tracker without Poco")
