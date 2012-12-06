@@ -38,19 +38,7 @@ if(WITH_EUROPA)
   include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
   include_directories(${CMAKE_BINARY_DIR})
   
-  add_library(MBARIeuropa SHARED
-    Constraints.cc
-    Constraints.hh
-    )
-
-  target_link_libraries(MBARIeuropa
-    MBARIshared
-    TREXeuropa
-    )
-  install(TARGETS MBARIeuropa DESTINATION lib) 
-  trex_lib(MBARIeuropa extra)
-
-  trex_plugin(mbari_europa plugin.cc)
-  target_link_libraries(mbari_europa_pg MBARIeuropa)    
+  trex_plugin(mbari_europa plugin.cc Constraints.cc Constraints.hh)
+  target_link_libraries(mbari_europa_pg MBARIshared TREXeuropa_core)    
 
 endif(WITH_EUROPA)

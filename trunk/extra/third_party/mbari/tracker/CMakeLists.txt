@@ -40,7 +40,9 @@ if(MBARI_TRACKER)
   # Check for Protonuf
   find_package(Protobuf)
   # Check for rabbitmq
-  check_library_exists(rabbitmq amqp_new_connection "" LIB_AMQP)
+  find_library(LIB_AMQP rabbitmq)
+  message(STATUS "Looking for rabbitmq : ${LIB_AMQP}")
+  
 
   
   if(LIB_AMQP)
@@ -51,8 +53,7 @@ if(MBARI_TRACKER)
       protobuf_generate_cpp(SENSOR_PROTO_SRCS SENSOR_PROTO_HDRS sensor.proto)
       protobuf_generate_cpp(TREX_PROTO_SRCS TREX_PROTO_HDRS trex.proto)
       
-
-      add_library(MBARIamqp SHARED
+      trex_plugin(dta tracker_plugin.cc
 	AMQP_connection.cc
 	AMQP_listener.cc
 	AMQP_queue.cc
@@ -76,17 +77,8 @@ if(MBARI_TRACKER)
 	PositionHandler.hh
 	serie.hh
 	)
-      target_link_libraries(MBARIamqp 
-	MBARIshared
-	TREXtransaction 
-	rabbitmq
-	${Boost_LIBRARIES}
-	${PROTOBUF_LIBRARIES})
-      install(TARGETS MBARIamqp DESTINATION lib)    
-      trex_lib(MBARIamqp extra)
-
-      trex_plugin(dta tracker_plugin.cc)
-      target_link_libraries(dta_pg MBARIamqp)
+      target_link_libraries(dta_pg MBARIshared TREXtransaction ${LIB_AMQP} 
+	${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
     else(PROTOBUF_FOUND)
       message(SEND_ERROR "Cannot compile MBARI tracker without protobuf")
