@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_reactor.hh"
+#include "ros_client.hh"
 
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
@@ -42,16 +43,15 @@ using namespace TREX::ROS;
 
 namespace {
   SingletonUse<LogManager> s_log;
+  SingletonUse<ros_client> s_ros; // initate connection to ros
 
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSREactor");
+  
 }
 
 namespace TREX {
 
   void initPlugin() {
-    int argc = 0;
-    char **argv = NULL;
-    ros::init(argc, argv, "trex2", ros::init_options::AnonymousName);
     s_log->syslog("ros.plugin", log::info)<<"ROS initialized";
   }
 
