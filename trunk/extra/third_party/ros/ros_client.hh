@@ -51,6 +51,9 @@ namespace TREX {
 
       bool started() const;
       void start();
+      void stop() {
+        m_active = false;
+      }
       
     private:
       ros_client();
