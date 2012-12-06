@@ -35,6 +35,7 @@
 # define H_trex_ros_ros_reactor
 
 # include "ros_subscriber.hh"
+# include "ros_client.hh"
 
 # include <trex/transaction/TeleoReactor.hh>
 
@@ -55,7 +56,8 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
 
-      ::ros::NodeHandle m_ros;
+      TREX::utils::SingletonUse<ros_client> m_cli;
+      ::ros::NodeHandle                     m_ros;
 
       friend class details::ros_timeline;
     }; // TREX::ros::ros_reactor
