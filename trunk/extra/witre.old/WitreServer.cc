@@ -276,8 +276,8 @@ void WitreServer::notify(Observation const &obs)
 
 }
 
-void WitreServer::log_proxy::operator()(log::entry::pointer msg) {
-  if( msg->kind()!=log::null ) {
+void WitreServer::log_proxy::operator()(TREX::utils::log::entry::pointer msg) {
+  if( msg->kind()!=TREX::utils::log::null ) {
     boost::mutex::scoped_lock lock(me.mutex_);
     boost::optional<unsigned long long> date;
     if( msg->is_dated() ) 
