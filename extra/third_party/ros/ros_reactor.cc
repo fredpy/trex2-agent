@@ -63,11 +63,12 @@ ros_reactor::~ros_reactor() {
 }
 
 void ros_reactor::handleInit() { 
+  m_cli->start();
 }
 
 bool ros_reactor::synchronize() {
   // fail synchronization when unable to connect to ros
-  return ::ros::ok();
+  return m_cli->ok();
 }
       
 void ros_reactor::handleRequest(goal_id const &g) {
