@@ -53,6 +53,7 @@ namespace TREX {
       void start();
       void stop() {
         m_active = false;
+        m_freq.cancel();
       }
       
     private:

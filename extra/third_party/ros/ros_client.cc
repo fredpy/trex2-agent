@@ -92,7 +92,7 @@ void ros_client::spin_cb() {
   if( started() ) {
     if( ::ros::ok() ) {
       // Set my timer
-      m_freq.expire_from_now(boost::posix_time::milliseconds(100)); // 10Hz is more than enough
+      m_freq.expires_from_now(boost::posix_time::milliseconds(100)); // 10Hz is more than enough
       // manage things from ros
       ::ros::spinOnce();
       
