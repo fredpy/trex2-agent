@@ -40,6 +40,8 @@ using namespace TREX::europa;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+namespace tlog=TREX::utils::log;
+
 namespace {
 
   SingletonUse<LogManager> s_log;
@@ -54,7 +56,7 @@ namespace TREX {
     if( !Assembly::actions_supported() )
       ::s_log->syslog("plugin.europa", warn)<<"This version of europa plugin"
 	  " was compiled without Europa 2.6 action support!"; 
-    ::s_log->syslog("plugin.europa", log::info)<<"Europa loaded.";
+    ::s_log->syslog("plugin.europa", tlog::info)<<"Europa loaded.";
     // ::decl;
   }  
 
