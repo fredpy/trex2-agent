@@ -94,8 +94,8 @@ if(WITH_EUROPA)
   include_directories(${CMAKE_BINARY_DIR})
 
   add_subdirectory(core)
-
-  add_library(TREXeuropa SHARED 
+  
+  trex_plugin(europa europa_plugin.cc
     EuropaReactor.cc
     europa_convert.cc
     EuropaDomain.cc  
@@ -116,15 +116,30 @@ if(WITH_EUROPA)
     extensions/GoalFilter.hh
     extensions/Numeric.hh
     extensions/Trigonometry.hh
-  )
+    )
+  target_link_libraries(europa_pg TREXeuropa_core TREXtransaction)
 
-  target_link_libraries(TREXeuropa TREXeuropa_core TREXtransaction)
-  
-  install(TARGETS TREXeuropa DESTINATION lib) 
-  trex_lib(TREXeuropa extra)
-  
-  trex_plugin(europa europa_plugin.cc)
-  target_link_libraries(europa_pg TREXeuropa)
+  source_group("Source\ Files\\extensions" FILES
+    extensions/Bind.cc
+    extensions/DoNotMatchFilter.cc
+    extensions/extensions.cc
+    extensions/EarliestFirstFlawManager.cc
+    extensions/GoalFilter.cc
+    extensions/Numeric.cc
+    extensions/Trigonometry.cc)
+
+  source_group("Header\ Files\\bits" FILES
+    bits/europa_convert.hh
+    )
+
+  source_group("Header\ Files\\extensions" FILES
+    extensions/Bind.hh
+    extensions/DoNotMatchFilter.hh
+    extensions/EarliestFirstFlawManager.hh
+    extensions/GoalFilter.hh
+    extensions/Numeric.hh
+    extensions/Trigonometry.hh)
+    
 
   install(DIRECTORY trex/ DESTINATION include/trex/
     FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
