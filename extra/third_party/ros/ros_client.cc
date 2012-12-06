@@ -53,7 +53,7 @@ ros_client::ros_client():m_active(false), m_freq(m_log->service()) {
 ros_client::~ros_client() {
   if(ros::ok() ) {
     m_log->syslog("ros", TREX::utils::log::info)<<"Shutting down ros connection";
-    ros::stop();
+    stop();
   }
 }
 
@@ -98,7 +98,7 @@ void ros_client::spin_cb() {
       
       m_freq.async_wait(boost::bind(&ros_client::spin_cb, this));
     } else
-      m_active = false;
+      stop();
   }
 }
 
