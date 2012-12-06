@@ -73,7 +73,7 @@ namespace TREX {
       
       void message(message_ptr const &msg) {
         // To be implemented for each instance : default just log a warning
-        syslog(TREX::utils::warn)<<"This ros subscriber handler is not implemented";
+        syslog(TREX::utils::log::warn)<<"This ros subscriber handler is not implemented";
       }
       
     private:
