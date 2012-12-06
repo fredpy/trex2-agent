@@ -33,8 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-trex_plugin(agentlocation agentlocation_pg.cc Agentlocation.cc 
+trex_plugin(agentlocation agentlocation_pg.cc AgentLocation.cc 
  # headers
- Agentlocation.hh)
+ AgentLocation.hh)
 
 target_link_libraries(agentlocation_pg TREXtransaction)
