@@ -40,26 +40,22 @@ if(WITH_WITRE)
 
   if(Wt_FOUND) 
     include_directories(${Wt_INCLUDE_DIR})
-    add_library(TREXwitre SHARED
-       Popup.cc 
-       Witre.cc 
-       WitreServer.cc 
-       # headers
-       Popup.hh
-       Witre.hh
-       WitreGraph.hh
-       WitreServer.hh
-     )
-   target_link_libraries(TREXwitre 
-     ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
-     ${Boost_THREAD_LIBRARY} 
-     ${Boost_SIGNALS_LIBRARY} 
-     TREXtransaction
-   ) 
-   trex_lib(TREXwitre extra)
-
-   trex_plugin(witre witre_pg.cc)
-   target_link_libraries(witre_pg TREXwitre)
+    
+    trex_plugin(witre witre_pg.cc 
+      Popup.cc 
+      Witre.cc 
+      WitreServer.cc
+      # headers
+      Popup.hh
+      Witre.hh
+      WitreGraph.hh
+      WitreServer.hh
+      )
+    target_link_libraries(witre_pg  
+      ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
+      ${Boost_THREAD_LIBRARY} 
+      ${Boost_SIGNALS_LIBRARY} 
+      TREXtransaction)
 
     # generate the witre.xml configuration file with a doocroot pointing to witre
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/witre.xml.in
