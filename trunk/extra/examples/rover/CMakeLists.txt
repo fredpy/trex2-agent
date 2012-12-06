@@ -33,15 +33,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXrover SHARED
-	Rover.cc
-	#headers
-	Rover.hh
-	)
-target_link_libraries(TREXrover
-	TREXtransaction
-	)
-trex_lib(TREXrover extra)
-
-trex_plugin(rover rover_pg.cc)
-target_link_libraries(rover_pg TREXrover)
+trex_plugin(rover rover_pg.cc Rover.cc 
+  # headers 
+  Rover.hh)
+target_link_libraries(rover_pg TREXtransaction)

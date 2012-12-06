@@ -33,15 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXAgentLocation SHARED
-	AgentLocation.cc
-	#headers
-	AgentLocation.hh
-	)
-target_link_libraries(TREXAgentLocation
-	TREXtransaction
-	)
-trex_lib(TREXAgentLocation extra)
+trex_plugin(agentlocation agentlocation_pg.cc Agentlocation.cc 
+ # headers
+ Agentlocation.hh)
 
-trex_plugin(agentlocation agentlocation_pg.cc)
-target_link_libraries(agentlocation_pg TREXAgentLocation)
+target_link_libraries(agentlocation_pg TREXtransaction)
