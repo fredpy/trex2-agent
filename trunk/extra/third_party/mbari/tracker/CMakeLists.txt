@@ -40,7 +40,12 @@ if(MBARI_TRACKER)
   # Check for Protonuf
   find_package(Protobuf)
   # Check for rabbitmq
-  find_library(LIB_AMQP rabbitmq)
+  find_library(LIB_AMQP
+    NAMES rabbitmq
+    PATHS /usr/local/lib 
+    /usr/lib 
+    /opt/local/lib
+    )
   message(STATUS "Looking for rabbitmq : ${LIB_AMQP}")
   
 
