@@ -47,10 +47,18 @@ if(MBARI_TRACKER)
     /opt/local/lib
     )
   message(STATUS "Looking for rabbitmq : ${LIB_AMQP}")
+  find_path(AMQP_INCLUDE_DIR amqp.h
+    PATHS /usr/local/include
+    /usr/include 
+    /opt/local/include
+    )
+  message(STATUS "AMQP include directory: ${AMQP_INCLUDE_DIR}")
   
 
   
   if(LIB_AMQP)
+    include_directories(${AMQP_INCLUDE_DIR})
+
     if(PROTOBUF_FOUND)
       include_directories(${PROTOBUF_INCLUDE_DIRS})
       include_directories(${CMAKE_CURRENT_BINARY_DIR})
