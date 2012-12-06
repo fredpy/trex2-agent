@@ -93,7 +93,7 @@ add_library(TREXros SHARED
   ros_client.cc
   # header
   ros_reactor.hh
-  ros_client.hh
+  trex/ros/ros_client.hh
   trex/ros/ros_clock.hh
   trex/ros/ros_subscriber.hh
   trex/ros/bits/ros_timeline.hh)
