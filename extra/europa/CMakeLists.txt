@@ -79,13 +79,6 @@ if(WITH_EUROPA)
     message(STATUS "EUROPA_ARCHIVAL='${EUROPA_ARCHIVAL}'")
   endif(EUROPA_ARCHIVAL_VALID LESS 0)
 
-  # put the europa flags under trex/europa/bits
-  configure_file(bits/europa_config.hh.in 
-    ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
-  install(
-    FILES ${CMAKE_BINARY_DIR}/bits/europa_config.hh 
-    DESTINATION include/trex/europa/bits
-    )
   
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
   include_directories(${EUROPA_INCLUDE_DIRS})
