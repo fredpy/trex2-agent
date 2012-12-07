@@ -49,7 +49,6 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/Assembly.hh
   ../trex/europa/DeliberationFilter.hh
   ../trex/europa/EuropaException.hh
-  ../trex/europa/bits/europa_helpers.hh
   ../trex/europa/EuropaPlugin.hh
   ../trex/europa/ModeConstraints.hh
   ../trex/europa/ReactorConstraint.hh
@@ -57,6 +56,8 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/SynchronizationManager.hh
   ../trex/europa/TimeConstraints.hh
   ../trex/europa/TrexThreatDecisionPoint.hh
+  ../trex/europa/bits/europa_helpers.hh
+  ../trex/europa/config.hh
 )
 
 source_group("Header\ Files\\bits" FILES 
