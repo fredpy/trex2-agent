@@ -47,16 +47,8 @@ ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   // embeds external configuration
   ext_xml(node.second, "config");
+  add_timelines(node.second.begin(), node.second.end());
  
-  for(boost::property_tree::ptree::iterator i=node.second.begin();
-      node.second.end()!=i; ++i) {
-    if( is_tag(*i, "Observe") ) {
-      // Do something to get the data
-    } else if( is_tag(*i, "Service") ) {
-      // Do something to both allow requests and collect feedback
-    } else
-      syslog(log::warn)<<"Ignoring XML tag "<<i->first;
-  }
 }
     
 ros_reactor::~ros_reactor() {
