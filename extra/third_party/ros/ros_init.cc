@@ -49,7 +49,7 @@ namespace TREX {
      */ 
     template<>
     void ros_subscriber<geometry_msgs::Point>::message(geometry_msgs::Point::ConstPtr const &msg) {
-      TREX::transaction::Observation obs(name(), "Hold");
+      TREX::transaction::Observation obs = new_obs("Hold");
       obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
       obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
       obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
