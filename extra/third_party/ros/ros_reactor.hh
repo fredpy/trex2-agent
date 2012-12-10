@@ -67,6 +67,7 @@ namespace TREX {
       std::set<TREX::transaction::goal_id> m_goals;
       void completed(TREX::transaction::goal_id const &g) {
 	m_goals.erase(g);
+	syslog(g->object(), TREX::utils::log::info)<<"Goal "<<g<<" completed.";
       }
       
       template<typename Iter>
