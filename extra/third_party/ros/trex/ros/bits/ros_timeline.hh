@@ -41,6 +41,7 @@
 # include <trex/utils/log/stream.hh>
 
 # include <trex/transaction/Observation.hh>
+# include <trex/transaction/Goal.hh>
 
 # include "../ros_error.hh"
 
