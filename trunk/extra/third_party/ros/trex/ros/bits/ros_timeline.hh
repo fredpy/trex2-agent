@@ -73,9 +73,6 @@ namespace TREX {
         
         ::ros::NodeHandle &node();
         
-        transaction::Observation obs(utils::Symbol const &pred) {
-          return transaction::Observation(name(), pred);
-        }
         void notify(transaction::Observation const &obs);
         TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
 	TREX::transaction::Observation new_obs(TREX::utils::Symbol const &pred) const {
