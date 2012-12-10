@@ -62,7 +62,7 @@ void details::ros_timeline::notify(transaction::Observation const &obs) {
   if( obs.object()!=m_name ) {
     syslog(log::error)<<"Attempted to post an observation which does not belong to "<<m_name<<":\n\t"<<obs;
   } else {
-    // Probably need to be protected by some mutex.
+    // Probably need to be protected by some mutex.... 
     m_reactor.postObservation(obs);
   }
 }
