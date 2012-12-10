@@ -37,6 +37,8 @@
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
 
+#include <trex/domain/FloatDaomin.hh>
+
 #include <geometry_msgs/Point.h>
 
 namespace TREX {
