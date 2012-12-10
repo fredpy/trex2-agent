@@ -33,6 +33,14 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+# put the europa flags under trex/europa/bits
+configure_file(bits/europa_config.hh.in 
+  ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
+install(
+  FILES ${CMAKE_BINARY_DIR}/bits/europa_config.hh 
+  DESTINATION include/trex/europa/bits
+  )
+
 add_library(TREXeuropa_core SHARED
   Assembly.cc
   core.cc
