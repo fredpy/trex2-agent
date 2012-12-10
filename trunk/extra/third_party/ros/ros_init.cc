@@ -44,7 +44,8 @@
 namespace TREX {
   namespace ROS {
     /*
-     * example for position update based on Point
+     * Simple example for position update based on Point
+     *   more a compilation test than anything else
      */ 
     template<>
     void ros_subscriber<geometry_msgs::Point>::message(geometry_msgs::Point::ConstPtr const &msg) {
