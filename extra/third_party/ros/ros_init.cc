@@ -47,6 +47,7 @@ using namespace TREX::ROS;
  * example for position update based on Point
  */ 
 
+template<>
 void TREX::ROS::ros_subscriber<geometry_msgs::Point>::message(Point::ConstPtr const &msg) {
   TREX::transaction::Observation obs(name(), "Hold");
   obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
