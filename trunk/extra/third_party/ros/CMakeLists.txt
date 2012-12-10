@@ -80,6 +80,23 @@ if(ROS_CFG)
   else(roscpp_PACKAGE_PATH)
     message(SEND_ERROR "Failed to locate roscpp ROS package")
   endif(roscpp_PACKAGE_PATH)
+
+  rosbuild_find_ros_package(actionlib)
+  if(actionlib_PACKAGE_PATH)
+    message(STATUS "Looking for roscpp: ${roscpp_PACKAGE_PATH}")
+    # gets compilation information
+    rosbuild_invoke_rospack(actionlib actionlib INCLUDE_DIRS cflags-only-I)
+    rosbuild_invoke_rospack(actionlib actionlib CFLAGS cflags-only-other)
+    rosbuild_invoke_rospack(actionlib actionlib LINK_PATH libs-only-L)
+    rosbuild_invoke_rospack(actionlib actionlib LINK_LIBS libs-only-l)
+    rosbuild_invoke_rospack(actionlib actionlib LINK_FLAGS libs-only-other)
+
+    # General library
+    include_directories(${actionlib_INCLUDE_DIRS})
+    add_definitions(${actionlib_CFLAGS})
+  else(actionlib_PACKAGE_PATH)
+    message(SEND_ERROR "Failed to locate actionlib ROS package")
+  endif(actionlib_PACKAGE_PATH)
 endif(ROS_CFG)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
@@ -97,6 +114,7 @@ add_library(TREXros SHARED
   trex/ros/ros_clock.hh
   trex/ros/ros_error.hh
   trex/ros/ros_subscriber.hh
+  trex/ros/ros_action.hh
   trex/ros/bits/ros_timeline.hh)
 
 source_group("Header\ Files\\bits" FILES 
@@ -107,9 +125,13 @@ install(DIRECTORY trex/ DESTINATION include/trex/
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
   
-target_link_libraries(TREXros ${roscpp_LINK_FLAGS}
+target_link_libraries(TREXros ${roscpp_LINK_FLAGS} 
   -L${roscpp_LINK_PATH} 
-  ${roscpp_LINK_LIBS} TREXagent)
+  ${roscpp_LINK_LIBS} 
+  ${actionlib_LINK_FLAGS} 
+  -L${actionlib_LINK_PATH} 
+  ${actionlib_LINK_LIBS} 
+  TREXagent)
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
 
