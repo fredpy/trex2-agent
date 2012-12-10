@@ -90,6 +90,9 @@ namespace TREX {
       }; // TREX:ROS::details::ros_timeline 
       
     } // TREX::ROS::details
+
+    typedef details::ros_timeline::xml_factory ros_factory;
+
   } // TREX::ROS
 } // TREX
 
