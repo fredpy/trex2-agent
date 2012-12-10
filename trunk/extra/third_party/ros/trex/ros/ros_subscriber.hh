@@ -65,9 +65,21 @@ namespace TREX {
         boost::property_tree::ptree::value_type &xml(details::ros_timeline::xml_factory::node(arg));
         
         m_service = TREX::utils::parse_attr<TREX::utils::Symbol>(xml, "ros_service");
-        // subscibr to the service qith a queue of 10 ... may change this to be configurable in the future
-        m_sub = node().subscribe(m_service.str(), 10,
-                                 &ros_subscriber<Message>::message, this);
+	try {
+
+	  // subscibr to the service with a queue of 10 ... may change this to be configurable in the future
+	  m_sub = node().subscribe(m_service.str(), 10,
+				   &ros_subscriber<Message>::message, this);
+	} catch(::ros::Exception const &e) {
+	  std::ostringstream oss;
+	  oss<<"Exception while trying to subscribe to \""<<m_service<<"\": "<<e.what();
+	  throw ros_exception(oss.str());
+	}
+	if( !m_sub ) {
+	  std::ostringstream oss;
+	  oss<<"Subscription ot publisher \""<<m_service<<"\" failed.";
+	  throw ros_exception(oss.str());
+	}
       }
       virtual ~ros_subscriber() {}
       
