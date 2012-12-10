@@ -59,9 +59,15 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
 
+
       TREX::utils::SingletonUse<ros_client> m_cli;
       ::ros::NodeHandle                     m_ros;
       TREX::utils::SingletonUse<ros_factory> m_tl_prod;
+
+      std::set<goal_id> m_goals;
+      void completed(goal_id const &g) {
+	m_goals.erase(g);
+      }
       
       template<typename Iter>
       size_t add_timelines(Iter from, Iter to);
