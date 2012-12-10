@@ -59,7 +59,7 @@ namespace TREX {
         typedef xml_factory::argument_type                                    xml_arg;
         
         
-        virtual ~ros_timeline() {}
+        virtual ~ros_timeline();
         
         utils::Symbol const &name() const {
           return m_name;

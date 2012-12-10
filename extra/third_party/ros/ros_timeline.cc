@@ -44,23 +44,32 @@ using namespace TREX::utils;
 details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
 :m_reactor(*arg.second), m_name(parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
 m_controlable(control) {
-  // Need to do something like this
-  if( !m_reactor.provide(m_name) ) {
-    std::ostringstream oss;
-    oss<<"Failed to create timeline \""<<name()<<"\"";
-    throw TREX::transaction::ReactorException(*m_reactor, oss.str());
-  }
+  init_timeline();
 }
 
 details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control)
 :m_reactor(*r), m_name(tl), m_controlable(control) {
-  // see above
-  if( !m_reactor.provide(m_name) ) {
-    std::ostringstream oss;
-    oss<<"Failed to create timeline \""<<name()<<"\"";
-    throw TREX::transaction::ReactorException(*m_reactor, oss.str());
+  init_timeline();
+}
+
+details::ros_timeline::~ros_timeline() {
+  m_reactor.unprovide(name());
+}
+
+void details::ros_timeline::init_timeline() {
+  std::ostringstream oss;
+  if( isInternal(name()) ) {
+    oss<<"Attempted to provide \""<<name()<<"\" which is already owned.";
+    throw TREX::transaction::ReactorException(m_reactor, oss.str());
+  } else {
+    m_reactor.provide(name(), controlable());
+    if( !isInternal(name()) ) {
+      oss<<"Failed to declare  \""<<name()<<"\" as Internal.";
+      throw TREX::transaction::ReactorException(m_reactor, oss.str());
+    }
   }
 }
+
 
 ::ros::NodeHandle &details::ros_timeline::node() {
   return m_reactor.m_ros;
