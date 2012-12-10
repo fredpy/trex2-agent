@@ -88,11 +88,12 @@ log::stream details::ros_timeline::syslog(Symbol const &kind) {
   return m_reactor.syslog(m_name, kind);
 }
 
-void details::ros_timeline::request(TREX::transaction::goal_id g) {
+bool details::ros_timeline::request(TREX::transaction::goal_id g) {
   if( g->object()!=name() )
     syslog(TREX::utils::log::error)<<"Goal "<<g<<" is not on "<<name();
   else if( controlable() )
-    handle_request(g);
+    return handle_request(g);
+  return false;
 }
 
 void details::ros_timeline::recall(TREX::transaction::goal_id g) {

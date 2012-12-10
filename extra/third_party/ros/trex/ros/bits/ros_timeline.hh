@@ -68,13 +68,15 @@ namespace TREX {
           return m_controlable;
         }
 
-	void request(TREX::transaction::goal_id g);
+	bool request(TREX::transaction::goal_id g);
 	void recall(TREX::transaction::goal_id g);
       protected:
         ros_timeline(xml_arg arg, bool control);
         ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool control);
 
-	virtual void handle_request(TREX::transaction::goal_id g) {}
+	virtual bool handle_request(TREX::transaction::goal_id g) {
+	  return false; // indicates that nothing was sent
+	}
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
         
         ::ros::NodeHandle &node();

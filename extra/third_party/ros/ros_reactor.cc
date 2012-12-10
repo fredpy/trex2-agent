@@ -64,7 +64,18 @@ bool ros_reactor::synchronize() {
 }
       
 void ros_reactor::handleRequest(goal_id const &g) {
+  // Look for the timeline
+  tl_map::const_iterator i = m_tl_conn.find(g->object());
+  if( m_tl_conn.end()!=i ) {
+    if( i->second->request(g) ) {
+      syslog("ros", TREX::utils::log::info)<<"Sent goal "<<g;
+    }
+  }
 }
 
 void ros_reactor::handleRecall(goal_id const &g) {
+  tl_map::const_iterator i = m_tl_conn.find(g->object());
+  if( m_tl_conn.end()!=i ) {
+    i->second->recall(g);
+  }
 }

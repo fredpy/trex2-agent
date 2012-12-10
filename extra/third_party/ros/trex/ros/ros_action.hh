@@ -91,7 +91,7 @@ namespace TREX {
 
     private:
       // TREX callbacks
-      void handle_request(TREX::transaction::goal_id g);
+      bool handle_request(TREX::transaction::goal_id g);
       void handle_recall(TREX::transaction::goal_id g);
 
       TREX::utils::Symbol m_service;
