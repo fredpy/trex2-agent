@@ -39,22 +39,25 @@
 
 #include <geometry_msgs/Point.h>
 
+namespace TREX {
+  namespace ROS {
+    /*
+     * example for position update based on Point
+     */ 
+    template<>
+    void ros_subscriber<geometry_msgs::Point>::message(geometry_msgs::Point::ConstPtr const &msg) {
+      TREX::transaction::Observation obs(name(), "Hold");
+      obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
+      obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
+      obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
+      notify(obs);
+    }
+  }
+}
+
 using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::ROS;
-
-/*
- * example for position update based on Point
- */ 
-
-template<>
-void TREX::ROS::ros_subscriber<geometry_msgs::Point>::message(geometry_msgs::Point::ConstPtr const &msg) {
-  TREX::transaction::Observation obs(name(), "Hold");
-  obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
-  obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
-  obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
-  notify(obs);
-}
 
 namespace {
   SingletonUse<LogManager> s_log;
