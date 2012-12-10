@@ -80,6 +80,9 @@ namespace TREX {
         TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
         
       private:
+	void init_timeline();
+
+
         ros_reactor &m_reactor;
         utils::Symbol const m_name;
         bool const m_controlable;

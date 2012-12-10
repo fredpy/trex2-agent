@@ -34,7 +34,7 @@
 #ifndef H_trex_ros_ros_error 
 # define H_trex_ros_ros_error
 
-# include <TREX/utils/Exception.hh>
+# include <trex/utils/Exception.hh>
 
 namespace TREX {
   namespace ROS {
