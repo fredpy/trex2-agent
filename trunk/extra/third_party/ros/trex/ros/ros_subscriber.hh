@@ -73,12 +73,12 @@ namespace TREX {
 	} catch(::ros::Exception const &e) {
 	  std::ostringstream oss;
 	  oss<<"Exception while trying to subscribe to \""<<m_service<<"\": "<<e.what();
-	  throw ros_exception(oss.str());
+	  throw ros_error(oss.str());
 	}
 	if( !m_sub ) {
 	  std::ostringstream oss;
 	  oss<<"Subscription ot publisher \""<<m_service<<"\" failed.";
-	  throw ros_exception(oss.str());
+	  throw ros_error(oss.str());
 	}
       }
       virtual ~ros_subscriber() {}
