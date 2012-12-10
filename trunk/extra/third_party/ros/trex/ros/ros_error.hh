@@ -31,50 +31,21 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "bits/ros_timeline.hh"
-#include "ros_reactor.hh"
+#ifndef H_trex_ros_ros_error 
+# define H_trex_ros_ros_error
 
-using namespace TREX::ROS;
-using namespace TREX::utils;
+# include <TREX/utils/Exception.hh>
 
+namespace TREX {
+  namespace ROS {
 
-/*
- * class TREX::ROS::details::ros_timeline
- */
-details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
-:m_reactor(*arg.second), m_name(parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
-m_controlable(control) {
-  // Need to do something like this
-  if( !m_reactor.provide(m_name) ) {
-    std::ostringstream oss;
-    oss<<"Failed to create timeline \""<<name()<<"\"";
-    throw TREX::transaction::ReactorException(*m_reactor, oss.str());
-  }
-}
+    class ros_error :public TREX::utils::Exception {
+    public:
+      ros_error(std::string const &msg) throw():TREX::utils::Exception(msg) {}
+      virtual ~ros_error() throw() {}
+    }; // TREX::ROS::ros_error
 
-details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control)
-:m_reactor(*r), m_name(tl), m_controlable(control) {
-  // see above
-  if( !m_reactor.provide(m_name) ) {
-    std::ostringstream oss;
-    oss<<"Failed to create timeline \""<<name()<<"\"";
-    throw TREX::transaction::ReactorException(*m_reactor, oss.str());
-  }
-}
+  } // TREX::ROS
+} // TREX
 
-::ros::NodeHandle &details::ros_timeline::node() {
-  return m_reactor.m_ros;
-}
-
-void details::ros_timeline::notify(transaction::Observation const &obs) {
-  if( obs.object()!=m_name ) {
-    syslog(log::error)<<"Attempted to post an observation which does not belong to "<<m_name<<":\n\t"<<obs;
-  } else {
-    // Probably need to be protected by some mutex.... 
-    m_reactor.postObservation(obs);
-  }
-}
-
-log::stream details::ros_timeline::syslog(Symbol const &kind) {
-  return m_reactor.syslog(m_name, kind);
-}
+#endif // H_trex_ros_ros_error
