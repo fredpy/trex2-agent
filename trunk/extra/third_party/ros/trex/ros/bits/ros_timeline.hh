@@ -80,9 +80,7 @@ namespace TREX {
 	}
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
 
-	void complete(TREX::transaction::goal_id g) {
-	  m_reactor.completed(g);
-	}
+	void complete(TREX::transaction::goal_id g);
         
         ::ros::NodeHandle &node();
         

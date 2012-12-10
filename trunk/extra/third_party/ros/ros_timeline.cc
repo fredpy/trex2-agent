@@ -100,3 +100,7 @@ void details::ros_timeline::recall(TREX::transaction::goal_id g) {
   if( controlable() )
     handle_recall(g);
 }
+
+void details::ros_timeline::complete(TREX::transaction::goal_id g) {
+  m_reactor.completed(g);
+}
