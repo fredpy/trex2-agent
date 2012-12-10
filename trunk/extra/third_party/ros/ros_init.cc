@@ -47,7 +47,7 @@ using namespace TREX::ROS;
  * example for position update based on Point
  */ 
 
-void TREX::ROS::ros_subscriber<Point>::message(Point::ConstPtr const &msg) {
+void TREX::ROS::ros_subscriber<geometry_msgs::Point>::message(Point::ConstPtr const &msg) {
   TREX::transaction::Observation obs(name(), "Hold");
   obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
   obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
@@ -61,7 +61,7 @@ namespace {
 
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   // declare the Point subscriber
-  details::ros_timeline::xml_factory::declare< ros_subscriber<Point> > pt_decl("Point");
+  details::ros_timeline::xml_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
 }
 
 
