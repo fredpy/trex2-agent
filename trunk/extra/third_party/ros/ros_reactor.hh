@@ -64,7 +64,7 @@ namespace TREX {
       ::ros::NodeHandle                     m_ros;
       TREX::utils::SingletonUse<ros_factory> m_tl_prod;
 
-      std::set<goal_id> m_goals;
+      std::set<TREX::transaction::goal_id> m_goals;
       void completed(TREX::transaction::goal_id const &g) {
 	m_goals.erase(g);
       }
