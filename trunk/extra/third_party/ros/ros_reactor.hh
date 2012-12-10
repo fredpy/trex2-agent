@@ -44,6 +44,9 @@ namespace TREX {
     
     class ros_reactor:public TREX::transaction::TeleoReactor {
     public:
+      typedef details::ros_timeline::xml_factory ros_factory;
+
+
       ros_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
       ~ros_reactor();
 
@@ -58,9 +61,39 @@ namespace TREX {
 
       TREX::utils::SingletonUse<ros_client> m_cli;
       ::ros::NodeHandle                     m_ros;
+      TREX::utils::SingletonUse<ros_factory> m_tl_prod;
+      
+      template<typename Iter>
+      size_t add_timelines(Iter from, Iter to);
+
+      typedef std::map<TREX::utils::Symbol, details::ros_timeline::pointer> tl_map;
+      tl_map m_tl_conn;
 
       friend class details::ros_timeline;
     }; // TREX::ros::ros_reactor
+
+    template<typename Iter>
+    size_t ros_reactor::add_timelines(Iter from, Iter to) {
+      ros_reactor *me = this;
+      typename ros_factory::iter_traits<Iter>::type
+	it = ros_factory::iter_traits<Iter>::build(from, me);
+      details::ros_timeline::pointer tl;
+      size_t count = 0;
+      
+      while( m_tl_prod->iter_produce(it, to, tl) ) {
+	std::pair<tl_map::iterator, bool>
+	  ret = m_tl_conn.insert(std::make_pair(tl->name(), tl));
+	if( ret.second ) {
+	  syslog(TREX::utils::log::null, 
+		 TREX::utils::log::info)<<"ROS timeline \""<<tl->name()<<"\" added";
+	  ++count;
+	} else 
+	  syslog(TREX::utils::log::null, 
+		 TREX::utils::log::error)<<"ROS timeline \""<<tl->name()<<"\" already exists.";
+      }
+      return count;
+    }
+
 
   } // TREX::ros
 } // TREX
