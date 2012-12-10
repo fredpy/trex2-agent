@@ -37,17 +37,33 @@
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
 
+#include <geometry_msgs/Point.h>
+
 using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::ROS;
+
+/*
+ * example for position update based on Point
+ */ 
+
+void TREX::ROS::ros_subscriber<Point>::message(Point::ConstPtr const &msg) {
+  TREX::transaction::Observation obs(name(), "Hold");
+  obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
+  obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
+  obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
+  notify(obs);
+}
 
 namespace {
   SingletonUse<LogManager> s_log;
   SingletonUse<ros_client> s_ros; // initate connection to ros
 
-  TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSREactor");
-  
+  TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
+  // declare the Point subscriber
+  details::ros_timeline::xml_factory::declare< ros_subscriber<Point> > pt_decl("Point");
 }
+
 
 namespace TREX {
 
