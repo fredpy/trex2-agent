@@ -95,6 +95,7 @@ add_library(TREXros SHARED
   ros_reactor.hh
   trex/ros/ros_client.hh
   trex/ros/ros_clock.hh
+  trex/ros/ros_error.hh
   trex/ros/ros_subscriber.hh
   trex/ros/bits/ros_timeline.hh)
 

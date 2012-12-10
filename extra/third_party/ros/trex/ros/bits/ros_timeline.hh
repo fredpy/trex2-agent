@@ -42,6 +42,8 @@
 
 # include <trex/transaction/Observation.hh>
 
+# include "../ros_error.hh"
+
 namespace TREX {
   namespace ROS {
 

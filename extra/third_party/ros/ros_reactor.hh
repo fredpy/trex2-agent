@@ -79,8 +79,15 @@ namespace TREX {
 	it = ros_factory::iter_traits<Iter>::build(from, me);
       details::ros_timeline::pointer tl;
       size_t count = 0;
-      
-      while( m_tl_prod->iter_produce(it, to, tl) ) {
+      bool loop = true;
+
+      while( loop ) {
+	try {
+	  loop = m_tl_prod->iter_produce(it, to, tl);
+	} catch(TREX::utils::Exception const &e) {
+	  syslog(TREX::utils::log::null,
+		 TREX::utils::log::error)<<"Error while creating ROS timeline: "<<e;
+	}
 	std::pair<tl_map::iterator, bool>
 	  ret = m_tl_conn.insert(std::make_pair(tl->name(), tl));
 	if( ret.second ) {
