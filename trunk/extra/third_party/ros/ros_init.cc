@@ -68,7 +68,7 @@ namespace {
 
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   // declare the Point subscriber
-  TREX::ROS::details::ros_timeline::xml_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
+  ros_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
 }
 
 
