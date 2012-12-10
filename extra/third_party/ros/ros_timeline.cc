@@ -58,12 +58,12 @@ details::ros_timeline::~ros_timeline() {
 
 void details::ros_timeline::init_timeline() {
   std::ostringstream oss;
-  if( isInternal(name()) ) {
+  if( m_reactor.isInternal(name()) ) {
     oss<<"Attempted to provide \""<<name()<<"\" which is already owned.";
     throw TREX::transaction::ReactorException(m_reactor, oss.str());
   } else {
     m_reactor.provide(name(), controlable());
-    if( !isInternal(name()) ) {
+    if( !m_reactor.isInternal(name()) ) {
       oss<<"Failed to declare  \""<<name()<<"\" as Internal.";
       throw TREX::transaction::ReactorException(m_reactor, oss.str());
     }
