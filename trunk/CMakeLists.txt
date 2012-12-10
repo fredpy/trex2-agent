@@ -327,6 +327,20 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config-version.cmake
   DESTINATION share/trex/cmake)
 
 
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)
+file(WRITE ${CMAKE_BINARY_DIR}/log/.empty_file " ") # Not really empty ... it is just to force tar to use it
+
+# create the default log directory ... everybody can read/write/exec
+install(DIRECTORY ${CMAKE_BINARY_DIR}/log DESTINATION ${TREX_SHARED}
+   DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+    GROUP_READ GROUP_WRITE GROUP_EXECUTE
+    WORLD_READ WORLD_WRITE WORLD_EXECUTE
+   FILES_MATCHING PATTERN "latest" EXCLUDE
+   PATTERN "????.???.*" EXCLUDE
+   PATTERN "archives" EXCLUDE
+   PATTERN ".empty_file")
+
 get_property(TREX_INCS GLOBAL PROPERTY TREX_INCLUDES)
 get_property(trex-core GLOBAL PROPERTY trex-core)
 get_property(trex-extra GLOBAL PROPERTY trex-extra)
@@ -341,20 +355,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/trex-config.cmake
 unset(TREX_INCS)
 
 # All the packages are mixed together so older version of cmake are not confused
-install(EXPORT trex-targets DESTINATION share/trex/cmake/imports)
-
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/log)
-file(WRITE ${CMAKE_BINARY_DIR}/log/.empty_file " ") # Not really empty ... it is just to force tar to use it
-
-# create the default log directory ... everybody can read/write/exec
-install(DIRECTORY ${CMAKE_BINARY_DIR}/log DESTINATION ${TREX_SHARED}
-   DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
-    GROUP_READ GROUP_WRITE GROUP_EXECUTE
-    WORLD_READ WORLD_WRITE WORLD_EXECUTE
-   FILES_MATCHING PATTERN "latest" EXCLUDE
-   PATTERN "????.???.*" EXCLUDE
-   PATTERN "archives" EXCLUDE
-   PATTERN ".empty_file")
+install(EXPORT trex-targets DESTINATION share/trex/cmake/imports OPTIONAL)
 
 #include(CMakePackageConfigHelpers)
 # Note I need to do a real version checking
