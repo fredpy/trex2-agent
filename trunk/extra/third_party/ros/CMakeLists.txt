@@ -83,7 +83,7 @@ if(ROS_CFG)
 
   rosbuild_find_ros_package(actionlib)
   if(actionlib_PACKAGE_PATH)
-    message(STATUS "Looking for roscpp: ${roscpp_PACKAGE_PATH}")
+    message(STATUS "Looking for actionlib: ${actionlib_PACKAGE_PATH}")
     # gets compilation information
     rosbuild_invoke_rospack(actionlib actionlib INCLUDE_DIRS cflags-only-I)
     rosbuild_invoke_rospack(actionlib actionlib CFLAGS cflags-only-other)
