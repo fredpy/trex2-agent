@@ -79,6 +79,10 @@ namespace TREX {
 	  return false; // indicates that nothing was sent
 	}
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
+
+	void complete(TREX::transaction::goal_id g) {
+	  m_reactor.completed(g);
+	}
         
         ::ros::NodeHandle &node();
         
