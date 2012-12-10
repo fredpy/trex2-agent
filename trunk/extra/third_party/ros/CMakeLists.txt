@@ -127,9 +127,9 @@ install(DIRECTORY trex/ DESTINATION include/trex/
   
 target_link_libraries(TREXros ${roscpp_LINK_FLAGS} 
   -L${roscpp_LINK_PATH} 
-  ${roscpp_LINK_LIBS} 
   ${actionlib_LINK_FLAGS} 
   -L${actionlib_LINK_PATH} 
+  ${roscpp_LINK_LIBS} 
   ${actionlib_LINK_LIBS} 
   TREXagent)
 install(TARGETS TREXros DESTINATION lib)

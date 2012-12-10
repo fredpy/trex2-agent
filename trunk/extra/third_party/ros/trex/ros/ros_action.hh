@@ -82,6 +82,7 @@ namespace TREX {
       }
 
     protected:
+      // ROS callbacks
       void handle_result(actionlib::SimpleClientGoalState const &state,
 			 result_ptr const &msg);
       void handle_active();
@@ -89,6 +90,10 @@ namespace TREX {
       
 
     private:
+      // TREX callbacks
+      void handle_request(TREX::transaction::goal_id g);
+      void handle_recall(TREX::transaction::goal_id g);
+
       TREX::utils::Symbol m_service;
       UNIQ_PTR< actionlib::SimpleActionClient<Action> > m_client;
     }; // TREX::ROS::ros_action 
