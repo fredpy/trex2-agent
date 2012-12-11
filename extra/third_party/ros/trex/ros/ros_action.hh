@@ -38,6 +38,8 @@
 # include <actionlib/client/simple_goal_state.h>
 # include <actionlib/client/simple_client_goal_state.h>
 
+# include <trex/utils/platfrom/memory.hh>
+
 # include "bits/ros_timeline.hh"
 
 namespace TREX {
