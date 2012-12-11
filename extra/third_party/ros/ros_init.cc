@@ -33,6 +33,7 @@
  */
 #include "ros_reactor.hh"
 #include "ros_client.hh"
+#include "ros_action.hh"
 
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
