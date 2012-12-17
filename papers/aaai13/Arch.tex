@@ -1,0 +1,206 @@
+\section{Planning Definitions}
+
+To consider the overall planning and plan execution within an agent we
+use the definition of a temporal domain, planning problem and solution
+as provided by \cite{Nau:2004}:
+\begin{definition}
+  \label{def:domain}
+  A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
+  \begin{itemize}
+  \item $\Lambda_\Phi$ is the set of all temporal databases that can be 
+    defined with the constraints and the constant, variable, and relation 
+    symbols in our representation.
+  \item $O$ is a set of temporal planning operators.
+  \item $X$ s a set of domain axioms.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}
+  \label{def:problem}
+  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_0, \Phi_g )$, where:
+  \begin{itemize}
+  \item $\Phi_0 = (F, C)$ is a database in $\Lambda_\Phi$ that satisfies the axioms of $X$.
+    $\Phi_0$ represents an initial scenario that describes not only the initial 
+    state of the domain but also the evolution predicted to take place 
+    independently of the actions to be planned.
+  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of the problem 
+    as a set $G$ of tques together with a set $C_g$ of objects and temporal 
+    constraints on variables of $G$. 
+  \end{itemize}
+\end{definition}
+
+\begin{definition}
+  \label{def:plan}
+A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each
+  being a partial instance of some operator in $O$.  
+
+  $\pi$ is a solution of a problem $P = (D, \Phi_0, \Phi_g)$ iff
+  there is a  database in $\lambda(\Phi_0, \pi)$\fcomment{Define
+    lambda} that entails $\Phi_g$.
+\end{definition}
+
+\pcomment{Need to define what a:
+  merged, slave, master, and active token is relative to a single token
+  Also what an effect and condition is}
+ 
+In this work, our focus is on executing a given plan $\pi$ which was
+computed by the agent planner. However, in order to reflect the
+dynamic interaction of the agent with its environment we need to
+refine the defintion of the sets $\Phi_0$ and $\Phi_g$. 
+
+Indeed as the world evolve new observations (or refinement of
+existing ones) are added into $\Phi_0$. Simlarly, the agent operator
+can request new future goals to be added to the agent $\Phi_g$ as
+mission time advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value 
+of these sets at the timepoint $t$. For the sake of simcplicity we
+ consider that the alteration of these sets is purely additive with
+ time\fcomment{ In practice, their evolution is more complex as
+   completed goals becomes observation or even a goal previsouly 
+   requested can be cancelled by the operator. Still this asumption 
+   largely simplify the problem description and our algorithm still
+   works without it (even though it kind fo assume it)}:
+\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
+\wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
+
+\fcomment{I will need to refine this and make it more convincing}
+The increasing nature $\Phi_0$ often reflects the execution of
+the agent's plan $\pi$ and in nominal situation is already predicated
+by the plan\footnote{This preclude the situation where new
+  observations invalidate the plan which is out of the scope 
+of this paper}. Considering that new goals vcan be added in the future
+to $\Phi_g$ impact the way the current plan execution should be
+handled. Indeed this can impact how actions should be executed within
+the scope of the mission. Considering the potential addition of new
+objectives, the eagent executive should balance the impact of
+executing the next available action(s) of the plan immediately or as
+late as possible. 
+
+\fcomment{I need to refine and develop this}
+We define that $\Phi_g$ is partitioned into two sets the internal goals $\Phi_{gi}$, 
+ which are the goals the agent started with, and the external goals $\Phi_{ge}$, which 
+ the agent received externally. The plan, $\pi$, will also need to change in order to remain valid.
+
+
+\section{Algorithm Draft}
+
+\begin{algorithm}
+\caption{The function $DispatchToken$ finds if there is a goal in $\Phi_{ge}$ that is connected
+to the token, $t$, and, if so, dispatches the token.}
+\label{DispatchToken}
+\begin{algorithmic}
+\Function{DispatchToken}{Token $T$}
+\State $Boolean Goal$ = $SearchForGoal( T )$
+\If{ $Goal$ $=$ true and  $T$ start time $ \leq $ upper bound for current tick}
+	\State \Return Dispatch $T$
+\ElsIf{ $T$ end time $ \leq $ upper bound for the current tick}
+	\State \Return Dispatch $T$
+\Else
+	\State \Return Don't dispatch $T$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm \ref{DispatchToken} is the central deciding point for how a token 
+should be dispatched. By finding out that a token is connected to a goal in $\Phi_{ge}$, we conclude 
+that the token is a sub-goal, and thus dispatch it immediately being proactive. 
+On the other hand, if the token is not connected to a goal then we defer dispatching it until necessary. 
+This demonstrates our distinction between how we dispatch tokens, proactive or deferred. 
+
+\begin{algorithm}
+\caption{The function $SearchForGoal$ does a Forward search looking for a token that is
+in the set $\Phi_{ge}$.}
+\label{SearchForGoal}
+\begin{algorithmic}
+\Function{SearchForGoal}{ Token $T$ }
+\ForAll{Actions(s), $A$, that $T$ is a Condition }
+	\ForAll{Effect(s), $E$, of Action $A$ }
+		\If{$E$ is a Goal in $\Phi_{ge}$}
+			\State \Return True
+		\ElsIf{$E$ is a Condition of an Action}
+			\State \Return SearchForGoal( $E$ )
+		\Else 
+			\State \Return False
+		\EndIf
+	\EndFor
+\EndFor
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+A crucial part for deciding how to dispatch a token is finding whether the token in question is 
+connected to a goal in $\Phi_{ge}$, call it $G$. Algorithm \ref{SearchForGoal} does the function of 
+searching for $G$ in a forward-search manner. We define a causal link within our plan that must be
+meet in order for our search to function. 
+\begin{definition}
+\label{def:subgoalLink}
+A causal link is defined as linking a goal as an effect of an action whose conditions are needed in order
+to complete the goal and, thus, are subgoals. This link can be recursive as the conditions themselves 
+may be the effect of an action causing a causal chain to build.
+\end{definition}
+During our search, if we find $G$ then we know that the original token is part of the solution for completing $G$. 
+As such, we want to be proactive with completing the token early so as to ultimately complete $G$. If we don't 
+find $G$ then the token has no connection to an external request. The token still needs to be dispatched, 
+however, there is no one explicitly requesting it to be accomplished. Thus, no reason to be proactive. 
+
+Searching for a goal as Algorithm \ref{SearchForGoal} does can be quite computational expensive particularly if
+there are many tokens that are continuously being dispatched. Completing a full search every time a token 
+needs to be dispatch can severely slow down the execution process, which needs to remain quick to ensure 
+proper execution. Therefore, our next algorithmic approach distributes the full search over time. 
+Thus, spreading out the full cost of the search. In order to not repeatedly search the plan, we save the tokens 
+which are connected to a goal in $\Phi_{ge}$ found during the search. In this way, we acquire a list of tokens 
+that should be dispatched early. 
+
+\begin{algorithm}
+\caption{Saves goals as they are added to plan}
+\label{NotifyAdded}
+\begin{algorithmic}
+\Function{NotifyAdded}{ Token $T$ }
+\If{ $T$ is a Goal in $\Phi_{ge}$}
+	\State Insert $T$ into $List_{goals}$
+\EndIf 
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Removes token from list}
+\label{NotifyRemoved}
+\begin{algorithmic}
+\Function{NotifyRemoved}{ Token $T$ }
+	\State Remove $T$ from $List_{goals}$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Searches for tokens connected to goals}
+\label{NotifyActivated}
+\begin{algorithmic}
+\Function{NotifyActivated}{ Token $T$ }
+\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through the causal link}
+	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+In order to distribute the search, we situate our algorithm within the planning search which
+offers callback functions for when a token in the plan is altered. Taking full advantage of the planning 
+search, we use a backwards search from the goal following the reverse causal link to the connected tokens. 
+We fully search from the goals because we know that all the tokens connected through the causal link are 
+sub-goal.  On the contrary, fully searching each token could be wasteful because there is no certainty that 
+it will be linked to a goal and, therefore, could bring little value to our search. However, some tokens 
+may get added to the plan or linked to a goal after we have already searched the goals. Therefore, for every 
+token we do a local forward search of one causal link to verify if it is connected to a goal in our saved list. 
+If so, we do a full backwards search from the token since it has now proven to be valuable. After the plan has 
+been searched, it is as easy as searching a list for a token to see if it should be dispatched early or be deferred
+to later.  
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 

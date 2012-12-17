@@ -1,0 +1,51 @@
+\usepackage{color}
+\usepackage{amsmath, amsfonts, amssymb}
+
+\def\rx{{\texttt{T-REX\ }}}
+\def\rxe{{\texttt{T-REX}}}
+\def\eut{{\texttt{EUROPA}$_2$\ }}
+\def\eu{{\texttt{EUROPA}\ }}
+\def\eue{{\texttt{EUROPA}}}
+\def\eus{{\texttt{EUROPA}'s\ }}
+\def\nd{{\texttt{NDDL\ }}}
+\def\nde{{\texttt{NDDL}}}
+\def\mb{{\texttt{MBFD\ }}}
+\def\mbe{{\texttt{MBFD}}}
+\def\WW{{\texttt{WireWalker\ }}}
+\def\WWe{{\texttt{WireWalker}}}
+
+\def\etal{{et al.\/}}
+\def\eg{e.g., }
+\def\ie{{i.e.,\ }}
+\def\etc{{etc.\ }}
+\def\situ{{in situ \/}}
+\def\PN{{\emph{PN} }}
+\def\can{{\texttt{CANON\ }}}
+\def\od{{\texttt{ODSS\ }}}
+\def\ode{{\texttt{ODSS}}}
+
+\newtheorem{Prop}{Proposition}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Corrolary}{Corollary}
+\newtheorem{definition}{Definition}
+
+%\setlength{\marginparwidth}{8mm}
+
+
+\usepackage{pdfcomment}
+\usepackage{xcolor}
+
+\newcommand{\comment}[2]{\pdfcomment[#1]{#2}}
+
+
+\newcommand{\kcomment}[1]{\comment{author=Kanna,color=red}{KR: #1}}
+\newcommand{\fcomment}[1]{\comment{author=Frederic,color=gray}{FP: #1}}
+\newcommand{\pcomment}[1]{\comment{author=Philip,color=yellow}{PC: #1}}
+
+\newcommand{\highlight}[2]{\pdfmarkupcomment[#1]{#2}{}}
+
+\newcommand{\khighlight}[1]{\highlight{author=Kanna,color=red}{#1}}
+\newcommand{\fhighlight}[1]{\highlight{author=Frederic,color=gray}{#1}}
+\newcommand{\phighlight}[1]{\comment{author=Philip,color=yellow}{#1}}
+

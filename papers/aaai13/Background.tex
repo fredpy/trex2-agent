@@ -1,0 +1,104 @@
+\section{Previous Approaches to Dispatching}
+
+\fcomment{I need to rework this as it is not really a state
+  of the art in the current form ... we also need to present that fact
+  that not that much people do consider postponment of actions
+  ... except maybe for dynamic controlability problem ... this may be
+  the key for this part. WE can present proactive approaches as being
+  the general agreement except for the special case of dynamic
+  controlability where 3DC+  introduces wait actions which in fact put
+  timepoints that need to be deferred. We on the other hand try to
+  look at another aspect that may trigger the decision to defer an
+  actions based on its purpose}
+
+Dispatchability for a simple temporal network (STN) has been identified
+with whether a plan is capable of fast execution, retains its
+flexibility despite uncertainty in the plan, and all information is
+available at execution \cite{mus98}.  To accomplish the task of
+efficient execution, the STN's are transformed into All-Pairs networks
+and striped of their unnecessary edges, which will often create a more
+compact temporal network and esse the propagation of its updates.
+The executive then selects a timepoint, within the bounds of the 
+execution time, and every timepoint before it has
+already been executed. It then sets the start time to the selected
+timepoint and propagates the needed changes throughout the graph
+\cite{mus98}. The process of selecting a timepoint can lead to
+issues when two timepoints have the possibility of being executed at the
+same time, where one should necessarily come first, but the incorrect
+one gets selected first. This mistake can cause the STN to become
+brittle, which leads to a higher chance of failure in the plan.
+
+In \cite{mus97}\fcomment{Missing reference or is itr pell97 ?}, the execution of events follows the same
+properties as before.  The executive is defined as having two jobs the
+selecting and scheduling of events for execution. The executive needs to
+be highly reactive as it is necessary to function in a real-time
+environment. One solution offered for dispatching events efficiently
+is the proactive approach. This approach greatly reduces the plan
+flexibility, and therefore robustness, as all start timepoints are
+grounded to a specific value which is compatible with the inital
+constraints. Take our shopping example, and apply the proactive
+approach globally.\fcomment{figure again}.  We'll say the agent wakes up
+at 9 AM and the duration for traveling to the store is forty minutes
+and buying the apples is twenty minutes. Using the proactive approach, the
+agent will start shopping as soon as possible and thus be done shopping
+by 10 AM. The agent will then go directly home afterwards to satisfy the
+``home by 8 PM'' goal. However by doing so, the agent will be back
+home by 11am with the constraint to stay at home for the next 9
+hours. 
+\fhighlight{If his wife is then calling to ask him to buy extra things it will
+results on hime to need to fully relax his current plan and go back
+and forth between its home and the store all other again. By being
+fully proactive the agent.}\fcomment{Maybe what was meant initially
+here is more related to dynamic controlability which mean that I need
+to twek this text to be more related to a modelled
+but uncontrolbale situation.}
+
+
+% However, the start time for this goal will be roughly
+% 11 AM, and if the agent wants to get some dessert before dinner it will
+% cause a failure in the plan. What this example shows is how EST can
+% severely reduce the flexibility of a mission. EST can also cause
+% inconsistency within the plan.
+
+ \fhighlight{Therefore, \cite{mus97}\fcomment{See comment before} added
+implied links between timepoints allowing the planner to find them
+efficiently.}\fcomment{I don't get what you mean here}
+
+Another issue with execution is uncertainty in the plan. The above
+example illustrates the uncertainty about when the agent should go home
+or if the agent will want to buy more food during the mission. A
+solution for execution uncertainty is the least-committed method, which
+waits until that last moment to execute events. This appoarch keeps the
+plans flexibility and it allows the executive to have all of the
+available information before making a choice (Block, 2006). However, it
+has been argued that the least-committed method is an inefficient
+solution because in a real-world environment an agent might idle for
+long periods of time (Gallien, 2006). This can severely decrease the
+overall performance of the system. Lets demonstrate the least-committed
+policy in our Shopping agent example using the same goals and durations
+as before. This time around the agent won’t want to do anything until it
+is absolutely necessary to do it. The agent will then wait until 6:20 PM
+before leaving and will finish shopping at 7:20 PM this way the agent
+can be home by 8 PM. However, even though this keeps flexibility in the
+plan there are a few issues. If there happens to be traffic then the
+agent might not make it home by eight PM. Also the agent procrastinates
+all day just waiting to go shopping rather than starting early on in the
+day, which wastes valuable time. Their (Gallien, 2006) solution is to
+change the planning heuristic altering how their plan is created
+inevitably adjusting it for faster execution.
+
+Therefore, one reoccurring problem of dispatchability is finding a way
+of balancing efficiency, EST, with flexibility, least-committed. There
+have been many uses of these two approaches when dispatching plans, as
+previously shown, but a compromise to one is most often used rather than
+a balance. Demonstrated in the tool MAPGEN (Bresina, 2003) which used
+the Earliest Time Solution (ETS) for generating and displaying plans
+very quickly. Then allowing the users to manipulate the plan afterwards,
+getting around the problem of EST generating undesirable plans. What is
+needed is a way of using both EST and least-committed together giving a
+balanced approach to dispatching.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 
