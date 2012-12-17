@@ -11,22 +11,54 @@
   look at another aspect that may trigger the decision to defer an
   actions based on its purpose}
 
-Dispatchability for a simple temporal network (STN) has been identified
-with whether a plan is capable of fast execution, retains its
-flexibility despite uncertainty in the plan, and all information is
-available at execution \cite{mus98}.  To accomplish the task of
-efficient execution, the STN's are transformed into All-Pairs networks
-and striped of their unnecessary edges, which will often create a more
-compact temporal network and esse the propagation of its updates.
-The executive then selects a timepoint, within the bounds of the 
-execution time, and every timepoint before it has
-already been executed. It then sets the start time to the selected
-timepoint and propagates the needed changes throughout the graph
-\cite{mus98}. The process of selecting a timepoint can lead to
-issues when two timepoints have the possibility of being executed at the
-same time, where one should necessarily come first, but the incorrect
-one gets selected first. This mistake can cause the STN to become
-brittle, which leads to a higher chance of failure in the plan.
+Dealing wiht plan execution s not a new problem and we can find a lot
+of work that relates to this during the last decades. Still, it is
+pretty rare to see work athta tries to envisage that actions could be
+postponned except when this is necessary to not break the current
+plan. 
+
+
+The most prominent work is related to the dispatchability of simple 
+temporal networks (STN) \cite{mus98}. The core of the problem is to
+ensure that the temporal constraints can be propagated efficiently
+within the plan in order to allow the executive to decide quickly
+whether an action should  be started or not while ensuring the plan
+consistency. In order to accomplish such a task, the STN supporting
+the plan to be dispatched is transformed into a All-Pairs network and
+stripped of unnecessary edges, resulting often on a more compact
+temporal network and lessen the propagation cost of its updates. The
+role of the executive is to select timepoints within the current
+execution bounds and propagate its value within the simplified
+network. Still, while this work contribute to ensure that execution
+time are correctly propagated within the plan with a limited cost, it
+does not directly address how to decide what value should be set for a
+given timepoint in the scope of its possible values. more specifically
+it is still the role of the executive to decide whether it should
+start an action as early as possible or consider it as not urgent. 
+
+
+
+
+% Dispatchability for a simple temporal network (STN) has been identified
+% with whether a plan is capable of fast execution, retains its
+% flexibility despite uncertainty in the plan, and all information is
+% available at execution \cite{mus98}.  To accomplish the task of
+% efficient execution, the STN's are transformed into All-Pairs networks
+% and striped of their unnecessary edges, which will often create a more
+% compact temporal network and esse the propagation of its updates.
+% The executive then selects a timepoint, within the bounds of the 
+% execution time, and every timepoint before it has
+% already been executed. It then sets the start time to the selected
+% timepoint and propagates the needed changes throughout the graph
+% \cite{mus98}. The process of selecting a timepoint can lead to
+% issues when two timepoints have the possibility of being executed at the
+% same time, where one should necessarily come first, but the incorrect
+% one gets selected first. This mistake can cause the STN to become
+% brittle, which leads to a higher chance of failure in the plan.
+
+\fcomment{Need to continue to refine from here and talk about STNU and
+  morris01 as  the only approach we know of where postponed events are present
+  though the inserted wait}
 
 In \cite{mus97}\fcomment{Missing reference or is itr pell97 ?}, the execution of events follows the same
 properties as before.  The executive is defined as having two jobs the
