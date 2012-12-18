@@ -96,14 +96,6 @@ illustration]{\label{fig:ex:graph}\includegraphics[width=0.51\columnwidth]{figs/
 \label{fig:Example}
 \end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.8\columnwidth]{figs/example_plan}
-  \caption{The flexible plan solution of our domain in
-    Fig. \ref{fig:Example}}
-  \label{fig:ex:plan}
-\end{figure}
-
 However, an issue with finding a balanced approach is deciding whether
 it starts to starts its action as early as possible -- which we will
 call proactive \fcomment{Need to replace least-commitment by
@@ -113,25 +105,41 @@ called later deferred\fcomment{similarly rename EST as ``deferred''}.
 makeThere is a clear difference between the two approaches
  but when should, for example, the shopping agent wait
 or start early ? Lets demonstrate an ideal scenario where the shopping
-agent balances both approaches. 
+agent balances both approaches illustrated in Figure \ref{fig:Example}. 
 
-The agent, waking up at 8 AM, wants to buy some pants and t-shirts 
-and needs to be home by 8 PM. The agent then leaves as early as
-possible to start shopping. The agent continues to walk around and 
-shop throughout the day because there is no reason to
-rush home yet. Around 7 PM, the agent decides that its time to go home
-so that it can make it there by 8 PM. What we have demonstrated is a
-clear example of how the shopping agent can alternate between the two
-approaches depending on the nature of the action or more accurately
-the nature of the objective related to this action. Indeed, theagent
-was proactive on leaving his house as it was related to him {\em
+The agent, waking up at 8 AM, {\em wants} to buy an apple
+and {\em needs} to be home by 8 PM. The agent then leaves as early as
+possible to start shopping. Considering that that it takes 20 minutes
+to half an hour to go from Home to the Clothing Shop, 10 to 15 minutes
+to go from the Clothing shop to Grocery and 5 to 10 minutes in order
+to buy an apple, a general plan solution is presented in  Figure
+\ref{fig:ex:plan}. The plan presented here is partially instantiated
+giving the ganet the freedom to decide when to start an action within
+the valid boundary of the solution. The agent can then for example go
+early on buy its apple so he is sure to have it as early as possible. Conversely,
+the agent may decide to walk around and fo window shopping throughout
+the rest of the day as there is no hurry yet. By 7pm though it should
+eventually leave so it can arrive back home by 8pm. In this scenario,
+we see that agent did alternate between deciding to execute actions
+early or proacrstinate depending on the the nature of the action it
+need to take next or more accurately the nature of the objectives 
+related to this action. Indeed, the agent was proactive on leaving his 
+house as it was related to him {\em
   wanting}  an apple, on the other hand he just {\em needed} to get
 back home by 8 PM allowing him to procrastinate at the grocery 
 store. By doing so he will be around in case his wife is calling him
 to buy extract things before he gets back home. 
 
-\fcomment{Need a figure that shows the plan somehow ... this can be
-  refined as we go along for illustrating proactive vs deferred}
+% \fcomment{Need a figure that shows the plan somehow ... this can be
+%   refined as we go along for illustrating proactive vs deferred}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\columnwidth]{figs/example_plan}
+  \caption{The flexible plan solution of our domain in
+    Fig. \ref{fig:Example}}
+  \label{fig:ex:plan}
+\end{figure}
 
 While this example may appear academic at first, it reflects situations
 er have seen within embedded agent execution in our domain. Indeed, we
@@ -170,7 +178,7 @@ valid, the agent is obligated to complete the non-goals, but there is no rush. T
 non-goals have a low priority. Therefore, we want to complete the goals
 as early as possible in order to give adequate time for the possibility of new
 goals, and complete the non-goals as they become necessary for the validity of the plan. 
-Some may argue that finishing the goals early doesn’t guarantee that
+Some may argue that finishing the goals early doesn't guarantee that
 there will be enough time for new goals, however, that is an issue with planning, 
 and our concern is with dispatching.
 
