@@ -11,9 +11,9 @@
   look at another aspect that may trigger the decision to defer an
   actions based on its purpose}
 
-Dealing wiht plan execution s not a new problem and we can find a lot
+Dealing with plan execution is not a new problem and we can find a lot
 of work that relates to this during the last decades. Still, it is
-pretty rare to see work athta tries to envisage that actions could be
+pretty rare to see work that envisage that actions could be
 postponned except when this is necessary to not break the current
 plan. 
 
@@ -35,6 +35,8 @@ does not directly address how to decide what value should be set for a
 given timepoint in the scope of its possible values. more specifically
 it is still the role of the executive to decide whether it should
 start an action as early as possible or consider it as not urgent. 
+
+
 
 
 
@@ -67,20 +69,20 @@ be highly reactive as it is necessary to function in a real-time
 environment. One solution offered for dispatching events efficiently
 is the proactive approach. This approach greatly reduces the plan
 flexibility, and therefore robustness, as all start timepoints are
-grounded to a specific value which is compatible with the inital
+grounded to a specific value which is compatible with the initial
 constraints. Take our shopping example, and apply the proactive
 approach globally.\fcomment{figure again}.  We'll say the agent wakes up
 at 9 AM and the duration for traveling to the store is forty minutes
-and buying the apples is twenty minutes. Using the proactive approach, the
+and buying the apples is ten minutes. Using the proactive approach, the
 agent will start shopping as soon as possible and thus be done shopping
 by 10 AM. The agent will then go directly home afterwards to satisfy the
 ``home by 8 PM'' goal. However by doing so, the agent will be back
 home by 11am with the constraint to stay at home for the next 9
 hours. 
-\fhighlight{If his wife is then calling to ask him to buy extra things it will
+\fhighlight{If his wife} is then calling to ask him to buy extra things it will
 results on hime to need to fully relax his current plan and go back
 and forth between its home and the store all other again. By being
-fully proactive the agent.}\fcomment{Maybe what was meant initially
+fully proactive the agent.\fcomment{Maybe what was meant initially
 here is more related to dynamic controllability which mean that I need
 to twek this text to be more related to a modelled
 but uncontrolbale situation.}
@@ -96,11 +98,15 @@ but uncontrolbale situation.}
 implied links between timepoints allowing the planner to find them
 efficiently.\fcomment{I don't get what you mean here}
 
-\fcomment{I am here : need to develop}
+\fcomment{I am here : Not very good so far ... to be tightened}
 The only case we have seen in literature where a timepoint is
-considered for postponement is related to the approach proposed in 
-\cite{morris01} to deal with dynamic controllability issue.
-\fcomment{following will be included in former para}
+considered to be deferred is related to the approach proposed in 
+\cite{morris01} to deal with dynamic controllability issue. 
+\fcomment{following will be included in former para. Also we need to
+  address that it is in fact outside of our scope here ... we actually
+do not address dynamic controllability, worse we tend to make waiting
+actions more brittle in general as we take the upper bound  for needed
+actions}
 
 Another issue with execution is uncertainty in the plan. The above
 example illustrates the uncertainty about when the agent should go home
@@ -114,7 +120,7 @@ solution because in a real-world environment an agent might idle for
 long periods of time (Gallien, 2006). This can severely decrease the
 overall performance of the system. Lets demonstrate the least-committed
 policy in our Shopping agent example using the same goals and durations
-as before. This time around the agent won’t want to do anything until it
+as before. This time around the agent won't want to do anything until it
 is absolutely necessary to do it. The agent will then wait until 6:20 PM
 before leaving and will finish shopping at 7:20 PM this way the agent
 can be home by 8 PM. However, even though this keeps flexibility in the
@@ -126,14 +132,14 @@ change the planning heuristic altering how their plan is created
 inevitably adjusting it for faster execution.
 
 Therefore, one reoccurring problem of dispatchability is finding a way
-of balancing efficiency, EST, with flexibility, least-committed. There
+of balancing efficiency, proactive, with flexibility,deferred. There
 have been many uses of these two approaches when dispatching plans, as
 previously shown, but a compromise to one is most often used rather than
 a balance. Demonstrated in the tool MAPGEN (Bresina, 2003) which used
 the Earliest Time Solution (ETS) for generating and displaying plans
 very quickly. Then allowing the users to manipulate the plan afterwards,
-getting around the problem of EST generating undesirable plans. What is
-needed is a way of using both EST and least-committed together giving a
+getting around the problem of ETS generating undesirable plans. What is
+needed is a way of using both proactive and deferred together giving a
 balanced approach to dispatching.
 
 %%% Local Variables: 
