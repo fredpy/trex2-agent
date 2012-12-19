@@ -1,0 +1,38 @@
+\section{Contribution}
+
+However, an issue with finding a balanced approach is deciding when to
+use least-committed and when to us EST. There is a clear difference
+between the two approaches but when should, for example, the shopping
+agent wait or start early. Lets demonstrate an ideal scenario where
+the shopping agent balances both approaches. The agent, waking up at 8
+AM, wants to buy some pants and t-shirts and needs to be home by 8
+PM. The agent then leaves as early as possible to start shopping. The
+agent continues to walk around and shop throughout the day because
+there is no reason to rush home yet. Around 7 PM, the agent decides
+that its time to go home so that it can make it there by 8 PM. What we
+have demonstrated is a clear example of how the shopping agent can
+start early while procrastinate about going home. This gives the agent
+some flexibility to do more shopping in the day, if needed, while
+still accomplishing its goal of being home by 8 PM.
+
+Now lets look at how to create this ideal agent. There is clearly a
+distinction being made between two different types of goals. There are
+the wants of the agent, which is buying stuff, and the requirements
+like being home by 8 PM.  The agent starts as early as possible when
+it wants something, using EST, and waits until it has to for the
+requirements, using least-committed. This distinction is a simple but
+effective way of balancing the two approaches. In planning, the goals
+can have sub-goals or conditions that must be met before the goal can
+be completed. Lets say the Shopping agent wants an apple then a
+sub-goal would be for the agent to buy an apple and even further to go
+to a store that sells apples. All these sub-goals are linked to the
+original goal and thus should be considered as goals
+themselves. Depending on the original goal, the new goal will either
+follow the ETS or least-committed approach.
+
+However, we need to define a relation between the goals and their
+sub-goals, which will allow us to easily identify all the
+sub-goals. As stated earlier, the sub-goals are conditions that must
+be met before the original goal can be achieved. The conditions are
+not linked directly to the original goal, the sub-goals are actually
+the conditions to an action that will satisfy the original goal.
