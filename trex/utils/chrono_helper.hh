@@ -31,6 +31,15 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/** @file "trex/utils/chrono_helper.hh"
+ * @brief chrono class helper utilities
+ *
+ * This header define utilities that helps manipulate and display chrono 
+ * instances.
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
+ */
 #ifndef H_trex_utils_chrono_helper
 # define H_trex_utils_chrono_helper
 
@@ -42,6 +51,7 @@ namespace TREX {
   namespace utils {
     
     /** @brief Human readable duration display
+     *
      * @tparam CharT stream char type
      * @tparam Traits stream char traits
      * @tparam Rep duration base type
