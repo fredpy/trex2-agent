@@ -359,17 +359,21 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     /*
     EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
     if(nowGoal.isId())
+    {
         m_assembly.dispatch(timeline(),*i);
+    }
     */
     /** @brief Dispatching function with the help of listener_proxy
     *   Using this code will allow for the token to be tested if it is a subgoal or goal itself
     *   for dispatching. Must have a goal<-effect<-action->condition->token relationship in
     *   the model to take advantage of this dispatching method.
     */
+
     if(dispatch_token(*i,lb,ub))
     {
          m_assembly.dispatch(timeline(),(*i));
     }
+
 #else
     debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
@@ -406,100 +410,95 @@ bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, 
 
 EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub)
 {
-  EUROPA::TokenSet actions, condActions, merged;
-  EUROPA::TokenSet::iterator it, end;
-  ///Gets all of the tokens merged with @token
-  merged = getAllTokens(token);
+    EUROPA::TokenSet actions, condActions, merged;
+    EUROPA::TokenSet::iterator it, end;
+    ///Gets all of the tokens merged with @token
+    merged = getAllTokens(token);
 
-  ///Tests to see if any of the tokens are fact and then @returns noId()
-  ///and gets the masters of all the merged tokens
-  for(it = merged.begin(), end = merged.end(); it!=end; it++)
+    ///Tests to see if any of the tokens are fact and if so @returns noId()
+    ///Gets the masters connected through conditions of all the merged tokens
+    for(it = merged.begin(), end = merged.end(); it!=end; it++)
     {
-      if((*it)->isFact())
-	return EUROPA::Id<EUROPA::Token>::noId();
+        if((*it)->isFact())
+            return EUROPA::Id<EUROPA::Token>::noId();
 
-      EUROPA::TokenId master = (*it)->master();
-      if(master.isId())
-	{
-	  if(m_assembly.is_effect((*it)) && m_assembly.is_action(master))
-	    actions.insert(master);
-	  else if(m_assembly.is_condition((*it))
-		  || (!m_assembly.is_condition((*it)) && !master->isFact()))
-	    condActions.insert(master);
-	}
+        EUROPA::TokenId master = (*it)->master();
+        if(master.isId())
+        {
+          if(m_assembly.is_condition((*it)) && m_assembly.is_action(master))
+            actions.insert(master);
+        }
     }
+    EUROPA::TokenId goal = searchGoal(actions);
+    if(goal.isId())
+        return goal;
+    else if(token->start()->lastDomain().getUpperBound()<=ub || m_assembly.is_action(token))
+        return token;
 
-  EUROPA::TokenId goal = searchGoal(actions);
-  if(goal.isId() && goal->start()->lastDomain().getLowerBound()<=ub)
-    return goal;
-  else
-    {
-      goal = searchGoal(condActions);
-      if(goal.isId() && goal->start()->lastDomain().getLowerBound()<=ub)
-	return goal;
-    }
-  return EUROPA::Id<EUROPA::Token>::noId();
+    return EUROPA::Id<EUROPA::Token>::noId();
 }
 
 EUROPA::TokenId CurrentState::searchGoal(EUROPA::TokenSet actions)
 {
-  EUROPA::TokenSet effects,conditions, merged, slaves;
-  EUROPA::TokenSet::iterator it, end, mergedIt, slave;
-  for(it=actions.begin(), end=actions.end(); it!=end; it++)
+    std::list<EUROPA::TokenId> search;
+    search.insert(search.end(), actions.begin(), actions.end());
+    std::list<EUROPA::TokenId>::iterator it;
+
+    EUROPA::TokenSet effects, merged, slaves;
+    EUROPA::TokenSet::iterator mergedIt, slave, sToken;
+
+    for(it=search.begin(); it!=search.end(); it++)
     {
-      merged = getAllTokens((*it));
-      for(mergedIt=merged.begin(); mergedIt!=merged.end(); mergedIt++)
-	{
-	  slaves = (*mergedIt)->slaves();
-	  for(slave=slaves.begin();slave!=slaves.end(); slave++)
-	    {
-	      if(!m_assembly.is_condition((*slave)))
-		effects.insert((*slave));
-	      else
-		conditions.insert((*slave));
-	    }
-	}
-      std::list<EUROPA::TokenId> search;
-      if(!effects.empty())
-	search.insert(search.end(), effects.begin(), effects.end());
-      std::list<EUROPA::TokenId>::iterator sToken = search.begin();
-      while(sToken != search.end())
-	{
-	  if(m_assembly.is_goal((*sToken)))
-	    {
-	      return *sToken;
-	    }
-	  else if((*sToken)->isActive())
-	    {
-	      merged = (*sToken)->getMergedTokens();
-	      if(!merged.empty())
-		search.insert(search.end(), merged.begin(), merged.end());
-	    }
-	  slaves = (*sToken)->slaves();
-	  if(!slaves.empty())
-	    search.insert(search.end(), slaves.begin(), slaves.end());
-	  sToken++;
-	}
+        effects.clear();
+        merged = getAllTokens((*it));
+        for(mergedIt=merged.begin(); mergedIt!=merged.end(); mergedIt++)
+        {
+            slaves = (*mergedIt)->slaves();
+            for(slave=slaves.begin(); slave!=slaves.end(); slave++)
+            {
+                if(m_assembly.is_effect((*slave)))
+                    effects.insert((*slave));
+            }
+        }
+        sToken = effects.begin();
+        while(sToken != effects.end())
+        {
+            merged = getAllTokens((*sToken));
+            for(mergedIt = merged.begin(); mergedIt!=merged.end(); mergedIt++)
+            {
+                if(m_assembly.is_goal((*mergedIt)))
+                {
+                    return *mergedIt;
+                }
+                EUROPA::TokenId master = (*mergedIt)->master();
+                if(master.isId())
+                {
+                    if(m_assembly.is_condition((*mergedIt)) && m_assembly.is_action(master))
+                        search.push_back(master);
+                }
+            }
+            sToken++;
+        }
     }
-  return EUROPA::Id<EUROPA::Token>::noId();
+    return EUROPA::Id<EUROPA::Token>::noId();
 }
 
 EUROPA::TokenSet CurrentState::getAllTokens(const EUROPA::TokenId& token)
 {
-  EUROPA::TokenSet merged;
-  if(token.isId())
+    EUROPA::TokenSet merged;
+    if(token.isId())
     {
-      ///Gets all of the tokens merged with @token
-      if(token->isActive())
-	{
-	  merged = token->getMergedTokens();
-	  merged.insert(token);
-	}
-      else
-	{
-	  merged = token->getActiveToken()->getMergedTokens();
-	  merged.insert(token->getActiveToken());
-	}
+        ///Gets all of the tokens merged with @token
+        if(token->isActive())
+        {
+          merged = token->getMergedTokens();
+          merged.insert(token);
+        }
+        else
+        {
+          merged = token->getActiveToken()->getMergedTokens();
+          merged.insert(token->getActiveToken());
+        }
     }
   return merged;
 }
@@ -734,7 +733,7 @@ EUROPA::IntervalIntDomain TimePoint::future(EUROPA::eint now) {
 			      std::numeric_limits<EUROPA::eint>::infinity());
 }
 
-// structors 
+// structors
 
 TimePoint::TimePoint(EUROPA::TokenId const &tok,
 		     EUROPA::eint now,
@@ -795,7 +794,7 @@ bool TimePoint::commit_date(EUROPA::eint now) {
   } else {
     restrictBaseDomain(future(now));
     // touch();
-    
+
     debugMsg("trex:synch:tp", "TimePoint "<<getKey()<<"="<<lastDomain().toString()
              <<" after commit to ["<<now+1<<", +inf]");
     return true;
