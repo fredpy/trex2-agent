@@ -31,4 +31,17 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/** @file "trex/europa/config.hh"
+ * @brief europa flag proxy header
+ *
+ * This header is a proxy that points to a generated header defining 
+ * compilations flags used to compile trex europa extensions. It is necessary 
+ * as some code within europa depends on this flags.
+ *
+ * All components that uses both trex and europa code should include this 
+ * header  in order to avoid compilation/link errors.
+ *
+ * @ingroup europa
+ * @author Frederic Py <fpy@mbari.org>
+ */
 #include "bits/europa_config.hh"
