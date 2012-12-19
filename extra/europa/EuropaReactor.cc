@@ -69,9 +69,9 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
    Assembly(parse_attr<std::string>(xml_factory::node(arg), "name"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
-   m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg), 
-				     "relation_gv")),
    m_completed_this_tick(false),
+   m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg),
+                                  "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
 			       "all_plans")) {
   bool found;
