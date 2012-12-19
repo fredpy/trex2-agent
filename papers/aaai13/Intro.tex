@@ -1,16 +1,23 @@
 \section{Introduction}
 \label{sec:intro}
 
+
+
 In order for an agent to operate in a dynamic environment, the agent
 needs to be constantly observing the external world so that it can
 keep up to date with how the world is changing. Therefore, a robotic
 agent needs to be planning in situ so that it can alter, or update,
 its plan according to the changes. The actual execution of the plan
 will also need to change accordingly. The execution also provide
-constant feedback on how the world is evolving. Thus as a result of
+constant feedback on how the world is evolving.  Thus as a result of
 the dynamic environment, the robotic agent will need to anticipate
 constant changes in the plan and need to evaluate how to properly
-execute the plan.
+execute the plan.The ability to plan in-situ leverage the ability to
+dynamically add new objectives dynamically to the agent during the
+mission execution instead of being forced to sepcify them beforehand.
+These capabilitiwes allow to more felxible and autonomous missions
+but also makes more challenging the overall mission execution by itself. 
+
 
 In the pursuit of planning in a dynamic environment, earlier work done
 in \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
@@ -22,42 +29,81 @@ functioned in the real-world, the Remote Agent Experiment \texttt{RAX}
 \cite{chien99}. In particular, we focus on constraint-based temporal
 planning which has been demonstrated to be a viable solution for
 real-world planning (citation).
-	
-\fcomment{I need to rework the following section, started here}
-At the highest level of abstraction, constraint-based temporal
-planning uses a temporal plan to organize how the world works. A
-temporal plan is made up of multiple timelines which each describe the
-evolution of a subsystem in chronological order. An example of a
-subsystem would be the navigator for a robotic agent. Each timeline is
-simply the encapsulation of all the possible state values for a
-subsystem, within the parameters of a plan.  Therefore, a timeline can
-be broken down into its state values along with their temporal
-extents, which are defined as tokens. As the base unit for a timeline,
-tokens describe the simplest behavior of a subsystem e.g. turn
-right. THis kind of representation as it follows least commitment
-planning strategy. It herefore allow to have a plan which is partailly
-grounded and especially tokens star, duration anfd end times are
-represented as intervals depiciting all the acceptable values for
-each. By doing so this leave  mroe flexiblity during execution to
-decided when -- within the specified domains -- an event should
-occur accroding to the current context. This also raises the probelem
-that thids decision should then be taken after the plan was produced
-by the executive. A lot of exitiing work ahas been made in the area on
-the best approach to send the plan to dispach the produced plan to an
-executive so it is easier for it to maintin the temporla constraints
-within this plan at execution (references). This still leave an issue
-open : how does one decide at execution whether a plan actitivy (or
-token) should be started as soon as possible or can be postponed
-later. This problem can become imporatnt when you see the plan being
-produced within a situated agent. Indeed, while the current set of
-objectives fr the agent is known these can evolve as time advance and
-the poperators or other agents give it new objectives to be
-fullfilled. It becomes therefore important for the agent to be
-proactive when required while being able to disitinguish actions that
-are not yet urgent. We propose here a systematic  approach to allow
-the agent to distinguishe which part of the plan needs to be taken
-proactively by tracing their causal chain within the plan structure.
 
+Most of these modern systems are using at the high-level 
+constraint-based planner with rich representation of resources 
+and time such as the ones presented in \cite{frank2003,lemai04}. 
+These systems provide a rich plan structure which often implements
+least-commitment planning giving a solution that do not commit on
+specfic values (such as the start and end time ofn action) unless it
+is required by the model. This flexibility also puts the burden to
+plan executive to decide a which time a specific action within all
+its possible value. Resolving this problem resulted on a large amount
+of research bboth considering how to represetn the plan to be
+dispatched to the executive with a compact yet complete
+representation, along with more refinements on how to deal with
+uncontrolable constraints. Still, remains the issue of deciding 
+whether the next possible(s) action(s) should be started immediately 
+or if it should be postponed for a later start date. 
+
+
+To avoid the system to procrastinate the solution selected has often 
+been to start actions as early as possible while ensuring that it does 
+not impact the plan brittleness. This choice is lead by the intuition that by
+starting actions early it gives more room in the future to deal worst
+case scenarios of execution. While this solution works in the general 
+case where all the goals of the agent are known a priori, it is
+challenged when one consider that the agent can have new obsejectives
+added as the mission execute. Indeed taking actions to early can lead
+the agent in a situation where the new goal received is not integrated
+as efficiently as it would have been should the agent have waited
+before taking action. In this context, it is imporant for the agent
+make a distinction between actions that can be taken proactively
+versus other actions that may not be yet urgent.  In this paper, we
+propose a systematic approach to allow the agent to make such
+distinction for each action by tracing the causal relations with
+ goals within the current plan.  This aloow us to deternmine the best
+ startegy based on the nature of the goals this action contribute to.
+\fcomment{Plan for the paper here}
+
+% this can have a
+% negative impact when consider that new goals for the agent could
+% emerge as it execute its mission.
+
+	
+% \fcomment{I need to rework the following section, started here}
+% At the highest level of abstraction, constraint-based temporal
+% planning uses a temporal plan to organize how the world works. A
+% temporal plan is made up of multiple timelines which each describe the
+% evolution of a subsystem in chronological order. An example of a
+% subsystem would be the navigator for a robotic agent. Each timeline is
+% simply the encapsulation of all the possible state values for a
+% subsystem, within the parameters of a plan.  Therefore, a timeline can
+% be broken down into its state values along with their temporal
+% extents, which are defined as tokens. As the base unit for a timeline,
+% tokens describe the simplest behavior of a subsystem e.g. turn
+% right. THis kind of representation as it follows least commitment
+% planning strategy. It herefore allow to have a plan which is partailly
+% grounded and especially tokens star, duration anfd end times are
+% represented as intervals depiciting all the acceptable values for
+% each. By doing so this leave  mroe flexiblity during execution to
+% decided when -- within the specified domains -- an event should
+% occur accroding to the current context. This also raises the probelem
+% that thids decision should then be taken after the plan was produced
+% by the executive. A lot of exitiing work ahas been made in the area on
+% the best approach to send the plan to dispach the produced plan to an
+% executive so it is easier for it to maintin the temporla constraints
+% within this plan at execution (references). This still leave an issue
+% open : how does one decide at execution whether a plan actitivy (or
+% token) should be started as soon as possible or can be postponed
+% later. This problem can become imporatnt when you see the plan being
+% produced within a situated agent. Indeed, while the current set of
+% objectives fr the agent is known these can evolve as time advance and
+% the poperators or other agents give it new objectives to be
+% fullfilled.
+% It becomes therefore important for the agent to be
+% proactive when required while being able to disitinguish actions that
+% are not yet urgent.
 % It is understood that grounding the start and end times of a
 % token decrease the robustness of a robotic agent while in a dynamic
 % environment (citations). Therefore, the tokens have flexible intervals
