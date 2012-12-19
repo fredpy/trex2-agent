@@ -1,0 +1,19 @@
+
+\section{Conclusion \& future directions}
+\label{sec:conclude}
+
+
+{\em\color{gray} Need pargarph that resume what was presented}
+
+
+\fcomment{This is just a quick presentaion on potential future direction}
+As we stated in the realted works our approach do not really adrress dynamic 
+controllability and hacve the more classic assumption present in many planning 
+frameworks that timepoints are controllable. A side effect of this is that in its current state it may result on the system to decide to dferr action as late as possible. In our example, this would result on the agent leaving the Grocery as late as 19:30 making the rest of its plan brittle to any delay due for example to traffic jam on its way back. This need ot be further addressed in the future and especially how our work can be integrated with work presented in \cite{morris01}. 
+
+Further as of today we consider that the qualification of the goal is predefined when the goals is submitted by the planner. It is possible though that part of this can be refined on some case based on the nature  of the goal. Looking back at our domain, one can note that the 2 goals provided rae constrained differently on their start time; while ``have an  apple'' start time is limited only on its upper bound, the being back at home conveersely is constrained only on the lower bound of its start time. This difference hints on some of the issues we presented. Whiel we do consider that explicit information of tese goals help the plan execution to be improved when such infromation is not initialy present. We also are aware that the nature of the constraints within the goal itself can help identify the best policy to be done. It is obviouds that has have an apple have a deadline it is better to be proactive on the actions that contribute to this goal. Conversely, the other goal only matter if it appears fairly late in the plan which mena that it is probably better to not atrt to complete this [part of the plan too agressively. We plan to further explore how we can refine the distinction between the different policies by using the information provided by the constraints of the different objectives. 
+ 
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 
