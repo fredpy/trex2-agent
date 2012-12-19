@@ -62,23 +62,48 @@ of these sets at the timepoint $t$. For the sake of simcplicity we
 \[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
-\fcomment{I will need to refine this and make it more convincing}
-The increasing nature $\Phi_0$ often reflects the execution of
-the agent's plan $\pi$ and in nominal situation is already predicated
-by the plan\footnote{This preclude the situation where new
-  observations invalidate the plan which is out of the scope 
-of this paper}. Considering that new goals vcan be added in the future
-to $\Phi_g$ impact the way the current plan execution should be
-handled. Indeed this can impact how actions should be executed within
-the scope of the mission. Considering the potential addition of new
-objectives, the eagent executive should balance the impact of
-executing the next available action(s) of the plan immediately or as
-late as possible. 
+%\fcomment{I will need to refine this and make it more convincing}
+The dynamically growing nature of $\Phi_0$ reflects the cumul of
+observation as the agent execute its plan $\pi$. In nominal 
+situation new elelments of $\Phi_0$ are refinements the plan 
+-- for example by asserting that a planned command just
+started\footnote{This preclude tsituations where new observations
+  invalidate the plan which is out of the scope of this paper}. We
+also consider that the agent can receive at any point nerw objectives
+that will be added to $\Phi_g$. This assumption have an impact onhow
+it is preferreeable to handle plan execution. Indeed while deciding
+when to start an action within the plan, one need to amae  sure that
+the execution of this action will not limit the ability fo the agent
+to treat potential future emerging goals. In the ligh of it the agent
+should at the best of its knowledeg  try to balance the impact of the
+next available action as early as possible or prefer to delay it in
+the eventuality new goal occur. In our example, it was making sense to
+go to the Grocery early, but on the other hand going back home to soon
+would result on the current plan locking the agent -- within its current
+plan -- at home unitl 8 pm. The solution providing the most fredom for
+the agent was therefore for him to alternate between the two policies
+depending on the action impact. 
 
-\fcomment{I need to refine and develop this}
-We define that $\Phi_g$ is partitioned into two sets the internal goals $\Phi_{gi}$, 
- which are the goals the agent started with, and the external goals $\Phi_{ge}$, which 
- the agent received externally. The plan, $\pi$, will also need to change in order to remain valid.
+In order to help the agent have a better knowledge on the nature of
+the goals we do consider that each goal provide information on its
+priority. In that putspose we define that $\Phi_g$ is partitioned into
+2 sets:
+\begin{itemize}
+\item the internal goals $\Phi_{gi}$ which represent goals the agent
+  {\em need} to maintain internally. These goals will be considered 
+  as objectives that are not of the higher priority and therefore
+  their actions can be deferred during execution.
+\item the external goals $\Phi_{ge}$ which represents the goal
+  received by the agent externally. As these goals are requested by
+  the user, we consider them as to be of higher important -- ie the
+  agent {\em wants} to execute them. Therefore, their execution should
+  be preferrrably proactive.
+\end{itemize}
+
+At any point we need to evaluate an action within our plan $\pi$ we
+consider that this plan is up to date and providea soltuiona of all 
+the goals of both $\Phi_{gi}$ and $\Phi_{ge}$ that can reasonably  be
+done within the current mission scope.
 
 
 \section{Algorithm Draft}
