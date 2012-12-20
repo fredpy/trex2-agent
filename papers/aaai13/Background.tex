@@ -22,7 +22,7 @@ The most prominent work is related to the dispatchability of simple
 temporal networks (STN) \cite{mus98a}. The core of the problem is to
 ensure that the temporal constraints can be propagated efficiently
 within the plan in order to allow the executive to decide quickly
-whether an action should  be started or not while ensuring the plan
+whether an action should be started or not while ensuring the plan
 consistency. In order to accomplish such a task, the STN supporting
 the plan to be dispatched is transformed into a All-Pairs network and
 stripped of unnecessary edges, resulting often on a more compact
@@ -32,14 +32,13 @@ execution bounds and propagate its value within the simplified
 network. Still, while this work contribute to ensure that execution
 time are correctly propagated within the plan with a limited cost, it
 does not directly address how to decide what value should be set for a
-given timepoint in the scope of its possible values. more specifically
+given timepoint in the scope of its possible values. More specifically
 it is still the role of the executive to decide whether it should
 start an action as early as possible or consider it as not urgent. 
 
 When dealing with least-commitment planning solution this decision is
-deferred to the plan executive. For example in \cite{mus98c} 
-\fcomment{I still need  this reference}, the executive is defined as
-having two responsibilities: the selection and scheduling of plan
+deferred to the plan executive. For example in \cite{mus98c}, the 
+executive is defined as having two responsibilities: the selection and scheduling of plan
 events for execution. The executive needs to
 be highly reactive as it is necessary to function in a real-time
 environment. One solution offered for dispatching events efficiently
@@ -63,13 +62,13 @@ balanced approach to dispatching.
 
 While in the general case it can be acceptable it
 may become problematic when put in he context of potential new
-objectives emerging during the mission.  Take our shopping example ,
+objectives emerging during the mission.  Take our shopping example,
 and apply the proactive approach globally -- assuming that all actions
 can be completed on their minimum time.  As shown in 
-Fig. \ref{fig:ex:proactive}, while the proactive approach allow the
+Fig. \ref{fig:ex:proactive}, the proactive approach allows the
 agent to get its apple safely before noon but as we go along with the
-remaining part of the plan this  result of the agent getting back home
-by 9:05 and being stuck in the context if the current plan for the
+remaining part of the plan it results in the agent getting back home
+by 9:05 and being stuck in the context of the current plan for the
 next 10 hours and 55 minutes. Should he receive a call from his wife
 to buy extra things he will then be forced to re-plan accordingly and
 get back and forth between his home and the stores all other
@@ -87,13 +86,13 @@ until he needs to get back home.
 
 The only case we have seen in literature where a time-point is
 considered to be deferred is related to the dynamic controllability
-issue with STNs with uncertainty (STNU). In \cite{morris01} they propose 
+issue with STNs with uncertainty (STNU). In \cite{morris01}, they propose 
 an algorithm that during planning insert wait constraints within the
 solution temporal network that will allow one time-point to wait until
-an uncontrollable event occurs. In this case the deterrence of the
+an uncontrollable event occurs. In this case, the deterrence of the
 execution of this time-point is enforced in order to ensure robust plan
 execution despite exogenous uncontrollable events. In
-\cite{gallien2006}  this approach is further discussed along with the
+\cite{gallien2006},  this approach is further discussed along with the
 Makespan issue while dealing with least-commitment planners which can
 insert unjustified waits within the plan potentially decreasing in turn the
 overall performance of the system. Both of these approaches show that
@@ -107,10 +106,10 @@ while we do not really deal with dynamic controllability in our
 problem -- which can anyway be treated as in this previous work -- the
 core of our problem is not that much the observation of events during
 execution (which is more a observation related impact) but instead we
-are more focused on the knowledge that, within our agent new
-objectives can emerge at any time and want to avoid as much as
-possible to do actions which are not ``urgent'' and by doing so take
-the risk to do unnecessary actions as new goals need to be integrated
+are more focused on the knowledge that, within our agent, new
+objectives can emerge at any time, and we want to avoid as much as
+possible doing actions which are not ``urgent''. By doing so, we take
+the risk of doing unnecessary actions as new goals need to be integrated
 in the plan.
 
 % s
