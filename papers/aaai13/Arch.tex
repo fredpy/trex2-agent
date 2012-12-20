@@ -146,7 +146,7 @@ in the set $\Phi_{ge}$.}
 \label{SearchForGoal}
 \begin{algorithmic}
 \Function{SearchForGoal}{ Token $T$ }
-\ForAll{Actions(s), $A$, that $T$ is a Condition }
+\ForAll{Action(s), $A$, that $T$ is a Condition }
 	\ForAll{Effect(s), $E$, of Action $A$ }
 		\If{$E$ is a Goal in $\Phi_{ge}$}
 			\State \Return True
@@ -271,10 +271,10 @@ connected tokens happens in algorithms \ref{NotifyActivated}, \ref{NotifyMerged}
 \end{algorithm}
 
 In order to distribute the search, we situate our algorithm within the
-planning search of the Europa Planner,\cite{frank2003} ,which offers 
+planning search of the Europa Planner,\cite{frank2003}, which offers 
 callback functions for when a token in the plan is altered. The majority
-of the searching happens when tokens are activated and when they 
-are merged. For a token to merge with another token they be compatible with
+of the searching happens when tokens are either activated or 
+merged. For a token to merge with another token it has to be compatible with
 another token already in the plan. Splitting happens when they are
 no longer compatible. We have designed our algorithm around the
 Europa Planner, however, we believe that the general approach
