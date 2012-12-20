@@ -60,11 +60,11 @@ in Fig. \ref{fig:ex:mixed2}. Again, both algorithms will result in the same conc
 will search from {\em Go(Grocery, Clothing)} and will now find {\em Have Shirt}. The distributed algorithm will find
 and star the new tokens when the plan gets updated. The resulting new starred tokens will be proactively dispatched.
 
-As the end of the day approaches, it will need to start heading home. At 19:40 both algorithms will find
+As the end of the day approaches, the agent will need to start heading home. At 19:40 both algorithms will find
 that the {\em Go(Clothing, Home)} is still not connected to a goal but that the upper bound time for starting the token
 has been reached. Therefore, we will dispatch the token because it has become necessary for completing the plan.
-After getting {\em Home}, the plan shows that the agent will then {\em Go(Home, Clothing)}. This is the result that while
-being {\em At} the token that follows is to {\em Go}. Thus, this resulting token is just part of the plan model and 
+After getting {\em Home}, the plan shows that the agent will then {\em Go(Home, Clothing)}. This is the result of the plan model
+that says while being {\em At} the token that follows is to {\em Go}. However, the token
 will not be dispatched because it is not connected to a goal and it's upper bound start time will not be meet.
 
 
