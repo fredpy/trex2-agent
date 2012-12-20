@@ -1,23 +1,38 @@
 \section{Introduction}
 \label{sec:intro}
 
+Substantial research effort in robot planning has revolved around how
+plans are executed and how threats to robust execution can be dealt
+with in-situ \kcomment{citations needed}. This is particularly
+important in dynamic and unpredictable real-world environments where
+plans can and do change rapidly and the robotic agent is expected to
+be responsive to such exogenous change. Often this focus has been
+driven by the need to replan given a priori goals. It is often assumed
+in such systems, that goals or objectives are known a priori with the
+agent having to deal with the dynamism associated at the execution end
+of the system. 
 
-
-In order for an agent to operate in a dynamic environment, the agent
-needs to be constantly observing the external world so that it can
-keep up to date with how the world is changing. Therefore, a robotic
-agent needs to be planning in situ so that it can alter, or update,
-its plan according to the changes. The actual execution of the plan
-will also need to change accordingly. The execution also provide
-constant feedback on how the world is evolving.  Thus as a result of
-the dynamic environment, the robotic agent will need to anticipate
-constant changes in the plan and need to evaluate how to properly
-execute the plan.The ability to plan in-situ leverage the ability to
-dynamically add new objectives dynamically to the agent during the
-mission execution instead of being forced to specify them beforehand.
-These capabilities allow to more flexible and autonomous missions
-but also makes more challenging the overall mission execution by itself. 
-
+In this paper, we argue that the impact of asynchronous arrival of
+goals and their consequent impact on execution is important to
+understand for the agent to systematically deal with a dynamic
+environment, and one that has been less well studied. We emphasize the
+need for planning and plan execution in-situ to enable tight closure
+of control loops for the robot's responsiveness.
+% In order for an agent to operate in a dynamic environment, the agent
+% needs to be constantly observing the external world so that it can
+% keep up to date with how the world is changing. Therefore, a robotic
+% agent needs to be planning in situ so that it can alter, or update,
+% its plan according to the changes. The actual execution of the plan
+% will also need to change accordingly. The execution also provide
+% constant feedback on how the world is evolving.  Thus as a result of
+% the dynamic environment, the robotic agent will need to anticipate
+% constant changes in the plan and need to evaluate how to properly
+% execute the plan.
+The ability to plan in-situ leverages the ability to dynamically add
+new objectives to the agent during mission execution instead of being
+forced to specify them beforehand.  While such capabilities allow for
+more flexible and autonomous missions it also makes the overall misson
+execution more challenging.
 
 In the pursuit of planning in a dynamic environment, earlier work done
 in \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
@@ -25,33 +40,37 @@ in \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
 all helped to make real-world planning possible. Based on these past
 successes, there have been multiple experiments that have successfully
 functioned in the real-world, the Remote Agent Experiment \texttt{RAX}
-\cite{mus98} and the Autonomous Spacecraft Experiment \texttt{ASE}
-\cite{chien99}. In particular, we focus on constraint-based temporal
-planning which has been demonstrated to be a viable solution for
-real-world planning (citation).
+\cite{mus98}, the Autonomous Spacecraft Experiment \texttt{ASE}
+\cite{chien99} and more recently the Teleo Reactive Execution \rxe
+\cite{mcgann08b,py10}. In all these systems, generative plans are
+dispatched for execution using rich representations that deal with
+durative actions and resources the focus of our work here
+\cite{lemai04}.
 
-Most of these modern systems are using at the high-level 
-constraint-based planner with rich representation of resources 
-and time such as the ones presented in \cite{frank2003,lemai04}. 
-These systems provide a rich plan structure which often implements
-least-commitment planning giving a solution that do not commit on
-specific values (such as the start and end time of an action) unless it
-is required by the model. This flexibility also puts the burden to
-plan executive to decide a which time a specific action within all
-its possible value. Resolving this problem resulted on a large amount
-of research both considering how to represent the plan to be
-dispatched to the executive with a compact yet complete
-representation, along with more refinements on how to deal with
-uncontrollable constraints. Still, remains the issue of deciding 
-whether the next possible(s) action(s) should be started immediately 
-or if it should be postponed for a later start date. 
+In particular, our focus is on constraint-based temporal planning
+\cite{frank2003} with a demonstrated capability for real-world
+planning and execution.
+% Most of these modern systems are using at the high-level 
+% constraint-based planner with rich representation of resources 
+% and time such as the ones presented in \cite{frank2003,lemai04}. 
+They often implement least-commitment planning generating a solution
+that does not commit to specific values (\eg action start and end
+times) unless explicitly required by the model. Such flexibility puts
+the burden on the plan executive to decide at which time a specific
+action within all possible values, can be dispatched. 
+% Resolving this problem resulted on a large amount of research both
+% considering how to represent the plan to be dispatched to the
+% executive with a compact yet complete representation, along with more
+% refinements on how to deal with uncontrollable constraints. Still,
+The challenge of deciding whether the next possible set of action(s)
+should be started immediately or if it should be postponed for a later
+start date.
 
-
-To avoid the system to procrastinate the solution selected has often 
-been to start actions as early as possible while ensuring that it does 
-not impact the plan brittleness. This choice is lead by the intuition that by
+To avoid procrastination the solution selected has often been to start
+actions as early as possible while ensuring that it does not impact
+the plan brittleness. This choice is lead by the intuition that by
 starting actions early it gives more room in the future to deal worst
-case scenarios of execution. While this solution works in the general 
+case scenarios of execution. While this solution works in the general
 case where all the goals of the agent are known a priori, it is
 challenged when one consider that the agent can have new objectives
 added as the mission execute. Indeed taking actions to early can lead
@@ -61,9 +80,9 @@ before taking action. In this context, it is important for the agent
 make a distinction between actions that can be taken proactively
 versus other actions that may not be yet urgent.  In this paper, we
 propose a systematic approach to allow the agent to make such
-distinction for each action by tracing the causal relations with
- goals within the current plan.  This allow us to determine the best
- strategy based on the nature of the goals this action contribute to.
+distinction for each action by tracing the causal relations with goals
+within the current plan.  This allow us to determine the best strategy
+based on the nature of the goals this action contribute to.
 
 % \fcomment{Plan for the paper here}
  The structure of this paper is as follow, first we introduce an
