@@ -33,15 +33,11 @@ as provided by \cite{Nau:2004}:
   \label{def:plan}
 A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each
   being a partial instance of some operator in $O$.  
+  We define $\lambda$ as the state-transition function.
 
   $\pi$ is a solution of a problem $P = (D, \Phi_0, \Phi_g)$ iff
-  there is a  database in $\lambda(\Phi_0, \pi)$\fcomment{Define
-    lambda} that entails $\Phi_g$.
+  there is a  database in $\lambda(\Phi_0, \pi)$ that entails $\Phi_g$.
 \end{definition}
-
-\pcomment{Need to define what a:
-  merged, slave, master, and active token is relative to a single token
-  Also what an effect and condition is}
  
 In this work, our focus is on executing a given plan $\pi$ which was
 computed by the agent planner. However, in order to reflect the
