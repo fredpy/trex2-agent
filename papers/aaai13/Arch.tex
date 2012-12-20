@@ -225,7 +225,7 @@ dispatched early.
 \label{NotifyActivated}
 \begin{algorithmic}
 \Function{NotifyActivated}{ Token $T$ }
-\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through the causal link}
+\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through one causal link}
 	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
 \EndIf
 \EndFunction

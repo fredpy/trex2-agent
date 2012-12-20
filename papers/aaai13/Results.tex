@@ -2,7 +2,7 @@
 \section{Experimental results}
 \label{sec:exp}
 
-{\em\color{gray} Need to present here both practical results that illustrates the outcome of our solution and how it benefits ... eg show a casewhere new goals are introduced as we go along}
+{\em\color{gray} Need to present here both practical results that illustrates the outcome of our solution and how it benefits ... eg show a case where new goals are introduced as we go along}
 
 {\em\color{gray} Also need some analysis -- potentially numerical -- on the overhead and impact fo both solutions relative to each other but also potentially to a more direct classic approach. 
 To finally discuss why one solution was preferred on our system} 
@@ -14,12 +14,43 @@ To finally discuss why one solution was preferred on our system}
   \label{fig:ex:mixed1}
 \end{figure}
 
+Our experiment follows that of the original plan given in Fig. \ref{fig:ex:plan}. At the beginning, the
+agent wants to {\em Buy} an apple and it has to be {\em Home} by the end of the mission. Figure \ref{fig:ex:mixed1} 
+demonstrate the resulting plan from our algorithm and will guide our explanation. Both algorithms will
+result in the same execution of the plan but their approach is quite different. 
+
+For Algorithm \ref{DispatchToken}, the search is quite straight forward. For example in Fig. \ref{fig:ex:mixed1},
+if we are {\em At Home} then the next {\em Go} token will be dispatched. Because the search will follow 
+the causal links forward, where upon, it will find the goal {\em Have Apple} which mean dispatch proactively.
+Similarly, this happens for all of the tokens that are starred. The rest of the tokens are deferred
+for later dispatching. Thus, resulting in the agent staying at the {\em Grocery} rather than heading {\em Home} 
+immediately like in Fig. \ref{fig:ex:proactive}.
+
+For the distributed algorithm approach, each token is checked during the creation of the plan to see if it is 
+an external goal in $\Phi_{ge}$, or connected to one through a causal link. When the {\em Have Apple} 
+is checked, we immediately find that it is a goal. We then follow the reverse causal link and find {\em Buy Apple}.
+However to better illustrate the algorithm, we can imagine that only the {\em Buy Apple} has been 
+causally connected to the goal so far. Therefore, we only star those two tokens. The path from {\em Home} 
+to {\em Clothing} to {\em Grocery} has yet to be built. When the path has finally
+been built and {\em At Grocery} is checked our algorithm searches one causal link and finds {\em Buy Apple}
+which is starred. The search then follows the reverse causal link and stars the rest of the path. The starred tokens will
+then be proactively dispatched while the non-starred tokens will be deferred until later. Having similar results to Algorithm
+\ref{DispatchToken}.
+
 \begin{figure}
   \centering
   \includegraphics[width=0.8\columnwidth]{figs/example_MixedUpdate}
   \caption{Our algorithm solution after receiving external request for the plan from Fig. \ref{fig:ex:mixed1}}
   \label{fig:ex:mixed2}
 \end{figure}
+
+Our reasoning for keeping the agent at the {\em Grocery} is that nothing is requiring it to go {\em Home}
+as soon as possible and that more external requests may come in the near future. To demonstrate this imagine 
+that while the agent is at the {\em Grocery} it gets a call at 9:00 asking it to buy a shirt.  We show the resulting plan 
+in Fig. \ref{fig:ex:mixed2}. Again, both algorithms will result in the same conclusion. Algorithm \ref{DispatchToken}
+will search from {\em Go(Grocery, Clothing)} and will now find {\em Have Shirt}. The distributed algorithm will find
+and star the new tokens when the plan gets updated. The resulting new starred tokens will be proactively dispatched.
+
 
 
 
