@@ -208,7 +208,7 @@ connected tokens happens in algorithms \ref{NotifyAdded}, \ref{NotifyRemoved}, \
 \label{NotifyAdded}
 \begin{algorithmic}
 \Function{NotifyAdded}{ Token $T$ }
-\If{ $T$ is a Goal in $\Phi_{ge}$}
+\If{$T$ is a Goal in $\Phi_{ge}$}
 	\State Insert $T$ into $List_{goals}$
 \EndIf 
 \EndFunction
@@ -216,7 +216,7 @@ connected tokens happens in algorithms \ref{NotifyAdded}, \ref{NotifyRemoved}, \
 \end{algorithm}
 
 \begin{algorithm}
-\caption{Removes token from list}
+\caption{Removes the token after it is removed from the plan}
 \label{NotifyRemoved}
 \begin{algorithmic}
 \Function{NotifyRemoved}{ Token $T$ }
@@ -232,6 +232,44 @@ connected tokens happens in algorithms \ref{NotifyAdded}, \ref{NotifyRemoved}, \
 \Function{NotifyActivated}{ Token $T$ }
 \If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through one causal link}
 	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Deactivates token in plan}
+\label{NotifyDeactivated}
+\begin{algorithmic}
+\Function{NotifyDeactivated}{ Token $T$ }
+\If{$T$ is not a goal and not one causally linked to a goal}
+	\State Remove $T$ from $List_{goals}$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Searches plan when tokens are merged}
+\label{NotifyMerged}
+\begin{algorithmic}
+\Function{NotifyMerged}{ Token $T$ }
+\If{$T$ is goal in $List_{goals}$}
+	\State Recursively search the reverse causal link of the active $T$ and add tokens to $List_{goals}$
+\ElsIf{The active token of $T$ is in $List_{goals}$}
+	\State Recursively search the reverse causal link of $T$ and add tokens to $List_{goals}$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Removes token when split}
+\label{NotifySplit}
+\begin{algorithmic}
+\Function{NotifySplit}{ Token $T$ }
+\If{$T$ is not a goal or not one causally linked to a goal}
+	\State Remove $T$ from $List_{goals}$
 \EndIf
 \EndFunction
 \end{algorithmic}
