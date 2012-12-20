@@ -7,15 +7,6 @@
 {\em\color{gray} Also need some analysis -- potentially numerical -- on the overhead and impact fo both solutions relative to each other but also potentially to a more direct classic approach. 
 To finally discuss why one solution was preferred on our system} 
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.8\columnwidth]{figs/example_MixedInitial}
-  \caption{Our algorithm solution for the plan from
-    Fig. \ref{fig:ex:plan}. Stars indicate tokens that were marked
-  as ``proactive''.}
-  \label{fig:ex:mixed1}
-\end{figure}
-
 Our experiment follows that of the original plan given in
 Fig. \ref{fig:ex:plan}. At the beginning, the agent wants to {\em Buy}
 an apple and it has to be {\em Home} by the end of the mission. We
@@ -27,6 +18,15 @@ europa planning engine \cite{frank2003}.\fcomment{I think it is
 demonstrate the resulting plan from our algorithm and will guide our
 explanation. Both algorithms will result in the same execution of the
 plan but their approach is quite different.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\columnwidth]{figs/example_MixedInitial}
+  \caption{Our algorithm solution for the plan from
+    Fig. \ref{fig:ex:plan}. Stars indicate tokens that were marked
+  as ``proactive''.}
+  \label{fig:ex:mixed1}
+\end{figure}
 
 For Algorithm \ref{DispatchToken}, the search is quite straight forward. For example in Fig. \ref{fig:ex:mixed1},
 if we are {\em At Home} then the next {\em Go} token will be dispatched. Because the search will follow 
@@ -60,6 +60,12 @@ in Fig. \ref{fig:ex:mixed2}. Again, both algorithms will result in the same conc
 will search from {\em Go(Grocery, Clothing)} and will now find {\em Have Shirt}. The distributed algorithm will find
 and star the new tokens when the plan gets updated. The resulting new starred tokens will be proactively dispatched.
 
+As the end of the day approaches, it will need to start heading home. At 19:40 both algorithms will find
+that the {\em Go(Clothing, Home)} is still not connected to a goal but that the upper bound time for starting the token
+has been reached. Therefore, we will dispatch the token because it has become necessary for completing the plan.
+After getting {\em Home}, the plan shows that the agent will then {\em Go(Home, Clothing)}. This is the result that while
+being {\em At} the token that follows is to {\em Go}. Thus, this resulting token is just part of the plan model and 
+will not be dispatched because it is not connected to a goal and it's upper bound start time will not be meet.
 
 
 
