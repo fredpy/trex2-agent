@@ -16,10 +16,14 @@ To finally discuss why one solution was preferred on our system}
   \label{fig:ex:mixed1}
 \end{figure}
 
-Our experiment follows that of the original plan given in Fig. \ref{fig:ex:plan}. At the beginning, the
-agent wants to {\em Buy} an apple and it has to be {\em Home} by the end of the mission. Figure \ref{fig:ex:mixed1} 
-demonstrate the resulting plan from our algorithm and will guide our explanation. Both algorithms will
-result in the same execution of the plan but their approach is quite different. 
+Our experiment follows that of the original plan given in
+Fig. \ref{fig:ex:plan}. At the beginning, the agent wants to {\em Buy}
+an apple and it has to be {\em Home} by the end of the mission. We
+implemented this on our executive with plans being produced by the
+europa planning engine \cite{frank2003}. Figure \ref{fig:ex:mixed1}
+demonstrate the resulting plan from our algorithm and will guide our
+explanation. Both algorithms will result in the same execution of the
+plan but their approach is quite different.
 
 For Algorithm \ref{DispatchToken}, the search is quite straight forward. For example in Fig. \ref{fig:ex:mixed1},
 if we are {\em At Home} then the next {\em Go} token will be dispatched. Because the search will follow 
