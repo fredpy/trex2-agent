@@ -21,9 +21,9 @@ result in the same execution of the plan but their approach is quite different.
 
 For Algorithm \ref{DispatchToken}, the search is quite straight forward. For example in Fig. \ref{fig:ex:mixed1},
 if we are {\em At Home} then the next {\em Go} token will be dispatched. Because the search will follow 
-the causal links forward, where upon, it will find the goal {\em Have Apple} which mean dispatch proactively.
+the causal links forward, where upon, it will find the goal {\em Have Apple} resulting in dispatching proactively.
 Similarly, this happens for all of the tokens that are starred. The rest of the tokens are deferred
-for later dispatching. Thus, resulting in the agent staying at the {\em Grocery} rather than heading {\em Home} 
+for later dispatching. The resulting agent stays at the {\em Grocery} rather than heading {\em Home} 
 immediately like in Fig. \ref{fig:ex:proactive}.
 
 For the distributed algorithm approach, each token is checked during the creation of the plan to see if it is 
