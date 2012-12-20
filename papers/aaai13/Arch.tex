@@ -255,7 +255,7 @@ connected tokens happens in algorithms \ref{NotifyAdded}, \ref{NotifyRemoved}, \
 \begin{algorithmic}
 \Function{NotifyMerged}{ Token $T$ }
 \If{$T$ is goal in $List_{goals}$}
-	\State Recursively search the reverse causal link of the active $T$ and add tokens to $List_{goals}$
+	\State Recursively search the reverse causal link of the active token merged with $T$ and add tokens to $List_{goals}$
 \ElsIf{The active token of $T$ is in $List_{goals}$}
 	\State Recursively search the reverse causal link of $T$ and add tokens to $List_{goals}$
 \EndIf
