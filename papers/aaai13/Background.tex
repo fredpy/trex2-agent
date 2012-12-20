@@ -2,19 +2,19 @@
 
 \fcomment{I need to rework this as it is not really a state
   of the art in the current form ... we also need to present that fact
-  that not that much people do consider postponment of actions
-  ... except maybe for dynamic controlability problem ... this may be
+  that not that much people do consider postponement of actions
+  ... except maybe for dynamic controllability problem ... this may be
   the key for this part. WE can present proactive approaches as being
   the general agreement except for the special case of dynamic
-  controlability where 3DC+  introduces wait actions which in fact put
-  timepoints that need to be deferred. We on the other hand try to
+  controllability where 3DC+  introduces wait actions which in fact put
+  time-points that need to be deferred. We on the other hand try to
   look at another aspect that may trigger the decision to defer an
   actions based on its purpose}
 
 Dealing with plan execution is not a new problem and we can find a lot
 of work that relates to this during the last decades. Still, it is
 pretty rare to see work that envisage that actions could be
-postponned except when this is necessary to not break the current
+postponed except when this is necessary to not break the current
 plan. 
 
 
@@ -27,12 +27,12 @@ consistency. In order to accomplish such a task, the STN supporting
 the plan to be dispatched is transformed into a All-Pairs network and
 stripped of unnecessary edges, resulting often on a more compact
 temporal network and lessen the propagation cost of its updates. The
-role of the executive is to select timepoints within the current
+role of the executive is to select time-points within the current
 execution bounds and propagate its value within the simplified
 network. Still, while this work contribute to ensure that execution
 time are correctly propagated within the plan with a limited cost, it
 does not directly address how to decide what value should be set for a
-given timepoint in the scope of its possible values. More specifically
+given time-point in the scope of its possible values. More specifically
 it is still the role of the executive to decide whether it should
 start an action as early as possible or consider it as not urgent. 
 
@@ -43,7 +43,7 @@ events for execution. The executive needs to
 be highly reactive as it is necessary to function in a real-time
 environment. One solution offered for dispatching events efficiently
 is the proactive approach. This approach greatly reduces the plan
-flexibility, and therefore robustness, as all start timepoints are
+flexibility, and therefore robustness, as all start time-points are
 grounded to a specific value which is compatible with the initial
 constraints. In order to avoid having a procrastinating system the
 overall agreement in term of policy is to start an action as early as

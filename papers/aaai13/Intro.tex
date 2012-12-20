@@ -14,8 +14,8 @@ the dynamic environment, the robotic agent will need to anticipate
 constant changes in the plan and need to evaluate how to properly
 execute the plan.The ability to plan in-situ leverage the ability to
 dynamically add new objectives dynamically to the agent during the
-mission execution instead of being forced to sepcify them beforehand.
-These capabilitiwes allow to more felxible and autonomous missions
+mission execution instead of being forced to specify them beforehand.
+These capabilities allow to more flexible and autonomous missions
 but also makes more challenging the overall mission execution by itself. 
 
 
@@ -35,14 +35,14 @@ constraint-based planner with rich representation of resources
 and time such as the ones presented in \cite{frank2003,lemai04}. 
 These systems provide a rich plan structure which often implements
 least-commitment planning giving a solution that do not commit on
-specfic values (such as the start and end time ofn action) unless it
+specific values (such as the start and end time of an action) unless it
 is required by the model. This flexibility also puts the burden to
 plan executive to decide a which time a specific action within all
 its possible value. Resolving this problem resulted on a large amount
 of research both considering how to represent the plan to be
 dispatched to the executive with a compact yet complete
 representation, along with more refinements on how to deal with
-uncontrolable constraints. Still, remains the issue of deciding 
+uncontrollable constraints. Still, remains the issue of deciding 
 whether the next possible(s) action(s) should be started immediately 
 or if it should be postponed for a later start date. 
 
@@ -53,17 +53,17 @@ not impact the plan brittleness. This choice is lead by the intuition that by
 starting actions early it gives more room in the future to deal worst
 case scenarios of execution. While this solution works in the general 
 case where all the goals of the agent are known a priori, it is
-challenged when one consider that the agent can have new obsejectives
+challenged when one consider that the agent can have new objectives
 added as the mission execute. Indeed taking actions to early can lead
 the agent in a situation where the new goal received is not integrated
 as efficiently as it would have been should the agent have waited
-before taking action. In this context, it is imporant for the agent
+before taking action. In this context, it is important for the agent
 make a distinction between actions that can be taken proactively
 versus other actions that may not be yet urgent.  In this paper, we
 propose a systematic approach to allow the agent to make such
 distinction for each action by tracing the causal relations with
- goals within the current plan.  This aloow us to deternmine the best
- startegy based on the nature of the goals this action contribute to.
+ goals within the current plan.  This allow us to determine the best
+ strategy based on the nature of the goals this action contribute to.
 \fcomment{Plan for the paper here}
 
 % this can have a
@@ -133,8 +133,8 @@ illustration]{\label{fig:ex:graph}\includegraphics[width=0.51\columnwidth]{figs/
 \hfill
 \subfloat[Initial problem]{\label{fig:ex:init}\includegraphics[width=0.47\columnwidth]{figs/example_initial}}
 \caption{A description of our shopping agent problem with an
-  illustation of the domain (\ref{fig:ex:graph}) along with the intial
-  partilal plan for this probelem (\ref{fig:ex:init}). In this domain
+  illustration of the domain (\ref{fig:ex:graph}) along with the initial
+  partial plan for this probelem (\ref{fig:ex:init}). In this domain
   our agent is initially at {\em Home} at 8am, he wants to have an
   {\em Apple}
   before noon and needs to be back 
@@ -160,14 +160,14 @@ to half an hour to go from Home to the Clothing Shop, 10 to 15 minutes
 to go from the Clothing shop to Grocery and 5 to 10 minutes in order
 to buy an apple, a general plan solution is presented in  Figure
 \ref{fig:ex:plan}. The plan presented here is partially instantiated
-giving the ganet the freedom to decide when to start an action within
+giving the agent the freedom to decide when to start an action within
 the valid boundary of the solution. The agent can then for example go
 early on buy its apple so he is sure to have it as early as possible. Conversely,
 the agent may decide to walk around and fo window shopping throughout
 the rest of the day as there is no hurry yet. By 7pm though, it should
 eventually leave so it can arrive back home by 8pm. In this scenario,
 we see that agent did alternate between deciding to execute actions
-early or proacrstinate depending on the the nature of the action it
+early or procrastinate depending on the the nature of the action it
 need to take next or more accurately the nature of the objectives 
 related to this action. Indeed, the agent was proactive on leaving his 
 house as it was related to him {\em
@@ -192,10 +192,10 @@ er have seen within embedded agent execution in our domain. Indeed, we
 do daily operations wehere our AUV is deployed and scientists can
 remotely send new objectives as the mission goes along to the vehicle
 as they see new area of interrest. At the same time the vehicle has
-also operational objectives such as going to a place wheer its
+also operational objectives such as going to a place where its
 recovery will be easier for operators. This gives a similar
 distinction between the science objectives and operation
-objectives. Similarly to our shopping agent we do not realy want the
+objectives. Similarly to our shopping agent we do not really want the
 AUV to get back to recovery area too early as a new science goal could
 be sent to him which in turns would rather be fulfilled as early as
 possible.
