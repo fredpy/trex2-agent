@@ -44,8 +44,8 @@ functioned in the real-world, the Remote Agent Experiment \texttt{RAX}
 \cite{chien99} and more recently the Teleo Reactive Execution \rxe
 \cite{mcgann08b,py10}. In all these systems, generative plans are
 dispatched for execution using rich representations that deal with
-durative actions and resources the focus of our work here
-\cite{lemai04}.
+durative actions and resources \cite{lemai04}, the focus of our work
+here.
 
 In particular, our focus is on constraint-based temporal planning
 \cite{frank2003} with a demonstrated capability for real-world
@@ -66,33 +66,42 @@ The challenge of deciding whether the next possible set of action(s)
 should be started immediately or if it should be postponed for a later
 start date.
 
-To avoid procrastination the solution selected has often been to start
-actions as early as possible while ensuring that it does not impact
-the plan brittleness. This choice is lead by the intuition that by
-starting actions early it gives more room in the future to deal worst
-case scenarios of execution. While this solution works in the general
-case where all the goals of the agent are known a priori, it is
-challenged when one consider that the agent can have new objectives
-added as the mission execute. Indeed taking actions to early can lead
-the agent in a situation where the new goal received is not integrated
-as efficiently as it would have been should the agent have waited
-before taking action. In this context, it is important for the agent
-make a distinction between actions that can be taken proactively
-versus other actions that may not be yet urgent.  In this paper, we
-propose a systematic approach to allow the agent to make such
-distinction for each action by tracing the causal relations with goals
-within the current plan.  This allow us to determine the best strategy
-based on the nature of the goals this action contribute to.
+Procrastination is avoided by starting actions as early as possible
+while ensuring that it does not impact plan brittleness. This choice
+is lead by the intuition that by starting actions early it gives more
+room in the future to deal with worst case execution scenarios. While
+this solution works in the general case where all the goals of the
+agent are known a priori, it is challenging when the agent can have
+new objectives added during the course of mission execution and leads
+to the typical dichotomy of dealing with \emph{when} to start an
+activity. Dispatching actions too early can lead can lead the agent to
+premature commitment towards a course of action dictated by the plan
+which can change in a dynamic context; waiting inordinately on the
+other hand, could either lead to doing nothing in the interim or
+missing the ability to deal with opportunistic events.
+% the agent in a
+% situation where the new goal received is not integrated as efficiently
+% as it would have been should the agent have waited before taking
+% action.
+In this context, it is important for the agent make a distinction
+between actions that can be taken proactively versus other actions
+that may not be urgent.  
+
+In this work, we propose a systematic approach to allow the agent to
+make such distinction for each action by tracing the causal relations
+with goals within the current plan.  This allow us to determine the
+best dispatch strategy based on the nature of the goals this action
+contributes to.
 
 % \fcomment{Plan for the paper here}
- The structure of this paper is as follow, first we introduce an
-example illustrating the problem of a flexible plan execution, We then
-discuss previous works and how they do tend to focus on a single
-policy or not consider the possibile emergence of new goal during the
-mission. We then present algorithmic solutions that allow to decide at
-execution when actions should be started. Finally after presenting the
-results we obtain on our implementation we conclude and present further
-research that need to be addressed. 
+The structure of this paper is as follow. We introduce an example
+illustrating the problem of a flexible plan execution. We then discuss
+previous works and how they do tend to focus on a single policy or not
+consider the possibile emergence of new goal during the mission. We
+then present algorithmic solutions that allow to decide at execution
+when actions should be started. Finally after presenting the results
+we obtain on our implementation we conclude and present further
+research that need to be addressed.
 
 
 
