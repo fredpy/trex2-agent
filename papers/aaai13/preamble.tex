@@ -34,18 +34,22 @@
 
 %\setlength{\marginparwidth}{8mm}
 
-
-\usepackage{pdfcomment}
 \usepackage{xcolor}
 
-\newcommand{\comment}[2]{\pdfcomment[#1]{#2}}
+\ifdefined\draft 
+  \usepackage{pdfcomment}
 
+  \newcommand{\comment}[2]{\pdfcomment[#1]{#2}}
+  \newcommand{\highlight}[2]{\pdfmarkupcomment[#1]{#2}{}}
+\else
+  \newcommand{\comment}[2]{}
+  \newcommand{\highlight}[2]{#2}
+\fi
 
 \newcommand{\kcomment}[1]{\comment{author=Kanna,color=red}{KR: #1}}
 \newcommand{\fcomment}[1]{\comment{author=Frederic,color=gray}{FP: #1}}
 \newcommand{\pcomment}[1]{\comment{author=Philip,color=yellow}{PC: #1}}
 
-\newcommand{\highlight}[2]{\pdfmarkupcomment[#1]{#2}{}}
 
 \newcommand{\khighlight}[1]{\highlight{author=Kanna,color=red}{#1}}
 \newcommand{\fhighlight}[1]{\highlight{author=Frederic,color=gray}{#1}}
