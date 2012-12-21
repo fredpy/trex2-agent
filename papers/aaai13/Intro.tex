@@ -154,16 +154,13 @@ research that need to be addressed.
 % task of choosing a token and sending it to its appropriate subsystem,
 % to be executed, as dispatching.
 
-\paragraph{An Illustrative Example} We define a simple Shopping agent
-that will be used to illustrate different approaches and issues that
-arise when dispatching. First, the agent can either be at a location or be
-traveling. Second, the agent starts with a certain amount of
-energy (resource) that will decrease as it travels. Third, the agent has some
-actions that allow it to interact with the environment. It can go to a location,
-buy items at stores, and eat the edible items for energy. Lastly, the agent can
-want to buy an item. In a typical Shopping agent mission,
-the goals are to buy a list of items from different stores and be back
-home by the end of the night. 
+\paragraph{An Illustrative Example} We define a simple autonomous underwater vehicle (AUV) mission
+that will be used to illustrate the validity of our approach compared to previous ones and the major issues that
+arise when dispatching. First, the AUV can be at a location ({\em vent}) or be
+traveling to one. Second, the AUV has a few basic actions that allow it to function within the environment. 
+It can go to a location, survey a location, and sample a location. In a typical AUV mission,
+the scientist will want the AUV to survey and sample a location and, if needed, direct the AUV on the fly to a new
+location for surveying and surveying. 
 
 \begin{figure}
   \centering
@@ -188,33 +185,31 @@ call proactive \fcomment{Need to replace least-commitment by
   ``proactive''}
 -- or wait until the action should necessary start --
 called later deferred\fcomment{similarly rename EST as ``deferred''}. 
-makeThere is a clear difference between the two approaches
- but when should, for example, the shopping agent wait
-or start early ? Lets demonstrate an ideal scenario where the shopping
-agent balances both approaches illustrated in Figure \ref{fig:Example}. 
+There is a clear difference between the two approaches
+ but when should, for example, the AUV wait
+or start early? Lets demonstrate an ideal scenario where the AUV
+balances both approaches. The initial problem is illustrated in Figure \ref{fig:Example}. 
 
-The agent, waking up at 8 AM, {\em wants} to buy an apple
-and {\em needs} to be home by 8 PM. The agent then leaves as early as
-possible to start shopping. Considering that that it takes 20 minutes
-to half an hour to go from Home to the Clothing Shop, 10 to 15 minutes
-to go from the Clothing shop to Grocery and 5 to 10 minutes in order
-to buy an apple, a general plan solution is presented in  Figure
+The AUV, mission starting at 8 AM, needs to {\em sample vent2}
+and return to the {\em ship} by 8 PM. The AUV starts traveling immediately
+to {\em vent1}. Considering that that it takes twenty minutes
+to half an hour to go from {\em Surface} to {\em vent1},  five minutes
+to go from {\em vent1} to {\em vent2}, and ten minutes in order
+to {\em survey} and {\em sample}, a general plan solution is presented in  Figure
 \ref{fig:ex:plan}. The plan presented here is partially instantiated
-giving the agent the freedom to decide when to start an action within
-the valid boundary of the solution. The agent can then for example go
-early on buy its apple so he is sure to have it as early as possible. Conversely,
-the agent may decide to walk around and fo window shopping throughout
-the rest of the day as there is no hurry yet. By 7pm though, it should
-eventually leave so it can arrive back home by 8pm. In this scenario,
-we see that agent did alternate between deciding to execute actions
+giving the AUV the freedom to decide {\em when} to start each action within
+the valid boundary of the solution. For example, the AUV should go
+early in order to {\em sample vent2} so that the scientist can have the possibility to 
+for more exploration. Conversely, heading back to the surface early would waste valuable
+time if the scientist decide they want to {\em survey} another location. By 7pm though, it should
+go to the surface so the scientist can pick it up by 8pm. In this scenario,
+we see that the AUV did alternate between deciding to execute actions
 early or procrastinate depending on the the nature of the action it
 need to take next or more accurately the nature of the objectives 
-related to this action. Indeed, the agent was proactive on leaving his 
-house as it was related to him {\em
-  wanting}  an apple, on the other hand he just {\em needed} to get
-back home by 8 PM allowing him to procrastinate at the grocery 
-store. By doing so he will be around in case his wife is calling him
-to buy extract things before he gets back home. 
+related to this action. The AUV was proactive on traveling to {\em sample vent2} because the
+scientist want it to be completed. On the other hand, the AUV has to return to the surface by
+8 PM, however, the scientist don't explicitly want this done. Thus, allowing it to procrastinate. 
+By doing so, the AUV is available to complete new tasks given to it by the scientist. 
 
 % \fcomment{Need a figure that shows the plan somehow ... this can be
 %   refined as we go along for illustrating proactive vs deferred}
