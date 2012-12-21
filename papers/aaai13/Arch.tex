@@ -161,14 +161,16 @@ in the set $\Phi_{ge}$.}
 \end{algorithmic}
 \end{algorithm}
 
-A crucial part for deciding how to dispatch a token is finding whether the token in question is 
-connected to a goal in $\Phi_{ge}$, call it $G$. Algorithm \ref{SearchForGoal} does the function of 
-searching for $G$ in a forward-search manner. We define a causal link within our plan that must be
-meet in order for our search to function. 
+A crucial part for deciding how to dispatch a token is finding whether
+the token in question is connected to a goal in $\Phi_{ge}$, call it
+$G$. Algorithm \ref{SearchForGoal} does the function of searching for
+$G$ in a forward-search manner. We define a causal link within our
+plan that must be meet in order for our search to function.
 \begin{definition}
 \label{def:subgoalLink}
-A causal link is defined as linking a goal as an effect of an action whose conditions are needed in order
-to complete the goal and, thus, are subgoals. This link can be recursive as the conditions themselves 
+A causal link is defined as linking a goal as an effect of an action
+whose conditions are needed in order to complete the goal and, thus,
+are subgoals. This link can be recursive as the conditions themselves
 may be the effect of an action causing a causal chain to build.
 \end{definition}
 During our search, if we find $G$ then we know that the original token
@@ -179,24 +181,34 @@ external request. The token still needs to be dispatched, however,
 there is no one explicitly requesting it to be accomplished. Thus, no
 reason to be proactive.
 
+This a;gorithm is equivalent to a breadth first search along the
+planning strtcure starting from the action we need to
+evaluate. Therefore its complexity is $O(N+E)$ where $N$ is the
+numnber of tokens within the plan and $E$ the causal links that relate
+these tokens. 
+
 \subsection{Dynamic solution during planning}
 
 Searching for a goal as Algorithm \ref{SearchForGoal} does can be
 quite computational expensive particularly if there are many tokens
 that are continuously being dispatched. Completing a full search every
-time a token needs to be dispatch can severely slow down the execution
-process, which needs to remain quick to ensure proper
+time a token needs to be dispatched can severely slow down the
+execution process, which needs to remain quick to ensure proper
 execution. Therefore, our next algorithmic approach distributes the
-full search within the creation of the plan.  Resulting in spreading out the full cost of the
-search. In order to not repeatedly search the plan, we save the tokens
-that are connected to a goal in $\Phi_{ge}$ found during the
-search. In this way, we acquire a list of tokens, $List_{goals}$, that should be
-dispatched early.
+full search within the creation of the plan.  Resulting in spreading
+out the full cost of the search. In order to not repeatedly search the
+plan, we save the tokens that are connected to a goal in $\Phi_{ge}$
+found during the search. In this way, we acquire a list of tokens,
+$List_{goals}$, that should be dispatched early.
 
-The algorithm uses the same dispatching method as algorithm \ref{DispatchToken}.
-The difference is that rather than searching for the goal using algorithm \ref{SearchForGoal}, 
-it only searches the list, $List_{goals}$, to see if the token is in it. The actually searching for the goals and causally 
-connected tokens happens in algorithms \ref{NotifyActivated}, \ref{NotifyMerged}. 
+An alternative solution is to embed the propagation of these value
+during the planning search. The algorithm uses the same dispatching
+method as algorithm \ref{DispatchToken}.  The difference is that
+rather than searching for the goal using algorithm
+\ref{SearchForGoal}, it only searches the list, $List_{goals}$, to see
+if the token is in it. The actually searching for the goals and
+causally connected tokens happens in algorithms \ref{NotifyActivated},
+\ref{NotifyMerged}.
 
 \begin{algorithm}
 \caption{Saves goals as they are added to plan}
@@ -295,8 +307,19 @@ from the token since it has now proven to be valuable. After the plan
 has been searched, it is as easy as searching a list for a token to
 see if it should be dispatched early or be deferred to later.
 
-
-
+This approach is potentially more costfull than the previous algorithm 
+as it needs to do local updates whenever the plan is altered by the search
+including retracting past updates if a backtrack occur during the
+search. Still it is compelling in the factthat this cost occurs during
+planning reducing the decision problem during execution to simply
+check how the given action has been marked during planning. It has
+been the solution we have preferred within our system for this reason
+as it is functionally equivalent to previous algorithm while reducing
+extra computation cost as the plan is executed. Planning phases occur
+within the plan only when either the initial plan failed to execute or
+the set of goals has been altered. Therefore it is safe to assume that
+planning should occur more sporadically than execution decisions 
+which then give an edge to this latter algorithmic solution. 
 
 %%% Local Variables: 
 %%% mode: latex
