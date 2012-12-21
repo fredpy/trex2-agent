@@ -168,12 +168,12 @@ location for surveying and surveying.
   \subfloat[\small An illustration of our domain]{\label{fig:ex:graph}\includegraphics[width=0.51\columnwidth]{figs/auv_example}}
   \hfill \subfloat[\small Initial  problem]{\label{fig:ex:init}\includegraphics[width=0.47\columnwidth]{figs/example_initial}}
   \caption{\small{\ref{fig:ex:axial} shows bathymetry of actual vent
-      sites off the coast of Oregon. A description of a hydrotermal
+      sites off the coast of Oregon. A description of a hydrothermal
       vent problem with an illustration of the domain
       (\ref{fig:ex:graph}) along with the initial partial plan for
-      this probelem (\ref{fig:ex:init}). In this domain our AUV is
+      this problem (\ref{fig:ex:init}). In this domain our AUV is
       initially at {\em Surface} at 8am, he wants to survey {\em vent
-        2} which is active before noon and needs to be back at {\em
+        2} and needs to be back at {\em
         Surface} before the end of its mission at 8pm (noted 20:00
       here).}}
 \label{fig:Example}
@@ -223,7 +223,7 @@ By doing so, the AUV is available to complete new tasks given to it by the scien
 \end{figure}
 
 While this example may appear academic at first, it reflects situations
-er have seen within embedded agent execution in our domain. Indeed, we
+we have seen within embedded agent execution in our domain. Indeed, we
 do daily operations wehere our AUV is deployed and scientists can
 remotely send new objectives as the mission goes along to the vehicle
 as they see new area of interrest. At the same time the vehicle has
@@ -241,19 +241,19 @@ plan is known to change either by uncontrollable events or external
 requests with new directives. External requests  can occur
 at any time which make them in essence uncontrollable events.
 Specifically, we focus on how these new requests, coming from the
-external world, will affect the way we dispatch the plan, rather than
+external world, alter the way we need to dispatch the plan, rather than
 how they will be integrated into the plan or any part of the planning
-process.  The reason for our separation from planning is that
+process. The reason for our separation from planning is that
 oftentimes planning and executing are split up into two different
-jobs. Where a robotic agent is give an already created plan, and it
-must then choose how to execute that plan. Therefore, our focus is on
-how to dispatch a plan after it has already been created, while
-understanding that the plan may still change in the near future.
+jobs. Often times a robotic agent is give an already created plan, and it
+must then choose when to execute parts of the plan. Therefore, our focus is on
+developing a method for dispatch a plan, after it has already been created, while
+understanding that new requests may come in the near future.
 
 The approach we have taken on dispatching looks at the token level of a plan,
-specifically at the externally requested tokens which we define as goals.
-Because they are requested by an external person with the intent of being 
-completed, they have a high priority. In contrast, there are tokens that only describe the
+specifically at tokens generated from external requests which we define as goals.
+Because they have been requested by an external person with the intent of being 
+completed fast, they have a high priority. In contrast, there are tokens that only describe the
 evolution of a timeline, which we define as non-goals. In order to keep the plan 
 valid, the agent is obligated to complete the non-goals, but there is no rush. Thus, the
 non-goals have a low priority. Therefore, we want to complete the goals
@@ -261,7 +261,7 @@ as early as possible in order to give adequate time for the possibility of new
 goals, and complete the non-goals as they become necessary for the validity of the plan. 
 Some may argue that finishing the goals early doesn't guarantee that
 there will be enough time for new goals, however, that is an issue with planning, 
-and our concern is with dispatching.
+and our concern is whether dispatching cased the waste of time.
 
 
 %%% Local Variables: 
