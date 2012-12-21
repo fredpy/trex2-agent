@@ -156,10 +156,10 @@ research that need to be addressed.
 
 \paragraph{An Illustrative Example} We define a simple autonomous underwater vehicle (AUV) mission
 that will be used to illustrate the validity of our approach compared to previous ones and the major issues that
-arise when dispatching. First, the AUV can be at a location ({\em vent}) or be
+arise when dispatching. First, the AUV can be at a location or be
 traveling to one. Second, the AUV has a few basic actions that allow it to function within the environment. 
 It can go to a location, survey a location, and sample a location. In a typical AUV mission,
-the scientist will want the AUV to survey and sample a location and, if needed, direct the AUV on the fly to a new
+the scientist will want it to survey and sample a location and, if needed, be redirect on the fly to a new
 location for surveying and surveying. 
 
 \begin{figure}
@@ -190,20 +190,20 @@ There is a clear difference between the two approaches
 or start early? Lets demonstrate an ideal scenario where the AUV
 balances both approaches. The initial problem is illustrated in Figure \ref{fig:Example}. 
 
-The AUV, mission starting at 8 AM, needs to {\em sample vent2}
+The AUV mission starting at 8 AM needs to {\em sample vent2}
 and return to the {\em ship} by 8 PM. The AUV starts traveling immediately
 to {\em vent1}. Considering that that it takes twenty minutes
-to half an hour to go from {\em Surface} to {\em vent1},  five minutes
+to half an hour to go from the {\em Surface} to {\em vent1},  five minutes
 to go from {\em vent1} to {\em vent2}, and ten minutes in order
-to {\em survey} and {\em sample}, a general plan solution is presented in  Figure
+to {\em survey} and {\em sample}, a general plan solution is presented in Figure
 \ref{fig:ex:plan}. The plan presented here is partially instantiated
 giving the AUV the freedom to decide {\em when} to start each action within
 the valid boundary of the solution. For example, the AUV should go
-early in order to {\em sample vent2} so that the scientist can have the possibility to 
-for more exploration. Conversely, heading back to the surface early would waste valuable
-time if the scientist decide they want to {\em survey} another location. By 7pm though, it should
+early in order to {\em sample vent2} so that the scientist can have the possibility request 
+more tasks. Conversely, heading back to the surface early would waste valuable
+time, roughly twenty minutes, if the scientist decide they want to {\em survey} another location. Though by 7pm, it should
 go to the surface so the scientist can pick it up by 8pm. In this scenario,
-we see that the AUV did alternate between deciding to execute actions
+we see that the AUV alternated between deciding to execute actions
 early or procrastinate depending on the the nature of the action it
 need to take next or more accurately the nature of the objectives 
 related to this action. The AUV was proactive on traveling to {\em sample vent2} because the
