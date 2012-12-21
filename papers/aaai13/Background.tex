@@ -84,7 +84,7 @@ until he needs to get back home.
   \label{fig:ex:proactive}
 \end{figure}
 
-The only case we have seen in literature where a time-point is
+One case we have seen in literature where a time-point is
 considered to be deferred is related to the dynamic controllability
 issue with STNs with uncertainty (STNU). In \cite{morris01}, they propose 
 an algorithm that during planning insert wait constraints within the
@@ -101,16 +101,35 @@ example the duration of a navigation task which depends on external
 factors -- it is necessary to defer some actions in order to ensure
 the plan execution. 
 
-Our work on the other hand is more complementary to this one, indeed
+An alternative approach is related to wrok with soft constraints
+within the temporal domain indicating preferences on actions timing
+such as in \cite{khatib2001temporal}. This should provide  a general
+solution for users to specify whether actions of the plan should be
+preferably started. One problem with general frameworks dealing with
+soft constraints though is their poor performances \cite{bartak2002}
+as the general problem is NP-hard. Even though it can be reduced to a
+more tractable (polynomial) solution by specifying preferences as
+convex functions \cite{rossi2006learning}, the  
+complexity is still at on the cubic in relation to the number of
+variables. Moreover the solutions proposed do optimize the plan {\em
+  a-priori} reducing then the plan flexibility which in turn make it
+in  turn more prone to fail during execution.
+
+Our work on the other hand is more complementary to previous work, indeed
 while we do not really deal with dynamic controllability in our
 problem -- which can anyway be treated as in this previous work -- the
 core of our problem is not that much the observation of events during
 execution (which is more a observation related impact) but instead we
 are more focused on the knowledge that, within our agent, new
 objectives can emerge at any time, and we want to avoid as much as
-possible doing actions which are not ``urgent''. By doing so, we take
-the risk of doing unnecessary actions as new goals need to be integrated
-in the plan.
+possible doing actions which are not ``urgent''. similarly while we do
+not really deal with complex preferences specification that can help
+improve the planned solution our purpose is to defer the decision to
+start to execute actions within the plan to the executive allowing to
+quickly adapt the plan without heavily relying on plan-repair or
+re-planning solutions that could badly impact the system reactiveness.
+By doing so, we take the risk of doing unnecessary actions as new
+goals need to be integrated in the plan.
 
 % s
 % considered to be deferred is related to the approach proposed in 
@@ -200,3 +219,5 @@ in the plan.
 %%% mode: latex
 %%% TeX-master: "aaai13"
 %%% End: 
+
+papr
