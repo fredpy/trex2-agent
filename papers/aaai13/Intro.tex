@@ -7,15 +7,36 @@ with in-situ \kcomment{citations needed}. This is particularly
 important in dynamic and unpredictable real-world environments where
 plans can and do change rapidly and the robotic agent is expected to
 be responsive to such exogenous change. Often this focus has been
-driven by the need to replan given a priori goals. It is often assumed
-in such systems, that goals or objectives are known a priori with the
-agent having to deal with the dynamism associated at the execution end
-of the system. 
+driven by the need to replan given a fixed set of goals a priori,
+where such objectives are known and do not perturb the planning and
+execution process.
 
 In this paper, we argue that the impact of asynchronous arrival of
-goals and their consequent impact on execution is important to
-understand for the agent to systematically deal with a dynamic
-environment, and one that has been less well studied. We emphasize the
+goals and their consequent impact on execution is important especially
+in dynamic and unpredictable environments especially during robotic
+exploration. Our robotic domain deals with benthic as well as upper
+water-column exploration using autonomous underwater vehicles (AUVs),
+which are untethered and propelled. For instance, in bathymetric
+surveys of subduction zones, AUVs are used to augment limited ship
+time to deal with largely unexplored areas of coverage. Even so
+finding hydrothermal vents is challenging given large spatial areas,
+noisy sensors and low signal/noise ratio as also the harsh environment
+in which the AUV has to survive. Identifying vents is painstaking;
+inadequate sensors and lack of closed loop bathymetric control,
+requires scientists on ship analyse previous surveys to inform the
+current AUV deployment. This often means that the vehicle can be
+re-tasked with new goals while executing one or more current mission
+objectives.  AUV deployment in such cases often occurs over multiple
+phases \cite{Yoerger01012007}; to minimize station time on site, the
+AUV is redeployed after each phase after a vehicle recharge while data
+analysis from the past survey continues. Consequent analysis then
+provides the impetus to retarget when new scientific targets are
+generated on ship.
+
+While substantial literature exists to deal with agent reactivity and
+replanning in the face of execution uncertainty \kcomment{citations
+  needed}, the ability of a robotic agent to systematically deal with
+dynamic goal is less well studied. In this context, we emphasize the
 need for planning and plan execution in-situ to enable tight closure
 of control loops for the robot's responsiveness.
 % In order for an agent to operate in a dynamic environment, the agent
@@ -28,11 +49,11 @@ of control loops for the robot's responsiveness.
 % the dynamic environment, the robotic agent will need to anticipate
 % constant changes in the plan and need to evaluate how to properly
 % execute the plan.
-The ability to plan in-situ leverages the ability to dynamically add
-new objectives to the agent during mission execution instead of being
-forced to specify them beforehand.  While such capabilities allow for
-more flexible and autonomous missions it also makes the overall misson
-execution more challenging.
+Doing so, leverages the ability to dynamically add new objectives to
+the agent during mission execution instead of being forced to specify
+them beforehand and is the context of this paper.  While such
+capabilities allow for more flexible and autonomous missions it also
+makes the overall misson execution more challenging.
 
 In the pursuit of planning in a dynamic environment, earlier work done
 in \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
