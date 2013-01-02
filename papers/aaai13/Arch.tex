@@ -131,23 +131,24 @@ to the token, $t$, and, if so, dispatches the token.}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
 \begin{algorithm} [H]
 \caption{The function $SearchForGoal$ does a Forward search looking for a token that is
 in the set $\Phi_{ge}$.}
 \label{SearchForGoal}
 \begin{algorithmic}
 \Function{SearchForGoal}{ Token $T$ }
-\ForAll{Action(s), $A$, that $T$ is a Condition }
+\State List $Search$ = Action(s) that $T$ is a Condition 
+\ForAll{Action(s), $A$, in $Search$ }
 	\ForAll{Effect(s), $E$, of Action $A$ }
 		\If{$E$ is a Goal in $\Phi_{ge}$}
 			\State \Return True
-		\ElsIf{$E$ is a Condition of an Action}
-			\State \Return SearchForGoal( $E$ )
-		\Else 
-			\State \Return False
+		\ElsIf{$E$ is a Condition of an Action $A_c$}
+			\State Add $A_c$ to back of list $Search$
 		\EndIf
 	\EndFor
 \EndFor
+\State \Return False
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
