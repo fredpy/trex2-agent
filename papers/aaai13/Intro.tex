@@ -213,20 +213,20 @@ balances both approaches. The initial problem is illustrated in Figure \ref{fig:
 
 The AUV mission starting at 8 AM needs to {\em sample vent2}
 and return to the {\em ship} by 8 PM. The AUV starts traveling immediately
-to {\em vent1}. Considering that that it takes twenty minutes
-to half an hour to go from the {\em Surface} to {\em vent1},  five minutes
-to go from {\em vent1} to {\em vent2}, and ten minutes in order
+to {\em vent1}. Considering that that it takes one to two hours
+to go from the {\em Surface} to {\em vent1},  roughly ten minutes
+to go from {\em vent1} to {\em vent2}, and more than two hours in order
 to {\em survey} and {\em sample}, a general plan solution is presented in Figure
 \ref{fig:ex:plan}. The plan presented here is partially instantiated
 giving the AUV the freedom to decide {\em when} to start each action within
 the valid boundary of the solution. For example, the AUV should go
-early in order to {\em sample vent2} so that the scientist can have the possibility request 
+early in order to {\em sample vent2} so that the scientist have the a possibility for requesting 
 more tasks. Conversely, heading back to the surface early would waste valuable
-time, roughly twenty minutes, if the scientist decide they want to {\em survey} another location. Though by 7pm, it should
+time, roughly two hours, if the scientist decide they want to {\em survey} another location. Though by 6pm, it should
 go to the surface so the scientist can pick it up by 8pm. In this scenario,
 we see that the AUV alternated between deciding to execute actions
-early or procrastinate depending on the the nature of the action it
-need to take next or more accurately the nature of the objectives 
+early or defer them depending on the the nature of the action it
+need to take next, or more accurately the nature of the objectives 
 related to this action. The AUV was proactive on traveling to {\em sample vent2} because the
 scientist want it to be completed. On the other hand, the AUV has to return to the surface by
 8 PM, however, the scientist don't explicitly want this done. Thus, allowing it to procrastinate. 
