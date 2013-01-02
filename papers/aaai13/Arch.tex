@@ -114,7 +114,7 @@ forward search on the causal links related to this token to see if
 they lead to an internal goal as implemented in Algorithm \ref{DispatchToken}
 
 
-\begin{algorithm}
+\begin{algorithm} [H]
 \caption{The function $DispatchToken$ finds if there is a goal in $\Phi_{ge}$ that is connected
 to the token, $t$, and, if so, dispatches the token.}
 \label{DispatchToken}
@@ -131,16 +131,7 @@ to the token, $t$, and, if so, dispatches the token.}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
-
-This Algorithm is the central deciding point for how a
-token should be dispatched. By finding out that a token is connected
-to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
-and thus dispatch it immediately being proactive.  On the other hand,
-if the token is not connected to a goal then we defer dispatching it
-until necessary.  This demonstrates our distinction between how we
-dispatch tokens, proactive or deferred.
-
-\begin{algorithm}
+\begin{algorithm} [H]
 \caption{The function $SearchForGoal$ does a Forward search looking for a token that is
 in the set $\Phi_{ge}$.}
 \label{SearchForGoal}
@@ -160,6 +151,14 @@ in the set $\Phi_{ge}$.}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
+This Algorithm is the central deciding point for how a
+token should be dispatched. By finding out that a token is connected
+to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
+and thus dispatch it immediately being proactive.  On the other hand,
+if the token is not connected to a goal then we defer dispatching it
+until necessary.  This demonstrates our distinction between how we
+dispatch tokens, proactive or deferred.
 
 A crucial part for deciding how to dispatch a token is finding whether
 the token in question is connected to a goal in $\Phi_{ge}$, call it
@@ -210,7 +209,7 @@ if the token is in it. The actually searching for the goals and
 causally connected tokens happens in algorithms \ref{NotifyActivated},
 \ref{NotifyMerged}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Saves goals as they are added to plan}
 \label{NotifyAdded}
 \begin{algorithmic}
@@ -222,7 +221,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm} [H]
 \caption{Removes the token after it is removed from the plan}
 \label{NotifyRemoved}
 \begin{algorithmic}
@@ -232,7 +231,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Searches for tokens connected to goals}
 \label{NotifyActivated}
 \begin{algorithmic}
@@ -244,7 +243,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Deactivates token in plan}
 \label{NotifyDeactivated}
 \begin{algorithmic}
@@ -256,7 +255,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Searches plan when tokens are merged}
 \label{NotifyMerged}
 \begin{algorithmic}
@@ -270,7 +269,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Removes token when split}
 \label{NotifySplit}
 \begin{algorithmic}
