@@ -74,15 +74,15 @@ to treat potential future emerging goals. In the light of it the agent
 should at the best of its knowledge  try to balance the impact of the
 next available action as early as possible or prefer to delay it in
 the eventuality new goal occur. In our example, it was making sense to
-go to the Grocery early, but on the other hand going back home to soon
-would result on the current plan locking the agent -- within its current
-plan -- at home until 8 pm. The solution providing the most freedom for
-the agent was therefore for him to alternate between the two policies
+go to Vent2 early, but on the other hand going back to the surface to soon
+would result on the current plan locking the AUV -- within its current
+plan -- at Surface until 8 pm. The solution providing the most freedom for
+the AUV was therefore for it to alternate between the two policies
 depending on the action impact. 
 
-In order to help the agent have a better knowledge on the nature of
+In order to help the AUV have a better knowledge on the nature of
 the goals we do consider that each goal provide information on its
-priority. In that putspose we define that $\Phi_g$ is partitioned into
+priority. In that purpose, we define that $\Phi_g$ is partitioned into
 2 sets:
 \begin{itemize}
 \item the internal goals $\Phi_{gi}$ which represent goals the agent
@@ -98,7 +98,7 @@ priority. In that putspose we define that $\Phi_g$ is partitioned into
 
 At any point we need to evaluate an action within our plan $\pi$ we
 consider that this plan is up to date and provide a solution of all 
-the goals of both $\Phi_{gi}$ and $\Phi_{ge}$ that can reasonably  be
+the goals of both $\Phi_{gi}$ and $\Phi_{ge}$ that can reasonably be
 done within the current mission scope.
 
 
@@ -181,10 +181,10 @@ external request. The token still needs to be dispatched, however,
 there is no one explicitly requesting it to be accomplished. Thus, no
 reason to be proactive.
 
-This a;gorithm is equivalent to a breadth first search along the
-planning strtcure starting from the action we need to
-evaluate. Therefore its complexity is $O(N+E)$ where $N$ is the
-numnber of tokens within the plan and $E$ the causal links that relate
+This algorithm is equivalent to a breadth first search along the
+planning structure starting from the action we need to
+evaluate. Therefore, its complexity is $O(N+E)$ where $N$ is the
+number of tokens within the plan and $E$ the causal links that relate
 these tokens. 
 
 \subsection{Dynamic solution during planning}
@@ -310,14 +310,14 @@ see if it should be dispatched early or be deferred to later.
 This approach is potentially more costfull than the previous algorithm 
 as it needs to do local updates whenever the plan is altered by the search
 including retracting past updates if a backtrack occur during the
-search. Still it is compelling in the factthat this cost occurs during
+search. Still it is compelling in the fact that this cost occurs during
 planning reducing the decision problem during execution to simply
-check how the given action has been marked during planning. It has
+check if the given action has been marked during planning. It has
 been the solution we have preferred within our system for this reason
 as it is functionally equivalent to previous algorithm while reducing
 extra computation cost as the plan is executed. Planning phases occur
 within the plan only when either the initial plan failed to execute or
-the set of goals has been altered. Therefore it is safe to assume that
+the set of goals has been altered. Therefore, it is safe to assume that
 planning should occur more sporadically than execution decisions 
 which then give an edge to this latter algorithmic solution. 
 

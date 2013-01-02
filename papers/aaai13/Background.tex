@@ -52,30 +52,30 @@ possible (ref ?).
 % \fcomment{Therefore, one reoccurring problem of dispatchability is finding a way
 % of balancing efficiency, proactive, with flexibility,deferred.}
 \fcomment{We need to update this to reflect that it is not ETS}
-There have been many uses of these two approaches when dispatching plans, as
-previously shown, but a compromise to one is most often used rather than
-a balance. Demonstrated in the tool MAPGEN \cite{bresina03} which used
-the Earliest Time Solution (ETS) for generating and displaying plans
-very quickly. Then allowing the users to manipulate the plan afterwards,
-getting around the problem of ETS generating undesirable plans. What is
-needed is a way of using both proactive and deferred together giving a
-balanced approach to dispatching.
+%There have been many uses of these two approaches when dispatching plans, as
+%previously shown, but a compromise to one is most often used rather than
+%a balance. Demonstrated in the tool MAPGEN \cite{bresina03} which used
+%the Earliest Time Solution (ETS) for generating and displaying plans
+%very quickly. Then allowing the users to manipulate the plan afterwards,
+%getting around the problem of ETS generating undesirable plans. What is
+%needed is a way of using both proactive and deferred together giving a
+%balanced approach to dispatching.
 
 While in the general case it can be acceptable it
 may become problematic when put in he context of potential new
-objectives emerging during the mission.  Take our shopping example,
+objectives emerging during the mission.  Take our AUV example,
 and apply the proactive approach globally -- assuming that all actions
 can be completed on their minimum time.  As shown in 
 Fig. \ref{fig:ex:proactive}, the proactive approach allows the
-agent to get its apple safely before noon but as we go along with the
-remaining part of the plan it results in the agent getting back home
-by 9:05 and being stuck in the context of the current plan for the
-next 10 hours and 55 minutes. Should he receive a call from his wife
-to buy extra things he will then be forced to re-plan accordingly and
-get back and forth between his home and the stores all other
-again. By being blindly proactive the agent made its overall strategy
-less efficient than if he took the option to procrastinate at the mall
-until he needs to get back home. 
+AUV to {\em Sample Vent2} before noon but as continue through
+the plan it results in the AUV getting back to the {\em Surface}
+by 12:21 and being stuck in the context of the current plan for the
+next 7 hours and 39 minutes. Should the scientist want to {\em Sample Vent1}
+the AUV will then be forced to re-plan accordingly and
+go back and forth between the surface and the locations all other
+again. By being blindly proactive, the AUV made its overall strategy
+less efficient than if it took the option to procrastinate at {\em Vent2}
+until it needs to get back to the surface. 
 
 
 \begin{figure}
@@ -123,7 +123,7 @@ core of our problem is not that much the observation of events during
 execution (which is more a observation related impact) but instead we
 are more focused on the knowledge that, within our agent, new
 objectives can emerge at any time, and we want to avoid as much as
-possible doing actions which are not ``urgent''. similarly while we do
+possible doing actions which are not ``urgent''. Similarly, while we do
 not really deal with complex preferences specification that can help
 improve the planned solution our purpose is to defer the decision to
 start to execute actions within the plan to the executive allowing to
@@ -220,5 +220,3 @@ goals need to be integrated in the plan.
 %%% mode: latex
 %%% TeX-master: "aaai13"
 %%% End: 
-
-papr
