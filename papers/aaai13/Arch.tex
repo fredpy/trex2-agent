@@ -44,7 +44,7 @@ computed by the agent planner. However, in order to reflect the
 dynamic interaction of the agent with its environment we need to
 refine the definition of the sets $\Phi_0$ and $\Phi_g$. 
 
-Indeed as the world evolve new observations (or refinement of
+Indeed as the world evolves new observations (or refinement of
 existing ones) are added into $\Phi_0$. Similarly, the agent operator
 can request new future goals to be added to the agent $\Phi_g$ as
 mission time advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value 
@@ -59,7 +59,7 @@ of these sets at the time-point $t$. For the sake of simplicity we
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
 %\fcomment{I will need to refine this and make it more convincing}
-The dynamically growing nature of $\Phi_0$ reflects the cumul of
+The dynamically growing nature of $\Phi_0$ reflects the cumulative
 observation as the agent execute its plan $\pi$. In nominal 
 situation new elements of $\Phi_0$ are refinements the plan 
 -- for example by asserting that a planned command just
@@ -74,7 +74,7 @@ to treat potential future emerging goals. In the light of it the agent
 should at the best of its knowledge  try to balance the impact of the
 next available action as early as possible or prefer to delay it in
 the eventuality new goal occur. In our example, it was making sense to
-go to Vent2 early, but on the other hand going back to the surface to soon
+go to Vent2 early, but on the other hand going back to the surface too soon
 would result on the current plan locking the AUV -- within its current
 plan -- at Surface until 8 pm. The solution providing the most freedom for
 the AUV was therefore for it to alternate between the two policies
@@ -165,7 +165,7 @@ A crucial part for deciding how to dispatch a token is finding whether
 the token in question is connected to a goal in $\Phi_{ge}$, call it
 $G$. Algorithm \ref{SearchForGoal} does the function of searching for
 $G$ in a forward-search manner. We define a causal link within our
-plan that must be meet in order for our search to function.
+plan that must be met in order for our search to function.
 \begin{definition}
 \label{def:subgoalLink}
 A causal link is defined as linking a goal as an effect of an action
@@ -178,13 +178,13 @@ is part of the solution for completing $G$.  As such, we want to be
 proactive with completing the token early so as to ultimately complete
 $G$. If we don't find $G$ then the token has no connection to an
 external request. The token still needs to be dispatched, however,
-there is no one explicitly requesting it to be accomplished. Thus, no
-reason to be proactive.
+there is no one explicitly requesting it to be accomplished. Thus,
+there is no reason to be proactive.
 
 This algorithm is equivalent to a breadth first search along the
 planning structure starting from the action we need to
 evaluate. Therefore, its complexity is $O(N+E)$ where $N$ is the
-number of tokens within the plan and $E$ the causal links that relate
+number of tokens within the plan and $E$ the number ofcausal links that relate
 these tokens. 
 
 \subsection{Dynamic solution during planning}
@@ -296,7 +296,7 @@ Taking full advantage of the planning search, we
 use a backwards search from the goal following the reverse causal link
 to the connected tokens.  We fully search from the goals because we
 know that all the tokens connected through the causal link are
-sub-goal.  On the contrary, fully searching each token could be
+sub-goals. By contrast, fully searching each token could be
 wasteful because there is no certainty that it will be linked to a
 goal and, therefore, could bring little value to our search. However,
 some tokens may get added to the plan or linked to a goal after we
@@ -307,7 +307,7 @@ from the token since it has now proven to be valuable. After the plan
 has been searched, it is as easy as searching a list for a token to
 see if it should be dispatched early or be deferred to later.
 
-This approach is potentially more costfull than the previous algorithm 
+This approach is potentially more costly than the previous algorithm 
 as it needs to do local updates whenever the plan is altered by the search
 including retracting past updates if a backtrack occur during the
 search. Still it is compelling in the fact that this cost occurs during

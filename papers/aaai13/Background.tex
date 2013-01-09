@@ -12,7 +12,7 @@
 %   actions based on its purpose}
 
 Dealing with plan execution is not a new problem and we can find a lot
-of work that relates to this during the last decades. Still, it is
+of work that relates to this over several decades. Still, it is
 pretty rare to see work that envisage that actions could be
 postponed except when this is necessary to not break the current
 plan. 
@@ -25,8 +25,8 @@ within the plan in order to allow the executive to decide quickly
 whether an action should be started or not while ensuring the plan
 consistency. In order to accomplish such a task, the STN supporting
 the plan to be dispatched is transformed into a All-Pairs network and
-stripped of unnecessary edges, resulting often on a more compact
-temporal network and lessen the propagation cost of its updates. The
+stripped of unnecessary edges, often resulting in a more compact
+temporal network that lessens the propagation cost of updates. The
 role of the executive is to select time-points within the current
 execution bounds and propagate its value within the simplified
 network. Still, while this work contribute to ensure that execution
@@ -45,9 +45,9 @@ environment. One solution offered for dispatching events efficiently
 is the proactive approach. This approach greatly reduces the plan
 flexibility, and therefore robustness, as all start time-points are
 grounded to a specific value which is compatible with the initial
-constraints. In order to avoid having a procrastinating system the
-overall agreement in term of policy is to start an action as early as
-possible (ref ?). 
+constraints. % In order to avoid having a procrastinating system the
+% overall agreement in term of policy is to start an action as early as
+% possible (ref ?). 
 
 % \fcomment{Therefore, one reoccurring problem of dispatchability is finding a way
 % of balancing efficiency, proactive, with flexibility,deferred.}
@@ -61,10 +61,10 @@ possible (ref ?).
 %needed is a way of using both proactive and deferred together giving a
 %balanced approach to dispatching.
 
-While in the general case it can be acceptable it
+While in the common case this might be acceptable it
 may become problematic when put in he context of potential new
 objectives emerging during the mission.  Take our AUV example,
-and apply the proactive approach globally -- assuming that all actions
+and apply the proactive approach globally --- assuming that all actions
 can be completed on their minimum time.  As shown in 
 Fig. \ref{fig:ex:proactive}, the proactive approach allows the
 AUV to {\em Sample Vent2} before noon but as continue through
@@ -102,7 +102,7 @@ example the duration of a navigation task which depends on external
 factors -- it is necessary to defer some actions in order to ensure
 the plan execution. 
 
-An alternative approach is related to wrok with soft constraints
+An alternative approach is related to work with soft constraints
 within the temporal domain indicating preferences on actions timing
 such as in \cite{khatib2001temporal}. This should provide  a general
 solution for users to specify whether actions of the plan should be
@@ -111,26 +111,40 @@ soft constraints though is their poor performances \cite{bartak2002}
 as the general problem is NP-hard. Even though it can be reduced to a
 more tractable (polynomial) solution by specifying preferences as
 convex functions \cite{rossi2006learning}, the  
-complexity is still at on the cubic in relation to the number of
+complexity is still cubic in relation to the number of
 variables. Moreover the solutions proposed do optimize the plan {\em
-  a-priori} reducing then the plan flexibility which in turn make it
-in  turn more prone to fail during execution.
+  a-priori} reducing then the plan flexibility which in turn makes it
+more prone to failure during execution.
 
-Our work on the other hand is more complementary to previous work, indeed
-while we do not really deal with dynamic controllability in our
-problem -- which can anyway be treated as in this previous work -- the
-core of our problem is not that much the observation of events during
-execution (which is more a observation related impact) but instead we
-are more focused on the knowledge that, within our agent, new
-objectives can emerge at any time, and we want to avoid as much as
-possible doing actions which are not ``urgent''. Similarly, while we do
-not really deal with complex preferences specification that can help
-improve the planned solution our purpose is to defer the decision to
-start to execute actions within the plan to the executive allowing to
-quickly adapt the plan without heavily relying on plan-repair or
-re-planning solutions that could badly impact the system reactiveness.
-By doing so, we take the risk of doing unnecessary actions as new
-goals need to be integrated in the plan.
+Our work is complementary to much of the previous work.  While we do
+not explicitly deal with dynamic controllability, our approach is not
+inconsistent with that work.  In any case, our focus is not on the
+observation of events during execution but rather on the possibility
+of new objectives arising at any time, and we want to avoid doing
+actions that are not ``urgent'' in order to preserve the context for
+those objectives.  Similarly, we have not implemented temporal
+preference specification during planning, which has the effect of
+limiting execution-time flexibility.  Our intent is to defer temporal
+decisions to the executive allowing it to adapt the plan to new
+objectives without heavily relying on plan-repair or re-planning
+solutions that could badly impact system reactiveness.
+
+
+% Our work on the other hand is more complementary to previous work, indeed
+% while we do not really deal with dynamic controllability in our
+% problem -- which can anyway be treated as in this previous work -- the
+% core of our problem is not that much the observation of events during
+% execution (which is more a observation related impact) but instead we
+% are more focused on the knowledge that, within our agent, new
+% objectives can emerge at any time, and we want to avoid as much as
+% possible doing actions which are not ``urgent''. Similarly, while we do
+% not really deal with complex preferences specification that can help
+% improve the planned solution our purpose is to defer the decision to
+% start to execute actions within the plan to the executive allowing to
+% quickly adapt the plan without heavily relying on plan-repair or
+% re-planning solutions that could badly impact the system reactiveness.
+% By doing so, we take the risk of doing unnecessary actions as new
+% goals need to be integrated in the plan.
 
 % s
 % considered to be deferred is related to the approach proposed in 
