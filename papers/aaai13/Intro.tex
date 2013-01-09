@@ -12,7 +12,7 @@ where such objectives are known and do not perturb the planning and
 execution process.
 
 In this paper, we argue that the impact of asynchronous arrival of
-goals and their consequent impact on execution is important especially
+goals and their consequent impact on execution is important 
 in dynamic and unpredictable environments especially during robotic
 exploration. Our robotic domain deals with benthic as well as upper
 water-column exploration using autonomous underwater vehicles (AUVs),
@@ -69,60 +69,58 @@ durative actions and resources \cite{lemai04}, the focus of our work
 here.
 
 In particular, our focus is on constraint-based temporal planning
-\cite{frank2003} with a demonstrated capability for real-world
+\cite{frank2003,lemai04} with a demonstrated capability for real-world
 planning and execution.
 % Most of these modern systems are using at the high-level 
 % constraint-based planner with rich representation of resources 
 % and time such as the ones presented in \cite{frank2003,lemai04}. 
-They often implement least-commitment planning generating a solution
-that does not commit to specific values (\eg action start and end
+Most of these approaches often implement  least-commitment 
+planning and generate a solution that does not commit to specific 
+values (\eg action start and end
 times) unless explicitly required by the model. Such flexibility puts
-the burden on the plan executive to decide at which time a specific
-action within all possible values, can be dispatched. 
+the burden on the plan executive to decide at which time within all
+possible values, a specific action can be  dispatched. 
 % Resolving this problem resulted on a large amount of research both
 % considering how to represent the plan to be dispatched to the
 % executive with a compact yet complete representation, along with more
 % refinements on how to deal with uncontrollable constraints. Still,
-The challenge of deciding whether the next possible set of action(s)
+The challenge is deciding whether the next possible set of action(s)
 should be started immediately or if it should be postponed for a later
 start date.
 
-Procrastination is avoided by starting actions as early as possible
-while ensuring that it does not impact plan brittleness. This choice
-is lead by the intuition that by starting actions early it gives more
+Starting actions as early as possible avoids procrastination and tends
+to reduce plan brittleness. This choice
+is motivated by the intuition that starting actions early provides more
 room in the future to deal with worst case execution scenarios. While
-this solution works in the general case where all the goals of the
-agent are known a priori, it is challenging when the agent can have
-new objectives added during the course of mission execution and leads
-to the typical dichotomy of dealing with \emph{when} to start an
-activity. Dispatching actions too early can lead can lead the agent to
-premature commitment towards a course of action dictated by the plan
-which can change in a dynamic context; waiting inordinately on the
-other hand, could either lead to doing nothing in the interim or
-missing the ability to deal with opportunistic events.
+this solution works in the classical case where all the goals of the
+agent are known a priori, it can be problematical when new objectives
+are added during the course of mission execution. For example, the
+agent may prematurely leave an area before new objective for this area
+are formulated. On the other hand, waiting inordinately could wast
+time and leave less flexibility for coping with diverse execution
+scenarios. 
 % the agent in a
 % situation where the new goal received is not integrated as efficiently
 % as it would have been should the agent have waited before taking
 % action.
-In this context, it is important for the agent make a distinction
+In this context, it is important for the agent to make a distinction
 between actions that can be taken proactively versus other actions
 that may not be urgent.  
 
 In this work, we propose a systematic approach to allow the agent to
-make such distinction for each action by tracing the causal relations
-with goals within the current plan.  This allow us to determine the
+make such a distinction for each action by tracing the causal relations
+between goals within the current plan.  This allow us to determine the
 best dispatch strategy based on the nature of the goals this action
 contributes to.
 
 % \fcomment{Plan for the paper here}
 The structure of this paper is as follow. We introduce an example
-illustrating the problem of a flexible plan execution. We then discuss
-previous works and how they do tend to focus on a single policy or not
-consider the possibile emergence of new goal during the mission. We
+illustrating the problem of flexible plan execution. We then discuss
+previous works and how they tend to focus on a single policy or not
+consider the possibile emergence of new goals during the mission. We
 then present algorithmic solutions that allow to decide at execution
-when actions should be started. Finally after presenting the results
-we obtain on our implementation we conclude and present further
-research that need to be addressed.
+when actions should be started. Finally, after presenting the results,
+we conclude and discuss potential directions for future research.
 
 
 
@@ -175,13 +173,16 @@ research that need to be addressed.
 % task of choosing a token and sending it to its appropriate subsystem,
 % to be executed, as dispatching.
 
-\paragraph{An Illustrative Example} We define a simple autonomous underwater vehicle (AUV) mission
-that will be used to illustrate the validity of our approach compared to previous ones and the major issues that
-arise when dispatching. First, the AUV can be at a location or be
-traveling to one. Second, the AUV has a few basic actions that allow it to function within the environment. 
-It can go to a location, survey a location, and sample a location. In a typical AUV mission,
-the scientist will want it to survey and sample a location and, if needed, be redirect on the fly to a new
-location for surveying and surveying. 
+\paragraph{An Illustrative Example} We define a simple autonomous
+underwater vehicle (AUV) mission that will be used to illustrate the
+benefits of our approach compared to previous ones and the major
+issues that arise when dispatching. First, the AUV can be at a
+location or be traveling to one. Second, the AUV has a few basic
+actions that allow it to function within the environment.  It can go
+to a location, survey a location, and sample a location. In a typical
+AUV mission, the scientist will want it to survey and sample a
+location and, if needed, be redirected on the fly to a new location for
+surveying and surveying.
 
 \begin{figure}
   \centering
@@ -201,36 +202,41 @@ location for surveying and surveying.
 \end{figure}
 
 However, an issue with finding a balanced approach is deciding whether
-it starts to starts its action as early as possible -- which we will
-call proactive \fcomment{Need to replace least-commitment by
-  ``proactive''}
--- or wait until the action should necessary start --
-called later deferred\fcomment{similarly rename EST as ``deferred''}. 
-There is a clear difference between the two approaches
- but when should, for example, the AUV wait
-or start early? Lets demonstrate an ideal scenario where the AUV
-balances both approaches. The initial problem is illustrated in Figure \ref{fig:Example}. 
+to start an action as early as possible --- which we will call {\em
+proactive} --- or wait until the action should necessary start ---
+called later {\em deferred}.  There is a clear difference between the
+two approaches but when should, for example, the AUV wait or start
+early? We demonstrate a scenario where the AUV ideally uses the two
+approaches at different times. The initial problem is illustrated in Figure
+\ref{fig:Example}.
 
-The AUV mission starting at 8 AM needs to {\em sample vent2}
-and return to the {\em ship} by 8 PM. The AUV starts traveling immediately
-to {\em vent1}. Considering that that it takes one to two hours
-to go from the {\em Surface} to {\em vent1},  roughly ten minutes
-to go from {\em vent1} to {\em vent2}, and more than two hours in order
-to {\em survey} and {\em sample}, a general plan solution is presented in Figure
-\ref{fig:ex:plan}. The plan presented here is partially instantiated
-giving the AUV the freedom to decide {\em when} to start each action within
-the valid boundary of the solution. For example, the AUV should go
-early in order to {\em sample vent2} so that the scientist have the a possibility for requesting 
-more tasks. Conversely, heading back to the surface early would waste valuable
-time, roughly two hours, if the scientist decide they want to {\em survey} another location. Though by 6pm, it should
-go to the surface so the scientist can pick it up by 8pm. In this scenario,
-we see that the AUV alternated between deciding to execute actions
-early or defer them depending on the the nature of the action it
-need to take next, or more accurately the nature of the objectives 
-related to this action. The AUV was proactive on traveling to {\em sample vent2} because the
-scientist want it to be completed. On the other hand, the AUV has to return to the surface by
-8 PM, however, the scientist don't explicitly want this done. Thus, allowing it to procrastinate. 
-By doing so, the AUV is available to complete new tasks given to it by the scientist. 
+The AUV mission starting at 8 AM needs to {\em sample vent2} and
+return to the {\em ship} by 8 PM. The AUV starts traveling immediately
+to {\em vent1}. Considering that that it takes one to two hours to go
+from the {\em Surface} to {\em vent1}, roughly ten minutes to go from
+{\em vent1} to {\em vent2}, and more than two hours in order to {\em
+survey} and {\em sample}, a general plan solution is presented in
+Figure \ref{fig:ex:plan}. The plan presented here is partially
+instantiated giving the AUV the freedom to decide {\em when} to start
+each action within the valid boundary of the solution. For example,
+the AUV should go early in order to {\em sample vent2} so that the
+scientists have the a possibility for requesting more
+tasks. Conversely, heading back to the surface early would waste
+valuable time, roughly two hours, if the scientists decide they want to
+{\em survey} another location. Though by 6pm, it should go to the
+surface so the scientists can pick it up by 8pm. In this scenario, we
+see that the AUV alternated between deciding to execute actions early
+or {\em defer} them depending on the nature of the action it needed to
+take next, or more accurately the nature of the objectives related to
+this action. The AUV was {\em proactive} on traveling to {\em sample vent2}
+because the scientists want it to be completed. On the other hand, the
+AUV has to return to the surface by 8 PM, however, the scientists don't
+explicitly want this done, allowing it to procrastinate.  By
+doing so, the AUV is available to complete new tasks given to it by
+the scientist.\fcomment{One concept that would help if introduced is
+  around the same notion of task span in plan optimization : we have
+  the same problem here but we use a more refined execution policy in
+  order to avoid extraneous actions should a goal come back to us.}
 
 % \fcomment{Need a figure that shows the plan somehow ... this can be
 %   refined as we go along for illustrating proactive vs deferred}
@@ -247,9 +253,9 @@ While this example may appear academic at first, it reflects situations
 we have seen within embedded agent execution in our domain. Indeed, we
 do daily operations wehere our AUV is deployed and scientists can
 remotely send new objectives as the mission goes along to the vehicle
-as they see new area of interrest. Especially in the upper water
-column the nature of the are to solve highly depends on the dynamic of
-the ocean itself and are difficult to predict beforehand. Therefore,
+as they see new areas of interest. Especially in the upper water
+column the nature of the area to be examined depends highly on the
+dynamic of the ocean itself and is difficult to predict beforehand. Therefore,
 scientist can use data sampled by the AUV or other sources (eg
 satellite data, ship based observations, \dots{}) during the beginning of
 the operation in order to give it better informed objectives for the
@@ -259,12 +265,12 @@ recovery will be easier for operators. This gives a similar
 distinction between the science objectives and operation
 objectives. Similarly to our example we do not really want the
 AUV to get back to recovery area too early as a new science goal could
-be sent to him which in turns would rather be fulfilled as early as
+be sent to it which in turn would rather be fulfilled as early as
 possible.
 
 This paper discusses the problem of dispatching when trying to execute
 a plan. In particular, dispatching in a dynamic environment where the
-plan is known to change either by uncontrollable events or external
+plan is expected to change due either to unanticipated events or external
 requests with new directives. External requests  can occur
 at any time which make them in essence uncontrollable events.
 Specifically, we focus on how these new requests, coming from the
@@ -272,15 +278,15 @@ external world, alter the way we need to dispatch the plan, rather than
 how they will be integrated into the plan or any part of the planning
 process. The reason for our separation from planning is that
 oftentimes planning and executing are split up into two different
-jobs. Often times a robotic agent is give an already created plan, and it
+jobs. Often times a robotic agent is given an already created plan, and it
 must then choose when to execute parts of the plan. Therefore, our focus is on
 developing a method for dispatch a plan, after it has already been created, while
-understanding that new requests may come in the near future.
+understanding that new requests may come in the future.
 
 The approach we have taken on dispatching looks at the token level of a plan,
 specifically at tokens generated from external requests which we define as goals.
 Because they have been requested by an external person with the intent of being 
-completed fast, they have a high priority. In contrast, there are tokens that only describe the
+completed promptly, they have a high priority. In contrast, there are tokens that only describe the
 evolution of a timeline, which we define as non-goals. In order to keep the plan 
 valid, the agent is obligated to complete the non-goals, but there is no rush. Thus, the
 non-goals have a low priority. Therefore, we want to complete the goals
@@ -288,7 +294,7 @@ as early as possible in order to give adequate time for the possibility of new
 goals, and complete the non-goals as they become necessary for the validity of the plan. 
 Some may argue that finishing the goals early doesn't guarantee that
 there will be enough time for new goals, however, that is an issue with planning, 
-and our concern is whether dispatching cased the waste of time.
+and our concern is whether dispatching caused the waste of time.
 
 
 %%% Local Variables: 
