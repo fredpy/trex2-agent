@@ -3,6 +3,7 @@
 To consider the overall planning and plan execution within an agent we
 use the definition of a temporal domain, planning problem and solution
 as provided by \cite{Nau:2004}:
+
 \begin{definition}
   \label{def:domain}
   A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
@@ -47,14 +48,14 @@ refine the definition of the sets $\Phi_0$ and $\Phi_g$.
 Indeed as the world evolves new observations (or refinement of
 existing ones) are added into $\Phi_0$. Similarly, the agent operator
 can request new future goals to be added to the agent $\Phi_g$ as
-mission time advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value 
-of these sets at the time-point $t$. For the sake of simplicity we
- consider that the alteration of these sets is purely additive with
- time\fcomment{ In practice, their evolution is more complex as
-   completed goals becomes observation or even a goal previously 
-   requested can be cancelled by the operator. Still this assumption 
-   largely simplify the problem description and our algorithm still
-   works without it (even though it kind fo assume it)}:
+mission time advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value of
+these sets at the time-point $t$. For the sake of simplicity we
+consider that the alteration of these sets is purely additive with
+time\fcomment{ In practice, their evolution is more complex as
+  completed goals becomes observation or even a goal previously
+  requested can be cancelled by the operator. Still this assumption
+  largely simplify the problem description and our algorithm still
+  works without it (even though it kind fo assume it)}:
 \[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
@@ -115,8 +116,9 @@ they lead to an internal goal as implemented in Algorithm \ref{DispatchToken}
 
 
 \begin{algorithm} [H]
-\caption{The function $DispatchToken$ finds if there is a goal in $\Phi_{ge}$ that is connected
-to the token, $t$, and, if so, dispatches the token.}
+  \caption{\small The function $DispatchToken$ finds if there is a
+    goal in $\Phi_{ge}$ that is connected to the token, $t$, and, if
+    so, dispatches the token.}
 \label{DispatchToken}
 \begin{algorithmic}
 \Function{DispatchToken}{Token $T$}
@@ -133,8 +135,8 @@ to the token, $t$, and, if so, dispatches the token.}
 \end{algorithm}
 
 \begin{algorithm} [H]
-\caption{The function $SearchForGoal$ does a Forward search looking for a token that is
-in the set $\Phi_{ge}$.}
+  \caption{\small The function $SearchForGoal$ does a Forward search
+    looking for a token that is in the set $\Phi_{ge}$.}
 \label{SearchForGoal}
 \begin{algorithmic}
 \Function{SearchForGoal}{ Token $T$ }
@@ -211,7 +213,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \ref{NotifyMerged}.
 
 \begin{algorithm}[H]
-\caption{Saves goals as they are added to plan}
+\caption{\small Saves goals as they are added to plan}
 \label{NotifyAdded}
 \begin{algorithmic}
 \Function{NotifyAdded}{ Token $T$ }
@@ -223,7 +225,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithm}
 
 \begin{algorithm} [H]
-\caption{Removes the token after it is removed from the plan}
+\caption{\small Removes the token after it is removed from the plan}
 \label{NotifyRemoved}
 \begin{algorithmic}
 \Function{NotifyRemoved}{ Token $T$ }
@@ -233,7 +235,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{Searches for tokens connected to goals}
+\caption{\small Searches for tokens connected to goals}
 \label{NotifyActivated}
 \begin{algorithmic}
 \Function{NotifyActivated}{ Token $T$ }
@@ -245,7 +247,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{Deactivates token in plan}
+\caption{\small Deactivates token in plan}
 \label{NotifyDeactivated}
 \begin{algorithmic}
 \Function{NotifyDeactivated}{ Token $T$ }
@@ -257,7 +259,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{Searches plan when tokens are merged}
+\caption{\small Searches plan when tokens are merged}
 \label{NotifyMerged}
 \begin{algorithmic}
 \Function{NotifyMerged}{ Token $T$ }
@@ -271,7 +273,7 @@ causally connected tokens happens in algorithms \ref{NotifyActivated},
 \end{algorithm}
 
 \begin{algorithm}[H]
-\caption{Removes token when split}
+\caption{\small Removes token when split}
 \label{NotifySplit}
 \begin{algorithmic}
 \Function{NotifySplit}{ Token $T$ }
