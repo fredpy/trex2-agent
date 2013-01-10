@@ -1,60 +1,59 @@
-
 \section{Introduction}
 \label{sec:intro}
 
 As their mission scope becomes longer, autonomous robots are more
 prone to receive new objectives during the course of their
-mission. Situated planning is a common mean within robotics 
-architectures to reeavaluate the mission startegy to
-better fullfill the current agent objectives and readapt it when
-unanticipated situations occur or fresh new objectives are
-communicated to the robot. Based on this belief, earlier work done in
-\texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE} \cite{Haigh98},
-and the LAAS architecture \cite{alami:1998p820} have all helped to
-make situated planning possible. These initial sucesses lead to modern
-goal directed architectures that have sucessfully worked in the
-real-world such as the Remote Agent Experiment \cite{mus98}, the
-Autonomous Spacecraft Experiment \cite{chien99} or more recently the
-Teleo Reactive Executive \cite{mcgann08b,py10}. Nowadays, these
-architectures support planning engines that have a rich representation
-of both durative actions and resources while keeping a plan that is
-flexible enough to be robustly executed \cite{lemai04}.
+mission. Situated planning is a common mean within robotics
+architectures to reeavaluate the mission startegy to better fulfill
+the current agent objectives and readapt it when unanticipated
+situations occur or fresh new objectives are communicated to the
+robot. Based on this belief, earlier work done in \texttt{IPEM}
+\cite{AmbrosIngerson88}, \texttt{ROGUE} \cite{Haigh98}, and the LAAS
+architecture \cite{alami:1998p820} have all helped to make situated
+planning possible. These initial sucesses lead to modern goal directed
+architectures that have sucessfully worked in the real-world such as
+the Remote Agent Experiment \cite{mus98}, the Autonomous Spacecraft
+Experiment \cite{chien99} or more recently the Teleo Reactive
+Executive \cite{mcgann08b,py10}. Nowadays, these architectures support
+planning engines that have a rich representation of both durative
+actions and resources while keeping a plan that is flexible enough to
+be robustly executed \cite{lemai04}.
 
 The planning community dis also provide a lot of work on efficients
 approaches to dispatch the plan to the executive in order to ensure
 that its execution is made robustly and soundly
-\cite{mus98a,morris01}. While these approaches  are necessary to
-properly execute a flexible temporal plan, they do not really
-consider the fact that new goals can be introduced later. This
-oversight is understandable as these goals are by nature unknown and
-therefore impossible to integrate within the plan limiting the ability
-to formally take them into account. Instead the natural choice was to
-make the executive execute its action as early as the plan and
-current context allow with the assumption that, by doing so, the
-robot will finish its plan as early as possible giving then more room
-for potential future objectives.  While
-this solution works in the classical case where all the goals of the
-agent are known a priori, it can be problematical when new objectives
-are added during the course of mission execution. For example, the
-agent may prematurely leave an area before new objective for this area
-are formulated resulting on superfluous actions from the robot. On the 
-other hand, waiting inordinately could wast time and leave less
-flexibility  for coping with diverse execution scenarios. In this
-context,  it is important for the agent to make a  distinction between 
-actions that can be taken proactively versus other actions that may
-not  be urgent.  
+\cite{mus98a,morris01}. While these approaches are necessary to
+properly execute a flexible temporal plan, they do not really consider
+the fact that new goals can be introduced later. This oversight is
+understandable as these goals are by nature unknown and therefore
+impossible to integrate within the plan limiting the ability to
+formally take them into account. Instead the natural choice was to
+make the executive execute its action as early as the plan and current
+context allow with the assumption that, by doing so, the robot will
+finish its plan as early as possible giving then more room for
+potential future objectives.  While this solution works in the
+classical case where all the goals of the agent are known a priori, it
+can be problematical when new objectives are added during the course
+of mission execution. For example, the agent may prematurely leave an
+area before new objective for this area are formulated resulting on
+superfluous actions from the robot. On the other hand, waiting
+inordinately could wast time and leave less flexibility for coping
+with diverse execution scenarios. In this context, it is important for
+the agent to make a distinction between actions that can be taken
+proactively versus other actions that may not be urgent.
 
 In this work, we propose a systematic approach to allow the agent to
-make such a distinction for each action by tracing the causal relations
-between goals within the current plan. This allow us to determine the
-best dispatch strategy based on the nature of the goals this action
-contributes to. While our approach manipulate the plan structure, it
-is worth mentionning that it is focused on the plan execution within 
-the agent than the process of producing such a plan. This alow us to
-consider planning at an bastract level and provide an approach that
-can be  applied to the execution of a large class of planners.
+make such a distinction for each action by tracing the causal
+relations between goals within the current plan. This allow us to
+determine the best dispatch strategy based on the nature of the goals
+this action contributes to. While our approach manipulate the plan
+structure, it is worth mentioning that it is focused on the plan
+execution within the agent than the process of producing such a
+plan. This allow us to consider planning at an bastract level and
+provide an approach that can be applied to the execution of a large
+class of planners.
 
-The structure of this paper is as follow. We introduce an example 
+The structure of this paper is as follow. We introduce an example
 illustrating the problem of flexible plan execution. We then discuss
 previous works and how they tend to focus on a single policy or not
 consider the possibile emergence of new goals during the mission. We

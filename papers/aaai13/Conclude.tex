@@ -1,4 +1,4 @@
-\section{Conclusion \& future directions}
+\section{Discussions \& future work}
 \label{sec:conclude}
 %{\em\color{gray} Need pargarph that resume what was presented}
 
@@ -20,33 +20,34 @@ quickly.
   direction} As we stated in the related works our approach does not
 really address dynamic controllability and has the more classic
 assumption present in many planning frameworks that time-points are
-controllable. A side effect of this is that in its current state it may
-result on the system to decide to defer action as late as possible. In
-our example, this would result on the AUV leaving Vent1 as late
-as 19:00 making the rest of its plan brittle to any delay due for
-example to downward water currents on its way to the surface. This needs to be further
-addressed in the future and, especially, how our work can be integrated
-with work presented in \cite{morris01}.
+controllable. A side effect of this is that in its current state it
+may result on the system to decide to defer action as late as
+possible. In our example, this would result on the AUV leaving Vent1
+as late as 19:00 making the rest of its plan brittle to any delay due
+for example to downward water currents on its way to the surface. This
+needs to be further addressed in the future and, especially, how our
+work can be integrated with work presented in \cite{morris01}.
 
 Further as of today, we consider that the qualification of the goal is
 predefined when the goal is submitted by the planner. It is possible
 though that part of this can be refined on some cases based on the
-nature of the goal. Looking back at our domain, one can note that the 2
-goals provided are constrained differently on their start time; while
-{\em Sample Vent2} start time is limited only on its upper bound, the
-returning to surface conversely is constrained only on the lower bound of
-its start time. This difference hints on some of the issues we
-presented. While we do consider that explicit information of these goals
-help the plan execution to be improved when such information is not
-initially present. We also are aware that the nature of the constraints
-within the goal itself can help identify the best policy to be done. It
-is obvious that for Sampling Vent2 it is better to be
-proactive on the actions that contribute to this goal. Conversely, the
-other goal only matter if it appears fairly late in the plan which means
-that it is probably better to not start completing this part of the
-plan too aggressively. We plan to further explore how we can refine the
-distinction between the different policies by using the information
-provided by the constraints of the different objectives.
+nature of the goal. Looking back at our domain, one can note that the
+2 goals provided are constrained differently on their start time;
+while {\em Sample Vent2} start time is limited only on its upper
+bound, the returning to surface conversely is constrained only on the
+lower bound of its start time. This difference hints on some of the
+issues we presented. While we do consider that explicit information of
+these goals help the plan execution to be improved when such
+information is not initially present. We also are aware that the
+nature of the constraints within the goal itself can help identify the
+best policy to be done. It is obvious that for Sampling Vent2 it is
+better to be proactive on the actions that contribute to this
+goal. Conversely, the other goal only matter if it appears fairly late
+in the plan which means that it is probably better to not start
+completing this part of the plan too aggressively. We plan to further
+explore how we can refine the distinction between the different
+policies by using the information provided by the constraints of the
+different objectives.
  
 %%% Local Variables: 
 %%% mode: latex
