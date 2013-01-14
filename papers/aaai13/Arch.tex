@@ -189,139 +189,139 @@ evaluate. Therefore, its complexity is $O(N+E)$ where $N$ is the
 number of tokens within the plan and $E$ the number ofcausal links that relate
 these tokens. 
 
-\subsection{Dynamic solution during planning}
-
-Searching for a goal as Algorithm \ref{SearchForGoal} does can be
-quite computational expensive particularly if there are many tokens
-that are continuously being dispatched. Completing a full search every
-time a token needs to be dispatched can severely slow down the
-execution process, which needs to remain quick to ensure proper
-execution. Therefore, our next algorithmic approach distributes the
-full search within the creation of the plan.  Resulting in spreading
-out the full cost of the search. In order to not repeatedly search the
-plan, we save the tokens that are connected to a goal in $\Phi_{ge}$
-found during the search. In this way, we acquire a list of tokens,
-$List_{goals}$, that should be dispatched early.
-
-An alternative solution is to embed the propagation of these value
-during the planning search. The algorithm uses the same dispatching
-method as algorithm \ref{DispatchToken}.  The difference is that
-rather than searching for the goal using algorithm
-\ref{SearchForGoal}, it only searches the list, $List_{goals}$, to see
-if the token is in it. The actually searching for the goals and
-causally connected tokens happens in algorithms \ref{NotifyActivated},
-\ref{NotifyMerged}.
-
-\begin{algorithm}[H]
-\caption{\small Saves goals as they are added to plan}
-\label{NotifyAdded}
-\begin{algorithmic}
-\Function{NotifyAdded}{ Token $T$ }
-\If{$T$ is a Goal in $\Phi_{ge}$}
-	\State Insert $T$ into $List_{goals}$
-\EndIf 
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm} [H]
-\caption{\small Removes the token after it is removed from the plan}
-\label{NotifyRemoved}
-\begin{algorithmic}
-\Function{NotifyRemoved}{ Token $T$ }
-	\State Remove $T$ from $List_{goals}$
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{\small Searches for tokens connected to goals}
-\label{NotifyActivated}
-\begin{algorithmic}
-\Function{NotifyActivated}{ Token $T$ }
-\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through one causal link}
-	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
-\EndIf
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{\small Deactivates token in plan}
-\label{NotifyDeactivated}
-\begin{algorithmic}
-\Function{NotifyDeactivated}{ Token $T$ }
-\If{$T$ is not a goal and not one causally linked to a goal}
-	\State Remove $T$ from $List_{goals}$
-\EndIf
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{\small Searches plan when tokens are merged}
-\label{NotifyMerged}
-\begin{algorithmic}
-\Function{NotifyMerged}{ Token $T$ }
-\If{$T$ is goal in $List_{goals}$}
-	\State Recursively search the reverse causal link of the active token merged with $T$ and add tokens to $List_{goals}$
-\ElsIf{The active token of $T$ is in $List_{goals}$}
-	\State Recursively search the reverse causal link of $T$ and add tokens to $List_{goals}$
-\EndIf
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{\small Removes token when split}
-\label{NotifySplit}
-\begin{algorithmic}
-\Function{NotifySplit}{ Token $T$ }
-\If{$T$ is not a goal or not one causally linked to a goal}
-	\State Remove $T$ from $List_{goals}$
-\EndIf
-\EndFunction
-\end{algorithmic}
-\end{algorithm}
-
-In order to distribute the search, we situate our algorithm within the
-planning search of the Europa Planner,\cite{frank2003}, which offers 
-callback functions for when a token in the plan is altered. The majority
-of the searching happens when tokens are either activated or 
-merged. For a token to merge with another token it has to be compatible with
-another token already in the plan. Splitting happens when they are
-no longer compatible. We have designed our algorithm around the
-Europa Planner, however, we believe that the general approach
-can work on any other planner. 
-
-Taking full advantage of the planning search, we
-use a backwards search from the goal following the reverse causal link
-to the connected tokens.  We fully search from the goals because we
-know that all the tokens connected through the causal link are
-sub-goals. By contrast, fully searching each token could be
-wasteful because there is no certainty that it will be linked to a
-goal and, therefore, could bring little value to our search. However,
-some tokens may get added to the plan or linked to a goal after we
-have already searched the goals. Therefore, for every token we do a
-local forward search of one causal link to verify if it is connected
-to a goal in our saved list.  If so, we do a full backwards search
-from the token since it has now proven to be valuable. After the plan
-has been searched, it is as easy as searching a list for a token to
-see if it should be dispatched early or be deferred to later.
-
-This approach is potentially more costly than the previous algorithm 
-as it needs to do local updates whenever the plan is altered by the search
-including retracting past updates if a backtrack occur during the
-search. Still it is compelling in the fact that this cost occurs during
-planning reducing the decision problem during execution to simply
-check if the given action has been marked during planning. It has
-been the solution we have preferred within our system for this reason
-as it is functionally equivalent to previous algorithm while reducing
-extra computation cost as the plan is executed. Planning phases occur
-within the plan only when either the initial plan failed to execute or
-the set of goals has been altered. Therefore, it is safe to assume that
-planning should occur more sporadically than execution decisions 
-which then give an edge to this latter algorithmic solution. 
+%\subsection{Dynamic solution during planning}
+%
+%Searching for a goal as Algorithm \ref{SearchForGoal} does can be
+%quite computational expensive particularly if there are many tokens
+%that are continuously being dispatched. Completing a full search every
+%time a token needs to be dispatched can severely slow down the
+%execution process, which needs to remain quick to ensure proper
+%execution. Therefore, our next algorithmic approach distributes the
+%full search within the creation of the plan.  Resulting in spreading
+%out the full cost of the search. In order to not repeatedly search the
+%plan, we save the tokens that are connected to a goal in $\Phi_{ge}$
+%found during the search. In this way, we acquire a list of tokens,
+%$List_{goals}$, that should be dispatched early.
+%
+%An alternative solution is to embed the propagation of these value
+%during the planning search. The algorithm uses the same dispatching
+%method as algorithm \ref{DispatchToken}.  The difference is that
+%rather than searching for the goal using algorithm
+%\ref{SearchForGoal}, it only searches the list, $List_{goals}$, to see
+%if the token is in it. The actually searching for the goals and
+%causally connected tokens happens in algorithms \ref{NotifyActivated},
+%\ref{NotifyMerged}.
+%
+%\begin{algorithm}[H]
+%\caption{\small Saves goals as they are added to plan}
+%\label{NotifyAdded}
+%\begin{algorithmic}
+%\Function{NotifyAdded}{ Token $T$ }
+%\If{$T$ is a Goal in $\Phi_{ge}$}
+%	\State Insert $T$ into $List_{goals}$
+%\EndIf 
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm} [H]
+%\caption{\small Removes the token after it is removed from the plan}
+%\label{NotifyRemoved}
+%\begin{algorithmic}
+%\Function{NotifyRemoved}{ Token $T$ }
+%	\State Remove $T$ from $List_{goals}$
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Searches for tokens connected to goals}
+%\label{NotifyActivated}
+%\begin{algorithmic}
+%\Function{NotifyActivated}{ Token $T$ }
+%\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through one causal link}
+%	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Deactivates token in plan}
+%\label{NotifyDeactivated}
+%\begin{algorithmic}
+%\Function{NotifyDeactivated}{ Token $T$ }
+%\If{$T$ is not a goal and not one causally linked to a goal}
+%	\State Remove $T$ from $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Searches plan when tokens are merged}
+%\label{NotifyMerged}
+%\begin{algorithmic}
+%\Function{NotifyMerged}{ Token $T$ }
+%\If{$T$ is goal in $List_{goals}$}
+%	\State Recursively search the reverse causal link of the active token merged with $T$ and add tokens to $List_{goals}$
+%\ElsIf{The active token of $T$ is in $List_{goals}$}
+%	\State Recursively search the reverse causal link of $T$ and add tokens to $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Removes token when split}
+%\label{NotifySplit}
+%\begin{algorithmic}
+%\Function{NotifySplit}{ Token $T$ }
+%\If{$T$ is not a goal or not one causally linked to a goal}
+%	\State Remove $T$ from $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%In order to distribute the search, we situate our algorithm within the
+%planning search of the Europa Planner,\cite{frank2003}, which offers 
+%callback functions for when a token in the plan is altered. The majority
+%of the searching happens when tokens are either activated or 
+%merged. For a token to merge with another token it has to be compatible with
+%another token already in the plan. Splitting happens when they are
+%no longer compatible. We have designed our algorithm around the
+%Europa Planner, however, we believe that the general approach
+%can work on any other planner. 
+%
+%Taking full advantage of the planning search, we
+%use a backwards search from the goal following the reverse causal link
+%to the connected tokens.  We fully search from the goals because we
+%know that all the tokens connected through the causal link are
+%sub-goals. By contrast, fully searching each token could be
+%wasteful because there is no certainty that it will be linked to a
+%goal and, therefore, could bring little value to our search. However,
+%some tokens may get added to the plan or linked to a goal after we
+%have already searched the goals. Therefore, for every token we do a
+%local forward search of one causal link to verify if it is connected
+%to a goal in our saved list.  If so, we do a full backwards search
+%from the token since it has now proven to be valuable. After the plan
+%has been searched, it is as easy as searching a list for a token to
+%see if it should be dispatched early or be deferred to later.
+%
+%This approach is potentially more costly than the previous algorithm 
+%as it needs to do local updates whenever the plan is altered by the search
+%including retracting past updates if a backtrack occur during the
+%search. Still it is compelling in the fact that this cost occurs during
+%planning reducing the decision problem during execution to simply
+%check if the given action has been marked during planning. It has
+%been the solution we have preferred within our system for this reason
+%as it is functionally equivalent to previous algorithm while reducing
+%extra computation cost as the plan is executed. Planning phases occur
+%within the plan only when either the initial plan failed to execute or
+%the set of goals has been altered. Therefore, it is safe to assume that
+%planning should occur more sporadically than execution decisions 
+%which then give an edge to this latter algorithmic solution. 
 
 %%% Local Variables: 
 %%% mode: latex
