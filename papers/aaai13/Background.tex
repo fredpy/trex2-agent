@@ -25,13 +25,6 @@ situated agent encodes plans in a rich and flexible representation.
 % postponed except when this is necessary to not break the current
 % plan. 
 
-As presented in \cite{lemai-chenevier2004}, while most of the
-architectures do handle goals emerging in the course of mission. This
-is often an afterthought and is considered similarly to any other
-unexpected situataion such as a plan execution failure. Even more so,
-in he work presented by the author, the emergence of new goals is
-actually triggering full replanning as against a simple plan
-repair. 
 % Still, while this work contribute to ensure that execution time are
 % correctly propagated within the plan with a limited cost, it does
 % not directly address how to decide what value should be set for a
@@ -40,20 +33,24 @@ repair.
 % it should start an action as early as possible or consider it as not
 % urgent.
 
-Prominent work in this area is related to dispatchability in simple
-temporal networks (STN) so efficient temporal propagation prior to
-execution encapsulates appropriate planning constraints \cite{mus98a}.
-To do so, the STN supporting is transformed into an all-pairs network
-and stripped of unnecessary edges, resulting in a more compact
-temporal network that lessens propagation cost. The role of the
-executive is to select time-points within the current execution bounds
-and propagate its value within the simplified network. However, the
-executive does not directly address how to decide what value should be
-set for a given time-point in the scope of possible values for
-dispatch.  When dealing with least-commitment planning this decision
-is usually deferred to the plan executive. For instance, in
-\cite{mus98c}, the executive has two responsibilities: the selection
-and scheduling of plan events for execution.%  The executive needs to be
+In \cite{lemai-chenevier2004}, the emergence of new goals triggers
+replanning; most architectures handle emergent goals similarly, mostly
+as an afterthought and often related to an off-nominal situation such
+as plan execution failure. Prominent work in this area is related to
+dispatchability in simple temporal networks (STN) so efficient
+temporal propagation prior to execution encapsulates appropriate
+planning constraints \cite{mus98a}.  To do so, the STN supporting is
+transformed into an all-pairs network and stripped of unnecessary
+edges, resulting in a more compact temporal network that lessens
+propagation cost. The role of the executive is to select time-points
+within the current execution bounds and propagate its value within the
+simplified network. However, the executive does not directly address
+how to decide what value should be set for a given time-point in the
+scope of possible values for dispatch.  When dealing with
+least-commitment planning this decision is usually deferred to the
+plan executive. For instance, in \cite{mus98c}, the executive has two
+responsibilities: the selection and scheduling of plan events for
+execution.% The executive needs to be
 % highly reactive to function in a real-time environment with the
 % resulting solution using a \emph{proactive} approach.  Doing so
 % greatly reduces the plan flexibility, and therefore robustness, as all
