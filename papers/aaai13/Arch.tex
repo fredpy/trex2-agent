@@ -1,16 +1,20 @@
 \section{Planning Definitions}
+\label{sec: defs}
 
-To consider the overall planning and plan execution within an agent we
-use the definition of a temporal domain, planning problem and solution
-as provided by \cite{Nau:2004}:
+We first consider some basic representational definitions related to
+temporal planning consistent with \cite{Nau:2004}:
+
+% To consider the overall planning and plan execution within an agent we
+% use the definition of a temporal domain, planning problem and solution
+% as provided by \cite{Nau:2004}:
 
 \begin{definition}
   \label{def:domain}
   A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
   \begin{itemize}
-  \item $\Lambda_\Phi$ is the set of all temporal databases that can be 
-    defined with the constraints and the constant, variable, and relation 
-    symbols in our representation.
+  \item $\Lambda_\Phi$ is the set of all temporal databases that can
+    be defined with the constraints, the constant, variable, and
+    relation symbols in the representation.
   \item $O$ is a set of temporal planning operators.
   \item $X$ s a set of domain axioms.
   \end{itemize}
@@ -20,42 +24,42 @@ as provided by \cite{Nau:2004}:
   \label{def:problem}
   A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_0, \Phi_g )$, where:
   \begin{itemize}
-  \item $\Phi_0 = (F, C)$ is a database in $\Lambda_\Phi$ that satisfies the axioms of $X$.
-    $\Phi_0$ represents an initial scenario that describes not only the initial 
-    state of the domain but also the evolution predicted to take place 
-    independently of the actions to be planned.
-  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of the problem 
-    as a set $G$ of tokens together with a set $C_g$ of objects and temporal 
-    constraints on variables of $G$. 
+  \item $\Phi_0 = (F, C)$ is a database in $\Lambda_\Phi$ that
+    satisfies the axioms of $X$.  $\Phi_0$ represents an initial
+    scenario that describes not only the initial state of the domain
+    but also the evolution predicted to take place independently of
+    the actions to be planned.
+  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
+    the problem as a set $G$ of tokens together with a set $C_g$ of
+    objects and temporal constraints on variables of $G$.
   \end{itemize}
 \end{definition}
 
 \begin{definition}
   \label{def:plan}
-A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each
-  being a partial instance of some operator in $O$.  
-  We define $\lambda$ as the state-transition function.
+  A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
+  partial instance of some operator in $O$.  We define $\lambda$ as
+  the state-transition function.
 
-  $\pi$ is a solution of a problem $P = (D, \Phi_0, \Phi_g)$ iff
-  there is a  database in $\lambda(\Phi_0, \pi)$ that entails $\Phi_g$.
+  $\pi$ is a solution of a problem $P = (D, \Phi_0, \Phi_g)$ iff there
+  is a database in $\lambda(\Phi_0, \pi)$ that entails $\Phi_g$.
 \end{definition}
  
-In this work, our focus is on executing a given plan $\pi$ which was
-computed by the agent planner. However, in order to reflect the
+Our focus is on executing a plan $\pi$; however, to reflect the
 dynamic interaction of the agent with its environment we need to
-refine the definition of the sets $\Phi_0$ and $\Phi_g$. 
+refine the definition of the sets $\Phi_0$ and $\Phi_g$.
 
-Indeed as the world evolves new observations (or refinement of
-existing ones) are added into $\Phi_0$. Similarly, the agent operator
-can request new future goals to be added to the agent $\Phi_g$ as
-mission time advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value of
-these sets at the time-point $t$. For the sake of simplicity we
-consider that the alteration of these sets is purely additive with
-time\fcomment{ In practice, their evolution is more complex as
-  completed goals becomes observation or even a goal previously
-  requested can be cancelled by the operator. Still this assumption
-  largely simplify the problem description and our algorithm still
-  works without it (even though it kind fo assume it)}:
+As the world evolves new (or refinement of existing) observations are
+added to $\Phi_0$. Similarly, the agent operator can request new
+future goals to be added to the agent $\Phi_g$ as mission time
+advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets
+at the time-point $t$. For the sake of simplicity we consider that the
+alteration of these sets is purely additive with time\fcomment{ In
+  practice, their evolution is more complex as completed goals becomes
+  observation or even a goal previously requested can be cancelled by
+  the operator. Still this assumption largely simplify the problem
+  description and our algorithm still works without it (even though it
+  kind fo assume it)}:
 \[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
@@ -105,14 +109,15 @@ done within the current mission scope.
 
 \section{Proposed algorithms}
 
-As a new action can be dispatched for execution, the executive
-needs to evaluate how it relates to the goals of the plan. Intuitively
-if this action was generated by (or contribute to) an internal goal of
-$\Phi_{gi}$ it needs to be taken proactively, while otherwise we can 
+As a new action can be dispatched for execution, the executive needs
+to evaluate how it relates to the goals of the plan. Intuitively if
+this action was generated by (or contribute to) an internal goal of
+$\Phi_{gi}$ it needs to be taken proactively, while otherwise we can
 consider it as non-urgent. Therefore, when evaluating if the token
-representing this action  within the plan the executive needs to do a
+representing this action within the plan the executive needs to do a
 forward search on the causal links related to this token to see if
-they lead to an internal goal as implemented in Algorithm \ref{DispatchToken}
+they lead to an internal goal as implemented in Algorithm
+\ref{DispatchToken}.
 
 
 \begin{algorithm} [H]

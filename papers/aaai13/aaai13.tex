@@ -1,8 +1,9 @@
-\documentclass[a4paper]{article}
+\documentclass[letterpaper]{article}
 \usepackage{aaai}
-% \usepackage{times}
-% \usepackage{helvet}
-% \usepackage{courier}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
 \usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -20,23 +21,26 @@
 \maketitle{}
 
 \begin{abstract}
-%In this paper we design a method, along with two algorithms,
-%for dispatching plans in situ with an agent located in a dynamic environment. 
-%We compare our method to previously used approaches and find that our
-%method remains both efficiency and flexibility when dispatching the on
-%board plan.
+
+  Robotic plan execution has traditionally assumed that goals are
+  articulated prior to mission execution. As robots have become
+  persistent and moved into the real-world, the need to anticipate and
+  capture evolving needs with new or reformulated goals becomes
+  critical. We demonstrate a simple but elegant approach to this
+  problem motivated by our oceanographic domain, in the context of a
+  continuously planning and executing robotic explorer and where
+  metric temporal representations allow for disambiguating goals for
+  mission dispatch. The complexity is linear in the number of actions
+  and causal links of an existing partial plan.
 
 \end{abstract}
 
-%\input{Intro_old.tex}
 \input{intro.tex}
 
 \input{example.tex}
 
 \input{Background.tex}
  
-%\input{contrib}
-
 \input{Arch.tex}
 
 \input{Results.tex}
