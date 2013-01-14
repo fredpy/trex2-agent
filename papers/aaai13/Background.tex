@@ -1,4 +1,4 @@
-\section{Previous Approaches to Dispatching}
+\section{Related Work}
 
 % \fcomment{I need to rework this as it is not really a state
 %   of the art in the current form ... we also need to present that fact
@@ -11,47 +11,56 @@
 %   look at another aspect that may trigger the decision to defer an
 %   actions based on its purpose}
 
-Dealing with plan execution is not a new problem and we can find a lot
-of work that relates to this over several decades. Still, it is
-pretty rare to see work that envisage that actions could be
-postponed except when this is necessary to not break the current
-plan. 
+Research in temporal plan execution is not new; dealing with
+anticipatory dispatch, however, has not been a focus of prior work. It
+becomes important in our context for three reasons; first because our
+system is embedded in a real-world robotic explorer, second because
+our integrated architecture \rx \cite{mcgann08bdup,py10dup,rajan12dup}
+plans \emph{continuously} during mission execution and finally, the
+situated agent encodes plans in a rich and flexible representation.
+
+% Dealing with plan execution is not a new problem and we can find a lot
+% of work that relates to this over several decades. Still, it is
+% pretty rare to see work that envisage that actions could be
+% postponed except when this is necessary to not break the current
+% plan. 
 
 
-The most prominent work is related to the dispatchability of simple 
-temporal networks (STN) \cite{mus98a}. The core of the problem is to
-ensure that the temporal constraints can be propagated efficiently
-within the plan in order to allow the executive to decide quickly
-whether an action should be started or not while ensuring the plan
-consistency. In order to accomplish such a task, the STN supporting
-the plan to be dispatched is transformed into a All-Pairs network and
-stripped of unnecessary edges, often resulting in a more compact
-temporal network that lessens the propagation cost of updates. The
-role of the executive is to select time-points within the current
-execution bounds and propagate its value within the simplified
-network. Still, while this work contribute to ensure that execution
-time are correctly propagated within the plan with a limited cost, it
-does not directly address how to decide what value should be set for a
-given time-point in the scope of its possible values. More specifically
-it is still the role of the executive to decide whether it should
-start an action as early as possible or consider it as not urgent. 
+% Still, while this work contribute to ensure that execution time are
+% correctly propagated within the plan with a limited cost, it does
+% not directly address how to decide what value should be set for a
+% given time-point in the scope of its possible values. More
+% specifically it is still the role of the executive to decide whether
+% it should start an action as early as possible or consider it as not
+% urgent.
 
-When dealing with least-commitment planning solution this decision is
-deferred to the plan executive. For example in \cite{mus98c}, the 
-executive is defined as having two responsibilities: the selection and scheduling of plan
-events for execution. The executive needs to
-be highly reactive as it is necessary to function in a real-time
-environment. One solution offered for dispatching events efficiently
-is the proactive approach. This approach greatly reduces the plan
-flexibility, and therefore robustness, as all start time-points are
-grounded to a specific value which is compatible with the initial
-constraints. % In order to avoid having a procrastinating system the
+Prominent work in this area is related to dispatchability in simple
+temporal networks (STN) so efficient temporal propagation prior to
+execution encapsulates appropriate planning constraints \cite{mus98a}.
+To do so, the STN supporting is transformed into an all-pairs network
+and stripped of unnecessary edges, resulting in a more compact
+temporal network that lessens propagation cost. The role of the
+executive is to select time-points within the current execution bounds
+and propagate its value within the simplified network. However, the
+executive does not directly address how to decide what value should be
+set for a given time-point in the scope of possible values for
+dispatch.  When dealing with least-commitment planning this decision
+is usually deferred to the plan executive. For instance, in
+\cite{mus98c}, the executive has two responsibilities: the selection
+and scheduling of plan events for execution. The executive needs to be
+highly reactive to function in a real-time environment with the
+resulting solution using a \emph{proactive} approach.  Doing so
+greatly reduces the plan flexibility, and therefore robustness, as all
+start time-points are grounded to a specific value compatible with the
+initial constraints. 
+
+% In order to avoid having a procrastinating system the
 % overall agreement in term of policy is to start an action as early as
 % possible (ref ?). 
 
 % \fcomment{Therefore, one reoccurring problem of dispatchability is finding a way
 % of balancing efficiency, proactive, with flexibility,deferred.}
-\fcomment{We need to update this to reflect that it is not ETS}
+% \fcomment{We need to update this to reflect that it is not ETS}
 %There have been many uses of these two approaches when dispatching plans, as
 %previously shown, but a compromise to one is most often used rather than
 %a balance. Demonstrated in the tool MAPGEN \cite{bresina03} which used
@@ -61,75 +70,85 @@ constraints. % In order to avoid having a procrastinating system the
 %needed is a way of using both proactive and deferred together giving a
 %balanced approach to dispatching.
 
-While in the common case this might be acceptable it
-may become problematic when put in he context of potential new
-objectives emerging during the mission.  Take our AUV example,
-and apply the proactive approach globally --- assuming that all actions
-can be completed on their minimum time.  As shown in 
-Fig. \ref{fig:ex:proactive}, the proactive approach allows the
-AUV to {\em Sample Vent2} before noon but as continue through
-the plan it results in the AUV getting back to the {\em Surface}
-by 12:21 and being stuck in the context of the current plan for the
-next 7 hours and 39 minutes. Should the scientist want to {\em Sample Vent1}
-the AUV will then be forced to re-plan accordingly and
-go back and forth between the surface and the locations all other
-again. By being blindly proactive, the AUV made its overall strategy
-less efficient than if it took the option to procrastinate at {\em Vent2}
-until it needs to get back to the surface. 
+%%%%
+%% The following point has already been made in example.tex. 
+%%%%
+% While in the common case this might be acceptable it may become
+% problematic when put in he context of potential new objectives
+% emerging during the mission.  Take our AUV example, and apply the
+% proactive approach globally --- assuming that all actions can be
+% completed on their minimum time.  As shown in
+% Fig. \ref{fig:ex:proactive}, the proactive approach allows the AUV to
+% {\em Sample Vent2} before noon but as continue through the plan it
+% results in the AUV getting back to the {\em Surface} by 12:21 and
+% being stuck in the context of the current plan for the next 7 hours
+% and 39 minutes. Should the scientist want to {\em Sample Vent1} the
+% AUV will then be forced to re-plan accordingly and go back and forth
+% between the surface and the locations all other again. By being
+% blindly proactive, the AUV made its overall strategy less efficient
+% than if it took the option to procrastinate at {\em Vent2} until it
+% needs to get back to the surface.
 
+Deferring a time-point for execution is another approach for dynamic
+controllability with STNs with uncertainty (STNU). \cite{morris01}
+proposes an algorithm that inserts \textbf{wait} constraints within
+the temporal network that waits until an uncontrollable event occurs
+during planning. \cite{gallien2006} also uses a similar approach to
+reduce Makespan; but they do so in the context of an exogenous event
+-- such as for example the duration of a navigation task which depends
+on external factors -- where it is necessary to defer actions for
+correct plan execution. Work in soft temporal constraints with
+preferences \cite{khatib2001temporal} on dispatching has another
+related approach with preferable start times. However as
+\cite{bartak2002} states, they are plagued by poor performance; while
+the complexity can be reduced to a more tractable (polynomial)
+solution by specifying preferences as convex functions
+\cite{rossi2006learning}, this is still cubic in relation to the
+number of variables. Moreover the solutions proposed optimize the plan
+{\em a-priori} reducing plan flexibility leading to execution time
+failure, which is not suitable for real-world embedded systems such as
+ours.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.65\columnwidth]{figs/example_early}
-  \caption{\small A proactive solution for the plan from
-    Fig. \ref{fig:ex:plan} resulting in a Surfacing event at the end
-    of mission lasting in excess of $7$ hours.}
-  \label{fig:ex:proactive}
-\end{figure}
+% In this case, the deterrence of the execution of this
+% time-point is enforced in order to ensure robust plan execution
+% despite exogenous uncontrollable events. In \cite{gallien2006}, this
+% approach is further discussed along with the Makespan issue while
+% dealing with least-commitment planners which can insert unjustified
+% waits within the plan potentially decreasing in turn the overall
+% performance of the system. Both of these approaches show that when
+% dealing with uncontrollable temporal constraints -- such as for
+% example the duration of a navigation task which depends on external
+% factors -- it is necessary to defer some actions in order to ensure
+% the plan execution.
 
-One case we have seen in literature where a time-point is
-considered to be deferred is related to the dynamic controllability
-issue with STNs with uncertainty (STNU). In \cite{morris01}, they propose 
-an algorithm that during planning insert wait constraints within the
-solution temporal network that will allow one time-point to wait until
-an uncontrollable event occurs. In this case, the deterrence of the
-execution of this time-point is enforced in order to ensure robust plan
-execution despite exogenous uncontrollable events. In
-\cite{gallien2006},  this approach is further discussed along with the
-Makespan issue while dealing with least-commitment planners which can
-insert unjustified waits within the plan potentially decreasing in turn the
-overall performance of the system. Both of these approaches show that
-when dealing with uncontrollable temporal constraints -- such as for
-example the duration of a navigation task which depends on external
-factors -- it is necessary to defer some actions in order to ensure
-the plan execution. 
+% An alternative approach is related to work with soft constraints
+% within the temporal domain indicating preferences on actions timing
+% such as in \cite{khatib2001temporal}. This should provide  a general
+% solution for users to specify whether actions of the plan should be
+% preferably started. One problem with general frameworks dealing with
+% soft constraints though is their poor performances \cite{bartak2002}
+% as the general problem is NP-hard. Even though it can be reduced to a
+% more tractable (polynomial) solution by specifying preferences as
+% convex functions \cite{rossi2006learning}, the  
+% complexity is still cubic in relation to the number of
+% variables. Moreover the solutions proposed do optimize the plan {\em
+%   a-priori} reducing then the plan flexibility which in turn makes it
+% more prone to failure during execution.
 
-An alternative approach is related to work with soft constraints
-within the temporal domain indicating preferences on actions timing
-such as in \cite{khatib2001temporal}. This should provide  a general
-solution for users to specify whether actions of the plan should be
-preferably started. One problem with general frameworks dealing with
-soft constraints though is their poor performances \cite{bartak2002}
-as the general problem is NP-hard. Even though it can be reduced to a
-more tractable (polynomial) solution by specifying preferences as
-convex functions \cite{rossi2006learning}, the  
-complexity is still cubic in relation to the number of
-variables. Moreover the solutions proposed do optimize the plan {\em
-  a-priori} reducing then the plan flexibility which in turn makes it
-more prone to failure during execution.
-
-Our work is complementary to much of the previous work.  While we do
-not explicitly deal with dynamic controllability, our approach is not
-inconsistent with that work.  In any case, our focus is not on the
+Our work is complementary to much of the above.  While we do not
+explicitly deal with dynamic controllability, our approach is not
+inconsistent with that work. Second, our focus is not on the
 observation of events during execution but rather on the possibility
-of new objectives arising at any time, and we want to avoid doing
-actions that are not ``urgent'' in order to preserve the context for
-those objectives.  Similarly, we have not implemented temporal
-preference specification during planning, which has the effect of
-limiting execution-time flexibility.  Our intent is to defer temporal
-decisions to the executive allowing it to adapt the plan to new
-objectives without heavily relying on plan-repair or re-planning
-solutions that could badly impact system reactiveness.
+of \emph{new objectives} arising at any time, and to avoid doing
+actions that are not ``urgent'' to preserve the context for those
+objectives.  Similarly, temporal preference specification during
+planning, which has the effect of limiting execution-time flexibility.
+And finally, most of the effort above, has decoupled execution from
+planning unlike our work, where planning is not only continuous, but
+execution is intertwined. Our interest is in deferring temporal
+decisions to the executive to adapt the plan to new objectives without
+heavily relying on plan-repair or re-planning solutions that could
+impact system reactivity.
 
 
 % Our work on the other hand is more complementary to previous work, indeed

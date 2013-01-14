@@ -1,12 +1,11 @@
-\section{An Illustrative Example} 
-\label{sec:example}
-
+\paragraph{An Illustrative Example} 
+% \label{sec:example}
 Our focus of research is the oceanographic domain with a robotic
 autonomous underwater vehicle (AUV) and illustrate issues arising with
 dynamic goal emergence and motivate our approach.  In domain an AUV
 can either transit from one location to another within the water mass
 or survey a location in order to obtain data of a feature of interest
-such as a hydrothermal vent depicted in Fig. \ref{fig:ex:axial}.  The
+such as a hydrothermal vent depicted in Fig. \ref{fig:Example}.  The
 vehicle is deployed initially with the scientific objective to sample
 {\em Vent 2} and the operational goal to be back at the {\em Surface}
 by the end of the mission which lasts $12$ hours limited by its energy
@@ -21,9 +20,8 @@ receive limited data via limited acoustic communications.
   \centering
   \subfloat[\small An illustration of our domain]{\label{fig:ex:graph}\includegraphics[width=0.51\columnwidth]{figs/auv_example}}
   \hfill \subfloat[\small Initial  problem]{\label{fig:ex:init}\includegraphics[width=0.47\columnwidth]{figs/example_initial}}
-  \caption{\small{\ref{fig:ex:axial} shows bathymetry of actual vent
-      sites off the coast of Oregon. (\ref{fig:ex:graph}) illustrates
-      the domain along with the initial partial plan for this problem
+  \caption{\small{(\ref{fig:ex:graph}) illustrates the domain along
+      with the initial partial plan for this problem
       (\ref{fig:ex:init}). The AUV is initially at {\em Surface} at
       $8$am and the mission is expected to complete by $8$pm.}}
 \label{fig:Example}
@@ -74,7 +72,10 @@ Since most vents are usually deep ($1500$ m or deeper) resulting in
 two separate actions of at least an hour each that could have been
 avoided with the AUV at the bottom. Neither of these approaches are
 satisfactory; {\em defer}ment leading to sensitivity to additional
-goals, while \emph{proactive} execution leading to inefficiency. 
+goals, while \emph{proactive} execution leading to
+inefficiency. Fig. \ref{fig:ex:proactive} is a solution for the latter
+approach.
+
 % in the plan execution not
 % being robust to the addition of new goals while blind {\em proactive}
 % execution can result on redundant actions within the mission that
@@ -83,6 +84,15 @@ goals, while \emph{proactive} execution leading to inefficiency.
 
 % the executive to alter
 % between the two divergent policies during the mission.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.65\columnwidth]{figs/example_early}
+  \caption{\small A proactive solution for the plan from
+    Fig. \ref{fig:ex:plan} resulting in a Surfacing event at the end
+    of mission lasting in excess of $7$ hours.}
+  \label{fig:ex:proactive}
+\end{figure}
 
 Analyzing the objectives we note that these divergent policies are
 because of divergent goal semantics. While visiting {\em Vent 1} was
