@@ -25,7 +25,13 @@ situated agent encodes plans in a rich and flexible representation.
 % postponed except when this is necessary to not break the current
 % plan. 
 
-
+As presented in \cite{lemai-chenevier2004}, while most of the
+architectures do handle goals emerging in the course of mission. This
+is often an afterthought and is considered similarly to any other
+unexpected situataion such as a plan execution failure. Even more so,
+in he work presented by the author, the emergence of new goals is
+actually triggering full replanning as against a simple plan
+repair. 
 % Still, while this work contribute to ensure that execution time are
 % correctly propagated within the plan with a limited cost, it does
 % not directly address how to decide what value should be set for a
@@ -47,12 +53,18 @@ set for a given time-point in the scope of possible values for
 dispatch.  When dealing with least-commitment planning this decision
 is usually deferred to the plan executive. For instance, in
 \cite{mus98c}, the executive has two responsibilities: the selection
-and scheduling of plan events for execution. The executive needs to be
-highly reactive to function in a real-time environment with the
-resulting solution using a \emph{proactive} approach.  Doing so
-greatly reduces the plan flexibility, and therefore robustness, as all
-start time-points are grounded to a specific value compatible with the
-initial constraints. 
+and scheduling of plan events for execution.%  The executive needs to be
+% highly reactive to function in a real-time environment with the
+% resulting solution using a \emph{proactive} approach.  Doing so
+% greatly reduces the plan flexibility, and therefore robustness, as all
+% start time-points are grounded to a specific value compatible with the
+% initial constraints.
+In all the cases we found in he literature the executive uses 
+exclusively a {\em proactive} execution policy. This is motivated by
+the intuition that it will give more time in the future should an 
+unexpected situation occur. While this assumption is valid in 
+most cases, our example do demonstrate that it can lead to 
+sub-optimal solutions.
 
 % In order to avoid having a procrastinating system the
 % overall agreement in term of policy is to start an action as early as
