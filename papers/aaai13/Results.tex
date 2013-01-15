@@ -1,16 +1,13 @@
 \section{Experimental results}
 \label{sec:exp}
 
-Our experiment follows a mission similar to the original plan given in
+The experiment follows a mission similar to the original plan given in
 Fig. \ref{fig:ex:plan}. At the beginning, the AUV need to {\em Sample
-  Vent2} and it has to return to the surface by the end of the
-mission. The AUV must also be at the surface around the time 13:00. We
+  Vent2} and it has to return to the {\em surface} by the end of the
+mission. The AUV must also be at the {\em surface} around the time 13:00. We
 implemented this on our executive with plans being produced by the
-europa planning engine \cite{frank2003}.\fcomment{I think it is
-  important to give at least some indication of the kind of tools
-  used.  this should be enough as it is not really giving away that we
-  used trex}. Figure \ref{fig:ex:mixed1} demonstrates the resulting
-plan from our algorithm and will guide our explanation.
+europa planning engine \cite{frank2003}. Figure \ref{fig:ex:mixed1} 
+demonstrates the resulting plan from Algorithm \ref{DispatchToken}.
 
 \begin{figure}[!htbp]
   \centering
@@ -22,15 +19,15 @@ plan from our algorithm and will guide our explanation.
   \label{fig:ex:mixed1}
 \end{figure}
 
-For Algorithm \ref{DispatchToken}, the search is straight forward. For
-example in Fig. \ref{fig:ex:mixed1}, if we are {\em At Surface} then
+For Algorithm \ref{SearchForGoal}, the search is straight forward. For
+example in Fig. \ref{fig:ex:mixed1}, if the AUV is {\em At Surface} then
 the next {\em Go} token will be dispatched. Because the search will
 follow the causal links forward, where upon, it will find the goal
 {\em Sample Vent2} resulting in dispatching proactively.  Similarly,
-this happens for all of the tokens that are starred. The next token,
-not starred, {\em Go(Surface)} is continuously searched but deferred,
-because it is not connected to a goal. The resulting AUV stays at {\em
-  Vent2} rather than heading to the {\em Surface} immediately.
+this occurs for all of the tokens that are starred. The next token that is
+not starred, {\em Go(Surface)}, is continuously searched but deferred,
+because it is not connected to an urgent goal. The resulting AUV stays 
+at {\em Vent2} rather than heading to the {\em Surface} immediately.
 
 %For the distributed algorithm approach, each token is checked during
 %the creation of the plan to see if it is an external goal in
@@ -62,7 +59,7 @@ the resulting plan in Fig. \ref{fig:ex:mixed2}. There is not enough
 time to {\em Sample Vent1} and be at the surface by 13:00. Therefore,
 the goal is placed after the AUV goes to the surface.  Consequently,
 the requirement {\em At Surface}, which would normally be deferred, is
-now superseded by the urgent goal {\em Sample Vent1}, and, therefore,
+now superseded by the goal {\em Sample Vent1} and, therefore,
 becomes proactive. The resulting starred tokens in
 Fig. \ref{fig:ex:mixed2} get dispatched proactively.
 
@@ -93,26 +90,26 @@ not be met.
 
 In our experiments, the simulated AUV missions ran in a virtual
 machine running Ubuntu, a Linux distribution. The virtual machine was
-run on a MacBook Pro. The virtual machine was allocated one core from
+run on a MacBook Pro and was allocated one core from
 a $2.33$ GHz Intel Core $2$ Duo processor. Time was
 recorded using a thread clock for the most accurate time.
 
 Figure \ref{fig:example_run} shows a simulated mission run that
 is similar to the original example in Fig. \ref{fig:ex:plan}.
 However, in order to increase the complexity of the plan a
-total of ten locations were added, eight before the vents. The first goal is to
-sample {\em vent2} at location ten and the second is to sample {\em
+total of eight locations were added before the vents. The first goal is to
+{\em Sample vent2} at location ten and the second is to {\em Sample
   vent1} at location nine. The spikes in the time happen when it
-dispatches both an {\em At} and a {\em Go} which means that the graph
-must be searched twice. There is a clear trend that as the AUV gets
+dispatches both an {\em At} and a {\em Go} token which means that the graph
+was searched twice. There is a clear trend that as the AUV gets
 closer to the goals the time decreases because the search distance
 decreases.  However, there is some variability in the time which can
-most likely be accounted for as timing with context switching as the
-virtual machine only has one processor. Before Goal\#2 is integrated
+most likely be accounted for as time added by context switching as the
+virtual machine only had one processor. Before Goal\#2 is integrated
 into the plan at time $127$, the algorithm is continually searching the
-graph which is shown as the time is on an average above $.2$
-milliseconds. At tick $127$, the {\em Go} is no longer deferred and gets
-dispatched. The search for Goal\#2 becomes relatively simple as it is
+graph from the next {\em Go}, from time $54$ through $126$. The time is on an average above $.2$
+milliseconds as the search is exhaustive. At tick $127$, the {\em Go} is no longer deferred and gets
+dispatched quickly. The search for Goal\#2 becomes relatively simple as it is
 not very far away in the plan, and thus the time decreases
 significantly.
 
@@ -136,7 +133,7 @@ to the left and decreases quickly as the time increases.  For less than $5\%$
 of the time, Algorithm \ref{DispatchToken} goes above two
 milliseconds with an upper bound time of thirteen. However, this
 portion of the histogram is largely condensed in order to maintain a
-reasonable size and would dissipate if spread out. These outliers can again 
+reasonable size and would dissipate if spread out. These outliers can 
 most likely be attributed to the virtual machine environment.
 
 %%% Local Variables: 
