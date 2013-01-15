@@ -1,24 +1,19 @@
 \section{Planning Definitions}
 \label{sec: defs}
 
-The focus of this paper is on the possibility of \emph{new objectives}
-arising at any time with consequent need to avoid doing actions that
-are not ``urgent'' in order to preserve the context for these
-objectives. Our robot generates and dispatches a partial plan in
-continuum to a lower level controller which further decomposes these
-plans towards atomic actions. These actions ultimately actuate
-hardware on our AUV; the world responds by sending sensory feedback as
-\emph{observations} up thru the hierarchical controller
-\cite{mcgann08bdup,rajan12dup}. Details of the controller are beyond
-the scope of this paper and are omitted without loss of generality of
-the concepts described.
-
-We first consider some basic representational definitions related to
-temporal planning consistent with \cite{Nau:2004}:
-
-% To consider the overall planning and plan execution within an agent we
-% use the definition of a temporal domain, planning problem and solution
-% as provided by \cite{Nau:2004}:
+The focus of this paper is on the possibility accommodating \emph{new
+  objectives} arising during mission execution, with consequent need
+to preserve context for their inclusion and subsequent execution and
+that actions not deemed 'urgent' be deferred. Our robot generates and
+dispatches a partial plan in continuum to a lower level controller
+which further decomposes these plans towards atomic actions. These
+actions ultimately actuate hardware on our AUV. The world responds by
+sending sensory feedback as \emph{observations} up thru the
+hierarchical controller \cite{mcgann08bdup,rajan12dup}. Details of the
+controller are beyond the scope of this paper and are omitted without
+loss of generality of the concepts described. We first consider some
+basic representational definitions related to temporal planning
+consistent with \cite{Nau:2004}:
 
 \begin{definition}
   \label{def:domain}
@@ -34,21 +29,18 @@ temporal planning consistent with \cite{Nau:2004}:
 
 A \emph{token} is a property that holds within a flexible temporal
 interval which represents an action or a state associated with $O$ or
-$X$ \cite{py10dup}. The temporal interval is delimeted by two 
-{\em timepoints} marking the possible values of its {\em start} and
-{\em end}.
- % \kcomment{define observations/timepoints; better
- %  still define the life-cycle within which an observation is received}
+$X$ \cite{py10dup}. A temporal interval is delimited by two {\em
+  timepoints} \cite{Boddy93} marking the possible values of its {\em
+  start} and {\em end}.
 
 \begin{definition}
   \label{def:problem}
-  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_0, \Phi_g )$, where:
+  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_{obs}, \Phi_g )$, where:
   \begin{itemize}
-  \item $\Phi_0 = (F, C)$ is a database in $\Lambda_\Phi$ that
-    satisfies the axioms of $X$.  $\Phi_0$ represents an initial
-    scenario that describes not only the initial state of the domain
-    but also the evolution of the world as depicted by the
-    observations fed by the executive in the course of the mission.
+  \item $\Phi_{obs} = (F, C)$ is a database in $\Lambda_\Phi$ that
+    satisfies the axioms of $X$.  $\Phi_{obs}$ represents an initial
+    scenario that describes initial state of the domain and
+    observations.
   \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
     the problem as a set $G$ of tokens together with a set $C_g$ of
     objects  and temporal constraints   on variables of $G$.
@@ -60,30 +52,31 @@ $X$ \cite{py10dup}. The temporal interval is delimeted by two
   A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
   partial instance of some operator in $O$.  We define $\lambda$ as
   the state-transition function.  $\pi$ is a solution of a problem $P
-  = (D, \Phi_0, \Phi_g)$ iff there is a database in $\lambda(\Phi_0,
+  = (D, \Phi_{obs}, \Phi_g)$ iff there is a database in $\lambda(\Phi_{obs},
   \pi)$ that entails $\Phi_g$.
 \end{definition}
  
 Our focus is on executing plan $\pi$; however, to reflect the dynamic
 interaction of the agent with its environment we need to refine the
-definition of the sets $\Phi_0$ and $\Phi_g$. As the world evolves,
-new (or refinement of existing) observations are added to
-$\Phi_0$. Similarly, the agent operator can request new future goals
-to be added to the agent $\Phi_g$ as mission time advances. We note
-$\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets at the instant
-$t$. For the sake of simplicity we consider that the alteration of
-these sets is purely additive with time\footnote{In practice, their
+definition of the sets $\Phi_{obs}$ and $\Phi_g$. As the world
+evolves, new (or refinement of existing) observations are added to
+$\Phi_{obs}$. Similarly, the agent operator can request new goals in
+the future to be added to the agent's $\Phi_g$ as mission time
+advances. For the sake of simplicity we consider that the alteration
+of these sets is purely additive with time\footnote{In practice, their
   evolution is more complex as completed goals becomes observation;
   even a goal previously requested can be cancelled by the
   operator. While this assumption largely simplifies problem
   description, our algorithm works regardless.}:
-\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
+\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_{obs}(t) \subseteq \Phi_{obs}(t')
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
-%\fcomment{I will need to refine this and make it more convincing}
-The dynamically growing nature of $\Phi_0$ reflects the cumulative
-observation as the agent execute its plan $\pi$. In nominal situations,
-new elements of $\Phi_0$ are refinements of the plan -- for example by
+where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
+time $t$.
+
+$\Phi_{obs}$ grows dynamically, reflecting cumulative observations as
+the agent executes its plan $\pi$. In nominal situations, new elements
+of $\Phi_{obs}$ are refinements of the plan -- for example by
 asserting that a planned command just started\footnote{This precludes
   situations where new observations invalidate the plan; this is out
   of the scope of this paper}. The agent can also receive new
