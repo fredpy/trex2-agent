@@ -19,6 +19,9 @@ system is embedded in a real-world robotic explorer, second because
 our integrated architecture \rx \cite{mcgann08bdup,py10dup,rajan12dup}
 plans \emph{continuously} during mission execution and finally, the
 situated agent encodes plans in a rich and flexible representation.
+While our onboard controller is influenced by work cited in the
+introduction, our work in this paper is complementary to much of the
+earlier work.
 
 % Dealing with plan execution is not a new problem and we can find a lot
 % of work that relates to this over several decades. Still, it is
@@ -107,7 +110,7 @@ task which depends on external factors -- where it is necessary to
 defer actions for correct plan execution. Work in soft temporal
 constraints with preferences \cite{khatib2001temporal} on dispatching
 has another related approach with preferable start times. However,
-they are plagued by poor performance \cite{bartak2002}% ; while the
+they are plagued by poor performance \cite{bartak2002}. % ; while the
 % complexity can be reduced to a more tractable (polynomial) solution by
 % specifying preferences as convex functions \cite{rossi2006learning},
 % this is still cubic in relation to the number of variables.
@@ -120,6 +123,12 @@ future should an unexpected situation occur. However, most such prior
 work focuses on improving plan quality but does not consider the
 impact of execution on the agent to handle anticipatory goals.
 
+The efforts above, decouple execution from planning unlike our work,
+where planning is not only continuous, but execution is intertwined
+with planning. Our interest is in deferring temporal decisions to the
+executive to adapt the plan to new objectives without heavily relying
+on plan-repair or re-planning solutions that could impact reactivity
+in an embedded system. 
 
 % In this case, the deterrence of the execution of this
 % time-point is enforced in order to ensure robust plan execution

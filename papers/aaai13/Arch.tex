@@ -1,21 +1,17 @@
 \section{Planning Definitions}
 \label{sec: defs}
 
-
-Our work is complementary to much of the above.  The focus of our is
-not on the observation of events during execution but rather on the
-possibility of \emph{new objectives} arising at any time, and to avoid
-doing actions that are not ``urgent'' to preserve the context for
-those objectives.  Similarly, temporal preference specification during
-planning, which has the effect of limiting execution-time flexibility.
-And finally, most of the effort above, has decoupled execution from
-planning unlike our work, where planning is not only continuous, but
-execution is intertwined. Our interest is in deferring temporal
-decisions to the executive to adapt the plan to new objectives without
-heavily relying on plan-repair or re-planning solutions that could
-impact system reactivity.
-
-Our robot generates a plan
+The focus of this paper is on the possibility of \emph{new objectives}
+arising at any time with consequent need to avoid doing actions that
+are not ``urgent'' in order to preserve the context for these
+objectives. Our robot generates and dispatches a partial plan in
+continuum to a lower level controller which further decomposes these
+plans towards atomic actions. These actions ultimately actuate
+hardware on our AUV; the world responds by sending sensory feedback as
+\emph{observations} up thru the hierarchical controller
+\cite{mcgann08bdup,rajan12dup}. Details of the controller are beyond
+the scope of this paper and are omitted without loss of generality of
+the concepts described.
 
 We first consider some basic representational definitions related to
 temporal planning consistent with \cite{Nau:2004}:
