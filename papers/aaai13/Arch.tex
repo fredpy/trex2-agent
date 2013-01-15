@@ -56,8 +56,8 @@ $X$ \cite{py10dup}. A temporal interval is delimited by two {\em
   \pi)$ that entails $\Phi_g$.
 \end{definition}
  
-Our focus is on executing plan $\pi$; however, to reflect the dynamic
-interaction of the agent with its environment we need to refine the
+While the focus is on executing plan $\pi$, to reflect the dynamic
+interaction of the agent with the environment we need to refine the
 definition of the sets $\Phi_{obs}$ and $\Phi_g$. As the world
 evolves, new (or refinement of existing) observations are added to
 $\Phi_{obs}$. Similarly, the agent operator can request new goals in
@@ -75,24 +75,24 @@ where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
 time $t$.
 
 $\Phi_{obs}$ grows dynamically, reflecting cumulative observations as
-the agent executes its plan $\pi$. In nominal situations, new elements
-of $\Phi_{obs}$ are refinements of the plan -- for example by
-asserting that a planned command just started\footnote{This precludes
-  situations where new observations invalidate the plan; this is out
-  of the scope of this paper}. The agent can also receive new
-objectives at any point with those added to $\Phi_g$. This assumption
-has an impact on how it is preferable to handle plan execution. Indeed
-while deciding when to start an action within the plan, one need to
-make sure that the execution of this action will not limit the ability
-of the agent to treat potential future emerging goals. In the light of
-it the agent should at the best of its knowledge try to balance the
-impact of the next available action as early as possible or prefer to
-delay it in the eventuality new goals occur. In our example, it was
-making sense to go to Vent2 early, but on the other hand going back to
-the surface too soon would result in locking the AUV -- within its
-current plan -- at the Surface until $8$ pm. The solution providing
-the most flexibility for the AUV was therefore for it to alternate
-between the two policies depending on the action impact.
+$\pi$ is executed. In nominal situations, new elements of $\Phi_{obs}$
+are refinements of the plan -- for example by asserting that a planned
+command just started\footnote{This precludes situations where new
+  observations invalidate the plan; this is out of the scope of this
+  paper}. The agent can also receive new objectives at any point with
+those added to $\Phi_g$. This assumption has an impact on how it is
+preferable to handle plan execution. Indeed while deciding when to
+start an action within the plan, one need to make sure that the
+execution of this action will not limit the ability of the agent to
+treat potential future emerging goals. In the light of it the agent
+should at the best of its knowledge try to balance the impact of the
+next available action as early as possible or prefer to delay it in
+the eventuality new goals occur. In our example, it was making sense
+to go to Vent2 early, but on the other hand going back to the surface
+too soon would result in locking the AUV -- within its current plan --
+at the Surface until $8$ pm. The solution providing the most
+flexibility for the AUV was therefore for it to alternate between the
+two policies depending on the action impact.
 
 In order to help the AUV have a better knowledge on the nature of the
 goals we do consider that each goal provide information on its
