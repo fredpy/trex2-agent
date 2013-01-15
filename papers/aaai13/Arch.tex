@@ -34,8 +34,11 @@ temporal planning consistent with \cite{Nau:2004}:
 
 A \emph{token} is a property that holds within a flexible temporal
 interval which represents an action or a state associated with $O$ or
-$X$ \cite{py10dup}. \kcomment{define observations/timepoints; better
-  still define the life-cycle within which an observation is received}
+$X$ \cite{py10dup}. The temporal interval is delimeted by two 
+{\em timepoints} marking the possible values of its {\em start} and
+{\em end}.
+ % \kcomment{define observations/timepoints; better
+ %  still define the life-cycle within which an observation is received}
 
 \begin{definition}
   \label{def:problem}
@@ -44,11 +47,11 @@ $X$ \cite{py10dup}. \kcomment{define observations/timepoints; better
   \item $\Phi_0 = (F, C)$ is a database in $\Lambda_\Phi$ that
     satisfies the axioms of $X$.  $\Phi_0$ represents an initial
     scenario that describes not only the initial state of the domain
-    but also the evolution predicted to take place independently of
-    the actions to be planned.
+    but also the evolution of the world as depicted by the
+    observations fed by the executive in the course of the mission.
   \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
     the problem as a set $G$ of tokens together with a set $C_g$ of
-    objects and temporal constraints on variables of $G$.
+    objects  and temporal constraints   on variables of $G$.
   \end{itemize}
 \end{definition}
 
@@ -67,7 +70,7 @@ definition of the sets $\Phi_0$ and $\Phi_g$. As the world evolves,
 new (or refinement of existing) observations are added to
 $\Phi_0$. Similarly, the agent operator can request new future goals
 to be added to the agent $\Phi_g$ as mission time advances. We note
-$\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets at the time-point
+$\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets at the instant
 $t$. For the sake of simplicity we consider that the alteration of
 these sets is purely additive with time\footnote{In practice, their
   evolution is more complex as completed goals becomes observation;
@@ -79,7 +82,7 @@ these sets is purely additive with time\footnote{In practice, their
 
 %\fcomment{I will need to refine this and make it more convincing}
 The dynamically growing nature of $\Phi_0$ reflects the cumulative
-observation as the agent execute plan $\pi$. In nominal situations,
+observation as the agent execute its plan $\pi$. In nominal situations,
 new elements of $\Phi_0$ are refinements of the plan -- for example by
 asserting that a planned command just started\footnote{This precludes
   situations where new observations invalidate the plan; this is out
@@ -158,11 +161,12 @@ subgoals with similar priority as $g$.
     so, dispatches the token.}
 \label{DispatchToken}
 \begin{algorithmic}
+\small 
 \Function{DispatchToken}{Token $T$}
-\State $Boolean Goal$ = $SearchForGoal( T )$
+\State Boolean $Goal = \textsc{SearchForGoal}( T )$
 \If{ $Goal$ $=$ True}
 	\State \Return Dispatch $T$
-\ElsIf{ $T$ start upper bound $ \leq $ upper bound for the current tick}
+\ElsIf{ $T$ start upper bound $ \leq $ current tick}
 	\State \Return Dispatch $T$
 \Else
 	\State \Return Don't dispatch $T$
@@ -176,17 +180,23 @@ subgoals with similar priority as $g$.
     looking for a token that is in the set $\Phi_{ge}$.}
 \label{SearchForGoal}
 \begin{algorithmic}
+\small
 \Function{SearchForGoal}{ Token $T$ }
-\State List $Search$ = Action(s) that $T$ is a Condition 
-\ForAll{Action(s), $A$, in $Search$ }
-	\ForAll{Effect(s), $E$, of Action $A$ }
-		\If{$E$ is a Goal in $\Phi_{ge}$}
-			\State \Return True
-		\ElsIf{$E$ is a Condition of an Action $A_c$}
-			\State Add $A_c$ to back of list $Search$
-		\EndIf
-	\EndFor
-\EndFor
+\If{$T \in \Phi_{ge}$}
+  \State \Return True
+\Else 
+  \State List $Fringe$ = \{ Actions that $T$ is Condition of \}
+  \ForAll{Action(s), $A$, in $Fringe$ }
+     \ForAll{Effects, $E$ of $A$}
+       \If{$E \in \phi_{ge}$}
+          \State \Return True
+        \Else 
+           \State List $L$ = \{ Action(s) that $E$ is Condition of \}
+           \State $Fringe$ = $Search \cup L$ 
+        \EndIf
+      \EndFor
+  \EndFor
+\EndIf
 \State \Return False
 \EndFunction
 \end{algorithmic}
