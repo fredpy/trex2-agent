@@ -83,10 +83,10 @@ not be met.
   \centering
   \includegraphics[width=\columnwidth]{figs/example_run.pdf}
   \caption{\small One mission run that shows the time needed for
-    dispatching. Star represents when the Goal\#2 was received and
+    dispatching. The star represents when the Goal\#2 was received and
     integrated into the plan. Lines with boxes at the end represent
     the deferred action {\em Go} Because of space, we didn't put an
-    arrow to every {\em At}. Our concern were the peak that showed
+    arrow to every {\em At}. Our concern were the peaks that showed
     where the system had to dispatch both {\em At} and {\em Go}. }
   \label{fig:example_run}
 \end{figure}
@@ -94,12 +94,13 @@ not be met.
 In our experiments, the simulated AUV missions ran in a virtual
 machine running Ubuntu, a Linux distribution. The virtual machine was
 run on a MacBook Pro. The virtual machine was allocated one core from
-a $2.33$ GHz Intel Core $2$ Duo processor.
+a $2.33$ GHz Intel Core $2$ Duo processor. Time was
+recorded using a thread clock for the most accurate time.
 
-In Figure \ref{fig:example_run}, we show a simulated mission run that
-is similar to our original example in Fig. \ref{fig:ex:plan}.
-However, in order to increase the complexity of the plan we added a
-total of ten locations, eight before the vents. The first goal is to
+Figure \ref{fig:example_run} shows a simulated mission run that
+is similar to the original example in Fig. \ref{fig:ex:plan}.
+However, in order to increase the complexity of the plan a
+total of ten locations were added, eight before the vents. The first goal is to
 sample {\em vent2} at location ten and the second is to sample {\em
   vent1} at location nine. The spikes in the time happen when it
 dispatches both an {\em At} and a {\em Go} which means that the graph
@@ -118,23 +119,25 @@ significantly.
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=\columnwidth]{figs/HistogramAlg1}
-  \caption{\small We ran 500 missions were Algorithm
-    \ref{DispatchToken} was timed for every tick of the mission time.
-    One goal was inserted into the plan at a random time. Shows the
-    distribution of the time.}
+  \caption{\small Algorithm \ref{DispatchToken} was 
+  timed at every increment of the mission time for 500 
+  simulated missions. One goal was inserted into the plan 
+  at a random time during the mission. The histogram shows 
+  the distribution of the time, which is heavily skewed to the left.}
   \label{fig:histogram}
 \end{figure}
 
 In order to demonstrate the average amount of time that Algorithm
-\ref{DispatchToken} uses, we ran $500$ simulated missions and timed it
-at every mission tick. Figure \ref{fig:histogram} shows that for about
+\ref{DispatchToken} uses, $500$ simulated missions were recorded and timed
+at every increment of the mission time. Figure \ref{fig:histogram} shows that for about
 90\% of the time, Algorithm \ref{DispatchToken} takes less than .2
 milliseconds to complete it's search. The histogram is clearly skewed
-to the left and decreases quickly as the time increases. Less than 5\%
-of the time did Algorithm \ref{DispatchToken} go above two
+to the left and decreases quickly as the time increases.  For less than 5\%
+of the time, Algorithm \ref{DispatchToken} goes above two
 milliseconds with an upper bound time of thirteen. However, this
 portion of the histogram is largely condensed in order to maintain a
-reasonable size and would decrease if spread out.
+reasonable size and would dissipate if spread out. These outliers can again 
+most likely be attributed to the virtual machine environment.
 
 %%% Local Variables: 
 %%% mode: latex
