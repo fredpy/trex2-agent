@@ -2,21 +2,22 @@
 \label{sec:exp}
 
 The experiments follow a mission similar to the original plan given in
-Fig. \ref{fig:ex:plan}. At the beginning, the AUV need to {\em Sample
-  Vent2} and it has to return to the {\em surface} by the end of the
-mission. The AUV must also be at the {\em surface} around the time 13:00. We
-implemented this on our executive with plans being produced by the
-europa planning engine \cite{frank2003}. Figure \ref{fig:ex:mixed1} 
-demonstrates the resulting plan after processing from 
+Fig. \ref{fig:ex:plan}. The AUV needs to {\em Sample Vent2} and return
+to the {\em surface} by the end of the mission. The AUV must also be
+at the {\em surface} around $13:00$. We implemented this in our
+executive which synthesizes temporal
+plans.  % with plans being produced by the europa planning engine
+% \cite{frank2003}.
+Fig. \ref{fig:ex:mixed1} demonstrates the resulting plan using
 Algorithm \ref{alg:dispatch}.
 
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.8\columnwidth]{figs/example_MixedInitial}
-  \caption{\small The algorithmic solution for the plan from
-    Fig. \ref{fig:ex:plan}. Solid lines indicate conditions and
-    dashed lines indicate effects. Pentagons indicate {\em urgent}
-    goals, stars indicate tokens that were deduced as {\em proactive}.}
+  \caption{\small Plan solution from Fig. \ref{fig:ex:plan}. Solid
+    lines indicate conditions and dashed lines indicate
+    effects. Pentagons indicate {\em urgent} goals, stars indicate
+    tokens that were deduced as {\em proactive}.}
   \label{fig:ex:mixed1}
 \end{figure}
 
