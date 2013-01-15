@@ -7,7 +7,8 @@ Fig. \ref{fig:ex:plan}. At the beginning, the AUV need to {\em Sample
 mission. The AUV must also be at the {\em surface} around the time 13:00. We
 implemented this on our executive with plans being produced by the
 europa planning engine \cite{frank2003}. Figure \ref{fig:ex:mixed1} 
-demonstrates the resulting plan from Algorithm \ref{DispatchToken}.
+demonstrates the resulting plan after processing from 
+Algorithm \ref{alg:dispatch}.
 
 \begin{figure}[!htbp]
   \centering
@@ -53,28 +54,28 @@ at {\em Vent2} rather than heading to the {\em Surface} immediately.
   \label{fig:ex:mixed2}
 \end{figure}
 
-Now imagine that while the AUV is at {\em Vent2} it gets a request
-from the scientist at 11:30 asking it to {\em Sample Vent1}. We show
-the resulting plan in Fig. \ref{fig:ex:mixed2}. There is not enough
+In this run we then introduced a new {\em urgent} goal to {\em Sample
+Vent1} at 11:30. We show the resulting plan in
+Fig. \ref{fig:ex:mixed2}. There is not enough
 time to {\em Sample Vent1} and be at the surface by 13:00. Therefore,
-the goal is placed after the AUV goes to the surface.  Consequently,
-the requirement {\em At Surface}, which would normally be deferred, is
-now superseded by the goal {\em Sample Vent1} and, therefore,
-becomes proactive. The resulting starred tokens in
-Fig. \ref{fig:ex:mixed2} get dispatched proactively.
+the goal is placed after the AUV goes to the surface. As a result the
+actions which were so fdfar marked as deferred are now also causaly
+linked to the new {\em urgent} goal. Therefore their former execution
+policy is now updated. The resulting starred tokens in
+Fig. \ref{fig:ex:mixed2} get dispatched proactively and includes all
+the actions related to this mid-day surfacing goal.
 
-As the end of the day approaches, the AUV will need to start heading
-to the surface. At 19:00, algorithm \ref{DispatchToken} will find that
-the {\em Go(Vent1, Surface)} is still not connected to a goal but that
-the upper bound time for starting the token has been
-reached. Therefore, we dispatch the token because it has become
-necessary for completing the plan.  After returning to the {\em
-  Surface}, the plan shows that the AUV will then {\em Go(Surface, ?)}
-(dashed in the figures). This is an artifact resulting from the plan
-model which specifies that a {\em At} token is followed by a {\em Go}.
+Meanwhile the actions related to the last surfacing goal remains {\em
+  deferred} and won't be executed until 19:00 allowing the vehicle to
+sample {\em Vent1} for a duration of 2:50 hours.  After returning to the {\em
+  Surface}, our planner and domain inserted a  partially instantiated
+action to {\em Go(Surface, ?)} (dashed in the figures). 
+This is an artifact resulting from the plan model which specifies that 
+an {\em At} token is necessarily followed by a {\em Go}.
 However, our algorithm will not be dispatching this token as it is not
-connected to a goal and its upper bound start time ($+\infty$) will
-not be met.
+connected to an {\em urgent} goal and its upper bound 
+start time ($+\infty$) will not be met within the scope of the
+mission. 
 
 \begin{figure}[!htbp]
   \centering
@@ -87,6 +88,7 @@ not be met.
     where the system had to dispatch both {\em At} and {\em Go}. }
   \label{fig:example_run}
 \end{figure}
+
 
 In our experiments, the simulated AUV missions ran in a virtual
 machine running Ubuntu, a Linux distribution. The virtual machine was
