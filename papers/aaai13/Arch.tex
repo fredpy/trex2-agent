@@ -146,12 +146,13 @@ conditions\footnote{For metric temporal plans, Allen Algebra
 \end{definition}
 
 As a result all the conditions of this action can be assumed to be
-subgoals with similar priority as $g$.
+subgoals with similar priority as $g$. 
 
 \begin{algorithm} [H]
   \caption{\small The function $DispatchToken$ finds if there is a
     goal in $\Phi_{ge}$ that is connected to the token, $t$, and, if
     so, dispatches the token.}
+  \label{alg:dispatch}
 \label{DispatchToken}
 \begin{algorithmic}
 \small 
@@ -167,6 +168,16 @@ subgoals with similar priority as $g$.
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
+
+Algorithm \ref{alg:dispatch} is the central deciding  point for how a 
+token should be dispatched.
+It is called at every execution cycles and evaluates the next tokens to be
+executed.  By finding out that a token is connected to a goal
+ in $\Phi_{ge}$, we conclude that the token is a sub-goal,
+and thus dispatch it immediately being proactive.  On the other hand,
+if the token is not connected to a goal then we defer dispatching it
+until necessary.  This demonstrates our distinction between how we
+dispatch tokens, proactive or deferred.
 
 \begin{algorithm} [H]
   \caption{\small The function $SearchForGoal$ does a Forward search
@@ -195,27 +206,15 @@ subgoals with similar priority as $g$.
 \end{algorithmic}
 \end{algorithm}
 
-This Algorithm is the central deciding point for how a
-token should be dispatched. By finding out that a token is connected
-to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
-and thus dispatch it immediately being proactive.  On the other hand,
-if the token is not connected to a goal then we defer dispatching it
-until necessary.  This demonstrates our distinction between how we
-dispatch tokens, proactive or deferred.
-
-A crucial part for deciding how to dispatch a token is finding whether
-the token in question is connected to a goal in $\Phi_{ge}$, call it
-$G$. Algorithm \ref{SearchForGoal} does the function of searching for
-$G$ in a forward-search manner. We define a causal link within our
-plan that must be met in order for our search to function.
-
-During our search, if we find $G$ then we know that the original token
-is part of the solution for completing $G$.  As such, we want to be
-proactive with completing the token early so as to ultimately complete
-$G$. If we don't find $G$ then the token has no connection to an
-external request. The token still needs to be dispatched, however,
-there is no one explicitly requesting it to be accomplished. Thus,
-there is no reason to be proactive.
+To inform this decision we uses Algorithm \ref{SearchForGoal} which
+search for a causally link between the token $T$ and token $G$ of
+$\Phi_{ge}$ in a forward-search manner. During our search, 
+if we find $G$ then we know that the original token is part of the 
+solution for completing $G$.  As such, we want to be
+proactive in ordeto utlimately complete $G$ as early as possible.
+If we don't find $G$ then the token has no connection to an
+external request. The token still needs to be eventually dispatched, 
+however, there is no motivation to execute this action earlier than necessary.
 
 This algorithm is equivalent to a breadth first search along the
 planning structure starting from the action we need to
