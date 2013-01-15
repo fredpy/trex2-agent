@@ -4,50 +4,116 @@
 
 As autonomous agents become more and more flexible it becomes difficult
 to deal with all the possible changes that occur during the
-mission. While there has already been work around the topic of robust
-plan execution, they always have been focused on threats coming from
-execution feedback while not considering how the potential emergence of
-new goals could impact how the current plan should be executed. In this
-paper, we discussed this aspect and proposed a solution that relies on
-extra information on the urgency of an objective. By propagating this
-through the plan structure, we were able to leverage this information for
-supporting the plan executive decision starting actions proactively or
-not. A second algorithm allowed to propagate this information during the
-planning phase ensuring that the executive can identify this information
-quickly.
+mission. During our work we identified that, while many existing 
+architectures embedding a planner do provide solutions to accept goals
+on the fly, the way they handle the execution of the plan beforehand
+is not necessarily fitted for efficent integration of such unpredicted
+situation. Until now the nly way we could improve this was to engineer
+exr information within the domain model which added complexity both in
+term of the planning search and more importantly in the engineering fo
+such model. This added complexity is increasing the risks of modeling
+error and forthis reason we did provide a simple but yet efficient
+solution that allow to propagate the information based on an extended
+goal specification. 
 
-\fcomment{This is just a quick presentation on potential future
-  direction} As we stated in the related works our approach does not
-really address dynamic controllability and has the more classic
-assumption present in many planning frameworks that time-points are
-controllable. A side effect of this is that in its current state it
-may result on the system to decide to defer action as late as
-possible. In our example, this would result on the AUV leaving Vent1
-as late as 19:00 making the rest of its plan brittle to any delay due
-for example to downward water currents on its way to the surface. This
-needs to be further addressed in the future and, especially, how our
-work can be integrated with work presented in \cite{morris01}.
 
-Further as of today, we consider that the qualification of the goal is
-predefined when the goal is submitted by the planner. It is possible
-though that part of this can be refined on some cases based on the
-nature of the goal. Looking back at our domain, one can note that the
-2 goals provided are constrained differently on their start time;
-while {\em Sample Vent2} start time is limited only on its upper
-bound, the returning to surface conversely is constrained only on the
-lower bound of its start time. This difference hints on some of the
-issues we presented. While we do consider that explicit information of
-these goals help the plan execution to be improved when such
-information is not initially present. We also are aware that the
-nature of the constraints within the goal itself can help identify the
-best policy to be done. It is obvious that for Sampling Vent2 it is
-better to be proactive on the actions that contribute to this
-goal. Conversely, the other goal only matter if it appears fairly late
-in the plan which means that it is probably better to not start
-completing this part of the plan too aggressively. We plan to further
-explore how we can refine the distinction between the different
-policies by using the information provided by the constraints of the
-different objectives.
+The current work is focusing on the plan  structure at a fairly
+abstarct level without direct consideration in our approach of the
+timing constraints applied to each goals of the plan. In this approahc
+we are able using a breadth first search within the exisinting plan
+structure to select different execution policyies for each actionn
+within the plan. By doing so we can improve the overall mission 
+execution as it avoids to be proactve on objectives that could lead it
+to inneficient handling of new goal requests.
+
+At this stage our causla link traversal is agnostic of the temporal 
+constraints applied to the timepoints of the plan. While it is
+beneficial for the generality of the approach, we also see that
+including such information could greatly the quality of our solution. 
+One specific point we see is that often the goals we necessarily mark
+as non urgent are tied to a timepoint that is constrained to be {\em
+  after} a future date. We need to explore this further in order to
+see how such information could be used for our system to automatically
+classify such goal as non urgent. It can also impact  also how the
+{\em urgent} goal propagate within the plan. For example in our result
+we had a non urgent goal around $1:00 pm$ that was eventually 
+followed by an urgent goal as a result of the planning. As of today 
+our policy did make all the actions related to the non urgent goal 
+become proactive. This can lead to premature surfacing that is then 
+prohibiting the agent to accept goals in the morning. our current
+understanding is that this timing constraint enforcing the non
+urgent {\em Surface} to end after $1:00$ is acting as a guard on the
+propagation of our heuristic. Therefore we should have ideally only
+marked as urgent the actions that are directly after this timepoint
+instead of continue to propagate to the actions leading to the
+surface. 
+
+Such refinement can be done only by considering the temporal
+constraints applied to the plan timepoints. Indeed should the 
+{\em Surface} not have been constrained to be around $1:00 pm$ staring
+its execution proactively would have not blocked the vehicle at the
+surface. We plan to explore in the future to explore how both the
+marking of the goals {\em as urgent} and propagation to action  can be
+better deduced by analyzing the simple temporal network (STN)
+supporting the current plan. Further, as the planner we used did not
+implement STNU and the work presented in \cite{morris01} about dynamic
+controllability. We believe that as this work is handled during
+planning while our approach is handled during plan execution, both
+should be easily complementary still the {\bf wait} actions inserted
+by their algorithm may need to be considered with a non
+urgent status within our approach. 
+
+All of these refinements are considered in order to further improve
+our approach int the context of temporal planning. They would allow to
+further improve the overal execution of our agent despite the fact
+that the set of goals it will receive is not fully known until mission 
+completion. In our domain such requirement became crucial as our $AUV$
+is evolving on a highly dynamic environment and scientists often need
+fresh information in ordert to identify what could be done next. Until
+now the common approach on AUV surveys was to separe exploration and
+exploitation into two different surveys \cite{Yoerger01012007}. We do
+believe that by improving how the vehicle can handle the reception of
+new goals can  greatly improve the efficiency of such surveys and can
+also generalized to any domain where a robot can receive unexpected
+new objectives from its users during the course  of its mission.
+
+
+
+
+
+% While there has already been work around the topic of robust
+% \fcomment{This is just a quick presentation on potential future
+%   direction} As we stated in the related works our approach does not
+% really address dynamic controllability and has the more classic
+% assumption present in many planning frameworks that time-points are
+% controllable. A side effect of this is that in its current state it
+% may result on the system to decide to defer action as late as
+% possible. In our example, this would result on the AUV leaving Vent1
+% as late as 19:00 making the rest of its plan brittle to any delay due
+% for example to downward water currents on its way to the surface. This
+% needs to be further addressed in the future and, especially, how our
+% work can be integrated with work presented in \cite{morris01}.
+
+% Further as of today, we consider that the qualification of the goal is
+% predefined when the goal is submitted by the planner. It is possible
+% though that part of this can be refined on some cases based on the
+% nature of the goal. Looking back at our domain, one can note that the
+% 2 goals provided are constrained differently on their start time;
+% while {\em Sample Vent2} start time is limited only on its upper
+% bound, the returning to surface conversely is constrained only on the
+% lower bound of its start time. This difference hints on some of the
+% issues we presented. While we do consider that explicit information of
+% these goals help the plan execution to be improved when such
+% information is not initially present. We also are aware that the
+% nature of the constraints within the goal itself can help identify the
+% best policy to be done. It is obvious that for Sampling Vent2 it is
+% better to be proactive on the actions that contribute to this
+% goal. Conversely, the other goal only matter if it appears fairly late
+% in the plan which means that it is probably better to not start
+% completing this part of the plan too aggressively. We plan to further
+% explore how we can refine the distinction between the different
+% policies by using the information provided by the constraints of the
+% different objectives.
  
 %%% Local Variables: 
 %%% mode: latex
