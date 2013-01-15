@@ -1,6 +1,22 @@
 \section{Planning Definitions}
 \label{sec: defs}
 
+
+Our work is complementary to much of the above.  The focus of our is
+not on the observation of events during execution but rather on the
+possibility of \emph{new objectives} arising at any time, and to avoid
+doing actions that are not ``urgent'' to preserve the context for
+those objectives.  Similarly, temporal preference specification during
+planning, which has the effect of limiting execution-time flexibility.
+And finally, most of the effort above, has decoupled execution from
+planning unlike our work, where planning is not only continuous, but
+execution is intertwined. Our interest is in deferring temporal
+decisions to the executive to adapt the plan to new objectives without
+heavily relying on plan-repair or re-planning solutions that could
+impact system reactivity.
+
+Our robot generates a plan
+
 We first consider some basic representational definitions related to
 temporal planning consistent with \cite{Nau:2004}:
 
@@ -13,12 +29,17 @@ temporal planning consistent with \cite{Nau:2004}:
   A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
   \begin{itemize}
   \item $\Lambda_\Phi$ is the set of all temporal databases that can
-    be defined with the constraints, the constant, variable, and
-    relation symbols in the representation.
+    be defined with constraint, constant, variable, and relation
+    symbols in the representation.
   \item $O$ is a set of temporal planning operators.
   \item $X$ s a set of domain axioms.
   \end{itemize}
 \end{definition}
+
+A \emph{token} is a property that holds within a flexible temporal
+interval which represents an action or a state associated with $O$ or
+$X$ \cite{py10dup}. \kcomment{define observations/timepoints; better
+  still define the life-cycle within which an observation is received}
 
 \begin{definition}
   \label{def:problem}
@@ -39,66 +60,66 @@ temporal planning consistent with \cite{Nau:2004}:
   \label{def:plan}
   A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
   partial instance of some operator in $O$.  We define $\lambda$ as
-  the state-transition function.
-
-  $\pi$ is a solution of a problem $P = (D, \Phi_0, \Phi_g)$ iff there
-  is a database in $\lambda(\Phi_0, \pi)$ that entails $\Phi_g$.
+  the state-transition function.  $\pi$ is a solution of a problem $P
+  = (D, \Phi_0, \Phi_g)$ iff there is a database in $\lambda(\Phi_0,
+  \pi)$ that entails $\Phi_g$.
 \end{definition}
  
-Our focus is on executing a plan $\pi$; however, to reflect the
-dynamic interaction of the agent with its environment we need to
-refine the definition of the sets $\Phi_0$ and $\Phi_g$.
-
-As the world evolves new (or refinement of existing) observations are
-added to $\Phi_0$. Similarly, the agent operator can request new
-future goals to be added to the agent $\Phi_g$ as mission time
-advance. We note $\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets
-at the time-point $t$. For the sake of simplicity we consider that the
-alteration of these sets is purely additive with time\fcomment{ In
-  practice, their evolution is more complex as completed goals becomes
-  observation or even a goal previously requested can be cancelled by
-  the operator. Still this assumption largely simplify the problem
-  description and our algorithm still works without it (even though it
-  kind fo assume it)}:
+Our focus is on executing plan $\pi$; however, to reflect the dynamic
+interaction of the agent with its environment we need to refine the
+definition of the sets $\Phi_0$ and $\Phi_g$. As the world evolves,
+new (or refinement of existing) observations are added to
+$\Phi_0$. Similarly, the agent operator can request new future goals
+to be added to the agent $\Phi_g$ as mission time advances. We note
+$\Phi_0(t)$ and $\Phi_g(t)$ the value of these sets at the time-point
+$t$. For the sake of simplicity we consider that the alteration of
+these sets is purely additive with time\footnote{In practice, their
+  evolution is more complex as completed goals becomes observation;
+  even a goal previously requested can be cancelled by the
+  operator. While this assumption largely simplifies problem
+  description, our algorithm works regardless.}:
 \[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_0(t) \subseteq \Phi_0(t')
 \wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 
 %\fcomment{I will need to refine this and make it more convincing}
 The dynamically growing nature of $\Phi_0$ reflects the cumulative
-observation as the agent execute its plan $\pi$. In nominal 
-situation new elements of $\Phi_0$ are refinements the plan 
--- for example by asserting that a planned command just
-started\footnote{This preclude situations where new observations
-  invalidate the plan which is out of the scope of this paper}. We
-also consider that the agent can receive at any point new objectives
-that will be added to $\Phi_g$. This assumption have an impact on how
-it is preferable to handle plan execution. Indeed while deciding
-when to start an action within the plan, one need to make  sure that
-the execution of this action will not limit the ability fo the agent
-to treat potential future emerging goals. In the light of it the agent
-should at the best of its knowledge  try to balance the impact of the
-next available action as early as possible or prefer to delay it in
-the eventuality new goal occur. In our example, it was making sense to
-go to Vent2 early, but on the other hand going back to the surface too soon
-would result on the current plan locking the AUV -- within its current
-plan -- at Surface until 8 pm. The solution providing the most freedom for
-the AUV was therefore for it to alternate between the two policies
-depending on the action impact. 
+observation as the agent execute plan $\pi$. In nominal situations,
+new elements of $\Phi_0$ are refinements of the plan -- for example by
+asserting that a planned command just started\footnote{This precludes
+  situations where new observations invalidate the plan; this is out
+  of the scope of this paper}. The agent can also receive new
+objectives at any point with those added to $\Phi_g$. This assumption
+has an impact on how it is preferable to handle plan execution. Indeed
+while deciding when to start an action within the plan, one need to
+make sure that the execution of this action will not limit the ability
+of the agent to treat potential future emerging goals. In the light of
+it the agent should at the best of its knowledge try to balance the
+impact of the next available action as early as possible or prefer to
+delay it in the eventuality new goals occur. In our example, it was
+making sense to go to Vent2 early, but on the other hand going back to
+the surface too soon would result in locking the AUV -- within its
+current plan -- at the Surface until $8$ pm. The solution providing
+the most flexibility for the AUV was therefore for it to alternate
+between the two policies depending on the action impact.
 
-In order to help the AUV have a better knowledge on the nature of
-the goals we do consider that each goal provide information on its
+In order to help the AUV have a better knowledge on the nature of the
+goals we do consider that each goal provide information on its
 priority. In that purpose, we define that $\Phi_g$ is partitioned into
-2 sets:
+two sets:
+
 \begin{itemize}
-\item the internal goals $\Phi_{gi}$ which represent goals the agent
-  {\em need} to maintain internally. These goals will be considered 
-  as objectives that are not of the higher priority and therefore
-  their actions can be deferred during execution.
-\item the external goals $\Phi_{ge}$ which represents the goal
+
+\item the \emph{internal} goals $\Phi_{gi}$ which represent goals the
+  agent {\em needs} to maintain internally. These goals will be
+  considered as objectives that are not of the higher priority and
+  therefore their actions can be deferred during execution.
+
+\item the \emph{external} goals $\Phi_{ge}$ which represents the goal
   received by the agent externally. As these goals are requested by
   the user, we consider them as to be of higher important -- ie the
   agent {\em wants} to execute them. Therefore, their execution should
   be preferrrably proactive.
+
 \end{itemize}
 
 At any point we need to evaluate an action within our plan $\pi$ we
@@ -106,12 +127,11 @@ consider that this plan is up to date and provide a solution of all
 the goals of both $\Phi_{gi}$ and $\Phi_{ge}$ that can reasonably be
 done within the current mission scope.
 
-
-\section{Proposed algorithms}
+\section{Algorithmic Description}
 
 As a new action can be dispatched for execution, the executive needs
 to evaluate how it relates to the goals of the plan. Intuitively if
-this action was generated by (or contribute to) an internal goal of
+this action was generated by (or contributes to) an internal goal of
 $\Phi_{gi}$ it needs to be taken proactively, while otherwise we can
 consider it as non-urgent. Therefore, when evaluating if the token
 representing this action within the plan the executive needs to do a
@@ -119,6 +139,22 @@ forward search on the causal links related to this token to see if
 they lead to an internal goal as implemented in Algorithm
 \ref{DispatchToken}.
 
+\begin{definition}
+\label{def:subgoalLink}
+A goal $g$ is causally linked to a state value $c_i$ if there is an
+action such as $g$ is an effect of this action and $c_i$ is one of its
+conditions\footnote{For metric temporal plans, Allen Algebra
+  \cite{allen84} is the basis for determining relationships between
+  actions and is more general than pre-conditions in classical
+  planning.}. 
+% A causal link is defined as linking a goal as an effect of an action
+% whose conditions are needed in order to complete the goal and, thus, are
+% subgoals. This link can be recursive as the conditions themselves may
+% be the effect of an action causing a causal chain to build.
+\end{definition}
+
+As a result all the conditions of this action can be assumed to be
+subgoals with similar priority as $g$.
 
 \begin{algorithm} [H]
   \caption{\small The function $DispatchToken$ finds if there is a
@@ -173,13 +209,7 @@ the token in question is connected to a goal in $\Phi_{ge}$, call it
 $G$. Algorithm \ref{SearchForGoal} does the function of searching for
 $G$ in a forward-search manner. We define a causal link within our
 plan that must be met in order for our search to function.
-\begin{definition}
-\label{def:subgoalLink}
-A causal link is defined as linking a goal as an effect of an action
-whose conditions are needed in order to complete the goal and, thus,
-are subgoals. This link can be recursive as the conditions themselves
-may be the effect of an action causing a causal chain to build.
-\end{definition}
+
 During our search, if we find $G$ then we know that the original token
 is part of the solution for completing $G$.  As such, we want to be
 proactive with completing the token early so as to ultimately complete

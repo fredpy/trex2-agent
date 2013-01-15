@@ -7,18 +7,24 @@ ongoing mission is high. Generative planning integrated within the
 robotic architecture to fulfill current or such evolving agent
 objectives and to deal with unanticipated situations is one approach
 to enhance persistence while dealing with robot adaptation.  Earlier
-work such as \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
-\cite{Haigh98}, and the LAAS architecture \cite{alami:1998p820} have
-all contributed to this field of research. Results from such work have
-lead to goal directed architectures that have sucessfully worked in
-the real-world such as the Remote Agent Experiment \cite{mus98}, the
-Autonomous Spacecraft Experiment \cite{chien99} and more recently the
-Teleo Reactive Executive \cite{py10}. Often these architectures embed
-planning engines that support a rich representation dealing with
-durative actions and resources while ensuring partial plans are
-flexible for robust execution \cite{lemai04}.  A resulting consequence
-has been results in efficient approaches to temporal plan dispatch to
-ensure robust and sound execution \cite{mus98a,morris01}. 
+work \cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,py10}
+have contributed control architectures which embed planning engines
+many of which support a rich representation dealing with durative
+actions while ensuring partial plans are flexible for robust execution
+\cite{lemai04}.
+
+% such as \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
+% \cite{Haigh98}, and the LAAS architecture \cite{alami:1998p820} have
+% all contributed to this field of research. Results from such work have
+% lead to goal directed architectures that have sucessfully worked in
+% the real-world such as the Remote Agent Experiment \cite{mus98}, the
+% Autonomous Spacecraft Experiment \cite{chien99} and more recently the
+% Teleo Reactive Executive \cite{py10}. Often these architectures embed
+% planning engines that support a rich representation dealing with
+% durative actions and resources while ensuring partial plans are
+% flexible for robust execution \cite{lemai04}.  % A resulting consequence
+% has been results in efficient approaches to temporal plan dispatch to
+% ensure robust and sound execution \cite{mus98a,morris01}. 
 
 While these approaches have been necessary to correctly execute a
 \emph{flexible temporal plan}, they view the agent itself as
@@ -43,16 +49,20 @@ coping with diverse execution scenarios. In this context, it is
 important for the agent to make a distinction between actions that can
 be taken proactively versus other actions that may not be urgent.
 
-In this work, we propose a systematic approach to allow the agent to
-make such a distinction for each action by tracking causal
-relationships between goals within the current plan. This allow us to
-determine an appropriate dispatch strategy for execution, based on the
-nature of the goals this action contributes to. While our approach
-manipulates the plan structure, it is worth mentioning that it is
-focused on more on plan execution within the agent than in the process
-plan synthesis.  For the purposes of this paper, it allows us to
-consider planning in abstraction while providing an anticipatory
-approach to continuous robotic plan execution.
+The novelty of our work is twofold. First, we allow the agent to make
+such a distinction during execution, for each action, by tracking
+causal relationships between goals. Second, while the approach is
+simple yet elegant, it is motivated by our real-world domain in the
+context of a continuously planning and executing robotic explorer with
+focus on execution rather than plan synthesis.
+
+% This
+% allows us to determine an appropriate dispatch strategy for execution,
+% based on the nature of the goals this action contributes to. While our
+% approach manipulates the plan structure, it focuses on plan execution
+% within the agent rather than plan synthesis.  For the purposes of this
+% paper, we consider planning in abstraction while providing an
+% anticipatory approach to continuous robotic plan execution.
 
 The structure of this paper is as follows. We motivate with an
 scenario illustrating the problem of flexible plan execution, discuss
