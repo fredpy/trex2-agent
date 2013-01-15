@@ -6,17 +6,17 @@
 %Also need some analysis -- potentially numerical -- on the overhead and impact fo both solutions relative to each other but also potentially to a more direct classic approach. 
 %To finally discuss why one solution was preferred on our system} 
 
-Our experiment follows that of the original plan given in
+Our experiment follows a mission similar to the original plan given in
 Fig. \ref{fig:ex:plan}. At the beginning, the AUV need to {\em Sample Vent2}
-and it has to return to the surface by the end of the mission. We
+and it has to return to the surface by the end of the mission. The AUV must
+also be at the surface around the time 13:00. We
 implemented this on our executive with plans being produced by the
 europa planning engine \cite{frank2003}.\fcomment{I think it is
-  important to give at least dome indication of the kind of tools used.
+  important to give at least some indication of the kind of tools used.
   this should be enough as it is not really giving away that we used
   trex}. Figure \ref{fig:ex:mixed1}
 demonstrates the resulting plan from our algorithm and will guide our
-explanation. Both algorithms will result in the same execution of the
-plan but their approach is quite different.
+explanation.
 
 \begin{figure}
   \centering
@@ -34,26 +34,26 @@ Surface} then the next {\em Go} token will be dispatched. Because the
 search will follow the causal links forward, where upon, it will find
 the goal {\em Sample Vent2} resulting in dispatching proactively.
 Similarly, this happens for all of the tokens that are starred. The
-next token to {\em Go} to {\em Vent1} is continuously searched but deferred for later dispatching,
+next token, not starred, {\em Go(Surface)} is continuously searched but deferred,
 because it is not connected to a goal. The resulting
 AUV stays at {\em Vent2} rather than heading to the {\em Surface}
-immediately like in Fig. \ref{fig:ex:proactive}.
+immediately.
 
-For the distributed algorithm approach, each token is checked during
-the creation of the plan to see if it is an external goal in
-$\Phi_{ge}$, or connected to one through a causal link. When the {\em
-Sample Vent2} is checked, we immediately find that it is a goal. We then
-follow the reverse causal link and find {\em Survey Vent2}.  However to
-better illustrate the algorithm, we can imagine that only the {\em Survey
-Vent2} has been causally connected to the goal so far. Therefore, we
-only star those two tokens. The path from {\em Surface} to {\em Vent1}
-to {\em Vent2} has yet to be built. When the path has finally been
-built, and {\em At Vent2} is checked, our algorithm searches one
-causal link and finds {\em Survey Vent2} which is starred. The search
-then follows the reverse causal link and stars the rest of the
-path. The starred tokens will then be proactively dispatched while the
-non-starred tokens will be deferred until later. Having similar
-results to Algorithm \ref{DispatchToken}.
+%For the distributed algorithm approach, each token is checked during
+%the creation of the plan to see if it is an external goal in
+%$\Phi_{ge}$, or connected to one through a causal link. When the {\em
+%Sample Vent2} is checked, we immediately find that it is a goal. We then
+%follow the reverse causal link and find {\em Survey Vent2}.  However to
+%better illustrate the algorithm, we can imagine that only the {\em Survey
+%Vent2} has been causally connected to the goal so far. Therefore, we
+%only star those two tokens. The path from {\em Surface} to {\em Vent1}
+%to {\em Vent2} has yet to be built. When the path has finally been
+%built, and {\em At Vent2} is checked, our algorithm searches one
+%causal link and finds {\em Survey Vent2} which is starred. The search
+%then follows the reverse causal link and stars the rest of the
+%path. The starred tokens will then be proactively dispatched while the
+%non-starred tokens will be deferred until later. Having similar
+%results to Algorithm \ref{DispatchToken}.
 
 \begin{figure}
   \centering
@@ -63,22 +63,18 @@ results to Algorithm \ref{DispatchToken}.
   \label{fig:ex:mixed2}
 \end{figure}
 
-Our reasoning for keeping the AUV at {\em Vent2} is that
-nothing is requiring it to go {\em Surface} as soon as possible and that
-more external requests may come in the near future. To demonstrate
-this imagine that while the AUV is at {\em Vent2} it gets a
-request at 11:30 asking it to {\em Sample Vent1}.  We show the resulting plan in
-Fig. \ref{fig:ex:mixed2}. Again, both algorithms will result in the
-same conclusion. Algorithm \ref{DispatchToken} will search from {\em
-Go(Vent2, Vent1)} and will now find {\em Sample Vent1}. The
-distributed algorithm will find and star the new tokens when the plan
-gets updated. The resulting new starred tokens will be proactively
-dispatched.
+Now imagine that while the AUV is at {\em Vent2} it gets a
+request from the scientist at 11:30 asking it to {\em Sample Vent1}. We show the resulting plan in
+Fig. \ref{fig:ex:mixed2}. There is not enough time to {\em Sample Vent1} and be at the surface by
+13:00. Therefore, the goal is placed after the AUV goes to the surface.  Consequently, the requirement
+{\em At Surface},  which would normally be deferred, is now superseded by the urgent goal {\em Sample Vent1},
+and, therefore, becomes proactive. The resulting starred tokens in Fig. \ref{fig:ec:mixed2} get dispatched 
+proactively.
 
 As the end of the day approaches, the AUV will need to start heading
-to the surface. At 19:00 both algorithms will find that the {\em Go(Vent1,
+to the surface. At 19:00, algorithm \ref{DispatchToken} will find that the {\em Go(Vent1,
 Surface)} is still not connected to a goal but that the upper bound time
-for starting the token has been reached. Therefore, we will dispatch
+for starting the token has been reached. Therefore, we dispatch
 the token because it has become necessary for completing the plan.
 After returning to the {\em Surface}, the plan shows that the AUV will then {\em
 Go(Surface, ?)} (dashed in the figures). This is an artifact resulting
@@ -97,7 +93,7 @@ we didn't put an arrow to every {\em At}. Our concern were the peak that showed 
 \end{figure}
 
 In our experiments, the simulated AUV missions ran in a virtual machine running Ubuntu, a Linux distribution. The virtual machine
-was run on a MacBook Pro. The virtual machine was allocated one processor from a 2.33 GHz Intel Core 2 Duo processor. 
+was run on a MacBook Pro. The virtual machine was allocated one core from a 2.33 GHz Intel Core 2 Duo processor. 
 
 In Figure \ref{fig:example_run}, we show a simulated mission run that is similar to our original example in Fig. \ref{fig:ex:plan}.
 However, in order to increase the complexity of the plan we added a total of ten locations, eight before the vents. The first goal 
