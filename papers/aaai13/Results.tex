@@ -2,9 +2,9 @@
 \section{Experimental results}
 \label{sec:exp}
 
-\fcomment{Need to present here both practical results that illustrates the outcome of our solution and how it benefits ... eg show a case where new goals are introduced as we go along.
-Also need some analysis -- potentially numerical -- on the overhead and impact fo both solutions relative to each other but also potentially to a more direct classic approach. 
-To finally discuss why one solution was preferred on our system} 
+%\fcomment{Need to present here both practical results that illustrates the outcome of our solution and how it benefits ... eg show a case where new goals are introduced as we go along.
+%Also need some analysis -- potentially numerical -- on the overhead and impact fo both solutions relative to each other but also potentially to a more direct classic approach. 
+%To finally discuss why one solution was preferred on our system} 
 
 Our experiment follows that of the original plan given in
 Fig. \ref{fig:ex:plan}. At the beginning, the AUV need to {\em Sample Vent2}
@@ -90,33 +90,40 @@ it is not connected to a goal and its upper bound start time
 \begin{figure}
 \centering
 \includegraphics[width=\columnwidth]{figs/example_run.pdf}
-\caption{\small  One mission run that shows the time needed for dispatching. Star represents when the new goal was
-received. } 
+\caption{\small  One mission run that shows the time needed for dispatching. Star represents when the Goal\#2 was
+received and integrated into the plan. Lines with boxes at the end represent the deferred action {\em Go} Because of space,
+we didn't put an arrow to every {\em At}. Our concern were the peak that showed where the system had to dispatch both {\em At} and {\em Go}. } 
   \label{fig:example_run}
 \end{figure}
+
+In our experiments, the simulated AUV missions ran in a virtual machine running Ubuntu, a Linux distribution. The virtual machine
+was run on a MacBook Pro. The virtual machine was allocated one processor from a 2.33 GHz Intel Core 2 Duo processor. 
 
 In Figure \ref{fig:example_run}, we show a simulated mission run that is similar to our original example in Fig. \ref{fig:ex:plan}.
 However, in order to increase the complexity of the plan we added a total of ten locations, eight before the vents. The first goal 
 is to sample {\em vent2} at location ten and the second is to sample {\em vent1} at location nine. The spikes in the time 
 happen when it dispatches both an {\em At} and a {\em Go} which means that the graph must be searched twice. There
-is a clear trend that as the AUV gets closer to the goal the time decreases. However, there is some variability in the time which
-can most likely be accounted for as an error in the clock since the times being measured are less than one milliseconds. 
-After the new goal is received at tick 127, the {\em Go} is no longer deferred gets dispatched. The search for Goal\#2 becomes 
-relatively simple as it is not very far away in the plan, and thus the time decreases significantly.
+is a clear trend that as the AUV gets closer to the goals the time decreases because the search distance decreases. 
+However, there is some variability in the time which can most likely be accounted for as timing with context switching as the virtual
+machine only has one processor. Before Goal\#2 is integrated into the plan at time 127, the algorithm is continually
+searching the graph which is shown as the time is on an average above .2 milliseconds. At tick 127, the {\em Go} is no longer 
+deferred and gets dispatched. The search for Goal\#2 becomes relatively simple as it is not very far away in the plan, and thus the
+time decreases significantly.
 
 \begin{figure}
 \centering
 \includegraphics[width=\columnwidth]{figs/HistogramAlg1}
-\caption{\small  We ran 500 missions were Algorithm \ref{DispatchToken} was timed for every tick. Shows the
-   distribution of the time.} 
+\caption{\small  We ran 500 missions were Algorithm \ref{DispatchToken} was timed for every tick of the mission time.
+One goal was inserted into the plan at a random time. Shows the distribution of the time.} 
   \label{fig:histogram}
 \end{figure}
 
 In order to demonstrate the average amount of time that Algorithm \ref{DispatchToken} uses, we ran 500 simulated missions
-and timed every tick of the mission. Figure \ref{fig:histogram} shows that for about 90\% of the time, Algorithm \ref{DispatchToken}
-takes less than .2 milliseconds to complete it's search. Less than 5\% of the time did Algorithm \ref{DispatchToken} go above
+and timed it at every mission tick. Figure \ref{fig:histogram} shows that for about 90\% of the time, Algorithm \ref{DispatchToken}
+takes less than .2 milliseconds to complete it's search. The histogram is clearly skewed to the left and decreases quickly as the
+time increases. Less than 5\% of the time did Algorithm \ref{DispatchToken} go above
 two milliseconds with an upper bound time of thirteen. However, this portion of the histogram is largely condensed in 
-order to maintain a reasonable size.   
+order to maintain a reasonable size and would decrease if spread out.   
 
 
 

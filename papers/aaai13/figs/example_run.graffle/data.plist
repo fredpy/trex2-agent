@@ -44,11 +44,34 @@
 	<key>Creator</key>
 	<string>Philip Cooksey</string>
 	<key>DisplayScale</key>
-	<string>1 0/72 in = 1 0/72 in</string>
+	<string>1 0/72 in = 1.0000 in</string>
 	<key>GraphDocumentVersion</key>
 	<integer>8</integer>
 	<key>GraphicsList</key>
 	<array>
+		<dict>
+			<key>Class</key>
+			<string>LineGraphic</string>
+			<key>ID</key>
+			<integer>164</integer>
+			<key>Points</key>
+			<array>
+				<string>{124, 256.442}</string>
+				<string>{119, 278}</string>
+			</array>
+			<key>Style</key>
+			<dict>
+				<key>stroke</key>
+				<dict>
+					<key>HeadArrow</key>
+					<string>FilledArrow</string>
+					<key>LineType</key>
+					<integer>1</integer>
+					<key>TailArrow</key>
+					<string>0</string>
+				</dict>
+			</dict>
+		</dict>
 		<dict>
 			<key>Class</key>
 			<string>LineGraphic</string>
@@ -475,7 +498,7 @@
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{526, 235}, {17, 14}}</string>
+					<string>{{539, 241}, {17, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -528,8 +551,7 @@
 					<integer>108</integer>
 					<key>Points</key>
 					<array>
-						<string>{541, 249}</string>
-						<string>{545, 265}</string>
+						<string>{548, 256}</string>
 						<string>{549, 292}</string>
 					</array>
 					<key>Style</key>
@@ -563,8 +585,7 @@
 					<integer>94</integer>
 					<key>Points</key>
 					<array>
-						<string>{477, 231}</string>
-						<string>{489, 260}</string>
+						<string>{494, 260}</string>
 						<string>{494.5, 317}</string>
 					</array>
 					<key>Style</key>
@@ -582,7 +603,7 @@
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{458, 210.38}, {42.5, 20.6199}}</string>
+					<string>{{473.25, 239.38}, {42.5, 20.6199}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>HFlip</key>
@@ -783,7 +804,7 @@
 					<integer>100</integer>
 					<key>Points</key>
 					<array>
-						<string>{138.354, 142.537}</string>
+						<string>{137.829, 143.831}</string>
 						<string>{151, 173}</string>
 					</array>
 					<key>Style</key>
@@ -815,7 +836,7 @@
 					<array>
 						<string>{145.545, 112.945}</string>
 						<string>{127, 196}</string>
-						<string>{123, 278}</string>
+						<string>{125, 288}</string>
 					</array>
 					<key>Style</key>
 					<dict>
@@ -1010,7 +1031,7 @@
 			<integer>78</integer>
 			<key>Points</key>
 			<array>
-				<string>{129.287, 182.017}</string>
+				<string>{128.462, 185.585}</string>
 				<string>{140, 206}</string>
 			</array>
 			<key>Style</key>
@@ -1040,7 +1061,7 @@
 			<integer>77</integer>
 			<key>Points</key>
 			<array>
-				<string>{124.462, 226.183}</string>
+				<string>{125.007, 232.293}</string>
 				<string>{131, 258}</string>
 			</array>
 			<key>Style</key>
@@ -1414,23 +1435,14 @@
 			<string>YES</string>
 		</dict>
 		<dict>
-			<key>AllowConnections</key>
-			<string>NO</string>
 			<key>Bounds</key>
-			<string>{{0, 70}, {683, 318}}</string>
+			<string>{{0, 70.0001}, {683, 318}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
-			<key>FontInfo</key>
-			<dict>
-				<key>Font</key>
-				<string>Helvetica</string>
-				<key>Size</key>
-				<real>12</real>
-			</dict>
 			<key>ID</key>
-			<integer>3</integer>
+			<integer>163</integer>
 			<key>ImageID</key>
-			<integer>1</integer>
+			<integer>3</integer>
 			<key>IsLocked</key>
 			<string>YES</string>
 			<key>Shape</key>
@@ -1464,14 +1476,14 @@
 	<key>HPages</key>
 	<integer>2</integer>
 	<key>ImageCounter</key>
-	<integer>2</integer>
+	<integer>4</integer>
 	<key>ImageLinkBack</key>
 	<array>
 		<dict/>
 	</array>
 	<key>ImageList</key>
 	<array>
-		<string>image1.pdf</string>
+		<string>image3.pdf</string>
 	</array>
 	<key>KeepToScale</key>
 	<false/>
@@ -1510,7 +1522,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-14 21:54:37 -0800</string>
+	<string>2013-01-15 10:51:11 -0800</string>
 	<key>Modifier</key>
 	<string>Philip Cooksey</string>
 	<key>NotesVisible</key>
