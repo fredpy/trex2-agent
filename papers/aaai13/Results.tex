@@ -88,6 +88,38 @@ However, our algorithm will not be dispatching this token as
 it is not connected to a goal and its upper bound start time
 ($+\infty$) will not be met.
 
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{figs/example_run.pdf}
+\caption{\small  One mission run that shows the time needed for dispatching. Star represents when the new goal was
+received. } 
+  \label{fig:example_run}
+\end{figure}
+
+In Figure \ref{fig:example_run}, we show a simulated mission run that is similar to our original example in Fig. \ref{fig:ex:plan}.
+However, in order to increase the complexity of the plan we added a total of ten locations, eight before the vents. The first goal 
+is to sample {\em vent2} at location ten and the second is to sample {\em vent1} at location nine. The spikes in the time 
+happen when it dispatches both an {\em At} and a {\em Go} which means that the graph must be searched twice. There
+is a clear trend that as the AUV gets closer to the goal the time decreases. However, there is some variability in the time which
+can most likely be accounted for as an error in the clock since the times being measured are less than one milliseconds. 
+After the new goal is received at tick 127, the {\em Go} is no longer deferred gets dispatched. The search for Goal#2 becomes 
+relatively simple as it is not very far away in the plan, and thus the time decreases significantly.
+
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{figs/HistogramAlg1}
+\caption{\small  We ran 500 missions were Algorithm \ref{DispatchToken} was timed for every tick. Shows the
+   distribution of the time.} 
+  \label{fig:histogram}
+\end{figure}
+
+In order to demonstrate the average amount of time that Algorithm \ref{DispatchToken} uses, we ran 500 simulated missions
+and timed every tick of the mission. Figure \ref{fig:histogram} shows that for about 90\% of the time, Algorithm \ref{DispatchToken}
+takes less than .2 milliseconds to complete it's search. Less than 5\% of the time Algorithm \ref{DispatchToken} went above
+two milliseconds with an upper bound time of thirteen.  
+
+
+
 
 
 %%% Local Variables: 
