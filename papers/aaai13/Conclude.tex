@@ -35,13 +35,13 @@ as non urgent are tied to a timepoint that is constrained to be {\em
 see how such information could be used for our system to automatically
 classify such goal as non urgent. It can also impact  also how the
 {\em urgent} goal propagate within the plan. For example in our result
-we had a non urgent goal around $1:00 pm$ that was eventually 
+we had a non urgent goal around 1:00 pm that was eventually 
 followed by an urgent goal as a result of the planning. As of today 
 our policy did make all the actions related to the non urgent goal 
 become proactive. This can lead to premature surfacing that is then 
 prohibiting the agent to accept goals in the morning. our current
 understanding is that this timing constraint enforcing the non
-urgent {\em Surface} to end after $1:00$ is acting as a guard on the
+urgent {\em Surface} to end after 1:00 is acting as a guard on the
 propagation of our heuristic. Therefore we should have ideally only
 marked as urgent the actions that are directly after this timepoint
 instead of continue to propagate to the actions leading to the
@@ -49,7 +49,7 @@ surface.
 
 Such refinement can be done only by considering the temporal
 constraints applied to the plan timepoints. Indeed should the 
-{\em Surface} not have been constrained to be around $1:00 pm$ staring
+{\em Surface} not have been constrained to be around 1:00 pm staring
 its execution proactively would have not blocked the vehicle at the
 surface. We plan to explore in the future to explore how both the
 marking of the goals {\em as urgent} and propagation to action  can be
