@@ -36,5 +36,9 @@
 trex_plugin(agentlocation agentlocation_pg.cc AgentLocation.cc 
  # headers
  AgentLocation.hh)
+trex_plugin(scientist scientist_pg.cc scientist.cc
+ # headers
+ scientist.hh)
 
 target_link_libraries(agentlocation_pg TREXtransaction)
+target_link_libraries(scientist_pg TREXtransaction)

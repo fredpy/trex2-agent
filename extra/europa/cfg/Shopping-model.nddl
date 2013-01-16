@@ -18,9 +18,9 @@ class Product {
   }
 } */
 
-enum Location {Home, SuperMarket, HardwareStore};
+enum Location {Home, GroceryStore, ClothingStore};
 
-enum Product {Banana, Milk, Drill};
+enum Product {Apple, Milk, Shirt};
 
 class ProductLocation {
   Location location;

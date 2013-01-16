@@ -50,6 +50,8 @@
 # include <fstream>
 # include <memory>
 
+#include <boost/chrono/thread_clock.hpp>
+
 namespace TREX {
   namespace europa {
 
@@ -423,13 +425,13 @@ namespace TREX {
        *
        * @param[in] obj A plan database object
        *
-       * Identifies the look-ahaed of the object @p obj. 
-       * This look-ahead is relevant only for objects thart are 
-       * @e External aganet timelines and is used to identify when 
+       * Identifies the look-ahaed of the object @p obj.
+       * This look-ahead is relevant only for objects thart are
+       * @e External aganet timelines and is used to identify when
        * a token can be dispatched for @p obj
        *
        * @retval 0 if @p obj is not @pExternal or do not accept goals
-       * @retval the look-ahead of the owner of @p obj otherwise 
+       * @retval the look-ahead of the owner of @p obj otherwise
        */
       size_t look_ahead(EUROPA::ObjectId const &obj);
       /** @Brief Check if ignored
@@ -846,7 +848,7 @@ namespace TREX {
        *
        * Identifies the look-ahaed to the trex timeline named @p name
        *
-       * @pre @p name is a valid @p External timeline 
+       * @pre @p name is a valid @p External timeline
        *
        * @return the look-ahead of the owner of @p name
        */
@@ -1037,7 +1039,7 @@ namespace TREX {
        *
        * @param nddl[in,out] A file name
        *
-       * This method attempts to locate the file @p nddl in @c TREX_PATH 
+       * This method attempts to locate the file @p nddl in @c TREX_PATH
        * along with all the files it includes.
        *
        * If @p nddl is found its value is updated to a fully qualified path
@@ -1211,7 +1213,7 @@ namespace TREX {
       }
       void archive(EUROPA::eint date);
 
-      std::ostream &print_domain(std::ostream &out, 
+      std::ostream &print_domain(std::ostream &out,
                                  EUROPA::ConstrainedVariableId const &var) const;
       /** @brief Log the plan structure
        *
@@ -1445,6 +1447,13 @@ namespace TREX {
        * the search on the new tokens. Allowing for recursive effect->action->condition.
        */
       void subgoalSearch(EUROPA::TokenSet& tokens);
+      /** @brief Searchs plan and removes tokens if they were subgoals
+       *
+       * Input is a token. The search goes through the
+       * recursive effect->action->condition link and removes all
+       * of the tokens that were considered subgoals
+       */
+      void removeSubgoals(EUROPA::TokenSet tokens);
 
 
       /** @brief Token Listner proxy
@@ -1538,6 +1547,23 @@ namespace TREX {
        * @sa m_goals
        */
       EUROPA::TokenSet m_goals;
+
+      /** @brief Map from a token to its master
+       *
+       * The Map keeps a record of the tokens masters as a record
+       * so that when they split up we can still access the old master
+       * for removing sub_goals that are no longer correct
+       *
+       * @sa m_masters
+       */
+      std::map<EUROPA::TokenId, EUROPA::TokenId> m_masters;
+
+      /**
+      *   Code for measuring the time for functions
+      */
+      typedef boost::chrono::thread_clock thread_clock;
+      typedef thread_clock::duration thread_duration;
+      std::map<EUROPA::eint, double> time_values;
 
       /** @brief Current iterator
        *
