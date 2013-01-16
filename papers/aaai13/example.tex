@@ -25,8 +25,8 @@ receive limited data via limited acoustic communications.
       (\ref{fig:ex:init}). The AUV is initially at {\em Surface} at
       $8$am and the mission is expected to complete by $8$pm with the
       Science goal --- marked with thick borders --- to sample {\em
-        Vent 2} and the operational goal to be beack at the surface
-      for recovery by the ned of the mission.}}
+        Vent 2} and the operational goal to be back at the surface
+      for recovery by the end of the mission.}}
 \label{fig:Example}
 \end{figure}
 
@@ -36,7 +36,7 @@ Fig. \ref{fig:ex:init}. However, at any time during the mission
 scientists can decide, for example, that they also want to {\em
   sample} {\em Vent 1} as a consequence of data processing during the
 traverse from the surface to {\em Vent 2}.  Time on site for such
-bathymetric exploration is limited and expensive, so dynamic goals
+bathymetric exploration is limited and expensive, so dynamic goal
 generation is a reality.  Balancing between dispatching a plan action
 \emph{proactive}ly or waiting till the latest start time is the
 dichotomy the plan executive needs to resolve with consequent mission
@@ -60,7 +60,7 @@ efficiency impact.
   \label{fig:ex:plan}
 \end{figure}
 
-{\em Deferring} the actions is not acceptable since it results in the
+Exclusively {\em deferrring} the actions is not acceptable since it results in the
 vehicle sitting at the surface, diving only at the very last
 minute. If a new goal arrives subsequently, there is no time left to
 do both objectives leaving the robot to exclude one of the goals or
@@ -113,7 +113,7 @@ two different approaches depending on what objective(s) the next action
 contribute to. The AUV could have been {\em proactive} until it starts
 to survey {\em Vent 2} and then {\em defer} to go back at the surface
 continuing to survey the same area, until it either receives a new
-goal or the earliest start time of the \emph{Surface} action is
+goal or the latest start time of the \emph{Surface} action is
 reached ($\sim$ 18:00). In the event of a new goal
 % or it is
 % really time to go back to the {\em Surface} (around 18:00). Therefore
@@ -126,7 +126,7 @@ objectives to be marked as either {\em urgent} or not leading to
 exploration of the plan structure during plan execution to identify if the action
 is linked to an {\em urgent} goal -- in which case it need to be
 executed {\em proactively} -- or otherwise leading towards 
-a {\em deferred} execution policy for a goal.
+a {\em deferred} execution policy for the action.
  
 
 % We demonstrate a scenario where the AUV ideally uses the two
