@@ -7,26 +7,26 @@ to deal with all the possible changes that occur during the
 mission. During our work we identified that, while many existing 
 architectures embedding a planner do provide solutions to accept goals
 on the fly, the way they handle the execution of the plan beforehand
-is not necessarily fitted for efficent integration of such unpredicted
-situation. Until now the nly way we could improve this was to engineer
-exr information within the domain model which added complexity both in
+is not necessarily fitted for efficient integration of such unpredicted
+situation. Until now the only way we could improve this was to engineer
+extra information within the domain model which added complexity both in
 term of the planning search and more importantly in the engineering fo
 such model. This added complexity is increasing the risks of modeling
-error and forthis reason we did provide a simple but yet efficient
+error and for this reason we did provide a simple but yet efficient
 solution that allow to propagate the information based on an extended
 goal specification. 
 
 
 The current work is focusing on the plan  structure at a fairly
-abstarct level without direct consideration in our approach of the
-timing constraints applied to each goals of the plan. In this approahc
-we are able using a breadth first search within the exisinting plan
-structure to select different execution policyies for each actionn
+abstract level without direct consideration in our approach of the
+timing constraints applied to each goals of the plan. In this approach
+we are able using a breadth first search within the existing plan
+structure to select different execution policies for each action
 within the plan. By doing so we can improve the overall mission 
-execution as it avoids to be proactve on objectives that could lead it
-to inneficient handling of new goal requests.
+execution as it avoids to be proactive on objectives that could lead it
+to inefficient handling of new goal requests.
 
-At this stage our causla link traversal is agnostic of the temporal 
+At this stage our causal link traversal is agnostic of the temporal 
 constraints applied to the timepoints of the plan. While it is
 beneficial for the generality of the approach, we also see that
 including such information could greatly the quality of our solution. 
