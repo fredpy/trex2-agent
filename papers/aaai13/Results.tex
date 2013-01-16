@@ -19,6 +19,7 @@ which synthesizes temporal plans.
     effects. Pentagons indicate {\em urgent} goals, stars indicate
     tokens that were deduced as {\em proactive}.}
   \label{fig:ex:mixed1}
+  \vskip-4mm
 \end{figure}
 
 % For Algorithm \ref{SearchForGoal}, the search is straight forward. For
@@ -74,6 +75,7 @@ actions related to the mid-day surfacing goal.
   \caption{\small The solution after receiving external request for
     the plan from Fig. \ref{fig:ex:mixed1}}
   \label{fig:ex:mixed2}
+  \vskip-6mm
 \end{figure}
 
 Meanwhile the actions related to the final surfacing goal remain {\em
@@ -123,6 +125,7 @@ be evaluated.
     arrow to every {\em At}. Our concern were the peaks that showed
     where the system had to dispatch both {\em At} and {\em Go}. }
   \label{fig:example_run}
+  \vskip-5mm
 \end{figure*}
 
 
@@ -139,10 +142,12 @@ from the next {\em Go}, which during this period, is not connected to
 an {\em urgent} goal. The resulting exhaustive search in the plan
 graph during this period is on an average above $.2$ milliseconds. At
 tick $127$, the {\em Go} is no longer deferred and gets dispatched.
-The search for our algorithm execution time {\em Goal \#2} becomes
-relatively simple as it is not very far away in the plan
-\kcomment{from what? from the end of the plan?}, and thus the time
-decreases significantly.
+% The search for our algorithm execution time {\em Goal \#2} becomes
+% relatively simple as it is not very far away in the plan
+% \kcomment{from what? from the end of the plan?}, and thus the time
+% decreases significantly.
+\fcomment{removed this part about time decreasing as it was redundant
+  with the beginning of the pargraph}
 
 \begin{figure}[!b]
   \centering
