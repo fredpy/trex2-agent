@@ -11,13 +11,12 @@ is not necessarily fitted for efficient integration of such unpredicted
 situation. Until now the only way we could improve this was to engineer
 extra information within the domain model which added complexity both in
 term of the planning search and more importantly during the design of
-such model. This added complexity is increasing the risks of modeling
-error and for this reason we did provide a simple but yet efficient
-solution that allow to propagate the information based on an extended
-goal specification. 
+such model. This added complexity increase the risk of fault
+introduction within the model, which motivate our approach to provide 
+a simple but yet efficient solution to deduce execution policy based
+on extra information on each goal {\em urgency}.
 
-
-The current work is focusing on the plan  structure at a fairly
+The current work is focusing on the plan structure at a fairly
 abstract level without direct consideration in our approach of the
 timing constraints applied to each goals of the plan. In this approach
 we are able using a breadth first search within the existing plan
