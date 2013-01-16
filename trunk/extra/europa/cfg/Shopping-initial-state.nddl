@@ -11,14 +11,14 @@ int horizonEnd = 100;
 //Product Milk = new Product("Milk");
 //Product Drill = new Product("Drill");
 
-ProductLocation bananaLocation = new ProductLocation(SuperMarket, Banana);
-ProductLocation milkLocation = new ProductLocation(SuperMarket, Milk);
-ProductLocation drillLocation = new ProductLocation(HardwareStore, Drill);
+ProductLocation appleLocation = new ProductLocation(GroceryStore, Apple);
+ProductLocation milkLocation = new ProductLocation(GroceryStore, Milk);
+ProductLocation shirtLocation = new ProductLocation(ClothingStore, Shirt);
 
-Path street1 = new Path(Home, HardwareStore);
-Path street2 = new Path(Home, SuperMarket);
-Path street3 = new Path(HardwareStore, Home);
-Path street4 = new Path(SuperMarket, Home);
+Path street1 = new Path(Home, ClothingStore);
+Path street2 = new Path(ClothingStore, Home);
+Path street3 = new Path(ClothingStore, GroceryStore);
+Path street4 = new Path(GroceryStore, ClothingStore);
 
 AgentLocation location = new AgentLocation(External);
 Agent agent = new Agent(Internal);

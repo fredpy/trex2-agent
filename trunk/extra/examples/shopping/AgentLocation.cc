@@ -46,7 +46,7 @@ Symbol const AgentLocation::AtPred("At");
 
 Symbol const AgentLocation::GoPred("Go");
 
-Symbol const AgentLocation::AgentLocationObj("location");
+Symbol const AgentLocation::AgentLocationObj("auvLocation");
 
 AgentLocation::AgentLocation(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false)
@@ -73,7 +73,7 @@ void AgentLocation::setGo(std::string origin, std::string destination){
 
 void AgentLocation::handleInit(){
     m_state.reset(new Observation(AgentLocationObj, AtPred));
-    m_state->restrictAttribute("loc", EnumDomain("Home"));
+    m_state->restrictAttribute("loc", EnumDomain("Ship"));
     postObservation(*m_state);
     m_nextSwitch = getCurrentTick() + 1;
 }

@@ -46,6 +46,8 @@
 # include <PLASMA/Token.hh>
 # include <PLASMA/Solver.hh>
 
+# include <fstream>
+
 namespace TREX {
   namespace europa {
 
@@ -214,7 +216,7 @@ namespace TREX {
 
         bool dispatch_token(const EUROPA::TokenId& token,
                             EUROPA::eint lb, EUROPA::eint ub);
-        EUROPA::TokenId getGoal(const EUROPA::TokenId& token, 
+        EUROPA::TokenId getGoal(const EUROPA::TokenId& token,
                                 EUROPA::eint lb, EUROPA::eint ub);
         EUROPA::TokenId searchGoal(EUROPA::TokenSet actions);
         EUROPA::TokenSet getAllTokens(const EUROPA::TokenId& token);
@@ -355,7 +357,7 @@ namespace TREX {
           void advance();
 
           EUROPA::Id<CurrentState> m_target;
-          std::list<EUROPA::TokenId>::const_iterator 
+          std::list<EUROPA::TokenId>::const_iterator
             m_cand_from, m_tok, m_cand_to;
           std::set<EUROPA::LabelStr>::const_iterator m_next_pred;
         }; // TREX::europa::details::CurrentState::DecisionPoint
@@ -478,6 +480,8 @@ namespace TREX {
 
         EUROPA::TokenId       m_last_obs, m_prev_obs;
 	EUROPA::Id<TimePoint>  m_frontier, m_prev_frontier;
+
+        std::map<EUROPA::eint, double> time_values;
 
         friend class TREX::europa::Assembly;
         friend class DecisionPoint;

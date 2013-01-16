@@ -38,6 +38,9 @@
 #include <PLASMA/TokenVariable.hh>
 #include <PLASMA/PlanDatabaseWriter.hh>
 
+#include <boost/chrono/timer.hpp>
+#include <boost/chrono/thread_clock.hpp>
+
 using namespace TREX::europa;
 using namespace TREX::europa::details;
 
@@ -331,6 +334,8 @@ bool CurrentState::commit() {
 // manipulators
 
 void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
+    bool bfs(true), dist(false);
+
   std::list<EUROPA::TokenId>::const_iterator
     i = timeline()->getTokenSequence().begin(),
     endi = timeline()->getTokenSequence().end();
@@ -355,23 +360,56 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
 	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString());
     // Old code from Philip
-    // Check if next candidate is goal dependent ... needs to be refined I think
-    /*
-    EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
-    if(nowGoal.isId())
+    //boost::chrono::high_resolution_timer start;
+
+    if(bfs)
     {
-        m_assembly.dispatch(timeline(),*i);
+        typedef boost::chrono::thread_clock thread_clock;
+        typedef thread_clock::duration thread_duration;
+        thread_duration duration;
+        thread_clock::time_point start = thread_clock::now();
+        EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
+        if(nowGoal.isId())
+        {
+            duration=thread_clock::now()-start;
+            m_assembly.dispatch(timeline(),*i);
+        } else {
+            duration=thread_clock::now()-start;
+        }
+        if(time_values.find(now())==time_values.end())
+        {
+            time_values[now()]=duration.count();
+        } else {
+            time_values[now()]+=duration.count();
+        }
+        //std::cout<<now()<<": "<<time_values[now()]<<(*i)->getUnqualifiedPredicateName().toString()
+	    // <<'('<<(*i)->getKey()<<")"<<std::endl;
     }
-    */
     /** @brief Dispatching function with the help of listener_proxy
     *   Using this code will allow for the token to be tested if it is a subgoal or goal itself
     *   for dispatching. Must have a goal<-effect<-action->condition->token relationship in
     *   the model to take advantage of this dispatching method.
     */
-
-    if(dispatch_token(*i,lb,ub))
+    if(dist)
     {
-         m_assembly.dispatch(timeline(),(*i));
+        typedef boost::chrono::thread_clock thread_clock;
+        typedef thread_clock::duration thread_duration;
+        thread_duration duration;
+        thread_clock::time_point start = thread_clock::now();
+        if(dispatch_token(*i,lb,ub))
+        {
+            duration=thread_clock::now()-start;
+            m_assembly.dispatch(timeline(),(*i));
+        } else {
+            duration=thread_clock::now()-start;
+        }
+        if(m_assembly.time_values.find(now())==m_assembly.time_values.end())
+        {
+            m_assembly.time_values[now()]=duration.count();
+        } else {
+            m_assembly.time_values[now()]+=duration.count();
+        }
+        //std::cout<<"Search: "<<now()<<": "<<m_assembly.time_values[now()]<<std::endl;
     }
 
 #else
@@ -392,11 +430,51 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     }
 #endif // EUROPA_HAVE_EFFECT
   }
+  /*
+    if(bfs)
+    {
+      if(lb==m_assembly.final_tick())
+      {
+        std::ofstream time_file;
+        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
+        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
+        {
+            if(i>0)
+                time_file<<", ";
+            if(time_values.find(i)!=time_values.end())
+                time_file<<time_values[i];
+            else
+                time_file<<"0";
+        }
+        time_file<<std::endl;
+        time_file.close();
+      }
+    }
+    if(dist)
+    {
+      if(lb==m_assembly.final_tick())
+      {
+        std::ofstream time_file;
+        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
+        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
+        {
+            if(i>0)
+                time_file<<", ";
+            if(m_assembly.time_values.find(i)!=m_assembly.time_values.end())
+                time_file<<m_assembly.time_values[i];
+            else
+                time_file<<"0";
+        }
+        time_file<<std::endl;
+        time_file.close();
+      }
+    }
+    */
 }
 
 bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub)
 {
-    if(m_assembly.is_subgoal(token))
+    if(m_assembly.is_subgoal(token) || m_assembly.is_action(token))
     {
         return true;
     }

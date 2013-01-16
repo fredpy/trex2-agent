@@ -1045,13 +1045,13 @@ EUROPA::ConstrainedVariableId Assembly::attribute(EUROPA::ObjectId const &obj,
   return var;
 }
 
-std::ostream &Assembly::print_domain(std::ostream &out, 
+std::ostream &Assembly::print_domain(std::ostream &out,
                             EUROPA::ConstrainedVariableId const &var) const {
   EUROPA::Domain const &dom = var->lastDomain();
-  
+
   if( dom.isSingleton() ) {
     EUROPA::edouble val = dom.getSingletonValue();
-    
+
     if( m_schema->isObjectType(dom.getTypeName()) )
       return out<<dom.toString();
     else {
@@ -1100,13 +1100,13 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     print_domain(out<<"  start="<<std::flush, (*it)->start());
     print_domain(out<<"\\n  duration="<<std::flush, (*it)->duration());
     print_domain(out<<"\\n  end="<<std::flush, (*it)->end())<<"\\n"<<std::flush;
-    
+
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = (*it)->parameters();
-    
+
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
         attrs.end()!=a; ++a)
       print_domain(out<<"  "<<(*a)->getName().toString()<<'='<<std::flush, *a)<<"\\n";
-    
+
     if( (*it)->isActive() ) {
       EUROPA::TokenSet const &merged = (*it)->getMergedTokens();
       if( !merged.empty() ) {
@@ -1352,21 +1352,37 @@ void Assembly::synchronization_listener::notifyRetractNotDone(EUROPA::SOLVERS::D
  */
 
 void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
-  // Adds goal when added to the plan
-  if(m_owner.is_goal(token)) {
+    // Adds goal when added to the plan
+    thread_duration duration;
+    thread_clock::time_point start = thread_clock::now();
+    if(m_owner.is_goal(token)) {
       m_owner.m_goals.insert(token);
-  }
+    }
+    duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+    //std::cout<<"Added: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 
-  EUROPA::TokenId master = token->master();
-  if( master.isNoId() ) {
+    EUROPA::TokenId master = token->master();
+    if( master.isNoId() ) {
     m_owner.m_roots.insert(token);
     // token->incRefCount();
-  }
+    }
 }
 
 void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
   // Removes goal when removed from plan
+  thread_duration duration;
+  thread_clock::time_point start = thread_clock::now();
   m_owner.m_goals.erase(token);
+  duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+  //std::cout<<"Removed: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 
   m_owner.erase(m_owner.m_roots, token);
   m_owner.erase(m_owner.m_completed, token);
@@ -1385,31 +1401,46 @@ void Assembly::listener_proxy::notifyRemoved(EUROPA::TokenId const &token) {
 
 void Assembly::listener_proxy::notifyActivated(EUROPA::TokenId const &token)
 {
+    thread_duration duration;
+    thread_clock::time_point start = thread_clock::now();
+
     if(m_owner.is_goal(token))
     {
         EUROPA::TokenSet tokens;
         tokens.insert(token);
         // Searchs for and adds all subgoals
         m_owner.subgoalSearch(tokens);
-    } else {
-        if(m_owner.conditionOfGoal(token))
-        {
-            EUROPA::TokenSet tokens;
-            tokens.insert(token);
-            m_owner.subgoalSearch(tokens);
-        }
+    } else if(m_owner.conditionOfGoal(token)) {
+        EUROPA::TokenSet tokens;
+        tokens.insert(token);
+        m_owner.subgoalSearch(tokens);
     }
+
+    duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+    //std::cout<<"Activated: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 }
 
 void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
   // Checks and erases the token if it was considered a goal
-  if(!m_owner.is_goal(token))
+  thread_duration duration;
+  thread_clock::time_point start = thread_clock::now();
+  if(!m_owner.is_goal(token) && !m_owner.conditionOfGoal(token) && m_owner.is_subgoal(token))
   {
-    if(!m_owner.conditionOfGoal(token))
-    {
-        m_owner.m_goals.erase(token);
-    }
+    EUROPA::TokenSet temp;
+    temp.insert(token);
+    m_owner.removeSubgoals(temp);
   }
+
+  duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+  //std::cout<<"Deactived: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 
   if( m_owner.is_agent_timeline(token) ) {
     debugMsg("trex:token", "cancel "<<token->getPredicateName().toString()
@@ -1420,7 +1451,9 @@ void Assembly::listener_proxy::notifyDeactivated(EUROPA::TokenId const &token) {
 }
 
 void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
-
+    thread_duration duration;
+    thread_clock::time_point start = thread_clock::now();
+    m_owner.m_masters[token] = token->getActiveToken();
     if(m_owner.is_goal(token) || m_owner.is_subgoal(token))
     {
         EUROPA::TokenSet tokens = token->getActiveToken()->getMergedTokens();
@@ -1436,17 +1469,49 @@ void Assembly::listener_proxy::notifyMerged(EUROPA::TokenId const &token) {
         // Searchs for and adds all subgoals
         m_owner.subgoalSearch(tokens);
     }
+
+    duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+    //std::cout<<"Merged: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 }
 
 void Assembly::listener_proxy::notifySplit(EUROPA::TokenId const &token) {
   // Checks and erases the token if it was considered a goal
-  if(!m_owner.is_goal(token))
+  thread_duration duration;
+  thread_clock::time_point start = thread_clock::now();
+  if(m_owner.is_subgoal(token) && m_owner.conditionOfGoal(token))
   {
-    if(!m_owner.conditionOfGoal(token))
-    {
-        m_owner.m_goals.erase(token);
-    }
+      EUROPA::TokenSet temp = m_owner.m_masters[token]->getMergedTokens();
+      temp.insert(m_owner.m_masters[token]);
+      EUROPA::TokenSet::iterator it;
+      bool remove = true;
+      for(it=temp.begin();  it!=temp.end(); ++it)
+      {
+          if(m_owner.is_goal(*it) || m_owner.conditionOfGoal(*it))
+          {
+              remove = false;
+          }
+      }
+      if(remove)
+      {
+          m_owner.removeSubgoals(temp);
+      }
+  } else {
+     EUROPA::TokenSet temp;
+     temp.insert(token);
+     m_owner.removeSubgoals(temp);
   }
+  m_owner.m_masters.erase(token);
+
+  duration = thread_clock::now()-start;
+    if(m_owner.time_values.find(m_owner.now())==m_owner.time_values.end())
+        m_owner.time_values[m_owner.now()]=duration.count();
+    else
+        m_owner.time_values[m_owner.now()]+=duration.count();
+  //std::cout<<"Split: "<<m_owner.now()<<": "<<m_owner.time_values[m_owner.now()]<<std::endl;
 
   // EUROPA::TokenId master = token->master();
   // if( master.isId() )
@@ -1546,12 +1611,35 @@ void Assembly::subgoalSearch(EUROPA::TokenSet& tokens)
     m_goals.insert(tokens.begin(), tokens.end());
     while(!tokens.empty())
     {
-        EUROPA::TokenSet::iterator it = tokens.begin();
+        EUROPA::TokenSet::iterator it = tokens.begin(), condIt;
         if(actionEffect((*it)))
         {
             EUROPA::TokenSet conds = conditions((*it)->master());
-            m_goals.insert(conds.begin(),conds.end());
-            tokens.insert(conds.begin(),conds.end());
+            for(condIt=conds.begin(); condIt!=conds.end(); ++condIt)
+            {
+                if(m_goals.insert(*condIt).second==true)
+                    tokens.insert(*condIt);
+            }
+        }
+        tokens.erase(it);
+    }
+}
+
+void Assembly::removeSubgoals(EUROPA::TokenSet tokens)
+{
+    EUROPA::TokenSet::iterator it;
+    while(!tokens.empty())
+    {
+        it = tokens.begin();
+        m_goals.erase(*it);
+        if(actionEffect((*it)))
+        {
+            EUROPA::TokenSet conds = conditions((*it)->master());
+            for(EUROPA::TokenSet::iterator cond=conds.begin(); cond!= conds.end(); ++cond)
+            {
+                if(m_goals.erase(*cond)>=1)
+                    tokens.insert(*cond);
+            }
         }
         tokens.erase(it);
     }
