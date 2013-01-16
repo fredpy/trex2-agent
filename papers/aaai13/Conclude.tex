@@ -2,19 +2,35 @@
 \label{sec:conclude}
 %{\em\color{gray} Need pargarph that resume what was presented}
 
-As autonomous agents become more and more flexible it becomes difficult
-to deal with all the possible changes that occur during the
-mission. During our work we identified that, while many existing 
-architectures embedding a planner do provide solutions to accept goals
-on the fly, the way they handle the execution of the plan beforehand
-is not necessarily fitted for efficient integration of such unpredicted
-situation. Until now the only way we could improve this was to engineer
-extra information within the domain model which added complexity both in
-term of the planning search and more importantly during the design of
-such model. This added complexity increase the risk of fault
-introduction within the model, which motivates our approach to provide 
-a simple yet efficient solution to deduce execution policy based
-on extra information on each goal {\em urgency}.
+Increased robustness in hardware has led to persistence of robots
+often in hostile environments such as our oceans. With onboard
+autonomy increased versatility has resulted in the need to anticipate
+and adapt to goals during mission execution. Existing approaches in
+systems with embedded planning do not have a balanced approach to deal
+with the tension between early action execution and deferment; this is
+especially so in the context of real-world environments where there is
+substantial unpredictability. Adding supplementary information in
+planning models has shown to be increase complexity and is error-prone
+\kcomment{citation needed} which motivates our approach to provide a
+simple yet efficient solution to deduce execution policy based on
+extra information on each goal, namely {\em urgency}.
+
+% As autonomous agents become more and more flexible it becomes
+% difficult to deal with all the possible changes that occur during the
+% mission. During our work we identified that, while many existing
+% architectures embedding a planner do provide solutions to accept goals
+% on the fly, the way they handle the execution of the plan beforehand
+% is not necessarily fitted for efficient integration of such
+% unpredicted situation.
+
+% Until now the only way we could improve this
+% was to engineer extra information within the domain model which added
+% complexity both in term of the planning search and more importantly
+% during the design of such model. This added complexity increase the
+% risk of fault introduction within the model, which motivates our
+% approach to provide a simple yet efficient solution to deduce
+% execution policy based on extra information on each goal {\em
+%   urgency}.
 
 The current work is focusing on the plan structure at a fairly
 abstract level without direct consideration in our approach of the

@@ -113,9 +113,9 @@ larger than the minimum duration of the {\em At} token; since our plan
 uses a {\em Go} immediately after, this \emph{Go} token also needs to
 be evaluated.
 
-\begin{figure}[b]
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figs/example_run.pdf}
+  \includegraphics[width=1.2\columnwidth]{figs/example_run.pdf}
   \caption{\small A mission run that shows the time needed for
     dispatching. The star represents when Goal \#2 is received and
     integrated into the plan. Lines with boxes at the end represent
@@ -123,27 +123,28 @@ be evaluated.
     arrow to every {\em At}. Our concern were the peaks that showed
     where the system had to dispatch both {\em At} and {\em Go}. }
   \label{fig:example_run}
-\end{figure}
+\end{figure*}
 
 
 We also identified a clear trend toward decreasing timing as the agent
 comes closer to the completion of either {\em Goal \#1} or {\em Goal
-  \#2}. This is clearly correlated to the reducing search distance
-toward these goals as we execute new actions.  We see an important
-variability in execution time which is most likely due to context
-switching between processes and threads within our agent as our
-virtual machine only had one processor.  The bump in timing between
-the time-step $56$ and the introduction of {\em Goal \#2} at time
-$127$ is due to the fact that our algorithm is continuously searching
-the graph from the next {\em Go}, which during this period, is not
-connected to an {\em urgent} goal. Due to the resulting exhaustive
-search in the plan graph our algorithm execution time during this
-period is on an average above $.2$ milliseconds. At tick $127$, the
-{\em Go} is no longer deferred and gets dispatched quickly. The search
-for {\em Goal \#2} becomes relatively simple as it is not very far
-away in the plan, and thus the time decreases significantly.
+  \#2}. This is correlated to the reduction in search distance toward
+these goals as we execute new actions.  We see an important
+variability in execution time which is likely due to context switching
+between processes and threads within our agent; multiple cores in the
+virtual machine is likely to remove this variation.  The bump in
+timing between time-step $56$ and the introduction of {\em Goal \#2}
+at $127$ is because the algorithm is continuously searching the graph
+from the next {\em Go}, which during this period, is not connected to
+an {\em urgent} goal. The resulting exhaustive search in the plan
+graph during this period is on an average above $.2$ milliseconds. At
+tick $127$, the {\em Go} is no longer deferred and gets dispatched.
+The search for our algorithm execution time {\em Goal \#2} becomes
+relatively simple as it is not very far away in the plan
+\kcomment{from what? from the end of the plan?}, and thus the time
+decreases significantly.
 
-\begin{figure}[!htbp]
+\begin{figure}[!b]
   \centering
   \includegraphics[width=\columnwidth]{figs/HistogramAlg1}
   \caption{\small Algorithm \ref{DispatchToken} was timed at every
@@ -154,17 +155,19 @@ away in the plan, and thus the time decreases significantly.
   \label{fig:histogram}
 \end{figure}
 
-In order to demonstrate the average amount of time that Algorithm
-\ref{DispatchToken} uses, $500$ simulated missions were recorded and
-timed at every increment of the mission time. Figure
-\ref{fig:histogram} shows the distribution of execution time for all
-of these runs. We see clearly that $90\%$ of the time our algorithm
-completed its search in less than $0.2 ms$. The distribution is
-then long tailed with worst performances between $2$ and $13ms$
-occuring for less than $5\%$ of our algorithm runs. Still these
-relatively poor performances often did occur when the {\em tokens}
-evaluated were meant to be {\em deferred} which makes the small loss
-of performances not as critical.
+% In order to demonstrate the average amount of time that Algorithm
+% \ref{DispatchToken} uses, $500$ simulated missions were recorded and
+% timed at every increment of the mission time. 
+Fig. \ref{fig:histogram} shows the distribution of execution time for
+$500$ simulated missions. It shows that $90\%$ of the time our
+algorithm completed its search in less than $0.2 ms$. The distribution
+is long tailed with the worst performance between $2$ and $13ms$
+occurring for less than $5\%$ of the runs. Such performance is
+exhibited when the {\em tokens} evaluated are meant to be {\em
+  deferred} which is not critical to the overall execution.
+
+% which makes the small loss of performances not as
+% critical.
 
 
 %%% Local Variables: 
