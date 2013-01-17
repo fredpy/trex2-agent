@@ -3,7 +3,7 @@
 
 Increased robustness in hardware has led to persistence of robots
 often in hostile environments such as our oceans. And with onboard
-autonomy increased versatility has resulted in the need to anticipate
+autonomy, the increased versatility has resulted in the need to anticipate
 and adapt to goals during mission execution.  Most existing autonomy
 approaches fall short of dealing with the ensuing tension of
 dispatching temporal actions either proactively or deferring them.
@@ -18,8 +18,8 @@ structure in abstraction without direct consideration of timing
 constraints applied to each goal in the plan. We are consequently able
 to use breadth first search within the existing plan structure to
 select different execution policies for each action within the
-plan. By doing so, we can improve overall mission execution avoiding
-being proactivity that could lead to inefficiency in handling new goal
+plan. By doing so, we can improve overall mission execution by avoiding
+proactivity that could lead to inefficiency in handling new goal
 requests.
 
 A number of open issues remain to be explored, however. The causal
@@ -32,24 +32,25 @@ greatly increase the quality of our solution.
 % further in order to see how such information could be used for our
 % system to automatically classify such goal as non urgent. It can also
 % impact how the {\em urgent} goal propagate within the plan.
-For instance the example in Fig. \ref{fig:ex:mixed2} where consequent
-to a non urgent {\em Surface} action, planning instantiates the urgent
-goal of surveying \emph{Vent1}. Currently, the policy is to make all
-actions related to the {\em Surface} action to become proactive
-because it is tied to a timepoint that is constrained to be proactive
-{\em after} in the near future.
+For instance, the example in Fig. \ref{fig:ex:mixed2} where consequent 
+to a non urgent {\em Surface} goal, planning instantiates the urgent
+goal of surveying \emph{Vent1}. Currently, the policy results into making all
+actions related to the non urgent {\em Surface} goal proactive due to the 
+proactive actions immediately following it.
+% because it is also connected to the  urgent Survey that is constrained to be proactive
+%{\em after} in the near future.
 % our policy did make all the actions related to the non
 % urgent goal become proactive.
 This can potentially lead to premature surfacing that is then
-prohibiting the agent to accept goals in the morning. Typically the
-non urgent {\em Surface} which is to end after 13:00 is acting as a
+prohibiting the agent from accepting goals in the morning. Typically the
+non urgent {\em Surface}, which is to end after 13:00, is acting as a
 guard on the propagation.
 % Our current understanding is that this timing constraint enforcing the
 % non urgent {\em Surface} to end after 1:00 is acting as a guard on the
 % propagation of our heuristic.
-Ideally therefore, only those actions that are directly after this
-{\em Surface} action should have been marked as urgent, instead of
-allowing propagation to continue to the {\em Surface} action itself.
+Therefore, ideally only those actions that are directly after this
+{\em Surface} goal should have been marked as urgent, instead of
+allowing propagation to continue to the {\em Go} to {\em Surface} action itself.
 % the actions
 % that are directly after this timepoint instead of continue to
 % propagate to the actions leading to the surface.
