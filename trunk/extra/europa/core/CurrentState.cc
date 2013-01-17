@@ -38,8 +38,7 @@
 #include <PLASMA/TokenVariable.hh>
 #include <PLASMA/PlanDatabaseWriter.hh>
 
-#include <boost/chrono/timer.hpp>
-#include <boost/chrono/thread_clock.hpp>
+#include <trex/utils/platform/chrono.hh>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -361,11 +360,20 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString());
     // Old code from Philip
     //boost::chrono::high_resolution_timer start;
-
+       # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+			typedef CHRONO::thread_clock thread_clock;
+	  # else
+	  #  if defined(CPP11_HAS_CHRONO)
+			// standard do not support processing time AFAIK
+			typedef CHRONO::high_resolution_clock thread_clock;
+	  #  else
+			// boost does on the other hand
+			typedef CHRONO::process_user_cpu_clock thread_clock;
+	  # endif
+	  # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+     typedef thread_clock::duration thread_duration;
     if(bfs)
     {
-        typedef boost::chrono::thread_clock thread_clock;
-        typedef thread_clock::duration thread_duration;
         thread_duration duration;
         thread_clock::time_point start = thread_clock::now();
         EUROPA::TokenId nowGoal = getGoal(*i, lb, ub);
@@ -392,8 +400,6 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     */
     if(dist)
     {
-        typedef boost::chrono::thread_clock thread_clock;
-        typedef thread_clock::duration thread_duration;
         thread_duration duration;
         thread_clock::time_point start = thread_clock::now();
         if(dispatch_token(*i,lb,ub))
