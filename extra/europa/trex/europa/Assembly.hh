@@ -50,7 +50,7 @@
 # include <fstream>
 # include <memory>
 
-#include <boost/chrono/thread_clock.hpp>
+#include <trex/utils/platform/chrono.hh>
 
 namespace TREX {
   namespace europa {
@@ -1561,7 +1561,17 @@ namespace TREX {
       /**
       *   Code for measuring the time for functions
       */
-      typedef boost::chrono::thread_clock thread_clock;
+      # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+			typedef CHRONO::thread_clock thread_clock;
+	  # else
+	  #  if defined(CPP11_HAS_CHRONO)
+			// standard do not support processing time AFAIK
+			typedef CHRONO::high_resolution_clock thread_clock;
+	  #  else
+			// boost does on the other hand
+			typedef CHRONO::process_user_cpu_clock thread_clock;
+	  # endif
+	  # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
       typedef thread_clock::duration thread_duration;
       std::map<EUROPA::eint, double> time_values;
 
