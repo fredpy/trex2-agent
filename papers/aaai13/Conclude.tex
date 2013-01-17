@@ -49,12 +49,23 @@ guard on the propagation.
 % non urgent {\em Surface} to end after 1:00 is acting as a guard on the
 % propagation of our heuristic.
 Therefore, ideally only those actions that are directly after this
-{\em Surface} goal should have been marked as urgent, instead of
-allowing propagation to continue to the {\em Go} to {\em Surface} action itself.
+{\em Surface} goal should have been marked as proactive as shown in
+Fig. \ref{fig:res:ideal}, while keeping actions preceding 13:00 deferred.
 % the actions
 % that are directly after this timepoint instead of continue to
 % propagate to the actions leading to the surface.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\columnwidth]{figs/example_ideal}
+  \caption{\small The ideal plan solution for Fig. \ref{fig:ex:mixed2}. The
+  thick line at 11:30 indicates the current time. Since {\em At Surface} is
+  constrained to be at 13:00, the AUV would be stuck for 30 minutes which is
+  not an efficient use of time.}
+  \label{fig:res:ideal}
+  \vskip-7mm
+\end{figure}
+ 
 Such refinement can be done only by considering the temporal
 % constraints applied to plan timepoints. Should the {\em Surface} not
 % have been constrained to be around 13:00 pm starting its execution
@@ -104,16 +115,6 @@ exploration and exploitation into two different surveys
 inclusion of new goals, we can greatly improve the efficacy of such
 surveys while generalizing to other domains.
 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\columnwidth]{figs/example_ideal}
-  \caption{\small The ideal plan solution for Fig. \ref{fig:ex:mixed2}. The
-  thick line at 11:30 indicates the current time. Since {\em At Surface} is
-  constrained to be at 13:00, the AUV would be stuck for 30 minutes which is
-  not an efficient use of time.}
-  \label{fig:ex:ideal}
-  \vskip-7mm
-\end{figure}
 
 
 
