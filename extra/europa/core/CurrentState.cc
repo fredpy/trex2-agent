@@ -39,6 +39,7 @@
 #include <PLASMA/PlanDatabaseWriter.hh>
 
 #include <trex/utils/platform/chrono.hh>
+#include <boost/unordered_map.hpp>
 
 using namespace TREX::europa;
 using namespace TREX::europa::details;
@@ -390,7 +391,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
         } else {
             time_values[now()]+=duration.count();
         }
-        //std::cout<<now()<<": "<<time_values[now()]<<(*i)->getUnqualifiedPredicateName().toString()
+        //std::cout<<now()<<": "<<time_values[now()]<<" | "<<(*i)->getUnqualifiedPredicateName().toString()
 	    // <<'('<<(*i)->getKey()<<")"<<std::endl;
     }
     /** @brief Dispatching function with the help of listener_proxy
@@ -456,6 +457,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
         time_file.close();
       }
     }
+
     if(dist)
     {
       if(lb==m_assembly.final_tick())
@@ -494,74 +496,67 @@ bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, 
 
 EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::eint lb, EUROPA::eint ub)
 {
-    EUROPA::TokenSet actions, condActions, merged;
-    EUROPA::TokenSet::iterator it, end;
-    ///Gets all of the tokens merged with @token
-    merged = getAllTokens(token);
-
-    ///Tests to see if any of the tokens are fact and if so @returns noId()
-    ///Gets the masters connected through conditions of all the merged tokens
-    for(it = merged.begin(), end = merged.end(); it!=end; it++)
+    if(token->start()->lastDomain().getUpperBound()<=ub || m_assembly.is_action(token))
     {
-        if((*it)->isFact())
-            return EUROPA::Id<EUROPA::Token>::noId();
-
-        EUROPA::TokenId master = (*it)->master();
-        if(master.isId())
-        {
-          if(m_assembly.is_condition((*it)) && m_assembly.is_action(master))
-            actions.insert(master);
-        }
-    }
-    EUROPA::TokenId goal = searchGoal(actions);
-    if(goal.isId())
-        return goal;
-    else if(token->start()->lastDomain().getUpperBound()<=ub || m_assembly.is_action(token))
         return token;
+    } else {
+        EUROPA::TokenSet merged;
+        EUROPA::TokenSet::iterator it, end;
+
+        ///Gets all of the tokens merged with @token
+        merged = getAllTokens(token);
+        ///Tests to see if any of the tokens are fact and if so @returns noId()
+        for(it = merged.begin(), end = merged.end(); it!=end; it++)
+        {
+            if((*it)->isFact())
+                return EUROPA::Id<EUROPA::Token>::noId();
+        }
+
+        EUROPA::TokenId goal = searchGoal(merged);
+        if(goal.isId())
+            return goal;
+    }
 
     return EUROPA::Id<EUROPA::Token>::noId();
 }
 
-EUROPA::TokenId CurrentState::searchGoal(EUROPA::TokenSet actions)
+EUROPA::TokenId CurrentState::searchGoal(const EUROPA::TokenSet& tokens)
 {
-    std::list<EUROPA::TokenId> search;
-    search.insert(search.end(), actions.begin(), actions.end());
-    std::list<EUROPA::TokenId>::iterator it;
-
-    EUROPA::TokenSet effects, merged, slaves;
-    EUROPA::TokenSet::iterator mergedIt, slave, sToken;
-
-    for(it=search.begin(); it!=search.end(); it++)
+    boost::unordered_map<long, bool> mark;
+    std::list<EUROPA::TokenId> list;
+    for(EUROPA::TokenSet::const_iterator it = tokens.begin(); it!=tokens.end(); ++it)
     {
-        effects.clear();
-        merged = getAllTokens((*it));
-        for(mergedIt=merged.begin(); mergedIt!=merged.end(); mergedIt++)
+        list.push_back(*it);
+        mark[(*it)->getKey().asLong()]=true;
+    }
+
+    EUROPA::TokenSet effects, merged;
+    EUROPA::TokenSet::iterator effToken, mergedIt;
+    while(!list.empty())
+    {
+        EUROPA::TokenId token = list.front();
+        list.pop_front();
+        if(m_assembly.is_goal(token))
+            return token;
+        if(m_assembly.is_condition(token))
         {
-            slaves = (*mergedIt)->slaves();
-            for(slave=slaves.begin(); slave!=slaves.end(); slave++)
+            EUROPA::TokenId master = token->master();
+            if(master.isId() && m_assembly.is_action(master))
             {
-                if(m_assembly.is_effect((*slave)))
-                    effects.insert((*slave));
-            }
-        }
-        sToken = effects.begin();
-        while(sToken != effects.end())
-        {
-            merged = getAllTokens((*sToken));
-            for(mergedIt = merged.begin(); mergedIt!=merged.end(); mergedIt++)
-            {
-                if(m_assembly.is_goal((*mergedIt)))
+                effects = actionEffects(master);
+                for(effToken = effects.begin(); effToken!=effects.end(); ++effToken)
                 {
-                    return *mergedIt;
-                }
-                EUROPA::TokenId master = (*mergedIt)->master();
-                if(master.isId())
-                {
-                    if(m_assembly.is_condition((*mergedIt)) && m_assembly.is_action(master))
-                        search.push_back(master);
+                    if(!mark[(*effToken)->getKey().asLong()])
+                    {
+                        merged = getAllTokens(*effToken);
+                        for(mergedIt=merged.begin(); mergedIt!=merged.end(); ++mergedIt)
+                        {
+                            mark[(*mergedIt)->getKey().asLong()]=true;
+                            list.push_back(*mergedIt);
+                        }
+                    }
                 }
             }
-            sToken++;
         }
     }
     return EUROPA::Id<EUROPA::Token>::noId();
@@ -584,7 +579,19 @@ EUROPA::TokenSet CurrentState::getAllTokens(const EUROPA::TokenId& token)
           merged.insert(token->getActiveToken());
         }
     }
-  return merged;
+    return merged;
+}
+
+EUROPA::TokenSet CurrentState::actionEffects(const EUROPA::TokenId& action)
+{
+    EUROPA::TokenSet slaves = action->slaves(), effects;
+    for(EUROPA::TokenSet::iterator it = slaves.begin(), end = slaves.end();
+        it!=end; it++)
+    {
+        if(m_assembly.is_effect((*it)))
+            effects.insert(*it);
+    }
+    return effects;
 }
 
 

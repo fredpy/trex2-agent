@@ -1608,10 +1608,11 @@ bool Assembly::is_subgoal(const EUROPA::TokenId& token)
 
 void Assembly::subgoalSearch(EUROPA::TokenSet& tokens)
 {
+    EUROPA::TokenSet::iterator it, condIt;
     m_goals.insert(tokens.begin(), tokens.end());
     while(!tokens.empty())
     {
-        EUROPA::TokenSet::iterator it = tokens.begin(), condIt;
+        it = tokens.begin();
         if(actionEffect((*it)))
         {
             EUROPA::TokenSet conds = conditions((*it)->master());
