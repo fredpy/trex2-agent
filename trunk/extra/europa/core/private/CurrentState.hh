@@ -214,12 +214,20 @@ namespace TREX {
          */
         void do_dispatch(EUROPA::eint lb, EUROPA::eint ub);
 
+        /**
+        *   Distributed method checking for execution
+        */
         bool dispatch_token(const EUROPA::TokenId& token,
                             EUROPA::eint lb, EUROPA::eint ub);
+        /**
+        *   Breath-first-search method for execution
+        */
         EUROPA::TokenId getGoal(const EUROPA::TokenId& token,
                                 EUROPA::eint lb, EUROPA::eint ub);
-        EUROPA::TokenId searchGoal(EUROPA::TokenSet actions);
+        EUROPA::TokenId searchGoal(const EUROPA::TokenSet& tokens);
         EUROPA::TokenSet getAllTokens(const EUROPA::TokenId& token);
+        EUROPA::TokenSet actionEffects(const EUROPA::TokenId& action);
+        //void enqueue(const EUROPA::TokenSet& tokens, std::queue<EUROPA::TokenId>& queue);
 
         /** @brief Current state decision point
          *
