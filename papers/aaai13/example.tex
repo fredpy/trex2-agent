@@ -1,17 +1,19 @@
 \paragraph{An Illustrative Example} 
 % \label{sec:example}
+
 Our focus of research is the oceanographic domain with a robotic
 autonomous underwater vehicle (AUV) and illustrate issues arising with
-dynamic goal emergence and motivate our approach.  In this domain an AUV
-can either transit from one location to another within the water mass
-or survey a location in order to collect data of a feature of interest
-such as a hydrothermal vent depicted in Fig. \ref{fig:Example}.  Note that
-the AUV must pass through {\em Vent1} to get to {\em Vent2}.  The
-vehicle is deployed initially with the scientific objective to sample
-{\em Vent 2} and the operational goal to be back at the {\em Surface}
-by the end of the mission which lasts $12$ hours limited by its energy
-carrying capacity. The support ship can send short commands and
-receive limited data via limited acoustic communications.
+dynamic goal emergence and motivate our approach.  In this domain an
+AUV can either transit from one location to another within the water
+mass or survey a location in order to collect data of a feature of
+interest such as a hydrothermal vent depicted in
+Fig. \ref{fig:Example}.  Note that the AUV must pass through {\em
+  Vent1} to get to {\em Vent2}.  The vehicle is deployed initially
+with the scientific objective to sample {\em Vent 2} and the
+operational goal to be back at the {\em Surface} by the end of the
+mission which lasts $12$ hours limited by its energy carrying
+capacity. The support ship can send short commands and receive limited
+data via limited acoustic communications.
 
 %%%%%%%%%%%%%%%%%%
 % Use the following if really needed
@@ -24,10 +26,10 @@ receive limited data via limited acoustic communications.
   \caption{\small{(\ref{fig:ex:graph}) illustrates the domain along
       with the initial partial plan for this problem
       (\ref{fig:ex:init}). The AUV is initially at {\em Surface} at
-      8:00 in the morning and the mission is expected to complete by 20:00 with the
-      Science goal --- marked with thick borders --- to sample {\em
-        Vent 2} and the operational goal to be back at the surface
-      for recovery by the end of the mission.}}
+      8:00 and the mission is expected to complete by 20:00 with the
+      goal --- marked with thick borders --- to sample {\em Vent 2}
+      and the operational goal to be back at the surface for recovery
+      by mission end.}}
 \label{fig:Example}
 \end{figure}
 
@@ -61,10 +63,10 @@ efficiency impact.
   \label{fig:ex:plan}
 \end{figure}
 
-Exclusively {\em deferring} the actions is not acceptable since it results in the
-vehicle sitting at the surface, diving only at the very last
-minute. If a new goal arrives subsequently, there is no time left to
-do both objectives leaving the robot to exclude one of the goals or
+Exclusively {\em deferring} the actions is not acceptable since it
+results in the vehicle sitting at the surface, diving only at the very
+last minute. If a new goal arrives subsequently, there is no time left
+to do both objectives leaving the robot to exclude one of the goals or
 fail to be at the surface as planned by 20:00. Equally, the {\em
   proactive} approach is problematic, since the vehicle will go
 through the actions of the plan and be back at the surface early
@@ -102,20 +104,20 @@ approach.
 
 Analyzing the objectives we note that these divergent policies are
 because of divergent goal semantics. While visiting {\em Vent 1} was
-reflecting a \emph{scientific need}, the goal to be back at the surface
-was more of an \emph{operational requirement} to avoid risk due to the
-battery running out. While fulfilling both goals are equally important
-for mission success, they do not carry the same notion of {\em
-  urgency}. It
-is desirable for the AUV to visit vents as early as possible but there is
-no strong motivation to return to the surface before the end of the
-day. Therefore, a more balanced policy would be to alternate between the
-two different approaches depending on what objective(s) the next action
-contribute to. The AUV could have been {\em proactive} until it starts
-to survey {\em Vent 2} and then {\em defer} heading back to the surface,
-continuing to survey the same area, until it either receives a new
-goal or the latest start time of the {\em Go} to \emph{Vent1} action is
-reached ($\sim$ 17:50). In the event of a new goal,
+reflecting a \emph{scientific need}, the goal to be back at the
+surface was more of an \emph{operational requirement} to avoid risk
+due to the battery running out. While fulfilling both goals are
+equally important for mission success, they do not carry the same
+notion of {\em urgency}. It is desirable for the AUV to visit vents as
+early as possible but there is no strong motivation to return to the
+surface before the end of the day. Therefore, a more balanced policy
+would be to alternate between the two different approaches depending
+on what objective(s) the next action contribute to. The AUV could have
+been {\em proactive} until it starts to survey {\em Vent 2} and then
+{\em defer} heading back to the surface, continuing to survey the same
+area, until it either receives a new goal or the latest start time of
+the {\em Go} to \emph{Vent1} action is reached ($\sim$ 17:50). In the
+event of a new goal,
 % or it is
 % really time to go back to the {\em Surface} (around 18:00). Therefore
 % when the AUV receive the new objective to sample {\em Vent 1} it would
@@ -123,11 +125,11 @@ reached ($\sim$ 17:50). In the event of a new goal,
 % new location. 
 the resulting mission scenario would then be more efficient in terms
 of its \emph{makespan}. Our approach revolves around mission
-objectives to be marked as either {\em urgent} or not leading to the 
-exploration of the plan structure during plan execution to identify if the action
-is linked to an {\em urgent} goal -- in which case it need to be
-executed {\em proactively} -- otherwise leading towards 
-a {\em deferred} execution policy for the action.
+objectives to be marked as either {\em urgent} or not leading to the
+exploration of the plan structure during plan execution to identify if
+the action is linked to an {\em urgent} goal -- in which case it need
+to be executed {\em proactively} -- otherwise leading towards a {\em
+  deferred} execution policy for the action.
  
 
 % We demonstrate a scenario where the AUV ideally uses the two

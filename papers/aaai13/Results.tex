@@ -14,10 +14,9 @@ which synthesizes temporal plans.
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.9\columnwidth]{figs/example_MixedInitial}
-  \caption{\small Solid
-    lines indicate conditions and dashed lines indicate
-    effects. Pentagons indicate {\em urgent} goals and stars indicate
-    tokens that were deduced as {\em proactive}.}
+  \caption{\small Solid lines indicate conditions and dashed lines
+    indicate effects. Pentagons indicate {\em urgent} goals and stars
+    indicate tokens that were deduced as {\em proactive}.}
   \label{fig:ex:mixed1}
   \vskip-4mm
 \end{figure}
@@ -103,17 +102,17 @@ no impact of significance.
 % if the mission were longer as the same plan would be produced just
 % with different timepoints.
  
-Figure \ref{fig:example_run} shows a mission run that is similar to
-the example in Fig. \ref{fig:ex:plan}.  To increase plan complexity a
+Fig. \ref{fig:example_run} shows a mission run that is similar to the
+example in Fig. \ref{fig:ex:plan}.  To increase plan complexity a
 total of $8$ intermediate locations were added between the {\em
-  surface} and {\em vent 1}, with all evaluations taking less then
-$1ms$. The largest performance spikes were due to the need to evaluate
-the dispatching condition for an {\em At} token which is followed by a
-{\em Go} token resulting in two forward searches within the plan
-structure. This is because the dispatch window is
-larger than the minimum duration of the {\em At} token; since our plan
-uses a {\em Go} immediately after, this \emph{Go} token also needs to
-be evaluated.
+  surface} and {\em vent 1}, with all evaluations taking less then $1$
+millisecond. The largest performance spikes were due to the need to
+evaluate the dispatching condition for an {\em At} token which is
+followed by a {\em Go} token resulting in two forward searches within
+the plan structure. This is because the dispatch window is larger than
+the minimum duration of the {\em At} token; since our plan uses a {\em
+  Go} immediately after, this \emph{Go} token also needs to be
+evaluated.
 
 \begin{figure*}[t]
   \centering
@@ -151,10 +150,10 @@ tick $127$, the {\em Go} is no longer deferred and gets dispatched.
   \centering
   \includegraphics[width=\columnwidth]{figs/HistogramAlg1}
   \caption{\small Algorithm \ref{DispatchToken} was timed at every
-    increment of the mission time for $500$ simulated missions. One
-    goal was inserted into the plan at a random time during the
-    mission. The histogram shows the distribution of the time, which
-    is heavily skewed to the left.}
+    increment (at $1$ Hz) of the mission time for $500$ simulated
+    missions. One goal was inserted into the plan at a random time
+    during the mission. The histogram shows the distribution of the
+    time, which is heavily skewed to the left.}
   \label{fig:histogram}
 \end{figure}
 
@@ -163,9 +162,9 @@ tick $127$, the {\em Go} is no longer deferred and gets dispatched.
 % timed at every increment of the mission time. 
 Fig. \ref{fig:histogram} shows the distribution of execution time for
 $500$ simulated missions. It shows that $90\%$ of the time our
-algorithm completed its search in less than $0.2 ms$. The distribution
-is long tailed with the worst performance between $2$ and $13ms$
-occurring for less than $5\%$ of the runs. Such performance is
+algorithm completed its search in less than $0.2$ millisecond. The
+distribution is long tailed with the worst performance between $2$ and
+$13ms$ occurring for less than $5\%$ of the runs. Such performance is
 exhibited when the {\em tokens} evaluated are meant to be {\em
   deferred} which is not critical to the overall execution.
 
