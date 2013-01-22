@@ -229,6 +229,18 @@ necessary. Its complexity is $O(N+E)$ \cite{corman} where $N$ is the
 number of tokens and $E$ the number of causal links that connect these
 tokens in the plan.
 
+An alternate version of Algorithm \ref{alg:dispatch} that propagated
+goal urgency through causal links during planning was also
+attempted. While functionally equivalent, the overhead during
+backtracking -- requiring removal of propagation made during search --
+and with continuous plan refinement, the results did not generate any
+significant performance benefit.
+
+% any significant benefit in term of performance and could ben create
+% important extra cost should the search for plan been misleader by the
+% heuristic.
+
+
 %\subsection{Dynamic solution during planning}
 %
 %Searching for a goal as Algorithm \ref{SearchForGoal} does can be
