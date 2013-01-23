@@ -55,8 +55,8 @@ namespace TREX {
        * handled asynchronously by the callbacks associated.
        *
        * This allow to have a generic way to redirect log messages created 
-       * to any kind of consumer such as an output file, a graphic interface, 
-       * a database, ...
+       * to any kind of consumer such as an output file, a graphic 
+       * interface, a database, ...
        *
        * The handling is done asynchronously using @asio and, by default, 
        * connected callbacks are wrapped in a strand which ensure that this 
@@ -69,8 +69,22 @@ namespace TREX {
        */
       class text_log :boost::noncopyable {
       public:
+        /** @brief Date type
+         *
+         * Type used to store the date of the message
+         */
         typedef entry::date_type                        date_type;
+        /** @brief Message Kind type
+         *
+         * Type used to store the kind of message produced
+         */
         typedef entry::id_type                          id_type;
+        /** @brief Signal slot type
+         *
+         * The type of slot that can handle new log message signal events
+         *
+         * @sa class details::log_signal
+         */
         typedef details::log_signal::extended_slot_type slot_type;
         
         /** @brief Constructor 
@@ -92,12 +106,12 @@ namespace TREX {
          * @param[in] kind A symbol describing the kind of message 
          *
          * Create a new local stream to build a new entry. The entry will be
-         * with @p who as the source the entry, with the message type @p what 
-         * and -- if provided -- dated as @p when. The returned stream will 
-         * allow to create the entry content for this message.
+         * with @p who as the source the entry, with the message type 
+         * @p what and -- if provided -- dated as @p when. The returned 
+         * stream will allow to create the entry content for this message.
          *
-         * @return A stream used to build and dispatch on its destruction the 
-         * newly created entry.
+         * @return A stream used to build and dispatch on its destruction 
+         * the newly created entry.
          *
          * For example one can create a new wraning message as follow:
          * @code
@@ -107,11 +121,11 @@ namespace TREX {
          * // ...
          * my_log(0, "a fancy source tag", log::info)<<"This my message";
          * @endcode
-         * At the end of this last line the temporary stream will be destoyed 
-         * resulting on the new @e info log entry dated @c 0 from 
-         * "a fancy source tag" with the content "This is my message" will be 
-         * dispatched from a signal to all the handlers which will in turn be 
-         * posted to execute and process this entry.       
+         * At the end of this last line the temporary stream will be 
+         * destoyed resulting on the new @e info log entry dated @c 0 from
+         * "a fancy source tag" with the content "This is my message" will 
+         * be dispatched from a signal to all the handlers which will in 
+         * turn be posted to execute and process this entry.       
          */
         stream msg(id_type const &who, id_type const &what=null);
         stream operator()(id_type const &who, id_type const &what=null) {
@@ -147,15 +161,16 @@ namespace TREX {
          * @pre @p Service has a post function that accept functors with no 
          * argument
          * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and return 
-         *      @c void 
+         * @pre @p Handler accept a log::entry::pointer as argument and 
+         *    return @c void
          *
-         * @return A slot that wraps the handler and will post its execution 
-         *        through @p s when signaled of a new event to the text_log(s) 
-         *        it is connected to
+         * @return A slot that wraps the handler and will post its execution
+         *        through @p s when signaled of a new event to the 
+         *        text_log(s) it is connected to
          *
-         * @note when no service is specified this call create a strand attached 
-         *       to the default @asio service associated to this instance
+         * @note when no service is specified this call create a strand
+         *    attached to the default @asio service associated to this 
+         *    instance
          * @sa text_log::post
          * @sa text_log::direct_wrap
          */
@@ -174,31 +189,61 @@ namespace TREX {
          * 
          * @param[in] fn The handler to be called
          *
-         * Create a new log event slot for the handler @p fn. As opposed to warp 
-         * this handler execution is not asynchronous which means that id will be 
-         * direcly executed when a new log entry is porduced within the thread 
-         * that created this event. Still this handler is protected in the sense 
-         * that it connection is temporarilly disbaled during @p fn execution
+         * Create a new log event slot for the handler @p fn. As opposed 
+         * to warp this handler execution is not asynchronous which means
+         * that id will be direcly executed when a new log entry is produced
+         * within the thread that created this event. Still this handler is
+         * protected in the sense that it connection is temporarilly
+         * disabled during @p fn execution
          *
          * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and return 
-         *      @c void 
+         * @pre @p Handler accept a log::entry::pointer as argument and
+         *    return @c void
          *
-         * @return A slot that wraps the handler and will execute immediately 
+         * @return A slot that wraps the handler and will execute
+         *    immediately
          * 
-         * @note As this handler is direct the execution of @p fn will not be 
-         *       thread safe and it is the resposibilty of the implement of @p 
-         *       fn to ensure its reentrancy.
-         *
-         * 
+         * @note As this handler is direct the execution of @p fn will not
+         *    be thread protected and it is the responsibilty of the
+         *    implement of @p fn to ensure its reentrancy.
          */
         template<typename Handler>
         slot_type direct_wrap(Handler fn) {
           return handler::direct(fn);
         }
         
+        /** @brief Signal handler connection
+         *
+         * @param[in] slot A signal handler
+         *
+         * Connect @p slot to this instance. Whenever a new log message 
+         * is produced @p slot will be called
+         *
+         * @return The connection beteween @p slot and this instance
+         */
         boost::signals2::connection connect(slot_type const &slot);
         
+        /** @{
+         * @brief Asynchronous signal handler connection
+         *
+         * @tparam Handler A functor type compatible with @c slot_type
+         * @tparam Service An asio service type or with similar interface
+         *
+         * @param[in]     fn A signal handler
+         * @param[in,out] s An asynchronous service
+         *
+         * Connect @p fn to this instance. Whenever a new log message
+         * is produced @p fn will be called through the service @p s
+         *
+         * @note If @p s is not specifed The io service from this 
+         * instance is used instead
+         *
+         * @pre @p Handler is copyable
+         * @pre @p Handler accept a log::entry::pointer as argument and
+         *    return @c void
+         *
+         * @return The connection beteween @p fn and this instance
+         */
         template<typename Handler, class Service>
         boost::signals2::connection connect(Handler fn, Service &s) {
           return connect(wrap(fn, s));
@@ -207,9 +252,29 @@ namespace TREX {
         boost::signals2::connection connect(Handler fn) {
           return connect(wrap(fn));
         }
+        /** @} */
+        /** @brief Direct signal handler connection
+         *
+         * @tparam Handler A functor type compatible with @c slot_type
+         *
+         * @param[in]     fn A signal handler
+         *
+         * Connect @p fn to this instance. Whenever a new log message
+         * is produced @p fn will be called directly
+         *
+         *
+         * @pre @p Handler is copyable
+         * @pre @p Handler accept a log::entry::pointer as argument and
+         *    return @c void
+         * @note As this is a direct call it is not thread protected. It
+         *  is the responsibility of the implementer to ensure @p fn 
+         *  reentrance
+         *
+         * @return The connection between @p fn and this instance
+         */
         template<typename Handler>
         boost::signals2::connection connect_direct(Handler fn) {
-          return connect(wrap_direct(fn));
+          return connect(direct_wrap(fn));
         }
         
       private:

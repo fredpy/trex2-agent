@@ -44,14 +44,37 @@ namespace TREX {
   namespace utils {
     namespace log {
       
+      /** @brief Basic log file handler
+       *
+       * This class implements a basic log message handler for 
+       * @c text_log that redirect all messages received in a 
+       * file
+       *
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup utils
+       * @sa text_log
+       */
       class out_file {
       public:
         typedef void           result_type;
         typedef entry::pointer argument_type;
         
-        out_file(std::string const &fname);
+        /** @brief Consrructor
+         * @param[in] fname A file open
+         *
+         * Create a new instance that will redirect all messages 
+         * received into the new ly created file @p fname
+         */
+        explicit out_file(std::string const &fname);
+        /** @brief Destructor */
         ~out_file() {}
         
+        /** @brief Message handling operator
+         *
+         * @param[in] msg A  new log entry
+         *
+         * Write @p msg in the output file
+         */
         void operator()(entry::pointer msg);
         
       private:
