@@ -54,16 +54,28 @@ namespace TREX {
      */
     namespace log {
       
+      /** @brief Message type identifier
+       *
+       * The type used to identify the type of log message
+       * @ingroup utils
+       */
       typedef Symbol id_type;
       class stream;
       
-      extern id_type const null;
-      extern id_type const info;
-      extern id_type const warn;
-      extern id_type const error;
+      extern id_type const null; //!< Untyped log message
+      extern id_type const info; //!< Infromation log message
+      extern id_type const warn; //!< Warning log message
+      extern id_type const error; //!< Error log message
       
       class text_log;
       
+      /** @brief Logging implementation details
+       *
+       * This namespace embeds classes and utilities used for implementation
+       * details for the text logging mechanism used within TREX
+       *
+       * @ingroup utils
+       */
       namespace details {
         
         class entry_sink;

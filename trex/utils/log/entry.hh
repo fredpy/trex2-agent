@@ -67,6 +67,7 @@ namespace TREX {
        */
       class entry {
       public:
+        
 # ifdef DOXYGEN	// doxygen tweaks
 	/** Type for a date
 	 *
@@ -78,16 +79,17 @@ namespace TREX {
 # else  // DOXYGEN
         typedef unsigned long long date_type;
 # endif // DOXYGEN
+        
 	/** @brief identifiers' type
 	 *
 	 * The type used for both that source and kind of the entry.
 	 */
-        typedef Symbol            id_type;
+        typedef ::TREX::utils::log::id_type id_type;
 	/** @brief Message content type
 	 *
 	 * The type used to store the message content.
 	 */
-        typedef std::string        msg_type;
+        typedef std::string                 msg_type;
         
 	/** @brief Pointer type
 	 *
