@@ -43,8 +43,8 @@ using namespace TREX::utils::log;
 // structors
 
 details::entry_sink::~entry_sink() {
-  if( NULL!=m_dest && m_entry && m_entry->has_content() ) 
-    m_dest->post(m_entry);
+  if( NULL!=m_log && m_entry && m_entry->has_content() )
+    (*m_log)(m_entry);
 }
 
 // manipulators

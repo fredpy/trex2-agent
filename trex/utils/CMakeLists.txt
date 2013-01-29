@@ -57,6 +57,8 @@ add_library(TREXutils SHARED
   log/entry.cc
   log/text_log.cc
   # headers
+  asio_signal.hh
+  bits/asio_signal_iter.hh
   chrono_helper.hh
   ErrnoExcept.hh
   Exception.hh
@@ -87,7 +89,7 @@ add_library(TREXutils SHARED
   log/bits/log_sig.hh
   log/text_log.hh
   log/out_file.hh
-  # platform specific information 
+  # platform specific information
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
@@ -106,6 +108,7 @@ source_group("Source\ Files\\log" FILES
 )
 
 source_group("Header\ Files\\bits" FILES 
+  bits/asio_signal_iter.hh
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh

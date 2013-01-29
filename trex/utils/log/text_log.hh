@@ -79,13 +79,21 @@ namespace TREX {
          * Type used to store the kind of message produced
          */
         typedef entry::id_type                          id_type;
+        
+        typedef details::log_signal              log_signal;
+        
         /** @brief Signal slot type
          *
          * The type of slot that can handle new log message signal events
          *
          * @sa class details::log_signal
          */
-        typedef details::log_signal::extended_slot_type slot_type;
+        typedef log_signal::slot_type          slot_type;
+        typedef log_signal::extended_slot_type extended_slot_type;
+        typedef log_signal::connection         connection;
+       
+        typedef log_signal::strand             strand;
+        
         
         /** @brief Constructor 
          *
@@ -139,80 +147,11 @@ namespace TREX {
         }
         /** @} */
         
-        /** @{ 
-         * @brief Asynchronous log handler wrapping
-         *
-         * @tparam Handler A handling functor
-         * @tparam Service A @asio "service"
-         * 
-         * @param[in] fn The handler to be called
-         * @param[in] s The service used
-         *
-         * Wrap @p fn as an asynchronous slot using the service @p s.
-         * These slot created, if connected will post the call of @p fn  
-         * through @p s service whenever a new log entry is published by 
-         * this class.
-         *
-         * If @p s is an asynchronous service (such as a io_service or a 
-         * io_service::strand) the posting will just schedulle the handler 
-         * execution in one of the threads executing this service and this 
-         * call will return immediately 
-         * 
-         * @pre @p Service has a post function that accept functors with no 
-         * argument
-         * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and 
-         *    return @c void
-         *
-         * @return A slot that wraps the handler and will post its execution
-         *        through @p s when signaled of a new event to the 
-         *        text_log(s) it is connected to
-         *
-         * @note when no service is specified this call create a strand
-         *    attached to the default @asio service associated to this 
-         *    instance
-         * @sa text_log::post
-         * @sa text_log::direct_wrap
-         */
-        template<typename Handler, class Service>
-        slot_type wrap(Handler fn, Service &s) {
-          return handler::async(s, fn);
-        }
-        template<typename Handler>
-        slot_type wrap(Handler fn) {
-          return handler::stranded(m_io, fn);
-        }
-        /** @} */
-        /** @brief Direct log handler wrapping 
-         *
-         * @tparam Handler A handling functor
-         * 
-         * @param[in] fn The handler to be called
-         *
-         * Create a new log event slot for the handler @p fn. As opposed 
-         * to warp this handler execution is not asynchronous which means
-         * that id will be direcly executed when a new log entry is produced
-         * within the thread that created this event. Still this handler is
-         * protected in the sense that it connection is temporarilly
-         * disabled during @p fn execution
-         *
-         * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and
-         *    return @c void
-         *
-         * @return A slot that wraps the handler and will execute
-         *    immediately
-         * 
-         * @note As this handler is direct the execution of @p fn will not
-         *    be thread protected and it is the responsibilty of the
-         *    implement of @p fn to ensure its reentrancy.
-         */
-        template<typename Handler>
-        slot_type direct_wrap(Handler fn) {
-          return handler::direct(fn);
+        strand new_strand() {
+          return m_new_log.new_strand();
         }
         
-        /** @brief Signal handler connection
+         /** @brief Signal handler connection
          *
          * @param[in] slot A signal handler
          *
@@ -221,69 +160,18 @@ namespace TREX {
          *
          * @return The connection beteween @p slot and this instance
          */
-        boost::signals2::connection connect(slot_type const &slot);
+        connection connect(slot_type const &slot);
+        connection connect(strand &s, slot_type const &slot);
+        connection connect_extended(extended_slot_type const &slot);
+        connection connect_extended(strand &s, extended_slot_type const &slot);
+
         
-        /** @{
-         * @brief Asynchronous signal handler connection
-         *
-         * @tparam Handler A functor type compatible with @c slot_type
-         * @tparam Service An asio service type or with similar interface
-         *
-         * @param[in]     fn A signal handler
-         * @param[in,out] s An asynchronous service
-         *
-         * Connect @p fn to this instance. Whenever a new log message
-         * is produced @p fn will be called through the service @p s
-         *
-         * @note If @p s is not specifed The io service from this 
-         * instance is used instead
-         *
-         * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and
-         *    return @c void
-         *
-         * @return The connection beteween @p fn and this instance
-         */
-        template<typename Handler, class Service>
-        boost::signals2::connection connect(Handler fn, Service &s) {
-          return connect(wrap(fn, s));
-        }
-        template<typename Handler>
-        boost::signals2::connection connect(Handler fn) {
-          return connect(wrap(fn));
-        }
-        /** @} */
-        /** @brief Direct signal handler connection
-         *
-         * @tparam Handler A functor type compatible with @c slot_type
-         *
-         * @param[in]     fn A signal handler
-         *
-         * Connect @p fn to this instance. Whenever a new log message
-         * is produced @p fn will be called directly
-         *
-         *
-         * @pre @p Handler is copyable
-         * @pre @p Handler accept a log::entry::pointer as argument and
-         *    return @c void
-         * @note As this is a direct call it is not thread protected. It
-         *  is the responsibility of the implementer to ensure @p fn 
-         *  reentrance
-         *
-         * @return The connection between @p fn and this instance
-         */
-        template<typename Handler>
-        boost::signals2::connection connect_direct(Handler fn) {
-          return connect(direct_wrap(fn));
-        }
+        connection async_connect(slot_type const &slot);
+        connection async_connect_extended(extended_slot_type const &slot);
         
       private:
-        void post(entry::pointer const &msg);
-        
-        boost::asio::io_service &m_io;
-        details::log_signal m_new_log; 
+        log_signal m_new_log;
        
-        friend class TREX::utils::log::details::entry_sink;
 # ifndef DOXYGEN
         text_log() DELETED; // Non default constructible
 # endif
