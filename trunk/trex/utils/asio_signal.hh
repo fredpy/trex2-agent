@@ -44,19 +44,10 @@
 #ifndef H_trex_utils_asio_signal
 # define H_trex_utils_asio_signal
 
-# include <boost/signals2/signal.hpp>
-
-# include <boost/asio.hpp>
-
-
-
+# include "asio_signal_fwd.hh"
 
 namespace TREX {
   namespace utils {
-
-    // Initial definition of the class
-    template<typename Signature>
-    class asio_signal;
     
 # ifndef DOXYGEN
     

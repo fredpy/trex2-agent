@@ -58,6 +58,7 @@ add_library(TREXutils SHARED
   log/text_log.cc
   # headers
   asio_signal.hh
+  asio_signal_fwd.hh
   bits/asio_signal_iter.hh
   chrono_helper.hh
   ErrnoExcept.hh
