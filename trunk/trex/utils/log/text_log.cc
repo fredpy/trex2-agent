@@ -54,55 +54,52 @@ namespace TREX {
 
 using namespace TREX::utils::log;
 
-namespace bs2=boost::signals2;
-namespace ba=boost::asio;
-
-/*
- * TREX::utils::log::details::local_protected_cb
- */
-
-void details::local_protected_cb::operator()(bs2::connection const &c,
-                                             entry::pointer msg) {
-  bs2::shared_connection_block disable(c);
-  m_fn(msg);
-}
-
-/*
- * TREX::utils::log::details::async_cb_base
- */
-
-boost::function<void ()> 
-details::async_cb_base::wrap(bs2::connection c,
-                             entry::pointer  msg) {
-  return boost::bind(m_callback, c, msg);
-}
-
 /*
  * class TREX::utils::log::text_log
  */
 
 // structors 
 
-text_log::text_log(ba::io_service &io):m_io(io) {} 
+text_log::text_log(boost::asio::io_service &io):m_new_log(io) {}
 
 // manipulators
 
 stream text_log::msg(id_type const &who, id_type const &what) {
-  return stream(details::entry_sink(*this, who, what));
+  return stream(details::entry_sink(m_new_log, who, what));
 }
 
 stream text_log::msg(date_type const &when, 
                      id_type const &who, id_type const &what) {
-  return stream(details::entry_sink(*this, when, who, what));  
+  return stream(details::entry_sink(m_new_log, when, who, what));
 }
 
-bs2::connection text_log::connect(text_log::slot_type const &slot) {
+text_log::connection text_log::connect(text_log::slot_type const &slot) {
+  return m_new_log.strand_connect(slot);
+}
+
+text_log::connection text_log::connect(text_log::strand &s,
+                                       text_log::slot_type const &slot) {
+  return m_new_log.strand_connect(s, slot);
+}
+
+text_log::connection text_log::async_connect(text_log::slot_type const &slot) {
+  return m_new_log.connect(slot);
+}
+
+text_log::connection text_log::connect_extended(text_log::extended_slot_type const &slot) {
+  return m_new_log.strand_connect_extended(slot);
+}
+
+text_log::connection text_log::connect_extended(text_log::strand &s,
+                                               text_log::extended_slot_type const &slot) {
+  return m_new_log.strand_connect_extended(s, slot);
+}
+
+text_log::connection text_log::async_connect_extended(text_log::extended_slot_type const &slot) {
   return m_new_log.connect_extended(slot);
 }
 
-void text_log::post(entry::pointer const &msg) {
-  m_new_log(msg);
-}
+
 
 /*
  * class TREX::utils::log::out_file

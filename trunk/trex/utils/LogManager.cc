@@ -145,7 +145,7 @@ LogManager::path_type const &LogManager::logPath() {
     
     trex_log /= TREX_LOG_FILE;
     m_trex_log.reset(new log::out_file(trex_log.string()));
-    m_syslog.connect(m_syslog.wrap(*m_trex_log).track(m_trex_log));
+    m_syslog.connect(*m_trex_log);
     
     syslog("", log::null)<<"TREX version "<<TREX::version::str();
     loadSearchPath();

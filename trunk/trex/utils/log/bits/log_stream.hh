@@ -35,7 +35,7 @@
 #ifndef H_trex_utils_log_log_stream
 # define H_trex_utils_log_log_stream
 
-# include "../entry.hh"
+# include "log_sig.hh"
 # include <boost/iostreams/stream.hpp>
 
 namespace TREX {
@@ -78,7 +78,7 @@ namespace TREX {
            * @note this constrauctor exists for the sole reason of better 
            * handling C++ containers. It should be avoided to use it directly.
            */
-          entry_sink():m_dest(NULL) {}
+          entry_sink():m_log(NULL) {}
           /** @brief Copy constructor
            *
            * @param[in] other Another instance
@@ -88,7 +88,7 @@ namespace TREX {
            *
            * @post @p other is non functional
            */
-          entry_sink(entry_sink const &other):m_dest(other.m_dest) {
+          entry_sink(entry_sink const &other):m_log(other.m_log) {
             m_entry.swap(other.m_entry);
           }
           /** @brief Destructor
@@ -117,15 +117,15 @@ namespace TREX {
           std::streamsize write(char_type const *s, std::streamsize n); 
           
         private:
-          entry_sink(text_log &dest, entry::id_type const &who, 
-                     entry::id_type const &what)
-          :m_dest(&dest), m_entry(new entry(who, what)) {}
+          entry_sink(log_signal &dest, entry::id_type const &who,
+                      entry::id_type const &what)
+          :m_log(&dest), m_entry(new entry(who, what)) {}
         
-          entry_sink(text_log &dest, entry::date_type const &when,
+          entry_sink(log_signal &dest, entry::date_type const &when,
                      entry::id_type const &who, entry::id_type const &what)
-          :m_dest(&dest), m_entry(new entry(when, who, what)) {}
+          :m_log(&dest), m_entry(new entry(when, who, what)) {}
         
-          text_log *m_dest;
+          log_signal *m_log;
           mutable entry::pointer m_entry;
         
           friend class ::TREX::utils::log::text_log;

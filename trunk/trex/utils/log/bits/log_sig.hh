@@ -36,105 +36,16 @@
 # define H_trex_utils_log_sig
 
 # include "../entry.hh"
-
-# include <boost/signals2/signal.hpp>
-# include <boost/asio.hpp>
+# include "../../asio_signal.hh"
 
 namespace TREX {
   namespace utils {
     namespace log {
       namespace details {
         
-        namespace bs2=boost::signals2;
-    
-        typedef bs2::signal<void (entry::pointer)>      log_signal; 
-        typedef log_signal::extended_slot_function_type log_handle_fn;
-        
-        class local_protected_cb {
-        public:
-          typedef log_signal::result_type   result_type;
-          typedef bs2::connection           first_argument_type;
-          typedef log_signal::argument_type second_argument_type; 
-          
-          template<typename Handler>
-          explicit local_protected_cb(Handler cb):m_fn(cb) {}
-          ~local_protected_cb() {};
-          
-          
-          void operator()(bs2::connection const &c,
-                          entry::pointer e);
-          
-        private:
-          boost::function<void (entry::pointer)> m_fn;
-        };
+        typedef asio_signal<void (entry::pointer)>  log_signal;
 
-        class async_cb_base {
-        public:
-          typedef local_protected_cb::result_type          result_type;
-          typedef local_protected_cb::first_argument_type  first_argument_type;
-          typedef local_protected_cb::second_argument_type second_argument_type;
-          
-          template<typename Handler>
-          async_cb_base(Handler fn):m_callback(fn) {}
-          ~async_cb_base() {}
-
-        protected:
-          boost::function<void ()> wrap(first_argument_type c,
-                                        second_argument_type msg);
-         
-        private:
-          local_protected_cb m_callback;
-        };
-        
-        template<class Service, typename ServicePtr=Service *>
-        class async_cb :public async_cb_base {
-        public:
-          typedef Service service_type;
-          
-          template<typename Handler>
-          async_cb(service_type &s, Handler cb):async_cb_base(cb),
-          m_service(&s) {}
-          
-          template<class ServicePointer, typename Handler>
-          async_cb(ServicePointer s, Handler cb):async_cb_base(cb),
-          m_service(s) {}
-          
-          
-          void operator()(first_argument_type const &c,
-                          second_argument_type const &msg) {
-            service().post(wrap(c, msg));
-          }
-          
-          service_type &service() {
-            return *m_service; 
-          }
-          
-        private:
-          ServicePtr m_service;
-        };
-        
       } // TREX::utils::log::details
-      
-      namespace handler {
-        
-        template<typename Handler>
-        details::log_handle_fn direct(Handler fn) {
-          return details::local_protected_cb(fn);
-        }
-        
-        template<class Service, typename Handler>
-        details::log_handle_fn async(Service &async,Handler fn) {
-          return details::async_cb<Service>(async, fn);
-        }
-        
-        template<typename Handler>
-        details::log_handle_fn stranded(boost::asio::io_service &io, Handler fn) {
-          return details::async_cb<boost::asio::io_service::strand, 
-          boost::shared_ptr<boost::asio::io_service::strand> >(new boost::asio::io_service::strand(io), fn);
-        }
-        
-        
-      } // TREX::utils::log::handler
     } // TREX::utils::log
   } // TREX::utils
 } // TREX
