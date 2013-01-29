@@ -31,25 +31,56 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/** @file "trex/utils/platform/chrono.hh"
+ * @brief chrono class integration helper header
+ *
+ * This header allows to include either @chrono or its C++11 
+ * std::chrono counterpart depending on the initial compilation 
+ * options of TREX
+ *
+ * This allow to either use chrono as implemented in boost 1.47 and 
+ * beyond or the one provided by the C++11 standard if the boost 
+ * version is older and the compiler supports C++11
+ *
+ * @ingroup utils 
+ * @author Frederic Py <fpy@mbari.org>
+ */
 #ifndef H_trex_utils_platform_chrono
 # define H_trex_utils_platform_chrono
 
 # include "bits/cpp11.hh"
 
-# ifdef CPP11_HAS_CHRONO
+# ifdef DOXYGEN
+
+/** @brief chrono class namespace 
+ *
+ * This macro defines the namespace where the chrono template class 
+ * is defined. This nemespace is either @c boost or @c std depending 
+ * on whether c++11 support is active or not
+ */
+#  define CHRONO_NS platform-dependent
+
+# else // !DOXYGEN
+#  ifdef CPP11_HAS_CHRONO
 /*
  * Use the standard C++11 chrono header
  */
-#  include <chrono>
-#  define CHRONO_NS std
-# else // !CPP11_HAS_CHRONO
+#   include <chrono>
+#   define CHRONO_NS ::std
+#  else // !CPP11_HAS_CHRONO
 /*
  * Use boost chrono as a replacement
  */
-#  include <boost/chrono.hpp>
-#  define CHRONO_NS boost
-# endif
+#   include <boost/chrono.hpp>
+#   define CHRONO_NS ::boost
+#  endif // CPP11_HAS_CHRONO
+# endif // DOXYGEN
 
+/** @brief chrono class name
+ *
+ * The full name of the chrono class with its associated
+ * namespace
+ */
 # define CHRONO CHRONO_NS::chrono
 
 #endif // H_trex_utils_platform_chrono
