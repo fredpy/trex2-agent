@@ -40,6 +40,9 @@
 # include "entry.hh"
 # include "stream.hh"
 
+// Note the direct reference to asio signal makes this header pretty hefty
+// to compile : I need to make a proxy version so we do not include the
+// preprocessor heavy code unless it is needed  
 # include "bits/log_sig.hh"
 # include "../platform/cpp11_deleted.hh"
 
