@@ -45,7 +45,7 @@
 # include <boost/preprocessor/iteration/iterate.hpp>
 
 #  ifndef ASIOSIG_MAX_SIZE
-#   define ASIOSIG_MAX_SIZE 6 // A maximum of 6 arguments should be more than enough
+#   define ASIOSIG_MAX_SIZE 3 // A maximum of 3 arguments should be more than enough
 #  endif // ASIOSIG_MAX_SIZE
 
 // Generate specializations for 0 to ASIOSIG_MAX_SIZE arguments
