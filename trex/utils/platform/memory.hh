@@ -57,6 +57,7 @@
 
 # ifdef DOXYGEN
 /** @brief Unique pointer type
+ *
  * The type to be used for unqie pointers. It is either std::auto_ptr 
  * or std::unique_ptr depending on C++11 support
  */
