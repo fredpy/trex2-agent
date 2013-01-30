@@ -150,6 +150,7 @@ namespace TREX {
       };      
      
       friend class log_proxy;
+      boost::signals2::connection m_log_conn;
 
       bool attach(WitreReactor &r);
       void detach(WitreReactor &r);
