@@ -37,7 +37,7 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
 using namespace TREX::transaction;
-using namespace TREX::utils;
+namespace utils=TREX::utils;
 
 
 namespace {
@@ -52,7 +52,7 @@ namespace {
   
     ~DateHandler() {} 
     
-    DateHandler(Symbol const &tag, graph const &owner)
+    DateHandler(utils::Symbol const &tag, graph const &owner)
       :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
@@ -60,8 +60,8 @@ namespace {
   private:  
     base_class::result_type produce(base_class::argument_type arg) const {
       boost::optional<date_type> 
-	min = parse_attr< boost::optional<date_type> >(arg.second, "min"),
-	max = parse_attr< boost::optional<date_type> >(arg.second, "max");
+       min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
+       max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
 	hi(IntegerDomain::plus_inf);
       boost::posix_time::ptime date;
@@ -83,7 +83,7 @@ namespace {
   public:
     ~DurationHandler() {} 
     
-    DurationHandler(Symbol const &tag, graph const &owner)
+    DurationHandler(utils::Symbol const &tag, graph const &owner)
       :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
@@ -91,8 +91,8 @@ namespace {
   private:
     base_class::result_type produce(base_class::argument_type arg) const {
       boost::optional<boost::posix_time::time_duration> 
-	min = parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
-	max = parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
+        min = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
+        max = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
         hi(IntegerDomain::plus_inf);
       CHRONO::duration<double> 
@@ -143,12 +143,12 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 // structors :
 
-graph::graph(Symbol const &name, TICK init, bool verbose) 
+graph::graph(utils::Symbol const &name, TICK init, bool verbose) 
   :m_name(name), m_tick_valid(false), m_currentTick(init), 
    m_verbose(verbose) {
 }
 
-graph::graph(Symbol const &name, boost::property_tree::ptree &conf, 
+graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
 	     TICK init, bool verbose) 
   :m_name(name), m_tick_valid(false),
    m_currentTick(init), m_verbose(verbose) {
@@ -160,8 +160,8 @@ graph::~graph() {
   clear();
 }
 
-TREX::utils::log::stream graph::syslog(Symbol const &context, 
-                                        Symbol const &kind) const {
+TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
+                                       utils::Symbol const &kind) const {
   utils::Symbol who = m_name;
   if( !context.empty() )
     who = who.str()+"."+context.str();
@@ -269,7 +269,7 @@ size_t graph::cleanup() {
   return ret;
 }  
 
-details::timeline_set::iterator graph::get_timeline(Symbol const &tl) {
+details::timeline_set::iterator graph::get_timeline(utils::Symbol const &tl) {
   details::timeline *cand = new details::timeline(m_currentTick, tl);
   std::pair<details::timeline_set::iterator, bool>
     ret = m_timelines.insert(cand);
@@ -289,7 +289,7 @@ graph::size_type graph::count_relations() const {
 }
 
 
-bool graph::assign(graph::reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::assign(graph::reactor_id r, utils::Symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     internal_check(r, **tl);
@@ -299,7 +299,7 @@ bool graph::assign(graph::reactor_id r, Symbol const &timeline, details::transac
   }
 }
 
-bool graph::subscribe(reactor_id r, Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::subscribe(reactor_id r, utils::Symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     external_check(r, **tl);

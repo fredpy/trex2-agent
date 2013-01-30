@@ -58,8 +58,11 @@ add_library(TREXutils SHARED
   log/text_log.cc
   # headers
   asio_signal.hh
+  asio_signal_n.hh
   asio_signal_fwd.hh
+  bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
+  bits/asio_signal_template.hh
   chrono_helper.hh
   ErrnoExcept.hh
   Exception.hh
@@ -109,7 +112,9 @@ source_group("Source\ Files\\log" FILES
 )
 
 source_group("Header\ Files\\bits" FILES 
+  bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
+  bits/asio_signal_template.hh
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh

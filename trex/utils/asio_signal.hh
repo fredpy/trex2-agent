@@ -46,9 +46,6 @@
 
 # include "asio_signal_fwd.hh"
 
-namespace TREX {
-  namespace utils {
-    
 # ifndef DOXYGEN
     
 #  include "bits/asio_signal_iter.hh"
@@ -57,6 +54,9 @@ namespace TREX {
        // Note: all the code below is purelly for documentation puspose and
        //      not meant to be compiled
   
+namespace TREX {
+  namespace utils {
+    
     /** @brief Asynchronous signal management class
      *
      * @tparam Signature A void function signature (e.g. @c void (int,std::string))
@@ -323,9 +323,10 @@ namespace TREX {
       /** @} */
     };
     
-# endif // DOXYGEN
-
   } // TREX::utils
 } // TREX
+
+# endif // DOXYGEN
+
 
 #endif // H_trex_utils_asio_signal

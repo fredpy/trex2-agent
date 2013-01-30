@@ -45,7 +45,7 @@
 
 
 using namespace TREX::europa;
-using namespace TREX::utils;
+namespace utils=TREX::utils;
 
 namespace xml = boost::property_tree::xml_parser;
 
@@ -119,7 +119,7 @@ std::string const &details::Schema::nddl_path() {
     // First add TREX_PATH
     opath<<'.';
 
-    for(LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i)
+    for(utils::LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i)
       opath<<':'<<i->string();
     
     // Now extract infotmnation for NDDL config file
@@ -140,7 +140,7 @@ std::string const &details::Schema::nddl_path() {
     boost::property_tree::ptree::assoc_iterator i,last;
     boost::tie(i, last) = cfg.front().second.equal_range("include");
     for(; last!=i; ++i) {
-      std::string path = parse_attr<std::string>(*i, "path");
+      std::string path = utils::parse_attr<std::string>(*i, "path");
       boost::replace_all(path, ";", ":");
       opath<<':'<<path;
     }

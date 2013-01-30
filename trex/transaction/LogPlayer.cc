@@ -426,7 +426,9 @@ namespace TREX {
 } // TREX
 
 using namespace TREX::transaction;
-using namespace TREX::utils;
+using TREX::utils::Symbol;
+
+namespace util=TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
 
 namespace {
@@ -468,7 +470,7 @@ LogPlayer::phase::phase(LogPlayer *owner,
   typedef details::tr_event::factory                  tr_fact;
   typedef boost::property_tree::ptree::iterator iter;
 
-  SingletonUse<tr_fact> events_f;
+  utils::SingletonUse<tr_fact> events_f;
   iter pos = node.second.begin();
   tr_fact::iter_traits<iter>::type 
     it = tr_fact::iter_traits<iter>::build(pos, owner);
@@ -490,7 +492,7 @@ Symbol const LogPlayer::s_step("step");
 
 TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg) {
   // force logging to false
-  set_attr(xml_factory::node(arg), "log", false);
+  utils::set_attr(xml_factory::node(arg), "log", false);
   return arg;
 }
 
@@ -499,7 +501,7 @@ TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg
 LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false, false) {
   std::string 
-    file_name = parse_attr<std::string>(getName().str()+".tr.log",
+    file_name = utils::parse_attr<std::string>(getName().str()+".tr.log",
 					xml_factory::node(arg),
 					"file");
   bool found;
@@ -532,7 +534,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   if( last!=i ) {
     typedef details::tr_event::factory                  tr_fact;
     typedef boost::property_tree::ptree::iterator iter;
-    SingletonUse<tr_fact> event_f;
+    utils::SingletonUse<tr_fact> event_f;
     iter pos = i->second.begin();
     LogPlayer *me = this;
     tr_fact::iter_traits<iter>::type
@@ -546,12 +548,12 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   boost::tie(i, last) = pt.equal_range("tick");
   bool first = true;
   for( ; last!=i; ++i) {
-    TICK cur = parse_attr<TICK>(*i, "value");    
+    TICK cur = utils::parse_attr<TICK>(*i, "value");
     for(boost::property_tree::ptree::iterator j=i->second.begin();
 	i->second.end()!=j; ++j) {
       if( s_init==j->first ) {
 	if( !first ) 
-	  throw XmlError(*j, s_init.str()+" tag can only be the first phase.");
+	  throw utils::XmlError(*j, s_init.str()+" tag can only be the first phase.");
       } else if( "<xmlattr>"==j->first )
 	continue;
       else if( s_new_tick!=j->first &&
@@ -721,9 +723,9 @@ void tr_event::set_goal(std::string const &key, goal_id const &g) {
 
 tl_event::tl_event(tl_event::factory::argument_type const &arg) 
   :tr_event(arg), 
-   m_timeline(parse_attr<std::string>(factory::node(arg), "name")),
-   m_goals(parse_attr<bool>(true, factory::node(arg), "goals")),
-   m_plan(parse_attr<bool>(true, factory::node(arg), "plan")) {}
+   m_timeline(utils::parse_attr<std::string>(factory::node(arg), "name")),
+   m_goals(utils::parse_attr<bool>(true, factory::node(arg), "goals")),
+   m_plan(utils::parse_attr<bool>(true, factory::node(arg), "plan")) {}
 
 /*
  * class TREX::transaction::details::tr_goal_event
@@ -732,23 +734,23 @@ tl_event::tl_event(tl_event::factory::argument_type const &arg)
 tr_goal_event::tr_goal_event(tr_goal_event::factory::argument_type const &arg, 
 			     bool build)
   :tr_event(arg) {
-  std::string id = parse_attr<std::string>(factory::node(arg), "id");
+  std::string id = utils::parse_attr<std::string>(factory::node(arg), "id");
   
   if( id.empty() )
-    throw XmlError(factory::node(arg), "id attribute is empty.");
+    throw utils::XmlError(factory::node(arg), "id attribute is empty.");
   
   if( build ) {
     boost::property_tree::ptree::assoc_iterator
       desc = factory::node(arg).second.find("Goal");
     if( factory::node(arg).second.not_found()==desc )
-      throw XmlError(factory::node(arg), 
+      throw utils::XmlError(factory::node(arg),
 		     "Unable to find token description.");
     m_goal.reset(new Goal(*desc));
     set_goal(id, m_goal);
   } else {
     m_goal = get_goal(id);
     if( !m_goal )
-      throw XmlError(factory::node(arg),
+      throw utils::XmlError(factory::node(arg),
 		     "Unable to find goal for id \""+id+"\".");
   }
 }
