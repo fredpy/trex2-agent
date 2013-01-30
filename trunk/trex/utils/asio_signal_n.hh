@@ -1,10 +1,3 @@
-/** @file "trex/utils/bits/asio_signal_iter.hh"
- *
- * @brief Asynchronous signal manager specializations
- *
- * @author Frederic Py
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -38,30 +31,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifdef H_trex_utils_asio_signal
-# ifndef BOOST_PP_IS_ITERATING
+#ifndef ASIO_SIGNAL_NUM_ARGS
+# error "Need to set ASIO_SIGNAL_NUM_ARGS before including this file"
+#else 
 
-# include <boost/preprocessor/repetition.hpp>
-# include <boost/preprocessor/iteration/iterate.hpp>
-# include "asio_signal_base.hh"
+# include "asio_signal_fwd.hh"
+# include "bits/asio_signal_base.hh"
+# include "bits/asio_signal_template.hh"
 
-#  ifndef ASIOSIG_MAX_SIZE
-#   define ASIOSIG_MAX_SIZE 3 // A maximum of 3 arguments should be more than enough
-#  endif // ASIOSIG_MAX_SIZE
-
-// Generate specializations for 0 to ASIOSIG_MAX_SIZE arguments
-#  define BOOST_PP_ITERATION_LIMITS (0, ASIOSIG_MAX_SIZE)
-#  define BOOST_PP_FILENAME_1       "trex/utils/bits/asio_signal_iter.hh"
-
-#  include BOOST_PP_ITERATE()
-
-#  undef BOOST_PP_ITERATION_LIMITS
-#  undef BOOST_PP_FILENAME_1
-
-# else // BOOST_PP_IS_ITERATING
-
-#  define ASIO_SIGNAL_NUM_ARGS BOOST_PP_ITERATION()
-#  include "asio_signal_template.hh"
-
-# endif // BOOST_PP_IS_ITERATING
-#endif //  H_trex_utils_asio_signal
+#endif

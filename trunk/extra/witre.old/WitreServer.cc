@@ -42,9 +42,11 @@
 #include <cstring>
 
 using namespace TREX::witre;
-using namespace TREX::transaction;
-using namespace TREX::utils;
+using namespace TREX;
 
+using TREX::utils::Symbol;
+
+namespace tr = TREX::transaction;
 namespace xml = boost::property_tree::xml_parser;
 
 /*
@@ -194,7 +196,7 @@ std::string WitreServer::getDependencies(std::string name)
  * by deriving from graph::timelines_listener I can now be informed
  * from new timeline created in the agent at any time
  */
-void WitreServer::declared(details::timeline const &timeline) {
+void WitreServer::declared(tr::details::timeline const &timeline) {
   if( !isExternal(timeline.name()) ) {
     pendingTimelines.insert(timeline.name());
 
@@ -226,7 +228,7 @@ void WitreServer::declared(details::timeline const &timeline) {
  * conversely I am notified from timelines not being owned by any reactor
  * anymore ... but we do not have that much to do here for now
  */
-void WitreServer::undeclared(details::timeline const &timeline)
+void WitreServer::undeclared(tr::details::timeline const &timeline)
 {
   pendingTimelines.erase(timeline.name());
 }

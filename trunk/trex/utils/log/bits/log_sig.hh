@@ -36,7 +36,10 @@
 # define H_trex_utils_log_sig
 
 # include "../entry.hh"
-# include "../../asio_signal.hh"
+
+// only define the sepcilaization with 1 argument
+# define ASIO_SIGNAL_NUM_ARGS 1
+# include "../../asio_signal_n.hh"
 
 namespace TREX {
   namespace utils {

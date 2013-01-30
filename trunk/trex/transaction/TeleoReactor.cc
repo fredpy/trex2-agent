@@ -49,7 +49,8 @@
 #include <boost/scope_exit.hpp>
 
 using namespace TREX::transaction;
-using namespace TREX::utils;
+using TREX::utils::Symbol;
+namespace utils=TREX::utils;
 
 /*
  * class TREX::transaction::ReactorException
@@ -146,7 +147,7 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
 	    m_pos->first.request(i->first);
 	    posted = true;
 	    i = m_pos->second.erase(i);
-	  } catch(Exception const &e) {
+	  } catch(utils::Exception const &e) {
 	    syslog(warn)<<"Exception received while sending request: "<<e;
 	  } catch(std::exception const &se) {
 	    syslog(warn)<<"C++ exception received while sending request: "
@@ -219,8 +220,8 @@ Relation const &details::external::dereference() const {
  * class TREX::transaction::TeleoReactor
  */
 
-Symbol const TeleoReactor::obs("ASSERT");
-Symbol const TeleoReactor::plan("PLAN");
+utils::Symbol const TeleoReactor::obs("ASSERT");
+utils::Symbol const TeleoReactor::plan("PLAN");
 
 
 // structors
@@ -228,24 +229,24 @@ Symbol const TeleoReactor::plan("PLAN");
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 			   bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
-   m_verbose(parse_attr<bool>(arg.second->is_verbose(), xml_factory::node(arg), "verbose")), 
+   m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(), xml_factory::node(arg), "verbose")),
    m_trLog(NULL),
-   m_name(parse_attr<Symbol>(xml_factory::node(arg), "name")),
-   m_latency(parse_attr<TICK>(xml_factory::node(arg), "latency")),
+   m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "name")),
+   m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
-   m_lookahead(parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
+   m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
    m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
-  LogManager::path_type fname = file_name("stat.csv");
+  utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
   m_stat_log<<"tick, synch_ns, delib_ns, n_steps\n";
      
-  if( parse_attr<bool>(log_default, node, "log") ) {
+  if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = getName().str()+".tr.log";
     fname = manager().file_name(base);
     m_trLog = new Logger(fname.string());
-    LogManager::path_type cfg = manager().file_name("cfg"), 
+    utils::LogManager::path_type cfg = manager().file_name("cfg"), 
       pwd = boost::filesystem::current_path(), 
       short_name(base), location("../"+base);
     boost::filesystem::current_path(cfg);
@@ -257,22 +258,22 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
   }
 
   if( loadTL ) {
-    Symbol tl_name;
+    utils::Symbol tl_name;
     // Add external file content
-    ext_xml(node.second, "config");
+    utils::ext_xml(node.second, "config");
 
     for(boost::property_tree::ptree::iterator i=node.second.begin();
 	node.second.end()!=i; ++i) {
-      if( is_tag(*i, "External") ) {
-	tl_name = parse_attr<Symbol>(*i, "name");
+      if( utils::is_tag(*i, "External") ) {
+	tl_name = utils::parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*i, "Timelines cannot have an empty name");
-	use(tl_name, parse_attr<bool>(true, *i, "goals"),
-            parse_attr<bool>(false, *i, "listen"));
-      } else if( is_tag(*i, "Internal") ) {
-	tl_name = parse_attr<Symbol>(*i, "name");
+	  throw utils::XmlError(*i, "Timelines cannot have an empty name");
+	use(tl_name, utils::parse_attr<bool>(true, *i, "goals"),
+            utils::parse_attr<bool>(false, *i, "listen"));
+      } else if( utils::is_tag(*i, "Internal") ) {
+	tl_name = utils::parse_attr<Symbol>(*i, "name");
 	if( tl_name.empty() )
-	  throw XmlError(*i, "Timelines cannot have an empty name");
+	  throw utils::XmlError(*i, "Timelines cannot have an empty name");
 	provide(tl_name);
       }
     }
@@ -285,7 +286,7 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
-  LogManager::path_type fname = file_name("stat.csv");
+  utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
      
   if( log ) {
@@ -594,7 +595,7 @@ bool TeleoReactor::doSynchronize() {
       m_updates.clear();
     }
     return success;
-  } catch(Exception const &e) {
+  } catch(utils::Exception const &e) {
     syslog(error)<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
     syslog(error)<<"C++ exception caught: "<<se.what();

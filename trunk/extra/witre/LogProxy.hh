@@ -63,9 +63,10 @@ namespace TREX {
 
 namespace Wt {
   namespace Dbo {
-    
+
     template<>
-    struct dbo_traits<TREX::witre::dbo::MsgType> :public dbo_default_traits {
+    struct dbo_traits<TREX::witre::dbo::MsgType>
+      :public dbo_default_traits {
       typedef std::string IdType;
       
       static IdType invalidId() {

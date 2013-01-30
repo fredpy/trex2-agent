@@ -39,12 +39,54 @@
 namespace TREX {
   namespace europa {
 
+    /** @brief date to tick constraint
+     *
+     * This class implements an europa constrainty that allow to convert a
+     * "real-time" date into a europa tick date or converselly.
+     * The conversion is handled through the clock used by the current 
+     * clock used by the agent.
+     *
+     * Such comstraint is pecifically usefull when one want to specify 
+     * to europa a real date (in unix time format) and have it used 
+     * during planning which the require to adapt this date into the 
+     * tick format used.
+     *
+     * @sa Assembly::date_to_tick
+     * @sa Assembly::tick_to_date
+     *
+     * It is provided as a nddl constraint with following format
+     * @code 
+     *  tick_date(tick, date)
+     * @endcode
+     * where @c tick and @c date are two integer variables
+     *
+     * @ingroup europa
+     * @author Frederic Py <fpy@mbari.org>
+     */
     class TickFromDate :public ReactorConstraint {
     public:
+      /** @brief Constructor
+       *
+       * @param[in] name The name of the constraint in the model
+       * @param[in] propagtorName Name of the constraint propagator used
+       * @param[in] cstrEngine Reference to the constraint engine
+       * @param[in] variables The variables given as argument
+       *
+       * @pre @p variables size is 2
+       * @pre @p variables contains only integer varaiables or equivalent
+       */
       TickFromDate(EUROPA::LabelStr const &name, 
 		 EUROPA::LabelStr const &propagatorName,
 		 EUROPA::ConstraintEngineId const &cstrEngine,
 		 std::vector<EUROPA::ConstrainedVariableId> const &variables);
+      /** @brief Execution handler
+       *
+       * Propagate the constraint. It applies the conversion from tick 
+       * to date to the variables given at construction. The propgation 
+       * is bidirectional meaning that it restrict both the domain of 
+       * the two variables based on the current variable of their
+       * counterpart. 
+       */
       void handleExecute();
     private:
       EUROPA::Domain *m_tick;

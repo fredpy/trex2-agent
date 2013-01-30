@@ -58,7 +58,7 @@ TickFromDate::TickFromDate(EUROPA::LabelStr  const &name,
   m_date = &getCurrentDomain(m_variables[TickFromDate::DATE]);
 }
 
-// manipualtors
+// manipulators
  
 void TickFromDate::handleExecute() {
   Assembly &a = assembly();

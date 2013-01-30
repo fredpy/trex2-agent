@@ -37,8 +37,10 @@
 #include "bits/europa_convert.hh"
 
 using namespace TREX::europa;
-using namespace TREX::transaction;
-using namespace TREX::utils;
+using namespace TREX;
+
+namespace tr=TREX::transaction;
+using TREX::utils::Symbol;
 
 
 /*
@@ -66,10 +68,10 @@ EUROPA::Domain *details::EuropaDomain::safe_copy(EUROPA::Domain *dom) {
 // structors
 
 details::EuropaDomain::EuropaDomain(EUROPA::Domain const &dom)
-  :DomainBase(type_name), m_dom(dom.copy()) {}
+  :tr::DomainBase(type_name), m_dom(dom.copy()) {}
 
 details::EuropaDomain::EuropaDomain(EuropaDomain const &other)
-  :DomainBase(type_name), m_dom(safe_copy(other.m_dom)) {}
+  :tr::DomainBase(type_name), m_dom(safe_copy(other.m_dom)) {}
 
 details::EuropaDomain::~EuropaDomain() {
   if( NULL!=m_dom )
@@ -108,18 +110,18 @@ bool details::EuropaDomain::equals(DomainBase const &other) const {
 boost::any details::EuropaDomain::singleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<DomainBase> tmp(copy());
+  UNIQ_PTR<tr::DomainBase> tmp(copy());
   return tmp->getSingleton();
 }
 
 std::string details::EuropaDomain::stringSingleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<DomainBase> tmp(copy());
+  UNIQ_PTR<tr::DomainBase> tmp(copy());
   return tmp->getStringSingleton();
 }
 
-DomainBase *details::EuropaDomain::copy() const {
+tr::DomainBase *details::EuropaDomain::copy() const {
   // copy implies a conversion to a real TREX representation
   // this can be costfull but at least won't happen until explicitely
   // copy the domain
@@ -129,20 +131,20 @@ DomainBase *details::EuropaDomain::copy() const {
 std::ostream &details::EuropaDomain::toXml(std::ostream &out, size_t tabs) const {
   // this copy can be costfull but guarantees that the output can be
   // parsed by TREX
-  UNIQ_PTR<DomainBase> tmp(copy());
+  UNIQ_PTR<tr::DomainBase> tmp(copy());
   return tmp->toXml(out, tabs);
 }
 
 std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
   // this copy is costfiull and we may want to avoid this
   // (so we see that the output is from europa)
-  UNIQ_PTR<DomainBase> tmp(copy());
+  UNIQ_PTR<tr::DomainBase> tmp(copy());
   return out<<(*tmp);
 }
 
 // modifiers 
 
-DomainBase &details::EuropaDomain::restrictWith(DomainBase const &other) {
+tr::DomainBase &details::EuropaDomain::restrictWith(tr::DomainBase const &other) {
   europa_domain visit(m_dom);
   other.accept(visit);
   return *this;
@@ -153,6 +155,6 @@ DomainBase &details::EuropaDomain::restrictWith(DomainBase const &other) {
 namespace {
 
   // declare EuropaEntity domain
-  DomainBase::xml_factory::declare<EuropaEntity> decl(EuropaEntity::type_name);
+  tr::DomainBase::xml_factory::declare<EuropaEntity> decl(EuropaEntity::type_name);
 
 } // ::
