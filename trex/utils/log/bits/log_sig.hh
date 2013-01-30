@@ -36,17 +36,14 @@
 # define H_trex_utils_log_sig
 
 # include "../entry.hh"
-
-// only define the sepcilaization with 1 argument
-# define ASIO_SIGNAL_NUM_ARGS 1
-# include "../../asio_signal_n.hh"
+# include <boost/signals2/signal.hpp>
 
 namespace TREX {
   namespace utils {
     namespace log {
       namespace details {
         
-        typedef asio_signal<void (entry::pointer)>  log_signal;
+        typedef boost::signals2::signal<void (entry::pointer)>  log_signal;
 
       } // TREX::utils::log::details
     } // TREX::utils::log
