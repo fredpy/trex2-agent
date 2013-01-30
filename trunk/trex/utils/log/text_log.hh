@@ -40,11 +40,11 @@
 # include "entry.hh"
 # include "stream.hh"
 
-// Note the direct reference to asio signal makes this header pretty hefty
-// to compile : I need to make a proxy version so we do not include the
-// preprocessor heavy code unless it is needed  
 # include "bits/log_sig.hh"
 # include "../platform/cpp11_deleted.hh"
+
+# include <boost/asio/io_service.hpp>
+# include <boost/asio/strand.hpp>
 
 namespace TREX {
   namespace utils {
@@ -93,9 +93,9 @@ namespace TREX {
          */
         typedef log_signal::slot_type          slot_type;
         typedef log_signal::extended_slot_type extended_slot_type;
-        typedef log_signal::connection         connection;
+        typedef boost::signals2::connection    connection;
        
-        typedef log_signal::strand             strand;
+        typedef boost::asio::io_service::strand  strand;
         
         
         /** @brief Constructor 
@@ -150,30 +150,77 @@ namespace TREX {
         }
         /** @} */
         
+        boost::asio::io_service &service() {
+          return m_service;
+        }
         strand new_strand() {
-          return m_new_log.new_strand();
+          return strand(service());
         }
         
-         /** @brief Signal handler connection
-         *
-         * @param[in] slot A signal handler
-         *
-         * Connect @p slot to this instance. Whenever a new log message 
-         * is produced @p slot will be called
-         *
-         * @return The connection beteween @p slot and this instance
-         */
-        connection connect(slot_type const &slot);
-        connection connect(strand &s, slot_type const &slot);
-        connection connect_extended(extended_slot_type const &slot);
-        connection connect_extended(strand &s, extended_slot_type const &slot);
-
         
-        connection async_connect(slot_type const &slot);
-        connection async_connect_extended(extended_slot_type const &slot);
+        template<typename Fn>
+        slot_type async(Fn const &cb) {
+          return service().wrap(cb);
+        }
+        template<typename Fn>
+        extended_slot_type async_extended(Fn const &cb) {
+          return service().wrap(cb);
+        }
+        
+        template<typename Fn>
+        slot_type stranded(strand &s, Fn const &cb) {
+          return s.wrap(cb);
+        }
+        template<typename Fn>
+        slot_type stranded(Fn const &cb) {
+          strand s=new_strand();
+          return stranded(s, cb);
+        }
+        template<typename Fn>
+        extended_slot_type stranded_extended(strand &s, Fn const &cb) {
+          return s.wrap(cb);
+        }
+        template<typename Fn>
+        extended_slot_type stranded_extended(Fn const &cb) {
+          strand s=new_strand();
+          return stranded_extended(s, cb);
+        }
+        
+        connection direct_connect(slot_type const &cb) {
+          return m_new_log.connect(cb);
+        }
+        connection direct_connect_extended(extended_slot_type const &cb) {
+          return m_new_log.connect_extended(cb);
+        }
+        template<typename Fn>
+        connection connect(Fn const &cb) {
+          return direct_connect(stranded(cb));
+        }
+        template<typename Fn>
+        connection connect(strand &s, Fn const &cb) {
+          return direct_connect(stranded(s, cb));
+        }
+        template<typename Fn>
+        connection connect_extended(Fn const &cb) {
+          return direct_connect_extended(stranded_extended(cb));
+        }
+        template<typename Fn>
+        connection connect_extended(strand &s, Fn const &cb) {
+          return direct_connect_extended(stranded_extended(s, cb));
+        }
+        
+        template<typename Fn>
+        connection async_connect(Fn const &cb) {
+          return direct_connect(async(cb));
+        }
+        template<typename Fn>
+        connection async_connect_extended(Fn const &cb) {
+          return direct_connect_extended(async_extended(cb));
+        }
         
       private:
         log_signal m_new_log;
+        boost::asio::io_service &m_service;
        
 # ifndef DOXYGEN
         text_log() DELETED; // Non default constructible

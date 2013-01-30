@@ -60,7 +60,7 @@ using namespace TREX::utils::log;
 
 // structors 
 
-text_log::text_log(boost::asio::io_service &io):m_new_log(io) {}
+text_log::text_log(boost::asio::io_service &io):m_service(io) {}
 
 // manipulators
 
@@ -72,33 +72,6 @@ stream text_log::msg(date_type const &when,
                      id_type const &who, id_type const &what) {
   return stream(details::entry_sink(m_new_log, when, who, what));
 }
-
-text_log::connection text_log::connect(text_log::slot_type const &slot) {
-  return m_new_log.strand_connect(slot);
-}
-
-text_log::connection text_log::connect(text_log::strand &s,
-                                       text_log::slot_type const &slot) {
-  return m_new_log.strand_connect(s, slot);
-}
-
-text_log::connection text_log::async_connect(text_log::slot_type const &slot) {
-  return m_new_log.connect(slot);
-}
-
-text_log::connection text_log::connect_extended(text_log::extended_slot_type const &slot) {
-  return m_new_log.strand_connect_extended(slot);
-}
-
-text_log::connection text_log::connect_extended(text_log::strand &s,
-                                               text_log::extended_slot_type const &slot) {
-  return m_new_log.strand_connect_extended(s, slot);
-}
-
-text_log::connection text_log::async_connect_extended(text_log::extended_slot_type const &slot) {
-  return m_new_log.connect_extended(slot);
-}
-
 
 
 /*
