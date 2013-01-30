@@ -122,7 +122,7 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
 }
 
 WitreServer::~WitreServer() {
-  // std::cerr<<"Deleting the server ???"<<std::endl;
+  // Disconnect from the log events 
   m_log_conn.disconnect();
   try {
     // destroy the server
