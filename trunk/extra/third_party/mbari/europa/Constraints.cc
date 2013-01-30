@@ -60,7 +60,7 @@ GeoUTMConstraint::GeoUTMConstraint(EUROPA::LabelStr const &name,
 }
 
 void GeoUTMConstraint::handleExecute() {
-  static EUROPA::IntervalIntDomain const UTM_10(-126.0, -120.0001);
+  static EUROPA::IntervalDomain const UTM_10(-126.0, -120.0001);
   // Lat lon precision is set to 0.018 seconds of a degree ~= 0.000005
   // this correspond roughly on 50cm precision in UTM
   static double const ll_precision = 0.00001;
