@@ -23,7 +23,12 @@ namespace TREX {
                 Ros_Listener(TREX::transaction::TeleoReactor::xml_arg_type arg);
                 ~Ros_Listener();
 
-                void latitudeCallback(const std_msgs::String::ConstPtr& msg);
+                /**
+                *   Callbacks for ROS
+                */
+                void dvlCallback(const std_msgs::String::ConstPtr& msg);
+                void ctd_rhCallback(const std_msgs::String::ConstPtr& msg);
+                void fixCallback(const std_msgs::String::ConstPtr& msg);
 
             private:
                 void handleInit();
@@ -41,7 +46,7 @@ namespace TREX {
 
 
                 TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-                //TREX::utils::SingletonUse<TREX::ROS::ros_client> m_cli;
+
                 ros::NodeHandle*                    m_ros;
                 std::list<ros::Subscriber>         m_sub;
 
@@ -56,7 +61,9 @@ namespace TREX {
 
                 std::list<TREX::transaction::goal_id> m_pending;
 
-                static TREX::utils::Symbol const latitudeObj;
+                static TREX::utils::Symbol const dvlObj;
+                static TREX::utils::Symbol const ctd_rhObj;
+                static TREX::utils::Symbol const fixObj;
         };
 
     }
