@@ -1,4 +1,4 @@
-# -*- cmake -*- 
+# -*- cmake -*-
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
@@ -33,6 +33,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_subdirectory(lightswitch) 
+add_subdirectory(lightswitch)
 add_subdirectory(rover)
 add_subdirectory(shopping)
+add_subdirectory(ecomapper)

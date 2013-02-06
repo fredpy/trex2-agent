@@ -1,6 +1,6 @@
 #include "TREX.nddl"
 
-enum Location {Ship, Waypoint1, Waypoint2, Surface}; //Waypoint3, Waypoint4, Waypoint5, Waypoint6, Waypoint7, Waypoint8, Waypoint9, Waypoint10};
+enum Location {Ship, Waypoint1, Waypoint2, Waypoint3, Waypoint4, Waypoint5, Waypoint6, Waypoint7, Waypoint8, Waypoint9, Waypoint10};
 
 enum Survey {Vent1, Vent2};
 
