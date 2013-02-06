@@ -334,7 +334,7 @@ bool CurrentState::commit() {
 // manipulators
 
 void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
-    bool bfs(true), dist(false);
+   static bool bfs(false), dist(true);
 
   std::list<EUROPA::TokenId>::const_iterator
     i = timeline()->getTokenSequence().begin(),
@@ -361,7 +361,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString());
     // Old code from Philip
     //boost::chrono::high_resolution_timer start;
-       # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+      # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 			typedef CHRONO::thread_clock thread_clock;
 	  # else
 	  #  if defined(CPP11_HAS_CHRONO)
@@ -372,6 +372,9 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 			typedef CHRONO::process_user_cpu_clock thread_clock;
 	  # endif
 	  # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+	  // Used to find the percision of the clock
+	  //std::cout << (double) CHRONO::high_resolution_clock::period::num
+      //                / CHRONO::high_resolution_clock::period::den;
      typedef thread_clock::duration thread_duration;
     if(bfs)
     {
@@ -437,7 +440,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     }
 #endif // EUROPA_HAVE_EFFECT
   }
-  /*
+
     if(bfs)
     {
       if(lb==m_assembly.final_tick())
@@ -477,7 +480,6 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
         time_file.close();
       }
     }
-    */
 }
 
 bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub)

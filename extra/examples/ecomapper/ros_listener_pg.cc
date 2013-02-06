@@ -31,50 +31,28 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <iostream>
-#include <time.h>
 
-#include <trex/domain/EnumDomain.hh>
-#include <trex/domain/StringDomain.hh>
+#include "ros_listener.hh"
 
-#include "scientist.hh"
+#include <trex/utils/LogManager.hh>
+#include <trex/utils/Plugin.hh>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
-using namespace TREX::Scientist;
+using namespace TREX::ecomapper;
 
-static int Horizon = 200;
+namespace {
+    SingletonUse<LogManager> s_log;
 
-Symbol const Scientist::auv("auv");
-Symbol const Scientist::Sample("Sample");
+    TeleoReactor::xml_factory::declare<Ros_Listener> decl("ros_listener");
+}
 
-Symbol const Scientist::Objective("objective");
-std::string const Scientist::Vent1("Vent1");
-std::string const Scientist::Vent2("Vent2");
+namespace TREX {
 
-Scientist::Scientist(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false)
-{
+  void initPlugin() {
+    ::s_log->syslog("plugin.ros_listener")<<"Ros_Listener loaded."<<std::endl;
+    // ::decl;
+  }
 
 }
 
-Scientist::~Scientist() {}
-
-void Scientist::handleInit() {
-    use(auv, true, false);
-    srand( time(NULL) );
-    //number = rand() % (Horizon-50) + 1;
-}
-
-bool Scientist::synchronize() {
-
-    if(getCurrentTick()==100)
-    {
-        Goal goal(auv,Sample);
-        transaction::Variable temp(Objective, TREX::transaction::StringDomain(Vent1));
-        goal.restrictAttribute(temp);
-        goal.restrictEnd(TREX::transaction::IntegerDomain(getCurrentTick()+1, Horizon));
-        postGoal(goal);
-    }
-    return true;
-}
