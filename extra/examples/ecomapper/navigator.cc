@@ -51,6 +51,19 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
     std::cout<<"Recieved!"<<std::endl;
 }
 
+void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
+{
+	
+}
+void Navigator::ctd_rhObservation(TREX::transaction::Observation const &obs)
+{
+
+}
+void Navigator::fixObservation(TREX::transaction::Observation const &obs)
+{
+
+}
+
 void Navigator::handleRequest(goal_id const &g)
 {
 

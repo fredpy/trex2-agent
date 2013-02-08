@@ -143,6 +143,7 @@ add_library(TREXecomapper SHARED
   # header
   ros_listener.hh
   navigator.hh
+  spline.hh
   )
 
 source_group("Header\ Files\\bits" FILES 
