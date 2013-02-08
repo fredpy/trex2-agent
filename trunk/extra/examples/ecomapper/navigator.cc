@@ -1,4 +1,6 @@
 #include "navigator.hh"
+#include "ros_listener.hh"
+
 #include <iostream>
 
 using namespace TREX::utils;
@@ -15,7 +17,9 @@ Navigator::~Navigator() {}
 
 void Navigator::handleInit()
 {
-    use("Latitude");
+    use(Ros_Listener::dvlObj);
+    use(Ros_Listener::ctd_rhObj);
+    use(Ros_Listener::fixObj);
 }
 
 bool Navigator::synchronize()

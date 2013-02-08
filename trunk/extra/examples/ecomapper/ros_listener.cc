@@ -1,5 +1,6 @@
 #include "ros_listener.hh"
 #include <trex/domain/StringDomain.hh>
+#include <trex/domain/FloatDomain.hh>
 #include <string>
 
 using namespace TREX::utils;
@@ -8,7 +9,7 @@ using namespace TREX::ecomapper;
 
 Symbol const Ros_Listener::dvlObj("dvl");
 Symbol const Ros_Listener::ctd_rhObj("ctd_rh");
-Symbol const Ros_Listener::fixObj("fix");
+Symbol const Ros_Listener::fixObj("extended_fix");
 
 Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false), m_active(false), m_freq(m_log->service())
@@ -40,24 +41,59 @@ void Ros_Listener::handleInit()
     start();
 }
 
-void Ros_Listener::dvlCallback(const std_msgs::String::ConstPtr& msg)
+void Ros_Listener::dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg)
 {
     Messagelock.lock();
-    Observation dvl_state(dvlObj, Symbol("location"));
-    std::string message = msg->data;
-    dvl_state.restrictAttribute("data", StringDomain(message));
-    obs.push_back(dvl_state);
+    Observation dvl_state(dvlObj, Symbol(dvlObj.str()));
+    const double& depth = msg->depth;
+    dvl_state.restrictAttribute("depth", FloatDomain(depth));
+    const double& altitude = msg->altitude;
+    dvl_state.restrictAttribute("altitude", FloatDomain(altitude));
+    const double& vel_x = msg->vel_x;
+    dvl_state.restrictAttribute("vel_x", FloatDomain(vel_x));
+    const double& vel_y = msg->vel_y;
+    dvl_state.restrictAttribute("vel_y", FloatDomain(vel_y));
+    const double& vel_z = msg->vel_z;
+    dvl_state.restrictAttribute("vel_z", FloatDomain(vel_z));
+    const double& dist_x = msg->dist_x;
+    dvl_state.restrictAttribute("dist_x", FloatDomain(dist_x));
+    const double& dist_y = msg->dist_y;
+    dvl_state.restrictAttribute("dist_y", FloatDomain(dist_y));
+    postObservation(dvl_state);
+    //obs.push_back(dvl_state);
     Messagelock.unlock();
 }
 
-void Ros_Listener::ctd_rhCallback(const std_msgs::String::ConstPtr& msg)
+void Ros_Listener::ctd_rhCallback(const ecomapper_msgs::CTD::ConstPtr& msg)
 {
-
+	Messagelock.lock();
+    Observation ctd_rh_state(ctd_rhObj, Symbol(ctd_rhObj.str()));
+    const double& conductivity = msg->conductivity;
+    ctd_rh_state.restrictAttribute("conductivity", FloatDomain(conductivity));
+    const double& temperature = msg->temperature;
+    ctd_rh_state.restrictAttribute("temperature", FloatDomain(temperature));
+    const double& salinity = msg->salinity;
+    ctd_rh_state.restrictAttribute("salinity", FloatDomain(salinity));
+    const double& sound_speed = msg->sound_speed;
+    ctd_rh_state.restrictAttribute("sound_speed", FloatDomain(sound_speed));
+    postObservation(ctd_rh_state);
+    //obs.push_back(ctd_rh_state);
+    Messagelock.unlock();
 }
 
-void Ros_Listener::fixCallback(const std_msgs::String::ConstPtr& msg)
+void Ros_Listener::fixCallback(const gps_common::GPSFix::ConstPtr& msg)
 {
-
+	Messagelock.lock();
+    Observation fix_state(fixObj, Symbol(fixObj.str()));
+    const double& latitude = msg->latitude;
+    fix_state.restrictAttribute("latitude", FloatDomain(latitude));
+    const double& longitude = msg->longitude;
+    fix_state.restrictAttribute("longitude", FloatDomain(longitude));
+    const double& altitude = msg->altitude;
+    fix_state.restrictAttribute("altitude", FloatDomain(altitude));
+    postObservation(fix_state);
+    //obs.push_back(fix_state);
+    Messagelock.unlock();
 }
 
 bool Ros_Listener::synchronize()
@@ -67,8 +103,8 @@ bool Ros_Listener::synchronize()
     {
         if(!obs.empty())
         {
-            postObservation(obs.front());
-            obs.clear();
+            //postObservation(obs.front());
+            //obs.clear();
         }
         while(!m_pending.empty())
         {

@@ -96,6 +96,40 @@ if(ROS_CFG)
   else(actionlib_PACKAGE_PATH)
     message(SEND_ERROR "Failed to locate actionlib ROS package")
   endif(actionlib_PACKAGE_PATH)
+
+  rosbuild_find_ros_package(ecomapper_msgs)
+  if(ecomapper_msgs_PACKAGE_PATH)
+    message(STATUS "Looking for ecomapper_msgs: ${ecomapper_msgs_PACKAGE_PATH}")
+    # gets compilation information
+    rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs INCLUDE_DIRS cflags-only-I)
+    rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs CFLAGS cflags-only-other)
+    rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_PATH libs-only-L)
+    rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_LIBS libs-only-l)
+    rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_FLAGS libs-only-other)
+
+    # General library
+    include_directories(${ecomapper_msgs_INCLUDE_DIRS})
+    add_definitions(${ecomapper_msgs_CFLAGS})
+  else(ecomapper_msgs_PACKAGE_PATH)
+    message(SEND_ERROR "Failed to locate ecomapper_msgs ROS package")
+  endif(ecomapper_msgs_PACKAGE_PATH)
+  
+  rosbuild_find_ros_package(gps_common)
+  if(gps_common_PACKAGE_PATH)
+    message(STATUS "Looking for ecomapper_msgs: ${gps_common_PACKAGE_PATH}")
+    # gets compilation information
+    rosbuild_invoke_rospack(gps_common gps_common INCLUDE_DIRS cflags-only-I)
+    rosbuild_invoke_rospack(gps_common gps_common CFLAGS cflags-only-other)
+    rosbuild_invoke_rospack(gps_common gps_common LINK_PATH libs-only-L)
+    rosbuild_invoke_rospack(gps_common gps_common LINK_LIBS libs-only-l)
+    rosbuild_invoke_rospack(gps_common gps_common LINK_FLAGS libs-only-other)
+
+    # General library
+    include_directories(${gps_common_INCLUDE_DIRS})
+    add_definitions(${gps_common_CFLAGS})
+  else(gps_common_PACKAGE_PATH)
+    message(SEND_ERROR "Failed to locate ecomapper_msgs ROS package")
+  endif(gps_common_PACKAGE_PATH)
 endif(ROS_CFG)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
@@ -123,15 +157,18 @@ target_link_libraries(TREXecomapper ${roscpp_LINK_FLAGS}
   -L${roscpp_LINK_PATH} 
   ${actionlib_LINK_FLAGS} 
   -L${actionlib_LINK_PATH} 
+  ${ecomapper_msgs_LINK_FLAGS}
+  -L${ecomapper_msgs_LINK_PATH}
+  ${gps_common_LINK_FLAGS}
+  -L${gps_common_LINK_PATH}
   ${roscpp_LINK_LIBS} 
-  ${actionlib_LINK_LIBS} 
+  ${actionlib_LINK_LIBS}
+  ${ecomapper_msgs_LIBS}
+  ${gps_common_LIBS} 
   TREXagent)
 
 install(TARGETS TREXecomapper DESTINATION lib)
 trex_lib(TREXecomapper extra)
 
 trex_plugin(ecomapper ecomapper_pg.cc)
-#trex_plugin(ros_listener ros_listener_pg.cc ros_listener.cc
-#  # headers
-#  ros_listener.hh)
 target_link_libraries(ecomapper_pg TREXecomapper)
