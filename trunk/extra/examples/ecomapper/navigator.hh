@@ -4,6 +4,8 @@
 #include <trex/transaction/TeleoReactor.hh>
 #include <iostream>
 
+#include "spline.hh" 
+
 namespace TREX {
 
     namespace ecomapper {
@@ -20,6 +22,10 @@ namespace TREX {
                 void notify(TREX::transaction::Observation const &obs);
                 void handleRequest(TREX::transaction::goal_id const &g);
                 void handleRecall(TREX::transaction::goal_id const &g);
+                
+                void dvlObservation(TREX::transaction::Observation const &obs);
+                void ctd_rhObservation(TREX::transaction::Observation const &obs);
+                void fixObservation(TREX::transaction::Observation const &obs);
 
 
                 TREX::transaction::TICK m_nextTick;
