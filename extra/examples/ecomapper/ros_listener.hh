@@ -1,10 +1,13 @@
 #ifndef H_ROS_LISTENER
 #define H_ROS_LISTENER
 
-//#include "../../third_party/ros/trex/ros/ros_subscriber.hh"
-//#include "../../third_party/ros/trex/ros/ros_client.hh"
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+
+//ecomapper message types
+#include "ecomapper_msgs/DVL.h"
+#include "ecomapper_msgs/CTD.h"
+#include "gps_common/GPSFix.h"
 
 #include <boost/asio/deadline_timer.hpp>
 
@@ -26,9 +29,14 @@ namespace TREX {
                 /**
                 *   Callbacks for ROS
                 */
-                void dvlCallback(const std_msgs::String::ConstPtr& msg);
-                void ctd_rhCallback(const std_msgs::String::ConstPtr& msg);
-                void fixCallback(const std_msgs::String::ConstPtr& msg);
+                void dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg);
+                void ctd_rhCallback(const ecomapper_msgs::CTD::ConstPtr& msg);
+                void fixCallback(const gps_common::GPSFix::ConstPtr& msg);
+                
+                //Public timelines that connect to ROS
+                static TREX::utils::Symbol const dvlObj;
+        		static TREX::utils::Symbol const ctd_rhObj;
+       			static TREX::utils::Symbol const fixObj;
 
             private:
                 void handleInit();
@@ -61,9 +69,6 @@ namespace TREX {
 
                 std::list<TREX::transaction::goal_id> m_pending;
 
-                static TREX::utils::Symbol const dvlObj;
-                static TREX::utils::Symbol const ctd_rhObj;
-                static TREX::utils::Symbol const fixObj;
         };
 
     }
