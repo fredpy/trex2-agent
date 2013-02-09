@@ -3,7 +3,9 @@
 
 #include <trex/transaction/TeleoReactor.hh>
 #include <iostream>
+#include <mutex>
 
+//Open source library for Cubic Splines
 #include "spline.hh" 
 
 namespace TREX {
@@ -27,7 +29,10 @@ namespace TREX {
                 void ctd_rhObservation(TREX::transaction::Observation const &obs);
                 void fixObservation(TREX::transaction::Observation const &obs);
 
-
+				
+				magnet::math::Spline spline;
+				std::mutex lock;
+				
                 TREX::transaction::TICK m_nextTick;
 
                 std::list<TREX::transaction::goal_id> m_pending;
