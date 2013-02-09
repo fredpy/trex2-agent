@@ -1,6 +1,7 @@
 #include "navigator.hh"
 #include "ros_listener.hh"
 
+#include <trex/domain/FloatDomain.hh>
 #include <iostream>
 
 using namespace TREX::utils;
@@ -48,7 +49,14 @@ bool Navigator::synchronize()
 
 void Navigator::notify(TREX::transaction::Observation const &obs)
 {
-    std::cout<<"Recieved!"<<std::endl;
+	///Dispatching the different timeline observations to their respective function 
+	TREX::utils::Symbol const & object = obs.object(); 
+	if(object==Ros_Listener::dvlObj)
+		dvlObservation(obs);
+	else if(object==Ros_Listener::ctd_rhObj)
+		ctd_rhObservation(obs);
+	else if(object==Ros_Listener::fixObj)
+		fixObservation(obs);
 }
 
 void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
@@ -61,7 +69,12 @@ void Navigator::ctd_rhObservation(TREX::transaction::Observation const &obs)
 }
 void Navigator::fixObservation(TREX::transaction::Observation const &obs)
 {
-
+	lock.lock();
+	//FloatDomain const & x= obs.getAttribute(Symbol("latitude")).typedDomain();
+	//FloatDomain y = obs.getDomain(Symbol("longitude"));
+	//This is were the point is add to the spline if depth is deep enough
+	//spline.addPoint(x,y);
+	lock.unlock(); 
 }
 
 void Navigator::handleRequest(goal_id const &g)
