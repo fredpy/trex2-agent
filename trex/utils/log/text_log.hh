@@ -41,10 +41,13 @@
 # include "stream.hh"
 
 # include "bits/log_sig.hh"
+
+# include "../platform/memory.hh"
 # include "../platform/cpp11_deleted.hh"
 
 # include <boost/asio/io_service.hpp>
 # include <boost/asio/strand.hpp>
+# include <boost/shared_ptr.hpp>
 
 namespace TREX {
   namespace utils {
@@ -76,14 +79,12 @@ namespace TREX {
          *
          * Type used to store the date of the message
          */
-        typedef entry::date_type                        date_type;
+        typedef entry::date_type    date_type;
         /** @brief Message Kind type
          *
          * Type used to store the kind of message produced
          */
-        typedef entry::id_type                          id_type;
-        
-        typedef details::log_signal              log_signal;
+        typedef entry::id_type      id_type;
         
         /** @brief Signal slot type
          *
@@ -91,9 +92,9 @@ namespace TREX {
          *
          * @sa class details::log_signal
          */
-        typedef log_signal::slot_type          slot_type;
-        typedef log_signal::extended_slot_type extended_slot_type;
-        typedef boost::signals2::connection    connection;
+        typedef details::slot       slot_type;
+        typedef details::ext_slot   extended_slot_type;
+        typedef details::connection connection;
        
         typedef boost::asio::io_service::strand  strand;
         
@@ -186,12 +187,9 @@ namespace TREX {
           return stranded_extended(s, cb);
         }
         
-        connection direct_connect(slot_type const &cb) {
-          return m_new_log.connect(cb);
-        }
-        connection direct_connect_extended(extended_slot_type const &cb) {
-          return m_new_log.connect_extended(cb);
-        }
+        connection direct_connect(slot_type const &cb);
+        connection direct_connect_extended(extended_slot_type const &cb);
+        
         template<typename Fn>
         connection connect(Fn const &cb) {
           return direct_connect(stranded(cb));
@@ -219,8 +217,8 @@ namespace TREX {
         }
         
       private:
-        log_signal m_new_log;
-        boost::asio::io_service &m_service;
+        boost::shared_ptr<details::sig_impl> m_new_log;
+        boost::asio::io_service    &m_service;
        
 # ifndef DOXYGEN
         text_log() DELETED; // Non default constructible

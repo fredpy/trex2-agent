@@ -36,17 +36,6 @@
 
 using namespace TREX::utils::log;
 
-/*
- * class TREX::utils::log::details::entry_sink
- */
-
-// structors
-
-details::entry_sink::~entry_sink() {
-  if( NULL!=m_log && m_entry && m_entry->has_content() )
-    (*m_log)(m_entry);
-}
-
 // manipulators
 
 std::streamsize details::entry_sink::write(details::entry_sink::char_type const *s, 
