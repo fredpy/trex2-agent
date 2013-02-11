@@ -36,7 +36,9 @@
 # define H_trex_utils_log_log_stream
 
 # include "log_sig.hh"
+
 # include <boost/iostreams/stream.hpp>
+# include <boost/weak_ptr.hpp>
 
 namespace TREX {
   namespace utils {
@@ -78,7 +80,7 @@ namespace TREX {
            * @note this constrauctor exists for the sole reason of better 
            * handling C++ containers. It should be avoided to use it directly.
            */
-          entry_sink():m_log(NULL) {}
+          entry_sink() {}
           /** @brief Copy constructor
            *
            * @param[in] other Another instance
@@ -117,16 +119,18 @@ namespace TREX {
           std::streamsize write(char_type const *s, std::streamsize n); 
           
         private:
-          entry_sink(log_signal &dest, entry::id_type const &who,
-                      entry::id_type const &what)
-          :m_log(&dest), m_entry(new entry(who, what)) {}
+          entry_sink(boost::shared_ptr<sig_impl> const &dest,
+                     entry::id_type const &who,
+                     entry::id_type const &what)
+          :m_log(dest), m_entry(new entry(who, what)) {}
         
-          entry_sink(log_signal &dest, entry::date_type const &when,
+          entry_sink(boost::shared_ptr<sig_impl> const &dest,
+                     entry::date_type const &when,
                      entry::id_type const &who, entry::id_type const &what)
-          :m_log(&dest), m_entry(new entry(when, who, what)) {}
+          :m_log(dest), m_entry(new entry(when, who, what)) {}
         
-          log_signal *m_log;
-          mutable entry::pointer m_entry;
+          boost::weak_ptr<sig_impl> m_log;
+          mutable entry::pointer    m_entry;
         
           friend class ::TREX::utils::log::text_log;
         }; // class TREX::utils::log::details::entry_sink

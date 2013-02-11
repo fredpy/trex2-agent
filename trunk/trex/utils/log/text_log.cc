@@ -38,6 +38,9 @@
 
 #include <boost/smart_ptr.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
+#include <boost/signals2/signal.hpp>
+
+namespace bs2=boost::signals2;
 
 namespace TREX {
   namespace utils {
@@ -47,7 +50,37 @@ namespace TREX {
       id_type const info("INFO");
       id_type const warn("WARNING");
       id_type const error("ERROR");
-
+      
+      namespace details {
+       
+        class sig_impl {
+        public:
+          typedef slot::signature_type signature_type;
+          typedef bs2::signal<signature_type, bs2::optional_last_value<void>,
+                              int, std::less<int>, slot::slot_function_type,
+                              ext_slot::slot_function_type> signal_type;
+          
+          
+          inline sig_impl() {}
+          inline ~sig_impl() {}
+          
+          inline void emit(entry::pointer const &e) {
+            m_signal(e);
+          }
+          
+          inline connection connect(slot const &s) {
+            return m_signal.connect(s);
+          }
+          inline connection ext_connect(ext_slot const &s) {
+            return m_signal.connect_extended(s);
+          }
+          
+        private:
+          signal_type m_signal;
+        };
+        
+        
+      }
     }
   }
 }
@@ -55,12 +88,29 @@ namespace TREX {
 using namespace TREX::utils::log;
 
 /*
+ * class TREX::utils::log::details::entry_sink
+ */
+
+// structors
+
+details::entry_sink::~entry_sink() {
+  if( m_entry && m_entry->has_content() ) {
+    // Get the pointer to the signal
+    boost::shared_ptr<details::sig_impl> dest = m_log.lock();
+  
+    if( dest ) // if the signal still exists then trigger it
+      dest->emit(m_entry);
+  }
+}
+
+/*
  * class TREX::utils::log::text_log
  */
 
 // structors 
 
-text_log::text_log(boost::asio::io_service &io):m_service(io) {}
+text_log::text_log(boost::asio::io_service &io)
+  :m_new_log(new details::sig_impl), m_service(io) {}
 
 // manipulators
 
@@ -73,13 +123,23 @@ stream text_log::msg(date_type const &when,
   return stream(details::entry_sink(m_new_log, when, who, what));
 }
 
+text_log::connection text_log::direct_connect(text_log::slot_type const &cb) {
+  return m_new_log->connect(cb);
+}
+
+text_log::connection text_log::direct_connect_extended(text_log::extended_slot_type const &cb) {
+  return m_new_log->ext_connect(cb);
+}
+
 
 /*
  * class TREX::utils::log::out_file
  */
 
 out_file::out_file(std::string const &name)
- :m_file(new std::ofstream(name.c_str())) {} // should use make_shared instead but clash when boost used with gcc with c++11 support
+ :m_file(new std::ofstream(name.c_str())) {} // should use make_shared instead but
+                                             // it conflicts when boost used with
+                                             // gcc with c++11 support
 
 void out_file::operator()(entry::pointer msg) {
   if( m_file && *m_file) {

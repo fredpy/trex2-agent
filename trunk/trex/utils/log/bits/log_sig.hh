@@ -36,15 +36,22 @@
 # define H_trex_utils_log_sig
 
 # include "../entry.hh"
-# include <boost/signals2/signal.hpp>
+
+# include <boost/signals2/slot.hpp>
+# include <boost/signals2/connection.hpp>
 
 namespace TREX {
   namespace utils {
     namespace log {
       namespace details {
         
-        typedef boost::signals2::signal<void (entry::pointer)>  log_signal;
-
+        typedef boost::signals2::connection  connection;
+        
+        typedef boost::signals2::slot<void (entry::pointer)> slot;
+        typedef boost::signals2::slot<void (connection, entry::pointer)> ext_slot;
+      
+        class sig_impl;
+        
       } // TREX::utils::log::details
     } // TREX::utils::log
   } // TREX::utils
