@@ -29,6 +29,7 @@ namespace TREX {
                 void dvlObservation(TREX::transaction::Observation const &obs);
                 void ctd_rhObservation(TREX::transaction::Observation const &obs);
                 void fixObservation(TREX::transaction::Observation const &obs);
+                void navSatFixObservation(TREX::transaction::Observation const &obs);
 
                 double getAttribute(std::string const &name, TREX::transaction::Observation const &obs);
 
