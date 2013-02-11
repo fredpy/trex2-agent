@@ -26,6 +26,7 @@ void Navigator::handleInit()
     use(Ros_Listener::dvlObj);
     use(Ros_Listener::ctd_rhObj);
     use(Ros_Listener::fixObj);
+    use(Ros_Listener::navSatFixObj);
 }
 
 bool Navigator::synchronize()
@@ -62,26 +63,33 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
 		ctd_rhObservation(obs);
 	else if(object==Ros_Listener::fixObj)
 		fixObservation(obs);
+	else if(object==Ros_Listener::navSatFixObj)
+		navSatFixObservation(obs);
 }
 
 void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
 {
     lock.lock();
+    /*
     double depth = getAttribute(gDepth, obs);
     double altitude = getAttribute(gAltitude, obs);
     addToMap(gDepth, depth);
     addToMap(gAltitude, altitude);
     //Still need to find the actual total_water_column
     addToMap(gTotal_Water_Column,depth+altitude);
+    */
     lock.unlock();
 }
+
 void Navigator::ctd_rhObservation(TREX::transaction::Observation const &obs)
 {
 
 }
+
 void Navigator::fixObservation(TREX::transaction::Observation const &obs)
 {
 	lock.lock();
+	/*
 	double x = getAttribute(gLatitude, obs);
     double y = getAttribute(gLongitude, obs);
     bool nextPoint = (getMapValue(gLatitude)!=0)?true:false;
@@ -105,8 +113,15 @@ void Navigator::fixObservation(TREX::transaction::Observation const &obs)
 	    addToMap(gLatitude, 0);
 	    addToMap(gLongitude, 0);
 	}
+	*/
 	lock.unlock();
 }
+
+void Navigator::navSatFixObservation(TREX::transaction::Observation const &obs)
+{
+
+}
+
 
 double Navigator::getAttribute(std::string const &name, Observation const &obs)
 {

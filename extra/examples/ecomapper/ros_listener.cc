@@ -10,6 +10,7 @@ using namespace TREX::ecomapper;
 Symbol const Ros_Listener::dvlObj("dvl");
 Symbol const Ros_Listener::ctd_rhObj("ctd_rh");
 Symbol const Ros_Listener::fixObj("extended_fix");
+Symbol const Ros_Listener::navSatFixObj("fix");
 
 Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false), m_active(false), m_freq(m_log->service())
@@ -25,6 +26,8 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     provide(ctd_rhObj);
     syslog()<<"I want to own "<<fixObj;
     provide(fixObj);
+    syslog()<<"I want to own "<<fixObj;
+    provide(navSatFixObj);
 }
 
 Ros_Listener::~Ros_Listener()
@@ -38,6 +41,7 @@ void Ros_Listener::handleInit()
     m_sub.push_back(m_ros->subscribe(dvlObj.str(), 10, &Ros_Listener::dvlCallback, this));
     m_sub.push_back(m_ros->subscribe(ctd_rhObj.str(), 10, &Ros_Listener::ctd_rhCallback, this));
     m_sub.push_back(m_ros->subscribe(fixObj.str(), 10, &Ros_Listener::fixCallback, this));
+    m_sub.push_back(m_ros->subscribe(navSatFixObj.str(), 10, &Ros_Listener::navSatFixCallback, this));
     start();
 }
 
@@ -59,6 +63,8 @@ void Ros_Listener::dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg)
     dvl_state.restrictAttribute("dist_x", FloatDomain(dist_x));
     const double& dist_y = msg->dist_y;
     dvl_state.restrictAttribute("dist_y", FloatDomain(dist_y));
+    const double& heading = msg->heading;
+    dvl_state.restrictAttribute("heading", FloatDomain(heading));
     postObservation(dvl_state);
     //obs.push_back(dvl_state);
     Messagelock.unlock();
@@ -91,8 +97,25 @@ void Ros_Listener::fixCallback(const gps_common::GPSFix::ConstPtr& msg)
     fix_state.restrictAttribute("longitude", FloatDomain(longitude));
     const double& altitude = msg->altitude;
     fix_state.restrictAttribute("altitude", FloatDomain(altitude));
+    const double& speed = msg->speed;
+    fix_state.restrictAttribute("speed", FloatDomain(speed));
     postObservation(fix_state);
     //obs.push_back(fix_state);
+    Messagelock.unlock();
+}
+
+void Ros_Listener::navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg)
+{
+	Messagelock.lock();
+    Observation state(navSatFixObj, Symbol(navSatFixObj.str()));
+    const double& latitude = msg->latitude;
+    state.restrictAttribute("latitude", FloatDomain(latitude));
+    const double& longitude = msg->longitude;
+    state.restrictAttribute("longitude", FloatDomain(longitude));
+    const double& altitude = msg->altitude;
+    state.restrictAttribute("altitude", FloatDomain(altitude));
+    postObservation(state);
+    //obs.push_back(state);
     Messagelock.unlock();
 }
 
