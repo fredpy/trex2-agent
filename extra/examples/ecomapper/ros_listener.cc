@@ -11,6 +11,7 @@ Symbol const Ros_Listener::dvlObj("dvl");
 Symbol const Ros_Listener::ctd_rhObj("ctd_rh");
 Symbol const Ros_Listener::fixObj("extended_fix");
 Symbol const Ros_Listener::navSatFixObj("fix");
+Symbol const Ros_Listener::wqmObj("wqm");
 
 Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false), m_active(false), m_freq(m_log->service())
@@ -28,6 +29,8 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     provide(fixObj);
     syslog()<<"I want to own "<<fixObj;
     provide(navSatFixObj);
+    syslog()<<"I want to own "<<fixObj;
+    provide(wqmObj);
 }
 
 Ros_Listener::~Ros_Listener()
@@ -42,6 +45,7 @@ void Ros_Listener::handleInit()
     m_sub.push_back(m_ros->subscribe(ctd_rhObj.str(), 10, &Ros_Listener::ctd_rhCallback, this));
     m_sub.push_back(m_ros->subscribe(fixObj.str(), 10, &Ros_Listener::fixCallback, this));
     m_sub.push_back(m_ros->subscribe(navSatFixObj.str(), 10, &Ros_Listener::navSatFixCallback, this));
+    m_sub.push_back(m_ros->subscribe(wqmObj.str(), 10, &Ros_Listener::wqmCallback, this));
     start();
 }
 
@@ -67,6 +71,26 @@ void Ros_Listener::dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg)
     dvl_state.restrictAttribute("heading", FloatDomain(heading));
     postObservation(dvl_state);
     //obs.push_back(dvl_state);
+    Messagelock.unlock();
+}
+
+void Ros_Listener::wqmCallback(const ecomapper_msgs::WQM::ConstPtr& msg)
+{
+    Messagelock.lock();
+    Observation state(wqmObj, Symbol(wqmObj.str()));
+    const double& depth = msg->depth;
+    state.restrictAttribute("depth", FloatDomain(depth));
+    const double& conductivity = msg->conductivity;
+    state.restrictAttribute("conductivity", FloatDomain(conductivity));
+    const double& temperature = msg->temperature;
+    state.restrictAttribute("temperature", FloatDomain(temperature));
+    const double& salinity = msg->salinity;
+    state.restrictAttribute("salinity", FloatDomain(salinity));
+    const double& pressure = msg->pressure;
+    state.restrictAttribute("pressure", FloatDomain(pressure));
+
+    postObservation(state);
+    //obs.push_back(state);
     Messagelock.unlock();
 }
 
