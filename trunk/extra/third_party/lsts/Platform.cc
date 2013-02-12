@@ -16,8 +16,8 @@
 #include <trex/domain/BooleanDomain.hh>
 #include <trex/domain/EnumDomain.hh>
 
-#include <Dune/Math/Angles.hpp>
-#include <Dune/Coordinates/WGS84.hpp>
+#include <DUNE/Math/Angles.hpp>
+#include <DUNE/Coordinates/WGS84.hpp>
 #include "Platform.hh"
 
 using namespace TREX::utils;
@@ -731,7 +731,7 @@ Observation Platform::maneuverObservation(IMC::Message * man)
 bool
 Platform::sendMsg(Message& msg, Address &dest)
 {
-  Dune::Utils::ByteBuffer bb;
+  DUNE::Utils::ByteBuffer bb;
   try
   {
     msg.setTimeStamp();
@@ -750,7 +750,7 @@ Platform::sendMsg(Message& msg, Address &dest)
 bool
 Platform::sendMsg(Message& msg, std::string ip, int port)
 {
-  Dune::Utils::ByteBuffer bb;
+  DUNE::Utils::ByteBuffer bb;
   try
   {
     msg.setTimeStamp();

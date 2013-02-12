@@ -1,6 +1,6 @@
 #include "DuneClock.hh"
 
-#include <Dune/Time/Clock.hpp>
+#include <DUNE/Time/Clock.hpp>
 
 using namespace TREX::LSTS;
 using TREX::agent::Clock;
@@ -40,12 +40,12 @@ namespace {
  * class TREX::LSTS::dune_posix_clock
  */
 dune_posix_clock::time_point dune_posix_clock::now() {
-  return time_point(duration(Dune::Time::Clock::getSinceEpochNsec()));
+  return time_point(duration(DUNE::Time::Clock::getSinceEpochNsec()));
 }
 
 /*
  * class TREX::LSTS::dune_steady_clock
  */
 dune_steady_clock::time_point dune_steady_clock::now() {
-  return time_point(duration(Dune::Time::Clock::getNsec()));
+  return time_point(duration(DUNE::Time::Clock::getNsec()));
 }

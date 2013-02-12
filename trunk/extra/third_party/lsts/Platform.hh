@@ -9,8 +9,8 @@
 # define H_Platform
 
 # include <trex/transaction/TeleoReactor.hh>
-# include <Dune/Dune.hpp>
-# include <extra/lsts/ControlInterface.hh>
+# include <DUNE/DUNE.hpp>
+# include <extra/third_party/lsts/ControlInterface.hh>
 # include "SharedEnvironment.hh"
 
 using DUNE_NAMESPACES;
