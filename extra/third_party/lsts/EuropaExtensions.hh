@@ -6,7 +6,7 @@
 # include <PLASMA/Constraint.hh>
 # include <PLASMA/Domain.hh>
 
-# include <Dune/Dune.hpp>
+# include <DUNE/DUNE.hpp>
 
 # include <boost/polygon/polygon.hpp>
 
@@ -26,10 +26,10 @@ public:
 
 	void handleExecute();
 
-	static void set_home(Dune::IMC::HomeRef *home);
+	static void set_home(DUNE::IMC::HomeRef *home);
 
 private:
-	static Dune::IMC::HomeRef *s_home;
+	static DUNE::IMC::HomeRef *s_home;
 
 	EUROPA::Domain &m_lat;
 	EUROPA::Domain &m_lon;
@@ -81,10 +81,10 @@ public:
 
 	void handleExecute();
 
-	static void set_oplimits(Dune::IMC::OperationalLimits *oplimits);
+	static void set_oplimits(DUNE::IMC::OperationalLimits *oplimits);
 
 private:
-	static Dune::IMC::OperationalLimits * s_oplimits;
+	static DUNE::IMC::OperationalLimits * s_oplimits;
 
 	EUROPA::Domain &m_lat;
 	EUROPA::Domain &m_lon;

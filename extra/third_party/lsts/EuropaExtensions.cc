@@ -5,8 +5,8 @@
 #include <trex/europa/EuropaPlugin.hh>
 #include <trex/europa/Assembly.hh>
 
-#include <Dune/Math/Angles.hpp>
-#include <Dune/Coordinates/WGS84.hpp>
+#include <DUNE/Math/Angles.hpp>
+#include <DUNE/Coordinates/WGS84.hpp>
 
 /**
  * DIST == ll_dist(lat1, lon1, lat2, lon2)
@@ -71,20 +71,20 @@ namespace {
 
 
 using namespace TREX::LSTS;
-using Dune::Math::Angles;
-using Dune::Coordinates::WGS84;
+using DUNE::Math::Angles;
+using DUNE::Coordinates::WGS84;
 
 // statics
 
-Dune::IMC::HomeRef *LatLonToOffset::s_home = NULL;
-Dune::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
+DUNE::IMC::HomeRef *LatLonToOffset::s_home = NULL;
+DUNE::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
 
-void LatLonToOffset::set_home(Dune::IMC::HomeRef *home) { 
+void LatLonToOffset::set_home(DUNE::IMC::HomeRef *home) {
   s_home = home;
   debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
 }
 
-void InsideOpLimits::set_oplimits(Dune::IMC::OperationalLimits *oplimits) {
+void InsideOpLimits::set_oplimits(DUNE::IMC::OperationalLimits *oplimits) {
   s_oplimits = oplimits;
 }
 
@@ -175,11 +175,11 @@ void InsideOpLimits::handleExecute() {
   if (m_depth.isSingleton())
     depth = cast_basis(m_depth.getSingletonValue());
 
-  if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_MAX_DEPTH)
+  if (s_oplimits->mask & DUNE::IMC::OperationalLimits::OPL_MAX_DEPTH)
     if (depth >= s_oplimits->max_depth)
       m_depth.empty();
 
-  if (s_oplimits->mask & Dune::IMC::OperationalLimits::OPL_AREA)
+  if (s_oplimits->mask & DUNE::IMC::OperationalLimits::OPL_AREA)
   {
 
     WGS84::displacement(s_oplimits->lat, s_oplimits->lon, 0, lat, lon, 0, &x, &y);
@@ -223,7 +223,7 @@ void LatLonToOffset::handleExecute() {
       lon = cast_basis(m_lon.getSingletonValue());
       debugMsg("lsts:ll_offset", "<n,e> = displacement(["<<s_home->lat<<", "
           <<s_home->lon<<"], ["<<lat<<", "<<lon<<"])");
-      Dune::Coordinates::WGS84::displacement(s_home->lat, s_home->lon, 0, lat, lon, 0, &n, &e);
+      DUNE::Coordinates::WGS84::displacement(s_home->lat, s_home->lon, 0, lat, lon, 0, &n, &e);
       debugMsg("lsts:ll_offset", "<n,e> = <"<<n<<", "<<e<<">");
       if( intersect(m_northing, n, n, dist_precision)
           && m_northing.isEmpty() ) {
@@ -242,7 +242,7 @@ void LatLonToOffset::handleExecute() {
         lat = s_home->lat;
         lon = s_home->lon;
         debugMsg("lsts:ll_offset", "[lat,lon] = displace(["<<lat<<", "<<lon<<"], <"<<n<<", "<<e<<">)");
-        Dune::Coordinates::WGS84::displace(n, e, &lat, &lon);
+        DUNE::Coordinates::WGS84::displace(n, e, &lat, &lon);
         debugMsg("lsts:ll_offset", "[lat,lon] = ["<<lat<<", "<<lon<<"]");
         if( m_lat.intersect(lat, lat)
             && m_lat.isEmpty() ) {
@@ -289,7 +289,7 @@ void RadDeg::handleExecute() {
   bool t_hi = true, t_lo = true;
 
   if( r_hi < std::numeric_limits<EUROPA::edouble>::infinity() ) {
-    tmp = Dune::Math::Angles::degrees(cast_basis(r_hi));
+    tmp = DUNE::Math::Angles::degrees(cast_basis(r_hi));
     if( tmp<=d_hi ) {
       // upper bound restricted => no need to compute rad upperbound
       t_hi = false;
@@ -297,7 +297,7 @@ void RadDeg::handleExecute() {
     }
   }
   if( std::numeric_limits<EUROPA::edouble>::minus_infinity() < r_lo ) {
-    tmp = Dune::Math::Angles::degrees(cast_basis(r_lo));
+    tmp = DUNE::Math::Angles::degrees(cast_basis(r_lo));
     if( d_lo<=tmp ) {
       // lowerbound restricted => no need to compute red lower bound
       t_lo = false;
@@ -310,9 +310,9 @@ void RadDeg::handleExecute() {
     return;
 
   if( t_hi && d_hi < std::numeric_limits<EUROPA::edouble>::infinity() )
-    r_hi = Dune::Math::Angles::radians(cast_basis(d_hi));
+    r_hi = DUNE::Math::Angles::radians(cast_basis(d_hi));
   if( t_lo && std::numeric_limits<EUROPA::edouble>::minus_infinity() < d_lo )
-    r_lo = Dune::Math::Angles::radians(cast_basis(d_lo));
+    r_lo = DUNE::Math::Angles::radians(cast_basis(d_lo));
   m_rad.intersect(r_lo, r_hi);
 }
 
