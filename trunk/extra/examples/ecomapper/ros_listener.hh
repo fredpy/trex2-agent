@@ -7,6 +7,7 @@
 //ecomapper message types
 #include "ecomapper_msgs/DVL.h"
 #include "ecomapper_msgs/CTD.h"
+#include "ecomapper_msgs/WQM.h"
 #include "sensor_msgs/NavSatFix.h"
 #include "gps_common/GPSFix.h"
 
@@ -31,15 +32,17 @@ namespace TREX {
                 *   Callbacks for ROS
                 */
                 void dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg);
+                void wqmCallback(const ecomapper_msgs::WQM::ConstPtr& msg);
                 void ctd_rhCallback(const ecomapper_msgs::CTD::ConstPtr& msg);
                 void fixCallback(const gps_common::GPSFix::ConstPtr& msg);
                 void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg);
-                
+
                 //Public timelines that connect to ROS
                 static TREX::utils::Symbol const dvlObj;
         		static TREX::utils::Symbol const ctd_rhObj;
        			static TREX::utils::Symbol const fixObj;
        			static TREX::utils::Symbol const navSatFixObj;
+       			static TREX::utils::Symbol const wqmObj;
 
             private:
                 void handleInit();
