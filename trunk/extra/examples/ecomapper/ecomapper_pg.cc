@@ -34,6 +34,7 @@
 
 #include "navigator.hh"
 #include "ros_listener.hh"
+#include "ros_commander.hh"
 
 #include <trex/utils/LogManager.hh>
 #include <trex/utils/Plugin.hh>
@@ -47,6 +48,7 @@ namespace {
 
     TeleoReactor::xml_factory::declare<Navigator> decl("navigator");
     TeleoReactor::xml_factory::declare<Ros_Listener> decl2("ros_listener");
+    TeleoReactor::xml_factory::declare<Ros_Commander> decl3("ros_commander");
 }
 
 namespace TREX {
@@ -54,6 +56,7 @@ namespace TREX {
   void initPlugin() {
     ::s_log->syslog("plugin.navigator")<<"Navigator loaded."<<std::endl;
     ::s_log->syslog("plugin.ros_listener")<<"Ros_Listener loaded."<<std::endl;
+    ::s_log->syslog("plugin.ros_commander")<<"Ros_Commander loaded."<<std::endl;
     // ::decl;
   }
 

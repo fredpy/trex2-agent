@@ -18,7 +18,7 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
 {
     int argc = 0;
     char **argv = NULL;
-    ros::init(argc, argv, "trex2" , ros::init_options::AnonymousName);
+    ros::init(argc, argv, "trex2_ros_listener" , ros::init_options::AnonymousName);
     m_ros = new ros::NodeHandle();
 
     syslog()<<"I want to own "<<dvlObj;
