@@ -5,7 +5,7 @@
  *      Author: zp
  */
 
-#include "extra/lsts/SafetyBug.hh"
+#include "extra/third_party/lsts/SafetyBug.hh"
 # include "Platform.hh"
 using namespace TREX::LSTS;
 using namespace TREX::transaction;
