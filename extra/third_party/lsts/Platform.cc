@@ -427,12 +427,30 @@ Platform::handleRecall(goal_id const &g)
 void
 Platform::convertToRelative(double lat, double lon, double &x, double &y)
 {
-  if (!aggregate.count(IMC::HomeRef::getIdStatic()))
-    return;
+	//FIXME
+//  if (!aggregate.count(IMC::HomeRef::getIdStatic()))
+//    return;
+//
+//  IMC::HomeRef * homeRef =
+//      dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
+//  WGS84::displacement(homeRef->lat, homeRef->lon, 0, lat, lon, 0, &x, &y);
+}
 
-  IMC::HomeRef * homeRef =
-      dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
-  WGS84::displacement(homeRef->lat, homeRef->lon, 0, lat, lon, 0, &x, &y);
+void
+Platform::convertToAbsolute(double northing, double easting, double &lat, double &lon)
+{
+	//FIXME
+  // double tmp = 0;
+//  if (lat == 0 && lon == 0) {
+//    if (!aggregate.count(IMC::HomeRef::getIdStatic()))
+//      return;
+//
+//    IMC::HomeRef * homeRef = dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
+//
+//    lat = homeRef->lat;
+//    lon = homeRef->lon;
+
+  WGS84::displace(northing, easting, &lat, &lon);
 }
 
 void
@@ -617,7 +635,7 @@ Platform::processState()
       man = lastCommand.maneuver.get();
       Observation obs = maneuverObservation(man);
       obs.restrictAttribute("eta", IntegerDomain(eta));
-      lastCommand.maneuver = IMC::InlineMessage();
+      lastCommand.maneuver = IMC::InlineMessage<Maneuver>();
       uniqueObservation(obs);
     }
   }
@@ -717,7 +735,7 @@ Platform::sendMsg(Message& msg, Address &dest)
   try
   {
     msg.setTimeStamp();
-    msg.serialize(bb);
+    IMC::Packet::serialize(&msg, bb);
     send.write((const char*)bb.getBuffer(), msg.getSerializationSize(), dest,
                duneport);
   }
@@ -738,7 +756,7 @@ Platform::sendMsg(Message& msg, std::string ip, int port)
     msg.setTimeStamp();
     msg.setSource(65000);
     msg.setDestination(remote_id);
-    msg.serialize(bb);
+    IMC::Packet::serialize(&msg, bb);
 
     if (debug)
       msg.toText(syslog("debug") << "sending message:\n");

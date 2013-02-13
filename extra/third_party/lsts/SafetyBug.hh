@@ -9,7 +9,7 @@
 #define SAFETYBUG_HH_
 
 # include <trex/transaction/TeleoReactor.hh>
-# include <DUNE/Dune.hpp>
+# include <DUNE/DUNE.hpp>
 # include"SharedEnvironment.hh"
 
 namespace TREX {
