@@ -248,9 +248,9 @@ Platform::synchronize()
         switch (command->command)
         {
           case IMC::TrexCommand::OP_POST_GOAL:
-            syslog(log::info) << "received (" << command->goalid << "): " << command->goalxml;
+            syslog(log::info) << "received (" << command->goal_id << "): " << command->goal_xml;
             if (controlInterfaceInstance) {
-              controlInterfaceInstance->proccess_message(command->goalxml);
+              controlInterfaceInstance->proccess_message(command->goal_xml);
             }
             break;
           case IMC::TrexCommand::OP_ENABLE:
@@ -436,23 +436,6 @@ Platform::convertToRelative(double lat, double lon, double &x, double &y)
 }
 
 void
-Platform::convertToAbsolute(double northing, double easting, double &lat, double &lon)
-{
-  // double tmp = 0;
-  if (lat == 0 && lon == 0) {
-    if (!aggregate.count(IMC::HomeRef::getIdStatic()))
-      return;
-
-    IMC::HomeRef * homeRef = dynamic_cast<IMC::HomeRef *>(aggregate[IMC::HomeRef::getIdStatic()]);
-
-    lat = homeRef->lat;
-    lon = homeRef->lon;
-  }
-
-  WGS84::displace(northing, easting, &lat, &lon);
-}
-
-void
 Platform::processState()
 {
 
@@ -474,8 +457,7 @@ Platform::processState()
     m_latitude = msg->lat;
     m_longitude = msg->lon;
     m_depth = msg->z;
-    if (msg->ref == IMC::EstimatedState::RM_NED_LLD)
-      WGS84::displace(msg->x, msg->y, &m_latitude, &m_longitude);
+    WGS84::displace(msg->x, msg->y, &m_latitude, &m_longitude);
 
     obs.restrictAttribute("latitude", FloatDomain(m_latitude));
     obs.restrictAttribute("longitude", FloatDomain(m_longitude));
@@ -518,17 +500,17 @@ Platform::processState()
         dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
     Observation obs("oplimits", "Limits");
 
-    if (msg->mask & IMC::OperationalLimits::OPL_MAX_DEPTH)
+    if (msg->mask & IMC::OPL_MAX_DEPTH)
       obs.restrictAttribute("maxDepth", FloatDomain(msg->max_depth));
 
-    if ((msg->mask & IMC::OperationalLimits::OPL_MAX_ALT))
+    if ((msg->mask & IMC::OPL_MAX_ALT))
       obs.restrictAttribute("maxAltitude", FloatDomain(msg->max_depth));
-    if(msg->mask & IMC::OperationalLimits::OPL_MIN_ALT)
+    if(msg->mask & IMC::OPL_MIN_ALT)
       obs.restrictAttribute("minAltitude", FloatDomain(msg->min_altitude));
 
-    if (msg->mask & IMC::OperationalLimits::OPL_MAX_SPEED)
+    if (msg->mask & IMC::OPL_MAX_SPEED)
       obs.restrictAttribute("maxSpeed", FloatDomain(msg->max_speed));
-    if (msg->mask & IMC::OperationalLimits::OPL_MIN_SPEED)
+    if (msg->mask & IMC::OPL_MIN_SPEED)
       obs.restrictAttribute("minSpeed", FloatDomain(msg->min_speed));
 
     InsideOpLimits::set_oplimits(msg);
@@ -654,11 +636,11 @@ Observation Platform::maneuverObservation(IMC::Message * man)
     obs.restrictAttribute("depth", FloatDomain(m->z));
     //  obs.restrictAttribute("type", EnumDomain("goto"));
 
-    if (m->speed_units == IMC::Goto::SUNITS_METERS_PS)
+    if (m->speed_units == IMC::SUNITS_METERS_PS)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed));
     }
-    else if (m->speed_units == IMC::Goto::SUNITS_RPM)
+    else if (m->speed_units == IMC::SUNITS_RPM)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
     }
@@ -672,11 +654,11 @@ Observation Platform::maneuverObservation(IMC::Message * man)
     obs.restrictAttribute("latitude", FloatDomain(m->lat /*floor(n,2), ceil(n,2)*/));
     obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
     obs.restrictAttribute("depth", FloatDomain(m->z));
-    if (m->speed_units == IMC::Loiter::SUNITS_METERS_PS)
+    if (m->speed_units == IMC::SUNITS_METERS_PS)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed));
     }
-    else if (m->speed_units == IMC::Loiter::SUNITS_RPM)
+    else if (m->speed_units == IMC::SUNITS_RPM)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
     }
@@ -692,11 +674,11 @@ Observation Platform::maneuverObservation(IMC::Message * man)
     obs.restrictAttribute("longitude", FloatDomain(m->lon /*floor(e,2), ceil(e,2)*/));
     obs.restrictAttribute("depth", FloatDomain(0));
     //obs.restrictAttribute("type", EnumDomain("skeeping"));
-    if (m->speed_units == IMC::StationKeeping::SUNITS_METERS_PS)
+    if (m->speed_units == IMC::SUNITS_METERS_PS)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed));
     }
-    else if (m->speed_units == IMC::StationKeeping::SUNITS_RPM)
+    else if (m->speed_units == IMC::SUNITS_RPM)
     {
       obs.restrictAttribute("speed", FloatDomain(m->speed/m_rpm_speed_factor));
     }
@@ -831,12 +813,12 @@ Platform::gotoCommand(const std::string &man_name, double lat, double lon, doubl
   if (m_use_rpm)
   {
     msg->speed = speed * m_rpm_speed_factor;
-    msg->speed_units = IMC::Goto::SUNITS_RPM;
+    msg->speed_units = IMC::SUNITS_RPM;
   }
   else
   {
     msg->speed = speed;
-    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+    msg->speed_units = IMC::SUNITS_METERS_PS;
   }
 
   if (timeout)
@@ -858,15 +840,13 @@ Platform::elevatorCommand(const std::string &man_name, double target_depth, boos
   msg->lon = state->lon;
   msg->end_z = target_depth;
 
-  if (state->ref == IMC::EstimatedState::RM_NED_LLD)
-    WGS84::displace(state->x, state->y, &msg->lat, &msg->lon);
+  WGS84::displace(state->x, state->y, &msg->lat, &msg->lon);
 
   msg->flags = IMC::Elevator::FLG_CURR_POS;
 
   msg->speed = 1000;
-  msg->speed_units = IMC::Elevator::SUNITS_RPM;
+  msg->speed_units = IMC::SUNITS_RPM;
 
-  msg->pitch = Angles::radians(15);
   msg->radius = m_loiter_radius;
 
 
@@ -889,15 +869,14 @@ Platform::elevatorCommand(const std::string &man_name, double lat, double lon, d
   if (m_use_rpm)
   {
     msg->speed = speed * m_rpm_speed_factor;
-    msg->speed_units = IMC::Elevator::SUNITS_RPM;
+    msg->speed_units = IMC::SUNITS_RPM;
   }
   else
   {
     msg->speed = speed;
-    msg->speed_units = IMC::Elevator::SUNITS_METERS_PS;
+    msg->speed_units = IMC::SUNITS_METERS_PS;
   }
 
-  msg->pitch = Angles::radians(15);
   msg->radius = m_loiter_radius;
 
   if (timeout)
@@ -919,12 +898,12 @@ Platform::skeepingCommand(const std::string &man_name, double lat, double lon, d
   if (m_use_rpm)
   {
     msg->speed = speed * m_rpm_speed_factor;
-    msg->speed_units = IMC::Goto::SUNITS_RPM;
+    msg->speed_units = IMC::SUNITS_RPM;
   }
   else
   {
     msg->speed = speed;
-    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+    msg->speed_units = IMC::SUNITS_METERS_PS;
   }
 
   return getManeuverCommand(man_name, msg);
@@ -946,12 +925,12 @@ Platform::loiterCommand(const std::string &man_name, double lat, double lon, dou
   if (m_use_rpm)
   {
     msg->speed = speed * m_rpm_speed_factor;
-    msg->speed_units = IMC::Goto::SUNITS_RPM;
+    msg->speed_units = IMC::SUNITS_RPM;
   }
   else
   {
     msg->speed = speed;
-    msg->speed_units = IMC::Goto::SUNITS_METERS_PS;
+    msg->speed_units = IMC::SUNITS_METERS_PS;
   }
 
   return getManeuverCommand(man_name, msg);
@@ -984,22 +963,22 @@ Platform::log_proxy::~log_proxy() {
 
 // callback
 
-void Platform::log_proxy::operator()(log::entry::pointer msg) {
-  m_platform->m_active_proxy = this;
-  // Example that display error/warnings on std::cerr
-
-  std::ostringstream ss;
-  if( msg->is_dated() )
-    ss<<'@'<<msg->date()<<' ';
-
-  ss<<msg->content();
-
-  if( log::warn==msg->kind() )
-    m_platform->reportToDune(IMC::LogBookEntry::LBET_WARNING, who.str(), ss.str());
-  else if ( log::error==msg->kind() )
-    m_platform->reportToDune(IMC::LogBookEntry::LBET_ERROR, who.str(), ss.str());
-  else if (TeleoReactor::obs==msg->kind() )
-    m_platform->reportToDune(IMC::LogBookEntry::LBET_INFO, who.str(), ss.str());
-}
+//void Platform::log_proxy::operator()(log::entry::pointer msg) {
+//  m_platform->m_active_proxy = this;
+//  // Example that display error/warnings on std::cerr
+//
+//  std::ostringstream ss;
+//  if( msg->is_dated() )
+//    ss<<'@'<<msg->date()<<' ';
+//
+//  ss<<msg->content();
+//
+//  if( log::warn==msg->kind() )
+//    m_platform->reportToDune(IMC::LogBookEntry::LBET_WARNING, who.str(), ss.str());
+//  else if ( log::error==msg->kind() )
+//    m_platform->reportToDune(IMC::LogBookEntry::LBET_ERROR, who.str(), ss.str());
+//  else if (TeleoReactor::obs==msg->kind() )
+//    m_platform->reportToDune(IMC::LogBookEntry::LBET_INFO, who.str(), ss.str());
+//}
 
 
