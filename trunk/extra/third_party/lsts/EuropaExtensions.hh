@@ -8,14 +8,14 @@
 
 # include <DUNE/DUNE.hpp>
 
-# include <boost/polygon/polygon.hpp>
+//# include <boost/polygon/polygon.hpp>
 
 
 namespace TREX {
 namespace LSTS {
 
-typedef boost::polygon::polygon_data<double> Polygon;
-typedef boost::polygon::polygon_traits<Polygon>::point_type Point;
+//typedef boost::polygon::polygon_data<double> Polygon;
+//typedef boost::polygon::polygon_traits<Polygon>::point_type Point;
 
 class LatLonToOffset :public EUROPA::Constraint {
 public:
@@ -26,10 +26,7 @@ public:
 
 	void handleExecute();
 
-	static void set_home(DUNE::IMC::HomeRef *home);
-
 private:
-	static DUNE::IMC::HomeRef *s_home;
 
 	EUROPA::Domain &m_lat;
 	EUROPA::Domain &m_lon;

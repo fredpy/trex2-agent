@@ -40,7 +40,7 @@ void SafetyBug::notify(TREX::transaction::Observation const &obs)
                   r->sendMsg(ab);
                   r->reportErrorToDune("Sent abort due to " + obs.object().str() + " failure.");
                 }
-		syslog(log::error)<< "Sent abort due to " << obs.object() 
+		syslog(utils::log::error)<< "Sent abort due to " << obs.object()
 			     << " failure.";
 		aborted = true;
 	}

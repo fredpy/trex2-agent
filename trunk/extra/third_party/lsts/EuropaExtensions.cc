@@ -16,8 +16,8 @@ namespace TREX {
   namespace LSTS {
 
     using namespace EUROPA;
-    using namespace boost::polygon::operators;
-    namespace poly = boost::polygon;
+    //using namespace boost::polygon::operators;
+    //namespace poly = boost::polygon;
 
     DECLARE_FUNCTION_TYPE(RadDeg, to_rad,
         "deg_to_rad", FloatDT, 1);
@@ -76,13 +76,13 @@ using DUNE::Coordinates::WGS84;
 
 // statics
 
-DUNE::IMC::HomeRef *LatLonToOffset::s_home = NULL;
+//DUNE::IMC::HomeRef *LatLonToOffset::s_home = NULL;
 DUNE::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
 
-void LatLonToOffset::set_home(DUNE::IMC::HomeRef *home) {
-  s_home = home;
-  debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
-}
+//void LatLonToOffset::set_home(DUNE::IMC::HomeRef *home) {
+//  s_home = home;
+//  debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
+//}
 
 void InsideOpLimits::set_oplimits(DUNE::IMC::OperationalLimits *oplimits) {
   s_oplimits = oplimits;
@@ -175,11 +175,11 @@ void InsideOpLimits::handleExecute() {
   if (m_depth.isSingleton())
     depth = cast_basis(m_depth.getSingletonValue());
 
-  if (s_oplimits->mask & DUNE::IMC::OperationalLimits::OPL_MAX_DEPTH)
+  if (s_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH)
     if (depth >= s_oplimits->max_depth)
       m_depth.empty();
 
-  if (s_oplimits->mask & DUNE::IMC::OperationalLimits::OPL_AREA)
+  if (s_oplimits->mask & DUNE::IMC::OPL_AREA)
   {
 
     WGS84::displacement(s_oplimits->lat, s_oplimits->lon, 0, lat, lon, 0, &x, &y);
@@ -217,13 +217,13 @@ LatLonToOffset::LatLonToOffset(EUROPA::LabelStr const &name,
 // manipulators
 void LatLonToOffset::handleExecute() {
   double lat, lon, n, e;
-  if( NULL!=s_home ) {
+  if( false ) { // FIXME
     if( m_lat.isSingleton() && m_lon.isSingleton() ) {
       lat = cast_basis(m_lat.getSingletonValue());
       lon = cast_basis(m_lon.getSingletonValue());
-      debugMsg("lsts:ll_offset", "<n,e> = displacement(["<<s_home->lat<<", "
-          <<s_home->lon<<"], ["<<lat<<", "<<lon<<"])");
-      DUNE::Coordinates::WGS84::displacement(s_home->lat, s_home->lon, 0, lat, lon, 0, &n, &e);
+      //debugMsg("lsts:ll_offset", "<n,e> = displacement(["<<s_home->lat<<", "
+      //    <<s_home->lon<<"], ["<<lat<<", "<<lon<<"])");
+      //DUNE::Coordinates::WGS84::displacement(s_home->lat, s_home->lon, 0, lat, lon, 0, &n, &e);
       debugMsg("lsts:ll_offset", "<n,e> = <"<<n<<", "<<e<<">");
       if( intersect(m_northing, n, n, dist_precision)
           && m_northing.isEmpty() ) {
@@ -239,8 +239,8 @@ void LatLonToOffset::handleExecute() {
       if( m_northing.isSingleton() && m_easting.isSingleton() ) {
         n = cast_basis(m_northing.getSingletonValue());
         e = cast_basis(m_easting.getSingletonValue());
-        lat = s_home->lat;
-        lon = s_home->lon;
+        //lat = s_home->lat;
+        //lon = s_home->lon;
         debugMsg("lsts:ll_offset", "[lat,lon] = displace(["<<lat<<", "<<lon<<"], <"<<n<<", "<<e<<">)");
         DUNE::Coordinates::WGS84::displace(n, e, &lat, &lon);
         debugMsg("lsts:ll_offset", "[lat,lon] = ["<<lat<<", "<<lon<<"]");
