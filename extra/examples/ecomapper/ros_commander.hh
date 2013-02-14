@@ -33,6 +33,10 @@ namespace TREX {
                 bool synchronize();
                 void handleRequest(TREX::transaction::goal_id const &g);
                 void handleRecall(TREX::transaction::goal_id const &g);
+                void postObservation(std::string pred);
+
+                /** ROS handle */
+                ros::NodeHandle* node;
 
                 /** ROS Client */
                 RosClient* client;
@@ -47,12 +51,9 @@ namespace TREX {
 
                 TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
-                //ros::NodeHandle*                    m_ros;
-                //std::list<ros::Subscriber>         m_sub;
-
-                std::list<TREX::transaction::Observation> obs;
-
                 //std::mutex Messagelock;
+                /** True if a goal is being executed by ROS */
+                bool goalLoaded;
 
                 TREX::transaction::TICK m_nextTick;
 

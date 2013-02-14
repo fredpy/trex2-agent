@@ -27,9 +27,9 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     provide(ctd_rhObj);
     syslog()<<"I want to own "<<fixObj;
     provide(fixObj);
-    syslog()<<"I want to own "<<fixObj;
+    syslog()<<"I want to own "<<navSatFixObj;
     provide(navSatFixObj);
-    syslog()<<"I want to own "<<fixObj;
+    syslog()<<"I want to own "<<wqmObj;
     provide(wqmObj);
 }
 
