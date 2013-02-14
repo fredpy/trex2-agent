@@ -8,23 +8,32 @@ using namespace TREX::ecomapper;
 Symbol const Ros_Commander::ros_commanderObj("ros_commander");
 
 Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false)
+    :TeleoReactor(arg,false), goalLoaded(false)
 {
-    int argc = 0;
-    char **argv = NULL;
-    ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
-    //m_ros = new ros::NodeHandle();
-    client = new actionlib::SimpleActionClient<ecomapper_msgs::EcomapperCommandAction>
-                                ("trex2_client_commander");
+
+    //int argc = 0;
+    //char **argv = NULL;
+    //ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
 
     syslog()<<"I want to own "<<ros_commanderObj;
     provide(ros_commanderObj);
+
+    node = new ros::NodeHandle;
+
+    client = new actionlib::SimpleActionClient<ecomapper_msgs::EcomapperCommandAction>
+                                ("trex2_client_commander");
+    bool clientConnected = client->waitForServer(ros::Duration(5.0));
+    if(clientConnected)
+        syslog()<<"Ros_Commander connected to client server";
+    else
+        syslog("Warning")<<"Ros_Commander did not connect to client server";
 
 }
 
 Ros_Commander::~Ros_Commander()
 {
     delete client;
+    delete node;
 }
 
 
@@ -36,6 +45,10 @@ void Ros_Commander::handleInit()
     sonar.channel = ecomapper_msgs::SonarSettings::CHANNEL_BOTH;
     sonar.type = ecomapper_msgs::SonarSettings::SONAR_TYPE_IMAGENEX;
     sonar.gain = 8;
+
+    ///First observation
+    postObservation(std::string("open"));
+
 }
 
 bool Ros_Commander::sendCommand(double const& longitude, double const& latitude)
@@ -51,13 +64,26 @@ bool Ros_Commander::sendCommand(double const& longitude, double const& latitude)
     wp.sonar_settings = sonar;
     wp.max_pitch = 20;
     ecoGoal.waypoints.push_back(wp);
-    client->sendGoal(ecoGoal, boost::bind(&Ros_Commander::goalCompleted, this, _1, _2), NULL, NULL);
+    if(client->isServerConnected())
+    {
+        client->sendGoal(ecoGoal, boost::bind(&Ros_Commander::goalCompleted, this, _1, _2), NULL, NULL);
+        postObservation(std::string("closed"));
+        goalLoaded = true;
+    } else
+        syslog("Warning")<<"Ros_Commander did not send goal because it is not connected to client";
 }
 
 void Ros_Commander::goalCompleted(const actionlib::SimpleClientGoalState& state,
                     const ecomapper_msgs::EcomapperCommandResultConstPtr& result)
 {
+    postObservation(std::string("open"));
+    goalLoaded = false;
+}
 
+void Ros_Commander::postObservation(std::string pred)
+{
+    Observation obs = Observation(ros_commanderObj, pred);
+    TREX::transaction::TeleoReactor::postObservation(obs);
 }
 
 bool Ros_Commander::synchronize()
@@ -65,19 +91,10 @@ bool Ros_Commander::synchronize()
     TICK cur = getCurrentTick();
     if(m_nextTick<=cur)
     {
-        while(!m_pending.empty())
+        if(client->isServerConnected() && goalLoaded)
         {
-            if(m_pending.front()->startsAfter(cur))
-            {
-                if(m_pending.front()->startsBefore(cur))
-                {
-                    m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
-                    m_pending.pop_front();
-                }
-                break;
-            } else {
-                m_pending.pop_front();
-            }
+            actionlib::SimpleClientGoalState state = client->getState();
+            postObservation(state.toString());
         }
     }
     return true;
@@ -85,18 +102,20 @@ bool Ros_Commander::synchronize()
 
 void Ros_Commander::handleRequest(goal_id const &g)
 {
-
+    double latitude, longitude;
+    try
+    {
+        latitude = boost::any_cast<double>(g->getAttribute(Symbol("latitude")).domain().getSingleton());
+        longitude = boost::any_cast<double>(g->getAttribute(Symbol("longitude")).domain().getSingleton());
+    } catch (boost::bad_any_cast& err) {
+        syslog("Error")<<"Ros_commander casting error in handleRequest";
+        return;
+    }
+    sendCommand(longitude, latitude);
 }
 
 void Ros_Commander::handleRecall(goal_id const &g)
 {
-    std::list<goal_id>::iterator i = m_pending.begin();
-    for(; i!=m_pending.end(); ++i)
-    {
-        if(*i==g)
-        {
-            m_pending.erase(i);
-            return;
-        }
-    }
+    ///Can't cancel a specifc goal but the current running goal
+    client->cancelGoal();
 }

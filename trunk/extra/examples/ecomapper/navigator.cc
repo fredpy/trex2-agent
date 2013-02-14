@@ -1,5 +1,6 @@
 #include "navigator.hh"
 #include "ros_listener.hh"
+#include "ros_commander.hh"
 
 #include <trex/domain/FloatDomain.hh>
 #include <iostream>
@@ -8,15 +9,18 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::ecomapper;
 
+Symbol const Navigator::navigatorObj("navigator");
+Symbol const Navigator::waypointObj("waypoint");
+
 static const std::string gLatitude("latitude"), gLongitude("longitude"),
-                         gDepth("depth"), gAltitude("altitude"),
-                         gTotal_Water_Column("Total_Water_Column");
+                         gDepth("depth"), gAltitude("altitude");
 static const double gDepthThreshold(100);
 
 Navigator::Navigator(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false)
+    :TeleoReactor(arg,false), ros_commanderBusy(true)
 {
-
+    syslog()<<"I want to own "<<navigatorObj;
+    provide(navigatorObj);
 }
 
 Navigator::~Navigator() {}
@@ -27,28 +31,20 @@ void Navigator::handleInit()
     use(Ros_Listener::ctd_rhObj);
     use(Ros_Listener::fixObj);
     use(Ros_Listener::navSatFixObj);
+    use(Ros_Commander::ros_commanderObj);
 }
 
 bool Navigator::synchronize()
 {
-    TICK cur = getCurrentTick();
-    if(m_nextTick<=cur)
+    if(!m_pending.empty() && !ros_commanderBusy)
     {
-        while(!m_pending.empty())
-        {
-            if(m_pending.front()->startsAfter(cur))
-            {
-                if(m_pending.front()->startsBefore(cur))
-                {
-                    //setValue(m_pending.front());
-                    m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
-                    m_pending.pop_front();
-                }
-                break;
-            } else {
-                m_pending.pop_front();
-            }
-        }
+        goal_id& navGoal = m_pending.front();
+        Goal goal = Goal(Ros_Commander::ros_commanderObj, waypointObj);
+        double latit, longit;
+        goal.restrictAttribute(navGoal->getAttribute(gLatitude));
+        goal.restrictAttribute(navGoal->getAttribute(gLongitude));
+        postGoal(goal);
+        m_pending.pop_front();
     }
     return true;
 }
@@ -65,6 +61,11 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
 		fixObservation(obs);
 	else if(object==Ros_Listener::navSatFixObj)
 		navSatFixObservation(obs);
+    else if(object==Ros_Commander::ros_commanderObj)
+        if(obs.predicate()=="PENDING" || obs.predicate()=="ACTIVE")
+            ros_commanderBusy = true;
+        else
+            ros_commanderBusy = false;
 }
 
 void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
@@ -137,7 +138,10 @@ double Navigator::getAttribute(std::string const &name, Observation const &obs)
 
 void Navigator::handleRequest(goal_id const &g)
 {
-
+    if(g->predicate()==waypointObj)
+    {
+        m_pending.push_back(g);
+    }
 }
 
 void Navigator::handleRecall(goal_id const &g)

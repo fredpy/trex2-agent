@@ -42,11 +42,16 @@ namespace TREX {
 				magnet::math::Spline spline;
 				std::mutex lock;
 
+				bool ros_commanderBusy;
+
 				boost::unordered_map<std::string, double> values;
 
                 TREX::transaction::TICK m_nextTick;
 
                 std::list<TREX::transaction::goal_id> m_pending;
+
+                static TREX::utils::Symbol const navigatorObj;
+                static TREX::utils::Symbol const waypointObj;
         };
 
     }
