@@ -5,6 +5,7 @@
 #include "std_msgs/String.h"
 
 //ecomapper message types
+#include "ecomapper_msgs/State.h"
 #include "ecomapper_msgs/DVL.h"
 #include "ecomapper_msgs/CTD.h"
 #include "ecomapper_msgs/WQM.h"
@@ -31,6 +32,7 @@ namespace TREX {
                 /**
                 *   Callbacks for ROS
                 */
+                void stateCallback(const ecomapper_msgs::State::ConstPtr& msg);
                 void dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg);
                 void wqmCallback(const ecomapper_msgs::WQM::ConstPtr& msg);
                 void ctd_rhCallback(const ecomapper_msgs::CTD::ConstPtr& msg);
@@ -38,6 +40,7 @@ namespace TREX {
                 void navSatFixCallback(const sensor_msgs::NavSatFix::ConstPtr& msg);
 
                 //Public timelines that connect to ROS
+                static TREX::utils::Symbol const stateObj;
                 static TREX::utils::Symbol const dvlObj;
         		static TREX::utils::Symbol const ctd_rhObj;
        			static TREX::utils::Symbol const fixObj;

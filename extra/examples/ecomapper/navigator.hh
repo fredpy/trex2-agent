@@ -26,17 +26,19 @@ namespace TREX {
                 void handleRequest(TREX::transaction::goal_id const &g);
                 void handleRecall(TREX::transaction::goal_id const &g);
 
+                void stateObservation(TREX::transaction::Observation const &obs);
                 void dvlObservation(TREX::transaction::Observation const &obs);
+                void wqmObservation(TREX::transaction::Observation const &obs);
                 void ctd_rhObservation(TREX::transaction::Observation const &obs);
                 void fixObservation(TREX::transaction::Observation const &obs);
                 void navSatFixObservation(TREX::transaction::Observation const &obs);
 
                 double getAttribute(std::string const &name, TREX::transaction::Observation const &obs);
 
-                void addToMap(std::string name, double value)
-                    { values[name]=value; };
-                double getMapValue(std::string name)
-                    { return values[name];};
+                void addToMap(TREX::transaction::TICK tick, double value)
+                    { columns[tick]=value; };
+                double getMapValue(TREX::transaction::TICK tick)
+                    { return columns[tick];};
 
 				//Cubic spline for path making
 				magnet::math::Spline spline;
@@ -44,9 +46,12 @@ namespace TREX {
 
 				bool ros_commanderBusy;
 
-				boost::unordered_map<std::string, double> values;
+                typedef boost::unordered_map<TREX::transaction::TICK, double> WaterColumnMap;
+				WaterColumnMap columns;
+				typedef boost::unordered_map<TREX::transaction::TICK, std::pair<double, double> > CoordinateMap;
+				CoordinateMap coordinates;
 
-                TREX::transaction::TICK m_nextTick;
+                TREX::transaction::TICK currentTick;
 
                 std::list<TREX::transaction::goal_id> m_pending;
 
