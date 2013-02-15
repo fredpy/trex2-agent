@@ -18,7 +18,8 @@ static const std::string gLatitude("latitude"), gLongitude("longitude"),
 static const double gDepthThreshold(100);
 
 Navigator::Navigator(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false), ros_commanderBusy(true)
+    :TeleoReactor(arg,false), ros_commanderBusy(true),
+    beginBoundaryTracking(false), nextwp_number(2), numberOfSplinePoints(0)
 {
     syslog()<<"I want to own "<<navigatorObj;
     provide(navigatorObj);
@@ -42,14 +43,49 @@ bool Navigator::synchronize()
 {
     if(currentTick>=2)
     {
+        CoordinateMap::iterator coordinate = coordinates.find(currentTick);
+        ///First equals latitude and second equals longitude
+        if(!beginBoundaryTracking && wp_numbers[currentTick]==nextwp_number)
+        {
+            beginBoundaryTracking = true;
+        }
+        if(beginBoundaryTracking)
+        {
+            double currentWaypoint = wp_numbers[currentTick],
+                   currentWaterColumn = columns[currentTick],
+                   avgWaterColumn = 0, difference = 0;
+            ///We are going back 10 ticks to check if they are in the same waypoint
+            if(wp_numbers[currentTick-10]==currentWaypoint)
+            {
+                ///Average the values of 5 ticks starting 10 ticks before the current
+                for(TICK t = currentTick-10; t<=currentTick-5; t++)
+                {
+                    avgWaterColumn += columns[t];
+                }
+                avgWaterColumn /= 5;
+                difference = std::abs(currentWaterColumn - avgWaterColumn);
+                ///If the difference is greater than value than we add it to the spline
+                if(difference>1)
+                {
+                    nextwp_number++;
+                    beginBoundaryTracking = false;
+                    ///Add to spline
+                    spline.addPoint(coordinate->second.first, coordinate->second.second);
+                    numberOfSplinePoints++;
+                }
+            }
+
+        }
+
+        if(wp_numbers[currentTick]>=5 && numberOfSplinePoints>=3)
+        {
+            double longitude = spline(coordinate->second.first);
+        }
+
         //std::fstream file;
         //file.open("test.csv", std::fstream::out | std::fstream::app);
         //std::pair<double, double>& coordinate = coordinates[currentTick];
         //file<<coordinate.first<<","<<coordinate.second<<",";
-        if(columns[currentTick]>=999)
-        {
-            columns[currentTick] = columns[currentTick-1];
-        }
         //file<<columns[currentTick]<<std::endl;
         //file.close();
         if(!m_pending.empty() && !ros_commanderBusy)
@@ -92,15 +128,29 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
 
 void Navigator::stateObservation(TREX::transaction::Observation const &obs)
 {
-
+    lock.lock();
+    if(obs.predicate()=="state")
+    {
+        double totalWaterColumn = getAttribute(gDepth, obs)+getAttribute(gAltitude, obs);
+        if(totalWaterColumn>=999)
+            columns[currentTick] = columns[currentTick-1];
+        else
+            columns[currentTick] = totalWaterColumn;
+        double x = getAttribute(gLatitude, obs);
+        double y = getAttribute(gLongitude, obs);
+        coordinates[currentTick]= std::make_pair(x,y);
+        wp_numbers[currentTick]= getAttribute("wp_number", obs);
+    }
+    lock.unlock();
 }
 
 void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
 {
     lock.lock();
+    /*
     if(obs.predicate()=="dvl")
     {
-        WaterColumnMap::iterator column;
+        TickDoubleMap::iterator column;
         column = columns.find(currentTick);
         if(column!=columns.end())
         {
@@ -109,15 +159,17 @@ void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
             columns[currentTick]= getAttribute(gDepth, obs);
         }
     }
+    */
     lock.unlock();
 }
 
 void Navigator::wqmObservation(TREX::transaction::Observation const &obs)
 {
     lock.lock();
+    /*
     if(obs.predicate()=="wqm")
     {
-        WaterColumnMap::iterator column;
+        TickDoubleMap::iterator column;
         column = columns.find(currentTick);
         if(column!=columns.end())
         {
@@ -126,6 +178,7 @@ void Navigator::wqmObservation(TREX::transaction::Observation const &obs)
             columns[currentTick]= getAttribute(gDepth, obs);
         }
     }
+    */
     lock.unlock();
 }
 
@@ -137,36 +190,14 @@ void Navigator::ctd_rhObservation(TREX::transaction::Observation const &obs)
 void Navigator::fixObservation(TREX::transaction::Observation const &obs)
 {
 	lock.lock();
+	/*
 	if(obs.predicate()=="extended_fix")
 	{
         double x = getAttribute(gLatitude, obs);
         double y = getAttribute(gLongitude, obs);
         coordinates[currentTick]= std::make_pair(x,y);
 	}
-
-    /*
-    bool nextPoint = (getMapValue(gLatitude)!=0)?true:false;
-    //If the depth is greater than the threshold add the inital point
-	if(!nextPoint && getMapValue(gTotal_Water_Column) >= gDepthThreshold)
-	{
-	    addToMap(gLatitude, x);
-        addToMap(gLongitude, y);
-	}
-	//If the dpeth is less than the treshold than we see
-	//if we already have a value which means we are at the end of the depth
-	else if(nextPoint)
-	{
-	    //We calculate the midpoint between the start and end points of the
-	    //side of the canyon we just completed
-	    double midx = (getMapValue(gLatitude)+x)/2;
-	    double midy = (getMapValue(gLongitude)+y)/2;
-	    //Add the point into the cubic spline
-	    spline.addPoint(midx, midy);
-	    //Then zero out the values
-	    addToMap(gLatitude, 0);
-	    addToMap(gLongitude, 0);
-	}
-	*/
+    */
 	lock.unlock();
 }
 

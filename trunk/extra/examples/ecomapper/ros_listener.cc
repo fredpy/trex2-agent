@@ -63,10 +63,12 @@ void Ros_Listener::stateCallback(const ecomapper_msgs::State::ConstPtr& msg)
     state.restrictAttribute("longitude", FloatDomain(longitude));
     const double& depth = msg->location.depth;
     state.restrictAttribute("depth", FloatDomain(depth));
-    const double& wp_number = msg->wp_number;
-    state.restrictAttribute("wp_number", FloatDomain(wp_number));
     const double& altitude = msg->location.altitude;
     state.restrictAttribute("altitude", FloatDomain(altitude));
+    const double& wp_number = msg->wp_number;
+    state.restrictAttribute("wp_number", FloatDomain(wp_number));
+    const double& wp_distance = msg->wp_distance;
+    state.restrictAttribute("wp_distance", FloatDomain(wp_distance));
     postObservation(state);
     Messagelock.unlock();
 }
