@@ -44,12 +44,16 @@ namespace TREX {
 				magnet::math::Spline spline;
 				std::mutex lock;
 
+                bool beginBoundaryTracking;
 				bool ros_commanderBusy;
 
-                typedef boost::unordered_map<TREX::transaction::TICK, double> WaterColumnMap;
-				WaterColumnMap columns;
+                typedef boost::unordered_map<TREX::transaction::TICK, double> TickDoubleMap;
+				TickDoubleMap columns;
 				typedef boost::unordered_map<TREX::transaction::TICK, std::pair<double, double> > CoordinateMap;
 				CoordinateMap coordinates;
+				TickDoubleMap wp_numbers;
+				double nextwp_number;
+				int numberOfSplinePoints;
 
                 TREX::transaction::TICK currentTick;
 
