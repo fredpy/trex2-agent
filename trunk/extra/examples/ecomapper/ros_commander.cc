@@ -1,5 +1,6 @@
 #include "ros_commander.hh"
 #include <string>
+#include <boost/thread.hpp>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
@@ -7,21 +8,27 @@ using namespace TREX::ecomapper;
 
 Symbol const Ros_Commander::ros_commanderObj("ros_commander");
 
+void spinThread()
+{
+    ros::spin();
+}
+
 Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false), goalLoaded(false)
 {
-
-    //int argc = 0;
-    //char **argv = NULL;
-    //ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
-
     syslog()<<"I want to own "<<ros_commanderObj;
     provide(ros_commanderObj);
+
+    int argc = 0;
+    char **argv = NULL;
+    ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
 
     node = new ros::NodeHandle;
 
     client = new actionlib::SimpleActionClient<ecomapper_msgs::EcomapperCommandAction>
                                 ("trex2_client_commander");
+    boost::thread spin_thread(&spinThread);
+
     bool clientConnected = client->waitForServer(ros::Duration(5.0));
     if(clientConnected)
         syslog()<<"Ros_Commander connected to client server";
@@ -32,6 +39,7 @@ Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
 
 Ros_Commander::~Ros_Commander()
 {
+    spin_thread.join();
     delete client;
     delete node;
 }

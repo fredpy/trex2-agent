@@ -4,6 +4,7 @@
 
 #include <trex/domain/FloatDomain.hh>
 #include <iostream>
+#include <fstream>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
@@ -27,25 +28,42 @@ Navigator::~Navigator() {}
 
 void Navigator::handleInit()
 {
+    currentTick = 0;
+    use(Ros_Listener::stateObj);
     use(Ros_Listener::dvlObj);
     use(Ros_Listener::ctd_rhObj);
     use(Ros_Listener::fixObj);
+    use(Ros_Listener::wqmObj);
     use(Ros_Listener::navSatFixObj);
     use(Ros_Commander::ros_commanderObj);
 }
 
 bool Navigator::synchronize()
 {
-    if(!m_pending.empty() && !ros_commanderBusy)
+    if(currentTick>=2)
     {
-        goal_id& navGoal = m_pending.front();
-        Goal goal = Goal(Ros_Commander::ros_commanderObj, waypointObj);
-        double latit, longit;
-        goal.restrictAttribute(navGoal->getAttribute(gLatitude));
-        goal.restrictAttribute(navGoal->getAttribute(gLongitude));
-        postGoal(goal);
-        m_pending.pop_front();
+        //std::fstream file;
+        //file.open("test.csv", std::fstream::out | std::fstream::app);
+        //std::pair<double, double>& coordinate = coordinates[currentTick];
+        //file<<coordinate.first<<","<<coordinate.second<<",";
+        if(columns[currentTick]>=999)
+        {
+            columns[currentTick] = columns[currentTick-1];
+        }
+        //file<<columns[currentTick]<<std::endl;
+        //file.close();
+        if(!m_pending.empty() && !ros_commanderBusy)
+        {
+            goal_id& navGoal = m_pending.front();
+            Goal goal = Goal(Ros_Commander::ros_commanderObj, waypointObj);
+            double latit, longit;
+            goal.restrictAttribute(navGoal->getAttribute(gLatitude));
+            goal.restrictAttribute(navGoal->getAttribute(gLongitude));
+            postGoal(goal);
+            m_pending.pop_front();
+        }
     }
+    currentTick++;
     return true;
 }
 
@@ -53,8 +71,12 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
 {
 	///Dispatching the different timeline observations to their respective function
 	TREX::utils::Symbol const & object = obs.object();
-	if(object==Ros_Listener::dvlObj)
+	if(object==Ros_Listener::stateObj)
+        stateObservation(obs);
+	else if(object==Ros_Listener::dvlObj)
 		dvlObservation(obs);
+    else if(object==Ros_Listener::wqmObj)
+		wqmObservation(obs);
 	else if(object==Ros_Listener::ctd_rhObj)
 		ctd_rhObservation(obs);
 	else if(object==Ros_Listener::fixObj)
@@ -68,17 +90,42 @@ void Navigator::notify(TREX::transaction::Observation const &obs)
             ros_commanderBusy = false;
 }
 
+void Navigator::stateObservation(TREX::transaction::Observation const &obs)
+{
+
+}
+
 void Navigator::dvlObservation(TREX::transaction::Observation const &obs)
 {
     lock.lock();
-    /*
-    double depth = getAttribute(gDepth, obs);
-    double altitude = getAttribute(gAltitude, obs);
-    addToMap(gDepth, depth);
-    addToMap(gAltitude, altitude);
-    //Still need to find the actual total_water_column
-    addToMap(gTotal_Water_Column,depth+altitude);
-    */
+    if(obs.predicate()=="dvl")
+    {
+        WaterColumnMap::iterator column;
+        column = columns.find(currentTick);
+        if(column!=columns.end())
+        {
+            column->second += getAttribute(gDepth, obs);
+        } else {
+            columns[currentTick]= getAttribute(gDepth, obs);
+        }
+    }
+    lock.unlock();
+}
+
+void Navigator::wqmObservation(TREX::transaction::Observation const &obs)
+{
+    lock.lock();
+    if(obs.predicate()=="wqm")
+    {
+        WaterColumnMap::iterator column;
+        column = columns.find(currentTick);
+        if(column!=columns.end())
+        {
+            column->second += getAttribute(gDepth, obs);
+        } else {
+            columns[currentTick]= getAttribute(gDepth, obs);
+        }
+    }
     lock.unlock();
 }
 
@@ -90,9 +137,14 @@ void Navigator::ctd_rhObservation(TREX::transaction::Observation const &obs)
 void Navigator::fixObservation(TREX::transaction::Observation const &obs)
 {
 	lock.lock();
-	/*
-	double x = getAttribute(gLatitude, obs);
-    double y = getAttribute(gLongitude, obs);
+	if(obs.predicate()=="extended_fix")
+	{
+        double x = getAttribute(gLatitude, obs);
+        double y = getAttribute(gLongitude, obs);
+        coordinates[currentTick]= std::make_pair(x,y);
+	}
+
+    /*
     bool nextPoint = (getMapValue(gLatitude)!=0)?true:false;
     //If the depth is greater than the threshold add the inital point
 	if(!nextPoint && getMapValue(gTotal_Water_Column) >= gDepthThreshold)

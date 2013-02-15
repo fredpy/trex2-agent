@@ -52,6 +52,7 @@ namespace TREX {
                 TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
                 //std::mutex Messagelock;
+                boost::thread spin_thread;
                 /** True if a goal is being executed by ROS */
                 bool goalLoaded;
 

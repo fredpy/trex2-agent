@@ -7,6 +7,7 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::ecomapper;
 
+Symbol const Ros_Listener::stateObj("state");
 Symbol const Ros_Listener::dvlObj("dvl");
 Symbol const Ros_Listener::ctd_rhObj("ctd_rh");
 Symbol const Ros_Listener::fixObj("extended_fix");
@@ -41,6 +42,7 @@ Ros_Listener::~Ros_Listener()
 
 void Ros_Listener::handleInit()
 {
+    m_sub.push_back(m_ros->subscribe(stateObj.str(), 10, &Ros_Listener::stateCallback, this));
     m_sub.push_back(m_ros->subscribe(dvlObj.str(), 10, &Ros_Listener::dvlCallback, this));
     m_sub.push_back(m_ros->subscribe(ctd_rhObj.str(), 10, &Ros_Listener::ctd_rhCallback, this));
     m_sub.push_back(m_ros->subscribe(fixObj.str(), 10, &Ros_Listener::fixCallback, this));
@@ -48,6 +50,26 @@ void Ros_Listener::handleInit()
     m_sub.push_back(m_ros->subscribe(wqmObj.str(), 10, &Ros_Listener::wqmCallback, this));
     start();
 }
+
+void Ros_Listener::stateCallback(const ecomapper_msgs::State::ConstPtr& msg)
+{
+    Messagelock.lock();
+    Observation state(stateObj, Symbol(stateObj.str()));
+    const double& latitude = msg->location.latitude;
+    state.restrictAttribute("latitude", FloatDomain(latitude));
+    const double& longitude = msg->location.longitude;
+    state.restrictAttribute("longitude", FloatDomain(longitude));
+    const double& depth = msg->location.depth;
+    state.restrictAttribute("depth", FloatDomain(depth));
+    const double& wp_number = msg->wp_number;
+    state.restrictAttribute("wp_number", FloatDomain(wp_number));
+    const double& altitude = msg->location.altitude;
+    state.restrictAttribute("altitude", FloatDomain(altitude));
+    postObservation(state);
+    Messagelock.unlock();
+}
+
+
 
 void Ros_Listener::dvlCallback(const ecomapper_msgs::DVL::ConstPtr& msg)
 {
