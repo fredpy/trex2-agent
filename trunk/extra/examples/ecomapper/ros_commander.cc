@@ -27,7 +27,7 @@ Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
 
     client = new actionlib::SimpleActionClient<ecomapper_msgs::EcomapperCommandAction>
                                 ("trex2_client_commander");
-    boost::thread spin_thread(&spinThread);
+    spin_thread = boost::thread(&spinThread);
 
     bool clientConnected = client->waitForServer(ros::Duration(5.0));
     if(clientConnected)
