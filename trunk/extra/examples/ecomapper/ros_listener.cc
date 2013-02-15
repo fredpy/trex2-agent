@@ -23,6 +23,8 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
     m_ros = new ros::NodeHandle();
 
     syslog()<<"I want to own "<<dvlObj;
+    provide(stateObj);
+    syslog()<<"I want to own "<<dvlObj;
     provide(dvlObj);
     syslog()<<"I want to own "<<ctd_rhObj;
     provide(ctd_rhObj);
