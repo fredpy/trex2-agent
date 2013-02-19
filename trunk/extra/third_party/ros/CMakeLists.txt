@@ -46,20 +46,20 @@ else(ROS_NO_CHECK)
   find_package(ROS)
   if(ROS_CONFIG)
     find_ros_pkg(roscpp)
-    if(roscpp_PACKAGE_PATH)
-      include_directories(${roscpp_INCLUDE_DIRS})
-      add_definitions(${roscpp_CFLAGS})
-    else(roscpp_PACKAGE_PATH)
+    if(ROS_roscpp_PACKAGE_PATH)
+      include_directories(${ROS_roscpp_INCLUDE_DIRS})
+      add_definitions(${ROS_roscpp_CFLAGS})
+    else(ROS_roscpp_PACKAGE_PATH)
       message(SEND_ERROR "Failed to find roscpp")
-    endif(roscpp_PACKAGE_PATH)
+    endif(ROS_roscpp_PACKAGE_PATH)
 
     find_ros_pkg(actionlib)
-    if(actionlib_PACKAGE_PATH)
-      include_directories(${actionlib_INCLUDE_DIRS})
-      add_definitions(${actionlib_CFLAGS})
-    else(actionlib_PACKAGE_PATH)
+    if(ROS_actionlib_PACKAGE_PATH)
+      include_directories(${ROS_actionlib_INCLUDE_DIRS})
+      add_definitions(${ROS_actionlib_CFLAGS})
+    else(ROS_actionlib_PACKAGE_PATH)
       message(SEND_ERROR "Failed to find actionlib")
-    endif(actionlib_PACKAGE_PATH)
+    endif(ROS_actionlib_PACKAGE_PATH)
     
   else(ROS_CONFIG)
     message(SEND_ERROR "Failed to loacte ROS configuration file.")
@@ -92,12 +92,12 @@ install(DIRECTORY trex/ DESTINATION include/trex/
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
   
-target_link_libraries(TREXros ${roscpp_LINK_FLAGS} 
-  -L${roscpp_LINK_PATH} 
-  ${actionlib_LINK_FLAGS} 
-  -L${actionlib_LINK_PATH} 
-  ${roscpp_LINK_LIBS} 
-  ${actionlib_LINK_LIBS} 
+target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
+  -L${ROS_roscpp_LINK_PATH} 
+  ${ROS_actionlib_LINK_FLAGS} 
+  -L${ROS_actionlib_LINK_PATH} 
+  ${ROS_roscpp_LINK_LIBS} 
+  ${ROS_actionlib_LINK_LIBS} 
   TREXagent)
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
