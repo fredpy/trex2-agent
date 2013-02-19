@@ -88,8 +88,8 @@ using namespace TREX::utils;
 
 namespace {
 
-  UNIQ_PTR<Agent> my_agent;
   SingletonUse<LogManager> amc_log;
+  UNIQ_PTR<Agent> my_agent;
   
 }
 
@@ -103,6 +103,11 @@ extern "C" {
     exit(1);
   }
 
+  void amc_terminate() {
+    amc_log->syslog("amc", error)<<" Received a terminate";
+    abort();
+  }
+  
 }
 
 
@@ -155,11 +160,14 @@ int main(int argc, char **argv) {
       return -1;
     }
   }
+  std::set_terminate(amc_terminate);
+  
   // Clean-up the agent on interruptions
   signal(SIGINT, amc_cleanup);
   signal(SIGTERM, amc_cleanup);
   signal(SIGQUIT, amc_cleanup);
   signal(SIGKILL, amc_cleanup);
+  signal(SIGABRT, amc_cleanup);
   // force trex log initialization
   amc_log->logPath();
 
