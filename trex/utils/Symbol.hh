@@ -181,7 +181,7 @@ namespace TREX {
        * @return the length of the string representing this instance
        */
       size_t length() const {
-	return size_t(empty()?0:m_name->size());
+	return size_t(empty()?0:m_name.get().size());
       }
       
       /** @brief Equality test
