@@ -46,7 +46,7 @@
 # include <list>
 # include <boost/filesystem.hpp>
 
-# include "log/text_log.hh"
+# include "log/log_pipe.hh"
 # include "log/out_file.hh"
 # include "asio_runner.hh"
 
@@ -389,6 +389,7 @@ namespace TREX {
       /** @brief syslog text log file */
       log::text_log   m_syslog;
       boost::shared_ptr<log::out_file> m_trex_log;
+      boost::shared_ptr<log::log_pipe> m_out, m_err;
       
       /** @brief verbosity level */
       LogLevel    m_level;

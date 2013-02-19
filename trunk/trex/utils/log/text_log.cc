@@ -32,9 +32,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "text_log.hh"
+#include "log_pipe.hh"
 #include "out_file.hh"
 #include "bits/log_stream.hh" 
+
+#include "../platform/chrono.hh"
 
 #include <boost/smart_ptr.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
@@ -161,3 +163,60 @@ void out_file::operator()(entry::pointer msg) {
   }
 }
 
+/*
+ * class TREX::util::log_pipe
+ */
+
+// structors 
+
+log_pipe::log_pipe(text_log &log, std::ostream &os, 
+		   TREX::utils::Symbol const &who,
+                   TREX::utils::Symbol const &what)
+  :m_who(who), m_what(what), m_log(log), m_dest(os), m_flush(log.service()) {
+  m_initial = m_dest.rdbuf();
+  m_me = new boost::iostreams::stream_buffer<pipe_sink>(*this);
+  m_dest.rdbuf(m_me);
+}
+
+
+log_pipe::~log_pipe() {
+  m_flush.cancel();
+  m_dest.rdbuf(m_initial);
+  delete m_me;
+  if( !m_msg.empty() )
+    m_log(m_who, m_what)<<m_msg;
+}
+	
+std::streamsize log_pipe::pipe_sink::write(log_pipe::pipe_sink::char_type const *s,
+                                          std::streamsize n) {
+  m_master->m_flush.cancel();
+  std::streamsize ret = m_master->m_initial->sputn(s, n);
+  if( ret>0 ) {
+    m_master->m_msg.append(s, ret);
+    m_master->flush_msg();
+  }
+  return ret;
+}
+
+void log_pipe::flush_to() {
+  std::string tmp;
+  std::swap(tmp, m_msg);
+  if( !tmp.empty() )
+    m_log(m_who, m_what)<<tmp;
+}
+
+
+void log_pipe::flush_msg() {
+  if( !m_msg.empty() ) {
+    std::string::size_type last = m_msg.rfind('\n');
+    if( last!=std::string::npos ) {
+      if( last>0 )
+	m_log(m_who, m_what)<<m_msg.substr(0, last);
+      m_msg.erase(0, last+1);
+    }
+    if( !m_msg.empty() ) {
+      m_flush.expires_from_now(boost::posix_time::milliseconds(100));
+      m_flush.async_wait(boost::bind(&log_pipe::flush_to, this));
+    }
+  }
+}

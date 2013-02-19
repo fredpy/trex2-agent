@@ -93,6 +93,7 @@ add_library(TREXutils SHARED
   log/bits/log_sig.hh
   log/text_log.hh
   log/out_file.hh
+  log/log_pipe.hh
   # platform specific information
   platform/chrono.hh 
   platform/memory.hh
@@ -132,6 +133,7 @@ source_group("Header\ Files\\log" FILES
   log/stream.hh
   log/text_log.hh
   log/out_file.hh
+  log/log_pipe.hh
 )
 
 source_group("Header\ Files\\log\\bits" FILES 
