@@ -62,10 +62,11 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
 
-  UNIQ_PTR<Agent> my_agent;
-
   /** @brief entry point to TREX system log */
   SingletonUse<LogManager> s_log;
+
+  UNIQ_PTR<Agent> my_agent;
+
 
   /** @brief @c sim help message
    *
@@ -176,9 +177,18 @@ extern "C" {
     s_log->syslog("sim", error)<<"Received SIGABRT"; 
     s_log->syslog("sim", error)<<"============================================";
     std::cout<<"Received abort."<<std::endl;
+    my_agent.reset();
+    exit(1);
   } 
 
+  void sim_terminate() {
+    std::cerr<<"Program terminated."<<std::endl;
+    abort();
+  }
+
 }
+
+
 
 
 /** @brief Interactive execution (sim) main function
@@ -237,6 +247,8 @@ int main(int argc, char **argv) {
     if( argc>=3 )
       clk.reset(new StepClock(Clock::duration_type(0), string_cast<size_t>(argv[2])));
     
+    std::set_terminate(sim_terminate);
+
     // Clean-up the agent on interruptions
     signal(SIGINT, sim_cleanup);
     signal(SIGTERM, sim_cleanup);
@@ -310,8 +322,10 @@ int main(int argc, char **argv) {
 	    std::cout<<"Reactor \""<<name<<"\" killed."<<std::endl;
 	  }
 	}
-      } else 
+      } else {
+        std::cerr<<"Unknown command \""<<cmdString<<"\""<<std::endl;
 	printHelp();
+      }
     }
   } catch(Exception const &e) {
     std::cerr<<"Caught a TREX exception: "<<e<<std::endl;
