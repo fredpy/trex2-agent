@@ -32,79 +32,30 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-cmake_minimum_required(VERSION 2.8)
 
-# locate ROS
-option(ROS_NO_CHECK "Include without checking" OFF)
-mark_as_advanced(ROS_NO_CHECK)
+set(ROS_ROOT $ENV{ROS_ROOT} CACHE PATH "root path for ROS")
 
-if(ROS_NO_CHECK)
-  message(STATUS "Include ROS in the project with no checking")
-  message(WARNING "Including ROS with no checking result on the "
-    "project not being compilable")
-else(ROS_NO_CHECK)
-  find_package(ROS)
-  if(ROS_CONFIG)
-    find_ros_pkg(roscpp)
-    if(roscpp_PACKAGE_PATH)
-      include_directories(${roscpp_INCLUDE_DIRS})
-      add_definitions(${roscpp_CFLAGS})
-    else(roscpp_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find roscpp")
-    endif(roscpp_PACKAGE_PATH)
-
-    find_ros_pkg(actionlib)
-    if(actionlib_PACKAGE_PATH)
-      include_directories(${actionlib_INCLUDE_DIRS})
-      add_definitions(${actionlib_CFLAGS})
-    else(actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find actionlib")
-    endif(actionlib_PACKAGE_PATH)
-    
-  else(ROS_CONFIG)
-    message(SEND_ERROR "Failed to loacte ROS configuration file.")
-  endif(ROS_CONFIG)
-endif(ROS_NO_CHECK)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
-
-add_library(TREXros SHARED
-  # source 
-  ros_reactor.cc 
-  ros_clock.cc
-  ros_timeline.cc
-  ros_client.cc
-  # header
-  ros_reactor.hh
-  trex/ros/ros_client.hh
-  trex/ros/ros_clock.hh
-  trex/ros/ros_error.hh
-  trex/ros/ros_subscriber.hh
-  trex/ros/ros_action.hh
-  trex/ros/bits/ros_timeline.hh)
-
-source_group("Header\ Files\\bits" FILES 
-  trex/ros/bits/ros_timeline.hh)
-
-install(DIRECTORY trex/ DESTINATION include/trex/
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
-  
-target_link_libraries(TREXros ${roscpp_LINK_FLAGS} 
-  -L${roscpp_LINK_PATH} 
-  ${actionlib_LINK_FLAGS} 
-  -L${actionlib_LINK_PATH} 
-  ${roscpp_LINK_LIBS} 
-  ${actionlib_LINK_LIBS} 
-  TREXagent)
-install(TARGETS TREXros DESTINATION lib)
-trex_lib(TREXros extra)
+if(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
+  find_file(ROS_CMAKE rosbuild.cmake HINTS ${ROS_ROOT}/core/rosbuild)
+  if(ROS_CMAKE)
+    set(ROS_CONFIG ${ROS_CMAKE} CACHE FILE "ROS configuration file" FORCE)
+    include(${ROS_CONFIG})
+  else(ROS_CMAKE)
+    set(ROS_CONFIG ROS_CONFIG-NOTFOUND CACHE FILE "ROS was not found" FORCE)
+  endif(ROS_CMAKE)
+  message(STATUS "Looking for ROS configuration: ${ROS_CONFIG}")
+  set(OLD_ROS_ROOT ${ROS_ROOT} CACHE INTERNAL "Last ROS_ROOT value" FORCE)
+endif(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
 
 
-
-# The plugin placeholder : also initialize ros on load
-trex_plugin(ros ros_init.cc)
-target_link_libraries(ros_pg TREXros)
-
+macro(FIND_ROS_PKG name)
+  rosbuild_find_ros_package(${name})
+  message(STATUS "Looking for ros package ${name}: ${${name}_PACKAGE_PATH}")
+  if(${name}_PACKAGE_PATH)
+    rosbuild_invoke_rospack(${name} ${name} INCLUDE_DIRS cflags-only-I)
+    rosbuild_invoke_rospack(${name} ${name} CFLAGS cflags-only-other)
+    rosbuild_invoke_rospack(${name} ${name} LINK_PATH "libs-only-L")
+    rosbuild_invoke_rospack(${name} ${name} LINK_LIBS "libs-only-l")
+    rosbuild_invoke_rospack(${name} ${name} LINK_FLAGS cflags-only-other)
+  endif(${name}_PACKAGE_PATH)
+endmacro(FIND_ROS_PKG)
