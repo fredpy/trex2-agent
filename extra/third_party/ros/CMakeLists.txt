@@ -92,13 +92,13 @@ install(DIRECTORY trex/ DESTINATION include/trex/
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
   
+link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
-  -L${ROS_roscpp_LINK_PATH} 
   ${ROS_actionlib_LINK_FLAGS} 
-  -L${ROS_actionlib_LINK_PATH} 
   ${ROS_roscpp_LINK_LIBS} 
   ${ROS_actionlib_LINK_LIBS} 
   TREXagent)
+
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
 
