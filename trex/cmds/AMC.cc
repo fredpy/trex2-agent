@@ -81,6 +81,8 @@
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/StepClock.hh>
 
+#include <boost/date_time/posix_time/time_formatters.hpp>
+
 #include "nice_flags.h"
 
 using namespace TREX::agent;
@@ -96,8 +98,12 @@ namespace {
 extern "C" {
 
   void amc_cleanup(int sig) {
+    boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
+
     amc_log->syslog("amc", info)<<"============================================";
-    amc_log->syslog("amc", info)<<"Received signal "<<sig; 
+    amc_log->syslog("amc", info)<<"At "<<boost::posix_time::to_simple_string(now)
+                                <<" UTC.";
+    amc_log->syslog("amc", info)<<"Received signal "<<sig;
     amc_log->syslog("amc", info)<<"============================================";
     my_agent.reset();
     exit(1);
