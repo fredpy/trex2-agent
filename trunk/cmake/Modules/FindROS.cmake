@@ -36,16 +36,15 @@
 set(ROS_ROOT $ENV{ROS_ROOT} CACHE PATH "root path for ROS")
 
 if(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
-  find_file(ROS_CMAKE rosbuild.cmake HINTS ${ROS_ROOT}/core/rosbuild)
-  if(ROS_CMAKE)
-    set(ROS_CONFIG ${ROS_CMAKE} CACHE FILE "ROS configuration file" FORCE)
-    include(${ROS_CONFIG})
-  else(ROS_CMAKE)
-    set(ROS_CONFIG ROS_CONFIG-NOTFOUND CACHE FILE "ROS was not found" FORCE)
-  endif(ROS_CMAKE)
+  find_file(ROS_CONFIG rosbuild.cmake HINTS ${ROS_ROOT}/core/rosbuild)
+  set(ROS_CONFIG ${ROS_CONFIG} CACHE FILE "ROS configuration file" FORCE)
   message(STATUS "Looking for ROS configuration: ${ROS_CONFIG}")
   set(OLD_ROS_ROOT ${ROS_ROOT} CACHE INTERNAL "Last ROS_ROOT value" FORCE)
 endif(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
+
+if(ROS_CONFIG)
+  include(${ROS_CONFIG})
+endif(ROS_CONFIG)
 
 
 macro(FIND_ROS_PKG name)
