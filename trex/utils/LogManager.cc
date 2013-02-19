@@ -39,7 +39,8 @@
  */
 #include <time.h>
 
-#include<boost/tokenizer.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/date_time/posix_time/time_formatters.hpp>
 
 #include <cerrno>
 #include <cstring>
@@ -66,6 +67,9 @@ LogManager::LogManager():m_inited(false), m_syslog(m_io.service()), m_level(TREX
 }
 
 LogManager::~LogManager() {
+  boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
+  
+  syslog("", log::info)<<">>> End of log at "<<boost::posix_time::to_simple_string(now)<<" UTC <<<";
   m_out.reset();
   m_log.reset();
   m_err.reset();
