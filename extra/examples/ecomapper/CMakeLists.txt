@@ -36,80 +36,47 @@
 option(WITH_ECOMAPPER "Enable Ecomapper" ${WITH_ROS})
 
 if(WITH_ECOMAPPER)
-  if(WITH_ROS AND ROS_CFG)
-    include(${ROS_CFG})
+  find_package(ROS)
+  
+  if(ROS_CONFIG)
+    find_ros_pkg(roscpp)
+    if(ROS_roscpp_PACKAGE_PATH)
+      include_directories(${ROS_roscpp_INCLUDE_DIRS})
+      add_definitions(${ROS_roscpp_CFLAGS})
+      link_directories(${ROS_roscpp_LINK_PATH})
+    else(ROS_roscpp_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find roscpp")
+    endif(ROS_roscpp_PACKAGE_PATH)
+    
+    find_ros_pkg(actionlib)
+    if(ROS_actionlib_PACKAGE_PATH)
+      include_directories(${ROS_actionlib_INCLUDE_DIRS})
+      add_definitions(${ROS_actionlib_CFLAGS})
+      link_directories(${ROS_actionlib_LINK_PATH})
+    else(ROS_actionlib_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find actionlib")
+    endif(ROS_actionlib_PACKAGE_PATH)
+    
+    find_ros_pkg(ecomapper_msgs)
+    if(ROS_ecomapper_msgs_PACKAGE_PATH)
+      include_directories(${ROS_ecomapper_msgs_INCLUDE_DIRS})
+      add_definitions(${ROS_ecomapper_msgs_CFLAGS})
+      link_directories(${ROS_ecomapper_msgs_LINK_PATH})
+    else(ROS_ecomapper_msgs_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find ecomapper_msgs")
+    endif(ROS_ecomapper_msgs_PACKAGE_PATH)
 
-    # Now I need to check all the things I need
-    rosbuild_find_ros_package(roscpp)
-    if(roscpp_PACKAGE_PATH)
-      message(STATUS "Looking for roscpp: ${roscpp_PACKAGE_PATH}")
-      # gets compilation information
-      rosbuild_invoke_rospack(roscpp roscpp INCLUDE_DIRS cflags-only-I)
-      rosbuild_invoke_rospack(roscpp roscpp CFLAGS cflags-only-other)
-      rosbuild_invoke_rospack(roscpp roscpp LINK_PATH libs-only-L)
-      rosbuild_invoke_rospack(roscpp roscpp LINK_LIBS libs-only-l)
-      rosbuild_invoke_rospack(roscpp roscpp LINK_FLAGS libs-only-other)
-
-      # General library
-      include_directories(${roscpp_INCLUDE_DIRS})
-      add_definitions(${roscpp_CFLAGS})
-    else(roscpp_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to locate roscpp ROS package")
-    endif(roscpp_PACKAGE_PATH)
-
-    rosbuild_find_ros_package(actionlib)
-    if(actionlib_PACKAGE_PATH)
-      message(STATUS "Looking for actionlib: ${actionlib_PACKAGE_PATH}")
-      # gets compilation information
-      rosbuild_invoke_rospack(actionlib actionlib INCLUDE_DIRS cflags-only-I)
-      rosbuild_invoke_rospack(actionlib actionlib CFLAGS cflags-only-other)
-      rosbuild_invoke_rospack(actionlib actionlib LINK_PATH libs-only-L)
-      rosbuild_invoke_rospack(actionlib actionlib LINK_LIBS libs-only-l)
-      rosbuild_invoke_rospack(actionlib actionlib LINK_FLAGS libs-only-other)
-
-      # General library
-      include_directories(${actionlib_INCLUDE_DIRS})
-      add_definitions(${actionlib_CFLAGS})
-    else(actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to locate actionlib ROS package")
-    endif(actionlib_PACKAGE_PATH)
-
-    rosbuild_find_ros_package(ecomapper_msgs)
-    if(ecomapper_msgs_PACKAGE_PATH)
-      message(STATUS "Looking for ecomapper_msgs: ${ecomapper_msgs_PACKAGE_PATH}")
-      # gets compilation information
-      rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs INCLUDE_DIRS cflags-only-I)
-      rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs CFLAGS cflags-only-other)
-      rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_PATH libs-only-L)
-      rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_LIBS libs-only-l)
-      rosbuild_invoke_rospack(ecomapper_msgs ecomapper_msgs LINK_FLAGS libs-only-other)
-
-      # General library
-      include_directories(${ecomapper_msgs_INCLUDE_DIRS})
-      add_definitions(${ecomapper_msgs_CFLAGS})
-    else(ecomapper_msgs_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to locate ecomapper_msgs ROS package")
-    endif(ecomapper_msgs_PACKAGE_PATH)
-
-    rosbuild_find_ros_package(gps_common)
-    if(gps_common_PACKAGE_PATH)
-      message(STATUS "Looking for ecomapper_msgs: ${gps_common_PACKAGE_PATH}")
-      # gets compilation information
-      rosbuild_invoke_rospack(gps_common gps_common INCLUDE_DIRS cflags-only-I)
-      rosbuild_invoke_rospack(gps_common gps_common CFLAGS cflags-only-other)
-      rosbuild_invoke_rospack(gps_common gps_common LINK_PATH libs-only-L)
-      rosbuild_invoke_rospack(gps_common gps_common LINK_LIBS libs-only-l)
-      rosbuild_invoke_rospack(gps_common gps_common LINK_FLAGS libs-only-other)
-
-      # General library
-      include_directories(${gps_common_INCLUDE_DIRS})
-      add_definitions(${gps_common_CFLAGS})
-    else(gps_common_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to locate ecomapper_msgs ROS package")
-    endif(gps_common_PACKAGE_PATH)
-  else(WITH_ROS AND ROS_CFG)
+    find_ros_pkg(gps_common)
+    if(ROS_gps_common_PACKAGE_PATH)
+      include_directories(${ROS_gps_common_INCLUDE_DIRS})
+      add_definitions(${ROS_gps_common_CFLAGS})
+      link_directories(${ROS_gps_common_LINK_PATH})
+    else(ROS_gps_common_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find gps_common")
+    endif(ROS_gps_common_PACKAGE_PATH)
+  else(ROS_CONFIG)
     message(SEND_ERROR "UNable to compile ecomapper without ROS support")
-  endif(WITH_ROS AND ROS_CFG)
+  endif(ROS_CONFIG)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
@@ -135,18 +102,14 @@ if(WITH_ECOMAPPER)
     PATTERN "private" EXCLUDE
     PATTERN ".svn" EXCLUDE)
 
-  target_link_libraries(TREXecomapper ${roscpp_LINK_FLAGS}
-    -L${roscpp_LINK_PATH}
-    ${actionlib_LINK_FLAGS}
-    -L${actionlib_LINK_PATH}
-    ${ecomapper_msgs_LINK_FLAGS}
-    -L${ecomapper_msgs_LINK_PATH}
-    ${gps_common_LINK_FLAGS}
-    -L${gps_common_LINK_PATH}
-    ${roscpp_LINK_LIBS}
-    ${actionlib_LINK_LIBS}
-    ${ecomapper_msgs_LIBS}
-    ${gps_common_LIBS}
+  target_link_libraries(TREXecomapper ${ROS_roscpp_LINK_FLAGS}
+    ${ROS_actionlib_LINK_FLAGS}
+    ${ROS_ecomapper_msgs_LINK_FLAGS}
+    ${ROS_gps_common_LINK_FLAGS}
+    ${ROS_roscpp_LINK_LIBS}
+    ${ROS_actionlib_LINK_LIBS}
+    ${ROS_ecomapper_msgs_LIBS}
+    ${ROS_gps_common_LIBS}
     TREXagent)
 
   install(TARGETS TREXecomapper DESTINATION lib)
