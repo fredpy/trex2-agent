@@ -758,9 +758,9 @@ void Agent::initComplete() {
 
   // start the clock
   m_clock->doStart();
+  syslog(null, log::info)<<"Final tick: "<<date_str(m_finalTick);
   syslog(null, "START")<<"\t=========================================================";
   updateTick(m_clock->tick());
-
 }
 
 void Agent::run() {

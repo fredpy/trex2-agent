@@ -184,6 +184,7 @@ namespace TREX {
         bool m_pending_nl;
                 
         friend class TREX::utils::log::details::entry_sink;
+        friend class log_pipe;
       }; // class TREX::utils::log::entry
             
     } // TREX::utils::log

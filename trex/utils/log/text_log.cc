@@ -172,7 +172,7 @@ void out_file::operator()(entry::pointer msg) {
 log_pipe::log_pipe(text_log &log, std::ostream &os, 
 		   TREX::utils::Symbol const &who,
                    TREX::utils::Symbol const &what)
-  :m_who(who), m_what(what), m_log(log), m_dest(os), m_flush(log.service()) {
+  :m_who(who), m_what(what), m_log(log.m_new_log), m_dest(os), m_flush(log.service()) {
   m_initial = m_dest.rdbuf();
   m_me = new boost::iostreams::stream_buffer<pipe_sink>(*this);
   m_dest.rdbuf(m_me);
@@ -184,7 +184,7 @@ log_pipe::~log_pipe() {
   m_dest.rdbuf(m_initial);
   delete m_me;
   if( !m_msg.empty() )
-    m_log(m_who, m_what)<<m_msg;
+    send(m_msg);
 }
 	
 std::streamsize log_pipe::pipe_sink::write(log_pipe::pipe_sink::char_type const *s,
@@ -202,7 +202,7 @@ void log_pipe::flush_to() {
   std::string tmp;
   std::swap(tmp, m_msg);
   if( !tmp.empty() )
-    m_log(m_who, m_what)<<tmp;
+    send(tmp);
 }
 
 
@@ -211,12 +211,21 @@ void log_pipe::flush_msg() {
     std::string::size_type last = m_msg.rfind('\n');
     if( last!=std::string::npos ) {
       if( last>0 )
-	m_log(m_who, m_what)<<m_msg.substr(0, last);
+        send(m_msg.substr(0, last));
       m_msg.erase(0, last+1);
     }
     if( !m_msg.empty() ) {
       m_flush.expires_from_now(boost::posix_time::milliseconds(100));
       m_flush.async_wait(boost::bind(&log_pipe::flush_to, this));
     }
+  }
+}
+
+void log_pipe::send(std::string const &msg) {
+  boost::shared_ptr<details::sig_impl> dest = m_log.lock();
+  if( dest ) {
+    boost::shared_ptr<entry> e(new entry(m_who, m_what));
+    e->m_content = msg;
+    dest->emit(e);
   }
 }

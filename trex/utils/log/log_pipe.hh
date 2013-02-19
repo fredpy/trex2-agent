@@ -68,8 +68,8 @@ namespace TREX {
         };
         
         
-	Symbol m_who, m_what;
-	text_log                                   &m_log;
+        Symbol m_who, m_what;
+        boost::weak_ptr<details::sig_impl>         m_log;
 	std::ostream                               &m_dest;
 	std::streambuf                             *m_initial;
 	std::string                                m_msg;
@@ -79,6 +79,7 @@ namespace TREX {
         
 	void flush_msg();
         void flush_to();
+        void send(std::string const &msg);
       };
 
     } // TREX::utils::log
