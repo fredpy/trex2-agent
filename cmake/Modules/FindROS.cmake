@@ -51,7 +51,7 @@ endif(NOT OLD_ROS_ROOT EQUAL ROS_ROOT)
 macro(FIND_ROS_PKG name)
   rosbuild_find_ros_package(${name})
   message(STATUS "Looking for ros package ${name}: ${${name}_PACKAGE_PATH}")
-  set(ROS_${name}_PACKAGE_PATH ${name}_PACKAGE_PATH CACHE DIRECTORY 
+  set(ROS_${name}_PACKAGE_PATH ${${name}_PACKAGE_PATH} CACHE DIRECTORY 
     "path for ros package ${name}" FORCE)
   if(${name}_PACKAGE_PATH)
     rosbuild_invoke_rospack(${name} ROS_${name} INCLUDE_DIRS cflags-only-I)
