@@ -67,6 +67,7 @@ namespace TREX {
       extern id_type const warn; //!< Warning log message
       extern id_type const error; //!< Error log message
       
+      class log_pipe;
       class text_log;
       
       /** @brief Logging implementation details

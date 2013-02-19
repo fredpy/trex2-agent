@@ -52,7 +52,7 @@
 namespace TREX {
   namespace utils {
     namespace log {
-
+      
       /** @brief Asynchronous text messages logging
        *
        * This class implements the logging mechanism used within trex to 
@@ -223,6 +223,8 @@ namespace TREX {
 # ifndef DOXYGEN
         text_log() DELETED; // Non default constructible
 # endif
+        
+        friend class log_pipe;
       }; // class TREX::utils::log::text_log
       
     }
