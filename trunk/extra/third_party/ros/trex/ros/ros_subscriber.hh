@@ -34,7 +34,11 @@
 #ifndef H_trex_ros_ros_subscriber
 # define H_trex_ros_ros_subscriber
 
+# include <ros/message_traits.h>
+
 # include <boost/bind.hpp>
+# include <boost/static_assert.hpp>
+
 # include "bits/ros_timeline.hh"
 
 namespace TREX {
@@ -57,7 +61,9 @@ namespace TREX {
      */
     template<typename Message>
     class ros_subscriber :public details::ros_timeline {
+      BOOST_STATIC_ASSERT(::ros::message_traits::IsMessage<Message>::value);
     public:
+
       typedef typename Message::ConstPtr message_ptr;
       
       
