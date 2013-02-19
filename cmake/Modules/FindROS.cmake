@@ -64,18 +64,18 @@ macro(FIND_ROS_PKG name)
       "${name} compilation flags" FORCE)
     mark_as_advanced(ROS_${name}_CFLAGS)
 
-    rosbuild_invoke_rospack(${name} ${name} LINK_PATH "libs-only-L")
-    set(ROS_${name}_LINK_PATH ${${name}_PATH} CACHE STRING 
+    rosbuild_invoke_rospack(${name} ${name} LINK_PATH libs-only-L)
+    set(ROS_${name}_LINK_PATH ${${name}_LINK_PATH} CACHE STRING 
       "${name} link libs paths" FORCE)
     mark_as_advanced(ROS_${name}_LINK_PATH)
 
     rosbuild_invoke_rospack(${name} ${name} LINK_LIBS "libs-only-l")
-    set(ROS_${name}_LINK_LIBS ${${name}_LIBS} CACHE STRING 
+    set(ROS_${name}_LINK_LIBS ${${name}_LINK_LIBS} CACHE STRING 
       "${name} link libraries" FORCE)
     mark_as_advanced(ROS_${name}_LINK_LIBS)
 
     rosbuild_invoke_rospack(${name} ${name} LINK_FLAGS cflags-only-other)
-    set(ROS_${name}_LINK_FLAGS ${${name}_FLAGS} CACHE STRING 
+    set(ROS_${name}_LINK_FLAGS ${${name}_LINK_FLAGS} CACHE STRING 
       "${name} link flags" FORCE)
     mark_as_advanced(ROS_${name}_LINK_FLAGS)
   endif(${name}_PACKAGE_PATH)
