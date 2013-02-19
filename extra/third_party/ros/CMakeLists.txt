@@ -68,6 +68,7 @@ endif(ROS_NO_CHECK)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
+link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
   # source 
@@ -92,7 +93,6 @@ install(DIRECTORY trex/ DESTINATION include/trex/
   PATTERN "private" EXCLUDE
   PATTERN ".svn" EXCLUDE)
   
-link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
   ${ROS_actionlib_LINK_FLAGS} 
   ${ROS_roscpp_LINK_LIBS} 
