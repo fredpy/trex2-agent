@@ -102,8 +102,7 @@ extern "C" {
 
     amc_log->syslog("amc", info)<<"============================================";
     amc_log->syslog("amc", info)<<"At "<<boost::posix_time::to_simple_string(now)
-                                <<" UTC.";
-    amc_log->syslog("amc", info)<<"Received signal "<<sig;
+                                <<" UTC:\n\t - Received signal "<<sig;
     amc_log->syslog("amc", info)<<"============================================";
     my_agent.reset();
     exit(1);
