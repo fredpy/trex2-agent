@@ -15,12 +15,13 @@ Symbol const Ros_Listener::navSatFixObj("fix");
 Symbol const Ros_Listener::wqmObj("wqm");
 
 Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false), m_active(false), m_freq(m_log->service())
+    :TeleoReactor(arg,false)
 {
     int argc = 0;
     char **argv = NULL;
     ros::init(argc, argv, "trex2_ros_listener" , ros::init_options::AnonymousName);
     m_ros = new ros::NodeHandle();
+    spinner = new ros::AsyncSpinner(0);
 
     syslog()<<"I want to own "<<dvlObj;
     provide(stateObj);
@@ -39,6 +40,8 @@ Ros_Listener::Ros_Listener(TeleoReactor::xml_arg_type arg)
 Ros_Listener::~Ros_Listener()
 {
     delete m_ros;
+    spinner->stop();
+    delete spinner;
 }
 
 
@@ -50,7 +53,7 @@ void Ros_Listener::handleInit()
     m_sub.push_back(m_ros->subscribe(fixObj.str(), 10, &Ros_Listener::fixCallback, this));
     m_sub.push_back(m_ros->subscribe(navSatFixObj.str(), 10, &Ros_Listener::navSatFixCallback, this));
     m_sub.push_back(m_ros->subscribe(wqmObj.str(), 10, &Ros_Listener::wqmCallback, this));
-    start();
+    spinner->start();
 }
 
 void Ros_Listener::stateCallback(const ecomapper_msgs::State::ConstPtr& msg)
@@ -214,43 +217,4 @@ void Ros_Listener::handleRecall(goal_id const &g)
             return;
         }
     }
-}
-
-
-
-/**
-*   Below controls the ROS node that is used to link to
-*   ROS. It controls the spin rate of the messages.
-*/
-
-bool Ros_Listener::started() const {
-  TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
-  return *m_active;
-}
-
-void Ros_Listener::start() {
-  bool should_start = false;
-  {
-    TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
-    if( !*m_active && ::ros::ok() ) {
-      should_start = true;
-      *m_active = true;
-    }
-  }
-  if( should_start )
-    m_log->service().post(boost::bind(&Ros_Listener::spin_cb, this));
-}
-
-void Ros_Listener::spin_cb() {
-  if( started() ) {
-    if( ::ros::ok() ) {
-      // Set my timer
-      m_freq.expires_from_now(boost::posix_time::milliseconds(10)); // 10Hz is more than enough
-      // manage things from ros
-      ::ros::spinOnce();
-
-      m_freq.async_wait(boost::bind(&Ros_Listener::spin_cb, this));
-    } else
-      stop();
-  }
 }

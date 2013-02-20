@@ -53,26 +53,16 @@ namespace TREX {
                 void handleRequest(TREX::transaction::goal_id const &g);
                 void handleRecall(TREX::transaction::goal_id const &g);
 
-                bool started() const;
-                void start();
-                void stop() {
-                    m_active = false;
-                    m_freq.cancel();
-                }
-                void spin_cb();
-
 
                 TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
                 ros::NodeHandle*                    m_ros;
                 std::list<ros::Subscriber>         m_sub;
+                ros::AsyncSpinner* spinner;
 
                 std::list<TREX::transaction::Observation> obs;
 
                 std::mutex Messagelock;
-
-                mutable TREX::utils::SharedVar<bool> m_active;
-                boost::asio::deadline_timer m_freq;
 
                 TREX::transaction::TICK m_nextTick;
 
