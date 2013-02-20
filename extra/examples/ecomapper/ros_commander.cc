@@ -8,26 +8,21 @@ using namespace TREX::ecomapper;
 
 Symbol const Ros_Commander::ros_commanderObj("ros_commander");
 
-void spinThread()
-{
-    ros::spin();
-}
-
 Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false), goalLoaded(false)
+    :TeleoReactor(arg,false), goalLoaded(false), spinner(0)
 {
     syslog()<<"I want to own "<<ros_commanderObj;
     provide(ros_commanderObj);
 
-    int argc = 0;
-    char **argv = NULL;
-    ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
+    //int argc = 0;
+    //char **argv = NULL;
+    //ros::init(argc, argv, "trex2_ros_commander" , ros::init_options::AnonymousName);
 
     node = new ros::NodeHandle;
 
     client = new actionlib::SimpleActionClient<ecomapper_msgs::EcomapperCommandAction>
                                 ("trex2_client_commander");
-    spin_thread = boost::thread(&spinThread);
+    spinner.start();
 
     bool clientConnected = client->waitForServer(ros::Duration(5.0));
     if(clientConnected)
@@ -39,9 +34,9 @@ Ros_Commander::Ros_Commander(TeleoReactor::xml_arg_type arg)
 
 Ros_Commander::~Ros_Commander()
 {
-    spin_thread.join();
     delete client;
     delete node;
+    spinner.stop();
 }
 
 
@@ -103,7 +98,8 @@ bool Ros_Commander::synchronize()
         {
             actionlib::SimpleClientGoalState state = client->getState();
             postObservation(state.toString());
-        }
+        } else if(!client->isServerConnected())
+            syslog("Warning")<<"Ros_Commander is not connected to client";
     }
     return true;
 }
