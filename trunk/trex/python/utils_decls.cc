@@ -37,12 +37,26 @@
 
 #include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/signals2/shared_connection_block.hpp>
 
 #include <functional>
 
 using namespace boost::python;
 
 namespace {
+  
+  class scoped_gil_release:boost::noncopyable {
+  public:
+    scoped_gil_release() {
+      m_gil_state = PyGILState_Ensure();
+    }
+    ~scoped_gil_release() {
+      PyGILState_Release(m_gil_state);
+    }
+    
+  private:
+    PyGILState_STATE m_gil_state;
+  };
   
   TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
 
@@ -52,12 +66,7 @@ namespace {
     :m_name(name) {}
     explicit log_wrapper(TREX::utils::Symbol const &name)
     :m_name(name) {}
-    ~log_wrapper() {
-      while( !m_connections.empty() ) {
-        m_connections.front().disconnect();
-        m_connections.pop_front();
-      }
-    }
+    ~log_wrapper() {}
     
     
     std::string get_log_dir() const {
@@ -105,35 +114,69 @@ namespace {
     bool add_path(std::string dir) {
       return m_log->addSearchPath(dir);
     }
-
-    
-    struct safe_handler :public std::unary_function<void, TREX::utils::log::entry::pointer> {
-      safe_handler(object fn):m_fn(fn) {
-      }
-      
-      
-      void operator()(TREX::utils::log::entry::pointer e) {
-        PyGILState_STATE gstate;
-        gstate = PyGILState_Ensure();
-        m_fn(e);
-        PyGILState_Release(gstate);
-      }
-      
-      object m_fn;
-    };
-    
-  
-    void connect(object fn) {
-      safe_handler handle(fn);
-      m_connections.push_back(m_log->on_new_log(handle));
-    }
     
     TREX::utils::Symbol m_name;
   private:
     TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-    std::list<boost::signals2::connection> m_connections;
   };
   
+  class py_log_handler {
+  public:
+    py_log_handler() {}
+    virtual ~py_log_handler() {
+      disconnect();
+    }
+    
+    bool connected() const {
+      return m_conn.connected();
+    }
+    void disconnect() {
+      m_conn.disconnect();
+    }
+    
+    virtual void new_entry(TREX::utils::log::entry::pointer e) =0;
+    
+  protected:
+    void handle_interface(TREX::utils::log::entry::pointer e) {
+      scoped_gil_release protect;
+      boost::signals2::shared_connection_block lock(m_conn);
+      try {
+        new_entry(e);
+      } catch(error_already_set const &e) {
+        disconnect();
+        // Extract error message for logging
+        PyObject *ptype, *pvalue, *ptrace;
+        PyErr_Fetch(&ptype, &pvalue, &ptrace);
+
+        std::string msg = extract<std::string>(pvalue);
+        
+        m_log->syslog("_python_", TREX::utils::log::error)<<msg;
+        // Reestablish error and display it in python
+        PyErr_Restore(ptype, pvalue, ptrace);
+        PyErr_Print();
+      } catch(...) {
+        disconnect();
+        m_log->syslog("python", TREX::utils::log::error)<<"Unknown exception during python callback.";
+      }
+    }
+    
+    void init() {
+      m_conn = m_log->on_new_log(boost::bind(&py_log_handler::handle_interface, this, _1),true);
+    }
+    
+  private:
+    TREX::utils::log::text_log::connection             m_conn;
+    TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+  };
+  
+  struct py_log_handler_wrap:py_log_handler, wrapper<py_log_handler> {
+  public:
+    py_log_handler_wrap() {
+      py_log_handler::init();
+    }
+    
+    void new_entry(TREX::utils::log::entry::pointer e);
+  };
   
 }
 
@@ -175,7 +218,7 @@ BOOST_PYTHON_MODULE(trex)
   //   trex.version.minor : minor version number
   //   trex.version.release : release number
   //   trex.version.is_rc : indicates if it is a release candidate
-  //   trex.version.rc : relealeas candidate number (or 0 if is_rc is False)
+  //   trex.version.rc : release candidate number (or 0 if is_rc is False)
   //   trex.version.str : A string value for this version of TREX
   class_<TREX::version>("version", "Version information about trex", no_init)
   .add_static_property("major", &TREX::version::major)
@@ -219,11 +262,18 @@ BOOST_PYTHON_MODULE(trex)
   .def("warn", &log_wrapper::warn)
   .def("error", &log_wrapper::error)
   .def("add_path", &log_wrapper::add_path)
-  .def("on_new_log", &log_wrapper::connect)
   ;
   
+  class_< py_log_handler_wrap, boost::noncopyable>("log_handler", "Logging entry handler")
+  .add_property("connected", &py_log_handler::connected, "Checks if the handler is still active")
+  .def("disconnect", &py_log_handler::disconnect)
+  .def("new_entry", pure_virtual(&py_log_handler::new_entry));
   
+  // todo : make a basic way to go through XML property tree
   
 } // BOOST_PYTHON_MODULE(trex)
 
+void py_log_handler_wrap::new_entry(TREX::utils::log::entry::pointer e) {
+  this->get_override("new_entry")(e);
+}
 
