@@ -44,13 +44,20 @@ using namespace boost::python;
 
 namespace {
   
+  TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
+
   class log_wrapper {
   public:
     explicit log_wrapper(std::string const &name)
     :m_name(name) {}
     explicit log_wrapper(TREX::utils::Symbol const &name)
     :m_name(name) {}
-    ~log_wrapper() {}
+    ~log_wrapper() {
+      while( !m_connections.empty() ) {
+        m_connections.front().disconnect();
+        m_connections.pop_front();
+      }
+    }
     
     
     std::string get_log_dir() const {
@@ -98,12 +105,19 @@ namespace {
     bool add_path(std::string dir) {
       return m_log->addSearchPath(dir);
     }
+
+  
+    void connect(object fn) {
+      m_connections.push_back(m_log->on_new_log(fn, true));
+    }
     
     TREX::utils::Symbol m_name;
   private:
     TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+    std::list<boost::signals2::connection> m_connections;
   };
-      
+  
+  
 }
 
 
@@ -153,6 +167,22 @@ BOOST_PYTHON_MODULE(trex)
   .add_static_property("str", &TREX::version::str)
   ;
   
+  // Log message entry
+  //   - no constructor (produced internally on log messages)
+  //   - is_dated : indicate if the entry has a date
+  //   - date() : the date of the entry (if is_dated)
+  //   - source() : the source of the entry (symbol)
+  //   - kind() : the type of the entry (symbol, either "INFO", "WARN", ...)
+  //   - content() : the message content as a string
+  class_<TREX::utils::log::entry, TREX::utils::log::entry::pointer>("log_entry",
+                                                                    "A single log entry message", no_init)
+  .add_property("is_dated", &TREX::utils::log::entry::is_dated, "Check if dated")
+  .def("date", &TREX::utils::log::entry::date, return_value_policy<copy_const_reference>())
+  .def("source", &TREX::utils::log::entry::source, return_internal_reference<>())
+  .def("kind", &TREX::utils::log::entry::kind,return_internal_reference<>())
+  .def("content", &TREX::utils::log::entry::content, return_value_policy<copy_const_reference>())
+  ;
+
   // simple log manager
   //   - constructor takes a symbol which will prefix any log messages produced by this class
   //   - name  attribute gives the symbol given at construction
@@ -161,7 +191,7 @@ BOOST_PYTHON_MODULE(trex)
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_<log_wrapper>("log", "Logging for trex", init<TREX::utils::Symbol>())
+  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Logging for trex", init<TREX::utils::Symbol>())
   .def_readonly("name", &log_wrapper::m_name)
   .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir, "TREX log directory")
   .add_property("path", &log_wrapper::path, "TREX file search path")
@@ -170,6 +200,11 @@ BOOST_PYTHON_MODULE(trex)
   .def("warn", &log_wrapper::warn)
   .def("error", &log_wrapper::error)
   .def("add_path", &log_wrapper::add_path)
+  .def("on_new_log", &log_wrapper::connect)
   ;
   
+  
+  
 } // BOOST_PYTHON_MODULE(trex)
+
+
