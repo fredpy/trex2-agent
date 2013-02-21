@@ -107,7 +107,7 @@ namespace {
 }
 
 
-BOOST_PYTHON_MODULE(trex_py)
+BOOST_PYTHON_MODULE(trex)
 {
   
   class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
@@ -143,4 +143,4 @@ BOOST_PYTHON_MODULE(trex_py)
   .def("add_path", &log_wrapper::add_path)
   ;
   
-} // BOOST_PYTHON_MODULE(trex_py)
+} // BOOST_PYTHON_MODULE(trex)

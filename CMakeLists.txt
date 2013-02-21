@@ -267,10 +267,10 @@ function(trex_lib target kind)
   endif(kind)
 endfunction(trex_lib)
 
-function(trex_py target kind)
+function(trex_py target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
-#  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${target}${CMAKE_SHARED_LIBRARY_SUFFIX})
-  trex_lib(${target} ${kind})
+  trex_lib(${target} FALSE)
+  install(TARGETS ${target} DESTINATION ${TREX_SHARED}/python OPTIONAL EXPORT trex-python) 
 endfunction(trex_py)
 
 macro(trex_cmd target)
