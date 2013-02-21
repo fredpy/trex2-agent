@@ -73,3 +73,14 @@ export TREX_PATH=@TREX_CONFIG_DIRS@
 
 export TREX_LOG_DIR=@CMAKE_BINARY_DIR@/log
 
+# Python support 
+py_libs=@TREX_PYTHON@
+
+if [ -n "${py_libs}" ]; then
+    if [ -n "${PYTHONPATH+x}" ]; then 
+	export PYTHONPATH=${py_libs}:${PYTHONPATH}
+    else
+	export PYTHONPATH=${py_libs}
+    fi
+fi
+
