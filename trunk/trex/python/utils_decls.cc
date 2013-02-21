@@ -264,6 +264,13 @@ BOOST_PYTHON_MODULE(trex)
   .def("add_path", &log_wrapper::add_path)
   ;
   
+  // new log entry handler
+  //   abstract class that python user can derive to handle new log messages
+  //   - connected    : indicate if the instance is still active
+  //   - disconnect() : deactivate the handler, as of now I have no way to activate it
+  //   - new_entry(e) : method that will be called by trex on a new log entry
+  //                    this is the method that one can implement to handle log messages
+  //                    in python
   class_< py_log_handler_wrap, boost::noncopyable>("log_handler", "Logging entry handler")
   .add_property("connected", &py_log_handler::connected, "Checks if the handler is still active")
   .def("disconnect", &py_log_handler::disconnect)
