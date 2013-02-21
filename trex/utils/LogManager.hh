@@ -258,6 +258,11 @@ namespace TREX {
         return m_syslog.connect(fn,s);
       }
       
+      template<typename Handler>
+      boost::signals2::connection on_new_log(Handler fn, bool) {
+        return m_syslog.direct_connect(fn);
+      }
+      
       size_t thread_count() const {
 	return m_io.thread_count();
       }
