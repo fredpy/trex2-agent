@@ -106,9 +106,26 @@ namespace {
       return m_log->addSearchPath(dir);
     }
 
+    
+    struct safe_handler :public std::unary_function<void, TREX::utils::log::entry::pointer> {
+      safe_handler(object fn):m_fn(fn) {
+      }
+      
+      
+      void operator()(TREX::utils::log::entry::pointer e) {
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+        m_fn(e);
+        PyGILState_Release(gstate);
+      }
+      
+      object m_fn;
+    };
+    
   
     void connect(object fn) {
-      m_connections.push_back(m_log->on_new_log(fn, true));
+      safe_handler handle(fn);
+      m_connections.push_back(m_log->on_new_log(handle));
     }
     
     TREX::utils::Symbol m_name;
@@ -129,6 +146,8 @@ namespace {
 BOOST_PYTHON_MODULE(trex)
 {
   
+  PyEval_InitThreads();
+    
   // trex.symbol class
   //   can be created with a string
   //   can be compared to each other with (==,!=,<,>,<=,=>)
