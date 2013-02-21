@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2011, MBARI.                                         #
+#  Copyright (c) 2013, MBARI.                                         #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -17,7 +17,7 @@
 #     with the distribution.                                          #
 #   * Neither the name of the TREX Project nor the names of its       #
 #     contributors may be used to endorse or promote products derived #
-#     from this software without specific prior written permmission.   #
+#     from this software without specific prior written permmission.  #
 #                                                                     #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS #
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT   #
@@ -32,48 +32,21 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
+find_package(Boost QUIET COMPONENTS python)
+message(STATUS "Checking for Boost.Python: ${Boost_PYTHON_LIBRARY}")
 
-configure_file(version.hh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/version.hh @ONLY)
+if(Boost_PYTHON_LIBRARY)
 
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/version.hh 
-  DESTINATION include/trex
-)
+  # Also need to check for python libraries and paths
+  find_package(PythonLibs REQUIRED)
+  include_directories(${PYTHON_INCLUDE_DIR})
 
-add_custom_target(core COMMENT "TREX core libraries")
-
-# Core libraries 
-
-add_subdirectory(utils)
-add_subdirectory(domain)
-add_subdirectory(transaction)
-add_subdirectory(agent)
-
-add_subdirectory(python)
-
-# utility commands 
-include(CheckFunctionExists)
-
-check_function_exists(setpriority HAVE_SETPRIORITY)
-if(NOT HAVE_SETPRIORITY)
-  check_function_exists(nice HAVE_NICE)
-endif(NOT HAVE_SETPRIORITY)
-
-configure_file(cmds/nice_flags.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/nice_flags.h @ONLY)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-add_executable(amc cmds/AMC.cc)
-target_link_libraries(amc TREXagent)
-add_dependencies(core amc)
-install(TARGETS amc DESTINATION bin)
-
-trex_cmd(amc)
-
-add_executable(sim cmds/Sim.cc)
-target_link_libraries(sim TREXagent)
-add_dependencies(core sim)
-install(TARGETS sim DESTINATION bin)
-
-trex_cmd(sim)
+  message(STATUS "Enabling TREX python adapters.")
+  python_add_module(trex_py utils_decls.cc)
+  add_dependencies(core trex_py)
+  target_link_libraries(trex_py TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+  trex_py(trex_py core)
+  
+else(Boost_PYTHON_LIBRARY)
+  message(WARNING "Did not find Boost.Python : disabling python support")
+endif(Boost_PYTHON_LIBRARY)

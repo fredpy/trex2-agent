@@ -221,6 +221,8 @@ macro(trex_cfg dir dest)
     ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 endmacro(trex_cfg)
 
+  
+
 function(trex_lib target kind)
   # message(STATUS "trex-lib(${target} ${kind})")
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
@@ -265,6 +267,12 @@ function(trex_lib target kind)
   endif(kind)
 endfunction(trex_lib)
 
+function(trex_py target kind)
+  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
+#  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${target}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  trex_lib(${target} ${kind})
+endfunction(trex_py)
+
 macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
     ${CMAKE_CURRENT_BINARY_DIR})
@@ -276,7 +284,9 @@ endmacro(trex_cmd)
 
 macro(bash_path var property) 
   get_property(tmp GLOBAL PROPERTY ${property})
-  list(REMOVE_DUPLICATES tmp)
+  if(tmp)
+    list(REMOVE_DUPLICATES tmp)
+  endif(tmp)
   string(REPLACE ";" ":" ${var} "${tmp}")
   unset(tmp)
 endmacro(bash_path)
@@ -311,6 +321,7 @@ set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
 bash_path(TREX_CONFIG_DIRS ${PROJECT_NAME}_CFGS)
 bash_path(TREX_LIBRARY_DIRS ${PROJECT_NAME}_LIBS)
 bash_path(TREX_BINARY_DIRS ${PROJECT_NAME}_CMDS)
+bash_path(TREX_PYTHON ${PROJECT_NAME}_PYTHON)
 
 # A file just for testing inside the build directory
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/trex_devel.bash.in
