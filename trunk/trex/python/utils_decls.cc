@@ -99,17 +99,27 @@ namespace {
       return m_log->addSearchPath(dir);
     }
     
-  private:
     TREX::utils::Symbol m_name;
+  private:
     TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
   };
       
 }
 
 
+// Python API for TREX::utils
+//   this basic API only exposes the bare minimum. Namely:
+//     - trex.symbol  for TREX::utils::Symbol
+//     - trex.version access to TREX version information
+//     - trex.log     basic/barebone access to TREX::utils::LogManager
 BOOST_PYTHON_MODULE(trex)
 {
   
+  // trex.symbol class
+  //   can be created with a string
+  //   can be compared to each other with (==,!=,<,>,<=,=>)
+  //   can be checked if empty()
+  //   supports str(s) and len(s)
   class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
                               init<optional<std::string> >())
    .def("empty", &TREX::utils::Symbol::empty)
@@ -123,6 +133,17 @@ BOOST_PYTHON_MODULE(trex)
    .def("__str__", &TREX::utils::Symbol::str, return_value_policy<copy_const_reference>())
   ;
   
+  // python string can be implicitly converted into trex.symbol
+  implicitly_convertible<std::string, TREX::utils::Symbol>();
+  
+  // trex.version class
+  // A class with only static read only properties
+  //   trex.version.major : major version number
+  //   trex.version.minor : minor version number
+  //   trex.version.release : release number
+  //   trex.version.is_rc : indicates if it is a release candidate
+  //   trex.version.rc : relealeas candidate number (or 0 if is_rc is False)
+  //   trex.version.str : A string value for this version of TREX
   class_<TREX::version>("version", "Version information about trex", no_init)
   .add_static_property("major", &TREX::version::major)
   .add_static_property("minor", &TREX::version::minor)
@@ -132,14 +153,22 @@ BOOST_PYTHON_MODULE(trex)
   .add_static_property("str", &TREX::version::str)
   ;
   
-  class_<log_wrapper>("log", "Logging for trex", init<std::string>())
-  .def(init<TREX::utils::Symbol>())
-  .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir)
+  // simple log manager
+  //   - constructor takes a symbol which will prefix any log messages produced by this class
+  //   - name  attribute gives the symbol given at construction
+  //   - dir   is a read/write attribute that indicates/sets the log directory
+  //   - path  is a read only attribute that gives the trex search path
+  //   - add_path adds the path passed as argument to the trex search path
+  //   - use_file locates the file passed as argument in trex search path and return its path if found
+  //   - info, wran, error produces the string passed as argument as a log message
+  class_<log_wrapper>("log", "Logging for trex", init<TREX::utils::Symbol>())
+  .def_readonly("name", &log_wrapper::m_name)
+  .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir, "TREX log directory")
+  .add_property("path", &log_wrapper::path, "TREX file search path")
   .def("use_file", &log_wrapper::use)
   .def("info", &log_wrapper::info)
   .def("warn", &log_wrapper::warn)
   .def("error", &log_wrapper::error)
-  .add_property("path", &log_wrapper::path)
   .def("add_path", &log_wrapper::add_path)
   ;
   
