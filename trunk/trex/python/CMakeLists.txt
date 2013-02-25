@@ -42,7 +42,7 @@ if(Boost_PYTHON_LIBRARY)
   include_directories(${PYTHON_INCLUDE_DIR})
 
   message(STATUS "Enabling TREX python adapters.")
-  python_add_module(trex utils_decls.cc)
+  python_add_module(trex trex_pkg.cc utils_decls.cc domain_decls.cc)
   add_dependencies(core trex)
   target_link_libraries(trex TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
   trex_py(trex)

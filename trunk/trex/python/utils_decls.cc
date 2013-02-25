@@ -32,7 +32,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <trex/utils/Symbol.hh>
-#include <trex/utils/TREXversion.hh>
 #include <trex/utils/LogManager.hh>
 
 #include <boost/python.hpp>
@@ -183,15 +182,19 @@ namespace {
 
 // Python API for TREX::utils
 //   this basic API only exposes the bare minimum. Namely:
-//     - trex.symbol  for TREX::utils::Symbol
-//     - trex.version access to TREX version information
-//     - trex.log     basic/barebone access to TREX::utils::LogManager
-BOOST_PYTHON_MODULE(trex)
-{
-  
-  PyEval_InitThreads();
-    
-  // trex.symbol class
+//     - trex.utils.symbol      for TREX::utils::Symbol
+//     - trex.utils.log         basic/barebone access to TREX::utils::LogManager
+//     - trex.utils.log_handler a simple abstract class for handling of new log entries
+//     - trex.utils.log_entry   the class used by trex for log entries 
+void export_utils() {
+  // Setup my submodule
+  object module(handle<>(borrowed(PyImport_AddModule("trex.utils"))));
+  scope().attr("utils") = module;
+  scope my_scope = module;
+  // from now on eveerything is under trex.utils
+
+
+  // trex.utils.symbol class
   //   can be created with a string
   //   can be compared to each other with (==,!=,<,>,<=,=>)
   //   can be checked if empty()
@@ -212,23 +215,8 @@ BOOST_PYTHON_MODULE(trex)
   // python string can be implicitly converted into trex.symbol
   implicitly_convertible<std::string, TREX::utils::Symbol>();
   
-  // trex.version class
-  // A class with only static read only properties
-  //   trex.version.major : major version number
-  //   trex.version.minor : minor version number
-  //   trex.version.release : release number
-  //   trex.version.is_rc : indicates if it is a release candidate
-  //   trex.version.rc : release candidate number (or 0 if is_rc is False)
-  //   trex.version.str : A string value for this version of TREX
-  class_<TREX::version>("version", "Version information about trex", no_init)
-  .add_static_property("major", &TREX::version::major)
-  .add_static_property("minor", &TREX::version::minor)
-  .add_static_property("release", &TREX::version::release)
-  .add_static_property("is_rc", &TREX::version::is_release_candidate)
-  .add_static_property("rc", &TREX::version::rc_number)
-  .add_static_property("str", &TREX::version::str)
-  ;
   
+  // trex.utils.log_entry class
   // Log message entry
   //   - no constructor (produced internally on log messages)
   //   - is_dated : indicate if the entry has a date
@@ -245,6 +233,7 @@ BOOST_PYTHON_MODULE(trex)
   .def("content", &TREX::utils::log::entry::content, return_value_policy<copy_const_reference>())
   ;
 
+  // trex.utils.log class
   // simple log manager
   //   - constructor takes a symbol which will prefix any log messages produced by this class
   //   - name  attribute gives the symbol given at construction
@@ -264,7 +253,8 @@ BOOST_PYTHON_MODULE(trex)
   .def("add_path", &log_wrapper::add_path)
   ;
   
-  // new log entry handler
+  // trex.utils.log_handler
+  // new log entry handler abstract class
   //   abstract class that python user can derive to handle new log messages
   //   - connected    : indicate if the instance is still active
   //   - disconnect() : deactivate the handler, as of now I have no way to activate it
@@ -278,7 +268,9 @@ BOOST_PYTHON_MODULE(trex)
   
   // todo : make a basic way to go through XML property tree
   
-} // BOOST_PYTHON_MODULE(trex)
+} // export_utils()
+
+
 
 void py_log_handler_wrap::new_entry(TREX::utils::log::entry::pointer e) {
   this->get_override("new_entry")(e);
