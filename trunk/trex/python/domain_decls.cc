@@ -239,6 +239,19 @@ void export_domain() {
   scope my_scope = module;
   // from now on eveerything is under trex.domain
   
+  
+  // class trex.domains.domain
+  //  abstract domain interface
+  //    - type()            give a string representation of the type
+  //    - is_interval()     indicates if the domain is an interval
+  //    - is_enumerated()   indicates if the domain is enumerated
+  //    - is_full()         indicates if the domain is full
+  //    - is_singleton()    indicates if the domain is a singleton
+  //    - intersect(domain) checks if the intersection with the arg is not empty
+  //    - __eq__(domain)    check if identical to the argument
+  //    - restrict(domain)  instersects with the arg
+  //    - xml()             gives xml repredsentation
+  //    - __str__()         gives the string representation
   class_<domain_wrapper, boost::noncopyable>("domain", "Abstract trex domain",
                                              init<tu::Symbol>())
   .def("type", &tt::DomainBase::getTypeName, return_internal_reference<>())
@@ -254,6 +267,10 @@ void export_domain() {
   .def("__str__", pure_virtual(&str_impl<tt::DomainBase>))
   ;
   
+  // class trex.domains.interval: trex.domains.domain
+  //  abstract interval interface
+  //    - has_lower() check if interval has a non infinite lower bound
+  //    - has_upper() check if interval has a non infinite upper bound
   class_<interval_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("interval", "Abstract trex interval",
                              init<tu::Symbol>())
@@ -261,32 +278,61 @@ void export_domain() {
   .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper))
   ;
   
+  // class trex.domains.bool: trex.domains.interval
+  //  boolean domain
+  //   - __init__()     create a full boolean domain
+  //   - __init__(bool) create a domain with the single value arg
   class_<tt::BooleanDomain, bases<tt::BasicInterval> >("bool", "Boolean domain",
                                                     init<>())
   .def(init<bool>())
   ;
   
+  // class trex.domains.int: trex.domains.interval
+  //  integer domain
+  //   - __init__()     create a full int domain
+  //   - __init__(long) create a domain with the single value arg
+  //   - __init__(long, long) create a domain with interval [arg1, arg2]
   class_<tt::IntegerDomain, bases<tt::BasicInterval> >("int", "Integer domain", init<>())
   .def(init<long>())
   .def(init<long,long>())
   ;
 
+  // class trex.domains.float: trex.domains.interval
+  //  float domain
+  //   - __init__()     create a full int domain
+  //   - __init__(double) create a domain with the single value arg
+  //   - __init__(double, double) create a domain with interval [arg1, arg2]
   class_<tt::FloatDomain, bases<tt::BasicInterval> >("float", "Float domain", init<>())
   .def(init<double>())
   .def(init<double,double>())
   ;
   
+  // class trex.domains.enumerated: trex.domains.domain
+  // abstract enumerated domain interface
+  //   - __len__()    number of elements
   class_<enum_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("enumerated", "Abstract trex Enumerated domain",
                              init<tu::Symbol>())
   .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize))
   ;
   
+  
+  // class trex.domains.string: trex.domains.enumerated
+  //  string domain
+  //    - __init__()           create the full domain
+  //    - __init__(string)     create a domain with the single value arg
+  //    - __init__(collection) create a domain with the elements given in colllection
   class_<tt::StringDomain, bases<tt::BasicEnumerated> >("string", "string domain", init<>())
   .def(init<std::string>())
   .def("__init__", &collection_init<tt::StringDomain, std::string>)
   ;
 
+  
+  // class trex.domains.enum: trex.domains.enumerated
+  //  enum domain
+  //    - __init__()                  create the full domain
+  //    - __init__(trex.utils.symbol) create a domain with the single value arg
+  //    - __init__(collection)        create a domain with the elements given in collection
   class_<tt::EnumDomain, bases<tt::BasicEnumerated> >("enum", "enum domain", init<>())
   .def(init<tu::Symbol>())
   .def("__init__", &collection_init<tt::EnumDomain, tu::Symbol>)
@@ -295,6 +341,15 @@ void export_domain() {
   tt::Variable &(tt::Variable::* restrict_domain)(tt::DomainBase const &) = &tt::Variable::restrict;
   tt::Variable &(tt::Variable::* restrict_var)(tt::Variable const &) = &tt::Variable::restrict;
   
+  // class trex.domains.var
+  //   A trex variable
+  //    - __init__(trex.utils.symbol, trex.domains.domain) create a variable with symbol as name and domain as base domain
+  //    - name() get variable name
+  //    - domain() get variable domain
+  //    - restrict(domain) restrict the varaiable by domain
+  //    - restrict(var) restrict variable with var.domain()
+  //    - xml()     xml representation
+  //    - __str__() string representation
   class_<tt::Variable>("var", "trex variable", init<tu::Symbol, tt::DomainBase const &>())
   .def("name", &tt::Variable::name, return_internal_reference<>())
   .def("domain", &tt::Variable::domain, return_internal_reference<>())
