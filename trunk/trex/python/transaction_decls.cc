@@ -79,20 +79,20 @@ void export_transactions() {
   class_<tt::Predicate, boost::noncopyable>("predicate", "trex timeline predicate", no_init)
   .def("object", &tt::Predicate::object, return_internal_reference<>())
   .def("predicate", &tt::Predicate::predicate, return_internal_reference<>())
-  .def("has_attribute", &tt::Predicate::hasAttribute)
-  .def("restrict", attr_1)
-  .def("restrict", attr_2)
-  .def("attribute", &tt::Predicate::getAttribute, return_internal_reference<>())
+  .def("has_attribute", &tt::Predicate::hasAttribute, arg("name"))
+  .def("restrict", attr_1, arg("var"))
+  .def("restrict", attr_2, (arg("name"), arg("domain")))
+  .def("attribute", &tt::Predicate::getAttribute, return_internal_reference<>(), arg("name"))
   .def("xml", &xml_str<tt::Predicate>)
   .def("__str__", &str_impl<tt::Predicate>)
   ;
   
   class_<tt::Observation, tt::observation_id, bases<tt::Predicate> >("obs", "trex observation", init<tt::Predicate const &>())
-  .def(init<tu::Symbol, tu::Symbol>())
+  .def(init<tu::Symbol, tu::Symbol>(args("timeline", "pred"), "Create new observation pred on timeline"))
   ;
                                                                      
   class_<tt::Goal, tt::goal_id, bases<tt::Predicate> >("goal", "trex goal",
-                                                       init<tu::Symbol, tu::Symbol>())
+                                                       init<tu::Symbol, tu::Symbol>(args("timeline", "pred"), "Create new goal pred on timeline"))
   ;
   
   class_<tt::TICK, boost::noncopyable>("tick", "trex tick date", init<>())
