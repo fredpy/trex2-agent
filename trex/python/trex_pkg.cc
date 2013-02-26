@@ -38,6 +38,7 @@
 
 void export_utils();
 void export_domain();
+void export_transactions();
 
 using namespace boost::python;
 
@@ -65,4 +66,5 @@ BOOST_PYTHON_MODULE(trex)
 
   export_utils();
   export_domain();
+  export_transactions();
 } // BOOST_PYTHON_MODULE(trex)

@@ -33,6 +33,7 @@
  */
 #include <trex/utils/Symbol.hh>
 #include <trex/utils/LogManager.hh>
+#include <trex/utils/XmlUtils.hh>
 
 #include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -41,6 +42,7 @@
 #include <functional>
 
 using namespace boost::python;
+namespace bp=boost::property_tree;
 
 namespace {
   
@@ -177,6 +179,34 @@ namespace {
     void new_entry(TREX::utils::log::entry::pointer e);
   };
   
+  
+  bp::ptree xml_from_string(std::string const &str) {
+    std::istringstream iss(str);
+    bp::ptree ret;
+    bp::read_xml(iss, ret);
+    return ret;
+  }
+  
+  bp::ptree xml_from_file(std::string const &fname) {
+    bp::ptree ret;
+    bp::read_xml(fname, ret);
+    return ret;
+  }
+  
+  std::string xml_to_string(bp::ptree const &p) {
+    std::ostringstream oss;
+    bp::write_xml(oss, p);
+    return oss.str();
+  }
+  
+  bool has_attribute(bp::ptree::value_type const &t, std::string const &name) {
+    return TREX::utils::parse_attr< boost::optional<std::string> >(t, name);
+  }
+  
+  std::string attribute(bp::ptree::value_type const &t, std::string const &name) {
+    return TREX::utils::parse_attr<std::string>(t, name);
+  }
+
 }
 
 
@@ -211,6 +241,7 @@ void export_utils() {
    .def(self >= self)
    .def("__str__", &TREX::utils::Symbol::str, return_value_policy<copy_const_reference>())
   ;
+  
   
   // python string can be implicitly converted into trex.symbol
   implicitly_convertible<std::string, TREX::utils::Symbol>();
@@ -265,8 +296,33 @@ void export_utils() {
   .add_property("connected", &py_log_handler::connected, "Checks if the handler is still active")
   .def("disconnect", &py_log_handler::disconnect)
   .def("new_entry", pure_virtual(&py_log_handler::new_entry));
+
+
+  // Very simple classes to manipulate xml property trees
   
-  // todo : make a basic way to go through XML property tree
+  class_<bp::ptree::value_type> tag("xml_tag", "XML configuration treee element", no_init);
+  tag.def_readonly("tag", &bp::ptree::value_type::first)
+  .def("has_attribute", &has_attribute, arg("attr_name"))
+  .def("attribute", &attribute, arg("attr_name"))
+  ;
+
+  class_<bp::ptree>("xml", "XML configuration tree", no_init)
+  .def("from_str", &xml_from_string,
+       arg("xml_text")).staticmethod("from_str")
+  .def("from_file", &xml_from_file,
+       arg("file_name")).staticmethod("from_file")
+  .def("content", static_cast<std::string const &(bp::ptree::*)() const>(&bp::ptree::data),
+       return_value_policy<copy_const_reference>())
+  .def("__str__", &xml_to_string)
+  .def("__iter__", iterator<bp::ptree>())
+  .def("__len__", &bp::ptree::size)
+  .add_property("empty", &bp::ptree::empty)
+  .def("ext_file", &TREX::utils::ext_xml,
+       (arg("self"), "attribute", arg("ahead")=true))
+  ;
+  
+  tag.def_readonly("forest", &bp::ptree::value_type::second)
+  ;
   
 } // export_utils()
 
