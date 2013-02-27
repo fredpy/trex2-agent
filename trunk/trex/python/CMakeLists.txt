@@ -46,9 +46,10 @@ if(Boost_PYTHON_LIBRARY)
     utils_decls.cc 
     domain_decls.cc
     transaction_decls.cc
+    agent_decls.cc
   )
   add_dependencies(core trex)
-  target_link_libraries(trex TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+  target_link_libraries(trex TREXagent ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
   trex_py(trex)
   
 else(Boost_PYTHON_LIBRARY)

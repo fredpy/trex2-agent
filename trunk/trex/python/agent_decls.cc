@@ -31,42 +31,50 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+#include <trex/agent/RealTimeClock.hh>
+#include <trex/agent/Agent.hh>
+
 #include <boost/python.hpp>
 
-#include <trex/utils/TREXversion.hh>
-
-
-void export_utils();
-void export_domain();
-void export_transactions();
-void export_agent();
-
 using namespace boost::python;
+namespace ta=TREX::agent;
+namespace tt=TREX::transaction;
+namespace tu=TREX::utils;
 
-BOOST_PYTHON_MODULE(trex)
-{
-  // trex.version class
-  // A class with only static read only properties
-  //   trex.version.major : major version number
-  //   trex.version.minor : minor version number
-  //   trex.version.release : release number
-  //   trex.version.is_rc : indicates if it is a release candidate
-  //   trex.version.rc : release candidate number (or 0 if is_rc is False)
-  //   trex.version.str : A string value for this version of TREX
-  class_<TREX::version>("version", "Version information about trex", no_init)
-  .add_static_property("major", &TREX::version::major)
-  .add_static_property("minor", &TREX::version::minor)
-  .add_static_property("release", &TREX::version::release)
-  .add_static_property("is_rc", &TREX::version::is_release_candidate)
-  .add_static_property("rc", &TREX::version::rc_number)
-  .add_static_property("str", &TREX::version::str)
+void export_agent() {
+  // Setup my submodule
+  object module(handle<>(borrowed(PyImport_AddModule("trex.agent"))));
+  scope().attr("agent") = module;
+  scope my_scope = module;
+  // from now on everything is under trex.agent
+ 
+  
+  class_<ta::Clock, boost::noncopyable>("clock", "trex clock abstract class", no_init)
+  .def("start", &ta::Clock::doStart)
+  .add_property("initial", &ta::Clock::initialTick)
+  .add_property("tick", &ta::Clock::tick)
+  .def("date_str", &ta::Clock::date_str)
+  .def("__str__", &ta::Clock::info)
   ;
-
-  object pkg = scope();
-  pkg.attr("__path__") = "trex";
-
-  export_utils();
-  export_domain();
-  export_transactions();
-  export_agent();
-} // BOOST_PYTHON_MODULE(trex)
+  
+  class_<ta::RealTimeClock, bases<ta::Clock>,boost::noncopyable>
+  ("rt_clock", "real time clock at 1000Hz resolution",
+   init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
+  ;
+  
+  
+  class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
+  ("agent", "TREX agent class",
+   init<tu::Symbol const &, tt::TICK>())
+  .def(init<std::string const &>())
+  .def(init<boost::property_tree::ptree::value_type &>())
+  // need to find a way to take ownership of the clock passed as argument
+  .def("set_clock", &ta::Agent::setClock, arg("clock"))
+  .add_property("mission_completed", &ta::Agent::missionCompleted)
+  .def("initialize", &ta::Agent::initComplete)
+  .def("run", &ta::Agent::run)
+  .def("step", &ta::Agent::doNext)
+  ;
+  
+  
+}
