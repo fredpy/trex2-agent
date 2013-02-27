@@ -41,6 +41,18 @@ namespace ta=TREX::agent;
 namespace tt=TREX::transaction;
 namespace tu=TREX::utils;
 
+namespace {
+
+  bool set_agent_clock(ta::Agent *agent, std::auto_ptr<ta::Clock> c) {
+    if( agent->setClock(c.get()) ) {
+      c.release();
+      return true;
+    }
+    return false;
+  }
+
+}
+
 void export_agent() {
   // Setup my submodule
   object module(handle<>(borrowed(PyImport_AddModule("trex.agent"))));
@@ -49,7 +61,8 @@ void export_agent() {
   // from now on everything is under trex.agent
  
   
-  class_<ta::Clock, boost::noncopyable>("clock", "trex clock abstract class", no_init)
+  class_<ta::Clock, std::auto_ptr<ta::Clock>, 
+	 boost::noncopyable>("clock", "trex clock abstract class", no_init)
   .def("start", &ta::Clock::doStart)
   .add_property("initial", &ta::Clock::initialTick)
   .add_property("tick", &ta::Clock::tick)
@@ -57,11 +70,13 @@ void export_agent() {
   .def("__str__", &ta::Clock::info)
   ;
   
-  class_<ta::RealTimeClock, bases<ta::Clock>,boost::noncopyable>
+  class_<ta::RealTimeClock, bases<ta::Clock>, std::auto_ptr<ta::RealTimeClock>,
+	 boost::noncopyable>
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
+implicitly_convertible<std::auto_ptr<ta::RealTimeClock>, std::auto_ptr<ta::Clock> >();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
@@ -69,7 +84,7 @@ void export_agent() {
   .def(init<std::string const &>())
   .def(init<boost::property_tree::ptree::value_type &>())
   // need to find a way to take ownership of the clock passed as argument
-  .def("set_clock", &ta::Agent::setClock, arg("clock"))
+  .def("set_clock", &set_agent_clock, arg("clock"))
   .add_property("mission_completed", &ta::Agent::missionCompleted)
   .def("initialize", &ta::Agent::initComplete)
   .def("run", &ta::Agent::run)
