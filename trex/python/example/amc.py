@@ -12,7 +12,7 @@ class log_printer(trex.utils.log_handler):
         "note: this is done within a C++ thread with correct python thread protection"
         date=''
         if( e.is_dated ):
-            date = '['+ str(e.date()) + ']'
+            date = '[{}]'.format(e.date())
         print '{}[{}]{}: {}'.format(date, e.source(), e.kind(), e.content())
 
 trex_log = log_printer();
