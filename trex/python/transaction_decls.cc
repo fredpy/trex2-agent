@@ -42,9 +42,34 @@ namespace tt=TREX::transaction;
 
 namespace {
   
+
+  void log_error(error_already_set const &e) {
+    PyObject *py_type, *py_val, *py_trace;
+    tu::SingletonUse<tu::LogManager> log;
+
+    PyErr_Fetch(&py_type, &py_val, &py_trace);
+    
+    std::string msg = extract<std::string>(py_val);
+    log->syslog("python", tu::log::error)<<msg;
+    //Set back error info, display and rethrow
+    PyErr_Restore(py_type, py_val, py_trace);
+    PyErr_Print();
+    throw e;
+  }
   
-  class PyReactor :public tt::TeleoReactor {
-  public:
+  
+  struct python_reactor: tt::TeleoReactor, wrapper<tt::TeleoReactor> {
+
+    // Factory constructor
+    explicit python_reactor(tt::TeleoReactor::xml_arg_type &arg)
+    :tt::TeleoReactor(arg) {
+      syslog("DEBUG")<<"New python reactor created: \""<<getName()<<"\".";
+    }
+    virtual ~python_reactor() {
+      syslog("DEBUG")<<"Destroying reactor \""<<getName()<<"\".";
+    }
+
+    // Logging
     void log_msg(tu::Symbol const &type, std::string const &msg) {
       syslog(type)<<msg;
     }
@@ -58,140 +83,169 @@ namespace {
       log_msg(tu::log::error, msg);
     }
     
+    // timeline management
     void ext_use(tu::Symbol const &tl, bool control) {
       use(tl, control);
-    }
-    bool ext_unuse(tu::Symbol const &tl) {
-      return unuse(tl);
     }
     bool ext_check(tu::Symbol const &tl) const {
       return isExternal(tl);
     }
-    
-    void int_decl(tu::Symbol const &tl, bool control) {
-      provide(tl, control);
-    }
-    bool int_undecl(tu::Symbol const &tl) {
-      return unprovide(tl);
-    }
-    bool int_check(tu::Symbol const &tl) const {
-      return isInternal(tl);
-    }
-    
-    void post_obs(tt::Observation const &obs, bool verb) {
-      postObservation(obs, verb);
-    }
-    
     void post_request(tt::goal_id const &g) {
       postGoal(g);
     }
     bool cancel_request(tt::goal_id const &g) {
       return postRecall(g);
     }
+    bool ext_unuse(tu::Symbol const &tl) {
+      return unuse(tl);
+    }
     
-  protected:
-    explicit PyReactor(tt::TeleoReactor::xml_arg_type &arg)
-    :tt::TeleoReactor(arg) {}
-    virtual ~PyReactor() {}
+
+    void int_decl(tu::Symbol const &tl, bool control) {
+      provide(tl, control);
+    }
+    bool int_check(tu::Symbol const &tl) const {
+      return isInternal(tl);
+    }
+    void post_obs(tt::Observation const &obs, bool verb) {
+      postObservation(obs, verb);
+    }
+    bool int_undecl(tu::Symbol const &tl) {
+      return unprovide(tl);
+    }
     
-  };
-  
-  class py_decl: public tt::TeleoReactor::xml_factory::factory_type::producer {
+    // transaction callbacks
+    void notify(tt::Observation const &o) {
+      try {
+        override fn = this->get_override("notify");
+        if( fn )
+          fn(obs);
+        else
+          tt::TeleoReactor::notify(o);
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    void handleRequest(tt::goal_id const &g) {
+      try {
+        override fn = this->get_override("handle_request");
+        if( fn )
+          fn(g);
+        else
+          tt::TeleoReactor::handleRequest(g);
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    void handleRecall(tt::goal_id const &g) {
+      try {
+        override fn = this->get_override("handle_recall");
+        if( fn )
+          fn(g);
+        else
+          tt::TeleoReactor::handleRecall(g);
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    
+    // execution callbacks
+    void handleInit() {
+      try {
+        override fn = this->get_override("handle_init");
+        if( fn )
+          fn();
+        else
+          tt::TeleoReactor::handleInit();
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+   }
+    void handleTickStart() {
+      try {
+        override fn = this->get_override("handle_new_tick");
+        if( fn )
+          fn();
+        else
+          tt::TeleoReactor::handleTickStart();
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    bool synchronize() {
+      try {
+        // pure virtual => it has to exist
+        bool ret = this->get_override("synchronize")();
+        return ret;
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    bool hasWork() {
+      try {
+        override fn = this->get_override("has_work");
+        if( fn ) {
+          bool ret = fn();
+          return ret;
+        } else
+          return tt::TeleoReactor::hasWork(); // false
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+    }
+    void resume() {
+      try {
+        override fn = this->get_override("resume");
+        if( fn )
+          fn();
+        else
+          tt::TeleoReactor::resume();
+      } catch(error_already_set const &e) {
+        log_error(e);
+      }
+   }
+    
+  }; // python_reactor
+ 
+  class python_producer: public tt::TeleoReactor::xml_factory::factory_type::producer {
   public:
-    py_decl(tu::Symbol const &name)
+    explicit python_producer(tu::Symbol const &name)
     :tt::TeleoReactor::xml_factory::factory_type::producer(name) {
       tt::TeleoReactor::xml_factory::factory_type::producer::notify();
     }
-    ~py_decl() {}
-    
+    ~python_producer() {}
+
   private:
     result_type produce(argument_type arg) const {
-      // I am not sure of the validity and even less robustness of this code ....
-      
+      // Extract the target python type name
       boost::property_tree::ptree::value_type &node = tt::TeleoReactor::xml_factory::node(arg);
-      std::string py_class = tu::parse_attr<std::string>(node, "class");
+      std::string class_name = tu::parse_attr<std::string>(node, "python_class");
+      object my_class = eval(str(class_name));
       
+      if( my_class.is_none() ) {
+        m_log->syslog("python", tu::log::error)<<"Python class \""<<class_name<<"\" not found";
+        throw tu::XmlError(node, "Python class \""+class_name+"\" not found");
+      }
       
-      object my_class = eval(str(py_class));
-    
-      // Is my_class valid and derived from PyReactor
-      if( my_class.is_none() )
-        throw tu::XmlError(node, "python object \""+py_class+"\" not found");
-      
-      object obj = my_class(arg);
-      return extract<result_type>(obj);
+      try {
+        object obj = my_class(arg);
+        m_log->syslog("python", tu::log::info)<<"Created new python object "<<std::string(extract<std::string>(str(obj)));
+        boost::shared_ptr<tt::TeleoReactor> r = extract< boost::shared_ptr<tt::TeleoReactor> >(obj);
+        m_log->syslog("python", tu::log::info)<<"Object is the reactor "<<r->getName();
+        return r;
+      } catch(error_already_set const &e) {
+        log_error(e);
+      } catch(...) {
+        m_log->syslog("python", tu::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
+        throw;
+      }
     }
+    tu::SingletonUse<tu::LogManager> m_log;
     
-  };
+  }; // python producer
   
-  // declare my python reactor factory
-  py_decl _py_decl("PyReactor");
+  python_producer python_decl("PyReactor");
   
-  
-  struct reactor_wrap: PyReactor, wrapper<PyReactor> {
-    explicit reactor_wrap(tt::TeleoReactor::xml_arg_type &arg)
-    :PyReactor(arg) {}
-    
-    
-    void notify(tt::Observation const &obs) {
-      override fn = this->get_override("notify");
-      if( fn )
-        fn(obs);
-      else
-        PyReactor::notify(obs);
-    }
-    virtual void handleRequest(tt::goal_id const &g) {
-      override fn = this->get_override("handle_request");
-      if( fn )
-        fn(g);
-      else
-        PyReactor::handleRequest(g);
-    }
-    virtual void handleRecall(tt::goal_id const &g) {
-      override fn = this->get_override("handle_recall");
-      if( fn )
-        fn(g);
-      else
-        PyReactor::handleRecall(g);
-    }
-    
-    void handleInit() {
-      override fn = this->get_override("handle_init");
-      if( fn )
-        fn();
-      else
-        PyReactor::handleInit();
-    }
-
-    void handleTickStart() {
-      override fn = this->get_override("handle_new_tick");
-      if( fn )
-        fn();
-      else
-        PyReactor::handleTickStart();
-    }
-    
-    bool synchronize() {
-      return this->get_override("synchronize")();
-    }
-    
-    bool hasWork() {
-      override fn = this->get_override("has_work");
-      if( fn )
-        return fn();
-      else
-        return PyReactor::hasWork();
-    }
-    void resume() {
-      override fn = this->get_override("resume");
-      if( fn )
-        fn();
-      else
-        PyReactor::resume();
-    }
-    
-    
-  };
   
   template<class Obj>
   std::string xml_str(Obj const &dom) {
@@ -220,6 +274,14 @@ namespace {
   }
   
   
+  boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+    TREX::utils::SingletonUse<tt::Predicate::xml_factory> fact;
+    return fact->produce(decl);
+  }
+  
+  void python_add_reactor(tt::graph &g, boost::property_tree::ptree::value_type &cfg) {
+    g.add_reactor(cfg);
+  }
 
 }
 
@@ -236,7 +298,8 @@ void export_transactions() {
     
 
   // TODO: need to give an iterator
-  class_<tt::Predicate, boost::noncopyable>("predicate", "trex timeline predicate", no_init)
+  class_<tt::Predicate, boost::shared_ptr<tt::Predicate>,
+         boost::noncopyable>("predicate", "trex timeline predicate", no_init)
   .def("object", &tt::Predicate::object, return_internal_reference<>())
   .def("predicate", &tt::Predicate::predicate, return_internal_reference<>())
   .def("has_attribute", &tt::Predicate::hasAttribute, arg("name"))
@@ -245,6 +308,7 @@ void export_transactions() {
   .def("attribute", &tt::Predicate::getAttribute, return_internal_reference<>(), arg("name"))
   .def("xml", &xml_str<tt::Predicate>)
   .def("__str__", &str_impl<tt::Predicate>)
+  .def("from_xml", &pred_factory).staticmethod("from_xml");
   ;
   
   class_<tt::Observation, tt::observation_id, bases<tt::Predicate> >("obs", "trex observation", init<tt::Predicate const &>())
@@ -287,54 +351,45 @@ void export_transactions() {
   .def_readonly("xml", &tt::TeleoReactor::xml_arg_type::first)
   ;
   
-  class_<tt::TeleoReactor, boost::noncopyable>("reactor", "Tha abstract interface for a reactor", no_init)
-  .def("name", &tt::TeleoReactor::getName, return_internal_reference<>())
-  .def("agent_name", &tt::TeleoReactor::getAgentName, return_internal_reference<>())
-  .def("graph", &tt::TeleoReactor::getGraph, return_internal_reference<>())
+  class_<python_reactor, boost::shared_ptr<python_reactor>, boost::noncopyable>
+  ("reactor", "abstract reactor interface", no_init)
+  .def(init<tt::TeleoReactor::xml_arg_type &>())
+  .add_property("name", make_function(&tt::TeleoReactor::getName, return_internal_reference<>()))
+  .add_property("agent_name", make_function(&tt::TeleoReactor::getAgentName, return_internal_reference<>()))
+  .add_property("graph", make_function(&tt::TeleoReactor::getGraph, return_internal_reference<>()))
   .add_property("initial_tick", &tt::TeleoReactor::getInitialTick)
   .add_property("current_tick", &tt::TeleoReactor::getCurrentTick)
   .add_property("final_tick", &tt::TeleoReactor::getFinalTick)
-  .def("date_str", &tt::TeleoReactor::date_str, "convert a tick into a date string")
+  .def("date_str", &tt::TeleoReactor::date_str)
   .add_property("latency", &tt::TeleoReactor::getLatency)
   .add_property("look_ahead", &tt::TeleoReactor::getLookAhead)
   .add_property("exec_latency", &tt::TeleoReactor::getExecLatency)
   .add_property("externals_count", &tt::TeleoReactor::count_externals)
   .add_property("internals_count", &tt::TeleoReactor::count_internals)
-  .add_property("work_ratio", &tt::TeleoReactor::workRatio)
-  .def("__str__", &str_id)
-  ;
-  
-  c_graph.def("add_reactor", static_cast<tt::graph::reactor_id (tt::graph::*)(boost::property_tree::ptree::value_type &)>(&tt::graph::add_reactor), return_internal_reference<>())
-  .def("add_reactors", static_cast<size_t (tt::graph::*)(boost::property_tree::ptree &)>(&tt::graph::add_reactors))
-  .def("kill_reactor", &tt::graph::kill_reactor)
-  ;
-  
-  class_<reactor_wrap, bases<tt::TeleoReactor>, boost::noncopyable>("py_reactor", "Base class for python based reactors", init<tt::TeleoReactor::xml_arg_type &>())
-  // transaction callbacks
-//  .def("notify", &tt::TeleoReactor::notify, arg("o"))
-//  .def("handle_request", &reactor_wrap::handleRequest, arg("g"))
-//  .def("handle_recall", &reactor_wrap::handleRequest, arg("g"))
-  // execution callbacks
-  .def("handle_init", &reactor_wrap::handleInit)
-  .def("handle_new_tick", &reactor_wrap::handleTickStart)
-  .def("synchronize", pure_virtual(&reactor_wrap::synchronize))
-  .def("has_work", &reactor_wrap::hasWork)
-  .def("resume", &reactor_wrap::resume)
-  // transaction calls
-  .def("is_external", &PyReactor::ext_check, arg("tl_name"))
-  .def("use", &PyReactor::ext_use, (arg("tl_name"), arg("controled")=true))
-  .def("unuse", &PyReactor::ext_unuse, arg("tl_name"))
-  .def("is_internal", &PyReactor::int_check, arg("tl_name"))
-  .def("use", &PyReactor::int_decl, (arg("tl_name"), arg("controlable")=true))
-  .def("unuse", &PyReactor::int_undecl, arg("tl_name"))
-  .def("post", &PyReactor::post_obs, (arg("o"), arg("verbose")=false))
-  .def("request", &PyReactor::post_request, arg("g"))
-  .def("recall", &PyReactor::cancel_request, arg("g"))
+  .def("is_external", &python_reactor::ext_check)
+  .def("use", &python_reactor::ext_use, (arg("tl"), arg("control")=true))
+  .def("unuse", &python_reactor::ext_unuse)
+  .def("request", &python_reactor::post_request)
+  .def("recall", &python_reactor::cancel_request)
+  .def("is_internal", &python_reactor::int_check)
+  .def("declare", &python_reactor::int_decl, (arg("tl"), arg("control")=true))
+  .def("undeclare", &python_reactor::int_undecl)
+  .def("post", &python_reactor::post_obs, (arg("o"), arg("verbose")=false))
   // logging
-  .def("info", &PyReactor::info, arg("msg"))
-  .def("warn", &PyReactor::warn, arg("msg"))
-  .def("error", &PyReactor::error, arg("msg"))
+  .def("info", &python_reactor::info)
+  .def("warn", &python_reactor::warn)
+  .def("error", &python_reactor::error)
+  // transactions
+  .def("notify", &tt::TeleoReactor::notify)
+  .def("handle_request", &python_reactor::handleRequest)
+  .def("handle_recall", &python_reactor::handleRecall)
+  // execution
+  .def("handle_init", &python_reactor::handleInit)
+  .def("handle_new_tick", &python_reactor::handleTickStart)
+  .def("synchronize", pure_virtual(&python_reactor::synchronize))
+  .def("has_work", &python_reactor::hasWork)
+  .def("resume", &python_reactor::resume)
   ;
   
-  
+  c_graph.def("add_reactor", &python_add_reactor);
 }

@@ -38,6 +38,8 @@
 #include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 
 #include <functional>
 
@@ -183,13 +185,20 @@ namespace {
   bp::ptree xml_from_string(std::string const &str) {
     std::istringstream iss(str);
     bp::ptree ret;
-    bp::read_xml(iss, ret);
+    bp::read_xml(iss, ret, bp::xml_parser::no_comments|bp::xml_parser::trim_whitespace);
     return ret;
   }
   
   bp::ptree xml_from_file(std::string const &fname) {
     bp::ptree ret;
-    bp::read_xml(fname, ret);
+    bp::read_xml(fname, ret, bp::xml_parser::no_comments|bp::xml_parser::trim_whitespace);
+    return ret;
+  }
+  
+  bp::ptree json_from_string(std::string const &str) {
+    std::istringstream iss(str);
+    bp::ptree ret;
+    bp::read_json(iss, ret);
     return ret;
   }
   
@@ -198,6 +207,73 @@ namespace {
     bp::write_xml(oss, p);
     return oss.str();
   }
+
+  std::ostream &json_print(std::ostream &out, bp::ptree const &p, size_t indent=0,
+                           bool attr=false, bool first=true);
+  
+  
+  std::ostream &json_print(std::ostream &out, bp::ptree::value_type const &p, bool first, size_t indent) {
+    if( p.first=="<xmlattr>" )
+      return json_print(out, p.second, indent, true, first);
+    else {
+      std::string tab((indent+1), ' ');
+      if( !first )
+        out<<",\n";
+      out<<tab<<'\"'<<p.first<<"\": ";
+      json_print(out, p.second, indent+1);
+      return out;
+    }
+  }
+  
+  std::ostream &json_print(std::ostream &out, bp::ptree const &p, size_t indent,
+                           bool attr, bool first) {
+    std::string tab(indent, ' ');
+    
+    if( p.empty() )
+      out<<"\""<<p.data()<<"\"";
+    else {
+      if( !attr ) {
+        if( indent>0 )
+          out<<'\n';
+        out<<tab<<"{\n";
+      }
+      for(bp::ptree::const_iterator i=p.begin(); p.end()!=i; ++i) {
+        json_print(out, *i, first, indent);
+        first = false;
+      }
+      if( !attr )
+        out<<'\n'<<tab<<'}';
+    }
+    return out;
+  }
+  
+  
+  void remove_attr(bp::ptree &p) {
+    for(bp::ptree::iterator i=p.begin(); p.end()!=i;) {
+      if( i->first=="<xmlattr>" ) {
+        bp::ptree tmp = i->second;
+        i = p.erase(i);
+        p.insert(i, tmp.begin(), tmp.end());
+      } else {
+        remove_attr(i->second);
+        ++i;
+      }
+    }
+  }
+  
+  std::string xml_to_json(bp::ptree const &p) {
+    std::ostringstream oss;
+//    bp::ptree compact = p;
+//    // I need to recompact the <xmlattr>
+//    remove_attr(compact);
+//    bp::write_json(oss, compact);
+
+    json_print(oss, p);
+    return oss.str();
+  }
+
+  
+  
   
   bool has_attribute(bp::ptree::value_type const &t, std::string const &name) {
     return TREX::utils::parse_attr< boost::optional<std::string> >(t, name);
@@ -311,6 +387,7 @@ void export_utils() {
        arg("xml_text")).staticmethod("from_str")
   .def("from_file", &xml_from_file,
        arg("file_name")).staticmethod("from_file")
+  .def("from_json", &json_from_string, arg("json_text")).staticmethod("from_json")
   .def("content", static_cast<std::string const &(bp::ptree::*)() const>(&bp::ptree::data),
        return_value_policy<copy_const_reference>())
   .def("__str__", &xml_to_string)
@@ -319,6 +396,7 @@ void export_utils() {
   .add_property("empty", &bp::ptree::empty)
   .def("ext_file", &TREX::utils::ext_xml,
        (arg("self"), "attribute", arg("ahead")=true))
+  .def("json", &xml_to_json)
   ;
   
   tag.def_readonly("forest", &bp::ptree::value_type::second)
