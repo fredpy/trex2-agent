@@ -51,7 +51,7 @@ if(Boost_PYTHON_LIBRARY)
   add_dependencies(core trex)
   target_link_libraries(trex TREXagent ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
   trex_py(trex)
-  
+    
 else(Boost_PYTHON_LIBRARY)
   message(WARNING "Did not find Boost.Python : disabling python support")
 endif(Boost_PYTHON_LIBRARY)
