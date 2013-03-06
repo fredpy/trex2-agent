@@ -282,6 +282,10 @@ namespace {
   std::string attribute(bp::ptree::value_type const &t, std::string const &name) {
     return TREX::utils::parse_attr<std::string>(t, name);
   }
+  
+  std::string symbol_rep(TREX::utils::Symbol const &s) {
+    return "<trex.utils.symbol '"+s.str()+"'>";
+  }
 
 }
 
@@ -300,6 +304,14 @@ void export_utils() {
   // from now on eveerything is under trex.utils
 
 
+  module.attr("__doc__") = "Trex utility classes.\n"
+  "The classes that are used by trex but are often general constructs that"
+  "could be used otherwise. This often includ general types such as symbols,"
+  "xml tree, ...\n"
+  "All of these objects are directly related to a class -- or set f classes --"
+  " from TREXutils C++ library."
+  ;
+  
   // trex.utils.symbol class
   //   can be created with a string
   //   can be compared to each other with (==,!=,<,>,<=,=>)
@@ -307,15 +319,21 @@ void export_utils() {
   //   supports str(s) and len(s)
   class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
                               init<optional<std::string> >())
-   .def("empty", &TREX::utils::Symbol::empty)
-   .def("__len__", &TREX::utils::Symbol::length)
+   .def("empty", &TREX::utils::Symbol::empty,
+        "Test if current instance is the empty symbol")
+   .def("__len__", &TREX::utils::Symbol::length,
+        "Length in character of the current instance")
    .def(self == self)
    .def(self != self)
    .def(self < self)
    .def(self > self)
    .def(self <= self)
    .def(self >= self)
-   .def("__str__", &TREX::utils::Symbol::str, return_value_policy<copy_const_reference>())
+   .def("__str__", &TREX::utils::Symbol::str,
+        return_value_policy<copy_const_reference>(),
+        "String representation. This just convert the symbol into "
+        "a python string")
+  .def("__repr__", &symbol_rep)
   ;
   
   
