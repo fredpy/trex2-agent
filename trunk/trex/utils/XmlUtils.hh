@@ -101,8 +101,23 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup utils
        */
-      template<class Ty>
+      template<class Ty, bool AttrOptional=true>
       struct attr_helper {
+        
+        static std::string get_str(boost::property_tree::ptree const &pt,
+                               std::string const &name) {
+          std::string path("<xmlattr>."+name);
+          
+          if( AttrOptional ) {
+            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
+            
+            if( ret )
+              return *ret;
+            path = name;
+          }
+          return pt.get<std::string>(path);
+        }
+        
         /** @brief Parse attribute
          * 
          * @param[in] pt A xml based property tree
@@ -122,17 +137,32 @@ namespace TREX {
          *     @p name into a @p Ty value
          */
         static Ty get(boost::property_tree::ptree const &pt,
-                      std::string const &name) {
-          return string_cast<Ty>(pt.get<std::string>("<xmlattr>."+name));
+                          std::string const &name) {
+          return string_cast<Ty>(get_str(pt, name));
         }
       }; // TREX::utils::internals::attr_helper<>
       
 #ifndef DOXYGEN
-      template<class Ty>
-      struct attr_helper< boost::optional<Ty> > {
+      template<class Ty, bool AttrOptional>
+      struct attr_helper< boost::optional<Ty>, AttrOptional > {
+        
+        static boost::optional<std::string> get_str(boost::property_tree::ptree const &pt,
+                                                    std::string const &name) {
+          std::string path("<xmlattr>."+name);
+          
+          if( AttrOptional ) {
+            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
+            
+            if( ret )
+              return ret;
+            path = name;
+          }
+          return pt.get_optional<std::string>(path);
+        }
+       
         static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
                                       std::string const &name) {
-	  boost::optional<std::string> tmp = pt.get_optional<std::string>("<xmlattr>."+name);
+	  boost::optional<std::string> tmp = get_str(pt, name);
 	  if( tmp )
 	    return boost::optional<Ty>(string_cast<Ty>(*tmp));
 	  else 

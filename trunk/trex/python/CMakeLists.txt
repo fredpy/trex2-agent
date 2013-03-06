@@ -32,26 +32,31 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-find_package(Boost QUIET COMPONENTS python)
-message(STATUS "Checking for Boost.Python: ${Boost_PYTHON_LIBRARY}")
+option(WITH_PYTHON "Enable trex python extension" ON)
 
-if(Boost_PYTHON_LIBRARY)
-
-  # Also need to check for python libraries and paths
-  find_package(PythonLibs REQUIRED)
-  include_directories(${PYTHON_INCLUDE_DIR})
-
-  message(STATUS "Enabling TREX python adapters.")
-  python_add_module(trex trex_pkg.cc 
-    utils_decls.cc 
-    domain_decls.cc
-    transaction_decls.cc
-    agent_decls.cc
-  )
-  add_dependencies(core trex)
-  target_link_libraries(trex TREXagent ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
-  trex_py(trex)
+if(WITH_PYTHON)
+  find_package(Boost QUIET COMPONENTS python)
+  message(STATUS "Checking for Boost.Python: ${Boost_PYTHON_LIBRARY}")
+  
+  if(Boost_PYTHON_LIBRARY)
     
-else(Boost_PYTHON_LIBRARY)
-  message(WARNING "Did not find Boost.Python : disabling python support")
-endif(Boost_PYTHON_LIBRARY)
+    # Also need to check for python libraries and paths
+    find_package(PythonLibs REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIR})
+    
+    message(STATUS "Enabling TREX python adapters.")
+    python_add_module(trex trex_pkg.cc 
+      utils_decls.cc 
+      domain_decls.cc
+      transaction_decls.cc
+      agent_decls.cc
+      )
+    add_dependencies(core trex)
+    target_link_libraries(trex TREXagent ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+    trex_py(trex)
+    
+  else(Boost_PYTHON_LIBRARY)
+    message(WARNING "Did not find Boost.Python : disabling python support")
+    set(WITH_PYTHON OFF CACHE BOOL "Disabled due to lack of Boost.Python" FORCE)
+  endif(Boost_PYTHON_LIBRARY)
+endif(WITH_PYTHON)
