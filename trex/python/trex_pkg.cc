@@ -45,6 +45,20 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(trex)
 {
+  
+  object pkg = scope();
+  pkg.attr("__doc__") = "Python API for trex\n"
+  "Provides basic core classes in order to use and extend trex through python."
+  "This API attempt to reproduce trex core libraries structure with the 4 "
+  "following submodules:\n"
+  "  - utils: present basic utilities classes that are used by trex\n"
+  "  - domains: basic classes to represent flaxible domains and variables\n"
+  "  - transaction: core classes for reactor implementation\n"
+  "  - agent: classes used to construct and execute an agent as a collection"
+  " of interconnected reactors\n"
+  ;
+  pkg.attr("__path__") = "trex";
+  
   // trex.version class
   // A class with only static read only properties
   //   trex.version.major : major version number
@@ -54,6 +68,7 @@ BOOST_PYTHON_MODULE(trex)
   //   trex.version.rc : release candidate number (or 0 if is_rc is False)
   //   trex.version.str : A string value for this version of TREX
   class_<TREX::version>("version", "Version information about trex", no_init)
+  // I  do not know how to documment static_properties
   .add_static_property("major", &TREX::version::major)
   .add_static_property("minor", &TREX::version::minor)
   .add_static_property("release", &TREX::version::release)
@@ -62,8 +77,6 @@ BOOST_PYTHON_MODULE(trex)
   .add_static_property("str", &TREX::version::str)
   ;
 
-  object pkg = scope();
-  pkg.attr("__path__") = "trex";
 
   export_utils();
   export_domain();
