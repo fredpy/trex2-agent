@@ -67,7 +67,9 @@ BOOST_PYTHON_MODULE(trex)
   //   trex.version.is_rc : indicates if it is a release candidate
   //   trex.version.rc : release candidate number (or 0 if is_rc is False)
   //   trex.version.str : A string value for this version of TREX
-  class_<TREX::version>("version", "Version information about trex", no_init)
+  class_<TREX::version>("version", "Version information about trex.\n"
+                        "All its properties are static and indicate version "
+                        "informations about the current trex version", no_init)
   // I  do not know how to documment static_properties
   .add_static_property("major", &TREX::version::major)
   .add_static_property("minor", &TREX::version::minor)
