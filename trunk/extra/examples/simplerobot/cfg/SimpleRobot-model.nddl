@@ -1,0 +1,88 @@
+#include "TREX.nddl"
+
+// Declare Location as a class to allow allocation of instances
+// at run-time rather than compile time.
+class Location {
+   string name;
+   Location(string _name){
+      name = _name;
+   }
+}
+
+// Declare Path as a triple of locations and cost
+class Path { 
+   Location from; // Declare member variable 'from' of type 'Location'
+   Location to; // Declare member variable 'to' of type 'Location'
+   float cost; // Declare member variable 'cost' of type 'float' with a default value. 
+
+   // Specify a constructor to initialize members
+   Path(Location _from, Location _to){
+      from = _from;
+      to = _to;
+   }
+
+   // Another constructor with only one Location - trivial path
+   Path(Location loc){
+      from = loc;
+      to = loc;
+   }
+
+   // Another constructor which over-rides default cost
+   Path(Location _from, Location _to, float _cost){
+      from = _from;
+      to = _to;
+      cost = _cost;
+   }
+}
+
+class Navigator extends AgentTimeline {
+   // A predicate for the state of being at a location for a period of time
+   predicate At{
+    Location location; // Paramater is Location
+   }
+
+   // A predicate for the state of being in the middle of travel between 2 locations
+   predicate Going{
+      Location from, to;
+      from !=  to; // Travel must happen between different locations
+   }
+   
+   
+   Navigator(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class SimpleRobot {
+   Navigator navigator;
+
+   SimpleRobot() {
+      navigator = new Navigator(External);
+   }     
+
+   // An action for traveling from one location to another
+   // Internally it can use the navigator to keep track of the Rover's location
+   action Go{
+       Location destination;
+   } 
+}
+
+SimpleRobot::Go
+{
+    // Keep track of initial and end location using the navigator
+    met_by(condition object.navigator.At currentLocation);
+
+    meets( object.navigator.At targetLocation);
+    eq(targetLocation.location, destination);
+
+    // Find a path between the current location and the desired destination
+    Path path; 
+        
+    // The path used must be between the 2 points
+    path.from == currentLocation.location;
+    path.to == destination;
+        
+    equals( object.navigator.Going going);
+    eq(going.from,currentLocation.location);
+    eq(going.to,destination);
+}
