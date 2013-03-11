@@ -8,19 +8,19 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::simpleRobot;
 
-Symbol const SimpleRobot::AtPred("At");
-Symbol const SimpleRobot::GoingPred("Going");
-Symbol const SimpleRobot::locationPred("Location");
-Symbol const SimpleRobot::pathPred("Path");
-
+// rover.navigator
+// rover corresponds to "SimpleRobot rover" declared in SimpleRobot-initial-state.nddl
+// navigator corresponds to the  Navigator navigator; declaration inside the SimpleRobot class in SimpleRobot-model.nddl
 Symbol const SimpleRobot::navigatorObj("rover.navigator");
 
 SimpleRobot::SimpleRobot(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false), m_firstTick(true)
+    :TeleoReactor(arg,false)
 {
     syslog()<<"I want to own "<<navigatorObj;
-    provide(navigatorObj, false); // declare the navigator timeline --> interna
-    provide(navigatorObj); // declare the navigator timeline --> externa
+    //provide(navigatorObj, false); // declare the navigator timeline --> internal
+    // this is an external timeline
+    // declare the navigator timeline (notice that the Navigator class in the nddl extends AgentTimeline)
+    provide(navigatorObj);
     syslog()<<"I am done";
 }
 
@@ -28,7 +28,6 @@ SimpleRobot::~SimpleRobot() {}
 
 void SimpleRobot::handleInit()
 {
-    location = "Unknown";
 }
 
 void SimpleRobot::setValue(TREX::transaction::goal_id const &g)
