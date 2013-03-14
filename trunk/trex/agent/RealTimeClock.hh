@@ -119,7 +119,7 @@ namespace TREX {
         check_tick();
         if( percent_use<5 || percent_use>100 )
           throw utils::Exception("Only accept clock percent_use between 5 and 100%");
-        m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);          
+        m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
       
@@ -160,36 +160,57 @@ namespace TREX {
           typedef boost::optional< typename CHRONO::nanoseconds::rep >
             value_type;
           value_type value;
+          bool has_attr = false;
 
           // Get nanoseconds
           value = utils::parse_attr<value_type>(node, "nanos");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::nanoseconds(*value);
+          }
           
           // Get microseconds
           value = utils::parse_attr<value_type>(node, "micros");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::microseconds(*value);
-            
+          }
+          
           // Get milliseconds
           value = utils::parse_attr<value_type>(node, "millis");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::milliseconds(*value);
-            
+          }
+          
           // Get seconds
           value = utils::parse_attr<value_type>(node, "seconds");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::seconds(*value);
+          }
           
           // Get minutes
           value = utils::parse_attr<value_type>(node, "minutes");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::minutes(*value);
+          }
           
           // Get hours
           value = utils::parse_attr<value_type>(node, "hours");
-          if( value )
+          if( value ) {
+            has_attr = true;
             ns_tick += CHRONO::hours(*value);
+          }
+          
+          if( !has_attr ) {
+            std::ostringstream oss;
+            oss<<"No tick duration attribute found. Specify one or more of the following:\n"
+            <<" - hours,minutes,seconds,millis,nanos";
+            throw utils::XmlError(node, oss.str());
+          }
+          
           m_period = CHRONO::duration_cast<tick_rate>(ns_tick);
         } 
         check_tick();
