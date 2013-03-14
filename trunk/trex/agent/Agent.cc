@@ -442,7 +442,7 @@ AgentException::AgentException(graph const &agent, std::string const &msg) throw
 // static
 
 TICK Agent::initialTick(clock_ref clk) {
-  return clk?0:clk->initialTick();
+  return clk?clk->initialTick():0;
 }
 
 // structors :
