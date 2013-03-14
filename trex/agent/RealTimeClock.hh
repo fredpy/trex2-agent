@@ -119,8 +119,7 @@ namespace TREX {
         check_tick();
         if( percent_use<5 || percent_use>100 )
           throw utils::Exception("Only accept clock percent_use between 5 and 100%");
-        m_sleep_watchdog = CHRONO::duration_cast<duration_type>(m_period);
-        m_sleep_watchdog *= percent_use;
+        m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);          
         m_sleep_watchdog /= 100;
       }
       
