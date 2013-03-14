@@ -31,7 +31,6 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <boost/python.hpp>
 
 #include <trex/utils/TREXversion.hh>
 
@@ -41,13 +40,21 @@ void export_domain();
 void export_transactions();
 void export_agent();
 
-using namespace boost::python;
 
 namespace {
   
+  unsigned long version_major() {
+    return TREX::version::major();
+  }
   
-  
+  unsigned long version_minor() {
+    return TREX::version::minor();
+  }
 }
+
+#include <boost/python.hpp>
+
+using namespace boost::python;
 
 BOOST_PYTHON_MODULE(trex)
 {
@@ -77,8 +84,8 @@ BOOST_PYTHON_MODULE(trex)
                         "All its properties are static and indicate version "
                         "informations about the current trex version", no_init)
   // I  do not know how to documment static_properties
-  .add_static_property("major", make_function(&TREX::version::major))
-  .add_static_property("minor", make_function(&TREX::version::minor))
+  .add_static_property("major", &version_major)
+  .add_static_property("minor", &version_minor)
   .add_static_property("release", &TREX::version::release)
   .add_static_property("is_rc", &TREX::version::is_release_candidate)
   .add_static_property("rc", &TREX::version::rc_number)
