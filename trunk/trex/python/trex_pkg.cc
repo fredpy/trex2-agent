@@ -43,6 +43,11 @@ void export_agent();
 
 namespace {
   
+  /*
+   * need to encapsulate these two calls like this to avoid a bug on g++ 4.6.3
+   * which otherwise complains that major and minor are not declared in 
+   * TREX::version
+   */
   unsigned long version_major() {
     return TREX::version::major();
   }
