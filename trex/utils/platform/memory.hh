@@ -79,11 +79,11 @@
 #  ifdef CPP11_HAS_UNIQUE_PTR
 #   define UNIQ_PTR  std::unique_ptr
 #   define STD_MOVE(ptr) std::move(ptr)
-#   define MOVE_ARG(ptr) && ptr
+#   define MOVE_ARG(type) type &&
 #  else // CPP11_HAS_UNIQUE_PTR
 #   define UNIQ_PTR  std::auto_ptr
 #   define STD_MOVE(ptr) ptr
-#   define MOVE_ARG(ptr) ptr
+#   define MOVE_ARG(type) type
 #  endif // CPP11_HAS_UNIQUE_PTR
 # endif // DOXYGEN
 
