@@ -33,6 +33,7 @@
  */
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/Agent.hh>
+#include <trex/utils/platform/memory.hh>
 
 #include <boost/python.hpp>
 
@@ -43,7 +44,7 @@ namespace tu=TREX::utils;
 
 namespace {
 
-  bool set_agent_clock(ta::Agent *agent, std::auto_ptr<ta::Clock> c) {
+  bool set_agent_clock(ta::Agent *agent, UNIQ_PTR<ta::Clock> c) {
     if( agent->setClock(c.get()) ) {
       c.release();
       return true;
@@ -61,7 +62,7 @@ void export_agent() {
   // from now on everything is under trex.agent
  
   
-  class_<ta::Clock, std::auto_ptr<ta::Clock>, 
+  class_<ta::Clock, UNIQ_PTR<ta::Clock>,
 	 boost::noncopyable>("clock", "trex clock abstract class", no_init)
   .def("start", &ta::Clock::doStart)
   .add_property("initial", &ta::Clock::initialTick)
@@ -70,13 +71,13 @@ void export_agent() {
   .def("__str__", &ta::Clock::info)
   ;
   
-  class_<ta::RealTimeClock, bases<ta::Clock>, std::auto_ptr<ta::RealTimeClock>,
+  class_<ta::RealTimeClock, bases<ta::Clock>, UNIQ_PTR<ta::RealTimeClock>,
 	 boost::noncopyable>
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
-implicitly_convertible<std::auto_ptr<ta::RealTimeClock>, std::auto_ptr<ta::Clock> >();
+implicitly_convertible<std::auto_ptr<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
