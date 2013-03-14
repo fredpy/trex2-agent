@@ -44,7 +44,7 @@ namespace tu=TREX::utils;
 
 namespace {
 
-  bool set_agent_clock(ta::Agent *agent, UNIQ_PTR<ta::Clock> MOVE_ARG(c)) {
+  bool set_agent_clock(ta::Agent *agent, MOVE_ARG(UNIQ_PTR<ta::Clock>) c) {
     if( agent->setClock(c.get()) ) {
       c.release();
       return true;
