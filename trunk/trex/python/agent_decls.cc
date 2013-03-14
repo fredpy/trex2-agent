@@ -51,7 +51,7 @@ namespace {
     }
     return false;
   }
-
+  
 }
 
 void export_agent() {
@@ -77,7 +77,7 @@ void export_agent() {
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
-implicitly_convertible<UNIQ_PTR<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
+  // implicitly_convertible<UNIQ_PTR<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
