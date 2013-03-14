@@ -44,9 +44,8 @@ namespace tu=TREX::utils;
 
 namespace {
 
-  bool set_agent_clock(ta::Agent *agent, MOVE_ARG(UNIQ_PTR<ta::Clock>) c) {
-    if( agent->setClock(c.get()) ) {
-      c.release();
+  bool set_agent_clock(ta::Agent *agent, ta::clock_ref const &c) {
+    if( agent->setClock(c) ) {
       return true;
     }
     return false;
@@ -62,7 +61,7 @@ void export_agent() {
   // from now on everything is under trex.agent
  
   
-  class_<ta::Clock, UNIQ_PTR<ta::Clock>,
+  class_<ta::Clock, ta::clock_ref,
 	 boost::noncopyable>("clock", "trex clock abstract class", no_init)
   .def("start", &ta::Clock::doStart)
   .add_property("initial", &ta::Clock::initialTick)
@@ -71,13 +70,13 @@ void export_agent() {
   .def("__str__", &ta::Clock::info)
   ;
   
-  class_<ta::RealTimeClock, bases<ta::Clock>, UNIQ_PTR<ta::RealTimeClock>,
+  class_<ta::RealTimeClock, bases<ta::Clock>, boost::shared_ptr<ta::RealTimeClock>,
 	 boost::noncopyable>
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
-  // makeimplicitly_convertible<UNIQ_PTR<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
+  implicitly_convertible<boost::shared_ptr<ta::RealTimeClock>, ta::clock_ref>();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",

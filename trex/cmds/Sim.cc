@@ -240,7 +240,7 @@ int main(int argc, char **argv) {
     return -1;
   }
   char *configFile = argv[1];
-  UNIQ_PTR<Clock> clk;
+  clock_ref clk;
 
   int ret = 0;
   try {
@@ -256,8 +256,8 @@ int main(int argc, char **argv) {
     signal(SIGKILL, sim_cleanup);
     signal(SIGABRT, sim_abort);
 
-    my_agent.reset(new Agent(configFile, clk.release(), true));
-    my_agent->setClock(new StepClock(Clock::duration_type(0), 60));
+    my_agent.reset(new Agent(configFile, clk, true));
+    my_agent->setClock(clock_ref(new StepClock(Clock::duration_type(0), 60)));
     my_agent->initComplete();
     printHelp();
     while( true ) {

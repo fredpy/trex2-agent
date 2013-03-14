@@ -31,6 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+#include <boost/python.hpp>
 
 #include <trex/utils/TREXversion.hh>
 
@@ -57,7 +58,6 @@ namespace {
   }
 }
 
-#include <boost/python.hpp>
 
 using namespace boost::python;
 

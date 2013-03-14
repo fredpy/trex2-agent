@@ -172,7 +172,7 @@ namespace TREX {
       virtual std::string date_str(TREX::transaction::TICK const &tick) const;
 
       /** @brief XML factory for clocks. */
-      typedef TREX::utils::XmlFactory<Clock> xml_factory;
+      typedef TREX::utils::XmlFactory<Clock, boost::shared_ptr<Clock> > xml_factory;
       
       /** @brief Clock basic information 
        *

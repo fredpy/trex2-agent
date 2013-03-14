@@ -55,7 +55,9 @@
 # include <trex/utils/PluginLoader.hh>
 
 namespace TREX {
-  namespace agent {    
+  namespace agent {
+    
+    typedef boost::shared_ptr<Clock> clock_ref;
     
     /** @brief TREX agent
      *
@@ -120,7 +122,7 @@ namespace TREX {
        */
       explicit Agent(TREX::utils::Symbol const &name,
 		     TREX::transaction::TICK final = 0,
-		     Clock *clock = NULL, bool verbose=false);
+		     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] file_name A configuration file name
@@ -192,7 +194,7 @@ namespace TREX {
        * @sa Agent::loadConf(std::string const &)
        */
       explicit Agent(std::string const &file_name, 
-		     Clock *clock = NULL, bool verbose=false);
+		     clock_ref clock = clock_ref(), bool verbose=false);
       
       /** @brief Constructor
        *
@@ -219,7 +221,7 @@ namespace TREX {
        * @sa Agent::loadConf(rapidxml::xml_node<> &)
        */
       explicit Agent(boost::property_tree::ptree::value_type &config, 
-		     Clock *clock=NULL, bool verbose=false);
+		     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Destructor */
       ~Agent(); 
       
@@ -238,7 +240,7 @@ namespace TREX {
        *       that this post-condition is true no matter what value has been
        *       returned by this function.
        */
-      bool setClock(Clock *clock);
+      bool setClock(clock_ref clock);
       
       /** @brief run the agent
        *
@@ -506,7 +508,7 @@ namespace TREX {
        */
       void loadConf(std::string const &file_name);
 
-      static TREX::transaction::TICK initialTick(Clock *clk);
+      static TREX::transaction::TICK initialTick(clock_ref clk);
 
       typedef TREX::transaction::TeleoReactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;
@@ -519,7 +521,7 @@ namespace TREX {
 #endif 
       std::ofstream m_stat_log;
 
-      Clock  *m_clock;  
+      clock_ref                  m_clock;
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
       std::list<reactor_id>      m_idle;
