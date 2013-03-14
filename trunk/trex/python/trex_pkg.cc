@@ -43,6 +43,12 @@ void export_agent();
 
 using namespace boost::python;
 
+namespace {
+  
+  
+  
+}
+
 BOOST_PYTHON_MODULE(trex)
 {
   
@@ -71,8 +77,8 @@ BOOST_PYTHON_MODULE(trex)
                         "All its properties are static and indicate version "
                         "informations about the current trex version", no_init)
   // I  do not know how to documment static_properties
-  .add_static_property("major", &TREX::version::major)
-  .add_static_property("minor", &TREX::version::minor)
+  .add_static_property("major", make_function(&TREX::version::major))
+  .add_static_property("minor", make_function(&TREX::version::minor))
   .add_static_property("release", &TREX::version::release)
   .add_static_property("is_rc", &TREX::version::is_release_candidate)
   .add_static_property("rc", &TREX::version::rc_number)
