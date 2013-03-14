@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
     return -1;
   }
   char *configFile = argv[1];
-  UNIQ_PTR<Clock> clk;
+  clock_ref clk;
     
   if( argc>=3 ) {
     Symbol simOption = argv[2];
@@ -212,9 +212,9 @@ int main(int argc, char **argv) {
     }
   }
  
-  my_agent.reset(new Agent(configFile, clk.release()));
+  my_agent.reset(new Agent(configFile, clk));
   // Use a 1Hz clock by default
-  my_agent->setClock(new RealTimeClock(CHRONO::seconds(1)));
+  my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
   try {
     my_agent->run(); 
     my_agent.reset();

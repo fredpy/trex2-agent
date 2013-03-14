@@ -441,20 +441,20 @@ AgentException::AgentException(graph const &agent, std::string const &msg) throw
 
 // static
 
-TICK Agent::initialTick(Clock *clk) {
-  return (NULL==clk)?0:clk->initialTick();
+TICK Agent::initialTick(clock_ref clk) {
+  return clk?0:clk->initialTick();
 }
 
 // structors :
 
-Agent::Agent(Symbol const &name, TICK final, Clock *clk, bool verbose)
+Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
   :graph(name, initialTick(clk), verbose),
    m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
-Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
+Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
   :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
@@ -478,7 +478,7 @@ Agent::Agent(std::string const &file_name, Clock *clk, bool verbose)
   }
 }
 
-Agent::Agent(boost::property_tree::ptree::value_type &conf, Clock *clk, bool verbose)
+Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool verbose)
   :m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
@@ -507,8 +507,6 @@ Agent::~Agent() {
   m_proxy = NULL;
   if( m_stat_log.is_open() )
     m_stat_log.close();
-  if( NULL!=m_clock )
-    delete m_clock;
   clear();
 }
 
@@ -574,13 +572,13 @@ void Agent::external_check(reactor_id r,
 // manipulators :
 
 
-bool Agent::setClock(Clock *clock) {
+bool Agent::setClock(clock_ref clock) {
   if( NULL==m_clock ) {
     m_clock = clock;
     updateTick(initialTick(m_clock), false);
     return true;
   } else {
-    delete clock;
+    // delete clock;
     return false;
   }
 }
