@@ -44,7 +44,7 @@ namespace tu=TREX::utils;
 
 namespace {
 
-  bool set_agent_clock(ta::Agent *agent, UNIQ_PTR<ta::Clock> c) {
+  bool set_agent_clock(ta::Agent *agent, UNIQ_PTR<ta::Clock> MOVE_ARG(c)) {
     if( agent->setClock(c.get()) ) {
       c.release();
       return true;
@@ -77,7 +77,7 @@ void export_agent() {
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
-  // implicitly_convertible<UNIQ_PTR<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
+  // makeimplicitly_convertible<UNIQ_PTR<ta::RealTimeClock>, UNIQ_PTR<ta::Clock> >();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
