@@ -61,7 +61,7 @@ namespace mbari {
      */
     PositionHandler(xml_arg const &arg);
     /** @brief Destructor */
-    ~PositionHandler() {}
+    virtual ~PositionHandler() {}
     
   private:
     bool handleMessage(amqp::queue::message &msg);
