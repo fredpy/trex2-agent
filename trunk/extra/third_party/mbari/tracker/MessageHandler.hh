@@ -104,7 +104,7 @@ namespace mbari {
      */
     MessageHandler(xml_arg const &arg);
     /** @brief Destructor */
-    ~MessageHandler() {}
+    virtual ~MessageHandler() {}
 
   protected:    
     /** @brief handle new message
