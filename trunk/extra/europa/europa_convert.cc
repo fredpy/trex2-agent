@@ -44,12 +44,13 @@
 #include <trex/domain/StringDomain.hh>
 #include <trex/domain/EnumDomain.hh>
 
-# pragma warning (push : 0)
-// europa has a lot of warnings: lets make it more silent
-#  include <PLASMA/Domains.hh>
-#  include <PLASMA/Object.hh>
-#  include <PLASMA/PlanDatabase.hh>
-# pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/Domains.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Object.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
+# include <trex/europa/bits/system_header.hh>
 
 #include <memory>
 
