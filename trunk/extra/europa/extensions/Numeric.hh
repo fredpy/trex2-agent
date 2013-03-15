@@ -37,11 +37,9 @@
 # include <trex/europa/config.hh>
 # include <trex/europa/EuropaException.hh>
 
-# pragma warning (push : 0)
-# pragma GCC diagnostic ignored "-Wall"
-// europa has a lot of warnings: lets make it more silent
-#  include <PLASMA/Constraint.hh>
-# pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/Constraint.hh>
+# include <trex/europa/bits/system_header.hh>
 
 namespace TREX {
   namespace europa {
