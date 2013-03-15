@@ -40,33 +40,39 @@
 #include "trex/europa/DeliberationFilter.hh"
 #include "trex/europa/SynchronizationManager.hh"
 
-#pragma warning (push : 0)
-#pragma GCC diagnostic ignored "-Wall"
-// europa has a lot of warnings: lets make it more silent
-# include <PLASMA/ModuleConstraintEngine.hh>
-# include <PLASMA/ModulePlanDatabase.hh>
-# include <PLASMA/ModuleRulesEngine.hh>
-# include <PLASMA/ModuleTemporalNetwork.hh>
-# include <PLASMA/ModuleSolvers.hh>
-# include <PLASMA/ModuleNddl.hh>
-
-# include <PLASMA/RulesEngine.hh>
-# include <PLASMA/Propagators.hh>
-# include <PLASMA/Schema.hh>
-# include <PLASMA/NddlInterpreter.hh>
-
-# include <PLASMA/Timeline.hh>
-# include <PLASMA/TokenVariable.hh>
-
-# include <PLASMA/PlanDatabaseWriter.hh>
-
-
-# include <PLASMA/Context.hh>
-
-# include <PLASMA/XMLUtils.hh>
-# include <PLASMA/Debug.hh>
-#pragma warning (pop)
-
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModuleConstraintEngine.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModulePlanDatabase.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModuleRulesEngine.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModuleTemporalNetwork.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModuleSolvers.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ModuleNddl.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/RulesEngine.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Propagators.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Schema.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/NddlInterpreter.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Timeline.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/TokenVariable.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabaseWriter.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Context.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/XMLUtils.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Debug.hh>
+# include <trex/europa/bits/system_header.hh>
 
 #include <boost/scope_exit.hpp>
 
@@ -1260,7 +1266,7 @@ void Assembly::backtracking(EUROPA::SOLVERS::DecisionPointId &dp) {
 }
 
 void Assembly::print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const {
-  EUROPA::TokenId tok = details::parent_token(v);
+  // EUROPA::TokenId tok = details::parent_token(v);
   details::var_print(out<<"Local context for ", v)<<":\n";
   out<<"  - base domain: "<<v->baseDomain().toString()
      <<"\n  - last domain: "<<v->lastDomain().toString()

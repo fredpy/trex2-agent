@@ -37,15 +37,17 @@
 
 #include <trex/utils/chrono_helper.hh>
 
-#pragma warning (push : 0)
-// europa has a lot of warnings: lets make it more silent
-# include <PLASMA/Timeline.hh>
-# include <PLASMA/Token.hh>
-# include <PLASMA/TokenVariable.hh>
-
-# include <PLASMA/PlanDatabaseWriter.hh>
-# include <PLASMA/ThreatDecisionPoint.hh>
-#pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/Timeline.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Token.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/TokenVariable.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabaseWriter.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/ThreatDecisionPoint.hh>
+# include <trex/europa/bits/system_header.hh>
 
 #include <boost/scope_exit.hpp>
 
@@ -592,8 +594,9 @@ void EuropaReactor::resume() {
   stat_clock::time_point start = stat_clock::now();
 
   size_t nsteps = planner()->getStepCount();
-  bool should_relax = false, should_continue;
-  size_t count = 0;
+  bool should_relax = false;
+  // bool should_continue;
+  // size_t count = 0;
   
   // do {
     if( constraint_engine()->pending() )
