@@ -34,8 +34,11 @@
 
 #include "EarliestFirstFlawManager.hh"
 
-#include <PLASMA/Token.hh>
-#include <PLASMA/TokenVariable.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/Token.hh>
+# include <PLASMA/TokenVariable.hh>
+#pragma warning (pop)
 
 using namespace TREX::europa;
 

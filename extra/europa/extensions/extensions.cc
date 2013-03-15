@@ -33,7 +33,10 @@
  */
 #include <trex/europa/Assembly.hh>
 
-#include <PLASMA/CFunctions.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/CFunctions.hh>
+#pragma warning (pop)
 
 #include "EarliestFirstFlawManager.hh"
 #include "Trigonometry.hh"

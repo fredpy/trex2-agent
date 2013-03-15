@@ -41,7 +41,15 @@
 # include <trex/utils/LogManager.hh>
 
 # include <trex/europa/config.hh>
-# include <PLASMA/CFunction.hh>
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Debug.hh>
+#  include <PLASMA/Error.hh>
+#  include <PLASMA/CFunction.hh>
+# pragma warning (pop)
+
+
 
 namespace TREX {
   namespace europa {

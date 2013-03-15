@@ -35,8 +35,14 @@
 # define H_trex_europa_TimePoint
 
 # include <trex/europa/config.hh>
-# include <PLASMA/Variable.hh>
-# include <PLASMA/Token.hh>
+
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Variable.hh>
+#  include <PLASMA/Token.hh>
+# pragma warning (pop)
+
 
 namespace TREX {
   namespace europa {

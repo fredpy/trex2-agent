@@ -37,12 +37,15 @@
 
 #include <trex/utils/chrono_helper.hh>
 
-#include <PLASMA/Timeline.hh>
-#include <PLASMA/Token.hh>
-#include <PLASMA/TokenVariable.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/Timeline.hh>
+# include <PLASMA/Token.hh>
+# include <PLASMA/TokenVariable.hh>
 
-#include <PLASMA/PlanDatabaseWriter.hh>
-#include <PLASMA/ThreatDecisionPoint.hh>
+# include <PLASMA/PlanDatabaseWriter.hh>
+# include <PLASMA/ThreatDecisionPoint.hh>
+#pragma warning (pop)
 
 #include <boost/scope_exit.hpp>
 

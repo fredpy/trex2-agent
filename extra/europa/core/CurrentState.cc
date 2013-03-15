@@ -35,8 +35,11 @@
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/bits/europa_helpers.hh"
 
-#include <PLASMA/TokenVariable.hh>
-#include <PLASMA/PlanDatabaseWriter.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/TokenVariable.hh>
+# include <PLASMA/PlanDatabaseWriter.hh>
+#pragma warning (pop)
 
 #include <trex/utils/platform/chrono.hh>
 #include <boost/unordered_map.hpp>

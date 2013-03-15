@@ -39,11 +39,14 @@
 
 # include <trex/utils/id_mapper.hh>
 
-# include <PLASMA/PlanDatabase.hh>
-# include <PLASMA/RulesEngineDefs.hh>
-# include <PLASMA/Module.hh>
-# include <PLASMA/Engine.hh>
-# include <PLASMA/Solver.hh>
+# pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/PlanDatabase.hh>
+#  include <PLASMA/RulesEngineDefs.hh>
+#  include <PLASMA/Module.hh>
+#  include <PLASMA/Engine.hh>
+#  include <PLASMA/Solver.hh>
+# pragma warning (pop)
 
 # include <boost/iterator/filter_iterator.hpp>
 

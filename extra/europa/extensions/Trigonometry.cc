@@ -33,7 +33,10 @@
  */
 #include "Trigonometry.hh"
 
-#include <PLASMA/ConstrainedVariable.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/ConstrainedVariable.hh>
+#pragma warning (pop)
 
 #include <boost/numeric/interval.hpp>
 
