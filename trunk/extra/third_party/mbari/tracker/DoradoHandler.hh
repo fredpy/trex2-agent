@@ -91,7 +91,7 @@ namespace mbari {
      */
     DoradoHandler(xml_arg const &arg);
     /** @brief Destructor */
-    ~DoradoHandler() {}
+    virtual ~DoradoHandler() {}
 
   private:
     bool handleMessage(amqp::queue::message &msg);

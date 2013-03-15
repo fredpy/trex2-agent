@@ -1,10 +1,16 @@
 #ifndef H_MBARI_Constraints
 # define H_MBARI_Constraints
 
-#include <trex/europa/config.hh>
+# include <trex/europa/config.hh>
 
-#include <PLASMA/Constraint.hh>
-#include <PLASMA/Domain.hh>
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Constraint.hh>
+#  include <PLASMA/Domain.hh>
+# pragma warning (pop)
+
+
 
 namespace mbari {
   namespace europa {
