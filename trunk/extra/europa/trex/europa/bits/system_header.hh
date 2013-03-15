@@ -32,7 +32,50 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #ifdef TREX_PP_SYSTEM_FILE
-# pragma GCC system_header
+
+# if defined(_MSC_VER)
+
+// for msvc set warning level to 0
+#  pragma warning (push, 0)
+
+# else // assume gcc or clang
+
+// save warning level
+#  pragma GCC diagnostic push
+// indicate that this header is system to gcc and clang
+#  pragma GCC system_header
+
+// This below is a hacky way to make gcc shut up about deprecated headers
+# undef TREX_PP_DEPRECATED
+# if defined(__GNUC__) && defined(__DEPRECATED)
+# undef __DEPRECATED
+# define TREX_PP_DEPRECATED
+# endif // __GNUC__ && _DEPRECATED
+
+# endif // _MSC_VER
+
+
+// include the file
 # include TREX_PP_SYSTEM_FILE
+// undef the macro
 # undef TREX_PP_SYSTEM_FILE
-#endif
+
+
+
+# if defined(_MSC_VER)
+
+// for msvc restore warning level
+#  pragma warning (pop)
+
+# else // assume gcc or clang
+
+#  if defined(TREX_PP_DEPRECATED)
+#   define __DEPRECATED
+#  endif
+
+// restore warning level
+#  pragma GCC diagnostic pop
+
+# endif // _MSC_VER
+
+#endif // TREX_PP_SYTEM_FILE
