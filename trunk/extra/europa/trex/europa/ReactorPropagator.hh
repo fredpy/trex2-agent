@@ -36,7 +36,11 @@
 
 # include "config.hh"
 
-# include <PLASMA/Propagators.hh>
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Propagators.hh>
+# pragma warning (pop)
 
 namespace TREX {
   namespace europa {

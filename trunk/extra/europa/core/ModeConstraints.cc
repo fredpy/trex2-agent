@@ -35,7 +35,10 @@
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/bits/europa_helpers.hh"
 
-#include <PLASMA/TokenVariable.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/TokenVariable.hh>
+#pragma warning (pop)
 
 using namespace TREX::europa;
 

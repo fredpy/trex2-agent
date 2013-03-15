@@ -40,11 +40,14 @@
 
 # include <trex/europa/config.hh>
 
-# include <PLASMA/LabelStr.hh>
-# include <PLASMA/Entity.hh>
-# include <PLASMA/Timeline.hh>
-# include <PLASMA/Token.hh>
-# include <PLASMA/Solver.hh>
+# pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/LabelStr.hh>
+#  include <PLASMA/Entity.hh>
+#  include <PLASMA/Timeline.hh>
+#  include <PLASMA/Token.hh>
+#  include <PLASMA/Solver.hh>
+# pragma warning (pop)
 
 # include <fstream>
 

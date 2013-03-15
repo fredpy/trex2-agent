@@ -44,9 +44,12 @@
 #include <trex/domain/StringDomain.hh>
 #include <trex/domain/EnumDomain.hh>
 
-#include <PLASMA/Domains.hh>
-#include <PLASMA/Object.hh>
-#include <PLASMA/PlanDatabase.hh>
+# pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Domains.hh>
+#  include <PLASMA/Object.hh>
+#  include <PLASMA/PlanDatabase.hh>
+# pragma warning (pop)
 
 #include <memory>
 

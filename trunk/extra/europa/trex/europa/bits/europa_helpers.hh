@@ -44,14 +44,18 @@
 #ifndef H_trex_europa_helpers
 # define H_trex_europa_helpers
 
-#include <string>
+# include <string>
 
-#include "../config.hh"
+# include "../config.hh"
 
-#include <PLASMA/Token.hh>
-#include <PLASMA/ConstrainedVariable.hh>
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Token.hh>
+#  include <PLASMA/ConstrainedVariable.hh>
+# pragma warning (pop)
 
-#include <boost/noncopyable.hpp>
+# include <boost/noncopyable.hpp>
 
 namespace TREX {
   namespace europa {

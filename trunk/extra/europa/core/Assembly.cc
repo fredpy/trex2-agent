@@ -40,28 +40,33 @@
 #include "trex/europa/DeliberationFilter.hh"
 #include "trex/europa/SynchronizationManager.hh"
 
-#include <PLASMA/ModuleConstraintEngine.hh>
-#include <PLASMA/ModulePlanDatabase.hh>
-#include <PLASMA/ModuleRulesEngine.hh>
-#include <PLASMA/ModuleTemporalNetwork.hh>
-#include <PLASMA/ModuleSolvers.hh>
-#include <PLASMA/ModuleNddl.hh>
+#pragma warning (push : 0)
+#pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/ModuleConstraintEngine.hh>
+# include <PLASMA/ModulePlanDatabase.hh>
+# include <PLASMA/ModuleRulesEngine.hh>
+# include <PLASMA/ModuleTemporalNetwork.hh>
+# include <PLASMA/ModuleSolvers.hh>
+# include <PLASMA/ModuleNddl.hh>
 
-#include <PLASMA/RulesEngine.hh>
-#include <PLASMA/Propagators.hh>
-#include <PLASMA/Schema.hh>
-#include <PLASMA/NddlInterpreter.hh>
+# include <PLASMA/RulesEngine.hh>
+# include <PLASMA/Propagators.hh>
+# include <PLASMA/Schema.hh>
+# include <PLASMA/NddlInterpreter.hh>
 
-#include <PLASMA/Timeline.hh>
-#include <PLASMA/TokenVariable.hh>
+# include <PLASMA/Timeline.hh>
+# include <PLASMA/TokenVariable.hh>
 
-#include <PLASMA/PlanDatabaseWriter.hh>
+# include <PLASMA/PlanDatabaseWriter.hh>
 
 
-#include <PLASMA/Context.hh>
+# include <PLASMA/Context.hh>
 
-#include <PLASMA/XMLUtils.hh>
-#include <PLASMA/Debug.hh>
+# include <PLASMA/XMLUtils.hh>
+# include <PLASMA/Debug.hh>
+#pragma warning (pop)
+
 
 #include <boost/scope_exit.hpp>
 

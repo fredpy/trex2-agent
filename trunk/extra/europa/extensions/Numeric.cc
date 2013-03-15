@@ -34,8 +34,11 @@
 #include "Numeric.hh"
 #include <trex/europa/bits/europa_helpers.hh>
 
-#include <PLASMA/ConstrainedVariable.hh>
-#include <PLASMA/Domains.hh>
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/ConstrainedVariable.hh>
+# include <PLASMA/Domains.hh>
+#pragma warning (pop)
 
 
 using namespace TREX::europa;

@@ -34,8 +34,10 @@
 #include "trex/europa/TimeConstraints.hh"
 #include "trex/europa/Assembly.hh"
 
-#include <PLASMA/Domain.hh>
-
+#pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+# include <PLASMA/Domain.hh>
+#pragma warning (pop)
 
 
 using namespace TREX::europa;

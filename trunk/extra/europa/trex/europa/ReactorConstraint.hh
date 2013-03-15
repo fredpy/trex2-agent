@@ -37,7 +37,10 @@
 # include "ReactorPropagator.hh"
 # include "EuropaException.hh"
 
-# include <PLASMA/Constraint.hh>
+# pragma warning (push : 0)
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/Constraint.hh>
+# pragma warning (pop)
 
 namespace TREX {
   namespace europa {

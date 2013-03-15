@@ -46,9 +46,13 @@
 #ifndef H_trex_europa_TrexThreatDecisionPoint
 # define H_trex_europa_TrexThreatDecisionPoint
 
-#include <trex/europa/config.hh>
+# include <trex/europa/config.hh>
 
-# include <PLASMA/ThreatDecisionPoint.hh>
+# pragma warning (push : 0)
+# pragma GCC diagnostic ignored "-Wall"
+// europa has a lot of warnings: lets make it more silent
+#  include <PLASMA/ThreatDecisionPoint.hh>
+# pragma warning (pop)
 
 namespace TREX {
   namespace europa {
