@@ -36,12 +36,11 @@
 
 # include <trex/europa/config.hh> // set the flags for europa
 
-# pragma warning (push : 0)
-# pragma GCC diagnostic ignored "-Wall"
-// europa has a lot of warnings: lets make it more silent
-#  include <PLASMA/Domain.hh>
-#  include <PLASMA/DataType.hh>
-# pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/DataType.hh>
+# include <trex/europa/bits/system_header.hh>
 
 # include <trex/domain/DomainVisitor.hh>
 

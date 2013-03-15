@@ -31,55 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_europa_ReactorPropagator 
-# define H_trex_europa_ReactorPropagator
-
-# include "config.hh"
-
-// include plasma header as system files in order to disable warnings
-# define TREX_PP_SYSTEM_FILE <PLASMA/Propagators.hh>
-# include <trex/europa/bits/system_header.hh>
-
-namespace TREX {
-  namespace europa {
-
-    class Assembly;
-    class ReactorConstraint;
-
-    /** @brief Europa propagator with access to T-REX
-     *
-     * This class provide a simple europa propagator that allow its clients to
-     * easily access to the Assembly that created it and by doing so extract 
-     * information from the reactor that executes this europa solver such as 
-     * AgentTimelines' type in T-REX or current tick, timeline latencies and 
-     * look-ahead, ...
-     *
-     * @ingroup europa
-     * @author Frederic Py <fpy@mbari.org>
-     */
-    class ReactorPropagator :public EUROPA::DefaultPropagator {
-    public:
-      /** @brief Destructor */
-      virtual ~ReactorPropagator() {}
-      
-    protected:
-      /** @brief Constructor
-       *
-       * @param[in] assembly The assebmly that created this instance
-       * @param[in] name The symbolic name associated to this instance
-       * @param[in] cstrEngine The constraint engine 
-       */
-      ReactorPropagator(Assembly &assembly, EUROPA::LabelStr const &name, 
-			EUROPA::ConstraintEngineId const &cstrEngine)
-	:EUROPA::DefaultPropagator(name, cstrEngine), m_assembly(assembly) {}
-
-      Assembly &m_assembly;
-
-      friend class Assembly;
-      friend class ReactorConstraint;
-    }; // TREX::europa::ReactorPropagator
-
-  } // TREX::europa
-} // TREX
-
-#endif // H_trex_europa_ReactorPropagator
+#ifdef TREX_PP_SYSTEM_FILE
+# pragma GCC system_header
+# include TREX_PP_SYSTEM_FILE
+# undef TREX_PP_SYSTEM_FILE
+#endif

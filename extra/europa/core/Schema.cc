@@ -37,11 +37,11 @@
 
 #include <trex/utils/XmlUtils.hh>
 
-#pragma warning (push : 0)
-// europa has a lot of warnings: lets make it more silent
-# include <PLASMA/Debug.hh>
-# include <PLASMA/Error.hh>
-#pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/Debug.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Error.hh>
+# include <trex/europa/bits/system_header.hh>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/regex.hpp>

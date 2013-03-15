@@ -40,14 +40,17 @@
 
 # include <trex/europa/config.hh>
 
-# pragma warning (push : 0)
-// europa has a lot of warnings: lets make it more silent
-#  include <PLASMA/LabelStr.hh>
-#  include <PLASMA/Entity.hh>
-#  include <PLASMA/Timeline.hh>
-#  include <PLASMA/Token.hh>
-#  include <PLASMA/Solver.hh>
-# pragma warning (pop)
+// include plasma header as system files in order to disable warnings
+# define TREX_PP_SYSTEM_FILE <PLASMA/LabelStr.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Entity.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Timeline.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Token.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Solver.hh>
+# include <trex/europa/bits/system_header.hh>
 
 # include <fstream>
 
