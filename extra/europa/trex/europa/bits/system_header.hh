@@ -33,15 +33,18 @@
  */
 #ifdef TREX_PP_SYSTEM_FILE
 
-# if defined(_MSC_VER)
-
-// for msvc set warning level to 0
+# if defined(_MSC_VER)  // MSVC
 #  pragma warning (push, 0)
 
-# else // assume gcc or clang
+# elif defined(__GNUC__) // gcc
 
-// save warning level
-#  pragma GCC diagnostic push
+#  undef TREX_PP_PUSHED
+#  if (__GNUC__>4) || ((__GNUC__==4) && (__GNUC_MINOR__>=6))
+// push and pop only exists since 4.6 in gcc
+#   pragma GCC diagnostic push
+#   define TREX_PP_PUSHED
+#  endif
+
 // indicate that this header is system to gcc and clang
 #  pragma GCC system_header
 
@@ -52,7 +55,12 @@
 # define TREX_PP_DEPRECATED
 # endif // __GNUC__ && _DEPRECATED
 
-# endif // _MSC_VER
+# elif defined(__clang__)
+
+# pragma clang diagnostic push
+# pragma clang system_header
+
+# endif // end of compiler specific macros
 
 
 // include the file
@@ -67,14 +75,22 @@
 // for msvc restore warning level
 #  pragma warning (pop)
 
-# else // assume gcc or clang
+# elif defined(__GNUC__)
 
 #  if defined(TREX_PP_DEPRECATED)
 #   define __DEPRECATED
+#   undef TREX_PP_DEPRECATED
 #  endif
 
+# if defined(TREX_PP_PUSHED)
 // restore warning level
 #  pragma GCC diagnostic pop
+#  undef TREX_PP_PUSHED
+# endif
+
+# elif defined(__clang__)
+
+#  pragma clang diagnostic pop
 
 # endif // _MSC_VER
 
