@@ -77,7 +77,7 @@ namespace TREX {
       static std::string const Vent1;
       static std::string const Vent2;
 
-      int number;
+      // int number;
 
     };
 
