@@ -51,9 +51,11 @@ if(POCO_NET_LIBRARY)
   trex_plugin(iridium iridium_pg.cc
     SbdMailer.cc
     DTAReactor.cc
+    ControlInterface.cc
     #headers 
     SbdMailer.hh
     DTAReactor.hh
+    ControlInterface.hh
     )
   target_link_libraries(iridium_pg TREXtransaction
     ${POCO_NET_LIBRARY})
