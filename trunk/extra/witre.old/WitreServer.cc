@@ -262,7 +262,7 @@ void WitreServer::searchGraph()
 void WitreServer::notify(Observation const &obs)
 {
     boost::mutex::scoped_lock lock(mutex_);
-    time_t now = (tickToTime(getCurrentTick())-boost::posix_time::from_time_t(0)).total_seconds();
+    // time_t now = (tickToTime(getCurrentTick())-boost::posix_time::from_time_t(0)).total_seconds();
     std::ostringstream oss;
     oss <<"<Token tick=\""<<getCurrentTick()<<"\" on=\""
         <<obs.object()<<"\" pred=\""<<obs.predicate()<<"\""

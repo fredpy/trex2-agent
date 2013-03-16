@@ -1,5 +1,11 @@
 #ifndef POPUP
 #define POPUP
+
+# if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Woverloaded-virtual"
+# endif
+
 #include <Wt/WCompositeWidget>
 #include <Wt/WContainerWidget>
 #include <Wt/WIntValidator>
@@ -15,6 +21,11 @@
 #include <Wt/WGroupBox>
 #include <Wt/WJavaScript>
 #include <Wt/WTemplate>
+
+# if defined(__clang__)
+#  pragma clang diagnostic pop
+# endif
+
 #include <string>
 #include <iostream>
 #include <boost/version.hpp>
@@ -30,7 +41,7 @@ namespace TREX {
         class Goalpopup : public Wt::WCompositeWidget {
             private:
             Wt::WContainerWidget* attributes;
-            Wt::WCompositeWidget* root;
+            // Wt::WCompositeWidget* root;
             Wt::WPushButton* ok;
             Wt::WIntValidator* numRange;
             Wt::WIntValidator* middleRange;
