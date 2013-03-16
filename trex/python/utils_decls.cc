@@ -248,18 +248,18 @@ namespace {
   }
   
   
-  void remove_attr(bp::ptree &p) {
-    for(bp::ptree::iterator i=p.begin(); p.end()!=i;) {
-      if( i->first=="<xmlattr>" ) {
-        bp::ptree tmp = i->second;
-        i = p.erase(i);
-        p.insert(i, tmp.begin(), tmp.end());
-      } else {
-        remove_attr(i->second);
-        ++i;
-      }
-    }
-  }
+//  void remove_attr(bp::ptree &p) {
+//    for(bp::ptree::iterator i=p.begin(); p.end()!=i;) {
+//      if( i->first=="<xmlattr>" ) {
+//        bp::ptree tmp = i->second;
+//        i = p.erase(i);
+//        p.insert(i, tmp.begin(), tmp.end());
+//      } else {
+//        remove_attr(i->second);
+//        ++i;
+//      }
+//    }
+//  }
   
   std::string xml_to_json(bp::ptree const &p) {
     std::ostringstream oss;

@@ -49,7 +49,18 @@
 # include "../Agent_fwd.hh"
 # include <trex/transaction/TeleoReactor.hh>
 
+# if defined(__clang__)
+// clang annoys me by putting plenty of warnings on unused variables from boost
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wunused-variable"
+#  pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+# endif
+
 # include <boost/graph/depth_first_search.hpp>
+
+# if defined(__clang__)
+#  pragma clang diagnostic pop
+# endif
 
 namespace boost {
 

@@ -179,6 +179,7 @@ namespace {
         return ret;
       } catch(error_already_set const &e) {
         log_error(e);
+        return false;
       }
     }
     bool hasWork() {
@@ -191,6 +192,7 @@ namespace {
           return tt::TeleoReactor::hasWork(); // false
       } catch(error_already_set const &e) {
         log_error(e);
+        return false;
       }
     }
     void resume() {
@@ -235,6 +237,7 @@ namespace {
         return r;
       } catch(error_already_set const &e) {
         log_error(e);
+        throw;
       } catch(...) {
         m_log->syslog("python", tu::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
         throw;
@@ -261,17 +264,17 @@ namespace {
     return oss.str();
   }
   
-  bool test_id(tt::graph::reactor_id const &id) {
-    return id;
-  }
-  tt::TeleoReactor const &reactor_id(tt::graph::reactor_id const &id) {
-    return *id;
-  }
-  std::string str_id(tt::graph::reactor_id const &id) {
-    if( id )
-      return id->getAgentName().str()+"."+id->getName().str();
-    return "";
-  }
+//  bool test_id(tt::graph::reactor_id const &id) {
+//    return id;
+//  }
+//  tt::TeleoReactor const &reactor_id(tt::graph::reactor_id const &id) {
+//    return *id;
+//  }
+//  std::string str_id(tt::graph::reactor_id const &id) {
+//    if( id )
+//      return id->getAgentName().str()+"."+id->getName().str();
+//    return "";
+//  }
   
   
   boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {

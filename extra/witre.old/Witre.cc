@@ -147,9 +147,9 @@ WitreApplication::WitreApplication(Wt::WEnvironment const &env, WitreServer* Ser
     //links in the east box
     Wt::WGroupBox* links = new Wt::WGroupBox("Links",east);
     links->setList(true);
-    Wt::WAnchor* lgraph = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/graph"), "Graph", links);
+    /* Wt::WAnchor* lgraph = */ new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/graph"), "Graph", links);
     new Wt::WBreak(links);
-    Wt::WAnchor* ltrex = new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/log/TREX.log"), "Trex log", links);
+    /* Wt::WAnchor* ltrex = */ new Wt::WAnchor(Wt::WLink(Wt::WLink::InternalPath, "/log/TREX.log"), "Trex log", links);
     new Wt::WBreak(links);
     new Wt::WBreak(links);
     Wt::WSignalMapper<Wt::WLineEdit*> *logmap = new Wt::WSignalMapper<Wt::WLineEdit*>(this);
@@ -268,7 +268,7 @@ void WitreApplication::urlPage(const std::string& path)
             }
             Wt::WContainerWidget* holder = new Wt::WContainerWidget(webpage);
             holder->setOverflow(Wt::WContainerWidget::OverflowAuto, Wt::Vertical);
-            Wt::WText* text = new Wt::WText(webout.str(), Wt::XHTMLText, holder);
+            /* Wt::WText* text = */new Wt::WText(webout.str(), Wt::XHTMLText, holder);
             webpage->setCurrentWidget(holder);
         }
         else
@@ -603,7 +603,7 @@ void WitreApplication::attributePopup()
         popup->setVisable();
     }
     else {
-        Wt::StandardButton incorrect = Wt::WMessageBox::show("Incorrect", "Invalid input for goal"
+        /* Wt::StandardButton incorrect = */Wt::WMessageBox::show("Incorrect", "Invalid input for goal"
                                                              , Wt::Ok);
         enter->enable();
     }

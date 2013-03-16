@@ -34,6 +34,11 @@
 #ifndef H_Witre
 # define H_Witre
 
+# if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Woverloaded-virtual"
+# endif
+
 #include <Wt/WApplication>
 #include <Wt/WIntValidator>
 #include <Wt/WWidget>
@@ -60,6 +65,11 @@
 #include <Wt/WTemplate>
 #include <Wt/WStandardItemModel>
 #include <Wt/WTableView>
+
+# if defined(__clang__)
+#  pragma clang diagnostic pop
+# endif
+
 
 #include <string>
 #include <queue>
