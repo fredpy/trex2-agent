@@ -112,7 +112,7 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
     if( !m_server->start() )
       throw Error("Unable to start the server");
     
-    m_log_conn = manager().on_new_log(log_proxy(*this));
+    // m_log_conn = manager().on_new_log(log_proxy(*this));
     
   } catch(Wt::WServer::Exception const &e) {
     m_log->syslog("witre.server", error)<<"Server initialization ERROR : "
@@ -123,7 +123,7 @@ WitreServer::WitreServer(TeleoReactor::xml_arg_type arg)
 
 WitreServer::~WitreServer() {
   // Disconnect from the log events 
-  m_log_conn.disconnect();
+  // m_log_conn.disconnect();
   try {
     // destroy the server
     if( NULL!=m_server )
