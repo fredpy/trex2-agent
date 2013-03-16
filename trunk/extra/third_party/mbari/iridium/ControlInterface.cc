@@ -53,9 +53,9 @@ SharedVar<size_t> ControlInterface::s_id;
 
 ControlInterface::ControlInterface(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false), m_running(false),
- m_need_fifo(utils::parse_attr<bool>(false, 
-				     TeleoReactor::xml_factory::node(arg), 
-				     "local_queue")),
+ m_need_fifo(TREX::utils::parse_attr<bool>(false, 
+					   TeleoReactor::xml_factory::node(arg), 
+					   "local_queue")),
  m_fifo(0) {
   use("estimator", true, true);
   use("navigator", true, true);
@@ -294,7 +294,6 @@ void ControlInterface::handleInit() {
     // spawn my listener thread
     m_thread.reset(new boost::thread(thread_proxy(this)));
   }
-  Platform::setControlInterface(this);
 }
 
 void ControlInterface::handleTickStart() {
