@@ -46,4 +46,4 @@ set(trex_LIBRARIES @trex-core@ CACHE STRING "trex core libraries" FORCE)
 set(trex_extra_LIBRARIES @trex-extra@ CACHE STRING "trex extensions for plugins" FORCE)
 
 # Note the plugin are not included ... should work on that later
-
+set(trex_python_LIBRARIES @trex-python@ CACHE STRING "trex python modules" FORCE)
