@@ -35,9 +35,11 @@
 
 add_library(MBARIshared SHARED 
   GeoUTM.cc
+  earth_point.cc
   # headers
   GeoUTM.hh
   GeoUTM.Constants.h
+  earth_point.hh
 )
 
 install(TARGETS MBARIshared DESTINATION lib) 
