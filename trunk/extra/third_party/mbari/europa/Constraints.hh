@@ -27,16 +27,20 @@ namespace mbari {
       EUROPA::Domain &m_lon;
       EUROPA::Domain &m_northing;
       EUROPA::Domain &m_easting;
+      EUROPA::Domain &m_number;
+      EUROPA::Domain &m_letter;
       
       enum indexes {
 	LAT = 0,
 	LON = 1,
 	NORTH = 2,
 	EAST = 3,
-	NARGS = 4
+        UTM_NUM = 4,
+        UTM_LET = 5,
+	NARGS = 6
       };
     }; 
-
+    
   }
 }
 
