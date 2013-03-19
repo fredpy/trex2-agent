@@ -54,8 +54,19 @@ namespace {
 // statics
 
 std::string const earth_point::s_utm_letters("CDEFGHJKLMNPQRSTUVWX");
-double const earth_point::s_radius_km(6371); // earth radius in km
+long double const earth_point::s_radius_km(6371); // earth radius in km
 
+
+long double earth_point::to_rad(double angle) {
+  long double ret = angle;
+  ret *= deg2rad;
+  return ret;
+}
+
+double earth_point::to_deg(long double angle) {
+  angle *= rad2deg;
+  return angle;
+}
 
 bool earth_point::is_utm_zone(unsigned short number, char letter) {
   if( is_utm_letter(letter) && is_utm_number(number) )
@@ -195,49 +206,52 @@ bool earth_point::is_utm() const {
 // manipulators
 
 double earth_point::distance_to(earth_point const &other) const {
-  // Compute the great circle distance
-  double d_lat = latitude()-other.latitude(),
-    d_lon = longitude()-other.longitude();
+  // Compute the great circle distance (haversine formula)
   
-  // Convert these in radian
-  d_lat *= deg2rad;
-  d_lon *= deg2rad;
+  long double lat_1 = to_rad(latitude()),
+  lon_1 = to_rad(longitude()),
+  lat_2 = to_rad(other.latitude()),
+  lon_2 = to_rad(other.longitude());
   
-  double sin_lat = sin(d_lat/2), sin_lon = sin(d_lon/2);
+  long double d_lat = lat_2-lat_1, d_lon = lon_2-lon_1;
+  long double sin_lat = sinl(d_lat/2.0), sin_lon = sinl(d_lon/2.0);
   
-  double a = sin_lat*sin_lat;
-  a += cos(latitude()*deg2rad)*cos(other.latitude()*deg2rad)*sin_lon*sin_lon;
+  long double a = sin_lat*sin_lat;
+  a += sin_lon*sin_lon*cosl(lat_1)*cosl(lat_2);
   
-  double c = 2*atan2(sqrt(a), sqrt(1.0-a));
+  long double c = atan2l(sqrtl(a), sqrtl(1.0-a))*2.0;
+  
   return c*s_radius_km*1000.0;
 }
 
 double earth_point::bearing_to(earth_point const &other) const {
   // Compute the bearing
-  double d_lat = latitude()-other.latitude(),
-  d_lon = longitude()-other.longitude();
-  
-  // Convert these in radian
-  d_lat *= deg2rad;
-  d_lon *= deg2rad;
+  long double lat_1 = to_rad(latitude()),
+  lon_1 = to_rad(longitude()),
+  lat_2 = to_rad(other.latitude()),
+  lon_2 = to_rad(other.longitude());
+  long double d_lon = lon_2-lon_1;
 
-  double y = sin(d_lon)*cos(other.latitude()*deg2rad);
-  double x =cos(latitude()*deg2rad)*sin(other.latitude()*deg2rad);
-  x -= sin(latitude()*deg2rad)*cos(other.latitude()*deg2rad)*cos(d_lon);
+  long double y = sinl(d_lon)*cosl(lat_2);
+  long double x = cosl(lat_1)*sinl(lat_2);
+  x -= sinl(lat_1)*cosl(lat_2)*cosl(d_lon);
   
-  return atan2(y, x)*rad2deg;
+  return to_deg(atan2l(y,x));
 }
 
 earth_point earth_point::destination(double bearing, double dist) const {
-  // project the destination point
-  double d_r = dist/(1000.0*s_radius_km),
-    lat_rad = latitude()*deg2rad, lon_rad = longitude()*deg2rad,
-    b_rad = bearing*deg2rad;
+  // idenitfy coordinate on a projected point
+  long double lat_1 = to_rad(latitude()),
+  lon_1 = to_rad(longitude()),
+  b_rad = to_rad(bearing);
+  long double d_r = dist;
   
-  double lat_r = asin(sin(lat_rad)*cos(d_r)+cos(lat_rad)*sin(d_r)*cos(b_rad));
-  double lon_r = lon_rad + atan2(sin(b_rad)*sin(d_r)*cos(lat_rad),
-                                 cos(d_r)-sin(lat_rad)*sin(lat_r));
-  return earth_point(lon_r*rad2deg, lat_r*rad2deg);
+  d_r /= s_radius_km*1000.0;
+  
+  long double lat_r = asinl(sinl(lat_1)*cosl(d_r)+cosl(lat_1)*sinl(d_r)*cosl(b_rad)),
+  lon_r = lon_1 + atan2l(sinl(b_rad)*sinl(d_r)*cosl(lat_1),
+                         cosl(d_r)-sinl(lat_1)*sinl(lat_1));
+  return earth_point(to_deg(lon_r), to_deg(lat_r));
 }
 
 
