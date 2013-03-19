@@ -205,7 +205,7 @@ bool earth_point::is_utm() const {
 
 // manipulators
 
-double earth_point::distance_to(earth_point const &other) const {
+long double earth_point::distance_to(earth_point const &other) const {
   // Compute the great circle distance (haversine formula)
   
   long double lat_1 = to_rad(latitude()),
@@ -239,7 +239,7 @@ double earth_point::bearing_to(earth_point const &other) const {
   return to_deg(atan2l(y,x));
 }
 
-earth_point earth_point::destination(double bearing, double dist) const {
+earth_point earth_point::destination(double bearing, long double dist) const {
   // idenitfy coordinate on a projected point
   long double lat_1 = to_rad(latitude()),
   lon_1 = to_rad(longitude()),
