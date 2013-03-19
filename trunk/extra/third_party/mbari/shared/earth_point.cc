@@ -54,7 +54,8 @@ namespace {
 // statics
 
 std::string const earth_point::s_utm_letters("CDEFGHJKLMNPQRSTUVWX");
-long double const earth_point::s_radius_km(6371); // earth radius in km
+long double const earth_point::s_radius(6378137.); // earth radius in meters :
+                                                   // same value as for WGS_84
 
 
 long double earth_point::to_rad(double angle) {
@@ -221,7 +222,7 @@ long double earth_point::distance_to(earth_point const &other) const {
   
   long double c = atan2l(sqrtl(a), sqrtl(1.0-a))*2.0;
   
-  return c*s_radius_km*1000.0;
+  return c*s_radius;
 }
 
 double earth_point::bearing_to(earth_point const &other) const {
@@ -244,9 +245,7 @@ earth_point earth_point::destination(double bearing, long double dist) const {
   long double lat_1 = to_rad(latitude()),
   lon_1 = to_rad(longitude()),
   b_rad = to_rad(bearing);
-  long double d_r = dist;
-  
-  d_r /= s_radius_km*1000.0;
+  long double d_r = dist / s_radius;
   
   long double lat_r = asinl(sinl(lat_1)*cosl(d_r)+cosl(lat_1)*sinl(d_r)*cosl(b_rad)),
   lon_r = lon_1 + atan2l(sinl(b_rad)*sinl(d_r)*cosl(lat_1),
