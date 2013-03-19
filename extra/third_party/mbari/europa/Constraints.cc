@@ -107,6 +107,7 @@ void GeoUTMConstraint::handleExecute() {
          && m_lat.isEmpty() )
         return;
     } else {
+      // this zone is invalid
       m_letter.empty();
       m_number.empty();
     }
