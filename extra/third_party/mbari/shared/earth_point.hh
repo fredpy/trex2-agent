@@ -55,7 +55,8 @@ namespace mbari {
     };
     
     static long double const s_radius;
-     
+    static std::string const s_utm_letters;
+    
     static bool is_utm_letter(char letter) {
       return std::string::npos!=letter_to_rank(letter);
     }
@@ -104,7 +105,6 @@ namespace mbari {
     static double to_deg(long double angle);
   private:
     
-    static std::string const s_utm_letters;
 
     static size_t letter_to_rank(char utm_ltr) {
       return  s_utm_letters.find(utm_ltr);

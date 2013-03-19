@@ -3,26 +3,11 @@
 #include <trex/europa/EuropaPlugin.hh>
 #include <trex/europa/Assembly.hh>
 
+#include <mbari/shared/earth_point.hh>
 
-#include <mbari/shared/GeoUTM.hh>
+
 
 namespace {
-  int const WGS_84 = 23;
-
-  void geo_to_utm(double lat, double lon, double &north, double &east) {
-    char zone[4];
-    LLtoUTM(WGS_84, lat, lon, north, east, zone);
-  }
-
-  void utm_to_geo(double north, double east, double &lat,  double &lon) {
-    const char* Zone = "10";
-    const int NORTHERN_HEMISPHERE_BUFFER = 10000000;
-    UTMtoLL(WGS_84, 
-	    north + NORTHERN_HEMISPHERE_BUFFER, east, 
-	    Zone, lat, lon);
-    if(east == 0.0)
-      lon = -126.0;
-  }
 
   bool intersect(EUROPA::Domain& dom, 
 		 double lb, double ub, double precision_error){
@@ -55,45 +40,75 @@ GeoUTMConstraint::GeoUTMConstraint(EUROPA::LabelStr const &name,
    m_lat(getCurrentDomain(m_variables[GeoUTMConstraint::LAT])),
    m_lon(getCurrentDomain(m_variables[GeoUTMConstraint::LON])),
    m_northing(getCurrentDomain(m_variables[GeoUTMConstraint::NORTH])),
-   m_easting(getCurrentDomain(m_variables[GeoUTMConstraint::EAST])) {
+   m_easting(getCurrentDomain(m_variables[GeoUTMConstraint::EAST])),
+   m_number(getCurrentDomain(m_variables[GeoUTMConstraint::UTM_NUM])),
+   m_letter(getCurrentDomain(m_variables[GeoUTMConstraint::UTM_LET])) {
   // assert ?
 }
 
 void GeoUTMConstraint::handleExecute() {
-  static EUROPA::IntervalDomain const UTM_10(-126.0, -120.0001);
-  // Lat lon precision is set to 0.018 seconds of a degree ~= 0.000005
-  // this correspond roughly on 50cm precision in UTM
-  static double const ll_precision = 0.00001;
-  static double const utm_precision = 0.5;
-
-  double lat, lon, north, east;
-
-  // ensure that longitude reflects UTM 10 zone
-  m_lon.intersect(UTM_10);
-
+  // restrict the zone on its base domain
+  m_number.intersect(EUROPA::IntervalIntDomain(1, 60));
+  m_lon.intersect(EUROPA::IntervalDomain(-180.0, 180.0));
+  m_lat.intersect(EUROPA::IntervalDomain(-80.0, 84.0));
+  
+  std::list<EUROPA::edouble> values;
+  
+  for(std::string::const_iterator i=earth_point::s_utm_letters.begin();
+      earth_point::s_utm_letters.end()!=i; ++i) {
+    EUROPA::edouble val;
+    if( m_letter.convertToMemberValue(std::string(1, *i), val) )
+      values.push_back(val);
+  }
+  if( values.empty() ) {
+    m_letter.empty();
+    return;
+  } else {
+    EUROPA::EnumeratedDomain tmp(m_letter.getDataType(), values);
+    m_letter.intersect(tmp);
+  }
+  
   if( m_lat.isSingleton() && m_lon.isSingleton() ) {
-    /* convert fixed (lat,lon) into UTM */
-    lat = EUROPA::cast_double(m_lat.getSingletonValue());
-    lon = EUROPA::cast_double(m_lon.getSingletonValue());
-        
-    geo_to_utm(lat, lon, north, east);
-    if( intersect(m_northing, north, north, utm_precision) &&
-	m_northing.isEmpty() )
+    earth_point pos(EUROPA::cast_double(m_lon.getSingletonValue()),
+                    EUROPA::cast_double(m_lat.getSingletonValue()));
+    // Set the zone number
+    m_number.intersect(EUROPA::IntervalIntDomain(pos.utm_number()));
+    // Set the zone letter
+    EUROPA::edouble val;
+    if( m_letter.convertToMemberValue(std::string(1, pos.utm_letter()), val) )
+      m_letter.set(val);
+    else {
+      m_letter.empty();
       return;
-    if( intersect(m_easting, east, east, utm_precision) &&
-	m_easting.isEmpty() )
+    }
+    
+    if( intersect(m_northing, pos.utm_northing(), pos.utm_northing(), 0.5)
+       && m_northing.isEmpty() )
       return;
-  } else if( m_northing.isSingleton() && m_easting.isSingleton() ) {
-    /* convert fixed UTM into (lat,lon) */
+    if( intersect(m_easting, pos.utm_easting(), pos.utm_easting(), 0.5)
+       && m_easting.isEmpty() )
+      return;
+  } else if( m_northing.isSingleton() && m_easting.isSingleton() &&
+             m_letter.isSingleton() && m_number.isSingleton() ) {
+    double north, east;
+    int num;
+    
     north = EUROPA::cast_double(m_northing.getSingletonValue());
     east = EUROPA::cast_double(m_easting.getSingletonValue());
-    utm_to_geo(north, east, lat, lon);
+    num = EUROPA::cast_int(m_number.getSingletonValue());
+    std::string letter_str = m_letter.toString(m_letter.getSingletonValue());
     
-    if( intersect(m_lat, lat, lat, ll_precision) &&
-	m_lat.isEmpty() )
-      return;
-    if( intersect(m_lon, lon, lon, ll_precision) &&
-	m_lon.isEmpty() )
-      return;
- } 
+    if( earth_point::is_utm_zone(num, letter_str[0]) ) {
+      earth_point pos(north, east, num, letter_str[0]);
+      if( intersect(m_lat, pos.latitude(), pos.latitude(), 0.00001)
+          && m_lat.isEmpty() )
+        return;
+      if( intersect(m_lon, pos.longitude(), pos.longitude(), 0.00001)
+         && m_lat.isEmpty() )
+        return;
+    } else {
+      m_letter.empty();
+      m_number.empty();
+    }
+  }
 }
