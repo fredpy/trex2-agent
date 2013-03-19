@@ -36,6 +36,8 @@
 
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/EnumDomain.hh>
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
@@ -51,7 +53,7 @@ namespace {
 
 PositionHandler::PositionHandler(PositionHandler::xml_arg const &arg)
 :MessageHandler(arg), 
- m_should_project(parse_attr<bool>(true, MessageHandler::factory::node(arg), "projected")) { 
+ m_should_project(parse_attr<bool>(true, MessageHandler::factory::node(arg), "projected")) {
   m_exchange += "_pb";
 }
 
@@ -82,15 +84,14 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
       asset_info base;
       asset_map::iterator pos;
       bool inserted;
-      double north, east;
+      earth_point loc(lon, lat);
       
-      geo_to_utm(lat, lon, north, east);
-
-      syslog(info)<<"New position update from "<<asset<<" ("<<lat<<", "<<lon<<")"
-		  <<" at "<<secs;
+//      syslog(info)<<"New position update from "<<asset<<" ("<<loc.latitude()<<", "<<loc.longitude()<<")"
+//		  <<" at "<<secs;
 
       boost::tie(pos, inserted) = m_assets.insert(asset_map::value_type(asset, base));
-      pos->second.second.update(secs, north, east);
+      
+      pos->second.second.update(secs, loc);
       pos->second.first = true;
       if( inserted )
         provide(asset);
@@ -108,12 +109,11 @@ bool PositionHandler::synchronize() {
     if( i->second.first || (m_should_project && i->second.second.have_speed()) ) {
       TREX::transaction::Observation obs(i->first, "Holds");
       location::duration_type dt;
-      point<2> vect(i->second.second.position(now_t, dt, m_should_project));
-      duration_type delta_t = cvt::to_chrono(dt); 
-      double lat, lon;
+      earth_point vect(i->second.second.position(now_t, dt, m_should_project));
+      
+      duration_type delta_t = cvt::to_chrono(dt);
     
       i->second.first = false;
-
       
       long double dtick = delta_t.count();
       dtick /= tickDuration().count();
@@ -121,15 +121,24 @@ bool PositionHandler::synchronize() {
       obs.restrictAttribute("freshness", 
                             IntegerDomain(std::floor(dtick+0.5)));
 
-      obs.restrictAttribute("northing", FloatDomain(vect[0]));
-      obs.restrictAttribute("easting", FloatDomain(vect[1]));
-      utm_to_geo(vect[0], vect[1], lat, lon);
-      obs.restrictAttribute("latitude", FloatDomain(lat));
-      obs.restrictAttribute("longitude", FloatDomain(lon));
+      if( vect.is_utm() ) {
+        obs.restrictAttribute("utm", BooleanDomain(true));
+        obs.restrictAttribute("northing", FloatDomain(vect.utm_northing()));
+        obs.restrictAttribute("easting", FloatDomain(vect.utm_easting()));
+        obs.restrictAttribute("utm_number", IntegerDomain(vect.utm_number()));
+        Symbol ltr(std::string(1, vect.utm_letter()));
+        obs.restrictAttribute("utm_letter", EnumDomain(ltr));
+      } else 
+        obs.restrictAttribute("utm", BooleanDomain(false));
+      obs.restrictAttribute("latitude", FloatDomain(vect.latitude()));
+      obs.restrictAttribute("longitude", FloatDomain(vect.longitude()));
     
       if( i->second.second.have_speed() ) {
-        obs.restrictAttribute("speed_north", FloatDomain(i->second.second.speed()[0]));
-        obs.restrictAttribute("speed_east", FloatDomain(i->second.second.speed()[1]));
+        point<2> sp = i->second.second.speed();
+        obs.restrictAttribute("speed_north", FloatDomain(sp[0]));
+        obs.restrictAttribute("speed_east", FloatDomain(sp[1]));
+        obs.restrictAttribute("lin_speed", FloatDomain(i->second.second.lin_speed()));
+        obs.restrictAttribute("heading", FloatDomain(i->second.second.heading()));
       }
       notify(obs);
     }

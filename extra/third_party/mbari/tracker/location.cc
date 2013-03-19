@@ -36,36 +36,39 @@
 
 using namespace mbari;
 
-void location::update(location::date_type const &date, double north, double east) {
-  point<2> former(m_last_pos);
-  m_last_pos[0] = north;
-  m_last_pos[1] = east;
-  
-  if( m_valid ) {
-    long double dt = (date - m_date).total_nanoseconds();
-    dt /= boost::posix_time::seconds(1).total_nanoseconds();
-    
-    m_speed = m_last_pos - former;
-    m_speed /= dt;
-    m_have_speed = true;
-  } else {
-    m_valid = true;
-    m_have_speed = false;
-  }
-  m_date = date;
-  m_valid = true;
+point<2> location::speed() const {
+  point<2> ret;
+  ret[0] = m_speed*cosl(earth_point::to_rad(m_heading));
+  ret[1] = m_speed*sinl(earth_point::to_rad(m_heading));
+  return ret;
 }
 
-point<2> location::position(location::date_type const &now, 
-                            location::duration_type &delta_t, 
-                            bool projected) const {
-  point<2> estimate(m_last_pos);
-  delta_t = now-m_date;
-  if( projected && have_speed() ) {
-    long double dt = delta_t.total_nanoseconds();
+void location::update(location::date_type const &date, earth_point const &pos) {
+  boost::optional<earth_point> pred = m_last_pos;
+  m_last_pos = pos;
+  
+  if( pred ) {
+    long double dt = (date-m_date).total_nanoseconds();
     dt /= boost::posix_time::seconds(1).total_nanoseconds();
     
-    estimate += m_speed*dt;
-  }
-  return estimate;
+    m_speed = pred->distance_to(pos);
+    m_speed /= dt;
+    
+    m_heading = pred->bearing_to(pos);
+    m_have_speed = true;
+  } else
+    m_have_speed = false;
+  m_date = date;
+}
+
+earth_point location::position(location::date_type const &now, location::duration_type &delta,
+                               bool projected) const {
+  delta = now-m_date;
+  if( projected && have_speed() ) {
+    long double dt = delta.total_nanoseconds();
+    dt /= boost::posix_time::seconds(1).total_nanoseconds();
+    
+    return m_last_pos->destination(m_heading, m_speed*dt);
+  } else
+    return *m_last_pos;
 }

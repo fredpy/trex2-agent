@@ -55,7 +55,7 @@ bool MessageHandler::provide(std::string const &timeline, bool control) {
 }
 
 void MessageHandler::notify(TREX::transaction::Observation const &obs) {
-  m_tracker.postObservation(obs);
+  m_tracker.postObservation(obs, true);
 }
 
 TREX::transaction::TICK MessageHandler::now() const {

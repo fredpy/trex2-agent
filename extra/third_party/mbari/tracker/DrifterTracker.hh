@@ -43,48 +43,6 @@
 
 namespace mbari {
 
-  /** @brief Convert (latitude, longitude) int oUTM coordinates
-   *
-   * @param[in] lat A latitude
-   * @param[in] lon A longitude
-   * @param[out] north UTM Northing in meters
-   * @param[out] east UTM Easting in meters
-   *
-   * Compute the UTM equivalent of (@p lat, @p lon) and store the result 
-   * into (@p north, @p east) using the 
-   * <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">World Geodesic 
-   * System 84</a> 
-   *
-   * @bug The current implementation assumes that the coordinate is into UTM 
-   * zone 10 which includes Monterrey Bay. Therefore the UTM zone is not 
-   * returned 
-   * @author Frederic Py <fpy@mbari.org>
-   * @ingroup tracker
-   * @sa utm_to_geo(double,double,double &,double &)  
-   */
-  void geo_to_utm(double lat, double lon, double &north, double &east);
-  /** @brief Convert (latitude, longitude) int oUTM coordinates
-   *
-   * @param[in] north UTM Northing in meters
-   * @param[in] east UTM Easting in meters
-   * @param[out] lat A latitude
-   * @param[out] lon A longitude
-   *
-   * Convert the UTM coordinate (@p north, @p east) on zone 10 into the 
-   * equivalent (@p lat, @p lon) using
-   * <a href="http://en.wikipedia.org/wiki/World_Geodetic_System">World Geodesic 
-   * System 84</a> 
-   *
-   * @bug The current implementation assumes that the coordinate is into UTM 
-   * zone 10 which includes Monterrey Bay. This will result into invalid @p lat 
-   * and @p lon if you are not in this zone.
-   *
-   * @author Frederic Py <fpy@mbari.org>
-   * @ingroup tracker
-   * @sa geo_to_utm(double,double,double &,double &)
-   */
-  void utm_to_geo(double north, double east, double &lat,  double &lon);
-
   /** @brief Track assets using MBARI amqp server messages
    *
    * This class is used for our shore side T-REX agent in order to track assets 

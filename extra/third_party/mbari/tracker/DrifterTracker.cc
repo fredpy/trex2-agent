@@ -39,6 +39,7 @@
 #include <trex/domain/IntegerDomain.hh>
 #include <trex/domain/FloatDomain.hh>
 
+#include <mbari/shared/earth_point.hh>
 #include <mbari/shared/GeoUTM.hh>
 
 #include "DrifterTracker.hh"
@@ -52,26 +53,7 @@ namespace {
   /** @brief Light reactor declaration */
   TeleoReactor::xml_factory::declare<DrifterTracker> decl("DrifterTracker");  
 
-  int const WGS_84 = 23;
-
 }
-
-namespace mbari {
-
-  void geo_to_utm(double lat, double lon, double &north, double &east) {
-    char zone[4];
-    LLtoUTM(WGS_84, lat, lon, north, east, zone);
-  }
-  void utm_to_geo(double north, double east, double &lat,  double &lon) {
-    const char* Zone = "10";
-    const int NORTHERN_HEMISPHERE_BUFFER = 10000000;
-    UTMtoLL(WGS_84, 
-	    north + NORTHERN_HEMISPHERE_BUFFER, east, 
-	    Zone, lat, lon);
-    if(east == 0.0)
-      lon = -126.0;
-  }
-} // mbari
 
 DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg) 
   :TeleoReactor(arg, false) {

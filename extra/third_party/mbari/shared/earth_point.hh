@@ -100,10 +100,9 @@ namespace mbari {
     
     earth_point destination(double bearing, long double dist) const;
     
-  private:
     static long double to_rad(double angle);
     static double to_deg(long double angle);
-
+  private:
     
     static std::string const s_utm_letters;
 
