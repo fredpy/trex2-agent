@@ -133,7 +133,7 @@ bool PositionHandler::synchronize() {
       obs.restrictAttribute("latitude", FloatDomain(vect.latitude()));
       obs.restrictAttribute("longitude", FloatDomain(vect.longitude()));
     
-      if( i->second.second.have_speed() ) {
+      if( i->second.second.have_speed() && m_should_project ) {
         point<2> sp = i->second.second.speed();
         obs.restrictAttribute("speed_north", FloatDomain(sp[0]));
         obs.restrictAttribute("speed_east", FloatDomain(sp[1]));
