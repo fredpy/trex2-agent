@@ -95,10 +95,10 @@ namespace mbari {
       return m_easting;
     }
     
-    double distance_to(earth_point const &other) const;
+    long double distance_to(earth_point const &other) const;
     double bearing_to(earth_point const &other) const;
     
-    earth_point destination(double bearing, double dist) const;
+    earth_point destination(double bearing, long double dist) const;
     
   private:
     static long double to_rad(double angle);
