@@ -54,8 +54,8 @@ namespace mbari {
       virtual ~bad_coordinate() throw() {}
     };
     
-    static double const s_radius_km;
-
+    static long double const s_radius_km;
+     
     static bool is_utm_letter(char letter) {
       return std::string::npos!=letter_to_rank(letter);
     }
@@ -101,6 +101,10 @@ namespace mbari {
     earth_point destination(double bearing, double dist) const;
     
   private:
+    static long double to_rad(double angle);
+    static double to_deg(long double angle);
+
+    
     static std::string const s_utm_letters;
 
     static size_t letter_to_rank(char utm_ltr) {
