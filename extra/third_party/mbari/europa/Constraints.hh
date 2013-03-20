@@ -39,7 +39,7 @@ namespace mbari {
         UTM_LET = 5,
 	NARGS = 6
       };
-    }; 
+    };
     
   }
 }
