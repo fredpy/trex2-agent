@@ -1,9 +1,5 @@
+#include "utm.nddl"
 
-typedef float [-90.0 90.0]       LATITUDE; // Range for latitude values
-typedef float [-126.0 -120.0001] LONGITUDE; // Range for longitude. Kept in UTM ZONE 10
-
-typedef float [0.0 10000000.0]   NORTHING;  // UTM northing (in m)
-typedef float [0.0 6000000.0]    EASTING;   // UTM easting (in m)
 typedef float [-10.0 6000.0]     DEPTH;     // depth below see level (in m)
 
 typedef float [0.0 2.0]      SPEED;
