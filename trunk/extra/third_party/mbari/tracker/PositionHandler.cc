@@ -134,11 +134,14 @@ bool PositionHandler::synchronize() {
       obs.restrictAttribute("longitude", FloatDomain(vect.longitude()));
     
       if( i->second.second.have_speed() && m_should_project ) {
+        double lin_sp = i->second.second.lin_speed();
         point<2> sp = i->second.second.speed();
         obs.restrictAttribute("speed_north", FloatDomain(sp[0]));
         obs.restrictAttribute("speed_east", FloatDomain(sp[1]));
-        obs.restrictAttribute("lin_speed", FloatDomain(i->second.second.lin_speed()));
-        obs.restrictAttribute("heading", FloatDomain(i->second.second.heading()));
+        obs.restrictAttribute("lin_speed", FloatDomain(lin_sp));
+        if( lin_sp>0.0 )
+          // do not set heading if we do not move
+          obs.restrictAttribute("heading", FloatDomain(i->second.second.heading()));
       }
       notify(obs);
     }
