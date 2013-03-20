@@ -455,7 +455,7 @@ earth_point utm_nav::destination(earth_point const &a,
   
   long double d_north = dist*cosl(b_rad), d_east = dist*sinl(b_rad);
   
-  // TODO: this porjection stongly assumes that we stay on the same zone
+  // TODO: this stongly assumes that we stay on the same zone
   return earth_point(a.utm_northing()+d_north, a.utm_easting()+d_east,
                      a.utm_number(), a.utm_letter());
 }
