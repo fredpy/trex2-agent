@@ -558,6 +558,39 @@ namespace mbari {
                              long double d_phi);
     
   };
+  
+  /** @brief UTM nav calculator
+   *
+   * This implement a nav_calculator based on UTM coordinates. It assumes that 
+   * UTM projection transpose earth in a perfect plane and that we can therefore
+   * use classic plane trigonometry.
+   *
+   * @note As this class assumes UTM as "perfect" the results can loose quickly 
+   * precision as the two points gets further (especially if not in the same UTM 
+   * zone). Additionally this method won't work if tone of the two point is not 
+   * UTM. That being said it is also the only one for now that do not assume 
+   * earth as a perfect sphere
+   *
+   * @warning Currently it does not consider earth as a cylinder either which means 
+   * that to travel from Japan to Hawaii it will go through Europe. Also I do not 
+   * guarantee results as soon as the two points (including projected destination) 
+   * are not in the same zone. 
+   *
+   * @author Frederic Py
+   */
+  struct utm_nav:public earth_point::nav_calculator {
+    utm_nav() {}
+    virtual ~utm_nav() {}
+    
+    virtual long double distance(earth_point const &a,
+                                 earth_point const &b) const;
+    virtual double bearing(earth_point const &a,
+                           earth_point const &b) const;
+    virtual earth_point destination(earth_point const &a,
+                                    double heading,
+                                    long double dist) const;
+  };
+
 }
 
 #endif // earth_point

@@ -390,3 +390,74 @@ earth_point rhumb_lines::destination(earth_point const &a,
   return earth_point(earth_point::to_deg(lon_b), earth_point::to_deg(lat_b));
 }
 
+/*
+ * struct mbari::utm_nav
+ */
+
+long double utm_nav::distance(earth_point const &a,
+                              earth_point const &b) const {
+  if( !a.is_utm() ) {
+    std::ostringstream oss;
+    oss<<"Cannot compute UTM distance with a source point that is not UTM ("
+    <<a.longitude()<<", "<<a.latitude()<<')';
+    throw earth_point::utm_error(oss.str());
+  }
+  if( !b.is_utm() ) {
+    std::ostringstream oss;
+    oss<<"Cannot compute UTM distance with a destination point that is not UTM ("
+    <<b.longitude()<<", "<<b.latitude()<<')';
+    throw earth_point::utm_error(oss.str());
+  }
+  // TODO: I need to handle the case where the points are closer through
+  // the Pacific
+  long double d_north = a.utm_northing(),
+              d_east = a.utm_easting();
+  d_north -= b.utm_northing();
+  d_east -= b.utm_easting();
+  
+  return sqrtl((d_north*d_north)+(d_east*d_east));
+}
+
+double utm_nav::bearing(earth_point const &a,
+                        earth_point const &b) const {
+  if( !a.is_utm() ) {
+    std::ostringstream oss;
+    oss<<"Cannot compute UTM bearing with a source point that is not UTM ("
+    <<a.longitude()<<", "<<a.latitude()<<')';
+    throw earth_point::utm_error(oss.str());
+  }
+  if( !b.is_utm() ) {
+    std::ostringstream oss;
+    oss<<"Cannot compute UTM bearing with a destination point that is not UTM ("
+    <<b.longitude()<<", "<<b.latitude()<<')';
+    throw earth_point::utm_error(oss.str());
+  }
+  // TODO: I need to handle the case where the points are closer through
+  // the Pacific
+  long double d_north = a.utm_northing(),
+  d_east = a.utm_easting();
+  d_north -= b.utm_northing();
+  d_east -= b.utm_easting();
+ 
+  return earth_point::to_deg(atan2l(d_north, d_east));
+}
+
+earth_point utm_nav::destination(earth_point const &a,
+                                 double heading,
+                                 long double dist) const {
+  if( !a.is_utm() ) {
+    std::ostringstream oss;
+    oss<<"Cannot project UTM destination with a source point that is not UTM ("
+    <<a.longitude()<<", "<<a.latitude()<<')';
+    throw earth_point::utm_error(oss.str());
+  }
+  long double b_rad = earth_point::to_rad(heading);
+  
+  long double d_north = dist*cosl(b_rad), d_east = dist*sinl(b_rad);
+  
+  // TODO: this porjection stongly assumes that we stay on the same zone
+  return earth_point(a.utm_northing()+d_north, a.utm_easting()+d_east,
+                     a.utm_number(), a.utm_letter());
+}
+
+
