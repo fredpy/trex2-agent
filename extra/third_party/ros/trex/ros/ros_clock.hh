@@ -104,4 +104,37 @@ namespace TREX {
   } // TREX::ROS
 } // TREX
 
+#ifndef CPP11_HAS_CHRONO
+namespace boost {
+  namespace chrono {
+  
+    /** @brief Information about TREX::LSTS::dune_posix 
+     *
+     * Textual information for the dune posix clock
+     *
+     * @relates TREX::LSTS::dune_posix
+     *
+     * @author Frederic Py 
+     */
+    template<class CharT>
+    struct clock_string<TREX::ROS::ros_clock, CharT> {
+      /** @brief Clock name */
+      static std::basic_string<CharT> name() {
+        static const CharT u[] =  
+          { 'R', 'o', 's',  '_', 'c', 'l', 'o', 'c', 'k' };
+        static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
+        return str;
+      } 
+      /** @brief Clock epoch */
+      static std::basic_string<CharT> since() {
+        static const CharT u[] =
+          { ' ', 's', 'i', 'n', 'c', 'e', ' ', 'J', 'a', 'n', ' ', '1', ',', ' ', '1', '9', '7', '0' };
+        static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
+        return str;
+      }
+    }; // boost::chrono::clock_string<TREX::LSTS::dune_posix_clock, >
+  }
+}
+#endif // CPP11_HAS_CHRONO
+
 #endif // H_trex_ros_ros_clock
