@@ -32,15 +32,72 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
+cmake_minimum_required(VERSION 2.8)
 
-add_subdirectory(lightswitch)
-add_subdirectory(rover)
-add_subdirectory(shopping)
-add_subdirectory(ecomapper)
-add_subdirectory(simplerobot)
+# locate ROS
+option(ROS_NO_CHECK "Include without checking" OFF)
+mark_as_advanced(ROS_NO_CHECK)
 
-# ROS connection components
-option(WITH_ROS "Use ROS plugin" OFF)
-if(WITH_ROS)
-  add_subdirectory(turtlesim)
-endif(WITH_ROS)
+if(ROS_NO_CHECK)
+  message(STATUS "Include ROS in the project with no checking")
+  message(WARNING "Including ROS with no checking result on the "
+    "project not being compilable")
+else(ROS_NO_CHECK)
+  find_package(ROS)
+  if(ROS_CONFIG)
+    find_ros_pkg(roscpp)
+    if(ROS_roscpp_PACKAGE_PATH)
+      include_directories(${ROS_roscpp_INCLUDE_DIRS})
+      add_definitions(${ROS_roscpp_CFLAGS})
+    else(ROS_roscpp_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find roscpp")
+    endif(ROS_roscpp_PACKAGE_PATH)
+
+    find_ros_pkg(actionlib)
+    if(ROS_actionlib_PACKAGE_PATH)
+      include_directories(${ROS_actionlib_INCLUDE_DIRS})
+      add_definitions(${ROS_actionlib_CFLAGS})
+    else(ROS_actionlib_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find actionlib")
+    endif(ROS_actionlib_PACKAGE_PATH)
+
+  else(ROS_CONFIG)
+    message(SEND_ERROR "Failed to loacte ROS configuration file.")
+  endif(ROS_CONFIG)
+endif(ROS_NO_CHECK)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
+link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
+
+add_library(TREXturtlesim SHARED
+  # source
+    turtlesimpub.cc
+    turtlesim_pg.cc
+  # header
+    turtlesimpub.hh
+  )
+
+source_group("Header\ Files\\bits" FILES
+  trex/ros/bits/ros_timeline.hh)
+
+install(DIRECTORY trex/ DESTINATION include/trex/
+  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+  PATTERN "private" EXCLUDE
+  PATTERN ".svn" EXCLUDE)
+
+target_link_libraries(TREXturtlesim ${ROS_roscpp_LINK_FLAGS}
+  ${ROS_actionlib_LINK_FLAGS}
+  ${ROS_roscpp_LINK_LIBS}
+  ${ROS_actionlib_LINK_LIBS}
+  TREXagent)
+
+install(TARGETS TREXturtlesim DESTINATION lib)
+trex_lib(TREXturtlesim extra)
+
+
+
+# The plugin placeholder : also initialize ros on load
+trex_plugin(turtlesim turtlesim_pg.cc)
+target_link_libraries(turtlesim_pg TREXturtlesim)
+
