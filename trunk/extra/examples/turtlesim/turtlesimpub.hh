@@ -9,7 +9,7 @@
 
 #include <list>
 #include <map>
-#include <mutex>
+# include <boost/thread/recursive_mutex.hpp>
 
 #include <trex/transaction/TeleoReactor.hh>
 
@@ -42,7 +42,8 @@ namespace TREX {
                 std::map<TREX::utils::Symbol, ros::Publisher> m_pub;
                 ros::AsyncSpinner* spinner;
 
-                std::mutex Messagelock;
+	  typedef boost::recursive_mutex mutex;
+                mutex Messagelock;
 
                 std::list<TREX::transaction::Observation> obs;
 
