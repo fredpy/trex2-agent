@@ -47,6 +47,7 @@ namespace TREX {
                 std::list<TREX::transaction::Observation> obs;
 
                 TREX::transaction::TICK m_nextTick;
+                TREX::transaction::TICK m_nextPoseTick;
 
                 std::list<TREX::transaction::goal_id> m_pending;
 

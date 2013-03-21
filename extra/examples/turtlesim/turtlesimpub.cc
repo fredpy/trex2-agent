@@ -5,8 +5,8 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::TREXturtlesim;
 
-Symbol const TurtleSimPub::PoseObj("/turtle1/pose");
-Symbol const TurtleSimPub::ControlObj("/turtle1/command_velocity");
+Symbol const TurtleSimPub::PoseObj("turtle1/pose");
+Symbol const TurtleSimPub::ControlObj("turtle1/command_velocity");
 
 TurtleSimPub::TurtleSimPub(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false)
@@ -39,22 +39,27 @@ void TurtleSimPub::handleInit()
     spinner->start();
 }
 
-void TurtleSimPub::poseCallback(const turtlesim::PoseConstPtr& msg)
+void TurtleSimPub::poseCallback(const turtlesim::Pose::ConstPtr& msg)
 {
-    Messagelock.lock();
-    Observation state(PoseObj, Symbol(PoseObj.str())); //Creates observation on Pose timeline
-    const float& x = msg->x; //Get message variable x and copy into float
-    state.restrictAttribute("x", FloatDomain(x)); // Restrict the "x" attribute in the observation
-    const float& y = msg->y;
-    state.restrictAttribute("y", FloatDomain(y));
-    const float& theta = msg->theta;
-    state.restrictAttribute("theta", FloatDomain(theta));
-    const float& linear_velocity = msg->linear_velocity;
-    state.restrictAttribute("linear_velocity", FloatDomain(linear_velocity));
-    const float& angular_velocity = msg->angular_velocity ;
-    state.restrictAttribute("angular_velocity", FloatDomain(angular_velocity));
-    postObservation(state);
-    Messagelock.unlock();
+    TICK cur = getCurrentTick();
+    if(m_nextPoseTick<=cur)
+    {
+        m_nextPoseTick = cur+1;
+        Messagelock.lock();
+        Observation state(PoseObj, Symbol(PoseObj.str())); //Creates observation on Pose timeline
+        const float& x = msg->x; //Get message variable x and copy into float
+        state.restrictAttribute("x", FloatDomain(x)); // Restrict the "x" attribute in the observation
+        const float& y = msg->y;
+        state.restrictAttribute("y", FloatDomain(y));
+        const float& theta = msg->theta;
+        state.restrictAttribute("theta", FloatDomain(theta));
+        const float& linear_velocity = msg->linear_velocity;
+        state.restrictAttribute("linear_velocity", FloatDomain(linear_velocity));
+        const float& angular_velocity = msg->angular_velocity ;
+        state.restrictAttribute("angular_velocity", FloatDomain(angular_velocity));
+        postObservation(state);
+        Messagelock.unlock();
+    }
 }
 
 
@@ -63,10 +68,14 @@ bool TurtleSimPub::synchronize()
     TICK cur = getCurrentTick();
     if(m_nextTick<=cur)
     {
+        Observation state(ControlObj, ControlObj);
         turtlesim::Velocity msg;
         msg.linear = 1;
+        state.restrictAttribute("linear", FloatDomain(msg.linear));
         msg.angular = .5;
+        state.restrictAttribute("angular", FloatDomain(msg.angular));
         m_pub[ControlObj].publish(msg);
+        postObservation(state);
         if(!obs.empty())
         {
             //postObservation(obs.front());
@@ -79,7 +88,7 @@ bool TurtleSimPub::synchronize()
                 if(m_pending.front()->startsBefore(cur))
                 {
                     //setValue(m_pending.front());
-                    m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
+                    //m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
                     m_pending.pop_front();
                 }
                 break;
