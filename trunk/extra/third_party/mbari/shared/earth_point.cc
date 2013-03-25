@@ -215,6 +215,201 @@ bool earth_point::is_utm() const {
 }
 
 
+
+/*
+ * struct mbari::vincenty
+ */
+
+
+bool vincenty::fixed_point(earth_point const &a, earth_point const &b,
+                           long double &sin_l, long double &cos_l,
+                           long double &sin_u_a, long double &cos_u_a,
+                           long double &sin_u_b, long double &cos_u_b,
+                           long double &sigma,
+                           long double &sin_sigma,
+                           long double &cos_sigma,
+                           long double &cos_alpha_2,
+                           long double &cos_2_sigma_m) const {
+  long double lat_a = earth_point::to_rad(a.latitude()),
+     lon_a = earth_point::to_rad(a.longitude()),
+     lat_b = earth_point::to_rad(b.latitude()),
+    lon_b = earth_point::to_rad(b.longitude());
+  long double d_lon = lon_b-lon_a,
+    u_a = atanl((1.0L-m_f)*tanl(lat_a)),
+    u_b = atanl((1.0L-m_f)*tanl(lat_b));
+  
+  sin_u_a = sinl(u_a); cos_u_a = cosl(u_a);
+  sin_u_b = sinl(u_b); cos_u_b = cosl(u_a);
+  
+  long double l = d_lon, prev_l;
+  size_t iter = 100;
+  
+  do {
+    sin_l = sinl(l); cos_l = cosl(l);
+    long double d_x=cos_u_b*sin_l,
+      d_y=(cos_u_a*sin_u_b)-(sin_u_a*cos_u_b*cos_l);
+    
+    sin_sigma = sqrtl((d_x*d_x)+(d_y*d_y));
+    if( 0.0L==sin_sigma )
+      return false; // notifies that dist is 0 and therefore paramters are not
+                    // to be trusted
+    cos_sigma = (sin_u_a*sin_u_b) + (cos_u_a*cos_u_b*cos_l);
+    
+    sigma = atan2l(sin_sigma, cos_sigma);
+    
+    long double sin_alpha = cos_u_a * cos_u_b * sin_l / sin_sigma;
+    
+    cos_alpha_2 = 1.0L - sin_alpha*sin_alpha;
+    cos_2_sigma_m = cos_sigma;
+    cos_2_sigma_m -= 2.0L * sin_u_a * sin_u_b / cos_alpha_2;
+  
+    if( std::isnan(cos_2_sigma_m) )
+      cos_2_sigma_m = 0.0L;
+    
+    long double c = m_f/16.0L;
+    c *= cos_alpha_2;
+    c *= 4.0L + m_f*(4.0 - 3.0*cos_alpha_2);
+    
+    prev_l = l;
+    l += (1.0L-c)*m_f*sin_alpha* (sigma + c*sin_sigma* (cos_2_sigma_m + c*cos_sigma * (-1.0L + 2.0L*cos_2_sigma_m*cos_2_sigma_m)));
+  } while( fabsl(prev_l-l)>1e-12L && (iter--)>1 );
+  
+  if( 0==iter ) {
+    std::ostringstream oss;
+    
+    oss<<"Vincenty failed to converge :\n"
+    <<" - input:\n"
+    <<"    source: <"<<a.longitude()<<", "<<a.latitude()<<">\n"
+    <<"    destination: <"<<b.longitude()<<", "<<b.latitude()<<">\n"
+    <<"    distance: <"<<earth_point::to_deg(d_lon)<<", "<<earth_point::to_deg(lat_b-lat_a)<<">\n"
+    <<" - context:\n"
+    <<"    lambda: "<<earth_point::to_deg(l)<<"\n"
+    <<"    lambda': "<<earth_point::to_deg(prev_l)<<"pi\n";
+    
+    
+    throw earth_point::bad_coordinate(oss.str());
+  }
+  
+  return true;
+}
+
+
+long double vincenty::distance(earth_point const &a,
+                               earth_point const &b) const {
+  long double sin_l, cos_l, sin_u_a, cos_u_a, sin_u_b, cos_u_b, sigma,
+  sin_sigma, cos_sigma, cos_alpha_2, cos_2_sigma_m;
+  
+  if( fixed_point(a, b, sin_l, cos_l, sin_u_a, cos_u_a,
+                  sin_u_b, cos_u_b, sigma, sin_sigma, cos_sigma,
+                  cos_alpha_2, cos_2_sigma_m) ) {
+    long double a_2 = m_equator_radius * m_equator_radius,
+    b_2 = m_pole_radius*m_pole_radius;
+    
+    long double u_2 = cos_alpha_2 * (a_2-b_2) / b_2;
+    
+    long double a_ = 320-175*u_2;
+    a_ = -768 + u_2*a_;
+    a_ = 4096 + u_2*a_;
+    a_ *= u_2/16384;
+    a_ += 1.0L;
+    long double b_ = 74-47*u_2;
+    b_ = -128 + u_2*b_;
+    b_ = 256 + u_2*b_;
+    b_ *= u_2/1024;
+    
+    long double delta_sigma = -3.0L + 4.0L*(cos_2_sigma_m*cos_2_sigma_m);
+    delta_sigma *= -3.0L + 4.0L*(sin_sigma*sin_sigma);
+    delta_sigma *= cos_2_sigma_m;
+    delta_sigma *= b_/6.0L;
+    delta_sigma = cos_sigma*(-1.0L+ 2.0L*cos_2_sigma_m*cos_2_sigma_m) - delta_sigma;
+    delta_sigma = cos_2_sigma_m + b_/4.0L*delta_sigma;
+    delta_sigma *= b_*sin_sigma;
+    
+    return m_pole_radius*a_*(sigma-delta_sigma);
+  } else
+    return 0.0L;
+}
+
+double vincenty::bearing(earth_point const &a,
+                              earth_point const &b) const {
+  long double sin_l, cos_l, sin_u_a, cos_u_a, sin_u_b, cos_u_b, sigma,
+  sin_sigma, cos_sigma, cos_alpha_2, cos_2_sigma_m;
+  
+  if( fixed_point(a, b, sin_l, cos_l, sin_u_a, cos_u_a,
+                  sin_u_b, cos_u_b, sigma, sin_sigma, cos_sigma,
+                  cos_alpha_2, cos_2_sigma_m) ) {
+    // note: return initial bearing
+    return atan2l(cos_u_b*sin_l, (cos_u_a*sin_u_b)-(sin_u_a*cos_u_b*cos_l));
+  } else
+    return 0.0; // no speed => set bearing to 0
+}
+
+
+earth_point vincenty::destination(earth_point const &a,
+                                       double heading,
+                                       long double dist) const {
+  long double lat_a = earth_point::to_rad(a.latitude()),
+  lon_a = earth_point::to_rad(a.longitude()),
+  alpha_1 = earth_point::to_rad(heading);
+  
+  long double sin_alpha_1 = sinl(alpha_1), cos_alpha_1 = cosl(alpha_1),
+  tan_u_a = (1.0L-m_f)*tanl(lat_a);
+  
+  long double cos_u_a = 1.0L / sqrtl(1.0L + tan_u_a*tan_u_a),
+  sin_u_a = tan_u_a*cos_u_a,
+  sigma_1 = atan2l(tan_u_a, cos_alpha_1),
+  sin_alpha = cos_u_a * sin_alpha_1;
+  
+  long double a_2 = m_equator_radius * m_equator_radius,
+  b_2 = m_pole_radius*m_pole_radius;
+  long double cos_alpha_2 = 1.0L - sin_alpha*sin_alpha;
+  long double u_2 = cos_alpha_2 * (a_2 - b_2)/b_2;
+  long double a_ = 320-175*u_2;
+  a_ = -768+u_2*a_;
+  a_ = 4096+u_2*a_;
+  a_ = 1.0L + u_2/16384*a_;
+  long double b_ = 74-47*u_2;
+  b_ = -128+u_2*b_;
+  b_ = 256+u_2*b_;
+  b_ *= u_2/1024;
+  
+  long double sigma = dist / (m_pole_radius*a_), prev_sigma = 2.0L*PI;
+  long double sin_sigma, cos_sigma, cos_2_sigma_m;
+  
+  while (fabsl(prev_sigma-sigma) > 1e-12L) {
+    cos_2_sigma_m = cosl(2.0L*sigma_1 + sigma);
+    sin_sigma = sinl(sigma); cos_sigma = cosl(sigma);
+    
+    long double delta_sigma = -3.0L +4.0L*cos_2_sigma_m*cos_2_sigma_m;
+    delta_sigma *= -3.0L+4.0L*sin_sigma*sin_sigma;
+    delta_sigma *= b_/6.0L*cos_2_sigma_m;
+    delta_sigma = cos_sigma*(-1.0L + 2.0L*cos_2_sigma_m*cos_2_sigma_m)-delta_sigma;
+    delta_sigma = cos_2_sigma_m + b_/4.0*delta_sigma;
+    delta_sigma *= b_*sin_sigma;
+    
+    prev_sigma = sigma;
+    sigma = dist /(m_pole_radius*a_) + delta_sigma;
+  }
+  
+  long double tmp = sin_u_a*sin_sigma - cos_u_a*cos_sigma*cos_alpha_1;
+  long double lat_b = atan2l(sin_u_a*cos_sigma + cos_u_a*sin_sigma*cos_alpha_1,
+                             (1.0L-m_f)*sqrtl(sin_alpha*sin_alpha + tmp*tmp));
+  long double l = atan2l(sin_sigma*sin_alpha_1,
+                         cos_u_a*cos_sigma - sin_u_a*sin_sigma*cos_alpha_1);
+  long double c = m_f/16.0L;
+  c *= cos_alpha_2;
+  c *= 4.0L + m_f*(4.0 - 3.0*cos_alpha_2);
+  
+  long double d_lon = -1.0L+2.0*cos_2_sigma_m*cos_2_sigma_m;
+  d_lon = cos_2_sigma_m + c*cos_sigma*d_lon;
+  d_lon = sigma + c*sin_sigma*d_lon;
+  d_lon = l - (1.0L - c)*m_f*sin_alpha*d_lon;
+  long double lon_b = fmodl(lon_a + l + 3.0*PI, 2.0*PI) - PI;
+  
+  return earth_point(earth_point::to_deg(lon_b), earth_point::to_deg(lat_b));
+ }
+
+
 /*
  * struct mbari::great_circles
  */

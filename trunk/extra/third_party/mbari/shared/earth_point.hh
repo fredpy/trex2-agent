@@ -508,7 +508,12 @@ namespace mbari {
    * @note this class assumes earth as a perfect sphere. While this may
    * introduce some error theyese errors should be small enough to be 
    * neglected in most cases.
-   * 
+   *
+   * @note to consider this as a spheroid one could use vincenty formulas 
+   * (http://www.movable-type.co.uk/scripts/latlong-vincenty.html) 
+   *
+   * @sa vincenty
+   *
    * @author Frederic Py
    */
   struct great_circles:public earth_point::nav_calculator {
@@ -524,6 +529,57 @@ namespace mbari {
                                     long double dist) const;
     long double const m_radius;
   };
+
+  /** @brief Vincenty based calculator
+   *
+   * Compute distance, and destination based on Vincenty algorithm.
+   * This algorithm takes into account the fact that earth is more
+   * an ellipsoid and is currently sets wiuth WGS-84 parameters.
+   * 
+   * This computation maybe an overkill for au navigation and rely on 
+   * a fixed point search which -- while limited to 100 iterations --
+   * can impact largellly the computation time. Otherwise it compute 
+   * the shortest arc similarly to the @c great_circles calculator
+   *
+   * @bug the computation does not appaer to convege at least for
+   * short distances.
+   *
+   * @note this implementation is based on the code given at
+   * http://www.movable-type.co.uk/scripts/latlong-vincenty.html 
+   *
+   * @sa great_circles
+   */
+  class vincenty:public earth_point::nav_calculator {
+  public:
+    vincenty(long double a=earth_point::s_radius,
+                  long double b=6356752.314245,
+                  long double f_inv=298.257223563)
+    :m_equator_radius(a), m_pole_radius(b), m_f(1.0/f_inv) {}
+    virtual ~vincenty() {}
+    
+    virtual long double distance(earth_point const &a,
+                                 earth_point const &b) const;
+    virtual double bearing(earth_point const &a,
+                           earth_point const &b) const;
+    virtual earth_point destination(earth_point const &a,
+                                    double heading,
+                                    long double dist) const;
+    long double const m_equator_radius;
+    long double const m_pole_radius;
+    long double const m_f;
+    
+  private:
+    bool fixed_point(earth_point const &a, earth_point const &b,
+                     long double &sin_l, long double &cos_l,
+                     long double &sin_u_a, long double &cos_u_a,
+                     long double &sin_u_b, long double &cos_u_b,
+                     long double &sigma,
+                     long double &sin_sigma,
+                     long double &cos_sigma,
+                     long double &cos_alpha_2,
+                     long double &cos_2_alpha_m) const;
+  };
+
   
   /** @brief Rhumb lines nav calculator
    *
