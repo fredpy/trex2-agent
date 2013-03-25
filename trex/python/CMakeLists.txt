@@ -39,12 +39,20 @@ if(WITH_PYTHON)
   message(STATUS "Checking for Boost.Python: ${Boost_PYTHON_LIBRARY}")
   
   if(Boost_PYTHON_LIBRARY)
-    
     # Also need to check for python libraries and paths
     find_package(PythonLibs REQUIRED)
     include_directories(${PYTHON_INCLUDE_DIR})
-    
     message(STATUS "Enabling TREX python adapters.")
+    
+    # First we need the library that define trex python_reactor class
+    add_library(TREXpython SHARED 
+      # C++ source
+      python_reactor.cc
+      # headers
+      python_reactor.hh)
+    target_link_libraries(TREXpython TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+    trex_lib(TREXpython core)
+
     python_add_module(trex trex_pkg.cc 
       utils_decls.cc 
       domain_decls.cc
@@ -52,7 +60,7 @@ if(WITH_PYTHON)
       agent_decls.cc
       )
     add_dependencies(core trex)
-    target_link_libraries(trex TREXagent ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+    target_link_libraries(trex TREXagent TREXpython)
     trex_py(trex)
     
   else(Boost_PYTHON_LIBRARY)
