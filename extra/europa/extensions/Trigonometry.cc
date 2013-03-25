@@ -133,8 +133,13 @@ CosineConstraint::CosineConstraint(EUROPA::LabelStr const &name,
 }
 
 void CosineConstraint::handleExecute() {
-  boost_flt b_angle(convert(m_angle)), b_cos = cos(deg_to_rad(b_angle));
-  EUROPA::edouble c_lo(b_cos.lower()), c_hi(b_cos.upper());
+  boost_flt b_angle(deg_to_rad(convert(m_angle))), b_cos;
+  // cos on ubuntu 12.10 appears to be buggy ... 
+  // we use cos(angle) = sin(pi/2 - angle) instead
+  b_cos = sin((pi<boost_flt>()/2.0)-b_angle);
+  
+  EUROPA::edouble c_lo(fmax(-1.0L, b_cos.lower())), 
+    c_hi(fmin(1.0L, b_cos.upper()));
   m_cos.intersect(c_lo, c_hi);
 }
 
@@ -154,6 +159,7 @@ m_sin(getCurrentDomain(vars[0])) {
 
 void SineConstraint::handleExecute() {
   boost_flt b_angle(convert(m_angle)), b_sin = sin(deg_to_rad(b_angle));
-  EUROPA::edouble s_lo(b_sin.lower()), s_hi(b_sin.upper());
+  EUROPA::edouble s_lo(fmax(-1.0L, b_sin.lower())), 
+    s_hi(fmin(1.0L, b_sin.upper()));
   m_sin.intersect(s_lo, s_hi);
 }

@@ -41,9 +41,13 @@ namespace TREX {
                 std::list<ros::Subscriber>          m_sub;
                 std::map<TREX::utils::Symbol, ros::Publisher> m_pub;
                 ros::AsyncSpinner* spinner;
-
+#if 0 // TODO see include above
 	  typedef boost::recursive_mutex mutex;
                 mutex Messagelock;
+#else 
+	  typedef boost::recursive_mutex mutex;
+	  mutex  Messagelock;
+#endif 
 
                 std::list<TREX::transaction::Observation> obs;
 
