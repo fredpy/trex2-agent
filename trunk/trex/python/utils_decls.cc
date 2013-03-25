@@ -323,7 +323,7 @@ void export_utils() {
                                                            "Create a new symbol with the given name"))
    .add_property("empty", &TREX::utils::Symbol::empty,
         "Test if current instance is the empty symbol")
-   .def("__len__", &TREX::utils::Symbol::length,
+   .def("__len__", &TREX::utils::Symbol::length, (arg("self")),
         "Length in character of the current instance")
    .def(self == self)
    .def(self != self)
@@ -333,9 +333,10 @@ void export_utils() {
    .def(self >= self)
    .def("__str__", &TREX::utils::Symbol::str,
         return_value_policy<copy_const_reference>(),
+        (arg("self")),
         "String representation. This just convert the symbol into a\n"
         "python string.")
-  .def("__repr__", &symbol_rep,
+  .def("__repr__", &symbol_rep,(arg("self")),
        "representation of the symbol. This just alter the usual python\n"
        "__repr__ in order to display the symbol value.")
   ;
@@ -382,25 +383,25 @@ void export_utils() {
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("name"), "Create a new logger with the given source name"))
+  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self", "name"), "Create a new logger with the given source name"))
   .add_property("name", make_getter(&log_wrapper::m_name, return_internal_reference<>()),
                 "Name of this log producer")
   .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir,
                 "TREX log directory")
   .add_property("path", &log_wrapper::path,
                 "TREX file search path")
-  .def("use_file", &log_wrapper::use, (arg("file_name")),
+  .def("use_file", &log_wrapper::use, (arg("self"), arg("file_name")),
        "Search for a file.\n"
        "This method locate the file file_name in TREX_PATH.\n"
        "If the file is found it copies it in the log directory and\n"
        "return its valid name. Otherwise it returns an empty string")
-  .def("info", &log_wrapper::info, (arg("msg")),
+  .def("info", &log_wrapper::info, (arg("self"), arg("msg")),
        "Produces the log message msg into trex log as an info message")
-  .def("warn", &log_wrapper::warn, (arg("msg")),
+  .def("warn", &log_wrapper::warn, (arg("self"), arg("msg")),
        "Produces the log message msg into trex log as a warning message")
-  .def("error", &log_wrapper::error, (arg("msg")),
+  .def("error", &log_wrapper::error, (arg("self"), arg("msg")),
        "Produces the log message msg into trex log as an error message")
-  .def("add_path", &log_wrapper::add_path, (arg("path")),
+  .def("add_path", &log_wrapper::add_path, (arg("self"), arg("path")),
        "Add the directory path to TREX_PATH")
   ;
   
@@ -423,13 +424,14 @@ void export_utils() {
    "different thread than the one where python is running. While trex do \n"
    "protect this call within C++, implementer of a new log_handler should \n"
    "make sure that the operations they do within this method are thread safe\n"
-   "within python.")
+   "within python.",
+   init<>(args("self"), "Default intializer.\n"))
   .add_property("connected", &py_log_handler::connected,
                 "Checks if the handler is still active")
-  .def("disconnect", &py_log_handler::disconnect,
+  .def("disconnect", &py_log_handler::disconnect, (arg("self")),
        "Disconnect this handler making it inactive. As fo today there's \n"
        "no way to reenable a disconnected handler.")
-  .def("new_entry", pure_virtual(&py_log_handler::new_entry), (arg("entry")),
+  .def("new_entry", pure_virtual(&py_log_handler::new_entry), (arg("self"), arg("entry")),
        "New entry callback.\n"
        "This method is called by trex whenever a new log entry has been \n"
        "produced. This method is pure virtual and therefore need to be \n"
@@ -453,9 +455,9 @@ void export_utils() {
                                     no_init);
   tag.add_property("tag", make_getter(&bp::ptree::value_type::first),
           "Name of the tag")
-  .def("has_attribute", &has_attribute, arg("attr_name"),
+  .def("has_attribute", &has_attribute, (arg("self"), arg("attr_name")),
        "Check if this tag have the attribute attr_name")
-  .def("attribute", &attribute, arg("attr_name"),
+  .def("attribute", &attribute, (arg("self"), arg("attr_name")),
        "Extract the value of the tag attribute attr_name")
   ;
 
@@ -475,21 +477,22 @@ void export_utils() {
                 make_function(static_cast<std::string const &(bp::ptree::*)() const>(&bp::ptree::data),
                               return_value_policy<copy_const_reference>()),
                 "Give the tree text content if any")
-  .def("__str__", &xml_to_string, "String conversion. Display this instance in XML ")
+  .def("__str__", &xml_to_string, (arg("self")),
+       "String conversion. Display this instance in XML ")
   .def("__iter__", iterator<bp::ptree>(),
        "An iterator through the tree xml_tags")
-  .def("__len__", &bp::ptree::size, "Number of tags for this tree")
-  .add_property("empty", &bp::ptree::empty, "Check igf empty")
+  .def("__len__", &bp::ptree::size, (arg("self")), "Number of tags for this tree")
+  .add_property("empty", &bp::ptree::empty, "Check if empty")
   .def("ext_file", &TREX::utils::ext_xml,
        (arg("self"), "attribute", arg("ahead")=true),
        "Inject external content.\n"
        "This method allow to inject the XML content of the file pointed\n"
-       "by\n the given xml attribute into this tree. The ahead flag\n"
+       "by the given xml attribute into this tree. The ahead flag\n"
        "allow to inject the new nodes either at the beginning of this \n"
        "instance or toward its end. This function is used heavily in \n"
        "trex code to allow to distribute a mission configuration \n"
        "between multiple files.")
-  .def("json", &xml_to_json, "Display the tree as a JSON string")
+  .def("json", &xml_to_json, (arg("self")), "Display the tree as a JSON string")
   ;
   
   tag.add_property("forest", make_getter(&bp::ptree::value_type::second),

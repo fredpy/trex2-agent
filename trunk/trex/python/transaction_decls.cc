@@ -31,225 +31,76 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <trex/transaction/TeleoReactor.hh>
+#include "python_reactor.hh"
 
-#include <boost/python.hpp>
+namespace bp=boost::python;
 
+using namespace TREX::python;
+using namespace TREX::transaction;
+using namespace TREX::utils;
+
+void export_transactions() {
+  // Setup my submodule
+  bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("trex.transaction"))));
+  bp::scope().attr("transaction") = module;
+  bp::scope my_scope = module;
+  // from now on everything is under trex.transaction
+  
+  void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
+  void (Predicate::* attr_2)(Symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
+  
+  /*
+   * class predicate:
+   *  properties 
+   *    - object : the name of the timeline
+   *    - name : the preidcate name
+   *  methods 
+   *    - has_attribute(self, name) -> bool
+   *    - attribute(self, name) -> domain
+   *    - restrict(self, var)
+   *    - restrict(self, name, domain)
+   */
+  bp::class_<Predicate, boost::shared_ptr<Predicate>, boost::noncopyable>
+  ("predicate", "trex timeline predicate", bp::no_init)
+  .add_property("object", bp::make_function(&Predicate::object, bp::return_internal_reference<>()))
+  .add_property("name", bp::make_function(&Predicate::predicate, bp::return_internal_reference<>()))
+  .def("has_attribute", &Predicate::hasAttribute, (bp::arg("name")))
+  .def("attribute", &Predicate::getAttribute, bp::return_internal_reference<>(), (bp::arg("name")))
+  .def("restrict", attr_1, (bp::arg("var")))
+  .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
+  ;
+  
+  
+  /*
+   * class obs(predicate):
+   *  methods
+   *    - __init__(self, predicate)
+   *    - __init__(self, symbol, symbol)
+   */
+  bp::class_<Observation, observation_id, bp::bases<Predicate> >
+  ("obs", "trex observation", bp::init<Predicate const &>(bp::args("pred"), "Convert pred into an observation"))
+  .def(bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+                                "Create new observation pred on timeline"))
+  ;
+  
+  /*
+   * class goal(predicate):
+   *  methods
+   *    - __init__(self, symbol, symbol)
+   */
+  bp::class_<Goal, goal_id, bp::bases<Predicate> >
+  ("goal", "trex goal", bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+                                                 "Create new goal pred on timeline"));
+}
+
+/*
 using namespace boost::python;
 
 namespace tu=TREX::utils;
 namespace tt=TREX::transaction;
 
 namespace {
-  
-
-  void log_error(error_already_set const &e) {
-    PyObject *py_type, *py_val, *py_trace;
-    tu::SingletonUse<tu::LogManager> log;
-
-    PyErr_Fetch(&py_type, &py_val, &py_trace);
-    
-    std::string msg = extract<std::string>(py_val);
-    log->syslog("python", tu::log::error)<<msg;
-    //Set back error info, display and rethrow
-    PyErr_Restore(py_type, py_val, py_trace);
-    PyErr_Print();
-    throw e;
-  }
-  
-  
-  struct python_reactor: tt::TeleoReactor, wrapper<tt::TeleoReactor> {
-
-    // Factory constructor
-    explicit python_reactor(tt::TeleoReactor::xml_arg_type &arg)
-    :tt::TeleoReactor(arg) {
-      syslog("DEBUG")<<"New python reactor created: \""<<getName()<<"\".";
-    }
-    virtual ~python_reactor() {
-      syslog("DEBUG")<<"Destroying reactor \""<<getName()<<"\".";
-    }
-
-    // Logging
-    void log_msg(tu::Symbol const &type, std::string const &msg) {
-      syslog(type)<<msg;
-    }
-    void info(std::string const &msg) {
-      log_msg(tu::log::info, msg);
-    }
-    void warn(std::string const &msg) {
-      log_msg(tu::log::warn, msg);
-    }
-    void error(std::string const &msg) {
-      log_msg(tu::log::error, msg);
-    }
-    
-    // timeline management
-    void ext_use(tu::Symbol const &tl, bool control) {
-      use(tl, control);
-    }
-    bool ext_check(tu::Symbol const &tl) const {
-      return isExternal(tl);
-    }
-    void post_request(tt::goal_id const &g) {
-      postGoal(g);
-    }
-    bool cancel_request(tt::goal_id const &g) {
-      return postRecall(g);
-    }
-    bool ext_unuse(tu::Symbol const &tl) {
-      return unuse(tl);
-    }
-    
-
-    void int_decl(tu::Symbol const &tl, bool control) {
-      provide(tl, control);
-    }
-    bool int_check(tu::Symbol const &tl) const {
-      return isInternal(tl);
-    }
-    void post_obs(tt::Observation const &obs, bool verb) {
-      postObservation(obs, verb);
-    }
-    bool int_undecl(tu::Symbol const &tl) {
-      return unprovide(tl);
-    }
-    
-    // transaction callbacks
-    void notify(tt::Observation const &o) {
-      try {
-        override fn = this->get_override("notify");
-        if( fn )
-          fn(obs);
-        else
-          tt::TeleoReactor::notify(o);
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-    }
-    void handleRequest(tt::goal_id const &g) {
-      try {
-        override fn = this->get_override("handle_request");
-        if( fn )
-          fn(g);
-        else
-          tt::TeleoReactor::handleRequest(g);
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-    }
-    void handleRecall(tt::goal_id const &g) {
-      try {
-        override fn = this->get_override("handle_recall");
-        if( fn )
-          fn(g);
-        else
-          tt::TeleoReactor::handleRecall(g);
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-    }
-    
-    // execution callbacks
-    void handleInit() {
-      try {
-        override fn = this->get_override("handle_init");
-        if( fn )
-          fn();
-        else
-          tt::TeleoReactor::handleInit();
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-   }
-    void handleTickStart() {
-      try {
-        override fn = this->get_override("handle_new_tick");
-        if( fn )
-          fn();
-        else
-          tt::TeleoReactor::handleTickStart();
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-    }
-    bool synchronize() {
-      try {
-        // pure virtual => it has to exist
-        bool ret = this->get_override("synchronize")();
-        return ret;
-      } catch(error_already_set const &e) {
-        log_error(e);
-        return false;
-      }
-    }
-    bool hasWork() {
-      try {
-        override fn = this->get_override("has_work");
-        if( fn ) {
-          bool ret = fn();
-          return ret;
-        } else
-          return tt::TeleoReactor::hasWork(); // false
-      } catch(error_already_set const &e) {
-        log_error(e);
-        return false;
-      }
-    }
-    void resume() {
-      try {
-        override fn = this->get_override("resume");
-        if( fn )
-          fn();
-        else
-          tt::TeleoReactor::resume();
-      } catch(error_already_set const &e) {
-        log_error(e);
-      }
-   }
-    
-  }; // python_reactor
  
-  class python_producer: public tt::TeleoReactor::xml_factory::factory_type::producer {
-  public:
-    explicit python_producer(tu::Symbol const &name)
-    :tt::TeleoReactor::xml_factory::factory_type::producer(name) {
-      tt::TeleoReactor::xml_factory::factory_type::producer::notify();
-    }
-    ~python_producer() {}
-
-  private:
-    result_type produce(argument_type arg) const {
-      // Extract the target python type name
-      boost::property_tree::ptree::value_type &node = tt::TeleoReactor::xml_factory::node(arg);
-      std::string class_name = tu::parse_attr<std::string>(node, "python_class");
-      object my_class = eval(str(class_name));
-      
-      if( my_class.is_none() ) {
-        m_log->syslog("python", tu::log::error)<<"Python class \""<<class_name<<"\" not found";
-        throw tu::XmlError(node, "Python class \""+class_name+"\" not found");
-      }
-      
-      try {
-        object obj = my_class(arg);
-        m_log->syslog("python", tu::log::info)<<"Created new python object "<<std::string(extract<std::string>(str(obj)));
-        boost::shared_ptr<tt::TeleoReactor> r = extract< boost::shared_ptr<tt::TeleoReactor> >(obj);
-        m_log->syslog("python", tu::log::info)<<"Object is the reactor "<<r->getName();
-        return r;
-      } catch(error_already_set const &e) {
-        log_error(e);
-        throw;
-      } catch(...) {
-        m_log->syslog("python", tu::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
-        throw;
-      }
-    }
-    tu::SingletonUse<tu::LogManager> m_log;
-    
-  }; // python producer
-  
-  python_producer python_decl("PyReactor");
-  
-  
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
@@ -396,3 +247,4 @@ void export_transactions() {
   
   c_graph.def("add_reactor", &python_add_reactor);
 }
+*/
