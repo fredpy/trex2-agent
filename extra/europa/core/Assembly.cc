@@ -395,7 +395,7 @@ bool Assembly::playTransaction(std::string const &nddl) {
 void Assembly::configure_solvers(std::string const &synchronizer,
 				 std::string const &planner) {
   debugMsg("trex:init", "Loading planner configuration from \""<<planner<<"\".");
-  std::auto_ptr<EUROPA::TiXmlElement>
+  UNIQ_PTR<EUROPA::TiXmlElement>
     xml_cfg(EUROPA::initXml(planner.c_str()));
 
   debugMsg("trex:init", "Injecting global filter for planning horizon");
@@ -442,7 +442,7 @@ EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
   EUROPA::DataTypeId type = m_clock->getDataType();
 
   if( m_tick_const.isNoId() || m_tick_const->getName()!=name ) {
-    std::auto_ptr<EUROPA::Domain> base(type->baseDomain().copy());
+    UNIQ_PTR<EUROPA::Domain> base(type->baseDomain().copy());
     base->set(now());
 
     debugMsg("trex:always", "Creating const "<<name.toString());

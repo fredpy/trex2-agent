@@ -155,7 +155,7 @@ namespace TREX {
       bool attach(WitreReactor &r);
       void detach(WitreReactor &r);
 
-      // std::auto_ptr<WitreApplication> m_app;
+      // UNIQ_PTR<WitreApplication> m_app;
       Wt::WServer *    m_server;
 
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;

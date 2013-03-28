@@ -35,6 +35,7 @@
 #define H_AgentLocation
 
 #include <trex/transaction/TeleoReactor.hh>
+#include <trex/utils/platform/memory.hh>
 
 namespace TREX {
   /** @brief AgentLocation plug-in utilities
@@ -75,7 +76,7 @@ namespace TREX {
       void setGo(std::string origin, std::string destination);
 
       std::list<TREX::transaction::goal_id> m_pending;
-      std::auto_ptr<TREX::transaction::Observation> m_state;
+      UNIQ_PTR<TREX::transaction::Observation> m_state;
 
       /** @brief Name of the predicate At */
       static TREX::utils::Symbol const AtPred;

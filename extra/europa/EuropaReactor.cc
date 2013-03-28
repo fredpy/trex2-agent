@@ -343,7 +343,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       // Exclude "implicit_var_*"
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var) ) {
-	std::auto_ptr<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	my_goal.restrictAttribute(attr);
       }

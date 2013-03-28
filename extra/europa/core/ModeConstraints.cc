@@ -92,7 +92,7 @@ void CheckInternal::handleExecute() {
 	  return;
 	} else if( m_test->isSingleton() ) {
 	  // Build the new domain based on test value
-	  std::auto_ptr<EUROPA::ObjectDomain> tmp;
+	  UNIQ_PTR<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
 	    tmp.reset(new EUROPA::ObjectDomain(type, internals));
 	  else 
@@ -159,7 +159,7 @@ void CheckExternal::handleExecute() {
 	  return;
 	} else if( m_test->isSingleton() ) {
 	  // Build the new domain based on test value
-	  std::auto_ptr<EUROPA::ObjectDomain> tmp;
+	  UNIQ_PTR<EUROPA::ObjectDomain> tmp;
 	  if( m_test->isMember(true) )
 	    tmp.reset(new EUROPA::ObjectDomain(type, externals));
 	  else 
