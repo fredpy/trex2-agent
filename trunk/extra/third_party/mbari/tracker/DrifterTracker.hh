@@ -115,8 +115,8 @@ namespace mbari {
     amqp::connection              m_connection;
     amqp::queue_ref               m_queue;
     amqp::msg_buffer              m_messages;    
-    std::auto_ptr<amqp::listener> m_listener;
-    std::auto_ptr<boost::thread>  m_thread;
+    UNIQ_PTR<amqp::listener> m_listener;
+    UNIQ_PTR<boost::thread>  m_thread;
 
     typedef std::multimap<std::string, 
 			  boost::shared_ptr<MessageHandler> > handle_map;

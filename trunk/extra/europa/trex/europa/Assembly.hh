@@ -37,8 +37,8 @@
 # include "EuropaPlugin.hh"
 # include "config.hh"
 
-
 # include <trex/utils/id_mapper.hh>
+# include <trex/utils/platform/memory.hh>
 
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
 # include <trex/europa/bits/system_header.hh>
@@ -1289,7 +1289,7 @@ namespace TREX {
       }; // class TREX::europa::Assembly::synchronization_listener
 
       friend class synchronization_listener;
-      std::auto_ptr<synchronization_listener> m_synchListener;
+      UNIQ_PTR<synchronization_listener> m_synchListener;
 
       void print_context(std::ostream &out, EUROPA::ConstrainedVariableId const &v) const;
 
@@ -1317,7 +1317,7 @@ namespace TREX {
       }; // class TREX::europa::Assembly::ce_listener
 
       friend class ce_listener;
-      std::auto_ptr<ce_listener> m_ce_listener;
+      UNIQ_PTR<ce_listener> m_ce_listener;
 
       bool m_in_synchronization;
 
@@ -1470,7 +1470,7 @@ namespace TREX {
        *
        * @sa listener_proxy
        */
-      std::auto_ptr<listener_proxy> m_proxy;
+      UNIQ_PTR<listener_proxy> m_proxy;
       /** @brief name of the Assembly
        *
        * This is the name of the assembly which should be the name of the
