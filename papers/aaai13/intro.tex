@@ -8,9 +8,9 @@ architecture to fulfill current or such evolving agent objectives and
 to deal with unanticipated situations is one approach to enhance
 persistence while dealing with robot adaptation.  Earlier work
 \cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10}
-have contributed control architectures which embed planning engines
+have contributed control architectures which embed planning engines,
 many of which support a rich representation dealing with durative
-actions while ensuring partial plans are flexible for robust execution
+actions, while ensuring partial plans are flexible for robust execution
 \cite{lemai-chenevier2004}.
 
 % such as \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
@@ -46,12 +46,15 @@ is received resulting in the robot inefficiently having to return to a
 location that it has already visited. Conversely, the robot waiting
 inordinately could waste time with consequent lack of flexibility for
 coping with diverse execution scenarios. In this context, it is
-important for the agent to make a distinction between actions that can
-be taken proactively versus other actions that may not be urgent.
+important for the agent to make a distinction between actions that should
+be executed proactively versus actions that may not be as urgent.
 
+Our work is situated between the planner and the executive. Therefore,
+we are working with an already generated plan and are helping to determine
+an execution policy for every action. 
 The novelty of our work is twofold. First, we allow the agent to make
 such a distinction \emph{during} execution, for each action, by
-tracking causal relationships between goals. Second, while the
+tracking causal relationships between goals. Second, while the initial
 approach is simple yet elegant, it is motivated by our real-world
 domain in the context of a continuously planning and executing robotic
 explorer with focus on execution rather than plan synthesis.
