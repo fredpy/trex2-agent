@@ -157,16 +157,14 @@ int main(int argc, char **argv) {
   
   po::options_description hidden("Hidden options"), cmd_line;
   
+  // Specifies the handler for extracting the mission name
   hidden.add_options()("mission",                       
                        po::value<std::string>(&mission_cfg),
                        "The name of the mission file");
-  
   po::positional_options_description p;
   p.add("mission", 1); // Only 1 mission file
   
-  
-  
-  
+  // Extra options publicly visible
   opt.add_options()
   ("help,h", "produce help message")
   ("version,v", "print trex version")
@@ -177,8 +175,8 @@ int main(int argc, char **argv) {
    "run this command with the given nice level")
   ;
   
+  // Build the general options
   cmd_line.add(opt).add(hidden);
-  
   
   po::variables_map opt_val;
 
@@ -203,11 +201,13 @@ int main(int argc, char **argv) {
     return 0;
   }
   
+  // Check that one mission was given
   if( !opt_val.count("mission") ) {
     std::cerr<<"No mission specified\n"
     <<opt<<std::endl;
     return 1;
   }
+  // Do we use a simulated clock ?
   if( opt_val.count("sim") ) {
     clk.reset(new StepClock(Clock::duration_type(0),
                             opt_val["sim"].as<size_t>()));
@@ -223,6 +223,7 @@ int main(int argc, char **argv) {
   
   // Initialize trex log path
   amc_log->logPath();
+  
   // Now add all the -I provided
   if( opt_val.count("include-path") ) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
@@ -252,6 +253,7 @@ int main(int argc, char **argv) {
     }
   }
   
+  // If nice_v is jot 0 then attempt to renice this process
   if( nice_v!=0 ) {
     int ret;
     
@@ -263,6 +265,7 @@ int main(int argc, char **argv) {
     amc_log->syslog("amc", info)<<"Setting my priority to "<<nice_v;
     ret = setpriority(which, pid, nice_v);
     if( ret<0 ) {
+      // No strong failure just log that we failed
       amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
     }
 #elif defined(HAVE_NICE)
@@ -270,9 +273,11 @@ int main(int argc, char **argv) {
     
     ret = nice(nice_v);
     if( ret<0 ) {
+      // No strong failure just log that we failed
       amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
     }
 #else
+    // No strong failure just log that we don't know how to do that
     amc_log->syslog("amc", error)<<"Don't know how to change nice level on this platform.";
 #endif
   }
@@ -284,18 +289,22 @@ int main(int argc, char **argv) {
   my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
   
   try {
+    // And we can run the agent 
     my_agent->run();
     my_agent.reset();
     return 0;
   } catch(TREX::utils::Exception const &e) {
+    // receved a trex error ...
     amc_log->syslog("amc", error)<<"TREX exception :"<<e;
     my_agent.reset();
     throw;
   } catch(std::exception const &se) {
+    // received a standard C++ exception
     amc_log->syslog("amc", error)<<"exception :"<<se.what();
     my_agent.reset();
     throw;
   } catch(...) {
+    // someone threw something which I don't know of
     amc_log->syslog("amc", error)<<"Unknown exception";
     my_agent.reset();
     throw;
