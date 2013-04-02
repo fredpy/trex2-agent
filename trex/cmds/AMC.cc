@@ -87,8 +87,9 @@
 #include <boost/program_options.hpp>
 #include <boost/iostreams/device/null.hpp>
 
-
 #include "nice_flags.h"
+
+#define DAEMON
 
 using namespace TREX::agent;
 using namespace TREX::utils;
@@ -96,31 +97,38 @@ using namespace TREX::utils;
 namespace po=boost::program_options;
 namespace pco=po::command_line_style;
 
-namespace {
 
-  SingletonUse<LogManager> amc_log;
-  UNIQ_PTR<Agent> my_agent;
+namespace {
   
   po::options_description opt("Usage:\n"
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
+  SingletonUse<LogManager> amc_log;
+  UNIQ_PTR<Agent> my_agent;
+ 
 }
 
+// Signal and exit handlers
+
 extern "C" {
-
+  
   void amc_cleanup(int sig) {
+    SingletonUse<LogManager> amc_log;
+    
     boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
-
+    
     amc_log->syslog("amc", info)<<"============================================";
     amc_log->syslog("amc", info)<<"At "<<boost::posix_time::to_simple_string(now)
-                                <<" UTC:\n\t - Received signal "<<sig;
+    <<" UTC:\n\t - Received signal "<<sig;
     amc_log->syslog("amc", info)<<"============================================";
     my_agent.reset();
     exit(1);
   }
-
+  
   void amc_terminate() {
+    SingletonUse<LogManager> amc_log;
+    
     amc_log->syslog("amc", error)<<" Received a terminate";
     abort();
   }
@@ -128,40 +136,12 @@ extern "C" {
 }
 
 
-/** @brief Batch execution (amc) main function
- * @param argc Number of arguments
- * @param argv command line arguments
- *
- * This is the main function for the @c amc program.
- * This program accepts 1 to 3 arguments :
- * @code
- * amc <mission>[.cfg] [-sim [<steps>]]
- * @endcode
- * Where :
- * @li @c @<mission@> is the name of a mission configuration file.
- * There should be a file named @c @<mission@>.cfg in the @c TREX_PATH
- * that describes an agent in XML format
- * @li @c -sim indicates that we want to use StepClock instead of the
- * default clock. Otherwise it loads the clock loaded by
- * @c @<mission@>.cfg or RealTimeClock if none was required
- * @c @<steps@> indicates the maximum number of deliberation steps per tick
- * StepClock should allow.
- *
- * This program will then load and execute the agent in a batch mode until
- * its mission is completed or an error occured
- * 
- * @ingroup amccmd
- */
-int main(int argc, char **argv) {
-  size_t stepsPerTick;
-  std::string mission_cfg;
-  clock_ref clk;
-  
+int main(int argc, char *argv[]) {
   po::options_description hidden("Hidden options"), cmd_line;
-  
+
   // Specifies the handler for extracting the mission name
-  hidden.add_options()("mission",                       
-                       po::value<std::string>(&mission_cfg),
+  hidden.add_options()("mission",
+                       po::value<std::string>(),
                        "The name of the mission file");
   po::positional_options_description p;
   p.add("mission", 1); // Only 1 mission file
@@ -172,21 +152,19 @@ int main(int argc, char **argv) {
   ("version,v", "print trex version")
   ("include-path,I", po::value< std::vector<std::string> >(), "Add a directory to trex search path")
   ("log-dir,L", po::value<std::string>(), "Set log directory")
-  ("sim,s", po::value<size_t>(&stepsPerTick)->implicit_value(60),
+  ("sim,s", po::value<size_t>()->implicit_value(60),
    "run agent with simulated clock with given deliberation steps per tick")
   ("nice", po::value<size_t>()->implicit_value(10),
    "run this command with the given nice level")
-#if 0 // This does not work well yet ... my damon do not log properly
-  ("daemon,D", "run amc as a detached daemon")
-#endif
+  ("daemon,D", "run amc as a detached daemon (experimental)")
   ;
-  
+ 
   // Build the general options
   cmd_line.add(opt).add(hidden);
   
+  // This will store the values needed
   po::variables_map opt_val;
-
-  // Extract command line options
+  
   try {
     po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).run(),
               opt_val);
@@ -196,12 +174,11 @@ int main(int argc, char **argv) {
     <<opt<<std::endl;
     return 1;
   }
-  
   // Deal with informative options
   if( opt_val.count("help") ) {
     std::cout<<"TREX batch execution command.\n"<<opt<<"\nExample:\n  "
-                  <<"amc sample --sim=50\n"
-                  <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
+    <<"amc sample --sim=50\n"
+    <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
     return 0;
   }
   if( opt_val.count("version") ) {
@@ -209,76 +186,72 @@ int main(int argc, char **argv) {
     return 0;
   }
   
-  // Check that one mission was given
+  // Check that 1 mission is specified
   if( !opt_val.count("mission") ) {
-    std::cerr<<"No mission specified\n"
-    <<opt<<std::endl;
+    std::cerr<<"Missing <mission> argument.\n"
+             <<opt<<std::endl;
     return 1;
   }
-  // Do we use a simulated clock ?
-  if( opt_val.count("sim") ) {
-    clk.reset(new StepClock(Clock::duration_type(0),
-                            opt_val["sim"].as<size_t>()));
+  // Extract the nice value
+  int nice_val;
+  
+  if( opt_val.count("nice") )
+    nice_val = opt_val["nice"].as<size_t>();
+  else {
+    // I need to check the environment instead
+    char *priority_env = getenv("TREX_NICE");
+    if( NULL!=priority_env ) {
+      try {
+        nice_val = string_cast<size_t>(priority_env);
+      } catch (bad_string_cast const &e) {
+        std::cerr<<"Ignoring invalid priority $TREX_NICE="<<priority_env<<std::endl;
+      }
+    }
   }
-    
-  // Set exit and interruptions handlers
-  std::set_terminate(amc_terminate);
-  signal(SIGINT, amc_cleanup);
-  signal(SIGTERM, amc_cleanup);
-  signal(SIGQUIT, amc_cleanup);
-  signal(SIGKILL, amc_cleanup);
-  signal(SIGABRT, amc_cleanup);
-  
-# if 0 // Something weird ... No ouput on trex.log after my fork
-  
-  boost::iostreams::stream_buffer<boost::iostreams::null_sink>
-  *null_out = new boost::iostreams::stream_buffer<boost::iostreams::null_sink>();
-  boost::iostreams::stream_buffer<boost::iostreams::null_source>
-  *null_in = new boost::iostreams::stream_buffer<boost::iostreams::null_source>();
-  
 
+  
+  // Before doing anything else Lets see if we need to start a daemon
   if( opt_val.count("daemon") ) {
-    pid_t pid;
     
-    pid = fork();
+    pid_t pid = fork();
     
     if( pid<0 ) {
-      std::cerr<<"Failed to fork the daemon: "<<strerror(errno)<<std::endl;
+      std::cerr<<"Failed to spawn the daemon process"<<std::endl;
       return 2;
     }
     if( pid>0 ) {
-      std::cout<<"Sucessfully created daemon (pid="<<pid<<")"<<std::endl;
-      return 0;
+      exit(0);
     }
+    
+    // I am the child : I need to do my cleanup
     setsid();
     umask(0);
     
-    // redirect all c++ streams to null
-    std::cout.rdbuf(null_out);
-    std::cout.rdbuf(null_out);
-    std::cin.rdbuf(null_in);
-    
-    // detach myself from the terminal
-    //close(STDIN_FILENO);
-    //close(STDOUT_FILENO);
-    //close(STDERR_FILENO);
-
-    amc_log->service().notify_fork(boost::asio::io_service::fork_child);
+    // Fork twice to ensurethe process cannot acquire a controlling terminal
+    if( (pid = fork()) )  {
+      if( pid>0 ) {
+        // I am the parent : I can die
+        std::cout<<"Daemon spawned (pid="<<pid<<")\n"
+        <<"All messages should now be reported in:\n  ";
+        if(opt_val.count("log-dir"))
+          std::cout<<opt_val["log-dir"].as<std::string>();
+        else
+          std::cout<<"$TREX_LOG_DIR/latest";
+        std::cout<<"/TREX.log"<<std::endl;
+        exit(0);
+      } else {
+        std::cerr<<"Failed to spawn twice"<<std::endl;
+        return 1;
+      }
+    }
+  
+    // I also need to close my standard ouputs
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
   }
-#endif 
   
-
-  
-  // Initialize trex log path
-  if( opt_val.count("log-dir") ) {
-    amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
-  } else // use default
-    amc_log->logPath();
-  
-  if( opt_val.count("daemon") )
-    amc_log->syslog("amc", info)<<"amc daemon with pid="<<getpid();
-  
-  // Now add all the -I provided
+  // Add first the path given so they will be looked before TREX_PATH
   if( opt_val.count("include-path") ) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
     for(std::vector<std::string>::const_iterator i=incs.begin();
@@ -287,28 +260,22 @@ int main(int argc, char **argv) {
         amc_log->syslog("amc", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
+ 
   
-  // Last I need to nice the program
-  int nice_v = 0; // no nice
+  // Initialize all the log environment
+  if( opt_val.count("log-dir") )
+    amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
+  // Create log directory and all
+  amc_log->logPath();
   
-  if( opt_val.count("nice") ) {
-    nice_v = opt_val["nice"].as<size_t>();
-  } else {
-    // Check environment instead
-    amc_log->syslog("amc", info)<<"Checking for TREX_NICE environment variable";
-    char *priority_env = getenv("TREX_NICE");
-    if( NULL!=priority_env ) {
-      amc_log->syslog("amc", info)<<"Found TREX_NICE="<<priority_env;
-      try {
-        nice_v = string_cast<size_t>(priority_env);
-      } catch(bad_string_cast const &e) {
-        amc_log->syslog("amc", error)<<"TREX_NICE is not a valid integer";
-      }
-    }
-  }
+
+
+  // If I am spawned as daemon reflects it in the logs
+  if( opt_val.count("daemon") )
+    amc_log->syslog("amc", info)<<"Spawned as daemon with pid="<<getpid();
   
-  // If nice_v is jot 0 then attempt to renice this process
-  if( nice_v!=0 ) {
+  if( 0!=nice_val ) {
+    // When nice is not 0 I need to renice the proces
     int ret;
     
 #if defined(HAVE_SETPRIORITY)
@@ -316,16 +283,16 @@ int main(int argc, char **argv) {
     id_t pid;
     
     pid = getpid();
-    amc_log->syslog("amc", info)<<"Setting my priority to "<<nice_v;
-    ret = setpriority(which, pid, nice_v);
+    amc_log->syslog("amc", info)<<"Setting my priority to "<<nice_val;
+    ret = setpriority(which, pid, nice_val);
     if( ret<0 ) {
       // No strong failure just log that we failed
       amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
     }
 #elif defined(HAVE_NICE)
-    amc_log->syslog("amc", info)<<"Nicing myself to "<<nice_v;
+    amc_log->syslog("amc", info)<<"Nicing myself to "<<nice_val;
     
-    ret = nice(nice_v);
+    ret = nice(nice_val);
     if( ret<0 ) {
       // No strong failure just log that we failed
       amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
@@ -336,16 +303,35 @@ int main(int argc, char **argv) {
 #endif
   }
   
-  // Finally I can initalize my agent
-  my_agent.reset(new Agent(mission_cfg, clk));
+  // Set exit and interruptions handlers
+  std::set_terminate(amc_terminate);
+  signal(SIGINT, amc_cleanup);
+  signal(SIGTERM, amc_cleanup);
+  signal(SIGQUIT, amc_cleanup);
+  signal(SIGKILL, amc_cleanup);
+  signal(SIGABRT, amc_cleanup);
+
+  // Now I finally reach the more trex specific stuff :
+  // - did user asked for a sim clock ?
+  clock_ref clk;
   
-  // If no clock specified use the degfault 1Hz clock
-  my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
+  // Do we use a simulated clock ?
+  if( opt_val.count("sim") ) {
+    clk.reset(new StepClock(Clock::duration_type(0),
+                            opt_val["sim"].as<size_t>()));
+  }
   
   try {
-    // And we can run the agent 
+    // Create the agent
+    my_agent.reset(new Agent(opt_val["mission"].as<std::string>(), clk));
+
+    // In case we did not have a clock set yet : use a 1Hz rt_clock
+    my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
+    
+    // execute the agent
     my_agent->run();
-    my_agent.reset();
+    my_agent.reset(); // destroy
+  
     return 0;
   } catch(TREX::utils::Exception const &e) {
     // receved a trex error ...
@@ -362,5 +348,5 @@ int main(int argc, char **argv) {
     amc_log->syslog("amc", error)<<"Unknown exception";
     my_agent.reset();
     throw;
-  }  
+  }
 }
