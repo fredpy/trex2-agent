@@ -71,7 +71,7 @@ install(TARGETS amc DESTINATION bin)
 trex_cmd(amc)
 
 add_executable(sim cmds/Sim.cc)
-target_link_libraries(sim TREXagent)
+target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
 add_dependencies(core sim)
 install(TARGETS sim DESTINATION bin)
 

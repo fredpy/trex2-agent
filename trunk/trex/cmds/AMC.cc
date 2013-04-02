@@ -99,7 +99,8 @@ namespace {
   SingletonUse<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
   
-  po::options_description opt("Usage:\n"
+  po::options_description opt("TREX batch execution command.\n"
+                              "Usage:\n"
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
