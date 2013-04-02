@@ -193,7 +193,9 @@ int main(int argc, char **argv) {
   
   // Deal with informative options
   if( opt_val.count("help") ) {
-    std::cout<<opt<<std::endl;
+    std::cout<<opt<<"\nExample:\n  "
+                  <<"amc sample --sim=50\n"
+                  <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
     return 0;
   }
   if( opt_val.count("version") ) {
