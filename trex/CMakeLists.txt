@@ -64,7 +64,7 @@ configure_file(cmds/nice_flags.h.in
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(amc cmds/AMC.cc)
-target_link_libraries(amc TREXagent)
+target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
 add_dependencies(core amc)
 install(TARGETS amc DESTINATION bin)
 
