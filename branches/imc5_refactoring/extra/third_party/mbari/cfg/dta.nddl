@@ -1,0 +1,110 @@
+#include "TREX.nddl"
+
+class AssetPosition extends AgentTimeline {
+    predicate Holds {
+	float latitude;
+	float longitude;
+	
+	float northing;
+	float easting;
+	
+	duration == 1;
+	geo_to_utm(latitude, longitude, northing, easting);
+    }
+
+    AssetPosition(Mode _mode) {
+	super(_mode);
+    }
+}
+
+
+class AssetUpdate extends AgentTimeline {
+    predicate none {}
+    
+    predicate Msg {
+	float latitude;
+	float longitude;
+	float speed_north;
+	float speed_east;
+	int tick;
+    }
+    
+    AssetUpdate() {
+	super(Mode.Observe, "none");
+    }
+}
+
+class AssetPosition extends AgentTimeline {
+
+  AssetUpdate source;
+
+  predicate Holds {
+    float latitude;
+    float longitude;
+    float northing;
+    float easting;
+    eq(duration, 1);
+  }
+
+  AssetPosition(AssetUpdate src) {
+    super(Mode.Observe);
+    source = src;
+  }
+}
+
+class TrexCmd extends Timeline {
+    predicate sendCmd {
+	int imei;
+	duration == 1;
+    }
+}
+
+class TrexMsg extends AgentTimeline {
+    TrexCmd _ctrl;
+    
+    predicate waiting {
+	int date;
+	int imei;	
+    }
+
+    TrexMsg() {
+	super(Mode.Observe);
+	_ctrl = new TrexCmd();
+    }
+}
+
+TrexMsg::waiting {
+    contains(TrexCmd.sendCmd cmd);
+    cmd.object == _ctrl;
+    cmd.imei == imei;
+}
+
+class Path {
+    
+}
+
+
+class Follow extends AgentTimeline {
+
+    predicate Active {
+	
+    }
+
+}
+
+
+TrexCmd::sendCmd {    
+}
+
+geo_to_utm(36.8017, -121.7883, mbariN, mbariE);
+
+AssetUpdate SIO_WWL_1_msg = new AssetUpdate();
+AssetPosition SIO_WWL_1 = new AssetPosition(SIO_WWL_1_msg);
+
+AssetUpdate ZEPHYR_msg = new AssetUpdate();
+AssetPosition ZEPHYR = new AssetPosition(ZEPHYR_msg);
+
+AssetUpdate dorado_msg = new AssetUpdate();
+AssetPosition dorado = new AssetPosition(dorado_msg);
+
+close();

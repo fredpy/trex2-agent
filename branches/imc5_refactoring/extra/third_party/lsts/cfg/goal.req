@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<Goal on="surveys" pred="LawnMower">
+   <!-- Example of a date range. Dates are specified in the format
+         YYYY-MMM-DD HH:MM:SS.mmm 
+	 and are always UTC -->
+  <!-- Variable name="start">
+    <date min="2011-Jul-10 10:00:00.500-05:00" max="2020-Jul-10 22:00:00.500" />
+  </Variable -->
+  <Variable name="lat_0">
+    <float value="41.185279"/>
+  </Variable>
+  <Variable name="lon_0">
+    <float value="-8.705758" />
+  </Variable>
+  <Variable name="lat_1">
+    <float value="41.183779" />
+  </Variable>
+  <Variable name="lon_1">
+    <float value="-8.705758" />
+  </Variable>
+  <Variable name="lat_2">
+    <float value="41.185279" />
+  </Variable>
+  <Variable name="lon_2">
+    <float value="-8.706758" />
+  </Variable>
+  <Variable name="lat_3">
+    <float value="41.183779" />
+  </Variable>
+  <Variable name="lon_3">
+    <float value="-8.706758" />
+  </Variable>
+  <Variable name="n_slices">
+    <int value="3"/>
+  </Variable>
+  <Variable name="depth">
+    <float value="0"/>
+  </Variable>
+    <!-- Example of duration. Dates are specified using the format 
+         HH:MM:SS.mmm
+    -->
+  <!-- Variable name="secs">
+    <duration min="0:00:05.3" max="1:00:00" />
+  </Variable -->
+</Goal>

@@ -1,0 +1,44 @@
+#include "declarations.nddl"
+#include "navigator.nddl"
+#include "platform.nddl"
+
+SurfaceController::Underwater {
+
+  subsetOf(speriod, object.surface_period);
+  
+  if (requested == true) {
+    surface == true; 
+    met_by(Surface surf);
+    surf.requested == true;
+    earliest_start == surf.start;
+  }
+  if( surface==true ) {
+    if (latest_end < AGENT_CLOCK && latest_end < end) {
+      starts_before(VehicleCommand.Maneuver man);
+      man.depth == 0;
+      man.start >= latest_end;
+    }
+  }
+}
+
+SurfaceController::Surface {
+  if (requested == true) {
+    met_by(Underwater und);
+    und.surface == true;
+  }
+}
+
+VehicleState::Boot {
+  contained_by(Navigator.Idle);
+}
+
+ManeuverController::Maneuver {
+  ends(Navigator.Going go);
+  go.start <= start;
+
+  lat_deg == go.latitude;
+  lon_deg == go.longitude;
+  depth == go.depth;
+  speed == go.speed;
+  secs == go.secs;
+}
