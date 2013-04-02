@@ -120,7 +120,7 @@ endif(LIB_RT)
 option(WITH_CPP11 "Compile with C++11 support" OFF)
 
 # The minimum requirement 
-find_package(Boost 1.46.1 COMPONENTS system filesystem thread regex signals date_time)
+find_package(Boost 1.46.1 COMPONENTS system filesystem thread regex signals date_time program_options)
 
 if(NOT Boost_FOUND) 
   message(ERROR "Unable to find Boost (>=1.46.1) library")

@@ -80,18 +80,27 @@
 #include <trex/agent/Agent.hh>
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/StepClock.hh>
+#include <trex/utils/TREXversion.hh>
 
 #include <boost/date_time/posix_time/time_formatters.hpp>
+
+#include <boost/program_options.hpp>
 
 #include "nice_flags.h"
 
 using namespace TREX::agent;
 using namespace TREX::utils;
 
+namespace po=boost::program_options;
+
 namespace {
 
   SingletonUse<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
+  
+  po::options_description opt("Usage:\n"
+                              "  amc <mission>[.cfg] [options]\n\n"
+                              "Allowed options");
   
 }
 
@@ -141,86 +150,151 @@ extern "C" {
  * @ingroup amccmd
  */
 int main(int argc, char **argv) {
-  if (argc < 2 || argc > 4) {
-    std::cerr << "Invalid argument list:"
-	      <<"\n Usage: "<<argv[0]<<" configFile [-sim [steps]]"
-	      << std::endl;
-    return -1;
-  }
-  char *configFile = argv[1];
+  size_t stepsPerTick;
+  std::string mission_cfg;
   clock_ref clk;
-    
-  if( argc>=3 ) {
-    Symbol simOption = argv[2];
-    if( simOption=="-sim" ) {
-      size_t stepsPerTick = 60;
-      
-      if( argc==4 )
-	stepsPerTick = string_cast<size_t>(argv[3]);
-      clk.reset(new StepClock(Clock::duration_type(0), stepsPerTick));
-    } else {
-      std::cerr<<"Invalid 2nd argument "<<simOption.str()
-	       <<"\nUsage: "<<argv[0]<<" configFile [-sim [steps]]"
-	       <<std::endl;
-      return -1;
-    }
-  }
-  std::set_terminate(amc_terminate);
   
-  // Clean-up the agent on interruptions
+  po::options_description hidden("Hidden options"), cmd_line;
+  
+  hidden.add_options()("mission",                       
+                       po::value<std::string>(&mission_cfg),
+                       "The name of the mission file");
+  
+  po::positional_options_description p;
+  p.add("mission", 1); // Only 1 mission file
+  
+  
+  opt.add_options()
+  ("help,h", "produce help message")
+  ("version,v", "print trex version")
+  ("include-path,I", po::value< std::vector<std::string> >(), "Add a directory to trex search path")
+  ("sim,s", po::value<size_t>(&stepsPerTick)->implicit_value(60),
+   "run agent with simulated clock with given deliberation steps per tick")
+  ("nice", po::value<size_t>()->implicit_value(10),
+   "run this command with the given nice level")
+  ;
+  
+  cmd_line.add(opt).add(hidden);
+  
+  
+  po::variables_map opt_val;
+
+  // Extract command line options
+  try {
+    po::store(po::command_line_parser(argc, argv).options(cmd_line).positional(p).run(),
+              opt_val);
+    po::notify(opt_val);
+  } catch(boost::program_options::error const &e) {
+    std::cerr<<"command line error: "<<e.what()<<'\n'
+    <<opt<<std::endl;
+    return 1;
+  }
+  
+  // Deal with informative options
+  if( opt_val.count("help") ) {
+    std::cout<<opt<<std::endl;
+    return 0;
+  }
+  if( opt_val.count("version") ) {
+    std::cout<<"amc for trex "<<TREX::version::str()<<std::endl;
+    return 0;
+  }
+  
+  if( !opt_val.count("mission") ) {
+    std::cerr<<"No mission specified\n"
+    <<opt<<std::endl;
+    return 1;
+  }
+  if( opt_val.count("sim") ) {
+    clk.reset(new StepClock(Clock::duration_type(0),
+                            opt_val["sim"].as<size_t>()));
+  }
+  
+  // Set exit and interruptions handlers
+  std::set_terminate(amc_terminate);
   signal(SIGINT, amc_cleanup);
   signal(SIGTERM, amc_cleanup);
   signal(SIGQUIT, amc_cleanup);
   signal(SIGKILL, amc_cleanup);
   signal(SIGABRT, amc_cleanup);
-  // force trex log initialization
+  
+  // Initialize trex log path
   amc_log->logPath();
-
-  amc_log->syslog("amc", info)<<"Checking for TREX_NICE";
-  char * priority_env = getenv("TREX_NICE");
-  if( NULL!=priority_env ) {
-
-    amc_log->syslog("amc", info)<<"Found environment TREX_NICE="<<priority_env;
-    unsigned priority;
-    try {
-      int ret;
-      priority = TREX::utils::string_cast<unsigned>(priority_env);
-#ifdef HAVE_SETPRIORITY
-      int which = PRIO_PROCESS;
-      id_t pid;
-
-      pid = getpid();
-      amc_log->syslog("amc", info)<<"Setting my priority to "<<priority;
-      ret =  setpriority(which, pid, priority);
-      if( ret<0 )
-	amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n\t"
-			    <<strerror(errno);
-#else
-# ifdef HAVE_NICE
-      amc_log->syslog("amc", info)<<"Nicing myself to "<<priority;
-      ret = nice(priority);
-      if( ret<0 )
-	amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n\t"
-			    <<strerror(errno);
-# else 
-      amc_log->syslog("amc", error)<<"Don't know how to change my priority on this system.";
-# endif
-#endif 
-    } catch(TREX::utils::bad_string_cast const &e) {
-      amc_log->syslog("amc", error)<<"Failed to parse TREX_NICE as an unsigned:\n"
-				   <<e.what();
+  // Now add all the -I provided
+  if( opt_val.count("include-path") ) {
+    std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
+    for(std::vector<std::string>::const_iterator i=incs.begin();
+        incs.end()!=i; ++i) {
+      if( amc_log->addSearchPath(*i) )
+        amc_log->syslog("amc", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
- 
-  my_agent.reset(new Agent(configFile, clk));
-  // Use a 1Hz clock by default
+  
+  // Last I need to nice the program
+  int nice_v = 0; // no nice
+  
+  if( opt_val.count("nice") ) {
+    nice_v = opt_val["nice"].as<size_t>();
+  } else {
+    // Check environment instead
+    amc_log->syslog("amc", info)<<"Checking for TREX_NICE environment variable";
+    char *priority_env = getenv("TREX_NICE");
+    if( NULL!=priority_env ) {
+      amc_log->syslog("amc", info)<<"Found TREX_NICE="<<priority_env;
+      try {
+        nice_v = string_cast<size_t>(priority_env);
+      } catch(bad_string_cast const &e) {
+        amc_log->syslog("amc", error)<<"TREX_NICE is not a valid integer";
+      }
+    }
+  }
+  
+  if( nice_v!=0 ) {
+    int ret;
+    
+#if defined(HAVE_SETPRIORITY)
+    int which = PRIO_PROCESS;
+    id_t pid;
+    
+    pid = getpid();
+    amc_log->syslog("amc", info)<<"Setting my priority to "<<nice_v;
+    ret = setpriority(which, pid, nice_v);
+    if( ret<0 ) {
+      amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
+    }
+#elif defined(HAVE_NICE)
+    amc_log->syslog("amc", info)<<"Nicing myself to "<<nice_v;
+    
+    ret = nice(nice_v);
+    if( ret<0 ) {
+      amc_log->syslog("amc", error)<<"Error while trying to set the priority:\n"<<strerror(errno);
+    }
+#else
+    amc_log->syslog("amc", error)<<"Don't know how to change nice level on this platform.";
+#endif
+  }
+  
+  // Finally I can initalize my agent
+  my_agent.reset(new Agent(mission_cfg, clk));
+  
+  // If no clock specified use the degfault 1Hz clock
   my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
+  
   try {
-    my_agent->run(); 
+    my_agent->run();
     my_agent.reset();
     return 0;
-  } catch(...) {
+  } catch(TREX::utils::Exception const &e) {
+    amc_log->syslog("amc", error)<<"TREX exception :"<<e;
     my_agent.reset();
     throw;
-  }
+  } catch(std::exception const &se) {
+    amc_log->syslog("amc", error)<<"exception :"<<se.what();
+    my_agent.reset();
+    throw;
+  } catch(...) {
+    amc_log->syslog("amc", error)<<"Unknown exception";
+    my_agent.reset();
+    throw;
+  }  
 }
