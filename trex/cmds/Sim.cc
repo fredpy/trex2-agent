@@ -55,10 +55,15 @@
 #include <trex/agent/StepClock.hh>
 #include <signal.h>
 
+#include <boost/program_options.hpp>
+
 using namespace TREX::agent;
 using namespace TREX::utils;
 using namespace TREX::transaction;
 namespace xml = boost::property_tree::xml_parser;
+
+namespace po=boost::program_options;
+namespace pco=po::command_line_style;
 
 namespace {
 
@@ -66,6 +71,11 @@ namespace {
   SingletonUse<LogManager> s_log;
 
   UNIQ_PTR<Agent> my_agent;
+
+  po::options_description opt("TREX \"interractive\" command.\n"
+                              "Usage:\n"
+                              "  sim <mission>[.cfg] [options]\n\n"
+                              "Allowed options");
 
 
   /** @brief @c sim help message
@@ -231,36 +241,94 @@ extern "C" {
  * @ingroup simcmd
  */
 int main(int argc, char **argv) {
-  std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
+  // Handling of command line arguments
+  std::string mission_cfg;
+  po::options_description hidden("Hidden options"), cmd_line;
 
-  if( argc<2 || argc>4 ) {
-    std::cerr << "Invalid argument list:"
-	      <<"\n Usage: "<<argv[0]<<" configFile [steps]"
-	      << std::endl;
-    return -1;
-  }
-  char *configFile = argv[1];
-  clock_ref clk;
+  opt.add_options()
+  ("help,h", "produce help message and exit")
+  ("version,v", "print trex version and exit")
+  ("include-path,I", po::value< std::vector<std::string> >(),
+   "Add a directory to trex search path")
+  ("steps,s", po::value<size_t>()->implicit_value(60),
+   "Set simulated clock steps per tick");
+  ;
+  hidden.add_options()("mission",
+                       po::value<std::string>(&mission_cfg),
+                       "The name of the mission file");
+  po::positional_options_description p;
+  p.add("mission", 1); // Only 1 mission file
 
-  int ret = 0;
+  cmd_line.add(opt).add(hidden);
+  po::variables_map opt_val;
+
+  // Extract command line options
   try {
-    if( argc>=3 )
-      clk.reset(new StepClock(Clock::duration_type(0), string_cast<size_t>(argv[2])));
-    
-    std::set_terminate(sim_terminate);
+    po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).run(),
+              opt_val);
+    po::notify(opt_val);
+  } catch(boost::program_options::error const &e) {
+    std::cerr<<"command line error: "<<e.what()<<'\n'
+    <<opt<<std::endl;
+    return 1;
+  }
 
-    // Clean-up the agent on interruptions
-    signal(SIGINT, sim_cleanup);
-    signal(SIGTERM, sim_cleanup);
-    signal(SIGQUIT, sim_cleanup);
-    signal(SIGKILL, sim_cleanup);
-    signal(SIGABRT, sim_abort);
+  // Deal with informative options
+  if( opt_val.count("help") ) {
+    std::cout<<opt<<"\nExample:\n  "
+    <<"sim sample --steps=50\n"
+    <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
+    return 0;
+  }
+  if( opt_val.count("version") ) {
+    std::cout<<"sim for trex "<<TREX::version::str()<<std::endl;
+    return 0;
+  }
+  // Check that one mission was given
+  if( !opt_val.count("mission") ) {
+    std::cerr<<"No mission specified\n"
+    <<opt<<std::endl;
+    return 1;
+  }
+  clock_ref clk;
+  
+  if( opt_val.count("steps") )
+    clk.reset(new StepClock(Clock::duration_type(0), opt_val["steps"].as<size_t>()));
+  
+  // Initialize trex log path
+  s_log->logPath();
+  
+  std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
+  
+  // Now add all the -I provided
+  if( opt_val.count("include-path") ) {
+    std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
+    for(std::vector<std::string>::const_iterator i=incs.begin();
+        incs.end()!=i; ++i) {
+      if( s_log->addSearchPath(*i) )
+        s_log->syslog("sim", info)<<"Added \""<<*i<<"\" to search path";
+    }
+  }
 
-    my_agent.reset(new Agent(configFile, clk, true));
+  std::set_terminate(sim_terminate);
+  
+  // Clean-up the agent on interruptions
+  signal(SIGINT, sim_cleanup);
+  signal(SIGTERM, sim_cleanup);
+  signal(SIGQUIT, sim_cleanup);
+  signal(SIGKILL, sim_cleanup);
+  signal(SIGABRT, sim_abort);
+  
+  int ret = 0;
+  
+  try {
+    // Set log path
+    my_agent.reset(new Agent(mission_cfg, clk, true));
+    // In case --steps was not specified and no clock on the mission
     my_agent->setClock(clock_ref(new StepClock(Clock::duration_type(0), 60)));
-    my_agent->initComplete();
     printHelp();
-    while( true ) {
+    
+    while(true) {
       if( my_agent->missionCompleted() ) {
 	std::cout<<"Mission completed."<<std::endl;
 	s_log->syslog("sim", info)<<"Mission completed.";
@@ -270,7 +338,7 @@ int main(int argc, char **argv) {
       std::cout<<'['<<my_agent->getName()<<':'<<tick<<"]> ";
       std::string cmdString;
       std::cin>>cmdString;
-
+     
       char const cmd = std::toupper(cmdString[0]);
       if( 'Q'==cmd ) {
 	std::cout<<"Goodbye"<<std::endl;
@@ -283,15 +351,15 @@ int main(int argc, char **argv) {
 	try {
 	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
 	  
-	  if( targetTick<=tick ) 
+	  if( targetTick<=tick )
 	    std::cout<<"Tick "<<targetTick<<" is in the past."
-	      // <<"\nYou can use W to wrap the agent to its initial tick."
-		     <<std::endl;
+            // <<"\nYou can use W to wrap the agent to its initial tick."
+            <<std::endl;
 	  else {
 	    while( my_agent->getCurrentTick()<targetTick &&
-		   !my_agent->missionCompleted() )
+                  !my_agent->missionCompleted() )
 	      my_agent->doNext();
-	  }  
+	  }
 	}catch(bad_string_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;
 	}
@@ -303,7 +371,7 @@ int main(int argc, char **argv) {
 	if( file.empty() ) {
 	  std::cerr<<"Missing file name"<<std::endl;
 	  printHelp();
-	} else if( !parseGoals(*my_agent, file) ) 
+	} else if( !parseGoals(*my_agent, file) )
 	  printHelp();
       } else if( 'K'==cmd ) {
 	std::string name;
@@ -315,7 +383,7 @@ int main(int argc, char **argv) {
 	  printHelp();
 	} else {
 	  Agent::reactor_iterator pos = my_agent->find_reactor(name);
-	  if( my_agent->reactor_end()==pos ) 
+	  if( my_agent->reactor_end()==pos )
 	    std::cerr<<"Reactor \""<<name<<"\" not found."<<std::endl;
 	  else {
 	    my_agent->kill_reactor(*pos);
