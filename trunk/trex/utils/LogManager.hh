@@ -267,7 +267,7 @@ namespace TREX {
 	return m_io.thread_count();
       }
       size_t thread_count(size_t n, bool override_hw=false) {
-	return m_io.thread_count(n, override_hw);
+        return m_io.thread_count(n, override_hw);
       }
       boost::asio::io_service &service() {
 	return m_io.service();
@@ -389,8 +389,8 @@ namespace TREX {
        * fully initialized
        */
       SharedVar<bool> m_inited;
+      asio_runner  m_io;
       
-      asio_runner     m_io;
       /** @brief syslog text log file */
       log::text_log   m_syslog;
       boost::shared_ptr<log::out_file> m_trex_log;
