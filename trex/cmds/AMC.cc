@@ -99,8 +99,7 @@ namespace {
   SingletonUse<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
   
-  po::options_description opt("TREX batch execution command.\n"
-                              "Usage:\n"
+  po::options_description opt("Usage:\n"
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
@@ -170,6 +169,7 @@ int main(int argc, char **argv) {
   ("help,h", "produce help message")
   ("version,v", "print trex version")
   ("include-path,I", po::value< std::vector<std::string> >(), "Add a directory to trex search path")
+  ("log-dir,L", po::value<std::string>(), "Set log directory")
   ("sim,s", po::value<size_t>(&stepsPerTick)->implicit_value(60),
    "run agent with simulated clock with given deliberation steps per tick")
   ("nice", po::value<size_t>()->implicit_value(10),
@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
   
   // Deal with informative options
   if( opt_val.count("help") ) {
-    std::cout<<opt<<"\nExample:\n  "
+    std::cout<<"TREX batch execution command.\n"<<opt<<"\nExample:\n  "
                   <<"amc sample --sim=50\n"
                   <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
     return 0;
@@ -225,7 +225,10 @@ int main(int argc, char **argv) {
   signal(SIGABRT, amc_cleanup);
   
   // Initialize trex log path
-  amc_log->logPath();
+  if( opt_val.count("log-dir") ) {
+    amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
+  } else // use default
+    amc_log->logPath();
   
   // Now add all the -I provided
   if( opt_val.count("include-path") ) {

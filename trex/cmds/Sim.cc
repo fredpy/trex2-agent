@@ -72,8 +72,7 @@ namespace {
 
   UNIQ_PTR<Agent> my_agent;
 
-  po::options_description opt("TREX \"interractive shell\".\n"
-                              "Usage:\n"
+  po::options_description opt("Usage:\n"
                               "  sim <mission>[.cfg] [options]\n\n"
                               "Allowed options");
 
@@ -250,6 +249,7 @@ int main(int argc, char **argv) {
   ("version,v", "print trex version and exit")
   ("include-path,I", po::value< std::vector<std::string> >(),
    "Add a directory to trex search path")
+  ("log-dir,L", po::value<std::string>(), "Set log directory")
   ("steps,s", po::value<size_t>()->implicit_value(60),
    "Set simulated clock steps per tick");
   ;
@@ -275,7 +275,7 @@ int main(int argc, char **argv) {
 
   // Deal with informative options
   if( opt_val.count("help") ) {
-    std::cout<<opt<<"\nExample:\n  "
+    std::cout<<"TREX \"interractive debug shell\"\n"<<opt<<"\nExample:\n  "
     <<"sim sample --steps=50\n"
     <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
     return 0;
@@ -296,7 +296,10 @@ int main(int argc, char **argv) {
     clk.reset(new StepClock(Clock::duration_type(0), opt_val["steps"].as<size_t>()));
   
   // Initialize trex log path
-  s_log->logPath();
+  if( opt_val.count("log-dir") ) {
+    s_log->setLogPath(opt_val["log-dir"].as<std::string>());
+  } else // use default
+    s_log->logPath();
   
   std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
   
