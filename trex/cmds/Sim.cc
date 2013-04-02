@@ -72,7 +72,7 @@ namespace {
 
   UNIQ_PTR<Agent> my_agent;
 
-  po::options_description opt("TREX \"interractive\" command.\n"
+  po::options_description opt("TREX \"interractive shell\".\n"
                               "Usage:\n"
                               "  sim <mission>[.cfg] [options]\n\n"
                               "Allowed options");
