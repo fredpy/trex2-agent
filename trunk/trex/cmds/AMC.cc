@@ -92,6 +92,7 @@ using namespace TREX::agent;
 using namespace TREX::utils;
 
 namespace po=boost::program_options;
+namespace pco=po::command_line_style;
 
 namespace {
 
@@ -164,6 +165,8 @@ int main(int argc, char **argv) {
   p.add("mission", 1); // Only 1 mission file
   
   
+  
+  
   opt.add_options()
   ("help,h", "produce help message")
   ("version,v", "print trex version")
@@ -181,7 +184,7 @@ int main(int argc, char **argv) {
 
   // Extract command line options
   try {
-    po::store(po::command_line_parser(argc, argv).options(cmd_line).positional(p).run(),
+    po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).run(),
               opt_val);
     po::notify(opt_val);
   } catch(boost::program_options::error const &e) {
