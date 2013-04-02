@@ -85,6 +85,8 @@
 #include <boost/date_time/posix_time/time_formatters.hpp>
 
 #include <boost/program_options.hpp>
+#include <boost/iostreams/device/null.hpp>
+
 
 #include "nice_flags.h"
 
@@ -174,6 +176,9 @@ int main(int argc, char **argv) {
    "run agent with simulated clock with given deliberation steps per tick")
   ("nice", po::value<size_t>()->implicit_value(10),
    "run this command with the given nice level")
+#if 0 // This does not work well yet ... my damon do not log properly
+  ("daemon,D", "run amc as a detached daemon")
+#endif
   ;
   
   // Build the general options
@@ -215,7 +220,7 @@ int main(int argc, char **argv) {
     clk.reset(new StepClock(Clock::duration_type(0),
                             opt_val["sim"].as<size_t>()));
   }
-  
+    
   // Set exit and interruptions handlers
   std::set_terminate(amc_terminate);
   signal(SIGINT, amc_cleanup);
@@ -224,11 +229,54 @@ int main(int argc, char **argv) {
   signal(SIGKILL, amc_cleanup);
   signal(SIGABRT, amc_cleanup);
   
+# if 0 // Something weird ... No ouput on trex.log after my fork
+  
+  boost::iostreams::stream_buffer<boost::iostreams::null_sink>
+  *null_out = new boost::iostreams::stream_buffer<boost::iostreams::null_sink>();
+  boost::iostreams::stream_buffer<boost::iostreams::null_source>
+  *null_in = new boost::iostreams::stream_buffer<boost::iostreams::null_source>();
+  
+
+  if( opt_val.count("daemon") ) {
+    pid_t pid;
+    
+    pid = fork();
+    
+    if( pid<0 ) {
+      std::cerr<<"Failed to fork the daemon: "<<strerror(errno)<<std::endl;
+      return 2;
+    }
+    if( pid>0 ) {
+      std::cout<<"Sucessfully created daemon (pid="<<pid<<")"<<std::endl;
+      return 0;
+    }
+    setsid();
+    umask(0);
+    
+    // redirect all c++ streams to null
+    std::cout.rdbuf(null_out);
+    std::cout.rdbuf(null_out);
+    std::cin.rdbuf(null_in);
+    
+    // detach myself from the terminal
+    //close(STDIN_FILENO);
+    //close(STDOUT_FILENO);
+    //close(STDERR_FILENO);
+
+    amc_log->service().notify_fork(boost::asio::io_service::fork_child);
+  }
+#endif 
+  
+
+  
   // Initialize trex log path
   if( opt_val.count("log-dir") ) {
     amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
   } else // use default
     amc_log->logPath();
+  
+  if( opt_val.count("daemon") )
+    amc_log->syslog("amc", info)<<"amc daemon with pid="<<getpid();
   
   // Now add all the -I provided
   if( opt_val.count("include-path") ) {
