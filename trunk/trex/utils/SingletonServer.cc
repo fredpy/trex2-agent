@@ -37,76 +37,64 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include "private/SingletonServer.hh"
 
-# include <iostream>
-# include <cxxabi.h> 
+#include <boost/thread/once.hpp>
+
+namespace {
+  boost::once_flag o_flag = BOOST_ONCE_INIT;
+}
 
 using namespace TREX::utils::internal;
 
-// statics 
+// static
 
 SingletonServer *SingletonServer::s_instance = 0x0;
 
+void SingletonServer::make_instance() {
+  s_instance = new SingletonServer;
+}
 
 SingletonServer &SingletonServer::instance() {
-  if( 0x0==s_instance ) 
-    new SingletonServer;
+  boost::call_once(&SingletonServer::make_instance, o_flag);
   return *s_instance;
 }
 
-SingletonServer::mutex_type &SingletonServer::sing_mtx() {
-  static SingletonServer::mutex_type mtx;
-  return mtx;
-}
+// *structors
 
-// structors 
+SingletonServer::SingletonServer() {}
 
-SingletonServer::SingletonServer():m_enabled(true) {
-  s_instance = this;
-}
+SingletonServer::~SingletonServer() {}
 
-SingletonServer::~SingletonServer() {
-  s_instance = 0x0;
-}
+// manipulators 
 
-// Modifiers :
-
-SingletonDummy *SingletonServer::attach(std::string const &name,
+SingletonDummy *SingletonServer::attach(std::string const &id,
                                         sdummy_factory const &factory) {
-  if( m_enabled ) {
-    single_map::iterator i = m_singletons.find(name);
-    
+  // Just to be safe for now
+  assert(this==s_instance);
+  {
+    lock_type lock(m_mtx);
+    single_map::iterator i = m_singletons.find(id);
     if( m_singletons.end()==i ) {
-      // std::cerr<<name<<" = new Ty()\n";
-      i = m_singletons.insert(single_map::value_type(name,
-                                                     factory.create())).first;
+      i = m_singletons.insert(single_map::value_type(id, factory.create())).first;
     }
     i->second->incr_ref();
     return i->second;
   }
-  return NULL;
 }
 
-void SingletonServer::disable() {
-  m_enabled = false;
-  m_singletons.clear();
-}
-
-bool SingletonServer::detach(std::string const &name) {
-  if( m_enabled ) {
-    single_map::iterator i = m_singletons.find(name);
-    
+bool SingletonServer::detach(std::string const &id) {
+  assert(this==s_instance);
+  {
+    lock_type lock(m_mtx);
+    single_map::iterator i = m_singletons.find(id);
     if( m_singletons.end()!=i ) {
-      SingletonDummy *dummy = i->second;
-      bool del = dummy->decr_ref();
-      
-      if( del ) {
+      SingletonDummy *ptr = i->second;
+      if( ptr->decr_ref() ) {
         m_singletons.erase(i);
-        
-        // std::cerr<<name<<" : delete Ty\n";
-        delete dummy;
-        return m_singletons.empty();
+        delete ptr;
+        return true;
       }
     }
   }

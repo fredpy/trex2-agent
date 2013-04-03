@@ -53,47 +53,33 @@
 namespace TREX {
   namespace utils {
     namespace internal {
-
-      /** @brief Singleton central manager
-       *
-       * This class is the container where all the phoenix
-       * singleton acccessed through SingletonUse are
-       * maintained.
-       *
-       * All its methods are private as no other class other  than
-       * SingletonDummy should manipulate it.
-       *
-       * @author Frederic Py <fpy@mbari.org>
-       * @ingroup utils
-       */
-      class SingletonServer : boost::noncopyable {
-      private:
-	SingletonServer();
-	~SingletonServer();
-
-	static SingletonServer &instance();
-
-	SingletonDummy *attach(std::string const &name, 
-                               sdummy_factory const &factory);
-	bool detach(std::string const &name);
+      
+      
+      class SingletonServer :boost::noncopyable {
+      public:
+        static SingletonServer &instance();
         
-        void disable();
-
-	typedef std::map<std::string, SingletonDummy *> single_map;
-	
-	single_map m_singletons;
-        bool m_enabled;
-	
-	static SingletonServer *s_instance;
-
-	typedef boost::recursive_mutex mutex_type;
+        
+        SingletonDummy *attach(std::string const &id,
+                               sdummy_factory const &factory);
+        bool detach(std::string const &id);
+        
+      private:
+        SingletonServer();
+        ~SingletonServer();
+        
+ 	typedef boost::recursive_mutex mutex_type;
 	typedef mutex_type::scoped_lock lock_type;
-
-	static mutex_type &sing_mtx();
-
-	friend class SingletonDummy;
-      }; // TREX::utils::internal::SingletonServer
-
+               
+        typedef std::map<std::string, SingletonDummy *> single_map;
+        
+        mutex_type m_mtx;
+        single_map m_singletons;
+        
+        static void make_instance();
+        static SingletonServer *s_instance;
+      };
+      
     }
   }
 }
