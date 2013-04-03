@@ -172,25 +172,25 @@ int main(int argc, char *argv[]) {
   } catch(boost::program_options::error const &e) {
     std::cerr<<"command line error: "<<e.what()<<'\n'
     <<opt<<std::endl;
-    return 1;
+    exit(1);
   }
   // Deal with informative options
   if( opt_val.count("help") ) {
     std::cout<<"TREX batch execution command.\n"<<opt<<"\nExample:\n  "
     <<"amc sample --sim=50\n"
     <<"  - run trex agent from sample.cfg using a simulated clock with 50 steps per tick\n"<<std::endl;
-    return 0;
+    exit(0);
   }
   if( opt_val.count("version") ) {
     std::cout<<"amc for trex "<<TREX::version::str()<<std::endl;
-    return 0;
+    exit(0);
   }
   
   // Check that 1 mission is specified
   if( !opt_val.count("mission") ) {
     std::cerr<<"Missing <mission> argument.\n"
              <<opt<<std::endl;
-    return 1;
+    exit(1);
   }
   // Extract the nice value
   int nice_val;
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
     
     if( pid<0 ) {
       std::cerr<<"Failed to spawn the daemon process"<<std::endl;
-      return 2;
+      exit(2);
     }
     if( pid>0 ) {
       // Disable singleton management for this process
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
         exit(0);
       } else {
         std::cerr<<"Failed to spawn twice"<<std::endl;
-        return 1;
+        exit(1);
       }
     }
   
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
     my_agent->run();
     my_agent.reset(); // destroy
   
-    return 0;
+    exit(0);
   } catch(TREX::utils::Exception const &e) {
     // receved a trex error ...
     amc_log->syslog("amc", error)<<"TREX exception :"<<e;
@@ -353,4 +353,6 @@ int main(int argc, char *argv[]) {
     my_agent.reset();
     throw;
   }
+  // Should never reach that point
+  return -1;
 }
