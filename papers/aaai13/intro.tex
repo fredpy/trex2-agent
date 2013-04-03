@@ -49,15 +49,27 @@ coping with diverse execution scenarios. In this context, it is
 important for the agent to make a distinction between actions that should
 be executed proactively versus actions that may not be as urgent.
 
-Our work is situated between the planner and the executive. Therefore,
-we are working with an already generated plan and are helping to determine
-an execution policy for every action. 
-The novelty of our work is twofold. First, we allow the agent to make
-such a distinction \emph{during} execution, for each action, by
-tracking causal relationships between goals. Second, while the initial
-approach is simple yet elegant, it is motivated by our real-world
-domain in the context of a continuously planning and executing robotic
-explorer with focus on execution rather than plan synthesis.
+While our work studies when an action should be started within the
+flexible frame of its current plan, its purpose is not about the
+process of planning itself. Instead we focus on a study demonstrating
+that strict execution policies -- should it be early or late execution
+-- can present problems when new goals could emerge at any time within
+the robot mission scope. Finally we provide a simple solution that
+exploits the current plan structure to identify the execution policy
+of the next potential actions base on the goals they are contributing
+to. This solution was motivated by our real-world domain applied to
+underwater robotic.
+
+
+% Our work is situated between the planner and the executive. Therefore,
+% we are working with an already generated plan and are helping to determine
+% an execution policy for every action. 
+% The novelty of our work is twofold. First, we allow the agent to make
+% such a distinction \emph{during} execution, for each action, by
+% tracking causal relationships between goals. Second, while the initial
+% approach is simple yet elegant, it is motivated by our real-world
+% domain in the context of a continuously planning and executing robotic
+% explorer with focus on execution rather than plan synthesis.
 
 % This
 % allows us to determine an appropriate dispatch strategy for execution,
