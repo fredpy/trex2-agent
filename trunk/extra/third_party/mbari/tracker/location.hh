@@ -71,7 +71,7 @@ namespace mbari {
     
   private:
     date_type     m_date;
-    mutable vincenty m_nav_calc;
+    mutable rhumb_lines m_nav_calc;
     
     bool m_have_speed;
     boost::optional<earth_point> m_last_pos;
