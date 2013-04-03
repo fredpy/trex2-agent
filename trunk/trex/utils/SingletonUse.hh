@@ -85,6 +85,8 @@ namespace TREX {
       Ty &operator*() const;
       Ty *operator->() const;
       /** @} */
+      
+      static void disable();
     private:
 
       Ty *m_instance; //!< Singleton_reference

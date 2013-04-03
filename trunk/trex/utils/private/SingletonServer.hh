@@ -76,10 +76,13 @@ namespace TREX {
 	SingletonDummy *attach(std::string const &name, 
                                sdummy_factory const &factory);
 	bool detach(std::string const &name);
+        
+        void disable();
 
 	typedef std::map<std::string, SingletonDummy *> single_map;
 	
 	single_map m_singletons;
+        bool m_enabled;
 	
 	static SingletonServer *s_instance;
 

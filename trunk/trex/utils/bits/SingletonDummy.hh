@@ -122,6 +122,7 @@ namespace TREX {
 	 * destroyed from the SingletonServer
 	 */
 	static void detach(std::string const &name);
+        static void disable();
 
       private:
 	/** @brief reference counting increment */

@@ -56,8 +56,13 @@ void SingletonDummy::detach(std::string const &name) {
   }
 }
 
+void SingletonDummy::disable() {
+  SingletonServer::lock_type locker(SingletonServer::sing_mtx());
+  SingletonServer::instance().disable();
+}
 
-// structors 
+
+// structors
 
 SingletonDummy::SingletonDummy() 
   :ref_counter(0ul) {}

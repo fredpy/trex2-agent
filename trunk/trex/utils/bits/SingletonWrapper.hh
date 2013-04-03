@@ -118,6 +118,8 @@ namespace TREX {
        * @sa void internal::SingletonDummy::detach(std::string const &)
        */
       static void detach();
+      static void disable_server();
+      
 
     private:
       /** @brief Constructor */
