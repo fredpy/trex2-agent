@@ -53,11 +53,13 @@ using namespace TREX::utils::internal;
 SingletonServer *SingletonServer::s_instance = 0x0;
 
 void SingletonServer::make_instance() {
-  s_instance = new SingletonServer;
+  if( 0x0==s_instance )
+    s_instance = new SingletonServer;
 }
 
 SingletonServer &SingletonServer::instance() {
-  boost::call_once(&SingletonServer::make_instance, o_flag);
+  // Use the C++11 like format
+  boost::call_once(o_flag, &SingletonServer::make_instance);
   return *s_instance;
 }
 

@@ -54,14 +54,81 @@ namespace TREX {
   namespace utils {
     namespace internal {
       
-      
+      /** @brief General trex singletons manager
+       *
+       * This class implements the only pure singleton in T-REX. 
+       * Its role is to manage and maintiain the lifetime of all the 
+       * objects accessed through SingletonUse. 
+       *
+       * while SingletonUse provide do not guarantee that the class 
+       * referred to as only one single instance (it only ensures that
+       * all the SingletonUse access to the same instance) and do not 
+       * ensure that the singleton will not be detroyed and recreated 
+       * within the program execution. This class on the other hand is 
+       * always unique and guaranteed to be the same from its creation 
+       * to the end of the program. 
+       *
+       * Access to the managed "SingletonUse" real instances is protected 
+       * here by a mutex which should ensure that their reference counting
+       * is properly handled in a multithread environment.
+       *
+       * @note In order to avoid destruction order issues this implementation
+       * do not destroy the initally created instance. While this generate 
+       * a small memory leak (at the end of the program we usueally have only 
+       * an empty map wialong with a mutex as managed SingletonUse did 
+       * destroy themselve) it appeared to be the only safe approach to ensure
+       * that this instance won't be destoyed prematurelly.
+       */
       class SingletonServer :boost::noncopyable {
       public:
+        /**
+         * @brief Singleton access
+         *
+         * Gives access to the singleton instance of this class. 
+         * This methofd will also create the instance when first 
+         * called in a thread safe way.
+         *
+         * @return the singleton instance
+         */
         static SingletonServer &instance();
         
         
+        /** @brief Request singletonUse referred instance
+         *
+         * @param[in] id An identifier (usually the typeid of the class)
+         * @param[in] factory A factory for the requested type
+         *
+         * Request access to the "singleton" associated to @p id. If no
+         * such instance currently exists. This will be created using 
+         * @p factory for creation.
+         *
+         * Additionally this method does increase the reference counter 
+         * for this @p id
+         *
+         * @note This operation is mutex protected to ensure reentrance.
+         *
+         * @return the wrapper associated to @p id
+         *
+         * @sa detach(std::string const &)
+         */
         SingletonDummy *attach(std::string const &id,
                                sdummy_factory const &factory);
+        /** @brief release SingletonUse instance
+         *
+         * @param[in] id an identifer
+         *
+         * Notifies that the "singleton" associated to @p id is not 
+         * referred anymore by one SingleonUse. As a result its 
+         * referrence counter is decreased and iff it reaches 0 the 
+         * associated singleton is then destroyed 
+         *
+         * @note This operation is mutex protected to ensure reentrance.
+         * @note This operation is robust to calls with invalid ids. If 
+         *     the @p id does not exists it just silently return false
+         *
+         * @retval true the associeted singleton hass been destroyed
+         * @retval false otehrwise
+         */
         bool detach(std::string const &id);
         
       private:
