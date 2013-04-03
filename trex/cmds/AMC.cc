@@ -220,6 +220,8 @@ int main(int argc, char *argv[]) {
       return 2;
     }
     if( pid>0 ) {
+      // Disable singleton management for this process
+      SingletonUse<LogManager>::disable();
       exit(0);
     }
     
@@ -230,6 +232,8 @@ int main(int argc, char *argv[]) {
     // Fork twice to ensurethe process cannot acquire a controlling terminal
     if( (pid = fork()) )  {
       if( pid>0 ) {
+        // Disable singleton management for this process
+        SingletonUse<LogManager>::disable();
         // I am the parent : I can die
         std::cout<<"Daemon spawned (pid="<<pid<<")\n"
         <<"All messages should now be reported in:\n  ";

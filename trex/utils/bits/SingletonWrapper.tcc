@@ -78,6 +78,12 @@ namespace TREX {
       return typeid(Ty).name();
     }
     
+    template<typename Ty>
+    void SingletonWrapper<Ty>::disable_server() {
+      internal::SingletonDummy::disable();
+    }
+
+    
     // structors :
     
     template<typename Ty>

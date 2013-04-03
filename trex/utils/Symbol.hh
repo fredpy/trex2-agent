@@ -55,14 +55,47 @@
 
 # include <boost/flyweight.hpp>
 # include <boost/flyweight/no_tracking.hpp>
-# include <boost/flyweight/intermodule_holder.hpp>
+# include <boost/flyweight/holder_tag.hpp>
 
 # include "IOstreamable.hh"
 # include "Hashable.hh"
 # include "StringExtract.hh"
+# include "SingletonUse.hh"
 
 namespace TREX {
   namespace utils {
+    
+    template<typename C>
+    class trex_holder_class {
+    public:
+      static C& get() {
+        static SingletonUse<C> hold;
+        return *hold;
+      }
+    };
+    
+    struct trex_holder_specifier :boost::flyweights::holder_marker {
+      template<typename C>
+      struct apply {
+        typedef trex_holder_class<C> type;
+      };
+    };
+    
+  }
+}
+
+namespace boost {
+  namespace flyweights {
+    
+    template<>
+    struct is_holder<TREX::utils::trex_holder_specifier> :boost::mpl::true_ {};
+    
+  }
+}
+
+namespace TREX {
+  namespace utils {
+
 
     /** @brief generic symbol class
      *
@@ -103,7 +136,7 @@ namespace TREX {
       typedef typename 
         boost::flyweight< str_type,
 			  boost::flyweights::no_tracking,
-			  boost::flyweights::intermodule_holder > ref_type;
+                         boost::flyweights::holder<trex_holder_specifier> > ref_type;
 
     public:
       /** @brief Constructor

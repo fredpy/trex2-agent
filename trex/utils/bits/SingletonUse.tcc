@@ -48,6 +48,12 @@ namespace TREX {
   namespace utils {
 
     template<typename Ty>
+    void SingletonUse<Ty>::disable() {
+      SingletonWrapper<Ty>::disable_server();
+    }
+    
+    
+    template<typename Ty>
     SingletonUse<Ty>::SingletonUse()
       :m_instance(SingletonWrapper<Ty>::attach()) {}
 
