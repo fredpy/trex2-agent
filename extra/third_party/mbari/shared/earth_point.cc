@@ -374,21 +374,22 @@ earth_point vincenty::destination(earth_point const &a,
   b_ *= u_2/1024;
   
   long double sigma = dist / (m_pole_radius*a_), prev_sigma = 2.0L*PI;
-  long double sin_sigma, cos_sigma, cos_2_sigma_m;
+  long double sin_sigma = sinl(sigma), cos_sigma=cosl(sigma),
+     cos_2_sigma_m = cosl(2.0L*sigma_1 + sigma);
   
   while (fabsl(prev_sigma-sigma) > 1e-12L) {
-    cos_2_sigma_m = cosl(2.0L*sigma_1 + sigma);
-    sin_sigma = sinl(sigma); cos_sigma = cosl(sigma);
-    
     long double delta_sigma = -3.0L +4.0L*cos_2_sigma_m*cos_2_sigma_m;
+    
     delta_sigma *= -3.0L+4.0L*sin_sigma*sin_sigma;
     delta_sigma *= b_/6.0L*cos_2_sigma_m;
     delta_sigma = cos_sigma*(-1.0L + 2.0L*cos_2_sigma_m*cos_2_sigma_m)-delta_sigma;
-    delta_sigma = cos_2_sigma_m + b_/4.0*delta_sigma;
+    delta_sigma = cos_2_sigma_m + b_/4.0L*delta_sigma;
     delta_sigma *= b_*sin_sigma;
     
     prev_sigma = sigma;
     sigma = dist /(m_pole_radius*a_) + delta_sigma;
+    sin_sigma = sinl(sigma); cos_sigma = cosl(sigma);
+    cos_2_sigma_m = cosl(2.0L*sigma_1 + sigma);
   }
   
   long double tmp = sin_u_a*sin_sigma - cos_u_a*cos_sigma*cos_alpha_1;
@@ -404,7 +405,7 @@ earth_point vincenty::destination(earth_point const &a,
   d_lon = cos_2_sigma_m + c*cos_sigma*d_lon;
   d_lon = sigma + c*sin_sigma*d_lon;
   d_lon = l - (1.0L - c)*m_f*sin_alpha*d_lon;
-  long double lon_b = fmodl(lon_a + l + 3.0*PI, 2.0*PI) - PI;
+  long double lon_b = fmodl(lon_a + d_lon + 3.0*PI, 2.0*PI) - PI;
   
   return earth_point(earth_point::to_deg(lon_b), earth_point::to_deg(lat_b));
  }

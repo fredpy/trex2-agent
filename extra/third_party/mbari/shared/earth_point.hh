@@ -541,7 +541,7 @@ namespace mbari {
    * can impact largellly the computation time. Otherwise it compute 
    * the shortest arc similarly to the @c great_circles calculator
    *
-   * @bug the computation does not appaer to convege at least for
+   * @bug the computation does not appaer to converge at least for
    * short distances.
    *
    * @note this implementation is based on the code given at
