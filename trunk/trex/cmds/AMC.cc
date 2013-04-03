@@ -89,7 +89,8 @@
 
 #include "nice_flags.h"
 
-#define DAEMON
+// disabled daemon option : my current implementation do not work well
+// #define DAEMON
 
 using namespace TREX::agent;
 using namespace TREX::utils;
@@ -156,7 +157,9 @@ int main(int argc, char *argv[]) {
    "run agent with simulated clock with given deliberation steps per tick")
   ("nice", po::value<size_t>()->implicit_value(10),
    "run this command with the given nice level")
+#ifdef DAEMON // fork does not work well with asio apprently ... to be refined
   ("daemon,D", "run amc as a detached daemon (experimental)")
+#endif
   ;
  
   // Build the general options
@@ -209,7 +212,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  
+#ifdef DAEMON
   // Before doing anything else Lets see if we need to start a daemon
   if( opt_val.count("daemon") ) {
     
@@ -254,6 +257,7 @@ int main(int argc, char *argv[]) {
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
   }
+#endif
   
   // Add first the path given so they will be looked before TREX_PATH
   if( opt_val.count("include-path") ) {
@@ -273,11 +277,11 @@ int main(int argc, char *argv[]) {
   amc_log->logPath();
   
 
-
+#ifdef DAEMON
   // If I am spawned as daemon reflects it in the logs
   if( opt_val.count("daemon") )
     amc_log->syslog("amc", info)<<"Spawned as daemon with pid="<<getpid();
-  
+#endif
   if( 0!=nice_val ) {
     // When nice is not 0 I need to renice the proces
     int ret;
