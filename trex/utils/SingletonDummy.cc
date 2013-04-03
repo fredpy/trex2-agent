@@ -45,20 +45,14 @@ using namespace TREX::utils::internal;
 
 SingletonDummy *SingletonDummy::attach(std::string const &name, 
                                        sdummy_factory const &factory) {
-  SingletonServer::lock_type locker(SingletonServer::sing_mtx());
   return SingletonServer::instance().attach(name, factory);
 }
 
 void SingletonDummy::detach(std::string const &name) {
-  SingletonServer::lock_type locker(SingletonServer::sing_mtx());
-  if( SingletonServer::instance().detach(name) ) {
-    delete SingletonServer::s_instance;
-  }
+  SingletonServer::instance().detach(name);
 }
 
 void SingletonDummy::disable() {
-  SingletonServer::lock_type locker(SingletonServer::sing_mtx());
-  SingletonServer::instance().disable();
 }
 
 
