@@ -31,9 +31,9 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "asio_runner.hh"
+#include <trex/asio_runner.hh>
 
-using namespace TREX::utils;
+using namespace trex;
 using namespace boost::asio;
 
 /*

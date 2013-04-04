@@ -37,14 +37,12 @@
 # include <boost/signals2/signal.hpp>
 # include <boost/asio.hpp>
 
-namespace TREX {
-  namespace utils {
-    
-    // Initial definition of the class
-    template<typename Signature>
-    class asio_signal;
+namespace trex {
+  
+  // Initial definition of the class
+  template<typename Signature>
+  class asio_signal;
 
-  } // TREX::utils
 } // TREX
 
 #endif // FWD_trex_utils_asio_signal

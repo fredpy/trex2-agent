@@ -35,9 +35,24 @@ include_directories(include)
 
 add_executable(multiplexer
 	# headers
-	include/trex/merged_signal.hh 
+	 include/trex/asio_runner.hh
+	 include/trex/asio_signal_fwd.hh
+	 include/trex/asio_signal.hh
+	 include/trex/asio_signal_n.hh
+	 include/trex/merged_signal.hh
+	 include/trex/bits/asio_signal_base.hh
+	 include/trex/bits/asio_signal_iter.hh
+	 include/trex/bits/asio_signal_template.hh
 	# source 
+	src/asio_runner.cc
 	src/multiplexer.cc 
 	src/merged_signal.cc)
+
 target_link_libraries(multiplexer ${SYSTEM_LIBRARIES} 
   ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
+
+source_group("Header\ Files\\bits" FILES
+	 include/trex/bits/asio_signal_base.hh
+	 include/trex/bits/asio_signal_iter.hh
+	 include/trex/bits/asio_signal_template.hh
+)

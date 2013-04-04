@@ -51,7 +51,7 @@
 
 // Generate specializations for 0 to ASIOSIG_MAX_SIZE arguments
 #  define BOOST_PP_ITERATION_LIMITS (0, ASIOSIG_MAX_SIZE)
-#  define BOOST_PP_FILENAME_1       "trex/utils/bits/asio_signal_iter.hh"
+#  define BOOST_PP_FILENAME_1       <trex/bits/asio_signal_iter.hh>
 
 #  include BOOST_PP_ITERATE()
 
