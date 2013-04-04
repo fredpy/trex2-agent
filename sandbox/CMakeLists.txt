@@ -31,7 +31,13 @@ if(NOT Boost_FOUND)
 endif(NOT Boost_FOUND)
 
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(include)
 
-add_executable(multiplexer src/multiplexer.cc)
-target_link_libraries(asio_daemon ${SYSTEM_LIBRARIES} 
+add_executable(multiplexer
+	# headers
+	include/trex/merged_signal.hh 
+	# source 
+	src/multiplexer.cc 
+	src/merged_signal.cc)
+target_link_libraries(multiplexer ${SYSTEM_LIBRARIES} 
   ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
