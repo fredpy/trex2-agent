@@ -8,13 +8,29 @@
 #ifndef H_Platform
 # define H_Platform
 
+# include <iostream>
+
 # include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/Plugin.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/FloatDomain.hh>
+# include <trex/domain/StringDomain.hh>
+# include <trex/domain/BooleanDomain.hh>
+# include <trex/domain/EnumDomain.hh>
+
 # include <DUNE/DUNE.hpp>
-# include <extra/third_party/lsts/ControlInterface.hh>
+# include <DUNE/Math/Angles.hpp>
+# include <DUNE/Coordinates/WGS84.hpp>
+
+# include "EuropaExtensions.hh"
+# include "ControlInterface.hh"
+# include "ImcAdapter.hh"
 # include "SharedEnvironment.hh"
+using namespace TREX::transaction;
+using namespace TREX::utils;
 
 using DUNE_NAMESPACES;
-
 
 namespace TREX {
   /** @brief lsts plug-in
@@ -26,6 +42,7 @@ namespace TREX {
    */
   namespace LSTS {
 
+    static const int TREX_ID = 65000;
 
     /** @brief LSTS platform reactor definition
      *
@@ -35,7 +52,7 @@ namespace TREX {
      * @author Jose Pinto <zepinto@gmail.com>
      * @ingroup lsts
      */
-    class Platform :public TREX::transaction::TeleoReactor {
+    class Platform :public TeleoReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -46,7 +63,7 @@ namespace TREX {
        * <Platform name="<name>" latency="<int>" lookahead="<int>" state="<bool>" duneport="<int>" localport="<int>"/>
        * @endcode
        */
-      Platform(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      Platform(TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Platform();
 
@@ -85,13 +102,13 @@ namespace TREX {
       bool sendMsg(Message& msg, Address &dest);
 
       void processState();
-      bool uniqueObservation(TREX::transaction::Observation obs);
-      typedef std::map<std::string, boost::shared_ptr<TREX::transaction::Observation> > obs_map;
+      bool postUniqueObservation(Observation obs);
+      typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      TREX::transaction::Observation estate(IMC::EstimatedState &msg);
-      TREX::transaction::Observation vstate(IMC::VehicleState &msg);
-      TREX::transaction::Observation mstate(IMC::ManeuverControlState &msg);
+      Observation estate(IMC::EstimatedState &msg);
+      Observation vstate(IMC::VehicleState &msg);
+      Observation mstate(IMC::ManeuverControlState &msg);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       static ControlInterface * controlInterfaceInstance;

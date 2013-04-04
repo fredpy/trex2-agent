@@ -62,6 +62,7 @@ trex_plugin(platform
   EuropaExtensions.cc 
   Platform.cc 
   SafetyBug.cc
+  ImcAdapter.cc
 
   # headers
   ControlInterface.hh 
@@ -69,6 +70,7 @@ trex_plugin(platform
   EuropaExtensions.hh 
   Platform.hh 
   SafetyBug.hh
+  ImcAdapter.hh
 )
 
 target_link_libraries(platform_pg TREXagent
