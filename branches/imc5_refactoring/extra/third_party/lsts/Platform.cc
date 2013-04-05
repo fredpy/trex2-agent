@@ -208,6 +208,34 @@ namespace TREX
           dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
+      TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(received[TrexCommand::getIdStatic()]);
+
+      if (command != NULL)
+      {
+      switch (command->command)
+      {
+        case IMC::TrexCommand::OP_POST_GOAL:
+          syslog(log::info) << "received (" << command->goal_id << "): " << command->goal_xml;
+          if (controlInterfaceInstance) {
+            controlInterfaceInstance->proccess_message(command->goal_xml);
+          }
+          break;
+        case IMC::TrexCommand::OP_ENABLE:
+          syslog(log::warn) << "Enable TREX command received";
+          // post active observation ...
+          postUniqueObservation(Observation("supervision", "Active"));
+          m_blocked = false;
+
+          break;
+        case IMC::TrexCommand::OP_DISABLE:
+          syslog(log::warn) << "Disable TREX command received";
+          // post blocked observation ...
+          postUniqueObservation(Observation("supervision", "Blocked"));
+          m_blocked = true;
+          break;
+      }
+      }
+
       if (pcstate != NULL)
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING);
 
@@ -235,6 +263,8 @@ namespace TREX
       {
         sendMsg(m_ref);
       }
+
+
 
     }
 
