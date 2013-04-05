@@ -36,8 +36,7 @@ namespace TREX
 
   namespace LSTS
   {
-    bool estate_posted = false, oplimits_posted = false, was_idle = false;
-    int last_vstate = -1;
+    bool was_idle = false;
     int remote_id = 0;
     ControlInterface * Platform::controlInterfaceInstance = 0;
     ImcAdapter m_adapter;
@@ -59,40 +58,34 @@ namespace TREX
       debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                "debug");
 
-      syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
-
-      // start listening for dune in a new thread
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
-
-      bfr = new uint8_t[65535];
-      receive.bind(localport, Address::Any, true);
-      receive.addToPoll(iom);
-
-      syslog(log::info) << "listening on port " << localport << "...";
 
       // Timelines for posting observations from DUNE
       provide("estate", false);
       provide("gps", false);
       provide("vstate", false);
       provide("oplimits", false);
-      provide("frefstate", false);
 
       // Timelines that can be controlled by other reactors
       provide("reference");
       provide("payload");
+
+      bfr = new uint8_t[65535];
     }
 
     bool
     Platform::postUniqueObservation(TREX::transaction::Observation obs)
     {
+
+      std::cout << obs << "\n";
+
       std::string timeline = obs.object().str();
       obs_map::iterator it = postedObservations.find(timeline);
 
       if (it == postedObservations.end() || !it->second->consistentWith(obs))
       {
         postedObservations[timeline].reset(new Observation(obs));
-
         postObservation(obs, true);
         return true;
       }
@@ -114,6 +107,16 @@ namespace TREX
 
     }
 
+    void
+    Platform::handleInit()
+    {
+      syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
+      receive.bind(localport, Address::Any, true);
+      receive.addToPoll(iom);
+
+      syslog(log::info) << "listening on port " << localport << "...";
+    }
+
     Platform::~Platform()
     {
       m_env->setPlatformReactor(NULL);
@@ -131,14 +134,12 @@ namespace TREX
     Platform::synchronize()
     {
 
-      syslog(log::info) << "synchronize()\n";
-
       try
       {
         Address addr;
         int msg_count = 0;
 
-        received.clear();
+        //received.clear();
 
         while (iom.poll(0))
         {
@@ -153,20 +154,21 @@ namespace TREX
           received[msg->getId()] = msg;
         }
 
-        // aggregate stores last messages received since TREX started,
-        // while received stores just the messages received since last tick
-        aggregate.insert(received.begin(), received.end());
+        if (msg_count < 1)
+        {
+          syslog(log::warn) << "Didn't receive any messages!\n";
+          std::cerr << "Didn't receive any messages!\n";
+        }
+
+        else
+        {
+          syslog(log::info) << "Received a total of " << msg_count << " messages\n";
+          std::cout << "Received a total of " << msg_count << " messages\n";
+          std::cout.flush();
+        }
 
         processState();
-
-        // send an heartbeat to Dune
-        IMC::Heartbeat hb;
-        sendMsg(hb);
-
-        if (msg_count < 1)
-          syslog(log::warn) << "processed " << msg_count << " messages\n";
-        else
-          syslog(log::info) << "processed " << msg_count << " messages\n";
+        syslog(log::info) << "Finished processing state.\n";
       }
       catch (std::runtime_error& e)
       {
@@ -175,6 +177,9 @@ namespace TREX
         return false;
       }
 
+      // Everything is fine. Send an heartbeat to Dune
+      Heartbeat hb;
+      sendMsg(hb);
       return true;
     }
 
@@ -199,50 +204,32 @@ namespace TREX
     void
     Platform::processState()
     {
-      /* ESTIMATED_STATE */
-      if (aggregate.count(IMC::EstimatedState::getIdStatic()))
-      {
-        IMC::EstimatedState * msg =
-            dynamic_cast<IMC::EstimatedState *>(aggregate[IMC::EstimatedState::getIdStatic()]);
-        postUniqueObservation(m_adapter.estimatedStateObservation(msg));
-      }
-      else
-        postUniqueObservation(m_adapter.estimatedStateObservation(NULL));
+      IMC::EstimatedState * estate =
+          dynamic_cast<IMC::EstimatedState *>(received[IMC::EstimatedState::getIdStatic()]);
+      postUniqueObservation(m_adapter.estimatedStateObservation(estate));
 
+      IMC::GpsFix * fix =
+          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
+      postUniqueObservation(m_adapter.gpsFixObservation(fix));
 
-      /* GPS FIX */
-      if (aggregate.count(IMC::GpsFix::getIdStatic()))
-      {
-        IMC::GpsFix * fix =
-            dynamic_cast<IMC::GpsFix *>(aggregate[IMC::GpsFix::getIdStatic()]);
-        postUniqueObservation(m_adapter.gpsFixObservation(fix));
-      }
-      else
-        postUniqueObservation(m_adapter.gpsFixObservation(NULL));
+      IMC::FollowRefState * frefstate =
+          dynamic_cast<IMC::FollowRefState *>(received[IMC::FollowRefState::getIdStatic()]);
+      postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
-//      /* FOLLOW REFERENCE STATE */
-//      if (aggregate.count(IMC::FollowRefState::getIdStatic()))
-//      {
-//        IMC::FollowRefState * msg =
-//            dynamic_cast<IMC::FollowRefState *>(aggregate[IMC::FollowRefState::getIdStatic()]);
-//        postUniqueObservation(m_adapter.followRefStateObservation(msg));
-//      }
-//      else
-//      {
-//        postUniqueObservation(m_adapter.followRefStateObservation(NULL));
-//      }
+      IMC::PlanControlState * vstate =
+          dynamic_cast<IMC::PlanControlState *>(received[IMC::PlanControlState::getIdStatic()]);
+      postUniqueObservation(m_adapter.planControlStateObservation(vstate));
 
-      /* VEHICLE STATE */
-      if (aggregate.count(IMC::VehicleState::getIdStatic()))
+      IMC::OperationalLimits * oplims =
+          dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
+
+      if (oplims == NULL)
       {
-        IMC::VehicleState * msg =
-            dynamic_cast<IMC::VehicleState *>(aggregate[IMC::VehicleState::getIdStatic()]);
-        postUniqueObservation(m_adapter.vehicleStateObservation(msg));
+        GetOperationalLimits req;
+        sendMsg(req);
       }
-      else
-      {
-        postUniqueObservation(m_adapter.vehicleStateObservation(NULL));
-      }
+      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+
     }
 
     bool

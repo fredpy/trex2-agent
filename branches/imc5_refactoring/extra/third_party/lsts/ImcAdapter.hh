@@ -21,15 +21,31 @@ using namespace TREX::transaction;
 namespace TREX {
   namespace LSTS {
 
-
+    /** @brief IMC to TREX translator
+     *
+     * This class is used to translate incoming IMC data into TREX observations
+     *
+     * @author Jose Pinto <zepinto@gmail.com>
+     * @ingroup lsts
+     */
     class ImcAdapter
     {
     public:
       ImcAdapter();
+      //@brief Translates GpsFix messages into "gps" timeline observations
       Observation gpsFixObservation(GpsFix * msg);
+
+      //@brief Translates EstimatedState messages into "estate" timeline observations
       Observation estimatedStateObservation(EstimatedState * msg);
+
+      //@brief Translates FollowRefState messages into "frefstate" timeline observations
       Observation followRefStateObservation(FollowRefState * msg);
-      Observation vehicleStateObservation(VehicleState * msg);
+
+      //@brief Translates PlanControlState messages into "vstate" timeline observations
+      Observation planControlStateObservation(PlanControlState * msg);
+
+      //@brief Translates OperationalLimits messages into "oplimits" timeline observations
+      Observation opLimitsObservation(OperationalLimits * msg);
 
       virtual
       ~ImcAdapter();

@@ -389,10 +389,10 @@ namespace TREX {
        * @pre the reactor has not been inited yet
        *
        * This method is called by the agent to allow the reactor to complete its
-       * initialization. At this stage the treactor knwos that it is part of the
-       * reactor graph and can complete its initialisation if needed. During this
+       * initialization. At this stage the reactor knows that it is part of the
+       * reactor graph and can complete its initialization if needed. During this
        * call, the callback handleInit will be executed allowing to execute reactors
-       * spacific initializations
+       * specific initializations
        *
        * @throw ReactorException Attempted to call this method twice
        *
@@ -445,7 +445,7 @@ namespace TREX {
       double workRatio();
       /** @brief Deliberation step
        *
-       * This method is aclled by the agent when it allows the reactor to
+       * This method is called by the agent when it allows the reactor to
        * do one deliberation step. It calls resume() and update informations
        * in order to compute the reactors next work ratio
        *
@@ -456,13 +456,13 @@ namespace TREX {
 
       /** @brief Iterator other external timelines
        *
-       * The type used to iterate other the external timlines of a reactor.
+       * The type used to iterate other the external timelines of a reactor.
        * This is mostly used by the boost graph library.
        */
       typedef details::external external_iterator;
       /** @brief size type
        *
-       * The type used to return a size such the number of @e External timleines
+       * The type used to return a size such the number of @e External timelines
        * of a reactor
        */
       typedef size_t            size_type;
@@ -496,7 +496,7 @@ namespace TREX {
        * This methods indicates the number of internal timelines this reactor 
        * currently owns
        *
-       * @return the number of internla timleins of this reactor
+       * @return the number of internal timelines of this reactor
        *
        * @sa count_internal_relations() const
        */
@@ -506,7 +506,7 @@ namespace TREX {
       /** @brief Count the number of internal relations
        *
        * This method count the number of relations that this reactor have 
-       * with other reactors issued from its internla timelines.
+       * with other reactors issued from its internal timelines.
        *
        * This number does not count the number of internal timelines but the 
        * sum of all the reactors that are connected to this reactor through its internal 
@@ -534,19 +534,19 @@ namespace TREX {
     protected:    
       /** @brief Constructor
        *
-       * @param[in] owner The graph that creates and will own this insatnce
+       * @param[in] owner The graph that creates and will own this instance
        * @param[in] name Name of the reactor
        * @param[in] latency Deliberation latency for this reactor
        * @param[in] lookahead of his reactor
        * @param[in] log A log flag
        *
-       * Create a new reactoe named @p name with a latency of @p latency and a
+       * Create a new reactor named @p name with a latency of @p latency and a
        * look-ahead of @p lookahead and associate it to the graph @p owner
        */
       TeleoReactor(graph *owner, TREX::utils::Symbol const &name,
 		   TICK latency, TICK lookahead, bool log=false);
 
-      /** @brief LogManager acces point
+      /** @brief LogManager access point
        *
        * @return the LogManager instance for this run
        */

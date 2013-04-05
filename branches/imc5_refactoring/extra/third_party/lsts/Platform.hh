@@ -98,6 +98,7 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
       void handleTickStart();
+      void handleInit();
       bool sendMsg(Message& msg, std::string ip, int port);
       bool sendMsg(Message& msg, Address &dest);
 
@@ -106,9 +107,6 @@ namespace TREX {
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      Observation estate(IMC::EstimatedState &msg);
-      Observation vstate(IMC::VehicleState &msg);
-      Observation mstate(IMC::ManeuverControlState &msg);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       static ControlInterface * controlInterfaceInstance;
