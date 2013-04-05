@@ -107,6 +107,7 @@ namespace TREX {
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
+      void handleGoingRequest(Goal g);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       static ControlInterface * controlInterfaceInstance;

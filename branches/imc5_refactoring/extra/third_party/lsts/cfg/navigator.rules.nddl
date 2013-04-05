@@ -1,44 +1,39 @@
-#include "declarations.nddl"
+#include "TREX.nddl"
 #include "navigator.nddl"
 #include "platform.nddl"
 
-SurfaceController::Underwater {
+Navigator::At {
 
-  subsetOf(speriod, object.surface_period);
-  
-  if (requested == true) {
-    surface == true; 
-    met_by(Surface surf);
-    surf.requested == true;
-    earliest_start == surf.start;
-  }
-  if( surface==true ) {
-    if (latest_end < AGENT_CLOCK && latest_end < end) {
-      starts_before(VehicleCommand.Maneuver man);
-      man.depth == 0;
-      man.start >= latest_end;
-    }
-  }
+	contained_by(Reference.At arr);
+		latitude == arr.latitude;
+		longitude == arr.longitude;
+		z == arr.z;
+		speed == arr.speed;
+	
+	met_by(Going g);
+		latitude == g.latitude;
+		longitude == g.longitude;
+		z == g.z;
+		speed == g.speed;
+		
+	duration >= secs; 
 }
 
-SurfaceController::Surface {
-  if (requested == true) {
-    met_by(Underwater und);
-    und.surface == true;
-  }
-}
+Navigator::Going {
 
-VehicleState::Boot {
-  contained_by(Navigator.Idle);
-}
 
-ManeuverController::Maneuver {
-  ends(Navigator.Going go);
-  go.start <= start;
+	contained_by(PlanControlState.Executing exec);
+		exec.plan == "trex_plan";
 
-  lat_deg == go.latitude;
-  lon_deg == go.longitude;
-  depth == go.depth;
-  speed == go.speed;
-  secs == go.secs;
+	contained_by(Reference.Going g);
+		latitude == g.latitude;
+		longitude == g.longitude;
+		z == g.z;
+		speed == g.speed;	
+
+	after(EstimatedState.Position origin);
+		orig_lat == origin.latitude;
+		orig_lon == origin.longitude;
+		orig_z == origin.z;
+		origin.start + 1 == start;
 }

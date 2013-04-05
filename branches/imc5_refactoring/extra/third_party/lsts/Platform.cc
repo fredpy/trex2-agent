@@ -40,6 +40,7 @@ namespace TREX
     int remote_id = 0;
     ControlInterface * Platform::controlInterfaceInstance = 0;
     ImcAdapter m_adapter;
+    Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
                 TeleoReactor(arg, false), /*m_active_proxy(NULL),*/ m_firstTick(
@@ -64,7 +65,7 @@ namespace TREX
       // Timelines for posting observations from DUNE
       provide("estate", false);
       provide("gps", false);
-      provide("vstate", false);
+      provide("pcstate", false);
       provide("oplimits", false);
 
       // Timelines that can be controlled by other reactors
@@ -74,11 +75,89 @@ namespace TREX
       bfr = new uint8_t[65535];
     }
 
+    void
+    Platform::handleInit()
+    {
+      syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
+      receive.bind(localport, Address::Any, true);
+      receive.addToPoll(iom);
+
+      syslog(log::info) << "listening on port " << localport << "...";
+    }
+
+    void
+    Platform::handleTickStart()
+    {
+      try
+      {
+        Address addr;
+        int msg_count = 0;
+
+        while (iom.poll(0))
+        {
+          msg_count++;
+          uint16_t rv = receive.read((char*)bfr, 65535, &addr);
+          IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
+          if (remote_id == 0)
+            remote_id = msg->getSource();
+
+          // substitute previously received message
+          if (received.count(msg->getId()))
+            delete received[msg->getId()];
+          received[msg->getId()] = msg;
+        }
+
+        if (msg_count < 1)
+        {
+          syslog(log::warn) << "No messages from DUNE!\n";
+        }
+
+        else
+        {
+          syslog(log::info) << "Received a total of " << msg_count << " messages\n";
+        }
+      }
+      catch (std::runtime_error& e)
+      {
+        syslog(log::error) << "Error during message processing: " << e.what();
+        std::cerr << e.what();
+      }
+    }
+
+    bool
+    Platform::synchronize()
+    {
+      processState();
+
+      Heartbeat hb;
+      sendMsg(hb);
+      return true;
+    }
+
+    void
+    Platform::handleRequest(goal_id const &g)
+    {
+
+      Goal * goal = g.get();
+
+      std::string gname = (goal->object()).str();
+      std::string gpred = (goal->predicate()).str();
+      std::string man_name;
+      syslog(log::info) << "handleRequest(" << gname << "." << gpred << ")\n";
+
+      if (gname == "reference" && gpred == "Going")
+        handleGoingRequest(*goal);
+    }
+
+    void
+    Platform::handleRecall(goal_id const &g)
+    {
+      syslog(log::warn) << "handleRecall(" << g.get()->object().str() << ")";
+    }
+
     bool
     Platform::postUniqueObservation(TREX::transaction::Observation obs)
     {
-
-      std::cout << obs << "\n";
 
       std::string timeline = obs.object().str();
       obs_map::iterator it = postedObservations.find(timeline);
@@ -99,111 +178,16 @@ namespace TREX
     }
 
     void
-    Platform::handleTickStart()
-    {
-      syslog(log::info) << "handleTickStart()\n";
-      if (m_blocked)
-        return;
-
-    }
-
-    void
-    Platform::handleInit()
-    {
-      syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
-      receive.bind(localport, Address::Any, true);
-      receive.addToPoll(iom);
-
-      syslog(log::info) << "listening on port " << localport << "...";
-    }
-
-    Platform::~Platform()
-    {
-      m_env->setPlatformReactor(NULL);
-      if (NULL != bfr)
-        delete[] bfr;
-    }
-
-    void
     Platform::setControlInterface(ControlInterface * itf)
     {
       controlInterfaceInstance = itf;
     }
 
-    bool
-    Platform::synchronize()
-    {
-
-      try
-      {
-        Address addr;
-        int msg_count = 0;
-
-        //received.clear();
-
-        while (iom.poll(0))
-        {
-          msg_count++;
-          uint16_t rv = receive.read((char*)bfr, 65535, &addr);
-          IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
-          if (remote_id == 0)
-            remote_id = msg->getSource();
-
-          if (received.count(msg->getId()))
-            delete received[msg->getId()];
-          received[msg->getId()] = msg;
-        }
-
-        if (msg_count < 1)
-        {
-          syslog(log::warn) << "Didn't receive any messages!\n";
-          std::cerr << "Didn't receive any messages!\n";
-        }
-
-        else
-        {
-          syslog(log::info) << "Received a total of " << msg_count << " messages\n";
-          std::cout << "Received a total of " << msg_count << " messages\n";
-          std::cout.flush();
-        }
-
-        processState();
-        syslog(log::info) << "Finished processing state.\n";
-      }
-      catch (std::runtime_error& e)
-      {
-        syslog(log::error) << "Error during message processing: " << e.what();
-        std::cerr << e.what();
-        return false;
-      }
-
-      // Everything is fine. Send an heartbeat to Dune
-      Heartbeat hb;
-      sendMsg(hb);
-      return true;
-    }
-
-    void
-    Platform::handleRequest(goal_id const &g)
-    {
-
-      Goal * goal = g.get();
-
-      std::string gname = (goal->object()).str();
-      std::string gpred = (goal->predicate()).str();
-      std::string man_name;
-      syslog(log::info) << "handleRequest(" << gname << "." << gpred << ")\n";
-    }
-
-    void
-    Platform::handleRecall(goal_id const &g)
-    {
-      syslog(log::warn) << "handleRecall(" << g.get()->object().str() << ")";
-    }
-
     void
     Platform::processState()
     {
+
+      // Translate incoming messages into observations
       IMC::EstimatedState * estate =
           dynamic_cast<IMC::EstimatedState *>(received[IMC::EstimatedState::getIdStatic()]);
       postUniqueObservation(m_adapter.estimatedStateObservation(estate));
@@ -216,20 +200,87 @@ namespace TREX
           dynamic_cast<IMC::FollowRefState *>(received[IMC::FollowRefState::getIdStatic()]);
       postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
-      IMC::PlanControlState * vstate =
+      IMC::PlanControlState * pcstate =
           dynamic_cast<IMC::PlanControlState *>(received[IMC::PlanControlState::getIdStatic()]);
-      postUniqueObservation(m_adapter.planControlStateObservation(vstate));
+      postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
 
       IMC::OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
+      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
+      if (pcstate != NULL)
+        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING);
+
+      // Operational limits are sent by DUNE on request
       if (oplims == NULL)
       {
         GetOperationalLimits req;
         sendMsg(req);
       }
-      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
+      if (m_ref.flags == 0 && estate != NULL)
+      {
+        m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
+        m_ref.lat = estate->lat;
+        m_ref.lon = estate->lon;
+        WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
+        DesiredZ desZ;
+        desZ.value = 0;
+        desZ.z_units = Z_DEPTH;
+        m_ref.z.set(desZ);
+      }
+
+      // Send current reference to DUNE
+      if (!m_blocked)
+      {
+        sendMsg(m_ref);
+      }
+
+    }
+
+    void
+    Platform::handleGoingRequest(Goal g) {
+      Variable v;
+      v = g.getAttribute("latitude");
+      int flags = Reference::FLAG_LOCATION;
+
+      if (v.domain().isSingleton())
+        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+
+      v = g.getAttribute("longitude");
+      if (v.domain().isSingleton())
+        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+
+      v = g.getAttribute("z");
+      if (v.domain().isSingleton())
+      {
+        double z = v.domain().getTypedSingleton<double, true>();
+        DesiredZ desZ;
+        flags |= Reference::FLAG_LOCATION;
+
+        if (z >= 0)
+        {
+          desZ.value = z;
+          desZ.z_units = Z_DEPTH;
+        }
+        else
+        {
+          desZ.value = -z;
+          desZ.z_units = Z_ALTITUDE;
+        }
+        m_ref.z.set(desZ);
+      }
+
+      v = g.getAttribute("speed");
+      if (v.domain().isSingleton())
+      {
+        double speed = v.domain().getTypedSingleton<double, true>();
+        DesiredSpeed desSpeed;
+        flags |= Reference::FLAG_SPEED;
+        desSpeed.value = speed;
+        desSpeed.speed_units = SUNITS_METERS_PS;
+        m_ref.speed.set(desSpeed);
+      }
     }
 
     bool
@@ -312,6 +363,13 @@ namespace TREX
     Platform::reportErrorToDune(const std::string &message)
     {
       return reportToDune(IMC::LogBookEntry::LBET_ERROR, message);
+    }
+
+    Platform::~Platform()
+    {
+      m_env->setPlatformReactor(NULL);
+      if (NULL != bfr)
+        delete[] bfr;
     }
   }
 }

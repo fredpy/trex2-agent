@@ -1,4 +1,4 @@
-#include "declarations.nddl"
+#include "TREX.nddl"
 #include "platform.nddl"
 
 class Navigator extends AgentTimeline {
@@ -14,12 +14,12 @@ class Navigator extends AgentTimeline {
 	predicate Idle {}
 	
 	predicate Going {
-		float latitude, longitude, depth, speed;
-		int secs, estimated_duration, duration_interval;
+		float latitude, longitude, z, speed;
+		float orig_lat, orig_lon, orig_z;
 	}
 	
-	predicate Staying {
-		float latitude, longitude, depth;
+	predicate At {
+		float latitude, longitude, z, speed;
 		int secs;
 	}
 }

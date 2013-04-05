@@ -39,22 +39,21 @@ namespace TREX {
 
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
-      obs.restrictAttribute("depth", FloatDomain(msg->depth));
-      obs.restrictAttribute("altitude", FloatDomain(msg->alt));
-      obs.restrictAttribute("height", FloatDomain(msg->height));
+
+      if (msg->depth != -1)
+        obs.restrictAttribute("z", FloatDomain(msg->depth));
+      else if (msg->alt != -1 )
+        obs.restrictAttribute("z", FloatDomain(-msg->alt));
+      else if (msg->alt != -1 )
+        obs.restrictAttribute("z", FloatDomain(msg->height));
 
       return obs;
     }
 
     Observation ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
-      if (msg == NULL || msg->control_src != TREX_ID || msg->state == FollowRefState::FR_TIMEOUT)
+      if (msg == NULL || msg->reference.isNull() || msg->control_src != TREX_ID || msg->state == FollowRefState::FR_TIMEOUT)
         return Observation("reference", "Boot");
-
-      if (msg->reference.isNull())
-      {
-        return Observation("reference", "Idle");
-      }
 
       bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;
       bool z_near = (msg->proximity & FollowRefState::PROX_Z_NEAR) != 0;
@@ -62,32 +61,27 @@ namespace TREX {
 
       std::string predicate = "Going";
       if (arrived)
-        predicate = "Arrived";
+        predicate = "At";
 
       Observation obs("reference", predicate);
 
-      obs.restrictAttribute("xy_near", BooleanDomain(xy_near));
-      obs.restrictAttribute("z_near", BooleanDomain(z_near));
-
-      obs.restrictAttribute("lat", FloatDomain(msg->reference->lat));
-      obs.restrictAttribute("lon", FloatDomain(msg->reference->lon));
+      obs.restrictAttribute("latitude", FloatDomain(msg->reference->lat));
+      obs.restrictAttribute("longitude", FloatDomain(msg->reference->lon));
 
       if (!msg->reference->z.isNull())
       {
-        obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z_mode", StringDomain("depth"));
+            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
             break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z_mode", StringDomain("altitude"));
+            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
             break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z_mode", StringDomain("height"));
+            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
             break;
           default:
-            obs.restrictAttribute("z_mode", StringDomain("none"));
             break;
         }
       }
@@ -106,29 +100,29 @@ namespace TREX {
       {
         if (msg->state == PlanControlState::PCS_BLOCKED)
         {
-          return Observation("vstate", "Blocked");
+          return Observation("pcstate", "Blocked");
         }
 
         if (msg->state == PlanControlState::PCS_READY)
         {
-          return Observation("vstate", "Ready");
+          return Observation("pcstate", "Ready");
         }
 
         if (msg->state == PlanControlState::PCS_INITIALIZING)
         {
-          Observation obs =  Observation("vstate", "Initializing");
+          Observation obs =  Observation("pcstate", "Initializing");
           obs.restrictAttribute("plan", StringDomain(msg->plan_id));
           return obs;
         }
 
         if (msg->state == PlanControlState::PCS_EXECUTING)
         {
-          Observation obs =  Observation("vstate", "Executing");
+          Observation obs =  Observation("pcstate", "Executing");
           obs.restrictAttribute("plan", StringDomain(msg->plan_id));
           return obs;
         }
       }
-      return Observation("vstate", "Boot");
+      return Observation("pcstate", "Boot");
     }
 
     Observation ImcAdapter::opLimitsObservation(OperationalLimits * msg)
