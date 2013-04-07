@@ -47,7 +47,10 @@ namespace TREX
     {
       m_firstTick = true;
       m_blocked = false;
+
+      // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
+
       duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
                                  "duneport");
       duneip = parse_attr<std::string>("127.0.0.1",
@@ -261,9 +264,6 @@ namespace TREX
       {
         sendMsg(m_ref);
       }
-
-
-
     }
 
     void

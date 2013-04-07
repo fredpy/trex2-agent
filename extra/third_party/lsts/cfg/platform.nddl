@@ -62,9 +62,14 @@ class OperationalLimits extends AgentTimeline {
 	predicate Boot {};
 
 	predicate Limits {
-		float depth;
-		float altitude;
-		float speed;		
+		float max_depth;
+		float max_altitude;
+		float min_altitude;
+		float max_speed;
+		float min_speed;
+		
+		max_altitude >= min_altitude;
+		max_speed >= min_speed;		
 	};
 };
 
