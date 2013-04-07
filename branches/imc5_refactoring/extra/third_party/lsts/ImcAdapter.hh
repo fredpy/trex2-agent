@@ -32,8 +32,8 @@ namespace TREX {
     {
     public:
       ImcAdapter();
-      //@brief Translates GpsFix messages into "gps" timeline observations
-      Observation gpsFixObservation(GpsFix * msg);
+      //@brief Translates VehicleMedium messages into "medium" timeline observations
+      Observation vehicleMediumObservation(VehicleMedium * msg);
 
       //@brief Translates EstimatedState messages into "estate" timeline observations
       Observation estimatedStateObservation(EstimatedState * msg);

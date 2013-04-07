@@ -176,7 +176,15 @@ void InsideOpLimits::handleExecute() {
     depth = cast_basis(m_depth.getSingletonValue());
 
   if (s_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH)
-    if (depth >= s_oplimits->max_depth)
+    if (depth >= 0 && depth >= s_oplimits->max_depth)
+      m_depth.empty();
+
+  if (s_oplimits->mask & DUNE::IMC::OPL_MAX_ALT)
+    if (depth < 0 && -depth >= s_oplimits->max_altitude)
+      m_depth.empty();
+
+  if (s_oplimits->mask & DUNE::IMC::OPL_MIN_ALT)
+    if (depth < 0 && -depth <= s_oplimits->min_altitude)
       m_depth.empty();
 
   if (s_oplimits->mask & DUNE::IMC::OPL_AREA)

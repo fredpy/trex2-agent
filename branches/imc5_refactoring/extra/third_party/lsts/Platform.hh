@@ -117,6 +117,7 @@ namespace TREX {
       IOMultiplexing iom;
       uint8_t* bfr;
 
+
       /** @brief Is the state already posted as observation ? */
       bool m_firstTick;
 

@@ -21,6 +21,8 @@ class Navigator extends AgentTimeline {
 	predicate At {
 		float latitude, longitude, z, speed;
 		int secs;
+		
+		sane_pos(latitude, longitude, z);
 	}
 }
 

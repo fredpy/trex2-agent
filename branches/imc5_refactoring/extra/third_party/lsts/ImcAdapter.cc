@@ -15,16 +15,30 @@ namespace TREX {
       // TODO Auto-generated constructor stub
     }
 
-    Observation ImcAdapter::gpsFixObservation(GpsFix * msg)
+    Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
     {
-      if (msg == NULL)
-        return Observation("gps", "Boot");
-
-      if ((msg->validity & GpsFix::GFV_VALID_POS) != 0)
-        return Observation("gps", "Valid");
-      else
-        return Observation("gps", "Invalid");
+      if (msg != NULL)
+      {
+        switch (msg->medium) {
+          case (VehicleMedium::VM_WATER):
+            return Observation("medium", "Water");
+            break;
+          case (VehicleMedium::VM_UNDERWATER):
+            return Observation("medium", "Underwater");
+            break;
+          case (VehicleMedium::VM_AIR):
+            return Observation("medium", "Air");
+            break;
+          case (VehicleMedium::VM_GROUND):
+            return Observation("medium", "Ground");
+            break;
+          default:
+            break;
+        }
+      }
+      return Observation("medium", "Unknown");
     }
+
 
     Observation ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
@@ -98,31 +112,16 @@ namespace TREX {
     {
       if (msg != NULL)
       {
-        if (msg->state == PlanControlState::PCS_BLOCKED)
-        {
-          return Observation("pcstate", "Blocked");
-        }
 
-        if (msg->state == PlanControlState::PCS_READY)
+        if (msg->state == PlanControlState::PCS_EXECUTING && msg->plan_id == "trex_plan")
         {
-          return Observation("pcstate", "Ready");
-        }
-
-        if (msg->state == PlanControlState::PCS_INITIALIZING)
-        {
-          Observation obs =  Observation("pcstate", "Initializing");
-          obs.restrictAttribute("plan", StringDomain(msg->plan_id));
+          Observation obs =  Observation("control", "TREX");
           return obs;
         }
-
-        if (msg->state == PlanControlState::PCS_EXECUTING)
-        {
-          Observation obs =  Observation("pcstate", "Executing");
-          obs.restrictAttribute("plan", StringDomain(msg->plan_id));
-          return obs;
-        }
+        return Observation("control", "DUNE");
       }
-      return Observation("pcstate", "Boot");
+
+      return Observation("control", "Boot");
     }
 
     Observation ImcAdapter::opLimitsObservation(OperationalLimits * msg)

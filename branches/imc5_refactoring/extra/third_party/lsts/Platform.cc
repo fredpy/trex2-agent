@@ -43,29 +43,25 @@ namespace TREX
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                TeleoReactor(arg, false), /*m_active_proxy(NULL),*/ m_firstTick(
-                    true), m_blocked(false)
+                TeleoReactor(arg, false)
     {
-
+      m_firstTick = true;
+      m_blocked = false;
       m_env->setPlatformReactor(this);
-
       duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
                                  "duneport");
-
       duneip = parse_attr<std::string>("127.0.0.1",
                                        TeleoReactor::xml_factory::node(arg),
                                        "duneip");
-
       debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                "debug");
-
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
 
       // Timelines for posting observations from DUNE
       provide("estate", false);
-      provide("gps", false);
-      provide("pcstate", false);
+      provide("medium", false);
+      provide("control", false);
       provide("oplimits", false);
 
       // Timelines that can be controlled by other reactors
@@ -143,7 +139,6 @@ namespace TREX
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
-      syslog(log::info) << "handleRequest(" << gname << "." << gpred << ")\n";
 
       if (gname == "reference" && gpred == "Going")
         handleGoingRequest(*goal);
@@ -152,7 +147,7 @@ namespace TREX
     void
     Platform::handleRecall(goal_id const &g)
     {
-      syslog(log::warn) << "handleRecall(" << g.get()->object().str() << ")";
+
     }
 
     bool
@@ -188,46 +183,49 @@ namespace TREX
     {
 
       // Translate incoming messages into observations
-      IMC::EstimatedState * estate =
-          dynamic_cast<IMC::EstimatedState *>(received[IMC::EstimatedState::getIdStatic()]);
+      EstimatedState * estate =
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       postUniqueObservation(m_adapter.estimatedStateObservation(estate));
 
-      IMC::GpsFix * fix =
-          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
-      postUniqueObservation(m_adapter.gpsFixObservation(fix));
+//      IMC::GpsFix * fix =
+//          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
+//      postUniqueObservation(m_adapter.gpsFixObservation(fix));
 
-      IMC::FollowRefState * frefstate =
-          dynamic_cast<IMC::FollowRefState *>(received[IMC::FollowRefState::getIdStatic()]);
+      VehicleMedium * medium =
+          dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
+      postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
+      FollowRefState * frefstate =
+          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
       postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
-      IMC::PlanControlState * pcstate =
-          dynamic_cast<IMC::PlanControlState *>(received[IMC::PlanControlState::getIdStatic()]);
+      PlanControlState * pcstate =
+          dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
 
-      IMC::OperationalLimits * oplims =
-          dynamic_cast<IMC::OperationalLimits *>(received[IMC::OperationalLimits::getIdStatic()]);
+      OperationalLimits * oplims =
+          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
-      TrexCommand * command = dynamic_cast<IMC::TrexCommand*>(received[TrexCommand::getIdStatic()]);
+      TrexCommand * command = dynamic_cast<TrexCommand*>(received[TrexCommand::getIdStatic()]);
 
       if (command != NULL)
       {
       switch (command->command)
       {
-        case IMC::TrexCommand::OP_POST_GOAL:
+        case TrexCommand::OP_POST_GOAL:
           syslog(log::info) << "received (" << command->goal_id << "): " << command->goal_xml;
           if (controlInterfaceInstance) {
             controlInterfaceInstance->proccess_message(command->goal_xml);
           }
           break;
-        case IMC::TrexCommand::OP_ENABLE:
+        case TrexCommand::OP_ENABLE:
           syslog(log::warn) << "Enable TREX command received";
           // post active observation ...
           postUniqueObservation(Observation("supervision", "Active"));
           m_blocked = false;
 
           break;
-        case IMC::TrexCommand::OP_DISABLE:
+        case TrexCommand::OP_DISABLE:
           syslog(log::warn) << "Disable TREX command received";
           // post blocked observation ...
           postUniqueObservation(Observation("supervision", "Blocked"));

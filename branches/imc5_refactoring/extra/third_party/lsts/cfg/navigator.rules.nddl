@@ -4,13 +4,13 @@
 
 Navigator::At {
 
-	contained_by(Reference.At arr);
+	contained_by(condition Reference.At arr);
 		latitude == arr.latitude;
 		longitude == arr.longitude;
 		z == arr.z;
 		speed == arr.speed;
 	
-	met_by(Going g);
+	met_by(effect Going g);
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
@@ -21,9 +21,8 @@ Navigator::At {
 
 Navigator::Going {
 
-
-	contained_by(PlanControlState.Executing exec);
-		exec.plan == "trex_plan";
+	contained_by(condition ControlMode.TREX c);
+		c.start + 1 <= start;
 
 	contained_by(Reference.Going g);
 		latitude == g.latitude;
@@ -31,7 +30,7 @@ Navigator::Going {
 		z == g.z;
 		speed == g.speed;	
 
-	after(EstimatedState.Position origin);
+	any(condition EstimatedState.Position origin);
 		orig_lat == origin.latitude;
 		orig_lon == origin.longitude;
 		orig_z == origin.z;

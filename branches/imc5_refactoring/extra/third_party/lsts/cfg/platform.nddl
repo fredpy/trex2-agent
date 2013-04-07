@@ -39,7 +39,7 @@ class Reference extends AgentTimeline {
 	};
 }
 
-class PlanControlState extends AgentTimeline {
+class ControlMode extends AgentTimeline {
 	
 	PlanControlState(Mode _mode) {
 		super(_mode, "Boot");
@@ -47,17 +47,10 @@ class PlanControlState extends AgentTimeline {
 	
 	predicate Boot {};
 	
-	predicate Blocked  {};
+	predicate DUNE  {};
 	
-	predicate Ready {};
+	predicate TREX {};
 	
-	predicate Initializing {
-		string plan;	
-	};
-	
-	predicate Executing {
-		string plan;
-	};
 };
 
 class OperationalLimits extends AgentTimeline {
@@ -75,16 +68,23 @@ class OperationalLimits extends AgentTimeline {
 	};
 };
 
-class Gps extends AgentTimeline {
+class Medium extends AgentTimeline {
 
-	Gps(Mode _mode) {
-		super(_mode, "Boot");
+	Medium(Mode _mode) {
+		super(_mode, "Unknown");
 	}
 	
-	predicate Boot {};
+	predicate Unknown {};
 	
-	predicate Valid {}
+	predicate Water {};
 	
-	predicate Invalid {}
+	predicate Underwater {};
+	
+	predicate Air {};
+	
+	predicate Ground {};
+	
 }
+
+
 
