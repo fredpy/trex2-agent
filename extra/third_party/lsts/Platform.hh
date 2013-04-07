@@ -8,13 +8,29 @@
 #ifndef H_Platform
 # define H_Platform
 
+# include <iostream>
+
 # include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/Plugin.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/FloatDomain.hh>
+# include <trex/domain/StringDomain.hh>
+# include <trex/domain/BooleanDomain.hh>
+# include <trex/domain/EnumDomain.hh>
+
 # include <DUNE/DUNE.hpp>
-# include <extra/third_party/lsts/ControlInterface.hh>
+# include <DUNE/Math/Angles.hpp>
+# include <DUNE/Coordinates/WGS84.hpp>
+
+# include "EuropaExtensions.hh"
+# include "ControlInterface.hh"
+# include "ImcAdapter.hh"
 # include "SharedEnvironment.hh"
+using namespace TREX::transaction;
+using namespace TREX::utils;
 
 using DUNE_NAMESPACES;
-
 
 namespace TREX {
   /** @brief lsts plug-in
@@ -26,6 +42,7 @@ namespace TREX {
    */
   namespace LSTS {
 
+    static const int TREX_ID = 65000;
 
     /** @brief LSTS platform reactor definition
      *
@@ -35,7 +52,7 @@ namespace TREX {
      * @author Jose Pinto <zepinto@gmail.com>
      * @ingroup lsts
      */
-    class Platform :public TREX::transaction::TeleoReactor {
+    class Platform :public TeleoReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -46,7 +63,7 @@ namespace TREX {
        * <Platform name="<name>" latency="<int>" lookahead="<int>" state="<bool>" duneport="<int>" localport="<int>"/>
        * @endcode
        */
-      Platform(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      Platform(TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Platform();
 
@@ -57,23 +74,23 @@ namespace TREX {
       bool reportErrorToDune(const std::string &message);
       bool sendMsg(Message& msg);
     private:
-      class log_proxy {
-      public:
-	typedef void                               result_type;
-	typedef ::TREX::utils::log::entry::pointer argument_type;
-
-        explicit log_proxy(Platform &me)
-        :m_platform(&me) {}
-        log_proxy(log_proxy const &other)
-        :m_platform(other.m_platform) {}
-        ~log_proxy();
-
-	void operator()(argument_type msg);
-
-      private:
-        Platform *m_platform;
-      };
-      log_proxy *m_active_proxy;
+//      class log_proxy {
+//      public:
+//	typedef void                               result_type;
+//	typedef ::TREX::utils::log::entry::pointer argument_type;
+//
+//        explicit log_proxy(Platform &me)
+//        :m_platform(&me) {}
+//        log_proxy(log_proxy const &other)
+//        :m_platform(other.m_platform) {}
+//        ~log_proxy();
+//
+//	void operator()(argument_type msg);
+//
+//      private:
+//        Platform *m_platform;
+//      };
+//      log_proxy *m_active_proxy;
 
 
 
@@ -81,44 +98,26 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
       void handleTickStart();
+      void handleInit();
       bool sendMsg(Message& msg, std::string ip, int port);
       bool sendMsg(Message& msg, Address &dest);
-//      bool commandManeuver(const std::string &man_name, IMC::Message * maneuver);
-      TREX::transaction::Observation maneuverObservation(IMC::Message * man);
-      IMC::Message * getManeuverCommand(const std::string &man_name, IMC::Message * maneuver);
 
-      IMC::Message * gotoCommand(const std::string &man_name, double lat, double lon, double depth, double speed, boost::optional<long long> timeout);
-      IMC::Message * loiterCommand(const std::string &man_name, double lat, double lon, double depth, double radius, double speed, int seconds);
-      IMC::Message * skeepingCommand(const std::string &man_name, double lat, double lon, double speed, int seconds);
-      IMC::Message * idleCommand(const std::string &man_name);
-      IMC::Message * elevatorCommand(const std::string &man_name, double lat, double lon, double target_depth, double speed, boost::optional<long long> timeout);
-      IMC::Message * elevatorCommand(const std::string &man_name, double target_depth, boost::optional<long long> timeout);
-
-      //IMC::Message commandCalibration();
-      void convertToAbsolute(double northing, double easting, double &lat, double &lon);
-      void convertToRelative(double lat, double lon, double &x, double &y);
       void processState();
-      bool uniqueObservation(TREX::transaction::Observation obs);
-      typedef std::map<std::string, boost::shared_ptr<TREX::transaction::Observation> > obs_map;
+      bool postUniqueObservation(Observation obs);
+      typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      TREX::transaction::Observation estate(IMC::EstimatedState &msg);
-      TREX::transaction::Observation vstate(IMC::VehicleState &msg);
-      TREX::transaction::Observation mstate(IMC::ManeuverControlState &msg);
+      void handleGoingRequest(Goal g);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
-
       static ControlInterface * controlInterfaceInstance;
-
 
       // Network related
       UDPSocket send, receive;
       IOMultiplexing iom;
       uint8_t* bfr;
 
-      /** @brief State of the timeline */
-      bool m_on;
-      TREX::transaction::TICK m_nextSwitch;
+
       /** @brief Is the state already posted as observation ? */
       bool m_firstTick;
 
@@ -136,25 +135,6 @@ namespace TREX {
       /** @brief use debug output */
       bool debug;
 
-
-      /** @brief whether to use RPM speeds or not */
-      bool m_use_rpm;
-
-      /** @brief value of conversion between m/s to RPM speeds */
-      double m_rpm_speed_factor;
-
-      /** @brief Default station keeping radius */
-      double m_skeeping_radius;
-
-      /** @brief Default loiter radius */
-      double m_loiter_radius;
-
-      /** @brief current vehicle position */
-      double m_latitude, m_longitude, m_depth;
-
-      /** @brief last sent command (Maneuver message) */
-      std::auto_ptr <IMC::Message> sent_command;
-
       /** @brief whether TREX is currently blocked or not */
       bool m_blocked;
 
@@ -163,11 +143,6 @@ namespace TREX {
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
-      IMC::VehicleCommand lastCommand;
-
-      IMC::Message * commandToBePosted, * postedCommand;
-      long long tickWhenToPost;
-      long long tickWhenToStop;
 
       void setValue(bool val);
 

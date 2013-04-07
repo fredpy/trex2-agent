@@ -59,7 +59,7 @@ ControlInterface::ControlInterface(TeleoReactor::xml_arg_type arg)
 				     TeleoReactor::xml_factory::node(arg), 
 				     "local_queue")),
  m_fifo(0) {
-  use("estimator", true, true);
+  //use("estimator", true, true);
   use("navigator", true, true);
 
   m_env->setControlInterfaceReactor(this);

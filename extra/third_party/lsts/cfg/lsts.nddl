@@ -1,47 +1,36 @@
-#include "declarations.nddl"
 #include "platform.nddl"
 #include "navigator.nddl"
-#include "estimator.nddl"
 #include "platform.rules.nddl"
 #include "navigator.rules.nddl"
-#include "estimator.rules.nddl"
 
 EstimatedState estate = new EstimatedState(Observe);
-VehicleState vstate = new VehicleState(Observe);
-Gps gps = new Gps(Observe);
-VehicleCommand command = new VehicleCommand(External);
+ControlMode control = new ControlMode(Observe);
+Medium medium = new Medium(Observe);
 OperationalLimits oplimits = new OperationalLimits(Observe);
-TrexSupervision supervision = new TrexSupervision(Observe, command);
 
-ManeuverController control = new ManeuverController();
+Navigator navigator = new Navigator(Internal);
 
-Navigator navigator = new Navigator(Internal);//, true);
-Estimator estimator = new Estimator(Internal);//,true);
-
-// arg1 -> delay at surface, arg2 -> period between surfaces
-SurfaceController surfacer = new SurfaceController([8,12], 300);
-
-
-
+Reference reference = new Reference(External);
 close();
 
-fact (control.Idle idle);
-idle.start.specify(0);
+rejectable (navigator.At target);
+target.latitude == to_rad(41.184195);
+target.longitude == to_rad(-8.705745);
+target.z.specify(2);
+target.secs.specify(30);
 
-//rejectable (estimator.At target);
-//target.latitude == to_rad(41.185279);
-//target.longitude == to_rad(-8.705758);
-//target.depth.specify(2);
-//target.secs.specify(0);
+rejectable (navigator.At target2);
+target2.latitude == to_rad(41.184572);
+target2.longitude == to_rad(-8.705328);
+target2.z.specify(1.5);
+target2.secs.specify(20);
 
+//rejectable (navigator.At target3);
+//target3.latitude == to_rad(41.184572);
+//target3.longitude == to_rad(-8.705328);
+//target3.z.specify(100);
+//target3.secs.specify(20);
 
-//rejectable (estimator.At target2);
-//target2.latitude == to_rad(41.185808);
-//target2.longitude == to_rad(-8.706347);
-//target2.depth.specify(2);
-//target2.secs.specify(100);
-
-//rejectable (estimator.At surface);
-//surface.depth.specify(0);
-
+//target after target2;
+//target2 after target3;
 
