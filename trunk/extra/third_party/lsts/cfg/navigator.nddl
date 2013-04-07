@@ -14,15 +14,13 @@ class Navigator extends AgentTimeline {
 	predicate Idle {}
 	
 	predicate Going {
-		float latitude, longitude, z, speed;
-		float orig_lat, orig_lon, orig_z;
+		float latitude, longitude, z, speed, dist;
+		float orig_lat, orig_lon, orig_z;		
 	}
 	
 	predicate At {
 		float latitude, longitude, z, speed;
-		int secs;
-		
-		sane_pos(latitude, longitude, z);
+		int secs;		
 	}
 }
 

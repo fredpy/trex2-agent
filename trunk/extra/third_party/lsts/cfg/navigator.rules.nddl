@@ -15,6 +15,15 @@ Navigator::At {
 		longitude == g.longitude;
 		z == g.z;
 		speed == g.speed;
+	
+	contained_by(condition OperationalLimits.Limits limits);
+		if (z > 0) {
+			z < limits.max_depth;
+		}
+		else {
+			-1 * z < limits.max_altitude;
+			-1 * z > limits.min_altitude;
+		}		
 		
 	duration >= secs; 
 }
@@ -28,7 +37,9 @@ Navigator::Going {
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
-		speed == g.speed;	
+		speed == g.speed;
+		//dist == ll_dist(orig_lat, orig_lon, latitude, longitude);	
+		//duration + [-20, 20] == 10 * speed;
 
 	any(condition EstimatedState.Position origin);
 		orig_lat == origin.latitude;

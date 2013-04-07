@@ -132,29 +132,19 @@ namespace TREX {
       Observation obs("oplimits", "Limits");
 
       if (msg->mask & IMC::OPL_MAX_DEPTH)
-        obs.restrictAttribute("depth", FloatDomain(0, msg->max_depth));
-      else
-        obs.restrictAttribute("depth", FloatDomain(0, FloatDomain::plus_inf));
-
-      FloatDomain::bound min_alt = 0, max_alt = FloatDomain::plus_inf;
+        obs.restrictAttribute("max_depth", FloatDomain(msg->max_depth));
 
       if ((msg->mask & IMC::OPL_MAX_ALT))
-        max_alt = msg->max_altitude;
+        obs.restrictAttribute("max_altitude", FloatDomain(msg->max_altitude));
 
       if(msg->mask & IMC::OPL_MIN_ALT)
-        min_alt = msg->min_altitude;
-
-      obs.restrictAttribute("altitude", FloatDomain(min_alt, max_alt));
-
-      FloatDomain::bound min_speed = 0, max_speed = FloatDomain::plus_inf;
+        obs.restrictAttribute("min_altitude", FloatDomain(msg->min_altitude));
 
       if (msg->mask & IMC::OPL_MAX_SPEED)
-        max_speed = msg->max_speed;
+        obs.restrictAttribute("max_speed", FloatDomain(msg->max_speed));
 
       if (msg->mask & IMC::OPL_MIN_SPEED)
-        min_speed = msg->min_speed;
-
-      obs.restrictAttribute("speed", FloatDomain(min_speed, max_speed));
+        obs.restrictAttribute("min_speed", FloatDomain(msg->min_speed));
 
       InsideOpLimits::set_oplimits(msg);
 
