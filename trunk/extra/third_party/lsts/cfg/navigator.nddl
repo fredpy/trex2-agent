@@ -1,32 +1,5 @@
-#include "declarations.nddl"
+#include "TREX.nddl"
 #include "platform.nddl"
-
-class SurfaceController extends AgentTimeline {	
-    int surface_delay;
-    int surface_period;
-    
-        
-    SurfaceController(int delay, int period) {
-    	super(Internal);
-    	surface_delay = delay;
-    	surface_period = period;
-    }
-        
-    predicate Surface {
-    	start >= 0;
-    	bool requested;
-    }
-    
-    predicate Underwater {
-    	int speriod;
-    	int earliest_start;
-    	int latest_end;
-    	bool requested;
-        bool surface; 
-        latest_end <= start + speriod;
-        latest_end >= start + 1;
-    }
-}
 
 class Navigator extends AgentTimeline {
 	
@@ -41,13 +14,15 @@ class Navigator extends AgentTimeline {
 	predicate Idle {}
 	
 	predicate Going {
-		float latitude, longitude, depth, speed;
-		int secs, estimated_duration, duration_interval;
+		float latitude, longitude, z, speed;
+		float orig_lat, orig_lon, orig_z;
 	}
 	
-	predicate Staying {
-		float latitude, longitude, depth;
+	predicate At {
+		float latitude, longitude, z, speed;
 		int secs;
+		
+		sane_pos(latitude, longitude, z);
 	}
 }
 
