@@ -12,15 +12,15 @@
 %   look at another aspect that may trigger the decision to defer an
 %   actions based on its purpose}
 
-Research in temporal plan execution is not new; dealing with
-anticipatory dispatching, however, has not been a focus of prior work. It
-becomes important in our context for three reasons; first because our
+Research in temporal plan execution is not new. However, dealing with
+anticipatory dispatching has not been a focus of prior work. It
+becomes important in our context for three reasons. First, our
 system is embedded in a real-world robotic explorer which can sustain
-itself for extended periods, second because our integrated
+itself for extended periods. Second, our integrated
 architecture \rx \cite{mcgann08bdup,py10dup,rajan12dup} plans
-\emph{continuously} during mission execution and finally, the situated
+\emph{continuously} during mission execution. Finally, the situated
 agent encodes plans in a rich and flexible representation which allows
-such inference cost-effectively.  While our onboard controller is
+such inference cost-effective.  While our onboard controller is
 influenced by work cited in the introduction, our work in this paper
 is complementary to much of the earlier work.
 
@@ -106,8 +106,8 @@ the plan executive. % For instance, in \cite{mus98c}, the executive has
 \cite{morris01} proposes an algorithm that inserts \textbf{wait}
 constraints within the temporal network during planning for any uncontrollable
 event that may occur. \cite{gallien2006} also uses a
-similar approach to reduce Makespan; but they do so in the context of
-an exogenous event -- such as for example the duration of a navigation
+similar approach to reduce Makespan. They do so in the context of
+an exogenous event -- such as the duration of a navigation
 task which depends on external factors -- where it is necessary to
 defer actions for correct plan execution. Work in soft temporal
 constraints with preferences \cite{khatib2001temporal} on dispatching
@@ -119,13 +119,13 @@ they are plagued by poor performance \cite{bartak2002}. % ; while the
 Moreover the solution proposed optimize the plan {\em a-priori}
 reducing plan flexibility leading to potential execution time failure,
 which is not suitable for real-world embedded systems. In most
-literature the executive exclusively uses a {\em proactive} execution
+literature, the executive exclusively uses a {\em proactive} execution
 policy motivated by the intuition that it will give more time in the
 future should an unexpected situation occur. However, most such prior
 work focuses on improving plan quality but does not consider the
 impact of execution on the agent to handle unanticipated goals.
 
-The efforts above, decouple execution from planning unlike our work,
+The efforts above decouple execution from planning. Unlike our work,
 where planning is not only continuous, but execution is intertwined
 with planning. Our interest is in deferring temporal decisions to the
 executive to adapt the plan to new objectives without heavily relying
