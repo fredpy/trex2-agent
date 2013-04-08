@@ -3,13 +3,12 @@
 
 As autonomous robots become more robust and persistent the likelihood
 of them receiving new or modified objectives during an ongoing
-mission is high. Generative planning integrated within the robotic
-architecture to fulfill current or such evolving agent objectives and
-to deal with unanticipated situations is one approach to enhance
-persistence while dealing with robot adaptation.  Earlier work
+mission is high. Generative planning, integrated within the robotic
+architecture, is one approach to enhance
+persistence while dealing with evolving objectives and unanticipated situations.  Earlier work in
 \cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10}
-have contributed control architectures which embed planning engines,
-many of which support a rich representation dealing with durative
+have contributed control architectures, which embed planning engines.
+They support a rich representation dealing with durative
 actions, while ensuring partial plans are flexible for robust execution
 \cite{lemai-chenevier2004}.
 
@@ -28,15 +27,15 @@ actions, while ensuring partial plans are flexible for robust execution
 
 While these approaches have been necessary to correctly execute a
 \emph{flexible temporal plan}, they view the agent itself as
-synchronously fulfilling goals provided a priori, without the
+synchronously fulfilling goals provided a priori. They don't take into account the
 introduction of new goals which could alter the mission state and
 execution.
 % This oversight is understandable as such goals are by nature unknown
 % and therefore impossible to integrate within the plan limiting the
 % ability to formally take them into account.
 The natural choice was to make the agent execute its actions as early
-as the temporal plan and the current context would allow, with the
-assumption that, the robot would finish its plan as early as possible
+as the temporal plan and the current context would allow. The
+assumption was that the robot would finish its plan as early as possible
 providing more ``temporal room" for potential future objectives.  This
 can be problematic when new objectives are added during the course of
 mission execution and especially pronounced with persistent
@@ -47,14 +46,14 @@ location that it has already visited. Conversely, the robot waiting
 inordinately could waste time with consequent lack of flexibility for
 coping with diverse execution scenarios. In this context, it is
 important for the agent to make a distinction between actions that should
-be executed proactively versus actions that may not be as urgent.
+be executed proactively versus actions that may be deferred
 
-While our work studies when an action should be started within the
+While our work studies when an action should be started, within the
 flexible frame of its current plan, its purpose is not about the
-process of planning itself. Instead we focus on a study demonstrating
+process of planning itself. Instead, we focus on a study demonstrating
 that strict execution policies -- should it be early or late execution
--- can present problems when new goals could emerge at any time within
-the robot mission scope. Finally we provide a simple solution that
+-- can present problems when new goals can emerge at any time within
+the robot mission scope. Finally, we provide a simple solution that
 exploits the current plan structure to identify the execution policy
 of the next potential actions base on the goals they are contributing
 to. This solution was motivated by our real-world domain applied to
