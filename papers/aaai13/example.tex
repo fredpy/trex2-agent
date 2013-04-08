@@ -20,12 +20,13 @@ data via limited acoustic communications.
 %%%%%%%%%%%%%%%%%%
 \begin{figure}[!t]
   \centering
-  \subfloat[\small An illustration of our domain]{\label{fig:ex:graph}\includegraphics[width=0.51\columnwidth]{figs/auv_example}}
-  \hfill \subfloat[\small Initial planning problem.]{\label{fig:ex:init}\includegraphics[width=0.49\columnwidth]{figs/example_initial}}
-  \caption{\small{(\ref{fig:ex:graph}) illustrates the domain along
-      with the initial partial plan for this problem
-      (\ref{fig:ex:init}). The AUV is initially at {\em Surface} at
-      8:00 and the mission is expected to complete by 20:00 with the
+  \subfloat[\small An illustration of our domain.]{\label{fig:ex:graph}\includegraphics[width=0.45\columnwidth]{figs/auv_example}}
+  \hfill \subfloat[\small Initial plan.] {\label{fig:ex:plan}\includegraphics[width=0.55\columnwidth]{figs/example_plan}}
+  %\hfill \subfloat[\small Initial planning problem.]{\label{fig:ex:init}\includegraphics[width=0.49\columnwidth]{figs/example_initial}}
+  \caption{\small{(\ref{fig:ex:graph}) illustrates the domain 
+     and beside it is the initial plan for the problem
+      (\ref{fig:ex:plan}). The AUV is initially at {\em Surface} at 8:00 
+      and the mission is expected to complete by 20:00 with the
       goal --- marked with thick borders --- to sample {\em Vent 2}
       and the operational goal to be back at the surface for recovery
       by mission end.}}
@@ -33,17 +34,17 @@ data via limited acoustic communications.
   \vskip-2mm
 \end{figure}
 
-Given the initial problem in Fig. \ref{fig:ex:init}, the onboard planner 
+Given the initial problem in Fig. \ref{fig:ex:graph}, the onboard planner 
 produces the flexible temporal plan shown in
 Fig. \ref{fig:ex:plan} for execution. However, at any time during the mission
 scientists can decide, for example, that they also want to {\em
   sample} {\em Vent 1} as a consequence of data processing during the
 traverse from the surface to {\em Vent 2}.  Time on site for such
 bathymetric exploration is limited and expensive, so dynamic goal
-generation is a reality.  Balancing between dispatching a plan action
+generation is a reality.  Finding a balancing between dispatching a plan action
 \emph{proactive}ly or waiting is the
-dichotomy the plan executive needs to resolve with a consequent mission
-efficiency impact.
+dichotomy that the plan executive needs to resolve. Otherwise, the plan will suffer along
+with the efficiency of the mission.
 
 % This raises the issue of balancing the decisions during plan execution
 % between staring one plan action as early as possible --- which we will
@@ -53,16 +54,16 @@ efficiency impact.
 % and how either will impact the mission execution when the new
 % objective will be integrated by the AUV ?
 
-\begin{figure}[!htb]
-  \centering
-  % \fcomment{In all the figures goals' color are the same "grey" as the
-  %   other actions .... need to correct this.}
-  \includegraphics[width=0.8\columnwidth]{figs/example_plan}
-  \vskip-2mm
-  \caption{\small The flexible plan solution of the AUV domain in
-    Fig. \ref{fig:Example}}
-  \label{fig:ex:plan}
-\end{figure}
+%\begin{figure}[!htb]
+%  \centering
+%  % \fcomment{In all the figures goals' color are the same "grey" as the
+%  %   other actions .... need to correct this.}
+%  \includegraphics[width=0.8\columnwidth]{figs/example_plan}
+%  \vskip-2mm
+%  \caption{\small The flexible plan solution of the AUV domain in
+%    Fig. \ref{fig:Example}}
+%  \label{fig:ex:plan}
+%\end{figure}
 
 Exclusively {\em deferring} the actions is not acceptable since it
 results in the vehicle sitting at the surface, diving only at the very
