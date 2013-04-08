@@ -4,7 +4,7 @@ Our focus of research is in the oceanographic domain with a robotic
 autonomous underwater vehicle (AUV), which illustrates issues arising with
 dynamic goal emergence and motivates our approach.  In this domain, an
 AUV can either transit from one location to another, within the water
-mass, or survey a location in order to collect data of a feature of
+mass, or survey a location in order to collect data about a feature of
 interest such as a hydrothermal vent depicted in
 Fig. \ref{fig:Example}.  Note that the AUV must pass through {\em
   Vent1} to get to {\em Vent2}.  The vehicle is deployed initially
@@ -33,9 +33,9 @@ data via limited acoustic communications.
   \vskip-2mm
 \end{figure}
 
-The onboard planner produces the flexible temporal plan shown in
-Fig. \ref{fig:ex:plan} for execution from the initial problem in
-Fig. \ref{fig:ex:init}. However, at any time during the mission
+Given the initial problem in Fig. \ref{fig:ex:init}, the onboard planner 
+produces the flexible temporal plan shown in
+Fig. \ref{fig:ex:plan} for execution. However, at any time during the mission
 scientists can decide, for example, that they also want to {\em
   sample} {\em Vent 1} as a consequence of data processing during the
 traverse from the surface to {\em Vent 2}.  Time on site for such
@@ -71,18 +71,18 @@ to do both objectives leaving the robot to exclude one of the goals or
 fail to be at the surface as planned by 20:00. Equally, the {\em
   proactive} approach can be problematic, since the vehicle will go
 through the actions of the plan and be back at the surface early
-(12:21). Even if the goal is provided early enough (by 14:00), the
+(12:21). Even if the new goal is provided early enough (by 14:00), the
 vehicle will have to dive back in order to survey and sample {\em
   Vent 1}.
 % Even though the plan did initial provide a solution optimal in term of
 % makespan the resulting mission scenario is not anymore as the vehicle
 % went back and forth during the mission. Moreover in this specific case
 Since most vents are usually deep ($1500$ m or deeper) such a
-situation results on two extraneous action of at least an hour each
+situation results on two extraneous action, of at least an hour each,
 that could have been avoided should the AUV have stayed at the bottom.
-Neither of these approaches are satisfactory; {\em defer}ment can leads to
+Neither of these approaches are satisfactory; {\em defer}ment can lead to
 sensitivity to additional goals, while \emph{proactive} execution
-can lead to inefficiency.  Fig. \ref{fig:ex:proactive}, for example is a
+can lead to inefficiency.  Fig. \ref{fig:ex:proactive}, is an example of a
 solution aimed at \emph{proactive} execution.
 
 % in the plan execution not
@@ -104,7 +104,7 @@ solution aimed at \emph{proactive} execution.
   \label{fig:ex:proactive}
 \end{figure}
 
-Analyzing the objectives we note that these divergent policies are
+After analyzing the objectives, we note that these divergent policies are
 because of divergent goal semantics. While visiting {\em Vent 1} was
 reflecting a \emph{scientific need}, the goal to be back at the
 surface is an \emph{operational requirement} to avoid risk
@@ -126,7 +126,9 @@ event of a new goal,
 % be still underwater and will just need to alter its plan to go in this
 % new location. 
 the resulting mission scenario would then be more efficient in terms
-of its \emph{makespan}. Our approach revolves around mission
+of its \emph{makespan}. We use latest start time which does not compensate
+for uncertainty in the plan and can be easily swapped with another policy.
+Our approach revolves around mission
 objectives to be marked by a policy depending on the 
 exploration of the plan structure, during plan execution, to identify if
 the action is linked to an {\em urgent} goal -- in which case it need
