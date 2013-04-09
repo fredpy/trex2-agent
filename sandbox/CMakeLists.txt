@@ -43,10 +43,12 @@ add_executable(multiplexer
 	 include/trex/bits/asio_signal_base.hh
 	 include/trex/bits/asio_signal_iter.hh
 	 include/trex/bits/asio_signal_template.hh
+	 include/trex/ticker.hh
 	# source 
 	src/asio_runner.cc
 	src/multiplexer.cc 
-	src/merged_signal.cc)
+	src/merged_signal.cc
+	src/ticker.cc)
 
 target_link_libraries(multiplexer ${SYSTEM_LIBRARIES} 
   ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
