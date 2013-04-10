@@ -164,8 +164,8 @@ executive needs to forward search the causal links related to this
 token to see if it leads to a token with a defined policy. A possible issue can occur 
 when a token is connected to two or more different policies. The issue will be
 discussed further later on when we detail Algorithm \ref{SearchForGoal}. Do
-note that our example only uses two policies, and the latest start time is the default.
-Therefore, this issue does not occur in our example.
+note that our example only uses two policies for execution.
+Therefore, this issue will not occur in our example.
 
 % as implemented in
 % Algorithm \ref{DispatchToken}.
@@ -205,7 +205,11 @@ Therefore, this issue does not occur in our example.
 
 Algorithm \ref{alg:dispatch} is key in determining how a token should
 be executed and is called at every execution cycle while evaluating
-the next set of tokens to be executed.  % Finding a token is connected
+the next set of tokens to be executed. It is also plays the role of the executive 
+and is very specific to our example. However, it does not affect the generality
+of Algorithm \ref{SearchForGoal}.
+
+% Finding a token is connected
 % to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
 % and thus dispatch it proactively.  Conversely, if the token is not
 % connected to a goal then we defer dispatching until necessary.  This
@@ -256,15 +260,16 @@ the next set of tokens to be executed.  % Finding a token is connected
 % number of tokens within the plan and $E$ the number of causal links
 % that connect these tokens.
 
-To inform this decision, we use Algorithm \ref{SearchForGoal} which
+To inform Algorithm \ref{alg:dispatch}, we use Algorithm \ref{SearchForGoal} which
 searches the causal links connected to token $T$ using a forward-search. 
 If a token with a policy is found, then it is added into the list of possible policies for $T$. 
-After gather all the possible policies, we use the $SelectPolicy$ function which
-determines which policy out of the list should be used. Here rises the issue of having multiple policies.
-$SelectPolicy$ could determine the policy in a number
-of ways. Some examples are by using a priority for each policy or having additive operators for the policies.
+After gather all the policies connected to $T$, we use the $SelectPolicy$ function which
+determines which policy out of the set should be used. Here rises the issue of having defined multiple policies.
+The function $SelectPolicy$ could determine which policy to return in a number
+of ways. Some examples are using a priority for each policy or having additive operators for the policies.
 In our case, the earliest start policy will be returned because it is the only policy we define.
-The default policy of latest start will be used if $T$ is not connected to any token with a defined policy. 
+The default policy of latest start will be used in Algorithm \ref{alg:dispatch} 
+if $T$ is not connected to a token with a defined policy. 
 %As such, we want to be proactive in order to dispatch $G$ as early as possible. If a $G$ is
 %not found, then token $T$ has no connection to an external goal and
 %therefore there is no motivation to execute this action earlier than
