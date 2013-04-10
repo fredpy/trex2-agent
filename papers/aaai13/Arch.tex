@@ -1,9 +1,9 @@
-\section{Planning Definitions}
+\section{Dispatching a partial plan}
 \label{sec: defs}
 
 The focus of this paper is on the possibility of accommodating \emph{new
-  objectives} arising during mission execution, with consequent need
-to preserve context for their inclusion and subsequent execution, and
+  objectives} arising during mission execution. 
+To preserve context for their inclusion and subsequent execution, and
 that the respective policy be applied to each action. Our robot generates and
 dispatches a partial plan in parallel with a lower level controller
 which further decomposes these plans towards atomic actions. These
@@ -12,40 +12,47 @@ sending sensory feedback as \emph{observations} up thru the
 hierarchical controller \cite{mcgann08bdup,rajan12dup}. Details of the
 controller are beyond the scope of this paper and are not relevant to the
 concepts described. We first consider some
-basic representational definitions related to temporal planning
-consistent with \cite{Nau:2004}:
+basic representational definitions related to a temporal plan.
+%basic representational definitions related to temporal planning
+%consistent with \cite{Nau:2004}:
 
-\begin{definition}
-  \label{def:domain}
-  A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
-  \begin{itemize}
-  \item $\Lambda_\Phi$ is the set of all temporal databases that can
-    be defined with constraint, constant, variable, and relation
-    symbols in the representation.
-  \item $O$ is a set of temporal planning operators.
-  \item $X$ is a set of domain axioms.
-  \end{itemize}
-\end{definition}
+%\begin{definition}
+%  \label{def:domain}
+%  A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
+%  \begin{itemize}
+%  \item $\Lambda_\Phi$ is the set of all temporal databases that can
+%    be defined with constraint, constant, variable, and relation
+%    symbols in the representation.
+%  \item $O$ is a set of temporal planning operators.
+%  \item $X$ is a set of domain axioms.
+%  \end{itemize}
+%\end{definition}
 
-A \emph{token} is a property that holds within a flexible temporal
-interval which represents an action or a state associated with $O$ or
-$X$ \cite{py10dup}. A temporal interval is delimited by two {\em
-  timepoints} \cite{Boddy93} marking the possible values of its {\em
-  start} and {\em end}.
+A temporal plan is a partially order graph of tasks where nodes
+are defined in metric time.
+Each task consists of when it starts and ends or its start
+and end timepoint in the plan. A \emph{token} is a task that holds over the 
+flexible temporal interval consisting of a start and end timepoint.
 
-\begin{definition}
-  \label{def:problem}
-  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_{obs}, \Phi_g )$, where:
-  \begin{itemize}
-  \item $\Phi_{obs} = (F, C)$ is a database in $\Lambda_\Phi$ that
-    satisfies the axioms of $X$.  $\Phi_{obs}$ represents an initial
-    scenario that describes initial state of the domain and
-    observations.
-  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
-    the problem as a set $G$ of tokens together with a set $C_g$ of
-    objects  and temporal constraints   on variables of $G$.
-  \end{itemize}
-\end{definition}
+%A \emph{token} is a property that holds within a flexible temporal
+%interval which represents an action or a state associated with $O$ or
+%$X$ \cite{py10dup}. A temporal interval is delimited by two {\em
+%  timepoints} \cite{Boddy93} marking the possible values of its {\em
+%  start} and {\em end}.
+
+%\begin{definition}
+%  \label{def:problem}
+%  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_{obs}, \Phi_g )$, where:
+%  \begin{itemize}
+%  \item $\Phi_{obs} = (F, C)$ is a database in $\Lambda_\Phi$ that
+%    satisfies the axioms of $X$.  $\Phi_{obs}$ represents an initial
+%    scenario that describes initial state of the domain and
+%    observations.
+%  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
+%    the problem as a set $G$ of tokens together with a set $C_g$ of
+%    objects  and temporal constraints   on variables of $G$.
+%  \end{itemize}
+%\end{definition}
 
 \begin{definition}
   \label{def:plan}
@@ -55,6 +62,8 @@ $X$ \cite{py10dup}. A temporal interval is delimited by two {\em
   = (D, \Phi_{obs}, \Phi_g)$ iff there is a database in $\lambda(\Phi_{obs},
   \pi)$ that entails $\Phi_g$.
 \end{definition}
+
+
  
 While the focus is on executing plan $\pi$, to reflect the dynamic
 interaction of the agent with the environment we need to refine the
