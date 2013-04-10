@@ -11,12 +11,12 @@ such knowledge within the system domain description which often
 results in a more complex model which is harder to maintain and
 therefore likely to be error prone.  This motivates the approach to
 provide an efficient solution to deduce execution policy based on the
-supplementary goal information namely that of {\em urgency}.  The work
+supplementary information namely that of defined policies in the plan.  The work
 in this paper focuses on plan structure in abstraction without direct
 consideration of timing constraints applied to each goal in the
-plan. We are consequently able to use breadth first search within the
+plan. We are able to use breadth first search within the
 existing plan structure to select different execution policies for
-each action within the plan. By doing so, we can improve overall
+each token within the plan. By doing so, we can improve overall
 mission execution by avoiding proactivity that could lead to
 inefficiency in handling new goal requests.
 
@@ -30,11 +30,11 @@ greatly increase the quality of our solution.
 % further in order to see how such information could be used for our
 % system to automatically classify such goal as non urgent. It can also
 % impact how the {\em urgent} goal propagate within the plan.
-For instance, the example in Fig. \ref{fig:ex:mixed2} where consequent
-to a non urgent {\em Surface} goal, planning instantiates the urgent
-goal of surveying \emph{Vent1}. Currently, the policy results in
-making all actions related to the non urgent {\em Surface} goal
-proactive due to the proactive actions immediately \emph{following}
+For instance, the example in Fig. \ref{fig:ex:mixed2}, where the consequent
+was a {\em Surface} token, planning instantiated the
+goal of surveying \emph{Vent1}. Currently, the result would
+make all tokens related to the {\em Surface} token
+proactive due to the goal immediately \emph{following}
 it.
 % because it is also connected to the  urgent Survey that is constrained to be proactive
 %{\em after} in the near future.
@@ -42,13 +42,13 @@ it.
 % urgent goal become proactive.
 This can potentially lead to premature surfacing that is then
 prohibiting the agent from accepting goals in the morning. Typically
-the non urgent {\em Surface}, which is to end after 13:00, is acting
+the {\em Surface}, which is to end after 13:00, is acting
 as a guard on the propagation.
 % Our current understanding is that this timing constraint enforcing the
 % non urgent {\em Surface} to end after 1:00 is acting as a guard on the
 % propagation of our heuristic.
-Therefore, ideally only those actions that are directly after this
-{\em Surface} goal should have been marked as proactive as shown in
+Therefore, ideally only those tokens that are directly after this
+{\em Surface} token should have been marked as proactive as shown in
 Fig. \ref{fig:res:ideal}, while keeping actions preceding 13:00 deferred.
 % the actions
 % that are directly after this timepoint instead of continue to
@@ -84,7 +84,7 @@ constraints applied to plan timepoints. Should the {\em Surface} not
 have been constrained to be around 13:00, starting its execution
 proactively would not have blocked the vehicle at the surface. We hope
 to explore how the analysis of the STN supporting the plan can help 
-identify goal urgency and deduced action execution policy. 
+identify and deduced a token's execution policy. 
 %both the marking of goals as {\em urgent} and
 %propagation to action can be better deduced by analyzing the STN
 %supporting the plan. 
@@ -101,7 +101,7 @@ execution time changes in plan structure.
 % inserted by their algorithm may need to be considered with a non
 % urgent status within our approach.
 
-Such refinements are likely to improve overall execution in our agent
+These refinements are likely to improve overall execution in our agent
 despite uncertainty in the number and nature of goals during mission
 execution. 
 % All of these refinements are considered in order to further improve
