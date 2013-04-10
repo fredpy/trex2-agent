@@ -7,9 +7,10 @@ to the {\em surface} by the end of the mission. The AUV must also be
 at the {\em surface} around
 13:00. % with plans being produced by the europa planning engine
 % \cite{frank2003}.
-Fig. \ref{fig:ex:mixed1} demonstrates the resulting plan after
-processing by Algorithm \ref{alg:dispatch} using our executive \rx
-which synthesizes temporal plans.
+Fig. \ref{fig:ex:mixed1} demonstrates the resulting plan after being
+processed by Algorithm \ref{alg:dispatch} using our executive \rx
+which synthesizes temporal plans. We have also defined the policy
+of earliest start time to the goals in plan.
 
 \begin{figure}[!htbp]
   \centering
@@ -36,11 +37,11 @@ which synthesizes temporal plans.
 
 As in Fig. \ref{fig:ex:mixed1}, the AUV is {\em At Surface} initially.
 At execution time, the next {\em Go} token will be dispatched
-proactively, because when the search follows causal links, it
-encounters the urgent {\em Sample Vent2} goal.  This occurs similarly
-for all tokens that are starred. {\em Go(Surface)} is deferred,
-because it is not connected to an urgent goal using forward
-search. Consequently, the result requires the AUV to stay at {\em
+early, because when the search follows causal links, it
+encounters the {\em Sample Vent2} goal.  This occurs similarly
+for all tokens that are starred. {\em Go(Surface)} gets deferred,
+because it is not connected to a goal using the forward
+search. Consequently, the resulting execution requires the AUV to stay at {\em
   Vent2} rather than heading to the {\em Surface} immediately.
 
 %For the distributed algorithm approach, each token is checked during
@@ -59,15 +60,15 @@ search. Consequently, the result requires the AUV to stay at {\em
 %non-starred tokens will be deferred until later. Having similar
 %results to Algorithm \ref{DispatchToken}.
 
-We then introduced a new {\em urgent} goal to {\em Sample Vent1} at
+We then introduced a new goal to {\em Sample Vent1} at
 11:30 with the resulting plan shown in Fig. \ref{fig:ex:mixed2}. Since
 there is not enough time to {\em Sample Vent1} and be at the surface
 by 13:00, the goal is placed after the AUV visits the
-surface. Propagation results in marking the actions, which were thus
-far deferred, to now be causally linked to the new {\em urgent}
-goal of {\em Sample Vent1} and their execution status is updated. The
+surface. Propagation results in marking the tokens, which were thus
+far deferred and are now causally linked to the new
+goal of {\em Sample Vent1}, as having the policy of the goal. The
 resulting starred tokens get dispatched proactively which includes all
-actions related to the mid-day surfacing goal.
+tokens related to the mid-day surfacing token.
 
 \begin{figure}[t]
   \centering
@@ -79,15 +80,15 @@ actions related to the mid-day surfacing goal.
   \vskip-3mm
 \end{figure}
 
-Meanwhile the actions related to the final surfacing goal remain {\em
+Meanwhile, the tokens related to the final surfacing remain {\em
   deferred} and won't be executed until 19:00 allowing the vehicle to
 sample {\em Vent1} for a duration of 2:50 hours.  After returning to
 the {\em Surface}, our planner and domain inserted a partially
-instantiated action to {\em Go(Surface, ?)} (dashed in the figures).
+instantiated token to {\em Go(Surface, ?)} (dashed in the figures).
 This is an artifact resulting from the plan model which specifies that
 an {\em At} token is necessarily followed by a {\em Go}.  However, our
 algorithm will not be dispatching this token as it is not connected to
-an {\em urgent} goal and its upper bound start time ($+\infty$) will
+a goal and its upper bound start time ($+\infty$) will
 not be met within the scope of the mission.
 
 \subsection{Performance Analysis}
@@ -132,17 +133,17 @@ evaluated.
 \end{figure*}
 
 
-We also identified a clear trend toward decreasing timing as the agent
+We also identified a clear trend of a decrease in time as the agent
 comes closer to the completion of either {\em Goal \#1} or {\em Goal
   \#2}. This is correlated to the reduction in search distance toward
-these goals as we execute new actions.  We see an important
+these goals as we execute new tokens.  We see an important
 variability in execution time which is likely due to context switching
 between processes and threads within our agent; multiple cores in the
 virtual machine is likely to remove this variation.  The bump in
 timing between time-step $56$ and the introduction of {\em Goal \#2}
 at $127$ is because the algorithm is continuously searching the graph
 from the next {\em Go}, which during this period, is not connected to
-an {\em urgent} goal. The resulting exhaustive search in the plan
+a goal. The resulting exhaustive search in the plan
 graph during this period is on an average above $0.2$ milliseconds. At
 tick $127$, the {\em Go} is no longer deferred and gets dispatched.
 % The search for our algorithm execution time {\em Goal \#2} becomes
