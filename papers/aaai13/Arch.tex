@@ -252,17 +252,22 @@ the next set of tokens to be executed.  % Finding a token is connected
 % number of tokens within the plan and $E$ the number of causal links
 % that connect these tokens.
 
-To inform this decision we use Algorithm \ref{SearchForGoal} which
-searches for a causal link between the token $T$ and $G$ of
-$\Phi_{ge}$ using forward-search. If $G$ is found, then token $T$ is
-part of the solution for completing $G$. As such, we want to be
-proactive in order to dispatch $G$ as early as possible. If a $G$ is
-not found, then token $T$ has no connection to an external goal and
-therefore there is no motivation to execute this action earlier than
-necessary. Its complexity is $O(N+E)$ \cite{corman} where $N$ is the
+To inform this decision, we use Algorithm \ref{SearchForGoal} which
+searches the causal links of the token $T$ using a forward-search. 
+If a token with a policy is found, then it is added into the list of possible policies for $T$. 
+After gather all the possible policies, we use the $SelectPolicy$ function which
+determines which policy out of the list should be used. This function could determine the policy in a number
+of ways by using a priority for each policy or it could have additive operators. In our case, the
+earliest start policy will returned because that is the only policy we use. Our default policy of latest start will be used
+if $T$ was not connected to any token with a defined policy. 
+%As such, we want to be proactive in order to dispatch $G$ as early as possible. If a $G$ is
+%not found, then token $T$ has no connection to an external goal and
+%therefore there is no motivation to execute this action earlier than
+%necessary. 
+The functions complexity is $O(N+E)$ \cite{corman} where $N$ is the
 number of tokens and $E$ the number of causal links that connect these
 tokens in the plan. An alternate version of Algorithm
-\ref{alg:dispatch} that propagated goal urgency through causal links
+\ref{alg:dispatch} that propagated policies through causal links
 during planning was also attempted. While functionally equivalent, the
 overhead during backtracking -- requiring removal of propagated
 information during search -- along with continuous plan refinement
