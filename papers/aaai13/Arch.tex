@@ -1,4 +1,4 @@
-\section{Executing a flexible temporal plan}
+\section{Executing a Flexible Temporal Plan}
 \label{sec: defs}
 
 The focus of this paper is on the possibility of accommodating \emph{new
@@ -22,8 +22,9 @@ STRIPS model in the definition of a plan.
 
 Within the plan, each state has a start, $T_s$ and end, $T_e$ time. We refer to
 these as timepoints. Each timepoint is actually a flexible interval of time $[t, T]$, which
-includes all possible values between $t$ and $T$.  This type of plan is referred to as 
-a flexible temporal plan. Further, we assume that the
+includes all possible values between $t$ and $T$. 
+A \emph{token} is a property that holds within two flexible interval which represents a state \cite{py10dup}. 
+This type of plan is referred to as a flexible temporal plan. Further, we assume that the
 plan, dispatched to us, is in its dispatchable form as defined by \cite{mus98a}.  This leaves an issue 
 for execution in determining when a timepoint should start within its flexible interval. This has been
 resolved in the past by using a strict execution policy for every state. However, as we described in our
@@ -86,64 +87,65 @@ be used.
 %\end{definition}
 
  
-While the focus is on executing plan $\pi$, to reflect the dynamic
-interaction of the agent with the environment we need to refine the
-definition of the sets $\Phi_{obs}$ and $\Phi_g$. As the world
+While our focus is on executing a plan, to reflect the dynamic
+interaction of the agent with the environment, we need to refine the
+definition of the flexible plan given to us. As the world
 evolves, new (or refinement of existing) observations are added to
-$\Phi_{obs}$. Similarly, the agent operator can request new goals in
-the future to be added to the agent's $\Phi_g$ as mission time
-advances. For the sake of simplicity we consider that the alteration
-of these sets is purely additive with time\footnote{In practice, their
+the plan. Similarly, the agent operator can request new goals
+to be added to the agent's plan as mission time
+advances. For the sake of simplicity, we consider that the alteration
+to the plan are purely additive with time\footnote{In practice, their
   evolution is more complex as completed goals becomes observation;
   even a goal previously requested can be cancelled by the
   operator. While this assumption largely simplifies problem
-  description, our algorithm works regardless.}:
-\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_{obs}(t) \subseteq \Phi_{obs}(t')
-\wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
+  description, our algorithm works regardless.}
+%\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_{obs}(t) \subseteq \Phi_{obs}(t')
+%\wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
+%
+%where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
+%time $t$.
 
-where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
-time $t$.
-
-$\Phi_{obs}$ grows dynamically, reflecting cumulative observations as
-$\pi$ is executed. In nominal situations, new elements of $\Phi_{obs}$
+The plan gets updated as observations are made from the plan
+being executed. In nominal situations, these new observations
 are refinements of the plan -- for example by asserting that a planned
 command has just started\footnote{This precludes situations where new
   observations invalidate the plan; they don't refine the plan, but
   invalidate it.}. The agent can also receive new objectives at any
-time which are added to $\Phi_g$. 
+time which are added to the plan. Therefore after refinements or changes are made,
+the plan is dispatched again to the executive with an up to date and valid solution. 
 
-This assumption has an impact on how it is preferable to handle plan
-execution. While deciding when to start a token within the plan, one
-needs to ensure that the token execution will not limit the ability of the
+The assumption that the plan will change has an impact on how to handle plan
+execution. While deciding when to start a state within the plan, one
+needs to ensure that the execution will not limit the ability of the
 agent to treat emergent goals. In light of this, the agent should
-attempt to balance the impact of the next available action to execute
-as early as possible or to delay it with the eventuality new goals
+attempt to balance the impact of execution on the next available action. We chose to execute
+as early as possible or delay it with the eventuality that new goals
 might occur. Going to \emph{Vent2} early is viable; however, going
 back to the surface too early would result in blocking the AUV --
 within its current plan -- at the Surface until 20:00. The solution
 which provides the most flexibility is for the agent to alternate
 between the two policies.
 
-The nature of the goals are better characterized by inclusion of their
-priority. For that purpose, we define $\Phi_g$ to be partitioned in two:
-
-\begin{itemize}
-
-\item \emph{internal} goals $\Phi_{gi}$ which represent goals the
-  agent {\em needs} to maintain internally. These goals will be
-  considered as objectives that can be deferred during execution.
-
-\item \emph{external} goals $\Phi_{ge}$ which represents the goal
-  received by the agent from an external source, like a user. These are
-  considered to be of higher importance -- \ie the agent {\em wants}
-  to execute them. Therefore, their execution should preferably be
-  proactive.
-
-\end{itemize}
-
-At any time $t$ during action evaluating by the executive within
-$\pi$, the plan is an up to date and valid solution to the set of
-goals in $\Phi_g$.
+%The nature of the goals are better characterized by inclusion of their
+%priority. For that purpose, we define $\Phi_g$ to be partitioned in two:
+%
+%\begin{itemize}
+%
+%\item \emph{internal} goals $\Phi_{gi}$ which represent goals the
+%  agent {\em needs} to maintain internally. These goals will be
+%  considered as objectives that can be deferred during execution.
+%
+%\item \emph{external} goals $\Phi_{ge}$ which represents the goal
+%  received by the agent from an external source, like a user. These are
+%  considered to be of higher importance -- \ie the agent {\em wants}
+%  to execute them. Therefore, their execution should preferably be
+%  proactive.
+%
+%\end{itemize}
+%
+%At any time $t$ during action evaluating by the executive within
+%$\pi$, the plan is an up to date and valid solution to the set of
+%goals in $\Phi_g$.
 
 % At any point we need to evaluate an action within plan $\pi$ we
 % consider that this plan is up to date and provide a solution of all
@@ -153,41 +155,40 @@ goals in $\Phi_g$.
 \section{Algorithmic Description}
 \label{sec:algo}
 
-As a new action is to be dispatched for execution, the executive needs
-to evaluate how it relates to the goals of the plan. Intuitively, if
-this action was generated by (or contributes to) an external goal of
-$\Phi_{gi}$ it needs to be taken proactively. Therefore, while
-evaluating the token representing this action within $\pi$, the
-executive needs to forward search on the causal links related to this
-token to see if it leads to an external goal.
+As a new state is to be executed, the executive needs
+to evaluate how it relates to the policies of other states in the plan. Intuitively, if
+a state $S_1$ was generated by (or contributes to) another state $S_2$, which has a defined policy, then
+$S_1$ should be executed using the policy of $S_2$. Therefore, while
+evaluating the token representing this state within the plan, the
+executive needs to forward search the causal links related to this
+token to see if it leads to a state with a defined policy. 
 
 % as implemented in
 % Algorithm \ref{DispatchToken}.
 
-\begin{definition}
-  \label{def:subgoalLink}
-  A goal $g$ is causally linked to a state value $c_i$ if
-  $g$ is an effect of an action $a$ and $c_i$ is a condition of $a$.
-  \footnote{For metric temporal plans, Allen Algebra
-    \cite{allen84} is the basis for determining relationships between
-    actions and is more general than pre-conditions in classical
-    planning.}.
-\end{definition}
+%\begin{definition}
+%  \label{def:subgoalLink}
+%  A goal $g$ is causally linked to a state value $c_i$ if
+%  $g$ is an effect of an action $a$ and $c_i$ is a condition of $a$.
+%  \footnote{For metric temporal plans, Allen Algebra
+%    \cite{allen84} is the basis for determining relationships between
+%    actions and is more general than pre-conditions in classical
+%    planning.}.
+%\end{definition}
 
-Consequently, all conditions of this action can be assumed to be
-subgoals with a similar policy as $g$.
+%Consequently, all conditions of this action can be assumed to be
+%subgoals with a similar policy as $g$.
 
 \begin{algorithm} [H]
-  \caption{\small The function $DispatchToken$ finds if there is a
-    goal in $\Phi_{ge}$ that is connected to the token, $t$, and, if
-    so, dispatches the token.}
+  \caption{\small The function $ExecutionPolicy$ uses the $SearchForPolicy$ to 
+   the execution policy for Token, $T$. The two policies are earliest and latest start.}
   \label{alg:dispatch}
-\label{DispatchToken}
+\label{ExecutionPolicy}
 \begin{algorithmic}
 \small 
-\Function{DispatchToken}{Token $T$}
-\State Boolean $Goal = \textsc{SearchForGoal}( T )$
-\If{ $Goal$ $=$ True}
+\Function{ExecutionPolicy}{Token $T$}
+\State Policy $P = \textsc{SearchForPolicy}( T )$
+\If{ $P$ $=$ Policy(EarliestStart)}
 	\State \Return Dispatch $T$
 \ElsIf{ $T$ start upper bound $ \leq $ current tick}
 	\State \Return Dispatch $T$
@@ -199,7 +200,7 @@ subgoals with a similar policy as $g$.
 \end{algorithm}
 
 Algorithm \ref{alg:dispatch} is key in determining how a token should
-be dispatched and is called at every execution cycle while evaluating
+be executed and is called at every execution cycle while evaluating
 the next set of tokens to be executed.  % Finding a token is connected
 % to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
 % and thus dispatch it proactively.  Conversely, if the token is not
@@ -208,28 +209,31 @@ the next set of tokens to be executed.  % Finding a token is connected
 % proactive or deferred.
 
 \begin{algorithm} [htb]
-  \caption{\small The function $SearchForGoal$ does a Forward search
-    looking for a token that is in the set $\Phi_{ge}$.}
+  \caption{\small The function $SearchForPolicy$ does a forward search
+    to determine a policy from the connected tokens.}
   \label{SearchForGoal}
 \begin{algorithmic}
   \small
-  \Function{SearchForGoal}{ Token $T$ }
-  \If{$T \in \Phi_{ge}$}
+  \Function{SearchForPolicy}{ Token $T$ }
+  \If{$T$ has Policy}
   \State \Return True
   \Else 
+  \State Set $Policies$ = \{\}
   \State List $Fringe$ = \{ Actions that $T$ is Condition of \}
+  \State Mark $T$
   \ForAll{Action(s), $A$, in $Fringe$ }
+  \State Mark $A$
   \ForAll{Effects, $E$ of $A$}
-  \If{$E \in \phi_{ge}$}
-  \State \Return True
-  \Else 
+  \State Mark $E$
+  \If{$E$ has Policy(Any)}
+  \State Insert $E \to Policy$ into $Policies$
+  \EndIf
   \State List $L$ = \{ Action(s) that $E$ is Condition of \}
-  \State $Fringe$ = $Fringe \cup L$ 
-  \EndIf
+  \State $Fringe$ = $Fringe \cup \{L \cap \neg Marked \}$ 
   \EndFor
   \EndFor
   \EndIf
-  \State \Return False
+  \State \Return SelectPolicy($Policies$)
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
