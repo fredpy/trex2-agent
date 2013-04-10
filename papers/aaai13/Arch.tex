@@ -3,35 +3,37 @@
 
 The focus of this paper is on the possibility of accommodating \emph{new
   objectives} arising during mission execution. 
-To preserve context for their inclusion and subsequent execution, and
-that the respective policy be applied to each action. Our robot generates and
-dispatches a partial plan in parallel with a lower level controller
+To preserve room for their inclusion and subsequent execution, and
+that the respective policy be applied to each task. Our robot generates and
+dispatches a partial plan in parallel with a lower level controller,
 which further decomposes these plans towards atomic actions. These
-actions ultimately actuate hardware on our AUV. The world responds by
+task ultimately actuate hardware on our AUV. The world responds by
 sending sensory feedback as \emph{observations} up thru the
 hierarchical controller \cite{mcgann08bdup,rajan12dup}. Details of the
 controller are beyond the scope of this paper and are not relevant to the
 concepts described. 
 
-We first consider some basic representational definitions related to a plan
-consistent with \cite{Nau:2004}. A plan has a set of operators and states.
+In order to explain our execution, we first consider some basic definitions related to a plan
+consistent with \cite{Nau:2004}. A plan has a given set of operators and states.
 Operators link a set of states, conditions, to a new set of states, effects. We 
 refer to this link as a causal link in the plan. Recursive causal links build a path
 in the plan from an initial state into a goal state. The plan structure is very similar to the
-STRIPS model in defining a plan. 
+STRIPS model in the definition of a plan. 
 
-Within the plan, each state has a start and end time. We refer to
-these times as timepoints. Each timepoint is a flexible interval of time $[t, T]$, which
+Within the plan, each state has a start, $T_s$ and end, $T_e$ time. We refer to
+these as timepoints. Each timepoint is actually a flexible interval of time $[t, T]$, which
 includes all possible values between $t$ and $T$.  This type of plan is referred to as 
 a flexible temporal plan. Further, we assume that the
 plan, dispatched to us, is in its dispatchable form as defined by \cite{mus98a}.  This leaves an issue 
-for execution in determining when a timepoint should start within its flexible interval.
+for execution in determining when a timepoint should start within its flexible interval. This has been
+resolved in the past by using a strict execution policy for every state. However, as we described in our
+example this can lead to issues when dealing with our problem domain.
 
-In order to handle this issue, we assume that some states have a defined execution policy. 
-A policy can be, but not limited, early start or late start as referred to in our example.  Also the
+In order to handle the issue, we assume that some states have a defined execution policy. 
+A policy can be, but not limited, early start or latest start as referred to in our example.  Moreover, the
 execution policies are determined beforehand by a user. We then use the policies to 
-to determine when to execute a state. Typically, the states that have a defined
-execution policy are the goal states of the plan. This leaves states without an execution policy
+to determine when to execute each state. Typically, the states that have a defined
+execution policy are the goal states of the plan. This leaves states without an execution policy,
 in which case we use a default policy. In our example, we use a strict latest start time but any policy can 
 be used. 
 
@@ -74,15 +76,14 @@ be used.
 %  \end{itemize}
 %\end{definition}
 
-\begin{definition}
-  \label{def:plan}
-  A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
-  partial instance of some operator in $O$.  We define $\lambda$ as
-  the state-transition function.  $\pi$ is a solution of a problem $P
-  = (D, \Phi_{obs}, \Phi_g)$ iff there is a database in $\lambda(\Phi_{obs},
-  \pi)$ that entails $\Phi_g$.
-\end{definition}
-
+%\begin{definition}
+%  \label{def:plan}
+%  A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
+%  partial instance of some operator in $O$.  We define $\lambda$ as
+%  the state-transition function.  $\pi$ is a solution of a problem $P
+%  = (D, \Phi_{obs}, \Phi_g)$ iff there is a database in $\lambda(\Phi_{obs},
+%  \pi)$ that entails $\Phi_g$.
+%\end{definition}
 
  
 While the focus is on executing plan $\pi$, to reflect the dynamic
