@@ -16,6 +16,7 @@
 \input{preamble}
 
 \begin{document}
+
 \title{Anticipatory Continuous Robotic Plan Execution}
 %\author{Paper \# 88}
 \author{Philip Cooksey \And Fr\'ed\'eric Py \And Paul Morris \And Kanna Rajan}
@@ -25,9 +26,17 @@
 
   Robotic plan execution has traditionally assumed that goals are
   articulated prior to mission execution. As robots have become
-  persistent and moved into the real-world, the need to anticipate and
-  capture evolving needs with new or reformulated goals becomes
-  critical.  We explore this issue not yet described in the literature.
+  persistent and moved into the real-world, this assumption is
+  challenged. User can decide to give new objective to the robot 
+  as the mission is executed. In current system this leads at best to
+  suboptimal final plan trace and possibly to the exclusion  of
+  objectives that weren't necessary should the robot have executed its
+  initial plan differently. 
+ % As robots have become
+ %  persistent and moved into the real-world, the need to anticipate and
+ %  capture evolving needs with new or reformulated goals becomes
+ %  critical. 
+  We explore this issue not yet described in the literature.
   We then demonstrate an initial approach to this
   problem motivated by our oceanographic domain.  An execution policy
   is sufficient to disambiguate actions for dispatch
