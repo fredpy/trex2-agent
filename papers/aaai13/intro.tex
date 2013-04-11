@@ -2,11 +2,11 @@
 \label{sec:intro}
 
 As autonomous robots become more robust and persistent, the likelihood
-of them receiving new or modified objectives during an ongoing mission
-is high. Generative planning, integrated within the robotic
-architecture, is one approach to enhance persistence while dealing
-with evolving objectives and unanticipated situations.  Earlier work
-in
+of them receiving new or modified objectives \emph{during} an ongoing
+mission is high. Generative continuous planning, integrated within the
+robotic architecture, is one approach to enhance persistence while
+dealing with evolving objectives and unanticipated situations.
+Earlier work in
 \cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10}
 have contributed control architectures, which embed planning engines.
 They support a rich representation dealing with durative actions,
@@ -28,57 +28,54 @@ while ensuring partial plans are flexible for robust execution
 
 While these approaches have been necessary to correctly execute a
 \emph{flexible temporal plan}, they view the agent itself as
-synchronously fulfilling goals provided a priori. They don't take into
-account the introduction of new goals which could alter the mission
-state and execution.
+synchronously fulfilling goals provided a priori. They do not take
+into account the introduction of new goals which could alter the
+mission state and execution.
 % This oversight is understandable as such goals are by nature unknown
 % and therefore impossible to integrate within the plan limiting the
 % ability to formally take them into account.
-The natural choice was to make the agent execute its actions as early
-as the temporal plan and the current context would allow. The
-assumption was that the robot would finish its plan as early as
-possible providing more ``temporal room" for potential change in the
-plan. Such assumption proved to be very efficient to deal with
-unanticipated execution threats. Indeed it should, except in specific
-cases --- such as dynamic controlability \cite{morris01} --- still
-acting as early as possible keeps the remaining part of the plan as
-flexible as possible. Moreover, should the plan still break, the robot
-has more time left to identify and execute an alternate strategy. An
-early policy proved to be the most efficient approach for the robot to
-robustly execute its plan when the set of goals for the mission are
-fully instantiated.
+Consequently, the natural choice was to make the agent execute its
+actions as early as the temporal plan and the current context would
+allow. The assumption was that the robot would finish its plan as
+early as possible providing more ``temporal room'' for potential
+change in the plan. Such an assumption proved to be very efficient in
+dealing with unanticipated execution threats with an exception in
+dealing with dynamic controlability \cite{morris01} --- acting as
+early as possible keeps the remaining partial plan flexible. Moreover,
+should the plan break, the robot has more time left to identify and
+execute an alternate strategy. An early dispatch policy therefore,
+proved to be the most efficient approach for the robot to robustly
+execute its plan when the set of goals for the mission are fully
+instantiated.
 
-That said, our experience in marine robotics demonstrated to us that
-in many case the set of objective of the robot is not known a
-priori. While our missions are in the order of a day, we can easily
-have an initial plan that could be executed in few hours. For example,
-a typical mission can start with a scientific goal to collect data on
-an area for half of the mission and an operational goal to be at the
+With our experience in marine robotics shows that in many instances,
+the set of objective of the robot is not known a priori. While our
+missions are in the order of a day, it is often feasible to have an
+initial plan that could be executed in few hours. For example, a
+typical mission can start with a scientific goal to collect data on an
+area for half of the mission and an operational goal to be at the
 recovery location by the end of the mission. Then as the vehicle
-collect and send data, the scientist can analyze it and decide which
-new goal(s) should be sent to the robot. This lead to a tension at the
-execution level.  For instance, the robot may be prematurely tasked to
-leave an area before an oncoming new objective for the same
-geographical area is received, resulting in the robot inefficiently
-having to return to a location that it has already
-visited. Conversely, the robot waiting inordinately could waste time
-with consequent lack of flexibility for coping with diverse execution
-scenarios. In this context, it is important for the agent to make a
-distinction between actions that should be executed proactively versus
-actions that may be deferred.
-
+collects and sends data, the scientist can analyze and decide which
+new goal(s) should be sent to the robot while it is still in the
+water. This leads to a tension at the execution level.  For instance,
+the robot may be prematurely tasked to leave an area before an
+oncoming new objective for the same geographical area is received,
+resulting in the robot inefficiently having to return to a location
+that it has already visited. Conversely, the robot could be left
+waiting inordinately wasting time with consequent lack of flexibility
+for coping with diverse execution scenarios. In this context, it is
+important for the agent to make a distinction between actions that
+should be executed proactively versus actions that may be deferred.
 
 While our work studies when an action should be started, within the
 flexible frame of its current plan, its purpose is not about the
 process of planning itself. Instead, we focus on a study demonstrating
 that strict execution policies -- should it be early or late execution
 -- can present problems when new goals can emerge at any time within
-the robot mission scope. Finally, we provide a simple solution that
-exploits the current plan structure to identify the execution policy
-of the next potential actions base on the goals they are contributing
-to. This solution was motivated by our real-world domain applied to
-underwater robotics.
-
+the robot mission scope. Finally, we provide a simple yet elegant
+solution that exploits plan structure to identify the execution policy
+of the next potential set of actions based on the goals they are
+contributing to motivated by our domain.
 
 % Our work is situated between the planner and the executive. Therefore,
 % we are working with an already generated plan and are helping to determine
