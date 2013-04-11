@@ -17,7 +17,7 @@ of earliest start time to the goals in plan.
   \includegraphics[width=0.9\columnwidth]{figs/example_MixedInitial}
   \vskip-2mm
   \caption{\small Solid lines indicate conditions and dashed lines
-    indicate effects. Pentagons indicate {\em urgent} goals and stars
+    indicate effects. Pentagons indicate goals and stars
     indicate tokens that were deduced as {\em proactive}.}
   \label{fig:ex:mixed1}
   \vskip-3mm
@@ -37,8 +37,8 @@ of earliest start time to the goals in plan.
 
 As in Fig. \ref{fig:ex:mixed1}, the AUV is {\em At Surface} initially.
 At execution time, the next {\em Go} token will be dispatched
-early, because when the search follows causal links, it
-encounters the {\em Sample Vent2} goal.  This occurs similarly
+early, because it encounters the {\em Sample Vent2} goal 
+when searching the causal links.  This occurs similarly
 for all tokens that are starred. {\em Go(Surface)} gets deferred,
 because it is not connected to a goal using the forward
 search. Consequently, the resulting execution requires the AUV to stay at {\em
@@ -66,7 +66,7 @@ there is not enough time to {\em Sample Vent1} and be at the surface
 by 13:00, the goal is placed after the AUV visits the
 surface. Propagation results in marking the tokens, which were thus
 far deferred and are now causally linked to the new
-goal of {\em Sample Vent1}, as having the policy of the goal. The
+goal of {\em Sample Vent1}, as having the policy of the new goal. The
 resulting starred tokens get dispatched proactively which includes all
 tokens related to the mid-day surfacing token.
 

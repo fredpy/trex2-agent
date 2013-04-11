@@ -5,7 +5,7 @@ autonomous underwater vehicle (AUV), which illustrates issues arising with
 dynamic goal emergence and motivates our approach.  In this domain, an
 AUV can either transit from one location to another, within the water
 mass, or survey a location in order to collect data about a feature of
-interest such as a hydrothermal vent depicted in
+interest.  An example being a hydrothermal vent depicted in
 Fig. \ref{fig:Example}.  Note that the AUV must pass through {\em
   Vent1} to get to {\em Vent2}.  The vehicle is deployed initially
 with the scientific objective to sample {\em Vent 2} and the
@@ -41,7 +41,7 @@ scientists can decide, for example, that they also want to {\em
   sample} {\em Vent 1} as a consequence of data processing during the
 traverse from the surface to {\em Vent 2}.  Time on site for such
 bathymetric exploration is limited and expensive, so dynamic goal
-generation is a reality.  Finding a balancing between dispatching a plan action
+generation is a reality.  Finding a balancing between executing a plan action
 \emph{proactive}ly or waiting is the
 dichotomy that the plan executive needs to resolve. Otherwise, the plan will suffer along
 with the efficiency of the mission.
@@ -129,10 +129,10 @@ event of a new goal,
 the resulting mission scenario would then be more efficient in terms
 of its \emph{makespan}. We use latest start time which does not compensate
 for uncertainty in the plan and can be easily swapped with another policy.
-Our approach revolves around mission
-objectives to be marked by a policy depending on the 
+Our approach revolves around marking mission
+objectives with a policy depending on the 
 exploration of the plan structure, during plan execution, to identify if
-the action is linked to an {\em urgent} goal -- in which case it need
+the action is linked to a goal -- in which case it need
 to be executed {\em proactively} -- otherwise leading towards a {\em
   deferred} execution policy for the action.
  
