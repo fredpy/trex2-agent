@@ -39,36 +39,32 @@ efficient in dealing with unanticipated execution threats with an
 exception in dealing with dynamic controllability \cite{morris01} ---
 acting as early as possible keeps the remaining partial plan
 flexible. Moreover, should the plan break, the robot has more time
-left to identify and execute an alternate strategy. An early dispatch
-policy therefore, proved to be the most efficient approach for the
-robot to robustly execute its plan when the set of goals for the
-mission are fully instantiated.
+left to identify and execute an alternate recovery strategy. An early
+dispatch policy therefore, has proved to be the most efficient
+approach for the robot to robustly execute its plan when the set of
+goals for the mission are fully instantiated.
 
 Our experience in marine robotics shows that in a number of instances,
-the full set of objective of the robot is not known a priori. While
+the full set of objectives of the robot is not known a priori. While
 our missions are in the order of a day, it is often feasible to have
 an initial plan that could be executed in few hours. For example, a
 typical mission can start with a scientific goal to collects data on
 an area for half of the mission and an operational goal to be at the
-recovery location by the end of the mission. The scientist then
-receives and analyzes data collected, sent by the robot, which allow
-him to produce new goal(s), received by the robot, while still in the
-water. This leads to a tension the robot needs to resolve;
- while starting an action proactively often gives more flexibility 
-to the current plan, it can also at times have a negative impact 
-should it receive a new goal that require the robot to take the 
-opposite action in order to get back to the state it currently was 
-before this action (such as returning to a location). 
+recovery location by the end of the mission. During this time, a
+scientist receives and analyzes data collected by the robot, which
+allow him to produce new goal(s) for dispatch to the robot, while
+still in the water.  While starting an action proactively can often
+add flexibility to the current plan, it can also at times negatively
+impact the outcome should a new goal directly conflict with an action
+undergoing execution.
 
-While our work studies when an action should be started, within the
-flexible frame of its current plan, its purpose is not about the
-process of planning itself. Instead, we focus on a study demonstrating
-that strict execution policies -- should it be early or late execution
--- can present problems when new goals can emerge at any time within
-the robot mission scope. Finally, we provide a simple yet elegant
-solution that exploits plan structure to identify the execution policy
-of the next potential set of actions based on the goals they are
-contributing to motivated by our domain.
+In this paper we focus on a study demonstrating that strict execution
+policies can present problems when new goals can emerge at any time
+within mission scope; we are agnostic to the planning process
+itself. And, we provide a simple yet elegant solution that exploits
+temporal plan structure to identify the execution policy of the next
+potential set of actions. % based on the goals they are contributing to
+% motivated by our domain.
 
 % Our work is situated between the planner and the executive. Therefore,
 % we are working with an already generated plan and are helping to determine
