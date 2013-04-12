@@ -8,9 +8,9 @@ generates and dispatches a partial plan, with a lower level controller
 that further decomposes these plans towards atomic actions; these
 tasks ultimately actuate hardware on our AUV. The world responds by
 sending sensory feedback as \emph{observations} up thru the
-hierarchical controller \cite{rajan12}. Details of the controller are
-beyond the scope of this paper and are not directly relevant to the
-concepts described.
+hierarchical controller \cite{mcgann08a,rajan12}. Details of the
+controller are beyond the scope of this paper and are not directly
+relevant to the concepts described.
 
 In order to explain our execution method, we first consider some basic
 definitions related to a plan consistent with \cite{Nau:2004}. A plan
@@ -32,22 +32,22 @@ flexible temporal plans are in a dispatchable form as defined by
 time advances, which timepoint withing the dispatched plan can be
 properly instantiated without generating inconsistency within the
 plan. If no solution exists, the executive can only report to the
-planner and wait for a new plan. In the past, this decision was often
-supported by a strict policy for every timepoints. However, as noted
-in the example this can lead to issues in when to dispatch actions.
+planner and wait for a new plan. In the literature, this decision was
+often supported by a strict policy for every timepoint. However, as
+noted in the example this can lead to issues in when to dispatch
+actions.
 
-In order to handle such problems, we assume that some states have a
-defined execution policy. This execution policy does impact how their
-start time will be handled by the executive. For example, an
-early execution policy  implies a preference to set the {\em token}'s
-start with the smallest possible value without breaking the plan. We
-consider that these  execution policies are determined beforehand by 
-a user for a limited number of the {\em tokens}. Typically, the {\em
-  tokens} that have a defined execution policy are the goal states 
-of the plan. This leaves states without an execution policy, 
-in which case we either derive a policy or use a default. In the rest
-of this paper our default policy is set to a strict latest start,
-however any policy can be used.
+To handle such problems, we assume that some states have a defined
+execution policy. This execution policy impacts how their start time
+will be handled by the executive. For example, an early execution
+policy implies a preference to set the token's start with the smallest
+possible value without breaking the plan. We consider that these
+execution policies are determined beforehand by a user for a limited
+number of tokens. Typically, the tokens that have a defined execution
+policy are the goal states of the plan. This leaves states without an
+execution policy, in which case we either derive a policy or use a
+default. In the rest of this paper our default policy is set to a
+strict latest start; however any policy can be used.
 
 
 %\begin{definition}
