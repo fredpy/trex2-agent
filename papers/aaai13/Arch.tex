@@ -22,28 +22,34 @@ in the plan from an initial state into a goal state. The plan
 structure is similar to the \texttt{STRIPS} model in the definition of
 a plan.
 
-Within the plan, each state has a start, $T_s$ and end, $T_e$ time. We
-refer to these as timepoints. Each timepoint is actually a flexible
+Within the plan, each state has a {\em start}, $T_s$ and {\em end}, $T_e$ time. We
+refer to these as {\em timepoints}. Each {\em timepoint} is actually a flexible
 interval of time $[t, T]$, which includes all possible values between
 $t$ and $T$.  A \emph{token} is a property that holds within two such
 flexible intervals, or timepoints, which represents a state
 \cite{py10}.  Such a representation is referred to as a flexible
 temporal plan. Further, we assume that the plan dispatched to us is in
-its dispatchable form as defined by \cite{mus98a}.  This leaves an
-issue for execution in determining when a timepoint should start
-within its flexible interval. This has been resolved in the past by
-using a strict execution policy for every state. However, as noted in
+its dispatchable form as defined by \cite{mus98a}.  The role of the
+executive is to identify and decide as time advance which {\em
+  timepoint} withing the dispatched plan can be properly instantiated
+without generating inconsistency within the plan. If no such solution
+exist the executive can only report this to the planner and  wait for
+a new plan solution. In the past, this decision was often supported by
+a strict policy for every timepoints. However, as noted in
 the example this can lead to issues in when to dispatch actions.
 
 In order to handle such problems, we assume that some states have a
-defined execution policy.  A policy can be, but is not limited to,
-early start or latest start.  Moreover, the execution policies are
-determined beforehand by a user. We then use the policies to determine
-when to execute each state. Typically, the states that have a defined
-execution policy are the goal states of the plan. This leaves states
-without an execution policy, in which case we either derive a policy
-or use a default. In our example, we default to a strict latest start
-time; however any policy can be used.
+defined execution policy. This execution policy does impact how their
+start time will be handled by the executive. For example, an
+early execution policy  implies a preference to set the {\em token}'s
+start with the smallest possible value without breaking the plan. We
+consider that these  execution policies are determined beforehand by 
+a user for a limited number of the {\em tokens}. Typically, the {\em
+  tokens} that have a defined execution policy are the goal states 
+of the plan. This leaves states without an execution policy, 
+in which case we either derive a policy or use a default. In the rest
+of this paper our default policy is set to a strict latest start,
+however any policy can be used.
 
 
 %\begin{definition}
@@ -93,36 +99,37 @@ time; however any policy can be used.
 %  \pi)$ that entails $\Phi_g$.
 %\end{definition}
  
-While our focus is on executing a plan, to reflect the dynamic
-interaction of the agent with the environment, we need to refine the
-definition of the flexible plan given to us. As the world evolves, new
-(or a refinement of existing) observations are added to the
-plan. Similarly, the operator can request new goals to be added to the
-agent's plan as mission time advances. For the sake of simplicity, we
-consider that the alterations to the plan are purely additive with
-time\footnote{In practice, their evolution is more complex as
-  completed goals becomes observation; even a goal previously
-  requested can be cancelled by the operator. While this assumption
-  largely simplifies problem description, our algorithm works
-  regardless.}
+% While our focus is on executing a plan, to reflect the dynamic
+% interaction of the agent with the environment, we need to refine the
+% definition of the flexible plan given to us. As the world evolves, new
+% (or a refinement of existing) observations are added to the
+% plan. Similarly, the operator can request new goals to be added to the
+% agent's plan as mission time advances. For the sake of simplicity, we
+% consider that the alterations to the plan are purely additive with
+% time\footnote{In practice, their evolution is more complex as
+%   completed goals becomes observation; even a goal previously
+%   requested can be cancelled by the operator. While this assumption
+%   largely simplifies problem description, our algorithm works
+%   regardless.}
 %\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_{obs}(t) \subseteq \Phi_{obs}(t')
 %\wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
 %
 %where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
 %time $t$.
 
-\kcomment{This para starts very similarly to text above.}The plan gets
-updated as observations are made from the plan being executed. In
-nominal situations, these new observations are refinements of the plan
--- for example by asserting that a planned command has just
-started\footnote{We exclude situations where new observations
-  invalidate the plan rather than merely refining it.}. The agent can
-also receive new objectives at any time which are added to the
-plan. Therefore after refinements or changes are made, the plan is
-dispatched again to the executive with an up to date and valid
-solution.
+% \kcomment{This para starts very similarly to text above.}The plan gets
+% updated as observations are made from the plan being executed. In
+% nominal situations, these new observations are refinements of the plan
+% -- for example by asserting that a planned command has just
+% started\footnote{We exclude situations where new observations
+%   invalidate the plan rather than merely refining it.}. The agent can
+% also receive new objectives at any time which are added to the
+% plan. Therefore after refinements or changes are made, the plan is
+% dispatched again to the executive with an up to date and valid
+% solution.
 
-The assumption that the plan will change has an impact on how to
+We finallly assume also that the plan can evolve in the future due to
+the introduction of new goals. This has an impact on how to
 handle plan execution. While deciding when to initiate a state
 transition within the plan, one needs to ensure that the execution
 will not limit the ability of the agent to treat emergent goals. In
@@ -163,6 +170,7 @@ the two policies.
 
 \section{Algorithmic Description}
 \label{sec:algo}
+
 
 As a new state is to be executed \kcomment{what does it mean to
   execute a 'state'?}, the executive needs to evaluate how it relates
