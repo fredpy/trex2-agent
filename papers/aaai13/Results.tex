@@ -14,6 +14,7 @@ of earliest start time to the goals in plan.
 
 \begin{figure}[!htbp]
   \centering
+  \vskip-2mm
   \includegraphics[width=0.9\columnwidth]{figs/example_MixedInitial}
   \vskip-2mm
   \caption{\small Solid lines indicate conditions and dashed lines
@@ -77,7 +78,7 @@ tokens related to the mid-day surfacing token.
   \caption{\small The solution after receiving external request for
     the plan from Fig. \ref{fig:ex:mixed1}}
   \label{fig:ex:mixed2}
-  \vskip-3mm
+  \vskip-5mm
 \end{figure}
 
 Meanwhile, the tokens related to the final surfacing remain {\em
@@ -117,11 +118,11 @@ the minimum duration of the {\em At} token; since our plan uses a {\em
   Go} immediately after, this \emph{Go} token also needs to be
 evaluated.
 
-\begin{figure*}[t]
-  \centering
-  \vskip-3mm
-  \includegraphics[width=1.2\columnwidth]{figs/example_run.pdf}
-  \vskip-3mm
+\begin{figure}[!ht]
+  %\centering
+  %\vskip-3mm
+  {\hskip-.5cm\includegraphics[width=1.1\columnwidth]{figs/example_run.pdf}}
+  \vskip-4mm
   \caption{\small A mission run that shows the time needed for
     dispatching. The star represents when Goal \#2 is received and
     integrated into the plan. Lines with boxes at the end represent
@@ -130,7 +131,7 @@ evaluated.
     where the system had to dispatch both {\em At} and {\em Go}. }
   \label{fig:example_run}
   \vskip-5mm
-\end{figure*}
+\end{figure}
 
 
 We also identified a clear trend of a decrease in time as the agent
@@ -151,15 +152,18 @@ tick $127$, the {\em Go} is no longer deferred and gets dispatched.
 % \kcomment{from what? from the end of the plan?}, and thus the time
 % decreases significantly.
 
-\begin{figure}[!b]
+\begin{figure}[!htb]
   \centering
+  \vskip-2mm
   \includegraphics[width=\columnwidth]{figs/HistogramAlg1}
+  \vskip-3mm
   \caption{\small Algorithm \ref{alg:dispatch} was timed at every
     increment ($1$ Hz) for $500$ simulated missions. One goal was
     inserted into the plan at random during the mission. The histogram
     shows the distribution of the time, which is heavily skewed to the
     left.}
   \label{fig:histogram}
+  \vskip-3mm
 \end{figure}
 
 % In order to demonstrate the average amount of time that Algorithm
