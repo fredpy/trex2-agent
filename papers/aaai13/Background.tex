@@ -13,16 +13,16 @@
 %   actions based on its purpose}
 
 Research in temporal plan execution is not new. However, dealing with
-anticipatory dispatching has not been a focus of prior work. It
-becomes important in our context for three reasons. First, our
-system is embedded in a real-world robotic explorer which can sustain
-itself for extended periods. Second, our integrated
-architecture \rx \cite{mcgann08bdup,py10dup,rajan12dup} plans
-\emph{continuously} during mission execution. Finally, the situated
-agent encodes plans in a rich and flexible representation which allows
-such inference cost-effective.  While our onboard controller is
-influenced by work cited in the introduction, our work in this paper
-is complementary to much of the earlier work.
+anticipatory dispatching has not been a focus of prior work in the
+literature. It becomes important in our context for three
+reasons. First, our system is embedded in a real-world robotic
+explorer which can sustain itself for extended periods in which new
+goals can evolve. Second, our integrated architecture \rx
+\cite{mcgann08bdup,py10dup,rajan12dup} plans \emph{continuously}
+during mission execution. Finally, the situated agent encodes plans in
+a rich and flexible representation which allows such cost-effective
+inference.  While our onboard controller is influenced by work cited
+here, this work is complementary to much of our earlier efforts.
 
 % Dealing with plan execution is not a new problem and we can find a lot
 % of work that relates to this over several decades. Still, it is
@@ -44,15 +44,17 @@ related to an off-nominal situation such as plan execution
 failure. Prominent work in this area is related to dispatchability in
 simple temporal networks (STN) so efficient temporal propagation prior
 to execution encapsulates appropriate planning constraints
-\cite{mus98a}.  % To do so, the STN supporting is transformed into an
+\cite{mus98a}.
+% To do so, the STN supporting is transformed into an
 % all-pairs network and stripped of unnecessary edges, resulting in a
 % more compact temporal network that lessens propagation cost. The role
 % of the executive is to select time-points within the current execution
 % bounds and propagate its value within the simplified network.
-However, the executive does not address what value should be set for a
-given time-point from a possible interval of values.  When dealing
-with least-commitment planning this decision is usually deferred to
-the plan executive. % For instance, in \cite{mus98c}, the executive has
+When dealing with least-commitment planning this decision is usually
+deferred to the plan executive.  However, the executive does not
+address what value should be set for a given time-point from a
+possible interval of values.
+% For instance, in \cite{mus98c}, the executive has
 % two responsibilities: the selection and scheduling of plan events for
 % execution.%
 % The executive needs to be
@@ -104,19 +106,19 @@ the plan executive. % For instance, in \cite{mus98c}, the executive has
 % Deferring a time-point for execution is another approach for dynamic
 % controllability with STNs with uncertainty (STNU).
 \cite{morris01} proposes an algorithm that inserts \textbf{wait}
-constraints within the temporal network during planning for any uncontrollable
-event that may occur. \cite{gallien2006} also uses a
-similar approach to reduce Makespan. They do so in the context of
-an exogenous event -- such as the duration of a navigation
-task which depends on external factors -- where it is necessary to
-defer actions for correct plan execution. Work in soft temporal
-constraints with preferences \cite{khatib2001temporal} on dispatching
-has another related approach with preferable start times. However,
-they are plagued by poor performance \cite{bartak2002}. % ; while the
+constraints within the temporal network during planning for any
+uncontrollable event that may occur. \cite{gallien2006} also uses a
+similar approach to reduce Makespan. They do so in the context of an
+exogenous event -- such as the duration of a navigation task which
+depends on external factors -- where it is necessary to defer actions
+for correct plan execution. Work in soft temporal constraints with
+preferences \cite{khatib2001temporal} on dispatching has another
+related approach with preferable start times. However, they are
+plagued by poor performance \cite{bartak2002}. % ; while the
 % complexity can be reduced to a more tractable (polynomial) solution by
 % specifying preferences as convex functions \cite{rossi2006learning},
 % this is still cubic in relation to the number of variables.
-Moreover the solution proposed optimize the plan {\em a-priori}
+Moreover the solution proposed optimizes the plan {\em a-priori}
 reducing plan flexibility leading to potential execution time failure,
 which is not suitable for real-world embedded systems. In most
 literature, the executive exclusively uses a {\em proactive} execution
@@ -125,12 +127,12 @@ future should an unexpected situation occur. However, most such prior
 work focuses on improving plan quality but does not consider the
 impact of execution on the agent to handle unanticipated goals.
 
-The efforts above decouple execution from planning. Unlike our work
+The efforts above decouple execution from planning, unlike our work
 where planning is not only continuous, but execution is intertwined
 with planning. Our interest is in deferring temporal decisions to the
 executive to adapt the plan to new objectives without heavily relying
 on plan-repair or re-planning solutions that could impact reactivity
-in an embedded system. 
+in an embedded system.
 
 % In this case, the deterrence of the execution of this
 % time-point is enforced in order to ensure robust plan execution
