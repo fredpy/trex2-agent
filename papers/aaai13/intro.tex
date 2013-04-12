@@ -54,18 +54,15 @@ our missions are in the order of a day, it is often feasible to have
 an initial plan that could be executed in few hours. For example, a
 typical mission can start with a scientific goal to collects data on
 an area for half of the mission and an operational goal to be at the
-recovery location by the end of the mission. Then as the vehicle
-collects and sends data, the scientist can analyze and decide which
-new goal(s) should be sent to the robot while it is still in the
-water. This leads to a tension at the execution level.  For instance,
-the robot may be prematurely tasked to leave an area before an
-oncoming new objective for the same geographical area is received,
-resulting in the robot inefficiently having to return to a location
-that it has already visited. Conversely, the robot could be left
-waiting inordinately wasting time with consequent lack of flexibility
-for coping with diverse execution scenarios. In this context, it is
-important for the agent to make a distinction between actions that
-should be executed proactively versus actions that may be deferred.
+recovery location by the end of the mission. The scientist then
+receive and analyze data collected and sent by the robot whoich allow
+him to produce new goal(s) received by the robot as it still is in the
+water. This leads to a tension the robot needs to resolve;
+ while starting an action proactively often give more flexibility 
+to the current plan, it can also at times have a negative impact 
+should it receive a new goal that require the robot to take the 
+opposite action in order to get back to the state it currently is 
+before  this action (such as returning to a location). 
 
 While our work studies when an action should be started, within the
 flexible frame of its current plan, its purpose is not about the
