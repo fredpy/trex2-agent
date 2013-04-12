@@ -251,17 +251,17 @@ impact the generality of Algorithm \ref{SearchForGoal}.
   \State Mark $T$
   \ForAll{Action(s), $A$, in $Fringe$ }
   \State Mark $A$
-  \ForAll{Effects, $E$ of $A$}
+  \ForAll{Effects, $E$ of $A; \neg Marked(E)$}
   \State Mark $E$
-  \If{$E$ has Policy(Any)}
-  \State Insert $E \to Policy$ into $Policies$
+  \If{$E.Policy \neq \emptyset$}
+    \State $Policies$ =  $\{ E.Policy \} \cup Policies$
   \EndIf
   \State List $L$ = \{ Action(s) that $E$ is Condition of \}
-  \State $Fringe$ = $Fringe \cup \{L \cap \neg Marked \}$ 
+  \State $Fringe$ = $Fringe \cup \{a \in L; \neg Marked(a) \}$ 
   \EndFor
   \EndFor
-  \EndIf
   \State \Return SelectPolicy($Policies$)
+  \EndIf
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
@@ -284,23 +284,15 @@ To inform Algorithm \ref{alg:dispatch}, we use Algorithm
 \ref{SearchForGoal} which searches the causal links connected to token
 $T$ using a forward-search.  If a token with a defined policy is found, then
 it is added into the set of potential execution policies for $T$.  After
-search all the tokens connected to $T$, we use the $SelectPolicy$
-function to determine which execution policy should be returned. Herein
-rises the issue of having multiply defined policies.  The function
-$SelectPolicy$ could select an execution policy by the highest priority in the set or use
-additive operators to combine them. In our case, the
-earliest start time will be returned because it is the only defined policy. 
-Otherwise, latest start will be used, in
-Algorithm \ref{alg:dispatch}, if the set of defined policies is empty and null
-is returned.
-%\kcomment{I think this entire para needs to be
-%  carefully read and evaluated. Overuse of the same word (policy or
-%  examples) needs to be avoided. Plus this notion of examples is
-%  confusing. What examples are these?}
-%As such, we want to be proactive in order to dispatch $G$ as early as possible. If a $G$ is
-%not found, then token $T$ has no connection to an external goal and
-%therefore there is no motivation to execute this action earlier than
-%necessary. 
+search all the tokens connected to $T$, we call $SelectPolicy$
+to determine which execution policy should be returned. The
+$SelectPolicy$ function take the set of all the policies found during the
+search and return the resulting unique policy in order to arbitrate
+conflicts. In our current implemetation we always return {\em LateStart}
+policy if this set is empty, otherwise we select the element of the
+set with the highest fixed priority ($EarliestStart >
+LateStart$). Still, an alternate implementation could be introduced
+without impacting the generlaity of our alogorihtm. 
 Algorithm \ref{SearchForGoal} complexity is $O(N+E)$ where
 $N$ is the number of tokens and $E$ the number of causal links that
 connect these tokens in the plan. 
