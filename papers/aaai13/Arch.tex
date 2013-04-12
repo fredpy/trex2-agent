@@ -282,27 +282,26 @@ impact the generality of Algorithm \ref{SearchForGoal}.
 
 To inform Algorithm \ref{alg:dispatch}, we use Algorithm
 \ref{SearchForGoal} which searches the causal links connected to token
-$T$ using a forward-search.  If a token with a policy is found, then
-it is added into the list of possible policies for $T$.  After
-gathering all the policies connected to $T$, we use the $SelectPolicy$
-function which determines which out of the set should be used. Herein
+$T$ using a forward-search.  If a token with a defined policy is found, then
+it is added into the set of potential execution policies for $T$.  After
+search all the tokens connected to $T$, we use the $SelectPolicy$
+function to determine which execution policy should be returned. Herein
 rises the issue of having multiply defined policies.  The function
-$SelectPolicy$ could determine which policy to return in a number of
-ways. Some examples are using a priority for each policy or having
-additive operators for the policies \kcomment{This last sentence
-  doesn't parse. What are 'some examples'?}.  In our case, the
-earliest start policy will be returned because it is the only policy
-we define.  The default policy of latest start will be used in
-Algorithm \ref{alg:dispatch} if $T$ is not connected to a token with a
-defined policy. \kcomment{I think this entire para needs to be
-  carefully read and evaluated. Overuse of the same word (policy or
-  examples) needs to be avoided. Plus this notion of examples is
-  confusing. What examples are these?}
+$SelectPolicy$ could select an execution policy by the highest priority in the set or use
+additive operators to combine them. In our case, the
+earliest start time will be returned because it is the only defined policy. 
+Otherwise, latest start will be used, in
+Algorithm \ref{alg:dispatch}, if the set of defined policies is empty and null
+is returned.
+%\kcomment{I think this entire para needs to be
+%  carefully read and evaluated. Overuse of the same word (policy or
+%  examples) needs to be avoided. Plus this notion of examples is
+%  confusing. What examples are these?}
 %As such, we want to be proactive in order to dispatch $G$ as early as possible. If a $G$ is
 %not found, then token $T$ has no connection to an external goal and
 %therefore there is no motivation to execute this action earlier than
 %necessary. 
-The functions \kcomment{which function?} complexity is $O(N+E)$ where
+Algorithm \ref{SearchForGoal} complexity is $O(N+E)$ where
 $N$ is the number of tokens and $E$ the number of causal links that
 connect these tokens in the plan. 
 
