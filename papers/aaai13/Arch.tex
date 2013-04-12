@@ -284,7 +284,7 @@ To inform Algorithm \ref{alg:dispatch}, we use Algorithm
 \ref{SearchForGoal} which searches the causal links connected to token
 $T$ using a forward-search.  If a token with a defined policy is found, then
 it is added into the set of potential execution policies for $T$.  After
-search all the tokens connected to $T$, we call $SelectPolicy$
+searching all the tokens connected to $T$, we call $SelectPolicy$
 to determine which execution policy should be returned. The
 $SelectPolicy$ function take the set of all the policies found during the
 search and return the resulting unique policy in order to arbitrate
@@ -292,7 +292,7 @@ conflicts. In our current implemetation we always return {\em LateStart}
 policy if this set is empty, otherwise we select the element of the
 set with the highest fixed priority ($EarliestStart >
 LateStart$). Still, an alternate implementation could be introduced
-without impacting the generlaity of our alogorihtm. 
+without impacting the generality of our algorithm. 
 Algorithm \ref{SearchForGoal} complexity is $O(N+E)$ where
 $N$ is the number of tokens and $E$ the number of causal links that
 connect these tokens in the plan. 
