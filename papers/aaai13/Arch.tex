@@ -1,17 +1,16 @@
 \section{Executing a Flexible Temporal Plan}
 \label{sec: defs}
 
-The focus of this paper is on the possibility of accommodating new
-objectives arising \emph{during} mission execution, while preserving
-room for their inclusion, and subsequent execution with appropriate
-policy decision applied to each task. Our robot generates and
-dispatches a partial plan in parallel with a lower level controller,
-which further decomposes these plans towards atomic actions; these
+The focus of this paper is on the study of unanticipated threats due
+to new goals arising \emph{during} mission execution, while preserving
+room for their inclusion and subsequent execution.  Our robot
+generates and dispatches a partial plan, with a lower level controller
+that further decomposes these plans towards atomic actions; these
 tasks ultimately actuate hardware on our AUV. The world responds by
 sending sensory feedback as \emph{observations} up thru the
-hierarchical controller \cite{mcgann08b,rajan12}. Details of the
-controller are beyond the scope of this paper and are not directly
-relevant to the concepts described.
+hierarchical controller \cite{rajan12}. Details of the controller are
+beyond the scope of this paper and are not directly relevant to the
+concepts described.
 
 In order to explain our execution method, we first consider some basic
 definitions related to a plan consistent with \cite{Nau:2004}. A plan
@@ -22,21 +21,20 @@ in the plan from an initial state into a goal state. The plan
 structure is similar to the \texttt{STRIPS} model in the definition of
 a plan.
 
-Within the plan, each state has a {\em start}, $T_s$ and {\em end}, $T_e$ time. We
-refer to these as {\em timepoints}. Each {\em timepoint} is actually a flexible
-interval of time $[t, T]$, which includes all possible values between
-$t$ and $T$.  A \emph{token} is a property that holds within two such
-flexible intervals, or timepoints, which represents a state
-\cite{py10}.  Such a representation is referred to as a flexible
-temporal plan. Further, we assume that the plan dispatched to us is in
-its dispatchable form as defined by \cite{mus98a}.  The role of the
-executive is to identify and decide as time advance which {\em
-  timepoint} withing the dispatched plan can be properly instantiated
-without generating inconsistency within the plan. If no such solution
-exist the executive can only report this to the planner and  wait for
-a new plan solution. In the past, this decision was often supported by
-a strict policy for every timepoints. However, as noted in
-the example this can lead to issues in when to dispatch actions.
+Within the plan, each state has a {\em start}, $T_s$ and {\em end},
+$T_e$ time. We refer to these as {\em timepoints}. Each timepoint is
+therefore a \emph{flexible} interval of time $[t, T]$, which includes
+all possible values between $t$ and $T$.  A \emph{token} is a property
+that holds within two such timepoints, which represents a state
+\cite{py10}; one to start and the other to end the state.  Such
+flexible temporal plans are in a dispatchable form as defined by
+\cite{mus98a}.  The role of the executive is to identify and decide as
+time advances, which timepoint withing the dispatched plan can be
+properly instantiated without generating inconsistency within the
+plan. If no solution exists, the executive can only report to the
+planner and wait for a new plan. In the past, this decision was often
+supported by a strict policy for every timepoints. However, as noted
+in the example this can lead to issues in when to dispatch actions.
 
 In order to handle such problems, we assume that some states have a
 defined execution policy. This execution policy does impact how their
@@ -170,7 +168,6 @@ the two policies.
 
 \section{Algorithmic Description}
 \label{sec:algo}
-
 
 As a new {\em token} start timepoint is to be executed, the executive 
 needs to evaluate how it relates
