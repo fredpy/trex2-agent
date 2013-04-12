@@ -2,7 +2,7 @@
 \label{sec:intro}
 
 As autonomous robots become more robust and persistent, the likelihood
-of them receiving new or modified objectives \emph{during} an ongoing
+of receiving new or modified objectives \emph{during} an ongoing
 mission is high. Generative continuous planning, integrated within the
 robotic architecture, is one approach to enhance persistence while
 dealing with evolving objectives and unanticipated situations.
@@ -30,23 +30,19 @@ While these approaches have been necessary to correctly execute a
 \emph{flexible temporal plan}, they view the agent itself as
 synchronously fulfilling goals provided a priori. They do not take
 into account the introduction of new goals which could alter the
-mission state and execution.
-% This oversight is understandable as such goals are by nature unknown
-% and therefore impossible to integrate within the plan limiting the
-% ability to formally take them into account.
-Consequently, the natural choice was to make the agent execute its
-actions as early as the temporal plan and the current context would
-allow. The assumption was that the robot would finish its plan as
-early as possible providing more ``temporal room'' for potential
-change in the plan. Such an assumption proved to be very efficient in
-dealing with unanticipated execution threats with an exception in
-dealing with dynamic controlability \cite{morris01} --- acting as
-early as possible keeps the remaining partial plan flexible. Moreover,
-should the plan break, the robot has more time left to identify and
-execute an alternate strategy. An early dispatch policy therefore,
-proved to be the most efficient approach for the robot to robustly
-execute its plan when the set of goals for the mission are fully
-instantiated.
+mission state and execution during mission execution.  Consequently,
+the natural choice was to make the agent execute its actions as early
+as the temporal plan would allow, so that the the robot would finish
+its plan as early as possible providing more ``temporal room'' for
+potential change in the plan. Such an assumption has proved to be very
+efficient in dealing with unanticipated execution threats with an
+exception in dealing with dynamic controllability \cite{morris01} ---
+acting as early as possible keeps the remaining partial plan
+flexible. Moreover, should the plan break, the robot has more time
+left to identify and execute an alternate strategy. An early dispatch
+policy therefore, proved to be the most efficient approach for the
+robot to robustly execute its plan when the set of goals for the
+mission are fully instantiated.
 
 Our experience in marine robotics shows that in a number of instances,
 the full set of objective of the robot is not known a priori. While

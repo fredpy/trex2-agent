@@ -18,7 +18,8 @@
 \begin{document}
 
 % \title{Anticipatory Continuous Robotic Plan Execution}
-\title{Unanticipated Goals Inclusion Issue in Continuous Robotic Plan Execution}
+% \title{Unanticipated Goals Inclusion Issue in Continuous Robotic Plan Execution}
+\title{Unanticipated Execution Threats in Continuous Robotic Plan Execution}
 %\author{Paper \# 88}
 % \author{Philip Cooksey \And Fr\'ed\'eric Py \And Paul Morris \And Kanna Rajan}
 \author{Philip Cooksey\\
@@ -51,22 +52,17 @@
   persistent and increasingly moved into real-world environments, this
   assumption is not necessarily true; for instance a user can decide
   to give a new objective to the robot for inclusion in the plan being
-  formulated, add newer goals or modified others queued for
-  execution. In most systems this leads, at best, to suboptimal final
-  plan trace and possibly to the exclusion of objectives either of
-  which could have been avoided should the robot have executed 
-  its initial plan differently.
- % As robots have become
- %  persistent and moved into the real-world, the need to anticipate and
- %  capture evolving needs with new or reformulated goals becomes
- %  critical. 
-  % We explore this issue not yet described in the literature.
-  We first articulate and then demonstrate an initial approach to this
-  problem motivated by a marine robotics domain with an execution
-  policy that is sufficient to disambiguate actions for execution
-  within a flexible temporal continuous plan execution system.  The
-  resulting algorithmic complexity is linear in the number of actions
-  and causal links of an existing partial plan.
+  formulated, add newer goals or modify others queued for
+  execution. In most systems this leads, at best, to a suboptimal
+  final plan or possibly to the exclusion of objectives, either of
+  which could have been avoided, should the robot have executed its
+  initial plan differently.  We first articulate and then demonstrate
+  a preliminary approach to this problem motivated by a marine
+  robotics domain. We do so with an execution policy that is
+  sufficient to disambiguate actions for execution within a flexible
+  temporal continuous plan execution system.  The resulting
+  algorithmic complexity is linear in the number of actions and causal
+  links of an existing partial plan.
 
 \end{abstract}
 
@@ -83,7 +79,8 @@
 \input{Conclude.tex}
 
 %\twocolumn 
+\footnotesize{
 \bibliographystyle{aaai}
 \bibliography{references}
-
+}
 \end{document}
