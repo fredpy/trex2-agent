@@ -22,8 +22,11 @@ inefficiency in handling new goal requests.
 
 A number of open issues remain to be explored, however. The causal
 link traversal proposed is agnostic to the temporal constraints
-applied to timepoints of the plan; including such information could
-greatly increase the quality of our solution.  
+applied to timepoints of the plan. This design choice was made as we
+consider ou approach as an heuristic supporting executive
+decisions. Therefore the management of the temporal constraints and
+their propagation remained the reponsibility of the ecxecutive itself.
+Still,  including such information could greatly increase the quality of our solution.  
 % When goals marked as deferred are tied to a timepoint that is
 % constrained to be {\em after} a future date. 
 % We need to explore this
