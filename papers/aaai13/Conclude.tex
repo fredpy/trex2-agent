@@ -26,15 +26,14 @@ applied to timepoints of the plan. This design choice was made as we
 consider our approach as a heuristic supporting executive
 decisions. Therefore the management of the temporal constraints and
 their propagation remained the reponsibility of the executive itself.
-Still, including \kcomment{including where and what?} such information
+Still, including temporal constraints
 could greatly increase the quality of our solution.  For instance, in
 Fig. \ref{fig:ex:mixed2}, where the consequent was a {\em Surface}
 token, planning instantiated the goal of surveying
 \emph{Vent1}. Currently, the result would make all tokens related to
 the {\em Surface} token proactive due to the goal immediately
 \emph{following} it.  This can potentially lead to premature surfacing
-that is then prohibiting the agent from accepting goals in the morning
-\kcomment{substitute morning with some actual time}. Typically the
+that is then prohibiting the agent from acting on goals until 13:00. Typically the
 {\em Surface}, which is to end after 13:00, is acting as a guard on
 the propagation.  Therefore, ideally only those tokens that are
 directly after this {\em Surface} token should have been marked as
