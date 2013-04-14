@@ -8,13 +8,13 @@ goals during mission execution.  Most existing autonomy approaches
 fall short of dealing with the ensuing dichotomy of proactive dispatch
 versus deferment.  Typically, the solution pursued is to integrate
 such knowledge within the system domain description which often
-results in a more complex model which is harder to maintain and
-therefore likely to be error prone.  This motivates our approach to
-provide an efficient solution to deduce execution policy based on the
+results in a more complex model making it harder to maintain and
+therefore error prone.  This motivates our approach to provide an
+efficient solution to deduce execution policy based on the
 supplementary information namely that of defined policies in the plan.
 The work in this paper focuses on plan structure in abstraction
 without direct consideration of timing constraints applied to each
-goal in the plan. We are able to use breadth first search within the
+goal in the plan. We are able to use breadth-first search within the
 existing plan structure to select different execution policies for
 each token within the plan. By doing so, we can improve overall
 mission execution by avoiding proactivity that could lead to
@@ -26,21 +26,20 @@ applied to timepoints of the plan. This design choice was made as we
 consider our approach as a heuristic supporting executive
 decisions. Therefore the management of the temporal constraints and
 their propagation remained the reponsibility of the executive itself.
-Still, including temporal constraints
-could greatly increase the quality of our solution.  For instance, in
-Fig. \ref{fig:ex:mixed2}, where the consequent was a {\em Surface}
-token, planning instantiated the goal of surveying
-\emph{Vent1}. Currently, the result would make all tokens related to
-the {\em Surface} token proactive due to the goal immediately
-\emph{following} it.  This can potentially lead to premature surfacing
-that is then prohibiting the agent from acting on goals until 13:00. Typically the
-{\em Surface}, which is to end after 13:00, is acting as a guard on
-the propagation.  Therefore, ideally only those tokens that are
-directly after this {\em Surface} token should have been marked as
-proactive as shown in Fig. \ref{fig:res:ideal}, while keeping actions
-preceding 13:00 deferred.
+Still, including temporal constraints could greatly increase the
+quality of our solution.  For instance, in Fig. \ref{fig:ex:mixed2},
+where the consequent was a {\em Surface} token, planning instantiated
+the goal of surveying \emph{Vent1}. Currently, the result would make
+all tokens related to the {\em Surface} token proactive due to the
+goal immediately following it.  This can potentially lead to premature
+surfacing that is then prohibiting the agent from acting on goals
+until 13:00. Typically the {\em Surface}, which is to end after 13:00,
+is acting as a guard on the propagation.  Therefore, ideally only
+those tokens that are directly after this {\em Surface} token should
+have been marked as proactive as shown in Fig. \ref{fig:res:ideal},
+while keeping actions preceding 13:00 deferred.
 
-\begin{figure}[!b]
+\begin{figure}[!t]
   \centering
   \includegraphics[width=0.8\columnwidth]{figs/example_ideal}
   \vskip-3mm
