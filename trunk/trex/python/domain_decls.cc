@@ -91,6 +91,13 @@ namespace {
       return out<<xml();
     }
     
+    std::string json() const {
+      return this->get_override("json")();
+    }
+    std::ostream &toJSON(std::ostream &out, size_t) const {
+      return out<<json();
+    }
+
     std::string str() const {
       return this->get_override("__str__")();
     }
@@ -218,6 +225,13 @@ namespace {
   }
   
   template<class Obj>
+  std::string json_str(Obj const &dom) {
+    std::ostringstream oss;
+    dom.toJSON(oss);
+    return oss.str();
+  }
+
+  template<class Obj>
   std::string str_impl(Obj const &dom) {
     std::ostringstream oss;
     oss<<dom;
@@ -264,6 +278,7 @@ void export_domain() {
   .def("restrict", pure_virtual(&tt::DomainBase::restrictWith),
        return_internal_reference<>())
   .def("xml", pure_virtual(&xml_str<tt::DomainBase>))
+  .def("json", pure_virtual(&json_str<tt::DomainBase>))
   .def("__str__", pure_virtual(&str_impl<tt::DomainBase>))
   ;
   
@@ -314,6 +329,7 @@ void export_domain() {
          boost::noncopyable>("enumerated", "Abstract trex Enumerated domain",
                              init<tu::Symbol>())
   .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize))
+  // TODO need to implement __iter__
   ;
   
   
@@ -356,6 +372,7 @@ void export_domain() {
   .def("restrict", restrict_domain, return_internal_reference<>())
   .def("restrict", restrict_var, return_internal_reference<>())
   .def("xml", &xml_str<tt::Variable>)
+  .def("json", &json_str<tt::Variable>)
   .def("__str__", &str_impl<tt::Variable>)
   ;
 
