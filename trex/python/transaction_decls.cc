@@ -59,6 +59,11 @@ namespace {
     oss<<dom;
     return oss.str();
   }
+
+  boost::shared_ptr<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+    TREX::utils::SingletonUse<Predicate::xml_factory> fact;
+    return fact->produce(decl);
+  }
 }
 
 void export_transactions() {
@@ -92,6 +97,7 @@ void export_transactions() {
   .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
   .def("xml", &xml_str<Predicate>)
   .def("json", &json_str<Predicate>)
+  .def("from_xml", &pred_factory).staticmethod("from_xml");
   ;
   
   

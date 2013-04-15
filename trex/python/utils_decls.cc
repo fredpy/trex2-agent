@@ -194,12 +194,44 @@ namespace {
     bp::read_xml(fname, ret, bp::xml_parser::no_comments|bp::xml_parser::trim_whitespace);
     return ret;
   }
+
+  bool recompact(bp::ptree::value_type &val, size_t indent=0) {
+    if( val.second.empty() )
+      return false;
+    else {
+      bp::ptree tmp;
+      val.second.swap(tmp);
+      std::string pad(' ', indent);
+      
+      if( tmp.size()==tmp.count("") ) {
+        for(bp::ptree::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+          recompact(*i, indent+1);
+          val.second.add_child(val.first, i->second);
+        }
+        return true;
+      } else {
+        for(bp::ptree::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+          if( recompact(*i, indent+1) ) {
+            for(bp::ptree::iterator j=i->second.begin(); i->second.end()!=j;++j)
+              val.second.add_child(i->first, j->second);
+          } else {
+            val.second.add_child(i->first, i->second);
+          }
+        }
+        return false;
+      }
+    }
+  }
+  
   
   bp::ptree json_from_string(std::string const &str) {
     std::istringstream iss(str);
     bp::ptree ret;
     bp::read_json(iss, ret);
-    return ret;
+    bp::ptree::value_type tmp("", ret);
+    recompact(tmp);
+    
+    return tmp.second;
   }
   
   std::string xml_to_string(bp::ptree const &p) {
@@ -472,7 +504,7 @@ void export_utils() {
        "Parse the JSON text json_text into an xml tree.\n"
        "while JSON is not XML the class we use in trex to parse xml\n"
        "is boost.property_tree. This function iexists just ofr the sake\n"
-       "of testing JSON as an alterneate to trex xml format").staticmethod("from_json")
+       "of testing JSON as an alternate to trex xml format").staticmethod("from_json")
   .add_property("content",
                 make_function(static_cast<std::string const &(bp::ptree::*)() const>(&bp::ptree::data),
                               return_value_policy<copy_const_reference>()),
