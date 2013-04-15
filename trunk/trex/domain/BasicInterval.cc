@@ -105,21 +105,31 @@ std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
   return out<<"/>";
 }
 
+bool BasicInterval::json_protect() const {
+  return true;
+}
+
+
 std::ostream &BasicInterval::toJSON(std::ostream &out, size_t tabs) const {
   std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
+  std::string p;
+  
+  if( json_protect() )
+    p = "\"";
+  
   out<<'\"'<<getTypeName()<<"\": { ";
   if( isSingleton() )
-    print_singleton(out<<"\"value\": \"")<<'\"';
+    print_singleton(out<<"\"value\": "<<p)<<p;
   else {
     bool comma = false;
     if( hasLower() ) {
-      print_lower(out<<"\"min\": \"")<<'\"';
+      print_lower(out<<"\"min\": "<<p)<<p;
       comma = true;
     }
     if( hasUpper() ) {
       if( comma )
         out<<", ";
-      print_upper(out<<"\"max\": \"")<<'\"';
+      print_upper(out<<"\"max\": "<<p)<<p;
     }
   }
   return out<<'}';

@@ -48,14 +48,14 @@
 
 // statics :
 
-template<typename Ty, class Cmp>
-Cmp IntervalDomain<Ty, Cmp>::bound::s_cmp;    
+template<typename Ty, bool Prot, class Cmp>
+Cmp IntervalDomain<Ty, Prot, Cmp>::bound::s_cmp;
 
 // observers :
     
-template<typename Ty, class Cmp>
+template<typename Ty, bool Prot, class Cmp>
 std::ostream &
-IntervalDomain<Ty, Cmp>::bound::print_to(std::ostream &out)  const {
+IntervalDomain<Ty, Prot, Cmp>::bound::print_to(std::ostream &out)  const {
   if( m_inf )
     out<<(m_pos?'+':'-')<<"inf";
   else 
@@ -63,22 +63,22 @@ IntervalDomain<Ty, Cmp>::bound::print_to(std::ostream &out)  const {
   return out;
 }
 
-template<typename Ty, class Cmp>
-typename IntervalDomain<Ty, Cmp>::bound 
-IntervalDomain<Ty, Cmp>::bound::plus
-(typename IntervalDomain<Ty, Cmp>::bound const &other,
- typename IntervalDomain<Ty, Cmp>::bound const &onInf) const {
+template<typename Ty, bool Prot, class Cmp>
+typename IntervalDomain<Ty, Prot, Cmp>::bound
+IntervalDomain<Ty, Prot, Cmp>::bound::plus
+(typename IntervalDomain<Ty, Prot, Cmp>::bound const &other,
+ typename IntervalDomain<Ty, Prot, Cmp>::bound const &onInf) const {
   if( m_inf || other.m_inf )
     return onInf;
   else 
     return bound(m_value+other.m_value);
 }
 
-template<typename Ty, class Cmp>
-typename IntervalDomain<Ty, Cmp>::bound 
-IntervalDomain<Ty, Cmp>::bound::minus
-(typename IntervalDomain<Ty, Cmp>::bound const &other,
- typename IntervalDomain<Ty, Cmp>::bound const &onInf) const {
+template<typename Ty, bool Prot, class Cmp>
+typename IntervalDomain<Ty, Prot, Cmp>::bound 
+IntervalDomain<Ty, Prot, Cmp>::bound::minus
+(typename IntervalDomain<Ty, Prot, Cmp>::bound const &other,
+ typename IntervalDomain<Ty, Prot, Cmp>::bound const &onInf) const {
   if( other.m_inf || m_inf )
     return onInf;
   else 
@@ -87,8 +87,8 @@ IntervalDomain<Ty, Cmp>::bound::minus
 
 // modifiers :
 
-template<typename Ty, class Cmp>
-std::istream &IntervalDomain<Ty, Cmp>::bound::read_from(std::istream &in) {
+template<typename Ty, bool Prot, class Cmp>
+std::istream &IntervalDomain<Ty, Prot, Cmp>::bound::read_from(std::istream &in) {
   // Attempt first to get [+-]inf
   bool is_pos;
   std::string buff;
@@ -135,34 +135,34 @@ std::istream &IntervalDomain<Ty, Cmp>::bound::read_from(std::istream &in) {
 
 // statics :
 
-template<typename Ty, class Cmp>
-typename IntervalDomain<Ty, Cmp>::bound const 
-IntervalDomain<Ty, Cmp>::plus_inf(true, true);
+template<typename Ty, bool Prot, class Cmp>
+typename IntervalDomain<Ty, Prot, Cmp>::bound const
+IntervalDomain<Ty, Prot, Cmp>::plus_inf(true, true);
 
-template<typename Ty, class Cmp>
-typename IntervalDomain<Ty, Cmp>::bound const 
-IntervalDomain<Ty, Cmp>::minus_inf(false, true); 
+template<typename Ty, bool Prot, class Cmp>
+typename IntervalDomain<Ty, Prot, Cmp>::bound const
+IntervalDomain<Ty, Prot, Cmp>::minus_inf(false, true);
 
 // observers :
 
-template<typename Ty, class Cmp>
-bool IntervalDomain<Ty, Cmp>::intersect(DomainBase const &other) const {
+template<typename Ty, bool Prot, class Cmp>
+bool IntervalDomain<Ty, Prot, Cmp>::intersect(DomainBase const &other) const {
   if( getTypeName()!=other.getTypeName() ) 
     return false;
   else {
-    IntervalDomain<Ty, Cmp> const &ref 
-      = dynamic_cast<IntervalDomain<Ty, Cmp> const &>(other);
+    IntervalDomain<Ty, Prot, Cmp> const &ref
+      = dynamic_cast<IntervalDomain<Ty, Prot, Cmp> const &>(other);
     return !(m_upper.min(ref.m_upper)<m_lower.max(ref.m_lower));
   }
 }
 
-template<typename Ty, class Cmp>
-bool IntervalDomain<Ty, Cmp>::equals(DomainBase const &other) const {
+template<typename Ty, bool Prot, class Cmp>
+bool IntervalDomain<Ty, Prot, Cmp>::equals(DomainBase const &other) const {
   if( getTypeName()!=other.getTypeName() ) 
     return false;
   else {
-    IntervalDomain<Ty, Cmp> const &ref 
-      = dynamic_cast<IntervalDomain<Ty, Cmp> const &>(other);
+    IntervalDomain<Ty, Prot, Cmp> const &ref
+      = dynamic_cast<IntervalDomain<Ty, Prot, Cmp> const &>(other);
     return m_lower==ref.m_lower && m_upper==ref.m_upper;
   }
 }
@@ -171,8 +171,8 @@ bool IntervalDomain<Ty, Cmp>::equals(DomainBase const &other) const {
 
 // modifiers :
 
-template<typename Ty, class Cmp>
-void IntervalDomain<Ty, Cmp>::parseSingleton(std::string const &val) {
+template<typename Ty, bool Prot, class Cmp>
+void IntervalDomain<Ty, Prot, Cmp>::parseSingleton(std::string const &val) {
   bound tmp = TREX::utils::string_cast<bound>(val);
   if( tmp.isInfinity() )
     throw EmptyDomain(*this, "trying to set domain to an infinity singleton.");
@@ -181,8 +181,8 @@ void IntervalDomain<Ty, Cmp>::parseSingleton(std::string const &val) {
 }
 
 
-template<typename Ty, class Cmp>
-void IntervalDomain<Ty, Cmp>::parseLower(std::string const &val) {
+template<typename Ty, bool Prot, class Cmp>
+void IntervalDomain<Ty, Prot, Cmp>::parseLower(std::string const &val) {
   bound tmp = TREX::utils::string_cast<bound>(val);
   if( m_upper<tmp || 
       ( m_upper==tmp && m_upper.isInfinity() ) ) 
@@ -190,8 +190,8 @@ void IntervalDomain<Ty, Cmp>::parseLower(std::string const &val) {
   m_lower = tmp;
 }
 
-template<typename Ty, class Cmp>
-void IntervalDomain<Ty, Cmp>::parseUpper(std::string const &val) {
+template<typename Ty, bool Prot, class Cmp>
+void IntervalDomain<Ty, Prot, Cmp>::parseUpper(std::string const &val) {
   bound tmp = TREX::utils::string_cast<bound>(val);
   if( m_lower>tmp || 
       ( m_lower==tmp && m_lower.isInfinity() ) ) 
@@ -199,10 +199,10 @@ void IntervalDomain<Ty, Cmp>::parseUpper(std::string const &val) {
   m_upper = tmp;
 }
 
-template<typename Ty, class Cmp>
-DomainBase &IntervalDomain<Ty, Cmp>::restrictWith
-(IntervalDomain<Ty, Cmp>::bound const &lo,
- IntervalDomain<Ty, Cmp>::bound const &hi) {
+template<typename Ty, bool Prot, class Cmp>
+DomainBase &IntervalDomain<Ty, Prot, Cmp>::restrictWith
+(IntervalDomain<Ty, Prot, Cmp>::bound const &lo,
+ IntervalDomain<Ty, Prot, Cmp>::bound const &hi) {
   bound const &low = m_lower.max(lo);
   bound const &up = m_upper.min(hi);
   if( up<low )
@@ -213,13 +213,13 @@ DomainBase &IntervalDomain<Ty, Cmp>::restrictWith
 }
 
 
-template<typename Ty, class Cmp>
-DomainBase &IntervalDomain<Ty, Cmp>::restrictWith(DomainBase const &other) {
+template<typename Ty, bool Prot, class Cmp>
+DomainBase &IntervalDomain<Ty, Prot, Cmp>::restrictWith(DomainBase const &other) {
   if( getTypeName()!=other.getTypeName() )
     throw EmptyDomain(*this, "Incompatible types");
   else {
-    IntervalDomain<Ty, Cmp> const &ref 
-      = dynamic_cast<IntervalDomain<Ty, Cmp> const &>(other);
+    IntervalDomain<Ty, Prot, Cmp> const &ref
+      = dynamic_cast<IntervalDomain<Ty, Prot, Cmp> const &>(other);
     return restrictWith(ref.lowerBound(), ref.upperBound());
   }
   return *this;

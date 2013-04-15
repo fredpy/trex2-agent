@@ -71,7 +71,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    template< typename Ty, class Comp=std::less<Ty> >
+    template< typename Ty, bool Prot=true, class Comp=std::less<Ty> >
     class IntervalDomain :public BasicInterval {
     public:
       /** @brief subjacent type for interval */
@@ -334,7 +334,7 @@ namespace TREX {
 	std::istream &read_from(std::istream &in);
 	std::ostream &print_to(std::ostream &out) const;
 	  		
-	friend class IntervalDomain<Ty, Comp>;
+	friend class IntervalDomain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
 
       /** @brief Plus infinity bound
@@ -527,6 +527,10 @@ namespace TREX {
       }
  
     private:
+      bool json_protect() const {
+        return Prot;
+      }
+
       /** @brief interval lower bound */
       bound m_lower;
       /** @brief interval upper bound */

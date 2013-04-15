@@ -106,6 +106,9 @@ namespace TREX {
       boost::any getUpper() const {
 	return m_full?true:m_val;
       }
+      bool json_protect() const {
+        return false;
+      }
 
       void parseSingleton(std::string const &val) {}
       void parseLower(std::string const &val) {}
