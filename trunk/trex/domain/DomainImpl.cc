@@ -113,7 +113,22 @@ BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
     completeParsing(node); // to handle the case where someon used min/max attributes
 }
 
-std::ostream &BooleanDomain::toXml(std::ostream &out, 
+std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
+  if( m_full || !m_val )
+    return out<<"false";
+  else
+    return out<<"true";
+}
+
+std::ostream &BooleanDomain::print_upper(std::ostream &out) const {
+  if( m_full || m_val )
+    return out<<"true";
+  else
+    return out<<"false";  
+}
+
+
+std::ostream &BooleanDomain::toXml(std::ostream &out,
 				   size_t tabs) const {
     std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
     out<<"<bool";

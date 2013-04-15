@@ -50,6 +50,8 @@
 # include <sstream>
 # include <typeinfo>
 
+# include <boost/algorithm/string/case_conv.hpp>
+
 namespace TREX {
   namespace utils {
  
@@ -143,6 +145,19 @@ namespace TREX {
     inline std::string string_cast<std::string>(std::string const &in, 
 						std::ios_base &(*format)(std::ios_base &)) {
       return in;
+    }
+    
+    template<>
+    inline bool string_cast<bool>(std::string const &in,
+                           std::ios_base &(*format)(std::ios_base &)) {
+      std::string tmp = boost::algorithm::to_lower_copy(in);
+      
+      if( "true"==tmp )
+        return true;
+      else if( "false"==tmp )
+        return false;
+      else
+        return 0!=string_cast<int>(in,format);
     }
     
     /** @brief Convert string to type.
