@@ -153,3 +153,19 @@ std::ostream &Variable::toXml(std::ostream &out, size_t tabs) const {
   return out;
 }
 
+std::ostream &Variable::toJSON(std::ostream &out, size_t tabs) const {
+  std::ostream_iterator<char> pad(out);
+  std::fill_n(pad, tabs, ' ');
+  out<<"{\n";
+  std::fill_n(pad, tabs+1, ' ');
+  out<<"\"name\": \""<<name()<<"\"";
+  if( m_domain ) {
+    out<<",\n";
+    m_domain->toJSON(out, tabs+1);
+  }
+  out<<'\n';
+  std::fill_n(pad, tabs, ' ');
+  return out<<'}';
+}
+
+

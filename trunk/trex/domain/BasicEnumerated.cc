@@ -105,6 +105,36 @@ std::ostream &BasicEnumerated::toXml(std::ostream &out, size_t tabs) const {
   }
 }
 
+std::ostream &BasicEnumerated::toJSON(std::ostream &out, size_t tabs) const {
+  std::ostream_iterator<char> pad(out);
+  size_t i, size = getSize();
+  bool first = true;
+  
+  std::fill_n(pad, tabs, ' ');
+  out<<'\"'<<getTypeName()<<"\": ";
+  if( size>0 ) {
+    out<<"{\n";
+    std::fill_n(pad, tabs+1, ' ');
+    out<<"\"elem\": [";
+    for(i=0; i<size; ++i) {
+      if( first )
+        first = false;
+      else
+        out.put(',');
+      out.put('\n');
+      std::fill_n(pad, tabs+2, ' ');
+      out<<"{ \"value\": \""<<getStringValue(i)<<"\" }";
+    }
+    out.put('\n');
+    std::fill_n(pad, tabs+1, ' ');
+    out<<"]\n";
+    std::fill_n(pad, tabs, ' ');
+    return out.put('}');
+  } else
+    return out<<"null";
+}
+
+
 // manipulators
 
 void BasicEnumerated::accept(DomainVisitor &visitor) const {

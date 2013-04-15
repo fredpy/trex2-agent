@@ -78,7 +78,9 @@ namespace TREX {
 	return 1==getSize();
       }
       std::ostream &toXml(std::ostream &out, size_t tabs) const;
+      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
 
+      
       /** @brief element count
        *
        * This method gives access to the number of elements in this instance.

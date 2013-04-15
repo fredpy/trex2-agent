@@ -277,6 +277,8 @@ namespace TREX {
        * @return @a out after the operation
        */
       std::ostream &toXml(std::ostream &out, size_t pad=0) const;
+      std::ostream &toJSON(std::ostream &out, size_t tabs=0) const;
+      
 	
     private:
       typedef DomainBase::xml_factory::returned_type domain_ptr;

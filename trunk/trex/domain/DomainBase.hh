@@ -401,7 +401,10 @@ namespace TREX {
        */
       virtual std::ostream &toXml(std::ostream &out, 
 				  size_t tabs=0) const =0;
-
+      virtual std::ostream &toJSON(std::ostream &out,
+                                   size_t tabs=0) const =0;
+      
+      
       /** @brief XML parsing factory for domains
        *
        * This type defines the factory that should be manipulated
