@@ -113,12 +113,8 @@ namespace TREX {
       void parseSingleton(std::string const &val) {}
       void parseLower(std::string const &val) {}
       void parseUpper(std::string const &val) {}
-      std::ostream &print_lower(std::ostream &out) const {
-	return out<<(m_full?false:m_val);
-      }
-      std::ostream &print_upper(std::ostream &out) const {
-	return out<<(m_full?true:m_val);
-      }
+      std::ostream &print_lower(std::ostream &out) const;
+      std::ostream &print_upper(std::ostream &out) const;
 
 
       /** @brief Flag for full domain
