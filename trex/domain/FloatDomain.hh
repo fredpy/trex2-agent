@@ -61,9 +61,9 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class FloatDomain :public IntervalDomain<double> {
+    class FloatDomain :public IntervalDomain<double, false> {
     public:
-      using typename IntervalDomain<double>::bound;
+      using typename IntervalDomain<double, false>::bound;
       
       /** @brief Symbolic type name for this domain
        *
@@ -79,7 +79,7 @@ namespace TREX {
        * Create a full float domain
        */
       FloatDomain()
-	:IntervalDomain<double>(type_name) {}
+	:IntervalDomain<double, false>(type_name) {}
       /** @brief Constructor
        *
        * @param node A XML node
@@ -91,7 +91,7 @@ namespace TREX {
        * @throw EmptyDomain the resulting interval is empty
        */
       FloatDomain(boost::property_tree::ptree::value_type &node)
-	:IntervalDomain<double>(node) {}
+	:IntervalDomain<double, false>(node) {}
       /** @brief Constructor
        * @param lb A lower bound
        * @param ub An upper bound
@@ -101,7 +101,7 @@ namespace TREX {
        * @throw EmptyDomain the resulting domain is empty
        */
       FloatDomain(bound const &lb, bound const ub)
-	:IntervalDomain<double>(type_name, lb, ub) {}
+	:IntervalDomain<double, false>(type_name, lb, ub) {}
       /** @brief Constructor
        * @param val A value
        *
@@ -110,7 +110,7 @@ namespace TREX {
        * [val, val]
        */
       FloatDomain(double val) 
-	:IntervalDomain<double>(type_name, val) {}
+	:IntervalDomain<double, false>(type_name, val) {}
       /** @brief Destructor */
       ~FloatDomain() {}
 

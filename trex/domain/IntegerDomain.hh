@@ -57,7 +57,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class IntegerDomain :public IntervalDomain<long long> {
+    class IntegerDomain :public IntervalDomain<long long, false> {
     public:
       /** @brief Symbolic type name for this domain
        *
@@ -73,7 +73,7 @@ namespace TREX {
        * Create a full integer domain
        */
       IntegerDomain() 
-	:IntervalDomain<long long>(type_name) {}
+	:IntervalDomain<long long, false>(type_name) {}
       /** @brief Constructor
        *
        * @param node A XML node
@@ -85,7 +85,7 @@ namespace TREX {
        * @throw EmptyDomain the resulting interval is empty
        */
       IntegerDomain(boost::property_tree::ptree::value_type &node)
-	:IntervalDomain<long long>(node) {}
+	:IntervalDomain<long long, false>(node) {}
       /** @brief Constructor
        * @param lb A lower bound
        * @param ub An upper bound
@@ -94,9 +94,9 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      IntegerDomain(IntervalDomain<long long>::bound const &lb, 
-		    IntervalDomain<long long>::bound const ub)
-	:IntervalDomain<long long>(type_name, lb, ub) {}
+      IntegerDomain(IntervalDomain<long long, false>::bound const &lb,
+		    IntervalDomain<long long, false>::bound const ub)
+	:IntervalDomain<long long, false>(type_name, lb, ub) {}
       /** @brief Constructor
        * @param val A value
        *
@@ -105,7 +105,7 @@ namespace TREX {
        * [val, val]
        */
       IntegerDomain(long long val) 
-	:IntervalDomain<long long>(type_name, val) {}
+	:IntervalDomain<long long, false>(type_name, val) {}
       /** @brief Destructor */
       ~IntegerDomain() {}
 

@@ -120,6 +120,8 @@ namespace TREX {
 
       void completeParsing(boost::property_tree::ptree::value_type &node);
 
+      virtual bool json_protect() const;
+      
       virtual void parseLower(std::string const &val) =0;
       virtual void parseUpper(std::string const &val) =0;
       virtual void parseSingleton(std::string const &val) =0;
