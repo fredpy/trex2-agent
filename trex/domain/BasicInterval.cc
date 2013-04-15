@@ -105,6 +105,27 @@ std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
   return out<<"/>";
 }
 
+std::ostream &BasicInterval::toJSON(std::ostream &out, size_t tabs) const {
+  std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
+  out<<'\"'<<getTypeName()<<"\": { ";
+  if( isSingleton() )
+    print_singleton(out<<"\"value\": \"")<<'\"';
+  else {
+    bool comma = false;
+    if( hasLower() ) {
+      print_lower(out<<"\"min\": \"")<<'\"';
+      comma = true;
+    }
+    if( hasUpper() ) {
+      if( comma )
+        out<<", ";
+      print_upper(out<<"\"max\": \"")<<'\"';
+    }
+  }
+  return out<<'}';
+}
+
+
 // manipulators
 
 void BasicInterval::accept(DomainVisitor &visitor) const {

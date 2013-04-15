@@ -297,6 +297,7 @@ namespace TREX {
        * @return @e out after the operation
        */
       std::ostream &toXml(std::ostream &out, size_t tabs=0) const;
+      std::ostream &toJSON(std::ostream &out, size_t tabs=0) const;
 
       /** @brief XML parsing factory for predicates
        *

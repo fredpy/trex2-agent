@@ -79,6 +79,7 @@ namespace TREX {
       }
 
       std::ostream &toXml(std::ostream &out, size_t tabs) const;
+      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
 
       virtual boost::any getLower() const =0;
       virtual boost::any getUpper() const =0;

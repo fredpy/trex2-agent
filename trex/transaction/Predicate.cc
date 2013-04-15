@@ -128,6 +128,41 @@ std::ostream &Predicate::toXml(std::ostream &out, size_t tabs) const {
   return out;
 }
 
+std::ostream &Predicate::toJSON(std::ostream &out, size_t tabs) const {
+  std::list<Symbol> vars;
+  std::ostream_iterator<char> pad(out);
+
+  std::fill_n(pad, tabs, ' ');
+  out<<"{\n";
+  std::fill_n(pad, tabs+1, ' ');
+  out<<"\"on\": \""<<object()<<"\",\n";
+  std::fill_n(pad, tabs+1, ' ');
+  out<<"\"pred\": \""<<predicate()<<"\"";
+  listAttributes(vars, false);
+  if( !vars.empty() ) {
+    out<<",\n";
+    std::fill_n(pad, tabs+1, ' ');
+    out<<"\"Variable\": [";
+    bool first = true;
+    do {
+      if( first )
+        first = false;
+      else
+        out.put(',');
+      out.put('\n');
+      getAttribute(vars.front()).toJSON(out, tabs+2);
+      vars.pop_front();
+    } while( !vars.empty() );
+    out.put('\n');
+    std::fill_n(pad, tabs+1, ' ');
+    out.put(']');
+  }
+  out.put('\n');
+  std::fill_n(pad, tabs, ' ');
+  return out.put('}');
+}
+
+
 void Predicate::listAttributes(std::list<TREX::utils::Symbol> &attrs,
 			       bool all) const {
   const_iterator i = begin();
