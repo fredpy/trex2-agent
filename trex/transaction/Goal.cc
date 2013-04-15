@@ -119,7 +119,7 @@ void Goal::restrictAttribute(Variable const &var) {
     restrictStart(var.typedDomain<IntegerDomain>());
   else if( s_durationName==id ) 
     restrictDuration(var.typedDomain<IntegerDomain>());
-  else if( s_durationName==id ) 
+  else if( s_endName==id )
     restrictEnd(var.typedDomain<IntegerDomain>());
   else 
     Predicate::restrictAttribute(var);
