@@ -39,6 +39,28 @@ using namespace TREX::python;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+namespace {
+  template<class Obj>
+  std::string xml_str(Obj const &dom) {
+    std::ostringstream oss;
+    dom.toXml(oss);
+    return oss.str();
+  }
+
+  template<class Obj>
+  std::string json_str(Obj const &dom) {
+    std::ostringstream oss;
+    dom.toJSON(oss);
+    return oss.str();
+  }
+  template<class Obj>
+  std::string str_impl(Obj const &dom) {
+    std::ostringstream oss;
+    oss<<dom;
+    return oss.str();
+  }
+}
+
 void export_transactions() {
   // Setup my submodule
   bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("trex.transaction"))));
@@ -68,6 +90,8 @@ void export_transactions() {
   .def("attribute", &Predicate::getAttribute, bp::return_internal_reference<>(), (bp::arg("name")))
   .def("restrict", attr_1, (bp::arg("var")))
   .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
+  .def("xml", &xml_str<Predicate>)
+  .def("json", &json_str<Predicate>)
   ;
   
   
@@ -91,6 +115,34 @@ void export_transactions() {
   bp::class_<Goal, goal_id, bp::bases<Predicate> >
   ("goal", "trex goal", bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
                                                  "Create new goal pred on timeline"));
+
+  
+  bp::class_<TICK, boost::noncopyable>("tick", "trex tick date", bp::init<>())
+  .def(bp::init<long>())
+  .def("__str__", &str_impl<TICK>)
+  .def(bp::self == bp::self)
+  .def(bp::self != bp::self)
+  .def(bp::self < bp::self)
+  .def(bp::self <= bp::self)
+  .def(bp::self > bp::self)
+  .def(bp::self >= bp::self)
+  ;
+  
+  bp::implicitly_convertible<long, TICK>();
+  
+  
+  bp::class_<graph, boost::noncopyable> c_graph("graph", "reactors transaction graph", bp::no_init);
+  
+  
+  
+  c_graph.def("name", &graph::getName, bp::return_internal_reference<>())
+  .add_property("empty", &graph::empty)
+  .add_property("reactors_count", &graph::count_reactors)
+  .add_property("relations_count", &graph::count_relations)
+  .add_property("current_tick", &graph::getCurrentTick, "current tick date")
+  .def("date_str", &graph::date_str, "convert a tick into a date string")
+  ;
+
 }
 
 /*
