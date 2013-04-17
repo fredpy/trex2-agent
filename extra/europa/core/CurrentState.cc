@@ -337,7 +337,7 @@ bool CurrentState::commit() {
 // manipulators
 
 void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
-   static bool bfs(false), dist(true);
+   static bool bfs(true), dist(false);
 
   std::list<EUROPA::TokenId>::const_iterator
     i = timeline()->getTokenSequence().begin(),

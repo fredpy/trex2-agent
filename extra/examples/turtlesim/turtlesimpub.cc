@@ -5,8 +5,8 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::TREXturtlesim;
 
-Symbol const TurtleSimPub::PoseObj("turtle1/pose");
-Symbol const TurtleSimPub::ControlObj("turtle1/command_velocity");
+Symbol const TurtleSimPub::PoseObj("pose");
+Symbol const TurtleSimPub::ControlObj("turtle");
 
 TurtleSimPub::TurtleSimPub(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false)
@@ -33,10 +33,14 @@ TurtleSimPub::~TurtleSimPub()
 
 void TurtleSimPub::handleInit()
 {
-    m_sub.push_back(m_ros->subscribe(PoseObj.str(), 10, &TurtleSimPub::poseCallback, this));
+    m_sub.push_back(m_ros->subscribe("turtle1/pose", 10, &TurtleSimPub::poseCallback, this));
 
     m_pub.insert(make_pair(ControlObj, m_ros->advertise<turtlesim::Velocity>("turtle1/command_velocity", 1)));
     spinner->start();
+
+    m_nextTick = getCurrentTick();
+    //Post the inital state of the turtle
+    stop();
 }
 
 void TurtleSimPub::poseCallback(const turtlesim::Pose::ConstPtr& msg)
@@ -65,31 +69,25 @@ void TurtleSimPub::poseCallback(const turtlesim::Pose::ConstPtr& msg)
 
 bool TurtleSimPub::synchronize()
 {
+    bool postedToTurtle = false;
     TICK cur = getCurrentTick();
     if(m_nextTick<=cur)
     {
-        Observation state(ControlObj, ControlObj);
-        turtlesim::Velocity msg;
-        msg.linear = 1;
-        state.restrictAttribute("linear", FloatDomain(msg.linear));
-        msg.angular = .5;
-        state.restrictAttribute("angular", FloatDomain(msg.angular));
-        m_pub[ControlObj].publish(msg);
-        postObservation(state);
-        if(!obs.empty())
-        {
-            //postObservation(obs.front());
-            //obs.clear();
-        }
         while(!m_pending.empty())
         {
             if(m_pending.front()->startsAfter(cur))
             {
-                if(m_pending.front()->startsBefore(cur))
+                if(m_pending.front()->startsBefore(cur)+1)
                 {
-                    //setValue(m_pending.front());
-                    //m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
+                    if(m_pending.front()->predicate()==Symbol("stop"))
+                    {
+                        stop();
+                    } else {
+                        move(m_pending.front());
+                    }
+                    m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
                     m_pending.pop_front();
+                    postedToTurtle = true;
                 }
                 break;
             } else {
@@ -97,12 +95,62 @@ bool TurtleSimPub::synchronize()
             }
         }
     }
+    if(!postedToTurtle)
+    {
+        updateTurtle();
+    }
     return true;
+}
+
+void TurtleSimPub::move(TREX::transaction::goal_id const &g)
+{
+    Observation state(ControlObj, "move");
+    turtlesim::Velocity msg;
+    msg.linear = boost::any_cast<double>(g->getAttribute(Symbol("lin_vel")).domain().getSingleton());
+    linear_velocity = msg.linear;
+    state.restrictAttribute("lin_vel", FloatDomain(msg.linear));
+    msg.angular = boost::any_cast<double>(g->getAttribute(Symbol("ang_vel")).domain().getSingleton());
+    angular_velocity = msg.angular;
+    state.restrictAttribute("ang_vel", FloatDomain(msg.angular));
+    m_pub[ControlObj].publish(msg);
+    postObservation(state);
+}
+
+void TurtleSimPub::stop()
+{
+    Observation state(ControlObj, Symbol("stop"));
+    angular_velocity = 0;
+    linear_velocity = 0;
+    postObservation(state);
+}
+
+void TurtleSimPub::updateTurtle()
+{
+    turtlesim::Velocity msg;
+    msg.linear = linear_velocity;
+    msg.angular = angular_velocity;
+    m_pub[ControlObj].publish(msg);
 }
 
 void TurtleSimPub::handleRequest(goal_id const &g)
 {
-
+    if(g->predicate()==Symbol("move") || g->predicate()==Symbol("stop"))
+    {
+        IntegerDomain::bound lo = g->getStart().lowerBound();
+        if(lo.isInfinity())
+        {
+            m_pending.push_front(g);
+        } else {
+            std::list<goal_id>::iterator i = m_pending.begin();
+            TICK val = lo.value();
+            for(; i!=m_pending.end(); ++i)
+            {
+                if((*i)->startsAfter(val))
+                    break;
+            }
+            m_pending.insert(i,g);
+        }
+    }
 }
 
 void TurtleSimPub::handleRecall(goal_id const &g)
