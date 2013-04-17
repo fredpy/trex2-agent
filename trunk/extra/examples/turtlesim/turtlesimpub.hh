@@ -34,6 +34,10 @@ namespace TREX {
                 void handleRequest(TREX::transaction::goal_id const &g);
                 void handleRecall(TREX::transaction::goal_id const &g);
 
+                void move(TREX::transaction::goal_id const &g);
+                void stop();
+                void updateTurtle();
+
 
                 TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
@@ -42,7 +46,7 @@ namespace TREX {
                 std::map<TREX::utils::Symbol, ros::Publisher> m_pub;
                 ros::AsyncSpinner* spinner;
 #if 0 // TODO see include above
-	  typedef boost::recursive_mutex mutex;
+                typedef boost::recursive_mutex mutex;
                 mutex Messagelock;
 #else 
 	  typedef boost::recursive_mutex mutex;
@@ -50,6 +54,8 @@ namespace TREX {
 #endif 
 
                 std::list<TREX::transaction::Observation> obs;
+
+                double angular_velocity, linear_velocity;
 
                 TREX::transaction::TICK m_nextTick;
                 TREX::transaction::TICK m_nextPoseTick;
