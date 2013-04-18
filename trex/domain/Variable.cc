@@ -158,11 +158,14 @@ std::ostream &Variable::toJSON(std::ostream &out, size_t tabs) const {
   std::fill_n(pad, tabs, ' ');
   out<<"{\n";
   std::fill_n(pad, tabs+1, ' ');
-  out<<"\"name\": \""<<name()<<"\"";
+  out<<"\"name\": \""<<name()<<"\",\n";
+  std::fill_n(pad, tabs+1, ' ');
+  out<<"\"type\": ";
   if( m_domain ) {
-    out<<",\n";
+    out<<'\"'<<m_domain->getTypeName()<<"\",\n";
     m_domain->toJSON(out, tabs+1);
-  }
+  } else
+    out<<"null";
   out<<'\n';
   std::fill_n(pad, tabs, ' ');
   return out<<'}';
