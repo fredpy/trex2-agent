@@ -33,32 +33,20 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_custom_target(plugins COMMENT "TREX plugins")
+option(WITH_REST "Enable REST based web API for trex agent" OFF)
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION ${TREX_SHARED}/plugins OPTIONAL 
-    EXPORT trex-plugins)
-  trex_cfg(cfg ${TREX_SHARED})
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg FALSE)
-endmacro(trex_plugin)
+if(WITH_REST) 
+  find_package(Wt)
 
-# the directories where plugins are located
-add_subdirectory(REST)
-add_subdirectory(witre.old)
-# add_subdirectory(witre)
-add_subdirectory(europa)
-
-# 3rd party plug-ins
-add_subdirectory(third_party)
-
-# backward compatibility stuff
-add_subdirectory(backward)
-
-# examples 
-add_subdirectory(examples)
-
-
+  if(Wt_FOUND)
+    include_directories(${Wt_INCLUDE_DIR})
+    
+    trex_plugin(REST REST_pg.cc)
+    target_link_libraries(REST_pg
+      ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
+      TREXtransaction)
+  else(Wt_FOUND)
+    message(WARNING "Unable to find Wt!!! Disabling REST plugin")
+    set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt" FORCE)
+  endif(Wt_FOUND)
+endif(WITH_REST)
