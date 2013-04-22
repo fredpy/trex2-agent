@@ -106,60 +106,24 @@ std::ostream &Predicate::print_to(std::ostream &out) const {
   return out;
 }
 
-std::ostream &Predicate::toXml(std::ostream &out, size_t tabs) const {
+boost::property_tree::ptree Predicate::as_tree() const {
   std::list<Symbol> vars;
-  std::ostream_iterator<char> pad(out);
+  boost::property_tree::ptree ret;
+  boost::property_tree::ptree &val = ret.add_child(getPredTag().str(), boost::property_tree::ptree());
   
-  std::fill_n(pad, tabs, ' ');
-  out<<"<"<<getPredTag()<<" on=\""<<object()
-     <<"\" pred=\""<<predicate()<<'\"';
+  set_attr(val, "on", object());
+  set_attr(val, "pred", predicate());
   listAttributes(vars, false);
-  if( vars.empty() )
-    out<<"/>";
-  else {
-    out<<">\n";
-    do {
-      getAttribute(vars.front()).toXml(out, tabs+1)<<'\n';
-      vars.pop_front();
-    } while( !vars.empty() );
-    std::fill_n(pad, tabs, ' ');
-    out<<"</"<<getPredTag()<<'>';
-  }
-  return out;
-}
-
-std::ostream &Predicate::toJSON(std::ostream &out, size_t tabs) const {
-  std::list<Symbol> vars;
-  std::ostream_iterator<char> pad(out);
-
-  std::fill_n(pad, tabs, ' ');
-  out<<"{\n";
-  std::fill_n(pad, tabs+1, ' ');
-  out<<"\"on\": \""<<object()<<"\",\n";
-  std::fill_n(pad, tabs+1, ' ');
-  out<<"\"pred\": \""<<predicate()<<"\"";
-  listAttributes(vars, false);
+  
   if( !vars.empty() ) {
-    out<<",\n";
-    std::fill_n(pad, tabs+1, ' ');
-    out<<"\"Variable\": [";
-    bool first = true;
+    boost::property_tree::ptree &tmp = val.add_child("Variable", boost::property_tree::ptree());
+    
     do {
-      if( first )
-        first = false;
-      else
-        out.put(',');
-      out.put('\n');
-      getAttribute(vars.front()).toJSON(out, tabs+2);
+      tmp.push_back(boost::property_tree::ptree::value_type("", getAttribute(vars.front()).as_tree()));
       vars.pop_front();
     } while( !vars.empty() );
-    out.put('\n');
-    std::fill_n(pad, tabs+1, ' ');
-    out.put(']');
   }
-  out.put('\n');
-  std::fill_n(pad, tabs, ' ');
-  return out.put('}');
+  return ret;
 }
 
 

@@ -63,7 +63,7 @@ size_t asio_runner::thread_count(size_t n, bool override) {
   // correct the number of threads
   if( !override ) {
     // Max thread is number of cores minus the main thread
-    size_t max_count = boost::thread::hardware_concurrency()-1;
+    size_t max_count = 2*boost::thread::hardware_concurrency();
     
     if( n > max_count )
       n=max_count;

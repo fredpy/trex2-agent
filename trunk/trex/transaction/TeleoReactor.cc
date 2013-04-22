@@ -48,9 +48,91 @@
 
 #include <boost/scope_exit.hpp>
 
-using namespace TREX::transaction;
+#include <bitset>
+
 using TREX::utils::Symbol;
 namespace utils=TREX::utils;
+
+namespace TREX {
+  namespace transaction {
+    
+    class TeleoReactor::Logger {
+    public:
+      Logger(std::string const &dest, boost::asio::io_service &io);
+      ~Logger();
+      
+      void provide(Symbol const &name, bool goals, bool plan);
+      void unprovide(Symbol const &name);
+      
+      void use(Symbol const &name , bool goals, bool plan);
+      void unuse(Symbol const &name);
+      
+      void init(TICK val);
+      void newTick(TICK val);
+      void synchronize();
+      
+      void failed();
+      void has_work();
+      void work(bool ret);
+      void step();
+      
+      void observation(Observation const &obs);
+      void request(goal_id const &goal);
+      void recall(goal_id const &goal);
+      
+      void comment(std::string const &msg);
+      void notifyPlan(goal_id const &tok);
+      void cancelPlan(goal_id const &tok);
+      
+    private:
+      boost::asio::strand           m_strand;
+      boost::asio::io_service::work m_active;
+      std::ofstream                 m_file;
+      
+      enum {
+        header      = 0,
+        tick        = 1,
+        tick_opened = 2,
+        in_phase    = 3,
+        has_data    = 4
+      };
+      
+      std::bitset<5> m_flags;
+      
+      enum tick_phase {
+        in_init,
+        in_new_tick,
+        in_synchronize,
+        in_work,
+        in_step
+      };
+      
+      tick_phase m_phase;
+      TICK m_current;
+      
+      void obs(Observation o);
+      void goal_event(std::string tag, goal_id g, bool full);
+      
+      void post_event(boost::function<void ()> fn);
+      void phase_event(boost::function<void ()> fn);
+      
+      void open_tick();
+      void open_phase();
+      void close_phase();
+      void close_tick();
+      
+      void set_tick(TICK val, tick_phase p);
+      void set_phase(tick_phase p);
+      void direct_write(std::string const &content, bool nl);
+      
+    };
+    
+  }
+}
+
+
+
+using namespace TREX::transaction;
 
 /*
  * class TREX::transaction::ReactorException
@@ -245,7 +327,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = getName().str()+".tr.log";
     fname = manager().file_name(base);
-    m_trLog = new Logger(fname.string());
+    m_trLog = new Logger(fname.string(), manager().service());
     utils::LogManager::path_type cfg = manager().file_name("cfg"), 
       pwd = boost::filesystem::current_path(), 
       short_name(base), location("../"+base);
@@ -291,7 +373,7 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
      
   if( log ) {
     fname = manager().file_name(getName().str()+".tr.log");
-    m_trLog = new Logger(fname.string());
+    m_trLog = new Logger(fname.string(), manager().service());
     syslog(info)<<"Transactions logged to "<<fname;
 
   }
@@ -299,8 +381,9 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
 
 TeleoReactor::~TeleoReactor() {
   isolate(false);
-  if( NULL!=m_trLog )
+  if( NULL!=m_trLog ) {
     delete m_trLog;
+  }
 }
 
 // observers
@@ -342,8 +425,6 @@ void TeleoReactor::reset_deadline() {
   m_nSteps = 0;  
   m_past_deadline = false;
 }
-
-
 
 double TeleoReactor::workRatio() {
   bool ret = false;
@@ -670,6 +751,18 @@ bool TeleoReactor::unprovide(TREX::utils::Symbol const &timeline) {
 }
 
 
+void TeleoReactor::isolate(bool failed) {
+  if( NULL!=m_trLog && failed ) {
+    Logger *tmp = NULL;
+    std::swap(tmp, m_trLog);
+    tmp->failed();
+    delete tmp;
+  }
+  clear_internals();
+  clear_externals();
+}
+
+
 void TeleoReactor::clear_internals() {
   while( !m_internals.empty() ) {
     m_internals.front()->unassign(getCurrentTick());
@@ -778,198 +871,243 @@ void TeleoReactor::unblock(Symbol const &name) {
  * class TREX::transaction::TeleoReactor::Logger
  */
 
-TeleoReactor::Logger::Logger(std::string const &file_name)
-  :m_file(file_name.c_str()), m_header(true), m_tick(false), 
-   m_tick_opened(false), m_in_phase(false), m_hasData(false) {
-  m_file<<"<Log>\n  <header>"<<std::endl;
+// structors
+
+TeleoReactor::Logger::Logger(std::string const &dest, boost::asio::io_service &io)
+:m_strand(io), m_active(io), m_file(dest.c_str()) {
+  m_flags.set(header);
+  m_strand.post(boost::bind(&Logger::direct_write, this, "<Log>\n <header>",
+                            true));
 }
 
 TeleoReactor::Logger::~Logger() {
-  close_tick();
-  m_file<<"</Log>\n";
+  //std::cerr<<"Destroy logger "<<std::endl;
+  //std::cerr<<" - schedulle : close potential tick tag"<<std::endl;
+  
+  m_strand.post(boost::bind(&Logger::close_tick, this));
+  //std::cerr<<" - build task : close the main tag"<<std::endl;
+  boost::packaged_task<void> close_xml(boost::bind(&Logger::direct_write,
+                                                   this, "</Log>",
+                                                   true));
+  //std::cerr<<" - get future of the task"<<std::endl;
+  boost::unique_future<void> completed = close_xml.get_future();
+  //std::cerr<<" - scedulled task execution"<<std::endl;
+  m_strand.post(boost::bind(&boost::packaged_task<void>::operator(),
+                            boost::ref(close_xml)));
+  //std::cerr<<" - wait for task completion"<<std::endl;
+  completed.wait();
+  //std::cerr<<" - close the file"<<std::endl;
   m_file.close();
 }
 
-void TeleoReactor::Logger::provide(TREX::utils::Symbol const &name, 
-				   bool goals, bool plan) {
-  open_phase();
-  m_file<<"      <provide name=\""<<name
-	<<"\" goals=\""<<goals
-	<<"\" plan=\""<<plan<<"\"/>"<<std::endl;
-}
-
-void TeleoReactor::Logger::use(TREX::utils::Symbol const &name, 
-			       bool goals, bool plan) {
-  open_phase();
-  m_file<<"      <use name=\""<<name
-	<<"\" goals=\""<<goals
-	<<"\" plan=\""<<plan<<"\"/>"<<std::endl;
-}
-
-void TeleoReactor::Logger::unprovide(TREX::utils::Symbol const &name) {
-  open_phase();
-  m_file<<"      <unprovide name=\""<<name<<"\"/>"<<std::endl;
-}
-
-void TeleoReactor::Logger::unuse(TREX::utils::Symbol const &name) {
-  open_phase();
-  m_file<<"      <unuse name=\""<<name<<"\"/>"<<std::endl;
-}
+// interface
 
 void TeleoReactor::Logger::comment(std::string const &msg) {
-  open_phase();
-  m_file<<"    <!-- "<<msg<<" -->"<<std::endl;
+  m_strand.post(boost::bind(&Logger::direct_write, this, "<!-- "+msg+" -->",
+                            true));
 }
 
 void TeleoReactor::Logger::init(TICK val) {
-  close_tick();
-  m_tick = true;
-  m_current = val;
-  m_in_phase = true;
-  m_phase = in_init;
+  m_strand.post(boost::bind(&Logger::set_tick, this, val, in_init));
 }
 
 void TeleoReactor::Logger::newTick(TICK val) {
-  close_tick();
-  m_tick = true;
-  m_current = val;
-  m_in_phase = true;
-  m_phase = in_new_tick;
+  m_strand.post(boost::bind(&Logger::set_tick, this, val, in_new_tick));
 }
 
 void TeleoReactor::Logger::synchronize() {
-  close_phase();
-  m_in_phase = true;
-  m_phase = in_synchronize;
+  m_strand.post(boost::bind(&Logger::set_phase, this, in_synchronize));
 }
 
 void TeleoReactor::Logger::failed() {
-  open_phase();
-  m_file<<"      <failed/>"<<std::endl;
+  post_event(boost::bind(&Logger::direct_write,
+                         this, "   <failed/>", true));
 }
 
-
 void TeleoReactor::Logger::has_work() {
-  close_phase();
-  m_in_phase = true;
-  m_phase = in_work;
+  m_strand.post(boost::bind(&Logger::set_phase, this, in_work));
+}
+
+void TeleoReactor::Logger::step() {
+  m_strand.post(boost::bind(&Logger::set_phase, this, in_step));
 }
 
 void TeleoReactor::Logger::work(bool ret) {
+  std::ostringstream oss;
+  oss<<"   <work value=\""<<ret<<"\" />";
+  post_event(boost::bind(&Logger::direct_write,
+                         this, oss.str(), true));
+}
+
+void TeleoReactor::Logger::provide(Symbol const &name, bool goals, bool plan) {
+  std::ostringstream oss;
+  oss<<"   <provide name=\""<<name
+  <<"\" goals=\""<<goals
+  <<"\" plan=\""<<plan<<"\" />";
+  post_event(boost::bind(&Logger::direct_write,
+                         this, oss.str(), true));
+}
+
+void TeleoReactor::Logger::unprovide(Symbol const &name) {
+  std::ostringstream oss;
+  oss<<"   <unprovide name=\""<<name<<"\" />";
+  post_event(boost::bind(&Logger::direct_write,
+                         this, oss.str(), true));  
+}
+
+void TeleoReactor::Logger::use(Symbol const &name, bool goals, bool plan) {
+  std::ostringstream oss;
+  oss<<"   <use name=\""<<name
+  <<"\" goals=\""<<goals
+  <<"\" plan=\""<<plan<<"\" />";
+  post_event(boost::bind(&Logger::direct_write,
+                         this, oss.str(), true));
+}
+
+void TeleoReactor::Logger::unuse(Symbol const &name) {
+  std::ostringstream oss;
+  oss<<"   <unuse name=\""<<name<<"\" />";
+  post_event(boost::bind(&Logger::direct_write,
+                         this, oss.str(), true));
+}
+
+void TeleoReactor::Logger::observation(Observation const &o) {
+  post_event(boost::bind(&Logger::obs, this, o));
+}
+
+void TeleoReactor::Logger::request(goal_id const &goal) {
+  post_event(boost::bind(&Logger::goal_event, this, "request", goal, true));
+}
+
+void TeleoReactor::Logger::recall(goal_id const &goal) {
+  post_event(boost::bind(&Logger::goal_event, this, "recall", goal, false));
+}
+
+void TeleoReactor::Logger::notifyPlan(goal_id const &tok) {
+  post_event(boost::bind(&Logger::goal_event, this, "token", tok, true));
+}
+
+void TeleoReactor::Logger::cancelPlan(goal_id const &tok) {
+  post_event(boost::bind(&Logger::goal_event, this, "cancel", tok, false));
+}
+
+
+// asio methods
+
+void TeleoReactor::Logger::obs(Observation o) {
+  o.to_xml(m_file)<<std::endl;
+}
+
+
+void TeleoReactor::Logger::goal_event(std::string tag, goal_id g, bool full) {
+  m_file<<"   <"<<tag<<" id=\""<<g<<"\" ";
+  if( full )
+    g->to_xml(m_file<<">\n")<<"\n   </"<<tag<<">"<<std::endl;
+  else
+    direct_write("/>", true);
+}
+
+void TeleoReactor::Logger::post_event(boost::function<void ()> fn) {
+  m_strand.post(boost::bind(&Logger::phase_event, this, fn));
+}
+
+void TeleoReactor::Logger::phase_event(boost::function<void ()> fn) {
   open_phase();
-  m_file<<"      <work value=\""<<ret<<"\"/>"<<std::endl;
+  fn();
 }
 
+void TeleoReactor::Logger::set_tick(TICK val, TeleoReactor::Logger::tick_phase p) {
+  close_tick();
+  m_current = val;
+  m_phase = p;
+  m_flags.set(tick);
+  m_flags.set(in_phase);
+}
 
-void TeleoReactor::Logger::step() {
+void TeleoReactor::Logger::set_phase(TeleoReactor::Logger::tick_phase p) {
   close_phase();
-  m_in_phase = true;
-  m_phase = in_step;
-}
-
-void TeleoReactor::Logger::open_tick() {
-  if( m_tick ) {
-    if( !m_tick_opened ) {
-      m_file<<"  <tick value=\""<<m_current<<"\">\n";
-      m_tick_opened = true;
-    } 
-  }
+  m_phase = p;
+  m_flags.set(in_phase);
 }
 
 void TeleoReactor::Logger::open_phase() {
-  if( m_in_phase && !m_hasData ) {
-    open_tick(); 
-  
-    switch(m_phase) {
+  if( m_flags.test(in_phase) && !m_flags.test(has_data) ) {
+    open_tick();
+    switch( m_phase ) {
       case in_init:
-	m_file<<"    <init>"<<std::endl;
-	break;
+        direct_write("  <init>", true);
+        break;
       case in_new_tick:
-	m_file<<"    <start>"<<std::endl;
-	break;
+        direct_write("  <start>", true);
+        break;
       case in_synchronize:
-	m_file<<"    <synchronize>"<<std::endl;
-	break;
+        direct_write("  <synchronize>", true);
+        break;
       case in_work:
-	m_file<<"    <has_work>"<<std::endl;
-	break;
+        direct_write("  <has_work>", true);
+        break;
       case in_step:
-	m_file<<"    <step>"<<std::endl;
-	break;
+        direct_write("  <step>", true);
+        break;
       default:
-	m_file<<"    <unknown>"<<std::endl;      
+        direct_write("  <unknown>", true);
     }
-    m_hasData = true;
+    m_flags.set(has_data);
   }
 }
 
 void TeleoReactor::Logger::close_phase() {
-  if( m_in_phase ) {
-    if( m_hasData ) {
-      switch(m_phase) {
-      case in_init:
-	m_file<<"    </init>"<<std::endl;
-	break;
-      case in_new_tick:
-	m_file<<"    </start>"<<std::endl;
-	break;
-      case in_synchronize:
-	m_file<<"    </synchronize>"<<std::endl;
-	break;
-      case in_work:
-	m_file<<"    </has_work>"<<std::endl;
-	break;
-      case in_step:
-	m_file<<"    </step>"<<std::endl;
-	break;
-      default:
-	m_file<<"    </unknown>"<<std::endl;
+  if( m_flags.test(in_phase) ) {
+    if( m_flags.test(has_data) ) {
+      switch( m_phase ) {
+        case in_init:
+          direct_write("  </init>", true);
+          break;
+        case in_new_tick:
+          direct_write("  </start>", true);
+          break;
+        case in_synchronize:
+          direct_write("  </synchronize>", true);
+          break;
+        case in_work:
+          direct_write("  </has_work>", true);
+          break;
+        case in_step:
+          direct_write("  </step>", true);
+          break;
+        default:
+          direct_write("  </unknown>", true);
       }
-      m_hasData = false;
-    } 
-    m_in_phase = false;
+      m_flags.reset(has_data);
+    }
+    m_flags.reset(in_phase);
+  }
+}
+
+void TeleoReactor::Logger::open_tick() {
+  if( m_flags.test(tick) && !m_flags.test(tick_opened) ) {
+    m_file<<" <tick value=\""<<m_current<<"\">\n";
+    m_flags.set(tick_opened);
   }
 }
 
 void TeleoReactor::Logger::close_tick() {
-  if( m_tick ) {
-    if( m_tick_opened ) {
+  if( m_flags.test(tick) ) {
+    if( m_flags.test(tick_opened) ) {
       close_phase();
-      m_file<<"  </tick>"<<std::endl;
+      direct_write(" </tick>", true);
     }
-  } else if( m_header ) {
-    m_file<<"  </header>"<<std::endl;
-    m_header = false;
-    m_in_phase = false;
+  } else if( m_flags.test(header) ) {
+    direct_write(" </header>", true);
+    m_flags.reset(header);
+    m_flags.reset(in_phase);
   }
-  m_tick = false;
-  m_tick_opened = false;
+  m_flags.reset(tick);
+  m_flags.reset(tick_opened);
 }
 
-void TeleoReactor::Logger::observation(Observation const &obs) {
-  open_phase();
-  obs.toXml(m_file, 6)<<std::endl;
+void TeleoReactor::Logger::direct_write(std::string const &content, bool nl) {
+  m_file.write(content.c_str(), content.length());
+  if( nl )
+    std::endl(m_file);
 }
-
-void TeleoReactor::Logger::request(goal_id const &goal) {
-  open_phase();
-  m_file<<"      <request id=\""<<goal<<"\">\n";
-  goal->toXml(m_file, 8)<<"\n      </request>"<<std::endl;
-}
-
-void TeleoReactor::Logger::recall(goal_id const &goal) {
-  open_phase();
-  m_file<<"      <recall id=\""<<goal<<"\"/>"<<std::endl;
-}
-
-void TeleoReactor::Logger::notifyPlan(goal_id const &t) {
-  open_phase();
-  m_file<<"      <token id=\""<<t<<"\">\n";
-  t->toXml(m_file, 8)<<"\n      </token>"<<std::endl;  
-}
-
-void TeleoReactor::Logger::cancelPlan(goal_id const &t) {
-  open_phase();
-  m_file<<"      <cancel id=\""<<t<<"\"/>"<<std::endl;  
-}
-

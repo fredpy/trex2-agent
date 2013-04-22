@@ -317,7 +317,7 @@ int main(int argc, char *argv[]) {
   signal(SIGTERM, amc_cleanup);
   signal(SIGQUIT, amc_cleanup);
   signal(SIGKILL, amc_cleanup);
-  signal(SIGABRT, amc_cleanup);
+  // signal(SIGABRT, amc_cleanup);
 
   // Now I finally reach the more trex specific stuff :
   // - did user asked for a sim clock ?
@@ -351,11 +351,13 @@ int main(int argc, char *argv[]) {
     amc_log->syslog("amc", error)<<"exception :"<<se.what();
     my_agent.reset();
     throw;
-  } catch(...) {
-    // someone threw something which I don't know of
-    amc_log->syslog("amc", error)<<"Unknown exception";
-    my_agent.reset();
-    throw;
+  } catch(boost::exception const &be) {
+    amc_log->syslog("amc", error)<<"boost exception :"<<boost::diagnostic_information(be);
+//  } catch(...) {
+//    // someone threw something which I don't know of
+//    amc_log->syslog("amc", error)<<"Unknown exception";
+//    my_agent.reset();
+//    throw;
   }
   // Should never reach that point
   return -1;

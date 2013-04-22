@@ -77,10 +77,7 @@ namespace TREX {
       bool isFull() const {
 	return !( hasLower() || hasUpper() );
       }
-
-      std::ostream &toXml(std::ostream &out, size_t tabs) const;
-      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
-
+      
       virtual boost::any getLower() const =0;
       virtual boost::any getUpper() const =0;
 
@@ -120,7 +117,6 @@ namespace TREX {
 
       void completeParsing(boost::property_tree::ptree::value_type &node);
 
-      virtual bool json_protect() const;
       
       virtual void parseLower(std::string const &val) =0;
       virtual void parseUpper(std::string const &val) =0;
@@ -132,6 +128,9 @@ namespace TREX {
       virtual std::ostream &print_upper(std::ostream &out) const =0;
       
     private:
+      boost::property_tree::ptree build_tree() const;
+
+      
       void accept(DomainVisitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       boost::any singleton() const {

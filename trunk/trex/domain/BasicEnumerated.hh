@@ -77,8 +77,8 @@ namespace TREX {
       bool isSingleton() const {
 	return 1==getSize();
       }
-      std::ostream &toXml(std::ostream &out, size_t tabs) const;
-      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
+//      std::ostream &toXml(std::ostream &out, size_t tabs) const;
+//      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
 
       
       /** @brief element count
@@ -175,6 +175,8 @@ namespace TREX {
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;
       
     private:
+      boost::property_tree::ptree build_tree() const;
+
       void accept(DomainVisitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       

@@ -115,16 +115,16 @@ BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
 
 std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
   if( m_full || !m_val )
-    return out<<"false";
+    return out<<false;
   else
-    return out<<"true";
+    return out<<true;
 }
 
 std::ostream &BooleanDomain::print_upper(std::ostream &out) const {
   if( m_full || m_val )
-    return out<<"true";
+    return out<<true;
   else
-    return out<<"false";  
+    return out<<false;
 }
 
 

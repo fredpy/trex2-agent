@@ -128,12 +128,18 @@ tr::DomainBase *details::EuropaDomain::copy() const {
   return trex_domain(europaDomain());
 }
 
-std::ostream &details::EuropaDomain::toXml(std::ostream &out, size_t tabs) const {
-  // this copy can be costfull but guarantees that the output can be
-  // parsed by TREX
+boost::property_tree::ptree details::EuropaDomain::build_tree() const {
   UNIQ_PTR<tr::DomainBase> tmp(copy());
-  return tmp->toXml(out, tabs);
+  return tmp->build_tree();
 }
+
+
+//std::ostream &details::EuropaDomain::toXml(std::ostream &out, size_t tabs) const {
+//  // this copy can be costfull but guarantees that the output can be
+//  // parsed by TREX
+//  UNIQ_PTR<tr::DomainBase> tmp(copy());
+//  return tmp->toXml(out, tabs);
+//}
 
 std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
   // this copy is costfiull and we may want to avoid this

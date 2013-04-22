@@ -83,55 +83,20 @@ std::ostream &BasicEnumerated::print_domain(std::ostream &out) const {
   }
 }
 
-std::ostream &BasicEnumerated::toXml(std::ostream &out, size_t tabs) const {
-  std::ostream_iterator<char> pad(out);
-  std::fill_n(pad, tabs, ' '); 
-  size_t i, size = getSize();
-  out<<'<'<<getTypeName();
-  if( 0==size )
-    return out<<"/>";
-  else {
-    out<<">\n";
-    for( i=0 ; i<size; ++i ) {
-      bpt::ptree elem;
-      elem.put("elem.<xmlattr>.value", getStringValue(i));
-      std::fill_n(pad, tabs+1, ' ');
-      // very hacky at this stage
-      write_xml_element(out, bpt::ptree::key_type(), elem, -1,
-			bpt::xml_parser::xml_writer_settings<bpt::ptree::key_type::value_type>());
-    }
-    std::fill_n(pad, tabs, ' '); 
-    return out<<"</"<<getTypeName()<<'>';
-  }
-}
-
-std::ostream &BasicEnumerated::toJSON(std::ostream &out, size_t tabs) const {
-  std::ostream_iterator<char> pad(out);
-  size_t i, size = getSize();
-  bool first = true;
+boost::property_tree::ptree BasicEnumerated::build_tree() const {
+  boost::property_tree::ptree values;
+  size_t len = getSize();
   
-  std::fill_n(pad, tabs, ' ');
-  out<<'\"'<<getTypeName()<<"\": ";
-  if( size>0 ) {
-    out<<"{\n";
-    std::fill_n(pad, tabs+1, ' ');
-    out<<"\"elem\": [";
-    for(i=0; i<size; ++i) {
-      if( first )
-        first = false;
-      else
-        out.put(',');
-      out.put('\n');
-      std::fill_n(pad, tabs+2, ' ');
-      out<<"{ \"value\": \""<<getStringValue(i)<<"\" }";
+  if( len>0 ) {
+    boost::property_tree::ptree &tmp = values.add_child("elem", boost::property_tree::ptree());
+    
+    for(size_t i=0; i<len; ++i) {
+      boost::property_tree::ptree e;
+      utils::set_attr(e, "value", getStringValue(i));
+      tmp.push_back(boost::property_tree::ptree::value_type("", e));
     }
-    out.put('\n');
-    std::fill_n(pad, tabs+1, ' ');
-    out<<"]\n";
-    std::fill_n(pad, tabs, ' ');
-    return out.put('}');
-  } else
-    return out<<"null";
+  }
+  return values;
 }
 
 

@@ -39,6 +39,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "DomainVisitor.hh"
+#include <trex/utils/XMLutils.hh>
 
 using namespace TREX::transaction;
 namespace bpt=boost::property_tree;
@@ -89,50 +90,17 @@ std::ostream &BasicInterval::print_domain(std::ostream &out) const {
     return print_upper(print_lower(out<<'[')<<", ")<<']';
 }
 
-std::ostream &BasicInterval::toXml(std::ostream &out, size_t tabs) const {
-  std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-  out<<'<'<<getTypeName();
-  out.precision(16);
-  out.setf(out.fixed);
-  if( isSingleton() ) 
-    print_singleton(out<<" value=\"")<<'\"';
-  else { 
-    if( hasLower() )
-      print_lower(out<<" min=\"")<<'\"';
-    if( hasUpper() )
-      print_upper(out<<" max=\"")<<'\"';
-  }
-  return out<<"/>";
-}
-
-bool BasicInterval::json_protect() const {
-  return true;
-}
-
-
-std::ostream &BasicInterval::toJSON(std::ostream &out, size_t tabs) const {
-  std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-  std::string p;
-  
-  if( json_protect() )
-    p = "\"";
-  
-  out<<'\"'<<getTypeName()<<"\": { ";
+boost::property_tree::ptree BasicInterval::build_tree() const {
+  boost::property_tree::ptree info;
   if( isSingleton() )
-    print_singleton(out<<"\"value\": "<<p)<<p;
+    TREX::utils::set_attr(info, "value", getStringSingleton());
   else {
-    bool comma = false;
-    if( hasLower() ) {
-      print_lower(out<<"\"min\": "<<p)<<p;
-      comma = true;
-    }
-    if( hasUpper() ) {
-      if( comma )
-        out<<", ";
-      print_upper(out<<"\"max\": "<<p)<<p;
-    }
+    if( hasLower() )
+      TREX::utils::set_attr(info, "min", getStringLower());
+    if( hasUpper() )
+      TREX::utils::set_attr(info, "min", getStringUpper());
   }
-  return out<<'}';
+  return info;
 }
 
 

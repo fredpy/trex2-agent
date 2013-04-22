@@ -87,7 +87,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class Variable :public TREX::utils::ostreamable {
+    class Variable :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
     public:
       /** @brief Constructor
        *
@@ -267,6 +267,9 @@ namespace TREX {
 	return restrict(var);
       }
 
+      boost::property_tree::ptree as_tree() const;
+
+      
       /** @brief XML output
        * @param out An output stream
        * @param pad desired tag indentation
@@ -276,8 +279,12 @@ namespace TREX {
        *
        * @return @a out after the operation
        */
-      std::ostream &toXml(std::ostream &out, size_t pad=0) const;
-      std::ostream &toJSON(std::ostream &out, size_t tabs=0) const;
+      std::ostream &toXml(std::ostream &out) const {
+        return to_xml(out);
+      }
+      std::ostream &toJSON(std::ostream &out) const {
+        return to_json(out);
+      }
       
 	
     private:

@@ -53,6 +53,7 @@
 # include <boost/any.hpp>
 
 # include <trex/utils/XmlFactory.hh>
+# include <trex/utils/ptree_io.hh>
 # include <trex/utils/platform/cpp11_deleted.hh>
 
 # include "DomainVisitor_fwd.hh"
@@ -156,7 +157,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains 
      */
-    class DomainBase :public TREX::utils::ostreamable {
+    class DomainBase :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
     public:
       /** @brief Destructor */
       virtual ~DomainBase() {}
@@ -380,7 +381,8 @@ namespace TREX {
 	  return boost::any_cast<Ty>(val);
       }
 
-
+      boost::property_tree::ptree as_tree() const;
+      
       /** @brief XML conversion
        *
        * @param out An output stream
@@ -399,10 +401,12 @@ namespace TREX {
        * @sa DomainBase(rapidxml::xml_node<> const &)
        * @sa xml_factory
        */
-      virtual std::ostream &toXml(std::ostream &out, 
-				  size_t tabs=0) const =0;
-      virtual std::ostream &toJSON(std::ostream &out,
-                                   size_t tabs=0) const =0;
+      std::ostream &toXml(std::ostream &out) const {
+        return to_xml(out);
+      }
+      std::ostream &toJSON(std::ostream &out) const {
+        return to_json(out);
+      }
       
       
       /** @brief XML parsing factory for domains
@@ -412,8 +416,10 @@ namespace TREX {
        */
       typedef TREX::utils::XmlFactory<DomainBase, 
 				      boost::shared_ptr<DomainBase> > xml_factory;
+      virtual boost::property_tree::ptree build_tree() const=0;
 
     protected:
+      
       /** @brief Constructor
        *
        * @param type A domain type descriptor
