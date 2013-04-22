@@ -122,6 +122,7 @@ if(WITH_SVN_TRACK)
     # this run my svn script
     add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/svn_version.hh
       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
       -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
 
     set_source_files_properties(${CMAKE_BINARY_DIR}/svn_version.hh

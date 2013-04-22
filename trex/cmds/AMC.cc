@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
   if( opt_val.count("version") ) {
-    std::cout<<"amc for trex "<<TREX::version::str()<<std::endl;
+    std::cout<<"amc for trex "<<TREX::version::full_str()<<std::endl;
     exit(0);
   }
   
