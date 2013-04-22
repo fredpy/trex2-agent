@@ -353,11 +353,11 @@ int main(int argc, char *argv[]) {
     throw;
   } catch(boost::exception const &be) {
     amc_log->syslog("amc", error)<<"boost exception :"<<boost::diagnostic_information(be);
-//  } catch(...) {
-//    // someone threw something which I don't know of
-//    amc_log->syslog("amc", error)<<"Unknown exception";
-//    my_agent.reset();
-//    throw;
+  } catch(...) {
+    // someone threw something which I don't know of
+    amc_log->syslog("amc", error)<<"Unknown exception";
+    my_agent.reset();
+    throw;
   }
   // Should never reach that point
   return -1;
