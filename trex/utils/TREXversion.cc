@@ -36,6 +36,14 @@
 
 #include <sstream>
 
+#ifdef WITH_SVN_TRACK
+# include "svn_version.hh"
+#else
+// Make the default dimilar to when we do not find svn
+# define SVN_INFO false
+# define SVN_ROOT "unknown"
+# define SVN_REV  "exported"
+#endif 
 
 unsigned short TREX::version::major() {
   return TREX_MAJOR;
@@ -68,3 +76,23 @@ unsigned long TREX::version::number() {
 std::string TREX::version::str() {
   return TREX_VERSION;
 }
+
+bool TREX::version::svn_info() {
+  return SVN_INFO;
+}
+
+std::string TREX::version::svn_root() {
+  return SVN_ROOT;
+}
+
+std::string TREX::version::svn_revision() {
+  return SVN_REV;
+}
+
+std::string TREX::version::full_str() {
+  if( svn_info() ) 
+    return str()+" (svn:"+svn_root()+"["+svn_revision()+"])";
+  else
+    return str();
+}
+

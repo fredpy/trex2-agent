@@ -42,6 +42,9 @@ install(
 )
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+
+
+
 add_library(TREXutils SHARED
   # real source
   ErrnoExcept.cc
@@ -107,6 +110,27 @@ add_library(TREXutils SHARED
   bits/Symbol.tcc
   bits/XmlFactory.tcc
 )
+
+
+option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" OFF)
+
+if(WITH_SVN_TRACK)
+    # this bit of code create an up to date svn info file 
+    # target svnheader is always ran
+    add_custom_target(svnheader ALL 
+      DEPENDS ${CMAKE_BINARY_DIR}/svn_version.hh)
+    # this run my svn script
+    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/svn_version.hh
+      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
+
+    set_source_files_properties(${CMAKE_BINARY_DIR}/svn_version.hh
+      PROPERTIES GENERATED TRUE
+      HEADER_FILE_ONLY TRUE)
+
+    add_dependencies(TREXutils svnheader)
+    add_definitions(-DWITH_SVN_TRACK)
+endif(WITH_SVN_TRACK)
 
 # map ditectory structure for XCode 
 source_group("Source\ Files\\log" FILES 

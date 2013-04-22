@@ -160,7 +160,7 @@ LogManager::path_type const &LogManager::logPath() {
     
     thread_count(2);
     
-    syslog("", log::null)<<"TREX version "<<TREX::version::str();
+    syslog("", log::null)<<"TREX version "<<TREX::version::full_str();
     loadSearchPath();
     *m_inited = true;
   }

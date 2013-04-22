@@ -108,6 +108,12 @@ namespace TREX {
      * @sa number()
      */
     static std::string str();
+
+    static std::string full_str();
+
+    static bool svn_info();
+    static std::string svn_root();
+    static std::string svn_revision();
     
   }; // TREX::version
   
