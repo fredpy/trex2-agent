@@ -53,6 +53,7 @@ add_library(TREXutils SHARED
   SingletonServer.cc
   TREXversion.cc
   XmlUtils.cc
+  ptree_io.cc
   asio_runner.cc
   log/entry.cc
   log/text_log.cc
@@ -85,6 +86,7 @@ add_library(TREXutils SHARED
   TREXversion.hh
   XmlFactory.hh
   XmlUtils.hh
+  ptree_io.hh
   asio_runner.hh
   log/log_fwd.hh
   log/entry.hh

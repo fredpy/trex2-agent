@@ -83,21 +83,10 @@ namespace {
       return this->get_override("restrict")(other);
     }
   
-    std::string xml() const {
-      return this->get_override("xml")();
+    boost::property_tree::ptree build_tree() const {
+      return this->get_override("build_tree")();
     }
     
-    std::ostream &toXml(std::ostream &out, size_t) const {
-      return out<<xml();
-    }
-    
-    std::string json() const {
-      return this->get_override("json")();
-    }
-    std::ostream &toJSON(std::ostream &out, size_t) const {
-      return out<<json();
-    }
-
     std::string str() const {
       return this->get_override("__str__")();
     }
@@ -277,8 +266,10 @@ void export_domain() {
   .def("__eq__", pure_virtual(&tt::DomainBase::equals))
   .def("restrict", pure_virtual(&tt::DomainBase::restrictWith),
        return_internal_reference<>())
-  .def("xml", pure_virtual(&xml_str<tt::DomainBase>))
-  .def("json", pure_virtual(&json_str<tt::DomainBase>))
+  .def("as_tree", &tt::DomainBase::as_tree)
+  .def("build_tree", pure_virtual(&tt::DomainBase::build_tree))
+  .def("xml", &xml_str<tt::DomainBase>)
+  .def("json", &json_str<tt::DomainBase>)
   .def("__str__", pure_virtual(&str_impl<tt::DomainBase>))
   ;
   

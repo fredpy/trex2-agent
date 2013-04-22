@@ -64,7 +64,8 @@ namespace TREX {
 	~EuropaDomain();
 	
 	TREX::transaction::DomainBase *copy() const;
-	std::ostream &toXml(std::ostream &out, size_t tabs) const;
+	// std::ostream &toXml(std::ostream &out, size_t tabs) const;
+      
 	
 	bool isInterval() const {
 	  return m_dom->isInterval();
@@ -85,6 +86,8 @@ namespace TREX {
 	}
 	
       private:
+        boost::property_tree::ptree build_tree() const;
+        
 	EUROPA::Domain *m_dom;
 	
 	static EUROPA::Domain *safe_copy(EUROPA::Domain *dom);

@@ -150,14 +150,13 @@ namespace TREX {
     template<>
     inline bool string_cast<bool>(std::string const &in,
                            std::ios_base &(*format)(std::ios_base &)) {
-      std::string tmp = boost::algorithm::to_lower_copy(in);
       
-      if( "true"==tmp )
-        return true;
-      else if( "false"==tmp )
-        return false;
-      else
-        return 0!=string_cast<int>(in,format);
+      bool result;
+      std::istringstream iss(in);
+      
+      if( (iss>>format>>std::boolalpha>>result).fail() )
+        return 0!=string_cast<int>(in, format);
+      return result;
     }
     
     /** @brief Convert string to type.

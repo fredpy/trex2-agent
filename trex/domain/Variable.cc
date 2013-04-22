@@ -138,37 +138,16 @@ std::ostream &Variable::print_to(std::ostream &out) const {
     return out<<"<?"<<m_name<<'>'; 
 }
 
-std::ostream &Variable::toXml(std::ostream &out, size_t tabs) const {
-  std::ostream_iterator<char> pad(out);
-  std::fill_n(pad, tabs, ' ');
-  out<<"<Variable name=\""<<name()<<"\"";
-  if( !m_domain ) 
-    out<<"/>";
-  else {
-    out<<">\n";
-    m_domain->toXml(out, tabs+1)<<'\n';
-    std::fill_n(pad, tabs, ' ');
-    out<<"</Variable>";
-  } 
-  return out;
-}
-
-std::ostream &Variable::toJSON(std::ostream &out, size_t tabs) const {
-  std::ostream_iterator<char> pad(out);
-  std::fill_n(pad, tabs, ' ');
-  out<<"{\n";
-  std::fill_n(pad, tabs+1, ' ');
-  out<<"\"name\": \""<<name()<<"\",\n";
-  std::fill_n(pad, tabs+1, ' ');
-  out<<"\"type\": ";
+boost::property_tree::ptree Variable::as_tree() const {
+  boost::property_tree::ptree ret;
+  
   if( m_domain ) {
-    out<<'\"'<<m_domain->getTypeName()<<"\",\n";
-    m_domain->toJSON(out, tabs+1);
+    ret = m_domain->as_tree();
+    set_attr(ret, "type", m_domain->getTypeName());
   } else
-    out<<"null";
-  out<<'\n';
-  std::fill_n(pad, tabs, ' ');
-  return out<<'}';
+    set_attr(ret, "type", "null");
+  set_attr(ret, "name", name());
+  return ret;
 }
 
 

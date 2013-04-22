@@ -1,19 +1,13 @@
-/** @file DomainBase.cc
- * @brief Basic domain utilities implementation
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup domains
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -23,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -37,37 +31,36 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sstream>
-#include "DomainVisitor.hh"
+#ifndef H_utils_ptree_utils
+# define H_utils_ptree_utils
 
-using namespace TREX::transaction;
+# include <boost/property_tree/ptree.hpp>
 
-std::string DomainExcept::build_message(DomainBase const &d, 
-				       std::string const &msg) throw() {
-  std::ostringstream oss;
-  oss<<"Domain "<<d.getTypeName()<<" "<<d<<" : "<<msg;
-  return oss.str();
-}
+namespace TREX {
+  namespace utils {
+    
+    void flatten_xml_attrs(boost::property_tree::ptree &p);
+    void flatten_json_arrays(boost::property_tree::ptree &p);
 
-void DomainBase::accept(DomainVisitor &visitor) const {
-  visitor.visit(this, true);
-}
+    void read_xml(std::istream &in, boost::property_tree::ptree &p);
+    void write_xml(std::ostream &out, boost::property_tree::ptree p,
+                   bool header=false);
 
-boost::any DomainBase::getSingleton() const {
-  if( !isSingleton() )
-    throw DomainAccess(*this, ": not a singleton");
-  return singleton();
-}
+    void read_json(std::istream &in, boost::property_tree::ptree &p);
+    void write_json(std::ostream &out, boost::property_tree::ptree p);
+    
+    class ptree_convertible {
+    public:      
+      virtual boost::property_tree::ptree as_tree() const =0;
+      
+      std::ostream &to_xml(std::ostream &out) const;
+      std::ostream &to_json(std::ostream &out) const;
+    protected:
+      ptree_convertible() {}
+      virtual ~ptree_convertible() {}
+    };
+    
+  } // TREX::utils
+} // TREX
 
-std::string DomainBase::getStringSingleton() const {
-  if( !isSingleton() )
-    throw DomainAccess(*this, ": not a singleton");
-  return stringSingleton();
-}
-
-boost::property_tree::ptree DomainBase::as_tree() const {
-  boost::property_tree::ptree ret;
-  ret.push_back(boost::property_tree::ptree::value_type(getTypeName().str(), build_tree()));
-  return ret;
-}
-
+#endif // H_utils_json_utils

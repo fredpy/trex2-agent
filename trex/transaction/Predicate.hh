@@ -94,7 +94,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup transaction
      */
-    class Predicate :public TREX::utils::ostreamable {
+    class Predicate :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
     protected:
       /** @brief Type used to store predicate attributes */
       typedef std::map<TREX::utils::Symbol, Variable> attr_set;
@@ -284,6 +284,9 @@ namespace TREX {
        */
       virtual void listAttributes(std::list<TREX::utils::Symbol> &attr,
 				  bool all=true) const;
+      
+      virtual boost::property_tree::ptree as_tree() const;
+      
       /** @brief XML output
        * @param out An output stream
        * @param tabs desired tags indentation
@@ -296,8 +299,12 @@ namespace TREX {
        *
        * @return @e out after the operation
        */
-      std::ostream &toXml(std::ostream &out, size_t tabs=0) const;
-      std::ostream &toJSON(std::ostream &out, size_t tabs=0) const;
+      std::ostream &toXml(std::ostream &out) const {
+        return to_xml(out);
+      }
+      std::ostream &toJSON(std::ostream &out) const {
+        return to_json(out);
+      }
 
       /** @brief XML parsing factory for predicates
        *

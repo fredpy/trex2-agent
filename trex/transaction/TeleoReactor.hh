@@ -1042,147 +1042,8 @@ namespace TREX {
       bool m_inited;
       bool m_firstTick;
       graph &m_graph;
-
-      /** @brief Transaction logger
-       * 
-       * This class is used by TeleoReactor to log all the transactions 
-       * events produced by this reactor. The transaction events are:
-       * @li declaration of an @p Internal timeline
-       * @li subscription to an @p External timeline
-       * @li observation produced on an @p Internal timeline
-       * @li goal request on an @p External timeline 
-       * @li goal recall on an @p External timeline
-       * @li unsubsiption to an @p External timeline 
-       * @li undecalration of an @p Internal timeline 
-       * All these events are produced in a file given during subscription using 
-       * an xml format that can be parsed from TransactionPlayer 
-       *
-       * @relates TeleoReactor
-       * @author Frederic Py <fpy@mbari.org>
-       * @sa TransactionPlayer
-       */
-      class Logger {
-      public:
-        /** @brief Constructor 
-         * @param[in] dest A filename
-         * 
-         * Create a new instance that will redirect all the transaction events 
-         * to the file @p dest
-         */
-	Logger(std::string const &dest);
-        /** @brief Destructor
-         * 
-         * Destroy the instance  and properly close the file maintained by 
-         * closing all the xml tags that remains open.
-         */
-	~Logger();
-        
-        /** @brief Internal timeline declaration
-         *
-         * @param[in] name the name of the timeline 
-         */
-	void provide(TREX::utils::Symbol const &name, bool goals, bool plan);
-        /** @brief External timeline subsription
-         *
-         * @param[in] name the name of the timeline 
-         */
-	void use(TREX::utils::Symbol const &name, bool goals, bool plan);
-
-        /** @brief undeclaration of an Internal timeline
-         *
-         * @param[in] name the name of the timeline 
-         */
-	void unprovide(TREX::utils::Symbol const &name);
-        /** @brief unsbscription of an Internal timeline
-         *
-         * @param[in] name the name of the timeline 
-         */
-	void unuse(TREX::utils::Symbol const &name);
-
-	void init(TICK val);
-        /** @brief New tick event
-         * 
-         * @param[in] val the new tick date
-         */
-	void newTick(TICK val);
-	void synchronize();
-	void failed();
-	void has_work();
-	void work(bool ret);
-	void step();
-
-        /** @brief New observation 
-         * @param[in] obs the observation
-         */
-	void observation(Observation const &obs);
-        /** @brief New request 
-         * @param[in] goal the goal requested
-         */
-	void request(goal_id const &goal);
-        /** @brief New recall 
-         * @param[in] goal the goal recalled
-         */
-	void recall(goal_id const &goal);
-        
-        void comment(std::string const &msg);
-        
-        void notifyPlan(goal_id const &t);
-        void cancelPlan(goal_id const &t);
-        
-        
-      private:
-        /** @brief Output file
-         */
-	std::ofstream m_file;
-
-        /** @brief In tick flag
-         * 
-         * A boolean flag used to identify if newTick was called at least once
-         */
-	bool m_header, m_tick, m_tick_opened;
-	/** @brief In phase flag,
-	 *
-	 * A boolean flag to indicate that a new phase callback has been called
-	 * since last update
-	 */
-	bool m_in_phase;
-	
-        /** @brief Pending data flag
-         *
-         * This flag is used to indicate that events did occur on the 
-         * previous tick. Indicating that the previous tick tag needs 
-         * to be closed
-         */
-        bool m_hasData;
-        /** @brief Current tick
-         * 
-         * the current tick value as provided by newTick call. This value is 
-         * valid only if m_tickj is @c true 
-         */
-	TICK m_current;
-
-	enum tick_phase {
-	  in_init = 0,
-	  in_new_tick,
-	  in_synchronize,
-	  in_work,
-	  in_step
-	};
-
-	tick_phase m_phase;
-
-	void open_tick();
-	void open_phase();
-	void close_phase();
-	void close_tick();
-
-        /** @brief Open new tick xml tag
-         *
-         * This method is called whenever new events are produced and oepn the 
-         * new tick xml tag for this tick if it was not previously opened
-         */
-	void openTick();
-      }; // TREX::transaction::TeleoReactor::Logger
+      
+      class Logger;
 
       /** @brief Request new observations
        *
@@ -1298,16 +1159,7 @@ namespace TREX {
        */
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
-      void isolate(bool failed=true) {
-	if( NULL!=m_trLog && failed ) {
-	  Logger *tmp = NULL;
-	  std::swap(tmp, m_trLog);
-	  tmp->failed();
-	  delete tmp;
-	}
-	clear_internals();
-	clear_externals();
-      }
+      void isolate(bool failed=true);
 
       // call-backs from timeline
       void assigned(details::timeline *tl);
