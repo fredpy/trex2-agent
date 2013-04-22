@@ -281,7 +281,7 @@ int main(int argc, char **argv) {
     return 0;
   }
   if( opt_val.count("version") ) {
-    std::cout<<"sim for trex "<<TREX::version::str()<<std::endl;
+    std::cout<<"sim for trex "<<TREX::version::full_str()<<std::endl;
     return 0;
   }
   // Check that one mission was given
