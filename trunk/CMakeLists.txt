@@ -85,11 +85,13 @@ set(TREX_FROM_PKG OFF)
 if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
   # This code is 
   set(TREX_FROM_PKG ON)
+  add_custom_target(trex_prep)
 else()
   set(TREX_EXTRA_DIR ${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
     CACHE INTERNAL "Directory where extra generated source can be put")
   set(CPACK_SOURCE_INSTALLED_DIRECTORIES
     "${CMAKE_SOURCE_DIR};/;${TREX_EXTRA_DIR};/${TREX_EXTRA_SRC}")
+  add_custom_target(trex_prep)
 endif()
 
 include(CPack)
