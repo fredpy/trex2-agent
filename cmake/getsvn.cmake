@@ -35,28 +35,33 @@
 
 find_package(Subversion QUIET)
 if(Subversion_FOUND)
-  Subversion_WC_INFO(${SOURCE_DIR} MY)
-  # tweak the url to be more compact
-  string(REGEX REPLACE "^.*/svn/(.*)$" "\\1" MY_WC_PATH ${MY_WC_URL})
-  set(MY_FLAG 1)
   # Now I need t osurun svnversion whihc is better than svn info
   find_program(SVN_VERSION_CMD svnversion 
     DOC "subversion version command")
   if(SVN_VERSION_CMD)
     execute_process(COMMAND ${SVN_VERSION_CMD} ${SOURCE_DIR} ${MY_SVN_TRUNK}
-      OUTPUT_VARIABLE MY_WC_REVISION
+      OUTPUT_VARIABLE MY_WC_REV
       OUTPUT_STRIP_TRAILING_WHITESPACE)
   endif(SVN_VERSION_CMD)
+
+  if(MY_WC_REV STREQUAL "exported")
+    set(MY_FLAG 0)
+  else()
+    Subversion_WC_INFO(${SOURCE_DIR} MY)
+    # tweak the url to be more compact
+    string(REGEX REPLACE "^.*/svn/(.*)$" "\\1" MY_WC_PATH ${MY_WC_URL})
+    set(MY_FLAG 1)
+  endif()
 else(Subversion_FOUND)
   set(MY_FLAG 0)
-  set(MY_WC_PATH    "unknown")
-  set(MY_WC_REVISION "exported")
+  set(MY_WC_PATH    "")
+  set(MY_WC_REV     "svn_not_found")
 endif(Subversion_FOUND)
 
 file(WRITE svn_version.hh.txt 
   "#define SVN_INFO ${MY_FLAG}\n"
   "#define SVN_ROOT \"${MY_WC_PATH}\"\n"
-  "#define SVN_REV \"${MY_WC_REVISION}\"\n"
+  "#define SVN_REV \"${MY_WC_REV}\"\n"
 )
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
