@@ -329,6 +329,8 @@ int main(int argc, char **argv) {
     my_agent.reset(new Agent(mission_cfg, clk, true));
     // In case --steps was not specified and no clock on the mission
     my_agent->setClock(clock_ref(new StepClock(Clock::duration_type(0), 60)));
+    my_agent->initComplete();
+    
     printHelp();
     
     while(true) {
