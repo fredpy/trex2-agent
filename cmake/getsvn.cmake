@@ -63,8 +63,6 @@ file(WRITE svn_version.hh.txt
   "#define SVN_REV \"${MY_WC_REV}\"\n"
 )
 
-message("Generate ${OUTPUT}")
-
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  svn_version.hh.txt ${OUTPUT})
+  svn_version.hh.txt ${OUTPUT_DIR}/svn/version.hh)
 
