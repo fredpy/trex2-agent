@@ -37,7 +37,7 @@
 #include <sstream>
 
 #ifdef WITH_SVN_TRACK
-# include "svn_version.hh"
+# include "svn/version.hh"
 #else
 // Make the default dimilar to when we do not find svn
 # define SVN_INFO false

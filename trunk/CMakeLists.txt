@@ -76,6 +76,22 @@ set(CPACK_SOURCE_IGNORE_FILES
 "/\\\\.svn/"
 "\\\\.DS_Store$"
 )
+
+
+
+set(TREX_EXTRA_SRC pkg)
+set(TREX_FROM_PKG OFF)
+
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
+  # This code is 
+  set(TREX_FROM_PKG ON)
+else()
+  set(TREX_EXTRA_DIR ${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
+    CACHE INTERNAL "Directory where extra generated source can be put")
+  set(CPACK_SOURCE_INSTALLED_DIRECTORIES
+    "${CMAKE_SOURCE_DIR};/;${TREX_EXTRA_DIR};/${TREX_EXTRA_SRC}")
+endif()
+
 include(CPack)
 
 include_directories(
