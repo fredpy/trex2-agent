@@ -39,7 +39,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "DomainVisitor.hh"
-#include <trex/utils/XMLutils.hh>
 
 using namespace TREX::transaction;
 namespace bpt=boost::property_tree;
