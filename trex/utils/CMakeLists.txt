@@ -111,28 +111,39 @@ add_library(TREXutils SHARED
   bits/XmlFactory.tcc
 )
 
+if(TREX_FROM_PKG)
+  set(SVN_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh)
 
-option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" OFF)
-mark_as_advanced(WITH_SVN_TRACK)
+  if(EXISTS ${SVN_HH})
+    include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
+    add_definitions(-DWITH_SVN_TRACK)
+  endif()
+else(TREX_FROM_PKG)
+ option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
+ mark_as_advanced(WITH_SVN_TRACK)
 
-if(WITH_SVN_TRACK)
+ if(WITH_SVN_TRACK)
     # this bit of code create an up to date svn info file 
     # target svnheader is always ran
     add_custom_target(svnheader ALL 
-      DEPENDS ${CMAKE_BINARY_DIR}/svn_version.hh)
+      DEPENDS ${TREX_EXTRA_DIR}/svn/version.hh)
     # this run my svn script
-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/svn_version.hh
+    add_custom_command(OUTPUT ${TREX_EXTRA_DIR}/svn/version.hh
       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+      -DOUTPUT=${TREX_EXTRA_DIR}/svn/version.hh
       -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
       -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
 
-    set_source_files_properties(${CMAKE_BINARY_DIR}/svn_version.hh
+     include_directories(${TREX_EXTRA_DIR})
+
+    set_source_files_properties(${CMAKE_EXTRA_DIR}/svn/version.hh
       PROPERTIES GENERATED TRUE
       HEADER_FILE_ONLY TRUE)
 
     add_dependencies(TREXutils svnheader)
     add_definitions(-DWITH_SVN_TRACK)
-endif(WITH_SVN_TRACK)
+ endif(WITH_SVN_TRACK)
+endif(TREX_FROM_PKG)
 
 # map ditectory structure for XCode 
 source_group("Source\ Files\\log" FILES 

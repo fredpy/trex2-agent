@@ -32,7 +32,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-
 find_package(Subversion QUIET)
 if(Subversion_FOUND)
   # Now I need t osurun svnversion whihc is better than svn info
@@ -64,6 +63,8 @@ file(WRITE svn_version.hh.txt
   "#define SVN_REV \"${MY_WC_REV}\"\n"
 )
 
+message("Generate ${OUTPUT}")
+
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  svn_version.hh.txt svn_version.hh)
+  svn_version.hh.txt ${OUTPUT})
 
