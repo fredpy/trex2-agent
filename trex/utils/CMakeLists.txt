@@ -144,6 +144,8 @@ else(TREX_FROM_PKG)
       LOCATION ${TREX_EXTRA_DIR})
 
     add_dependencies(TREXutils svnheader)
+    set_source_files_properties(TREXversion.cc
+      PROPERTIES OBJECT_DEPEND ${SVN_HH})
     add_definitions(-DWITH_SVN_TRACK)
  endif(WITH_SVN_TRACK)
 endif(TREX_FROM_PKG)
