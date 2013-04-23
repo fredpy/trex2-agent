@@ -113,6 +113,7 @@ add_library(TREXutils SHARED
 
 
 option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" OFF)
+mark_as_advanced(WITH_SVN_TRACK)
 
 if(WITH_SVN_TRACK)
     # this bit of code create an up to date svn info file 
