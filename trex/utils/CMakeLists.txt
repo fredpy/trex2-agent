@@ -129,9 +129,11 @@ else(TREX_FROM_PKG)
     set(SVN_HH svn/version.hh)
     add_custom_target(svnheader ALL 
       DEPENDS ${SVN_HH})
+    add_dependencies(trex_prep svnheader)
 
     # this run my svn script
     add_custom_command(OUTPUT ${SVN_HH}
+      PRE_BUILD
       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
       -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
       -DOUTPUT_DIR=${TREX_EXTRA_DIR}
@@ -140,10 +142,11 @@ else(TREX_FROM_PKG)
     include_directories(${TREX_EXTRA_DIR})
     set_source_files_properties(${SVN_HH}
       PROPERTIES GENERATED TRUE
-      HEADER_FILE_ONLY TRUE
+     # HEADER_FILE_ONLY TRUE
       LOCATION ${TREX_EXTRA_DIR})
 
     add_dependencies(TREXutils svnheader)
+
     set_source_files_properties(TREXversion.cc
       PROPERTIES OBJECT_DEPEND ${SVN_HH})
     add_definitions(-DWITH_SVN_TRACK)
