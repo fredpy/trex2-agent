@@ -138,6 +138,9 @@ namespace TREX {
       /** @brief whether TREX is currently blocked or not */
       bool m_blocked;
 
+      /** @brief Whether it was connected on last tick */
+      bool m_connected;
+
       /** @brief map of received messages       */
       std::map<uint16_t, IMC::Message *> received;
 
