@@ -136,7 +136,7 @@ else(TREX_FROM_PKG)
 
      include_directories(${TREX_EXTRA_DIR})
 
-    set_source_files_properties(${CMAKE_EXTRA_DIR}/svn/version.hh
+    set_source_files_properties(${TREX_EXTRA_DIR}/svn/version.hh
       PROPERTIES GENERATED TRUE
       HEADER_FILE_ONLY TRUE)
 
