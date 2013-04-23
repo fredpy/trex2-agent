@@ -47,7 +47,7 @@ namespace TREX
     {
       m_firstTick = true;
       m_blocked = false;
-
+      m_connected = true;
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
 
@@ -108,12 +108,19 @@ namespace TREX
 
         if (msg_count < 1)
         {
-          syslog(log::warn) << "No messages from DUNE!\n";
+          if (m_connected)
+            std::cerr <<"Disconnected from DUNE\n";
+
+          syslog(log::warn) << "Disconnected from DUNE";
+          m_connected = false;
         }
 
         else
         {
           syslog(log::info) << "Received a total of " << msg_count << " messages\n";
+          if (!m_connected)
+            std::cerr <<"Now connected to DUNE\n";
+          m_connected = true;
         }
       }
       catch (std::runtime_error& e)
@@ -235,6 +242,8 @@ namespace TREX
           m_blocked = true;
           break;
       }
+      delete received[TrexCommand::getIdStatic()];
+
       }
 
       if (pcstate != NULL)
@@ -402,36 +411,4 @@ namespace TREX
   }
 }
 
-/*
- * class TREX::LSTS::Platform::log_proxy
- */
-
-// structors 
-//Platform::log_proxy::~log_proxy()
-//{
-//  if (this == m_platform->m_active_proxy)
-//  {
-//    m_platform->m_active_proxy = NULL;
-//  }
-//}
-
-// callback
-
-//void Platform::log_proxy::operator()(log::entry::pointer msg) {
-//  m_platform->m_active_proxy = this;
-//  // Example that display error/warnings on std::cerr
-//
-//  std::ostringstream ss;
-//  if( msg->is_dated() )
-//    ss<<'@'<<msg->date()<<' ';
-//
-//  ss<<msg->content();
-//
-//  if( log::warn==msg->kind() )
-//    m_platform->reportToDune(IMC::LogBookEntry::LBET_WARNING, who.str(), ss.str());
-//  else if ( log::error==msg->kind() )
-//    m_platform->reportToDune(IMC::LogBookEntry::LBET_ERROR, who.str(), ss.str());
-//  else if (TeleoReactor::obs==msg->kind() )
-//    m_platform->reportToDune(IMC::LogBookEntry::LBET_INFO, who.str(), ss.str());
-//}
 
