@@ -7,6 +7,7 @@
 
 #include <DUNE/Math/Angles.hpp>
 #include <DUNE/Coordinates/WGS84.hpp>
+using namespace EUROPA;
 
 /**
  * DIST == ll_dist(lat1, lon1, lat2, lon2)
@@ -14,10 +15,6 @@
  */
 namespace TREX {
   namespace LSTS {
-
-    using namespace EUROPA;
-    //using namespace boost::polygon::operators;
-    //namespace poly = boost::polygon;
 
     DECLARE_FUNCTION_TYPE(RadDeg, to_rad,
         "deg_to_rad", FloatDT, 1);
@@ -108,7 +105,7 @@ void LatLonDist::handleExecute() {
 
   if( m_dist.isSingleton() ) {
     // While generally incomplete this approach avoid to
-    // compute the same distance other and other again ... and 
+    // compute the same distance over and over again ... and
     // it should work as long as nobody constraints dist 
     // otherwise
     return; 

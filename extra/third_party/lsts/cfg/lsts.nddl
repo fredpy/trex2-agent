@@ -3,6 +3,12 @@
 #include "platform.rules.nddl"
 #include "navigator.rules.nddl"
 
+//Payload lbl = new Payload(External, "lbl", 0.5);
+//Payload imu = new Payload(External, "imu", 10);
+//Payload sidescan = new Payload(External, "sidescan", 25);
+//Payload camera = new Payload(External, "camera", 20);
+//Payload multibeam = new Payload(External, "multibeam", 5);
+
 EstimatedState estate = new EstimatedState(Observe);
 ControlMode control = new ControlMode(Observe);
 Medium medium = new Medium(Observe);
@@ -16,6 +22,7 @@ rejectable (navigator.At target);
 target.latitude == to_rad(41.184195);
 target.longitude == to_rad(-8.705745);
 target.z.specify(2);
+target.speed.specify(1.5);
 target.secs.specify(0);
 
 //rejectable (navigator.At target2);
@@ -24,6 +31,7 @@ target.secs.specify(0);
 //target2.z.specify(0);
 //target2.secs.specify(15);
 
+//target2 after target;
 //target after target2;
 
 //rejectable (navigator.At target3);
