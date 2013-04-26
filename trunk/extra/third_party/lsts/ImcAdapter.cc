@@ -66,7 +66,9 @@ namespace TREX {
 
     Observation ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
-      if (msg == NULL || msg->reference.isNull() || msg->control_src != TREX_ID || msg->state == FollowRefState::FR_TIMEOUT)
+      if (msg == NULL || msg->reference.isNull() || msg->control_src != TREX_ID
+          || msg->state == FollowRefState::FR_TIMEOUT
+          || msg->state == FollowRefState::FR_WAIT)
         return Observation("reference", "Boot");
 
       bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;

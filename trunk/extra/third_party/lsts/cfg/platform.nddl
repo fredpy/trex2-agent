@@ -16,6 +16,26 @@ class EstimatedState extends AgentTimeline {
 	};
 };
 
+class Payload extends AgentTimeline {
+
+	float power;
+	string name;
+	
+	Payload(Mode _mode, string _name, float _power) {
+		super(_mode, "Boot");
+		power = _power;
+		name = _name;
+	}
+	
+	predicate Boot {};
+	
+	predicate Unavailable {};
+	
+	predicate Active {};
+	
+	predicate Disabled {};
+}
+
 class Reference extends AgentTimeline {
 	
 	Reference(Mode _mode) {

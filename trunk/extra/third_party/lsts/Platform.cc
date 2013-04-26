@@ -69,7 +69,11 @@ namespace TREX
 
       // Timelines that can be controlled by other reactors
       provide("reference");
-      provide("payload");
+   //   provide("imu");
+   //   provide("lbl");
+   //   provide("sidescan");
+   //   provide("multibeam");
+   //   provide("camera");
 
       bfr = new uint8_t[65535];
     }
@@ -150,8 +154,12 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
+      std::cerr << "handleRequest(" << gpred << ")";
+
       if (gname == "reference" && gpred == "Going")
         handleGoingRequest(*goal);
+
+
     }
 
     void
@@ -182,11 +190,17 @@ namespace TREX
       return false;
     }
 
-//    void
-//    Platform::setControlInterface(ControlInterface * itf)
-//    {
-//      controlInterfaceInstance = itf;
-//    }
+    void
+    Platform::handleTrexOperation(TrexOperation trexOp)
+    {
+      switch (trexOp.op)
+      {
+        case TrexOperation::OP_POST_GOAL:
+          postGoalToken(trexOp.goal_id, TrexToken(*trexOp.token.get()));
+          break;
+      }
+
+    }
 
     void
     Platform::postGoalToken(std::string goald_id, TrexToken token)
@@ -243,56 +257,30 @@ namespace TREX
     Platform::processState()
     {
 
+      // if DUNE is disconnected everything is on initial (unknown / boot) state...
+      if (!m_connected)
+      {
+        m_ref = Reference();
+        received.clear();
+      }
+
+      PlanControlState * pcstate =
+          dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
+      postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
+      if (pcstate != NULL)
+        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING);
+
+
       // Translate incoming messages into observations
       EstimatedState * estate =
           dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       postUniqueObservation(m_adapter.estimatedStateObservation(estate));
 
-      //      IMC::GpsFix * fix =
-      //          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
-      //      postUniqueObservation(m_adapter.gpsFixObservation(fix));
-
       VehicleMedium * medium =
           dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
-      FollowRefState * frefstate =
-          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
-      postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
-      PlanControlState * pcstate =
-          dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
-      postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
-
-      OperationalLimits * oplims =
-          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
-      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
-
-      TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
-      std::stringstream ss;
-
-      if (command != NULL)
-      {
-        switch (command->op)
-        {
-          case TrexOperation::OP_POST_GOAL:
-            postGoalToken(command->goal_id, TrexToken(*command->token.get()));
-            break;
-        }
-        delete received[TrexCommand::getIdStatic()];
-
-      }
-
-      if (pcstate != NULL)
-        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING);
-
-      // Operational limits are sent by DUNE on request
-      if (oplims == NULL)
-      {
-        GetOperationalLimits req;
-        sendMsg(req);
-      }
-
-      if (m_ref.flags == 0 && estate != NULL)
+      if (!m_blocked && m_ref.flags == 0 && estate != NULL)
       {
         m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
         m_ref.lat = estate->lat;
@@ -307,8 +295,33 @@ namespace TREX
       // Send current reference to DUNE
       if (!m_blocked)
       {
-        sendMsg(m_ref);
+        if (m_ref.lat != 0 || m_ref.lon != 0)
+          sendMsg(m_ref);
       }
+
+      FollowRefState * frefstate =
+          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
+
+      OperationalLimits * oplims =
+          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
+      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+
+      // Operational limits are sent by DUNE on request
+      if (oplims == NULL)
+      {
+        GetOperationalLimits req;
+        sendMsg(req);
+      }
+
+      TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
+      if (command != NULL)
+      {
+        handleTrexOperation(*command);
+        delete received[TrexOperation::getIdStatic()];
+      }
+
+
     }
 
     void

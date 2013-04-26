@@ -32,18 +32,26 @@ Navigator::Going {
 
 	contained_by(condition ControlMode.TREX c);
 		c.start + 1 <= start;
+		
+		// underwater navigation requires LBL or IMU sensors activated
+		//if (z > 0) {
+		//	contained_by(Payload.Active lbl_active);
+		//	lbl_active.object.name == "lbl" || lbl_active.object.name == "imu";
+		//}
 
 	contained_by(Reference.Going g);
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
 		speed == g.speed;
-		//dist == ll_dist(orig_lat, orig_lon, latitude, longitude);	
-		//duration + [-20, 20] == 10 * speed;
+		dist == ll_distance(orig_lat, orig_lon, latitude, longitude);			
+		duration < ceil(dist * speed * 0.8); // 20% tolerance
+		duration > floor(dist * speed * 1.2);
 
 	any(condition EstimatedState.Position origin);
 		orig_lat == origin.latitude;
 		orig_lon == origin.longitude;
 		orig_z == origin.z;
 		origin.start + 1 == start;
+	
 }

@@ -104,6 +104,7 @@ namespace TREX {
 
       void processState();
       bool postUniqueObservation(Observation obs);
+      void handleTrexOperation(TrexOperation trexOp);
       void postGoalToken(std::string goal_id, TrexToken token);
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
