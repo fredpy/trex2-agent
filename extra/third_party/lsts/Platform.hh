@@ -67,7 +67,7 @@ namespace TREX {
       /** @brief Destructor */
       ~Platform();
 
-      static void setControlInterface(TREX::LSTS::ControlInterface * itf);
+      //static void setControlInterface(TREX::LSTS::ControlInterface * itf);
       bool reportToDune(int type, const std::string &context, const std::string &text);
       bool reportToDune(int type, const std::string &message);
       bool reportToDune(const std::string &message);
@@ -104,13 +104,14 @@ namespace TREX {
 
       void processState();
       bool postUniqueObservation(Observation obs);
+      void postGoalToken(std::string goal_id, TrexToken token);
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
       void handleGoingRequest(Goal g);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
-      static ControlInterface * controlInterfaceInstance;
+      //static ControlInterface * controlInterfaceInstance;
 
       // Network related
       UDPSocket send, receive;

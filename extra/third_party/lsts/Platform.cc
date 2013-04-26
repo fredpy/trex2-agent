@@ -38,12 +38,12 @@ namespace TREX
   {
     bool was_idle = false;
     int remote_id = 0;
-    ControlInterface * Platform::controlInterfaceInstance = 0;
+    //ControlInterface * Platform::controlInterfaceInstance = 0;
     ImcAdapter m_adapter;
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                TeleoReactor(arg, false)
+                    TeleoReactor(arg, false)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -182,10 +182,61 @@ namespace TREX
       return false;
     }
 
+//    void
+//    Platform::setControlInterface(ControlInterface * itf)
+//    {
+//      controlInterfaceInstance = itf;
+//    }
+
     void
-    Platform::setControlInterface(ControlInterface * itf)
+    Platform::postGoalToken(std::string goald_id, TrexToken token)
     {
-      controlInterfaceInstance = itf;
+      std::stringstream ss;
+      std::string timeline = token.timeline;
+      std::string predicate = token.predicate;
+
+      ss << "<Goal on='" << token.timeline << "' pred='"
+          << token.predicate << "' id='" << goald_id << "'>\n";
+
+      MessageList<TrexAttribute>::const_iterator it;
+      for (it = token.attributes.begin(); it != token.attributes.end(); it++)
+      {
+        ss << "\t<Variable name='" << (*it)->name << "'>\n";
+
+        switch ((*it)->attr_type)
+        {
+          case TrexAttribute::TYPE_FLOAT:
+            ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_INT:
+            ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_STRING:
+            ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_BOOL:
+            ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_ENUM:
+            ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          default:
+            std::cerr << "Error parsing attribute: ";
+            (*it)->toText(std::cerr);
+            break;
+        }
+
+        ss << "\t</Variable>\n";
+
+        if(m_env->getControlInterfaceReactor() != NULL)
+        {
+          m_env->getControlInterfaceReactor()->proccess_message(ss.str());
+        }
+        else
+        {
+          std::cerr << "ControlInterface not instantiated!\n";
+        }
+      }
     }
 
     void
@@ -197,9 +248,9 @@ namespace TREX
           dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       postUniqueObservation(m_adapter.estimatedStateObservation(estate));
 
-//      IMC::GpsFix * fix =
-//          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
-//      postUniqueObservation(m_adapter.gpsFixObservation(fix));
+      //      IMC::GpsFix * fix =
+      //          dynamic_cast<IMC::GpsFix *>(received[IMC::GpsFix::getIdStatic()]);
+      //      postUniqueObservation(m_adapter.gpsFixObservation(fix));
 
       VehicleMedium * medium =
           dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
@@ -216,33 +267,18 @@ namespace TREX
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
-      TrexCommand * command = dynamic_cast<TrexCommand*>(received[TrexCommand::getIdStatic()]);
+      TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
+      std::stringstream ss;
 
       if (command != NULL)
       {
-      switch (command->command)
-      {
-        case TrexCommand::OP_POST_GOAL:
-          syslog(log::info) << "received (" << command->goal_id << "): " << command->goal_xml;
-          if (controlInterfaceInstance) {
-            controlInterfaceInstance->proccess_message(command->goal_xml);
-          }
-          break;
-        case TrexCommand::OP_ENABLE:
-          syslog(log::warn) << "Enable TREX command received";
-          // post active observation ...
-          postUniqueObservation(Observation("supervision", "Active"));
-          m_blocked = false;
-
-          break;
-        case TrexCommand::OP_DISABLE:
-          syslog(log::warn) << "Disable TREX command received";
-          // post blocked observation ...
-          postUniqueObservation(Observation("supervision", "Blocked"));
-          m_blocked = true;
-          break;
-      }
-      delete received[TrexCommand::getIdStatic()];
+        switch (command->op)
+        {
+          case TrexOperation::OP_POST_GOAL:
+            postGoalToken(command->goal_id, TrexToken(*command->token.get()));
+            break;
+        }
+        delete received[TrexCommand::getIdStatic()];
 
       }
 
@@ -347,7 +383,6 @@ namespace TREX
       {
         msg.setTimeStamp();
         msg.setSource(TREX_ID);
-        msg.setDestination(remote_id);
         IMC::Packet::serialize(&msg, bb);
 
         if (debug)

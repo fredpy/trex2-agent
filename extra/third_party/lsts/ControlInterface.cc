@@ -299,7 +299,7 @@ void ControlInterface::handleInit() {
     // spawn my listener thread
     m_thread.reset(new boost::thread(thread_proxy(this)));
   }
-  Platform::setControlInterface(this);
+  //Platform::setControlInterface(this);
 }
 
 void ControlInterface::handleTickStart() {
