@@ -46,11 +46,11 @@ namespace TREX {
         return Observation("estate", "Boot");
 
       Observation obs("estate", "Position");
+
       double latitude, longitude;
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
-
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
 

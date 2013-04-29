@@ -165,6 +165,14 @@ namespace TREX
     void
     Platform::handleRecall(goal_id const &g)
     {
+      Goal * goal = g.get();
+
+      std::string gname = (goal->object()).str();
+      std::string gpred = (goal->predicate()).str();
+      std::string man_name;
+
+      if (gname == "reference" && gpred == "Going")
+        handleGoingRecall(*goal);
 
     }
 
@@ -242,6 +250,8 @@ namespace TREX
 
         ss << "\t</Variable>\n";
 
+        std::cerr << "Received goal:\n" << ss.str();
+
         if(m_env->getControlInterfaceReactor() != NULL)
         {
           m_env->getControlInterfaceReactor()->proccess_message(ss.str());
@@ -257,10 +267,12 @@ namespace TREX
     Platform::processState()
     {
 
+      bool createNewReference = false;
+
       // if DUNE is disconnected everything is on initial (unknown / boot) state...
       if (!m_connected)
       {
-        m_ref = Reference();
+        createNewReference = true;
         received.clear();
       }
 
@@ -268,8 +280,11 @@ namespace TREX
           dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
       if (pcstate != NULL)
-        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING);
+        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING)
+            && pcstate->plan_id == "trex_plan";
 
+      if (m_blocked)
+        createNewReference = true;
 
       // Translate incoming messages into observations
       EstimatedState * estate =
@@ -280,7 +295,22 @@ namespace TREX
           dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
 
-      if (!m_blocked && m_ref.flags == 0 && estate != NULL)
+      FollowRefState * frefstate =
+          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
+
+      OperationalLimits * oplims =
+          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
+      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+
+
+      if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
+        createNewReference = true;
+
+      if (m_ref.flags == 0)
+        createNewReference = true;
+
+      if (createNewReference && estate != NULL)
       {
         m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
         m_ref.lat = estate->lat;
@@ -295,17 +325,8 @@ namespace TREX
       // Send current reference to DUNE
       if (!m_blocked)
       {
-        if (m_ref.lat != 0 || m_ref.lon != 0)
           sendMsg(m_ref);
       }
-
-      FollowRefState * frefstate =
-          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
-        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
-
-      OperationalLimits * oplims =
-          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
-      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
       // Operational limits are sent by DUNE on request
       if (oplims == NULL)
@@ -324,8 +345,46 @@ namespace TREX
 
     }
 
+    void Platform::handleGoingRecall(Goal g)
+    {
+      EstimatedState * estate =
+                dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+      if (estate != NULL)
+      {
+        double latitude, longitude;
+        latitude = estate->lat;
+        longitude = estate->lon;
+        WGS84::displace(estate->x, estate->y, &latitude, &longitude);
+        int flags = Reference::FLAG_LOCATION;
+        DesiredZ dz;
+        if (estate->depth != -1)
+        {
+          flags |= Reference::FLAG_Z;
+          dz.value = estate->depth;
+          dz.z_units = Z_DEPTH;
+        }
+        else if (estate->alt != -1)
+        {
+          flags |= Reference::FLAG_Z;
+          dz.value = estate->alt;
+          dz.z_units = Z_ALTITUDE;
+        }
+        else if (estate->height != -1){
+          flags |= Reference::FLAG_Z;
+          dz.value = estate->height;
+          dz.z_units = Z_HEIGHT;
+        }
+
+        m_ref.z.set(dz);
+        m_ref.lat = latitude;
+        m_ref.lon = longitude;
+      }
+    }
+
+
     void
-    Platform::handleGoingRequest(Goal g) {
+    Platform::handleGoingRequest(Goal g)
+    {
       Variable v;
       v = g.getAttribute("latitude");
       int flags = Reference::FLAG_LOCATION;
@@ -342,7 +401,7 @@ namespace TREX
       {
         double z = v.domain().getTypedSingleton<double, true>();
         DesiredZ desZ;
-        flags |= Reference::FLAG_LOCATION;
+        flags |= Reference::FLAG_Z;
 
         if (z >= 0)
         {
