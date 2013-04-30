@@ -40,8 +40,12 @@ if(WITH_REST)
 
   if(Wt_FOUND)
     include_directories(${Wt_INCLUDE_DIR})
-    
-    trex_plugin(REST REST_pg.cc)
+
+    trex_plugin(REST REST_pg.cc
+      REST_reactor.cc
+      REST_service.cc
+      REST_reactor.hh
+      REST_service.hh)
     target_link_libraries(REST_pg
       ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
       TREXtransaction)
