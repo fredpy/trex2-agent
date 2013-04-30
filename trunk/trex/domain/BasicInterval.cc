@@ -97,7 +97,7 @@ boost::property_tree::ptree BasicInterval::build_tree() const {
     if( hasLower() )
       TREX::utils::set_attr(info, "min", getStringLower());
     if( hasUpper() )
-      TREX::utils::set_attr(info, "min", getStringUpper());
+      TREX::utils::set_attr(info, "max", getStringUpper());
   }
   return info;
 }

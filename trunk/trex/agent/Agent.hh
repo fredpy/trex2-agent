@@ -363,6 +363,15 @@ namespace TREX {
       std::string date_str(TREX::transaction::TICK cur) const {
         return m_clock->date_str(cur);
       }
+      std::string duration_str(TREX::transaction::TICK dur) const {
+        return m_clock->duration_str(dur);
+      }
+      
+      transaction::TICK finalTick() const {
+        return m_finalTick;
+      }
+
+
       
       /** @brief Agent interraction proxy
        *

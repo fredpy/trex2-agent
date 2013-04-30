@@ -285,7 +285,11 @@ namespace TREX {
       virtual void listAttributes(std::list<TREX::utils::Symbol> &attr,
 				  bool all=true) const;
       
-      virtual boost::property_tree::ptree as_tree() const;
+      boost::property_tree::ptree as_tree() const {
+        return as_tree(true);
+      }
+      
+      boost::property_tree::ptree as_tree(bool all) const;
       
       /** @brief XML output
        * @param out An output stream

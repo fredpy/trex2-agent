@@ -756,7 +756,13 @@ void Agent::initComplete() {
 
   // start the clock
   m_clock->doStart();
-  syslog(null, log::info)<<"Final tick: "<<date_str(m_finalTick);
+  transaction::TICK clock_max = m_clock->max_tick();
+  
+  if( m_finalTick>clock_max )
+    m_finalTick = clock_max;
+  
+  syslog(null, log::info)<<"Final tick: "<<date_str(m_finalTick)
+    <<" ("<<m_finalTick<<").";
   syslog(null, "START")<<"\t=========================================================";
   updateTick(m_clock->tick());
 }

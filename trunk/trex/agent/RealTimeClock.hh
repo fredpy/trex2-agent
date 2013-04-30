@@ -238,6 +238,15 @@ namespace TREX {
         else 
           return Clock::epoch();
       }
+      
+      virtual TREX::transaction::TICK max_tick() const {
+        typename mutex_type::scoped_lock guard(m_lock);
+        if( NULL!=m_clock.get() ) {
+          return timeToTick(date_type(boost::posix_time::max_date_time));
+        } else
+          return Clock::max_tick();
+      }
+
 
       duration_type tickDuration() const {
         return CHRONO::duration_cast<duration_type>(m_period);
@@ -245,17 +254,82 @@ namespace TREX {
       
       transaction::TICK timeToTick(date_type const &date) const {
         typedef utils::chrono_posix_convert<tick_rate> convert;
+    
         return initialTick()+(convert::to_chrono(date-epoch()).count()/m_period.count());
       }
+      
       date_type tickToTime(TREX::transaction::TICK cur) const {
         typedef utils::chrono_posix_convert<tick_rate> convert;
-        return epoch()+convert::to_posix(m_period*(cur-initialTick()));
+        typedef typename convert::posix_duration conv_dur;
+        conv_dur delta, max_delta = boost::posix_time::ptime(boost::posix_time::max_date_time)-epoch();
+        
+        transaction::TICK max_t = max_tick();
+        
+        if( cur>max_t ) {
+          std::cout<<"convert: reduce "<<cur<<" to "<<max_t<<std::endl;
+          cur = max_t;
+        } else
+          std::cout<<"convert: "<<cur<<std::endl;
+        
+        
+        
+        
+        rep const t_max = std::numeric_limits<rep>::max()/(2*m_period.count());
+        
+        if( t_max<=cur ) {          
+//          std::cout<<"convert: "<<cur<<" >= "<<t_max<<std::endl;
+          
+          conv_dur const base = convert::to_posix(m_period*t_max);
+          rep factor = cur/t_max, remains=cur%t_max;
+          
+//          std::cout<<"convert: "<<cur<<" = "<<factor<<"*max + "<<remains<<std::endl;
+//          std::cout<<"convert:     = "<<factor<<"*"<<base<<" + "
+//          <<convert::to_posix(m_period*remains)<<std::endl;
+//          
+//          std::cout<<"Max hours in posix "<<std::numeric_limits<long>::max()<<std::endl;
+          
+          
+          delta = base*factor;
+//          std::cout<<"convert:    = "<<delta<<" + "<<convert::to_posix(m_period*remains)<<std::endl;
+//          std::cout<<"convert:    = "<<factor<<" * "<<(base/factor)<<" + ..."<<std::endl;
+          
+          delta += convert::to_posix(m_period*remains);
+        } else {
+          // Do the same for the min just in case
+          rep const t_min = std::numeric_limits<rep>::min()/(2*m_period.count());
+          
+          if( t_min>=cur ) {
+            conv_dur const base = convert::to_posix(m_period*t_min);
+            rep factor = cur/t_min, remains = cur%t_min;
+            
+            delta = base*factor;
+            delta += convert::to_posix(m_period*remains);
+          } else {
+//            std::cout<<"convert: "<<cur<<" within ("<<t_min<<", "<<t_max<<")"<<std::endl;
+            
+            delta = convert::to_posix(m_period*cur);
+          }
+        }
+        
+//        std::cout<<"convert: delta is "<<delta<<std::endl;
+        
+        return epoch()+delta;
       }
       std::string date_str(TREX::transaction::TICK const &tick) const {
         std::ostringstream oss;
-        oss<<tickToTime(tick)<<" ("<<tick<<')';
+        oss<<tickToTime(tick);
         return oss.str();
       }
+      std::string duration_str(TREX::transaction::TICK dur) const {
+        duration_type dt = tickDuration()*dur;
+        typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
+        
+        typename cvt::posix_duration p_dur = cvt::to_posix(dt);
+        std::ostringstream oss;
+        oss<<p_dur;
+        return oss.str();
+      }      
+      
       std::string info() const {
         std::ostringstream oss;
 # ifndef CPP11_HAS_CHRONO
@@ -363,11 +437,12 @@ namespace TREX {
       typename clock_type::base_time_point m_sleep;
       
       
+      
       typename clock_type::time_point m_tick;
     }; 
     
     typedef rt_clock<CHRONO_NS::milli> RealTimeClock;
-  
+    
     
   } // TREX::agent 
 } // TREX
