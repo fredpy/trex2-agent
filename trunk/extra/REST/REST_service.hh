@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,22 +31,37 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "REST_reactor.hh"
+#ifndef H_trex_REST_service
+# define H_trex_REST_service
 
-#include <trex/utils/Plugin.hh>
+# include <Wt/WResource>
+# include <Wt/Http/Response>
 
-using namespace TREX::utils;
-using namespace TREX::REST;
-
-namespace {
-  using TREX::transaction::TeleoReactor;
-
-  SingletonUse<LogManager> s_log;
-  TeleoReactor::xml_factory::declare<REST_reactor> decl("REST_api");
-}
+# include <boost/function.hpp>
+# include <boost/property_tree/ptree.hpp>
 
 namespace TREX {
-  void initPlugin() {
-    ::s_log->syslog("plugin.REST", log::info)<<"REST plugin loaded."<<std::endl;
+  namespace REST {
+    
+    class REST_service :public Wt::WResource {
+    public:
+      typedef boost::property_tree::ptree fn_output;
+      typedef Wt::Http::Request           fn_input;
+      
+      typedef boost::function<fn_output (fn_input const &)> handler_fn;
+      
+      template<typename Handler>
+      explicit REST_service(Handler f):m_handler(f) {}
+      ~REST_service() {}
+      
+    private:
+      void handleRequest(Wt::Http::Request const &req,
+                         Wt::Http::Response &response);
+      
+      handler_fn m_handler;
+    };
+    
   }
 }
+
+#endif
