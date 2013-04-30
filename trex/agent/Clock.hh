@@ -108,6 +108,9 @@ namespace TREX {
       void doStart();
 
       TREX::transaction::TICK tick();
+      virtual TREX::transaction::TICK max_tick() const {
+        return std::numeric_limits<TREX::transaction::TICK>::max();
+      }
       bool is_free() const;
 
       
@@ -170,6 +173,8 @@ namespace TREX {
        * @return A string representation for @p tick
        */
       virtual std::string date_str(TREX::transaction::TICK const &tick) const;
+
+      virtual std::string duration_str(TREX::transaction::TICK dur) const;
 
       /** @brief XML factory for clocks. */
       typedef TREX::utils::XmlFactory<Clock, boost::shared_ptr<Clock> > xml_factory;

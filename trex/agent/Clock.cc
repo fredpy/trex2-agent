@@ -151,3 +151,8 @@ std::string Clock::date_str(TICK const &tick) const {
   oss<<tick;
   return oss.str();
 }
+
+std::string Clock::duration_str(TICK dur) const {
+  return date_str(dur);
+}
+

@@ -181,6 +181,11 @@ std::string graph::date_str(TICK cur) const {
   return oss.str();
 }
 
+std::string graph::duration_str(TICK dur) const {
+  return date_str(dur);
+}
+
+
 
 void graph::clear() {
   while( !m_reactors.empty() ) {
@@ -317,6 +322,84 @@ goal_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
   
   return goal_id(new Goal(goal));
 }
+
+namespace bp=boost::property_tree;
+
+namespace {
+  
+  std::string date_export(graph const &g, IntegerDomain::bound const &val) {
+    return g.date_str(val.value());
+  }
+  
+  bp::ptree date_export(graph const &g, IntegerDomain const &dom) {
+    bp::ptree ret;
+    bp::ptree &tmp = ret.add_child("date", bp::ptree());
+    
+    if( dom.isSingleton() )
+      TREX::utils::set_attr(tmp, "value", date_export(g,dom.lowerBound()));
+    else {
+      if( dom.hasLower() ) 
+        TREX::utils::set_attr(tmp, "min", date_export(g,dom.lowerBound()));
+      if( dom.hasUpper() )
+        TREX::utils::set_attr(tmp, "max", date_export(g,dom.lowerBound()));
+    }
+    TREX::utils::set_attr(ret, "type", "date");
+    return ret;
+  }
+  
+  std::string duration_export(graph const &g,
+                              IntegerDomain::bound const &val) {
+    return g.duration_str(val.value());
+  }
+  
+  bp::ptree duration_export(graph const &g, IntegerDomain const &dom) {
+    bp::ptree ret;
+    bp::ptree &tmp = ret.add_child("duration", bp::ptree());
+    
+    if( dom.isSingleton() )
+      TREX::utils::set_attr(tmp, "value",
+                            duration_export(g,dom.lowerBound()));
+    else {
+      if( dom.hasLower() )
+        TREX::utils::set_attr(tmp, "min",
+                              duration_export(g,dom.lowerBound()));
+      if( dom.hasUpper() )
+        TREX::utils::set_attr(tmp, "max",
+                              duration_export(g,dom.lowerBound()));
+    }
+    TREX::utils::set_attr(ret, "type", "duration");
+    return ret;
+  }
+}
+
+boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
+  bp::ptree ret = g->as_tree(false);
+  bp::ptree &attr = ret.front().second;
+  boost::optional<bp::ptree &> vars = attr.get_child_optional("Variable");
+  
+  if( !vars )
+    vars = attr.add_child("Variable", bp::ptree());
+  
+  if( !g->getStart().isFull() ) {
+    bp::ptree domain = date_export(*this, g->getStart());
+    TREX::utils::set_attr(domain, "name", "start");
+    vars->push_back(bp::ptree::value_type("", domain));
+  }
+  if( !g->getEnd().isFull() ) {
+    bp::ptree domain = date_export(*this, g->getEnd());
+    TREX::utils::set_attr(domain, "name", "end");
+    vars->push_back(bp::ptree::value_type("", domain));
+  }
+  if( g->getDuration().hasUpper() ||
+     g->getDuration().lowerBound()!=Goal::s_durationDomain.lowerBound() ) {
+    bp::ptree domain = duration_export(*this, g->getDuration());
+    TREX::utils::set_attr(domain, "name", "duration");
+    vars->push_back(bp::ptree::value_type("", domain));    
+  }
+
+  return ret;
+}
+
 
 
 /*

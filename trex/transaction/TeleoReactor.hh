@@ -297,6 +297,9 @@ namespace TREX {
       std::string date_str(TICK cur) const {
         return m_graph.date_str(cur);      
       }
+      std::string duration_str(TICK cur) const {
+        return m_graph.duration_str(cur);
+      }
 
       /** @brief Get current tick
        *
@@ -323,7 +326,12 @@ namespace TREX {
        * @sa getCurrentTick() const
        */
       TICK getFinalTick() const {
-	return m_finalTick;
+        TICK g_final = m_graph.finalTick();
+        
+        if( g_final<m_finalTick )
+          return g_final;
+        else
+          return m_finalTick;
       }
       /** @brief reactor latency
        *

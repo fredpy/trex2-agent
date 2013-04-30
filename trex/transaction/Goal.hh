@@ -287,10 +287,11 @@ namespace TREX {
       void restrictEnd(IntegerDomain const &e) {
 	restrictTime(s_dateDomain, s_durationDomain, e);
       }
-    private:
-      Variable m_start, m_duration, m_end;
       static IntegerDomain const s_dateDomain;
       static IntegerDomain const s_durationDomain;
+
+    private:
+      Variable m_start, m_duration, m_end;
       
       TREX::utils::Symbol const &getPredTag() const;
     };

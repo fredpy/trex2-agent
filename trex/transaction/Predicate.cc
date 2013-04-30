@@ -106,23 +106,31 @@ std::ostream &Predicate::print_to(std::ostream &out) const {
   return out;
 }
 
-boost::property_tree::ptree Predicate::as_tree() const {
-  std::list<Symbol> vars;
+boost::property_tree::ptree Predicate::as_tree(bool all) const {
   boost::property_tree::ptree ret;
   boost::property_tree::ptree &val = ret.add_child(getPredTag().str(), boost::property_tree::ptree());
   
   set_attr(val, "on", object());
   set_attr(val, "pred", predicate());
-  listAttributes(vars, false);
-  
-  if( !vars.empty() ) {
+  if( all ) {
+    std::list<Symbol> vars;
+    listAttributes(vars, false);
+
+    if( !vars.empty() ) {
+      boost::property_tree::ptree &tmp = val.add_child("Variable", boost::property_tree::ptree());
+      
+      do {
+        tmp.push_back(boost::property_tree::ptree::value_type("", getAttribute(vars.front()).as_tree()));
+        vars.pop_front();
+      } while( !vars.empty() );
+    }
+  } else if( !m_vars.empty() ) {
     boost::property_tree::ptree &tmp = val.add_child("Variable", boost::property_tree::ptree());
-    
-    do {
-      tmp.push_back(boost::property_tree::ptree::value_type("", getAttribute(vars.front()).as_tree()));
-      vars.pop_front();
-    } while( !vars.empty() );
+
+    for(const_iterator i=begin(); end()!=i; ++i) 
+      tmp.push_back(boost::property_tree::ptree::value_type("", i->second.as_tree()));
   }
+  
   return ret;
 }
 

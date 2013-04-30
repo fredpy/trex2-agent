@@ -126,7 +126,7 @@ namespace TREX {
     public:
       typedef CHRONO::nanoseconds duration_type;
       typedef boost::posix_time::ptime   date_type;
-    
+          
       /** @brief reactor ID type
        *
        * The type used to represent a reactor in the graph
@@ -496,6 +496,10 @@ namespace TREX {
       TICK getCurrentTick() const {
 	return m_currentTick;
       }
+      virtual TICK finalTick() const {
+        return std::numeric_limits<TICK>::max();
+      }
+      
       /** @brief get tick duration
        *
        * This method provides the tick duration in real-time in order to
@@ -554,7 +558,7 @@ namespace TREX {
       }
   
       virtual std::string date_str(TICK cur) const;
-
+      virtual std::string duration_str(TICK dur) const;
       
       /** @brief Number of reactors
        *
@@ -652,7 +656,8 @@ namespace TREX {
       }
       
       goal_id parse_goal(boost::property_tree::ptree::value_type goal) const;
-            
+      boost::property_tree::ptree export_goal(goal_id const &g) const;
+      
     protected:
       reactor_id add_reactor(reactor_id r);
 

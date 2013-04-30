@@ -155,6 +155,8 @@ int main(int argc, char *argv[]) {
   ("log-dir,L", po::value<std::string>(), "Set log directory")
   ("sim,s", po::value<size_t>()->implicit_value(60),
    "run agent with simulated clock with given deliberation steps per tick")
+  ("period,p", po::value<unsigned long>()->implicit_value(1000),
+   "run agent with a real time clock with the given period in ms")
   ("nice", po::value<size_t>()->implicit_value(10),
    "run this command with the given nice level")
 #ifdef DAEMON // fork does not work well with asio apprently ... to be refined
@@ -324,7 +326,20 @@ int main(int argc, char *argv[]) {
   clock_ref clk;
   
   // Do we use a simulated clock ?
-  if( opt_val.count("sim") ) {
+  if( opt_val.count("period") ) {
+    if( opt_val.count("sim") ) {
+      std::cerr<<"Options period and sim are conflicting: pick one!\n"
+      <<opt<<std::endl;
+      exit(1);
+    }
+    unsigned long ms = opt_val["period"].as<unsigned long>();
+    if( ms<=0 ) {
+      std::cerr<<"period of "<<ms<<"ms is invalid.\n"
+      <<opt<<std::endl;
+      exit(1);
+    }
+    clk.reset(new RealTimeClock(CHRONO::milliseconds(ms)));
+  } else if( opt_val.count("sim") ) {
     clk.reset(new StepClock(Clock::duration_type(0),
                             opt_val["sim"].as<size_t>()));
   }

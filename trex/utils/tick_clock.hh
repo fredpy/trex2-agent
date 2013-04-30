@@ -227,14 +227,15 @@ namespace TREX {
         } else 
           return base_duration::zero();
       }
-          
+      
+      
       
       /** @brief time left 
        * 
        * @param[in] target A date
        *
        * @return the duration until target
-       */ 
+       */
       base_duration left(time_point const &target) const {
         duration t_dur = target.time_since_epoch();
         base_time_point 
