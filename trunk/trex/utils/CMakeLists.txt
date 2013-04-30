@@ -126,7 +126,7 @@ else(TREX_FROM_PKG)
  mark_as_advanced(WITH_SVN_TRACK)
 
  if(WITH_SVN_TRACK)
-    set(SVN_HH ${TREX_EXTRA_DIR}/svn/version.hh)
+    set(SVN_HH svn/version.hh)
     add_custom_target(svnheader ALL 
       DEPENDS ${SVN_HH})
     add_dependencies(trex_prep svnheader)
@@ -143,12 +143,13 @@ else(TREX_FROM_PKG)
     set_source_files_properties(${SVN_HH}
       PROPERTIES GENERATED TRUE
      # HEADER_FILE_ONLY TRUE
-      LOCATION ${TREX_EXTRA_DIR})
+     LOCATION ${TREX_EXTRA_DIR}
+     )
 
     add_dependencies(TREXutils svnheader)
 
     set_source_files_properties(TREXversion.cc
-      PROPERTIES OBJECT_DEPENDS ${SVN_HH})
+      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${SVN_HH})
     add_definitions(-DWITH_SVN_TRACK)
  endif(WITH_SVN_TRACK)
 endif(TREX_FROM_PKG)

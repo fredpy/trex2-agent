@@ -56,6 +56,7 @@ else(Subversion_FOUND)
   set(MY_WC_PATH    "")
   set(MY_WC_REV     "svn_not_found")
 endif(Subversion_FOUND)
+# message("svn version is ${MY_WC_REV}")
 
 file(WRITE svn_version.hh.txt 
   "#define SVN_INFO ${MY_FLAG}\n"
