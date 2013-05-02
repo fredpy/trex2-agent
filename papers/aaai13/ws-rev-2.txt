@@ -1,0 +1,64 @@
+This paper raises the issue of dynamically introduced goals, where a
+plan can be interrupted at runtime to insert a new goal. When the
+agent is using a temporally flexible plan this represents an
+opportuniy, because the agent can organize its plan to have maximum
+flexibility to receive incoming goal, but also a problem, because it
+is not clear how to do this.
+
+To do so, the paper pre-defines an execution policy (do this now, or
+wait the maximum amount of time possible) for each goal. This is
+writing in the solution to the problem in some sense. However, the
+algorithm produced by the authors propagates these backwards so it can
+assign a reasonable policy to a sequence of operators leading to that
+subgoal. However, I'd like to see some insight into, fundamentally,
+which goals should be delayed and which should not. I think this has
+something to do with the operators reachable from the states, i.e.,
+which operators (or subgoals) can be easily reached from a state. I
+expect we would need to consider the distribution of goals over
+states, to determine whether each goal is likely or unlikely to make
+reaching a new goal feasible.
+
+One thing that bothers me is that you may wish to have multiple
+policies per goal, for example, consider examining vent 2. If the task
+is examine vent 2, then surface, we want to execute examining vent 2
+immediately. But if the goal is examine vent 1, then examine vent 2,
+then surface, we may, after examining vent 1, wish to remain in the
+area before moving to vent 2, in case we get new goals to do with vent
+1. So we want examining vent 2 to be pushed back. How far we want it
+pushed back is an interesting question, and reasoning about it will, I
+suspect, require the use of probabilities. I am reasonably convinced
+that is necessary anyway.
+
+The authors present results which are mostly to do with planning time,
+which isn't anywhere near as interesting as experimentally evaluating
+how much time the actual UAV would save if it used this new planning
+mechanism vs. selecting a deferral policy at random, or using a
+default one. This can be done in simulation, given the amount of time
+an effort it takes to actually perform a UAV run, but would require
+some sort of selection of appropriate tasks to average over.
+
+This is definitely the sort of paper the workshop is looking for,
+because it formalizes a problem that has been raised by the
+implementation of AI techniques on a real robot system. However, I
+think there is a lot more to this problem than the authors' fairly
+straightforward solution, and I would've liked to have seen more
+insight into how to automatically determine the appropriate deferral
+policy.
+
+Unfortunately the paper has a few too many instances of poor writing. A few examples:
+ o "within the robotic architecture" sounds like the architecture is
+ robotic.
+ o A parenthetical citation is not a noun.
+ o "early dispatch policy therfore, has" -> has therefore
+ o "are in the order of a day" -> "last on the order of a day".
+ o "with a scientific goal to collects data" -> "with the goal of
+ collecting data"
+ o "And, we provide a simple" -> "We provide a simple"
+ o "scientific objective to sample" -> "of sampling"; "goal to be
+ back" -> "goal of being back"
+ o "deferment" -> "deferral"
+ o m-dashes do not have trailing spaces
+ o "thru" is not a word.
+  ... etc.
+
+Recommendation: weak accept. 
