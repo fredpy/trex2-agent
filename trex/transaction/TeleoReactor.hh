@@ -49,7 +49,7 @@
 
 # include <trex/utils/TimeUtils.hh>
 
-# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+# if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #  include <boost/chrono/thread_clock.hpp>
 # endif 
 
@@ -94,16 +94,14 @@ namespace TREX {
       typedef details::external_set                       external_set;
  
     public:
-# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-      typedef CHRONO::thread_clock stat_clock;
-# else
-#  if defined(CPP11_HAS_CHRONO)
+# if defined(CPP11_HAS_CHRONO) 
       // standard do not support processing time AFAIK
       typedef CHRONO::high_resolution_clock stat_clock;
-#  else
+# elif defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+      typedef CHRONO::thread_clock stat_clock;
+# else
       // boost does on the other hand
       typedef CHRONO::process_user_cpu_clock stat_clock;
-#  endif
 # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
       typedef stat_clock::duration stat_duration; 
 
