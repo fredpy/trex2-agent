@@ -261,37 +261,27 @@ namespace TREX {
       date_type tickToTime(TREX::transaction::TICK cur) const {
         typedef utils::chrono_posix_convert<tick_rate> convert;
         typedef typename convert::posix_duration conv_dur;
-        conv_dur delta, max_delta = boost::posix_time::ptime(boost::posix_time::max_date_time)-epoch();
+        static boost::posix_time::ptime const max_date(boost::posix_time::max_date_time);
+        conv_dur delta /*, max_delta = max_date-epoch()*/;
         
         transaction::TICK max_t = max_tick();
         
         if( cur>max_t ) {
-          std::cout<<"convert: reduce "<<cur<<" to "<<max_t<<std::endl;
+          syslog(warn)<<"Tick "<<cur<<" is larger than max delay until "
+          <<max_date<<".\n\tReducing it to "<<max_t;
           cur = max_t;
-        } else
-          std::cout<<"convert: "<<cur<<std::endl;
-        
-        
-        
+        }
         
         rep const t_max = std::numeric_limits<rep>::max()/(2*m_period.count());
         
         if( t_max<=cur ) {          
-//          std::cout<<"convert: "<<cur<<" >= "<<t_max<<std::endl;
           
           conv_dur const base = convert::to_posix(m_period*t_max);
           rep factor = cur/t_max, remains=cur%t_max;
           
-//          std::cout<<"convert: "<<cur<<" = "<<factor<<"*max + "<<remains<<std::endl;
-//          std::cout<<"convert:     = "<<factor<<"*"<<base<<" + "
-//          <<convert::to_posix(m_period*remains)<<std::endl;
-//          
-//          std::cout<<"Max hours in posix "<<std::numeric_limits<long>::max()<<std::endl;
           
           
           delta = base*factor;
-//          std::cout<<"convert:    = "<<delta<<" + "<<convert::to_posix(m_period*remains)<<std::endl;
-//          std::cout<<"convert:    = "<<factor<<" * "<<(base/factor)<<" + ..."<<std::endl;
           
           delta += convert::to_posix(m_period*remains);
         } else {
@@ -305,13 +295,9 @@ namespace TREX {
             delta = base*factor;
             delta += convert::to_posix(m_period*remains);
           } else {
-//            std::cout<<"convert: "<<cur<<" within ("<<t_min<<", "<<t_max<<")"<<std::endl;
-            
             delta = convert::to_posix(m_period*cur);
           }
         }
-        
-//        std::cout<<"convert: delta is "<<delta<<std::endl;
         
         return epoch()+delta;
       }
