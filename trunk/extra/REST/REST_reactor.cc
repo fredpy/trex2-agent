@@ -54,13 +54,13 @@ namespace alg=boost::algorithm;
 namespace {
   
   template<class Set>
-  bp::ptree list_timelines(Set const &l, Wt::Http::Request const &req) {
+  bp::ptree list_timelines(Set const &l, req_info const &req) {
     bp::ptree ret, tls;
     
     for(typename Set::const_iterator i=l.begin(); l.end()!=i; ++i) {
       bp::ptree tl;
       tl.put("name", *i);
-      tl.put("href", "/timeline/"+i->str());
+      tl.put("href", req.request().path()+"/timeline/"+i->str());
       tls.push_back(bp::ptree::value_type("", tl));
     }
     ret.add_child("timelines", tls);
@@ -121,12 +121,32 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     delete [] argv;
     
     graph::timelines_listener::initialize();
-    m_server->addResource(new REST_service(boost::bind(&REST_reactor::timelines,
-                                                       this, _1)),
-                          "/timelines");
-    m_server->addResource(new REST_service(boost::bind(&REST_reactor::tick_info,
-                                                       this, _1)),
-                          "/tick");
+    m_server->addResource(&m_services, "/rest");
+    m_services.add_handler("tick",
+                           boost::bind(&REST_reactor::get_tick, this, _1),
+                           "Give tick information.\n"
+                           "If no argument, gives the current tick.\n"
+                           "Example: /rest/tick/1");
+    m_services.add_handler("tick/next",
+                           boost::bind(&REST_reactor::next_tick, this, _1),
+                           "Give next tick information");
+    m_services.add_handler("tick/initial",
+                           boost::bind(&REST_reactor::initial_tick, this, _1),
+                           "Give initial tick when trex got started.");
+    m_services.add_handler("tick/final",
+                           boost::bind(&REST_reactor::final_tick, this, _1),
+                           "Give final tick when trex will exit.");
+    m_services.add_handler("tick/at",
+                           boost::bind(&REST_reactor::tick_at, this, _1),
+                           "Give the largest tick before the given date.\n"
+                           "Example: /tick/at/2013-May-03%2021:17:21");
+    m_services.add_handler("tick/rate",
+                           boost::bind(&REST_reactor::tick_period, this, _1),
+                           "Give the duration between two ticks");
+    m_services.add_handler("timelines",
+                           boost::bind(&REST_reactor::timelines, this, _1),
+                           "List all the timelines");
+    
     if( !m_server->start() )
       throw ReactorException(*this, "Unable to start the server");
 
@@ -176,78 +196,56 @@ void REST_reactor::undeclared(details::timeline const &tl) {
   m_strand->post(boost::bind(&REST_reactor::remove_tl, this, tl.name()));
 }
 
-bp::ptree REST_reactor::timelines(Wt::Http::Request const &req) {
+bp::ptree REST_reactor::timelines(req_info const &req) {
   return strand_run<bp::ptree>(boost::bind(&list_timelines<tl_set>,
                                            boost::ref(m_timelines),
                                            req));
 }
 
-bp::ptree REST_reactor::tick_info(Wt::Http::Request const &req) {
+bp::ptree REST_reactor::tick_info(TICK date) const {
   bp::ptree ret;
-  std::string sub_path(req.pathInfo());
   
-  std::list<std::string> rest_params;
-  alg::split(rest_params, sub_path, alg::is_any_of("/"),
-             alg::token_compress_on);
-  std::list<std::string>::iterator i=rest_params.begin();
+  ret.put("value", date);
+  ret.put("date", this->date_str(date));
+  return ret;
+}
+
+bp::ptree REST_reactor::get_tick(req_info const &req) const {
+  TICK date;
   
-  // Remove all the empty ones
-  while( i!=rest_params.end() ) {
-    if( i->empty() )
-      i = rest_params.erase(i);
-    else
-      ++i;
-  }
-  
-  TICK cur;
-  
-  if( rest_params.empty() )
-    cur = getCurrentTick();
-  else if( rest_params.front()=="rate" ) {
-    duration_type rate = this->tickDuration();
-    // Commented out as the format id not really standard right now
-    //std::ostringstream oss;
-    //TREX::utils::display(oss, rate);
-    //ret.put("duration", oss.str());
-    
-    CHRONO::nanoseconds
-      ns = CHRONO::duration_cast<CHRONO::nanoseconds>(rate);
-    ret.put("nanoseconds", ns.count());
-    ret.put("duration", duration_str(1));
-    
-    return ret;
-  } else if( rest_params.front()=="initial" )
-    cur = getInitialTick();
-  else if( rest_params.front()=="next" )
-    cur = getCurrentTick()+1;
-  else if( rest_params.front()=="final" )
-    cur = getFinalTick();
-  else if( rest_params.front()=="at" ) {
-    if( rest_params.size()!=2 )
-      throw ReactorException(*this, "tick/at require a UTC date.\n"
-                             "Example tick/at/2013-Apr-23%2021:03:00");
-    // TODO need to parse the date
-    std::string date_str = Wt::Utils::urlDecode(rest_params.back());
+  if( req.arg_list().empty() )
+    date = getCurrentTick();
+  else {
     try {
-      syslog(info)<<"Parsing \""<<date_str<<"\" as a date";
-      date_type date = utils::string_cast<date_type>(date_str);
-      syslog(info)<<"Result of parsing is "<<date;
-      
-      cur = this->timeToTick(date);
-      syslog(info)<<"conversion in tick is "<<cur
-      <<"\n\twhich is "<<this->date_str(cur);
+      date = TREX::utils::string_cast<TICK>(req.arg_list().front());
     } catch(...) {
-      throw ReactorException(*this, "Invalid date format: "+date_str);
-    }
-  } else {
-    try {
-      cur = TREX::utils::string_cast<TICK>(rest_params.front());
-    } catch(...) {
-      throw ReactorException(*this, "Invalid tick request "+req.path()+req.pathInfo());
+      throw ReactorException(*this, "Invalid tick request "+req.request().path()+
+                             req.request().pathInfo());
     }
   }
-  ret.put("value", cur);
-  ret.put("date", this->date_str(cur));
+  return tick_info(date);
+}
+
+bp::ptree REST_reactor::tick_at(req_info const &req) const {
+  if( req.arg_list().empty() )
+    throw ReactorException(*this, "Missing date argument to "+req.request().path()+req.request().pathInfo());
+  std::string date_str = Wt::Utils::urlDecode(req.arg_list().front());
+  try {
+    date_type date = utils::string_cast<date_type>(date_str);
+    return tick_info(this->timeToTick(date));
+  } catch(...) {
+    throw ReactorException(*this, "Failed to parse date: "+date_str);
+  }
+}
+
+bp::ptree REST_reactor::tick_period(req_info const &req) const {
+  duration_type rate = this->tickDuration();
+  CHRONO::nanoseconds
+    ns = CHRONO::duration_cast<CHRONO::nanoseconds>(rate);
+  bp::ptree ret;
+  
+  ret.put("nanoseconds", ns.count());
+  ret.put("duration", duration_str(1));
   return ret;
 }
 
