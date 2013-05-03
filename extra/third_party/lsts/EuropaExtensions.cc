@@ -155,7 +155,8 @@ InsideOpLimits::InsideOpLimits(EUROPA::LabelStr const &name,
 void InsideOpLimits::handleExecute() {
 
   double lat, lon, depth;
-  bool inside = true;
+  // commented unused variable
+  // bool inside = true;
   double x, y;
 
   if (s_oplimits == NULL)
