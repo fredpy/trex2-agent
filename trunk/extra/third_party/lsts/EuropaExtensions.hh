@@ -4,6 +4,9 @@
 # include <trex/europa/config.hh>
 
 
+// It may look like I include the same header twice but it is just a
+// C preprocessor trick to make gcc thinks that PLASMA headers are
+// system headers and therefore not complain but its bad implementation
 # define TREX_PP_SYSTEM_FILE <PLASMA/Constraint.hh>
 # include <trex/europa/bits/system_header.hh>
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
