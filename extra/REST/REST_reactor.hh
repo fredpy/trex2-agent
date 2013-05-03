@@ -35,9 +35,12 @@
 # define H_trex_REST_reactor
 
 # include <trex/transaction/TeleoReactor.hh>
+# include "REST_service.hh"
+
 # include <Wt/WServer>
 
 # include <boost/thread.hpp>
+
 
 namespace TREX {
   namespace REST {
@@ -61,8 +64,21 @@ namespace TREX {
       void declared(transaction::details::timeline const &timeline);
       void undeclared(transaction::details::timeline const &timeline);
       
-      boost::property_tree::ptree timelines(Wt::Http::Request const &req);
-      boost::property_tree::ptree tick_info(Wt::Http::Request const &req);
+      boost::property_tree::ptree tick_info(transaction::TICK date) const;
+      boost::property_tree::ptree tick_period(req_info const &req) const;
+      boost::property_tree::ptree get_tick(req_info const &req) const;
+      boost::property_tree::ptree tick_at(req_info const &req) const;
+      boost::property_tree::ptree next_tick(req_info const &) const {
+        return tick_info(getCurrentTick()+1);
+      }
+      boost::property_tree::ptree initial_tick(req_info const &) const {
+        return tick_info(getInitialTick());
+      }
+      boost::property_tree::ptree final_tick(req_info const &) const {
+        return tick_info(getFinalTick());
+      }
+            
+      boost::property_tree::ptree timelines(req_info const &req);
       
       void add_tl(utils::Symbol const &tl);
       void remove_tl(utils::Symbol const &tl);
@@ -76,6 +92,8 @@ namespace TREX {
                                   boost::ref(tsk)));
         return result.get();
       }
+      
+      REST_service m_services;
   
       
       UNIQ_PTR<Wt::WServer>           m_server;
