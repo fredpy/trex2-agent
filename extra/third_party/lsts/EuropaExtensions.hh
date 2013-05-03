@@ -3,8 +3,11 @@
 
 # include <trex/europa/config.hh>
 
-# include <PLASMA/Constraint.hh>
-# include <PLASMA/Domain.hh>
+
+# define TREX_PP_SYSTEM_FILE <PLASMA/Constraint.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
+# include <trex/europa/bits/system_header.hh>
 
 # include <DUNE/DUNE.hpp>
 
