@@ -212,9 +212,7 @@ REST_service::fn_output REST_service::print_help(req_info const &req) const {
   
   cb_map const &pos = walk_path(m_handlers, extra,
                                 boost::bind(&handler_wrap::active, _1),
-                                base);
-  std::cout<<" -> wk ["<<collapse(extra, "/")<<", "<<collapse(base,  "/")<<']'<<std::endl;
-  
+                                base);  
   bpt::ptree ret,help;
   
   ret.add_child("help", build_help(help, pos, base));

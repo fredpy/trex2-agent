@@ -79,6 +79,10 @@ namespace TREX {
       }
             
       boost::property_tree::ptree timelines(req_info const &req);
+      boost::property_tree::ptree timeline(req_info const &req);
+      boost::property_tree::ptree manage_goal(req_info const &req);
+
+      boost::property_tree::ptree get_timeline(std::string name);
       
       void add_tl(utils::Symbol const &tl);
       void remove_tl(utils::Symbol const &tl);
