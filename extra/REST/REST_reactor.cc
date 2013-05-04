@@ -146,6 +146,15 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     m_services.add_handler("timelines",
                            boost::bind(&REST_reactor::timelines, this, _1),
                            "List all the timelines");
+    m_services.add_handler("timeline",
+                           boost::bind(&REST_reactor::timeline, this, _1),
+                           "Access information ot a specific timeline.\n"
+                           "Example: /rest/timeline/foo");
+    m_services.add_handler("goal",
+                           boost::bind(&REST_reactor::manage_goal, this, _1),
+                           "POST: post the attached goal to trex.\n"
+                           "DELETE: request the concelation of the given goal.\n"
+                           "GET: get a description of an exisiting goal.\n");
     
     if( !m_server->start() )
       throw ReactorException(*this, "Unable to start the server");
@@ -200,6 +209,46 @@ bp::ptree REST_reactor::timelines(req_info const &req) {
   return strand_run<bp::ptree>(boost::bind(&list_timelines<tl_set>,
                                            boost::ref(m_timelines),
                                            req));
+}
+
+bp::ptree REST_reactor::timeline(req_info const &req) {
+  if( req.arg_list().empty() )
+    throw ReactorException(*this, "Missing timeline argeument to "
+                           +req.request().path()+req.request().pathInfo());
+  return strand_run<bp::ptree>(boost::bind(&REST_reactor::get_timeline,
+                                           this, req.arg_list().front()));
+}
+
+bp::ptree REST_reactor::manage_goal(req_info const &req) {
+  std::string kind = req.request().method();
+  bp::ptree ret;
+  ret.put("kind", kind);
+  
+  if( kind=="POST" ) {
+    ret.put("warning", "unimplemented");
+    return ret;
+  } else if( kind=="DELETE" ) {
+    ret.put("warning", "unimplemented");
+    return ret;
+  } else if( kind=="GET" ) {
+    ret.put("warning", "unimplemented");
+    return ret;
+  } else 
+    throw ReactorException(*this, "http method \""+kind+"\" is not supported by "
+                           +req.request().path()+req.request().pathInfo());
+
+}
+
+
+bp::ptree REST_reactor::get_timeline(std::string name) {
+  bp::ptree ret;
+  
+  tl_set::iterator i=m_timelines.find(name);
+  
+  ret.put("warning", "unimplemented");
+  if( m_timelines.end()!=i )
+    ret.put("name", *i);
+  return ret;
 }
 
 bp::ptree REST_reactor::tick_info(TICK date) const {
