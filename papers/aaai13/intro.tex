@@ -4,10 +4,10 @@
 As autonomous robots become more robust and persistent, the likelihood
 of receiving new or modified objectives \emph{during} an ongoing
 mission is high. Generative continuous planning, integrated within the
-robotic architecture, is one approach to enhance persistence while
+robot's architecture, is one approach to enhance persistence while
 dealing with evolving objectives and unanticipated situations.
-Earlier work in
-\cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10}
+Earlier works,
+\cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10},
 have contributed control architectures, which embed planning engines.
 They support a rich representation dealing with durative actions,
 while ensuring partial plans are flexible for robust execution
@@ -40,15 +40,15 @@ exception in dealing with dynamic controllability \cite{morris01} ---
 acting as early as possible keeps the remaining partial plan
 flexible. Moreover, should the plan break, the robot has more time
 left to identify and execute an alternate recovery strategy. An early
-dispatch policy therefore, has proved to be the most efficient
+dispatch policy has therefore proved to be the most efficient
 approach for the robot to robustly execute its plan when the set of
 goals for the mission are fully instantiated.
 
 Our experience in marine robotics shows that in a number of instances,
 the full set of objectives of the robot is not known a priori. While
-our missions are in the order of a day, it is often feasible to have
-an initial plan that could be executed in few hours. For example, a
-typical mission can start with a scientific goal to collects data on
+our missions last on the order of a day, it is often feasible to have
+an initial plan that could be executed in a few hours. For example, a
+typical mission can start with the scientific goal of collecting data on
 an area for half of the mission and an operational goal to be at the
 recovery location by the end of the mission. During this time, a
 scientist receives and analyzes data collected by the robot, which
@@ -61,7 +61,7 @@ undergoing execution.
 In this paper we focus on a study demonstrating that strict execution
 policies can present problems when new goals can emerge at any time
 within mission scope; we are agnostic to the planning process
-itself. And, we provide a simple solution that exploits temporal plan
+itself. We provide a simple solution that exploits temporal plan
 structure to identify the execution policy of the next potential set
 of actions. % based on the goals they are contributing to
 % motivated by our domain.
