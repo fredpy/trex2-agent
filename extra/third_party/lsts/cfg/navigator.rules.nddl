@@ -10,21 +10,6 @@ Navigator::At {
 		z == arr.z;
 		speed == arr.speed;
 	
-	met_by(effect Going g);
-		latitude == g.latitude;
-		longitude == g.longitude;
-		z == g.z;
-		speed == g.speed;
-	
-	contained_by(condition OperationalLimits.Limits limits);
-		if (z > 0) {
-			z < limits.max_depth;
-		}
-		else {
-			-1 * z < limits.max_altitude;
-			-1 * z > limits.min_altitude;
-		}		
-		
 	duration >= secs; 
 }
 
@@ -39,7 +24,23 @@ Navigator::Going {
 		//	lbl_active.object.name == "lbl" || lbl_active.object.name == "imu";
 		//}
 
-	contained_by(Reference.Going g);
+	contained_by(condition OperationalLimits.Limits limits);
+		if (z > 0) {
+			z < limits.max_depth;
+		}
+		else {
+			-1 * z < limits.max_altitude;
+			-1 * z > limits.min_altitude;
+		}
+		//sane_pos(latitude, longitude, z);		
+		
+	meets(effect At at);
+		latitude == at.latitude;
+		longitude == at.longitude;
+		z == at.z;
+		speed == at.speed;
+
+	contained_by(condition Reference.Going g);
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
