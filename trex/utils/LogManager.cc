@@ -61,9 +61,9 @@ using namespace boost::filesystem;
 
 LogManager::LogManager():m_inited(false), m_syslog(m_io.service()), m_level(TREX_LOG_LEVEL) {
   // Capture standard output and error in TREX.log
-  m_out.reset(new log::log_pipe(m_syslog, std::cout, "_cout_", ""));
-  m_log.reset(new log::log_pipe(m_syslog, std::clog, "_clog_", ""));
-  m_err.reset(new log::log_pipe(m_syslog, std::cerr, "_cerr_", "ERROR"));
+//  m_out.reset(new log::log_pipe(m_syslog, std::cout, "_cout_", ""));
+//  m_log.reset(new log::log_pipe(m_syslog, std::clog, "_clog_", ""));
+//  m_err.reset(new log::log_pipe(m_syslog, std::cerr, "_cerr_", "ERROR"));
 }
 
 LogManager::~LogManager() {
