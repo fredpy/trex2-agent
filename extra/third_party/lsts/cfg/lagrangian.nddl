@@ -127,11 +127,11 @@ LagrangianPath::ExecutePath {
     // easting == base_y + d_y;
 
     float computed_lat, computed_lon;
-
-    contains(Navigator.Going go);
+    
+    // contains(Navigator.Going go);
     
     ends(condition Navigator.At pos);
-    go meets pos;
+    // go meets pos;
     pos.latitude == computed_lat;
     pos.longitude == computed_lon;
     pos.z == min_z;
