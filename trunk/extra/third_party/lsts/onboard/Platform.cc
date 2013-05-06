@@ -43,7 +43,7 @@ namespace TREX
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                    TeleoReactor(arg, false)
+                            LstsReactor(arg)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -70,11 +70,11 @@ namespace TREX
 
       // Timelines that can be controlled by other reactors
       provide("reference");
-   //   provide("imu");
-   //   provide("lbl");
-   //   provide("sidescan");
-   //   provide("multibeam");
-   //   provide("camera");
+      //   provide("imu");
+      //   provide("lbl");
+      //   provide("sidescan");
+      //   provide("multibeam");
+      //   provide("camera");
 
     }
 
@@ -92,6 +92,7 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
+      Announce * ann;
       try
       {
         Address addr;
@@ -105,10 +106,21 @@ namespace TREX
           if (remote_id == 0)
             remote_id = msg->getSource();
 
-          // substitute previously received message
-          if (received.count(msg->getId()))
-            delete received[msg->getId()];
-          received[msg->getId()] = msg;
+          if (msg->getId() == Announce::getIdStatic())
+          {
+            ann = (Announce *) dynamic_cast<Announce *>(msg);
+
+            syslog(log::warn) << "Finally got an announce";
+            if (m_receivedAnnounces[ann->sys_name] != NULL)
+              delete m_receivedAnnounces[ann->sys_name];
+            m_receivedAnnounces[ann->sys_name] = ann;
+          }
+          else {
+            // substitute previously received message
+            if (received.count(msg->getId()))
+              delete received[msg->getId()];
+            received[msg->getId()] = msg;
+          }
         }
 
         if (msg_count < 1)
@@ -175,28 +187,6 @@ namespace TREX
       if (gname == "reference" && gpred == "Going")
         handleGoingRecall(*goal);
 
-    }
-
-    bool
-    Platform::postUniqueObservation(TREX::transaction::Observation obs)
-    {
-
-      std::string timeline = obs.object().str();
-      obs_map::iterator it = postedObservations.find(timeline);
-
-      if (it == postedObservations.end() || !it->second->consistentWith(obs))
-      {
-        postedObservations[timeline].reset(new Observation(obs));
-        postObservation(obs, true);
-        return true;
-      }
-      else
-      {
-        if (debug)
-          syslog("debug") << "Found repeated observations:\n" << obs << "\n"
-          << *it->second;
-      }
-      return false;
     }
 
     void
@@ -300,7 +290,7 @@ namespace TREX
       postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
       if (pcstate != NULL)
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING)
-            && pcstate->plan_id == "trex_plan";
+        && pcstate->plan_id == "trex_plan";
 
       if (m_blocked)
         createNewReference = true;
@@ -316,19 +306,19 @@ namespace TREX
 
       FollowRefState * frefstate =
           dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
-        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
+      postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
       OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
+      std::map<std::string, Announce *>::iterator it;
 
-      //VehicleLinks * links =
-      //    dynamic_cast<IMC::VehicleLinks *>(received[VehicleLinks::getIdStatic()]);
-      //if (links != NULL)
-      //{
-        //links->
-      //}
+      for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
+      {
+        Observation obs = m_adapter.announceObservation(it->second);
+        postUniqueObservation(obs);
+      }
 
       if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
         createNewReference = true;
@@ -351,7 +341,7 @@ namespace TREX
       // Send current reference to DUNE
       if (!m_blocked)
       {
-          sendMsg(m_ref);
+        sendMsg(m_ref);
       }
 
       // Operational limits are sent by DUNE on request
@@ -374,7 +364,7 @@ namespace TREX
     void Platform::handleGoingRecall(Goal g)
     {
       EstimatedState * estate =
-                dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       if (estate != NULL)
       {
         double latitude, longitude;
@@ -457,9 +447,9 @@ namespace TREX
     bool
     Platform::sendMsg(Message& msg, std::string ip, int port)
     {
-        msg.setTimeStamp();
-        msg.setSource(TREX_ID);
-        return m_adapter.send(&msg, ip, port);
+      msg.setTimeStamp();
+      msg.setSource(TREX_ID);
+      return m_adapter.send(&msg, ip, port);
     }
 
     bool
@@ -502,6 +492,8 @@ namespace TREX
     {
       m_env->setPlatformReactor(NULL);
       m_adapter.unbind();
+      std::map<std::string, Announce *>::iterator it;
+      m_receivedAnnounces.clear();
     }
   }
 }

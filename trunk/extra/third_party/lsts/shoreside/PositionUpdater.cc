@@ -14,7 +14,7 @@ using DUNE_NAMESPACES;
 namespace TREX {
   namespace LSTS {
     PositionUpdater::PositionUpdater(TeleoReactor::xml_arg_type arg) :
-      TeleoReactor(arg, false)
+      LstsReactor(arg)
     {
       m_bind_port = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
                                     "bindport");
@@ -59,8 +59,8 @@ namespace TREX {
 
       for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
       {
-      //  Observation obs = m_adapter.announceObservation(it->second);
-
+        Observation obs = m_adapter.announceObservation(it->second);
+        postUniqueObservation(obs);
       }
       return true;
     }
