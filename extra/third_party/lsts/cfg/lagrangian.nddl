@@ -21,11 +21,13 @@ class LagrangianPath extends AgentTimeline {
     action ExecutePath {
 	PathList path;
 	float x, y;
+	float d_x, d_y;
 	float factor_x, factor_y;
+	float drift;
 	bool first;
 	
 	// Cannot have an empty path
-	is_nil(false, path); 
+	is_empty(false, path); 
     }
     
     LagrangianPath(Mode _mode) {
@@ -36,6 +38,7 @@ class LagrangianPath extends AgentTimeline {
 LagrangianPath::ExecutePath {
     PathList        pred;
     LagrangianPoint loc;
+    float delta_x, delta_y;
 
     cdr(pred, path);
     car(loc, path);
@@ -43,13 +46,16 @@ LagrangianPath::ExecutePath {
     x == loc.x*factor_x;
     y == loc.y*factor_y;
     
-    first == nil(pred);
+    first == empty(pred);
 
     contained_by(condition LagrangianSpace.Holds space);
     contained_by(condition VerticalControl.Holds vc);
 
     if( true==first ) {
 	// This is the first waypoint ... need to do something
+	drift == 0.0;
+	delta_x == x;
+	delta_y == y;
     } else {
 	met_by(condition ExecutePath prev);
 	space contains prev;
@@ -58,5 +64,77 @@ LagrangianPath::ExecutePath {
 	prev.path == pred;
 	prev.factor_x == factor_x;
 	prev.factor_y == factor_y;
+
+	delta_x == x-prev.x;
+	delta_y == y-prev.y;
+
+	float dspeed_2, px_2, py_2;
+	dspeed_2 == space._speed_2 + vc._hspeed_2;
+	
+	abs(delta_x) == sqrt(px_2);
+	abs(delta_y) == sqrt(py_2);
+	
+	float vx_2, vy_2, sq_root, upper_frac, vy, main_sum;
+
+	vx_2 == vc._hspeed_2*px_2;
+	vy_2 == vc._hspeed_2*py_2;
+
+	vy == space.speed * delta_y;
+	main_sum == sqrt(vx_2+vy_2) + vy;
+	drift * dspeed_2 == space.speed * main_sum;
     }
+
+    float projected_y, x_cos;
+    // float d_x, d_y;
+    float travel_dist;
+
+    projected_y == delta_y + drift;
+    calcDistance(travel_dist, 0.0, 0.0, delta_x, projected_y);
+
+    // identify a safe lower bound for duration
+    5<=duration; // last for at least 5 seconds
+
+    float min_z, max_z;
+    vc.min_z <= min_z;
+    max_z <= vc.max_z;
+
+    if( false==first ) {
+	float fast_speed, slow_speed, min_duration, max_duration;
+
+	fast_speed == 3.0*vc.horizontal_speed;
+	travel_dist == min_duration*fast_speed;
+	min_duration <= duration;
+
+	slow_speed*10.0 == vc.horizontal_speed;
+	travel_dist == max_duration*slow_speed;
+	duration <= max_duration;
+
+	min_z == vc.min_z;
+	max_z == vc.max_z;
+    }
+    // Make sure that it ends before mission end (is it needed ?)
+    end <= MISSION_END;
+    start + duration == end;
+
+    // this goes UTM  .... I need to change it to be lat/lon
+    d_x == (delta_x * space.cos_angle) + (projected_y * space.sin_angle);
+    d_y == (projected_y * space.cos_angle) - (delta_x * space.sin_angle);
+
+    // float northing, easting;
+   
+
+    // northing == base_x + d_x;
+    // easting == base_y + d_y;
+
+    float computed_lat, computed_lon;
+
+    contains(Navigator.Going go);
+    
+    ends(condition Navigator.At pos);
+    go meets pos;
+    pos.latitude == computed_lat;
+    pos.longitude == computed_lon;
+    pos.z == min_z;
+    pos.speed == vc.speed;
+    pos.secs == 0;
 }
