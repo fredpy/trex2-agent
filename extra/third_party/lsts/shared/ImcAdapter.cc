@@ -155,7 +155,7 @@ namespace TREX {
       return obs;
     }
 
-    Observation announceObservation(Announce * msg)
+    Observation ImcAdapter::announceObservation(Announce * msg)
     {
       std::string system = msg->sys_name;
       std::replace(system.begin(), system.end(), '-', '_');
@@ -179,7 +179,7 @@ namespace TREX {
       return obs;
     }
 
-    Observation genericObservation(TrexToken * msg)
+    Observation ImcAdapter::genericObservation(TrexToken * msg)
     {
       Observation obs(msg->timeline, msg->predicate);
       IntegerDomain::bound min_i, max_i;
