@@ -206,7 +206,16 @@ namespace TREX
         case TrexOperation::OP_POST_GOAL:
           postGoalToken(trexOp.goal_id, TrexToken(*trexOp.token.get()));
           break;
+        case TrexOperation::OP_POST_TOKEN:
+          postObservationToken(TrexToken(*trexOp.token.get()));
+          break;
       }
+
+    }
+
+    void
+    Platform::postObservationToken(TrexToken token)
+    {
 
     }
 
@@ -334,6 +343,8 @@ namespace TREX
         GetOperationalLimits req;
         sendMsg(req);
       }
+
+      std::cout << received[TrexOperation::getIdStatic()] << "\n";
 
       TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
       if (command != NULL)
