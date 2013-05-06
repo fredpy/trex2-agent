@@ -1,0 +1,74 @@
+class DrifterFollow extends AgentTimeline {
+    predicate Inactive {}
+
+    predicate DoSurvey {
+	float center_lat, center_lon;
+	float speed_north, speed_east;
+	bool dynamic;
+    }
+
+    predicate Survey {
+	float center_lat, center_lon;
+	float speed_north, speed_east, u, v;
+
+	PathList path;
+	float    size;
+	bool     lagrangian, dynamic;
+	
+	speed_east == u;
+	speed_north == v;
+	duration == 1;
+    }
+
+    DrifterFollow(Mode _mode) {
+	super(_mode, "Inactive");
+    }
+}
+
+DrifterFollow::Inactive {
+    contained_by(LagrangianPath.Inactive);
+}
+
+DrifterFollow::Survey {
+    met_by(DoSurvey exec);
+    exec.center_lat == center_lat;
+    exec.center_lon == center_lon;
+    exec.speed_north == speed_north;
+    exec.speed_east == speed_east;
+
+    met_by(LagrangianPath.ExecutePath last);
+    last.path == path;
+    last.factor_x == size;
+    last.factor_y == size;
+}
+
+DrifterFollow::DoSurvey {
+    contained_by(VerticalControl.Holds);
+    contained_by(LagrangianSpace.Holds ref);
+    
+    ref.origin_lat == center_lat;
+    ref.origin_lon == center_lon;
+   
+    float u_2, v_2;
+    abs(speed_east) == sqrt(u_2);
+    abs(speed_north) == sqrt(v_2);
+    ref._speed_2 == u_2 + v_2;
+    ref.dynamic == dynamic;
+    
+    if( 0.0 < ref.speed ) {
+	speed_east == ref.cos_angle * ref.speed;
+	speed_north == ref.sin_angle * ref.speed;
+    } else {
+	ref.cos_angle == 1.0;
+	ref.sin_angle == 0.0;
+    }
+
+    met_by(LagrangianPath.Inactive);
+    meets(LagrangianPath.Inactive);
+}
+
+LagrangianPath::ExecutePath {
+   contained_by(effect DrifterFollow.DoSurvey surv); 
+   before(effect DrifterFollow.Survey objective);
+   surv meets objective;
+}
