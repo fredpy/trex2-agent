@@ -12,7 +12,8 @@ namespace TREX {
 
     ImcAdapter::ImcAdapter()
     {
-      // TODO Auto-generated constructor stub
+      m_bound = false;
+      m_bfr = new uint8_t[65535];
     }
 
     Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
@@ -153,6 +154,20 @@ namespace TREX {
       return obs;
     }
 
+    Observation announceObservation(Announce * msg)
+    {
+      std::string system = msg->sys_name;
+      std::replace(system.begin(), system.end(), '-', '_');
+
+      Observation obs(system, "position");
+
+      obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+      obs.restrictAttribute("longitude", FloatDomain(msg->lon));
+      obs.restrictAttribute("height", FloatDomain(msg->height));
+
+      return obs;
+    }
+
     Observation genericObservation(TrexToken * msg)
     {
       Observation obs(msg->timeline, msg->predicate);
@@ -222,9 +237,70 @@ namespace TREX {
       return obs;
     }
 
+    bool
+    ImcAdapter::send(Message * msg, std::string addr, int port)
+    {
+      DUNE::Utils::ByteBuffer bb;
+      try
+      {
+        IMC::Packet::serialize(msg, bb);
+
+        m_mutex.lock();
+        m_send.write((const char*)bb.getBuffer(), msg->getSerializationSize(),
+                     Address(addr.c_str()), port);
+        m_mutex.unlock();
+      }
+      catch (std::runtime_error& e)
+      {
+        std::cerr << "ERROR: " << log::error << ": " << e.what() << "\n";
+        return false;
+      }
+      return true;
+    }
+
+    Message * ImcAdapter::poll(double timeout)
+    {
+      if (!m_bound || !m_iom.poll(timeout))
+        return NULL;
+
+      Address addr;
+      uint16_t rv = m_receive.read((char*)m_bfr, 65535, &addr);
+      IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
+
+      return msg;
+    }
+
+    bool
+    ImcAdapter::bind(int port)
+    {
+      if (m_bound)
+        unbind();
+
+      m_receive.bind(port, Address::Any, true);
+      m_receive.addToPoll(m_iom);
+
+      m_bound = true;
+      return true;
+    }
+
+    bool
+    ImcAdapter::unbind()
+    {
+      if (m_bound)
+      {
+        m_receive.delFromPoll(m_iom);
+      }
+      else
+        return false;
+
+      m_bound = false;
+      return true;
+    }
+
     ImcAdapter::~ImcAdapter()
     {
-      // TODO Auto-generated destructor stub
+      if (m_bound)
+        unbind();
     }
   }
 }

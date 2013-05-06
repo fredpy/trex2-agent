@@ -60,6 +60,7 @@ namespace TREX
                                "debug");
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
+      //m_links = std::map<std::string, Announce*>();
 
       // Timelines for posting observations from DUNE
       provide("estate", false);
@@ -75,15 +76,15 @@ namespace TREX
    //   provide("multibeam");
    //   provide("camera");
 
-      bfr = new uint8_t[65535];
     }
 
     void
     Platform::handleInit()
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
-      receive.bind(localport, Address::Any, true);
-      receive.addToPoll(iom);
+      m_adapter.bind(localport);
+      //receive.bind(localport, Address::Any, true);
+      //receive.addToPoll(iom);
 
       syslog(log::info) << "listening on port " << localport << "...";
     }
@@ -96,11 +97,11 @@ namespace TREX
         Address addr;
         int msg_count = 0;
 
-        while (iom.poll(0))
+        IMC::Message * msg;
+
+        while ((msg = m_adapter.poll(0)) != NULL)
         {
           msg_count++;
-          uint16_t rv = receive.read((char*)bfr, 65535, &addr);
-          IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
           if (remote_id == 0)
             remote_id = msg->getSource();
 
@@ -322,6 +323,13 @@ namespace TREX
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
 
+      //VehicleLinks * links =
+      //    dynamic_cast<IMC::VehicleLinks *>(received[VehicleLinks::getIdStatic()]);
+      //if (links != NULL)
+      //{
+        //links->
+      //}
+
       if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
         createNewReference = true;
 
@@ -353,7 +361,7 @@ namespace TREX
         sendMsg(req);
       }
 
-      std::cout << received[TrexOperation::getIdStatic()] << "\n";
+      //std::cout << received[TrexOperation::getIdStatic()] << "\n";
 
       TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
       if (command != NULL)
@@ -361,8 +369,6 @@ namespace TREX
         handleTrexOperation(*command);
         delete received[TrexOperation::getIdStatic()];
       }
-
-
     }
 
     void Platform::handleGoingRecall(Goal g)
@@ -449,48 +455,11 @@ namespace TREX
     }
 
     bool
-    Platform::sendMsg(Message& msg, Address &dest)
-    {
-      DUNE::Utils::ByteBuffer bb;
-      try
-      {
-        msg.setTimeStamp();
-        IMC::Packet::serialize(&msg, bb);
-        send.write((const char*)bb.getBuffer(), msg.getSerializationSize(), dest,
-                   duneport);
-      }
-      catch (std::runtime_error& e)
-      {
-        syslog("ERROR", log::error) << e.what();
-        return false;
-      }
-      return true;
-    }
-
-    bool
     Platform::sendMsg(Message& msg, std::string ip, int port)
     {
-      DUNE::Utils::ByteBuffer bb;
-      try
-      {
         msg.setTimeStamp();
         msg.setSource(TREX_ID);
-        IMC::Packet::serialize(&msg, bb);
-
-        if (debug)
-          msg.toText(syslog("debug") << "sending message:\n");
-
-        m_mutex.lock();
-        send.write((const char*)bb.getBuffer(), msg.getSerializationSize(),
-                   Address(ip.c_str()), port);
-        m_mutex.unlock();
-      }
-      catch (std::runtime_error& e)
-      {
-        syslog("ERROR", log::error) << e.what();
-        return false;
-      }
-      return true;
+        return m_adapter.send(&msg, ip, port);
     }
 
     bool
@@ -532,8 +501,7 @@ namespace TREX
     Platform::~Platform()
     {
       m_env->setPlatformReactor(NULL);
-      if (NULL != bfr)
-        delete[] bfr;
+      m_adapter.unbind();
     }
   }
 }

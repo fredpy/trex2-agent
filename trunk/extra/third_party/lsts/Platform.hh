@@ -100,7 +100,6 @@ namespace TREX {
       void handleTickStart();
       void handleInit();
       bool sendMsg(Message& msg, std::string ip, int port);
-      bool sendMsg(Message& msg, Address &dest);
 
       void processState();
       bool postUniqueObservation(Observation obs);
@@ -108,6 +107,7 @@ namespace TREX {
       void postGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
+      typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
       void handleGoingRequest(Goal g);
@@ -117,16 +117,8 @@ namespace TREX {
 
       //static ControlInterface * controlInterfaceInstance;
 
-      // Network related
-      UDPSocket send, receive;
-      IOMultiplexing iom;
-      uint8_t* bfr;
-
-
       /** @brief Is the state already posted as observation ? */
       bool m_firstTick;
-
-      Concurrency::Mutex m_mutex;
 
       /** @brief ip where dune is listening */
       std::string duneip;

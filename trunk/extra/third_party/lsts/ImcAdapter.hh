@@ -32,6 +32,19 @@ namespace TREX {
     {
     public:
       ImcAdapter();
+
+      bool
+      bind(int port);
+
+      bool
+      unbind();
+
+      bool
+      send(Message * msg, std::string address, int port);
+
+      Message *
+      poll(double timeout);
+
       //@brief Translates VehicleMedium messages into "medium" timeline observations
       Observation vehicleMediumObservation(VehicleMedium * msg);
 
@@ -50,9 +63,18 @@ namespace TREX {
       //@brief Translates TrexToken messages into a generic observation
       Observation genericObservation(TrexToken * msg);
 
+      //@brief Translates TrexToken messages into a generic observation
+      Observation announceObservation(Announce * msg);
 
       virtual
       ~ImcAdapter();
+
+    private:
+      UDPSocket m_send, m_receive;
+      IOMultiplexing m_iom;
+      uint8_t* m_bfr;
+      Concurrency::Mutex m_mutex;
+      bool m_bound;
     };
   }
 }
