@@ -15,7 +15,6 @@
 namespace TREX {
   namespace LSTS {
     
-    
     /** @brief Simple goal posting interface for TREX
      *
      * This reactor provides a simple interface to post XML goals to TREX.

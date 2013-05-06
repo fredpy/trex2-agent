@@ -7,7 +7,6 @@
 
 #include <DUNE/Math/Angles.hpp>
 #include <DUNE/Coordinates/WGS84.hpp>
-
 using namespace EUROPA;
 
 /**
@@ -350,9 +349,6 @@ void RadDeg::handleExecute() {
 
 namespace {
   
-  // Helpers to access attributes of a PathList
-  // these are hardcoded indexes which makes it brittle to nddl alteration
-  
   EUROPA::ConstrainedVariableId nil_attr(EUROPA::ObjectId const &l) {
     return l->getVariables()[0];
   }
@@ -484,23 +480,19 @@ void PathEmpty::handleExecute() {
       }
     }
   } else {
-    bool is_set, last_val;
+    bool is_set = false, last_val;
     
     for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
         values.end()!=i; ++i) {
       bool is_nil = EUROPA::cast_int(nil_attr(*i)->lastDomain().getSingletonValue());
       if( is_set ) {
-        if( is_nil!=last_val ) {
-          is_set = false;
+        if( is_nil!=last_val )
           break;
-        }
       } else {
         is_set = true;
         last_val = is_nil;
       }
     }
-    if( is_set )
-      testV.set(last_val);
   }
 }
 

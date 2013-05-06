@@ -3,7 +3,7 @@
 // POSIX headers for fifo pipes
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <extra/third_party/lsts/Platform.hh>
+#include "Platform.hh"
 
 #include <sstream>
 

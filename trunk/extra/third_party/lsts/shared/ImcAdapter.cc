@@ -12,6 +12,7 @@ namespace TREX {
 
     ImcAdapter::ImcAdapter()
     {
+      m_trex_id = 65000;
       m_bound = false;
       m_bfr = new uint8_t[65535];
     }
@@ -67,7 +68,7 @@ namespace TREX {
 
     Observation ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
-      if (msg == NULL || msg->reference.isNull() || msg->control_src != TREX_ID
+      if (msg == NULL || msg->reference.isNull() || msg->control_src != m_trex_id
           || msg->state == FollowRefState::FR_TIMEOUT
           || msg->state == FollowRefState::FR_WAIT)
         return Observation("reference", "Boot");
@@ -262,7 +263,7 @@ namespace TREX {
       }
       catch (std::runtime_error& e)
       {
-        std::cerr << "ERROR: " << log::error << ": " << e.what() << "\n";
+        std::cerr << "ERROR: " << ": " << e.what() << "\n";
         return false;
       }
       return true;
@@ -305,6 +306,12 @@ namespace TREX {
 
       m_bound = false;
       return true;
+    }
+
+    void
+    ImcAdapter::setTrexId(int trex_id)
+    {
+      m_trex_id = trex_id;
     }
 
     ImcAdapter::~ImcAdapter()

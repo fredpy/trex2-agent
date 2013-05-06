@@ -32,29 +32,26 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-### Locate dune 
-# NOTE fpy: dune home is set to this directory by default to look 
-# for the dune local copy ... need to be changed when 
-# the platform is not linux
-set(DUNE_HOME "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH "Home for the Dune library")
+option(WITH_LSTS_ONBOARD "Enable LSTS AUV control" OFF)
 
-find_library(DUNE_CORE_LIB NAMES dune-core HINTS ${DUNE_HOME}/lib 
-  DOCS "Looking for dune core library")
-if(NOT DUNE_CORE_LIB)
-  message(SEND_ERROR "Failed to locate dune-core library\n"
-    "Set your DUNE_HOME where dune is installed.")
-endif(NOT DUNE_CORE_LIB)
+trex_plugin(platform 
+  # source
+  ControlInterface.cc 
+  Platform.cc 
+  SafetyBug.cc
+  TimelineReporter.cc
+  DummyOperator.cc
 
-find_path(DUNE_INCLUDE_DIR "Dune/Dune.hpp" HINTS ${DUNE_HOME}/include)
-if(NOT DUNE_INCLUDE_DIR)
-  message(SEND_ERROR "Failed to locate dune headers\n"
-    "Set your DUNE_HOME where dune is installed.")
-endif(NOT DUNE_INCLUDE_DIR)
+  # headers
+  ControlInterface.hh 
+  Platform.hh 
+  SafetyBug.hh
+  TimelineReporter.hh
+  DummyOperator.hh
+)
 
-include_directories(${DUNE_INCLUDE_DIR})
-include_directories(${EUROPA_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
-
-add_subdirectory(shared)
-add_subdirectory(onboard)
-add_subdirectory(shoreside)
+target_link_libraries(platform_pg TREXagent
+  TREXeuropa_core LSTSshared
+  ${Boost_LIBRARIES}
+  ${DUNE_CORE_LIB}
+)

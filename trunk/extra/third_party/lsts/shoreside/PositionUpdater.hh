@@ -9,9 +9,10 @@
 #define POSITIONUPDATER_HPP_
 
 # include <DUNE/DUNE.hpp>
-# include "ImcAdapter.hh"
+# include "../shared/ImcAdapter.hh"
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
+
 using namespace TREX::transaction;
 using namespace TREX::utils;
 

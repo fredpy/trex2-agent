@@ -13,7 +13,10 @@
 # include <trex/domain/FloatDomain.hh>
 # include <trex/domain/BooleanDomain.hh>
 # include <trex/domain/StringDomain.hh>
-# include "Platform.hh"
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/EnumDomain.hh>
+
+# include "EuropaExtensions.hh"
 
 using DUNE_NAMESPACES;
 using namespace TREX::transaction;
@@ -41,6 +44,9 @@ namespace TREX {
 
       bool
       send(Message * msg, std::string address, int port);
+
+      void
+      setTrexId(int trex_id);
 
       Message *
       poll(double timeout);
@@ -74,6 +80,7 @@ namespace TREX {
       IOMultiplexing m_iom;
       uint8_t* m_bfr;
       Concurrency::Mutex m_mutex;
+      int m_trex_id;
       bool m_bound;
     };
   }
