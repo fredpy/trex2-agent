@@ -34,16 +34,18 @@
 
 option(WITH_SHORESIDE_LSTS "Enable LSTS shore-side plug-in" OFF)
 
-trex_plugin(lstsshore 
-  # source
-  PositionUpdater.cc 
-
-  # headers
-  PositionUpdater.hh 
-)
-
-target_link_libraries(lstsshore_pg TREXagent
-  TREXeuropa_core LSTSshared
-  ${Boost_LIBRARIES}
-  ${DUNE_CORE_LIB}
-)
+if(WITH_SHORESIDE_LSTS)
+  trex_plugin(lstsshore 
+    # source
+    PositionUpdater.cc 
+    
+    # headers
+    PositionUpdater.hh 
+    )
+  
+  target_link_libraries(lstsshore_pg TREXagent
+    TREXeuropa_core LSTSshared
+    ${Boost_LIBRARIES}
+    ${DUNE_CORE_LIB}
+    )
+endif(WITH_SHORESIDE_LSTS)
