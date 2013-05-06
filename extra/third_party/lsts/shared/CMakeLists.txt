@@ -45,8 +45,8 @@ add_library(LSTSshared SHARED
   ImcAdapter.hh
   LstsUtils.hh
   LstsReactor.hh
-  
 )
 
 install(TARGETS LSTSshared DESTINATION lib) 
 trex_lib(LSTSshared extra)
+target_link_libraries(LSTSshared TREXeuropa_core TREXagent ${DUNE_CORE_LIB})
