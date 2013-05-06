@@ -834,6 +834,8 @@ void Agent::synchronize() {
 }
 
 bool Agent::executeReactor() {
+  Symbol id = null;
+  
   if( m_edf.empty() )
     return false;
   else {
@@ -844,6 +846,7 @@ bool Agent::executeReactor() {
     m_edf.erase(m_edf.begin());
     m_idle.push_back(r);
     try {
+      id = r->getName();
       r->step();
       
       std::list<reactor_id>::iterator i = m_idle.begin();
@@ -861,12 +864,12 @@ bool Agent::executeReactor() {
           i = m_idle.erase(i);
       }
     } catch(Exception const &e) {
-      syslog(null, warn)<<"Exception caught while executing reactor step:\n"<<e;
+      syslog(id, warn)<<"Exception caught while executing reactor step:\n"<<e;
     } catch(std::exception const &se) {
-      syslog(null, warn)<<"C++ exception caught while executing reactor step:\n"
+      syslog(id, warn)<<"C++ exception caught while executing reactor step:\n"
 			<<se.what();      
     } catch(...) {
-      syslog(null, warn)<<"Unknown exception caught while executing reactor step.";            
+      syslog(id, warn)<<"Unknown exception caught while executing reactor step.";
     }
     return !m_edf.empty();
   }
