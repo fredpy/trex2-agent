@@ -216,7 +216,16 @@ namespace TREX
     void
     Platform::postObservationToken(TrexToken token)
     {
+      obs_map::iterator it = postedObservations.find(token.timeline);
 
+      // If no such timeline has ever been posted, a new timeline will now be provided
+      if (it == postedObservations.end())
+        provide(token.timeline, false, false);
+
+      //Observation obs = m_adapter.genericObservation(&token);
+
+      //std::cerr << "Posting observation: " << obs << "\n";
+      //postUniqueObservation(obs);
     }
 
     void

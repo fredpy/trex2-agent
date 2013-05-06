@@ -153,6 +153,75 @@ namespace TREX {
       return obs;
     }
 
+    Observation genericObservation(TrexToken * msg)
+    {
+      Observation obs(msg->timeline, msg->predicate);
+      IntegerDomain::bound min_i, max_i;
+      FloatDomain::bound min_f, max_f;
+      MessageList<TrexAttribute>::const_iterator it;
+
+      for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
+      {
+        std::string min = (*it)->min;
+        std::string max = (*it)->max;
+        std::string attr = (*it)->name;
+
+        switch((*it)->attr_type)
+        {
+          case TrexAttribute::TYPE_STRING:
+            obs.restrictAttribute(attr, StringDomain(min));
+            break;
+
+          case TrexAttribute::TYPE_BOOL:
+            if (min == max && min != "")
+              obs.restrictAttribute(attr, BooleanDomain(min != "false" || min != "0"));
+            else
+              obs.restrictAttribute(attr, BooleanDomain());
+            break;
+
+          case TrexAttribute::TYPE_INT:
+            if (min == "")
+              min_i = IntegerDomain::minus_inf;
+            else
+              min_i = strtoll(max.c_str(), NULL, 10);
+
+            if (max == "")
+              max_i = IntegerDomain::plus_inf;
+            else
+              max_i = strtoll(max.c_str(), NULL, 10);
+
+            obs.restrictAttribute(attr, IntegerDomain(min_i, max_i));
+            break;
+
+          case TrexAttribute::TYPE_FLOAT:
+            if (min == "")
+              min_f = FloatDomain::minus_inf;
+            else
+              min_f = strtod(min.c_str(), NULL);
+
+            if (max == "")
+              max_f = FloatDomain::plus_inf;
+            else
+              max_f = strtod(max.c_str(), NULL);
+
+            obs.restrictAttribute(attr, FloatDomain(min_f, max_f));
+            break;
+
+          case TrexAttribute::TYPE_ENUM:
+            if (min == "" || max == "")
+              obs.restrictAttribute(attr, EnumDomain());
+            else
+              obs.restrictAttribute(attr, EnumDomain(min));
+            break;
+
+          default:
+            break;
+        }
+      }
+
+      return obs;
+    }
+
     ImcAdapter::~ImcAdapter()
     {
       // TODO Auto-generated destructor stub

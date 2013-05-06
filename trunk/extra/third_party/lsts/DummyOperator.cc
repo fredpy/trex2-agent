@@ -15,7 +15,7 @@ namespace
 {
 
   /** @brief DummyOperator reactor declaration */
-  TeleoReactor::xml_factory::declare<SafetyBug> decl("DummyOperator");
+  TeleoReactor::xml_factory::declare<DummyOperator> decl("DummyOperator");
 
 }
 
@@ -29,8 +29,6 @@ DummyOperator::~DummyOperator() {
   // TODO Auto-generated destructor stub
 }
 
-
-
 void DummyOperator::notify(TREX::transaction::Observation const &obs)
 {
   if (obs.object().str() == "control" && obs.predicate() == "DUNE")
@@ -38,22 +36,18 @@ void DummyOperator::notify(TREX::transaction::Observation const &obs)
     Platform *r = m_env->getPlatformReactor();
     // TODO activate TREX
 
+    PlanControl pc;
+    pc.op = PlanControl::PC_STOP;
+    pc.info = "TREX Dummy Operator Reactor";
+    m_env.instance().getPlatformReactor()->sendMsg(pc);
 
+    SetEntityParameters params;
+    params.name = "TREX";
+    EntityParameter param;
+    param.name = "Active";
+    param.value = "1b";
+    params.params.push_back(param);
+    m_env.instance().getPlatformReactor()->sendMsg(params);
   }
-}
-
-void DummyOperator::handleTickStart()
-{
 
 }
-
-void DummyOperator::handleInit()
-{
-
-}
-
-bool DummyOperator::synchronize()
-{
-  return true;
-}
-
