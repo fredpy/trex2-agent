@@ -29,12 +29,8 @@ namespace TREX {
 
     private:
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
-
-      bool synchronize();
-      void handleTickStart();
-      void handleInit();
       void notify(TREX::transaction::Observation const &obs);
-
+      bool synchronize() {return true;}
     };
   }
 }

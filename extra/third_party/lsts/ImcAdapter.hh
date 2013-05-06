@@ -47,6 +47,10 @@ namespace TREX {
       //@brief Translates OperationalLimits messages into "oplimits" timeline observations
       Observation opLimitsObservation(OperationalLimits * msg);
 
+      //@brief Translates TrexToken messages into a generic observation
+      Observation genericObservation(TrexToken * msg);
+
+
       virtual
       ~ImcAdapter();
     };
