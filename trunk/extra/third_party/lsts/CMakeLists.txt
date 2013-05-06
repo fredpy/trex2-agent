@@ -64,6 +64,8 @@ trex_plugin(platform
   SafetyBug.cc
   ImcAdapter.cc
   TimelineReporter.cc
+  DummyOperator.cc
+  PositionUpdater.cc
 
   # headers
   ControlInterface.hh 
@@ -73,6 +75,8 @@ trex_plugin(platform
   SafetyBug.hh
   ImcAdapter.hh
   TimelineReporter.hh
+  DummyOperator.hh
+  PositionUpdater.hh
 )
 
 target_link_libraries(platform_pg TREXagent

@@ -159,8 +159,18 @@ namespace TREX {
       std::string system = msg->sys_name;
       std::replace(system.begin(), system.end(), '-', '_');
 
-      Observation obs(system, "position");
+      double age = Time::Clock::getSinceEpoch() - msg->getTimeStamp();
 
+      if(age > 15)
+      {
+        Observation obs(system, "disconnected");
+        obs.restrictAttribute("latitude", FloatDomain(msg->lat));
+        obs.restrictAttribute("longitude", FloatDomain(msg->lon));
+        obs.restrictAttribute("height", FloatDomain(msg->height));
+        return obs;
+      }
+
+      Observation obs(system, "connected");
       obs.restrictAttribute("latitude", FloatDomain(msg->lat));
       obs.restrictAttribute("longitude", FloatDomain(msg->lon));
       obs.restrictAttribute("height", FloatDomain(msg->height));
