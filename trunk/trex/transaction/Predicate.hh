@@ -406,6 +406,10 @@ namespace TREX {
        * @sa std::ostream &toXml(std::ostream &, size_t) const
        */
       virtual TREX::utils::Symbol const &getPredTag() const = 0;
+      
+      std::ostream &print_attr(std::ostream &out,
+                               utils::Symbol const &name,
+                               bool &first) const;
       virtual std::ostream &print_to(std::ostream &out) const;
       
     private:

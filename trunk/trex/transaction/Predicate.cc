@@ -92,15 +92,31 @@ Variable const &Predicate::getAttribute(Symbol const &name) const {
   return pos->second;
 }
 
+std::ostream &Predicate::print_attr(std::ostream &out,
+                                    Symbol const &name,
+                                    bool &first) const {
+  if( !(name.empty() || name.str()[0]=='_') ) {
+    if( first )
+      first = false;
+    else
+      out<<", ";
+    out<<getAttribute(name);
+  }
+  return out;
+}
+
+
 std::ostream &Predicate::print_to(std::ostream &out) const {
   std::list<Symbol> vars;
   out<<m_object<<'.'<<m_type;
   out.precision(10);
   listAttributes(vars, false);
   if( !vars.empty() ) {
-    out<<'{'<<getAttribute(vars.front());
-    for( vars.pop_front(); !vars.empty(); vars.pop_front() )
-      out<<", "<<getAttribute(vars.front());
+    bool first = true;
+    
+    out<<'{';
+    for( ; !vars.empty(); vars.pop_front() )
+      print_attr(out, vars.front(), first);
     out<<'}';
   }
   return out;
