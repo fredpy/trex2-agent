@@ -51,10 +51,6 @@ trex_plugin(platform
   DummyOperator.hh
 )
 
-target_link_libraries(platform_pg TREXagent
-  TREXeuropa_core LSTSshared
-  ${Boost_LIBRARIES}
-  ${DUNE_CORE_LIB}
-)
+target_link_libraries(platform_pg LSTSshared)
 
 endif(WITH_LSTS_ONBOARD)

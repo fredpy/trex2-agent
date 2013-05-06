@@ -43,9 +43,5 @@ if(WITH_LSTS_SHORESIDE)
     PositionUpdater.hh 
     )
   
-  target_link_libraries(lstsshore_pg TREXagent
-    TREXeuropa_core LSTSshared
-    ${Boost_LIBRARIES}
-    ${DUNE_CORE_LIB}
-    )
+  target_link_libraries(lstsshore_pg LSTSshared)
 endif(WITH_LSTS_SHORESIDE)
