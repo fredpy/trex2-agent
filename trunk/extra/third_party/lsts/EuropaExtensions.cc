@@ -350,6 +350,9 @@ void RadDeg::handleExecute() {
 
 namespace {
   
+  // Helpers to access attributes of a PathList
+  // these are hardcoded indexes which makes it brittle to nddl alteration
+  
   EUROPA::ConstrainedVariableId nil_attr(EUROPA::ObjectId const &l) {
     return l->getVariables()[0];
   }

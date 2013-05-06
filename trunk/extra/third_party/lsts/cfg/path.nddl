@@ -8,6 +8,9 @@ class LagrangianPoint {
 }
 
 class PathList {
+    // Attributes used by the list 
+    // note: the place and order of these should not be changed
+    // as their position is hard coded in EuropaExtensions.cc
     bool nil;
     LagrangianPoint car;
     PathList cdr;
