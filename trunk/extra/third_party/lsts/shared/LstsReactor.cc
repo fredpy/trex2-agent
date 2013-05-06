@@ -19,6 +19,8 @@ namespace TREX
     {
 
     }
+    
+    LstsReactor::~LstsReactor() {}
 
     bool
     LstsReactor::postUniqueObservation(TREX::transaction::Observation obs)
