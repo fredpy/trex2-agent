@@ -5,8 +5,8 @@
  *      Author: zp
  */
 
-#include "extra/third_party/lsts/SafetyBug.hh"
-# include "Platform.hh"
+#include "extra/third_party/lsts/onboard/SafetyBug.hh"
+# include "extra/third_party/lsts/onboard/Platform.hh"
 using namespace TREX::LSTS;
 using namespace TREX::transaction;
 using DUNE_NAMESPACES;

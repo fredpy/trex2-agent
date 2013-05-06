@@ -23,10 +23,11 @@
 # include <DUNE/Math/Angles.hpp>
 # include <DUNE/Coordinates/WGS84.hpp>
 
-# include "EuropaExtensions.hh"
+# include "../shared/EuropaExtensions.hh"
 # include "ControlInterface.hh"
-# include "ImcAdapter.hh"
+# include "../shared/ImcAdapter.hh"
 # include "SharedEnvironment.hh"
+
 using namespace TREX::transaction;
 using namespace TREX::utils;
 

@@ -5,7 +5,7 @@
  *      Author: zp
  */
 
-#include "extra/third_party/lsts/DummyOperator.hh"
+# include "DummyOperator.hh"
 # include "Platform.hh"
 using namespace TREX::LSTS;
 using namespace TREX::transaction;
