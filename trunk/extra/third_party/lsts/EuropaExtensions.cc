@@ -350,13 +350,13 @@ void RadDeg::handleExecute() {
 namespace {
   
   EUROPA::ConstrainedVariableId nil_attr(EUROPA::ObjectId const &l) {
-    return l->getVariable("nil");
+    return l->getVariables()[0];
   }
   EUROPA::ConstrainedVariableId car_attr(EUROPA::ObjectId const &l) {
-    return l->getVariable("car");
+    return l->getVariables()[1];
   }
   EUROPA::ConstrainedVariableId cdr_attr(EUROPA::ObjectId const &l) {
-    return l->getVariable("cdr");
+    return l->getVariables()[2];
   }
     
 }
@@ -372,44 +372,33 @@ PathCar::PathCar(EUROPA::LabelStr const &name,
 :EUROPA::Constraint(name, propagator, engine, vars) {}
 
 void PathCar::handleExecute() {
-  EUROPA::Domain &listV = getCurrentDomain(m_variables[1]);
-  EUROPA::Domain &headV = getCurrentDomain(m_variables[0]);
+  EUROPA::ObjectDomain &headV = dynamic_cast<EUROPA::ObjectDomain &>(getCurrentDomain(m_variables[0]));
+  EUROPA::ObjectDomain &listV = dynamic_cast<EUROPA::ObjectDomain &>(getCurrentDomain(m_variables[1]));
   
-  std::list<EUROPA::edouble> values;
-  std::set<EUROPA::edouble> car_list;
-  listV.getValues(values);
+  std::list<EUROPA::ObjectId> values;
+  EUROPA::ObjectSet car_set;
   
-  // Remove all the lists which are not fit
-  while( !values.empty() ) {
-    EUROPA::ObjectId obj(EUROPA::cast_basis(values.front()));
-    
-    if( EUROPA::cast_int(nil_attr(obj)->lastDomain().getSingletonValue()) )
-      // nill list do not have a car
-      listV.remove(values.front());
-    else {
-      // I assume that the car is always a singleton
-      EUROPA::edouble car_v = car_attr(obj)->lastDomain().getSingletonValue();
-      if( headV.isMember(car_v) )
-        // this car is in the result domain
-        car_list.insert(car_v);
-      else
-        // this one is not in the result
-        listV.remove(values.front());
-    }
-    values.pop_front();
+  values = listV.makeObjectList();
+  
+  
+  for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
+      values.end()!=i; ++i) {
+    if( EUROPA::cast_int(nil_attr(*i)->lastDomain().getSingletonValue()) )
+      listV.remove(*i);
+    else if( headV.isMember(car_attr(*i)->lastDomain().getSingletonValue()) ) {
+      car_set.insert(headV.getObject(car_attr(*i)->lastDomain().getSingletonValue()));
+    } else
+      listV.remove(*i);
   }
-  // Now apply the result to the result domain
-  if( car_list.empty() )
+  
+  if( car_set.empty() )
     headV.empty();
-  else if( car_list.size()==1 )
-    headV.set(*car_list.begin());
-  else {
-    headV.getValues(values);
-    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
-        values.end()!=i; ++i) {
-      if( car_list.end()==car_list.find(*i) )
+  else { 
+    values = headV.makeObjectList();
+    for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
+        values.end()!=i; ++i)
+      if( car_set.end()==car_set.find(*i) )
         headV.remove(*i);
-    }
   }
 }
 
@@ -424,46 +413,41 @@ PathCdr::PathCdr(EUROPA::LabelStr const &name,
 :EUROPA::Constraint(name, propagator, engine, vars) {}
 
 void PathCdr::handleExecute() {
-  // Cdr code is similar to Car except that we acces cdr attribute instead of car
+  EUROPA::ObjectDomain &tailV = dynamic_cast<EUROPA::ObjectDomain &>(getCurrentDomain(m_variables[0]));
+  EUROPA::ObjectDomain &listV = dynamic_cast<EUROPA::ObjectDomain &>(getCurrentDomain(m_variables[1]));
   
-  EUROPA::Domain &listV = getCurrentDomain(m_variables[1]);
-  EUROPA::Domain &tailV = getCurrentDomain(m_variables[0]);
+  std::list<EUROPA::ObjectId> values;
+  EUROPA::ObjectSet cdr_set;
   
-  std::list<EUROPA::edouble> values;
-  std::set<EUROPA::edouble> cdr_list;
-  listV.getValues(values);
+  values = listV.makeObjectList();
   
-  // Remove all the lists which are not fit
-  while( !values.empty() ) {
-    EUROPA::ObjectId obj(EUROPA::cast_basis(values.front()));
-    
-    if( EUROPA::cast_int(nil_attr(obj)->lastDomain().getSingletonValue()) )
-      // nill list do not have a car
-      listV.remove(values.front());
-    else {
-      // I assume that the car is always a singleton
-      EUROPA::edouble car_v = cdr_attr(obj)->lastDomain().getSingletonValue();
-      if( tailV.isMember(car_v) )
-        // this car is in the result domain
-        cdr_list.insert(car_v);
-      else
-        // this one is not in the result
-        listV.remove(values.front());
+  for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
+      values.end()!=i; ++i) {
+    if( EUROPA::cast_int(nil_attr(*i)->lastDomain().getSingletonValue()) ) {
+      listV.remove(*i);
+    } else {
+      EUROPA::ObjectDomain cdr = dynamic_cast<EUROPA::ObjectDomain const &>(cdr_attr(*i)->lastDomain());
+      
+      cdr.intersect(tailV);
+      if( cdr.isEmpty() )
+        listV.remove(*i);
+      else {
+        std::list<EUROPA::ObjectId> tmp = cdr.makeObjectList();
+        for(std::list<EUROPA::ObjectId>::const_iterator j=tmp.begin();
+            tmp.end()!=j; ++j)
+          cdr_set.insert(*j);
+      }
     }
-    values.pop_front();
   }
-  // Now apply the result to the result domain
-  if( cdr_list.empty() )
+  
+  if( cdr_set.empty() )
     tailV.empty();
-  else if( cdr_list.size()==1 )
-    tailV.set(*cdr_list.begin());
   else {
-    tailV.getValues(values);
-    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
-        values.end()!=i; ++i) {
-      if( cdr_list.end()==cdr_list.find(*i) )
+    values = tailV.makeObjectList();
+    for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
+        values.end()!=i; ++i)
+      if( cdr_set.end()==cdr_set.find(*i) )
         tailV.remove(*i);
-    }
   }
 }
 
@@ -478,36 +462,35 @@ PathEmpty::PathEmpty(EUROPA::LabelStr const &name,
 :EUROPA::Constraint(name, propagator, engine, vars) {}
 
 void PathEmpty::handleExecute() {
-  EUROPA::Domain &testV = getCurrentDomain(m_variables[0]);
-  EUROPA::Domain &listV = getCurrentDomain(m_variables[1]);
-  std::list<EUROPA::edouble> values;
+  EUROPA::Domain &testV = getCurrentDomain(m_variables[0]);  
+  EUROPA::ObjectDomain &listV = dynamic_cast<EUROPA::ObjectDomain &>(getCurrentDomain(m_variables[1]));
   
-  listV.getValues(values);
+  std::list<EUROPA::ObjectId> values = listV.makeObjectList();
   
+
   if( testV.isSingleton() ) {
     bool is_empty = EUROPA::cast_int(testV.getSingletonValue());
     
-    // reduce the domain to the list that respect is_empty
-    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
+    for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
         values.end()!=i; ++i) {
-      EUROPA::ObjectId l(EUROPA::cast_basis(*i));
-      bool is_nil = EUROPA::cast_int(nil_attr(l)->lastDomain().getSingletonValue());
-      if( is_nil!=is_empty )
+      bool is_nil = EUROPA::cast_int(nil_attr(*i)->lastDomain().getSingletonValue());
+      
+      if( is_nil!=is_empty ) {
         listV.remove(*i);
+      }
     }
   } else {
-    bool is_set=false, last_value;
+    bool is_set = false, last_val;
     
-    for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
+    for(std::list<EUROPA::ObjectId>::const_iterator i=values.begin();
         values.end()!=i; ++i) {
-      EUROPA::ObjectId l(EUROPA::cast_basis(*i));
-      bool is_nil = EUROPA::cast_int(nil_attr(l)->lastDomain().getSingletonValue());
+      bool is_nil = EUROPA::cast_int(nil_attr(*i)->lastDomain().getSingletonValue());
       if( is_set ) {
-        if( is_nil!=last_value )
-          return; // this is a mix of empty and non-empty => stop
+        if( is_nil!=last_val )
+          break;
       } else {
         is_set = true;
-        last_value = is_nil;
+        last_val = is_nil;
       }
     }
   }

@@ -23,27 +23,27 @@ class PathList {
     PathList(LagrangianPoint l1, LagrangianPoint l2, PathList p) {
 	nil = false;
 	car = l1;
-	cdr = new LagrangianPoint(l2, p);
+	cdr = new PathList(l2, p);
     }
     PathList(LagrangianPoint l1, LagrangianPoint l2, 
 	     LagrangianPoint l3, PathList p) {
 	nil = false;
 	car = l1;
-	cdr = new LagrangianPoint(l2, l3, p);
+	cdr = new PathList(l2, l3, p);
     }
     PathList(LagrangianPoint l1, LagrangianPoint l2, 
 	     LagrangianPoint l3, LagrangianPoint l4, 
 	     PathList p) {
 	nil = false;
 	car = l1;
-	cdr = new LagrangianPoint(l2, l3, l4, p);
+	cdr = new PathList(l2, l3, l4, p);
     }
     PathList(LagrangianPoint l1, LagrangianPoint l2, 
 	     LagrangianPoint l3, LagrangianPoint l4, 
 	     LagrangianPoint l5, PathList p) {
 	nil = false;
 	car = l1;
-	cdr = new LagrangianPoint(l2, l3, l4, l5, p);
+	cdr = new PathList(l2, l3, l4, l5, p);
     }    
     PathList(LagrangianPoint l1, LagrangianPoint l2, 
 	     LagrangianPoint l3, LagrangianPoint l4, 
@@ -51,13 +51,9 @@ class PathList {
 	     PathList p) {
 	nil = false;
 	car = l1;
-	cdr = new LagrangianPoint(l2, l3, l4, l5, l6, p);
+	cdr = new PathList(l2, l3, l4, l5, l6, p);
     }
 }
-
-constraint cdr(ret, l) { l <: PathList && ret <: PathList }
-constraint car(ret, l) { l <: PathList && ret <: LagrangianPoint }
-constraint is_nil(ret, l) { l <: PathList && ret <: bool }
 
 PathList nilPath = new PathList(); // special value for the end of the path
 
