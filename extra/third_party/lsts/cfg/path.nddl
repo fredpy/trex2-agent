@@ -55,11 +55,9 @@ class PathList {
     }
 }
 
-
-// TODO : migarte these constraints to europa extensions for lsts
-constraint cdr(a, b) { a <: PathList && b <: PathList }
-constraint car(a, b) { a <: PathList && b <: LagrangianPoint }
-constraint isNil(a, ret) { a <: PathList && ret <: bool }
+constraint cdr(ret, l) { l <: PathList && ret <: PathList }
+constraint car(ret, l) { l <: PathList && ret <: LagrangianPoint }
+constraint is_nil(ret, l) { l <: PathList && ret <: bool }
 
 PathList nilPath = new PathList(); // special value for the end of the path
 
@@ -81,39 +79,6 @@ class VerticalControl extends AgentTimeline {
     }
 }
 
-class LagrangianSpace extends AgentTimeline {
-    predicate Holds {
-	float origin_lat, origin_lon;
-	float cos_angle, sin_angle;
-	float speed, _speed_2;
-	bool dynamic;
-	
-	speed == sqrt(_speed_2); 
-	calcDistance(1.0, 0.0, 0.0, cos_angle, sin_angle);
-    }
-    LagrangianSpace(Mode _mode) {
-	super(_mode, "Holds");
-    }
-}
-
-class LagrangianPath extends AgentTimeline {
-    predicate Inactive {}
-
-    action ExecutePath {
-	PathList path;
-	float x, y;
-	float factor_x, factor_y;
-	float drift;
-	bool first;
-
-	isNil(path, false);
-    }
-
-    LagrangianPath(Mode _mode) {
-	super(_mode, "Inactive");
-    }
-}
-
 VerticalControl::Holds {
     met_by(Holds prev);
     
@@ -126,28 +91,4 @@ VerticalControl::Holds {
 	_corrected_pitch == pitch_angle;
     }
     horizontal_speed == speed * cos(_corrected_pitch);
-}
-
-LagrangianPath::ExecutePath {
-    PathList        pred;
-    LagrangianPoint loc;
-
-    cdr(path, pred);
-    car(path, point);
-    isNil(pred, first);
-
-    contained_by(condition LagrangianSpace.Holds space);
-    contained_by(condition VerticalControl.Holds vc);
-    
-    if( first==true ) {
-	// This is the firtst waypoint
-    } else {
-	met_by(condition ExecutePath prev);
-	space contains prev;
-	vc contains prev;
-	prev.path == pred;
-	prev.factor_x == factor_x;
-	prev.factor_y == factor_y;
-	
-    }
 }
