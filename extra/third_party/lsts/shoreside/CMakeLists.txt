@@ -32,9 +32,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                          #
 ########################################################################
 
-option(WITH_SHORESIDE_LSTS "Enable LSTS shore-side plug-in" OFF)
+option(WITH_LSTS_SHORESIDE "Enable LSTS shore-side plug-in" OFF)
 
-if(WITH_SHORESIDE_LSTS)
+if(WITH_LSTS_SHORESIDE)
   trex_plugin(lstsshore 
     # source
     PositionUpdater.cc 
@@ -48,4 +48,4 @@ if(WITH_SHORESIDE_LSTS)
     ${Boost_LIBRARIES}
     ${DUNE_CORE_LIB}
     )
-endif(WITH_SHORESIDE_LSTS)
+endif(WITH_LSTS_SHORESIDE)

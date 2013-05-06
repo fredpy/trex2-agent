@@ -4,7 +4,7 @@
 
 Navigator::At {
 
-	contained_by(condition Reference.At arr);
+	contained_by(Reference.At arr);
 		latitude == arr.latitude;
 		longitude == arr.longitude;
 		z == arr.z;
@@ -16,7 +16,7 @@ Navigator::At {
 Navigator::Going {
 
 	contained_by(condition ControlMode.TREX c);
-		c.start + 1 <= start;
+		
 		
 		// underwater navigation requires LBL or IMU sensors activated
 		//if (z > 0) {
@@ -25,12 +25,12 @@ Navigator::Going {
 		//}
 
 	contained_by(condition OperationalLimits.Limits limits);
-		if (z > 0) {
+		if (z > 0.0) {
 			z < limits.max_depth;
 		}
 		else {
-			-1 * z < limits.max_altitude;
-			-1 * z > limits.min_altitude;
+			-1.0 * z < limits.max_altitude;
+			-1.0 * z > limits.min_altitude;
 		}
 		//sane_pos(latitude, longitude, z);		
 		
@@ -40,19 +40,25 @@ Navigator::Going {
 		z == at.z;
 		speed == at.speed;
 
-	contained_by(condition Reference.Going g);
+	met_by(condition EstimatedState.Position origin);
+		orig_lat == origin.latitude;
+		orig_lon == origin.longitude;
+		orig_z == origin.z;
+
+	int my_start;
+	my_start == max(origin.start, c.start);
+
+		/*
+	if(  my_start<= AGENT_CLOCK ) {
+		contains(condition Reference.Going g);
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
 		speed == g.speed;
-		dist == ll_distance(orig_lat, orig_lon, latitude, longitude);			
-		duration < ceil(dist * speed * 0.8); // 20% tolerance
-		duration > floor(dist * speed * 1.2);
-
-	any(condition EstimatedState.Position origin);
-		orig_lat == origin.latitude;
-		orig_lon == origin.longitude;
-		orig_z == origin.z;
-		origin.start + 1 == start;
+	}
+		*/
+	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);			
+    duration > ceil(dist * speed * 0.8); // 20% tolerance
+	duration < floor(dist * speed * 1.2);
 	
 }

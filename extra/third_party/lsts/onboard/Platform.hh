@@ -24,8 +24,9 @@
 # include <DUNE/Coordinates/WGS84.hpp>
 
 # include "../shared/EuropaExtensions.hh"
-# include "ControlInterface.hh"
 # include "../shared/ImcAdapter.hh"
+# include "../shared/LstsReactor.hh"
+# include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
 
 using namespace TREX::transaction;
@@ -53,7 +54,7 @@ namespace TREX {
      * @author Jose Pinto <zepinto@gmail.com>
      * @ingroup lsts
      */
-    class Platform :public TeleoReactor {
+    class Platform : public LstsReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -68,7 +69,6 @@ namespace TREX {
       /** @brief Destructor */
       ~Platform();
 
-      //static void setControlInterface(TREX::LSTS::ControlInterface * itf);
       bool reportToDune(int type, const std::string &context, const std::string &text);
       bool reportToDune(int type, const std::string &message);
       bool reportToDune(const std::string &message);
@@ -103,7 +103,6 @@ namespace TREX {
       bool sendMsg(Message& msg, std::string ip, int port);
 
       void processState();
-      bool postUniqueObservation(Observation obs);
       void handleTrexOperation(TrexOperation trexOp);
       void postGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
@@ -149,6 +148,8 @@ namespace TREX {
 
       std::list<TREX::transaction::goal_id> m_pending;
 
+      /** @brief received announces since last tick */
+      std::map<std::string, Announce *> m_receivedAnnounces;
     };
 
   }

@@ -13,6 +13,8 @@ class EstimatedState extends AgentTimeline {
 		float latitude;
 		float longitude;
 		float z;
+		
+		duration == 1;
 	};
 };
 

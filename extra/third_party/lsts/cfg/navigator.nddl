@@ -4,13 +4,9 @@
 class Navigator extends AgentTimeline {
 	
 	Navigator(Mode _mode) {
-		super(_mode, "Idle");
+		super(_mode, "Idle", true);
 	}
     
-    Navigator(Mode _mode, bool plan) {
-	    super(_mode, "Idle", plan);
-    }
-	
 	predicate Idle {}
 	
 	action Going {

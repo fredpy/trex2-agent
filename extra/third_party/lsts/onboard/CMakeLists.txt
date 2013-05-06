@@ -34,6 +34,7 @@
 
 option(WITH_LSTS_ONBOARD "Enable LSTS AUV control" OFF)
 
+if(WITH_LSTS_ONBOARD)
 trex_plugin(platform 
   # source
   ControlInterface.cc 
@@ -55,3 +56,5 @@ target_link_libraries(platform_pg TREXagent
   ${Boost_LIBRARIES}
   ${DUNE_CORE_LIB}
 )
+
+endif(WITH_LSTS_ONBOARD)

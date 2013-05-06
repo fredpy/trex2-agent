@@ -12,6 +12,7 @@
 # include "../shared/ImcAdapter.hh"
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
+# include "../shared/LstsReactor.hh"
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -20,7 +21,7 @@ using DUNE_NAMESPACES;
 
 namespace TREX {
   namespace LSTS {
-    class PositionUpdater: public TeleoReactor
+    class PositionUpdater: public LstsReactor
     {
     public:
       PositionUpdater(TeleoReactor::xml_arg_type arg);
