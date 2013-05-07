@@ -35,11 +35,11 @@
 trex_plugin(lstscommon 
     # source
     TimelineReporter.cc
-    #TimelineProxy.cc
+    TimelineProxy.cc
     
     # headers
     TimelineReporter.hh 
-    #TimelineProxy.hh
+    TimelineProxy.hh
     )
   
   target_link_libraries(lstscommon_pg LSTSshared)

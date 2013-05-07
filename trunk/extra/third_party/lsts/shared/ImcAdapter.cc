@@ -24,24 +24,23 @@ namespace TREX {
       {
         switch (msg->medium) {
           case (VehicleMedium::VM_WATER):
-            return Observation("medium", "Water");
-            break;
+                return Observation("medium", "Water");
+          break;
           case (VehicleMedium::VM_UNDERWATER):
-            return Observation("medium", "Underwater");
-            break;
+                return Observation("medium", "Underwater");
+          break;
           case (VehicleMedium::VM_AIR):
-            return Observation("medium", "Air");
-            break;
+                return Observation("medium", "Air");
+          break;
           case (VehicleMedium::VM_GROUND):
-            return Observation("medium", "Ground");
-            break;
+                return Observation("medium", "Ground");
+          break;
           default:
             break;
         }
       }
       return Observation("medium", "Unknown");
     }
-
 
     Observation ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
@@ -92,14 +91,14 @@ namespace TREX {
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+          break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+          break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+          break;
           default:
             break;
         }
@@ -343,6 +342,62 @@ namespace TREX {
         { }
       }
       return false;
+    }
+
+    void
+    ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
+    {
+      Symbol t = v.domain().getTypeName();
+      attr->name = v.name().str();
+      if (t.str() == "float") {
+        attr->attr_type = TrexAttribute::TYPE_FLOAT;
+      }
+      else if (t.str() == "int") {
+        attr->attr_type = TrexAttribute::TYPE_INT;
+      }
+      else if (t.str() == "bool") {
+        attr->attr_type = TrexAttribute::TYPE_BOOL;
+      }
+      else if (t.str() == "string") {
+        attr->attr_type = TrexAttribute::TYPE_STRING;
+      }
+      else if (t.str() == "enum") {
+        attr->attr_type = TrexAttribute::TYPE_ENUM;
+      }
+
+      if (v.domain().isSingleton()) {
+        attr->max = v.domain().getStringSingleton();
+        attr->min = v.domain().getStringSingleton();
+      }
+      //FIXME add support for interval domains
+      //else if (v.domain().isInterval())
+      //{
+
+      //}
+      else  {// if (v.domain().isFull()) {
+        attr->max = "";
+        attr->min = "";
+      }
+    }
+
+    void
+    ImcAdapter::asImcMessage(Predicate const &obs, TrexToken * result)
+    {
+      result->timeline = obs.object().str();
+      result->predicate = obs.predicate().str();
+      result->attributes.clear();
+
+      std::list<TREX::utils::Symbol> attrs;
+
+      obs.listAttributes(attrs);
+      std::list<TREX::utils::Symbol>::iterator it;
+      for (it = attrs.begin(); it != attrs.end(); it++)
+      {
+        TrexAttribute attr;
+        Variable v = obs.getAttribute(*it);
+        variableToImc(v, &attr);
+        result->attributes.push_back(attr);
+      }
     }
 
     void
