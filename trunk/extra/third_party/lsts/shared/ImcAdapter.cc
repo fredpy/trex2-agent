@@ -19,6 +19,7 @@ namespace TREX {
 
     Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
     {
+
       if (msg != NULL)
       {
         switch (msg->medium) {
