@@ -97,6 +97,8 @@ namespace TREX {
         return result.get();
       }
       
+      size_t get_id();
+      
       REST_service m_services;
   
       
@@ -106,6 +108,7 @@ namespace TREX {
       
       typedef std::set<utils::Symbol> tl_set;
       tl_set m_timelines;
+      utils::SharedVar<size_t> m_file_count;
     };
     
   }

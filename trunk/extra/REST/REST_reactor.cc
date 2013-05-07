@@ -35,11 +35,12 @@
 #include "REST_service.hh"
 
 #include <trex/utils/XmlUtils.hh>
+#include <trex/utils/ptree_io.hh>
 #include <trex/utils/chrono_helper.hh>
+
 #include <boost/date_time/posix_time/posix_time_io.hpp>
-
-
 #include <boost/algorithm/string.hpp>
+
 #include <Wt/Utils>
 
 
@@ -195,6 +196,13 @@ void REST_reactor::cancelledPlanToken(goal_id const &t) {
   
 }
 
+size_t REST_reactor::get_id() {
+  utils::SharedVar<size_t>::scoped_lock lock(m_file_count);
+  *m_file_count += 1;
+  return *m_file_count;
+}
+
+
 // timelines events
 void REST_reactor::declared(details::timeline const &tl) {
   syslog()<<"New timeline "<<tl.name();
@@ -220,12 +228,53 @@ bp::ptree REST_reactor::timeline(req_info const &req) {
 }
 
 bp::ptree REST_reactor::manage_goal(req_info const &req) {
-  std::string kind = req.request().method();
+  Wt::Http::Request const &rq = req.request();
+  std::string kind = rq.method();
   bp::ptree ret;
   ret.put("kind", kind);
   
   if( kind=="POST" ) {
-    ret.put("warning", "unimplemented");
+    if( "application/json"!=rq.contentType() )
+      throw ReactorException(*this, "Data content type should be application/json instead of "+rq.contentType());
+    if( rq.contentLength()<=0 )
+      throw ReactorException(*this, "POST content is empty.");
+    std::ostringstream oss;
+    oss<<"upload."<<get_id()<<".dat";
+    path_type f_name = file_name(oss.str());
+    
+    syslog(utils::log::info)<<"Caching POST goal data to "<<f_name.string();
+    {
+      std::ofstream tmp(f_name.c_str());
+      tmp<<rq.in().rdbuf();
+    }
+    bp::ptree data;
+    try {
+      std::ifstream in(f_name.c_str());
+      utils::read_json(in, data);
+    } catch(std::exception const &e) {
+      syslog(utils::log::warn)<<"Failed to parse "<<f_name<<" as json:\n\t"
+        <<e.what();
+      throw ReactorException(*this, std::string("Failed to parse data as json: ")+e.what());
+    } catch(...) {
+      syslog(utils::log::warn)<<"Failed to parse "<<f_name<<" as json: unknown exception";
+      throw ReactorException(*this, "Failed to parse data as json");
+    }
+    
+    if( data.empty() )
+      throw ReactorException(*this, "empty json data");
+    
+    bp::ptree::value_type g_desc("goal", data);
+    
+    // For now I only parse the first element
+    goal_id g(parse_goal(g_desc));
+    
+    if( !isExternal(g->object()) )
+      throw ReactorException(*this, "Timeline "+g->object().str()+" does not exist");
+    postGoal(g);
+    ret.put("id", g);
+    ret.put("href", rq.path()+rq.pathInfo()+"/"+ret.get<std::string>("id"));
+    ret.push_back(getGraph().export_goal(g).front());
+    
     return ret;
   } else if( kind=="DELETE" ) {
     ret.put("warning", "unimplemented");
@@ -301,9 +350,11 @@ bp::ptree REST_reactor::tick_period(req_info const &req) const {
 
 void REST_reactor::add_tl(utils::Symbol const &tl) {
   m_timelines.insert(tl);
+  use(tl);
 }
 
 void REST_reactor::remove_tl(utils::Symbol const &tl) {
+  unuse(tl);
   m_timelines.erase(tl);
 }
 
