@@ -16,13 +16,6 @@ Navigator::At {
 Navigator::Going {
 
 	contained_by(condition ControlMode.TREX c);
-		
-		
-		// underwater navigation requires LBL or IMU sensors activated
-		//if (z > 0) {
-		//	contained_by(Payload.Active lbl_active);
-		//	lbl_active.object.name == "lbl" || lbl_active.object.name == "imu";
-		//}
 
 	contained_by(condition OperationalLimits.Limits limits);
 		if (z > 0.0) {
@@ -32,7 +25,7 @@ Navigator::Going {
 			-1.0 * z < limits.max_altitude;
 			-1.0 * z > limits.min_altitude;
 		}
-		//sane_pos(latitude, longitude, z);		
+		sane_pos(latitude, longitude, z);		
 		
 	meets(effect At at);
 		latitude == at.latitude;
@@ -48,7 +41,6 @@ Navigator::Going {
 	int my_start;
 	my_start == max(origin.start, c.start);
 
-		/*
 	if(  my_start<= AGENT_CLOCK ) {
 		contains(condition Reference.Going g);
 		latitude == g.latitude;
@@ -56,9 +48,10 @@ Navigator::Going {
 		z == g.z;
 		speed == g.speed;
 	}
-		*/
-	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);			
-    duration > ceil(dist * speed * 0.8); // 20% tolerance
-	duration < floor(dist * speed * 1.2);
+
+	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
+	
+    duration > floor(dist * speed * 0.8);
+	duration <  ceil(dist * speed * 1.2);
 	
 }
