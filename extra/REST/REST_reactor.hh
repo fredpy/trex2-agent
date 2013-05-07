@@ -80,9 +80,20 @@ namespace TREX {
             
       boost::property_tree::ptree timelines(req_info const &req);
       boost::property_tree::ptree timeline(req_info const &req);
+      
+      boost::property_tree::ptree export_goal(transaction::goal_id g,
+                                              req_info const &req) const;
+      
+      boost::property_tree::ptree goals(req_info const &req);
       boost::property_tree::ptree manage_goal(req_info const &req);
 
       boost::property_tree::ptree get_timeline(std::string name);
+      
+      void add_goal(transaction::goal_id g);
+      transaction::goal_id get_goal(std::string const &id) const;
+      bool remove_goal(std::string const &id);
+      
+      boost::property_tree::ptree list_goals(req_info const &req) const;
       
       void add_tl(utils::Symbol const &tl);
       void remove_tl(utils::Symbol const &tl);
@@ -97,6 +108,8 @@ namespace TREX {
         return result.get();
       }
       
+      
+      
       size_t get_id();
       
       REST_service m_services;
@@ -108,8 +121,25 @@ namespace TREX {
       
       typedef std::set<utils::Symbol> tl_set;
       tl_set m_timelines;
+      
+      
+      typedef std::map<std::string, transaction::goal_id> goal_map;
+      
+      goal_map m_goals;
+      
       utils::SharedVar<size_t> m_file_count;
     };
+    
+    template<>
+    inline void REST_reactor::strand_run<void>(boost::function<void ()> const &f) {
+      boost::packaged_task<void> tsk(f);
+      boost::unique_future<void> result = tsk.get_future();
+      
+      m_strand->post(boost::bind(&boost::packaged_task<void>::operator(),
+                                 boost::ref(tsk)));
+      result.get();
+    }
+
     
   }
 }
