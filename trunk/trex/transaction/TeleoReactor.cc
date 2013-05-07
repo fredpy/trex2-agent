@@ -138,7 +138,7 @@ using namespace TREX::transaction;
  * class TREX::transaction::ReactorException
  */
 ReactorException::ReactorException(TeleoReactor const &r,
-				   std::string const &msg) throw()
+                                   std::string const &msg) throw()
   :GraphException(r.m_graph, r.getName().str(), msg) {}
 
 
@@ -182,7 +182,7 @@ TREX::transaction::details::external::external(details::external const &other)
   :m_pos(other.m_pos), m_last(other.m_last) {}
 
 TREX::transaction::details::external::external(details::external_set::iterator const &pos,
-					       details::external_set::iterator const &last)
+                                               details::external_set::iterator const &last)
   :m_pos(pos), m_last(last) {}
 
 // manipulators
@@ -219,33 +219,33 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
 
     if( future || i->first->endsAfter(current+1) ) {
       // Need to check for dispatching
-	if( i->second && m_pos->first.accept_goals() ) {
-	  if( m_pos->first.client().is_verbose() )
-	    syslog(info)<<"Dispatching "<<i->first->predicate()
-			<<'['<<(i->first)<<"] on \""
-			<<m_pos->first.name()<<"\".";
-	  bool posted = false;
-	  try {
-	    m_pos->first.request(i->first);
-	    posted = true;
-	    i = m_pos->second.erase(i);
-	  } catch(utils::Exception const &e) {
-	    syslog(warn)<<"Exception received while sending request: "<<e;
-	  } catch(std::exception const &se) {
-	    syslog(warn)<<"C++ exception received while sending request: "
-			<<se.what();
-	  } catch(...) {
-	    syslog(warn)<<"Unknown exception received while sending request.";
-	  }
-	  if( !posted ) {
-	    syslog(warn)<<"Marking goal as non-postable.";
-	    i->second = false;
-	  }
-	} else
-	  ++i;
+        if( i->second && m_pos->first.accept_goals() ) {
+          if( m_pos->first.client().is_verbose() )
+            syslog(info)<<"Dispatching "<<i->first->predicate()
+                        <<'['<<(i->first)<<"] on \""
+                        <<m_pos->first.name()<<"\".";
+          bool posted = false;
+          try {
+            m_pos->first.request(i->first);
+            posted = true;
+            i = m_pos->second.erase(i);
+          } catch(utils::Exception const &e) {
+            syslog(warn)<<"Exception received while sending request: "<<e;
+          } catch(std::exception const &se) {
+            syslog(warn)<<"C++ exception received while sending request: "
+                        <<se.what();
+          } catch(...) {
+            syslog(warn)<<"Unknown exception received while sending request.";
+          }
+          if( !posted ) {
+            syslog(warn)<<"Marking goal as non-postable.";
+            i->second = false;
+          }
+        } else
+          ++i;
     } else if( !future ) {
       syslog(warn)<<"Goal "<<i->first->predicate()<<'['<<(i->first)
-		  <<"] is in the past: removing it\n\t"<<(*(i->first));
+                  <<"] is in the past: removing it\n\t"<<(*(i->first));
       i = m_pos->second.erase(i);
     } else if( !m_pos->first.accept_goals() )
       break; // no need to  look further ... this guy do not accept goals
@@ -309,7 +309,7 @@ utils::Symbol const TeleoReactor::plan("PLAN");
 // structors
 
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
-			   bool log_default)
+                           bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
    m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(), xml_factory::node(arg), "verbose")),
    m_trLog(NULL),
@@ -345,25 +345,25 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
     utils::ext_xml(node.second, "config");
 
     for(boost::property_tree::ptree::iterator i=node.second.begin();
-	node.second.end()!=i; ++i) {
+        node.second.end()!=i; ++i) {
       if( utils::is_tag(*i, "External") ) {
-	tl_name = utils::parse_attr<Symbol>(*i, "name");
-	if( tl_name.empty() )
-	  throw utils::XmlError(*i, "Timelines cannot have an empty name");
-	use(tl_name, utils::parse_attr<bool>(true, *i, "goals"),
+        tl_name = utils::parse_attr<Symbol>(*i, "name");
+        if( tl_name.empty() )
+          throw utils::XmlError(*i, "Timelines cannot have an empty name");
+        use(tl_name, utils::parse_attr<bool>(true, *i, "goals"),
             utils::parse_attr<bool>(false, *i, "listen"));
       } else if( utils::is_tag(*i, "Internal") ) {
-	tl_name = utils::parse_attr<Symbol>(*i, "name");
-	if( tl_name.empty() )
-	  throw utils::XmlError(*i, "Timelines cannot have an empty name");
-	provide(tl_name);
+        tl_name = utils::parse_attr<Symbol>(*i, "name");
+        if( tl_name.empty() )
+          throw utils::XmlError(*i, "Timelines cannot have an empty name");
+        provide(tl_name);
       }
     }
   }
 }
 
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
-			   TICK latency, TICK lookahead, bool log)
+                           TICK latency, TICK lookahead, bool log)
   :m_inited(false), m_firstTick(true), m_graph(*owner), 
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
@@ -460,8 +460,8 @@ double TeleoReactor::workRatio() {
       
       // Manage goal dispatching
       for( ; i.valid(); ++i )
-	i.dispatch(getCurrentTick()+1, dispatched);
-	
+        i.dispatch(getCurrentTick()+1, dispatched);
+        
     }
   } catch(std::exception const &se) {
     syslog(warn)<<"Exception during hasWork question: "<<se.what();
@@ -470,9 +470,9 @@ double TeleoReactor::workRatio() {
   }
   if( m_past_deadline ) {
     syslog(warn)<<"Reactor needed to deliberate "<<(m_nSteps-m_validSteps)
-		      <<" extra steps spread other "
-		      <<(getCurrentTick()-m_deadline)
-		      <<" ticks after its latency."; 
+                      <<" extra steps spread other "
+                      <<(getCurrentTick()-m_deadline)
+                      <<" ticks after its latency."; 
   }
   reset_deadline();
   return NAN;
@@ -483,7 +483,7 @@ void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
 
   if( m_internals.end()==i )
     throw SynchronizationError(*this, "attempted to post observation on "+
-			       obs.object().str()+" which is not Internal.");
+                               obs.object().str()+" which is not Internal.");
 
   (*i)->postObservation(getCurrentTick(), obs, verbose);
   m_updates.insert(*i);
@@ -564,7 +564,7 @@ void TeleoReactor::cancelPlanToken(goal_id const &g) {
     if( m_internals.end()!=tl ) {
       // do something 
       if( NULL!=m_trLog )
-	m_trLog->cancelPlan(g);
+        m_trLog->cancelPlan(g);
             
       (*tl)->cancelPlan(g);
     }
@@ -603,7 +603,7 @@ bool TeleoReactor::newTick() {
   if( m_firstTick ) {
     if( getCurrentTick()!=m_initialTick ) {
       syslog(warn)<<"Updating initial tick from "<<m_initialTick
-		    <<" to "<<getCurrentTick();
+                    <<" to "<<getCurrentTick();
       m_initialTick = getCurrentTick();
     }
     reset_deadline();
@@ -665,12 +665,12 @@ bool TeleoReactor::doSynchronize() {
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
-	bool echo;
-	Observation const &observ = (*i)->lastObservation(echo);
-	
-	if( echo || is_verbose() || NULL==m_trLog )
-	  syslog(obs)<<observ;
-	if( NULL!=m_trLog )
+        bool echo;
+        Observation const &observ = (*i)->lastObservation(echo);
+        
+        if( echo || is_verbose() || NULL==m_trLog )
+          syslog(obs)<<observ;
+        if( NULL!=m_trLog )
           m_trLog->observation(observ);
       }
       m_updates.clear();
@@ -706,10 +706,10 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
   if( !m_graph.subscribe(this, timeline, flag) ) {
     if( isInternal(timeline) ) 
       syslog(null, warn)<<"External declaration of the Internal timeline \""
-	      <<timeline.str()<<"\"";
+              <<timeline.str()<<"\"";
     else
       syslog(null, warn)<<"Multiple External declarations of timeline \""
-	      <<timeline.str()<<"\"";
+              <<timeline.str()<<"\"";
   }
 }
 
@@ -846,14 +846,14 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
   else if( old_l==m_maxDelay ) {
     m_maxDelay = new_l;
     for(details::active_external i(ext_begin(), ext_end()), endi(ext_end());
-	endi!=i; ++i) 
+        endi!=i; ++i) 
       m_maxDelay = std::max(m_maxDelay, i->latency());
   }
   if( m_maxDelay!=prev ) {
     // It may be anoying on the long run but for now I will log when this
     // exec latency changes
     syslog(info)<<" Execution latency updated from "<<prev<<" to "
-		<<m_maxDelay;
+                <<m_maxDelay;
     // Notify all the reactors that depend on me
     for(internal_set::iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
       (*i)->latency_update(getLatency()+prev);
