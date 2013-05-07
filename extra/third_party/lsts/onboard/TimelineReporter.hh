@@ -22,12 +22,16 @@ namespace TREX {
    */
   namespace LSTS {
 
-    class TimelineReporter :public TREX::transaction::TeleoReactor {
+    class TimelineReporter :public TREX::transaction::TeleoReactor,
+    TREX::transaction::graph::timelines_listener {
     public:
       TimelineReporter(TREX::transaction::TeleoReactor::xml_arg_type arg);
       virtual ~TimelineReporter();
 
+
     private:
+      void declared(transaction::details::timeline const &timeline);
+      void undeclared(transaction::details::timeline const &timeline);
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
       bool aborted;
 

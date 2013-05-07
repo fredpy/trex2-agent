@@ -42,19 +42,21 @@ namespace TREX {
     void
     PositionUpdater::handleInit()
     {
-      m_adapter.bind(m_bind_port);
+      m_adapter.startDiscovery();
     }
 
     void
     PositionUpdater::handleTickStart()
     {
       Message * msg = NULL;
-      while((msg = m_adapter.poll(0)) != NULL)
+      while((msg = m_adapter.poll(0, true)) != NULL)
       {
         if (msg->getId() == Announce::getIdStatic())
         {
           Announce * ann = (Announce *) dynamic_cast<Announce *>(msg);
 
+          std::cerr << "Got an announce! yay!" << "\n";
+          std::cerr.flush();
           if (m_receivedAnnounces[ann->sys_name] != NULL)
             delete m_receivedAnnounces[ann->sys_name];
 

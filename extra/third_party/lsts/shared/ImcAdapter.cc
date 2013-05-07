@@ -269,8 +269,16 @@ namespace TREX {
       return true;
     }
 
-    Message * ImcAdapter::poll(double timeout)
+    Message * ImcAdapter::poll(double timeout, bool discovery = false)
     {
+      if (discovery && m_diom.poll(timeout))
+      {
+        Address addr;
+        uint16_t rv = m_discovery.read((char*)m_bfr, 65535, &addr);
+        IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
+        return msg;
+      }
+
       if (!m_bound || !m_iom.poll(timeout))
         return NULL;
 
@@ -280,6 +288,9 @@ namespace TREX {
 
       return msg;
     }
+
+
+
 
     bool
     ImcAdapter::bind(int port)
@@ -306,6 +317,31 @@ namespace TREX {
 
       m_bound = false;
       return true;
+    }
+
+    bool
+    ImcAdapter::startDiscovery()
+    {
+      m_discovery.setMulticastTTL(1);
+      m_discovery.setMulticastLoop(false);
+      m_discovery.enableBroadcast(true);
+      std::vector<Interface> itfs = Interface::get();
+      int i;
+      for (unsigned i = 0; i < itfs.size(); ++i)
+        m_discovery.joinMulticastGroup("224.0.75.69", itfs[i].address());
+      for (i = 30100; i < 30105; i++)
+      {
+        try
+        {
+          m_discovery.bind(i, Address::Any, true);
+          std::cout << "listening for advertisements on port " << i << "\n";
+          m_discovery.addToPoll(m_diom);
+          return true;
+        }
+        catch (...)
+        { }
+      }
+      return false;
     }
 
     void
