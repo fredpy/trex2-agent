@@ -365,7 +365,7 @@ namespace {
                               duration_export(g,dom.lowerBound()));
       if( dom.hasUpper() )
         TREX::utils::set_attr(tmp, "max",
-                              duration_export(g,dom.lowerBound()));
+                              duration_export(g,dom.upperBound()));
     }
     TREX::utils::set_attr(ret, "type", "duration");
     return ret;
