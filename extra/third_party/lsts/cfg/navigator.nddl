@@ -3,20 +3,23 @@
 
 class Navigator extends AgentTimeline {
 	
-	Navigator(Mode _mode) {
-		super(_mode, "Idle", true);
-	}
+  Navigator(Mode _mode) {
+    super(_mode, "Idle", true);
+  }
+  Navigator(Mode _mode, bool plan) {
+    super(_mode, "Idle", plan);
+  }
     
-	predicate Idle {}
+  predicate Idle {}
 	
-	action Going {
-		float latitude, longitude, z, speed, dist;
-		float orig_lat, orig_lon, orig_z;		
-	}
+  action Going {
+    float latitude, longitude, z, speed, dist;
+    float orig_lat, orig_lon, orig_z;		
+  }
 	
-	predicate At {
-		float latitude, longitude, z, speed;
-		int secs;		
-	}
+  predicate At {
+    float latitude, longitude, z, speed;
+    int secs;		
+  }
 }
 
