@@ -164,7 +164,7 @@ namespace TREX {
 
       if(age > 15)
       {
-        Observation obs(system, "disconnected");
+        Observation obs(system, "position");
         obs.restrictAttribute("latitude", FloatDomain(msg->lat));
         obs.restrictAttribute("longitude", FloatDomain(msg->lon));
         obs.restrictAttribute("height", FloatDomain(msg->height));

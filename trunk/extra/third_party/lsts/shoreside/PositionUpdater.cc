@@ -11,7 +11,20 @@ using namespace TREX::utils;
 using namespace TREX::LSTS;
 using DUNE_NAMESPACES;
 
+namespace
+{
+  /** @brief PositionUpdater reactor declaration */
+  TeleoReactor::xml_factory::declare<PositionUpdater> decl("PositionUpdater");
+}
+
+
 namespace TREX {
+  void
+  initPlugin()
+  {
+
+  }
+
   namespace LSTS {
     PositionUpdater::PositionUpdater(TeleoReactor::xml_arg_type arg) :
       LstsReactor(arg)
