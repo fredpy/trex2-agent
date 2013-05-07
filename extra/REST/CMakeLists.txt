@@ -49,7 +49,10 @@ if(WITH_REST)
     target_link_libraries(REST_pg
       ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
       TREXtransaction)
-
+    
+    set(REST_HOST "localhost" CACHE STRING "default REST server address.")
+    set(REST_PORT 8080 CACHE NUMBER "default rest server port.")
+    
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rest.xml.in
       ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml 
