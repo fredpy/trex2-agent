@@ -180,7 +180,7 @@ namespace TREX {
        *        information from the XML structure
        */
       explicit TeleoReactor(xml_arg_type &arg, bool loadTL=true,
-			    bool log_default=true);
+                            bool log_default=true);
       /** @brief Destructor */
       virtual ~TeleoReactor();
       
@@ -188,7 +188,7 @@ namespace TREX {
        * @return the anme of the reactor
        */
       TREX::utils::Symbol const &getName() const {
-	return m_name;
+        return m_name;
       }
       /** @brief get \"agent\" name
        *
@@ -207,7 +207,7 @@ namespace TREX {
        * @sa getGraphName() const
        */
       TREX::utils::Symbol const &getAgentName() const {
-	return getGraphName();
+        return getGraphName();
       }
       /** @brief Get graph name
        *
@@ -216,7 +216,7 @@ namespace TREX {
        * @sa class TREX::transaction::graph
        */
       TREX::utils::Symbol const &getGraphName() const {
-	return m_graph.getName();
+        return m_graph.getName();
       }
       /** @brief Get graph
        *
@@ -243,7 +243,7 @@ namespace TREX {
        * @sa getFinalTick() const
        */
       TICK getInitialTick() const {
-	return m_initialTick;
+        return m_initialTick;
       }
       /** @brief Tick duration
        *
@@ -254,7 +254,7 @@ namespace TREX {
        * @return the duration of a single tick
        */
       duration_type tickDuration() const {
-	return m_graph.tickDuration();
+        return m_graph.tickDuration();
       }
       
       /** @brief unix time to tick conversion
@@ -273,7 +273,7 @@ namespace TREX {
        * (as if the mission started on January 1st 1970)
        */
       TICK timeToTick(date_type const &date) const {
-	return m_graph.timeToTick(date);
+        return m_graph.timeToTick(date);
       }
       /** @brief tick to unix time conversion
        * @param[in] cur A tick value
@@ -290,7 +290,7 @@ namespace TREX {
        * (as if the mission started on January 1st 1970)
        */
       date_type tickToTime(TICK cur) const {
-	return m_graph.tickToTime(cur);
+        return m_graph.tickToTime(cur);
       }
       std::string date_str(TICK cur) const {
         return m_graph.date_str(cur);
@@ -308,7 +308,7 @@ namespace TREX {
        * @sa graph::getInitialTick() const
        */
       TICK getCurrentTick() const {
-	return m_graph.getCurrentTick();
+        return m_graph.getCurrentTick();
       }
       /** @brief Get final tick
        *
@@ -342,7 +342,7 @@ namespace TREX {
        * @sa getExecLatency() const
        */
       TICK getLatency() const {
-	return m_latency;
+        return m_latency;
       }
       /** @brief reactor execution latency
        *
@@ -359,7 +359,7 @@ namespace TREX {
        * @sa getLatency() const
        */
       TICK getExecLatency() const {
-	return m_latency+m_maxDelay;
+        return m_latency+m_maxDelay;
       }
       /** @brief Get reactor look-ahead
        *
@@ -369,7 +369,7 @@ namespace TREX {
        * @return the reactor look-ahead
        */
       TICK getLookAhead() const {
-	return m_lookahead;
+        return m_lookahead;
       }
       /** @btrief New observation callback
        *
@@ -478,7 +478,7 @@ namespace TREX {
        * @return the number of @e External timelines on this reactor
        */
       size_type         count_externals() const {
-	return m_externals.size();
+        return m_externals.size();
       }
       /** @brief beginning of @e External timelines set
        *
@@ -507,7 +507,7 @@ namespace TREX {
        * @sa count_internal_relations() const
        */
       size_type     count_internals() const {
-	return m_internals.size();
+        return m_internals.size();
       }
       /** @brief Count the number of internal relations
        *
@@ -526,7 +526,7 @@ namespace TREX {
        * @sa int_end() const
        */
       internal_iterator int_begin() const {
-	return internal_iterator(m_internals.begin(), m_internals.end());
+        return internal_iterator(m_internals.begin(), m_internals.end());
       }
       /** @brief Last internal relation iterator
        *
@@ -534,7 +534,7 @@ namespace TREX {
        * @sa int_begin() const
        */
       internal_iterator int_end() const {
-	return internal_iterator(m_internals.end(), m_internals.end());
+        return internal_iterator(m_internals.end(), m_internals.end());
       }
       
     protected:
@@ -550,14 +550,14 @@ namespace TREX {
        * look-ahead of @p lookahead and associate it to the graph @p owner
        */
       TeleoReactor(graph *owner, TREX::utils::Symbol const &name,
-		   TICK latency, TICK lookahead, bool log=false);
+                   TICK latency, TICK lookahead, bool log=false);
       
       /** @brief LogManager access point
        *
        * @return the LogManager instance for this run
        */
       TREX::utils::LogManager &manager() const {
-	return m_graph.manager();
+        return m_graph.manager();
       }
       typedef utils::LogManager::path_type path_type;
       
@@ -618,7 +618,7 @@ namespace TREX {
        * @sa step()
        */
       virtual bool hasWork() {
-	return false;
+        return false;
       }
       
       
@@ -961,7 +961,7 @@ namespace TREX {
        * @sa failed_internal(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
       virtual bool failed_external(TREX::utils::Symbol const &timeline,
-				   graph::timeline_failure const &err) {
+                                   graph::timeline_failure const &err) {
         throw err;
       }
       /** @brief Request for internal failed
@@ -978,7 +978,7 @@ namespace TREX {
        * @sa failed_external(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
       virtual bool failed_internal(TREX::utils::Symbol const &timeline,
-				   graph::timeline_failure const &err) {
+                                   graph::timeline_failure const &err) {
         throw err;
       }
       /** @brief Check for internal timeline
@@ -1017,14 +1017,14 @@ namespace TREX {
        */
       utils::log::stream
       syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const {
-	if( context.empty() )
-	  return m_graph.syslog(getName(), kind);
-	else
-	  return m_graph.syslog(getName().str()+"."+context.str(), kind);
+        if( context.empty() )
+          return m_graph.syslog(getName(), kind);
+        else
+          return m_graph.syslog(getName().str()+"."+context.str(), kind);
       }
       utils::log::stream
       syslog(utils::log::id_type const &kind=null) const {
-	return m_graph.syslog(getName(), kind);
+        return m_graph.syslog(getName(), kind);
       }
       
       /** @brief Find an external timeline
