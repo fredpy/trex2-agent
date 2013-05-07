@@ -172,6 +172,8 @@ namespace TREX
       if (gname == "reference" && gpred == "Going")
         handleGoingRequest(*goal);
 
+      else if (gname == "reference" && gpred == "At")
+        handleGoingRequest(*goal);
 
     }
 
@@ -396,7 +398,6 @@ namespace TREX
         m_ref.lon = longitude;
       }
     }
-
 
     void
     Platform::handleGoingRequest(Goal g)

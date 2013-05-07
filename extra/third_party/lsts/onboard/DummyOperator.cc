@@ -45,7 +45,7 @@ void DummyOperator::notify(TREX::transaction::Observation const &obs)
     params.name = "TREX";
     EntityParameter param;
     param.name = "Active";
-    param.value = "1b";
+    param.value = "true";
     params.params.push_back(param);
     m_env.instance().getPlatformReactor()->sendMsg(params);
   }
