@@ -15,12 +15,15 @@
 # include <trex/domain/StringDomain.hh>
 # include <trex/domain/IntegerDomain.hh>
 # include <trex/domain/EnumDomain.hh>
+# include <trex/utils/Plugin.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/Symbol.hh>
 
 # include "EuropaExtensions.hh"
 
 using DUNE_NAMESPACES;
 using namespace TREX::transaction;
-
+using namespace TREX::utils;
 namespace TREX {
   namespace LSTS {
 
@@ -75,10 +78,14 @@ namespace TREX {
       //@brief Translates TrexToken messages into a generic observation
       Observation announceObservation(Announce * msg);
 
+      void asImcMessage(Predicate const &obs, TrexToken * result);
+
       virtual
       ~ImcAdapter();
 
     private:
+      void variableToImc(Variable const &v, TrexAttribute * attr);
+
       UDPSocket m_send, m_receive, m_discovery;
       IOMultiplexing m_iom, m_diom;
       uint8_t* m_bfr;

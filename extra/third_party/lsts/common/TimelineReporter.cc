@@ -15,8 +15,8 @@ using DUNE_NAMESPACES;
 namespace
 {
 
-	/** @brief TimelineReporter reactor declaration */
-	TeleoReactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
+  /** @brief TimelineReporter reactor declaration */
+  TeleoReactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
 
 }
 
@@ -35,6 +35,9 @@ TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
   m_hostaddr = parse_attr<std::string>("127.0.0.1",
                                        TeleoReactor::xml_factory::node(arg),
                                        "hostaddr");
+  m_output = parse_attr<bool>(false,
+                              TeleoReactor::xml_factory::node(arg),
+                              "output");
 }
 
 TimelineReporter::~TimelineReporter() {
@@ -125,7 +128,8 @@ void TimelineReporter::notify(Observation const &obs)
 
     //std::cout << v;
   }
-  std::cout << obs << std::endl;
+  if (m_output)
+    std::cout << obs << std::endl;
 
   op.token.set(token);
   m_adapter.send(&op, m_hostaddr, m_hostport);

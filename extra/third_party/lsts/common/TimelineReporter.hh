@@ -36,6 +36,7 @@ namespace TREX {
       void undeclared(transaction::details::timeline const &timeline);
       //TREX::utils::SingletonUse<SharedEnvironment> m_env;
       bool aborted;
+      bool m_output;
       int m_hostport;
       std::string m_hostaddr;
       ImcAdapter m_adapter;

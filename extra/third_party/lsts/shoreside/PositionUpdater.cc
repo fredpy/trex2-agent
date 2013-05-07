@@ -55,8 +55,6 @@ namespace TREX {
         {
           Announce * ann = (Announce *) dynamic_cast<Announce *>(msg);
 
-          std::cerr << "Got an announce! yay!" << "\n";
-          std::cerr.flush();
           if (m_receivedAnnounces[ann->sys_name] != NULL)
             delete m_receivedAnnounces[ann->sys_name];
 
@@ -84,7 +82,5 @@ namespace TREX {
     {
       m_adapter.unbind();
     }
-
-
   }
 }
