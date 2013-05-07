@@ -37,6 +37,12 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/CFunctions.hh>
 # include <trex/europa/bits/system_header.hh>
 
+# define TREX_PP_SYSTEM_FILE <PLASMA/UnboundVariableDecisionPoint.hh>
+# include <trex/europa/bits/system_header.hh> 
+
+# define TREX_PP_SYSTEM_FILE <PLASMA/ValueSource.hh>
+# include <trex/europa/bits/system_header.hh>
+
 #include "EarliestFirstFlawManager.hh"
 #include "Trigonometry.hh"
 #include "Numeric.hh"
@@ -95,6 +101,66 @@ namespace TREX {
     
     DECLARE_FUNCTION_TYPE(MaxConstraint, max, "maxf", EUROPA::FloatDT, 2);
     DECLARE_FUNCTION_TYPE(MinConstraint, min, "minf", EUROPA::FloatDT, 2);
+
+
+
+    class TowardZero: public EUROPA::SOLVERS::UnboundVariableDecisionPoint {
+    public:
+      TowardZero(EUROPA::DbClientId const &client, 
+		 EUROPA::ConstrainedVariableId const &flawed_var,
+		 EUROPA::TiXmlElement const &config,
+		 EUROPA::LabelStr const &explanation = "unknown")
+      :EUROPA::SOLVERS::UnboundVariableDecisionPoint(client, flawed_var, config, explanation),
+	 m_choiceIndex(0) {}
+
+      bool hasNext() const {
+	return m_choiceIndex < m_choices->getCount();
+      }
+      EUROPA::edouble getNext() {
+        EUROPA::edouble ret = choice(m_choiceIndex++);
+        debugMsg("trex:to_zero", "next choice: "<<m_flawedVariable->toString()
+                 <<" <- "<<ret<<" ("<<m_choiceIndex<<")");
+        return ret;
+      }
+
+    private:
+      EUROPA::edouble choice(unsigned int idx) {
+	EUROPA::Domain const &dom = m_flawedVariable->lastDomain();
+	EUROPA::edouble zero(0.0);
+	
+	if( dom.isInterval() ) {
+	  EUROPA::edouble lo = dom.getLowerBound(),
+	    hi = dom.getUpperBound(),
+	    steps = dom.minDelta();
+	  if( lo<=zero ) {
+	    if( hi<=zero ) 
+	      idx = m_choices->getCount() - (idx+1);
+	    else {
+	      EUROPA::Domain::size_type 
+		lo_cut = EUROPA::cast_int((zero-lo)/steps),
+		hi_cut = EUROPA::cast_int(hi/steps),
+		half_idx = (idx+1)/2;
+	      if( half_idx>lo_cut ) {
+		// exhausted all the choices below zero 
+		idx -= lo_cut;
+		return steps*idx;
+	      } else if( half_idx>hi_cut ) {
+		// exhausted all the choices above zero 
+		idx -= hi_cut;
+		return zero-(steps*idx);
+	      } else if( idx&1 ) 
+		return steps*half_idx;
+	      else
+		return zero-(steps*half_idx);
+	    }
+	  }
+	}
+
+	return m_choices->getValue(idx);
+      }
+      unsigned int m_choiceIndex;
+    };
+
   }
 }
 
@@ -130,7 +196,9 @@ namespace {
         TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::GoalFilter, goals);
         TREX_REGISTER_FLAW_FILTER(assembly, TREX::europa::NotGoalFilter, 
 				  notGoals);
-        
+
+	TREX_REGISTER_FLAW_HANDLER(assembly, TREX::europa::TowardZero,
+				   toZero);
         
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
