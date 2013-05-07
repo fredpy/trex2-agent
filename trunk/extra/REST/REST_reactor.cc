@@ -75,6 +75,7 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
   bool found;
   
   m_strand.reset(new boost::asio::strand(manager().service()));
+  set_verbose(true);
   
   boost::filesystem::path wt_cfg = manager().use("wt_config.xml", found),
   log_dest = file_name("Wt.log");
@@ -156,6 +157,9 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
                            "POST: post the attached goal to trex.\n"
                            "DELETE: request the concelation of the given goal.\n"
                            "GET: get a description of an exisiting goal.\n");
+    m_services.add_handler("goals",
+                           boost::bind(&REST_reactor::goals, this, _1),
+                           "List all the goals");
     
     if( !m_server->start() )
       throw ReactorException(*this, "Unable to start the server");
@@ -221,17 +225,73 @@ bp::ptree REST_reactor::timelines(req_info const &req) {
 
 bp::ptree REST_reactor::timeline(req_info const &req) {
   if( req.arg_list().empty() )
-    throw ReactorException(*this, "Missing timeline argeument to "
+    throw ReactorException(*this, "Missing timeline argument to "
                            +req.request().path()+req.request().pathInfo());
   return strand_run<bp::ptree>(boost::bind(&REST_reactor::get_timeline,
                                            this, req.arg_list().front()));
 }
 
+bp::ptree REST_reactor::export_goal(goal_id g, req_info const &req) const {
+  bp::ptree ret;
+  ret.put("id", g);
+  ret.put("href", req.request().path()+"/goal/"+ret.get<std::string>("id"));
+  ret.push_back(getGraph().export_goal(g).front());
+  return ret;
+}
+
+void REST_reactor::add_goal(transaction::goal_id g) {
+  std::ostringstream id;
+  postGoal(g);
+  id<<g;
+  m_goals[id.str()] = g;
+}
+
+goal_id REST_reactor::get_goal(std::string const &id) const {
+  goal_map::const_iterator pos = m_goals.find(id);
+  
+  if( m_goals.end()==pos )
+    return goal_id();
+  else
+    return pos->second;
+}
+
+bool REST_reactor::remove_goal(std::string const &id) {
+  goal_map::iterator pos = m_goals.find(id);
+
+  if( m_goals.end()==pos )
+    return false;
+  else {
+    goal_id g = pos->second;
+    m_goals.erase(pos);
+    return postRecall(g);
+  }
+}
+
+
+
+bp::ptree REST_reactor::list_goals(req_info const &req) const {
+  bp::ptree ret;
+  for(goal_map::const_iterator i=m_goals.begin();
+      m_goals.end()!=i; ++i) {
+    ret.push_back(bp::ptree::value_type("", export_goal(i->second, req)));
+  }
+  return ret;
+}
+
+bp::ptree REST_reactor::goals(req_info const &req) {
+  bp::ptree ret,
+    tmp = strand_run<bp::ptree>(boost::bind(&REST_reactor::list_goals,
+                                            this, boost::ref(req)));
+  
+  ret.add_child("goals", tmp);
+  return ret;
+}
+
+
 bp::ptree REST_reactor::manage_goal(req_info const &req) {
   Wt::Http::Request const &rq = req.request();
   std::string kind = rq.method();
   bp::ptree ret;
-  ret.put("kind", kind);
   
   if( kind=="POST" ) {
     if( "application/json"!=rq.contentType() )
@@ -270,18 +330,32 @@ bp::ptree REST_reactor::manage_goal(req_info const &req) {
     
     if( !isExternal(g->object()) )
       throw ReactorException(*this, "Timeline "+g->object().str()+" does not exist");
-    postGoal(g);
-    ret.put("id", g);
-    ret.put("href", rq.path()+rq.pathInfo()+"/"+ret.get<std::string>("id"));
-    ret.push_back(getGraph().export_goal(g).front());
     
-    return ret;
+    strand_run<void>(boost::bind(&REST_reactor::add_goal, this, g));
+    
+    return export_goal(g, req);
   } else if( kind=="DELETE" ) {
-    ret.put("warning", "unimplemented");
+    if( req.arg_list().empty() )
+      throw ReactorException(*this, "Missing goal id argument to "
+                             +req.request().path()+req.request().pathInfo());
+
+    bool recalled = strand_run<bool>(boost::bind(&REST_reactor::remove_goal,
+                                                 this, req.arg_list().front()));
+    ret.put("id", req.arg_list().front());
+    ret.put("deleted", recalled);
+                                                 
     return ret;
   } else if( kind=="GET" ) {
-    ret.put("warning", "unimplemented");
-    return ret;
+    if( req.arg_list().empty() )
+      throw ReactorException(*this, "Missing goal id argument to "
+                             +req.request().path()+req.request().pathInfo());
+    goal_id g = strand_run<goal_id>(boost::bind(&REST_reactor::get_goal, this,
+                                                req.arg_list().front()));
+    if( !g )
+      throw ReactorException(*this,
+                             "No goal associated to "+req.arg_list().front());
+    
+    return export_goal(g, req);
   } else 
     throw ReactorException(*this, "http method \""+kind+"\" is not supported by "
                            +req.request().path()+req.request().pathInfo());
