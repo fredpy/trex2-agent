@@ -49,6 +49,15 @@ if(WITH_REST)
     target_link_libraries(REST_pg
       ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
       TREXtransaction)
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rest.xml.in
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml 
+      DESTINATION ${TREX_SHARED}/cfg)
+    set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg)
+
+
   else(Wt_FOUND)
     message(WARNING "Unable to find Wt!!! Disabling REST plugin")
     set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt" FORCE)

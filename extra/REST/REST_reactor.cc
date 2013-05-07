@@ -92,10 +92,10 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     m_server.reset(new Wt::WServer("", wt_cfg.string()));
   } else
     m_server.reset(new Wt::WServer(""));
-  wt_cfg = manager().use("witre.xml", found);
+  wt_cfg = manager().use("rest.xml", found);
   
   if( !found )
-    throw ReactorException(*this, "unable to locate witre.xml config file");
+    throw ReactorException(*this, "unable to locate rest.xml config file");
 
   try {
     boost::property_tree::ptree doc;
@@ -402,8 +402,10 @@ bp::ptree REST_reactor::tick_at(req_info const &req) const {
   if( req.arg_list().empty() )
     throw ReactorException(*this, "Missing date argument to "+req.request().path()+req.request().pathInfo());
   std::string date_str = Wt::Utils::urlDecode(req.arg_list().front());
+  syslog()<<"Requested to convert date \""<<date_str<<"\" into a tick";
   try {
     date_type date = utils::string_cast<date_type>(date_str);
+    syslog()<<"Result date is "<<date<<" with zone "<<date.zone_abbrev();
     return tick_info(this->timeToTick(date));
   } catch(...) {
     throw ReactorException(*this, "Failed to parse date: "+date_str);
