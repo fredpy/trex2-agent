@@ -40,14 +40,12 @@ trex_plugin(platform
   ControlInterface.cc 
   Platform.cc 
   SafetyBug.cc
-  TimelineReporter.cc
   DummyOperator.cc
 
   # headers
   ControlInterface.hh 
   Platform.hh 
   SafetyBug.hh
-  TimelineReporter.hh
   DummyOperator.hh
 )
 

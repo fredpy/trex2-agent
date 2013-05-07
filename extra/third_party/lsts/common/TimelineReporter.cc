@@ -6,10 +6,10 @@
  */
 
 #include "TimelineReporter.hh"
-# include "Platform.hh"
 
 using namespace TREX::LSTS;
 using namespace TREX::transaction;
+using namespace TREX::utils;
 using DUNE_NAMESPACES;
 
 namespace
@@ -20,10 +20,21 @@ namespace
 
 }
 
+namespace TREX {
+  void
+  initPlugin()
+  {
+  }
+}
+
 TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg), graph::timelines_listener(arg), aborted(false)
 {
-
+  m_hostport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
+                               "hostport");
+  m_hostaddr = parse_attr<std::string>("127.0.0.1",
+                                       TeleoReactor::xml_factory::node(arg),
+                                       "hostaddr");
 }
 
 TimelineReporter::~TimelineReporter() {
@@ -117,9 +128,10 @@ void TimelineReporter::notify(Observation const &obs)
   std::cout << obs << std::endl;
 
   op.token.set(token);
+  m_adapter.send(&op, m_hostaddr, m_hostport);
 
-  Platform *r = m_env->getPlatformReactor();
-  r->sendMsg(op);
+  //Platform *r = m_env->getPlatformReactor();
+  //r->sendMsg(op);
 }
 
 

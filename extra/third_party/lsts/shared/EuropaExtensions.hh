@@ -77,6 +77,35 @@ namespace TREX {
       };
     };
 
+    class LatLonDisplacement :public EUROPA::Constraint {
+       public:
+         LatLonDisplacement(EUROPA::LabelStr const &name,
+                        EUROPA::LabelStr const &propagator,
+                        EUROPA::ConstraintEngineId const &cstrEngine,
+                        std::vector<EUROPA::ConstrainedVariableId> const &vars);
+
+         void handleExecute();
+
+       private:
+
+         EUROPA::Domain &m_lat;
+         EUROPA::Domain &m_lon;
+         EUROPA::Domain &m_northing;
+         EUROPA::Domain &m_easting;
+         EUROPA::Domain &m_latr;
+         EUROPA::Domain &m_lonr;
+
+         enum indexes {
+           LAT = 0,
+           LON = 1,
+           NORTH = 2,
+           EAST = 3,
+           LATR = 4,
+           LONR = 5,
+           NARGS = 6
+         };
+       };
+
     class LatLonDist :public EUROPA::Constraint {
     public:
       LatLonDist(EUROPA::LabelStr const &name,
