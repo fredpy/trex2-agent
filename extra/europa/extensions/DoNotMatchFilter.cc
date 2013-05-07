@@ -37,10 +37,12 @@ using namespace TREX::europa;
 
 DoNotMatchFilter::DoNotMatchFilter(EUROPA::TiXmlElement const &cfg)
 :EUROPA::SOLVERS::FlawFilter(cfg, true) {
+  debugMsg("trex:not_match", "Creating not match filter");
   for(EUROPA::TiXmlElement *child=cfg.FirstChildElement("Choice");
       NULL!=child; child = child->NextSiblingElement("Choice")) {
     char const *name = child->Attribute("name");
     if( NULL!=name ) {
+      debugMsg("trex:not_match", " accept: "<<name);
       m_names.insert(name);
     }
   }
@@ -49,5 +51,7 @@ DoNotMatchFilter::DoNotMatchFilter(EUROPA::TiXmlElement const &cfg)
 }
 
 bool DoNotMatchFilter::test(EUROPA::EntityId const &entity) {
-  return m_names.find(entity->getName())==m_names.end();  
+  bool ret = m_names.find(entity->getName())==m_names.end();
+  debugMsg("trex:not_match", "Testing for variable "<<entity->getName().toString()<<": "<<ret);
+  return ret;
 }

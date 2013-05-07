@@ -83,7 +83,7 @@ bool TokenFilter::test(EUROPA::EntityId const &entity) {
     set_assembly(var->getConstraintEngine());
 
     token = details::parent_token(var);
-  }    
+  }
   
   return token.isNoId() || tokenCheck(token) || doTest(token);
 }
@@ -94,13 +94,22 @@ bool TokenFilter::test(EUROPA::EntityId const &entity) {
 
 bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::IntervalIntDomain const &t_start(tok->start()->lastDomain());
-  EUROPA::IntervalIntDomain const &t_end(tok->start()->lastDomain());
+  EUROPA::IntervalIntDomain const &t_end(tok->end()->lastDomain());
   EUROPA::IntervalIntDomain horizon = assembly().plan_scope();
   EUROPA::eint initial = assembly().initial_tick();
-
-  return t_start.getLowerBound() >= horizon.getUpperBound() ||
-      t_end.getUpperBound() < horizon.getLowerBound() ||
-      t_end.getUpperBound() <= initial;
+  
+  if( t_start.getLowerBound() >= horizon.getUpperBound() ) {
+    debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") starts "<<t_start.toString()
+              <<" after horizon "<<horizon.toString());
+    return true;
+  } else if( t_end.getUpperBound() < horizon.getLowerBound() ) {    
+    debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") ends "<<t_end.toString()<<" before horizon "<<horizon.toString());
+    return true;
+  } else if( t_end.getUpperBound() <= initial ) {
+    debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") ends "<<t_end.toString()<<" before initial "<<initial);
+    return true;    
+  } else
+    return false;
 }
 
 /*
