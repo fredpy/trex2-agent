@@ -65,6 +65,10 @@ class VerticalControl extends AgentTimeline {
 	float speed, horizontal_speed, _hspeed_2;
 	float min_z, max_z;
 	float pitch_angle, _corrected_pitch;
+	float _deg_pitch;
+
+	// My sin and cos constraints use degree ... so I have to convert the angle
+	_corrected_pitch == to_rad(_deg_pitch);
 	
 	0.0 < speed;
 	0.0 <= _corrected_pitch;
@@ -81,13 +85,10 @@ class VerticalControl extends AgentTimeline {
 VerticalControl::Holds {
     met_by(Holds prev);
     
-    // How can I set the pitch_angle properly ?
-    pitch_angle == 0.5; // 0.5 rad ~ 30 degrees
-    
     if( min_z==max_z ) {
 	_corrected_pitch == 0;
     } else {
 	_corrected_pitch == pitch_angle;
     }
-    horizontal_speed == speed * cos(_corrected_pitch);
+    horizontal_speed == speed * cos(_deg_pitch);
 }

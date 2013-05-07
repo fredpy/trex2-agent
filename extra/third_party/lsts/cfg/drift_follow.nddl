@@ -49,7 +49,7 @@ close();
 
 rejectable(vc.Holds ctrl);
 ctrl.speed == 1.5;
-ctrl.pitch_angle == 0.5;
+ctrl.pitch_angle == to_rad(15.0);
 ctrl.min_z == 2.0;
 ctrl.max_z == 25.0;
 
