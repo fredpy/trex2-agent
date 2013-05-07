@@ -9,8 +9,10 @@
 #define TIMELINEREPORTER_HH_
 
 # include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/Plugin.hh>
+# include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
-# include "SharedEnvironment.hh"
+# include "../shared/ImcAdapter.hh"
 
 namespace TREX {
   /** @brief lsts plug-in
@@ -32,9 +34,11 @@ namespace TREX {
     private:
       void declared(transaction::details::timeline const &timeline);
       void undeclared(transaction::details::timeline const &timeline);
-      TREX::utils::SingletonUse<SharedEnvironment> m_env;
+      //TREX::utils::SingletonUse<SharedEnvironment> m_env;
       bool aborted;
-
+      int m_hostport;
+      std::string m_hostaddr;
+      ImcAdapter m_adapter;
       bool synchronize()
       {
         // nothing to do
