@@ -63,6 +63,9 @@ namespace {
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::InsideOpLimits,
                                sane_pos, trex);
       
+      TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::LatLonDisplace,
+                                     wgsdisplace, trex);
+
       declareFunction(assembly, new TREX::LSTS::RadDegFunction());
       declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
       
@@ -120,6 +123,38 @@ LatLonDist::LatLonDist(EUROPA::LabelStr const &name,
    m_lat2(getCurrentDomain(m_variables[LatLonDist::LAT2])),
    m_lon2(getCurrentDomain(m_variables[LatLonDist::LON2]))
 {}
+
+
+LatLonDisplace::LatLonDisplace(EUROPA::LabelStr const &name,
+    EUROPA::LabelStr const &propagator,
+    EUROPA::ConstraintEngineId const &cstrEngine,
+    std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagator, cstrEngine, vars),
+ m_lat(getCurrentDomain(m_variables[LatLonDisplace::LAT])),
+ m_lon(getCurrentDomain(m_variables[LatLonDisplace::LON])),
+ m_northing(getCurrentDomain(m_variables[LatLonDisplace::NORTH])),
+ m_easting(getCurrentDomain(m_variables[LatLonDisplace::EAST])),
+ m_latr(getCurrentDomain(m_variables[LatLonDisplace::LATR])),
+ m_lonr(getCurrentDomain(m_variables[LatLonDisplace::LONR]))
+{}
+
+void
+LatLonDisplace::handleExecute()
+{
+
+  double lat, lon, n, e, dummy;
+  if (!m_lat.isSingleton() || !m_lon.isSingleton() || !m_northing.isSingleton() || !m_easting.isSingleton())
+    return;
+
+  lat = cast_basis(m_lat.getSingletonValue());
+  lon = cast_basis(m_lon.getSingletonValue());
+  n = cast_basis(m_northing.getSingletonValue());
+  e = cast_basis(m_easting.getSingletonValue());
+
+  WGS84::displace(n, e, 0, &lat, &lon, &dummy);
+  m_latr.set(lat);
+  m_lonr.set(lon);
+}
 
 void LatLonDist::handleExecute() {
   double lat1, lon1, lat2, lon2;
