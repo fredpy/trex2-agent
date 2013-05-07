@@ -58,3 +58,5 @@ include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
 add_subdirectory(shared)
 add_subdirectory(onboard)
 add_subdirectory(shoreside)
+
+trex_cfg(cfg ${TREX_SHARED})
