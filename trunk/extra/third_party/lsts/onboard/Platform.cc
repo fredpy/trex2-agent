@@ -100,7 +100,7 @@ namespace TREX
 
         IMC::Message * msg;
 
-        while ((msg = m_adapter.poll(0)) != NULL)
+        while ((msg = m_adapter.poll(0, false)) != NULL)
         {
           msg_count++;
           if (remote_id == 0)

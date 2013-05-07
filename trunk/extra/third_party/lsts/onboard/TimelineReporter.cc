@@ -7,6 +7,7 @@
 
 #include "TimelineReporter.hh"
 # include "Platform.hh"
+
 using namespace TREX::LSTS;
 using namespace TREX::transaction;
 using DUNE_NAMESPACES;
@@ -20,13 +21,27 @@ namespace
 }
 
 TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg), aborted(false)
+:TeleoReactor(arg), graph::timelines_listener(arg), aborted(false)
 {
 
 }
 
 TimelineReporter::~TimelineReporter() {
 	// TODO Auto-generated destructor stub
+}
+
+void
+TimelineReporter::declared(details::timeline const &timeline)
+{
+  syslog(log::warn) << "Timeline has been declared: " << timeline.name();
+  use(timeline.name(), false, false);
+}
+
+void
+TimelineReporter::undeclared(details::timeline const &timeline)
+{
+  syslog(log::warn) << "Timeline has been undeclared: " << timeline.name();
+  unuse(timeline.name());
 }
 
 void TimelineReporter::newPlanToken(goal_id const &g)
@@ -49,7 +64,8 @@ void TimelineReporter::notify(Observation const &obs)
 
   token.predicate = obs.predicate().str();
   token.timeline = obs.object().str();
-  std::cout << token.timeline << "." << token.predicate <<"{";
+
+  //std::cout << token.timeline << "." << token.predicate <<"{";
 
   op.op = TrexOperation::OP_POST_TOKEN;
 
@@ -96,10 +112,9 @@ void TimelineReporter::notify(Observation const &obs)
 
     token.attributes.push_back(attr);
 
-    std::cout << v;
+    //std::cout << v;
   }
-  std::cout << "}\n";
-  std::cout.flush();
+  std::cout << obs << std::endl;
 
   op.token.set(token);
 

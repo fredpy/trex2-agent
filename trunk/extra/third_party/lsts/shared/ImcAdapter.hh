@@ -45,11 +45,14 @@ namespace TREX {
       bool
       send(Message * msg, std::string address, int port);
 
+      bool
+      startDiscovery();
+
       void
       setTrexId(int trex_id);
 
       Message *
-      poll(double timeout);
+      poll(double timeout, bool discovery);
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
       Observation vehicleMediumObservation(VehicleMedium * msg);
@@ -76,8 +79,8 @@ namespace TREX {
       ~ImcAdapter();
 
     private:
-      UDPSocket m_send, m_receive;
-      IOMultiplexing m_iom;
+      UDPSocket m_send, m_receive, m_discovery;
+      IOMultiplexing m_iom, m_diom;
       uint8_t* m_bfr;
       Concurrency::Mutex m_mutex;
       int m_trex_id;
