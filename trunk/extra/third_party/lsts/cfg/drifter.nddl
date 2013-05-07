@@ -10,11 +10,12 @@ class DrifterFollow extends AgentTimeline {
     predicate Survey {
 	float center_lat, center_lon;
 	float speed_north, speed_east, u, v;
+	float _bind_u, _bind_v;
 
 	PathList path;
 	float    size;
 	bool     lagrangian, dynamic;
-	
+       
 	speed_east == u;
 	speed_north == v;
 	duration == 1;
@@ -40,6 +41,7 @@ DrifterFollow::Survey {
     last.path == path;
     last.factor_x == size;
     last.factor_y == size;
+
 }
 
 DrifterFollow::DoSurvey {

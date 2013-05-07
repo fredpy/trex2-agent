@@ -1,0 +1,27 @@
+<Solver name="LstsSynchCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+  
+  <!-- UnboundVariableManager defaultPriority="2001">
+    <FlawFilter component="doNotMatch">
+      <Choice name="_bind_u"/>
+      <Choice name="_bind_v"/>
+      <Choice name="_bind_deg"/>
+    </FlawFilter>
+    <FlawHandler component="toZero" />
+  </UnboundVariableManager -->
+  <!-- any mgr with a priority above 2000 will happen 
+       after states are resolved -->
+
+  <!-- add this if you wan to resolve goals during synch (costful) -->
+  <!-- OpenConditionManager defaultPriority="2500">
+       <FlawFilter component="notGoals"/>
+       <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager -->
+</Solver>

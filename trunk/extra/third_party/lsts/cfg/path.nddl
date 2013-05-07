@@ -65,11 +65,13 @@ class VerticalControl extends AgentTimeline {
 	float speed, horizontal_speed, _hspeed_2;
 	float min_z, max_z;
 	float pitch_angle, _corrected_pitch;
-	float _deg_pitch;
+	float _deg_pitch, _bind_deg;
 
 	// My sin and cos constraints use degree ... so I have to convert the angle
 	_corrected_pitch == to_rad(_deg_pitch);
-	
+	_deg_pitch <= 45.0;
+	_deg_pitch == 15.0 + _bind_deg;
+
 	0.0 < speed;
 	0.0 <= _corrected_pitch;
 	_corrected_pitch <= pitch_angle;

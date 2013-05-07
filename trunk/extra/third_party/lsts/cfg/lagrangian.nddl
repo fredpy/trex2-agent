@@ -9,6 +9,10 @@ class LagrangianSpace extends AgentTimeline {
 	speed == sqrt(_speed_2); 
 	// 1.0 == cos_angle^2 + sin_angle^2
 	calcDistance(1.0, 0.0, 0.0, cos_angle, sin_angle);
+	cos_angle <= 1.0;
+	-1.0 <= cos_angle;
+	sin_angle <= 1.0;
+	-1.0 <= sin_angle;
     }
     LagrangianSpace(Mode _mode) {
 	super(_mode, "Holds");

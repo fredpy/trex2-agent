@@ -1,0 +1,27 @@
+<Solver name="LstsPlanCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/> 
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <UnboundVariableManager defaultPriority="2300">
+    <FlawFilter component="doNotMatch">
+      <Choice name="_bind_u"/>
+      <Choice name="_bind_v"/>
+      <Choice name="_bind_deg"/>
+    </FlawFilter>
+    <!-- FlawFilter component="InfiniteDynamicFilter"/ -->
+    <FlawHandler component="toZero" />
+  </UnboundVariableManager>
+
+  <!-- then resolve new goals -->
+  <OpenConditionManager defaultPriority="2200" component="EarliestFirst" >
+    <FlawFilter component="notGoals"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+
+</Solver>
