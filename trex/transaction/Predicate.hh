@@ -130,6 +130,10 @@ namespace TREX {
 	return m_type;
       }
 
+      virtual bool has_temporal_scope() const {
+        return false;
+      }
+      
       /** @brief beginning of the attributes set
        *
        * This method allows to iterate through the attributes of this
