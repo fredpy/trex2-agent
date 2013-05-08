@@ -36,6 +36,7 @@
 #include <trex/utils/ptree_io.hh>
 
 using namespace TREX::REST;
+using namespace TREX::REST::bits;
 namespace bpt=boost::property_tree;
 namespace wht=Wt::Http;
 
@@ -107,7 +108,7 @@ REST_service::REST_service() {
 // modifiers
 
 bool REST_service::add_handler_impl(REST_service::path_type const &p,
-                                    REST_service::handler_wrap const &cb) {
+                                    handler_wrap const &cb) {
   boost::optional<cb_map &> pos = m_handlers.get_child_optional(p);
   
   if( pos ) {
@@ -229,5 +230,4 @@ req_info::req_info(wht::Request const &r)
 :m_req(r), m_call_path('/'), m_arg_path(r.pathInfo(), '/') {
   m_arg_list = to_list(m_arg_path);
 }
-
 
