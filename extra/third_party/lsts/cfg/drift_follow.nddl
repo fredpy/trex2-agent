@@ -37,28 +37,11 @@ PathList square = new PathList(upper_left, lower_left,
  * TREX timelines
  */
 Navigator navigator = new Navigator(External, false);
+
+LagrangianSpace lagrange = new LagrangianSpace();
+
 VerticalControl vc = new VerticalControl(Internal);
-
-// These 2 are meant to not be AgentTimeline
-LagrangianSpace lagrange = new LagrangianSpace(Internal);
-LagrangianPath path_control = new LagrangianPath(Internal);
-
 DrifterFollow drifter = new DrifterFollow(Internal);
 
 close();
 
-rejectable(vc.Holds ctrl);
-ctrl.speed == 1.5;
-ctrl.pitch_angle <= to_rad(12.0);
-ctrl.min_z == 2.0;
-ctrl.max_z == 25.0;
-
-
-// rejectable(drifter.Survey survey);
-// survey.path == square;
-// survey.speed_north == 0.1;
-// survey.speed_east == -0.05;
-// survey.center_lat == to_rad(41.184195);
-// survey.center_lon == to_rad(-8.705745);
-// survey.size == 1000.0; // 1km
-// survey.dynamic == true;
