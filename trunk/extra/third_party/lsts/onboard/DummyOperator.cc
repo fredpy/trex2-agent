@@ -33,7 +33,6 @@ void DummyOperator::notify(TREX::transaction::Observation const &obs)
 {
   if (obs.object().str() == "control" && obs.predicate() == "DUNE")
   {
-    Platform *r = m_env->getPlatformReactor();
     // TODO activate TREX
 
     PlanControl pc;
