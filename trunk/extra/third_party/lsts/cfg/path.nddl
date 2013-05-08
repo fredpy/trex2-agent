@@ -77,6 +77,8 @@ class VerticalControl extends AgentTimeline {
 	_corrected_pitch <= pitch_angle;
 	min_z <= max_z;
 	horizontal_speed == sqrt(_hspeed_2);
+
+	start + duration == end;
     }
     
     VerticalControl(Mode _mode) {

@@ -147,6 +147,8 @@ LatLonDisplace::handleExecute()
   if (!m_lat.isSingleton() || !m_lon.isSingleton() || !m_northing.isSingleton()
       || !m_easting.isSingleton())
     return;
+  if( m_latr.isSingleton() && m_lonr.isSingleton() )
+    return; // avoid to compute these twice
 
   lat = cast_basis(m_lat.getSingletonValue());
   lon = cast_basis(m_lon.getSingletonValue());
