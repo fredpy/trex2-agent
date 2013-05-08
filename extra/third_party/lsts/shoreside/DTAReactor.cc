@@ -49,12 +49,18 @@ bool DTAReactor::synchronize() {
       path_d.add(m_path);
       tmp.restrictAttribute(Variable("path", path_d));
     
-      if( m_have_speed ) {
-        tmp.restrictAttribute(Variable("speed_north",
-                                        FloatDomain(m_speed.first)));
-        tmp.restrictAttribute(Variable("speed_east",
-                                        FloatDomain(m_speed.second)));
+      if( !m_have_speed ) {
+        // set default speeds
+        // In theory if they are not set the vehcile side know how to set them
+        // although lets do most of the work where the cpu is
+        m_speed.first = 0.0;
+        m_speed.second = 0.0;
       }
+      tmp.restrictAttribute(Variable("speed_north",
+                                     FloatDomain(m_speed.first)));
+      tmp.restrictAttribute(Variable("speed_east",
+                                     FloatDomain(m_speed.second)));
+    
       
       tmp.restrictAttribute(Variable("size", FloatDomain(m_factor)));
       tmp.restrictAttribute(Variable("lagrangian", BooleanDomain(m_lagrangian)));
