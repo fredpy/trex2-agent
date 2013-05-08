@@ -110,7 +110,10 @@ namespace TREX {
       /** @brief destructor */
       ~Goal() {}
 
-      /** @brief Dispatchability test
+      bool has_temporal_scope() const {
+        return true;
+      }
+     /** @brief Dispatchability test
        * @param[in] date  current date
        * @param[in] delay A delay
        *

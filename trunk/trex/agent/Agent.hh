@@ -242,6 +242,10 @@ namespace TREX {
        */
       bool setClock(clock_ref clock);
       
+      clock_ref getClock() const {
+        return m_clock;
+      }
+      
       /** @brief run the agent
        *
        * This method runs the agent until its completes. It is just a
