@@ -110,9 +110,6 @@ namespace TREX
           {
             ann = (Announce *) dynamic_cast<Announce *>(msg);
 
-            syslog(log::info) << "Received announce from " << ann->sys_name << "\n";
-            std::cerr.flush();
-
             if (m_receivedAnnounces[ann->sys_name] != NULL)
               delete m_receivedAnnounces[ann->sys_name];
             m_receivedAnnounces[ann->sys_name] = ann;
