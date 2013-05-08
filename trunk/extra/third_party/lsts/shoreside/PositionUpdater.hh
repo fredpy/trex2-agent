@@ -30,8 +30,7 @@ namespace TREX {
 
     private:
 
-      int m_bind_port, m_send_port;
-      std::string m_send_address;
+      int m_bind_port;
       ImcAdapter m_adapter, m_discovery;
       std::map<std::string, Announce *> m_receivedAnnounces;
       bool synchronize();
