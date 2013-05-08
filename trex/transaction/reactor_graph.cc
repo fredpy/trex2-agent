@@ -372,6 +372,26 @@ namespace {
   }
 }
 
+TICK graph::as_date(std::string const &str) const {
+  return timeToTick(utils::string_cast<date_type>(str));
+}
+
+TICK graph::as_duration(std::string const &str, bool up) const {
+  boost::posix_time::time_duration
+    dur=utils::string_cast<boost::posix_time::time_duration>(str);
+  typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
+
+  CHRONO::duration<double> ratio = tickDuration(), val(cvt::to_chrono(dur));
+  
+  double value = val.count()/ratio.count();
+  
+  if( up )
+    return static_cast<TICK>(std::ceil(value));
+  else
+    return static_cast<TICK>(std::floor(value));
+}
+
+
 boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
   bp::ptree ret = g->as_tree(false);
   bp::ptree &attr = ret.front().second;

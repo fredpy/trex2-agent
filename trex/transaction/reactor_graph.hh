@@ -482,6 +482,9 @@ namespace TREX {
        * @sa kill_reactor(reactor_id)
        */
       size_t cleanup();
+      
+      TICK as_date(std::string const &str) const;
+      TICK as_duration(std::string const &str, bool up=false) const;
 
       /** @brief get current tick
        *
