@@ -140,8 +140,8 @@ TimelineProxy::synchronize()
     {
       TrexOperation * top = dynamic_cast<TrexOperation *>(msg);
 
-      std::cerr << "just received this: " << std::endl;
-      top->toText(std::cerr);
+     // std::cerr << "just received this: " << std::endl;
+     // top->toText(std::cerr);
       switch(top->op)
       {
         case (TrexOperation::OP_POST_TOKEN):
