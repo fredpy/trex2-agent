@@ -207,6 +207,11 @@ bool details::external::post_goal(goal_id const &g) {
       return false;
   // insert the new goal
   m_pos->second.insert(i, std::make_pair(g, true));
+  if( m_pos->first.client().is_verbose() ) {
+    syslog(info)<<m_pos->first.client().getName()
+      <<" added "<<g->predicate()<<'['<<g<<"] to the pending queue of "
+      <<m_pos->first.name();
+  }
   return true;
 }
 
