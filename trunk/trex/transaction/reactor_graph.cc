@@ -46,32 +46,32 @@ namespace {
 
   class DateHandler :public DomainBase::xml_factory::factory_type::producer {
     typedef DomainBase::xml_factory::factory_type::producer base_class;
-   
+
   public:
     typedef graph::date_type date_type;
-  
+
     ~DateHandler() {} 
-    
+
     DateHandler(utils::Symbol const &tag, graph const &owner)
-      :base_class(tag), m_owner(owner) {
+    :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
-    
+
   private:  
     base_class::result_type produce(base_class::argument_type arg) const {
       boost::optional<date_type> 
-       min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
-       max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
+      min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
+      max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
-	hi(IntegerDomain::plus_inf);
+          hi(IntegerDomain::plus_inf);
       boost::posix_time::ptime date;
       if( min )
         lo = m_owner.timeToTick(*min);
       if( max )
-	hi = m_owner.timeToTick(*max);
+        hi = m_owner.timeToTick(*max);
       return result_type(new IntegerDomain(lo, hi));
     }
-    
+
     graph const &m_owner;
 
     friend class TREX::transaction::graph;
@@ -79,24 +79,24 @@ namespace {
 
   class DurationHandler :public DomainBase::xml_factory::factory_type::producer {
     typedef DomainBase::xml_factory::factory_type::producer base_class;
-   
+
   public:
     ~DurationHandler() {} 
-    
+
     DurationHandler(utils::Symbol const &tag, graph const &owner)
-      :base_class(tag), m_owner(owner) {
+    :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
-    
+
   private:
     base_class::result_type produce(base_class::argument_type arg) const {
       boost::optional<boost::posix_time::time_duration> 
-        min = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
-        max = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
+      min = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
+      max = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
-        hi(IntegerDomain::plus_inf);
+          hi(IntegerDomain::plus_inf);
       CHRONO::duration<double> 
-        ratio = m_owner.tickDuration();
+      ratio = m_owner.tickDuration();
       typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
       if( min ) {
         CHRONO::duration<double> min_s(cvt::to_chrono(*min));
@@ -105,13 +105,13 @@ namespace {
         lo = static_cast<long long>(std::floor(value));
       } if( max ) {
         CHRONO::duration<double> max_s(cvt::to_chrono(*max));
-        
+
         double value = max_s.count()/ratio.count();
-	hi = static_cast<long long>(std::ceil(value));
+        hi = static_cast<long long>(std::ceil(value));
       }
       return result_type(new IntegerDomain(lo, hi));
     }
-    
+
     graph const &m_owner;
 
     friend class TREX::transaction::graph;
@@ -123,19 +123,19 @@ namespace {
  * class TREX::transaction::GraphException
  */
 GraphException::GraphException(graph const &g, std::string const &msg) throw()
-  :TREX::utils::Exception(g.getName().str()+": "+msg) {}
+      :TREX::utils::Exception(g.getName().str()+": "+msg) {}
 
 GraphException::GraphException(graph const &g, std::string const &who,
-			       std::string const &msg) throw()
-  :TREX::utils::Exception(g.getName().str()+"."+who+": "+msg) {}
+    std::string const &msg) throw()
+      :TREX::utils::Exception(g.getName().str()+"."+who+": "+msg) {}
 
 
 /*
  * class TREX::transaction::MultipleReactors
  */
 MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw()
-  :GraphException(g, "Multiple reactors with the same name \""+
-		  r.getName().str()+"\"") {}
+      :GraphException(g, "Multiple reactors with the same name \""+
+          r.getName().str()+"\"") {}
 
 /*
  * class TREX::transaction::graph
@@ -144,14 +144,14 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 // structors :
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose) 
-  :m_name(name), m_tick_valid(false), m_currentTick(init), 
-   m_verbose(verbose) {
+:m_name(name), m_tick_valid(false), m_currentTick(init),
+ m_verbose(verbose) {
 }
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
-	     TICK init, bool verbose) 
-  :m_name(name), m_tick_valid(false),
-   m_currentTick(init), m_verbose(verbose) {
+    TICK init, bool verbose)
+:m_name(name), m_tick_valid(false),
+ m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }
@@ -161,7 +161,7 @@ graph::~graph() {
 }
 
 TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
-                                       utils::Symbol const &kind) const {
+    utils::Symbol const &kind) const {
   utils::Symbol who = m_name;
   if( !context.empty() )
     who = who.str()+"."+context.str();
@@ -190,7 +190,7 @@ std::string graph::duration_str(TICK dur) const {
 void graph::clear() {
   while( !m_reactors.empty() ) {
     syslog(info)<<"Disconnecting \""<<m_reactors.front()->getName()
-		<<"\" from the graph.";
+		    <<"\" from the graph.";
     m_reactors.front()->isolate(false);
     m_reactors.pop_front();
   } 
@@ -209,7 +209,7 @@ long graph::index(graph::reactor_id id) const {
 graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
   graph *me = this;
   TeleoReactor::xml_arg_type 
-    arg = xml_factory::arg_traits::build(description, me);
+  arg = xml_factory::arg_traits::build(description, me);
   boost::shared_ptr<TeleoReactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
@@ -238,13 +238,13 @@ bool graph::is_member(graph::reactor_id r) const {
 bool graph::kill_reactor(graph::reactor_id r) {
   if( null_reactor()!=r ) {
     details::reactor_set::iterator pos = m_reactors.find(r->getName()),
-      pos_q = m_quarantined.find(r->getName());
-    
+        pos_q = m_quarantined.find(r->getName());
+
     if( pos->get()==r ) {
       // clean up relations
       syslog(warn)<<"Destroying reactor \""<<r->getName()<<"\".";
       if( pos_q->get()==r )
-	m_quarantined.erase(pos_q);
+        m_quarantined.erase(pos_q);
       else 
         r->isolate();
       std::cerr<<"Erase the reactor"<<std::endl;
@@ -279,7 +279,7 @@ size_t graph::cleanup() {
 details::timeline_set::iterator graph::get_timeline(utils::Symbol const &tl) {
   details::timeline *cand = new details::timeline(m_currentTick, tl);
   std::pair<details::timeline_set::iterator, bool>
-    ret = m_timelines.insert(cand);
+  ret = m_timelines.insert(cand);
   if( ret.second ) 
     syslog(info)<<"Timeline \""<<tl.str()<<"\" created.";
   else
@@ -319,56 +319,58 @@ bool graph::subscribe(reactor_id r, utils::Symbol const &timeline, details::tran
 goal_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
   DateHandler date_parser("date", *this);
   DurationHandler duration_parser("duration", *this);
-  
+
   return goal_id(new Goal(goal));
 }
 
 namespace bp=boost::property_tree;
 
-namespace {
-  
-  std::string date_export(graph const &g, IntegerDomain::bound const &val) {
-    return g.date_str(val.value());
-  }
-  
-  bp::ptree date_export(graph const &g, IntegerDomain const &dom) {
-    bp::ptree ret;
-    bp::ptree &tmp = ret.add_child("date", bp::ptree());
-    
-    if( dom.isSingleton() )
-      TREX::utils::set_attr(tmp, "value", date_export(g,dom.lowerBound()));
-    else {
-      if( dom.hasLower() ) 
-        TREX::utils::set_attr(tmp, "min", date_export(g,dom.lowerBound()));
-      if( dom.hasUpper() )
-        TREX::utils::set_attr(tmp, "max", date_export(g,dom.lowerBound()));
+namespace TREX {
+  namespace transaction {
+
+    std::string date_export(graph const &g, IntegerDomain::bound const &val) {
+      return g.date_str(val.value());
     }
-    TREX::utils::set_attr(ret, "type", "date");
-    return ret;
-  }
-  
-  std::string duration_export(graph const &g,
-                              IntegerDomain::bound const &val) {
-    return g.duration_str(val.value());
-  }
-  
-  bp::ptree duration_export(graph const &g, IntegerDomain const &dom) {
-    bp::ptree ret;
-    bp::ptree &tmp = ret.add_child("duration", bp::ptree());
-    
-    if( dom.isSingleton() )
-      TREX::utils::set_attr(tmp, "value",
-                            duration_export(g,dom.lowerBound()));
-    else {
-      if( dom.hasLower() )
-        TREX::utils::set_attr(tmp, "min",
-                              duration_export(g,dom.lowerBound()));
-      if( dom.hasUpper() )
-        TREX::utils::set_attr(tmp, "max",
-                              duration_export(g,dom.upperBound()));
+
+    bp::ptree date_export(graph const &g, IntegerDomain const &dom) {
+      bp::ptree ret;
+      bp::ptree &tmp = ret.add_child("date", bp::ptree());
+
+      if( dom.isSingleton() )
+        TREX::utils::set_attr(tmp, "value", date_export(g,dom.lowerBound()));
+      else {
+        if( dom.hasLower() )
+          TREX::utils::set_attr(tmp, "min", date_export(g,dom.lowerBound()));
+        if( dom.hasUpper() )
+          TREX::utils::set_attr(tmp, "max", date_export(g,dom.lowerBound()));
+      }
+      TREX::utils::set_attr(ret, "type", "date");
+      return ret;
     }
-    TREX::utils::set_attr(ret, "type", "duration");
-    return ret;
+
+    std::string duration_export(graph const &g,
+        IntegerDomain::bound const &val) {
+      return g.duration_str(val.value());
+    }
+
+    bp::ptree duration_export(graph const &g, IntegerDomain const &dom) {
+      bp::ptree ret;
+      bp::ptree &tmp = ret.add_child("duration", bp::ptree());
+
+      if( dom.isSingleton() )
+        TREX::utils::set_attr(tmp, "value",
+            duration_export(g,dom.lowerBound()));
+      else {
+        if( dom.hasLower() )
+          TREX::utils::set_attr(tmp, "min",
+              duration_export(g,dom.lowerBound()));
+        if( dom.hasUpper() )
+          TREX::utils::set_attr(tmp, "max",
+              duration_export(g,dom.upperBound()));
+      }
+      TREX::utils::set_attr(ret, "type", "duration");
+      return ret;
+    }
   }
 }
 
@@ -396,10 +398,10 @@ boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
   bp::ptree ret = g->as_tree(false);
   bp::ptree &attr = ret.front().second;
   boost::optional<bp::ptree &> vars = attr.get_child_optional("Variable");
-  
+
   if( !vars )
     vars = attr.add_child("Variable", bp::ptree());
-  
+
   if( !g->getStart().isFull() ) {
     bp::ptree domain = date_export(*this, g->getStart());
     TREX::utils::set_attr(domain, "name", "start");
@@ -411,7 +413,7 @@ boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
     vars->push_back(bp::ptree::value_type("", domain));
   }
   if( g->getDuration().hasUpper() ||
-     g->getDuration().lowerBound()!=Goal::s_durationDomain.lowerBound() ) {
+      g->getDuration().lowerBound()!=Goal::s_durationDomain.lowerBound() ) {
     bp::ptree domain = duration_export(*this, g->getDuration());
     TREX::utils::set_attr(domain, "name", "duration");
     vars->push_back(bp::ptree::value_type("", domain));    
@@ -429,19 +431,19 @@ boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
 // structors 
 
 graph::timelines_listener::timelines_listener(graph &g)
-  :m_graph(g) {
-    m_graph.m_listeners.insert(this);
+:m_graph(g) {
+  m_graph.m_listeners.insert(this);
 }
 
 graph::timelines_listener::timelines_listener(graph::xml_factory::argument_type const &arg)
-  :m_graph(*(arg.second)){
+:m_graph(*(arg.second)){
   m_graph.m_listeners.insert(this);  
 }
 
 graph::timelines_listener::~timelines_listener() {
   m_graph.m_listeners.erase(this);
 }
-  
+
 // manpipulators
 
 void graph::timelines_listener::initialize() {

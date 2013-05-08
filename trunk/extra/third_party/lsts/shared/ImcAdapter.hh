@@ -54,6 +54,8 @@ namespace TREX {
       void
       setTrexId(int trex_id);
 
+      void setReactorGraph(graph &g);
+
       Message *
       poll(double timeout, bool discovery);
 
@@ -75,16 +77,22 @@ namespace TREX {
       //@brief Translates TrexToken messages into a generic observation
       Observation genericObservation(TrexToken * msg);
 
+      //@brief Translates TrexToken messages into a goal
+      Goal genericGoal(TrexToken * msg);
+
       //@brief Translates TrexToken messages into a generic observation
       Observation announceObservation(Announce * msg);
 
       void asImcMessage(Predicate const &obs, TrexToken * result);
+
+      void fillInExtraGoalAttributes(goal_id &goal, TrexToken * result);
 
       virtual
       ~ImcAdapter();
 
     private:
       void variableToImc(Variable const &v, TrexAttribute * attr);
+      void setAttribute(Predicate &pred, TrexAttribute const &attr);
 
       UDPSocket m_send, m_receive, m_discovery;
       IOMultiplexing m_iom, m_diom;
@@ -92,6 +100,7 @@ namespace TREX {
       Concurrency::Mutex m_mutex;
       int m_trex_id;
       bool m_bound;
+      graph * m_graph;
     };
   }
 }
