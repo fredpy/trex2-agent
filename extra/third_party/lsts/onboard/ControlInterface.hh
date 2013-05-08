@@ -204,7 +204,8 @@ namespace TREX {
       typedef mutex_type::scoped_lock scoped_lock;
 
       mutable mutex_type m_mutex;
-      std::auto_ptr<boost::thread> m_thread;
+      
+      UNIQ_PTR<boost::thread> m_thread;
       
       
       bool m_running;
