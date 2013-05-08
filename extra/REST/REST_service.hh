@@ -47,38 +47,73 @@ namespace TREX {
     class REST_service;
     
     class req_info {
-    public:
-      typedef boost::property_tree::path  path_type;
-      
-      ~req_info() {}
-      
-      Wt::Http::Request const &request() const {
-        return m_req;
-      }
-      path_type const &call_path() const {
-        return m_call_path;
-      }
-      path_type const &arg_path() const {
-        return m_arg_path;
-      }
-      std::list<std::string> const &call_list() const {
-        return m_call_list;
-      }
-      std::list<std::string> const &arg_list() const {
-        return m_arg_list;
-      }
-      
-    private:
-      explicit req_info(Wt::Http::Request const &r);
-      
-      Wt::Http::Request const &m_req;
-      
-      std::list<std::string> m_call_list, m_arg_list;
-      path_type m_call_path, m_arg_path;
-      
-      
-      friend class REST_service;
-    };
+     public:
+       typedef boost::property_tree::path  path_type;
+
+       ~req_info() {}
+
+       Wt::Http::Request const &request() const {
+         return m_req;
+       }
+       path_type const &call_path() const {
+         return m_call_path;
+       }
+       path_type const &arg_path() const {
+         return m_arg_path;
+       }
+       std::list<std::string> const &call_list() const {
+         return m_call_list;
+       }
+       std::list<std::string> const &arg_list() const {
+         return m_arg_list;
+       }
+
+     private:
+       explicit req_info(Wt::Http::Request const &r);
+
+       Wt::Http::Request const &m_req;
+
+       std::list<std::string> m_call_list, m_arg_list;
+       path_type m_call_path, m_arg_path;
+
+
+       friend class REST_service;
+     };
+  namespace bits {
+    struct handler_wrap {
+        typedef boost::property_tree::ptree fn_output;
+        typedef req_info::path_type path_type;
+
+
+
+        typedef boost::function<fn_output (req_info const &)> handler_fn;
+     handler_wrap() {}
+
+       template<class Handler>
+       handler_wrap(Handler cb, std::string const &info="")
+       :callback(cb), help(info) {}
+
+       void clear() {
+         callback.clear();
+         help.clear();
+       }
+
+       handler_wrap &swap(handler_wrap &other) {
+    	   std::swap(callback, other.callback);
+    	   std::swap(help, other.help);
+    	   return *this;
+       }
+
+       bool active() const {
+         return callback;
+       }
+
+       handler_fn  callback;
+       std::string help;
+     };
+
+    }
+
 
     class REST_service :public Wt::WResource {
     public:
@@ -97,7 +132,7 @@ namespace TREX {
       bool add_handler(std::string const &sub_path,
                        Handler cb, std::string const &help="") {
         return add_handler_impl(path_type(sub_path, '/'),
-                         handler_wrap(cb, help));
+                         bits::handler_wrap(cb, help));
       }
       
       bool remove_handler(std::string const &sub_path, bool childs=false) {
@@ -112,30 +147,11 @@ namespace TREX {
       fn_output print_help(req_info const &req) const;
       
     
-      struct handler_wrap {
-        handler_wrap() {}
-        
-        template<class Handler>
-        handler_wrap(Handler cb, std::string const &info="")
-        :callback(cb), help(info) {}
-        
-        void clear() {
-          callback.clear();
-          help.clear();
-        }
-        
-        bool active() const {
-          return callback;
-        }
-        
-        handler_fn  callback;
-        std::string help;
-      };
-      
-      bool add_handler_impl(path_type const &p, handler_wrap const &cb);
+
+      bool add_handler_impl(path_type const &p, bits::handler_wrap const &cb);
 
       
-      typedef boost::property_tree::basic_ptree<std::string, handler_wrap> cb_map;
+      typedef boost::property_tree::basic_ptree<std::string, bits::handler_wrap> cb_map;
       
       bool remove_handlers_impl(path_type &p, cb_map &m, bool childs);
       fn_output &build_help(fn_output &, cb_map const &tree,

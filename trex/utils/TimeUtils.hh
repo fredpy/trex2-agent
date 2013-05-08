@@ -51,7 +51,9 @@
 # include <boost/date_time/posix_time/ptime.hpp>
 # include <boost/config.hpp>
 
+# ifndef CPP11_HAS_CHRONO
 # include <boost/chrono/chrono_io.hpp>
+# endif
 # include <boost/date_time/posix_time/posix_time_io.hpp>
 
 
@@ -167,4 +169,4 @@ namespace TREX {
   } // utils 
 } // TREX
 
-#endif // H_TimeUtils 
+#endif // H_TimeUtils
