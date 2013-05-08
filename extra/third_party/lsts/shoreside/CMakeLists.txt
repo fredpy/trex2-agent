@@ -37,9 +37,11 @@ option(WITH_LSTS_SHORESIDE "Enable LSTS shore-side plug-in" OFF)
 if(WITH_LSTS_SHORESIDE)
   trex_plugin(lstsshore 
     # source
+    DTAReactor.cc
     PositionUpdater.cc 
     
     # headers
+    DTAReactor.hh
     PositionUpdater.hh 
     )
   
