@@ -56,12 +56,27 @@ TimelineProxy::handleInit()
     use(m_timeline);
   }
 
+  m_adapter.setReactorGraph(this->getGraph());
   m_adapter.bind(m_localport);
+
+  if (m_goalProxy)
+  {
+    syslog(log::warn) << "listening for " << m_timeline << " goals at port " << m_localport;
+    std::cout << "listening for " << m_timeline << " goals at port " << m_localport << std::endl;
+  }
+  else
+  {
+    syslog(log::warn) << "listening for " << m_timeline << " observations at port " << m_localport;
+    std::cout << "listening for " << m_timeline << " observations at port " << m_localport << std::endl;
+  }
 }
 
 void
 TimelineProxy::handleRequest(goal_id const &g)
 {
+
+  syslog(log::info) << "handleRequest(" << g <<")";
+
   if (!m_goalProxy)
   {
     syslog(log::warn) << "Cannot post goals to this observation-forwarding proxy";
@@ -83,6 +98,8 @@ TimelineProxy::handleRequest(goal_id const &g)
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_GOAL;
   m_adapter.send(&op, m_destaddr, m_destport);
+  std::cerr << "just sent this: " << std::endl;
+  op.toText(std::cerr);
 }
 
 void
@@ -106,11 +123,15 @@ TimelineProxy::notify(Observation const &obs)
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_TOKEN;
   m_adapter.send(&op, m_destaddr, m_destport);
+  std::cerr << "just sent this: " << std::endl;
+  op.toText(std::cerr);
 }
 
 bool
 TimelineProxy::synchronize()
 {
+
+  //std::cout << "I'm here" << std::endl;
 
   Message * msg;
   while ((msg = m_adapter.poll(0, false)) != NULL)
@@ -118,24 +139,27 @@ TimelineProxy::synchronize()
     if (msg->getId() == TrexOperation::getIdStatic())
     {
       TrexOperation * top = dynamic_cast<TrexOperation *>(msg);
+
+      std::cerr << "just received this: " << std::endl;
+      top->toText(std::cerr);
       switch(top->op)
       {
         case (TrexOperation::OP_POST_TOKEN):
-          postObservation(m_adapter.genericObservation(top->token.get()), true);
+              postObservation(m_adapter.genericObservation(top->token.get()), true);
         break;
         case (TrexOperation::OP_POST_GOAL):
-          {
+            {
           goal_id gid = postGoal(m_adapter.genericGoal(top->token.get()));
           m_goals[top->goal_id] = gid;
-          }
+            }
         break;
         case (TrexOperation::OP_RECALL_GOAL):
-          goal_map::iterator found = m_goals.find(top->goal_id);
-          if (found != m_goals.end())
-          {
-            postRecall(found->second);
-            m_goals.erase(found);
-          }
+              goal_map::iterator found = m_goals.find(top->goal_id);
+        if (found != m_goals.end())
+        {
+          postRecall(found->second);
+          m_goals.erase(found);
+        }
         break;
       }
     }

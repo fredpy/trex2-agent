@@ -29,19 +29,16 @@ namespace TREX {
     PositionUpdater::PositionUpdater(TeleoReactor::xml_arg_type arg) :
       LstsReactor(arg)
     {
-      m_bind_port = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
+      m_bind_port = parse_attr<int>(-1, TeleoReactor::xml_factory::node(arg),
                                     "bindport");
-      m_send_port = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
-                                    "sendport");
-
-      m_send_address = parse_attr<std::string>("255.255.255.255",
-                                               TeleoReactor::xml_factory::node(arg),
-                                               "sendip");
     }
 
     void
     PositionUpdater::handleInit()
     {
+      if (m_bind_port != -1)
+        m_adapter.bind(m_bind_port);
+
       m_adapter.startDiscovery();
     }
 

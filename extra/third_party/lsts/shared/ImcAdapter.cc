@@ -25,16 +25,16 @@ namespace TREX {
       {
         switch (msg->medium) {
           case (VehicleMedium::VM_WATER):
-                        return Observation("medium", "Water");
+                            return Observation("medium", "Water");
           break;
           case (VehicleMedium::VM_UNDERWATER):
-                        return Observation("medium", "Underwater");
+                            return Observation("medium", "Underwater");
           break;
           case (VehicleMedium::VM_AIR):
-                        return Observation("medium", "Air");
+                            return Observation("medium", "Air");
           break;
           case (VehicleMedium::VM_GROUND):
-                        return Observation("medium", "Ground");
+                            return Observation("medium", "Ground");
           break;
           default:
             break;
@@ -69,7 +69,7 @@ namespace TREX {
 
 
     void
-    ImcAdapter::setReactorGraph(graph &g)
+    ImcAdapter::setReactorGraph(graph const &g)
     {
       m_graph = &g;
     }
@@ -99,13 +99,13 @@ namespace TREX {
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-                        obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           case (Z_ALTITUDE):
-                        obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+                            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
           break;
           case (Z_HEIGHT):
-                        obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           default:
             break;
@@ -230,9 +230,9 @@ namespace TREX {
     {
       IntegerDomain::bound min_i, max_i;
       FloatDomain::bound min_f, max_f;
-      MessageList<TrexAttribute>::const_iterator it;
-      std::string min = (*it)->min;
-      std::string max = (*it)->max;
+      //MessageList<TrexAttribute>::const_iterator it;
+      std::string min = attr.min;
+      std::string max = attr.max;
 
       switch(attr.attr_type)
       {
@@ -303,6 +303,9 @@ namespace TREX {
     bool
     ImcAdapter::send(Message * msg, std::string addr, int port)
     {
+      if (port < 0)
+        return false;
+
       DUNE::Utils::ByteBuffer bb;
       try
       {
@@ -325,10 +328,16 @@ namespace TREX {
     {
       if (discovery && m_diom.poll(timeout))
       {
-        Address addr;
-        uint16_t rv = m_discovery.read((char*)m_bfr, 65535, &addr);
-        IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
-        return msg;
+        try {
+          Address addr;
+          uint16_t rv = m_discovery.read((char*)m_bfr, 65535, &addr);
+          IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
+          return msg;
+        }
+        catch (std::exception &e) {
+          SingletonUse<LogManager> s_log;
+          s_log->syslog(log::error) << "exception caught while deserializing message: " << e.what();
+        }
       }
 
       if (!m_bound || !m_iom.poll(timeout))
@@ -340,9 +349,6 @@ namespace TREX {
 
       return msg;
     }
-
-
-
 
     bool
     ImcAdapter::bind(int port)
@@ -401,7 +407,56 @@ namespace TREX {
     {
       Symbol t = v.domain().getTypeName();
       attr->name = v.name().str();
-      if (t.str() == "float") {
+
+      if (attr->name == "start" || attr->name == "end")
+      {
+        attr->attr_type = TrexAttribute::TYPE_STRING;
+        IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
+        if (id.isSingleton())
+        {
+          std::string s = date_export(*m_graph, id.lowerBound().value());
+          attr->min = s;
+          attr->max = s;
+        }
+        else {
+          if (id.hasUpper())
+          {
+            std::string s = date_export(*m_graph, id.upperBound().value());
+            attr->max = s;
+          }
+          if (id.hasLower())
+          {
+            std::string s = date_export(*m_graph, id.lowerBound().value());
+            attr->min = s;
+          }
+        }
+        return;
+      }
+      else if (attr->name == "duration")
+      {
+        attr->attr_type = TrexAttribute::TYPE_STRING;
+        IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
+        if (id.isSingleton())
+        {
+          std::string s = duration_export(*m_graph, id.lowerBound().value());
+          attr->min = s;
+          attr->max = s;
+        }
+        else {
+          if (id.hasUpper())
+          {
+            std::string s = duration_export(*m_graph, id.upperBound().value());
+            attr->max = s;
+          }
+          if (id.hasLower())
+          {
+            std::string s = duration_export(*m_graph, id.lowerBound().value());
+            attr->min = s;
+          }
+        }
+        return;
+      }
+      else if (t.str() == "float") {
         attr->attr_type = TrexAttribute::TYPE_FLOAT;
       }
       else if (t.str() == "int") {
@@ -421,11 +476,6 @@ namespace TREX {
         attr->max = v.domain().getStringSingleton();
         attr->min = v.domain().getStringSingleton();
       }
-      //FIXME add support for interval domains
-      //else if (v.domain().isInterval())
-      //{
-
-      //}
       else  {// if (v.domain().isFull()) {
         attr->max = "";
         attr->min = "";
@@ -450,8 +500,6 @@ namespace TREX {
         variableToImc(v, &attr);
         result->attributes.push_back(attr);
       }
-
-
     }
 
     void

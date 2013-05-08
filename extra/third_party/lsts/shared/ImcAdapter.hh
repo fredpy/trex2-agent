@@ -54,7 +54,7 @@ namespace TREX {
       void
       setTrexId(int trex_id);
 
-      void setReactorGraph(graph &g);
+      void setReactorGraph(graph const &g);
 
       Message *
       poll(double timeout, bool discovery);
@@ -100,7 +100,7 @@ namespace TREX {
       Concurrency::Mutex m_mutex;
       int m_trex_id;
       bool m_bound;
-      graph * m_graph;
+      graph const * m_graph;
     };
   }
 }

@@ -45,6 +45,7 @@ namespace TREX {
         // nothing to do
         return !aborted;
       }
+
       void notify(TREX::transaction::Observation const &obs);
       void newPlanToken(TREX::transaction::goal_id const &t);
 
