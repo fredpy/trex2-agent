@@ -15,6 +15,7 @@ namespace TREX {
       m_trex_id = 65000;
       m_bound = false;
       m_bfr = new uint8_t[65535];
+      m_graph = NULL;
     }
 
     Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
@@ -24,16 +25,16 @@ namespace TREX {
       {
         switch (msg->medium) {
           case (VehicleMedium::VM_WATER):
-                return Observation("medium", "Water");
+                        return Observation("medium", "Water");
           break;
           case (VehicleMedium::VM_UNDERWATER):
-                return Observation("medium", "Underwater");
+                        return Observation("medium", "Underwater");
           break;
           case (VehicleMedium::VM_AIR):
-                return Observation("medium", "Air");
+                        return Observation("medium", "Air");
           break;
           case (VehicleMedium::VM_GROUND):
-                return Observation("medium", "Ground");
+                        return Observation("medium", "Ground");
           break;
           default:
             break;
@@ -66,6 +67,13 @@ namespace TREX {
       return obs;
     }
 
+
+    void
+    ImcAdapter::setReactorGraph(graph &g)
+    {
+      m_graph = &g;
+    }
+
     Observation ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
       if (msg == NULL || msg->reference.isNull() || msg->control_src != m_trex_id
@@ -91,13 +99,13 @@ namespace TREX {
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                        obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           case (Z_ALTITUDE):
-                obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+                        obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
           break;
           case (Z_HEIGHT):
-                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                        obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           default:
             break;
@@ -179,70 +187,114 @@ namespace TREX {
       return obs;
     }
 
-    Observation ImcAdapter::genericObservation(TrexToken * msg)
+    Goal ImcAdapter::genericGoal(TrexToken * msg)
     {
-      Observation obs(msg->timeline, msg->predicate);
+      Goal g(msg->timeline, msg->predicate);
+
+      MessageList<TrexAttribute>::const_iterator it;
+      for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
+      {
+        TrexAttribute * attr = *it;
+
+        if (attr->name == "start" || attr->name == "end")
+        {
+          IntegerDomain::bound min = m_graph->getCurrentTick(), max = IntegerDomain::plus_inf;
+          if (!attr->min.empty())
+            min = m_graph->as_date(attr->min);
+          if (!attr->max.empty())
+            max = m_graph->as_date(attr->max);
+
+          if (attr->name == "start")
+            g.restrictStart(IntegerDomain(min, max));
+          else
+            g.restrictEnd(IntegerDomain(min, max));
+        }
+        else if (attr->name == "duration") {
+          IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
+          if (!attr->min.empty())
+            min = m_graph->as_duration(attr->min);
+          if (!attr->max.empty())
+            max = m_graph->as_duration(attr->max);
+
+          g.restrictDuration(IntegerDomain(min, max));
+        }
+        else
+          setAttribute(g, *attr);
+      }
+
+      return g;
+    }
+
+    void
+    ImcAdapter::setAttribute(Predicate &pred, TrexAttribute const &attr)
+    {
       IntegerDomain::bound min_i, max_i;
       FloatDomain::bound min_f, max_f;
       MessageList<TrexAttribute>::const_iterator it;
+      std::string min = (*it)->min;
+      std::string max = (*it)->max;
 
+      switch(attr.attr_type)
+      {
+        case TrexAttribute::TYPE_STRING:
+          pred.restrictAttribute(attr.name, StringDomain(min));
+          break;
+
+        case TrexAttribute::TYPE_BOOL:
+          if (min == max && min != "")
+            pred.restrictAttribute(attr.name, BooleanDomain(min != "false" || min != "0"));
+          else
+            pred.restrictAttribute(attr.name, BooleanDomain());
+          break;
+
+        case TrexAttribute::TYPE_INT:
+          if (min == "")
+            min_i = IntegerDomain::minus_inf;
+          else
+            min_i = strtoll(max.c_str(), NULL, 10);
+
+          if (max == "")
+            max_i = IntegerDomain::plus_inf;
+          else
+            max_i = strtoll(max.c_str(), NULL, 10);
+
+          pred.restrictAttribute(attr.name, IntegerDomain(min_i, max_i));
+          break;
+
+        case TrexAttribute::TYPE_FLOAT:
+          if (min == "")
+            min_f = FloatDomain::minus_inf;
+          else
+            min_f = strtod(min.c_str(), NULL);
+
+          if (max == "")
+            max_f = FloatDomain::plus_inf;
+          else
+            max_f = strtod(max.c_str(), NULL);
+
+          pred.restrictAttribute(attr.name, FloatDomain(min_f, max_f));
+          break;
+
+        case TrexAttribute::TYPE_ENUM:
+          if (min == "" || max == "")
+            pred.restrictAttribute(attr.name, EnumDomain());
+          else
+            pred.restrictAttribute(attr.name, EnumDomain(min));
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    Observation ImcAdapter::genericObservation(TrexToken * msg)
+    {
+      Observation obs(msg->timeline, msg->predicate);
+
+      MessageList<TrexAttribute>::const_iterator it;
       for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
       {
-        std::string min = (*it)->min;
-        std::string max = (*it)->max;
-        std::string attr = (*it)->name;
-
-        switch((*it)->attr_type)
-        {
-          case TrexAttribute::TYPE_STRING:
-            obs.restrictAttribute(attr, StringDomain(min));
-            break;
-
-          case TrexAttribute::TYPE_BOOL:
-            if (min == max && min != "")
-              obs.restrictAttribute(attr, BooleanDomain(min != "false" || min != "0"));
-            else
-              obs.restrictAttribute(attr, BooleanDomain());
-            break;
-
-          case TrexAttribute::TYPE_INT:
-            if (min == "")
-              min_i = IntegerDomain::minus_inf;
-            else
-              min_i = strtoll(max.c_str(), NULL, 10);
-
-            if (max == "")
-              max_i = IntegerDomain::plus_inf;
-            else
-              max_i = strtoll(max.c_str(), NULL, 10);
-
-            obs.restrictAttribute(attr, IntegerDomain(min_i, max_i));
-            break;
-
-          case TrexAttribute::TYPE_FLOAT:
-            if (min == "")
-              min_f = FloatDomain::minus_inf;
-            else
-              min_f = strtod(min.c_str(), NULL);
-
-            if (max == "")
-              max_f = FloatDomain::plus_inf;
-            else
-              max_f = strtod(max.c_str(), NULL);
-
-            obs.restrictAttribute(attr, FloatDomain(min_f, max_f));
-            break;
-
-          case TrexAttribute::TYPE_ENUM:
-            if (min == "" || max == "")
-              obs.restrictAttribute(attr, EnumDomain());
-            else
-              obs.restrictAttribute(attr, EnumDomain(min));
-            break;
-
-          default:
-            break;
-        }
+        setAttribute(obs, **it);
       }
 
       return obs;
@@ -398,6 +450,8 @@ namespace TREX {
         variableToImc(v, &attr);
         result->attributes.push_back(attr);
       }
+
+
     }
 
     void

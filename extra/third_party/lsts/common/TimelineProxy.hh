@@ -66,6 +66,9 @@ namespace TREX {
        * Timeline where to post goals / observations
        */
       std::string m_timeline;
+
+      typedef std::map<std::string, transaction::goal_id> goal_map;
+      goal_map m_goals;
     };
   }
 }
