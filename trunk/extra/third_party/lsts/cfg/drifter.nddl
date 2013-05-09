@@ -48,10 +48,13 @@ class Counter extends Timeline {
 };
 
 Counter::Holds {
-    if( start <= AGENT_CLOCK ) {
-	meets(Holds next);
-	next.id == id + 1;
-    }
+    // Assume that initial tick is 0
+    if( start > 0 ) {
+	met_by(Holds prev);
+	id == prev.id + 1;
+    } else {
+	id == 0;
+    }	
 }
 
 class DrifterFollow extends AgentTimeline {
@@ -69,6 +72,7 @@ class DrifterFollow extends AgentTimeline {
 	PathList path;
 	float    size;
 	int      id;
+	start >= 0;
 	start + duration == end;
     }
 
@@ -77,11 +81,10 @@ class DrifterFollow extends AgentTimeline {
 	float speed_north, speed_east, u, v;
 	int _id;
 	
-
 	PathList path;
 	float    size;
 	bool     lagrangian;
-       
+	start > 0;
 	speed_east == u;
 	speed_north == v;
 	//duration == 1;
@@ -271,7 +274,7 @@ DrifterController::DoSegment {
 DrifterController::DoInitial {
     Counter my_counter = object.command.counter;
 
-    meets(effect Waypoint wp);
+    equals(effect Waypoint wp);
     true == wp.first;
 
     // Start to make general computation for waypoint 
@@ -280,6 +283,8 @@ DrifterController::DoInitial {
 
     wp.origin_lat == space.origin_lat;
     wp.origin_lon == space.origin_lon;
+    wp.x == x;
+    wp.y == y;
     wp.delta_x == x;
     wp.delta_y == y;
     
@@ -289,7 +294,7 @@ DrifterController::DoInitial {
     if( cpt.start <= AGENT_CLOCK ) {
 	true == wp.ready;
 
-	meets(condition Navigator.At cmd);
+	ends(condition Navigator.At cmd);
 	cmd.latitude == wp.lat;
 	cmd.longitude == wp.lon;
 	cmd.z == vc.min_z; // for now navigate at min_z
