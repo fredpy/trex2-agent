@@ -1,4 +1,5 @@
 #include "EuropaExtensions.hh"
+#include "LstsUtils.hh"
 
 #include <PLASMA/CFunctions.hh>
 
