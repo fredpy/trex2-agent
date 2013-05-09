@@ -45,3 +45,6 @@ DrifterFollow drifter = new DrifterFollow(Internal);
 
 close();
 
+fact(drifter.counter.Holds initial);
+initial.start.specify(0);
+initial.id.specify(0);
