@@ -154,7 +154,7 @@ void DTAReactor::notify(Observation const &obs) {
     }
   } else if( obs.object()==m_proxy_timeline ) {
     if( obs.predicate()=="undefined" || obs.predicate()=="Failed" ) {
-      syslog(warn)<<"No info from dorado";
+      syslog(warn)<<"No info from "<<m_proxy_timeline;
       m_trex_state = UNKNOWN;
     } else if( obs.predicate()=="Inactive" ) {
       syslog(info)<<"dorado waits for a new goal !!!";
