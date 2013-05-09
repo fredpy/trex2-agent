@@ -3,19 +3,26 @@
 #include "platform.nddl"
 
 Navigator::At {
-
+	float accuracy;
+	//accuracy == 0.00001;
+	float min_dist;
+	min_dist == 3;
+	
 	contained_by(Reference.At arr);
-		latitude == arr.latitude;
-		longitude == arr.longitude;
+		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
+		//abs(latitude - arr.latitude) <= accuracy;
+		//abs(longitude - arr.longitude) <= accuracy;
+		//longitude == arr.longitude;
 		z == arr.z;
 		speed == arr.speed;
 	
-	duration >= secs; 
+	//duration >= secs; 
 }
 
 Navigator::Going {
 
 	contained_by(condition ControlMode.TREX c);
+		c.start < start;	
 
 	contained_by(condition OperationalLimits.Limits limits);
 		if (z > 0.0) {
@@ -43,15 +50,21 @@ Navigator::Going {
 
 	if(  my_start<= AGENT_CLOCK ) {
 		contains(condition Reference.Going g);
+
 		latitude == g.latitude;
 		longitude == g.longitude;
 		z == g.z;
 		speed == g.speed;
+		concurrent(end, g.end);
 	}
 
-	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
+	//dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
 	
-    duration > floor(dist * speed * 0.8);
-	duration <  ceil(dist * speed * 1.2);
+	//float expected_duration;
+	
+	//expected_duration * speed == dist;
+	
+    //duration > floor(expected_duration * 0.5);
+	//duration <  ceil(expected_duration * 2.0);
 	
 }

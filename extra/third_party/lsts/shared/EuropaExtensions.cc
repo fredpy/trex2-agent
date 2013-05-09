@@ -417,7 +417,7 @@ RadDeg::handleExecute()
 
   if (r_hi < std::numeric_limits<EUROPA::edouble>::infinity())
   {
-    tmp = DUNE::Math::Angles::degrees(cast_basis(r_hi));
+    tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_hi)), 8);
     if (tmp <= d_hi)
     {
       // upper bound restricted => no need to compute rad upperbound
@@ -427,7 +427,7 @@ RadDeg::handleExecute()
   }
   if (std::numeric_limits<EUROPA::edouble>::minus_infinity() < r_lo)
   {
-    tmp = DUNE::Math::Angles::degrees(cast_basis(r_lo));
+    tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_lo)), 8);
     if (d_lo <= tmp)
     {
       // lowerbound restricted => no need to compute red lower bound
@@ -440,9 +440,9 @@ RadDeg::handleExecute()
     return;
 
   if (t_hi && d_hi < std::numeric_limits<EUROPA::edouble>::infinity())
-    r_hi = DUNE::Math::Angles::radians(cast_basis(d_hi));
+    r_hi = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_hi), 8));
   if (t_lo && std::numeric_limits<EUROPA::edouble>::minus_infinity() < d_lo)
-    r_lo = DUNE::Math::Angles::radians(cast_basis(d_lo));
+    r_lo = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_lo), 8));
   m_rad.intersect(r_lo, r_hi);
 }
 

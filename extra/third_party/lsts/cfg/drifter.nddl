@@ -63,7 +63,7 @@ class DrifterFollow extends AgentTimeline {
        
 	speed_east == u;
 	speed_north == v;
-	duration == 1;
+	//duration == 1;
 	start + duration == end;
     }
 

@@ -16,6 +16,7 @@ namespace TREX
     class LstsUtils
     {
     public:
+      static float normalizeDecPlaces(double coordinate, int decimalPlaces = 8);
       LstsUtils();
       virtual
       ~LstsUtils();

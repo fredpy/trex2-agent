@@ -6,6 +6,7 @@
  */
 
 #include "PositionUpdater.hh"
+# include "../shared/LstsUtils.hh"
 using namespace TREX::transaction;
 using namespace TREX::utils;
 using namespace TREX::LSTS;
@@ -36,6 +37,7 @@ namespace TREX {
     void
     PositionUpdater::handleInit()
     {
+
       if (m_bind_port != -1)
         m_adapter.bind(m_bind_port);
 

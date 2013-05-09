@@ -5,7 +5,8 @@
  *      Author: zp
  */
 
-#include "LstsUtils.hh"
+# include "LstsUtils.hh"
+# include <cmath>
 
 namespace TREX
 {
@@ -18,10 +19,15 @@ namespace TREX
 
     }
 
+    float LstsUtils::normalizeDecPlaces(double coordinate, int decimalPlaces)
+    {
+      double factor = pow(10, decimalPlaces);
+      return std::floor(coordinate * factor) / factor;
+    }
+
     LstsUtils::~LstsUtils()
     {
       // TODO Auto-generated destructor stub
     }
-
   } /* namespace LSTS */
 } /* namespace TREX */

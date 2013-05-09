@@ -445,12 +445,12 @@ namespace TREX {
         else {
           if (id.hasUpper())
           {
-            std::string s = duration_export(*m_graph, id.upperBound().value());
+            std::string s = duration_export(*m_graph, id.upperBound().value()+1);
             attr->max = s;
           }
           if (id.hasLower())
           {
-            std::string s = duration_export(*m_graph, id.lowerBound().value());
+            std::string s = duration_export(*m_graph, id.lowerBound().value()-1);
             attr->min = s;
           }
         }
