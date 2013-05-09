@@ -97,19 +97,25 @@ using DUNE::Coordinates::WGS84;
 // statics
 
 //DUNE::IMC::HomeRef *LatLonToOffset::s_home = NULL;
-DUNE::IMC::OperationalLimits *InsideOpLimits::s_oplimits = NULL;
+TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *> InsideOpLimits::s_oplimits(NULL);
 
 //void LatLonToOffset::set_home(DUNE::IMC::HomeRef *home) {
 //  s_home = home;
 //  debugMsg("lsts:ll_offset", "Home updated to ("<<Angles::degrees(home->lat)<<", "<<Angles::degrees(home->lon)<<")");
 //}
 
+DUNE::IMC::OperationalLimits *
+InsideOpLimits::get_oplimits()
+{
+  TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *>::scoped_lock l(s_oplimits);
+   return *s_oplimits;
+}
+
 void
 InsideOpLimits::set_oplimits(DUNE::IMC::OperationalLimits *oplimits)
 {
   s_oplimits = oplimits;
 }
-
 //LATLONDIST STARTS ...
 
 LatLonDist::LatLonDist(EUROPA::LabelStr const &name,
@@ -255,7 +261,10 @@ InsideOpLimits::handleExecute()
   // bool inside = true;
   double x, y;
 
-  if (s_oplimits == NULL)
+  TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *>::scoped_lock lck(s_oplimits);
+  DUNE::IMC::OperationalLimits * l_oplimits = *s_oplimits;
+
+  if (l_oplimits == NULL)
     return;
   if (m_lat.isSingleton())
     lat = cast_basis(m_lat.getSingletonValue());
@@ -269,28 +278,28 @@ InsideOpLimits::handleExecute()
   if (m_depth.isSingleton())
     depth = cast_basis(m_depth.getSingletonValue());
 
-  if (s_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH)
-    if (depth >= 0 && depth >= s_oplimits->max_depth)
+  if (l_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH)
+    if (depth >= 0 && depth >= l_oplimits->max_depth)
       m_depth.empty();
 
-  if (s_oplimits->mask & DUNE::IMC::OPL_MAX_ALT)
-    if (depth < 0 && -depth >= s_oplimits->max_altitude)
+  if (l_oplimits->mask & DUNE::IMC::OPL_MAX_ALT)
+    if (depth < 0 && -depth >= l_oplimits->max_altitude)
       m_depth.empty();
 
-  if (s_oplimits->mask & DUNE::IMC::OPL_MIN_ALT)
-    if (depth < 0 && -depth <= s_oplimits->min_altitude)
+  if (l_oplimits->mask & DUNE::IMC::OPL_MIN_ALT)
+    if (depth < 0 && -depth <= l_oplimits->min_altitude)
       m_depth.empty();
 
-  if (s_oplimits->mask & DUNE::IMC::OPL_AREA)
+  if (l_oplimits->mask & DUNE::IMC::OPL_AREA)
   {
 
-    WGS84::displacement(s_oplimits->lat, s_oplimits->lon, 0, lat, lon, 0, &x,
+    WGS84::displacement(l_oplimits->lat, l_oplimits->lon, 0, lat, lon, 0, &x,
                         &y);
 
-    Angles::rotate(s_oplimits->orientation, true, x, y);
+    Angles::rotate(l_oplimits->orientation, true, x, y);
 
-    double d2limits = std::max(std::fabs(x) - 0.5 * s_oplimits->length,
-                               std::fabs(y) - 0.5 * s_oplimits->width);
+    double d2limits = std::max(std::fabs(x) - 0.5 * l_oplimits->length,
+                               std::fabs(y) - 0.5 * l_oplimits->width);
 
     debugMsg("trex:always", "dist2oplimits: " << d2limits);
     if (!(d2limits < 0))

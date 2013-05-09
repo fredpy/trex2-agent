@@ -528,44 +528,44 @@ bool Agent::missionCompleted() {
 
 void Agent::internal_check(reactor_id r,
 			   TREX::transaction::details::timeline const &tl) {
-    if(index(r)==count_reactors()) return;
-    if(tl.owned())
-    {
-        std::stringstream msg;
-        msg <<"Timeline "<<tl.name()<<" already owned by "<<tl.owner().getName();
-        throw timeline_failure(r, msg.str());
-    }
-
-    details::cycle_checker checkInternal(r, r, details::cycle_checker::internal, tl.name());
-    try {
-        boost::depth_first_search(me(), boost::visitor(checkInternal).root_vertex(r));
-    } catch (details::cycle_checker::has_cycle check) {
-        if(check.cycle)
-        {
-            throw timeline_failure(r, check.message);
-            // throw timeline_failure(...) <= indicate to reactor_graph that
-            //this connection is not allowed
-        }
-    }
+//    if(index(r)==count_reactors()) return;
+//    if(tl.owned())
+//    {
+//        std::stringstream msg;
+//        msg <<"Timeline "<<tl.name()<<" already owned by "<<tl.owner().getName();
+//        throw timeline_failure(r, msg.str());
+//    }
+//
+//    details::cycle_checker checkInternal(r, r, details::cycle_checker::internal, tl.name());
+//    try {
+//        boost::depth_first_search(me(), boost::visitor(checkInternal).root_vertex(r));
+//    } catch (details::cycle_checker::has_cycle check) {
+//        if(check.cycle)
+//        {
+//            throw timeline_failure(r, check.message);
+//            // throw timeline_failure(...) <= indicate to reactor_graph that
+//            //this connection is not allowed
+//        }
+//    }
 }
 
 void Agent::external_check(reactor_id r,
 			   TREX::transaction::details::timeline const &tl) {
-    if(index(r)==count_reactors()) return;
-    if(tl.owned())
-    {
-        details::cycle_checker checkExternal(r, &(tl.owner()), details::cycle_checker::external, tl.name());
-        try {
-        boost::depth_first_search(me(), boost::visitor(checkExternal).root_vertex(&(tl.owner())));
-        } catch (details::cycle_checker::has_cycle check) {
-            if(check.cycle)
-            {
-                throw timeline_failure(r, check.message);
-                //throw timeline_failure(...) <= indicate to reactor_graph that
-                //this connection is not allowed
-            }
-        }
-    }
+//    if(index(r)==count_reactors()) return;
+//    if(tl.owned())
+//    {
+//        details::cycle_checker checkExternal(r, &(tl.owner()), details::cycle_checker::external, tl.name());
+//        try {
+//        boost::depth_first_search(me(), boost::visitor(checkExternal).root_vertex(&(tl.owner())));
+//        } catch (details::cycle_checker::has_cycle check) {
+//            if(check.cycle)
+//            {
+//                throw timeline_failure(r, check.message);
+//                //throw timeline_failure(...) <= indicate to reactor_graph that
+//                //this connection is not allowed
+//            }
+//        }
+//    }
 }
 
 

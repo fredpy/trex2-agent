@@ -11,7 +11,7 @@
 # include <trex/europa/bits/system_header.hh>
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
 # include <trex/europa/bits/system_header.hh>
-
+# include <trex/utils/SharedVar.hh>
 # include <DUNE/DUNE.hpp>
 
 //# include <boost/polygon/polygon.hpp>
@@ -143,9 +143,9 @@ namespace TREX {
       void handleExecute();
       
       static void set_oplimits(DUNE::IMC::OperationalLimits *oplimits);
-      
+      static DUNE::IMC::OperationalLimits * get_oplimits();
     private:
-      static DUNE::IMC::OperationalLimits * s_oplimits;
+      static TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *> s_oplimits;
       
       EUROPA::Domain &m_lat;
       EUROPA::Domain &m_lon;
