@@ -207,6 +207,14 @@ void details::europa_domain::visit(tr::BasicEnumerated const *dom) {
     throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not enumerated.");
 }
 
+namespace {
+  float decimal_places(double val, size_t n_places) {
+    double factor = pow(10.0L, n_places);
+    return std::floor(val*factor) / factor;
+  }
+}
+
+
 void details::europa_domain::visit(tr::BasicInterval const *dom) {
   if( m_dom->isInterval() ) {
     UNIQ_PTR<EUROPA::Domain> tmp(m_dom->copy());
@@ -230,7 +238,14 @@ void details::europa_domain::visit(tr::BasicInterval const *dom) {
       std::string lo = dom->getStringLower(), hi = dom->getStringUpper();
       EUROPA::edouble elo = m_type->createValue(lo),
         ehi = m_type->createValue(hi);
-
+      
+      // float values received by trex are restrainted to use only
+      // 8 decimal places
+      if( elo>std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+        elo = decimal_places(EUROPA::cast_basis(elo), 8);
+      if( ehi<std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+        ehi = decimal_places(EUROPA::cast_basis(ehi), 8);
+      
       tmp->intersect(elo, ehi);
     }
     if( tmp->isEmpty() )
