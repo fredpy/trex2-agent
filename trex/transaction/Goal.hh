@@ -55,11 +55,11 @@ namespace TREX {
     /** @brief TREX goal
      *
      * This class represent a goal as exchanged between reactors a goal
-     * is a predicate with the 3 temporal varaiables @c start, @c duration
+     * is a predicate with the 3 temporal variables @c start, @c duration
      * and @c end. It is in substance what is called a Token inside the
      * EUROPA planning framework.
      *
-     * This class embeds also suficient code to ensure that the @c duration
+     * This class embeds also sufficient code to ensure that the @c duration
      * is at least 1 TICK and that any modification of one of the temporal
      * attributes is propagated to the others so @c start+duration=end is
      * maintained

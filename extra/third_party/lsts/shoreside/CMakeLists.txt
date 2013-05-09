@@ -39,10 +39,12 @@ if(WITH_LSTS_SHORESIDE)
     # source
     DTAReactor.cc
     PositionUpdater.cc 
+    YesMan.cc
     
     # headers
     DTAReactor.hh
-    PositionUpdater.hh 
+    PositionUpdater.hh
+    YesMan.hh 
     )
   
   target_link_libraries(lstsshore_pg LSTSshared)

@@ -54,8 +54,8 @@ namespace TREX {
     /** @brief Reactor observation
      *
      * This class encapsulate the latest observation on a timeline. Each time a timeline
-     * value changes/is updated the reactor owning this timeline is producing tis observation
-     * which in turn is dispatched to all the reactors tha observe the corresponding timeline.
+     * value changes/is updated the reactor owning this timeline is producing this observation
+     * which in turn is dispatched to all the reactors that observe the corresponding timeline.
      *
      * @sa void TeleoReactor::postObservation(Observation const &obs)
      * @sa void TeleoReactor::notify(Observation const &obs)
