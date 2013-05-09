@@ -54,8 +54,13 @@ bool DTAReactor::synchronize() {
   if( m_active ) {
     if( m_have_pos && WAITING==m_trex_state ) {
       Goal tmp(m_proxy_timeline, "Survey");
+      Observation sent(m_state_tl, "Sent");
+      
+      
       tmp.restrictAttribute(Variable("center_lat", FloatDomain(m_pos.first)));
+      sent.restrictAttribute(Variable("center_lat", FloatDomain(m_pos.first)));
       tmp.restrictAttribute(Variable("center_lon", FloatDomain(m_pos.second)));
+      sent.restrictAttribute(Variable("center_lon", FloatDomain(m_pos.second)));
       
       EnumDomain path_d;
       path_d.add(m_path);
@@ -70,7 +75,11 @@ bool DTAReactor::synchronize() {
       }
       tmp.restrictAttribute(Variable("speed_north",
                                      FloatDomain(m_speed.first)));
+      sent.restrictAttribute(Variable("speed_north",
+                                     FloatDomain(m_speed.first)));
       tmp.restrictAttribute(Variable("speed_east",
+                                     FloatDomain(m_speed.second)));
+      sent.restrictAttribute(Variable("speed_east",
                                      FloatDomain(m_speed.second)));
     
       
@@ -78,6 +87,8 @@ bool DTAReactor::synchronize() {
       tmp.restrictAttribute(Variable("lagrangian", BooleanDomain(m_lagrangian)));
     
       postGoal(tmp);
+      m_trex_state = GOAL_SENT;
+      postObservation(sent);
     }
   }
   return true;
