@@ -26,6 +26,10 @@ namespace TREX {
       std::pair<double, double> m_pos, m_speed;
       bool m_have_pos;
       bool m_have_speed;
+      
+      TREX::utils::Symbol m_proxy_timeline;
+      TREX::utils::Symbol m_asset_id;
+      TREX::utils::Symbol m_survey_tl, m_state_tl;
 
       enum vehicle_mode {
 	UNKNOWN =0,
