@@ -150,10 +150,18 @@ namespace TREX
     Platform::synchronize()
     {
       processState();
-
       Heartbeat hb;
       sendMsg(hb);
-      return true;
+
+//      if (!m_observations_pending.empty())
+//      {
+//        std::list<Observation>::iterator it;
+//        for (it = m_observations_pending.begin(); it != m_observations_pending.end(); it++)
+//        {
+//          postObservation(*it
+//        }
+//      }
+   return true;
     }
 
     void
@@ -166,13 +174,15 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << gpred << ")";
+      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
+
+      //m_goals_pending.push_back(g);
 
       if (gname == "reference" && gpred == "Going")
         handleGoingRequest(*goal);
 
       else if (gname == "reference" && gpred == "At")
-        handleGoingRequest(*goal);
+        handleAtRequest(*goal);
 
     }
 
@@ -184,10 +194,9 @@ namespace TREX
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
-
+      std::cerr << "handleRecall(" << gpred << ")" << std::endl;
       if (gname == "reference" && gpred == "Going")
         handleGoingRecall(*goal);
-
     }
 
     void
@@ -396,6 +405,46 @@ namespace TREX
         m_ref.lat = latitude;
         m_ref.lon = longitude;
       }
+    }
+
+    void
+    Platform::handleAtRequest(Goal g)
+    {
+      double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
+
+      if(g.getAttribute("latitude").domain().isSingleton())
+      {
+        req_lat = g.getAttribute("latitude").domain().getTypedSingleton<double, true>();
+      }
+      if(g.getAttribute("longitude").domain().isSingleton())
+      {
+        req_lon = g.getAttribute("longitude").domain().getTypedSingleton<double, true>();
+      }
+      if(g.getAttribute("z").domain().isSingleton())
+      {
+        req_z = g.getAttribute("z").domain().getTypedSingleton<double, true>();
+      }
+
+      EstimatedState * estate =
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+      if (estate != NULL)
+      {
+        my_lat = estate->lat;
+        my_lon = estate->lon;
+        if (req_z >= 0)
+          my_z = estate->depth;
+        else
+          my_z = estate->alt;
+
+        WGS84::displace(estate->x, estate->y, &my_lat, &my_lon);
+      }
+
+//      if (WGS84::distance(my_lat, my_lon, my_z, req_lat, req_lon, req_z) < 10)
+//      {
+//        std::cerr << "Ok! I'm there... posting..." << std::endl;
+//        Observation * obs = (Observation *) &g;
+//        m_observations_pending.push_back(*obs);
+//      }
     }
 
     void
