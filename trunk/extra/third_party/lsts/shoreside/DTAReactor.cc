@@ -11,6 +11,14 @@ using namespace TREX::LSTS;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
+
+namespace
+{
+  /** @brief PositionUpdater reactor declaration */
+  TeleoReactor::xml_factory::declare<DTAReactor> decl("DTAReactor");
+}
+
+
 #define SURVEY_TL "lsts_survey" // internal
 
 
@@ -26,12 +34,16 @@ using namespace TREX::utils;
 
 DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg) 
   :TeleoReactor(arg, false), 
-   m_active(false) {
-  provide(SURVEY_TL);
-  postObservation(Observation(SURVEY_TL, "None"));
-  provide(STATE_TL, false);
-  postObservation(Observation(STATE_TL, "Nothing"));
-  use(TREX_TL, false);    
+   m_active(false),
+m_proxy_timeline(parse_attr<Symbol>(xml_factory::node(arg), "proxy")),
+m_asset_id(parse_attr<Symbol>(xml_factory::node(arg), "id")) {
+  m_survey_tl = m_asset_id.str() + "_follow";
+  m_state_tl = m_asset_id.str() + "_state";
+  provide(m_survey_tl);
+  postObservation(Observation(m_survey_tl, "None"));
+  provide(m_state_tl, false);
+  postObservation(Observation(m_state_tl, "Nothing"));
+  use(m_proxy_timeline, true);
 }
 
 DTAReactor::~DTAReactor() {}
@@ -41,7 +53,7 @@ DTAReactor::~DTAReactor() {}
 bool DTAReactor::synchronize() {
   if( m_active ) {
     if( m_have_pos && WAITING==m_trex_state ) {
-      Goal tmp(TREX_TL, "Survey");
+      Goal tmp(m_proxy_timeline, "Survey");
       tmp.restrictAttribute(Variable("center_lat", FloatDomain(m_pos.first)));
       tmp.restrictAttribute(Variable("center_lon", FloatDomain(m_pos.second)));
       
@@ -72,12 +84,12 @@ bool DTAReactor::synchronize() {
 }
 
 void DTAReactor::handleRequest(goal_id const &g) {
-  if( g->object()==SURVEY_TL ) {
+  if( g->object()==m_survey_tl ) {
     if( g->predicate()=="None" ) {
       if( m_active ) {
 	m_active=false;
-	postObservation(Observation(SURVEY_TL, g->predicate()));
-	postObservation(Observation(STATE_TL, "Nothing"));
+	postObservation(Observation(m_survey_tl, g->predicate()));
+	postObservation(Observation(m_state_tl, "Nothing"));
 	unuse(m_drifter);
       }
     } else if( g->predicate()=="Track" ) {
@@ -119,14 +131,14 @@ void DTAReactor::handleRequest(goal_id const &g) {
       m_path = path;
       m_factor = factor;
       postObservation(*g);
-      postObservation(Observation(STATE_TL, "Wait"));
+      postObservation(Observation(m_state_tl, "Wait"));
     }
   }
 }
 
 void DTAReactor::notify(Observation const &obs) {
   if( obs.object()==m_drifter ) {
-    if( obs.predicate()=="Holds" ) {
+    if( obs.predicate()=="position" || obs.predicate()=="connected" ) {
       // Get lat/lon
       m_pos.first = obs.getAttribute("latitude").domain().getTypedSingleton<double, true>();
       m_pos.second = obs.getAttribute("longitude").domain().getTypedSingleton<double, true>();
@@ -140,7 +152,7 @@ void DTAReactor::notify(Observation const &obs) {
 	m_speed.second = obs.getAttribute("speed_east").domain().getTypedSingleton<double, true>();
       }
     }
-  } else if( obs.object()==TREX_TL ) {
+  } else if( obs.object()==m_proxy_timeline ) {
     if( obs.predicate()=="undefined" || obs.predicate()=="Failed" ) {
       syslog(warn)<<"No info from dorado";
       m_trex_state = UNKNOWN;
@@ -151,7 +163,7 @@ void DTAReactor::notify(Observation const &obs) {
       syslog(info)<<"dorado execute a goal !!!";
       m_trex_state = RUNNING;
       if( m_active )
-      postObservation(Observation(STATE_TL, "Wait"));
+      postObservation(Observation(m_state_tl, "Wait"));
     }
   }
 }
