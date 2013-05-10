@@ -4,22 +4,23 @@ class DrifterController {
     DrifterFollow command;
 
     action DoSurvey {
-	start + duration == end;
+		start + duration == end;
     }
 
     predicate Waypoint {
-	PathList completed, target;
-	LagrangianPoint loc;
-	float origin_lat, origin_lon;
-	float x, y;
-	float delta_x, delta_y;
-	float lat, lon, factor;
-	bool first;
-	int  id;
-	bool ready, executed;
+		PathList completed, target;
+		LagrangianPoint loc;
+		float origin_lat, origin_lon;
+		float x, y;
+		float delta_x, delta_y;
+		float lat, lon, factor;
+		bool first;
+		int  id, at_date;
+		bool ready, executed;
 
-	duration == 1;
-	start + duration == end;
+		at_date <= start;
+		duration == 1;
+		start + duration == end;
     }
 
     action DoSegment {
@@ -40,8 +41,8 @@ class DrifterController {
 
 class Counter extends Timeline {
     predicate Holds {
-	int id;
-	id >= 0;
+		int id;
+		id >= 0;
     }
 
     Counter() {}
@@ -50,10 +51,10 @@ class Counter extends Timeline {
 Counter::Holds {
     // Assume that initial tick is 0
     if( start > 0 ) {
-	met_by(Holds prev);
-	id == prev.id + 1;
+		met_by(Holds prev);
+		id == prev.id + 1;
     } else {
-	id == 0;
+		id == 0;
     }	
 }
 
@@ -63,38 +64,37 @@ class DrifterFollow extends AgentTimeline {
     Counter counter;
 
     predicate Inactive {
-	int _id;
-	start + duration == end;
+		int _id;
+		start + duration == end;
     }
 
     predicate DoSurvey {
-	bool     lagrangian;
-	PathList path;
-	float    size;
-	int      id;
-	start >= 0;
-	start + duration == end;
+		bool     lagrangian;
+		PathList path;
+		float    size;
+		int      id;
+		start >= 0;
+		start + duration == end;
     }
 
     predicate Survey {
-	float center_lat, center_lon;
-	float speed_north, speed_east, u, v;
-	int _id;
+		float center_lat, center_lon;
+		float speed_north, speed_east, u, v;
+		int _id;
 	
-	PathList path;
-	float    size;
-	bool     lagrangian;
-	start > 0;
-	speed_east == u;
-	speed_north == v;
-	//duration == 1;
-	start + duration == end;
+		PathList path;
+		float    size;
+		bool     lagrangian;
+		start > 0;
+		speed_east == u;
+		speed_north == v;
+		start + duration == end;
     }
 
     DrifterFollow(Mode _mode) {
-	super(_mode, "Inactive");
-	controller = new DrifterController(this);
-	counter = new Counter();
+		super(_mode, "Inactive");
+		controller = new DrifterController(this);
+		counter = new Counter();
     }
 }
 
@@ -108,18 +108,17 @@ DrifterFollow::Inactive {
 
 DrifterFollow::DoSurvey {
     Counter my_id = object.counter;
+
+	met_by(Inactive);
     contained_by(my_id.Holds cpt);
     id == cpt.id;
 }
 
 DrifterFollow::Survey {
+	
     Counter my_id = object.counter;
     ends(my_id.Holds cpt);
-    met_by(DoSurvey exec);
-    after(Inactive previous);
-    previous starts cpt;
-    previous before exec;
-    
+    met_by(DoSurvey exec);    
     _id == cpt.id;
 }
 
@@ -145,8 +144,8 @@ DrifterController::DoSurvey {
     space.origin_lon == g.center_lon;
 
     if( 0.0==space.speed ) {
-	space.cos_angle == 1.0;
-	space.sin_angle == 0.0;
+		space.cos_angle == 1.0;
+		space.sin_angle == 0.0;
     } else {
      	space.cos_angle * space.speed == g.u;
      	space.sin_angle * space.speed == g.v;
@@ -181,28 +180,16 @@ DrifterController::Waypoint {
     first == empty(prev);
     
     if( completed==target ) {
-	equals(me.Survey completion);
-	target == completion.path;
-	factor == completion.size;
-	id == completion._id;
+		equals(me.Survey completion);
+		target == completion.path;
+		factor == completion.size;
+		id == completion._id;
     } else {
         contained_by(me.DoSurvey exec);
-	target == exec.path;
-	factor == exec.size;
-	id == exec.id;
+		target == exec.path;
+		factor == exec.size;
+		id == exec.id;
     }
-
-    if( ready==true ) {
-	contained_by(Navigator.At nav);
-	nav.latitude == lat;
-	nav.longitude == lon;
-	
-	if( nav.start <= AGENT_CLOCK ) {
-	    executed == true;
-	}
-    }
-	
-
     contained_by(LagrangianSpace.Holds space);
 
     // Rotate the points based on space direction
@@ -212,6 +199,12 @@ DrifterController::Waypoint {
 
     // Compute the point lat,lon
     wgsdisplace(origin_lat, origin_lon, rot_x, rot_y, lat, lon);
+ 
+ 	if( at_date <= AGENT_CLOCK ) {
+ 		executed == true;
+ 	}
+ 	
+        
 }
 
 DrifterController::DoSegment {
@@ -230,6 +223,7 @@ DrifterController::DoSegment {
     init.completed == to_complete;
     wp.origin_lat == init.lat;
     wp.origin_lon == init.lon;
+    wp.at_date >= init.at_date;
 
     init.x + dx == wp.x;
     init.y + dy == wp.y;
@@ -256,34 +250,35 @@ DrifterController::DoSegment {
     main_sum == sqrt(vx_2+vy_2) + vy;
     drift * dspeed_2 == space.speed * main_sum;
 
-    float travel_dist;
+    //float travel_dist;
 
     wp.delta_y == dy+drift;
-    calcDistance(travel_dist, 0.0, 0.0, wp.delta_x, wp.delta_y);
+    //calcDistance(travel_dist, 0.0, 0.0, wp.delta_x, wp.delta_y);
 
     end <= MISSION_END;
     start+duration == end;
     
-    float fast_speed, min_duration;
+    //float fast_speed, min_duration;
 
-    fast_speed == 3.0*vc.horizontal_speed;
-    travel_dist == min_duration * fast_speed;
-    min_duration <= duration;
+    //fast_speed == 3.0*vc.horizontal_speed;
+    //travel_dist == min_duration * fast_speed;
+    //min_duration <= duration;
 
     if( completed==true ) {
-	meets(condition Navigator.At cmd);
-	cmd.latitude == wp.lat;
-	cmd.longitude == wp.lon;
-	cmd.z == vc.min_z; // for now navigate at min_z
-	cmd.speed == vc.speed;
-	cmd.secs == 0;
+		meets(condition Navigator.At cmd);
+		cmd.latitude == wp.lat;
+		cmd.longitude == wp.lon;
+		cmd.z == vc.min_z; // for now navigate at min_z
+		cmd.speed == vc.speed;
+		cmd.secs == 0;
+		wp.at_date == cmd.start;
     }
 }
 
 DrifterController::DoInitial {
     Counter my_counter = object.command.counter;
 
-    equals(effect Waypoint wp);
+    meets(effect Waypoint wp);
     true == wp.first;
 
     // Start to make general computation for waypoint 
@@ -301,14 +296,15 @@ DrifterController::DoInitial {
     wp.id == cpt.id;
     
     if( cpt.start <= AGENT_CLOCK ) {
-	true == wp.ready;
-
-	ends(condition Navigator.At cmd);
-	cmd.latitude == wp.lat;
-	cmd.longitude == wp.lon;
-	cmd.z == vc.min_z; // for now navigate at min_z
-	cmd.speed == vc.speed;
-	cmd.secs == 0;
+		ends(condition Navigator.At cmd);
+		cmd.latitude == wp.lat;
+		cmd.longitude == wp.lon;
+		cmd.z == vc.min_z; // for now navigate at min_z
+		cmd.speed == vc.speed;
+		cmd.secs == 0;
+		
+		wp.at_date == cmd.start;
+		true == wp.ready;
     }
 }
 
