@@ -16,7 +16,7 @@ class DrifterController {
 	float lat, lon, factor;
 	bool first;
 	int  id;
-	bool ready;
+	bool ready, executed;
 
 	duration == 1;
 	start + duration == end;
@@ -192,6 +192,17 @@ DrifterController::Waypoint {
 	id == exec.id;
     }
 
+    if( ready==true ) {
+	contained_by(Navigator.At nav);
+	nav.latitude == lat;
+	nav.longitude == lon;
+	
+	if( nav.start <= AGENT_CLOCK ) {
+	    executed == true;
+	}
+    }
+	
+
     contained_by(LagrangianSpace.Holds space);
 
     // Rotate the points based on space direction
@@ -225,9 +236,7 @@ DrifterController::DoSegment {
     dx == wp.delta_x;
 
     exec contains init;
-    if( init.start <= AGENT_CLOCK ) {
-	completed == true;
-    }
+    completed == init.executed;
 
     // Start to make general computation for waypoint 
     contained_by(LagrangianSpace.Holds space);
