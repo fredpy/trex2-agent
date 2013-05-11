@@ -3,314 +3,260 @@ class DrifterFollow;
 class DrifterController {
     DrifterFollow command;
 
-    action DoSurvey {
-		start + duration == end;
-    }
+    action EndSurvey {}
+
+    action DoSegment {}
+
+    action DoInitial {}
 
     predicate Waypoint {
-		PathList completed, target;
-		LagrangianPoint loc;
-		float origin_lat, origin_lon;
-		float x, y;
-		float delta_x, delta_y;
-		float lat, lon, factor;
-		bool first;
-		int  id, at_date;
-		bool ready, executed;
+	int             path_id;
+	PathList        full_path, completed, to_complete;
+	LagrangianPoint loc;
+	
+	float           ref_lat, ref_lon;
+	float           shift_x, shift_y;
+	float           cos_a, sin_a;
+	float           lat, lon;
 
-		at_date <= start;
-		duration == 1;
-		start + duration == end;
+	int completion_date;
+
+	car(loc,         completed);
+	cdr(to_complete, completed);
+	duration == 1;
+	completion_date <= start;
     }
 
-    action DoSegment {
-	PathList to_complete;
-	float dx, dy, drift;
-	bool completed;
-	start + duration == end;
-    }
-    action DoInitial {
-	float x, y;
-	start + duration == end;
-    }
-
-    DrifterController(DrifterFollow d) {
-	command = d;
+    DrifterController(DrifterFollow cmd) {
+	command = cmd;
     }
 }
 
 class Counter extends Timeline {
+
     predicate Holds {
-		int id;
-		id >= 0;
+	int id;
+	0 <= id;
+	id <= start;
     }
 
     Counter() {}
-};
-
-Counter::Holds {
-    // Assume that initial tick is 0
-    if( start > 0 ) {
-		met_by(Holds prev);
-		id == prev.id + 1;
-    } else {
-		id == 0;
-    }	
 }
 
 class DrifterFollow extends AgentTimeline {
-
     DrifterController controller;
-    Counter counter;
+    Counter           counter;
 
-    predicate Inactive {
-		int _id;
-		start + duration == end;
-    }
+    predicate Inactive {}
 
     predicate DoSurvey {
-		bool     lagrangian;
-		PathList path;
-		float    size;
-		int      id;
-		start >= 0;
-		start + duration == end;
-    }
+	float center_lat, center_lon;
+	float speed, _speed_2;
+	float cos_angle, sin_angle;
 
+	PathList path;
+	float    size;
+	bool     lagrangian;
+
+	int id;
+    }
     predicate Survey {
-		float center_lat, center_lon;
-		float speed_north, speed_east, u, v;
-		int _id;
-	
-		PathList path;
-		float    size;
-		bool     lagrangian;
-		start > 0;
-		speed_east == u;
-		speed_north == v;
-		start + duration == end;
+	float    center_lat, center_lon;
+	float    speed_north, speed_east, u, v;
+	PathList path;
+	float    size;
+	bool     lagrangian;
+
+	speed_east  == v;
+	speed_north == u;
+
+	duration==1;
     }
 
     DrifterFollow(Mode _mode) {
-		super(_mode, "Inactive");
-		controller = new DrifterController(this);
-		counter = new Counter();
+	super(_mode, "Inactive");
+	controller = new DrifterController(this);
+	counter = new Counter();
     }
 }
 
+Counter::Holds {
+    if( start<=0 ) {
+	id == 0;
+    } else {
+	met_by(Holds prev);
+	id == prev.id + 1;
+    }
+}
 
 DrifterFollow::Inactive {
-    Counter my_id = object.counter;
-    starts(my_id.Holds cpt);
-    _id == cpt.id;
-    end <= cpt.end;
+    Counter cpt = object.counter;
+    starts(cpt.Holds cur);
 }
 
 DrifterFollow::DoSurvey {
-    Counter my_id = object.counter;
-
-	met_by(Inactive);
-    contained_by(my_id.Holds cpt);
-    id == cpt.id;
+    Counter cpt = object.counter;
+    contained_by(cpt.Holds cur);
+    id == cur.id;
 }
 
-DrifterFollow::Survey {
-	
-    Counter my_id = object.counter;
-    ends(my_id.Holds cpt);
-    met_by(DoSurvey exec);    
-    _id == cpt.id;
-}
-
-
-DrifterController::DoSurvey {
+DrifterController::EndSurvey {
     DrifterFollow me = object.command;
+    Counter cpt = me.counter;
 
-    meets(effect me.Survey g);
-    contained_by(LagrangianSpace.Holds space);
-    contained_by(condition VerticalControl.Holds vc);
-
+    equals(effect me.Survey survey);
     float _bind_u_2, _bind_v_2;
+    
+    abs(survey.u) == sqrt(_bind_u_2);
+    abs(survey.v) == sqrt(_bind_v_2);
 
+
+    ends(cpt.Holds cur);
+    met_by(me.DoSurvey exec);
+    exec.id == cur.id;
+    exec.path == survey.path;
+    exec.size == survey.size;
+    exec.center_lat == survey.center_lat;
+    exec.center_lon == survey.center_lon;
+    exec.lagrangian == survey.lagrangian;
+    exec._speed_2 == _bind_u_2+_bind_v_2;
+    exec.speed == sqrt(exec._speed_2);
+   
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
     _bind_u_2 < vc._hspeed_2;
     _bind_v_2 < vc._hspeed_2;
-    
-    abs(g.u) == sqrt(_bind_u_2);
-    abs(g.v) == sqrt(_bind_v_2);    
-    
-    // Set up the lagrangian space
-    space._speed_2 == _bind_u_2+_bind_v_2;
-    space.origin_lat == g.center_lat;
-    space.origin_lon == g.center_lon;
 
-    if( 0.0==space.speed ) {
-		space.cos_angle == 1.0;
-		space.sin_angle == 0.0;
+    if( 0==exec.speed ) {
+	exec.cos_angle == 1.0;
+	exec.sin_angle == 0.0;
     } else {
-     	space.cos_angle * space.speed == g.u;
-     	space.sin_angle * space.speed == g.v;
+	exec.cos_angle * exec.speed == survey.speed_north;
+	exec.sin_angle * exec.speed == survey.speed_east;
     }
 
-    equals(me.DoSurvey exec);
-    exec.id == g._id;
-    exec meets g;
-    space contains exec;
-    vc contains exec;
-
-    exec.path == g.path;
-    exec.size == g.size;
-    exec.lagrangian == g.lagrangian;
-	
-    before(me.Inactive idle);
-    g meets idle;
-    
-    meets(condition Waypoint full);
-    full.completed == g.path; 
-    full.target == g.path;
+    equals(condition Waypoint last_wp);
+    last_wp.path_id == cur.id;
+    last_wp.full_path == exec.path;
+    last_wp.completed == exec.path;
+    exec.cos_angle == last_wp.cos_a;
+    exec.sin_angle == last_wp.sin_a;
 }
 
 DrifterController::Waypoint {
     DrifterFollow me = object.command;
-    PathList prev;
+    Counter cpt = me.counter;
+    contained_by(cpt.Holds count);
+    path_id == count.id;
 
-    car(loc, completed);
-    x == loc.x * factor;
-    y == loc.y * factor;
+    float shift_n, shift_e;
+    shift_e == (shift_x * cos_a) + (shift_y * sin_a);
+    shift_n == (shift_y * cos_a) - (shift_x * sin_a);
     
-    first == empty(prev);
-    
-    if( completed==target ) {
-		equals(me.Survey completion);
-		target == completion.path;
-		factor == completion.size;
-		id == completion._id;
-    } else {
-        contained_by(me.DoSurvey exec);
-		target == exec.path;
-		factor == exec.size;
-		id == exec.id;
-    }
-    contained_by(LagrangianSpace.Holds space);
-
-    // Rotate the points based on space direction
-    float rot_x, rot_y;
-    rot_x == (delta_x * space.cos_angle) + (delta_y * space.sin_angle);
-    rot_y == (delta_y * space.cos_angle) - (delta_x * space.sin_angle);
-
-    // Compute the point lat,lon
-    wgsdisplace(origin_lat, origin_lon, rot_x, rot_y, lat, lon);
- 
- 	if( at_date <= AGENT_CLOCK ) {
- 		executed == true;
- 	}
- 	
-        
+    wgsdisplace(ref_lat, ref_lon, shift_n, shift_e, lat, lon);
 }
 
 DrifterController::DoSegment {
     DrifterFollow me = object.command;
-
-    meets(effect Waypoint wp);
-    contained_by(me.DoSurvey exec);
-
-    false == wp.first;
-    wp.ready == completed;
-    cdr(to_complete, wp.completed);
-
-    starts(condition Waypoint init);
-    init.id == wp.id;
-    init.target == wp.target;
-    init.completed == to_complete;
-    wp.origin_lat == init.lat;
-    wp.origin_lon == init.lon;
-    wp.at_date >= init.at_date;
-
-    init.x + dx == wp.x;
-    init.y + dy == wp.y;
-    dx == wp.delta_x;
-
-    exec contains init;
-    completed == init.executed;
-
-    // Start to make general computation for waypoint 
-    contained_by(LagrangianSpace.Holds space);
-    contained_by(VerticalControl.Holds vc);
-
-    float dspeed_2, px_2, py_2;
-    dspeed_2 == space._speed_2 + vc._hspeed_2;
-    abs(dx) == sqrt(px_2);
-    abs(dy) == sqrt(py_2);
-
-    float vx_2, vy_2, sq_root, upper_frac, vy, main_sum;
-
-    vx_2 == vc._hspeed_2 * px_2;
-    vy_2 == vc._hspeed_2 * py_2;
-
-    vy == space.speed * dy;
-    main_sum == sqrt(vx_2+vy_2) + vy;
-    drift * dspeed_2 == space.speed * main_sum;
-
-    //float travel_dist;
-
-    wp.delta_y == dy+drift;
-    //calcDistance(travel_dist, 0.0, 0.0, wp.delta_x, wp.delta_y);
-
-    end <= MISSION_END;
-    start+duration == end;
+    Counter cpt = me.counter;
     
-    //float fast_speed, min_duration;
+    meets(effect Waypoint to);
+    false == empty(to.to_complete);
 
-    //fast_speed == 3.0*vc.horizontal_speed;
-    //travel_dist == min_duration * fast_speed;
-    //min_duration <= duration;
+    contained_by(me.DoSurvey exec);
+    exec.id == to.path_id;
+    exec.path == to.full_path;
+    exec.cos_angle == to.cos_a;
+    exec.sin_angle == to.sin_a;
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
+    
+    starts(condition Waypoint from);
+    from.path_id == to.path_id;
+    from.full_path == to.full_path;
+    from.completed == to.to_complete;
+    from.lat == to.ref_lat;
+    from.lon == to.ref_lon;
+    from.completion_date <= to.completion_date;
+    exec.cos_angle == from.cos_a;
+    exec.sin_angle == from.sin_a;
 
-    if( completed==true ) {
-		meets(condition Navigator.At cmd);
-		cmd.latitude == wp.lat;
-		cmd.longitude == wp.lon;
-		cmd.z == vc.min_z; // for now navigate at min_z
-		cmd.speed == vc.speed;
-		cmd.secs == 0;
-		wp.at_date == cmd.start;
+    float dx, dy, delta_y;
+    
+    from.loc.x + dx == to.loc.x; 
+    to.shift_x == dx * exec.size;
+    from.loc.y + dy == to.loc.y; 
+    delta_y == dy * exec.size;
+
+    float drift;
+    drift >= 0.0;
+    to.shift_y == delta_y + drift;
+
+    if( exec.lagrangian==false ) {
+	drift == 0.0;
+    } else {
+
+	float dspeed_2, px_2, py_2;
+	
+	dspeed_2 == exec._speed_2 + vc._hspeed_2;
+	abs(to.shift_x) == sqrt(px_2);
+	abs(delta_y) == sqrt(py_2);
+	
+	float vx_2, vy_2, sq_root, upper_frac, vy, main_sum;
+	vx_2 == vc._hspeed_2 * px_2;
+	vy_2 == vc._hspeed_2 * py_2;
+
+	vy == exec.speed * delta_y;
+	main_sum == sqrt(vx_2 + vy_2) + vy;
+	drift * dspeed_2 == exec.speed * main_sum;
     }
+
+    // Finally send the next At when the previous one did complete
+    if( from.completion_date <= AGENT_CLOCK ) {
+	// I will assume that from are to are far enough to require a waypoint
+	meets(condition Navigator.At dest);
+	dest.latitude == to.lat;
+	dest.longitude == to.lon;
+	dest.speed == vc.speed;
+	dest.secs == 0;
+	dest.z == vc.min_z;
+	to.completion_date == dest.start;
+   }
 }
 
 DrifterController::DoInitial {
-    Counter my_counter = object.command.counter;
+    DrifterFollow me = object.command;
+    Counter cpt = me.counter;
 
-    meets(effect Waypoint wp);
-    true == wp.first;
+    equals(effect Waypoint to);
+    true == empty(to.to_complete);
 
-    // Start to make general computation for waypoint 
-    contained_by(LagrangianSpace.Holds space);
+    contained_by(me.DoSurvey exec);
+    exec.id == to.path_id;
+    exec.path == to.full_path;
+    exec.center_lat == to.ref_lat;
+    exec.center_lon == to.ref_lon;
+    exec.cos_angle == to.cos_a;
+    exec.sin_angle == to.sin_a;
     contained_by(VerticalControl.Holds vc);
+    vc contains exec;
 
-    wp.origin_lat == space.origin_lat;
-    wp.origin_lon == space.origin_lon;
-    wp.x == x;
-    wp.y == y;
-    wp.delta_x == x;
-    wp.delta_y == y;
-    
-    contained_by(my_counter.Holds cpt);
-    wp.id == cpt.id;
-    
-    if( cpt.start <= AGENT_CLOCK ) {
-		ends(condition Navigator.At cmd);
-		cmd.latitude == wp.lat;
-		cmd.longitude == wp.lon;
-		cmd.z == vc.min_z; // for now navigate at min_z
-		cmd.speed == vc.speed;
-		cmd.secs == 0;
-		
-		wp.at_date == cmd.start;
-		true == wp.ready;
+    float x, y;
+
+    to.shift_x == to.loc.x * exec.size;
+    to.shift_y == to.loc.y * exec.size;
+
+    // Check that I can start 
+    contained_by(cpt.Holds cur);
+    if( cur.start<= AGENT_CLOCK ) {
+	contained_by(condition Navigator.At dest);
+	dest.latitude == to.lat;
+	dest.longitude == to.lon;
+	dest.speed == vc.speed;
+	dest.secs == 0;
+	dest.z == vc.min_z;
+	to.completion_date == dest.start;
     }
 }
-
-	
-    
-
-
 
 

@@ -3,8 +3,16 @@
     <FlawHandler component="TrexThreatHandler"/>
   </ThreatManager>
 
-  <OpenConditionManager defaultPriority="100">
+
+  <OpenConditionManager defaultPriority="40" component="EarliestFirst">
     <FlawFilter component="goals"/> 
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+
+
+  <!-- then resolve new goals -->
+  <OpenConditionManager defaultPriority="2200" component="EarliestFirst" >
+    <FlawFilter component="notGoals"/>
     <FlawHandler component="StandardOpenConditionHandler"/>
   </OpenConditionManager>
 
@@ -16,11 +24,5 @@
     </FlawFilter>
     <FlawHandler component="toZero" />
   </UnboundVariableManager>
-
-  <!-- then resolve new goals -->
-  <OpenConditionManager defaultPriority="2200" component="EarliestFirst" >
-    <FlawFilter component="notGoals"/>
-    <FlawHandler component="StandardOpenConditionHandler"/>
-  </OpenConditionManager>
 
 </Solver>

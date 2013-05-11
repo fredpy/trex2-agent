@@ -1098,6 +1098,11 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
     out<<"nref="<<(*it)->refCount()<<"\\n";
+    if( !(*it)->isInactive() )
+      print_domain(out<<"  STATE: "<<std::flush, (*it)->getState())
+        <<"\\n"<<std::flush;
+    else
+      out<<"  STATE: INACTIVE\\n"<<std::flush;
 #ifdef EUROPA_HAVE_EFFECT
     out<<"type: ";
     if( is_action(*it) )
