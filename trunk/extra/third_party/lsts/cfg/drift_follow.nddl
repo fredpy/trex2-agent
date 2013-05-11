@@ -1,7 +1,6 @@
 #include "TREX.nddl"
 #include "path.nddl"
 #include "navigator.nddl"
-#include "lagrangian.nddl"
 #include "drifter.nddl"
 
 // The nine equi-distant points in a square of 1x1
@@ -32,13 +31,12 @@ PathList upper_line = new PathList(upper_right, upper_left, nilPath);
 PathList square = new PathList(upper_left, lower_left, 
 			       lower_right, upper_line);
 
+PathList go_to = new PathList(center, nilPath);
 
 /*
  * TREX timelines
  */
 Navigator navigator = new Navigator(External, false);
-
-LagrangianSpace lagrange = new LagrangianSpace();
 
 VerticalControl vc = new VerticalControl(Internal);
 DrifterFollow drifter = new DrifterFollow(Internal);
