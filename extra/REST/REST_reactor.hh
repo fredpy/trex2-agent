@@ -78,6 +78,8 @@ namespace TREX {
         return tick_info(getFinalTick());
       }
             
+      boost::property_tree::ptree trex_version(req_info const &req) const;
+
       boost::property_tree::ptree timelines(req_info const &req);
       boost::property_tree::ptree timeline(req_info const &req);
       

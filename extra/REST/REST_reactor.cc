@@ -34,6 +34,7 @@
 #include "REST_reactor.hh"
 #include "REST_service.hh"
 
+#include <trex/utils/TREXversion.hh>
 #include <trex/utils/XmlUtils.hh>
 #include <trex/utils/ptree_io.hh>
 #include <trex/utils/chrono_helper.hh>
@@ -124,6 +125,9 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     
     graph::timelines_listener::initialize();
     m_server->addResource(&m_services, "/rest");
+    m_services.add_handler("version",
+                           boost::bind(&REST_reactor::trex_version, this, _1),
+                           "Give information on trex version");
     m_services.add_handler("tick",
                            boost::bind(&REST_reactor::get_tick, this, _1),
                            "Give tick information.\n"
@@ -360,6 +364,24 @@ bp::ptree REST_reactor::manage_goal(req_info const &req) {
     throw ReactorException(*this, "http method \""+kind+"\" is not supported by "
                            +req.request().path()+req.request().pathInfo());
 
+}
+
+
+bp::ptree REST_reactor::trex_version(req_info const &req) const {
+  bp::ptree ret;
+  ret.put("version_major", TREX::version::major());
+  ret.put("version_minor", TREX::version::minor());
+  ret.put("version_release", TREX::version::release());
+  if( TREX::version::is_release_candidate() ) {
+    ret.put("version_rc", TREX::version::rc_number());
+  }
+  if( TREX::version::svn_info() ) {
+    ret.put("svn_root", TREX::version::svn_root());
+    ret.put("svn_rev", TREX::version::svn_revision());
+  }
+  ret.put("version_str", TREX::version::full_str());
+  
+  return ret;
 }
 
 
