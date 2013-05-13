@@ -761,7 +761,7 @@ void Agent::initComplete() {
   if( m_finalTick>clock_max )
     m_finalTick = clock_max;
   
-  syslog(null, log::info)<<"Final tick: "<<date_str(m_finalTick)
+  syslog(null, TREX::utils::log::info)<<"Final tick: "<<date_str(m_finalTick)
     <<" ("<<m_finalTick<<").";
   syslog(null, "START")<<"\t=========================================================";
   updateTick(m_clock->tick());

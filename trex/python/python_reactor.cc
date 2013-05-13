@@ -51,7 +51,7 @@ void TREX::python::log_error(bp::error_already_set const &e) {
   PyErr_Fetch(&py_type, &py_val, &py_trace);
   
   std::string msg = bp::extract<std::string>(py_val);
-  s_log->syslog("<python>", log::error)<<msg;
+  s_log->syslog("<python>", TREX::utils::log::error)<<msg;
   //Set back error info, display and rethrow
   PyErr_Restore(py_type, py_val, py_trace);
   PyErr_Print();
@@ -220,21 +220,21 @@ producer::result_type producer::produce(producer::argument_type arg) const {
   bp::object my_class = bp::eval(bp::str(class_name));
     
   if( my_class.is_none() ) {
-    s_log->syslog("python", log::error)<<"Python class \""<<class_name<<"\" not found";
+    s_log->syslog("python", TREX::utils::log::error)<<"Python class \""<<class_name<<"\" not found";
     throw XmlError(node, "Python class \""+class_name+"\" not found");
   }
   
   try {
     bp::object obj = my_class(arg);
-    s_log->syslog("python", log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
+    s_log->syslog("python", TREX::utils::log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
     boost::shared_ptr<TeleoReactor> r = bp::extract< boost::shared_ptr<TeleoReactor> >(obj);
-    s_log->syslog("python", log::info)<<"Object is the reactor "<<r->getName();
+    s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->getName();
       return r;
   } catch(bp::error_already_set const &e) {
     log_error(e);
     throw;
   } catch(...) {
-    s_log->syslog("python", log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
+    s_log->syslog("python", TREX::utils::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
     throw;
   }
 }
