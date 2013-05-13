@@ -33,6 +33,9 @@
  */
 #include "ptree_io.hh"
 
+// Need to indicate to spirit to be thread safe
+# define BOOST_SPIRIT_THREADSAFE
+
 # include <boost/property_tree/json_parser.hpp>
 # include <boost/property_tree/xml_parser.hpp>
 

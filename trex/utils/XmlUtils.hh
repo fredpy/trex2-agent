@@ -46,6 +46,8 @@
 
 # include <boost/shared_ptr.hpp>
 # include <boost/property_tree/ptree.hpp>
+// Need to indicate to spirit to be thread safe
+# define BOOST_SPIRIT_THREADSAFE
 # include <boost/property_tree/xml_parser.hpp>
 
 # include "StringExtract.hh"

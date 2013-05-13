@@ -38,6 +38,9 @@
 #include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
+
+// Need to indicate to spirit to be thread safe
+#define BOOST_SPIRIT_THREADSAFE
 #include <boost/property_tree/json_parser.hpp>
 
 
