@@ -47,6 +47,7 @@ namespace {
 
 namespace TREX {
   void initPlugin() {
-    ::s_log->syslog("plugin.REST", log::info)<<"REST plugin loaded."<<std::endl;
+    ::s_log->syslog("plugin.REST", 
+		    TREX::utils::log::info)<<"REST plugin loaded."<<std::endl;
   }
 }

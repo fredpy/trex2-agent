@@ -101,14 +101,14 @@ void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> c
 
       boost::tie(pos, inserted) = m_goals.insert(goal_map::value_type(*id, g));
       if( !inserted ) {
-        syslog(log::warn)<<"New goal hiding previous goal with id \""
+        syslog(TREX::utils::log::warn)<<"New goal hiding previous goal with id \""
             <<*id<<'\"';
         m_goals.erase(pos);
         m_goals.insert(goal_map::value_type(*id, g));
       }
     }
   }
-  syslog(log::info)<<"Goal ["<<g<<"] added to pending queue :\n\t"<<*g;
+  syslog(TREX::utils::log::info)<<"Goal ["<<g<<"] added to pending queue :\n\t"<<*g;
 }
 
 void ControlInterface::add_recall(std::string const &id) {
@@ -120,7 +120,7 @@ void ControlInterface::add_recall(std::string const &id) {
     if( 0==m_pending_goals.erase(g) )
       m_pending_recalls.insert(g);
   } else
-    syslog(log::warn)<<"No goal to recall with id \""<<id<<'\"';
+    syslog(TREX::utils::log::warn)<<"No goal to recall with id \""<<id<<'\"';
 }
 
 bool ControlInterface::next(std::set<goal_id> &l, goal_id &g) {
@@ -162,22 +162,22 @@ void ControlInterface::create_fifo() {
 
   if( 0==fid ) {
     std::string queue_name = fifo_name();
-    syslog(log::info)<<"Creating fifo pipe \""<<queue_name<<"\" ...";
+    syslog(TREX::utils::log::info)<<"Creating fifo pipe \""<<queue_name<<"\" ...";
     int ret = mkfifo(queue_name.c_str(), S_IWUSR|S_IWGRP|S_IRUSR|S_IRGRP);
 
     if( 0!=ret ) {
       if( EEXIST==errno ) {
-        syslog(log::warn)<<"A file with this name did already exist !!!"
+        syslog(TREX::utils::log::warn)<<"A file with this name did already exist !!!"
             <<"\n\tI'll assume it is a unix pipe.";
       } else {
-        syslog(log::error)<<"Failed to create fifo";
+        syslog(TREX::utils::log::error)<<"Failed to create fifo";
         throw TREX::utils::ErrnoExcept("mkfifo("+queue_name+")");
       }
     }
-    syslog(log::info)<<"Opening the pipe...";
+    syslog(TREX::utils::log::info)<<"Opening the pipe...";
     fid = open(queue_name.c_str(), O_RDONLY|O_NONBLOCK);
     if( fid<0 ) {
-      syslog(log::error)<<"Failed to open fifo";
+      syslog(TREX::utils::log::error)<<"Failed to open fifo";
       throw TREX::utils::ErrnoExcept("open("+queue_name+")");
     } else { // critical section
       scoped_lock cs(m_mutex);
@@ -197,7 +197,7 @@ void ControlInterface::destroy_fifo() {
   }
 
   if( 0<fid ) {
-    syslog(log::null, log::info)<<"Destroying the fifo "<<fifo_name();
+    syslog(TREX::utils::log::null, TREX::utils::log::info)<<"Destroying the fifo "<<fifo_name();
     close(fid);
     // remove the queue from the file system
     bfs::path fpath(fifo_name());
@@ -240,14 +240,14 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
 void ControlInterface::proccess_message(std::string const &msg) {  
   // First log the message
   std::string msg_id = log_message(msg);
-  syslog(log::info)<<"Received message "<<msg_id;
+  syslog(TREX::utils::log::info)<<"Received message "<<msg_id;
 
   boost::property_tree::ptree xml_tree;
   try {
     std::istringstream is(msg);
     read_xml(is, xml_tree, xml::no_comments|xml::trim_whitespace);
   } catch(xml::xml_parser_error const &e) {
-    syslog(log::warn)<<"Xml error while parsing "<<msg_id<<":\n\t"
+    syslog(TREX::utils::log::warn)<<"Xml error while parsing "<<msg_id<<":\n\t"
         <<e.what();
     return;
   }
@@ -263,7 +263,7 @@ void ControlInterface::proccess_message(std::string const &msg) {
       add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
-      syslog(log::warn)<<"Exception while building new goal: "<<e;
+      syslog(TREX::utils::log::warn)<<"Exception while building new goal: "<<e;
     }
   }
 
@@ -273,11 +273,11 @@ void ControlInterface::proccess_message(std::string const &msg) {
       add_recall(TREX::utils::parse_attr<std::string>(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
-      syslog(log::warn)<<"Exception while building recall: "<<e;
+      syslog(TREX::utils::log::warn)<<"Exception while building recall: "<<e;
     }
   }
   if( !had_cmd )
-    syslog(log::warn)<<"No valid Goal or Recall found.";
+    syslog(TREX::utils::log::warn)<<"No valid Goal or Recall found.";
 }
 
 void ControlInterface::stop() {
@@ -311,9 +311,9 @@ void ControlInterface::handleTickStart() {
       use(g->object(), true, true);
     if( isExternal(g->object()) ) {
       if( !postGoal(g) )
-	syslog(log::warn)<<"["<<g<<"] was already posted ... ?";
+	syslog(TREX::utils::log::warn)<<"["<<g<<"] was already posted ... ?";
     } else
-      syslog(log::warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
+      syslog(TREX::utils::log::warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
   }
 }
 
@@ -358,18 +358,18 @@ void ControlInterface::run() {
 
       // check if any data received
       if( !msg.empty() ) {
-        syslog(log::info)<<"Received "<<msg.size()<<" bytes.";
+        syslog(TREX::utils::log::info)<<"Received "<<msg.size()<<" bytes.";
         proccess_message(msg);
       }
       // sleep a little
       boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
   } catch(TREX::utils::Exception const &te) {
-    syslog(log::error)<<"In fifo listener thread: "<<te;
+    syslog(TREX::utils::log::error)<<"In fifo listener thread: "<<te;
   } catch(std::exception const &se) {
-    syslog(log::error)<<"In fifo listener thread: "<<se.what();
+    syslog(TREX::utils::log::error)<<"In fifo listener thread: "<<se.what();
   } catch(...) {
-    syslog(log::error)<<"In fifo listener thread: Unknown exception caught";
+    syslog(TREX::utils::log::error)<<"In fifo listener thread: Unknown exception caught";
   }
   { // critical section : ensure that running is false
     scoped_lock cs(m_mutex);
