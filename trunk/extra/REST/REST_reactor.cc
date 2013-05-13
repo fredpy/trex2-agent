@@ -65,7 +65,8 @@ namespace {
       tl.put("href", req.request().path()+"/timeline/"+i->str());
       tls.push_back(bp::ptree::value_type("", tl));
     }
-    ret.add_child("timelines", tls);
+    if( !tls.empty() )
+      ret.add_child("timelines", tls);
     return ret;
   }
 
@@ -286,8 +287,9 @@ bp::ptree REST_reactor::goals(req_info const &req) {
   bp::ptree ret,
     tmp = strand_run<bp::ptree>(boost::bind(&REST_reactor::list_goals,
                                             this, boost::ref(req)));
-  
-  ret.add_child("goals", tmp);
+  // Do not add elements that are empty
+  if( !tmp.empty() )
+    ret.add_child("goals", tmp);
   return ret;
 }
 
