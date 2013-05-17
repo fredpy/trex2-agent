@@ -20,6 +20,7 @@ namespace
 
 YesMan::YesMan(TeleoReactor::xml_arg_type arg)
 	:TeleoReactor(arg){
+	  postObservation(Observation(SPOT_SIM_TL, "None"));
 }
 
 YesMan::~YesMan() { }
