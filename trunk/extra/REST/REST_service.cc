@@ -36,47 +36,16 @@
 #include <Wt/WServer>
 
 #include <trex/utils/ptree_io.hh>
-#include <boost/iostreams/stream.hpp>
 
 
 using namespace TREX::REST;
 namespace bpt=boost::property_tree;
 namespace wht=Wt::Http;
 
+using TREX::REST::helpers::json_stream;
+
 namespace {
 
-  class unprotect_slash {
-  public:
-    typedef char char_type;
-    typedef boost::iostreams::sink_tag category;
-
-    explicit unprotect_slash(std::ostream &dest):m_dest(dest), m_protect(false) {}
-    unprotect_slash(unprotect_slash const &other):m_dest(other.m_dest), m_protect(other.m_protect) {}
-    ~unprotect_slash() {}
-
-    std::streamsize write(char_type const *s, std::streamsize n) {
-      int i=0;
-      for(char_type const *p=s; i<n; ++i, ++p) {
-        if( m_protect ) {
-          m_protect=false;
-          if( '/'!=*p )
-            m_dest.put('\\');
-        } else if( '\\'==*p ) {
-          m_protect = true;
-          continue;
-        }
-        m_dest.put(*p);
-      }
-      return n;
-    }
-  private:
-    std::ostream &m_dest;
-    bool m_protect;
-  };
-
-  typedef boost::iostreams::stream<unprotect_slash> json_stream;
-
-  
   rest_request::path_type cleanup(std::string p) {
     rest_request::path_type me(p, '/'), ret('/');
     
