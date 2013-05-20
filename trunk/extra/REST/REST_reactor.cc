@@ -32,7 +32,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "REST_reactor.hh"
-#include "REST_service.hh"
 
 #include <trex/utils/TREXversion.hh>
 #include <trex/utils/XmlUtils.hh>
@@ -56,13 +55,16 @@ namespace alg=boost::algorithm;
 namespace {
   
   template<class Set>
-  bp::ptree list_timelines(Set const &l, req_info const &req) {
+  bp::ptree list_timelines(Set const &l, rest_request::path_type const &pfx) {
     bp::ptree ret, tls;
+    rest_request::path_type uri(pfx);
+    uri /= "timeline";
     
     for(typename Set::const_iterator i=l.begin(); l.end()!=i; ++i) {
       bp::ptree tl;
+            
       tl.put("name", *i);
-      tl.put("href", req.request().path()+"/timeline/"+i->str());
+      tl.put("href", (uri / rest_request::path_type(i->str())).dump());
       tls.push_back(bp::ptree::value_type("", tl));
     }
     if( !tls.empty() )
@@ -125,47 +127,54 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     delete [] argv;
     
     graph::timelines_listener::initialize();
-    m_server->addResource(&m_services, "/rest");
-    m_services.add_handler("version",
-                           boost::bind(&REST_reactor::trex_version, this, _1),
-                           "Give information on trex version");
-    m_services.add_handler("tick",
-                           boost::bind(&REST_reactor::get_tick, this, _1),
-                           "Give tick information.\n"
-                           "If no argument, gives the current tick.\n"
-                           "Example: /rest/tick/1");
-    m_services.add_handler("tick/next",
-                           boost::bind(&REST_reactor::next_tick, this, _1),
-                           "Give next tick information");
-    m_services.add_handler("tick/initial",
-                           boost::bind(&REST_reactor::initial_tick, this, _1),
-                           "Give initial tick when trex got started.");
-    m_services.add_handler("tick/final",
-                           boost::bind(&REST_reactor::final_tick, this, _1),
-                           "Give final tick when trex will exit.");
-    m_services.add_handler("tick/at",
-                           boost::bind(&REST_reactor::tick_at, this, _1),
-                           "Give the largest tick before the given date.\n"
-                           "Example: /tick/at/2013-May-03%2021:17:21");
-    m_services.add_handler("tick/rate",
-                           boost::bind(&REST_reactor::tick_period, this, _1),
-                           "Give the duration between two ticks");
-    m_services.add_handler("timelines",
-                           boost::bind(&REST_reactor::timelines, this, _1),
-                           "List all the timelines");
-    m_services.add_handler("timeline",
-                           boost::bind(&REST_reactor::timeline, this, _1),
-                           "Access information ot a specific timeline.\n"
-                           "Example: /rest/timeline/foo");
-    m_services.add_handler("goal",
-                           boost::bind(&REST_reactor::manage_goal, this, _1),
-                           "POST: post the attached goal to trex.\n"
-                           "DELETE: request the concelation of the given goal.\n"
-                           "GET: get a description of an exisiting goal.\n");
-    m_services.add_handler("goals",
-                           boost::bind(&REST_reactor::goals, this, _1),
-                           "List all the goals");
+    m_services.reset(new service_tree(*m_server, "/rest"));
+    // TREX general information
+    m_services->add_handler("version",
+                            new json_direct(boost::bind(&REST_reactor::trex_version, this, _1),
+                                            "Give current trex version"));
     
+    // Tick related info
+    m_services->add_handler("tick",
+                            new json_direct(boost::bind(&REST_reactor::get_tick, this, _1),
+                                            "Give tick information.\n"
+                                            "If no argument, gives the current tick.\n"
+                                            "Example: /rest/tick/1"));
+    m_services->add_handler("tick/next",
+                            new json_direct(boost::bind(&REST_reactor::next_tick, this, _1),
+                                            "Give next tick information"));
+    m_services->add_handler("tick/initial",
+                            new json_direct(boost::bind(&REST_reactor::initial_tick, this, _1),
+                                            "Give initial tick information (ie the tick when trex got started)"));
+    m_services->add_handler("tick/final",
+                            new json_direct(boost::bind(&REST_reactor::final_tick, this, _1),
+                                            "Give final tick information (ie the tick when trex will exit)"));
+    m_services->add_handler("tick/at",
+                            new json_direct(boost::bind(&REST_reactor::tick_at, this, _1),
+                                            "Give the largest tick before the given date.\n"
+                                            "Example: /tick/at/2013-May-03%2021:17:21"));
+    
+    m_services->add_handler("tick/rate",
+                            new json_direct(boost::bind(&REST_reactor::tick_period, this, _1),
+                                            "Give the duration between two ticks"));
+    // Timeline related stuff
+    m_services->add_handler("timelines",
+                            new json_direct(boost::bind(&REST_reactor::timelines, this, _1),
+                                            "List all the timelines"));
+    m_services->add_handler("timeline",
+                            new json_direct(boost::bind(&REST_reactor::timeline, this, _1),
+                                            "Access information ot a specific timeline.\n"
+                                            "Example: /rest/timeline/foo"));
+    
+    // Goal management
+    m_services->add_handler("goals",
+                            new json_direct(boost::bind(&REST_reactor::goals, this, _1),
+                                            "List all the goals currently received"));
+    m_services->add_handler("goal",
+                            new json_direct(boost::bind(&REST_reactor::manage_goal, this, _1),
+                                            "POST: post the attached goal to trex.\n"
+                                            "DELETE: request the concelation of the given goal.\n"
+                                            "GET: get a description of an existing goal."));
+ 
     if( !m_server->start() )
       throw ReactorException(*this, "Unable to start the server");
 
@@ -187,6 +196,7 @@ void REST_reactor::handleInit() {
 }
 
 void REST_reactor::handleTickStart() {
+  m_tick_signal(getCurrentTick());
 }
 
 void REST_reactor::notify(Observation const &obs) {
@@ -214,7 +224,6 @@ size_t REST_reactor::get_id() {
 
 // timelines events
 void REST_reactor::declared(details::timeline const &tl) {
-  syslog()<<"New timeline "<<tl.name();
   m_strand->post(boost::bind(&REST_reactor::add_tl, this, tl.name()));
 }
 
@@ -222,24 +231,28 @@ void REST_reactor::undeclared(details::timeline const &tl) {
   m_strand->post(boost::bind(&REST_reactor::remove_tl, this, tl.name()));
 }
 
-bp::ptree REST_reactor::timelines(req_info const &req) {
+bp::ptree REST_reactor::timelines(rest_request const &req) {
   return strand_run<bp::ptree>(boost::bind(&list_timelines<tl_set>,
                                            boost::ref(m_timelines),
-                                           req));
+                                           m_services->base()));
 }
 
-bp::ptree REST_reactor::timeline(req_info const &req) {
-  if( req.arg_list().empty() )
-    throw ReactorException(*this, "Missing timeline argument to "
-                           +req.request().path()+req.request().pathInfo());
+bp::ptree REST_reactor::timeline(rest_request const &req) {
+  if( req.arg_path().empty() )
+    throw ReactorException(*this, "Missing timeline argument to "+req.request().path());
+  
   return strand_run<bp::ptree>(boost::bind(&REST_reactor::get_timeline,
-                                           this, req.arg_list().front()));
+                                           this, req.arg_path().dump()));
 }
 
-bp::ptree REST_reactor::export_goal(goal_id g, req_info const &req) const {
+bp::ptree REST_reactor::export_goal(goal_id g) const {
   bp::ptree ret;
+  rest_request::path_type uri = m_services->base();
+  uri /= "goal";
   ret.put("id", g);
-  ret.put("href", req.request().path()+"/goal/"+ret.get<std::string>("id"));
+  uri /= ret.get<std::string>("id");
+  
+   ret.put("href", uri.dump());
   ret.push_back(getGraph().export_goal(g).front());
   return ret;
 }
@@ -274,16 +287,16 @@ bool REST_reactor::remove_goal(std::string const &id) {
 
 
 
-bp::ptree REST_reactor::list_goals(req_info const &req) const {
+bp::ptree REST_reactor::list_goals(rest_request const &req) const {
   bp::ptree ret;
   for(goal_map::const_iterator i=m_goals.begin();
       m_goals.end()!=i; ++i) {
-    ret.push_back(bp::ptree::value_type("", export_goal(i->second, req)));
+    ret.push_back(bp::ptree::value_type("", export_goal(i->second)));
   }
   return ret;
 }
 
-bp::ptree REST_reactor::goals(req_info const &req) {
+bp::ptree REST_reactor::goals(rest_request const &req) {
   bp::ptree ret,
     tmp = strand_run<bp::ptree>(boost::bind(&REST_reactor::list_goals,
                                             this, boost::ref(req)));
@@ -294,7 +307,7 @@ bp::ptree REST_reactor::goals(req_info const &req) {
 }
 
 
-bp::ptree REST_reactor::manage_goal(req_info const &req) {
+bp::ptree REST_reactor::manage_goal(rest_request const &req) {
   Wt::Http::Request const &rq = req.request();
   std::string kind = rq.method();
   bp::ptree ret;
@@ -319,7 +332,7 @@ bp::ptree REST_reactor::manage_goal(req_info const &req) {
       utils::read_json(in, data);
     } catch(std::exception const &e) {
       syslog(utils::log::warn)<<"Failed to parse "<<f_name<<" as json:\n\t"
-        <<e.what();
+      <<e.what();
       throw ReactorException(*this, std::string("Failed to parse data as json: ")+e.what());
     } catch(...) {
       syslog(utils::log::warn)<<"Failed to parse "<<f_name<<" as json: unknown exception";
@@ -339,37 +352,29 @@ bp::ptree REST_reactor::manage_goal(req_info const &req) {
     
     strand_run<void>(boost::bind(&REST_reactor::add_goal, this, g));
     
-    return export_goal(g, req);
-  } else if( kind=="DELETE" ) {
-    if( req.arg_list().empty() )
-      throw ReactorException(*this, "Missing goal id argument to "
-                             +req.request().path()+req.request().pathInfo());
-
-    bool recalled = strand_run<bool>(boost::bind(&REST_reactor::remove_goal,
-                                                 this, req.arg_list().front()));
-    ret.put("id", req.arg_list().front());
-    ret.put("deleted", recalled);
-                                                 
-    return ret;
-  } else if( kind=="GET" ) {
-    if( req.arg_list().empty() )
-      throw ReactorException(*this, "Missing goal id argument to "
-                             +req.request().path()+req.request().pathInfo());
-    goal_id g = strand_run<goal_id>(boost::bind(&REST_reactor::get_goal, this,
-                                                req.arg_list().front()));
-    if( !g )
-      throw ReactorException(*this,
-                             "No goal associated to "+req.arg_list().front());
+    return export_goal(g);
+  } else {
+    if( req.arg_path().empty() )
+      throw ReactorException(*this, "Missing goal id on "+kind+" "+req.request().path()+" request");
+    std::string id = req.arg_path().dump();
     
-    return export_goal(g, req);
-  } else 
-    throw ReactorException(*this, "http method \""+kind+"\" is not supported by "
-                           +req.request().path()+req.request().pathInfo());
-
+    if( "DELETE"==kind ) {
+      bool recalled = strand_run<bool>(boost::bind(&REST_reactor::remove_goal, this, id));
+      ret.put("id", id);
+      ret.put("deleted", recalled);
+      return ret;
+    } else if( "GET"==kind ) {
+      goal_id g = strand_run<goal_id>(boost::bind(&REST_reactor::get_goal, this, id));
+      if( !g )
+        throw ReactorException(*this, "No goal associated to id \""+id+"\"");
+      return export_goal(g);
+    } else
+      throw ReactorException(*this, "Service "+req.request().path()+" do not implement "+kind);
+  }
 }
 
 
-bp::ptree REST_reactor::trex_version(req_info const &req) const {
+bp::ptree REST_reactor::trex_version(rest_request const &req) const {
   bp::ptree ret;
   ret.put("version_major", TREX::version::major());
   ret.put("version_minor", TREX::version::minor());
@@ -406,37 +411,36 @@ bp::ptree REST_reactor::tick_info(TICK date) const {
   return ret;
 }
 
-bp::ptree REST_reactor::get_tick(req_info const &req) const {
+bp::ptree REST_reactor::get_tick(rest_request const &req) const {
   TICK date;
   
-  if( req.arg_list().empty() )
+  if( req.arg_path().empty() )
     date = getCurrentTick();
   else {
+    std::string arg = req.arg_path().dump();
     try {
-      date = TREX::utils::string_cast<TICK>(req.arg_list().front());
+      date = TREX::utils::string_cast<TICK>(arg);
     } catch(...) {
-      throw ReactorException(*this, "Invalid tick request "+req.request().path()+
-                             req.request().pathInfo());
+      throw ReactorException(*this, "REST argument \""+arg+"\" is not a valid tick.");
     }
   }
   return tick_info(date);
 }
 
-bp::ptree REST_reactor::tick_at(req_info const &req) const {
-  if( req.arg_list().empty() )
-    throw ReactorException(*this, "Missing date argument to "+req.request().path()+req.request().pathInfo());
-  std::string date_str = Wt::Utils::urlDecode(req.arg_list().front());
-  syslog()<<"Requested to convert date \""<<date_str<<"\" into a tick";
+bp::ptree REST_reactor::tick_at(rest_request const &req) const {
+  if( req.arg_path().empty() )
+    throw ReactorException(*this, "Missing date argument to "+req.request().path());
+  std::string date_str = Wt::Utils::urlDecode(req.arg_path().dump());
+  
   try {
     date_type date = utils::string_cast<date_type>(date_str);
-    syslog()<<"Result date is "<<date<<" with zone "<<date.zone_abbrev();
     return tick_info(this->timeToTick(date));
   } catch(...) {
     throw ReactorException(*this, "Failed to parse date: "+date_str);
   }
 }
 
-bp::ptree REST_reactor::tick_period(req_info const &req) const {
+bp::ptree REST_reactor::tick_period(rest_request const &req) const {
   duration_type rate = this->tickDuration();
   CHRONO::nanoseconds
     ns = CHRONO::duration_cast<CHRONO::nanoseconds>(rate);

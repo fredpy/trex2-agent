@@ -40,10 +40,12 @@
 # include <Wt/WServer>
 
 # include <boost/thread.hpp>
+# include <boost/signals2/signal.hpp>
 
 
 namespace TREX {
   namespace REST {
+        
     
     class REST_reactor: public TREX::transaction::TeleoReactor,
     public TREX::transaction::graph::timelines_listener {
@@ -52,6 +54,8 @@ namespace TREX {
       ~REST_reactor();
       
     private:
+      
+      
       //reactor handlers
       void handleInit();
       void handleTickStart();
@@ -65,29 +69,29 @@ namespace TREX {
       void undeclared(transaction::details::timeline const &timeline);
       
       boost::property_tree::ptree tick_info(transaction::TICK date) const;
-      boost::property_tree::ptree tick_period(req_info const &req) const;
-      boost::property_tree::ptree get_tick(req_info const &req) const;
-      boost::property_tree::ptree tick_at(req_info const &req) const;
-      boost::property_tree::ptree next_tick(req_info const &) const {
+      boost::property_tree::ptree tick_period(rest_request const &req) const;
+      boost::property_tree::ptree get_tick(rest_request const &req) const;
+      boost::property_tree::ptree tick_at(rest_request const &req) const;
+      boost::property_tree::ptree next_tick(rest_request const &) const {
         return tick_info(getCurrentTick()+1);
       }
-      boost::property_tree::ptree initial_tick(req_info const &) const {
+      boost::property_tree::ptree initial_tick(rest_request const &) const {
         return tick_info(getInitialTick());
       }
-      boost::property_tree::ptree final_tick(req_info const &) const {
+      boost::property_tree::ptree final_tick(rest_request const &) const {
         return tick_info(getFinalTick());
       }
-            
-      boost::property_tree::ptree trex_version(req_info const &req) const;
+      boost::property_tree::ptree wait_tick(rest_request &req);
+      
+      boost::property_tree::ptree trex_version(rest_request const &req) const;
 
-      boost::property_tree::ptree timelines(req_info const &req);
-      boost::property_tree::ptree timeline(req_info const &req);
+      boost::property_tree::ptree timelines(rest_request const &req);
+      boost::property_tree::ptree timeline(rest_request const &req);
       
-      boost::property_tree::ptree export_goal(transaction::goal_id g,
-                                              req_info const &req) const;
+      boost::property_tree::ptree export_goal(transaction::goal_id g) const;
       
-      boost::property_tree::ptree goals(req_info const &req);
-      boost::property_tree::ptree manage_goal(req_info const &req);
+      boost::property_tree::ptree goals(rest_request const &req);
+      boost::property_tree::ptree manage_goal(rest_request const &req);
 
       boost::property_tree::ptree get_timeline(std::string name);
       
@@ -95,7 +99,7 @@ namespace TREX {
       transaction::goal_id get_goal(std::string const &id) const;
       bool remove_goal(std::string const &id);
       
-      boost::property_tree::ptree list_goals(req_info const &req) const;
+      boost::property_tree::ptree list_goals(rest_request const &req) const;
       
       void add_tl(utils::Symbol const &tl);
       void remove_tl(utils::Symbol const &tl);
@@ -114,10 +118,10 @@ namespace TREX {
       
       size_t get_id();
       
-      REST_service m_services;
-  
+      boost::signals2::signal<void (transaction::TICK)> m_tick_signal;
       
       UNIQ_PTR<Wt::WServer>           m_server;
+      UNIQ_PTR<service_tree>          m_services;
 
       UNIQ_PTR<boost::asio::strand>   m_strand;
       

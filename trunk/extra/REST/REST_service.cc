@@ -33,77 +33,27 @@
  */
 #include "REST_service.hh"
 
+#include <Wt/WServer>
+
 #include <trex/utils/ptree_io.hh>
 #include <boost/iostreams/stream.hpp>
 
 
 using namespace TREX::REST;
-using namespace TREX::REST::bits;
 namespace bpt=boost::property_tree;
 namespace wht=Wt::Http;
 
-
-
 namespace {
-  
-  template<class Path>
-  std::list<typename Path::key_type> to_list(Path p) {
-    std::list<typename Path::key_type> ret;
-    while( !p.empty() ) {
-      typename Path::key_type key = p.reduce();
-      if( !key.empty() )
-        ret.push_back(key);
-    }
-    return ret;
-  }
 
-  template<class List>
-  typename List::value_type collapse(List const &l,
-                                     typename List::value_type const &sep) {
-    typename List::value_type ret;
-    for(typename List::const_iterator i=l.begin(); l.end()!=i; ++i) {
-      ret += sep + *i;
-    }
-    return ret;
-  }
-  
-  
-  template<class Tree, typename Pred, class Path>
-  Tree const &walk_path(Tree const &t, Path &path,
-                        Pred fn, Path &traversed) {
-    if( path.empty() )
-      return t;
-    else {
-      typename Path::value_type next=path.front();
-      typename Tree::const_assoc_iterator pos = t.find(next);
-      
-      if( t.not_found()==pos ) {
-        return t;
-      } else {
-        path.pop_front();
-        traversed.push_back(next);
-        Tree const &ret = walk_path(pos->second, path, fn, traversed);
-        if( fn(ret.data()) )
-          return ret;
-        else {
-          traversed.pop_back();
-          path.push_front(next);
-          return t;
-        }
-      }
-    }
-  }
-  
-  
   class unprotect_slash {
   public:
     typedef char char_type;
     typedef boost::iostreams::sink_tag category;
-    
+
     explicit unprotect_slash(std::ostream &dest):m_dest(dest), m_protect(false) {}
     unprotect_slash(unprotect_slash const &other):m_dest(other.m_dest), m_protect(other.m_protect) {}
     ~unprotect_slash() {}
-    
+
     std::streamsize write(char_type const *s, std::streamsize n) {
       int i=0;
       for(char_type const *p=s; i<n; ++i, ++p) {
@@ -123,148 +73,176 @@ namespace {
     std::ostream &m_dest;
     bool m_protect;
   };
-  
+
   typedef boost::iostreams::stream<unprotect_slash> json_stream;
 
+  
+  rest_request::path_type cleanup(std::string p) {
+    rest_request::path_type me(p, '/'), ret('/');
+    
+    while( !me.empty() ) {
+      std::string cur = me.reduce();
+      if( !cur.empty() )
+        ret /= cur;
+    }
+    return ret;
+  }
 }
 
 /*
- * TREX::REST::REST_service
+ * class TREX::REST::rest_request
  */
 
-// structors
-
-REST_service::REST_service() {
-  add_handler("help", boost::bind(&REST_service::print_help, this, _1),
-              "List REST commands availables.\n"
-              "Argument restrict the help to command matching given path."); 
+rest_request::rest_request(wht::Request const &r)
+:m_req(r), m_arg_path(cleanup(r.pathInfo())) {
 }
 
-// modifiers
+/*
+ * class TREX::REST::rest_service
+ */
 
-bool REST_service::add_handler_impl(REST_service::path_type const &p,
-                                    handler_wrap const &cb) {
-  boost::optional<cb_map &> pos = m_handlers.get_child_optional(p);
-  
-  if( pos ) {
-    if( pos->data().active() )
-      return false; // Already handled : need to remove it first
-    else
-      pos->data() = cb;
-  } else
-    m_handlers.put_child(p, cb_map(cb));
-  return true;
-}
-
-bool REST_service::remove_handlers_impl(REST_service::path_type &p,
-                                        REST_service::cb_map &m,
-                                        bool childs) {
-  if( p.empty() ) {
-    m.data().clear();
-    return childs || m.empty();
-  } else {
-    path_type::key_type key = p.reduce();
-    cb_map::assoc_iterator pos = m.find(key);
-    
-    if( m.not_found()==pos )
-      return false;
-    else {
-      if( remove_handlers_impl(p, pos->second, childs) ) {
-        m.erase(m.to_iterator(pos));
-        return m.empty() && !m.data().callback;
-      } else
-        return false;
-    }
-  }
-}
-
-
-// observers
-
-bool REST_service::has_handler(std::string const &path) const {
-  path_type p(path, '/');
-  boost::optional<cb_map const &> ret = m_handlers.get_child_optional(p);
-  
-  return ret && ret->data().callback;
-}
-
-REST_service::fn_output &REST_service::build_help(REST_service::fn_output &ret,
-                                                  REST_service::cb_map const &t,
-                                                  std::list<std::string> &p) const {
-  if( t.data().callback ) {
-    bpt::ptree info;
-    info.put("href", collapse(p, "/"));
-    info.put("info", t.data().help);
-    ret.push_back(bpt::ptree::value_type("", info));
-  }
-  
-  for(cb_map::const_iterator i=t.begin(); t.end()!=i; ++i) {
-    p.push_back(i->first);
-    build_help(ret, i->second, p);
-    p.pop_back();
-  }
-  
-    
-  return ret;
-}
-
-
-// callbacks
-
-void REST_service::handleRequest(wht::Request const &req,
+void rest_service::handleRequest(wht::Request const &req,
                                  wht::Response &response) {
-  req_info tmp(req);
-  
-  cb_map const &pos = walk_path(static_cast<cb_map const &>(m_handlers),
-                                tmp.m_arg_list,
-                                boost::bind(&handler_wrap::active, _1),
-                                tmp.m_call_list);
-  tmp.m_call_path = path_type(collapse(tmp.m_call_list, "/"), '/');
-  tmp.m_arg_path = path_type(collapse(tmp.m_arg_list, "/"), '/');
-  
-  if( pos.data().active() ) {
-    try {
-      json_stream json(response.out());
-      
-      TREX::utils::write_json(json, pos.data().callback(tmp));
-      response.setMimeType("application/json");
-    } catch(std::exception const &err) {
-      response.setStatus(400);
-      response.out()<<"Error from service "<<tmp.request().path()
-      <<tmp.call_path().dump()<<":\n  "<<err.what();
-    } catch(...) {
-      response.setStatus(400);
-      response.out()<<"Unknown error from service "<<tmp.request().path()<<tmp.call_path().dump();
+  rest_request rest(req);
+  try {
+    std::ostringstream oss;
+    handleRequest(rest, oss, response);
+    if( !oss.str().empty() ) {
+      response.out()<<oss.str();
     }
-  } else {
-    response.setStatus(404);
-    response.out()<<"No service associated to \""<<req.pathInfo()<<'\"'
-      <<std::endl;
+  } catch(std::exception const &e) {
+    response.setStatus(400);
+    response.setMimeType("text/plain");
+    response.out()<<"Error from service "<<req.path()<<":\n  "<<e.what();
+  } catch(...) {
+    response.setStatus(400);
+    response.setMimeType("text/plain");
+    response.out()<<"Unknown error from service "<<req.path()<<".";
   }
 }
 
-REST_service::fn_output REST_service::print_help(req_info const &req) const {
-  path_type tmp(req.request().path(), '/');
-  
-  std::list<std::string> base(to_list(tmp)), extra(req.arg_list());
-  
-  cb_map const &pos = walk_path(m_handlers, extra,
-                                boost::bind(&handler_wrap::active, _1),
-                                base);  
-  bpt::ptree ret,help;
-  
-  ret.add_child("help", build_help(help, pos, base));
-  return ret;
-}
-
-
-
 /*
- * TREX::REST::REST_service::req_info
+ * class service_tree
  */
 
-req_info::req_info(wht::Request const &r)
-:m_req(r), m_call_path('/'), m_arg_path(r.pathInfo(), '/') {
-  m_arg_list = to_list(m_arg_path);
+
+service_tree::service_tree(Wt::WServer &serv, std::string const &base_path)
+:rest_service("List available REST commands.\n"
+              "Argument restrict the help to command matching given path."),
+ m_server(&serv), m_base(base_path, '/') {
+   m_server->addResource(this, (m_base/rest_request::path_type("help", '/')).dump());
+   m_services.add("help", service_ptr());
 }
 
+void service_tree::handleRequest(rest_request const &req,
+                                 std::ostream &data,
+                                 Wt::Http::Response &ans) {
+  bpt::ptree list, result;
+  
+  // Note no help on help in this implementation ...
+  if( req.arg_path().empty() )
+    build_help(m_services, req.arg_path(), list);
+  else
+    build_help(m_services.get_child(req.arg_path()), req.arg_path(), list);
+  
+  ans.setMimeType("application/json");
+  json_stream json(data);
+  result.add_child("help", list);
+  TREX::utils::write_json(json, result);
+}
+
+void service_tree::add_handler(rest_request::path_type const &path,
+                               service_ptr const &cmd) {
+  if( cmd ) {
+    m_services.put(path, cmd);
+    m_server->addResource(cmd.get(), (m_base/path).dump());
+  }
+}
+
+
+void service_tree::build_help(cb_map const &sub,
+                              rest_request::path_type path,
+                              bpt::ptree &out) const {  
+  if( !path.empty() && path.single() && path.dump()=="help" ) {
+    bpt::ptree info;
+    info.put("href", (m_base/path).dump());
+    info.put("info", help());
+    out.push_back(bpt::ptree::value_type("", info));
+  }
+  if( sub.data() ) {
+    bpt::ptree info;
+    info.put("href", (m_base/path).dump());
+    info.put("info", sub.data()->help());
+    out.push_back(bpt::ptree::value_type("", info));
+  } 
+  for(cb_map::const_iterator i=sub.begin(); sub.end()!=i; ++i)
+    build_help(i->second, path/rest_request::path_type(i->first, '/'), out);
+}
+
+/*
+ * class json_direct
+ */
+
+void json_direct::handleRequest(rest_request const &req,
+                                std::ostream &data,
+                                Wt::Http::Response &ans) {
+  ans.setMimeType("application/json");
+  json_stream json(data);
+  TREX::utils::write_json(json, m_handler(req));
+}
+
+
+
+//namespace {
+//
+//  template<class Path>
+//  std::list<typename Path::key_type> to_list(Path p) {
+//    std::list<typename Path::key_type> ret;
+//    while( !p.empty() ) {
+//      typename Path::key_type key = p.reduce();
+//      if( !key.empty() )
+//        ret.push_back(key);
+//    }
+//    return ret;
+//  }
+//
+//  template<class List>
+//  typename List::value_type collapse(List const &l,
+//                                     typename List::value_type const &sep) {
+//    typename List::value_type ret;
+//    for(typename List::const_iterator i=l.begin(); l.end()!=i; ++i) {
+//      ret += sep + *i;
+//    }
+//    return ret;
+//  }
+//  
+//  
+//  template<class Tree, typename Pred, class Path>
+//  Tree const &walk_path(Tree const &t, Path &path,
+//                        Pred fn, Path &traversed) {
+//    if( path.empty() )
+//      return t;
+//    else {
+//      typename Path::value_type next=path.front();
+//      typename Tree::const_assoc_iterator pos = t.find(next);
+//      
+//      if( t.not_found()==pos ) {
+//        return t;
+//      } else {
+//        path.pop_front();
+//        traversed.push_back(next);
+//        Tree const &ret = walk_path(pos->second, path, fn, traversed);
+//        if( fn(ret.data()) )
+//          return ret;
+//        else {
+//          traversed.pop_back();
+//          path.push_front(next);
+//          return t;
+//        }
+//      }
+//    }
+//  }
+//  
+//  
+//
+//}
