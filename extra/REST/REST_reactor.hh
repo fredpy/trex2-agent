@@ -45,7 +45,10 @@
 
 namespace TREX {
   namespace REST {
-        
+    
+    namespace bits {
+      class tick_wait;
+    }
     
     class REST_reactor: public TREX::transaction::TeleoReactor,
     public TREX::transaction::graph::timelines_listener {
@@ -115,10 +118,10 @@ namespace TREX {
       }
       
       
-      
       size_t get_id();
       
-      boost::signals2::signal<void (transaction::TICK)> m_tick_signal;
+      typedef boost::signals2::signal<void (transaction::TICK)> tick_event;
+      tick_event m_tick_signal;
       
       UNIQ_PTR<Wt::WServer>           m_server;
       UNIQ_PTR<service_tree>          m_services;
@@ -134,6 +137,8 @@ namespace TREX {
       goal_map m_goals;
       
       utils::SharedVar<size_t> m_file_count;
+      
+      friend class bits::tick_wait;
     };
     
     template<>

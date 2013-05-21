@@ -41,6 +41,8 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <boost/enable_shared_from_this.hpp>
+
 #include <Wt/Utils>
 
 
@@ -71,7 +73,69 @@ namespace {
       ret.add_child("timelines", tls);
     return ret;
   }
+  
 
+}
+
+#include <trex/utils/ptree_io.hh>
+
+namespace TREX {
+  namespace REST {
+    namespace bits {
+      class tick_wait :public rest_service {
+      public:
+        tick_wait(REST_reactor &r, std::string const &info)
+        :rest_service(info), m_reactor(&r) {
+          m_conn = m_reactor->m_tick_signal.connect(boost::bind(&tick_wait::new_tick, this, _1));
+        }
+        ~tick_wait() {
+          m_conn.disconnect();
+          beingDeleted();
+        }
+
+      private:
+        void new_tick(TICK cur) {
+          m_current = cur;
+          haveMoreData();
+        }
+        TICK get_tick() {
+          TREX::utils::SharedVar<TICK>::scoped_lock lck(m_current);
+          return *m_current;
+        }
+        
+        void handleRequest(rest_request const &req,
+                           std::ostream &data,
+                           Wt::Http::Response &ans) {
+          Wt::Http::ResponseContinuation *cont = req.request().continuation();
+          if( cont ) {
+            TICK date = boost::any_cast<TICK>(cont->data()), cur = get_tick();
+           if( date<=cur ) {
+              helpers::json_stream json(data);
+              ans.setMimeType("application/json");
+              TREX::utils::write_json(json, m_reactor->tick_info(cur));
+            } else {
+              cont = ans.createContinuation();
+              cont->setData(date);
+              cont->waitForMoreData();
+           }
+          } else {
+            // Initial implementation only wait for next tick
+            TICK next = get_tick()+1;
+            
+            cont = ans.createContinuation();
+            cont->setData(next);
+            cont->waitForMoreData();
+          }
+        }
+        
+        TREX::utils::SharedVar<TICK> m_current;
+        
+        REST_reactor *m_reactor;
+        boost::signals2::connection m_conn;
+      };
+
+    }
+  }
 }
 
 REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
@@ -156,6 +220,8 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     m_services->add_handler("tick/rate",
                             new json_direct(boost::bind(&REST_reactor::tick_period, this, _1),
                                             "Give the duration between two ticks"));
+    m_services->add_handler("tick/wait", new bits::tick_wait(*this, "Wait for next tick."));
+    
     // Timeline related stuff
     m_services->add_handler("timelines",
                             new json_direct(boost::bind(&REST_reactor::timelines, this, _1),
