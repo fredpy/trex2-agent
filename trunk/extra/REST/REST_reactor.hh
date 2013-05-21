@@ -41,13 +41,40 @@
 
 # include <boost/thread.hpp>
 # include <boost/signals2/signal.hpp>
+# include <boost/operators.hpp>
 
 
 namespace TREX {
   namespace REST {
     
+    class REST_reactor;
+    
     namespace bits {
       class tick_wait;
+      
+      class timeline_info
+      :boost::less_than_comparable1<timeline_info,
+      boost::less_than_comparable2<timeline_info, TREX::utils::Symbol> > {
+      public:
+        timeline_info(transaction::details::timeline const &tl, REST_reactor &r)
+        :m_timeline(tl), m_reactor(&r) {}
+        ~timeline_info() {}
+        
+        boost::property_tree::ptree basic_tree() const;
+        utils::Symbol const &name() const;
+        
+        bool alive() const;
+        bool accept_goals() const;
+        
+        bool operator< (TREX::utils::Symbol const &name) const;
+        bool operator< (timeline_info const &other) const;
+      private:
+        boost::property_tree::ptree duration_tree(transaction::TICK d) const;
+        
+        transaction::details::timeline const &m_timeline;
+        REST_reactor *m_reactor;
+      };
+      
     }
     
     class REST_reactor: public TREX::transaction::TeleoReactor,
@@ -104,7 +131,7 @@ namespace TREX {
       
       boost::property_tree::ptree list_goals(rest_request const &req) const;
       
-      void add_tl(utils::Symbol const &tl);
+      void add_tl(bits::timeline_info const &tl);
       void remove_tl(utils::Symbol const &tl);
       
       template<typename Ret>
@@ -128,7 +155,7 @@ namespace TREX {
 
       UNIQ_PTR<boost::asio::strand>   m_strand;
       
-      typedef std::set<utils::Symbol> tl_set;
+      typedef std::set<bits::timeline_info> tl_set;
       tl_set m_timelines;
       
       

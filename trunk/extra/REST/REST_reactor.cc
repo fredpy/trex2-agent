@@ -63,10 +63,8 @@ namespace {
     uri /= "timeline";
     
     for(typename Set::const_iterator i=l.begin(); l.end()!=i; ++i) {
-      bp::ptree tl;
-            
-      tl.put("name", *i);
-      tl.put("href", (uri / rest_request::path_type(i->str())).dump());
+      bp::ptree tl = i->basic_tree();
+      tl.put("href", (uri / rest_request::path_type(i->name().str())).dump());
       tls.push_back(bp::ptree::value_type("", tl));
     }
     if( !tls.empty() )
@@ -82,6 +80,7 @@ namespace {
 namespace TREX {
   namespace REST {
     namespace bits {
+      
       class tick_wait :public rest_service {
       public:
         tick_wait(REST_reactor &r, std::string const &info)
@@ -132,11 +131,11 @@ namespace TREX {
         
         REST_reactor *m_reactor;
         boost::signals2::connection m_conn;
-      };
+      }; //TREX::REST::bits::tick_wait
 
-    }
-  }
-}
+    } // TREX::REST::bits
+  } // TREX::REST
+} // TREX
 
 REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false), graph::timelines_listener(arg) {
@@ -290,7 +289,8 @@ size_t REST_reactor::get_id() {
 
 // timelines events
 void REST_reactor::declared(details::timeline const &tl) {
-  m_strand->post(boost::bind(&REST_reactor::add_tl, this, tl.name()));
+  bits::timeline_info t(tl, *this);
+  m_strand->post(boost::bind(&REST_reactor::add_tl, this, t));
 }
 
 void REST_reactor::undeclared(details::timeline const &tl) {
@@ -460,12 +460,15 @@ bp::ptree REST_reactor::trex_version(rest_request const &req) const {
 
 bp::ptree REST_reactor::get_timeline(std::string name) {
   bp::ptree ret;
-  
-  tl_set::iterator i=m_timelines.find(name);
-  
-  ret.put("warning", "unimplemented");
-  if( m_timelines.end()!=i )
-    ret.put("name", *i);
+
+  tl_set::iterator i=m_timelines.begin();
+ 
+  for(; m_timelines.end()!=i && *i<name; ++i);
+    
+  if( i!=m_timelines.end() && i->name()==name ) {
+    ret = i->basic_tree();
+    ret.put("warning", "unimplemented");
+  }
   return ret;
 }
 
@@ -518,15 +521,59 @@ bp::ptree REST_reactor::tick_period(rest_request const &req) const {
 }
 
 
-void REST_reactor::add_tl(utils::Symbol const &tl) {
+void REST_reactor::add_tl(bits::timeline_info const &tl) {
   m_timelines.insert(tl);
-  use(tl);
+  use(tl.name());
 }
 
 void REST_reactor::remove_tl(utils::Symbol const &tl) {
   unuse(tl);
-  m_timelines.erase(tl);
 }
+
+/*
+ * class TREX::REST::REST_reactor::timeline_info
+ */
+
+TREX::utils::Symbol const &bits::timeline_info::name() const {
+  return m_timeline.name();
+}
+
+bool bits::timeline_info::operator< (TREX::utils::Symbol const &n) const {
+  return name()<n;
+}
+
+bool bits::timeline_info::operator< (bits::timeline_info const &other) const {
+  return operator< (other.name());
+}
+
+bool bits::timeline_info::alive() const {
+  return m_timeline.owned();
+}
+
+bool bits::timeline_info::accept_goals() const {
+  return m_timeline.look_ahead()>0;
+}
+
+bp::ptree bits::timeline_info::duration_tree(TICK d) const {
+  bp::ptree ret;
+  ret.put("ticks", d);
+  ret.put("duration", m_reactor->duration_str(d));
+  return ret;
+}
+
+
+bp::ptree bits::timeline_info::basic_tree() const {
+  bp::ptree ret, tick_info;
+  ret.put("name", name());
+  ret.put("alive", alive());
+  ret.put("accept_goals", accept_goals());
+  // Extra info
+  ret.put_child("latency", duration_tree(m_timeline.latency()));
+  ret.put_child("look_ahead", duration_tree(m_timeline.look_ahead()));
+  ret.put("publish_plan", m_timeline.publish_plan());
+  return ret;
+}
+
 
 
 
