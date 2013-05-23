@@ -43,6 +43,10 @@
 # include <boost/signals2/signal.hpp>
 # include <boost/operators.hpp>
 
+# include <Wt/Dbo/backend/Sqlite3>
+# include <Wt/Dbo/Dbo>
+
+
 
 namespace TREX {
   namespace REST {
@@ -60,7 +64,7 @@ namespace TREX {
         :m_timeline(tl), m_reactor(&r) {}
         ~timeline_info() {}
         
-        boost::property_tree::ptree basic_tree() const;
+        boost::property_tree::ptree basic_tree(bool complete=true) const;
         utils::Symbol const &name() const;
         
         bool alive() const;
@@ -68,10 +72,20 @@ namespace TREX {
         
         bool operator< (TREX::utils::Symbol const &name) const;
         bool operator< (timeline_info const &other) const;
+        
+        void notify(transaction::Observation const &obs, transaction::TICK cur) const;
+        void future(transaction::IntegerDomain const &f) const;
+        
+        boost::property_tree::ptree list_tokens(transaction::IntegerDomain const &range) const;
+        
       private:
+        
         boost::property_tree::ptree duration_tree(transaction::TICK d) const;
+        boost::property_tree::ptree token_tree(transaction::goal_id g) const;
         
         transaction::details::timeline const &m_timeline;
+        mutable transaction::TICK                     m_last_tick;
+        mutable transaction::goal_id                  m_last;
         REST_reactor *m_reactor;
       };
       
@@ -123,7 +137,8 @@ namespace TREX {
       boost::property_tree::ptree goals(rest_request const &req);
       boost::property_tree::ptree manage_goal(rest_request const &req);
 
-      boost::property_tree::ptree get_timeline(std::string name);
+      boost::property_tree::ptree get_timeline(std::string name,
+                                               transaction::IntegerDomain range);
       
       void add_goal(transaction::goal_id g);
       transaction::goal_id get_goal(std::string const &id) const;
@@ -133,6 +148,9 @@ namespace TREX {
       
       void add_tl(bits::timeline_info const &tl);
       void remove_tl(utils::Symbol const &tl);
+      
+      void add_obs(transaction::Observation obs, transaction::TICK cur);
+      void extend_obs(transaction::TICK cur);
       
       template<typename Ret>
       Ret strand_run(boost::function<Ret ()> const &f) {
@@ -155,6 +173,10 @@ namespace TREX {
 
       UNIQ_PTR<boost::asio::strand>   m_strand;
       
+      // Observation database
+      Wt::Dbo::Session                    m_obs_session;
+      UNIQ_PTR<Wt::Dbo::backend::Sqlite3> m_obs_db;
+      
       typedef std::set<bits::timeline_info> tl_set;
       tl_set m_timelines;
       
@@ -166,6 +188,7 @@ namespace TREX {
       utils::SharedVar<size_t> m_file_count;
       
       friend class bits::tick_wait;
+      friend class bits::timeline_info;
     };
     
     template<>

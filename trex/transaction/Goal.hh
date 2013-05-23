@@ -46,7 +46,7 @@
 #ifndef H_Goal
 # define H_Goal
 
-#include "Predicate.hh"
+#include "Observation.hh"
 #include "Tick.hh"
 
 namespace TREX {
@@ -78,6 +78,8 @@ namespace TREX {
        * Create a copy of @a other
        */
       Goal(Goal const &others);
+      explicit Goal(Observation const &obs, TICK date);
+      
       /** @brief Constructor
        * @param[in] object A timeline identifier
        * @param[in] pred   A predicate name

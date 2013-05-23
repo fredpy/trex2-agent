@@ -44,7 +44,7 @@
 #include <boost/enable_shared_from_this.hpp>
 
 #include <Wt/Utils>
-
+#include <Wt/Dbo/Dbo>
 
 using namespace TREX::REST;
 using namespace TREX::transaction;
@@ -52,6 +52,8 @@ using namespace TREX::transaction;
 namespace xml=boost::property_tree::xml_parser;
 namespace bp=boost::property_tree;
 namespace alg=boost::algorithm;
+
+namespace dbo=Wt::Dbo;
 
 
 namespace {
@@ -72,7 +74,60 @@ namespace {
     return ret;
   }
   
+  class db_token;
+  
+  class db_timeline {
+  public:
+    std::string name;
+    dbo::collection< dbo::ptr<db_token> > observations;
+    dbo::ptr<db_token> last_obs;
+    
+    template<class Action>
+    void persist(Action &a) {
+      dbo::id(a, name, "name");
+      dbo::hasMany(a, observations, dbo::ManyToOne, "timeline");
+      dbo::field(a, last_obs, "last");
+    }
+  };
 
+}
+
+namespace Wt {
+  namespace Dbo {
+    
+    template<>
+    struct dbo_traits<db_timeline>
+    :public dbo_default_traits {
+      typedef std::string IdType;
+      
+      static IdType invalidId() {
+        return std::string();
+      }
+      
+      static const char *surrogateIdField() { return 0; }
+    }; // Wt::Dbo::dbo_traits<db_timeline>
+
+  }
+}
+
+namespace {
+  
+  class db_token {
+  public:
+    TICK                  start;
+    TICK                  end;
+    dbo::ptr<db_timeline> timeline;
+    std::string           value;
+    
+    template<class Action>
+    void persist(Action &a) {
+      dbo::field(a, start, "start");
+      dbo::field(a, end, "end");
+      dbo::belongsTo(a, timeline, dbo::NotNull);
+      dbo::field(a, value, "json");
+    }
+  };
+  
 }
 
 #include <trex/utils/ptree_io.hh>
@@ -132,6 +187,8 @@ namespace TREX {
         REST_reactor *m_reactor;
         boost::signals2::connection m_conn;
       }; //TREX::REST::bits::tick_wait
+      
+      
 
     } // TREX::REST::bits
   } // TREX::REST
@@ -189,7 +246,23 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
       free(argv[i]);
     delete [] argv;
     
+    // Create the timline database
+    std::string fname = this->file_name("timelines_history.db3").string();
+    m_obs_db.reset(new dbo::backend::Sqlite3(fname));
+    syslog(utils::log::info)<<"Observations will be logged in database: "<<fname;
+    //m_obs_db->setProperty("show-queries", "true");
+    
+    m_obs_session.setConnection(*m_obs_db);
+    m_obs_session.mapClass<db_timeline>("timeline");
+    m_obs_session.mapClass<db_token>("token");
+    m_obs_session.createTables();
+
+    // Now that we have the database for timelines we can start to listen to timeline events
     graph::timelines_listener::initialize();
+    
+    /*
+     * Populate the rest/ URI with services 
+     */
     m_services.reset(new service_tree(*m_server, "/rest"));
     // TREX general information
     m_services->add_handler("version",
@@ -237,8 +310,9 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     m_services->add_handler("goal",
                             new json_direct(boost::bind(&REST_reactor::manage_goal, this, _1),
                                             "POST: post the attached goal to trex.\n"
-                                            "DELETE: request the concelation of the given goal.\n"
+                                            "DELETE: request the cancelation of the given goal.\n"
                                             "GET: get a description of an existing goal."));
+    
  
     if( !m_server->start() )
       throw ReactorException(*this, "Unable to start the server");
@@ -265,10 +339,12 @@ void REST_reactor::handleTickStart() {
 }
 
 void REST_reactor::notify(Observation const &obs) {
-  
+  m_strand->post(boost::bind(&REST_reactor::add_obs, this, obs, getCurrentTick()));
 }
 
+
 bool REST_reactor::synchronize() {
+  m_strand->post(boost::bind(&REST_reactor::extend_obs, this, getCurrentTick()));
   return true;
 }
 
@@ -303,12 +379,64 @@ bp::ptree REST_reactor::timelines(rest_request const &req) {
                                            m_services->base()));
 }
 
+#include <boost/lexical_cast.hpp>
+
 bp::ptree REST_reactor::timeline(rest_request const &req) {
   if( req.arg_path().empty() )
     throw ReactorException(*this, "Missing timeline argument to "+req.request().path());
+  IntegerDomain::bound lo=IntegerDomain::minus_inf, hi=IntegerDomain::plus_inf;
+  bool as_date = true;
+  
+  std::string const *param;
+  
+  param = req.request().getParameter("format");
+  if( param ) {
+    if( "tick"==*param )
+      as_date = false;
+    else if( "date"!=*param )
+      throw ReactorException(*this, "Invalid format: allowed values are date and tick");
+  }
+  
+  param = req.request().getParameter("from");
+  if( as_date ) {
+    if( NULL!=param ) {
+      try {
+        date_type date = utils::string_cast<date_type>(Wt::Utils::urlDecode(*param));
+        lo = timeToTick(date);
+      } catch(utils::bad_string_cast const &e) {
+        throw ReactorException(*this, "Failed to parse from="+Wt::Utils::urlDecode(*param)+" as a date");
+      }
+    }
+    param = req.request().getParameter("to");
+    if( NULL!=param ) {
+      try {
+        date_type date = utils::string_cast<date_type>(Wt::Utils::urlDecode(*param));
+        hi = timeToTick(date)+1;
+      } catch(utils::bad_string_cast const &e) {
+        throw ReactorException(*this, "Failed to parse to="+Wt::Utils::urlDecode(*param)+" as a date");
+      }
+    }
+  } else {
+    if( NULL!=param ) {
+      try {
+        lo = boost::lexical_cast<TICK>(Wt::Utils::urlDecode(*param));
+      } catch(boost::bad_lexical_cast const &e) {
+        throw ReactorException(*this, "Failed to parse from="+Wt::Utils::urlDecode(*param)+" as a tick");
+      }
+    }
+    param = req.request().getParameter("to");
+    if( NULL!=param ) {
+      try {
+        hi = boost::lexical_cast<TICK>(Wt::Utils::urlDecode(*param));
+      } catch(boost::bad_lexical_cast const &e) {
+        throw ReactorException(*this, "Failed to parse to="+Wt::Utils::urlDecode(*param)+" as a tick");
+      }
+    }
+  }
   
   return strand_run<bp::ptree>(boost::bind(&REST_reactor::get_timeline,
-                                           this, req.arg_path().dump()));
+                                           this, req.arg_path().dump(),
+                                           IntegerDomain(lo, hi)));
 }
 
 bp::ptree REST_reactor::export_goal(goal_id g) const {
@@ -458,16 +586,18 @@ bp::ptree REST_reactor::trex_version(rest_request const &req) const {
 }
 
 
-bp::ptree REST_reactor::get_timeline(std::string name) {
+bp::ptree REST_reactor::get_timeline(std::string name,
+                                     IntegerDomain range) {
   bp::ptree ret;
 
   tl_set::iterator i=m_timelines.begin();
  
   for(; m_timelines.end()!=i && *i<name; ++i);
     
-  if( i!=m_timelines.end() && i->name()==name ) {
-    ret = i->basic_tree();
-    ret.put("warning", "unimplemented");
+  if( i!=m_timelines.end() && i->name()==name ) {    
+    ret = i->basic_tree(false);
+    ret.put_child("requested_tick_range", range.as_tree());
+    ret.put_child("token", i->list_tokens(range));
   }
   return ret;
 }
@@ -524,7 +654,41 @@ bp::ptree REST_reactor::tick_period(rest_request const &req) const {
 void REST_reactor::add_tl(bits::timeline_info const &tl) {
   m_timelines.insert(tl);
   use(tl.name());
+  
+  dbo::ptr<db_timeline> db_entry;
+
+  {
+    dbo::Transaction tr(m_obs_session);
+    db_timeline *tmp = new db_timeline;
+    
+    tmp->name = tl.name().str();
+    db_entry = m_obs_session.add(tmp);
+  
+    tr.commit();
+  }
+  syslog(utils::log::info)<<"Added "<<db_entry->name<<" timeline to database.";
 }
+
+void REST_reactor::add_obs(Observation obs, TICK cur) {
+  tl_set::const_iterator i = m_timelines.begin();
+  
+  for( ; m_timelines.end()!=i && i->name()<obs.object();++i);
+
+  if( m_timelines.end()!=i && i->name()==obs.object() )
+    i->notify(obs, cur);
+  else
+    syslog(utils::log::warn)<<"Observaytion on unknown timeline "<<obs.object();
+}
+
+void REST_reactor::extend_obs(TICK cur) {
+  IntegerDomain fut(cur+1, IntegerDomain::plus_inf);
+  
+  for(tl_set::const_iterator i=m_timelines.begin(); m_timelines.end()!=i; ++i)
+    i->future(fut);
+}
+
+
+
 
 void REST_reactor::remove_tl(utils::Symbol const &tl) {
   unuse(tl);
@@ -561,18 +725,128 @@ bp::ptree bits::timeline_info::duration_tree(TICK d) const {
   return ret;
 }
 
-
-bp::ptree bits::timeline_info::basic_tree() const {
+bp::ptree bits::timeline_info::basic_tree(bool complete) const {
   bp::ptree ret, tick_info;
   ret.put("name", name());
   ret.put("alive", alive());
-  ret.put("accept_goals", accept_goals());
-  // Extra info
-  ret.put_child("latency", duration_tree(m_timeline.latency()));
-  ret.put_child("look_ahead", duration_tree(m_timeline.look_ahead()));
-  ret.put("publish_plan", m_timeline.publish_plan());
+  if( complete ) {
+    ret.put("accept_goals", accept_goals());
+    // Extra info
+    ret.put_child("latency", duration_tree(m_timeline.latency()));
+    ret.put_child("look_ahead", duration_tree(m_timeline.look_ahead()));
+    ret.put("publish_plan", m_timeline.publish_plan());
+  }
   return ret;
 }
+
+bp::ptree bits::timeline_info::token_tree(goal_id g) const {
+  graph const &gr = m_reactor->getGraph();
+  return gr.export_goal(g).get_child("Goal");
+}
+
+
+void  bits::timeline_info::notify(Observation const &obs, TICK cur) const {
+  
+  if( m_last ) {
+    std::ostringstream oss;
+  
+    m_last->restrictEnd(IntegerDomain(cur));
+    helpers::json_stream json(oss);
+    utils::write_json(json, token_tree(m_last));
+        
+    {
+      dbo::Transaction tr(m_reactor->m_obs_session);
+      dbo::ptr<db_timeline> tl = m_reactor->m_obs_session.find<db_timeline>().where("name = ?").bind(name().str());
+      if( !tl ) {
+        m_reactor->syslog(utils::log::error)<<"Received an observation for timeline "
+        <<name().str()<<" which is not on the database.";
+        return;
+      }
+      db_token *prev_t  = new db_token;
+      prev_t->start = m_last_tick;
+      prev_t->end = cur;
+      prev_t->timeline = tl;
+      prev_t->value = oss.str();
+      dbo::ptr<db_token> tok = m_reactor->m_obs_session.add(prev_t);
+      tl.modify()->last_obs = tok;
+      tl.flush();
+      tr.commit();
+      // m_reactor->syslog(utils::log::info)<<"Added "<<tok->value<<" on ["<<m_last_tick<<", "<<cur<<"].";
+    }
+  }
+  m_last_tick = cur;
+  
+  m_last.reset(new Goal(obs, cur));
+}
+
+void bits::timeline_info::future(IntegerDomain const &f) const {
+  if( m_last )
+    m_last->restrictEnd(f);
+}
+
+
+
+bp::ptree bits::timeline_info::list_tokens(IntegerDomain const &range) const {
+  typedef dbo::collection< dbo::ptr<db_token> > token_set;
+  IntegerDomain::bound lo, hi;
+  
+  range.getBounds(lo, hi);
+  
+  bool no_db = true, get_current = false;
+  dbo::Query< dbo::ptr<db_token> >
+    query = m_reactor->m_obs_session.find<db_token>().where("timeline_name = ?").bind(name().str());
+  
+  m_reactor->syslog(utils::log::info)<<"Building the set of tokens over "<<range;
+  
+  if( m_last ) {
+    if( range.hasLower() ) {
+      if( m_last_tick>=lo.value() ) {
+        no_db = false;
+        query.where("end >= ?").bind(lo.value());
+      }
+    } else
+      no_db = false;
+    get_current = (hi>=m_last_tick);
+  }
+  // do it with an innefficient reparse for now
+  bp::ptree result;
+  
+  if( !no_db ) {
+    token_set past;
+    dbo::Transaction tr(m_reactor->m_obs_session);
+    if( range.hasUpper() && m_last_tick>=hi.value() )
+      query.where("start <= ?").bind(hi.value());
+    
+    past = query;
+    
+    m_reactor->syslog(utils::log::info)<<past.size()<<" past observations in "<<range;
+    for(token_set::const_iterator i=past.begin(); i!=past.end(); ++i) {
+      if( lo>(*i)->start )
+        lo = (*i)->start;
+      if( hi< (*i)->end )
+        hi = (*i)->end;
+      
+      std::istringstream iss((*i)->value);
+      bp::ptree tok;
+      utils::read_json(iss, tok);
+      result.push_back(bp::ptree::value_type("", tok));
+    }
+    tr.commit();
+  }
+  
+  if( get_current ) {
+    if( lo>m_last_tick )
+      lo = m_last_tick;
+    if( hi<m_last->getEnd().lowerBound() )
+      hi = m_last->getEnd().lowerBound();
+    
+    result.push_back(bp::ptree::value_type("", token_tree(m_last)));
+  }  
+  return result;
+}
+
+
+
 
 
 

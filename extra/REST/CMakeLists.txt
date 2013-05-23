@@ -47,7 +47,8 @@ if(WITH_REST)
       REST_reactor.hh
       REST_service.hh)
     target_link_libraries(REST_pg
-      ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY}
+      ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} ${Wt_DBO_LIBRARY}
+      ${Wt_DBOSQLITE3_LIBRARY}
       TREXtransaction)
     
     set(REST_HOST "localhost" CACHE STRING "default REST server address.")
