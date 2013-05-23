@@ -242,44 +242,46 @@ namespace TREX
       MessageList<TrexAttribute>::const_iterator it;
       for (it = token.attributes.begin(); it != token.attributes.end(); it++)
       {
-        ss << "\t<Variable name='" << (*it)->name << "'>\n";
+    	  ss << "\t<Variable name='" << (*it)->name << "'>\n";
 
-        switch ((*it)->attr_type)
-        {
-          case TrexAttribute::TYPE_FLOAT:
-            ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_INT:
-            ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_STRING:
-            ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_BOOL:
-            ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_ENUM:
-            ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          default:
-            std::cerr << "Error parsing attribute: ";
-            (*it)->toText(std::cerr);
-            break;
-        }
+    	  switch ((*it)->attr_type)
+    	  {
+    	  case TrexAttribute::TYPE_FLOAT:
+    		  ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+    		  break;
+    	  case TrexAttribute::TYPE_INT:
+    		  ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+    		  break;
+    	  case TrexAttribute::TYPE_STRING:
+    		  ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+    		  break;
+    	  case TrexAttribute::TYPE_BOOL:
+    		  ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+    		  break;
+    	  case TrexAttribute::TYPE_ENUM:
+    		  ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+    		  break;
+    	  default:
+    		  std::cerr << "Error parsing attribute: ";
+    		  (*it)->toText(std::cerr);
+    		  break;
+    	  }
 
-        ss << "\t</Variable>\n";
+    	  ss << "\t</Variable>\n";
 
-        std::cerr << "Received goal:\n" << ss.str();
-
-        if(m_env->getControlInterfaceReactor() != NULL)
-        {
-          m_env->getControlInterfaceReactor()->proccess_message(ss.str());
-        }
-        else
-        {
-          std::cerr << "ControlInterface not instantiated!\n";
-        }
       }
+      ss << "\t</Goal>\n";
+      std::cerr << "Received goal:\n" << ss.str();
+
+      if(m_env->getControlInterfaceReactor() != NULL)
+      {
+    	  m_env->getControlInterfaceReactor()->proccess_message(ss.str());
+      }
+      else
+      {
+    	  std::cerr << "ControlInterface not instantiated!\n";
+      }
+
     }
 
     void
@@ -320,7 +322,7 @@ namespace TREX
 
       OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
-      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
       std::map<std::string, Announce *>::iterator it;
 
