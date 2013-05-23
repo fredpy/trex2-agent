@@ -67,6 +67,14 @@ Goal::Goal(Goal const &other)
   :Predicate(other), m_start(other.m_start), 
    m_duration(other.m_duration), m_end(other.m_end) {}
 
+Goal::Goal(Observation const &obs, TICK date)
+:Predicate(obs), m_start(s_startName, s_dateDomain),
+m_duration(s_durationName, s_durationDomain),
+m_end(s_endName, s_dateDomain) {
+  restrictStart(IntegerDomain(date));
+}
+
+
 Goal::Goal(Symbol const &object, Symbol const &pred)
   :Predicate(object, pred), m_start(s_startName, s_dateDomain), 
    m_duration(s_durationName, s_durationDomain), 
