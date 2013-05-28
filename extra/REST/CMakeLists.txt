@@ -39,29 +39,54 @@ if(WITH_REST)
   find_package(Wt)
 
   if(Wt_FOUND)
-    include_directories(${Wt_INCLUDE_DIR})
+    if(Wt_DBOSQLITE3_LIBRARY)
+      set(DBO_BACKEND Sqlite3)
+      set(DBO_EXTENSION ".db3")
+      set(DBO_LIBS ${Wt_DBO_LIBRARY} ${Wt_DBOSQLITE3_LIBRARY})
+      set(DBO_FOUND TRUE)
+    endif(Wt_DBOSQLITE3_LIBRARY)
 
-    trex_plugin(REST REST_pg.cc
-      REST_reactor.cc
-      REST_service.cc
-      REST_reactor.hh
-      REST_service.hh)
-    target_link_libraries(REST_pg
-      ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} ${Wt_DBO_LIBRARY}
-      ${Wt_DBOSQLITE3_LIBRARY}
-      TREXtransaction)
-    
-    set(REST_HOST "localhost" CACHE STRING "default REST server address.")
-    set(REST_PORT 8080 CACHE NUMBER "default rest server port.")
-    
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rest.xml.in
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml @ONLY)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml 
-      DESTINATION ${TREX_SHARED}/cfg)
-    set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg)
+    if(DBO_FOUND) 
 
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbo_cfg.hh.in
+	${CMAKE_CURRENT_BINARY_DIR}/dbo_cfg.hh @ONLY)
+      
+      include_directories(${Wt_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
+      trex_plugin(REST
+	# source
+	db_manager.cc
+	tick_manager.cc
+	timeline_services.cc
+	REST_pg.cc
+	REST_reactor.cc
+	REST_service.cc
+	TimelineHistory.cc
+	# headers
+	db_manager.hh
+	tick_manager.hh
+	timeline_services.hh
+	timeline_wrap.hh
+	REST_reactor.hh
+	REST_service.hh
+	TimelineHistory.hh)
+      target_link_libraries(REST_pg
+	${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} ${DBO_LIBS}
+	TREXtransaction)
+      
+      set(REST_HOST "localhost" CACHE STRING "default REST server address.")
+      set(REST_PORT 8080 CACHE NUMBER "default rest server port.")
+      
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rest.xml.in
+	${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml @ONLY)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cfg/rest.xml 
+	DESTINATION ${TREX_SHARED}/cfg)
+      set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
+	${CMAKE_CURRENT_BINARY_DIR}/cfg)
+    else(DBO_FOUND)
+      message(WARNING "Unable to find Wt/Dbo!!! Disabling REST plugin")
+      set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt/Dbo" FORCE)
+    endif(DBO_FOUND)
   else(Wt_FOUND)
     message(WARNING "Unable to find Wt!!! Disabling REST plugin")
     set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt" FORCE)
