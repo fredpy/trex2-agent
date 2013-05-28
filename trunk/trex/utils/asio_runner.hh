@@ -136,6 +136,26 @@ namespace TREX {
       boost::thread_group m_threads;
     }; // TREX::utils::asio_runner
     
+    template<class Service, typename Ret>
+    Ret strand_run(Service &s, boost::function<Ret ()> const &f) {
+      boost::packaged_task<Ret> tsk(f);
+      boost::unique_future<Ret> result = tsk.get_future();
+      
+      s.dispatch(boost::bind(&boost::packaged_task<Ret>::operator(),
+                         boost::ref(tsk)));
+      return result.get();
+    }
+    
+    template<class Service>
+    void strand_run(Service &s, boost::function<void ()> const &f) {
+      boost::packaged_task<void> tsk(f);
+      boost::unique_future<void> result = tsk.get_future();
+      
+      s.dispatch(boost::bind(&boost::packaged_task<void>::operator(),
+                         boost::ref(tsk)));
+      result.get();
+    }
+    
   } // TREX::utils
 } // TREX
 
