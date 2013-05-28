@@ -229,6 +229,7 @@ namespace TREX {
         return m_graph;
       }
       
+      
       /** @brief reactor initial tick
        *
        * This method indicates the tick during which the reactor has been
@@ -1036,7 +1037,11 @@ namespace TREX {
        */
       external_iterator find_external(TREX::utils::Symbol const &name);
       
-      
+    protected:
+      graph &get_graph() {
+        return m_graph;
+      }
+
     private:
       stat_duration m_synch_usage, m_deliberation_usage;
       
