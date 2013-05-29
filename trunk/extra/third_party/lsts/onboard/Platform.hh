@@ -110,8 +110,8 @@ namespace TREX {
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      void handleGoingRequest(Goal g);
-      void handleAtRequest(Goal g);
+      void handleGoingRequest(goal_id const &g);
+      void handleAtRequest(goal_id const &g);
       void handleGoingRecall(Goal g);
 
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
