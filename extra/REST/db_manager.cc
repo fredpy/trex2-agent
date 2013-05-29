@@ -184,7 +184,7 @@ size_t db_manager::get_tokens(std::string const &tl,
       // append these results to my stream
       for(db_tokens::const_iterator i=result.begin(); i!=result.end(); ++i, ++cpt) {
         if( cpt>0 )
-          out<<", ";
+          out.put(',');
         out<<(*i)->json;
         // update min so next call will omit this value
         min = (*i)->end+1;

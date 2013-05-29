@@ -51,6 +51,7 @@
 # include <typeinfo>
 
 # include <boost/algorithm/string/case_conv.hpp>
+# include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace TREX {
   namespace utils {
@@ -159,6 +160,26 @@ namespace TREX {
       return result;
     }
     
+    template<>
+    inline boost::posix_time::ptime string_cast<boost::posix_time::ptime>(std::string const &in,
+                                                                          std::ios_base &(*format)(std::ios_base &)) {
+      typedef boost::date_time::time_input_facet<boost::posix_time::ptime, char> facet;
+      
+      facet *f = new facet("%Y-%m-%dT%H:%M:%S%F%q");
+      //f->set_iso_extended_format();
+      
+      std::istringstream iss(in);
+      iss.imbue(std::locale(iss.getloc(), f));
+      boost::posix_time::ptime date;
+      if( (iss>>date).fail() ) {
+	std::ostringstream message;
+	
+	message<<"string_cast : unable to parse \""<<in<<"\"";
+	throw bad_string_cast(message.str());
+      }
+      return date;
+    }
+  
     /** @brief Convert string to type.
      *
      * @tparam Ty       Destination type

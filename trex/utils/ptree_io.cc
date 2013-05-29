@@ -113,11 +113,11 @@ void TREX::utils::read_json(std::istream &in, bp::ptree &p) {
   flatten_json_arrays(p);
 }
 
-void TREX::utils::write_json(std::ostream &out, boost::property_tree::ptree p) {
+void TREX::utils::write_json(std::ostream &out, boost::property_tree::ptree p, bool fancy) {
   // Clean up the mess for xml
   flatten_xml_attrs(p);
   // fancy print
-  json::write_json(out, p, true);
+  json::write_json(out, p, fancy);
 }
 
 

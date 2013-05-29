@@ -47,7 +47,8 @@ namespace TREX {
                    bool header=false);
 
     void read_json(std::istream &in, boost::property_tree::ptree &p);
-    void write_json(std::ostream &out, boost::property_tree::ptree p);
+    void write_json(std::ostream &out, boost::property_tree::ptree p,
+                      bool fancy=true);
     
     class ptree_convertible {
     public:      
