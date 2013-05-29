@@ -33,7 +33,6 @@
  */
 #include "tick_manager.hh"
 
-#include <Wt/Utils>
 
 using namespace TREX::REST;
 using namespace TREX::transaction;
@@ -62,10 +61,14 @@ namespace {
     return mgr->json_tick(mgr->current()+1);
   }
   
+  
   bp::ptree tick_at(rest_request const &req, tick_manager *mgr) {
     if( req.arg_path().empty() )
       throw std::runtime_error("Missing date argument to "+req.request().path());
-    std::string date_str = Wt::Utils::urlDecode(req.arg_path().dump());
+    std::cout<<req.arg_path().dump()<<std::endl;
+    std::string date_str = my_url_decode(req.arg_path().dump());
+    std::cout<<" -> "<<date_str<<std::endl;
+    
     
     try {
       graph::date_type date = TREX::utils::string_cast<graph::date_type>(date_str);

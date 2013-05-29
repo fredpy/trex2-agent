@@ -52,6 +52,7 @@
 
 # include <boost/algorithm/string/case_conv.hpp>
 # include <boost/date_time/posix_time/posix_time.hpp>
+# include <boost/date_time/local_time/local_time.hpp>
 
 namespace TREX {
   namespace utils {
@@ -163,19 +164,27 @@ namespace TREX {
     template<>
     inline boost::posix_time::ptime string_cast<boost::posix_time::ptime>(std::string const &in,
                                                                           std::ios_base &(*format)(std::ios_base &)) {
+
       typedef boost::posix_time::time_input_facet facet;
-      
-      facet *f = new facet("%Y-%m-%dT%H:%M:%S%F");
-      //f->set_iso_extended_format();
-      
       std::istringstream iss(in);
-      iss.imbue(std::locale(iss.getloc(), f));
-      boost::posix_time::ptime date;
+      
+      iss.imbue(std::locale(iss.getloc(), new facet("%Y-%m-%dT%H:%M:%S%F")));
+      boost::posix_time::ptime date(boost::date_time::not_a_date_time);
+      
       if( (iss>>date).fail() ) {
-	std::ostringstream message;
+        std::ostringstream message;
 	
 	message<<"string_cast : unable to parse \""<<in<<"\"";
 	throw bad_string_cast(message.str());
+      } else {
+        std::string tz(iss.str().substr(iss.tellg()));
+        if( "Z"!=tz && !tz.empty() ) {
+          try {
+            date -= boost::posix_time::duration_from_string(tz);
+          } catch(boost::bad_lexical_cast const &e) {
+            throw bad_string_cast(e.what());
+          }
+        }
       }
       return date;
     }
