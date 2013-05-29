@@ -302,9 +302,7 @@ namespace TREX {
         return epoch()+delta;
       }
       std::string date_str(TREX::transaction::TICK const &tick) const {
-        std::ostringstream oss;
-        oss<<tickToTime(tick);
-        return oss.str();
+        return boost::posix_time::to_iso_extended_string(tickToTime(tick));
       }
       std::string duration_str(TREX::transaction::TICK dur) const {
         duration_type dt = tickDuration()*dur;

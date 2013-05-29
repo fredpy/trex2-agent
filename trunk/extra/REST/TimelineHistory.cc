@@ -106,8 +106,8 @@ void TimelineHistory::list_timelines(std::ostream &out) {
   size_t count = utils::strand_run(m_strand, fn);
   
   if( count>0 )
-    out<<"\n ";
-  out<<"]\n}";
+    out.put(' ');
+  out<<"] }";
 }
 
 void TimelineHistory::get_tokens(std::string const &timeline,
@@ -208,7 +208,7 @@ void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
       std::ostringstream oss;
       helpers::json_stream json(oss);
       prev->restrictEnd(IntegerDomain(date));
-      utils::write_json(json, get_token(prev));
+      utils::write_json(json, get_token(prev), false);
       m_db.add_token(start, date, (*pos)->name().str(), oss.str());
     }
   } else
@@ -283,7 +283,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
           out.put(',');
         else
           first = false;
-        utils::write_json(out, get_token((*pos)->obs()));
+        utils::write_json(out, get_token((*pos)->obs()), false);
         ret += 1;
       }
       // TODO : repeat this for the planned tokens
