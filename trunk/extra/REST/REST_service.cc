@@ -52,7 +52,7 @@ namespace {
     while( !me.empty() ) {
       std::string cur = me.reduce();
       if( !cur.empty() )
-        ret /= cur;
+        ret /= rest_request::path_type(cur, '/');
     }
     return ret;
   }
