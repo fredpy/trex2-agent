@@ -34,6 +34,7 @@
 #include "REST_service.hh"
 
 #include <Wt/WServer>
+#include <Wt/Utils>
 
 #include <trex/utils/ptree_io.hh>
 
@@ -57,6 +58,27 @@ namespace {
     return ret;
   }
 }
+
+std::string TREX::REST::my_url_decode(std::string str) {
+  std::string result;
+  
+  do {
+    size_t pos;
+    
+    pos = str.find_first_of('+');
+    
+    result += Wt::Utils::urlDecode(str.substr(0, pos));
+    if( std::string::npos==pos )
+      break;
+    
+    result += '+';
+    str = str.substr(pos+1);
+  } while( !str.empty() );
+  
+  
+  return result;
+}
+
 
 /*
  * class TREX::REST::rest_request

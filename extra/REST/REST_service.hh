@@ -37,6 +37,7 @@
 # include <Wt/WResource>
 # include <Wt/Http/Response>
 
+
 # include <boost/function.hpp>
 # include <boost/shared_ptr.hpp>
 # include <boost/property_tree/ptree.hpp>
@@ -183,7 +184,9 @@ namespace TREX {
                          Wt::Http::Response &ans);
       
     };
-        
+    
+    std::string my_url_decode(std::string str);
+
   }
 }
 

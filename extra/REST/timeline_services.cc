@@ -102,14 +102,14 @@ void timeline_service::handleRequest(rest_request const &req,
         try {
           lo = ptr->get_date(*val);
         } catch(std::exception const &e) {
-          throw std::runtime_error("Failed to parse from as a date");
+          throw std::runtime_error("Failed to parse from="+(*val)+" as a date");
         }
       val = req.request().getParameter("to");
       if( val )
         try {
           hi = ptr->get_date(*val);
         } catch(std::exception const &e) {
-          throw std::runtime_error("Failed to parse to as a date");
+          throw std::runtime_error("Failed to parse to="+(*val)+" as a date");
         }
     } else {
       if( val )
