@@ -179,10 +179,10 @@ namespace TREX
       //m_goals_pending.push_back(g);
 
       if (gname == "reference" && gpred == "Going")
-        handleGoingRequest(*goal);
+        handleGoingRequest(g);
 
       else if (gname == "reference" && gpred == "At")
-        handleAtRequest(*goal);
+        handleAtRequest(g);
 
     }
 
@@ -297,6 +297,7 @@ namespace TREX
         received.clear();
       }
 
+
       PlanControlState * pcstate =
           dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
@@ -369,7 +370,8 @@ namespace TREX
       if (command != NULL)
       {
         handleTrexOperation(*command);
-        delete received[TrexOperation::getIdStatic()];
+        //delete received[TrexOperation::getIdStatic()];
+        received.erase(TrexOperation::getIdStatic());
       }
     }
 
@@ -410,21 +412,21 @@ namespace TREX
     }
 
     void
-    Platform::handleAtRequest(Goal g)
+    Platform::handleAtRequest(goal_id const &g)
     {
       double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
 
-      if(g.getAttribute("latitude").domain().isSingleton())
+      if(g->getAttribute("latitude").domain().isSingleton())
       {
-        req_lat = g.getAttribute("latitude").domain().getTypedSingleton<double, true>();
+        req_lat = g->getAttribute("latitude").domain().getTypedSingleton<double, true>();
       }
-      if(g.getAttribute("longitude").domain().isSingleton())
+      if(g->getAttribute("longitude").domain().isSingleton())
       {
-        req_lon = g.getAttribute("longitude").domain().getTypedSingleton<double, true>();
+        req_lon = g->getAttribute("longitude").domain().getTypedSingleton<double, true>();
       }
-      if(g.getAttribute("z").domain().isSingleton())
+      if(g->getAttribute("z").domain().isSingleton())
       {
-        req_z = g.getAttribute("z").domain().getTypedSingleton<double, true>();
+        req_z = g->getAttribute("z").domain().getTypedSingleton<double, true>();
       }
 
       EstimatedState * estate =
@@ -450,20 +452,20 @@ namespace TREX
     }
 
     void
-    Platform::handleGoingRequest(Goal g)
+    Platform::handleGoingRequest(goal_id const &g)
     {
       Variable v;
-      v = g.getAttribute("latitude");
+      v = g->getAttribute("latitude");
       int flags = Reference::FLAG_LOCATION;
 
       if (v.domain().isSingleton())
         m_ref.lat = v.domain().getTypedSingleton<double, true>();
 
-      v = g.getAttribute("longitude");
+      v = g->getAttribute("longitude");
       if (v.domain().isSingleton())
         m_ref.lon = v.domain().getTypedSingleton<double, true>();
 
-      v = g.getAttribute("z");
+      v = g->getAttribute("z");
       if (v.domain().isSingleton())
       {
         double z = v.domain().getTypedSingleton<double, true>();
@@ -483,7 +485,7 @@ namespace TREX
         m_ref.z.set(desZ);
       }
 
-      v = g.getAttribute("speed");
+      v = g->getAttribute("speed");
       if (v.domain().isSingleton())
       {
         double speed = v.domain().getTypedSingleton<double, true>();
