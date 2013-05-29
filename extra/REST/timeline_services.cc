@@ -130,11 +130,11 @@ void timeline_service::handleRequest(rest_request const &req,
     transaction::IntegerDomain initial(lo, hi);
     // As it is the start I need to add initial info to the stream
     data<<"{\n \"name\": \""<<req.arg_path().dump()
-    <<"\",\n  \"requested_tick_range\": ";
+    <<"\",\"requested_tick_range\": ";
     if( initial.isFull() )
       data<<"{}";
     else
-      utils::write_json(data, initial.as_tree());
+      utils::write_json(data, initial.as_tree(), false);
     data<<",\n \"tokens\": [\n";
   }
   
