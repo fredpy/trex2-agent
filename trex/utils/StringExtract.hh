@@ -163,9 +163,9 @@ namespace TREX {
     template<>
     inline boost::posix_time::ptime string_cast<boost::posix_time::ptime>(std::string const &in,
                                                                           std::ios_base &(*format)(std::ios_base &)) {
-      typedef boost::date_time::time_input_facet<boost::posix_time::ptime, char> facet;
+      typedef boost::posix_time::time_input_facet facet;
       
-      facet *f = new facet("%Y-%m-%dT%H:%M:%S%F%q");
+      facet *f = new facet("%Y-%m-%dT%H:%M:%S%F");
       //f->set_iso_extended_format();
       
       std::istringstream iss(in);
