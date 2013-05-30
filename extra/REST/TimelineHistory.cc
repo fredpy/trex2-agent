@@ -97,11 +97,12 @@ void TimelineHistory::declared(details::timeline const &timeline) {
 
 // REST callbacks
 
-void TimelineHistory::list_timelines(std::ostream &out) {
+void TimelineHistory::list_timelines(std::ostream &out,
+                                     std::set<std::string> const &select) {
   // I build the json by hand
   out<<"{ \"timelines\": [";
   
-  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out)));
+  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out), boost::ref(select)));
   
   size_t count = utils::strand_run(m_strand, fn);
   
@@ -227,42 +228,47 @@ void TimelineHistory::ext_obs_sync(TICK date) {
 }
 
 
-size_t TimelineHistory::list_tl_sync(std::ostream &out) {
+size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select) {
   size_t count =0;
   
   for(helpers::rest_tl_set::const_iterator i=m_timelines.begin(); m_timelines.end()!=i;
-      ++i, ++count) {
-    if( count>0 )
-      out.put(',');
-    TICK t_l = (*i)->latency(), t_pi = (*i)->look_ahead();
-        
-    out<<"\n  { \"name\": \""<<(*i)->name()<<"\","
-    // href is hard coded .... I dshould be able to do better but will
-    // do for now
-       <<"\n    \"href\": \"/rest/timeline/"<<(*i)->name()<<"\","
-       <<"\n    \"alive\": \""<<(*i)->alive()<<"\","
-       <<"\n    \"accept_goals\": \""<<(*i)->accept_goals()<<"\","
-       <<"\n    \"latency\": { \"ticks\": \""<<t_l<<"\", \"duration\": \""
-       <<m_reactor.duration_str(t_l)<<"\" },"
-       <<"\n    \"look_ahead\": { \"ticks\": \""<<t_pi<<"\", \"duration\": \""
-       <<m_reactor.duration_str(t_pi)<<"\" },"
-       <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
-       <<"\n    \"total_obs\": "<<(*i)->count()<<",";
-
-    typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
-    convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
-    long double factor = 0.0;
-    if( (*i)->count()>0 ) {
-      TICK n_ticks = 1+m_cur-(*i)->initial();
-      factor = n_ticks;
-      factor /= (*i)->count();
-      period *= n_ticks;
-      period /= (*i)->count();
-    } else
-      period *= 0;
+      ++i) {
     
-    out<<"\n    \"obs_period\": { \"ticks\": \""<<factor<<"\", "
-       <<"\"duration\": \""<<period<<"\" }\n  }";
+    if( select.empty() || select.end()!=select.find((*i)->name().str()) ) {
+      if( count>0 )
+        out.put(',');
+      ++count;
+    
+      TICK t_l = (*i)->latency(), t_pi = (*i)->look_ahead();
+        
+      out<<"\n  { \"name\": \""<<(*i)->name()<<"\","
+      // href is hard coded .... I dshould be able to do better but will
+      // do for now
+         <<"\n    \"href\": \"/rest/timeline/"<<(*i)->name()<<"\","
+         <<"\n    \"alive\": \""<<(*i)->alive()<<"\","
+         <<"\n    \"accept_goals\": \""<<(*i)->accept_goals()<<"\","
+         <<"\n    \"latency\": { \"ticks\": \""<<t_l<<"\", \"duration\": \""
+         <<m_reactor.duration_str(t_l)<<"\" },"
+         <<"\n    \"look_ahead\": { \"ticks\": \""<<t_pi<<"\", \"duration\": \""
+         <<m_reactor.duration_str(t_pi)<<"\" },"
+         <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
+         <<"\n    \"total_obs\": "<<(*i)->count()<<",";
+
+      typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
+      convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
+      long double factor = 0.0;
+      if( (*i)->count()>0 ) {
+        TICK n_ticks = 1+m_cur-(*i)->initial();
+        factor = n_ticks;
+        factor /= (*i)->count();
+        period *= n_ticks;
+        period /= (*i)->count();
+      } else
+        period *= 0;
+    
+      out<<"\n    \"obs_period\": { \"ticks\": \""<<factor<<"\", "
+         <<"\"duration\": \""<<period<<"\" }\n  }";
+    }
   }
   
   return count;
