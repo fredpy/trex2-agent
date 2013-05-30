@@ -249,19 +249,20 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out) {
        <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
        <<"\n    \"total_obs\": "<<(*i)->count()<<",";
 
-    TeleoReactor::duration_type period = m_reactor.tickDuration();
+    typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
+    convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
     long double factor = 0.0;
     if( (*i)->count()>0 ) {
-      factor = 1+m_cur-(*i)->initial();
+      TICK n_ticks = 1+m_cur-(*i)->initial();
+      factor = n_ticks;
       factor /= (*i)->count();
-      period *= factor;
+      period *= n_ticks;
+      period /= (*i)->count();
     } else
       period *= 0;
-    typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
-    convert::posix_duration dur = convert::to_posix(period);
     
     out<<"\n    \"obs_period\": { \"ticks\": \""<<factor<<"\", "
-       <<"\"duration\": \""<<dur<<"\" }\n  }";
+       <<"\"duration\": \""<<period<<"\" }\n  }";
   }
   
   return count;
