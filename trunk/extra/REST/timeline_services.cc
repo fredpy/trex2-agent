@@ -50,7 +50,14 @@ void timeline_list_service::handleRequest(rest_request const &req,
                              "This probaly means that trex is terminating.");
   
   ans.setMimeType("application/json");
-  ptr->list_timelines(data);
+  std::set<std::string> subset;
+  
+  rest_request::path_type tmp(req.arg_path());
+  
+  while( !tmp.empty() )
+    subset.insert(tmp.reduce());
+  
+  ptr->list_timelines(data, subset);
 }
 
 /*
