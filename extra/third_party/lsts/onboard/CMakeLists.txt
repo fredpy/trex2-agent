@@ -41,12 +41,14 @@ trex_plugin(platform
   Platform.cc 
   SafetyBug.cc
   DummyOperator.cc
+  YoYoController.cpp
 
   # headers
   ControlInterface.hh 
   Platform.hh 
   SafetyBug.hh
   DummyOperator.hh
+  YoYoController.hpp
 )
 
 target_link_libraries(platform_pg LSTSshared)
