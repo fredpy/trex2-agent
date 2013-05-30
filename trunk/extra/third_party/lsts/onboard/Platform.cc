@@ -43,11 +43,12 @@ namespace TREX
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-                            LstsReactor(arg)
+      LstsReactor(arg), m_yoyoController(0,0,0,0)
     {
       m_firstTick = true;
       m_blocked = false;
       m_connected = true;
+
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
 
@@ -70,12 +71,6 @@ namespace TREX
 
       // Timelines that can be controlled by other reactors
       provide("reference");
-      //   provide("imu");
-      //   provide("lbl");
-      //   provide("sidescan");
-      //   provide("multibeam");
-      //   provide("camera");
-
     }
 
     void
@@ -83,9 +78,6 @@ namespace TREX
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
       m_adapter.bind(localport);
-      //receive.bind(localport, Address::Any, true);
-      //receive.addToPoll(iom);
-
       syslog(log::info) << "listening on port " << localport << "...";
     }
 
@@ -153,15 +145,27 @@ namespace TREX
       Heartbeat hb;
       sendMsg(hb);
 
-//      if (!m_observations_pending.empty())
-//      {
-//        std::list<Observation>::iterator it;
-//        for (it = m_observations_pending.begin(); it != m_observations_pending.end(); it++)
-//        {
-//          postObservation(*it
-//        }
-//      }
-   return true;
+      if (!m_goals_pending.empty())
+      {
+        goal_id goal = m_goals_pending.front();
+        std::string gname = (goal->object()).str();
+        std::string gpred = (goal->predicate()).str();
+        std::string man_name;
+        bool commited = false;
+        if (gname == "reference" && gpred == "Going")
+          commited = handleGoingRequest(goal);
+        else if (gname == "reference" && gpred == "YoYo")
+          commited = handleYoYoRequest(goal);
+        else if (gname == "reference" && gpred == "At")
+          commited = handleAtRequest(goal);
+
+        if (commited)
+        {
+          m_goals_pending.remove(goal);
+          postUniqueObservation(*goal.get());
+        }
+      }
+      return true;
     }
 
     void
@@ -176,13 +180,13 @@ namespace TREX
 
       std::cerr << "handleRequest(" << gpred << ")" << std::endl;
 
-      //m_goals_pending.push_back(g);
+      m_goals_pending.push_back(g);
 
-      if (gname == "reference" && gpred == "Going")
-        handleGoingRequest(g);
+      //if (gname == "reference" && gpred == "Going")
+      //  handleGoingRequest(*goal);
 
-      else if (gname == "reference" && gpred == "At")
-        handleAtRequest(g);
+      //else if (gname == "reference" && gpred == "At")
+      //  handleAtRequest(*goal);
 
     }
 
@@ -196,7 +200,7 @@ namespace TREX
       std::string man_name;
       std::cerr << "handleRecall(" << gpred << ")" << std::endl;
       if (gname == "reference" && gpred == "Going")
-        handleGoingRecall(*goal);
+        handleGoingRecall(g);
     }
 
     void
@@ -222,9 +226,7 @@ namespace TREX
       // If no such timeline has ever been posted, a new timeline will now be provided
       if (it == postedObservations.end())
         provide(token.timeline, false, false);
-
       //Observation obs = m_adapter.genericObservation(&token);
-
       //std::cerr << "Posting observation: " << obs << "\n";
       //postUniqueObservation(obs);
     }
@@ -242,32 +244,32 @@ namespace TREX
       MessageList<TrexAttribute>::const_iterator it;
       for (it = token.attributes.begin(); it != token.attributes.end(); it++)
       {
-    	  ss << "\t<Variable name='" << (*it)->name << "'>\n";
+        ss << "\t<Variable name='" << (*it)->name << "'>\n";
 
-    	  switch ((*it)->attr_type)
-    	  {
-    	  case TrexAttribute::TYPE_FLOAT:
-    		  ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-    		  break;
-    	  case TrexAttribute::TYPE_INT:
-    		  ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-    		  break;
-    	  case TrexAttribute::TYPE_STRING:
-    		  ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-    		  break;
-    	  case TrexAttribute::TYPE_BOOL:
-    		  ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-    		  break;
-    	  case TrexAttribute::TYPE_ENUM:
-    		  ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-    		  break;
-    	  default:
-    		  std::cerr << "Error parsing attribute: ";
-    		  (*it)->toText(std::cerr);
-    		  break;
-    	  }
+        switch ((*it)->attr_type)
+        {
+          case TrexAttribute::TYPE_FLOAT:
+            ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_INT:
+            ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_STRING:
+            ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_BOOL:
+            ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          case TrexAttribute::TYPE_ENUM:
+            ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            break;
+          default:
+            std::cerr << "Error parsing attribute: ";
+            (*it)->toText(std::cerr);
+            break;
+        }
 
-    	  ss << "\t</Variable>\n";
+        ss << "\t</Variable>\n";
 
       }
       ss << "\t</Goal>\n";
@@ -275,11 +277,11 @@ namespace TREX
 
       if(m_env->getControlInterfaceReactor() != NULL)
       {
-    	  m_env->getControlInterfaceReactor()->proccess_message(ss.str());
+        m_env->getControlInterfaceReactor()->proccess_message(ss.str());
       }
       else
       {
-    	  std::cerr << "ControlInterface not instantiated!\n";
+        std::cerr << "ControlInterface not instantiated!\n";
       }
 
     }
@@ -296,7 +298,6 @@ namespace TREX
         createNewReference = true;
         received.clear();
       }
-
 
       PlanControlState * pcstate =
           dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
@@ -319,11 +320,10 @@ namespace TREX
 
       FollowRefState * frefstate =
           dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
-      postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
       OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
-       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
+      postUniqueObservation(m_adapter.opLimitsObservation(oplims));
 
       std::map<std::string, Announce *>::iterator it;
 
@@ -333,28 +333,40 @@ namespace TREX
         postUniqueObservation(obs);
       }
 
-      if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
-        createNewReference = true;
-
-      if (m_ref.flags == 0)
-        createNewReference = true;
-
-      if (createNewReference && estate != NULL)
+      if (m_yoyoController.active)
       {
-        m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
-        m_ref.lat = estate->lat;
-        m_ref.lon = estate->lon;
-        WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
-        DesiredZ desZ;
-        desZ.value = 0;
-        desZ.z_units = Z_DEPTH;
-        m_ref.z.set(desZ);
+        m_yoyoController.setEstimatedState(estate);
+        m_yoyoController.setFollowRefState(frefstate);
+        m_yoyoController.setReference(m_ref);
+        m_yoyoController.setTimeUnderwater(-1);
+        m_ref = m_yoyoController.getCurrentReference();
+      }
+      else {
+        if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
+          createNewReference = true;
+
+        if (m_ref.flags == 0)
+          createNewReference = true;
+
+        if (createNewReference && estate != NULL)
+        {
+          m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
+          m_ref.lat = estate->lat;
+          m_ref.lon = estate->lon;
+          WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
+          DesiredZ desZ;
+          desZ.value = 0;
+          desZ.z_units = Z_DEPTH;
+          m_ref.z.set(desZ);
+          postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
+        }
       }
 
       // Send current reference to DUNE
       if (!m_blocked)
       {
         sendMsg(m_ref);
+        m_ref.toText(std::cout);
       }
 
       // Operational limits are sent by DUNE on request
@@ -370,12 +382,11 @@ namespace TREX
       if (command != NULL)
       {
         handleTrexOperation(*command);
-        //delete received[TrexOperation::getIdStatic()];
-        received.erase(TrexOperation::getIdStatic());
+        delete received[TrexOperation::getIdStatic()];
       }
     }
 
-    void Platform::handleGoingRecall(Goal g)
+    void Platform::handleGoingRecall(goal_id const &g)
     {
       EstimatedState * estate =
           dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
@@ -411,9 +422,11 @@ namespace TREX
       }
     }
 
-    void
-    Platform::handleAtRequest(goal_id const &g)
+    bool
+    Platform::handleAtRequest(goal_id const &goal)
     {
+
+      Goal *g = goal.get();
       double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
 
       if(g->getAttribute("latitude").domain().isSingleton())
@@ -443,19 +456,93 @@ namespace TREX
         WGS84::displace(estate->x, estate->y, &my_lat, &my_lon);
       }
 
-//      if (WGS84::distance(my_lat, my_lon, my_z, req_lat, req_lon, req_z) < 10)
-//      {
-//        std::cerr << "Ok! I'm there... posting..." << std::endl;
-//        Observation * obs = (Observation *) &g;
-//        m_observations_pending.push_back(*obs);
-//      }
+      return true;
     }
 
-    void
-    Platform::handleGoingRequest(goal_id const &g)
+    bool
+    Platform::handleYoYoRequest(goal_id const &goal)
     {
+      double minz, maxz, z;
+      int max_secs_underwater = 30000;
+
+      Goal *g = goal.get();
       Variable v;
       v = g->getAttribute("latitude");
+      int flags = Reference::FLAG_LOCATION;
+
+      if (v.domain().isSingleton())
+        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+
+      v = g->getAttribute("longitude");
+      if (v.domain().isSingleton())
+        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+
+      v = g->getAttribute("z");
+      if (v.domain().isSingleton())
+      {
+        z = v.domain().getTypedSingleton<double, true>();
+        DesiredZ desZ;
+        flags |= Reference::FLAG_Z;
+
+        if (z >= 0)
+        {
+          desZ.value = z;
+          desZ.z_units = Z_DEPTH;
+        }
+        else
+        {
+          desZ.value = -z;
+          desZ.z_units = Z_ALTITUDE;
+        }
+        m_ref.z.set(desZ);
+      }
+
+      v = g->getAttribute("minz");
+      if (v.domain().isSingleton())
+      {
+        //FIXME altitude
+        minz = v.domain().getTypedSingleton<double, true>();
+      }
+
+      v = g->getAttribute("maxz");
+      if (v.domain().isSingleton())
+      {
+        //FIXME altitude
+        maxz = v.domain().getTypedSingleton<double, true>();
+      }
+
+      //v = g->getAttribute("secs_underwater");
+      //if (v.domain().isSingleton())
+      //{
+      //  max_secs_underwater = v.domain().getTypedSingleton<int, true>();
+      //}
+
+      v = g->getAttribute("speed");
+      if (v.domain().isSingleton())
+      {
+        double speed = v.domain().getTypedSingleton<double, true>();
+        DesiredSpeed desSpeed;
+        flags |= Reference::FLAG_SPEED;
+        desSpeed.value = speed;
+        desSpeed.speed_units = SUNITS_METERS_PS;
+        m_ref.speed.set(desSpeed);
+      }
+
+      m_yoyoController = YoYoController(minz, maxz, z, max_secs_underwater);
+      m_yoyoController.active = true;
+
+      return true;
+    }
+
+
+    bool
+    Platform::handleGoingRequest(goal_id const &goal)
+    {
+
+      Goal *g = goal.get();
+      Variable v;
+      v = g->getAttribute("latitude");
+
       int flags = Reference::FLAG_LOCATION;
 
       if (v.domain().isSingleton())
@@ -495,6 +582,8 @@ namespace TREX
         desSpeed.speed_units = SUNITS_METERS_PS;
         m_ref.speed.set(desSpeed);
       }
+
+      return true;
     }
 
     bool

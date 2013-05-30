@@ -53,6 +53,16 @@ class Reference extends AgentTimeline {
 		float speed;	
 	};
 	
+	predicate YoYo {
+		float latitude;
+		float longitude;
+		float z; 		// final z
+		float minz; 	// transect min z 
+		float maxz;		// transect max z
+		float speed;	
+	};
+	
+	
 	predicate At {
 		float latitude;
 		float longitude;

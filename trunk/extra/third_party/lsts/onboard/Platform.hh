@@ -28,6 +28,7 @@
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
+# include "YoYoController.hpp"
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -75,25 +76,6 @@ namespace TREX {
       bool reportErrorToDune(const std::string &message);
       bool sendMsg(Message& msg);
     private:
-//      class log_proxy {
-//      public:
-//	typedef void                               result_type;
-//	typedef ::TREX::utils::log::entry::pointer argument_type;
-//
-//        explicit log_proxy(Platform &me)
-//        :m_platform(&me) {}
-//        log_proxy(log_proxy const &other)
-//        :m_platform(other.m_platform) {}
-//        ~log_proxy();
-//
-//	void operator()(argument_type msg);
-//
-//      private:
-//        Platform *m_platform;
-//      };
-//      log_proxy *m_active_proxy;
-
-
 
       bool synchronize();
       void handleRequest(TREX::transaction::goal_id const &g);
@@ -110,9 +92,10 @@ namespace TREX {
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      void handleGoingRequest(goal_id const &g);
-      void handleAtRequest(goal_id const &g);
-      void handleGoingRecall(Goal g);
+      bool handleGoingRequest(goal_id const & g);
+      bool handleAtRequest(goal_id const & g);
+      bool handleYoYoRequest(goal_id const &goal);
+      void handleGoingRecall(goal_id const & g);
 
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
@@ -147,11 +130,13 @@ namespace TREX {
 
       void setValue(bool val);
 
-      //std::list<TREX::transaction::goal_id> m_goals_pending;
+      std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;
 
       /** @brief received announces since last tick */
       std::map<std::string, Announce *> m_receivedAnnounces;
+
+      YoYoController m_yoyoController;
     };
 
   }

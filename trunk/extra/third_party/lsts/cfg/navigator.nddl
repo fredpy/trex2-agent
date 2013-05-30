@@ -1,11 +1,15 @@
 #include "TREX.nddl"
 #include "platform.nddl"
+#include "path.nddl"
 
 class Navigator extends AgentTimeline {
-	
+
+  float min_z, max_z;
+
   Navigator(Mode _mode) {
-    super(_mode, "Idle", true);
+    super(_mode, "Idle", true);    
   }
+  
   Navigator(Mode _mode, bool plan) {
     super(_mode, "Idle", plan);
   }
@@ -19,7 +23,6 @@ class Navigator extends AgentTimeline {
 	
   predicate At {
     float latitude, longitude, z, speed;
-    int secs;		
+    int secs;
   }
 }
-

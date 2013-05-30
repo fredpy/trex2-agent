@@ -3,6 +3,7 @@
 #include "platform.nddl"
 
 Navigator::At {
+	float accuracy;
 	float min_dist;
 	min_dist == 3;
 	
@@ -10,7 +11,6 @@ Navigator::At {
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 		z == arr.z;
 		speed == arr.speed;
-	
 }
 
 Navigator::Going {
@@ -43,14 +43,14 @@ Navigator::Going {
 	my_start == max(origin.start, c.start);
 
 	if(  my_start<= AGENT_CLOCK ) {
-		contains(condition Reference.Going g);
+		contains(condition Reference.YoYo g);
 
 		latitude == g.latitude;
 		longitude == g.longitude;
-		z == g.z;
+		g.maxz == object.max_z;
+		g.minz == object.min_z;
+		g.z == z;
 		speed == g.speed;
 		concurrent(end, g.end);
 	}
-
-	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
 }
