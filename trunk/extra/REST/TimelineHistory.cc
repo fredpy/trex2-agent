@@ -235,6 +235,7 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out) {
     if( count>0 )
       out.put(',');
     TICK t_l = (*i)->latency(), t_pi = (*i)->look_ahead();
+        
     out<<"\n  { \"name\": \""<<(*i)->name()<<"\","
     // href is hard coded .... I dshould be able to do better but will
     // do for now
@@ -245,9 +246,24 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out) {
        <<m_reactor.duration_str(t_l)<<"\" },"
        <<"\n    \"look_ahead\": { \"ticks\": \""<<t_pi<<"\", \"duration\": \""
        <<m_reactor.duration_str(t_pi)<<"\" },"
-       <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\""
-       <<"\n  }";
+       <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
+       <<"\n    \"total_obs\": "<<(*i)->count()<<",";
+
+    TeleoReactor::duration_type period = m_reactor.tickDuration();
+    long double factor = 0.0;
+    if( (*i)->count()>0 ) {
+      factor = 1+m_cur-(*i)->initial();
+      factor /= (*i)->count();
+      period *= factor;
+    } else
+      period *= 0;
+    typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
+    convert::posix_duration dur = convert::to_posix(period);
+    
+    out<<"\n    \"obs_period\": { \"ticks\": \""<<factor<<"\", "
+       <<"\"duration\": \""<<dur<<"\" }\n  }";
   }
+  
   return count;
 }
 

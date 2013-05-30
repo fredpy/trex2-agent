@@ -49,7 +49,7 @@ namespace TREX {
           return tl.name();
         }
         
-        timeline_wrap(transaction::details::timeline const &tl):m_tl(tl) {}
+        timeline_wrap(transaction::details::timeline const &tl):m_tl(tl),m_count(0) {}
         ~timeline_wrap() {}
         
         utils::Symbol const &name() const {
@@ -77,7 +77,10 @@ namespace TREX {
         new_obs(transaction::TICK cur, transaction::goal_id tok) {
           std::pair<transaction::TICK, transaction::goal_id> ret(m_date, m_obs);
           m_date = cur;
+          if( 0==m_count )
+            m_initial = m_date;
           m_obs = tok;
+          ++m_count;
           return ret;
         }
         
@@ -87,15 +90,24 @@ namespace TREX {
         transaction::TICK obs_date() const {
           return m_date;
         }
+        transaction::TICK initial() const {
+          return m_initial;
+        }
+        
         transaction::goal_id obs() const {
           return m_obs;
         }
+        unsigned long long count() const {
+          return m_count;
+        }
+        
         
       private:
         transaction::details::timeline const &m_tl;
         
-        transaction::TICK    m_date;
+        transaction::TICK    m_initial, m_date;
         transaction::goal_id m_obs;
+        unsigned long long   m_count;
       };
       
       typedef utils::pointer_id_traits<timeline_wrap> tw_ptr_id_traits;
