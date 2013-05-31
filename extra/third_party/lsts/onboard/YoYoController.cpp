@@ -60,12 +60,14 @@ namespace TREX
       switch(m_exec_state)
       {
         case INIT:
+          std::cout << "INIT" << std::endl;
           desZ.value = m_maxz;
           desZ.z_units = Z_DEPTH;
           m_exec_state = YOYO_DOWN;
           break;
 
         case YOYO_DOWN:
+          std::cout << "DOWN" << std::endl;
           if ((m_fref_state->proximity & FollowRefState::PROX_XY_NEAR) != 0)
           {
             desZ = *m_original_ref.z.get();
@@ -89,6 +91,7 @@ namespace TREX
           break;
 
         case YOYO_UP:
+          std::cout << "UP" << std::endl;
           if ((m_fref_state->proximity & FollowRefState::PROX_XY_NEAR) != 0)
           {
             desZ = *m_original_ref.z.get();
@@ -112,6 +115,7 @@ namespace TREX
           break;
 
         case SURFACE:
+          std::cout << "SURFACE" << std::endl;
           if ((m_fref_state->proximity & FollowRefState::PROX_Z_NEAR) != 0)
           {
             m_ref = m_original_ref;
@@ -121,6 +125,7 @@ namespace TREX
           }
           break;
         case END:
+          std::cout << "END" << std::endl;
           active = false;
           break;
       }
