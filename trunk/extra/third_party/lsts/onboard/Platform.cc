@@ -43,7 +43,7 @@ namespace TREX
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-      LstsReactor(arg), m_yoyoController(0,0,0,0)
+          LstsReactor(arg)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -141,9 +141,7 @@ namespace TREX
     bool
     Platform::synchronize()
     {
-      processState();
-      Heartbeat hb;
-      sendMsg(hb);
+      bool postControl = true;
 
       if (!m_goals_pending.empty())
       {
@@ -162,9 +160,15 @@ namespace TREX
         if (commited)
         {
           m_goals_pending.remove(goal);
+          postControl = false;
           postUniqueObservation(*goal.get());
         }
       }
+
+      processState(postControl);
+      Heartbeat hb;
+      sendMsg(hb);
+
       return true;
     }
 
@@ -178,16 +182,9 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
+      std::cerr << "handleRequest(" << g << ", " << *goal << ")" << std::endl;
 
       m_goals_pending.push_back(g);
-
-      //if (gname == "reference" && gpred == "Going")
-      //  handleGoingRequest(*goal);
-
-      //else if (gname == "reference" && gpred == "At")
-      //  handleAtRequest(*goal);
-
     }
 
     void
@@ -198,7 +195,10 @@ namespace TREX
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
-      std::cerr << "handleRecall(" << gpred << ")" << std::endl;
+      std::cerr << "handleRecall(" << g << ", " << *goal << ")" << std::endl;
+
+      m_goals_pending.remove(g);
+
       if (gname == "reference" && gpred == "Going")
         handleGoingRecall(g);
     }
@@ -215,7 +215,6 @@ namespace TREX
           postObservationToken(TrexToken(*trexOp.token.get()));
           break;
       }
-
     }
 
     void
@@ -283,11 +282,10 @@ namespace TREX
       {
         std::cerr << "ControlInterface not instantiated!\n";
       }
-
     }
 
     void
-    Platform::processState()
+    Platform::processState(bool postControl)
     {
 
       bool createNewReference = false;
@@ -320,6 +318,8 @@ namespace TREX
 
       FollowRefState * frefstate =
           dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+      if (postControl)
+        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
       OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
@@ -333,40 +333,29 @@ namespace TREX
         postUniqueObservation(obs);
       }
 
-      if (m_yoyoController.active)
+      if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
+        createNewReference = true;
+
+      if (m_ref.flags == 0)
+        createNewReference = true;
+
+      if (createNewReference && estate != NULL)
       {
-        m_yoyoController.setEstimatedState(estate);
-        m_yoyoController.setFollowRefState(frefstate);
-        m_yoyoController.setReference(m_ref);
-        m_yoyoController.setTimeUnderwater(-1);
-        m_ref = m_yoyoController.getCurrentReference();
-      }
-      else {
-        if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
-          createNewReference = true;
-
-        if (m_ref.flags == 0)
-          createNewReference = true;
-
-        if (createNewReference && estate != NULL)
-        {
-          m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
-          m_ref.lat = estate->lat;
-          m_ref.lon = estate->lon;
-          WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
-          DesiredZ desZ;
-          desZ.value = 0;
-          desZ.z_units = Z_DEPTH;
-          m_ref.z.set(desZ);
-          postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
-        }
+        m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
+        m_ref.lat = estate->lat;
+        m_ref.lon = estate->lon;
+        WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
+        DesiredZ desZ;
+        desZ.value = 0;
+        desZ.z_units = Z_DEPTH;
+        m_ref.z.set(desZ);
       }
 
       // Send current reference to DUNE
       if (!m_blocked)
       {
         sendMsg(m_ref);
-        m_ref.toText(std::cout);
+        //m_ref.toText(std::cout);
       }
 
       // Operational limits are sent by DUNE on request
@@ -375,8 +364,6 @@ namespace TREX
         GetOperationalLimits req;
         sendMsg(req);
       }
-
-      //std::cout << received[TrexOperation::getIdStatic()] << "\n";
 
       TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
       if (command != NULL)
@@ -467,78 +454,8 @@ namespace TREX
     bool
     Platform::handleYoYoRequest(goal_id const &goal)
     {
-      double minz, maxz, z;
-      int max_secs_underwater = 30000;
-
-      Goal *g = goal.get();
-      Variable v;
-      v = g->getAttribute("latitude");
-      int flags = Reference::FLAG_LOCATION;
-
-      if (v.domain().isSingleton())
-        m_ref.lat = v.domain().getTypedSingleton<double, true>();
-
-      v = g->getAttribute("longitude");
-      if (v.domain().isSingleton())
-        m_ref.lon = v.domain().getTypedSingleton<double, true>();
-
-      v = g->getAttribute("z");
-      if (v.domain().isSingleton())
-      {
-        z = v.domain().getTypedSingleton<double, true>();
-        DesiredZ desZ;
-        flags |= Reference::FLAG_Z;
-
-        if (z >= 0)
-        {
-          desZ.value = z;
-          desZ.z_units = Z_DEPTH;
-        }
-        else
-        {
-          desZ.value = -z;
-          desZ.z_units = Z_ALTITUDE;
-        }
-        m_ref.z.set(desZ);
-      }
-
-      v = g->getAttribute("minz");
-      if (v.domain().isSingleton())
-      {
-        //FIXME altitude
-        minz = v.domain().getTypedSingleton<double, true>();
-      }
-
-      v = g->getAttribute("maxz");
-      if (v.domain().isSingleton())
-      {
-        //FIXME altitude
-        maxz = v.domain().getTypedSingleton<double, true>();
-      }
-
-      //v = g->getAttribute("secs_underwater");
-      //if (v.domain().isSingleton())
-      //{
-      //  max_secs_underwater = v.domain().getTypedSingleton<int, true>();
-      //}
-
-      v = g->getAttribute("speed");
-      if (v.domain().isSingleton())
-      {
-        double speed = v.domain().getTypedSingleton<double, true>();
-        DesiredSpeed desSpeed;
-        flags |= Reference::FLAG_SPEED;
-        desSpeed.value = speed;
-        desSpeed.speed_units = SUNITS_METERS_PS;
-        m_ref.speed.set(desSpeed);
-      }
-
-      m_yoyoController = YoYoController(minz, maxz, z, max_secs_underwater);
-      m_yoyoController.active = true;
-
-      return true;
+      return handleGoingRequest(goal);
     }
-
 
     bool
     Platform::handleGoingRequest(goal_id const &goal)

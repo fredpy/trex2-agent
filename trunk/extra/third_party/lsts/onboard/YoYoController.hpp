@@ -10,6 +10,7 @@
 
 # include <DUNE/DUNE.hpp>
 # include <trex/transaction/Observation.hh>
+# include "ReferenceController.hpp"
 
 using DUNE_NAMESPACES;
 using namespace TREX::transaction;
@@ -20,16 +21,13 @@ namespace TREX
   {
     enum ExecutionState {INIT, YOYO_DOWN, YOYO_UP, SURFACE, END};
 
-    class YoYoController
+    class YoYoController : ReferenceController
     {
     public:
-      YoYoController(double minz, double maxz, double endz, int secs_underwater);
-      void setFollowRefState(DUNE::IMC::FollowRefState * state);
-      void setEstimatedState(DUNE::IMC::EstimatedState * state);
-      void setTimeUnderwater(int seconds);
-      void setReference(DUNE::IMC::Reference ref);
-      Reference getCurrentReference();
-      bool active;
+      YoYoController();
+      void init(goal_id const &goal);
+      bool finished();
+      Reference control(EstimatedState * estate, FollowRefState * frefState);
       virtual
       ~YoYoController();
 
@@ -39,11 +37,9 @@ namespace TREX
       double m_endz;
       ExecutionState m_exec_state;
       int m_max_time_underwater, m_time_underwater;
-      bool ascending;
-      DUNE::IMC::FollowRefState * m_fref_state;
-      DUNE::IMC::EstimatedState * m_estate;
       DUNE::IMC::Reference m_original_ref;
       DUNE::IMC::Reference m_ref;
+      bool m_active;
     };
 
   } /* namespace LSTS */

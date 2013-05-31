@@ -17,7 +17,15 @@ close();
 rejectable (navigator.At target);
 target.latitude == to_rad(41.184195);
 target.longitude == to_rad(-8.705745);
-target.z.specify(2);
+target.z.specify(7);
 target.speed.specify(1.5);
 target.secs.specify(0);
-target.start.specify(10);
+
+//rejectable (reference.YoYo target);
+//target.latitude == to_rad(41.184195);
+//target.longitude == to_rad(-8.705745);
+//target.z.specify(0);
+//target.minz.specify(2);
+//target.maxz.specify(50);
+//target.speed.specify(1.5);
+//target.start.specify(10);
