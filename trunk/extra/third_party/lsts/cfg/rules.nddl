@@ -2,6 +2,14 @@
 #include "navigator.nddl"
 #include "platform.nddl"
 
+Reference::At {
+	met_by(Going g);
+	g.latitude == latitude;
+	g.longitude == longitude;
+	g.z == z;
+	g.speed == speed;
+}
+
 Navigator::At {
 	float min_dist;
 	min_dist == 3;

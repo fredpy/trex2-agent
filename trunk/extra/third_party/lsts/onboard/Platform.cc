@@ -456,7 +456,12 @@ namespace TREX
         WGS84::displace(estate->x, estate->y, &my_lat, &my_lon);
       }
 
-      return true;
+      double dist = WGS84::distance(my_lat, my_lon, 0, req_lat, req_lon, 0);
+
+      if (dist < 3)
+        return true;
+      else
+        return false;
     }
 
     bool
