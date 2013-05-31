@@ -5,7 +5,7 @@
  *      Author: zp
  */
 
-#include "extra/third_party/lsts/onboard/YoYoController.hpp"
+#include "YoYoController.hpp"
 
 using DUNE_NAMESPACES;
 
@@ -14,46 +14,79 @@ namespace TREX
   namespace LSTS
   {
 
-    YoYoController::YoYoController(double minz, double maxz, double endz, int secs_underwater)
-    {
-      m_fref_state = NULL;
-      m_estate = NULL;
-      m_minz = minz;
-      m_maxz = maxz;
-      m_endz = endz;
-      m_exec_state = INIT;
-      m_max_time_underwater = secs_underwater;
-      m_time_underwater = 0;
-      ascending = false;
-      active = false;
 
-      std::cout << "YoyoController: " << minz << " -> " << maxz << std::endl;
+    void
+    YoYoController::init(goal_id const &goal)
+    {
+      double z;
+      Goal *g = goal.get();
+      Variable v;
+      v = g->getAttribute("latitude");
+      int flags = Reference::FLAG_LOCATION;
+
+      if (v.domain().isSingleton())
+        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+
+      v = g->getAttribute("longitude");
+      if (v.domain().isSingleton())
+        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+
+      v = g->getAttribute("z");
+      if (v.domain().isSingleton())
+      {
+        z = v.domain().getTypedSingleton<double, true>();
+        DesiredZ desZ;
+        flags |= Reference::FLAG_Z;
+
+        if (z >= 0)
+        {
+          desZ.value = z;
+          desZ.z_units = Z_DEPTH;
+        }
+        else
+        {
+          desZ.value = -z;
+          desZ.z_units = Z_ALTITUDE;
+        }
+        m_ref.z.set(desZ);
+      }
+
+      v = g->getAttribute("minz");
+      if (v.domain().isSingleton())
+      {
+        m_minz = v.domain().getTypedSingleton<double, true>();
+      }
+
+      v = g->getAttribute("maxz");
+      if (v.domain().isSingleton())
+      {
+        m_maxz = v.domain().getTypedSingleton<double, true>();
+      }
+
+      v = g->getAttribute("speed");
+      if (v.domain().isSingleton())
+      {
+        double speed = v.domain().getTypedSingleton<double, true>();
+        DesiredSpeed desSpeed;
+        flags |= Reference::FLAG_SPEED;
+        desSpeed.value = speed;
+        desSpeed.speed_units = SUNITS_METERS_PS;
+        m_ref.speed.set(desSpeed);
+      }
+
+      m_active = true;
     }
 
-    void YoYoController::setFollowRefState(DUNE::IMC::FollowRefState * state)
+    bool
+    YoYoController::finished()
     {
-      m_fref_state = state;
+      return m_active;
     }
 
-    void YoYoController::setEstimatedState(DUNE::IMC::EstimatedState * state)
+    Reference
+    YoYoController::control(EstimatedState * estate, FollowRefState * frefstate)
     {
-      m_estate = state;
-    }
-
-    void YoYoController::setReference(DUNE::IMC::Reference ref)
-    {
-      m_ref = m_original_ref = ref;
-    }
-
-    void YoYoController::setTimeUnderwater(int seconds)
-    {
-      m_time_underwater = seconds;
-    }
-
-    Reference YoYoController::getCurrentReference()
-    {
-
-      if (m_fref_state == NULL || m_estate == NULL)
+      if (estate == NULL || frefstate == NULL)
         return m_ref;
 
       DesiredZ desZ;
@@ -68,21 +101,21 @@ namespace TREX
 
         case YOYO_DOWN:
           std::cout << "DOWN" << std::endl;
-          if ((m_fref_state->proximity & FollowRefState::PROX_XY_NEAR) != 0)
+          if ((frefstate->proximity & FollowRefState::PROX_XY_NEAR) != 0)
           {
             desZ = *m_original_ref.z.get();
             m_exec_state = END;
           }
           else if (m_time_underwater >= m_max_time_underwater)
           {
-            m_ref.lat = m_estate->lat;
-            m_ref.lon = m_estate->lon;
-            WGS84::displace(m_estate->x, m_estate->y, &(m_ref.lat), &(m_ref.lon));
+            m_ref.lat = estate->lat;
+            m_ref.lon = estate->lon;
+            WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
             desZ.value = 0;
             desZ.z_units = Z_DEPTH;
             m_exec_state = SURFACE;
           }
-          else if ((m_fref_state->proximity & FollowRefState::PROX_Z_NEAR) != 0)
+          else if ((frefstate->proximity & FollowRefState::PROX_Z_NEAR) != 0)
           {
             desZ.value = m_minz;
             desZ.z_units = Z_DEPTH;
@@ -92,21 +125,21 @@ namespace TREX
 
         case YOYO_UP:
           std::cout << "UP" << std::endl;
-          if ((m_fref_state->proximity & FollowRefState::PROX_XY_NEAR) != 0)
+          if ((frefstate->proximity & FollowRefState::PROX_XY_NEAR) != 0)
           {
             desZ = *m_original_ref.z.get();
             m_exec_state = END;
           }
           else if (m_time_underwater >= m_max_time_underwater)
           {
-            m_ref.lat = m_estate->lat;
-            m_ref.lon = m_estate->lon;
-            WGS84::displace(m_estate->x, m_estate->y, &(m_ref.lat), &(m_ref.lon));
+            m_ref.lat = estate->lat;
+            m_ref.lon = estate->lon;
+            WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
             desZ.value = 0;
             desZ.z_units = Z_DEPTH;
             m_exec_state = SURFACE;
           }
-          else if ((m_fref_state->proximity & FollowRefState::PROX_Z_NEAR) != 0)
+          else if ((frefstate->proximity & FollowRefState::PROX_Z_NEAR) != 0)
           {
             desZ.value = m_maxz;
             desZ.z_units = Z_DEPTH;
@@ -116,7 +149,7 @@ namespace TREX
 
         case SURFACE:
           std::cout << "SURFACE" << std::endl;
-          if ((m_fref_state->proximity & FollowRefState::PROX_Z_NEAR) != 0)
+          if ((frefstate->proximity & FollowRefState::PROX_Z_NEAR) != 0)
           {
             m_ref = m_original_ref;
             desZ.value = m_maxz;
@@ -126,12 +159,20 @@ namespace TREX
           break;
         case END:
           std::cout << "END" << std::endl;
-          active = false;
+          m_active = false;
           break;
       }
       m_ref.z.set(&desZ);
 
       return m_ref;
+    }
+
+    YoYoController::YoYoController()
+    {
+      m_active = false;
+      m_max_time_underwater = m_time_underwater = 0;
+      m_exec_state = INIT;
+      m_maxz = m_minz = m_endz = 0;
     }
 
     YoYoController::~YoYoController()

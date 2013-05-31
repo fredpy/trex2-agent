@@ -28,7 +28,6 @@
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
-# include "YoYoController.hpp"
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -84,7 +83,7 @@ namespace TREX {
       void handleInit();
       bool sendMsg(Message& msg, std::string ip, int port);
 
-      void processState();
+      void processState(bool postControl);
       void handleTrexOperation(TrexOperation trexOp);
       void postGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
@@ -136,7 +135,7 @@ namespace TREX {
       /** @brief received announces since last tick */
       std::map<std::string, Announce *> m_receivedAnnounces;
 
-      YoYoController m_yoyoController;
+      //YoYoController m_yoyoController;
     };
 
   }
