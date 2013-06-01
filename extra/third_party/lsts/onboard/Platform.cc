@@ -43,7 +43,7 @@ namespace TREX
     Reference m_ref;
 
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-          LstsReactor(arg)
+                  LstsReactor(arg)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -68,10 +68,13 @@ namespace TREX
       provide("medium", false);
       provide("control", false);
       provide("oplimits", false);
+      provide("refstate", false);
 
       // Timelines that can be controlled by other reactors
       provide("reference");
+
     }
+
 
     void
     Platform::handleInit()
@@ -84,6 +87,26 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
+
+      if (!m_goals_pending.empty())
+      {
+        goal_id goal = m_goals_pending.front();
+        std::string gname = (goal->object()).str();
+        std::string gpred = (goal->predicate()).str();
+        std::string man_name;
+        bool commited = false;
+        if (gname == "reference" && gpred == "Going")
+          commited = handleGoingRequest(goal);
+        else if (gname == "reference" && gpred == "At")
+          commited = handleAtRequest(goal);
+
+        if (commited)
+        {
+          m_goals_pending.remove(goal);
+          postUniqueObservation(*goal.get());
+        }
+      }
+
       Announce * ann;
       try
       {
@@ -141,34 +164,9 @@ namespace TREX
     bool
     Platform::synchronize()
     {
-      bool postControl = true;
-
-      if (!m_goals_pending.empty())
-      {
-        goal_id goal = m_goals_pending.front();
-        std::string gname = (goal->object()).str();
-        std::string gpred = (goal->predicate()).str();
-        std::string man_name;
-        bool commited = false;
-        if (gname == "reference" && gpred == "Going")
-          commited = handleGoingRequest(goal);
-        else if (gname == "reference" && gpred == "YoYo")
-          commited = handleYoYoRequest(goal);
-        else if (gname == "reference" && gpred == "At")
-          commited = handleAtRequest(goal);
-
-        if (commited)
-        {
-          m_goals_pending.remove(goal);
-          postControl = false;
-          postUniqueObservation(*goal.get());
-        }
-      }
-
-      processState(postControl);
+      processState();
       Heartbeat hb;
       sendMsg(hb);
-
       return true;
     }
 
@@ -285,7 +283,7 @@ namespace TREX
     }
 
     void
-    Platform::processState(bool postControl)
+    Platform::processState()
     {
 
       bool createNewReference = false;
@@ -293,7 +291,6 @@ namespace TREX
       // if DUNE is disconnected everything is on initial (unknown / boot) state...
       if (!m_connected)
       {
-        createNewReference = true;
         received.clear();
       }
 
@@ -303,9 +300,6 @@ namespace TREX
       if (pcstate != NULL)
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING)
         && pcstate->plan_id == "trex_plan";
-
-      if (m_blocked)
-        createNewReference = true;
 
       // Translate incoming messages into observations
       EstimatedState * estate =
@@ -318,8 +312,7 @@ namespace TREX
 
       FollowRefState * frefstate =
           dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
-      if (postControl)
-        postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
+      postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
 
       OperationalLimits * oplims =
           dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
@@ -356,6 +349,39 @@ namespace TREX
       {
         sendMsg(m_ref);
         //m_ref.toText(std::cout);
+      }
+
+      if (atDestination(frefstate))
+      {
+        Observation obs("reference", "At");
+
+        obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
+        obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
+
+        if (!m_ref.z.isNull())
+        {
+          switch(m_ref.z->z_units)
+          {
+            case (Z_DEPTH):
+                          obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            break;
+            case (Z_ALTITUDE):
+                          obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+            break;
+            case (Z_HEIGHT):
+                          obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            break;
+            default:
+              break;
+          }
+        }
+
+        if (!m_ref.speed.isNull())
+        {
+          obs.restrictAttribute("speed",
+                                FloatDomain((m_ref.speed->value)));
+        }
+        postUniqueObservation(obs);
       }
 
       // Operational limits are sent by DUNE on request
@@ -402,7 +428,7 @@ namespace TREX
           dz.value = estate->height;
           dz.z_units = Z_HEIGHT;
         }
-
+        m_ref.flags = flags;
         m_ref.z.set(dz);
         m_ref.lat = latitude;
         m_ref.lon = longitude;
@@ -492,7 +518,10 @@ namespace TREX
           desZ.z_units = Z_ALTITUDE;
         }
         m_ref.z.set(desZ);
+
       }
+
+      m_ref.flags = flags;
 
       v = g->getAttribute("speed");
       if (v.domain().isSingleton())
@@ -505,8 +534,64 @@ namespace TREX
         m_ref.speed.set(desSpeed);
       }
 
+      sendMsg(m_ref);
+
       return true;
     }
+
+    bool
+    Platform::atDestination(FollowRefState * frefstate)
+    {
+      if (frefstate == NULL)
+        return false;
+
+      if ((frefstate->proximity & FollowRefState::PROX_XY_NEAR) == 0)
+        return false;
+
+      if ((frefstate->proximity & FollowRefState::PROX_Z_NEAR) == 0)
+        return false;
+
+      if (!sameReference(&m_ref, frefstate->reference.get()))
+        return false;
+
+      return true;
+    }
+
+    bool
+    Platform::sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2)
+    {
+      if (msg1->flags != msg2->flags)
+        return false;
+      if (msg1->lat != msg2->lat)
+        return false;
+      if (msg1->lon != msg2->lon)
+        return false;
+
+      if (msg1->z.isNull() != msg2->z.isNull())
+        return false;
+      else if (!msg1->z.isNull())
+      {
+        const IMC::DesiredZ *z1 = msg1->z.get();
+        const IMC::DesiredZ *z2 = msg2->z.get();
+
+        if (!z1->fieldsEqual(*z2))
+          return false;
+      }
+
+      if (msg1->speed.isNull() != msg2->speed.isNull())
+        return false;
+      else if (!msg1->speed.isNull())
+      {
+        const IMC::DesiredSpeed *s1 = msg1->speed.get();
+        const IMC::DesiredSpeed *s2 = msg2->speed.get();
+
+        if (!s1->fieldsEqual(*s2))
+          return false;
+      }
+
+      return true;
+    }
+
 
     bool
     Platform::sendMsg(Message& msg, std::string ip, int port)

@@ -39,6 +39,28 @@ class Payload extends AgentTimeline {
 }
 
 class Reference extends AgentTimeline {
+	PathControl(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+	
+	predicate At {
+		float latitude;
+		float longitude;
+		float speed;
+		float z;
+	}
+	
+	predicate Going {
+		float latitude;
+		float longitude;
+		float z;
+		float speed;
+	}
+}
+
+class ReferenceState extends AgentTimeline {
 	
 	Reference(Mode _mode) {
 		super(_mode, "Boot");
@@ -50,24 +72,9 @@ class Reference extends AgentTimeline {
 		float latitude;
 		float longitude;
 		float z;
-		float speed;	
-	};
-	
-	predicate YoYo {
-		float latitude;
-		float longitude;
-		float z; 		// final z
-		float minz; 	// transect min z 
-		float maxz;		// transect max z
-		float speed;	
-	};
-	
-	
-	predicate At {
-		float latitude;
-		float longitude;
-		float z;
 		float speed;
+		bool near_z;
+		bool near_xy;
 	};
 }
 
