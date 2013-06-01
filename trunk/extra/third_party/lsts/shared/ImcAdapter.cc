@@ -83,13 +83,11 @@ namespace TREX {
 
       bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;
       bool z_near = (msg->proximity & FollowRefState::PROX_Z_NEAR) != 0;
-      bool arrived = xy_near && z_near;
 
-      std::string predicate = "Going";
-      if (arrived)
-        predicate = "At";
+      Observation obs("refstate", "Going");
 
-      Observation obs("reference", predicate);
+      obs.restrictAttribute("near_z", BooleanDomain((z_near)));
+      obs.restrictAttribute("near_xy", BooleanDomain((xy_near)));
 
       obs.restrictAttribute("latitude", FloatDomain(msg->reference->lat));
       obs.restrictAttribute("longitude", FloatDomain(msg->reference->lon));
@@ -99,13 +97,13 @@ namespace TREX {
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-                            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           case (Z_ALTITUDE):
-                            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
           break;
           case (Z_HEIGHT):
-                            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           default:
             break;
@@ -117,6 +115,8 @@ namespace TREX {
         obs.restrictAttribute("speed",
                               FloatDomain((msg->reference->speed->value)));
       }
+
+
       return obs;
     }
 
