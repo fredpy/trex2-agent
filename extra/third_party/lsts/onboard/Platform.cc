@@ -88,7 +88,8 @@ namespace TREX
     Platform::handleTickStart()
     {
 
-      if (!m_goals_pending.empty())
+
+      if (!m_blocked && !m_goals_pending.empty())
       {
         goal_id goal = m_goals_pending.front();
         std::string gname = (goal->object()).str();
