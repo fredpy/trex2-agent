@@ -1,5 +1,4 @@
 #include "platform.nddl"
-
 #include "navigator.nddl"
 #include "rules.nddl"
 
