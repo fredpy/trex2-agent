@@ -130,10 +130,16 @@ namespace TREX
               delete m_receivedAnnounces[ann->sys_name];
             m_receivedAnnounces[ann->sys_name] = ann;
           }
-          if (msg->getId() == TrexOperation::getIdStatic())
+          else if (msg->getId() == TrexOperation::getIdStatic())
           {
             TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
             handleTrexOperation(*command);
+          }
+          else {
+            // substitute previously received message
+            if (received.count(msg->getId()))
+              delete received[msg->getId()];
+            received[msg->getId()] = msg;
           }
         }
 
