@@ -10,6 +10,10 @@ Reference::At {
 	g.speed == speed;
 }
 
+ControlMode::DUNE {
+	contained_by(Navigator.Idle);
+}
+
 Navigator::At {
 	float min_dist;
 	min_dist == 3;
@@ -18,10 +22,15 @@ Navigator::At {
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 		z == arr.z;
 		speed == arr.speed;
+		
+	meets(Idle);
 	
+	duration == max(1, secs);
 }
 
 Navigator::Going {
+
+	met_by(Idle);
 
 	contained_by(condition ControlMode.TREX c);
 		c.start < start;	

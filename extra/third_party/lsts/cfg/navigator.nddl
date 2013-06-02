@@ -23,6 +23,6 @@ class Navigator extends AgentTimeline {
 	
   predicate At {
     float latitude, longitude, z, speed;
-    int secs;
+    int secs;    
   }
 }

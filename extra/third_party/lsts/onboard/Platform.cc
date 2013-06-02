@@ -130,11 +130,10 @@ namespace TREX
               delete m_receivedAnnounces[ann->sys_name];
             m_receivedAnnounces[ann->sys_name] = ann;
           }
-          else {
-            // substitute previously received message
-            if (received.count(msg->getId()))
-              delete received[msg->getId()];
-            received[msg->getId()] = msg;
+          if (msg->getId() == TrexOperation::getIdStatic())
+          {
+            TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
+            handleTrexOperation(*command);
           }
         }
 
@@ -390,13 +389,6 @@ namespace TREX
       {
         GetOperationalLimits req;
         sendMsg(req);
-      }
-
-      TrexOperation * command = dynamic_cast<TrexOperation*>(received[TrexOperation::getIdStatic()]);
-      if (command != NULL)
-      {
-        handleTrexOperation(*command);
-        delete received[TrexOperation::getIdStatic()];
       }
     }
 
