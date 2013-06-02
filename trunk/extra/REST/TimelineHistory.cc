@@ -307,6 +307,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
         else
           first = false;
         utils::write_json(out, get_token((*pos)->obs()), false);
+        lo = IntegerDomain::plus_inf;
         ret += 1;
       }
       // TODO : repeat this for the planned tokens
