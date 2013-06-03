@@ -58,6 +58,13 @@ class Reference extends AgentTimeline {
 		float z;
 		float speed;
 	}
+	
+	predicate Surveil {
+		float latitude;
+		float longitude;
+		float z;
+		float speed;
+	}
 }
 
 class ReferenceState extends AgentTimeline {

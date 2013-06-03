@@ -95,6 +95,7 @@ namespace TREX {
       bool handleAtRequest(goal_id const & g);
       bool handleYoYoRequest(goal_id const &goal);
       void handleGoingRecall(goal_id const & g);
+      bool handleSurveilRequest(goal_id const &g);
 
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);

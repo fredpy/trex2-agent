@@ -72,9 +72,7 @@ namespace TREX
 
       // Timelines that can be controlled by other reactors
       provide("reference");
-
     }
-
 
     void
     Platform::handleInit()
@@ -100,6 +98,8 @@ namespace TREX
           commited = handleGoingRequest(goal);
         else if (gname == "reference" && gpred == "At")
           commited = handleAtRequest(goal);
+        else if (gname == "reference" && gpred == "Surveil")
+          commited = handleSurveilRequest(goal);
 
         if (commited)
         {
@@ -138,7 +138,7 @@ namespace TREX
           else {
             // substitute previously received message
             if (received.count(msg->getId()))
-              delete received[msg->getId()];
+               received.erase(msg->getId());
             received[msg->getId()] = msg;
           }
         }
@@ -176,6 +176,8 @@ namespace TREX
       return true;
     }
 
+    
+
     void
     Platform::handleRequest(goal_id const &g)
     {
@@ -186,7 +188,7 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << g << ", " << *goal << ")" << std::endl;
+      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
 
       m_goals_pending.push_back(g);
     }
@@ -219,6 +221,7 @@ namespace TREX
           postObservationToken(TrexToken(*trexOp.token.get()));
           break;
       }
+
     }
 
     void
@@ -286,6 +289,7 @@ namespace TREX
       {
         std::cerr << "ControlInterface not instantiated!\n";
       }
+
     }
 
     void
@@ -340,14 +344,10 @@ namespace TREX
 
       if (createNewReference && estate != NULL)
       {
-        m_ref.flags = Reference::FLAG_LOCATION | Reference::FLAG_Z;
+        // idle
+        m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
-        WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
-        DesiredZ desZ;
-        desZ.value = 0;
-        desZ.z_units = Z_DEPTH;
-        m_ref.z.set(desZ);
       }
 
       // Send current reference to DUNE
@@ -368,24 +368,24 @@ namespace TREX
         {
           switch(m_ref.z->z_units)
           {
-            case (Z_DEPTH):
-                          obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+          case (Z_DEPTH):
+                              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+          break;
+          case (Z_ALTITUDE):
+                              obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+          break;
+          case (Z_HEIGHT):
+                              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+          break;
+          default:
             break;
-            case (Z_ALTITUDE):
-                          obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
-            break;
-            case (Z_HEIGHT):
-                          obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-            break;
-            default:
-              break;
           }
         }
 
         if (!m_ref.speed.isNull())
         {
           obs.restrictAttribute("speed",
-                                FloatDomain((m_ref.speed->value)));
+              FloatDomain((m_ref.speed->value)));
         }
         postUniqueObservation(obs);
       }
@@ -439,7 +439,7 @@ namespace TREX
     {
 
       Goal *g = goal.get();
-      double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
+    	double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
 
       if(g->getAttribute("latitude").domain().isSingleton())
       {
@@ -470,18 +470,62 @@ namespace TREX
 
       double dist = WGS84::distance(my_lat, my_lon, 0, req_lat, req_lon, 0);
 
-      if (dist < 3)
+       if (dist < 3)
         return true;
       else
         return false;
     }
 
     bool
+    Platform::handleSurveilRequest(goal_id const &g)
+    {
+      double minz, maxz, z;
+      int max_secs_underwater = 30000;
+
+      //Goal *g = goal.get();
+      Variable v;
+      m_ref.flags = Reference::FLAG_LOCATION;
+      m_ref.flags |= Reference::FLAG_Z;
+      m_ref.flags |= Reference::FLAG_SPEED;
+      v = g->getAttribute("latitude");
+      if (v.domain().isSingleton())
+      {
+        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+
+        std::cout << "lat" << v.domain().getTypedSingleton<double, true>() << "\n\n";
+      }
+      else
+      {
+        std::cout << "ja foste \n\n";
+      }
+
+      v = g->getAttribute("longitude");
+      if (v.domain().isSingleton())
+        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+
+      DesiredZ desZ;
+      desZ.value = 300;
+      desZ.z_units = Z_HEIGHT;
+      m_ref.z.set(desZ);
+
+      DesiredSpeed desSpeed;
+      desSpeed.value = 20;
+      desSpeed.speed_units = SUNITS_METERS_PS;
+      m_ref.speed.set(desSpeed);
+
+      std::cout << m_ref.lat << " " << m_ref.lon << "\n";
+      syslog(log::info) << "sending to dune "<< m_ref.lat << " " << m_ref.lon << "\n";
+      sendMsg(m_ref);
+
+      return true;
+    }
+
+bool
     Platform::handleYoYoRequest(goal_id const &goal)
     {
       return handleGoingRequest(goal);
     }
-
+    
     bool
     Platform::handleGoingRequest(goal_id const &goal)
     {
