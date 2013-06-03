@@ -39,6 +39,8 @@ void DummyOperator::notify(TREX::transaction::Observation const &obs)
     pc.op = PlanControl::PC_STOP;
     pc.info = "TREX Dummy Operator Reactor";
     m_env.instance().getPlatformReactor()->sendMsg(pc);
+    std::cout << "Sending to Dune\n";
+    pc.toJSON(std::cout);
 
     SetEntityParameters params;
     params.name = "TREX";
@@ -47,6 +49,8 @@ void DummyOperator::notify(TREX::transaction::Observation const &obs)
     param.value = "true";
     params.params.push_back(param);
     m_env.instance().getPlatformReactor()->sendMsg(params);
+    params.toJSON(std::cout);
+
   }
 
 }
