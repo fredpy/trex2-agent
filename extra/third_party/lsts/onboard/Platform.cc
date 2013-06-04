@@ -154,7 +154,6 @@ namespace TREX
 
         else
         {
-          syslog(log::info) << "Received a total of " << msg_count << " messages\n";
           if (!m_connected)
             std::cerr <<"Now connected to DUNE\n";
           m_connected = true;
@@ -489,15 +488,7 @@ namespace TREX
       m_ref.flags |= Reference::FLAG_SPEED;
       v = g->getAttribute("latitude");
       if (v.domain().isSingleton())
-      {
         m_ref.lat = v.domain().getTypedSingleton<double, true>();
-
-        std::cout << "lat" << v.domain().getTypedSingleton<double, true>() << "\n\n";
-      }
-      else
-      {
-        std::cout << "ja foste \n\n";
-      }
 
       v = g->getAttribute("longitude");
       if (v.domain().isSingleton())
@@ -514,7 +505,7 @@ namespace TREX
       m_ref.speed.set(desSpeed);
 
       std::cout << m_ref.lat << " " << m_ref.lon << "\n";
-      syslog(log::info) << "sending to dune "<< m_ref.lat << " " << m_ref.lon << "\n";
+      syslog(log::info) << "sending reference to dune "<< m_ref.lat << " " << m_ref.lon << "\n";
       sendMsg(m_ref);
 
       return true;
