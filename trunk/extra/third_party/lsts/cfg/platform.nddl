@@ -65,6 +65,7 @@ class Reference extends AgentTimeline {
 		float z;
 		float speed;
 	}
+	
 }
 
 class ReferenceState extends AgentTimeline {
