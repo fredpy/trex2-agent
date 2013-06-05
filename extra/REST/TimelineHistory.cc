@@ -311,7 +311,7 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
       typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
       convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
       long double factor = 0.0;
-      if( (*i)->count()>0 ) {
+      if( cnt>0 ) {
         factor = n_ticks;
         factor /= cnt;
         period *= n_ticks;
