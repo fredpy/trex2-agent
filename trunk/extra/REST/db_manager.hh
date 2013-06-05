@@ -79,6 +79,8 @@ namespace TREX {
         size_t get_tokens(std::string const &tl, bound &min, bound const &max,
                           std::ostream &out, size_t max_count=100);
         
+        unsigned long long count(std::string const &name, bound const &min, bound const &max);
+        
       private:
         UNIQ_PTR<Wt::Dbo::SqlConnection> m_db;
         Wt::Dbo::Session                 m_session;

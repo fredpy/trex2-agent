@@ -37,6 +37,51 @@
 using namespace TREX::REST;
 namespace bp=boost::property_tree;
 
+
+namespace {
+  
+  
+  transaction::TICK parse_date(std::string const &var, std::string const &val, bool as_date) {
+    if( as_date ) {
+      try {
+        return ptr->get_date(val);
+      } catch(std::exception const &e) {
+        throw std::runtime_error("Failed to parse "+var+"="+val+" as a date.");
+      }
+    } else {
+      try {
+        return boost::lexical_cast<transaction::TICK>(val);
+      } catch(boost::bad_lexcal_cast const &e) {
+        throw std::runtime_error("Failed to parse "+var+"="+val+" as a tick.");
+      }      
+    }
+  }
+  
+  void temporal_bounds(Wt::Http::Request const &req,
+                       transaction::IntegerDomain::bound &lo,
+                       transaction::IntegerDomain::bound &hi) {
+    bool as_date = true;
+    std::string const *value;
+    
+    // Gte format option
+    value = req.getParameter("format");
+    if( NULL!=value ) {
+      if( "tick"==*value )
+        as_date = false;
+      else if( "date"!=*value )
+        throw std::runtime_error("Invalid format="+(*format)+". Only accept tick or date");
+    }
+    // Parse lower and upperbound 
+    value = req.getParameter("from");
+    if( NULL!=value )
+      lo = parse_date("from", *value, as_date);
+    value = req.getParameter("to");
+    if( NULL!=value )
+      hi = parse_date("to", *value, as_date);
+  }
+                       
+}
+
 /*
  * class TREX::REST::timeline_list_service
  */
@@ -49,6 +94,12 @@ void timeline_list_service::handleRequest(rest_request const &req,
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
   
+  transaction::IntegerDomain::bound lo = transaction::IntegerDomain::minus_inf,
+  hi = transaction::IntegerDomain::plus_inf;
+  
+  temporal_bounds(req.request(), lo, hi);
+  transaction::IntegerDomain initial(lo, hi);
+
   ans.setMimeType("application/json");
   std::set<std::string> subset;
   
@@ -67,7 +118,7 @@ void timeline_list_service::handleRequest(rest_request const &req,
       // silently ignore for now
     }
   }
-  ptr->list_timelines(data, subset, hidden);
+  ptr->list_timelines(data, subset, hidden, initial);
 }
 
 /*
@@ -96,54 +147,7 @@ void timeline_service::handleRequest(rest_request const &req,
     range->getBounds(lo, hi);
     first = false;
   } else {
-    bool as_date = true; // By default parse the attributes as UTC date
-    std::string const *format;
-    
-    // first check the timeline existence
-    if( !ptr->exists(req.arg_path().dump()) )
-      throw std::runtime_error("timeline \""+req.arg_path().dump()
-                               +"\" does not exist.");
-    
-    format = req.request().getParameter("format");
-    if( format ) {
-      if( "tick"==*format )
-        as_date = false;
-      else if( "date"!=*format )
-        throw std::runtime_error("Invalid format="+(*format)+". Only accept tick or date");
-    }
-    // Initialize the bounds with largest possible range
-    std::string const *val;
-    
-    val = req.request().getParameter("from");
-    if( as_date ) {
-      if( val )
-        try {
-          lo = ptr->get_date(*val);
-        } catch(std::exception const &e) {
-          throw std::runtime_error("Failed to parse from="+(*val)+" as a date");
-        }
-      val = req.request().getParameter("to");
-      if( val )
-        try {
-          hi = ptr->get_date(*val);
-        } catch(std::exception const &e) {
-          throw std::runtime_error("Failed to parse to="+(*val)+" as a date");
-        }
-    } else {
-      if( val )
-        try {
-          lo = boost::lexical_cast<transaction::TICK>(*val);
-        } catch(boost::bad_lexical_cast const &e) {
-          throw std::runtime_error("Failed to parse from as a tick");
-        }
-      val = req.request().getParameter("to");
-      if( val )
-        try {
-          hi = boost::lexical_cast<transaction::TICK>(*val);
-        } catch(boost::bad_lexical_cast const &e) {
-          throw std::runtime_error("Failed to parse to as a tick");
-        }
-    }
+    temporal_bounds(req.request(), lo, hi);
     if( lo.isInfinity() ) {
       if( hi>=now )
         lo = now;

@@ -199,6 +199,20 @@ size_t db_manager::get_tokens(std::string const &tl,
   }
 }
 
+unsigned long long db_manager::count(std::string const &name, bound const &min, bound const &max) {
+  dbo::Query<int> req = m_session.query<int>("select count(1) from token").where("timeline_name = ?").bind(name);
+  if( !min.isInfinity() )
+    req.where("end >= ?").bind(min.value());
+  // and start <= max
+  if( !max.isInfinity() )
+    req.where("start <= ?").bind(max.value());
+  {
+    dbo::Transaction tr(m_session);
+    return req.resultValue();
+  }
+}
+
+
 
 
 
