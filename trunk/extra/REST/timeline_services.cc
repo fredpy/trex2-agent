@@ -41,7 +41,8 @@ namespace bp=boost::property_tree;
 namespace {
   
   
-  transaction::TICK parse_date(std::string const &var, std::string const &val, bool as_date) {
+  TREX::transaction::TICK parse_date(std::string const &var, std::string const &val, bool as_date,
+                                     boost::shared_ptr<TimelineHistory> ptr) {
     if( as_date ) {
       try {
         return ptr->get_date(val);
@@ -50,16 +51,17 @@ namespace {
       }
     } else {
       try {
-        return boost::lexical_cast<transaction::TICK>(val);
-      } catch(boost::bad_lexcal_cast const &e) {
+        return boost::lexical_cast<TREX::transaction::TICK>(val);
+      } catch(boost::bad_lexical_cast const &e) {
         throw std::runtime_error("Failed to parse "+var+"="+val+" as a tick.");
       }      
     }
   }
   
   void temporal_bounds(Wt::Http::Request const &req,
-                       transaction::IntegerDomain::bound &lo,
-                       transaction::IntegerDomain::bound &hi) {
+                       TREX::transaction::IntegerDomain::bound &lo,
+                       TREX::transaction::IntegerDomain::bound &hi,
+                       boost::shared_ptr<TimelineHistory> ptr) {
     bool as_date = true;
     std::string const *value;
     
@@ -69,15 +71,15 @@ namespace {
       if( "tick"==*value )
         as_date = false;
       else if( "date"!=*value )
-        throw std::runtime_error("Invalid format="+(*format)+". Only accept tick or date");
+        throw std::runtime_error("Invalid format="+(*value)+". Only accept tick or date");
     }
     // Parse lower and upperbound 
     value = req.getParameter("from");
     if( NULL!=value )
-      lo = parse_date("from", *value, as_date);
+      lo = parse_date("from", *value, as_date, ptr);
     value = req.getParameter("to");
     if( NULL!=value )
-      hi = parse_date("to", *value, as_date);
+      hi = parse_date("to", *value, as_date, ptr);
   }
                        
 }
@@ -97,7 +99,7 @@ void timeline_list_service::handleRequest(rest_request const &req,
   transaction::IntegerDomain::bound lo = transaction::IntegerDomain::minus_inf,
   hi = transaction::IntegerDomain::plus_inf;
   
-  temporal_bounds(req.request(), lo, hi);
+  temporal_bounds(req.request(), lo, hi, ptr);
   transaction::IntegerDomain initial(lo, hi);
 
   ans.setMimeType("application/json");
@@ -147,7 +149,7 @@ void timeline_service::handleRequest(rest_request const &req,
     range->getBounds(lo, hi);
     first = false;
   } else {
-    temporal_bounds(req.request(), lo, hi);
+    temporal_bounds(req.request(), lo, hi, ptr);
     if( lo.isInfinity() ) {
       if( hi>=now )
         lo = now;
