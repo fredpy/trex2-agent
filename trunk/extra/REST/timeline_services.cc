@@ -145,8 +145,8 @@ void timeline_service::handleRequest(rest_request const &req,
         }
     }
     if( lo.isInfinity() ) {
-      if( hi>=cur )
-        lo = cur;
+      if( hi>=now )
+        lo = now;
     }
     
     ans.setMimeType("application/json");
