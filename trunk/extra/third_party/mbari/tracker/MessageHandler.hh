@@ -146,7 +146,7 @@ namespace mbari {
       return true;
     }
     
-    utils::Symbol tl_name(utils::Symbol const &base) const {
+    TREX::utils::Symbol tl_name(TREX::utils::Symbol const &base) const {
       return m_prefix+base.str();
     }
 
