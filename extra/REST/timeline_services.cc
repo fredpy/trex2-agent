@@ -85,7 +85,8 @@ void timeline_service::handleRequest(rest_request const &req,
   Wt::Http::ResponseContinuation *cont = req.request().continuation();
   
   transaction::IntegerDomain::bound lo = transaction::IntegerDomain::minus_inf,
-  hi = transaction::IntegerDomain::plus_inf;
+  hi = transaction::IntegerDomain::plus_inf,
+  now = ptr->now();
   
   bool first = true;
   if( cont ) {
@@ -143,6 +144,11 @@ void timeline_service::handleRequest(rest_request const &req,
           throw std::runtime_error("Failed to parse to as a tick");
         }
     }
+    if( lo.isInfinity() ) {
+      if( hi>=cur )
+        lo = cur;
+    }
+    
     ans.setMimeType("application/json");
     transaction::IntegerDomain initial(lo, hi);
     // As it is the start I need to add initial info to the stream
