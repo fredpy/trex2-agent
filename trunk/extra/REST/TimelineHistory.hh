@@ -73,6 +73,9 @@ namespace TREX {
       bool fancy() const {
         return m_fancy;
       }
+      transaction::TICk now() const {
+        return m_cur;
+      }
       
     private:
       boost::property_tree::ptree get_token(transaction::goal_id const &tok) const;
