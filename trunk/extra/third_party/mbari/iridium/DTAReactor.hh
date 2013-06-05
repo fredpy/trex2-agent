@@ -41,10 +41,11 @@ namespace mbari {
       };
 
       vehicle_mode m_trex_state;
-      std::string  m_drifter_pfx;
       
       std::string    m_imei;
       SbdMailer      m_iridium;
+
+      std::string  m_drifter_pfx;
     };
 
   }

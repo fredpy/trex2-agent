@@ -27,7 +27,7 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
    m_active(false),
    m_imei(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "imei")),
    m_iridium(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host")),
-   m_drifter_pfx(parse_attr<std::string>("_pos_", TeleoReactor::xml_factory::node(arg), "prefix")) s{
+   m_drifter_pfx(parse_attr<std::string>("_pos_", TeleoReactor::xml_factory::node(arg), "prefix")) {
   provide(SURVEY_TL);
   postObservation(Observation(SURVEY_TL, "None"));
   provide(STATE_TL, false);
