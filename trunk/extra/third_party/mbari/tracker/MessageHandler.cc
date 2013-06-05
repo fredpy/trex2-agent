@@ -43,7 +43,7 @@ MessageHandler::MessageHandler(MessageHandler::xml_arg const &arg, std::string c
 						   "exchange")),
    m_route(TREX::utils::parse_attr<std::string>("", factory::node(arg), "route")),
    m_tracker(*(arg.second)),
-   m_prefix(TREX::utils::parse_attr<std::string>("_", factory::node(arg), "prefix"))
+   m_prefix(TREX::utils::parse_attr<std::string>(pfx, factory::node(arg), "prefix"))
  {}
 
 bool MessageHandler::provide(std::string const &timeline, bool control) {
