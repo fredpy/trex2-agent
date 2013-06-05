@@ -62,7 +62,7 @@ void timeline_list_service::handleRequest(rest_request const &req,
   
   if( full ) {
     try {
-      hidden = !boost::lexical_cast<bool>(*full);
+      hidden = boost::lexical_cast<bool>(*full);
     } catch(boost::bad_lexical_cast const &e) {
       // silently ignore for now
     }
