@@ -47,7 +47,7 @@ using namespace TREX::REST;
  */
 
 TimelineHistory::TimelineHistory(REST_reactor &creator)
-:graph::timelines_listener(creator.get_graph()),m_reactor(creator),
+:graph::timelines_listener(creator.get_graph()), m_fancy(true), m_reactor(creator),
  m_strand(creator.manager().service()) {
    boost::filesystem::path p = m_reactor.file_name("timelines"+helpers::db_manager::db_ext);
    m_db.initialize(p.string());
@@ -209,7 +209,7 @@ void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
       std::ostringstream oss;
       helpers::json_stream json(oss);
       prev->restrictEnd(IntegerDomain(date));
-      utils::write_json(json, get_token(prev), false);
+      utils::write_json(json, get_token(prev), fancy());
       m_db.add_token(start, date, (*pos)->name().str(), oss.str());
     }
   } else
@@ -311,7 +311,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
           out.put(',');
         else
           first = false;
-        utils::write_json(out, get_token((*pos)->obs()), false);
+        utils::write_json(out, get_token((*pos)->obs()), fancy());
         lo = IntegerDomain::plus_inf;
         ret += 1;
       }
