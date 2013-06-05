@@ -53,7 +53,8 @@ namespace TREX {
                    transaction::TICK cur);
       void update_tick(transaction::TICK cur);
       
-      void list_timelines(std::ostream &out, std::set<std::string> const &select, bool hidden);
+      void list_timelines(std::ostream &out, std::set<std::string> const &select, bool hidden,
+                          transaction::IntegerDomain const &range);
       
       transaction::TICK get_date(std::string const &date);
       void get_tokens(std::string const &timeline,
@@ -73,12 +74,15 @@ namespace TREX {
       bool fancy() const {
         return m_fancy;
       }
-      transaction::TICk now() const {
+      transaction::TICK now() const {
         return m_cur;
       }
       
     private:
       boost::property_tree::ptree get_token(transaction::goal_id const &tok) const;
+      unsigned long long count_tokens(helpers::timeline_wrap const &tl,
+                                      transaction::IntegerDomain const &dom,
+                                      transaction::TICK &delta_t);
       
       void declared(transaction::details::timeline const &timeline);
       
@@ -100,7 +104,8 @@ namespace TREX {
       transaction::goal_id del_goal_sync(std::string id);
       
       
-      size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden);
+      size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden,
+                          transaction::IntegerDomain rng);
       
       bool const m_fancy;
       

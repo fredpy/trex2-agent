@@ -98,11 +98,18 @@ void TimelineHistory::declared(details::timeline const &timeline) {
 // REST callbacks
 
 void TimelineHistory::list_timelines(std::ostream &out,
-                                     std::set<std::string> const &select, bool hidden) {
+                                     std::set<std::string> const &select,
+                                     bool hidden,
+                                     IntegerDomain const &range) {
   // I build the json by hand
-  out<<"{ \"timelines\": [";
+  out<<"{ \"requested_tick_range\": ";
+  if( range.isFull() )
+    out<<"{}";
+  else
+    utils::write_json(out, range.as_tree(), fancy());
+  out<<",\n  \"timelines\": [";
   
-  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out), boost::ref(select), hidden));
+  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out), boost::ref(select), hidden, range));
   
   size_t count = utils::strand_run(m_strand, fn);
   
@@ -227,8 +234,49 @@ void TimelineHistory::ext_obs_sync(TICK date) {
       (*i)->obs()->restrictEnd(future);
 }
 
+unsigned long long TimelineHistory::count_tokens(helpers::timeline_wrap const &tl,
+                                                 IntegerDomain const &dom,
+                                                 transaction::TICK &delta_t) {
+  if( tl.has_observation() ) {
+    IntegerDomain::bound lo, hi;
+    dom.getBounds(lo, hi);
+    
+    if( lo>=tl.obs_date() ) {
+      // should evolve in the future : as of now we just look at observations
+      delta_t = 1+now()-tl.obs_date();
+      return 1;
+    } else if( hi < tl.initial() ) {
+      delta_t = 0;
+      return 0;
+    } else if( lo<=tl.initial() && hi>=tl.obs_date() ) {
+      delta_t = 1+now()-tl.initial();
+      return tl.count();
+    } else {
+      unsigned long long ret = 0;
+      
+      // reset the domains
+      if( lo<tl.initial() )
+        lo = tl.initial();
+      if( hi>now() ) {
+        ret = 1;
+        hi = now();
+      }
+      
+      delta_t = hi.value()-lo.value();
+      // Now access the domain for the given range
+      return ret + m_db.count(tl.name(), lo, hi);
+    }
+  } else {
+    delta_t = 0;
+    return 0;
+  }
+    
+}
 
-size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden) {
+
+
+size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select,
+                                     bool hidden, IntegerDomain rng) {
   size_t count =0;
   
   for(helpers::rest_tl_set::const_iterator i=m_timelines.begin(); m_timelines.end()!=i;
@@ -244,7 +292,8 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
         out.put(',');
       ++count;
     
-      TICK t_l = (*i)->latency(), t_pi = (*i)->look_ahead();
+      TICK t_l = (*i)->latency(), t_pi = (*i)->look_ahead(), n_ticks;
+      unsigned long long cnt = count_tokens(**i, rng, n_ticks);
         
       out<<"\n  { \"name\": \""<<(*i)->name()<<"\","
       // href is hard coded .... I dshould be able to do better but will
@@ -257,17 +306,16 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
          <<"\n    \"look_ahead\": { \"ticks\": \""<<t_pi<<"\", \"duration\": \""
          <<m_reactor.duration_str(t_pi)<<"\" },"
          <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
-         <<"\n    \"total_obs\": "<<(*i)->count()<<",";
+         <<"\n    \"total_obs\": "<<cnt<<",";
 
       typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
       convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
       long double factor = 0.0;
       if( (*i)->count()>0 ) {
-        TICK n_ticks = 1+m_cur-(*i)->initial();
         factor = n_ticks;
-        factor /= (*i)->count();
+        factor /= cnt;
         period *= n_ticks;
-        period /= (*i)->count();
+        period /= cnt;
       } else
         period *= 0;
     
