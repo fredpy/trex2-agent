@@ -58,7 +58,7 @@ void timeline_list_service::handleRequest(rest_request const &req,
     subset.insert(tmp.reduce());
   
   bool hidden = false;
-  std::string *full = req.request().getParameter("full");
+  std::string const *full = req.request().getParameter("full");
   
   if( full ) {
     try {
