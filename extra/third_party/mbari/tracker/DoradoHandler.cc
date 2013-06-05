@@ -41,8 +41,8 @@
 #include <trex/domain/BooleanDomain.hh>
 #include <trex/domain/EnumDomain.hh>
 
-# define DATA_TL "trex_data"
-# define MBFD_TL "mbfd"
+# define DATA_TL "_trex_data"
+# define MBFD_TL "_mbfd"
 # define TREX_TL "drifterFollow"
 
 using namespace mbari;
@@ -53,7 +53,7 @@ namespace {
 }
 
 DoradoHandler::DoradoHandler(MessageHandler::xml_arg const &arg) 
-  :MessageHandler(arg), m_updated(false), 
+  :MessageHandler(arg, ""), m_updated(false),
   m_last_obs(TREX_TL, "undefined"), m_obs_fresh(false) {
   provide(DATA_TL);
   notify(TREX::transaction::Observation(DATA_TL, "undefined"));

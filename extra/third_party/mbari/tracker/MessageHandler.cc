@@ -38,10 +38,11 @@ using namespace mbari;
 /*
  * class mbari::MessageHandler
  */
-MessageHandler::MessageHandler(MessageHandler::xml_arg const &arg) 
+MessageHandler::MessageHandler(MessageHandler::xml_arg const &arg, std::string const &pfx)
   :m_exchange(TREX::utils::parse_attr<std::string>(factory::node(arg), 
 						   "exchange")),
    m_route(TREX::utils::parse_attr<std::string>("", factory::node(arg), "route")),
+   m_prefix(TREX::utils::parse_attr<std::string>("_", factory::node(arg), "prefix")),
    m_tracker(*(arg.second)) {}
 
 bool MessageHandler::provide(std::string const &timeline, bool control) {

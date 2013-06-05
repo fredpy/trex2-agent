@@ -16,6 +16,10 @@ namespace mbari {
       bool synchronize();
       void handleRequest(TREX::transaction::goal_id const &g);
       void notify(TREX::transaction::Observation const &obs);
+      
+      TREX::utils::Symbol tl_name(TREX::utils::Symbol const &name) const {
+        return m_drifter_pfx+name.str();
+      }
 
       bool m_active;
       TREX::utils::Symbol m_drifter;
@@ -37,7 +41,7 @@ namespace mbari {
       };
 
       vehicle_mode m_trex_state;
-      
+      std::string  m_drifter_pfx;
       
       std::string    m_imei;
       SbdMailer      m_iridium;
