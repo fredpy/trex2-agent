@@ -89,11 +89,12 @@ namespace mbari {
     /** @brief XML constructor
      *
      * @param[in] arg an XML argument
+     * @param[in] pfx The default timeline name prefix 
      *
      * Constructor used to create new handlers from the factory. The expected 
      * XML structure is:
      * @code
-     * < <HandlerType> exchange="<exchange>" routing="<routing>" />
+     * < <HandlerType> exchange="<exchange>" routing="<routing>" prefix="<prefix>"/>
      * @endcode 
      * With:
      * @li @p HandlerType is the type of the handler as defined in the factory
@@ -102,7 +103,7 @@ namespace mbari {
      *   specified this routing will be set to "" meaning that any message from 
      *   the exchange are accepted. 
      */
-    MessageHandler(xml_arg const &arg);
+    MessageHandler(xml_arg const &arg, std::string const &pfx);
     /** @brief Destructor */
     virtual ~MessageHandler() {}
 
@@ -143,6 +144,10 @@ namespace mbari {
      */
     virtual bool synchronize() {
       return true;
+    }
+    
+    utils::Symbol tl_name(utils::Symbol const &base) const {
+      return m_prefix+base.str();
     }
 
     /** @brief Current tick
@@ -195,6 +200,7 @@ namespace mbari {
     syslog(TREX::utils::Symbol const &kind = TREX::utils::log::null);
   private:
     DrifterTracker &m_tracker;
+    std::string     m_prefix;
 
     friend class DrifterTracker;
   }; // mbari::MessageHandler

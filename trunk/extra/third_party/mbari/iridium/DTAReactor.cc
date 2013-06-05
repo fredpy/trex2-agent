@@ -11,7 +11,8 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 #define SURVEY_TL "dorado_survey"
-#define STATE_TL "dorado_state"
+#define STATE_TL  "dorado_state"
+#define TRACK_TL  "dorado_tracked"
 #define TREX_TL "drifterFollow"
 #define IRIDIUM_TL "iridium"
 
@@ -25,11 +26,17 @@ DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false), 
    m_active(false),
    m_imei(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "imei")),
-   m_iridium(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host")) {
+   m_iridium(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "host")),
+   m_drifter_pfx(parse_attr<std::string>("_pos_", TeleoReactor::xml_factory::node(arg), "prefix")) s{
   provide(SURVEY_TL);
   postObservation(Observation(SURVEY_TL, "None"));
   provide(STATE_TL, false);
   postObservation(Observation(STATE_TL, "Nothing"));
+     
+  provide(TRACK_TL, false);
+  postObservation(Observation(TRACK_TL, "None"));
+
+     
   use(TREX_TL, false);
   m_iridium.set_sender(parse_attr<std::string>(TeleoReactor::xml_factory::node(arg), "from"));
   syslog(info)<<"Mail sender set to "<<m_iridium.sender();
@@ -142,13 +149,16 @@ void DTAReactor::handleRequest(goal_id const &g) {
 
       if( m_active ) {
 	if( m_drifter!=drifter ) {
-	  unuse(m_drifter);
+	  unuse(tl_name(m_drifter));
 	  m_drifter = drifter;
 	  use(m_drifter, false);
 	}
      } else {
 	m_drifter = drifter;
-	use(m_drifter, false);
+	use(tl_name(m_drifter), false);
+        Observation obs(TRACK_TL, "NoPosition");
+        obs.restrictAttribute("drifter", EnumDomain(m_drifter));
+        postObservation(obs);
 	m_active = true;
 	m_have_pos = false;
       }
@@ -175,11 +185,16 @@ void DTAReactor::handleRequest(goal_id const &g) {
 }
 
 void DTAReactor::notify(Observation const &obs) {
-  if( obs.object()==m_drifter ) {
-    if( obs.predicate()=="Holds" ) {
+  if( obs.object()==tl_name(m_drifter) ) {
+    if( obs.predicate()=="Holds" ) {      
       // Get lat/lon
       m_pos.first = obs.getAttribute("latitude").domain().getTypedSingleton<double, true>();
       m_pos.second = obs.getAttribute("longitude").domain().getTypedSingleton<double, true>();
+
+      Observation update(TRACK_TL, "Position");
+      update.restrictAttribute("drifter", EnumDomain(m_drifter));
+      update.restrictAttribute(obs.getAttribute("latitude"));
+      update.restrictAttribute(obs.getAttribute("longitude"));
       if( !m_have_pos ) {
 	syslog()<<"Received a first position from "<<m_drifter;
 	m_have_pos = true;
@@ -187,8 +202,11 @@ void DTAReactor::notify(Observation const &obs) {
       if( obs.hasAttribute("speed_north") ) {
 	m_have_speed = obs.getAttribute("speed_north").domain().isSingleton();
 	m_speed.first = obs.getAttribute("speed_north").domain().getTypedSingleton<double, true>();
+        update.restrictAttribute(obs.getAttribute("speed_north"));
 	m_speed.second = obs.getAttribute("speed_east").domain().getTypedSingleton<double, true>();
+        update.restrictAttribute(obs.getAttribute("speed_east"));
       }
+      postObservation(update);
     }
   } else if( obs.object()==TREX_TL ) {
     if( obs.predicate()=="undefined" || obs.predicate()=="Failed" ) {

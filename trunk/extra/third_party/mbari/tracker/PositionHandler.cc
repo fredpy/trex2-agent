@@ -52,7 +52,7 @@ namespace {
 }
 
 PositionHandler::PositionHandler(PositionHandler::xml_arg const &arg)
-:MessageHandler(arg), 
+:MessageHandler(arg, "_pos_"),
  m_should_project(parse_attr<bool>(true, MessageHandler::factory::node(arg), "projected")) {
   m_exchange += "_pb";
 }
@@ -94,7 +94,7 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
       pos->second.second.update(secs, loc);
       pos->second.first = true;
       if( inserted )
-        provide(asset);
+        provide(tl_name(asset));
       return true;
     } 
   }
@@ -107,7 +107,7 @@ bool PositionHandler::synchronize() {
   
   for(asset_map::iterator i=m_assets.begin(); m_assets.end()!=i; ++i) {
     if( i->second.first || (m_should_project && i->second.second.have_speed()) ) {
-      TREX::transaction::Observation obs(i->first, "Holds");
+      TREX::transaction::Observation obs(tl_name(i->first), "Holds");
       location::duration_type dt;
       earth_point vect(i->second.second.position(now_t, dt, m_should_project));
       
