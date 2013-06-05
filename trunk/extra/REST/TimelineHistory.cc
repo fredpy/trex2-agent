@@ -98,11 +98,11 @@ void TimelineHistory::declared(details::timeline const &timeline) {
 // REST callbacks
 
 void TimelineHistory::list_timelines(std::ostream &out,
-                                     std::set<std::string> const &select) {
+                                     std::set<std::string> const &select, bool hidden) {
   // I build the json by hand
   out<<"{ \"timelines\": [";
   
-  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out), boost::ref(select)));
+  boost::function<size_t ()> fn(boost::bind(&TimelineHistory::list_tl_sync, this, boost::ref(out), boost::ref(select), hidden));
   
   size_t count = utils::strand_run(m_strand, fn);
   
@@ -228,13 +228,18 @@ void TimelineHistory::ext_obs_sync(TICK date) {
 }
 
 
-size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select) {
+size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden) {
   size_t count =0;
   
   for(helpers::rest_tl_set::const_iterator i=m_timelines.begin(); m_timelines.end()!=i;
       ++i) {
+    bool valid;
+    if( select.empty() ) {      
+      valid = hidden || 0!=(*i)->name().str().compare(0,1, "_");
+    } else
+      valid = select.end()!=select.find((*i)->name().str());
     
-    if( select.empty() || select.end()!=select.find((*i)->name().str()) ) {
+    if( valid ) {
       if( count>0 )
         out.put(',');
       ++count;

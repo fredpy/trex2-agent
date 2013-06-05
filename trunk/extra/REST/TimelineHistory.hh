@@ -53,7 +53,7 @@ namespace TREX {
                    transaction::TICK cur);
       void update_tick(transaction::TICK cur);
       
-      void list_timelines(std::ostream &out, std::set<std::string> const &select);
+      void list_timelines(std::ostream &out, std::set<std::string> const &select, bool hidden);
       
       transaction::TICK get_date(std::string const &date);
       void get_tokens(std::string const &timeline,
@@ -93,7 +93,7 @@ namespace TREX {
       transaction::goal_id del_goal_sync(std::string id);
       
       
-      size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select);
+      size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden);
       
       transaction::TICK   m_cur;
       REST_reactor       &m_reactor;

@@ -57,7 +57,17 @@ void timeline_list_service::handleRequest(rest_request const &req,
   while( !tmp.empty() )
     subset.insert(tmp.reduce());
   
-  ptr->list_timelines(data, subset);
+  bool hidden = false;
+  std::string *full = req.request().getParameter("full");
+  
+  if( full ) {
+    try {
+      hidden = !boost::lexical_cast<bool>(*full);
+    } catch(boost::bad_lexical_cast const &e) {
+      // silently ignore for now
+    }
+  }
+  ptr->list_timelines(data, subset, hidden);
 }
 
 /*
