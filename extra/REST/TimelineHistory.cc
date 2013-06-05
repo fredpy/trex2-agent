@@ -264,7 +264,7 @@ unsigned long long TimelineHistory::count_tokens(helpers::timeline_wrap const &t
       
       delta_t = hi.value()-lo.value();
       // Now access the domain for the given range
-      return ret + m_db.count(tl.name(), lo, hi);
+      return ret + m_db.count(tl.name().str(), lo, hi);
     }
   } else {
     delta_t = 0;
