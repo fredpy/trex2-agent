@@ -139,7 +139,7 @@ void service_tree::handleRequest(rest_request const &req,
   ans.setMimeType("application/json");
   json_stream json(data);
   result.add_child("help", list);
-  TREX::utils::write_json(json, result);
+  TREX::utils::write_json(json, result, true);
 }
 
 void service_tree::add_handler(rest_request::path_type const &path,
@@ -179,6 +179,6 @@ void json_direct::handleRequest(rest_request const &req,
                                 Wt::Http::Response &ans) {
   ans.setMimeType("application/json");
   json_stream json(data);
-  TREX::utils::write_json(json, m_handler(req));
+  TREX::utils::write_json(json, m_handler(req), true);
 }
 

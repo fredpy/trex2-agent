@@ -151,7 +151,7 @@ void timeline_service::handleRequest(rest_request const &req,
     if( initial.isFull() )
       data<<"{}";
     else
-      utils::write_json(data, initial.as_tree(), false);
+      utils::write_json(data, initial.as_tree(), ptr->fancy());
     data<<",\n \"tokens\": [\n";
   }
   
@@ -189,7 +189,7 @@ void goals_service::handleRequest(rest_request const &req,
     helpers::json_stream json(data);
     
     result.put_child("goals", goals);
-    TREX::utils::write_json(json, result);
+    TREX::utils::write_json(json, result, ptr->fancy());
   }
 }
 
@@ -235,7 +235,7 @@ void goal_service::handleRequest(rest_request const &req,
     }
     TREX::transaction::goal_id g = ptr->add_goal(file);
     ans.setMimeType("application/json");
-    utils::write_json(json, ptr->get_goal(g));
+    utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else if( "DELETE"==kind ) {
     std::string id = req.arg_path().dump();
     ans.setMimeType("application/json");
@@ -244,7 +244,7 @@ void goal_service::handleRequest(rest_request const &req,
   } else if( "GET"==kind ) {
     TREX::transaction::goal_id g = ptr->get_goal(req.arg_path().dump());
     ans.setMimeType("application/json");
-    utils::write_json(json, ptr->get_goal(g));
+    utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else
     throw std::runtime_error("Do not know how to handle request method "+kind);
 }

@@ -70,6 +70,10 @@ namespace TREX {
       transaction::goal_id get_goal(std::string const &id);
       bool                 delete_goal(std::string const &id);
       
+      bool fancy() const {
+        return m_fancy;
+      }
+      
     private:
       boost::property_tree::ptree get_token(transaction::goal_id const &tok) const;
       
@@ -94,6 +98,8 @@ namespace TREX {
       
       
       size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden);
+      
+      bool const m_fancy;
       
       transaction::TICK   m_cur;
       REST_reactor       &m_reactor;
