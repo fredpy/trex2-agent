@@ -34,6 +34,8 @@
 #ifndef H_trex_REST_service
 # define H_trex_REST_service
 
+# include <trex/utils/Exception.hh>
+
 # include <Wt/WResource>
 # include <Wt/Http/Response>
 
@@ -82,6 +84,29 @@ namespace TREX {
     }
     
     class rest_service;
+    
+    class rest_error :public utils::Exception {
+    public:
+      rest_error(std::string const &msg) throw()
+      :utils::Exception(msg), m_code(400) {}
+      rest_error(int code, std::string const &msg) throw() 
+      :utils::Exception(msg), m_code(code) {}
+      virtual ~rest_error() throw () {}
+      
+      int get_code() const {
+        return m_code;
+      }
+      
+    private:
+      int const m_code;
+    };
+    
+    class rest_not_found: public rest_error {
+    public:
+      rest_not_found(std::string const &msg) throw()
+      :rest_error(404, msg) {}
+      ~rest_not_found() throw() {}
+    };
     
     class rest_request {
     public:

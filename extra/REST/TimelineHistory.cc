@@ -340,7 +340,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
   size_t ret = 0;
   helpers::rest_tl_set::const_iterator pos = m_timelines.find(tl);
   if( m_timelines.end()==pos )
-    throw std::runtime_error("Unknown timeline "+tl.str());
+    throw boost::enable_current_exception(rest_not_found("Unknown timeline "+tl.str()));
   else {
     if( !first )
       out.put(',');

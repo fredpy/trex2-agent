@@ -101,6 +101,10 @@ void rest_service::handleRequest(wht::Request const &req,
     if( !oss.str().empty() ) {
       response.out()<<oss.str();
     }
+  } catch(rest_error const &err) {
+    response.setStatus(err.get_code());
+    response.setMimeType("text/plain");
+    response.out()<<err.what();
   } catch(std::exception const &e) {
     response.setStatus(400);
     response.setMimeType("text/plain");
