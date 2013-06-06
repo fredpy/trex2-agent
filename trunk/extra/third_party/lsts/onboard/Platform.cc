@@ -85,8 +85,6 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
-
-
       if (!m_blocked && !m_goals_pending.empty())
       {
         goal_id goal = m_goals_pending.front();
@@ -104,7 +102,7 @@ namespace TREX
         if (commited)
         {
           m_goals_pending.remove(goal);
-          postUniqueObservation(*goal.get());
+          std::cout << (*goal.get()) << "\n";
         }
       }
 
@@ -187,7 +185,7 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
+      std::cerr << "handleRequest(" << *(g.get()) << ")" << std::endl;
 
       m_goals_pending.push_back(g);
     }
