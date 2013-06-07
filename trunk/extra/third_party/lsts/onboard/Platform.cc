@@ -85,6 +85,8 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
+
+
       if (!m_blocked && !m_goals_pending.empty())
       {
         goal_id goal = m_goals_pending.front();
@@ -102,7 +104,7 @@ namespace TREX
         if (commited)
         {
           m_goals_pending.remove(goal);
-          std::cout << (*goal.get()) << "\n";
+          postUniqueObservation(*goal.get());
         }
       }
 
@@ -185,7 +187,7 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << *(g.get()) << ")" << std::endl;
+      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
 
       m_goals_pending.push_back(g);
     }
@@ -492,6 +494,13 @@ namespace TREX
       if (v.domain().isSingleton())
         m_ref.lon = v.domain().getTypedSingleton<double, true>();
 
+      v = g->getAttribute("radius");
+      if (v.domain().isSingleton()){
+        m_ref.radius = v.domain().getTypedSingleton<double, true>();
+        m_ref.flags |= Reference::FLAG_RADIUS;
+        syslog(log::info) << "New radius " << m_ref.radius << "\n";
+      }
+
       DesiredZ desZ;
       desZ.value = 300;
       desZ.z_units = Z_HEIGHT;
@@ -502,8 +511,7 @@ namespace TREX
       desSpeed.speed_units = SUNITS_METERS_PS;
       m_ref.speed.set(desSpeed);
 
-      std::cout << m_ref.lat << " " << m_ref.lon << "\n";
-      syslog(log::info) << "sending reference to dune "<< m_ref.lat << " " << m_ref.lon << "\n";
+      syslog(log::info) << "sending reference to dune "<< m_ref.lat << " " << m_ref.lon  << " " << m_ref.radius << "\n";
       sendMsg(m_ref);
 
       return true;

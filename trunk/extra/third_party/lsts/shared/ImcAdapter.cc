@@ -57,9 +57,10 @@ namespace TREX {
       obs.restrictAttribute("latitude", FloatDomain(latitude));
       obs.restrictAttribute("longitude", FloatDomain(longitude));
 
-      if (msg->depth != -1)
+      //msg->toText(std::cout);
+      if (msg->depth > 0)
         obs.restrictAttribute("z", FloatDomain(msg->depth));
-      else if (msg->alt != -1 )
+      else if (msg->alt > 0 )
         obs.restrictAttribute("z", FloatDomain(-msg->alt));
       else if (msg->height != -1 )
         obs.restrictAttribute("z", FloatDomain(msg->height));

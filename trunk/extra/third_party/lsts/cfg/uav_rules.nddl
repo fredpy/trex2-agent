@@ -3,12 +3,18 @@
 #include "platform.nddl"
 
 Navigator::Visit{
-	met_by(Idle i);
+	//met_by(Idle i);
 
-	contains(effect Reference.Surveil s);
+	meets(effect Reference.Surveil s);
 	s.latitude == latitude;
 	s.longitude == longitude;
-	
+	s.radius == -100.0;
 }
 
+
+//Reference::Surveil{
+	//meets(effect Reference.Surveil l2);
+	  //l2.radius == radius + 50.0;
+	  
+//}
 
