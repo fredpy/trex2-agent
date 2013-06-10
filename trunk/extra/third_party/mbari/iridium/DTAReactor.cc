@@ -121,7 +121,7 @@ void DTAReactor::handleRequest(goal_id const &g) {
 	m_active=false;
 	postObservation(Observation(SURVEY_TL, g->predicate()));
 	postObservation(Observation(STATE_TL, "Nothing"));
-	unuse(m_drifter);
+	unuse(tl_name(m_drifter));
         postObservation(Observation(TRACK_TL, "None"));
       }
     } else if( g->predicate()=="Track" ) {
