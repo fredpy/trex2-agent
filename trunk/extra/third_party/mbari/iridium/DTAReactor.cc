@@ -152,7 +152,7 @@ void DTAReactor::handleRequest(goal_id const &g) {
 	if( m_drifter!=drifter ) {
 	  unuse(tl_name(m_drifter));
 	  m_drifter = drifter;
-	  use(m_drifter, false);
+	  use(tl_name(m_drifter), false);
 	}
      } else {
 	m_drifter = drifter;
