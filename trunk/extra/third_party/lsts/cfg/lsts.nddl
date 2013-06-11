@@ -1,6 +1,7 @@
 #include "platform.nddl"
 #include "navigator.nddl"
-#include "rules.nddl"
+//#include "rules.nddl"
+#include "yoyo.nddl"
 
 EstimatedState estate = new EstimatedState(Observe);
 ControlMode control = new ControlMode(Observe);
@@ -9,11 +10,14 @@ OperationalLimits oplimits = new OperationalLimits(Observe);
 Navigator navigator = new Navigator(Internal);
 Reference reference = new Reference(External);
 ReferenceState refstate = new ReferenceState(Observe);
-
 navigator.min_z.specify(2);
 navigator.max_z.specify(50);
 
 close();
+
+//rejectable (yoyo.Done target);
+//target.latitude == to_rad(41.184195);
+//target.longitude == to_rad(-8.705745);
 
 //rejectable (navigator.At target);
 //target.latitude == to_rad(41.184195);
