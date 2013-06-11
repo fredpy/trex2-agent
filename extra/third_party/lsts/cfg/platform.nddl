@@ -52,11 +52,12 @@ class Reference extends AgentTimeline {
 		float z;
 	}
 	
-	predicate Going {
+	action Going {
 		float latitude;
 		float longitude;
 		float z;
 		float speed;
+		float radius;
 	}
 	
 	action Surveil {
