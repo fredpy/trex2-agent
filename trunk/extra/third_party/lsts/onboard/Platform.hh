@@ -132,6 +132,9 @@ namespace TREX {
       std::map<uint16_t, IMC::Message *> aggregate;
 
       void setValue(bool val);
+      
+      void goingAUV(const goal_id& goal);
+      void goingUAV(const goal_id& g);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;

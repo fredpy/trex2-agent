@@ -5,7 +5,7 @@
 Navigator::Visit{
 	//met_by(Idle i);
 
-	meets(effect Reference.Surveil s);
+	contains(effect Reference.Going s);
 	s.latitude == latitude;
 	s.longitude == longitude;
 	s.radius == -100.0;
@@ -13,8 +13,8 @@ Navigator::Visit{
 
 
 //Reference::Surveil{
-	//meets(effect Reference.Surveil l2);
-	  //l2.radius == radius + 50.0;
-	  
+	//contained_by(Navigator.Visit s);
+	//starts_after(ReferenceState.Going arrival);
+	  //arrival.near_xy == true;
 //}
 
