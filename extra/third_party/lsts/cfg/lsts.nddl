@@ -1,7 +1,7 @@
 #include "platform.nddl"
 #include "navigator.nddl"
-//#include "rules.nddl"
-#include "yoyo.nddl"
+#include "rules.nddl"
+//#include "yoyo.nddl"
 
 EstimatedState estate = new EstimatedState(Observe);
 ControlMode control = new ControlMode(Observe);

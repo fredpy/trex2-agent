@@ -1,0 +1,15 @@
+#include "TREX.nddl"
+#include "navigator.nddl"
+#include "spotter.nddl"
+
+/*
+ * TREX timelines
+ */
+Navigator navigator = new Navigator(External, false);
+SpotterFollow spotter = new SpotterFollow(Internal);
+
+close();
+
+fact(spotter.counter.Holds initial);
+initial.start.specify(0);
+initial.id.specify(0);

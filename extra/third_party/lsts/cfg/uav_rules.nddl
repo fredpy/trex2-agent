@@ -12,9 +12,11 @@ Navigator::Visit{
 }
 
 
-//Reference::Surveil{
-	//contained_by(Navigator.Visit s);
-	//starts_after(ReferenceState.Going arrival);
-	  //arrival.near_xy == true;
-//}
+ReferenceState::Going{
+	if(near_xy == true){
+      starts_before(effect Reference.Surveil s1); // Why does it crash if I use starts instead of starts_before?
+        s1.start < start + 20;
+        s1.end < s1.start + 100;
+	} 
+}
 

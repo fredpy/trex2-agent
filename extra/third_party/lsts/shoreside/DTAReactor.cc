@@ -98,29 +98,30 @@ void DTAReactor::handleRequest(goal_id const &g) {
   if( g->object()==m_survey_tl ) {
     if( g->predicate()=="None" ) {
       if( m_active ) {
-	m_active=false;
-	postObservation(Observation(m_survey_tl, g->predicate()));
-	postObservation(Observation(m_state_tl, "Nothing"));
-	unuse(m_drifter);
+        m_active=false;
+        postObservation(Observation(m_survey_tl, g->predicate()));
+        postObservation(Observation(m_state_tl, "Nothing"));
+        unuse(m_drifter);
       }
-    } else if( g->predicate()=="Track" ) {
+    }
+    else if( g->predicate()=="Track" ) {
       // Need a drifter, a size and a path
       TREX::utils::Symbol drifter, path;
       double factor;
 
       if( g->hasAttribute("drifter") ) 
-	drifter = g->getAttribute("drifter").domain().getStringSingleton();
+        drifter = g->getAttribute("drifter").domain().getStringSingleton();
       else 
-	return;
+        return;
 
       if( g->hasAttribute("path") ) 
-	path = g->getAttribute("path").domain().getStringSingleton();
+        path = g->getAttribute("path").domain().getStringSingleton();
       else 
-	return;
+        return;
       if( g->hasAttribute("size") )
-	factor = g->getAttribute("size").domain().getTypedSingleton<double, true>();
+        factor = g->getAttribute("size").domain().getTypedSingleton<double, true>();
       else
-	return;
+        return;
 
       if( g->hasAttribute("lagrangian") )
         m_lagrangian = g->getAttribute("lagrangian").domain().getTypedSingleton<bool, true>();
@@ -128,16 +129,17 @@ void DTAReactor::handleRequest(goal_id const &g) {
         m_lagrangian = false;
 
       if( m_active ) {
-	if( m_drifter!=drifter ) {
-	  unuse(m_drifter);
-	  m_drifter = drifter;
-	  use(m_drifter, false);
-	}
-     } else {
-	m_drifter = drifter;
-	use(m_drifter, false);
-	m_active = true;
-	m_have_pos = false;
+        if( m_drifter!=drifter ) {
+          unuse(m_drifter);
+          m_drifter = drifter;
+          use(m_drifter, false);
+        }
+      }
+      else {
+        m_drifter = drifter;
+        use(m_drifter, false);
+        m_active = true;
+        m_have_pos = false;
       }
       m_path = path;
       m_factor = factor;

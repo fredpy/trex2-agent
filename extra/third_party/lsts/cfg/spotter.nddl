@@ -1,0 +1,216 @@
+class SpotterFollow;
+
+
+/** Subjacent controller for spotter following surveys
+ *
+ * this class embeds all the actions and intermediate predicates
+ * used by the reactor in order to transform a high level Survey
+ * goal from SpotterFollow agent timeline into simple Navigation 
+ * waypoints (At)
+ */
+class SpotterController {
+    // The SpotterFollow timeline which created this instance
+    SpotterFollow command;
+
+    /* High level survey action 
+     *
+     * effect: complete the survey
+     * condition: reach the final waypoint of the survey path
+     *
+     * set up the survey and create the last waypoint which trigger 
+     * planning of the rest of the survey path
+     */
+    action EndSurvey {}
+
+    /* survey segment iteration
+     *
+     * effect reach a waypoint of the path
+     * condition reach previous waypoint of the path
+     *
+     * this action unroll the path up to the initial waypoint
+     */
+    action DoSegment {
+		int count; // number of the segment
+		count > 0;
+    }
+
+    /* go to initial waypoint
+     *
+     * effect    reach the first waypoint
+     * condition Navigation is At the location of our waypoint
+     * 
+     * this action allow to go to the initial waypoint of our survey
+     */
+    action DoInitial {}
+
+    /* A waypoint
+     *
+     * This predciat is used as intermediate information for the 
+     * waypoints to be done during a survey. It iscreated and manipulated 
+     * by the actions of this class for the planner to keep track of the 
+     * waypoints it will have to reach and their sequence.
+     */
+    predicate Waypoint {
+		int path_id;          // identifier of the survey
+		int wp_num;           // waypoint number
+		float lat, lon;       // resulting waypoint location
+		int completion_date;  // when did this waypoint was reached
+						      // by Navigation. This is used as
+						      // information to send only one At at
+						      // time and avoid to overflow Navigation
+						      // with all the waypoints at once
+		duration == 1;
+		completion_date <= start;
+		wp_num > 0; 
+    }
+
+    SpotterController(SpotterFollow cmd) {
+	  command = cmd;
+    }
+}
+
+/* A counter/id generator
+ *
+ * This timeline is used to generate unique ids for Surveys
+ * it increments a counter every time a new token is created resulting on 
+ * an unique id which is used by SpotterFollow timeline
+ */
+class Counter extends Timeline {
+
+    predicate Holds {
+		int id;
+		0 <= id;
+		id <= start;
+    }
+
+    Counter() {}
+}
+
+/* High level spotter follow class
+ *
+ * This class is the main interface of the spotter follow reactor. 
+ * It allows to transform Survey goals received on a full survey 
+ * execution.
+ */
+class SpotterFollow extends AgentTimeline {
+    SpotterController controller;
+    Counter           counter;
+
+    predicate Inactive {}
+
+    predicate DoSurvey {
+		int id;
+		int waypoints;
+		float    size;
+		float center_lat, center_lon;
+    }
+    predicate Survey {
+		float    center_lat, center_lon;
+		duration==1;
+    }
+
+    SpotterFollow(Mode _mode) {
+		super(_mode, "Inactive");
+		controller = new SpotterController(this);
+		counter = new Counter();
+    }
+}
+
+Counter::Holds {
+    if( start<=0 ) {
+	    id == 0;
+    } else {
+		met_by(Holds prev);
+		id == prev.id + 1;
+    }
+}
+
+SpotterFollow::Inactive {
+    Counter cpt = object.counter;
+    starts(cpt.Holds cur);
+}
+
+SpotterFollow::DoSurvey {
+    Counter cpt = object.counter;
+    contained_by(cpt.Holds cur);
+    id == cur.id;
+}
+
+SpotterController::EndSurvey {
+    SpotterFollow me = object.command;
+    Counter cpt = me.counter;
+
+    equals(effect me.Survey survey);
+    ends(cpt.Holds cur);
+    met_by(me.DoSurvey exec);
+      exec.id == cur.id;
+      exec.center_lat == survey.center_lat;
+      exec.center_lon == survey.center_lon;
+   
+    equals(condition Waypoint last_wp);
+      last_wp.path_id == cur.id;
+      last_wp.wp_num == exec.waypoints;
+}
+
+SpotterController::Waypoint {
+    SpotterFollow me = object.command;
+    Counter cpt = me.counter;
+    contained_by(cpt.Holds count);
+      path_id == count.id;
+}
+
+SpotterController::DoSegment {
+    SpotterFollow me = object.command;
+    Counter cpt = me.counter;
+    meets(effect Waypoint to);
+      to.wp_num == count + 1;
+    contained_by(me.DoSurvey exec);
+      exec.id == to.path_id;
+      exec.waypoints > count;
+    starts(condition Waypoint from);
+      from.path_id == to.path_id;
+      from.lat == to.lat;
+      from.lon == to.lon;
+      from.wp_num == count;
+      from.completion_date <= to.completion_date;
+    }
+
+    // Finally send the next At when the previous one did complete
+    if( from.completion_date <= AGENT_CLOCK ) {
+		// I will assume that from are to are far enough to require a waypoint
+		meets(condition Navigator.At dest);
+		dest.latitude == to.lat;
+		dest.longitude == to.lon;
+		dest.speed == vc.speed;
+		dest.secs == 0;
+		dest.z == 400;
+		to.completion_date == dest.start;
+   }
+}
+
+SpotterController::DoInitial {
+    SpotterFollow me = object.command;
+    Counter cpt = me.counter;
+
+    equals(effect Waypoint to);
+      to.wp_num == 1; // This is the first waypoint
+
+    contained_by(me.DoSurvey exec);
+      exec.id == to.path_id;
+      exec.center_lat == to.lat;
+      exec.center_lon == to.lon;
+
+    // Check that I can start 
+    contained_by(cpt.Holds cur);
+    if( cur.start<= AGENT_CLOCK ) {
+		contained_by(condition Navigator.At dest);
+		dest.latitude == to.lat;
+		dest.longitude == to.lon;
+		dest.speed == vc.speed;
+		dest.secs == 0;
+		dest.z == 400;
+		to.completion_date == dest.start;
+    }
+}
+
+
