@@ -135,6 +135,7 @@ namespace TREX {
       
       void goingAUV(const goal_id& goal);
       void goingUAV(const goal_id& g);
+  void postRefAtObservation(FollowRefState* frefstate);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;

@@ -291,6 +291,33 @@ namespace TREX
 
     }
 
+void Platform::postRefAtObservation(FollowRefState* frefstate) {
+  if (atDestination(frefstate)) {
+    Observation obs("reference", "At");
+    obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
+    obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
+    if (!m_ref.z.isNull()) {
+      switch (m_ref.z->z_units) {
+      case (Z_DEPTH):
+        obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+        break;
+      case (Z_ALTITUDE):
+        obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+        break;
+      case (Z_HEIGHT):
+        obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+        break;
+      default:
+        break;
+      }
+    }
+    if (!m_ref.speed.isNull()) {
+      obs.restrictAttribute("speed", FloatDomain((m_ref.speed->value)));
+    }
+    postUniqueObservation(obs);
+  }
+}
+
     void
     Platform::processState()
     {
@@ -356,38 +383,7 @@ namespace TREX
         //m_ref.toText(std::cout);
       }
 
-      if (atDestination(frefstate))
-      {
-        Observation obs("reference", "At");
-
-        obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
-        obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
-
-        if (!m_ref.z.isNull())
-        {
-          switch(m_ref.z->z_units)
-          {
-          case (Z_DEPTH):
-                              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-          break;
-          case (Z_ALTITUDE):
-                              obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
-          break;
-          case (Z_HEIGHT):
-                              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-          break;
-          default:
-            break;
-          }
-        }
-
-        if (!m_ref.speed.isNull())
-        {
-          obs.restrictAttribute("speed",
-              FloatDomain((m_ref.speed->value)));
-        }
-        postUniqueObservation(obs);
-      }
+      postRefAtObservation(frefstate);
 
       // Operational limits are sent by DUNE on request
       if (oplims == NULL)
@@ -563,10 +559,9 @@ void Platform::goingAUV(const goal_id& goal) {
     bool
     Platform::handleGoingRequest(goal_id const &goal)
     {
-      //FIXME choose according to medium
-      //goingAUV(goal);
+      goingAUV(goal);
       std::cout << "handleGoingRequest\n";
-      goingUAV(goal);
+      //goingUAV(goal);
       sendMsg(m_ref);
 
       return true;
