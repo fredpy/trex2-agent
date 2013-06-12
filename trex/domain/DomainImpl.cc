@@ -105,9 +105,9 @@ double TREX::transaction::ceil(double d, size_t places) {
 
 BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
   :BasicInterval(node), m_full(true) {
-  boost::optional<bool> val = parse_attr< boost::optional<bool> >(node, "value");
+  boost::optional<int> val = parse_attr< boost::optional<int> >(node, "value");
   if( val ) {
-    m_val = val;
+    m_val = (0!=val);
     m_full = false;
   } else
     completeParsing(node); // to handle the case where someon used min/max attributes
