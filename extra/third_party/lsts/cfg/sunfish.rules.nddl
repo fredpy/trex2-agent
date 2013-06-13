@@ -2,15 +2,50 @@
 #include "navigator.nddl"
 #include "platform.nddl"
 
+
+class YoYoController extends AgentTimeline {
+	
+	YoYoController(Mode _mode) {
+		super(_mode, "Idle");
+	}	
+	
+	predicate Idle {}
+	
+	predicate Done {
+		float latitude, longitude, max_z, min_z, speed;
+		int secs_underwater;
+	}
+	
+	action Exec {
+		float latitude, longitude, max_z, min_z, speed;
+		int secs_underwater;
+	}
+}
+
+YoYoController::Done {
+	met_by(Exec exec);
+		exec.latitude == latitude;
+		exec.longitude == longitude;
+		exec.speed == speed;
+		exec.max_z == max_z;
+		exec.min_z == min_z;
+		exec.secs_underwater == secs_underwater;
+	
+	duration == 1;		
+}
+
 Navigator::At {
-	float accuracy;
 	float min_dist;
 	min_dist == 3;
 	
-	contained_by(Reference.At arr);
+	contained_by(YoYoController.Done arr);
+		arr.speed == speed;
+		arr.latitude == latitude;
+		arr.longitude == longitude;
+		arr.min_z == object.min_z;
+		arr.max_z == object.max_z;
+		arr.secs_underwater == object.secs_underwater;
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
-		z == arr.z;
-		speed == arr.speed;
 }
 
 Navigator::Going {
@@ -31,7 +66,6 @@ Navigator::Going {
 	meets(effect At at);
 		latitude == at.latitude;
 		longitude == at.longitude;
-		z == at.z;
 		speed == at.speed;
 
 	met_by(condition EstimatedState.Position origin);
@@ -43,14 +77,14 @@ Navigator::Going {
 	my_start == max(origin.start, c.start);
 
 	if(  my_start<= AGENT_CLOCK ) {
-		contains(condition Reference.YoYo g);
+		contains(condition YoYoController.Exec g);
 
 		latitude == g.latitude;
 		longitude == g.longitude;
-		g.maxz == object.max_z;
-		g.minz == object.min_z;
-		g.z == z;
+		g.max_z == object.max_z;
+		g.min_z == object.min_z;
 		speed == g.speed;
+		g.secs_underwater == object.secs_underwater;
 		concurrent(end, g.end);
 	}
 }
