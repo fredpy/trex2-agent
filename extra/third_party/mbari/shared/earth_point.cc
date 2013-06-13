@@ -215,6 +215,22 @@ bool earth_point::is_utm() const {
 }
 
 
+earth_point earth_point::destination(long double d_north, long double d_east,
+                                     nav_calculator &calc) const {
+  long double dist, heading;
+  dist = d_north*d_north;
+  dist += d_east*d_east;
+  
+  dist = sqrtl(dist);
+  if( dist>0.0 ) {
+    heading = atan2l(d_east, d_north);
+    return destination(heading, dist, calc);
+  } else
+    return *this;
+}
+
+
+
 
 /*
  * struct mbari::vincenty

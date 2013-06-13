@@ -461,6 +461,9 @@ namespace mbari {
       return calc.destination(*this, heading, dist);
     }
     
+    earth_point destination(long double d_north, long double d_east,
+                            nav_calculator &calc) const;
+    
     /** @brief degree to radian
      *
      * @param[in] An angle in degree
