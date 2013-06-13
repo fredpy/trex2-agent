@@ -559,9 +559,9 @@ void Platform::goingAUV(const goal_id& goal) {
     bool
     Platform::handleGoingRequest(goal_id const &goal)
     {
-      goingAUV(goal);
+      //goingAUV(goal);
       std::cout << "handleGoingRequest\n";
-      //goingUAV(goal);
+      goingUAV(goal);
       sendMsg(m_ref);
 
       return true;

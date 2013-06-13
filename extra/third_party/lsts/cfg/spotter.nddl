@@ -173,7 +173,7 @@ SpotterController::DoSegment {
       from.lon == to.lon;
       from.wp_num == count;
       from.completion_date <= to.completion_date;
-    }
+ 
 
     // Finally send the next At when the previous one did complete
     if( from.completion_date <= AGENT_CLOCK ) {
@@ -181,7 +181,7 @@ SpotterController::DoSegment {
 		meets(condition Navigator.At dest);
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
-		dest.speed == vc.speed;
+		dest.speed == 2;
 		dest.secs == 0;
 		dest.z == 400;
 		to.completion_date == dest.start;
@@ -206,7 +206,7 @@ SpotterController::DoInitial {
 		contained_by(condition Navigator.At dest);
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
-		dest.speed == vc.speed;
+		dest.speed == 2;
 		dest.secs == 0;
 		dest.z == 400;
 		to.completion_date == dest.start;
