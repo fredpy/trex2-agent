@@ -57,7 +57,7 @@ if(POCO_NET_LIBRARY)
     DTAReactor.hh
     ControlInterface.hh
     )
-  target_link_libraries(iridium_pg TREXtransaction
+  target_link_libraries(iridium_pg MBARIshared TREXtransaction
     ${POCO_NET_LIBRARY})
 
 

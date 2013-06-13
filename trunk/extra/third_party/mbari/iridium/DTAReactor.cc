@@ -1,4 +1,5 @@
 #include "DTAReactor.hh"
+#include "../shared/earth_point.hh"
 
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/EnumDomain.hh>
@@ -82,9 +83,15 @@ bool DTAReactor::synchronize() {
 	m_speed.second = 0.0;
       }
       trex_goal.precision(8);
+      mbari::earth_point drifter(m_pos.first, m_pos.second), pos;
+      
+      mbari::rhumb_lines calc;
+      pos = drifter.destination(m_shift.first, m_shift.second, calc);
+      
+      
       trex_goal<<"<Goal on=\""<<TREX_TL<<"\" predicate=\"DrifterFollow.Survey\">\n"
-	       <<"  <Assert name=\"centerLat\"><value type=\"LATITUDE\" name=\""<<m_pos.first<<"\" /></Assert>\n"
-	       <<"  <Assert name=\"centerLon\"><value type=\"LONGITUDE\" name=\""<<m_pos.second<<"\" /></Assert>\n"
+	       <<"  <Assert name=\"centerLat\"><value type=\"LATITUDE\" name=\""<<pos.latitude()<<"\" /></Assert>\n"
+	       <<"  <Assert name=\"centerLon\"><value type=\"LONGITUDE\" name=\""<<pos.longitude()<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"path\"><object value=\""<<m_path<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"size\"><value type=\"float\" name=\""<<m_factor<<"\" /></Assert>\n"
 	       <<"  <Assert name=\"lagrangian\"><value type=\"bool\" name=\""<<(m_lagrangian?"true":"false")<<"\" /></Assert>\n"
@@ -147,6 +154,20 @@ void DTAReactor::handleRequest(goal_id const &g) {
         m_lagrangian = g->getAttribute("lagrangian").domain().getTypedSingleton<bool, true>();
       else 
         m_lagrangian = false;
+      
+      if( g->hasAttribute("shift_north") )
+        m_shift.first = g->getAttribute("shift_north").domain().getTypedSingleton<double, true>();
+      else {
+        m_shift.first = 0.0;
+        g->restrictAttribute(Variable("shift_north", FloatDomain(0.0)));
+      }
+
+      if( g->hasAttribute("shift_east") )
+        m_shift.second = g->getAttribute("shift_east").domain().getTypedSingleton<double, true>();
+      else {
+        m_shift.second = 0.0;
+        g->restrictAttribute(Variable("shift_east", FloatDomain(0.0)));
+      }
 
       if( m_active ) {
 	if( m_drifter!=drifter ) {

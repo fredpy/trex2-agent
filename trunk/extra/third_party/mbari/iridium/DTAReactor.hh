@@ -27,7 +27,7 @@ namespace mbari {
       double              m_factor;
       bool                m_lagrangian;
       
-      std::pair<double, double> m_pos, m_speed;
+      std::pair<double, double> m_pos, m_speed, m_shift;
       bool m_have_pos;
       bool m_have_speed;
       // bool m_waiting;
