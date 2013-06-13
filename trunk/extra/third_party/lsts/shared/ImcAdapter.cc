@@ -25,16 +25,16 @@ namespace TREX {
       {
         switch (msg->medium) {
           case (VehicleMedium::VM_WATER):
-                            return Observation("medium", "Water");
+            return Observation("medium", "Water");
           break;
           case (VehicleMedium::VM_UNDERWATER):
-                            return Observation("medium", "Underwater");
+            return Observation("medium", "Underwater");
           break;
           case (VehicleMedium::VM_AIR):
-                            return Observation("medium", "Air");
+            return Observation("medium", "Air");
           break;
           case (VehicleMedium::VM_GROUND):
-                            return Observation("medium", "Ground");
+            return Observation("medium", "Ground");
           break;
           default:
             break;
@@ -98,13 +98,13 @@ namespace TREX {
         switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+                obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
           break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
           break;
           default:
             break;

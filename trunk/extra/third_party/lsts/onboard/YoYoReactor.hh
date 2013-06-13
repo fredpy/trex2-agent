@@ -51,7 +51,7 @@ namespace TREX {
       TREX::transaction::Observation m_lastReference;
 
       double m_lat, m_lon, m_minz, m_maxz, m_speed;
-      int m_secs_underwater;
+      int m_secs_underwater, m_time_underwater, m_time_at_surface;
 
 
       void handleInit();
@@ -60,6 +60,8 @@ namespace TREX {
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
       void notify(TREX::transaction::Observation const &obs);
+
+      void requestReference(double lat, double lon, double speed, double z);
 
       virtual
       ~YoYoReactor();
