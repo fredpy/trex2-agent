@@ -20,12 +20,25 @@ namespace mbari {
       TREX::utils::Symbol tl_name(TREX::utils::Symbol const &name) const {
         return m_drifter_pfx+name.str();
       }
+      
+      void update_state(TREX::transaction::TICK date);
+      void set_state(TREX::transaction::Goal const &g) {
+        TREX::transaction::Observation o(g);
+        set_state(o, g.getEnd());
+      }
+      void set_state(TREX::transaction::Observation obs,
+                     TREX::transaction::IntegerDomain const &end);
+      void send_cmd();
 
       bool m_active;
       TREX::utils::Symbol m_drifter;
       TREX::utils::Symbol m_path;
       double              m_factor;
       bool                m_lagrangian;
+      
+      
+      UNIQ_PTR<TREX::transaction::IntegerDomain> m_current_end;
+      std::list<TREX::transaction::goal_id> m_pending_goals;
       
       std::pair<double, double> m_pos, m_speed, m_shift;
       bool m_have_pos;
