@@ -1047,6 +1047,27 @@ namespace TREX {
       
       std::ofstream m_stat_log;
       
+      bool internal_sync(TREX::utils::Symbol name) const;
+      bool external_sync(TREX::utils::Symbol name) const;
+      
+      void clear_int_sync();
+      void clear_ext_sync();
+      
+      
+      
+      void use_sync(TREX::utils::Symbol name, details::transaction_flags f);
+      bool unuse_sync(TREX::utils::Symbol name);
+  
+      void provide_sync(TREX::utils::Symbol name, details::transaction_flags f);
+      bool unprovide_sync(TREX::utils::Symbol name);
+     
+      void observation_sync(Observation o, TICK date, bool verbose);
+      bool goal_sync(goal_id g);
+      bool recall_sync(goal_id g);
+      
+      bool plan_sync(goal_id tok);
+      void cancel_sync(goal_id tok);
+      
       void clear_internals();
       void clear_externals();
       
@@ -1055,6 +1076,23 @@ namespace TREX {
       graph &m_graph;
       
       class Logger;
+    
+      void queue(std::list<goal_id> &l, goal_id g);
+      
+      void queue_goal(goal_id g);
+      void queue_recall(goal_id g);
+      void queue_token(goal_id g);
+      void queue_cancel(goal_id g);
+      
+      
+      void goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest);
+      
+      std::list<goal_id>     m_sync_goals, m_sync_recalls, m_sync_toks, m_sync_cancels;
+      utils::SharedVar<size_t> m_have_goals;
+      
+      bool have_goals();
+      
+      void collect_obs_sync(std::list<Observation> &l);
       
       /** @brief Request new observations
        *

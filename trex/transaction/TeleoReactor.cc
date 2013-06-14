@@ -316,7 +316,9 @@ utils::Symbol const TeleoReactor::plan("PLAN");
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
                            bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
-   m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(), xml_factory::node(arg), "verbose")),
+   m_have_goals(0),
+   m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
+                                     xml_factory::node(arg), "verbose")),
    m_trLog(NULL),
    m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "name")),
    m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
@@ -369,7 +371,8 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
                            TICK latency, TICK lookahead, bool log)
-  :m_inited(false), m_firstTick(true), m_graph(*owner), 
+  :m_inited(false), m_firstTick(true), m_graph(*owner),
+   m_have_goals(0),
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0) {
@@ -402,12 +405,23 @@ TeleoReactor::size_type TeleoReactor::count_internal_relations() const {
 }
 
 
-bool TeleoReactor::isInternal(TREX::utils::Symbol const &timeline) const {
-  return m_internals.end()!=m_internals.find(timeline);
+bool TeleoReactor::internal_sync(TREX::utils::Symbol name) const {
+  return m_internals.end()!=m_internals.find(name);
 }
 
+bool TeleoReactor::isInternal(TREX::utils::Symbol const &timeline) const {
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::internal_sync, this, timeline));
+  return utils::strand_run(m_graph.strand(), fn);
+}
+
+bool TeleoReactor::external_sync(TREX::utils::Symbol name) const {
+  return m_externals.end()!=m_externals.find(name);
+}
+
+
 bool TeleoReactor::isExternal(TREX::utils::Symbol const &timeline) const {
-  return m_externals.end()!=m_externals.find(timeline);
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::external_sync, this, timeline));
+  return utils::strand_run(m_graph.strand(), fn);
 }
 
 details::external TeleoReactor::ext_begin() {
@@ -431,9 +445,102 @@ void TeleoReactor::reset_deadline() {
   m_past_deadline = false;
 }
 
+bool TeleoReactor::have_goals() {
+  utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+  return 0 < *m_have_goals;
+}
+
+void TeleoReactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
+  {
+    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+    *m_have_goals -= a.size();
+  }
+  std::swap(a, dest);
+}
+
+
+void TeleoReactor::queue(std::list<goal_id> &l, goal_id g) {
+  {
+    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+    *m_have_goals += 1;
+  }
+  l.push_back(g);
+}
+
+
+void TeleoReactor::queue_goal(goal_id g) {
+  m_graph.strand().dispatch(boost::bind(&TeleoReactor::queue, this,
+                                        boost::ref(m_sync_goals), g));
+}
+
+void TeleoReactor::queue_recall(goal_id g) {
+  m_graph.strand().dispatch(boost::bind(&TeleoReactor::queue, this,
+                                        boost::ref(m_sync_recalls), g));
+}
+
+void TeleoReactor::queue_token(goal_id g) {
+  m_graph.strand().dispatch(boost::bind(&TeleoReactor::queue, this,
+                                        boost::ref(m_sync_toks), g));
+}
+
+void TeleoReactor::queue_cancel(goal_id g) {
+  m_graph.strand().dispatch(boost::bind(&TeleoReactor::queue, this,
+                                        boost::ref(m_sync_cancels), g));
+}
+
+
 double TeleoReactor::workRatio() {
+  std::list<goal_id> tmp;
+
+  if( have_goals() ) {
+    // Start to flush goals
+    boost::function<void ()> fn(boost::bind(&TeleoReactor::goal_flush, this,
+                                            boost::ref(m_sync_goals),
+                                            boost::ref(tmp)));
+    utils::strand_run(m_graph.strand(), fn);
+    
+    while( !tmp.empty() ) {
+      handleRequest(tmp.front());
+      tmp.pop_front();
+    }
+  }
+  if( have_goals() ) {
+    // Start to flush recalls
+    boost::function<void ()> fn(boost::bind(&TeleoReactor::goal_flush, this,
+                                            boost::ref(m_sync_recalls),
+                                            boost::ref(tmp)));
+    utils::strand_run(m_graph.strand(), fn);
+    while( !tmp.empty() ) {
+      handleRecall(tmp.front());
+      tmp.pop_front();
+    }
+  }
+  if( have_goals() ) {
+    // Start to flush plan tokens
+    boost::function<void ()> fn(boost::bind(&TeleoReactor::goal_flush, this,
+                                            boost::ref(m_sync_toks),
+                                            boost::ref(tmp)));
+    utils::strand_run(m_graph.strand(), fn);
+    while( !tmp.empty() ) {
+      newPlanToken(tmp.front());
+      tmp.pop_front();
+    }
+  }
+  if( have_goals() ) {
+    // Start to flush plan tokens
+    boost::function<void ()> fn(boost::bind(&TeleoReactor::goal_flush, this,
+                                            boost::ref(m_sync_cancels),
+                                            boost::ref(tmp)));
+    utils::strand_run(m_graph.strand(), fn);
+    while( !tmp.empty() ) {
+      cancelPlanToken(tmp.front());
+      tmp.pop_front();
+    }
+  }
+  
   bool ret = false;
-  if( NULL!=m_trLog ) 
+  
+  if( NULL!=m_trLog )
     m_trLog->has_work();
   try {
     ret = hasWork();
@@ -483,29 +590,41 @@ double TeleoReactor::workRatio() {
   return NAN;
 }
 
-void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
-  internal_set::iterator i = m_internals.find(obs.object());
-
+void TeleoReactor::observation_sync(Observation o, TICK date, bool verbose) {
+  internal_set::iterator i = m_internals.find(o.object());
+  
   if( m_internals.end()==i )
-    throw SynchronizationError(*this, "attempted to post observation on "+
-                               obs.object().str()+" which is not Internal.");
-
-  (*i)->postObservation(getCurrentTick(), obs, verbose);
+    throw boost::enable_current_exception(SynchronizationError(*this, "attempted to post observation on "+
+                               o.object().str()+" which is not Internal."));
+  
+  (*i)->postObservation(date, o, verbose);
   m_updates.insert(*i);
 }
 
-bool TeleoReactor::postGoal(goal_id const &g) {
-  if( !g )
-    throw DispatchError(*this, g, "Invalid goal Id");
+void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
+                                          this, obs, getCurrentTick(), verbose));
+  utils::strand_run(m_graph.strand(), fn);
+}
 
+bool TeleoReactor::goal_sync(goal_id g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
-
   if( tl.valid() ) {
     if( NULL!=m_trLog )
       m_trLog->request(g);
     return tl.post_goal(g);
   } else
-    throw DispatchError(*this, g, "Goals can only be posted on External timelines");
+    throw boost::enable_current_exception(DispatchError(*this, g, "Goals can only be posted on External timelines"));
+}
+
+
+bool TeleoReactor::postGoal(goal_id const &g) {
+  if( !g )
+    throw DispatchError(*this, g, "Invalid goal Id");
+
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::goal_sync,
+                                          this, g));
+  return utils::strand_run(m_graph.strand(), fn);
 }
 
 goal_id TeleoReactor::postGoal(Goal const &g) {
@@ -523,12 +642,9 @@ goal_id TeleoReactor::parse_goal(boost::property_tree::ptree::value_type const &
   return getGraph().parse_goal(g);
 }
 
-
-bool TeleoReactor::postRecall(goal_id const &g) {
-  if( !g )
-    return false;
+bool TeleoReactor::recall_sync(goal_id g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
-
+  
   if( tl.valid() ) {
     if( NULL!=m_trLog )
       m_trLog->recall(g);
@@ -538,20 +654,47 @@ bool TeleoReactor::postRecall(goal_id const &g) {
   return false;
 }
 
-bool TeleoReactor::postPlanToken(goal_id const &t) {
-  if( !t )
-    throw DispatchError(*this, t, "Invalid token id");
+
+bool TeleoReactor::postRecall(goal_id const &g) {
+  if( !g )
+    return false;
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::recall_sync,
+                                          this, g));
+  return utils::strand_run(m_graph.strand(), fn);
+}
+
+bool TeleoReactor::plan_sync(goal_id t) {
   
   // Look for the internal timeline
   internal_set::const_iterator tl = m_internals.find(t->object());
   if( m_internals.end()==tl )
-    throw DispatchError(*this, t, "plan tokens can only be posted on Internal timelines.");
+    throw boost::enable_current_exception(DispatchError(*this, t, "plan tokens can only be posted on Internal timelines."));
   else if( t->getEnd().upperBound() > getCurrentTick() ) {
     if( NULL!=m_trLog )
       m_trLog->notifyPlan(t);
     return (*tl)->notifyPlan(t);
   }
   return false;
+}
+
+void TeleoReactor::cancel_sync(goal_id tok) {
+  internal_set::const_iterator tl = m_internals.find(tok->object());
+  if( m_internals.end()!=tl ) {
+    // do something
+    if( NULL!=m_trLog )
+      m_trLog->cancelPlan(tok);
+    
+    (*tl)->cancelPlan(tok);
+  } 
+}
+
+bool TeleoReactor::postPlanToken(goal_id const &t) {
+  if( !t )
+    throw DispatchError(*this, t, "Invalid token id");
+  
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::plan_sync,
+                                          this, t));
+  return utils::strand_run(m_graph.strand(), fn);
 }
 
 goal_id TeleoReactor::postPlanToken(Goal const &g) {
@@ -565,14 +708,9 @@ goal_id TeleoReactor::postPlanToken(Goal const &g) {
 
 void TeleoReactor::cancelPlanToken(goal_id const &g) {
   if( g ) {
-    internal_set::const_iterator tl = m_internals.find(g->object());
-    if( m_internals.end()!=tl ) {
-      // do something 
-      if( NULL!=m_trLog )
-        m_trLog->cancelPlan(g);
-            
-      (*tl)->cancelPlan(g);
-    }
+    boost::function<void ()> fn(boost::bind(&TeleoReactor::cancel_sync,
+                                            this, g));
+    utils::strand_run(m_graph.strand(), fn);
   }
 }
 
@@ -648,12 +786,23 @@ bool TeleoReactor::newTick() {
   return false;
 }
 
-void TeleoReactor::doNotify() {
+void TeleoReactor::collect_obs_sync(std::list<Observation> &l) {
   for(external_set::iterator i = m_externals.begin();
       m_externals.end()!=i; ++i) {
     if( i->first.lastObsDate()==getCurrentTick() )
-      notify( i->first.lastObservation() );
+      l.push_back( i->first.lastObservation() );
   }
+  
+}
+
+
+void TeleoReactor::doNotify() {
+  std::list<Observation> obs;
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::collect_obs_sync,
+                                          this, boost::ref(obs)));
+  utils::strand_run(m_graph.strand(), fn);
+  for(std::list<Observation>::const_iterator i=obs.begin(); obs.end()!=i; ++i)
+    notify(*i);
 }
 
 
@@ -703,30 +852,41 @@ void TeleoReactor::step() {
   m_tick_steps +=1;
 }
 
-void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
-  details::transaction_flags flag; // initialize all the flags to 0
-  flag.set(0,control);        // update the control flag
-  flag.set(1,plan_listen);    // update the plan_listen flag 
-  
-  if( !m_graph.subscribe(this, timeline, flag) ) {
-    if( isInternal(timeline) ) 
-      syslog(null, warn)<<"External declaration of the Internal timeline \""
-              <<timeline.str()<<"\"";
+void TeleoReactor::use_sync(TREX::utils::Symbol name, details::transaction_flags f) {
+  if( !m_graph.subscribe(this, name, f) ) {
+    if( internal_sync(name) )
+      syslog(warn)<<"External declaration of the Internal timeline \""<<name<<"\"";
     else
-      syslog(null, warn)<<"Multiple External declarations of timeline \""
-              <<timeline.str()<<"\"";
+      syslog(warn)<<"Multiple External declarations of timeline \""<<name<<"\"";
   }
 }
 
 
-void TeleoReactor::provide(TREX::utils::Symbol const &timeline, bool controllable, bool publish) {
+void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
+  details::transaction_flags flag; // initialize all the flags to 0
+  flag.set(0,control);        // update the control flag
+  flag.set(1,plan_listen);    // update the plan_listen flag
+  
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::use_sync, this, timeline, flag));
+  utils::strand_run(m_graph.strand(), fn);
+}
+
+void TeleoReactor::provide_sync(TREX::utils::Symbol name, details::transaction_flags f) {
+  if( !m_graph.assign(this, name, f) )
+    if( internal_sync(name) ) {
+      syslog(warn)<<"Promoted \""<<name<<"\" from External to Internal.";
+    } 
+}
+
+
+void TeleoReactor::provide(TREX::utils::Symbol const &timeline,
+                           bool controllable, bool publish) {
   details::transaction_flags flag;
   flag.set(0, controllable);
   flag.set(1, publish);
-  if( !m_graph.assign(this, timeline, flag) )
-    if( isInternal(timeline) ) {
-      syslog(null, warn)<<"Promoted \""<<timeline.str()<<"\" from External to Internal.";
-    }
+ 
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::provide_sync, this, timeline, flag));
+  utils::strand_run(m_graph.strand(), fn);
 }
 
 void TeleoReactor::tr_info(std::string const &msg) {
@@ -735,24 +895,34 @@ void TeleoReactor::tr_info(std::string const &msg) {
   }
 }
 
-
-bool TeleoReactor::unuse(TREX::utils::Symbol const &timeline) {
-  external_set::iterator i = m_externals.find(timeline);
+bool TeleoReactor::unuse_sync(TREX::utils::Symbol name) {
+  external_set::iterator i = m_externals.find(name);
   if( m_externals.end()!=i ) {
     Relation r = i->first;
     r.unsubscribe();
     return true;
   }
-  return false;
+  return false; 
 }
 
-bool TeleoReactor::unprovide(TREX::utils::Symbol const &timeline) {
-  internal_set::iterator i = m_internals.find(timeline);
+
+bool TeleoReactor::unuse(TREX::utils::Symbol const &timeline) {
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::unuse_sync, this, timeline));
+  return utils::strand_run(m_graph.strand(), fn);
+}
+
+bool TeleoReactor::unprovide_sync(TREX::utils::Symbol name) {
+  internal_set::iterator i = m_internals.find(name);
   if( m_internals.end()!=i ) {
     (*i)->unassign(getCurrentTick());
     return true;
   }
-  return false;
+  return false;  
+}
+
+bool TeleoReactor::unprovide(TREX::utils::Symbol const &timeline) {
+  boost::function<bool ()> fn(boost::bind(&TeleoReactor::unprovide_sync, this, timeline));
+  return utils::strand_run(m_graph.strand(), fn);
 }
 
 
@@ -768,17 +938,28 @@ void TeleoReactor::isolate(bool failed) {
 }
 
 
-void TeleoReactor::clear_internals() {
+void TeleoReactor::clear_int_sync() {
   while( !m_internals.empty() ) {
     m_internals.front()->unassign(getCurrentTick());
   }
 }
 
-void TeleoReactor::clear_externals() {
+void TeleoReactor::clear_ext_sync() {
   while( !m_externals.empty() ) {
     Relation r = m_externals.begin()->first;
     r.unsubscribe();
-  }
+  }  
+}
+
+
+void TeleoReactor::clear_internals() {
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::clear_int_sync, this));
+  utils::strand_run(m_graph.strand(), fn);
+}
+
+void TeleoReactor::clear_externals() {
+  boost::function<void ()> fn(boost::bind(&TeleoReactor::clear_ext_sync, this));
+  utils::strand_run(m_graph.strand(), fn);
 }
 
 void TeleoReactor::assigned(details::timeline *tl) {

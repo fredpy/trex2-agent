@@ -39,6 +39,8 @@
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 
+namespace asio=boost::asio;
+
 
 namespace {
 
@@ -143,15 +145,23 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 // structors :
 
-graph::graph(utils::Symbol const &name, TICK init, bool verbose) 
+graph::graph():m_tick_valid(false) {
+  m_strand.reset(new asio::strand(m_log->service()));
+}
+
+
+graph::graph(utils::Symbol const &name, TICK init, bool verbose)
 :m_name(name), m_tick_valid(false), m_currentTick(init),
  m_verbose(verbose) {
+   m_strand.reset(new asio::strand(m_log->service()));
 }
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
 :m_name(name), m_tick_valid(false),
  m_currentTick(init), m_verbose(verbose) {
+  m_strand.reset(new asio::strand(m_log->service()));
+  
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }

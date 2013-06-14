@@ -180,15 +180,15 @@ void timeline::postObservation(TICK date, Observation const &obs,
 void timeline::request(goal_id const &g) {
   if( owned() ) {
     owner().syslog(info)<<"Request received ["<<g<<"] "
-				<<*g;    
-    owner().handleRequest(g);
+				<<*g;
+    owner().queue_goal(g);
   }
 }
 
 void timeline::recall(goal_id const &g) {
   if( owned() ) {
     owner().syslog(info)<<"Recall received ["<<g<<"]";
-    owner().handleRecall(g);
+    owner().queue_recall(g);
   }
 }
 
@@ -198,7 +198,7 @@ bool timeline::notifyPlan(goal_id const &t) {
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
-          i->first->newPlanToken(t);
+          i->first->queue_token(t);
     }
     return true; 
   } 
@@ -213,7 +213,7 @@ bool timeline::cancelPlan(goal_id const &t) {
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
-          i->first->cancelledPlanToken(t);
+          i->first->queue_cancel(t);
     }
   } 
   return true;
