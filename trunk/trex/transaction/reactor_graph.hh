@@ -661,10 +661,15 @@ namespace TREX {
       goal_id parse_goal(boost::property_tree::ptree::value_type goal) const;
       boost::property_tree::ptree export_goal(goal_id const &g) const;
       
+      
+      boost::asio::strand &strand() {
+        return *m_strand;
+      }
+      
     protected:
       reactor_id add_reactor(reactor_id r);
 
-      graph():m_tick_valid(false) {}
+      graph();
 
       bool hasTick() const {
 	return m_tick_valid;
@@ -741,6 +746,7 @@ namespace TREX {
       virtual void external_check(reactor_id r, details::timeline const &tl) {}
 
     private:
+      
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
                   details::transaction_flags const &flags);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
@@ -753,6 +759,8 @@ namespace TREX {
       details::timeline_set    m_timelines;
       bool                     m_tick_valid;
       TICK                     m_currentTick;
+      
+      UNIQ_PTR<boost::asio::strand> m_strand;
 
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
       listen_set m_listeners;
