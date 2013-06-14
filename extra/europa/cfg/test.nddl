@@ -67,9 +67,9 @@ class Tracker extends AgentTimeline {
 }
 
 Tracker::Holds {
-  if( obj ) {
+//  if( obj ) {
     equals(obj.Holds nxt);
-  }
+//  }
 }
 
 Light light = new Light(Observe);
