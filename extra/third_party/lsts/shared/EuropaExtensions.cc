@@ -257,7 +257,7 @@ void
 InsideOpLimits::handleExecute()
 {
 
-  double lat, lon, depth;
+  double lat, lon;
   // commented unused variable
   // bool inside = true;
   double x, y;
@@ -276,20 +276,31 @@ InsideOpLimits::handleExecute()
   else
     return;
 
-  if (m_depth.isSingleton())
-    depth = cast_basis(m_depth.getSingletonValue());
-
-  if (l_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH)
-    if (depth >= 0 && depth >= l_oplimits->max_depth)
-      m_depth.empty();
-
-  if (l_oplimits->mask & DUNE::IMC::OPL_MAX_ALT)
-    if (depth < 0 && -depth >= l_oplimits->max_altitude)
-      m_depth.empty();
-
-  if (l_oplimits->mask & DUNE::IMC::OPL_MIN_ALT)
-    if (depth < 0 && -depth <= l_oplimits->min_altitude)
-      m_depth.empty();
+  EUROPA::edouble d_lo, d_hi;
+  m_depth.getBounds(d_lo, d_hi);
+  
+  if( l_oplimits->mask & DUNE::IMC::OPL_MAX_DEPTH ) {
+    if( m_depth.intersect(d_lo, l_oplimits->max_depth) ) {
+      if( m_depth.isEmpty() )
+        return;
+      d_hi = m_depth.getUpperBound();
+    }
+  }
+  
+  if (l_oplimits->mask & DUNE::IMC::OPL_MAX_ALT) {
+    if( m_depth.intersect(-l_oplimits->max_altitude, d_hi) ) {
+      if( m_depth.isEmpty() )
+        return;
+      d_lo = m_depth.getLowerBound();
+    }
+  }
+  if (l_oplimits->mask & DUNE::IMC::OPL_MIN_ALT ) {
+    if( d_hi<0 && m_depth.intersect(d_lo, -l_oplimits->min_altitude) ) {
+      if( m_depth.isEmpty() )
+        return;
+      d_hi = m_depth.getUpperBound();
+    }
+  }
 
   if (l_oplimits->mask & DUNE::IMC::OPL_AREA)
   {
@@ -306,7 +317,7 @@ InsideOpLimits::handleExecute()
     if (!(d2limits < 0))
     {
       debugMsg("trex:always",
-               "Outside op limits! " << lat << ", " << lon << ", " << depth);
+               "Outside op limits! " << lat << ", " << lon << ", [" <<d_lo<<", "<<d_hi<<"]");
       m_lat.empty();
     }
   }
