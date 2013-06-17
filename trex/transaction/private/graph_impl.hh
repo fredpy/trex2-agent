@@ -58,8 +58,8 @@ namespace TREX {
         void name(utils::Symbol const &name) {
           m_name = name;
         }
-        void date(date_type const &d);
-        boost::optional<date_type> date() const;
+        void set_date(date_type const &d);
+        boost::optional<date_type> get_date(bool fast=false) const;
         
         utils::log::stream syslog(utils::Symbol const &ctx,
                                   utils::Symbol const &kind) const;

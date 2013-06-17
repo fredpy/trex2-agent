@@ -192,18 +192,18 @@ void graph::set_name(TREX::utils::Symbol const &name) {
 }
 
 bool graph::hasTick() const {
-  return m_impl->date();
+  return m_impl->get_date();
 }
 
 void graph::updateTick(TICK value, bool started) {
   if( started )
-    m_impl->date(value);
+    m_impl->set_date(value);
   else
     m_currentTick = value;
 }
 
 TICK graph::getCurrentTick() const {
-  boost::optional<details::graph_impl::date_type> cur = m_impl->date();
+  boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
   
   if( !cur )
     return m_currentTick;
