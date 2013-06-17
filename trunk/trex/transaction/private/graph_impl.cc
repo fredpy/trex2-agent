@@ -57,18 +57,23 @@ details::graph_impl::~graph_impl() {
 
 // public  manipulators
 
-void details::graph_impl::date(details::graph_impl::date_type const &d) {
+void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
   m_strand->dispatch(boost::bind(&graph_impl::set_date_sync, shared_from_this(), d));
 }
 
-boost::optional<details::graph_impl::date_type> details::graph_impl::date() const {
-  utils::SharedVar< boost::optional<date_type> >::scoped_lock lock(m_date);
-  return *m_date;
+boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {
+  if( fast ) {
+    utils::SharedVar< boost::optional<date_type> >::scoped_lock lock(m_date);
+    return *m_date;
+  } else {
+    boost::function<boost::optional<date_type> ()> fn(boost::bind(&graph_impl::get_date, this, true));
+    return utils::strand_run(strand(), fn);
+  }
 }
 
 tlog::stream details::graph_impl::syslog(Symbol const &ctx,
                                          Symbol const &kind) const {
-  boost::optional<date_type> cur = date();
+  boost::optional<date_type> cur = get_date(true);
   Symbol who = m_name;
   if( !ctx.empty() )
     who = who.str()+"."+ctx.str();
