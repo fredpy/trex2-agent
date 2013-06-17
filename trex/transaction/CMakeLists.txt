@@ -41,6 +41,7 @@ add_library(TREXtransaction SHARED
   Relation.cc
   TeleoReactor.cc
   LogPlayer.cc
+  private/graph_impl.cc
   # headers
   bits/bgl_support.hh
   bits/external.hh
@@ -54,6 +55,7 @@ add_library(TREXtransaction SHARED
   Tick.hh
   bits/timeline.hh
   LogPlayer.hh
+  private/graph_impl.hh
   # template source
   bits/reactor_graph.tcc
 )
@@ -66,6 +68,15 @@ source_group("Header\ Files\\bits" FILES
   bits/external.hh
   bits/timeline.hh
 )
+
+source_group("Header\ Files\\private" FILES 
+  private/graph_impl.hh
+)
+
+source_group("Source\ Files\\private" FILES 
+  private/graph_impl.cc
+)
+
 
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain 

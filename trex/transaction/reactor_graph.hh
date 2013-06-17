@@ -48,6 +48,10 @@
 
 namespace TREX {
   namespace transaction {
+    namespace details {
+      class graph_impl;
+    }
+    
 
     using utils::log::null;
     using utils::log::info;
@@ -123,8 +127,9 @@ namespace TREX {
      * @ingroup transactions
      */
     class graph :boost::noncopyable {
+      boost::shared_ptr<details::graph_impl> m_impl;
     public:
-      typedef CHRONO::nanoseconds duration_type;
+      typedef CHRONO::nanoseconds        duration_type;
       typedef boost::posix_time::ptime   date_type;
           
       /** @brief reactor ID type
@@ -335,9 +340,7 @@ namespace TREX {
        *
        * @return The name of the graph
        */
-      inline TREX::utils::Symbol const &getName() const {
-	return m_name;
-      }
+      TREX::utils::Symbol const &getName() const;
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -496,9 +499,7 @@ namespace TREX {
        *       the Agent. It may be refactored in roder to keep the graph class
        *       as simple as possible.
        */
-      TICK getCurrentTick() const {
-	return m_currentTick;
-      }
+      TICK getCurrentTick() const;
       virtual TICK finalTick() const {
         return std::numeric_limits<TICK>::max();
       }
@@ -662,26 +663,17 @@ namespace TREX {
       boost::property_tree::ptree export_goal(goal_id const &g) const;
       
       
-      boost::asio::strand &strand() {
-        return *m_strand;
-      }
+      boost::asio::strand &strand();
       
     protected:
       reactor_id add_reactor(reactor_id r);
 
       graph();
 
-      bool hasTick() const {
-	return m_tick_valid;
-      }
+      bool hasTick() const;
 
-      void updateTick(TICK value, bool started=true) {
-	m_tick_valid = started;
-	m_currentTick = value;
-      }
-      void set_name(TREX::utils::Symbol const &name) {
-	m_name = name;
-      }
+      void updateTick(TICK value, bool started=true);
+      void set_name(TREX::utils::Symbol const &name);
 
       utils::log::stream syslog(utils::log::id_type const &context, 
                                 utils::log::id_type const &kind) const;
@@ -689,9 +681,7 @@ namespace TREX {
 	return syslog(null, kind);
       }
       
-      TREX::utils::LogManager &manager() const {
-	return *m_log;
-      }
+      TREX::utils::LogManager &manager() const;
 
       bool has_timeline(TREX::utils::Symbol const &tl) const {
 	return m_timelines.find(tl)!=m_timelines.end();
@@ -754,19 +744,14 @@ namespace TREX {
       
       details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
 
-      utils::Symbol            m_name;
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
-      bool                     m_tick_valid;
       TICK                     m_currentTick;
       
-      UNIQ_PTR<boost::asio::strand> m_strand;
-
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
       listen_set m_listeners;
 
       bool m_verbose;
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       TREX::utils::SingletonUse<xml_factory>             m_factory;
 
       mutable details::reactor_set m_quarantined;
