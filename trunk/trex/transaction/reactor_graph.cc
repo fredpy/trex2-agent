@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "reactor_graph.hh"
+#include "private/graph_impl.hh"
 #include "TeleoReactor.hh"
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -145,23 +146,16 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 // structors :
 
-graph::graph():m_tick_valid(false) {
-  m_strand.reset(new asio::strand(m_log->service()));
-}
-
+graph::graph():m_impl(boost::make_shared<details::graph_impl>()) {}
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose)
-:m_name(name), m_tick_valid(false), m_currentTick(init),
- m_verbose(verbose) {
-   m_strand.reset(new asio::strand(m_log->service()));
-}
+:m_impl(boost::make_shared<details::graph_impl>(name)), m_currentTick(init),
+ m_verbose(verbose) {}
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
-:m_name(name), m_tick_valid(false),
- m_currentTick(init), m_verbose(verbose) {
-  m_strand.reset(new asio::strand(m_log->service()));
-  
+:m_impl(boost::make_shared<details::graph_impl>(name)),
+ m_currentTick(init), m_verbose(verbose) {  
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }
@@ -172,13 +166,7 @@ graph::~graph() {
 
 TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
     utils::Symbol const &kind) const {
-  utils::Symbol who = m_name;
-  if( !context.empty() )
-    who = who.str()+"."+context.str();
-  if( hasTick() )
-    return m_log->syslog(m_currentTick, who, kind);
-  else 
-    return m_log->syslog(who, kind);
+  return m_impl->syslog(context, kind);
 }
 
 bool graph::is_isolated(graph::reactor_id r) const {
@@ -195,6 +183,40 @@ std::string graph::duration_str(TICK dur) const {
   return date_str(dur);
 }
 
+TREX::utils::Symbol const &graph::getName() const {
+  return m_impl->name();
+}
+
+void graph::set_name(TREX::utils::Symbol const &name) {
+  m_impl->name(name);
+}
+
+bool graph::hasTick() const {
+  return m_impl->date();
+}
+
+void graph::updateTick(TICK value, bool started) {
+  if( started )
+    m_impl->date(value);
+  else
+    m_currentTick = value;
+}
+
+TICK graph::getCurrentTick() const {
+  boost::optional<details::graph_impl::date_type> cur = m_impl->date();
+  
+  if( !cur )
+    return m_currentTick;
+  return *cur;
+}
+
+boost::asio::strand &graph::strand() {
+  return m_impl->strand();
+}
+
+TREX::utils::LogManager &graph::manager() const {
+  return m_impl->manager();
+}
 
 
 void graph::clear() {
