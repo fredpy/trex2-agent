@@ -43,6 +43,8 @@ namespace TREX {
   namespace transaction {
     namespace details {
       
+      class node_impl;
+      
       /** @breif Graph internal implementation
        *
        * This class handles the implementation details of the transaction graph.
@@ -60,6 +62,8 @@ namespace TREX {
       public boost::enable_shared_from_this<graph_impl> {
       public:
         typedef utils::log::entry::date_type date_type;
+        typedef boost::weak_ptr<node_impl>   node_id;
+        
         
         /** @brief Default constructor
          *
@@ -145,9 +149,31 @@ namespace TREX {
         boost::asio::strand &strand() const {
           return *m_strand;
         }
-        
+        /** @brief Create a new transaction node
+         *
+         * This method creates a new node that is associated 
+         * to this graph. The newly created node has no name.
+         *
+         * @return The newly created node
+         */
+        node_id create_node();
+        /** @brief Remove node from the graph
+         *
+         * @param[in] n A transaction node
+         *
+         * This method remove the node @p n from this graph if and only 
+         * if @p n was associated to this graph. In such case it also  
+         * schedule the cleanup of the node connections
+         *
+         * @retval true if @p n was attached to this graph
+         * @retval false otherwise
+         *
+         * @post @p n is not attached to this graph. If it was before the call,
+         * the node is now attached to no graph and scheduled for cleaning.
+         */
+        bool remove_node(node_id const &n);
+                
       private:
-        void set_date_sync(date_type date);
         
         /** @brief graph date local storage
          *
@@ -175,6 +201,13 @@ namespace TREX {
          * of its structure
          */
         UNIQ_PTR<boost::asio::strand>          m_strand;
+
+        std::set< boost::shared_ptr<node_impl> > m_nodes;
+        
+        void set_date_sync(date_type date);
+        void add_node_sync(boost::shared_ptr<node_impl> n);
+        void rm_node_sync(boost::shared_ptr<node_impl> n);
+        
       }; // TREX::transaction::details::graph_impl
       
     } // TREX::transaction::details
