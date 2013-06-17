@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "graph_impl.hh"
+#include "node_impl.hh"
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
@@ -88,10 +89,41 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
 }
 
 
+details::graph_impl::node_id details::graph_impl::create_node() {
+  boost::shared_ptr<graph_impl> me = shared_from_this();
+  boost::shared_ptr<node_impl> ret(new node_impl(me));
+
+  strand().dispatch(boost::bind(&graph_impl::add_node_sync, me, ret));
+  return ret;
+}
+
+bool details::graph_impl::remove_node(details::graph_impl::node_id const &n) {
+  boost::shared_ptr<graph_impl> me = shared_from_this();
+  boost::shared_ptr<node_impl> node = n.lock();
+
+  if( node && me==node->graph() ) {
+    node->m_graph.reset();
+    strand().dispatch(boost::bind(&graph_impl::rm_node_sync, me, node));
+    return true;
+  }
+  return false;
+}
+
+
 // strand protected calls
 
 void details::graph_impl::set_date_sync(details::graph_impl::date_type date) {
   // This may not look thread safe but it is : there's a mutex lock happening
   // behind the curtain thanks to SharedVar
   m_date = date;
+}
+
+
+void details::graph_impl::add_node_sync(boost::shared_ptr<details::node_impl> n) {
+  m_nodes.insert(n);
+}
+
+void details::graph_impl::rm_node_sync(boost::shared_ptr<details::node_impl> n) {
+  n->isolate(shared_from_this());
+  m_nodes.erase(n);
 }

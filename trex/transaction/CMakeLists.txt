@@ -42,6 +42,7 @@ add_library(TREXtransaction SHARED
   TeleoReactor.cc
   LogPlayer.cc
   private/graph_impl.cc
+  private/node_impl.cc
   # headers
   bits/bgl_support.hh
   bits/external.hh
@@ -56,6 +57,7 @@ add_library(TREXtransaction SHARED
   bits/timeline.hh
   LogPlayer.hh
   private/graph_impl.hh
+  private/node_impl.hh
   # template source
   bits/reactor_graph.tcc
 )
@@ -71,10 +73,12 @@ source_group("Header\ Files\\bits" FILES
 
 source_group("Header\ Files\\private" FILES 
   private/graph_impl.hh
+  private/node_impl.hh
 )
 
 source_group("Source\ Files\\private" FILES 
   private/graph_impl.cc
+  private/node_impl.cc
 )
 
 
