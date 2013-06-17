@@ -171,7 +171,7 @@ namespace TREX {
         utils::SingletonUse<utils::LogManager> m_log;
         /** @brief Acess/update strand
          *
-         * The starnd which is used by this graph for accesses and updates 
+         * The strand which is used by this graph for accesses and updates
          * of its structure
          */
         UNIQ_PTR<boost::asio::strand>          m_strand;
