@@ -63,9 +63,11 @@ void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
 
 boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {
   if( fast ) {
+    // if fast just directly access the mutex protected value
     utils::SharedVar< boost::optional<date_type> >::scoped_lock lock(m_date);
     return *m_date;
   } else {
+    // If not fast post the call through the starnd to ensure that any queued set_date have been processed
     boost::function<boost::optional<date_type> ()> fn(boost::bind(&graph_impl::get_date, this, true));
     return utils::strand_run(strand(), fn);
   }
@@ -73,6 +75,8 @@ boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bo
 
 tlog::stream details::graph_impl::syslog(Symbol const &ctx,
                                          Symbol const &kind) const {
+  // Access quickly to the date : I'd rather have an innacurate date in the logs
+  // than being blocked by pending events in the graph strand 
   boost::optional<date_type> cur = get_date(true);
   Symbol who = m_name;
   if( !ctx.empty() )
@@ -87,5 +91,7 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
 // strand protected calls
 
 void details::graph_impl::set_date_sync(details::graph_impl::date_type date) {
+  // This may not look thread safe but it is : there's a mutex lock happening
+  // behind the curtain thanks to SharedVar
   m_date = date;
 }
