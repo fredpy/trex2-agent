@@ -80,7 +80,7 @@ Clock::~Clock() {
 void Clock::doStart() {
   start();
   m_data.open(m_log->file_name("clock.xml").c_str());
-  m_data<<"<Clock epoch=\""<<epoch()<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
+  m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
   m_first = true;
   syslog(TREX::utils::log::info)<<"Clock started at "<<epoch()
   <<' '<<epoch().zone_name()
