@@ -20,28 +20,40 @@ namespace
 
 namespace TREX {
   namespace LSTS {
+    
+    // Sy,bol equaity test is faster than string : use global Symbols to improve performances
+    utils::Symbol const YoYoReactor::s_trex_pred("TREX");
+    utils::Symbol const YoYoReactor::s_exec_pred("Exec");
+
+    utils::Symbol const YoYoReactor::s_reference_tl("reference");
+    utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
+    utils::Symbol const YoYoReactor::s_control_tl("control");
+
+    utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
+
 
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
                 LstsReactor(arg),
-                m_lastRefState("refstate", "Failed"),
-                m_lastReference("reference", "Failed"),
-                m_lastControl("control", "Failed")
+                m_lastRefState(s_refstate_tl, "Failed"),
+                m_lastControl(s_control_tl, "Failed"),
+                m_lastReference(s_reference_tl, "Failed")
     {
       m_lat = m_lon = m_speed = m_minz = m_maxz = -1;
       m_time_underwater = 0;
       m_time_at_surface = 0;
       m_secs_underwater = 0;
       state = IDLE;
-      use("reference", true);
-      use("refstate", false);
-      use("control");
-      provide("yoyo");
+      use(s_reference_tl, true);
+      use(s_refstate_tl, false);
+      use(s_control_tl);
+      
+      provide(s_yoyo_tl);
     }
 
     void
     YoYoReactor::handleInit()
     {
-      Observation yoyo("yoyo", "Idle");
+      Observation yoyo(s_yoyo_tl, "Idle");
       postObservation(yoyo);
     }
 
@@ -132,7 +144,7 @@ namespace TREX {
         std::cerr << "[YOYO] SURFACE" << std::endl;
         if (nearXY && nearZ)
         {
-          Observation obs = Observation("yoyo", "Done");
+          Observation obs = Observation(s_yoyo_tl, "Done");
           obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
           obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
           obs.restrictAttribute("speed", FloatDomain(m_speed, m_speed));
@@ -153,7 +165,7 @@ namespace TREX {
         break;
         default:
           std::cerr << "[YOYO] IDLE" << std::endl;
-          postUniqueObservation(Observation("yoyo", "Idle"));
+          postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
 
@@ -163,16 +175,14 @@ namespace TREX {
     void
     YoYoReactor::requestReference(double lat, double lon, double speed, double z)
     {
-
-
-      Goal g = Goal("reference", "Going");
+      Goal g(s_reference_tl, "Going");
 
       g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
       g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
-      std::cerr << "[YOYO] Request(" << lat << ", \" << lon << ", " << speed << ", " << z << std::endl;
+      std::cerr << "[YOYO] Request(" << lat << ", " << lon << ", " << speed << ", " << z << std::endl;
 
       postGoal(g);
     }
@@ -182,17 +192,16 @@ namespace TREX {
     {
       std::cerr << "[YOYO] handleRequest(" << *(goal.get()) << ")" << std::endl;
 
-      if (!m_lastControl.predicate().str() == "TREX")
+      if ( s_trex_pred != m_lastControl.predicate() )
       {
         std::cerr << "[YOYO] won't handle this request because TREX is not controlling the vehicle!" << std::endl;
       }
 
-      Goal *g = goal.get();
+      // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
+      goal_id g = goal;
       Variable v;
 
-      std::string gpred = (g->predicate()).str();
-
-      if (gpred == "Exec")
+      if ( g->predicate() == s_exec_pred )
       {
         v = g->getAttribute("latitude");
         if (v.domain().isSingleton())
@@ -240,14 +249,14 @@ namespace TREX {
     {
       std::cerr << "[YOYO] notify(" << obs << ")" << std::endl;
 
-      std::string timeline = obs.object().str();
-      std::string predicate = obs.predicate().str();
-
-      if (timeline == "reference")
+      // std::string timeline = obs.object().str();
+      //std::string predicate = obs.predicate().str();
+    
+      if (s_reference_tl == obs.object())
         m_lastReference = obs;
-      else if (timeline == "refstate")
+      else if (s_refstate_tl == obs.object())
         m_lastRefState = obs;
-      else if (timeline == "control")
+      else if (s_control_tl == obs.object())
         m_lastControl = obs;
     }
 
