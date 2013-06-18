@@ -56,6 +56,7 @@ add_library(TREXtransaction SHARED
   Tick.hh
   bits/timeline.hh
   LogPlayer.hh
+  bits/transaction_fwd.hh
   private/graph_impl.hh
   private/node_impl.hh
   # template source
@@ -66,6 +67,7 @@ source_group("Template Files\\bits" FILES
   bits/reactor_graph.tcc)
 
 source_group("Header\ Files\\bits" FILES 
+  bits/transaction_fwd.hh
   bits/bgl_support.hh
   bits/external.hh
   bits/timeline.hh

@@ -48,9 +48,6 @@
 
 namespace TREX {
   namespace transaction {
-    namespace details {
-      class graph_impl;
-    }
     
 
     using utils::log::null;

@@ -89,7 +89,7 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
 }
 
 
-details::graph_impl::node_id details::graph_impl::create_node() {
+details::node_id details::graph_impl::create_node() {
   boost::shared_ptr<graph_impl> me = shared_from_this();
   boost::shared_ptr<node_impl> ret(new node_impl(me));
 
@@ -97,7 +97,7 @@ details::graph_impl::node_id details::graph_impl::create_node() {
   return ret;
 }
 
-bool details::graph_impl::remove_node(details::graph_impl::node_id const &n) {
+bool details::graph_impl::remove_node(details::node_id const &n) {
   boost::shared_ptr<graph_impl> me = shared_from_this();
   boost::shared_ptr<node_impl> node = n.lock();
 
@@ -107,6 +107,22 @@ bool details::graph_impl::remove_node(details::graph_impl::node_id const &n) {
     return true;
   }
   return false;
+}
+
+// private calls
+
+void details::graph_impl::declare(boost::shared_ptr<details::node_impl> n,
+                                  Symbol const &name,
+                                  details::transaction_flags flag) {
+  boost::shared_ptr<graph_impl> me = shared_from_this();
+  strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
+}
+
+void details::graph_impl::subscribe(boost::shared_ptr<details::node_impl> n,
+                                    Symbol const &name,
+                                    details::transaction_flags flag) {
+  boost::shared_ptr<graph_impl> me = shared_from_this();
+  strand().dispatch(boost::bind(&graph_impl::use_sync, me, n, name, flag));
 }
 
 
@@ -127,3 +143,25 @@ void details::graph_impl::rm_node_sync(boost::shared_ptr<details::node_impl> n) 
   n->isolate(shared_from_this());
   m_nodes.erase(n);
 }
+
+void details::graph_impl::decl_sync(boost::shared_ptr<details::node_impl> n,
+                                    Symbol name, details::transaction_flags flag) {
+  boost::shared_ptr<graph_impl> owned = n->graph();
+  if( shared_from_this()==owned ) {
+    
+  } else
+    syslog(tlog::null, tlog::warn)<<"Ignoring creation request of timeline \""<<name
+    <<"\" as it was requested by a reactor that is no longer part of this graph.";
+}
+
+void details::graph_impl::use_sync(boost::shared_ptr<details::node_impl> n,
+                                   Symbol name, details::transaction_flags flag) {
+  
+  boost::shared_ptr<graph_impl> owned = n->graph();
+  if( shared_from_this()==owned ) {
+    
+  } else
+    syslog(tlog::null, tlog::warn)<<"Ignoring subscription request to timeline \""<<name
+    <<"\" as it was requested by a reactor that is no longer part of this graph.";
+}
+
