@@ -1,6 +1,5 @@
 class SpotterFollow;
 
-
 /** Subjacent controller for spotter following surveys
  *
  * this class embeds all the actions and intermediate predicates
@@ -46,7 +45,7 @@ class SpotterController {
     /* A waypoint
      *
      * This predciat is used as intermediate information for the 
-     * waypoints to be done during a survey. It iscreated and manipulated 
+     * waypoints to be done during a survey. It is created and manipulated 
      * by the actions of this class for the planner to keep track of the 
      * waypoints it will have to reach and their sequence.
      */
@@ -62,6 +61,7 @@ class SpotterController {
 		duration == 1;
 		completion_date <= start;
 		wp_num > 0; 
+		float radius;
     }
 
     SpotterController(SpotterFollow cmd) {
@@ -103,6 +103,7 @@ class SpotterFollow extends AgentTimeline {
 		int waypoints;
 		float    size;
 		float center_lat, center_lon;
+		waypoints == 3;
     }
     predicate Survey {
 		float    center_lat, center_lon;
@@ -164,6 +165,7 @@ SpotterController::DoSegment {
     Counter cpt = me.counter;
     meets(effect Waypoint to);
       to.wp_num == count + 1;
+      to.radius == (count + 2 )  * -50;
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
@@ -181,9 +183,7 @@ SpotterController::DoSegment {
 		meets(condition Navigator.At dest);
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
-		dest.speed == 2;
 		dest.secs == 0;
-		dest.z == 400;
 		to.completion_date == dest.start;
    }
 }
@@ -194,7 +194,7 @@ SpotterController::DoInitial {
 
     equals(effect Waypoint to);
       to.wp_num == 1; // This is the first waypoint
-
+      to.radius == -100;
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.center_lat == to.lat;
@@ -206,11 +206,9 @@ SpotterController::DoInitial {
 		contained_by(condition Navigator.At dest);
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
-		dest.speed == 2;
 		dest.secs == 0;
-		dest.z == 400;
 		to.completion_date == dest.start;
     }
+    
 }
-
 
