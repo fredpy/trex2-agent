@@ -1,0 +1,32 @@
+#include "platform.nddl"
+#include "navigator.nddl"
+#include "sunfish.rules.nddl"
+
+EstimatedState estate = new EstimatedState(Observe);
+ControlMode control = new ControlMode(Observe);
+Medium medium = new Medium(Observe);
+OperationalLimits oplimits = new OperationalLimits(Observe);
+Navigator navigator = new Navigator(Internal);
+Reference reference = new Reference(External);
+ReferenceState refstate = new ReferenceState(Observe);
+navigator.min_z.specify(2);
+navigator.max_z.specify(7);
+navigator.secs_underwater.specify(300);
+
+YoYoController yoyo = new YoYoController(External);
+
+close();
+
+//rejectable (navigator.At target);
+//target.latitude == to_rad(41.184195);
+//target.longitude == to_rad(-8.705745);
+//target.speed.specify(1.3);
+//target.secs.specify(0);
+
+//rejectable (navigator.At t2);
+//t2.latitude == to_rad(41.184895);
+//t2.longitude == to_rad(-8.705745);
+//t2.speed.specify(1.3);
+//t2.secs.specify(0);
+
+//t2 after target;

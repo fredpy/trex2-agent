@@ -1,0 +1,142 @@
+#include "TREX.nddl"
+#include "navigator.nddl"
+
+class EstimatedState extends AgentTimeline {
+
+	EstimatedState(Mode _mode) {
+		super(_mode, "Boot");
+	};
+	
+	predicate Boot {};
+	
+	predicate Position {
+		float latitude;
+		float longitude;
+		float z;
+		
+		duration == 1;
+	};
+};
+
+class Payload extends AgentTimeline {
+
+	float power;
+	string name;
+	
+	Payload(Mode _mode, string _name, float _power) {
+		super(_mode, "Boot");
+		power = _power;
+		name = _name;
+	}
+	
+	predicate Boot {};
+	
+	predicate Unavailable {};
+	
+	predicate Active {};
+	
+	predicate Disabled {};
+}
+
+class Reference extends AgentTimeline {
+	PathControl(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+	
+	predicate At {
+		float latitude;
+		float longitude;
+		float speed;
+		float z;
+	}
+	
+	action Going {
+		float latitude;
+		float longitude;
+		float z;
+		float speed;
+		float radius;
+	}
+	
+	action Surveil {
+		float latitude;
+		float longitude;
+		float radius;
+	}
+	
+}
+
+class ReferenceState extends AgentTimeline {
+	
+	Reference(Mode _mode) {
+		super(_mode, "Boot");
+	};
+	
+	predicate Boot {};
+	
+	predicate Going {
+		float latitude;
+		float longitude;
+		float z;
+		float speed;
+		bool near_z;
+		bool near_xy;
+	};
+}
+
+class ControlMode extends AgentTimeline {
+	
+	PlanControlState(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+	
+	predicate DUNE  {};
+	
+	predicate TREX {};
+	
+};
+
+class OperationalLimits extends AgentTimeline {
+
+	OperationalLimits(Mode _mode) {
+		super(_mode, "Boot");
+	}
+	
+	predicate Boot {};
+
+	predicate Limits {
+		float max_depth;
+		float max_altitude;
+		float min_altitude;
+		float max_speed;
+		float min_speed;
+		
+		max_altitude >= min_altitude;
+		max_speed >= min_speed;		
+	};
+};
+
+class Medium extends AgentTimeline {
+
+	Medium(Mode _mode) {
+		super(_mode, "Unknown");
+	}
+	
+	predicate Unknown {};
+	
+	predicate Water {};
+	
+	predicate Underwater {};
+	
+	predicate Air {};
+	
+	predicate Ground {};
+	
+}
+
+
+

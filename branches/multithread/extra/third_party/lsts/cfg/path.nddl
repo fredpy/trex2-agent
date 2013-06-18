@@ -1,0 +1,98 @@
+class LagrangianPoint {
+    float x, y;
+
+    LagrangianPoint(float _x, float _y) {
+	x = _x;
+	y = _y;
+    }
+}
+
+class PathList {
+    // Attributes used by the list 
+    // note: the place and order of these should not be changed
+    // as their position is hard coded in EuropaExtensions.cc
+    bool nil;
+    LagrangianPoint car;
+    PathList cdr;
+    
+    PathList() {
+	nil = true;
+    }
+    PathList(LagrangianPoint loc, PathList p) {
+	nil = false;
+	car = loc;
+	cdr = p;
+    }
+    PathList(LagrangianPoint l1, LagrangianPoint l2, PathList p) {
+	nil = false;
+	car = l1;
+	cdr = new PathList(l2, p);
+    }
+    PathList(LagrangianPoint l1, LagrangianPoint l2, 
+	     LagrangianPoint l3, PathList p) {
+	nil = false;
+	car = l1;
+	cdr = new PathList(l2, l3, p);
+    }
+    PathList(LagrangianPoint l1, LagrangianPoint l2, 
+	     LagrangianPoint l3, LagrangianPoint l4, 
+	     PathList p) {
+	nil = false;
+	car = l1;
+	cdr = new PathList(l2, l3, l4, p);
+    }
+    PathList(LagrangianPoint l1, LagrangianPoint l2, 
+	     LagrangianPoint l3, LagrangianPoint l4, 
+	     LagrangianPoint l5, PathList p) {
+	nil = false;
+	car = l1;
+	cdr = new PathList(l2, l3, l4, l5, p);
+    }    
+    PathList(LagrangianPoint l1, LagrangianPoint l2, 
+	     LagrangianPoint l3, LagrangianPoint l4, 
+	     LagrangianPoint l5, LagrangianPoint l6,
+	     PathList p) {
+	nil = false;
+	car = l1;
+	cdr = new PathList(l2, l3, l4, l5, l6, p);
+    }
+}
+
+PathList nilPath = new PathList(); // special value for the end of the path
+
+class VerticalControl extends AgentTimeline {
+    predicate Holds {
+	float speed, horizontal_speed, _hspeed_2;
+	float min_z, max_z;
+	float pitch_angle, _corrected_pitch;
+	float _deg_pitch, _bind_deg;
+
+	// My sin and cos constraints use degree ... so I have to convert the angle
+	_corrected_pitch == to_rad(_deg_pitch);
+	_deg_pitch <= 45.0;
+	_deg_pitch == 15.0 + _bind_deg;
+
+	0.0 < speed;
+	0.0 <= _corrected_pitch;
+	_corrected_pitch <= pitch_angle;
+	min_z <= max_z;
+	horizontal_speed == sqrt(_hspeed_2);
+
+	start + duration == end;
+    }
+    
+    VerticalControl(Mode _mode) {
+	super(_mode, "Holds");
+    }
+}
+
+VerticalControl::Holds {
+    met_by(Holds prev);
+    
+    if( min_z==max_z ) {
+	_corrected_pitch == 0;
+    } else {
+	_corrected_pitch == pitch_angle;
+    }
+    horizontal_speed == speed * cos(_deg_pitch);
+}

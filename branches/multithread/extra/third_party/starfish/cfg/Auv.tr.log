@@ -1,0 +1,838 @@
+<Log>
+  <header>
+    <provide name="vehicleState"/>
+    <provide name="wp"/>
+  </header>
+  <tick value="0">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.8000" max="0.8000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="219.9998" max="219.9998"/>
+     </Variable>
+     <Variable name="y">
+      <float min="400.0000" max="400.0000"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Inactive">
+     <Variable name="status">
+      <enum>
+       <elem value="UNDEFINED"/>      </enum>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="1">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.9000" max="0.9000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="220.0000" max="220.0000"/>
+     </Variable>
+     <Variable name="y">
+      <float min="400.0003" max="400.0003"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="2">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="1.0000" max="1.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="220.0001" max="220.0001"/>
+     </Variable>
+     <Variable name="y">
+      <float min="400.0006" max="400.0006"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Active"/>
+  </tick>
+  <tick value="3">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.5000" max="0.5000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="220.3776" max="220.3776"/>
+     </Variable>
+     <Variable name="y">
+      <float min="401.5856" max="401.5856"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="4">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="207.7442" max="207.7442"/>
+     </Variable>
+     <Variable name="y">
+      <float min="390.3571" max="390.3571"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="5">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="201.9159" max="201.9159"/>
+     </Variable>
+     <Variable name="y">
+      <float min="385.4448" max="385.4448"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="6">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="199.0873" max="199.0873"/>
+     </Variable>
+     <Variable name="y">
+      <float min="383.7342" max="383.7342"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="7">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="193.2735" max="193.2735"/>
+     </Variable>
+     <Variable name="y">
+      <float min="378.8050" max="378.8050"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="8">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="187.4307" max="187.4307"/>
+     </Variable>
+     <Variable name="y">
+      <float min="373.9330" max="373.9330"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="9">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="181.6742" max="181.6742"/>
+     </Variable>
+     <Variable name="y">
+      <float min="369.0335" max="369.0335"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="10">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="175.8526" max="175.8526"/>
+     </Variable>
+     <Variable name="y">
+      <float min="364.0911" max="364.0911"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="11">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="170.0678" max="170.0678"/>
+     </Variable>
+     <Variable name="y">
+      <float min="359.1751" max="359.1751"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="12">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="164.2579" max="164.2579"/>
+     </Variable>
+     <Variable name="y">
+      <float min="354.2764" max="354.2764"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="13">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="158.4819" max="158.4819"/>
+     </Variable>
+     <Variable name="y">
+      <float min="349.3610" max="349.3610"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="14">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="152.6631" max="152.6631"/>
+     </Variable>
+     <Variable name="y">
+      <float min="344.5054" max="344.5054"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="15">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="143.8730" max="143.8730"/>
+     </Variable>
+     <Variable name="y">
+      <float min="336.4268" max="336.4268"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="16">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="138.0582" max="138.0582"/>
+     </Variable>
+     <Variable name="y">
+      <float min="331.5305" max="331.5305"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="17">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="132.2037" max="132.2037"/>
+     </Variable>
+     <Variable name="y">
+      <float min="326.7066" max="326.7066"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="18">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="126.3850" max="126.3850"/>
+     </Variable>
+     <Variable name="y">
+      <float min="321.8421" max="321.8421"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="19">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="120.5226" max="120.5226"/>
+     </Variable>
+     <Variable name="y">
+      <float min="317.0313" max="317.0313"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="20">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="114.7048" max="114.7048"/>
+     </Variable>
+     <Variable name="y">
+      <float min="312.1630" max="312.1630"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="21">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="108.8410" max="108.8410"/>
+     </Variable>
+     <Variable name="y">
+      <float min="307.3490" max="307.3490"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="22">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="103.0201" max="103.0201"/>
+     </Variable>
+     <Variable name="y">
+      <float min="302.4837" max="302.4837"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Inactive">
+     <Variable name="status">
+      <enum>
+       <elem value="SUCCESS"/>      </enum>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="23">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="100.2215" max="100.2215"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.8887" max="300.8887"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="24">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="96.0391" max="96.0391"/>
+     </Variable>
+     <Variable name="y">
+      <float min="296.9214" max="296.9214"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="25">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.1000" max="0.1000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="94.8785" max="94.8785"/>
+     </Variable>
+     <Variable name="y">
+      <float min="295.8816" max="295.8816"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="26">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.2000" max="0.2000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="94.2210" max="94.2210"/>
+     </Variable>
+     <Variable name="y">
+      <float min="295.2841" max="295.2841"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="27">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.2000" max="0.2000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="93.9698" max="93.9698"/>
+     </Variable>
+     <Variable name="y">
+      <float min="295.0706" max="295.0706"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Active"/>
+  </tick>
+  <tick value="28">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="90.7477" max="90.7477"/>
+     </Variable>
+     <Variable name="y">
+      <float min="291.6195" max="291.6195"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="29">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="92.3872" max="92.3872"/>
+     </Variable>
+     <Variable name="y">
+      <float min="279.5641" max="279.5641"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="30">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="98.7767" max="98.7767"/>
+     </Variable>
+     <Variable name="y">
+      <float min="274.8547" max="274.8547"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="31">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="106.7572" max="106.7572"/>
+     </Variable>
+     <Variable name="y">
+      <float min="274.7320" max="274.7320"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="32">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="114.6840" max="114.6840"/>
+     </Variable>
+     <Variable name="y">
+      <float min="275.6174" max="275.6174"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="33">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="122.5180" max="122.5180"/>
+     </Variable>
+     <Variable name="y">
+      <float min="276.5731" max="276.5731"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="34">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="130.2083" max="130.2083"/>
+     </Variable>
+     <Variable name="y">
+      <float min="277.5345" max="277.5345"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="35">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="137.8573" max="137.8573"/>
+     </Variable>
+     <Variable name="y">
+      <float min="278.4929" max="278.4929"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="36">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="145.5682" max="145.5682"/>
+     </Variable>
+     <Variable name="y">
+      <float min="279.4686" max="279.4686"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="37">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="153.2651" max="153.2651"/>
+     </Variable>
+     <Variable name="y">
+      <float min="280.4406" max="280.4406"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="38">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="160.9590" max="160.9590"/>
+     </Variable>
+     <Variable name="y">
+      <float min="281.4117" max="281.4117"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="39">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="168.6570" max="168.6570"/>
+     </Variable>
+     <Variable name="y">
+      <float min="282.3841" max="282.3841"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="40">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="176.2884" max="176.2884"/>
+     </Variable>
+     <Variable name="y">
+      <float min="283.3407" max="283.3407"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="41">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="184.0134" max="184.0134"/>
+     </Variable>
+     <Variable name="y">
+      <float min="284.3269" max="284.3269"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="42">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="191.7269" max="191.7269"/>
+     </Variable>
+     <Variable name="y">
+      <float min="285.3137" max="285.3137"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="43">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="199.4140" max="199.4140"/>
+     </Variable>
+     <Variable name="y">
+      <float min="286.2936" max="286.2936"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="44">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="207.0984" max="207.0984"/>
+     </Variable>
+     <Variable name="y">
+      <float min="287.2772" max="287.2772"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="45">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="214.7889" max="214.7889"/>
+     </Variable>
+     <Variable name="y">
+      <float min="288.2661" max="288.2661"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="46">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="222.4304" max="222.4304"/>
+     </Variable>
+     <Variable name="y">
+      <float min="289.2463" max="289.2463"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="47">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="229.9993" max="229.9993"/>
+     </Variable>
+     <Variable name="y">
+      <float min="290.2133" max="290.2133"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="48">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="237.6872" max="237.6872"/>
+     </Variable>
+     <Variable name="y">
+      <float min="291.2182" max="291.2182"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="49">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="245.3884" max="245.3884"/>
+     </Variable>
+     <Variable name="y">
+      <float min="292.2283" max="292.2283"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="50">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="253.0751" max="253.0751"/>
+     </Variable>
+     <Variable name="y">
+      <float min="293.2423" max="293.2423"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="51">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="260.7388" max="260.7388"/>
+     </Variable>
+     <Variable name="y">
+      <float min="294.2625" max="294.2625"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="52">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="268.4338" max="268.4338"/>
+     </Variable>
+     <Variable name="y">
+      <float min="295.3076" max="295.3076"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="53">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="276.0908" max="276.0908"/>
+     </Variable>
+     <Variable name="y">
+      <float min="296.3600" max="296.3600"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="54">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="283.7438" max="283.7438"/>
+     </Variable>
+     <Variable name="y">
+      <float min="297.4328" max="297.4328"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="55">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="291.3288" max="291.3288"/>
+     </Variable>
+     <Variable name="y">
+      <float min="298.5198" max="298.5198"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Inactive">
+     <Variable name="status">
+      <enum>
+       <elem value="SUCCESS"/>      </enum>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="56">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="295.9890" max="295.9890"/>
+     </Variable>
+     <Variable name="y">
+      <float min="299.3539" max="299.3539"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="57">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="301.8470" max="301.8470"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.0128" max="300.0128"/>
+     </Variable>
+    </Observation>
+    <Observation on="wp" pred="Inactive">
+     <Variable name="status">
+      <enum>
+       <elem value="PREEMPTED"/>      </enum>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="58">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.1000" max="0.1000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="303.0568" max="303.0568"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.1618" max="300.1618"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="59">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.2000" max="0.2000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="303.8493" max="303.8493"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.2545" max="300.2545"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="60">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.3000" max="0.3000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="304.4339" max="304.4339"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.3194" max="300.3194"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="61">
+    <Observation on="vehicleState" pred="Holds">
+     <Variable name="depth">
+      <float min="0.4000" max="0.4000"/>
+     </Variable>
+     <Variable name="x">
+      <float min="305.0572" max="305.0572"/>
+     </Variable>
+     <Variable name="y">
+      <float min="300.3789" max="300.3789"/>
+     </Variable>
+    </Observation>
+  </tick>
+</Log>
