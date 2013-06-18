@@ -65,6 +65,16 @@ namespace TREX {
 
       virtual
       ~YoYoReactor();
+      
+    private:
+      static utils::Symbol const s_trex_pred;
+      static utils::Symbol const s_exec_pred;
+      
+      static utils::Symbol const s_reference_tl;
+      static utils::Symbol const s_refstate_tl;
+      static utils::Symbol const s_control_tl;
+      
+      static utils::Symbol const s_yoyo_tl;
     };
   }
 }
