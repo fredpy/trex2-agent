@@ -32,12 +32,19 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "node_impl.hh"
+#include "graph_impl.hh"
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 namespace tlog=utils::log;
 
 using utils::Symbol;
+
+namespace {
+  // A reference to the LogManager singleton. So I can silently handle cases where a node
+  // is not connected to a graph
+  utils::SingletonUse<utils::LogManager> s_log;
+}
 
 /*
  * class TREX::transaction::details::node_impl
@@ -57,18 +64,53 @@ tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) c
   Symbol source = name();
   if( !ctx.empty() )
     source = source.str()+"."+ctx.str();
-  boost::shared_ptr<graph_impl> g = m_graph.lock();
+  boost::shared_ptr<graph_impl> g = graph();
   
   if( g )
     return g->syslog(source, kind);
   else {
     // In case someone produce a message on a disconnected node
-    utils::SingletonUse<utils::LogManager> log;
     
     source = "<nil>."+source.str();
-    return log->syslog(source, kind);
+    return s_log->syslog(source, kind);
   }
 }
+
+utils::LogManager &details::node_impl::manager() const {
+  boost::shared_ptr<graph_impl> g = graph();
+
+  // Following code can appear redundant but it is future proof in the sendse it
+  // handle possible case where one graph do not use the global singleton as
+  // LogManager.
+  if( g )
+    return g->manager();
+  else
+    return *s_log;
+}
+
+void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_plan) {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    transaction_flags flags;
+    flags.set(0, !read_only);
+    flags.set(1, publish_plan);
+    g->declare(shared_from_this(), tl, flags);
+  }
+}
+
+void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan) {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    transaction_flags flags;
+    flags.set(0, !read_only);
+    flags.set(1, listen_plan);
+    g->subscribe(shared_from_this(), tl, flags);
+  }
+}
+
+
 
 // strand protected calls
 

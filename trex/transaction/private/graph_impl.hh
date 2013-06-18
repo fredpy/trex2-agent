@@ -34,6 +34,8 @@
 #ifndef H_trex_transaction_graph_impl
 # define H_trex_transaction_graph_impl
 
+# include "../bits/transaction_fwd.hh"
+
 # include <trex/utils/LogManager.hh>
 
 # include <boost/enable_shared_from_this.hpp>
@@ -42,9 +44,7 @@
 namespace TREX {
   namespace transaction {
     namespace details {
-      
-      class node_impl;
-      
+            
       /** @breif Graph internal implementation
        *
        * This class handles the implementation details of the transaction graph.
@@ -62,9 +62,7 @@ namespace TREX {
       public boost::enable_shared_from_this<graph_impl> {
       public:
         typedef utils::log::entry::date_type date_type;
-        typedef boost::weak_ptr<node_impl>   node_id;
-        
-        
+                
         /** @brief Default constructor
          *
          * Create a nameless graph
@@ -172,9 +170,12 @@ namespace TREX {
          * the node is now attached to no graph and scheduled for cleaning.
          */
         bool remove_node(node_id const &n);
-                
+        
       private:
         
+        void declare(boost::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void subscribe(boost::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+
         /** @brief graph date local storage
          *
          * The attribute where the graph date is locally stored. While this 
@@ -208,6 +209,11 @@ namespace TREX {
         void add_node_sync(boost::shared_ptr<node_impl> n);
         void rm_node_sync(boost::shared_ptr<node_impl> n);
         
+        
+        void decl_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void use_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
+        
+        friend class node_impl;
       }; // TREX::transaction::details::graph_impl
       
     } // TREX::transaction::details

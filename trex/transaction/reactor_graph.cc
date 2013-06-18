@@ -37,6 +37,13 @@
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
+#undef WITH_MAKE_SHARED
+
+#ifdef WITH_MAKE_SHARED
+# include <boost/make_shared.hpp>
+#endif
+
+
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 
@@ -146,16 +153,31 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 // structors :
 
-graph::graph():m_impl(boost::make_shared<details::graph_impl>()) {}
+graph::graph()
+#ifdef WITH_MAKE_SHARED
+:m_impl(boost::make_shared<details::graph_impl>())
+#else 
+:m_impl(new details::graph_impl)
+#endif
+{}
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose)
-:m_impl(boost::make_shared<details::graph_impl>(name)), m_currentTick(init),
- m_verbose(verbose) {}
+#ifdef WITH_MAKE_SHARED
+:m_impl(boost::make_shared<details::graph_impl>(name))
+#else 
+:m_impl(new details::graph_impl(name))
+#endif
+, m_currentTick(init)
+, m_verbose(verbose) {}
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
-:m_impl(boost::make_shared<details::graph_impl>(name)),
- m_currentTick(init), m_verbose(verbose) {  
+#ifdef WITH_MAKE_SHARED
+:m_impl(boost::make_shared<details::graph_impl>(name))
+#else
+:m_impl(new details::graph_impl(name))
+#endif
+, m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }
