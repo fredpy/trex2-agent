@@ -1,6 +1,6 @@
 #include "TREX.nddl"
-#include "navigator.nddl"
-#include "spotter.nddl"
+#include "uav/navigator.nddl"
+#include "uav/spotter.nddl"
 
 /*
  * TREX timelines
