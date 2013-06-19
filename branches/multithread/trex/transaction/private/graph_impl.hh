@@ -37,6 +37,7 @@
 # include "../bits/transaction_fwd.hh"
 
 # include <boost/enable_shared_from_this.hpp>
+# include <boost/signals2/signal.hpp>
 
 # include <set>
 
@@ -62,6 +63,8 @@ namespace TREX {
       public boost::enable_shared_from_this<graph_impl> {
       public:
         typedef utils::log::entry::date_type date_type;
+        
+        typedef boost::signals2::signal<void (tl_ref)> tl_event;
                 
         /** @brief Default constructor
          *
@@ -171,6 +174,10 @@ namespace TREX {
          */
         bool remove_node(node_id const &n);
         
+        tl_event &on_new_tl() {
+          return m_new_tl;
+        }
+        
       private:
         
         void declare(boost::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
@@ -196,13 +203,15 @@ namespace TREX {
          * A reference to the global LogManager singleton.
          */
         utils::SingletonUse<utils::LogManager> m_log;
+        tl_event                               m_new_tl;
         /** @brief Acess/update strand
          *
          * The strand which is used by this graph for accesses and updates
          * of its structure
          */
         UNIQ_PTR<boost::asio::strand>          m_strand;
-
+        
+        
         std::set< boost::shared_ptr<node_impl> > m_nodes;
         
         typedef std::map<utils::Symbol, tl_ref> tl_map;
@@ -217,6 +226,8 @@ namespace TREX {
         void decl_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
         void use_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
         void undeclare(boost::shared_ptr<node_impl> n, tl_ref tl);
+        
+        void notify_new(tl_ref tl);
         
         friend class node_impl;
       }; // TREX::transaction::details::graph_impl

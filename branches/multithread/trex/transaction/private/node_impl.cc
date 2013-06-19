@@ -154,18 +154,22 @@ void details::node_impl::unprovide_sync(boost::shared_ptr<details::graph_impl> g
   if( m_internals.end()!=i ) {
     m_internals.erase(i);
     g->undeclare(shared_from_this(), i->second);
+    syslog(tlog::null, tlog::info)<<"undeclared "<<tl;
   }
 }
 
 void details::node_impl::unuse_sync(Symbol tl) {
-  m_externals.erase(tl);
+  if( m_externals.erase(tl) )
+    syslog(tlog::null, tlog::info)<<"unsubscribed from "<<tl;
 }
 
 void details::node_impl::assigned(details::tl_ref tl) {
+  syslog(tlog::null, tlog::info)<<"declared "<<tl->name()<<" as Internal";
   m_internals.insert(std::make_pair(tl->name(), tl));
 }
 
 void details::node_impl::subscribed(details::ext_ref tl) {
+  syslog(tlog::null, tlog::info)<<"subscribed to "<<tl->name()<<" as External";
   m_externals.insert(std::make_pair(tl->name(), tl));
 }
 

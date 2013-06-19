@@ -152,6 +152,8 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
     tl_ref tl = boost::make_shared<internal_impl>(name, shared_from_this());
     
     i = m_timelines.insert(i, tl_map::value_type(name, tl));
+    // schedule event for later
+    strand().post(boost::bind(&graph_impl::notify_new, shared_from_this(), tl));
   }
   return i->second;
 }
@@ -189,4 +191,7 @@ void details::graph_impl::undeclare(boost::shared_ptr<details::node_impl> n, det
     tl->reset_sync();
 }
 
-
+void details::graph_impl::notify_new(details::tl_ref tl) {
+  syslog(tlog::null, tlog::info)<<"New timeline \""<<tl->name()<<"\" created.";
+  m_new_tl(tl);
+}
