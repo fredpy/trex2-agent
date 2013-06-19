@@ -1185,14 +1185,6 @@ namespace TREX {
       internal_set m_internals;
       internal_set m_updates;
       
-      /** @brief TREX log entry point
-       *
-       * Used to all the configuration and logging management for this reactor
-       *
-       * @sa syslog() const
-       */
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-      
       void isolate(bool failed=true);
       
       // call-backs from timeline
