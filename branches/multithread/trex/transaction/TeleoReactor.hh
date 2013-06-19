@@ -1017,15 +1017,9 @@ namespace TREX {
        * @sa TREX::utils::TextLog
        */
       utils::log::stream
-      syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const {
-        if( context.empty() )
-          return m_graph.syslog(getName(), kind);
-        else
-          return m_graph.syslog(getName().str()+"."+context.str(), kind);
-      }
-      utils::log::stream
-      syslog(utils::log::id_type const &kind=null) const {
-        return m_graph.syslog(getName(), kind);
+      syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const;
+      utils::log::stream syslog(utils::log::id_type const &kind=null) const {
+        return syslog(utils::log::null, kind);
       }
       
       /** @brief Find an external timeline

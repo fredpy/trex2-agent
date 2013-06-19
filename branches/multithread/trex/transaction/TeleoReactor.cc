@@ -396,12 +396,8 @@ TeleoReactor::~TeleoReactor() {
 // observers
 
 utils::Symbol TeleoReactor::getName() const {
-  boost::shared_ptr<details::node_impl> n = m_impl.lock();
-  
-  if( n )
-    return n->name();
-  else
-    return utils::Symbol("<nil>");
+  // TODO ensure that this call is robust
+  return m_impl.lock()->name();
 }
 
 
@@ -446,6 +442,12 @@ details::external TeleoReactor::find_external(TREX::utils::Symbol const &name) {
 }
 
 // modifers/callbacks
+
+utils::log::stream
+TeleoReactor::syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const {
+  return m_impl.lock()->syslog(context, kind);
+}
+
 
 void TeleoReactor::reset_deadline() {
   // initialize the deliberation parameters
