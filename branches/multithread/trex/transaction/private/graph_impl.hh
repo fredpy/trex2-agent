@@ -36,10 +36,10 @@
 
 # include "../bits/transaction_fwd.hh"
 
-# include <trex/utils/LogManager.hh>
-
 # include <boost/enable_shared_from_this.hpp>
-# include <boost/asio/strand.hpp>
+
+# include <set>
+
 
 namespace TREX {
   namespace transaction {
