@@ -59,8 +59,8 @@ namespace TREX {
        */
       typedef std::bitset<2> transaction_flags;
       
-      class timeline_impl;
-      typedef boost::shared_ptr<timeline_impl> tl_ref;
+      class internal_impl;
+      typedef boost::shared_ptr<internal_impl> tl_ref;
     }
 
   }

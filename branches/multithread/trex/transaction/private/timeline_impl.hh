@@ -40,10 +40,14 @@ namespace TREX {
   namespace transaction {
     namespace details {
       
-      class timeline_impl :boost::noncopyable, public boost::enable_shared_from_this<timeline_impl> {
+      class external_impl;
+      
+      typedef boost::shared_ptr<external_impl> ext_ref;
+      
+      class internal_impl :boost::noncopyable, public boost::enable_shared_from_this<internal_impl> {
       public:
-        timeline_impl(utils::Symbol const &name, boost::weak_ptr<graph_impl> const &g);
-        ~timeline_impl();
+        internal_impl(utils::Symbol const &name, boost::weak_ptr<graph_impl> const &g);
+        ~internal_impl();
         
         utils::Symbol const &name() const {
           return m_name;
@@ -53,6 +57,10 @@ namespace TREX {
         
         bool accept_goals() const;
         bool publish_plan() const;
+        
+        boost::shared_ptr<graph_impl> graph() const {
+          return m_graph.lock();
+        }
         
       private:
         utils::Symbol               m_name;
@@ -73,8 +81,33 @@ namespace TREX {
         
         
         friend class graph_impl;
-        timeline_impl() DELETED;
-      }; // TREX::transaction::details::timeline_impl
+        internal_impl() DELETED;
+      }; // TREX::transaction::details::internal_impl
+      
+      
+      class external_impl :boost::noncopyable, public boost::enable_shared_from_this<external_impl> {
+      public:
+        external_impl(boost::shared_ptr<node_impl> cli, tl_ref tl, transaction_flags const &fl);
+        ~external_impl();
+        
+        utils::Symbol const &name() const {
+          return m_timeline->name();
+        }
+        
+        bool accept_goals() const;
+        bool publish_plan() const;
+        
+        boost::shared_ptr<graph_impl> graph() const;
+
+        
+      private:
+        tl_ref            m_timeline;
+        node_id           m_client;
+        transaction_flags m_flags;
+        
+        external_impl() DELETED;
+      }; // TREX::transaction::details::external_impl
+      
 
     } // TREX::transaction::details
   } // TREX::transaction

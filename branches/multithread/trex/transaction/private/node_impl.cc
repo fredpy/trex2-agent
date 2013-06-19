@@ -58,6 +58,29 @@ details::node_impl::node_impl(boost::weak_ptr<details::graph_impl> const &g):m_g
 details::node_impl::~node_impl() {
 }
 
+// public observers
+
+bool details::node_impl::internal(Symbol const &tl) const {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&node_impl::check_internal_sync, this, tl));
+    return utils::strand_run(g->strand(), fn);
+  }
+  return false;
+}
+
+bool details::node_impl::external(Symbol const &tl) const {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&node_impl::check_external_sync, this, tl));
+    return utils::strand_run(g->strand(), fn);
+  }
+  return false;
+}
+
+
 // public manipulators
 
 tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) const {
@@ -79,7 +102,7 @@ tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) c
 utils::LogManager &details::node_impl::manager() const {
   boost::shared_ptr<graph_impl> g = graph();
 
-  // Following code can appear redundant but it is future proof in the sendse it
+  // Following code can appear redundant but it is future proof in the sense it
   // handle possible case where one graph do not use the global singleton as
   // LogManager.
   if( g )
@@ -99,6 +122,13 @@ void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_
   }
 }
 
+void details::node_impl::unprovide(Symbol const &tl) {
+  boost::shared_ptr<graph_impl> g = graph();
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::unprovide_sync, shared_from_this(), g, tl));
+}
+
+
 void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan) {
   boost::shared_ptr<graph_impl> g = graph();
   
@@ -110,10 +140,49 @@ void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan)
   }
 }
 
-
+void details::node_impl::unuse(Symbol const &tl) {
+  boost::shared_ptr<graph_impl> g = graph();
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::unuse_sync, shared_from_this(), tl));
+}
 
 // strand protected calls
 
+void details::node_impl::unprovide_sync(boost::shared_ptr<details::graph_impl> g, Symbol tl) {
+  internal_map::iterator i = m_internals.find(tl);
+  
+  if( m_internals.end()!=i ) {
+    m_internals.erase(i);
+    g->undeclare(shared_from_this(), i->second);
+  }
+}
+
+void details::node_impl::unuse_sync(Symbol tl) {
+  m_externals.erase(tl);
+}
+
+void details::node_impl::assigned(details::tl_ref tl) {
+  m_internals.insert(std::make_pair(tl->name(), tl));
+}
+
+void details::node_impl::subscribed(details::ext_ref tl) {
+  m_externals.insert(std::make_pair(tl->name(), tl));
+}
+
+bool details::node_impl::check_internal_sync(Symbol name) const {
+  return graph() && m_internals.end()!=m_internals.find(name);
+}
+
+bool details::node_impl::check_external_sync(Symbol name) const {
+  return graph() && m_externals.end()!=m_externals.find(name);
+}
+
+
 void details::node_impl::isolate(boost::shared_ptr<details::graph_impl> const &g) {
-  // Disable all connections
+  boost::shared_ptr<node_impl> me = shared_from_this();
+  
+  for(internal_map::iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
+    g->undeclare(me, i->second);
+  m_internals.clear();
+  m_externals.clear();
 }

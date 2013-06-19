@@ -34,7 +34,9 @@
 #ifndef H_trex_transaction_node_impl
 # define H_trex_transaction_node_impl
 
-# include "../bits/transaction_fwd.hh"
+# include "timeline_impl.hh"
+
+# include <map>
 
 namespace TREX {
   namespace transaction {
@@ -65,16 +67,37 @@ namespace TREX {
           return m_graph.lock();
         }
         
+        bool internal(utils::Symbol const &tl) const;
+        bool external(utils::Symbol const &tl) const;
+        
+        
         void provide(utils::Symbol const &tl, bool read_only, bool publish_plan);
+        void unprovide(utils::Symbol const &tl);
         void use(utils::Symbol const &tl, bool read_only, bool listen_plan);
+        void unuse(utils::Symbol const &tl);
         
       private:
         explicit node_impl(boost::weak_ptr<graph_impl> const &g);
         
         void isolate(boost::shared_ptr<graph_impl> const &g);
         
+        void assigned(tl_ref tl);
+        void subscribed(ext_ref tl);
+        
         utils::Symbol               m_name;
         boost::weak_ptr<graph_impl> m_graph;
+        
+        typedef std::map<utils::Symbol, tl_ref> internal_map;
+        typedef std::map<utils::Symbol, ext_ref> external_map;
+
+        internal_map m_internals;
+        external_map m_externals;
+        
+        void unprovide_sync(boost::shared_ptr<graph_impl> g, utils::Symbol tl);
+        void unuse_sync(utils::Symbol tl);
+        
+        bool check_internal_sync(utils::Symbol name) const;
+        bool check_external_sync(utils::Symbol name) const;
         
         friend class graph_impl;
 

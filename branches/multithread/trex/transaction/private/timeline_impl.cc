@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "timeline_impl.hh"
 #include "graph_impl.hh"
+#include "node_impl.hh"
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
@@ -42,20 +42,20 @@ namespace asio=boost::asio;
 using utils::Symbol;
 
 /*
- * class TREX::transaction::details::timeline_impl
+ * class TREX::transaction::details::internal_impl
  */
 
 // structors
 
-details::timeline_impl::timeline_impl(Symbol const &name, boost::weak_ptr<details::graph_impl> const &g)
+details::internal_impl::internal_impl(Symbol const &name, boost::weak_ptr<details::graph_impl> const &g)
 :m_name(name), m_graph(g), m_flags(0) {}
 
 
-details::timeline_impl::~timeline_impl() {}
+details::internal_impl::~internal_impl() {}
 
 // public observers
 
-bool details::timeline_impl::accept_goals() const {
+bool details::internal_impl::accept_goals() const {
   boost::shared_ptr<graph_impl> g = m_graph.lock();
   
   if( g ) {
@@ -65,7 +65,7 @@ bool details::timeline_impl::accept_goals() const {
   return false;
 }
 
-bool details::timeline_impl::publish_plan() const {
+bool details::internal_impl::publish_plan() const {
   boost::shared_ptr<graph_impl> g = m_graph.lock();
   
   if( g ) {
@@ -75,11 +75,11 @@ bool details::timeline_impl::publish_plan() const {
   return false;  
 }
 
-details::node_id details::timeline_impl::owner() const {
+details::node_id details::internal_impl::owner() const {
   boost::shared_ptr<graph_impl> g = m_graph.lock();
 
   if( g ) {
-    boost::function<node_id ()> fn(boost::bind(&timeline_impl::owner_sync, this));
+    boost::function<node_id ()> fn(boost::bind(&internal_impl::owner_sync, this));
     return utils::strand_run(g->strand(), fn);
   } else {
     node_id empty;
@@ -89,11 +89,11 @@ details::node_id details::timeline_impl::owner() const {
 
 // strand protected calls
 
-details::node_id details::timeline_impl::owner_sync() const {
+details::node_id details::internal_impl::owner_sync() const {
   return m_owner;
 }
 
-bool details::timeline_impl::reset_sync() {
+bool details::internal_impl::reset_sync() {
   if( m_owner.lock() ) {
     m_owner.reset();
     m_flags.reset();
@@ -103,7 +103,7 @@ bool details::timeline_impl::reset_sync() {
   return false;
 }
 
-bool details::timeline_impl::set_sync(boost::shared_ptr<details::node_impl> const &n,
+bool details::internal_impl::set_sync(boost::shared_ptr<details::node_impl> const &n,
                                       details::transaction_flags const &fl) {
   boost::shared_ptr<node_impl> cur = m_owner.lock();
   
@@ -119,6 +119,57 @@ bool details::timeline_impl::set_sync(boost::shared_ptr<details::node_impl> cons
     return true;
   }
 }
+
+/*
+ * class TREX::transaction::details::external_impl
+ */
+
+// structors
+
+details::external_impl::external_impl(boost::shared_ptr<details::node_impl> cli,
+                                      details::tl_ref tl,
+                                      details::transaction_flags const &fl)
+:m_timeline(tl), m_client(cli), m_flags(fl) {}
+
+details::external_impl::~external_impl() {}
+
+// public observers
+
+boost::shared_ptr<details::graph_impl> details::external_impl::graph() const {
+  boost::shared_ptr<graph_impl> ret;
+  boost::shared_ptr<node_impl> node = m_client.lock();
+
+  if( node )
+    ret = node->graph();
+  return ret;
+}
+
+
+bool details::external_impl::accept_goals() const {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 0));
+    if( utils::strand_run(g->strand(), fn) )
+      return m_timeline->accept_goals();
+  }
+  return false;
+}
+
+bool  details::external_impl::publish_plan() const {
+  boost::shared_ptr<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 1));
+    if( utils::strand_run(g->strand(), fn) )
+      return m_timeline->publish_plan();
+  }
+  return false; 
+}
+
+
+
+
 
 
 

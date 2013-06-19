@@ -33,7 +33,6 @@
  */
 #include "graph_impl.hh"
 #include "node_impl.hh"
-#include "timeline_impl.hh"
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
@@ -150,7 +149,7 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
   tl_map::iterator i = m_timelines.lower_bound(name);
 
   if( m_timelines.end()==i || name!=i->first ) {
-    tl_ref tl = boost::make_shared<timeline_impl>(name, shared_from_this());
+    tl_ref tl = boost::make_shared<internal_impl>(name, shared_from_this());
     
     i = m_timelines.insert(i, tl_map::value_type(name, tl));
   }
@@ -163,10 +162,9 @@ void details::graph_impl::decl_sync(boost::shared_ptr<details::node_impl> n,
   boost::shared_ptr<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
     tl_ref tl = get_timeline_sync(name);
-    
-    // TODO : need to check for cycles and stuff
-    // update the timeline
-    // notify the node
+
+    if( tl->set_sync(n, flag) )
+      n->assigned(tl);
   } else
     syslog(tlog::null, tlog::warn)<<"Ignoring creation request of timeline \""<<name
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
@@ -177,12 +175,18 @@ void details::graph_impl::use_sync(boost::shared_ptr<details::node_impl> n,
   
   boost::shared_ptr<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
-    tl_ref tl = get_timeline_sync(name);
-
-    // TODO need to check for cycle and stuff
-    // notify the node
+    boost::shared_ptr<external_impl>
+    ext = boost::make_shared<external_impl>(n, get_timeline_sync(name), flag);
+    
+    n->subscribed(ext);
   } else
     syslog(tlog::null, tlog::warn)<<"Ignoring subscription request to timeline \""<<name
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
 }
+
+void details::graph_impl::undeclare(boost::shared_ptr<details::node_impl> n, details::tl_ref tl) {
+  if( tl->owner().lock()==n )
+    tl->reset_sync();
+}
+
 

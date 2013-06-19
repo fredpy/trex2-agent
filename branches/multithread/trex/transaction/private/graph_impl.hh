@@ -216,6 +216,7 @@ namespace TREX {
         
         void decl_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
         void use_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void undeclare(boost::shared_ptr<node_impl> n, tl_ref tl);
         
         friend class node_impl;
       }; // TREX::transaction::details::graph_impl
