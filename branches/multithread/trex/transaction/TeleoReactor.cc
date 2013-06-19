@@ -44,6 +44,7 @@
 
 #include "TeleoReactor.hh"
 #include "private/node_impl.hh"
+#include "private/graph_impl.hh"
 
 
 #include <trex/domain/FloatDomain.hh>
@@ -944,8 +945,17 @@ void TeleoReactor::isolate(bool failed) {
     tmp->failed();
     delete tmp;
   }
+  
   clear_internals();
   clear_externals();
+
+  // A bad cleanup -- just for now -- this should come from node_impl instead
+  boost::shared_ptr<details::node_impl> n = m_impl.lock();
+  if( n ) {
+    boost::shared_ptr<details::graph_impl> g = n->graph();
+    if( g )
+      g->remove_node(m_impl);
+  }
 }
 
 
