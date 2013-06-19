@@ -39,7 +39,7 @@ class Payload extends AgentTimeline {
 }
 
 class Reference extends AgentTimeline {
-	PathControl(Mode _mode) {
+	Reference(Mode _mode) {
 		super(_mode, "Boot");
 	}
 	

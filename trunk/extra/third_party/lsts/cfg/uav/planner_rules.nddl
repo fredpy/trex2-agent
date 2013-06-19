@@ -22,15 +22,10 @@ Navigator::At {
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 		z == arr.z;
 		speed == arr.speed;
-		
-	//meets(Idle);
 	
-	duration == max(1, secs);
 }
 
 Navigator::Going {
-
-	//met_by(Idle);
 
 	contained_by(condition ControlMode.TREX c);
 		c.start < start;	
@@ -69,6 +64,4 @@ Navigator::Going {
 		g.radius == -100;
 		concurrent(end, g.end);
 	}
-
-	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
 }
