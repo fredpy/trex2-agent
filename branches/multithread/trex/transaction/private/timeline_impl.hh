@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2013, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,39 +31,53 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_bits_transaction
-# define FWD_trex_transaction_bits_transaction
+#ifndef H_trex_transaction_timeline_impl
+# define H_trex_transaction_timeline_impl
 
-# include <trex/utils/LogManager.hh>
-
-# include <boost/shared_ptr.hpp>
-
-# include <bitset>
+# include "../bits/transaction_fwd.hh"
 
 namespace TREX {
   namespace transaction {
     namespace details {
-
-      class graph_impl;
       
-      class node_impl;
-      typedef boost::weak_ptr<node_impl> node_id;
+      class timeline_impl :boost::noncopyable, public boost::enable_shared_from_this<timeline_impl> {
+      public:
+        timeline_impl(utils::Symbol const &name, boost::weak_ptr<graph_impl> const &g);
+        ~timeline_impl();
+        
+        utils::Symbol const &name() const {
+          return m_name;
+        }
+        
+        node_id owner() const;
+        
+        bool accept_goals() const;
+        bool publish_plan() const;
+        
+      private:
+        utils::Symbol               m_name;
+        boost::weak_ptr<graph_impl> m_graph;
+        
+        transaction_flags           m_flags;
+        node_id                     m_owner;
       
-      /** @brief Reactor transaction flags
-       *
-       * This type contains the different flags used to handle a reactor
-       * transaction for a specific timeline. The flags are as follow :
-       * @li @c 0 indicates if the timeline accept goals otr not
-       * @li @c 1 indicates if the timeline should broadcast plan tokens
-       *     to the reactor
-       */
-      typedef std::bitset<2> transaction_flags;
-      
-      class timeline_impl;
-      typedef boost::shared_ptr<timeline_impl> tl_ref;
-    }
+        node_id owner_sync() const;
+        bool reset_sync();
+        /**
+         *
+         * @retval true if either the owner or the flags have been modified
+         * @retval false otherwise
+         */
+        bool set_sync(boost::shared_ptr<node_impl> const &n, transaction_flags const &fl);
+        
+        
+        
+        friend class graph_impl;
+        timeline_impl() DELETED;
+      }; // TREX::transaction::details::timeline_impl
 
-  }
-}
+    } // TREX::transaction::details
+  } // TREX::transaction
+} // TREX
 
-#endif // FWD_trex_transaction_bits_transaction
+#endif // H_trex_transaction_timeline_impl

@@ -205,10 +205,14 @@ namespace TREX {
 
         std::set< boost::shared_ptr<node_impl> > m_nodes;
         
+        typedef std::map<utils::Symbol, tl_ref> tl_map;
+        tl_map m_timelines;
+        
         void set_date_sync(date_type date);
         void add_node_sync(boost::shared_ptr<node_impl> n);
         void rm_node_sync(boost::shared_ptr<node_impl> n);
         
+        tl_ref get_timeline_sync(utils::Symbol const &name);
         
         void decl_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
         void use_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
