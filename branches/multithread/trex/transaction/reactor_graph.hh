@@ -666,6 +666,7 @@ namespace TREX {
       reactor_id add_reactor(reactor_id r);
 
       graph();
+      details::node_id new_node(utils::Symbol const &name);
 
       bool hasTick() const;
 

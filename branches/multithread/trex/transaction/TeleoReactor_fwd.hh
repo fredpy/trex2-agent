@@ -131,6 +131,7 @@ namespace TREX {
       struct reactor_id_traits {
 	typedef PtrType base_type;
 	typedef utils::Symbol id_type;
+        typedef id_type return_type;
 
 	/** @brief ID extraction function
 	 *
@@ -146,7 +147,7 @@ namespace TREX {
 	 * @return The name of @p r
 	 * @relates reactor_set
 	 */
-	static id_type const &get_id(base_type r) {
+	static id_type get_id(base_type r) {
 	  return r->getName();
 	}
       }; // TREX::transaction::details::reactor_id_traits

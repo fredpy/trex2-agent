@@ -38,6 +38,7 @@
 # include <list>
 
 # include <boost/call_traits.hpp>
+# include <boost/function_types/result_type.hpp>
 # include <boost/tuple/tuple.hpp>
 
 namespace TREX {
@@ -123,9 +124,8 @@ namespace TREX {
      */
     template<class IdTraits, class Ty>
     struct map_id_traits {
-      typedef std::pair<typename IdTraits::base_type, Ty>     base_type;
-      typedef typename IdTraits::id_type                      id_type;
-      typedef typename boost::call_traits<id_type>::param_type return_type;
+      typedef std::pair<typename IdTraits::base_type, Ty>  base_type;
+      typedef typename IdTraits::id_type                   id_type;
       
       /** @brief Extract identifier
        *
@@ -133,7 +133,7 @@ namespace TREX {
        *
        * @return the identifier associated to @p p
        */
-      static return_type get_id(base_type const &p) {
+      static id_type get_id(base_type const &p) {
 	return IdTraits::get_id(p.first);
       }
     }; // TREX::utils::map_id_traits<>
@@ -155,7 +155,6 @@ namespace TREX {
       typedef Ptr                         base_type;
       typedef typename boost::call_traits<base_type>::param_type argument_type;
       typedef typename IdTraits::id_type  id_type;
-      typedef typename boost::call_traits<id_type>::param_type return_type;
 
       /** @brief Extract identifier
        *
@@ -163,7 +162,7 @@ namespace TREX {
        *
        * @return the identifier associated to @p ptr
        */
-      static return_type get_id(argument_type ptr) {
+      static id_type get_id(argument_type ptr) {
 	return IdTraits::get_id(*ptr);
       }	
     }; // TREX::utils::pointer_id_traits<>

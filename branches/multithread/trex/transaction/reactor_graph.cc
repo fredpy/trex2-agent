@@ -33,6 +33,8 @@
  */
 #include "reactor_graph.hh"
 #include "private/graph_impl.hh"
+#include "private/node_impl.hh"
+
 #include "TeleoReactor.hh"
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -169,6 +171,13 @@ graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
 graph::~graph() {
   clear();
 }
+
+details::node_id graph::new_node(utils::Symbol const &name) {
+  boost::shared_ptr<details::node_impl> n = m_impl->create_node().lock();
+  n->set_name(name);
+  return n;
+}
+
 
 TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
     utils::Symbol const &kind) const {

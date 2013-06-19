@@ -93,6 +93,8 @@ namespace TREX {
       typedef details::timeline_set                       internal_set;
       typedef details::external_set                       external_set;
       
+      details::node_id m_impl;
+      
     public:
 # if defined(CPP11_HAS_CHRONO)
       // standard do not support processing time AFAIK
@@ -187,9 +189,7 @@ namespace TREX {
       /** @brief Reactor name
        * @return the anme of the reactor
        */
-      TREX::utils::Symbol const &getName() const {
-        return m_name;
-      }
+      TREX::utils::Symbol getName() const;
       /** @brief get \"agent\" name
        *
        * Gets the name of the agent that controls this reactor.
@@ -1123,15 +1123,6 @@ namespace TREX {
        * @sa TransactionPlayer
        */
       Logger *m_trLog;
-      
-      /** @brief Reactor name
-       *
-       * This is the name of the reactor. It is used to idenitify the
-       * reactor in the agent and for displaying log messages.
-       *
-       * @sa getName() const
-       */
-      TREX::utils::Symbol m_name;
       
       /** @brief Deliberation latency
        *

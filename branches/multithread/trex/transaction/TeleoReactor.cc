@@ -43,6 +43,9 @@
 // #include <boost/chrono/clock_string.hpp>
 
 #include "TeleoReactor.hh"
+#include "private/node_impl.hh"
+
+
 #include <trex/domain/FloatDomain.hh>
 #include <trex/utils/chrono_helper.hh>
 
@@ -315,16 +318,13 @@ utils::Symbol const TeleoReactor::plan("PLAN");
 
 TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
                            bool log_default)
-  :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
-   m_have_goals(0),
-   m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
-                                     xml_factory::node(arg), "verbose")),
-   m_trLog(NULL),
-   m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "name")),
-   m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
-   m_maxDelay(0),
-   m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
-   m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
+:m_impl(arg.second->new_node(utils::parse_attr<Symbol>(xml_factory::node(arg), "name")))
+,m_inited(false), m_firstTick(true), m_graph(*(arg.second)), m_have_goals(0)
+,m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
+                                   xml_factory::node(arg), "verbose"))
+,m_trLog(NULL), m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency"))
+,m_maxDelay(0), m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead"))
+,m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
   utils::LogManager::path_type fname = file_name("stat.csv");
@@ -371,11 +371,10 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
 TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
                            TICK latency, TICK lookahead, bool log)
-  :m_inited(false), m_firstTick(true), m_graph(*owner),
-   m_have_goals(0),
-   m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
-   m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
-   m_nSteps(0) {
+:m_impl(owner->new_node(name)), m_inited(false), m_firstTick(true)
+,m_graph(*owner), m_have_goals(0), m_verbose(owner->is_verbose())
+,m_trLog(NULL), m_latency(latency), m_maxDelay(0), m_lookahead(lookahead)
+,m_nSteps(0) {
   utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
      
@@ -395,6 +394,16 @@ TeleoReactor::~TeleoReactor() {
 }
 
 // observers
+
+utils::Symbol TeleoReactor::getName() const {
+  boost::shared_ptr<details::node_impl> n = m_impl.lock();
+  
+  if( n )
+    return n->name();
+  else
+    return utils::Symbol("<nil>");
+}
+
 
 TeleoReactor::size_type TeleoReactor::count_internal_relations() const {
   size_type result(0);

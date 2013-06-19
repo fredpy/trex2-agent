@@ -447,7 +447,7 @@ namespace TREX {
 
 	typedef boost::readable_property_map_tag category;
 	typedef TREX::utils::Symbol              value_type;
-	typedef TREX::utils::Symbol const &      reference;
+	typedef TREX::utils::Symbol              reference;
 	typedef graph::reactor_id                key_type;
 
 	/** @brief Reactor name accessor
@@ -461,7 +461,7 @@ namespace TREX {
 	 * @sa TREX::transaction::TeleoReactor::getName() const
 	 */
 	reference operator[](key_type r) const {
-	  static TREX::utils::Symbol const null_name("0x0");
+	  static TREX::utils::Symbol const null_name("<nil>");
 
 	  if( graph::null_reactor()==r )
 	    return null_name;
@@ -676,7 +676,7 @@ namespace boost {
    * @sa get(vertex_name_t, TREX::transaction::graph const &)
    * @sa TREX::transaction::details::graph_vertex_name_map
    */
-  inline TREX::utils::Symbol const &
+  inline TREX::utils::Symbol
   get(TREX::transaction::details::graph_vertex_name_map const &m,
       TREX::transaction::graph::reactor_id r) {
     return m[r];
