@@ -49,7 +49,6 @@ endmacro(trex_plugin)
 # the directories where plugins are located
 add_subdirectory(REST)
 add_subdirectory(witre.old)
-# add_subdirectory(witre)
 add_subdirectory(europa)
 
 # 3rd party plug-ins
