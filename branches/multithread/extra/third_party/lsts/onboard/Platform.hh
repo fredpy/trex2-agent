@@ -87,7 +87,7 @@ namespace TREX {
       void handleTrexOperation(TrexOperation trexOp);
       void postGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
-      typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
+      typedef std::map<std::string, SHARED_PTR<Observation> > obs_map;
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);

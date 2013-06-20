@@ -90,16 +90,16 @@ tlog::stream details::graph_impl::syslog(Symbol const &ctx,
 
 
 details::node_id details::graph_impl::create_node() {
-  boost::shared_ptr<graph_impl> me = shared_from_this();
-  boost::shared_ptr<node_impl> ret(new node_impl(me));
+  SHARED_PTR<graph_impl> me = shared_from_this();
+  SHARED_PTR<node_impl> ret(new node_impl(me));
 
   strand().dispatch(boost::bind(&graph_impl::add_node_sync, me, ret));
   return ret;
 }
 
 bool details::graph_impl::remove_node(details::node_id const &n) {
-  boost::shared_ptr<graph_impl> me = shared_from_this();
-  boost::shared_ptr<node_impl> node = n.lock();
+  SHARED_PTR<graph_impl> me = shared_from_this();
+  SHARED_PTR<node_impl> node = n.lock();
 
   if( node && me==node->graph() ) {
     node->m_graph.reset();
@@ -111,17 +111,17 @@ bool details::graph_impl::remove_node(details::node_id const &n) {
 
 // private calls
 
-void details::graph_impl::declare(boost::shared_ptr<details::node_impl> n,
+void details::graph_impl::declare(SHARED_PTR<details::node_impl> n,
                                   Symbol const &name,
                                   details::transaction_flags flag) {
-  boost::shared_ptr<graph_impl> me = shared_from_this();
+  SHARED_PTR<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
 }
 
-void details::graph_impl::subscribe(boost::shared_ptr<details::node_impl> n,
+void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
                                     Symbol const &name,
                                     details::transaction_flags flag) {
-  boost::shared_ptr<graph_impl> me = shared_from_this();
+  SHARED_PTR<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::use_sync, me, n, name, flag));
 }
 
@@ -135,11 +135,11 @@ void details::graph_impl::set_date_sync(details::graph_impl::date_type date) {
 }
 
 
-void details::graph_impl::add_node_sync(boost::shared_ptr<details::node_impl> n) {
+void details::graph_impl::add_node_sync(SHARED_PTR<details::node_impl> n) {
   m_nodes.insert(n);
 }
 
-void details::graph_impl::rm_node_sync(boost::shared_ptr<details::node_impl> n) {
+void details::graph_impl::rm_node_sync(SHARED_PTR<details::node_impl> n) {
   n->isolate(shared_from_this());
   m_nodes.erase(n);
 }
@@ -149,7 +149,7 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
   tl_map::iterator i = m_timelines.lower_bound(name);
 
   if( m_timelines.end()==i || name!=i->first ) {
-    tl_ref tl = boost::make_shared<internal_impl>(name, shared_from_this());
+    tl_ref tl = MAKE_SHARED<internal_impl>(name, shared_from_this());
     
     i = m_timelines.insert(i, tl_map::value_type(name, tl));
     // schedule event for later
@@ -159,9 +159,9 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
 }
 
 
-void details::graph_impl::decl_sync(boost::shared_ptr<details::node_impl> n,
+void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
                                     Symbol name, details::transaction_flags flag) {
-  boost::shared_ptr<graph_impl> owned = n->graph();
+  SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
     tl_ref tl = get_timeline_sync(name);
 
@@ -172,13 +172,13 @@ void details::graph_impl::decl_sync(boost::shared_ptr<details::node_impl> n,
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
 }
 
-void details::graph_impl::use_sync(boost::shared_ptr<details::node_impl> n,
+void details::graph_impl::use_sync(SHARED_PTR<details::node_impl> n,
                                    Symbol name, details::transaction_flags flag) {
   
-  boost::shared_ptr<graph_impl> owned = n->graph();
+  SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
-    boost::shared_ptr<external_impl>
-    ext = boost::make_shared<external_impl>(n, get_timeline_sync(name), flag);
+    SHARED_PTR<external_impl>
+    ext = MAKE_SHARED<external_impl>(n, get_timeline_sync(name), flag);
     
     n->subscribed(ext);
   } else
@@ -186,7 +186,7 @@ void details::graph_impl::use_sync(boost::shared_ptr<details::node_impl> n,
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
 }
 
-void details::graph_impl::undeclare(boost::shared_ptr<details::node_impl> n, details::tl_ref tl) {
+void details::graph_impl::undeclare(SHARED_PTR<details::node_impl> n, details::tl_ref tl) {
   if( tl->owner().lock()==n )
     tl->reset_sync();
 }

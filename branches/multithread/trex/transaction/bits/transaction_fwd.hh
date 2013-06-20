@@ -36,8 +36,6 @@
 
 # include <trex/utils/LogManager.hh>
 
-# include <boost/shared_ptr.hpp>
-
 # include <bitset>
 
 namespace TREX {
@@ -47,7 +45,7 @@ namespace TREX {
       class graph_impl;
       
       class node_impl;
-      typedef boost::weak_ptr<node_impl> node_id;
+      typedef WEAK_PTR<node_impl> node_id;
       
       /** @brief Reactor transaction flags
        *
@@ -60,7 +58,7 @@ namespace TREX {
       typedef std::bitset<2> transaction_flags;
       
       class internal_impl;
-      typedef boost::shared_ptr<internal_impl> tl_ref;
+      typedef SHARED_PTR<internal_impl> tl_ref;
     }
 
   }

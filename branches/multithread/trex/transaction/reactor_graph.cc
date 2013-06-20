@@ -152,17 +152,17 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 // structors :
 
 graph::graph()
-:m_impl(boost::make_shared<details::graph_impl>())
+:m_impl(MAKE_SHARED<details::graph_impl>())
 {}
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose)
-:m_impl(boost::make_shared<details::graph_impl>(name))
+:m_impl(MAKE_SHARED<details::graph_impl>(name))
 , m_currentTick(init)
 , m_verbose(verbose) {}
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
-:m_impl(boost::make_shared<details::graph_impl>(name))
+:m_impl(MAKE_SHARED<details::graph_impl>(name))
 , m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
@@ -173,7 +173,7 @@ graph::~graph() {
 }
 
 details::node_id graph::new_node(utils::Symbol const &name) {
-  boost::shared_ptr<details::node_impl> n = m_impl->create_node().lock();
+  SHARED_PTR<details::node_impl> n = m_impl->create_node().lock();
   n->set_name(name);
   return n;
 }
@@ -257,7 +257,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
   graph *me = this;
   TeleoReactor::xml_arg_type 
   arg = xml_factory::arg_traits::build(description, me);
-  boost::shared_ptr<TeleoReactor> tmp(m_factory->produce(arg));
+  SHARED_PTR<TeleoReactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
   if( ret.second ) 
@@ -268,7 +268,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
 }
 
 graph::reactor_id graph::add_reactor(graph::reactor_id r) {
-  boost::shared_ptr<TeleoReactor> tmp(r);  
+  SHARED_PTR<TeleoReactor> tmp(r);  
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
   // As it is an internal call make is silent for now ...
   return ret.first->get();

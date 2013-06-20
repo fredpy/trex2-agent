@@ -42,11 +42,11 @@ namespace TREX {
       
       class external_impl;
       
-      typedef boost::shared_ptr<external_impl> ext_ref;
+      typedef SHARED_PTR<external_impl> ext_ref;
       
       class internal_impl :boost::noncopyable, public boost::enable_shared_from_this<internal_impl> {
       public:
-        internal_impl(utils::Symbol const &name, boost::weak_ptr<graph_impl> const &g);
+        internal_impl(utils::Symbol const &name, WEAK_PTR<graph_impl> const &g);
         ~internal_impl();
         
         utils::Symbol const &name() const {
@@ -58,13 +58,13 @@ namespace TREX {
         bool accept_goals() const;
         bool publish_plan() const;
         
-        boost::shared_ptr<graph_impl> graph() const {
+        SHARED_PTR<graph_impl> graph() const {
           return m_graph.lock();
         }
         
       private:
         utils::Symbol               m_name;
-        boost::weak_ptr<graph_impl> m_graph;
+        WEAK_PTR<graph_impl> m_graph;
         
         transaction_flags           m_flags;
         node_id                     m_owner;
@@ -76,7 +76,7 @@ namespace TREX {
          * @retval true if either the owner or the flags have been modified
          * @retval false otherwise
          */
-        bool set_sync(boost::shared_ptr<node_impl> const &n, transaction_flags const &fl);
+        bool set_sync(SHARED_PTR<node_impl> const &n, transaction_flags const &fl);
         
         
         
@@ -87,7 +87,7 @@ namespace TREX {
       
       class external_impl :boost::noncopyable, public boost::enable_shared_from_this<external_impl> {
       public:
-        external_impl(boost::shared_ptr<node_impl> cli, tl_ref tl, transaction_flags const &fl);
+        external_impl(SHARED_PTR<node_impl> cli, tl_ref tl, transaction_flags const &fl);
         ~external_impl();
         
         utils::Symbol const &name() const {
@@ -97,7 +97,7 @@ namespace TREX {
         bool accept_goals() const;
         bool publish_plan() const;
         
-        boost::shared_ptr<graph_impl> graph() const;
+        SHARED_PTR<graph_impl> graph() const;
 
         
       private:

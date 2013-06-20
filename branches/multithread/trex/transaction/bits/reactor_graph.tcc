@@ -41,7 +41,7 @@ namespace TREX {
       graph *me = this;
       typename xml_factory::iter_traits<Iter>::type
 	it = xml_factory::iter_traits<Iter>::build(from, me);
-      boost::shared_ptr<TeleoReactor> reactor;
+      SHARED_PTR<TeleoReactor> reactor;
       size_t count = 0;
       
       while( m_factory->iter_produce(it, to, reactor) ) {

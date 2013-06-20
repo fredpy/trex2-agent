@@ -60,7 +60,7 @@ namespace {
     return oss.str();
   }
 
-  boost::shared_ptr<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+  SHARED_PTR<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
     TREX::utils::SingletonUse<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
@@ -87,7 +87,7 @@ void export_transactions() {
    *    - restrict(self, var)
    *    - restrict(self, name, domain)
    */
-  bp::class_<Predicate, boost::shared_ptr<Predicate>, boost::noncopyable>
+  bp::class_<Predicate, SHARED_PTR<Predicate>, boost::noncopyable>
   ("predicate", "trex timeline predicate", bp::no_init)
   .add_property("object", bp::make_function(&Predicate::object, bp::return_internal_reference<>()))
   .add_property("name", bp::make_function(&Predicate::predicate, bp::return_internal_reference<>()))
@@ -186,7 +186,7 @@ namespace {
 //  }
   
   
-  boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+  SHARED_PTR<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
     TREX::utils::SingletonUse<tt::Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
@@ -210,7 +210,7 @@ void export_transactions() {
     
 
   // TODO: need to give an iterator
-  class_<tt::Predicate, boost::shared_ptr<tt::Predicate>,
+  class_<tt::Predicate, SHARED_PTR<tt::Predicate>,
          boost::noncopyable>("predicate", "trex timeline predicate", no_init)
   .def("object", &tt::Predicate::object, return_internal_reference<>())
   .def("predicate", &tt::Predicate::predicate, return_internal_reference<>())
@@ -263,7 +263,7 @@ void export_transactions() {
   .def_readonly("xml", &tt::TeleoReactor::xml_arg_type::first)
   ;
   
-  class_<python_reactor, boost::shared_ptr<python_reactor>, boost::noncopyable>
+  class_<python_reactor, SHARED_PTR<python_reactor>, boost::noncopyable>
   ("reactor", "abstract reactor interface", no_init)
   .def(init<tt::TeleoReactor::xml_arg_type &>())
   .add_property("name", make_function(&tt::TeleoReactor::getName, return_internal_reference<>()))

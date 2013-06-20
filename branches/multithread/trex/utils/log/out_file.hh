@@ -78,7 +78,7 @@ namespace TREX {
         void operator()(entry::pointer msg);
         
       private:
-        boost::shared_ptr<std::ofstream> m_file;
+        SHARED_PTR<std::ofstream> m_file;
       };
       
     }

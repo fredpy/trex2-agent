@@ -47,7 +47,7 @@ using utils::Symbol;
 
 // structors
 
-details::internal_impl::internal_impl(Symbol const &name, boost::weak_ptr<details::graph_impl> const &g)
+details::internal_impl::internal_impl(Symbol const &name, WEAK_PTR<details::graph_impl> const &g)
 :m_name(name), m_graph(g), m_flags(0) {}
 
 
@@ -56,7 +56,7 @@ details::internal_impl::~internal_impl() {}
 // public observers
 
 bool details::internal_impl::accept_goals() const {
-  boost::shared_ptr<graph_impl> g = m_graph.lock();
+  SHARED_PTR<graph_impl> g = m_graph.lock();
   
   if( g ) {
     boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 0));
@@ -66,7 +66,7 @@ bool details::internal_impl::accept_goals() const {
 }
 
 bool details::internal_impl::publish_plan() const {
-  boost::shared_ptr<graph_impl> g = m_graph.lock();
+  SHARED_PTR<graph_impl> g = m_graph.lock();
   
   if( g ) {
     boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 1));
@@ -76,7 +76,7 @@ bool details::internal_impl::publish_plan() const {
 }
 
 details::node_id details::internal_impl::owner() const {
-  boost::shared_ptr<graph_impl> g = m_graph.lock();
+  SHARED_PTR<graph_impl> g = m_graph.lock();
 
   if( g ) {
     boost::function<node_id ()> fn(boost::bind(&internal_impl::owner_sync, this));
@@ -103,9 +103,9 @@ bool details::internal_impl::reset_sync() {
   return false;
 }
 
-bool details::internal_impl::set_sync(boost::shared_ptr<details::node_impl> const &n,
+bool details::internal_impl::set_sync(SHARED_PTR<details::node_impl> const &n,
                                       details::transaction_flags const &fl) {
-  boost::shared_ptr<node_impl> cur = m_owner.lock();
+  SHARED_PTR<node_impl> cur = m_owner.lock();
   
   if( cur ) {
     if( n==cur && m_flags!=fl ) {
@@ -126,7 +126,7 @@ bool details::internal_impl::set_sync(boost::shared_ptr<details::node_impl> cons
 
 // structors
 
-details::external_impl::external_impl(boost::shared_ptr<details::node_impl> cli,
+details::external_impl::external_impl(SHARED_PTR<details::node_impl> cli,
                                       details::tl_ref tl,
                                       details::transaction_flags const &fl)
 :m_timeline(tl), m_client(cli), m_flags(fl) {}
@@ -135,9 +135,9 @@ details::external_impl::~external_impl() {}
 
 // public observers
 
-boost::shared_ptr<details::graph_impl> details::external_impl::graph() const {
-  boost::shared_ptr<graph_impl> ret;
-  boost::shared_ptr<node_impl> node = m_client.lock();
+SHARED_PTR<details::graph_impl> details::external_impl::graph() const {
+  SHARED_PTR<graph_impl> ret;
+  SHARED_PTR<node_impl> node = m_client.lock();
 
   if( node )
     ret = node->graph();
@@ -146,7 +146,7 @@ boost::shared_ptr<details::graph_impl> details::external_impl::graph() const {
 
 
 bool details::external_impl::accept_goals() const {
-  boost::shared_ptr<graph_impl> g = graph();
+  SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
     boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 0));
@@ -157,7 +157,7 @@ bool details::external_impl::accept_goals() const {
 }
 
 bool  details::external_impl::publish_plan() const {
-  boost::shared_ptr<graph_impl> g = graph();
+  SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
     boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test, &m_flags, 1));

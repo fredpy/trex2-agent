@@ -46,7 +46,7 @@
 # include <string>
 # include <stdexcept>
 
-# include <boost/shared_ptr.hpp>
+# include <trex/utils/platform/memory.hh>
 
 namespace mbari {
   /** @brief amqp connection classes
@@ -60,7 +60,7 @@ namespace mbari {
   namespace amqp {
 
     class queue;
-    typedef boost::shared_ptr<queue> queue_ref;
+    typedef SHARED_PTR<queue> queue_ref;
 
     namespace details {
       int const FRAME_MAX = 131072;

@@ -63,7 +63,7 @@ namespace TREX {
                                   utils::Symbol const &kind) const;
         utils::LogManager &manager() const;
         
-        boost::shared_ptr<graph_impl> graph() const {
+        SHARED_PTR<graph_impl> graph() const {
           return m_graph.lock();
         }
         
@@ -77,15 +77,15 @@ namespace TREX {
         void unuse(utils::Symbol const &tl);
         
       private:
-        explicit node_impl(boost::weak_ptr<graph_impl> const &g);
+        explicit node_impl(WEAK_PTR<graph_impl> const &g);
         
-        void isolate(boost::shared_ptr<graph_impl> const &g);
+        void isolate(SHARED_PTR<graph_impl> const &g);
         
         void assigned(tl_ref tl);
         void subscribed(ext_ref tl);
         
         utils::Symbol               m_name;
-        boost::weak_ptr<graph_impl> m_graph;
+        WEAK_PTR<graph_impl> m_graph;
         
         typedef std::map<utils::Symbol, tl_ref> internal_map;
         typedef std::map<utils::Symbol, ext_ref> external_map;
@@ -93,7 +93,7 @@ namespace TREX {
         internal_map m_internals;
         external_map m_externals;
         
-        void unprovide_sync(boost::shared_ptr<graph_impl> g, utils::Symbol tl);
+        void unprovide_sync(SHARED_PTR<graph_impl> g, utils::Symbol tl);
         void unuse_sync(utils::Symbol tl);
         
         bool check_internal_sync(utils::Symbol name) const;

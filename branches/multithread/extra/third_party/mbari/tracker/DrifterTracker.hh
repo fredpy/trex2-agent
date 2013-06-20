@@ -119,7 +119,7 @@ namespace mbari {
     UNIQ_PTR<boost::thread>  m_thread;
 
     typedef std::multimap<std::string, 
-			  boost::shared_ptr<MessageHandler> > handle_map;
+			  SHARED_PTR<MessageHandler> > handle_map;
     handle_map m_message_handlers;
     std::multimap<std::string, MessageHandler *> m_goal_handlers;
 

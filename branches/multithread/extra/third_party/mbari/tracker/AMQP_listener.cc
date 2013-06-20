@@ -71,8 +71,8 @@ bool msg_buffer::empty() const {
   return m_queue->empty();
 }
 
-boost::shared_ptr<queue::message> msg_buffer::pop() {
-  boost::shared_ptr<queue::message> result;
+SHARED_PTR<queue::message> msg_buffer::pop() {
+  SHARED_PTR<queue::message> result;
 
   {
     SharedVar<queue_type>::scoped_lock lock(m_queue);
@@ -84,7 +84,7 @@ boost::shared_ptr<queue::message> msg_buffer::pop() {
   return result;
 }
 
-void msg_buffer::handle(boost::shared_ptr<queue::message> const &msg) {
+void msg_buffer::handle(SHARED_PTR<queue::message> const &msg) {
     SharedVar<queue_type>::scoped_lock lock(m_queue);
     m_queue->push_back(msg);
 }

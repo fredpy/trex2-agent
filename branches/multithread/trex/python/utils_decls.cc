@@ -418,7 +418,7 @@ void export_utils() {
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self", "name"), "Create a new logger with the given source name"))
+  class_< log_wrapper, SHARED_PTR<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self", "name"), "Create a new logger with the given source name"))
   .add_property("name", make_getter(&log_wrapper::m_name, return_internal_reference<>()),
                 "Name of this log producer")
   .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir,

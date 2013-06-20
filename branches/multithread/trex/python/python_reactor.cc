@@ -227,7 +227,7 @@ producer::result_type producer::produce(producer::argument_type arg) const {
   try {
     bp::object obj = my_class(arg);
     s_log->syslog("python", TREX::utils::log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
-    boost::shared_ptr<TeleoReactor> r = bp::extract< boost::shared_ptr<TeleoReactor> >(obj);
+    SHARED_PTR<TeleoReactor> r = bp::extract< SHARED_PTR<TeleoReactor> >(obj);
     s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->getName();
       return r;
   } catch(bp::error_already_set const &e) {

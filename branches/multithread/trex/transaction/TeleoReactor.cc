@@ -950,9 +950,9 @@ void TeleoReactor::isolate(bool failed) {
   clear_externals();
 
   // A bad cleanup -- just for now -- this should come from node_impl instead
-  boost::shared_ptr<details::node_impl> n = m_impl.lock();
+  SHARED_PTR<details::node_impl> n = m_impl.lock();
   if( n ) {
-    boost::shared_ptr<details::graph_impl> g = n->graph();
+    SHARED_PTR<details::graph_impl> g = n->graph();
     if( g )
       g->remove_node(m_impl);
   }

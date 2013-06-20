@@ -35,13 +35,13 @@
 # define H_trex_REST_service
 
 # include <trex/utils/Exception.hh>
+# include <trex/utils/platform/memory.hh>
 
 # include <Wt/WResource>
 # include <Wt/Http/Response>
 
 
 # include <boost/function.hpp>
-# include <boost/shared_ptr.hpp>
 # include <boost/property_tree/ptree.hpp>
 # include <boost/iostreams/stream.hpp>
 
@@ -155,7 +155,7 @@ namespace TREX {
     
     class service_tree :public rest_service {
     public:
-      typedef boost::shared_ptr<rest_service> service_ptr;
+      typedef SHARED_PTR<rest_service> service_ptr;
 
       service_tree(Wt::WServer &serv, std::string const &base_path);
       ~service_tree() {

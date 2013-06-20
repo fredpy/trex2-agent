@@ -44,7 +44,8 @@
 #ifndef H_XmlUtils 
 # define H_XmlUtils
 
-# include <boost/shared_ptr.hpp>
+# include <trex/utils/platform/memory.hh>
+
 # include <boost/property_tree/ptree.hpp>
 // Need to indicate to spirit to be thread safe
 # define BOOST_SPIRIT_THREADSAFE

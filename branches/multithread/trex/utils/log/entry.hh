@@ -42,6 +42,8 @@
 # define H_trex_utils_log_entry
 
 # include "log_fwd.hh"
+# include "../platform/memory.hh"
+
 # include <boost/optional.hpp>
 
 namespace TREX {
@@ -96,7 +98,7 @@ namespace TREX {
 	 * The type used to refer to an entry. This typ[e is the 
 	 * expected argument of log message handlers.
 	 */
-        typedef boost::shared_ptr<entry> pointer;
+        typedef SHARED_PTR<entry> pointer;
         
 	/** @brief Desturctor */
         ~entry() {}

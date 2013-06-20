@@ -57,7 +57,7 @@
 namespace TREX {
   namespace agent {
     
-    typedef boost::shared_ptr<Clock> clock_ref;
+    typedef SHARED_PTR<Clock> clock_ref;
     
     /** @brief TREX agent
      *

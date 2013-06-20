@@ -47,7 +47,6 @@
 
 # include <boost/asio/io_service.hpp>
 # include <boost/asio/strand.hpp>
-# include <boost/shared_ptr.hpp>
 
 namespace TREX {
   namespace utils {
@@ -217,7 +216,7 @@ namespace TREX {
         }
         
       private:
-        boost::shared_ptr<details::sig_impl> m_new_log;
+        SHARED_PTR<details::sig_impl> m_new_log;
         boost::asio::io_service    &m_service;
        
 # ifndef DOXYGEN

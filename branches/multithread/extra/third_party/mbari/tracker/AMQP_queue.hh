@@ -178,7 +178,7 @@ namespace mbari {
        * @throw connection::error An error occured while receviing the message
        * @return A pointer to the new message
        */
-      boost::shared_ptr<queue::message> consume();
+      SHARED_PTR<queue::message> consume();
 
     private:
       explicit queue(connection &cn);

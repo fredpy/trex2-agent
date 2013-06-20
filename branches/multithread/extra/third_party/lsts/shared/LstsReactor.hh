@@ -24,7 +24,7 @@ namespace TREX
       virtual ~LstsReactor();
       bool postUniqueObservation(TREX::transaction::Observation obs);
     private:
-      typedef std::map<std::string, boost::shared_ptr<TREX::transaction::Observation> > obs_map;
+      typedef std::map<std::string, SHARED_PTR<TREX::transaction::Observation> > obs_map;
       obs_map postedObservations;
     };
 
