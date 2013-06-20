@@ -159,7 +159,7 @@ LogManager::path_type const &LogManager::logPath() {
     
     trex_log /= TREX_LOG_FILE;
     m_trex_log.reset(new log::out_file(trex_log.string()));
-    m_syslog.direct_connect(m_syslog.stranded(*m_trex_log).track(m_trex_log));
+    m_syslog.direct_connect(m_syslog.stranded(*m_trex_log).track_foreign(m_trex_log));
     
     thread_count(2);
     
