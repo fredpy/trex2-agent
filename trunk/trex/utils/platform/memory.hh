@@ -75,7 +75,11 @@
  * replace the dperecated std::auto_ptr
  */
 #  define STD_MOVE(ptr)
+
+#  define SHARED_NS  computed_namespace
+
 # else
+
 #  ifdef CPP11_HAS_UNIQUE_PTR
 #   define UNIQ_PTR  std::unique_ptr
 #   define STD_MOVE(ptr) std::move(ptr)
@@ -85,6 +89,53 @@
 #   define STD_MOVE(ptr) ptr
 #   define MOVE_ARG(type) type
 #  endif // CPP11_HAS_UNIQUE_PTR
+
+
+
+#  ifdef CPP11_HAS_SHARED_PTR
+#   define SHARED_NS std
+
+namespace boost {
+  
+  /** @brief Pointer cessagss helper for boost
+   *
+   * @tparam[Ty] the type used by the std::shared_ptr
+   * @param[in] p A std::shared_ptr pointing to an element of type Ty
+   *
+   * @return The value of the pointer handled by @p p
+   *
+   * This specialization is made so boost can manipulate std::shared_ptr
+   * within its other libarires. Specifically the bind of a mem_fn while
+   * handling a boost shared_ptr would not handle a std::shared_ptr. It also 
+   * impact the ability to uses std::shared_ptr into boost.python
+   *
+   * @note While this direct specialization apprars to work at least on 
+   * with boost 1.46.1, I am not sure if boost did eventually do that for
+   * more recent versions of boost in which case this specialization sould 
+   * generate a conflict
+   *
+   * @author Frederic Py
+   */
+  template<typename Ty>
+  inline Ty *get_pointer(SHARED_NS::shared_ptr<Ty> const &p) {
+    return p.get();
+  }
+
+}
+
+#  else // CPP11_HAS_SHARED_PTR
+#   include <boost/make_shared.hpp>
+#   include <boost/weak_ptr.hpp>
+#   include <boost/enable_shared_from_this.hpp>
+
+#   define SHARED_NS boost
+#  endif // CPP11_HAS_SHARED_PTR
+
 # endif // DOXYGEN
+
+# define SHARED_PTR  SHARED_NS::shared_ptr
+# define WEAK_PTR    SHARED_NS::weak_ptr
+# define MAKE_SHARED SHARED_NS::make_shared
+# define ENABLE_SHARED_FROM_THIS SHARED_NS::enable_shared_from_this
 
 #endif // H_trex_memory

@@ -36,6 +36,7 @@
 
 #cmakedefine CPP11_HAS_CHRONO
 #cmakedefine CPP11_HAS_UNIQUE_PTR
+#cmakedefine CPP11_HAS_SHARED_PTR
 #cmakedefine CPP11_HAS_DELETED_FUNCTIONS
 
 #endif // H_trex_cpp11
