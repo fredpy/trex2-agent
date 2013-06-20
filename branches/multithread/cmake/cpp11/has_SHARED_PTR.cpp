@@ -33,11 +33,18 @@
  */
 #include <memory>
 
+struct test_shared :public std::enable_shared_from_this<test_shared> {
+  explicit test_shared(int val):value(val) {}
+  ~test_shared() {}
+
+  int const value;
+};
+
 int main(int argc, const char **argv) {
-  std::shared_ptr<int> p1 = std::make_shared<int>(0), p2;
-  std::weak_ptr<int> w1(p1);
+  std::shared_ptr<test_shared> p1 = std::make_shared<test_shared>(0), p2;
+  std::weak_ptr<test_shared> w1(p1->shared_from_this());
   
   p2 = w1.lock();
 
-  return (p1==p2)?*p1:1;
+  return (p1==p2)?p1->value:1;
 }

@@ -43,7 +43,7 @@ namespace TREX {
     namespace details {
 
       class node_impl :boost::noncopyable,
-      public boost::enable_shared_from_this<node_impl> {
+      public ENABLE_SHARED_FROM_THIS<node_impl> {
       public:
         ~node_impl();
 

@@ -44,7 +44,7 @@ namespace TREX {
       
       typedef SHARED_PTR<external_impl> ext_ref;
       
-      class internal_impl :boost::noncopyable, public boost::enable_shared_from_this<internal_impl> {
+      class internal_impl :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<internal_impl> {
       public:
         internal_impl(utils::Symbol const &name, WEAK_PTR<graph_impl> const &g);
         ~internal_impl();
@@ -85,7 +85,7 @@ namespace TREX {
       }; // TREX::transaction::details::internal_impl
       
       
-      class external_impl :boost::noncopyable, public boost::enable_shared_from_this<external_impl> {
+      class external_impl :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<external_impl> {
       public:
         external_impl(SHARED_PTR<node_impl> cli, tl_ref tl, transaction_flags const &fl);
         ~external_impl();

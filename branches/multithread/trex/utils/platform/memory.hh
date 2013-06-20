@@ -95,6 +95,7 @@
 #  else // CPP11_HAS_SHARED_PTR
 #   include <boost/make_shared.hpp>
 #   include <boost/weak_ptr.hpp>
+#   include <boost/enable_shared_from_this.hpp>
 
 #   define SHARED_NS boost
 #  endif // CPP11_HAS_SHARED_PTR
@@ -104,5 +105,6 @@
 # define SHARED_PTR  SHARED_NS::shared_ptr
 # define WEAK_PTR    SHARED_NS::weak_ptr
 # define MAKE_SHARED SHARED_NS::make_shared
+# define ENABLE_SHARED_FROM_THIS SHARED_NS::enable_shared_from_this
 
 #endif // H_trex_memory

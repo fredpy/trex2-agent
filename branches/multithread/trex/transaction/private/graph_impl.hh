@@ -36,7 +36,6 @@
 
 # include "../bits/transaction_fwd.hh"
 
-# include <boost/enable_shared_from_this.hpp>
 # include <boost/signals2/signal.hpp>
 
 # include <set>
@@ -60,7 +59,7 @@ namespace TREX {
        * @ingroup transaction
        */
       class graph_impl :boost::noncopyable,
-      public boost::enable_shared_from_this<graph_impl> {
+      public ENABLE_SHARED_FROM_THIS<graph_impl> {
       public:
         typedef utils::log::entry::date_type date_type;
         
