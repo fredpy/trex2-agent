@@ -59,7 +59,9 @@ details::graph_impl::~graph_impl() {
 // public  manipulators
 
 void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
-  m_strand->dispatch(boost::bind(&graph_impl::set_date_sync, shared_from_this(), d));
+  m_strand->dispatch(boost::bind(boost::mem_fn(&graph_impl::set_date_sync), 
+				 shared_from_this(), 
+				 d));
 }
 
 boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {
@@ -93,7 +95,8 @@ details::node_id details::graph_impl::create_node() {
   SHARED_PTR<graph_impl> me = shared_from_this();
   SHARED_PTR<node_impl> ret(new node_impl(me));
 
-  strand().dispatch(boost::bind(&graph_impl::add_node_sync, me, ret));
+  strand().dispatch(boost::bind(&graph_impl::add_node_sync, 
+				me, ret));
   return ret;
 }
 
@@ -103,7 +106,8 @@ bool details::graph_impl::remove_node(details::node_id const &n) {
 
   if( node && me==node->graph() ) {
     node->m_graph.reset();
-    strand().dispatch(boost::bind(&graph_impl::rm_node_sync, me, node));
+    strand().dispatch(boost::bind(&graph_impl::rm_node_sync, 
+				  me, node));
     return true;
   }
   return false;
@@ -115,14 +119,18 @@ void details::graph_impl::declare(SHARED_PTR<details::node_impl> n,
                                   Symbol const &name,
                                   details::transaction_flags flag) {
   SHARED_PTR<graph_impl> me = shared_from_this();
-  strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
+  strand().dispatch(boost::bind(&graph_impl::decl_sync, 
+				me, 
+				n, name, flag));
 }
 
 void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
                                     Symbol const &name,
                                     details::transaction_flags flag) {
   SHARED_PTR<graph_impl> me = shared_from_this();
-  strand().dispatch(boost::bind(&graph_impl::use_sync, me, n, name, flag));
+  strand().dispatch(boost::bind(&graph_impl::use_sync, 
+				me, 
+				n, name, flag));
 }
 
 
@@ -153,7 +161,9 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
     
     i = m_timelines.insert(i, tl_map::value_type(name, tl));
     // schedule event for later
-    strand().post(boost::bind(&graph_impl::notify_new, shared_from_this(), tl));
+    strand().post(boost::bind(boost::mem_fn(&graph_impl::notify_new), 
+			      shared_from_this(), 
+			      tl));
   }
   return i->second;
 }

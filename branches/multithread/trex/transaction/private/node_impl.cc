@@ -125,7 +125,9 @@ void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_
 void details::node_impl::unprovide(Symbol const &tl) {
   SHARED_PTR<graph_impl> g = graph();
   if( g )
-    g->strand().dispatch(boost::bind(&node_impl::unprovide_sync, shared_from_this(), g, tl));
+    g->strand().dispatch(boost::bind(&node_impl::unprovide_sync, 
+				     shared_from_this(), 
+				     g, tl));
 }
 
 
@@ -143,7 +145,9 @@ void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan)
 void details::node_impl::unuse(Symbol const &tl) {
   SHARED_PTR<graph_impl> g = graph();
   if( g )
-    g->strand().dispatch(boost::bind(&node_impl::unuse_sync, shared_from_this(), tl));
+    g->strand().dispatch(boost::bind(&node_impl::unuse_sync, 
+				     shared_from_this(), 
+				     tl));
 }
 
 // strand protected calls

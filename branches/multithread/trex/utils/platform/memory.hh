@@ -92,6 +92,16 @@
 
 #  ifdef CPP11_HAS_SHARED_PTR
 #   define SHARED_NS std
+
+namespace boost {
+  
+  template<typename Ty>
+  inline Ty *get_pointer(SHARED_NS::shared_ptr<Ty> const &p) {
+    return p.get();
+  }
+
+}
+
 #  else // CPP11_HAS_SHARED_PTR
 #   include <boost/make_shared.hpp>
 #   include <boost/weak_ptr.hpp>
