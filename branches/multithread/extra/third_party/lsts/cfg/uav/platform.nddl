@@ -1,5 +1,5 @@
 #include "TREX.nddl"
-#include "navigator.nddl"
+#include "uav/navigator.nddl"
 
 class EstimatedState extends AgentTimeline {
 
