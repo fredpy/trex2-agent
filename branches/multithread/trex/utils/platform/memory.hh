@@ -75,7 +75,11 @@
  * replace the dperecated std::auto_ptr
  */
 #  define STD_MOVE(ptr)
+
+#  define SHARED_NS  computed_namespace
+
 # else
+
 #  ifdef CPP11_HAS_UNIQUE_PTR
 #   define UNIQ_PTR  std::unique_ptr
 #   define STD_MOVE(ptr) std::move(ptr)
@@ -85,6 +89,21 @@
 #   define STD_MOVE(ptr) ptr
 #   define MOVE_ARG(type) type
 #  endif // CPP11_HAS_UNIQUE_PTR
+
+#  ifdef CPP11_HAS_SHARED_PTR
+#   define SHARED_NS std
+#  else // CPP11_HAS_SHARED_PTR
+#  endif // CPP11_HAS_SHARED_PTR
+
+#   include <boost/make_shared.hpp>
+#   include <boost/weak_ptr.hpp>
+
+#   define SHARED_NS boost
+
 # endif // DOXYGEN
+
+# define SHARED_PTR  SHARED_NS::shared_ptr
+# define WEAK_PTR    SHARED_NS::weak_ptr
+# define MAKE_SHARED SHARED_NS::make_shared
 
 #endif // H_trex_memory
