@@ -93,12 +93,11 @@
 #  ifdef CPP11_HAS_SHARED_PTR
 #   define SHARED_NS std
 #  else // CPP11_HAS_SHARED_PTR
-#  endif // CPP11_HAS_SHARED_PTR
-
 #   include <boost/make_shared.hpp>
 #   include <boost/weak_ptr.hpp>
 
 #   define SHARED_NS boost
+#  endif // CPP11_HAS_SHARED_PTR
 
 # endif // DOXYGEN
 
