@@ -184,6 +184,7 @@ SpotterController::DoSegment {
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
+		dest.radius == (count + 2 )  * -50;
         //to.completion_date == dest.start + 6.28*to.radius*20.0;
    }
 }
@@ -207,6 +208,7 @@ SpotterController::DoInitial {
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
+		dest.radius == -100;
 		to.completion_date == dest.start;
     }
     

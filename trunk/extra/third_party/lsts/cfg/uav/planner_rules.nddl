@@ -61,7 +61,7 @@ Navigator::Going {
 		longitude == g.longitude;
 		z == g.z;
 		speed == g.speed;
-		g.radius == -100;
+		g.radius == at.radius;
 		concurrent(end, g.end);
 	}
 }
