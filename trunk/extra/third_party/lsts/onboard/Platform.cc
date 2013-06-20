@@ -98,8 +98,6 @@ namespace TREX
           commited = handleGoingRequest(goal);
         else if (gname == "reference" && gpred == "At")
           commited = handleAtRequest(goal);
-        else if (gname == "reference" && gpred == "Surveil")
-          commited = handleSurveilRequest(goal);
 
         if (commited)
         {
@@ -502,15 +500,6 @@ void Platform::goingUAV(const goal_id& g) {
   syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") ";
   std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") \n";
 }
-
-    bool
-    Platform::handleSurveilRequest(goal_id const &g)
-    {
-      //goingUAV(g);
-      sendMsg(m_ref);
-
-      return true;
-    }
 
 bool
     Platform::handleYoYoRequest(goal_id const &goal)
