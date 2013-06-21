@@ -141,9 +141,9 @@ SpotterController::EndSurvey {
     SpotterFollow me = object.command;
     Counter cpt = me.counter;
 
-    equals(effect me.Survey survey);
-    ends(cpt.Holds cur);
-    met_by(me.DoSurvey exec);
+    equals(effect me.Survey survey); //origin.start == target.start && origin.end == target.end && origin.duration == target.duration
+    ends(cpt.Holds cur);             //origin.end == target.end
+    met_by(me.DoSurvey exec);        //origin.start == target.end
       exec.id == cur.id;
       exec.center_lat == survey.center_lat;
       exec.center_lon == survey.center_lon;
@@ -169,7 +169,7 @@ SpotterController::DoSegment {
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
-    starts(condition Waypoint from);
+    starts_during(condition Waypoint from); // correction for error that was propagated down the line
       from.path_id == to.path_id;
       from.lat == to.lat;
       from.lon == to.lon;
@@ -196,7 +196,7 @@ SpotterController::DoInitial {
     equals(effect Waypoint to);
       to.wp_num == 1; // This is the first waypoint
       to.radius == -100;
-    contained_by(me.DoSurvey exec);
+    meets(me.DoSurvey exec); // Relaxing the constraints on DoSurvey
       exec.id == to.path_id;
       exec.center_lat == to.lat;
       exec.center_lon == to.lon;
@@ -204,7 +204,7 @@ SpotterController::DoInitial {
     // Check that I can start 
     contained_by(cpt.Holds cur);
     if( cur.start<= AGENT_CLOCK ) {
-		contained_by(condition Navigator.At dest);
+		contained_by(condition Navigator.At dest);//using starts gives the 'constraintConsistent() is false' exception, so I'm going with relaxing the DoSurvey further
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
