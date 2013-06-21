@@ -169,7 +169,21 @@ SpotterController::DoSegment {
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
-    starts_during(condition Waypoint from); // correction for error that was propagated down the line
+      
+      /* 
+	 both  starts  and starts_during are messing with the DoSurvey above 
+	 because europa still tries to start this token strictly before the 
+	 last Waypoint ends. 
+	 starts_during shouldn't but apprently europa do not agree with me
+	 starts_during(condition Waypoint from); // correction for error that was propagated down the line
+      */
+      // The alternate solution say that it is met_by :
+      // by doing so we have the classic Waypoint meets DoSegment meets Waypoint
+      // which will on ly work if all the waypoints are not identical and take
+      // at least 1 tick to go from one to the other. 
+      // but I think we can assume this (right ?)
+      met_by(condition Waypoint from);
+      
       from.path_id == to.path_id;
       from.lat == to.lat;
       from.lon == to.lon;
