@@ -76,6 +76,14 @@
  */
 #  define STD_MOVE(ptr)
 
+/** @brief Namespace where shared_ptr reside
+ *
+ * This preprocessor macro defines the namespace in which shared_ptr,
+ * weak_ptr, make_shared and enable_shared_from_this are defined.
+ *
+ * If the compil;er support it as a C++11 feature this will point to std, 
+ * otherwise we use the boost implementation.
+ */
 #  define SHARED_NS  computed_namespace
 
 # else
