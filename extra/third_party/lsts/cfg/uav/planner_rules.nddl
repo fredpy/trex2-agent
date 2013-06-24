@@ -8,6 +8,7 @@ Reference::At {
 	g.longitude == longitude;
 	g.z == z;
 	g.speed == speed;
+	g.radius == radius;
 }
 
 ControlMode::DUNE {
@@ -22,7 +23,7 @@ Navigator::At {
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 		z == arr.z;
 		speed == arr.speed;
-	
+		radius == arr.radius;
 }
 
 Navigator::Going {
