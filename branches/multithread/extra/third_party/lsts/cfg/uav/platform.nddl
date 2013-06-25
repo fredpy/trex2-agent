@@ -50,6 +50,7 @@ class Reference extends AgentTimeline {
 		float longitude;
 		float speed;
 		float z;
+		float radius;
 	}
 	
 	action Going {

@@ -200,6 +200,7 @@ SpotterController::DoSegment {
 		dest.secs == 0;
 		dest.radius == (count + 2 )  * -50;
         //to.completion_date == dest.start + 6.28*to.radius*20.0;
+	    //to.completion_date == dest.start;
    }
 }
 
