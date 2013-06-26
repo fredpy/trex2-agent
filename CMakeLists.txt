@@ -195,7 +195,13 @@ int main(int argc, char *argv[]) {
     endif(NOT ${CPP11_SUPPORT_Boost})
     add_definitions(${CPP11_COMPILER_SWITCH})
   endif(CPP11_ENABLED)
+else(WITH_CPP11)
+  # ensure that cpp11 is not enabled
+  set(CPP11_ENABLED FALSE)
 endif(WITH_CPP11)
+
+message(STATUS "CPP11 enabled: ${CPP11_ENABLED}")
+message(STATUS "CHRONO_LIB: ${CHRONO_LIB}")
 
 ########################################################################
 # Europa                                                               #
