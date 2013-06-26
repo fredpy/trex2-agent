@@ -85,7 +85,7 @@ namespace TREX {
 
       void processState();
       void handleTrexOperation(TrexOperation trexOp);
-      void postGoalToken(std::string goal_id, TrexToken token);
+      void enqueueGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
       typedef std::map<std::string, boost::shared_ptr<Observation> > obs_map;
       typedef std::map<std::string, Announce *> m_links;
@@ -128,6 +128,12 @@ namespace TREX {
       /** @brief map of received messages       */
       std::map<uint16_t, IMC::Message *> received;
 
+      /** @brif vector of received goals */
+      std::queue<std::string> receivedGoals;
+      std::queue<Observation> referenceObservations;
+      IMC::Reference goingRef;
+
+
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
 
@@ -135,7 +141,8 @@ namespace TREX {
       
       void goingAUV(const goal_id& goal);
       void goingUAV(const goal_id& g);
-  void postRefAtObservation(FollowRefState* frefstate);
+      //Observation* updateRefAtObservation(FollowRefState* frefstate);
+      void postGoalToken();
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;
