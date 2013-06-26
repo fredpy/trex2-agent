@@ -240,6 +240,20 @@ macro(trex_cfg dir dest)
     ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 endmacro(trex_cfg)
 
+function(expand_libs target)
+  get_property(deps TARGET ${target} PROPERTY LINK_LIBRARIES)
+  if(deps)
+    foreach(lib ${deps})
+      if(TARGET ${lib})
+	get_property(d2 TARGET ${lib} PROPERTY LINK_LIBRARIES)
+	if(d2)
+	  list(REMOVE_ITEM d2 ${deps})
+	  target_link_libraries(${target} ${d2})
+	endif(d2)
+      endif(TARGET ${lib})
+    endforeach()
+  endif(deps)
+endfunction(expand_libs)
   
 
 function(trex_lib target kind)
@@ -249,6 +263,7 @@ function(trex_lib target kind)
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
+  expand_libs(${target})
 
   # message(STATUS "${target}: ${i_incs}")
   # transmit directory include to target include for older cmake
@@ -288,6 +303,7 @@ endfunction(trex_lib)
 
 function(trex_py target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
+  expand_libs(${target})
   # trex_lib(${target} FALSE)
   install(TARGETS ${target} DESTINATION ${TREX_SHARED}/python OPTIONAL EXPORT trex-targets) 
   set_property(GLOBAL APPEND PROPERTY trex-python ${target})
@@ -296,6 +312,7 @@ endfunction(trex_py)
 macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
     ${CMAKE_CURRENT_BINARY_DIR})
+  expand_libs(${target})
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
