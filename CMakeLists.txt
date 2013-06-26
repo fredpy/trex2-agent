@@ -138,24 +138,26 @@ endif(LIB_RT)
 option(WITH_CPP11 "Compile with C++11 support" OFF)
 
 # The minimum requirement 
-find_package(Boost 1.46.1 COMPONENTS system filesystem thread regex signals date_time program_options)
+find_package(Boost 1.46.1 REQUIRED COMPONENTS 
+  system filesystem thread regex signals date_time program_options)
 
 if(NOT Boost_FOUND) 
   message(ERROR "Unable to find Boost (>=1.46.1) library")
 endif(NOT Boost_FOUND)
 
 include_directories(${Boost_INCLUDE_DIRS})
-find_package(Boost QUIET COMPONENTS chrono)
+find_package(Boost COMPONENTS chrono)
 message(STATUS "Checking for Boost.Chrono: ${Boost_CHRONO_LIBRARY}")
 
 
-if(Boost_CHRONO_FOUND)
-  set(CHRONO_LIB ${Boost_CHRONO_LIBRARY})
-else(Boost_CHRONO_FOUND)
+if(Boost_CHRONO_LIBRARY)
+  set(CHRONO_LIB ${Boost_CHRONO_LIBRARY} CACHE PATH "Boost chrono library path" FORCE)
+else(Boost_CHRONO_LIBRARY)
+  set(CHRONO_LIB "" CACHE PATH "Boost chrono not found" FORCE)
   message(WARNING "Boost.Chrono was not found."
     "Checking for C++11 equivalent instead")
   set(WITH_CPP11 ON CACHE BOOL "C++11 required for lack of Boost.Chrono" FORCE)
-endif(Boost_CHRONO_FOUND)
+endif(Boost_CHRONO_LIBRARY)
 
 ########################################################################
 # C++11 capabilities                                                   #
