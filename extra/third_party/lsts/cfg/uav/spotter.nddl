@@ -163,9 +163,10 @@ SpotterController::Waypoint {
 SpotterController::DoSegment {
     SpotterFollow me = object.command;
     Counter cpt = me.counter;
-    meets(effect Waypoint to);
+    before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
       to.radius == (count + 2 )  * -50;
+      to.start == end + 20;
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
@@ -179,10 +180,9 @@ SpotterController::DoSegment {
       */
       // The alternate solution say that it is met_by :
       // by doing so we have the classic Waypoint meets DoSegment meets Waypoint
-      // which will on ly work if all the waypoints are not identical and take
+      // which will only work if all the waypoints are not identical and take
       // at least 1 tick to go from one to the other. 
-      // but I think we can assume this (right ?)
-      met_by(condition Waypoint from);
+      met_by(condition Waypoint from); //origin.start == target.end
       
       from.path_id == to.path_id;
       from.lat == to.lat;
@@ -194,13 +194,14 @@ SpotterController::DoSegment {
     // Finally send the next At when the previous one did complete
     if( from.completion_date <= AGENT_CLOCK ) {
 		// I will assume that from are to are far enough to require a waypoint
-		meets(condition Navigator.At dest);
+		meets(condition Navigator.At dest); //DoSegment.end == Navigator.At.start
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
 		dest.radius == (count + 2 )  * -50;
         //to.completion_date == dest.start + 6.28*to.radius*20.0;
 	    //to.completion_date == dest.start;
+	    //to.completion_date == dest.start + 100; //erase the reactor
    }
 }
 
