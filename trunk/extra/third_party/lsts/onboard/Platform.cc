@@ -72,6 +72,8 @@ namespace TREX
 
       // Timelines that can be controlled by other reactors
       provide("reference");
+
+
     }
 
     void
@@ -85,6 +87,15 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
+        if(!referenceObservations.empty()){
+          syslog(log::info) << "Posting observations started with " << referenceObservations.size();
+          postUniqueObservation(referenceObservations.front());
+          if(referenceObservations.front().predicate() == "Going"){
+            sendMsg(goingRef);
+          }
+          referenceObservations.pop();
+          syslog(log::info) << " now I have " << referenceObservations.size() << "\n";
+        }
 
 
       if (!m_blocked && !m_goals_pending.empty())
@@ -93,17 +104,21 @@ namespace TREX
         std::string gname = (goal->object()).str();
         std::string gpred = (goal->predicate()).str();
         std::string man_name;
-        bool commited = false;
-        if (gname == "reference" && gpred == "Going")
-          commited = handleGoingRequest(goal);
-        else if (gname == "reference" && gpred == "At")
-          commited = handleAtRequest(goal);
 
-        if (commited)
-        {
-          m_goals_pending.remove(goal);
-          postUniqueObservation(*goal.get());
-        }
+        if(gname == "reference"){
+          syslog(log::info) << "Got a goal reference ";
+          // save observations
+          if(gpred == "Going" && handleGoingRequest(goal)){
+            syslog(log::info) << " type going \n";
+            referenceObservations.push(*goal.get());
+            m_goals_pending.remove(goal);
+          }
+          else if(gpred == "At" && handleAtRequest(goal)){
+            syslog(log::info) << " type at \n";
+            referenceObservations.push(*goal.get());
+            m_goals_pending.remove(goal);
+          }
+        }        
       }
 
       Announce * ann;
@@ -137,9 +152,11 @@ namespace TREX
             // substitute previously received message
             if (received.count(msg->getId()))
                received.erase(msg->getId());
-            received[msg->getId()] = msg;
+               received[msg->getId()] = msg;
+            }
           }
-        }
+
+        postGoalToken();
 
         if (msg_count < 1)
         {
@@ -185,7 +202,7 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
 
-      std::cerr << "handleRequest(" << gpred << ")" << std::endl;
+      syslog(log::info)  << "handleRequest(" << gpred << ")" << std::endl;
 
       m_goals_pending.push_back(g);
     }
@@ -212,7 +229,7 @@ namespace TREX
       switch (trexOp.op)
       {
         case TrexOperation::OP_POST_GOAL:
-          postGoalToken(trexOp.goal_id, TrexToken(*trexOp.token.get()));
+          enqueueGoalToken(trexOp.goal_id, TrexToken(*trexOp.token.get()));
           break;
         case TrexOperation::OP_POST_TOKEN:
           postObservationToken(TrexToken(*trexOp.token.get()));
@@ -234,8 +251,20 @@ namespace TREX
       //postUniqueObservation(obs);
     }
 
+void Platform::postGoalToken() {
+  if(receivedGoals.empty()) return;
+  syslog(log::info) << "Posting " << receivedGoals.front();
+  if (m_env->getControlInterfaceReactor() != NULL) {
+    m_env->getControlInterfaceReactor()->proccess_message(
+        receivedGoals.front());
+    receivedGoals.pop();
+  } else {
+    std::cerr << "ControlInterface not instantiated!\n";
+  }
+}
+
     void
-    Platform::postGoalToken(std::string goald_id, TrexToken token)
+    Platform::enqueueGoalToken(std::string goald_id, TrexToken token)
     {
       std::stringstream ss;
       std::string timeline = token.timeline;
@@ -278,43 +307,10 @@ namespace TREX
       ss << "\t</Goal>\n";
       std::cerr << "Received goal:\n" << ss.str();
 
-      if(m_env->getControlInterfaceReactor() != NULL)
-      {
-        m_env->getControlInterfaceReactor()->proccess_message(ss.str());
-      }
-      else
-      {
-        std::cerr << "ControlInterface not instantiated!\n";
-      }
+      receivedGoals.push(ss.str());
+
 
     }
-
-void Platform::postRefAtObservation(FollowRefState* frefstate) {
-  if (atDestination(frefstate)) {
-    Observation obs("reference", "At");
-    obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
-    obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
-    if (!m_ref.z.isNull()) {
-      switch (m_ref.z->z_units) {
-      case (Z_DEPTH):
-        obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-        break;
-      case (Z_ALTITUDE):
-        obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
-        break;
-      case (Z_HEIGHT):
-        obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-        break;
-      default:
-        break;
-      }
-    }
-    if (!m_ref.speed.isNull()) {
-      obs.restrictAttribute("speed", FloatDomain((m_ref.speed->value)));
-    }
-    postUniqueObservation(obs);
-  }
-}
 
     void
     Platform::processState()
@@ -334,6 +330,7 @@ void Platform::postRefAtObservation(FollowRefState* frefstate) {
       if (pcstate != NULL)
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING)
         && pcstate->plan_id == "trex_plan";
+
 
       // Translate incoming messages into observations
       EstimatedState * estate =
@@ -381,7 +378,32 @@ void Platform::postRefAtObservation(FollowRefState* frefstate) {
         //m_ref.toText(std::cout);
       }
 
-      postRefAtObservation(frefstate);
+      if (atDestination(frefstate)) {
+          Observation obs("reference", "At");
+          obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
+          obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
+          if (!m_ref.z.isNull()) {
+            switch (m_ref.z->z_units) {
+            case (Z_DEPTH):
+              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+              break;
+            case (Z_ALTITUDE):
+              obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+              break;
+            case (Z_HEIGHT):
+              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+              break;
+            default:
+              break;
+            }
+          }
+          if (!m_ref.speed.isNull()) {
+            obs.restrictAttribute("speed", FloatDomain((m_ref.speed->value)));
+          }
+          //postUniqueObservation(obs);
+          referenceObservations.push( obs);
+        }
+
 
       // Operational limits are sent by DUNE on request
       if (oplims == NULL)
@@ -497,8 +519,8 @@ void Platform::goingUAV(const goal_id& g) {
   desSpeed.value = 20;
   desSpeed.speed_units = SUNITS_METERS_PS;
   m_ref.speed.set(desSpeed);
-  syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") ";
-  std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") \n";
+  syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") radius:" << m_ref.radius << "; z:" << desZ.value;
+  std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")  radius:"<< m_ref.radius << "; z:" << desZ.value << "\n";
 }
 
 bool
@@ -551,7 +573,7 @@ void Platform::goingAUV(const goal_id& goal) {
       //goingAUV(goal);
       std::cout << "handleGoingRequest\n";
       goingUAV(goal);
-      sendMsg(m_ref);
+      goingRef = m_ref;
 
       return true;
     }
@@ -583,6 +605,8 @@ void Platform::goingAUV(const goal_id& goal) {
         return false;
       if (msg1->lon != msg2->lon)
         return false;
+      if (msg1->radius != msg2->radius)
+        return false;
 
       if (msg1->z.isNull() != msg2->z.isNull())
         return false;
@@ -594,7 +618,6 @@ void Platform::goingAUV(const goal_id& goal) {
         if (!z1->fieldsEqual(*z2))
           return false;
       }
-
       if (msg1->speed.isNull() != msg2->speed.isNull())
         return false;
       else if (!msg1->speed.isNull())
