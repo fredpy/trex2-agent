@@ -166,7 +166,7 @@ SpotterController::DoSegment {
     before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
       to.radius == (count + 2 )  * -50;
-      to.start == end + 20;
+      to.start == end + 60;
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
