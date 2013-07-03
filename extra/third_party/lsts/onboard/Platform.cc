@@ -514,7 +514,10 @@ void Platform::goingUAV(const goal_id& g) {
     m_ref.flags |= Reference::FLAG_RADIUS;
   }
   DesiredZ desZ;
-  desZ.value = 255; //TODO user difined height0.
+  v = g->getAttribute("z");
+    if (v.domain().isSingleton()) {
+      desZ.value = v.domain().getTypedSingleton<double, true>();
+    }
   desZ.z_units = Z_HEIGHT;
   m_ref.z.set(desZ);
   DesiredSpeed desSpeed;

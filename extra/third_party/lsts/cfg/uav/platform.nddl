@@ -61,12 +61,6 @@ class Reference extends AgentTimeline {
 		float radius;
 	}
 	
-	action Surveil {
-		float latitude;
-		float longitude;
-		float radius;
-	}
-	
 }
 
 class ReferenceState extends AgentTimeline {
