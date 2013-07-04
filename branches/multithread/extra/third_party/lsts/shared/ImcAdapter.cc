@@ -63,7 +63,7 @@ namespace TREX {
       else if (msg->alt > 0 )
         obs.restrictAttribute("z", FloatDomain(-msg->alt));
       else if (msg->height != -1 )
-        obs.restrictAttribute("z", FloatDomain(msg->height));
+        obs.restrictAttribute("z", FloatDomain(msg->height + (- msg->z)));
 
       return obs;
     }

@@ -87,14 +87,14 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
-        if(!referenceObservations.empty()){
-          syslog(log::info) << "Posting observations started with " << referenceObservations.size();
+        if(!referenceObservations.empty())
+        {
           postUniqueObservation(referenceObservations.front());
-          if(referenceObservations.front().predicate() == "Going"){
+          if(referenceObservations.front().predicate() == "Going")
+          {
             sendMsg(goingRef);
           }
           referenceObservations.pop();
-          syslog(log::info) << " now I have " << referenceObservations.size() << "\n";
         }
 
 
@@ -105,10 +105,12 @@ namespace TREX
         std::string gpred = (goal->predicate()).str();
         std::string man_name;
 
-        if(gname == "reference"){
+        if(gname == "reference")
+        {
           syslog(log::info) << "Got a goal reference ";
           // save observations
-          if(gpred == "Going" && handleGoingRequest(goal)){
+          if(gpred == "Going" && handleGoingRequest(goal))
+          {
             syslog(log::info) << " type going \n";
             referenceObservations.push(*goal.get());
             m_goals_pending.remove(goal);
@@ -118,7 +120,7 @@ namespace TREX
             referenceObservations.push(*goal.get());
             m_goals_pending.remove(goal);
           }
-        }        
+        }
       }
 
       Announce * ann;
@@ -512,7 +514,10 @@ void Platform::goingUAV(const goal_id& g) {
     m_ref.flags |= Reference::FLAG_RADIUS;
   }
   DesiredZ desZ;
-  desZ.value = 300;
+  v = g->getAttribute("z");
+    if (v.domain().isSingleton()) {
+      desZ.value = v.domain().getTypedSingleton<double, true>();
+    }
   desZ.z_units = Z_HEIGHT;
   m_ref.z.set(desZ);
   DesiredSpeed desSpeed;

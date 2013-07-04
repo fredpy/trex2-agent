@@ -44,7 +44,7 @@ class SpotterController {
 
     /* A waypoint
      *
-     * This predciat is used as intermediate information for the 
+     * This prediciate is used as intermediate information for the 
      * waypoints to be done during a survey. It is created and manipulated 
      * by the actions of this class for the planner to keep track of the 
      * waypoints it will have to reach and their sequence.
@@ -101,12 +101,13 @@ class SpotterFollow extends AgentTimeline {
     predicate DoSurvey {
 		int id;
 		int waypoints;
-		float    size;
+		float    size, z;
 		float center_lat, center_lon;
 		waypoints == 3;
     }
     predicate Survey {
 		float    center_lat, center_lon;
+		float z;
 		duration==1;
     }
 
@@ -147,6 +148,7 @@ SpotterController::EndSurvey {
       exec.id == cur.id;
       exec.center_lat == survey.center_lat;
       exec.center_lon == survey.center_lon;
+      exec.z == survey.z;
    
     equals(condition Waypoint last_wp);
       last_wp.path_id == cur.id;
@@ -166,7 +168,7 @@ SpotterController::DoSegment {
     before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
       to.radius == (count + 2 )  * -50;
-      to.start == end + 20;
+      to.start == end + 60;
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;
@@ -199,6 +201,7 @@ SpotterController::DoSegment {
 		dest.longitude == to.lon;
 		dest.secs == 0;
 		dest.radius == (count + 2 )  * -50;
+		dest.z == exec.z;
         //to.completion_date == dest.start + 6.28*to.radius*20.0;
 	    //to.completion_date == dest.start;
 	    //to.completion_date == dest.start + 100; //erase the reactor
@@ -226,6 +229,7 @@ SpotterController::DoInitial {
 		dest.secs == 0;
 		dest.radius == -100;
 		to.completion_date == dest.start;
+		dest.z == exec.z;
     }
     
 }
