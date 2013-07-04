@@ -494,8 +494,8 @@ void Platform::postGoalToken() {
     }
 
 void Platform::goingUAV(const goal_id& g) {
-  double minz, maxz, z;
-  int max_secs_underwater = 30000;
+  // double minz, maxz, z;
+  // int max_secs_underwater = 30000;
   Variable v;
   m_ref.flags = Reference::FLAG_LOCATION;
   m_ref.flags |= Reference::FLAG_Z;
