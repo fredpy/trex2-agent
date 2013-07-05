@@ -234,7 +234,7 @@ LatLonDist::handleExecute()
 
   EUROPA::edouble dist = WGS84::distance(lat1, lon1, 0, lat2, lon2, 0);
 
-  debugMsg("trex:always", m_dist.toString() << " == " << dist);
+  // debugMsg("trex:always", m_dist.toString() << " == " << dist);
   intersect(m_dist, dist, dist, 0.5);
 }
 
