@@ -50,8 +50,10 @@ Navigator::Going {
 	met_by(condition EstimatedState.Position origin);
 		orig_lat == origin.latitude;
 		orig_lon == origin.longitude;
-		orig_z - 5 < origin.z < orig_z + 5;
-		//orig_z + 5 > origin.z;
+		abs(origin.z-orig_z) < 5.0;
+
+		// orig_z - 5.0 < origin.z < orig_z + 5.0;
+		//orig_z + 5.0 > origin.z;
 
 	int my_start;
 	my_start == max(origin.start, c.start);
