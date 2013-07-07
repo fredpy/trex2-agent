@@ -324,14 +324,7 @@ namespace TREX {
        * @sa getInitialTick() const
        * @sa getCurrentTick() const
        */
-      TICK getFinalTick() const {
-        TICK g_final = m_graph.finalTick();
-        
-        if( g_final<m_finalTick )
-          return g_final;
-        else
-          return m_finalTick;
-      }
+      TICK getFinalTick() const; 
       /** @brief reactor latency
        *
        * Indicates the reactor @p deliberation latency. Thids vlaue reflects
@@ -1035,6 +1028,8 @@ namespace TREX {
       graph &get_graph() {
         return m_graph;
       }
+      
+      void setMaxTick(TICK max); 
 
     private:
       stat_duration m_synch_usage, m_deliberation_usage;
@@ -1144,7 +1139,7 @@ namespace TREX {
        * The tick date when the reactor will end. THis value often reflects
        * the same value as the agent end time
        */
-      TICK   m_finalTick;
+      boost::optional<TICK>   m_finalTick;
       
       
       void reset_deadline();

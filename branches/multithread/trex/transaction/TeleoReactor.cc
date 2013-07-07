@@ -727,13 +727,33 @@ void TeleoReactor::cancelPlanToken(goal_id const &g) {
 }
 
 
+TICK TeleoReactor::getFinalTick() const {
+  TICK g_final = m_graph.finalTick();
+  
+  if( !m_finalTick || g_final<*m_finalTick )
+    return g_final;
+  else
+    return *m_finalTick;
+}
+
+
+void TeleoReactor::setMaxTick(TICK max) {
+  if( !m_finalTick || max<*m_finalTick ) {
+    syslog(warn)<<"Restricted reactor final tick to "<<max;
+    m_finalTick = max;
+  }
+}
+
+
 bool TeleoReactor::initialize(TICK final) {
   if( m_inited ) {
     syslog(error)<< "Attempted to initalize this reactor twice.";
     return false;
   }
   m_initialTick = getCurrentTick();
-  m_finalTick   = final;
+  
+  if( !m_finalTick || final<*m_finalTick )
+    m_finalTick   = final;
   syslog(info)<<"Creation tick is "<<getInitialTick();
   syslog(info)<<"Execution latency is "<<getExecLatency();
   // syslog()<<"Clock used for stats is "<<boost::chrono::clock_string<stat_clock, char>::name();
@@ -762,6 +782,12 @@ bool TeleoReactor::newTick() {
       m_initialTick = getCurrentTick();
     }
     reset_deadline();
+    TICK final = getFinalTick();
+    
+    if( final < m_graph.finalTick() )
+      syslog(warn)<<"Reactor final tick is before agent's one:\n\t"
+        <<date_str(final)<<" ("<<final<<").";
+    
     m_firstTick = false;
   } else 
     m_stat_log<<(getCurrentTick()-1)<<", "
@@ -770,9 +796,15 @@ bool TeleoReactor::newTick() {
               <<", "<<m_tick_steps<<std::endl;
   m_tick_steps = 0;
   
+  if( getCurrentTick()>getFinalTick() ) {
+    syslog(warn)<<"This reactor reached its final tick.";
+    return false;
+  }
+  
 //  if( m_deliberation_usage > stat_duration::zero() )
 //    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
   m_deliberation_usage = stat_duration::zero();
+  
   if( NULL!=m_trLog )
     m_trLog->newTick(getCurrentTick());
 

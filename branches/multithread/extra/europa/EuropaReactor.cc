@@ -307,6 +307,11 @@ void EuropaReactor::cancelledPlanToken(goal_id const &t) {
 void EuropaReactor::handleInit() {
   setStream();
   {
+    TICK max_int = EUROPA::cast_basis(std::numeric_limits<EUROPA::eint>::max());
+    
+    syslog(info)<<"Restricting reactor final tick to Europa's "
+      "largest finite integer.";
+    setMaxTick(max_int);
     init_clock_vars();
   }
 }
