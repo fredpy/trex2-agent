@@ -100,24 +100,27 @@ namespace TREX
     Platform::handleTickStart()
     {
       
-      // First deal with requests
-      if( !m_blocked && !m_goals_pending.empty() ) {
-        goal_id goal = m_goals_pending.front();
-        std::string gname = (goal->object()).str();
-        std::string gpred = (goal->predicate()).str();
-        std::string man_name;
+      // Dop not process goals if you still have observations to post
+      if( referenceObservations.empty() ) {
+        // First deal with requests
+        if( !m_blocked && !m_goals_pending.empty() ) {
+          goal_id goal = m_goals_pending.front();
+          std::string gname = (goal->object()).str();
+          std::string gpred = (goal->predicate()).str();
+          std::string man_name;
       
-        if( "reference"==gname ) {
-          syslog(log::info)<<"Processingg next goal on reference ";
-          if( "Going"==gpred && handleGoingRequest(goal) ) {
-            sendMsg(goingRef); // send the command now !!!
-            m_goals_pending.remove(goal);
-            referenceObservations.push(*goal); // schedule this guy
+          if( "reference"==gname ) {
+            syslog(log::info)<<"Processingg next goal on reference ";
+            if( "Going"==gpred && handleGoingRequest(goal) ) {
+              sendMsg(goingRef); // send the command now !!!
+              m_goals_pending.remove(goal);
+              referenceObservations.push(*goal); // schedule this guy
                                               // as an observation
-          } else if( "At"==gpred && handleAtRequest(goal) ) {
-            // just convert the pending goal into an observation
-            m_goals_pending.remove(goal);
-            referenceObservations.push(*goal);
+            } else if( "At"==gpred && handleAtRequest(goal) ) {
+              // just convert the pending goal into an observation
+              m_goals_pending.remove(goal);
+              referenceObservations.push(*goal);
+            }
           }
         }
       }
