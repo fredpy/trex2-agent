@@ -8,7 +8,7 @@ Medium medium = new Medium(Observe);
 OperationalLimits oplimits = new OperationalLimits(Observe);
 Navigator navigator = new Navigator(Internal);
 Reference reference = new Reference(External);
-ReferenceState refstate = new ReferenceState(Observe);
+//ReferenceState refstate = new ReferenceState(Observe);
 navigator.min_z.specify(2);
 navigator.max_z.specify(50);
 

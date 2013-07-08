@@ -48,7 +48,8 @@ void
 TimelineReporter::declared(details::timeline const &timeline)
 {
   syslog(log::warn) << "Timeline has been declared: " << timeline.name();
-  use(timeline.name(), false, false);
+  if( !isExternal(timeline.name()) )
+	  use(timeline.name(), false, false);
 }
 
 void
