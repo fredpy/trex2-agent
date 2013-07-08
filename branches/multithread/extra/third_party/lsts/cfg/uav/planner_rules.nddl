@@ -17,7 +17,7 @@ ControlMode::DUNE {
 
 Navigator::At {
 	float min_dist;
-	min_dist == 3;
+	min_dist == 3.0;
 	
 	contained_by(Reference.At arr);
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;

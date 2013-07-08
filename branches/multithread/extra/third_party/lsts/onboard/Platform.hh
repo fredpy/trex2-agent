@@ -75,7 +75,7 @@ namespace TREX {
       bool reportErrorToDune(const std::string &message);
       bool sendMsg(Message& msg);
     private:
-
+      
       bool synchronize();
       void handleRequest(TREX::transaction::goal_id const &g);
       void handleRecall(TREX::transaction::goal_id const &g);
@@ -133,14 +133,15 @@ namespace TREX {
       std::queue<Observation> referenceObservations;
       IMC::Reference goingRef;
 
+      boost::function<bool (goal_id)> m_going_platform;
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
 
       void setValue(bool val);
       
-      void goingAUV(const goal_id& goal);
-      void goingUAV(const goal_id& g);
+      bool goingAUV(goal_id goal);
+      bool goingUAV(goal_id g);
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
       void postGoalToken();
 
