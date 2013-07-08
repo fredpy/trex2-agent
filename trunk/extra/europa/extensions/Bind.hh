@@ -12,6 +12,19 @@
 
 namespace TREX {
   namespace europa {
+    
+    /** @brief Binding constraint
+     *
+     * This constraint is a backward compatibility constraint from TREX
+     * It allows to set the first argument to the closed value of the 
+     * second argument when this 2nd arg is a singleton.
+     *
+     * @deprecated This constraint was replaced by the much more flexible
+     * TowardZero unbound variable manager. By using an unbound variable 
+     * manager this allows to separate fixing variables ploiucy from the 
+     * core model along with better configuarion ability on when such 
+     * fixing should occur during deliberation.
+     */
     class Bind :public EUROPA::Constraint {
     public:
       Bind(EUROPA::LabelStr const &name, 
