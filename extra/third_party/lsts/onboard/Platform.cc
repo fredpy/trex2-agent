@@ -99,41 +99,39 @@ namespace TREX
     void
     Platform::handleTickStart()
     {
-      if(!referenceObservations.empty())
-      {
-        postUniqueObservation(referenceObservations.front());
-        if(referenceObservations.front().predicate() == "Going")
-        {
-          sendMsg(goingRef);
-        }
-        referenceObservations.pop();
-      }
       
-      
-      if (!m_blocked && !m_goals_pending.empty())
-      {
+      // First deal with requests
+      if( !m_blocked && !m_goals_pending.empty() ) {
         goal_id goal = m_goals_pending.front();
         std::string gname = (goal->object()).str();
         std::string gpred = (goal->predicate()).str();
         std::string man_name;
-        
-        if(gname == "reference")
-        {
-          syslog(log::info) << "Got a goal reference ";
-          // save observations
-          if(gpred == "Going" && handleGoingRequest(goal))
-          {
-            syslog(log::info) << " type going \n";
-            referenceObservations.push(*goal);
+      
+        if( "reference"==gname ) {
+          syslog(log::info)<<"Processingg next goal on reference ";
+          if( "Going"==gpred && handleGoingRequest(goal) ) {
+            sendMsg(goingRef); // send the command now !!!
             m_goals_pending.remove(goal);
-          }
-          else if(gpred == "At" && handleAtRequest(goal)){
-            syslog(log::info) << " type at \n";
-            referenceObservations.push(*goal);
+            referenceObservations.push(*goal); // schedule this guy
+                                              // as an observation
+          } else if( "At"==gpred && handleAtRequest(goal) ) {
+            // just convert the pending goal into an observation
             m_goals_pending.remove(goal);
+            referenceObservations.push(*goal);
           }
         }
       }
+      
+      // Now that we dealt with goal processing and command sending
+      // just look ifg any observation need to be posted
+      
+      if(!referenceObservations.empty())
+      {
+        postUniqueObservation(referenceObservations.front());
+        referenceObservations.pop();
+      }
+      
+      
       
       Announce * ann;
       try
