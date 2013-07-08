@@ -384,6 +384,7 @@ namespace TREX
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
+        WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
       }
       
       // Send current reference to DUNE
