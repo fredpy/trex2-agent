@@ -389,6 +389,7 @@ namespace TREX
       if (!m_blocked)
       {
         sendMsg(m_ref);
+        m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
       
@@ -505,39 +506,50 @@ namespace TREX
         return false;
     }
     
-    void Platform::goingUAV(goal_id g) {
+    bool Platform::goingUAV(goal_id g) {
       // double minz, maxz, z;
       // int max_secs_underwater = 30000;
-      Variable v;
-      m_ref.flags = Reference::FLAG_LOCATION;
-      m_ref.flags |= Reference::FLAG_Z;
-      m_ref.flags |= Reference::FLAG_SPEED;
-      v = g->getAttribute("latitude");
-      if (v.domain().isSingleton())
-        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+      Variable lat, lon, z, v;
       
-      v = g->getAttribute("longitude");
-      if (v.domain().isSingleton())
-        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+      lat = g->getAttribute("latitude");
+      lon = g->getAttribute("longitude");
+      z = g->getAttribute("z");
       
-      v = g->getAttribute("radius");
-      if (v.domain().isSingleton()) {
-        m_ref.radius = v.domain().getTypedSingleton<double, true>();
-        m_ref.flags |= Reference::FLAG_RADIUS;
+      if( lat.domain().isSingleton() &&
+          lon.domain().isSingleton() &&
+         z.domain().isSingleton() ) {
+        m_ref.flags = Reference::FLAG_LOCATION;
+        m_ref.flags |= Reference::FLAG_Z;
+        m_ref.flags |= Reference::FLAG_SPEED;
+        m_ref.lat = lat.domain().getTypedSingleton<double, true>();
+        m_ref.lon = lon.domain().getTypedSingleton<double, true>();
+      
+        DesiredZ desZ;
+        desZ.value = z.domain().getTypedSingleton<double, true>();
+        desZ.z_units = Z_HEIGHT;
+        m_ref.z.set(desZ);
+        
+        // Deal with the optional attributes
+        v = g->getAttribute("radius");
+        if (v.domain().isSingleton()) {
+          m_ref.radius = v.domain().getTypedSingleton<double, true>();
+          m_ref.flags |= Reference::FLAG_RADIUS;
+        } else {
+          syslog(log::warn)<<"UAV oing didn ot specifiy its radius."
+            "keeping previous one.";
+        }
+        DesiredSpeed desSpeed;
+        desSpeed.value = 20;
+        desSpeed.speed_units = SUNITS_METERS_PS;
+        m_ref.speed.set(desSpeed);
+        syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") radius:" << m_ref.radius << "; z:" << desZ.value;
+        std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")   radius:"<< m_ref.radius << "; z:" << desZ.value << "\n";
+        return true;
+      } else {
+        syslog(log::warn)<<"Ignored UAV going request dur to some of its "
+        "required parameters not being fixed (id="<<g<<").";
+        return false;
       }
-      DesiredZ desZ;
-      v = g->getAttribute("z");
-      if (v.domain().isSingleton()) {
-        desZ.value = v.domain().getTypedSingleton<double, true>();
-      }
-      desZ.z_units = Z_HEIGHT;
-      m_ref.z.set(desZ);
-      DesiredSpeed desSpeed;
-      desSpeed.value = 20;
-      desSpeed.speed_units = SUNITS_METERS_PS;
-      m_ref.speed.set(desSpeed);
-      syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") radius:" << m_ref.radius << "; z:" << desZ.value;
-      std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")  radius:"<< m_ref.radius << "; z:" << desZ.value << "\n";
     }
     
     bool
@@ -546,41 +558,51 @@ namespace TREX
       return handleGoingRequest(goal);
     }
     
-    void Platform::goingAUV(goal_id goal) {
+    bool Platform::goingAUV(goal_id goal) {
       goal_id g = goal;
-      Variable v;
-      v = g->getAttribute("latitude");
-      int flags = Reference::FLAG_LOCATION;
-      if (v.domain().isSingleton())
-        m_ref.lat = v.domain().getTypedSingleton<double, true>();
+      Variable lat, lon, v;
       
-      v = g->getAttribute("longitude");
-      if (v.domain().isSingleton())
-        m_ref.lon = v.domain().getTypedSingleton<double, true>();
+      lat = g->getAttribute("latitude");
+      lon = g->getAttribute("longitude");
       
-      v = g->getAttribute("z");
-      if (v.domain().isSingleton()) {
-        double z = v.domain().getTypedSingleton<double, true>();
-        DesiredZ desZ;
-        flags |= Reference::FLAG_Z;
-        if (z >= 0) {
-          desZ.value = z;
-          desZ.z_units = Z_DEPTH;
+      // Double check that lat and lon are singleton just to be
+      // on the safe side
+      if( lat.domain().isSingleton() && lon.domain().isSingleton() ) {
+      
+        int flags = Reference::FLAG_LOCATION;
+        m_ref.lat = lat.domain().getTypedSingleton<double, true>();
+        m_ref.lon = lon.domain().getTypedSingleton<double, true>();
+      
+        v = g->getAttribute("z");
+        if(v.domain().isSingleton()) {
+          double z = v.domain().getTypedSingleton<double, true>();
+          DesiredZ desZ;
+          flags |= Reference::FLAG_Z;
+          if (z >= 0) {
+            desZ.value = z;
+            desZ.z_units = Z_DEPTH;
+          } else {
+            desZ.value = -z;
+            desZ.z_units = Z_ALTITUDE;
+          }
+          m_ref.z.set(desZ);
         } else {
-          desZ.value = -z;
-          desZ.z_units = Z_ALTITUDE;
+          syslog(log::warn)<<"AUV going : Z was not set keeping old value ...";
         }
-        m_ref.z.set(desZ);
-      }
-      m_ref.flags = flags;
-      v = g->getAttribute("speed");
-      if (v.domain().isSingleton()) {
-        double speed = v.domain().getTypedSingleton<double, true>();
-        DesiredSpeed desSpeed;
-        flags |= Reference::FLAG_SPEED;
-        desSpeed.value = speed;
-        desSpeed.speed_units = SUNITS_METERS_PS;
-        m_ref.speed.set(desSpeed);
+        m_ref.flags = flags;
+        v = g->getAttribute("speed");
+        if (v.domain().isSingleton()) {
+          double speed = v.domain().getTypedSingleton<double, true>();
+          DesiredSpeed desSpeed;
+          flags |= Reference::FLAG_SPEED;
+          desSpeed.value = speed;
+          desSpeed.speed_units = SUNITS_METERS_PS;
+          m_ref.speed.set(desSpeed);
+        }
+        return true;
+      } else {
+        syslog(log::warn)<<"Ignoring AUV going as some of its attributes are not set";
+        return false;
       }
     }
     
@@ -588,12 +610,25 @@ namespace TREX
     Platform::handleGoingRequest(goal_id const &goal)
     {
       //goingAUV(goal);
-      std::cout << "handleGoingRequest\n";
-      m_going_platform(goal); //method called is set at construction time
-      //      goingUAV(goal);
-      goingRef = m_ref;
+      Variable lat, lon, z;
       
-      return true;
+      lat = goal->getAttribute("latitude");
+      lon = goal->getAttribute("longitude");
+      
+      if( lat.domain().isSingleton() &&
+          lon.domain().isSingleton() &&
+          z.domain().isSingleton() ) {
+        syslog(log::info)<<"handling going("<<lat.domain()
+          <<", "<<lon.domain()<<")";
+      
+        if( m_going_platform(goal) ) { //method called is set at construction time
+          goingRef = m_ref;
+          return true;
+        } else
+          syslog(log::warn)<<"This going was rejected by its handler";
+      } else
+        syslog(log::warn)<<"Going rejected due to lat or lon not being set.";
+      return false;
     }
     
     bool
