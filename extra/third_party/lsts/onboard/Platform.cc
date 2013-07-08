@@ -612,14 +612,13 @@ namespace TREX
     Platform::handleGoingRequest(goal_id const &goal)
     {
       //goingAUV(goal);
-      Variable lat, lon, z;
+      Variable lat, lon;
       
       lat = goal->getAttribute("latitude");
       lon = goal->getAttribute("longitude");
       
       if( lat.domain().isSingleton() &&
-          lon.domain().isSingleton() &&
-          z.domain().isSingleton() ) {
+          lon.domain().isSingleton() ) {
         syslog(log::info)<<"handling going("<<lat.domain()
           <<", "<<lon.domain()<<")";
       
