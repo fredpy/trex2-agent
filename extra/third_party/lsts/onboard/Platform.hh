@@ -133,15 +133,15 @@ namespace TREX {
       std::queue<Observation> referenceObservations;
       IMC::Reference goingRef;
 
-      boost::function<void (goal_id)> m_going_platform;
+      boost::function<bool (goal_id)> m_going_platform;
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
 
       void setValue(bool val);
       
-      void goingAUV(goal_id goal);
-      void goingUAV(goal_id g);
+      bool goingAUV(goal_id goal);
+      bool goingUAV(goal_id g);
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
       void postGoalToken();
 
