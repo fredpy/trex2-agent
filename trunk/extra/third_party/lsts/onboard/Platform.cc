@@ -81,9 +81,12 @@ namespace TREX
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";
         m_going_platform = boost::bind(&Platform::goingUAV, this, _1);
+        m_max_delta = 3;
+        syslog(log::info)<< "Setting max delta without message to "<<m_max_delta;
       } else {
         syslog(log::info)<< "Setting platform Going handler for AUVs (underwater)";
         m_going_platform = boost::bind(&Platform::goingAUV, this, _1);
+        m_max_delta = 1;
       }
       
     }
@@ -175,11 +178,19 @@ namespace TREX
         
         if (msg_count < 1)
         {
-          if (m_connected)
-            std::cerr <<"Disconnected from DUNE\n";
+          TICK delta = getCurrentTick()-m_last_msg;
+
+          if( delta>=m_max_delta ) {
+            if (m_connected)
+              std::cerr <<"Disconnected from DUNE\n";
           
-          syslog(log::warn) << "Disconnected from DUNE";
-          m_connected = false;
+            syslog(log::warn) << "Disconnected from DUNE";
+            m_connected = false;
+          } else {
+            syslog(log::warn)<<"No message received from DUNE for "
+              <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
+          }
+          
         }
         
         else
@@ -187,6 +198,7 @@ namespace TREX
           if (!m_connected)
             std::cerr <<"Now connected to DUNE\n";
           m_connected = true;
+          m_last_msg = getCurrentTick();
         }
       }
       catch (std::runtime_error& e)

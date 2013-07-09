@@ -124,6 +124,7 @@ namespace TREX {
 
       /** @brief Whether it was connected on last tick */
       bool m_connected;
+      TICK m_last_msg, m_max_delta;
 
       /** @brief map of received messages       */
       std::map<uint16_t, IMC::Message *> received;
