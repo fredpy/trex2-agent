@@ -19,6 +19,7 @@
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/Symbol.hh>
 
+
 # include "EuropaExtensions.hh"
 
 using DUNE_NAMESPACES;
@@ -47,6 +48,9 @@ namespace TREX {
 
       bool
       send(Message * msg, std::string address, int port);
+
+      bool
+      sendViaIridium(Message * msg, const std::string address, int port);
 
       bool
       startDiscovery();

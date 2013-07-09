@@ -22,6 +22,16 @@ namespace TREX
     
     LstsReactor::~LstsReactor() {}
 
+
+    bool
+    LstsReactor::isObservationNew(TREX::transaction::Observation obs)
+    {
+      std::string timeline = obs.object().str();
+      obs_map::iterator it = postedObservations.find(timeline);
+
+      return (it == postedObservations.end() || !it->second->consistentWith(obs));
+    }
+
     bool
     LstsReactor::postUniqueObservation(TREX::transaction::Observation obs)
     {

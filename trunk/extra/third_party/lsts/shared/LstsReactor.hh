@@ -22,6 +22,7 @@ namespace TREX
     public:
       LstsReactor(TeleoReactor::xml_arg_type arg);
       virtual ~LstsReactor();
+      bool isObservationNew(TREX::transaction::Observation obs);
       bool postUniqueObservation(TREX::transaction::Observation obs);
     private:
       typedef std::map<std::string, boost::shared_ptr<TREX::transaction::Observation> > obs_map;

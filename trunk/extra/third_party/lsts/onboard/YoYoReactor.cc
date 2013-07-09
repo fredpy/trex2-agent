@@ -195,6 +195,7 @@ namespace TREX {
       if ( s_trex_pred != m_lastControl.predicate() )
       {
         std::cerr << "[YOYO] won't handle this request because TREX is not controlling the vehicle!" << std::endl;
+        return;
       }
 
       // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
