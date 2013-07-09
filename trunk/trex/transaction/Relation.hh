@@ -384,6 +384,7 @@ namespace TREX {
 	++m_pos;
 	return *this;
       }
+      std::string rights() const;
 
     private:
       /** @brief Constructor
