@@ -37,6 +37,8 @@ TimelineProxy::TimelineProxy(TeleoReactor::xml_arg_type arg)
   m_timeline = parse_attr<std::string>("", TeleoReactor::xml_factory::node(arg),
                                        "timeline");
 
+  m_useIridium = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+                                        "iridium");
 }
 
 TimelineProxy::~TimelineProxy()
@@ -122,8 +124,18 @@ TimelineProxy::notify(Observation const &obs)
   m_adapter.asImcMessage(Observation(obs), &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_TOKEN;
-  m_adapter.send(&op, m_destaddr, m_destport);
-  std::cerr << "just sent this: " << std::endl;
+
+  if (m_useIridium)
+  {
+    m_adapter.sendViaIridium(&op, m_destaddr, m_destport);
+    std::cerr << "just sent this via iridium: " << std::endl;
+  }
+  else
+  {
+    m_adapter.send(&op, m_destaddr, m_destport);
+    std::cerr << "just sent this via IMC: " << std::endl;
+  }
+
   op.toText(std::cerr);
 }
 
