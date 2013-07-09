@@ -571,14 +571,14 @@ bool EuropaReactor::hasWork() {
         logPlan("plan");
         getFuturePlan();
       }
-    }
-  }
-  if( m_completed_this_tick ) {
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
         TeleoReactor::external_iterator
         j=find_external((*from)->timeline()->getName().c_str());
         EUROPA::eint e_lo, e_hi;
+        debugMsg("trex:dispatch", getName()<<'['<<getCurrentTick()<<"]: Looking for the dispatch of "
+        		<<(*from)->timeline()->getName().c_str()<<" valid:"<<j.valid()
+        		<<" goals:"<<j->accept_goals());
         if( j.valid() && j->accept_goals() ) {
           IntegerDomain window = j->dispatch_window(getCurrentTick()+1);
           IntegerDomain::bound lo = window.lowerBound(), 
@@ -591,7 +591,8 @@ bool EuropaReactor::hasWork() {
           (*from)->do_dispatch(e_lo, e_hi);
         }
       }
-  }
+    }
+  }  
   return !m_completed_this_tick;
 }
 

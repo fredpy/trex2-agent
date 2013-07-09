@@ -112,7 +112,7 @@ namespace TREX
           if( "reference"==gname ) {
             syslog(log::info)<<"Processingg next goal on reference ";
             if( "Going"==gpred && handleGoingRequest(goal) ) {
-              sendMsg(m_ref); // send the command now !!!
+              sendMsg(goingRef); // send the command now !!!
               m_goals_pending.remove(goal);
               referenceObservations.push(*goal); // schedule this guy
                                               // as an observation
@@ -134,8 +134,8 @@ namespace TREX
         referenceObservations.pop();
       }
       
-
-
+      
+      
       Announce * ann;
       try
       {
@@ -259,7 +259,7 @@ namespace TREX
       obs_map::iterator it = postedObservations.find(token.timeline);
       
       // If no such timeline has ever been posted, a new timeline will now be provided
-      if (it == postedObservations.end())
+      if ( !isInternal(token.timeline))
         provide(token.timeline, false, false);
       //Observation obs = m_adapter.genericObservation(&token);
       //std::cerr << "Posting observation: " << obs << "\n";
@@ -630,7 +630,7 @@ namespace TREX
           <<", "<<lon.domain()<<")";
       
         if( m_going_platform(goal) ) { //method called is set at construction time
-          //goingRef = m_ref;
+          goingRef = m_ref;
           return true;
         } else
           syslog(log::warn)<<"This going was rejected by its handler";
