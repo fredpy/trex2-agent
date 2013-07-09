@@ -904,7 +904,8 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
 }
 
 void TeleoReactor::provide_sync(TREX::utils::Symbol name, details::transaction_flags f) {
-  if( !m_graph.assign(this, name, f) )
+syslog(info)<<"provide("<<name<<","<<f.test(0)<<","<<f.test(1)<<")";
+if( !m_graph.assign(this, name, f) )
     if( internal_sync(name) ) {
       syslog(warn)<<"Promoted \""<<name<<"\" from External to Internal.";
     } 
@@ -997,7 +998,8 @@ void TeleoReactor::clear_externals() {
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
   if( is_verbose() )
-    syslog(null, info)<<"Declared \""<<tl->name()<<"\".";
+    syslog(null, info)<<"Declared \""<<tl->name()<<"\""
+    	<<(tl->accept_goals()?" goals accepted":" read-only")<<".";
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name(), tl->accept_goals(), tl->publish_plan());
   }
@@ -1026,6 +1028,7 @@ void TeleoReactor::subscribed(Relation const &r) {
   latency_updated(0, r.latency());
   if( is_verbose() )
     syslog(null, info)<<"Subscribed to \""<<r.name()<<'\"'
+    	    <<(r.accept_goals()?" goals accepted":" read-only")
             <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
   if( NULL!=m_trLog ) {
     m_trLog->use(r.name(), r.accept_goals(), r.accept_plan_tokens());

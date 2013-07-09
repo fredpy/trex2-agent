@@ -27,7 +27,7 @@ Estimator estimator = new Estimator(Internal);//,true);
 
   <!-- resolve non goal first -->
 
-  <OpenConditionManager defaultPriority="100">
+  <OpenConditionManager defaultPriority="100" component="EarliestFirst">
     <FlawFilter component="goals"/>
     
     <FlawHandler component="StandardOpenConditionHandler"/>
