@@ -101,7 +101,7 @@ namespace TREX
     {
       
       // Dop not process goals if you still have observations to post
-      if( referenceObservations.empty() ) {
+      //if( referenceObservations.empty() ) {
         // First deal with requests
         if( !m_blocked && !m_goals_pending.empty() ) {
           goal_id goal = m_goals_pending.front();
@@ -112,7 +112,7 @@ namespace TREX
           if( "reference"==gname ) {
             syslog(log::info)<<"Processingg next goal on reference ";
             if( "Going"==gpred && handleGoingRequest(goal) ) {
-              sendMsg(goingRef); // send the command now !!!
+              sendMsg(m_ref); // send the command now !!!
               m_goals_pending.remove(goal);
               referenceObservations.push(*goal); // schedule this guy
                                               // as an observation
@@ -123,7 +123,7 @@ namespace TREX
             }
           }
         }
-      }
+      //}
       
       // Now that we dealt with goal processing and command sending
       // just look ifg any observation need to be posted
@@ -134,8 +134,8 @@ namespace TREX
         referenceObservations.pop();
       }
       
-      
-      
+
+
       Announce * ann;
       try
       {
@@ -350,8 +350,11 @@ namespace TREX
       // Translate incoming messages into observations
       EstimatedState * estate =
       dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
-      postUniqueObservation(m_adapter.estimatedStateObservation(estate));
       
+      // force posting of position observations (duration == 1)
+      if (estate != NULL)
+        postObservation(m_adapter.estimatedStateObservation(estate));
+
       VehicleMedium * medium =
       dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
@@ -561,6 +564,10 @@ namespace TREX
     }
     
     bool Platform::goingAUV(goal_id goal) {
+
+      syslog(log::info) << "goingAUV: " << goal;
+
+
       goal_id g = goal;
       Variable lat, lon, v;
       
@@ -623,7 +630,7 @@ namespace TREX
           <<", "<<lon.domain()<<")";
       
         if( m_going_platform(goal) ) { //method called is set at construction time
-          goingRef = m_ref;
+          //goingRef = m_ref;
           return true;
         } else
           syslog(log::warn)<<"This going was rejected by its handler";
