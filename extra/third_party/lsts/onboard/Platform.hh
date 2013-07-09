@@ -131,7 +131,6 @@ namespace TREX {
       /** @brif vector of received goals */
       std::queue<std::string> receivedGoals;
       std::queue<Observation> referenceObservations;
-      IMC::Reference goingRef;
 
       boost::function<bool (goal_id)> m_going_platform;
 

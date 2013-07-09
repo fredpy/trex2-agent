@@ -325,6 +325,21 @@ namespace TREX {
       return true;
     }
 
+    bool
+    ImcAdapter::sendViaIridium(Message * msg, const std::string address, int port)
+    {
+      uint8_t buffer[500];
+      GenericIridiumMessage * irMsg = new GenericIridiumMessage(msg);
+      irMsg->destination = msg->getDestination();
+      irMsg->source = msg->getSource();
+      int len = irMsg->serialize(buffer);
+      IridiumMsgTx * tx = new IridiumMsgTx();
+      tx->data.assign(buffer, buffer + len);
+
+      return send(tx, address, port);
+    }
+
+
     Message * ImcAdapter::poll(double timeout, bool discovery = false)
     {
       if (discovery && m_diom.poll(timeout))
