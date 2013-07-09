@@ -39,6 +39,18 @@
 namespace TREX {
   namespace transaction {
     namespace details {
+      
+      /** @brief Gives acces trights string
+       *
+       * This method gives a string representation of the timeline access
+       * the string is 2 characters with the following values:
+       * @li goal acceptance (g when accepting goals, - otherwise)
+       * @li plan publication (p when publishing plan, - otherwise)
+       *
+       * @return the access string
+       */
+     std::string access_str(bool g, bool p);
+      
 
       /** @brief TREX timeline representation
        *
@@ -299,6 +311,10 @@ namespace TREX {
 	bool publish_plan() const {
 	  return owned() && m_transactions.test(1);
 	}
+        
+        std::string rights() const {
+          return access_str(accept_goals(), publish_plan());
+        }
 
       private:
 	/** @brief Create ownership
