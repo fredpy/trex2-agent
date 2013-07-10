@@ -387,9 +387,13 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
         if(nowGoal.isId())
         {
             duration=thread_clock::now()-start;
+            debugMsg("trex:dispatch", "Token "<<(*i)->getUnqualifiedPredicateName().toString()<<"("<<(*i)->getKey()<<") schedulled for dispatch."
+                     "\n\treason: linked to goal "<<nowGoal->getUnqualifiedPredicateName().toString()
+                     <<'('<<nowGoal->getKey()<<").");
             m_assembly.dispatch(timeline(),*i);
         } else {
             duration=thread_clock::now()-start;
+          debugMsg("trex:dispatch", "Holding on "<<(*i)->getUnqualifiedPredicateName().toString()<<"("<<(*i)->getKey()<<") should not be dispatched yet.")
         }
         if(time_values.find(now())==time_values.end())
         {
