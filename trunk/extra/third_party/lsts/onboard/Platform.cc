@@ -96,6 +96,7 @@ namespace TREX
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
       m_adapter.bind(localport);
+      m_last_msg = -1;
       syslog(log::info) << "listening on port " << localport << "...";
     }
     
@@ -178,8 +179,13 @@ namespace TREX
         
         if (msg_count < 1)
         {
+          if( m_firstTick ) {
+            m_last_msg = getCurrentTick()-1;
+            m_firstTick = false;
+          }
           TICK delta = getCurrentTick()-m_last_msg;
 
+          
           if( delta>=m_max_delta ) {
             if (m_connected)
               std::cerr <<"Disconnected from DUNE\n";

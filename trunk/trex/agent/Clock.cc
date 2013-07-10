@@ -78,6 +78,7 @@ Clock::~Clock() {
 // modifiers :
 
 void Clock::doStart() {
+  m_last = 0;
   start();
   m_data.open(m_log->file_name("clock.xml").c_str());
   m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;

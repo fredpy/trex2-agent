@@ -998,7 +998,7 @@ void TeleoReactor::clear_externals() {
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
   if( is_verbose() )
-    syslog(null, info)<<"Declared \""<<tl->name()<<"\".";
+    syslog(null, info)<<"Declared \""<<tl->name()<<"\" with rights "<<tl->rights()<<".";
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name(), tl->accept_goals(), tl->publish_plan());
   }
