@@ -113,7 +113,7 @@ namespace TREX
           std::string man_name;
       
           if( "reference"==gname ) {
-            syslog(log::info)<<"Processingg next goal on reference ";
+            syslog(log::info)<<"Processing next goal on reference ";
             if( "Going"==gpred && handleGoingRequest(goal) ) {
               sendMsg(goingRef); // send the command now !!!
               m_goals_pending.remove(goal);
@@ -406,7 +406,7 @@ namespace TREX
       if (!m_blocked)
       {
         sendMsg(m_ref);
-        m_ref.toText(syslog(log::info));
+        //m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
       

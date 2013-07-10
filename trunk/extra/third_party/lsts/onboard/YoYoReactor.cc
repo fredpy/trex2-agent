@@ -20,7 +20,7 @@ namespace
 
 namespace TREX {
   namespace LSTS {
-    
+
     // Sy,bol equaity test is faster than string : use global Symbols to improve performances
     utils::Symbol const YoYoReactor::s_trex_pred("TREX");
     utils::Symbol const YoYoReactor::s_exec_pred("Exec");
@@ -33,20 +33,20 @@ namespace TREX {
 
 
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
-                LstsReactor(arg),
-                m_lastRefState(s_refstate_tl, "Failed"),
-                m_lastControl(s_control_tl, "Failed"),
-                m_lastReference(s_reference_tl, "Failed")
+                    LstsReactor(arg),
+                    m_lastRefState(s_refstate_tl, "Failed"),
+                    m_lastControl(s_control_tl, "Failed"),
+                    m_lastReference(s_reference_tl, "Failed")
     {
       m_lat = m_lon = m_speed = m_minz = m_maxz = -1;
-      m_time_underwater = 0;
+      //      m_time_underwater = 0;
       m_time_at_surface = 0;
-      m_secs_underwater = 0;
+      //      m_secs_underwater = 0;
       state = IDLE;
       use(s_reference_tl, true);
       use(s_refstate_tl, false);
       use(s_control_tl);
-      
+
       provide(s_yoyo_tl);
     }
 
@@ -99,8 +99,8 @@ namespace TREX {
       switch(state)
       {
         case (ASCEND):
-        m_time_underwater ++;
-        m_time_at_surface  = 0;
+            //m_time_underwater ++;
+            m_time_at_surface  = 0;
         std::cerr << "[YOYO] ASCEND" << std::endl;
 
         if (nearXY)
@@ -110,21 +110,21 @@ namespace TREX {
         }
         else if (nearZ)
         {
-          if (m_time_underwater >= m_secs_underwater)
-          {
-            requestReference(m_lat, m_lon, m_speed, 0);
-            state = SURFACE;
-          }
-          else
-          {
-            requestReference(m_lat, m_lon, m_speed, m_maxz);
-            state = DESCEND;
-          }
+          //          if (m_time_underwater >= m_secs_underwater)
+          //          {
+          //            requestReference(m_lat, m_lon, m_speed, 0);
+          //            state = SURFACE;
+          //          }
+          //          else
+          //          {
+          requestReference(m_lat, m_lon, m_speed, m_maxz);
+          state = DESCEND;
+          //          }
         }
         break;
 
         case (DESCEND):
-                    m_time_underwater ++;
+                        //m_time_underwater ++;
         m_time_at_surface  = 0;
         std::cerr << "[YOYO] DESCEND" << std::endl;
         if (nearXY)
@@ -140,7 +140,6 @@ namespace TREX {
         break;
 
         case (SURFACE):
-        m_time_underwater = 0;
         std::cerr << "[YOYO] SURFACE" << std::endl;
         if (nearXY && nearZ)
         {
@@ -153,15 +152,15 @@ namespace TREX {
           postUniqueObservation(obs);
           state = IDLE;
         }
-        else if (nearZ)
-        {
-          m_time_at_surface ++;
-          if (m_time_at_surface >= secs_at_surface)
-          {
-            requestReference(m_lat, m_lon, m_speed, m_maxz);
-            state = DESCEND;
-          }
-        }
+//        else if (nearZ)
+//        {
+//          m_time_at_surface ++;
+//          if (m_time_at_surface >= secs_at_surface)
+//          {
+//            requestReference(m_lat, m_lon, m_speed, m_maxz);
+//            state = DESCEND;
+//          }
+//        }
         break;
         default:
           std::cerr << "[YOYO] IDLE" << std::endl;
@@ -224,10 +223,10 @@ namespace TREX {
         if (v.domain().isSingleton())
           m_maxz = v.domain().getTypedSingleton<double, true>();
 
-        v = g->getAttribute("secs_underwater");
+        /*v = g->getAttribute("secs_underwater");
         if (v.domain().isSingleton())
           m_secs_underwater = v.domain().getTypedSingleton<int, true>();
-
+         */
         state = DESCEND;
         requestReference(m_lat, m_lon, m_speed, m_maxz);
         postUniqueObservation(*g);
@@ -252,7 +251,7 @@ namespace TREX {
 
       // std::string timeline = obs.object().str();
       //std::string predicate = obs.predicate().str();
-    
+
       if (s_reference_tl == obs.object())
         m_lastReference = obs;
       else if (s_refstate_tl == obs.object())
