@@ -1148,7 +1148,7 @@ namespace TREX {
        *
        * The tick date when this reactor started to execute (typically 0)
        */
-      TICK   m_initialTick;
+      TICK   m_initialTick, m_obsTick;
       /** @brief Final tick value
        *
        * The tick date when the reactor will end. THis value often reflects
