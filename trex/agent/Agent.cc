@@ -53,6 +53,7 @@
 #include <boost/graph/reverse_graph.hpp>
 
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace TREX::agent;
@@ -721,16 +722,23 @@ void Agent::loadConf(std::string const &file_name) {
   loadConf(agent.front());
 }
 
+void Agent::init_dfs_sync() {
+  details::init_visitor init(m_finalTick);
+  boost::depth_first_search(me(), boost::visitor(init));
+}
+
+
 void Agent::initComplete() {
   if( getName().empty() )
     throw AgentException(*this, "Agent has no name :"
 			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
     throw AgentException(*this, "Agent is not connected to a clock");
-  // Complete the init for the reactors and check that there's 
-  // no cycle
-  details::init_visitor init(m_finalTick);
-  boost::depth_first_search(me(), boost::visitor(init));
+
+  boost::function<void ()> init_graph = boost::bind(&Agent::init_dfs_sync, this);
+  TREX::utils::strand_run(strand(), init_graph);
+  
+  
   size_t n_failed = cleanup();
   if( n_failed>0 )
     syslog(null, warn)<<n_failed<<" reactors failed to initialize.";
@@ -773,20 +781,30 @@ void Agent::run() {
   syslog(null, info)<<"Mission completed."<<std::endl;
 }
 
+std::list<Agent::reactor_id> Agent::sort_reactors_sync() {
+  std::list<reactor_id> queue;
+  details::sync_scheduller sync(queue);
+  
+  boost::depth_first_search(me(), boost::visitor(sync));
+  return queue;
+}
+
+
 
 void Agent::synchronize() {
   details::sync_scheduller::reactor_queue queue;
-  details::sync_scheduller sync(queue);
-
+  boost::function<details::sync_scheduller::reactor_queue ()>
+  sort_dfs(boost::bind(&Agent::sort_reactors_sync, this));
+  
   m_edf.clear(); // Make sure that there's no one left in the schedulling
   m_idle.clear();
   bool update = false;
 
   stat_clock::time_point synch_start = stat_clock::now();
   rt_clock::time_point synch_start_rt = rt_clock::now();
+  
+  queue = strand_run(strand(), sort_dfs);
 
-  // Identify synchronization order while notifying of the new tick
-  boost::depth_first_search(me(), boost::visitor(sync));
   size_t n_failed = cleanup();
   if( n_failed>0 )
     syslog(null, warn)<<n_failed<<" reactors failed to start tick "
