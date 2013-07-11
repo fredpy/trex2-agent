@@ -20,7 +20,7 @@
     <FlawFilter component="doNotMatch">
       <Choice name="_bind_u_2"/>
       <Choice nam.e="_bind_v_2"/>
-      <Choice name="_bind_deg"/>
+      <Choice name="_bind_heading"/>
     </FlawFilter>
     <FlawHandler component="toZero" />
   </UnboundVariableManager>
