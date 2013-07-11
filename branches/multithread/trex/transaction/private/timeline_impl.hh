@@ -44,41 +44,155 @@ namespace TREX {
       
       typedef SHARED_PTR<external_impl> ext_ref;
       
+      /** @brief Internal timeline implementation
+       *
+       * This class provides the basic implementation for an internal timeline
+       * and its transactions management.
+       *
+       * It is a private implementastion that is used internally by graph_impl
+       * and node_impl in order to mananege the connection between reactors 
+       * and their communication.
+       *
+       * @author Frederic Py
+       */
       class internal_impl :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<internal_impl> {
       public:
-        internal_impl(utils::Symbol const &name, WEAK_PTR<graph_impl> const &g);
+        /** @brief Constructor
+         *
+         * @param[in] name The timeline name
+         * @param[in] g The graph managing this timeline 
+         *
+         * This constructor is called internally by graph_impl when a new 
+         * timeline needs to be created
+         */
+        internal_impl(utils::Symbol const &name,
+                      WEAK_PTR<graph_impl> const &g);
+        /** @brief Destructor */
         ~internal_impl();
         
+        /** @brief Timeline name
+         *
+         * Give the nasme of the timeline. Within a graph this name is 
+         * unique and can be used to identify the timeline
+         *
+         * @return the name of the timeline
+         */
         utils::Symbol const &name() const {
           return m_name;
         }
         
+        /** @brief Owner of the timeline
+         *
+         * This function identifyies the node that currently maintain this
+         * timeline as internal if any.
+         *
+         * @return A weak reference to the owner fo the timeline or an 
+         * null reference if it has no owner
+         *
+         * @note this call will block until all the pending operations 
+         * for this timleine are completed.
+         */
         node_id owner() const;
         
+        /** @brief Check for goal access
+         *
+         * This method checks if this timleine currently accept goals 
+         * or not.
+         *
+         * @retval true if the timeline accept goals
+         * @retval false otherwise
+         *
+         * @note This operation will block until pending operations of this
+         * timeline are completed.
+         */  
         bool accept_goals() const;
+        /** @brief Check for plan publication
+         *
+         * Check if this timelien currently promises to publish its plan or 
+         * not
+         *
+         * @retval true if the timleien currently promises to publish its plan
+         * @retval false otherwise
+         *
+         * @note This call will blciak until all the pending operations on 
+         * this timeline are completed
+         */
         bool publish_plan() const;
         
+        /** @brief Get timeline managing graph
+         *
+         * @return A pointer to the grtaph managing this timeline or a null
+         * pointer if the managing graph has already been destroyed
+         */
         SHARED_PTR<graph_impl> graph() const {
           return m_graph.lock();
         }
         
       private:
-        utils::Symbol               m_name;
+        /** @rbief timeline name */
+        utils::Symbol        m_name;
+        /** @brief weak reference to the managing graph */
         WEAK_PTR<graph_impl> m_graph;
         
+        /** @brief transaction flags
+         *
+         * This maintin the transaction access rights to this timeline
+         * This flags define 2 binary attributes 
+         * @li Goal acceptance the timelien will accept to receive goals
+         * from other nodes only if this flag is true
+         * @li Plan publication the timelien won't publish any potential 
+         * tokens in the future when this tag is false
+         */
         transaction_flags           m_flags;
+        /** @brief owner
+         * 
+         * A weak reference to the owner of this timeline 
+         */
         node_id                     m_owner;
       
+        /** @brief Get owner of the timeline
+         *
+         * This non thread protected call directlt acces to the current 
+         * owner of the timleine
+         *
+         * @note this call is not thread safe and should not normally be 
+         * called directly
+         *
+         * @sa owner() const
+         */
         node_id owner_sync() const;
+        /** @brief reset owner
+         *
+         * This method disown the timelien form its owner. The operation is 
+         * not thread protected and is meant to use only internally
+         *
+         * @retval true if the timleine was owned before tyhis call
+         * @retval false otherwise
+         *
+         * @note this call is not thread safe and is onlyt meant for internal
+         * uses
+         *
+         * @post !this->owner()
+         */
         bool reset_sync();
-        /**
+        /** @brief set the timelien owner
+         *
+         * @param[in] n  The requester of ownership
+         * @param[in] fl transaction flags
+         *
+         * This non thread protected call attempt to change the ownership 
+         * of this timeline to the node @p n and the transaction flags to 
+         * @p fl. Transaction flags indicate whether the timeline will accept
+         * goals or not and whtjer it will publish its plan or not.
+         *
+         * The operation will success only if the timeline is not currently 
+         * owned or @p n is the current owner of this timeline.
          *
          * @retval true if either the owner or the flags have been modified
          * @retval false otherwise
          */
-        bool set_sync(SHARED_PTR<node_impl> const &n, transaction_flags const &fl);
-        
-        
+        bool set_sync(SHARED_PTR<node_impl> const &n,
+                      transaction_flags const &fl);
         
         friend class graph_impl;
         internal_impl() DELETED;
