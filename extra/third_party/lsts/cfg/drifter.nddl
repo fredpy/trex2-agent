@@ -94,7 +94,7 @@ class DrifterController {
 	
 	float           ref_lat, ref_lon; // Location used as space reference
 	float           shift_x, shift_y; // displacement from reference
-	float           cos_a, sin_a;     // rotation angle
+	float           cos_a, sin_a;     // roatation 
 	float           lat, lon;         // resulting waypoint location
 
 	int completion_date;              // ewhen didthis waypoint was reached
@@ -158,9 +158,13 @@ class DrifterFollow extends AgentTimeline {
     predicate Survey {
 	float    center_lat, center_lon;
 	float    speed_north, speed_east, u, v;
+	// The rotation angle to apply to the survey when speed is 0 
+	float    heading, heading_deg;
 	PathList path;
 	float    size;
 	bool     lagrangian;
+
+	angle == to_rad(angle_deg);
 
 	speed_east  == v;
 	speed_north == u;
@@ -200,10 +204,11 @@ DrifterController::EndSurvey {
     Counter cpt = me.counter;
 
     equals(effect me.Survey survey);
-    float _bind_u_2, _bind_v_2;
+    float _bind_u_2, _bind_v_2, _bind_heading;
     
     abs(survey.u) == sqrt(_bind_u_2);
     abs(survey.v) == sqrt(_bind_v_2);
+    heading == _bind_heading;
 
 
     ends(cpt.Holds cur);
@@ -223,8 +228,8 @@ DrifterController::EndSurvey {
     _bind_v_2 < vc._hspeed_2;
 
     if( 0==exec.speed ) {
-	exec.cos_angle == 1.0;
-	exec.sin_angle == 0.0;
+	exec.cos_angle == cos(heading_deg);
+	exec.sin_angle == sin(heading_deg);
     } else {
 	exec.cos_angle * exec.speed == survey.speed_north;
 	exec.sin_angle * exec.speed == survey.speed_east;
