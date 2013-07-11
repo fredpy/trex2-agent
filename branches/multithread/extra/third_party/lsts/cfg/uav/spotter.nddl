@@ -31,6 +31,7 @@ class SpotterController {
     action DoSegment {
 		int count; // number of the segment
 		count > 0;
+		float flyTimeF;
     }
 
     /* go to initial waypoint
@@ -165,10 +166,14 @@ SpotterController::Waypoint {
 SpotterController::DoSegment {
     SpotterFollow me = object.command;
     Counter cpt = me.counter;
+    float radiusF;
     before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
       to.radius == (count + 2 )  * -50;
-      to.start == end + 60;
+      floor(radiusF) == to.radius;
+      flyTimeF * 20.0  == (2.0 * 3.14 * abs(radiusF));
+      to.start >= end + floor(flyTimeF * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
+  
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
       exec.waypoints > count;

@@ -218,10 +218,13 @@ EuropaReactor::~EuropaReactor() {
 void EuropaReactor::notify(Observation const &obs) {
   setStream();
 
+  //syslog(null, info)<<"Integrating observation "<<obs;
   EUROPA::ObjectId obj = plan_db()->getObject(obs.object().str());
   bool undefined;
   std::string pred = obs.predicate().str();
   EUROPA::TokenId fact = new_obs(obj, pred, undefined);
+  //syslog(null, info)<<"Converting observation "<<obs<<" to token "
+  //  <<fact->getUnqualifiedPredicateName().toString()<<'('<<fact->getKey()<<')';
 
   if( undefined )
     syslog(null, warn)<<"Predicate "<<obs.object()<<"."<<obs.predicate()
@@ -361,6 +364,8 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       setStream();
     } else
       return false;
+  } else {
+    debugMsg("trex:dispatch", "Token "<<tok->getUnqualifiedPredicateName().toString()<<'('<<tok->getKey()<<") was already dispatched.");
   }
   return true;
 }
@@ -503,6 +508,8 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_active_requests.left.find(tok->getKey());
   bool ret = false;
 
+  //syslog(null, info)<<"Discarding "<<tok->getUnqualifiedPredicateName().toString()<<'('<<tok->getKey()<<')';
+  
   if( m_active_requests.left.end()!=i ) {
     syslog(null, info)<<"Discarded completed request ["<<i->second<<"]";
     m_active_requests.left.erase(i);
@@ -510,7 +517,7 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   }
   i = m_dispatched.left.find(tok->getKey());
   if( m_dispatched.left.end()!=i ) {
-    // syslog(null, info)<<"Discarded past goal ["<<i->second<<"]";
+    syslog(null, info)<<"Discarded past goal ["<<i->second<<"]";
     m_dispatched.left.erase(i);
     ret = true;
   }
@@ -571,14 +578,14 @@ bool EuropaReactor::hasWork() {
         logPlan("plan");
         getFuturePlan();
       }
-    }
-  }
-  if( m_completed_this_tick ) {
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
         TeleoReactor::external_iterator
         j=find_external((*from)->timeline()->getName().c_str());
         EUROPA::eint e_lo, e_hi;
+        debugMsg("trex:dispatch", getName()<<'['<<getCurrentTick()<<"]: Looking for the dispatch of "
+        		<<(*from)->timeline()->getName().c_str()<<" valid:"<<j.valid()
+        		<<" goals:"<<j->accept_goals());
         if( j.valid() && j->accept_goals() ) {
           IntegerDomain window = j->dispatch_window(getCurrentTick()+1);
           IntegerDomain::bound lo = window.lowerBound(), 
@@ -591,7 +598,8 @@ bool EuropaReactor::hasWork() {
           (*from)->do_dispatch(e_lo, e_hi);
         }
       }
-  }
+    }
+  }  
   return !m_completed_this_tick;
 }
 

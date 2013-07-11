@@ -5,8 +5,7 @@
 class Navigator extends AgentTimeline {
 
   float min_z, max_z;
-  int secs_underwater;
-
+  
   Navigator(Mode _mode) {
     super(_mode, "Idle", true);    
   }

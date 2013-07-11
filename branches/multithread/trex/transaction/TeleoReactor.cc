@@ -615,7 +615,7 @@ void TeleoReactor::observation_sync(Observation o, TICK date, bool verbose) {
 
 void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
   boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
-                                          this, obs, getCurrentTick(), verbose));
+                                          this, obs, m_obsTick, verbose));
   utils::strand_run(m_graph.strand(), fn);
 }
 
@@ -750,7 +750,7 @@ bool TeleoReactor::initialize(TICK final) {
     syslog(error)<< "Attempted to initalize this reactor twice.";
     return false;
   }
-  m_initialTick = getCurrentTick();
+  m_initialTick = m_obsTick = getCurrentTick();
   
   if( !m_finalTick || final<*m_finalTick )
     m_finalTick   = final;
@@ -776,10 +776,11 @@ bool TeleoReactor::initialize(TICK final) {
 
 bool TeleoReactor::newTick() {
   if( m_firstTick ) {
-    if( getCurrentTick()!=m_initialTick ) {
+    m_obsTick = getCurrentTick();
+    if( m_obsTick!=m_initialTick ) {
       syslog(warn)<<"Updating initial tick from "<<m_initialTick
                     <<" to "<<getCurrentTick();
-      m_initialTick = getCurrentTick();
+      m_initialTick = m_obsTick;
     }
     reset_deadline();
     TICK final = getFinalTick();
@@ -833,8 +834,12 @@ bool TeleoReactor::newTick() {
 void TeleoReactor::collect_obs_sync(std::list<Observation> &l) {
   for(external_set::iterator i = m_externals.begin();
       m_externals.end()!=i; ++i) {
-    if( i->first.lastObsDate()==getCurrentTick() )
+    // syslog(info)<<"Checking for new observation on "<<i->first.name();
+    if( i->first.lastObsDate()==getCurrentTick() ) {
+      // syslog(info)<<"Collecting new obs: "<<i->first.lastObservation();
       l.push_back( i->first.lastObservation() );
+    } //else
+     // syslog(info)<<"Last observation date ("<<i->first.lastObsDate()<<") is before current tick";
   }
   
 }
@@ -873,6 +878,7 @@ bool TeleoReactor::doSynchronize() {
       }
       m_updates.clear();
     }
+    m_obsTick = m_obsTick+1;
     return success;
   } catch(utils::Exception const &e) {
     syslog(error)<<"Exception caught: "<<e;
@@ -918,8 +924,9 @@ void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool p
 void TeleoReactor::provide_sync(TREX::utils::Symbol name, details::transaction_flags f) {
   if( !m_graph.assign(this, name, f) )
     if( internal_sync(name) ) {
-      syslog(warn)<<"Promoted \""<<name<<"\" from External to Internal.";
-    } 
+      syslog(warn)<<"Promoted \""<<name<<"\" from External to Internal with rights "
+      <<details::access_str(f.test(0), f.test(1));
+    }
 }
 
 
@@ -1018,7 +1025,7 @@ void TeleoReactor::clear_externals() {
 void TeleoReactor::assigned(details::timeline *tl) {
   m_internals.insert(tl);
   if( is_verbose() )
-    syslog(null, info)<<"Declared \""<<tl->name()<<"\".";
+    syslog(null, info)<<"Declared \""<<tl->name()<<"\" with rights "<<tl->rights()<<".";
   if( NULL!=m_trLog ) {
     m_trLog->provide(tl->name(), tl->accept_goals(), tl->publish_plan());
   }
@@ -1046,8 +1053,8 @@ void TeleoReactor::subscribed(Relation const &r) {
   m_externals.insert(tmp);
   latency_updated(0, r.latency());
   if( is_verbose() )
-    syslog(null, info)<<"Subscribed to \""<<r.name()<<'\"'
-            <<(r.accept_plan_tokens()?" with plan listening":"")<<'.';
+    syslog(null, info)<<"Subscribed to \""<<r.name()<<"\" with rights "
+      <<r.rights()<<'.';
   if( NULL!=m_trLog ) {
     m_trLog->use(r.name(), r.accept_goals(), r.accept_plan_tokens());
   }

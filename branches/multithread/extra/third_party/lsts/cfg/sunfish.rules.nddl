@@ -13,12 +13,10 @@ class YoYoController extends AgentTimeline {
 	
 	predicate Done {
 		float latitude, longitude, max_z, min_z, speed;
-		int secs_underwater;
 	}
 	
 	action Exec {
 		float latitude, longitude, max_z, min_z, speed;
-		int secs_underwater;
 	}
 }
 
@@ -29,7 +27,6 @@ YoYoController::Done {
 		exec.speed == speed;
 		exec.max_z == max_z;
 		exec.min_z == min_z;
-		exec.secs_underwater == secs_underwater;
 	
 	duration == 1;		
 }
@@ -38,13 +35,12 @@ Navigator::At {
 	float min_dist;
 	min_dist == 3.0;
 	
-	contained_by(YoYoController.Done arr);
+	starts(YoYoController.Done arr);
 		arr.speed == speed;
 		arr.latitude == latitude;
 		arr.longitude == longitude;
 		arr.min_z == object.min_z;
 		arr.max_z == object.max_z;
-		arr.secs_underwater == object.secs_underwater;
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 }
 
@@ -84,7 +80,6 @@ Navigator::Going {
 		g.max_z == object.max_z;
 		g.min_z == object.min_z;
 		speed == g.speed;
-		g.secs_underwater == object.secs_underwater;
 		concurrent(end, g.end);
 	}
 }

@@ -361,7 +361,7 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 #ifdef  EUROPA_HAVE_EFFECT
     debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
-	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString());
+	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString()<<")");
     // Old code from Philip
     //boost::chrono::high_resolution_timer start;
       # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
@@ -387,9 +387,13 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
         if(nowGoal.isId())
         {
             duration=thread_clock::now()-start;
+            debugMsg("trex:dispatch", "Token "<<(*i)->getUnqualifiedPredicateName().toString()<<"("<<(*i)->getKey()<<") schedulled for dispatch."
+                     "\n\treason: linked to goal "<<nowGoal->getUnqualifiedPredicateName().toString()
+                     <<'('<<nowGoal->getKey()<<").");
             m_assembly.dispatch(timeline(),*i);
         } else {
             duration=thread_clock::now()-start;
+          debugMsg("trex:dispatch", "Holding on "<<(*i)->getUnqualifiedPredicateName().toString()<<"("<<(*i)->getKey()<<") should not be dispatched yet.")
         }
         if(time_values.find(now())==time_values.end())
         {
@@ -503,24 +507,39 @@ EUROPA::TokenId  CurrentState::getGoal(const EUROPA::TokenId& token, EUROPA::ein
 {
     if(token->start()->lastDomain().getUpperBound()<=ub || m_assembly.is_action(token))
     {
+        debugMsg("trex:dispatch", token->getUnqualifiedPredicateName().toString()
+                  <<'('<<token->getKey()<<") necessraly starts in ["<<lb<<", "
+                  <<ub<<"] or before");
         return token;
     } else {
         EUROPA::TokenSet merged;
         EUROPA::TokenSet::iterator it, end;
+        debugMsg("trex:dispatch", token->getUnqualifiedPredicateName().toString()
+                 <<'('<<token->getKey()<<") can start after ["<<lb<<", "
+               <<ub<<"] => checking if it is goal dependendent");
 
         ///Gets all of the tokens merged with @token
         merged = getAllTokens(token);
         ///Tests to see if any of the tokens are fact and if so @returns noId()
         for(it = merged.begin(), end = merged.end(); it!=end; it++)
         {
-            if((*it)->isFact())
-                return EUROPA::Id<EUROPA::Token>::noId();
+          if((*it)->isFact()) {
+            debugMsg("trex:dispatch", token->getUnqualifiedPredicateName().toString()
+                     <<'('<<token->getKey()<<") is already a fact : skipping");
+            return EUROPA::Id<EUROPA::Token>::noId();
+          }
         }
 
         EUROPA::TokenId goal = searchGoal(merged);
-        if(goal.isId())
-            return goal;
+      if(goal.isId()) {
+        debugMsg("trex:dispatch", token->getUnqualifiedPredicateName().toString()
+                 <<'('<<token->getKey()<<") depends on a goal.");
+
+        return goal;
+      }
     }
+    debugMsg("trex:dispatch", token->getUnqualifiedPredicateName().toString()
+             <<'('<<token->getKey()<<") is not urgent.");
 
     return EUROPA::Id<EUROPA::Token>::noId();
 }

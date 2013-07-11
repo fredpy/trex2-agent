@@ -345,7 +345,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
       if( !active->isCommitted() )
         m_completed.insert(active);
     }
-  }
+  } else if( tok->isActive() )
+    discard(tok);
   for(EUROPA::TokenSet::const_iterator i=active->getMergedTokens().begin();
       active->getMergedTokens().end()!=i; ++i) {
     if( rejectable(*i) && discard(*i) ) {

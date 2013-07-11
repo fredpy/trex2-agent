@@ -124,6 +124,7 @@ namespace TREX {
 
       /** @brief Whether it was connected on last tick */
       bool m_connected;
+      TICK m_last_msg, m_max_delta;
 
       /** @brief map of received messages       */
       std::map<uint16_t, IMC::Message *> received;
@@ -131,6 +132,7 @@ namespace TREX {
       /** @brif vector of received goals */
       std::queue<std::string> receivedGoals;
       std::queue<Observation> referenceObservations;
+
       IMC::Reference goingRef;
 
       boost::function<bool (goal_id)> m_going_platform;

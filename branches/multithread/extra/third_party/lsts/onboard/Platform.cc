@@ -81,9 +81,12 @@ namespace TREX
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";
         m_going_platform = boost::bind(&Platform::goingUAV, this, _1);
+        m_max_delta = 3;
+        syslog(log::info)<< "Setting max delta without message to "<<m_max_delta;
       } else {
         syslog(log::info)<< "Setting platform Going handler for AUVs (underwater)";
         m_going_platform = boost::bind(&Platform::goingAUV, this, _1);
+        m_max_delta = 1;
       }
       
     }
@@ -93,6 +96,7 @@ namespace TREX
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
       m_adapter.bind(localport);
+      m_last_msg = -1;
       syslog(log::info) << "listening on port " << localport << "...";
     }
     
@@ -101,7 +105,7 @@ namespace TREX
     {
       
       // Dop not process goals if you still have observations to post
-      if( referenceObservations.empty() ) {
+      //if( referenceObservations.empty() ) {
         // First deal with requests
         if( !m_blocked && !m_goals_pending.empty() ) {
           goal_id goal = m_goals_pending.front();
@@ -110,7 +114,7 @@ namespace TREX
           std::string man_name;
       
           if( "reference"==gname ) {
-            syslog(log::info)<<"Processingg next goal on reference ";
+            syslog(log::info)<<"Processing next goal on reference ";
             if( "Going"==gpred && handleGoingRequest(goal) ) {
               sendMsg(goingRef); // send the command now !!!
               m_goals_pending.remove(goal);
@@ -123,7 +127,7 @@ namespace TREX
             }
           }
         }
-      }
+      //}
       
       // Now that we dealt with goal processing and command sending
       // just look ifg any observation need to be posted
@@ -175,11 +179,24 @@ namespace TREX
         
         if (msg_count < 1)
         {
-          if (m_connected)
-            std::cerr <<"Disconnected from DUNE\n";
+          if( m_firstTick ) {
+            m_last_msg = getCurrentTick()-1;
+            m_firstTick = false;
+          }
+          TICK delta = getCurrentTick()-m_last_msg;
+
           
-          syslog(log::warn) << "Disconnected from DUNE";
-          m_connected = false;
+          if( delta>=m_max_delta ) {
+            if (m_connected)
+              std::cerr <<"Disconnected from DUNE\n";
+          
+            syslog(log::warn) << "Disconnected from DUNE";
+            m_connected = false;
+          } else {
+            syslog(log::warn)<<"No message received from DUNE for "
+              <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
+          }
+          
         }
         
         else
@@ -187,6 +204,7 @@ namespace TREX
           if (!m_connected)
             std::cerr <<"Now connected to DUNE\n";
           m_connected = true;
+          m_last_msg = getCurrentTick();
         }
       }
       catch (std::runtime_error& e)
@@ -259,7 +277,7 @@ namespace TREX
       obs_map::iterator it = postedObservations.find(token.timeline);
       
       // If no such timeline has ever been posted, a new timeline will now be provided
-      if (it == postedObservations.end())
+      if ( !isInternal(token.timeline))
         provide(token.timeline, false, false);
       //Observation obs = m_adapter.genericObservation(&token);
       //std::cerr << "Posting observation: " << obs << "\n";
@@ -350,8 +368,11 @@ namespace TREX
       // Translate incoming messages into observations
       EstimatedState * estate =
       dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
-      postUniqueObservation(m_adapter.estimatedStateObservation(estate));
       
+      // force posting of position observations (duration == 1)
+      if (estate != NULL)
+        postObservation(m_adapter.estimatedStateObservation(estate));
+
       VehicleMedium * medium =
       dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
@@ -391,7 +412,7 @@ namespace TREX
       if (!m_blocked)
       {
         sendMsg(m_ref);
-        m_ref.toText(syslog(log::info));
+        //m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
       
@@ -561,6 +582,10 @@ namespace TREX
     }
     
     bool Platform::goingAUV(goal_id goal) {
+
+      syslog(log::info) << "goingAUV: " << goal;
+
+
       goal_id g = goal;
       Variable lat, lon, v;
       

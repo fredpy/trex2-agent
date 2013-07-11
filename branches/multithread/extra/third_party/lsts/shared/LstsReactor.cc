@@ -22,12 +22,22 @@ namespace TREX
     
     LstsReactor::~LstsReactor() {}
 
+
+    bool
+    LstsReactor::isObservationNew(TREX::transaction::Observation obs)
+    {
+      std::string timeline = obs.object().str();
+      obs_map::iterator it = postedObservations.find(timeline);
+
+      return (it == postedObservations.end() || !it->second->consistentWith(obs));
+    }
+
     bool
     LstsReactor::postUniqueObservation(TREX::transaction::Observation obs)
     {
 
-      std::string timeline = obs.object().str();
-      obs_map::iterator it = postedObservations.find(timeline);
+      utils::Symbol timeline = obs.object();
+      obs_map::iterator it = postedObservations.find(timeline.str());
 
       if (it == postedObservations.end() || !it->second->consistentWith(obs))
       {
@@ -35,7 +45,7 @@ namespace TREX
         if (!isInternal(timeline) && !isExternal(timeline))
           provide(timeline, false);
 
-        postedObservations[timeline].reset(new Observation(obs));
+        postedObservations[timeline.str()].reset(new Observation(obs));
         postObservation(obs, true);
         return true;
       }

@@ -422,7 +422,9 @@ namespace TREX {
 			  TREX::transaction::details::timeline const &tl);
       void external_check(reactor_id r, 
 			  TREX::transaction::details::timeline const &tl);
-
+      
+      void init_dfs_sync();
+      std::list<reactor_id> sort_reactors_sync();
 
       AgentProxy *m_proxy;
             

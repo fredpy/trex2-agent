@@ -82,6 +82,13 @@ TICK timeline::latency() const {
   return accept_goals()?owner().getExecLatency():0;
 }
 
+std::string TREX::transaction::details::access_str(bool g, bool p) {
+  std::ostringstream oss;
+  oss<<(g?'g':'-')<<(p?'p':'-');
+  return oss.str();
+}
+
+
 // modifiers :
 
 bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
@@ -102,6 +109,7 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
     TICK update = 0;
     if( !flags.test(0) )
       update = r.getExecLatency();
+    r.syslog(name(), warn)<<"Updated transaction rights to "<<rights();
     m_transactions = flags;
     r.assigned(this);
     latency_update(update);
@@ -145,14 +153,16 @@ bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
         m_plan_listeners += 1;
       r.subscribed(Relation(this, pos));
     } else if( pos->second!=flags ) {
-      r.syslog(null, warn)<<"Updated transaction flags for external timeline "
-			  <<name();
+      std::string prev = rights();
+      
       if( flags.test(1) ) {
         if( !pos->second.test(1) )
           m_plan_listeners += 1;
       } else if( pos->second.test(1) )
         m_plan_listeners -= 1;
-      pos->second = flags; 
+      pos->second = flags;
+      r.syslog(name(), warn)<<"Updated timeline transaction rights from "
+        <<prev<<" to "<<rights();
     }
     return inserted;
   }
@@ -282,6 +292,11 @@ bool Relation::accept_goals() const {
 bool Relation::accept_plan_tokens() const {
   return m_pos->second.test(1);
 }
+
+std::string Relation::rights() const {
+  return details::access_str(accept_goals(), accept_plan_tokens());
+}
+
 
 
 TICK Relation::latency() const {

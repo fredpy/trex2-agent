@@ -51,7 +51,7 @@ namespace TREX {
       TREX::transaction::Observation m_lastReference;
 
       double m_lat, m_lon, m_minz, m_maxz, m_speed;
-      int m_secs_underwater, m_time_underwater, m_time_at_surface;
+      int m_time_at_surface;
 
 
       void handleInit();

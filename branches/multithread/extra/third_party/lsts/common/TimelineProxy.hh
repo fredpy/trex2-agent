@@ -44,7 +44,7 @@ namespace TREX {
       /**
        * @brief should this reactor use Iridium for forwarding tokens (true) or something else (false)?
       */
-      bool m_useIridum;
+      bool m_useIridium;
 
       /**
        * Destination where to send tokens
