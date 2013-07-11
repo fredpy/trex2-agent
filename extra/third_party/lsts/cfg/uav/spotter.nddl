@@ -172,7 +172,14 @@ SpotterController::DoSegment {
       to.radius == (count + 2 )  * -50;
       floor(radiusF) == to.radius;
       flyTimeF * 20.0  == (2.0 * 3.14 * abs(radiusF));
-      to.start >= end + floor(flyTimeF * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
+
+      // These lines allow to convert flyTimeF (seconds) into its tick equivalent
+      // As a result this model will run fine event if the clock runs at a 
+      // tick rate whihc is no 1Hz
+      float flyTimeInTick;
+      flyTimeInTick * TICK_DURATION == flyTimeF;
+
+      to.start >= end + floor(flyTimeInTick * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
   
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
