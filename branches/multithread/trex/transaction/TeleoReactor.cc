@@ -602,21 +602,23 @@ double TeleoReactor::workRatio() {
   return NAN;
 }
 
-void TeleoReactor::observation_sync(Observation o, TICK date, bool verbose) {
+void TeleoReactor::observation_sync(Observation o, bool verbose) {
   internal_set::iterator i = m_internals.find(o.object());
   
   if( m_internals.end()==i )
     throw boost::enable_current_exception(SynchronizationError(*this, "attempted to post observation on "+
                                o.object().str()+" which is not Internal."));
   
-  (*i)->postObservation(date, o, verbose);
+  (*i)->postObservation(o, verbose);
   m_updates.insert(*i);
 }
 
 void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
   boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
-                                          this, obs, m_obsTick, verbose));
+                                          this, obs, verbose));
   utils::strand_run(m_graph.strand(), fn);
+  if( NULL!=m_trLog )
+    m_trLog->observation(obs);
 }
 
 bool TeleoReactor::goal_sync(goal_id g) {
@@ -750,7 +752,7 @@ bool TeleoReactor::initialize(TICK final) {
     syslog(error)<< "Attempted to initalize this reactor twice.";
     return false;
   }
-  m_initialTick = m_obsTick = getCurrentTick();
+  m_initialTick = /* m_obsTick = */ getCurrentTick();
   
   if( !m_finalTick || final<*m_finalTick )
     m_finalTick   = final;
@@ -776,11 +778,11 @@ bool TeleoReactor::initialize(TICK final) {
 
 bool TeleoReactor::newTick() {
   if( m_firstTick ) {
-    m_obsTick = getCurrentTick();
-    if( m_obsTick!=m_initialTick ) {
+    TICK cur = getCurrentTick();
+    if( cur!=m_initialTick ) {
       syslog(warn)<<"Updating initial tick from "<<m_initialTick
-                    <<" to "<<getCurrentTick();
-      m_initialTick = m_obsTick;
+                    <<" to "<<cur;
+      m_initialTick = cur;
     }
     reset_deadline();
     TICK final = getFinalTick();
@@ -836,7 +838,7 @@ void TeleoReactor::collect_obs_sync(std::list<Observation> &l) {
       m_externals.end()!=i; ++i) {
     // syslog(info)<<"Checking for new observation on "<<i->first.name();
     if( i->first.lastObsDate()==getCurrentTick() ) {
-      // syslog(info)<<"Collecting new obs: "<<i->first.lastObservation();
+      syslog(info)<<"Collecting new obs: "<<i->first.lastObservation();
       l.push_back( i->first.lastObservation() );
     } //else
      // syslog(info)<<"Last observation date ("<<i->first.lastObsDate()<<") is before current tick";
@@ -844,6 +846,15 @@ void TeleoReactor::collect_obs_sync(std::list<Observation> &l) {
   
 }
 
+void TeleoReactor::publish_obs_sync(TICK date) {
+  for(internal_set::const_iterator i=m_updates.begin();
+      m_updates.end()!=i; ++i) {
+    Observation const &o = (*i)->lastObservation();
+    if( (*i)->synchronize(date) )
+      syslog(obs)<<o;
+  }
+  m_updates.clear();
+}
 
 void TeleoReactor::doNotify() {
   std::list<Observation> obs;
@@ -866,19 +877,11 @@ bool TeleoReactor::doSynchronize() {
       success = synchronize();      
     }
     if( success ) {
-      for(internal_set::const_iterator i=m_updates.begin();
-          m_updates.end()!=i; ++i) {
-        bool echo;
-        Observation const &observ = (*i)->lastObservation(echo);
-        
-        if( echo || is_verbose() || NULL==m_trLog )
-          syslog(obs)<<observ;
-        if( NULL!=m_trLog )
-          m_trLog->observation(observ);
-      }
-      m_updates.clear();
+      boost::function<void ()> fn(boost::bind(&TeleoReactor::publish_obs_sync,
+                                              this, getCurrentTick()));
+      utils::strand_run(m_graph.strand(), fn);
     }
-    m_obsTick = m_obsTick+1;
+//    m_obsTick = m_obsTick+1;
     return success;
   } catch(utils::Exception const &e) {
     syslog(error)<<"Exception caught: "<<e;

@@ -1050,7 +1050,8 @@ namespace TREX {
       void provide_sync(TREX::utils::Symbol name, details::transaction_flags f);
       bool unprovide_sync(TREX::utils::Symbol name);
      
-      void observation_sync(Observation o, TICK date, bool verbose);
+      void observation_sync(Observation o, bool verbose);
+      
       bool goal_sync(goal_id g);
       bool recall_sync(goal_id g);
       
@@ -1082,6 +1083,7 @@ namespace TREX {
       bool have_goals();
       
       void collect_obs_sync(std::list<Observation> &l);
+      void publish_obs_sync(TICK date);
       
       /** @brief Request new observations
        *
@@ -1133,7 +1135,7 @@ namespace TREX {
        *
        * The tick date when this reactor started to execute (typically 0)
        */
-      TICK   m_initialTick, m_obsTick;
+      TICK   m_initialTick;
       /** @brief Final tick value
        *
        * The tick date when the reactor will end. THis value often reflects

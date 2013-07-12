@@ -103,8 +103,9 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
     }
     m_owner = &r;
     m_transactions = flags;
+    m_failedDate.reset();
     r.assigned(this);
-    latency_update(0);    
+    latency_update(0);
   } else if( owned_by(r) ) {
     TICK update = 0;
     if( !flags.test(0) )
@@ -127,7 +128,8 @@ TeleoReactor *timeline::unassign(TICK date) {
     m_owner->unassigned(this);
     m_owner = NULL;
     m_transactions.reset();
-    postObservation(date, Observation(name(), s_failed));
+    postObservation(Observation(name(), s_failed));
+    m_failedDate = date;
     latency_update(ret->getExecLatency());
   }
   return ret;
@@ -175,17 +177,40 @@ void timeline::unsubscribe(Relation const &rel) {
   m_clients.erase(rel.m_pos);
 }
 
-void timeline::postObservation(TICK date, Observation const &obs, 
+void timeline::postObservation(Observation const &obs,
 			       bool verbose) {
   verbose = verbose || ( owned() && owner().is_verbose() );
 
-  if( m_obsDate==date && owned() && m_shouldPrint )
+  if( m_nextObs )
     owner().syslog(warn)<<"New observation overwrite formerly posted one:\n\t"
-			<<m_lastObs;
-  m_obsDate = date;
-  m_lastObs = obs;
+			<<(*m_nextObs);
+  m_nextObs = obs;
   m_shouldPrint = verbose;
 }
+
+Observation const &timeline::lastObservation() {
+  if( m_failedDate )
+    synchronize(*m_failedDate);
+  return m_lastObs;
+}
+
+bool timeline::synchronize(TICK date) {
+  if( m_nextObs ) {
+    m_lastObs = *m_nextObs;
+    m_nextObs.reset();
+    m_failedDate.reset();
+    m_obsDate = date;
+    
+    if( m_shouldPrint ) {
+      m_shouldPrint = false;
+      return true;
+    }
+  }
+  return false;
+}
+
+
+
 
 void timeline::request(goal_id const &g) {
   if( owned() ) {
