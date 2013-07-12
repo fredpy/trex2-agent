@@ -39,6 +39,12 @@ namespace TREX {
    */
   namespace LSTS {
 
+    typedef struct {
+      double lat, lon;
+      double z;
+      double speed;
+    } ReferenceRequest;
+
     enum EXEC_STATE {IDLE, DESCEND, ASCEND, SURFACE, DONE};
 
     class YoYoReactor : public LstsReactor
@@ -49,10 +55,11 @@ namespace TREX {
       TREX::transaction::Observation m_lastRefState;
       TREX::transaction::Observation m_lastControl;
       TREX::transaction::Observation m_lastReference;
+      TREX::transaction::Observation m_lastPosition;
 
       double m_lat, m_lon, m_minz, m_maxz, m_speed;
       int m_time_at_surface;
-
+      ReferenceRequest m_lastSentRef, m_lastSeenRef;
 
       void handleInit();
       void handleTickStart();
@@ -73,9 +80,12 @@ namespace TREX {
       static utils::Symbol const s_reference_tl;
       static utils::Symbol const s_refstate_tl;
       static utils::Symbol const s_control_tl;
+      static utils::Symbol const s_position_tl;
       
       static utils::Symbol const s_yoyo_tl;
     };
+
+
   }
 }
 

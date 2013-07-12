@@ -11,11 +11,11 @@ class YoYoController extends AgentTimeline {
 	
 	predicate Idle {}
 	
-	predicate Done {
+	action Done {
 		float latitude, longitude, max_z, min_z, speed;
 	}
 	
-	action Exec {
+	predicate Exec {
 		float latitude, longitude, max_z, min_z, speed;
 	}
 }
