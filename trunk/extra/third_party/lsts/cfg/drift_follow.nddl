@@ -37,8 +37,8 @@ PathList go_to = new PathList(center, nilPath);
  * TREX timelines
  */
 Navigator navigator = new Navigator(External, false);
+VerticalControl vc = new VerticalControl(Observe, false);
 
-VerticalControl vc = new VerticalControl(Internal);
 DrifterFollow drifter = new DrifterFollow(Internal);
 
 close();
