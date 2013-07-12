@@ -305,10 +305,16 @@ namespace TREX {
       if (s_reference_tl == obs.object())
       {
         m_lastReference = obs;
-        m_lastSeenRef.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
-        m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-        m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
-        m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+        if (m_lastReference.predicate() == "Going")
+        {
+          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+        }
+        else {
+
+        }
       }
       else if (s_refstate_tl == obs.object())
         m_lastRefState = obs;
