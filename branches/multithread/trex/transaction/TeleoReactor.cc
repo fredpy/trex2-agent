@@ -838,7 +838,7 @@ void TeleoReactor::collect_obs_sync(std::list<Observation> &l) {
       m_externals.end()!=i; ++i) {
     // syslog(info)<<"Checking for new observation on "<<i->first.name();
     if( i->first.lastObsDate()==getCurrentTick() ) {
-      syslog(info)<<"Collecting new obs: "<<i->first.lastObservation();
+      // syslog(info)<<"Collecting new obs: "<<i->first.lastObservation();
       l.push_back( i->first.lastObservation() );
     } //else
      // syslog(info)<<"Last observation date ("<<i->first.lastObsDate()<<") is before current tick";
