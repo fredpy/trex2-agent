@@ -326,7 +326,7 @@ DrifterController::DoSegment {
 	dest.longitude == to.lon;
 	dest.speed == vc.speed;
 	dest.secs == 0;
-	dest.z == vc.min_z;
+	dest.z == 0.0; // go at the surface
 	to.completion_date == dest.start;
    }
 }
@@ -361,7 +361,7 @@ DrifterController::DoInitial {
 	dest.latitude == to.lat;
 	dest.longitude == to.lon;
 	dest.speed == vc.speed;
-	dest.z == vc.min_z; 	// yoyo
+	dest.z == 0.0; 	// Go at the sruface
 	//dest.maxz == vc.max_z; 	// yoyo
 	dest.secs == 0;//60; 		// stay at surface for 1 min
 	//dest.z == 0;			// end at surface

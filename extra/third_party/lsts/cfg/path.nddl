@@ -84,6 +84,9 @@ class VerticalControl extends AgentTimeline {
     VerticalControl(Mode _mode) {
 	super(_mode, "Holds");
     }
+    VerticalControl(Mode _mode, bool goals) {
+	super(_mode, "Holds", goals);
+    }
 }
 
 VerticalControl::Holds {
