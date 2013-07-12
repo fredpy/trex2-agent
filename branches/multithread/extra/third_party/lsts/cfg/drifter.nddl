@@ -164,7 +164,7 @@ class DrifterFollow extends AgentTimeline {
 	float    size;
 	bool     lagrangian;
 
-	angle == to_rad(angle_deg);
+	heading == to_rad(heading_deg);
 
 	speed_east  == v;
 	speed_north == u;
@@ -208,7 +208,7 @@ DrifterController::EndSurvey {
     
     abs(survey.u) == sqrt(_bind_u_2);
     abs(survey.v) == sqrt(_bind_v_2);
-    heading == _bind_heading;
+    survey.heading == _bind_heading;
 
 
     ends(cpt.Holds cur);
@@ -228,8 +228,8 @@ DrifterController::EndSurvey {
     _bind_v_2 < vc._hspeed_2;
 
     if( 0==exec.speed ) {
-	exec.cos_angle == cos(heading_deg);
-	exec.sin_angle == sin(heading_deg);
+	exec.cos_angle == cos(survey.heading_deg);
+	exec.sin_angle == sin(survey.heading_deg);
     } else {
 	exec.cos_angle * exec.speed == survey.speed_north;
 	exec.sin_angle * exec.speed == survey.speed_east;

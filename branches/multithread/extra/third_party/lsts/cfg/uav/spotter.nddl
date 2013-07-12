@@ -104,7 +104,7 @@ class SpotterFollow extends AgentTimeline {
 		int waypoints;
 		float    size, z;
 		float center_lat, center_lon;
-		waypoints == 3;
+		waypoints == 4;
     }
     predicate Survey {
 		float    center_lat, center_lon;
@@ -169,10 +169,17 @@ SpotterController::DoSegment {
     float radiusF;
     before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
-      to.radius == (count + 2 )  * -50;
+      to.radius == (count + 1 )  * -50;
       floor(radiusF) == to.radius;
       flyTimeF * 20.0  == (2.0 * 3.14 * abs(radiusF));
-      to.start >= end + floor(flyTimeF * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
+
+      // These lines allow to convert flyTimeF (seconds) into its tick equivalent
+      // As a result this model will run fine event if the clock runs at a 
+      // tick rate whihc is no 1Hz
+      float flyTimeInTick;
+      flyTimeInTick * TICK_DURATION == flyTimeF;
+
+      to.start == end + floor(flyTimeInTick * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
   
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;
@@ -205,7 +212,7 @@ SpotterController::DoSegment {
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
-		dest.radius == (count + 2 )  * -50;
+		dest.radius == to.radius;
 		dest.z == exec.z;
         //to.completion_date == dest.start + 6.28*to.radius*20.0;
 	    //to.completion_date == dest.start;
@@ -220,6 +227,7 @@ SpotterController::DoInitial {
     equals(effect Waypoint to);
       to.wp_num == 1; // This is the first waypoint
       to.radius == -100;
+  
     meets(me.DoSurvey exec); // Relaxing the constraints on DoSurvey
       exec.id == to.path_id;
       exec.center_lat == to.lat;

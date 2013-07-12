@@ -28,6 +28,7 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_reference_tl("reference");
     utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
     utils::Symbol const YoYoReactor::s_control_tl("control");
+    utils::Symbol const YoYoReactor::s_position_tl("position");
 
     utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
 
@@ -36,17 +37,19 @@ namespace TREX {
                     LstsReactor(arg),
                     m_lastRefState(s_refstate_tl, "Failed"),
                     m_lastControl(s_control_tl, "Failed"),
-                    m_lastReference(s_reference_tl, "Failed")
+                    m_lastReference(s_reference_tl, "Failed"),
+                    m_lastPosition(s_position_tl, "Failed")
     {
       m_lat = m_lon = m_speed = m_minz = m_maxz = -1;
       //      m_time_underwater = 0;
       m_time_at_surface = 0;
+
       //      m_secs_underwater = 0;
       state = IDLE;
       use(s_reference_tl, true);
       use(s_refstate_tl, false);
       use(s_control_tl);
-
+      use(s_position_tl);
       provide(s_yoyo_tl);
     }
 
@@ -63,13 +66,60 @@ namespace TREX {
       //std::cerr << "[YOYO] handleTickStart()" << std::endl;
     }
 
+    void
+    printReference(ReferenceRequest req) {
+      std::cerr << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")" << std::endl;
+    }
+
+    bool
+    sameReference(ReferenceRequest req1, ReferenceRequest req2)
+    {
+      if (req1.lat != req2.lat)
+        return false;
+      if (req1.lon != req2.lon)
+        return false;
+      if (req1.z != req2.z)
+        return false;
+      if (req1.speed != req2.speed)
+        return false;
+
+      return true;
+    }
+
     bool
     YoYoReactor::synchronize()
     {
-
-      bool nearXY = false, nearZ = false;
+      bool nearXY = false, nearZ = false, nearBottom = false;
       Variable v;
       int secs_at_surface = 60;
+
+
+      printReference(m_lastSeenRef);
+      printReference(m_lastSentRef);
+
+      if (m_lastPosition.hasAttribute("alt"))
+      {
+        v = m_lastRefState.getAttribute("altitude");
+        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
+        v = m_lastPosition.getAttribute("altitude");
+
+        double alt_ = v.domain().getTypedSingleton<double, true>();
+        if (alt_ > 0 && alt_ < 2)
+        {
+          nearBottom = true;
+          std::cerr << "Detected bottom." << std::endl;
+        }
+      }
+
+      if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
+        std::cerr << "sent and seen references don't match." << std::endl;
+        return true;
+      }
+
+      if (nearBottom)
+      {
+
+      }
 
       if (m_lastRefState.hasAttribute("near_z"))
       {
@@ -99,12 +149,12 @@ namespace TREX {
       switch(state)
       {
         case (ASCEND):
-            //m_time_underwater ++;
             m_time_at_surface  = 0;
         std::cerr << "[YOYO] ASCEND" << std::endl;
 
         if (nearXY)
         {
+          std::cerr << "near XY, going to the surface";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
@@ -132,7 +182,7 @@ namespace TREX {
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
-        else if (nearZ)
+        else if (nearZ || nearBottom)
         {
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
@@ -181,9 +231,14 @@ namespace TREX {
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
-      std::cerr << "[YOYO] Request(" << lat << ", " << lon << ", " << speed << ", " << z << std::endl;
+      std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
       postGoal(g);
+
+      m_lastSentRef.lat = lat;
+      m_lastSentRef.lon = lon;
+      m_lastSentRef.z = z;
+      m_lastSentRef.speed = speed;
     }
 
     void
@@ -223,14 +278,9 @@ namespace TREX {
         if (v.domain().isSingleton())
           m_maxz = v.domain().getTypedSingleton<double, true>();
 
-        /*v = g->getAttribute("secs_underwater");
-        if (v.domain().isSingleton())
-          m_secs_underwater = v.domain().getTypedSingleton<int, true>();
-         */
         state = DESCEND;
         requestReference(m_lat, m_lon, m_speed, m_maxz);
         postUniqueObservation(*g);
-
       }
       else
       {
@@ -253,11 +303,25 @@ namespace TREX {
       //std::string predicate = obs.predicate().str();
 
       if (s_reference_tl == obs.object())
+      {
         m_lastReference = obs;
+        if (m_lastReference.predicate() == "Going")
+        {
+          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+        }
+        else {
+
+        }
+      }
       else if (s_refstate_tl == obs.object())
         m_lastRefState = obs;
       else if (s_control_tl == obs.object())
         m_lastControl = obs;
+      else if (s_position_tl == obs.object())
+        m_lastPosition = obs;
     }
 
     YoYoReactor::~YoYoReactor()
