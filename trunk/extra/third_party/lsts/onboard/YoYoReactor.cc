@@ -28,7 +28,7 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_reference_tl("reference");
     utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
     utils::Symbol const YoYoReactor::s_control_tl("control");
-    utils::Symbol const YoYoReactor::s_position_tl("position");
+    utils::Symbol const YoYoReactor::s_position_tl("estate");
 
     utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
 
@@ -94,14 +94,11 @@ namespace TREX {
       int secs_at_surface = 60;
 
 
-      printReference(m_lastSeenRef);
-      printReference(m_lastSentRef);
-
-      if (m_lastPosition.hasAttribute("alt"))
+      if (m_lastPosition.hasAttribute("altitude"))
       {
-        v = m_lastRefState.getAttribute("altitude");
-        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
         v = m_lastPosition.getAttribute("altitude");
+        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
+        std::cerr << "altitude: " << alt << std::endl;
 
         double alt_ = v.domain().getTypedSingleton<double, true>();
         if (alt_ > 0 && alt_ < 2)
@@ -112,13 +109,7 @@ namespace TREX {
       }
 
       if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
-        std::cerr << "sent and seen references don't match." << std::endl;
         return true;
-      }
-
-      if (nearBottom)
-      {
-
       }
 
       if (m_lastRefState.hasAttribute("near_z"))
@@ -160,21 +151,12 @@ namespace TREX {
         }
         else if (nearZ)
         {
-          //          if (m_time_underwater >= m_secs_underwater)
-          //          {
-          //            requestReference(m_lat, m_lon, m_speed, 0);
-          //            state = SURFACE;
-          //          }
-          //          else
-          //          {
           requestReference(m_lat, m_lon, m_speed, m_maxz);
           state = DESCEND;
-          //          }
         }
         break;
 
         case (DESCEND):
-                        //m_time_underwater ++;
         m_time_at_surface  = 0;
         std::cerr << "[YOYO] DESCEND" << std::endl;
         if (nearXY)
@@ -182,7 +164,7 @@ namespace TREX {
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
-        else if (nearZ || nearBottom)
+        else if (nearZ /*|| nearBottom*/)
         {
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
@@ -202,15 +184,6 @@ namespace TREX {
           postUniqueObservation(obs);
           state = IDLE;
         }
-//        else if (nearZ)
-//        {
-//          m_time_at_surface ++;
-//          if (m_time_at_surface >= secs_at_surface)
-//          {
-//            requestReference(m_lat, m_lon, m_speed, m_maxz);
-//            state = DESCEND;
-//          }
-//        }
         break;
         default:
           std::cerr << "[YOYO] IDLE" << std::endl;
@@ -319,7 +292,13 @@ namespace TREX {
       else if (s_refstate_tl == obs.object())
         m_lastRefState = obs;
       else if (s_control_tl == obs.object())
+      {
         m_lastControl = obs;
+        if (m_lastControl.predicate() != "TREX")
+        {
+          state = IDLE;
+        }
+      }
       else if (s_position_tl == obs.object())
         m_lastPosition = obs;
     }
