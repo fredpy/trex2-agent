@@ -162,9 +162,10 @@ class DrifterFollow extends AgentTimeline {
 	float    heading, heading_deg;
 	PathList path;
 	float    size;
-	bool     lagrangian;
+	bool     lagrangian, _bind_lagrangian;
 
 	heading == to_rad(heading_deg);
+	lagrangian == _bind_lagrangian;
 
 	speed_east  == v;
 	speed_north == u;
@@ -335,11 +336,11 @@ DrifterController::DoInitial {
     DrifterFollow me = object.command;
     Counter cpt = me.counter;
 
-    equals(effect Waypoint to);
+    meets(effect Waypoint to);
     true == empty(to.to_complete);
     to.wp_num == 1; // This is the first waypoint
 
-    contained_by(me.DoSurvey exec);
+    meets(me.DoSurvey exec);
     exec.id == to.path_id;
     exec.path == to.full_path;
     exec.center_lat == to.ref_lat;

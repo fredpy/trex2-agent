@@ -120,6 +120,44 @@ std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
     return out<<true;
 }
 
+
+void BooleanDomain::parseSingleton(std::string const &val) {
+  int v = string_cast<int>(val);
+  bool bv = (0!=v);
+  if( m_full ) {
+    m_full = false;
+    m_val = bv;
+  } else if( m_val!=bv )
+    throw EmptyDomain(*this, "setting to singleton resulted in boolean empty domain");
+
+}
+
+void BooleanDomain::parseLower(std::string const &val) {
+  int v = string_cast<int>(val);
+  bool bv = (0!=v);
+  if( bv ) {
+    if( m_full ) {
+      m_full = false;
+      m_val = bv;
+    } else if( m_val!=bv )
+      throw EmptyDomain(*this, "setting to lower bound to true resulted in boolean empty domain");
+  }
+}
+
+
+void BooleanDomain::parseUpper(std::string const &val)  {
+  int v = string_cast<int>(val);
+  bool bv = (0!=v);
+  if( !bv ) {
+    if( m_full ) {
+      m_full = false;
+      m_val = bv;
+    } else if( m_val!=bv )
+      throw EmptyDomain(*this, "setting to upper bound to false resulted in boolean empty domain");
+  }
+}
+
+
 std::ostream &BooleanDomain::print_upper(std::ostream &out) const {
   if( m_full || m_val )
     return out<<true;
