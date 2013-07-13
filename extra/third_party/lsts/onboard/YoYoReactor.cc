@@ -67,8 +67,8 @@ namespace TREX {
     }
 
     void
-    printReference(ReferenceRequest req) {
-      std::cerr << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")" << std::endl;
+    YoYoReactor::printReference(ReferenceRequest req) {
+      syslog(log::warn) << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")";
     }
 
     bool
@@ -98,13 +98,12 @@ namespace TREX {
       {
         v = m_lastPosition.getAttribute("altitude");
         FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
-        std::cerr << "altitude: " << alt << std::endl;
 
         double alt_ = v.domain().getTypedSingleton<double, true>();
         if (alt_ > 0 && alt_ < 2)
         {
           nearBottom = true;
-          std::cerr << "Detected bottom." << std::endl;
+          syslog(log::warn) << "Close to bottom: " << alt;
         }
       }
 
@@ -141,16 +140,16 @@ namespace TREX {
       {
         case (ASCEND):
             m_time_at_surface  = 0;
-        std::cerr << "[YOYO] ASCEND" << std::endl;
 
         if (nearXY)
         {
-          std::cerr << "near XY, going to the surface";
+          syslog(log::warn)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
         else if (nearZ)
         {
+          syslog(log::info)<< "Arrived at min depth, now going down...";
           requestReference(m_lat, m_lon, m_speed, m_maxz);
           state = DESCEND;
         }
@@ -158,23 +157,24 @@ namespace TREX {
 
         case (DESCEND):
         m_time_at_surface  = 0;
-        std::cerr << "[YOYO] DESCEND" << std::endl;
         if (nearXY)
         {
+          syslog(log::info)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
-        else if (nearZ /*|| nearBottom*/)
+        else if (nearZ || nearBottom)
         {
+          syslog(log::info)<< "Arrived at max depth, now going up...";
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
         }
         break;
 
         case (SURFACE):
-        std::cerr << "[YOYO] SURFACE" << std::endl;
         if (nearXY && nearZ)
         {
+          syslog(log::info)<< "Finished executing yoyo...";
           Observation obs = Observation(s_yoyo_tl, "Done");
           obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
           obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
@@ -186,7 +186,6 @@ namespace TREX {
         }
         break;
         default:
-          std::cerr << "[YOYO] IDLE" << std::endl;
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
@@ -204,7 +203,7 @@ namespace TREX {
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
-      std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
+      //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
       postGoal(g);
 
@@ -217,11 +216,9 @@ namespace TREX {
     void
     YoYoReactor::handleRequest(TREX::transaction::goal_id const &goal)
     {
-      std::cerr << "[YOYO] handleRequest(" << *(goal.get()) << ")" << std::endl;
-
       if ( s_trex_pred != m_lastControl.predicate() )
       {
-        std::cerr << "[YOYO] won't handle this request because TREX is not controlling the vehicle!" << std::endl;
+        syslog(log::warn)<< "won't handle this request because TREX is not controlling the vehicle!";
         return;
       }
 
@@ -257,7 +254,7 @@ namespace TREX {
       }
       else
       {
-        std::cerr << "[YOYO] request not valid" << std::endl;
+        syslog(log::warn)<< "Request is not valid: " << g->predicate();
       }
     }
 
@@ -270,11 +267,6 @@ namespace TREX {
     void
     YoYoReactor::notify(TREX::transaction::Observation const &obs)
     {
-      std::cerr << "[YOYO] notify(" << obs << ")" << std::endl;
-
-      // std::string timeline = obs.object().str();
-      //std::string predicate = obs.predicate().str();
-
       if (s_reference_tl == obs.object())
       {
         m_lastReference = obs;

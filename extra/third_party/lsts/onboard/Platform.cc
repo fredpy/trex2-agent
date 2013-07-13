@@ -296,6 +296,24 @@ namespace TREX
       }
     }
     
+    namespace {
+      struct LocaleBool {
+          bool data;
+          LocaleBool() {}
+          LocaleBool( bool data ) : data(data) {}
+          operator bool() const { return data; }
+          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
+              out << std::boolalpha << b.data;
+              return out;
+          }
+          friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
+              in >> std::boolalpha >> b.data;
+              return in;
+          }
+      };
+
+    }
+
     void
     Platform::enqueueGoalToken(std::string goald_id, TrexToken token)
     {
@@ -310,7 +328,7 @@ namespace TREX
       for (it = token.attributes.begin(); it != token.attributes.end(); it++)
       {
         ss << "\t<Variable name='" << (*it)->name << "'>\n";
-        
+
         switch ((*it)->attr_type)
         {
           case TrexAttribute::TYPE_FLOAT:
@@ -323,10 +341,15 @@ namespace TREX
             ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
             break;
           case TrexAttribute::TYPE_BOOL:
-            ss << "\t\t<bool min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            {
+                bool min_v = boost::lexical_cast<LocaleBool>((*it)->min).data,
+                    max_v = boost::lexical_cast<LocaleBool>((*it)->max).data;
+
+                ss << "\t\t<bool min='" << min_v << "' max='" << max_v << "'/>\n";
+            }
             break;
           case TrexAttribute::TYPE_ENUM:
-            ss << "\t\t<enum min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
+            ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
             break;
           default:
             std::cerr << "Error parsing attribute: ";
