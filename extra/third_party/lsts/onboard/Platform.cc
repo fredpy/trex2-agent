@@ -369,8 +369,6 @@ namespace TREX
       std::cerr << "Received goal:\n" << ss.str();
       
       receivedGoals.push(ss.str());
-      
-      
     }
     
     void
