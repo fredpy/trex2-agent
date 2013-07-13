@@ -329,6 +329,8 @@ namespace TREX
       {
         ss << "\t<Variable name='" << (*it)->name << "'>\n";
 
+        //FIXME if min == max, use value instead
+
         switch ((*it)->attr_type)
         {
           case TrexAttribute::TYPE_FLOAT:
@@ -345,7 +347,10 @@ namespace TREX
                 bool min_v = boost::lexical_cast<LocaleBool>((*it)->min).data,
                     max_v = boost::lexical_cast<LocaleBool>((*it)->max).data;
 
-                ss << "\t\t<bool min='" << min_v << "' max='" << max_v << "'/>\n";
+                if (min_v == max_v)
+                  ss << "\t\t<bool value='" << min_v << "'/>\n";
+                else
+                  ss << "\t\t<bool/>\n";
             }
             break;
           case TrexAttribute::TYPE_ENUM:
