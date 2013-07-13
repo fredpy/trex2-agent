@@ -5,6 +5,7 @@
 
   <OpenConditionManager defaultPriority="100">
     <FlawFilter component="goals"/>
+    <FlawFilter class-match="DrifterController" />
     <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
   

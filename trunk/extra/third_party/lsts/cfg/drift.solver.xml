@@ -21,6 +21,7 @@
       <Choice name="_bind_u_2"/>
       <Choice name="_bind_v_2"/>
       <Choice name="_bind_heading"/>
+      <Choice name="_bind_lagrangian"/>
     </FlawFilter>
     <FlawHandler component="toZero" />
   </UnboundVariableManager>
