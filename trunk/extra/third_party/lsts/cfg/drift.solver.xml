@@ -6,14 +6,14 @@
 
   <OpenConditionManager defaultPriority="40" component="EarliestFirst">
     <FlawFilter component="goals"/> 
-    <FlawHandler component="StandardOpenConditionHandler"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
 
 
   <!-- then resolve new goals -->
   <OpenConditionManager defaultPriority="2200" component="EarliestFirst" >
     <FlawFilter component="notGoals"/>
-    <FlawHandler component="StandardOpenConditionHandler"/>
+    <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
 
   <UnboundVariableManager defaultPriority="2300">
