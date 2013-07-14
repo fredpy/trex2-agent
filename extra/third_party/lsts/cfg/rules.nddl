@@ -14,6 +14,18 @@ ControlMode::DUNE {
 	contained_by(Navigator.Idle);
 }
 
+class NavActions {
+    
+    action DoGoing {
+	float orig_lat, orig_lon, orig_z;
+	float dist;
+    }
+    
+    NavActions() {
+	super();
+    }
+}
+
 Navigator::At {
 	float min_dist;
 	min_dist == 3;
@@ -28,47 +40,104 @@ Navigator::At {
 	duration == max(1, secs);
 }
 
-Navigator::Going {
 
-	met_by(Idle);
 
-	contained_by(condition ControlMode.TREX c);
-		c.start < start;	
 
-	contained_by(condition OperationalLimits.Limits limits);
-		if (z > 0.0) {
-			z < limits.max_depth;
-		}
-		else {
-			-1.0 * z < limits.max_altitude;
-			-1.0 * z > limits.min_altitude;
-		}
-		sane_pos(latitude, longitude, z);		
-		
-	meets(effect At at);
-		latitude == at.latitude;
-		longitude == at.longitude;
-		z == at.z;
-		speed == at.speed;
+NavActions::DoGoing {
+    contained_by(ControlMode.TREX c);
+    c.start < start;
 
-	met_by(condition EstimatedState.Position origin);
-		orig_lat == origin.latitude;
-		orig_lon == origin.longitude;
-		orig_z == origin.z;
+    contained_by(OperationalLimits.Limits limits);
+    ends(condition Navigator.Going go);
+    go.start <= start;
 
-	int my_start;
-	my_start == max(origin.start, c.start);
+    if( go.z > 0.0 ) {
+	go.z < limits.max_depth;
+    } else {
+	-1.0 * z < limits.max_altitude;
+	-1.0 * z > limits.min_altitude; 
+    }
+    meets(effect Navigator.At destination);
+    go.object == destination.object;
+    go.latitude == at.latitude;
+    go.longitude == at.longitude;
+    go.z == at.z;
+    go.speed == at.speed;
 
-	if(  my_start<= AGENT_CLOCK ) {
-		contains(condition Reference.Going g);
+    int my_start;
+    my_start >= c.start;
 
-		latitude == g.latitude;
-		longitude == g.longitude;
-		z == g.z;
-		speed == g.speed;
-		g.radius == -100;
-		concurrent(end, g.end);
-	}
+    dist == ll_distance(orig_lat, orig_lon, go.latitude, go.longitude);
+    
+    if( c.start <= AGENT_CLOCK ) {
+	// Gather my intial position only when I know I can take control
+	met_by(EstimatedState.Position origin);
+	orig_lat == origin.latitude;
+	orig_lon == origin.longitude;
+	orig_z == origin.z;
 
-	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
+	my_start == max(c.start, origin.start);
+    }
+    if( my_start >= AGENT_CLOCK ) {
+	contains(condition Reference.Going cmd);
+	cmd.latitude == go.latitude;
+	cmd.longitude == go.longitude;
+	cmd.z == go.z;
+	cmd.speed == g.speed;
+	cmd.radius == -100.0;
+	concurrent(end, cmd.end);
+    }
+
 }
+
+
+Navigator::Going {
+    sane_pos(latitude, longitude, z);
+    contained_by(ControlMode.TREX); // I am not Going if I am not running
+}
+
+
+// Navigator::Going {
+
+// 	met_by(Idle);
+
+// 	contained_by(condition ControlMode.TREX c);
+// 		c.start < start;	
+
+// 	contained_by(condition OperationalLimits.Limits limits);
+// 		if (z > 0.0) {
+// 			z < limits.max_depth;
+// 		}
+// 		else {
+// 			-1.0 * z < limits.max_altitude;
+// 			-1.0 * z > limits.min_altitude;
+// 		}
+// 		sane_pos(latitude, longitude, z);		
+		
+// 	meets(effect At at);
+// 		latitude == at.latitude;
+// 		longitude == at.longitude;
+// 		z == at.z;
+// 		speed == at.speed;
+
+// 	met_by(condition EstimatedState.Position origin);
+// 		orig_lat == origin.latitude;
+// 		orig_lon == origin.longitude;
+// 		orig_z == origin.z;
+
+// 	int my_start;
+// 	my_start == max(origin.start, c.start);
+
+// 	if(  my_start<= AGENT_CLOCK ) {
+// 		contains(condition Reference.Going g);
+
+// 		latitude == g.latitude;
+// 		longitude == g.longitude;
+// 		z == g.z;
+// 		speed == g.speed;
+// 		g.radius == -100;
+// 		concurrent(end, g.end);
+// 	}
+
+// 	dist == ll_distance(orig_lat, orig_lon, latitude, longitude);
+// }
