@@ -597,7 +597,7 @@ EUROPA::TokenSet CurrentState::getAllTokens(const EUROPA::TokenId& token)
           merged = token->getMergedTokens();
           merged.insert(token);
         }
-        else
+        else if( token->isMerged() )
         {
           merged = token->getActiveToken()->getMergedTokens();
           merged.insert(token->getActiveToken());
