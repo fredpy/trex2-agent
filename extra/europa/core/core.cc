@@ -208,12 +208,12 @@ namespace TREX {
           m_choices.push_back(new EUROPA::SOLVERS::RejectToken(m_client,m_flawedToken));
         
         
-#else
+#else // !EUROPA_HAVE_EFFECT
 	default_oc_dp::handleInitialize();
 	// invert the order or merging decisions
 	std::reverse(m_compatibleTokens.begin(), 
 		     m_compatibleTokens.end());
-#endif
+#endif // EUROPA_HAVE_EFFECT
       }
     }; // TREX::europa::TrexOpenConditionDP
 
