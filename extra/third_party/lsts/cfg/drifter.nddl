@@ -125,7 +125,6 @@ class Counter extends Timeline {
     predicate Holds {
 	int id;
 	0 <= id;
-	id <= start;
     }
 
     Counter() {}
@@ -181,12 +180,7 @@ class DrifterFollow extends AgentTimeline {
 }
 
 Counter::Holds {
-    if( start<=0 ) {
-	id == 0;
-    } else {
-	met_by(Holds prev);
-	id == prev.id + 1;
-    }
+    id == start;
 }
 
 DrifterFollow::Inactive {
@@ -358,7 +352,11 @@ DrifterController::DoInitial {
     // Check that I can start 
     contained_by(cpt.Holds cur);
     if( cur.start<= AGENT_CLOCK ) {
-	contained_by(condition Navigator.At dest);
+	// contained_by was often resulting on weird mergeing with previous waypoint
+	// instead we replace it by a meets that ewill force the vehicle to get there 
+	// even if it is already there
+	// contained_by(condition Navigator.At dest);
+	meets(condition Navigator.At dest);
 	dest.latitude == to.lat;
 	dest.longitude == to.lon;
 	dest.speed == vc.speed;
