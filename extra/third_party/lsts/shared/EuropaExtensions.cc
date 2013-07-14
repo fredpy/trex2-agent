@@ -41,14 +41,15 @@ namespace
   intersect(EUROPA::Domain& dom, EUROPA::edouble lb, EUROPA::edouble ub,
       double precision_error)
   {
-    if (ub > dom.getUpperBound()
-        && ub < std::numeric_limits<EUROPA::edouble>::infinity())
-      ub -= precision_error;
+    if (lb > dom.getUpperBound()
+        && lb < std::numeric_limits<EUROPA::edouble>::infinity())
+      lb -= precision_error;
 
-    if (lb < dom.getLowerBound()
-        && std::numeric_limits<EUROPA::edouble>::minus_infinity() < lb)
-      lb += precision_error;
-
+    if (ub < dom.getLowerBound()
+        && std::numeric_limits<EUROPA::edouble>::minus_infinity()<ub)
+      ub += precision_error;
+  
+    //debugMsg("trex:always", dom.toString() << " == ["<<lb<<", "<<ub<<"]");
     return dom.intersect(lb, ub);
   }
 
@@ -154,8 +155,8 @@ LatLonDisplace::handleExecute()
   if (!m_lat.isSingleton() || !m_lon.isSingleton() || !m_northing.isSingleton()
       || !m_easting.isSingleton())
     return;
-  if( m_latr.isSingleton() && m_lonr.isSingleton() )
-    return; // avoid to compute these twice
+//  if( m_latr.isSingleton() && m_lonr.isSingleton() )
+//    return; // avoid to compute these twice
 
   lat = cast_basis(m_lat.getSingletonValue());
   lon = cast_basis(m_lon.getSingletonValue());
@@ -163,8 +164,8 @@ LatLonDisplace::handleExecute()
   e = cast_basis(m_easting.getSingletonValue());
 
   WGS84::displace(n, e, 0, &lat, &lon, &dummy);
-  m_latr.set(lat);
-  m_lonr.set(lon);
+  intersect(m_latr,lat, lat, 1.7e-8);
+  intersect(m_lonr,lon, lon, 1.7e-8);
 }
 
 LatLonDisplacement::LatLonDisplacement(EUROPA::LabelStr const &name,
@@ -205,14 +206,14 @@ LatLonDist::handleExecute()
 {
   double lat1, lon1, lat2, lon2;
 
-  if (m_dist.isSingleton())
-  {
-    // While generally incomplete this approach avoid to
-    // compute the same distance over and over again ... and
-    // it should work as long as nobody constraints dist
-    // otherwise
-    return;
-  }
+//  if (m_dist.isSingleton())
+//  {
+//    // While generally incomplete this approach avoid to
+//    // compute the same distance over and over again ... and
+//    // it should work as long as nobody constraints dist
+//    // otherwise
+//    return;
+//  }
 
   if (m_lat1.isSingleton())
     lat1 = cast_basis(m_lat1.getSingletonValue());
@@ -234,7 +235,7 @@ LatLonDist::handleExecute()
 
   EUROPA::edouble dist = WGS84::distance(lat1, lon1, 0, lat2, lon2, 0);
 
-  // debugMsg("trex:always", m_dist.toString() << " == " << dist);
+//  debugMsg("trex:always", m_dist.toString() << " == " << dist << " inter " << m_dist.toString());
   intersect(m_dist, dist, dist, 0.5);
 }
 
@@ -418,8 +419,8 @@ RadDeg::handleExecute()
 {
   EUROPA::edouble d_lo, d_hi, r_lo, r_hi, tmp;
 
-  if (m_rad.isSingleton() && m_deg.isSingleton())
-    return;
+//  if (m_rad.isSingleton() && m_deg.isSingleton())
+//    return;
 
   m_rad.getBounds(r_lo, r_hi);
   m_deg.getBounds(d_lo, d_hi);
