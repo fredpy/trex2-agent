@@ -150,6 +150,36 @@ void details::node_impl::unuse(Symbol const &tl) {
 				     tl));
 }
 
+Observation details::node_impl::obs(utils::Symbol const &name,
+                                    utils::Symbol const &pred) {
+  SHARED_PTR<graph_impl> g = graph();
+  if( g ) {
+    boost::function<Observation ()> fn(boost::bind(&node_impl::obs_sync,
+                                                   this, name, pred));
+    return utils::strand_run(g->strand(), fn);
+  } else
+    // To be replaced
+    throw utils::Exception("Reactor detached from graph cannot build observation");
+}
+
+
+void details::node_impl::post_observation(Observation const &obs, bool echo) {
+  SHARED_PTR<graph_impl> g = graph();
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::post_obs_sync,
+                                     shared_from_this(),
+                                     obs, echo));
+}
+
+void details::node_impl::synchronize(TICK date) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::synch_sync,
+                                     shared_from_this(), date));
+}
+
+
+
 // strand protected calls
 
 void details::node_impl::unprovide_sync(SHARED_PTR<details::graph_impl> g, Symbol tl) {
@@ -185,6 +215,27 @@ bool details::node_impl::check_external_sync(Symbol name) const {
   return graph() && m_externals.end()!=m_externals.find(name);
 }
 
+Observation details::node_impl::obs_sync(Symbol name, Symbol pred) {
+  internal_map::const_iterator i = m_internals.find(name);
+  if( m_internals.end()==i )
+    throw utils::Exception("Cannot create observation for non intranl timeline "
+                           +name.str());
+  return i->second->obs(pred);
+}
+
+
+void details::node_impl::post_obs_sync(Observation o, bool echo) {
+  internal_map::iterator tl = m_internals.find(o.object());
+  if( m_internals.end()!=tl )
+    tl->second->post_observation(o, echo);
+  else
+    syslog(tlog::null, tlog::warn)<<"Ignoring post observation on non internal timeline.\n\t- "<<o;
+}
+
+void details::node_impl::synch_sync(TICK date) {
+  for(internal_map::iterator i=m_internals.begin(); m_internals.end()!=i; ++i)
+    i->second->synchronize(date);
+} 
 
 void details::node_impl::isolate(SHARED_PTR<details::graph_impl> const &g) {
   SHARED_PTR<node_impl> me = shared_from_this();

@@ -35,6 +35,8 @@
 # define H_trex_transaction_timeline_impl
 
 # include "../bits/transaction_fwd.hh"
+# include "../Observation.hh"
+# include "../Goal.hh"
 
 namespace TREX {
   namespace transaction {
@@ -128,6 +130,13 @@ namespace TREX {
           return m_graph.lock();
         }
         
+        TICK synch_date() const;
+        
+        void post_observation(Observation const &obs, bool echo=false);
+        void synchronize(TICK date);
+        
+        Observation obs(utils::Symbol const &pred);
+        
       private:
         /** @rbief timeline name */
         utils::Symbol        m_name;
@@ -149,6 +158,10 @@ namespace TREX {
          * A weak reference to the owner of this timeline 
          */
         node_id                     m_owner;
+        
+        boost::optional<Observation> m_last_obs, m_next_obs;
+        TICK m_last_synch;
+        bool m_echo;
       
         /** @brief Get owner of the timeline
          *
@@ -193,6 +206,9 @@ namespace TREX {
          */
         bool set_sync(SHARED_PTR<node_impl> const &n,
                       transaction_flags const &fl);
+        
+        void post_obs_sync(SHARED_PTR<node_impl> n, Observation o, bool echo);
+        void notify_sync(TICK date);
         
         friend class graph_impl;
         internal_impl() DELETED;

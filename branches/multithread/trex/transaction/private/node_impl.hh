@@ -219,6 +219,11 @@ namespace TREX {
          */
         void unuse(utils::Symbol const &tl);
         
+        Observation obs(utils::Symbol const &name, utils::Symbol const &pred);
+        void post_observation(Observation const &obs, bool echo = false);
+        
+        void synchronize(TICK date);
+        
       private:
         /** @brief Constructor 
          *
@@ -326,6 +331,11 @@ namespace TREX {
          * @post !external(tl)
          */
         void unuse_sync(utils::Symbol tl);
+        
+        Observation obs_sync(utils::Symbol name, utils::Symbol pred);
+        void post_obs_sync(Observation o, bool echo);
+        void synch_sync(TICK date);
+
         
         /** @brief Check for ownership
          *

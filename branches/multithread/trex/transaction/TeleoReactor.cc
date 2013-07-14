@@ -614,6 +614,10 @@ void TeleoReactor::observation_sync(Observation o, bool verbose) {
 }
 
 void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
+  SHARED_PTR<details::node_impl> n = m_impl.lock();
+  
+  n->post_observation(obs, verbose || is_verbose());
+  
   boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
                                           this, obs, verbose));
   utils::strand_run(m_graph.strand(), fn);
@@ -850,8 +854,9 @@ void TeleoReactor::publish_obs_sync(TICK date) {
   for(internal_set::const_iterator i=m_updates.begin();
       m_updates.end()!=i; ++i) {
     Observation const &o = (*i)->lastObservation();
-    if( (*i)->synchronize(date) )
-      syslog(obs)<<o;
+    if( (*i)->synchronize(date) ) {
+     //  syslog(obs)<<o;
+    }
   }
   m_updates.clear();
 }
@@ -880,6 +885,9 @@ bool TeleoReactor::doSynchronize() {
       boost::function<void ()> fn(boost::bind(&TeleoReactor::publish_obs_sync,
                                               this, getCurrentTick()));
       utils::strand_run(m_graph.strand(), fn);
+      
+      SHARED_PTR<details::node_impl> n = m_impl.lock();
+      n->synchronize(getCurrentTick());
     }
 //    m_obsTick = m_obsTick+1;
     return success;
@@ -916,6 +924,9 @@ void TeleoReactor::use_sync(TREX::utils::Symbol name, details::transaction_flags
 
 
 void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
+  SHARED_PTR<details::node_impl> n = m_impl.lock();
+  n->use(timeline, !control, plan_listen);
+  
   details::transaction_flags flag; // initialize all the flags to 0
   flag.set(0,control);        // update the control flag
   flag.set(1,plan_listen);    // update the plan_listen flag
@@ -935,6 +946,9 @@ void TeleoReactor::provide_sync(TREX::utils::Symbol name, details::transaction_f
 
 void TeleoReactor::provide(TREX::utils::Symbol const &timeline,
                            bool controllable, bool publish) {
+  SHARED_PTR<details::node_impl> n = m_impl.lock();
+  n->provide(timeline, !controllable, publish);
+
   details::transaction_flags flag;
   flag.set(0, controllable);
   flag.set(1, publish);
@@ -1130,22 +1144,15 @@ TeleoReactor::Logger::Logger(std::string const &dest, boost::asio::io_service &i
 }
 
 TeleoReactor::Logger::~Logger() {
-  //std::cerr<<"Destroy logger "<<std::endl;
-  //std::cerr<<" - schedulle : close potential tick tag"<<std::endl;
   
   m_strand.post(boost::bind(&Logger::close_tick, this));
-  //std::cerr<<" - build task : close the main tag"<<std::endl;
   boost::packaged_task<void> close_xml(boost::bind(&Logger::direct_write,
                                                    this, "</Log>",
                                                    true));
-  //std::cerr<<" - get future of the task"<<std::endl;
   boost::unique_future<void> completed = close_xml.get_future();
-  //std::cerr<<" - scedulled task execution"<<std::endl;
   m_strand.post(boost::bind(&boost::packaged_task<void>::operator(),
                             boost::ref(close_xml)));
-  //std::cerr<<" - wait for task completion"<<std::endl;
   completed.wait();
-  //std::cerr<<" - close the file"<<std::endl;
   m_file.close();
 }
 

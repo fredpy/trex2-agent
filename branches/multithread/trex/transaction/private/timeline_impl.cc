@@ -87,6 +87,34 @@ details::node_id details::internal_impl::owner() const {
   }
 }
 
+Observation details::internal_impl::obs(utils::Symbol const &pred) {
+  return Observation(name(), pred);
+}
+
+
+// manipulators
+
+void details::internal_impl::post_observation(Observation const &obs,
+                                              bool echo) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  
+  if( g ) {
+    SHARED_PTR<node_impl> node = m_owner.lock();
+    if( node ) {
+      g->strand().post(boost::bind(&internal_impl::post_obs_sync,
+                                   shared_from_this(), node, obs, echo));
+    }
+  }
+}
+
+void details::internal_impl::synchronize(TICK date) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  if( g ) {
+    g->strand().post(boost::bind(&internal_impl::notify_sync,
+                                 shared_from_this(), date));
+  }
+}
+
 // strand protected calls
 
 details::node_id details::internal_impl::owner_sync() const {
@@ -98,6 +126,7 @@ bool details::internal_impl::reset_sync() {
     m_owner.reset();
     m_flags.reset();
     // TODO set myself as faile
+    m_next_obs = obs("Failed");
     return true;
   }
   return false;
@@ -119,6 +148,42 @@ bool details::internal_impl::set_sync(SHARED_PTR<details::node_impl> const &n,
     return true;
   }
 }
+
+void details::internal_impl::post_obs_sync(SHARED_PTR<node_impl> n,
+                                           Observation o, bool echo) {
+  SHARED_PTR<node_impl> owner = m_owner.lock();
+  
+  if( n==owner ) {
+    if( m_next_obs ) {
+      owner->syslog(name(), tlog::warn)<<"post observation overrule the previous pending.\n\t - lost observation is "<<o;
+    }
+    m_next_obs = o;
+    m_echo = echo;
+  } else if( n ) {
+    n->syslog(tlog::null, tlog::error)<<"Cannot post observation on non owned timeline "<<name()<<".\n\t- observation was :"<<o;
+  } else {
+    owner->syslog(name(), tlog::warn)<<"Ignored post observation from a null reactor.\n\t- observation was: "<<o;
+  }
+}
+
+void details::internal_impl::notify_sync(TICK date) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  
+  if( g ) {
+    if( m_next_obs ) {
+      m_last_obs = m_next_obs;
+      m_next_obs.reset(); // remove cached observation
+      m_last_synch = date;
+      // Emit the observation
+      
+      if( m_echo )
+        g->syslog(name(), "ASSERT")<<"["<<date<<"] "<<(*m_last_obs);
+    } else {
+      // emit no observation but tick
+    }
+  }
+}
+
 
 /*
  * class TREX::transaction::details::external_impl
