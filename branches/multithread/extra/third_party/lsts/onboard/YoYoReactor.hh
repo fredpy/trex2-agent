@@ -70,6 +70,8 @@ namespace TREX {
 
       void requestReference(double lat, double lon, double speed, double z);
 
+      void printReference(ReferenceRequest req);
+
       virtual
       ~YoYoReactor();
       

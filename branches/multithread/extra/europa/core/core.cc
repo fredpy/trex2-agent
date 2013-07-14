@@ -52,6 +52,7 @@
 #include <trex/europa/SynchronizationManager.hh>
 #include <trex/europa/TrexThreatDecisionPoint.hh>
 
+#include "trex/europa/bits/europa_helpers.hh"
 #include "private/CurrentState.hh"
 
 // include plasma header as system files in order to disable warnings
@@ -60,6 +61,8 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/DataTypes.hh>
 # include <trex/europa/bits/system_header.hh>
 # define TREX_PP_SYSTEM_FILE <PLASMA/OpenConditionDecisionPoint.hh>
+# include <trex/europa/bits/system_header.hh>
+# define TREX_PP_SYSTEM_FILE <PLASMA/TokenVariable.hh>
 # include <trex/europa/bits/system_header.hh>
 
 
@@ -133,16 +136,21 @@ namespace TREX {
     }; // TREX::europa::CoreExtensions
 
 
-    class TrexOpenConditionDP 
-      :public EUROPA::SOLVERS::OpenConditionDecisionPoint {
+#ifdef EUROPA_HAVE_EFFECT
+    typedef EUROPA::SOLVERS::SupportedOCDecisionPoint default_oc_dp;
+
+#else
+    typedef EUROPA::SOLVERS::OpenConditionDecisionPoint default_oc_dp;
+#endif
+    
+    
+    class TrexOpenConditionDP:public default_oc_dp {
     public:
       TrexOpenConditionDP(EUROPA::DbClientId const &client,
 			  EUROPA::TokenId const &flawed,
 			  EUROPA::TiXmlElement const &configData,
 			  EUROPA::LabelStr const &explanation = "trex")
-	:EUROPA::SOLVERS::OpenConditionDecisionPoint(client, flawed,
-						     configData, 
-						     explanation) {
+	:default_oc_dp(client, flawed, configData, explanation) {
         flawed->incRefCount();
       }
       ~TrexOpenConditionDP() {
@@ -159,10 +167,53 @@ namespace TREX {
 
     private:
       void handleInitialize() {
-	EUROPA::SOLVERS::OpenConditionDecisionPoint::handleInitialize();
+#ifdef EUROPA_HAVE_EFFECT
+        // There's no easty way to tweak SupportedOCDecisionPoint after its
+        // init. So I just copy pasted the code instead
+        const EUROPA::StateDomain stateDomain(m_flawedToken->getState()->lastDomain());
+        
+        if(stateDomain.isMember(EUROPA::Token::MERGED)){
+          std::vector<EUROPA::TokenId> compatibleTokens;
+          
+          m_flawedToken->getPlanDatabase()->getCompatibleTokens(
+                                                                m_flawedToken,
+                                                                compatibleTokens,
+                                                                std::numeric_limits<unsigned int>::max(),
+                                                                true);
+          
+          std::reverse(compatibleTokens.begin(), compatibleTokens.end());
+
+          // comment from europa code :
+          // TODO: if flawed token is a fact, make sure we only look at other facts
+          // trex comment: the above is weird ....
+          if (compatibleTokens.size() > 0)
+            m_choices.push_back(new EUROPA::SOLVERS::MergeToken(m_client,m_flawedToken,compatibleTokens));
+        }
+        
+        if(stateDomain.isMember(Token::ACTIVE)) {
+          SchemaId schema = m_client->getSchema();
+          // TODO: PSToken::getTokenType() should return token type, not token type name
+          TokenTypeId tokenType = schema->getTokenType(m_flawedToken->getFullTokenType());
+          std::vector<TokenTypeId> supportActionTypes = schema->getTypeSupporters(tokenType);
+          // TODO: allow heuristic function to be passed as a parameter to SupportToken
+          if (!m_flawedToken->isFact() &&
+              !m_flawedToken->hasAttributes(PSTokenType::EFFECT) &&
+              (supportActionTypes.size() > 0))
+            m_choices.push_back(new EUROPA::SOLVERS::SupportToken(m_client,m_flawedToken,supportActionTypes));
+          else
+            m_choices.push_back(new EUROPA::SOLVERS::ActivateToken(m_client,m_flawedToken));
+        }
+        
+        if(stateDomain.isMember(Token::REJECTED))
+          m_choices.push_back(new EUROPA::SOLVERS::RejectToken(m_client,m_flawedToken));
+        
+        
+#else // !EUROPA_HAVE_EFFECT
+	default_oc_dp::handleInitialize();
 	// invert the order or merging decisions
 	std::reverse(m_compatibleTokens.begin(), 
 		     m_compatibleTokens.end());
+#endif // EUROPA_HAVE_EFFECT
       }
     }; // TREX::europa::TrexOpenConditionDP
 

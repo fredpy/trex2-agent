@@ -28,7 +28,7 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_reference_tl("reference");
     utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
     utils::Symbol const YoYoReactor::s_control_tl("control");
-    utils::Symbol const YoYoReactor::s_position_tl("position");
+    utils::Symbol const YoYoReactor::s_position_tl("estate");
 
     utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
 
@@ -67,8 +67,8 @@ namespace TREX {
     }
 
     void
-    printReference(ReferenceRequest req) {
-      std::cerr << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")" << std::endl;
+    YoYoReactor::printReference(ReferenceRequest req) {
+      syslog(log::warn) << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")";
     }
 
     bool
@@ -94,31 +94,21 @@ namespace TREX {
       int secs_at_surface = 60;
 
 
-      printReference(m_lastSeenRef);
-      printReference(m_lastSentRef);
-
-      if (m_lastPosition.hasAttribute("alt"))
+      if (m_lastPosition.hasAttribute("altitude"))
       {
-        v = m_lastRefState.getAttribute("altitude");
-        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
         v = m_lastPosition.getAttribute("altitude");
+        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
 
         double alt_ = v.domain().getTypedSingleton<double, true>();
         if (alt_ > 0 && alt_ < 2)
         {
           nearBottom = true;
-          std::cerr << "Detected bottom." << std::endl;
+          syslog(log::warn) << "Close to bottom: " << alt;
         }
       }
 
       if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
-        std::cerr << "sent and seen references don't match." << std::endl;
         return true;
-      }
-
-      if (nearBottom)
-      {
-
       }
 
       if (m_lastRefState.hasAttribute("near_z"))
@@ -150,49 +140,41 @@ namespace TREX {
       {
         case (ASCEND):
             m_time_at_surface  = 0;
-        std::cerr << "[YOYO] ASCEND" << std::endl;
 
         if (nearXY)
         {
-          std::cerr << "near XY, going to the surface";
+          syslog(log::warn)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
         else if (nearZ)
         {
-          //          if (m_time_underwater >= m_secs_underwater)
-          //          {
-          //            requestReference(m_lat, m_lon, m_speed, 0);
-          //            state = SURFACE;
-          //          }
-          //          else
-          //          {
+          syslog(log::info)<< "Arrived at min depth, now going down...";
           requestReference(m_lat, m_lon, m_speed, m_maxz);
           state = DESCEND;
-          //          }
         }
         break;
 
         case (DESCEND):
-                        //m_time_underwater ++;
         m_time_at_surface  = 0;
-        std::cerr << "[YOYO] DESCEND" << std::endl;
         if (nearXY)
         {
+          syslog(log::info)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
         else if (nearZ || nearBottom)
         {
+          syslog(log::info)<< "Arrived at max depth, now going up...";
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
         }
         break;
 
         case (SURFACE):
-        std::cerr << "[YOYO] SURFACE" << std::endl;
         if (nearXY && nearZ)
         {
+          syslog(log::info)<< "Finished executing yoyo...";
           Observation obs = Observation(s_yoyo_tl, "Done");
           obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
           obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
@@ -202,18 +184,8 @@ namespace TREX {
           postUniqueObservation(obs);
           state = IDLE;
         }
-//        else if (nearZ)
-//        {
-//          m_time_at_surface ++;
-//          if (m_time_at_surface >= secs_at_surface)
-//          {
-//            requestReference(m_lat, m_lon, m_speed, m_maxz);
-//            state = DESCEND;
-//          }
-//        }
         break;
         default:
-          std::cerr << "[YOYO] IDLE" << std::endl;
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
@@ -231,7 +203,7 @@ namespace TREX {
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
-      std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
+      //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
       postGoal(g);
 
@@ -244,11 +216,9 @@ namespace TREX {
     void
     YoYoReactor::handleRequest(TREX::transaction::goal_id const &goal)
     {
-      std::cerr << "[YOYO] handleRequest(" << *(goal.get()) << ")" << std::endl;
-
       if ( s_trex_pred != m_lastControl.predicate() )
       {
-        std::cerr << "[YOYO] won't handle this request because TREX is not controlling the vehicle!" << std::endl;
+        syslog(log::warn)<< "won't handle this request because TREX is not controlling the vehicle!";
         return;
       }
 
@@ -284,7 +254,7 @@ namespace TREX {
       }
       else
       {
-        std::cerr << "[YOYO] request not valid" << std::endl;
+        syslog(log::warn)<< "Request is not valid: " << g->predicate();
       }
     }
 
@@ -297,11 +267,6 @@ namespace TREX {
     void
     YoYoReactor::notify(TREX::transaction::Observation const &obs)
     {
-      std::cerr << "[YOYO] notify(" << obs << ")" << std::endl;
-
-      // std::string timeline = obs.object().str();
-      //std::string predicate = obs.predicate().str();
-
       if (s_reference_tl == obs.object())
       {
         m_lastReference = obs;
@@ -319,7 +284,13 @@ namespace TREX {
       else if (s_refstate_tl == obs.object())
         m_lastRefState = obs;
       else if (s_control_tl == obs.object())
+      {
         m_lastControl = obs;
+        if (m_lastControl.predicate() != "TREX")
+        {
+          state = IDLE;
+        }
+      }
       else if (s_position_tl == obs.object())
         m_lastPosition = obs;
     }
