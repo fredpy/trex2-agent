@@ -222,7 +222,7 @@ DrifterController::EndSurvey {
     _bind_u_2 < vc._hspeed_2;
     _bind_v_2 < vc._hspeed_2;
 
-    if( 0==exec.speed ) {
+    if( 0.0==exec.speed ) {
 	exec.cos_angle == cos(survey.heading_deg);
 	exec.sin_angle == sin(survey.heading_deg);
     } else {
