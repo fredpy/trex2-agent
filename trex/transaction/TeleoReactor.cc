@@ -778,11 +778,8 @@ bool TeleoReactor::newTick() {
         <<date_str(final)<<" ("<<final<<").";
     
     m_firstTick = false;
-  } else 
-    m_stat_log<<(getCurrentTick()-1)<<", "
-              <<m_synch_usage.count()
-              <<", "<<m_synch_rt.count()
-              <<", "<<m_deliberation_usage.count()
+  } else
+    m_stat_log<<", "<<m_deliberation_usage.count()
               <<", "<<m_delib_rt.count()
               <<", "<<m_tick_steps<<std::endl;
   m_tick_steps = 0;
@@ -869,8 +866,10 @@ namespace  {
 bool TeleoReactor::doSynchronize() {
   if( NULL!=m_trLog )
     m_trLog->synchronize();
+  bool stat_logged = false;
   
   try {
+    
     bool success;
     {
       // collect information from external timelines 
@@ -881,6 +880,9 @@ bool TeleoReactor::doSynchronize() {
         chronograph<stat_clock> usage(m_synch_usage);
         success = synchronize();
       }
+      m_stat_log<<getCurrentTick()<<", "<<m_synch_usage.count()
+      <<", "<<m_synch_rt.count()<<std::flush;
+      stat_logged = true;
     }
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
@@ -897,7 +899,11 @@ bool TeleoReactor::doSynchronize() {
     }
     m_obsTick = m_obsTick+1;
     
-    return success;
+    if( !stat_logged ) {
+      m_stat_log<<getCurrentTick()<<", "<<m_synch_usage.count()
+      <<", "<<m_synch_rt.count()<<std::flush;
+    }
+   return success;
   } catch(utils::Exception const &e) {
     syslog(error)<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
