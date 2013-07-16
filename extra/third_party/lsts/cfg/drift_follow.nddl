@@ -33,6 +33,10 @@ PathList square = new PathList(upper_left, lower_left,
 
 PathList go_to = new PathList(center, nilPath);
 
+Navigator::Failed {
+  start >= MISSION_END;
+}
+
 /*
  * TREX timelines
  */
