@@ -92,7 +92,7 @@ NavActions::DoGoing {
 
 	my_start == max(c.start, origin.start);
     }
-    if( my_start >= AGENT_CLOCK ) {
+    if( my_start <= AGENT_CLOCK ) {
 	contains(condition YoYoController.Exec cmd);
 	cmd.latitude == go.latitude;
 	cmd.longitude == go.longitude;
