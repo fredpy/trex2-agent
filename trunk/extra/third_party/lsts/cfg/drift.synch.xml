@@ -5,7 +5,7 @@
 
   <OpenConditionManager defaultPriority="100">
     <FlawFilter component="goals"/>
-    <!-- Waypoint tokens are not used in synchronization and can mislead it -->
+    <!-- uncomment if trex still crash on 2nd goal posting -->
     <FlawFilter predicate-match="Waypoint" />
     <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
