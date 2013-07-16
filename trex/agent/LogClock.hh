@@ -81,6 +81,8 @@ namespace TREX {
       duration_type m_period;
       std::list<tick_info> m_ticks;
       size_t m_counter;
+      boost::optional<transaction::TICK> m_last;
+      
       // TREX::transaction::TICK m_last;
     }; // TREX::agent::LogClock
 

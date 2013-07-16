@@ -329,7 +329,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
   utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
-  m_stat_log<<"tick, synch_ns, delib_ns, n_steps\n";
+  m_stat_log<<"tick, synch_ns, synch_rt_ns, delib_ns, delib_rt_ns, n_steps\n";
      
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = getName().str()+".tr.log";
@@ -781,7 +781,9 @@ bool TeleoReactor::newTick() {
   } else 
     m_stat_log<<(getCurrentTick()-1)<<", "
               <<m_synch_usage.count()
+              <<", "<<m_synch_rt.count()
               <<", "<<m_deliberation_usage.count()
+              <<", "<<m_delib_rt.count()
               <<", "<<m_tick_steps<<std::endl;
   m_tick_steps = 0;
   
@@ -793,6 +795,7 @@ bool TeleoReactor::newTick() {
 //  if( m_deliberation_usage > stat_duration::zero() )
 //    syslog("stats")<<" delib="<<boost::chrono::duration_short<<m_deliberation_usage;
   m_deliberation_usage = stat_duration::zero();
+  m_delib_rt = rt_clock::duration::zero();
   
   if( NULL!=m_trLog )
     m_trLog->newTick(getCurrentTick());
@@ -842,16 +845,42 @@ void TeleoReactor::doNotify() {
     notify(*i);
 }
 
+namespace  {
+
+  template<class Clock>
+  class chronograph {
+  public:
+    typedef typename Clock::time_point time_point;
+    typedef typename Clock::duration   duration;
+    
+    chronograph(duration &dest):m_start(Clock::now()), output(dest) {}
+    ~chronograph() {
+      output = Clock::now()-m_start;
+    }
+    
+  private:
+    time_point m_start;
+    duration &output;
+  };
+  
+}
+
 
 bool TeleoReactor::doSynchronize() {
   if( NULL!=m_trLog )
     m_trLog->synchronize();
+  
   try {
     bool success;
     {
       // collect information from external timelines 
       doNotify();
-      success = synchronize();      
+      {
+        // measure timing only for synchronization call
+        chronograph<rt_clock> real_time(m_synch_rt);
+        chronograph<stat_clock> usage(m_synch_usage);
+        success = synchronize();
+      }
     }
     if( success ) {
       for(internal_set::const_iterator i=m_updates.begin();
@@ -867,6 +896,7 @@ bool TeleoReactor::doSynchronize() {
       m_updates.clear();
     }
     m_obsTick = m_obsTick+1;
+    
     return success;
   } catch(utils::Exception const &e) {
     syslog(error)<<"Exception caught: "<<e;
@@ -882,10 +912,13 @@ bool TeleoReactor::doSynchronize() {
 void TeleoReactor::step() {
   if( NULL!=m_trLog )
     m_trLog->step();
+  rt_clock::time_point start_rt = rt_clock::now();
   stat_clock::time_point start = stat_clock::now();
   resume();
   stat_clock::duration delta = stat_clock::now()-start;
+  rt_clock::duration delta_rt = rt_clock::now()-start_rt;
   m_deliberation_usage += delta;
+  m_delib_rt += delta_rt;
   m_nSteps += 1;
   m_tick_steps +=1;
 }

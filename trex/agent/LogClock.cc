@@ -88,11 +88,17 @@ LogClock::LogClock(bpt::ptree::value_type &node)
   m_period = Clock::duration_type(parse_attr<Clock::duration_type::rep>(tks, "rate"));
   bpt::ptree::assoc_iterator i, last;
   boost::tie(i, last) = tks.equal_range("tick");
+  boost::optional<transaction::TICK> prev;
   for(; last!=i; ++i) {
     tick_info tck(*i);
-    if( tck.count>0 ) 
+    if( tck.count>0 ) {
+      if( prev ) {
+        if( tck.date > 1+(*prev) )
+          syslog(warn)<<"Missing tick(s) between "<<(*prev)<<" and "<<tck.date;
+      }
+      prev = tck.date;
       m_ticks.push_back(tck);
-    else 
+    } else
       syslog(warn)<<"Skipping tick "<<tck.date<<" with 0 count.";
   }
   if( m_ticks.empty() )
@@ -122,6 +128,14 @@ bool LogClock::free() const {
 void LogClock::doSleep() {
   // advance to next tick
   m_ticks.pop_front();
+  if( !m_ticks.empty() ) {
+    transaction::TICK cur = m_ticks.front().date;
+    
+    if( m_last && (cur > 1+(*m_last)) )
+      syslog(warn)<<"The clock skipped tick(s) between "<<(*m_last)
+                  <<" and "<<cur;
+    m_last = cur;
+  }
   m_counter = 0;
 }
 

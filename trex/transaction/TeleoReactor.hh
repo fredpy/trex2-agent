@@ -97,12 +97,15 @@ namespace TREX {
 # if defined(CPP11_HAS_CHRONO)
       // standard do not support processing time AFAIK
       typedef CHRONO::high_resolution_clock stat_clock;
-# elif defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-      typedef CHRONO::thread_clock stat_clock;
+      typedef CHRONO::high_resolution_clock rt_clock;
 # else
       // boost does on the other hand
+      // Not we used to pick the thrad clock but user_time
+      // is better measure as some tasks of trex are distributed
+      // in multiple threads
       typedef CHRONO::process_user_cpu_clock stat_clock;
-# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+      typedef CHRONO::steady_clock     rt_clock;
+# endif // CPP11_HAS_CHRONO      
       typedef stat_clock::duration stat_duration;
       
       static utils::Symbol const obs;
@@ -1038,7 +1041,8 @@ namespace TREX {
       void setMaxTick(TICK max); 
 
     private:
-      stat_duration m_synch_usage, m_deliberation_usage;
+      stat_duration m_synch_usage, m_synch_rt,
+        m_deliberation_usage, m_delib_rt;
       
       std::ofstream m_stat_log;
       
