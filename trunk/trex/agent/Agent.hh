@@ -527,13 +527,8 @@ namespace TREX {
 
       typedef TREX::transaction::TeleoReactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;
-#ifdef CPP11_HAS_CHRONO 
-      // ubuntu 12.04 does not hav a strady clock: 
-      //   this a quick hack until I find a better way
-      typedef CHRONO::high_resolution_clock  rt_clock;
-#else
-      typedef CHRONO::steady_clock     rt_clock;
-#endif 
+      typedef TREX::transaction::TeleoReactor::rt_clock   rt_clock;
+
       std::ofstream m_stat_log;
 
       clock_ref                  m_clock;
