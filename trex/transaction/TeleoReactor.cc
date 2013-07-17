@@ -329,7 +329,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
 
   utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
-  m_stat_log<<"tick, synch_ns, synch_rt_ns, delib_ns, delib_rt_ns, n_steps\n";
+  m_stat_log<<"tick, tick_ns, tick_rt_ns, synch_ns, synch_rt_ns, delib_ns, delib_rt_ns, n_steps\n";
      
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = getName().str()+".tr.log";
@@ -798,7 +798,12 @@ bool TeleoReactor::newTick() {
     m_trLog->newTick(getCurrentTick());
 
   try {
-    handleTickStart(); // allow derived class processing
+    {
+      utils::chronograph<stat_clock> stat_chron(m_start_usage);
+      utils::chronograph<rt_clock> rt_chron(m_start_rt);
+    
+      handleTickStart(); // allow derived class processing
+    }
 
     // Dispatched goals management
     details::external i = ext_begin();
@@ -844,21 +849,6 @@ void TeleoReactor::doNotify() {
 
 namespace  {
 
-  template<class Clock>
-  class chronograph {
-  public:
-    typedef typename Clock::time_point time_point;
-    typedef typename Clock::duration   duration;
-    
-    chronograph(duration &dest):m_start(Clock::now()), output(dest) {}
-    ~chronograph() {
-      output = Clock::now()-m_start;
-    }
-    
-  private:
-    time_point m_start;
-    duration &output;
-  };
   
 }
 
@@ -876,11 +866,13 @@ bool TeleoReactor::doSynchronize() {
       doNotify();
       {
         // measure timing only for synchronization call
-        chronograph<rt_clock> real_time(m_synch_rt);
-        chronograph<stat_clock> usage(m_synch_usage);
+        utils::chronograph<rt_clock> real_time(m_synch_rt);
+        utils::chronograph<stat_clock> usage(m_synch_usage);
         success = synchronize();
       }
-      m_stat_log<<getCurrentTick()<<", "<<m_synch_usage.count()
+      m_stat_log<<getCurrentTick()<<", "<<m_start_usage.count()
+      <<", "<<m_start_rt.count()
+      <<", "<<m_synch_usage.count()
       <<", "<<m_synch_rt.count()<<std::flush;
       stat_logged = true;
     }
@@ -918,11 +910,14 @@ bool TeleoReactor::doSynchronize() {
 void TeleoReactor::step() {
   if( NULL!=m_trLog )
     m_trLog->step();
-  rt_clock::time_point start_rt = rt_clock::now();
-  stat_clock::time_point start = stat_clock::now();
-  resume();
-  stat_clock::duration delta = stat_clock::now()-start;
-  rt_clock::duration delta_rt = rt_clock::now()-start_rt;
+  stat_clock::duration delta;
+  rt_clock::duration delta_rt;
+  
+  {
+    utils::chronograph<rt_clock> rt_chron(delta_rt);
+    utils::chronograph<stat_clock> stat_chron(delta);
+    resume();
+  }
   m_deliberation_usage += delta;
   m_delib_rt += delta_rt;
   m_nSteps += 1;
