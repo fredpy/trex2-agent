@@ -564,6 +564,7 @@ bool Assembly::relax(bool aggressive) {
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
   planner()->reset();
+  m_updated_commit = aggressive; // ask for archiving whenever we have a full relax
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
