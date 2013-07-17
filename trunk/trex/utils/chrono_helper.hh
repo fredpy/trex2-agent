@@ -112,6 +112,27 @@ namespace TREX {
 # endif
     }
     
+    template<class Clock>
+    class chronograph :boost::noncopyable {
+    public:
+      typedef typename Clock::time_point time_point;
+      typedef typename Clock::duration   duration;
+      
+      chronograph(duration &dest):m_start(Clock::now()), output(dest) {
+        output = duration();
+      }
+      ~chronograph() {
+        output = Clock::now()-m_start;
+      }
+      
+    private:
+      time_point m_start;
+      duration &output;
+      
+      chronograph() DELETED;
+    };
+
+    
   } // TREX::utils
 } // TREX
 

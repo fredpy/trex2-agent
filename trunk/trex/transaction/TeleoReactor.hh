@@ -105,7 +105,7 @@ namespace TREX {
       // Not we used to pick the thrad clock but user_time
       // is better measure as some tasks of trex are distributed
       // in multiple threads
-      typedef CHRONO::process_cpu_clock stat_clock;
+      typedef CHRONO::process_real_cpu_clock stat_clock;
       typedef CHRONO::steady_clock     rt_clock;
 # endif // CPP11_HAS_CHRONO      
       typedef stat_clock::duration stat_duration;
@@ -1044,8 +1044,8 @@ namespace TREX {
       void setMaxTick(TICK max); 
 
     private:
-      stat_duration m_synch_usage, m_deliberation_usage;
-      rt_clock::duration m_synch_rt, m_delib_rt;
+      stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
+      rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
       std::ofstream m_stat_log;
       
