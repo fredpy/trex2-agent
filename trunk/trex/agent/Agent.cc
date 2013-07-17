@@ -757,7 +757,7 @@ void Agent::initComplete() {
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
     " delib_ns, delib_rt_ns, delib_steps,"
-    " sleep_ns"<<std::endl;
+    " planned_sleep, sleep_cnt, sleep_ns"<<std::endl;
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
@@ -909,7 +909,8 @@ bool Agent::doNext() {
   size_t count = 0; //slp_count = 0;
   bool completed = false;
   stat_clock::duration delib;
-  rt_clock::duration delib_rt, sleep_time;
+  rt_clock::duration delib_rt, sleep_time, sleep_req;
+  size_t sl_count = 0;
   
   bool print_delib = true;
   
@@ -933,10 +934,11 @@ bool Agent::doNext() {
     {
       utils::chronograph<rt_clock> sleep_chrono(sleep_time);
       while( valid() && m_clock->tick()==getCurrentTick() ) {
-        m_clock->sleep();
-        // ++slp_count;
+        sleep_req += CHRONO::duration_cast<rt_clock::duration>(m_clock->sleep());
+        ++sl_count;
       }
     }
+    
     
     if( valid() )
       updateTick(m_clock->tick());
@@ -946,7 +948,7 @@ bool Agent::doNext() {
   }
   if( print_delib )
     m_stat_log<<", "<<delib.count()<<", "<<count<<", ";
-  m_stat_log<<sleep_time.count()<<std::endl;
+  m_stat_log<<sleep_req.count()<<", "<<sl_count<<", "<<sleep_time.count()<<std::endl;
 
   return valid();
 }

@@ -125,7 +125,7 @@ bool LogClock::free() const {
   return !m_ticks.empty() && m_counter < m_ticks.front().count;
 }
 
-void LogClock::doSleep() {
+LogClock::duration_type LogClock::doSleep() {
   // advance to next tick
   m_ticks.pop_front();
   if( !m_ticks.empty() ) {
@@ -137,6 +137,7 @@ void LogClock::doSleep() {
     m_last = cur;
   }
   m_counter = 0;
+  return duration_type();
 }
 
 std::string LogClock::info() const {
