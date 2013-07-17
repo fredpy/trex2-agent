@@ -113,13 +113,15 @@ TICK Clock::tick() {
   return ret;
 }
 
-void Clock::sleep() {
+Clock::duration_type Clock::sleep() {
   m_free = false;
-  doSleep();
+  return doSleep();
 }
 
-void Clock::doSleep() {
-  sleep(getSleepDelay());
+Clock::duration_type Clock::doSleep() {
+  Clock::duration_type delay = getSleepDelay();
+  sleep(delay);
+  return delay;
 }
 
 TREX::utils::log::stream Clock::syslog(utils::Symbol const &kind) const {

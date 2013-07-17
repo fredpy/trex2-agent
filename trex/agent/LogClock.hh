@@ -65,7 +65,7 @@ namespace TREX {
       std::string info() const;
      
     private:
-      void doSleep();
+      duration_type doSleep();
       TREX::transaction::TICK getNextTick();
       bool free() const;
       
