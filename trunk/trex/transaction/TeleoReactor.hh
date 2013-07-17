@@ -1063,7 +1063,7 @@ namespace TREX {
       void provide_sync(TREX::utils::Symbol name, details::transaction_flags f);
       bool unprovide_sync(TREX::utils::Symbol name);
      
-      void observation_sync(Observation o, TICK date, bool verbose);
+      void observation_sync(Observation o, bool verbose);
       bool goal_sync(goal_id g);
       bool recall_sync(goal_id g);
       

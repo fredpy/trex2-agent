@@ -590,20 +590,20 @@ double TeleoReactor::workRatio() {
   return NAN;
 }
 
-void TeleoReactor::observation_sync(Observation o, TICK date, bool verbose) {
+void TeleoReactor::observation_sync(Observation o, bool verbose) {
   internal_set::iterator i = m_internals.find(o.object());
   
   if( m_internals.end()==i )
     throw boost::enable_current_exception(SynchronizationError(*this, "attempted to post observation on "+
                                o.object().str()+" which is not Internal."));
   
-  (*i)->postObservation(date, o, verbose);
+  (*i)->postObservation(o, verbose);
   m_updates.insert(*i);
 }
 
 void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
   boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
-                                          this, obs, m_obsTick, verbose));
+                                          this, obs, verbose));
   utils::strand_run(m_graph.strand(), fn);
 }
 
@@ -843,13 +843,10 @@ void TeleoReactor::doNotify() {
   boost::function<void ()> fn(boost::bind(&TeleoReactor::collect_obs_sync,
                                           this, boost::ref(obs)));
   utils::strand_run(m_graph.strand(), fn);
-  for(std::list<Observation>::const_iterator i=obs.begin(); obs.end()!=i; ++i)
+  for(std::list<Observation>::const_iterator i=obs.begin(); obs.end()!=i; ++i) {
+    syslog("NOTIFY")<<(*i);
     notify(*i);
-}
-
-namespace  {
-
-  
+  }
 }
 
 
@@ -880,6 +877,7 @@ bool TeleoReactor::doSynchronize() {
       for(internal_set::const_iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
         bool echo;
+        (*i)->synchronize(getCurrentTick());
         Observation const &observ = (*i)->lastObservation(echo);
         
         if( echo || is_verbose() || NULL==m_trLog )

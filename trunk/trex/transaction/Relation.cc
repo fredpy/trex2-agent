@@ -57,11 +57,11 @@ utils::Symbol const timeline::s_failed("Failed");
 
 timeline::timeline(TICK date, utils::Symbol const &name)
   :m_name(name), m_owner(NULL), m_plan_listeners(0),
-   m_lastObs(name, s_failed), m_obsDate(date), m_shouldPrint(false) {}
+   m_last_obs(Observation(name, s_failed)), m_obs_date(date), m_shouldPrint(false) {}
 
 timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
   :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
-   m_lastObs(name, s_failed), m_obsDate(date), m_shouldPrint(false)  {}
+   m_last_obs(Observation(name, s_failed)), m_obs_date(date), m_shouldPrint(false)  {}
 
 timeline::~timeline() {
   // maybe some clean-up to do (?)
@@ -127,7 +127,8 @@ TeleoReactor *timeline::unassign(TICK date) {
     m_owner->unassigned(this);
     m_owner = NULL;
     m_transactions.reset();
-    postObservation(date, Observation(name(), s_failed));
+    postObservation(Observation(name(), s_failed));
+    synchronize(date);
     latency_update(ret->getExecLatency());
   }
   return ret;
@@ -175,16 +176,24 @@ void timeline::unsubscribe(Relation const &rel) {
   m_clients.erase(rel.m_pos);
 }
 
-void timeline::postObservation(TICK date, Observation const &obs, 
+void timeline::postObservation(Observation const &obs,
 			       bool verbose) {
   verbose = verbose || ( owned() && owner().is_verbose() );
 
-  if( m_obsDate==date && owned() && m_shouldPrint )
+  if( m_next_obs )
     owner().syslog(warn)<<"New observation overwrite formerly posted one:\n\t"
-			<<m_lastObs;
-  m_obsDate = date;
-  m_lastObs = obs;
+			<<(*m_next_obs);
+  m_next_obs = obs;
   m_shouldPrint = verbose;
+}
+
+void timeline::synchronize(TICK date) {
+  if( m_next_obs ) {
+    m_last_obs = m_next_obs;
+    m_obs_date = date;
+    m_next_obs.reset();
+    owner().syslog(name(), TeleoReactor::obs)<<(*m_last_obs);
+  }
 }
 
 void timeline::request(goal_id const &g) {
