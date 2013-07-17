@@ -54,7 +54,12 @@ void TREX::europa::details::restrict_base(EUROPA::TokenId const &tok,
       var->undoDeactivation(); 
     try {
       var->restrictBaseDomain(dom);
-    } catch(Error) {}
+    } catch(Error e) {
+      debugMsg("trex:always", "Failed to restrict domain of "
+               <<var->getName().toString()<<'('
+               <<var->getId()<<")=="<<var->lastDomain().toString()<<" to "
+               <<dom.toString()<<"\n\t"<<e.getMsg());
+    }
     avar->handleBase(var->baseDomain());
     if( var->isSpecified() )
       avar->handleSpecified(var->lastDomain().getSingletonValue());

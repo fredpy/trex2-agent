@@ -301,9 +301,9 @@ bool graph::kill_reactor(graph::reactor_id r) {
         m_quarantined.erase(pos_q);
       else 
         r->isolate();
-      std::cerr<<"Erase the reactor"<<std::endl;
+      // std::cerr<<"Erase the reactor"<<std::endl;
       m_reactors.erase(pos);
-      std::cerr<<"Done."<<std::endl;
+      /// std::cerr<<"Done."<<std::endl;
       return true;
     }
   }

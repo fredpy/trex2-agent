@@ -1214,6 +1214,9 @@ namespace TREX {
        * Europa archive method) does not appear to be efficient on cleaning the
        * plan
        */
+      bool should_archive() const {
+        return m_updated_commit;
+      }
       void archive() {
         archive(now());
       }
@@ -1644,7 +1647,7 @@ namespace TREX {
 
       EUROPA::ConstrainedVariableId m_tick_const;
       size_t m_synchSteps, m_synchDepth;
-      bool m_archiving;
+      bool m_archiving, m_updated_commit;
 
       friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;

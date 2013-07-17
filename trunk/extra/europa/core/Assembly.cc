@@ -330,8 +330,10 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   EUROPA::TokenId active = tok;
 
   if( !tok->isCommitted() &&
-      m_committed.find(tok)==m_committed.end() )
-    m_completed.insert(tok);
+     m_committed.find(tok)==m_committed.end() ) {
+    if( m_completed.insert(tok).second )
+      m_updated_commit = true;
+  }
 
   details::restrict_base(tok, tok->end(),
                          details::active(tok)->end()->lastDomain());
@@ -343,7 +345,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
       details::restrict_base(active, active->end(), tok->end()->baseDomain());
       details::restrict_base(active, active->start(), tok->start()->baseDomain());
       if( !active->isCommitted() )
-        m_completed.insert(active);
+        if( m_completed.insert(active).second )
+          m_updated_commit = true;
     }
   } else if( tok->isActive() )
     discard(tok);
@@ -353,7 +356,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
       details::restrict_base(*i, (*i)->end(), tok->end()->baseDomain());
       details::restrict_base(*i, (*i)->start(), tok->start()->baseDomain());
       if( !(*i)->isCommitted() )
-        m_completed.insert(*i);
+        if( m_completed.insert(*i).second )
+          m_updated_commit = true;
     }
   }
 }
@@ -690,14 +694,19 @@ void Assembly::archive(EUROPA::eint date) {
 #ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
   size_t deleted = 0;
-
+  m_updated_commit = false;
+  
   debugMsg("trex:archive", "Checking for completed root tokens");
   m_iter = m_roots.begin();
   while( m_roots.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    if( details::active(tok)->end()->lastDomain().getUpperBound() <= date
-        && m_committed.end()!=m_committed.find(tok) )
+    if( !tok->isCommitted() &&
+       details::active(tok)->end()->lastDomain().getUpperBound() <= date
+       && m_committed.end()!=m_committed.find(tok) ) {
+      debugMsg("trex:archive", "Terminating "<<tok->getPredicateName().toString()
+               <<'('<<tok->getKey()<<')');
       terminate(tok);
+    }
   }
 
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()
@@ -1384,7 +1393,8 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 
     EUROPA::TokenId master = token->master();
     if( master.isNoId() ) {
-    m_owner.m_roots.insert(token);
+      m_owner.m_roots.insert(token);
+      m_owner.m_updated_commit = true;
     // token->incRefCount();
     }
 }

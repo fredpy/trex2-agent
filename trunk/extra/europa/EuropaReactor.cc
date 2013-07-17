@@ -482,23 +482,24 @@ bool EuropaReactor::synchronize() {
     if( m_completed_this_tick ) {
       //tr_info("clean-up plan solver");
       planner()->clear(); // remove the past decisions of the planner
-
+      
       //tr_info("remove completed requests");
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for( ; to!=from; ++from) {
-	EUROPA::TokenId cur = (*from)->previous();
-	if( cur.isId() && cur->isMerged() )
-	  m_dispatched.left.erase(cur->getActiveToken()->getKey());
+        EUROPA::TokenId cur = (*from)->previous();
+        if( cur.isId() && cur->isMerged() )
+          m_dispatched.left.erase(cur->getActiveToken()->getKey());
       }
       m_completed_this_tick = false;
     }
-    if( 0==planner()->getStepCount() ) {
+    if( 0==planner()->getStepCount() && should_archive() ) {
       stat_clock::time_point start = stat_clock::now();
       logPlan(stage);
       archive();
       stage = "archive";
       print_stats("archive", 0, 0, stat_clock::now()-start);
-    } 
+    }
+    
   }
   // tr_info("end of synch");
   return constraint_engine()->propagate(); // should not fail
