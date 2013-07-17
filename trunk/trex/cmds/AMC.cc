@@ -209,7 +209,9 @@ int main(int argc, char *argv[]) {
       try {
         nice_val = string_cast<size_t>(priority_env);
       } catch (bad_string_cast const &e) {
-        std::cerr<<"Ignoring invalid priority $TREX_NICE="<<priority_env<<std::endl;
+        std::cerr<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"'<<std::endl;
+        amc_log->syslog("amc", log::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
+        nice_val = opt_val["nice"].as<size_t>();
       }
     }
   }
