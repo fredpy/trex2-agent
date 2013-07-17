@@ -192,7 +192,12 @@ void timeline::synchronize(TICK date) {
     m_last_obs = m_next_obs;
     m_obs_date = date;
     m_next_obs.reset();
-    owner().syslog(name(), TeleoReactor::obs)<<(*m_last_obs);
+    if( owned() )
+      owner().syslog(name(), TeleoReactor::obs)<<(*m_last_obs);
+    else {
+      static utils::SingletonUse<utils::LogManager> s_log;
+      s_log->syslog(date, name(), utils::log::error)<<(*m_last_obs);
+    }
   }
 }
 

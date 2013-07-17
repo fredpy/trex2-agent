@@ -856,6 +856,7 @@ bool TeleoReactor::doSynchronize() {
   bool stat_logged = false;
   
   try {
+    TICK now = getCurrentTick();
     
     bool success;
     {
@@ -867,17 +868,21 @@ bool TeleoReactor::doSynchronize() {
         utils::chronograph<stat_clock> usage(m_synch_usage);
         success = synchronize();
       }
-      m_stat_log<<getCurrentTick()<<", "<<m_start_usage.count()
+      m_stat_log<<now<<", "<<m_start_usage.count()
       <<", "<<m_start_rt.count()
       <<", "<<m_synch_usage.count()
       <<", "<<m_synch_rt.count()<<std::flush;
       stat_logged = true;
     }
     if( success ) {
-      for(internal_set::const_iterator i=m_updates.begin();
+      for(internal_set::iterator i=m_updates.begin();
           m_updates.end()!=i; ++i) {
         bool echo;
-        (*i)->synchronize(getCurrentTick());
+        
+        boost::function<void ()> fn(boost::bind(&details::timeline::synchronize,
+                                                *i, now));
+        utils::strand_run(m_graph.strand(), fn);
+
         Observation const &observ = (*i)->lastObservation(echo);
         
         if( echo || is_verbose() || NULL==m_trLog )
