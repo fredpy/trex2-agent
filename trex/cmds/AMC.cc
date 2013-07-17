@@ -213,7 +213,8 @@ int main(int argc, char *argv[]) {
         amc_log->syslog("amc", log::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
         nice_val = opt_val["nice"].as<size_t>();
       }
-    }
+    } else
+      nice_val = opt_val["nice"].as<size_t>();
   }
 
 #ifdef DAEMON
