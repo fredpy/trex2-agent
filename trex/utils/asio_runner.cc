@@ -83,4 +83,23 @@ void asio_runner::spawn(size_t n) {
     m_threads.create_thread(boost::bind(&io_service::run, boost::ref(m_io)));
 }
 
+// TODO: move me
+
+# include "chrono_helper.hh"
+# include <sys/time.h>
+# include <sys/resource.h>
+
+cpu_clock::time_point cpu_clock::now() {
+  struct rusage result;
+  
+  getrusage(RUSAGE_SELF, &result);
+  duration utime, stime;
+  
+  utime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_utime.tv_sec)
+                                          +CHRONO::microseconds(result.ru_utime.tv_usec));
+  stime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_stime.tv_sec)
+                                          +CHRONO::microseconds(result.ru_stime.tv_usec));
+  return time_point(utime+stime);
+}
+
 

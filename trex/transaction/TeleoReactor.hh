@@ -48,6 +48,7 @@
 # include "reactor_graph.hh"
 
 # include <trex/utils/TimeUtils.hh>
+# include <trex/utils/chrono_helper.hh>
 
 # if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #  include <boost/chrono/thread_clock.hpp>
@@ -105,7 +106,7 @@ namespace TREX {
       // Not we used to pick the thrad clock but user_time
       // is better measure as some tasks of trex are distributed
       // in multiple threads
-      typedef CHRONO::process_real_cpu_clock stat_clock;
+      typedef TREX::utils::cpu_clock stat_clock;
       typedef CHRONO::steady_clock     rt_clock;
 # endif // CPP11_HAS_CHRONO      
       typedef stat_clock::duration stat_duration;
