@@ -1,0 +1,110 @@
+#include "TREX.nddl"
+#include "auv.nddl"
+
+class NavigationCmd extends Timeline {
+  predicate Holds {
+    SPEED  speed;
+    DEGREE heading;
+    PITCH  pitch;
+
+    float x_rate, y_rate, z_rate;
+  }
+
+  NavigationCmd() {
+    super();
+  }
+}
+
+class DepthControl extends Timeline {
+  action onAbove {
+    SequentialBehavior behavior;
+    DEPTH depth;
+  }
+
+  action onBelow {
+    SequentialBehavior behavior;
+    DEPTH depth;
+  }
+
+  DepthControl() {
+    super();
+  }
+}
+
+
+NavigationCmd::Holds {
+  float cos_pitch, tick_speed, my_speed;
+
+  my_speed == speed;
+  tick_speed == my_speed*TICK_DURATION;
+
+  cos_pitch == cos(pitch);
+
+  if( speed<=0.1 ) {
+    z_rate == -0.05 * TICK_DURATION;
+  } else {
+    z_rate == 0.0 - ( tick_speed * sin(pitch) );
+  }
+  float horizontal_rate;
+  
+  horizontal_rate == tick_speed * abs(cos_pitch);
+
+  x_rate == horizontal_rate * cos(heading);
+  y_rate == horizontal_rate * sin(heading);
+}
+
+
+SetPoint::Active {
+  contained_by(NavigationCmd.Holds cmd);
+  cmd.speed == speed;
+  cmd.heading == heading;
+  cmd.pitch == pitch;
+  meets(Inactive);
+}
+
+
+Ascend::Active {
+  contained_by(NavigationCmd.Holds cmd);
+  cmd.speed == speed;
+  cmd.heading == heading;
+  cmd.pitch == pitch;  
+
+  start + duration == end;
+  starts(VehicleState.Holds vs);
+  if( vs.z > targetDepth ) {
+    float delta_z, min_ticks, dur;
+    delta_z == targetDepth - vs.z;
+    min_ticks * cmd.z_rate == delta_z;
+    
+    
+    dur == min(duration, min_ticks);
+    duration >= dur;
+  } else {
+    concurrent(end, vs.end);
+  }
+}
+
+
+VehicleState::Holds {
+  contained_by(NavigationCmd.Holds cmd);
+  met_by(VehicleState.Holds prev);
+
+  float prev_x, prev_y, prev_z, new_x, new_y, new_z;
+  
+  prev_x == prev.x;
+  prev_y == prev.y;
+  prev_z == prev.z;
+
+
+  if( prev_z < 0.0 ) {
+    z == prev_z + ( 0.05 * TICK_DURATION );
+  } else {
+    z == prev_z + cmd.z_rate;
+  }
+  
+  new_x == prev_x + cmd.x_rate;
+  new_y == prev_y + cmd.y_rate;
+
+  x == new_x;
+  y == new_y;
+}

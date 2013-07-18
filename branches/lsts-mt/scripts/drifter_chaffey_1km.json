@@ -1,0 +1,20 @@
+{
+    "on": "dorado_survey",
+    "pred": "Track",
+    "Variable": [
+        { "name": "drifter",
+          "type": "enum",
+          "enum": { "elem": [ { "value": "wgTex" } ] }
+        },
+        { "name": "lagrangian",
+          "type": "bool",
+          "bool": { "value": "1" }
+        },
+        { "name": "path",
+          "enum": { "elem": [ { "value": "chaffey" } ] }
+        },
+        { "name": "size", 
+          "float": { "value": 1000.0 }
+        }
+    ]
+}
