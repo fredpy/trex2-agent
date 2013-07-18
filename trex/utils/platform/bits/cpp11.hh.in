@@ -34,9 +34,13 @@
 #ifndef H_trex_cpp11
 # define H_trex_cpp11
 
+#cmakedefine CPP11_ENABLED 
+
+#ifdef CPP11_ENABLED
 #cmakedefine CPP11_HAS_CHRONO
 #cmakedefine CPP11_HAS_UNIQUE_PTR
 #cmakedefine CPP11_HAS_SHARED_PTR
 #cmakedefine CPP11_HAS_DELETED_FUNCTIONS
+#endif // CPP11_ENABLED
 
 #endif // H_trex_cpp11
