@@ -134,46 +134,7 @@ namespace TREX {
       chronograph() DELETED;
     };
     
-
-    class cpu_clock {
-    public:
-      typedef CHRONO::nanoseconds duration;
-      typedef duration::rep       rep;
-      typedef duration::period    period;
-      
-      typedef CHRONO::time_point<cpu_clock> time_point;
-      static const bool is_steady = true;
-      
-      static time_point now();
-    };
-    
-    
   } // TREX::utils
 } // TREX
-
-namespace boost {
-  namespace chrono {
-    
-    
-//    template<class CharT>
-//    struct clock_string<TREX::LSTS::dune_posix_clock, CharT> {
-//      /** @brief Clock name */
-//      static std::basic_string<CharT> name() {
-//        static const CharT u[] =
-//        { 'D', 'u', 'n', 'e', '_', 'p', 'o', 's', 'i', 'x', '_', 'c', 'l', 'o', 'c', 'k' };
-//        static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
-//        return str;
-//      }
-//      /** @brief Clock epoch */
-//      static std::basic_string<CharT> since() {
-//        static const CharT u[] =
-//        { ' ', 's', 'i', 'n', 'c', 'e', ' ', 'J', 'a', 'n', ' ', '1', ',', ' ', '1', '9', '7', '0' };
-//        static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
-//        return str;
-//      }
-//    }; // boost::chrono::clock_string<TREX::LSTS::dune_posix_clock, >
-
-  }
-}
 
 #endif // H_trex_utils_chrono_helper

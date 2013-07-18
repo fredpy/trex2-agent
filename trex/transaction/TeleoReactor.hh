@@ -49,6 +49,7 @@
 
 # include <trex/utils/TimeUtils.hh>
 # include <trex/utils/chrono_helper.hh>
+# include <trex/utils/cpu_clock.hh>
 
 # if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #  include <boost/chrono/thread_clock.hpp>

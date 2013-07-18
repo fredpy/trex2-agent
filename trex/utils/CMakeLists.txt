@@ -60,6 +60,7 @@ add_library(TREXutils SHARED
   asio_runner.cc
   log/entry.cc
   log/text_log.cc
+  cpu_clock.cc
   # headers
   asio_signal.hh
   asio_signal_n.hh
@@ -91,6 +92,7 @@ add_library(TREXutils SHARED
   XmlUtils.hh
   ptree_io.hh
   asio_runner.hh
+  cpu_clock.hh
   log/log_fwd.hh
   log/entry.hh
   log/stream.hh
