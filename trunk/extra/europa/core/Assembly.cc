@@ -221,7 +221,7 @@ Assembly::Assembly(std::string const &name, size_t steps,
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  m_cstr_engine->setAutoPropagation(true);
+  m_cstr_engine->setAutoPropagation(false);
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
@@ -295,7 +295,11 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
 }
 
 void Assembly::new_tick() {
-  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]\n");
+  bool auto_prop = constraint_engine()->getAutoPropagation();
+  constraint_engine()->setAutoPropagation(false);
+  
+  debugMsg("trex:tick", "START new_tick["<<now()<< "]-----------------------------------------------------");
+  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]");
   m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
 
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now());
@@ -304,25 +308,37 @@ void Assembly::new_tick() {
     t(m_roots.begin(), m_roots.end()), end_t(m_roots.end(), m_roots.end());
   EUROPA::IntervalIntDomain future(now(),
                                    std::numeric_limits<EUROPA::eint>::infinity());
-
+  
+  
   for(; end_t!=t; ++t) {
     EUROPA::TokenId active = (*t);
 
     if( (*t)->isMerged() )
       active = (*t)->getActiveToken();
 
+    debugMsg("trex:tick", "Checking start & end times of "
+             <<(*t)->getUnqualifiedPredicateName().toString()
+             <<'('<<(*t)->getKey()<<") : "
+             <<active->start()->lastDomain().toString()
+             <<" -> "<<active->end()->lastDomain().toString());
+    
     if( now()<=active->start()->lastDomain().getUpperBound() ) {
-      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+      debugMsg("trex:tick", "Maintaining token start time to be after "<<now());
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<(*t)->start()->baseDomain().toString()<<" * "<<active->start()->lastDomain().toString());
       details::restrict_base(*t, (*t)->start(), future);
       details::restrict_base(*t, (*t)->end(), EUROPA::IntervalIntDomain(now()+1,
                                                                         std::numeric_limits<EUROPA::eint>::infinity()));
-      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<(*t)->start()->baseDomain().toString()<<" * "<<active->start()->lastDomain().toString());
     } else if( now()<=active->end()->lastDomain().getUpperBound() ) {
-      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
+      debugMsg("trex:tick", "Maintaining token end time to be after "<<now());
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".end="<<(*t)->end()->baseDomain().toString()<<" * "<<active->end()->lastDomain().toString());
       details::restrict_base(*t, (*t)->end(), future);
-      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".end="<<(*t)->end()->baseDomain().toString()<<" * "<<active->end()->lastDomain().toString());
     }
   }
+  debugMsg("trex:tick", "END new_tick["<<now()<< "]-----------------------------------------------------");
+  // constraint_engine()->propagate();
+  constraint_engine()->setAutoPropagation(auto_prop);
 }
 
 void Assembly::terminate(EUROPA::TokenId const &tok) {
