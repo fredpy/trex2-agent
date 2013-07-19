@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     exit(1);
   } else
     std::cerr<<"System running at "<<clock_ticks<<"Hz"<<std::endl;
+  std::cerr<<"Tracking "<<path<<std::endl;
   
   unsigned long long ns_fact = 1000000000ull;
   ns_fact /= clock_ticks;
@@ -43,14 +44,24 @@ int main(int argc, char **argv) {
     
     CHRONO::system_clock::time_point st = CHRONO::system_clock::now();
   
-    if( in.bad() )
+    if( !in.good() ) {
+      std::cerr<<"Failed to open "<<path<<std::endl;
       break;
-    else {
+    } else {
       in.getline(stats_buff, BUFF_SIZE);
+      if( !in.good() ) {
+        std::cerr<<"Failed to read "<<path<<" content"<<std::endl;
+        break;
+      }
       in.close();
       
       std::vector<std::string> args;
       boost::algorithm::split(args, stats_buff, boost::algorithm::is_space());
+      if( args.size()<15 ) {
+        std::cerr<<"Not enough fields ("<<args.size()<<" should be 44 or at least 15)"<<std::endl;
+        break;
+      }
+        
       
       unsigned long long
         utime = boost::lexical_cast<unsigned long long>(args[13]),
