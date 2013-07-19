@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         rt = CHRONO::duration_cast<CHRONO::nanoseconds>(st.time_since_epoch()),
         ut(utime), st(stime);
       
-      unsigned long long pcpu = 0;
+      unsigned long long pcpu = 200;
       
       if( prev_date ) {
         CHRONO::nanoseconds dt = rt, dts = ut+st;
