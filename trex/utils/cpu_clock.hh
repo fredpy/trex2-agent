@@ -39,15 +39,45 @@
 namespace TREX {
   namespace utils {
     
+    /** @brief process cpu clock
+     *
+     * This class implements a chrono clock that measure the process
+     * cpu time (both user and system) of the current process. 
+     *
+     * It allows to uses such clock independently on whteher we use boost 
+     * or c++11 implementation (the later not providing such clock). In 
+     * addition it uses getrusage as a backend as opposed to boost using 
+     * times which is deprecated on some systems (at least recent version 
+     * of MacOS X).
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     */
     class cpu_clock {
     public:
-      typedef CHRONO::nanoseconds duration;
-      typedef duration::rep       rep;
-      typedef duration::period    period;
+      typedef CHRONO::nanoseconds duration; //*< Duration type
+      typedef duration::rep       rep;      //*< internal representation type
+      typedef duration::period    period;   //*< period type
       
-      typedef CHRONO::time_point<cpu_clock> time_point;
+      typedef CHRONO::time_point<cpu_clock> time_point; //*< time point type
+      /** @brief Steady information
+       *
+       * Indicates that this clock is steady.
+       *
+       * @note While the cpu clock being steady is open for debate; the clock
+       * date cannot change to anterior date but can stilll stay at the same
+       * value when the process do not run. Boost implementation claims its
+       * implementation is steady. Therfore we just follow suit.
+       */
       static const bool is_steady = true;
       
+      /** @brief Current date
+       *
+       * Get the current date in term of proecess cpu time. The time corresponds
+       * to the wall cpu time (ie system time+user time). And epoch is set to 
+       * process start time.
+       *
+       * @return process wall cpu time
+       */
       static time_point now();
     }; // TREX::utils::cpu_clock
 
