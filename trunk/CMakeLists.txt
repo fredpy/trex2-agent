@@ -179,12 +179,12 @@ if(WITH_CPP11)
   cpp11_feature_detection(THREAD)
 
   if(CPP11_ENABLED) 
-    set(boost_flags -I${Boost_INCLUDE_DIRS} -L${Boost_LIBRARY_DIRS} -l${Boost_DATE_TIME})
+    set(boost_flags -I${Boost_INCLUDE_DIRS})
     # A simple date_time program : will fail to compile if boost 
     # was linked to a non c++11 compatible standard library
     #   this handle Clang that links against different lib*c++ depending 
     #   on c++11 flags
-    cpp11_lib_support(Boost "#include <boost/date_time/posix_time/posix_time.hpp>
+    cpp11_lib_support(Boost_DATE_TIME "#include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 
 using namespace boost::posix_time\;
@@ -193,16 +193,53 @@ int main(int argc, char *argv[]) {
   ptime today(second_clock::local_time())\;
   std::cout<<today<<std::endl\;
   return 0\;
-}" ${boost_flags})
-    if(NOT ${CPP11_SUPPORT_Boost})
-      message(FATAL_ERROR " Boost library cannot be used with C++11")
-    endif(NOT ${CPP11_SUPPORT_Boost})
+}" ${boost_flags} ${Boost_DATE_TIME_LIBRARY})
+
+
+    if(NOT ${CPP11_SUPPORT_Boost_DATE_TIME})
+      message(FATAL_ERROR " Boost.DATE_TIME library cannot be used with C++11")
+    endif(NOT ${CPP11_SUPPORT_Boost_DATE_TIME})
+ 
+    cpp11_lib_support(Boost_PROGRAM_OPTIONS "#include <boost/program_options.hpp>
+#include <iostream>
+
+namespace po=boost::program_options\;
+
+namespace {
+  po::options_description opt(\"Test:\")\;
+}
+
+int main(int argc, char *argv[]) {
+  opt.add_options()
+  (\"help,h\", \"should print help\")
+  (\"val,v\", po::value< std::vector<std::string> >(), \"A set of strings\")
+  (\"int,i\", po::value<int>()->implicit_value(0), \"An integer\")\;
+
+  po::variables_map vals\;
+
+  try {
+    po::store(po::command_line_parser(argc,argv).options(opt).run(), vals)\;
+    po::notify(vals)\;
+  } catch(po::error) {
+    return 1\;
+  }
+  return 0\;
+}" ${boost_flags} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+    if(NOT ${CPP11_SUPPORT_Boost_PROGRAM_OPTIONS})
+      message(FATAL_ERROR " Boost.Program_Options library cannot be used with C++11")
+    endif(NOT ${CPP11_SUPPORT_Boost_PROGRAM_OPTIONS})
+
     add_definitions(${CPP11_COMPILER_SWITCH})
-    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${CPP11_LINK_FLAGS})
-    set(CMAKE_LINK_LIBRARY_FLAGS ${CMAKE_LINK_LIBRARY_FLAGS} ${CPP11_LINK_FLAGS})
-    # The scode stuff
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++0x")
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+    # SET (CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS}
+    #   CACHE STRING "Flags used by the linker during the creation of dll's.")
+    # set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${CPP11_LINK_FLAGS})
+    # set(CMAKE_LINK_LIBRARY_FLAGS ${CMAKE_LINK_LIBRARY_FLAGS} ${CPP11_LINK_FLAGS})
+    # message(STATUS "CPP11_LINK_FLAGS=${CPP11_LINK_FLAGS}")
+    # message(STATUS "CMAKE_LINK_LIBRARY_FLAGS=${CMAKE_LINK_LIBRARY_FLAGS}")
+    # # The xcode stuff
+    # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++0x")
+    # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
   endif(CPP11_ENABLED)
 else(WITH_CPP11)
   # ensure that cpp11 is not enabled
@@ -280,6 +317,10 @@ function(trex_lib target kind)
     ${tmp})
   expand_libs(${target})
 
+  if(CPP11_ENABLED) 
+    set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
+  endif(CPP11_ENABLED)
+
   # message(STATUS "${target}: ${i_incs}")
   # transmit directory include to target include for older cmake
   get_property(tmp DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
@@ -319,6 +360,9 @@ endfunction(trex_lib)
 function(trex_py target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  if(CPP11_ENABLED) 
+    set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
+  endif(CPP11_ENABLED)
   # trex_lib(${target} FALSE)
   install(TARGETS ${target} DESTINATION ${TREX_SHARED}/python OPTIONAL EXPORT trex-targets) 
   set_property(GLOBAL APPEND PROPERTY trex-python ${target})
@@ -328,6 +372,9 @@ macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
     ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  if(CPP11_ENABLED) 
+    set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
+  endif(CPP11_ENABLED)
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${tmp})
