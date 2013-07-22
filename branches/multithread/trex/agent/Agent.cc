@@ -44,6 +44,8 @@
 #include <iterator>
 #include <limits>
 
+#include <trex/utils/chrono_helper.hh>
+
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???
 // #define BOOST_EXCEPTION_DISABLE
@@ -755,7 +757,7 @@ void Agent::initComplete() {
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
     " delib_ns, delib_rt_ns, delib_steps,"
-    " sleep_ns"<<std::endl;
+    " planned_sleep, sleep_cnt, sleep_ns"<<std::endl;
 
   graph_names_writer gn;
   boost::write_graphviz(dotf, me(), gn, gn);
@@ -800,42 +802,45 @@ void Agent::synchronize() {
   m_idle.clear();
   bool update = false;
 
-  stat_clock::time_point synch_start = stat_clock::now();
-  rt_clock::time_point synch_start_rt = rt_clock::now();
+  stat_clock::duration delta;
+  rt_clock::duration delta_rt;
   
-  queue = strand_run(strand(), sort_dfs);
+  {
+    utils::chronograph<rt_clock> rt_chron(delta_rt);
+    utils::chronograph<stat_clock> stat_chron(delta);
+  
+    queue = strand_run(strand(), sort_dfs);
 
-  size_t n_failed = cleanup();
-  if( n_failed>0 )
-    syslog(null, warn)<<n_failed<<" reactors failed to start tick "
-		      <<getCurrentTick();
-  // Execute synchronization
-  //  - could be done with a dfs but we choose for now to do it using the
-  //  output list of sync_scheduller to avoid a potentially costfull graph
-  //  exploration.
-  while( !queue.empty() ) {
-    reactor_id r = queue.front();
-    queue.pop_front();        
-    // synchronization
-    if( r->doSynchronize() ) {
-      double wr = r->workRatio();
+    size_t n_failed = cleanup();
+    if( n_failed>0 )
+      syslog(null, warn)<<n_failed<<" reactors failed to start tick "
+                        <<getCurrentTick();
+      // Execute synchronization
+      //  - could be done with a dfs but we choose for now to do it using the
+      //  output list of sync_scheduller to avoid a potentially costfull graph
+      //  exploration.
+      while( !queue.empty() ) {
+        reactor_id r = queue.front();
+        queue.pop_front();
+        // synchronization
+        if( r->doSynchronize() ) {
+          double wr = r->workRatio();
 
-      if( !std::isnan(wr) ) {
-	// this reactor has deliberation :
-	//   - add it to the edf scheduler
-	m_edf.insert(std::make_pair(wr, r));
-      } else { 
-        m_idle.push_front(r);
+          if( !std::isnan(wr) ) {
+            // this reactor has deliberation :
+            //   - add it to the edf scheduler
+            m_edf.insert(std::make_pair(wr, r));
+          } else {
+            m_idle.push_front(r);
+          }
+        } else {
+          // r failed => kill the reactor
+          kill_reactor(r);
+          update = true;
+        }
       }
-    } else {
-      // r failed => kill the reactor
-      kill_reactor(r);
-      update = true;
-    }
   }
-  m_stat_log<<getCurrentTick()
-	    <<", "<<(stat_clock::now()-synch_start).count()	    
-	    <<", "<<(rt_clock::now()-synch_start_rt).count()
+  m_stat_log<<getCurrentTick()<<", "<<delta.count()<<", "<<delta_rt.count()
 	    <<std::flush;
   if( update ) {
     // Create new graph file
@@ -903,45 +908,47 @@ bool Agent::doNext() {
   synchronize();
   size_t count = 0; //slp_count = 0;
   bool completed = false;
-  stat_clock::time_point start_delib = stat_clock::now();
-  rt_clock::time_point start_delib_rt = rt_clock::now();
-  stat_duration delib;
-  rt_clock::duration delib_rt, sleep_time;
+  stat_clock::duration delib;
+  rt_clock::duration delib_rt, sleep_time, sleep_req;
+  size_t sl_count = 0;
+  
   bool print_delib = true;
-
-  try {  
-    while( m_clock->tick()==getCurrentTick()
-	   && m_clock->is_free() && valid() 
-	   && executeReactor() ) {
-      ++count;
+  
+  try {
+    {
+      utils::chronograph<stat_clock> stat_chron(delib);
+      utils::chronograph<rt_clock> rt_chron(delib_rt);
+      while( m_clock->tick()==getCurrentTick()
+            && m_clock->is_free() && valid()
+            && executeReactor() ) {
+        ++count;
+      }
+      completed = true;
     }
-    completed = true;
-    delib = stat_clock::now()-start_delib;
-    delib_rt = rt_clock::now()-start_delib_rt;
-      
+    
     m_stat_log<<", "<<delib.count()<<", "<<delib_rt.count()
-	      <<", "<<count<<", "<<std::flush;
+    <<", "<<count<<", "<<std::flush;
     print_delib = false;
     
     
-    rt_clock::time_point start_sleep = rt_clock::now();
-    while( valid() && m_clock->tick()==getCurrentTick() ) {
-      m_clock->sleep();
-      // ++slp_count;
+    {
+      utils::chronograph<rt_clock> sleep_chrono(sleep_time);
+      while( valid() && m_clock->tick()==getCurrentTick() ) {
+        sleep_req += CHRONO::duration_cast<rt_clock::duration>(m_clock->sleep());
+        ++sl_count;
+      }
     }
-    sleep_time = rt_clock::now()-start_sleep;
-
+    
+    
     if( valid() )
       updateTick(m_clock->tick());
   } catch(Clock::Error const &err) {
     syslog(null, error)<<"error from the clock: "<<err;
     m_valid = false;
-    if( !completed )
-      delib = stat_clock::now()-start_delib;
-  } 
+  }
   if( print_delib )
     m_stat_log<<", "<<delib.count()<<", "<<count<<", ";
-  m_stat_log<<sleep_time.count()<<std::endl;
+  m_stat_log<<sleep_req.count()<<", "<<sl_count<<", "<<sleep_time.count()<<std::endl;
 
   return valid();
 }

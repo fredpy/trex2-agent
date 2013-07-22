@@ -44,8 +44,10 @@
 # define H_trex_utils_chrono_helper
 
 # include "platform/chrono.hh"
+# include "platform/cpp11_deleted.hh"
 # include <ostream>
 # include <iostream>
+
 
 namespace TREX {
   namespace utils {
@@ -111,6 +113,26 @@ namespace TREX {
       return out<<ss.count()<<" s";
 # endif
     }
+    
+    template<class Clock>
+    class chronograph :boost::noncopyable {
+    public:
+      typedef typename Clock::time_point time_point;
+      typedef typename Clock::duration   duration;
+      
+      chronograph(duration &dest):m_start(Clock::now()), output(dest) {
+        output = duration();
+      }
+      ~chronograph() {
+        output = Clock::now()-m_start;
+      }
+      
+    private:
+      time_point m_start;
+      duration &output;
+      
+      chronograph() DELETED;
+    };
     
   } // TREX::utils
 } // TREX

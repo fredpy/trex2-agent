@@ -115,6 +115,26 @@ void details::internal_impl::synchronize(TICK date) {
   }
 }
 
+void details::internal_impl::connect(details::ext_ref tl) {
+  SHARED_PTR<graph_impl> g = graph();
+  
+  if( g ) {
+    synch_event::slot_type s(&details::external_impl::on_synch, tl.get(),
+                             _1, _2);
+    m_synch.connect(s.track(tl));
+  
+    if( m_last_obs ) {
+      g->strand().post(boost::bind(&details::external_impl::on_synch,
+                                   tl, m_obs_date, m_last_obs));
+      if( m_obs_date<m_last_synch )
+        g->strand().post(boost::bind(&details::external_impl::on_synch,
+                                     tl, m_last_synch,
+                                     boost::optional<Observation>()));
+    }
+  }
+}
+
+
 // strand protected calls
 
 details::node_id details::internal_impl::owner_sync() const {
@@ -125,8 +145,7 @@ bool details::internal_impl::reset_sync() {
   if( m_owner.lock() ) {
     m_owner.reset();
     m_flags.reset();
-    // TODO set myself as faile
-    m_next_obs = obs("Failed");
+    m_next_obs = obs("Failed"); // need to schedule a synchronize ...
     return true;
   }
   return false;
@@ -170,17 +189,18 @@ void details::internal_impl::notify_sync(TICK date) {
   SHARED_PTR<graph_impl> g = m_graph.lock();
   
   if( g ) {
+    boost::optional<Observation> o(m_next_obs);
     if( m_next_obs ) {
       m_last_obs = m_next_obs;
       m_next_obs.reset(); // remove cached observation
-      m_last_synch = date;
-      // Emit the observation
-      
-      if( m_echo )
+      m_obs_date = date;
+      if( m_echo ) {
         g->syslog(name(), "ASSERT")<<"["<<date<<"] "<<(*m_last_obs);
-    } else {
-      // emit no observation but tick
+        m_echo = false;
+      }
     }
+    m_last_synch = date;
+    m_synch(date, o);
   }
 }
 
@@ -230,6 +250,18 @@ bool  details::external_impl::publish_plan() const {
       return m_timeline->publish_plan();
   }
   return false; 
+}
+
+// Manipulators
+
+void details::external_impl::on_synch(TICK date, boost::optional<Observation> o) {
+  SHARED_PTR<node_impl> n = m_client.lock();
+  if( n ) {
+    if( o )
+      n->syslog(name(), tlog::info)<<'['<<date<<"]obs: "<<o;
+    else  
+      n->syslog(name(), tlog::info)<<"Synch event ["<<date<<"]";
+  }
 }
 
 

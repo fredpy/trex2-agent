@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2013, MBARI.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,16 +31,21 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#include <thread>
 
-#cmakedefine CPP11_ENABLED 
+namespace {
 
-#ifdef CPP11_ENABLED
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_SHARED_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
-#endif // CPP11_ENABLED
+  void set_to_zero(int *ret) {
+    std::this_thread::yield();
+    *ret = 0;
+  }
+  
+}
 
-#endif // H_trex_cpp11
+int main(int argc, char **argv) {
+  int returned = 1;
+  std::thread th(set_to_zero, &returned);
+
+  th.join();
+  return returned;
+}

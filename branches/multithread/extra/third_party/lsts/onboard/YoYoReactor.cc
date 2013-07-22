@@ -91,10 +91,9 @@ namespace TREX {
     {
       bool nearXY = false, nearZ = false, nearBottom = false;
       Variable v;
-      int secs_at_surface = 60;
+      // int secs_at_surface = 60; //< unused variable
 
-
-      if (m_lastPosition.hasAttribute("altitude"))
+     /* if (m_lastPosition.hasAttribute("altitude"))
       {
         v = m_lastPosition.getAttribute("altitude");
         FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
@@ -105,10 +104,23 @@ namespace TREX {
           nearBottom = true;
           syslog(log::warn) << "Close to bottom: " << alt;
         }
-      }
+      }*/
 
       if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
+	std::cerr << "the seen reference doesn't match my command. nothing to do." << std::endl;
         return true;
+      }
+
+
+      double atZ = -1000;
+      if (m_lastPosition.hasAttribute("z"))
+      {
+        Variable vz = m_lastPosition.getAttribute("z");
+        if (vz.isComplete() && vz.domain().isSingleton())
+        {
+	   atZ = vz.domain().getTypedSingleton<double,true>();      
+	   std::cerr << "VZ IS NOW " << vz<< ", atZ: " << atZ << std::endl;     
+        }
       }
 
       if (m_lastRefState.hasAttribute("near_z"))
@@ -121,8 +133,10 @@ namespace TREX {
         {
           nearZ = nearz.getStringSingleton() == "true" || nearz.getStringSingleton() == "1";
         }
-
       }
+
+      nearZ = nearZ && abs(atZ - m_cmdz) < 2;
+      std::cerr << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", m_cmdz: "<< m_cmdz<< std::endl;
 
       if (m_lastRefState.hasAttribute("near_xy"))
       {
@@ -211,6 +225,7 @@ namespace TREX {
       m_lastSentRef.lon = lon;
       m_lastSentRef.z = z;
       m_lastSentRef.speed = speed;
+      m_cmdz = z;
     }
 
     void

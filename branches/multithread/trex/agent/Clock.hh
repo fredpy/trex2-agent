@@ -152,7 +152,7 @@ namespace TREX {
        * @sa double getSleepDelay() const
        * @sa void sleep(double)
        */
-      void sleep();
+      duration_type sleep();
 
 
       /** @brief Process sleep
@@ -189,7 +189,7 @@ namespace TREX {
       virtual std::string info() const =0;
       
     protected:
-       virtual void doSleep();
+       virtual duration_type doSleep();
 
 
       /** @brief Check if clock free

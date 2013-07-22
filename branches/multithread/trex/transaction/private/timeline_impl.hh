@@ -38,6 +38,8 @@
 # include "../Observation.hh"
 # include "../Goal.hh"
 
+# include <boost/signals2/signal.hpp>
+
 namespace TREX {
   namespace transaction {
     namespace details {
@@ -137,6 +139,8 @@ namespace TREX {
         
         Observation obs(utils::Symbol const &pred);
         
+        void connect(ext_ref tl);
+        
       private:
         /** @rbief timeline name */
         utils::Symbol        m_name;
@@ -145,7 +149,7 @@ namespace TREX {
         
         /** @brief transaction flags
          *
-         * This maintin the transaction access rights to this timeline
+         * This maintain the transaction access rights to this timeline
          * This flags define 2 binary attributes 
          * @li Goal acceptance the timelien will accept to receive goals
          * from other nodes only if this flag is true
@@ -160,7 +164,7 @@ namespace TREX {
         node_id                     m_owner;
         
         boost::optional<Observation> m_last_obs, m_next_obs;
-        TICK m_last_synch;
+        TICK m_last_synch, m_obs_date;
         bool m_echo;
       
         /** @brief Get owner of the timeline
@@ -210,6 +214,9 @@ namespace TREX {
         void post_obs_sync(SHARED_PTR<node_impl> n, Observation o, bool echo);
         void notify_sync(TICK date);
         
+        typedef boost::signals2::signal<void (TICK, boost::optional<Observation>)> synch_event;
+        synch_event m_synch;
+
         friend class graph_impl;
         internal_impl() DELETED;
       }; // TREX::transaction::details::internal_impl
@@ -228,12 +235,17 @@ namespace TREX {
         bool publish_plan() const;
         
         SHARED_PTR<graph_impl> graph() const;
-
+        
+        void on_synch(TICK date, boost::optional<Observation> o);
+        void connect() {
+          m_timeline->connect(shared_from_this());
+        }
         
       private:
         tl_ref            m_timeline;
         node_id           m_client;
         transaction_flags m_flags;
+        
         
         external_impl() DELETED;
       }; // TREX::transaction::details::external_impl

@@ -7,11 +7,14 @@
 # we need C++11
 if(${CMAKE_COMPILER_IS_GNUCXX})
   set(CPP11_flags -std=c++0x)
+  set(CPP11_link_flags "-std=c++0x")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CPP11_flags -std=c++0x -stdlib=libc++ -DCPP11_NO_NOEXCEPT=1)
+  set(CPP11_link_flags "-std=c++0x -stdlib=libc++")
 endif()
 
 set(CPP11_COMPILER_SWITCH ${CPP11_flags} CACHE LIST "C++ compiler flags")
+set(CPP11_LINK_SWITCH ${CPP11_link_flags} CACHE LIST "C++ link flags")
 mark_as_advanced(CPP11_COMPILER_SWITCH)
 
 
@@ -26,13 +29,30 @@ function(cpp11_feature_detection FEATURE_NAME)
     ${CMAKE_BINARY_DIR}/cpp11/has_${FEATURE_NAME}.cpp
     )
   
-  try_compile(
-    CPP11_HAS_${FEATURE_NAME}
+  try_run(
+    CPP11_RAN_${FEATURE_NAME}
+    CPP11_COMPILED_${FEATURE_NAME}
     ${CMAKE_BINARY_DIR}
     ${CMAKE_BINARY_DIR}/cpp11/has_${FEATURE_NAME}.cpp
+    CMAKE_FLAGS "-DCMAKE_EXE_LINKER_FLAGS=${CPP11_link_flags}"
     COMPILE_DEFINITIONS ${CPP11_COMPILER_SWITCH}
-    OUTPUT_VARIABLE OUT
+    COMPILE_OUTPUT_VARIABLE COMP_OUT
+    RUN_OUTPUT_VARIABLE RUN_OUT
     )
+  set(CPP11_HAS_${FEATURE_NAME} FALSE)
+
+  if(CPP11_COMPILED_${FEATURE_NAME})
+
+    if(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
+      set(CPP11_HAS_${FEATURE_NAME} TRUE)
+    else(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
+      message(WARNING "Failed to run test for c++11 ${FEATURE_NAME}: ${CPP11_RAN_${FEATURE_NAME}}\n${RUN_OUT}")
+    endif(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
+
+  else(CPP11_COMPILED_${FEATURE_NAME})
+    message(WARNING "Failed to compile test for c++11 ${FEATURE_NAME}:\n${COMP_OUT}")
+  endif(CPP11_COMPILED_${FEATURE_NAME})
+
   message(STATUS "Detecting support for c++11 feature '${FEATURE_NAME}': ${CPP11_HAS_${FEATURE_NAME}}")
   if(CPP11_HAS_${FEATURE_NAME})
     set(CPP11_HAS_${FEATURE_NAME} TRUE PARENT_SCOPE)
@@ -51,8 +71,12 @@ function(cpp11_lib_support NAME CODE DEFINITIONS)
   try_compile(success
     ${CMAKE_BINARY_DIR}
     ${test_file}.cc
+    CMAKE_FLAGS "-DCMAKE_EXE_LINKER_FLAGS=${CPP11_link_flags}"
     COMPILE_DEFINITIONS ${FLAGS}
     OUTPUT_VARIABLE OUT)
+  if(NOT success)
+    message(WARNING "Failed to compile test for '${NAME}' compatibilty with c++11:\n ${OUT}")
+  endif(NOT success)
   message(STATUS "Checking c++11 compatibility for '${NAME}': ${success}")
   set(CPP11_SUPPORT_${NAME} ${success} PARENT_SCOPE)
   if(NOT success)

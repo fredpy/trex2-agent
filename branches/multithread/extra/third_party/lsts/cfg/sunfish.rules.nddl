@@ -44,42 +44,110 @@ Navigator::At {
 		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 }
 
-Navigator::Going {
-
-	contained_by(condition ControlMode.TREX c);
-		c.start < start;	
-
-	contained_by(condition OperationalLimits.Limits limits);
-		if (z > 0.0) {
-			z < limits.max_depth;
-		}
-		else {
-			-1.0 * z < limits.max_altitude;
-			-1.0 * z > limits.min_altitude;
-		}
-		sane_pos(latitude, longitude, z);		
-		
-	meets(effect At at);
-		latitude == at.latitude;
-		longitude == at.longitude;
-		speed == at.speed;
-
-	met_by(condition EstimatedState.Position origin);
-		orig_lat == origin.latitude;
-		orig_lon == origin.longitude;
-		orig_z == origin.z;
-
-	int my_start;
-	my_start == max(origin.start, c.start);
-
-	if(  my_start<= AGENT_CLOCK ) {
-		contains(condition YoYoController.Exec g);
-
-		latitude == g.latitude;
-		longitude == g.longitude;
-		g.max_z == object.max_z;
-		g.min_z == object.min_z;
-		speed == g.speed;
-		concurrent(end, g.end);
-	}
+class NavActions {
+    
+    action DoGoing {
+	float orig_lat, orig_lon, orig_z;
+	float dist;
+    }
+    
+    NavActions() {
+	super();
+    }
 }
+
+
+NavActions::DoGoing {
+    contained_by(ControlMode.TREX c);
+    c.start < start;
+
+    contained_by(OperationalLimits.Limits limits);
+    ends(condition Navigator.Going go);
+    go.start <= start;
+
+    if( go.z > 0.0 ) {
+	go.z < limits.max_depth;
+    } else {
+	-1.0 * go.z < limits.max_altitude;
+	-1.0 * go.z > limits.min_altitude; 
+    }
+    meets(effect Navigator.At at);
+    go.object == at.object;
+    go.latitude == at.latitude;
+    go.longitude == at.longitude;
+    go.z == at.z;
+    go.speed == at.speed;
+
+    int my_start;
+    my_start >= c.start;
+
+    dist == ll_distance(orig_lat, orig_lon, go.latitude, go.longitude);
+    
+    if( c.start <= AGENT_CLOCK ) {
+	// Gather my intial position only when I know I can take control
+	met_by(EstimatedState.Position origin);
+	orig_lat == origin.latitude;
+	orig_lon == origin.longitude;
+	orig_z == origin.z;
+
+	my_start == max(c.start, origin.start);
+    }
+    if( my_start <= AGENT_CLOCK ) {
+	contains(condition YoYoController.Exec cmd);
+	cmd.latitude == go.latitude;
+	cmd.longitude == go.longitude;
+	cmd.min_z == go.object.min_z;
+	cmd.max_z == go.object.max_z;
+	cmd.speed == go.speed;
+	concurrent(end, cmd.end);
+    }
+
+}
+
+
+Navigator::Going {
+    sane_pos(latitude, longitude, z);
+    contained_by(ControlMode.TREX); // I am not Going if I am not running
+}
+
+
+
+// Navigator::Going {
+
+// 	contained_by(condition ControlMode.TREX c);
+// 		c.start < start;	
+
+// 	contained_by(condition OperationalLimits.Limits limits);
+// 		if (z > 0.0) {
+// 			z < limits.max_depth;
+// 		}
+// 		else {
+// 			-1.0 * z < limits.max_altitude;
+// 			-1.0 * z > limits.min_altitude;
+// 		}
+// 		sane_pos(latitude, longitude, z);		
+		
+// 	meets(effect At at);
+// 		latitude == at.latitude;
+// 		longitude == at.longitude;
+// 		speed == at.speed;
+
+// 	met_by(condition EstimatedState.Position origin);
+// 		orig_lat == origin.latitude;
+// 		orig_lon == origin.longitude;
+// 		orig_z == origin.z;
+
+// 	int my_start;
+// 	my_start == max(origin.start, c.start);
+
+// 	if(  my_start<= AGENT_CLOCK ) {
+// 		contains(condition YoYoController.Exec g);
+
+// 		latitude == g.latitude;
+// 		longitude == g.longitude;
+// 		g.max_z == object.max_z;
+// 		g.min_z == object.min_z;
+// 		speed == g.speed;
+// 		concurrent(end, g.end);
+// 	}
+// }

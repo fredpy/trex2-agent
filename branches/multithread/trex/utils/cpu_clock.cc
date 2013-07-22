@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2011, MBARI.
+ *
+ *  Copyright (c) 2013, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,16 +31,22 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#include "cpu_clock.hh"
 
-#cmakedefine CPP11_ENABLED 
+# include <sys/time.h>
+# include <sys/resource.h>
 
-#ifdef CPP11_ENABLED
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_SHARED_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
-#endif // CPP11_ENABLED
+using namespace TREX::utils;
 
-#endif // H_trex_cpp11
+cpu_clock::time_point cpu_clock::now() {
+  struct rusage result;
+  
+  getrusage(RUSAGE_SELF, &result);
+  duration utime, stime;
+  
+  utime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_utime.tv_sec)
+                                          +CHRONO::microseconds(result.ru_utime.tv_usec));
+  stime = CHRONO::duration_cast<duration>(CHRONO::seconds(result.ru_stime.tv_sec)
+                                          +CHRONO::microseconds(result.ru_stime.tv_usec));
+  return time_point(utime+stime);
+}

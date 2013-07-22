@@ -27,47 +27,53 @@ Navigator::At {
 }
 
 Navigator::Going {
+    sane_pos(latitude, longitude, z);		
+    contained_by(ControlMode.TREX);
+}
 
-	contained_by(condition ControlMode.TREX c);
-		c.start < start;	
+NavActions::DoGoing {
+    contained_by(condition ControlMode.TREX c);
+    c.start < start;	
 
-	contained_by(condition OperationalLimits.Limits limits);
-		if (z > 0.0) {
-			z < limits.max_depth;
-		}
-		else {
-			-1.0 * z < limits.max_altitude;
-			-1.0 * z > limits.min_altitude;
-		}
-		sane_pos(latitude, longitude, z);		
+    contained_by(OperationalLimits.Limits limits);
+    ends(condition Navigator.Going go);
+    
+    if (go.z > 0.0) {
+	go.z < limits.max_depth;
+    } else {
+	-1.0 * go.z < limits.max_altitude;
+	-1.0 * go.z > limits.min_altitude;
+    }
 		
-	meets(effect At at);
-		latitude == at.latitude;
-		longitude == at.longitude;
-		z == at.z;
-		speed == at.speed;
+    meets(effect Navigator.At at);
+    go.latitude == at.latitude;
+    go.longitude == at.longitude;
+    go.z == at.z;
+    go.speed == at.speed;
 
-	int my_start;
-	if( c.start<=AGENT_CLOCK ) {
-		met_by(condition EstimatedState.Position origin);
-			orig_lat == origin.latitude;
-			orig_lon == origin.longitude;
-			abs(origin.z-orig_z) < 5.0;
+    int my_start;
+    my_start >= c.start;
+
+    if( c.start<=AGENT_CLOCK ) {
+	met_by(EstimatedState.Position origin);
+	orig_lat == origin.latitude;
+	orig_lon == origin.longitude;
+	abs(origin.z-orig_z) < 5.0;
 	
-			// orig_z - 5.0 < origin.z < orig_z + 5.0;
-			//orig_z + 5.0 > origin.z;
+	// orig_z - 5.0 < origin.z < orig_z + 5.0;
+	//orig_z + 5.0 > origin.z;
 	
-		my_start == max(origin.start, c.start);
-	}
+	my_start == max(origin.start, c.start);
+    }
 
-	if(  my_start<= AGENT_CLOCK ) {
-		contains(condition Reference.Going g);
+    if(  my_start<= AGENT_CLOCK ) {
+	contains(condition Reference.Going g);
 
-		latitude == g.latitude;
-		longitude == g.longitude;
-		z == g.z;
-		speed == g.speed;
-		g.radius == at.radius;
-		concurrent(end, g.end);
-	}
+	go.latitude == g.latitude;
+	go.longitude == g.longitude;
+	go.z == g.z;
+	go.speed == g.speed;
+	g.radius == at.radius;
+	concurrent(end, g.end);
+    }
 }

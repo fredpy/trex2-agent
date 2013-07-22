@@ -6,7 +6,7 @@
   <OpenConditionManager defaultPriority="100">
     <FlawFilter component="goals"/>
     <!-- uncomment if trex still crash on 2nd goal posting -->
-    <!-- FlawFilter class-match="DrifterController" / -->
+    <FlawFilter predicate-match="Waypoint" />
     <FlawHandler component="TrexOpenConditionHandler"/>
   </OpenConditionManager>
   

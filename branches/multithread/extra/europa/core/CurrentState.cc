@@ -362,20 +362,9 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
     debugMsg("trex:dispatch", "Checking if token "<<tl<<'.'<<(*i)->getUnqualifiedPredicateName().toString()
 	     <<'('<<(*i)->getKey()<<") overlaps ["<<lb<<", "<<ub
 	     <<"] as a goal (start="<<(*i)->start()->lastDomain().toString()<<")");
-    // Old code from Philip
-    //boost::chrono::high_resolution_timer start;
-      # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-			typedef CHRONO::thread_clock thread_clock;
-	  # else
-	  #  if defined(CPP11_HAS_CHRONO)
-			// standard do not support processing time AFAIK
-			typedef CHRONO::high_resolution_clock thread_clock;
-	  #  else
-			// boost does on the other hand
-			typedef CHRONO::process_user_cpu_clock thread_clock;
-	  # endif
-	  # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
-	  // Used to find the percision of the clock
+    typedef Assembly::thread_clock thread_clock;
+    
+      // Used to find the percision of the clock
 	  //std::cout << (double) CHRONO::high_resolution_clock::period::num
       //                / CHRONO::high_resolution_clock::period::den;
      typedef thread_clock::duration thread_duration;
@@ -597,7 +586,7 @@ EUROPA::TokenSet CurrentState::getAllTokens(const EUROPA::TokenId& token)
           merged = token->getMergedTokens();
           merged.insert(token);
         }
-        else
+        else if( token->isMerged() )
         {
           merged = token->getActiveToken()->getMergedTokens();
           merged.insert(token->getActiveToken());

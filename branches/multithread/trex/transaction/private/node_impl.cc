@@ -205,6 +205,7 @@ void details::node_impl::assigned(details::tl_ref tl) {
 void details::node_impl::subscribed(details::ext_ref tl) {
   syslog(tlog::null, tlog::info)<<"subscribed to "<<tl->name()<<" as External";
   m_externals.insert(std::make_pair(tl->name(), tl));
+  tl->connect();
 }
 
 bool details::node_impl::check_internal_sync(Symbol name) const {
@@ -218,7 +219,7 @@ bool details::node_impl::check_external_sync(Symbol name) const {
 Observation details::node_impl::obs_sync(Symbol name, Symbol pred) {
   internal_map::const_iterator i = m_internals.find(name);
   if( m_internals.end()==i )
-    throw utils::Exception("Cannot create observation for non intranl timeline "
+    throw utils::Exception("Cannot create observation for non internal timeline "
                            +name.str());
   return i->second->obs(pred);
 }

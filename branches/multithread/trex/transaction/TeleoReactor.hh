@@ -48,6 +48,8 @@
 # include "reactor_graph.hh"
 
 # include <trex/utils/TimeUtils.hh>
+# include <trex/utils/chrono_helper.hh>
+# include <trex/utils/cpu_clock.hh>
 
 # if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #  include <boost/chrono/thread_clock.hpp>
@@ -96,16 +98,16 @@ namespace TREX {
       details::node_id m_impl;
       
     public:
+      typedef utils::cpu_clock stat_clock;
+      
 # if defined(CPP11_HAS_CHRONO)
-      // standard do not support processing time AFAIK
-      typedef CHRONO::high_resolution_clock stat_clock;
-# elif defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-      typedef CHRONO::thread_clock stat_clock;
+      typedef CHRONO::high_resolution_clock rt_clock;
 # else
-      // boost does on the other hand
-      typedef CHRONO::process_user_cpu_clock stat_clock;
-# endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+      typedef CHRONO::steady_clock     rt_clock;
+# endif // CPP11_HAS_CHRONO      
+      
       typedef stat_clock::duration stat_duration;
+
       
       static utils::Symbol const obs;
       static utils::Symbol const plan;
@@ -1032,7 +1034,8 @@ namespace TREX {
       void setMaxTick(TICK max); 
 
     private:
-      stat_duration m_synch_usage, m_deliberation_usage;
+      stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
+      rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
       std::ofstream m_stat_log;
       

@@ -234,7 +234,7 @@ namespace TREX {
 	 */
 	TICK lastObsDate() {
           lastObservation();
-	  return m_obsDate;
+	  return m_obs_date;
 	}
 	/** @brief last observation 
 	 * 
@@ -246,8 +246,7 @@ namespace TREX {
 	Observation const &lastObservation();
         bool synchronize(TICK date);
         
-      
-	/** @brief Timeline look ahead
+      	/** @brief Timeline look ahead
 	 *
 	 * Reflects the look ahaed of the reactor owning this timeline.
 	 * This insdicates how far ahead a goal can be posted to the
@@ -482,20 +481,20 @@ namespace TREX {
          * 
          * The value of the last observation posted to this timeline.
          */
-	Observation   m_lastObs;
+	Observation   m_last_obs;
         /** @brief Next observation
          *
          * This attribute stores the next observation 
          * to be posted. 
          */
-        boost::optional<Observation> m_nextObs;
+        boost::optional<Observation> m_next_obs;
         /** @brief last observation posting date.
          * 
          * The tick date when the last observation was posted
          */
-	TICK          m_obsDate;
-        boost::optional<TICK> m_failedDate;
-	bool          m_shouldPrint;
+	TICK          m_obs_date;
+        boost::optional<TICK> m_failed_date;
+	bool          m_should_print;
 	
 	/** @brief Name of the special @c Failed observation
 	 *

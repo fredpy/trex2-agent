@@ -133,6 +133,11 @@ void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
 				n, name, flag));
 }
 
+void details::graph_impl::synchronize(TICK date) {
+  SHARED_PTR<graph_impl> me = shared_from_this();
+  strand().dispatch(boost::bind(&graph_impl::synch_sync, me, date));
+}
+
 
 // strand protected calls
 
@@ -160,12 +165,28 @@ details::tl_ref details::graph_impl::get_timeline_sync(Symbol const &name) {
     tl_ref tl = MAKE_SHARED<internal_impl>(name, shared_from_this());
     
     i = m_timelines.insert(i, tl_map::value_type(name, tl));
+    m_failed.insert(*i); // Add this timeline to the failed set
     // schedule event for later
     strand().post(boost::bind(boost::mem_fn(&graph_impl::notify_new), 
 			      shared_from_this(), 
 			      tl));
   }
   return i->second;
+}
+
+void details::graph_impl::synch_sync(TICK date) {
+  for(tl_map::iterator i=m_failed.begin(); m_failed.end()!=i; ++i) {
+    tl_ref tl = i->second;
+    if( !tl->m_last_obs ) {
+      tl->m_next_obs = tl->obs("Failed");
+    } else if( tl->m_last_obs->predicate()!="Failed" ) {
+      TICK fail_date = tl->m_last_synch + 1;
+      tl->m_next_obs = tl->obs("Failed");
+      if( fail_date<date )
+        tl->synchronize(fail_date); // post the Failed observation
+    }
+    tl->synchronize(date); // Update timeline to current tick
+  }
 }
 
 
@@ -175,8 +196,10 @@ void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
   if( shared_from_this()==owned ) {
     tl_ref tl = get_timeline_sync(name);
 
-    if( tl->set_sync(n, flag) )
+    if( tl->set_sync(n, flag) ) {
+      m_failed.erase(name);
       n->assigned(tl);
+    }
   } else
     syslog(tlog::null, tlog::warn)<<"Ignoring creation request of timeline \""<<name
     <<"\" as it was requested by a reactor that is no longer part of this graph.";
@@ -197,8 +220,10 @@ void details::graph_impl::use_sync(SHARED_PTR<details::node_impl> n,
 }
 
 void details::graph_impl::undeclare(SHARED_PTR<details::node_impl> n, details::tl_ref tl) {
-  if( tl->owner().lock()==n )
+  if( tl->owner().lock()==n ) {
+    m_failed.insert(tl_map::value_type(tl->name(), tl));
     tl->reset_sync();
+  }
 }
 
 void details::graph_impl::notify_new(details::tl_ref tl) {

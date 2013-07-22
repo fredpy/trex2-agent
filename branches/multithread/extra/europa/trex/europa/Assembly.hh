@@ -39,6 +39,7 @@
 
 # include <trex/utils/id_mapper.hh>
 # include <trex/utils/platform/memory.hh>
+# include <trex/utils/cpu_clock.hh>
 
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
 # include <trex/europa/bits/system_header.hh>
@@ -1214,6 +1215,9 @@ namespace TREX {
        * Europa archive method) does not appear to be efficient on cleaning the
        * plan
        */
+      bool should_archive() const {
+        return m_updated_commit;
+      }
       void archive() {
         archive(now());
       }
@@ -1565,19 +1569,14 @@ namespace TREX {
       std::map<EUROPA::TokenId, EUROPA::TokenId> m_masters;
 
       /**
-      *   Code for measuring the time for functions
-      */
-      # if defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-			typedef CHRONO::thread_clock thread_clock;
-	  # else
-	  #  if defined(CPP11_HAS_CHRONO)
-			// standard do not support processing time AFAIK
-			typedef CHRONO::high_resolution_clock thread_clock;
-	  #  else
-			// boost does on the other hand
-			typedef CHRONO::process_user_cpu_clock thread_clock;
-	  # endif
-	  # endif // BOOST_CHRONO_HAS_THREAD_CLOCK
+       *   Code for measuring the time for functions
+       */
+# if defined(BOOST_CHRONO_HAS_THREAD_CLOCK) && !defined(CPP11_HAS_CHRONO)
+      typedef CHRONO::thread_clock thread_clock;
+# else 
+      typedef utils::cpu_clock     thread_clock;
+# endif
+      
       typedef thread_clock::duration thread_duration;
       std::map<EUROPA::eint, double> time_values;
 
@@ -1644,7 +1643,7 @@ namespace TREX {
 
       EUROPA::ConstrainedVariableId m_tick_const;
       size_t m_synchSteps, m_synchDepth;
-      bool m_archiving;
+      bool m_archiving, m_updated_commit;
 
       friend class TREX::europa::details::Schema;
       friend class TREX::europa::details::UpdateFlawIterator;

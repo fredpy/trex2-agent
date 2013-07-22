@@ -57,11 +57,13 @@ utils::Symbol const timeline::s_failed("Failed");
 
 timeline::timeline(TICK date, utils::Symbol const &name)
   :m_name(name), m_owner(NULL), m_plan_listeners(0),
-   m_lastObs(name, s_failed), m_obsDate(date), m_shouldPrint(false) {}
+   m_last_obs(Observation(name, s_failed)), m_obs_date(date),
+   m_should_print(false) {}
 
 timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
   :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
-   m_lastObs(name, s_failed), m_obsDate(date), m_shouldPrint(false)  {}
+   m_last_obs(Observation(name, s_failed)), m_obs_date(date),
+   m_should_print(false)  {}
 
 timeline::~timeline() {
   // maybe some clean-up to do (?)
@@ -103,7 +105,7 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
     }
     m_owner = &r;
     m_transactions = flags;
-    m_failedDate.reset();
+    m_failed_date.reset();
     r.assigned(this);
     latency_update(0);
   } else if( owned_by(r) ) {
@@ -129,7 +131,7 @@ TeleoReactor *timeline::unassign(TICK date) {
     m_owner = NULL;
     m_transactions.reset();
     postObservation(Observation(name(), s_failed));
-    m_failedDate = date;
+    m_failed_date = date;
     latency_update(ret->getExecLatency());
   }
   return ret;
@@ -181,41 +183,37 @@ void timeline::postObservation(Observation const &obs,
 			       bool verbose) {
   verbose = verbose || ( owned() && owner().is_verbose() );
 
-  if( m_nextObs )
+  if( m_next_obs )
     owner().syslog(warn)<<"New observation overwrite formerly posted one:\n\t"
-			<<(*m_nextObs);
-  m_nextObs = obs;
-  m_shouldPrint = verbose;
+			<<(*m_next_obs);
+  m_next_obs = obs;
+  m_should_print = verbose;
 }
 
 Observation const &timeline::lastObservation() {
-  if( m_failedDate )
-    synchronize(*m_failedDate);
-  return m_lastObs;
+  if( m_failed_date )
+    synchronize(*m_failed_date);
+  return m_last_obs;
 }
 
 bool timeline::synchronize(TICK date) {
-  if( m_nextObs ) {
-    m_lastObs = *m_nextObs;
-    m_nextObs.reset();
-    m_failedDate.reset();
-    m_obsDate = date;
+  if( m_next_obs ) {
+    m_last_obs = *m_next_obs;
+    m_next_obs.reset();
+    m_failed_date.reset();
+    m_obs_date = date;
     
-    if( m_shouldPrint ) {
-      m_shouldPrint = false;
+    if( m_should_print ) {
+      m_should_print = false;
       return true;
     }
   }
   return false;
 }
 
-
-
-
 void timeline::request(goal_id const &g) {
   if( owned() ) {
-    owner().syslog(info)<<"Request received ["<<g<<"] "
-				<<*g;
+    owner().syslog(info)<<"Request received ["<<g<<"] "<<*g;
     owner().queue_goal(g);
   }
 }

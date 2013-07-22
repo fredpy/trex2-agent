@@ -35,6 +35,7 @@
 # define H_trex_transaction_graph_impl
 
 # include "../bits/transaction_fwd.hh"
+# include "../Tick.hh"
 
 # include <boost/signals2/signal.hpp>
 
@@ -177,7 +178,11 @@ namespace TREX {
           return m_new_tl;
         }
         
+        void synchronize(TICK date);
+        
       private:
+        void synch_sync(TICK date);
+        
         
         void declare(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
         void subscribe(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
@@ -215,6 +220,7 @@ namespace TREX {
         
         typedef std::map<utils::Symbol, tl_ref> tl_map;
         tl_map m_timelines;
+        tl_map m_failed;
         
         void set_date_sync(date_type date);
         void add_node_sync(SHARED_PTR<node_impl> n);

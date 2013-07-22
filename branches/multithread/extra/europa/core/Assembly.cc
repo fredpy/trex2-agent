@@ -221,7 +221,7 @@ Assembly::Assembly(std::string const &name, size_t steps,
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
 
-  m_cstr_engine->setAutoPropagation(true);
+  m_cstr_engine->setAutoPropagation(false);
 
   // Get extra europa extensions
   m_trex_schema->registerComponents(*this);
@@ -295,7 +295,11 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
 }
 
 void Assembly::new_tick() {
-  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]\n");
+  bool auto_prop = constraint_engine()->getAutoPropagation();
+  constraint_engine()->setAutoPropagation(false);
+  
+  debugMsg("trex:tick", "START new_tick["<<now()<< "]-----------------------------------------------------");
+  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]");
   m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
 
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now());
@@ -304,25 +308,37 @@ void Assembly::new_tick() {
     t(m_roots.begin(), m_roots.end()), end_t(m_roots.end(), m_roots.end());
   EUROPA::IntervalIntDomain future(now(),
                                    std::numeric_limits<EUROPA::eint>::infinity());
-
+  
+  
   for(; end_t!=t; ++t) {
     EUROPA::TokenId active = (*t);
 
     if( (*t)->isMerged() )
       active = (*t)->getActiveToken();
 
+    debugMsg("trex:tick", "Checking start & end times of "
+             <<(*t)->getUnqualifiedPredicateName().toString()
+             <<'('<<(*t)->getKey()<<") : "
+             <<active->start()->lastDomain().toString()
+             <<" -> "<<active->end()->lastDomain().toString());
+    
     if( now()<=active->start()->lastDomain().getUpperBound() ) {
-      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+      debugMsg("trex:tick", "Maintaining token start time to be after "<<now());
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".start="<<(*t)->start()->baseDomain().toString()<<" * "<<active->start()->lastDomain().toString());
       details::restrict_base(*t, (*t)->start(), future);
       details::restrict_base(*t, (*t)->end(), EUROPA::IntervalIntDomain(now()+1,
                                                                         std::numeric_limits<EUROPA::eint>::infinity()));
-      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<active->start()->lastDomain().toString());
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".start="<<(*t)->start()->baseDomain().toString()<<" * "<<active->start()->lastDomain().toString());
     } else if( now()<=active->end()->lastDomain().getUpperBound() ) {
-      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
+      debugMsg("trex:tick", "Maintaining token end time to be after "<<now());
+      debugMsg("trex:tick", "Before: "<<(*t)->toString()<<".end="<<(*t)->end()->baseDomain().toString()<<" * "<<active->end()->lastDomain().toString());
       details::restrict_base(*t, (*t)->end(), future);
-      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".end="<<active->end()->lastDomain().toString());
+      debugMsg("trex:tick", "After: "<<(*t)->toString()<<".end="<<(*t)->end()->baseDomain().toString()<<" * "<<active->end()->lastDomain().toString());
     }
   }
+  debugMsg("trex:tick", "END new_tick["<<now()<< "]-----------------------------------------------------");
+  // constraint_engine()->propagate();
+  constraint_engine()->setAutoPropagation(auto_prop);
 }
 
 void Assembly::terminate(EUROPA::TokenId const &tok) {
@@ -330,8 +346,10 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
   EUROPA::TokenId active = tok;
 
   if( !tok->isCommitted() &&
-      m_committed.find(tok)==m_committed.end() )
-    m_completed.insert(tok);
+     m_committed.find(tok)==m_committed.end() ) {
+    if( m_completed.insert(tok).second )
+      m_updated_commit = true;
+  }
 
   details::restrict_base(tok, tok->end(),
                          details::active(tok)->end()->lastDomain());
@@ -343,7 +361,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
       details::restrict_base(active, active->end(), tok->end()->baseDomain());
       details::restrict_base(active, active->start(), tok->start()->baseDomain());
       if( !active->isCommitted() )
-        m_completed.insert(active);
+        if( m_completed.insert(active).second )
+          m_updated_commit = true;
     }
   } else if( tok->isActive() )
     discard(tok);
@@ -353,7 +372,8 @@ void Assembly::terminate(EUROPA::TokenId const &tok) {
       details::restrict_base(*i, (*i)->end(), tok->end()->baseDomain());
       details::restrict_base(*i, (*i)->start(), tok->start()->baseDomain());
       if( !(*i)->isCommitted() )
-        m_completed.insert(*i);
+        if( m_completed.insert(*i).second )
+          m_updated_commit = true;
     }
   }
 }
@@ -560,6 +580,7 @@ bool Assembly::relax(bool aggressive) {
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
   planner()->reset();
+  m_updated_commit = aggressive; // ask for archiving whenever we have a full relax
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
@@ -690,14 +711,19 @@ void Assembly::archive(EUROPA::eint date) {
 #ifdef TREX_ARCHIVE_Greedy
   EUROPA::DbClientId cli = plan_db()->getClient();
   size_t deleted = 0;
-
+  m_updated_commit = false;
+  
   debugMsg("trex:archive", "Checking for completed root tokens");
   m_iter = m_roots.begin();
   while( m_roots.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
-    if( details::active(tok)->end()->lastDomain().getUpperBound() <= date
-        && m_committed.end()!=m_committed.find(tok) )
+    if( !tok->isCommitted() &&
+       details::active(tok)->end()->lastDomain().getUpperBound() <= date
+       && m_committed.end()!=m_committed.find(tok) ) {
+      debugMsg("trex:archive", "Terminating "<<tok->getPredicateName().toString()
+               <<'('<<tok->getKey()<<')');
       terminate(tok);
+    }
   }
 
   debugMsg("trex:archive", "Evaluating "<<m_completed.size()
@@ -1384,7 +1410,8 @@ void Assembly::listener_proxy::notifyAdded(EUROPA::TokenId const &token) {
 
     EUROPA::TokenId master = token->master();
     if( master.isNoId() ) {
-    m_owner.m_roots.insert(token);
+      m_owner.m_roots.insert(token);
+      m_owner.m_updated_commit = true;
     // token->incRefCount();
     }
 }
