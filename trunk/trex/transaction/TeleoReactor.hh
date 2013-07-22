@@ -96,20 +96,14 @@ namespace TREX {
       typedef details::external_set                       external_set;
       
     public:
+      typedef utils::cpu_clock stat_clock;
+      
 # if defined(CPP11_HAS_CHRONO)
-      // standard do not support processing time AFAIK
-      typedef CHRONO::high_resolution_clock stat_clock;
       typedef CHRONO::high_resolution_clock rt_clock;
-      
-      
 # else
-      // boost does on the other hand
-      // Not we used to pick the thrad clock but user_time
-      // is better measure as some tasks of trex are distributed
-      // in multiple threads
-      typedef TREX::utils::cpu_clock stat_clock;
       typedef CHRONO::steady_clock     rt_clock;
 # endif // CPP11_HAS_CHRONO      
+      
       typedef stat_clock::duration stat_duration;
 
       
