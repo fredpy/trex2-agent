@@ -860,7 +860,7 @@ void TeleoReactor::publish_obs_sync(TICK date) {
       m_updates.end()!=i; ++i) {
     Observation const &o = (*i)->lastObservation();
     if( (*i)->synchronize(date) ) {
-     //  syslog(obs)<<o;
+      syslog(obs)<<o;
     }
   }
   m_updates.clear();
