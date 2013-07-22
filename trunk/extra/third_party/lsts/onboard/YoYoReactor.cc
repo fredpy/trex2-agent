@@ -91,7 +91,7 @@ namespace TREX {
     {
       bool nearXY = false, nearZ = false, nearBottom = false;
       Variable v;
-      int secs_at_surface = 60;
+      // int secs_at_surface = 60; //< unused variable
 
      /* if (m_lastPosition.hasAttribute("altitude"))
       {

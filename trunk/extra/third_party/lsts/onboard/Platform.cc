@@ -38,7 +38,7 @@ namespace TREX
   {
     
     namespace {
-      bool was_idle = false;
+      // bool was_idle = false; //< unused variable
       int remote_id = 0;
       //ControlInterface * Platform::controlInterfaceInstance = 0;
       ImcAdapter m_adapter;
@@ -274,8 +274,8 @@ namespace TREX
     void
     Platform::postObservationToken(TrexToken token)
     {
-      obs_map::iterator it = postedObservations.find(token.timeline);
-      
+      // obs_map::iterator it = postedObservations.find(token.timeline); //< unused variable
+
       // If no such timeline has ever been posted, a new timeline will now be provided
       if ( !isInternal(token.timeline))
         provide(token.timeline, false, false);
@@ -302,10 +302,12 @@ namespace TREX
           LocaleBool() {}
           LocaleBool( bool data ) : data(data) {}
           operator bool() const { return data; }
-          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
-              out << std::boolalpha << b.data;
-              return out;
-          }
+
+        // unused method
+//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
+//              out << std::boolalpha << b.data;
+//              return out;
+//          }
           friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
               in >> std::boolalpha >> b.data;
               return in;
