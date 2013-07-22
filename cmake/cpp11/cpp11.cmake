@@ -14,8 +14,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 set(CPP11_COMPILER_SWITCH ${CPP11_flags} CACHE LIST "C++ compiler flags")
-set(CPP11_LINK_SWITCH ${CPP11_link_flags} CACHE LIST "C++ link flags")
+set(CPP11_LINK_FLAGS ${CPP11_link_flags} CACHE LIST "C++ link flags")
 mark_as_advanced(CPP11_COMPILER_SWITCH)
+mark_as_advanced(CPP11_LINK_FLAGS)
 
 
 
@@ -46,11 +47,15 @@ function(cpp11_feature_detection FEATURE_NAME)
     if(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
       set(CPP11_HAS_${FEATURE_NAME} TRUE)
     else(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
-      message(WARNING "Failed to run test for c++11 ${FEATURE_NAME}: ${CPP11_RAN_${FEATURE_NAME}}\n${RUN_OUT}")
+      file(WRITE has_${FEATURE_NAME}.exec ${RUN_OUT})
+      message(WARNING "Failed to run test for c++11 ${FEATURE_NAME}: ${CPP11_RAN_${FEATURE_NAME}}"
+	"Failed execution output stored in has_${FEATURE_NAME}.exec")
     endif(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
 
   else(CPP11_COMPILED_${FEATURE_NAME})
-    message(WARNING "Failed to compile test for c++11 ${FEATURE_NAME}:\n${COMP_OUT}")
+    file(WRITE has_${FEATURE_NAME}.comp ${COMP_OUT})
+    message(WARNING "Failed to compile test for c++11 ${FEATURE_NAME}"
+      "compilation output is in ${has_${FEATURE_NAME}.comp")
   endif(CPP11_COMPILED_${FEATURE_NAME})
 
   message(STATUS "Detecting support for c++11 feature '${FEATURE_NAME}': ${CPP11_HAS_${FEATURE_NAME}}")
@@ -64,23 +69,23 @@ function(cpp11_feature_detection FEATURE_NAME)
   unset(CPP11_HAS_${FEATURE_NAME})
 endfunction()
 
-function(cpp11_lib_support NAME CODE DEFINITIONS)
+function(cpp11_lib_support NAME CODE DEFINITIONS LIBS)
   set(FLAGS ${CPP11_COMPILER_SWITCH} ${DEFINITIONS})
   set(test_file ${CMAKE_BINARY_DIR}/cpp11/supported_by_${NAME})
   file(WRITE  ${test_file}.cc ${CODE})
   try_compile(success
     ${CMAKE_BINARY_DIR}
     ${test_file}.cc
-    CMAKE_FLAGS "-DCMAKE_EXE_LINKER_FLAGS=${CPP11_link_flags}"
     COMPILE_DEFINITIONS ${FLAGS}
+    CMAKE_FLAGS 
+      -DCMAKE_EXE_LINKER_FLAGS:STRING=${CPP11_link_flags} 
+      -DLINK_LIBRARIES:STRING=${LIBS}
     OUTPUT_VARIABLE OUT)
-  if(NOT success)
-    message(WARNING "Failed to compile test for '${NAME}' compatibilty with c++11:\n ${OUT}")
-  endif(NOT success)
   message(STATUS "Checking c++11 compatibility for '${NAME}': ${success}")
   set(CPP11_SUPPORT_${NAME} ${success} PARENT_SCOPE)
   if(NOT success)
     file(WRITE ${test_file}.out ${OUT})
+    message(STATUS "Failed compilation output stored in ${test_file}.out")
   endif(NOT success)
 endfunction()
 
