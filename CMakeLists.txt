@@ -154,9 +154,10 @@ if(Boost_CHRONO_LIBRARY)
   set(CHRONO_LIB ${Boost_CHRONO_LIBRARY} CACHE PATH "Boost chrono library path" FORCE)
 else(Boost_CHRONO_LIBRARY)
   set(CHRONO_LIB "" CACHE PATH "Boost chrono not found" FORCE)
-  message(WARNING "Boost.Chrono was not found."
-    "Checking for C++11 equivalent instead")
-  set(WITH_CPP11 ON CACHE BOOL "C++11 required for lack of Boost.Chrono" FORCE)
+  if(NOT WITH_CPP11)
+    message(FATAL_ERROR "Boost.Chrono was not found and WITH_CPP11 is false."
+      "Try to enable WITH_CPP11 in order to find C++11 chrono implementation.")
+  endif(NOT WITH_CPP11)
 endif(Boost_CHRONO_LIBRARY)
 
 ########################################################################
@@ -175,9 +176,10 @@ if(WITH_CPP11)
   cpp11_feature_detection(UNIQUE_PTR)
   cpp11_feature_detection(SHARED_PTR) 
   cpp11_feature_detection(DELETED_FUNCTIONS)
+  cpp11_feature_detection(THREAD)
 
   if(CPP11_ENABLED) 
-    set(boost_flags -L${Boost_LIBRARY_DIRS} -l${Boost_DATE_TIME})
+    set(boost_flags -I${Boost_INCLUDE_DIRS} -L${Boost_LIBRARY_DIRS} -l${Boost_DATE_TIME})
     # A simple date_time program : will fail to compile if boost 
     # was linked to a non c++11 compatible standard library
     #   this handle Clang that links against different lib*c++ depending 
@@ -196,6 +198,11 @@ int main(int argc, char *argv[]) {
       message(FATAL_ERROR " Boost library cannot be used with C++11")
     endif(NOT ${CPP11_SUPPORT_Boost})
     add_definitions(${CPP11_COMPILER_SWITCH})
+    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${CPP11_LINK_FLAGS})
+    set(CMAKE_LINK_LIBRARY_FLAGS ${CMAKE_LINK_LIBRARY_FLAGS} ${CPP11_LINK_FLAGS})
+    # The scode stuff
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++0x")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
   endif(CPP11_ENABLED)
 else(WITH_CPP11)
   # ensure that cpp11 is not enabled
