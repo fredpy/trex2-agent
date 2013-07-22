@@ -175,7 +175,7 @@ void LogManager::createLatest() {
   char dated_dir[16];
   
   if( NULL==base_dir_name ) {
-    throw ErrnoExcept("LogManager: $"LOG_DIR_ENV" is not set");
+    throw ErrnoExcept("LogManager: $" LOG_DIR_ENV " is not set");
   }
   path_type base_dir(base_dir_name);
   base_dir.make_preferred();
