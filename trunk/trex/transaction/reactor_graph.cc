@@ -225,7 +225,7 @@ void graph::updateTick(TICK value, bool started) {
 }
 
 TICK graph::getCurrentTick() const {
-  boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
+  boost::optional<details::graph_impl::date_type> cur = m_impl->get_date(true);
   
   if( !cur )
     return m_currentTick;
