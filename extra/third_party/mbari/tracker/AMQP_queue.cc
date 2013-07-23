@@ -87,12 +87,12 @@ void queue::bind(std::string const &exchange, std::string const &key) {
   }
 }
 
-boost::shared_ptr<queue::message> queue::consume() {
+SHARED_PTR<queue::message> queue::consume() {
   int ret;
   amqp_frame_t             frame;
   amqp_basic_deliver_t    *deliver;
   amqp_basic_properties_t *props;
-  boost::shared_ptr<message> result;
+  SHARED_PTR<message> result;
 
   // Wait for an header 
   do {

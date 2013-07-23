@@ -42,12 +42,6 @@ if(WITH_LSTS)
   add_subdirectory(lsts)
 endif(WITH_LSTS)
 
-# NUS AUV component
-option(WITH_NUS "Use NUS plugin" OFF)
-if(WITH_NUS)
-  add_subdirectory(starfish)
-endif(WITH_NUS)
-
 # ROS connection components
 option(WITH_ROS "Use ROS plugin" OFF)
 if(WITH_ROS)

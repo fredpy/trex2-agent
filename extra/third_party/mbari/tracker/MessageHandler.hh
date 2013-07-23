@@ -62,7 +62,7 @@ namespace mbari {
      *
      * The factory used by DrifterTracker to create new MessageHandler
      */
-    typedef TREX::utils::XmlFactory<MessageHandler, boost::shared_ptr<MessageHandler>, 
+    typedef TREX::utils::XmlFactory<MessageHandler, SHARED_PTR<MessageHandler>, 
 				    DrifterTracker *> factory;
     /** @brief XML factory argument
      * The type of the argeument provided by the factory while constructing  a 
