@@ -59,7 +59,8 @@ details::graph_impl::~graph_impl() {
 // public  manipulators
 
 void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
-  m_strand->dispatch(boost::bind(&graph_impl::set_date_sync, shared_from_this(), d));
+//  m_strand->dispatch(boost::bind(&graph_impl::set_date_sync, shared_from_this(), d));
+  set_date_sync(d);
 }
 
 boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {

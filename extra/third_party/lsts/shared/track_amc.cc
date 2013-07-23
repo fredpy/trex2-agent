@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
         dt -= *prev_date;
         if( dt>CHRONO::nanoseconds::zero() ) {
           dts -= *prev_stat;
-          pcpu = dts.count()/dt.count();
+          pcpu = (100 * dts.count())/dt.count();
         }
       } else
         std::cout<<"time_ns, utime_ns, stime_ns, pcpu, state"<<std::endl;
