@@ -804,6 +804,7 @@ void Agent::synchronize() {
 
   stat_clock::duration delta;
   rt_clock::duration delta_rt;
+  TICK const now = getCurrentTick();
   
   {
     utils::chronograph<rt_clock> rt_chron(delta_rt);
@@ -814,7 +815,7 @@ void Agent::synchronize() {
     size_t n_failed = cleanup();
     if( n_failed>0 )
       syslog(null, warn)<<n_failed<<" reactors failed to start tick "
-                        <<getCurrentTick();
+                        <<now;
       // Execute synchronization
       //  - could be done with a dfs but we choose for now to do it using the
       //  output list of sync_scheduller to avoid a potentially costfull graph
@@ -840,12 +841,12 @@ void Agent::synchronize() {
         }
       }
   }
-  m_stat_log<<getCurrentTick()<<", "<<delta.count()<<", "<<delta_rt.count()
+  m_stat_log<<now<<", "<<delta.count()<<", "<<delta_rt.count()
 	    <<std::flush;
   if( update ) {
     // Create new graph file
     std::ostringstream name;
-    name<<"reactors."<<getCurrentTick()<<".gv";
+    name<<"reactors."<<now<<".gv";
     
     LogManager::path_type graph_dot = manager().file_name(name.str());
     std::ofstream dotf(graph_dot.c_str());
@@ -906,6 +907,8 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
+  TICK const now = getCurrentTick();
+  
   size_t count = 0; //slp_count = 0;
   bool completed = false;
   stat_clock::duration delib;
@@ -918,7 +921,7 @@ bool Agent::doNext() {
     {
       utils::chronograph<stat_clock> stat_chron(delib);
       utils::chronograph<rt_clock> rt_chron(delib_rt);
-      while( m_clock->tick()==getCurrentTick()
+      while( m_clock->tick()==now
             && m_clock->is_free() && valid()
             && executeReactor() ) {
         ++count;
@@ -933,7 +936,7 @@ bool Agent::doNext() {
     
     {
       utils::chronograph<rt_clock> sleep_chrono(sleep_time);
-      while( valid() && m_clock->tick()==getCurrentTick() ) {
+      while( valid() && m_clock->tick()==now ) {
         sleep_req += CHRONO::duration_cast<rt_clock::duration>(m_clock->sleep());
         ++sl_count;
       }

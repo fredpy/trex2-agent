@@ -218,18 +218,21 @@ bool graph::hasTick() const {
 }
 
 void graph::updateTick(TICK value, bool started) {
-  if( started )
+  if( started ) {
+    m_tick_updated = true;
     m_impl->set_date(value);
-  else
+  } else
     m_currentTick = value;
 }
 
 TICK graph::getCurrentTick() const {
-  boost::optional<details::graph_impl::date_type> cur = m_impl->get_date(true);
-  
-  if( !cur )
-    return m_currentTick;
-  return *cur;
+  if( tick_updated() ) {
+    boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
+    m_tick_updated = false;
+    if( cur )
+      m_currentTick = *cur;
+  }
+  return m_currentTick;
 }
 
 boost::asio::strand &graph::strand() {
