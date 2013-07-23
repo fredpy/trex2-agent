@@ -40,6 +40,7 @@
 # include "entry.hh"
 # include "stream.hh"
 
+# include <trex/utils/bits/asio_conf.hh>
 # include "bits/log_sig.hh"
 
 # include "../platform/memory.hh"

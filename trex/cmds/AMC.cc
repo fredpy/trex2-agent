@@ -139,6 +139,7 @@ extern "C" {
 
 int main(int argc, char *argv[]) {
   po::options_description hidden("Hidden options"), cmd_line;
+  size_t nice_val;
 
   // Specifies the handler for extracting the mission name
   hidden.add_options()("mission",
@@ -157,7 +158,7 @@ int main(int argc, char *argv[]) {
    "run agent with simulated clock with given deliberation steps per tick")
   ("period,p", po::value<unsigned long>()->implicit_value(1000),
    "run agent with a real time clock with the given period in ms")
-  ("nice", po::value<size_t>()->implicit_value(10),
+  ("nice", po::value<size_t>(&nice_val)->implicit_value(10),
    "run this command with the given nice level")
 #ifdef DAEMON // fork does not work well with asio apprently ... to be refined
   ("daemon,D", "run amc as a detached daemon (experimental)")
@@ -197,12 +198,8 @@ int main(int argc, char *argv[]) {
              <<opt<<std::endl;
     exit(1);
   }
-  // Extract the nice value
-  int nice_val;
   
-  if( opt_val.count("nice") )
-    nice_val = opt_val["nice"].as<size_t>();
-  else {
+  if( !opt_val.count("nice") ) {
     // I need to check the environment instead
     char *priority_env = getenv("TREX_NICE");
     if( NULL!=priority_env ) {
@@ -213,8 +210,7 @@ int main(int argc, char *argv[]) {
         amc_log->syslog("amc", log::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
         nice_val = opt_val["nice"].as<size_t>();
       }
-    } else
-      nice_val = opt_val["nice"].as<size_t>();
+    }
   }
 
 #ifdef DAEMON
