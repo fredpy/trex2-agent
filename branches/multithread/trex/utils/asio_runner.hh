@@ -1,9 +1,3 @@
-/** @file trex/utils/asio_runner.hh
- * @brief An helper to manage asio service execution
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -36,6 +30,12 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
+ */
+/** @file trex/utils/asio_runner.hh
+ * @brief An helper to manage asio service execution
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
  */
 #ifndef H_trex_utils_asio_runner
 # define H_trex_utils_asio_runner
@@ -73,6 +73,7 @@ namespace TREX {
        * @post a new asio service is running on a newly spawned thread
        */
       asio_runner();
+      explicit asio_runner(size_t n_threads);
       /** @brief Destructor 
        *
        * This destructor will join all the threads this instance had created
@@ -136,6 +137,25 @@ namespace TREX {
       boost::thread_group m_threads;
     }; // TREX::utils::asio_runner
     
+    /** @brief synchronize asynchronous call
+     *
+     * @param s Executing service
+     * @param f A function
+     *
+     * Executes @p f using the asio service @p s and block until 
+     * @p f completes.
+     *
+     * @note This method acts as a acritical section between the calling 
+     * thread and @p s as it will block the calling thread until @p f 
+     * was completd by @p s.
+     *
+     * @note If the caller is executed by @p s then the call of @p f will 
+     * be done immediately within this thread.
+     *
+     * @return the value returned by @p f
+     *
+     * @throw an exception rpduced by @p f if any
+     */
     template<class Service, typename Ret>
     Ret strand_run(Service &s, boost::function<Ret ()> const &f) {
       boost::packaged_task<Ret> tsk(f);
@@ -145,7 +165,9 @@ namespace TREX {
                          boost::ref(tsk)));
       return result.get();
     }
-    
+
+# ifndef DOXYGEN
+
     template<class Service>
     void strand_run(Service &s, boost::function<void ()> const &f) {
       boost::packaged_task<void> tsk(f);
@@ -155,6 +177,8 @@ namespace TREX {
                          boost::ref(tsk)));
       result.get();
     }
+    
+# endif // DOXYGEN
     
   } // TREX::utils
 } // TREX

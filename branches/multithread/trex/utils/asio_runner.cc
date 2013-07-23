@@ -45,9 +45,14 @@ using namespace boost::asio;
 asio_runner::asio_runner() {
   // Create a work for maintaining our service 
   m_active.reset(new io_service::work(m_io));
-  // spawn a first thread that manages our service
-  //spawn(1);
 }
+
+asio_runner::asio_runner(size_t n_threads) {
+  m_active.reset(new io_service::work(m_io));
+  if( n_threads>0 )
+    thread_count(n_threads);
+}
+
 
 asio_runner::~asio_runner() {
   // complete our work so threads can complete

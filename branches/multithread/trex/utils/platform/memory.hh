@@ -31,6 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
 /** @file "trex/utils/platform/memory.hh"
  * @brief C++11 Unique pointer adapter header
  *
@@ -86,7 +87,7 @@
  */
 #  define SHARED_NS  computed_namespace
 
-# else
+# else // DOXYGEN
 
 #  ifdef CPP11_HAS_UNIQUE_PTR
 #   define UNIQ_PTR  std::unique_ptr
@@ -138,12 +139,39 @@ namespace boost {
 
 #   define SHARED_NS boost
 #  endif // CPP11_HAS_SHARED_PTR
-
 # endif // DOXYGEN
 
+/** @brief shared_ptr macro
+ *
+ * A macro defining the correct synmbol for shared_ptr template
+ * class implementation 
+ */
 # define SHARED_PTR  SHARED_NS::shared_ptr
+/** @brief weak_ptr macro
+ *
+ * A macro defining the correct symbol for weak_ptr template
+ * class implementation
+ *
+ * @sa SHARED_PTR
+ */
 # define WEAK_PTR    SHARED_NS::weak_ptr
+/** @brief make_shared macro
+ *
+ * A macro defining the correct symbol for make_shared template function.
+ * This function allow to more efficiently allocating shared_ptr by making
+ * it in a single memory allocation
+ *
+ * @sa SHARED_PTR
+ */
 # define MAKE_SHARED SHARED_NS::make_shared
+/** @brief enable_shared_from_this
+ *
+ * A macro defining the correct symbol for the enable_shared_from_this 
+ * template class. This class allows its derived classes to directly 
+ * access to its existing shared pointer.
+ *
+ * @sa SHARED_PTR
+ */
 # define ENABLE_SHARED_FROM_THIS SHARED_NS::enable_shared_from_this
 
 #endif // H_trex_memory
