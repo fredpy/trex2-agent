@@ -74,7 +74,7 @@ DrifterTracker::DrifterTracker(TeleoReactor::xml_arg_type arg)
   DrifterTracker *me = this;
   MessageHandler::factory::iter_traits<boost::property_tree::ptree::iterator>::type
     it = MessageHandler::factory::iter_traits<boost::property_tree::ptree::iterator>::build(initial, me);
-  boost::shared_ptr<MessageHandler> handler;
+  SHARED_PTR<MessageHandler> handler;
 
   while( m_msg_factory->iter_produce(it, node.second.end(), handler) ) {
     // bind to this exchange
@@ -120,7 +120,7 @@ bool DrifterTracker::synchronize() {
 
 
   while( !m_messages.empty() ) {
-    boost::shared_ptr<amqp::queue::message> msg = m_messages.pop();
+    SHARED_PTR<amqp::queue::message> msg = m_messages.pop();
     // syslog(info)<<"New message["<<msg->key()<<"]: "<<msg->size()
     // 		<<" bytes from \""
     // 		<<msg->exchange()<<"\"";

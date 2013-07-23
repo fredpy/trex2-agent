@@ -81,7 +81,7 @@ namespace mbari {
          * This method is called by the listner whenever a new message @p msg is 
          * received.
          */
-	virtual void handle(boost::shared_ptr<queue::message> const &msg) =0;
+	virtual void handle(SHARED_PTR<queue::message> const &msg) =0;
 	
 	friend class listener;
       }; // mbari::amqp::listener::handler
@@ -197,12 +197,12 @@ namespace mbari {
        *
        * @post the returned message is not in the buffer anymore
        */
-      boost::shared_ptr<queue::message> pop();
+      SHARED_PTR<queue::message> pop();
       
     private:
-      void handle(boost::shared_ptr<queue::message> const &msg);
+      void handle(SHARED_PTR<queue::message> const &msg);
 
-      typedef std::list<boost::shared_ptr<queue::message> > queue_type;
+      typedef std::list<SHARED_PTR<queue::message> > queue_type;
 
       mutable TREX::utils::SharedVar<queue_type> m_queue;
     }; // mbari::amqp::msg_buffer
