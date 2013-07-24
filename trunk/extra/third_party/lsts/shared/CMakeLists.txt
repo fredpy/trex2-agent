@@ -83,7 +83,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(track_amc track_amc.cc)
 install(TARGETS track_amc DESTINATION bin)
 target_link_libraries(track_amc ${SYSTEM_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${CHRONO_LIB} 
-  ${RAW_CLK_LIB})
+  ${RAW_CLK_LIB} ${DUNE_CORE_LIB})
 trex_cmd(track_amc)
 
 install(TARGETS LSTSshared DESTINATION lib) 
