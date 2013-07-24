@@ -40,9 +40,12 @@
 #include <errno.h>
 
 #include <trex/utils/platform/chrono.hh>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
+
+#include <Dune/Time/Clock.hpp>
 
 #define BUFF_SIZE 4096
 
@@ -102,15 +105,15 @@ int main(int argc, char **argv) {
   
   char stats_buff[BUFF_SIZE+1];
   stats_buff[BUFF_SIZE] = '\0';
-  boost::optional<CHRONO::nanoseconds> prev_date, prev_raw, prev_stat;
-
+  boost::optional<CHRONO::nanoseconds> prev_date, prev_raw, prev_stat, prev_dune;
   
   while(1) {
     std::ifstream in(path.c_str());
     
     CHRONO::system_clock::time_point st = CHRONO::system_clock::now();
     raw_clock::time_point raw = raw_clock::now();
-  
+    CHRONO::nanoseconds dune(DUNE::Time::Clock::getNsec());
+
     if( !in.good() ) {
       std::cerr<<"Failed to open "<<path<<std::endl;
       break;
@@ -144,10 +147,10 @@ int main(int argc, char **argv) {
         ut(utime), st(stime);
       
       unsigned long long pcpu = 0;
-      long double speed = 1.0;
+      long double speed = 1.0, dune_speed = 1.0;
       
       if( prev_date ) {
-        CHRONO::nanoseconds dt = rt, dts = ut+st, dtr = rtc;
+        CHRONO::nanoseconds dt = rt, dts = ut+st, dtr = rtc, dtd = dune;
         dt -= *prev_date;
         if( dt>CHRONO::nanoseconds::zero() ) {
           dts -= *prev_stat;
@@ -156,16 +159,23 @@ int main(int argc, char **argv) {
 	  dtr -= *prev_raw;
 	  speed = dtr.count();
 	  speed /= dt.count();
+
+	  dtd -= *prev_dune;
+	  dune_speed = dtd.count();
+	  dune_speed /= dt.count();
         }
       } else
-        std::cout<<"time_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, state"<<std::endl;
-      std::cout<<rt.count()<<", "<<rtc.count()<<", "<<ut.count()<<", "<<st.count()
+        std::cout<<"time_ns, dune_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, d_raw/d_dune, state"<<std::endl;
+      std::cout<<rt.count()<<", "<<dune.count()<<", "<<rtc.count()
+	       <<", "<<ut.count()<<", "<<st.count()
 	       <<", "<<pcpu<<", "
 	       <<std::fixed<<std::setprecision(2)<<speed<<", "
+	       <<std::fixed<<std::setprecision(2)<<dune_speed<<", "
 	       <<args[2]<<std::endl;
       prev_date = rt;
       prev_stat = ut+st;
       prev_raw = rtc;
+      prev_dune = dune;
       struct timespec rq, rm;
       rq.tv_sec = 0;
       rq.tv_nsec = CHRONO::duration_cast<CHRONO::nanoseconds>(CHRONO::milliseconds(100)).count(); // wake up every 100ms or so
