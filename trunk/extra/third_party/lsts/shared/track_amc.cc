@@ -65,8 +65,8 @@ namespace {
     if( ::clock_gettime(CLOCK_MONOTONIC_RAW, &date) ) {
       BOOST_ASSERT(0 && "raw_clock Internal error");
     }
-    return timepoint(duration(static_cast<duration::rep>(date.tv_sec)*1000000000
-                              +date.tv_usec));
+    return time_point(duration(static_cast<duration::rep>(date.tv_sec)*1000000000
+                              +date.tv_nsec));
   }
   
 #else // HAS_CLOCK_MONOTONIC_RAW
