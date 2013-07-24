@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
   
   char stats_buff[BUFF_SIZE+1];
   stats_buff[BUFF_SIZE] = '\0';
-  boost::optional<CHRONO::nanoseconds> prev_date, prev_stat;
+  boost::optional<CHRONO::nanoseconds> prev_date, prev_raw, prev_stat;
 
   
   while(1) {
@@ -143,20 +143,26 @@ int main(int argc, char **argv) {
         ut(utime), st(stime);
       
       unsigned long long pcpu = 0;
+      long double speed = 1.0;
       
       if( prev_date ) {
-        CHRONO::nanoseconds dt = rt, dts = ut+st;
+        CHRONO::nanoseconds dt = rt, dts = ut+st, dtr = rtc;
         dt -= *prev_date;
         if( dt>CHRONO::nanoseconds::zero() ) {
           dts -= *prev_stat;
           pcpu = (100 * dts.count())/dt.count();
+
+	  dtr -= *prev_raw;
+	  speed = dtr.count();
+	  speed /= dt.count();
         }
       } else
-        std::cout<<"time_ns, raw_ns, utime_ns, stime_ns, pcpu, diff_raw, state"<<std::endl;
+        std::cout<<"time_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, state"<<std::endl;
       std::cout<<rt.count()<<", "<<rtc.count()<<", "<<ut.count()<<", "<<st.count()
-      <<", "<<pcpu<<", "<<(rt-rtc).count()<<", "<<args[2]<<std::endl;
+      <<", "<<pcpu<<", "<<speed<<", "<<args[2]<<std::endl;
       prev_date = rt;
       prev_stat = ut+st;
+      prev_raw = rtc;
       struct timespec rq, rm;
       rq.tv_sec = 0;
       rq.tv_nsec = CHRONO::duration_cast<CHRONO::nanoseconds>(CHRONO::milliseconds(100)).count(); // wake up every 100ms or so
