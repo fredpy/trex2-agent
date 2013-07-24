@@ -33,6 +33,7 @@
  */
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include <unistd.h>
@@ -159,7 +160,9 @@ int main(int argc, char **argv) {
       } else
         std::cout<<"time_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, state"<<std::endl;
       std::cout<<rt.count()<<", "<<rtc.count()<<", "<<ut.count()<<", "<<st.count()
-      <<", "<<pcpu<<", "<<speed<<", "<<args[2]<<std::endl;
+	       <<", "<<pcpu<<", "
+	       <<std::fixed<<std::setprecision(2)<<speed<<", "
+	       <<args[2]<<std::endl;
       prev_date = rt;
       prev_stat = ut+st;
       prev_raw = rtc;
