@@ -45,6 +45,38 @@
 
 #define BUFF_SIZE 4096
 
+#include <raw_clock.hh>
+
+namespace {
+#ifdef HAS_CLOCK_MONOTONIC_RAW
+  struct raw_clock {
+    typedef CHRONO::nanoseconds          duration;
+    typedef duration::rep                rep;
+    typedef duration::period             period;
+    typedef CHRONO::timepoint<raw_clock> time_point;
+    
+    static const bool is_steady = true;
+    
+    static time_point now();
+  };
+  
+  raw_clock::time_point raw_clock::now() {
+    timespec date;
+    if( ::clock_gettime(CLOCK_MONOTONIC_RAW, &date) ) {
+      BOOST_ASSERT(0 && "raw_clock Internal error");
+    }
+    return timepoint(duration(static_cast<duration::rep>(date.tv_sec)*1000000000
+                              +date.tv_usec));
+  }
+  
+#else // HAS_CLOCK_MONOTONIC_RAW
+  
+  typedef CHRONO::steady_clock raw_clock;
+  
+#endif // HAS_CLOCK_MONOTONIC_RAW
+}
+
+
 int main(int argc, char **argv) {
   if( argc<2 ) {
     std::cerr<<"usage: "<<argv[0]<<" <pid>"<<std::endl;
@@ -76,6 +108,7 @@ int main(int argc, char **argv) {
     std::ifstream in(path.c_str());
     
     CHRONO::system_clock::time_point st = CHRONO::system_clock::now();
+    raw_clock::time_point raw = raw_clock::now();
   
     if( !in.good() ) {
       std::cerr<<"Failed to open "<<path<<std::endl;
@@ -106,6 +139,7 @@ int main(int argc, char **argv) {
       
       CHRONO::nanoseconds
         rt = CHRONO::duration_cast<CHRONO::nanoseconds>(st.time_since_epoch()),
+        rtc = CHRONO::duration_cast<CHRONO::nanoseconds>(raw.time_since_epoch()),
         ut(utime), st(stime);
       
       unsigned long long pcpu = 0;
@@ -118,9 +152,9 @@ int main(int argc, char **argv) {
           pcpu = (100 * dts.count())/dt.count();
         }
       } else
-        std::cout<<"time_ns, utime_ns, stime_ns, pcpu, state"<<std::endl;
-      std::cout<<rt.count()<<", "<<ut.count()<<", "<<st.count()
-      <<", "<<pcpu<<", "<<args[2]<<std::endl;
+        std::cout<<"time_ns, raw_ns, utime_ns, stime_ns, pcpu, diff_raw, state"<<std::endl;
+      std::cout<<rt.count()<<", "<<rtc.count()<<", "<<ut.count()<<", "<<st.count()
+      <<", "<<pcpu<<", "<<(rt-rtc).count()<<", "<<args[2]<<std::endl;
       prev_date = rt;
       prev_stat = ut+st;
       struct timespec rq, rm;
