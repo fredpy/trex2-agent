@@ -47,6 +47,25 @@ add_library(LSTSshared SHARED
   LstsReactor.hh
 )
 
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.c
+"#include <time.h>
+
+int main(int argc, char **argv) {
+  struct timespec date;
+  clock_gettime(CLOCK_MONOTONIC_RAW, &date);
+  return 0;
+}")
+try_compile(HAS_CLOCK_MONOTONIC_RAW 
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.c
+  OUTPUT_VARIABLE OUT)
+
+message(STATUS "Checking for clock_gettime(CLOCK_MONOTONIC_RAW ...): ${HAS_CLOCK_MONOTONIC_RAW}")
+configure_file(raw_clock.hh.in ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.hh)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+
+
 add_executable(track_amc track_amc.cc)
 install(TARGETS track_amc DESTINATION bin)
 target_link_libraries(track_amc ${SYSTEM_LIBRARIES} ${Boost_SYSTEM_LIBRARY} ${CHRONO_LIB})
