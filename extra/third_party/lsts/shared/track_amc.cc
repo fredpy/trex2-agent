@@ -45,7 +45,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 
-#include <Dune/Time/Clock.hpp>
+#include <DUNE/Time/Clock.hpp>
 
 #define BUFF_SIZE 4096
 
