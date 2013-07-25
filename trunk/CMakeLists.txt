@@ -107,9 +107,9 @@ include_directories(
 # Linux 64 really needs -fPIC                                          #
 ########################################################################
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+#if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+#endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 
 
@@ -186,7 +186,7 @@ if(WITH_CPP11)
   cpp11_feature_detection(UNIQUE_PTR)
   cpp11_feature_detection(SHARED_PTR) 
   cpp11_feature_detection(DELETED_FUNCTIONS)
-  cpp11_feature_detection(THREAD)
+  #cpp11_feature_detection(THREAD)
 
   if(CPP11_ENABLED) 
     set(boost_flags -I${Boost_INCLUDE_DIRS})
