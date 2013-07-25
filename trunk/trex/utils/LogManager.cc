@@ -80,6 +80,10 @@ LogManager::~LogManager() {
 
 // methods :
 
+void LogManager::flush() {
+  m_trex_log->flush();
+}
+
 
 LogManager::path_type LogManager::locate(std::string const &file, bool &found) const {
   path_type ret(file);

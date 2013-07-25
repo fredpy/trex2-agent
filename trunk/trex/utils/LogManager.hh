@@ -247,6 +247,7 @@ namespace TREX {
                          log::id_type const &kind=log::null) {
 	return m_syslog(when, who, kind);
       }
+      void flush();
       
       template<typename Handler>
       boost::signals2::connection on_new_log(Handler fn) {
@@ -390,7 +391,7 @@ namespace TREX {
        */
       SharedVar<bool> m_inited;
       asio_runner  m_io;
-      
+            
       /** @brief syslog text log file */
       log::text_log   m_syslog;
       boost::shared_ptr<log::out_file> m_trex_log;

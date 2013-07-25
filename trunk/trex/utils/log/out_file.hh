@@ -76,6 +76,7 @@ namespace TREX {
          * Write @p msg in the output file
          */
         void operator()(entry::pointer msg);
+        void flush();
         
       private:
         boost::shared_ptr<std::ofstream> m_file;

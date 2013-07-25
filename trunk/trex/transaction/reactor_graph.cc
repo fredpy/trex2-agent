@@ -184,6 +184,7 @@ graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
 
 graph::~graph() {
   clear();
+  manager().flush();
 }
 
 TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
