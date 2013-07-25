@@ -33,17 +33,53 @@
  */
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include <unistd.h>
 #include <errno.h>
 
 #include <trex/utils/platform/chrono.hh>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 
+#include <DUNE/Time/Clock.hpp>
+
 #define BUFF_SIZE 4096
+
+#include <raw_clock.hh>
+
+namespace {
+#ifdef HAS_CLOCK_MONOTONIC_RAW
+  struct raw_clock {
+    typedef CHRONO::nanoseconds          duration;
+    typedef duration::rep                rep;
+    typedef duration::period             period;
+    typedef CHRONO::time_point<raw_clock> time_point;
+    
+    static const bool is_steady = true;
+    
+    static time_point now();
+  };
+  
+  raw_clock::time_point raw_clock::now() {
+    timespec date;
+    if( ::clock_gettime(CLOCK_MONOTONIC_RAW, &date) ) {
+      BOOST_ASSERT(0 && "raw_clock Internal error");
+    }
+    return time_point(duration(static_cast<duration::rep>(date.tv_sec)*1000000000
+                              +date.tv_nsec));
+  }
+  
+#else // HAS_CLOCK_MONOTONIC_RAW
+  
+  typedef CHRONO::steady_clock raw_clock;
+  
+#endif // HAS_CLOCK_MONOTONIC_RAW
+}
+
 
 int main(int argc, char **argv) {
   if( argc<2 ) {
@@ -69,14 +105,15 @@ int main(int argc, char **argv) {
   
   char stats_buff[BUFF_SIZE+1];
   stats_buff[BUFF_SIZE] = '\0';
-  boost::optional<CHRONO::nanoseconds> prev_date, prev_stat;
-
+  boost::optional<CHRONO::nanoseconds> prev_date, prev_raw, prev_stat, prev_dune;
   
   while(1) {
     std::ifstream in(path.c_str());
     
     CHRONO::system_clock::time_point st = CHRONO::system_clock::now();
-  
+    raw_clock::time_point raw = raw_clock::now();
+    CHRONO::nanoseconds dune(DUNE::Time::Clock::getNsec());
+
     if( !in.good() ) {
       std::cerr<<"Failed to open "<<path<<std::endl;
       break;
@@ -106,23 +143,39 @@ int main(int argc, char **argv) {
       
       CHRONO::nanoseconds
         rt = CHRONO::duration_cast<CHRONO::nanoseconds>(st.time_since_epoch()),
+        rtc = CHRONO::duration_cast<CHRONO::nanoseconds>(raw.time_since_epoch()),
         ut(utime), st(stime);
       
       unsigned long long pcpu = 0;
+      long double speed = 1.0, dune_speed = 1.0;
       
       if( prev_date ) {
-        CHRONO::nanoseconds dt = rt, dts = ut+st;
+        CHRONO::nanoseconds dt = rt, dts = ut+st, dtr = rtc, dtd = dune;
         dt -= *prev_date;
         if( dt>CHRONO::nanoseconds::zero() ) {
           dts -= *prev_stat;
-          pcpu = dts.count()/dt.count();
+          pcpu = (100 * dts.count())/dt.count();
+
+	  dtr -= *prev_raw;
+	  speed = dtr.count();
+	  speed /= dt.count();
+
+	  dtd -= *prev_dune;
+	  dune_speed = dtd.count();
+	  dune_speed /= dt.count();
         }
       } else
-        std::cout<<"time_ns, utime_ns, stime_ns, pcpu, state"<<std::endl;
-      std::cout<<rt.count()<<", "<<ut.count()<<", "<<st.count()
-      <<", "<<pcpu<<", "<<args[2]<<std::endl;
+        std::cout<<"time_ns, dune_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, d_raw/d_dune, state"<<std::endl;
+      std::cout<<rt.count()<<", "<<dune.count()<<", "<<rtc.count()
+	       <<", "<<ut.count()<<", "<<st.count()
+	       <<", "<<pcpu<<", "
+	       <<std::fixed<<std::setprecision(2)<<speed<<", "
+	       <<std::fixed<<std::setprecision(2)<<dune_speed<<", "
+	       <<args[2]<<std::endl;
       prev_date = rt;
       prev_stat = ut+st;
+      prev_raw = rtc;
+      prev_dune = dune;
       struct timespec rq, rm;
       rq.tv_sec = 0;
       rq.tv_nsec = CHRONO::duration_cast<CHRONO::nanoseconds>(CHRONO::milliseconds(100)).count(); // wake up every 100ms or so
