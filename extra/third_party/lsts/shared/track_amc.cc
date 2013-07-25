@@ -75,7 +75,7 @@ namespace {
   
 #else // HAS_CLOCK_MONOTONIC_RAW
   
-  typedef CHRONO::steady_clock raw_clock;
+  typedef CHRONO::high_resolution_clock raw_clock;
   
 #endif // HAS_CLOCK_MONOTONIC_RAW
 }
