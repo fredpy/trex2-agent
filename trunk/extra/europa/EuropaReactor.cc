@@ -232,7 +232,7 @@ void EuropaReactor::notify(Observation const &obs) {
   else if( !restrict_token(fact, obs) )
     syslog(null, error)<<"Failed to restrict some attributes of observation "
 		       <<obs;
-  logPlan("notify");
+  // logPlan("notify");
 }
 
 void EuropaReactor::handleRequest(goal_id const &request) {
@@ -267,7 +267,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       }
     }
   }
-  logPlan("request");
+  // logPlan("request");
 }
 
 void EuropaReactor::handleRecall(goal_id const &request) {
@@ -290,7 +290,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
     syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
     recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
-  logPlan("recall");
+  // logPlan("recall");
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
@@ -325,7 +325,7 @@ void EuropaReactor::handleTickStart() {
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
-  logPlan("tick");
+  // logPlan("tick");
 }
 
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
@@ -416,6 +416,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 void EuropaReactor::print_stats(std::string const &what, 
 				size_t steps, size_t depth,
 				EuropaReactor::stat_clock::duration const &dur) {
+  return; // disabled this for now 
   m_stats<<now()<<", "<<what<<", "<<dur.count()
 	 <<", "<<plan_db()->getTokens().size()
 	 <<", "<<steps<<", "<<depth<<std::endl;
@@ -427,7 +428,7 @@ bool EuropaReactor::do_relax(bool full) {
   stat_clock::time_point start = stat_clock::now();
   bool ret = relax(full);
   print_stats("relax", 0, 0, stat_clock::now()-start);
-  logPlan("relax");
+  // logPlan("relax");
   m_dispatched.clear(); // need this in case we have the same
 			// token coming back
   return ret;

@@ -1257,14 +1257,14 @@ void TeleoReactor::Logger::cancelPlan(goal_id const &tok) {
 // asio methods
 
 void TeleoReactor::Logger::obs(Observation o) {
-  o.to_xml(m_file)<<std::endl;
+  o.to_xml(m_file)<<'\n';
 }
 
 
 void TeleoReactor::Logger::goal_event(std::string tag, goal_id g, bool full) {
   m_file<<"   <"<<tag<<" id=\""<<g<<"\" ";
   if( full )
-    g->to_xml(m_file<<">\n")<<"\n   </"<<tag<<">"<<std::endl;
+    g->to_xml(m_file<<">\n")<<"\n   </"<<tag<<">\n";
   else
     direct_write("/>", true);
 }
@@ -1348,7 +1348,7 @@ void TeleoReactor::Logger::close_phase() {
 
 void TeleoReactor::Logger::open_tick() {
   if( m_flags.test(tick) && !m_flags.test(tick_opened) ) {
-    m_file<<" <tick value=\""<<m_current<<"\">\n";
+    m_file<<" <tick value=\""<<m_current<<"\">";
     m_flags.set(tick_opened);
   }
 }
@@ -1358,6 +1358,7 @@ void TeleoReactor::Logger::close_tick() {
     if( m_flags.test(tick_opened) ) {
       close_phase();
       direct_write(" </tick>", true);
+      // std::flush(m_file); // Flush the buffer at every tick
     }
   } else if( m_flags.test(header) ) {
     direct_write(" </header>", true);
@@ -1371,5 +1372,5 @@ void TeleoReactor::Logger::close_tick() {
 void TeleoReactor::Logger::direct_write(std::string const &content, bool nl) {
   m_file.write(content.c_str(), content.length());
   if( nl )
-    std::endl(m_file);
+    m_file.put('\n');
 }
