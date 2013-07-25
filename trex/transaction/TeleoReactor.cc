@@ -844,7 +844,7 @@ void TeleoReactor::doNotify() {
                                           this, boost::ref(obs)));
   utils::strand_run(m_graph.strand(), fn);
   for(std::list<Observation>::const_iterator i=obs.begin(); obs.end()!=i; ++i) {
-    syslog("NOTIFY")<<(*i);
+    // syslog("NOTIFY")<<(*i);
     notify(*i);
   }
 }
