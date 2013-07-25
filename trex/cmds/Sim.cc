@@ -350,8 +350,10 @@ int main(int argc, char **argv) {
 	s_log->syslog("sim", info)<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
-	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() )
+	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() ) {
 	  my_agent->doNext();
+          s_log->flush();
+        }
       } else if( 'G'==cmd ) {
 	try {
 	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
@@ -362,8 +364,10 @@ int main(int argc, char **argv) {
             <<std::endl;
 	  else {
 	    while( my_agent->getCurrentTick()<targetTick &&
-                  !my_agent->missionCompleted() )
+                  !my_agent->missionCompleted() ) {
 	      my_agent->doNext();
+              s_log->flush();
+            }
 	  }
 	}catch(bad_string_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;

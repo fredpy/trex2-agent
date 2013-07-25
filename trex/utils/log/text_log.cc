@@ -143,6 +143,12 @@ out_file::out_file(std::string const &name)
                                              // it conflicts when boost used with
                                              // gcc with c++11 support
 
+
+void out_file::flush() {
+  std::flush(*m_file);
+}
+
+
 void out_file::operator()(entry::pointer msg) {
   if( m_file && *m_file) {
     bool prefixed = false;
