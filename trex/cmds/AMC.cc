@@ -94,6 +94,8 @@
 
 using namespace TREX::agent;
 using namespace TREX::utils;
+namespace tlog=TREX::utils::log;
+
 
 namespace po=boost::program_options;
 namespace pco=po::command_line_style;
@@ -208,7 +210,7 @@ int main(int argc, char *argv[]) {
         nice_val = string_cast<size_t>(priority_env);
       } catch (bad_string_cast const &e) {
         std::cerr<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"'<<std::endl;
-        amc_log->syslog("amc", log::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
+        amc_log->syslog("amc", tlog::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
       }
     }
   }
