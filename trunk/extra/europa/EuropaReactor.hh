@@ -37,6 +37,8 @@
 # include <trex/europa/Assembly.hh>
 
 # include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/asio_fstream.hh>
+
 
 # include <boost/bimap.hpp>
 
@@ -170,7 +172,7 @@ namespace TREX {
       
       void print_stats(std::string const &what, size_t steps, size_t depth,
 		       stat_clock::duration const &dur);
-      std::ofstream m_stats;
+      utils::async_ofstream m_stats;
       bool m_old_plan_style, m_full_log;
       mutable size_t m_plan_counter;
     }; // TREX::europa::EuropaReactor

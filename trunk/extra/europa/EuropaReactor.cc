@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "EuropaReactor.hh"
+
 #include "bits/europa_convert.hh"
 #include "core/private/CurrentState.hh"
 
@@ -75,6 +76,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
             parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_completed_this_tick(false),
+   m_stats(manager().service()),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg),
                                   "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
@@ -762,8 +764,11 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
     name = base_name;
   
   LogManager::path_type full_name = file_name(name+".gv");
-  std::ofstream out(full_name.c_str());  
-  print_plan(out, m_old_plan_style);
+  utils::async_ofstream out(manager().service(), full_name.string());
+  {
+    utils::async_ofstream::entry e = out.new_entry();
+    print_plan(e.stream(), m_old_plan_style);
+  }
   if( m_full_log ) {
     LogManager::path_type link_name = file_name(base_name+".gv");
     if( exists(link_name) ) 

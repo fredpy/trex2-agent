@@ -87,7 +87,7 @@ namespace TREX {
     private:
       boost::asio::strand           m_strand;
       boost::asio::io_service::work m_active;
-      std::ofstream                 m_file;
+      utils::async_ofstream         m_file;
       
       enum {
         header      = 0,
@@ -324,7 +324,8 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
    m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
-   m_nSteps(0), m_past_deadline(false), m_validSteps(0) {
+   m_nSteps(0), m_past_deadline(false), m_validSteps(0),
+   m_stat_log(m_log->service()) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
   utils::LogManager::path_type fname = file_name("stat.csv");
@@ -375,9 +376,9 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
    m_have_goals(0),
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
-   m_nSteps(0) {
+   m_nSteps(0), m_stat_log(m_log->service()) {
   utils::LogManager::path_type fname = file_name("stat.csv");
-  m_stat_log.open(fname.c_str());
+  m_stat_log.open(fname.string());
      
   if( log ) {
     fname = manager().file_name(getName().str()+".tr.log");
@@ -389,6 +390,13 @@ TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
 
 TeleoReactor::~TeleoReactor() {
   isolate(false);
+  if( !m_firstTick ) {
+    m_stat_log<<", "<<m_deliberation_usage.count()
+              <<", "<<m_delib_rt.count()
+              <<", "<<m_tick_steps<<std::endl;
+    m_stat_log.close();
+  }
+
   if( NULL!=m_trLog ) {
     delete m_trLog;
   }
@@ -871,7 +879,7 @@ bool TeleoReactor::doSynchronize() {
       m_stat_log<<now<<", "<<m_start_usage.count()
       <<", "<<m_start_rt.count()
       <<", "<<m_synch_usage.count()
-      <<", "<<m_synch_rt.count()<<std::flush;
+      <<", "<<m_synch_rt.count();
       stat_logged = true;
     }
     if( success ) {
@@ -896,7 +904,7 @@ bool TeleoReactor::doSynchronize() {
     
     if( !stat_logged ) {
       m_stat_log<<getCurrentTick()<<", "<<m_synch_usage.count()
-      <<", "<<m_synch_rt.count()<<std::flush;
+      <<", "<<m_synch_rt.count();
     }
    return success;
   } catch(utils::Exception const &e) {
@@ -1136,7 +1144,7 @@ void TeleoReactor::unblock(Symbol const &name) {
 // structors
 
 TeleoReactor::Logger::Logger(std::string const &dest, boost::asio::io_service &io)
-:m_strand(io), m_active(io), m_file(dest.c_str()) {
+:m_strand(io), m_active(io), m_file(io, dest) {
   m_flags.set(header);
   m_strand.post(boost::bind(&Logger::direct_write, this, "<Log>\n <header>",
                             true));
@@ -1257,7 +1265,8 @@ void TeleoReactor::Logger::cancelPlan(goal_id const &tok) {
 // asio methods
 
 void TeleoReactor::Logger::obs(Observation o) {
-  o.to_xml(m_file)<<'\n';
+  utils::async_ofstream::entry e = m_file.new_entry();
+  o.to_xml(e.stream())<<'\n';
 }
 
 
@@ -1370,7 +1379,9 @@ void TeleoReactor::Logger::close_tick() {
 }
 
 void TeleoReactor::Logger::direct_write(std::string const &content, bool nl) {
-  m_file.write(content.c_str(), content.length());
+  utils::async_ofstream::entry e = m_file.new_entry();
+  
+  e.stream().write(content.c_str(), content.length());
   if( nl )
-    m_file.put('\n');
+    e.stream().put('\n');
 }

@@ -48,6 +48,7 @@
 
 # include <trex/transaction/Tick.hh>
 # include <trex/utils/ErrnoExcept.hh>
+# include <trex/utils/asio_fstream.hh>
 
 # include <trex/utils/TimeUtils.hh>
 
@@ -231,7 +232,7 @@ namespace TREX {
        * @a sleepSeconds
        */
       explicit Clock(duration_type const &sleep)
-      :m_sleep(sleep), m_started(false) {}
+      :m_sleep(sleep), m_started(false), m_data(m_log->service()) {}
 
       /** @brief Internal start method
        *
@@ -267,7 +268,7 @@ namespace TREX {
       mutable transaction::TICK  m_last;
       mutable bool               m_free;
       mutable size_t             m_count;
-      mutable std::ofstream m_data;
+      mutable utils::async_ofstream m_data;
     }; // TREX::agent::Clock
 
   } // TREX::agent   
