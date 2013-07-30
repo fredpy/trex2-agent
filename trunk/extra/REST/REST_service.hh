@@ -35,13 +35,13 @@
 # define H_trex_REST_service
 
 # include <trex/utils/Exception.hh>
+# include <trex/utils/platform/memory.hh>
 
 # include <Wt/WResource>
 # include <Wt/Http/Response>
 
 
 # include <boost/function.hpp>
-# include <boost/shared_ptr.hpp>
 # include <boost/property_tree/ptree.hpp>
 # include <boost/iostreams/stream.hpp>
 
