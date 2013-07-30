@@ -45,7 +45,7 @@ namespace TREX {
     
     class timeline_list_service :public rest_service {
     public:
-      timeline_list_service(boost::weak_ptr<TimelineHistory> const &ref)
+      timeline_list_service(WEAK_PTR<TimelineHistory> const &ref)
       :rest_service("List all the timelines"), m_entry(ref) {}
       ~timeline_list_service() {
         beingDeleted();
@@ -56,12 +56,12 @@ namespace TREX {
                          std::ostream &data,
                          Wt::Http::Response &ans);
       
-      boost::weak_ptr<TimelineHistory> m_entry;
+      WEAK_PTR<TimelineHistory> m_entry;
     };
     
     class timeline_service :public rest_service {
     public:
-      timeline_service(boost::weak_ptr<TimelineHistory> const &ref)
+      timeline_service(WEAK_PTR<TimelineHistory> const &ref)
       :rest_service("Give state history of the timeline.\nOptioanl args are:\n"
                     " - format: format indicator (tick or date)\n"
                     " - from: initial tick of the requested range\n"
@@ -76,12 +76,12 @@ namespace TREX {
                          std::ostream &data,
                          Wt::Http::Response &ans);
       
-      boost::weak_ptr<TimelineHistory> m_entry;
+      WEAK_PTR<TimelineHistory> m_entry;
     };
     
     class goals_service :public rest_service {
     public:
-      goals_service(boost::weak_ptr<TimelineHistory> const &ref)
+      goals_service(WEAK_PTR<TimelineHistory> const &ref)
       :rest_service("List all the goals received"), m_entry(ref) {}
       ~goals_service() {
         beingDeleted();
@@ -92,13 +92,13 @@ namespace TREX {
                          std::ostream &data,
                          Wt::Http::Response &ans);
       
-      boost::weak_ptr<TimelineHistory> m_entry;
+      WEAK_PTR<TimelineHistory> m_entry;
       
     };
     
     class goal_service :public rest_service {
     public:
-      goal_service(boost::weak_ptr<TimelineHistory> const &ref, std::string prefix)
+      goal_service(WEAK_PTR<TimelineHistory> const &ref, std::string prefix)
       :rest_service("POST: post the attached goal to trex.\n"
                     "DELETE: request the cancelation of the given goal.\n"
                     "GET: get a description of an existing goal."), m_entry(ref) {}
@@ -113,7 +113,7 @@ namespace TREX {
       
       std::string file_name();
       
-      boost::weak_ptr<TimelineHistory> m_entry;
+      WEAK_PTR<TimelineHistory> m_entry;
       std::string const m_prefix;
       TREX::utils::SharedVar<size_t> m_counter;
     };

@@ -320,7 +320,7 @@ namespace TREX {
        * from XML.
        */
       typedef TREX::utils::XmlFactory< Predicate, 
-				       boost::shared_ptr<Predicate> > xml_factory;
+				       SHARED_PTR<Predicate> > xml_factory;
 
       /** @brief Check for predicate compatibility
        *

@@ -155,7 +155,7 @@ namespace TREX {
     
     class service_tree :public rest_service {
     public:
-      typedef boost::shared_ptr<rest_service> service_ptr;
+      typedef SHARED_PTR<rest_service> service_ptr;
 
       service_tree(Wt::WServer &serv, std::string const &base_path);
       ~service_tree() {
