@@ -268,7 +268,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
   graph *me = this;
   TeleoReactor::xml_arg_type 
   arg = xml_factory::arg_traits::build(description, me);
-  boost::shared_ptr<TeleoReactor> tmp(m_factory->produce(arg));
+  SHARED_PTR<TeleoReactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
   if( ret.second ) 
@@ -279,7 +279,7 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
 }
 
 graph::reactor_id graph::add_reactor(graph::reactor_id r) {
-  boost::shared_ptr<TeleoReactor> tmp(r);  
+  SHARED_PTR<TeleoReactor> tmp(r);
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
   // As it is an internal call make is silent for now ...
   return ret.first->get();

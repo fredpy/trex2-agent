@@ -65,8 +65,8 @@ namespace TREX {
       
       UNIQ_PTR<Wt::WServer>     m_server;
       
-      boost::shared_ptr<TimelineHistory> m_timelines;
-      boost::shared_ptr<tick_manager>    m_tick;
+      SHARED_PTR<TimelineHistory> m_timelines;
+      SHARED_PTR<tick_manager>    m_tick;
       UNIQ_PTR<service_tree>             m_services;
       
       friend class TimelineHistory;

@@ -415,7 +415,7 @@ namespace TREX {
        * for parsing domains from xml.
        */
       typedef TREX::utils::XmlFactory<DomainBase, 
-				      boost::shared_ptr<DomainBase> > xml_factory;
+				      SHARED_PTR<DomainBase> > xml_factory;
       virtual boost::property_tree::ptree build_tree() const=0;
 
     protected:

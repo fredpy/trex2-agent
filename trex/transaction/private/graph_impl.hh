@@ -36,8 +36,6 @@
 
 # include "../bits/transaction_fwd.hh"
 
-# include <boost/enable_shared_from_this.hpp>
-
 # include <set>
 
 
@@ -59,7 +57,7 @@ namespace TREX {
        * @ingroup transaction
        */
       class graph_impl :boost::noncopyable,
-      public boost::enable_shared_from_this<graph_impl> {
+      public ENABLE_SHARED_FROM_THIS<graph_impl> {
       public:
         typedef utils::log::entry::date_type date_type;
                 
@@ -173,8 +171,8 @@ namespace TREX {
         
       private:
         
-        void declare(boost::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
-        void subscribe(boost::shared_ptr<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void declare(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void subscribe(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
 
         /** @brief graph date local storage
          *
@@ -203,15 +201,15 @@ namespace TREX {
          */
         UNIQ_PTR<boost::asio::strand>          m_strand;
 
-        std::set< boost::shared_ptr<node_impl> > m_nodes;
+        std::set< SHARED_PTR<node_impl> > m_nodes;
         
         void set_date_sync(date_type date);
-        void add_node_sync(boost::shared_ptr<node_impl> n);
-        void rm_node_sync(boost::shared_ptr<node_impl> n);
+        void add_node_sync(SHARED_PTR<node_impl> n);
+        void rm_node_sync(SHARED_PTR<node_impl> n);
         
         
-        void decl_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
-        void use_sync(boost::shared_ptr<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void decl_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void use_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
         
         friend class node_impl;
       }; // TREX::transaction::details::graph_impl

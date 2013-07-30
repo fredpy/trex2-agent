@@ -42,7 +42,7 @@ namespace {
   
   
   TREX::transaction::TICK parse_date(std::string const &var, std::string const &val, bool as_date,
-                                     boost::shared_ptr<TimelineHistory> ptr) {
+                                     SHARED_PTR<TimelineHistory> ptr) {
     if( as_date ) {
       try {
         return ptr->get_date(val);
@@ -61,7 +61,7 @@ namespace {
   void temporal_bounds(Wt::Http::Request const &req,
                        TREX::transaction::IntegerDomain::bound &lo,
                        TREX::transaction::IntegerDomain::bound &hi,
-                       boost::shared_ptr<TimelineHistory> ptr) {
+                       SHARED_PTR<TimelineHistory> ptr) {
     bool as_date = true;
     std::string const *value;
     
@@ -91,7 +91,7 @@ namespace {
 void timeline_list_service::handleRequest(rest_request const &req,
                                           std::ostream &data,
                                           Wt::Http::Response &ans) {
-  boost::shared_ptr<TimelineHistory> ptr(m_entry.lock());
+  SHARED_PTR<TimelineHistory> ptr(m_entry.lock());
   if( !ptr )
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
@@ -130,7 +130,7 @@ void timeline_list_service::handleRequest(rest_request const &req,
 void timeline_service::handleRequest(rest_request const &req,
                                      std::ostream &data,
                                      Wt::Http::Response &ans) {
-  boost::shared_ptr<TimelineHistory> ptr(m_entry.lock());
+  SHARED_PTR<TimelineHistory> ptr(m_entry.lock());
   if( !ptr )
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
@@ -143,8 +143,8 @@ void timeline_service::handleRequest(rest_request const &req,
   
   bool first = true;
   if( cont ) {
-    boost::shared_ptr<transaction::IntegerDomain> range;
-    range = boost::any_cast< boost::shared_ptr<transaction::IntegerDomain> >(cont->data());
+    SHARED_PTR<transaction::IntegerDomain> range;
+    range = boost::any_cast< SHARED_PTR<transaction::IntegerDomain> >(cont->data());
     
     range->getBounds(lo, hi);
     first = false;
@@ -172,7 +172,7 @@ void timeline_service::handleRequest(rest_request const &req,
   if( transaction::IntegerDomain::plus_inf==lo || hi<lo ) {
     data<<" ]\n}";
   } else {
-    boost::shared_ptr<transaction::IntegerDomain> range(new transaction::IntegerDomain(lo, hi));
+    SHARED_PTR<transaction::IntegerDomain> range(new transaction::IntegerDomain(lo, hi));
     cont = ans.createContinuation();
     cont->setData(range);
   }
@@ -186,7 +186,7 @@ void timeline_service::handleRequest(rest_request const &req,
 void goals_service::handleRequest(rest_request const &req,
                                      std::ostream &data,
                                      Wt::Http::Response &ans) {
-  boost::shared_ptr<TimelineHistory> ptr(m_entry.lock());
+  SHARED_PTR<TimelineHistory> ptr(m_entry.lock());
   if( !ptr )
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
@@ -228,7 +228,7 @@ std::string goal_service::file_name() {
 void goal_service::handleRequest(rest_request const &req,
                                   std::ostream &data,
                                   Wt::Http::Response &ans) {
-  boost::shared_ptr<TimelineHistory> ptr(m_entry.lock());
+  SHARED_PTR<TimelineHistory> ptr(m_entry.lock());
   if( !ptr )
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
