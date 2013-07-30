@@ -53,6 +53,7 @@
 
 # include "Clock.hh"
 # include <trex/utils/PluginLoader.hh>
+# include <trex/utils/asio_fstream.hh>
 
 namespace TREX {
   namespace agent {
@@ -529,7 +530,7 @@ namespace TREX {
       typedef stat_clock::duration     stat_duration;
       typedef TREX::transaction::TeleoReactor::rt_clock   rt_clock;
 
-      std::ofstream m_stat_log;
+      TREX::utils::async_ofstream m_stat_log;
 
       clock_ref                  m_clock;
       TREX::transaction::TICK    m_finalTick;

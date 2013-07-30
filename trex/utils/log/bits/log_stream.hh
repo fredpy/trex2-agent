@@ -38,7 +38,7 @@
 # include "log_sig.hh"
 
 # include <boost/iostreams/stream.hpp>
-# include <boost/weak_ptr.hpp>
+# include "../../platform/memory.hh"
 
 namespace TREX {
   namespace utils {
@@ -129,7 +129,7 @@ namespace TREX {
                      entry::id_type const &who, entry::id_type const &what)
           :m_log(dest), m_entry(new entry(when, who, what)) {}
         
-          boost::weak_ptr<sig_impl> m_log;
+          WEAK_PTR<sig_impl> m_log;
           mutable entry::pointer    m_entry;
         
           friend class ::TREX::utils::log::text_log;

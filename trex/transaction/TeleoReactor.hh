@@ -50,6 +50,7 @@
 # include <trex/utils/TimeUtils.hh>
 # include <trex/utils/chrono_helper.hh>
 # include <trex/utils/cpu_clock.hh>
+# include <trex/utils/asio_fstream.hh>
 
 # if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #  include <boost/chrono/thread_clock.hpp>
@@ -1043,7 +1044,6 @@ namespace TREX {
       stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
       rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
-      std::ofstream m_stat_log;
       
       bool internal_sync(TREX::utils::Symbol name) const;
       bool external_sync(TREX::utils::Symbol name) const;
@@ -1205,6 +1205,9 @@ namespace TREX {
        * @sa syslog() const
        */
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+
+      utils::async_ofstream m_stat_log;
+
       
       void isolate(bool failed=true);
       

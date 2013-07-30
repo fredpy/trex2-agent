@@ -437,45 +437,46 @@ void CurrentState::do_dispatch(EUROPA::eint lb, EUROPA::eint ub) {
 #endif // EUROPA_HAVE_EFFECT
   }
 
-    if(bfs)
-    {
-      if(lb==m_assembly.final_tick())
-      {
-        std::ofstream time_file;
-        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
-        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
-        {
-            if(i>0)
-                time_file<<", ";
-            if(time_values.find(i)!=time_values.end())
-                time_file<<time_values[i];
-            else
-                time_file<<"0";
-        }
-        time_file<<std::endl;
-        time_file.close();
-      }
-    }
-
-    if(dist)
-    {
-      if(lb==m_assembly.final_tick())
-      {
-        std::ofstream time_file;
-        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
-        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
-        {
-            if(i>0)
-                time_file<<", ";
-            if(m_assembly.time_values.find(i)!=m_assembly.time_values.end())
-                time_file<<m_assembly.time_values[i];
-            else
-                time_file<<"0";
-        }
-        time_file<<std::endl;
-        time_file.close();
-      }
-    }
+//
+//    if(bfs)
+//    {
+//      if(lb==m_assembly.final_tick())
+//      {
+//        std::ofstream time_file;
+//        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
+//        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
+//        {
+//            if(i>0)
+//                time_file<<", ";
+//            if(time_values.find(i)!=time_values.end())
+//                time_file<<time_values[i];
+//            else
+//                time_file<<"0";
+//        }
+//        time_file<<std::endl;
+//        time_file.close();
+//      }
+//    }
+//
+//    if(dist)
+//    {
+//      if(lb==m_assembly.final_tick())
+//      {
+//        std::ofstream time_file;
+//        time_file.open("time_file.csv", std::ofstream::app | std::ofstream::out | std::ofstream::ate);
+//        for(EUROPA::eint i=0; i<=m_assembly.final_tick(); i++)
+//        {
+//            if(i>0)
+//                time_file<<", ";
+//            if(m_assembly.time_values.find(i)!=m_assembly.time_values.end())
+//                time_file<<m_assembly.time_values[i];
+//            else
+//                time_file<<"0";
+//        }
+//        time_file<<std::endl;
+//        time_file.close();
+//      }
+//    }
 }
 
 bool CurrentState::dispatch_token(const EUROPA::TokenId& token,EUROPA::eint lb, EUROPA::eint ub)

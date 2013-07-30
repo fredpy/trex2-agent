@@ -452,13 +452,13 @@ TICK Agent::initialTick(clock_ref clk) {
 
 Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
   :graph(name, initialTick(clk), verbose),
-   m_clock(clk), m_finalTick(final), m_valid(true) {
+   m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
 }
 
 Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
-  :m_clock(clk), m_valid(true) {
+:m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
@@ -482,7 +482,7 @@ Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 }
 
 Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool verbose)
-  :m_clock(clk), m_valid(true) {
+  :m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
   updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
@@ -753,14 +753,18 @@ void Agent::initComplete() {
 
   // Create initial graph file
   LogManager::path_type graph_dot = manager().file_name("reactors.gv");
-  std::ofstream dotf(graph_dot.c_str());
+  async_ofstream dotf(manager().service(), graph_dot.string());
+  
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
     " delib_ns, delib_rt_ns, delib_steps,"
-    " planned_sleep, sleep_cnt, sleep_ns"<<std::endl;
+  " planned_sleep, sleep_cnt, sleep_ns\n";
 
-  graph_names_writer gn;
-  boost::write_graphviz(dotf, me(), gn, gn);
+  {
+    graph_names_writer gn;
+    async_ofstream::entry e = dotf.new_entry();
+    boost::write_graphviz(e.stream(), me(), gn, gn);
+  }
   syslog(null, info)<<"Initial graph logged in \"reactors.gv\".";
 
 
@@ -849,11 +853,14 @@ void Agent::synchronize() {
     name<<"reactors."<<now<<".gv";
     
     LogManager::path_type graph_dot = manager().file_name(name.str());
-    std::ofstream dotf(graph_dot.c_str());
+    async_ofstream dotf(manager().service(), graph_dot.string());
     
-    graph_names_writer gn;
-    boost::write_graphviz(dotf, me(), gn, gn);
-    syslog(null, info)<<"New graph logged in \""<<name.str()<<"\".";    
+    {
+      graph_names_writer gn;
+      async_ofstream::entry e = dotf.new_entry();
+      boost::write_graphviz(e.stream(), me(), gn, gn);
+    }
+    syslog(null, info)<<"New graph logged in \""<<name.str()<<"\".";
   }
 }
 

@@ -70,10 +70,12 @@ add_library(TREXutils SHARED
   XmlUtils.cc
   ptree_io.cc
   asio_runner.cc
+  asio_fstream.cc
   log/entry.cc
   log/text_log.cc
   cpu_clock.cc
   # headers
+  asio_fstream.hh
   asio_signal.hh
   asio_signal_n.hh
   asio_signal_fwd.hh
