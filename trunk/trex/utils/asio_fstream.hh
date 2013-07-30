@@ -125,7 +125,7 @@ namespace TREX {
       void open(std::string const &fname);
       void close();
       bool is_open() const {
-        return m_impl;
+        return NULL!=m_impl.get();
       }
       
       class entry;
