@@ -394,8 +394,8 @@ namespace TREX {
             
       /** @brief syslog text log file */
       log::text_log   m_syslog;
-      boost::shared_ptr<log::out_file> m_trex_log;
-      boost::shared_ptr<log::log_pipe> m_out, m_err, m_log;
+      SHARED_PTR<log::out_file> m_trex_log;
+      SHARED_PTR<log::log_pipe> m_out, m_err, m_log;
       
       /** @brief verbosity level */
       LogLevel    m_level;

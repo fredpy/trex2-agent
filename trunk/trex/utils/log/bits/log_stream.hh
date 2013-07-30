@@ -119,12 +119,12 @@ namespace TREX {
           std::streamsize write(char_type const *s, std::streamsize n); 
           
         private:
-          entry_sink(boost::shared_ptr<sig_impl> const &dest,
+          entry_sink(SHARED_PTR<sig_impl> const &dest,
                      entry::id_type const &who,
                      entry::id_type const &what)
           :m_log(dest), m_entry(new entry(who, what)) {}
         
-          entry_sink(boost::shared_ptr<sig_impl> const &dest,
+          entry_sink(SHARED_PTR<sig_impl> const &dest,
                      entry::date_type const &when,
                      entry::id_type const &who, entry::id_type const &what)
           :m_log(dest), m_entry(new entry(when, who, what)) {}
