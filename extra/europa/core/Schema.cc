@@ -102,10 +102,10 @@ void details::Schema::registerComponents(Assembly const &assembly) {
     (*i)->registerComponents(assembly);
 }
 
-void details::Schema::setStream(std::ofstream &out, std::string const &name) {
-  out.open(m_log->file_name(name).c_str());
-  setStream(out);
-}
+//void details::Schema::setStream(std::ofstream &out, std::string const &name) {
+//  out.open(m_log->file_name(name).c_str());
+//  setStream(out);
+//}
 
 void details::Schema::setStream(std::ostream &out) {
   Error::doThrowExceptions();

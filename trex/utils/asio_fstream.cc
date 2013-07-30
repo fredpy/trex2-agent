@@ -122,7 +122,7 @@ void async_ofstream::entry_sink::flush() {
   if( m_dest && !m_cache.empty() ) {
     std::string tmp;
     std::swap(tmp, m_cache);
-    m_dest->write(tmp);
+    m_dest->async_write(tmp);
   }
 }
 
@@ -148,10 +148,27 @@ std::ostream &async_ofstream::entry::stream() {
 }
 
 void async_ofstream::entry::flush() {
-  if( NULL!=m_out.get() )
-    m_out->flush();
+  if( NULL!=m_out.get() ) {
+    (*m_out)->flush();
+  }
 }
 
+/*
+ * class async_buffer_sink
+ */
+
+std::streamsize async_buffer_sink::write(async_buffer_sink::char_type const *s, std::streamsize n) {
+  // Find last '\n'
+  std::streamsize pos = n;
+  for( ; pos>0 && '\n'!=s[pos-1]; --pos);
+  
+  if( pos>0 ) {
+    m_dest.write(s, pos);
+    m_dest.flush();
+  }
+  m_dest.write(s+pos, n-pos);
+  return n;
+}
 
 
 
