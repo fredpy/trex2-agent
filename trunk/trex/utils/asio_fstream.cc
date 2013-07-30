@@ -34,6 +34,7 @@
 #include "asio_fstream.hh"
 
 #include <boost/bind.hpp>
+#include "platform/chrono.hh"
 
 #include <fstream>
 
@@ -46,6 +47,8 @@ namespace TREX {
     class async_ofstream::pimpl:public ENABLE_SHARED_FROM_THIS<async_ofstream::pimpl> {
     public:
       typedef async_ofstream::service service;
+      typedef CHRONO::system_clock    clock;
+      
       
       pimpl(asio::io_service &io, std::string const &path)
       :m_io(io), m_file(MAKE_SHARED<std::ofstream>()) {
@@ -61,11 +64,22 @@ namespace TREX {
       }
       
       void async_write(std::string const &buffer) {
-        get_service().post(boost::bind(&pimpl::write, shared_from_this(), buffer));
+        get_service().post(boost::bind(&pimpl::write, shared_from_this(), buffer, clock::now()));
       }
-      void write(std::string buffer) {
+      void write(std::string buffer, clock::time_point tp) {
+        
         m_file->write(buffer.c_str(), buffer.length());
-        std::flush(*m_file);
+        if( !m_last ) {
+          m_last = tp;
+        }
+
+        CHRONO::milliseconds const limit(10), // force flush only at ~100Hz
+          delta = CHRONO::duration_cast<CHRONO::milliseconds>(clock::now()-*m_last);
+        
+        if( delta>limit ) {
+          std::flush(*m_file);
+          m_last.reset();
+        }
       }
       
       static void open(SHARED_PTR<std::ofstream> f, std::string p) {
@@ -81,8 +95,9 @@ namespace TREX {
       SHARED_PTR<std::ofstream> m_file;
       SHARED_PTR<asio::io_service::work>    m_work;
       
+      boost::optional<clock::time_point> m_last;
     };
-    
+        
   }
 }
 
