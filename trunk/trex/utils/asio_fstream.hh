@@ -43,6 +43,7 @@
 # include <boost/iostreams/stream.hpp>
 
 # include <string>
+# include <fstream>
 
 namespace TREX {
   namespace utils {
@@ -168,6 +169,10 @@ namespace TREX {
           return stream()<<val;
         }
         
+        std::ostream &write(entry_sink::char_type const *s, std::streamsize n) {
+          return stream().write(s, n);
+        }
+        
         void flush();
         
       private:
@@ -186,13 +191,30 @@ namespace TREX {
         tmp<<val;
         return tmp;
       }
-
+      
     private:
       boost::asio::io_service &m_io;
       SHARED_PTR<pimpl>        m_impl;
     };
     
     
+    class async_buffer_sink {
+    public:
+      typedef async_ofstream::entry_sink::char_type char_type;
+      typedef boost::iostreams::sink_tag            category;
+
+      explicit async_buffer_sink(async_ofstream &dest)
+      :m_dest(dest.new_entry()) {}
+      ~async_buffer_sink() {}
+      
+      std::streamsize write(char_type const *s, std::streamsize n);
+      
+    private:
+      async_ofstream::entry m_dest;
+    };
+    
+    typedef boost::iostreams::stream<async_buffer_sink> async_proxy;
+  
   } // TREX::utils
 } // TREX
 

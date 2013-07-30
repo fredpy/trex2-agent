@@ -73,7 +73,12 @@ namespace TREX {
       class Schema :boost::noncopyable {
       public:
 	void registerComponents(Assembly const &assembly);
-	void setStream(std::ofstream &out, std::string const &name);
+        boost::asio::io_service &service() {
+          return m_log->service();
+        }
+        std::string file_name(std::string const &path) {
+          return m_log->file_name(path).string();
+        }
 	void setStream(std::ostream &out);
 	
 	std::string const &nddl_path();

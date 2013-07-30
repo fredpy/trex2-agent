@@ -184,10 +184,15 @@ bool Assembly::actions_supported() {
 Assembly::Assembly(std::string const &name, size_t steps,
                    size_t depth)
   :m_in_synchronization(false), m_name(name),
+   m_debug_file(m_trex_schema->service()),
    m_synchSteps(steps), m_synchDepth(depth),
    m_archiving(false) {
+     m_debug_file.open(m_trex_schema->file_name(m_name+"/europa.log"));
+     m_debug.open(utils::async_buffer_sink(m_debug_file));
+     m_trex_schema->setStream(m_debug);
+     
   //  redirect log output to <name>/europa.log
-  m_trex_schema->setStream(m_debug, m_name+"/europa.log");
+  //  m_trex_schema->setStream(m_debug, m_name+"/europa.log");
   if( m_synchSteps==0 )
     m_synchSteps = std::numeric_limits<unsigned int>::max();
   else

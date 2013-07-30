@@ -40,6 +40,7 @@
 # include <trex/utils/id_mapper.hh>
 # include <trex/utils/platform/memory.hh>
 # include <trex/utils/cpu_clock.hh>
+# include <trex/utils/asio_fstream.hh>
 
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
 # include <trex/europa/bits/system_header.hh>
@@ -1599,7 +1600,8 @@ namespace TREX {
        *
        * The file this assembly will use for europa debug log messages.
        */
-      mutable std::ofstream m_debug;
+      mutable utils::async_ofstream m_debug_file;
+      mutable utils::async_proxy    m_debug;
 
       /** @brief Object attroibute extraction
        * @param[in] obj An object
