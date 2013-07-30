@@ -98,7 +98,7 @@ using namespace TREX::utils::log;
 details::entry_sink::~entry_sink() {
   if( m_entry && m_entry->has_content() ) {
     // Get the pointer to the signal
-    boost::shared_ptr<details::sig_impl> dest = m_log.lock();
+    SHARED_PTR<details::sig_impl> dest = m_log.lock();
   
     if( dest ) // if the signal still exists then trigger it
       dest->emit(m_entry);
@@ -228,9 +228,9 @@ void log_pipe::flush_msg() {
 }
 
 void log_pipe::send(std::string const &msg) {
-  boost::shared_ptr<details::sig_impl> dest = m_log.lock();
+  SHARED_PTR<details::sig_impl> dest = m_log.lock();
   if( dest ) {
-    boost::shared_ptr<entry> e(new entry(m_who, m_what));
+    SHARED_PTR<entry> e(new entry(m_who, m_what));
     e->m_content = msg;
     dest->emit(e);
   }
