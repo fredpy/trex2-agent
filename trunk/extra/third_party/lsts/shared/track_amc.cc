@@ -73,10 +73,14 @@ namespace {
                               +date.tv_nsec));
   }
   
+  std::string const raw_name("raw");
+  
 #else // HAS_CLOCK_MONOTONIC_RAW
   
   typedef CHRONO::high_resolution_clock raw_clock;
   
+  std::string const raw_name("hires");
+
 #endif // HAS_CLOCK_MONOTONIC_RAW
 }
 
@@ -165,7 +169,7 @@ int main(int argc, char **argv) {
 	  dune_speed /= dt.count();
         }
       } else
-        std::cout<<"time_ns, dune_ns, raw_ns, utime_ns, stime_ns, pcpu, d_raw/d_time, d_raw/d_dune, state"<<std::endl;
+        std::cout<<"time_ns, dune_ns, "<<raw_name<<"_ns, utime_ns, stime_ns, pcpu, d_"<<raw_name<<"/d_time, d_"<<raw_name<<"/d_dune, state"<<std::endl;
       std::cout<<rt.count()<<", "<<dune.count()<<", "<<rtc.count()
 	       <<", "<<ut.count()<<", "<<st.count()
 	       <<", "<<pcpu<<", "
