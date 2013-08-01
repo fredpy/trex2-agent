@@ -49,16 +49,14 @@ if(WITH_DORADO)
       endif(EXISTS ${auv_home})
     endif(NOT EXISTS ${auv_var})
     
-    if(EXISTS ${auv_var})
-      set(DORADO_HOME ${auv_home} CACHE PATH
-	"AUV home directory" FORCE)
-    endif(EXISTS ${auv_var})
+    set(DORADO_HOME ${auv_var} CACHE PATH
+      "AUV home directory" FORCE)
   endif(NOT DORADO_HOME)
 
   if(NOT EXISTS ${DORADO_HOME}) 
-    set(DORADO_HOME DORADO_HOME-NOT_FOUND CACHE STRING 
+    set(DORADO_HOME DORADO_HOME-NOT_FOUND CACHE PATH 
       "Failed to find dorado source code" FORCE)
-    message(SEND_ERROR "Failed to find dordaod source code.")
+    message(SEND_ERROR "Failed to find dordado source code.")
   endif(NOT EXISTS ${DORADO_HOME})
 
   if(NOT OLD_DORADO_HOME EQUAL DORADO_HOME)
@@ -66,9 +64,16 @@ if(WITH_DORADO)
       "Location of StatePacket structure description file" FORCE)
     mark_as_advanced(DORADO_STATE)
 
+
     set(OLD_DORADO_HOME ${DORADO_HOME} CACHE INTERNAL 
       "Former DOARDO_HOME value" FORCE)
   endif(NOT OLD_DORADO_HOME EQUAL DORADO_HOME)
+
+  if(NOT EXISTS ${DORADO_STATE})
+    set(DORADO_STATE DORADO_STATE-NOT_FOUND CACHE PATH
+      "Failed to find dorado source code" FORCE)
+    message(SEND_ERROR "Failed to locate StatePacket.x")
+  endif(NOT EXISTS ${DORADO_STATE})
 
   find_program(RPC_CMD rpcgen)
   if(NOT EXISTS ${RPC_CMD})
