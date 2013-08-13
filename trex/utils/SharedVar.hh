@@ -204,6 +204,12 @@ namespace TREX {
 	m_var = value;
  	return value;
       }
+      
+      void swap(Ty &other) {
+	scoped_lock lock(*this);
+        std::swap(m_var, other);
+      }
+      
       /** @brief Check for thread ownership
        *
        * This methods indicates if current instance is locked by
