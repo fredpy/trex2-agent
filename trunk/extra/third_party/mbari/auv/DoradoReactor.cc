@@ -34,6 +34,10 @@
 #include "DoradoReactor.hh"
 #include "StatePacket.h"
 
+#include <trex/domain/FloatDomain.hh>
+
+#include <boost/bimap.hpp>
+
 namespace asio=boost::asio;
 
 
@@ -47,12 +51,14 @@ namespace TREX {
       static unsigned short const out_default;
       static unsigned short const in_default;
       
-      explicit msg_api(asio::io_service &io);
+      msg_api(asio::io_service &io, DoradoReactor &owner);
       ~msg_api();
       
       void connect(std::string const &host, unsigned short out_port, unsigned short in_port);
       bool connected() const;
       void disconnect();
+      
+      void post_behavior(transaction::goal_id req);
       
       /** @brief Send a message
        *
@@ -67,16 +73,31 @@ namespace TREX {
        * @throw boost::system::system_error An error coccured while trying to 
        * send the message
        */
-      void send(std::string const &msg);
+      void send(std::string const &msg, bool verbose=false);
 
       void start();
       bool started() const;
       bool stop();
       
+      bool inited();
+      
       bool get_state_packet(StatePacket &p);
       
+      void add_alias(utils::Symbol name, utils::Symbol target) {
+        m_alias[name] = target;
+      }
+      
+      void ping(bool test = true);
+
     private:
-      // 
+      std::map<utils::Symbol, utils::Symbol> m_alias;
+      
+      DoradoReactor &m_owner;
+
+      bool m_init, m_pinged;
+      boost::promise<bool> m_init_p;
+      
+      
       asio::ip::address m_server_ip;
       
       // udp socket for incoming messages
@@ -97,6 +118,44 @@ namespace TREX {
       asio::ip::tcp::endpoint m_out_server;
       asio::ip::tcp::socket   m_out_socket;
       
+      utils::SharedVar<int32_t> m_cpt;
+      typedef boost::bimap<int32_t, transaction::goal_id> req_map;
+      req_map m_goals;
+      
+      
+      utils::Symbol alias(utils::Symbol const &name) const;
+      
+      int32_t get(transaction::goal_id g) {
+        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+        req_map::right_const_iterator pos = m_goals.right.find(g);
+        
+        if( m_goals.right.end()==pos ) {
+          int32_t idx = ++(*m_cpt);
+          m_goals.insert(req_map::value_type(idx, g));
+          
+          return idx;
+        } else
+          return pos->second;
+      }
+      
+      transaction::goal_id get(int32_t id) {
+        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+        req_map::left_const_iterator pos = m_goals.left.find(id);
+        transaction::goal_id ret;
+        
+        if( m_goals.left.end()!=pos )
+          ret = pos->second;
+        return ret;
+      }
+      
+      void erase(transaction::goal_id g) {
+        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+        m_goals.right.erase(g);
+      }
+      void erase(int32_t id) {
+        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+        m_goals.left.erase(id);
+      }
       
       void async_rcv();
       void sp_header_rvcd(boost::system::error_code const & error, // Result of operation.
@@ -104,6 +163,9 @@ namespace TREX {
       void get_state_packet(size_t size);
       void get_behavior();
       
+      
+      void behavior_started(int32_t id);
+      void behavior_finished(int32_t id);
       
       mutable utils::SharedVar<bool> m_started;
       static size_t const s_xdr_size;
@@ -115,13 +177,14 @@ namespace TREX {
       msg_api() DELETED;
     };
     
-  
     
   }
 }
 
 using namespace TREX::mbari;
 using namespace TREX::utils;
+
+namespace tlog=TREX::utils::log;
 
 /*
  * class TREX::mbari::DoradoReactor::msg_api
@@ -135,8 +198,8 @@ size_t const DoradoReactor::msg_api::s_xdr_size(sizeof(uint16_t)+2*sizeof(StateP
 
 // structors
 
-DoradoReactor::msg_api::msg_api(asio::io_service &io)
-:m_in_socket(io), m_out_socket(io) {
+DoradoReactor::msg_api::msg_api(asio::io_service &io, DoradoReactor &owner)
+:m_owner(owner), m_in_socket(io), m_out_socket(io) {
   // Set up the xdr stream
   xdrmem_create(&m_xdr_stream, m_xdr_data.data()+sizeof(uint16_t),
                 2*sizeof(StatePacket), XDR_DECODE);
@@ -153,6 +216,9 @@ void DoradoReactor::msg_api::connect(std::string const &host,
                                      unsigned short in_port) {
   if( connected() )
     disconnect();
+  m_owner.syslog(tlog::info)<<"Connecting to AUV at "<<host
+  <<"\n\t- outbound TCP port "<<out_port
+  <<"\n\t- inbound UDP port "<<in_port;
   
   // First try to resolve the name
   asio::ip::tcp::resolver dns(m_out_socket.get_io_service());
@@ -176,12 +242,13 @@ void DoradoReactor::msg_api::connect(std::string const &host,
 }
 
 void DoradoReactor::msg_api::disconnect() {
+  m_owner.syslog(tlog::info)<<"Disconnecting from AUV";
   stop();
   m_in_socket.close();
   m_out_socket.close();
 }
 
-void DoradoReactor::msg_api::send(std::string const &msg) {
+void DoradoReactor::msg_api::send(std::string const &msg, bool verbose) {
   std::vector<asio::const_buffer> buffs;
   uint32_t len = msg.length(), net_len = htonl(len);
   
@@ -191,9 +258,19 @@ void DoradoReactor::msg_api::send(std::string const &msg) {
   buffs.push_back(asio::buffer(&net_len, sizeof(uint32_t)));
   buffs.push_back(asio::buffer(msg));
   
+  if( verbose )
+    m_owner.syslog()<<"Sending: "<<msg;
   // Directly write the message
   asio::write(m_out_socket, buffs);
+  m_pinged = true;
 }
+
+void DoradoReactor::msg_api::ping(bool test) {
+  if( test && !m_pinged )
+    send("PING");
+  m_pinged = false;
+}
+
 
 void DoradoReactor::msg_api::start() {
   if( connected() ) {
@@ -205,11 +282,51 @@ void DoradoReactor::msg_api::start() {
 }
 
 void DoradoReactor::msg_api::async_rcv() {
-  // Post my asynchronous listen to m_out_socket
-  m_in_socket.async_receive_from(asio::buffer(m_sp_header), m_from,
-                                 boost::bind(&msg_api::sp_header_rvcd,
-                                             shared_from_this(),
-                                             _1, _2));
+  // Post my asynchronous listen to m_out_socket only if still active
+  if( started() )
+    m_in_socket.async_receive_from(asio::buffer(m_sp_header), m_from,
+                                   boost::bind(&msg_api::sp_header_rvcd,
+                                               shared_from_this(),
+                                               _1, _2));
+}
+
+
+void DoradoReactor::msg_api::post_behavior(TREX::transaction::goal_id req) {
+  int32_t id = get(req);
+  std::ostringstream oss;
+
+  
+  transaction::IntegerDomain::bound duration = req->getDuration().upperBound();
+  boost::optional<size_t> vcs_dur;
+  
+  if( duration.isInfinity() ) {
+    m_owner.syslog(tlog::warn)<<"No maximum duration set for goal "<<req<<" on "<<req->object();
+  } else {
+    vcs_dur = duration.value();
+    if( 2 < *vcs_dur )
+      *vcs_dur -= 2;
+      
+  }
+  
+  oss.setf(std::ios::fixed);
+  oss<<"insert|behavior "<<alias(req->object())<<" { "
+  <<" id="<<id<<"; ";
+  if( vcs_dur )
+    oss<<" duration="<<*vcs_dur<<"; ";
+  
+  for(transaction::Predicate::const_iterator a=req->begin(); req->end()!=a; ++a) {
+    transaction::DomainBase const &dom = a->second.domain();
+    
+    if( dom.isSingleton() ) {
+      // TODO: handle the special case for boolean domains : vcs expect True or False
+      oss<<a->first<<"="<<dom.getStringSingleton()<<"; ";
+    } else {
+      m_owner.syslog(tlog::warn)<<"Ignoring attribute "<<a->first<<" of request "<<req<<" as its domain is not singleton ("<<dom<<")";
+    }
+  }
+  oss<<"}";
+  
+  send(oss.str(), true);
 }
 
 
@@ -224,6 +341,8 @@ void DoradoReactor::msg_api::sp_header_rvcd(boost::system::error_code const & er
   if( started() ) {
     if( error ) {
       // Handle the error message
+      m_owner.syslog(tlog::error)<<"Error while waiting for new message: "<<error.message();
+      disconnect();
     } else if( valid_sender(m_from) ) {
       // Check the type of the message
       
@@ -236,12 +355,15 @@ void DoradoReactor::msg_api::sp_header_rvcd(boost::system::error_code const & er
           break;
         default:
           // handle unknown error
+          m_owner.syslog(tlog::error)<<"Unknown message header type ("<<m_sp_header[0]
+          <<"=0x"<<std::hex<<static_cast<short>(m_sp_header[0])<<std::dec<<")";
           break;
       }
       // Repost 
       async_rcv();
     } else {
       // Notify that the message has been disregarded
+      m_owner.syslog(tlog::warn)<<"Ignoring message from unexpected source: "<<m_from;
     }
   }
 }
@@ -261,14 +383,20 @@ void DoradoReactor::msg_api::get_state_packet(size_t size) {
   SHARED_PTR<xdr_buff_t> buff = MAKE_SHARED<xdr_buff_t>();
   
   size_t len;
+  bool received = false;
   
-  do {
+  
+  while( !received ) {
     len = m_in_socket.receive_from(asio::buffer(buff.get(), *m_xdr_buff_size), from);
-  } while( !valid_sender(from) );
+    if( !valid_sender(from) ) {
+      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
+    } else
+      received = true;
+  }
   
   if( len!=*m_xdr_buff_size ) {
-    // error (?)
-    return; // should throw instead
+    m_owner.syslog(tlog::error)<<"Received "<<len<<" bytes when a state packet should be "<<*m_xdr_buff_size;
+    return; // probably better to throw
   }
   m_xdr_buff = buff;
 }
@@ -288,13 +416,88 @@ bool DoradoReactor::msg_api::get_state_packet(StatePacket &p) {
 
 
 void DoradoReactor::msg_api::get_behavior() {
+  boost::array<char, 6> msg;
+  asio::ip::udp::endpoint  from;
+  uint32_t id;
+  uint32_t *net_id = reinterpret_cast<uint32_t *>(msg.data()+2);
+  uint32_t *local_id = reinterpret_cast<uint32_t *>(&id);
+
+  
+  bool received = false;
+  size_t len;
+  
+  while( !received ) {
+    len = m_in_socket.receive_from(asio::buffer(msg), from);
+    if( valid_sender(from) )
+      received = true;
+    else
+      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
+  }
+  if( 0==len ) {
+    m_owner.syslog(tlog::error)<<"Connection to AUV lost";
+    return; // probably better to throw 
+  }
+  // Convert net id inot local id
+  *local_id = ntohl(*net_id);
+  
+  if( -1==id && 'A'==msg[1] ) {
+    m_owner.syslog(tlog::error)<<"Received an ABORT from AUV";
+    // Do something to disconnect
+    return;
+  }
+
+  if( '0'==id && !m_init ) {
+    if( 'F'==msg[1] ) {
+      m_init = true;
+      m_init_p.set_value(m_init);
+    }
+  } else {
+    switch( msg[1] ) {
+      case 'S':
+        // started event
+        behavior_started(id);
+        break;
+      case 'F':
+        behavior_finished(id);
+        break;
+      default:
+        m_owner.syslog(tlog::warn)<<"Unknown behavior event ("<<msg[1]
+        <<"=0x"<<std::hex<<static_cast<short>(msg[1])<<") for behavior id="
+        <<id;
+        return;
+    }
+  }
   
 }
 
+void DoradoReactor::msg_api::behavior_started(int32_t id) {
+  transaction::goal_id g = get(id);
 
+  if( !g && id>0 )
+    m_owner.syslog(tlog::warn)<<"Received end notification from unknown behavior id="<<id;
+  
+  if( m_init )
+    m_owner.started(g);
+}
 
+void DoradoReactor::msg_api::behavior_finished(int32_t id) {
+  transaction::goal_id g = get(id);
+
+  if( !g && id>0 )
+    m_owner.syslog(tlog::warn)<<"Received start notification from unknown behavior id="<<id;
+  erase(id);
+  if( m_init )
+    m_owner.completed(g);
+}
 
 // observers
+
+Symbol DoradoReactor::msg_api::alias(Symbol const &name) const {
+  std::map<Symbol, Symbol>::const_iterator pos = m_alias.find(name);
+  if( m_alias.end()!=pos )
+    return pos->second;
+  return name;
+}
 
 bool DoradoReactor::msg_api::connected() const {
   return m_in_socket.is_open() && m_out_socket.is_open();
@@ -308,6 +511,207 @@ bool DoradoReactor::msg_api::started() const {
 
 bool DoradoReactor::msg_api::valid_sender(asio::ip::udp::endpoint const &from) const {
   return from.address()==m_server_ip;
+}
+
+bool DoradoReactor::msg_api::inited() {
+  return m_init_p.get_future().get();
+}
+
+
+
+namespace fs=boost::filesystem;
+
+/*
+ * class DoradoReactor
+ */
+
+// statics
+
+Symbol const DoradoReactor::s_inactive("Inactive");
+Symbol const DoradoReactor::s_depth_envelope("depthEnvelope");
+Symbol const DoradoReactor::s_sp_timeline("vehicleState");
+
+// structors
+
+DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
+:TREX::transaction::TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
+                                 0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")) {
+  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
+  m_api = MAKE_SHARED<msg_api>(boost::ref(manager().service()), boost::ref(*this));
+  
+  // Declare all of my timelines
+  provide(s_sp_timeline, false);  // state updates are read only
+  provide(s_depth_envelope, false); // so is the depth enveloppe
+  
+  syslog()<<"Extracting behavior timelines";
+  for(boost::property_tree::ptree::iterator i = node.second.begin();
+      node.second.end()!=i; ++i) {
+    if( is_tag(*i, "Timeline") ) {
+      Symbol name = parse_attr<Symbol>(*i, "name");
+      if( name.empty() )
+        throw XmlError(*i, "Behavior cannot have an empty name");
+      provide(name);
+      boost::optional<Symbol> alias = parse_attr< boost::optional<Symbol> >(*i, "alias");
+      bool sequential = parse_attr<bool>(true, *i, "sequential"); // behaviors are sequential by default
+      
+      if( alias ) {
+        if( alias->empty() )
+          throw XmlError(*i, "Behavior alias cannot be empty");
+        m_api->add_alias(name, *alias);
+      }
+      if( sequential )
+        m_sequential.insert(name);
+      
+      postObservation(TREX::transaction::Observation(name, s_inactive));
+    }
+  }
+  // TODO: create also gulper timelines
+  
+  bool found;
+  
+  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "inital_plan"),
+                                               found);
+  if( !found )
+    throw XmlError(node, "Unable to locate auv inital plan file \""+init.string()+"\"");
+  // get socket info
+  std::string host = parse_attr<std::string>(node, "vcs_host");
+  unsigned short out_port = parse_attr<unsigned short>(8004, node, "vcs_port"),
+    in_port = parse_attr<unsigned short>(8002, node, "port");
+  
+  syslog()<<"Connecting to vcs server at "<<host<<':'<<out_port;
+  m_api->connect(host, out_port, in_port);
+  initial_plan(init); // extract and send the initial plan to vcs
+}
+
+DoradoReactor::~DoradoReactor() {
+  m_api->disconnect();
+}
+
+// manipulators
+
+void DoradoReactor::initial_plan(fs::path const &file) {
+  // Load the content of the file
+  TREX::transaction::Observation envelope(s_depth_envelope, "Active");
+  
+  syslog(tlog::info)<<"Extracting initial plan from "<<file;
+
+  std::string plan, de_args;
+  {
+    std::ifstream f(file.c_str());
+    std::ostringstream oss;
+    oss<<"init|"<<f.rdbuf();
+    plan = oss.str();
+    
+    //
+    // Now start a very loose parsing of depthEnvelope
+    //
+    
+    // locate depthEnvelope
+    size_t b_start = plan.find(s_depth_envelope.str()), b_arg_start, b_arg_end;
+    // Locate the brackets delimiting depthEnvelope arguments
+    b_arg_start = plan.find('{', b_start);
+    b_arg_end = plan.find('}', b_arg_start);
+    de_args = plan.substr(b_arg_start+1, b_arg_end-b_arg_start-1);
+  }
+  syslog(tlog::info)<<"Parsing arguments of "<<s_depth_envelope;
+  bool end_of_parse = false;
+  
+  while( !end_of_parse ) {
+    size_t eq_pos, sc_pos;
+    
+    eq_pos = de_args.find('=');
+    if( std::string::npos==eq_pos )
+      break; // No more '=' ; no more variables to parse
+    sc_pos = de_args.find(';', eq_pos);
+    if( std::string::npos==sc_pos ) {
+      sc_pos = de_args.length(); // No ';' means that it is the last argument
+      end_of_parse = true;
+    }
+    
+    std::string var_name(de_args, 0, eq_pos), // name of the variable is before the '='
+      value(de_args, eq_pos+1, sc_pos-eq_pos-1); // value is between '=' and ';'
+    
+    // trim white spaces on var_name
+    size_t v_start = var_name.find_first_not_of(" \n\t"), v_end;
+    v_end = var_name.find_first_of(" \n\t", v_start);
+    if( std::string::npos==v_end )
+      var_name = var_name.substr(v_start);
+    else
+      var_name = var_name.substr(v_start, v_end-v_start);
+    // same for value except that here we target for a float
+    v_start = value.find_first_of("0123456789.e-");
+    v_end = value.find_first_not_of("0123456789.e-", v_start);
+    if( std::string::npos==v_end )
+      value = value.substr(v_start);
+    else
+      value = value.substr(v_start, v_end-v_start);
+    // Now that I have cleand up these lets try to add these as an argument
+    envelope.restrictAttribute(var_name, TREX::transaction::FloatDomain(string_cast<double>(value)));
+    
+    if( !end_of_parse ) // Remove parsed element fro mthe string
+      de_args = de_args.substr(sc_pos+1);
+  }
+  // done parsing
+  postObservation(envelope); // Now post the resulting depth envelope
+  m_api->send(plan, true);
+}
+
+// callbacks
+
+void DoradoReactor::handleInit() {
+  // At this point the inital plan was already sent (during construction)
+  // I just need to wait for inital feedback
+  syslog(tlog::info)<<"Waiting for VCS to complete its initial plan";
+  m_api->start();
+  if( !m_api->inited() )
+    throw TREX::transaction::ReactorException(*this, "Failed to complete VCS handshake");
+  m_api->send("start");
+  syslog(tlog::info)<<"VCS ready : sent \"start\" to confirm hand-shake";
+  m_api->ping(false); // Just to reset the ping without sending the ping
+  m_seq_count = 0;
+}
+
+void DoradoReactor::handleTickStart() {
+  m_api->ping(m_seq_count==0);
+}
+
+bool DoradoReactor::synchronize() {
+  
+  return true;
+}
+
+
+void DoradoReactor::handleRequest(transaction::goal_id const &g) {
+  
+}
+
+void DoradoReactor::handleRecall(transaction::goal_id const &g) {
+  
+}
+
+
+void DoradoReactor::started(TREX::transaction::goal_id g) {
+  if( g ) {
+    if( is_sequential(g->object()) ) {
+      
+    } else {
+      
+    }
+  }
+}
+
+void DoradoReactor::completed(TREX::transaction::goal_id g) {
+  if( g ) {
+    if( is_sequential(g->object()) ) {
+      // Add lock.Free as an observation that can be overwritten
+      // Add this observation the same way
+      // process possible pending sequential request
+      
+      
+    } else {
+      
+    }
+  }
 }
 
 
