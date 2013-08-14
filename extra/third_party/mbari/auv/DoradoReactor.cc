@@ -35,6 +35,10 @@
 #include "StatePacket.h"
 
 #include <trex/domain/FloatDomain.hh>
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/IntegerDomain.hh>
+
+#include "auv_factors.hh"
 
 #include <boost/bimap.hpp>
 
@@ -521,6 +525,23 @@ bool DoradoReactor::msg_api::inited() {
 
 namespace fs=boost::filesystem;
 
+using TREX::transaction::FloatDomain;
+using TREX::transaction::BooleanDomain;
+using TREX::transaction::IntegerDomain;
+
+#include <boost/math/special_functions/pow.hpp>
+#include <boost/math/special_functions/round.hpp>
+
+namespace {
+  
+  template<typename Ty, int places>
+  Ty round_p(Ty v) {
+    static Ty const factor = boost::math::pow<places>(Ty(10));
+    return boost::math::round(factor*v)/factor;
+  }
+
+}
+
 /*
  * class DoradoReactor
  */
@@ -646,7 +667,7 @@ void DoradoReactor::initial_plan(fs::path const &file) {
     else
       value = value.substr(v_start, v_end-v_start);
     // Now that I have cleand up these lets try to add these as an argument
-    envelope.restrictAttribute(var_name, TREX::transaction::FloatDomain(string_cast<double>(value)));
+    envelope.restrictAttribute(var_name, FloatDomain(string_cast<double>(value)));
     
     if( !end_of_parse ) // Remove parsed element fro mthe string
       de_args = de_args.substr(sc_pos+1);
@@ -669,13 +690,76 @@ void DoradoReactor::handleInit() {
   syslog(tlog::info)<<"VCS ready : sent \"start\" to confirm hand-shake";
   m_api->ping(false); // Just to reset the ping without sending the ping
   m_seq_count = 0;
+  m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
+  postObservation(*m_last_state);
+  m_last_packet = getInitialTick();
 }
 
 void DoradoReactor::handleTickStart() {
+  // send a ping whenever we did not send any message and are not rtunning a bahvior
   m_api->ping(m_seq_count==0);
 }
-
+ 
 bool DoradoReactor::synchronize() {
+  //
+  // Produce sensors update
+  //
+  StatePacket sp;
+  transaction::TICK now = getCurrentTick();
+  
+  if( m_api->get_state_packet(sp) ) {
+    m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, "Holds");
+    
+    // get lat,lon, northing, easting, depth
+    m_last_state->restrictAttribute("latitude", FloatDomain(sp.position.latitude));
+    m_last_state->restrictAttribute("longitude", FloatDomain(sp.position.longitude));
+    // round all metric values to cm accuracy
+    m_last_state->restrictAttribute("x", FloatDomain(round_p<long double, 2>(sp.position.x)));
+    m_last_state->restrictAttribute("y", FloatDomain(round_p<long double, 2>(sp.position.y)));
+    m_last_state->restrictAttribute("z", FloatDomain(round_p<long double, 2>(sp.position.z)));
+    
+    // there used to be cluster data in here bu I don't really use it anymore
+    
+    // CTD data
+    m_last_state->restrictAttribute("ctdValid", BooleanDomain(sp.ctd.valid));
+    if( sp.ctd.valid ) {
+      m_last_state->restrictAttribute("conductivity", FloatDomain(sp.ctd.c));
+      m_last_state->restrictAttribute("temperature", FloatDomain(sp.ctd.t));
+      m_last_state->restrictAttribute("density", FloatDomain(sp.ctd.d));
+      m_last_state->restrictAttribute("salinity", FloatDomain(sp.ctd.salinity));
+    }
+    
+    // Isus data
+    m_last_state->restrictAttribute("isusValid", BooleanDomain(sp.isus.valid));
+    if( sp.isus.valid ) {
+      m_last_state->restrictAttribute("nitrate", FloatDomain(sp.isus.nitrate));
+    }
+    
+    // Backscatter data
+    m_last_state->restrictAttribute("hydroscatValid", BooleanDomain(sp.hydroscat.valid));
+    if( sp.hydroscat.valid ) {
+      // NOTE: all the hs2 data are changed by a factor to better handle small values
+      m_last_state->restrictAttribute("ch_fl", FloatDomain(sp.hydroscat.fl/CH_fact));
+      m_last_state->restrictAttribute("bb470", FloatDomain(sp.hydroscat.bb470/BB_fact));
+      m_last_state->restrictAttribute("bb676", FloatDomain(sp.hydroscat.bb676/BB_fact));
+    }
+    postObservation(*m_last_state, false); // silently post the new state obs
+    m_last_packet = now;
+    
+    // TODO: sp also contains gulper info -> process it
+    
+  } else {
+    if( m_last_state->predicate()!=transaction::Predicate::undefined_pred ) {
+      syslog(tlog::warn)<<"No sensor update received starting from now.";
+      m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
+      postObservation(*m_last_state, true); // undefined obs is not silent so we see it in the logs
+    } else if( m_last_packet+3 < now ) {
+      syslog(tlog::error)<<"Did not receive sensor updates for more than 3 ticks";
+      return false;
+    }
+  }
+  
+  // TODO process behaviors
   
   return true;
 }
@@ -693,7 +777,7 @@ void DoradoReactor::handleRecall(transaction::goal_id const &g) {
 void DoradoReactor::started(TREX::transaction::goal_id g) {
   if( g ) {
     if( is_sequential(g->object()) ) {
-      
+      m_seq_count += 1;
     } else {
       
     }
@@ -706,7 +790,10 @@ void DoradoReactor::completed(TREX::transaction::goal_id g) {
       // Add lock.Free as an observation that can be overwritten
       // Add this observation the same way
       // process possible pending sequential request
-      
+      if( m_seq_count>0 )
+        m_seq_count -= 1;
+      else
+        syslog(tlog::warn)<<"Completion of "<<g->object()<<" resulted on a count of posted sequentials below 0.";
       
     } else {
       

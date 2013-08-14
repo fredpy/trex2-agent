@@ -87,7 +87,7 @@ if(WITH_DORADO)
     DEPENDS ${DORADO_STATE})
   
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
+  
   # Library for connecting to dorado
   add_library(MBARIdorado SHARED
     # source
@@ -95,6 +95,7 @@ if(WITH_DORADO)
     DoradoReactor.cc
     DownlinkReactor.cc
     # headers 
+    auv_factors.hh
     StatePacket.h
     DoradoReactor.hh
     DownlinkReactor.hh)
