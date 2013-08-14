@@ -114,9 +114,12 @@ namespace TREX {
       }
       
       class msg_api;
+
       
       SHARED_PTR<msg_api> m_api;
       size_t m_seq_count;
+      SHARED_PTR<transaction::Observation> m_last_state;
+      transaction::TICK m_last_packet;
       
       static utils::Symbol const s_inactive;
       static utils::Symbol const s_depth_envelope;
