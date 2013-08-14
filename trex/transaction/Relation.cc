@@ -51,7 +51,7 @@ MultipleInternals::MultipleInternals(TeleoReactor const &faulty, utils::Symbol c
  * class TREX::transaction::details::timeline
  */
 
-utils::Symbol const timeline::s_failed("Failed");
+utils::Symbol const timeline::s_failed(Predicate::failed_pred);
 
 // structors :
 
