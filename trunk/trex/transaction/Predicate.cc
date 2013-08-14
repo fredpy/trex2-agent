@@ -44,7 +44,12 @@ using namespace TREX::transaction;
 
 /*
  * class TREX::transaction::Predicate
- */ 
+ */
+// statics
+
+Symbol const Predicate::undefined_pred("undefined");
+Symbol const Predicate::failed_pred("Failed");
+
 // structors :
 
 Predicate::Predicate(boost::property_tree::ptree::value_type &node)
