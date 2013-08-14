@@ -99,6 +99,7 @@ namespace TREX {
 
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);
+      void insertIntoReceived(IMC::Message* msg);
 
       TREX::utils::SingletonUse<SharedEnvironment> m_env;
 

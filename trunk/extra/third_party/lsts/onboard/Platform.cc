@@ -99,12 +99,26 @@ namespace TREX
       m_last_msg = -1;
       syslog(log::info) << "listening on port " << localport << "...";
     }
-    
+
+    /**
+     * @param msg received
+     *
+     * Substitute previously received message
+     */
+    void Platform::insertIntoReceived(IMC::Message* msg)
+    {
+      // substitute previously received message
+      if (received.count(msg->getId()))
+        received.erase(msg->getId());
+
+      received[msg->getId()] = msg;
+    }
+
     void
     Platform::handleTickStart()
     {
       
-      // Dop not process goals if you still have observations to post
+      // Do not process goals if you still have observations to post
       //if( referenceObservations.empty() ) {
         // First deal with requests
         if( !m_blocked && !m_goals_pending.empty() ) {
@@ -130,7 +144,7 @@ namespace TREX
       //}
       
       // Now that we dealt with goal processing and command sending
-      // just look ifg any observation need to be posted
+      // just look if any observation need to be posted
       
       if(!referenceObservations.empty())
       {
@@ -169,9 +183,7 @@ namespace TREX
           }
           else {
             // substitute previously received message
-            if (received.count(msg->getId()))
-              received.erase(msg->getId());
-            received[msg->getId()] = msg;
+            insertIntoReceived(msg);
           }
         }
         
@@ -385,13 +397,13 @@ namespace TREX
         received.clear();
       }
       
-      PlanControlState * pcstate =
-      dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
-      postUniqueObservation(m_adapter.planControlStateObservation(pcstate));
+      PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
+      TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
+      postUniqueObservation(planControlStateObservation);
       if (pcstate != NULL)
-        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING)
-        && pcstate->plan_id == "trex_plan";
-      
+      {
+        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING) && pcstate->plan_id == "trex_plan";
+      }
       
       // Translate incoming messages into observations
       EstimatedState * estate =
@@ -440,6 +452,7 @@ namespace TREX
       if (!m_blocked)
       {
         sendMsg(m_ref);
+        syslog(log::info)<< "Sending reference";
         //m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
@@ -582,11 +595,14 @@ namespace TREX
         
         // Deal with the optional attributes
         v = g->getAttribute("radius");
-        if (v.domain().isSingleton()) {
+        if (v.domain().isSingleton())
+        {
           m_ref.radius = v.domain().getTypedSingleton<double, true>();
           m_ref.flags |= Reference::FLAG_RADIUS;
-        } else {
-          syslog(log::warn)<<"UAV oing didn ot specifiy its radius."
+        }
+        else
+        {
+          syslog(log::warn)<<"UAV going didn't specifiy radius."
             "keeping previous one.";
         }
         DesiredSpeed desSpeed;
@@ -596,7 +612,9 @@ namespace TREX
         syslog(log::info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") radius:" << m_ref.radius << "; z:" << desZ.value;
         std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")   radius:"<< m_ref.radius << "; z:" << desZ.value << "\n";
         return true;
-      } else {
+      }
+      else
+      {
         syslog(log::warn)<<"Ignored UAV going request dur to some of its "
         "required parameters not being fixed (id="<<g<<").";
         return false;
