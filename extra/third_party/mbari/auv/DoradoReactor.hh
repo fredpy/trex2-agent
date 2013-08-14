@@ -102,27 +102,25 @@ namespace TREX {
       void handleRequest(transaction::goal_id const &g);
       void handleRecall(transaction::goal_id const &g);
             
-      static boost::asio::io_service s_io_service;
-      static utils::Symbol const     s_depth_enveloppe;
-      static utils::Symbol const     s_sp_timeline;
+      void initial_plan(boost::filesystem::path const &file);
+      void started(transaction::goal_id g);
+      void completed(transaction::goal_id g);
       
-      /** @brief execution temporal uncertainty
-       *
-       * This value includes the temporal uncertainty of execution observation 
-       * of behavior. It is set to 2 as it includes the worst case scenario of 
-       * the behavior starting and ending right between two ticks resulting on 
-       * 2 extra ticks of duration.
-       *
-       * As a result thois reactor decrease the duration deadline sent to the 
-       * vehicle by this amount of time when possibel in order to hide to trex 
-       * this possible uncertainty.
-       */
-      static transaction::IntegerDomain::bound const s_temporal_uncertainty;
       
+      std::set<utils::Symbol> m_sequential;
+      
+      bool is_sequential(utils::Symbol const &name) const {
+        return m_sequential.end()!=m_sequential.find(name);
+      }
       
       class msg_api;
       
       SHARED_PTR<msg_api> m_api;
+      size_t m_seq_count;
+      
+      static utils::Symbol const s_inactive;
+      static utils::Symbol const s_depth_envelope;
+      static utils::Symbol const s_sp_timeline;
       
 //      boost::asio::ip::udp::socket m_sp_socket;  // server
 //      boost::asio::deadline_timer  m_sp_timer;
