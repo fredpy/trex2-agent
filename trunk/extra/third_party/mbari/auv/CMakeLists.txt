@@ -89,8 +89,9 @@ if(WITH_DORADO)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
   
   # Library for connecting to dorado
-  add_library(MBARIdorado SHARED
+  trex_plugin(dorado 
     # source
+    dorado_pg.cc
     StatePacket_xdr.c
     DoradoReactor.cc
     DownlinkReactor.cc
@@ -100,7 +101,7 @@ if(WITH_DORADO)
     DoradoReactor.hh
     DownlinkReactor.hh)
 
-  target_link_libraries(MBARIdorado TREXtransaction)
-  add_dependencies(mbari MBARIdorado)
+  target_link_libraries(dorado_pg TREXtransaction)
+  add_dependencies(mbari dorado_pg)
 
 endif(WITH_DORADO)
