@@ -44,7 +44,6 @@
 
 namespace asio=boost::asio;
 
-
 namespace TREX {
   namespace mbari {
     
@@ -560,6 +559,13 @@ DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
   m_api = MAKE_SHARED<msg_api>(boost::ref(manager().service()), boost::ref(*this));
   
+  // Populate with external config
+  ext_xml(node.second, "config");
+  
+  std::ostringstream oss;
+  write_json(oss, node.second);
+  syslog()<<node.first<<": "<<oss.str();
+  
   // Declare all of my timelines
   provide(s_sp_timeline, false);  // state updates are read only
   provide(s_depth_envelope, false); // so is the depth enveloppe
@@ -590,7 +596,7 @@ DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
   
   bool found;
   
-  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "inital_plan"),
+  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "initial_plan"),
                                                found);
   if( !found )
     throw XmlError(node, "Unable to locate auv inital plan file \""+init.string()+"\"");
