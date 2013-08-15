@@ -64,6 +64,21 @@ void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &
       throw XmlError("Xml file \""+file+"\" is empty.");
     if( pt.size()==1 )
       pt = pt.front().second;
+
+    boost::optional<boost::property_tree::ptree &> attrs = tree.get_child_optional("<xmlattr>");
+    
+    if( attrs ) {
+      boost::property_tree::ptree::assoc_iterator attrs2 = pt.find("<xmlattr>");
+      if( attrs2!=pt.not_found() ) {
+        if( ahead )
+          attrs->insert(attrs->begin(), attrs2->second.begin(), attrs2->second.end());
+        else
+          attrs->insert(attrs->end(), attrs2->second.begin(), attrs2->second.end());
+        pt.erase(pt.to_iterator(attrs2));
+      }
+    }
+    
+
     if( ahead )
       tree.insert(tree.begin(), pt.begin(), pt.end());
     else 

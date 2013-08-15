@@ -180,7 +180,7 @@ void timeline::postObservation(Observation const &obs,
 			       bool verbose) {
   verbose = verbose || ( owned() && owner().is_verbose() );
 
-  if( m_next_obs )
+  if( m_next_obs && owned() )
     owner().syslog(warn)<<"New observation overwrite formerly posted one:\n\t"
 			<<(*m_next_obs);
   m_next_obs = obs;
