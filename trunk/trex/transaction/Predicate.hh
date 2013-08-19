@@ -106,8 +106,8 @@ namespace TREX {
       typedef attr_set::const_iterator const_iterator;
       
       
-      static utils::Symbol const undefined_pred;
-      static utils::Symbol const failed_pred;
+      static utils::Symbol const &undefined_pred();
+      static utils::Symbol const &failed_pred();
 
       /** @brief Destructor */
       virtual ~Predicate() =0;

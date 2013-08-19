@@ -47,8 +47,15 @@ using namespace TREX::transaction;
  */
 // statics
 
-Symbol const Predicate::undefined_pred("undefined");
-Symbol const Predicate::failed_pred("Failed");
+Symbol const &Predicate::undefined_pred() {
+  static Symbol const undefined("undefined");
+  return undefined;
+}
+
+Symbol const &Predicate::failed_pred() {
+ static Symbol const failed("Failed");
+  return failed;
+}
 
 // structors :
 
