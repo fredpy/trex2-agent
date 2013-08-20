@@ -47,7 +47,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(TREXutils SHARED
   # real source
-  ErrnoExcept.cc
   Exception.cc
   LogManager.cc
   Pdlfcn.cc
@@ -69,7 +68,6 @@ add_library(TREXutils SHARED
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
   chrono_helper.hh
-  ErrnoExcept.hh
   Exception.hh
   Factory.hh
   Hashable.hh

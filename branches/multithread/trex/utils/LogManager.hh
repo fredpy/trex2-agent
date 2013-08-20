@@ -52,7 +52,8 @@
 
 # include "SingletonUse.hh"
 # include "SharedVar.hh"
-# include "ErrnoExcept.hh"
+
+# include <boost/system/system_error.hpp>
 
 /** @brief TREX default log file name
  *

@@ -709,8 +709,12 @@ void Agent::loadConf(std::string const &file_name) {
   std::string name = manager().use(file_name, found);
   if( !found ) {
     name = manager().use(file_name+".cfg", found);
-    if( !found )
-      throw ErrnoExcept("Unable to locate "+file_name);
+    if( !found ) {
+      boost::system::error_code ec(boost::system::errc::no_such_file_or_directory,
+                                   boost::system::generic_category());
+      throw boost::system::system_error(ec,
+                                        "Unable to locate \""+file_name+"[.cfg]\"");
+    }
   }
   boost::property_tree::ptree agent;
   read_xml(name, agent, xml::no_comments|xml::trim_whitespace);

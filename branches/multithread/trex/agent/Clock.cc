@@ -59,9 +59,11 @@ void Clock::sleep(Clock::duration_type const &delay){
     while( tv.tv_sec>0 || tv.tv_nsec>0 ) {
       if( 0==nanosleep(&tv, &tv) )
         return;
-      if( EINTR!=errno )
-        throw ErrnoExcept("Clock:sleep");
-    } 
+      if( EINTR!=errno ) {
+        boost::system::error_code ec(errno, boost::system::system_category());
+        throw boost::system::system_error(ec, "Clock:sleep: "+ec.message());
+      }
+    }
   }
 }
 

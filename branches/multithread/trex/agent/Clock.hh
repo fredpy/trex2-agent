@@ -47,9 +47,11 @@
 # include "bits/agent_graph.hh"
 
 # include <trex/transaction/Tick.hh>
-# include <trex/utils/ErrnoExcept.hh>
 
 # include <trex/utils/TimeUtils.hh>
+
+# include <boost/system/system_error.hpp>
+
 
 namespace TREX {
   namespace agent {

@@ -170,15 +170,18 @@ void ControlInterface::create_fifo() {
         syslog(TREX::utils::log::warn)<<"A file with this name did already exist !!!"
             <<"\n\tI'll assume it is a unix pipe.";
       } else {
-        syslog(TREX::utils::log::error)<<"Failed to create fifo";
-        throw TREX::utils::ErrnoExcept("mkfifo("+queue_name+")");
+        boost::system::error_code ec(errno, boost::system::system_category());
+        
+        syslog(TREX::utils::log::error)<<"Failed to create fifo: "<<ec.message();
+        throw boost::system::system_error(ec);
       }
     }
     syslog(TREX::utils::log::info)<<"Opening the pipe...";
     fid = open(queue_name.c_str(), O_RDONLY|O_NONBLOCK);
     if( fid<0 ) {
-      syslog(TREX::utils::log::error)<<"Failed to open fifo";
-      throw TREX::utils::ErrnoExcept("open("+queue_name+")");
+      boost::system::error_code ec(errno, boost::system::system_category());
+      syslog(TREX::utils::log::error)<<"Failed to open fifo: "<<ec.message();
+      throw boost::system::system_error(ec);
     } else { // critical section
       scoped_lock cs(m_mutex);
       // update the file id to the newly opened fifo
@@ -228,8 +231,10 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
       if( 0<m_fifo ) {
         int len = read(m_fifo, buff, buff_size*sizeof(char));
 
-        if( len<0 )
-          throw TREX::utils::ErrnoExcept("Error while reading fifo");
+        if( len<0 ) {
+          boost::system::error_code ec(errno, boost::system::system_category());
+          throw boost::system::system_error(ec);
+        }
         return len;
       }
     }

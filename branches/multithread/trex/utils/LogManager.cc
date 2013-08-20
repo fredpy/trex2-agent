@@ -175,7 +175,11 @@ void LogManager::createLatest() {
   char dated_dir[16];
   
   if( NULL==base_dir_name ) {
-    throw ErrnoExcept("LogManager: $" LOG_DIR_ENV " is not set");
+    boost::system::error_code ec(boost::system::errc::no_such_file_or_directory,
+                                 boost::system::generic_category());
+    
+    throw boost::system::system_error(ec,
+                                      "LogManager: $" LOG_DIR_ENV " is not set");
   }
   path_type base_dir(base_dir_name);
   base_dir.make_preferred();
@@ -212,8 +216,11 @@ void LogManager::createLatest() {
       return;
     }
   }
-  throw ErrnoExcept("LogManager", "Too many attempts ... clean up your "
-		    "log directory");
+  boost::system::error_code ec(boost::system::errc::value_too_large,
+                               boost::system::generic_category());
+  throw boost::system::system_error(ec,
+                                    "Too many attempts to create latest: "
+                                    "clean up your TREX log directory");
 }
 
 LogManager::path_type LogManager::file_name(std::string const &short_name) {
