@@ -41,8 +41,11 @@
 #include "auv_factors.hh"
 
 #include <boost/bimap.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/interprocess/sync/named_mutex.hpp>
 
 namespace asio=boost::asio;
+namespace ipc=boost::interprocess;
 
 namespace TREX {
   namespace mbari {
@@ -51,138 +54,234 @@ namespace TREX {
     :boost::noncopyable
     ,public ENABLE_SHARED_FROM_THIS<DoradoReactor::msg_api> {
     public:
-      static unsigned short const out_default;
-      static unsigned short const in_default;
+      typedef unsigned short port_type;
+      typedef asio::deadline_timer::duration_type duration_type;
       
+      static port_type const out_default;
+      static port_type const in_default;
+    
       msg_api(asio::io_service &io, DoradoReactor &owner);
       ~msg_api();
       
-      void connect(std::string const &host, unsigned short out_port, unsigned short in_port);
-      bool connected() const;
-      void disconnect();
+      void add_alias(utils::Symbol const &alias, utils::Symbol const &real) {
+        m_aliases[alias] = real;
+      }
+      utils::Symbol const &alias(utils::Symbol const &name) const;
       
-      void post_behavior(transaction::goal_id req);
       
-      /** @brief Send a message
-       *
-       * @param[in] msg The message to b sent
-       *
-       * @pre This instance is connected
-       *
-       * Send the text message @p msg to the out server this instance is 
-       * connected to with the proper encoding. This call will block until 
-       * message sending completion or a failure.
-       *
-       * @throw boost::system::system_error An error coccured while trying to 
-       * send the message
-       */
-      void send(std::string const &msg, bool verbose=false);
-
-      void start();
-      bool started() const;
-      bool stop();
       
-      bool inited();
-      
-      bool get_state_packet(StatePacket &p);
-      
-      void add_alias(utils::Symbol name, utils::Symbol target) {
-        m_alias[name] = target;
+      void connect(std::string const &host, port_type out, port_type in,
+                   duration_type const &time_out,
+                   boost::function<void ()> handler);
+      bool connected() {
+        if( !m_connected.valid() )
+          m_owner.syslog(TREX::utils::log::error)<<"Connected is not valid ...";
+        m_connected.wait();
+        if(m_connected.has_exception())
+          m_owner.syslog(TREX::utils::log::warn)<<"Connected is an exception ...";
+        
+        return m_connected.get();
       }
       
-      void ping(bool test = true);
-
+      void close();
+      
+      void send(std::string const &msg);
+      
+      
     private:
-      std::map<utils::Symbol, utils::Symbol> m_alias;
+      typedef asio::deadline_timer::traits_type timer_traits;
       
-      DoradoReactor &m_owner;
+      DoradoReactor       &m_owner;
+      
+    
+      void timed_out(boost::system::error_code const &ec);
+      void resolved(boost::system::error_code const &ec,
+                    asio::ip::tcp::resolver::iterator addr,
+                    port_type out, port_type in);
+      void connected(boost::system::error_code const &ec);
+      
+      
+      boost::function<void ()>      m_connect_handle;
+      boost::promise<bool>       m_connected_p;
+      boost::shared_future<bool> m_connected;
+      bool                       m_pinged;
 
-      bool m_init, m_pinged;
-      boost::promise<bool> m_init_p;
+      asio::deadline_timer    m_timer;
       
+      asio::ip::tcp::resolver m_dns;
+      asio::ip::address       m_vcs_ip;
       
-      asio::ip::address m_server_ip;
+      asio::ip::tcp::socket   m_out;
+      asio::ip::udp::socket   m_in;
       
-      // udp socket for incoming messages
-      asio::ip::udp::socket   m_in_socket;
-      // incoming udp message header
-      boost::array<char, 3>     m_sp_header;
-      boost::optional<uint16_t> m_xdr_buff_size;
+      std::map<utils::Symbol, utils::Symbol> m_aliases;
 
-      typedef boost::array<char, sizeof(uint16_t)+2*sizeof(StatePacket)> xdr_buff_t;
-      SHARED_PTR<xdr_buff_t>  m_xdr_buff;
-      xdr_buff_t m_xdr_data;
-      XDR m_xdr_stream;
-            
-      // incoming udp message sender
       asio::ip::udp::socket::endpoint_type m_from;
+
+      boost::array<char, 3>                m_sp_header;
+      boost::optional<uint16_t>            m_xdr_buff_size;
       
-      // tcp socket for outgoing messages
-      asio::ip::tcp::endpoint m_out_server;
-      asio::ip::tcp::socket   m_out_socket;
+      typedef boost::array<char, sizeof(uint16_t)+2*sizeof(StatePacket)> xdr_buff_t;
+      typedef SHARED_PTR<xdr_buff_t> xdr_buff_ref;
       
-      utils::SharedVar<int32_t> m_cpt;
-      typedef boost::bimap<int32_t, transaction::goal_id> req_map;
-      req_map m_goals;
+      boost::promise<xdr_buff_ref>       m_xdr_p;
+      boost::shared_future<xdr_buff_ref> m_xdr;
       
-      
-      utils::Symbol alias(utils::Symbol const &name) const;
-      
-      int32_t get(transaction::goal_id g) {
-        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
-        req_map::right_const_iterator pos = m_goals.right.find(g);
-        
-        if( m_goals.right.end()==pos ) {
-          int32_t idx = ++(*m_cpt);
-          m_goals.insert(req_map::value_type(idx, g));
-          
-          return idx;
-        } else
-          return pos->second;
-      }
-      
-      transaction::goal_id get(int32_t id) {
-        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
-        req_map::left_const_iterator pos = m_goals.left.find(id);
-        transaction::goal_id ret;
-        
-        if( m_goals.left.end()!=pos )
-          ret = pos->second;
-        return ret;
-      }
-      
-      void erase(transaction::goal_id g) {
-        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
-        m_goals.right.erase(g);
-      }
-      void erase(int32_t id) {
-        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
-        m_goals.left.erase(id);
+      bool valid_sender() {
+        return m_from.address()==m_vcs_ip;
       }
       
       void async_rcv();
-      void sp_header_rvcd(boost::system::error_code const & error, // Result of operation.
-                          std::size_t bytes_transferred);
+      void on_new_header(boost::system::error_code const & error, // Result of operation.
+                         std::size_t bytes_transferred);
       void get_state_packet(size_t size);
+      void on_new_packet(boost::system::error_code const &errr,
+                         std::size_t bytes_transferred, xdr_buff_ref buff);
       void get_behavior();
+     
+      void close_impl();
       
+      ipc::named_mutex m_lock;
       
-      void behavior_started(int32_t id);
-      void behavior_finished(int32_t id);
-      
-      mutable utils::SharedVar<bool> m_started;
-      static size_t const s_xdr_size;
-      
-      
-      bool valid_sender(asio::ip::udp::endpoint const &from) const;
-      
-      
-      msg_api() DELETED;
     };
+    
+    
+    
+      
+//      static unsigned short const out_default;
+//      static unsigned short const in_default;
+//      
+//      msg_api(asio::io_service &io, DoradoReactor &owner);
+//      ~msg_api();
+//      
+//      void connect(std::string const &host, unsigned short out_port, unsigned short in_port);
+//      bool connected() const;
+//      void disconnect();
+//      
+//      void post_behavior(transaction::goal_id req);
+//      
+//      /** @brief Send a message
+//       *
+//       * @param[in] msg The message to b sent
+//       *
+//       * @pre This instance is connected
+//       *
+//       * Send the text message @p msg to the out server this instance is 
+//       * connected to with the proper encoding. This call will block until 
+//       * message sending completion or a failure.
+//       *
+//       * @throw boost::system::system_error An error coccured while trying to 
+//       * send the message
+//       */
+//      void send(std::string const &msg, bool verbose=false);
+//
+//      void start();
+//      bool started() const;
+//      bool stop();
+//      
+//      bool inited();
+//      
+//      bool get_state_packet(StatePacket &p);
+//      
+//      void add_alias(utils::Symbol name, utils::Symbol target) {
+//        m_alias[name] = target;
+//      }
+//      
+//      void ping(bool test = true);
+//
+//    private:
+//      std::map<utils::Symbol, utils::Symbol> m_alias;
+//      
+//      DoradoReactor &m_owner;
+//
+//      bool m_init, m_pinged;
+//      boost::promise<bool> m_init_p;
+//      
+//      
+//      asio::ip::address m_server_ip;
+//      
+//      // udp socket for incoming messages
+//      asio::ip::udp::socket   m_in_socket;
+//      // incoming udp message header
+//      boost::array<char, 3>     m_sp_header;
+//      boost::optional<uint16_t> m_xdr_buff_size;
+//
+//      typedef boost::array<char, sizeof(uint16_t)+2*sizeof(StatePacket)> xdr_buff_t;
+//      SHARED_PTR<xdr_buff_t>  m_xdr_buff;
+//      xdr_buff_t m_xdr_data;
+//      XDR m_xdr_stream;
+//            
+//      // incoming udp message sender
+//      asio::ip::udp::socket::endpoint_type m_from;
+//      
+//      // tcp socket for outgoing messages
+//      asio::ip::tcp::endpoint m_out_server;
+//      asio::ip::tcp::socket   m_out_socket;
+//      
+//      utils::SharedVar<int32_t> m_cpt;
+//      typedef boost::bimap<int32_t, transaction::goal_id> req_map;
+//      req_map m_goals;
+//      
+//      
+//      utils::Symbol alias(utils::Symbol const &name) const;
+//      
+//      int32_t get(transaction::goal_id g) {
+//        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+//        req_map::right_const_iterator pos = m_goals.right.find(g);
+//        
+//        if( m_goals.right.end()==pos ) {
+//          int32_t idx = ++(*m_cpt);
+//          m_goals.insert(req_map::value_type(idx, g));
+//          
+//          return idx;
+//        } else
+//          return pos->second;
+//      }
+//      
+//      transaction::goal_id get(int32_t id) {
+//        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+//        req_map::left_const_iterator pos = m_goals.left.find(id);
+//        transaction::goal_id ret;
+//        
+//        if( m_goals.left.end()!=pos )
+//          ret = pos->second;
+//        return ret;
+//      }
+//      
+//      void erase(transaction::goal_id g) {
+//        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+//        m_goals.right.erase(g);
+//      }
+//      void erase(int32_t id) {
+//        utils::SharedVar<int32_t>::scoped_lock lock(m_cpt);
+//        m_goals.left.erase(id);
+//      }
+//      
+//      void async_rcv();
+//      void sp_header_rvcd(boost::system::error_code const & error, // Result of operation.
+//                          std::size_t bytes_transferred);
+//      void get_state_packet(size_t size);
+//      void get_behavior();
+//      
+//      
+//      void behavior_started(int32_t id);
+//      void behavior_finished(int32_t id);
+//      
+//      mutable utils::SharedVar<bool> m_started;
+//      static size_t const s_xdr_size;
+//      
+//      
+//      bool valid_sender(asio::ip::udp::endpoint const &from) const;
+//      
+//      
+//      msg_api() DELETED;
+//    };
     
     
   }
 }
+
+
 
 using namespace TREX::mbari;
 using namespace TREX::utils;
@@ -193,65 +292,152 @@ namespace tlog=TREX::utils::log;
  * class TREX::mbari::DoradoReactor::msg_api
  */
 
-// statics 
+// statics
 
-unsigned short const DoradoReactor::msg_api::out_default(8004);
-unsigned short const DoradoReactor::msg_api::in_default(8002);
-size_t const DoradoReactor::msg_api::s_xdr_size(sizeof(uint16_t)+2*sizeof(StatePacket));
+DoradoReactor::msg_api::port_type const DoradoReactor::msg_api::out_default(8004);
+DoradoReactor::msg_api::port_type const DoradoReactor::msg_api::in_default(8002);
 
 // structors
 
 DoradoReactor::msg_api::msg_api(asio::io_service &io, DoradoReactor &owner)
-:m_owner(owner), m_in_socket(io), m_out_socket(io) {
-  // Set up the xdr stream
-  xdrmem_create(&m_xdr_stream, m_xdr_data.data()+sizeof(uint16_t),
-                2*sizeof(StatePacket), XDR_DECODE);
+:m_owner(owner), m_timer(io), m_dns(io), m_out(io), m_in(io) {
+  // No deadline right now
+  m_timer.expires_at(boost::posix_time::pos_infin);
+  
+  m_connected = m_connected_p.get_future();
+  m_connected_p.set_value(false);
+  
+  m_xdr = m_xdr_p.get_future();
 }
 
 DoradoReactor::msg_api::~msg_api() {
-  disconnect();
+  close_impl();
 }
 
-// modifiers 
+// modifiers
 
-void DoradoReactor::msg_api::connect(std::string const &host,
-                                     unsigned short out_port,
-                                     unsigned short in_port) {
-  if( connected() )
-    disconnect();
-  m_owner.syslog(tlog::info)<<"Connecting to AUV at "<<host
-  <<"\n\t- outbound TCP port "<<out_port
-  <<"\n\t- inbound UDP port "<<in_port;
+void DoradoReactor::msg_api::connect(std::string const &host, port_type out, port_type in,
+                                     duration_type const &time_out,
+                                     boost::function<void ()> handler) {
+  // reserve the value of m_connected
+  {
+    boost::promise<bool>       my_promise;
+    boost::shared_future<bool> status(my_promise.get_future());
   
-  // First try to resolve the name
-  asio::ip::tcp::resolver dns(m_out_socket.get_io_service());
+    status.swap(m_connected);
+    
+    status.wait();
+    
+    if( status.has_value() && status.get() ) {
+      my_promise.set_value(true); // just in case someone tried to read me before
+      throw Exception("Cannot connect when already connected");
+    }
+    my_promise.swap(m_connected_p);
+  }
+  m_owner.syslog()<<"Resolving "<<host<<" IP";
   asio::ip::tcp::resolver::query q(host, "");
-  asio::ip::tcp::resolver::iterator iter = dns.resolve(q);
   
-  // store sresolved server address
-  m_server_ip = iter->endpoint().address();
+  m_in.close();
+  m_out.close();
+  m_connect_handle = handler;
   
-  asio::ip::tcp::endpoint tcp_server;
+  m_timer.expires_from_now(time_out); // Set timer
+
+  m_dns.async_resolve(q, boost::bind(&msg_api::resolved, shared_from_this(),
+                                     _1, _2, out, in));
   
-  tcp_server.address(m_server_ip);
-  tcp_server.port(out_port);
-  
-  // Attempt to connect to vcs for outgoing tcp messages
-  m_out_socket.connect(tcp_server);
-  
-  // Create udp connection for incoming udp messages
-  m_in_socket.open(asio::ip::udp::v4());
-  m_in_socket.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), in_port));
+  m_timer.async_wait(boost::bind(&msg_api::timed_out, shared_from_this(), _1));
 }
 
-void DoradoReactor::msg_api::disconnect() {
-  m_owner.syslog(tlog::info)<<"Disconnecting from AUV";
-  stop();
-  m_in_socket.close();
-  m_out_socket.close();
+void DoradoReactor::msg_api::close() {
+  // reserve the value of m_connected
+  boost::promise<bool>       my_promise;
+  boost::shared_future<bool> status(my_promise.get_future());
+  
+  status.swap(m_connected);
+  status.wait();
+  if( status.has_value() && status.get() ) {
+    m_timer.cancel();
+    m_timer.expires_at(boost::posix_time::pos_infin);
+    close_impl();
+    m_in.close();
+    m_out.close();
+    m_lock.unlock();
+  }
+  my_promise.set_value(false);
 }
 
-void DoradoReactor::msg_api::send(std::string const &msg, bool verbose) {
+
+void DoradoReactor::msg_api::timed_out(boost::system::error_code const &ec) {
+  if( !ec ) {
+    m_owner.syslog(tlog::error)<<"Socket operation timed out";
+    close_impl();
+  }
+  m_timer.expires_at(boost::posix_time::pos_infin);
+}
+
+void DoradoReactor::msg_api::resolved(boost::system::error_code const &ec,
+                                      asio::ip::tcp::resolver::iterator addr,
+                                      port_type out, port_type in) {
+
+  if( !ec ) {
+    asio::ip::tcp::endpoint out_addr;
+    
+    m_vcs_ip = addr->endpoint().address();
+    out_addr.address(m_vcs_ip);
+    out_addr.port(out);
+    
+    m_owner.syslog()<<"Connecting to VCS at "<<m_vcs_ip
+    <<":\n\t- TCP out port: "<<out
+    <<"\n\t- UDP in port: "<<in;
+   
+    m_out.async_connect(out_addr, boost::bind(&msg_api::connected, shared_from_this(), _1));
+    try {
+      m_in.open(asio::ip::udp::v4());
+      m_in.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), in));
+    } catch(std::exception const &e) {
+      m_timer.cancel();
+      // Need to do something here 
+      m_connected_p.set_exception(boost::copy_exception(e));
+    } catch(boost::system::error_code ec2) {
+      m_timer.cancel();
+      Exception err("Error during name resolution of VCS: "+ec2.message());
+      m_connected_p.set_exception(boost::copy_exception(err));
+    } catch(...) {
+      std::cerr<<"blah"<<std::endl;
+      m_timer.cancel();
+      std::runtime_error err("error");
+      m_connected_p.set_exception(boost::copy_exception(err));
+    }
+  } else {
+    m_timer.cancel();
+    Exception err(ec.message());
+    m_connected_p.set_exception(boost::copy_exception(err));
+  }
+}
+
+void DoradoReactor::msg_api::connected(boost::system::error_code const &ec) {
+  if( !ec ) {
+    m_timer.cancel();
+    m_owner.syslog()<<"TCP socket to VCS opened";
+    try {
+      m_connect_handle();
+      m_connected_p.set_value(true);
+      async_rcv();
+    } catch(std::exception const &e) {
+      m_connected_p.set_exception(boost::copy_exception(e));
+    } catch(...) {
+      std::runtime_error err("Unknown exception while sending initial plan");
+      m_connected_p.set_exception(boost::copy_exception(err));
+    }
+  } else {
+    Exception err("Error during connection to VCS: "+ec.message());
+    m_connected_p.set_exception(boost::copy_exception(err));
+  }
+}
+
+
+void DoradoReactor::msg_api::send(std::string const &msg) {
   std::vector<asio::const_buffer> buffs;
   uint32_t len = msg.length(), net_len = htonl(len);
   
@@ -261,288 +447,168 @@ void DoradoReactor::msg_api::send(std::string const &msg, bool verbose) {
   buffs.push_back(asio::buffer(&net_len, sizeof(uint32_t)));
   buffs.push_back(asio::buffer(msg));
   
-  if( verbose )
-    m_owner.syslog()<<"Sending: "<<msg;
   // Directly write the message
-  asio::write(m_out_socket, buffs);
+  asio::write(m_out, buffs);
   m_pinged = true;
 }
 
-void DoradoReactor::msg_api::ping(bool test) {
-  if( test && !m_pinged )
-    send("PING");
-  m_pinged = false;
-}
-
-
-void DoradoReactor::msg_api::start() {
-  if( connected() ) {
-    bool running = true;
-    m_started.swap(running);
-    if( !running )
-      async_rcv();
-  }
-}
-
 void DoradoReactor::msg_api::async_rcv() {
-  // Post my asynchronous listen to m_out_socket only if still active
-  if( started() )
-    m_in_socket.async_receive_from(asio::buffer(m_sp_header), m_from,
-                                   boost::bind(&msg_api::sp_header_rvcd,
-                                               shared_from_this(),
-                                               _1, _2));
+  m_owner.syslog()<<"Wait for msg from VCS";
+  
+  m_sp_header.fill('\0');
+  m_in.async_receive_from(asio::buffer(m_sp_header), m_from,
+                          boost::bind(&msg_api::on_new_header, shared_from_this(),
+                                      _1, _2));
 }
 
-
-void DoradoReactor::msg_api::post_behavior(TREX::transaction::goal_id req) {
-  int32_t id = get(req);
-  std::ostringstream oss;
-
-  
-  transaction::IntegerDomain::bound duration = req->getDuration().upperBound();
-  boost::optional<size_t> vcs_dur;
-  
-  if( duration.isInfinity() ) {
-    m_owner.syslog(tlog::warn)<<"No maximum duration set for goal "<<req<<" on "<<req->object();
-  } else {
-    vcs_dur = duration.value();
-    if( 2 < *vcs_dur )
-      *vcs_dur -= 2;
-      
-  }
-  
-  oss.setf(std::ios::fixed);
-  oss<<"insert|behavior "<<alias(req->object())<<" { "
-  <<" id="<<id<<"; ";
-  if( vcs_dur )
-    oss<<" duration="<<*vcs_dur<<"; ";
-  
-  for(transaction::Predicate::const_iterator a=req->begin(); req->end()!=a; ++a) {
-    transaction::DomainBase const &dom = a->second.domain();
-    
-    if( dom.isSingleton() ) {
-      // TODO: handle the special case for boolean domains : vcs expect True or False
-      oss<<a->first<<"="<<dom.getStringSingleton()<<"; ";
-    } else {
-      m_owner.syslog(tlog::warn)<<"Ignoring attribute "<<a->first<<" of request "<<req<<" as its domain is not singleton ("<<dom<<")";
-    }
-  }
-  oss<<"}";
-  
-  send(oss.str(), true);
-}
-
-
-bool DoradoReactor::msg_api::stop() {
-  bool ret = false;
-  m_started.swap(ret);
-  return ret;
-}
-
-void DoradoReactor::msg_api::sp_header_rvcd(boost::system::error_code const & error, // Result of operation.
-                                            std::size_t bytes_transferred) {
-  if( started() ) {
-    if( error ) {
-      // Handle the error message
-      m_owner.syslog(tlog::error)<<"Error while waiting for new message: "<<error.message();
-      disconnect();
-    } else if( valid_sender(m_from) ) {
-      // Check the type of the message
-      
-      switch (m_sp_header[0]) {
-        case 'S':
-          get_state_packet(*reinterpret_cast<uint16_t *>(m_sp_header.data()+1));
-          break;
-        case 'B':
-          get_behavior();
-          break;
-        default:
-          // handle unknown error
-          m_owner.syslog(tlog::error)<<"Unknown message header type ("<<m_sp_header[0]
-          <<"=0x"<<std::hex<<static_cast<short>(m_sp_header[0])<<std::dec<<")";
-          break;
+void DoradoReactor::msg_api::on_new_header(boost::system::error_code const & error, // Result of operation.
+                                           std::size_t bytes_transferred) {
+  if( error ) {
+    m_owner.syslog(tlog::error)<<"Error while waiting for VCS message: "<<error.message();
+    close_impl();
+    return;
+  } else if( valid_sender() ){
+    m_owner.syslog()<<"Header of type '"<<m_sp_header[0]<<"'";
+    switch( m_sp_header[0] ) {
+      case 'S':
+      {
+        uint16_t *net = reinterpret_cast<uint16_t *>(m_sp_header.data()+1);
+        uint16_t sp_bytes = ntohs(*net);
+        get_state_packet(sp_bytes);
       }
-      // Repost 
-      async_rcv();
-    } else {
-      // Notify that the message has been disregarded
-      m_owner.syslog(tlog::warn)<<"Ignoring message from unexpected source: "<<m_from;
+        break;
+      case 'B':
+        get_behavior();
+        break;
+      default:
+        m_owner.syslog(tlog::error)<<"Unknown message header type ("<<m_sp_header[0]
+           <<"=0x"<<std::hex<<static_cast<short>(m_sp_header[0])<<std::dec<<")";
+        return;
     }
+  } else {
+    m_owner.syslog(tlog::warn)<<"Ignoring message from "<<m_from;
+    async_rcv();
   }
 }
 
+void DoradoReactor::msg_api::get_state_packet(size_t h_size) {
+  // reserve the value of m_xdr
+  if( m_xdr.is_ready() ) {
+    boost::promise<xdr_buff_ref>       my_promise;
+    boost::shared_future<xdr_buff_ref> status(my_promise.get_future());
+    
+    status.swap(m_xdr);
+    my_promise.swap(m_xdr_p);
+  }
+  // m_owner.syslog()<<"Read state update from VCS ("<<h_size<<"~"<<(2*sizeof(StatePacket))<<")";
 
-
-void DoradoReactor::msg_api::get_state_packet(size_t size) {
+  
   if( m_xdr_buff_size ) {
-    if( size+3 != *m_xdr_buff_size ) {
-      // error
-      return; // but should throw an exception instead
+    if( h_size+3 != *m_xdr_buff_size ) {
+      m_owner.syslog(tlog::error)<<"StatePacket size ("<<h_size<<") is not former value ("<<*m_xdr_buff_size<<")";
+      m_xdr_p.set_exception(boost::copy_exception(Exception("Invalid state packet size")));
+     return;
     }
   } else
-    m_xdr_buff_size = size+3;
-
-  asio::ip::udp::endpoint  from;
-  SHARED_PTR<xdr_buff_t> buff = MAKE_SHARED<xdr_buff_t>();
+    m_xdr_buff_size = h_size+3;
+  xdr_buff_ref tmp = MAKE_SHARED<xdr_buff_t>();
+  std::copy(m_sp_header.begin(), m_sp_header.end(), tmp->begin());
   
-  size_t len;
-  bool received = false;
-  
-  
-  while( !received ) {
-    len = m_in_socket.receive_from(asio::buffer(buff.get(), *m_xdr_buff_size), from);
-    if( !valid_sender(from) ) {
-      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
-    } else
-      received = true;
-  }
-  
-  if( len!=*m_xdr_buff_size ) {
-    m_owner.syslog(tlog::error)<<"Received "<<len<<" bytes when a state packet should be "<<*m_xdr_buff_size;
-    return; // probably better to throw
-  }
-  m_xdr_buff = buff;
+  m_in.async_receive_from(asio::buffer(tmp->data()+3, *m_xdr_buff_size), m_from,
+                          boost::bind(&msg_api::on_new_packet, shared_from_this(),
+                                      _1, _2, tmp));
 }
 
-
-bool DoradoReactor::msg_api::get_state_packet(StatePacket &p) {
-  SHARED_PTR<xdr_buff_t> tmp;
-  m_xdr_buff.swap(tmp);
-  
-  if( tmp ) {
-    m_xdr_data = *tmp;
-    xdr_setpos(&m_xdr_stream, 0);
-    return xdr_StatePacket(&m_xdr_stream, &p);
+void DoradoReactor::msg_api::on_new_packet(boost::system::error_code const &err,
+                                           std::size_t bytes_transferred,
+                                           DoradoReactor::msg_api::xdr_buff_ref buff) {
+  if( err ) {
+    Exception error("error while receiving state packet: "+err.message());
+    m_xdr_p.set_exception(boost::copy_exception(error));
+  } else if( valid_sender() ) {
+    // For now I will assume that all the data is received at once
+    // m_owner.syslog()<<"state update made available ("<<bytes_transferred<<")";
+    m_xdr_p.set_value(buff);
+    async_rcv(); // respawn the wait for an header
+  } else {
+    m_owner.syslog(tlog::warn)<<"Ignoring data from invalid sender "<<m_from;
+    // respawn this CB
+    m_in.async_receive_from(asio::buffer(*buff), m_from,
+                            boost::bind(&msg_api::on_new_packet, shared_from_this(),
+                                        _1, _2, buff));
   }
-  return false;
 }
 
 
 void DoradoReactor::msg_api::get_behavior() {
   boost::array<char, 6> msg;
-  asio::ip::udp::endpoint  from;
-  uint32_t id;
+  msg.fill('\0');
+  std::copy(m_sp_header.begin(), m_sp_header.end(), msg.begin());
+  int32_t id = 0;
   uint32_t *net_id = reinterpret_cast<uint32_t *>(msg.data()+2);
   uint32_t *local_id = reinterpret_cast<uint32_t *>(&id);
-
   
   bool received = false;
   size_t len;
-  
-  while( !received ) {
-    len = m_in_socket.receive_from(asio::buffer(msg), from);
-    if( valid_sender(from) )
-      received = true;
-    else
-      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
-  }
-  if( 0==len ) {
-    m_owner.syslog(tlog::error)<<"Connection to AUV lost";
-    return; // probably better to throw 
-  }
-  // Convert net id inot local id
-  *local_id = ntohl(*net_id);
-  
-  if( -1==id && 'A'==msg[1] ) {
-    m_owner.syslog(tlog::error)<<"Received an ABORT from AUV";
-    // Do something to disconnect
+  m_owner.syslog()<<"Collect behavior update";
+  try {
+    while( !received ) {
+      len = m_in.receive_from(asio::buffer(msg.data()+3, 3), m_from);
+      if( valid_sender() )
+        received = true;
+      else
+        m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes from "<<m_from;
+      m_owner.syslog()<<"Received "<<len<<" bytes out of 6: ["<<msg[0]<<", "<<msg[1]<<", "<<*net_id<<']';
+      
+    }
+  } catch(boost::system::error_code const &ec) {
+    m_owner.aborted("Error while rceiving behavior update: "+ec.message());
     return;
   }
-
-  if( '0'==id && !m_init ) {
-    if( 'F'==msg[1] ) {
-      m_init = true;
-      m_init_p.set_value(m_init);
+  // Convert net encoded id into local int32
+  *local_id = ntohl(*net_id);
+  
+  m_owner.syslog()<<"   - "<<msg[1]<<'('<<id<<')';
+  
+  if( 'A'==msg[1] )
+    m_owner.aborted("Received abort message from vcs");
+  else {
+    if( id>=0 ) {
+      if( 'S'==msg[1] )
+        m_owner.started(id);
+      else if( 'F'==msg[1] )
+        m_owner.completed(id);
+      else
+        m_owner.syslog(tlog::warn)<<"Unknown behavior event ("<<msg[1]<<"=0x"
+        <<std::hex<<static_cast<short>(msg[1])<<") for behavior id="<<id;
     }
-  } else {
-    switch( msg[1] ) {
-      case 'S':
-        // started event
-        behavior_started(id);
-        break;
-      case 'F':
-        behavior_finished(id);
-        break;
-      default:
-        m_owner.syslog(tlog::warn)<<"Unknown behavior event ("<<msg[1]
-        <<"=0x"<<std::hex<<static_cast<short>(msg[1])<<") for behavior id="
-        <<id;
-        return;
-    }
+    async_rcv(); // respawn the listen
   }
+}
+
+
+void DoradoReactor::msg_api::close_impl() {
+  // m_dns.cancel();
+  m_in.cancel();
+  m_out.cancel();
+}
+
+Symbol const &DoradoReactor::msg_api::alias(Symbol const &name) const {
+  std::map<Symbol, Symbol>::const_iterator pos = m_aliases.find(name);
   
-}
-
-void DoradoReactor::msg_api::behavior_started(int32_t id) {
-  transaction::goal_id g = get(id);
-
-  if( !g && id>0 )
-    m_owner.syslog(tlog::warn)<<"Received end notification from unknown behavior id="<<id;
-  
-  if( m_init )
-    m_owner.started(g);
-}
-
-void DoradoReactor::msg_api::behavior_finished(int32_t id) {
-  transaction::goal_id g = get(id);
-
-  if( !g && id>0 )
-    m_owner.syslog(tlog::warn)<<"Received start notification from unknown behavior id="<<id;
-  erase(id);
-  if( m_init )
-    m_owner.completed(g);
-}
-
-// observers
-
-Symbol DoradoReactor::msg_api::alias(Symbol const &name) const {
-  std::map<Symbol, Symbol>::const_iterator pos = m_alias.find(name);
-  if( m_alias.end()!=pos )
+  if( m_aliases.end()!=pos )
     return pos->second;
   return name;
 }
 
-bool DoradoReactor::msg_api::connected() const {
-  return m_in_socket.is_open() && m_out_socket.is_open();
-}
-
-
-bool DoradoReactor::msg_api::started() const {
-  SharedVar<bool>::scoped_lock lck(m_started);
-  return *m_started;
-}
-
-bool DoradoReactor::msg_api::valid_sender(asio::ip::udp::endpoint const &from) const {
-  return from.address()==m_server_ip;
-}
-
-bool DoradoReactor::msg_api::inited() {
-  return m_init_p.get_future().get();
-}
 
 
 
+using namespace TREX::transaction;
 namespace fs=boost::filesystem;
 
-using TREX::transaction::FloatDomain;
-using TREX::transaction::BooleanDomain;
-using TREX::transaction::IntegerDomain;
-
-#include <boost/math/special_functions/pow.hpp>
-#include <boost/math/special_functions/round.hpp>
-
-namespace {
-  
-  template<typename Ty, int places>
-  Ty round_p(Ty v) {
-    static Ty const factor = boost::math::pow<places>(Ty(10));
-    return boost::math::round(factor*v)/factor;
-  }
-
-}
-
 /*
- * class DoradoReactor
+ * class TREX::mbari::DoradoReactor
  */
 
 // statics
@@ -553,24 +619,24 @@ Symbol const DoradoReactor::s_sp_timeline("vehicleState");
 
 // structors
 
-DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
-:TREX::transaction::TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
-                                 0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")) {
+DoradoReactor::DoradoReactor(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
+              0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
+  
+  // create the socket api
   m_api = MAKE_SHARED<msg_api>(boost::ref(manager().service()), boost::ref(*this));
   
   // Populate with external config
   ext_xml(node.second, "config");
   
-  std::ostringstream oss;
-  write_json(oss, node.second);
-  syslog()<<node.first<<": "<<oss.str();
+  // Declare basic timelines
+  provide(s_depth_envelope, false);
+  provide(s_sp_timeline, false);
   
-  // Declare all of my timelines
-  provide(s_sp_timeline, false);  // state updates are read only
-  provide(s_depth_envelope, false); // so is the depth enveloppe
-  
+  // Extract and declare behavior timelines
   syslog()<<"Extracting behavior timelines";
+  
   for(boost::property_tree::ptree::iterator i = node.second.begin();
       node.second.end()!=i; ++i) {
     if( is_tag(*i, "Timeline") ) {
@@ -594,53 +660,77 @@ DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
   }
   // TODO: create also gulper timelines
   
+  // Now I extract and analize the plan
   bool found;
-  
-  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "initial_plan"),
-                                               found);
+  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "initial_plan"), found);
   if( !found )
-    throw XmlError(node, "Unable to locate auv inital plan file \""+init.string()+"\"");
-  // get socket info
+    throw XmlError(node, "Unable to locate AUV initial plan file \""+m_init_cfg.string()+"\"");
   std::string host = parse_attr<std::string>(node, "vcs_host");
-  unsigned short out_port = parse_attr<unsigned short>(8004, node, "vcs_port"),
-    in_port = parse_attr<unsigned short>(8002, node, "port");
+  unsigned short out_port = parse_attr<unsigned short>(msg_api::out_default, node, "vcs_port"),
+  in_port = parse_attr<unsigned short>(msg_api::in_default, node, "port");
   
-  syslog()<<"Connecting to vcs server at "<<host<<':'<<out_port;
-  m_api->connect(host, out_port, in_port);
-  initial_plan(init); // extract and send the initial plan to vcs
+  msg_api::duration_type timeout = boost::posix_time::seconds(10);
+  
+  syslog()<<"Connecting to vcs server at "<<host<<':'<<out_port<<" with a time-out of "<<timeout;
+  manager().flush();
+  m_started = m_start.get_future();
+  m_api->connect(host, out_port, in_port, timeout,
+                 boost::bind(&DoradoReactor::initial_plan, this, init));
 }
 
 DoradoReactor::~DoradoReactor() {
-  m_api->disconnect();
+  m_api->close();
 }
 
-// manipulators
+// TREX callbacks
 
-void DoradoReactor::initial_plan(fs::path const &file) {
-  // Load the content of the file
-  TREX::transaction::Observation envelope(s_depth_envelope, "Active");
+void DoradoReactor::handleInit() {
+  syslog()<<"Waiting for connection to VCS";
+  if( !m_api->connected() ) // block until connected
+    throw ReactorException(*this, "Connection to VCS failed");
+  syslog()<<"Waiting for initial plan to complete";
+  if( !m_started.get() )
+    syslog(tlog::error)<<"started flag has been set to false";
   
-  syslog(tlog::info)<<"Extracting initial plan from "<<file;
+}
 
+void DoradoReactor::handleTickStart() {
+}
+
+bool DoradoReactor::synchronize() {
+  return m_api->connected();
+}
+
+void DoradoReactor::handleRequest(transaction::goal_id const &g) {
+  
+}
+
+void DoradoReactor::handleRecall(transaction::goal_id const &g) {
+  
+}
+
+// socket api callbacks
+// NOTE: this calls are run on a different thread then TREX - beware
+
+void DoradoReactor::initial_plan(fs::path file) {
+  Observation envelope(s_depth_envelope, "Active");
   std::string plan, de_args;
+  
+  syslog()<<"Extracting initial plan from "<<file;
+  
   {
     std::ifstream f(file.c_str());
     std::ostringstream oss;
     oss<<"init|"<<f.rdbuf();
     plan = oss.str();
-    
-    //
-    // Now start a very loose parsing of depthEnvelope
-    //
-    
-    // locate depthEnvelope
+
     size_t b_start = plan.find(s_depth_envelope.str()), b_arg_start, b_arg_end;
     // Locate the brackets delimiting depthEnvelope arguments
     b_arg_start = plan.find('{', b_start);
     b_arg_end = plan.find('}', b_arg_start);
     de_args = plan.substr(b_arg_start+1, b_arg_end-b_arg_start-1);
   }
-  syslog(tlog::info)<<"Parsing arguments of "<<s_depth_envelope;
+  syslog()<<"Parsing attributes of "<<s_depth_envelope;
   bool end_of_parse = false;
   
   while( !end_of_parse ) {
@@ -660,7 +750,8 @@ void DoradoReactor::initial_plan(fs::path const &file) {
     
     // trim white spaces on var_name
     size_t v_start = var_name.find_first_not_of(" \n\t"), v_end;
-    v_end = var_name.find_first_of(" \n\t", v_start);
+      v_end = var_name.find_first_of(" \n\t", v_start);
+    
     if( std::string::npos==v_end )
       var_name = var_name.substr(v_start);
     else
@@ -672,143 +763,657 @@ void DoradoReactor::initial_plan(fs::path const &file) {
       value = value.substr(v_start);
     else
       value = value.substr(v_start, v_end-v_start);
+    syslog()<<"\t- DepthEnvelope."<<var_name<<"="<<value;
+  
     // Now that I have cleand up these lets try to add these as an argument
     envelope.restrictAttribute(var_name, FloatDomain(string_cast<double>(value)));
     
-    if( !end_of_parse ) // Remove parsed element fro mthe string
+    if( !end_of_parse ) // Remove parsed element from the string
       de_args = de_args.substr(sc_pos+1);
   }
-  // done parsing
-  postObservation(envelope); // Now post the resulting depth envelope
-  m_api->send(plan, true);
-}
-
-// callbacks
-
-void DoradoReactor::handleInit() {
-  // At this point the inital plan was already sent (during construction)
-  // I just need to wait for inital feedback
-  syslog(tlog::info)<<"Waiting for VCS to complete its initial plan";
-  m_api->start();
-  if( !m_api->inited() )
-    throw TREX::transaction::ReactorException(*this, "Failed to complete VCS handshake");
-  m_api->send("start");
-  syslog(tlog::info)<<"VCS ready : sent \"start\" to confirm hand-shake";
-  m_api->ping(false); // Just to reset the ping without sending the ping
-  m_seq_count = 0;
-  m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
-  postObservation(*m_last_state);
-  m_last_packet = getInitialTick();
-}
-
-void DoradoReactor::handleTickStart() {
-  // send a ping whenever we did not send any message and are not rtunning a bahvior
-  m_api->ping(m_seq_count==0);
-}
- 
-bool DoradoReactor::synchronize() {
-  //
-  // Produce sensors update
-  //
-  StatePacket sp;
-  transaction::TICK now = getCurrentTick();
+  syslog()<<"Posting depthEnvelope observation: "<<envelope;
+  postObservation(envelope);
   
-  if( m_api->get_state_packet(sp) ) {
-    m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, "Holds");
-    
-    // get lat,lon, northing, easting, depth
-    m_last_state->restrictAttribute("latitude", FloatDomain(sp.position.latitude));
-    m_last_state->restrictAttribute("longitude", FloatDomain(sp.position.longitude));
-    // round all metric values to cm accuracy
-    m_last_state->restrictAttribute("x", FloatDomain(round_p<long double, 2>(sp.position.x)));
-    m_last_state->restrictAttribute("y", FloatDomain(round_p<long double, 2>(sp.position.y)));
-    m_last_state->restrictAttribute("z", FloatDomain(round_p<long double, 2>(sp.position.z)));
-    
-    // there used to be cluster data in here bu I don't really use it anymore
-    
-    // CTD data
-    m_last_state->restrictAttribute("ctdValid", BooleanDomain(sp.ctd.valid));
-    if( sp.ctd.valid ) {
-      m_last_state->restrictAttribute("conductivity", FloatDomain(sp.ctd.c));
-      m_last_state->restrictAttribute("temperature", FloatDomain(sp.ctd.t));
-      m_last_state->restrictAttribute("density", FloatDomain(sp.ctd.d));
-      m_last_state->restrictAttribute("salinity", FloatDomain(sp.ctd.salinity));
-    }
-    
-    // Isus data
-    m_last_state->restrictAttribute("isusValid", BooleanDomain(sp.isus.valid));
-    if( sp.isus.valid ) {
-      m_last_state->restrictAttribute("nitrate", FloatDomain(sp.isus.nitrate));
-    }
-    
-    // Backscatter data
-    m_last_state->restrictAttribute("hydroscatValid", BooleanDomain(sp.hydroscat.valid));
-    if( sp.hydroscat.valid ) {
-      // NOTE: all the hs2 data are changed by a factor to better handle small values
-      m_last_state->restrictAttribute("ch_fl", FloatDomain(sp.hydroscat.fl/CH_fact));
-      m_last_state->restrictAttribute("bb470", FloatDomain(sp.hydroscat.bb470/BB_fact));
-      m_last_state->restrictAttribute("bb676", FloatDomain(sp.hydroscat.bb676/BB_fact));
-    }
-    postObservation(*m_last_state, false); // silently post the new state obs
-    m_last_packet = now;
-    
-    // TODO: sp also contains gulper info -> process it
-    
-  } else {
-    if( m_last_state->predicate()!=transaction::Predicate::undefined_pred ) {
-      syslog(tlog::warn)<<"No sensor update received starting from now.";
-      m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
-      postObservation(*m_last_state, true); // undefined obs is not silent so we see it in the logs
-    } else if( m_last_packet+3 < now ) {
-      syslog(tlog::error)<<"Did not receive sensor updates for more than 3 ticks";
-      return false;
-    }
-  }
-  
-  // TODO process behaviors
-  
-  return true;
+  syslog()<<"Sending the plan to VCS: "<<plan;
+  m_api->send(plan);
 }
 
+void DoradoReactor::started(size_t id) {
 
-void DoradoReactor::handleRequest(transaction::goal_id const &g) {
-  
 }
 
-void DoradoReactor::handleRecall(transaction::goal_id const &g) {
-  
-}
-
-
-void DoradoReactor::started(TREX::transaction::goal_id g) {
-  if( g ) {
-    if( is_sequential(g->object()) ) {
-      m_seq_count += 1;
-    } else {
-      
-    }
+void DoradoReactor::completed(size_t id) {
+  if( id==0 ) {
+    if( !m_started.is_ready() )
+      m_start.set_value(true);
   }
 }
 
-void DoradoReactor::completed(TREX::transaction::goal_id g) {
-  if( g ) {
-    if( is_sequential(g->object()) ) {
-      // Add lock.Free as an observation that can be overwritten
-      // Add this observation the same way
-      // process possible pending sequential request
-      if( m_seq_count>0 )
-        m_seq_count -= 1;
-      else
-        syslog(tlog::warn)<<"Completion of "<<g->object()<<" resulted on a count of posted sequentials below 0.";
-      
-    } else {
-      
-    }
-  }
+void DoradoReactor::aborted(std::string const &msg) {
+  // Set an error
+  if( !m_started.is_ready() )
+    m_start.set_exception(boost::copy_exception(ReactorException(*this, msg)));
 }
 
 
 
+
+//// statics
+//
+//unsigned short const DoradoReactor::msg_api::out_default(8004);
+//unsigned short const DoradoReactor::msg_api::in_default(8002);
+//size_t const DoradoReactor::msg_api::s_xdr_size(sizeof(uint16_t)+2*sizeof(StatePacket));
+//
+//// structors
+//
+//DoradoReactor::msg_api::msg_api(asio::io_service &io, DoradoReactor &owner)
+//:m_owner(owner), m_in_socket(io), m_out_socket(io) {
+//  // Set up the xdr stream
+//  xdrmem_create(&m_xdr_stream, m_xdr_data.data()+sizeof(uint16_t),
+//                2*sizeof(StatePacket), XDR_DECODE);
+//}
+//
+//DoradoReactor::msg_api::~msg_api() {
+//  disconnect();
+//}
+//
+//// modifiers 
+//
+//void DoradoReactor::msg_api::connect(std::string const &host,
+//                                     unsigned short out_port,
+//                                     unsigned short in_port) {
+//  if( connected() )
+//    disconnect();
+//  m_owner.syslog(tlog::info)<<"Connecting to AUV at "<<host
+//  <<"\n\t- outbound TCP port "<<out_port
+//  <<"\n\t- inbound UDP port "<<in_port;
+//  
+//  // First try to resolve the name
+//  asio::ip::tcp::resolver dns(m_out_socket.get_io_service());
+//  asio::ip::tcp::resolver::query q(host, "");
+//  asio::ip::tcp::resolver::iterator iter = dns.resolve(q);
+//  
+//  // store sresolved server address
+//  m_server_ip = iter->endpoint().address();
+//  
+//  asio::ip::tcp::endpoint tcp_server;
+//  
+//  tcp_server.address(m_server_ip);
+//  tcp_server.port(out_port);
+//  
+//  // Attempt to connect to vcs for outgoing tcp messages
+//  m_out_socket.connect(tcp_server);
+//  
+//  // Create udp connection for incoming udp messages
+//  m_in_socket.open(asio::ip::udp::v4());
+//  m_in_socket.bind(asio::ip::udp::endpoint(asio::ip::udp::v4(), in_port));
+//}
+//
+//void DoradoReactor::msg_api::disconnect() {
+//  m_owner.syslog(tlog::info)<<"Disconnecting from AUV";
+//  stop();
+//  m_in_socket.close();
+//  m_out_socket.close();
+//}
+//
+//void DoradoReactor::msg_api::send(std::string const &msg, bool verbose) {
+//  std::vector<asio::const_buffer> buffs;
+//  uint32_t len = msg.length(), net_len = htonl(len);
+//  
+//  // A string packet is encoded as follow :
+//  //  - int 32 with the length of the string (with endianess encoding)
+//  //  - the corresponding number of characters
+//  buffs.push_back(asio::buffer(&net_len, sizeof(uint32_t)));
+//  buffs.push_back(asio::buffer(msg));
+//  
+//  if( verbose )
+//    m_owner.syslog()<<"Sending: "<<msg;
+//  // Directly write the message
+//  asio::write(m_out_socket, buffs);
+//  m_pinged = true;
+//}
+//
+//void DoradoReactor::msg_api::ping(bool test) {
+//  if( test && !m_pinged )
+//    send("PING");
+//  m_pinged = false;
+//}
+//
+//
+//void DoradoReactor::msg_api::start() {
+//  if( connected() ) {
+//    bool running = true;
+//    m_started.swap(running);
+//    if( !running )
+//      async_rcv();
+//  }
+//}
+//
+//void DoradoReactor::msg_api::async_rcv() {
+//  // Post my asynchronous listen to m_out_socket only if still active
+//  if( started() )
+//    m_in_socket.async_receive_from(asio::buffer(m_sp_header), m_from,
+//                                   boost::bind(&msg_api::sp_header_rvcd,
+//                                               shared_from_this(),
+//                                               _1, _2));
+//}
+//
+//
+//void DoradoReactor::msg_api::post_behavior(TREX::transaction::goal_id req) {
+//  int32_t id = get(req);
+//  std::ostringstream oss;
+//
+//  
+//  transaction::IntegerDomain::bound duration = req->getDuration().upperBound();
+//  boost::optional<size_t> vcs_dur;
+//  
+//  if( duration.isInfinity() ) {
+//    m_owner.syslog(tlog::warn)<<"No maximum duration set for goal "<<req<<" on "<<req->object();
+//  } else {
+//    vcs_dur = duration.value();
+//    if( 2 < *vcs_dur )
+//      *vcs_dur -= 2;
+//      
+//  }
+//  
+//  oss.setf(std::ios::fixed);
+//  oss<<"insert|behavior "<<alias(req->object())<<" { "
+//  <<" id="<<id<<"; ";
+//  if( vcs_dur )
+//    oss<<" duration="<<*vcs_dur<<"; ";
+//  
+//  for(transaction::Predicate::const_iterator a=req->begin(); req->end()!=a; ++a) {
+//    transaction::DomainBase const &dom = a->second.domain();
+//    
+//    if( dom.isSingleton() ) {
+//      // TODO: handle the special case for boolean domains : vcs expect True or False
+//      oss<<a->first<<"="<<dom.getStringSingleton()<<"; ";
+//    } else {
+//      m_owner.syslog(tlog::warn)<<"Ignoring attribute "<<a->first<<" of request "<<req<<" as its domain is not singleton ("<<dom<<")";
+//    }
+//  }
+//  oss<<"}";
+//  
+//  send(oss.str(), true);
+//}
+//
+//
+//bool DoradoReactor::msg_api::stop() {
+//  bool ret = false;
+//  m_started.swap(ret);
+//  return ret;
+//}
+//
+//void DoradoReactor::msg_api::sp_header_rvcd(boost::system::error_code const & error, // Result of operation.
+//                                            std::size_t bytes_transferred) {
+//  if( started() ) {
+//    if( error ) {
+//      // Handle the error message
+//      m_owner.syslog(tlog::error)<<"Error while waiting for new message: "<<error.message();
+//      disconnect();
+//    } else if( valid_sender(m_from) ) {
+//      // Check the type of the message
+//      
+//      switch (m_sp_header[0]) {
+//        case 'S':
+//          get_state_packet(*reinterpret_cast<uint16_t *>(m_sp_header.data()+1));
+//          break;
+//        case 'B':
+//          get_behavior();
+//          break;
+//        default:
+//          // handle unknown error
+//          m_owner.syslog(tlog::error)<<"Unknown message header type ("<<m_sp_header[0]
+//          <<"=0x"<<std::hex<<static_cast<short>(m_sp_header[0])<<std::dec<<")";
+//          break;
+//      }
+//      // Repost 
+//      async_rcv();
+//    } else {
+//      // Notify that the message has been disregarded
+//      m_owner.syslog(tlog::warn)<<"Ignoring message from unexpected source: "<<m_from;
+//    }
+//  }
+//}
+//
+//
+//
+//void DoradoReactor::msg_api::get_state_packet(size_t size) {
+//  if( m_xdr_buff_size ) {
+//    if( size+3 != *m_xdr_buff_size ) {
+//      // error
+//      return; // but should throw an exception instead
+//    }
+//  } else
+//    m_xdr_buff_size = size+3;
+//
+//  asio::ip::udp::endpoint  from;
+//  SHARED_PTR<xdr_buff_t> buff = MAKE_SHARED<xdr_buff_t>();
+//  
+//  size_t len;
+//  bool received = false;
+//  
+//  
+//  while( !received ) {
+//    len = m_in_socket.receive_from(asio::buffer(buff.get(), *m_xdr_buff_size), from);
+//    if( !valid_sender(from) ) {
+//      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
+//    } else
+//      received = true;
+//  }
+//  
+//  if( len!=*m_xdr_buff_size ) {
+//    m_owner.syslog(tlog::error)<<"Received "<<len<<" bytes when a state packet should be "<<*m_xdr_buff_size;
+//    return; // probably better to throw
+//  }
+//  m_xdr_buff = buff;
+//}
+//
+//
+//bool DoradoReactor::msg_api::get_state_packet(StatePacket &p) {
+//  SHARED_PTR<xdr_buff_t> tmp;
+//  m_xdr_buff.swap(tmp);
+//  
+//  if( tmp ) {
+//    m_xdr_data = *tmp;
+//    xdr_setpos(&m_xdr_stream, 0);
+//    return xdr_StatePacket(&m_xdr_stream, &p);
+//  }
+//  return false;
+//}
+//
+//
+//void DoradoReactor::msg_api::get_behavior() {
+//  boost::array<char, 6> msg;
+//  asio::ip::udp::endpoint  from;
+//  uint32_t id;
+//  uint32_t *net_id = reinterpret_cast<uint32_t *>(msg.data()+2);
+//  uint32_t *local_id = reinterpret_cast<uint32_t *>(&id);
+//
+//  
+//  bool received = false;
+//  size_t len;
+//  
+//  while( !received ) {
+//    len = m_in_socket.receive_from(asio::buffer(msg), from);
+//    if( valid_sender(from) )
+//      received = true;
+//    else
+//      m_owner.syslog(tlog::warn)<<"Ignoring "<<len<<" bytes received from unexpeted source: "<<from;
+//  }
+//  if( 0==len ) {
+//    m_owner.syslog(tlog::error)<<"Connection to AUV lost";
+//    return; // probably better to throw 
+//  }
+//  // Convert net id inot local id
+//  *local_id = ntohl(*net_id);
+//  
+//  if( -1==id && 'A'==msg[1] ) {
+//    m_owner.syslog(tlog::error)<<"Received an ABORT from AUV";
+//    // Do something to disconnect
+//    return;
+//  }
+//
+//  if( '0'==id && !m_init ) {
+//    if( 'F'==msg[1] ) {
+//      m_init = true;
+//      m_init_p.set_value(m_init);
+//    }
+//  } else {
+//    switch( msg[1] ) {
+//      case 'S':
+//        // started event
+//        behavior_started(id);
+//        break;
+//      case 'F':
+//        behavior_finished(id);
+//        break;
+//      default:
+//        m_owner.syslog(tlog::warn)<<"Unknown behavior event ("<<msg[1]
+//        <<"=0x"<<std::hex<<static_cast<short>(msg[1])<<") for behavior id="
+//        <<id;
+//        return;
+//    }
+//  }
+//  
+//}
+//
+//void DoradoReactor::msg_api::behavior_started(int32_t id) {
+//  transaction::goal_id g = get(id);
+//
+//  if( !g && id>0 )
+//    m_owner.syslog(tlog::warn)<<"Received end notification from unknown behavior id="<<id;
+//  
+//  if( m_init )
+//    m_owner.started(g);
+//}
+//
+//void DoradoReactor::msg_api::behavior_finished(int32_t id) {
+//  transaction::goal_id g = get(id);
+//
+//  if( !g && id>0 )
+//    m_owner.syslog(tlog::warn)<<"Received start notification from unknown behavior id="<<id;
+//  erase(id);
+//  if( m_init )
+//    m_owner.completed(g);
+//}
+//
+//// observers
+//
+//Symbol DoradoReactor::msg_api::alias(Symbol const &name) const {
+//  std::map<Symbol, Symbol>::const_iterator pos = m_alias.find(name);
+//  if( m_alias.end()!=pos )
+//    return pos->second;
+//  return name;
+//}
+//
+//bool DoradoReactor::msg_api::connected() const {
+//  return m_in_socket.is_open() && m_out_socket.is_open();
+//}
+//
+//
+//bool DoradoReactor::msg_api::started() const {
+//  SharedVar<bool>::scoped_lock lck(m_started);
+//  return *m_started;
+//}
+//
+//bool DoradoReactor::msg_api::valid_sender(asio::ip::udp::endpoint const &from) const {
+//  return from.address()==m_server_ip;
+//}
+//
+//bool DoradoReactor::msg_api::inited() {
+//  return m_init_p.get_future().get();
+//}
+//
+//
+//
+//namespace fs=boost::filesystem;
+//
+//using TREX::transaction::FloatDomain;
+//using TREX::transaction::BooleanDomain;
+//using TREX::transaction::IntegerDomain;
+//
+//#include <boost/math/special_functions/pow.hpp>
+//#include <boost/math/special_functions/round.hpp>
+//
+//namespace {
+//  
+//  template<typename Ty, int places>
+//  Ty round_p(Ty v) {
+//    static Ty const factor = boost::math::pow<places>(Ty(10));
+//    return boost::math::round(factor*v)/factor;
+//  }
+//
+//}
+//
+///*
+// * class DoradoReactor
+// */
+//
+//// statics
+//
+//Symbol const DoradoReactor::s_inactive("Inactive");
+//Symbol const DoradoReactor::s_depth_envelope("depthEnvelope");
+//Symbol const DoradoReactor::s_sp_timeline("vehicleState");
+//
+//// structors
+//
+//DoradoReactor::DoradoReactor(TREX::transaction::TeleoReactor::xml_arg_type arg)
+//:TREX::transaction::TeleoReactor(arg.second, parse_attr<utils::Symbol>(xml_factory::node(arg), "name"),
+//                                 0, 1, parse_attr<bool>(true, xml_factory::node(arg), "log")) {
+//  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
+//  m_api = MAKE_SHARED<msg_api>(boost::ref(manager().service()), boost::ref(*this));
+//  
+//  // Populate with external config
+//  ext_xml(node.second, "config");
+//  
+//  std::ostringstream oss;
+//  write_json(oss, node.second);
+//  syslog()<<node.first<<": "<<oss.str();
+//  
+//  // Declare all of my timelines
+//  provide(s_sp_timeline, false);  // state updates are read only
+//  provide(s_depth_envelope, false); // so is the depth enveloppe
+//  
+//  syslog()<<"Extracting behavior timelines";
+//  for(boost::property_tree::ptree::iterator i = node.second.begin();
+//      node.second.end()!=i; ++i) {
+//    if( is_tag(*i, "Timeline") ) {
+//      Symbol name = parse_attr<Symbol>(*i, "name");
+//      if( name.empty() )
+//        throw XmlError(*i, "Behavior cannot have an empty name");
+//      provide(name);
+//      boost::optional<Symbol> alias = parse_attr< boost::optional<Symbol> >(*i, "alias");
+//      bool sequential = parse_attr<bool>(true, *i, "sequential"); // behaviors are sequential by default
+//      
+//      if( alias ) {
+//        if( alias->empty() )
+//          throw XmlError(*i, "Behavior alias cannot be empty");
+//        m_api->add_alias(name, *alias);
+//      }
+//      if( sequential )
+//        m_sequential.insert(name);
+//      
+//      postObservation(TREX::transaction::Observation(name, s_inactive));
+//    }
+//  }
+//  // TODO: create also gulper timelines
+//  
+//  bool found;
+//  
+//  fs::path init = manager().use(parse_attr<std::string>("auv_init.cfg", node, "initial_plan"),
+//                                               found);
+//  if( !found )
+//    throw XmlError(node, "Unable to locate auv inital plan file \""+init.string()+"\"");
+//  // get socket info
+//  std::string host = parse_attr<std::string>(node, "vcs_host");
+//  unsigned short out_port = parse_attr<unsigned short>(8004, node, "vcs_port"),
+//    in_port = parse_attr<unsigned short>(8002, node, "port");
+//  
+//  syslog()<<"Connecting to vcs server at "<<host<<':'<<out_port;
+//  m_api->connect(host, out_port, in_port);
+//  initial_plan(init); // extract and send the initial plan to vcs
+//}
+//
+//DoradoReactor::~DoradoReactor() {
+//  m_api->disconnect();
+//}
+//
+//// manipulators
+//
+//void DoradoReactor::initial_plan(fs::path const &file) {
+//  // Load the content of the file
+//  TREX::transaction::Observation envelope(s_depth_envelope, "Active");
+//  
+//  syslog(tlog::info)<<"Extracting initial plan from "<<file;
+//
+//  std::string plan, de_args;
+//  {
+//    std::ifstream f(file.c_str());
+//    std::ostringstream oss;
+//    oss<<"init|"<<f.rdbuf();
+//    plan = oss.str();
+//    
+//    //
+//    // Now start a very loose parsing of depthEnvelope
+//    //
+//    
+//    // locate depthEnvelope
+//    size_t b_start = plan.find(s_depth_envelope.str()), b_arg_start, b_arg_end;
+//    // Locate the brackets delimiting depthEnvelope arguments
+//    b_arg_start = plan.find('{', b_start);
+//    b_arg_end = plan.find('}', b_arg_start);
+//    de_args = plan.substr(b_arg_start+1, b_arg_end-b_arg_start-1);
+//  }
+//  syslog(tlog::info)<<"Parsing arguments of "<<s_depth_envelope;
+//  bool end_of_parse = false;
+//  
+//  while( !end_of_parse ) {
+//    size_t eq_pos, sc_pos;
+//    
+//    eq_pos = de_args.find('=');
+//    if( std::string::npos==eq_pos )
+//      break; // No more '=' ; no more variables to parse
+//    sc_pos = de_args.find(';', eq_pos);
+//    if( std::string::npos==sc_pos ) {
+//      sc_pos = de_args.length(); // No ';' means that it is the last argument
+//      end_of_parse = true;
+//    }
+//    
+//    std::string var_name(de_args, 0, eq_pos), // name of the variable is before the '='
+//      value(de_args, eq_pos+1, sc_pos-eq_pos-1); // value is between '=' and ';'
+//    
+//    // trim white spaces on var_name
+//    size_t v_start = var_name.find_first_not_of(" \n\t"), v_end;
+//    v_end = var_name.find_first_of(" \n\t", v_start);
+//    if( std::string::npos==v_end )
+//      var_name = var_name.substr(v_start);
+//    else
+//      var_name = var_name.substr(v_start, v_end-v_start);
+//    // same for value except that here we target for a float
+//    v_start = value.find_first_of("0123456789.e-");
+//    v_end = value.find_first_not_of("0123456789.e-", v_start);
+//    if( std::string::npos==v_end )
+//      value = value.substr(v_start);
+//    else
+//      value = value.substr(v_start, v_end-v_start);
+//    // Now that I have cleand up these lets try to add these as an argument
+//    envelope.restrictAttribute(var_name, FloatDomain(string_cast<double>(value)));
+//    
+//    if( !end_of_parse ) // Remove parsed element fro mthe string
+//      de_args = de_args.substr(sc_pos+1);
+//  }
+//  // done parsing
+//  postObservation(envelope); // Now post the resulting depth envelope
+//  m_api->send(plan, true);
+//}
+//
+//// callbacks
+//
+//void DoradoReactor::handleInit() {
+//  // At this point the inital plan was already sent (during construction)
+//  // I just need to wait for inital feedback
+//  syslog(tlog::info)<<"Waiting for VCS to complete its initial plan";
+//  m_api->start();
+//  if( !m_api->inited() )
+//    throw TREX::transaction::ReactorException(*this, "Failed to complete VCS handshake");
+//  m_api->send("start");
+//  syslog(tlog::info)<<"VCS ready : sent \"start\" to confirm hand-shake";
+//  m_api->ping(false); // Just to reset the ping without sending the ping
+//  m_seq_count = 0;
+//  m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
+//  postObservation(*m_last_state);
+//  m_last_packet = getInitialTick();
+//}
+//
+//void DoradoReactor::handleTickStart() {
+//  // send a ping whenever we did not send any message and are not rtunning a bahvior
+//  m_api->ping(m_seq_count==0);
+//}
+// 
+//bool DoradoReactor::synchronize() {
+//  //
+//  // Produce sensors update
+//  //
+//  StatePacket sp;
+//  transaction::TICK now = getCurrentTick();
+//  
+//  if( m_api->get_state_packet(sp) ) {
+//    m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, "Holds");
+//    
+//    // get lat,lon, northing, easting, depth
+//    m_last_state->restrictAttribute("latitude", FloatDomain(sp.position.latitude));
+//    m_last_state->restrictAttribute("longitude", FloatDomain(sp.position.longitude));
+//    // round all metric values to cm accuracy
+//    m_last_state->restrictAttribute("x", FloatDomain(round_p<long double, 2>(sp.position.x)));
+//    m_last_state->restrictAttribute("y", FloatDomain(round_p<long double, 2>(sp.position.y)));
+//    m_last_state->restrictAttribute("z", FloatDomain(round_p<long double, 2>(sp.position.z)));
+//    
+//    // there used to be cluster data in here bu I don't really use it anymore
+//    
+//    // CTD data
+//    m_last_state->restrictAttribute("ctdValid", BooleanDomain(sp.ctd.valid));
+//    if( sp.ctd.valid ) {
+//      m_last_state->restrictAttribute("conductivity", FloatDomain(sp.ctd.c));
+//      m_last_state->restrictAttribute("temperature", FloatDomain(sp.ctd.t));
+//      m_last_state->restrictAttribute("density", FloatDomain(sp.ctd.d));
+//      m_last_state->restrictAttribute("salinity", FloatDomain(sp.ctd.salinity));
+//    }
+//    
+//    // Isus data
+//    m_last_state->restrictAttribute("isusValid", BooleanDomain(sp.isus.valid));
+//    if( sp.isus.valid ) {
+//      m_last_state->restrictAttribute("nitrate", FloatDomain(sp.isus.nitrate));
+//    }
+//    
+//    // Backscatter data
+//    m_last_state->restrictAttribute("hydroscatValid", BooleanDomain(sp.hydroscat.valid));
+//    if( sp.hydroscat.valid ) {
+//      // NOTE: all the hs2 data are changed by a factor to better handle small values
+//      m_last_state->restrictAttribute("ch_fl", FloatDomain(sp.hydroscat.fl/CH_fact));
+//      m_last_state->restrictAttribute("bb470", FloatDomain(sp.hydroscat.bb470/BB_fact));
+//      m_last_state->restrictAttribute("bb676", FloatDomain(sp.hydroscat.bb676/BB_fact));
+//    }
+//    postObservation(*m_last_state, false); // silently post the new state obs
+//    m_last_packet = now;
+//    
+//    // TODO: sp also contains gulper info -> process it
+//    
+//  } else {
+//    if( m_last_state->predicate()!=transaction::Predicate::undefined_pred ) {
+//      syslog(tlog::warn)<<"No sensor update received starting from now.";
+//      m_last_state = MAKE_SHARED<transaction::Observation>(s_sp_timeline, transaction::Predicate::undefined_pred);
+//      postObservation(*m_last_state, true); // undefined obs is not silent so we see it in the logs
+//    } else if( m_last_packet+3 < now ) {
+//      syslog(tlog::error)<<"Did not receive sensor updates for more than 3 ticks";
+//      return false;
+//    }
+//  }
+//  
+//  // TODO process behaviors
+//  
+//  return true;
+//}
+//
+//
+//void DoradoReactor::handleRequest(transaction::goal_id const &g) {
+//  
+//}
+//
+//void DoradoReactor::handleRecall(transaction::goal_id const &g) {
+//  
+//}
+//
+//
+//void DoradoReactor::started(TREX::transaction::goal_id g) {
+//  if( g ) {
+//    if( is_sequential(g->object()) ) {
+//      m_seq_count += 1;
+//    } else {
+//      
+//    }
+//  }
+//}
+//
+//void DoradoReactor::completed(TREX::transaction::goal_id g) {
+//  if( g ) {
+//    if( is_sequential(g->object()) ) {
+//      // Add lock.Free as an observation that can be overwritten
+//      // Add this observation the same way
+//      // process possible pending sequential request
+//      if( m_seq_count>0 )
+//        m_seq_count -= 1;
+//      else
+//        syslog(tlog::warn)<<"Completion of "<<g->object()<<" resulted on a count of posted sequentials below 0.";
+//      
+//    } else {
+//      
+//    }
+//  }
+//}
+
+
+                   /////////
 
 
 //#include <trex/domain/FloatDomain.hh>

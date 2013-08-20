@@ -102,9 +102,12 @@ namespace TREX {
       void handleRequest(transaction::goal_id const &g);
       void handleRecall(transaction::goal_id const &g);
             
-      void initial_plan(boost::filesystem::path const &file);
-      void started(transaction::goal_id g);
-      void completed(transaction::goal_id g);
+      void initial_plan(boost::filesystem::path file);
+      
+      
+      void started(size_t id);
+      void completed(size_t id);
+      void aborted(std::string const &msg);
       
       
       std::set<utils::Symbol> m_sequential;
@@ -117,6 +120,13 @@ namespace TREX {
 
       
       SHARED_PTR<msg_api> m_api;
+      
+      boost::filesystem::path m_init_cfg;
+      
+      SHARED_PTR<transaction::Observation> m_envelope;
+      boost::promise<bool> m_start;
+      boost::unique_future<bool> m_started;
+      
       size_t m_seq_count;
       SHARED_PTR<transaction::Observation> m_last_state;
       transaction::TICK m_last_packet;
