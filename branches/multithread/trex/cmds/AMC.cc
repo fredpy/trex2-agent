@@ -94,6 +94,8 @@
 
 using namespace TREX::agent;
 using namespace TREX::utils;
+namespace tlog=TREX::utils::log;
+
 
 namespace po=boost::program_options;
 namespace pco=po::command_line_style;
@@ -123,6 +125,7 @@ extern "C" {
     amc_log->syslog("amc", info)<<"At "<<boost::posix_time::to_simple_string(now)
     <<" UTC:\n\t - Received signal "<<sig;
     amc_log->syslog("amc", info)<<"============================================";
+    amc_log->flush();
     my_agent.reset();
     exit(1);
   }
@@ -131,15 +134,25 @@ extern "C" {
     SingletonUse<LogManager> amc_log;
     
     amc_log->syslog("amc", error)<<" Received a terminate";
+    amc_log->flush();
     abort();
   }
   
 }
 
 
+namespace {
+  std::pair<std::string, std::string> reg_threads(std::string const &s) {
+    if( s.find("-j")==0 )
+      return std::make_pair(s.substr(1, 1), s.substr(2));
+    else
+      return std::make_pair(std::string(), std::string());
+  }
+}
+
 int main(int argc, char *argv[]) {
   po::options_description hidden("Hidden options"), cmd_line;
-  size_t nice_val;
+  size_t nice_val, threads;
 
   // Specifies the handler for extracting the mission name
   hidden.add_options()("mission",
@@ -160,6 +173,8 @@ int main(int argc, char *argv[]) {
    "run agent with a real time clock with the given period in ms")
   ("nice", po::value<size_t>(&nice_val)->implicit_value(10),
    "run this command with the given nice level")
+  ("j", po::value<size_t>(&threads)->implicit_value(3),
+   "Set the hnumber of threads (minimum is 3)")
 #ifdef DAEMON // fork does not work well with asio apprently ... to be refined
   ("daemon,D", "run amc as a detached daemon (experimental)")
 #endif
@@ -172,7 +187,7 @@ int main(int argc, char *argv[]) {
   po::variables_map opt_val;
   
   try {
-    po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).run(),
+    po::store(po::command_line_parser(argc, argv).style(pco::default_style|pco::allow_long_disguise).options(cmd_line).positional(p).extra_parser(&reg_threads).run(),
               opt_val);
     po::notify(opt_val);
   } catch(boost::program_options::error const &e) {
@@ -207,11 +222,11 @@ int main(int argc, char *argv[]) {
         nice_val = string_cast<size_t>(priority_env);
       } catch (bad_string_cast const &e) {
         std::cerr<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"'<<std::endl;
-        amc_log->syslog("amc", log::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
+        amc_log->syslog("amc", tlog::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
       }
     }
   }
-
+  
 #ifdef DAEMON
   // Before doing anything else Lets see if we need to start a daemon
   if( opt_val.count("daemon") ) {
@@ -343,9 +358,15 @@ int main(int argc, char *argv[]) {
   }
   
   try {
+    if( threads>=3 ) {
+      amc_log->syslog("amc", tlog::info)<<"Setting thread count to "<<threads;
+      amc_log->thread_count(threads, true);
+    }
+    
+    
     // Create the agent
     my_agent.reset(new Agent(opt_val["mission"].as<std::string>(), clk));
-
+    
     // In case we did not have a clock set yet : use a 1Hz rt_clock
     my_agent->setClock(clock_ref(new RealTimeClock(CHRONO::seconds(1))));
     

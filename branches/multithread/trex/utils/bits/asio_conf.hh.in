@@ -1,4 +1,3 @@
-/* -*- C++ -*- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -32,58 +31,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_log_out_file
-# define H_trex_utils_log_out_file
+#cmakedefine ASIO_DEBUG
 
-# include "entry.hh"
+#ifdef ASIO_DEBUG
+// works only on boost 1.47 or above
+# define BOOST_ASIO_ENABLE_HANDLER_TRACKING
+# undef ASIO_DEBUG
 
-# include <fstream>
-# include <memory>
-
-namespace TREX {
-  namespace utils {
-    namespace log {
-      
-      /** @brief Basic log file handler
-       *
-       * This class implements a basic log message handler for 
-       * @c text_log that redirect all messages received in a 
-       * file
-       *
-       * @author Frederic Py <fpy@mbari.org>
-       * @ingroup utils
-       * @sa text_log
-       */
-      class out_file {
-      public:
-        typedef void           result_type;
-        typedef entry::pointer argument_type;
-        
-        /** @brief Consrructor
-         * @param[in] fname A file open
-         *
-         * Create a new instance that will redirect all messages 
-         * received into the new ly created file @p fname
-         */
-        explicit out_file(std::string const &fname);
-        /** @brief Destructor */
-        ~out_file() {}
-        
-        /** @brief Message handling operator
-         *
-         * @param[in] msg A  new log entry
-         *
-         * Write @p msg in the output file
-         */
-        void operator()(entry::pointer msg);
-        void flush();
-        
-      private:
-        SHARED_PTR<std::ofstream> m_file;
-      };
-      
-    }
-  }
-}
-
-#endif // H_trex_utils_log_out_file
+#endif // ASIO_DEBUG

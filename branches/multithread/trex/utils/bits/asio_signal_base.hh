@@ -1,6 +1,8 @@
 #ifndef H_trex_utils_asio_signal_base
 # define H_trex_utils_asio_signal_base
 
+# include "asio_conf.hh"
+
 # include <boost/asio/io_service.hpp>
 # include <boost/signals2/signal.hpp>
 

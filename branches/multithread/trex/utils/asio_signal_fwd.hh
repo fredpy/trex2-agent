@@ -34,6 +34,8 @@
 #ifndef FWD_trex_utils_asio_signal
 # define FWD_trex_utils_asio_signal
 
+# include "bits/asio_conf.hh"
+
 # include <boost/signals2/signal.hpp>
 # include <boost/asio.hpp>
 

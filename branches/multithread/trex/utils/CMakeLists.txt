@@ -35,11 +35,23 @@
 
 configure_file(platform/bits/cpp11.hh.in 
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
-
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh 
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
   DESTINATION include/trex/utils/platform/bits
 )
+
+
+option(ASIO_DEBUG "enable debug of asio" OFF)
+mark_as_advanced(ASIO_DEBUG)
+
+configure_file(bits/asio_conf.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh)
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
+  DESTINATION include/trex/utils/bits
+)
+
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
@@ -57,10 +69,12 @@ add_library(TREXutils SHARED
   XmlUtils.cc
   ptree_io.cc
   asio_runner.cc
+  asio_fstream.cc
   log/entry.cc
   log/text_log.cc
   cpu_clock.cc
   # headers
+  asio_fstream.hh
   asio_signal.hh
   asio_signal_n.hh
   asio_signal_fwd.hh

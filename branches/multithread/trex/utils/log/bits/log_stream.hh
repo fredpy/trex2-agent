@@ -38,7 +38,7 @@
 # include "log_sig.hh"
 
 # include <boost/iostreams/stream.hpp>
-# include <boost/weak_ptr.hpp>
+# include "../../platform/memory.hh"
 
 namespace TREX {
   namespace utils {

@@ -40,6 +40,8 @@
 #ifndef H_trex_utils_asio_runner
 # define H_trex_utils_asio_runner
 
+# include "bits/asio_conf.hh"
+
 # include <boost/asio.hpp>
 # include <boost/smart_ptr.hpp>
 # include <boost/thread.hpp>
