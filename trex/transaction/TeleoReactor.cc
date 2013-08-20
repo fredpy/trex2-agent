@@ -612,7 +612,8 @@ void TeleoReactor::observation_sync(Observation o, bool verbose) {
 void TeleoReactor::postObservation(Observation const &obs, bool verbose) {
   boost::function<void ()> fn(boost::bind(&TeleoReactor::observation_sync,
                                           this, obs, verbose));
-  utils::strand_run(m_graph.strand(), fn);
+  m_graph.strand().dispatch(fn);
+  // utils::strand_run(m_graph.strand(), fn);
 }
 
 bool TeleoReactor::goal_sync(goal_id g) {
