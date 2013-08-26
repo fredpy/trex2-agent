@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<messages>
+  <message id='test'>
+    Can you read me?
+  </message>
+  <message id="testpage">
+    <div> ${friend} with input. ${input}</div>
+  </message>	
+</messages>

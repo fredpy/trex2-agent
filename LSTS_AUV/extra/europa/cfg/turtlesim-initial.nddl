@@ -1,0 +1,14 @@
+#include "turtlesim.nddl"
+
+
+Turtle turtle = new Turtle(External);
+Controller controller = new Controller(Internal, turtle);
+
+fact(controller.stop initstate);
+eq(initstate.start, 0);
+
+goal(controller.circle goal1);
+lt(0, goal1.start);
+lt(goal1.start, 10);
+
+close();

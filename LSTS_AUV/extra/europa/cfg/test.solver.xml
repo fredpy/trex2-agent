@@ -1,0 +1,15 @@
+<Solver name="DefaultTestSolver">
+  	<ThreatManager defaultPriority="10">
+    		<FlawHandler component="TrexThreatHandler"/>
+  	</ThreatManager>
+
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
+    		<FlawHandler component="StandardOpenConditionHandler"/>
+  	</OpenConditionManager>
+
+  	<UnboundVariableManager defaultPriority="10000">
+	  <!-- Block binding by the solver if varaibales are not singleton -->
+    		<FlawFilter component="Singleton"/>
+    		<FlawHandler component="StandardVariableHandler"/>
+  	</UnboundVariableManager>
+</Solver>
