@@ -34,8 +34,7 @@
 #ifndef H_mbari_location
 # define H_mbari_location
 
-
-# include <boost/date_time/posix_time/ptime.hpp>
+# include <trex/utils/TimeUtils.hh>
 # include <mbari/shared/earth_point.hh>
 # include "point.hh"
 
@@ -45,8 +44,8 @@ namespace mbari {
 
   class location {
   public:
-    typedef boost::posix_time::ptime         date_type;
-    typedef boost::posix_time::time_duration duration_type;
+    typedef TREX::utils::rt_date      date_type;
+    typedef TREX::utils::rt_duration  duration_type;
     
     location():m_have_speed(false) {}
     

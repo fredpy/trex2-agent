@@ -127,7 +127,7 @@ namespace TREX {
       SHARED_PTR<details::graph_impl> m_impl;
     public:
       typedef CHRONO::nanoseconds        duration_type;
-      typedef boost::posix_time::ptime   date_type;
+      typedef utils::rt_date             date_type;
           
       /** @brief reactor ID type
        *
@@ -534,8 +534,7 @@ namespace TREX {
        * @sa tickToTime(TICK) const
        */
       virtual TICK timeToTick(date_type const &date) const {
-        typedef utils::chrono_posix_convert<duration_type> convert;
-	return convert::to_chrono(date-boost::posix_time::from_time_t(0)).count()/tickDuration().count();
+        return date.since_epoch().to_chrono<duration_type>().count()/tickDuration().count();
       }
       /** @brief convert a TICK into its real-time equivalent
        *
@@ -554,8 +553,7 @@ namespace TREX {
        * @sa timeToTick(time_t, suseconds_t) const
        */
       virtual date_type tickToTime(TICK cur) const {
-        typedef utils::chrono_posix_convert<duration_type> convert;
-        return boost::posix_time::from_time_t(0)+convert::to_posix(tickDuration()*cur);
+        return date_type::epoch().add(utils::rt_duration(tickDuration()*cur));
       }
   
       virtual std::string date_str(TICK cur) const;

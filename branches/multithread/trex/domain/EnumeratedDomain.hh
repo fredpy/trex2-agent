@@ -259,7 +259,7 @@ namespace TREX {
        * @endcode
        * where @c @<type@> is the type of the domain
        * and @c @<vali@> are possible values for this domain
-       * @throw TREX::utils::bad_string_cast Unable to parse one of
+       * @throw boost::bad_lexical_cast Unable to parse one of
        * the @c @<vali@> attributes
        *
        * @note If no elem tag is defined into @e node, the domain
@@ -271,7 +271,7 @@ namespace TREX {
       }
       
       void addTextValue(std::string const &val) {
-        add(TREX::utils::string_cast<Ty>(val));
+        add(boost::lexical_cast<Ty>(val));
       }
       std::ostream &print_value(std::ostream &out, size_t i) const {
         // Not very optimal but this is the easiest way to go

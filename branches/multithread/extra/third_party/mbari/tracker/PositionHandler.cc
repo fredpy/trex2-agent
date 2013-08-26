@@ -103,7 +103,6 @@ bool PositionHandler::handleMessage(amqp::queue::message &msg) {
 
 bool PositionHandler::synchronize() {
   date_type now_t = tickToTime(now());
-  typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
   
   for(asset_map::iterator i=m_assets.begin(); m_assets.end()!=i; ++i) {
     if( i->second.first || (m_should_project && i->second.second.have_speed()) ) {
@@ -111,8 +110,9 @@ bool PositionHandler::synchronize() {
       location::duration_type dt;
       earth_point vect(i->second.second.position(now_t, dt, m_should_project));
       
-      duration_type delta_t = cvt::to_chrono(dt);
-    
+      duration_type delta_t = dt.to_chrono<duration_type>();
+      
+          
       i->second.first = false;
       
       long double dtick = delta_t.count();

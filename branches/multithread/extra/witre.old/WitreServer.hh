@@ -76,9 +76,9 @@ namespace TREX {
       int extTimelinesSize() { return externalTimelines.size(); };
       const std::queue<std::string> receiveObs() { return observations; };
       bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
-      time_t getTime_t() { 
-        time_t now = (tickToTime(getCurrentTick())-boost::posix_time::from_time_t(0)).total_seconds();
-        return now; 
+      time_t getTime_t() {
+        time_t now = tickToTime(getCurrentTick()).since_epoch().value.total_seconds();        
+        return now;
       }
       std::string getDependencies(std::string name);
       const timed_goal& plan() { return planTokens; };

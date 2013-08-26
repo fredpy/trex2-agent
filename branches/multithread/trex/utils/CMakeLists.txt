@@ -65,6 +65,7 @@ add_library(TREXutils SHARED
   PluginLoader.cc
   SingletonDummy.cc
   SingletonServer.cc
+  TimeUtils.cc
   TREXversion.cc
   XmlUtils.cc
   ptree_io.cc
@@ -86,7 +87,6 @@ add_library(TREXutils SHARED
   Factory.hh
   Hashable.hh
   id_mapper.hh
-  IOstreamable.hh
   LogManager.hh
   Plugin.hh
   PluginLoader.hh
@@ -95,7 +95,6 @@ add_library(TREXutils SHARED
   bits/SingletonDummy.hh
   bits/SingletonServer_fwd.hh
   bits/SingletonWrapper.hh
-  StringExtract.hh
   Symbol.hh
   tick_clock.hh
   TimeUtils.hh

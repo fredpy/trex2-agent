@@ -174,8 +174,20 @@ void Goalpopup::done()
         Wt::WLineEdit* first = it->second.first;
         Wt::WLineEdit* second = it->second.second;
         string name = it->first;
-        values.insert(make_pair(name,transaction::IntegerDomain(string_cast(IntegerDomain::minus_inf,first->text().toUTF8()),
-                                                                   string_cast(IntegerDomain::plus_inf,second->text().toUTF8()))));
+      IntegerDomain::bound lo = IntegerDomain::minus_inf, hi = IntegerDomain::plus_inf;
+      
+      try {
+        lo = boost::lexical_cast<IntegerDomain::bound>(first->text().toUTF8());
+      } catch(boost::bad_lexical_cast const &e) {
+        // silently ignore : lo = -inf
+      }
+      try {
+        hi = boost::lexical_cast<IntegerDomain::bound>(second->text().toUTF8());
+      } catch(boost::bad_lexical_cast const &e) {
+        // silently ignore : hi = +inf
+      }
+      
+      values.insert(make_pair(name, transaction::IntegerDomain(lo, hi)));
     }
     typedef std::list<std::pair<Wt::WInPlaceEdit*,Wt::WLineEdit*> >::iterator additionMap;
     for(additionMap it = additions.begin(); it!=additions.end(); it++)

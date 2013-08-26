@@ -114,9 +114,9 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
     for(size_t i=0; i<data.observations_size(); ++i) {      
       org::mbari::trex::Predicate const &pred(data.observations(i));
       if( TREX_TL==pred.object() ) {
-        date_type date = boost::posix_time::from_time_t(pred.start());
+        date_type::base_type date = boost::posix_time::from_time_t(pred.start());
         
-        if( m_obs_fresh && m_since>date )
+        if( m_obs_fresh && m_since.value>date )
           continue; // ignore old observations
 	syslog(info)<<"Creating new observation "<<pred.object()<<"."<<pred.predicate();
         m_last_obs = Observation(pred.object(), pred.predicate());
@@ -162,13 +162,12 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
 
 bool DoradoHandler::synchronize() {
   double delta_t;
-  typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
-  
   if( m_updated ) {
     TREX::transaction::Observation obs(DATA_TL, "Received");
     
     duration_type 
-       delta = cvt::to_chrono(tickToTime(now())-m_serie.newest());
+    delta = (tickToTime(now())-m_serie.newest()).to_chrono<duration_type>();
+    
     delta_t= delta.count();
     delta_t /= tickDuration().count();
     obs.restrictAttribute("freshness", 

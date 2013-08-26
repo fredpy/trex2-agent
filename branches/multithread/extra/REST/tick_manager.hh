@@ -55,6 +55,7 @@ namespace TREX {
       transaction::TICK current();
       
       transaction::TICK tick_at(transaction::TeleoReactor::date_type const &date) const;
+      transaction::TICK tick_at(std::string const &date) const;
       
       boost::property_tree::ptree json_tick(transaction::TICK val) const;
       boost::property_tree::ptree json_initial(rest_request const &) const;

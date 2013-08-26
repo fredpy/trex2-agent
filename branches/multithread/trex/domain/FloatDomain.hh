@@ -86,7 +86,7 @@ namespace TREX {
        *
        * Create a integer domain by parsing @e node.
        * 
-       * @throw TREX::utils::bad_string_cast One of the attributes is
+       * @throw boost::bad_lexical_cast One of the attributes is
        * not correctly formatted
        * @throw EmptyDomain the resulting interval is empty
        */

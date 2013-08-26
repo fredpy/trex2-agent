@@ -38,6 +38,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "Exception.hh"
+#include <iostream>
 
 using namespace TREX::utils;
 
@@ -51,8 +52,8 @@ Exception::Exception(std::string const &msg) throw()
 
 Exception::~Exception() throw() {}
 
-// observers :
+// friends, etc :
 
-std::ostream &Exception::print_to(std::ostream &out) const {
-  return out<<what();
+std::ostream &TREX::utils::operator<<(std::ostream &out, Exception const &e) {
+  return out<<e.what();
 }

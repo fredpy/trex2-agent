@@ -74,7 +74,7 @@ bp::ptree TimelineHistory::get_token(goal_id const &tok) const {
 }
 
 TICK TimelineHistory::get_date(std::string const &date) {
-  return m_reactor.timeToTick(utils::string_cast<REST_reactor::date_type>(date));
+  return m_reactor.getGraph().as_date(date);
 }
 
 
@@ -307,17 +307,16 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
          <<m_reactor.duration_str(t_pi)<<"\" },"
          <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
          <<"\n    \"total_obs\": "<<cnt<<",";
+      utils::rt_duration period(m_reactor.tickDuration());
 
-      typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
-      convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
       long double factor = 0.0;
       if( cnt>0 ) {
         factor = n_ticks;
         factor /= cnt;
-        period *= n_ticks;
-        period /= cnt;
+        period.value *= n_ticks;
+        period.value /= cnt;
       } else
-        period *= 0;
+        period.value *= 0;
     
       out<<"\n    \"obs_period\": { \"ticks\": \""<<factor<<"\", "
          <<"\"duration\": \""<<period<<"\" }\n  }";

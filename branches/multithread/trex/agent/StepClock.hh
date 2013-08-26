@@ -46,7 +46,7 @@
 
 # include "Clock.hh"
 # include <trex/utils/LogManager.hh>
-# include <trex/utils/StringExtract.hh>
+# include <boost/lexical_cast.hpp>
 
 namespace TREX {
   namespace agent {
@@ -87,7 +87,7 @@ namespace TREX {
        * @note If the @c steps attribute is not given its value
        * is set to a default of 50
        *
-       * @throw TREX::utils::bad_string_cast unable to parse @c steps attribute
+       * @throw boost::bad_lexical_cast unable to parse @c steps attribute
        */
       StepClock(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
@@ -131,7 +131,7 @@ namespace TREX {
        * @param steps An XML attribute
        * @pre @a steps value is an integer
        *
-       * @throw TREX::utils::bad_string_cast unable to parse @a steps value
+       * @throw boost::bad_lexical_cast unable to parse @a steps value
        * @retval the integer value of @a steps if it is not @c NULL
        * and positive
        * @retval 50 otherwise

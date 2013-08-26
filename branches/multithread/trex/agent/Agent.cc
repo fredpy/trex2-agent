@@ -690,7 +690,7 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
     m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
     if( m_finalTick<=0 )
       throw XmlError(config, "agent life time should be greater than 0");
-  } catch(bad_string_cast const &e) {
+  } catch(boost::bad_lexical_cast const &e) {
     throw XmlError(config, e.what());
   }
   // Populate with external configuration

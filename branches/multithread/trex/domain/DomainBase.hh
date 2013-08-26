@@ -157,7 +157,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains 
      */
-    class DomainBase :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
+    class DomainBase :public TREX::utils::ptree_convertible {
     public:
       /** @brief Destructor */
       virtual ~DomainBase() {}
@@ -358,9 +358,9 @@ namespace TREX {
        * @pre the type of the value manip[ulated by this domain should be
        * convertible to @e Ty or @i exactly @e Ty is @e Safe is @c false 
        * @throw DomainAccess the insatnce was not a singleton
-       * @throw boost::bad_string_cast @a Safe is @a true and the value of
+       * @throw boost::bad_lexical_cast @a Safe is @a true and the value of
        * the singleton cannot be parse into @a Ty
-       * @throw boost::bad_string_cast @a Safe is @a false and the type of
+       * @throw boost::bad_lexical_cast @a Safe is @a false and the type of
        * the singleton is not  @a Ty  
        * @return The singleton value of this domain
        *
@@ -376,7 +376,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else 
-            return TREX::utils::string_cast<Ty>(getStringSingleton());
+            return boost::lexical_cast<Ty>(getStringSingleton());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
@@ -500,18 +500,7 @@ namespace TREX {
       /** @brief type of the domain */
       TREX::utils::Symbol const m_type;
 
-      /** @brief OUtput stream wrting helper
-       * @param out An output stream
-       *
-       * Write the value of current domain as a text from inot @e out.
-       * @return @e out after the operation
-       */
-      std::ostream &print_to(std::ostream &out) const {
-	if( isFull() )
-	  return out<<'*';
-	else 
-	  return print_domain(out);
-      }
+      friend std::ostream &operator<<(std::ostream &out, DomainBase const &d);
 
 # ifndef DOXYGEN
       // Following method have no code
@@ -519,6 +508,7 @@ namespace TREX {
 # endif
     }; // TREX::transaction::DomainBase
 
+    
 
   } // TREX::transaction
 } // TREX

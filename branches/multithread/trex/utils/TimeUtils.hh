@@ -59,112 +59,113 @@
 
 namespace TREX {
   namespace utils {
-  
-# ifndef DOXYGEN
+    
+    namespace internals {
+      
+      template<class ChronDuration>
+      struct chrono_posix_conv;
+      
+      template<typename Rep, class Period>
+      struct chrono_posix_conv< CHRONO::duration<Rep, Period> > {
+        typedef CHRONO::duration<Rep, Period>    chrono_duration;
+        typedef boost::posix_time::time_duration posix_duration;
+        
+        static chrono_duration to_chrono(posix_duration const &pd) {
+          chrono_duration
+            result = CHRONO::duration_cast<chrono_duration>(CHRONO::hours(pd.hours()));
+          result += CHRONO::duration_cast<chrono_duration>(CHRONO::minutes(pd.minutes()));
+          result += CHRONO::duration_cast<chrono_duration>(CHRONO::seconds(pd.seconds()));
+          
+          long long cpt_s = pd.fractional_seconds(), // remaining seconds
+            max_s = pd.ticks_per_second(); // posix clock subseconds accuracy
 
-    template<class ChronoDuration>
-    struct chrono_posix_convert;
-  
-    template<typename Rep, typename Period>
-    struct chrono_posix_convert< CHRONO::duration<Rep, Period> > {
-      typedef CHRONO::duration<Rep, Period> chrono_duration;
-      typedef boost::posix_time::time_duration     posix_duration;
-      
-      
+          if( 1000000000L != max_s ) // if clock is not nanosecond accurate
+            cpt_s = (cpt_s*1000000000L)/max_s; // convert cpt_s in ns
 
-      typedef CHRONO::nanoseconds ns_duration;
+          CHRONO::nanoseconds ns(cpt_s);
+          return result+CHRONO::duration_cast<chrono_duration>(ns);
+        }
+        
+        static posix_duration  to_posix(chrono_duration const &cd) {
+          CHRONO::hours h = CHRONO::duration_cast<CHRONO::hours>(cd);
+          posix_duration result = boost::posix_time::hours(h.count());
+          typename CHRONO_NS::common_type<chrono_duration, CHRONO::hours>::type sub_hours = cd-h;
+          
+          CHRONO::seconds secs = CHRONO::duration_cast<CHRONO::seconds>(sub_hours);
+          result += boost::posix_time::seconds(secs.count());
+          
+          CHRONO::nanoseconds nsecs = CHRONO::duration_cast<CHRONO::nanoseconds>(sub_hours-secs);
+# ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
+          result += boost::posix_time::nanoseconds(nsecs.count());
+# else
+          result += boost::posix_time::microseconds((nsecs.count()+500)/1000);
+# endif
+          return result;
+        }
+        
+      };
       
-      static chrono_duration to_chrono(posix_duration const &pd) {
-        chrono_duration
-        result = CHRONO::duration_cast<chrono_duration>(CHRONO::hours(pd.hours()));
-        
-        result += CHRONO::duration_cast<chrono_duration>(CHRONO::minutes(pd.minutes()));
-        
-        result += CHRONO::duration_cast<chrono_duration>(CHRONO::seconds(pd.seconds()));
-        
-        long long cpt_s = pd.fractional_seconds(),
-          max_s = pd.ticks_per_second();
       
-        if( 1000000000L != max_s )
-          cpt_s = (cpt_s*1000000000L)/max_s;
-        
-        CHRONO::nanoseconds ns(cpt_s);
-        
-        return result+CHRONO::duration_cast<chrono_duration>(CHRONO::nanoseconds(cpt_s));
+    } // TREX::utils::internals
+    
+
+    struct rt_duration {
+      typedef boost::posix_time::time_duration base_type;
+      
+      rt_duration() {}
+      rt_duration(base_type const &val):value(val) {}
+      
+      template<class ChronoDuration>
+      explicit rt_duration(ChronoDuration const &dur)
+      :value(internals::chrono_posix_conv<ChronoDuration>::to_posix(dur)) {}
+      
+      ~rt_duration() {}
+      
+      template<class ChronoDuration>
+      ChronoDuration to_chrono() const {
+        return internals::chrono_posix_conv<ChronoDuration>::to_chrono(value);
       }
       
-      static posix_duration to_posix(chrono_duration cd) {
-        CHRONO::hours h = CHRONO::duration_cast<CHRONO::hours>(cd);
-        posix_duration result = boost::posix_time::hours(h.count());
-        typename CHRONO_NS::common_type<chrono_duration, CHRONO::hours>::type
-        sub_hours = cd-h;
-        
-        
-        
-        CHRONO::seconds secs = CHRONO::duration_cast<CHRONO::seconds>(sub_hours);
-        result += boost::posix_time::seconds(secs.count());
-        
-        
-        ns_duration nsecs = CHRONO::duration_cast<ns_duration>(sub_hours-secs);
-#  ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
-        result += boost::posix_time::nanoseconds(nsecs.count());
-#  else 
-        result += boost::posix_time::microseconds((nsecs.count()+500)/1000);
-#  endif
-        return result;
-      }
-      
-    }; // TREX::utils::chrono_posix_convert
-
-# else // DOXYGEN
-
-    /** @brief Boost chrono to POSIX duration conversion
-     *
-     * @tparam ChronoDuration A boost chrono duration type
-     *
-     * An helper to convert back and forth POSIX durations to/from their 
-     * @p ChronoDuration equivalent.
-     *
-     * This helper exists as in Boost posix dates and duration  are not 
-     * represented using boost chrono which is used in trex to describe 
-     * a tick duration.Therefore, in order ot relate trex ticks to human-readable 
-     * real-time values, we needed simple way to go back anf forth between the 
-     * two representaions  
-     *
-     * @note Depending omn  the system we are running on and the precision of 
-     * @p ChronoDuration these conversions can result on rounding errors.
-     *
-     * @ingroup utils
-     */
-    template<class ChronoDuration>
-    struct chrono_posix_convert {
-      /** @brief Type used for chrono duration
-       */
-      typedef ChronoDuration                   chrono_duration;
-      /** @brief Type used to represent posix duration 
-       */
-      typedef boost::posix_time::time_duration posix_duration;
-      
-      /** @brief Conversion from posix to chrono
-       *
-       * @param[in] pd A duration in POSIX representation
-       * @return The equivalent of @p pd as a `chrono_duration`
-       *
-       * @sa to_posix(chrono_duration const &)
-       */
-      static chrono_duration to_chrono(posix_duration const &pd);
-      /** @brief Conversion from chrono to posix
-       *
-       * @param[in] cd A duration as a `chrono_duyration`
-       * @return The equivalent of @p cd as a posix duration
-       *
-       * @sa to_chrono(posix_duration const &)
-       */
-      static posix_duration  to_posix(chrono_duration const &cd);
-       
+      base_type value;
     };
-   
-# endif // DOXYGEN
+
+    std::ostream &operator<<(std::ostream &out, rt_duration const &dur);
+    std::istream &operator>>(std::istream &in, rt_duration &dur);
+
+    struct rt_date {
+      typedef boost::posix_time::ptime base_type;
+      typedef rt_duration              duration_type;
+
+      static  rt_date const &epoch();
+      static  rt_date const &max();
+      
+      rt_date() {}
+      rt_date(base_type const &val):value(val) {}
+      ~rt_date() {}
+      
+      inline duration_type since(rt_date const &other) const {
+        return value-other.value;
+      }
+      inline duration_type since_epoch() const {
+        return since(epoch());
+      }
+      inline rt_date add(duration_type const &delta) const {
+        return value+delta.value;
+      }
+      
+      base_type value;
+    };
+    
+    inline rt_duration operator-(rt_date const &a, rt_date const &b) {
+      return a.since(b);
+    }
+    inline rt_date operator+(rt_date const &a, rt_duration const &b) {
+      return a.add(b);
+    }
+
+    std::ostream &operator<<(std::ostream &out, rt_date const &date);
+    std::istream &operator>>(std::istream &in, rt_date &date);
+    
 
   } // utils 
 } // TREX

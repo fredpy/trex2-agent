@@ -51,12 +51,15 @@
 
 # include <trex/utils/TimeUtils.hh>
 # include <trex/utils/LogManager.hh>
-# include <trex/utils/StringExtract.hh>
+
+# include <boost/lexical_cast.hpp>
 
 # include <trex/utils/tick_clock.hh>
 # include <trex/utils/chrono_helper.hh>
 
 # include <boost/thread/recursive_mutex.hpp>
+
+# include <boost/date_time/posix_time/posix_time.hpp>
 # include <boost/date_time/posix_time/posix_time_io.hpp>
 
 # include <boost/math/common_factor_rt.hpp>
@@ -242,7 +245,7 @@ namespace TREX {
       virtual TREX::transaction::TICK max_tick() const {
         typename mutex_type::scoped_lock guard(m_lock);
         if( NULL!=m_clock.get() ) {
-          return timeToTick(date_type(boost::posix_time::max_date_time));
+          return timeToTick(date_type::max());
         } else
           return Clock::max_tick();
       }
@@ -253,62 +256,41 @@ namespace TREX {
       }
       
       transaction::TICK timeToTick(date_type const &date) const {
-        typedef utils::chrono_posix_convert<tick_rate> convert;
-    
-        return initialTick()+(convert::to_chrono(date-epoch()).count()/m_period.count());
-      }
+        tick_rate delta = date.since(epoch()).template to_chrono<tick_rate>();
+        
+        return initialTick()+(delta.count()/m_period.count());
+       }
       
       date_type tickToTime(TREX::transaction::TICK cur) const {
-        typedef utils::chrono_posix_convert<tick_rate> convert;
-        typedef typename convert::posix_duration conv_dur;
-        static boost::posix_time::ptime const max_date(boost::posix_time::max_date_time);
-        conv_dur delta /*, max_delta = max_date-epoch()*/;
-        
-        transaction::TICK max_t = max_tick();
+        transaction::TICK const max_t = max_tick();
+
+        utils::rt_duration delta;
         
         if( cur>max_t ) {
-          syslog(warn)<<"Tick "<<cur<<" is larger than max delay until "
-          <<max_date<<".\n\tReducing it to "<<max_t;
+          syslog(warn)<<"Tick "<<cur<<" is larger than max delay until "<<date_type::max()
+          <<".\n\tReducing it to "<<max_t;
           cur = max_t;
         }
-        
         rep const t_max = std::numeric_limits<rep>::max()/(2*m_period.count());
         
-        if( t_max<=cur ) {          
+        if( t_max<=cur ) {
+          utils::rt_duration const base(m_period*t_max);
+          rep factor = cur/t_max, remains = cur%t_max;
           
-          conv_dur const base = convert::to_posix(m_period*t_max);
-          rep factor = cur/t_max, remains=cur%t_max;
-          
-          
-          
-          delta = base*factor;
-          
-          delta += convert::to_posix(m_period*remains);
-        } else {
-          // Do the same for the min just in case
-          rep const t_min = std::numeric_limits<rep>::min()/(2*m_period.count());
-          
-          if( t_min>=cur ) {
-            conv_dur const base = convert::to_posix(m_period*t_min);
-            rep factor = cur/t_min, remains = cur%t_min;
-            
-            delta = base*factor;
-            delta += convert::to_posix(m_period*remains);
-          } else {
-            delta = convert::to_posix(m_period*cur);
-          }
-        }
-        
-        return epoch()+delta;
+          delta.value = base.value*factor;
+          delta.value += utils::rt_duration(m_period*remains).value;
+        } else
+          delta = utils::rt_duration(m_period*cur);
+        return epoch().add(delta);
       }
+       
       std::string date_str(TREX::transaction::TICK const &tick) const {
-        return boost::posix_time::to_iso_extended_string(tickToTime(tick));
+        std::ostringstream oss;
+        oss<<tickToTime(tick);
+        return oss.str();
       }
       std::string duration_str(TREX::transaction::TICK dur) const {
-        duration_type dt = tickDuration()*dur;
-        typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
-        
-        typename cvt::posix_duration p_dur = cvt::to_posix(dt);
+        utils::rt_duration p_dur(tickDuration()*dur);
         std::ostringstream oss;
         oss<<p_dur;
         return oss.str();

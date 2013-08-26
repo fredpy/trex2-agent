@@ -48,7 +48,7 @@ void location::update(location::date_type const &date, earth_point const &pos) {
   m_last_pos = pos;
   
   if( pred ) {
-    long double dt = (date-m_date).total_nanoseconds();
+    long double dt = (date-m_date).value.total_nanoseconds();
     dt /= boost::posix_time::seconds(1).total_nanoseconds();
     
     m_speed = pred->distance(pos, m_nav_calc);
@@ -65,7 +65,7 @@ earth_point location::position(location::date_type const &now, location::duratio
                                bool projected) const {
   delta = now-m_date;
   if( projected && have_speed() ) {
-    long double dt = delta.total_nanoseconds();
+    long double dt = delta.value.total_nanoseconds();
     dt /= boost::posix_time::seconds(1).total_nanoseconds();
     
     return m_last_pos->destination(m_heading, m_speed*dt, m_nav_calc);

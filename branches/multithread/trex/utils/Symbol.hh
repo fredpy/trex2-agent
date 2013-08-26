@@ -57,9 +57,8 @@
 # include <boost/flyweight/no_tracking.hpp>
 # include <boost/flyweight/holder_tag.hpp>
 
-# include "IOstreamable.hh"
 # include "Hashable.hh"
-# include "StringExtract.hh"
+# include <boost/lexical_cast.hpp>
 # include "SingletonUse.hh"
 
 namespace TREX {
@@ -115,8 +114,7 @@ namespace TREX {
      */
     template< class CharT, class Traits=std::char_traits<CharT>,
 	      class Alloc=std::allocator<CharT> >
-    class BasicSymbol :public ostreamable, public istreamable, 
-		       public Hashable {
+    class BasicSymbol :public Hashable {
     public:
       /** @brief equivalent string type */
       typedef std::basic_string<CharT, Traits, Alloc> str_type;
@@ -337,12 +335,27 @@ namespace TREX {
        */
       static ref_type create(CharT const *str, size_t len);
 
-      std::ostream &print_to(std::ostream &out) const;
-      std::istream &read_from(std::istream &in);
       size_t hash() const;
+      
+      friend std::istream &operator>>(std::istream &in, BasicSymbol &s) {
+        BasicSymbol::str_type tmp;
+        
+        if( in>>tmp )
+          s.m_name = BasicSymbol::create(tmp);
+        return in;
+      }
 
     }; // TREX::utils::BasicSymbol<>
 
+    template<class CharT, class Traits, class Alloc>
+    std::ostream &operator<<(std::ostream &out, BasicSymbol<CharT, Traits, Alloc> const &s) {
+      if( !s.empty() )
+        out<<s.str();
+      return out;
+    }
+
+
+    
 # define In_H_Symbol
 #  include "bits/Symbol.tcc"
 # undef In_H_Symbol
@@ -356,23 +369,7 @@ namespace TREX {
      * @ingroup utils
      */
     typedef BasicSymbol<char> Symbol;
-
     
-    /** @brief string casting specialization
-     * @param in A string
-     * @param format A format
-     * @relates Symbol
-     *
-     * This specialization just copy the content of @a in in a new Symbol
-     *
-     * @return a Symbol with the value of @a in
-     * @ingroup utils
-     */ 
-    template<>
-    inline Symbol string_cast<Symbol>(std::string const &in,
-				      std::ios_base &(*format)(std::ios_base &)) {
-      return Symbol(in);
-    }
   } // TREX::utils
 } // TREX 
 

@@ -219,8 +219,8 @@ int main(int argc, char *argv[]) {
     char *priority_env = getenv("TREX_NICE");
     if( NULL!=priority_env ) {
       try {
-        nice_val = string_cast<size_t>(priority_env);
-      } catch (bad_string_cast const &e) {
+        nice_val = boost::lexical_cast<size_t>(priority_env);
+      } catch (boost::bad_lexical_cast const &e) {
         std::cerr<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"'<<std::endl;
         amc_log->syslog("amc", tlog::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
       }

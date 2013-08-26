@@ -87,8 +87,7 @@ namespace TREX {
        * @sa class IntervalDomain
        * @author Frederic Py <fpy@mbari.org>
        */
-      class bound :public TREX::utils::istreamable,
-		   public TREX::utils::ostreamable {
+      class bound {
       public:
 	/** @brief constructor
 	 *
@@ -331,9 +330,18 @@ namespace TREX {
 	bound(bool pos, bool) 
 	  :m_inf(true), m_pos(pos) {}
 
+        
+        
 	std::istream &read_from(std::istream &in);
 	std::ostream &print_to(std::ostream &out) const;
 	  		
+        friend std::istream &operator>>(std::istream &in, bound &val) {
+          return val.read_from(in);
+        }
+        friend std::ostream &operator<<(std::ostream &out, bound const &val) {
+          return val.print_to(out);
+        }
+        
 	friend class IntervalDomain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
 
@@ -517,7 +525,7 @@ namespace TREX {
        * @c -inf or @c +inf. The format of @c @<val@> is the classic @a Ty
        * text format or @c [-+]?inf.
        *
-       * @throw TREX::utils::bad_string_cast One of the attributes is
+       * @throw boost::bad_lexical_cast One of the attributes is
        * not correctly formatted
        * @throw TREX::transaction::EmptyDomain the resulting interval is empty
        */

@@ -51,7 +51,7 @@
 # define BOOST_SPIRIT_THREADSAFE
 # include <boost/property_tree/xml_parser.hpp>
 
-# include "StringExtract.hh"
+# include <boost/lexical_cast.hpp>
 # include "Exception.hh"
 # include "LogManager.hh"
 
@@ -89,90 +89,40 @@ namespace TREX {
       virtual ~XmlError() throw() {}
     }; // TREX::utils::FactoryException
     
-    namespace internals { 
+    namespace internals {
       
-      /** @brief XML attribibute parsing helper 
-       * 
-       * @tparam Ty the expected output type
-       * 
-       * This class is used internally as an helper to extract the value of an 
-       * XML attribute and parse it as a @p Ty instance 
-       *
-       * It is used by the parse_attr methods in order to extract and parse an 
-       * attribute from an XML tag.
-       * 
-       * @author Frederic Py <fpy@mbari.org>
-       * @ingroup utils
-       */
-      template<class Ty, bool AttrOptional=true>
-      struct attr_helper {
-        
-        static std::string get_str(boost::property_tree::ptree const &pt,
-                               std::string const &name) {
-          std::string path("<xmlattr>."+name);
+      namespace bp=boost::property_tree;
+      
+      boost::optional<bp::ptree const &> find_attr(bp::ptree const &pt,
+                                                   std::string const &path);       
+      
+      template<class Ty>
+      struct attr_helper {        
+        static Ty get(bp::ptree const &pt, std::string const &path) {
+          boost::optional<bp::ptree const &> node = find_attr(pt, path);
           
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
-              return *ret;
-            path = name;
-          }
-          return pt.get<std::string>(path);
+          if( !node )
+            throw bp::ptree_bad_path("Failed to find attribute", bp::path(path));
+          return  boost::lexical_cast<Ty>(node->data());
         }
-        
-        /** @brief Parse attribute
-         * 
-         * @param[in] pt A xml based property tree
-         * @param[in] name An attribute name
-         * 
-         * Extracts the value of the attribute @p name from the property tree 
-         * @p pt
-         * 
-         * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a boost::optional
-         * @pre The value of the attribute can be parsed as a @p Ty
-         * 
-         * @return the value of this attribute
-         * @note if @p Ty is a boost::optional and the attribute @p name does 
-         *       not exists the returned value is an empty optional  
-         *
-         * @throw bad_string_cast Failed to convert the attribute 
-         *     @p name into a @p Ty value
-         */
-        static Ty get(boost::property_tree::ptree const &pt,
-                          std::string const &name) {
-          return string_cast<Ty>(get_str(pt, name));
-        }
-      }; // TREX::utils::internals::attr_helper<>
+      };
       
+
 #ifndef DOXYGEN
-      template<class Ty, bool AttrOptional>
-      struct attr_helper< boost::optional<Ty>, AttrOptional > {
-        
-        static boost::optional<std::string> get_str(boost::property_tree::ptree const &pt,
-                                                    std::string const &name) {
-          std::string path("<xmlattr>."+name);
+      template<class Ty>
+      struct attr_helper< boost::optional<Ty> > {
+        static boost::optional<Ty> get(bp::ptree const &pt,
+                                       std::string const &path) {
+          boost::optional<bp::ptree const &> node = find_attr(pt, path);
+          boost::optional<Ty> ret;
           
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
-              return ret;
-            path = name;
-          }
-          return pt.get_optional<std::string>(path);
+          if( node )
+            ret = boost::lexical_cast<Ty>(node->data());
+          return ret;
         }
-       
-        static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
-                                      std::string const &name) {
-	  boost::optional<std::string> tmp = get_str(pt, name);
-	  if( tmp )
-	    return boost::optional<Ty>(string_cast<Ty>(*tmp));
-	  else 
-	    return boost::optional<Ty>();
-        }
-      }; // TREX::utils::internals::attr_helper< boost::optional<> >
-#endif // DOXYGEN
+      };
+#endif
+      
       
     } // TREX::utils::internals
     
@@ -187,7 +137,7 @@ namespace TREX {
      * @pre @a node has the attribute @a attr
      * @pre the value of @a attr can be parsed into the type @a Ty
      * @throw XmlError Unable to find attribute @a attr
-     * @throw bad_string_cast Cannot parse the value of @a attr as @a Ty
+     * @throw bad_lexical_cast Cannot parse the value of @a attr as @a Ty
      *
      * @return The parsed value from @a attr
      * @sa template<class Ty> Ty const &parse_attr(Ty const &, rapidxml::xml_node<> const &, std::string const &attr)
@@ -254,7 +204,7 @@ namespace TREX {
      * default @a on_missing value
      *
      * @pre the value of @a attr can be parsed into the type @a Ty
-     * @throw bad_string_cast Cannot parse the value of @a attr as @a Ty
+     * @throw bad_lexical_cast Cannot parse the value of @a attr as @a Ty
      *
      * @retval @a on_missing If @a attr does not exist in @a node
      * @return The parsed value from @a attr otherwise

@@ -62,17 +62,17 @@ namespace {
   }
   
   
+  
   bp::ptree tick_at(rest_request const &req, tick_manager *mgr) {
     if( req.arg_path().empty() )
       throw std::runtime_error("Missing date argument to "+req.request().path());
-    std::cout<<req.arg_path().dump()<<std::endl;
+    // std::cout<<req.arg_path().dump()<<std::endl;
     std::string date_str = my_url_decode(req.arg_path().dump());
-    std::cout<<" -> "<<date_str<<std::endl;
+    // std::cout<<" -> "<<date_str<<std::endl;
     
     
     try {
-      graph::date_type date = TREX::utils::string_cast<graph::date_type>(date_str);
-      return mgr->json_tick(mgr->tick_at(date));
+      return mgr->json_tick(mgr->tick_at(date_str));
     } catch(...) {
       throw std::runtime_error("Failed to parse \""+date_str+" as a date.");
     }
@@ -178,6 +178,11 @@ TICK tick_manager::current() {
 TICK tick_manager::tick_at(TeleoReactor::date_type const &date) const {
   return m_agent.timeToTick(date);
 }
+
+TICK tick_manager::tick_at(std::string const &date) const {
+  return m_agent.as_date(date);
+}
+
 
 
 void tick_manager::update_sync(TICK cur) {

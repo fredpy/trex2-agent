@@ -116,7 +116,7 @@ namespace TREX {
        * This method give access to the element @a i of the domain converted
        * in the type @a Ty. The @a Safe flag indicate whether the conversion to
        * @a Ty should be done using @c boost::any_cast -- which will fail if
-       * the encapsulated type is not @a Ty -- or using the safer string_cast
+       * the encapsulated type is not @a Ty -- or using the safer lexical_cast
        * that should be more type robust
        *
        * @pre @a i is less than the size of the set
@@ -143,7 +143,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else
-            return TREX::utils::string_cast<Ty>(getStringValue(n));
+            return boost::lexical_cast<Ty>(getStringValue(n));
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
