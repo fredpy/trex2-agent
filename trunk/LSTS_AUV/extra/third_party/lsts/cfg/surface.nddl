@@ -1,0 +1,28 @@
+#include "TREX.nddl"
+#include "navigator.nddl"
+
+class MediumState extends Timeline {
+
+	predicate AtSurface {
+		equals(Navigator.At atSurface);
+			atSurface.z == 0;
+			duration >= 5;
+	};
+	
+	predicate Underwater {	};
+
+}
+
+class SurfaceController extends AgentTimeline {
+
+	predicate Idle{
+		duration == 1;
+	
+	};
+	
+	predicate SurfacePeriodically {
+		int ticksBetweenSurfaces;
+		meets(MediumState.AtSurface surf);
+		duration < ticksBetweenSurfaces;
+	};
+}

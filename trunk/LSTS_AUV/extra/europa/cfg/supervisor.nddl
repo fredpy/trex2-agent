@@ -1,0 +1,30 @@
+#include "TREX.nddl"
+
+class Luminance extends AgentTimeline {
+    predicate Bright {}
+    predicate Dim {}
+    
+    Luminance(Mode _mode) {
+	super(_mode, true);
+    }
+}
+
+Luminance::Bright {
+  Luminance lums;
+  lums != object;
+  foreach(lum in lums) {
+    equals(lum.Bright);
+  }
+}
+
+Luminance::Dim {
+  Luminance lums;
+  lums != object;
+  foreach(lum in lums) {
+    equals(lum.Dim);
+  }
+}
+
+Luminance lum = new Luminance(External);
+Luminance lum2 = new Luminance(External);
+

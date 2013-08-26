@@ -1,0 +1,24 @@
+<Solver name="DefaultTestSolver">
+  <ThreatManager defaultPriority="10">
+    <!-- resolve scheduling threats first -->
+    <FlawHandler component="StandardThreatHandler"/>
+  </ThreatManager>
+
+  <OpenConditionManager component="EarliestFirst" defaultPriority="100"
+			class-match="VehicleState">
+    <!-- vehicle state should be resolved last -->
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+
+  <UnboundVariableManager defaultPriority="200"
+			  variable="start">
+    <FlawFilter variable="duration"/>
+    <FlawFilter variable="end"/>
+    <FlawHandler component="StandardVariableHandler"/>
+  </UnboundVariableManager>
+
+  <Openconditionmanager component="EarliestFirst" defaultPriority="210">
+    <!-- vehicle state OCs are resolved at the very end of regular deliberation -->
+    <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager>
+</Solver>
