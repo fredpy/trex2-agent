@@ -236,6 +236,32 @@ int main(int argc, char *argv[]) {
   return 0\;
 }" ${boost_flags} ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
+    # this test if boost/get_pointer defines get_pointer for std::shared_ptr
+    if(CPP11_HAS_SHARED_PTR)
+      file(WRITE ${CMAKE_BINARY_DIR}/boost_get_pointer_test.cc "#include <memory>
+#include <boost/get_pointer.hpp>
+
+int main(int argv, char *argc[]) {
+  std::shared_ptr<int> foo = std::make_shared<int>(0);
+  return boost::get_pointer(foo)==foo.get()?0:1; 
+}
+") 
+      try_compile(success
+	${CMAKE_BINARY_DIR}
+	${CMAKE_BINARY_DIR}/boost_get_pointer_test.cc
+	COMPILE_DEFINITIONS ${CPP11_COMPILER_SWITCH} ${boost_flags}
+	CMAKE_FLAGS 
+	  -DCMAKE_EXE_LINKER_FLAGS:STRING=${CPP11_link_flags} 
+	  -DLINK_LIBRARIES:STRING=${LIBS}
+	OUTPUT_VARIABLE OUT)
+      set(CPP11_BOOST_GET_POINTER_STD ${success})
+      if(NOT success)
+	file(WRITE ${CMAKE_BINARY_DIR}/boost_get_pointer_test.out ${OUT})
+      endif(NOT success)
+      message(STATUS "Test if boost::get_pointer support std::shared_ptr: ${CPP11_BOOST_GET_POINTER_STD}") 
+    endif(CPP11_HAS_SHARED_PTR)
+  
+
     if(NOT ${CPP11_SUPPORT_Boost_PROGRAM_OPTIONS})
       message(FATAL_ERROR " Boost.Program_Options library cannot be used with C++11")
     endif(NOT ${CPP11_SUPPORT_Boost_PROGRAM_OPTIONS})
