@@ -152,7 +152,7 @@ namespace {
 
 int main(int argc, char *argv[]) {
   po::options_description hidden("Hidden options"), cmd_line;
-  size_t nice_val, threads;
+  size_t nice_val, threads = 3;
 
   // Specifies the handler for extracting the mission name
   hidden.add_options()("mission",
