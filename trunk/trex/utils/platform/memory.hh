@@ -104,6 +104,9 @@
 #  ifdef CPP11_HAS_SHARED_PTR
 #   define SHARED_NS std
 
+// version of boost before 1.53 did not specialize get_pointer for std::shared_ptr
+# ifndef CPP11_BOOST_GET_POINTER_STD
+
 namespace boost {
   
   /** @brief Pointer cessagss helper for boost
@@ -131,6 +134,7 @@ namespace boost {
   }
 
 }
+# endif // CPP11_BOOST_GET_POINTER_STD
 
 #  else // CPP11_HAS_SHARED_PTR
 #   include <boost/make_shared.hpp>
