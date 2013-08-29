@@ -46,7 +46,7 @@ namespace TREX
     } // Hide this crap from outside this file ....
     
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-    LstsReactor(arg)
+    LstsReactor(arg), m_create_new_ref(false)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -100,6 +100,15 @@ namespace TREX
       syslog(log::info) << "listening on port " << localport << "...";
     }
 
+
+  bool Platform::isActiveInPlanControlStateMsg(
+      PlanControlState* previous_pcstate)
+  {
+    return previous_pcstate != NULL
+        && (previous_pcstate->state == PlanControlState::PCS_EXECUTING
+            && previous_pcstate->plan_id == "trex_plan");
+  }
+
     /**
      * @param msg received
      *
@@ -114,117 +123,137 @@ namespace TREX
       received[msg->getId()] = msg;
     }
 
-    void
-    Platform::handleTickStart()
-    {
-      
-      // Do not process goals if you still have observations to post
-      //if( referenceObservations.empty() ) {
-        // First deal with requests
-        if( !m_blocked && !m_goals_pending.empty() ) {
-          goal_id goal = m_goals_pending.front();
-          std::string gname = (goal->object()).str();
-          std::string gpred = (goal->predicate()).str();
-          std::string man_name;
-      
-          if( "reference"==gname ) {
-            syslog(log::info)<<"Processing next goal on reference ";
-            if( "Going"==gpred && handleGoingRequest(goal) ) {
-              sendMsg(goingRef); // send the command now !!!
-              m_goals_pending.remove(goal);
-              referenceObservations.push(*goal); // schedule this guy
-                                              // as an observation
-            } else if( "At"==gpred && handleAtRequest(goal) ) {
-              // just convert the pending goal into an observation
-              m_goals_pending.remove(goal);
-              referenceObservations.push(*goal);
-            }
-          }
-        }
-      //}
-      
-      // Now that we dealt with goal processing and command sending
-      // just look if any observation need to be posted
-      
-      if(!referenceObservations.empty())
-      {
-        postUniqueObservation(referenceObservations.front());
-        referenceObservations.pop();
-      }
-      
-      
-      
-      Announce * ann;
-      try
-      {
-        Address addr;
-        int msg_count = 0;
-        
-        IMC::Message * msg;
-        
-        while ((msg = m_adapter.poll(0, false)) != NULL)
-        {
-          msg_count++;
-          if (remote_id == 0)
-            remote_id = msg->getSource();
-          
-          if (msg->getId() == Announce::getIdStatic())
-          {
-            ann = (Announce *) dynamic_cast<Announce *>(msg);
-            
-            if (m_receivedAnnounces[ann->sys_name] != NULL)
-              delete m_receivedAnnounces[ann->sys_name];
-            m_receivedAnnounces[ann->sys_name] = ann;
-          }
-          else if (msg->getId() == TrexOperation::getIdStatic())
-          {
-            TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
-            handleTrexOperation(*command);
-          }
-          else {
-            // substitute previously received message
-            insertIntoReceived(msg);
-          }
-        }
-        
-        postGoalToken();
-        
-        if (msg_count < 1)
-        {
-          if( m_firstTick ) {
-            m_last_msg = getCurrentTick()-1;
-            m_firstTick = false;
-          }
-          TICK delta = getCurrentTick()-m_last_msg;
 
-          
-          if( delta>=m_max_delta ) {
-            if (m_connected)
-              std::cerr <<"Disconnected from DUNE\n";
-          
-            syslog(log::warn) << "Disconnected from DUNE";
-            m_connected = false;
-          } else {
-            syslog(log::warn)<<"No message received from DUNE for "
-              <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
-          }
-          
-        }
-        
-        else
-        {
-          if (!m_connected)
-            std::cerr <<"Now connected to DUNE\n";
-          m_connected = true;
-          m_last_msg = getCurrentTick();
-        }
-      }
-      catch (std::runtime_error& e)
+
+
+  void
+  Platform::handleTickStart()
+  {
+
+    // Do not process goals if you still have observations to post
+    //if( referenceObservations.empty() ) {
+    // First deal with requests
+    if( !m_blocked && !m_goals_pending.empty() )
+    {
+      goal_id goal = m_goals_pending.front();
+      std::string gname = (goal->object()).str();
+      std::string gpred = (goal->predicate()).str();
+      std::string man_name;
+
+      if( "reference"==gname )
       {
-        syslog(log::error) << "Error during message processing: " << e.what();
-        std::cerr << e.what();
+        syslog(log::info)<<"Processing next goal on reference ";
+        if( "Going"==gpred && handleGoingRequest(goal) )
+        {
+          sendMsg(goingRef); // send the command now !!!
+          m_goals_pending.remove(goal);
+          referenceObservations.push(*goal); // schedule this guy
+          // as an observation
+        }
+        else if( "At"==gpred && handleAtRequest(goal) )
+        {
+          // just convert the pending goal into an observation
+          m_goals_pending.remove(goal);
+          referenceObservations.push(*goal);
+        }
       }
     }
+    //}
+
+    // Now that we dealt with goal processing and command sending
+    // just look if any observation need to be posted
+
+    if(!referenceObservations.empty())
+    {
+      postUniqueObservation(referenceObservations.front());
+      referenceObservations.pop();
+    }
+
+
+
+    Announce * ann;
+    try
+    {
+      Address addr;
+      int msg_count = 0;
+
+      IMC::Message * msg;
+
+      while ((msg = m_adapter.poll(0, false)) != NULL)
+      {
+        msg_count++;
+        if (remote_id == 0)
+          remote_id = msg->getSource();
+
+        if (msg->getId() == Announce::getIdStatic())
+        {
+          ann = (Announce *) dynamic_cast<Announce *>(msg);
+
+          if (m_receivedAnnounces[ann->sys_name] != NULL)
+            delete m_receivedAnnounces[ann->sys_name];
+          m_receivedAnnounces[ann->sys_name] = ann;
+        }
+        else if (msg->getId() == TrexOperation::getIdStatic())
+        {
+          TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
+          handleTrexOperation(*command);
+        }
+        else if (msg->getId() == PlanControlState::getIdStatic())
+        {
+          ///////////////////////////////////
+          PlanControlState * previous_pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
+          PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(msg);
+          bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
+          bool isActive = isActiveInPlanControlStateMsg(pcstate);
+          if(wasActive!=isActive) m_create_new_ref = true;
+          // keep to test if creating new ref is working
+          std::cout << "new ref:" << (wasActive?"true":"false") << " + " << (isActive?"true":"false") << " ==> " << (m_create_new_ref?"true":"false") << "\n";
+          insertIntoReceived(msg);
+        }
+        else {
+          // substitute previously received message
+          insertIntoReceived(msg);
+        }
+      }
+
+      postGoalToken();
+
+      if (msg_count < 1)
+      {
+        if( m_firstTick ) {
+          m_last_msg = getCurrentTick()-1;
+          m_firstTick = false;
+        }
+        TICK delta = getCurrentTick()-m_last_msg;
+
+
+        if( delta>=m_max_delta ) {
+          if (m_connected)
+            std::cerr <<"Disconnected from DUNE\n";
+
+          syslog(log::warn) << "Disconnected from DUNE";
+          m_connected = false;
+        } else {
+          syslog(log::warn)<<"No message received from DUNE for "
+              <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
+        }
+
+      }
+
+      else
+      {
+        if (!m_connected)
+          std::cerr <<"Now connected to DUNE\n";
+        m_connected = true;
+        m_last_msg = getCurrentTick();
+      }
+    }
+    catch (std::runtime_error& e)
+    {
+      syslog(log::error) << "Error during message processing: " << e.what();
+      std::cerr << e.what();
+    }
+  }
     
     bool
     Platform::synchronize()
@@ -368,6 +397,8 @@ namespace TREX
             }
             break;
           case TrexAttribute::TYPE_ENUM:
+            // <enum value="square"/>
+            ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
             ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
             break;
           default:
@@ -383,14 +414,13 @@ namespace TREX
       std::cerr << "Received goal:\n" << ss.str();
       
       receivedGoals.push(ss.str());
+
+
     }
     
     void
     Platform::processState()
     {
-      
-      bool createNewReference = false;
-      
       // if DUNE is disconnected everything is on initial (unknown / boot) state...
       if (!m_connected)
       {
@@ -400,8 +430,7 @@ namespace TREX
       PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
-      if (pcstate != NULL)
-      {
+      if (pcstate != NULL){
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING) && pcstate->plan_id == "trex_plan";
       }
       
@@ -433,26 +462,26 @@ namespace TREX
         postUniqueObservation(obs);
       }
       
-      if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
+      /*if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
         createNewReference = true;
       
       if (m_ref.flags == 0)
-        createNewReference = true;
+        createNewReference = true;*/
       
-      if (createNewReference && estate != NULL)
+      if (m_create_new_ref && estate != NULL)
       {
         // idle
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
+        m_create_new_ref = false;
       }
       
       // Send current reference to DUNE
-      if (!m_blocked)
+      if (!m_blocked  && estate != NULL)
       {
-        sendMsg(m_ref);
-        syslog(log::info)<< "Sending reference";
+        sendMsg(m_ref );
         //m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
@@ -811,5 +840,4 @@ namespace TREX
     }
   }
 }
-
 
