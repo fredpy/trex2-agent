@@ -146,7 +146,7 @@ TimelineProxy::synchronize()
   //std::cout << "I'm here" << std::endl;
 
   Message * msg;
-  while ((msg = m_adapter.poll(0, false)) != NULL)
+  while ((msg = m_adapter.poll()) != NULL)
   {
     if (msg->getId() == TrexOperation::getIdStatic())
     {

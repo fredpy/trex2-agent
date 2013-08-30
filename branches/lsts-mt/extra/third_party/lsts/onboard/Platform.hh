@@ -18,6 +18,7 @@
 # include <trex/domain/StringDomain.hh>
 # include <trex/domain/BooleanDomain.hh>
 # include <trex/domain/EnumDomain.hh>
+# include <boost/thread/thread.hpp>
 
 # include <DUNE/DUNE.hpp>
 # include <DUNE/Math/Angles.hpp>
@@ -28,6 +29,7 @@
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
+
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
