@@ -1,0 +1,371 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ * 
+ *  Copyright (c) 2013, MBARI.
+ *  All rights reserved.
+ * 
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the TREX Project nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+class DrifterFollow;
+
+
+/** Subjacent controller for drifter following surveys
+ *
+ * this class embeds all the actions and intermediate prediactes
+ * used by the reactor in order to transform a high level Survey
+ * goal from DrifterFollow agent timeline into simple Navigation 
+ * waypoints (At)
+ */
+class DrifterController {
+    // The DrifterFollow timeline which created this instance
+    DrifterFollow command;
+
+    /* High level survey action 
+     *
+     * effect: complete the survey
+     * condition: reach the final waypoint of the survey path
+     *
+     * set up the survey and create the last waypoint which trigger 
+     * planning of the reast of the survey path
+     */
+    action EndSurvey {}
+
+    /* survey segment iteration
+     *
+     * effect reach a waypoint of the path
+     * condition reach previous waypoint of the path
+     *
+     * this action unroll the path up to the iniial waypoint
+     */
+    action DoSegment {
+	int count; // number of the segment
+	count > 0;
+    }
+
+    /* go to initial waypoint
+     *
+     * effect    reach the first waypoint
+     * condition Navigation is At the location of our waypoint
+     * 
+     * this action allow to go to the initial waypoint of our survey
+     */
+    action DoInitial {}
+
+    /* A waypoint
+     *
+     * This predciat is used as intermediate information for the 
+     * waypoints to be done during a survey. It iscreated and manipulated 
+     * by the actions of this class for the planner to keep track of the 
+     * waypoints it will have to reach and their sequence.
+     */
+    predicate Waypoint {
+	int             path_id; // identifer of the wurvey
+	int             wp_num;  // waypoint number
+	PathList        full_path, // full path of the survey
+	    completed, // path this waypoint will complete = (loc . to_complete)
+	    to_complete;  // path to be completed before this waypoint
+	LagrangianPoint loc; // location this waypoint want to reach
+			     // in lagrangian space
+	
+	float           ref_lat, ref_lon; // Location used as space reference
+	float           shift_x, shift_y; // displacement from reference
+	float           cos_a, sin_a;     // roatation 
+	float           lat, lon;         // resulting waypoint location
+
+	int completion_date;              // ewhen didthis waypoint was reached
+					  // by Navigation. This is used as
+					  // information to send only one At at
+					  // time and avoid to overflow Navigation
+					  // with all the waypoints at once
+	car(loc,         completed);
+	cdr(to_complete, completed);
+	duration == 1;
+	completion_date <= start;
+	wp_num > 0; 
+    }
+
+    DrifterController(DrifterFollow cmd) {
+	command = cmd;
+    }
+}
+
+/* A counter/id generator
+ *
+ * This timeline is used to generate unique ids for Surveys
+ * it increments a counter every time a new token is created resulting on 
+ * an unique id which is used by DrifterFollow timeline
+ */
+class Counter extends Timeline {
+
+    predicate Holds {
+	int id;
+	0 <= id;
+    }
+
+    Counter() {}
+}
+
+/* High level drifter follow class
+ *
+ * This class is the main interface of the drifter follow reactor. 
+ * It allows to trabnsform Survey goals received on a full survey 
+ * execution.
+ */
+class DrifterFollow extends AgentTimeline {
+    DrifterController controller;
+    Counter           counter;
+
+    predicate Inactive {}
+
+    predicate DoSurvey {
+	int id;
+	int waypoints;
+
+	PathList path;
+	float    size;
+	bool     lagrangian;
+
+	float center_lat, center_lon;
+	float speed, _speed_2;
+	float cos_angle, sin_angle;
+    }
+    predicate Survey {
+	float    center_lat, center_lon;
+	float    speed_north, speed_east, u, v;
+	// The rotation angle to apply to the survey when speed is 0 
+	float    heading, heading_deg;
+	PathList path;
+	float    size;
+	bool     lagrangian, _bind_lagrangian;
+
+	heading == to_rad(heading_deg);
+	lagrangian == _bind_lagrangian;
+
+	speed_east  == v;
+	speed_north == u;
+
+	duration==1;
+    }
+
+    DrifterFollow(Mode _mode) {
+	super(_mode, "Inactive");
+	controller = new DrifterController(this);
+	counter = new Counter();
+    }
+}
+
+Counter::Holds {
+    id == start;
+}
+
+DrifterFollow::Inactive {
+    Counter cpt = object.counter;
+    starts(cpt.Holds cur);
+}
+
+DrifterFollow::DoSurvey {
+    Counter cpt = object.counter;
+    contained_by(cpt.Holds cur);
+    id == cur.id;
+}
+
+DrifterController::EndSurvey {
+    DrifterFollow me = object.command;
+    Counter cpt = me.counter;
+
+    equals(effect me.Survey survey);
+    float _bind_u_2, _bind_v_2, _bind_heading;
+    
+    abs(survey.u) == sqrt(_bind_u_2);
+    abs(survey.v) == sqrt(_bind_v_2);
+    survey.heading == _bind_heading;
+
+
+    ends(cpt.Holds cur);
+    met_by(me.DoSurvey exec);
+    exec.id == cur.id;
+    exec.path == survey.path;
+    exec.size == survey.size;
+    exec.center_lat == survey.center_lat;
+    exec.center_lon == survey.center_lon;
+    exec.lagrangian == survey.lagrangian;
+    exec._speed_2 == _bind_u_2+_bind_v_2;
+    exec.speed == sqrt(exec._speed_2);
+   
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
+    _bind_u_2 < vc._hspeed_2;
+    _bind_v_2 < vc._hspeed_2;
+
+    if( 0.0==exec.speed ) {
+	exec.cos_angle == cos(survey.heading_deg);
+	exec.sin_angle == sin(survey.heading_deg);
+    } else {
+	exec.cos_angle * exec.speed == survey.speed_north;
+	exec.sin_angle * exec.speed == survey.speed_east;
+    }
+
+    equals(condition Waypoint last_wp);
+    last_wp.path_id == cur.id;
+    last_wp.full_path == exec.path;
+    last_wp.completed == exec.path;
+    last_wp.wp_num == exec.waypoints;
+
+    exec.cos_angle == last_wp.cos_a;
+    exec.sin_angle == last_wp.sin_a;
+
+}
+
+DrifterController::Waypoint {
+    DrifterFollow me = object.command;
+    Counter cpt = me.counter;
+    contained_by(cpt.Holds count);
+    path_id == count.id;
+
+    float shift_n, shift_e;
+    shift_e == (shift_x * cos_a) + (shift_y * sin_a);
+    shift_n == (shift_y * cos_a) - (shift_x * sin_a);
+    
+    wgsdisplace(ref_lat, ref_lon, shift_n, shift_e, lat, lon);
+}
+
+DrifterController::DoSegment {
+    DrifterFollow me = object.command;
+    Counter cpt = me.counter;
+    
+    meets(effect Waypoint to);
+    false == empty(to.to_complete);
+    to.wp_num == count + 1;
+
+    contained_by(me.DoSurvey exec);
+    exec.id == to.path_id;
+    exec.path == to.full_path;
+    exec.cos_angle == to.cos_a;
+    exec.sin_angle == to.sin_a;
+    exec.waypoints > count;
+
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
+    
+    starts(condition Waypoint from);
+    from.path_id == to.path_id;
+    from.full_path == to.full_path;
+    from.completed == to.to_complete;
+    from.lat == to.ref_lat;
+    from.lon == to.ref_lon;
+    from.wp_num == count;
+    from.completion_date <= to.completion_date;
+    exec.cos_angle == from.cos_a;
+    exec.sin_angle == from.sin_a;
+
+    float dx, dy, delta_y;
+    
+    from.loc.x + dx == to.loc.x; 
+    to.shift_x == dx * exec.size;
+    from.loc.y + dy == to.loc.y; 
+    delta_y == dy * exec.size;
+
+    float drift;
+    drift >= 0.0;
+    to.shift_y == delta_y + drift;
+
+    if( exec.lagrangian==false ) {
+	drift == 0.0;
+    } else {
+
+	float dspeed_2, px_2, py_2;
+	
+	dspeed_2 == exec._speed_2 + vc._hspeed_2;
+	abs(to.shift_x) == sqrt(px_2);
+	abs(delta_y) == sqrt(py_2);
+	
+	float vx_2, vy_2, sq_root, upper_frac, vy, main_sum;
+	vx_2 == vc._hspeed_2 * px_2;
+	vy_2 == vc._hspeed_2 * py_2;
+
+	vy == exec.speed * delta_y;
+	main_sum == sqrt(vx_2 + vy_2) + vy;
+	drift * dspeed_2 == exec.speed * main_sum;
+    }
+
+    // Finally send the next At when the previous one did complete
+    if( from.completion_date <= AGENT_CLOCK ) {
+	// I will assume that from are to are far enough to require a waypoint
+	meets(condition Navigator.At dest);
+	dest.latitude == to.lat;
+	dest.longitude == to.lon;
+	dest.speed == vc.speed;
+	dest.secs == 0;
+	dest.z == 0.0; // go at the surface
+	to.completion_date == dest.start;
+   }
+}
+
+DrifterController::DoInitial {
+    DrifterFollow me = object.command;
+    Counter cpt = me.counter;
+
+    meets(effect Waypoint to);
+    true == empty(to.to_complete);
+    to.wp_num == 1; // This is the first waypoint
+
+    meets(me.DoSurvey exec);
+    exec.id == to.path_id;
+    exec.path == to.full_path;
+    exec.center_lat == to.ref_lat;
+    exec.center_lon == to.ref_lon;
+    exec.cos_angle == to.cos_a;
+    exec.sin_angle == to.sin_a;
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
+
+    float x, y;
+
+    to.shift_x == to.loc.x * exec.size;
+    to.shift_y == to.loc.y * exec.size;
+
+    // Check that I can start 
+    contained_by(cpt.Holds cur);
+    if( cur.start<= AGENT_CLOCK ) {
+	// contained_by was often resulting on weird mergeing with previous waypoint
+	// instead we replace it by a meets that ewill force the vehicle to get there 
+	// even if it is already there
+	// contained_by(condition Navigator.At dest);
+	meets(condition Navigator.At dest);
+	dest.latitude == to.lat;
+	dest.longitude == to.lon;
+	dest.speed == vc.speed;
+	dest.z == 0.0; 	// Go at the sruface
+	//dest.maxz == vc.max_z; 	// yoyo
+	dest.secs == 0;//60; 		// stay at surface for 1 min
+	//dest.z == 0;			// end at surface
+	to.completion_date == dest.start;
+    }
+}
+
+
