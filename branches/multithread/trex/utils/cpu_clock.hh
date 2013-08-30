@@ -100,7 +100,7 @@ namespace boost {
         { 'P', 'r', 'o', 'c', 'e', 's', 's', '_', 'c', 'p', 'u',  '_', 'c', 'l', 'o', 'c', 'k' };
         static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
         return str;
-      }
+      }
       /** @brief Clock epoch */
       static std::basic_string<CharT> since() {
         static const CharT u[] =
