@@ -121,11 +121,6 @@ namespace boost {
    * handling a boost shared_ptr would not handle a std::shared_ptr. It also 
    * impact the ability to uses std::shared_ptr into boost.python
    *
-   * @note While this direct specialization appears to work at least on
-   * with boost 1.46.1, I am not sure if boost did eventually do that for
-   * more recent versions of boost in which case this specialization would
-   * generate a conflict
-   *
    * @author Frederic Py
    */
   template<typename Ty>
