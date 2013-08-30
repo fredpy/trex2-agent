@@ -235,6 +235,7 @@ SpotterController::DoInitial {
 
     // Check that I can start 
     contained_by(cpt.Holds cur);
+    exec.id == cur.id;
     if( cur.start<= AGENT_CLOCK ) {
 		contained_by(condition Navigator.At dest);//using starts gives the 'constraintConsistent() is false' exception, so I'm going with relaxing the DoSurvey further
 		dest.latitude == to.lat;

@@ -37,6 +37,7 @@ NavActions::DoGoing {
 
     contained_by(OperationalLimits.Limits limits);
     ends(condition Navigator.Going go);
+    go.start <= start;
     
     if (go.z > 0.0) {
 	go.z < limits.max_depth;
