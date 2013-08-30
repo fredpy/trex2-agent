@@ -51,6 +51,7 @@ add_library(LSTSshared SHARED
 
 
 check_library_exists(rt clock_gettime "" LIB_RT)
+message(STATUS "Checking for clock_gettime in librt: ${LIBRT}")
 
 if(LIB_RT)
   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.c
@@ -71,11 +72,10 @@ int main(int argc, char **argv) {
   else(NOT HAS_CLOCK_MONOTONIC_RAW)
     set(RAW_CLK_LIB rt)
   endif(NOT HAS_CLOCK_MONOTONIC_RAW)
+  message(STATUS "Checking for clock_gettime(CLOCK_MONOTONIC_RAW ...): ${HAS_CLOCK_MONOTONIC_RAW}")
 else(LIB_RT)
   set(HAS_CLOCK_MONOTONIC_RAW FALSE)
 endif(LIB_RT)
-
-message(STATUS "Checking for clock_gettime(CLOCK_MONOTONIC_RAW ...): ${HAS_CLOCK_MONOTONIC_RAW}")
 
 configure_file(raw_clock.hh.in ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.hh)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
