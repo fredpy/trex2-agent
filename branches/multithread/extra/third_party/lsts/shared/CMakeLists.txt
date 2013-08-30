@@ -52,7 +52,7 @@ add_library(LSTSshared SHARED
 
 
 check_library_exists(rt clock_gettime "" LIB_RT)
-message(STATUS "Checking for clock_gettime in librt: $LIBRT)
+message(STATUS "Checking for clock_gettime in librt: ${LIB_RT}")
 
 if(LIB_RT)
   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.c
