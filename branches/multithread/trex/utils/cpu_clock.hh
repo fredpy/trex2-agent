@@ -84,7 +84,10 @@ namespace TREX {
   }
 }
 
-# ifndef CPP11_HAS_CHRONO
+# if !defined(CPP11_HAS_CHRONO) && !defined(DOXYGEN)
+// If we do not use c++11 std::chrono then we use boost:
+//   boost extends chrono clocks with the clock_string traits
+//   which allow user to print details on the clock in human readable text
 
 namespace boost {
   namespace chrono {
@@ -97,7 +100,7 @@ namespace boost {
         { 'P', 'r', 'o', 'c', 'e', 's', 's', '_', 'c', 'p', 'u',  '_', 'c', 'l', 'o', 'c', 'k' };
         static const std::basic_string<CharT> str(u, u + sizeof(u) / sizeof(u[0]));
         return str;
-      }
+      }
       /** @brief Clock epoch */
       static std::basic_string<CharT> since() {
         static const CharT u[] =
@@ -110,6 +113,6 @@ namespace boost {
   }
 }
 
-# endif // CPP11_HAS_CHRONO
+# endif // !CPP11_HAS_CHRONO && !DOXYGEN
 
 #endif // H_trex_utils_cpu_clock
