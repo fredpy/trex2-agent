@@ -645,7 +645,8 @@ RECURSIVE              = YES
 
 EXCLUDE                = .svn/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/ \
-                         @CMAKE_CURRENT_SOURCE_DIR@/log/ 
+                         @CMAKE_CURRENT_SOURCE_DIR@/log/ \
+			 @CMAKE_CURRENT_SOURCE_DIR@/cmake/
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
