@@ -748,7 +748,8 @@ void Agent::initComplete() {
   // Check for missing timelines
   for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) {
     boost::function<bool ()> 
-      is_owned = boost::bind(&details::timeline::owned, *it);
+      is_owned = boost::bind(&TREX::transaction::details::timeline::owned,
+			     *it);
 
     if( !TREX::utils::strand_run(strand(), is_owned) )
       syslog(null, warn)<<"Timeline \""<<(*it)->name()
