@@ -10,7 +10,7 @@
 namespace TREX {
   namespace LSTS {
 
-    void receiverThread(int port, std::queue<Message *> *inbox)
+    void receiverThread(int port, std::queue<Message *> *inbox, Concurrency::Mutex * mutex)
     {
       UDPSocket sock;
       IOMultiplexing iom;
@@ -26,52 +26,62 @@ namespace TREX {
           Address addr;
           uint16_t rv = sock.read((char*)bfr, 65535, &addr);
           IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
+          mutex->lock();
           inbox->push(msg);
+          mutex->unlock();
         }
       }
     }
 
-    void senderThread(std::queue<SendRequest> *outbox)
+    void senderThread(std::queue<SendRequest> *outbox, Concurrency::Mutex * mutex)
     {
       UDPSocket sock;
       while (true)
       {
-        if (outbox->empty())
-        {
-          boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-          continue;
-        }
-        SendRequest req = outbox->front();
-        outbox->pop();
+        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 
-        std::cout << req.msg << std::endl;
-        DUNE::Utils::ByteBuffer bb;
-        try
-        {
-          IMC::Packet::serialize(req.msg, bb);
+        mutex->lock();
+        bool empty = outbox->empty();
+        mutex->unlock();
 
-          sock.write((const char*)bb.getBuffer(), (req.msg)->getSerializationSize(),
-                     Address(req.addr.c_str()), req.port);
-        }
-        catch (std::runtime_error& e)
+        if (!empty)
         {
-          std::cerr << "ERROR: " << ": " << e.what() << "\n";
+          mutex->lock();
+          SendRequest req = outbox->front();
+          outbox->pop();
+          mutex->unlock();
+
+          //std::cout << req.msg << std::endl;
+          //std::cout << (req.msg)->getSerializationSize() << std::endl;
+          DUNE::Utils::ByteBuffer bb;
+          try
+          {
+            IMC::Packet::serialize(req.msg, bb);
+
+            sock.write((const char*)bb.getBuffer(), (req.msg)->getSerializationSize(),
+                       Address(req.addr.c_str()), req.port);
+
+            delete req.msg;
+          }
+          catch (std::runtime_error& e)
+          {
+            std::cerr << "ERROR: " << ": " << e.what() << "\n";
+          }
         }
-        delete req.msg;
       }
     }
 
     ImcMessenger::ImcMessenger()
     {
       receiver = NULL;
-      sender = new boost::thread(senderThread, &outbox);
+      sender = new boost::thread(senderThread, &outbox, &send_mutex);
     }
 
     void
     ImcMessenger::startListening(int bindPort)
     {
       stopListening();
-      receiver = new boost::thread(receiverThread, bindPort, &inbox);
+      receiver = new boost::thread(receiverThread, bindPort, &inbox, &receive_mutex);
       std::cout << "listening for messages on " << bindPort << std::endl;
     }
 
@@ -85,7 +95,11 @@ namespace TREX {
     bool
     ImcMessenger::inboxEmpty()
     {
-      return inbox.empty();
+      bool empty = false;
+      receive_mutex.lock();
+      empty = inbox.empty();
+      receive_mutex.unlock();
+      return empty;
     }
 
 
@@ -93,11 +107,13 @@ namespace TREX {
     ImcMessenger::receive()
     {
       Message * ret = NULL;
+      receive_mutex.lock();
       if (!inbox.empty())
       {
         ret = inbox.front();
         inbox.pop();
       }
+      receive_mutex.unlock();
       return ret;
     }
 
@@ -105,10 +121,12 @@ namespace TREX {
     ImcMessenger::post(Message * msg, int port, std::string addr)
     {
       SendRequest req;
-      req.msg = msg;
+      req.msg = msg->clone();
       req.port = port;
       req.addr = addr;
+      send_mutex.lock();
       outbox.push(req);
+      send_mutex.unlock();
     }
 
     ImcMessenger::~ImcMessenger()

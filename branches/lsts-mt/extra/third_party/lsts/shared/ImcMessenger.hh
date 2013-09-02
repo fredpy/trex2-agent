@@ -54,6 +54,7 @@ namespace TREX {
       boost::thread * receiver, * sender;
       std::queue<Message *> inbox;
       std::queue<SendRequest> outbox;
+      Concurrency::Mutex send_mutex, receive_mutex;
     };
   }
 }

@@ -148,7 +148,7 @@ namespace TREX
         
         IMC::Message * msg;
         
-        while ((msg = m_adapter.poll(0, false)) != NULL)
+        while ((msg = m_adapter.poll()) != NULL)
         {
           msg_count++;
           if (remote_id == 0)
@@ -472,8 +472,8 @@ namespace TREX
       // Operational limits are sent by DUNE on request
       if (oplims == NULL)
       {
-        GetOperationalLimits req;
-        sendMsg(req);
+        GetOperationalLimits getLimits;
+        sendMsg(getLimits);
       }
     }
     
