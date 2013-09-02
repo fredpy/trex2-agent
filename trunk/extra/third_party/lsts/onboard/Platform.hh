@@ -134,7 +134,7 @@ namespace TREX {
       std::queue<Observation> referenceObservations;
 
       IMC::Reference goingRef;
-      bool m_create_new_ref;
+      bool m_reference_initialized;
 
       boost::function<bool (goal_id)> m_going_platform;
 

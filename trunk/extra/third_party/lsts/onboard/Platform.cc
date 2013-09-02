@@ -46,7 +46,7 @@ namespace TREX
     } // Hide this crap from outside this file ....
     
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-    LstsReactor(arg), m_create_new_ref(false)
+    LstsReactor(arg), m_reference_initialized(false)
     {
       m_firstTick = true;
       m_blocked = false;
@@ -198,18 +198,20 @@ namespace TREX
           TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
           handleTrexOperation(*command);
         }
-        else if (msg->getId() == PlanControlState::getIdStatic())
+        /*else if (msg->getId() == PlanControlState::getIdStatic())
         {
           ///////////////////////////////////
           PlanControlState * previous_pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
           PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(msg);
-          bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
+          /*bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
           bool isActive = isActiveInPlanControlStateMsg(pcstate);
-          if(wasActive!=isActive) m_create_new_ref = true;
+          if(wasActive!=isActive) m_create_new_ref = true;*//*
           // keep to test if creating new ref is working
-          std::cout << "new ref:" << (wasActive?"true":"false") << " + " << (isActive?"true":"false") << " ==> " << (m_create_new_ref?"true":"false") << "\n";
+          if(isActiveInPlanControlStateMsg(pcstate) && !m_create_new_ref)
+            //std::cout << "new ref:" << (wasActive?"true":"false") << " + " << (isActive?"true":"false") << " ==> " << (m_create_new_ref?"true":"false") << "\n";
+            std::cout << "create new reference \n";
           insertIntoReceived(msg);
-        }
+        }*/
         else {
           // substitute previously received message
           insertIntoReceived(msg);
@@ -468,14 +470,14 @@ namespace TREX
       if (m_ref.flags == 0)
         createNewReference = true;*/
       
-      if (m_create_new_ref && estate != NULL)
+      if (!m_reference_initialized && estate != NULL && isActiveInPlanControlStateMsg(pcstate))
       {
         // idle
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
-        m_create_new_ref = false;
+        m_reference_initialized = true;
       }
       
       // Send current reference to DUNE
@@ -486,7 +488,8 @@ namespace TREX
         //m_ref.toText(std::cout);
       }
       
-      if (atDestination(frefstate)) {
+      if (!m_blocked && atDestination(frefstate)) {
+        std::cout << "Reference.At \n";
         Observation obs("reference", "At");
         obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
         obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
