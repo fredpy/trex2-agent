@@ -9,18 +9,18 @@
 
 namespace
 {
-  
+
   /** @brief TREX log entry point */
   SingletonUse<LogManager> s_log;
-  
+
   /** @brief Platform reactor declaration */
   TeleoReactor::xml_factory::declare<TREX::LSTS::Platform> decl("Platform");
-  
+
 }
 
 namespace TREX
 {
-  
+
   /** @brief Plug-in initialization
    *
    * This function is called by TREX after loading the plug-in.
@@ -33,10 +33,10 @@ namespace TREX
   {
     ::s_log->syslog("plugin.platform", log::info) << "Platform loaded.";
   }
-  
+
   namespace LSTS
   {
-    
+
     namespace {
       // bool was_idle = false; //< unused variable
       int remote_id = 0;
@@ -44,17 +44,17 @@ namespace TREX
       ImcAdapter m_adapter;
       Reference m_ref;
     } // Hide this crap from outside this file ....
-    
+
     Platform::Platform(TeleoReactor::xml_arg_type arg) :
-    LstsReactor(arg), m_reference_initialized(false)
+        LstsReactor(arg), m_reference_initialized(false)
     {
       m_firstTick = true;
       m_blocked = false;
       m_connected = true;
-      
+
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
-      
+
       duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
                                  "duneport");
       duneip = parse_attr<std::string>("127.0.0.1",
@@ -65,17 +65,17 @@ namespace TREX
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
       //m_links = std::map<std::string, Announce*>();
-      
+
       // Timelines for posting observations from DUNE
       provide("estate", false);
       provide("medium", false);
       provide("control", false);
       provide("oplimits", false);
       provide("refstate", false);
-      
+
       // Timelines that can be controlled by other reactors
       provide("reference");
-      
+
       bool is_uav = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                      "uav");
       if( is_uav ) {
@@ -88,9 +88,9 @@ namespace TREX
         m_going_platform = boost::bind(&Platform::goingAUV, this, _1);
         m_max_delta = 1;
       }
-      
+
     }
-    
+
     void
     Platform::handleInit()
     {
@@ -101,13 +101,13 @@ namespace TREX
     }
 
 
-  bool Platform::isActiveInPlanControlStateMsg(
-      PlanControlState* previous_pcstate)
-  {
-    return previous_pcstate != NULL
-        && (previous_pcstate->state == PlanControlState::PCS_EXECUTING
-            && previous_pcstate->plan_id == "trex_plan");
-  }
+    bool Platform::isActiveInPlanControlStateMsg(
+        PlanControlState* previous_pcstate)
+    {
+      return previous_pcstate != NULL
+          && (previous_pcstate->state == PlanControlState::PCS_EXECUTING
+              && previous_pcstate->plan_id == "trex_plan");
+    }
 
     /**
      * @param msg received
@@ -118,87 +118,86 @@ namespace TREX
     {
       // substitute previously received message
       if (received.count(msg->getId()))
-        received.erase(msg->getId());
-
+        delete received[msg->getId()];
       received[msg->getId()] = msg;
     }
 
 
 
 
-  void
-  Platform::handleTickStart()
-  {
-
-    // Do not process goals if you still have observations to post
-    //if( referenceObservations.empty() ) {
-    // First deal with requests
-    if( !m_blocked && !m_goals_pending.empty() )
+    void
+    Platform::handleTickStart()
     {
-      goal_id goal = m_goals_pending.front();
-      std::string gname = (goal->object()).str();
-      std::string gpred = (goal->predicate()).str();
-      std::string man_name;
 
-      if( "reference"==gname )
+      // Do not process goals if you still have observations to post
+      //if( referenceObservations.empty() ) {
+      // First deal with requests
+      if( !m_blocked && !m_goals_pending.empty() )
       {
-        syslog(log::info)<<"Processing next goal on reference ";
-        if( "Going"==gpred && handleGoingRequest(goal) )
+        goal_id goal = m_goals_pending.front();
+        std::string gname = (goal->object()).str();
+        std::string gpred = (goal->predicate()).str();
+        std::string man_name;
+
+        if( "reference"==gname )
         {
-          sendMsg(goingRef); // send the command now !!!
-          m_goals_pending.remove(goal);
-          referenceObservations.push(*goal); // schedule this guy
-          // as an observation
-        }
-        else if( "At"==gpred && handleAtRequest(goal) )
-        {
-          // just convert the pending goal into an observation
-          m_goals_pending.remove(goal);
-          referenceObservations.push(*goal);
+          syslog(log::info)<<"Processing next goal on reference ";
+          if( "Going"==gpred && handleGoingRequest(goal) )
+          {
+            sendMsg(goingRef); // send the command now !!!
+            m_goals_pending.remove(goal);
+            referenceObservations.push(*goal); // schedule this guy
+            // as an observation
+          }
+          else if( "At"==gpred && handleAtRequest(goal) )
+          {
+            // just convert the pending goal into an observation
+            m_goals_pending.remove(goal);
+            referenceObservations.push(*goal);
+          }
         }
       }
-    }
-    //}
+      //}
 
-    // Now that we dealt with goal processing and command sending
-    // just look if any observation need to be posted
+      // Now that we dealt with goal processing and command sending
+      // just look if any observation need to be posted
 
-    if(!referenceObservations.empty())
-    {
-      postUniqueObservation(referenceObservations.front());
-      referenceObservations.pop();
-    }
-
-
-
-    Announce * ann;
-    try
-    {
-      Address addr;
-      int msg_count = 0;
-
-      IMC::Message * msg;
-
-      while ((msg = m_adapter.poll(0, false)) != NULL)
+      if(!referenceObservations.empty())
       {
-        msg_count++;
-        if (remote_id == 0)
-          remote_id = msg->getSource();
+        postUniqueObservation(referenceObservations.front());
+        referenceObservations.pop();
+      }
 
-        if (msg->getId() == Announce::getIdStatic())
-        {
-          ann = (Announce *) dynamic_cast<Announce *>(msg);
 
-          if (m_receivedAnnounces[ann->sys_name] != NULL)
-            delete m_receivedAnnounces[ann->sys_name];
-          m_receivedAnnounces[ann->sys_name] = ann;
-        }
-        else if (msg->getId() == TrexOperation::getIdStatic())
+
+      Announce * ann;
+      try
+      {
+        Address addr;
+        int msg_count = 0;
+
+        IMC::Message * msg;
+
+        while ((msg = m_adapter.poll()) != NULL)
         {
-          TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
-          handleTrexOperation(*command);
-        }
-        /*else if (msg->getId() == PlanControlState::getIdStatic())
+          msg_count++;
+          if (remote_id == 0)
+            remote_id = msg->getSource();
+
+          if (msg->getId() == Announce::getIdStatic())
+          {
+            ann = (Announce *) dynamic_cast<Announce *>(msg);
+
+            if (m_receivedAnnounces[ann->sys_name] != NULL)
+              delete m_receivedAnnounces[ann->sys_name];
+            m_receivedAnnounces[ann->sys_name] = ann;
+          }
+          else if (msg->getId() == TrexOperation::getIdStatic())
+          {
+            TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
+            handleTrexOperation(*command);
+          }
+          /*else if (msg->getId() == PlanControlState::getIdStatic())
         {
           ///////////////////////////////////
           PlanControlState * previous_pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
@@ -212,51 +211,51 @@ namespace TREX
             std::cout << "create new reference \n";
           insertIntoReceived(msg);
         }*/
-        else {
-          // substitute previously received message
-          insertIntoReceived(msg);
+          else {
+            // substitute previously received message
+            insertIntoReceived(msg);
+          }
+        }
+
+        postGoalToken();
+
+        if (msg_count < 1)
+        {
+          if( m_firstTick ) {
+            m_last_msg = getCurrentTick()-1;
+            m_firstTick = false;
+          }
+          TICK delta = getCurrentTick()-m_last_msg;
+
+
+          if( delta>=m_max_delta ) {
+            if (m_connected)
+              std::cerr <<"Disconnected from DUNE\n";
+
+            syslog(log::warn) << "Disconnected from DUNE";
+            m_connected = false;
+          } else {
+            syslog(log::warn)<<"No message received from DUNE for "
+                <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
+          }
+
+        }
+
+        else
+        {
+          if (!m_connected)
+            std::cerr <<"Now connected to DUNE\n";
+          m_connected = true;
+          m_last_msg = getCurrentTick();
         }
       }
-
-      postGoalToken();
-
-      if (msg_count < 1)
+      catch (std::runtime_error& e)
       {
-        if( m_firstTick ) {
-          m_last_msg = getCurrentTick()-1;
-          m_firstTick = false;
-        }
-        TICK delta = getCurrentTick()-m_last_msg;
-
-
-        if( delta>=m_max_delta ) {
-          if (m_connected)
-            std::cerr <<"Disconnected from DUNE\n";
-
-          syslog(log::warn) << "Disconnected from DUNE";
-          m_connected = false;
-        } else {
-          syslog(log::warn)<<"No message received from DUNE for "
-              <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
-        }
-
-      }
-
-      else
-      {
-        if (!m_connected)
-          std::cerr <<"Now connected to DUNE\n";
-        m_connected = true;
-        m_last_msg = getCurrentTick();
+        syslog(log::error) << "Error during message processing: " << e.what();
+        std::cerr << e.what();
       }
     }
-    catch (std::runtime_error& e)
-    {
-      syslog(log::error) << "Error during message processing: " << e.what();
-      std::cerr << e.what();
-    }
-  }
-    
+
     bool
     Platform::synchronize()
     {
@@ -265,40 +264,40 @@ namespace TREX
       sendMsg(hb);
       return true;
     }
-    
-    
-    
+
+
+
     void
     Platform::handleRequest(goal_id const &g)
     {
-      
+
       goal_id goal = g;
-      
+
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
-      
+
       syslog(log::info)  << "handleRequest(" << gpred << ")" << std::endl;
-      
+
       m_goals_pending.push_back(g);
     }
-    
+
     void
     Platform::handleRecall(goal_id const &g)
     {
-       goal_id goal = g;
-      
+      goal_id goal = g;
+
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
       std::cerr << "handleRecall(" << g << ", " << *goal << ")" << std::endl;
-      
+
       m_goals_pending.remove(g);
-      
+
       if (gname == "reference" && gpred == "Going")
         handleGoingRecall(g);
     }
-    
+
     void
     Platform::handleTrexOperation(TrexOperation trexOp)
     {
@@ -311,9 +310,9 @@ namespace TREX
           postObservationToken(TrexToken(*trexOp.token.get()));
           break;
       }
-      
+
     }
-    
+
     void
     Platform::postObservationToken(TrexToken token)
     {
@@ -326,35 +325,35 @@ namespace TREX
       //std::cerr << "Posting observation: " << obs << "\n";
       //postUniqueObservation(obs);
     }
-    
+
     void Platform::postGoalToken() {
       if(receivedGoals.empty()) return;
       syslog(log::info) << "Posting " << receivedGoals.front();
       if (m_env->getControlInterfaceReactor() != NULL) {
         m_env->getControlInterfaceReactor()->proccess_message(
-                                                              receivedGoals.front());
+            receivedGoals.front());
         receivedGoals.pop();
       } else {
         std::cerr << "ControlInterface not instantiated!\n";
       }
     }
-    
+
     namespace {
       struct LocaleBool {
-          bool data;
-          LocaleBool() {}
-          LocaleBool( bool data ) : data(data) {}
-          operator bool() const { return data; }
+        bool data;
+        LocaleBool() {}
+        LocaleBool( bool data ) : data(data) {}
+        operator bool() const { return data; }
 
         // unused method
-//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
-//              out << std::boolalpha << b.data;
-//              return out;
-//          }
-          friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
-              in >> std::boolalpha >> b.data;
-              return in;
-          }
+        //          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
+        //              out << std::boolalpha << b.data;
+        //              return out;
+        //          }
+        friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
+          in >> std::boolalpha >> b.data;
+          return in;
+        }
       };
 
     }
@@ -365,10 +364,10 @@ namespace TREX
       std::stringstream ss;
       std::string timeline = token.timeline;
       std::string predicate = token.predicate;
-      
+
       ss << "<Goal on='" << token.timeline << "' pred='"
-      << token.predicate << "' id='" << goald_id << "'>\n";
-      
+          << token.predicate << "' id='" << goald_id << "'>\n";
+
       MessageList<TrexAttribute>::const_iterator it;
       for (it = token.attributes.begin(); it != token.attributes.end(); it++)
       {
@@ -388,16 +387,16 @@ namespace TREX
             ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
             break;
           case TrexAttribute::TYPE_BOOL:
-            {
-                bool min_v = boost::lexical_cast<LocaleBool>((*it)->min).data,
-                    max_v = boost::lexical_cast<LocaleBool>((*it)->max).data;
+          {
+            bool min_v = boost::lexical_cast<LocaleBool>((*it)->min).data,
+                max_v = boost::lexical_cast<LocaleBool>((*it)->max).data;
 
-                if (min_v == max_v)
-                  ss << "\t\t<bool value='" << min_v << "'/>\n";
-                else
-                  ss << "\t\t<bool/>\n";
-            }
-            break;
+            if (min_v == max_v)
+              ss << "\t\t<bool value='" << min_v << "'/>\n";
+            else
+              ss << "\t\t<bool/>\n";
+          }
+          break;
           case TrexAttribute::TYPE_ENUM:
             // <enum value="square"/>
             ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
@@ -408,18 +407,18 @@ namespace TREX
             (*it)->toText(std::cerr);
             break;
         }
-        
+
         ss << "\t</Variable>\n";
-        
+
       }
       ss << "\t</Goal>\n";
       std::cerr << "Received goal:\n" << ss.str();
-      
+
       receivedGoals.push(ss.str());
 
 
     }
-    
+
     void
     Platform::processState()
     {
@@ -428,48 +427,48 @@ namespace TREX
       {
         received.clear();
       }
-      
+
       PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
       if (pcstate != NULL){
         m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING) && pcstate->plan_id == "trex_plan";
       }
-      
+
       // Translate incoming messages into observations
       EstimatedState * estate =
-      dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
-      
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+
       // force posting of position observations (duration == 1)
       if (estate != NULL)
         postObservation(m_adapter.estimatedStateObservation(estate));
 
       VehicleMedium * medium =
-      dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
+          dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
-      
+
       FollowRefState * frefstate =
-      dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+          dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
       postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
-      
+
       OperationalLimits * oplims =
-      dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
+          dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
-      
+
       std::map<std::string, Announce *>::iterator it;
-      
+
       for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
       {
         Observation obs = m_adapter.announceObservation(it->second);
         postUniqueObservation(obs);
       }
-      
+
       /*if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
         createNewReference = true;
-      
+
       if (m_ref.flags == 0)
         createNewReference = true;*/
-      
+
       if (!m_reference_initialized && estate != NULL && isActiveInPlanControlStateMsg(pcstate))
       {
         // idle
@@ -479,7 +478,7 @@ namespace TREX
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
         m_reference_initialized = true;
       }
-      
+
       // Send current reference to DUNE
       if (!m_blocked  && estate != NULL)
       {
@@ -487,7 +486,7 @@ namespace TREX
         //m_ref.toText(syslog(log::info));
         //m_ref.toText(std::cout);
       }
-      
+
       if (!m_blocked && atDestination(frefstate)) {
         std::cout << "Reference.At \n";
         Observation obs("reference", "At");
@@ -496,14 +495,14 @@ namespace TREX
         if (!m_ref.z.isNull()) {
           switch (m_ref.z->z_units) {
             case (Z_DEPTH):
-              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-              break;
+                  obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            break;
             case (Z_ALTITUDE):
-              obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
-              break;
+                  obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+            break;
             case (Z_HEIGHT):
-              obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
-              break;
+                  obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            break;
             default:
               break;
           }
@@ -514,20 +513,20 @@ namespace TREX
         //postUniqueObservation(obs);
         referenceObservations.push( obs);
       }
-      
-      
+
+
       // Operational limits are sent by DUNE on request
       if (oplims == NULL)
       {
-        GetOperationalLimits req;
-        sendMsg(req);
+        GetOperationalLimits getLimits;
+        sendMsg(getLimits);
       }
     }
-    
+
     void Platform::handleGoingRecall(goal_id const &g)
     {
       EstimatedState * estate =
-      dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       if (estate != NULL)
       {
         double latitude, longitude;
@@ -559,14 +558,14 @@ namespace TREX
         m_ref.lon = longitude;
       }
     }
-    
+
     bool
     Platform::handleAtRequest(goal_id const &goal)
     {
-      
+
       goal_id g = goal;
       double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
-      
+
       if(g->getAttribute("latitude").domain().isSingleton())
       {
         req_lat = g->getAttribute("latitude").domain().getTypedSingleton<double, true>();
@@ -579,9 +578,9 @@ namespace TREX
       {
         req_z = g->getAttribute("z").domain().getTypedSingleton<double, true>();
       }
-      
+
       EstimatedState * estate =
-      dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+          dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       if (estate != NULL)
       {
         my_lat = estate->lat;
@@ -590,41 +589,41 @@ namespace TREX
           my_z = estate->depth;
         else
           my_z = estate->alt;
-        
+
         WGS84::displace(estate->x, estate->y, &my_lat, &my_lon);
       }
-      
+
       double dist = WGS84::distance(my_lat, my_lon, 0, req_lat, req_lon, 0);
-      
+
       if (dist < 3)
         return true;
       else
         return false;
     }
-    
+
     bool Platform::goingUAV(goal_id g) {
       // double minz, maxz, z;
       // int max_secs_underwater = 30000;
       Variable lat, lon, z, v;
-      
+
       lat = g->getAttribute("latitude");
       lon = g->getAttribute("longitude");
       z = g->getAttribute("z");
-      
+
       if( lat.domain().isSingleton() &&
           lon.domain().isSingleton() &&
-         z.domain().isSingleton() ) {
+          z.domain().isSingleton() ) {
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.flags |= Reference::FLAG_Z;
         m_ref.flags |= Reference::FLAG_SPEED;
         m_ref.lat = lat.domain().getTypedSingleton<double, true>();
         m_ref.lon = lon.domain().getTypedSingleton<double, true>();
-      
+
         DesiredZ desZ;
         desZ.value = z.domain().getTypedSingleton<double, true>();
         desZ.z_units = Z_HEIGHT;
         m_ref.z.set(desZ);
-        
+
         // Deal with the optional attributes
         v = g->getAttribute("radius");
         if (v.domain().isSingleton())
@@ -635,7 +634,7 @@ namespace TREX
         else
         {
           syslog(log::warn)<<"UAV going didn't specifiy radius."
-            "keeping previous one.";
+              "keeping previous one.";
         }
         DesiredSpeed desSpeed;
         desSpeed.value = 20;
@@ -648,17 +647,17 @@ namespace TREX
       else
       {
         syslog(log::warn)<<"Ignored UAV going request dur to some of its "
-        "required parameters not being fixed (id="<<g<<").";
+            "required parameters not being fixed (id="<<g<<").";
         return false;
       }
     }
-    
+
     bool
     Platform::handleYoYoRequest(goal_id const &goal)
     {
       return handleGoingRequest(goal);
     }
-    
+
     bool Platform::goingAUV(goal_id goal) {
 
       syslog(log::info) << "goingAUV: " << goal;
@@ -666,18 +665,18 @@ namespace TREX
 
       goal_id g = goal;
       Variable lat, lon, v;
-      
+
       lat = g->getAttribute("latitude");
       lon = g->getAttribute("longitude");
-      
+
       // Double check that lat and lon are singleton just to be
       // on the safe side
       if( lat.domain().isSingleton() && lon.domain().isSingleton() ) {
-      
+
         int flags = Reference::FLAG_LOCATION;
         m_ref.lat = lat.domain().getTypedSingleton<double, true>();
         m_ref.lon = lon.domain().getTypedSingleton<double, true>();
-      
+
         v = g->getAttribute("z");
         if(v.domain().isSingleton()) {
           double z = v.domain().getTypedSingleton<double, true>();
@@ -710,21 +709,21 @@ namespace TREX
         return false;
       }
     }
-    
+
     bool
     Platform::handleGoingRequest(goal_id const &goal)
     {
       //goingAUV(goal);
       Variable lat, lon;
-      
+
       lat = goal->getAttribute("latitude");
       lon = goal->getAttribute("longitude");
-      
+
       if( lat.domain().isSingleton() &&
           lon.domain().isSingleton() ) {
         syslog(log::info)<<"handling going("<<lat.domain()
-          <<", "<<lon.domain()<<")";
-      
+              <<", "<<lon.domain()<<")";
+
         if( m_going_platform(goal) ) { //method called is set at construction time
           goingRef = m_ref;
           return true;
@@ -734,25 +733,25 @@ namespace TREX
         syslog(log::warn)<<"Going rejected due to lat or lon not being set.";
       return false;
     }
-    
+
     bool
     Platform::atDestination(FollowRefState * frefstate)
     {
       if (frefstate == NULL)
         return false;
-      
+
       if ((frefstate->proximity & FollowRefState::PROX_XY_NEAR) == 0)
         return false;
-      
+
       if ((frefstate->proximity & FollowRefState::PROX_Z_NEAR) == 0)
         return false;
-      
+
       if (!sameReference(&m_ref, frefstate->reference.get()))
         return false;
-      
+
       return true;
     }
-    
+
     bool
     Platform::sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2)
     {
@@ -764,14 +763,14 @@ namespace TREX
         return false;
       if (msg1->radius != msg2->radius)
         return false;
-      
+
       if (msg1->z.isNull() != msg2->z.isNull())
         return false;
       else if (!msg1->z.isNull())
       {
         const IMC::DesiredZ *z1 = msg1->z.get();
         const IMC::DesiredZ *z2 = msg2->z.get();
-        
+
         if (!z1->fieldsEqual(*z2))
           return false;
       }
@@ -781,15 +780,15 @@ namespace TREX
       {
         const IMC::DesiredSpeed *s1 = msg1->speed.get();
         const IMC::DesiredSpeed *s2 = msg2->speed.get();
-        
+
         if (!s1->fieldsEqual(*s2))
           return false;
       }
-      
+
       return true;
     }
-    
-    
+
+
     bool
     Platform::sendMsg(Message& msg, std::string ip, int port)
     {
@@ -797,28 +796,28 @@ namespace TREX
       msg.setSource(TREX_ID);
       return m_adapter.send(&msg, ip, port);
     }
-    
+
     bool
     Platform::sendMsg(Message& msg)
     {
       return sendMsg(msg, duneip, duneport);
     }
-    
+
     bool
     Platform::reportToDune(int type, const std::string &message)
     {
       return reportToDune(IMC::LogBookEntry::LBET_INFO, "Autonomy.TREX", message);
     }
-    
+
     bool
     Platform::reportToDune(const std::string &message)
     {
       return reportToDune(IMC::LogBookEntry::LBET_INFO, message);
     }
-    
+
     bool
     Platform::reportToDune(int type, const std::string &context,
-                           const std::string &text)
+        const std::string &text)
     {
       IMC::LogBookEntry entry;
       entry.text = text;
@@ -827,13 +826,13 @@ namespace TREX
       entry.type = type;
       return sendMsg(entry);
     }
-    
+
     bool
     Platform::reportErrorToDune(const std::string &message)
     {
       return reportToDune(IMC::LogBookEntry::LBET_ERROR, message);
     }
-    
+
     Platform::~Platform()
     {
       m_env->setPlatformReactor(NULL);
