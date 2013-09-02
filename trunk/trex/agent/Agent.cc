@@ -746,9 +746,14 @@ void Agent::initComplete() {
     syslog(null, warn)<<n_failed<<" reactors failed to initialize.";
 
   // Check for missing timelines
-  for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it)
-    if( !(*it)->owned() )
-      syslog(null, warn)<<"Timeline \""<<(*it)->name()<<"\" has no owner.";
+  for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) {
+    boost::function<bool ()> 
+      is_owned = boost::bind(&details::timeline::owned, *it);
+
+    if( !TREX::utils::strand_run(strand(), is_owned) )
+      syslog(null, warn)<<"Timeline \""<<(*it)->name()
+			<<"\" has no owner.";
+  }
 
 
   // Create initial graph file
