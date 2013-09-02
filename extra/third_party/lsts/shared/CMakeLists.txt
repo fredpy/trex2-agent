@@ -39,12 +39,14 @@ add_library(LSTSshared SHARED
   ImcAdapter.cc
   LstsUtils.cc
   LstsReactor.cc  
+  ImcMessenger.cc
   # headers
   DuneClock.hh
   EuropaExtensions.hh
   ImcAdapter.hh
   LstsUtils.hh
   LstsReactor.hh
+  ImcMessenger.hh
 )
 
 # check if clock_gettime exists 

@@ -41,14 +41,14 @@ namespace TREX {
       if (m_bind_port != -1)
         m_adapter.bind(m_bind_port);
 
-      m_adapter.startDiscovery();
+      //m_adapter.startDiscovery();
     }
 
     void
     PositionUpdater::handleTickStart()
     {
       Message * msg = NULL;
-      while((msg = m_adapter.poll(0, true)) != NULL)
+      while((msg = m_adapter.poll()) != NULL)
       {
         if (msg->getId() == Announce::getIdStatic())
         {

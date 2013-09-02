@@ -21,6 +21,7 @@
 
 
 # include "EuropaExtensions.hh"
+# include "ImcMessenger.hh"
 
 using DUNE_NAMESPACES;
 using namespace TREX::transaction;
@@ -52,8 +53,8 @@ namespace TREX {
       bool
       sendViaIridium(Message * msg, const std::string address, int port);
 
-      bool
-      startDiscovery();
+      //bool
+      //startDiscovery();
 
       void
       setTrexId(int trex_id);
@@ -61,7 +62,7 @@ namespace TREX {
       void setReactorGraph(graph const &g);
 
       Message *
-      poll(double timeout, bool discovery);
+      poll();
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
       Observation vehicleMediumObservation(VehicleMedium * msg);
@@ -97,13 +98,8 @@ namespace TREX {
     private:
       void variableToImc(Variable const &v, TrexAttribute * attr);
       void setAttribute(Predicate &pred, TrexAttribute const &attr);
-
-      UDPSocket m_send, m_receive, m_discovery;
-      IOMultiplexing m_iom, m_diom;
-      uint8_t* m_bfr;
-      Concurrency::Mutex m_mutex;
       int m_trex_id;
-      bool m_bound;
+      ImcMessenger messenger;
       graph const * m_graph;
     };
   }
