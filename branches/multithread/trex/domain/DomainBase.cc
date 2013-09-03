@@ -73,11 +73,16 @@ boost::property_tree::ptree DomainBase::as_tree() const {
 
 // friends, etc
 
-std::ostream &TREX::transaction::operator<<(std::ostream &out, DomainBase const &d) {
-  if( d.isFull() )
-    return out<<'*';
-  else
-    return d.print_domain(out);
+namespace TREX {
+  namespace transaction {
+
+    std::ostream &operator<<(std::ostream &out, DomainBase const &d) {
+      if( d.isFull() )
+        return out<<'*';
+      else
+        return d.print_domain(out);
+    }
+  }
 }
 
 
