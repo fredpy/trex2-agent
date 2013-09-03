@@ -195,7 +195,7 @@ int p_dlclose(void* handle) {
 }
 #else
 /*
- * use unix dl functions in all non Apple cases
+ * use unix dl functions in all non Apple or Windows cases
  */
 void * p_dlopen(const char *path, int mode) {  
   return dlopen(path, mode);
