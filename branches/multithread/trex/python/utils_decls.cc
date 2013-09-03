@@ -64,7 +64,7 @@ namespace {
     PyGILState_STATE m_gil_state;
   };
   
-  TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
+  TREX::utils::singleton_use<TREX::utils::LogManager> s_log;
 
   class log_wrapper {
   public:
@@ -123,7 +123,7 @@ namespace {
     
     TREX::utils::Symbol m_name;
   private:
-    TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+    TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
   };
   
   class py_log_handler {
@@ -172,7 +172,7 @@ namespace {
     
   private:
     TREX::utils::log::text_log::connection             m_conn;
-    TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+    TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
   };
   
   struct py_log_handler_wrap:py_log_handler, wrapper<py_log_handler> {

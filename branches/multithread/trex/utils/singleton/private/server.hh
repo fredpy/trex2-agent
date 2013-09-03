@@ -1,8 +1,12 @@
-/** @file "SingletonServer.cc"
- * @brief SingletonServer internal class implmentation
+/** @file "SingletonServer.hh"
+ * @brief Defintion of the SingletonServer class
+ *
+ * This header is for internal use and define the
+ * SingletonServer class. This class is the centralized
+ * place where all the singletons are maintained
  *
  * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
+ * @ingroup utils 
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -37,68 +41,46 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef H_SingletonServer
+# define H_SingletonServer
 
-#include "private/SingletonServer.hh"
+# include <boost/thread/recursive_mutex.hpp>
 
-#include <boost/thread/once.hpp>
+# include <map>
 
-namespace {
-  boost::once_flag o_flag = BOOST_ONCE_INIT;
-}
+# include "../bits/dummy.hh"
 
-using namespace TREX::utils::internal;
+namespace TREX {
+  namespace utils {
+    namespace singleton {
+      
+      class server :boost::noncopyable {
+      public:
+        static server &instance();
+        
+        dummy *attach(std::string const &id,
+                      details::dummy_factory const &factory);
+        bool detach(std::string const &id);
+        
+      private:
+        server();
+        ~server();
+        
+        typedef boost::recursive_mutex  mutex_type;
+        typedef mutex_type::scoped_lock lock_type;
+        
+        typedef std::map<std::string, dummy *> single_map;
+        
+        mutex_type m_mtx;
+        single_map m_singletons;
+        
+        
+        static void make_instance();
+        static server *s_instance;
+      }; // TREX::utils::singleton::server
+      
+    } // TREX::utils::singleton
+  } // TREX::utils
+} // TREX
 
-// static
-
-SingletonServer *SingletonServer::s_instance = 0x0;
-
-void SingletonServer::make_instance() {
-  if( 0x0==s_instance )
-    s_instance = new SingletonServer;
-}
-
-SingletonServer &SingletonServer::instance() {
-  // Use the C++11 like format
-  boost::call_once(o_flag, &SingletonServer::make_instance);
-  return *s_instance;
-}
-
-// *structors
-
-SingletonServer::SingletonServer() {}
-
-SingletonServer::~SingletonServer() {}
-
-// manipulators 
-
-SingletonDummy *SingletonServer::attach(std::string const &id,
-                                        sdummy_factory const &factory) {
-  // Just to be safe for now
-  assert(this==s_instance);
-  {
-    lock_type lock(m_mtx);
-    single_map::iterator i = m_singletons.find(id);
-    if( m_singletons.end()==i ) {
-      i = m_singletons.insert(single_map::value_type(id, factory.create())).first;
-    }
-    i->second->incr_ref();
-    return i->second;
-  }
-}
-
-bool SingletonServer::detach(std::string const &id) {
-  assert(this==s_instance);
-  {
-    lock_type lock(m_mtx);
-    single_map::iterator i = m_singletons.find(id);
-    if( m_singletons.end()!=i ) {
-      SingletonDummy *ptr = i->second;
-      if( ptr->decr_ref() ) {
-        m_singletons.erase(i);
-        delete ptr;
-        return true;
-      }
-    }
-  }
-  return false;
-}
+#endif // H_SingletonServer

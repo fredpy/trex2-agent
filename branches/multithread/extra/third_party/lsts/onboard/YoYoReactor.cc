@@ -11,7 +11,7 @@ namespace
 {
 
   /** @brief TREX log entry point */
-  SingletonUse<LogManager> s_log;
+  singleton_use<LogManager> s_log;
 
   /** @brief Platform reactor declaration */
   TeleoReactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");

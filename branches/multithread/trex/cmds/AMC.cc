@@ -107,7 +107,7 @@ namespace {
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
-  SingletonUse<LogManager> amc_log;
+  singleton_use<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
  
 }
@@ -117,7 +117,7 @@ namespace {
 extern "C" {
   
   void amc_cleanup(int sig) {
-    SingletonUse<LogManager> amc_log;
+    singleton_use<LogManager> amc_log;
     
     boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
     
@@ -131,7 +131,7 @@ extern "C" {
   }
   
   void amc_terminate() {
-    SingletonUse<LogManager> amc_log;
+    singleton_use<LogManager> amc_log;
     
     amc_log->syslog("amc", error)<<" Received a terminate";
     amc_log->flush();

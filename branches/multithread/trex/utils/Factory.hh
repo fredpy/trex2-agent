@@ -51,7 +51,7 @@
 # include <boost/type_traits.hpp>
 # include <boost/utility.hpp>
 
-# include "SingletonUse.hh"
+# include "singleton.hh"
 
 namespace TREX {
   namespace utils {
@@ -324,7 +324,7 @@ namespace TREX {
       private:
 				
 	Id const              m_type;    //!< Producer Identifer
-	SingletonUse<Factory> m_factory; //!< Acees point to Factory singleton
+	singleton_use<Factory> m_factory; //!< Acees point to Factory singleton
 				
 	/** @brief Prohibited Default constructor
 	 *
@@ -482,7 +482,7 @@ namespace TREX {
       catalog_type m_producers;
 			
       friend class producer;
-      friend class SingletonWrapper<Factory>;
+      friend class singleton::wrapper<Factory>;
     }; // class TREX::utils::Factory<>
 		
 # define In_H_Factory

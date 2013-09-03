@@ -1,8 +1,6 @@
-/* -*- C++ -*-
- * $Id$
- */
-/** @file "SingletonUse.hh"
- * @brief Define the access class to a phoenix singleton
+/* -*- C++ -*- */
+/** @file SingletonUse.tcc
+ * @brief SingletonUse implementation
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
@@ -40,61 +38,51 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SingletonUse
-# define H_SingletonUse
+#ifndef In_H_SingletonUse
+# error "Cannot include tcc files outside of their corresponding header"
+#else
+
+#include "wrapper.hh"
 
 namespace TREX {
   namespace utils {
 
-    /** @brief Singleton accessor
-     * @tparam Ty type of the singleton
-     *
-     * This class is used to access to a phoenix singleton.
-     * It also manages the singleton creation and lifetime
-     * through reference counting
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup utils
-     */
     template<typename Ty>
-    struct SingletonUse {
-    public:
-      /** @brief Constructor
-       *
-       * Create a new instance referring to the singleton @a Ty. If
-       * this singleton does not already exist it is created using
-       * the default constructor of @a Ty. On any case the reference
-       * counter for the singleton @a Ty is incremented by 1.
-       */
-      SingletonUse();
-      /** @overload SingletonUse() */
-      SingletonUse(SingletonUse<Ty> const &other);
-      /** @brief Destructor
-       * Send a notification to the singleton mmanager that one
-       * instance less is accessing to the singleton @a Ty if no
-       * more instance are refering to it them this singleton will
-       * be destroyed
-       */
-      ~SingletonUse();
+    void singleton_use<Ty>::disable() {
+      singleton::wrapper<Ty>::disable_server();
+    }
+    
+    
+    template<typename Ty>
+    singleton_use<Ty>::singleton_use()
+    :m_instance(singleton::wrapper<Ty>::attach()) {}
 
-      /** @brief Singleton instance
-       * @return a reference to the singleton @a Ty
-       * @{
-       */
-      Ty &instance() const;
-      Ty &operator*() const;
-      Ty *operator->() const;
-      /** @} */
-      
-      static void disable();
-    private:
+    template<typename Ty>
+    singleton_use<Ty>::singleton_use(singleton_use<Ty> const &)
+    :m_instance(singleton::wrapper<Ty>::attach()) {}
 
-      Ty *m_instance; //!< Singleton_reference
-    }; // TREX::utils::SingletonUse<>
+    template<typename Ty>
+    singleton_use<Ty>::~singleton_use() {
+      m_instance = 0x0;
+      singleton::wrapper<Ty>::detach();
+    }
+
+    template<typename Ty>
+    Ty &singleton_use<Ty>::instance() const {
+      return *m_instance;
+    }
+
+    template<typename Ty>
+    Ty &singleton_use<Ty>::operator*() const {
+      return instance();
+    }
+
+    template<typename Ty>
+    Ty *singleton_use<Ty>::operator->() const {
+      return &instance();
+    }
+    
   }
-}    
-# define In_H_SingletonUse
-#  include "bits/SingletonUse.tcc"
-# undef  In_H_SingletonUse
+}
 
-#endif // H_SingletonUse
+#endif 

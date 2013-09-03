@@ -59,7 +59,7 @@
 
 # include "Hashable.hh"
 # include <boost/lexical_cast.hpp>
-# include "SingletonUse.hh"
+# include "singleton.hh"
 
 namespace TREX {
   namespace utils {
@@ -68,7 +68,7 @@ namespace TREX {
     class trex_holder_class {
     public:
       static C& get() {
-        static SingletonUse<C> hold;
+        static singleton_use<C> hold;
         return *hold;
       }
     };

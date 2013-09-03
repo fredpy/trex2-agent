@@ -28,7 +28,7 @@ public:
 	virtual ~SafetyBug();
 
 private:
-	TREX::utils::SingletonUse<SharedEnvironment> m_env;
+	TREX::utils::singleton_use<SharedEnvironment> m_env;
 	bool aborted;
 
 	bool synchronize()

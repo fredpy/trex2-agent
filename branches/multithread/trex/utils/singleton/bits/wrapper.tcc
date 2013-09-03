@@ -1,3 +1,10 @@
+/* -*- C++ -*- */
+/** @file "SingletonWrapper.tcc"
+ * @brief SingletonWrapper implementation
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -31,25 +38,64 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "AgentLocation.hh"
+#ifndef In_H_SingletonWrapper
+# error "Cannot include tcc file outside of its corresponding header"
+#else
 
-#include <trex/utils/LogManager.hh>
-#include <trex/utils/Plugin.hh>
-
-using namespace TREX::utils;
-using namespace TREX::transaction;
-using namespace TREX::AgentLocation;
-
-namespace {
-    singleton_use<LogManager> s_log;
-    TeleoReactor::xml_factory::declare<AgentLocation> decl("AgentLocation");
-}
+#include <typeinfo>
 
 namespace TREX {
+  namespace utils {
+    namespace singleton {
+      namespace details {
+        
+        template<typename Ty>
+        class wrapper_factory :public dummy_factory {
+          dummy *create() const {
+            return new wrapper<Ty>;
+          }
+        }; // TREX:utils::singleton::details::warrper_factory<>
+        
+      } // TREX:utils::singleton::details
+      
+      /*
+       * class TREX::utils::singleton::wrapper<>
+       */
+      
+      // statics
+      
+      template<typename Ty>
+      Ty *wrapper<Ty>::attach() {
+        wrapper<Ty> *me = static_cast<wrapper<Ty> *>(dummy::attach(name(),
+                                                                   details::wrapper_factory<Ty>()));
+        return &(me->m_value);
+      }
+      
+      template<typename Ty>
+      void wrapper<Ty>::detach() {
+        return dummy::detach(name());
+      }
 
-  void initPlugin() {
-    ::s_log->syslog("plugin.AgentLocation", info)<<"AgentLocation loaded."<<std::endl;
-    // ::decl;
-  }
+      template<typename Ty>
+      std::string wrapper<Ty>::name() {
+        // Use RTTI for generating a id for this type
+        return typeid(Ty).name();
+      }
+      
+      template<typename Ty>
+      void wrapper<Ty>::disable_server() {
+        dummy::disable();
+      }
+      
+      // structors
+      template<typename Ty>
+      wrapper<Ty>::wrapper() {}
+      
+      template<typename Ty>      
+      wrapper<Ty>::~wrapper() {}
+      
+    } // TREX::utils::singleton
+  } // TREX::utils
+} // TREX
 
-}
+#endif

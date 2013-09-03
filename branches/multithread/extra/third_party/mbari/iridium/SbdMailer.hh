@@ -55,7 +55,7 @@ namespace mbari {
       static std::string new_file();
 
 
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
     };
 
   }

@@ -297,7 +297,7 @@ namespace TREX {
       friend std::ostream &operator<<(std::ostream &out, Variable const &v);
 
       /** @brief Entry point to domain XML parsing */
-      static TREX::utils::SingletonUse< DomainBase::xml_factory > s_dom_factory;
+      static TREX::utils::singleton_use< DomainBase::xml_factory > s_dom_factory;
 
       /** @brief Domain duplication helper
        * @param dom A domain

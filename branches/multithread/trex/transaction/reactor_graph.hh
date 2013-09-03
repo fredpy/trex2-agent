@@ -748,7 +748,7 @@ namespace TREX {
       listen_set m_listeners;
 
       bool m_verbose;
-      TREX::utils::SingletonUse<xml_factory>             m_factory;
+      TREX::utils::singleton_use<xml_factory>             m_factory;
 
       mutable details::reactor_set m_quarantined;
 

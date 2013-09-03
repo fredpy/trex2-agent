@@ -158,10 +158,10 @@ namespace TREX {
       // UNIQ_PTR<WitreApplication> m_app;
       Wt::WServer *    m_server;
 
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
       WitreReactor *m_entry;
 
-      friend class TREX::utils::SingletonWrapper<WitreServer>;
+      friend class TREX::utils::singleton::wrapper<WitreServer>;
       friend class WitreReactor;
     }; // TREX::witre::WitreServer
 

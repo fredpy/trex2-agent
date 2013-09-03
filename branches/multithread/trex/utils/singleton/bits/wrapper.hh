@@ -1,8 +1,12 @@
-/** @file "SingletonDummy.cc"
- * @brief SingletonDummy internal class implmentation
+/** @file "SingletonWrapper.hh"
+ * @brief Defintion of the SingletonWrapper class
+ *
+ * This header is for internal use and define the
+ * SingletonWrapper class that encapsulate a pheonix
+ * singleton and control its life-time.
  *
  * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
+ * @ingroup utils 
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -37,40 +41,48 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "private/SingletonServer.hh"
+#ifndef H_SingletonWrapper
+# define H_SingletonWrapper
 
-using namespace TREX::utils::internal;
+# include "dummy.hh"
 
-// statics 
+namespace TREX {
+  namespace utils {
+    namespace singleton {
 
-SingletonDummy *SingletonDummy::attach(std::string const &name, 
-                                       sdummy_factory const &factory) {
-  return SingletonServer::instance().attach(name, factory);
+      namespace details {
+        template<typename Ty>
+        class wrapper_factory;
+      } // TREX::utils::singleton::details
+      
+
+      template<typename Ty>
+      class wrapper :dummy {
+      public:
+        static Ty *attach();
+        static void detach();
+        static void disable_server();
+        
+      private:
+        wrapper();
+        ~wrapper();
+        
+        static std::string name();
+        
+        Ty m_value;
+        
+        friend class details::wrapper_factory<Ty>;
+        
+      }; // TREX::utils::singleton::wrapper<>
+      
+    
+    } // TREX::utils::singleton
+
+  }
 }
 
-void SingletonDummy::detach(std::string const &name) {
-  SingletonServer::instance().detach(name);
-}
+# define In_H_SingletonWrapper
+#  include "wrapper.tcc"
+# undef In_H_SingletonWrapper
 
-void SingletonDummy::disable() {
-}
-
-
-// structors
-
-SingletonDummy::SingletonDummy() 
-  :ref_counter(0ul) {}
-
-SingletonDummy::~SingletonDummy() {}
-
-// modifers
-
-void SingletonDummy::incr_ref() const {
-  ++ref_counter;
-}
-
-bool SingletonDummy::decr_ref() const {
-  return (ref_counter--)<=1;
-}
-
-
+#endif // H_SingletonWrapper

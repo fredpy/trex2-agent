@@ -1,13 +1,19 @@
+/** @file "SingletonDummy.cc"
+ * @brief SingletonDummy internal class implmentation
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +23,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,25 +37,44 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "AgentLocation.hh"
+#include "private/server.hh"
 
-#include <trex/utils/LogManager.hh>
-#include <trex/utils/Plugin.hh>
+using namespace TREX::utils::singleton;
 
-using namespace TREX::utils;
-using namespace TREX::transaction;
-using namespace TREX::AgentLocation;
+/*
+ * class TREX::utils::singleton::dummy
+ */
 
-namespace {
-    singleton_use<LogManager> s_log;
-    TeleoReactor::xml_factory::declare<AgentLocation> decl("AgentLocation");
+// statics
+
+dummy *dummy::attach(std::string const &name,
+                     details::dummy_factory const &factory) {
+  return server::instance().attach(name, factory);
 }
 
-namespace TREX {
-
-  void initPlugin() {
-    ::s_log->syslog("plugin.AgentLocation", info)<<"AgentLocation loaded."<<std::endl;
-    // ::decl;
-  }
-
+void dummy::detach(std::string const &name) {
+  server::instance().detach(name);
 }
+
+void dummy::disable() {
+}
+
+
+// structors
+
+dummy::dummy()
+  :m_ref_counter(0ul) {}
+
+dummy::~dummy() {}
+
+// modifers
+
+void dummy::incr_ref() const {
+  ++m_ref_counter;
+}
+
+bool dummy::decr_ref() const {
+  return (m_ref_counter--)<=1;
+}
+
+

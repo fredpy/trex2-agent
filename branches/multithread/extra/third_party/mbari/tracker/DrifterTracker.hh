@@ -125,7 +125,7 @@ namespace mbari {
 
     TREX::utils::Symbol            m_trexMsg;
 
-    TREX::utils::SingletonUse<MessageHandler::factory> m_msg_factory;
+    TREX::utils::singleton_use<MessageHandler::factory> m_msg_factory;
         
     void trex_msg(amqp::queue::message const &msg);
 

@@ -61,7 +61,7 @@ namespace {
   }
 
   SHARED_PTR<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::SingletonUse<Predicate::xml_factory> fact;
+    TREX::utils::singleton_use<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
 }

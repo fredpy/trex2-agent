@@ -4,7 +4,7 @@
 namespace {
   
   
-  TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
+  TREX::utils::singleton_use<TREX::utils::LogManager> s_log;
   
 }
 

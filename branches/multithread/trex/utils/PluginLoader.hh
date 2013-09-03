@@ -166,9 +166,9 @@ namespace TREX {
        * information but mostly to uses the @c LogManager::locate 
        * method in order to locate the plug-in 
        */ 
-      SingletonUse<LogManager> m_log;
+      singleton_use<LogManager> m_log;
       
-      friend class SingletonWrapper<PluginLoader>;
+      friend class singleton::wrapper<PluginLoader>;
     }; // class TREX::utils::PluginLoader
 		
     /** @brief Plugin management related error

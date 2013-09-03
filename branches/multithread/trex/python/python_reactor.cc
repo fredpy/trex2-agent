@@ -40,7 +40,7 @@ using namespace TREX::utils;
 namespace bp=boost::python;
 
 namespace  {
-  SingletonUse<LogManager> s_log;
+  singleton_use<LogManager> s_log;
   
   producer python_decl("PyReactor");
 }

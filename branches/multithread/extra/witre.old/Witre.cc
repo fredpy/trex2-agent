@@ -47,7 +47,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
 
-  SingletonUse<LogManager> s_log;
+  singleton_use<LogManager> s_log;
 
 }
 

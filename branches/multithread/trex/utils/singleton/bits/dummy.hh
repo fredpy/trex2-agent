@@ -1,9 +1,13 @@
-/* -*- C++ -*- */
-/** @file SingletonUse.tcc
- * @brief SingletonUse implementation
+/** @file "SingletonDummy.hh"
+ * @brief Defintion of the SingletonDummy class
+ *
+ * This header is for internal use and define an
+ * abstract definition of the SingletonWrapper
+ * used to create and manipulate phoenix singletons
+ * internally
  *
  * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
+ * @ingroup utils 
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -38,51 +42,50 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef In_H_SingletonUse
-# error "Cannot include tcc files outside of their corresponding header"
-#else
+#ifndef H_SingletonDummy
+# define H_SingletonDummy
 
-#include "SingletonWrapper.hh"
+# include <string>
+
+# include <boost/utility.hpp>
+
+# include "server_fwd.hh"
 
 namespace TREX {
   namespace utils {
+    namespace singleton {
+      
+      class dummy;
+      
+      namespace details {
+        
+        struct dummy_factory {
+          virtual ~dummy_factory() {}
+          virtual dummy *create() const =0;
+        }; // TREX::utils::singleton::details::dummy_factory
+                  
+      } // TREX::utils::singleton::details
+      
+      class dummy :boost::noncopyable {
+      protected:
+        dummy();
+        virtual ~dummy() =0;
+        
+        static dummy *attach(std::string const &name,
+                             details::dummy_factory const &factory);
+        static void detach(std::string const &name);
+        static void disable();
+        
+      private:
+        void incr_ref() const;
+        bool decr_ref() const;
+        
+        mutable size_t m_ref_counter;
+        friend class server;
+      }; // TREX::utils::singleton::dummy
+      
+    } // TREX::utils::singleton
+  } // TREX::utils
+} // TREX
 
-    template<typename Ty>
-    void SingletonUse<Ty>::disable() {
-      SingletonWrapper<Ty>::disable_server();
-    }
-    
-    
-    template<typename Ty>
-    SingletonUse<Ty>::SingletonUse()
-      :m_instance(SingletonWrapper<Ty>::attach()) {}
-
-    template<typename Ty>
-    SingletonUse<Ty>::SingletonUse(SingletonUse<Ty> const &)
-      :m_instance(SingletonWrapper<Ty>::attach()) {}
-
-    template<typename Ty>
-    SingletonUse<Ty>::~SingletonUse() {
-      m_instance = 0x0;
-      SingletonWrapper<Ty>::detach();
-    }
-
-    template<typename Ty>
-    Ty &SingletonUse<Ty>::instance() const {
-      return *m_instance;
-    }
-
-    template<typename Ty>
-    Ty &SingletonUse<Ty>::operator*() const {
-      return instance();
-    }
-
-    template<typename Ty>
-    Ty *SingletonUse<Ty>::operator->() const {
-      return &instance();
-    }
-    
-  }
-}
-
-#endif 
+#endif // H_SingletonDummy

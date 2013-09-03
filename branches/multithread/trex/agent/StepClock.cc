@@ -63,7 +63,7 @@ namespace {
  */
 // statics
 
-SingletonUse<LogManager> StepClock::m_log;
+singleton_use<LogManager> StepClock::m_log;
 
 unsigned int StepClock::selectStep(unsigned int stepsPerTick) {
   if( stepsPerTick<=0 ) {

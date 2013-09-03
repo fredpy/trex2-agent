@@ -39,7 +39,7 @@ using namespace TREX::utils;
 using namespace TREX::witre;
 
 namespace {
-    SingletonUse<LogManager> s_log;
+    singleton_use<LogManager> s_log;
     TeleoReactor::xml_factory::declare<WitreServer> decl("WitreReactor");
 }
 

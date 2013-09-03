@@ -50,7 +50,7 @@
 # include "log/out_file.hh"
 # include "asio_runner.hh"
 
-# include "SingletonUse.hh"
+# include "singleton.hh"
 # include "SharedVar.hh"
 
 # include <boost/system/system_error.hpp>
@@ -438,7 +438,7 @@ namespace TREX {
        */
       std::list<path_type> m_searchPath;
       
-      friend class SingletonWrapper<LogManager>;
+      friend class singleton::wrapper<LogManager>;
     }; // TREX::utils::LogManager
     
   } // TREX::utils 

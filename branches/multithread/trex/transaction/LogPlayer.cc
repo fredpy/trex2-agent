@@ -470,7 +470,7 @@ LogPlayer::phase::phase(LogPlayer *owner,
   typedef details::tr_event::factory                  tr_fact;
   typedef boost::property_tree::ptree::iterator iter;
 
-  utils::SingletonUse<tr_fact> events_f;
+  utils::singleton_use<tr_fact> events_f;
   iter pos = node.second.begin();
   tr_fact::iter_traits<iter>::type 
     it = tr_fact::iter_traits<iter>::build(pos, owner);
@@ -534,7 +534,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   if( last!=i ) {
     typedef details::tr_event::factory                  tr_fact;
     typedef boost::property_tree::ptree::iterator iter;
-    utils::SingletonUse<tr_fact> event_f;
+    utils::singleton_use<tr_fact> event_f;
     iter pos = i->second.begin();
     LogPlayer *me = this;
     tr_fact::iter_traits<iter>::type

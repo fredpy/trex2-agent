@@ -259,7 +259,7 @@ namespace TREX {
 
     private:
       duration_type const m_sleep;
-      utils::SingletonUse<utils::LogManager> m_log;
+      utils::singleton_use<utils::LogManager> m_log;
       
       void log_tick() const ;
       

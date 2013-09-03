@@ -100,7 +100,7 @@ namespace TREX {
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);
 
-      TREX::utils::SingletonUse<SharedEnvironment> m_env;
+      TREX::utils::singleton_use<SharedEnvironment> m_env;
 
       //static ControlInterface * controlInterfaceInstance;
 

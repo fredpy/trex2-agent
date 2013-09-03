@@ -45,7 +45,7 @@ namespace bp = boost::property_tree;
 namespace xml = bp::xml_parser;
 
 namespace {
-  SingletonUse<LogManager> s_log;
+  singleton_use<LogManager> s_log;
 }
 
 boost::optional<bp::ptree const &> TREX::utils::internals::find_attr(bp::ptree const &pt,

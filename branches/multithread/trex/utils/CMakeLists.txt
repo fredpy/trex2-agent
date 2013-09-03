@@ -63,8 +63,6 @@ add_library(TREXutils SHARED
   LogManager.cc
   Pdlfcn.cc
   PluginLoader.cc
-  SingletonDummy.cc
-  SingletonServer.cc
   TimeUtils.cc
   TREXversion.cc
   XmlUtils.cc
@@ -74,6 +72,8 @@ add_library(TREXutils SHARED
   log/entry.cc
   log/text_log.cc
   cpu_clock.cc
+  singleton/dummy.cc
+  singleton/server.cc
   # headers
   asio_fstream.hh
   asio_signal.hh
@@ -91,10 +91,12 @@ add_library(TREXutils SHARED
   Plugin.hh
   PluginLoader.hh
   SharedVar.hh
-  SingletonUse.hh
-  bits/SingletonDummy.hh
-  bits/SingletonServer_fwd.hh
-  bits/SingletonWrapper.hh
+  singleton.hh
+  singleton/use.hh
+  singleton/bits/dummy.hh
+  singleton/bits/server_fwd.hh
+  singleton/bits/wrapper.hh
+  singleton/private/server.hh
   Symbol.hh
   tick_clock.hh
   TimeUtils.hh
@@ -118,8 +120,8 @@ add_library(TREXutils SHARED
   platform/cpp11_deleted.hh
   # template source code
   bits/Factory.tcc
-  bits/SingletonUse.tcc
-  bits/SingletonWrapper.tcc
+  singleton/bits/use.tcc
+  singleton/bits/wrapper.tcc
   bits/Symbol.tcc
   bits/XmlFactory.tcc
 )
@@ -173,13 +175,29 @@ source_group("Source\ Files\\log" FILES
   log/text_log.cc
 )
 
+source_group("Source\ Files\\singleton" FILES 
+  singleton/dummy.cc
+  singleton/server.cc
+)
+
 source_group("Header\ Files\\bits" FILES 
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
-  bits/SingletonDummy.hh
-  bits/SingletonServer_fwd.hh
-  bits/SingletonWrapper.hh
+)
+
+source_group("Header\ Files\\singleton" FILES 
+  singleton/use.hh
+)
+
+source_group("Header\ Files\\singleton\\bits" FILES 
+  singleton/bits/dummy.hh
+  singleton/bits/server_fwd.hh
+  singleton/bits/wrapper.hh
+)
+
+source_group("Header\ Files\\singleton\\private" FILES 
+  singleton/private/server.hh
 )
 
 source_group("Header\ Files\\platform" FILES
@@ -204,10 +222,13 @@ source_group("Header\ Files\\log\\bits" FILES
 
 source_group("Template Files\\bits" FILES  
   bits/Factory.tcc
-  bits/SingletonUse.tcc
-  bits/SingletonWrapper.tcc
   bits/Symbol.tcc
   bits/XmlFactory.tcc
+)
+
+source_group("Template Files\\singleton\\bits" FILES  
+  singleton/bits/use.tcc
+  singleton/bits/wrapper.tcc
 )
 
 add_dependencies(core TREXutils)

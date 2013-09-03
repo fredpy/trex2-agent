@@ -68,7 +68,7 @@ namespace pco=po::command_line_style;
 namespace {
 
   /** @brief entry point to TREX system log */
-  SingletonUse<LogManager> s_log;
+  singleton_use<LogManager> s_log;
 
   UNIQ_PTR<Agent> my_agent;
 

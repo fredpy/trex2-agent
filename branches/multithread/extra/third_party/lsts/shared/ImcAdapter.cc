@@ -359,7 +359,7 @@ namespace TREX {
           return msg;
         }
         catch (std::exception &e) {
-          SingletonUse<LogManager> s_log;
+          singleton_use<LogManager> s_log;
           s_log->syslog(log::error) << "exception caught while deserializing message: " << e.what();
         }
       }

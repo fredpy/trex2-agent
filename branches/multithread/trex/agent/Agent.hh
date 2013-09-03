@@ -551,7 +551,7 @@ namespace TREX {
                       std::string path);
 
       /** @brief plug-in loader entry point */
-      TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;
+      TREX::utils::singleton_use<TREX::utils::PluginLoader> m_pg;
 
     }; // TREX::agent::Agent
 
