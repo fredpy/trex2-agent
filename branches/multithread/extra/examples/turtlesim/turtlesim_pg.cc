@@ -42,7 +42,7 @@ using namespace TREX::transaction;
 using namespace TREX::TREXturtlesim;
 
 namespace {
-    SingletonUse<LogManager> s_log;
+    singleton_use<LogManager> s_log;
 
     TeleoReactor::xml_factory::declare<TurtleSimPub> decl("TurtleSimPub");
 }
