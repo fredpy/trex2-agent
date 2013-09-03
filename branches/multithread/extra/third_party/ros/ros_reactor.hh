@@ -60,9 +60,9 @@ namespace TREX {
       void handleRecall(TREX::transaction::goal_id const &g);
 
 
-      TREX::utils::SingletonUse<ros_client> m_cli;
+      TREX::utils::singleton_use<ros_client> m_cli;
       ::ros::NodeHandle                     m_ros;
-      TREX::utils::SingletonUse<ros_factory> m_tl_prod;
+      TREX::utils::singleton_use<ros_factory> m_tl_prod;
 
       std::set<TREX::transaction::goal_id> m_goals;
       void completed(TREX::transaction::goal_id const &g) {
