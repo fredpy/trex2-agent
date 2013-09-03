@@ -119,9 +119,11 @@ void details::internal_impl::connect(details::ext_ref tl) {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
+    
+    
     synch_event::slot_type s(&details::external_impl::on_synch, tl.get(),
                              _1, _2);
-    m_synch.connect(s.track(tl));
+    m_synch.connect(s.track_foreign(tl));
   
     if( m_last_obs ) {
       g->strand().post(boost::bind(&details::external_impl::on_synch,
