@@ -76,5 +76,5 @@ target_link_libraries(turtlesim_pg ${ROS_roscpp_LINK_FLAGS}
   ${ROS_actionlib_LINK_FLAGS}
   ${ROS_roscpp_LINK_LIBS}
   ${ROS_actionlib_LINK_LIBS}
-  TREXagent)
+  TREXtransaction)
 
