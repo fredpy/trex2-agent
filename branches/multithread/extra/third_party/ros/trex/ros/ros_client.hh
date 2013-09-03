@@ -62,11 +62,11 @@ namespace TREX {
       
       void spin_cb();
       
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
       mutable TREX::utils::SharedVar<bool> m_active;
       boost::asio::deadline_timer m_freq;
       
-      friend class TREX::utils::SingletonWrapper<ros_client>;
+      friend class TREX::utils::singleton::wrapper<ros_client>;
     }; // TREX::ROS::ros_client
     
     
