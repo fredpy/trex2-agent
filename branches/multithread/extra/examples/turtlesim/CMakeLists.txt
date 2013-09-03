@@ -70,34 +70,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
 link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
-add_library(TREXturtlesim SHARED
-  # source
-    turtlesimpub.cc
-    turtlesim_pg.cc
-  # header
-    turtlesimpub.hh
-  )
-
-source_group("Header\ Files\\bits" FILES
-  trex/ros/bits/ros_timeline.hh)
-
-install(DIRECTORY trex/ DESTINATION include/trex/
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
-
-target_link_libraries(TREXturtlesim ${ROS_roscpp_LINK_FLAGS}
+# The plugin placeholder : also initialize ros on load
+trex_plugin(turtlesim turtlesim_pg.cc turtlesimpub.cc turtlesimpub.hh)
+target_link_libraries(turtlesim_pg ${ROS_roscpp_LINK_FLAGS}
   ${ROS_actionlib_LINK_FLAGS}
   ${ROS_roscpp_LINK_LIBS}
   ${ROS_actionlib_LINK_LIBS}
   TREXagent)
-
-install(TARGETS TREXturtlesim DESTINATION lib)
-trex_lib(TREXturtlesim extra)
-
-
-
-# The plugin placeholder : also initialize ros on load
-trex_plugin(turtlesim turtlesim_pg.cc)
-target_link_libraries(turtlesim_pg TREXturtlesim)
 
