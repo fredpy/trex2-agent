@@ -64,8 +64,8 @@ using namespace TREX::transaction;
 using namespace TREX::ROS;
 
 namespace {
-  SingletonUse<LogManager> s_log;
-  SingletonUse<ros_client> s_ros; // initate connection to ros
+  singleton_use<LogManager> s_log;
+  singleton_use<ros_client> s_ros; // initate connection to ros
 
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   // declare the Point subscriber
