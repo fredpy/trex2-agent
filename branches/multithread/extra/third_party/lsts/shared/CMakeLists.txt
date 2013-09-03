@@ -39,12 +39,14 @@ add_library(LSTSshared SHARED
   ImcAdapter.cc
   LstsUtils.cc
   LstsReactor.cc  
+  ImcMessenger.cc
   # headers
   DuneClock.hh
   EuropaExtensions.hh
   ImcAdapter.hh
   LstsUtils.hh
   LstsReactor.hh
+  ImcMessenger.hh
 )
 
 # check if clock_gettime exists 
@@ -77,7 +79,6 @@ int main(int argc, char **argv) {
 else(LIB_RT)
   set(HAS_CLOCK_MONOTONIC_RAW FALSE)
 endif(LIB_RT)
-
 
 configure_file(raw_clock.hh.in ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.hh)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

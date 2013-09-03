@@ -118,6 +118,7 @@ add_library(TREXutils SHARED
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
   # template source code
   bits/Factory.tcc
   singleton/bits/use.tcc
@@ -204,6 +205,10 @@ source_group("Header\ Files\\platform" FILES
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
+)
+
+source_group("Header\ Files\\platform\\bits" FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
 )
 
 source_group("Header\ Files\\log" FILES 

@@ -62,7 +62,7 @@ class SpotterController {
 		duration == 1;
 		completion_date <= start;
 		wp_num > 0; 
-		float radius;
+		float radius == 150;
     }
 
     SpotterController(SpotterFollow cmd) {
@@ -102,13 +102,14 @@ class SpotterFollow extends AgentTimeline {
     predicate DoSurvey {
 		int id;
 		int waypoints;
-		float    size, z;
-		float center_lat, center_lon;
-		waypoints == 4;
+		float center_lat, center_lon, z;
+		float cameraOffset;
+		waypoints == 5;
+		
     }
     predicate Survey {
-		float    center_lat, center_lon;
-		float z;
+		float center_lat, center_lon, z;
+		float cameraOffset;
 		duration==1;
     }
 
@@ -150,6 +151,7 @@ SpotterController::EndSurvey {
       exec.center_lat == survey.center_lat;
       exec.center_lon == survey.center_lon;
       exec.z == survey.z;
+      exec.cameraOffset == survey.cameraOffset;
    
     equals(condition Waypoint last_wp);
       last_wp.path_id == cur.id;
@@ -166,16 +168,18 @@ SpotterController::Waypoint {
 SpotterController::DoSegment {
     SpotterFollow me = object.command;
     Counter cpt = me.counter;
-    float radiusF;
     before(effect Waypoint to); //DoSegment.end == Waypoint.start
       to.wp_num == count + 1;
-      to.radius == (count + 1 )  * -50;
-      floor(radiusF) == to.radius;
-      flyTimeF * 20.0  == (2.0 * 3.14 * abs(radiusF));
+	  float theta, shift_n, shift_e, dest_lat, dest_lon;
+	  360 == theta * exec.waypoints;
+	  shift_n == exec.cameraOffset * cos(to.wp_num * theta);
+	  shift_e == exec.cameraOffset * sin(to.wp_num * theta);
+      wgsdisplace(exec.center_lat, exec.center_lon, shift_n, shift_e, to.lat, to.lon);
+      flyTimeF * 20.0  == (4.0 * 3.14 * abs(to.radius));
 
       // These lines allow to convert flyTimeF (seconds) into its tick equivalent
       // As a result this model will run fine event if the clock runs at a 
-      // tick rate whihc is no 1Hz
+      // tick rate which is no 1Hz
       float flyTimeInTick;
       flyTimeInTick * TICK_DURATION == flyTimeF;
 
@@ -189,20 +193,18 @@ SpotterController::DoSegment {
 	 both  starts  and starts_during are messing with the DoSurvey above 
 	 because europa still tries to start this token strictly before the 
 	 last Waypoint ends. 
-	 starts_during shouldn't but apprently europa do not agree with me
+	 starts_during shouldn't but apparently europa do not agree with me
 	 starts_during(condition Waypoint from); // correction for error that was propagated down the line
       */
       // The alternate solution say that it is met_by :
       // by doing so we have the classic Waypoint meets DoSegment meets Waypoint
       // which will only work if all the waypoints are not identical and take
       // at least 1 tick to go from one to the other. 
-      met_by(condition Waypoint from); //origin.start == target.end
       
-      from.path_id == to.path_id;
-      from.lat == to.lat;
-      from.lon == to.lon;
-      from.wp_num == count;
-      from.completion_date <= to.completion_date;
+      met_by(condition Waypoint from); //origin.start == target.end
+	    from.path_id == to.path_id;
+	    from.wp_num == count;
+	    from.completion_date <= to.completion_date;
  
 
     // Finally send the next At when the previous one did complete
@@ -212,11 +214,7 @@ SpotterController::DoSegment {
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
-		dest.radius == to.radius;
 		dest.z == exec.z;
-        //to.completion_date == dest.start + 6.28*to.radius*20.0;
-	    //to.completion_date == dest.start;
-	    //to.completion_date == dest.start + 100; //erase the reactor
    }
 }
 
@@ -226,7 +224,6 @@ SpotterController::DoInitial {
 
     equals(effect Waypoint to);
       to.wp_num == 1; // This is the first waypoint
-      to.radius == -100;
   
     meets(me.DoSurvey exec); // Relaxing the constraints on DoSurvey
       exec.id == to.path_id;
@@ -235,13 +232,11 @@ SpotterController::DoInitial {
 
     // Check that I can start 
     contained_by(cpt.Holds cur);
-    exec.id == cur.id;
     if( cur.start<= AGENT_CLOCK ) {
 		contained_by(condition Navigator.At dest);//using starts gives the 'constraintConsistent() is false' exception, so I'm going with relaxing the DoSurvey further
 		dest.latitude == to.lat;
 		dest.longitude == to.lon;
 		dest.secs == 0;
-		dest.radius == -100;
 		to.completion_date == dest.start;
 		dest.z == exec.z;
     }

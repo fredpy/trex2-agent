@@ -18,6 +18,7 @@
 # include <trex/domain/StringDomain.hh>
 # include <trex/domain/BooleanDomain.hh>
 # include <trex/domain/EnumDomain.hh>
+# include <boost/thread/thread.hpp>
 
 # include <DUNE/DUNE.hpp>
 # include <DUNE/Math/Angles.hpp>
@@ -28,6 +29,7 @@
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"
+
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -134,6 +136,7 @@ namespace TREX {
       std::queue<Observation> referenceObservations;
 
       IMC::Reference goingRef;
+      bool m_reference_initialized;
 
       boost::function<bool (goal_id)> m_going_platform;
 
@@ -145,7 +148,9 @@ namespace TREX {
       bool goingAUV(goal_id goal);
       bool goingUAV(goal_id g);
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
+      void insertIntoReceived(IMC::Message* msg);
       void postGoalToken();
+bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;

@@ -13,8 +13,6 @@ namespace TREX {
     ImcAdapter::ImcAdapter()
     {
       m_trex_id = 65000;
-      m_bound = false;
-      m_bfr = new uint8_t[65535];
       m_graph = NULL;
     }
 
@@ -312,24 +310,7 @@ namespace TREX {
     bool
     ImcAdapter::send(Message * msg, std::string addr, int port)
     {
-      if (port < 0)
-        return false;
-
-      DUNE::Utils::ByteBuffer bb;
-      try
-      {
-        IMC::Packet::serialize(msg, bb);
-
-        m_mutex.lock();
-        m_send.write((const char*)bb.getBuffer(), msg->getSerializationSize(),
-                     Address(addr.c_str()), port);
-        m_mutex.unlock();
-      }
-      catch (std::runtime_error& e)
-      {
-        std::cerr << "ERROR: " << ": " << e.what() << "\n";
-        return false;
-      }
+      messenger.post(msg, port, addr);
       return true;
     }
 
@@ -348,83 +329,47 @@ namespace TREX {
     }
 
 
-    Message * ImcAdapter::poll(double timeout, bool discovery = false)
+    Message * ImcAdapter::poll()
     {
-      if (discovery && m_diom.poll(timeout))
-      {
-        try {
-          Address addr;
-          uint16_t rv = m_discovery.read((char*)m_bfr, 65535, &addr);
-          IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
-          return msg;
-        }
-        catch (std::exception &e) {
-          singleton_use<LogManager> s_log;
-          s_log->syslog(log::error) << "exception caught while deserializing message: " << e.what();
-        }
-      }
-
-      if (!m_bound || !m_iom.poll(timeout))
-        return NULL;
-
-      Address addr;
-      uint16_t rv = m_receive.read((char*)m_bfr, 65535, &addr);
-      IMC::Message * msg = IMC::Packet::deserialize(m_bfr, rv);
-
-      return msg;
+      return messenger.receive();
     }
 
     bool
     ImcAdapter::bind(int port)
     {
-      if (m_bound)
-        unbind();
-
-      m_receive.bind(port, Address::Any, true);
-      m_receive.addToPoll(m_iom);
-
-      m_bound = true;
-      return true;
+      messenger.startListening(port);
     }
 
     bool
     ImcAdapter::unbind()
     {
-      if (m_bound)
-      {
-        m_receive.delFromPoll(m_iom);
-      }
-      else
-        return false;
-
-      m_bound = false;
-      return true;
+      messenger.stopListening();
     }
-
-    bool
-    ImcAdapter::startDiscovery()
-    {
-      m_discovery.setMulticastTTL(1);
-      m_discovery.setMulticastLoop(false);
-      m_discovery.enableBroadcast(true);
-      std::vector<Interface> itfs = Interface::get();
-      int i;
-      for (unsigned i = 0; i < itfs.size(); ++i)
-        m_discovery.joinMulticastGroup("224.0.75.69", itfs[i].address());
-      for (i = 30100; i < 30105; i++)
-      {
-        try
-        {
-          m_discovery.bind(i, Address::Any, true);
-          std::cout << "listening for advertisements on port " << i << "\n";
-          m_discovery.addToPoll(m_diom);
-          return true;
-        }
-        catch (...)
-        { }
-      }
-      return false;
-    }
+//
+//    bool
+//    ImcAdapter::startDiscovery()
+//    {
+//      m_discovery.setMulticastTTL(1);
+//      m_discovery.setMulticastLoop(false);
+//      m_discovery.enableBroadcast(true);
+//      std::vector<Interface> itfs = Interface::get();
+//      int i;
+//      for (unsigned i = 0; i < itfs.size(); ++i)
+//        m_discovery.joinMulticastGroup("224.0.75.69", itfs[i].address());
+//      for (i = 30100; i < 30105; i++)
+//      {
+//        try
+//        {
+//          m_discovery.bind(i, Address::Any, true);
+//          std::cout << "listening for advertisements on port " << i << "\n";
+//          m_discovery.addToPoll(m_diom);
+//          return true;
+//        }
+//        catch (...)
+//        { }
+//      }
+//      return false;
+//    }
 
     void
     ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
@@ -534,8 +479,7 @@ namespace TREX {
 
     ImcAdapter::~ImcAdapter()
     {
-      if (m_bound)
-        unbind();
+      unbind();
     }
   }
 }
