@@ -39,7 +39,7 @@ namespace TREX {
                 void updateTurtle();
 
 
-                TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+                TREX::utils::singleton_use<TREX::utils::LogManager> m_log;
 
                 ros::NodeHandle*                    m_ros;
                 std::list<ros::Subscriber>          m_sub;
