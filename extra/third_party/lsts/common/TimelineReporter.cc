@@ -47,14 +47,19 @@ TimelineReporter::~TimelineReporter() {
 void
 TimelineReporter::declared(details::timeline const &timeline)
 {
+  if (m_output)
+    std::cout << "Timeline has been declared: " << timeline.name() << std::endl;
+
   syslog(log::warn) << "Timeline has been declared: " << timeline.name();
   if( !isExternal(timeline.name()) )
-	  use(timeline.name(), false, false);
+	  use(timeline.name(), false, true);
 }
 
 void
 TimelineReporter::undeclared(details::timeline const &timeline)
 {
+  if (m_output)
+    std::cout << "Timeline has been undeclared: " << timeline.name() << std::endl;
   syslog(log::warn) << "Timeline has been undeclared: " << timeline.name();
   unuse(timeline.name());
 }
@@ -66,13 +71,28 @@ void TimelineReporter::newPlanToken(goal_id const &g)
   std::string gname = (goal->object()).str();
   std::string gpred = (goal->predicate()).str();
 
-  std::cerr << "newPlanToken(" << gname << " , " << gpred << ")\n";
+  if (m_output)
+    std::cout << "GOAL: " << *goal << std::endl;
+
+  syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
+}
+
+void TimelineReporter::cancelledPlanToken(goal_id const &g)
+{
+  Goal * goal = g.get();
+
+   std::string gname = (goal->object()).str();
+   std::string gpred = (goal->predicate()).str();
+
+   if (m_output)
+     std::cout << "RECALL: " << *goal << std::endl;
+
+   syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
 }
 
 void TimelineReporter::notify(Observation const &obs)
 {
   std::list<TREX::utils::Symbol> attrs;
-  //TrexObservation msg;
 
   TrexOperation op;
   TrexToken token;
@@ -80,10 +100,7 @@ void TimelineReporter::notify(Observation const &obs)
   token.predicate = obs.predicate().str();
   token.timeline = obs.object().str();
 
-  //std::cout << token.timeline << "." << token.predicate <<"{";
-
   op.op = TrexOperation::OP_POST_TOKEN;
-
 
   obs.listAttributes(attrs);
   std::list<TREX::utils::Symbol>::iterator it;
@@ -126,8 +143,6 @@ void TimelineReporter::notify(Observation const &obs)
     }
 
     token.attributes.push_back(attr);
-
-    //std::cout << v;
   }
   if (m_output)
     std::cout << obs << std::endl;
@@ -135,9 +150,6 @@ void TimelineReporter::notify(Observation const &obs)
   op.token.set(token);
   if (m_hostport != -1)
     m_adapter.send(&op, m_hostaddr, m_hostport);
-
-  //Platform *r = m_env->getPlatformReactor();
-  //r->sendMsg(op);
 }
 
 

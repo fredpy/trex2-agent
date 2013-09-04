@@ -486,7 +486,6 @@ namespace TREX
       }
 
       if (!m_blocked && atDestination(frefstate)) {
-        std::cout << "Reference.At \n";
         Observation obs("reference", "At");
         obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
         obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
