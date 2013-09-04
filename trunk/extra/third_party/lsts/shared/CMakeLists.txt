@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/raw_clock.c.out
        ${OUT})
    else(NOT HAS_CLOCK_MONOTONIC_RAW)
-     set(RAW_CLK_LIB ${LIB_RT})
+     set(RAW_CLK_LIB ${HAVE_CLOCK_GETTIME})
    endif(NOT HAS_CLOCK_MONOTONIC_RAW)
 
    message(STATUS "Checking for clock_gettime(CLOCK_MONOTONIC_RAW, ...): ${HAS_CLOCK_MONOTONIC_RAW}")
