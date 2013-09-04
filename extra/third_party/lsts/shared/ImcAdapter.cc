@@ -14,6 +14,8 @@ namespace TREX {
     {
       m_trex_id = 65000;
       m_graph = NULL;
+      bfr = new uint8_t[65535];
+      messenger = NULL;
     }
 
     Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
@@ -308,9 +310,11 @@ namespace TREX {
     }
 
     bool
-    ImcAdapter::send(Message * msg, std::string addr, int port)
+    ImcAdapter::sendAsynchronous(Message * msg, std::string addr, int port)
     {
-      messenger.post(msg, port, addr);
+      if (messenger == NULL)
+        messenger = new ImcMessenger();
+      messenger->post(msg, port, addr);
       return true;
     }
 
@@ -329,21 +333,80 @@ namespace TREX {
     }
 
 
-    Message * ImcAdapter::poll()
+    Message * ImcAdapter::pollAsynchronous()
     {
-      return messenger.receive();
+      if (messenger == NULL)
+        messenger = new ImcMessenger();
+      return messenger->receive();
     }
 
     bool
-    ImcAdapter::bind(int port)
+    ImcAdapter::bindSynchronous(int port)
     {
-      messenger.startListening(port);
+      sock_receive.bind(port, Address::Any, true);
+      sock_receive.addToPoll(iom);
+    }
+
+    Message *
+    ImcAdapter::pollSynchronous()
+    {
+      if (iom.poll(0))
+      {
+        Address addr;
+        uint16_t rv = sock_receive.read((char*)bfr, 65535, &addr);
+        IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
+        return msg;
+      }
+      return NULL;
     }
 
     bool
-    ImcAdapter::unbind()
+    ImcAdapter::sendSynchronous(Message * msg, std::string addr, int port)
     {
-      messenger.stopListening();
+      DUNE::Utils::ByteBuffer bb;
+      try
+      {
+        IMC::Packet::serialize(msg, bb);
+
+        return sock_send.write((const char*)bb.getBuffer(), msg->getSerializationSize(),
+                   Address(addr.c_str()), port);
+      }
+      catch (std::runtime_error& e)
+      {
+        std::cerr << "ERROR: " << ": " << e.what() << "\n";
+        return false;
+      }
+      return true;
+    }
+
+
+    bool
+    ImcAdapter::bindAsynchronous(int port)
+    {
+      if (messenger != NULL)
+        unbindAsynchronous();
+
+      messenger = new ImcMessenger();
+      messenger->startListening(port);
+    }
+
+    bool
+    ImcAdapter::unbindAsynchronous()
+    {
+      if (messenger != NULL)
+      {
+        messenger->stopListening();
+        delete messenger;
+      }
+      messenger = NULL;
+      return true;
+    }
+
+    bool
+    ImcAdapter::unbindSynchronous()
+    {
+      sock_receive.delFromPoll(iom);
+      return true;
     }
 //
 //    bool

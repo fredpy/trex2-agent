@@ -230,9 +230,7 @@ namespace TREX
 
           if( delta>=m_max_delta ) {
             if (m_connected)
-              std::cerr <<"Disconnected from DUNE\n";
-
-            syslog(log::warn) << "Disconnected from DUNE";
+              syslog(log::warn) << "Disconnected from DUNE";
             m_connected = false;
           } else {
             syslog(log::warn)<<"No message received from DUNE for "
@@ -244,7 +242,7 @@ namespace TREX
         else
         {
           if (!m_connected)
-            std::cerr <<"Now connected to DUNE\n";
+            syslog(log::warn) << "Disconnected from DUNE";
           m_connected = true;
           m_last_msg = getCurrentTick();
         }
@@ -252,7 +250,7 @@ namespace TREX
       catch (std::runtime_error& e)
       {
         syslog(log::error) << "Error during message processing: " << e.what();
-        std::cerr << e.what();
+        //std::cerr << e.what();
       }
     }
 
@@ -290,7 +288,7 @@ namespace TREX
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
-      std::cerr << "handleRecall(" << g << ", " << *goal << ")" << std::endl;
+      syslog(log::error) << "handleRecall(" << g << ", " << *goal << ")";
 
       m_goals_pending.remove(g);
 
@@ -334,7 +332,7 @@ namespace TREX
             receivedGoals.front());
         receivedGoals.pop();
       } else {
-        std::cerr << "ControlInterface not instantiated!\n";
+        syslog(log::error) << "ControlInterface not instantiated!";
       }
     }
 
@@ -403,8 +401,8 @@ namespace TREX
             ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
             break;
           default:
-            std::cerr << "Error parsing attribute: ";
-            (*it)->toText(std::cerr);
+            syslog(log::error) << "Error parsing attribute: ";
+            (*it)->toText(syslog(log::error));
             break;
         }
 
@@ -412,7 +410,7 @@ namespace TREX
 
       }
       ss << "\t</Goal>\n";
-      std::cerr << "Received goal:\n" << ss.str();
+      syslog(log::error) << "Received goal:\n" << ss.str();
 
       receivedGoals.push(ss.str());
 

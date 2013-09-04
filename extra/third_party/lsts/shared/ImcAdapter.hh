@@ -26,6 +26,9 @@
 using DUNE_NAMESPACES;
 using namespace TREX::transaction;
 using namespace TREX::utils;
+
+//#define ASYNC_COMMS
+
 namespace TREX {
   namespace LSTS {
 
@@ -41,28 +44,62 @@ namespace TREX {
     public:
       ImcAdapter();
 
-      bool
-      bind(int port);
+      bool bindAsynchronous(int port);
+      bool bindSynchronous(int port);
 
-      bool
-      unbind();
+      bool bind(int port)
+      {
+#ifdef ASYNC_COMMS
+        return bindAsynchronous(port);
+#else
+        return bindSynchronous(port);
+#endif
+      }
 
-      bool
-      send(Message * msg, std::string address, int port);
+      bool unbindAsynchronous();
+      bool unbindSynchronous();
+
+      bool unbind()
+      {
+#ifdef ASYNC_COMMS
+        return unbindAsynchronous();
+#else
+        return unbindSynchronous();
+#endif
+      }
+
+      bool sendAsynchronous(Message * msg, std::string address, int port);
+      bool sendSynchronous(Message * msg, std::string address, int port);
+
+      bool send(Message * msg, std::string address, int port)
+      {
+#ifdef ASYNC_COMMS
+        return sendAsynchronous(msg, address, port);
+#else
+        return sendSynchronous(msg, address, port);
+#endif
+      }
+
+      Message * pollAsynchronous();
+      Message * pollSynchronous();
+
+      Message * poll()
+      {
+#ifdef ASYNC_COMMS
+        return pollAsynchronous();
+#else
+        return pollSynchronous();
+#endif
+      }
 
       bool
       sendViaIridium(Message * msg, const std::string address, int port);
-
-      //bool
-      //startDiscovery();
 
       void
       setTrexId(int trex_id);
 
       void setReactorGraph(graph const &g);
 
-      Message *
-      poll();
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
       Observation vehicleMediumObservation(VehicleMedium * msg);
@@ -99,7 +136,10 @@ namespace TREX {
       void variableToImc(Variable const &v, TrexAttribute * attr);
       void setAttribute(Predicate &pred, TrexAttribute const &attr);
       int m_trex_id;
-      ImcMessenger messenger;
+      UDPSocket sock_send, sock_receive;
+      uint8_t* bfr;
+      IOMultiplexing iom;
+      ImcMessenger * messenger;
       graph const * m_graph;
     };
   }
