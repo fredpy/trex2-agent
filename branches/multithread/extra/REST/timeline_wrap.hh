@@ -85,7 +85,7 @@ namespace TREX {
         }
         
         bool has_observation() const {
-          return m_obs;
+          return !!m_obs; 
         }
         transaction::TICK obs_date() const {
           return m_date;
