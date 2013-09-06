@@ -122,8 +122,15 @@ namespace TREX
       received[msg->getId()] = msg;
     }
 
-
-
+    void
+    Platform::announce(double lat, double lon) {
+      Announce ann;
+      ann.sys_name = "trex";
+      ann.sys_type = SYSTEMTYPE_CCU;
+      ann.lat = lat;
+      ann.lon = lon;
+      sendMsg(ann);
+    }
 
     void
     Platform::handleTickStart()
@@ -236,13 +243,11 @@ namespace TREX
             syslog(log::warn)<<"No message received from DUNE for "
                 <<delta<<" ticks out of "<<m_max_delta<<" allowed.";
           }
-
         }
-
         else
         {
           if (!m_connected)
-            syslog(log::warn) << "Disconnected from DUNE";
+            syslog(log::warn) << "Now connected to DUNE";
           m_connected = true;
           m_last_msg = getCurrentTick();
         }
@@ -260,6 +265,30 @@ namespace TREX
       processState();
       Heartbeat hb;
       sendMsg(hb);
+//      if(getCurrentTick() % 10 == 0)
+//      {
+//        if (received.count(EstimatedState::getIdStatic()) != 0)
+//        {
+//          // Translate incoming messages into observations
+//           EstimatedState * estate =
+//               dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+//
+//           double lat = estate->lat, lon = estate->lon;
+//           WGS84::displace(estate->x, estate->y, &lat, &lon);
+//           announce(lat, lon);
+//        }
+//      }
+      IMC::CpuUsage cpu_usage;
+      int value = m_sys_resources.getProcessorUsage();
+      if (value >= 0 && value <= 100)
+      {
+        cpu_usage.value = value;
+        sendMsg(cpu_usage);
+      }
+      else
+      {
+      	syslog(log::error) << "Cannot get cpu usage:" << value;
+      }
       return true;
     }
 
