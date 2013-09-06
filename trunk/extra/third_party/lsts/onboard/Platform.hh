@@ -150,13 +150,17 @@ namespace TREX {
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
       void insertIntoReceived(IMC::Message* msg);
       void postGoalToken();
-bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
+      bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
+      void announce(double lat, double lon);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;
 
       /** @brief received announces since last tick */
       std::map<std::string, Announce *> m_receivedAnnounces;
+
+      //! System resources.
+      DUNE::System::Resources m_sys_resources;
     };
 
   }

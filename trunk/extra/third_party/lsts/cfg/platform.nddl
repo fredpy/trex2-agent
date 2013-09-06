@@ -17,8 +17,6 @@ class EstimatedState extends AgentTimeline {
 		float altitude;
 		float depth;
 		float height;
-		
-		duration <= 2;
 	};
 };
 
