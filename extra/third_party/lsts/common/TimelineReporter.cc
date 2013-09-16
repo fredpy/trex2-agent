@@ -145,8 +145,10 @@ void TimelineReporter::notify(Observation const &obs)
     token.attributes.push_back(attr);
   }
   if (m_output)
-    std::cout << obs << std::endl;
+  {
 
+    std::cout << "[" << getCurrentTick() << "] " << obs << std::endl;
+  }
   op.token.set(token);
   if (m_hostport != -1)
     m_adapter.send(&op, m_hostaddr, m_hostport);
