@@ -66,7 +66,7 @@ namespace TREX {
         obs.restrictAttribute("z", FloatDomain(msg->height + (- msg->z)));
 
       if (msg->depth > 0)
-        obs.restrictAttribute("depth", FloatDomain(msg->depth + (- msg->z)));
+        obs.restrictAttribute("depth", FloatDomain(msg->depth /*+ (- msg->z)*/));
       if (msg->alt > 0)
         obs.restrictAttribute("altitude", FloatDomain(msg->alt));
       if (msg->height != -1)

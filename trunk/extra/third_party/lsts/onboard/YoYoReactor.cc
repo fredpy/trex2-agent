@@ -33,6 +33,7 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
 
 
+
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
                     LstsReactor(arg),
                     m_lastRefState(s_refstate_tl, "Failed"),
@@ -51,6 +52,7 @@ namespace TREX {
       use(s_control_tl);
       use(s_position_tl);
       provide(s_yoyo_tl);
+      provide("yoyo_state");
     }
 
     void
@@ -107,7 +109,8 @@ namespace TREX {
       }
 
       if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
-	//std::cerr << "the seen reference doesn't match my command. nothing to do." << std::endl;
+	std::cerr << "Seen reference doesn't match my command. nothing to do." << std::endl;
+	postUniqueObservation(Observation("yoyo_state", "IDLE"));
         return true;
       }
 
@@ -159,12 +162,14 @@ namespace TREX {
           syslog(log::warn)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
+          postUniqueObservation(Observation("yoyo_state", "SURFACE"));
         }
         else if (nearZ)
         {
           syslog(log::info)<< "Arrived at min depth, now going down...";
           requestReference(m_lat, m_lon, m_speed, m_maxz);
           state = DESCEND;
+          postUniqueObservation(Observation("yoyo_state", "DESCEND"));
         }
         break;
 
@@ -175,12 +180,14 @@ namespace TREX {
           syslog(log::info)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
+          postUniqueObservation(Observation("yoyo_state", "SURFACE"));
         }
         else if (nearZ || nearBottom)
         {
           syslog(log::info)<< "Arrived at max depth, now going up...";
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
+          postUniqueObservation(Observation("yoyo_state", "ASCEND"));
         }
         break;
 
@@ -196,10 +203,13 @@ namespace TREX {
           obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
           postUniqueObservation(obs);
           state = IDLE;
+          postUniqueObservation(Observation("yoyo_state", "IDLE"));
+
         }
         break;
         default:
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
+          postUniqueObservation(Observation("yoyo_state", "IDLE"));
           break;
       }
 
@@ -265,6 +275,7 @@ namespace TREX {
         state = DESCEND;
         requestReference(m_lat, m_lon, m_speed, m_maxz);
         postUniqueObservation(*g);
+        postUniqueObservation(Observation("yoyo_state", "DESCEND"));
       }
       else
       {
