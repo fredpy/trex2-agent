@@ -41,6 +41,9 @@
 #include <trex/domain/BooleanDomain.hh>
 #include <trex/domain/EnumDomain.hh>
 
+#include "DrifterTracker.hh"
+#include "location.hh"
+
 # define DATA_TL "_trex_data"
 # define MBFD_TL "_mbfd"
 # define TREX_TL "drifterFollow"
@@ -75,9 +78,19 @@ bool DoradoHandler::handleRequest(TREX::transaction::goal_id const &g) {
 
 bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
   org::mbari::trex::SensorMessage data;
+  static size_t count = 0;
   
   if( data.ParseFromArray(msg.body(), msg.size()) ) {
     int samples = data.sample_size();
+    {
+      std::ostringstream oss;
+      oss<<"dorado."<<(count++)<<".sbd";
+      std::fstream of(owner().get_file(oss.str()).c_str());
+      data.SerializeToOstream(&of);
+      of.close();
+      syslog()<<"New trex proto message logged to "<<oss.str();
+    }      
+    
     for(int i=0; i<samples; ++i) {
       org::mbari::trex::SensorMessage_Sample const &samp = data.sample(i);
       boost::posix_time::ptime 
@@ -111,6 +124,48 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
                     boost::posix_time::from_time_t(fix.to_time()), 
                     error_rate);
     }
+    
+    // For now I will produce the file globally asuming that this a whole single mission
+    std::ofstream csv(owner().get_file("sensor.csv").c_str());
+    csv<<"utime, latitude, longitude, northing, easting, depth, temperature, salinity, ch_fl, nitrate"<<std::endl;
+    
+    // Generate the csv file
+    for(serie<sensor_data>::iterator i=m_serie.begin(); m_serie.end()!=i; ++i) {
+      csv<<i->first<<", ";
+      earth_point loc(i->second.first[0], i->second.first[1], 10, 'S'); // hard coded zone for mbari
+      
+      
+      
+      csv.precision(6);
+      csv<<loc.latitude()<<", "<<loc.longitude()<<", ";
+      csv.precision(2);
+      csv<<i->second.first[0]<<", "<<i->second.first[1]<<", "<<i->second.first[2]<<", ";
+      sensor_data::const_iterator j = i->second.second.find("temperature");
+      if( j!=i->second.second.end() )
+        csv<<j->second<<", ";
+      else
+        csv<<"NaN, ";
+      j = i->second.second.find("salinity");
+      if( j!=i->second.second.end() ) {
+        csv.precision(4);
+        csv<<j->second<<", ";
+      } else
+        csv<<"NaN, ";
+      csv.precision(6);
+      j = i->second.second.find("ch_fl");
+      if( j!=i->second.second.end() ) {
+        csv<<j->second<<", ";
+      } else
+        csv<<"NaN, ";
+      j = i->second.second.find("nitrate");
+      if( j!=i->second.second.end() ) {
+        csv<<j->second;
+      } else
+        csv<<"NaN";
+      csv<<std::endl;
+    }
+    csv.close();
+    
     for(size_t i=0; i<data.observations_size(); ++i) {      
       org::mbari::trex::Predicate const &pred(data.observations(i));
       if( TREX_TL==pred.object() ) {

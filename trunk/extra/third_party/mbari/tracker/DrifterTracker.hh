@@ -103,6 +103,10 @@ namespace mbari {
     /** @brief Destructor */
     ~DrifterTracker();
 
+    path_type get_file(std::string const &name) const {
+      return file_name(name);
+    }
+    
   private:
     void handleInit();
     bool synchronize();
