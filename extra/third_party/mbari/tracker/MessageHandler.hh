@@ -198,6 +198,10 @@ namespace mbari {
 
     TREX::utils::log::stream
     syslog(TREX::utils::Symbol const &kind = TREX::utils::log::null);
+    
+    DrifterTracker &owner() {
+      return m_tracker;
+    }
   private:
     DrifterTracker &m_tracker;
     std::string     m_prefix;
