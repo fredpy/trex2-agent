@@ -85,10 +85,12 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
     {
       std::ostringstream oss;
       oss<<"dorado."<<(count++)<<".sbd";
-      std::fstream of(owner().get_file(oss.str()).c_str());
+      boost::filesystem::path p = owner().get_file(oss.str());
+      
+      std::fstream of(p.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
       data.SerializeToOstream(&of);
       of.close();
-      syslog()<<"New trex proto message logged to "<<oss.str();
+      syslog()<<"New trex proto message logged to "<<oss.str()<<"\n\t"<<p.string();
     }      
     
     for(int i=0; i<samples; ++i) {
@@ -102,6 +104,9 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       pos[0] = samp.northing();
       pos[1] = samp.easting();
       pos[2] = samp.depth();
+      
+      values.insert(sensor_data::value_type("northing", pos[0]));
+      values.insert(sensor_data::value_type("easting", pos[1]));
       
       if( samp.has_temperature() ) 
 	values.insert(sensor_data::value_type("temperature", samp.temperature()));
@@ -123,24 +128,58 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       m_serie.align(boost::posix_time::from_time_t(fix.from_time()), 
                     boost::posix_time::from_time_t(fix.to_time()), 
                     error_rate);
+      gps_fix tmp;
+      tmp.from = fix.from_time();
+      tmp.to = fix.to_time();
+      tmp.north = fix.northing_error_rate();
+      tmp.east = fix.easting_error_rate();
+      m_fix.push_back(tmp);
+
+      std::ofstream err(owner().get_file("gps_fix.csv").c_str());
+      err<<"from_time, to_time, err_north(m/s), err_east(m/s)"<<std::endl;
+      err.precision(2);
+      for(std::list<gps_fix>::const_iterator j = m_fix.begin(); m_fix.end()!=j; ++j) {
+        err<<j->from<<", "<<j->to<<", "<<j->north<<", "<<j->east<<std::endl;
+      }
+      err.close();
+      syslog()<<"Updated gps_fix.csv with new fix update";
     }
     
     // For now I will produce the file globally asuming that this a whole single mission
     std::ofstream csv(owner().get_file("sensor.csv").c_str());
-    csv<<"utime, latitude, longitude, northing, easting, depth, temperature, salinity, ch_fl, nitrate"<<std::endl;
+    csv<<"utime, corrected_lat, corrected_lon, corrected_northing, corrected_easting, depth, "
+    ", travel_dist, northing, easting, temperature, salinity, nitrate, chfl"<<std::endl;
+    
+    double travel = 0.0;
+    earth_point pred;
+    rhumb_lines dist_c;
     
     // Generate the csv file
     for(serie<sensor_data>::iterator i=m_serie.begin(); m_serie.end()!=i; ++i) {
       csv<<i->first<<", ";
       earth_point loc(i->second.first[0], i->second.first[1], 10, 'S'); // hard coded zone for mbari
-      
-      
+      if( i!=m_serie.begin() ) {
+        travel += pred.distance(loc, dist_c);
+      }
+      pred = loc;
       
       csv.precision(6);
       csv<<loc.latitude()<<", "<<loc.longitude()<<", ";
       csv.precision(2);
-      csv<<i->second.first[0]<<", "<<i->second.first[1]<<", "<<i->second.first[2]<<", ";
-      sensor_data::const_iterator j = i->second.second.find("temperature");
+      csv<<i->second.first[0]<<", "<<i->second.first[1]<<", "<<i->second.first[2]<<", "<<travel;
+      sensor_data::const_iterator j = i->second.second.find("northing");
+      if( j!=i->second.second.end() )
+        csv<<j->second<<", ";
+      else
+        csv<<"NaN, ";
+      j = i->second.second.find("easting");
+      if( j!=i->second.second.end() )
+        csv<<j->second<<", ";
+      else
+        csv<<"NaN, ";
+      csv.precision(6);
+
+      j = i->second.second.find("temperature");
       if( j!=i->second.second.end() )
         csv<<j->second<<", ";
       else
@@ -152,19 +191,20 @@ bool DoradoHandler::handleMessage(amqp::queue::message &msg) {
       } else
         csv<<"NaN, ";
       csv.precision(6);
-      j = i->second.second.find("ch_fl");
-      if( j!=i->second.second.end() ) {
-        csv<<j->second<<", ";
-      } else
-        csv<<"NaN, ";
       j = i->second.second.find("nitrate");
       if( j!=i->second.second.end() ) {
         csv<<j->second;
       } else
         csv<<"NaN";
+      j = i->second.second.find("ch_fl");
+      if( j!=i->second.second.end() ) {
+        csv<<j->second<<", ";
+      } else
+        csv<<"NaN, ";
       csv<<std::endl;
     }
     csv.close();
+    syslog()<<"Wrote "<<m_serie.size()<<" samples other "<<travel<<" meters travelled";
     
     for(size_t i=0; i<data.observations_size(); ++i) {      
       org::mbari::trex::Predicate const &pred(data.observations(i));

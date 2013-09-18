@@ -35,6 +35,7 @@
 # define H_DoradoHandler
 
 # include <string>
+# include <list> 
 
 # include "MessageHandler.hh"
 # include "serie.hh"
@@ -103,12 +104,20 @@ namespace mbari {
     serie<sensor_data> m_serie;
     bool m_updated;
     
+    struct gps_fix {
+      time_t from, to;
+      double north, east;
+    };
+    std::list<gps_fix> m_fix;
+    
+    
     TREX::transaction::Observation m_last_obs;
     bool m_obs_fresh;
     date_type m_since;
     
     
     std::map<std::string, kalman_filter_fn> m_filters;
+    
     
     
     void mbfd(serie<sensor_data>::iterator from, serie<sensor_data>::iterator to,
