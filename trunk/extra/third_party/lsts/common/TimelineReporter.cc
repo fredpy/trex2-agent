@@ -50,7 +50,7 @@ TimelineReporter::declared(details::timeline const &timeline)
   if (m_output)
     std::cout << "Timeline has been declared: " << timeline.name() << std::endl;
 
-  syslog(log::warn) << "Timeline has been declared: " << timeline.name();
+  //syslog(log::warn) << "Timeline has been declared: " << timeline.name();
   if( !isExternal(timeline.name()) )
 	  use(timeline.name(), false, true);
 }
@@ -60,7 +60,7 @@ TimelineReporter::undeclared(details::timeline const &timeline)
 {
   if (m_output)
     std::cout << "Timeline has been undeclared: " << timeline.name() << std::endl;
-  syslog(log::warn) << "Timeline has been undeclared: " << timeline.name();
+  //syslog(log::warn) << "Timeline has been undeclared: " << timeline.name();
   unuse(timeline.name());
 }
 
@@ -74,7 +74,7 @@ void TimelineReporter::newPlanToken(goal_id const &g)
   if (m_output)
     std::cout << "GOAL: " << *goal << std::endl;
 
-  syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
+  //syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
 }
 
 void TimelineReporter::cancelledPlanToken(goal_id const &g)
@@ -87,7 +87,7 @@ void TimelineReporter::cancelledPlanToken(goal_id const &g)
    if (m_output)
      std::cout << "RECALL: " << *goal << std::endl;
 
-   syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
+   //syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
 }
 
 void TimelineReporter::notify(Observation const &obs)

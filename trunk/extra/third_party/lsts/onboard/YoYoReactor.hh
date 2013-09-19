@@ -43,6 +43,7 @@ namespace TREX {
       double lat, lon;
       double z;
       double speed;
+      int tick;
     } ReferenceRequest;
 
     enum EXEC_STATE {IDLE, DESCEND, ASCEND, SURFACE, DONE};
@@ -83,8 +84,8 @@ namespace TREX {
       static utils::Symbol const s_refstate_tl;
       static utils::Symbol const s_control_tl;
       static utils::Symbol const s_position_tl;
-      
       static utils::Symbol const s_yoyo_tl;
+      static utils::Symbol const s_yoyo_state_tl;
     };
 
 

@@ -686,9 +686,6 @@ namespace TREX
 
     bool Platform::goingAUV(goal_id goal) {
 
-      syslog(log::info) << "goingAUV: " << goal;
-
-
       goal_id g = goal;
       Variable lat, lon, v;
 
