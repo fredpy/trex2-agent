@@ -49,6 +49,7 @@ namespace TREX
         postObservation(obs, true);
         return true;
       }
+
       return false;
     }
   } /* namespace LSTS */

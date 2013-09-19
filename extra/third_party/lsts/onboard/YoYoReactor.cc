@@ -21,7 +21,7 @@ namespace
 namespace TREX {
   namespace LSTS {
 
-    // Sy,bol equaity test is faster than string : use global Symbols to improve performances
+    // Symbol equality test is faster than string : use global Symbols to improve performances
     utils::Symbol const YoYoReactor::s_trex_pred("TREX");
     utils::Symbol const YoYoReactor::s_exec_pred("Exec");
 
@@ -29,30 +29,27 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
     utils::Symbol const YoYoReactor::s_control_tl("control");
     utils::Symbol const YoYoReactor::s_position_tl("estate");
-
     utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
-
-
+    utils::Symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
 
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
-                    LstsReactor(arg),
-                    m_lastRefState(s_refstate_tl, "Failed"),
-                    m_lastControl(s_control_tl, "Failed"),
-                    m_lastReference(s_reference_tl, "Failed"),
-                    m_lastPosition(s_position_tl, "Failed")
+      LstsReactor(arg),
+      m_lastRefState(s_refstate_tl, "Failed"),
+      m_lastControl(s_control_tl, "Failed"),
+      m_lastReference(s_reference_tl, "Failed"),
+      m_lastPosition(s_position_tl, "Failed")
     {
       m_lat = m_lon = m_speed = m_minz = m_maxz = -1;
-      //      m_time_underwater = 0;
       m_time_at_surface = 0;
+      m_cmdz = 0;
 
-      //      m_secs_underwater = 0;
       state = IDLE;
       use(s_reference_tl, true);
       use(s_refstate_tl, false);
       use(s_control_tl);
       use(s_position_tl);
       provide(s_yoyo_tl);
-      provide("yoyo_state");
+      provide(s_yoyo_state_tl);
     }
 
     void
@@ -60,17 +57,25 @@ namespace TREX {
     {
       Observation yoyo(s_yoyo_tl, "Idle");
       postObservation(yoyo);
+
+      Observation yoyo_state(s_yoyo_state_tl, "Idle");
+      postObservation(yoyo_state);
+
+      m_lastSeenRef.lat = m_lastSeenRef.lon = m_lastSeenRef.speed =
+          m_lastSeenRef.z = m_lastSeenRef.tick = 0;
+      m_lastSentRef.lat = m_lastSentRef.lon = m_lastSentRef.speed =
+          m_lastSentRef.z = m_lastSentRef.tick = 0;
+
     }
 
     void
     YoYoReactor::handleTickStart()
     {
-      //std::cerr << "[YOYO] handleTickStart()" << std::endl;
     }
 
     void
     YoYoReactor::printReference(ReferenceRequest req) {
-      syslog(log::warn) << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")";
+      std::cerr << "Reference ( lat: " << req.lat << ", lon: " << req.lon << " / z: " << req.z << ", speed: " << req.speed << ")\n";
     }
 
     bool
@@ -84,7 +89,6 @@ namespace TREX {
         return false;
       if (req1.speed != req2.speed)
         return false;
-
       return true;
     }
 
@@ -108,12 +112,16 @@ namespace TREX {
         }
       }
 
+      // If reference not yet sent or if other system is controlling the vehicle
       if (!sameReference(m_lastSeenRef, m_lastSentRef)) {
-	std::cerr << "Seen reference doesn't match my command. nothing to do." << std::endl;
-	postUniqueObservation(Observation("yoyo_state", "IDLE"));
+        std::cerr << "Seen reference doesn't match sent command." << std::endl;
+        printReference(m_lastSeenRef);
+        printReference(m_lastSentRef);
         return true;
       }
-
+      /*else {
+        std::cerr << "Requested at " << m_lastSentRef.tick << " and started at " << m_lastSeenRef.tick << std::endl;
+      }*/
 
       double atZ = -1000;
       if (m_lastPosition.hasAttribute("z"))
@@ -121,13 +129,12 @@ namespace TREX {
         Variable vz = m_lastPosition.getAttribute("z");
         if (vz.isComplete() && vz.domain().isSingleton())
         {
-	   atZ = vz.domain().getTypedSingleton<double,true>();
+          atZ = vz.domain().getTypedSingleton<double,true>();
         }
       }
 
       if (m_lastRefState.hasAttribute("near_z"))
       {
-
         v = m_lastRefState.getAttribute("near_z");
         BooleanDomain const &nearz = dynamic_cast<BooleanDomain const &>(v.domain());
 
@@ -162,14 +169,12 @@ namespace TREX {
           syslog(log::warn)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
-          postUniqueObservation(Observation("yoyo_state", "SURFACE"));
         }
         else if (nearZ)
         {
           syslog(log::info)<< "Arrived at min depth, now going down...";
           requestReference(m_lat, m_lon, m_speed, m_maxz);
           state = DESCEND;
-          postUniqueObservation(Observation("yoyo_state", "DESCEND"));
         }
         break;
 
@@ -180,19 +185,18 @@ namespace TREX {
           syslog(log::info)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
-          postUniqueObservation(Observation("yoyo_state", "SURFACE"));
         }
         else if (nearZ || nearBottom)
         {
           syslog(log::info)<< "Arrived at max depth, now going up...";
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
-          postUniqueObservation(Observation("yoyo_state", "ASCEND"));
         }
         break;
 
         case (SURFACE):
-        if (nearXY && nearZ)
+
+        if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
         {
           syslog(log::info)<< "Finished executing yoyo...";
           Observation obs = Observation(s_yoyo_tl, "Done");
@@ -203,13 +207,27 @@ namespace TREX {
           obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
           postUniqueObservation(obs);
           state = IDLE;
-          postUniqueObservation(Observation("yoyo_state", "IDLE"));
-
         }
         break;
         default:
+          syslog(log::info)<< "Just idling...";
           postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
-          postUniqueObservation(Observation("yoyo_state", "IDLE"));
+          break;
+      }
+
+      switch (state)
+      {
+        case (DESCEND):
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Descending"));
+          break;
+        case (ASCEND):
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Ascending"));
+          break;
+        case (SURFACE):
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Surfacing"));
+          break;
+        case (IDLE):
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Idle"));
           break;
       }
 
@@ -234,6 +252,7 @@ namespace TREX {
       m_lastSentRef.lon = lon;
       m_lastSentRef.z = z;
       m_lastSentRef.speed = speed;
+      m_lastSentRef.tick = getCurrentTick();
       m_cmdz = z;
     }
 
@@ -272,10 +291,9 @@ namespace TREX {
         if (v.domain().isSingleton())
           m_maxz = v.domain().getTypedSingleton<double, true>();
 
-        state = DESCEND;
         requestReference(m_lat, m_lon, m_speed, m_maxz);
+        state = DESCEND;
         postUniqueObservation(*g);
-        postUniqueObservation(Observation("yoyo_state", "DESCEND"));
       }
       else
       {
@@ -301,6 +319,7 @@ namespace TREX {
           m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
           m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
           m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.tick = getCurrentTick();
         }
         else {
 
