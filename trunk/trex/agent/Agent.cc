@@ -74,7 +74,7 @@ namespace TREX {
        * graph.
        *
        * The initialization is done through the @c initialize call on each
-       * reactor that will in turn call handleInit callback insisde this
+       * reactor that will in turn call handleInit callback inside this
        * reactor
        *
        * @sa TREX::transaction::TeleoReactor::initialize(TREX::transaction::TICK)
@@ -86,17 +86,19 @@ namespace TREX {
        */
       class init_visitor :public CycleDetector {
       public:
+	typedef std::list<graph::reactor_id> reactor_queue;
+
 	/** @brief Constructor
 	 * @param[in] final the final tick of the mission
 	 */
-	explicit init_visitor(TICK final)
-	  :m_final(final) {}
+	explicit init_visitor(reactor_queue &q)
+	  :m_queue(&q) {}
 	/** @brief Copy constructor
 	 *
 	 * @param[in] other the instance to copy
 	 */
 	init_visitor(init_visitor const &other)
-	  :CycleDetector(other), m_final(other.m_final) {}
+	  :CycleDetector(other), m_queue(other.m_queue) {}
 	/** @brief Destructor */
 	virtual ~init_visitor() {}
 
@@ -117,18 +119,16 @@ namespace TREX {
 	 */
 	void finish_vertex(graph::reactor_id r, graph const &g) {
 	  if( is_valid(r,g) ) {
-	    if( !r->initialize(m_final) ) {
-	      g.isolate(r);
-	    }
-	  }
+            // std::cerr<<r->getName()<<" is queued for init"<<std::endl;
+            m_queue->push_back(r);
+	  } // else {
+//            std::cerr<<r->getName()<<" is not valid"<<std::endl;
+//          }
 	}
       protected:
-	/** @brief Final tick value
-	 *
-	 * Stores the final tick of the mission that will be proovided to
-	 * the reactors during the depth first search execution of this visitor.
-	 */
-	TICK m_final;
+	reactor_queue               *m_queue;
+
+	
 
       };
 
@@ -724,9 +724,11 @@ void Agent::loadConf(std::string const &file_name) {
   loadConf(agent.front());
 }
 
-void Agent::init_dfs_sync() {
-  details::init_visitor init(m_finalTick);
+std::list<Agent::reactor_id> Agent::init_dfs_sync() {
+  std::list<Agent::reactor_id> queue;
+  details::init_visitor init(queue);
   boost::depth_first_search(me(), boost::visitor(init));
+  return queue;
 }
 
 
@@ -736,14 +738,31 @@ void Agent::initComplete() {
 			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
     throw AgentException(*this, "Agent is not connected to a clock");
+  
+  details::sync_scheduller::reactor_queue queue;
+  boost::function<details::init_visitor::reactor_queue ()>
+  sort_dfs(boost::bind(&Agent::init_dfs_sync, this));
 
-  boost::function<void ()> init_graph = boost::bind(&Agent::init_dfs_sync, this);
-  TREX::utils::strand_run(strand(), init_graph);
+  queue = strand_run(strand(), sort_dfs);
+  size_t n_failed = 0;
   
+//  std::cerr<<"Intializing "<<queue.size()<<" reactors."<<std::endl;
   
-  size_t n_failed = cleanup();
+  while( !queue.empty() ) {
+    reactor_id r = queue.front();
+    queue.pop_front();
+    
+//    std::cerr<<r->getName()<<".initialize("<<m_finalTick<<")."<<std::endl;
+    if( !r->initialize(m_finalTick) ) {
+      syslog(null, error)<<r->getName()<<" failed to initialize";
+      kill_reactor(r);
+      ++n_failed;
+    }
+  }
+  
   if( n_failed>0 )
     syslog(null, warn)<<n_failed<<" reactors failed to initialize.";
+  
 
   // Check for missing timelines
   for(timeline_iterator it=timeline_begin(); timeline_end()!=it; ++it) {
