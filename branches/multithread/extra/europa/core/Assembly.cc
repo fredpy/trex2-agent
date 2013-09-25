@@ -184,10 +184,15 @@ bool Assembly::actions_supported() {
 Assembly::Assembly(std::string const &name, size_t steps,
                    size_t depth)
   :m_in_synchronization(false), m_name(name),
+   m_debug_file(m_trex_schema->service()),
    m_synchSteps(steps), m_synchDepth(depth),
    m_archiving(false) {
+     m_debug_file.open(m_trex_schema->file_name(m_name+"/europa.log"));
+     m_debug.open(utils::async_buffer_sink(m_debug_file));
+     m_trex_schema->setStream(m_debug);
+     
   //  redirect log output to <name>/europa.log
-  m_trex_schema->setStream(m_debug, m_name+"/europa.log");
+  //  m_trex_schema->setStream(m_debug, m_name+"/europa.log");
   if( m_synchSteps==0 )
     m_synchSteps = std::numeric_limits<unsigned int>::max();
   else
@@ -543,7 +548,9 @@ bool Assembly::do_synchronize() {
   }
   for(internal_iterator i=begin_internal(); end_internal()!=i; ++i)
     (*i)->commit(); // It was consistent from synchronizer => never fail
-
+  
+  // On success clear decisions as they are now assertions
+  synchronizer()->clear();
   return true;
 }
 
@@ -580,7 +587,7 @@ bool Assembly::relax(bool aggressive) {
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
   planner()->reset();
-  m_updated_commit = aggressive; // ask for archiving whenever we have a full relax
+  m_updated_commit = m_updated_commit || aggressive; // ask for archiving whenever we have a full relax
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
@@ -688,6 +695,10 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
     details::restrict_bases(active, tok);
     tok->cancel();
   }
+  if( m_committed.end()==m_committed.find(active) ) {
+    m_completed.insert(active);
+    m_updated_commit = true;
+  }
   // Make dsure that this guy will stay on the current spot
   tok->end()->restrictBaseDomain(active->end()->lastDomain());
   tok->start()->restrictBaseDomain(active->start()->lastDomain());
@@ -731,9 +742,14 @@ void Assembly::archive(EUROPA::eint date) {
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
+    std::string type;
+    if( is_action(tok) )
+      type = "action";
+    else
+      type = "predicate";
 
     if( details::upperBound(details::active(tok)->end()) > cur ) {
-      debugMsg("trex:always", "WARNING: Token "
+      debugMsg("trex:always", "WARNING: "<<type<<" "
                <<tok->getPredicateName().toString()<<'('<<tok->getKey()
                <<") is no longer completed (end=["
                <<details::lowerBound(details::active(tok)->end())<<", "
@@ -745,7 +761,7 @@ void Assembly::archive(EUROPA::eint date) {
 
       if( master.isNoId() ) {
         if( tok->isInactive() ) {
-          debugMsg("trex:archive", "Discard ROOT inactive completed token "
+          debugMsg("trex:archive", "Discard ROOT inactive completed "<<type<<" "
                    <<tok->getPredicateName().toString()<<'('
                    <<tok->getKey()<<')');
           discard(tok);
@@ -754,7 +770,7 @@ void Assembly::archive(EUROPA::eint date) {
         } else if( tok->isMerged() ) {
           EUROPA::TokenId active = tok->getActiveToken();
           if( m_committed.find(active)!=m_committed.end() ) {
-            debugMsg("trex:archive", "Discard ROOT merged completed token "
+            debugMsg("trex:archive", "Discard ROOT merged completed "<<type<<" "
                      <<tok->getPredicateName().toString()<<'('
                      <<tok->getKey()<<')');
             replace(tok);
@@ -768,27 +784,43 @@ void Assembly::archive(EUROPA::eint date) {
             terminate(active);
           }
         } else if( tok->isActive() ) {
-          debugMsg("trex:archive", "Commit ROOT active completed token "
+          debugMsg("trex:archive", "Commit ROOT active completed "<<type<<" "
                    <<tok->getPredicateName().toString()<<'('
                    <<tok->getKey()<<')');
           m_committed.insert(tok);
           m_completed.erase(tok);
+          m_updated_commit = true;
         }
       } else if( m_committed.end()!=m_committed.find(master) ) {
         if( tok->isMerged() ) {
           EUROPA::TokenId active = tok->getActiveToken();
           if( m_committed.find(active)!=m_committed.end() ) {
-            debugMsg("trex:archive", "Cancel merged completed token "
+            debugMsg("trex:archive", "Cancel merged completed "<<type<<" "
                      <<tok->getPredicateName().toString()<<'('
                      <<tok->getKey()<<')');
             replace(tok);
-          } else if( m_completed.find(active)==m_completed.end() )
+          } else if( m_completed.find(active)==m_completed.end() ) {
+            debugMsg("trex:archive", "Marking active ("<<master->getKey()
+                     <<") counterpart of "<<type<<" "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()<<") as completed");
             terminate(active);
+          }
         } else if( tok->isActive() ) {
+          debugMsg("trex:archive", "Making active "<<type<<" "
+                   <<tok->getPredicateName().toString()<<'('
+                   <<tok->getKey()<<") committed");
           m_committed.insert(tok);
           m_completed.erase(tok);
+          m_updated_commit = true;
+        } else {
+          debugMsg("trex:archive", type<<" "<<tok->getPredicateName().toString()
+                   <<'('<<tok->getKey()<<") is completed but neither active nor merged");
         }
       } else if( details::upperBound(master->end())<=cur ) {
+        debugMsg("trex:archive", type<<" "<<tok->getPredicateName().toString()
+                 <<'('<<tok->getKey()<<") marked as completed as its end="
+                 <<master->end()->lastDomain()<<"<="<<cur);
         terminate(master);
       }
     }
@@ -812,11 +844,17 @@ void Assembly::archive(EUROPA::eint date) {
               debugMsg("trex:archive", "Cannot delete "
                        <<tok->getPredicateName().toString()<<'('
                        <<tok->getKey()
-                       <<"): one of its master is not yet committed");
+                       <<"): one of its master is not yet committed:\n\t-"
+                       <<(is_action(master)?"action":"predicate")
+                       <<" "<<master->getPredicateName().toString()<<'('<<master->getKey()<<")");
               can_delete = false;
             }
-            if( details::upperBound(master->end())<=date )
+            if( details::upperBound(master->end())<=date ) {
+              debugMsg("trex:archive", "Adding "<<tok->getPredicateName().toString()
+                       <<'('<<tok->getKey()<<")'s master "<<(is_action(master)?"action":"predicate")
+                       <<" "<<master->getPredicateName().toString()<<'('<<master->getKey()<<") to completed list");
               terminate(master);
+            }
           }
         }
       }
@@ -825,46 +863,71 @@ void Assembly::archive(EUROPA::eint date) {
 
       for(EUROPA::TokenSet::const_iterator i=tmp.begin();
           tmp.end()!=i; ++i) {
-        if( details::upperBound(details::active(*i)->end())<=date ) {
+        EUROPA::TokenId i_active = details::active(*i);
+        
+        if( details::upperBound(i_active->end())<=date ) {
           if( !(*i)->isInactive() ) {
-            if( can_delete ) {
-              debugMsg("trex:archive", "Cannot delete "
-                       <<tok->getPredicateName().toString()<<'('
-                       <<tok->getKey()
-                       <<"): one of its slaves is part of the plan");
-              can_delete = false;
+            EUROPA::TokenSet::const_iterator j = m_committed.find(i_active);
+            
+            if(m_committed.end()==j ) {
+              if( can_delete ) {
+                debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
+                         <<tok->getPredicateName().toString()<<'('
+                         <<tok->getKey()
+                         <<"): one of its slaves is part of the plan:\n\t- "
+                         <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
+                         <<'('<<(*i)->getKey()<<") |"<<details::active(*i)->start()->lastDomain()<<", "
+                         <<details::active(*i)->end()->lastDomain()<<"|.");
+                can_delete = false;
+              }
+              if( m_completed.end()!=m_completed.find(*i) ) {
+                debugMsg("trex:archive", "Adding slave "<<(is_action(*i)?"action ":"predicate ")
+                         <<(*i)->getPredicateName().toString()
+                         <<'('<<(*i)->getKey()<<") to completed tokens.");
+                terminate(*i);
+              }
+            } else {
+              if( (*i)->isMerged() ) {
+                debugMsg("trex:archive", "Cancel merged completed slave "<<(is_action(*i)?"action ":"predicate ")
+                         <<(*i)->getPredicateName().toString()<<'('
+                         <<(*i)->getKey()<<')');
+                replace(*i);
+              } else {
+                // Tricky situation where I need to try to cancl thistoken without killing (*i)
+              }
             }
-            if( m_committed.find(*i)==m_committed.end() &&
-                m_completed.find(*i)==m_completed.end() )
-              // could do better but lets keep it cool for now
-              terminate(*i);
           }
-        } else if( details::upperBound(details::active(*i)->start())<date ) {
+      
+        } else if( details::upperBound(i_active->start())<date ) {
           EUROPA::ObjectDomain const &dom = (*i)->getObject()->lastDomain();
           EUROPA::ObjectId obj = dom.makeObjectList().front();
           state_iterator pos = m_agent_timelines.find(obj->getKey());
           if( m_agent_timelines.end()==pos ||
               !((*pos)->external() && 0==look_ahead(obj)) ) {
             if( can_delete ) {
-              debugMsg("trex:archive", "Cannot delete "
+              debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
                        <<tok->getPredicateName().toString()<<'('
                        <<tok->getKey()
-                       <<"): one of its slaves is not finished yet.");
+                       <<"): one of its slaves is not finished yet:\n\t- "
+                       <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
+                       <<'('<<(*i)->getKey()<<')');
               can_delete = false;
             }
           }
         } else {
           if( can_delete ) {
-            debugMsg("trex:archive", "Cannot delete "
+            debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
                      <<tok->getPredicateName().toString()<<'('
                      <<tok->getKey()
-                     <<"): one of its slaves is not yet started.");
+                     <<"): one of its slaves is not yet started:\n\t- "
+                     <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
+                     <<'('<<(*i)->getKey()<<')');
             can_delete = false;
           }
         }
       }
       if( can_delete ) {
-        debugMsg("trex:archive", "Destroy token "
+        debugMsg("trex:archive", "Destroy "<<(is_action(tok)?"action":"predicate")<<" "
                  <<tok->getPredicateName().toString()<<'('<<tok->getKey()
                  <<") as all its slaves are now inactives and in the past.");
         discard(tok);
@@ -876,7 +939,7 @@ void Assembly::archive(EUROPA::eint date) {
         ++deleted;
       }
     } else {
-      debugMsg("trex:archive", "Token "<<tok->getPredicateName().toString()
+      debugMsg("trex:archive", (is_action(tok)?"action":"predicate")<<" "<<tok->getPredicateName().toString()
                <<'('<<tok->getKey()<<") is not active.\n\tSet it complete.");
       m_committed.erase(tok);
       terminate(tok);
@@ -884,7 +947,7 @@ void Assembly::archive(EUROPA::eint date) {
   }
 
   // Needf
-  debugMsg("trex:archive", "Archived "<<deleted<<" tokens.");
+  debugMsg("trex:archive", "Archived "<<deleted<<" tokens [updated="<<m_updated_commit<<"].");
   constraint_engine()->propagate();
 
   // plan_db()->archive(now()-1);

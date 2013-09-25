@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "EuropaReactor.hh"
+
 #include "bits/europa_convert.hh"
 #include "core/private/CurrentState.hh"
 
@@ -75,6 +76,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
             parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
    m_completed_this_tick(false),
+   m_stats(manager().service()),
    m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg),
                                   "relation_gv")),
    m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
@@ -232,7 +234,7 @@ void EuropaReactor::notify(Observation const &obs) {
   else if( !restrict_token(fact, obs) )
     syslog(null, error)<<"Failed to restrict some attributes of observation "
 		       <<obs;
-  logPlan("notify");
+  // logPlan("notify");
 }
 
 void EuropaReactor::handleRequest(goal_id const &request) {
@@ -267,7 +269,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       }
     }
   }
-  logPlan("request");
+  // logPlan("request");
 }
 
 void EuropaReactor::handleRecall(goal_id const &request) {
@@ -290,7 +292,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
     syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
     recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
-  logPlan("recall");
+  // logPlan("recall");
 }
 
 void EuropaReactor::newPlanToken(goal_id const &t) {
@@ -325,7 +327,7 @@ void EuropaReactor::handleTickStart() {
   // Updating the clock
   clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
   new_tick();
-  logPlan("tick");
+  // logPlan("tick");
 }
 
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
@@ -416,6 +418,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 void EuropaReactor::print_stats(std::string const &what, 
 				size_t steps, size_t depth,
 				EuropaReactor::stat_clock::duration const &dur) {
+  // return; // disabled this for now
   m_stats<<now()<<", "<<what<<", "<<dur.count()
 	 <<", "<<plan_db()->getTokens().size()
 	 <<", "<<steps<<", "<<depth<<std::endl;
@@ -427,7 +430,7 @@ bool EuropaReactor::do_relax(bool full) {
   stat_clock::time_point start = stat_clock::now();
   bool ret = relax(full);
   print_stats("relax", 0, 0, stat_clock::now()-start);
-  logPlan("relax");
+  // logPlan("relax");
   m_dispatched.clear(); // need this in case we have the same
 			// token coming back
   return ret;
@@ -579,6 +582,14 @@ bool EuropaReactor::hasWork() {
         logPlan("plan");
         getFuturePlan();
       }
+      
+      // size_t cpt = 0;
+      if( should_archive() ) {
+        stat_clock::time_point start = stat_clock::now();
+        archive();
+        print_stats("archive", 0, 0, stat_clock::now()-start);
+      }
+
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
         TeleoReactor::external_iterator
@@ -760,11 +771,14 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
   } else 
     name = base_name;
   
-  LogManager::path_type full_name = file_name(name+".gv");
-  std::ofstream out(full_name.c_str());  
-  print_plan(out, m_old_plan_style);
+  LogManager::path_type full_name = file_name(name+".dot");
+  utils::async_ofstream out(manager().service(), full_name.string());
+  {
+    utils::async_ofstream::entry e = out.new_entry();
+    print_plan(e.stream(), m_old_plan_style);
+  }
   if( m_full_log ) {
-    LogManager::path_type link_name = file_name(base_name+".gv");
+    LogManager::path_type link_name = file_name(base_name+".dot");
     if( exists(link_name) ) 
       remove(link_name);
     create_symlink(full_name, link_name);
