@@ -587,7 +587,7 @@ bool Assembly::relax(bool aggressive) {
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
   planner()->reset();
-  m_updated_commit = aggressive; // ask for archiving whenever we have a full relax
+  m_updated_commit = m_updated_commit || aggressive; // ask for archiving whenever we have a full relax
 
   // Use m_iter for robust iteration
   m_iter = m_roots.begin();
@@ -695,6 +695,10 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
     details::restrict_bases(active, tok);
     tok->cancel();
   }
+  if( m_committed.end()==m_committed.find(active) ) {
+    m_completed.insert(active);
+    m_updated_commit = true;
+  }
   // Make dsure that this guy will stay on the current spot
   tok->end()->restrictBaseDomain(active->end()->lastDomain());
   tok->start()->restrictBaseDomain(active->start()->lastDomain());
@@ -785,6 +789,7 @@ void Assembly::archive(EUROPA::eint date) {
                    <<tok->getKey()<<')');
           m_committed.insert(tok);
           m_completed.erase(tok);
+          m_updated_commit = true;
         }
       } else if( m_committed.end()!=m_committed.find(master) ) {
         if( tok->isMerged() ) {
@@ -794,13 +799,28 @@ void Assembly::archive(EUROPA::eint date) {
                      <<tok->getPredicateName().toString()<<'('
                      <<tok->getKey()<<')');
             replace(tok);
-          } else if( m_completed.find(active)==m_completed.end() )
+          } else if( m_completed.find(active)==m_completed.end() ) {
+            debugMsg("trex:archive", "Marking active ("<<master->getKey()
+                     <<") counterpart of "<<type<<" "
+                     <<tok->getPredicateName().toString()<<'('
+                     <<tok->getKey()<<") as completed");
             terminate(active);
+          }
         } else if( tok->isActive() ) {
+          debugMsg("trex:archive", "Making active "<<type<<" "
+                   <<tok->getPredicateName().toString()<<'('
+                   <<tok->getKey()<<") committed");
           m_committed.insert(tok);
           m_completed.erase(tok);
+          m_updated_commit = true;
+        } else {
+          debugMsg("trex:archive", type<<" "<<tok->getPredicateName().toString()
+                   <<'('<<tok->getKey()<<") is completed but neither active nor merged");
         }
       } else if( details::upperBound(master->end())<=cur ) {
+        debugMsg("trex:archive", type<<" "<<tok->getPredicateName().toString()
+                 <<'('<<tok->getKey()<<") marked as completed as its end="
+                 <<master->end()->lastDomain()<<"<="<<cur);
         terminate(master);
       }
     }
@@ -843,23 +863,42 @@ void Assembly::archive(EUROPA::eint date) {
 
       for(EUROPA::TokenSet::const_iterator i=tmp.begin();
           tmp.end()!=i; ++i) {
-       if( details::upperBound(details::active(*i)->end())<=date ) {
+        EUROPA::TokenId i_active = details::active(*i);
+        
+        if( details::upperBound(i_active->end())<=date ) {
           if( !(*i)->isInactive() ) {
-            if( can_delete ) {
-              debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
-                       <<tok->getPredicateName().toString()<<'('
-                       <<tok->getKey()
-                       <<"): one of its slaves is part of the plan:\n\t- "
-                       <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
-                       <<'('<<(*i)->getKey()<<')');
-              can_delete = false;
+            EUROPA::TokenSet::const_iterator j = m_committed.find(i_active);
+            
+            if(m_committed.end()==j ) {
+              if( can_delete ) {
+                debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
+                         <<tok->getPredicateName().toString()<<'('
+                         <<tok->getKey()
+                         <<"): one of its slaves is part of the plan:\n\t- "
+                         <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
+                         <<'('<<(*i)->getKey()<<") |"<<details::active(*i)->start()->lastDomain()<<", "
+                         <<details::active(*i)->end()->lastDomain()<<"|.");
+                can_delete = false;
+              }
+              if( m_completed.end()!=m_completed.find(*i) ) {
+                debugMsg("trex:archive", "Adding slave "<<(is_action(*i)?"action ":"predicate ")
+                         <<(*i)->getPredicateName().toString()
+                         <<'('<<(*i)->getKey()<<") to completed tokens.");
+                terminate(*i);
+              }
+            } else {
+              if( (*i)->isMerged() ) {
+                debugMsg("trex:archive", "Cancel merged completed slave "<<(is_action(*i)?"action ":"predicate ")
+                         <<(*i)->getPredicateName().toString()<<'('
+                         <<(*i)->getKey()<<')');
+                replace(*i);
+              } else {
+                // Tricky situation where I need to try to cancl thistoken without killing (*i)
+              }
             }
-            if( m_committed.find(*i)==m_committed.end() &&
-                m_completed.find(*i)==m_completed.end() )
-              // could do better but lets keep it cool for now
-              terminate(*i);
           }
-        } else if( details::upperBound(details::active(*i)->start())<date ) {
+      
+        } else if( details::upperBound(i_active->start())<date ) {
           EUROPA::ObjectDomain const &dom = (*i)->getObject()->lastDomain();
           EUROPA::ObjectId obj = dom.makeObjectList().front();
           state_iterator pos = m_agent_timelines.find(obj->getKey());
@@ -908,7 +947,7 @@ void Assembly::archive(EUROPA::eint date) {
   }
 
   // Needf
-  debugMsg("trex:archive", "Archived "<<deleted<<" tokens.");
+  debugMsg("trex:archive", "Archived "<<deleted<<" tokens [updated="<<m_updated_commit<<"].");
   constraint_engine()->propagate();
 
   // plan_db()->archive(now()-1);
