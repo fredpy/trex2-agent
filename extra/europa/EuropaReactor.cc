@@ -418,7 +418,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 void EuropaReactor::print_stats(std::string const &what, 
 				size_t steps, size_t depth,
 				EuropaReactor::stat_clock::duration const &dur) {
-  return; // disabled this for now 
+  // return; // disabled this for now
   m_stats<<now()<<", "<<what<<", "<<dur.count()
 	 <<", "<<plan_db()->getTokens().size()
 	 <<", "<<steps<<", "<<depth<<std::endl;
@@ -582,6 +582,14 @@ bool EuropaReactor::hasWork() {
         logPlan("plan");
         getFuturePlan();
       }
+      
+      // size_t cpt = 0;
+      if( should_archive() ) {
+        stat_clock::time_point start = stat_clock::now();
+        archive();
+        print_stats("archive", 0, 0, stat_clock::now()-start);
+      }
+
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
         TeleoReactor::external_iterator
@@ -763,14 +771,14 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
   } else 
     name = base_name;
   
-  LogManager::path_type full_name = file_name(name+".gv");
+  LogManager::path_type full_name = file_name(name+".dot");
   utils::async_ofstream out(manager().service(), full_name.string());
   {
     utils::async_ofstream::entry e = out.new_entry();
     print_plan(e.stream(), m_old_plan_style);
   }
   if( m_full_log ) {
-    LogManager::path_type link_name = file_name(base_name+".gv");
+    LogManager::path_type link_name = file_name(base_name+".dot");
     if( exists(link_name) ) 
       remove(link_name);
     create_symlink(full_name, link_name);
