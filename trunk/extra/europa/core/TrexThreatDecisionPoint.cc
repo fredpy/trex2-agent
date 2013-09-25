@@ -65,7 +65,9 @@ TrexThreatDecisionPoint::TrexThreatDecisionPoint
 }
 
 TrexThreatDecisionPoint::~TrexThreatDecisionPoint() {
-  m_tokenToOrder->decRefCount();
+  // should not be commented buteuropa crashes at time with that
+  // I really need to refine memory management in this reactor
+  // m_tokenToOrder->decRefCount();
 }
 
 // manipulators
