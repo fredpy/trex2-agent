@@ -131,9 +131,11 @@ void Light::setValue(bool val) {
     switch_v = upPred;
   }
   m_light_state.reset(new Observation(lightObj, light_v));
+  //syslog()<<"Posting "<<*m_light_state;
   postObservation(*m_light_state);
   Observation switch_state(switchObj, switch_v);
   switch_state.restrictAttribute("foo", BooleanDomain(m_on));
+  //syslog()<<"Posting "<<switch_state;
   postObservation(switch_state);
 } 
 
@@ -141,6 +143,7 @@ void Light::setValue(bool val) {
 bool Light::synchronize() {
   bool need_post = m_verbose;
 
+  //syslog()<<"Synchronization :\n\t- first tick: "<<m_firstTick<<"\n\t- state: "<<m_on;
   if( m_firstTick ) {
     setValue(m_on);
     need_post = false;
@@ -149,31 +152,43 @@ bool Light::synchronize() {
   } else {
     TICK cur = getCurrentTick();
 
+    //syslog()<<"Testing next goal switch "<<m_nextSwitch<<"<="<<cur;
     if( m_nextSwitch<=cur ) {
-      while( !m_pending.empty() )
+      while( !m_pending.empty() ){
+//        syslog()<<"Checking "<<m_pending.front()->object()<<"."
+//        <<m_pending.front()->predicate()<<".start="<<m_pending.front()->getStart();
 	if( m_pending.front()->startsAfter(cur) ) {
 	  // it can start after cur
-	  if( m_pending.front()->startsBefore(cur) ) {
+	  if( m_pending.front()->startsBefore(cur+1) ) {
 	    
 	    // it can also starts before cur => it can be set to cur 
 	    if( brokenPred!=m_pending.front()->predicate() ) {
+//              syslog()<<"Switching to "<<(downPred==m_pending.front()->predicate());
 	      setValue(downPred==m_pending.front()->predicate());
 	      need_post = false;
 	    } else {
 	      Observation obs(*m_pending.front());
+//              syslog()<<"Posting "<<obs<<" as an observation";
 	      postObservation(obs);
 	    }
 	    m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
 	    m_pending.pop_front();
-	  }
+	  } // else {
+//            syslog()<<"This goal is still in the future ("<<m_pending.front()->getStart()
+//            <<">"<<cur<<").";
+//          }
 	  // if we reached this point that mesans that the goal
 	  // necessarily starts in the future (or has been
 	  // processed)
 	  break;
 	} else {
+//          syslog()<<"This goal shoudl have been already started ("
+//          <<m_pending.front()->getStart()<<"<"<<cur<<").";
 	  // too late to execute => remove it
 	  m_pending.pop_front();
+          
 	}
+      }
     }
   }
   // check if I still need to post the ligh state
@@ -188,17 +203,23 @@ void Light::handleRequest(goal_id const &g) {
     // I insert it on my list
     IntegerDomain::bound lo = g->getStart().lowerBound();
     if( lo.isInfinity() ) {
+//      syslog()<<"Adding "<<*g<<" to front of pending goals";
       m_pending.push_front(g);
     } else {
       std::list<goal_id>::iterator i = m_pending.begin();
+//      size_t pos = 1;
       TICK val = lo.value();
       for(; m_pending.end()!=i; ++i ) {
 	if( (*i)->startsAfter(val) )
 	  break;
+//        ++pos;
       }
+//      syslog()<<"Adding "<<*g<<" at position "<<pos<<" of pending goals";
       m_pending.insert(i, g);
     }
-  }
+  }// else {
+//    syslog()<<"Ignoring goal "<<*g;
+//  }
 }
 
 void Light::handleRecall(goal_id const &g) {
