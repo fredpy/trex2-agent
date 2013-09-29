@@ -12,8 +12,7 @@ class EstimatedState extends AgentTimeline {
 	predicate Position {
 		float latitude;
 		float longitude;
-		float z;
-		
+		float z;		
 		float altitude;
 		float depth;
 		float height;

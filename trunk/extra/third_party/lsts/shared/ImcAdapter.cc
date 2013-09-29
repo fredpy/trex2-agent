@@ -344,16 +344,16 @@ namespace TREX {
     ImcAdapter::bindSynchronous(int port)
     {
       sock_receive.bind(port, Address::Any, true);
-      sock_receive.addToPoll(iom);
+      m_poll.add(sock_receive);
     }
 
     Message *
     ImcAdapter::pollSynchronous()
     {
-      if (iom.poll(0))
+      if (m_poll.poll(0))
       {
         Address addr;
-        uint16_t rv = sock_receive.read((char*)bfr, 65535, &addr);
+        uint16_t rv = sock_receive.read(bfr, 65535, &addr);
         IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
         return msg;
       }
@@ -368,7 +368,7 @@ namespace TREX {
       {
         IMC::Packet::serialize(msg, bb);
 
-        return sock_send.write((const char*)bb.getBuffer(), msg->getSerializationSize(),
+        return sock_send.write(bb.getBuffer(), msg->getSerializationSize(),
                    Address(addr.c_str()), port);
       }
       catch (std::runtime_error& e)
@@ -405,7 +405,9 @@ namespace TREX {
     bool
     ImcAdapter::unbindSynchronous()
     {
-      sock_receive.delFromPoll(iom);
+      m_poll.remove(sock_receive);
+
+      //sock_receive.delFromPoll(iom);
       return true;
     }
 //

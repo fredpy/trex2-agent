@@ -28,12 +28,12 @@ YoYoController::Done {
 		exec.max_z == max_z;
 		exec.min_z == min_z;
 	
-	duration == 1;		
+	duration == 1;
 }
 
 Navigator::At {
-	float min_dist;
-	min_dist == 3.0;
+	//float min_dist;
+	//min_dist == 3.0;
 	
 	starts(YoYoController.Done arr);
 		arr.speed == speed;
@@ -41,7 +41,7 @@ Navigator::At {
 		arr.longitude == longitude;
 		arr.min_z == object.min_z;
 		arr.max_z == object.max_z;
-		ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
+		//ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 }
 
 class NavActions {

@@ -13,18 +13,21 @@ namespace TREX {
     void receiverThread(int port, std::queue<Message *> *inbox, Concurrency::Mutex * mutex)
     {
       UDPSocket sock;
-      IOMultiplexing iom;
+      DUNE::IO::Poll poll;
+      //IOMultiplexing iom;
       uint8_t* bfr = new uint8_t[65535];
 
       sock.bind(port, Address::Any, true);
-      sock.addToPoll(iom);
+
+      poll.add(sock);
+      //sock.addToPoll(iom);
 
       while (true)
       {
-        if (iom.poll(100))
+        if (poll.poll(sock, 100))
         {
           Address addr;
-          uint16_t rv = sock.read((char*)bfr, 65535, &addr);
+          uint16_t rv = sock.read(bfr, 65535, &addr);
           IMC::Message * msg = IMC::Packet::deserialize(bfr, rv);
           mutex->lock();
           inbox->push(msg);
@@ -58,7 +61,7 @@ namespace TREX {
           {
             IMC::Packet::serialize(req.msg, bb);
 
-            sock.write((const char*)bb.getBuffer(), (req.msg)->getSerializationSize(),
+            sock.write(bb.getBuffer(), (req.msg)->getSerializationSize(),
                        Address(req.addr.c_str()), req.port);
 
             delete req.msg;
