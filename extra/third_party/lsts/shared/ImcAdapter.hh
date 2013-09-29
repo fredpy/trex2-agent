@@ -138,7 +138,8 @@ namespace TREX {
       int m_trex_id;
       UDPSocket sock_send, sock_receive;
       uint8_t* bfr;
-      IOMultiplexing iom;
+      //IOMultiplexing iom;
+      DUNE::IO::Poll m_poll;
       ImcMessenger * messenger;
       graph const * m_graph;
     };
