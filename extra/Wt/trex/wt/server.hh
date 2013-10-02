@@ -1,13 +1,14 @@
+/* -*- C++ -- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2011, MBARI.
+ *
+ *  Copyright (c) 2013, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +18,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,47 +32,66 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_REST_reactor
-# define H_trex_REST_reactor
+#ifndef H_trex_wt_server
+# define H_trex_wt_server
 
-# include <trex/transaction/TeleoReactor.hh>
-# include <trex/Wt/server.hh>
+# include <Wt/WServer>
 
-# include <boost/signals2/signal.hpp>
+# include <trex/utils/platform/memory.hh>
+# include <trex/utils/SingletonUse.hh>
 
 namespace TREX {
-  namespace REST {
+  namespace wt {
     
-    class service_tree;
-    class TimelineHistory;
-    class tick_manager;
-    
-    class REST_reactor :public transaction::TeleoReactor {
+    class server :boost::noncopyable {
     public:
-      REST_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
-      ~REST_reactor();
+      bool is_inited() const;
+      bool is_running() const;
+      
+      /** Initialize the server 
+       * @param[in] argc Number of arguments
+       * @param[in] argv List of arguments
+       *
+       * @pre The server was not initialized yet
+       *
+       * Create a new instance of the Wt server with the given server
+       *
+       * @post A server is created with either the given arguments or 
+       * others if it was initalized before
+       */
+      void init(size_t argc, char *arg[], boost::optional<std::string> const &cfg);
+      /** Start the server
+       *
+       * @pre init was called at least once
+       *
+       * Start the exisiting server if tis was not started already
+       *
+       * @retval true if the server was started
+       * @retval fals if the server was already running or there was an error
+       *
+       * @sa is_inited()
+       * @sa is_running()
+       */
+      bool start();
+      
+      /** @brief Get server implementation
+       *
+       * @pre is_inited()
+       * @return A reference to the server 
+       * @throw std::bad_access Server implementation was not created  
+       */
+      ::Wt::WServer &impl() const;
       
     private:
-      //reactor handlers
-      void handleInit();
-      void handleTickStart();
-      void notify(TREX::transaction::Observation const &obs);
-      bool synchronize();
-      void newPlanToken(transaction::goal_id const &t);
-      void cancelledPlanToken(transaction::goal_id const &t);
+      server();
+      ~server();
       
-      TREX::utils::SingletonUse<TREX::wt::server> m_server;
-      
-      // UNIQ_PTR<Wt::WServer>     m_server;
-      
-      SHARED_PTR<TimelineHistory> m_timelines;
-      SHARED_PTR<tick_manager>    m_tick;
-      UNIQ_PTR<service_tree>             m_services;
-      
-      friend class TimelineHistory;
+      UNIQ_PTR< ::Wt::WServer > m_server;
+
+      friend class TREX::utils::SingletonWrapper<server>;
     };
     
-  }
-}
+  } // TREX::Wt
+} // TREX
 
-#endif // H_trex_REST_reactor
+#endif // H_trex_wt_server

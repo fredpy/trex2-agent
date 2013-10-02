@@ -82,6 +82,9 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
   
   boost::filesystem::path wt_cfg = manager().use("wt_config.xml", found),
     log_dest = file_name("Wt.log");
+  boost::optional<std::string> wt_cfg_arg;
+  
+  
   if( found ) {
     bp::ptree cfg;
     
@@ -94,10 +97,10 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     wt_cfg = manager().file_name("cfg/wt_trex.xml");
     xml::write_xml(wt_cfg.string(), cfg);
   
-    m_server.reset(new Wt::WServer("", wt_cfg.string()));
+    wt_cfg_arg = wt_cfg.string(); 
+    // m_server.reset(new Wt::WServer("", wt_cfg.string()));
   } else {
     syslog(utils::log::warn)<<"Did not find "<<wt_cfg.string()<<": using default Wt server config instead.";
-    m_server.reset(new Wt::WServer(""));
   }
   
   // Now look for the program options
@@ -131,10 +134,12 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
     for(size_t i=0; i<argc; ++i)
       argv[i+1] = strdup(args[i].c_str());
   }
-  // No I can set my configuration as Wt expect it
-  m_server->setServerConfiguration(argc, argv);
-  
-  // clean up this blooy malloc mess
+  if( !m_server->is_inited() ) {
+    syslog(utils::log::info)<<"Starting web server";
+    m_server->init(argc, argv, wt_cfg_arg);
+  }
+     
+  // clean up this bloody malloc mess
   for(size_t i=0; i<=argc; ++i)
     free(argv[i]);
   delete[] argv;
@@ -145,7 +150,6 @@ REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
 REST_reactor::~REST_reactor() {
   syslog(utils::log::info)<<"Closing Wt REST server";
   try {
-    m_server.reset();
     m_timelines.reset();
   } catch(Wt::WServer::Exception const &e) {
     syslog(utils::log::error)<<"Eror during REST server shutdown: "<<e.what();
@@ -160,7 +164,7 @@ void REST_reactor::handleInit() {
   m_tick.reset(new tick_manager(get_graph(), manager().service()));
   
   // Build service tree
-  m_services.reset(new service_tree(*m_server, "/rest"));
+  m_services.reset(new service_tree(m_server->impl(), "/rest"));
   m_services->add_handler("version",
                           new json_direct(&trex_version,
                                           "Give current trex version"));
@@ -177,14 +181,16 @@ void REST_reactor::handleInit() {
   m_tick->signal().connect(boost::bind(&TimelineHistory::update_tick, m_timelines, _1));
   
  
-  try {
-    // the final thing to do is start my server
-    if( !m_server->start() )
-      throw ReactorException(*this, "Unable to start Wt REST server");
-    syslog(utils::log::info)<<"Wt REST server started on port "<<m_server->httpPort();
-  } catch(Wt::WServer::Exception const &e) {
-    syslog(utils::log::error)<<"Server initialization error: "<<e.what();
-    throw ReactorException(*this, e.what());
+  if( !m_server->is_running() ) {
+    try {
+      // the final thing to do is start my server
+      if( !m_server->start() )
+        throw ReactorException(*this, "Unable to start Wt REST server");
+      syslog(utils::log::info)<<"Wt REST server started on port "<<m_server->impl().httpPort();
+    } catch(Wt::WServer::Exception const &e) {
+      syslog(utils::log::error)<<"Server initialization error: "<<e.what();
+      throw ReactorException(*this, e.what());
+    }
   }
 }
 

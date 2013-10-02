@@ -36,9 +36,7 @@
 option(WITH_REST "Enable REST based web API for trex agent" OFF)
 
 if(WITH_REST) 
-  find_package(Wt)
-
-  if(Wt_FOUND)
+  if(WITH_WT_SERVER) 
     if(Wt_DBOSQLITE3_LIBRARY)
       set(DBO_BACKEND Sqlite3)
       set(DBO_EXTENSION ".db3")
@@ -47,12 +45,9 @@ if(WITH_REST)
     endif(Wt_DBOSQLITE3_LIBRARY)
 
     if(DBO_FOUND) 
-
       configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbo_cfg.hh.in
 	${CMAKE_CURRENT_BINARY_DIR}/dbo_cfg.hh @ONLY)
-      
-      include_directories(${Wt_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-
+      include_directories(${TREX_WT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
       trex_plugin(REST
 	# source
 	db_manager.cc
@@ -70,10 +65,11 @@ if(WITH_REST)
 	REST_reactor.hh
 	REST_service.hh
 	TimelineHistory.hh)
+
       target_link_libraries(REST_pg
-	${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} ${DBO_LIBS}
+	TREXwt_server ${DBO_LIBS}
 	TREXtransaction)
-      
+
       set(REST_HOST "localhost" CACHE STRING "default REST server address.")
       set(REST_PORT 8080 CACHE NUMBER "default rest server port.")
       
@@ -87,8 +83,7 @@ if(WITH_REST)
       message(WARNING "Unable to find Wt/Dbo!!! Disabling REST plugin")
       set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt/Dbo" FORCE)
     endif(DBO_FOUND)
-  else(Wt_FOUND)
-    message(WARNING "Unable to find Wt!!! Disabling REST plugin")
-    set(WITH_REST OFF CACHE BOOL "Disabled for the lack of Wt" FORCE)
-  endif(Wt_FOUND)
+  else(WITH_WT_SERVER)
+    message(ERROR "Cannot enable WITH_REST plugin while WITH_WT_SERVER is OFF")
+  endif(WITH_WT_SERVER)      
 endif(WITH_REST)
