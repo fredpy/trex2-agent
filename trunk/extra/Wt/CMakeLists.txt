@@ -33,33 +33,25 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_custom_target(plugins COMMENT "TREX plugins")
+option(WITH_WT_SERVER "Enable Wt web server used by REST and witre plugins" ON)
 
-macro(trex_plugin name src)
-  add_library(${name}_pg SHARED ${src} ${ARGN})
-  add_dependencies(plugins ${name}_pg)
-  install(TARGETS ${name}_pg DESTINATION ${TREX_SHARED}/plugins OPTIONAL 
-    EXPORT trex-plugins)
-  trex_cfg(cfg ${TREX_SHARED})
-  set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
-    ${CMAKE_CURRENT_BINARY_DIR})
-  trex_lib(${name}_pg FALSE)
-endmacro(trex_plugin)
+if(WITH_WT_SERVER)
+  find_package(Wt)
 
-# the directories where plugins are located
-add_subdirectory(Wt)
-add_subdirectory(REST)
-add_subdirectory(witre.old)
-# add_subdirectory(witre)
-add_subdirectory(europa)
+  if(Wt_FOUND)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+      ${Wt_INCLUDE_DIR})
 
-# 3rd party plug-ins
-add_subdirectory(third_party)
-
-# backward compatibility stuff
-add_subdirectory(backward)
-
-# examples 
-add_subdirectory(examples)
-
-
+    add_library(TREXwt_server SHARED
+      wt_server.cc
+      trex/wt/server.hh
+      )
+    target_link_libraries(TREXwt_server ${Wt_LIBRARY} ${Wt_HTTP_LIBRARY} TREXutils)
+    trex_lib(TREXwt_server extra)
+  
+    set(TREX_WT_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${Wt_INCLUDE_DIR} PARENT_SCOPE)
+  else(Wt_FOUND)
+    message(WARNING "Unable to find Wt!!! Disabling TREX Wt interface library")
+    set(WITH_WT_SERVER OFF CACHE BOOL "Disabled due to the lack of Wt" FORCE)
+  endif(Wt_FOUND)
+endif(WITH_WT_SERVER)
