@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 #include <trex/domain/EnumDomain.hh>
 #include <trex/domain/StringDomain.hh>
