@@ -14,14 +14,15 @@
 #include "private/Pdlfcn.hh"
 
 #if defined(__APPLE__) && (__GNUC__ < 4)   
-#include <mach-o/dyld.h>
+# include <mach-o/dyld.h>
 #elif defined(__MINGW32__)
-#include <windows.h>
+# include <windows.h>
 #else
-#include <dlfcn.h>
+# include <dlfcn.h>
 #endif
-#include<iostream>
-#include<stdlib.h>
+
+#include <iostream>
+#include <cstdlib>
 
 #define DLERROR_STR_MAX_LEN 256
 

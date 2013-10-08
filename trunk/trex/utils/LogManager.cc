@@ -37,17 +37,22 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <time.h>
 
+// trex headers
+#include "LogManager.hh"
+#include "TREXversion.hh"
+
+// C++ standard headers
+#include <ctime>
+#include <cstring>
+
+#include <iomanip>
+
+// boost libraries
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/time_formatters.hpp>
 
-#include <cerrno>
-#include <cstring>
-#include <iomanip>
-
-#include "LogManager.hh"
-#include "TREXversion.hh"
+#include <boost/system/error_code.hpp>
 
 using namespace TREX::utils; 
 using namespace boost::filesystem;
@@ -129,6 +134,8 @@ bool LogManager::addSearchPath(std::string const &path) {
 
 void LogManager::loadSearchPath() {
   char *home = getenv(TREX_ENV);
+  char *path = getenv(SEARCH_ENV);
+  
   if( NULL!=home ) {
     std::string home_path(home);
     // Right now I am adding $TREX_HOME as it is
@@ -136,15 +143,15 @@ void LogManager::loadSearchPath() {
     // -- or whatever I decide -- instead
     addSearchPath(home_path);
   }
-  char *path = getenv(SEARCH_ENV);
+
   if( NULL!=path ) {
     // column separated list
     std::string path_str(path);
     static boost::char_delimiters_separator<char> sep(false, "", ":");
     boost::tokenizer<> tok(path_str, sep);
-    for(boost::tokenizer<>::iterator beg=tok.begin(); beg!=tok.end();++beg) {
-      addSearchPath(*beg);
-    }
+    
+    for(boost::tokenizer<>::iterator it=tok.begin(); tok.end()!=it;++it)
+      addSearchPath(*it);
   }
 }
 

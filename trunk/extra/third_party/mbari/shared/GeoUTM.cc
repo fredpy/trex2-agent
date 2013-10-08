@@ -1,9 +1,10 @@
 //LatLong- UTM conversion.cpp
 //Lat Long - UTM, UTM - Lat Long conversions
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+
 #include "GeoUTM.Constants.h"
 #include "GeoUTM.hh"
 

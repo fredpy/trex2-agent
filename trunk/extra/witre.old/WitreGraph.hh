@@ -26,7 +26,7 @@
 
 #include <map>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <limits>
 using namespace std;
 
