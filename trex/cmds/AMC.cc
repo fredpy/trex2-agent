@@ -75,7 +75,7 @@
  * @ingroup amccmd
  */
 #include <cstring>
-#include <signal.h>
+#include <csignal>
 
 #include <trex/agent/Agent.hh>
 #include <trex/agent/RealTimeClock.hh>

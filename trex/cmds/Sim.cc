@@ -49,11 +49,11 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cctype>
+#include <csignal>
 
 #include <trex/utils/TREXversion.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/agent/StepClock.hh>
-#include <signal.h>
 
 #include <boost/program_options.hpp>
 
