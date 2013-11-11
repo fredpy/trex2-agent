@@ -35,7 +35,7 @@ void TurtleSimPub::handleInit()
 {
     m_sub.push_back(m_ros->subscribe("turtle1/pose", 10, &TurtleSimPub::poseCallback, this));
 
-    m_pub.insert(make_pair(ControlObj, m_ros->advertise<turtlesim::Velocity>("turtle1/command_velocity", 1)));
+    m_pub.insert(make_pair(ControlObj, m_ros->advertise<turtle_actionlib::Velocity>("turtle1/command_velocity", 1)));
     spinner->start();
 
     m_nextTick = getCurrentTick();
@@ -105,7 +105,7 @@ bool TurtleSimPub::synchronize()
 void TurtleSimPub::move(TREX::transaction::goal_id const &g)
 {
     Observation state(ControlObj, "move");
-    turtlesim::Velocity msg;
+    turtle_actionlib::Velocity msg;
     msg.linear = boost::any_cast<double>(g->getAttribute(Symbol("lin_vel")).domain().getSingleton());
     linear_velocity = msg.linear;
     state.restrictAttribute("lin_vel", FloatDomain(msg.linear));
@@ -126,7 +126,7 @@ void TurtleSimPub::stop()
 
 void TurtleSimPub::updateTurtle()
 {
-    turtlesim::Velocity msg;
+    turtle_actionlib::Velocity msg;
     msg.linear = linear_velocity;
     msg.angular = angular_velocity;
     m_pub[ControlObj].publish(msg);
