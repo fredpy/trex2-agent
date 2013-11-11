@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <turtlesim/Pose.h>
-#include <turtlesim/Velocity.h>
+#include <turtle_actionlib/Velocity.h>
 #include <turtlesim/Color.h>
 
 #include <list>
