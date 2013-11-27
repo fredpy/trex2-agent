@@ -97,15 +97,17 @@ namespace TREX {
 		 TREX::utils::log::error)<<"Error while creating ROS timeline: "<<e;
 	  throw e;
 	}
-	std::pair<tl_map::iterator, bool>
-	  ret = m_tl_conn.insert(std::make_pair(tl->name(), tl));
-	if( ret.second ) {
-	  syslog(TREX::utils::log::null, 
-		 TREX::utils::log::info)<<"ROS timeline \""<<tl->name()<<"\" added";
-	  ++count;
-	} else 
-	  syslog(TREX::utils::log::null, 
-		 TREX::utils::log::error)<<"ROS timeline \""<<tl->name()<<"\" already exists.";
+	if( tl ) {
+	  std::pair<tl_map::iterator, bool>
+	    ret = m_tl_conn.insert(std::make_pair(tl->name(), tl));
+	  if( ret.second ) {
+	    syslog(TREX::utils::log::null, 
+		   TREX::utils::log::info)<<"ROS timeline \""<<tl->name()<<"\" added";
+	    ++count;
+	  } else 
+	    syslog(TREX::utils::log::null, 
+		   TREX::utils::log::error)<<"ROS timeline \""<<tl->name()<<"\" already exists.";
+	}
       }
       return count;
     }

@@ -75,10 +75,9 @@ namespace TREX {
 
         CHRONO::milliseconds const limit(10), // force flush only at ~100Hz
           delta = CHRONO::duration_cast<CHRONO::milliseconds>(clock::now()-*m_last);
-        
         if( delta>limit ) {
           std::flush(*m_file);
-          m_last.reset();
+          m_last = tp;
         }
       }
       
