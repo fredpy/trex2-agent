@@ -69,22 +69,6 @@ else(ROS_NO_CHECK)
       message(SEND_ERROR "Failed to find turtlesim")
     endif(ROS_turtlesim_PACKAGE_PATH)
 
-    find_ros_pkg(turtle_actionlib)
-    if(ROS_turtle_actionlib_PACKAGE_PATH)
-      include_directories(${ROS_turtle_actionlib_INCLUDE_DIRS})
-      add_definitions(${ROS_turtle_actionlib_CFLAGS})      
-    else(ROS_turtle_actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find turtle_actionlib")
-    endif(ROS_turtle_actionlib_PACKAGE_PATH)
-
-    find_ros_pkg(move_base)
-    if(ROS_move_base_PACKAGE_PATH)
-      include_directories(${ROS_move_base_INCLUDE_DIRS})
-      add_definitions(${ROS_move_base_CFLAGS})      
-    else(ROS_move_base_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find move_base")
-    endif(ROS_move_base_PACKAGE_PATH)
-
   else(ROS_CONFIG)
     message(SEND_ERROR "Failed to loacte ROS configuration file.")
   endif(ROS_CONFIG)
@@ -95,7 +79,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 link_directories(${ROS_actionlib_LINK_PATH} ${ROS_move_base_LINK_PATH} 
   ${ROS_roscpp_LINK_PATH})
 
-trex_plugin(turtlesim pose_adapter.cc odom_adapter.cc turtlesim_pg.cc)
+trex_plugin(turtlesim pose_adapter.cc turtlesim_pg.cc)
 target_link_libraries(turtlesim_pg TREXros)
 
 # add_library(TREXturtlesim SHARED
