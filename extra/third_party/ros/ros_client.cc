@@ -96,6 +96,7 @@ void ros_client::spin_cb() {
       // manage things from ros
       ::ros::spinOnce();
       
+      
       m_freq.async_wait(boost::bind(&ros_client::spin_cb, this));
     } else
       stop();

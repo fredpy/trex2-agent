@@ -65,17 +65,26 @@ namespace TREX {
     public:
 
       typedef typename Message::ConstPtr message_ptr;
+      typedef Message message_type;
       
       
-      ros_subscriber(details::ros_timeline::xml_arg arg):details::ros_timeline(arg, false) {
+      ros_subscriber(details::ros_timeline::xml_arg arg)
+	:details::ros_timeline(arg, TREX::utils::parse_attr(false, details::ros_timeline::xml_factory::node(arg), 
+							    "control")) {
         boost::property_tree::ptree::value_type &xml(details::ros_timeline::xml_factory::node(arg));
         
         m_service = TREX::utils::parse_attr<TREX::utils::Symbol>(xml, "ros_service");
+	
+	if( controlable() ) {
+	  // syslog()<<"Creating service "<<m_service<<" to dispatch goals";
+	  m_pub = advertise<message_type>(m_service.str());
+	}
 	try {
+	  syslog()<<"Connecting to service "<<m_service;
 
 	  // subscibr to the service with a queue of 10 ... may change this to be configurable in the future
 	  m_sub = node().subscribe(m_service.str(), 10,
-				   &ros_subscriber<Message>::message, this);
+				   &ros_subscriber<message_type>::message, this);
 	} catch(::ros::Exception const &e) {
 	  std::ostringstream oss;
 	  oss<<"Exception while trying to subscribe to \""<<m_service<<"\": "<<e.what();
@@ -91,12 +100,26 @@ namespace TREX {
       
       void message(message_ptr const &msg) {
         // To be implemented for each instance : default just log a warning
-        syslog(TREX::utils::log::warn)<<"This ros subscriber handler is not implemented";
+        syslog(TREX::utils::log::warn)<<"This ros subscriber message handler is not implemented";
       }
       
+      void dispatch(Message const &msg) {
+	if( controlable() ) {
+	  m_pub.publish(msg);
+	}
+      }
+      
+      bool handle_request(TREX::transaction::goal_id g) {
+        // To be implemented for each instance : default just log a warning
+        syslog(TREX::utils::log::warn)<<"This ros subscriber goal handler is not implemented";
+	return false;
+      }
+
+
     private:
       TREX::utils::Symbol m_service;
       ::ros::Subscriber m_sub;
+      ::ros::Publisher m_pub;
     }; // TREX::ROS::ros_subscriber<>
     
   } // TREX::ROS

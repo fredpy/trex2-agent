@@ -75,14 +75,17 @@ namespace TREX {
         ros_timeline(xml_arg arg, bool control);
         ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool control);
 
-	virtual bool handle_request(TREX::transaction::goal_id g) {
-	  return false; // indicates that nothing was sent
-	}
+	virtual bool handle_request(TREX::transaction::goal_id g) =0;
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
 
 	void complete(TREX::transaction::goal_id g);
         
         ::ros::NodeHandle &node();
+	template<typename Msg>
+	::ros::Publisher advertise(std::string const &name) {
+	  ::ros::NodeHandle &n = node();
+	  return n.advertise<Msg>(name, 10, true);
+	}
         
         void notify(transaction::Observation const &obs);
         TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
