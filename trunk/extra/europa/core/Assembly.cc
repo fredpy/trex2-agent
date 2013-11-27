@@ -293,7 +293,7 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
       m_agent_timelines.insert(state);
     }
   } else {
-    debugMsg("trex:always", "WARNING attempted to create a sate"
+    debugMsg("trex:always", "WARNING attempted to create a state"
              <<" flaw manager for non public timeline "
 	     <<tl->getName().toString());
   }
@@ -705,6 +705,7 @@ void Assembly::replace(EUROPA::TokenId const &tok) {
 }
 
 void Assembly::archive(EUROPA::eint date) {
+  // return;
   bool auto_prop = m_cstr_engine->getAutoPropagation();
   EUROPA::eint cur = now();
 
@@ -742,18 +743,23 @@ void Assembly::archive(EUROPA::eint date) {
   m_iter = m_completed.begin();
   while( m_completed.end()!=m_iter ) {
     EUROPA::TokenId tok = *(m_iter++);
+    if( !tok.isId() ) {
+      debugMsg("trex:always", "WARNING: token reference "<<tok<<" is not valid.");
+      m_completed.erase(tok);
+      continue;
+    }       
     std::string type;
     if( is_action(tok) )
       type = "action";
     else
       type = "predicate";
-
+    
     if( details::upperBound(details::active(tok)->end()) > cur ) {
       debugMsg("trex:always", "WARNING: "<<type<<" "
-               <<tok->getPredicateName().toString()<<'('<<tok->getKey()
-               <<") is no longer completed (end=["
-               <<details::lowerBound(details::active(tok)->end())<<", "
-               <<details::upperBound(details::active(tok)->end())<<"])");
+	       <<tok->getPredicateName().toString()<<'('<<tok->getKey()
+	       <<") is no longer completed (end=["
+	       <<details::lowerBound(details::active(tok)->end())<<", "
+	       <<details::upperBound(details::active(tok)->end())<<"])");
       m_completed.erase(tok);
       continue;
     } else {
@@ -978,7 +984,8 @@ EUROPA::TokenId Assembly::create_token(EUROPA::ObjectId const &obj,
   // Restrict token domain to obj
   EUROPA::ConstrainedVariableId obj_var = tok->getObject();
   obj_var->specify(obj->getKey());
-
+  
+  //std::cerr<<"Created "<<tok->getPredicateName().toString()<<'('<<tok->getKey()<<')'<<std::endl;
   return tok;
 }
 
@@ -1032,6 +1039,7 @@ bool Assembly::with_plan(EUROPA::ObjectId const &obj) const {
 
 bool Assembly::is_action(EUROPA::TokenId const &tok) const {
 #ifdef EUROPA_HAVE_EFFECT
+  // std::cerr<<"EVAL is_action("<<tok->getPredicateName().toString()<<"("<<tok->getKey()<<"))"<<std::endl;
   return tok->hasAttributes(EUROPA::PSTokenType::ACTION);
 #else
   return false;
@@ -1181,9 +1189,20 @@ void Assembly::print_plan(std::ostream &out, bool expanded) const {
     endi(filter, tokens.end(), tokens.end());
   // Iterate through plan tokens
   for( ; endi!=it; ++it) {
+    std::string name;
+    EUROPA::ObjectVarId obj = (*it)->getObject();
+    if( obj->getLastDomain().isSingleton() ) {
+      std::list<EUROPA::ObjectId> objs = obj->getLastDomain().makeObjectList();
+      std::ostringstream oss;
+      oss<<objs.front()->getName().toString()<<'.'<<(*it)->getUnqualifiedPredicateName().toString();
+      name = oss.str();
+    } else 
+      name = (*it)->getPredicateName().toString();
+    
+
     EUROPA::eint key = (*it)->getKey();
     // display the token as a node
-    out<<"  t"<<key<<"[label=\""<<(*it)->getPredicateName().toString()
+    out<<"  t"<<key<<"[label=\""<<name
        <<'('<<key<<") {\\n";
     if( (*it)->isIncomplete() )
       out<<"incomplete\\n";
