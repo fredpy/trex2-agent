@@ -77,43 +77,55 @@ else(ROS_NO_CHECK)
       message(SEND_ERROR "Failed to find turtle_actionlib")
     endif(ROS_turtle_actionlib_PACKAGE_PATH)
 
+    find_ros_pkg(move_base)
+    if(ROS_move_base_PACKAGE_PATH)
+      include_directories(${ROS_move_base_INCLUDE_DIRS})
+      add_definitions(${ROS_move_base_CFLAGS})      
+    else(ROS_move_base_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find move_base")
+    endif(ROS_move_base_PACKAGE_PATH)
+
   else(ROS_CONFIG)
     message(SEND_ERROR "Failed to loacte ROS configuration file.")
   endif(ROS_CONFIG)
 endif(ROS_NO_CHECK)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
-link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ros)
+link_directories(${ROS_actionlib_LINK_PATH} ${ROS_move_base_LINK_PATH} 
+  ${ROS_roscpp_LINK_PATH})
 
-add_library(TREXturtlesim SHARED
-  # source
-    turtlesimpub.cc
-    turtlesim_pg.cc
-  # header
-    turtlesimpub.hh
-  )
+trex_plugin(turtlesim pose_adapter.cc odom_adapter.cc turtlesim_pg.cc)
+target_link_libraries(turtlesim_pg TREXros)
 
-source_group("Header\ Files\\bits" FILES
-  trex/ros/bits/ros_timeline.hh)
+# add_library(TREXturtlesim SHARED
+#   # source
+#     turtlesimpub.cc
+#     turtlesim_pg.cc
+#   # header
+#     turtlesimpub.hh
+#   )
 
-install(DIRECTORY trex/ DESTINATION include/trex/
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+# source_group("Header\ Files\\bits" FILES
+#   trex/ros/bits/ros_timeline.hh)
 
-target_link_libraries(TREXturtlesim ${ROS_roscpp_LINK_FLAGS}
-  ${ROS_actionlib_LINK_FLAGS}
-  ${ROS_roscpp_LINK_LIBS}
-  ${ROS_actionlib_LINK_LIBS}
-  TREXagent)
+# install(DIRECTORY trex/ DESTINATION include/trex/
+#   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+#   PATTERN "private" EXCLUDE
+#   PATTERN ".svn" EXCLUDE)
 
-install(TARGETS TREXturtlesim DESTINATION lib)
-trex_lib(TREXturtlesim extra)
+# target_link_libraries(TREXturtlesim ${ROS_roscpp_LINK_FLAGS}
+#   ${ROS_actionlib_LINK_FLAGS}
+#   ${ROS_roscpp_LINK_LIBS}
+#   ${ROS_actionlib_LINK_LIBS}
+#   TREXagent)
+
+# install(TARGETS TREXturtlesim DESTINATION lib)
+# trex_lib(TREXturtlesim extra)
 
 
 
-# The plugin placeholder : also initialize ros on load
-trex_plugin(turtlesim turtlesim_pg.cc)
-target_link_libraries(turtlesim_pg TREXturtlesim)
+# # The plugin placeholder : also initialize ros on load
+# trex_plugin(turtlesim turtlesim_pg.cc)
+# target_link_libraries(turtlesim_pg TREXturtlesim)
 
