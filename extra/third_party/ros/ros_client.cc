@@ -41,19 +41,23 @@ using namespace TREX::ROS;
 
 // structors
 
-ros_client::ros_client():m_active(false), m_freq(m_log->service()) {
+ros_client::ros_client() {
   int argc = 0;
   char **argv = NULL;
   m_log->syslog("ros", TREX::utils::log::info)<<"Initialize ros connection";
   ros::init(argc, argv, "trex2", ros::init_options::AnonymousName);
-  // Create an extra thread for when the service will be started
-  m_log->thread_count(m_log->thread_count()+1, true);
+  m_log->syslog("ros", TREX::utils::log::info)
+    <<"Creating 4 threads for ros events handling";
+  m_spinner.reset(new ::ros::AsyncSpinner(4));
+
+  // // Create an extra thread for when the service will be started
+  // m_log->thread_count(m_log->thread_count()+1, true);
 }
 
 ros_client::~ros_client() {
   if(ros::ok() ) {
     m_log->syslog("ros", TREX::utils::log::info)<<"Shutting down ros connection";
-    stop();
+    m_spinner.reset();
   }
 }
 
@@ -63,10 +67,10 @@ bool ros_client::ok() const {
   return ::ros::ok();
 }
 
-bool ros_client::started() const {
-  TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
-  return *m_active;
-}
+// bool ros_client::started() const {
+//   TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
+//   return *m_active;
+// }
 
 ::ros::NodeHandle ros_client::handle() const {
   ros::NodeHandle handle;
@@ -76,32 +80,42 @@ bool ros_client::started() const {
 // modifiers
 
 void ros_client::start() {
-  bool should_start = false;
-  {
-    TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
-    if( !*m_active && ::ros::ok() ) {
-      should_start = true;
-      *m_active = true;
-    }
-  }
-  if( should_start )
-    m_log->service().post(boost::bind(&ros_client::spin_cb, this));
+  m_log->syslog("ros", TREX::utils::log::info)
+    <<"Starting ros event handling threads";
+  m_spinner->start();
+  // bool should_start = false;
+  // {
+  //   TREX::utils::SharedVar<bool>::scoped_lock l(m_active);
+  //   if( !*m_active && ::ros::ok() ) {
+  //     should_start = true;
+  //     *m_active = true;
+  //   }
+  // }
+  // if( should_start )
+  //   m_log->service().post(boost::bind(&ros_client::spin_cb, this));
 }
 
-void ros_client::spin_cb() {
-  if( started() ) {
-    if( ::ros::ok() ) {
-      // Set my timer
-      m_freq.expires_from_now(boost::posix_time::milliseconds(100)); // 10Hz is more than enough
-      // manage things from ros
-      ::ros::spinOnce();
-      
-      
-      m_freq.async_wait(boost::bind(&ros_client::spin_cb, this));
-    } else
-      stop();
-  }
+void ros_client::stop() {
+  m_log->syslog("ros", TREX::utils::log::info)
+    <<"Stopping ros event handling threads";
+  m_spinner->stop();
 }
+
+// void ros_client::spin_cb() {
+//   if( started() ) {
+//     if( ::ros::ok() ) {
+//       std::cerr<<"ros spin"<<std::endl;
+//       // Set my timer
+//       m_freq.expires_from_now(boost::posix_time::milliseconds(40)); // 25Hz is more than enough
+//       // manage things from ros
+//       ::ros::spinOnce();
+      
+      
+//       m_freq.async_wait(boost::bind(&ros_client::spin_cb, this));
+//     } else
+//       stop();
+//   }
+// }
 
 
 

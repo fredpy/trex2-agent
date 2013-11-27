@@ -37,6 +37,7 @@
 # include <ros/ros.h>
 
 # include <trex/utils/LogManager.hh>
+// # include <trex/utils/platform/memory.hh>
 
 # include <boost/asio/deadline_timer.hpp>
 
@@ -49,22 +50,15 @@ namespace TREX {
       
       ::ros::NodeHandle handle() const;
 
-      bool started() const;
       void start();
-      void stop() {
-        m_active = false;
-        m_freq.cancel();
-      }
+      void stop();
       
     private:
       ros_client();
       ~ros_client();
       
-      void spin_cb();
-      
       TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-      mutable TREX::utils::SharedVar<bool> m_active;
-      boost::asio::deadline_timer m_freq;
+      UNIQ_PTR<ros::AsyncSpinner> m_spinner;
       
       friend class TREX::utils::SingletonWrapper<ros_client>;
     }; // TREX::ROS::ros_client

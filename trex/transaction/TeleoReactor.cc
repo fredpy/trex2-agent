@@ -894,8 +894,8 @@ bool TeleoReactor::doSynchronize() {
 
         Observation const &observ = (*i)->lastObservation(echo);
         
-        if( echo || is_verbose() || NULL==m_trLog )
-          syslog(obs)<<observ;
+        // if( echo || is_verbose() || NULL==m_trLog )
+        //   syslog(obs)<<observ;
         if( NULL!=m_trLog )
           m_trLog->observation(observ);
       }

@@ -44,12 +44,12 @@ using TREX::utils::Symbol;
  */
 details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
   :m_reactor(*arg.second), m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
-   m_controlable(control) {
+   m_controlable(control), m_updated(false) {
   init_timeline();
 }
 
 details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control)
-:m_reactor(*r), m_name(tl), m_controlable(control) {
+  :m_reactor(*r), m_name(tl), m_controlable(control), m_updated(false) {
   init_timeline();
 }
 
@@ -73,6 +73,12 @@ void details::ros_timeline::init_timeline() {
   }
 }
 
+void details::ros_timeline::do_synchronize() {
+  // syslog()<<name()<<" - Updated="<<m_updated;
+  synchronize();
+  m_updated = m_undefined;  
+}
+
 
 ::ros::NodeHandle &details::ros_timeline::node() {
   return m_reactor.m_ros;
@@ -82,8 +88,10 @@ void details::ros_timeline::notify(transaction::Observation const &obs) {
   if( obs.object()!=m_name ) {
     syslog(utils::log::error)<<"Attempted to post an observation which does not belong to "<<m_name<<":\n\t"<<obs;
   } else {
-    // Probably need to be protected by some mutex.... 
+    // Probably need to be protected by some mutex....
+    m_undefined = (obs.predicate()==TREX::transaction::Predicate::undefined_pred());
     m_reactor.postObservation(obs);
+    m_updated = true;
   }
 }
 

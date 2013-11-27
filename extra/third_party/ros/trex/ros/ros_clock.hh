@@ -35,6 +35,7 @@
 # define H_trex_ros_ros_clock
 
 # include <trex/agent/RealTimeClock.hh>
+# include <ros/time.h>
 
 namespace TREX {
   namespace ROS {
@@ -78,6 +79,22 @@ namespace TREX {
 
       static time_point now();
     }; // TREX::ROS::ros_clock
+  }
+
+  namespace agent {
+
+    template<>
+    Clock::duration_type rt_clock<CHRONO_NS::milli, ROS::ros_clock>::doSleep() {
+      Clock::duration_type delay = getSleepDelay();
+      ::ros::Duration ros_dt;
+      ros_dt.fromNSec(delay.count());
+      // Now Compute the date in ROS term
+      ::ros::Time::sleepUntil(::ros::Time::now()+ros_dt);
+      return delay;
+    }
+  }
+
+  namespace ROS {
 
     /** @brief default clock for ROS
      *
