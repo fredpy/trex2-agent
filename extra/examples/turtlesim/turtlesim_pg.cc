@@ -31,20 +31,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "turtlesimpub.hh"
-
 #include <trex/utils/LogManager.hh>
 #include <trex/utils/Plugin.hh>
 
 using namespace TREX::utils;
-using namespace TREX::transaction;
-using namespace TREX::TREXturtlesim;
 
 namespace {
     SingletonUse<LogManager> s_log;
 
-    TeleoReactor::xml_factory::declare<TurtleSimPub> decl("TurtleSimPub");
 }
 
 namespace TREX {
