@@ -383,6 +383,10 @@ namespace TREX {
         return true;
       }
       
+      duration_type doSleep() {
+	return Clock::doSleep();
+      }
+
       duration_type getSleepDelay() const {
         typename mutex_type::scoped_lock guard(m_lock);
         if( NULL!=m_clock.get() ) {

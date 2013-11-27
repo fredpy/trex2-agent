@@ -60,6 +60,9 @@ void ros_reactor::handleInit() {
 
 bool ros_reactor::synchronize() {
   // fail synchronization when unable to connect to ros
+  for(tl_map::const_iterator i=m_tl_conn.begin();
+      m_tl_conn.end()!=i; ++i)
+    i->second->do_synchronize();
   return m_cli->ok();
 }
       

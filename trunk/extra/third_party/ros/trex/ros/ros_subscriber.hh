@@ -105,7 +105,15 @@ namespace TREX {
       
       void dispatch(Message const &msg) {
 	if( controlable() ) {
+	  syslog()<<"Publish message to ros topic "<<m_pub.getTopic()
+			 <<":\n"<<msg; 
 	  m_pub.publish(msg);
+	}
+      }
+
+      void synchronize() {
+	if( !updated() ) {
+	  notify(new_obs(TREX::transaction::Predicate::undefined_pred()));
 	}
       }
       

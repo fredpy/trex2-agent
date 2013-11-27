@@ -32,8 +32,10 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_clock.hh"
+#include "ros_client.hh"
 
 #include <ros/time.h>
+#include <boost/thread.hpp>
 
 
 namespace {
@@ -44,5 +46,17 @@ namespace {
 using namespace TREX::ROS;
 
 ros_clock::time_point ros_clock::now() {
-  return time_point(duration(ros::Time::now().toNSec()));
+  static TREX::utils::SingletonUse<ros_client> client;
+  
+  ros::Time current(ros::Time::now());
+
+  // Simulated clock can return 0 when no event received 
+  // and we should wait for a correct update
+  while( current.isZero() ) {
+    // sleep a little
+    boost::thread::yield(); 
+    current = ros::Time::now();
+  }
+    
+  return time_point(duration(current.toNSec()));     
 }
