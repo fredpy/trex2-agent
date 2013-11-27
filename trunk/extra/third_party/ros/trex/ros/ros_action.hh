@@ -84,21 +84,37 @@ namespace TREX {
       }
 
     protected:
+
       // ROS callbacks
       void handle_result(actionlib::SimpleClientGoalState const &state,
 			 result_ptr const &msg);
       void handle_active();
       void handle_feedback(feedback_ptr const &msg);
       
+      bool build_goal(TREX::transaction::goal_id g, goal_type &ros_g);
+
 
     private:
       // TREX callbacks
-      bool handle_request(TREX::transaction::goal_id g);
+      bool handle_request(TREX::transaction::goal_id g) {
+	if( g->predicate()==s_active ) {
+	  goal_type ros_goal;
+	  if( build_goal(g, ros_goal) ) {
+	    m_client->sendGoal(ros_goal);
+	    return true;
+	  }
+	}
+	return false;
+      }
       void handle_recall(TREX::transaction::goal_id g);
 
+      static TREX::utils::Symbol const s_active;
       TREX::utils::Symbol m_service;
       UNIQ_PTR< actionlib::SimpleActionClient<Action> > m_client;
     }; // TREX::ROS::ros_action 
+
+    template<typename Action>
+    TREX::utils::Symbol const ros_action<Action>::s_active("Active");
 
   } // TREX::ROS
 } // TREX

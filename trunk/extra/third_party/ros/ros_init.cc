@@ -40,7 +40,7 @@
 
 #include <trex/domain/FloatDomain.hh>
 
-#include <geometry_msgs/Point.h>
+#include <geometry_msgs/Pose.h>
 
 namespace TREX {
   namespace ROS {
@@ -56,6 +56,16 @@ namespace TREX {
       obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
       notify(obs);
     }
+
+    template<>
+    void ros_subscriber<geometry_msgs::Pose>::message(geometry_msgs::Pose::ConstPtr const &msg) {
+
+      TREX::transaction::Observation obs = new_obs("Hold");
+      obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->position.x));
+      obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->position.y));
+      obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->position.z));
+    }
+
   }
 }
 
@@ -70,6 +80,7 @@ namespace {
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   // declare the Point subscriber
   ros_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
+  ros_factory::declare< ros_subscriber<geometry_msgs::Pose> > pose_decl("Pose");
 }
 
 

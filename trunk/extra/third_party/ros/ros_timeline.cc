@@ -68,6 +68,8 @@ void details::ros_timeline::init_timeline() {
       oss<<"Failed to declare  \""<<name()<<"\" as Internal.";
       throw TREX::transaction::ReactorException(m_reactor, oss.str());
     }
+    // Initialize the observation to undefined
+    notify(new_obs(TREX::transaction::Predicate::undefined_pred()));
   }
 }
 

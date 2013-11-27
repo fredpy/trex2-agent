@@ -48,7 +48,7 @@ ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
   // embeds external configuration
   ext_xml(node.second, "config");
   add_timelines(node.second.begin(), node.second.end());
- 
+  syslog()<<"Done initializing ROS timelines";
 }
     
 ros_reactor::~ros_reactor() {
