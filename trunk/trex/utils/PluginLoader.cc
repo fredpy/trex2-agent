@@ -85,8 +85,11 @@ bool PluginLoader::load(Symbol const &name,
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()==i ) {
     bool found;
-    std::string fileName = m_log->locate("lib"+name.str()+p_dlext(), found).string();
+    std::string const libName = "lib"+name.str()+p_dlext();
+    std::string fileName = m_log->locate(libName, found).string();
     if( found ) {
+      if( libName==fileName )
+	fileName = "./"+libName;
       m_log->syslog("plugin", log::info)<<"Loading "<<fileName;
       void *handle = p_dlopen(fileName.c_str(), RTLD_NOW);
       if( NULL==handle )
