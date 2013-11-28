@@ -1,0 +1,81 @@
+#include "TREX.nddl"
+
+class Odometry extends AgentTimeline {
+    predicate Hold {
+      	float x;
+	float y;
+	float z;
+    }
+
+    Odometry(Mode _mode) {
+	super(_mode);
+    }
+}
+
+
+class Twist extends AgentTimeline {
+    predicate Hold {
+	float linear_x, linear_y, linear_z;
+	float angular_x, angular_y, angular_z;
+    }
+
+    Twist(Mode _mode) {
+	super(_mode);
+    }
+} 
+
+class Motion extends AgentTimeline {
+    predicate Move {
+	float linear_x, linear_y, linear_z;
+	float angular_x, angular_y, angular_z;
+	start + duration == end;
+    }
+
+    Motion(Mode _mode) {
+	super(_mode);
+    }
+}
+
+class MotionAct {
+    action Move {
+	duration==1;
+    }
+}
+
+Twist::Hold {
+  starts(MotionState.Active a);
+  a.cmd == object;
+}
+
+MotionAct::Move {
+    contained_by(effect Motion.Move);
+    starts(condition MotionState.Active act);
+    starts(condition Twist.Hold cmd);
+    cmd.object == act.cmd;
+}
+
+
+MotionState::Active {
+    cmd == object.velocity_cmd;
+
+    contained_by(Motion.Move objective);
+    starts(cmd.Hold evt);
+  
+    evt.linear_x == objective.linear_x;
+    evt.linear_y == objective.linear_y;
+    evt.linear_z == objective.linear_z;
+    evt.angular_x == objective.angular_x;
+    evt.angular_y == objective.angular_y;
+    evt.angular_z == objective.angular_z;
+
+}
+
+
+Odometry position = new Odometry(Observe);
+Twist velocity = new Twist(External);
+
+Motion command = new Motion(Internal);
+MotionState my_state = new MotionState(Internal, velocity);
+MotionAct actions = new MotionAct();
+
+close();
