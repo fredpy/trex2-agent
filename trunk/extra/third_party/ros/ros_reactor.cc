@@ -72,19 +72,13 @@ void ros_reactor::handleRequest(goal_id const &g) {
   if( m_tl_conn.end()!=i ) {
     if( i->second->request(g) ) {
       syslog("ros", TREX::utils::log::info)<<"Sent goal "<<g;
-      m_goals.insert(g);
     }
   }
 }
 
 void ros_reactor::handleRecall(goal_id const &g) {
-  std::set<goal_id>::iterator pos = m_goals.find(g);
-
-  if( m_goals.end()!=pos ) {
-    m_goals.erase(pos);
-    tl_map::const_iterator i = m_tl_conn.find(g->object());
-    if( m_tl_conn.end()!=i ) {
-      i->second->recall(g);
-    }
+  tl_map::const_iterator i = m_tl_conn.find(g->object());
+  if( m_tl_conn.end()!=i ) {
+    i->second->recall(g);
   }
 }
