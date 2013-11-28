@@ -33,7 +33,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-option(WITH_WITRE "Enable witre plugin (require Wt)" ON)
+option(WITH_WITRE "Enable witre plugin (require Wt)" OFF)
 
 if(WITH_WITRE) 
   find_package(Wt)

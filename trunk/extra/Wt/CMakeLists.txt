@@ -33,7 +33,7 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-option(WITH_WT_SERVER "Enable Wt web server used by REST and witre plugins" ON)
+option(WITH_WT_SERVER "Enable Wt web server used by REST and witre plugins" OFF)
 
 if(WITH_WT_SERVER)
   find_package(Wt)
