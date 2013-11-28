@@ -34,7 +34,7 @@
 #ifndef H_trex_ros_ros_subscriber
 # define H_trex_ros_ros_subscriber
 
-# include <ros/message_traits.h>
+# include "ros_convert_traits.hh"
 
 # include <boost/bind.hpp>
 # include <boost/static_assert.hpp>
@@ -44,6 +44,30 @@
 namespace TREX {
   namespace ROS {
     
+    namespace details {
+
+      template<class RosCvt, bool Goals>
+      struct ros_goal_helper {
+	typedef typename RosCvt::message_ptr message_ptr;
+	
+	static message_ptr trex_to_ros(transaction::goal_id g) {
+	  return RosCvt::trex_to_ros(g);
+	}
+      };
+      
+      template<class RosCvt>
+      struct ros_goal_helper<RosCvt, false> {
+	
+	typedef typename RosCvt::message_ptr message_ptr;
+	
+	static message_ptr trex_to_ros(transaction::goal_id g) {
+	  message_ptr ret;
+	  return ret;
+	}
+      };
+    }
+
+
     /** @brief Observing timeline interface
      *
      * @tparam Message A ROS message type
@@ -59,18 +83,20 @@ namespace TREX {
      * @ingroup ros
      * @author Frederic Py <fpy@mbari.org>
      */
-    template<typename Message>
+    template<typename Message, class Convert = ros_convert_traits<Message> >
     class ros_subscriber :public details::ros_timeline {
       BOOST_STATIC_ASSERT(::ros::message_traits::IsMessage<Message>::value);
     public:
 
       typedef typename Message::ConstPtr message_ptr;
       typedef Message message_type;
+      typedef Convert converter;
       
       
       ros_subscriber(details::ros_timeline::xml_arg arg)
-	:details::ros_timeline(arg, TREX::utils::parse_attr(false, details::ros_timeline::xml_factory::node(arg), 
-							    "control")) {
+	:details::ros_timeline(arg, Convert::accept_goals && 
+			       TREX::utils::parse_attr(false, details::ros_timeline::xml_factory::node(arg), 
+						       "control")) {
         boost::property_tree::ptree::value_type &xml(details::ros_timeline::xml_factory::node(arg));
         
         m_service = TREX::utils::parse_attr<TREX::utils::Symbol>(xml, "ros_service");
@@ -99,8 +125,9 @@ namespace TREX {
       virtual ~ros_subscriber() {}
       
       void message(message_ptr const &msg) {
-        // To be implemented for each instance : default just log a warning
-        syslog(TREX::utils::log::warn)<<"This ros subscriber message handler is not implemented";
+	TREX::transaction::observation_id o = converter::ros_to_trex(name(), msg);
+	if( o )
+	  notify(*o);
       }
       
       void dispatch(Message const &msg) {
@@ -118,10 +145,13 @@ namespace TREX {
       }
       
       bool handle_request(TREX::transaction::goal_id g) {
-        // To be implemented for each instance : default just log a warning
-        syslog(TREX::utils::log::warn)<<"This ros subscriber goal handler is not implemented";
+	message_ptr msg = details::ros_goal_helper<converter, converter::accept_goals>::trex_to_ros(g);
+	if( msg ) {
+	  dispatch(*msg);
+	  return true;
+	}
 	return false;
-      }
+      } 
 
 
     private:
