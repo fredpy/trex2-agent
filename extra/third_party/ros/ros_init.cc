@@ -40,30 +40,55 @@
 
 #include <trex/domain/FloatDomain.hh>
 
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Point.h>
 
 namespace TREX {
   namespace ROS {
-    /*
-     * Simple example for position update based on Point
-     *   more a compilation test than anything else
-     */ 
-    template<>
-    void ros_subscriber<geometry_msgs::Point>::message(geometry_msgs::Point::ConstPtr const &msg) {
-      TREX::transaction::Observation obs = new_obs("Hold");
-      obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->x));
-      obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->y));
-      obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->z));
-      notify(obs);
-    }
 
     template<>
-    void ros_subscriber<geometry_msgs::Pose>::message(geometry_msgs::Pose::ConstPtr const &msg) {
+    struct ros_convert_traits<geometry_msgs::Point> {
+      typedef geometry_msgs::Point    message;
+      typedef message::ConstPtr  message_ptr;
+      enum {
+	accept_goals = true
+      };
+      
+      static transaction::observation_id ros_to_trex(utils::Symbol const &timeline,
+						     message_ptr const &msg);
 
-      TREX::transaction::Observation obs = new_obs("Hold");
-      obs.restrictAttribute("x", TREX::transaction::FloatDomain(msg->position.x));
-      obs.restrictAttribute("y", TREX::transaction::FloatDomain(msg->position.y));
-      obs.restrictAttribute("z", TREX::transaction::FloatDomain(msg->position.z));
+      static message_ptr trex_to_ros(transaction::goal_id g);
+    };
+
+    transaction::observation_id ros_convert_traits<geometry_msgs::Point>::ros_to_trex(utils::Symbol const &timeline,
+										      ros_convert_traits<geometry_msgs::Point>::message_ptr const &msg) {
+      transaction::observation_id obs = MAKE_SHARED<transaction::Observation>(timeline, utils::Symbol("Hold"));
+      
+      obs->restrictAttribute("x", transaction::FloatDomain(msg->x));
+      obs->restrictAttribute("y", transaction::FloatDomain(msg->y));
+      obs->restrictAttribute("z", transaction::FloatDomain(msg->z));
+      return obs;
+    } 
+
+    
+    ros_convert_traits<geometry_msgs::Point>::message_ptr ros_convert_traits<geometry_msgs::Point>::trex_to_ros(transaction::goal_id g) {
+      geometry_msgs::Point::Ptr msg;
+
+      if( g->predicate()=="Hold" ) { 
+	msg.reset(new geometry_msgs::Point);
+	if( g->hasAttribute("x") )
+	  msg->x = g->getDomain<transaction::FloatDomain>("x").closestTo(0.0);
+	else 
+	  msg->x = 0.0;
+	if( g->hasAttribute("y") )
+	  msg->y = g->getDomain<transaction::FloatDomain>("y").closestTo(0.0);
+	else 
+	  msg->y = 0.0;
+	if( g->hasAttribute("z") )
+	  msg->z = g->getDomain<transaction::FloatDomain>("z").closestTo(0.0);
+	else 
+	  msg->z = 0.0;	
+      }
+      return msg;
     }
 
   }
@@ -80,7 +105,6 @@ namespace {
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   // declare the Point subscriber
   ros_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
-  ros_factory::declare< ros_subscriber<geometry_msgs::Pose> > pose_decl("Pose");
 }
 
 
