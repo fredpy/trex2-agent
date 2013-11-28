@@ -1,0 +1,5091 @@
+<Log>
+  <header>
+    <provide name="MessagesFromTrex"/>
+    <provide name="dorado"/>
+    <provide name="ZEPHYR"/>
+    <provide name="stella101"/>
+    <provide name="trex_data"/>
+    <provide name="mbfd"/>
+  </header>
+  <tick value="0">
+    <Observation on="MessagesFromTrex" pred="undefined"/>
+    <Observation on="ZEPHYR" pred="undefined"/>
+    <Observation on="dorado" pred="undefined"/>
+    <Observation on="mbfd" pred="Inactive"/>
+    <Observation on="stella101" pred="undefined"/>
+    <Observation on="trex_data" pred="undefined"/>
+  </tick>
+  <tick value="8">
+    <provide name="drifterFollow"/>
+    <Observation on="drifterFollow" pred="Inactive"/>
+  </tick>
+  <tick value="15">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="7" max="7"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="30">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="31">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="32">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="33">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="34">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="35">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="36">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="37">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="38">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="39">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="40">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="41">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="42">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="43">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="44">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="45">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="46">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608219.2263" max="608219.2263"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7602" max="4073669.7602"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="47">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.6869" max="608216.6869"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="7" max="7"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7280" max="4073669.7280"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="48">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.5855" max="608216.5855"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7267" max="4073669.7267"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="49">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.4841" max="608216.4841"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7254" max="4073669.7254"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="50">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.3827" max="608216.3827"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7241" max="4073669.7241"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="51">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.2814" max="608216.2814"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7228" max="4073669.7228"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="52">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.1800" max="608216.1800"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7215" max="4073669.7215"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="53">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.0786" max="608216.0786"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7203" max="4073669.7203"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="54">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.9772" max="608215.9772"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7190" max="4073669.7190"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="55">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.8759" max="608215.8759"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7177" max="4073669.7177"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="56">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.7745" max="608215.7745"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7164" max="4073669.7164"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="57">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.6731" max="608215.6731"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7151" max="4073669.7151"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="58">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.5717" max="608215.5717"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7138" max="4073669.7138"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="59">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.4704" max="608215.4704"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7125" max="4073669.7125"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="60">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.3690" max="608215.3690"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7113" max="4073669.7113"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="61">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.2676" max="608215.2676"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7100" max="4073669.7100"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="62">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.1662" max="608215.1662"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7087" max="4073669.7087"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="63">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.0649" max="608215.0649"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7074" max="4073669.7074"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="64">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608214.9635" max="608214.9635"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7061" max="4073669.7061"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0017" max="-0.0017"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="65">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="66">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="67">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="68">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="69">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="70">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="71">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="72">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="73">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="74">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="75">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="76">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="77">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="78">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="79">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="80">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="81">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="82">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4421" max="608217.4421"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="25" max="25"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7376" max="4073669.7376"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="83">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4620" max="608217.4620"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="7" max="7"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073668.1710" max="4073668.1710"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="84">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4628" max="608217.4628"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073668.1097" max="4073668.1097"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="85">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4636" max="608217.4636"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073668.0485" max="4073668.0485"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="86">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4643" max="608217.4643"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.9873" max="4073667.9873"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="87">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4651" max="608217.4651"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.9260" max="4073667.9260"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="88">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4659" max="608217.4659"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.8648" max="4073667.8648"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="89">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4667" max="608217.4667"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.8036" max="4073667.8036"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="90">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4674" max="608217.4674"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.7423" max="4073667.7423"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="91">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4682" max="608217.4682"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.6811" max="4073667.6811"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="92">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4690" max="608217.4690"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.6199" max="4073667.6199"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="93">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4698" max="608217.4698"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.5586" max="4073667.5586"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="94">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4705" max="608217.4705"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.4974" max="4073667.4974"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="95">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4713" max="608217.4713"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.4362" max="4073667.4362"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="96">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4721" max="608217.4721"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.3749" max="4073667.3749"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="97">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4729" max="608217.4729"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.3137" max="4073667.3137"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="98">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4736" max="608217.4736"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.2525" max="4073667.2525"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="99">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4744" max="608217.4744"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.1912" max="4073667.1912"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="100">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4752" max="608217.4752"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.1300" max="4073667.1300"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0010" max="-0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="101">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4363" max="608217.4363"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="7" max="7"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.1977" max="4073670.1977"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="102">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4355" max="608217.4355"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.2594" max="4073670.2594"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="103">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4347" max="608217.4347"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.3210" max="4073670.3210"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="104">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4339" max="608217.4339"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.3826" max="4073670.3826"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="105">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4332" max="608217.4332"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.4443" max="4073670.4443"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="106">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4324" max="608217.4324"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.5059" max="4073670.5059"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="107">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4316" max="608217.4316"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.5675" max="4073670.5675"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="108">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4308" max="608217.4308"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.6292" max="4073670.6292"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="109">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4300" max="608217.4300"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.6908" max="4073670.6908"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="110">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4293" max="608217.4293"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.7524" max="4073670.7524"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="111">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4285" max="608217.4285"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.8141" max="4073670.8141"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="112">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4277" max="608217.4277"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.8757" max="4073670.8757"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="113">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4269" max="608217.4269"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.9373" max="4073670.9373"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="114">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4261" max="608217.4261"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073670.9989" max="4073670.9989"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="115">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608217.4253" max="608217.4253"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073671.0606" max="4073671.0606"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0000" max="-0.0000"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="116">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.2035" max="608220.2035"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7726" max="4073669.7726"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="117">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.3264" max="608220.3264"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7741" max="4073669.7741"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="118">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.4493" max="608220.4493"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7757" max="4073669.7757"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="119">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.5722" max="608220.5722"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7773" max="4073669.7773"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="120">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.6951" max="608220.6951"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7788" max="4073669.7788"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="121">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.8180" max="608220.8180"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7804" max="4073669.7804"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="122">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.9409" max="608220.9409"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7819" max="4073669.7819"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="123">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.0638" max="608221.0638"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7835" max="4073669.7835"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="124">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.1867" max="608221.1867"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7851" max="4073669.7851"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="125">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.3096" max="608221.3096"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7866" max="4073669.7866"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="126">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.4326" max="608221.4326"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7882" max="4073669.7882"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="127">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.5555" max="608221.5555"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7897" max="4073669.7897"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="128">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.6784" max="608221.6784"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7913" max="4073669.7913"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="129">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.8013" max="608221.8013"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7929" max="4073669.7929"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="130">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.9242" max="608221.9242"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7944" max="4073669.7944"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0020" max="0.0020"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="131">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.6482" max="608220.6482"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7782" max="4073669.7782"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="132">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.7101" max="608220.7101"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7790" max="4073669.7790"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="133">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.7721" max="608220.7721"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7798" max="4073669.7798"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="134">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.8340" max="608220.8340"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7806" max="4073669.7806"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="135">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.8960" max="608220.8960"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7814" max="4073669.7814"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="136">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608220.9579" max="608220.9579"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7822" max="4073669.7822"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="137">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.0199" max="608221.0199"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7829" max="4073669.7829"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="138">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.0818" max="608221.0818"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7837" max="4073669.7837"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="139">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.1438" max="608221.1438"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7845" max="4073669.7845"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="140">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.2057" max="608221.2057"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7853" max="4073669.7853"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="141">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.2677" max="608221.2677"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7861" max="4073669.7861"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="142">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.3296" max="608221.3296"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7869" max="4073669.7869"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="143">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.3916" max="608221.3916"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7877" max="4073669.7877"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="144">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.4535" max="608221.4535"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073669.7884" max="4073669.7884"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0000" max="0.0000"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="145">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.9537" max="608211.9537"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073674.7056" max="4073674.7056"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="146">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.5916" max="608211.5916"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073674.9244" max="4073674.9244"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="147">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.2296" max="608211.2296"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.1432" max="4073675.1432"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="148">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608210.8675" max="608210.8675"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.3620" max="4073675.3620"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="149">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608210.5054" max="608210.5054"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.5808" max="4073675.5808"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="150">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608210.1433" max="608210.1433"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.7996" max="4073675.7996"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="151">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608209.7813" max="608209.7813"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.0184" max="4073676.0184"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="152">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608209.4192" max="608209.4192"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.2372" max="4073676.2372"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="153">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608209.0571" max="608209.0571"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.4560" max="4073676.4560"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="154">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608208.6951" max="608208.6951"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.6748" max="4073676.6748"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="155">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608208.3330" max="608208.3330"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.8936" max="4073676.8936"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="156">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608207.9709" max="608207.9709"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.1124" max="4073677.1124"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="157">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608207.6088" max="608207.6088"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.3312" max="4073677.3312"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="158">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608207.2468" max="608207.2468"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.5500" max="4073677.5500"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="159">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608206.8847" max="608206.8847"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.7688" max="4073677.7688"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0060" max="-0.0060"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0036" max="0.0036"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="160">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.6154" max="608221.6154"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073661.3782" max="4073661.3782"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="161">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608221.9197" max="608221.9197"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073660.8637" max="4073660.8637"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="162">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608222.2240" max="608222.2240"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073660.3492" max="4073660.3492"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="163">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608222.5283" max="608222.5283"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073659.8347" max="4073659.8347"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="164">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608222.8325" max="608222.8325"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073659.3202" max="4073659.3202"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="165">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608223.1368" max="608223.1368"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073658.8057" max="4073658.8057"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="166">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608223.4411" max="608223.4411"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073658.2912" max="4073658.2912"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="167">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608223.7454" max="608223.7454"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073657.7767" max="4073657.7767"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="168">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608224.0496" max="608224.0496"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073657.2622" max="4073657.2622"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="169">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608224.3539" max="608224.3539"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073656.7477" max="4073656.7477"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="170">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608224.6582" max="608224.6582"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073656.2332" max="4073656.2332"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="171">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608224.9625" max="608224.9625"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073655.7187" max="4073655.7187"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="172">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608225.2667" max="608225.2667"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073655.2041" max="4073655.2041"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="173">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608225.5710" max="608225.5710"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073654.6896" max="4073654.6896"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="174">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608225.8753" max="608225.8753"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073654.1751" max="4073654.1751"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="175">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608226.1796" max="608226.1796"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073653.6606" max="4073653.6606"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="176">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608226.4838" max="608226.4838"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073653.1461" max="4073653.1461"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="177">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608226.7881" max="608226.7881"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="25" max="25"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073652.6316" max="4073652.6316"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="178">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608227.0924" max="608227.0924"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="26" max="26"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8025" max="36.8025"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073652.1171" max="4073652.1171"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0051" max="0.0051"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0086" max="-0.0086"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="179">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.7565" max="608216.7565"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073666.8493" max="4073666.8493"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="180">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.6618" max="608216.6618"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073666.9065" max="4073666.9065"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="181">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.5670" max="608216.5670"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073666.9638" max="4073666.9638"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="182">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.4723" max="608216.4723"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.0210" max="4073667.0210"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="183">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.3776" max="608216.3776"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.0783" max="4073667.0783"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="184">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.2828" max="608216.2828"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.1355" max="4073667.1355"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="185">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.1881" max="608216.1881"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.1928" max="4073667.1928"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="186">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608216.0934" max="608216.0934"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.2500" max="4073667.2500"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="187">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.9987" max="608215.9987"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.3073" max="4073667.3073"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="188">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.9039" max="608215.9039"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.3645" max="4073667.3645"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="189">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.8092" max="608215.8092"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.4218" max="4073667.4218"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="190">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.7145" max="608215.7145"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.4790" max="4073667.4790"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="191">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.6197" max="608215.6197"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.5363" max="4073667.5363"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="192">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.5250" max="608215.5250"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.5935" max="4073667.5935"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="193">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.4303" max="608215.4303"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.6508" max="4073667.6508"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="194">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608215.3355" max="608215.3355"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073667.7080" max="4073667.7080"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0016" max="-0.0016"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0010" max="0.0010"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="195">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608213.3453" max="608213.3453"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.6319" max="4073664.6319"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="196">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608213.1705" max="608213.1705"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7869" max="-121.7869"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.5569" max="4073664.5569"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="197">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.9958" max="608212.9958"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.4818" max="4073664.4818"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="198">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.8210" max="608212.8210"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.4068" max="4073664.4068"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="199">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.6462" max="608212.6462"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.3317" max="4073664.3317"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="200">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.4715" max="608212.4715"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.2567" max="4073664.2567"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="201">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.2967" max="608212.2967"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.1816" max="4073664.1816"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="202">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608212.1220" max="608212.1220"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.1066" max="4073664.1066"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="203">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.9472" max="608211.9472"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073664.0315" max="4073664.0315"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="204">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.7724" max="608211.7724"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.9565" max="4073663.9565"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="205">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.5977" max="608211.5977"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="18" max="18"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.8814" max="4073663.8814"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="206">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.4229" max="608211.4229"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.8063" max="4073663.8063"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="207">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.2481" max="608211.2481"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.7313" max="4073663.7313"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="208">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608211.0734" max="608211.0734"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.6562" max="4073663.6562"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="209">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608210.8986" max="608210.8986"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8026" max="36.8026"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7870" max="-121.7870"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073663.5812" max="4073663.5812"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="-0.0029" max="-0.0029"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="-0.0013" max="-0.0013"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="210">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608228.1911" max="608228.1911"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="8" max="8"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.5075" max="4073675.5075"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="211">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608228.7612" max="608228.7612"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="9" max="9"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073675.9443" max="4073675.9443"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="212">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608229.3313" max="608229.3313"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="10" max="10"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.3810" max="4073676.3810"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="213">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608229.9014" max="608229.9014"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="11" max="11"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073676.8177" max="4073676.8177"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="214">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608230.4716" max="608230.4716"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="12" max="12"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8027" max="36.8027"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7868" max="-121.7868"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.2545" max="4073677.2545"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="215">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608231.0417" max="608231.0417"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="13" max="13"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073677.6912" max="4073677.6912"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="216">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608231.6118" max="608231.6118"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="14" max="14"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073678.1279" max="4073678.1279"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="217">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608232.1819" max="608232.1819"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="15" max="15"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073678.5647" max="4073678.5647"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="218">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608232.7520" max="608232.7520"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="16" max="16"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073679.0014" max="4073679.0014"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="219">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608233.3221" max="608233.3221"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="17" max="17"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073679.4381" max="4073679.4381"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="221">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608234.4623" max="608234.4623"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="19" max="19"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073680.3116" max="4073680.3116"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="222">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608235.0324" max="608235.0324"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="20" max="20"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073680.7483" max="4073680.7483"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="223">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608235.6025" max="608235.6025"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="21" max="21"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073681.1851" max="4073681.1851"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="224">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608236.1726" max="608236.1726"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="22" max="22"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073681.6218" max="4073681.6218"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="225">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608236.7427" max="608236.7427"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="23" max="23"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073682.0585" max="4073682.0585"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="226">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608237.3128" max="608237.3128"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="24" max="24"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073682.4953" max="4073682.4953"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="227">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608237.8830" max="608237.8830"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="25" max="25"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073682.9320" max="4073682.9320"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="228">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608238.4531" max="608238.4531"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="26" max="26"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073683.3687" max="4073683.3687"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="229">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608239.0232" max="608239.0232"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="27" max="27"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7867" max="-121.7867"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073683.8055" max="4073683.8055"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="230">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608239.5933" max="608239.5933"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="28" max="28"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7866" max="-121.7866"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073684.2422" max="4073684.2422"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="231">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608240.1634" max="608240.1634"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="29" max="29"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7866" max="-121.7866"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073684.6789" max="4073684.6789"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+  <tick value="232">
+    <Observation on="stella101" pred="Holds">
+     <Variable name="easting">
+      <float min="608240.7335" max="608240.7335"/>
+     </Variable>
+     <Variable name="freshness">
+      <int min="30" max="30"/>
+     </Variable>
+     <Variable name="latitude">
+      <float min="36.8028" max="36.8028"/>
+     </Variable>
+     <Variable name="longitude">
+      <float min="-121.7866" max="-121.7866"/>
+     </Variable>
+     <Variable name="northing">
+      <float min="4073685.1157" max="4073685.1157"/>
+     </Variable>
+     <Variable name="speed_east">
+      <float min="0.0095" max="0.0095"/>
+     </Variable>
+     <Variable name="speed_north">
+      <float min="0.0073" max="0.0073"/>
+     </Variable>
+    </Observation>
+  </tick>
+</Log>
