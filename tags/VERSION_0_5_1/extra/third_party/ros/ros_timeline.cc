@@ -75,7 +75,7 @@ void details::ros_timeline::init_timeline() {
 
 void details::ros_timeline::do_synchronize() {
   // syslog()<<name()<<" - Updated="<<m_updated;
-  synchronize();
+  synchronize(m_reactor.getCurrentTick());
   m_updated = m_undefined;  
 }
 
@@ -110,8 +110,4 @@ bool details::ros_timeline::request(TREX::transaction::goal_id g) {
 void details::ros_timeline::recall(TREX::transaction::goal_id g) {
   if( controlable() )
     handle_recall(g);
-}
-
-void details::ros_timeline::complete(TREX::transaction::goal_id g) {
-  m_reactor.completed(g);
 }
