@@ -63,12 +63,6 @@ namespace TREX {
       TREX::utils::SingletonUse<ros_client> m_cli;
       ::ros::NodeHandle                     m_ros;
       TREX::utils::SingletonUse<ros_factory> m_tl_prod;
-
-      std::set<TREX::transaction::goal_id> m_goals;
-      void completed(TREX::transaction::goal_id const &g) {
-	m_goals.erase(g);
-	syslog(g->object(), TREX::utils::log::info)<<"Goal "<<g<<" completed.";
-      }
       
       template<typename Iter>
       size_t add_timelines(Iter from, Iter to);

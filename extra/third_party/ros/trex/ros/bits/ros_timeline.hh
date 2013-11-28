@@ -79,12 +79,11 @@ namespace TREX {
 	virtual bool handle_request(TREX::transaction::goal_id g) =0;
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
 
-	virtual void synchronize() {}
+	virtual void synchronize(transaction::TICK date) {}
 
 	bool updated() const {
 	  return m_updated;
 	}
-	void complete(TREX::transaction::goal_id g);
         
         ::ros::NodeHandle &node();
 	template<typename Msg>
