@@ -86,4 +86,5 @@ target_link_libraries(turtle_pg TREXros)
 install(TARGETS turtle_pg DESTINATION share/trex/plugins)
 install(DIRECTORY cfg DESTINATION share/trex OPTIONAL
   FILES_MATCHING PATTERN "*"
+  PATTERN "*~" EXCLUDE
   PATTERN ".svn" EXCLUDE)
