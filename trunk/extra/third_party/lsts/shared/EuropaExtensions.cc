@@ -19,8 +19,6 @@ namespace TREX
   namespace LSTS
   {
 
-    DECLARE_FUNCTION_TYPE(RadDeg, to_rad, "deg_to_rad", FloatDT, 1);
-
     DECLARE_FUNCTION_TYPE(LatLonDist, ll_distance, "ll_dist", FloatDT, 4);
 
     DECLARE_FUNCTION_TYPE(PathEmpty, empty, "is_empty", EUROPA::BoolDT, 1);
@@ -62,7 +60,6 @@ namespace
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::LatLonToOffset, ll_offset,
                                trex);
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::LatLonDist, ll_dist, trex);
-      TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::RadDeg, deg_to_rad, trex);
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::InsideOpLimits, sane_pos,
                                trex);
 
@@ -72,7 +69,6 @@ namespace
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::LatLonDisplacement,
                                wgsdisplacement, trex);
 
-      declareFunction(assembly, new TREX::LSTS::RadDegFunction());
       declareFunction(assembly, new TREX::LSTS::LatLonDistFunction());
 
       TREX_REGISTER_CONSTRAINT(assembly, TREX::LSTS::PathEmpty, is_empty, trex);
@@ -398,66 +394,66 @@ LatLonToOffset::handleExecute()
   }
 }
 
-/*
- * class TREX::LSTS::DegRad
- */
+// /*
+//  * class TREX::LSTS::DegRad
+//  */
 
-// structors
-RadDeg::RadDeg(EUROPA::LabelStr const &name, EUROPA::LabelStr const &propagator,
-    EUROPA::ConstraintEngineId const &cstrEngine,
-    std::vector<EUROPA::ConstrainedVariableId> const &vars) :
-    EUROPA::Constraint(name, propagator, cstrEngine, vars), m_deg(
-        getCurrentDomain(m_variables[RadDeg::DEGREES])), m_rad(
-        getCurrentDomain(m_variables[RadDeg::RADIANS]))
-{
-}
+// // structors
+// RadDeg::RadDeg(EUROPA::LabelStr const &name, EUROPA::LabelStr const &propagator,
+//     EUROPA::ConstraintEngineId const &cstrEngine,
+//     std::vector<EUROPA::ConstrainedVariableId> const &vars) :
+//     EUROPA::Constraint(name, propagator, cstrEngine, vars), m_deg(
+//         getCurrentDomain(m_variables[RadDeg::DEGREES])), m_rad(
+//         getCurrentDomain(m_variables[RadDeg::RADIANS]))
+// {
+// }
 
-// manipulators
+// // manipulators
 
-void
-RadDeg::handleExecute()
-{
-  EUROPA::edouble d_lo, d_hi, r_lo, r_hi, tmp;
+// void
+// RadDeg::handleExecute()
+// {
+//   EUROPA::edouble d_lo, d_hi, r_lo, r_hi, tmp;
 
-//  if (m_rad.isSingleton() && m_deg.isSingleton())
-//    return;
+// //  if (m_rad.isSingleton() && m_deg.isSingleton())
+// //    return;
 
-  m_rad.getBounds(r_lo, r_hi);
-  m_deg.getBounds(d_lo, d_hi);
+//   m_rad.getBounds(r_lo, r_hi);
+//   m_deg.getBounds(d_lo, d_hi);
 
-  // this boolean will indicate if I need to restrict rad
-  bool t_hi = true, t_lo = true;
+//   // this boolean will indicate if I need to restrict rad
+//   bool t_hi = true, t_lo = true;
 
-  if (r_hi < std::numeric_limits<EUROPA::edouble>::infinity())
-  {
-    tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_hi)), 8);
-    if (tmp <= d_hi)
-    {
-      // upper bound restricted => no need to compute rad upperbound
-      t_hi = false;
-      d_hi = tmp;
-    }
-  }
-  if (std::numeric_limits<EUROPA::edouble>::minus_infinity() < r_lo)
-  {
-    tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_lo)), 8);
-    if (d_lo <= tmp)
-    {
-      // lowerbound restricted => no need to compute red lower bound
-      t_lo = false;
-      d_lo = tmp;
-    }
-  }
-  // update deg
-  if (intersect(m_deg, d_lo, d_hi, deg_precision) && m_deg.isEmpty())
-    return;
+//   if (r_hi < std::numeric_limits<EUROPA::edouble>::infinity())
+//   {
+//     tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_hi)), 8);
+//     if (tmp <= d_hi)
+//     {
+//       // upper bound restricted => no need to compute rad upperbound
+//       t_hi = false;
+//       d_hi = tmp;
+//     }
+//   }
+//   if (std::numeric_limits<EUROPA::edouble>::minus_infinity() < r_lo)
+//   {
+//     tmp = LstsUtils::normalizeDecPlaces(DUNE::Math::Angles::degrees(cast_basis(r_lo)), 8);
+//     if (d_lo <= tmp)
+//     {
+//       // lowerbound restricted => no need to compute red lower bound
+//       t_lo = false;
+//       d_lo = tmp;
+//     }
+//   }
+//   // update deg
+//   if (intersect(m_deg, d_lo, d_hi, deg_precision) && m_deg.isEmpty())
+//     return;
 
-  if (t_hi && d_hi < std::numeric_limits<EUROPA::edouble>::infinity())
-    r_hi = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_hi), 8));
-  if (t_lo && std::numeric_limits<EUROPA::edouble>::minus_infinity() < d_lo)
-    r_lo = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_lo), 8));
-  m_rad.intersect(r_lo, r_hi);
-}
+//   if (t_hi && d_hi < std::numeric_limits<EUROPA::edouble>::infinity())
+//     r_hi = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_hi), 8));
+//   if (t_lo && std::numeric_limits<EUROPA::edouble>::minus_infinity() < d_lo)
+//     r_lo = DUNE::Math::Angles::radians(LstsUtils::normalizeDecPlaces(cast_basis(d_lo), 8));
+//   m_rad.intersect(r_lo, r_hi);
+// }
 
 //====================================
 // Path list handling constraints
