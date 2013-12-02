@@ -43,6 +43,35 @@
 namespace TREX {
   namespace europa {
 
+    class InCircle :public EUROPA::Constraint {
+    public: 
+      InCircle(EUROPA::LabelStr const &name,
+	       EUROPA::LabelStr const &propagatorName,
+	       EUROPA::ConstraintEngineId const &cstrEngine,
+	       std::vector<EUROPA::ConstrainedVariableId> const &vars);
+
+    private:
+      EUROPA::Domain &m_deg;
+      EUROPA::Domain &m_val;
+
+      void handleExecute();
+
+   };
+
+    class RadDeg :public EUROPA::Constraint {
+    public:
+      RadDeg(EUROPA::LabelStr const &name,
+	     EUROPA::LabelStr const &propagatorName,
+	     EUROPA::ConstraintEngineId const &cstrEngine,
+	     std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    private:
+      EUROPA::Domain &m_deg;
+      EUROPA::Domain &m_rad;
+      
+      void handleExecute();
+      
+    };
+
     /** @brief Cosine constraint 
      * 
      * A constraint that compute the cosine of an angle in degree.
