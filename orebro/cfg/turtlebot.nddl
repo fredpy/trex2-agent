@@ -54,20 +54,6 @@ class Twist extends AgentTimeline {
     }
 }
 
-/* An intermediate timeline thatidentifies if the robot is commanded to move
- *
- * predicate 
- *   Hold The predicate used to ease identification
- *    this predicate is always the same and just change its attributes depending on the context:
- *      if Twist.undefined : MotionHelper.Hold.moving == false
- *      if Twist.Hold : MotionHelper.Hold.moving == true
- */
-class MotionHelper extends Timeline {
-      predicate Hold {
-        bool moving;
-      }
-}
-
 /* The timeline identifying current ronbot behavior
  *
  * predicates:
@@ -85,7 +71,7 @@ class Motion extends AgentTimeline {
     predicate At {
       float x, y;
       float yaw;
-      abs(yaw) <= 180.0; // yaw is an angle in degrees
+      // abs(yaw) <= 180.0; // yaw is an angle in degrees
     }
     
     // Constructor 
@@ -98,85 +84,50 @@ class Motion extends AgentTimeline {
 // ====================================================================
 // synchronization model : tie External observations to Internal states
 
-// Rule that convert a Twist.undefined into a MotionHelper.Hold with moving == false
+// Rule that convert a Twist.undefined into a at state
 Twist::undefined {
-   equals(MotionHelper.Hold motion);
-   motion.moving == false;
+    starts(Odometry.Hold odom);
+    equals(Motion.At pos);
+
+    float dx, dy, _bind_dx_2, _bind_dy_2;
+    
+    pos.x + dx == odom.position_x;
+    pos.y + dy == odom.position_y;
+    
+    abs(dx) == sqrt(_bind_dx_2);
+    abs(dy) == sqrt(_bind_dy_2);
+
+    // Accurate at 10cm
+    sqrt(_bind_dx_2 + _bind_dy_2) <= 0.1; 
+    
+
+    odom.orientation_x == 0.0;
+    odom.orientation_y == 0.0;
+
+    float sin_half_y_2;
+    abs(odom.orientation_z) == sqrt(sin_half_y_2);
+    
+    // orientation_z == sin(yaw/2)
+    // orientation_w == cos(yaw/2)
+    
+    // Trigo identities tells us that 
+    // sin(2*x) == 2 * sin(x) * cos(x)
+    // cos(2*x) == 2* (sin(x)^2) - 1
+    // therefore
+    //
+    // sin(yaw) == 2 * sin(yaw/2) * cos(yaw/2)
+    sin(pos.yaw) == 2.0*odom.orientation_w*odom.orientation_z;
+    // cos(yaw) == 2* (sin(yaw/2)^2) - 1
+    cos(pos.yaw) + 1.0 == 2.0 * sin_half_y_2;
 }
 
-// Rule that convert a Twist.Hold into a MotionHelper.Hold with moving == true
+// Rule that convert a Twist.Hold into a go state
 Twist::Hold {
-    // Note it would be even smarter to handle the case were all the speeds are 0.0 to set moving==false in this case 
-   equals(MotionHelper.Hold motion);
-   motion.moving == true;   
+    equals(Motion.Go go);
+    go.linear_x == linear_x;
+    go.linear_y == linear_y;
+    angular_z == to_rad(go.angular_z);
 }
-
-
-// rule that convert a MotionHelper.Hold.moving==true into a Motion.Go
-MotionHelper::Hold {
-   if( moving==true ) {
-     contained_by(Motion.Go go);
-     equals(Twist.Hold cmd);
-     
-     go.linear_x == cmd.linear_x;
-     go.linear_y == cmd.linear_y;
-
-     float tmp;
-     cmd.angular_z == to_rad(go.angular_z);
-
-   } 
-}
-
-// rule that identifies the current Moviing.At 
-// when MotionHelper.Hold.moving==false
-Odometry::Hold {	       
-  bool moving;
-  contained_by(MotionHelper.Hold move);
-  moving == move.moving;
-  if( moving==false ) {
-      
-     // Rule to identify my position (x,y)
-     float dx, dy, _bind_dx_2, _bind_dy_2;
-
-     contained_by(Motion.At pos);
-     pos.x + dx == position_x;
-     pos.y + dy == position_y;
-
-     abs(dx) == sqrt(_bind_dx_2);
-     abs(dy) == sqrt(_bind_dy_2);
-     
-     sqrt(_bind_dx_2+_bind_dy_2) <= 0.5; // Location accurate at 50 cm
- 
-
-     orientation_x == 0.0;
-     orientation_y == 0.0;
-
-     float my_yaw, sin_half_y_2, c_y, s_y, c_b, s_b;
-     abs(orientation_z) == sqrt(sin_half_y_2);
-
-     // orientation_z == sin(yaw/2)
-     // orientation_w == cos(yaw/2)
-
-     // Trigo identities tells us that 
-     // sin(2*x) == 2 * sin(x) * cos(x)
-     // cos(2*x) == 2* (sin(x)^2) - 1
-     // therefore
-     //
-     // sin(yaw) == 2 * sin(yaw/2) * cos(yaw/2)
-     s_y == sin(my_yaw);
-     s_y == 2.0*orientation_w*orientation_z;
-     // cos(yaw) == 2* (sin(yaw/2)^2) - 1
-     c_y == cos(my_yaw);
-     c_y + 1.0 == 2.0 * sin_half_y_2; 
-     
-     float _bind_yaw;
-     
-     pos.yaw == in_circle(my_yaw+_bind_yaw);
-     abs(_bind_yaw) <= 10.0;
-     
-     
-  }   
-} 
 
 // ===========================================================================================================
 // Planning model : tie Internal goals to External subgoals through actions
@@ -184,55 +135,32 @@ Odometry::Hold {
 // possible actions for the planner 
 // 
 class NavActions {
-    action Move {}
-    //    action RotateTo {}
+    action DoMove {}
+    action RotateTo {}
+    //    action LinearTo {}
 }
 
-NavActions::Move {
+// convert a Motion.Go into its Twist.Hold counterpart for commanding 
+NavActions::DoMove {
     contained_by(effect Motion.Go go);
     equals(condition Twist.Hold cmd);
 }
 
 // NavActions::RotateTo {
-//     meets(effect Motion.At to);
-//     met_by(condition Motion.At from);
-//     equals(condition Motion.Go r);
+//     meets(effect Motion.At location);
+//     equals(condition Motion.Go rotation);
+//     rotation.linear_x == 0.0;
+//     rotation.linear_y == 0.0;
+//     met_by(Odometry.Hold initial);
 
-//     r.linear_x == 0.0;
-//     r.linear_y == 0.0;
+//     // float dx
+//     initial.linear_x
     
-//     // location should be roughtly the same
-//     float dx, dy, _bind_dx_2, _bind_dy_2, rot;
-//     from.x + dx == to.x;
-//     from.y + dy == to.y;
-    
-//     abs(dx) == sqrt(_bind_dx_2);
-//     abs(dy) == sqrt(_bind_dy_2);
-     
-//     sqrt(_bind_dx_2+_bind_dy_2) <= 0.5; // Location accurate at 50 cm
-    
-//     from.yaw + rot == to.yaw;
-    
-//     float rot_z, rot_duration;
-//     rot_duration >= 1.0;
-
-//     to_rad(rot_z) == r.angular_z * TICK_DURATION; // rot_z is the speed per TREX tick
-    
-//     if( abs(rot)<=10.0 ) {
-// 	rot_z * 2.0 == rot;
-// 	rot_duration == 2.0;
-//     } else {
-// 	abs(rot_z) >= 10.0*TICK_DURATION;
-// 	rot_z * rot_duration == r.angular_z;
-//     }
-//     equals(condition Twist.Hold cmd);
-//     cmd.linear_x == 0.0;
-//     cmd.linear_y == 0.0;
-//     cmd.linear_z == 0.0;
-//     cmd.angular_x == 0.0;
-//     cmd.angular_y == 0.0;
-//     cmd.duration <= rot_duration;
 // }
+
+
+
+
 
 
 // Instantiation of the model
@@ -240,7 +168,6 @@ NavActions::Move {
 Odometry position = new Odometry(Observe);
 Twist velocity = new Twist(External);
 
-MotionHelper move_helper = new MotionHelper();
 Motion move = new Motion(Internal);
 
 NavActions mover = new NavActions();
