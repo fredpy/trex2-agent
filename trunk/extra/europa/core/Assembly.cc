@@ -535,6 +535,8 @@ bool Assembly::do_synchronize() {
     m_in_synchronization = false;
   } BOOST_SCOPE_EXIT_END;
 
+  debugMsg("trex:synch", "Execute synchronization with steps="<<m_synchSteps
+	   <<" depth="<<m_synchDepth);
   if( !synchronizer()->solve(m_synchSteps, m_synchDepth) ) {
     debugMsg("trex:synch", "Failed to resolve synchronization for tick "<<now());
     if( synchronizer()->getStepCount()>m_synchSteps ) {

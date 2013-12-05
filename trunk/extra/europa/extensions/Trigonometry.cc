@@ -228,12 +228,12 @@ void InCircle::handleExecute() {
     val = fmod(val, 360.0);
     if( val.lower()>180.0 ) {
       val -= 360.0;
-      intersect(m_deg, val.lower(), val.upper(), 1e-8);
+      intersect(m_deg, val.lower(), val.upper(), 1e-6);
     } else if( val.upper()<=-180.0 ) {
       val += 360.0;
-      intersect(m_deg, val.lower(), val.upper(), 1e-8);
+      intersect(m_deg, val.lower(), val.upper(), 1e-6);
     } else if( val.lower()>-180.0 && val.upper()<=180.0 )
-	intersect(m_deg, val.lower(), val.upper(), 1e-8);
+	intersect(m_deg, val.lower(), val.upper(), 1e-6);
   }
   
 }
@@ -255,8 +255,8 @@ RadDeg::RadDeg(EUROPA::LabelStr const &name,
 void RadDeg::handleExecute() {
   boost_flt b_rad(deg_to_rad(convert(m_deg))), b_deg(rad_to_deg(convert(m_rad)));
   
-  intersect(m_rad, b_rad.lower(), b_rad.upper(), 1.0e-10);
-  intersect(m_deg, b_deg.lower(), b_deg.upper(), 1.0e-8);
+  intersect(m_rad, b_rad.lower(), b_rad.upper(), 1.0e-8);
+  intersect(m_deg, b_deg.lower(), b_deg.upper(), 1.0e-6);
 }
 
 /*
@@ -274,21 +274,31 @@ CosineConstraint::CosineConstraint(EUROPA::LabelStr const &name,
 }
 
 void CosineConstraint::handleExecute() {
-  boost_flt b_angle(deg_to_rad(convert(m_angle))), b_cos;
-  // cos on ubuntu 12.10 appears to be buggy ... 
-  // we use cos(angle) = sin(pi/2 - angle) instead
-  b_cos = sin((pi<boost_flt>()/2.0)-b_angle);
+  if( m_angle.intersect(-180.0, 180.0) && m_angle.isEmpty() ) 
+    return;
+  if( m_cos.intersect(-1.0, 1.0) && m_cos.isEmpty() ) 
+    return;
+  if( m_angle.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = cos(M_PI*EUROPA::cast_basis(m_angle.getSingletonValue())/180.0);
+    intersect(m_cos, tmp, tmp, 1e-6);
+  } else if( m_cos.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = acos(EUROPA::cast_basis(m_cos.getSingletonValue()));
+    tmp *= 180.0/M_PI;
   
-  EUROPA::edouble::basis_type c_lo(fmax(-1.0L, b_cos.lower())), 
-    c_hi(fmin(1.0L, b_cos.upper()));
-  intersect(m_cos, c_lo, c_hi, 1.0e-10);
-  if( m_cos.isSingleton() ) {
-    double angle = 180.0*acos(EUROPA::cast_basis(m_cos.getSingletonValue()))/M_PI;
-    intersect(m_angle, -angle, angle, 1.0e-8);
-    if( m_angle.getUpperBound()<angle )
-      intersect(m_angle, -angle, -angle, 1.0e-8);
-    else if( m_angle.getLowerBound()>-angle ) 
-      intersect(m_angle, angle, angle, 1.0e-8);
+    intersect(m_angle, -tmp, tmp, 1e-6);
+    if( m_angle.getUpperBound()+1e-6 < tmp )
+      intersect(m_angle, -tmp, -tmp, 1e-6);
+    else if( 1e-6-tmp < m_angle.getLowerBound() )
+      intersect(m_angle, tmp, tmp, 1e-6);
+  } else {
+    boost_flt b_angle(deg_to_rad(convert(m_angle))), b_cos;
+    
+    b_cos = sin((pi<boost_flt>()/2.0)-b_angle);
+    
+    EUROPA::edouble::basis_type c_lo(fmax(-1.0, b_cos.lower())),
+      c_hi(fmin(1.0L, b_cos.upper()));
+    
+    intersect(m_cos, c_lo, c_hi, 1e-6);
   }
 }
 
@@ -307,45 +317,62 @@ m_sin(getCurrentDomain(vars[0])) {
 }
 
 void SineConstraint::handleExecute() {
-  boost_flt b_angle(convert(m_angle)), b_sin = sin(deg_to_rad(b_angle));
-  EUROPA::edouble s_lo(fmax(-1.0L, b_sin.lower())), 
-    s_hi(fmin(1.0L, b_sin.upper()));
-  intersect(m_sin, s_lo, s_hi, 1.0e-10);
-  if( m_sin.isSingleton() ) {
-    // domain based was to hard lets do the singleton case instead
-    EUROPA::edouble a_lo = asin(EUROPA::cast_basis(m_sin.getSingletonValue())), a_hi;
-    a_lo = 180.0*a_lo/M_PI;
-    if( a_lo>0.0 ) {
-      a_hi = 180.0-a_lo;
+  if( m_angle.intersect(-180.0, 180.0) && m_angle.isEmpty() ) 
+    return;
+  if( m_sin.intersect(-1.0, 1.0) && m_sin.isEmpty() ) 
+    return;
+  if( m_angle.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = sin(M_PI*EUROPA::cast_basis(m_angle.getSingletonValue())/180.0);
+    intersect(m_sin, tmp, tmp, 1e-6);
+  } else if( m_sin.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = asin(EUROPA::cast_basis(m_sin.getSingletonValue()));
+    tmp *= 180.0/M_PI;
+    EUROPA::edouble a_lo, a_hi;
 
-      intersect(m_angle, a_lo, a_hi, 1.0e-8);
-      // Check if I can specify it 
-      if( m_angle.getUpperBound()<a_hi )
-	intersect(m_angle, a_lo, a_lo, 1.0e-8);
-      else if( m_angle.getLowerBound()>a_lo )
-	intersect(m_angle, a_hi, a_hi, 1.0e-8);
-    } else if( a_lo<0.0 ) {
-      std::swap(a_lo, a_hi);
-      a_lo = -180.0-a_hi;
+    if( tmp>1e-6 ) {
+      a_lo = tmp;
+      a_hi = 180.0-tmp;
+
+      if( m_angle.getUpperBound()+1e-6 < a_hi )
+	a_hi = a_lo;
+      if( a_lo+1e-6 < m_angle.getLowerBound() )
+	a_lo = a_hi;
+      intersect(m_angle, a_lo, a_hi, 1e-6);
+    } else if( tmp<1e-6 ) {
+      a_lo = -180.0 - tmp;
+      a_hi = tmp;
       
-      intersect(m_angle, a_lo, a_hi, 1.0e-8);
-      // Check if I can specify it 
-      if( m_angle.getUpperBound()<a_hi )
-	intersect(m_angle, a_lo, a_lo, 1.0e-8);
-      else if( m_angle.getLowerBound()>a_lo )
-	intersect(m_angle, a_hi, a_hi, 1.0e-8);
+      if( m_angle.getUpperBound()+1e-6 < a_hi )
+	a_hi = a_lo;
+      if( a_lo+1e-6 < m_angle.getLowerBound() )
+	a_lo = a_hi;
+      intersect(m_angle, a_lo, a_hi, 1e-6);
+      
     } else {
-      intersect(m_angle, -180.0, 180.0, 1.0e-8);
-      if( m_angle.getLowerBound()>0.0 )
-	intersect(m_angle, 180.0, 180.0, 1.0e-8);
-      else if( m_angle.getUpperBound()<0.0 )
-	intersect(m_angle, -180.0, -180.0, 1.0e-8);
-      else {
-	if( m_angle.getUpperBound()<180.0 )
-	  intersect(m_angle, -180.0, 0.0, 1.0e-8);
-	if( m_angle.getLowerBound()>-180.0 )
-	  intersect(m_angle, 0.0, 180.0, 1.0e-8);
+      a_lo = -180.0;
+      a_hi = 180.0;
+      
+      if( m_angle.getLowerBound()-1e-6 > a_lo ) {
+	if( m_angle.getLowerBound()<=1e-6 )
+	  a_lo = 0.0;
+	else 
+	  a_lo = 180.0;
       }
+      if( m_angle.getUpperBound()+1e-6 < a_hi ) {
+	if( m_angle.getUpperBound()>=-1e-6 )
+	  a_hi = 0.0;
+	else
+	  a_hi = -180.0;
+      }
+      intersect(m_angle, a_lo, a_hi, 1e-6);
     } 
+  } else {
+    boost_flt b_angle(deg_to_rad(convert(m_angle))), b_sin;
+    b_sin = sin(b_angle);
+
+    EUROPA::edouble s_lo(fmax(-1.0L, b_sin.lower())), 
+      s_hi(fmin(1.0L, b_sin.upper()));
+
+    intersect(m_sin, s_lo, s_hi, 1e-6);
   }
 }
