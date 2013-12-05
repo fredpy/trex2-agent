@@ -97,6 +97,7 @@ namespace TREX {
 	:details::ros_timeline(arg, Convert::accept_goals && 
 			       TREX::utils::parse_attr(false, details::ros_timeline::xml_factory::node(arg), 
 						       "control")),
+	 m_merge(TREX::utils::parse_attr(true, details::ros_timeline::xml_factory::node(arg), "merge")), 
 	 m_extend(false) { 
         boost::property_tree::ptree::value_type &xml(details::ros_timeline::xml_factory::node(arg));
         
@@ -110,8 +111,10 @@ namespace TREX {
 	  syslog()<<"Connecting to service "<<m_service;
 
 	  // subscibr to the service with a queue of 10 ... may change this to be configurable in the future
+
 	  m_sub = node().subscribe(m_service.str(), 10,
 				   &ros_subscriber<message_type>::message, this);
+	    
 	} catch(::ros::Exception const &e) {
 	  std::ostringstream oss;
 	  oss<<"Exception while trying to subscribe to \""<<m_service<<"\": "<<e.what();
@@ -130,7 +133,7 @@ namespace TREX {
 
 	if( o ) {
 	  if( m_last_obs ) {
-	    if( o->consistentWith(*m_last_obs) ) {
+	    if( m_merge && o->consistentWith(*m_last_obs) ) {
 	      m_extend = true;
 	      return;
 	    } 
@@ -280,9 +283,11 @@ namespace TREX {
       transaction::TICK        m_obs_start;
       boost::optional<transaction::Observation> m_last_obs;
       std::list<transaction::goal_id> m_pending;
+      bool const m_merge;
       bool m_extend;
 
       transaction::TICK m_next;
+      
 
 
       TREX::utils::Symbol m_service;

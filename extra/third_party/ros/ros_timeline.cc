@@ -44,12 +44,14 @@ using TREX::utils::Symbol;
  */
 details::ros_timeline::ros_timeline(details::ros_timeline::xml_arg arg, bool control)
   :m_reactor(*arg.second), m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "timeline")),
-   m_controlable(control), m_updated(false) {
+   m_controlable(control),
+   m_init(utils::parse_attr(false, xml_factory::node(arg), "init")),
+   m_updated(false) {
   init_timeline();
 }
 
-details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control)
-  :m_reactor(*r), m_name(tl), m_controlable(control), m_updated(false) {
+details::ros_timeline::ros_timeline(ros_reactor *r, Symbol const &tl, bool control, bool init)
+  :m_reactor(*r), m_name(tl), m_controlable(control), m_init(init), m_updated(false) {
   init_timeline();
 }
 
@@ -68,8 +70,20 @@ void details::ros_timeline::init_timeline() {
       oss<<"Failed to declare  \""<<name()<<"\" as Internal.";
       throw TREX::transaction::ReactorException(m_reactor, oss.str());
     }
-    // Initialize the observation to undefined
-    notify(new_obs(TREX::transaction::Predicate::undefined_pred()));
+    if( !m_init ) {
+      // Initialize the observation to undefined
+      notify(new_obs(TREX::transaction::Predicate::undefined_pred()));
+    }
+  }
+}
+
+void details::ros_timeline::do_init() {
+  if( m_init ) {
+    // Wait for new obs here
+    syslog()<<"Waiting for first ROS update on \""<<name()<<"\""; 
+    do {
+      boost::this_thread::yield();
+    } while( !m_updated );
   }
 }
 

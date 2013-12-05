@@ -56,13 +56,18 @@ ros_reactor::~ros_reactor() {
 
 void ros_reactor::handleInit() { 
   m_cli->start();
+  for(tl_map::const_iterator i=m_tl_conn.begin();
+      m_tl_conn.end()!=i; ++i) {
+    // syslog()<<"Initializing \""<<i->first<<"\"";
+    i->second->do_init();
+  }
 }
 
 bool ros_reactor::synchronize() {
-  // fail synchronization when unable to connect to ros
   for(tl_map::const_iterator i=m_tl_conn.begin();
       m_tl_conn.end()!=i; ++i)
     i->second->do_synchronize();
+  // fail synchronization when unable to connect to ros
   return m_cli->ok();
 }
       
