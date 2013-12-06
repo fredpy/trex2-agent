@@ -83,4 +83,48 @@ The final step is to set up[ your environment by adding the following line into 
 source ~/trex/share/trex/trex_init.bash
 }}}
  
- 
+== T-REX extension for Lucia ==
+
+ # Get the source through svn (may change before tuesday)
+    {{{
+$ svn co checkout http://trex2-agent.googlecode.com/svn/orebro ~/trex_orebro
+    }}}
+ # Create a build directory and run cmake as before  
+    {{{
+$ mkdir ~/trex_orebro.build
+$ cd ~/trex_orebro.build
+$ ccmake ~/trex_orebro
+    }}}
+The ccmake should go seamlessly if your trex environment is set and you have already installed go_turtle ros package (even without go_turlte this should just display a warning).
+The only option I recommend is to set CMAKE_INSTALL_PREFIX to  the same value as fro trex (~/trex in this document)
+The hit 'c' as required and 'g;' to generate the makefiles. Finally just compile :
+   {{{
+$ cd ~/trex_orebro.build
+$ make 
+$ make install
+   }}}
+== A simple test ==
+You  are set and can do a simple test with a gazebo simulation (has instructed at [http://wiki.ros.org/turtlebot_simulator])
+ # On one terminal start gazebo:
+   {{{
+$ roslaunch turtlebot_gazebo turtlebot_empty_world.launch   
+   }}}
+ # When the simulation is started  (i.e. you should axe a gazebo window with the robot). You can start a sample trex mission provided in trex_orebro:
+   {{{
+$ amc turtlebot &
+   }}} 
+ # This mission will make the robot move after 10 seconds trex is started for 15 seconds in one direction 
+ # You can track the activity of TREX by looking at $TREX_LOG_DIR/latest/TREX.log. The command below will show you the content of the file as it is updated:
+   {{{
+$ tail -f $TREX_LOG_DIR/latest/TREX.log
+   }}}
+ # Finally you can shutdown the mission by killing trex:
+   {{{
+$ killall amc
+   }}}
+   and of course shutdown ROS simulation (hitting ^C on the window where sorlaunc is running should be enough)
+
+
+
+
+
