@@ -59,7 +59,8 @@ Hit the key 'c' (or the configure button on cmake-gui) to do the first configura
 Then we can set up extra options:
   * set CMAKE_INSTALL_PREFIX to ~/trex (or whatever you want)
   * set WITH_ROS to ON
-To edit e field on ccmake navigate your cursor to the field (with up and down arrow) and hit enter in order to edit it. You should have the following:
+
+To set a field on ccmake navigate your cursor to the field (with up and down arrow) and hit enter in order to edit it. You should have the following:
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-edit.png]
 
 From there you can hit 'c' which will detect ROS. Then if no error occur you will hit 'c' again and should end up with no more fields prefixed by a `*` :
@@ -122,6 +123,4 @@ $ tail -f $TREX_LOG_DIR/latest/TREX.log
 $ killall amc
    }}}
    and of course shutdown ROS simulation (hitting ^C on the window where sorlaunc is running should be enough)
-
-
 
