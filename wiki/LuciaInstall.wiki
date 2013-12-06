@@ -63,7 +63,8 @@ Then we can set up extra options:
 To edit e field on ccmake navigate your cursor to the field (with up and down arrow) and hit enter in order to edit it. You should have the following:
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-edit.png]
 
-From there you can hit 'c' which will detect ROS. Then if no error occur you will hit 'c' again and should end up with no more fields prefixed by a '*' as follow: 
+From there you can hit 'c' which will detect ROS. Then if no error occur you will hit 'c' again and should end up with no more fields prefixed by a '`*`' as follow:
+ 
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-final.png]
 
 From there just hit 'g' which will generate your compilation environment for T-REX.
@@ -83,4 +84,3 @@ source ~/trex/share/trex/trex_init.bash
 }}}
  
  
-
