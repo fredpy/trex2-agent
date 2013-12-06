@@ -41,6 +41,61 @@
 
 namespace {
   
+  bool
+  intersect(EUROPA::Domain& dom, EUROPA::edouble::basis_type lb, EUROPA::edouble::basis_type ub,
+	    EUROPA::edouble::basis_type decimal_places)
+  {
+    EUROPA::edouble const p_inf = std::numeric_limits<EUROPA::edouble>::infinity();
+    EUROPA::edouble const n_inf = std::numeric_limits<EUROPA::edouble>::minus_infinity();
+    EUROPA::edouble const prec = decimal_places;
+      
+
+    if( lb>ub || lb>=p_inf || ub<=n_inf ) {
+      dom.empty();
+      return true;
+    } else {
+      EUROPA::edouble lo = n_inf, hi = p_inf;
+
+      // std::cerr<<dom.toString()<<" * ["<<lb<<", "<<ub<<"]"<<std::flush;
+
+      if( lb>lo ) {
+	lo = lb;
+	if( lo > dom.getUpperBound() )
+	  lo -= prec;
+      }
+      if( ub<hi ) {
+	hi = ub;
+	if( hi < dom.getLowerBound() )
+	  hi += prec;
+      }
+      bool ret = dom.intersect(lo, hi);
+
+      // if( dom.isEmpty() )
+      // 	std::cerr<<" EMPTY"<<std::endl;
+      // else
+      // 	std::cerr<<" = "<<dom.toString()<<std::endl;
+
+      return ret;
+    }
+  }
+
+  bool intersect(EUROPA::Domain &dom, EUROPA::edouble lb, EUROPA::edouble ub, 
+		 EUROPA::edouble::basis_type decimal_places) {
+    
+    EUROPA::edouble const prec = decimal_places;
+    
+    if( lb>dom.getUpperBound() &&
+	lb < std::numeric_limits<EUROPA::edouble>::infinity() )
+      lb -= prec;
+    if( ub<dom.getLowerBound() &&
+	ub > std::numeric_limits<EUROPA::edouble>::minus_infinity() )
+      ub += prec;
+	
+    // std::cerr<<dom.toString()<<" * ["<<lb<<", "<<ub<<"]"<<std::endl;
+    return dom.intersect(lb, ub);
+  }
+
+
   /*
    * A replacement to boost::rounded_arith_opp as it has a bug under clang :
    *   - the to_int call made in the boost version needed to be replaced by 
@@ -113,10 +168,96 @@ return r
   inline boost_flt deg_to_rad(boost_flt const &dom) {
     return pi<boost_flt>()*dom/180.0;
   }
+  inline boost_flt rad_to_deg(boost_flt const &dom) {
+    return 180.0*dom/pi<boost_flt>();
+  }
+  
   
 }
 
 using namespace TREX::europa;
+
+
+/*
+ * class RadDeg
+ */
+
+InCircle::InCircle(EUROPA::LabelStr const &name,
+		   EUROPA::LabelStr const &propagatorName,
+		   EUROPA::ConstraintEngineId const &cstrEngine,
+		   std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
+ m_deg(getCurrentDomain(vars[0])), 
+ m_val(getCurrentDomain(vars[1])) {
+  checkError(vars.size()==2, "Exactly 2 parameters required.");
+}
+
+void InCircle::handleExecute() {
+  // First restrict the bounds of m_val
+  m_deg.intersect(-180.0, 180.0);
+  EUROPA::edouble d_hi, d_lo, v_hi, v_lo;
+  
+  m_deg.getBounds(d_lo, d_hi);
+  m_val.getBounds(v_lo, v_hi);
+
+  if( v_hi< std::numeric_limits<EUROPA::edouble>::infinity() ) {
+    EUROPA::edouble::basis_type mod = fmod(EUROPA::cast_basis(v_hi), 360.0);
+    if( mod<=-180.0 )
+      mod += 360.0;
+    else if( mod>180.0 )
+      mod-= 360.0;
+    // Mod is now in the range [-180, 180]
+    if( mod>d_hi )
+      v_hi -= mod-d_hi;   
+  }
+  if( v_lo > std::numeric_limits<EUROPA::edouble>::minus_infinity() ) {
+    EUROPA::edouble::basis_type mod = fmod(EUROPA::cast_basis(v_lo), 360.0);
+    if( mod<=-180.0 )
+      mod += 360.0;
+    else if( mod>180.0 )
+      mod-= 360.0;
+    // Mod is now in the range [-180, 180]
+    if( mod<d_lo )
+      v_lo += d_lo-mod;   
+  }
+  m_val.intersect(v_lo, v_hi);
+
+  boost_flt val = convert(m_val);
+  
+  if( width(val)<360.0 ) {
+    val = fmod(val, 360.0);
+    if( val.lower()>180.0 ) {
+      val -= 360.0;
+      intersect(m_deg, val.lower(), val.upper(), 1e-6);
+    } else if( val.upper()<=-180.0 ) {
+      val += 360.0;
+      intersect(m_deg, val.lower(), val.upper(), 1e-6);
+    } else if( val.lower()>-180.0 && val.upper()<=180.0 )
+	intersect(m_deg, val.lower(), val.upper(), 1e-6);
+  }
+  
+}
+
+/*
+ * class RadDeg
+ */
+
+RadDeg::RadDeg(EUROPA::LabelStr const &name,
+	       EUROPA::LabelStr const &propagatorName,
+	       EUROPA::ConstraintEngineId const &cstrEngine,
+	       std::vector<EUROPA::ConstrainedVariableId> const &vars)
+:EUROPA::Constraint(name, propagatorName, cstrEngine, vars),
+ m_deg(getCurrentDomain(vars[1])), 
+ m_rad(getCurrentDomain(vars[0])) {
+  checkError(vars.size()==2, "Exactly 2 parameters required.");
+}
+
+void RadDeg::handleExecute() {
+  boost_flt b_rad(deg_to_rad(convert(m_deg))), b_deg(rad_to_deg(convert(m_rad)));
+  
+  intersect(m_rad, b_rad.lower(), b_rad.upper(), 1.0e-8);
+  intersect(m_deg, b_deg.lower(), b_deg.upper(), 1.0e-6);
+}
 
 /*
  * class CosineConstraint
@@ -133,14 +274,32 @@ CosineConstraint::CosineConstraint(EUROPA::LabelStr const &name,
 }
 
 void CosineConstraint::handleExecute() {
-  boost_flt b_angle(deg_to_rad(convert(m_angle))), b_cos;
-  // cos on ubuntu 12.10 appears to be buggy ... 
-  // we use cos(angle) = sin(pi/2 - angle) instead
-  b_cos = sin((pi<boost_flt>()/2.0)-b_angle);
+  if( m_angle.intersect(-180.0, 180.0) && m_angle.isEmpty() ) 
+    return;
+  if( m_cos.intersect(-1.0, 1.0) && m_cos.isEmpty() ) 
+    return;
+  if( m_angle.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = cos(M_PI*EUROPA::cast_basis(m_angle.getSingletonValue())/180.0);
+    intersect(m_cos, tmp, tmp, 1e-6);
+  } else if( m_cos.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = acos(EUROPA::cast_basis(m_cos.getSingletonValue()));
+    tmp *= 180.0/M_PI;
   
-  EUROPA::edouble c_lo(fmax(-1.0L, b_cos.lower())), 
-    c_hi(fmin(1.0L, b_cos.upper()));
-  m_cos.intersect(c_lo, c_hi);
+    intersect(m_angle, -tmp, tmp, 1e-6);
+    if( m_angle.getUpperBound()+1e-6 < tmp )
+      intersect(m_angle, -tmp, -tmp, 1e-6);
+    else if( 1e-6-tmp < m_angle.getLowerBound() )
+      intersect(m_angle, tmp, tmp, 1e-6);
+  } else {
+    boost_flt b_angle(deg_to_rad(convert(m_angle))), b_cos;
+    
+    b_cos = sin((pi<boost_flt>()/2.0)-b_angle);
+    
+    EUROPA::edouble::basis_type c_lo(fmax(-1.0, b_cos.lower())),
+      c_hi(fmin(1.0L, b_cos.upper()));
+    
+    intersect(m_cos, c_lo, c_hi, 1e-6);
+  }
 }
 
 /*
@@ -158,8 +317,62 @@ m_sin(getCurrentDomain(vars[0])) {
 }
 
 void SineConstraint::handleExecute() {
-  boost_flt b_angle(convert(m_angle)), b_sin = sin(deg_to_rad(b_angle));
-  EUROPA::edouble s_lo(fmax(-1.0L, b_sin.lower())), 
-    s_hi(fmin(1.0L, b_sin.upper()));
-  m_sin.intersect(s_lo, s_hi);
+  if( m_angle.intersect(-180.0, 180.0) && m_angle.isEmpty() ) 
+    return;
+  if( m_sin.intersect(-1.0, 1.0) && m_sin.isEmpty() ) 
+    return;
+  if( m_angle.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = sin(M_PI*EUROPA::cast_basis(m_angle.getSingletonValue())/180.0);
+    intersect(m_sin, tmp, tmp, 1e-6);
+  } else if( m_sin.isSingleton() ) {
+    EUROPA::edouble::basis_type tmp = asin(EUROPA::cast_basis(m_sin.getSingletonValue()));
+    tmp *= 180.0/M_PI;
+    EUROPA::edouble a_lo, a_hi;
+
+    if( tmp>1e-6 ) {
+      a_lo = tmp;
+      a_hi = 180.0-tmp;
+
+      if( m_angle.getUpperBound()+1e-6 < a_hi )
+	a_hi = a_lo;
+      if( a_lo+1e-6 < m_angle.getLowerBound() )
+	a_lo = a_hi;
+      intersect(m_angle, a_lo, a_hi, 1e-6);
+    } else if( tmp<1e-6 ) {
+      a_lo = -180.0 - tmp;
+      a_hi = tmp;
+      
+      if( m_angle.getUpperBound()+1e-6 < a_hi )
+	a_hi = a_lo;
+      if( a_lo+1e-6 < m_angle.getLowerBound() )
+	a_lo = a_hi;
+      intersect(m_angle, a_lo, a_hi, 1e-6);
+      
+    } else {
+      a_lo = -180.0;
+      a_hi = 180.0;
+      
+      if( m_angle.getLowerBound()-1e-6 > a_lo ) {
+	if( m_angle.getLowerBound()<=1e-6 )
+	  a_lo = 0.0;
+	else 
+	  a_lo = 180.0;
+      }
+      if( m_angle.getUpperBound()+1e-6 < a_hi ) {
+	if( m_angle.getUpperBound()>=-1e-6 )
+	  a_hi = 0.0;
+	else
+	  a_hi = -180.0;
+      }
+      intersect(m_angle, a_lo, a_hi, 1e-6);
+    } 
+  } else {
+    boost_flt b_angle(deg_to_rad(convert(m_angle))), b_sin;
+    b_sin = sin(b_angle);
+
+    EUROPA::edouble s_lo(fmax(-1.0L, b_sin.lower())), 
+      s_hi(fmin(1.0L, b_sin.upper()));
+
+    intersect(m_sin, s_lo, s_hi, 1e-6);
+  }
 }
