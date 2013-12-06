@@ -71,6 +71,16 @@ if(ROS_CONFIG)
   include_directories(${ROS_roscpp_INCLUDE_DIRS})
   add_definitions(${ROS_roscpp_CFLAGS})
   link_directories(${ROS_roscpp_LINK_PATH})
+
+  find_ros_pkg(go_turtle)
+  if(ROS_go_turtle_PACKAGE_PATH)
+    set(EXTRA_SRC src/nav_adapter.cc)
+    include_directories(${ROS_go_turtle_INCLUDE_DIRS})
+    add_definitions(${ROS_go_turtle_CFLAGS})
+    link_directories(${ROS_go_turtle_LINK_PATH})
+  else(ROS_go_turtle_PACKAGE_PATH)
+    message(WARNING "go_turlte ROS package not detected") 
+  endif(ROS_go_turtle_PACKAGE_PATH)
 else(ROS_CONFIG)
   message(SEND_ERROR "Failed to localize ROS")
 endif(ROS_CONFIG)
@@ -78,7 +88,8 @@ endif(ROS_CONFIG)
 # Define my new trex plugin
 add_library(turtle_pg SHARED 
   src/turtle_pg.cc
-  src/odom_adapter.cc)
+  src/odom_adapter.cc
+  ${EXTRA_SRC})
 
 target_link_libraries(turtle_pg TREXros)
 
@@ -88,3 +99,4 @@ install(DIRECTORY cfg DESTINATION share/trex OPTIONAL
   FILES_MATCHING PATTERN "*"
   PATTERN "*~" EXCLUDE
   PATTERN ".svn" EXCLUDE)
+
