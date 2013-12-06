@@ -1,0 +1,53 @@
+#summary One-sentence summary of this page.
+#labels Phase-Deploy
+Installation instructions for Lucia winter school 2013
+
+
+= Introduction =
+
+In order to install T-REX for the Lucia winter school you will need the following:
+  * A ubuntu linux box 12.04 64 bits
+  * administration rights in the box
+  * ROS hydra installed
+
+Additionally you will need europa_pso which is provided.
+It is also recommended to have ccmake or cmake-gui installed as this documentation assume that you have at least ccmake (cmake-gui being just the more fancy version of it). To install 
+
+For installing ccmake:
+{{{ $ sudo apt-get install cmake-curses-gui }}}
+Or for installing cmake-gui
+{{{ $ sudo apt-get install cmake-qt-gui }}}
+
+= Installing Europa =
+
+ # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= binary]
+ # Install antlr3c on ubuntu
+   {{{ 
+$ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
+   }}}
+ # Unpack the europa archive 
+   {{{
+$ cd ~/
+$ tar zxvf europa-ubuntu-12.10-64.tar.gz
+   }}}
+After this you should have a ~/europa directory which include all the europa binaries and headers required for T-REX compilation.
+  
+= Installing T-REX =
+ # Get the source of T-REX [http://code.google.com/p/trex2-agent/downloads/detail?name=trex-0.5.1.tar.gz&can=2&q= here]  
+ # unpack the source 
+    {{{
+$ cd ~/
+$ tar zxvf trex-0.5.1.tar.gz
+    }}}
+ # Set EUROPA_HOME to where europa was unpacked
+   {{{
+$ export EUROPA_HOME=~/europa
+   }}}
+ # Create build directory and run ccmake (alt.cmake-gui on it) with the source location as argument
+    {{{ 
+$ mkdir ~/trex.build
+$ cd ~/trex.build
+$ ccmake ~/trex-0.5.1
+   }}}
+At this point you should be facing an interface similar to this:
+[http://code.google.com/p/trex2-agent/source/browse/wiki/imgs/ccmake-init.png]
