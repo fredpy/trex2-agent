@@ -53,5 +53,12 @@ $ ccmake ~/trex-0.5.1 -DWITH_CPP11=ON
 
 At this point you should be facing an interface similar to this:
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-init.png]
+
 Hit the key 'c' (or the configure button on cmake-gui) to do the first configuration:
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-first.png]
+
+Then we can set up extra options:
+  * set CMAKE_INSTALL_PREFIX to ~/trex (or whatever you want)
+  * set WITH_ROS to ON
+To edit e field on ccmake navigate your cursor to the field (with up and down arrow) and hit enter in order to edit it. You should have the following:
+[https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-edit.png]
