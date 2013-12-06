@@ -427,10 +427,15 @@ void EuropaReactor::print_stats(std::string const &what,
 
 bool EuropaReactor::do_relax(bool full) {
   logPlan("failed");
+  syslog()<<"Relax current plan"<<(full?" and forget past":""); 
   stat_clock::time_point start = stat_clock::now();
   bool ret = relax(full);
   print_stats("relax", 0, 0, stat_clock::now()-start);
-  // logPlan("relax");
+  if( ret )
+    syslog()<<"Relaxation completed";
+  else
+    syslog(null, error)<<"Relaxation failed";
+  logPlan("relax");
   m_dispatched.clear(); // need this in case we have the same
 			// token coming back
   return ret;
@@ -472,7 +477,7 @@ bool EuropaReactor::synchronize() {
   if( !synch() ) {
     m_completed_this_tick = false;
     syslog(null, warn)<<"Failed to synchronize : relaxing current plan.";
-
+    
     if( !( do_relax(false) && synch() ) ) {
       syslog(null, warn)<<"Failed to synchronize(2) : forgetting past.";
       if( !( do_relax(true) && synch() ) ) {

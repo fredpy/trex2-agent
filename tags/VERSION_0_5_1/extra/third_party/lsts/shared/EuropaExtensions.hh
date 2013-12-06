@@ -159,23 +159,23 @@ namespace TREX {
       };
     };
     
-    class RadDeg :public EUROPA::Constraint {
-    public:
-      RadDeg(EUROPA::LabelStr const &name,
-             EUROPA::LabelStr const &propagator,
-             EUROPA::ConstraintEngineId const &engine,
-             std::vector<EUROPA::ConstrainedVariableId> const &vars);
-      void handleExecute();
-    private:
-      EUROPA::Domain &m_deg;
-      EUROPA::Domain &m_rad;
+    // class RadDeg :public EUROPA::Constraint {
+    // public:
+    //   RadDeg(EUROPA::LabelStr const &name,
+    //          EUROPA::LabelStr const &propagator,
+    //          EUROPA::ConstraintEngineId const &engine,
+    //          std::vector<EUROPA::ConstrainedVariableId> const &vars);
+    //   void handleExecute();
+    // private:
+    //   EUROPA::Domain &m_deg;
+    //   EUROPA::Domain &m_rad;
       
-      enum indexes {
-        RADIANS = 0,
-        DEGREES = 1,
-        NARGS   = 2
-      };
-    }; // TREX::LSTS::RadDeg
+    //   enum indexes {
+    //     RADIANS = 0,
+    //     DEGREES = 1,
+    //     NARGS   = 2
+    //   };
+    // }; // TREX::LSTS::RadDeg
     
     class PathCar :public EUROPA::Constraint {
     public:

@@ -80,6 +80,9 @@ namespace TREX {
     DECLARE_FUNCTION_TYPE(FloorConstraint, floor, 
                           "floorf", EUROPA::IntDT, 1); 
     
+    DECLARE_FUNCTION_TYPE(RadDeg, to_rad, "deg_to_rad", EUROPA::FloatDT, 1);
+    DECLARE_FUNCTION_TYPE(InCircle, in_circle, "circle_mod", EUROPA::FloatDT, 1);
+
     /** @brief sinf NDDL function
      *
      * Declare the sine function within nddl language
@@ -99,6 +102,7 @@ namespace TREX {
     DECLARE_FUNCTION_TYPE(CosineConstraint, cos, 
                           "cosf", EUROPA::FloatDT, 1); 
     
+
     DECLARE_FUNCTION_TYPE(MaxConstraint, max, "maxf", EUROPA::FloatDT, 2);
     DECLARE_FUNCTION_TYPE(MinConstraint, min, "minf", EUROPA::FloatDT, 2);
 
@@ -202,6 +206,9 @@ namespace {
         
 	TREX_REGISTER_FLAW_MANAGER(assembly, TREX::europa::EarliestFirstFlawManager,
 			EarliestFirst);
+	
+	TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::InCircle, circle_mod, trex);
+	TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::RadDeg, deg_to_rad, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::CosineConstraint, cosf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::SineConstraint, sinf, trex);
         TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::AbsValConstraint, absf, trex);
@@ -214,6 +221,8 @@ namespace {
 				 minf, Default);
 	TREX_REGISTER_CONSTRAINT(assembly, TREX::europa::Bind, bind, trex);
         
+	declareFunction(assembly, new TREX::europa::InCircleFunction());
+	declareFunction(assembly, new TREX::europa::RadDegFunction());
         declareFunction(assembly, new TREX::europa::SineConstraintFunction());
         declareFunction(assembly, new TREX::europa::CosineConstraintFunction());
         declareFunction(assembly, new TREX::europa::AbsValConstraintFunction());

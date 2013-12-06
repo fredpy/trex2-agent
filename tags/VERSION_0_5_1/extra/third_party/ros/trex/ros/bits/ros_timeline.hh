@@ -71,10 +71,11 @@ namespace TREX {
 
 	bool request(TREX::transaction::goal_id g);
 	void recall(TREX::transaction::goal_id g);
+	void do_init();
 	void do_synchronize();
       protected:
         ros_timeline(xml_arg arg, bool control);
-        ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool control);
+        ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool init, bool control);
 
 	virtual bool handle_request(TREX::transaction::goal_id g) =0;
 	virtual void handle_recall(TREX::transaction::goal_id g) {}
@@ -104,6 +105,7 @@ namespace TREX {
         ros_reactor &m_reactor;
         utils::Symbol const m_name;
         bool const m_controlable;
+	bool const m_init;
 
 	bool m_undefined, m_updated;
         
