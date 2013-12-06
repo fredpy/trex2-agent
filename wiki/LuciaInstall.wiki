@@ -47,7 +47,11 @@ $ export EUROPA_HOME=~/europa
     {{{ 
 $ mkdir ~/trex.build
 $ cd ~/trex.build
-$ ccmake ~/trex-0.5.1
+$ ccmake ~/trex-0.5.1 -DWITH_CPP11=ON
    }}}
+*Note* the WITH_CPP11 option is required as ubuntu 12.xx uses a version of boost anterior to 1.47. Setting it up beforehand avoid to have the trex cmake scripts  display an error message.
+
 At this point you should be facing an interface similar to this:
 [https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-init.png]
+Hit the key 'c' (or the configure button on cmake-gui) to do the first configuration:
+[https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-first.png]
