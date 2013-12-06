@@ -13,9 +13,13 @@ Additionally you will need europa_pso which is provided.
 It is also recommended to have ccmake or cmake-gui installed as this documentation assume that you have at least ccmake (cmake-gui being just the more fancy version of it). To install 
 
 For installing ccmake:
-{{{ $ sudo apt-get install cmake-curses-gui }}}
+{{{ 
+$ sudo apt-get install cmake-curses-gui 
+}}}
 Or for installing cmake-gui
-{{{ $ sudo apt-get install cmake-qt-gui }}}
+{{{ 
+$ sudo apt-get install cmake-qt-gui 
+}}}
 
 = Installing Europa =
 
@@ -123,4 +127,3 @@ $ tail -f $TREX_LOG_DIR/latest/TREX.log
 $ killall amc
    }}}
    and of course shutdown ROS simulation (hitting ^C on the window where sorlaunc is running should be enough)
-
