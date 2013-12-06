@@ -1,6 +1,5 @@
-#summary One-sentence summary of this page.
+#summary Installation instructions for Lucia winter school 2013
 #labels Phase-Deploy
-Installation instructions for Lucia winter school 2013
 
 
 = Introduction =
@@ -123,8 +122,6 @@ $ tail -f $TREX_LOG_DIR/latest/TREX.log
 $ killall amc
    }}}
    and of course shutdown ROS simulation (hitting ^C on the window where sorlaunc is running should be enough)
-
-
 
 
 
