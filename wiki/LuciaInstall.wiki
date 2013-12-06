@@ -50,4 +50,4 @@ $ cd ~/trex.build
 $ ccmake ~/trex-0.5.1
    }}}
 At this point you should be facing an interface similar to this:
-[http://code.google.com/p/trex2-agent/source/browse/wiki/imgs/ccmake-init.png]
+[https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-init.png]
