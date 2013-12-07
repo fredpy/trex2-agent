@@ -22,17 +22,28 @@ $ sudo apt-get install cmake-qt-gui
 }}}
 
 = Installing Europa =
-
- # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= binary]
- # Install antlr3c on ubuntu
-   {{{ 
+ # check if your linux is 32 or 64 bits. You can do this by running :
+     {{{
+$ arch 
+     }}}
+    If it writes `x86_64` then your system is 64 bits, otherwise (`I386`) it is 32 bits
+ # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= 64 bits binary] or [https://code.google.com/p/europa-pso/downloads/detail?name=europa-2.6-linux.zip&can=2&q= 3bits binary]
+# Install antlr3c on ubuntu.
+     {{{ 
 $ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
-   }}}
- # Unpack the europa archive 
-   {{{
+    }}}
+ # Unpack the europa archive
+   * 64 bits: 
+     {{{
 $ cd ~/
 $ tar zxvf europa-ubuntu-12.10-64.tar.gz
-   }}}
+     }}}
+   * 32 bits:
+     {{{
+$ cd ~/
+$ unzip europa-2.6-linux.zip
+$ mv europa-2 europa
+     }}} 
 After this you should have a ~/europa directory which include all the europa binaries and headers required for T-REX compilation.
   
 = Installing T-REX =
