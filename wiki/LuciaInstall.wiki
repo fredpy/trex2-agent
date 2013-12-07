@@ -93,11 +93,20 @@ After a while the compilation should complete without issue. You can then instal
 {{{
 $ make install
 }}}
-The final step is to set up[ your environment by adding the following line into your `~/.bashrc` file:
+
+== Setting up your T-REX environment ==
+
+The final step is to set up your environment for T-REX the easiest way is to run this command 
+(assuming that you installed trex on ~/trex):
 {{{
-source ~/trex/share/trex/trex_init.bash
+$ echo "source ${HOME}/trex/share/trex/trex_init.bash" >> ~/.bashrc
 }}}
- 
+
+The either open a new terminal or run the command on  your terminal :
+{{{
+$ source ~/.bashrc
+}}}
+
 == T-REX extension for Lucia ==
 
  # Get the source through svn (may change before tuesday)
