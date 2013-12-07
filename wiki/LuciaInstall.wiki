@@ -26,8 +26,8 @@ $ sudo apt-get install cmake-qt-gui
      {{{
 $ arch 
      }}}
-    If it writes `x86_64` then your system is 64 bits, otherwise (`I386`) it is 32 bits
- # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= 64 bits binary] or [https://code.google.com/p/europa-pso/downloads/detail?name=europa-2.6-linux.zip&can=2&q= 3bits binary]
+    If it writes `x86_64` then your system is 64 bits, otherwise (`i386`) it is 32 bits
+ # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= 64 bits binary] or [https://code.google.com/p/europa-pso/downloads/detail?name=europa-2.6-linux.zip&can=2&q= 32 bits binary]
 # Install antlr3c on ubuntu.
      {{{ 
 $ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
