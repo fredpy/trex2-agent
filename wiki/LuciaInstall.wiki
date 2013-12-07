@@ -5,7 +5,7 @@
 = Introduction =
 
 In order to install T-REX for the Lucia winter school you will need the following:
-  * A ubuntu linux box 12.04 64 bits
+  * A ubuntu linux box 12.04 64 bits (32 bits supported)
   * administration rights in the box
   * ROS hydra installed
 
