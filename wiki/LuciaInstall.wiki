@@ -10,7 +10,26 @@ In order to install T-REX for the Lucia winter school you will need the followin
   * ROS hydra installed
 
 Additionally you will need europa_pso which is provided.
-It is also recommended to have ccmake or cmake-gui installed as this documentation assume that you have at least ccmake (cmake-gui being just the more fancy version of it). To install 
+
+= ubuntu packages to install =
+== Required ==
+
+ROS hydro is needed for the exercises we will do, If you do not have installed it already follow [http://wiki.ros.org/hydro/Installation/Ubuntu these steps]  
+
+Also while not critical we recommend to install turtlebot gazebo simulator as it is used for the final test 
+of this compilation and will be used as an initial example during the lecture/exercises.
+
+{{{
+$ sudo apt-get install ros-hydro-turtlebot-simulator
+}}}
+
+The europa planner requires to have libantlr3c (for parsing its nddl domain files):
+{{{ 
+$ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
+}}}
+
+== Recommended == 
+It is highly recommended to have ccmake or cmake-gui installed as this documentation assume that you have at least ccmake (cmake-gui being just the more fancy version of it). To install 
 
 For installing ccmake:
 {{{ 
@@ -21,6 +40,12 @@ Or for installing cmake-gui
 $ sudo apt-get install cmake-qt-gui 
 }}}
 
+Another tool which can be useful to see later on t-rex plans is graphviz and its graphical viewer xdot 
+{{{
+$ sudo apt-get install xdot 
+}}} 
+
+
 = Installing Europa =
  # check if your linux is 32 or 64 bits. You can do this by running :
      {{{
@@ -28,10 +53,6 @@ $ arch
      }}}
     If it writes `x86_64` then your system is 64 bits, otherwise (`i386`) it is 32 bits
  # Download the [http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q= 64 bits binary] or [https://code.google.com/p/europa-pso/downloads/detail?name=europa-2.6-linux.zip&can=2&q= 32 bits binary]
-# Install antlr3c on ubuntu.
-     {{{ 
-$ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
-    }}}
  # Unpack the europa archive
    * 64 bits: 
      {{{
@@ -111,7 +132,7 @@ $ source ~/.bashrc
 
  # Get the source through svn (may change before tuesday)
     {{{
-$ svn co checkout http://trex2-agent.googlecode.com/svn/orebro ~/trex_orebro
+$ svn checkout http://trex2-agent.googlecode.com/svn/orebro ~/trex_orebro
     }}}
  # Create a build directory and run cmake as before  
     {{{
