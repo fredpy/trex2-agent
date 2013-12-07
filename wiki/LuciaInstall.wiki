@@ -130,6 +130,8 @@ $ source ~/.bashrc
 
 == T-REX extension for Lucia ==
 
+This extra package is an extension of T-REX that includes some basic materials and relevant connections to ROS topics. Consider it later on as the place where you will work to understand a simple T-REX agent connected to turtlebot and try to extend its capabilities during the exercises of the lecture.
+
  # Get the source through svn (may change before tuesday)
     {{{
 $ svn checkout http://trex2-agent.googlecode.com/svn/orebro ~/trex_orebro
