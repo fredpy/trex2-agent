@@ -1,7 +1,7 @@
 #summary Installation instructions for Lucia winter school 2013
 #labels Phase-Deploy
 
-
+<wiki:toc max_depth="2" />
 = Introduction =
 
 In order to install T-REX for the Lucia winter school you will need the following:
