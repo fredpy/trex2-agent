@@ -62,8 +62,8 @@ $ tar zxvf europa-ubuntu-12.10-64.tar.gz
    * 32 bits:
      {{{
 $ cd ~/
+$ mkdir europa; cd europa
 $ unzip europa-2.6-linux.zip
-$ mv europa-2 europa
      }}} 
 After this you should have a ~/europa directory which include all the europa binaries and headers required for T-REX compilation.
   
