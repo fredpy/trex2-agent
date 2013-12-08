@@ -169,4 +169,4 @@ $ tail -f $TREX_LOG_DIR/latest/TREX.log
    {{{
 $ killall amc
    }}}
-   and of course shutdown ROS simulation (hitting ^C on the window where sorlaunc is running should be enough)
+   and of course shutdown ROS simulation (hitting ^C on the window where roslaunch is running should be enough)
