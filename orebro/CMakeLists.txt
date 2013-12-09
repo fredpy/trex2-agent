@@ -89,6 +89,7 @@ endif(ROS_CONFIG)
 add_library(turtle_pg SHARED 
   src/turtle_pg.cc
   src/odom_adapter.cc
+  src/fail_guard.cc
   ${EXTRA_SRC})
 
 target_link_libraries(turtle_pg TREXros)
