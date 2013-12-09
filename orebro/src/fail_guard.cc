@@ -52,20 +52,27 @@ private:
 
 void fail_guard::notify(Observation const &obs) {
   if( obs.predicate()==Predicate::failed_pred() ) {
+    // Write this on TREX.log as an error
     syslog(tlog::error)<<"Failed observation from "<<obs.object()
 		     <<"I will kill T-REX";
+    // Write this message en standard error output
     std::cerr<<"Terminating T-REX due to "<<obs<<std::endl;
+    // set me up for killin trex
     m_failed = true;
   }
 }
 
 bool fail_guard::synchronize() {
   if( m_failed )
-    exit(1);
+    exit(1); // When m_failed just do a dirty exit
+  // return 
+  //  - true to indicate that synchronization succeded
+  //  - false to indicate that you failed to synchronize 
+  //          (but on that case we did call exit already)
   return !m_failed;
 }
 
 namespace {
-  // Declare this reactor for XML
+  // Declare this reactor for XML as a <FailSafe> tag
   TeleoReactor::xml_factory::declare<fail_guard> decl("FailSafe");
 }
