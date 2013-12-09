@@ -116,9 +116,9 @@ Twist::undefined {
     // therefore
     //
     // sin(yaw) == 2 * sin(yaw/2) * cos(yaw/2)
-    sin(pos.yaw) == 2.0*odom.orientation_w*odom.orientation_z;
+    //    sin(pos.yaw) == 2.0*odom.orientation_w*odom.orientation_z;
     // cos(yaw) == 2* (sin(yaw/2)^2) - 1
-    cos(pos.yaw) + 1.0 == 2.0 * sin_half_y_2;
+    //cos(pos.yaw) + 1.0 == 2.0 * sin_half_y_2;
 }
 
 // Rule that convert a Twist.Hold into a go state
