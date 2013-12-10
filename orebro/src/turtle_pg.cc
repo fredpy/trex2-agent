@@ -11,8 +11,14 @@ namespace {
 namespace TREX {
 
   // The function TREX call when loading a plugin
+  // Any T-REX plugin must to implement it
+  // As a bonus you can use it to do some global intialization if needed
   void initPlugin() {
+
+    // write this message in $TREX_LOG_DIR/latest/TREX.log
     ::s_log->syslog("plugin.TurtleSimPub")<<"TurtleSimPub loaded."<<std::endl;
+
+    
   }
 
 }
