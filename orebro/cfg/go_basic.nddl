@@ -1,0 +1,91 @@
+#include "TREX.nddl"
+
+
+// timeline for robot position on the map
+class NavPose extends AgentTimeline {
+    predicate Hold {
+    	// (x, y, z) 
+      	float position_x;
+	float position_y;
+	float position_z;
+	// (quaternion for orientation angles) 
+	float orientation_x;
+	float orientation_y;
+	float orientation_z;
+	float orientation_w;
+
+	duration == 1; // A Hold last only 1 tick 
+    }
+
+    NavPose(Mode _mode) {
+      super(_mode);
+    }
+}
+
+
+class NavState extends AgentTimeline {
+  // all the possible states from go_turtle 
+  predicate ACTIVE {}
+  predicate SUCCEEDED {}
+  predicate RECALLED {}
+  predicate REJECTED {}
+  predicate ABORTED {}
+  predicate LOST {}
+  predicate TIME_OUT {}
+  
+
+  NavState(Mode _mode) {
+    super(_mode);)
+  }
+}
+
+typedef int[-2, 3] nav_mode;
+
+// timeline for asking the robot to 
+class NavAction extends AgentTimeline {
+  NavState state; // the state associated to this NavAction
+  
+  predicate Hold {
+    nav_mode action;
+    float x;
+    float y;
+    float timeout;
+    
+    0.0 < timeout; // timeout is strictly positive 
+    // make sure that europa does it jobs 
+    start + duration == end;
+  }
+   
+  NavAction(Mode _mode, NavState _state) {
+     super(_mode);
+     state = _state; 
+  }  
+}
+
+
+// Rule that ties timeout to the token duration
+NavAction::Hold {
+  float tick_timeout;
+  int max_duration;
+
+  duration <= max_duration;
+  start + max_duration <= MISSION_END + 1;
+  
+  // convert timeout from seconds to ticks
+  timeout == tick_timeout * TICK_DURATION;
+  // Make sur that this timeout will be before mission end
+  ceil(timeout) == max_duration;
+}
+
+
+
+/*
+ * External timelines instantiation for go_basic.cfg 
+ */
+
+NavPose   pose      = new NavPose(Observe);
+NavState  go_state  = new NavState(Observe);
+NavAction go_action = new NavAction(External, go_state);
+
+close(); // close the world
+ 
