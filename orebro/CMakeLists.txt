@@ -33,11 +33,15 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+# indicate the cmake version we need
 cmake_minimum_required(VERSION 2.8)
+# tell cmake that some files it may need can be found here
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
+# Name of the project
 project(trex_turtle)
 
+# some extra things to easilly generate a tarball from the source or binaries 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX ROS integration example")
 set(CPACK_PACKAGE_VENDOR "TREX2 development team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
@@ -55,49 +59,70 @@ set(CPACK_SOURCE_IGNORE_FILES
 )
 
 include(CPack)
+# end of the extra things
 
-
-
-# set up trex
+#----------------- T-REX ----------------------------
+# locate trex libraries and set up
 find_package(trex REQUIRED)
+
+# add the location of trex headers to the include path 
 include_directories(${trex_INCLUDE_DIRS})
+# add trex comilation flags to the compilation flags
 add_definitions(${trex_CPPFLAGS})
 
-# set up ros
+#----------------- ROS ------------------------------ 
+# locate ros
 find_package(ROS)
+
 if(ROS_CONFIG)
+  # find the ros package roscpp
   find_ros_pkg(roscpp)
 
+  # add include paths, compilations flags and libraries needed 
+  # to use roscpp
   include_directories(${ROS_roscpp_INCLUDE_DIRS})
   add_definitions(${ROS_roscpp_CFLAGS})
   link_directories(${ROS_roscpp_LINK_PATH})
 
+  # find the ros package go_turtle
   find_ros_pkg(go_turtle)
   if(ROS_go_turtle_PACKAGE_PATH)
+    # add the source files dedicated for comm with go_turtle 
     set(EXTRA_SRC src/nav_adapter.cc)
+
+    # add compile flags for go_turtle 
     include_directories(${ROS_go_turtle_INCLUDE_DIRS})
     add_definitions(${ROS_go_turtle_CFLAGS})
     link_directories(${ROS_go_turtle_LINK_PATH})
+
   else(ROS_go_turtle_PACKAGE_PATH)
+
+    # go_turtle was not found: print a warning
     message(WARNING "go_turlte ROS package not detected") 
   endif(ROS_go_turtle_PACKAGE_PATH)
 else(ROS_CONFIG)
+  # ROS was not found: send an error
   message(SEND_ERROR "Failed to localize ROS")
 endif(ROS_CONFIG)
 
+
+#------------------------- My trex plugin -----------------------
+
 # Define my new trex plugin
 add_library(turtle_pg SHARED 
-  src/turtle_pg.cc
-  src/odom_adapter.cc
-  src/pose_adapter.cc
-  src/fail_guard.cc
-  ${EXTRA_SRC})
+  src/turtle_pg.cc          # this file defines the plugin API TREX uses (a function that T_REX neeed to find on any plugin)
+  src/odom_adapter.cc       # define conversion from ros odometry messages to a trex token
+  src/pose_adapter.cc       # define conversion from ros pose...  messages to a trex token
+  src/fail_guard.cc         # define a simple reactor that will kill trex if a reactor is killed
+  ${EXTRA_SRC}              # extra code if go_turtle was found: adapter from go_turtle topics to trex tokens
+)
 
 target_link_libraries(turtle_pg TREXros)
 
 # Make sure you install this guy in TREX_PATH
-install(TARGETS turtle_pg DESTINATION share/trex/plugins)
-install(DIRECTORY cfg DESTINATION share/trex OPTIONAL
+install(TARGETS turtle_pg DESTINATION share/trex/plugins) # install the plugin libarary here 
+
+install(DIRECTORY cfg DESTINATION share/trex OPTIONAL # install configuration files (the content of cfg) there
   FILES_MATCHING PATTERN "*"
   PATTERN "*~" EXCLUDE
   PATTERN ".svn" EXCLUDE)
