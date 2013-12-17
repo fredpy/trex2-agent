@@ -75,8 +75,8 @@ void export_agent() {
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
-  
-  implicitly_convertible<boost::shared_ptr<ta::RealTimeClock>, ta::clock_ref>();
+
+  implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",

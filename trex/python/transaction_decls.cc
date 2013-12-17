@@ -40,6 +40,19 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 namespace {
+  
+  /** @brief Convert domain to XML
+   *
+   * @tparam Obj The domain type
+   *
+   * @param[in] dom A domain
+   *
+   * Print the domain @p dom into its XML form
+   *
+   * @return The xml representation of @p dom
+   *
+   * @sa json_str
+   */
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
@@ -47,12 +60,34 @@ namespace {
     return oss.str();
   }
 
+  /** @brief Convert domain to JSON
+   *
+   * @tparam Obj The domain type
+   *
+   * @param[in] dom A domain
+   *
+   * Print the domain @p dom into its JSON form
+   *
+   * @return The JSON representation of @p dom
+   *
+   * @sa xml_str
+   */
   template<class Obj>
   std::string json_str(Obj const &dom) {
     std::ostringstream oss;
     dom.toJSON(oss);
     return oss.str();
   }
+  /** @brief Print A domain value
+   *
+   * @tparam Obj A domain type
+   *
+   * @param[in] dom A domain
+   *
+   * Print the value of @p dom into a human readable string 
+   *
+   * @return A string representing the value of @p dom
+   */
   template<class Obj>
   std::string str_impl(Obj const &dom) {
     std::ostringstream oss;
@@ -60,12 +95,31 @@ namespace {
     return oss.str();
   }
 
-  boost::shared_ptr<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+  /** @brief Predicate deserialization
+   *
+   * @param decl A ptree serialization for a predicate
+   *
+   * Parse the tree @pred ato create the corresponding predicate instance
+   *
+   * @return A predicate correspinding to the description in @p pred
+   */
+  SHARED_PTR<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
     TREX::utils::SingletonUse<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
 }
 
+/** @brief Python declaration for trex.transaction module
+ *
+ * This function populates the python namespace trex.transaction with 
+ * several classes and utilities corresponding to the TREX::transaction 
+ * C++ namespace. It includes the following:
+ * @li predicate A trex predicate
+ * @li obs A trex observation (extends predicate)
+ * @li goal A trex goal (extends predicate)
+ * @li tick A trex tick date
+ * @li graph A reactor transaction graph
+ */
 void export_transactions() {
   // Setup my submodule
   bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("trex.transaction"))));

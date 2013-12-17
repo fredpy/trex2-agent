@@ -51,7 +51,7 @@ add_subdirectory(transaction)
 add_subdirectory(agent)
 
 # pyhton support disbaled for now as it is incomplete anyway 
-# add_subdirectory(python)
+add_subdirectory(python)
 
 # utility commands 
 include(CheckFunctionExists)
