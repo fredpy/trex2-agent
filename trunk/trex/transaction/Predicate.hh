@@ -94,7 +94,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup transaction
      */
-    class Predicate :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
+    class Predicate:  public TREX::utils::ptree_convertible {
     protected:
       /** @brief Type used to store predicate attributes */
       typedef std::map<TREX::utils::Symbol, Variable> attr_set;
@@ -419,6 +419,10 @@ namespace TREX {
                                utils::Symbol const &name,
                                bool &first) const;
       virtual std::ostream &print_to(std::ostream &out) const;
+      
+      friend std::ostream &operator<<(std::ostream &out, Predicate const &p) {
+        return p.print_to(out);
+      }
       
     private:
       /** @brief object name */

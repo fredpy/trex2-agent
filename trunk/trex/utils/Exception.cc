@@ -51,8 +51,3 @@ Exception::Exception(std::string const &msg) throw()
 
 Exception::~Exception() throw() {}
 
-// observers :
-
-std::ostream &Exception::print_to(std::ostream &out) const {
-  return out<<what();
-}

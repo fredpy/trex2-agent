@@ -87,7 +87,6 @@ add_library(TREXutils SHARED
   Factory.hh
   Hashable.hh
   id_mapper.hh
-  IOstreamable.hh
   LogManager.hh
   Plugin.hh
   PluginLoader.hh

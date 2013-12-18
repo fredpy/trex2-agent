@@ -44,7 +44,7 @@
 # define H_Exception
 
 # include <stdexcept>
-# include "IOstreamable.hh"
+# include <iostream>
 
 namespace TREX {
   namespace utils {
@@ -56,7 +56,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
      */
-    class Exception :public std::runtime_error, public ostreamable {
+    class Exception :public std::runtime_error {
     public:
       /** @brief Constructor
        * @param[in] msg A text message
@@ -66,12 +66,14 @@ namespace TREX {
       Exception(std::string const &msg) throw();
       /** @brief Destructor */
       virtual ~Exception() throw();
-			
-    protected:
-      std::ostream &print_to(std::ostream &out) const;
     }; // class TREX::utils::Exception
+
+    inline std::ostream &operator<<(std::ostream &out, Exception const &e) {
+      return out<<e.what();
+    }
     
   } // TREX::utils
 }  // TREX
+
 
 #endif // H_Exception
