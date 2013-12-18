@@ -43,8 +43,8 @@
 #ifndef H_trex_utils_chrono_helper
 # define H_trex_utils_chrono_helper
 
-# include "platform/chrono.hh"
-# include "platform/cpp11_deleted.hh"
+# include "../platform/chrono.hh"
+# include "../platform/cpp11_deleted.hh"
 # include <ostream>
 # include <iostream>
 

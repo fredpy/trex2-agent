@@ -71,9 +71,9 @@ add_library(TREXutils SHARED
   asio_fstream.cc
   log/entry.cc
   log/text_log.cc
-  cpu_clock.cc
   singleton/dummy.cc
   singleton/server.cc
+  timing/cpu_clock.cc
   # headers
   asio_fstream.hh
   asio_signal.hh
@@ -82,7 +82,6 @@ add_library(TREXutils SHARED
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
-  chrono_helper.hh
   ErrnoExcept.hh
   Exception.hh
   Factory.hh
@@ -95,14 +94,11 @@ add_library(TREXutils SHARED
   SharedVar.hh
   StringExtract.hh
   Symbol.hh
-  tick_clock.hh
-  TimeUtils.hh
   TREXversion.hh
   XmlFactory.hh
   XmlUtils.hh
   ptree_io.hh
   asio_runner.hh
-  cpu_clock.hh
   log/log_fwd.hh
   log/entry.hh
   log/stream.hh
@@ -117,6 +113,10 @@ add_library(TREXutils SHARED
   singleton/bits/server_fwd.hh
   singleton/bits/wrapper.hh
   singleton/private/server.hh
+  timing/chrono_helper.hh
+  timing/cpu_clock.hh
+  timing/tick_clock.hh
+  timing/posix_utils.hh
   # platform specific information
   platform/chrono.hh 
   platform/memory.hh
@@ -183,6 +183,9 @@ source_group("Source\ Files\\singleton" FILES
   singleton/server.cc
 )
 
+source_group("Source\ Files\\timing" FILES
+  timing/cpu_clock.cc
+)
 
 source_group("Header\ Files\\bits" FILES 
   bits/asio_signal_base.hh
@@ -200,6 +203,12 @@ source_group("Header\ Files\\singleton" FILES
   singleton/use.hh
 )
 
+source_group("Header\ Files\\timing" FILES 
+  timing/chrono_helper.hh
+  timing/cpu_clock.hh
+  timing/tick_clock.hh
+  timing/posix_utils.hh
+)
 
 source_group("Header\ Files\\singleton\\bits" FILES 
   singleton/bits/dummy.hh

@@ -44,7 +44,7 @@
 #include <iterator>
 #include <limits>
 
-#include <trex/utils/chrono_helper.hh>
+#include <trex/utils/timing/chrono_helper.hh>
 
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???

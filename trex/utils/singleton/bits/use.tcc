@@ -1,10 +1,3 @@
-/* -*- C++ -*- */
-/** @file singleton::use.tcc
- * @brief singleton::use implementation
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 

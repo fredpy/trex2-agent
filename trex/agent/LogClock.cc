@@ -33,7 +33,7 @@
  */
 #include "LogClock.hh"
 
-#include <trex/utils/chrono_helper.hh>
+#include <trex/utils/timing/chrono_helper.hh>
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 

@@ -50,7 +50,7 @@
 # include <trex/utils/ErrnoExcept.hh>
 # include <trex/utils/asio_fstream.hh>
 
-# include <trex/utils/TimeUtils.hh>
+# include <trex/utils/timing/posix_utils.hh>
 
 namespace TREX {
   namespace agent {

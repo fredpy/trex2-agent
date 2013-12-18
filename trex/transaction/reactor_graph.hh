@@ -37,7 +37,7 @@
 # include "TeleoReactor_fwd.hh"
 # include "bits/timeline.hh"
 
-# include <trex/utils/TimeUtils.hh>
+# include <trex/utils/timing/posix_utils.hh>
 
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>

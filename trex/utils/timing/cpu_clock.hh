@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_cpu_clock
 # define H_trex_utils_cpu_clock
 
-# include "platform/chrono.hh"
+# include "../platform/chrono.hh"
 
 namespace TREX {
   namespace utils {

@@ -39,7 +39,7 @@
 
 # include <trex/utils/id_mapper.hh>
 # include <trex/utils/platform/memory.hh>
-# include <trex/utils/cpu_clock.hh>
+# include <trex/utils/timing/cpu_clock.hh>
 # include <trex/utils/asio_fstream.hh>
 
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
