@@ -36,7 +36,7 @@
 #include "bits/europa_convert.hh"
 #include "core/private/CurrentState.hh"
 
-#include <trex/utils/chrono_helper.hh>
+#include <trex/utils/timing/chrono_helper.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/Timeline.hh>
