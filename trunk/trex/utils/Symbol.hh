@@ -60,7 +60,7 @@
 # include "IOstreamable.hh"
 # include "Hashable.hh"
 # include "StringExtract.hh"
-# include "SingletonUse.hh"
+# include "singleton.hh"
 
 namespace TREX {
   namespace utils {
@@ -69,7 +69,7 @@ namespace TREX {
     class trex_holder_class {
     public:
       static C& get() {
-        static SingletonUse<C> hold;
+        static singleton::use<C> hold;
         return *hold;
       }
     };

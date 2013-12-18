@@ -126,13 +126,13 @@ namespace TREX {
 	std::ofstream            m_europa_debug;
 	std::string              m_path;
 
-	TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+	TREX::utils::singleton::use<TREX::utils::LogManager> m_log;
 	typedef std::map<std::string, boost::filesystem::path> 
           include_map;
         include_map m_includes;
         
         
-	friend class TREX::utils::SingletonWrapper<Schema>;
+	friend class TREX::utils::singleton::wrapper<Schema>;
 	friend class TREX::europa::EuropaPlugin;
       }; // TREX::europa::details::Schema
       

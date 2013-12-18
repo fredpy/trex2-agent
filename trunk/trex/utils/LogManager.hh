@@ -50,7 +50,8 @@
 # include "log/out_file.hh"
 # include "asio_runner.hh"
 
-# include "SingletonUse.hh"
+# include "singleton.hh"
+
 # include "SharedVar.hh"
 # include "ErrnoExcept.hh"
 
@@ -160,11 +161,11 @@ namespace TREX {
      * by the program in a specific directory.
      *
      * This class is a pure singleton and consequently its access should
-     * be done using SingletonUse :
+     * be done using singleton::use :
      * @code
      * #include "LogManager.hh"
      *
-     * TREX::utils::SingletonUse<TREX::utils::LogManager> log;
+     * TREX::utils::singleton::use<TREX::utils::LogManager> log;
      *
      * log->syslog("me")<<"A message to the log"<<std::endl;
      * @endcode
@@ -437,7 +438,7 @@ namespace TREX {
        */
       std::list<path_type> m_searchPath;
       
-      friend class SingletonWrapper<LogManager>;
+      friend class singleton::wrapper<LogManager>;
     }; // TREX::utils::LogManager
     
   } // TREX::utils 

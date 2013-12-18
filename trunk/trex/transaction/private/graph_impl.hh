@@ -193,7 +193,7 @@ namespace TREX {
          *
          * A reference to the global LogManager singleton.
          */
-        utils::SingletonUse<utils::LogManager> m_log;
+        utils::singleton::use<utils::LogManager> m_log;
         /** @brief Acess/update strand
          *
          * The strand which is used by this graph for accesses and updates

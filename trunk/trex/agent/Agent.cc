@@ -620,7 +620,7 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
 void Agent::subConf(boost::property_tree::ptree &conf, 
                     std::string const &path) {
   boost::property_tree::ptree::assoc_iterator i, last;
-  SingletonUse<Clock::xml_factory> clk_f;
+  singleton::use<Clock::xml_factory> clk_f;
   
   if( path.empty() ) {
     // On the root we need to load plug-ins before the clock 

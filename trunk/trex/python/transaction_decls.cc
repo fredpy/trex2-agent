@@ -104,7 +104,7 @@ namespace {
    * @return A predicate correspinding to the description in @p pred
    */
   SHARED_PTR<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::SingletonUse<Predicate::xml_factory> fact;
+    TREX::utils::singleton::use<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
 }
@@ -241,7 +241,7 @@ namespace {
   
   
   boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::SingletonUse<tt::Predicate::xml_factory> fact;
+    TREX::utils::singleton::use<tt::Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
   

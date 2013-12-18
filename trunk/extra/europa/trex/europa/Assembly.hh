@@ -1489,7 +1489,7 @@ namespace TREX {
        * @li loading Europa extension though EuropaPlugin exisiting instances
        * @li switching the europa debug log file
        */
-      TREX::utils::SingletonUse<details::Schema> m_trex_schema;
+      TREX::utils::singleton::use<details::Schema> m_trex_schema;
 
       EUROPA::SchemaId           m_schema;
       EUROPA::PlanDatabaseId     m_plan;

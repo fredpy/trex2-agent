@@ -34,7 +34,7 @@
 #ifndef H_trex_EuropaPlugin
 # define H_trex_EuropaPlugin
 
-# include <trex/utils/SingletonUse.hh>
+# include <trex/utils/singleton.hh>
 
 # include "EuropaException.hh"
 # include "config.hh"
@@ -109,7 +109,7 @@ namespace TREX {
       void declareFunction(Assembly const &assembly, EUROPA::CFunction *fn);
 
     private:
-      TREX::utils::SingletonUse<details::Schema> m_schema;
+      TREX::utils::singleton::use<details::Schema> m_schema;
 
       friend class details::Schema;
     }; // TREX::europa::EuropaPlugin

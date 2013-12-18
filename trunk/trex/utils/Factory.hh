@@ -51,7 +51,7 @@
 # include <boost/type_traits.hpp>
 # include <boost/utility.hpp>
 
-# include "SingletonUse.hh"
+# include "singleton.hh"
 
 namespace TREX {
   namespace utils {
@@ -168,11 +168,11 @@ namespace TREX {
      * As long as @c bar_decl is existing the factory will provide
      * an access to this producer. To be able to use it one can do :
      * @code
-     * SingletonUse< Factory<Foo,std::string, int> > bar_fact;
+     * singleton::use< Factory<Foo,std::string, int> > bar_fact;
      * Foo *var = bar_fact->get("bar")(5);
      * @endcode
      *
-     * @sa TREX::utils::SingletonUse
+     * @sa TREX::utils::singleton::use
      * 
      * @pre @p ProductRef is expected to be a pointer like type for
      * @p AbstractProduct
@@ -306,7 +306,6 @@ namespace TREX {
 	 * @sa Factory::add(Factory::producer const *)
 	 */
 	void declareMe() const {
-	  // std::cerr<<m_factory.operator->()<<".add("<<m_type<<")"<<std::endl;
 	  m_factory->add(this);
 	}
 				
@@ -317,14 +316,13 @@ namespace TREX {
 	 * @sa Factory::remove(producer *)
 	 */
 	virtual ~producer() {
-	  // std::cerr<<m_factory.operator->()<<".remove("<<m_type<<")"<<std::endl;
 	  m_factory->remove(this);
 	}
 				
       private:
 				
 	Id const              m_type;    //!< Producer Identifer
-	SingletonUse<Factory> m_factory; //!< Acees point to Factory singleton
+        singleton::use<Factory> m_factory; //!< Acees point to Factory singleton
 				
 	/** @brief Prohibited Default constructor
 	 *
@@ -482,7 +480,7 @@ namespace TREX {
       catalog_type m_producers;
 			
       friend class producer;
-      friend class SingletonWrapper<Factory>;
+      friend class singleton::wrapper<Factory>;
     }; // class TREX::utils::Factory<>
 		
 # define In_H_Factory

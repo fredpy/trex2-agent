@@ -1,20 +1,20 @@
 /* -*- C++ -*- */
-/** @file "SingletonWrapper.tcc"
- * @brief SingletonWrapper implementation
+/** @file singleton::use.tcc
+ * @brief singleton::use implementation
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -24,7 +24,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,61 +38,54 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef In_H_SingletonWrapper
-# error "Cannot include tcc file outside of its corresponding header"
+#ifndef In_H_trex_utils_singleton_use
+# error "Cannot include tcc files outside of their corresponding header"
 #else
 
-#include <typeinfo>
+#include "wrapper.hh"
 
 namespace TREX {
   namespace utils {
-    
-    namespace internal {
+    namespace singleton {
       
+      /*
+       * class TREX::utils::singleton::use<>
+       */
       template<typename Ty>
-      struct swrapper_factory :public sdummy_factory {
-        SingletonDummy *create() const {
-          return new SingletonWrapper<Ty>;
-        }
-      };
-      
-    }
+      void use<Ty>::disable() {
+        wrapper<Ty>::disable_server();
+      }
     
-    // statics :
     
-    template<typename Ty>
-    Ty *SingletonWrapper<Ty>::attach() {
-      SingletonWrapper<Ty> *
-      me = static_cast<SingletonWrapper<Ty> *>(internal::SingletonDummy::attach(name(),
-                                                                                internal::swrapper_factory<Ty>()));
-      return &(me->m_value);
-    }
-    
-    template<typename Ty>
-    void SingletonWrapper<Ty>::detach() {
-      internal::SingletonDummy::detach(name());
-    }
-    
-    template<typename Ty>
-    std::string SingletonWrapper<Ty>::name() {
-      return typeid(Ty).name();
-    }
-    
-    template<typename Ty>
-    void SingletonWrapper<Ty>::disable_server() {
-      internal::SingletonDummy::disable();
-    }
+      template<typename Ty>
+      use<Ty>::use():m_instance(wrapper<Ty>::attach()) {}
 
-    
-    // structors :
-    
-    template<typename Ty>
-    SingletonWrapper<Ty>::SingletonWrapper() {}
-    
-    template<typename Ty>
-    SingletonWrapper<Ty>::~SingletonWrapper() {}
-    
+      template<typename Ty>
+      use<Ty>::use(use<Ty> const &):m_instance(wrapper<Ty>::attach()) {}
+
+      template<typename Ty>
+      use<Ty>::~use() {
+        m_instance = 0x0;
+        wrapper<Ty>::detach();
+      }
+
+      template<typename Ty>
+      Ty &use<Ty>::instance() const {
+        return *m_instance;
+      }
+
+      template<typename Ty>
+      Ty &use<Ty>::operator*() const {
+        return instance();
+      }
+
+      template<typename Ty>
+      Ty *use<Ty>::operator->() const {
+        return &instance();
+      }
+
+    }
   }
 }
 
-#endif
+#endif 

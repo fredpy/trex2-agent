@@ -1,11 +1,12 @@
-/* -*- C++ -*-
- * $Id$
- */
-/** @file "SingletonUse.hh"
- * @brief Define the access class to a phoenix singleton
+/** @file "SingletonServer.hh"
+ * @brief Defintion of the SingletonServer class
+ *
+ * This header is for internal use and define the
+ * SingletonServer class. This class is the centralized
+ * place where all the singletons are maintained
  *
  * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
+ * @ingroup utils 
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
@@ -40,61 +41,47 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SingletonUse
-# define H_SingletonUse
+#ifndef H_SingletonServer
+# define H_SingletonServer
+
+# include <boost/thread/recursive_mutex.hpp>
+
+# include <map>
+
+# include "../bits/dummy.hh"
 
 namespace TREX {
   namespace utils {
-
-    /** @brief Singleton accessor
-     * @tparam Ty type of the singleton
-     *
-     * This class is used to access to a phoenix singleton.
-     * It also manages the singleton creation and lifetime
-     * through reference counting
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup utils
-     */
-    template<typename Ty>
-    struct SingletonUse {
-    public:
-      /** @brief Constructor
-       *
-       * Create a new instance referring to the singleton @a Ty. If
-       * this singleton does not already exist it is created using
-       * the default constructor of @a Ty. On any case the reference
-       * counter for the singleton @a Ty is incremented by 1.
-       */
-      SingletonUse();
-      /** @overload SingletonUse() */
-      SingletonUse(SingletonUse<Ty> const &other);
-      /** @brief Destructor
-       * Send a notification to the singleton mmanager that one
-       * instance less is accessing to the singleton @a Ty if no
-       * more instance are refering to it them this singleton will
-       * be destroyed
-       */
-      ~SingletonUse();
-
-      /** @brief Singleton instance
-       * @return a reference to the singleton @a Ty
-       * @{
-       */
-      Ty &instance() const;
-      Ty &operator*() const;
-      Ty *operator->() const;
-      /** @} */
+    namespace singleton {
+      namespace internal {
       
-      static void disable();
-    private:
-
-      Ty *m_instance; //!< Singleton_reference
-    }; // TREX::utils::SingletonUse<>
+        class server :boost::noncopyable {
+        public:
+          static server &instance();
+        
+          dummy *attach(std::string const &id,
+                        sdummy_factory const &factory);
+          bool detach(std::string const &id);
+        
+        private:
+          server();
+          ~server();
+        
+          typedef boost::recursive_mutex mutex_type;
+          typedef mutex_type::scoped_lock lock_type;
+               
+          typedef std::map<std::string, dummy *> single_map;
+        
+          mutex_type m_mtx;
+          single_map m_singletons;
+        
+          static void make_instance();
+          static server *s_instance;
+        };
+        
+      }
+    }
   }
-}    
-# define In_H_SingletonUse
-#  include "bits/SingletonUse.tcc"
-# undef  In_H_SingletonUse
+}
 
-#endif // H_SingletonUse
+#endif // H_SingletonServer

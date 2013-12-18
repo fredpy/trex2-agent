@@ -147,7 +147,7 @@ namespace TREX {
       /** @brief default maximum allowed number of steps  */
       unsigned int const m_stepsPerTickDefault;
       /** @brief TREX log entry point */ 
-      static TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      static TREX::utils::singleton::use<TREX::utils::LogManager> m_log;
     }; // TREX::agent::StepClock
 
   } // TREX::agent 

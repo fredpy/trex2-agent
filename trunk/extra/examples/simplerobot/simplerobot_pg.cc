@@ -41,7 +41,7 @@ using namespace TREX::transaction;
 using namespace TREX::simpleRobot;
 
 namespace {
-    SingletonUse<LogManager> s_log;
+    singleton::use<LogManager> s_log;
     TeleoReactor::xml_factory::declare<SimpleRobot> decl("SimpleRobot");
 }
 

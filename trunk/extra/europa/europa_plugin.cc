@@ -44,7 +44,7 @@ namespace tlog=TREX::utils::log;
 
 namespace {
 
-  SingletonUse<LogManager> s_log;
+  singleton::use<LogManager> s_log;
 
   TeleoReactor::xml_factory::declare<EuropaReactor> decl("EuropaReactor");
 
