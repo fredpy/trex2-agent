@@ -41,7 +41,7 @@ using namespace TREX::transaction;
 using namespace TREX::AgentLocation;
 
 namespace {
-    SingletonUse<LogManager> s_log;
+    singleton::use<LogManager> s_log;
     TeleoReactor::xml_factory::declare<AgentLocation> decl("AgentLocation");
 }
 

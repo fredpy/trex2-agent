@@ -66,7 +66,7 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 LogClock::LogClock(bpt::ptree::value_type &node) 
   :Clock(Clock::duration_type::zero()), m_counter(0) {
   // find the log to replay
-  SingletonUse<LogManager> log;
+  singleton::use<LogManager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
   bool found;
   file = log->use(file, found);

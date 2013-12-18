@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,25 +31,48 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "scientist.hh"
+#ifndef H_SingletonDummy
+# define H_SingletonDummy
 
-#include <trex/utils/LogManager.hh>
-#include <trex/utils/Plugin.hh>
+# include <string>
 
-using namespace TREX::utils;
-using namespace TREX::transaction;
-using namespace TREX::Scientist;
+# include <boost/utility.hpp>
 
-namespace {
-    singleton::use<LogManager> s_log;
-    TeleoReactor::xml_factory::declare<Scientist> decl("Scientist");
-}
+# include "server_fwd.hh"
 
 namespace TREX {
+  namespace utils {
+    namespace singleton {
+      namespace internal {
+      
+        class dummy;
+      
+        struct sdummy_factory {
+          virtual ~sdummy_factory() {};
+          virtual dummy *create() const =0;
+        }; // TREX::utils::singleton::internal::sdummy_factory
 
-  void initPlugin() {
-    ::s_log->syslog("plugin.Scientist", info)<<"Scientist loaded."<<std::endl;
-    // ::decl;
+        class dummy: boost::noncopyable {
+        protected:
+          dummy();
+          virtual ~dummy() =0;
+	
+          static dummy *attach(std::string const &name,
+                               sdummy_factory const &factory);
+          static void detach(std::string const &name);
+          static void disable();
+
+        private:
+          void incr_ref() const;
+          bool decr_ref() const;
+
+          mutable size_t ref_counter;
+
+          friend class server;
+        }; // TREX::utils::singleton::internal::dummy
+      }
+    }
   }
-
 }
+
+#endif // H_SingletonDummy

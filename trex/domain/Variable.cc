@@ -51,7 +51,7 @@ using namespace TREX::transaction;
 
 // statics :
 
-SingletonUse<DomainBase::xml_factory> Variable::s_dom_factory;
+singleton::use<DomainBase::xml_factory> Variable::s_dom_factory;
 
 DomainBase *Variable::clone
 (boost::call_traits<Variable::domain_ptr>::param_type dom) {

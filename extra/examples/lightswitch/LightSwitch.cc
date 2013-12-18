@@ -65,7 +65,7 @@ using namespace TREX::lightswitch;
 namespace {
 
   /** @brief TREX log entry point */
-  SingletonUse<LogManager> s_log;
+  singleton::use<LogManager> s_log;
 
   /** @brief Light reactor declaration */
   TeleoReactor::xml_factory::declare<Light> decl("Light");

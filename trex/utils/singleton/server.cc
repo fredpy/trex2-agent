@@ -1,13 +1,19 @@
+/** @file "SingletonServer.cc"
+ * @brief SingletonServer internal class implmentation
+ *
+ * @author Frederic Py <fpy@mbari.org>
+ * @ingroup utils
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +23,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,25 +37,68 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "scientist.hh"
 
-#include <trex/utils/LogManager.hh>
-#include <trex/utils/Plugin.hh>
+#include "private/server.hh"
 
-using namespace TREX::utils;
-using namespace TREX::transaction;
-using namespace TREX::Scientist;
+#include <boost/thread/once.hpp>
 
 namespace {
-    singleton::use<LogManager> s_log;
-    TeleoReactor::xml_factory::declare<Scientist> decl("Scientist");
+  boost::once_flag o_flag = BOOST_ONCE_INIT;
 }
 
-namespace TREX {
+using namespace TREX::utils::singleton::internal;
 
-  void initPlugin() {
-    ::s_log->syslog("plugin.Scientist", info)<<"Scientist loaded."<<std::endl;
-    // ::decl;
+// static
+
+server *server::s_instance = 0x0;
+
+void server::make_instance() {
+  if( 0x0==s_instance )
+    s_instance = new server;
+}
+
+server &server::instance() {
+  // Use the C++11 like format
+  boost::call_once(o_flag, &server::make_instance);
+  return *s_instance;
+}
+
+// *structors
+
+server::server() {}
+
+server::~server() {}
+
+// manipulators 
+
+dummy *server::attach(std::string const &id,
+                      sdummy_factory const &factory) {
+  // Just to be safe for now
+  assert(this==s_instance);
+  {
+    lock_type lock(m_mtx);
+    single_map::iterator i = m_singletons.find(id);
+    if( m_singletons.end()==i ) {
+      i = m_singletons.insert(single_map::value_type(id, factory.create())).first;
+    }
+    i->second->incr_ref();
+    return i->second;
   }
+}
 
+bool server::detach(std::string const &id) {
+  assert(this==s_instance);
+  {
+    lock_type lock(m_mtx);
+    single_map::iterator i = m_singletons.find(id);
+    if( m_singletons.end()!=i ) {
+      dummy *ptr = i->second;
+      if( ptr->decr_ref() ) {
+        m_singletons.erase(i);
+        delete ptr;
+        return true;
+      }
+    }
+  }
+  return false;
 }

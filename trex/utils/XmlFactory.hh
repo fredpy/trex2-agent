@@ -312,9 +312,9 @@ namespace TREX {
       XmlFactory() {}
       ~XmlFactory() {}
       
-      SingletonUse<factory_type> m_factory;
+      singleton::use<factory_type> m_factory;
 
-      friend class SingletonWrapper<XmlFactory>;
+      friend class singleton::wrapper<XmlFactory>;
     }; // TREX::utils::XmlFactory<>
 
 

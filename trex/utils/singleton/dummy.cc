@@ -1,9 +1,3 @@
-/** @file "SingletonDummy.cc"
- * @brief SingletonDummy internal class implmentation
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -37,39 +31,39 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "private/SingletonServer.hh"
+#include "private/server.hh"
 
-using namespace TREX::utils::internal;
+using namespace TREX::utils::singleton::internal;
 
 // statics 
 
-SingletonDummy *SingletonDummy::attach(std::string const &name, 
-                                       sdummy_factory const &factory) {
-  return SingletonServer::instance().attach(name, factory);
+dummy *dummy::attach(std::string const &name,
+                     sdummy_factory const &factory) {
+  return server::instance().attach(name, factory);
 }
 
-void SingletonDummy::detach(std::string const &name) {
-  SingletonServer::instance().detach(name);
+void dummy::detach(std::string const &name) {
+  server::instance().detach(name);
 }
 
-void SingletonDummy::disable() {
+void dummy::disable() {
 }
 
 
 // structors
 
-SingletonDummy::SingletonDummy() 
+dummy::dummy()
   :ref_counter(0ul) {}
 
-SingletonDummy::~SingletonDummy() {}
+dummy::~dummy() {}
 
 // modifers
 
-void SingletonDummy::incr_ref() const {
+void dummy::incr_ref() const {
   ++ref_counter;
 }
 
-bool SingletonDummy::decr_ref() const {
+bool dummy::decr_ref() const {
   return (ref_counter--)<=1;
 }
 

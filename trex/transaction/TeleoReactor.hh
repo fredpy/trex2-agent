@@ -1204,7 +1204,7 @@ namespace TREX {
        *
        * @sa syslog() const
        */
-      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+      TREX::utils::singleton::use<TREX::utils::LogManager> m_log;
 
       utils::async_ofstream m_stat_log;
 

@@ -107,7 +107,7 @@ namespace {
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
-  SingletonUse<LogManager> amc_log;
+  singleton::use<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
  
 }
@@ -117,7 +117,7 @@ namespace {
 extern "C" {
   
   void amc_cleanup(int sig) {
-    SingletonUse<LogManager> amc_log;
+    singleton::use<LogManager> amc_log;
     
     boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
     
@@ -131,7 +131,7 @@ extern "C" {
   }
   
   void amc_terminate() {
-    SingletonUse<LogManager> amc_log;
+    singleton::use<LogManager> amc_log;
     
     amc_log->syslog("amc", error)<<" Received a terminate";
     amc_log->flush();
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
     }
     if( pid>0 ) {
       // Disable singleton management for this process
-      SingletonUse<LogManager>::disable();
+      singleton::use<LogManager>::disable();
       exit(0);
     }
     
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
     if( (pid = fork()) )  {
       if( pid>0 ) {
         // Disable singleton management for this process
-        SingletonUse<LogManager>::disable();
+        singleton::use<LogManager>::disable();
         // I am the parent : I can die
         std::cout<<"Daemon spawned (pid="<<pid<<")\n"
         <<"All messages should now be reported in:\n  ";

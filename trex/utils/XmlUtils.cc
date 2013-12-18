@@ -45,7 +45,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 
 namespace {
-  SingletonUse<LogManager> s_log;
+  singleton::use<LogManager> s_log;
 }
 
 void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {

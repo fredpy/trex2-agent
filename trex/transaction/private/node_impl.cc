@@ -43,7 +43,7 @@ using utils::Symbol;
 namespace {
   // A reference to the LogManager singleton. So I can silently handle cases where a node
   // is not connected to a graph
-  utils::SingletonUse<utils::LogManager> s_log;
+  utils::singleton::use<utils::LogManager> s_log;
 }
 
 /*
