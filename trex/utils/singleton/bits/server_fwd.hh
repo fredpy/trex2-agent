@@ -42,7 +42,7 @@
 
 namespace TREX {
   namespace utils {
-    namespace singelton {
+    namespace singleton {
       namespace internal {
 
         class server;
