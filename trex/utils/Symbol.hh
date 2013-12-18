@@ -52,12 +52,12 @@
 # define H_Symbol
 
 # include <string>
+# include <iostream>
 
 # include <boost/flyweight.hpp>
 # include <boost/flyweight/no_tracking.hpp>
 # include <boost/flyweight/holder_tag.hpp>
 
-# include "IOstreamable.hh"
 # include "Hashable.hh"
 # include "StringExtract.hh"
 # include "singleton.hh"
@@ -115,8 +115,7 @@ namespace TREX {
      */
     template< class CharT, class Traits=std::char_traits<CharT>,
 	      class Alloc=std::allocator<CharT> >
-    class BasicSymbol :public ostreamable, public istreamable, 
-		       public Hashable {
+    class BasicSymbol :public Hashable {
     public:
       /** @brief equivalent string type */
       typedef std::basic_string<CharT, Traits, Alloc> str_type;
@@ -337,11 +336,24 @@ namespace TREX {
        */
       static ref_type create(CharT const *str, size_t len);
 
-      std::ostream &print_to(std::ostream &out) const;
-      std::istream &read_from(std::istream &in);
       size_t hash() const;
 
+      friend std::istream &operator>>(std::istream &in, BasicSymbol &s) {
+        BasicSymbol::str_type tmp;
+        
+        if( in>>tmp )
+          s.m_name = BasicSymbol::create(tmp);
+        return in;
+      }
+      
     }; // TREX::utils::BasicSymbol<>
+    
+    template<class CharT, class Traits, class Alloc>
+    std::ostream &operator<<(std::ostream &out, BasicSymbol<CharT, Traits, Alloc> const &s) {
+      if( !s.empty() )
+        out<<s.str();
+      return out;
+    }
 
 # define In_H_Symbol
 #  include "bits/Symbol.tcc"

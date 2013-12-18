@@ -131,13 +131,6 @@ DomainBase const &Variable::domain() const {
   return *m_domain;
 } 
 
-std::ostream &Variable::print_to(std::ostream &out) const {
-  if( isComplete() ) 
-    return out<<m_name<<"="<<*m_domain;
-  else
-    return out<<"<?"<<m_name<<'>'; 
-}
-
 boost::property_tree::ptree Variable::as_tree() const {
   boost::property_tree::ptree ret;
   

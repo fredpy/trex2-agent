@@ -87,7 +87,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class Variable :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
+    class Variable :public TREX::utils::ptree_convertible {
     public:
       /** @brief Constructor
        *
@@ -294,8 +294,6 @@ namespace TREX {
       /** @brief Variable domain */
       domain_ptr m_domain;
 
-      std::ostream &print_to(std::ostream &out) const;
-
       /** @brief Entry point to domain XML parsing */
       static TREX::utils::singleton::use< DomainBase::xml_factory > s_dom_factory;
 
@@ -317,6 +315,13 @@ namespace TREX {
       explicit Variable(TREX::utils::Symbol const &name,
 			DomainBase *domain = NULL);
       friend class Predicate;
+      
+      friend std::ostream &operator<<(std::ostream &out, Variable const &v) {
+        if( v.isComplete() )
+          return out<<v.m_name<<'='<<*(v.m_domain);
+        else
+          return out<<"<?"<<v.m_name<<'>';
+      }
    }; // class TREX::transaction::Variable
       
   } // TREX::transaction

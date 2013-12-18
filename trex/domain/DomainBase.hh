@@ -157,7 +157,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains 
      */
-    class DomainBase :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
+    class DomainBase :public TREX::utils::ptree_convertible {
     public:
       /** @brief Destructor */
       virtual ~DomainBase() {}
@@ -500,26 +500,22 @@ namespace TREX {
       /** @brief type of the domain */
       TREX::utils::Symbol const m_type;
 
-      /** @brief OUtput stream wrting helper
-       * @param out An output stream
-       *
-       * Write the value of current domain as a text from inot @e out.
-       * @return @e out after the operation
-       */
-      std::ostream &print_to(std::ostream &out) const {
-	if( isFull() )
-	  return out<<'*';
-	else 
-	  return print_domain(out);
-      }
 
 # ifndef DOXYGEN
       // Following method have no code
       DomainBase() DELETED;
 # endif
+
+      friend std::ostream &operator<<(std::ostream &out, DomainBase const &d) {
+        if( d.isFull() )
+          return out.put('*');
+        else
+          return d.print_domain(out);
+      }
+
     }; // TREX::transaction::DomainBase
 
-
+    
   } // TREX::transaction
 } // TREX
 

@@ -87,8 +87,7 @@ namespace TREX {
        * @sa class IntervalDomain
        * @author Frederic Py <fpy@mbari.org>
        */
-      class bound :public TREX::utils::istreamable,
-		   public TREX::utils::ostreamable {
+      class bound {
       public:
 	/** @brief constructor
 	 *
@@ -333,7 +332,14 @@ namespace TREX {
 
 	std::istream &read_from(std::istream &in);
 	std::ostream &print_to(std::ostream &out) const;
-	  		
+
+        friend std::istream &operator>>(std::istream &in, bound &b) {
+          return b.read_from(in);
+        }
+        friend std::ostream &operator<<(std::istream &out, bound const &b) {
+          return b.print_to(out);
+        }
+        
 	friend class IntervalDomain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
 
@@ -540,10 +546,10 @@ namespace TREX {
       void parseLower(std::string const &val);
       void parseUpper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const {
-	return out<<m_lower;
+	return m_lower.print_to(out);
       }
       std::ostream &print_upper(std::ostream &out) const {
-	return out<<m_upper;
+	return m_upper.print_to(out);
       }
     }; // IntervalDomain<>
 

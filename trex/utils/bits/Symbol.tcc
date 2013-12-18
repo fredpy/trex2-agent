@@ -83,23 +83,5 @@ size_t BasicSymbol<CharT, Traits, Alloc>::hash() const {
   return href(m_name.get());
 }
 
-template<class CharT, class Traits, class Alloc> 
-std::ostream &
-BasicSymbol<CharT, Traits, Alloc>::print_to(std::ostream &out) const {
-  if( !empty() )
-    out<<str();
-  return out;
-}
-
-template<class CharT, class Traits, class Alloc> 
-std::istream &BasicSymbol<CharT, Traits, Alloc>::read_from(std::istream &in) {
-  str_type tmp;
-  in>>tmp;
-  if( in.good() )
-    m_name = create(tmp);
-  return in;
-}
-
-
 
 #endif 
