@@ -710,8 +710,7 @@ void Agent::loadConf(std::string const &file_name) {
   if( !found ) {
     name = manager().use(file_name+".cfg", found);
     if( !found ) {
-      ERROR_CODE ec(ERRC::no_such_file_or_directory,
-                    ERROR_NS::generic_category());
+      ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
     
       throw SYSTEM_ERROR(ec, "Unable to locate "+file_name);
     }
