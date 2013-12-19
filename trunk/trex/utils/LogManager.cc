@@ -186,7 +186,9 @@ void LogManager::createLatest() {
   char dated_dir[16];
   
   if( NULL==base_dir_name ) {
-    throw ErrnoExcept("LogManager: $" LOG_DIR_ENV " is not set");
+    ERROR_CODE ec(ERRC::no_such_file_or_directory,
+                  ERROR_NS::generic_category());
+    throw SYSTEM_ERROR(ec, "LogManager: $" LOG_DIR_ENV " is not set");
   }
   path_type base_dir(base_dir_name);
   base_dir.make_preferred();
@@ -223,8 +225,8 @@ void LogManager::createLatest() {
       return;
     }
   }
-  throw ErrnoExcept("LogManager", "Too many attempts ... clean up your "
-		    "log directory");
+  ERROR_CODE ec(ERRC::value_too_large, ERROR_NS::generic_category());
+  throw SYSTEM_ERROR(ec, "Too many attempts: clean up your log directory");
 }
 
 LogManager::path_type LogManager::file_name(std::string const &short_name) {

@@ -55,8 +55,11 @@ void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &
     bool found;
     std::string file = s_log->use(*name, found);
     
-    if( !found ) 
-      throw ErrnoExcept("Unable to locate file \""+(*name)+"\"");
+    if( !found ) {
+      ERROR_CODE ec(ERRC::no_such_file_or_directory,
+                    ERROR_NS::generic_category());
+      throw SYSTEM_ERROR(ec, "Unable to locate file \""+(*name)+"\"");
+    }
     
     boost::property_tree::ptree pt;
     read_xml(file, pt, xml::no_comments|xml::trim_whitespace);

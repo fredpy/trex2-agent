@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2013, Frederic Py.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,18 +31,34 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#ifndef H_trex_system_error
+# define H_trex_system_error
 
-#cmakedefine CPP11_ENABLED 
+# include <bits/cpp11.hh>
 
-#ifdef CPP11_ENABLED
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_SHARED_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
-#cmakedefine CPP11_BOOST_GET_POINTER_STD
-#cmakedefine CPP11_SYSTEM_ERROR
-#endif // CPP11_ENABLED
+# ifdef DOXYGEN
+#  define ERROR_CODE   computed_type
+#  define ERRC         computed_type
+#  define SYSTEM_ERROR computed_type
+#  define ERROR_NS     computed_ns
+# else 
 
-#endif // H_trex_cpp11
+#  ifdef CPP11_SYSTEM_ERROR
+
+#   include <system_error>
+#   define ERROR_NS ::std
+
+#  else 
+
+#   include <boost/system/system_error.hpp>
+#   define ERROR_NS ::boost::system
+
+#  endif
+
+#  define ERROR_CODE   ERROR_NS::error_code
+#  define SYSTEM_ERROR ERROR_NS::system_error
+#  define ERRC         ERROR_NS::errc
+
+# endif // DOXYGEN
+
+#endif // H_trex_system_error

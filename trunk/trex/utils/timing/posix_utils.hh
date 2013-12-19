@@ -1,15 +1,3 @@
-/* -*- C++ -*-
- */
-/** @file "TimeUtils.hh"
- *
- * @brief C++ utilities for @c timeval
- *
- * This file defines some C++ operators to manipulate @c timeval
- * structure in a mor intuitive way.
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 

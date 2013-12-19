@@ -51,9 +51,9 @@
 # include "asio_runner.hh"
 
 # include "singleton.hh"
+# include "platform/system_error.hh"
 
 # include "SharedVar.hh"
-# include "ErrnoExcept.hh"
 
 /** @brief TREX default log file name
  *
