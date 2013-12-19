@@ -59,7 +59,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(TREXutils SHARED
   # real source
-  ErrnoExcept.cc
   Exception.cc
   LogManager.cc
   Pdlfcn.cc
@@ -82,7 +81,6 @@ add_library(TREXutils SHARED
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
-  ErrnoExcept.hh
   Exception.hh
   Factory.hh
   Hashable.hh
@@ -120,6 +118,7 @@ add_library(TREXutils SHARED
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
+  platform/system_error.hh
   # template source code
   bits/Factory.tcc
   singleton/bits/use.tcc
@@ -196,6 +195,7 @@ source_group("Header\ Files\\platform" FILES
   platform/chrono.hh 
   platform/memory.hh
   platform/cpp11_deleted.hh
+  platform/system_error.hh
 )
 
 source_group("Header\ Files\\singleton" FILES 

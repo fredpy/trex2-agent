@@ -60,8 +60,9 @@ void Clock::sleep(Clock::duration_type const &delay){
       if( 0==nanosleep(&tv, &tv) )
         return;
       if( EINTR!=errno )
-        throw ErrnoExcept("Clock:sleep");
-    } 
+        throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
+                           "Clock::sleep");
+    }
   }
 }
 

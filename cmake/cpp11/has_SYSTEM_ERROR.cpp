@@ -1,13 +1,7 @@
-/** @file "trex/utils/ErrnoExcept.cc"
- * @brief ErrnoExcept implementation
- * 
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2013, Frederic Py.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -37,27 +31,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <cstring>
+#include <system_error>
 
-#include <sstream>
+int main(int argc, const char **argv) {
+  std::error_code no_fail;			
+  std::system_error ec(no_fail);
 
-#include "ErrnoExcept.hh"
-
-using namespace TREX::utils;
-
-/*
- * class ErrnoExcept
- */
-// Statics :
-
-std::string ErrnoExcept::build_message(std::string const &from, 
-				       std::string const &what) throw() {
-  std::ostringstream message;
-  
-  message<<from<<": \""<<what<<'\"';
-  return message.str();
-}
-  
-std::string ErrnoExcept::build_message(std::string const &from) throw() {
-  return build_message(from, strerror(errno));
+  return no_fail || ec.code!=no_fail;
 }
