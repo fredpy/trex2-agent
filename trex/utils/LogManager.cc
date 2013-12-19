@@ -186,9 +186,9 @@ void LogManager::createLatest() {
   char dated_dir[16];
   
   if( NULL==base_dir_name ) {
-    ERROR_CODE ec(ERRC::no_such_file_or_directory,
-                  ERROR_NS::generic_category());
-    throw SYSTEM_ERROR(ec, "LogManager: $" LOG_DIR_ENV " is not set");
+    ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
+    throw SYSTEM_ERROR(ec,
+                       "LogManager: $" LOG_DIR_ENV " is no set");
   }
   path_type base_dir(base_dir_name);
   base_dir.make_preferred();
@@ -225,7 +225,7 @@ void LogManager::createLatest() {
       return;
     }
   }
-  ERROR_CODE ec(ERRC::value_too_large, ERROR_NS::generic_category());
+  ERROR_CODE ec = make_error_code(ERRC::value_too_large);
   throw SYSTEM_ERROR(ec, "Too many attempts: clean up your log directory");
 }
 

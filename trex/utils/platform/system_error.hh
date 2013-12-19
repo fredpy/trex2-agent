@@ -37,23 +37,25 @@
 # include <bits/cpp11.hh>
 
 # ifdef DOXYGEN
+
 #  define ERROR_CODE   computed_type
 #  define ERRC         computed_type
 #  define SYSTEM_ERROR computed_type
 #  define ERROR_NS     computed_ns
-# else 
 
-#  ifdef CPP11_SYSTEM_ERROR
+# else // !DOXYGEN
+
+#  ifdef CPP11_HAS_SYSTEM_ERROR
 
 #   include <system_error>
 #   define ERROR_NS ::std
 
-#  else 
+#  else // !CPP11_HAS_SYSTEM_ERROR
 
 #   include <boost/system/system_error.hpp>
 #   define ERROR_NS ::boost::system
 
-#  endif
+#  endif // CPP11_HAS_SYSTEM_ERROR
 
 #  define ERROR_CODE   ERROR_NS::error_code
 #  define SYSTEM_ERROR ERROR_NS::system_error

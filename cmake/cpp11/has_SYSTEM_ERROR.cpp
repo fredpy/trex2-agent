@@ -37,5 +37,5 @@ int main(int argc, const char **argv) {
   std::error_code no_fail;			
   std::system_error ec(no_fail);
 
-  return no_fail || ec.code!=no_fail;
+  return no_fail || ec.code()!=no_fail;
 }
