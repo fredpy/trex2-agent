@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-/** @file "SharedVar.hh"
+/** @file "trex/utils/shared_var.hh"
  * @brief utilities for multi-thread shared variable
  *
  * This header declare classes and utilities to easily
@@ -41,8 +41,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SharedVar
-# define H_SharedVar
+#ifndef H_trex_utils_shared_var
+# define H_trex_utils_shared_var
 
 # include <boost/call_traits.hpp>
 # include <boost/utility.hpp>
@@ -52,7 +52,7 @@
 
 namespace TREX {
   namespace utils {
-
+    
     /** @brief Bad access exception
      * @relates SharedVar
      *
@@ -66,7 +66,7 @@ namespace TREX {
      * that this condition is respected. (?)
      * @ingroup utils
      */
-    class AccessExcept
+    class bad_access
       :public Exception {
     public:
       /** @brief Constructor.
@@ -75,12 +75,12 @@ namespace TREX {
        *
        * Create a new instance with associated message @p message
        */
-      AccessExcept(std::string const &message) throw()
+      bad_access(std::string const &message) throw()
 	:Exception(message) {}
       /** @brief Destructor. */
-      ~AccessExcept() throw() {}
+      ~bad_access() throw() {}
       
-    }; // TREX::utils::AccessExcept
+    }; // TREX::utils::bad_access
     
     /** @brief multi-thread shared variable
      *
@@ -98,7 +98,7 @@ namespace TREX {
      * @ingroup utils
      */
     template<class Ty>
-    class SharedVar :boost::noncopyable {
+    class shared_var :boost::noncopyable {
     private:
       typedef boost::recursive_timed_mutex mutex_type;
 
@@ -130,7 +130,7 @@ namespace TREX {
        * will be destroyed and by doing so will release the mutex it locked during
        * its creation. 
        */
-      typedef boost::unique_lock< SharedVar<Ty> > scoped_lock;
+      typedef boost::unique_lock< shared_var<Ty> > scoped_lock;
       
       /** @brief Constructor.
        *
@@ -140,10 +140,10 @@ namespace TREX {
        *
        * @post the newly created instance is not locked
        */
-      SharedVar(typename boost::call_traits<Ty>::param_type val=Ty())
+      shared_var(typename boost::call_traits<Ty>::param_type val=Ty())
 	:m_lockCount(0ul), m_var(val) {}
       /** @brief Destructor */
-      ~SharedVar() {}
+      ~shared_var() {}
       
       /** @brief Locking method.
        *
@@ -177,7 +177,7 @@ namespace TREX {
        * @sa ownIt() const
        */
       void unlock() const {
-	if( ownIt() ) {
+	if( own_it() ) {
 	  --m_lockCount;
 	  m_mtx.unlock();
 	}
@@ -224,7 +224,7 @@ namespace TREX {
        * @sa lock() const
        * @sa unlock() const
        */
-      bool ownIt() const {
+      bool own_it() const {
 	mutex_type::scoped_try_lock lock(m_mtx);
 	return lock.owns_lock() && m_lockCount>0;
       }
@@ -246,14 +246,14 @@ namespace TREX {
        * @{
        */
       Ty &operator* () {
-	if( !ownIt() )
-	  throw AccessExcept("Cannot access a shared var which I don't own.");
+	if( !own_it() )
+	  throw bad_access("Cannot access a shared var which I don't own.");
 	return m_var;
       }
 
       Ty const &operator* () const {
-	if( !ownIt() )
-	  throw AccessExcept("Cannot access a shared var which I don't own.");
+	if( !own_it() )
+	  throw bad_access("Cannot access a shared var which I don't own.");
 	return m_var;
       }
       /** @} */
@@ -302,7 +302,7 @@ namespace TREX {
       /** @brief Variable value */
       Ty m_var;
       
-    }; // TREX::utils::SharedVar<>
+    }; // TREX::utils::shared_var<>
 
   } // TREX::utils
 } // TREX

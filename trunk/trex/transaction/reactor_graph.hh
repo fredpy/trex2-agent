@@ -745,9 +745,9 @@ namespace TREX {
       details::timeline_set    m_timelines;
       mutable TICK             m_currentTick;
       
-      mutable utils::SharedVar<bool>   m_tick_updated;
+      mutable utils::shared_var<bool>   m_tick_updated;
       bool tick_updated() const {
-        utils::SharedVar<bool>::scoped_lock lck(m_tick_updated);
+        utils::shared_var<bool>::scoped_lock lck(m_tick_updated);
         return *m_tick_updated;
       }
       
