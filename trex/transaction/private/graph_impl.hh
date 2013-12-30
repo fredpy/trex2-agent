@@ -181,7 +181,7 @@ namespace TREX {
          * in order to allow quick access when Hasving Accurate date is not 
          * critical
          */
-        mutable utils::SharedVar< boost::optional<date_type> > m_date;
+        mutable utils::shared_var< boost::optional<date_type> > m_date;
         /** @brief graph name local storage
          *
          * The attrobute that stroes the graph assocaited name. This attribute 

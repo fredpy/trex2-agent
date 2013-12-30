@@ -53,7 +53,7 @@
 # include "singleton.hh"
 # include "platform/system_error.hh"
 
-# include "SharedVar.hh"
+# include "shared_var.hh"
 
 /** @brief TREX default log file name
  *
@@ -390,7 +390,7 @@ namespace TREX {
        * This flag is set to true as soon as the log manager is
        * fully initialized
        */
-      SharedVar<bool> m_inited;
+      shared_var<bool> m_inited;
       asio_runner  m_io;
             
       /** @brief syslog text log file */

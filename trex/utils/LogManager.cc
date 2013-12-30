@@ -156,7 +156,7 @@ void LogManager::loadSearchPath() {
 }
 
 LogManager::path_type const &LogManager::logPath() {
-  SharedVar<bool>::scoped_lock lock(m_inited);
+  shared_var<bool>::scoped_lock lock(m_inited);
 
   if( !*m_inited ) {
     if( m_path.empty() ) {
@@ -264,7 +264,7 @@ std::string LogManager::use(std::string const &file_name, bool &found) {
 }
 
 bool LogManager::setLogLevel(LogLevel lvl) {
-  SharedVar<bool>::scoped_lock guard(m_inited);
+  shared_var<bool>::scoped_lock guard(m_inited);
   if( !*m_inited ) {
     m_level = lvl;
     return true;
@@ -274,7 +274,7 @@ bool LogManager::setLogLevel(LogLevel lvl) {
 }
 
 bool LogManager::setLogPath(std::string const &path) {
-  SharedVar<bool>::scoped_lock guard(m_inited);
+  shared_var<bool>::scoped_lock guard(m_inited);
   if( !*m_inited ) {
     m_path = path;
     return true;

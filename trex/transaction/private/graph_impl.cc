@@ -66,7 +66,7 @@ void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
 boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {
   if( fast ) {
     // if fast just directly access the mutex protected value
-    utils::SharedVar< boost::optional<date_type> >::scoped_lock lock(m_date);
+    utils::shared_var< boost::optional<date_type> >::scoped_lock lock(m_date);
     return *m_date;
   } else {
     // If not fast post the call through the starnd to ensure that any queued set_date have been processed

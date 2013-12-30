@@ -1086,7 +1086,7 @@ namespace TREX {
       void goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest);
       
       std::list<goal_id>     m_sync_goals, m_sync_recalls, m_sync_toks, m_sync_cancels;
-      utils::SharedVar<size_t> m_have_goals;
+      utils::shared_var<size_t> m_have_goals;
       
       bool have_goals();
       

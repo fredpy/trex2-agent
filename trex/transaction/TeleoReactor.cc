@@ -453,13 +453,13 @@ void TeleoReactor::reset_deadline() {
 }
 
 bool TeleoReactor::have_goals() {
-  utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+  utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
   return 0 < *m_have_goals;
 }
 
 void TeleoReactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
   {
-    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+    utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals -= a.size();
   }
   std::swap(a, dest);
@@ -468,7 +468,7 @@ void TeleoReactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
 
 void TeleoReactor::queue(std::list<goal_id> &l, goal_id g) {
   {
-    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
+    utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals += 1;
   }
   l.push_back(g);

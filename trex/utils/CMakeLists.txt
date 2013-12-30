@@ -88,7 +88,7 @@ add_library(TREXutils SHARED
   LogManager.hh
   Plugin.hh
   PluginLoader.hh
-  SharedVar.hh
+  shared_var.hh
   StringExtract.hh
   Symbol.hh
   TREXversion.hh
