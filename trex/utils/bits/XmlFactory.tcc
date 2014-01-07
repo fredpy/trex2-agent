@@ -48,7 +48,7 @@ template<class Product, class Output, class Arg>
 Output XmlFactory<Product, Output, Arg>::produce
 (typename XmlFactory<Product, Output, Arg>::argument_type arg) {
   tree_t::value_type &node = arg_traits::xml(arg);
-  Symbol id(node.first);
+  symbol id(node.first);
 
   // Now I locate the producer for id and pass to him
   // the node and extra argument
@@ -73,7 +73,7 @@ bool XmlFactory<Product, Output, Arg>::iter_produce
   Iter &i = iter_traits<Iter>::xml(it);
   
   while( last!=i ) {
-    Symbol tag(i->first);
+    symbol tag(i->first);
     if( m_factory->exists(tag) ) {
       argument_type arg = iter_traits<Iter>::build_node(*i, it);
       try {

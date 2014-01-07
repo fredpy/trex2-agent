@@ -63,7 +63,7 @@ namespace TREX {
     class StringDomain 
       :public TREX::transaction::EnumeratedDomain<std::string> {
     public:
-      static TREX::utils::Symbol const type_name;
+      static TREX::utils::symbol const type_name;
       /** @brief Default Constructor 
        * 
        * Creates a new full string domain.

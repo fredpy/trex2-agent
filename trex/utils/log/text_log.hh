@@ -93,6 +93,14 @@ namespace TREX {
          * @sa class details::log_signal
          */
         typedef details::slot       slot_type;
+        /** @brief Extended signal slot type 
+         *
+         * The type of slot that can handle new log message while 
+         * giving a reference to the producer of this message event
+         *
+         * @sa class details::log_signal
+         * @sa slot_type
+         */
         typedef details::ext_slot   extended_slot_type;
         typedef details::connection connection;
        

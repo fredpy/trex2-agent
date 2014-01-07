@@ -50,7 +50,7 @@
 # include <trex/utils/platform/memory.hh>
 
 # include <trex/utils/timing/posix_utils.hh>
-# include <trex/utils/LogManager.hh>
+# include <trex/utils/log_manager.hh>
 # include <trex/utils/StringExtract.hh>
 
 # include <trex/utils/timing/tick_clock.hh>

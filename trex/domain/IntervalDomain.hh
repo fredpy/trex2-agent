@@ -362,7 +362,7 @@ namespace TREX {
        *
        * Create a new instance withe as a full interval of type @e type
        */
-      explicit IntervalDomain(TREX::utils::Symbol const &type)
+      explicit IntervalDomain(TREX::utils::symbol const &type)
 	:BasicInterval(type), m_lower(minus_inf), m_upper(plus_inf) {}
       /** @brief Constructor
        * @param type A symbolic type name
@@ -375,7 +375,7 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      IntervalDomain(TREX::utils::Symbol const &type, 
+      IntervalDomain(TREX::utils::symbol const &type,
 		     bound const &lb, bound const &ub)
 	:BasicInterval(type), m_lower(lb), m_upper(ub) {
 	if( m_upper<m_lower || ( m_lower.isInfinity() 
@@ -391,7 +391,7 @@ namespace TREX {
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      IntervalDomain(TREX::utils::Symbol const &type, Ty const &val) 
+      IntervalDomain(TREX::utils::symbol const &type, Ty const &val)
 	:BasicInterval(type), m_lower(val), m_upper(val) {}
       /** @brief Destructor */
       virtual ~IntervalDomain() {}

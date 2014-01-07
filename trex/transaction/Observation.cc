@@ -51,7 +51,7 @@ namespace {
 
 }
 
-Symbol const &Observation::getPredTag() const {
-  static Symbol const name("Observation");
+symbol const &Observation::getPredTag() const {
+  static symbol const name("Observation");
   return name;
 }

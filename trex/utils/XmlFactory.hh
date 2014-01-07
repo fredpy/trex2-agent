@@ -211,7 +211,7 @@ namespace TREX {
        *
        * The factory used underneath to implement this XmlFactory
        */
-      typedef Factory<Product, Symbol, argument_type, Output> factory_type;
+      typedef Factory<Product, symbol, argument_type, Output> factory_type;
       typedef typename factory_type::returned_type returned_type;
       
 
@@ -254,7 +254,7 @@ namespace TREX {
          * Declare the new producer that will create a class Ty whenever the 
          * XmlFactory encounters an XML tag @p id
          */
-	declare(Symbol const &id) 
+	declare(symbol const &id)
 	  :factory_type::template declare<Ty>(id) {}
         /** @brief Destructor 
          *
@@ -282,7 +282,7 @@ namespace TREX {
        *
        * Store all the currently recognized XML tags for this factory in @p ids
        */
-      void getIds(std::list<Symbol> &ids) const {
+      void getIds(std::list<symbol> &ids) const {
 	m_factory->getIds(ids);
       }
 

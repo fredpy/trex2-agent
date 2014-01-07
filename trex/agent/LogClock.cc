@@ -66,10 +66,10 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 LogClock::LogClock(bpt::ptree::value_type &node) 
   :Clock(Clock::duration_type::zero()), m_counter(0) {
   // find the log to replay
-  singleton::use<LogManager> log;
+  singleton::use<log_manager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
   bool found;
-  file = log->use(file, found);
+  file = log->use(file, found).string();
   if( !found )
     throw XmlError(node, "Unable to locate file \""+file+"\"");
   bpt::ptree tks;

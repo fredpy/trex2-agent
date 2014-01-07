@@ -8,21 +8,21 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::rover;
 
-Symbol const Rover::AtPred("At");
-Symbol const Rover::GoingPred("Going");
-Symbol const Rover::locationPred("Location");
-Symbol const Rover::pathPred("Path");
-Symbol const Rover::StowedPred("Stowed");
-Symbol const Rover::StowingPred("Stowing");
-Symbol const Rover::UnstowedPred("Unstowed");
-Symbol const Rover::UnstowingPred("Unstowing");
-Symbol const Rover::PlacedPred("Placed");
-Symbol const Rover::SamplingPred("Sampling");
-Symbol const Rover::FreePred("Free");
+symbol const Rover::AtPred("At");
+symbol const Rover::GoingPred("Going");
+symbol const Rover::locationPred("Location");
+symbol const Rover::pathPred("Path");
+symbol const Rover::StowedPred("Stowed");
+symbol const Rover::StowingPred("Stowing");
+symbol const Rover::UnstowedPred("Unstowed");
+symbol const Rover::UnstowingPred("Unstowing");
+symbol const Rover::PlacedPred("Placed");
+symbol const Rover::SamplingPred("Sampling");
+symbol const Rover::FreePred("Free");
 
-Symbol const Rover::navigatorObj("Navigator");
-Symbol const Rover::instrumentLocationObj("InstrumentLocation");
-Symbol const Rover::instrumentStateObj("InstrumentState");
+symbol const Rover::navigatorObj("Navigator");
+symbol const Rover::instrumentLocationObj("InstrumentLocation");
+symbol const Rover::instrumentStateObj("InstrumentState");
 
 Rover::Rover(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false), m_firstTick(true)

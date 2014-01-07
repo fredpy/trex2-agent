@@ -52,7 +52,7 @@
 
 # include "StringExtract.hh"
 # include "Exception.hh"
-# include "LogManager.hh"
+# include "log_manager.hh"
 
 namespace TREX {
   namespace utils {

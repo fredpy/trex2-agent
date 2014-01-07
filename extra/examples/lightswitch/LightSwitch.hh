@@ -103,20 +103,20 @@ namespace TREX {
       UNIQ_PTR<TREX::transaction::Observation> m_light_state;
 
       /** @brief Name of the predicate on */
-      static TREX::utils::Symbol const onPred;
+      static TREX::utils::symbol const onPred;
       /** @brief Name of the predicate off */
-      static TREX::utils::Symbol const offPred;
+      static TREX::utils::symbol const offPred;
       /** @brief Name of the predicate up */
-      static TREX::utils::Symbol const upPred;
+      static TREX::utils::symbol const upPred;
       /** @brief Name of the predicate down */
-      static TREX::utils::Symbol const downPred;
+      static TREX::utils::symbol const downPred;
       /** @brief Name of the predicate broken */
-      static TREX::utils::Symbol const brokenPred;
+      static TREX::utils::symbol const brokenPred;
 
       /** @brief Name of the timeline for light */
-      static TREX::utils::Symbol const lightObj;
+      static TREX::utils::symbol const lightObj;
       /** @brief Name of the timeline for light */
-      static TREX::utils::Symbol const switchObj;
+      static TREX::utils::symbol const switchObj;
     };
 
   }

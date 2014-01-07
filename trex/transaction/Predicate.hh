@@ -97,7 +97,7 @@ namespace TREX {
     class Predicate:  public TREX::utils::ptree_convertible {
     protected:
       /** @brief Type used to store predicate attributes */
-      typedef std::map<TREX::utils::Symbol, Variable> attr_set;
+      typedef std::map<TREX::utils::symbol, Variable> attr_set;
 
     public:
       /** @brief Predicate attributes' iterator */
@@ -106,8 +106,8 @@ namespace TREX {
       typedef attr_set::const_iterator const_iterator;
       
       
-      static utils::Symbol const &undefined_pred();
-      static utils::Symbol const &failed_pred();
+      static utils::symbol const &undefined_pred();
+      static utils::symbol const &failed_pred();
 
       /** @brief Destructor */
       virtual ~Predicate() =0;
@@ -120,7 +120,7 @@ namespace TREX {
        *
        * @return the name of the associated object
        */
-      TREX::utils::Symbol const &object() const {
+      TREX::utils::symbol const &object() const {
 	return m_object;
       }
       /** @brief predicate type
@@ -130,7 +130,7 @@ namespace TREX {
        *
        * @return the type of the predicate
        */
-      TREX::utils::Symbol const &predicate() const {
+      TREX::utils::symbol const &predicate() const {
 	return m_type;
       }
 
@@ -198,7 +198,7 @@ namespace TREX {
        * @sa void restrictAttribute(Variable const &)
        * @sa Variable &restrict(Variable const &)
        */
-      void restrictAttribute(TREX::utils::Symbol const &name, 
+      void restrictAttribute(TREX::utils::symbol const &name,
 			     DomainBase const &domain) {
 	return restrictAttribute(Variable(name, domain));
       }
@@ -229,7 +229,7 @@ namespace TREX {
        *
        * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const
        */
-      bool hasAttribute(TREX::utils::Symbol const &name) const {
+      bool hasAttribute(TREX::utils::symbol const &name) const {
 	return end()!=m_vars.find(name);
       }
       /** @brief Attribute access
@@ -240,7 +240,7 @@ namespace TREX {
        *
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &) const
        */
-      virtual Variable const &getAttribute(TREX::utils::Symbol const &name) 
+      virtual Variable const &getAttribute(TREX::utils::symbol const &name)
 	const;
       /** @brief Attribute domain access
        * @tparam Ty the type of the domain
@@ -258,7 +258,7 @@ namespace TREX {
        * @sa template<class Ty> Ty const &Variable::typedDomain() const
        */
       template<class Ty> 
-      Ty const &getDomain(TREX::utils::Symbol const &name) const {
+      Ty const &getDomain(TREX::utils::symbol const &name) const {
 	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
 			     DomainBase const &>::value));
 	Variable const &attr = getAttribute(name);
@@ -273,7 +273,7 @@ namespace TREX {
        * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const 
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &)
        */
-      Variable const &operator[](TREX::utils::Symbol const &name) const {
+      Variable const &operator[](TREX::utils::symbol const &name) const {
 	return getAttribute(name);
       }
     
@@ -290,7 +290,7 @@ namespace TREX {
        *
        * @post attr list contains all the attributes appendded to it end
        */
-      virtual void listAttributes(std::list<TREX::utils::Symbol> &attr,
+      virtual void listAttributes(std::list<TREX::utils::symbol> &attr,
 				  bool all=true) const;
       
       boost::property_tree::ptree as_tree() const {
@@ -356,8 +356,8 @@ namespace TREX {
        * @pre both @e obj and @e pred should not be empty symbols
        * @throw PredicateException One of the argument was empty
        */
-      Predicate(TREX::utils::Symbol const &obj, 
-		TREX::utils::Symbol const &pred)
+      Predicate(TREX::utils::symbol const &obj,
+		TREX::utils::symbol const &pred)
 	:m_object(obj), m_type(pred) {
 	if( obj.empty() )
 	  throw PredicateException("Empty predicate's object names are not allowed");
@@ -392,7 +392,7 @@ namespace TREX {
        * @retval An iterator pointing to the attribute @e name if it exists
        * @retval end() if the attribute @e name is not found
        */
-      iterator find(TREX::utils::Symbol const &name) {
+      iterator find(TREX::utils::symbol const &name) {
 	return m_vars.find(name);
       }
       /** @brief removce an attribute
@@ -413,10 +413,10 @@ namespace TREX {
        *
        * @sa std::ostream &toXml(std::ostream &, size_t) const
        */
-      virtual TREX::utils::Symbol const &getPredTag() const = 0;
+      virtual TREX::utils::symbol const &getPredTag() const = 0;
       
       std::ostream &print_attr(std::ostream &out,
-                               utils::Symbol const &name,
+                               utils::symbol const &name,
                                bool &first) const;
       virtual std::ostream &print_to(std::ostream &out) const;
       
@@ -426,9 +426,9 @@ namespace TREX {
       
     private:
       /** @brief object name */
-      TREX::utils::Symbol m_object;
+      TREX::utils::symbol m_object;
       /** @brief predicate type */
-      TREX::utils::Symbol m_type;
+      TREX::utils::symbol m_type;
       /** @brief Associated attributes */
       attr_set m_vars;
 

@@ -407,12 +407,12 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        */
       struct graph_edge_name_map 
-	:public boost::put_get_helper<TREX::utils::Symbol, 
+	:public boost::put_get_helper<TREX::utils::symbol,
 				      graph_edge_name_map> {
 
 	typedef boost::readable_property_map_tag category;
-	typedef TREX::utils::Symbol              value_type;
-	typedef TREX::utils::Symbol const &      reference;
+	typedef TREX::utils::symbol              value_type;
+	typedef TREX::utils::symbol const &      reference;
 	typedef graph::relation_type             key_type;
 
 	/** @brief Relation name accessor
@@ -442,12 +442,12 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        */
       struct graph_vertex_name_map 
-	:public boost::put_get_helper<TREX::utils::Symbol, 
+	:public boost::put_get_helper<TREX::utils::symbol,
 				      graph_vertex_name_map> {
 
 	typedef boost::readable_property_map_tag category;
-	typedef TREX::utils::Symbol              value_type;
-	typedef TREX::utils::Symbol const &      reference;
+	typedef TREX::utils::symbol              value_type;
+	typedef TREX::utils::symbol const &      reference;
 	typedef graph::reactor_id                key_type;
 
 	/** @brief Reactor name accessor
@@ -461,7 +461,7 @@ namespace TREX {
 	 * @sa TREX::transaction::TeleoReactor::getName() const
 	 */
 	reference operator[](key_type r) const {
-	  static TREX::utils::Symbol const null_name("0x0");
+	  static TREX::utils::symbol const null_name("0x0");
 
 	  if( graph::null_reactor()==r )
 	    return null_name;
@@ -573,7 +573,7 @@ namespace TREX {
        * This method will wirte into @p out a graphviz formtatted optional information
        * that indicates that labe should  be the value of @p name
        */
-      void label(std::ostream &out, TREX::utils::Symbol const &name) const {
+      void label(std::ostream &out, TREX::utils::symbol const &name) const {
 	out<<"[label=\""<<name<<"\"]";
       }	
     };
@@ -611,7 +611,7 @@ namespace boost {
    * @sa get(edge_name_t, TREX::transaction::graph const &)
    * @sa TREX::transaction::details::graph_edge_name_map
    */
-  inline TREX::utils::Symbol const &
+  inline TREX::utils::symbol const &
   get(TREX::transaction::details::graph_edge_name_map const &m,
       TREX::transaction::graph::relation_type const &rel) {
     return m[rel];
@@ -676,7 +676,7 @@ namespace boost {
    * @sa get(vertex_name_t, TREX::transaction::graph const &)
    * @sa TREX::transaction::details::graph_vertex_name_map
    */
-  inline TREX::utils::Symbol const &
+  inline TREX::utils::symbol const &
   get(TREX::transaction::details::graph_vertex_name_map const &m,
       TREX::transaction::graph::reactor_id r) {
     return m[r];

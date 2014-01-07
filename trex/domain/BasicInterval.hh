@@ -110,7 +110,7 @@ namespace TREX {
       virtual std::string getStringLower() const;
       virtual std::string getStringUpper() const;
     protected:
-      explicit BasicInterval(TREX::utils::Symbol const &type) 
+      explicit BasicInterval(TREX::utils::symbol const &type) 
 	:DomainBase(type) {}
       explicit BasicInterval(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}

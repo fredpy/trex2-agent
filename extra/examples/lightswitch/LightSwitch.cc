@@ -50,7 +50,7 @@
 #include <iostream>
 
 #include <trex/utils/Plugin.hh>
-#include <trex/utils/LogManager.hh>
+#include <trex/utils/log_manager.hh>
 
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/EnumDomain.hh>
@@ -65,7 +65,7 @@ using namespace TREX::lightswitch;
 namespace {
 
   /** @brief TREX log entry point */
-  singleton::use<LogManager> s_log;
+  singleton::use<log_manager> s_log;
 
   /** @brief Light reactor declaration */
   TeleoReactor::xml_factory::declare<Light> decl("Light");
@@ -88,19 +88,19 @@ namespace TREX {
 
 } // TREX
 
-Symbol const Light::onPred("On");
+symbol const Light::onPred("On");
 
-Symbol const Light::offPred("Off");
+symbol const Light::offPred("Off");
 
-Symbol const Light::lightObj("light");
+symbol const Light::lightObj("light");
 
-Symbol const Light::upPred("Up");
+symbol const Light::upPred("Up");
 
-Symbol const Light::downPred("Down");
+symbol const Light::downPred("Down");
 
-Symbol const Light::brokenPred("Broken");
+symbol const Light::brokenPred("Broken");
 
-Symbol const Light::switchObj("switch");
+symbol const Light::switchObj("switch");
 
 
 Light::Light(TeleoReactor::xml_arg_type arg)
@@ -120,7 +120,7 @@ Light::Light(TeleoReactor::xml_arg_type arg)
 Light::~Light() {}
 
 void Light::setValue(bool val) {
-  Symbol light_v, switch_v;
+  symbol light_v, switch_v;
   m_on = val;
 
   if( m_on ) {

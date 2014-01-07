@@ -50,30 +50,30 @@ namespace TREX {
           return shared_from_this();
         }
         
-        void set_name(utils::Symbol const &name) {
+        void set_name(utils::symbol const &name) {
           m_name = name;
         }
-        utils::Symbol const &name() const {
+        utils::symbol const &name() const {
           return m_name;
         }
         
-        utils::log::stream syslog(utils::Symbol const &ctx,
-                                  utils::Symbol const &kind) const;
-        utils::LogManager &manager() const;
+        utils::log::stream syslog(utils::symbol const &ctx,
+                                  utils::symbol const &kind) const;
+        utils::log_manager &manager() const;
         
         SHARED_PTR<graph_impl> graph() const {
           return m_graph.lock();
         }
         
-        void provide(utils::Symbol const &tl, bool read_only, bool publish_plan);
-        void use(utils::Symbol const &tl, bool read_only, bool listen_plan);
+        void provide(utils::symbol const &tl, bool read_only, bool publish_plan);
+        void use(utils::symbol const &tl, bool read_only, bool listen_plan);
         
       private:
         explicit node_impl(WEAK_PTR<graph_impl> const &g);
         
         void isolate(SHARED_PTR<graph_impl> const &g);
         
-        utils::Symbol               m_name;
+        utils::symbol               m_name;
         WEAK_PTR<graph_impl> m_graph;
         
         friend class graph_impl;

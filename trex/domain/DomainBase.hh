@@ -224,7 +224,7 @@ namespace TREX {
        *
        * @return the type associated to this domain
        */
-      TREX::utils::Symbol const &getTypeName() const {
+      TREX::utils::symbol const &getTypeName() const {
 	return m_type;
       }
 
@@ -426,7 +426,7 @@ namespace TREX {
        *
        * Create a new instance with associated domain type @e type
        */
-      explicit DomainBase(TREX::utils::Symbol const &type)
+      explicit DomainBase(TREX::utils::symbol const &type)
 	:m_type(type) {}
       /** @brief XML parsing constructor
        *
@@ -498,7 +498,7 @@ namespace TREX {
 
     private:
       /** @brief type of the domain */
-      TREX::utils::Symbol const m_type;
+      TREX::utils::symbol const m_type;
 
 
 # ifndef DOXYGEN

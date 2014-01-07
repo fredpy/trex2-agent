@@ -57,8 +57,8 @@
 # include <boost/flyweight.hpp>
 # include <boost/flyweight/no_tracking.hpp>
 # include <boost/flyweight/holder_tag.hpp>
+# include <boost/functional/hash.hpp>
 
-# include "Hashable.hh"
 # include "StringExtract.hh"
 # include "singleton.hh"
 
@@ -115,7 +115,7 @@ namespace TREX {
      */
     template< class CharT, class Traits=std::char_traits<CharT>,
 	      class Alloc=std::allocator<CharT> >
-    class BasicSymbol :public Hashable {
+    class basic_symbol {
     public:
       /** @brief equivalent string type */
       typedef std::basic_string<CharT, Traits, Alloc> str_type;
@@ -144,7 +144,7 @@ namespace TREX {
        *
        * Create a new symbol with the same value as @e str
        */
-      BasicSymbol(str_type const &str = str_type()) 
+      basic_symbol(str_type const &str = str_type())
 	:m_name(create(str)) {}
       /** @brief Constructor
        *
@@ -156,7 +156,7 @@ namespace TREX {
        *
        * @sa BasicSymbol &reset(CharT const *str, size_t len)
        */
-      BasicSymbol(CharT const *str, size_t len =str_type::npos)
+      basic_symbol(CharT const *str, size_t len =str_type::npos)
 	:m_name(create(str, len)) {}
       /** @brief Copy constructor
        *
@@ -164,11 +164,10 @@ namespace TREX {
        *
        * Create a new symbol with the same value as @e other
        */
-      BasicSymbol(BasicSymbol const &other)
+      basic_symbol(basic_symbol const &other)
 	:m_name(other.m_name) {}
       /** @brief Destructor */
-      ~BasicSymbol() {
-      }
+      ~basic_symbol() {}
 
       /** @brief Asignment operator
        *
@@ -178,7 +177,7 @@ namespace TREX {
        *
        * @return current instance after operation
        */
-      BasicSymbol &operator= (BasicSymbol const &other) {
+      basic_symbol &operator= (basic_symbol const &other) {
 	m_name = other.m_name;
 	return *this;
       }
@@ -193,7 +192,7 @@ namespace TREX {
        *
        * @sa BasicSymbol(CharT const *str, size_t len)
        */
-      BasicSymbol &reset(CharT const *str=NULL, size_t len=str_type::npos) {
+      basic_symbol &reset(CharT const *str=NULL, size_t len=str_type::npos) {
 	m_name = create(str, len);
 	return *this;
       }
@@ -229,7 +228,7 @@ namespace TREX {
        *
        * @sa bool operator!=(BasicSymbol const &) const
        */
-      bool operator==(BasicSymbol const &other) const {
+      bool operator==(basic_symbol const &other) const {
 	return m_name==other.m_name;
       }
       /** @brief Difference test
@@ -245,7 +244,7 @@ namespace TREX {
        *
        * @sa bool operator==(BasicSymbol const &) const
        */
-      bool operator!=(BasicSymbol const &other) const {
+      bool operator!=(basic_symbol const &other) const {
 	return !operator==(other);
       }
       /** @brief Less than test
@@ -259,7 +258,7 @@ namespace TREX {
        * @retval true if current instance is before @e other
        * @retval false  otherwise
        */
-      bool operator< (BasicSymbol const &other) const;
+      bool operator< (basic_symbol const &other) const;
       /** @brief Greater than test
        *
        * @param other instance
@@ -271,7 +270,7 @@ namespace TREX {
        * @retval true if current instance is after @e other
        * @retval false  otherwise
        */
-      bool operator> (BasicSymbol const &other) const {
+      bool operator> (basic_symbol const &other) const {
 	return other.operator< (*this);
       }
       /** @brief Less or equal to test
@@ -285,7 +284,7 @@ namespace TREX {
        * @retval false if current instance is after @e other
        * @retval true  otherwise
        */
-      bool operator<=(BasicSymbol const &other) const {
+      bool operator<=(basic_symbol const &other) const {
 	return !operator> (other);
       }
       /** @brief Greater or equal to test
@@ -299,7 +298,7 @@ namespace TREX {
        * @retval false if current instance is before @e other
        * @retval true  otherwise
        */
-      bool operator>=(BasicSymbol const &other) const {
+      bool operator>=(basic_symbol const &other) const {
 	return !operator< (other);
       }
 
@@ -336,20 +335,24 @@ namespace TREX {
        */
       static ref_type create(CharT const *str, size_t len);
 
-      size_t hash() const;
-
-      friend std::istream &operator>>(std::istream &in, BasicSymbol &s) {
-        BasicSymbol::str_type tmp;
+      friend std::istream &operator>>(std::istream &in, basic_symbol &s) {
+        basic_symbol::str_type tmp;
         
         if( in>>tmp )
-          s.m_name = BasicSymbol::create(tmp);
+          s.m_name = basic_symbol::create(tmp);
         return in;
       }
       
-    }; // TREX::utils::BasicSymbol<>
+      friend std::size_t hash_value(basic_symbol const &x) {
+        boost::hash<typename basic_symbol::str_type> href;
+        return href(x.m_name.get());
+      }
+      
+    }; // TREX::utils::basic_symbol<>
     
     template<class CharT, class Traits, class Alloc>
-    std::ostream &operator<<(std::ostream &out, BasicSymbol<CharT, Traits, Alloc> const &s) {
+    std::ostream &operator<<(std::ostream &out,
+                             basic_symbol<CharT, Traits, Alloc> const &s) {
       if( !s.empty() )
         out<<s.str();
       return out;
@@ -367,7 +370,7 @@ namespace TREX {
      *
      * @ingroup utils
      */
-    typedef BasicSymbol<char> Symbol;
+    typedef basic_symbol<char> symbol;
 
     
     /** @brief string casting specialization
@@ -381,9 +384,9 @@ namespace TREX {
      * @ingroup utils
      */ 
     template<>
-    inline Symbol string_cast<Symbol>(std::string const &in,
+    inline symbol string_cast<symbol>(std::string const &in,
 				      std::ios_base &(*format)(std::ios_base &)) {
-      return Symbol(in);
+      return symbol(in);
     }
   } // TREX::utils
 } // TREX 

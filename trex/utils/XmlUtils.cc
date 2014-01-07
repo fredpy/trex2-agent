@@ -45,7 +45,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 
 namespace {
-  singleton::use<LogManager> s_log;
+  singleton::use<log_manager> s_log;
 }
 
 void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {
@@ -53,7 +53,7 @@ void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &
   
   if( name ) {
     bool found;
-    std::string file = s_log->use(*name, found);
+    std::string file = s_log->use(*name, found).string();
     
     if( !found ) {
       ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);

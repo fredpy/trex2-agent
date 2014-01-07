@@ -80,7 +80,7 @@ void export_agent() {
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
-   init<tu::Symbol const &, tt::TICK>())
+   init<tu::symbol const &, tt::TICK>())
   .def(init<std::string const &>())
   .def(init<boost::property_tree::ptree::value_type &>())
   // need to find a way to take ownership of the clock passed as argument

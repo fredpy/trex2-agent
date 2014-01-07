@@ -76,7 +76,7 @@ namespace TREX {
 	 *
 	 * @return the name of the timeline this operation applies to
 	 */
-	utils::Symbol const &timeline() const {
+	utils::symbol const &timeline() const {
 	  return m_timeline;
 	}
 	/** @brief goal flag
@@ -95,7 +95,7 @@ namespace TREX {
 	  return m_plan;
 	}
       private:
-	utils::Symbol m_timeline;
+	utils::symbol m_timeline;
 	bool m_goals, m_plan;
       }; // TREX::transaction::details::tl_event
       
@@ -426,7 +426,7 @@ namespace TREX {
 } // TREX
 
 using namespace TREX::transaction;
-using TREX::utils::Symbol;
+using TREX::utils::symbol;
 
 namespace util=TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
@@ -484,11 +484,11 @@ LogPlayer::phase::phase(LogPlayer *owner,
  */
 // statics
 
-Symbol const LogPlayer::s_init("init");
-Symbol const LogPlayer::s_new_tick("start");
-Symbol const LogPlayer::s_synchronize("synchronize");
-Symbol const LogPlayer::s_has_work("has_work");
-Symbol const LogPlayer::s_step("step");
+symbol const LogPlayer::s_init("init");
+symbol const LogPlayer::s_new_tick("start");
+symbol const LogPlayer::s_synchronize("synchronize");
+symbol const LogPlayer::s_has_work("has_work");
+symbol const LogPlayer::s_step("step");
 
 TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg) {
   // force logging to false
@@ -505,7 +505,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
 					xml_factory::node(arg),
 					"file");
   bool found;
-  file_name = manager().use(file_name, found);
+  file_name = manager().use(file_name, found).string();
   if( !found ) {
     syslog(null, error)<<"Unable to locate transaction log \""
 		       <<file_name<<"\".";
@@ -582,7 +582,7 @@ LogPlayer::~LogPlayer() {
 
 // manipulators
 
-bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
+bool LogPlayer::next_phase(TICK tck, utils::symbol const &kind) {
   if( !m_log.empty() ) {
     if( m_log.front().first==tck  ) {
       SHARED_PTR<phase> nxt = m_log.front().second;
@@ -650,19 +650,19 @@ void LogPlayer::resume() {
 
 
 // events 
-void LogPlayer::play_use(utils::Symbol const &tl, bool goals, bool plan) {
+void LogPlayer::play_use(utils::symbol const &tl, bool goals, bool plan) {
   use(tl, goals, plan);
 }
  
-void LogPlayer::play_unuse(utils::Symbol const &tl) {
+void LogPlayer::play_unuse(utils::symbol const &tl) {
   unuse(tl);
 }
 
-void LogPlayer::play_provide(utils::Symbol const &tl, bool goals, bool plan) {
+void LogPlayer::play_provide(utils::symbol const &tl, bool goals, bool plan) {
   provide(tl, goals, plan);
 }
 
-void LogPlayer::play_unprovide(utils::Symbol const &tl) {
+void LogPlayer::play_unprovide(utils::symbol const &tl) {
   unprovide(tl);
 }
 

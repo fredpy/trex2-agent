@@ -49,10 +49,10 @@ namespace TREX {
      * @ingroup europa
      */
     class EuropaEntity 
-    :public TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> {
-      typedef TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> base_class;
+    :public TREX::transaction::EnumeratedDomain<TREX::utils::symbol> {
+      typedef TREX::transaction::EnumeratedDomain<TREX::utils::symbol> base_class;
     public:
-      static TREX::utils::Symbol const type_name;
+      static TREX::utils::symbol const type_name;
       
       /** @brief Constructor
        *
@@ -78,7 +78,7 @@ namespace TREX {
        *
        * Create the domain with the single value @p val
        */
-      explicit EuropaEntity(TREX::utils::Symbol const &val) 
+      explicit EuropaEntity(TREX::utils::symbol const &val) 
 	:base_class(type_name, val) {}
       /** @brief XML constructor 
        * @param[in] node XML decsciption of the domain

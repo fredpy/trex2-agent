@@ -38,7 +38,7 @@
 # include <set>
 # include <string>
 
-# include <trex/utils/LogManager.hh>
+# include <trex/utils/log_manager.hh>
 
 # include <trex/europa/config.hh>
 
@@ -126,7 +126,7 @@ namespace TREX {
 	std::ofstream            m_europa_debug;
 	std::string              m_path;
 
-	TREX::utils::singleton::use<TREX::utils::LogManager> m_log;
+	TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
 	typedef std::map<std::string, boost::filesystem::path> 
           include_map;
         include_map m_includes;

@@ -25,7 +25,7 @@ namespace TREX {
                 void setValue(TREX::transaction::goal_id const &g);
 
                 /** Timeline Navigator */
-                static TREX::utils::Symbol const navigatorObj;
+                static TREX::utils::symbol const navigatorObj;
         };
 
     }
