@@ -46,7 +46,8 @@
 # include <boost/unordered_map.hpp>
 
 # include "Symbol.hh"
-# include "LogManager.hh"
+# include "Exception.hh"
+# include "log_manager.hh"
 
 namespace TREX {
   namespace utils {
@@ -112,7 +113,7 @@ namespace TREX {
        * @retval false if we failed to cloate @p name and 
        *    @p fail_on_locate is @c false
        */
-      bool load(Symbol const &name, 
+      bool load(symbol const &name,
                 bool fail_on_locate=true);
       /** @brief plug-in unload method
        *
@@ -128,7 +129,7 @@ namespace TREX {
        *    because either this plug-in was not loaded on the 
        *    first place or is still in use. 
        */
-      bool unload(Symbol const &name);
+      bool unload(symbol const &name);
       
     private:
       /** @brief Constructor */
@@ -151,7 +152,7 @@ namespace TREX {
        * a plug-in to a pointer to its handle and a reference
        * counter.
        */
-      typedef boost::unordered_map<Symbol, std::pair<void *, size_t> > handle_map;
+      typedef boost::unordered_map<symbol, std::pair<void *, size_t> > handle_map;
 			
       /** @brief Loaded plug-ins information
        * 
@@ -166,7 +167,7 @@ namespace TREX {
        * information but mostly to uses the @c LogManager::locate 
        * method in order to locate the plug-in 
        */ 
-      singleton::use<LogManager> m_log;
+      singleton::use<log_manager> m_log;
       
       friend class singleton::wrapper<PluginLoader>;
     }; // class TREX::utils::PluginLoader
@@ -193,7 +194,7 @@ namespace TREX {
        * Creates an exception associated to the plug-in @p name 
        * with the error @p msg
        */
-      PluginError(Symbol const &name, 
+      PluginError(symbol const &name,
                   std::string const &msg) throw();
 			
       friend class PluginLoader;

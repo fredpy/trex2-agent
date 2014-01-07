@@ -40,7 +40,7 @@ using namespace TREX::utils;
 namespace bp=boost::python;
 
 namespace  {
-  singleton::use<LogManager> s_log;
+  singleton::use<log_manager> s_log;
   
   producer python_decl("PyReactor");
 }
@@ -61,15 +61,15 @@ void TREX::python::log_error(bp::error_already_set const &e) {
  * class TREX::python::python_reactor
  */
 
-void python_reactor::log_msg(Symbol const &type, std::string const &msg) {
+void python_reactor::log_msg(symbol const &type, std::string const &msg) {
   syslog(type)<<msg;
 }
 
-void python_reactor::ext_use(Symbol const &tl, bool control) {
+void python_reactor::ext_use(symbol const &tl, bool control) {
   use(tl, control);
 }
 
-bool python_reactor::ext_check(Symbol const &tl) const {
+bool python_reactor::ext_check(symbol const &tl) const {
   return isExternal(tl);
 }
 
@@ -81,15 +81,15 @@ bool python_reactor::cancel_request(goal_id const &g) {
   return postRecall(g);
 }
 
-bool python_reactor::ext_unuse(Symbol const &tl) {
+bool python_reactor::ext_unuse(symbol const &tl) {
   return unuse(tl);
 }
 
-void python_reactor::int_decl(Symbol const &tl, bool control) {
+void python_reactor::int_decl(symbol const &tl, bool control) {
   provide(tl, control);
 }
 
-bool python_reactor::int_check(Symbol const &tl) const {
+bool python_reactor::int_check(symbol const &tl) const {
   return isInternal(tl);
 }
 
@@ -97,7 +97,7 @@ void python_reactor::post_obs(Observation const &obs, bool verb) {
   postObservation(obs, verb);
 }
 
-bool python_reactor::int_undecl(Symbol const &tl) {
+bool python_reactor::int_undecl(symbol const &tl) {
   return unprovide(tl);
 }
 
@@ -208,7 +208,7 @@ void python_reactor::resume() {
  * class TREX::python::python_producer
  */
 
-producer::producer(Symbol const &name)
+producer::producer(symbol const &name)
 :TeleoReactor::xml_factory::factory_type::producer(name) {
   TeleoReactor::xml_factory::factory_type::producer::notify();
 }

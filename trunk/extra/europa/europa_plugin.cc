@@ -34,7 +34,7 @@
 #include "EuropaReactor.hh"
 
 #include <trex/utils/Plugin.hh>
-#include <trex/utils/LogManager.hh>
+#include <trex/utils/log_manager.hh>
 
 using namespace TREX::europa;
 using namespace TREX::transaction;
@@ -44,7 +44,7 @@ namespace tlog=TREX::utils::log;
 
 namespace {
 
-  singleton::use<LogManager> s_log;
+  singleton::use<log_manager> s_log;
 
   TeleoReactor::xml_factory::declare<EuropaReactor> decl("EuropaReactor");
 

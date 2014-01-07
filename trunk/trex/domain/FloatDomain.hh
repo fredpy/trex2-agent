@@ -72,7 +72,7 @@ namespace TREX {
        * its value is "float" but programmers who want to use this name
        * would better use this variable in case it changes in the future
        */
-      static TREX::utils::Symbol const type_name;
+      static TREX::utils::symbol const type_name;
 
       /** @brief Constructor
        *

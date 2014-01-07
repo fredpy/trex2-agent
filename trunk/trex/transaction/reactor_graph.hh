@@ -38,6 +38,7 @@
 # include "bits/timeline.hh"
 
 # include <trex/utils/timing/posix_utils.hh>
+# include <trex/utils/shared_var.hh>
 
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>
@@ -337,7 +338,7 @@ namespace TREX {
        *
        * @return The name of the graph
        */
-      TREX::utils::Symbol const &getName() const;
+      TREX::utils::symbol const &getName() const;
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -347,7 +348,7 @@ namespace TREX {
        *
        * @post the graph is empty
        */
-      explicit graph(TREX::utils::Symbol const &name, TICK init =0, bool verbose=false);
+      explicit graph(TREX::utils::symbol const &name, TICK init =0, bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -362,7 +363,7 @@ namespace TREX {
        *
        * @sa add_reactors(ext_iterator)
        */
-      graph(TREX::utils::Symbol const &name,
+      graph(TREX::utils::symbol const &name,
 	    boost::property_tree::ptree &conf,
 	    TICK init =0, bool verbose=false);
       /** @brief Destructor
@@ -615,7 +616,7 @@ namespace TREX {
        * @sa reactor_end() const
        * @sa TeleoReactor::getName() const
        */
-      reactor_iterator find_reactor(TREX::utils::Symbol const &name) const {
+      reactor_iterator find_reactor(TREX::utils::symbol const &name) const {
 	return reactor_iterator(m_reactors.find(name));
       }
 
@@ -670,7 +671,7 @@ namespace TREX {
       bool hasTick() const;
 
       void updateTick(TICK value, bool started=true);
-      void set_name(TREX::utils::Symbol const &name);
+      void set_name(TREX::utils::symbol const &name);
 
       utils::log::stream syslog(utils::log::id_type const &context, 
                                 utils::log::id_type const &kind) const;
@@ -678,9 +679,9 @@ namespace TREX {
 	return syslog(null, kind);
       }
       
-      TREX::utils::LogManager &manager() const;
+      TREX::utils::log_manager &manager() const;
 
-      bool has_timeline(TREX::utils::Symbol const &tl) const {
+      bool has_timeline(TREX::utils::symbol const &tl) const {
 	return m_timelines.find(tl)!=m_timelines.end();
       }
 
@@ -734,12 +735,12 @@ namespace TREX {
 
     private:
       
-      bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
+      bool assign(reactor_id r, TREX::utils::symbol const &timeline,
                   details::transaction_flags const &flags);
-      bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
+      bool subscribe(reactor_id r, TREX::utils::symbol const &timeline,
 		     details::transaction_flags const &flags);
       
-      details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
+      details::timeline_set::iterator get_timeline(TREX::utils::symbol const &tl);
 
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;

@@ -81,11 +81,11 @@ namespace {
   DomainBase::xml_factory::declare<EnumDomain> decl_enum("enum");  
 }
 
-Symbol const BooleanDomain::type_name("bool");
-Symbol const IntegerDomain::type_name("int");
-Symbol const FloatDomain::type_name("float");
-Symbol const StringDomain::type_name("string");
-Symbol const EnumDomain::type_name("enum");
+symbol const BooleanDomain::type_name("bool");
+symbol const IntegerDomain::type_name("int");
+symbol const FloatDomain::type_name("float");
+symbol const StringDomain::type_name("string");
+symbol const EnumDomain::type_name("enum");
 
 double TREX::transaction::round(double d, size_t places) {
   double factor = pow(10, places);

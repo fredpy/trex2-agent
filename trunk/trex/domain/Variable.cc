@@ -65,10 +65,10 @@ DomainBase *Variable::clone
 
 Variable::Variable() {}
 
-Variable::Variable(Symbol const &name, DomainBase *dom)
+Variable::Variable(symbol const &name, DomainBase *dom)
   :m_name(name), m_domain(dom) {}
 
-Variable::Variable(Symbol const &name, DomainBase const &dom) 
+Variable::Variable(symbol const &name, DomainBase const &dom) 
   :m_name(name), m_domain(dom.copy()) {
   if( m_name.empty() )
     throw VariableException("Empty variable names are not allowed");
@@ -78,7 +78,7 @@ Variable::Variable(Variable const &other)
   :m_name(other.m_name), m_domain(clone(other.m_domain)) {}
 
 Variable::Variable(boost::property_tree::ptree::value_type &node)
-  :m_name(parse_attr<Symbol>(node.second, "name")) {
+  :m_name(parse_attr<symbol>(node.second, "name")) {
   if( m_name.empty() )
     throw XmlError(node, "Variable name is empty.");
   

@@ -45,10 +45,10 @@ using namespace TREX::Scientist;
 
 static int Horizon = 200;
 
-Symbol const Scientist::auv("auv");
-Symbol const Scientist::Sample("Sample");
+symbol const Scientist::auv("auv");
+symbol const Scientist::Sample("Sample");
 
-Symbol const Scientist::Objective("objective");
+symbol const Scientist::Objective("objective");
 std::string const Scientist::Vent1("Vent1");
 std::string const Scientist::Vent2("Vent2");
 

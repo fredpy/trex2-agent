@@ -33,7 +33,7 @@
  */
 #include "AgentLocation.hh"
 
-#include <trex/utils/LogManager.hh>
+#include <trex/utils/log_manager.hh>
 #include <trex/utils/Plugin.hh>
 
 using namespace TREX::utils;
@@ -41,7 +41,7 @@ using namespace TREX::transaction;
 using namespace TREX::AgentLocation;
 
 namespace {
-    singleton::use<LogManager> s_log;
+    singleton::use<log_manager> s_log;
     TeleoReactor::xml_factory::declare<AgentLocation> decl("AgentLocation");
 }
 

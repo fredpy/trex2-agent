@@ -38,12 +38,12 @@ using namespace TREX::transaction;
 namespace utils=TREX::utils;
 namespace tlog=utils::log;
 
-using utils::Symbol;
+using utils::symbol;
 
 namespace {
   // A reference to the LogManager singleton. So I can silently handle cases where a node
   // is not connected to a graph
-  utils::singleton::use<utils::LogManager> s_log;
+  utils::singleton::use<utils::log_manager> s_log;
 }
 
 /*
@@ -60,8 +60,8 @@ details::node_impl::~node_impl() {
 
 // public manipulators
 
-tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) const {
-  Symbol source = name();
+tlog::stream details::node_impl::syslog(symbol const &ctx, symbol const &kind) const {
+  symbol source = name();
   if( !ctx.empty() )
     source = source.str()+"."+ctx.str();
   SHARED_PTR<graph_impl> g = graph();
@@ -76,7 +76,7 @@ tlog::stream details::node_impl::syslog(Symbol const &ctx, Symbol const &kind) c
   }
 }
 
-utils::LogManager &details::node_impl::manager() const {
+utils::log_manager &details::node_impl::manager() const {
   SHARED_PTR<graph_impl> g = graph();
 
   // Following code can appear redundant but it is future proof in the sendse it
@@ -88,7 +88,7 @@ utils::LogManager &details::node_impl::manager() const {
     return *s_log;
 }
 
-void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_plan) {
+void details::node_impl::provide(symbol const &tl, bool read_only, bool publish_plan) {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
@@ -99,7 +99,7 @@ void details::node_impl::provide(Symbol const &tl, bool read_only, bool publish_
   }
 }
 
-void details::node_impl::use(Symbol const &tl, bool read_only, bool listen_plan) {
+void details::node_impl::use(symbol const &tl, bool read_only, bool listen_plan) {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {

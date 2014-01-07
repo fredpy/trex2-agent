@@ -47,9 +47,9 @@
  */ 
 // statics
 template<class CharT, class Traits, class Alloc> 
-typename BasicSymbol<CharT, Traits, Alloc>::ref_type
-BasicSymbol<CharT, Traits, Alloc>::create
-(typename BasicSymbol<CharT, Traits, Alloc>::str_type const &str) {
+typename basic_symbol<CharT, Traits, Alloc>::ref_type
+basic_symbol<CharT, Traits, Alloc>::create
+(typename basic_symbol<CharT, Traits, Alloc>::str_type const &str) {
   if( str.empty() )
     return ref_type();
   else 
@@ -57,8 +57,8 @@ BasicSymbol<CharT, Traits, Alloc>::create
 }
 
 template<class CharT, class Traits, class Alloc> 
-typename BasicSymbol<CharT, Traits, Alloc>::ref_type
-BasicSymbol<CharT, Traits, Alloc>::create(CharT const *str, size_t len) {
+typename basic_symbol<CharT, Traits, Alloc>::ref_type
+basic_symbol<CharT, Traits, Alloc>::create(CharT const *str, size_t len) {
   if( NULL==str || 0==len )
     return ref_type();
   else if( str_type::npos==len )
@@ -70,18 +70,11 @@ BasicSymbol<CharT, Traits, Alloc>::create(CharT const *str, size_t len) {
 // observers
 
 template<class CharT, class Traits, class Alloc> 
-bool BasicSymbol<CharT, Traits, Alloc>::operator< 
-(BasicSymbol<CharT, Traits, Alloc> const &other) const {
+bool basic_symbol<CharT, Traits, Alloc>::operator<
+(basic_symbol<CharT, Traits, Alloc> const &other) const {
   return !other.empty() &&
     ( empty() ||( m_name!=other.m_name &&
 		  m_name.get()<other.m_name.get() ) );
 }
-
-template<class CharT, class Traits, class Alloc> 
-size_t BasicSymbol<CharT, Traits, Alloc>::hash() const {
-  boost::hash<str_type> href;
-  return href(m_name.get());
-}
-
 
 #endif 

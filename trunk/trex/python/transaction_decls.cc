@@ -128,7 +128,7 @@ void export_transactions() {
   // from now on everything is under trex.transaction
   
   void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
-  void (Predicate::* attr_2)(Symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
+  void (Predicate::* attr_2)(symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
   
   /*
    * class predicate:
@@ -163,7 +163,7 @@ void export_transactions() {
    */
   bp::class_<Observation, observation_id, bp::bases<Predicate> >
   ("obs", "trex observation", bp::init<Predicate const &>(bp::args("pred"), "Convert pred into an observation"))
-  .def(bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+  .def(bp::init<symbol, symbol>(bp::args("timeline", "pred"),
                                 "Create new observation pred on timeline"))
   ;
   
@@ -173,7 +173,7 @@ void export_transactions() {
    *    - __init__(self, symbol, symbol)
    */
   bp::class_<Goal, goal_id, bp::bases<Predicate> >
-  ("goal", "trex goal", bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+  ("goal", "trex goal", bp::init<symbol, symbol>(bp::args("timeline", "pred"),
                                                  "Create new goal pred on timeline"));
 
   

@@ -40,7 +40,7 @@ using namespace TREX::europa;
 using namespace TREX;
 
 namespace tr=TREX::transaction;
-using TREX::utils::Symbol;
+using TREX::utils::symbol;
 
 
 /*
@@ -49,7 +49,7 @@ using TREX::utils::Symbol;
 
 // statics 
 
-Symbol const EuropaEntity::type_name("europa_object");
+symbol const EuropaEntity::type_name("europa_object");
 
 /*
  * class TREX::europa::details::EuropaDomain
@@ -57,7 +57,7 @@ Symbol const EuropaEntity::type_name("europa_object");
 
 // statics 
 
-Symbol const details::EuropaDomain::type_name("europa_domain");
+symbol const details::EuropaDomain::type_name("europa_domain");
 
 EUROPA::Domain *details::EuropaDomain::safe_copy(EUROPA::Domain *dom) {
   if( NULL!=dom ) 

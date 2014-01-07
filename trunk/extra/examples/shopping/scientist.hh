@@ -67,12 +67,12 @@ namespace TREX {
       bool synchronize();
 
       /** @brief Name of the timeline auv */
-      static TREX::utils::Symbol const auv;
+      static TREX::utils::symbol const auv;
       /** @brief Name of the predicate Sample */
-      static TREX::utils::Symbol const Sample;
+      static TREX::utils::symbol const Sample;
 
       /** @brief Name of the pred for Locations */
-      static TREX::utils::Symbol const Objective;
+      static TREX::utils::symbol const Objective;
       /** @brief Name of the Locations */
       static std::string const Vent1;
       static std::string const Vent2;

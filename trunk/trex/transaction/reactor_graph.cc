@@ -62,7 +62,7 @@ namespace {
 
     ~DateHandler() {} 
 
-    DateHandler(utils::Symbol const &tag, graph const &owner)
+    DateHandler(utils::symbol const &tag, graph const &owner)
     :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
@@ -93,7 +93,7 @@ namespace {
   public:
     ~DurationHandler() {} 
 
-    DurationHandler(utils::Symbol const &tag, graph const &owner)
+    DurationHandler(utils::symbol const &tag, graph const &owner)
     :base_class(tag), m_owner(owner) {
       base_class::notify();
     }
@@ -161,7 +161,7 @@ graph::graph()
 #endif
 {}
 
-graph::graph(utils::Symbol const &name, TICK init, bool verbose)
+graph::graph(utils::symbol const &name, TICK init, bool verbose)
 #ifdef WITH_MAKE_SHARED
 :m_impl(boost::make_shared<details::graph_impl>(name))
 #else 
@@ -170,7 +170,7 @@ graph::graph(utils::Symbol const &name, TICK init, bool verbose)
 , m_currentTick(init)
 , m_verbose(verbose) {}
 
-graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
+graph::graph(utils::symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
 #ifdef WITH_MAKE_SHARED
 :m_impl(boost::make_shared<details::graph_impl>(name))
@@ -187,8 +187,8 @@ graph::~graph() {
   manager().flush();
 }
 
-TREX::utils::log::stream graph::syslog(utils::Symbol const &context,
-    utils::Symbol const &kind) const {
+TREX::utils::log::stream graph::syslog(utils::symbol const &context,
+    utils::symbol const &kind) const {
   return m_impl->syslog(context, kind);
 }
 
@@ -206,11 +206,11 @@ std::string graph::duration_str(TICK dur) const {
   return date_str(dur);
 }
 
-TREX::utils::Symbol const &graph::getName() const {
+TREX::utils::symbol const &graph::getName() const {
   return m_impl->name();
 }
 
-void graph::set_name(TREX::utils::Symbol const &name) {
+void graph::set_name(TREX::utils::symbol const &name) {
   m_impl->name(name);
 }
 
@@ -240,7 +240,7 @@ boost::asio::strand &graph::strand() {
   return m_impl->strand();
 }
 
-TREX::utils::LogManager &graph::manager() const {
+TREX::utils::log_manager &graph::manager() const {
   return m_impl->manager();
 }
 
@@ -334,7 +334,7 @@ size_t graph::cleanup() {
   return ret;
 }  
 
-details::timeline_set::iterator graph::get_timeline(utils::Symbol const &tl) {
+details::timeline_set::iterator graph::get_timeline(utils::symbol const &tl) {
   details::timeline *cand = new details::timeline(m_currentTick, tl);
   std::pair<details::timeline_set::iterator, bool>
   ret = m_timelines.insert(cand);
@@ -354,7 +354,7 @@ graph::size_type graph::count_relations() const {
 }
 
 
-bool graph::assign(graph::reactor_id r, utils::Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::assign(graph::reactor_id r, utils::symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     internal_check(r, **tl);
@@ -364,7 +364,7 @@ bool graph::assign(graph::reactor_id r, utils::Symbol const &timeline, details::
   }
 }
 
-bool graph::subscribe(reactor_id r, utils::Symbol const &timeline, details::transaction_flags const &flags) {
+bool graph::subscribe(reactor_id r, utils::symbol const &timeline, details::transaction_flags const &flags) {
   details::timeline_set::iterator tl = get_timeline(timeline);
   try {
     external_check(r, **tl);

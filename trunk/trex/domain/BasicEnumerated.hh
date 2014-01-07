@@ -165,7 +165,7 @@ namespace TREX {
 
       virtual void addTextValue(std::string const &val) =0;
     protected:
-      explicit BasicEnumerated(TREX::utils::Symbol const &type) 
+      explicit BasicEnumerated(TREX::utils::symbol const &type) 
 	:DomainBase(type) {}
       explicit BasicEnumerated(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}

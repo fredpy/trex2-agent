@@ -121,7 +121,7 @@ namespace TREX {
        *
        * @post the agent has no reactor
        */
-      explicit Agent(TREX::utils::Symbol const &name,
+      explicit Agent(TREX::utils::symbol const &name,
 		     TREX::transaction::TICK final = 0,
 		     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Constructor

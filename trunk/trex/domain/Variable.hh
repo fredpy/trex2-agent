@@ -108,7 +108,7 @@ namespace TREX {
        * @throw VariableException Tried to create a variable with an
        * empty name
        */
-      Variable(TREX::utils::Symbol const &name,
+      Variable(TREX::utils::symbol const &name,
 	       DomainBase const &domain);
       /** @brief Constructor
        * @brief var Another instance
@@ -165,7 +165,7 @@ namespace TREX {
        * @return the name of this variable
        * @sa bool isComplete() const
        */
-      TREX::utils::Symbol const &name() const {
+      TREX::utils::symbol const &name() const {
 	return m_name;
       }
 
@@ -290,7 +290,7 @@ namespace TREX {
     private:
       typedef DomainBase::xml_factory::returned_type domain_ptr;
       /** @brief varaible name */
-      TREX::utils::Symbol m_name;
+      TREX::utils::symbol m_name;
       /** @brief Variable domain */
       domain_ptr m_domain;
 
@@ -312,7 +312,7 @@ namespace TREX {
        * This constructor is used internally to create a variable
        * from a domain that has already been allocated
        */
-      explicit Variable(TREX::utils::Symbol const &name,
+      explicit Variable(TREX::utils::symbol const &name,
 			DomainBase *domain = NULL);
       friend class Predicate;
       

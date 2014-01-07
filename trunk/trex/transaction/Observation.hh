@@ -82,8 +82,8 @@ namespace TREX {
        * Create a new instance connected to timeline @a object with the
        * state @a pred and all its attributes not constrained.
        */
-      Observation(TREX::utils::Symbol const &obj,
-		  TREX::utils::Symbol const &pred)
+      Observation(TREX::utils::symbol const &obj,
+		  TREX::utils::symbol const &pred)
 	:Predicate(obj, pred) {}
       /** @brief XML parsing constructor
        * @param node An XML node
@@ -107,7 +107,7 @@ namespace TREX {
       /** brief Destructor */
       ~Observation() {}
     private:
-      TREX::utils::Symbol const &getPredTag() const;
+      TREX::utils::symbol const &getPredTag() const;
 
     }; // TREX::transaction::Observation
 

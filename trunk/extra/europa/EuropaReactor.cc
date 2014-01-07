@@ -140,7 +140,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     syslog(null, error)<<"Planner config file name is empty.";
     throw XmlError(cfg, "Attribute "+attr+" is not a valid file name.");
   }
-  planner_cfg = manager().use(*tmp, found);
+  planner_cfg = manager().use(*tmp, found).string();
   if( !found ) {
     syslog(null, error)<<"Unable to locate planner cfg file \""<<*tmp<<"\"";
     throw ReactorException(*this, "Unable to locate planner cfg \""+(*tmp)+"\"");
@@ -151,7 +151,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     syslog(null, warn)<<"Did not find synch_cfg attribute. Will use plan_cfg instead.";
     synch_cfg = planner_cfg;
   } else {
-    synch_cfg = manager().use(*tmp, found);
+    synch_cfg = manager().use(*tmp, found).string();
     if( !found ) {
       syslog(null, error)<<"Unable to locate synch cfg file \""<<*tmp<<"\"";
       throw ReactorException(*this, "Unable to locate synch cfg \""+(*tmp)+"\"");
@@ -175,7 +175,7 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     for(std::list<EUROPA::ObjectId>::const_iterator o=objs.begin();
 	objs.end()!=o; ++o) {
       EUROPA::LabelStr name = (*o)->getName(), mode_val;
-      Symbol trex_name(name.c_str());
+      symbol trex_name(name.c_str());
       EUROPA::ConstrainedVariableId o_mode = mode(*o);
       
       if( !o_mode->lastDomain().isSingleton() )
@@ -333,7 +333,7 @@ void EuropaReactor::handleTickStart() {
 bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
                              EUROPA::TokenId const &tok) {
   if( m_dispatched.left.find(tok->getKey())==m_dispatched.left.end() ) {
-    TREX::utils::Symbol name(tl->getName().toString());
+    TREX::utils::symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
@@ -375,7 +375,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId const &tok)
 {
   if( m_plan_tokens.left.find(tok->getKey()) == m_plan_tokens.left.end() ) {
-    TREX::utils::Symbol name(tl->getName().toString());
+    TREX::utils::symbol name(tl->getName().toString());
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     restrict_goal(my_goal, tok);
 
@@ -723,10 +723,10 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
 bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 				   Predicate const &pred) {
   bool no_empty = true;
-  std::list<Symbol> attrs;
+  std::list<symbol> attrs;
   pred.listAttributes(attrs, false);
 
-  for(std::list<Symbol>::const_iterator v=attrs.begin(); attrs.end()!=v; ++v) {
+  for(std::list<symbol>::const_iterator v=attrs.begin(); attrs.end()!=v; ++v) {
     EUROPA::ConstrainedVariableId param = tok->getVariable(v->str());
 
     if( param.isId() ) {
@@ -776,14 +776,14 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
   } else 
     name = base_name;
   
-  LogManager::path_type full_name = file_name(name+".dot");
+  log_manager::path_type full_name = file_name(name+".dot");
   utils::async_ofstream out(manager().service(), full_name.string());
   {
     utils::async_ofstream::entry e = out.new_entry();
     print_plan(e.stream(), m_old_plan_style);
   }
   if( m_full_log ) {
-    LogManager::path_type link_name = file_name(base_name+".dot");
+    log_manager::path_type link_name = file_name(base_name+".dot");
     if( exists(link_name) ) 
       remove(link_name);
     create_symlink(full_name, link_name);

@@ -125,7 +125,7 @@ Clock::duration_type Clock::doSleep() {
   return delay;
 }
 
-TREX::utils::log::stream Clock::syslog(utils::Symbol const &kind) const {
+TREX::utils::log::stream Clock::syslog(utils::symbol const &kind) const {
   if( m_started )
     return m_log->syslog(m_last, "clock", kind);
   else 

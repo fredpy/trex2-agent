@@ -176,8 +176,8 @@ void out_file::operator()(entry::pointer msg) {
 // structors 
 
 log_pipe::log_pipe(text_log &log, std::ostream &os, 
-		   TREX::utils::Symbol const &who,
-                   TREX::utils::Symbol const &what)
+		   TREX::utils::symbol const &who,
+                   TREX::utils::symbol const &what)
   :m_who(who), m_what(what), m_log(log.m_new_log), m_dest(os), m_flush(log.service()) {
   m_initial = m_dest.rdbuf();
   m_me = new boost::iostreams::stream_buffer<pipe_sink>(*this);

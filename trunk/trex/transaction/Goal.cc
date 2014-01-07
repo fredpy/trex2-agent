@@ -57,9 +57,9 @@ namespace {
 
 IntegerDomain const Goal::s_dateDomain;
 IntegerDomain const Goal::s_durationDomain(1, IntegerDomain::plus_inf);
-Symbol const Goal::s_startName("start");
-Symbol const Goal::s_durationName("duration");
-Symbol const Goal::s_endName("end"); 
+symbol const Goal::s_startName("start");
+symbol const Goal::s_durationName("duration");
+symbol const Goal::s_endName("end");
 
 // structors :
 
@@ -75,7 +75,7 @@ m_end(s_endName, s_dateDomain) {
 }
 
 
-Goal::Goal(Symbol const &object, Symbol const &pred)
+Goal::Goal(symbol const &object, symbol const &pred)
   :Predicate(object, pred), m_start(s_startName, s_dateDomain), 
    m_duration(s_durationName, s_durationDomain), 
    m_end(s_endName, s_dateDomain) {}
@@ -121,7 +121,7 @@ Goal::Goal(boost::property_tree::ptree::value_type &node)
 // Modifiers :
 
 void Goal::restrictAttribute(Variable const &var) {
-  Symbol const &id = var.name();
+  symbol const &id = var.name();
   // Handle specific temporal attributes
   if( s_startName==id )
     restrictStart(var.typedDomain<IntegerDomain>());
@@ -221,7 +221,7 @@ bool Goal::startsAfter(TICK date, TICK delay) {
 
 // Observers :
 
-Variable const &Goal::getAttribute(Symbol const &name) const {
+Variable const &Goal::getAttribute(symbol const &name) const {
   if( s_startName==name )
     return m_start;
   else if( s_durationName==name ) 
@@ -245,7 +245,7 @@ IntegerDomain const &Goal::getEnd() const {
 }
 
 
-void Goal::listAttributes(std::list<TREX::utils::Symbol> &attr,
+void Goal::listAttributes(std::list<TREX::utils::symbol> &attr,
 			  bool all) const {
   if( all || !m_start.domain().isFull() )
     attr.push_back(s_startName);
@@ -256,7 +256,7 @@ void Goal::listAttributes(std::list<TREX::utils::Symbol> &attr,
   Predicate::listAttributes(attr, all);
 }
   
-Symbol const &Goal::getPredTag() const {
-  static Symbol const name("Goal");
+symbol const &Goal::getPredTag() const {
+  static symbol const name("Goal");
   return name;
 }

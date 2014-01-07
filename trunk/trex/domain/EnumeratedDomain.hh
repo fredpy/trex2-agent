@@ -105,7 +105,7 @@ namespace TREX {
        *
        * Create a new instance as a full domain of type @e type.
        */
-      explicit EnumeratedDomain(TREX::utils::Symbol const &type)
+      explicit EnumeratedDomain(TREX::utils::symbol const &type)
       :BasicEnumerated(type) {}
       /** @brief Constructor
        * @tparam Iter an iterator type
@@ -122,7 +122,7 @@ namespace TREX {
        * @throw EmptyDomain the created domain is empty
        */
       template<class Iter>
-      EnumeratedDomain(TREX::utils::Symbol const &type,
+      EnumeratedDomain(TREX::utils::symbol const &type,
                        Iter from, Iter to)
       :BasicEnumerated(type), m_elements(from, to) {
         if( m_elements.empty() )
@@ -136,7 +136,7 @@ namespace TREX {
        * Create a new instance of type @e type containing only the element
        * @e val
        */
-      explicit EnumeratedDomain(TREX::utils::Symbol const &type,
+      explicit EnumeratedDomain(TREX::utils::symbol const &type,
                                 Ty const &val)
       :BasicEnumerated(type) {
         add(val);

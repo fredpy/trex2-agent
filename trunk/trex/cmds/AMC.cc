@@ -107,7 +107,7 @@ namespace {
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
-  singleton::use<LogManager> amc_log;
+  singleton::use<log_manager> amc_log;
   UNIQ_PTR<Agent> my_agent;
  
 }
@@ -117,7 +117,7 @@ namespace {
 extern "C" {
   
   void amc_cleanup(int sig) {
-    singleton::use<LogManager> amc_log;
+    singleton::use<log_manager> amc_log;
     
     boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
     
@@ -131,7 +131,7 @@ extern "C" {
   }
   
   void amc_terminate() {
-    singleton::use<LogManager> amc_log;
+    singleton::use<log_manager> amc_log;
     
     amc_log->syslog("amc", error)<<" Received a terminate";
     amc_log->flush();
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
     for(std::vector<std::string>::const_iterator i=incs.begin();
         incs.end()!=i; ++i) {
-      if( amc_log->addSearchPath(*i) )
+      if( amc_log->add_search_path(*i) )
         amc_log->syslog("amc", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
@@ -287,9 +287,9 @@ int main(int argc, char *argv[]) {
   
   // Initialize all the log environment
   if( opt_val.count("log-dir") )
-    amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
+    amc_log->log_path(opt_val["log-dir"].as<std::string>());
   // Create log directory and all
-  amc_log->logPath();
+  amc_log->log_path();
   
 
 #ifdef DAEMON

@@ -59,7 +59,7 @@ namespace TREX {
        * The type used to identify the type of log message
        * @ingroup utils
        */
-      typedef Symbol id_type;
+      typedef symbol id_type;
       class stream;
       
       extern id_type const null; //!< Untyped log message

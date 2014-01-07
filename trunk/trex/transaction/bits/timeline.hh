@@ -64,7 +64,7 @@ namespace TREX {
       class timeline {
       public:
 	typedef timeline      base_type;
-	typedef utils::Symbol id_type;
+	typedef utils::symbol id_type;
 
 	/** @brief Timline symbolic name
 	 *
@@ -92,7 +92,7 @@ namespace TREX {
 	 *
 	 * @sa owned() const
 	 */
-	timeline(TICK date, utils::Symbol const &name);
+	timeline(TICK date, utils::symbol const &name);
 	/** @brief Constructor
 	 * @param[in] date The current tick
 	 * @param[in] name A symbolic name
@@ -107,7 +107,7 @@ namespace TREX {
 	 * @sa owned() const
 	 * @sa owner() const
 	 */
-	timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, 
+	timeline(TICK date, utils::symbol const &name, TeleoReactor &serv,
                  transaction_flags const &flags);
 	/** @brief Destructor */
 	~timeline();
@@ -118,7 +118,7 @@ namespace TREX {
 	 *
 	 * @return The name of this timeline
 	 */
-	utils::Symbol const &name() const {
+	utils::symbol const &name() const {
 	  return m_name;
 	}
 
@@ -460,7 +460,7 @@ namespace TREX {
          * 
          * The name identifier for this timeline. 
          */
-	utils::Symbol m_name;
+	utils::symbol m_name;
         /** @brief owner of the timeline 
          *
          * A pointer to the reactor currently decalring this timeline as 
@@ -513,7 +513,7 @@ namespace TREX {
 	 *
 	 * @sa unassign(TICK,bool,bool)
 	 */
-	static utils::Symbol const  s_failed;
+	static utils::symbol const  s_failed;
 	
 	friend class TREX::transaction::TeleoReactor;
 	friend class TREX::transaction::Relation;

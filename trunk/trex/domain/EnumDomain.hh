@@ -61,15 +61,15 @@ namespace TREX {
      * @ingroup domains
      */
     class EnumDomain 
-      :public TREX::transaction::EnumeratedDomain<TREX::utils::Symbol> {
+      :public TREX::transaction::EnumeratedDomain<TREX::utils::symbol> {
     public:
-      static TREX::utils::Symbol const type_name;
+      static TREX::utils::symbol const type_name;
       /** @brief Default Constructor 
        * 
        * Creates a new full string domain.
        */
       EnumDomain() 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::Symbol>(type_name) {}
+	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name) {}
       /** @brief Constructor
        * 
        * @tparam a C++ iterator type
@@ -85,14 +85,14 @@ namespace TREX {
        */
       template<class Iter>
       EnumDomain(Iter from, Iter to) 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::Symbol>(type_name, from, to) {}
+	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name, from, to) {}
       /** @brief Constructor
        * @param val a value
        *
        * Create a new domain with the single value @e val
        */
-      EnumDomain(TREX::utils::Symbol const &val) 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::Symbol>(type_name, val) {}
+      EnumDomain(TREX::utils::symbol const &val)
+	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name, val) {}
       /** @brief XML parsing constructor
        *
        * @param node an XML node
@@ -114,7 +114,7 @@ namespace TREX {
        *@endcode
        */
       explicit EnumDomain(boost::property_tree::ptree::value_type &node) 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::Symbol>(node) {}
+	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(node) {}
 
       /** @brief Destructor */
       ~EnumDomain() {}

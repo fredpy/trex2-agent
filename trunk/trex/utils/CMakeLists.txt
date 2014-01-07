@@ -60,7 +60,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_library(TREXutils SHARED
   # real source
   Exception.cc
-  LogManager.cc
+  log_manager.cc
   Pdlfcn.cc
   PluginLoader.cc
   TREXversion.cc
@@ -83,9 +83,8 @@ add_library(TREXutils SHARED
   bits/asio_signal_template.hh
   Exception.hh
   Factory.hh
-  Hashable.hh
   id_mapper.hh
-  LogManager.hh
+  log_manager.hh
   Plugin.hh
   PluginLoader.hh
   shared_var.hh

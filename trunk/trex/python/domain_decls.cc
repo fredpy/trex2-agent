@@ -49,7 +49,7 @@ namespace tt=TREX::transaction;
 namespace {
   
   struct domain_wrapper:tt::DomainBase, wrapper<tt::DomainBase> {
-    domain_wrapper(tu::Symbol const &name)
+    domain_wrapper(tu::symbol const &name)
     :TREX::transaction::DomainBase(name) {}
     ~domain_wrapper() {}
     
@@ -108,7 +108,7 @@ namespace {
   
   
   struct interval_wrap:tt::BasicInterval, wrapper<tt::BasicInterval> {
-    interval_wrap(tu::Symbol const &type):tt::BasicInterval(type) {}
+    interval_wrap(tu::symbol const &type):tt::BasicInterval(type) {}
     
     tt::DomainBase *copy() const {
       return this->get_override("copy")();
@@ -167,7 +167,7 @@ namespace {
   };
   
   struct enum_wrap: tt::BasicEnumerated, wrapper<tt::BasicEnumerated> {
-    enum_wrap(tu::Symbol const &type):tt::BasicEnumerated(type) {}
+    enum_wrap(tu::symbol const &type):tt::BasicEnumerated(type) {}
     
     tt::DomainBase *copy() const {
       return this->get_override("copy")();
@@ -256,7 +256,7 @@ void export_domain() {
   //    - xml()             gives xml repredsentation
   //    - __str__()         gives the string representation
   class_<domain_wrapper, boost::noncopyable>("domain", "Abstract trex domain",
-                                             init<tu::Symbol>())
+                                             init<tu::symbol>())
   .def("type", &tt::DomainBase::getTypeName, return_internal_reference<>())
   .def("is_interval", pure_virtual(&tt::DomainBase::isInterval))
   .def("is_enumerated", pure_virtual(&tt::DomainBase::isEnumerated))
@@ -279,7 +279,7 @@ void export_domain() {
   //    - has_upper() check if interval has a non infinite upper bound
   class_<interval_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("interval", "Abstract trex interval",
-                             init<tu::Symbol>())
+                             init<tu::symbol>())
   .def("has_lower", pure_virtual(&tt::BasicInterval::hasLower))
   .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper))
   ;
@@ -318,7 +318,7 @@ void export_domain() {
   //   - __len__()    number of elements
   class_<enum_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("enumerated", "Abstract trex Enumerated domain",
-                             init<tu::Symbol>())
+                             init<tu::symbol>())
   .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize))
   // TODO need to implement __iter__
   ;
@@ -341,8 +341,8 @@ void export_domain() {
   //    - __init__(trex.utils.symbol) create a domain with the single value arg
   //    - __init__(collection)        create a domain with the elements given in collection
   class_<tt::EnumDomain, bases<tt::BasicEnumerated> >("enum", "enum domain", init<>())
-  .def(init<tu::Symbol>())
-  .def("__init__", &collection_init<tt::EnumDomain, tu::Symbol>)
+  .def(init<tu::symbol>())
+  .def("__init__", &collection_init<tt::EnumDomain, tu::symbol>)
   ;
   
   tt::Variable &(tt::Variable::* restrict_domain)(tt::DomainBase const &) = &tt::Variable::restrict;
@@ -357,7 +357,7 @@ void export_domain() {
   //    - restrict(var) restrict variable with var.domain()
   //    - xml()     xml representation
   //    - __str__() string representation
-  class_<tt::Variable>("var", "trex variable", init<tu::Symbol, tt::DomainBase const &>())
+  class_<tt::Variable>("var", "trex variable", init<tu::symbol, tt::DomainBase const &>())
   .def("name", &tt::Variable::name, return_internal_reference<>())
   .def("domain", &tt::Variable::domain, return_internal_reference<>())
   .def("restrict", restrict_domain, return_internal_reference<>())
