@@ -73,6 +73,7 @@ add_library(TREXutils SHARED
   singleton/dummy.cc
   singleton/server.cc
   timing/cpu_clock.cc
+  timing/posix_utils.cc
   # headers
   asio_fstream.hh
   asio_signal.hh
@@ -88,7 +89,6 @@ add_library(TREXutils SHARED
   Plugin.hh
   PluginLoader.hh
   shared_var.hh
-  StringExtract.hh
   Symbol.hh
   TREXversion.hh
   XmlFactory.hh
@@ -182,6 +182,7 @@ source_group("Source\ Files\\singleton" FILES
 
 source_group("Source\ Files\\timing" FILES
   timing/cpu_clock.cc
+  timing/posix_utils.cc
 )
 
 source_group("Header\ Files\\bits" FILES 

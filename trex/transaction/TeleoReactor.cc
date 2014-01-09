@@ -356,13 +356,13 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
       if( utils::is_tag(*i, "External") ) {
         tl_name = utils::parse_attr<symbol>(*i, "name");
         if( tl_name.empty() )
-          throw utils::XmlError(*i, "Timelines cannot have an empty name");
+          boost::property_tree::ptree_bad_data("Timelines cannot have an empty name", *i);
         use(tl_name, utils::parse_attr<bool>(true, *i, "goals"),
             utils::parse_attr<bool>(false, *i, "listen"));
       } else if( utils::is_tag(*i, "Internal") ) {
         tl_name = utils::parse_attr<symbol>(*i, "name");
         if( tl_name.empty() )
-          throw utils::XmlError(*i, "Timelines cannot have an empty name");
+          throw boost::property_tree::ptree_bad_data("Timelines cannot have an empty name", *i);
         provide(tl_name);
       }
     }

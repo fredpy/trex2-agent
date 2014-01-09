@@ -122,7 +122,7 @@ std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
 
 
 void BooleanDomain::parseSingleton(std::string const &val) {
-  int v = string_cast<int>(val);
+  int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( m_full ) {
     m_full = false;
@@ -133,7 +133,7 @@ void BooleanDomain::parseSingleton(std::string const &val) {
 }
 
 void BooleanDomain::parseLower(std::string const &val) {
-  int v = string_cast<int>(val);
+  int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( bv ) {
     if( m_full ) {
@@ -146,7 +146,7 @@ void BooleanDomain::parseLower(std::string const &val) {
 
 
 void BooleanDomain::parseUpper(std::string const &val)  {
-  int v = string_cast<int>(val);
+  int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( !bv ) {
     if( m_full ) {

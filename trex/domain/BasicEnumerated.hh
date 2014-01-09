@@ -143,7 +143,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else
-            return TREX::utils::string_cast<Ty>(getStringValue(n));
+            return boost::lexical_cast<Ty>(getStringValue(n));
 	} else 
 	  return boost::any_cast<Ty>(val);
       }

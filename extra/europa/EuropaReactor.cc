@@ -96,10 +96,10 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
   // Load the specified model
   if( model ) {
     if( model->empty() )
-      throw XmlError(cfg, "Attribute \"model\" is empty.");
+      boost::property_tree::ptree_bad_data("Attribute \"model\" is empty.", cfg);
     nddl = *model;
     if( !locate_nddl(nddl) )
-      throw XmlError(cfg, "Unable to locate model file \""+(*model)+"\"");
+      throw boost::property_tree::ptree_bad_data("Unable to locate model file \""+(*model)+"\"", cfg);
   } else {
     std::string short_nddl = getName().str()+".nddl",
       long_nddl = getGraphName().str()+"."+short_nddl;
@@ -134,11 +134,11 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     attr = "solverConfig";
     tmp = parse_attr< boost::optional<std::string> >(cfg, attr);
     if( !tmp )
-      throw XmlError(cfg, "Missing plan_cfg file attribute");
+      throw boost::property_tree::ptree_bad_data("Missing plan_cfg file attribute", cfg);
   }
   if( tmp->empty() ) {
     syslog(null, error)<<"Planner config file name is empty.";
-    throw XmlError(cfg, "Attribute "+attr+" is not a valid file name.");
+    throw boost::property_tree::ptree_bad_data("Attribute "+attr+" is not a valid file name.", cfg);
   }
   planner_cfg = manager().use(*tmp, found).string();
   if( !found ) {
@@ -750,14 +750,14 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 // Observers
 
 EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
-  typedef chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
-  return convert::to_chrono(tickToTime(EUROPA::cast_basis(tick))-boost::posix_time::from_time_t(0)).count();
+  return tickToTime(EUROPA::cast_basis(tick)).since_epoch().to_chrono<duration_type>().count();
 }
 
 EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
-  typedef chrono_posix_convert< CHRONO::duration<EUROPA::edouble::basis_type> > convert;
-  convert::chrono_duration rdate(EUROPA::cast_basis(date));
-  return static_cast<EUROPA::eint::basis_type>(timeToTick(boost::posix_time::from_time_t(0)+convert::to_posix(rdate)));
+  CHRONO::duration<EUROPA::edouble::basis_type> rdate(EUROPA::cast_basis(date));
+  utils::rt_duration delta(rdate);
+  
+  return static_cast<EUROPA::eint::basis_type>(timeToTick(date_type::epoch().add(delta)));
 }
 
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {

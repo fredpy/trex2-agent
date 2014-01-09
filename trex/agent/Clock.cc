@@ -85,7 +85,7 @@ void Clock::doStart() {
   m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
   m_first = true;
   syslog(TREX::utils::log::info)<<"Clock started at "<<epoch()
-  <<' '<<epoch().zone_name()
+  <<' '<<epoch().value.zone_name()
     <<"\n\t"<<info();
 }
 

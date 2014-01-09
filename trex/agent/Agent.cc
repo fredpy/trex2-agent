@@ -678,27 +678,23 @@ void Agent::subConf(boost::property_tree::ptree &conf,
 
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") )
-    throw XmlError(config, "Not an Agent node");
+    throw boost::property_tree::ptree_bad_data("Not an Agent node", config);
   // Extract attributes
-  try {
-    symbol name(parse_attr<std::string>(config, "name"));
+  symbol name(parse_attr<std::string>(config, "name"));
 
-    if( name.empty() )
-      throw XmlError(config, "Agent name is empty.");
-    set_name(name);
+  if( name.empty() )
+    throw boost::property_tree::ptree_bad_data("Agent name is empty.", config);
+  set_name(name);
     
-    m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
-    if( m_finalTick<=0 )
-      throw XmlError(config, "agent life time should be greater than 0");
-  } catch(bad_string_cast const &e) {
-    throw XmlError(config, e.what());
-  }
+  m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
+  if( m_finalTick<=0 )
+    throw boost::property_tree::ptree_bad_data("agent life time should be greater than 0", config);
   // Populate with external configuration
   ext_xml(config.second, "config");
 
   // Now iterate through the sub-tags
   if( config.second.empty() )
-    throw XmlError(config, "Agent node does not have sub nodes.");
+    throw boost::property_tree::ptree_bad_data("Agent node does not have sub nodes.", config);
 
   subConf(config.second, "");
   syslog(null, info)<<"End of init.";

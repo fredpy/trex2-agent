@@ -100,24 +100,21 @@ namespace {
 
   private:
     base_class::result_type produce(base_class::argument_type arg) const {
-      boost::optional<boost::posix_time::time_duration> 
-      min = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "min"),
-      max = utils::parse_attr< boost::optional<boost::posix_time::time_duration> >(arg.second, "max");
+      boost::optional<utils::rt_duration>
+      min = utils::parse_attr< boost::optional<utils::rt_duration> >(arg.second, "min"),
+      max = utils::parse_attr< boost::optional<utils::rt_duration> >(arg.second, "max");
       IntegerDomain::bound lo(IntegerDomain::minus_inf), 
           hi(IntegerDomain::plus_inf);
-      CHRONO::duration<double> 
-      ratio = m_owner.tickDuration();
-      typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
+      CHRONO::duration<double> ratio = m_owner.tickDuration();
+      
       if( min ) {
-        CHRONO::duration<double> min_s(cvt::to_chrono(*min));
-
-        double value = min_s.count()/ratio.count();
-        lo = static_cast<long long>(std::floor(value));
-      } if( max ) {
-        CHRONO::duration<double> max_s(cvt::to_chrono(*max));
-
-        double value = max_s.count()/ratio.count();
-        hi = static_cast<long long>(std::ceil(value));
+        CHRONO::duration<double> min_s = min->to_chrono< CHRONO::duration<double> >();
+        lo = static_cast<long long>(std::floor(min_s.count()/ratio.count()));
+      }
+      if( max ) {
+        CHRONO::duration<double> max_s = max->to_chrono< CHRONO::duration<double> >();
+        lo = static_cast<long long>(std::ceil(max_s.count()/ratio.count()));
+        
       }
       return result_type(new IntegerDomain(lo, hi));
     }
@@ -433,18 +430,17 @@ namespace TREX {
 }
 
 TICK graph::as_date(std::string const &str) const {
-  return timeToTick(utils::string_cast<date_type>(str));
+  return timeToTick(boost::lexical_cast<date_type>(str));
 }
 
 TICK graph::as_duration(std::string const &str, bool up) const {
-  boost::posix_time::time_duration
-    dur=utils::string_cast<boost::posix_time::time_duration>(str);
-  typedef TREX::utils::chrono_posix_convert< CHRONO::duration<double> > cvt;
-
-  CHRONO::duration<double> ratio = tickDuration(), val(cvt::to_chrono(dur));
+  utils::rt_duration tmp = boost::lexical_cast<utils::rt_duration>(str);
+  
+  CHRONO::duration<double> ratio = tickDuration(),
+  val = tmp.to_chrono< CHRONO::duration<double> >();
   
   double value = val.count()/ratio.count();
-  
+    
   if( up )
     return static_cast<TICK>(std::ceil(value));
   else

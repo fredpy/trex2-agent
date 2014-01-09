@@ -1,3 +1,4 @@
+/* -*- C++ -*- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -35,7 +36,7 @@
 # error "Cannot include tcc files outside of their corresponding header"
 #else
 
-#include "wrapper.hh"
+# include "wrapper.hh"
 
 namespace TREX {
   namespace utils {

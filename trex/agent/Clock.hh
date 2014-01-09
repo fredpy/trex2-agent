@@ -93,7 +93,6 @@ namespace TREX {
       }; // TREX::agent::Clock::Error
             
       typedef transaction::graph::duration_type          duration_type;
-      typedef utils::chrono_posix_convert<duration_type> dur_converter;
       typedef transaction::graph::date_type              date_type;
     
       /** @brief Destructor */
@@ -137,10 +136,11 @@ namespace TREX {
 	return CHRONO::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
-        return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
-      }	
+        return initialTick()+(date.since(epoch()).to_chrono<duration_type>().count()/tickDuration().count());
+      }
       virtual date_type tickToTime(TREX::transaction::TICK cur) const {
-        return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
+        utils::rt_duration delta(tickDuration()*(cur-initialTick()));
+        return epoch().add(delta);
       }
       
       /** @brief Sleep until next tick

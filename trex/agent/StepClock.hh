@@ -46,7 +46,6 @@
 
 # include "Clock.hh"
 # include <trex/utils/log_manager.hh>
-# include <trex/utils/StringExtract.hh>
 
 namespace TREX {
   namespace agent {

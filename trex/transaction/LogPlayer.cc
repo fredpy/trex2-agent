@@ -552,8 +552,8 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
     for(boost::property_tree::ptree::iterator j=i->second.begin();
 	i->second.end()!=j; ++j) {
       if( s_init==j->first ) {
-	if( !first ) 
-	  throw utils::XmlError(*j, s_init.str()+" tag can only be the first phase.");
+	if( !first )
+          throw boost::property_tree::ptree_bad_data(s_init.str()+" tag can only be the first phase.", *j);
       } else if( "<xmlattr>"==j->first )
 	continue;
       else if( s_new_tick!=j->first &&
@@ -737,20 +737,21 @@ tr_goal_event::tr_goal_event(tr_goal_event::factory::argument_type const &arg,
   std::string id = utils::parse_attr<std::string>(factory::node(arg), "id");
   
   if( id.empty() )
-    throw utils::XmlError(factory::node(arg), "id attribute is empty.");
+    throw boost::property_tree::ptree_bad_data("id attribute is empty.",
+                                               factory::node(arg));
   
   if( build ) {
     boost::property_tree::ptree::assoc_iterator
       desc = factory::node(arg).second.find("Goal");
     if( factory::node(arg).second.not_found()==desc )
-      throw utils::XmlError(factory::node(arg),
-		     "Unable to find token description.");
+      throw boost::property_tree::ptree_bad_data("Unable to find token description.", factory::node(arg));
     m_goal.reset(new Goal(*desc));
     set_goal(id, m_goal);
   } else {
     m_goal = get_goal(id);
     if( !m_goal )
-      throw utils::XmlError(factory::node(arg),
-		     "Unable to find goal for id \""+id+"\".");
+      throw boost::property_tree::ptree_bad_data(
+		     "Unable to find goal for id \""+id+"\".",
+                                                 factory::node(arg));
   }
 }

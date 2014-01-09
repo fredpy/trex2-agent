@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
         }
       } else if( 'G'==cmd ) {
 	try {
-	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
+	  TICK targetTick = boost::lexical_cast<TICK>(cmdString.substr(1));
 	  
 	  if( targetTick<=tick )
 	    std::cout<<"Tick "<<targetTick<<" is in the past."
@@ -369,7 +369,7 @@ int main(int argc, char **argv) {
               s_log->flush();
             }
 	  }
-	}catch(bad_string_cast const &e) {
+	}catch(boost::bad_lexical_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;
 	}
       } else if( 'P'==cmd ) {
