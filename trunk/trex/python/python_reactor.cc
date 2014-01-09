@@ -221,7 +221,7 @@ producer::result_type producer::produce(producer::argument_type arg) const {
     
   if( my_class.is_none() ) {
     s_log->syslog("python", TREX::utils::log::error)<<"Python class \""<<class_name<<"\" not found";
-    throw XmlError(node, "Python class \""+class_name+"\" not found");
+    throw boost::property_tree::ptree_bad_data("Python class \""+class_name+"\" not found", node);
   }
   
   try {

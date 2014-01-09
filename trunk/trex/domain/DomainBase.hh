@@ -375,8 +375,8 @@ namespace TREX {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
-          else 
-            return TREX::utils::string_cast<Ty>(getStringSingleton());
+          else
+            return boost::lexical_cast<Ty>(getStringSingleton());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }

@@ -49,130 +49,48 @@
 // Need to indicate to spirit to be thread safe
 # define BOOST_SPIRIT_THREADSAFE
 # include <boost/property_tree/xml_parser.hpp>
+# include <boost/lexical_cast.hpp>
 
-# include "StringExtract.hh"
 # include "Exception.hh"
 # include "log_manager.hh"
 
 namespace TREX {
   namespace utils {
-
-    /** @brief XML parsing related errors.
-     *
-     * This exception is used for error related to XML parsing
-     * and data extraction
-     * 
-     * @todo As we migrate to Boost.PropertyTree the source fo the 
-     *   tree os not necessarily XML. Which means that I may need 
-     *   to rename this class. 
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup utils
-     */
-    class XmlError :public Exception {
-    public:
-      explicit XmlError(std::string const &msg) throw() 
-	:Exception("XML error: "+msg) {}
-      /** @brief Constructor
-       * @param node A porperty tree node
-       * @param msg A message
-       *
-       * Create a new exception associated to the XML node @a node
-       * with the error message @a msg
-       */
-      XmlError(boost::property_tree::ptree::value_type const &node,
-	       std::string const &msg) throw() 
-	:Exception(std::string("On ")+
-		   std::string(node.first)+": "+msg) {}
-      /** @brief Destructor */
-      virtual ~XmlError() throw() {}
-    }; // TREX::utils::FactoryException
     
-    namespace internals { 
+    namespace internals {
+      namespace bp=boost::property_tree;
       
-      /** @brief XML attribibute parsing helper 
-       * 
-       * @tparam Ty the expected output type
-       * 
-       * This class is used internally as an helper to extract the value of an 
-       * XML attribute and parse it as a @p Ty instance 
-       *
-       * It is used by the parse_attr methods in order to extract and parse an 
-       * attribute from an XML tag.
-       * 
-       * @author Frederic Py <fpy@mbari.org>
-       * @ingroup utils
-       */
-      template<class Ty, bool AttrOptional=true>
+      boost::optional<bp::ptree const &> find_attr(bp::ptree const &pt,
+                                                   std::string const &path);
+      
+      template<class Ty>
       struct attr_helper {
         
-        static std::string get_str(boost::property_tree::ptree const &pt,
-                               std::string const &name) {
-          std::string path("<xmlattr>."+name);
+        static Ty get(bp::ptree const &pt, std::string const &path) {
+          boost::optional<bp::ptree const &> node = find_attr(pt, path);
           
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
-              return *ret;
-            path = name;
-          }
-          return pt.get<std::string>(path);
+          if(!node)
+            throw bp::ptree_bad_path("Failed to find attribute", bp::path(path));
+          return boost::lexical_cast<Ty>(node->data());
         }
         
-        /** @brief Parse attribute
-         * 
-         * @param[in] pt A xml based property tree
-         * @param[in] name An attribute name
-         * 
-         * Extracts the value of the attribute @p name from the property tree 
-         * @p pt
-         * 
-         * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a boost::optional
-         * @pre The value of the attribute can be parsed as a @p Ty
-         * 
-         * @return the value of this attribute
-         * @note if @p Ty is a boost::optional and the attribute @p name does 
-         *       not exists the returned value is an empty optional  
-         *
-         * @throw bad_string_cast Failed to convert the attribute 
-         *     @p name into a @p Ty value
-         */
-        static Ty get(boost::property_tree::ptree const &pt,
-                          std::string const &name) {
-          return string_cast<Ty>(get_str(pt, name));
-        }
       }; // TREX::utils::internals::attr_helper<>
       
-#ifndef DOXYGEN
-      template<class Ty, bool AttrOptional>
-      struct attr_helper< boost::optional<Ty>, AttrOptional > {
+# ifndef DOXYGEN
+      template<class Ty>
+      struct attr_helper< boost::optional<Ty> > {
+        static boost::optional<Ty> get(bp::ptree const &pt,
+                                       std::string const &path) {
+          boost::optional<bp::ptree const &> node = find_attr(pt, path);
+          boost::optional<Ty> ret;
         
-        static boost::optional<std::string> get_str(boost::property_tree::ptree const &pt,
-                                                    std::string const &name) {
-          std::string path("<xmlattr>."+name);
-          
-          if( AttrOptional ) {
-            boost::optional<std::string> ret=pt.get_optional<std::string>(path);
-            
-            if( ret )
-              return ret;
-            path = name;
-          }
-          return pt.get_optional<std::string>(path);
-        }
-       
-        static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
-                                      std::string const &name) {
-	  boost::optional<std::string> tmp = get_str(pt, name);
-	  if( tmp )
-	    return boost::optional<Ty>(string_cast<Ty>(*tmp));
-	  else 
-	    return boost::optional<Ty>();
+          if( node )
+            ret = boost::lexical_cast<Ty>(node->data());
+          return ret;
         }
       }; // TREX::utils::internals::attr_helper< boost::optional<> >
-#endif // DOXYGEN
-      
+# endif // DOXYGEN
+
     } // TREX::utils::internals
     
     /** @brief XML attribute extraction
@@ -195,23 +113,15 @@ namespace TREX {
      * @{
      */
     template<class Ty>
-    Ty parse_attr(boost::property_tree::ptree const &node, 
+    Ty parse_attr(boost::property_tree::ptree const &node,
 		  std::string const &attr) {
-      try {
-        return internals::attr_helper<Ty>::get(node, attr);
-      } catch(boost::property_tree::ptree_bad_data const &e) {
-        throw XmlError("Failed to parse attribute \""+attr+"\": "+e.what());
-      }
+      return internals::attr_helper<Ty>::get(node, attr);
     }
 
     template<class Ty>
     Ty parse_attr(boost::property_tree::ptree::value_type const &node, 
 		  std::string const &attr) {
-      try {
-        return parse_attr<Ty>(node.second, attr);
-      } catch(XmlError const &n) {
-        throw XmlError(node, n.what());
-      }
+      return parse_attr<Ty>(node.second, attr);
     }
     /** @} */
     

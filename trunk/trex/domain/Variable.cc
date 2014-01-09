@@ -45,6 +45,8 @@
 using namespace TREX::utils;
 using namespace TREX::transaction;
 
+namespace bp=boost::property_tree;
+
 /*
  * class TREX::transaction::Variable
  */
@@ -80,11 +82,11 @@ Variable::Variable(Variable const &other)
 Variable::Variable(boost::property_tree::ptree::value_type &node)
   :m_name(parse_attr<symbol>(node.second, "name")) {
   if( m_name.empty() )
-    throw XmlError(node, "Variable name is empty.");
+    throw bp::ptree_bad_data("Variable name is empty", node);
   
   boost::property_tree::ptree::iterator i = node.second.begin();
   if( !s_dom_factory->iter_produce(i, node.second.end(), m_domain) )
-    throw XmlError(node, "Missing variable domain on XML tag"); 
+    throw bp::ptree_bad_data("Missing variable domain on XML tag", node);
 }
 
 Variable::~Variable() {}

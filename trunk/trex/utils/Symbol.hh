@@ -59,7 +59,6 @@
 # include <boost/flyweight/holder_tag.hpp>
 # include <boost/functional/hash.hpp>
 
-# include "StringExtract.hh"
 # include "singleton.hh"
 
 namespace TREX {
@@ -371,23 +370,7 @@ namespace TREX {
      * @ingroup utils
      */
     typedef basic_symbol<char> symbol;
-
     
-    /** @brief string casting specialization
-     * @param in A string
-     * @param format A format
-     * @relates Symbol
-     *
-     * This specialization just copy the content of @a in in a new Symbol
-     *
-     * @return a Symbol with the value of @a in
-     * @ingroup utils
-     */ 
-    template<>
-    inline symbol string_cast<symbol>(std::string const &in,
-				      std::ios_base &(*format)(std::ios_base &)) {
-      return symbol(in);
-    }
   } // TREX::utils
 } // TREX 
 

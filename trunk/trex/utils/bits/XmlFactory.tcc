@@ -50,18 +50,7 @@ Output XmlFactory<Product, Output, Arg>::produce
   tree_t::value_type &node = arg_traits::xml(arg);
   symbol id(node.first);
 
-  // Now I locate the producer for id and pass to him
-  // the node and extra argument
-  try {
-    return m_factory->get(id)(arg);
-  } catch(std::exception const &e) {
-    // Capture any exception derived from std::exception
-    // this includes TREX exceptions as rapidxml::parse_error
-    throw XmlError(node, e.what());
-  }  catch(...) {
-    // capture unknown exceptions
-    throw XmlError(node, "Unknown exception caught.");
-  } 
+  return m_factory->get(id)(arg);
 }
 
 template<class Product, class Output, class Arg>
@@ -76,18 +65,10 @@ bool XmlFactory<Product, Output, Arg>::iter_produce
     symbol tag(i->first);
     if( m_factory->exists(tag) ) {
       argument_type arg = iter_traits<Iter>::build_node(*i, it);
-      try {
-	ret = m_factory->get(tag)(arg);
-	++i;
-	return true;
-      } catch(std::exception const &e) {
-	// Capture any exception derived from std::exception
-	// this includes TREX exceptions as rapidxml::parse_error
-	throw XmlError(arg_traits::xml(arg), e.what());
-      }  catch(...) {
-	// capture unknown exceptions
-	throw XmlError(arg_traits::xml(arg), "Unknown exception caught.");
-      } 
+      
+      ret = m_factory->get(tag)(arg);
+      ++i;
+      return true;
     } else 
       ++i;
   }

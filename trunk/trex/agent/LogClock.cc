@@ -71,17 +71,17 @@ LogClock::LogClock(bpt::ptree::value_type &node)
   bool found;
   file = log->use(file, found).string();
   if( !found )
-    throw XmlError(node, "Unable to locate file \""+file+"\"");
+    throw boost::property_tree::ptree_bad_data("Unable to locate file \""+file+"\"", node);
   bpt::ptree tks;
   // parse the log
   read_xml(file, tks, xml::no_comments|xml::trim_whitespace);
   if( tks.empty() ) {
     syslog(error)<<"clock log \""<<file<<"\" is empty.";
-    throw XmlError(node, "Empty clock log file.");
+    throw boost::property_tree::ptree_bad_data("Empty clock log file.", node);
   }
   if( tks.size()!=1 ) {
     syslog(error)<<"clock log \""<<file<<"\" has more than 1 root.";
-    throw XmlError(node, "Invalid clock log file");
+    throw boost::property_tree::ptree_bad_data("Invalid clock log file", node);
   }
   tks = tks.get_child("Clock");
   m_epoch = parse_attr<Clock::date_type>(tks, "epoch");
@@ -102,7 +102,7 @@ LogClock::LogClock(bpt::ptree::value_type &node)
       syslog(warn)<<"Skipping tick "<<tck.date<<" with 0 count.";
   }
   if( m_ticks.empty() )
-    throw XmlError(node, "clock log has no valid tick.");
+    throw boost::property_tree::ptree_bad_data("clock log has no valid tick.", node);
 }
 
 // manipulators

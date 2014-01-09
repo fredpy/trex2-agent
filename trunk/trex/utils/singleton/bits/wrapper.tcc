@@ -1,3 +1,4 @@
+/* -*- C++ -*- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -35,7 +36,7 @@
 # error "Cannot include tcc file outside of its corresponding header"
 #else
 
-#include <typeinfo>
+# include <typeinfo>
 
 namespace TREX {
   namespace utils {

@@ -271,7 +271,7 @@ namespace TREX {
       }
       
       void addTextValue(std::string const &val) {
-        add(TREX::utils::string_cast<Ty>(val));
+        add(boost::lexical_cast<Ty>(val));
       }
       std::ostream &print_value(std::ostream &out, size_t i) const {
         // Not very optimal but this is the easiest way to go
