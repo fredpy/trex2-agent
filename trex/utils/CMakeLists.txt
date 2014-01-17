@@ -89,7 +89,7 @@ add_library(TREXutils SHARED
   Plugin.hh
   PluginLoader.hh
   shared_var.hh
-  Symbol.hh
+  basic_symbol.hh
   TREXversion.hh
   XmlFactory.hh
   XmlUtils.hh
@@ -122,7 +122,7 @@ add_library(TREXutils SHARED
   bits/generic_factory.tcc
   singleton/bits/use.tcc
   singleton/bits/wrapper.tcc
-  bits/Symbol.tcc
+  bits/basic_symbol.tcc
   bits/XmlFactory.tcc
 )
 
