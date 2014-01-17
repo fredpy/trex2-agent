@@ -1,20 +1,14 @@
 /* -*- C++ -*- */
-/** @file "trex/utils/log/log_fwd.hh" 
- * @brief Forward declaration of log utilities
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -24,7 +18,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,52 +32,25 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_utils_log_log
-# define FWD_trex_utils_log_log
+#ifndef H_trex_utils_symbol
+# define H_trex_utils_symbol
 
-# include "../symbol.hh"
+# include "basic_symbol.hh"
 
 namespace TREX {
   namespace utils {
-    /** @brief Logging utilities
+    
+    /** @brief char based basic_symbol
      *
-     * This namespace contains all the classes and utilities for 
-     * logging text messages from T-REx activity.
+     * This typedef is the default type one would use to
+     * manipulate symbols. It is the counterpart of the standard
+     * C++ string class.
      *
      * @ingroup utils
      */
-    namespace log {
-      
-      /** @brief Message type identifier
-       *
-       * The type used to identify the type of log message
-       * @ingroup utils
-       */
-      typedef symbol id_type;
-      class stream;
-      
-      extern id_type const null; //!< Untyped log message
-      extern id_type const info; //!< Infromation log message
-      extern id_type const warn; //!< Warning log message
-      extern id_type const error; //!< Error log message
-      
-      class log_pipe;
-      class text_log;
-      
-      /** @brief Logging implementation details
-       *
-       * This namespace embeds classes and utilities used for implementation
-       * details for the text logging mechanism used within TREX
-       *
-       * @ingroup utils
-       */
-      namespace details {
-        
-        class entry_sink;
-        
-      } // TREX::utils::log::details
-    } // TREX::utils::log    
-  } // TREX::utils
-} // TREX
+    typedef basic_symbol<char> symbol;
+    
+  }
+}
 
-#endif // FWD_trex_utils_log_log
+#endif // H_trex_utils_symbol

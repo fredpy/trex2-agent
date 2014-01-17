@@ -1,20 +1,4 @@
 /* -*- C++ -*- */
-/** @file "Symbol.hh"
- *
- * Symbol class deintion and utilities
- *
- * This header defines the Symbol class. Symbol is a class based on
- * standard C++ string but managed via  a unique instance reference
- * counting pointer ensuring better performances and memory management
- * for constant strings frequenlty used.
- *
- * @note In this latest implementation this class is just some wrapper
- * of @c boost::flyweight class which ewas kept just toavoid heavy
- * modifications of the client classes.
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup utils
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
@@ -361,15 +345,6 @@ namespace TREX {
 #  include "bits/basic_symbol.tcc"
 # undef In_H_trex_utils_basic_symbol
 
-    /** @brief char based BasicSymbol
-     *
-     * This typedef is the default type one would use to
-     * manipulate symbols. It is the counterpart of the standard
-     * C++ string class.
-     *
-     * @ingroup utils
-     */
-    typedef basic_symbol<char> symbol;
     
   } // TREX::utils
 } // TREX 

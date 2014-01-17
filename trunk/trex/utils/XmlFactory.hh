@@ -50,7 +50,7 @@
 
 # include "XmlUtils.hh" 
 # include "generic_factory.hh"
-# include "Symbol.hh"
+# include "symbol.hh"
 
 namespace TREX {
   namespace utils {

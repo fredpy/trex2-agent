@@ -45,7 +45,7 @@
 
 # include <boost/unordered_map.hpp>
 
-# include "Symbol.hh"
+# include "symbol.hh"
 # include "Exception.hh"
 # include "log_manager.hh"
 
