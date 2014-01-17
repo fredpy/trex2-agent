@@ -48,8 +48,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Symbol 
-# define H_Symbol
+#ifndef H_trex_utils_basic_symbol
+# define H_trex_utils_basic_symbol
 
 # include <string>
 # include <iostream>
@@ -357,9 +357,9 @@ namespace TREX {
       return out;
     }
 
-# define In_H_Symbol
-#  include "bits/Symbol.tcc"
-# undef In_H_Symbol
+# define In_H_trex_utils_basic_symbol
+#  include "bits/basic_symbol.tcc"
+# undef In_H_trex_utils_basic_symbol
 
     /** @brief char based BasicSymbol
      *
