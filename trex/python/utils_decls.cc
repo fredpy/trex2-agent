@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <trex/utils/Symbol.hh>
+#include <trex/utils/symbol.hh>
 #include <trex/utils/log_manager.hh>
 #include <trex/utils/XmlUtils.hh>
 

@@ -89,6 +89,7 @@ add_library(TREXutils SHARED
   Plugin.hh
   PluginLoader.hh
   shared_var.hh
+  symbol.hh
   basic_symbol.hh
   TREXversion.hh
   XmlFactory.hh
@@ -235,7 +236,7 @@ source_group("Header\ Files\\log\\bits" FILES
 
 source_group("Template Files\\bits" FILES  
   bits/generic_factory.tcc
-  bits/Symbol.tcc
+  bits/basic_symbol.tcc
   bits/XmlFactory.tcc
 )
 
