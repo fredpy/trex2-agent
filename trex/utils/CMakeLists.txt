@@ -83,7 +83,7 @@ add_library(TREXutils SHARED
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
   Exception.hh
-  Factory.hh
+  generic_factory.hh
   id_mapper.hh
   log_manager.hh
   Plugin.hh
@@ -119,7 +119,7 @@ add_library(TREXutils SHARED
   platform/cpp11_deleted.hh
   platform/system_error.hh
   # template source code
-  bits/Factory.tcc
+  bits/generic_factory.tcc
   singleton/bits/use.tcc
   singleton/bits/wrapper.tcc
   bits/Symbol.tcc
@@ -234,7 +234,7 @@ source_group("Header\ Files\\log\\bits" FILES
 )
 
 source_group("Template Files\\bits" FILES  
-  bits/Factory.tcc
+  bits/generic_factory.tcc
   bits/Symbol.tcc
   bits/XmlFactory.tcc
 )
