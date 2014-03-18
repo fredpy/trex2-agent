@@ -1,0 +1,16 @@
+<Log>
+  <header>
+    <!-- start by just providing the top timeline and connect to the middle -->
+    <provide name="top"/>
+    <use name="middle"/>
+  </header>
+  <tick value="0">
+    <!-- tell everybody that we are still alive -->
+    <Observation on="top" pred="Alive"/>
+  </tick>
+  <tick value="20">
+    <!-- try to provide ground ... at this point the bottom reactor is subscribing (done at tick 15) 
+	 to this timeline so we should generate a cycle -->
+    <provide name="ground"/>
+  </tick>
+</Log>

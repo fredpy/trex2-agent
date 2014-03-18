@@ -1,0 +1,20 @@
+<Mission>
+  <Goal on="dorado_survey" pred="Track">
+    <Variable name="size">
+      <float min="1000.0" max="1000.0"/>
+    </Variable>
+    <Variable name="path">
+      <enum>
+	<elem value="square"/>
+      </enum>
+    </Variable>
+    <Variable name="drifter">
+      <enum>
+	<elem value="stella110"/>
+      </enum>
+    </Variable>
+    <Variable name="lagrangian">
+      <bool value="1"/>
+    </Variable>
+  </Goal>
+</Mission>
