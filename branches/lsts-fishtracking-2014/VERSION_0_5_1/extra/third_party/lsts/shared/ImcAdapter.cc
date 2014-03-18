@@ -322,7 +322,7 @@ namespace TREX {
     ImcAdapter::sendViaIridium(Message * msg, const std::string address, int port)
     {
       uint8_t buffer[500];
-      GenericIridiumMessage * irMsg = new GenericIridiumMessage(msg);
+      ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
       irMsg->source = msg->getSource();
       int len = irMsg->serialize(buffer);
