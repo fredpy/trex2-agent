@@ -91,6 +91,16 @@ int main(int argc, char **argv) {
     exit(-1);
   }
   
+
+  if (strcmp(argv[1], "wait") == 0) {
+    while (DUNE::Time::Clock::getSinceEpoch() < 1388534400) {
+      std::cerr << "waiting for clock to be synched..." << std::endl;
+      sleep(1);
+    }
+    std::cerr << "clock is synched." << std::endl;
+    exit(0);
+  }
+
   // build path name for the stat file
   std::string path(argv[1]);
   path = "/proc/"+path+"/stat";
