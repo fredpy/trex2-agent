@@ -2,6 +2,21 @@
 #include "navigator.nddl"
 #include "platform.nddl"
 
+class SurveyParams extends AgentTimeline {
+
+	predicate Boot {}
+	
+	predicate Params {
+		float speed;
+		float min_depth, max_depth;
+		float pitch_angle;
+	}   
+	 
+    SurveyParams(Mode _mode) {
+		super(_mode, "Boot");
+    }
+
+}
 
 class YoYoController extends AgentTimeline {
 	

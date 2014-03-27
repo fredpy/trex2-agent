@@ -93,6 +93,7 @@ int main(int argc, char **argv) {
   
 
   if (strcmp(argv[1], "wait") == 0) {
+    // Check if the clock is in the past (before 1st Jan. 2014)
     while (DUNE::Time::Clock::getSinceEpoch() < 1388534400) {
       std::cerr << "waiting for clock to be synched..." << std::endl;
       sleep(1);
