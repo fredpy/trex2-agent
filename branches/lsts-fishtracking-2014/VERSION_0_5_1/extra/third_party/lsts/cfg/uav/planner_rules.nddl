@@ -35,16 +35,16 @@ NavActions::DoGoing {
     contained_by(condition ControlMode.TREX c);
     c.start < start;	
 
-    contained_by(OperationalLimits.Limits limits);
+    //contained_by(OperationalLimits.Limits limits);
     ends(condition Navigator.Going go);
     go.start <= start;
     
-    if (go.z > 0.0) {
-	go.z < limits.max_depth;
-    } else {
-	-1.0 * go.z < limits.max_altitude;
-	-1.0 * go.z > limits.min_altitude;
-    }
+    //if (go.z > 0.0) {
+	//go.z < limits.max_depth;
+    //} else {
+	//-1.0 * go.z < limits.max_altitude;
+	//-1.0 * go.z > limits.min_altitude;
+    //}
 		
     meets(effect Navigator.At at);
     go.latitude == at.latitude;
