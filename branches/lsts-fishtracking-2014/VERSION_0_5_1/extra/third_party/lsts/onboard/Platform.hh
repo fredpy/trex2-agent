@@ -152,6 +152,8 @@ namespace TREX {
       void postGoalToken();
       bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
       void announce(double lat, double lon);
+      void enqueueReferenceAtObs();
+      DesiredZ setUavRefZ(const double z);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;
