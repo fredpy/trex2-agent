@@ -182,8 +182,9 @@ SpotterController::DoSegment {
       // tick rate whihc is no 1Hz
       float flyTimeInTick;
       flyTimeInTick * TICK_DURATION == flyTimeF;
-
-      to.start == end + floor(flyTimeInTick * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
+	  // since Waypoint is a command it will be dispatched as early as possible, 
+	  // if it doesn't happen it is flexible to do it a few ticks later
+      to.start == end + floor(flyTimeInTick * 1.1);  
   
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;

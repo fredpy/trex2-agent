@@ -10,7 +10,6 @@ Navigator navigator = new Navigator(Internal);
 NavActions nav_act = new NavActions();
 
 Reference reference = new Reference(External);
-//ReferenceState refstate = new ReferenceState(Observe);
 navigator.min_z.specify(2);
 navigator.max_z.specify(50);
 
