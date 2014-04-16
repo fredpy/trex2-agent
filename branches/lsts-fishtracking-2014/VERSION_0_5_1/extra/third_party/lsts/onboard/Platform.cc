@@ -157,8 +157,9 @@ namespace TREX
           sendMsg(goingRef); // send the command now !!!
           m_goals_pending.remove(goal);
           referenceObservations.push(*goal); // schedule this guy
-          syslog(log::info)<<"Passing from queue to timeline "<<gname<<"."<<gpred<<"\n";
-          std::cout<<"Passing from queue to timeline "<<gname<<"."<<gpred<<"\n";
+          syslog(log::info)<<"Passing from queue to timeline "<<gname<<"."<<gpred;
+          if (debug)
+            std::cout<<"Passing from queue to timeline "<<gname<<"."<<gpred<<std::endl;
           // as an observation
         }
         else if( "At"==gpred && handleAtRequest(goal) )
@@ -166,12 +167,14 @@ namespace TREX
           // just convert the pending goal into an observation
           m_goals_pending.remove(goal);
           referenceObservations.push(*goal);
-          syslog(log::info)<<"Passing from queue to timeline "<<gname<<"."<<gpred<<"\n";
-          std::cout<<"Passing from queue to timeline "<<gname<<"."<<gpred<<"\n";
+          syslog(log::info)<<"Passing from queue to timeline "<<gname<<"."<<gpred;
+          if (debug)
+            std::cout<<"Passing from queue to timeline "<<gname<<"."<<gpred<<std::endl;
         }
         else if( "Boot"==gpred ){
-          syslog(log::info)<<"Doing nothing "<<gname<<"."<<gpred<<"\n";
-          std::cout<<"Doing nothing "<<gname<<"."<<gpred<<"\n";
+          syslog(log::info)<<"Doing nothing "<<gname<<"."<<gpred;
+          if (debug)
+            std::cout<<"Doing nothing "<<gname<<"."<<gpred<<std::endl;
         }
       }
     }
@@ -184,7 +187,8 @@ namespace TREX
     {
       postUniqueObservation(referenceObservations.front());
       referenceObservations.pop();
-      std::cout << "Posting Reference.At\n";
+      if (debug)
+        std::cout << "Posting Reference.At\n";
     }
 
 
@@ -249,10 +253,11 @@ namespace TREX
 
 
         if( delta>=m_max_delta ) {
-          if (m_connected)
-            std::cerr <<"Disconnected from DUNE\n";
-
-          syslog(log::warn) << "Disconnected from DUNE";
+          if (m_connected) {
+            if (debug)
+            std::cerr <<"Disconnected from DUNE"<<std::endl;
+            syslog(log::warn) << "Disconnected from DUNE";
+          }
           m_connected = false;
         } else {
           syslog(log::warn)<<"No message received from DUNE for "
@@ -263,8 +268,11 @@ namespace TREX
 
       else
       {
-        if (!m_connected)
-          std::cerr <<"Now connected to DUNE\n";
+        if (!m_connected) {
+          if (debug)
+            std::cerr <<"Now connected to DUNE"<<std::endl;
+          syslog(log::warn) << "Now connected to DUNE";
+        }
         m_connected = true;
         m_last_msg = getCurrentTick();
       }
@@ -272,7 +280,8 @@ namespace TREX
     catch (std::runtime_error& e)
     {
       syslog(log::error) << "Error during message processing: " << e.what();
-      std::cerr << e.what();
+      if (debug)
+        std::cerr << e.what();
     }
   }
     
@@ -335,7 +344,8 @@ namespace TREX
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
       syslog(log::error) << "handleRecall(" << g << ", " << *goal << ")";
-      std::cout << "handleRecall(" << g << ", " << *goal << ")";
+      if (debug)
+        std::cout << "handleRecall(" << g << ", " << *goal << ")";
       
       m_goals_pending.remove(g);
       handleRequest(g);
@@ -376,16 +386,19 @@ namespace TREX
       if(receivedGoals.empty()) return;
       if (m_env->getControlInterfaceReactor() != NULL) {
         std::string front = receivedGoals.front();
-        std::cout << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<front;
+        if (debug)
+          std::cout << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<front;
         syslog(log::info) << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<front;
         m_env->getControlInterfaceReactor()->proccess_message(
                                                               front);
         receivedGoals.pop();
       } else {
-        std::cout << "2. ControlInterface not instantiated!\n";
+        if (debug)
+          std::cout << "2. ControlInterface not instantiated!\n";
         syslog(log::error) << "2. ControlInterface not instantiated!";
       }
-      std::cout << "\n";
+      if (debug)
+        std::cout << std::endl;
     }
     
     namespace {
@@ -668,7 +681,8 @@ namespace TREX
         desSpeed.speed_units = SUNITS_METERS_PS;
         m_ref.speed.set(desSpeed);
         syslog(info) << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ") radius:" << m_ref.radius << "; z:" << desZ.value;
-        std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")   radius:"<< m_ref.radius << "; z:" << desZ.value << "\n";
+        if (debug)
+          std::cout << "goingUAV (" << m_ref.lat << ", " << m_ref.lon << ")   radius:"<< m_ref.radius << "; z:" << desZ.value << std::endl;
         return true;
       }
       else
