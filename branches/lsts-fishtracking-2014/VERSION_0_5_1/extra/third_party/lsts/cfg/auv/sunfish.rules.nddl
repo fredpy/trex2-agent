@@ -1,0 +1,127 @@
+#include "TREX.nddl"
+#include "auv/navigator.nddl"
+#include "auv/platform.nddl"
+
+class SurveyParams extends AgentTimeline {
+
+	predicate Boot {}
+	
+	predicate Params {
+		float speed;
+		float min_depth, max_depth;
+		float pitch_angle;
+	}   
+	 
+    SurveyParams(Mode _mode) {
+		super(_mode, "Boot");
+    }
+
+}
+
+class YoYoController extends AgentTimeline {
+	
+	YoYoController(Mode _mode) {
+		super(_mode, "Idle");
+	}	
+	
+	predicate Idle {}
+	
+	action Done {
+		float latitude, longitude, max_z, min_z, speed;
+	}
+	
+	predicate Exec {
+		float latitude, longitude, max_z, min_z, speed;
+	}
+}
+
+YoYoController::Done {
+	met_by(Exec exec);
+		exec.latitude == latitude;
+		exec.longitude == longitude;
+		exec.speed == speed;
+		exec.max_z == max_z;
+		exec.min_z == min_z;
+	
+	duration == 1;
+}
+
+Navigator::At {
+	//float min_dist;
+	//min_dist == 3.0;
+	
+	starts(YoYoController.Done arr);
+		arr.speed == speed;
+		arr.latitude == latitude;
+		arr.longitude == longitude;
+		arr.min_z == object.min_z;
+		arr.max_z == object.max_z;
+		//ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
+}
+
+class NavActions {
+    
+    action DoGoing {
+	float orig_lat, orig_lon, orig_z;
+	float dist;
+    }
+    
+    NavActions() {
+	super();
+    }
+}
+
+
+NavActions::DoGoing {
+    contained_by(ControlMode.TREX c);
+    c.start < start;
+
+    contained_by(OperationalLimits.Limits limits);
+    ends(condition Navigator.Going go);
+    go.start <= start;
+
+    if( go.z > 0.0 ) {
+	go.z < limits.max_depth;
+    } else {
+	-1.0 * go.z < limits.max_altitude;
+	-1.0 * go.z > limits.min_altitude; 
+    }
+    meets(effect Navigator.At at);
+    go.object == at.object;
+    go.latitude == at.latitude;
+    go.longitude == at.longitude;
+    go.z == at.z;
+    go.speed == at.speed;
+
+    int my_start;
+    my_start >= c.start;
+
+    dist == ll_distance(orig_lat, orig_lon, go.latitude, go.longitude);
+    
+    if( c.start <= AGENT_CLOCK ) {
+	// Gather my intial position only when I know I can take control
+	met_by(EstimatedState.Position origin);
+	orig_lat == origin.latitude;
+	orig_lon == origin.longitude;
+	orig_z == origin.z;
+
+	my_start == max(c.start, origin.start);
+    }
+    if( my_start <= AGENT_CLOCK ) {
+	contains(condition YoYoController.Exec cmd);
+	cmd.latitude == go.latitude;
+	cmd.longitude == go.longitude;
+	cmd.min_z == go.object.min_z;
+	cmd.max_z == go.object.max_z;
+	cmd.speed == go.speed;
+	concurrent(end, cmd.end);
+    }
+
+}
+
+
+Navigator::Going {
+    sane_pos(latitude, longitude, z);
+    contained_by(ControlMode.TREX); // I am not Going if I am not running
+}
+
