@@ -62,6 +62,10 @@ namespace TREX
                                        "duneip");
       debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                "debug");
+
+      m_auv = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+                               "auv");
+
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
       //m_links = std::map<std::string, Announce*>();
@@ -116,6 +120,8 @@ namespace TREX
      */
     void Platform::insertIntoReceived(IMC::Message* msg)
     {
+      if (debug)
+        std::cout << "received " << msg->getName() << std::endl;
       // substitute previously received message
       if (received.count(msg->getId()))
         received.erase(msg->getId());
@@ -202,7 +208,7 @@ namespace TREX
       IMC::Message * msg;
 
 //mine --> while ((msg = m_adapter.poll(0, false)) != NULL)
-        while ((msg = m_adapter.poll()) != NULL)
+      while ((msg = m_adapter.poll()) != NULL)
       {
         msg_count++;
         if (remote_id == 0)
@@ -569,7 +575,9 @@ namespace TREX
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
-        setUavRefZ(estate->height-estate->z);
+
+        if (!m_auv)
+          setUavRefZ(estate->height-estate->z);
         //enqueueReferenceAtObs();
         m_reference_initialized = true;
       }
