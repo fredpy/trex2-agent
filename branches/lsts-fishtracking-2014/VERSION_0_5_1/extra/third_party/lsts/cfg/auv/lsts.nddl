@@ -14,7 +14,7 @@ NavActions nav_act = new NavActions();
 Reference reference = new Reference(External);
 ReferenceState refstate = new ReferenceState(Observe);
 navigator.min_z.specify(2);
-navigator.max_z.specify(25);
+navigator.max_z.specify(20);
 
 VerticalControl vc = new VerticalControl(Internal, false); // Do not accept goals for now
 fact(vc.Holds v_control); // fact has it will not change
