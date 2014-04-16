@@ -104,7 +104,6 @@ namespace TREX
       syslog(log::info) << "listening on port " << localport << "...";
     }
 
-
   bool Platform::isActiveInPlanControlStateMsg(
       PlanControlState* previous_pcstate)
   {
@@ -122,7 +121,6 @@ namespace TREX
     {
       if (debug)
         std::cout << "received " << msg->getName() << std::endl;
-      // substitute previously received message
       if (received.count(msg->getId()))
         received.erase(msg->getId());
 
@@ -530,9 +528,7 @@ namespace TREX
       PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
-      if (pcstate != NULL){
-        m_blocked = !(pcstate->state == PlanControlState::PCS_EXECUTING) && pcstate->plan_id == "trex_plan";
-      }
+      m_blocked = !isActiveInPlanControlStateMsg(pcstate);
       
       // Translate incoming messages into observations
       EstimatedState * estate =
@@ -561,14 +557,12 @@ namespace TREX
         Observation obs = m_adapter.announceObservation(it->second);
         postUniqueObservation(obs);
       }
-      
-      /*if (frefstate != NULL && frefstate->state == FollowRefState::FR_WAIT)
-        createNewReference = true;
-      
-      if (m_ref.flags == 0)
-        createNewReference = true;*/
-      
-      if (!m_reference_initialized && estate != NULL && isActiveInPlanControlStateMsg(pcstate))
+
+      if (m_blocked)
+      {
+        m_reference_initialized = false;
+      }
+      else if (!m_reference_initialized && estate != NULL)
       {
         // idle
         m_ref.flags = Reference::FLAG_LOCATION;
