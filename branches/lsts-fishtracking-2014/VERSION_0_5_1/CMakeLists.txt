@@ -107,9 +107,12 @@ include_directories(
 # Linux 64 really needs -fPIC                                          #
 ########################################################################
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-#endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  message (STATUS "Adding -fPIC to CXX flags")
+else()
+  message (STATUS "CXX flagsdo not need -fPIC (not a linux system)")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 
 
