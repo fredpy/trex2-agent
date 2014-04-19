@@ -361,6 +361,7 @@ namespace TREX
           irMsg->source = msg->getSource();
           int length = irMsg->serialize(buff);
           IridiumMsgTx * tx = new IridiumMsgTx();
+          tx->ttl = 1800; // try sending this update for 30 minutes
           tx->data.assign(buff, buff + length);
           if (!send(tx, address, port))
             return false;
