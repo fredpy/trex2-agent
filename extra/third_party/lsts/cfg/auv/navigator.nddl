@@ -1,6 +1,6 @@
 #include "TREX.nddl"
-#include "platform.nddl"
-#include "path.nddl"
+#include "auv/platform.nddl"
+#include "auv/path.nddl"
 
 class Navigator extends AgentTimeline {
 

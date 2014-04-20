@@ -588,7 +588,8 @@ bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
       SHARED_PTR<phase> nxt = m_log.front().second;
       if( nxt->type()==kind ) {
 	m_log.pop_front();
-	nxt->execute();
+	size_t n = nxt->execute();
+	// syslog(kind, info)<<"Executed "<<n<<" events";
 	return true;
       } 
     }
@@ -612,12 +613,19 @@ void LogPlayer::handleTickStart() {
     handleInit(); // try to emulate the reactor staring at a later tick
   if( !next_phase(getCurrentTick(), s_new_tick) ) {
     size_t skipped =0;
+    std::ostringstream oss;
     while( !m_log.empty() && m_log.front().first<getCurrentTick() ) {
+      oss<<"\n\t- ["<<m_log.front().first<<"]: "
+	 <<m_log.front().second->type();
+      size_t n = m_log.front().second->execute();
+      if( n>0 ) 
+	oss<<"( "<<n<<" events late)";	
       m_log.pop_front();
       ++skipped;
     }
     if( skipped>0 ) {
-      syslog(null, warn)<<"Skipped "<<skipped<<" past events !!!";
+      syslog(null, warn)<<"Replayed "<<skipped
+			<<" past events after the tick started !!!:"<<oss.str();
       m_inited = true;
       next_phase(getCurrentTick(), s_new_tick);
     } 

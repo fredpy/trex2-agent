@@ -107,9 +107,13 @@ class SpotterFollow extends AgentTimeline {
 		waypoints == 4;
     }
     predicate Survey {
-		float    center_lat, center_lon;
 		float z;
 		duration==1;
+		
+		float center_lat, center_lon;
+  		float center_lat_deg, center_lon_deg;
+  		center_lat == to_rad(center_lat_deg);
+  		center_lon== to_rad(center_lon_deg);
     }
 
     SpotterFollow(Mode _mode) {
@@ -178,8 +182,9 @@ SpotterController::DoSegment {
       // tick rate whihc is no 1Hz
       float flyTimeInTick;
       flyTimeInTick * TICK_DURATION == flyTimeF;
-
-      to.start == end + floor(flyTimeInTick * 1.1);  // since Waypoint is a command it will be dispatched as early as possible, if it desn't happen it is flexible to do it a few ticks later
+	  // since Waypoint is a command it will be dispatched as early as possible, 
+	  // if it doesn't happen it is flexible to do it a few ticks later
+      to.start == end + floor(flyTimeInTick * 1.1);  
   
     contained_by(me.DoSurvey exec);
       exec.id == to.path_id;

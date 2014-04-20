@@ -927,9 +927,11 @@ void Assembly::archive(EUROPA::eint date) {
             debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
                      <<tok->getPredicateName().toString()<<'('
                      <<tok->getKey()
-                     <<"): one of its slaves is not yet started:\n\t- "
+                     <<"): one of its slaves is not yet started ("<<date<<"):\n\t- "
                      <<(is_action(*i)?"action ":"predicate ")<<(*i)->getPredicateName().toString()
-                     <<'('<<(*i)->getKey()<<')');
+                     <<'('<<(*i)->getKey()<<':'<<i_active->getKey()<<")["<<(*i)->getState()->lastDomain().toString()<<"]"
+ 		     <<"\n\t    start=="<<i_active->start()->toString()<<"<="<<details::upperBound(i_active->start())
+ 		     <<"\n\t    end=="<<i_active->end()->toString()<<"<="<<details::upperBound(i_active->end()));
             can_delete = false;
           }
         }
@@ -939,9 +941,24 @@ void Assembly::archive(EUROPA::eint date) {
                  <<tok->getPredicateName().toString()<<'('<<tok->getKey()
                  <<") as all its slaves are now inactives and in the past.");
         discard(tok);
-        tok->start()->restrictBaseDomain(tok->start()->lastDomain());
-        tok->end()->restrictBaseDomain(tok->end()->lastDomain());
-        cli->cancel(tok);
+	EUROPA::IntervalIntDomain st = tok->start()->lastDomain(), en = tok->end()->lastDomain();
+	
+	details::restrict_bases(tok);
+	if( tok->isActive() ) {
+	  // Need to propagate the values to all the merged tokens
+	  // NOTE: this is not very acceptable as I may lose this information
+	  //       should the merged tokens been removed ... ideally I should 
+	  //       activate another one instead and/or make sured that the one 
+	  //       to be activated is marked as potential deletion
+	  //       Still it worked fine in the case of lsts PLanner to forget 
+	  //       the past and something like this is obviously need to ensure 
+	  //       proper archiving
+	  EUROPA::TokenSet merged = tok->getMergedTokens();
+	  cli->cancel(tok);
+	  for(EUROPA::TokenSet::iterator i=merged.begin(); merged.end()!=i; ++i)
+	    details::restrict_bases(*i, tok);
+	} else
+	  cli->cancel(tok);
         if( tok->master().isNoId() )
           tok->discard();
         ++deleted;
