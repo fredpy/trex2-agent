@@ -267,7 +267,7 @@ namespace TREX {
       mutable bool   m_started;
       mutable transaction::TICK  m_last;
       mutable bool               m_free;
-      mutable size_t             m_count;
+      mutable size_t             m_free_count, m_count;
       mutable utils::async_ofstream m_data;
     }; // TREX::agent::Clock
 
