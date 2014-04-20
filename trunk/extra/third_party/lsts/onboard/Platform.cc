@@ -11,7 +11,7 @@ namespace
 {
   
   /** @brief TREX log entry point */
-  singleton::use<LogManager> s_log;
+  singleton::use<log_manager> s_log;
   
   /** @brief Platform reactor declaration */
   TeleoReactor::xml_factory::declare<TREX::LSTS::Platform> decl("Platform");
@@ -409,14 +409,13 @@ namespace TREX
       struct LocaleBool {
           bool data;
           LocaleBool() {}
-          LocaleBool( bool data ) : data(data) {}
-          operator bool() const { return data; }
+          explicit LocaleBool( bool data ) : data(data) {}
 
         // unused method
-//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
-//              out << std::boolalpha << b.data;
-//              return out;
-//          }
+          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
+              out << std::boolalpha << b.data;
+              return out;
+          }
           friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
               in >> std::boolalpha >> b.data;
               return in;

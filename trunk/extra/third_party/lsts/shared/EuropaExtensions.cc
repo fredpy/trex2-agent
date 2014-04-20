@@ -95,7 +95,7 @@ using DUNE::Coordinates::WGS84;
 // statics
 
 //DUNE::IMC::HomeRef *LatLonToOffset::s_home = NULL;
-TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *> InsideOpLimits::s_oplimits(NULL);
+TREX::utils::shared_var<DUNE::IMC::OperationalLimits *> InsideOpLimits::s_oplimits(NULL);
 
 //void LatLonToOffset::set_home(DUNE::IMC::HomeRef *home) {
 //  s_home = home;
@@ -105,7 +105,7 @@ TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *> InsideOpLimits::s_oplimit
 DUNE::IMC::OperationalLimits *
 InsideOpLimits::get_oplimits()
 {
-  TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *>::scoped_lock l(s_oplimits);
+  TREX::utils::shared_var<DUNE::IMC::OperationalLimits *>::scoped_lock l(s_oplimits);
    return *s_oplimits;
 }
 
@@ -259,7 +259,7 @@ InsideOpLimits::handleExecute()
   // bool inside = true;
   double x, y;
 
-  TREX::utils::SharedVar<DUNE::IMC::OperationalLimits *>::scoped_lock lck(s_oplimits);
+  TREX::utils::shared_var<DUNE::IMC::OperationalLimits *>::scoped_lock lck(s_oplimits);
   DUNE::IMC::OperationalLimits * l_oplimits = *s_oplimits;
 
   if (l_oplimits == NULL)

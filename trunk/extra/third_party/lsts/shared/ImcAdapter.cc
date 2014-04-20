@@ -486,7 +486,7 @@ namespace TREX
     void
     ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
     {
-      Symbol t = v.domain().getTypeName();
+      symbol t = v.domain().getTypeName();
       attr->name = v.name().str();
 
       if (attr->name == "start" || attr->name == "end")
@@ -583,10 +583,10 @@ namespace TREX
       result->predicate = obs.predicate().str();
       result->attributes.clear();
 
-      std::list<TREX::utils::Symbol> attrs;
+      std::list<TREX::utils::symbol> attrs;
 
       obs.listAttributes(attrs);
-      std::list<TREX::utils::Symbol>::iterator it;
+      std::list<TREX::utils::symbol>::iterator it;
       for (it = attrs.begin(); it != attrs.end(); it++)
       {
         TrexAttribute attr;

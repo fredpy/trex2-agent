@@ -49,7 +49,7 @@ void ControlInterface::thread_proxy::operator()() {
 
 // statics 
 
-SharedVar<size_t> ControlInterface::s_id;
+shared_var<size_t> ControlInterface::s_id;
 
 // structors 
 
@@ -145,7 +145,7 @@ std::string ControlInterface::log_message(std::string const &content) {
   // Build unique message name
   name<<"msg.";
   {
-    SharedVar<size_t>::scoped_lock cs(s_id);
+    shared_var<size_t>::scoped_lock cs(s_id);
     name<<(++(*s_id))<<".rcvd";
   }
   // Log the message
@@ -176,14 +176,17 @@ void ControlInterface::create_fifo() {
             <<"\n\tI'll assume it is a unix pipe.";
       } else {
         syslog(log::error)<<"Failed to create fifo";
-        throw TREX::utils::ErrnoExcept("mkfifo("+queue_name+")");
+        
+        throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
+                           "mkfifo("+queue_name+")");
       }
     }
     syslog(log::info)<<"Opening the pipe...";
     fid = open(queue_name.c_str(), O_RDONLY|O_NONBLOCK);
     if( fid<0 ) {
       syslog(log::error)<<"Failed to open fifo";
-      throw TREX::utils::ErrnoExcept("open("+queue_name+")");
+      throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
+                         "open("+queue_name+")");
     } else { // critical section
       scoped_lock cs(m_mutex);
       // update the file id to the newly opened fifo
@@ -234,7 +237,8 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
         int len = read(m_fifo, buff, buff_size*sizeof(char));
 
         if( len<0 )
-          throw TREX::utils::ErrnoExcept("Error while reading fifo");
+          throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
+                             "Error while reading fifo");
         return len;
       }
     }

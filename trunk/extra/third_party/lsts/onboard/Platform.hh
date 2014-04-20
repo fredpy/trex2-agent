@@ -12,7 +12,7 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/LogManager.hh>
+# include <trex/utils/log_manager.hh>
 # include <trex/domain/IntegerDomain.hh>
 # include <trex/domain/FloatDomain.hh>
 # include <trex/domain/StringDomain.hh>
