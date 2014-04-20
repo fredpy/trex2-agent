@@ -292,11 +292,14 @@ namespace TREX {
 	utils::Symbol const &type() const {
 	  return m_type;
 	}
-	void execute() {
+	size_t execute() {
+	  size_t ret = 0;
 	  while( !m_events.empty() ) {
 	    m_events.front()->play();
 	    m_events.pop_front();
+	    ++ret;
 	  }
+	  return ret;
 	}
       private:
 	utils::Symbol m_type;

@@ -104,12 +104,14 @@ TICK Clock::tick() {
     m_free = true;
     m_started = true;
     m_count = 0;
+    m_free_count = 0;
   } else if( ret!=m_last ) {
     log_tick();    
     m_last = ret;
   }
+  ++m_count;
   if( m_free )
-    ++m_count;
+    m_free_count = m_count;
   return ret;
 }
 
@@ -142,8 +144,9 @@ bool Clock::is_free() const {
 void Clock::log_tick() const {
   if( m_data.is_open() ) {
     m_data<<"  <tick value=\""<<m_last<<"\" count=\""<<m_count
-	  <<"\"/>"<<std::endl;
+	  <<"\" free=\""<<m_free_count<<"\"/>"<<std::endl;
     m_count = 0;
+    m_free_count = 0;
     m_free = true;
   }
 }

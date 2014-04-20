@@ -289,6 +289,7 @@ bool CurrentState::commit() {
                  <<'('<<m_prev_obs->getKey()<<')');
         return false;
       }
+      m_prev_obs->end()->restrictBaseDomain(m_prev_frontier->lastDomain());
       m_assembly.terminate(m_prev_obs);
       m_prev_obs = EUROPA::TokenId::noId();
       if( m_prev_frontier.isId() )

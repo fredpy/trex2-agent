@@ -42,7 +42,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 5)
-set(TREX_PATCH 1)
+set(TREX_PATCH 2)
 set(TREX_RC 0)
 
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
@@ -107,9 +107,12 @@ include_directories(
 # Linux 64 really needs -fPIC                                          #
 ########################################################################
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-#endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  message (STATUS "Adding -fPIC to CXX flags")
+else()
+  message (STATUS "CXX flagsdo not need -fPIC (not a linux system)")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 
 

@@ -18,8 +18,8 @@
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/Symbol.hh>
-
-
+# include <DUNE/Network.hpp>
+# include <DUNE/Network/Fragments.hpp>
 # include "EuropaExtensions.hh"
 # include "ImcMessenger.hh"
 
@@ -31,6 +31,7 @@ using namespace TREX::utils;
 
 namespace TREX {
   namespace LSTS {
+
 
     /** @brief IMC to TREX translator
      *
@@ -133,6 +134,8 @@ namespace TREX {
       ~ImcAdapter();
 
     private:
+      const int c_imc_header_length;
+      const int c_max_iridium_payload_length;
       void variableToImc(Variable const &v, TrexAttribute * attr);
       void setAttribute(Predicate &pred, TrexAttribute const &attr);
       int m_trex_id;
