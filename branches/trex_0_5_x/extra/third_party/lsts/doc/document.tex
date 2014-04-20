@@ -1,0 +1,89 @@
+%%This is a very basic article template.
+%%There is just one section and two subsections.
+\documentclass{article}
+
+\begin{document}
+
+\title{LSTS Domain Model}
+
+\maketitle
+
+\section{Introduction}
+
+This document aims describing the domain model of the autonomous vehicles used
+by LSTS. This is done by enumerating tasks running on the DUNE onboard software,
+their function and communication interfaces.
+
+\subsection{DUNE onboard software}
+The DUNE (Uniform Navigatio Environment) is the software that is used across
+different vehicles from LSTS. DUNE is beig used to control AUVs, UAVs, ASVs and
+ROVs. DUNE is also the basis of other systems like the Manta Gateway and
+oceanographic buoys that run unnatended for years.
+
+DUNE is constituted by a set of asynchronous tasks that exchange messages among
+each other. Some tasks function as hardware drivers, other function as
+communication manangers while others monitor and control the behavior of other
+tasks (supervisors). This intrinsic modularity and the fact that DUNE is
+POSIX-compliant greatly eases the effort of porting DUNE to other platforms and
+hardware systems.
+
+\subsection{Networked Vehicle Systems}
+On LSTS, we aim creating networks of unmanned vehicles. These networks have
+nodes which move according to planned behavior and, while moving, they change
+the structure of the network. Many interesting problems arise from this
+definition like ``how to control the movement of nodes so that communication
+properties are maintained'', ``how to provide situational awareness to the
+users, despite continuous network disruptions'', ``how to coordinate actions of
+the nodes in order to attain cooperative behavior through limited communication
+channels'', etc.
+
+\section{Onboard software}
+\subsection{Software architecture}
+In DUNE, all tasks run in their own execution thread, share a configuration
+environment from where they can fetch specific parameters and a message
+communication bus to where they send messages and listen for incoming messages. 
+
+Communication between tasks is done through IMC (Inter-Module Communication)
+messages. These messages can be addressed to other specific tasks or even for
+other systems (like operator consoles or other vehicles).
+
+\subsubsection{Transport tasks}
+Transport tasks are responsible for transporting messages in different means.
+For instance, the \emph{Transports.UDP} task is responsible for listening to a
+server UDP socket and forward any incoming messages to the DUNE message bus. On
+the other hand, this task as a parametrized set of messages that, when received
+via the message bus, get forwared through UDP. Something similar to this happens
+for the \emph{Transports.TCP},  \emph{Transports.HTTP} and
+\emph{Transports.GenericGSM}.
+
+The \emph{Transports.Logging} task acts as a sink of messages. All the
+parametrized messages will get stored to a file whenever they are heard in the
+DUNE message bus.
+
+\subsection{Control architecture}
+
+\subsubsection{Actuation tasks}
+In DUNE, there exist several tasks directly responsible for driving the
+vehicle, these are the \emph{Actuator} tasks. For instance, in LAUV vehicles, these are
+\emph{Actuators.Broom} and \emph{Actuators.SCRT} for controllig the motor and
+servos (fin positions), respectively. These tasks receive low-level commands
+like \emph{SetThrusterActuation} and \emph{SetFinPosition} which are translated
+into mechanical actions.
+
+\subsubsection{Guidance Tasks}
+Guidance tasks are tasks that receive intermediate-level commands and decompose
+these commands into low-level actuations. These are usually specific to vehicle
+type like \emph{Control.ASV.HeadingAndSpeed} which is a task that transforms
+DesiredSpeed and DesiredHeading into actuations at each control loop.
+
+\subsubsection{Sensing Tasks}
+Sensing tasks are sensor drivers that connect to hardware sensors and provide
+readings to other tasks (including logging tasks) through IMC messages.
+
+\subsubsection{Navigation Tasks}
+
+\subsection{Vehicle modes}
+On DUNE, there is a specialized task (Supervisors.Vehicle) which defines the
+current vehicle operational mode, starts execution
+
+\end{document}
