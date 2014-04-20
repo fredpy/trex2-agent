@@ -44,12 +44,13 @@
 
 #include "TeleoReactor.hh"
 #include <trex/domain/FloatDomain.hh>
+#include <trex/utils/chrono_helper.hh>
 
 #include <boost/scope_exit.hpp>
 
 #include <bitset>
 
-using TREX::utils::symbol;
+using TREX::utils::Symbol;
 namespace utils=TREX::utils;
 
 namespace TREX {
@@ -60,11 +61,11 @@ namespace TREX {
       Logger(std::string const &dest, boost::asio::io_service &io);
       ~Logger();
       
-      void provide(symbol const &name, bool goals, bool plan);
-      void unprovide(symbol const &name);
+      void provide(Symbol const &name, bool goals, bool plan);
+      void unprovide(Symbol const &name);
       
-      void use(symbol const &name , bool goals, bool plan);
-      void unuse(symbol const &name);
+      void use(Symbol const &name , bool goals, bool plan);
+      void unuse(Symbol const &name);
       
       void init(TICK val);
       void newTick(TICK val);
@@ -294,7 +295,7 @@ bool details::external::equal(details::external const &other) const {
     return !other.valid();
 }
 
-TREX::utils::log::stream details::external::syslog(utils::symbol const &kind) {
+TREX::utils::log::stream details::external::syslog(utils::Symbol const &kind) {
   return m_pos->first.client().syslog(m_pos->first.name(), kind);
 }
 
@@ -306,8 +307,8 @@ Relation const &details::external::dereference() const {
  * class TREX::transaction::TeleoReactor
  */
 
-utils::symbol const TeleoReactor::obs("ASSERT");
-utils::symbol const TeleoReactor::plan("PLAN");
+utils::Symbol const TeleoReactor::obs("ASSERT");
+utils::Symbol const TeleoReactor::plan("PLAN");
 
 
 // structors
@@ -319,7 +320,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
                                      xml_factory::node(arg), "verbose")),
    m_trLog(NULL),
-   m_name(utils::parse_attr<symbol>(xml_factory::node(arg), "name")),
+   m_name(utils::parse_attr<Symbol>(xml_factory::node(arg), "name")),
    m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
    m_maxDelay(0),
    m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
@@ -327,7 +328,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
    m_stat_log(m_log->service()) {
   boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
 
-  utils::log_manager::path_type fname = file_name("stat.csv");
+  utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
   m_stat_log<<"tick, tick_ns, tick_rt_ns, synch_ns, synch_rt_ns, delib_ns, delib_rt_ns, n_steps\n";
      
@@ -335,7 +336,7 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
     std::string base = getName().str()+".tr.log";
     fname = manager().file_name(base);
     m_trLog = new Logger(fname.string(), manager().service());
-    utils::log_manager::path_type cfg = manager().file_name("cfg"),
+    utils::LogManager::path_type cfg = manager().file_name("cfg"), 
       pwd = boost::filesystem::current_path(), 
       short_name(base), location("../"+base);
     boost::filesystem::current_path(cfg);
@@ -347,36 +348,36 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
   }
 
   if( loadTL ) {
-    utils::symbol tl_name;
+    utils::Symbol tl_name;
     // Add external file content
     utils::ext_xml(node.second, "config");
 
     for(boost::property_tree::ptree::iterator i=node.second.begin();
         node.second.end()!=i; ++i) {
       if( utils::is_tag(*i, "External") ) {
-        tl_name = utils::parse_attr<symbol>(*i, "name");
+        tl_name = utils::parse_attr<Symbol>(*i, "name");
         if( tl_name.empty() )
-          boost::property_tree::ptree_bad_data("Timelines cannot have an empty name", *i);
+          throw utils::XmlError(*i, "Timelines cannot have an empty name");
         use(tl_name, utils::parse_attr<bool>(true, *i, "goals"),
             utils::parse_attr<bool>(false, *i, "listen"));
       } else if( utils::is_tag(*i, "Internal") ) {
-        tl_name = utils::parse_attr<symbol>(*i, "name");
+        tl_name = utils::parse_attr<Symbol>(*i, "name");
         if( tl_name.empty() )
-          throw boost::property_tree::ptree_bad_data("Timelines cannot have an empty name", *i);
+          throw utils::XmlError(*i, "Timelines cannot have an empty name");
         provide(tl_name);
       }
     }
   }
 }
 
-TeleoReactor::TeleoReactor(graph *owner, symbol const &name,
+TeleoReactor::TeleoReactor(graph *owner, Symbol const &name,
                            TICK latency, TICK lookahead, bool log)
   :m_inited(false), m_firstTick(true), m_graph(*owner),
    m_have_goals(0),
    m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name),
    m_latency(latency), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0), m_stat_log(m_log->service()) {
-  utils::log_manager::path_type fname = file_name("stat.csv");
+  utils::LogManager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.string());
      
   if( log ) {
@@ -412,21 +413,21 @@ TeleoReactor::size_type TeleoReactor::count_internal_relations() const {
 }
 
 
-bool TeleoReactor::internal_sync(TREX::utils::symbol name) const {
+bool TeleoReactor::internal_sync(TREX::utils::Symbol name) const {
   return m_internals.end()!=m_internals.find(name);
 }
 
-bool TeleoReactor::isInternal(TREX::utils::symbol const &timeline) const {
+bool TeleoReactor::isInternal(TREX::utils::Symbol const &timeline) const {
   boost::function<bool ()> fn(boost::bind(&TeleoReactor::internal_sync, this, timeline));
   return utils::strand_run(m_graph.strand(), fn);
 }
 
-bool TeleoReactor::external_sync(TREX::utils::symbol name) const {
+bool TeleoReactor::external_sync(TREX::utils::Symbol name) const {
   return m_externals.end()!=m_externals.find(name);
 }
 
 
-bool TeleoReactor::isExternal(TREX::utils::symbol const &timeline) const {
+bool TeleoReactor::isExternal(TREX::utils::Symbol const &timeline) const {
   boost::function<bool ()> fn(boost::bind(&TeleoReactor::external_sync, this, timeline));
   return utils::strand_run(m_graph.strand(), fn);
 }
@@ -439,7 +440,7 @@ details::external TeleoReactor::ext_end() {
   return details::external(m_externals.end(), m_externals.end());
 }
 
-details::external TeleoReactor::find_external(TREX::utils::symbol const &name) {
+details::external TeleoReactor::find_external(TREX::utils::Symbol const &name) {
   return details::external(m_externals.find(name), m_externals.end());
 }
 
@@ -453,13 +454,13 @@ void TeleoReactor::reset_deadline() {
 }
 
 bool TeleoReactor::have_goals() {
-  utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
+  utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
   return 0 < *m_have_goals;
 }
 
 void TeleoReactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
   {
-    utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
+    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals -= a.size();
   }
   std::swap(a, dest);
@@ -468,7 +469,7 @@ void TeleoReactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
 
 void TeleoReactor::queue(std::list<goal_id> &l, goal_id g) {
   {
-    utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
+    utils::SharedVar<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals += 1;
   }
   l.push_back(g);
@@ -935,7 +936,7 @@ void TeleoReactor::step() {
   m_tick_steps +=1;
 }
 
-void TeleoReactor::use_sync(TREX::utils::symbol name, details::transaction_flags f) {
+void TeleoReactor::use_sync(TREX::utils::Symbol name, details::transaction_flags f) {
   if( !m_graph.subscribe(this, name, f) ) {
     if( internal_sync(name) )
       syslog(warn)<<"External declaration of the Internal timeline \""<<name<<"\"";
@@ -945,7 +946,7 @@ void TeleoReactor::use_sync(TREX::utils::symbol name, details::transaction_flags
 }
 
 
-void TeleoReactor::use(TREX::utils::symbol const &timeline, bool control, bool plan_listen) {
+void TeleoReactor::use(TREX::utils::Symbol const &timeline, bool control, bool plan_listen) {
   details::transaction_flags flag; // initialize all the flags to 0
   flag.set(0,control);        // update the control flag
   flag.set(1,plan_listen);    // update the plan_listen flag
@@ -954,7 +955,7 @@ void TeleoReactor::use(TREX::utils::symbol const &timeline, bool control, bool p
   utils::strand_run(m_graph.strand(), fn);
 }
 
-void TeleoReactor::provide_sync(TREX::utils::symbol name, details::transaction_flags f) {
+void TeleoReactor::provide_sync(TREX::utils::Symbol name, details::transaction_flags f) {
   if( !m_graph.assign(this, name, f) )
     if( internal_sync(name) ) {
       syslog(warn)<<"Promoted \""<<name<<"\" from External to Internal with rights "
@@ -963,7 +964,7 @@ void TeleoReactor::provide_sync(TREX::utils::symbol name, details::transaction_f
 }
 
 
-void TeleoReactor::provide(TREX::utils::symbol const &timeline,
+void TeleoReactor::provide(TREX::utils::Symbol const &timeline,
                            bool controllable, bool publish) {
   details::transaction_flags flag;
   flag.set(0, controllable);
@@ -979,7 +980,7 @@ void TeleoReactor::tr_info(std::string const &msg) {
   }
 }
 
-bool TeleoReactor::unuse_sync(TREX::utils::symbol name) {
+bool TeleoReactor::unuse_sync(TREX::utils::Symbol name) {
   external_set::iterator i = m_externals.find(name);
   if( m_externals.end()!=i ) {
     Relation r = i->first;
@@ -990,12 +991,12 @@ bool TeleoReactor::unuse_sync(TREX::utils::symbol name) {
 }
 
 
-bool TeleoReactor::unuse(TREX::utils::symbol const &timeline) {
+bool TeleoReactor::unuse(TREX::utils::Symbol const &timeline) {
   boost::function<bool ()> fn(boost::bind(&TeleoReactor::unuse_sync, this, timeline));
   return utils::strand_run(m_graph.strand(), fn);
 }
 
-bool TeleoReactor::unprovide_sync(TREX::utils::symbol name) {
+bool TeleoReactor::unprovide_sync(TREX::utils::Symbol name) {
   internal_set::iterator i = m_internals.find(name);
   if( m_internals.end()!=i ) {
     (*i)->unassign(getCurrentTick());
@@ -1004,7 +1005,7 @@ bool TeleoReactor::unprovide_sync(TREX::utils::symbol name) {
   return false;  
 }
 
-bool TeleoReactor::unprovide(TREX::utils::symbol const &timeline) {
+bool TeleoReactor::unprovide(TREX::utils::Symbol const &timeline) {
   boost::function<bool ()> fn(boost::bind(&TeleoReactor::unprovide_sync, this, timeline));
   return utils::strand_run(m_graph.strand(), fn);
 }
@@ -1130,7 +1131,7 @@ void TeleoReactor::latency_updated(TICK old_l, TICK new_l) {
   }
 }
 
-void TeleoReactor::unblock(symbol const &name) {
+void TeleoReactor::unblock(Symbol const &name) {
   details::external e=find_external(name);  
   if( e.active() )
     e.unblock();
@@ -1209,7 +1210,7 @@ void TeleoReactor::Logger::work(bool ret) {
                          this, oss.str(), true));
 }
 
-void TeleoReactor::Logger::provide(symbol const &name, bool goals, bool plan) {
+void TeleoReactor::Logger::provide(Symbol const &name, bool goals, bool plan) {
   std::ostringstream oss;
   oss<<"   <provide name=\""<<name
   <<"\" goals=\""<<goals
@@ -1218,14 +1219,14 @@ void TeleoReactor::Logger::provide(symbol const &name, bool goals, bool plan) {
                          this, oss.str(), true));
 }
 
-void TeleoReactor::Logger::unprovide(symbol const &name) {
+void TeleoReactor::Logger::unprovide(Symbol const &name) {
   std::ostringstream oss;
   oss<<"   <unprovide name=\""<<name<<"\" />";
   post_event(boost::bind(&Logger::direct_write,
                          this, oss.str(), true));  
 }
 
-void TeleoReactor::Logger::use(symbol const &name, bool goals, bool plan) {
+void TeleoReactor::Logger::use(Symbol const &name, bool goals, bool plan) {
   std::ostringstream oss;
   oss<<"   <use name=\""<<name
   <<"\" goals=\""<<goals
@@ -1234,7 +1235,7 @@ void TeleoReactor::Logger::use(symbol const &name, bool goals, bool plan) {
                          this, oss.str(), true));
 }
 
-void TeleoReactor::Logger::unuse(symbol const &name) {
+void TeleoReactor::Logger::unuse(Symbol const &name) {
   std::ostringstream oss;
   oss<<"   <unuse name=\""<<name<<"\" />";
   post_event(boost::bind(&Logger::direct_write,

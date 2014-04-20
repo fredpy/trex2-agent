@@ -34,7 +34,7 @@
 #ifndef FWD_trex_transaction_bits_transaction
 # define FWD_trex_transaction_bits_transaction
 
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 
 # include <bitset>
 

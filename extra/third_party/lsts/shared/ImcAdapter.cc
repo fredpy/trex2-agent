@@ -7,14 +7,10 @@
 
 #include "ImcAdapter.hh"
 
-namespace TREX
-{
-  namespace LSTS
-  {
+namespace TREX {
+  namespace LSTS {
 
-    ImcAdapter::ImcAdapter() :
-        c_imc_header_length(sizeof(IMC::Header)),
-        c_max_iridium_payload_length(260)
+    ImcAdapter::ImcAdapter()
     {
       m_trex_id = 65000;
       m_graph = NULL;
@@ -22,26 +18,24 @@ namespace TREX
       messenger = NULL;
     }
 
-    Observation
-    ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
+    Observation ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
     {
 
       if (msg != NULL)
       {
-        switch (msg->medium)
-        {
+        switch (msg->medium) {
           case (VehicleMedium::VM_WATER):
             return Observation("medium", "Water");
-            break;
+          break;
           case (VehicleMedium::VM_UNDERWATER):
             return Observation("medium", "Underwater");
-            break;
+          break;
           case (VehicleMedium::VM_AIR):
             return Observation("medium", "Air");
-            break;
+          break;
           case (VehicleMedium::VM_GROUND):
             return Observation("medium", "Ground");
-            break;
+          break;
           default:
             break;
         }
@@ -49,8 +43,7 @@ namespace TREX
       return Observation("medium", "Unknown");
     }
 
-    Observation
-    ImcAdapter::estimatedStateObservation(EstimatedState * msg)
+    Observation ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
       if (msg == NULL)
         return Observation("estate", "Boot");
@@ -67,21 +60,22 @@ namespace TREX
       //msg->toText(std::cout);
       if (msg->depth > 0)
         obs.restrictAttribute("z", FloatDomain(msg->depth));
-      else if (msg->alt > 0)
+      else if (msg->alt > 0 )
         obs.restrictAttribute("z", FloatDomain(-msg->alt));
-      else if (msg->height != -1)
-        obs.restrictAttribute("z", FloatDomain(msg->height + (-msg->z)));
+      else if (msg->height != -1 )
+        obs.restrictAttribute("z", FloatDomain(msg->height + (- msg->z)));
 
       if (msg->depth > 0)
-        obs.restrictAttribute("depth",
-                              FloatDomain(msg->depth /*+ (- msg->z)*/));
+        obs.restrictAttribute("depth", FloatDomain(msg->depth /*+ (- msg->z)*/));
       if (msg->alt > 0)
         obs.restrictAttribute("altitude", FloatDomain(msg->alt));
       if (msg->height != -1)
-        obs.restrictAttribute("height", FloatDomain(msg->height + (-msg->z)));
+        obs.restrictAttribute("height", FloatDomain(msg->height + (- msg->z)));
+
 
       return obs;
     }
+
 
     void
     ImcAdapter::setReactorGraph(graph const &g)
@@ -89,11 +83,9 @@ namespace TREX
       m_graph = &g;
     }
 
-    Observation
-    ImcAdapter::followRefStateObservation(FollowRefState * msg)
+    Observation ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
-      if (msg == NULL || msg->reference.isNull()
-          || msg->control_src != m_trex_id
+      if (msg == NULL || msg->reference.isNull() || msg->control_src != m_trex_id
           || msg->state == FollowRefState::FR_TIMEOUT
           || msg->state == FollowRefState::FR_WAIT)
         return Observation("reference", "Boot");
@@ -111,17 +103,17 @@ namespace TREX
 
       if (!msg->reference->z.isNull())
       {
-        switch (msg->reference->z->z_units)
+        switch(msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+          break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+          break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
-            break;
+                obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+          break;
           default:
             break;
         }
@@ -133,19 +125,18 @@ namespace TREX
                               FloatDomain((msg->reference->speed->value)));
       }
 
+
       return obs;
     }
 
-    Observation
-    ImcAdapter::planControlStateObservation(PlanControlState * msg)
+    Observation ImcAdapter::planControlStateObservation(PlanControlState * msg)
     {
       if (msg != NULL)
       {
 
-        if (msg->state == PlanControlState::PCS_EXECUTING
-            && msg->plan_id == "trex_plan")
+        if (msg->state == PlanControlState::PCS_EXECUTING && msg->plan_id == "trex_plan")
         {
-          Observation obs = Observation("control", "TREX");
+          Observation obs =  Observation("control", "TREX");
           return obs;
         }
         return Observation("control", "DUNE");
@@ -154,8 +145,7 @@ namespace TREX
       return Observation("control", "Boot");
     }
 
-    Observation
-    ImcAdapter::opLimitsObservation(OperationalLimits * msg)
+    Observation ImcAdapter::opLimitsObservation(OperationalLimits * msg)
     {
       if (msg == NULL)
         return Observation("oplimits", "Boot");
@@ -168,7 +158,7 @@ namespace TREX
       if ((msg->mask & IMC::OPL_MAX_ALT))
         obs.restrictAttribute("max_altitude", FloatDomain(msg->max_altitude));
 
-      if (msg->mask & IMC::OPL_MIN_ALT)
+      if(msg->mask & IMC::OPL_MIN_ALT)
         obs.restrictAttribute("min_altitude", FloatDomain(msg->min_altitude));
 
       if (msg->mask & IMC::OPL_MAX_SPEED)
@@ -182,15 +172,14 @@ namespace TREX
       return obs;
     }
 
-    Observation
-    ImcAdapter::announceObservation(Announce * msg)
+    Observation ImcAdapter::announceObservation(Announce * msg)
     {
       std::string system = msg->sys_name;
       std::replace(system.begin(), system.end(), '-', '_');
 
       double age = Time::Clock::getSinceEpoch() - msg->getTimeStamp();
 
-      if (age > 15)
+      if(age > 15)
       {
         Observation obs(system, "position");
         obs.restrictAttribute("latitude", FloatDomain(msg->lat));
@@ -207,8 +196,7 @@ namespace TREX
       return obs;
     }
 
-    Goal
-    ImcAdapter::genericGoal(TrexToken * msg)
+    Goal ImcAdapter::genericGoal(TrexToken * msg)
     {
       Goal g(msg->timeline, msg->predicate);
 
@@ -219,8 +207,7 @@ namespace TREX
 
         if (attr->name == "start" || attr->name == "end")
         {
-          IntegerDomain::bound min = m_graph->getCurrentTick(), max =
-              IntegerDomain::plus_inf;
+          IntegerDomain::bound min = m_graph->getCurrentTick(), max = IntegerDomain::plus_inf;
           if (!attr->min.empty())
             min = m_graph->as_date(attr->min);
           if (!attr->max.empty())
@@ -231,8 +218,7 @@ namespace TREX
           else
             g.restrictEnd(IntegerDomain(min, max));
         }
-        else if (attr->name == "duration")
-        {
+        else if (attr->name == "duration") {
           IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
           if (!attr->min.empty())
             min = m_graph->as_duration(attr->min);
@@ -257,7 +243,7 @@ namespace TREX
       std::string min = attr.min;
       std::string max = attr.max;
 
-      switch (attr.attr_type)
+      switch(attr.attr_type)
       {
         case TrexAttribute::TYPE_STRING:
           pred.restrictAttribute(attr.name, StringDomain(min));
@@ -265,8 +251,7 @@ namespace TREX
 
         case TrexAttribute::TYPE_BOOL:
           if (min == max && min != "")
-            pred.restrictAttribute(attr.name,
-                                   BooleanDomain(min != "false" || min != "0"));
+            pred.restrictAttribute(attr.name, BooleanDomain(min != "false" || min != "0"));
           else
             pred.restrictAttribute(attr.name, BooleanDomain());
           break;
@@ -311,8 +296,7 @@ namespace TREX
       }
     }
 
-    Observation
-    ImcAdapter::genericObservation(TrexToken * msg)
+    Observation ImcAdapter::genericObservation(TrexToken * msg)
     {
       Observation obs(msg->timeline, msg->predicate);
 
@@ -335,49 +319,21 @@ namespace TREX
     }
 
     bool
-    ImcAdapter::sendViaIridium(Message * msg, const std::string address,
-        int port)
+    ImcAdapter::sendViaIridium(Message * msg, const std::string address, int port)
     {
-      uint8_t buffer[65635];
-      ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
+      uint8_t buffer[500];
+      GenericIridiumMessage * irMsg = new GenericIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
       irMsg->source = msg->getSource();
       int len = irMsg->serialize(buffer);
+      IridiumMsgTx * tx = new IridiumMsgTx();
+      tx->data.assign(buffer, buffer + len);
 
-      // message needs to be fragmented...
-      if (len > c_max_iridium_payload_length)
-      {
-        int i;
-        DUNE::Network::Fragments frags(msg, c_max_iridium_payload_length);
-        std::cout << "Message to be sent via iridium fragmented into "
-            << frags.getNumberOfFragments() << " fragments." << std::endl;
-
-        for (i = 0; i < frags.getNumberOfFragments(); i++)
-        {
-          ImcIridiumMessage * irMsg = new ImcIridiumMessage(
-              frags.getFragment(i));
-          uint8_t buff[512];
-          irMsg->destination = msg->getDestination();
-          irMsg->source = msg->getSource();
-          int length = irMsg->serialize(buff);
-          IridiumMsgTx * tx = new IridiumMsgTx();
-          tx->ttl = 1800; // try sending this update for 30 minutes
-          tx->data.assign(buff, buff + length);
-          if (!send(tx, address, port))
-            return false;
-        }
-        return true;
-      }
-      else
-      {
-        IridiumMsgTx * tx = new IridiumMsgTx();
-        tx->data.assign(buffer, buffer + len);
-        return send(tx, address, port);
-      }
+      return send(tx, address, port);
     }
 
-    Message *
-    ImcAdapter::pollAsynchronous()
+
+    Message * ImcAdapter::pollAsynchronous()
     {
       if (messenger == NULL)
         messenger = new ImcMessenger();
@@ -389,8 +345,6 @@ namespace TREX
     {
       sock_receive.bind(port, Address::Any, true);
       m_poll.add(sock_receive);
-
-      return true;
     }
 
     Message *
@@ -415,7 +369,7 @@ namespace TREX
         IMC::Packet::serialize(msg, bb);
 
         return sock_send.write(bb.getBuffer(), msg->getSerializationSize(),
-                               Address(addr.c_str()), port);
+                   Address(addr.c_str()), port);
       }
       catch (std::runtime_error& e)
       {
@@ -425,6 +379,7 @@ namespace TREX
       return true;
     }
 
+
     bool
     ImcAdapter::bindAsynchronous(int port)
     {
@@ -433,8 +388,6 @@ namespace TREX
 
       messenger = new ImcMessenger();
       messenger->startListening(port);
-
-      return true;
     }
 
     bool
@@ -486,22 +439,20 @@ namespace TREX
     void
     ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
     {
-      symbol t = v.domain().getTypeName();
+      Symbol t = v.domain().getTypeName();
       attr->name = v.name().str();
 
       if (attr->name == "start" || attr->name == "end")
       {
         attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
+        IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
         if (id.isSingleton())
         {
           std::string s = date_export(*m_graph, id.lowerBound().value());
           attr->min = s;
           attr->max = s;
         }
-        else
-        {
+        else {
           if (id.hasUpper())
           {
             std::string s = date_export(*m_graph, id.upperBound().value());
@@ -518,59 +469,48 @@ namespace TREX
       else if (attr->name == "duration")
       {
         attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
+        IntegerDomain const &id = dynamic_cast<IntegerDomain const &>(v.domain());
         if (id.isSingleton())
         {
           std::string s = duration_export(*m_graph, id.lowerBound().value());
           attr->min = s;
           attr->max = s;
         }
-        else
-        {
+        else {
           if (id.hasUpper())
           {
-            std::string s = duration_export(*m_graph,
-                                            id.upperBound().value() + 1);
+            std::string s = duration_export(*m_graph, id.upperBound().value()+1);
             attr->max = s;
           }
           if (id.hasLower())
           {
-            std::string s = duration_export(*m_graph,
-                                            id.lowerBound().value() - 1);
+            std::string s = duration_export(*m_graph, id.lowerBound().value()-1);
             attr->min = s;
           }
         }
         return;
       }
-      else if (t.str() == "float")
-      {
+      else if (t.str() == "float") {
         attr->attr_type = TrexAttribute::TYPE_FLOAT;
       }
-      else if (t.str() == "int")
-      {
+      else if (t.str() == "int") {
         attr->attr_type = TrexAttribute::TYPE_INT;
       }
-      else if (t.str() == "bool")
-      {
+      else if (t.str() == "bool") {
         attr->attr_type = TrexAttribute::TYPE_BOOL;
       }
-      else if (t.str() == "string")
-      {
+      else if (t.str() == "string") {
         attr->attr_type = TrexAttribute::TYPE_STRING;
       }
-      else if (t.str() == "enum")
-      {
+      else if (t.str() == "enum") {
         attr->attr_type = TrexAttribute::TYPE_ENUM;
       }
 
-      if (v.domain().isSingleton())
-      {
+      if (v.domain().isSingleton()) {
         attr->max = v.domain().getStringSingleton();
         attr->min = v.domain().getStringSingleton();
       }
-      else
-      { // if (v.domain().isFull()) {
+      else  {// if (v.domain().isFull()) {
         attr->max = "";
         attr->min = "";
       }
@@ -583,10 +523,10 @@ namespace TREX
       result->predicate = obs.predicate().str();
       result->attributes.clear();
 
-      std::list<TREX::utils::symbol> attrs;
+      std::list<TREX::utils::Symbol> attrs;
 
       obs.listAttributes(attrs);
-      std::list<TREX::utils::symbol>::iterator it;
+      std::list<TREX::utils::Symbol>::iterator it;
       for (it = attrs.begin(); it != attrs.end(); it++)
       {
         TrexAttribute attr;

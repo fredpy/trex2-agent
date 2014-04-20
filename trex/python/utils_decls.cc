@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <trex/utils/symbol.hh>
-#include <trex/utils/log_manager.hh>
+#include <trex/utils/Symbol.hh>
+#include <trex/utils/LogManager.hh>
 #include <trex/utils/XmlUtils.hh>
 
 #include <boost/python.hpp>
@@ -64,24 +64,24 @@ namespace {
     PyGILState_STATE m_gil_state;
   };
   
-  TREX::utils::singleton::use<TREX::utils::log_manager> s_log;
+  TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
 
   class log_wrapper {
   public:
     explicit log_wrapper(std::string const &name)
     :m_name(name) {}
-    explicit log_wrapper(TREX::utils::symbol const &name)
+    explicit log_wrapper(TREX::utils::Symbol const &name)
     :m_name(name) {}
     ~log_wrapper() {}
     
     
     std::string get_log_dir() const {
-      return m_log->log_path().string();
+      return m_log->logPath().string();
     }
     void set_log_dir(std::string const &path) {
-      m_log->log_path(path);
+      m_log->setLogPath(path);
     }
-    void log(TREX::utils::symbol const &what, std::string const &msg) {
+    void log(TREX::utils::Symbol const &what, std::string const &msg) {
       get_log_dir();
       m_log->syslog(m_name, what)<<msg;
     }
@@ -97,7 +97,7 @@ namespace {
     
     std::string use(std::string fname) {
       bool found;
-      fname = m_log->use(fname, found).string();
+      fname = m_log->use(fname, found);
       if( found )
         return fname;
       return std::string();
@@ -105,16 +105,25 @@ namespace {
         
     std::string path() const {
       get_log_dir();
-      return m_log->search_path();
+      std::ostringstream ret;
+      bool not_first = false;
+      for(TREX::utils::LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i) {
+        if( not_first )
+          ret.put(':');
+        else
+          not_first = true;
+        ret<<i->string();
+      }
+      return ret.str();
     }
     
     bool add_path(std::string dir) {
-      return m_log->add_search_path(dir);
+      return m_log->addSearchPath(dir);
     }
     
-    TREX::utils::symbol m_name;
+    TREX::utils::Symbol m_name;
   private:
-    TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
+    TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
   };
   
   class py_log_handler {
@@ -163,7 +172,7 @@ namespace {
     
   private:
     TREX::utils::log::text_log::connection             m_conn;
-    TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
+    TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
   };
   
   struct py_log_handler_wrap:py_log_handler, wrapper<py_log_handler> {
@@ -309,7 +318,7 @@ namespace {
     return TREX::utils::parse_attr<std::string>(t, name);
   }
   
-  std::string symbol_rep(TREX::utils::symbol const &s) {
+  std::string symbol_rep(TREX::utils::Symbol const &s) {
     return "<trex.utils.symbol '"+s.str()+"'>";
   }
 
@@ -344,12 +353,12 @@ void export_utils() {
   //   can be compared to each other with (==,!=,<,>,<=,=>)
   //   can be checked if empty()q
   //   supports str(s) and len(s)
-  class_<TREX::utils::symbol>("symbol", "Unique instance symbolic value",
+  class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
                               init<optional<std::string> >(args("name"),
                                                            "Create a new symbol with the given name"))
-   .add_property("empty", &TREX::utils::symbol::empty,
+   .add_property("empty", &TREX::utils::Symbol::empty,
         "Test if current instance is the empty symbol")
-   .def("__len__", &TREX::utils::symbol::length, (arg("self")),
+   .def("__len__", &TREX::utils::Symbol::length, (arg("self")),
         "Length in character of the current instance")
    .def(self == self)
    .def(self != self)
@@ -357,7 +366,7 @@ void export_utils() {
    .def(self > self)
    .def(self <= self)
    .def(self >= self)
-   .def("__str__", &TREX::utils::symbol::str,
+   .def("__str__", &TREX::utils::Symbol::str,
         return_value_policy<copy_const_reference>(),
         (arg("self")),
         "String representation. This just convert the symbol into a\n"
@@ -369,7 +378,7 @@ void export_utils() {
   
     
   // python string can be implicitly converted into trex.symbol
-  implicitly_convertible<std::string, TREX::utils::symbol>();
+  implicitly_convertible<std::string, TREX::utils::Symbol>();
   
   
   // trex.utils.log_entry class
@@ -409,7 +418,7 @@ void export_utils() {
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::symbol>(args("self", "name"), "Create a new logger with the given source name"))
+  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self", "name"), "Create a new logger with the given source name"))
   .add_property("name", make_getter(&log_wrapper::m_name, return_internal_reference<>()),
                 "Name of this log producer")
   .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir,

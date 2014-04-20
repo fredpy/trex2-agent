@@ -46,11 +46,11 @@
 
 # include "bits/agent_graph.hh"
 
-# include <trex/utils/platform/system_error.hh>
 # include <trex/transaction/Tick.hh>
+# include <trex/utils/ErrnoExcept.hh>
 # include <trex/utils/asio_fstream.hh>
 
-# include <trex/utils/timing/posix_utils.hh>
+# include <trex/utils/TimeUtils.hh>
 
 namespace TREX {
   namespace agent {
@@ -93,6 +93,7 @@ namespace TREX {
       }; // TREX::agent::Clock::Error
             
       typedef transaction::graph::duration_type          duration_type;
+      typedef utils::chrono_posix_convert<duration_type> dur_converter;
       typedef transaction::graph::date_type              date_type;
     
       /** @brief Destructor */
@@ -136,11 +137,10 @@ namespace TREX {
 	return CHRONO::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
-        return initialTick()+(date.since(epoch()).to_chrono<duration_type>().count()/tickDuration().count());
-      }
+        return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
+      }	
       virtual date_type tickToTime(TREX::transaction::TICK cur) const {
-        utils::rt_duration delta(tickDuration()*(cur-initialTick()));
-        return epoch().add(delta);
+        return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
       }
       
       /** @brief Sleep until next tick
@@ -258,7 +258,7 @@ namespace TREX {
 
     private:
       duration_type const m_sleep;
-      utils::singleton::use<utils::log_manager> m_log;
+      utils::SingletonUse<utils::LogManager> m_log;
       
       void log_tick() const ;
       
@@ -267,7 +267,7 @@ namespace TREX {
       mutable bool   m_started;
       mutable transaction::TICK  m_last;
       mutable bool               m_free;
-      mutable size_t             m_free_count, m_count;
+      mutable size_t             m_count;
       mutable utils::async_ofstream m_data;
     }; // TREX::agent::Clock
 

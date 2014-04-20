@@ -11,7 +11,7 @@ namespace
 {
 
   /** @brief TREX log entry point */
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
   /** @brief Platform reactor declaration */
   TeleoReactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
@@ -22,15 +22,15 @@ namespace TREX {
   namespace LSTS {
 
     // Symbol equality test is faster than string : use global Symbols to improve performances
-    utils::symbol const YoYoReactor::s_trex_pred("TREX");
-    utils::symbol const YoYoReactor::s_exec_pred("Exec");
+    utils::Symbol const YoYoReactor::s_trex_pred("TREX");
+    utils::Symbol const YoYoReactor::s_exec_pred("Exec");
 
-    utils::symbol const YoYoReactor::s_reference_tl("reference");
-    utils::symbol const YoYoReactor::s_refstate_tl("refstate");
-    utils::symbol const YoYoReactor::s_control_tl("control");
-    utils::symbol const YoYoReactor::s_position_tl("estate");
-    utils::symbol const YoYoReactor::s_yoyo_tl("yoyo");
-    utils::symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
+    utils::Symbol const YoYoReactor::s_reference_tl("reference");
+    utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
+    utils::Symbol const YoYoReactor::s_control_tl("control");
+    utils::Symbol const YoYoReactor::s_position_tl("estate");
+    utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
+    utils::Symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
 
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
       LstsReactor(arg),

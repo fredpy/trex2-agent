@@ -28,7 +28,7 @@ namespace TREX {
       virtual ~DummyOperator();
 
     private:
-      TREX::utils::singleton::use<SharedEnvironment> m_env;
+      TREX::utils::SingletonUse<SharedEnvironment> m_env;
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize() {return true;}
     };

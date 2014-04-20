@@ -56,7 +56,7 @@
 
 using namespace TREX::europa;
 using namespace TREX;
-using TREX::utils::symbol;
+using TREX::utils::Symbol;
 
 namespace tr=TREX::transaction;
 
@@ -257,7 +257,7 @@ void details::europa_domain::visit(tr::BasicInterval const *dom) {
 }
 
 void details::europa_domain::visit(tr::DomainBase const *dom, bool) {
-  symbol const &type = dom->getTypeName();
+  Symbol const &type = dom->getTypeName();
 
   if( EuropaDomain::type_name==type ) {
     // EuropaDomain has a europa Domain directly available

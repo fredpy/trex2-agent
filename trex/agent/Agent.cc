@@ -44,7 +44,7 @@
 #include <iterator>
 #include <limits>
 
-#include <trex/utils/timing/chrono_helper.hh>
+#include <trex/utils/chrono_helper.hh>
 
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???
@@ -292,7 +292,7 @@ namespace TREX {
          * by declaring the timeline @p name as @p type.
          */
         cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, 
-                      Cycle_Type type, utils::symbol name="" )
+                      Cycle_Type type, utils::Symbol name="" )
         :root(root), node(goal), name(name), timelineType(type) {};
 
         /** @brief New reactor discovered 
@@ -321,7 +321,7 @@ namespace TREX {
                 std::stringstream msg;
                 
                 msg<<"Found a potential cycle going from ";
-                for(std::list<utils::symbol>::iterator it = path.begin(); it!=path.end(); it++) {
+                for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
                   msg<<"("<<*it<<")->";
                 }
                 msg<<"("<<name<<")";
@@ -361,7 +361,7 @@ namespace TREX {
             if(boost::target(rel, g)==node) {
               std::stringstream msg;
               msg<<"Found a potential cycle going from ("<<name<<")->";
-              for(std::list<utils::symbol>::iterator it = path.begin(); it!=path.end(); it++) {
+              for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
                 msg<<"("<<*it<<")->";
               }
               msg<<"("<<rel->name()<<")";
@@ -418,13 +418,13 @@ namespace TREX {
          *
          * The name of the timeline the reactor node attempts to declare
          */
-        utils::symbol name;
+        utils::Symbol name;
         /** @brief current timelines path
          *
          * The list of all the timlines currently traversed by the search. 
          * If a cycle is detected this path describes it.
          */
-        std::list<utils::symbol> path;
+        std::list<utils::Symbol> path;
         /** @brief Type of attempted connection
          */
         Cycle_Type timelineType;
@@ -450,7 +450,7 @@ TICK Agent::initialTick(clock_ref clk) {
 
 // structors :
 
-Agent::Agent(symbol const &name, TICK final, clock_ref clk, bool verbose)
+Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
   :graph(name, initialTick(clk), verbose),
    m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
@@ -620,7 +620,7 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
 void Agent::subConf(boost::property_tree::ptree &conf, 
                     std::string const &path) {
   boost::property_tree::ptree::assoc_iterator i, last;
-  singleton::use<Clock::xml_factory> clk_f;
+  SingletonUse<Clock::xml_factory> clk_f;
   
   if( path.empty() ) {
     // On the root we need to load plug-ins before the clock 
@@ -678,23 +678,27 @@ void Agent::subConf(boost::property_tree::ptree &conf,
 
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") )
-    throw boost::property_tree::ptree_bad_data("Not an Agent node", config);
+    throw XmlError(config, "Not an Agent node");
   // Extract attributes
-  symbol name(parse_attr<std::string>(config, "name"));
+  try {
+    Symbol name(parse_attr<std::string>(config, "name"));
 
-  if( name.empty() )
-    throw boost::property_tree::ptree_bad_data("Agent name is empty.", config);
-  set_name(name);
+    if( name.empty() )
+      throw XmlError(config, "Agent name is empty.");
+    set_name(name);
     
-  m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
-  if( m_finalTick<=0 )
-    throw boost::property_tree::ptree_bad_data("agent life time should be greater than 0", config);
+    m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
+    if( m_finalTick<=0 )
+      throw XmlError(config, "agent life time should be greater than 0");
+  } catch(bad_string_cast const &e) {
+    throw XmlError(config, e.what());
+  }
   // Populate with external configuration
   ext_xml(config.second, "config");
 
   // Now iterate through the sub-tags
   if( config.second.empty() )
-    throw boost::property_tree::ptree_bad_data("Agent node does not have sub nodes.", config);
+    throw XmlError(config, "Agent node does not have sub nodes.");
 
   subConf(config.second, "");
   syslog(null, info)<<"End of init.";
@@ -702,14 +706,11 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
 
 void Agent::loadConf(std::string const &file_name) {
   bool found;
-  std::string name = manager().use(file_name, found).string();
+  std::string name = manager().use(file_name, found);
   if( !found ) {
-    name = manager().use(file_name+".cfg", found).string();
-    if( !found ) {
-      ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
-    
-      throw SYSTEM_ERROR(ec, "Unable to locate "+file_name);
-    }
+    name = manager().use(file_name+".cfg", found);
+    if( !found )
+      throw ErrnoExcept("Unable to locate "+file_name);
   }
   boost::property_tree::ptree agent;
   read_xml(name, agent, xml::no_comments|xml::trim_whitespace);
@@ -776,7 +777,7 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  log_manager::path_type graph_dot = manager().file_name("reactors.gv");
+  LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   async_ofstream dotf(manager().service(), graph_dot.string());
   
   m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
@@ -876,7 +877,7 @@ void Agent::synchronize() {
     std::ostringstream name;
     name<<"reactors."<<now<<".gv";
     
-    log_manager::path_type graph_dot = manager().file_name(name.str());
+    LogManager::path_type graph_dot = manager().file_name(name.str());
     async_ofstream dotf(manager().service(), graph_dot.string());
     
     {
@@ -889,7 +890,7 @@ void Agent::synchronize() {
 }
 
 bool Agent::executeReactor() {
-  symbol id = null;
+  Symbol id = null;
   
   if( m_edf.empty() )
     return false;

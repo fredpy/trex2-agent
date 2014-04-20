@@ -87,8 +87,8 @@ namespace TREX {
        * Create a new instance connected to timeline @a object with the
        * state @a pred and all its attributes not constrained
        */
-      Goal(TREX::utils::symbol const &object,
-	   TREX::utils::symbol const &pred);
+      Goal(TREX::utils::Symbol const &object,
+	   TREX::utils::Symbol const &pred);
       /** @brief XML parsing constructor
        * @param[in] node An XML node
        *
@@ -211,16 +211,16 @@ namespace TREX {
        *                  IntegerDomain const &)
        */
       void restrictAttribute(Variable const &var);
-      Variable const &getAttribute(TREX::utils::symbol const &name) const;
-      void listAttributes(std::list<TREX::utils::symbol> &attr,
+      Variable const &getAttribute(TREX::utils::Symbol const &name) const;
+      void listAttributes(std::list<TREX::utils::Symbol> &attr,
 			  bool all) const;
       
       /** @brief name of start attribute */
-      static TREX::utils::symbol const s_startName;
+      static TREX::utils::Symbol const s_startName;
       /** @brief name of duration attribute */
-      static TREX::utils::symbol const s_durationName;
+      static TREX::utils::Symbol const s_durationName;
       /** @brief name of end attribute */
-      static TREX::utils::symbol const s_endName;
+      static TREX::utils::Symbol const s_endName; 
 
       /** @brief Restrict time variables
        *
@@ -298,7 +298,7 @@ namespace TREX {
     private:
       Variable m_start, m_duration, m_end;
       
-      TREX::utils::symbol const &getPredTag() const;
+      TREX::utils::Symbol const &getPredTag() const;
     };
 
     /** @brief A goal identifier

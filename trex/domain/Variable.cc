@@ -45,15 +45,13 @@
 using namespace TREX::utils;
 using namespace TREX::transaction;
 
-namespace bp=boost::property_tree;
-
 /*
  * class TREX::transaction::Variable
  */
 
 // statics :
 
-singleton::use<DomainBase::xml_factory> Variable::s_dom_factory;
+SingletonUse<DomainBase::xml_factory> Variable::s_dom_factory;
 
 DomainBase *Variable::clone
 (boost::call_traits<Variable::domain_ptr>::param_type dom) {
@@ -67,10 +65,10 @@ DomainBase *Variable::clone
 
 Variable::Variable() {}
 
-Variable::Variable(symbol const &name, DomainBase *dom)
+Variable::Variable(Symbol const &name, DomainBase *dom)
   :m_name(name), m_domain(dom) {}
 
-Variable::Variable(symbol const &name, DomainBase const &dom) 
+Variable::Variable(Symbol const &name, DomainBase const &dom) 
   :m_name(name), m_domain(dom.copy()) {
   if( m_name.empty() )
     throw VariableException("Empty variable names are not allowed");
@@ -80,13 +78,13 @@ Variable::Variable(Variable const &other)
   :m_name(other.m_name), m_domain(clone(other.m_domain)) {}
 
 Variable::Variable(boost::property_tree::ptree::value_type &node)
-  :m_name(parse_attr<symbol>(node.second, "name")) {
+  :m_name(parse_attr<Symbol>(node.second, "name")) {
   if( m_name.empty() )
-    throw bp::ptree_bad_data("Variable name is empty", node);
+    throw XmlError(node, "Variable name is empty.");
   
   boost::property_tree::ptree::iterator i = node.second.begin();
   if( !s_dom_factory->iter_produce(i, node.second.end(), m_domain) )
-    throw bp::ptree_bad_data("Missing variable domain on XML tag", node);
+    throw XmlError(node, "Missing variable domain on XML tag"); 
 }
 
 Variable::~Variable() {}
@@ -132,6 +130,13 @@ DomainBase const &Variable::domain() const {
     throw VariableException("Variable's domain cannot be accessed.");
   return *m_domain;
 } 
+
+std::ostream &Variable::print_to(std::ostream &out) const {
+  if( isComplete() ) 
+    return out<<m_name<<"="<<*m_domain;
+  else
+    return out<<"<?"<<m_name<<'>'; 
+}
 
 boost::property_tree::ptree Variable::as_tree() const {
   boost::property_tree::ptree ret;

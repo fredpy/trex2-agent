@@ -50,7 +50,7 @@ namespace TREX {
       virtual ~python_reactor() {}
       
       // logging
-      void log_msg(utils::symbol const &type, std::string const &msg);
+      void log_msg(utils::Symbol const &type, std::string const &msg);
       void info(std::string const &msg) {
         log_msg(utils::log::info, msg);
       }
@@ -62,16 +62,16 @@ namespace TREX {
       }
       
       // timeline management
-      void ext_use(utils::symbol const &tl, bool control);
-      bool ext_check(utils::symbol const &tl) const;
-      bool ext_unuse(utils::symbol const &tl);
+      void ext_use(utils::Symbol const &tl, bool control);
+      bool ext_check(utils::Symbol const &tl) const;
+      bool ext_unuse(utils::Symbol const &tl);
 
       void post_request(transaction::goal_id const &g);
       bool cancel_request(transaction::goal_id const &g);
     
-      void int_decl(utils::symbol const &tl, bool control);
-      bool int_check(utils::symbol const &tl) const;
-      bool int_undecl(utils::symbol const &tl);
+      void int_decl(utils::Symbol const &tl, bool control);
+      bool int_check(utils::Symbol const &tl) const;
+      bool int_undecl(utils::Symbol const &tl);
 
       void post_obs(transaction::Observation const &obs, bool verb);
       
@@ -91,7 +91,7 @@ namespace TREX {
     
     class producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
     public:
-      explicit producer(utils::symbol const &name);
+      explicit producer(utils::Symbol const &name);
       ~producer() {}
       
     private:

@@ -10,7 +10,7 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
 # include "../shared/ImcAdapter.hh"
 

@@ -49,14 +49,27 @@
 # include <iostream>
 
 # include "XmlUtils.hh" 
-# include "generic_factory.hh"
-# include "symbol.hh"
+# include "Factory.hh"
+# include "Symbol.hh"
 
 namespace TREX {
   namespace utils {
 
     namespace internals {
 
+      /** @brief XmlFactory argument helper
+       *
+      * @tparam Base The argument bmain type. This type is often a 
+       *   Boost.PropertyTree or a type including such tree
+       * @tparam Extra Extra information type. The type emebedding no XML information
+       *
+       * This class is used by XmlDFactory as an helper to extract information from 
+       * the factory production argument.  
+       * 
+       * @relates TREX::utils::XmlFactory
+       * @author Frederic Py <fpy@mbari.org>
+       * @ingroup utils
+       */
       template<class Base, class Extra>
       struct xml_arg_helper {
       private:
@@ -65,16 +78,53 @@ namespace TREX {
 	typedef std::pair<boost::property_tree::ptree::value_type *, Extra> computed_node;
 #endif 
       public:
- 	typedef computed_type argument_type;
- 	typedef computed_node node_proxy;
+        /** @brief Deduced argument type
+         * The type used to compose @p Base and @p Extra. 
+         * If @p Extra is @c void then this type is @p Base,
+         * otherwise it would be a pair of the two types
+         */
+	typedef computed_type argument_type;
+        /** @brief Deduced node type
+         * The type used to compose a Boost.PropertyTree and @p Extra. 
+         * This type is the one that the `XmlFactory` will pass to its producers   
+         */
+	typedef computed_node node_proxy;
 
+        /** @brief Extract xml information
+         *
+         * @param[in] arg An argument structure
+         *
+         * This method allows to extract the @p Base component of @p arg. As @p Base 
+         * is often related to a Boost.PropertyTree, we assume that this part is the XML 
+         * part of the argument
+         *
+         * @return The @p Base comsponent of @p arg
+         */
 	static Base &xml(argument_type &arg) {
 	  return *(arg.first);
 	}
+        /** @brief Build new element 
+         *
+         * @param[in] n A @p Base instance 
+         * @param[in] e A @p Extra instance 
+         *
+         * Create a new argument
+         *
+         * @return the newly created argument that composes @p n and @p e 
+         */
 	static argument_type build(Base &n, Extra &e) {
 	  return std::make_pair(&n, e);
 	}
 
+        /** @brief Build new node 
+         *
+         * @param[in] n A Boost.PropertyTree 
+         * @param[in] b An  
+         *
+         * Create a new xml node
+         *
+         * @return the newly created node that composes @p n and the @p Extra part of @p b 
+         */
 	static node_proxy build_node(boost::property_tree::ptree::value_type &n,
 				     argument_type &b) {
 	  boost::property_tree::ptree::value_type *p = &n;
@@ -106,6 +156,24 @@ namespace TREX {
     } // TREX::utils::details
 
 
+    /** @brief A Generic XML based factory
+     *
+     * @tparam Product The base type for the factory products
+     * @tparam Output  The type returned by the factory
+     * @tparam Arg     Optional extra type to be given with the Xml tree
+     *
+     * This template class implments a factory that can create new @p Product 
+     * based on an XML description -- represented as a Boost.PropertyTree -- and 
+     * an optional extra object of type @p Arg.
+     *
+     * It is a wrapper of the template class Factory that ease both the declaration 
+     * and provides extra utilities that takes benefit of the XML structure.
+     *
+     * @sa Factory
+     *
+     * @author Frederic Py <fpy@mbari.org>
+     * @ingroup utils
+     */
     template<class Product, class Output=Product *, class Arg=void>
     class XmlFactory :boost::noncopyable {
       typedef boost::property_tree::ptree tree_t;
@@ -113,11 +181,25 @@ namespace TREX {
     public:
       typedef internals::xml_arg_helper<tree_t::value_type, Arg> arg_traits;
       
+      /** @brief Production iterator traits
+       *
+       * The traits used to identify the type of a production iterator for this 
+       * factory based on a property_tree iterator
+       *
+       * @relates XmlFactory
+       */
       template<class Iter>
       struct iter_traits :public internals::xml_arg_helper<Iter, Arg> {
 #ifdef DOXYGEN
+        // This is C++0x ... most compiler do not support it yet 
+        //  for now we just put it for DOXYGEN asthis code is more parsable for it
         using argument_type = typename internals::xml_arg_helper<Iter, Arg>::argument_type;
-        typedef argument_type type;
+        /** @brief iteration proxy type
+         *
+         * An alias to the type XmlFactory will use to iter_produce using 
+         * @p Iter as a property iterator
+         */
+        typedef argument_type type; 
 #else 
 	typedef typename internals::xml_arg_helper<Iter, Arg>::argument_type type;
 #endif
@@ -125,8 +207,11 @@ namespace TREX {
 
       typedef typename arg_traits::argument_type argument_type;
       
-      typedef generic_factory<Product, symbol,
-                             argument_type, Output> factory_type;
+      /** @brief Subjacent factory
+       *
+       * The factory used underneath to implement this XmlFactory
+       */
+      typedef Factory<Product, Symbol, argument_type, Output> factory_type;
       typedef typename factory_type::returned_type returned_type;
       
 
@@ -169,7 +254,7 @@ namespace TREX {
          * Declare the new producer that will create a class Ty whenever the 
          * XmlFactory encounters an XML tag @p id
          */
-	declare(symbol const &id)
+	declare(Symbol const &id) 
 	  :factory_type::template declare<Ty>(id) {}
         /** @brief Destructor 
          *
@@ -197,7 +282,7 @@ namespace TREX {
        *
        * Store all the currently recognized XML tags for this factory in @p ids
        */
-      void getIds(std::list<symbol> &ids) const {
+      void getIds(std::list<Symbol> &ids) const {
 	m_factory->getIds(ids);
       }
 
@@ -227,9 +312,9 @@ namespace TREX {
       XmlFactory() {}
       ~XmlFactory() {}
       
-      singleton::use<factory_type> m_factory;
+      SingletonUse<factory_type> m_factory;
 
-      friend class singleton::wrapper<XmlFactory>;
+      friend class SingletonWrapper<XmlFactory>;
     }; // TREX::utils::XmlFactory<>
 
 

@@ -41,7 +41,7 @@
 #ifndef FWD_trex_utils_log_log
 # define FWD_trex_utils_log_log
 
-# include "../symbol.hh"
+# include "../Symbol.hh"
 
 namespace TREX {
   namespace utils {
@@ -59,7 +59,7 @@ namespace TREX {
        * The type used to identify the type of log message
        * @ingroup utils
        */
-      typedef symbol id_type;
+      typedef Symbol id_type;
       class stream;
       
       extern id_type const null; //!< Untyped log message

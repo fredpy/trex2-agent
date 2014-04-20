@@ -33,7 +33,7 @@
  */
 #include "SimpleRobot.hh"
 
-#include <trex/utils/log_manager.hh>
+#include <trex/utils/LogManager.hh>
 #include <trex/utils/Plugin.hh>
 
 using namespace TREX::utils;
@@ -41,7 +41,7 @@ using namespace TREX::transaction;
 using namespace TREX::simpleRobot;
 
 namespace {
-    singleton::use<log_manager> s_log;
+    SingletonUse<LogManager> s_log;
     TeleoReactor::xml_factory::declare<SimpleRobot> decl("SimpleRobot");
 }
 

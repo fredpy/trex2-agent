@@ -84,7 +84,7 @@ std::set<std::string> details::Schema::includes(std::istream &is) {
 details::Schema::Schema() {
   bool found;
   
-  std::string cfg_dbg = m_log->use("Debug.cfg", found).string();
+  std::string cfg_dbg = m_log->use("Debug.cfg", found);
   
   if( found ) {
     std::ifstream cfg(cfg_dbg.c_str());
@@ -121,15 +121,14 @@ std::string const &details::Schema::nddl_path() {
     
     // First add TREX_PATH
     opath<<'.';
-    std::string p = m_log->search_path();
-    
-    if( !p.empty() )
-      opath<<':'<<p;
+
+    for(utils::LogManager::path_iterator i=m_log->begin(); m_log->end()!=i; ++i)
+      opath<<':'<<i->string();
     
     // Now extract infotmnation for NDDL config file
-    config = m_log->use("NDDL.cfg", found).string();
+    config = m_log->use("NDDL.cfg", found);
     if( !found ) {
-      config = m_log->use("temp_nddl_gen.cfg", found).string();
+      config = m_log->use("temp_nddl_gen.cfg", found);
       if( !found ) 
 	throw EuropaException("Unable to locate NDDL.cfg or temp_nddl_gen.cfg");
     }

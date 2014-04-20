@@ -76,7 +76,7 @@ namespace TREX {
 	 *
 	 * @return the name of the timeline this operation applies to
 	 */
-	utils::symbol const &timeline() const {
+	utils::Symbol const &timeline() const {
 	  return m_timeline;
 	}
 	/** @brief goal flag
@@ -95,7 +95,7 @@ namespace TREX {
 	  return m_plan;
 	}
       private:
-	utils::symbol m_timeline;
+	utils::Symbol m_timeline;
 	bool m_goals, m_plan;
       }; // TREX::transaction::details::tl_event
       
@@ -426,7 +426,7 @@ namespace TREX {
 } // TREX
 
 using namespace TREX::transaction;
-using TREX::utils::symbol;
+using TREX::utils::Symbol;
 
 namespace util=TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
@@ -470,7 +470,7 @@ LogPlayer::phase::phase(LogPlayer *owner,
   typedef details::tr_event::factory                  tr_fact;
   typedef boost::property_tree::ptree::iterator iter;
 
-  utils::singleton::use<tr_fact> events_f;
+  utils::SingletonUse<tr_fact> events_f;
   iter pos = node.second.begin();
   tr_fact::iter_traits<iter>::type 
     it = tr_fact::iter_traits<iter>::build(pos, owner);
@@ -484,11 +484,11 @@ LogPlayer::phase::phase(LogPlayer *owner,
  */
 // statics
 
-symbol const LogPlayer::s_init("init");
-symbol const LogPlayer::s_new_tick("start");
-symbol const LogPlayer::s_synchronize("synchronize");
-symbol const LogPlayer::s_has_work("has_work");
-symbol const LogPlayer::s_step("step");
+Symbol const LogPlayer::s_init("init");
+Symbol const LogPlayer::s_new_tick("start");
+Symbol const LogPlayer::s_synchronize("synchronize");
+Symbol const LogPlayer::s_has_work("has_work");
+Symbol const LogPlayer::s_step("step");
 
 TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg) {
   // force logging to false
@@ -505,7 +505,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
 					xml_factory::node(arg),
 					"file");
   bool found;
-  file_name = manager().use(file_name, found).string();
+  file_name = manager().use(file_name, found);
   if( !found ) {
     syslog(null, error)<<"Unable to locate transaction log \""
 		       <<file_name<<"\".";
@@ -534,7 +534,7 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
   if( last!=i ) {
     typedef details::tr_event::factory                  tr_fact;
     typedef boost::property_tree::ptree::iterator iter;
-    utils::singleton::use<tr_fact> event_f;
+    utils::SingletonUse<tr_fact> event_f;
     iter pos = i->second.begin();
     LogPlayer *me = this;
     tr_fact::iter_traits<iter>::type
@@ -552,8 +552,8 @@ LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
     for(boost::property_tree::ptree::iterator j=i->second.begin();
 	i->second.end()!=j; ++j) {
       if( s_init==j->first ) {
-	if( !first )
-          throw boost::property_tree::ptree_bad_data(s_init.str()+" tag can only be the first phase.", *j);
+	if( !first ) 
+	  throw utils::XmlError(*j, s_init.str()+" tag can only be the first phase.");
       } else if( "<xmlattr>"==j->first )
 	continue;
       else if( s_new_tick!=j->first &&
@@ -582,14 +582,13 @@ LogPlayer::~LogPlayer() {
 
 // manipulators
 
-bool LogPlayer::next_phase(TICK tck, utils::symbol const &kind) {
+bool LogPlayer::next_phase(TICK tck, utils::Symbol const &kind) {
   if( !m_log.empty() ) {
     if( m_log.front().first==tck  ) {
       SHARED_PTR<phase> nxt = m_log.front().second;
       if( nxt->type()==kind ) {
 	m_log.pop_front();
-	size_t n = nxt->execute();
-	// syslog(kind, info)<<"Executed "<<n<<" events";
+	nxt->execute();
 	return true;
       } 
     }
@@ -613,19 +612,12 @@ void LogPlayer::handleTickStart() {
     handleInit(); // try to emulate the reactor staring at a later tick
   if( !next_phase(getCurrentTick(), s_new_tick) ) {
     size_t skipped =0;
-    std::ostringstream oss;
     while( !m_log.empty() && m_log.front().first<getCurrentTick() ) {
-      oss<<"\n\t- ["<<m_log.front().first<<"]: "
-	 <<m_log.front().second->type();
-      size_t n = m_log.front().second->execute();
-      if( n>0 ) 
-	oss<<"( "<<n<<" events late)";	
       m_log.pop_front();
       ++skipped;
     }
     if( skipped>0 ) {
-      syslog(null, warn)<<"Replayed "<<skipped
-			<<" past events after the tick started !!!:"<<oss.str();
+      syslog(null, warn)<<"Skipped "<<skipped<<" past events !!!";
       m_inited = true;
       next_phase(getCurrentTick(), s_new_tick);
     } 
@@ -658,19 +650,19 @@ void LogPlayer::resume() {
 
 
 // events 
-void LogPlayer::play_use(utils::symbol const &tl, bool goals, bool plan) {
+void LogPlayer::play_use(utils::Symbol const &tl, bool goals, bool plan) {
   use(tl, goals, plan);
 }
  
-void LogPlayer::play_unuse(utils::symbol const &tl) {
+void LogPlayer::play_unuse(utils::Symbol const &tl) {
   unuse(tl);
 }
 
-void LogPlayer::play_provide(utils::symbol const &tl, bool goals, bool plan) {
+void LogPlayer::play_provide(utils::Symbol const &tl, bool goals, bool plan) {
   provide(tl, goals, plan);
 }
 
-void LogPlayer::play_unprovide(utils::symbol const &tl) {
+void LogPlayer::play_unprovide(utils::Symbol const &tl) {
   unprovide(tl);
 }
 
@@ -745,21 +737,20 @@ tr_goal_event::tr_goal_event(tr_goal_event::factory::argument_type const &arg,
   std::string id = utils::parse_attr<std::string>(factory::node(arg), "id");
   
   if( id.empty() )
-    throw boost::property_tree::ptree_bad_data("id attribute is empty.",
-                                               factory::node(arg));
+    throw utils::XmlError(factory::node(arg), "id attribute is empty.");
   
   if( build ) {
     boost::property_tree::ptree::assoc_iterator
       desc = factory::node(arg).second.find("Goal");
     if( factory::node(arg).second.not_found()==desc )
-      throw boost::property_tree::ptree_bad_data("Unable to find token description.", factory::node(arg));
+      throw utils::XmlError(factory::node(arg),
+		     "Unable to find token description.");
     m_goal.reset(new Goal(*desc));
     set_goal(id, m_goal);
   } else {
     m_goal = get_goal(id);
     if( !m_goal )
-      throw boost::property_tree::ptree_bad_data(
-		     "Unable to find goal for id \""+id+"\".",
-                                                 factory::node(arg));
+      throw utils::XmlError(factory::node(arg),
+		     "Unable to find goal for id \""+id+"\".");
   }
 }

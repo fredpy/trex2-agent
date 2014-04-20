@@ -75,7 +75,6 @@ namespace TREX {
         
         TREX::transaction::TICK const date;
         size_t const count;
-        size_t const free_count;
       }; // TREX::agent::LogClock::tick_info
       
       date_type     m_epoch;
@@ -83,7 +82,6 @@ namespace TREX {
       std::list<tick_info> m_ticks;
       size_t m_counter;
       boost::optional<transaction::TICK> m_last;
-      bool m_eot;
       
       // TREX::transaction::TICK m_last;
     }; // TREX::agent::LogClock

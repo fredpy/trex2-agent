@@ -36,7 +36,7 @@ namespace TREX
     LstsReactor::postUniqueObservation(TREX::transaction::Observation obs)
     {
 
-      utils::symbol timeline = obs.object();
+      utils::Symbol timeline = obs.object();
       obs_map::iterator it = postedObservations.find(timeline.str());
 
       if (it == postedObservations.end() || !it->second->consistentWith(obs))

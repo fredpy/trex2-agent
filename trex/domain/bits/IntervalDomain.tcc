@@ -173,7 +173,7 @@ bool IntervalDomain<Ty, Prot, Cmp>::equals(DomainBase const &other) const {
 
 template<typename Ty, bool Prot, class Cmp>
 void IntervalDomain<Ty, Prot, Cmp>::parseSingleton(std::string const &val) {
-  bound tmp = boost::lexical_cast<bound>(val);
+  bound tmp = TREX::utils::string_cast<bound>(val);
   if( tmp.isInfinity() )
     throw EmptyDomain(*this, "trying to set domain to an infinity singleton.");
   m_lower = tmp;
@@ -183,7 +183,7 @@ void IntervalDomain<Ty, Prot, Cmp>::parseSingleton(std::string const &val) {
 
 template<typename Ty, bool Prot, class Cmp>
 void IntervalDomain<Ty, Prot, Cmp>::parseLower(std::string const &val) {
-  bound tmp = boost::lexical_cast<bound>(val);
+  bound tmp = TREX::utils::string_cast<bound>(val);
   if( m_upper<tmp || 
       ( m_upper==tmp && m_upper.isInfinity() ) ) 
     throw EmptyDomain(*this, "trying to set lower bound above upper bound");
@@ -192,7 +192,7 @@ void IntervalDomain<Ty, Prot, Cmp>::parseLower(std::string const &val) {
 
 template<typename Ty, bool Prot, class Cmp>
 void IntervalDomain<Ty, Prot, Cmp>::parseUpper(std::string const &val) {
-  bound tmp = boost::lexical_cast<bound>(val);
+  bound tmp = TREX::utils::string_cast<bound>(val);
   if( m_lower>tmp || 
       ( m_lower==tmp && m_lower.isInfinity() ) ) 
     throw EmptyDomain(*this, "trying to set upper bound below upper bound");

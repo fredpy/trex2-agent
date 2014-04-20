@@ -51,33 +51,21 @@
 
 namespace TREX {
   namespace utils {
-    /** @brief Thread safe log management
-     *
-     * This namespace contains all the classes and utilities related to
-     * producing log messages in a multihtreaded program with multiple 
-     * log outputs. 
-     *
-     * It handle new log messages as atomic entrys that can then be 
-     * dispatched to multiple clients for storage or display.
-     *
-     * @ingroup utils
-     * @author Frederic Py
-     */
     namespace log {
       
       /** @brief Asynchronous text messages logging
        *
        * This class implements the logging mechanism used within trex to 
-       * create log entries. Entries are created through a temporary stream
-       * which at its destruction signals its content to listeners that 
-       * can then handle asynchronously the message by the associated callbacks.
+       * create log entries. entries are creted through a temporary stream 
+       * which at its destruction signals its content that can then be 
+       * handled asynchronously by the callbacks associated.
        *
        * This allow to have a generic way to redirect log messages created 
        * to any kind of consumer such as an output file, a graphic 
        * interface, a database, ...
        *
        * The handling is done asynchronously using @asio and, by default, 
-       * connected callbacks are wrapped in a strand which guarantee that this
+       * connected callbacks are wrapped in a strand which ensure that this 
        * callback cannot be executed more than once at any time -- ensuring 
        * thread safetyness.
        *
@@ -105,14 +93,6 @@ namespace TREX {
          * @sa class details::log_signal
          */
         typedef details::slot       slot_type;
-        /** @brief Extended signal slot type 
-         *
-         * The type of slot that can handle new log message while 
-         * giving a reference to the producer of this message event
-         *
-         * @sa class details::log_signal
-         * @sa slot_type
-         */
         typedef details::ext_slot   extended_slot_type;
         typedef details::connection connection;
        
@@ -238,7 +218,7 @@ namespace TREX {
         
       private:
         SHARED_PTR<details::sig_impl> m_new_log;
-        boost::asio::io_service      &m_service;
+        boost::asio::io_service    &m_service;
        
 # ifndef DOXYGEN
         text_log() DELETED; // Non default constructible

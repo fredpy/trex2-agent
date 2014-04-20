@@ -49,7 +49,7 @@ using namespace TREX::utils::internals;
  * class TREX::utils::PluginError
  */ 
 
-PluginError::PluginError(symbol const &name,
+PluginError::PluginError(Symbol const &name, 
                          std::string const &msg) throw()
 :Exception("Plugin("+name.str()+") "+msg+": "+p_dlerror()) {}
 
@@ -80,7 +80,7 @@ PluginLoader::~PluginLoader() {
 
 // Modifiers :
 
-bool PluginLoader::load(symbol const &name,
+bool PluginLoader::load(Symbol const &name, 
                         bool fail_on_locate) {
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()==i ) {
@@ -115,7 +115,7 @@ bool PluginLoader::load(symbol const &name,
   return true;
 }
 
-bool PluginLoader::unload(symbol const &name) {
+bool PluginLoader::unload(Symbol const &name) {
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()!=i ) {
     if( (i->second.second--)<=1 ) {

@@ -47,21 +47,21 @@ using namespace TREX::transaction;
  */
 // statics
 
-symbol const &Predicate::undefined_pred() {
-  static symbol const undefined("undefined");
+Symbol const &Predicate::undefined_pred() {
+  static Symbol const undefined("undefined");
   return undefined;
 }
 
-symbol const &Predicate::failed_pred() {
- static symbol const failed("Failed");
+Symbol const &Predicate::failed_pred() {
+ static Symbol const failed("Failed");
   return failed;
 }
 
 // structors :
 
 Predicate::Predicate(boost::property_tree::ptree::value_type &node)
-  :m_object(parse_attr<symbol>(node, "on")),
-   m_type(parse_attr<symbol>(node, "pred")) {
+  :m_object(parse_attr<Symbol>(node, "on")),
+   m_type(parse_attr<Symbol>(node, "pred")) {
   if( m_object.empty() ) 
     throw PredicateException("Empty \"on\" attribute in XML tag");
   if( m_type.empty() )
@@ -97,7 +97,7 @@ void Predicate::restrictAttribute(Variable const &var) {
 
 // observers :
 
-Variable const &Predicate::getAttribute(symbol const &name) const {
+Variable const &Predicate::getAttribute(Symbol const &name) const {
   const_iterator pos = m_vars.find(name);
   if( end()==pos ) 
     throw PredicateException("Attribute \""+name.str()+"\" is unknown");
@@ -105,7 +105,7 @@ Variable const &Predicate::getAttribute(symbol const &name) const {
 }
 
 std::ostream &Predicate::print_attr(std::ostream &out,
-                                    symbol const &name,
+                                    Symbol const &name,
                                     bool &first) const {
   if( !(name.empty() || name.str()[0]=='_') ) {
     if( first )
@@ -119,7 +119,7 @@ std::ostream &Predicate::print_attr(std::ostream &out,
 
 
 std::ostream &Predicate::print_to(std::ostream &out) const {
-  std::list<symbol> vars;
+  std::list<Symbol> vars;
   out<<m_object<<'.'<<m_type;
   out.precision(10);
   listAttributes(vars, false);
@@ -141,7 +141,7 @@ boost::property_tree::ptree Predicate::as_tree(bool all) const {
   set_attr(val, "on", object());
   set_attr(val, "pred", predicate());
   if( all ) {
-    std::list<symbol> vars;
+    std::list<Symbol> vars;
     listAttributes(vars, false);
 
     if( !vars.empty() ) {
@@ -163,7 +163,7 @@ boost::property_tree::ptree Predicate::as_tree(bool all) const {
 }
 
 
-void Predicate::listAttributes(std::list<TREX::utils::symbol> &attrs,
+void Predicate::listAttributes(std::list<TREX::utils::Symbol> &attrs,
 			       bool all) const {
   const_iterator i = begin();
   const_iterator const endi = end();

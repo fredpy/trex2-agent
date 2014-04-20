@@ -124,10 +124,10 @@ namespace TREX {
 			  TREX::transaction::Predicate const &pred);
 
       bool is_internal(EUROPA::LabelStr const &name) const {
-	return isInternal(TREX::utils::symbol(name.c_str()));
+	return isInternal(TREX::utils::Symbol(name.c_str()));
       }
       bool is_external(EUROPA::LabelStr const &name) const {
-	return isExternal(TREX::utils::symbol(name.c_str()));
+	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
       size_t look_ahead(EUROPA::LabelStr const &name); 
 

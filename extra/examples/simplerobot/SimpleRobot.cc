@@ -11,7 +11,7 @@ using namespace TREX::simpleRobot;
 // rover.navigator
 // rover corresponds to "SimpleRobot rover" declared in SimpleRobot-initial-state.nddl
 // navigator corresponds to the  Navigator navigator; declaration inside the SimpleRobot class in SimpleRobot-model.nddl
-symbol const SimpleRobot::navigatorObj("rover.navigator");
+Symbol const SimpleRobot::navigatorObj("rover.navigator");
 
 SimpleRobot::SimpleRobot(TeleoReactor::xml_arg_type arg)
     :TeleoReactor(arg,false)

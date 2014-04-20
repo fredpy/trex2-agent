@@ -42,11 +42,11 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::AgentLocation;
 
-symbol const AgentLocation::AtPred("At");
+Symbol const AgentLocation::AtPred("At");
 
-symbol const AgentLocation::GoPred("Go");
+Symbol const AgentLocation::GoPred("Go");
 
-symbol const AgentLocation::AgentLocationObj("auvLocation");
+Symbol const AgentLocation::AgentLocationObj("auvLocation");
 
 AgentLocation::AgentLocation(TeleoReactor::xml_arg_type arg)
   :TeleoReactor(arg, false)

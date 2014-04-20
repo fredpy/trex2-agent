@@ -42,20 +42,10 @@
 
 using namespace TREX::utils;
 namespace xml = boost::property_tree::xml_parser;
-namespace bp = boost::property_tree;
-
-boost::optional<bp::ptree const &> TREX::utils::internals::find_attr(bp::ptree const &pt,
-                                                                     std::string const &path) {
-  boost::optional<bp::ptree const &> ret = pt.get_child_optional("<xmlattr>."+path);
-  
-  if( !ret )
-    ret = pt.get_child_optional(path);
-  return ret;
-}
 
 
 namespace {
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 }
 
 void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &conf, bool ahead) {
@@ -63,17 +53,15 @@ void TREX::utils::ext_xml(boost::property_tree::ptree &tree, std::string const &
   
   if( name ) {
     bool found;
-    std::string file = s_log->use(*name, found).string();
+    std::string file = s_log->use(*name, found);
     
-    if( !found ) {
-      ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
-      throw SYSTEM_ERROR(ec, "Unable to locate file \""+(*name)+"\"");
-    }
+    if( !found ) 
+      throw ErrnoExcept("Unable to locate file \""+(*name)+"\"");
     
     boost::property_tree::ptree pt;
     read_xml(file, pt, xml::no_comments|xml::trim_whitespace);
-    if( pt.empty() )
-      throw bp::ptree_error("Xml file \""+file+"\" is empty.");
+    if( pt.empty() ) 
+      throw XmlError("Xml file \""+file+"\" is empty.");
     if( pt.size()==1 )
       pt = pt.front().second;
 

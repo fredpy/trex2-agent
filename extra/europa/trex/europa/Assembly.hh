@@ -39,7 +39,7 @@
 
 # include <trex/utils/id_mapper.hh>
 # include <trex/utils/platform/memory.hh>
-# include <trex/utils/timing/cpu_clock.hh>
+# include <trex/utils/cpu_clock.hh>
 # include <trex/utils/asio_fstream.hh>
 
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabase.hh>
@@ -1489,7 +1489,7 @@ namespace TREX {
        * @li loading Europa extension though EuropaPlugin exisiting instances
        * @li switching the europa debug log file
        */
-      TREX::utils::singleton::use<details::Schema> m_trex_schema;
+      TREX::utils::SingletonUse<details::Schema> m_trex_schema;
 
       EUROPA::SchemaId           m_schema;
       EUROPA::PlanDatabaseId     m_plan;

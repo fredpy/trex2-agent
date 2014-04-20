@@ -89,7 +89,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringLower());
+            return TREX::utils::string_cast<Ty>(getStringLower());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
@@ -102,7 +102,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringUpper());
+            return TREX::utils::string_cast<Ty>(getStringUpper());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
@@ -110,7 +110,7 @@ namespace TREX {
       virtual std::string getStringLower() const;
       virtual std::string getStringUpper() const;
     protected:
-      explicit BasicInterval(TREX::utils::symbol const &type) 
+      explicit BasicInterval(TREX::utils::Symbol const &type) 
 	:DomainBase(type) {}
       explicit BasicInterval(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}

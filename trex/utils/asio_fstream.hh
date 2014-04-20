@@ -36,7 +36,7 @@
 
 # include "platform/memory.hh"
 # include "platform/cpp11_deleted.hh"
-# include "shared_var.hh"
+# include "SharedVar.hh"
 # include "asio_runner.hh"
 
 # include <boost/ref.hpp>

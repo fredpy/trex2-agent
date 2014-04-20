@@ -67,6 +67,24 @@ class Reference extends AgentTimeline {
 	
 }
 
+class ReferenceState extends AgentTimeline {
+	
+	Reference(Mode _mode) {
+		super(_mode, "Boot");
+	};
+	
+	predicate Boot {};
+	
+	predicate Going {
+		float latitude;
+		float longitude;
+		float z;
+		float speed;
+		bool near_z;
+		bool near_xy;
+	};
+}
+
 class ControlMode extends AgentTimeline {
 	
 	PlanControlState(Mode _mode) {

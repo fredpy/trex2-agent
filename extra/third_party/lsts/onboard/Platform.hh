@@ -12,7 +12,7 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 # include <trex/domain/IntegerDomain.hh>
 # include <trex/domain/FloatDomain.hh>
 # include <trex/domain/StringDomain.hh>
@@ -102,7 +102,7 @@ namespace TREX {
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);
 
-      TREX::utils::singleton::use<SharedEnvironment> m_env;
+      TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       //static ControlInterface * controlInterfaceInstance;
 
@@ -123,9 +123,6 @@ namespace TREX {
 
       /** @brief whether TREX is currently blocked or not */
       bool m_blocked;
-
-      /** @brief are we controlling an auv? */
-      bool m_auv;
 
       /** @brief Whether it was connected on last tick */
       bool m_connected;
@@ -155,8 +152,6 @@ namespace TREX {
       void postGoalToken();
       bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
       void announce(double lat, double lon);
-      void enqueueReferenceAtObs();
-      DesiredZ setUavRefZ(const double z);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;

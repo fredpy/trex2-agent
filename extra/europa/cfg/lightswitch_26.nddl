@@ -34,8 +34,7 @@
 #include "TREX.nddl"
 
 class Light extends AgentTimeline {
-    predicate On {
-    }
+    predicate On {}
     predicate Off {}
 
     Light(Mode _mode) {

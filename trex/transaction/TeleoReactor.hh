@@ -47,9 +47,9 @@
 # include "bits/external.hh"
 # include "reactor_graph.hh"
 
-# include <trex/utils/timing/posix_utils.hh>
-# include <trex/utils/timing/chrono_helper.hh>
-# include <trex/utils/timing/cpu_clock.hh>
+# include <trex/utils/TimeUtils.hh>
+# include <trex/utils/chrono_helper.hh>
+# include <trex/utils/cpu_clock.hh>
 # include <trex/utils/asio_fstream.hh>
 
 # if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
@@ -108,8 +108,8 @@ namespace TREX {
       typedef stat_clock::duration stat_duration;
 
       
-      static utils::symbol const obs;
-      static utils::symbol const plan;
+      static utils::Symbol const obs;
+      static utils::Symbol const plan;
       
       typedef graph::duration_type duration_type;
       typedef graph::date_type     date_type;
@@ -190,7 +190,7 @@ namespace TREX {
       /** @brief Reactor name
        * @return the anme of the reactor
        */
-      TREX::utils::symbol const &getName() const {
+      TREX::utils::Symbol const &getName() const {
         return m_name;
       }
       /** @brief get \"agent\" name
@@ -209,7 +209,7 @@ namespace TREX {
        * @return the name of the "agent"
        * @sa getGraphName() const
        */
-      TREX::utils::symbol const &getAgentName() const {
+      TREX::utils::Symbol const &getAgentName() const {
         return getGraphName();
       }
       /** @brief Get graph name
@@ -218,7 +218,7 @@ namespace TREX {
        *
        * @sa class TREX::transaction::graph
        */
-      TREX::utils::symbol const &getGraphName() const {
+      TREX::utils::Symbol const &getGraphName() const {
         return m_graph.getName();
       }
       /** @brief Get graph
@@ -546,17 +546,17 @@ namespace TREX {
        * Create a new reactor named @p name with a latency of @p latency and a
        * look-ahead of @p lookahead and associate it to the graph @p owner
        */
-      TeleoReactor(graph *owner, TREX::utils::symbol const &name,
+      TeleoReactor(graph *owner, TREX::utils::Symbol const &name,
                    TICK latency, TICK lookahead, bool log=false);
       
       /** @brief LogManager access point
        *
        * @return the LogManager instance for this run
        */
-      TREX::utils::log_manager &manager() const {
+      TREX::utils::LogManager &manager() const {
         return m_graph.manager();
       }
-      typedef utils::log_manager::path_type path_type;
+      typedef utils::LogManager::path_type path_type;
       
       path_type file_name(std::string const &short_name) const {
         return manager().file_name(getName().str()+"/"+short_name);
@@ -876,7 +876,7 @@ namespace TREX {
        * @sa provide(TREX::utils::Symbol const &)
        * @sa unuse(TREX::utils::Symbol const &)
        */
-      void use(TREX::utils::symbol const &timeline, bool control=true, bool plan_listen=false);
+      void use(TREX::utils::Symbol const &timeline, bool control=true, bool plan_listen=false);
       
       /** @brief Internal timeline declaration
        *
@@ -899,7 +899,7 @@ namespace TREX {
        * @sa use(TREX::utils::Symbol const &, bool)
        * @sa unprovide(TREX::utils::Symbol const &)
        */
-      void provide(TREX::utils::symbol const &timeline, bool controllable=true, bool publish=false);
+      void provide(TREX::utils::Symbol const &timeline, bool controllable=true, bool publish=false);
       
       /** Add comment on transaction log
        * @param[in] msg A message
@@ -925,7 +925,7 @@ namespace TREX {
        * @sa unprovide(TREX::utils::Symbol const &)
        * @sa isolate(bool)
        */
-      bool unuse(TREX::utils::symbol const &timeline);
+      bool unuse(TREX::utils::Symbol const &timeline);
       /** @brief Internal timeline unsubscription
        *
        * @param[in] timeline A timeline name
@@ -942,7 +942,7 @@ namespace TREX {
        * @sa provide(TREX::utils::Symbol const &, bool, bool)
        * @sa isolate(bool)
        */
-      bool unprovide(TREX::utils::symbol const &timeline);
+      bool unprovide(TREX::utils::Symbol const &timeline);
       
       /** @brief Request for external failed
        *
@@ -957,7 +957,7 @@ namespace TREX {
        *
        * @sa failed_internal(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
-      virtual bool failed_external(TREX::utils::symbol const &timeline,
+      virtual bool failed_external(TREX::utils::Symbol const &timeline,
                                    graph::timeline_failure const &err) {
         throw err;
       }
@@ -974,7 +974,7 @@ namespace TREX {
        *
        * @sa failed_external(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
-      virtual bool failed_internal(TREX::utils::symbol const &timeline,
+      virtual bool failed_internal(TREX::utils::Symbol const &timeline,
                                    graph::timeline_failure const &err) {
         throw err;
       }
@@ -988,7 +988,7 @@ namespace TREX {
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa provide(TREX::utils::Symbol const &)
        */
-      bool isInternal(TREX::utils::symbol const &timeline) const;
+      bool isInternal(TREX::utils::Symbol const &timeline) const;
       /** @brief Check for exeternal timeline
        *
        * @param[in] timeline A name
@@ -999,7 +999,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa use(TREX::utils::Symbol const &, bool)
        */
-      bool isExternal(TREX::utils::symbol const &timeline) const;
+      bool isExternal(TREX::utils::Symbol const &timeline) const;
       
       /** @brief new log entry
        *
@@ -1031,7 +1031,7 @@ namespace TREX {
        * @return An iterator refering to the @e external timeline @p name or
        *        @c ext_end() if this reactor does not subscribe to @p name
        */
-      external_iterator find_external(TREX::utils::symbol const &name);
+      external_iterator find_external(TREX::utils::Symbol const &name);
       
     protected:
       graph &get_graph() {
@@ -1045,19 +1045,19 @@ namespace TREX {
       rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
       
-      bool internal_sync(TREX::utils::symbol name) const;
-      bool external_sync(TREX::utils::symbol name) const;
+      bool internal_sync(TREX::utils::Symbol name) const;
+      bool external_sync(TREX::utils::Symbol name) const;
       
       void clear_int_sync();
       void clear_ext_sync();
       
       
       
-      void use_sync(TREX::utils::symbol name, details::transaction_flags f);
-      bool unuse_sync(TREX::utils::symbol name);
+      void use_sync(TREX::utils::Symbol name, details::transaction_flags f);
+      bool unuse_sync(TREX::utils::Symbol name);
   
-      void provide_sync(TREX::utils::symbol name, details::transaction_flags f);
-      bool unprovide_sync(TREX::utils::symbol name);
+      void provide_sync(TREX::utils::Symbol name, details::transaction_flags f);
+      bool unprovide_sync(TREX::utils::Symbol name);
      
       void observation_sync(Observation o, bool verbose);
       bool goal_sync(goal_id g);
@@ -1086,7 +1086,7 @@ namespace TREX {
       void goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest);
       
       std::list<goal_id>     m_sync_goals, m_sync_recalls, m_sync_toks, m_sync_cancels;
-      utils::shared_var<size_t> m_have_goals;
+      utils::SharedVar<size_t> m_have_goals;
       
       bool have_goals();
       
@@ -1129,7 +1129,7 @@ namespace TREX {
        *
        * @sa getName() const
        */
-      TREX::utils::symbol m_name;
+      TREX::utils::Symbol m_name;
       
       /** @brief Deliberation latency
        *
@@ -1204,7 +1204,7 @@ namespace TREX {
        *
        * @sa syslog() const
        */
-      TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
+      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
 
       utils::async_ofstream m_stat_log;
 
@@ -1217,7 +1217,7 @@ namespace TREX {
       void subscribed(Relation const &r);
       void unsubscribed(Relation const &r);
       void latency_updated(TICK old_l, TICK new_l);
-      void unblock(utils::symbol const &name);
+      void unblock(utils::Symbol const &name);
       
       
       friend class details::timeline;

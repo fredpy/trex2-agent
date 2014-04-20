@@ -130,7 +130,7 @@ namespace TREX {
       template<class PtrType = TeleoReactor *>
       struct reactor_id_traits {
 	typedef PtrType base_type;
-	typedef utils::symbol id_type;
+	typedef utils::Symbol id_type;
 
 	/** @brief ID extraction function
 	 *

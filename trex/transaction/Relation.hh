@@ -61,7 +61,7 @@ namespace TREX {
        * Create a new instance that indicates that @p faulty attempted to declare the
        * timeline named @p timeline while it is alread oewned by @p owner
        */
-      MultipleInternals(TeleoReactor const &faulty, utils::symbol const &timeline,
+      MultipleInternals(TeleoReactor const &faulty, utils::Symbol const &timeline,
 			TeleoReactor const &owner) throw();
       /** @brief Destructor */
       ~MultipleInternals() throw() {}
@@ -111,7 +111,7 @@ namespace TREX {
       typedef Relation const *pointer;
 
       typedef Relation      base_type;
-      typedef utils::symbol id_type;
+      typedef utils::Symbol id_type;
 
       /** @brief Get relation identifier
        *
@@ -306,7 +306,7 @@ namespace TREX {
        *
        * @sa Relation::valid() const
        */
-      utils::symbol const &name() const;
+      utils::Symbol const &name() const;
       /** @brief Timeline server
        *
        * Gives the reactor that declared the timline associated to

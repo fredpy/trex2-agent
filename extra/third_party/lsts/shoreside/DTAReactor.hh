@@ -18,8 +18,8 @@ namespace TREX {
       void notify(TREX::transaction::Observation const &obs);
 
       bool m_active;
-      TREX::utils::symbol m_drifter;
-      TREX::utils::symbol m_path;
+      TREX::utils::Symbol m_drifter;
+      TREX::utils::Symbol m_path;
       double              m_factor;
       bool                m_lagrangian;
       
@@ -27,9 +27,9 @@ namespace TREX {
       bool m_have_pos;
       bool m_have_speed;
       
-      TREX::utils::symbol m_proxy_timeline;
-      TREX::utils::symbol m_asset_id;
-      TREX::utils::symbol m_survey_tl, m_state_tl;
+      TREX::utils::Symbol m_proxy_timeline;
+      TREX::utils::Symbol m_asset_id;
+      TREX::utils::Symbol m_survey_tl, m_state_tl;
 
       enum vehicle_mode {
 	UNKNOWN =0,

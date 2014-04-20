@@ -186,14 +186,14 @@ namespace TREX {
        * subscribe this reactor to the timeline @p tl with the transaction 
        * flags @p goals and @p plan
        */
-      void play_use(utils::symbol const &tl, bool goals, bool plan);
+      void play_use(utils::Symbol const &tl, bool goals, bool plan);
       /** @brief External timeline undeclaration
        * 
        * @param[in] tl    A timeline name
        * 
        * Unsubscribe this reactor to the timeline @p tl.
        */
-      void play_unuse(utils::symbol const &tl);
+      void play_unuse(utils::Symbol const &tl);
       /** @brief Internal timeline declaration
        * 
        * @param[in] tl    A timeline name
@@ -203,14 +203,14 @@ namespace TREX {
        * Make this reactor delcare the timeline @p tl as Internal 
        * with the transaction flags @p goals and @p plan
        */
-      void play_provide(utils::symbol const &tl, bool goals, bool plan);
+      void play_provide(utils::Symbol const &tl, bool goals, bool plan);
       /** @brief Internal timeline undeclaration
        * 
        * @param[in] tl    A timeline name
        * 
        * Make this reactor give away its ownership of the timeline @p tl.
        */
-      void play_unprovide(utils::symbol const &tl);
+      void play_unprovide(utils::Symbol const &tl);
       /** @brief post observation
        *
        * @param[in] obs An observation
@@ -266,11 +266,11 @@ namespace TREX {
       void resume();
       
 
-      static utils::symbol const s_init;
-      static utils::symbol const s_new_tick;
-      static utils::symbol const s_synchronize;
-      static utils::symbol const s_has_work;
-      static utils::symbol const s_step;
+      static utils::Symbol const s_init;
+      static utils::Symbol const s_new_tick;
+      static utils::Symbol const s_synchronize;
+      static utils::Symbol const s_has_work;
+      static utils::Symbol const s_step;
      
       /** @brief Execution phase 
        * 
@@ -289,20 +289,17 @@ namespace TREX {
 	phase(LogPlayer *owner, boost::property_tree::ptree::value_type &node);
 	~phase() {}
 
-	utils::symbol const &type() const {
+	utils::Symbol const &type() const {
 	  return m_type;
 	}
-	size_t execute() {
-	  size_t ret = 0;
+	void execute() {
 	  while( !m_events.empty() ) {
 	    m_events.front()->play();
 	    m_events.pop_front();
-	    ++ret;
 	  }
-	  return ret;
 	}
       private:
-	utils::symbol m_type;
+	utils::Symbol m_type;
 	std::list< SHARED_PTR<details::tr_event> > m_events;
       };
 
@@ -310,7 +307,7 @@ namespace TREX {
       std::list<tick_event>    m_log;
       std::map<std::string, goal_id> m_goal_map;
 
-      bool next_phase(TICK tck, utils::symbol const &kind);
+      bool next_phase(TICK tck, utils::Symbol const &kind); 
       bool in_tick(TICK tck) const;
       
       static TeleoReactor::xml_arg_type &alter_cfg(TeleoReactor::xml_arg_type &arg);

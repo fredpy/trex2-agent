@@ -7,7 +7,7 @@
 
 #ifndef SHAREDENVIRONMENT_HH_
 #define SHAREDENVIRONMENT_HH_
-#include <trex/utils/singleton.hh>
+#include <trex/utils/SingletonUse.hh>
 
 namespace TREX {
 	namespace LSTS {
@@ -55,7 +55,7 @@ public:
 		m_controlInterface = citf;
 	}
 
-  friend class TREX::utils::singleton::wrapper<SharedEnvironment>;
+	friend class TREX::utils::SingletonWrapper<SharedEnvironment>;
 };
 
 #endif /* SHAREDENVIRONMENT_HH_ */

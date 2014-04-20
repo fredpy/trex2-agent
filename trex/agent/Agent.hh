@@ -121,7 +121,7 @@ namespace TREX {
        *
        * @post the agent has no reactor
        */
-      explicit Agent(TREX::utils::symbol const &name,
+      explicit Agent(TREX::utils::Symbol const &name,
 		     TREX::transaction::TICK final = 0,
 		     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Constructor
@@ -537,10 +537,10 @@ namespace TREX {
       priority_queue             m_edf;
       std::list<reactor_id>      m_idle;
       
-      mutable utils::shared_var<bool> m_valid;
+      mutable utils::SharedVar<bool> m_valid;
       
       bool valid() const {
-        utils::shared_var<bool>::scoped_lock lck(m_valid);
+        utils::SharedVar<bool>::scoped_lock lck(m_valid);
         return *m_valid;
       }
 
@@ -552,7 +552,7 @@ namespace TREX {
                       std::string path);
 
       /** @brief plug-in loader entry point */
-      TREX::utils::singleton::use<TREX::utils::PluginLoader> m_pg;
+      TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;
 
     }; // TREX::agent::Agent
 

@@ -35,7 +35,6 @@
 # define H_trex_transaction_graph_impl
 
 # include "../bits/transaction_fwd.hh"
-# include "trex/utils/shared_var.hh"
 
 # include <set>
 
@@ -73,7 +72,7 @@ namespace TREX {
          *
          * Create a graph named @p name
          */
-        explicit graph_impl(utils::symbol const &name);
+        explicit graph_impl(utils::Symbol const &name);
         /** @brief Destructor 
          */
         ~graph_impl();
@@ -82,7 +81,7 @@ namespace TREX {
          * 
          * @return The name of the graph
          */
-        utils::symbol const &name() const {
+        utils::Symbol const &name() const {
           return m_name;
         }
         /** @brief set graph name
@@ -91,7 +90,7 @@ namespace TREX {
          *
          * Change the graph names to @p name
          */
-        void name(utils::symbol const &name) {
+        void name(utils::Symbol const &name) {
           m_name = name;
         }
         /** @brief Update date
@@ -124,8 +123,8 @@ namespace TREX {
          *
          * @return A stream that can receive the log message
          */
-        utils::log::stream syslog(utils::symbol const &ctx,
-                                  utils::symbol const &kind) const;
+        utils::log::stream syslog(utils::Symbol const &ctx,
+                                  utils::Symbol const &kind) const;
         /** @brief graph log manager
          *
          * @return The log manager for this graph
@@ -135,7 +134,7 @@ namespace TREX {
          * this could change in the future, therefore it is better to access the 
          * log manager through this method.
          */
-        utils::log_manager &manager() const {
+        utils::LogManager &manager() const {
           return *m_log;
         }
         /** @bief Transaction strand
@@ -172,8 +171,8 @@ namespace TREX {
         
       private:
         
-        void declare(SHARED_PTR<node_impl> n, utils::symbol const &name, transaction_flags flag);
-        void subscribe(SHARED_PTR<node_impl> n, utils::symbol const &name, transaction_flags flag);
+        void declare(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
+        void subscribe(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
 
         /** @brief graph date local storage
          *
@@ -182,19 +181,19 @@ namespace TREX {
          * in order to allow quick access when Hasving Accurate date is not 
          * critical
          */
-        mutable utils::shared_var< boost::optional<date_type> > m_date;
+        mutable utils::SharedVar< boost::optional<date_type> > m_date;
         /** @brief graph name local storage
          *
          * The attrobute that stroes the graph assocaited name. This attribute 
          * is not thread protected as it is assumed that it won't be updated 
          * during the agent execution
          */
-        utils::symbol                          m_name;
+        utils::Symbol                          m_name;
         /** @brief Log manager
          *
          * A reference to the global LogManager singleton.
          */
-        utils::singleton::use<utils::log_manager> m_log;
+        utils::SingletonUse<utils::LogManager> m_log;
         /** @brief Acess/update strand
          *
          * The strand which is used by this graph for accesses and updates
@@ -209,8 +208,8 @@ namespace TREX {
         void rm_node_sync(SHARED_PTR<node_impl> n);
         
         
-        void decl_sync(SHARED_PTR<node_impl> n, utils::symbol name, transaction_flags flag);
-        void use_sync(SHARED_PTR<node_impl> n, utils::symbol name, transaction_flags flag);
+        void decl_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
+        void use_sync(SHARED_PTR<node_impl> n, utils::Symbol name, transaction_flags flag);
         
         friend class node_impl;
       }; // TREX::transaction::details::graph_impl

@@ -143,7 +143,7 @@ namespace TREX {
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringValue(n));
+            return TREX::utils::string_cast<Ty>(getStringValue(n));
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
@@ -165,7 +165,7 @@ namespace TREX {
 
       virtual void addTextValue(std::string const &val) =0;
     protected:
-      explicit BasicEnumerated(TREX::utils::symbol const &type) 
+      explicit BasicEnumerated(TREX::utils::Symbol const &type) 
 	:DomainBase(type) {}
       explicit BasicEnumerated(boost::property_tree::ptree::value_type &node)
 	:DomainBase(node) {}

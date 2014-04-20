@@ -105,7 +105,7 @@ namespace TREX {
        *
        * Create a new instance as a full domain of type @e type.
        */
-      explicit EnumeratedDomain(TREX::utils::symbol const &type)
+      explicit EnumeratedDomain(TREX::utils::Symbol const &type)
       :BasicEnumerated(type) {}
       /** @brief Constructor
        * @tparam Iter an iterator type
@@ -122,7 +122,7 @@ namespace TREX {
        * @throw EmptyDomain the created domain is empty
        */
       template<class Iter>
-      EnumeratedDomain(TREX::utils::symbol const &type,
+      EnumeratedDomain(TREX::utils::Symbol const &type,
                        Iter from, Iter to)
       :BasicEnumerated(type), m_elements(from, to) {
         if( m_elements.empty() )
@@ -136,7 +136,7 @@ namespace TREX {
        * Create a new instance of type @e type containing only the element
        * @e val
        */
-      explicit EnumeratedDomain(TREX::utils::symbol const &type,
+      explicit EnumeratedDomain(TREX::utils::Symbol const &type,
                                 Ty const &val)
       :BasicEnumerated(type) {
         add(val);
@@ -271,7 +271,7 @@ namespace TREX {
       }
       
       void addTextValue(std::string const &val) {
-        add(boost::lexical_cast<Ty>(val));
+        add(TREX::utils::string_cast<Ty>(val));
       }
       std::ostream &print_value(std::ostream &out, size_t i) const {
         // Not very optimal but this is the easiest way to go

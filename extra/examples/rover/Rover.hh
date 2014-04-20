@@ -34,24 +34,24 @@ namespace TREX {
                 UNIQ_PTR<TREX::transaction::Observation> m_Instrument_state;
 
                 /** Timeline Navigator */
-                static TREX::utils::symbol const navigatorObj;
-                    static TREX::utils::symbol const AtPred;
-                    static TREX::utils::symbol const GoingPred;
-                    static TREX::utils::symbol const locationPred;
-                    static TREX::utils::symbol const pathPred;
+                static TREX::utils::Symbol const navigatorObj;
+                    static TREX::utils::Symbol const AtPred;
+                    static TREX::utils::Symbol const GoingPred;
+                    static TREX::utils::Symbol const locationPred;
+                    static TREX::utils::Symbol const pathPred;
 
                 /** Timeline InstrumentLocation */
-                static TREX::utils::symbol const instrumentLocationObj;
-                    static TREX::utils::symbol const StowedPred;
-                    static TREX::utils::symbol const StowingPred;
-                    static TREX::utils::symbol const UnstowedPred;
-                    static TREX::utils::symbol const UnstowingPred;
+                static TREX::utils::Symbol const instrumentLocationObj;
+                    static TREX::utils::Symbol const StowedPred;
+                    static TREX::utils::Symbol const StowingPred;
+                    static TREX::utils::Symbol const UnstowedPred;
+                    static TREX::utils::Symbol const UnstowingPred;
 
                 /** Timline InstrumentState */
-                static TREX::utils::symbol const instrumentStateObj;
-                    static TREX::utils::symbol const PlacedPred;
-                    static TREX::utils::symbol const SamplingPred;
-                    static TREX::utils::symbol const FreePred;
+                static TREX::utils::Symbol const instrumentStateObj;
+                    static TREX::utils::Symbol const PlacedPred;
+                    static TREX::utils::Symbol const SamplingPred;
+                    static TREX::utils::Symbol const FreePred;
         };
 
     }

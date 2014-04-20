@@ -35,8 +35,8 @@ namespace
 DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg) 
   :TeleoReactor(arg, false), 
    m_active(false),
-m_proxy_timeline(parse_attr<symbol>(xml_factory::node(arg), "proxy")),
-m_asset_id(parse_attr<symbol>(xml_factory::node(arg), "id")) {
+m_proxy_timeline(parse_attr<Symbol>(xml_factory::node(arg), "proxy")),
+m_asset_id(parse_attr<Symbol>(xml_factory::node(arg), "id")) {
   m_survey_tl = m_asset_id.str() + "_follow";
   m_state_tl = m_asset_id.str() + "_state";
   provide(m_survey_tl);
@@ -106,7 +106,7 @@ void DTAReactor::handleRequest(goal_id const &g) {
     }
     else if( g->predicate()=="Track" ) {
       // Need a drifter, a size and a path
-      TREX::utils::symbol drifter, path;
+      TREX::utils::Symbol drifter, path;
       double factor;
 
       if( g->hasAttribute("drifter") ) 

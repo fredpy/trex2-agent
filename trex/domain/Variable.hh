@@ -47,7 +47,7 @@
 # include <boost/static_assert.hpp>
 # include <boost/type_traits.hpp>
 
-# include <trex/utils/symbol.hh>
+# include <trex/utils/Symbol.hh>
 # include "DomainBase.hh"
 
 namespace TREX {
@@ -87,7 +87,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class Variable :public TREX::utils::ptree_convertible {
+    class Variable :public TREX::utils::ostreamable, public TREX::utils::ptree_convertible {
     public:
       /** @brief Constructor
        *
@@ -108,7 +108,7 @@ namespace TREX {
        * @throw VariableException Tried to create a variable with an
        * empty name
        */
-      Variable(TREX::utils::symbol const &name,
+      Variable(TREX::utils::Symbol const &name,
 	       DomainBase const &domain);
       /** @brief Constructor
        * @brief var Another instance
@@ -165,7 +165,7 @@ namespace TREX {
        * @return the name of this variable
        * @sa bool isComplete() const
        */
-      TREX::utils::symbol const &name() const {
+      TREX::utils::Symbol const &name() const {
 	return m_name;
       }
 
@@ -290,12 +290,14 @@ namespace TREX {
     private:
       typedef DomainBase::xml_factory::returned_type domain_ptr;
       /** @brief varaible name */
-      TREX::utils::symbol m_name;
+      TREX::utils::Symbol m_name;
       /** @brief Variable domain */
       domain_ptr m_domain;
 
+      std::ostream &print_to(std::ostream &out) const;
+
       /** @brief Entry point to domain XML parsing */
-      static TREX::utils::singleton::use< DomainBase::xml_factory > s_dom_factory;
+      static TREX::utils::SingletonUse< DomainBase::xml_factory > s_dom_factory;
 
       /** @brief Domain duplication helper
        * @param dom A domain
@@ -312,16 +314,9 @@ namespace TREX {
        * This constructor is used internally to create a variable
        * from a domain that has already been allocated
        */
-      explicit Variable(TREX::utils::symbol const &name,
+      explicit Variable(TREX::utils::Symbol const &name,
 			DomainBase *domain = NULL);
       friend class Predicate;
-      
-      friend std::ostream &operator<<(std::ostream &out, Variable const &v) {
-        if( v.isComplete() )
-          return out<<v.m_name<<'='<<*(v.m_domain);
-        else
-          return out<<"<?"<<v.m_name<<'>';
-      }
    }; // class TREX::transaction::Variable
       
   } // TREX::transaction

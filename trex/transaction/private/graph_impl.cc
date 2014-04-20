@@ -33,14 +33,13 @@
  */
 #include "graph_impl.hh"
 #include "node_impl.hh"
-#include "trex/utils/asio_runner.hh"
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 namespace tlog=utils::log;
 namespace asio=boost::asio;
 
-using utils::symbol;
+using utils::Symbol;
 
 /*
  * class TREX::transaction::details::graph_impl
@@ -51,7 +50,7 @@ using utils::symbol;
 details::graph_impl::graph_impl()
 :m_strand(new asio::strand(m_log->service())) {}
 
-details::graph_impl::graph_impl(symbol const &name)
+details::graph_impl::graph_impl(Symbol const &name)
 :m_name(name), m_strand(new asio::strand(m_log->service())) {}
 
 details::graph_impl::~graph_impl() {
@@ -67,7 +66,7 @@ void details::graph_impl::set_date(details::graph_impl::date_type const &d) {
 boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bool fast) const {
   if( fast ) {
     // if fast just directly access the mutex protected value
-    utils::shared_var< boost::optional<date_type> >::scoped_lock lock(m_date);
+    utils::SharedVar< boost::optional<date_type> >::scoped_lock lock(m_date);
     return *m_date;
   } else {
     // If not fast post the call through the starnd to ensure that any queued set_date have been processed
@@ -76,12 +75,12 @@ boost::optional<details::graph_impl::date_type> details::graph_impl::get_date(bo
   }
 }
 
-tlog::stream details::graph_impl::syslog(symbol const &ctx,
-                                         symbol const &kind) const {
+tlog::stream details::graph_impl::syslog(Symbol const &ctx,
+                                         Symbol const &kind) const {
   // Access quickly to the date : I'd rather have an innacurate date in the logs
   // than being blocked by pending events in the graph strand 
   boost::optional<date_type> cur = get_date(true);
-  symbol who = m_name;
+  Symbol who = m_name;
   if( !ctx.empty() )
     who = who.str()+"."+ctx.str();
   if( cur )
@@ -114,14 +113,14 @@ bool details::graph_impl::remove_node(details::node_id const &n) {
 // private calls
 
 void details::graph_impl::declare(SHARED_PTR<details::node_impl> n,
-                                  symbol const &name,
+                                  Symbol const &name,
                                   details::transaction_flags flag) {
   SHARED_PTR<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
 }
 
 void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
-                                    symbol const &name,
+                                    Symbol const &name,
                                     details::transaction_flags flag) {
   SHARED_PTR<graph_impl> me = shared_from_this();
   strand().dispatch(boost::bind(&graph_impl::use_sync, me, n, name, flag));
@@ -147,7 +146,7 @@ void details::graph_impl::rm_node_sync(SHARED_PTR<details::node_impl> n) {
 }
 
 void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
-                                    symbol name, details::transaction_flags flag) {
+                                    Symbol name, details::transaction_flags flag) {
   SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
     
@@ -157,7 +156,7 @@ void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
 }
 
 void details::graph_impl::use_sync(SHARED_PTR<details::node_impl> n,
-                                   symbol name, details::transaction_flags flag) {
+                                   Symbol name, details::transaction_flags flag) {
   
   SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {

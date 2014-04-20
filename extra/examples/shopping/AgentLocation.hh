@@ -79,12 +79,12 @@ namespace TREX {
       UNIQ_PTR<TREX::transaction::Observation> m_state;
 
       /** @brief Name of the predicate At */
-      static TREX::utils::symbol const AtPred;
+      static TREX::utils::Symbol const AtPred;
       /** @brief Name of the predicate Go */
-      static TREX::utils::symbol const GoPred;
+      static TREX::utils::Symbol const GoPred;
 
       /** @brief Name of the Timeline AgentLocation */
-      static TREX::utils::symbol const AgentLocationObj;
+      static TREX::utils::Symbol const AgentLocationObj;
 
     };
 

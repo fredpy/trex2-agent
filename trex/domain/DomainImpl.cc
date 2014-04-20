@@ -81,11 +81,11 @@ namespace {
   DomainBase::xml_factory::declare<EnumDomain> decl_enum("enum");  
 }
 
-symbol const BooleanDomain::type_name("bool");
-symbol const IntegerDomain::type_name("int");
-symbol const FloatDomain::type_name("float");
-symbol const StringDomain::type_name("string");
-symbol const EnumDomain::type_name("enum");
+Symbol const BooleanDomain::type_name("bool");
+Symbol const IntegerDomain::type_name("int");
+Symbol const FloatDomain::type_name("float");
+Symbol const StringDomain::type_name("string");
+Symbol const EnumDomain::type_name("enum");
 
 double TREX::transaction::round(double d, size_t places) {
   double factor = pow(10, places);
@@ -122,7 +122,7 @@ std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
 
 
 void BooleanDomain::parseSingleton(std::string const &val) {
-  int v = boost::lexical_cast<int>(val);
+  int v = string_cast<int>(val);
   bool bv = (0!=v);
   if( m_full ) {
     m_full = false;
@@ -133,7 +133,7 @@ void BooleanDomain::parseSingleton(std::string const &val) {
 }
 
 void BooleanDomain::parseLower(std::string const &val) {
-  int v = boost::lexical_cast<int>(val);
+  int v = string_cast<int>(val);
   bool bv = (0!=v);
   if( bv ) {
     if( m_full ) {
@@ -146,7 +146,7 @@ void BooleanDomain::parseLower(std::string const &val) {
 
 
 void BooleanDomain::parseUpper(std::string const &val)  {
-  int v = boost::lexical_cast<int>(val);
+  int v = string_cast<int>(val);
   bool bv = (0!=v);
   if( !bv ) {
     if( m_full ) {

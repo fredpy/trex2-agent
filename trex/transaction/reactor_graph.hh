@@ -37,8 +37,7 @@
 # include "TeleoReactor_fwd.hh"
 # include "bits/timeline.hh"
 
-# include <trex/utils/timing/posix_utils.hh>
-# include <trex/utils/shared_var.hh>
+# include <trex/utils/TimeUtils.hh>
 
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>
@@ -128,8 +127,8 @@ namespace TREX {
       SHARED_PTR<details::graph_impl> m_impl;
     public:
       typedef CHRONO::nanoseconds        duration_type;
-      typedef utils::rt_date             date_type;
-      
+      typedef boost::posix_time::ptime   date_type;
+          
       /** @brief reactor ID type
        *
        * The type used to represent a reactor in the graph
@@ -338,7 +337,7 @@ namespace TREX {
        *
        * @return The name of the graph
        */
-      TREX::utils::symbol const &getName() const;
+      TREX::utils::Symbol const &getName() const;
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -348,7 +347,7 @@ namespace TREX {
        *
        * @post the graph is empty
        */
-      explicit graph(TREX::utils::symbol const &name, TICK init =0, bool verbose=false);
+      explicit graph(TREX::utils::Symbol const &name, TICK init =0, bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -363,7 +362,7 @@ namespace TREX {
        *
        * @sa add_reactors(ext_iterator)
        */
-      graph(TREX::utils::symbol const &name,
+      graph(TREX::utils::Symbol const &name,
 	    boost::property_tree::ptree &conf,
 	    TICK init =0, bool verbose=false);
       /** @brief Destructor
@@ -535,7 +534,8 @@ namespace TREX {
        * @sa tickToTime(TICK) const
        */
       virtual TICK timeToTick(date_type const &date) const {
-        return date.since_epoch().to_chrono<duration_type>().count()/tickDuration().count();
+        typedef utils::chrono_posix_convert<duration_type> convert;
+	return convert::to_chrono(date-boost::posix_time::from_time_t(0)).count()/tickDuration().count();
       }
       /** @brief convert a TICK into its real-time equivalent
        *
@@ -554,7 +554,8 @@ namespace TREX {
        * @sa timeToTick(time_t, suseconds_t) const
        */
       virtual date_type tickToTime(TICK cur) const {
-        return date_type::epoch().add(utils::rt_duration(tickDuration()*cur));
+        typedef utils::chrono_posix_convert<duration_type> convert;
+        return boost::posix_time::from_time_t(0)+convert::to_posix(tickDuration()*cur);
       }
   
       virtual std::string date_str(TICK cur) const;
@@ -614,7 +615,7 @@ namespace TREX {
        * @sa reactor_end() const
        * @sa TeleoReactor::getName() const
        */
-      reactor_iterator find_reactor(TREX::utils::symbol const &name) const {
+      reactor_iterator find_reactor(TREX::utils::Symbol const &name) const {
 	return reactor_iterator(m_reactors.find(name));
       }
 
@@ -669,7 +670,7 @@ namespace TREX {
       bool hasTick() const;
 
       void updateTick(TICK value, bool started=true);
-      void set_name(TREX::utils::symbol const &name);
+      void set_name(TREX::utils::Symbol const &name);
 
       utils::log::stream syslog(utils::log::id_type const &context, 
                                 utils::log::id_type const &kind) const;
@@ -677,9 +678,9 @@ namespace TREX {
 	return syslog(null, kind);
       }
       
-      TREX::utils::log_manager &manager() const;
+      TREX::utils::LogManager &manager() const;
 
-      bool has_timeline(TREX::utils::symbol const &tl) const {
+      bool has_timeline(TREX::utils::Symbol const &tl) const {
 	return m_timelines.find(tl)!=m_timelines.end();
       }
 
@@ -733,20 +734,20 @@ namespace TREX {
 
     private:
       
-      bool assign(reactor_id r, TREX::utils::symbol const &timeline,
+      bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
                   details::transaction_flags const &flags);
-      bool subscribe(reactor_id r, TREX::utils::symbol const &timeline,
+      bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
 		     details::transaction_flags const &flags);
       
-      details::timeline_set::iterator get_timeline(TREX::utils::symbol const &tl);
+      details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
 
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
       mutable TICK             m_currentTick;
       
-      mutable utils::shared_var<bool>   m_tick_updated;
+      mutable utils::SharedVar<bool>   m_tick_updated;
       bool tick_updated() const {
-        utils::shared_var<bool>::scoped_lock lck(m_tick_updated);
+        utils::SharedVar<bool>::scoped_lock lck(m_tick_updated);
         return *m_tick_updated;
       }
       
@@ -754,7 +755,7 @@ namespace TREX {
       listen_set m_listeners;
 
       bool m_verbose;
-      TREX::utils::singleton::use<xml_factory>             m_factory;
+      TREX::utils::SingletonUse<xml_factory>             m_factory;
 
       mutable details::reactor_set m_quarantined;
 

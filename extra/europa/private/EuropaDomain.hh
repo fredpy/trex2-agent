@@ -57,7 +57,7 @@ namespace TREX {
        */
       class EuropaDomain :public TREX::transaction::DomainBase {
       public:
-	static TREX::utils::symbol const type_name;
+	static TREX::utils::Symbol const type_name;
 
 	explicit EuropaDomain(EUROPA::Domain const &dom);
 	EuropaDomain(EuropaDomain const &other);

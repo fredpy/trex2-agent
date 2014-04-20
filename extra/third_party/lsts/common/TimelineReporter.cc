@@ -12,8 +12,6 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 using DUNE_NAMESPACES;
 
-namespace tr_details=TREX::transaction::details;
-
 namespace
 {
 
@@ -46,9 +44,8 @@ TimelineReporter::~TimelineReporter() {
 	// TODO Auto-generated destructor stub
 }
 
-
 void
-TimelineReporter::declared(tr_details::timeline const &timeline)
+TimelineReporter::declared(details::timeline const &timeline)
 {
   if (m_output)
     std::cout << "Timeline has been declared: " << timeline.name() << std::endl;
@@ -59,7 +56,7 @@ TimelineReporter::declared(tr_details::timeline const &timeline)
 }
 
 void
-TimelineReporter::undeclared(tr_details::timeline const &timeline)
+TimelineReporter::undeclared(details::timeline const &timeline)
 {
   if (m_output)
     std::cout << "Timeline has been undeclared: " << timeline.name() << std::endl;
@@ -95,7 +92,7 @@ void TimelineReporter::cancelledPlanToken(goal_id const &g)
 
 void TimelineReporter::notify(Observation const &obs)
 {
-  std::list<TREX::utils::symbol> attrs;
+  std::list<TREX::utils::Symbol> attrs;
 
   TrexOperation op;
   TrexToken token;
@@ -106,12 +103,12 @@ void TimelineReporter::notify(Observation const &obs)
   op.op = TrexOperation::OP_POST_TOKEN;
 
   obs.listAttributes(attrs);
-  std::list<TREX::utils::symbol>::iterator it;
+  std::list<TREX::utils::Symbol>::iterator it;
   for (it = attrs.begin(); it != attrs.end(); it++)
   {
     TrexAttribute attr;
     Variable v = obs.getAttribute(*it);
-    symbol type = v.domain().getTypeName();
+    Symbol type = v.domain().getTypeName();
 
     if (type.str() == "float") {
       attr.attr_type = TrexAttribute::TYPE_FLOAT;

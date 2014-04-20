@@ -33,7 +33,7 @@
  */
 #include "LogClock.hh"
 
-#include <trex/utils/timing/chrono_helper.hh>
+#include <trex/utils/chrono_helper.hh>
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
@@ -55,8 +55,7 @@ namespace {
 
 LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
   :date(parse_attr<TICK>(node, "value")),
-   count(parse_attr<size_t>(node, "count")),
-   free_count(parse_attr<size_t>(count, node, "free")) {}
+   count(parse_attr<size_t>(node, "count")) {}
 
 /*
  * class TREX::agent::LogClock 
@@ -65,24 +64,24 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 // structors
 
 LogClock::LogClock(bpt::ptree::value_type &node) 
-  :Clock(Clock::duration_type::zero()), m_counter(0), m_eot(false) {
+  :Clock(Clock::duration_type::zero()), m_counter(0) {
   // find the log to replay
-  singleton::use<log_manager> log;
+  SingletonUse<LogManager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
   bool found;
-  file = log->use(file, found).string();
+  file = log->use(file, found);
   if( !found )
-    throw boost::property_tree::ptree_bad_data("Unable to locate file \""+file+"\"", node);
+    throw XmlError(node, "Unable to locate file \""+file+"\"");
   bpt::ptree tks;
   // parse the log
   read_xml(file, tks, xml::no_comments|xml::trim_whitespace);
   if( tks.empty() ) {
     syslog(error)<<"clock log \""<<file<<"\" is empty.";
-    throw boost::property_tree::ptree_bad_data("Empty clock log file.", node);
+    throw XmlError(node, "Empty clock log file.");
   }
   if( tks.size()!=1 ) {
     syslog(error)<<"clock log \""<<file<<"\" has more than 1 root.";
-    throw boost::property_tree::ptree_bad_data("Invalid clock log file", node);
+    throw XmlError(node, "Invalid clock log file");
   }
   tks = tks.get_child("Clock");
   m_epoch = parse_attr<Clock::date_type>(tks, "epoch");
@@ -103,7 +102,7 @@ LogClock::LogClock(bpt::ptree::value_type &node)
       syslog(warn)<<"Skipping tick "<<tck.date<<" with 0 count.";
   }
   if( m_ticks.empty() )
-    throw boost::property_tree::ptree_bad_data("clock log has no valid tick.", node);
+    throw XmlError(node, "clock log has no valid tick.");
 }
 
 // manipulators
@@ -117,18 +116,13 @@ TICK LogClock::getNextTick() {
   tick_info const &tck = m_ticks.front();
   if( m_counter<tck.count )
     ++m_counter;
-  else if( m_eot ) {
-    doSleep();
-    ++m_counter;
-  } else
-    m_eot = true;
   return tck.date;
 }
 
 // observers
 
 bool LogClock::free() const {
-  return !m_ticks.empty() && m_counter <= m_ticks.front().free_count;
+  return !m_ticks.empty() && m_counter < m_ticks.front().count;
 }
 
 LogClock::duration_type LogClock::doSleep() {
@@ -143,7 +137,6 @@ LogClock::duration_type LogClock::doSleep() {
     m_last = cur;
   }
   m_counter = 0;
-  m_eot = false;
   return duration_type();
 }
 

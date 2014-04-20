@@ -68,7 +68,7 @@ namespace pco=po::command_line_style;
 namespace {
 
   /** @brief entry point to TREX system log */
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
   UNIQ_PTR<Agent> my_agent;
 
@@ -125,7 +125,7 @@ namespace {
 
     if( !found ) {
       // try to add the .req extension
-      file = s_log->use(name+".req", found).string();
+      file = s_log->use(name+".req", found);
     } else {
       s_log->use(file, found);
     }
@@ -297,9 +297,9 @@ int main(int argc, char **argv) {
   
   // Initialize trex log path
   if( opt_val.count("log-dir") ) {
-    s_log->log_path(opt_val["log-dir"].as<std::string>());
+    s_log->setLogPath(opt_val["log-dir"].as<std::string>());
   } else // use default
-    s_log->log_path();
+    s_log->logPath();
   
   std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
   
@@ -308,7 +308,7 @@ int main(int argc, char **argv) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
     for(std::vector<std::string>::const_iterator i=incs.begin();
         incs.end()!=i; ++i) {
-      if( s_log->add_search_path(*i) )
+      if( s_log->addSearchPath(*i) )
         s_log->syslog("sim", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
         }
       } else if( 'G'==cmd ) {
 	try {
-	  TICK targetTick = boost::lexical_cast<TICK>(cmdString.substr(1));
+	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
 	  
 	  if( targetTick<=tick )
 	    std::cout<<"Tick "<<targetTick<<" is in the past."
@@ -369,7 +369,7 @@ int main(int argc, char **argv) {
               s_log->flush();
             }
 	  }
-	}catch(boost::bad_lexical_cast const &e) {
+	}catch(bad_string_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;
 	}
       } else if( 'P'==cmd ) {

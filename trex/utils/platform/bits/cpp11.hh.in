@@ -42,7 +42,6 @@
 #cmakedefine CPP11_HAS_SHARED_PTR
 #cmakedefine CPP11_HAS_DELETED_FUNCTIONS
 #cmakedefine CPP11_BOOST_GET_POINTER_STD
-#cmakedefine CPP11_HAS_SYSTEM_ERROR
 #endif // CPP11_ENABLED
 
 #endif // H_trex_cpp11

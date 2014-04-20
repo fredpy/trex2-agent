@@ -42,7 +42,7 @@ using namespace TREX::transaction::details;
  * class TREX::transaction::MultipleInternals
  */
 
-MultipleInternals::MultipleInternals(TeleoReactor const &faulty, utils::symbol const &timeline,
+MultipleInternals::MultipleInternals(TeleoReactor const &faulty, utils::Symbol const &timeline,
 				     TeleoReactor const &owner) throw() 
   :ReactorException(faulty, "timeline "+timeline.str()+" already Internal to "
 		    +owner.getName().str()) {}
@@ -51,15 +51,15 @@ MultipleInternals::MultipleInternals(TeleoReactor const &faulty, utils::symbol c
  * class TREX::transaction::details::timeline
  */
 
-utils::symbol const timeline::s_failed(Predicate::failed_pred());
+utils::Symbol const timeline::s_failed(Predicate::failed_pred());
 
 // structors :
 
-timeline::timeline(TICK date, utils::symbol const &name)
+timeline::timeline(TICK date, utils::Symbol const &name)
   :m_name(name), m_owner(NULL), m_plan_listeners(0),
    m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false) {}
 
-timeline::timeline(TICK date, utils::symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
+timeline::timeline(TICK date, utils::Symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
   :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
    m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false)  {}
 
@@ -197,7 +197,7 @@ void timeline::synchronize(TICK date) {
     if( owned() )
       owner().syslog(name(), TeleoReactor::obs)<<(*m_last_obs);
     else {
-      static utils::singleton::use<utils::log_manager> s_log;
+      static utils::SingletonUse<utils::LogManager> s_log;
       s_log->syslog(date, name(), utils::log::error)<<(*m_last_obs);
     }
   }
@@ -341,7 +341,7 @@ Observation const &Relation::lastObservation() const {
   return m_timeline->lastObservation();
 }
 
-utils::symbol const &Relation::name() const {
+utils::Symbol const &Relation::name() const {
   return m_timeline->name();
 }
 

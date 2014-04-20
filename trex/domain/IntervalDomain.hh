@@ -87,7 +87,8 @@ namespace TREX {
        * @sa class IntervalDomain
        * @author Frederic Py <fpy@mbari.org>
        */
-      class bound {
+      class bound :public TREX::utils::istreamable,
+		   public TREX::utils::ostreamable {
       public:
 	/** @brief constructor
 	 *
@@ -332,14 +333,7 @@ namespace TREX {
 
 	std::istream &read_from(std::istream &in);
 	std::ostream &print_to(std::ostream &out) const;
-
-        friend std::istream &operator>>(std::istream &in, bound &b) {
-          return b.read_from(in);
-        }
-        friend std::ostream &operator<<(std::istream &out, bound const &b) {
-          return b.print_to(out);
-        }
-        
+	  		
 	friend class IntervalDomain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
 
@@ -362,7 +356,7 @@ namespace TREX {
        *
        * Create a new instance withe as a full interval of type @e type
        */
-      explicit IntervalDomain(TREX::utils::symbol const &type)
+      explicit IntervalDomain(TREX::utils::Symbol const &type)
 	:BasicInterval(type), m_lower(minus_inf), m_upper(plus_inf) {}
       /** @brief Constructor
        * @param type A symbolic type name
@@ -375,7 +369,7 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      IntervalDomain(TREX::utils::symbol const &type,
+      IntervalDomain(TREX::utils::Symbol const &type, 
 		     bound const &lb, bound const &ub)
 	:BasicInterval(type), m_lower(lb), m_upper(ub) {
 	if( m_upper<m_lower || ( m_lower.isInfinity() 
@@ -391,7 +385,7 @@ namespace TREX {
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      IntervalDomain(TREX::utils::symbol const &type, Ty const &val)
+      IntervalDomain(TREX::utils::Symbol const &type, Ty const &val) 
 	:BasicInterval(type), m_lower(val), m_upper(val) {}
       /** @brief Destructor */
       virtual ~IntervalDomain() {}
@@ -546,10 +540,10 @@ namespace TREX {
       void parseLower(std::string const &val);
       void parseUpper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const {
-	return m_lower.print_to(out);
+	return out<<m_lower;
       }
       std::ostream &print_upper(std::ostream &out) const {
-	return m_upper.print_to(out);
+	return out<<m_upper;
       }
     }; // IntervalDomain<>
 
