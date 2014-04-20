@@ -124,6 +124,9 @@ namespace TREX {
       /** @brief whether TREX is currently blocked or not */
       bool m_blocked;
 
+      /** @brief are we controlling an auv? */
+      bool m_auv;
+
       /** @brief Whether it was connected on last tick */
       bool m_connected;
       TICK m_last_msg, m_max_delta;
@@ -152,6 +155,8 @@ namespace TREX {
       void postGoalToken();
       bool isActiveInPlanControlStateMsg(PlanControlState* previous_pcstate);
       void announce(double lat, double lon);
+      void enqueueReferenceAtObs();
+      DesiredZ setUavRefZ(const double z);
 
       std::list<TREX::transaction::goal_id> m_goals_pending;
       std::list<TREX::transaction::Observation> m_observations_pending;

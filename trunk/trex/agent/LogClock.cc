@@ -55,7 +55,8 @@ namespace {
 
 LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
   :date(parse_attr<TICK>(node, "value")),
-   count(parse_attr<size_t>(node, "count")) {}
+   count(parse_attr<size_t>(node, "count")),
+   free_count(parse_attr<size_t>(count, node, "free")) {}
 
 /*
  * class TREX::agent::LogClock 
@@ -64,7 +65,7 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 // structors
 
 LogClock::LogClock(bpt::ptree::value_type &node) 
-  :Clock(Clock::duration_type::zero()), m_counter(0) {
+  :Clock(Clock::duration_type::zero()), m_counter(0), m_eot(false) {
   // find the log to replay
   singleton::use<log_manager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
@@ -116,13 +117,18 @@ TICK LogClock::getNextTick() {
   tick_info const &tck = m_ticks.front();
   if( m_counter<tck.count )
     ++m_counter;
+  else if( m_eot ) {
+    doSleep();
+    ++m_counter;
+  } else
+    m_eot = true;
   return tck.date;
 }
 
 // observers
 
 bool LogClock::free() const {
-  return !m_ticks.empty() && m_counter < m_ticks.front().count;
+  return !m_ticks.empty() && m_counter <= m_ticks.front().free_count;
 }
 
 LogClock::duration_type LogClock::doSleep() {
@@ -137,6 +143,7 @@ LogClock::duration_type LogClock::doSleep() {
     m_last = cur;
   }
   m_counter = 0;
+  m_eot = false;
   return duration_type();
 }
 

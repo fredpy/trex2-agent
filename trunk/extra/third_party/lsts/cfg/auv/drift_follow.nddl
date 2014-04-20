@@ -1,7 +1,7 @@
 #include "TREX.nddl"
-#include "path.nddl"
-#include "navigator.nddl"
-#include "drifter.nddl"
+#include "auv/path.nddl"
+#include "auv/navigator.nddl"
+#include "auv/drifter.nddl"
 
 // The nine equi-distant points in a square of 1x1
 LagrangianPoint upper_left  = new LagrangianPoint(-0.5, 0.5);

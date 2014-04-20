@@ -120,14 +120,19 @@ class DrifterController {
  * it increments a counter every time a new token is created resulting on 
  * an unique id which is used by DrifterFollow timeline
  */
-class Counter extends Timeline {
+class Counter extends AgentTimeline {
 
     predicate Holds {
 	int id;
 	0 <= id;
     }
 
-    Counter() {}
+    Counter() {
+      super(Internal, "Holds");
+    }
+    Counter(Mode _mode) {
+      super(_mode, "Holds");
+    }
 }
 
 /* High level drifter follow class
@@ -175,7 +180,7 @@ class DrifterFollow extends AgentTimeline {
     DrifterFollow(Mode _mode) {
 	super(_mode, "Inactive");
 	controller = new DrifterController(this);
-	counter = new Counter();
+	counter = new Counter(_mode);
     }
 }
 
