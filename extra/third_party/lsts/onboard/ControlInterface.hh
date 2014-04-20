@@ -226,10 +226,10 @@ namespace TREX {
       /**
        * @brief pointer to singleton class
        */
-      TREX::utils::SingletonUse<SharedEnvironment> m_env;
+      TREX::utils::singleton::use<SharedEnvironment> m_env;
 
       std::string log_message(std::string const &content);
-      static TREX::utils::SharedVar<size_t> s_id;
+      static TREX::utils::shared_var<size_t> s_id;
       
       // TODO : put a bimap to associate goals to their id
 

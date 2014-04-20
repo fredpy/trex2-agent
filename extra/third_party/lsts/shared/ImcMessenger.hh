@@ -16,8 +16,8 @@
 # include <trex/domain/IntegerDomain.hh>
 # include <trex/domain/EnumDomain.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/LogManager.hh>
-# include <trex/utils/Symbol.hh>
+# include <trex/utils/log_manager.hh>
+# include <trex/utils/symbol.hh>
 
 # include <boost/thread/thread.hpp>
 

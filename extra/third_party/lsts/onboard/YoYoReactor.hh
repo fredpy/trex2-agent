@@ -10,7 +10,7 @@
 
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/LogManager.hh>
+# include <trex/utils/log_manager.hh>
 # include <trex/domain/IntegerDomain.hh>
 # include <trex/domain/FloatDomain.hh>
 # include <trex/domain/StringDomain.hh>
@@ -77,15 +77,15 @@ namespace TREX {
       ~YoYoReactor();
       
     private:
-      static utils::Symbol const s_trex_pred;
-      static utils::Symbol const s_exec_pred;
+      static utils::symbol const s_trex_pred;
+      static utils::symbol const s_exec_pred;
       
-      static utils::Symbol const s_reference_tl;
-      static utils::Symbol const s_refstate_tl;
-      static utils::Symbol const s_control_tl;
-      static utils::Symbol const s_position_tl;
-      static utils::Symbol const s_yoyo_tl;
-      static utils::Symbol const s_yoyo_state_tl;
+      static utils::symbol const s_reference_tl;
+      static utils::symbol const s_refstate_tl;
+      static utils::symbol const s_control_tl;
+      static utils::symbol const s_position_tl;
+      static utils::symbol const s_yoyo_tl;
+      static utils::symbol const s_yoyo_state_tl;
     };
 
 
