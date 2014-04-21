@@ -65,9 +65,9 @@ namespace TREX {
       std::string info() const;
      
     private:
-      duration_type doSleep();
+      //duration_type doSleep();
       TREX::transaction::TICK getNextTick();
-      bool free() const;
+      bool free() const;      
       
       struct tick_info {
         tick_info(boost::property_tree::ptree::value_type const &node);
@@ -81,8 +81,7 @@ namespace TREX {
       date_type     m_epoch;
       duration_type m_period;
       std::list<tick_info> m_ticks;
-      size_t m_counter;
-      boost::optional<transaction::TICK> m_last;
+      // size_t m_counter;
       bool m_eot;
       
       // TREX::transaction::TICK m_last;

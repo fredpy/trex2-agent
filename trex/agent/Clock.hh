@@ -108,6 +108,7 @@ namespace TREX {
        */
       void doStart();
 
+
       TREX::transaction::TICK tick();
       virtual TREX::transaction::TICK max_tick() const {
         return std::numeric_limits<TREX::transaction::TICK>::max();
@@ -206,6 +207,11 @@ namespace TREX {
       virtual bool free() const {
         return true;
       }
+      virtual size_t count() const {
+	return m_count;
+      }
+
+
       /** @brief get time in TICK
        *
        * This method is used to compute the current time.
@@ -255,6 +261,7 @@ namespace TREX {
       
       utils::log::stream syslog(utils::log::id_type const &kind=utils::log::null) 
 	const;
+
 
     private:
       duration_type const m_sleep;
