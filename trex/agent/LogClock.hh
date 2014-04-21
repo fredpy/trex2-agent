@@ -81,8 +81,6 @@ namespace TREX {
       date_type     m_epoch;
       duration_type m_period;
       std::list<tick_info> m_ticks;
-      // size_t m_counter;
-      bool m_eot;
       
       // TREX::transaction::TICK m_last;
     }; // TREX::agent::LogClock

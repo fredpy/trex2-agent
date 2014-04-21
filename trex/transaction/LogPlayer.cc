@@ -588,8 +588,7 @@ bool LogPlayer::next_phase(TICK tck, utils::symbol const &kind) {
       SHARED_PTR<phase> nxt = m_log.front().second;
       if( nxt->type()==kind ) {
 	m_log.pop_front();
-	size_t n = nxt->execute();
-	// syslog(kind, info)<<"Executed "<<n<<" events";
+	nxt->execute();
 	return true;
       } 
     }
