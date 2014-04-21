@@ -55,7 +55,6 @@ void Clock::sleep(Clock::duration_type const &delay){
     timespec tv;
     tv.tv_sec = delay.count()/1000000000l;
     tv.tv_nsec = delay.count()%1000000000l;
-    
     while( tv.tv_sec>0 || tv.tv_nsec>0 ) {
       if( 0==nanosleep(&tv, &tv) )
         return;
@@ -79,6 +78,8 @@ Clock::~Clock() {
 
 void Clock::doStart() {
   m_last = 0;
+  m_count = 0;
+  m_free_count = 0;
   start();
   m_data.open(m_log->file_name("clock.xml").c_str());
   m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
@@ -98,6 +99,7 @@ void Clock::advanceTick(TICK &tick) {
 
 TICK Clock::tick() {
   TICK ret = getNextTick();
+
   if( m_first ) {
     m_first = false;
     m_last = ret;
@@ -116,7 +118,12 @@ TICK Clock::tick() {
 }
 
 Clock::duration_type Clock::sleep() {
-  m_free = false;
+  if( m_free ) { // handle the case were sleep did occur naturally
+    m_free_count = m_count;
+    if( m_free_count>0 )
+      --m_free_count;
+    m_free = false;
+  }
   return doSleep();
 }
 
@@ -136,7 +143,7 @@ TREX::utils::log::stream Clock::syslog(utils::Symbol const &kind) const {
 
 // observers :
 
-bool Clock::is_free() const {  
+bool Clock::is_free() const {
   m_free = free();
   return m_free;
 }
