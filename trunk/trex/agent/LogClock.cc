@@ -65,7 +65,7 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 // structors
 
 LogClock::LogClock(bpt::ptree::value_type &node) 
-  :Clock(Clock::duration_type::zero()), m_eot(false) {
+  :Clock(Clock::duration_type::zero()) {
   // find the log to replay
   singleton::use<log_manager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
