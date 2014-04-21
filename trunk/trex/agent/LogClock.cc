@@ -65,7 +65,7 @@ LogClock::tick_info::tick_info(bpt::ptree::value_type const &node)
 // structors
 
 LogClock::LogClock(bpt::ptree::value_type &node) 
-  :Clock(Clock::duration_type::zero()), m_counter(0), m_eot(false) {
+  :Clock(Clock::duration_type::zero()), m_eot(false) {
   // find the log to replay
   singleton::use<log_manager> log;
   std::string file = parse_attr<std::string>("clock.xml", node, "file");
@@ -113,39 +113,43 @@ TICK LogClock::getNextTick() {
     syslog(error)<<"no more tick to play.";
     throw Clock::Error("clock has no more tick to play.");
   } 
-
   tick_info const &tck = m_ticks.front();
-  if( m_counter<tck.count )
-    ++m_counter;
-  else if( m_eot ) {
-    doSleep();
-    ++m_counter;
-  } else
-    m_eot = true;
-  return tck.date;
+  size_t counter = count();
+
+
+  if( counter< tck.count ) {
+    // Note ideally I should be able to skipp anything that occurs after 
+    // I am not free anymore and it would be much more fficient but lets 
+    // keep it that way for now
+    return tck.date;
+  } else  {
+    TICK expected = tck.date+1, next;
+
+    m_ticks.pop_front();
+    if( m_ticks.empty() )
+      throw Clock::Error("LogClock has no more tick to play");
+    next = m_ticks.front().date;
+
+    if( next!=expected ) {
+      syslog(warn)<<"The clock skipped tick(s) between "<<(expected-1)
+		  <<" and "<<next;
+    }
+    return next;
+  }
 }
 
 // observers
 
 bool LogClock::free() const {
-  return !m_ticks.empty() && m_counter <= m_ticks.front().free_count;
+  if( m_ticks.empty() )
+    throw Clock::Error("LogClock has no more tick to play");
+
+  return count()<m_ticks.front().free_count;
 }
 
-LogClock::duration_type LogClock::doSleep() {
-  // advance to next tick
-  m_ticks.pop_front();
-  if( !m_ticks.empty() ) {
-    transaction::TICK cur = m_ticks.front().date;
-    
-    if( m_last && (cur > 1+(*m_last)) )
-      syslog(warn)<<"The clock skipped tick(s) between "<<(*m_last)
-                  <<" and "<<cur;
-    m_last = cur;
-  }
-  m_counter = 0;
-  m_eot = false;
-  return duration_type();
-}
+// LogClock::duration_type LogClock::doSleep() {
+//   return duration_type();
+// }
 
 std::string LogClock::info() const {
   std::ostringstream oss;
