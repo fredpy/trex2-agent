@@ -46,19 +46,76 @@ namespace TREX {
 
       } // TREX::utils::singleton::internal
     
+      /** @brief singleton instance wrapper
+       * 
+       * This class wrap a typed singleton instance and handle
+       * its creation and destruction along with the connection 
+       * to the central singleton server.
+       *
+       * It is used internallly by the singleton::use class to 
+       * access to the singleton and manage its lifetime.
+       *
+       * @tparam Ty the type of the wrapped singleton
+       *
+       * @pre @p Ty is default constructible
+       * @pre @p The default constructor and destructor of Ty 
+       * are accessible by this class
+       *
+       * @sa TREX::utils::singleton::use
+       * @author Frederic Py <fredpy@gmail.com>
+       */
       template<typename Ty>
       class wrapper :private internal::dummy {
       public:
+        /** @brief New reference to singleton
+         *
+         * This method notifies that the singleton as a new client.
+         * It creates if needed the singleton isntance and increment 
+         * its reference counter by 1
+         * 
+         * @return A pointer to the singleton instance
+         * @post the reference counter for this singleton is incremented by 1
+         * @sa wrapper::detach
+         */
         static Ty *attach();
+        /** @brief Dereference singleton
+         *
+         * Notifies that one client of this singleton no longer refers to it.
+         * As a result it decrease the singleon reference counter and, if the
+         * counter reaches 0 destroy the singleton instance 
+         *
+         * @pre The reference counter is greater than 0
+         * @sa wrapper::attach
+         */
         static void detach();
+      
         static void disable_server();
       
       private:
+        /** @brief Constructor
+         *
+         * Create  a new instance and initialize the singleton 
+         * instance of Ty
+         */
         wrapper();
+        /** @brief Destructor
+         */
         ~wrapper();
 
+        /** @brief Singleton identifier
+         *
+         * The identifier used to differentiate this singleton type 
+         * from others. Its current implementation is based on C++ 
+         * @c typeid which gives the mangled name of the type.
+         *
+         * @return A unique identifier for @p Ty
+         */
         static std::string name();
         
+        /** @brief The singleton instance
+         *
+         * This is were the singleton instance is stored.
+         */
         Ty m_value;
       
         friend struct internal::swrapper_factory<Ty>;

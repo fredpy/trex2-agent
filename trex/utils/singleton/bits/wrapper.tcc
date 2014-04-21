@@ -80,7 +80,7 @@ namespace TREX {
       void wrapper<Ty>::disable_server() {
         internal::dummy::disable();
       }
-      
+
       // structors :
       template<typename Ty>
       wrapper<Ty>::wrapper() {}
