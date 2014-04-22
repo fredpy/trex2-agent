@@ -38,28 +38,23 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "PluginLoader.hh"
+#include "plugin_loader.hh"
 #include "private/Pdlfcn.hh"
 #include "Plugin.hh"
+
+#include <boost/system/error_code.hpp>
+
 
 using namespace TREX::utils;
 using namespace TREX::utils::internals;
 
 /*
- * class TREX::utils::PluginError
- */ 
-
-PluginError::PluginError(symbol const &name,
-                         std::string const &msg) throw()
-:Exception("Plugin("+name.str()+") "+msg+": "+p_dlerror()) {}
-
-/* 
- * class TREX::utils::PluginLoader
+ * class TREX::utils::plugin_loader
  */
 
 // structors :
 
-PluginLoader::~PluginLoader() {
+plugin_loader::~plugin_loader() {
   /*
    * Unloading plug-ins at destruction appeared to be a bad idea.
    * Indeed I have no guarantee that objects from ythe loaded 
@@ -80,7 +75,7 @@ PluginLoader::~PluginLoader() {
 
 // Modifiers :
 
-bool PluginLoader::load(symbol const &name,
+bool plugin_loader::load(symbol const &name,
                         bool fail_on_locate) {
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()==i ) {
@@ -92,11 +87,14 @@ bool PluginLoader::load(symbol const &name,
 	fileName = "./"+libName;
       m_log->syslog("plugin", log::info)<<"Loading "<<fileName;
       void *handle = p_dlopen(fileName.c_str(), RTLD_NOW);
-      if( NULL==handle )
-        throw PluginError(name, "Failed to load \""+name.str()+"\"");
+      if( NULL==handle ) {
+        ERROR_CODE ec = make_error_code(ERRC::executable_format_error);
+        throw SYSTEM_ERROR(ec, "Failed to load library "+name.str());
+      }
       plugin_fn f_init = (plugin_fn)p_dlsym(handle, "initPlugin");
       if( NULL==f_init ) {
-        PluginError err(name, "missing initPlugin");
+        ERROR_CODE ec = make_error_code(ERRC::function_not_supported);
+        SYSTEM_ERROR err(ec, "plugin("+name.str()+") Function initPLugin missing");
         p_dlclose(handle);
         throw err;
       }
@@ -105,8 +103,10 @@ bool PluginLoader::load(symbol const &name,
       //                  it is too be avoided
       f_init();
     } else {
-      if( fail_on_locate )
-        throw Exception("Unable to locate plugin "+name.str());
+      if( fail_on_locate ) {
+        ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
+        throw SYSTEM_ERROR(ec, "Failed to locate plugin "+name.str());
+      }
       return false;
     }
   } else {
@@ -115,13 +115,15 @@ bool PluginLoader::load(symbol const &name,
   return true;
 }
 
-bool PluginLoader::unload(symbol const &name) {
+bool plugin_loader::unload(symbol const &name) {
   handle_map::iterator i = m_loaded.find(name);
   if( m_loaded.end()!=i ) {
     if( (i->second.second--)<=1 ) {
       void *handle = i->second.first;
-      if( 0!=p_dlclose(handle) )
-        throw PluginError(i->first, "Failed to unload");
+      if( 0!=p_dlclose(handle) ) {
+        ERROR_CODE ec = make_error_code(ERRC::io_error);
+        throw SYSTEM_ERROR(ec, "Failed to unload plugin("+i->first.str()+")");
+      }
       m_loaded.erase(i);
       return true;
     }

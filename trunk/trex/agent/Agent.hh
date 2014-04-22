@@ -52,7 +52,7 @@
 # define H_Agent
 
 # include "Clock.hh"
-# include <trex/utils/PluginLoader.hh>
+# include <trex/utils/plugin_loader.hh>
 # include <trex/utils/asio_fstream.hh>
 
 namespace TREX {
@@ -552,7 +552,7 @@ namespace TREX {
                       std::string path);
 
       /** @brief plug-in loader entry point */
-      TREX::utils::singleton::use<TREX::utils::PluginLoader> m_pg;
+      TREX::utils::singleton::use<TREX::utils::plugin_loader> m_pg;
 
     }; // TREX::agent::Agent
 

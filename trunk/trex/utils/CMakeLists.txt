@@ -62,7 +62,7 @@ add_library(TREXutils SHARED
   Exception.cc
   log_manager.cc
   Pdlfcn.cc
-  PluginLoader.cc
+  plugin_loader.cc
   TREXversion.cc
   XmlUtils.cc
   ptree_io.cc
@@ -87,7 +87,7 @@ add_library(TREXutils SHARED
   id_mapper.hh
   log_manager.hh
   Plugin.hh
-  PluginLoader.hh
+  plugin_loader.hh
   shared_var.hh
   symbol.hh
   basic_symbol.hh
