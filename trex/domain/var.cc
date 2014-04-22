@@ -203,7 +203,7 @@ var &var::restrict_with(var const &v) {
     return operator=(v);
   else if( NULL!=v.m_impl.get() ) {
     if( name()!=v.name() )
-      throw VariableException("Cannot merge varibales with different names");
+      throw VariableException("Cannot merge variables with different names");
     m_impl->restrict_with(v.domain());
   }
   return *this;
