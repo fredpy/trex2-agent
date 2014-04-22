@@ -161,6 +161,10 @@ namespace TREX {
      * access to this ioservice and manage the number of threads that 
      * are executing this service
      *
+     * @note This class can be accessed only as a singleton
+     *
+     * @sa TREX::utils::singleton::use
+     *
      * @ingroup utils
      * @author Frederic Py <fredpy@gmail.com>
      */
