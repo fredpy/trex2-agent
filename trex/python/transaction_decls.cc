@@ -127,7 +127,7 @@ void export_transactions() {
   bp::scope my_scope = module;
   // from now on everything is under trex.transaction
   
-  void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
+  void (Predicate::* attr_1)(var const &) = &Predicate::restrictAttribute;
   void (Predicate::* attr_2)(symbol const &, abstract_domain const &) = &Predicate::restrictAttribute;
   
   /*

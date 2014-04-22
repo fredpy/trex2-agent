@@ -96,7 +96,7 @@ namespace TREX {
     YoYoReactor::synchronize()
     {
       bool nearXY = false, nearZ = false, nearBottom = false;
-      Variable v;
+      var v;
       // int secs_at_surface = 60; //< unused variable
 
       if (m_lastPosition.hasAttribute("altitude"))
@@ -126,7 +126,7 @@ namespace TREX {
       double atZ = -1000;
       if (m_lastPosition.hasAttribute("z"))
       {
-        Variable vz = m_lastPosition.getAttribute("z");
+        var vz = m_lastPosition.getAttribute("z");
         if (vz.is_complete() && vz.domain().is_singleton())
         {
           atZ = vz.domain().get_typed_singleton<double,true>();
@@ -239,10 +239,10 @@ namespace TREX {
     {
       Goal g(s_reference_tl, "Going");
 
-      g.restrictAttribute(Variable("latitude", float_domain(lat)));
-      g.restrictAttribute(Variable("longitude", float_domain(lon)));
-      g.restrictAttribute(Variable("z", float_domain(z)));
-      g.restrictAttribute(Variable("speed", float_domain(speed)));
+      g.restrictAttribute(var("latitude", float_domain(lat)));
+      g.restrictAttribute(var("longitude", float_domain(lon)));
+      g.restrictAttribute(var("z", float_domain(z)));
+      g.restrictAttribute(var("speed", float_domain(speed)));
 
       //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
@@ -267,7 +267,7 @@ namespace TREX {
 
       // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
       goal_id g = goal;
-      Variable v;
+      var v;
 
       if ( g->predicate() == s_exec_pred )
       {

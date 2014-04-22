@@ -57,14 +57,14 @@ bool DTAReactor::synchronize() {
       Observation sent(m_state_tl, "Sent");
       
       
-      tmp.restrictAttribute(Variable("center_lat", float_domain(m_pos.first)));
-      sent.restrictAttribute(Variable("center_lat", float_domain(m_pos.first)));
-      tmp.restrictAttribute(Variable("center_lon", float_domain(m_pos.second)));
-      sent.restrictAttribute(Variable("center_lon", float_domain(m_pos.second)));
+      tmp.restrictAttribute(var("center_lat", float_domain(m_pos.first)));
+      sent.restrictAttribute(var("center_lat", float_domain(m_pos.first)));
+      tmp.restrictAttribute(var("center_lon", float_domain(m_pos.second)));
+      sent.restrictAttribute(var("center_lon", float_domain(m_pos.second)));
       
       enum_domain path_d;
       path_d.add(m_path);
-      tmp.restrictAttribute(Variable("path", path_d));
+      tmp.restrictAttribute(var("path", path_d));
     
       if( !m_have_speed ) {
         // set default speeds
@@ -73,18 +73,18 @@ bool DTAReactor::synchronize() {
         m_speed.first = 0.0;
         m_speed.second = 0.0;
       }
-      tmp.restrictAttribute(Variable("speed_north",
+      tmp.restrictAttribute(var("speed_north",
                                      float_domain(m_speed.first)));
-      sent.restrictAttribute(Variable("speed_north",
+      sent.restrictAttribute(var("speed_north",
                                      float_domain(m_speed.first)));
-      tmp.restrictAttribute(Variable("speed_east",
+      tmp.restrictAttribute(var("speed_east",
                                      float_domain(m_speed.second)));
-      sent.restrictAttribute(Variable("speed_east",
+      sent.restrictAttribute(var("speed_east",
                                      float_domain(m_speed.second)));
     
       
-      tmp.restrictAttribute(Variable("size", float_domain(m_factor)));
-      tmp.restrictAttribute(Variable("lagrangian", boolean_domain(m_lagrangian)));
+      tmp.restrictAttribute(var("size", float_domain(m_factor)));
+      tmp.restrictAttribute(var("lagrangian", boolean_domain(m_lagrangian)));
     
       postGoal(tmp);
       m_trex_state = GOAL_SENT;

@@ -71,7 +71,7 @@ bool Scientist::synchronize() {
     if(getCurrentTick()==100)
     {
         Goal goal(auv,Sample);
-        transaction::Variable temp(Objective, TREX::transaction::string_domain(Vent1));
+        transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
         goal.restrictAttribute(temp);
         goal.restrictEnd(TREX::transaction::int_domain(getCurrentTick()+1, Horizon));
         postGoal(goal);

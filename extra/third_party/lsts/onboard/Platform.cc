@@ -649,7 +649,7 @@ namespace TREX
     bool Platform::goingUAV(goal_id g) {
       // double minz, maxz, z;
       // int max_secs_underwater = 30000;
-      Variable lat, lon, z, v;
+      var lat, lon, z, v;
       
       lat = g->getAttribute("latitude");
       lon = g->getAttribute("longitude");
@@ -703,7 +703,7 @@ namespace TREX
     bool Platform::goingAUV(goal_id goal) {
 
       goal_id g = goal;
-      Variable lat, lon, v;
+      var lat, lon, v;
       
       lat = g->getAttribute("latitude");
       lon = g->getAttribute("longitude");
@@ -753,7 +753,7 @@ namespace TREX
     Platform::handleGoingRequest(goal_id const &goal)
     {
       //goingAUV(goal);
-      Variable lat, lon;
+      var lat, lon;
       
       lat = goal->getAttribute("latitude");
       lon = goal->getAttribute("longitude");

@@ -36,7 +36,7 @@
 #include <trex/domain/float_domain.hh>
 #include <trex/domain/enum_domain.hh>
 #include <trex/domain/string_domain.hh>
-#include <trex/domain/Variable.hh>
+#include <trex/domain/var.hh>
 
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
@@ -345,8 +345,8 @@ void export_domain() {
   .def("__init__", &collection_init<tt::enum_domain, tu::symbol>)
   ;
   
-  tt::Variable &(tt::Variable::* restrict_domain)(tt::abstract_domain const &) = &tt::Variable::restrict_with;
-  tt::Variable &(tt::Variable::* restrict_var)(tt::Variable const &) = &tt::Variable::restrict_with;
+  tt::var &(tt::var::* restrict_domain)(tt::abstract_domain const &) = &tt::var::restrict_with;
+  tt::var &(tt::var::* restrict_var)(tt::var const &) = &tt::var::restrict_with;
   
   // class trex.domains.var
   //   A trex variable
@@ -357,14 +357,15 @@ void export_domain() {
   //    - restrict(var) restrict variable with var.domain()
   //    - xml()     xml representation
   //    - __str__() string representation
-  class_<tt::Variable>("var", "trex variable", init<tu::symbol, tt::abstract_domain const &>())
-  .def("name", &tt::Variable::name, return_internal_reference<>())
-  .def("domain", &tt::Variable::domain, return_internal_reference<>())
+  class_<tt::var>("var", "trex variable",
+                  init<tu::symbol, tt::abstract_domain const &>())
+  .def("name", &tt::var::name)
+  .def("domain", &tt::var::domain, return_internal_reference<>())
   .def("restrict", restrict_domain, return_internal_reference<>())
   .def("restrict", restrict_var, return_internal_reference<>())
-  .def("xml", &xml_str<tt::Variable>)
-  .def("json", &json_str<tt::Variable>)
-  .def("__str__", &str_impl<tt::Variable>)
+  .def("xml", &xml_str<tt::var>)
+  .def("json", &json_str<tt::var>)
+  .def("__str__", &str_impl<tt::var>)
   ;
 
 }

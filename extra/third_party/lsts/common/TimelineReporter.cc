@@ -110,7 +110,7 @@ void TimelineReporter::notify(Observation const &obs)
   for (it = attrs.begin(); it != attrs.end(); it++)
   {
     TrexAttribute attr;
-    Variable v = obs.getAttribute(*it);
+    var v = obs.getAttribute(*it);
     symbol type = v.domain().type_name();
 
     if (type.str() == "float") {

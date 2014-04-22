@@ -70,8 +70,8 @@ Predicate::Predicate(boost::property_tree::ptree::value_type &node)
   
   boost::tie(i, last) = node.second.equal_range("Variable");
   for(; last!=i; ++i) {
-    Variable var(*i);
-    restrictAttribute(var);
+    var v(*i);
+    restrictAttribute(v);
   }
 }
 
@@ -83,21 +83,21 @@ Predicate::~Predicate() {}
 
 // modifiers :
 
-void Predicate::restrictAttribute(Variable const &var) {
-  if( !var.is_complete() )
+void Predicate::restrictAttribute(var const &v) {
+  if( !v.is_complete() )
     throw PredicateException("Predicate attribute is not fully defined");
-  iterator pos = m_vars.lower_bound(var.name());
-  if( end()!=pos && var.name()==pos->second.name() ) {
-    pos->second.restrict_with(var);
+  iterator pos = m_vars.lower_bound(v.name());
+  if( end()!=pos && v.name()==pos->second.name() ) {
+    pos->second.restrict_with(v);
   } else {
     // probably need to check if the varaible is valid/OK
-    m_vars.insert(pos, std::make_pair(var.name(), var));
+    m_vars.insert(pos, std::make_pair(v.name(), v));
   }
 }
 
 // observers :
 
-Variable const &Predicate::getAttribute(symbol const &name) const {
+var const &Predicate::getAttribute(symbol const &name) const {
   const_iterator pos = m_vars.find(name);
   if( end()==pos ) 
     throw PredicateException("Attribute \""+name.str()+"\" is unknown");
