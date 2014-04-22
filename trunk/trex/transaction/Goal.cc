@@ -120,17 +120,17 @@ Goal::Goal(boost::property_tree::ptree::value_type &node)
 
 // Modifiers :
 
-void Goal::restrictAttribute(Variable const &var) {
-  symbol const &id = var.name();
+void Goal::restrictAttribute(var const &v) {
+  symbol const &id = v.name();
   // Handle specific temporal attributes
   if( s_startName==id )
-    restrictStart(var.typedDomain<int_domain>());
+    restrictStart(v.typed_domain<int_domain>());
   else if( s_durationName==id ) 
-    restrictDuration(var.typedDomain<int_domain>());
+    restrictDuration(v.typed_domain<int_domain>());
   else if( s_endName==id )
-    restrictEnd(var.typedDomain<int_domain>());
+    restrictEnd(v.typed_domain<int_domain>());
   else 
-    Predicate::restrictAttribute(var);
+    Predicate::restrictAttribute(v);
 }
 
 void Goal::restrictTime(int_domain const &s,
@@ -144,20 +144,20 @@ void Goal::restrictTime(int_domain const &s,
 	 m_end.domain().intersect(e) ) )
     throw PredicateException("Invalid time constraint on Goal");
   // Compute the new domains
-  m_start.typedDomain<int_domain>().get_bounds(sLo, sHi);
+  m_start.typed_domain<int_domain>().get_bounds(sLo, sHi);
   
   s.get_bounds(aLo, aHi);
   // s = s inter start
   sLo = sLo.max(aLo);
   sHi = sHi.min(aHi);
 
-  m_duration.typedDomain<int_domain>().get_bounds(dLo, dHi);
+  m_duration.typed_domain<int_domain>().get_bounds(dLo, dHi);
   d.get_bounds(aLo, aHi);
   // d = d inter duration 
   dLo = dLo.max(aLo);
   dHi = dHi.min(aHi);
 
-  m_end.typedDomain<int_domain>().get_bounds(eLo, eHi);
+  m_end.typed_domain<int_domain>().get_bounds(eLo, eHi);
   e.get_bounds(aLo, aHi);
   // e = e inter end
   eLo = eLo.max(aLo);
@@ -212,7 +212,7 @@ void Goal::restrictTime(int_domain const &s,
 bool Goal::startsAfter(TICK date, TICK delay) {
   int_domain test_window(date+delay, int_domain::plus_inf),
     cstr_window(date, int_domain::plus_inf);
-  if( m_start.typedDomain<int_domain>().intersect(test_window) ) {
+  if( m_start.typed_domain<int_domain>().intersect(test_window) ) {
     restrictTime(cstr_window, s_durationDomain, s_dateDomain);
     return true;
   }
@@ -221,7 +221,7 @@ bool Goal::startsAfter(TICK date, TICK delay) {
 
 // Observers :
 
-Variable const &Goal::getAttribute(symbol const &name) const {
+var const &Goal::getAttribute(symbol const &name) const {
   if( s_startName==name )
     return m_start;
   else if( s_durationName==name ) 
@@ -233,15 +233,15 @@ Variable const &Goal::getAttribute(symbol const &name) const {
 }
 
 int_domain const &Goal::getStart() const {
-  return m_start.typedDomain<int_domain>();
+  return m_start.typed_domain<int_domain>();
 }
 
 int_domain const &Goal::getDuration() const {
-  return m_duration.typedDomain<int_domain>();
+  return m_duration.typed_domain<int_domain>();
 }
 
 int_domain const &Goal::getEnd() const {
-  return m_end.typedDomain<int_domain>();
+  return m_end.typed_domain<int_domain>();
 }
 
 

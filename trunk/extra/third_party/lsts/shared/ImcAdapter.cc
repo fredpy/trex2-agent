@@ -484,7 +484,7 @@ namespace TREX
 //    }
 
     void
-    ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
+    ImcAdapter::variableToImc(var const &v, TrexAttribute * attr)
     {
       symbol t = v.domain().type_name();
       attr->name = v.name().str();
@@ -590,7 +590,7 @@ namespace TREX
       for (it = attrs.begin(); it != attrs.end(); it++)
       {
         TrexAttribute attr;
-        Variable v = obs.getAttribute(*it);
+        var v = obs.getAttribute(*it);
         variableToImc(v, &attr);
         result->attributes.push_back(attr);
       }

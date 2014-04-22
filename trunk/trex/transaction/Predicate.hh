@@ -49,7 +49,7 @@
 # include <list>
 
 // put it this way to avoid conflict with Europa
-# include <trex/domain/Variable.hh>
+# include <trex/domain/var.hh>
 
 namespace TREX {
   namespace transaction {
@@ -97,7 +97,7 @@ namespace TREX {
     class Predicate:  public TREX::utils::ptree_convertible {
     protected:
       /** @brief Type used to store predicate attributes */
-      typedef std::map<TREX::utils::symbol, Variable> attr_set;
+      typedef std::map<TREX::utils::symbol, var> attr_set;
 
     public:
       /** @brief Predicate attributes' iterator */
@@ -200,7 +200,7 @@ namespace TREX {
        */
       void restrictAttribute(TREX::utils::symbol const &name,
 			     abstract_domain const &domain) {
-	return restrictAttribute(Variable(name, domain));
+	return restrictAttribute(var(name, domain));
       }
       /** @brief attribute domain restriction
        * @param var A varaible describing the attribute
@@ -212,7 +212,7 @@ namespace TREX {
        * @sa void restrictAttribute(TREX::utils::Symbol const &, DomainBase const &)
        * @sa Variable &restrict(Variable const &)
        */
-      virtual void restrictAttribute(Variable const &var);
+      virtual void restrictAttribute(var const &var);
       /** @brief Check for constrained attribute
        * @param name an attribute
        * This methodsw checks if current instance explicitely defines
@@ -240,7 +240,7 @@ namespace TREX {
        *
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &) const
        */
-      virtual Variable const &getAttribute(TREX::utils::symbol const &name)
+      virtual var const &getAttribute(TREX::utils::symbol const &name)
 	const;
       /** @brief Attribute domain access
        * @tparam Ty the type of the domain
@@ -261,8 +261,8 @@ namespace TREX {
       Ty const &getDomain(TREX::utils::symbol const &name) const {
 	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
 			     abstract_domain const &>::value));
-	Variable const &attr = getAttribute(name);
-	return attr.typedDomain<Ty>();
+	var const &attr = getAttribute(name);
+	return attr.typed_domain<Ty>();
       }
       /** @brief Attribute access
        * @param name The name of an attribute
@@ -273,7 +273,7 @@ namespace TREX {
        * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const 
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &)
        */
-      Variable const &operator[](TREX::utils::symbol const &name) const {
+      var const &operator[](TREX::utils::symbol const &name) const {
 	return getAttribute(name);
       }
     

@@ -136,7 +136,7 @@ namespace TREX {
     private:
       const int c_imc_header_length;
       const int c_max_iridium_payload_length;
-      void variableToImc(Variable const &v, TrexAttribute * attr);
+      void variableToImc(var const &v, TrexAttribute * attr);
       void setAttribute(Predicate &pred, TrexAttribute const &attr);
       int m_trex_id;
       UDPSocket sock_send, sock_receive;

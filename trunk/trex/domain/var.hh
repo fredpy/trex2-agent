@@ -87,7 +87,11 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class Variable :public TREX::utils::ptree_convertible {
+    class var :public TREX::utils::ptree_convertible {
+    private:
+      class impl;
+
+      UNIQ_PTR<impl> m_impl;
     public:
       /** @brief Constructor
        *
@@ -98,7 +102,7 @@ namespace TREX {
        * should not be used by other components as it create an undefined
        * variable
        */
-      Variable();
+      var();
       /** @brief Constructor
        * @param name A symbolic name
        * @param domain A domain
@@ -108,14 +112,14 @@ namespace TREX {
        * @throw VariableException Tried to create a variable with an
        * empty name
        */
-      Variable(TREX::utils::symbol const &name,
-	       abstract_domain const &domain);
+      var(TREX::utils::symbol const &name,
+          abstract_domain const &domain);
       /** @brief Constructor
        * @brief var Another instance
        *
        * Create a copy of @e var
        */
-      Variable(Variable const &var);
+      var(var const &var);
       /** @brief Constructor
        * @param node A XML node
        *
@@ -134,9 +138,9 @@ namespace TREX {
        * @throw XmlError @c domain was missing
        * @throw XmlError An error occurred while parsing the domain
        */
-      Variable(boost::property_tree::ptree::value_type &node);
+      var(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
-      ~Variable();
+      ~var();
 
       /** @brief Check for complete varaible definition
        *
@@ -146,9 +150,7 @@ namespace TREX {
        * @retval true if fully defined
        * @retval false else
        */
-      bool is_complete() const {
-	return !( m_name.empty() || !m_domain );
-      }
+      bool is_complete() const;
       
       /** @brief Assignment operator
        *
@@ -159,15 +161,13 @@ namespace TREX {
        *
        * @return current instance after operation
        */
-      Variable &operator= (Variable const &other);
+      var &operator= (var const &other);
       
       /** @brief Variable name
        * @return the name of this variable
        * @sa bool isComplete() const
        */
-      TREX::utils::symbol const &name() const {
-	return m_name;
-      }
+      TREX::utils::symbol name() const;
 
       /** @brief Variable domain
        *
@@ -196,7 +196,7 @@ namespace TREX {
        * @sa DomainBase &domain() const
        */
       template<class Ty>
-      Ty const &typedDomain() const {
+      Ty const &typed_domain() const {
 	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
 			     abstract_domain const &>::value));
 	return dynamic_cast<Ty const &>(domain());
@@ -219,7 +219,7 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &restrict_with(abstract_domain const &dom);
+      var &restrict_with(abstract_domain const &dom);
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -233,7 +233,7 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &operator*=(abstract_domain const &dom) {
+      var &operator*=(abstract_domain const &dom) {
 	return restrict_with(dom);
       }
       /** @brief Merge variable
@@ -249,7 +249,7 @@ namespace TREX {
        * @return current insatnce after being merged with @e var
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &restrict_with(Variable const &var);
+      var &restrict_with(var const &v);
       /** @brief Merge variable
        * @param var another variable
        *
@@ -263,50 +263,19 @@ namespace TREX {
        * @return current insatnce after being merged with @e var
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &operator*=(Variable const &var) {
-	return restrict_with(var);
+      var &operator*=(var const &v) {
+	return restrict_with(v);
       }
 
       boost::property_tree::ptree as_tree() const;
 
 	
-    private:
-      typedef abstract_domain::factory::returned_type domain_ptr;
-      /** @brief varaible name */
-      TREX::utils::symbol m_name;
-      /** @brief Variable domain */
-      domain_ptr m_domain;
-
-      /** @brief Entry point to domain XML parsing */
-      static TREX::utils::singleton::use< abstract_domain::factory > s_dom_factory;
-
-      /** @brief Domain duplication helper
-       * @param dom A domain
-       * This method helps to duplicate a domain pointed by @e dom
-       * while managing the case where @e dom is NULL
-       * @return a pointer to a copy of @a *dom or a NULL pointer
-       */
-      static abstract_domain *clone(boost::call_traits<Variable::domain_ptr>::param_type dom);
-      
-      /** @brief Constructor
-       * @param name A symbolic name 
-       * @param domain A poiunbter to a domain
-       *
-       * This constructor is used internally to create a variable
-       * from a domain that has already been allocated
-       */
-      explicit Variable(TREX::utils::symbol const &name,
-			abstract_domain *domain = NULL);
       friend class Predicate;
       
-      friend std::ostream &operator<<(std::ostream &out, Variable const &v) {
-        if( v.is_complete() )
-          return out<<v.m_name<<'='<<*(v.m_domain);
-        else
-          return out<<"<?"<<v.m_name<<'>';
-      }
-   }; // class TREX::transaction::Variable
+   }; // class TREX::transaction::var
       
+  std::ostream &operator<<(std::ostream &out, var const &v);
+        
   } // TREX::transaction
 } // TREX 
 

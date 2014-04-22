@@ -210,8 +210,8 @@ namespace TREX {
        * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
        *                  IntegerDomain const &)
        */
-      void restrictAttribute(Variable const &var);
-      Variable const &getAttribute(TREX::utils::symbol const &name) const;
+      void restrictAttribute(var const &var);
+      var const &getAttribute(TREX::utils::symbol const &name) const;
       void listAttributes(std::list<TREX::utils::symbol> &attr,
 			  bool all) const;
       
@@ -296,7 +296,7 @@ namespace TREX {
       static int_domain const s_durationDomain;
 
     private:
-      Variable m_start, m_duration, m_end;
+      var m_start, m_duration, m_end;
       
       TREX::utils::symbol const &getPredTag() const;
     };

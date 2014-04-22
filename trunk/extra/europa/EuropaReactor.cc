@@ -354,7 +354,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var) ) {
 	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
-	Variable attr((*a)->getName().toString(), *dom);
+	var attr((*a)->getName().toString(), *dom);
 	my_goal.restrictAttribute(attr);
       }
     }
@@ -409,7 +409,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var)) {
 	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
-	Variable attr((*a)->getName().toString(), *dom);
+	var attr((*a)->getName().toString(), *dom);
 	goal.restrictAttribute(attr);
       }
     }
@@ -710,8 +710,8 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
 					      implicit_var) ) {
       UNIQ_PTR<TREX::transaction::abstract_domain>
 	dom(details::trex_domain((*a)->lastDomain()));
-      TREX::transaction::Variable var((*a)->getName().toString(), *dom);
-      obs.restrictAttribute(var);
+      TREX::transaction::var v((*a)->getName().toString(), *dom);
+      obs.restrictAttribute(v);
     }
   }
   postObservation(obs);
@@ -730,10 +730,10 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
     EUROPA::ConstrainedVariableId param = tok->getVariable(v->str());
 
     if( param.isId() ) {
-      Variable const &var = pred[*v];
+      var const &attr = pred[*v];
       //syslog("INFO")<<"Apply "<<tok->toString()<<"."<<var;
       try {
-	details::europa_restrict(param, var.domain());
+	details::europa_restrict(param, attr.domain());
       } catch(DomainExcept const &e) {
 	syslog(null, warn)<<"Failed to restrict attribute "<<(*v)
 		      <<" on token "<<pred.object()<<'.'<<pred.predicate()
