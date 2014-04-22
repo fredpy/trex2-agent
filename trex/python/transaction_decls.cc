@@ -128,7 +128,7 @@ void export_transactions() {
   // from now on everything is under trex.transaction
   
   void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
-  void (Predicate::* attr_2)(symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
+  void (Predicate::* attr_2)(symbol const &, abstract_domain const &) = &Predicate::restrictAttribute;
   
   /*
    * class predicate:

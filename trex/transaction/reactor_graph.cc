@@ -54,8 +54,8 @@ namespace {
 
 
 
-  class DateHandler :public DomainBase::xml_factory::factory_type::producer {
-    typedef DomainBase::xml_factory::factory_type::producer base_class;
+  class DateHandler :public abstract_domain::factory::factory_type::producer {
+    typedef abstract_domain::factory::factory_type::producer base_class;
 
   public:
     typedef graph::date_type date_type;
@@ -72,14 +72,14 @@ namespace {
       boost::optional<date_type> 
       min = utils::parse_attr< boost::optional<date_type> >(arg.second, "min"),
       max = utils::parse_attr< boost::optional<date_type> >(arg.second, "max");
-      IntegerDomain::bound lo(IntegerDomain::minus_inf), 
-          hi(IntegerDomain::plus_inf);
+      int_domain::bound lo(int_domain::minus_inf),
+          hi(int_domain::plus_inf);
       boost::posix_time::ptime date;
       if( min )
         lo = m_owner.timeToTick(*min);
       if( max )
         hi = m_owner.timeToTick(*max);
-      return result_type(new IntegerDomain(lo, hi));
+      return result_type(new int_domain(lo, hi));
     }
 
     graph const &m_owner;
@@ -87,8 +87,8 @@ namespace {
     friend class TREX::transaction::graph;
   }; // DateHandler
 
-  class DurationHandler :public DomainBase::xml_factory::factory_type::producer {
-    typedef DomainBase::xml_factory::factory_type::producer base_class;
+  class DurationHandler :public abstract_domain::factory::factory_type::producer {
+    typedef abstract_domain::factory::factory_type::producer base_class;
 
   public:
     ~DurationHandler() {} 
@@ -103,8 +103,8 @@ namespace {
       boost::optional<utils::rt_duration>
       min = utils::parse_attr< boost::optional<utils::rt_duration> >(arg.second, "min"),
       max = utils::parse_attr< boost::optional<utils::rt_duration> >(arg.second, "max");
-      IntegerDomain::bound lo(IntegerDomain::minus_inf), 
-          hi(IntegerDomain::plus_inf);
+      int_domain::bound lo(int_domain::minus_inf),
+          hi(int_domain::plus_inf);
       CHRONO::duration<double> ratio = m_owner.tickDuration();
       
       if( min ) {
@@ -116,7 +116,7 @@ namespace {
         lo = static_cast<long long>(std::ceil(max_s.count()/ratio.count()));
         
       }
-      return result_type(new IntegerDomain(lo, hi));
+      return result_type(new int_domain(lo, hi));
     }
 
     graph const &m_owner;
@@ -383,45 +383,45 @@ namespace bp=boost::property_tree;
 namespace TREX {
   namespace transaction {
 
-    std::string date_export(graph const &g, IntegerDomain::bound const &val) {
+    std::string date_export(graph const &g, int_domain::bound const &val) {
       return g.date_str(val.value());
     }
 
-    bp::ptree date_export(graph const &g, IntegerDomain const &dom) {
+    bp::ptree date_export(graph const &g, int_domain const &dom) {
       bp::ptree ret;
       bp::ptree &tmp = ret.add_child("date", bp::ptree());
 
-      if( dom.isSingleton() )
-        TREX::utils::set_attr(tmp, "value", date_export(g,dom.lowerBound()));
+      if( dom.is_singleton() )
+        TREX::utils::set_attr(tmp, "value", date_export(g,dom.lower_bound()));
       else {
-        if( dom.hasLower() )
-          TREX::utils::set_attr(tmp, "min", date_export(g,dom.lowerBound()));
-        if( dom.hasUpper() )
-          TREX::utils::set_attr(tmp, "max", date_export(g,dom.lowerBound()));
+        if( dom.has_lower() )
+          TREX::utils::set_attr(tmp, "min", date_export(g,dom.lower_bound()));
+        if( dom.has_upper() )
+          TREX::utils::set_attr(tmp, "max", date_export(g,dom.upper_bound()));
       }
       TREX::utils::set_attr(ret, "type", "date");
       return ret;
     }
 
     std::string duration_export(graph const &g,
-        IntegerDomain::bound const &val) {
+        int_domain::bound const &val) {
       return g.duration_str(val.value());
     }
 
-    bp::ptree duration_export(graph const &g, IntegerDomain const &dom) {
+    bp::ptree duration_export(graph const &g, int_domain const &dom) {
       bp::ptree ret;
       bp::ptree &tmp = ret.add_child("duration", bp::ptree());
 
-      if( dom.isSingleton() )
+      if( dom.is_singleton() )
         TREX::utils::set_attr(tmp, "value",
-            duration_export(g,dom.lowerBound()));
+            duration_export(g,dom.lower_bound()));
       else {
-        if( dom.hasLower() )
+        if( dom.has_lower() )
           TREX::utils::set_attr(tmp, "min",
-              duration_export(g,dom.lowerBound()));
-        if( dom.hasUpper() )
+              duration_export(g,dom.lower_bound()));
+        if( dom.has_upper() )
           TREX::utils::set_attr(tmp, "max",
-              duration_export(g,dom.upperBound()));
+              duration_export(g,dom.upper_bound()));
       }
       TREX::utils::set_attr(ret, "type", "duration");
       return ret;
@@ -456,18 +456,18 @@ boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
   if( !vars )
     vars = attr.add_child("Variable", bp::ptree());
 
-  if( !g->getStart().isFull() ) {
+  if( !g->getStart().is_full() ) {
     bp::ptree domain = date_export(*this, g->getStart());
     TREX::utils::set_attr(domain, "name", "start");
     vars->push_back(bp::ptree::value_type("", domain));
   }
-  if( !g->getEnd().isFull() ) {
+  if( !g->getEnd().is_full() ) {
     bp::ptree domain = date_export(*this, g->getEnd());
     TREX::utils::set_attr(domain, "name", "end");
     vars->push_back(bp::ptree::value_type("", domain));
   }
-  if( g->getDuration().hasUpper() ||
-      g->getDuration().lowerBound()!=Goal::s_durationDomain.lowerBound() ) {
+  if( g->getDuration().has_upper() ||
+      g->getDuration().lower_bound()!=Goal::s_durationDomain.lower_bound() ) {
     bp::ptree domain = duration_export(*this, g->getDuration());
     TREX::utils::set_attr(domain, "name", "duration");
     vars->push_back(bp::ptree::value_type("", domain));    

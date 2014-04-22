@@ -338,14 +338,14 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
     // Get start, duration and end
-    UNIQ_PTR<DomainBase>
+    UNIQ_PTR<abstract_domain>
       d_start(details::trex_domain(tok->start()->lastDomain())),
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
 
-    my_goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
-                         *dynamic_cast<IntegerDomain *>(d_duration.get()),
-                         *dynamic_cast<IntegerDomain *>(d_end.get()));
+    my_goal.restrictTime(*dynamic_cast<int_domain *>(d_start.get()),
+                         *dynamic_cast<int_domain *>(d_duration.get()),
+                         *dynamic_cast<int_domain *>(d_end.get()));
 
     // Manage other attributes
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
@@ -353,7 +353,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       // Exclude "implicit_var_*"
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var) ) {
-	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	my_goal.restrictAttribute(attr);
       }
@@ -393,14 +393,14 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
 void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 {
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
-    UNIQ_PTR<DomainBase>
+    UNIQ_PTR<abstract_domain>
         d_start(details::trex_domain(tok->start()->lastDomain())),
         d_duration(details::trex_domain(tok->duration()->lastDomain())),
         d_end(details::trex_domain(tok->end()->lastDomain()));
 
-    goal.restrictTime(*dynamic_cast<IntegerDomain *>(d_start.get()),
-                       *dynamic_cast<IntegerDomain *>(d_duration.get()),
-                       *dynamic_cast<IntegerDomain *>(d_end.get()));
+    goal.restrictTime(*dynamic_cast<int_domain *>(d_start.get()),
+                       *dynamic_cast<int_domain *>(d_duration.get()),
+                       *dynamic_cast<int_domain *>(d_end.get()));
 
     // Manage other attributes
     for(std::vector<EUROPA::ConstrainedVariableId>::const_iterator a=attrs.begin();
@@ -408,7 +408,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
       // ignore implicit_var
       if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 						implicit_var)) {
-	UNIQ_PTR<DomainBase> dom(details::trex_domain((*a)->lastDomain()));
+	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
 	Variable attr((*a)->getName().toString(), *dom);
 	goal.restrictAttribute(attr);
       }
@@ -604,11 +604,11 @@ bool EuropaReactor::hasWork() {
         		<<(*from)->timeline()->getName().c_str()<<" valid:"<<j.valid()
         		<<" goals:"<<j->accept_goals());
         if( j.valid() && j->accept_goals() ) {
-          IntegerDomain window = j->dispatch_window(getCurrentTick()+1);
-          IntegerDomain::bound lo = window.lowerBound(), 
-	    hi = window.upperBound();
+          int_domain window = j->dispatch_window(getCurrentTick()+1);
+          int_domain::bound lo = window.lower_bound(),
+	    hi = window.upper_bound();
           e_lo = static_cast<EUROPA::eint::basis_type>(lo.value());
-          if( hi.isInfinity() )
+          if( hi.is_infinity() )
             e_hi = final_tick();
           else
             e_hi = static_cast<EUROPA::eint::basis_type>(hi.value());
@@ -708,7 +708,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
     // ignore implicit_var
     if( 0!=(*a)->getName().toString().compare(0, implicit_var.length(), 
 					      implicit_var) ) {
-      UNIQ_PTR<TREX::transaction::DomainBase>
+      UNIQ_PTR<TREX::transaction::abstract_domain>
 	dom(details::trex_domain((*a)->lastDomain()));
       TREX::transaction::Variable var((*a)->getName().toString(), *dom);
       obs.restrictAttribute(var);

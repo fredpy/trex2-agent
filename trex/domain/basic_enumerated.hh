@@ -45,7 +45,7 @@
 #ifndef H_BasicEnumerated
 # define H_BasicEnumerated
 
-# include "DomainBase.hh"
+# include "abstract_domain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -59,27 +59,24 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class BasicEnumerated :public DomainBase {
+    class basic_enumerated :public abstract_domain {
     public:
       /** @brief Destructor */
-      virtual ~BasicEnumerated() {}
+      virtual ~basic_enumerated() {}
 
-      bool isInterval() const {
+      bool is_interval() const {
 	return false;
       }
-      bool isEnumerated() const {
+      bool is_enumerated() const {
 	return true;
       }
 
-      bool isFull() const {
-	return 0==getSize();
+      bool is_full() const {
+	return 0==size();
       }
-      bool isSingleton() const {
-	return 1==getSize();
+      bool is_singleton() const {
+	return 1==size();
       }
-//      std::ostream &toXml(std::ostream &out, size_t tabs) const;
-//      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
-
       
       /** @brief element count
        *
@@ -89,7 +86,7 @@ namespace TREX {
        * @note by convention if the returned value is 0, TREX will
        * consider this domain as full
        */
-      virtual size_t getSize() const =0;
+      virtual size_t size() const =0;
       /** @brief generic element access
        * @param i index of the element
        *
@@ -102,11 +99,11 @@ namespace TREX {
        *
        * @sa size_t getSize() const
        */
-      virtual boost::any getElement(size_t i) const =0;
+      virtual boost::any element(size_t i) const =0;
       /** @overload boost::any getElement(size_t i) const
        */
       boost::any operator[](size_t i) const {
-	return getElement(i);
+	return element(i);
       }
       /** @brief Typed element access
        * @tparam Ty   expected return type
@@ -136,14 +133,14 @@ namespace TREX {
        * @sa std::string getStringValue(size_t i) const
        */
       template< class Ty, bool Safe >
-      Ty getTypedElement(size_t n) const {
-        boost::any val = getElement(n);
+      Ty typed_element(size_t n) const {
+        boost::any val = element(n);
 	if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringValue(n));
+            return boost::lexical_cast<Ty>(element_as_string(n));
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
@@ -161,30 +158,30 @@ namespace TREX {
        * @sa getElement(size_t) const
        * @sa getTypedElement(size_t) const
        */
-      virtual std::string getStringValue(size_t i) const;
+      virtual std::string element_as_string(size_t i) const;
 
-      virtual void addTextValue(std::string const &val) =0;
+      virtual void add_string_value(std::string const &val) =0;
     protected:
-      explicit BasicEnumerated(TREX::utils::symbol const &type) 
-	:DomainBase(type) {}
-      explicit BasicEnumerated(boost::property_tree::ptree::value_type &node)
-	:DomainBase(node) {}
+      explicit basic_enumerated(TREX::utils::symbol const &type)
+	:abstract_domain(type) {}
+      explicit basic_enumerated(boost::property_tree::ptree::value_type &node)
+	:abstract_domain(node) {}
 
-      void completeParsing(boost::property_tree::ptree::value_type &node);
+      void complete_parsing(boost::property_tree::ptree::value_type &node);
 
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;
       
     private:
       boost::property_tree::ptree build_tree() const;
 
-      void accept(DomainVisitor &visitor) const;
+      void accept(domain_visitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       
       boost::any singleton() const {
-	return getElement(0);
+	return element(0);
       }
-      std::string stringSingleton() const {
-	return getStringValue(0);
+      std::string string_singleton() const {
+	return element_as_string(0);
       }
     }; // TREX::transaction::BasicEnumerated
 

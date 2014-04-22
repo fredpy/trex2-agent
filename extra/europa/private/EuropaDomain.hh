@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_EuropaDomain
 # define H_trex_europa_EuropaDomain
 
-# include <trex/domain/DomainBase.hh>
+# include <trex/domain/abstract_domain.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
@@ -55,32 +55,32 @@ namespace TREX {
        *
        * @author Frederic Py <fpy@mbari.org>
        */
-      class EuropaDomain :public TREX::transaction::DomainBase {
+      class EuropaDomain :public TREX::transaction::abstract_domain {
       public:
-	static TREX::utils::symbol const type_name;
+	static TREX::utils::symbol const type_str;
 
 	explicit EuropaDomain(EUROPA::Domain const &dom);
 	EuropaDomain(EuropaDomain const &other);
 	~EuropaDomain();
 	
-	TREX::transaction::DomainBase *copy() const;
+	TREX::transaction::abstract_domain *copy() const;
 	// std::ostream &toXml(std::ostream &out, size_t tabs) const;
       
 	
-	bool isInterval() const {
+	bool is_interval() const {
 	  return m_dom->isInterval();
 	}
-	bool isEnumerated() const {
+	bool is_enumerated() const {
 	  return m_dom->isEnumerated();
 	}
-	bool isFull() const;
-	bool isSingleton() const {
+	bool is_full() const;
+	bool is_singleton() const {
 	  return m_dom->isSingleton();
 	}
-	bool intersect(TREX::transaction::DomainBase const &other) const;
-	bool equals(TREX::transaction::DomainBase const &other) const;
+	bool intersect(TREX::transaction::abstract_domain const &other) const;
+	bool equals(TREX::transaction::abstract_domain const &other) const;
 
-	TREX::transaction::DomainBase &restrictWith(TREX::transaction::DomainBase const &other);
+	TREX::transaction::abstract_domain &restrict_with(TREX::transaction::abstract_domain const &other);
 	EUROPA::Domain const &europaDomain() const {
 	  return *m_dom;
 	}
@@ -94,7 +94,7 @@ namespace TREX {
 
 	std::ostream &print_domain(std::ostream &out) const;
 	boost::any singleton() const;
-	std::string stringSingleton() const;
+	std::string string_singleton() const;
 
       }; // TREX::europa::details::EuropaDomain
 

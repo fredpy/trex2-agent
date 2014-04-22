@@ -10,7 +10,7 @@
 #ifndef H_BooleanDomain
 # define H_BooleanDomain
 
-# include "BasicInterval.hh"
+# include "basic_interval.hh"
 
 namespace TREX {
   namespace transaction {
@@ -24,7 +24,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class BooleanDomain :public BasicInterval {
+    class boolean_domain :public basic_interval {
     public:
       /** @brief Symbolic type name for this domain
        *
@@ -33,29 +33,29 @@ namespace TREX {
        * its value is "bool" but programmers who want to use this name
        * would better use this variable in case it changes in the future
        */
-      static TREX::utils::symbol const type_name;
+      static TREX::utils::symbol const type_str;
 
       /** @brief Default constructor
 
        *
        * Creates a full boolean domain
        */
-      BooleanDomain()
-	:BasicInterval(type_name), m_full(true) {}
+      boolean_domain()
+	:basic_interval(type_str), m_full(true) {}
       /** @brief Constructor
        * @param val A booelan value
        *
        * Creates a singleton domain with value @e val
        */
-      explicit BooleanDomain(bool val)
-	:BasicInterval(type_name), m_full(false), m_val(val) {}
+      explicit boolean_domain(bool val)
+	:basic_interval(type_str), m_full(false), m_val(val) {}
       /** @brief Copy constructor
        * @param d Another instance
        *
        * Create a copy of @e d
        */
-      BooleanDomain(BooleanDomain const &d)
-	:BasicInterval(d), m_full(d.m_full), m_val(d.m_val) {}
+      boolean_domain(boolean_domain const &d)
+	:basic_interval(d), m_full(d.m_full), m_val(d.m_val) {}
       /** @brief Constructor
        *
        * @param node A XML node 
@@ -72,47 +72,47 @@ namespace TREX {
        * @throw TREX::utils::bad_string_cast Unable to parse value
        * attribute
        */
-      explicit BooleanDomain(boost::property_tree::ptree::value_type &node);
+      explicit boolean_domain(boost::property_tree::ptree::value_type &node);
 
       /** @brief Destructor */
-      ~BooleanDomain() {}
+      ~boolean_domain() {}
 
       std::ostream &toXml(std::ostream &out, size_t tabs) const;
 
-      DomainBase *copy() const {
-	return new BooleanDomain(*this);
+      abstract_domain *copy() const {
+	return new boolean_domain(*this);
       }
-      bool hasLower() const {
-	return isSingleton();
+      bool has_lower() const {
+	return is_singleton();
       }
-      bool hasUpper() const {
-	return isSingleton();
+      bool has_upper() const {
+	return is_singleton();
       }
-      bool isFull() const {
+      bool is_full() const {
 	return m_full;
       }
-      bool isSingleton() const {
+      bool is_singleton() const {
 	return !m_full;
       }
       
-      bool intersect(DomainBase const &other) const;
-      bool equals(DomainBase const &other) const;
-      DomainBase &restrictWith(DomainBase const &other);
+      bool intersect(abstract_domain const &other) const;
+      bool equals(abstract_domain const &other) const;
+      abstract_domain &restrict_with(abstract_domain const &other);
 
     private:
-      boost::any getLower() const {
+      boost::any get_lower() const {
 	return m_full?false:m_val;
       }
-      boost::any getUpper() const {
+      boost::any get_upper() const {
 	return m_full?true:m_val;
       }
       bool json_protect() const {
         return false;
       }
 
-      void parseSingleton(std::string const &val);
-      void parseLower(std::string const &val);
-      void parseUpper(std::string const &val);
+      void parse_singleton(std::string const &val);
+      void parse_lower(std::string const &val);
+      void parse_upper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const;
       std::ostream &print_upper(std::ostream &out) const;
 
@@ -127,7 +127,7 @@ namespace TREX {
        */
       bool m_val;
       
-    }; // BooleanDomain
+    }; // boolean_domain
 
   } // TREX::transaction
 } // TREX

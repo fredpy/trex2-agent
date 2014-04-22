@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <trex/domain/StringDomain.hh>
+#include <trex/domain/string_domain.hh>
 
 #include "SimpleRobot.hh"
 

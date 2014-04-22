@@ -45,11 +45,11 @@
 
 #include <cmath>
 
-#include "BooleanDomain.hh"
-#include "FloatDomain.hh"
-#include "IntegerDomain.hh"
-#include "StringDomain.hh"
-#include "EnumDomain.hh"
+#include "boolean_domain.hh"
+#include "float_domain.hh"
+#include "int_domain.hh"
+#include "string_domain.hh"
+#include "enum_domain.hh"
 
 using namespace TREX::transaction;
 using namespace TREX::utils;
@@ -59,33 +59,33 @@ namespace {
   /** @brief Declaration of the @c int domain
    * @ingroup domains
    */
-  DomainBase::xml_factory::declare<IntegerDomain> int_decl  ("int");
+  abstract_domain::factory::declare<int_domain> int_decl  ("int");
   /** @brief Declaration of the @c float domain 
    * @ingroup domains
    */
-  DomainBase::xml_factory::declare<FloatDomain>   float_decl("float");
+  abstract_domain::factory::declare<float_domain>   float_decl("float");
   /** @brief Declaration of the @c bool domain 
    * @ingroup domains
    */
-  DomainBase::xml_factory::declare<BooleanDomain> bool_decl ("bool");
+  abstract_domain::factory::declare<boolean_domain> bool_decl ("bool");
  
   /** @brief Declaration of the @c string domain 
    * @ingroup domains
    */
-  DomainBase::xml_factory::declare<StringDomain> declStr("string");  
+  abstract_domain::factory::declare<string_domain> decl_str("string");
 
 
   /** @brief Declaration of the @c enum domain 
    * @ingroup domains
    */
-  DomainBase::xml_factory::declare<EnumDomain> decl_enum("enum");  
+  abstract_domain::factory::declare<enum_domain> decl_enum("enum");
 }
 
-symbol const BooleanDomain::type_name("bool");
-symbol const IntegerDomain::type_name("int");
-symbol const FloatDomain::type_name("float");
-symbol const StringDomain::type_name("string");
-symbol const EnumDomain::type_name("enum");
+symbol const boolean_domain::type_str("bool");
+symbol const int_domain::type_str("int");
+symbol const float_domain::type_str("float");
+symbol const string_domain::type_str("string");
+symbol const enum_domain::type_str("enum");
 
 double TREX::transaction::round(double d, size_t places) {
   double factor = pow(10, places);
@@ -103,17 +103,17 @@ double TREX::transaction::ceil(double d, size_t places) {
 }
 
 
-BooleanDomain::BooleanDomain(boost::property_tree::ptree::value_type &node)
-  :BasicInterval(node), m_full(true) {
+boolean_domain::boolean_domain(boost::property_tree::ptree::value_type &node)
+  :basic_interval(node), m_full(true) {
   boost::optional<int> val = parse_attr< boost::optional<int> >(node, "value");
   if( val ) {
     m_val = (0!=val);
     m_full = false;
   } else
-    completeParsing(node); // to handle the case where someon used min/max attributes
+    complete_parsing(node); // to handle the case where someon used min/max attributes
 }
 
-std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
+std::ostream &boolean_domain::print_lower(std::ostream &out) const {
   if( m_full || !m_val )
     return out<<false;
   else
@@ -121,7 +121,7 @@ std::ostream &BooleanDomain::print_lower(std::ostream &out) const {
 }
 
 
-void BooleanDomain::parseSingleton(std::string const &val) {
+void boolean_domain::parse_singleton(std::string const &val) {
   int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( m_full ) {
@@ -132,7 +132,7 @@ void BooleanDomain::parseSingleton(std::string const &val) {
 
 }
 
-void BooleanDomain::parseLower(std::string const &val) {
+void boolean_domain::parse_lower(std::string const &val) {
   int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( bv ) {
@@ -145,7 +145,7 @@ void BooleanDomain::parseLower(std::string const &val) {
 }
 
 
-void BooleanDomain::parseUpper(std::string const &val)  {
+void boolean_domain::parse_upper(std::string const &val)  {
   int v = boost::lexical_cast<int>(val);
   bool bv = (0!=v);
   if( !bv ) {
@@ -158,7 +158,7 @@ void BooleanDomain::parseUpper(std::string const &val)  {
 }
 
 
-std::ostream &BooleanDomain::print_upper(std::ostream &out) const {
+std::ostream &boolean_domain::print_upper(std::ostream &out) const {
   if( m_full || m_val )
     return out<<true;
   else
@@ -166,32 +166,32 @@ std::ostream &BooleanDomain::print_upper(std::ostream &out) const {
 }
 
 
-std::ostream &BooleanDomain::toXml(std::ostream &out,
-				   size_t tabs) const {
-    std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-    out<<"<bool";
-    if( !m_full )
-        out<<" value=\""<<m_val<<'\"';
-    out<<"/>";
-    return out;
-}
+//std::ostream &BooleanDomain::toXml(std::ostream &out,
+//				   size_t tabs) const {
+//    std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
+//    out<<"<bool";
+//    if( !m_full )
+//        out<<" value=\""<<m_val<<'\"';
+//    out<<"/>";
+//    return out;
+//}
 
 
-bool BooleanDomain::intersect(DomainBase const &other) const {
-  if( other.getTypeName()!=getTypeName() )
+bool boolean_domain::intersect(abstract_domain const &other) const {
+  if( other.type_name()!=type_name() )
     return false;
   else {
-    BooleanDomain const &ref = dynamic_cast<BooleanDomain const &>(other);
+    boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
     
     return m_full || ref.m_full || m_val==ref.m_val;
   }
 }
 
-bool BooleanDomain::equals(DomainBase const &other) const {
-  if( other.getTypeName()!=getTypeName() )
+bool boolean_domain::equals(abstract_domain const &other) const {
+  if( other.type_name()!=type_name() )
     return false;
   else {
-    BooleanDomain const &ref = dynamic_cast<BooleanDomain const &>(other);
+    boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
     if( m_full )
       return ref.m_full;
     else 
@@ -199,11 +199,11 @@ bool BooleanDomain::equals(DomainBase const &other) const {
   } 
 }
       
-DomainBase &BooleanDomain::restrictWith(DomainBase const &other) {
-  if( other.getTypeName()!=getTypeName() )
+abstract_domain &boolean_domain::restrict_with(abstract_domain const &other) {
+  if( other.type_name()!=type_name() )
     throw EmptyDomain(*this, "Incompatible types");
   else {
-    BooleanDomain const &ref = dynamic_cast<BooleanDomain const &>(other);
+    boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
     if( m_full ) {
       m_full = ref.m_full;
       m_val = ref.m_val;

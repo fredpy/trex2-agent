@@ -11,11 +11,11 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/log_manager.hh>
-# include <trex/domain/IntegerDomain.hh>
-# include <trex/domain/FloatDomain.hh>
-# include <trex/domain/StringDomain.hh>
-# include <trex/domain/BooleanDomain.hh>
-# include <trex/domain/EnumDomain.hh>
+# include <trex/domain/int_domain.hh>
+# include <trex/domain/float_domain.hh>
+# include <trex/domain/string_domain.hh>
+# include <trex/domain/boolean_domain.hh>
+# include <trex/domain/enum_domain.hh>
 
 # include "../shared/LstsReactor.hh"
 

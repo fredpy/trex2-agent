@@ -43,7 +43,7 @@
 // #include <boost/chrono/clock_string.hpp>
 
 #include "TeleoReactor.hh"
-#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/float_domain.hh>
 
 #include <boost/scope_exit.hpp>
 
@@ -160,14 +160,15 @@ std::string DispatchError::build_msg(goal_id const &g, std::string const &msg) t
  * class TREX::transaction::details::external
  */
 
-bool TREX::transaction::details::external::cmp_goals(IntegerDomain const &a, IntegerDomain const &b) {
+bool TREX::transaction::details::external::cmp_goals(int_domain const &a,
+                                                     int_domain const &b) {
   // sorting order
   //   - based on upperBound
   //   - if same upperBound : sorted based on lower bound
   //
   // this way I can safely update lower bounds without impacting tokens order
-  return a.upperBound()<b.upperBound() ||
-    ( a.upperBound()==b.upperBound() && a.lowerBound()<b.lowerBound() );
+  return a.upper_bound()<b.upper_bound() ||
+    ( a.upper_bound()==b.upper_bound() && a.lower_bound()<b.lower_bound() );
 }
 
 
@@ -186,7 +187,7 @@ TREX::transaction::details::external::external(details::external_set::iterator c
 
 // manipulators
 
-details::goal_queue::iterator details::external::lower_bound(IntegerDomain const &dom) {
+details::goal_queue::iterator details::external::lower_bound(int_domain const &dom) {
   details::goal_queue::iterator i = m_pos->second.begin();
 
   for(; m_pos->second.end()!=i && cmp_goals(i->first->getStart(), dom); ++i);
@@ -196,7 +197,7 @@ details::goal_queue::iterator details::external::lower_bound(IntegerDomain const
 // modifiers
 
 bool details::external::post_goal(goal_id const &g) {
-  IntegerDomain const &g_start(g->getStart());
+  int_domain const &g_start(g->getStart());
   // locate goal position
   details::goal_queue::iterator i = lower_bound(g_start);
 
@@ -216,9 +217,9 @@ bool details::external::post_goal(goal_id const &g) {
 
 void details::external::dispatch(TICK current, details::goal_queue &sent) {
   details::goal_queue::iterator i=m_pos->second.begin();
-  IntegerDomain dispatch_w = m_pos->first.dispatch_window(current);
+  int_domain dispatch_w = m_pos->first.dispatch_window(current);
 
-  for( ; m_pos->second.end()!=i && i->first->startsBefore(dispatch_w.upperBound());  ) {
+  for( ; m_pos->second.end()!=i && i->first->startsBefore(dispatch_w.upper_bound());  ) {
     bool future = i->first->startsAfter(current);
 
     if( future || i->first->endsAfter(current+1) ) {
@@ -264,7 +265,7 @@ void details::external::unblock() {
 }
 
 void details::external::recall(goal_id const &g) {
-  IntegerDomain const &g_start(g->getStart());
+  int_domain const &g_start(g->getStart());
   // locate goal position
   details::goal_queue::iterator i = lower_bound(g_start);
   for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->getStart()); 
@@ -677,7 +678,7 @@ bool TeleoReactor::plan_sync(goal_id t) {
   internal_set::const_iterator tl = m_internals.find(t->object());
   if( m_internals.end()==tl )
     throw boost::enable_current_exception(DispatchError(*this, t, "plan tokens can only be posted on Internal timelines."));
-  else if( t->getEnd().upperBound() > getCurrentTick() ) {
+  else if( t->getEnd().upper_bound() > getCurrentTick() ) {
     if( NULL!=m_trLog )
       m_trLog->notifyPlan(t);
     return (*tl)->notifyPlan(t);

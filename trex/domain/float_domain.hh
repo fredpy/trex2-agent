@@ -1,8 +1,8 @@
 /* -*- C++ -*- */
-/** @file "IntegerDomain.hh"
- * @brief Integer domain representation
+/** @file "FloatDomain.hh"
+ * @brief Float domain representation
  *
- * This files defines an integer based domain
+ * This files defines a float based domain
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
@@ -40,40 +40,46 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_IntegerDomain 
-# define H_IntegerDomain 
+#ifndef H_FloatDomain 
+# define H_FloatDomain 
 
-# include "IntervalDomain.hh" 
+# include "interval_domain.hh" 
 
 namespace TREX {
   namespace transaction {
     
-    /** @brief Integer domain
+    double round(double d, size_t places);
+    double floor(double d, size_t places);
+    double ceil(double d, size_t places); 
+    
+    /** @brief Float domain
      *
-     * This class implements a a domain used to describe integers.
-     * The symbolic type name for this class is "int" and it fully
+     * This class implements a domain used to describe floats.
+     * The symbolic type name for this class is "float" and it fully
      * support XML serialization.
      *
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class IntegerDomain :public IntervalDomain<long long, false> {
+    class float_domain :public interval_domain<double, false> {
     public:
+      using typename interval_domain<double, false>::bound;
+      
       /** @brief Symbolic type name for this domain
        *
        * This static attibute gives an access to the symbolic name
-       * used for IntegerDomain. As stated in the main class description
-       * its value is "int" but programmers who want to use this name
+       * used for FloatDomain. As stated in the main class description
+       * its value is "float" but programmers who want to use this name
        * would better use this variable in case it changes in the future
        */
-      static TREX::utils::symbol const type_name;
-      
+      static TREX::utils::symbol const type_str;
+
       /** @brief Constructor
        *
-       * Create a full integer domain
+       * Create a full float domain
        */
-      IntegerDomain() 
-	:IntervalDomain<long long, false>(type_name) {}
+      float_domain()
+	:interval_domain<double, false>(type_str) {}
       /** @brief Constructor
        *
        * @param node A XML node
@@ -84,8 +90,8 @@ namespace TREX {
        * not correctly formatted
        * @throw EmptyDomain the resulting interval is empty
        */
-      IntegerDomain(boost::property_tree::ptree::value_type &node)
-	:IntervalDomain<long long, false>(node) {}
+      float_domain(boost::property_tree::ptree::value_type &node)
+	:interval_domain<double, false>(node) {}
       /** @brief Constructor
        * @param lb A lower bound
        * @param ub An upper bound
@@ -94,9 +100,8 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      IntegerDomain(IntervalDomain<long long, false>::bound const &lb,
-		    IntervalDomain<long long, false>::bound const ub)
-	:IntervalDomain<long long, false>(type_name, lb, ub) {}
+      float_domain(bound const &lb, bound const ub)
+	:interval_domain<double, false>(type_str, lb, ub) {}
       /** @brief Constructor
        * @param val A value
        *
@@ -104,18 +109,18 @@ namespace TREX {
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      IntegerDomain(long long val) 
-	:IntervalDomain<long long, false>(type_name, val) {}
+      float_domain(double val)
+	:interval_domain<double, false>(type_str, val) {}
       /** @brief Destructor */
-      ~IntegerDomain() {}
+      ~float_domain() {}
 
-      DomainBase *copy() const {
-	return new IntegerDomain(*this);
+      abstract_domain *copy() const {
+	return new float_domain(*this);
       }
       
-    }; // IntegerDomain 
+    }; // FloatDomain 
 
   } // TREX::utils
 } // TREX
 
-#endif // H_IntegerDomain
+#endif // H_FloatDomain

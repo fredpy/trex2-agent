@@ -55,8 +55,8 @@ namespace {
  */
 // statics :
 
-IntegerDomain const Goal::s_dateDomain;
-IntegerDomain const Goal::s_durationDomain(1, IntegerDomain::plus_inf);
+int_domain const Goal::s_dateDomain;
+int_domain const Goal::s_durationDomain(1, int_domain::plus_inf);
 symbol const Goal::s_startName("start");
 symbol const Goal::s_durationName("duration");
 symbol const Goal::s_endName("end");
@@ -71,7 +71,7 @@ Goal::Goal(Observation const &obs, TICK date)
 :Predicate(obs), m_start(s_startName, s_dateDomain),
 m_duration(s_durationName, s_durationDomain),
 m_end(s_endName, s_dateDomain) {
-  restrictStart(IntegerDomain(date));
+  restrictStart(int_domain(date));
 }
 
 
@@ -87,11 +87,11 @@ Goal::Goal(boost::property_tree::ptree::value_type &node)
   iterator iStart = find(s_startName), 
     iDuration, iEnd;
   iterator const endi = end();
-  IntegerDomain dStart(s_dateDomain), dDuration(s_durationDomain),
+  int_domain dStart(s_dateDomain), dDuration(s_durationDomain),
     dEnd(s_dateDomain);
   if( endi!=iStart ) {
     try {
-      dStart.restrictWith(iStart->second.domain());
+      dStart.restrict_with(iStart->second.domain());
     } catch( EmptyDomain const &e ) {
       throw PredicateException(std::string("Goal: start domain : ")+e.what());
     }
@@ -100,7 +100,7 @@ Goal::Goal(boost::property_tree::ptree::value_type &node)
   iDuration = find(s_durationName);
   if( endi!=iDuration ) {
     try {
-      dDuration.restrictWith(iDuration->second.domain());
+      dDuration.restrict_with(iDuration->second.domain());
     } catch( EmptyDomain const &e ) {
       throw PredicateException(std::string("Goal: duration domain : ")+e.what());
     }
@@ -109,7 +109,7 @@ Goal::Goal(boost::property_tree::ptree::value_type &node)
   iEnd = find(s_endName);
   if( endi!=iEnd ) {
     try {
-      dEnd.restrictWith(iEnd->second.domain());
+      dEnd.restrict_with(iEnd->second.domain());
     } catch( EmptyDomain const &e ) {
       throw PredicateException(std::string("Goal: end domain : ")+e.what());
     }
@@ -124,41 +124,41 @@ void Goal::restrictAttribute(Variable const &var) {
   symbol const &id = var.name();
   // Handle specific temporal attributes
   if( s_startName==id )
-    restrictStart(var.typedDomain<IntegerDomain>());
+    restrictStart(var.typedDomain<int_domain>());
   else if( s_durationName==id ) 
-    restrictDuration(var.typedDomain<IntegerDomain>());
+    restrictDuration(var.typedDomain<int_domain>());
   else if( s_endName==id )
-    restrictEnd(var.typedDomain<IntegerDomain>());
+    restrictEnd(var.typedDomain<int_domain>());
   else 
     Predicate::restrictAttribute(var);
 }
 
-void Goal::restrictTime(IntegerDomain const &s,
-			IntegerDomain const &d,
-			IntegerDomain const &e) {
-  IntegerDomain::bound sLo, sHi, dLo, dHi, eLo, eHi;
-  IntegerDomain::bound mLo, mHi, aLo, aHi;
+void Goal::restrictTime(int_domain const &s,
+			int_domain const &d,
+			int_domain const &e) {
+  int_domain::bound sLo, sHi, dLo, dHi, eLo, eHi;
+  int_domain::bound mLo, mHi, aLo, aHi;
 
   if( !( m_start.domain().intersect(s) && 
 	 m_duration.domain().intersect(d) &&
 	 m_end.domain().intersect(e) ) )
     throw PredicateException("Invalid time constraint on Goal");
   // Compute the new domains
-  m_start.typedDomain<IntegerDomain>().getBounds(sLo, sHi);
+  m_start.typedDomain<int_domain>().get_bounds(sLo, sHi);
   
-  s.getBounds(aLo, aHi);
+  s.get_bounds(aLo, aHi);
   // s = s inter start
   sLo = sLo.max(aLo);
   sHi = sHi.min(aHi);
 
-  m_duration.typedDomain<IntegerDomain>().getBounds(dLo, dHi);
-  d.getBounds(aLo, aHi);
+  m_duration.typedDomain<int_domain>().get_bounds(dLo, dHi);
+  d.get_bounds(aLo, aHi);
   // d = d inter duration 
   dLo = dLo.max(aLo);
   dHi = dHi.min(aHi);
 
-  m_end.typedDomain<IntegerDomain>().getBounds(eLo, eHi);
-  e.getBounds(aLo, aHi);
+  m_end.typedDomain<int_domain>().get_bounds(eLo, eHi);
+  e.get_bounds(aLo, aHi);
   // e = e inter end
   eLo = eLo.max(aLo);
   eHi = eHi.min(aHi);
@@ -188,21 +188,21 @@ void Goal::restrictTime(IntegerDomain const &s,
     throw PredicateException("duration is empty after propagation");
   try {
     // start = start inter s
-    m_start.restrict(IntegerDomain(sLo, sHi));
+    m_start.restrict_with(int_domain(sLo, sHi));
   } catch( EmptyDomain const &e) {
     // this should not happen
     throw PredicateException(std::string("Goal: start progation: ")+e.what());
   }
   try {
     // duration = duration inter d
-    m_duration.restrict(IntegerDomain(dLo, dHi));
+    m_duration.restrict_with(int_domain(dLo, dHi));
   } catch( EmptyDomain const &e) {
     // this should not happen
     throw PredicateException(std::string("Goal: duration progation: ")+e.what());
   }
   try {
     // end = end inter e
-    m_end.restrict(IntegerDomain(eLo, eHi));
+    m_end.restrict_with(int_domain(eLo, eHi));
   } catch( EmptyDomain const &e) {
     // this should not happen
     throw PredicateException(std::string("Goal: end progation: ")+e.what());
@@ -210,9 +210,9 @@ void Goal::restrictTime(IntegerDomain const &s,
 }
 
 bool Goal::startsAfter(TICK date, TICK delay) {
-  IntegerDomain test_window(date+delay, IntegerDomain::plus_inf),
-    cstr_window(date, IntegerDomain::plus_inf);
-  if( m_start.typedDomain<IntegerDomain>().intersect(test_window) ) {
+  int_domain test_window(date+delay, int_domain::plus_inf),
+    cstr_window(date, int_domain::plus_inf);
+  if( m_start.typedDomain<int_domain>().intersect(test_window) ) {
     restrictTime(cstr_window, s_durationDomain, s_dateDomain);
     return true;
   }
@@ -232,26 +232,26 @@ Variable const &Goal::getAttribute(symbol const &name) const {
     return Predicate::getAttribute(name);
 }
 
-IntegerDomain const &Goal::getStart() const {
-  return m_start.typedDomain<IntegerDomain>();
+int_domain const &Goal::getStart() const {
+  return m_start.typedDomain<int_domain>();
 }
 
-IntegerDomain const &Goal::getDuration() const {
-  return m_duration.typedDomain<IntegerDomain>();
+int_domain const &Goal::getDuration() const {
+  return m_duration.typedDomain<int_domain>();
 }
 
-IntegerDomain const &Goal::getEnd() const {
-  return m_end.typedDomain<IntegerDomain>();
+int_domain const &Goal::getEnd() const {
+  return m_end.typedDomain<int_domain>();
 }
 
 
 void Goal::listAttributes(std::list<TREX::utils::symbol> &attr,
 			  bool all) const {
-  if( all || !m_start.domain().isFull() )
+  if( all || !m_start.domain().is_full() )
     attr.push_back(s_startName);
   if( all || !m_duration.domain().equals(s_durationDomain) )
     attr.push_back(s_durationName);
-  if( all || !m_end.domain().isFull() )
+  if( all || !m_end.domain().is_full() )
     attr.push_back(s_endName);
   Predicate::listAttributes(attr, all);
 }

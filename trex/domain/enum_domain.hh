@@ -46,7 +46,7 @@
 #ifndef H_EnumDomain
 # define H_EnumDomain
 
-# include "EnumeratedDomain.hh"
+# include "enumerated_domain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -60,16 +60,16 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org> 
      * @ingroup domains
      */
-    class EnumDomain 
-      :public TREX::transaction::EnumeratedDomain<TREX::utils::symbol> {
+    class enum_domain
+      :public TREX::transaction::enumerated_domain<TREX::utils::symbol> {
     public:
-      static TREX::utils::symbol const type_name;
+      static TREX::utils::symbol const type_str;
       /** @brief Default Constructor 
        * 
        * Creates a new full string domain.
        */
-      EnumDomain() 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name) {}
+      enum_domain()
+	:TREX::transaction::enumerated_domain<TREX::utils::symbol>(type_str) {}
       /** @brief Constructor
        * 
        * @tparam a C++ iterator type
@@ -84,15 +84,15 @@ namespace TREX {
        * @throw EmptyDomainthe created domain is empty
        */
       template<class Iter>
-      EnumDomain(Iter from, Iter to) 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name, from, to) {}
+      enum_domain(Iter from, Iter to)
+	:TREX::transaction::enumerated_domain<TREX::utils::symbol>(type_str, from, to) {}
       /** @brief Constructor
        * @param val a value
        *
        * Create a new domain with the single value @e val
        */
-      EnumDomain(TREX::utils::symbol const &val)
-	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(type_name, val) {}
+      enum_domain(TREX::utils::symbol const &val)
+	:TREX::transaction::enumerated_domain<TREX::utils::symbol>(type_str, val) {}
       /** @brief XML parsing constructor
        *
        * @param node an XML node
@@ -113,18 +113,18 @@ namespace TREX {
        * </enum>
        *@endcode
        */
-      explicit EnumDomain(boost::property_tree::ptree::value_type &node) 
-	:TREX::transaction::EnumeratedDomain<TREX::utils::symbol>(node) {}
+      explicit enum_domain(boost::property_tree::ptree::value_type &node)
+	:TREX::transaction::enumerated_domain<TREX::utils::symbol>(node) {}
 
       /** @brief Destructor */
-      ~EnumDomain() {}
+      ~enum_domain() {}
 
       /** @brief Copy operator
        *
        * Allocates a new copy of current instance
        */
-      DomainBase *copy() const {
-	return new EnumDomain(begin(), end());
+      abstract_domain *copy() const {
+	return new enum_domain(begin(), end());
       }
     }; // TREX::transaction::EnumDomain
 

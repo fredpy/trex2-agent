@@ -1,5 +1,6 @@
-/** @file DomainBase.cc
- * @brief Basic domain utilities implementation
+/* -*- C++ -*- */
+/** @file "DomainVisitor_fwd.hh"
+ * @brief Forward declaration of DomainVisitor class
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
@@ -37,37 +38,15 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sstream>
-#include "DomainVisitor.hh"
+#ifndef FWD_DomainVisitor
+# define FWD_DomainVisitor
 
-using namespace TREX::transaction;
+namespace TREX {
+  namespace transaction {
 
-std::string DomainExcept::build_message(DomainBase const &d, 
-				       std::string const &msg) throw() {
-  std::ostringstream oss;
-  oss<<"Domain "<<d.getTypeName()<<" "<<d<<" : "<<msg;
-  return oss.str();
+    class domain_visitor;
+
+  }
 }
 
-void DomainBase::accept(DomainVisitor &visitor) const {
-  visitor.visit(this, true);
-}
-
-boost::any DomainBase::getSingleton() const {
-  if( !isSingleton() )
-    throw DomainAccess(*this, ": not a singleton");
-  return singleton();
-}
-
-std::string DomainBase::getStringSingleton() const {
-  if( !isSingleton() )
-    throw DomainAccess(*this, ": not a singleton");
-  return stringSingleton();
-}
-
-boost::property_tree::ptree DomainBase::as_tree() const {
-  boost::property_tree::ptree ret;
-  ret.push_back(boost::property_tree::ptree::value_type(getTypeName().str(), build_tree()));
-  return ret;
-}
-
+#endif // FWD_DomainVisitor

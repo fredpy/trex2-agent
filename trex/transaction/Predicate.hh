@@ -199,7 +199,7 @@ namespace TREX {
        * @sa Variable &restrict(Variable const &)
        */
       void restrictAttribute(TREX::utils::symbol const &name,
-			     DomainBase const &domain) {
+			     abstract_domain const &domain) {
 	return restrictAttribute(Variable(name, domain));
       }
       /** @brief attribute domain restriction
@@ -260,7 +260,7 @@ namespace TREX {
       template<class Ty> 
       Ty const &getDomain(TREX::utils::symbol const &name) const {
 	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
-			     DomainBase const &>::value));
+			     abstract_domain const &>::value));
 	Variable const &attr = getAttribute(name);
 	return attr.typedDomain<Ty>();
       }

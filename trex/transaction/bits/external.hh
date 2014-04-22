@@ -222,9 +222,9 @@ namespace TREX {
                  external_set::iterator const &last);
         
         
-        static bool cmp_goals(IntegerDomain const &a, IntegerDomain const &b);
+        static bool cmp_goals(int_domain const &a, int_domain const &b);
         
-        goal_queue::iterator lower_bound(IntegerDomain const &dom);
+        goal_queue::iterator lower_bound(int_domain const &dom);
 
 	void increment();
 	bool equal(external const &other) const;

@@ -1,8 +1,8 @@
 #include "DTAReactor.hh"
 
-#include <trex/domain/FloatDomain.hh>
-#include <trex/domain/EnumDomain.hh>
-#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/float_domain.hh>
+#include <trex/domain/enum_domain.hh>
+#include <trex/domain/boolean_domain.hh>
 
 #include <boost/tokenizer.hpp>
 
@@ -57,12 +57,12 @@ bool DTAReactor::synchronize() {
       Observation sent(m_state_tl, "Sent");
       
       
-      tmp.restrictAttribute(Variable("center_lat", FloatDomain(m_pos.first)));
-      sent.restrictAttribute(Variable("center_lat", FloatDomain(m_pos.first)));
-      tmp.restrictAttribute(Variable("center_lon", FloatDomain(m_pos.second)));
-      sent.restrictAttribute(Variable("center_lon", FloatDomain(m_pos.second)));
+      tmp.restrictAttribute(Variable("center_lat", float_domain(m_pos.first)));
+      sent.restrictAttribute(Variable("center_lat", float_domain(m_pos.first)));
+      tmp.restrictAttribute(Variable("center_lon", float_domain(m_pos.second)));
+      sent.restrictAttribute(Variable("center_lon", float_domain(m_pos.second)));
       
-      EnumDomain path_d;
+      enum_domain path_d;
       path_d.add(m_path);
       tmp.restrictAttribute(Variable("path", path_d));
     
@@ -74,17 +74,17 @@ bool DTAReactor::synchronize() {
         m_speed.second = 0.0;
       }
       tmp.restrictAttribute(Variable("speed_north",
-                                     FloatDomain(m_speed.first)));
+                                     float_domain(m_speed.first)));
       sent.restrictAttribute(Variable("speed_north",
-                                     FloatDomain(m_speed.first)));
+                                     float_domain(m_speed.first)));
       tmp.restrictAttribute(Variable("speed_east",
-                                     FloatDomain(m_speed.second)));
+                                     float_domain(m_speed.second)));
       sent.restrictAttribute(Variable("speed_east",
-                                     FloatDomain(m_speed.second)));
+                                     float_domain(m_speed.second)));
     
       
-      tmp.restrictAttribute(Variable("size", FloatDomain(m_factor)));
-      tmp.restrictAttribute(Variable("lagrangian", BooleanDomain(m_lagrangian)));
+      tmp.restrictAttribute(Variable("size", float_domain(m_factor)));
+      tmp.restrictAttribute(Variable("lagrangian", boolean_domain(m_lagrangian)));
     
       postGoal(tmp);
       m_trex_state = GOAL_SENT;
@@ -110,21 +110,21 @@ void DTAReactor::handleRequest(goal_id const &g) {
       double factor;
 
       if( g->hasAttribute("drifter") ) 
-        drifter = g->getAttribute("drifter").domain().getStringSingleton();
+        drifter = g->getAttribute("drifter").domain().get_singleton_as_string();
       else 
         return;
 
       if( g->hasAttribute("path") ) 
-        path = g->getAttribute("path").domain().getStringSingleton();
+        path = g->getAttribute("path").domain().get_singleton_as_string();
       else 
         return;
       if( g->hasAttribute("size") )
-        factor = g->getAttribute("size").domain().getTypedSingleton<double, true>();
+        factor = g->getAttribute("size").domain().get_typed_singleton<double, true>();
       else
         return;
 
       if( g->hasAttribute("lagrangian") )
-        m_lagrangian = g->getAttribute("lagrangian").domain().getTypedSingleton<bool, true>();
+        m_lagrangian = g->getAttribute("lagrangian").domain().get_typed_singleton<bool, true>();
       else 
         m_lagrangian = false;
 
@@ -153,16 +153,16 @@ void DTAReactor::notify(Observation const &obs) {
   if( obs.object()==m_drifter ) {
     if( obs.predicate()=="position" || obs.predicate()=="connected" ) {
       // Get lat/lon
-      m_pos.first = obs.getAttribute("latitude").domain().getTypedSingleton<double, true>();
-      m_pos.second = obs.getAttribute("longitude").domain().getTypedSingleton<double, true>();
+      m_pos.first = obs.getAttribute("latitude").domain().get_typed_singleton<double, true>();
+      m_pos.second = obs.getAttribute("longitude").domain().get_typed_singleton<double, true>();
       if( !m_have_pos ) {
 	syslog()<<"Received a first position from "<<m_drifter;
 	m_have_pos = true;
       }
       if( obs.hasAttribute("speed_north") ) {
-	m_have_speed = obs.getAttribute("speed_north").domain().isSingleton();
-	m_speed.first = obs.getAttribute("speed_north").domain().getTypedSingleton<double, true>();
-	m_speed.second = obs.getAttribute("speed_east").domain().getTypedSingleton<double, true>();
+	m_have_speed = obs.getAttribute("speed_north").domain().is_singleton();
+	m_speed.first = obs.getAttribute("speed_north").domain().get_typed_singleton<double, true>();
+	m_speed.second = obs.getAttribute("speed_east").domain().get_typed_singleton<double, true>();
       }
     }
   } else if( obs.object()==m_proxy_timeline ) {

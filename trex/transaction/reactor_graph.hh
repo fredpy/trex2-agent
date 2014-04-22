@@ -762,8 +762,8 @@ namespace TREX {
       friend class timelines_listener;
     };
 
-    std::string date_export(graph const &g, IntegerDomain::bound const &val);
-    std::string duration_export(graph const &g, IntegerDomain::bound const &val);
+    std::string date_export(graph const &g, int_domain::bound const &val);
+    std::string duration_export(graph const &g, int_domain::bound const &val);
   }
 }
 

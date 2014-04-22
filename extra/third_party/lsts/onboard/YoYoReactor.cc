@@ -102,9 +102,9 @@ namespace TREX {
       if (m_lastPosition.hasAttribute("altitude"))
       {
         v = m_lastPosition.getAttribute("altitude");
-        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
+        float_domain const &alt = dynamic_cast<float_domain const &>(v.domain());
 
-        double alt_ = v.domain().getTypedSingleton<double, true>();
+        double alt_ = v.domain().get_typed_singleton<double, true>();
         if (alt_ > 0 && alt_ < 2)
         {
           nearBottom = true;
@@ -127,20 +127,20 @@ namespace TREX {
       if (m_lastPosition.hasAttribute("z"))
       {
         Variable vz = m_lastPosition.getAttribute("z");
-        if (vz.isComplete() && vz.domain().isSingleton())
+        if (vz.is_complete() && vz.domain().is_singleton())
         {
-          atZ = vz.domain().getTypedSingleton<double,true>();
+          atZ = vz.domain().get_typed_singleton<double,true>();
         }
       }
 
       if (m_lastRefState.hasAttribute("near_z"))
       {
         v = m_lastRefState.getAttribute("near_z");
-        BooleanDomain const &nearz = dynamic_cast<BooleanDomain const &>(v.domain());
+        boolean_domain const &nearz = dynamic_cast<boolean_domain const &>(v.domain());
 
-        if (nearz.isSingleton())
+        if (nearz.is_singleton())
         {
-          nearZ = nearz.getStringSingleton() == "true" || nearz.getStringSingleton() == "1";
+          nearZ = nearz.get_singleton_as_string() == "true" || nearz.get_singleton_as_string() == "1";
         }
       }
 
@@ -151,11 +151,11 @@ namespace TREX {
       {
         v = m_lastRefState.getAttribute("near_xy");
 
-        BooleanDomain const &near_XY = dynamic_cast<BooleanDomain const &>(v.domain());
+        boolean_domain const &near_XY = dynamic_cast<boolean_domain const &>(v.domain());
 
-        if (near_XY.isSingleton())
+        if (near_XY.is_singleton())
         {
-          nearXY = near_XY.getStringSingleton() == "true" || near_XY.getStringSingleton() == "1";
+          nearXY = near_XY.get_singleton_as_string() == "true" || near_XY.get_singleton_as_string() == "1";
         }
       }
 
@@ -200,11 +200,11 @@ namespace TREX {
         {
           syslog(log::info)<< "Finished executing yoyo...";
           Observation obs = Observation(s_yoyo_tl, "Done");
-          obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
-          obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
-          obs.restrictAttribute("speed", FloatDomain(m_speed, m_speed));
-          obs.restrictAttribute("max_z", FloatDomain(m_maxz, m_maxz));
-          obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
+          obs.restrictAttribute("latitude", float_domain(m_lat));
+          obs.restrictAttribute("longitude", float_domain(m_lon));
+          obs.restrictAttribute("speed", float_domain(m_speed));
+          obs.restrictAttribute("max_z", float_domain(m_maxz));
+          obs.restrictAttribute("min_z", float_domain(m_minz));
           postUniqueObservation(obs);
           state = IDLE;
         }
@@ -239,10 +239,10 @@ namespace TREX {
     {
       Goal g(s_reference_tl, "Going");
 
-      g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
-      g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
-      g.restrictAttribute(Variable("z", FloatDomain(z)));
-      g.restrictAttribute(Variable("speed", FloatDomain(speed)));
+      g.restrictAttribute(Variable("latitude", float_domain(lat)));
+      g.restrictAttribute(Variable("longitude", float_domain(lon)));
+      g.restrictAttribute(Variable("z", float_domain(z)));
+      g.restrictAttribute(Variable("speed", float_domain(speed)));
 
       //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
@@ -272,24 +272,24 @@ namespace TREX {
       if ( g->predicate() == s_exec_pred )
       {
         v = g->getAttribute("latitude");
-        if (v.domain().isSingleton())
-          m_lat = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton())
+          m_lat = v.domain().get_typed_singleton<double, true>();
 
         v = g->getAttribute("longitude");
-        if (v.domain().isSingleton())
-          m_lon = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton())
+          m_lon = v.domain().get_typed_singleton<double, true>();
 
         v = g->getAttribute("speed");
-        if (v.domain().isSingleton())
-          m_speed = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton())
+          m_speed = v.domain().get_typed_singleton<double, true>();
 
         v = g->getAttribute("min_z");
-        if (v.domain().isSingleton())
-          m_minz = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton())
+          m_minz = v.domain().get_typed_singleton<double, true>();
 
         v = g->getAttribute("max_z");
-        if (v.domain().isSingleton())
-          m_maxz = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton())
+          m_maxz = v.domain().get_typed_singleton<double, true>();
 
         requestReference(m_lat, m_lon, m_speed, m_maxz);
         state = DESCEND;
@@ -315,10 +315,10 @@ namespace TREX {
         m_lastReference = obs;
         if (m_lastReference.predicate() == "Going")
         {
-          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
-          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
-          m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
-          m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.speed = obs.getAttribute("speed").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.z = obs.getAttribute("z").domain().get_typed_singleton<double,true>();
           m_lastSeenRef.tick = getCurrentTick();
         }
         else {

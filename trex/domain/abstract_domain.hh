@@ -56,7 +56,7 @@
 # include <trex/utils/ptree_io.hh>
 # include <trex/utils/platform/cpp11_deleted.hh>
 
-# include "DomainVisitor_fwd.hh"
+# include "domain_visitor_fwd.hh"
 
 namespace TREX {
   /** @brief TREX transaction framework
@@ -77,7 +77,7 @@ namespace TREX {
    */
   namespace transaction {      
     
-    class DomainBase;
+    class abstract_domain;
 
     /** @brief Empty domain
      *
@@ -95,13 +95,13 @@ namespace TREX {
        *
        * Create new instance with the message @e msg
        */
-      DomainExcept(DomainBase const &d, std::string const &msg) throw()
+      DomainExcept(abstract_domain const &d, std::string const &msg) throw()
 	:TREX::utils::Exception(build_message(d, msg)) {}
       /** @brief Destructor */
       ~DomainExcept() throw() {}
       
     private:
-      static std::string build_message(DomainBase const &d, 
+      static std::string build_message(abstract_domain const &d,
 				       std::string const &msg) throw();
     }; // TREX::transaction::DomainExcept
 
@@ -121,7 +121,7 @@ namespace TREX {
        *
        * Create new instance with the message @e msg
        */
-      EmptyDomain(DomainBase const &d, std::string const &msg) throw()
+      EmptyDomain(abstract_domain const &d, std::string const &msg) throw()
 	:DomainExcept(d, msg) {}
       /** @brief Destructor */
       ~EmptyDomain() throw() {}
@@ -142,7 +142,7 @@ namespace TREX {
        *
        * Create new instance with the message @e msg
        */
-      DomainAccess(DomainBase const &d, std::string const &msg) throw()
+      DomainAccess(abstract_domain const &d, std::string const &msg) throw()
 	:DomainExcept(d, msg) {}
       /** @brief Destructor */
       ~DomainAccess() throw() {}
@@ -157,10 +157,10 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains 
      */
-    class DomainBase :public TREX::utils::ptree_convertible {
+    class abstract_domain :public TREX::utils::ptree_convertible {
     public:
       /** @brief Destructor */
-      virtual ~DomainBase() {}
+      virtual ~abstract_domain() {}
       /** @brief Duplicate method
        *
        * Create a new instance which is identical to current instance value.
@@ -169,7 +169,7 @@ namespace TREX {
        *
        * @return The newly created instance
        */
-      virtual DomainBase *copy() const=0; 
+      virtual abstract_domain *copy() const=0;
 
       /** @brief Visiting method
        *
@@ -188,7 +188,7 @@ namespace TREX {
        *
        * @sa DomainVisitor
        */
-      virtual void accept(DomainVisitor &visitor) const;
+      virtual void accept(domain_visitor &visitor) const;
 
       /** @brief Check for interval domain
        *
@@ -201,7 +201,7 @@ namespace TREX {
        *
        * @sa bool isEnumerated() const
        */
-      virtual bool isInterval() const =0;
+      virtual bool is_interval() const =0;
       /** @brief Check for enumerated domain
        *
        * This method check if the domain is based on an
@@ -213,7 +213,7 @@ namespace TREX {
        *
        * @sa bool isInterval() const
        */
-      virtual bool isEnumerated() const =0;
+      virtual bool is_enumerated() const =0;
       
       /** @brief type of the domain
        *
@@ -224,7 +224,7 @@ namespace TREX {
        *
        * @return the type associated to this domain
        */
-      TREX::utils::symbol const &getTypeName() const {
+      TREX::utils::symbol const &type_name() const {
 	return m_type;
       }
 
@@ -242,7 +242,7 @@ namespace TREX {
        * @sa bool equals(DomainBase const &other) const
        * @sa DomainBase &restrictWith(DomainBase const &other)
        */
-      virtual bool intersect(DomainBase const &other) const =0;
+      virtual bool intersect(abstract_domain const &other) const =0;
       /** @brief Equality test
        * @param other Another instance
        *
@@ -256,7 +256,7 @@ namespace TREX {
        *
        * @sa bool intersect(DomainBase const &other) const
        */
-      virtual bool equals(DomainBase const &other) const =0;      
+      virtual bool equals(abstract_domain const &other) const =0;
       
       /** @brief Restrict domain possible values
        * @param other Another domain
@@ -269,7 +269,7 @@ namespace TREX {
        * @throw EmptyDomain resulting domain is empty
        * @sa bool intersect(DomainBase const &) const
        */
-      virtual DomainBase &restrictWith(DomainBase const &other) =0;      
+      virtual abstract_domain &restrict_with(abstract_domain const &other) =0;
       /** @brief Restrict domain possible values
        * @param other Another domain
        *
@@ -281,8 +281,8 @@ namespace TREX {
        * @throw EmptyDomain resulting domain is empty
        * @sa bool intersect(DomainBase const &) const
        */
-      DomainBase &operator*=(DomainBase const &other) {
-	return restrictWith(other);
+      abstract_domain &operator*=(abstract_domain const &other) {
+	return restrict_with(other);
       }
 
       /** @brief check for full domain
@@ -293,7 +293,7 @@ namespace TREX {
        * @retval true if current instance is full
        * @retval false otherwise
        */
-      virtual bool isFull() const =0;
+      virtual bool is_full() const =0;
 
       /** @brief check for singleton value
        * 
@@ -303,7 +303,7 @@ namespace TREX {
        * @retval true if current instance is a singleton 
        * @retval false otherwise
        */
-      virtual bool isSingleton() const =0;
+      virtual bool is_singleton() const =0;
 
       /** @brief singleton value
        *
@@ -321,7 +321,7 @@ namespace TREX {
        * @sa getStringSingleton() const
        * @sa getTypedSingleton() const
        */
-      boost::any getSingleton() const;
+      boost::any get_singleton() const;
       /** @brief singleton value
        *
        * This methods give acces to the value of a singleton instance
@@ -339,7 +339,7 @@ namespace TREX {
        * @sa getStringSingleton() const
        * @sa getTypedSingleton() const
        */
-      std::string getStringSingleton() const;
+      std::string get_singleton_as_string() const;
       /** @brief singleton value
        *
        * @tparam Ty output type
@@ -369,44 +369,19 @@ namespace TREX {
        * @sa getSingleton() const
        */
       template<class Ty, bool Safe>
-      Ty getTypedSingleton() const {
-        boost::any val = getSingleton();
+      Ty get_typed_singleton() const {
+        boost::any val = get_singleton();
 	if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringSingleton());
+            return boost::lexical_cast<Ty>(get_singleton_as_string());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
 
       boost::property_tree::ptree as_tree() const;
-      
-      /** @brief XML conversion
-       *
-       * @param out An output stream
-       * @param tabs indentation level
-       *
-       * This methods writes an XML representation of the domain into
-       * the output stream @e out. The @e tabs attribute indicates the
-       * indentation level expected for the tags.
-       *
-       * @note To ensure compatibility this method should produce an
-       * xml output which is compatible with the XML parsing constructor
-       * of this domain.
-       *
-       * @return @e out after the operation
-       *
-       * @sa DomainBase(rapidxml::xml_node<> const &)
-       * @sa xml_factory
-       */
-      std::ostream &toXml(std::ostream &out) const {
-        return to_xml(out);
-      }
-      std::ostream &toJSON(std::ostream &out) const {
-        return to_json(out);
-      }
       
       
       /** @brief XML parsing factory for domains
@@ -414,8 +389,8 @@ namespace TREX {
        * This type defines the factory that should be manipulated
        * for parsing domains from xml.
        */
-      typedef TREX::utils::xml_factory<DomainBase,
-                                       SHARED_PTR<DomainBase> > xml_factory;
+      typedef TREX::utils::xml_factory<abstract_domain,
+                                       SHARED_PTR<abstract_domain> > factory;
       virtual boost::property_tree::ptree build_tree() const=0;
 
     protected:
@@ -426,7 +401,7 @@ namespace TREX {
        *
        * Create a new instance with associated domain type @e type
        */
-      explicit DomainBase(TREX::utils::symbol const &type)
+      explicit abstract_domain(TREX::utils::symbol const &type)
 	:m_type(type) {}
       /** @brief XML parsing constructor
        *
@@ -444,14 +419,14 @@ namespace TREX {
        * @sa std::ostream &toXml(std::ostream &out, size_t tabs) const
        * @sa xml_factory
        */
-      explicit DomainBase(boost::property_tree::ptree::value_type &node) 
+      explicit abstract_domain(boost::property_tree::ptree::value_type &node)
 	:m_type(node.first) {}   
       /** @brief Copy constructor
        * @param other Another instance
        *
        * Create a new instance similar to @e other
        */
-      DomainBase(DomainBase const &other)
+      abstract_domain(abstract_domain const &other)
 	:m_type(other.m_type) {}
 
       /** @brief Print domain
@@ -494,7 +469,7 @@ namespace TREX {
        *
        * @sa std::string getStringSingleton() const
        */
-      virtual std::string stringSingleton() const =0;
+      virtual std::string string_singleton() const =0;
 
     private:
       /** @brief type of the domain */
@@ -503,17 +478,18 @@ namespace TREX {
 
 # ifndef DOXYGEN
       // Following method have no code
-      DomainBase() DELETED;
+      abstract_domain() DELETED;
 # endif
 
-      friend std::ostream &operator<<(std::ostream &out, DomainBase const &d) {
-        if( d.isFull() )
+      friend std::ostream &operator<<(std::ostream &out,
+                                      abstract_domain const &d) {
+        if( d.is_full() )
           return out.put('*');
         else
           return d.print_domain(out);
       }
 
-    }; // TREX::transaction::DomainBase
+    }; // TREX::transaction::abstract_domain
 
     
   } // TREX::transaction

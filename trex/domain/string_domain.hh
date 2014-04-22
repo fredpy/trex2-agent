@@ -46,7 +46,7 @@
 #ifndef H_StringDomain
 # define H_StringDomain
 
-# include "EnumeratedDomain.hh"
+# include "enumerated_domain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -60,16 +60,16 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org> 
      * @ingroup domains
      */
-    class StringDomain 
-      :public TREX::transaction::EnumeratedDomain<std::string> {
+    class string_domain
+      :public TREX::transaction::enumerated_domain<std::string> {
     public:
-      static TREX::utils::symbol const type_name;
+      static TREX::utils::symbol const type_str;
       /** @brief Default Constructor 
        * 
        * Creates a new full string domain.
        */
-      StringDomain() 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name) {}
+      string_domain()
+	:TREX::transaction::enumerated_domain<std::string>(type_str) {}
       /** @brief Constructor
        * 
        * @tparam a C++ iterator type
@@ -84,15 +84,15 @@ namespace TREX {
        * @throw EmptyDomainthe created domain is empty
        */
       template<class Iter>
-      StringDomain(Iter from, Iter to) 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name, from, to) {}
+      string_domain(Iter from, Iter to)
+	:TREX::transaction::enumerated_domain<std::string>(type_str, from, to) {}
       /** @brief Constructor
        * @param val a value
        *
        * Create a new domain with the single value @e val
        */
-      StringDomain(std::string const &val) 
-	:TREX::transaction::EnumeratedDomain<std::string>(type_name, val) {}
+      string_domain(std::string const &val)
+	:TREX::transaction::enumerated_domain<std::string>(type_str, val) {}
       /** @brief XML parsing constructor
        *
        * @param node an XML node
@@ -113,18 +113,18 @@ namespace TREX {
        * </string>
        *@endcode
        */
-      explicit StringDomain(boost::property_tree::ptree::value_type &node) 
-	:TREX::transaction::EnumeratedDomain<std::string>(node) {}
+      explicit string_domain(boost::property_tree::ptree::value_type &node)
+	:TREX::transaction::enumerated_domain<std::string>(node) {}
 
       /** @brief Destructor */
-      ~StringDomain() {}
+      ~string_domain() {}
 
       /** @brief Copy operator
        *
        * Allocates a new copy of current instance
        */
-      DomainBase *copy() const {
-	return new StringDomain(begin(), end());
+      abstract_domain *copy() const {
+	return new string_domain(begin(), end());
       }
     }; // TREX::transaction::StringDomain
 
