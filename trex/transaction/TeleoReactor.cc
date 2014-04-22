@@ -333,9 +333,9 @@ TeleoReactor::TeleoReactor(TeleoReactor::xml_arg_type &arg, bool loadTL,
      
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = getName().str()+".tr.log";
-    fname = manager().file_name(base);
+    fname = manager().log_file(base);
     m_trLog = new Logger(fname.string(), manager().service());
-    utils::log_manager::path_type cfg = manager().file_name("cfg"),
+    utils::log_manager::path_type cfg = manager().log_file("cfg"),
       pwd = boost::filesystem::current_path(), 
       short_name(base), location("../"+base);
     boost::filesystem::current_path(cfg);
@@ -380,7 +380,7 @@ TeleoReactor::TeleoReactor(graph *owner, symbol const &name,
   m_stat_log.open(fname.string());
      
   if( log ) {
-    fname = manager().file_name(getName().str()+".tr.log");
+    fname = manager().log_file(getName().str()+".tr.log");
     m_trLog = new Logger(fname.string(), manager().service());
     syslog(info)<<"Transactions logged to "<<fname;
 

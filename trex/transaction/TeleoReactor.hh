@@ -559,7 +559,7 @@ namespace TREX {
       typedef utils::log_manager::path_type path_type;
       
       path_type file_name(std::string const &short_name) const {
-        return manager().file_name(getName().str()+"/"+short_name);
+        return manager().log_file(getName().str()+"/"+short_name);
       }
       
       /** @brief Check for verbosity level
