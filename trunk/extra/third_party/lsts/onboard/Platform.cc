@@ -488,20 +488,20 @@ namespace TREX
     Platform::enqueueReferenceAtObs()
     {
       Observation obs("reference", "At");
-      obs.restrictAttribute("latitude", FloatDomain(m_ref.lat));
-      obs.restrictAttribute("longitude", FloatDomain(m_ref.lon));
+      obs.restrictAttribute("latitude", float_domain(m_ref.lat));
+      obs.restrictAttribute("longitude", float_domain(m_ref.lon));
       if (!m_ref.z.isNull())
       {
         switch (m_ref.z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            obs.restrictAttribute("z", float_domain(m_ref.z->value));
             break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-m_ref.z->value));
+            obs.restrictAttribute("z", float_domain(-m_ref.z->value));
             break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(m_ref.z->value));
+            obs.restrictAttribute("z", float_domain(m_ref.z->value));
             break;
           default:
             break;
@@ -509,7 +509,7 @@ namespace TREX
       }
       if (!m_ref.speed.isNull())
       {
-        obs.restrictAttribute("speed", FloatDomain((m_ref.speed->value)));
+        obs.restrictAttribute("speed", float_domain((m_ref.speed->value)));
       }
       //postUniqueObservation(obs);
       referenceObservations.push(obs);
@@ -601,17 +601,17 @@ namespace TREX
       goal_id g = goal;
       double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
       
-      if(g->getAttribute("latitude").domain().isSingleton())
+      if(g->getAttribute("latitude").domain().is_singleton())
       {
-        req_lat = g->getAttribute("latitude").domain().getTypedSingleton<double, true>();
+        req_lat = g->getAttribute("latitude").domain().get_typed_singleton<double, true>();
       }
-      if(g->getAttribute("longitude").domain().isSingleton())
+      if(g->getAttribute("longitude").domain().is_singleton())
       {
-        req_lon = g->getAttribute("longitude").domain().getTypedSingleton<double, true>();
+        req_lon = g->getAttribute("longitude").domain().get_typed_singleton<double, true>();
       }
-      if(g->getAttribute("z").domain().isSingleton())
+      if(g->getAttribute("z").domain().is_singleton())
       {
-        req_z = g->getAttribute("z").domain().getTypedSingleton<double, true>();
+        req_z = g->getAttribute("z").domain().get_typed_singleton<double, true>();
       }
       
       EstimatedState * estate =
@@ -655,21 +655,21 @@ namespace TREX
       lon = g->getAttribute("longitude");
       z = g->getAttribute("z");
       
-      if( lat.domain().isSingleton() &&
-          lon.domain().isSingleton() &&
-         z.domain().isSingleton() ) {
+      if( lat.domain().is_singleton() &&
+          lon.domain().is_singleton() &&
+         z.domain().is_singleton() ) {
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.flags |= Reference::FLAG_Z;
         m_ref.flags |= Reference::FLAG_SPEED;
-        m_ref.lat = lat.domain().getTypedSingleton<double, true>();
-        m_ref.lon = lon.domain().getTypedSingleton<double, true>();
+        m_ref.lat = lat.domain().get_typed_singleton<double, true>();
+        m_ref.lon = lon.domain().get_typed_singleton<double, true>();
       
-        DesiredZ desZ = setUavRefZ(z.domain().getTypedSingleton<double, true>());
+        DesiredZ desZ = setUavRefZ(z.domain().get_typed_singleton<double, true>());
         // Deal with the optional attributes
         v = g->getAttribute("radius");
-        if (v.domain().isSingleton())
+        if (v.domain().is_singleton())
         {
-          m_ref.radius = v.domain().getTypedSingleton<double, true>();
+          m_ref.radius = v.domain().get_typed_singleton<double, true>();
           m_ref.flags |= Reference::FLAG_RADIUS;
         }
         else
@@ -710,15 +710,15 @@ namespace TREX
       
       // Double check that lat and lon are singleton just to be
       // on the safe side
-      if( lat.domain().isSingleton() && lon.domain().isSingleton() ) {
+      if( lat.domain().is_singleton() && lon.domain().is_singleton() ) {
       
         int flags = Reference::FLAG_LOCATION;
-        m_ref.lat = lat.domain().getTypedSingleton<double, true>();
-        m_ref.lon = lon.domain().getTypedSingleton<double, true>();
+        m_ref.lat = lat.domain().get_typed_singleton<double, true>();
+        m_ref.lon = lon.domain().get_typed_singleton<double, true>();
       
         v = g->getAttribute("z");
-        if(v.domain().isSingleton()) {
-          double z = v.domain().getTypedSingleton<double, true>();
+        if(v.domain().is_singleton()) {
+          double z = v.domain().get_typed_singleton<double, true>();
           DesiredZ desZ;
           flags |= Reference::FLAG_Z;
           if (z >= 0) {
@@ -734,8 +734,8 @@ namespace TREX
         }
         m_ref.flags = flags;
         v = g->getAttribute("speed");
-        if (v.domain().isSingleton()) {
-          double speed = v.domain().getTypedSingleton<double, true>();
+        if (v.domain().is_singleton()) {
+          double speed = v.domain().get_typed_singleton<double, true>();
           DesiredSpeed desSpeed;
           flags |= Reference::FLAG_SPEED;
           desSpeed.value = speed;
@@ -758,8 +758,8 @@ namespace TREX
       lat = goal->getAttribute("latitude");
       lon = goal->getAttribute("longitude");
       
-      if( lat.domain().isSingleton() &&
-          lon.domain().isSingleton() ) {
+      if( lat.domain().is_singleton() &&
+          lon.domain().is_singleton() ) {
         syslog(log::info)<<"handling going("<<lat.domain()
           <<", "<<lon.domain()<<")";
       

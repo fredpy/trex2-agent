@@ -84,11 +84,11 @@ Predicate::~Predicate() {}
 // modifiers :
 
 void Predicate::restrictAttribute(Variable const &var) {
-  if( !var.isComplete() )
+  if( !var.is_complete() )
     throw PredicateException("Predicate attribute is not fully defined");
   iterator pos = m_vars.lower_bound(var.name());
   if( end()!=pos && var.name()==pos->second.name() ) {
-    pos->second.restrict(var);
+    pos->second.restrict_with(var);
   } else {
     // probably need to check if the varaible is valid/OK
     m_vars.insert(pos, std::make_pair(var.name(), var));
@@ -168,8 +168,8 @@ void Predicate::listAttributes(std::list<TREX::utils::symbol> &attrs,
   const_iterator i = begin();
   const_iterator const endi = end();
   for( ; endi!=i; ++i )
-    if( i->second.isComplete() &&
-	( all || !i->second.domain().isFull() ) )
+    if( i->second.is_complete() &&
+	( all || !i->second.domain().is_full() ) )
       attrs.push_back(i->first);
 }
 

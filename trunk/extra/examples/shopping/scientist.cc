@@ -34,8 +34,8 @@
 #include <iostream>
 #include <ctime>
 
-#include <trex/domain/EnumDomain.hh>
-#include <trex/domain/StringDomain.hh>
+#include <trex/domain/enum_domain.hh>
+#include <trex/domain/string_domain.hh>
 
 #include "scientist.hh"
 
@@ -71,9 +71,9 @@ bool Scientist::synchronize() {
     if(getCurrentTick()==100)
     {
         Goal goal(auv,Sample);
-        transaction::Variable temp(Objective, TREX::transaction::StringDomain(Vent1));
+        transaction::Variable temp(Objective, TREX::transaction::string_domain(Vent1));
         goal.restrictAttribute(temp);
-        goal.restrictEnd(TREX::transaction::IntegerDomain(getCurrentTick()+1, Horizon));
+        goal.restrictEnd(TREX::transaction::int_domain(getCurrentTick()+1, Horizon));
         postGoal(goal);
     }
     return true;

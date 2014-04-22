@@ -53,9 +53,9 @@ namespace bp=boost::property_tree;
 
 // statics :
 
-singleton::use<DomainBase::xml_factory> Variable::s_dom_factory;
+singleton::use<abstract_domain::factory> Variable::s_dom_factory;
 
-DomainBase *Variable::clone
+abstract_domain *Variable::clone
 (boost::call_traits<Variable::domain_ptr>::param_type dom) {
   if( !dom )
     return NULL;
@@ -67,10 +67,10 @@ DomainBase *Variable::clone
 
 Variable::Variable() {}
 
-Variable::Variable(symbol const &name, DomainBase *dom)
+Variable::Variable(symbol const &name, abstract_domain *dom)
   :m_name(name), m_domain(dom) {}
 
-Variable::Variable(symbol const &name, DomainBase const &dom) 
+Variable::Variable(symbol const &name, abstract_domain const &dom)
   :m_name(name), m_domain(dom.copy()) {
   if( m_name.empty() )
     throw VariableException("Empty variable names are not allowed");
@@ -99,35 +99,35 @@ Variable &Variable::operator= (Variable const &other) {
   return *this;
 }
 
-Variable &Variable::restrict(DomainBase const &dom) {
+Variable &Variable::restrict_with(abstract_domain const &dom) {
   if( !m_domain )
     m_domain.reset(dom.copy());
   else 
-    m_domain->restrictWith(dom);
+    m_domain->restrict_with(dom);
   return *this;
 }
 
-Variable &Variable::restrict(Variable const &var) {
+Variable &Variable::restrict_with(Variable const &var) {
   if( var.m_name.empty() ) {
     if( var.m_domain )
-      restrict(*(var.m_domain));
+      restrict_with(*(var.m_domain));
   } else if( m_name.empty() ) {
     if( var.m_domain )
-      restrict(*(var.m_domain));
+      restrict_with(*(var.m_domain));
     m_name = var.m_name;
   } else {
     if( m_name!=var.m_name ) {
       throw VariableException("Cannot merge variables with different names.");
     }
     if( var.m_domain )
-      restrict(*(var.m_domain));
+      restrict_with(*(var.m_domain));
   }
   return *this;
 }
 
 // Observers :
 
-DomainBase const &Variable::domain() const {
+abstract_domain const &Variable::domain() const {
   if( !m_domain ) 
     throw VariableException("Variable's domain cannot be accessed.");
   return *m_domain;
@@ -138,7 +138,7 @@ boost::property_tree::ptree Variable::as_tree() const {
   
   if( m_domain ) {
     ret = m_domain->as_tree();
-    set_attr(ret, "type", m_domain->getTypeName());
+    set_attr(ret, "type", m_domain->type_name());
   } else
     set_attr(ret, "type", "null");
   set_attr(ret, "name", name());

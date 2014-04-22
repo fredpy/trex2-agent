@@ -111,7 +111,7 @@ void TimelineReporter::notify(Observation const &obs)
   {
     TrexAttribute attr;
     Variable v = obs.getAttribute(*it);
-    symbol type = v.domain().getTypeName();
+    symbol type = v.domain().type_name();
 
     if (type.str() == "float") {
       attr.attr_type = TrexAttribute::TYPE_FLOAT;
@@ -131,9 +131,9 @@ void TimelineReporter::notify(Observation const &obs)
 
     attr.name = (*it).str();
 
-    if (v.domain().isSingleton()) {
-      attr.max = v.domain().getStringSingleton();
-      attr.min = v.domain().getStringSingleton();
+    if (v.domain().is_singleton()) {
+      attr.max = v.domain().get_singleton_as_string();
+      attr.min = v.domain().get_singleton_as_string();
     }
     //FIXME add support for interval domains
     //else if (v.domain().isInterval())

@@ -45,7 +45,7 @@
 #ifndef H_BasicInterval
 # define H_BasicInterval
 
-# include "DomainBase.hh"
+# include "abstract_domain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -59,68 +59,68 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup domains
      */
-    class BasicInterval :public DomainBase {
+    class basic_interval :public abstract_domain {
     public:
       /** @brief Destructor */
-      virtual ~BasicInterval() {}
+      virtual ~basic_interval() {}
 
-      bool isInterval() const {
+      bool is_interval() const {
 	return true;
       }
-      bool isEnumerated() const {
+      bool is_enumerated() const {
 	return false;
       }
 
-      virtual bool hasLower()  const =0;
-      virtual bool hasUpper()  const =0;
+      virtual bool has_lower()  const =0;
+      virtual bool has_upper()  const =0;
 
-      bool isFull() const {
-	return !( hasLower() || hasUpper() );
+      bool is_full() const {
+	return !( has_lower() || has_upper() );
       }
       
-      virtual boost::any getLower() const =0;
-      virtual boost::any getUpper() const =0;
+      virtual boost::any get_lower() const =0;
+      virtual boost::any get_upper() const =0;
 
       template<class Ty, bool Safe>
-      Ty getTypedLower() const {
-        boost::any val = getLower();
+      Ty get_typed_lower() const {
+        boost::any val = get_lower();
 	if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringLower());
+            return boost::lexical_cast<Ty>(lower_as_string());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
            
       template<class Ty, bool Safe>
-      Ty getTypedUpper() const {
-        boost::any val = getUpper();
+      Ty get_typed_upper() const {
+        boost::any val = get_upper();
 	if( Safe ) { 
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
-            return boost::lexical_cast<Ty>(getStringUpper());
+            return boost::lexical_cast<Ty>(upper_as_string());
 	} else 
 	  return boost::any_cast<Ty>(val);
       }
            
-      virtual std::string getStringLower() const;
-      virtual std::string getStringUpper() const;
+      virtual std::string lower_as_string() const;
+      virtual std::string upper_as_string() const;
     protected:
-      explicit BasicInterval(TREX::utils::symbol const &type) 
-	:DomainBase(type) {}
-      explicit BasicInterval(boost::property_tree::ptree::value_type &node)
-	:DomainBase(node) {}
+      explicit basic_interval(TREX::utils::symbol const &type)
+	:abstract_domain(type) {}
+      explicit basic_interval(boost::property_tree::ptree::value_type &node)
+	:abstract_domain(node) {}
 
-      void completeParsing(boost::property_tree::ptree::value_type &node);
+      void complete_parsing(boost::property_tree::ptree::value_type &node);
 
       
-      virtual void parseLower(std::string const &val) =0;
-      virtual void parseUpper(std::string const &val) =0;
-      virtual void parseSingleton(std::string const &val) =0;
+      virtual void parse_lower(std::string const &val) =0;
+      virtual void parse_upper(std::string const &val) =0;
+      virtual void parse_singleton(std::string const &val) =0;
       std::ostream &print_singleton(std::ostream &out) const {
 	return print_lower(out);
       }
@@ -131,15 +131,15 @@ namespace TREX {
       boost::property_tree::ptree build_tree() const;
 
       
-      void accept(DomainVisitor &visitor) const;
+      void accept(domain_visitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       boost::any singleton() const {
-	return getLower();
+	return get_lower();
       }
-      std::string stringSingleton() const {
-	return getStringLower();
+      std::string string_singleton() const {
+	return lower_as_string();
       }
-   }; // TREX::transaction::BasicInterval
+   }; // TREX::transaction::basic_interval
 
 
   } // TREX::transaction

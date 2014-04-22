@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <trex/domain/StringDomain.hh>
+#include <trex/domain/string_domain.hh>
 
 #include "Rover.hh"
 
@@ -47,14 +47,14 @@ void Rover::setValue(TREX::transaction::goal_id const &g)
 {
     if(g->predicate()==AtPred)
     {
-        location = g->getAttribute(locationPred).domain().getStringSingleton();
+        location = g->getAttribute(locationPred).domain().get_singleton_as_string();
         m_navigator_state.reset(new Observation(navigatorObj, AtPred));
-        (*m_navigator_state).restrictAttribute(locationPred, StringDomain(location));
+        (*m_navigator_state).restrictAttribute(locationPred, string_domain(location));
         postObservation(*m_navigator_state);
     } else if(g->predicate()==GoingPred) {
-        location = g->getAttribute(pathPred).domain().getStringSingleton();
+        location = g->getAttribute(pathPred).domain().get_singleton_as_string();
         m_navigator_state.reset(new Observation(navigatorObj, GoingPred));
-        (*m_navigator_state).restrictAttribute(pathPred, StringDomain(location));
+        (*m_navigator_state).restrictAttribute(pathPred, string_domain(location));
         postObservation(*m_navigator_state);
     } else if(g->predicate()==StowedPred || g->predicate()==StowingPred ||
               g->predicate()==UnstowedPred || g->predicate()==UnstowingPred)
@@ -74,7 +74,7 @@ bool Rover::synchronize()
     if(m_firstTick)
     {
         m_navigator_state.reset(new Observation(navigatorObj, AtPred));
-        (*m_navigator_state).restrictAttribute(locationPred, StringDomain(location));
+        (*m_navigator_state).restrictAttribute(locationPred, string_domain(location));
         postObservation(*m_navigator_state);
         m_InstrumentLocation_state.reset(new Observation(instrumentLocationObj, StowedPred));
         postObservation(*m_InstrumentLocation_state);
@@ -93,7 +93,7 @@ bool Rover::synchronize()
                     if(m_pending.front()->startsBefore(cur))
                     {
                         setValue(m_pending.front());
-                        m_nextTick = cur+m_pending.front()->getDuration().lowerBound().value();
+                        m_nextTick = cur+m_pending.front()->getDuration().lower_bound().value();
                         m_pending.pop_front();
                     }
                     break;
@@ -111,8 +111,8 @@ void Rover::handleRequest(goal_id const &g)
     if(g->predicate()==AtPred || g->predicate()==GoingPred || g->predicate()==PlacedPred
        || g->predicate()==SamplingPred || g->predicate()==FreePred)
     {
-        IntegerDomain::bound lo = g->getStart().lowerBound();
-        if(lo.isInfinity())
+        int_domain::bound lo = g->getStart().lower_bound();
+        if(lo.is_infinity())
         {
             m_pending.push_front(g);
         } else {

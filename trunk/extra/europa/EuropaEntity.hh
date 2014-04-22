@@ -34,7 +34,7 @@
 #ifndef H_trex_EuropaEntity
 # define H_trex_EuropaEntity
 
-# include <trex/domain/EnumeratedDomain.hh>
+# include <trex/domain/enumerated_domain.hh>
 
 namespace TREX {
   namespace europa {
@@ -49,17 +49,17 @@ namespace TREX {
      * @ingroup europa
      */
     class EuropaEntity 
-    :public TREX::transaction::EnumeratedDomain<TREX::utils::symbol> {
-      typedef TREX::transaction::EnumeratedDomain<TREX::utils::symbol> base_class;
+    :public TREX::transaction::enumerated_domain<TREX::utils::symbol> {
+      typedef TREX::transaction::enumerated_domain<TREX::utils::symbol> base_class;
     public:
-      static TREX::utils::symbol const type_name;
+      static TREX::utils::symbol const type_str;
       
       /** @brief Constructor
        *
        * Creates a full domain
        */
       EuropaEntity()
-	:base_class(type_name) {}
+	:base_class(type_str) {}
       /** @brief Constructor
        *
        * @tparam Iter An iterator type
@@ -79,7 +79,7 @@ namespace TREX {
        * Create the domain with the single value @p val
        */
       explicit EuropaEntity(TREX::utils::symbol const &val) 
-	:base_class(type_name, val) {}
+	:base_class(type_str, val) {}
       /** @brief XML constructor 
        * @param[in] node XML decsciption of the domain
        *
@@ -99,7 +99,7 @@ namespace TREX {
       ~EuropaEntity() {}
 
        
-      TREX::transaction::DomainBase *copy() const {
+      TREX::transaction::abstract_domain *copy() const {
 	return new EuropaEntity(*this);
       }      
     }; // TREX::europa::EuropaEntity

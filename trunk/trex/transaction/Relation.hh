@@ -221,10 +221,10 @@ namespace TREX {
        * @sa latency() const
        * @sa look_ahead() const
        */
-      IntegerDomain dispatch_window(TICK current) const {
+      int_domain dispatch_window(TICK current) const {
 	TICK lb = current+latency();
 	
-	return IntegerDomain(lb, lb+look_ahead());
+	return int_domain(lb, lb+look_ahead());
       }
 
       /** @brief Check for relation validity

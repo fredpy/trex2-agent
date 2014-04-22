@@ -1,9 +1,5 @@
-/* -*- C++ -*- */
-/** @file "DomainVisitor.hh"
- * @brief Definition of DomainVisitor
- *
- * This file defines the abstract interface DomainVisitor used to visit
- * TREX domains
+/** @file DomainBase.cc
+ * @brief Basic domain utilities implementation
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
@@ -41,53 +37,47 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_DomainVisitor
-# define H_DomainVisitor
+#include <sstream>
+#include "domain_visitor.hh"
 
-# include "BasicEnumerated.hh"
-# include "BasicInterval.hh"
+using namespace TREX::transaction;
 
-namespace TREX {
-  namespace transaction {
-
-    /** @brief abstract domain visitor interface
-     *
-     * This class defines the abstract interface used to implement a visitor
-     * of TREX domains (aka DomainBase)
-     *
-     * It allows to visit different standard types of domain and embeds a
-     * default behavior for classes that do  not inherit from these.
-     *
-     * @sa void DomainBase::accept(DomainVisitor &)
-     * @author Frederic Py <fpy@mbari.org>
-     */
-    class DomainVisitor {
-    public:
-      /** @brief Enumerated domain visit
-       *
-       * @param dom A domain
-       *
-       * This method is called when visiting the BasicEnumerated domain @e dom
-       */
-      virtual void visit(BasicEnumerated const *dom) = 0;
-      /** @brief Interval domain visit
-       *
-       * @param dom A domain
-       *
-       * This method is called when visiting the BasicInterval domain @e dom
-       */
-      virtual void visit(BasicInterval const *dom) =0;
-      /** @brief Default visit
-       *
-       * @param dom A domain
-       *
-       * This method is called when visiting a domain @e dom which is not a
-       * BasicInterval nor a BasicEnumerated class
-       */
-      virtual void visit(DomainBase const *dom, bool) =0;
-    };
-
-  }
+std::string DomainExcept::build_message(abstract_domain const &d,
+                                        std::string const &msg) throw() {
+  std::ostringstream oss;
+  oss<<"Domain "<<d.type_name()<<" "<<d<<" : "<<msg;
+  return oss.str();
 }
 
-#endif // H_DomainVisitor
+/*
+ * class TREX::transaction::abstract_domain
+ */
+
+// observers
+
+boost::any abstract_domain::get_singleton() const {
+  if( !is_singleton() )
+    throw DomainAccess(*this, ": not a singleton");
+  return singleton();
+}
+
+std::string abstract_domain::get_singleton_as_string() const {
+  if( !is_singleton() )
+    throw DomainAccess(*this, ": not a singleton");
+  return string_singleton();
+}
+
+boost::property_tree::ptree abstract_domain::as_tree() const {
+  boost::property_tree::ptree ret;
+  ret.push_back(boost::property_tree::ptree::value_type(type_name().str(), build_tree()));
+  return ret;
+}
+
+// manipulators
+
+void abstract_domain::accept(domain_visitor &visitor) const {
+  visitor.visit(this, true);
+}
+
+
+

@@ -136,12 +136,12 @@ namespace TREX {
        * @retval true if @c start can be less to @a date
        * @retval false otherwise
        */
-      bool startsBefore(IntegerDomain::bound const &date) const {
-	return getStart().lowerBound()<date;
+      bool startsBefore(int_domain::bound const &date) const {
+	return getStart().lower_bound()<date;
       }
       
       bool endsAfter(TICK date) const {
-        return getEnd().lowerBound()>date;
+        return getEnd().lower_bound()>date;
       }
     
 
@@ -160,7 +160,7 @@ namespace TREX {
        * @sa getEnd() const
        * @sa getAttribute() const 
        */
-      IntegerDomain const &getStart() const;
+      int_domain const &getStart() const;
       /** @brief Get duration interval
        *
        * Identifies the domain of possible furations 
@@ -177,7 +177,7 @@ namespace TREX {
        * @sa getEnd() const
        * @sa getAttribute() const 
        */
-      IntegerDomain const &getDuration() const;
+      int_domain const &getDuration() const;
       /** @brief Get end  interval
        *
        * Identifies the domain of possible end TICK.
@@ -193,7 +193,7 @@ namespace TREX {
        * @sa getEnd() const
        * @sa getAttribute() const 
        */
-      IntegerDomain const &getEnd() const;
+      int_domain const &getEnd() const;
       
       /** @brief restrict one of the Goal attributes
        *
@@ -241,9 +241,9 @@ namespace TREX {
        *
        * @sa restrictAttribute(Variable const &)
        */
-      void restrictTime(IntegerDomain const &s,
-			IntegerDomain const &d,
-			IntegerDomain const &e);
+      void restrictTime(int_domain const &s,
+			int_domain const &d,
+			int_domain const &e);
       /** @brief Restrict start time domain
        *
        * @param[in] s A domain
@@ -257,7 +257,7 @@ namespace TREX {
        * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
        *                  IntegerDomain const &)
        */
-      void restrictStart(IntegerDomain const &s) {
+      void restrictStart(int_domain const &s) {
 	restrictTime(s, s_durationDomain, s_dateDomain);
       }
       /** @brief Restrict duration domain
@@ -273,7 +273,7 @@ namespace TREX {
        * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
        *                  IntegerDomain const &)
        */
-      void restrictDuration(IntegerDomain const &d) {
+      void restrictDuration(int_domain const &d) {
 	restrictTime(s_dateDomain, d, s_dateDomain);
       }
       /** @brief Restrict end domain
@@ -289,11 +289,11 @@ namespace TREX {
        * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
        *                  IntegerDomain const &)
        */
-      void restrictEnd(IntegerDomain const &e) {
+      void restrictEnd(int_domain const &e) {
 	restrictTime(s_dateDomain, s_durationDomain, e);
       }
-      static IntegerDomain const s_dateDomain;
-      static IntegerDomain const s_durationDomain;
+      static int_domain const s_dateDomain;
+      static int_domain const s_durationDomain;
 
     private:
       Variable m_start, m_duration, m_end;

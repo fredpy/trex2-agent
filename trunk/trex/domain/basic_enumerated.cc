@@ -1,6 +1,6 @@
 /* -*- C++ -*- */
-/** @file "BasicInterval.hh"
- * @brief Implementation of BasicInterval
+/** @file "BasicEnumerated.hh"
+ * @brief Implementation of BasicEnumerated
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup domains
@@ -38,73 +38,77 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "DomainVisitor.hh"
+#include <sstream>
+#include "domain_visitor.hh"
 
 using namespace TREX::transaction;
 namespace bpt=boost::property_tree;
+/*
+ * class TREX::transaction::basic_enumerated
+ */
 
-// modifiers 
+// manipulators
 
-void BasicInterval::completeParsing(bpt::ptree::value_type &node) {
-  // Try for a singleton first 
-  boost::optional<std::string> 
-    val = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "value");
-  if( val ) {
-    parseSingleton(*val);
+void basic_enumerated::complete_parsing(bpt::ptree::value_type &node) {
+  bpt::ptree::assoc_iterator i, last;
+  
+  boost::tie(i, last) = node.second.equal_range("elem");
+  if( last==i ) {
+    // In case there's no elem childs check if someone specified
+    // its value directly
+    boost::optional<std::string>
+    txt = TREX::utils::parse_attr< boost::optional<std::string> >(node, "value");
+    if( txt )
+      add_string_value(*txt);
   } else {
-    boost::optional< std::string >
-      lo = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "min"),
-      hi = TREX::utils::parse_attr< boost::optional<std::string> >(node.second, "max");
-
-    if( lo ) 
-      parseLower(*lo);
-    if( hi )
-      parseUpper(*hi);
+    for(; last!=i; ++i) {
+      boost::optional<std::string>
+        txt = TREX::utils::parse_attr< boost::optional<std::string> >( i->second,   "value");
+      if( txt )
+        add_string_value(*txt);
+    }
   }
 }
 
-// observers 
-    
-std::string BasicInterval::getStringLower() const {
+// observers
+
+std::string basic_enumerated::element_as_string(size_t i) const {
   std::ostringstream oss;
-  oss.precision(16);
-  oss.setf(oss.fixed);
-  print_lower(oss);
+  print_value(oss, i);
   return oss.str();
 }
 
-std::string BasicInterval::getStringUpper() const {
-  std::ostringstream oss;
-  oss.precision(16);
-  oss.setf(oss.fixed);
-  print_upper(oss);
-  return oss.str();
-}
-
-std::ostream &BasicInterval::print_domain(std::ostream &out) const {
-  //out.setf(out.fixed);
-  if( isSingleton() ) 
-    return print_lower(out);
-  else
-    return print_upper(print_lower(out<<'[')<<", ")<<']';
-}
-
-boost::property_tree::ptree BasicInterval::build_tree() const {
-  boost::property_tree::ptree info;
-  if( isSingleton() )
-    TREX::utils::set_attr(info, "value", getStringSingleton());
+std::ostream &basic_enumerated::print_domain(std::ostream &out) const {
+  size_t i, n=size();
+  if( 1==n )
+    return print_value(out, 0);
   else {
-    if( hasLower() )
-      TREX::utils::set_attr(info, "min", getStringLower());
-    if( hasUpper() )
-      TREX::utils::set_attr(info, "max", getStringUpper());
+    print_value(out<<'{', 0);
+    for( i=1; i<n; ++i )
+      print_value(out<<", ", i);
+    return out<<'}';
   }
-  return info;
+}
+
+boost::property_tree::ptree basic_enumerated::build_tree() const {
+  boost::property_tree::ptree values;
+  size_t len = size();
+  
+  if( len>0 ) {
+    boost::property_tree::ptree &tmp = values.add_child("elem", boost::property_tree::ptree());
+    
+    for(size_t i=0; i<len; ++i) {
+      boost::property_tree::ptree e;
+      utils::set_attr(e, "value", element_as_string(i));
+      tmp.push_back(boost::property_tree::ptree::value_type("", e));
+    }
+  }
+  return values;
 }
 
 
 // manipulators
 
-void BasicInterval::accept(DomainVisitor &visitor) const {
+void basic_enumerated::accept(domain_visitor &visitor) const {
   return visitor.visit(this);
 }

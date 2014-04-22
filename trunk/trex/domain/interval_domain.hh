@@ -46,7 +46,7 @@
 
 # include <cctype>
 
-# include "BasicInterval.hh"
+# include "basic_interval.hh"
 
 namespace TREX {
   namespace transaction {
@@ -72,7 +72,7 @@ namespace TREX {
      * @ingroup domains
      */
     template< typename Ty, bool Prot=true, class Comp=std::less<Ty> >
-    class IntervalDomain :public BasicInterval {
+    class interval_domain :public basic_interval {
     public:
       /** @brief subjacent type for interval */
       typedef Ty base_type;
@@ -144,7 +144,7 @@ namespace TREX {
 	 * @retval true if the value is +inf or -inf
 	 * @retval false if the value is of type @e Ty
 	 */
-	bool isInfinity() const {
+	bool is_infinity() const {
 	  return m_inf;
 	}
 	/** Finite bound value
@@ -340,7 +340,7 @@ namespace TREX {
           return b.print_to(out);
         }
         
-	friend class IntervalDomain<Ty, Prot, Comp>;
+	friend class interval_domain<Ty, Prot, Comp>;
       }; // IntervalDomain<>::bound
 
       /** @brief Plus infinity bound
@@ -362,8 +362,8 @@ namespace TREX {
        *
        * Create a new instance withe as a full interval of type @e type
        */
-      explicit IntervalDomain(TREX::utils::symbol const &type)
-	:BasicInterval(type), m_lower(minus_inf), m_upper(plus_inf) {}
+      explicit interval_domain(TREX::utils::symbol const &type)
+	:basic_interval(type), m_lower(minus_inf), m_upper(plus_inf) {}
       /** @brief Constructor
        * @param type A symbolic type name
        * @param lb A bound
@@ -375,10 +375,10 @@ namespace TREX {
        * @pre [lb, ub] is a valid interval (ie not empty)
        * @throw EmptyDomain the resulting domain is empty
        */
-      IntervalDomain(TREX::utils::symbol const &type,
+      interval_domain(TREX::utils::symbol const &type,
 		     bound const &lb, bound const &ub)
-	:BasicInterval(type), m_lower(lb), m_upper(ub) {
-	if( m_upper<m_lower || ( m_lower.isInfinity() 
+	:basic_interval(type), m_lower(lb), m_upper(ub) {
+	if( m_upper<m_lower || ( m_lower.is_infinity()
 				 && m_upper==m_lower ) ) {
 	  throw EmptyDomain(*this, "interval domain is empty");
 	}
@@ -391,10 +391,10 @@ namespace TREX {
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      IntervalDomain(TREX::utils::symbol const &type, Ty const &val)
-	:BasicInterval(type), m_lower(val), m_upper(val) {}
+      interval_domain(TREX::utils::symbol const &type, Ty const &val)
+	:basic_interval(type), m_lower(val), m_upper(val) {}
       /** @brief Destructor */
-      virtual ~IntervalDomain() {}
+      virtual ~interval_domain() {}
       
       /** @brief Check for inclusion
        * @param val A value
@@ -420,7 +420,7 @@ namespace TREX {
        * @retval upperBound() if @a val @c> @c upperBound()
        * @retval val otherwise
        */
-      Ty const &closestTo(Ty const &val) const {
+      Ty const &closest_to(Ty const &val) const {
 	bound me(val);
 	
 	if( m_lower>me )
@@ -430,8 +430,8 @@ namespace TREX {
 	return val;
       }
 
-      bool intersect(DomainBase const &other) const;
-      bool equals(DomainBase const &other) const;
+      bool intersect(abstract_domain const &other) const;
+      bool equals(abstract_domain const &other) const;
       /** @brief Restrict domain possible values
        * @param lo minimum value
        * @param hi maximum value
@@ -444,8 +444,8 @@ namespace TREX {
        * @return this domain after the operation
        * @throw EmptyDomain resulting domain is empty
        */
-      DomainBase &restrictWith(bound const &lo, bound const &hi);
-      DomainBase &restrictWith(DomainBase const &other);
+      abstract_domain &restrict_with(bound const &lo, bound const &hi);
+      abstract_domain &restrict_with(abstract_domain const &other);
 
       /** @brief interval lower bound
        *
@@ -453,7 +453,7 @@ namespace TREX {
        * @sa bound const &upperBound() const
        * @sa void getBounds(bound &, bound&) vonst
        */
-      bound const &lowerBound() const {
+      bound const &lower_bound() const {
 	return m_lower;
       }
       /** @brief interval upper bound
@@ -462,25 +462,25 @@ namespace TREX {
        * @sa bound const &lowerBound() const
        * @sa void getBounds(bound &, bound&) vonst
        */
-      bound const &upperBound() const {
+      bound const &upper_bound() const {
 	return m_upper;
       }
 
-      bool isSingleton() const {
+      bool is_singleton() const {
 	return m_lower==m_upper;
       }
 
-      bool hasLower() const {
-	return !m_lower.isInfinity();
+      bool has_lower() const {
+	return !m_lower.is_infinity();
       }
-      bool hasUpper() const {
-	return !m_upper.isInfinity();
+      bool has_upper() const {
+	return !m_upper.is_infinity();
       }
 
-      boost::any getLower() const {
+      boost::any get_lower() const {
 	return m_lower.value();
       }
-      boost::any getUpper() const {
+      boost::any get_upper() const {
 	return m_upper.value();
       }
       
@@ -497,7 +497,7 @@ namespace TREX {
        * @sa bound const &lowerBound() const
        * @sa bound const &upperBound() const
        */
-      void getBounds(bound &lo, bound &hi) const {
+      void get_bounds(bound &lo, bound &hi) const {
 	lo = m_lower;
 	hi = m_upper;
       }
@@ -508,8 +508,8 @@ namespace TREX {
        *
        * Create a copy of @a other
        */
-      IntervalDomain(IntervalDomain const &other)
-	:BasicInterval(other), m_lower(other.m_lower), m_upper(other.m_upper) {}
+      interval_domain(interval_domain const &other)
+	:basic_interval(other), m_lower(other.m_lower), m_upper(other.m_upper) {}
       /** @brief XML parsing constructor
        *
        * @param node An XML node
@@ -527,9 +527,9 @@ namespace TREX {
        * not correctly formatted
        * @throw TREX::transaction::EmptyDomain the resulting interval is empty
        */
-      explicit IntervalDomain(boost::property_tree::ptree::value_type &node)
-	:BasicInterval(node), m_lower(minus_inf), m_upper(plus_inf) {
-	completeParsing(node);
+      explicit interval_domain(boost::property_tree::ptree::value_type &node)
+	:basic_interval(node), m_lower(minus_inf), m_upper(plus_inf) {
+	complete_parsing(node);
       }
  
     private:
@@ -542,19 +542,19 @@ namespace TREX {
       /** @brief interval upper bound */
       bound m_upper;
 
-      void parseSingleton(std::string const &val);
-      void parseLower(std::string const &val);
-      void parseUpper(std::string const &val);
+      void parse_singleton(std::string const &val);
+      void parse_lower(std::string const &val);
+      void parse_upper(std::string const &val);
       std::ostream &print_lower(std::ostream &out) const {
 	return m_lower.print_to(out);
       }
       std::ostream &print_upper(std::ostream &out) const {
 	return m_upper.print_to(out);
       }
-    }; // IntervalDomain<>
+    }; // interval_domain<>
 
 # define In_H_IntervalDomain
-#  include "bits/IntervalDomain.tcc"
+#  include "bits/interval_domain.tcc"
 # undef In_H_IntervalDomain
 
   }

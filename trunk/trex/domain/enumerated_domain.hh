@@ -53,7 +53,7 @@
 # include <iterator>
 # include <set>
 
-# include "BasicEnumerated.hh"
+# include "basic_enumerated.hh"
 
 namespace TREX {
   namespace transaction {
@@ -90,7 +90,7 @@ namespace TREX {
      * @ingroup domains
      */
     template< typename Ty, class Comp=std::less<Ty> >
-    class EnumeratedDomain :public BasicEnumerated {
+    class enumerated_domain :public basic_enumerated {
     private:
       /** @brief Internal domain elements container */
       typedef std::set<Ty, Comp> container_type;
@@ -105,8 +105,8 @@ namespace TREX {
        *
        * Create a new instance as a full domain of type @e type.
        */
-      explicit EnumeratedDomain(TREX::utils::symbol const &type)
-      :BasicEnumerated(type) {}
+      explicit enumerated_domain(TREX::utils::symbol const &type)
+      :basic_enumerated(type) {}
       /** @brief Constructor
        * @tparam Iter an iterator type
        * @param type A symbolic type name
@@ -122,9 +122,9 @@ namespace TREX {
        * @throw EmptyDomain the created domain is empty
        */
       template<class Iter>
-      EnumeratedDomain(TREX::utils::symbol const &type,
+      enumerated_domain(TREX::utils::symbol const &type,
                        Iter from, Iter to)
-      :BasicEnumerated(type), m_elements(from, to) {
+      :basic_enumerated(type), m_elements(from, to) {
         if( m_elements.empty() )
           throw EmptyDomain(*this, "Newly created EnumeratedDomain is empty.");
       }
@@ -136,14 +136,14 @@ namespace TREX {
        * Create a new instance of type @e type containing only the element
        * @e val
        */
-      explicit EnumeratedDomain(TREX::utils::symbol const &type,
+      explicit enumerated_domain(TREX::utils::symbol const &type,
                                 Ty const &val)
-      :BasicEnumerated(type) {
+      :basic_enumerated(type) {
         add(val);
       }
       
       /** @brief Destructor */
-      virtual ~EnumeratedDomain() {}
+      virtual ~enumerated_domain() {}
       
       // Extra helpers
       /** @brief Add an element to the domain
@@ -195,17 +195,17 @@ namespace TREX {
        * @retval false otherwise
        */
       bool contains(Ty const &val) const {
-        return isFull() || end()!=m_elements.find(val);
+        return is_full() || end()!=m_elements.find(val);
       }
-      bool intersect(DomainBase const &other) const;
-      bool equals(DomainBase const &other) const;
-      DomainBase &restrictWith(DomainBase const &other);
+      bool intersect(abstract_domain const &other) const;
+      bool equals(abstract_domain const &other) const;
+      abstract_domain &restrict_with(abstract_domain const &other);
       
-      size_t getSize() const {
+      size_t size() const {
         return m_elements.size();
       }
       
-      boost::any getElement(size_t i) const {
+      boost::any element(size_t i) const {
         typename container_type::const_iterator it = begin();
         // std::set doe not provide operator[]
         // I need to do the iteration by my own
@@ -242,8 +242,8 @@ namespace TREX {
        *
        * Create a new instance which is a copy of @e other
        */
-      EnumeratedDomain(EnumeratedDomain const &other)
-      :BasicEnumerated(other), m_elements(other.m_elements) {}
+      enumerated_domain(enumerated_domain const &other)
+      :basic_enumerated(other), m_elements(other.m_elements) {}
       /** @brief XML parsing constructor
        * @param node An XML node
        *
@@ -265,17 +265,17 @@ namespace TREX {
        * @note If no elem tag is defined into @e node, the domain
        * will be considered as full.
        */
-      EnumeratedDomain(boost::property_tree::ptree::value_type &node) 
-      :BasicEnumerated(node) {
-        completeParsing(node);
+      enumerated_domain(boost::property_tree::ptree::value_type &node)
+      :basic_enumerated(node) {
+        complete_parsing(node);
       }
       
-      void addTextValue(std::string const &val) {
+      void add_string_value(std::string const &val) {
         add(boost::lexical_cast<Ty>(val));
       }
       std::ostream &print_value(std::ostream &out, size_t i) const {
         // Not very optimal but this is the easiest way to go
-        return out<<(getTypedElement<Ty, false>(i));
+        return out<<(typed_element<Ty, false>(i));
       }
       
     private:
@@ -297,13 +297,13 @@ namespace TREX {
      */
     
     template<class Ty, class Cmp>
-    bool EnumeratedDomain<Ty, Cmp>::intersect(DomainBase const &other) const {
-      if( getTypeName()!=other.getTypeName() ) 
+    bool enumerated_domain<Ty, Cmp>::intersect(abstract_domain const &other) const {
+      if( type_name()!=other.type_name() )
         return false;
       else {
-        EnumeratedDomain<Ty, Cmp> const &ref 
-        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
-        if( isFull() || ref.isFull() )
+        enumerated_domain<Ty, Cmp> const &ref
+        = dynamic_cast<enumerated_domain<Ty, Cmp> const &>(other);
+        if( is_full() || ref.is_full() )
           return true;
         else {
           iterator i = begin(), j = ref.begin();
@@ -326,23 +326,24 @@ namespace TREX {
     }
     
     template<class Ty, class Cmp>
-    bool EnumeratedDomain<Ty, Cmp>::equals(DomainBase const &other) const {
-      if( getTypeName()!=other.getTypeName() ) 
+    bool enumerated_domain<Ty, Cmp>::equals(abstract_domain const &other) const {
+      if( type_name()!=other.type_name() )
         return false;
       else {
-        EnumeratedDomain<Ty, Cmp> const &ref 
-        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);
+        enumerated_domain<Ty, Cmp> const &ref
+        = dynamic_cast<enumerated_domain<Ty, Cmp> const &>(other);
         return m_elements==ref.m_elements;
       }
     }
     
     template<class Ty, class Cmp>
-    DomainBase &EnumeratedDomain<Ty, Cmp>::restrictWith(DomainBase const &other) {
-      if( getTypeName()!=other.getTypeName() ) 
+    abstract_domain &enumerated_domain<Ty, Cmp>::restrict_with
+    (abstract_domain const &other) {
+      if( type_name()!=other.type_name() )
         throw EmptyDomain(*this, "Incompatible types");
       else {
-        EnumeratedDomain<Ty, Cmp> const &ref 
-        = dynamic_cast<EnumeratedDomain<Ty, Cmp> const &>(other);    
+        enumerated_domain<Ty, Cmp> const &ref
+        = dynamic_cast<enumerated_domain<Ty, Cmp> const &>(other);
         container_type tmp;
         std::set_intersection(begin(), end(), ref.begin(), ref.end(), 
                               std::inserter(tmp, tmp.begin()), 

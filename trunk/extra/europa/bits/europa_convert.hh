@@ -42,7 +42,7 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/DataType.hh>
 # include <trex/europa/bits/system_header.hh>
 
-# include <trex/domain/DomainVisitor.hh>
+# include <trex/domain/domain_visitor.hh>
 
 namespace TREX {
   namespace europa {
@@ -64,7 +64,8 @@ namespace TREX {
        * @sa europa_domain
        * @ingroup europa
        */
-      TREX::transaction::DomainBase *trex_domain(EUROPA::Domain const &dom);
+      TREX::transaction::abstract_domain
+      *trex_domain(EUROPA::Domain const &dom);
 
       /** @brief TREX to Europa domain conversion
        *
@@ -79,7 +80,7 @@ namespace TREX {
        * @sa trex_domain(EUROPA::Domain const &)
        * @ingroup europa
        */
-      class europa_domain :public TREX::transaction::DomainVisitor {
+      class europa_domain :public TREX::transaction::domain_visitor {
       public:
 	/** @brief Constructor 
 	 * 
@@ -167,9 +168,9 @@ namespace TREX {
          * the europa domain is empty
          * @{
          */
-	void visit(TREX::transaction::BasicEnumerated const *dom);
-	void visit(TREX::transaction::BasicInterval const *dom);
-	void visit(TREX::transaction::DomainBase const *dom, bool);
+	void visit(TREX::transaction::basic_enumerated const *dom);
+	void visit(TREX::transaction::basic_interval const *dom);
+	void visit(TREX::transaction::abstract_domain const *dom, bool);
         /** @} */
         
 	/** @brief Get europa domain 
@@ -224,7 +225,7 @@ namespace TREX {
        * @ingroup europa
        */
       inline void europa_restrict(EUROPA::ConstrainedVariableId &var,
-				  TREX::transaction::DomainBase const &dom) {
+				  TREX::transaction::abstract_domain const &dom) {
 	europa_domain convert(var->lastDomain());
 	dom.accept(convert);
 	var->restrictBaseDomain(convert.domain());

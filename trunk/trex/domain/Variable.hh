@@ -48,7 +48,7 @@
 # include <boost/type_traits.hpp>
 
 # include <trex/utils/symbol.hh>
-# include "DomainBase.hh"
+# include "abstract_domain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -109,7 +109,7 @@ namespace TREX {
        * empty name
        */
       Variable(TREX::utils::symbol const &name,
-	       DomainBase const &domain);
+	       abstract_domain const &domain);
       /** @brief Constructor
        * @brief var Another instance
        *
@@ -146,7 +146,7 @@ namespace TREX {
        * @retval true if fully defined
        * @retval false else
        */
-      bool isComplete() const {
+      bool is_complete() const {
 	return !( m_name.empty() || !m_domain );
       }
       
@@ -177,7 +177,7 @@ namespace TREX {
        * @sa bool isComplete() const
        * @sa template<class Ty> Ty const &typedDomain() const
        */
-      DomainBase const &domain() const;
+      abstract_domain const &domain() const;
       /** @brief Variable domain
        * @tparam Ty Expected type of the domain
        *
@@ -198,11 +198,11 @@ namespace TREX {
       template<class Ty>
       Ty const &typedDomain() const {
 	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
-			     DomainBase const &>::value));
+			     abstract_domain const &>::value));
 	return dynamic_cast<Ty const &>(domain());
       }
       
-      void accept(DomainVisitor &visitor) const {
+      void accept(domain_visitor &visitor) const {
 	domain().accept(visitor);
       }
 
@@ -219,7 +219,7 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &restrict(DomainBase const &dom);
+      Variable &restrict_with(abstract_domain const &dom);
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -233,8 +233,8 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &operator*=(DomainBase const &dom) {
-	return restrict(dom);
+      Variable &operator*=(abstract_domain const &dom) {
+	return restrict_with(dom);
       }
       /** @brief Merge variable
        * @param var another variable
@@ -249,7 +249,7 @@ namespace TREX {
        * @return current insatnce after being merged with @e var
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      Variable &restrict(Variable const &var);
+      Variable &restrict_with(Variable const &var);
       /** @brief Merge variable
        * @param var another variable
        *
@@ -264,38 +264,21 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       Variable &operator*=(Variable const &var) {
-	return restrict(var);
+	return restrict_with(var);
       }
 
       boost::property_tree::ptree as_tree() const;
 
-      
-      /** @brief XML output
-       * @param out An output stream
-       * @param pad desired tag indentation
-       *
-       * This method writes in @e out an XML representation of current
-       * instance with an indentation of @e pad
-       *
-       * @return @a out after the operation
-       */
-      std::ostream &toXml(std::ostream &out) const {
-        return to_xml(out);
-      }
-      std::ostream &toJSON(std::ostream &out) const {
-        return to_json(out);
-      }
-      
 	
     private:
-      typedef DomainBase::xml_factory::returned_type domain_ptr;
+      typedef abstract_domain::factory::returned_type domain_ptr;
       /** @brief varaible name */
       TREX::utils::symbol m_name;
       /** @brief Variable domain */
       domain_ptr m_domain;
 
       /** @brief Entry point to domain XML parsing */
-      static TREX::utils::singleton::use< DomainBase::xml_factory > s_dom_factory;
+      static TREX::utils::singleton::use< abstract_domain::factory > s_dom_factory;
 
       /** @brief Domain duplication helper
        * @param dom A domain
@@ -303,7 +286,7 @@ namespace TREX {
        * while managing the case where @e dom is NULL
        * @return a pointer to a copy of @a *dom or a NULL pointer
        */
-      static DomainBase *clone(boost::call_traits<Variable::domain_ptr>::param_type dom);
+      static abstract_domain *clone(boost::call_traits<Variable::domain_ptr>::param_type dom);
       
       /** @brief Constructor
        * @param name A symbolic name 
@@ -313,11 +296,11 @@ namespace TREX {
        * from a domain that has already been allocated
        */
       explicit Variable(TREX::utils::symbol const &name,
-			DomainBase *domain = NULL);
+			abstract_domain *domain = NULL);
       friend class Predicate;
       
       friend std::ostream &operator<<(std::ostream &out, Variable const &v) {
-        if( v.isComplete() )
+        if( v.is_complete() )
           return out<<v.m_name<<'='<<*(v.m_domain);
         else
           return out<<"<?"<<v.m_name<<'>';

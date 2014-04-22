@@ -61,24 +61,24 @@ namespace TREX
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
-      obs.restrictAttribute("latitude", FloatDomain(latitude));
-      obs.restrictAttribute("longitude", FloatDomain(longitude));
+      obs.restrictAttribute("latitude", float_domain(latitude));
+      obs.restrictAttribute("longitude", float_domain(longitude));
 
       //msg->toText(std::cout);
       if (msg->depth > 0)
-        obs.restrictAttribute("z", FloatDomain(msg->depth));
+        obs.restrictAttribute("z", float_domain(msg->depth));
       else if (msg->alt > 0)
-        obs.restrictAttribute("z", FloatDomain(-msg->alt));
+        obs.restrictAttribute("z", float_domain(-msg->alt));
       else if (msg->height != -1)
-        obs.restrictAttribute("z", FloatDomain(msg->height + (-msg->z)));
+        obs.restrictAttribute("z", float_domain(msg->height + (-msg->z)));
 
       if (msg->depth > 0)
         obs.restrictAttribute("depth",
-                              FloatDomain(msg->depth /*+ (- msg->z)*/));
+                              float_domain(msg->depth /*+ (- msg->z)*/));
       if (msg->alt > 0)
-        obs.restrictAttribute("altitude", FloatDomain(msg->alt));
+        obs.restrictAttribute("altitude", float_domain(msg->alt));
       if (msg->height != -1)
-        obs.restrictAttribute("height", FloatDomain(msg->height + (-msg->z)));
+        obs.restrictAttribute("height", float_domain(msg->height + (-msg->z)));
 
       return obs;
     }
@@ -103,24 +103,24 @@ namespace TREX
 
       Observation obs("refstate", "Going");
 
-      obs.restrictAttribute("near_z", BooleanDomain((z_near)));
-      obs.restrictAttribute("near_xy", BooleanDomain((xy_near)));
+      obs.restrictAttribute("near_z", boolean_domain((z_near)));
+      obs.restrictAttribute("near_xy", boolean_domain((xy_near)));
 
-      obs.restrictAttribute("latitude", FloatDomain(msg->reference->lat));
-      obs.restrictAttribute("longitude", FloatDomain(msg->reference->lon));
+      obs.restrictAttribute("latitude", float_domain(msg->reference->lat));
+      obs.restrictAttribute("longitude", float_domain(msg->reference->lon));
 
       if (!msg->reference->z.isNull())
       {
         switch (msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+            obs.restrictAttribute("z", float_domain(msg->reference->z->value));
             break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", FloatDomain(-msg->reference->z->value));
+            obs.restrictAttribute("z", float_domain(-msg->reference->z->value));
             break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", FloatDomain(msg->reference->z->value));
+            obs.restrictAttribute("z", float_domain(msg->reference->z->value));
             break;
           default:
             break;
@@ -130,7 +130,7 @@ namespace TREX
       if (!msg->reference->speed.isNull())
       {
         obs.restrictAttribute("speed",
-                              FloatDomain((msg->reference->speed->value)));
+                              float_domain((msg->reference->speed->value)));
       }
 
       return obs;
@@ -163,19 +163,19 @@ namespace TREX
       Observation obs("oplimits", "Limits");
 
       if (msg->mask & IMC::OPL_MAX_DEPTH)
-        obs.restrictAttribute("max_depth", FloatDomain(msg->max_depth));
+        obs.restrictAttribute("max_depth", float_domain(msg->max_depth));
 
       if ((msg->mask & IMC::OPL_MAX_ALT))
-        obs.restrictAttribute("max_altitude", FloatDomain(msg->max_altitude));
+        obs.restrictAttribute("max_altitude", float_domain(msg->max_altitude));
 
       if (msg->mask & IMC::OPL_MIN_ALT)
-        obs.restrictAttribute("min_altitude", FloatDomain(msg->min_altitude));
+        obs.restrictAttribute("min_altitude", float_domain(msg->min_altitude));
 
       if (msg->mask & IMC::OPL_MAX_SPEED)
-        obs.restrictAttribute("max_speed", FloatDomain(msg->max_speed));
+        obs.restrictAttribute("max_speed", float_domain(msg->max_speed));
 
       if (msg->mask & IMC::OPL_MIN_SPEED)
-        obs.restrictAttribute("min_speed", FloatDomain(msg->min_speed));
+        obs.restrictAttribute("min_speed", float_domain(msg->min_speed));
 
       InsideOpLimits::set_oplimits(msg);
 
@@ -193,16 +193,16 @@ namespace TREX
       if (age > 15)
       {
         Observation obs(system, "position");
-        obs.restrictAttribute("latitude", FloatDomain(msg->lat));
-        obs.restrictAttribute("longitude", FloatDomain(msg->lon));
-        obs.restrictAttribute("height", FloatDomain(msg->height));
+        obs.restrictAttribute("latitude", float_domain(msg->lat));
+        obs.restrictAttribute("longitude", float_domain(msg->lon));
+        obs.restrictAttribute("height", float_domain(msg->height));
         return obs;
       }
 
       Observation obs(system, "connected");
-      obs.restrictAttribute("latitude", FloatDomain(msg->lat));
-      obs.restrictAttribute("longitude", FloatDomain(msg->lon));
-      obs.restrictAttribute("height", FloatDomain(msg->height));
+      obs.restrictAttribute("latitude", float_domain(msg->lat));
+      obs.restrictAttribute("longitude", float_domain(msg->lon));
+      obs.restrictAttribute("height", float_domain(msg->height));
 
       return obs;
     }
@@ -219,27 +219,27 @@ namespace TREX
 
         if (attr->name == "start" || attr->name == "end")
         {
-          IntegerDomain::bound min = m_graph->getCurrentTick(), max =
-              IntegerDomain::plus_inf;
+          int_domain::bound
+            min_v = m_graph->getCurrentTick(), max_v = int_domain::plus_inf;
           if (!attr->min.empty())
-            min = m_graph->as_date(attr->min);
+            min_v = m_graph->as_date(attr->min);
           if (!attr->max.empty())
-            max = m_graph->as_date(attr->max);
+            max_v = m_graph->as_date(attr->max);
 
           if (attr->name == "start")
-            g.restrictStart(IntegerDomain(min, max));
+            g.restrictStart(int_domain(min_v, max_v));
           else
-            g.restrictEnd(IntegerDomain(min, max));
+            g.restrictEnd(int_domain(min_v, max_v));
         }
         else if (attr->name == "duration")
         {
-          IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
+          int_domain::bound min_v = 1, max_v = int_domain::plus_inf;
           if (!attr->min.empty())
-            min = m_graph->as_duration(attr->min);
+            min_v = m_graph->as_duration(attr->min);
           if (!attr->max.empty())
-            max = m_graph->as_duration(attr->max);
+            max_v = m_graph->as_duration(attr->max);
 
-          g.restrictDuration(IntegerDomain(min, max));
+          g.restrictDuration(int_domain(min_v, max_v));
         }
         else
           setAttribute(g, *attr);
@@ -251,59 +251,59 @@ namespace TREX
     void
     ImcAdapter::setAttribute(Predicate &pred, TrexAttribute const &attr)
     {
-      IntegerDomain::bound min_i, max_i;
-      FloatDomain::bound min_f, max_f;
+      int_domain::bound min_i, max_i;
+      float_domain::bound min_f, max_f;
       //MessageList<TrexAttribute>::const_iterator it;
-      std::string min = attr.min;
-      std::string max = attr.max;
+      std::string min_v = attr.min;
+      std::string max_v = attr.max;
 
       switch (attr.attr_type)
       {
         case TrexAttribute::TYPE_STRING:
-          pred.restrictAttribute(attr.name, StringDomain(min));
+          pred.restrictAttribute(attr.name, string_domain(min_v));
           break;
 
         case TrexAttribute::TYPE_BOOL:
-          if (min == max && min != "")
+          if (min_v == max_v && min_v != "")
             pred.restrictAttribute(attr.name,
-                                   BooleanDomain(min != "false" || min != "0"));
+                                   boolean_domain(min_v != "false" || min_v != "0"));
           else
-            pred.restrictAttribute(attr.name, BooleanDomain());
+            pred.restrictAttribute(attr.name, boolean_domain());
           break;
 
         case TrexAttribute::TYPE_INT:
-          if (min == "")
-            min_i = IntegerDomain::minus_inf;
+          if (min_v == "")
+            min_i = int_domain::minus_inf;
           else
-            min_i = strtoll(max.c_str(), NULL, 10);
+            min_i = strtoll(min_v.c_str(), NULL, 10);
 
-          if (max == "")
-            max_i = IntegerDomain::plus_inf;
+          if (max_v == "")
+            max_i = int_domain::plus_inf;
           else
-            max_i = strtoll(max.c_str(), NULL, 10);
+            max_i = strtoll(max_v.c_str(), NULL, 10);
 
-          pred.restrictAttribute(attr.name, IntegerDomain(min_i, max_i));
+          pred.restrictAttribute(attr.name, int_domain(min_i, max_i));
           break;
 
         case TrexAttribute::TYPE_FLOAT:
-          if (min == "")
-            min_f = FloatDomain::minus_inf;
+          if (min_v == "")
+            min_f = float_domain::minus_inf;
           else
-            min_f = strtod(min.c_str(), NULL);
+            min_f = strtod(min_v.c_str(), NULL);
 
-          if (max == "")
-            max_f = FloatDomain::plus_inf;
+          if (max_v == "")
+            max_f = float_domain::plus_inf;
           else
-            max_f = strtod(max.c_str(), NULL);
+            max_f = strtod(max_v.c_str(), NULL);
 
-          pred.restrictAttribute(attr.name, FloatDomain(min_f, max_f));
+          pred.restrictAttribute(attr.name, float_domain(min_f, max_f));
           break;
 
         case TrexAttribute::TYPE_ENUM:
-          if (min == "" || max == "")
-            pred.restrictAttribute(attr.name, EnumDomain());
+          if (min_v == "" || max_v == "")
+            pred.restrictAttribute(attr.name, enum_domain());
           else
-            pred.restrictAttribute(attr.name, EnumDomain(min));
+            pred.restrictAttribute(attr.name, enum_domain(min_v));
           break;
 
         default:
@@ -486,30 +486,30 @@ namespace TREX
     void
     ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
     {
-      symbol t = v.domain().getTypeName();
+      symbol t = v.domain().type_name();
       attr->name = v.name().str();
 
       if (attr->name == "start" || attr->name == "end")
       {
         attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
-        if (id.isSingleton())
+        int_domain const &id =
+            dynamic_cast<int_domain const &>(v.domain());
+        if (id.is_singleton())
         {
-          std::string s = date_export(*m_graph, id.lowerBound().value());
+          std::string s = date_export(*m_graph, id.lower_bound().value());
           attr->min = s;
           attr->max = s;
         }
         else
         {
-          if (id.hasUpper())
+          if (id.has_upper())
           {
-            std::string s = date_export(*m_graph, id.upperBound().value());
+            std::string s = date_export(*m_graph, id.upper_bound().value());
             attr->max = s;
           }
-          if (id.hasLower())
+          if (id.has_lower())
           {
-            std::string s = date_export(*m_graph, id.lowerBound().value());
+            std::string s = date_export(*m_graph, id.lower_bound().value());
             attr->min = s;
           }
         }
@@ -518,26 +518,26 @@ namespace TREX
       else if (attr->name == "duration")
       {
         attr->attr_type = TrexAttribute::TYPE_STRING;
-        IntegerDomain const &id =
-            dynamic_cast<IntegerDomain const &>(v.domain());
-        if (id.isSingleton())
+        int_domain const &id =
+            dynamic_cast<int_domain const &>(v.domain());
+        if (id.is_singleton())
         {
-          std::string s = duration_export(*m_graph, id.lowerBound().value());
+          std::string s = duration_export(*m_graph, id.lower_bound().value());
           attr->min = s;
           attr->max = s;
         }
         else
         {
-          if (id.hasUpper())
+          if (id.has_upper())
           {
             std::string s = duration_export(*m_graph,
-                                            id.upperBound().value() + 1);
+                                            id.upper_bound().value() + 1);
             attr->max = s;
           }
-          if (id.hasLower())
+          if (id.has_lower())
           {
             std::string s = duration_export(*m_graph,
-                                            id.lowerBound().value() - 1);
+                                            id.lower_bound().value() - 1);
             attr->min = s;
           }
         }
@@ -564,10 +564,10 @@ namespace TREX
         attr->attr_type = TrexAttribute::TYPE_ENUM;
       }
 
-      if (v.domain().isSingleton())
+      if (v.domain().is_singleton())
       {
-        attr->max = v.domain().getStringSingleton();
-        attr->min = v.domain().getStringSingleton();
+        attr->max = v.domain().get_singleton_as_string();
+        attr->min = v.domain().get_singleton_as_string();
       }
       else
       { // if (v.domain().isFull()) {

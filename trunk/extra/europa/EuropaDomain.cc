@@ -49,7 +49,7 @@ using TREX::utils::symbol;
 
 // statics 
 
-symbol const EuropaEntity::type_name("europa_object");
+symbol const EuropaEntity::type_str("europa_object");
 
 /*
  * class TREX::europa::details::EuropaDomain
@@ -57,7 +57,7 @@ symbol const EuropaEntity::type_name("europa_object");
 
 // statics 
 
-symbol const details::EuropaDomain::type_name("europa_domain");
+symbol const details::EuropaDomain::type_str("europa_domain");
 
 EUROPA::Domain *details::EuropaDomain::safe_copy(EUROPA::Domain *dom) {
   if( NULL!=dom ) 
@@ -68,10 +68,10 @@ EUROPA::Domain *details::EuropaDomain::safe_copy(EUROPA::Domain *dom) {
 // structors
 
 details::EuropaDomain::EuropaDomain(EUROPA::Domain const &dom)
-  :tr::DomainBase(type_name), m_dom(dom.copy()) {}
+  :tr::abstract_domain(type_str), m_dom(dom.copy()) {}
 
 details::EuropaDomain::EuropaDomain(EuropaDomain const &other)
-  :tr::DomainBase(type_name), m_dom(safe_copy(other.m_dom)) {}
+  :tr::abstract_domain(type_str), m_dom(safe_copy(other.m_dom)) {}
 
 details::EuropaDomain::~EuropaDomain() {
   if( NULL!=m_dom )
@@ -80,12 +80,12 @@ details::EuropaDomain::~EuropaDomain() {
 
 // observers
 
-bool details::EuropaDomain::isFull() const {
+bool details::EuropaDomain::is_full() const {
   EUROPA::DataTypeId const &type = europaDomain().getDataType();
   return type->baseDomain()==europaDomain();
 }
 
-bool details::EuropaDomain::intersect(DomainBase const &other) const {
+bool details::EuropaDomain::intersect(abstract_domain const &other) const {
   try {  // this try/catch is not very efficient ... should find a way to avoid this
     europa_domain visit(europaDomain().getDataType());
     other.accept(visit);
@@ -96,7 +96,7 @@ bool details::EuropaDomain::intersect(DomainBase const &other) const {
   }
 }
 
-bool details::EuropaDomain::equals(DomainBase const &other) const {
+bool details::EuropaDomain::equals(abstract_domain const &other) const {
   try { // this try/catch is not very efficient ... should find a way to avoid this
     europa_domain visit(europaDomain().getDataType());
     other.accept(visit);
@@ -110,18 +110,18 @@ bool details::EuropaDomain::equals(DomainBase const &other) const {
 boost::any details::EuropaDomain::singleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
-  return tmp->getSingleton();
+  UNIQ_PTR<tr::abstract_domain> tmp(copy());
+  return tmp->get_singleton();
 }
 
-std::string details::EuropaDomain::stringSingleton() const {
+std::string details::EuropaDomain::string_singleton() const {
   // copy shoud not be too costful as I should have already checked
   // that the domain is a singleton
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
-  return tmp->getStringSingleton();
+  UNIQ_PTR<tr::abstract_domain> tmp(copy());
+  return tmp->get_singleton_as_string();
 }
 
-tr::DomainBase *details::EuropaDomain::copy() const {
+tr::abstract_domain *details::EuropaDomain::copy() const {
   // copy implies a conversion to a real TREX representation
   // this can be costfull but at least won't happen until explicitely
   // copy the domain
@@ -129,7 +129,7 @@ tr::DomainBase *details::EuropaDomain::copy() const {
 }
 
 boost::property_tree::ptree details::EuropaDomain::build_tree() const {
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  UNIQ_PTR<tr::abstract_domain> tmp(copy());
   return tmp->build_tree();
 }
 
@@ -144,13 +144,13 @@ boost::property_tree::ptree details::EuropaDomain::build_tree() const {
 std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
   // this copy is costfiull and we may want to avoid this
   // (so we see that the output is from europa)
-  UNIQ_PTR<tr::DomainBase> tmp(copy());
+  UNIQ_PTR<tr::abstract_domain> tmp(copy());
   return out<<(*tmp);
 }
 
 // modifiers 
 
-tr::DomainBase &details::EuropaDomain::restrictWith(tr::DomainBase const &other) {
+tr::abstract_domain &details::EuropaDomain::restrict_with(tr::abstract_domain const &other) {
   europa_domain visit(m_dom);
   other.accept(visit);
   return *this;
@@ -161,6 +161,6 @@ tr::DomainBase &details::EuropaDomain::restrictWith(tr::DomainBase const &other)
 namespace {
 
   // declare EuropaEntity domain
-  tr::DomainBase::xml_factory::declare<EuropaEntity> decl(EuropaEntity::type_name);
+  tr::abstract_domain::factory::declare<EuropaEntity> decl(EuropaEntity::type_str);
 
 } // ::

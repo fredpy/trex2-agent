@@ -52,9 +52,9 @@
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/log_manager.hh>
 
-#include <trex/domain/FloatDomain.hh>
-#include <trex/domain/EnumDomain.hh>
-#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/boolean_domain.hh>
+#include <trex/domain/float_domain.hh>
+#include <trex/domain/enum_domain.hh>
 
 #include "LightSwitch.hh"
 
@@ -134,7 +134,7 @@ void Light::setValue(bool val) {
   //syslog()<<"Posting "<<*m_light_state;
   postObservation(*m_light_state);
   Observation switch_state(switchObj, switch_v);
-  switch_state.restrictAttribute("foo", BooleanDomain(m_on));
+  switch_state.restrictAttribute("foo", boolean_domain(m_on));
   //syslog()<<"Posting "<<switch_state;
   postObservation(switch_state);
 } 
@@ -171,7 +171,7 @@ bool Light::synchronize() {
 //              syslog()<<"Posting "<<obs<<" as an observation";
 	      postObservation(obs);
 	    }
-	    m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
+	    m_nextSwitch = cur+m_pending.front()->getDuration().lower_bound().value();
 	    m_pending.pop_front();
 	  } // else {
 //            syslog()<<"This goal is still in the future ("<<m_pending.front()->getStart()
@@ -201,8 +201,8 @@ bool Light::synchronize() {
 void Light::handleRequest(goal_id const &g) {
   if( g->predicate()==upPred || g->predicate()==downPred || g->predicate()==brokenPred ) {
     // I insert it on my list
-    IntegerDomain::bound lo = g->getStart().lowerBound();
-    if( lo.isInfinity() ) {
+    int_domain::bound lo = g->getStart().lower_bound();
+    if( lo.is_infinity() ) {
 //      syslog()<<"Adding "<<*g<<" to front of pending goals";
       m_pending.push_front(g);
     } else {
