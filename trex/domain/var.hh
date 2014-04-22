@@ -268,10 +268,6 @@ namespace TREX {
       }
 
       boost::property_tree::ptree as_tree() const;
-
-	
-      friend class Predicate;
-      
    }; // class TREX::transaction::var
       
   std::ostream &operator<<(std::ostream &out, var const &v);
