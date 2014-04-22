@@ -77,7 +77,7 @@ namespace TREX {
       /** @brief Destructor */
       ~boolean_domain() {}
 
-      std::ostream &toXml(std::ostream &out, size_t tabs) const;
+//      std::ostream &toXml(std::ostream &out, size_t tabs) const;
 
       abstract_domain *copy() const {
 	return new boolean_domain(*this);
@@ -100,6 +100,7 @@ namespace TREX {
       abstract_domain &restrict_with(abstract_domain const &other);
 
     private:
+      boost::property_tree::ptree build_tree() const;
       boost::any get_lower() const {
 	return m_full?false:m_val;
       }

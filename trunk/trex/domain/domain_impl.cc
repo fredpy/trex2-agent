@@ -166,16 +166,13 @@ std::ostream &boolean_domain::print_upper(std::ostream &out) const {
 }
 
 
-//std::ostream &BooleanDomain::toXml(std::ostream &out,
-//				   size_t tabs) const {
-//    std::fill_n(std::ostream_iterator<char>(out), tabs, ' ');
-//    out<<"<bool";
-//    if( !m_full )
-//        out<<" value=\""<<m_val<<'\"';
-//    out<<"/>";
-//    return out;
-//}
-
+boost::property_tree::ptree boolean_domain::build_tree() const {
+  boost::property_tree::ptree info;
+  
+  if( !m_full )
+    set_attr(info, "value", m_val);
+  return info;
+}
 
 bool boolean_domain::intersect(abstract_domain const &other) const {
   if( other.type_name()!=type_name() )

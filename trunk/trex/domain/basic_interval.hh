@@ -127,9 +127,10 @@ namespace TREX {
       virtual std::ostream &print_lower(std::ostream &out) const =0;
       virtual std::ostream &print_upper(std::ostream &out) const =0;
       
-    private:
-      boost::property_tree::ptree build_tree() const;
+    protected:
+      virtual boost::property_tree::ptree build_tree() const;
 
+    private:
       
       void accept(domain_visitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
