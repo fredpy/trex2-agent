@@ -38,7 +38,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "XmlUtils.hh"
+#include "xml_utils.hh"
 
 using namespace TREX::utils;
 namespace xml = boost::property_tree::xml_parser;

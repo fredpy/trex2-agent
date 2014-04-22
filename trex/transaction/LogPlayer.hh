@@ -59,7 +59,7 @@ namespace TREX {
 	 * The factory used to generate transactions vents from a log 
 	 * file.
 	 */
-	typedef utils::XmlFactory<tr_event, SHARED_PTR<tr_event>,
+	typedef utils::xml_factory<tr_event, SHARED_PTR<tr_event>,
 				  LogPlayer *> factory;
 
 	/** @brief Constructor 

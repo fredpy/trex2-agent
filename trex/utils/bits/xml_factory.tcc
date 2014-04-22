@@ -45,8 +45,8 @@
 # ifndef DOXYGEN
 
 template<class Product, class Output, class Arg>
-Output XmlFactory<Product, Output, Arg>::produce
-(typename XmlFactory<Product, Output, Arg>::argument_type arg) {
+Output xml_factory<Product, Output, Arg>::produce
+(typename xml_factory<Product, Output, Arg>::argument_type arg) {
   tree_t::value_type &node = arg_traits::xml(arg);
   symbol id(node.first);
 
@@ -55,8 +55,8 @@ Output XmlFactory<Product, Output, Arg>::produce
 
 template<class Product, class Output, class Arg>
 template<class Iter>
-bool XmlFactory<Product, Output, Arg>::iter_produce
-(typename XmlFactory<Product, Output, Arg>::template iter_traits<Iter>::type it, 
+bool xml_factory<Product, Output, Arg>::iter_produce
+(typename xml_factory<Product, Output, Arg>::template iter_traits<Iter>::type it,
  Iter const &last,
  Output &ret) {
   Iter &i = iter_traits<Iter>::xml(it);

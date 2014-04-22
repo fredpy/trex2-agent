@@ -53,6 +53,7 @@
 
 # include "singleton.hh"
 # include "platform/cpp11_deleted.hh"
+# include "Exception.hh"
 
 namespace TREX {
   namespace utils {
@@ -93,7 +94,7 @@ namespace TREX {
       typedef AbstractProduct product_type;
       typedef ProductRef      returned_type;
 			
-      void getIds(std::list<Id> &ids) const;
+      void get_ids(std::list<Id> &ids) const;
       
       class producer: boost::noncopyable {
       public:

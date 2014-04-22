@@ -179,7 +179,7 @@ namespace TREX {
       virtual std::string duration_str(TREX::transaction::TICK dur) const;
 
       /** @brief XML factory for clocks. */
-      typedef TREX::utils::XmlFactory<Clock, SHARED_PTR<Clock> > xml_factory;
+      typedef TREX::utils::xml_factory<Clock, SHARED_PTR<Clock> > xml_factory;
       
       /** @brief Clock basic information 
        *

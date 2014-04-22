@@ -52,7 +52,7 @@
 
 # include <boost/any.hpp>
 
-# include <trex/utils/XmlFactory.hh>
+# include <trex/utils/xml_factory.hh>
 # include <trex/utils/ptree_io.hh>
 # include <trex/utils/platform/cpp11_deleted.hh>
 
@@ -414,8 +414,8 @@ namespace TREX {
        * This type defines the factory that should be manipulated
        * for parsing domains from xml.
        */
-      typedef TREX::utils::XmlFactory<DomainBase, 
-				      SHARED_PTR<DomainBase> > xml_factory;
+      typedef TREX::utils::xml_factory<DomainBase,
+                                       SHARED_PTR<DomainBase> > xml_factory;
       virtual boost::property_tree::ptree build_tree() const=0;
 
     protected:

@@ -35,7 +35,7 @@
 #include "trex/europa/EuropaPlugin.hh"
 #include "trex/europa/Assembly.hh"
 
-#include <trex/utils/XmlUtils.hh>
+#include <trex/utils/xml_utils.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/Debug.hh>

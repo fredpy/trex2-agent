@@ -75,7 +75,7 @@ void generic_factory<P, I, C, R, O>::remove
 }
 
 template<class P, class I, class C, class R, class O>
-void generic_factory<P, I, C, R, O>::getIds(std::list<I> &ids) const {
+void generic_factory<P, I, C, R, O>::get_ids(std::list<I> &ids) const {
     typename generic_factory<P, I, C, R, O>::catalog_type::const_iterator
     i = m_producers.begin();
     for( ; m_producers.end()!=i; ++i)

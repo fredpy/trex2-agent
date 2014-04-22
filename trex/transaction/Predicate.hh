@@ -323,7 +323,7 @@ namespace TREX {
        * This defines a factory that allows to parse Predicate classes
        * from XML.
        */
-      typedef TREX::utils::XmlFactory< Predicate, 
+      typedef TREX::utils::xml_factory< Predicate, 
 				       SHARED_PTR<Predicate> > xml_factory;
 
       /** @brief Check for predicate compatibility
