@@ -776,10 +776,10 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  log_manager::path_type graph_dot = manager().file_name("reactors.gv");
+  log_manager::path_type graph_dot = manager().log_file("reactors.gv");
   async_ofstream dotf(manager().service(), graph_dot.string());
   
-  m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
+  m_stat_log.open(manager().log_file("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
     " delib_ns, delib_rt_ns, delib_steps,"
   " planned_sleep, sleep_cnt, sleep_ns\n";
@@ -876,7 +876,7 @@ void Agent::synchronize() {
     std::ostringstream name;
     name<<"reactors."<<now<<".gv";
     
-    log_manager::path_type graph_dot = manager().file_name(name.str());
+    log_manager::path_type graph_dot = manager().log_file(name.str());
     async_ofstream dotf(manager().service(), graph_dot.string());
     
     {

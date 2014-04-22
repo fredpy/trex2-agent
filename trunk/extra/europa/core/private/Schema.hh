@@ -77,7 +77,7 @@ namespace TREX {
           return m_log->service();
         }
         std::string file_name(std::string const &path) {
-          return m_log->file_name(path).string();
+          return m_log->log_file(path).string();
         }
 	void setStream(std::ostream &out);
 	

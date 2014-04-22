@@ -81,7 +81,7 @@ std::string ControlInterface::fifo_name() const {
   // file name is <agent>.<reactor>.in
   oss<<getAgentName()<<'.'<<getName()<<".in";
   // Position the file into our log directory
-  return manager().file_name(oss.str()).string();
+  return manager().log_file(oss.str()).string();
 }
 
 bool ControlInterface::is_running() const {

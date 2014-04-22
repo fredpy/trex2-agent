@@ -115,7 +115,7 @@
  * should be done before giving up and generating an error.
  * 
  * @note This value @b do @b not mean that TREX can only execute up to 
- *       @c MAX_LOG_ATTEMPT missions in a single day. Ifndeed if one look 
+ *       @c MAX_LOG_ATTEMPT missions in a single day. Indeed if one look
  *       at the code of LogManager::createLatest he will see that it makes this 
  *       number of attempt stariung from the directory referred by @c LATEST_DIR
  *       link. Such behavior should really happen if the symbolic link 
@@ -128,34 +128,210 @@
 
 namespace TREX {
   namespace utils {
+
     namespace details {
+      /** @brief log_manager implementation details
+       *
+       * This class impelement most of the main functionalities of 
+       * log_manager class. Its interface and implementation are 
+       * hidden from the rest of the API so any modification at 
+       * implementation level has a  limited impact on other components 
+       * using log_manager
+       *
+       * @relates TREX::utils::log_manager
+       * @author Frederic Py <fredpy@gmail.com>
+       */
       class mgmt_impl;
-    }
+    } // TREX::utils::details
     
     
+    /** @brief Logging and file access management for trex
+     *
+     * This class is a gloabl utility for trex components in order 
+     * to log information and access files. It provides ways to produce 
+     * log messages with atomic write (avoiding messages intertwined due
+     * to multithread access); access to any log messsages as they are 
+     * provided; management and stroage of all the log files within a 
+     * single directory; localisation of files using TREX_PATH 
+     * environement variable. 
+     *
+     * In addition this class manages the shared asio threads used 
+     * within trex. It creates an io service which is executed within 
+     * a thread pool, clients of this class can uses this class to have 
+     * access to this ioservice and manage the number of threads that 
+     * are executing this service
+     *
+     * @ingroup utils
+     * @author Frederic Py <fredpy@gmail.com>
+     */
     class log_manager :boost::noncopyable {
     public:
+      /** @brief File path type
+       *
+       * The type used to represent a file path. The path is 
+       * system agnostic which means that it should work on both 
+       * posix and windows naming conventions.
+       */
       typedef boost::filesystem::path path_type;
 
+      /** @brief Log directory path
+       *
+       * This function gives the directory path where log_manager 
+       * will store all the log files. If the directory was not 
+       * set yet, it will both identify the correct path and create it.
+       *
+       * @throw SYSTEM_ERROR failed to create the log path
+       * @return The target log directory
+       * @post The log directory path returned is valid directory
+       * @post log_manager log directory is inited
+       */
       path_type log_path();
+      /** @brief Set log directory path
+       *
+       * @param[in] path A directory name
+       *
+       * Set the log directory to path if it has not been set already.
+       *
+       * @pre log directory has not been inited yet
+       *
+       * @retval true if the operation succeeded
+       * @retval false if the log directory has already been inited 
+       *
+       * @note this function do not check for the validity of its argument. 
+       * The checking of the directory is made during the initalisation of 
+       * the log_directory whcih is triggered by log_path() or nay other 
+       * call that will trigger the creation of the log directory 
+       * (such as log_file, cfg_path or syslog)
+       *
+       * @sa path_type log_path()
+       */
       bool log_path(std::string const &path);
       
+      /** @brief File path for a log file 
+       *
+       * @param[in] short_name A short file name
+       *
+       * Give thefull path for a file named @p short_name to be created in 
+       * the log directory.  If @p short_name include a parent_path (for 
+       * example "cfg/bar/foo") this call will also create the corresponding
+       * directory structure in the log path (in that case it will create 
+       * the directory cfg/bar). 
+       * This method calls log_path() in order to identify the log directory.
+       *
+       * @throw SYSTEM_ERROR failed to create log directory or one of the
+       * parent directories of @p short_name within th elog_directory. 
+       *
+       * @return The full path for @p short_name in the log directory
+       *
+       * @post log_manager log directory is inited
+       * @post all the parent directories of @p file_name have been 
+       * properly created within the log_directory
+       */
       path_type log_file(std::string const &short_name);
-      // deprecated
-      path_type file_name(std::string const &short_name) {
-        return log_file(short_name);
-      }
       
+      /** @brief Add directory to search path
+       *
+       * @param path A directory path
+       *
+       * Add @p path to the directories the log_manager will uses to 
+       * locate files. @p poath can be absolute or relative (in which 
+       * case this path will be searched relatively to the directory
+       * where the program is currently running)
+       *
+       * @retval true if @p path has been succesfully added to the search path
+       * @retval false if the path is not valid (ie not a directory)
+       *
+       * @post if the value returned is true then @path is now part of 
+       * the search directory. 
+       *
+       * @note paths added through this called are appended at the end 
+       * of the search list
+       *
+       * @sa search_path
+       * @sa locate
+       */
       bool add_search_path(std::string const &path);
+      /** @brief search path
+       *
+       * Gives the gloabl search path the manager uses to locate files. 
+       * 
+       * @return A string gving all the paths used for locating files 
+       * separated by columns
+       *
+       * @sa add_search_path
+       * @sa locate
+       */
       std::string search_path();
 
+      /** @brief log directory for configuration files
+       *
+       * This methods give the target directory were all the configuration 
+       * files used by trex can be stored. 
+       *
+       * This method is just a conveninence function and is requivalent to 
+       * log_file("cfg")
+       *
+       * @return A path where all configurations files can be logged.
+       * 
+       * @sa log_file
+       */
       path_type cfg_path() {
         return log_file("cfg");
       }
+      /** @brief locate an existing file
+       *
+       * @param[in]  file_name  A file name
+       * @param[out] found      success flag
+       *
+       * Try to locate @p file_name in the serahc path. The way log_manage 
+       * locates a file is as follow:
+       * @li check if @p file_name exists as is
+       * @li if the above failed and @p file_name is not absolute check
+       *  if this file exists on any directory in the search path
+       * @note In order to consider the file as located it neeeds to be a
+       * regular file oar a link to a regulare file (ie not a directory)
+       *
+       * @return if @p found is true then it returns a valid path 
+       * for @p file_name otherswise it just retrun @p file_name
+       * 
+       * @sa search_path
+       * @sa use
+       */
       path_type locate(std::string const &file_name, bool &found);
+      /** brief locate and log a file
+       *
+       * @param[in]  file_name  A file name
+       * @param[out] found      success flag
+       *
+       * This function behaves similarly to @p locate except that in
+       * addition it will copy @p file_name into the log config 
+       * directory if @p file_name was located
+       *
+       * @return if @p found is true then it returns a valid path
+       * for @p file_name otherwise it just retrun @p file_name
+       *
+       * @post if found is truen then @p file_name has now a loca copy 
+       * under cfg_path()
+       *
+       * @sa locate
+       * @sa cfg_path
+       */
       path_type use(std::string const &file_name, bool &found);
 
       // TREX log
+      /** @{
+       * @brief Create a new log entry
+       *
+       * @param[in] when An optional time tag
+       * @param[in] who  An optional specifier for the source of the message
+       * @param[in] kind An optional specifier for the type of message
+       *
+       * Create a new log entry to be logged in the main TREX.log file. 
+       *
+       * @return The log entry that will recieve the message to be logged
+       *
+       * @sa TREX::utils::log::text_log
+       */
       log::text_log &syslog();
       log::stream syslog(log::id_type const &who,
                          log::id_type const &kind=log::null) {
@@ -166,6 +342,11 @@ namespace TREX {
                          log::id_type const &kind=log::null) {
         return syslog()(when, who, kind);
       }
+      /** @} */
+      /** @brief Flush TREX.log
+       *
+       * Force the buffer of TREX.log file to be flushed into the file
+       */
       void flush();
       
       template<typename Handler>
@@ -182,8 +363,44 @@ namespace TREX {
         return syslog().direct_connect(fn);
       }
       
+      /** @brief Number of threads
+       *
+       * Indicate the number of thread managed by the pool of this log_manager.
+       * All these threads are tied to the log_manager asio service
+       *
+       * @return the number of threads within the pool
+       *
+       * @sa thread_count(size_t, bool)
+       * @sa service()
+       */
       size_t thread_count() const;
+      /** @brief Set thread_count
+       *
+       * @param[in] n minimum number of thread desired
+       * @param[in] override_hw should we override the number of ahrdware threads ?
+       *
+       * Set the number of threads in the pool to at least @p n unless @p n 
+       * is greater than the number of hardware threads and @p override_hw 
+       * is @c false (the default). All these threads ewill then be attached 
+       * to this log_manager asio service
+       *
+       * @return the number of thread in this pool after the operation
+       *
+       * @sa service()
+       */
       size_t thread_count(size_t n, bool override_hw=false);
+      /** @brief log_manager asio service
+       *
+       * The service this log_manager uses in all of its threads in order 
+       * to execute asynchronous operations. The servie is boost asio 
+       * io_service and can be used by any client to post asynchronous
+       * operations that will then be executed within the thread_pool 
+       * this class manages
+       *
+       * @return the io_service for this manager
+       *
+       * @sa thread_count()
+       */
       boost::asio::io_service &service();
       
       
@@ -195,142 +412,6 @@ namespace TREX {
       
       friend class singleton::wrapper<log_manager>;
     };
-    
-    
-    
-    
-    
-//      size_t thread_count() const {
-//	return m_io.thread_count();
-//      }
-//      size_t thread_count(size_t n, bool override_hw=false) {
-//        return m_io.thread_count(n, override_hw);
-//      }
-//      boost::asio::io_service &service() {
-//	return m_io.service();
-//      }
-//
-//      
-//    
-//      /** @brief add a directory to the search path
-//       * @param path A directory
-//       *
-//       * This method adds @p path  to the end of the search path.
-//       * It will do so only if @p path is a valid directory or
-//       * is starting with @c '.'
-//       *
-//       * @retval true if @p path was successfully added
-//       * @retval false otherwise
-//       *
-//       * @post if the returned value is @c true @a path
-//       * is now part of the serch path
-//       *
-//       * @sa std::string locate(std::string const &file, bool &found) const
-//       */
-//      bool add_search_path(std::string const &path);
-//      
-//      /** @brief TREX_PATH iterator
-//       * 
-//       * An iterator used to go through all the path used by LogManager to 
-//       * locate a file
-//       * 
-//       * @sa locate(std::string const &,bool &) const
-//       */
-//      typedef std::list<path_type>::const_iterator path_iterator;
-//      /** @brief First path
-//       * 
-//       * @return An iterator refering to the first element of TREX_PATH
-//       * @sa setLogPath(std::string const &)
-//       * @sa end() const
-//       */
-//      path_iterator begin() const {
-//        return m_search_path.begin();
-//      }
-//      /** @brief End of searh path
-//       * 
-//       * @return An iterator refering to the ebnd of TREX_PATH
-//       * @sa setLogPath(std::string const &)
-//       * @sa begin() const
-//       */
-//      path_iterator end() const {
-//        return m_search_path.end();
-//      }
-//      
-//      /** @brief Locate a file 
-//       * @param[in] file   A file name
-//       * @param[out] found Indicator of success/failure
-//       *
-//       * This methods tries to locate @p file in the search path.
-//       * it first attempt to see if @p file exists by its own.
-//       * If it is not the case and @p file do not starts with a @c '/',
-//       * it iterates through the search path and tries to locate the file.
-//       * 
-//       * @retval @p file if @a found is @c false which indicates that it was 
-//       *         unable to locate this file
-//       * @retval A valid symbolic name for @a file if @a found is @c true
-//       *
-//       * @sa bool addSearchPath(std::string const &path)
-//       * @sa std::string use(std::string const &, bool &)
-//       */
-//      path_type locate(std::string const &file, bool &found) const;
-//      
-//      /** @brief Get directory where cfg files should be stored
-//       *
-//       * @sa use(std::string const &)
-//       */
-//      path_type cfg_path();
-//    private:
-//      /** @brief Log directory path */
-//      path_type m_path;
-//      
-//      /** @brief Initialisation flag
-//       * This flag is set to true as soon as the log manager is
-//       * fully initialized
-//       */
-//      shared_var<bool> m_inited;
-//      asio_runner  m_io;
-//            
-//      /** @brief syslog text log file */
-//      log::text_log   m_syslog;
-//      SHARED_PTR<log::out_file> m_trex_log;
-//      SHARED_PTR<log::log_pipe> m_out, m_err, m_log;
-//      
-//      /** @brief Constructor */
-//      log_manager();
-//      /** @brief Destructor */
-//      ~log_manager();
-//      
-//      /** @brief latest symbolic link creation.
-//       * 
-//       * This method creates a symbolic link with the
-//       * name given by @c LATEST_DIR that refers to the
-//       * log directory. It also manage the creation of the log
-//       * directory if this one does not exist yet.
-//       */
-//      void create_latest();
-//      
-//      /** @brief load search path from environement variables
-//       *
-//       * This method is called during initialisation and load
-//       * the default search path from environment variables.
-//       *
-//       * @sa TREX_ENV
-//       * @sa SEARCH_ENV
-//       */
-//      void load_search_path();
-//      
-//      /** @brief Search path
-//       *
-//       * This varisble is built using @c TREX_ENV and @c SEARCH_ENV
-//       * and stores the set of directories to look for when trying
-//       * to locate a file
-//       *
-//       * @sa std::string locate(std::string const &file, bool &found) const
-//       */
-//      std::list<path_type> m_search_path;
-//      
-//      friend class singleton::wrapper<log_manager>;
-//    }; // TREX::utils::log_manager
     
   } // TREX::utils 
 } // TREX

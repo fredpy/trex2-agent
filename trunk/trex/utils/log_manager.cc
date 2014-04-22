@@ -273,7 +273,7 @@ namespace TREX {
               // Note: would be better to check if this is the same file
               m_syslog(log::null, log::warn)<<"A file named \""
               <<dest.string()<<" already exists\n\t"
-              <<"I won;t't overwrite the previous file.";
+              <<"I won't overwrite the previous file.";
             } else {
               create_directories(dest.parent_path());
               strand().post(boost::bind(boost::filesystem::copy, real_loc,
