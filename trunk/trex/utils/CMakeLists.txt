@@ -64,7 +64,7 @@ add_library(TREXutils SHARED
   Pdlfcn.cc
   plugin_loader.cc
   TREXversion.cc
-  XmlUtils.cc
+  xml_utils.cc
   ptree_io.cc
   asio_runner.cc
   asio_fstream.cc
@@ -92,8 +92,8 @@ add_library(TREXutils SHARED
   symbol.hh
   basic_symbol.hh
   TREXversion.hh
-  XmlFactory.hh
-  XmlUtils.hh
+  xml_factory.hh
+  xml_utils.hh
   ptree_io.hh
   asio_runner.hh
   log/log_fwd.hh
@@ -124,7 +124,7 @@ add_library(TREXutils SHARED
   singleton/bits/use.tcc
   singleton/bits/wrapper.tcc
   bits/basic_symbol.tcc
-  bits/XmlFactory.tcc
+  bits/xml_factory.tcc
 )
 
 if(TREX_FROM_PKG)
@@ -237,7 +237,7 @@ source_group("Header\ Files\\log\\bits" FILES
 source_group("Template Files\\bits" FILES  
   bits/generic_factory.tcc
   bits/basic_symbol.tcc
-  bits/XmlFactory.tcc
+  bits/xml_factory.tcc
 )
 
 source_group("Template Files\\singleton\\bits" FILES  

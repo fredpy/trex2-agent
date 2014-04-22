@@ -174,7 +174,7 @@ namespace TREX {
        * A factory used ot produce new reactor in a graph using XML
        * input.
        */
-      typedef TREX::utils::XmlFactory<TeleoReactor, SHARED_PTR<TeleoReactor>,
+      typedef TREX::utils::xml_factory<TeleoReactor, SHARED_PTR<TeleoReactor>,
 				      graph *> xml_factory;
 
       /** @brief Reverse of a reactor graph

@@ -48,7 +48,7 @@
 # include <utility>
 # include <iostream>
 
-# include "XmlUtils.hh" 
+# include "xml_utils.hh" 
 # include "generic_factory.hh"
 # include "symbol.hh"
 
@@ -107,7 +107,7 @@ namespace TREX {
 
 
     template<class Product, class Output=Product *, class Arg=void>
-    class XmlFactory :boost::noncopyable {
+    class xml_factory :boost::noncopyable {
       typedef boost::property_tree::ptree tree_t;
 
     public:
@@ -157,7 +157,7 @@ namespace TREX {
        */
       template<class Ty>
 #ifndef DOXYGEN
-      class declare :public XmlFactory::factory_type::template declare<Ty> 
+      class declare :public xml_factory::factory_type::template declare<Ty>
 #else 
       class declare :public factory_type::declare<Ty> 
 #endif 
@@ -197,8 +197,8 @@ namespace TREX {
        *
        * Store all the currently recognized XML tags for this factory in @p ids
        */
-      void getIds(std::list<symbol> &ids) const {
-	m_factory->getIds(ids);
+      void get_ids(std::list<symbol> &ids) const {
+	m_factory->get_ids(ids);
       }
 
       /** @brief iterator based production
@@ -224,17 +224,17 @@ namespace TREX {
 			Iter const &last, Output &ret);
 
     private:
-      XmlFactory() {}
-      ~XmlFactory() {}
+      xml_factory() {}
+      ~xml_factory() {}
       
       singleton::use<factory_type> m_factory;
 
-      friend class singleton::wrapper<XmlFactory>;
+      friend class singleton::wrapper<xml_factory>;
     }; // TREX::utils::XmlFactory<>
 
 
 # define In_H_XmlFactory
-#  include "bits/XmlFactory.tcc"
+#  include "bits/xml_factory.tcc"
 # undef In_H_XmlFactory
 
   } // TREX::utils

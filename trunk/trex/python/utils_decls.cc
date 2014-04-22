@@ -33,7 +33,7 @@
  */
 #include <trex/utils/symbol.hh>
 #include <trex/utils/log_manager.hh>
-#include <trex/utils/XmlUtils.hh>
+#include <trex/utils/xml_utils.hh>
 
 #include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
