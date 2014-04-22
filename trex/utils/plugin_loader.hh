@@ -46,7 +46,6 @@
 # include <boost/unordered_map.hpp>
 
 # include "symbol.hh"
-# include "Exception.hh"
 # include "log_manager.hh"
 
 namespace TREX {
@@ -75,14 +74,14 @@ namespace TREX {
      * counting to ensure that a plug-in won't be unloaded before 
      * it is not used anymore. Indeed, to unload a plug-in one need 
      * to either :
-     * @li destroy the LogPLayer singleton
+     * @li destroy the log_player singleton
      * @li or call @c unload for this plug-in as many times as he 
      * called @c load
      *
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
      */
-    class PluginLoader :public boost::noncopyable {
+    class plugin_loader :public boost::noncopyable {
     public:
       /** @brief plug-in load method
        *
@@ -104,10 +103,8 @@ namespace TREX {
        * This operation is guaranteed to be called only if the 
        * plug-in @p name is not currently loaded
        *
-       * @throw PluginError Problem while trying to load the 
+       * @throw SYSTEM_ERROR Problem while trying to load the
        *     plug-in @p name
-       * @throw Exception Unable to locate the library for 
-       *     @p name and @p fail_on _locate was @c true
        *
        * @retval true if the plug-in was successfully loaded 
        * @retval false if we failed to cloate @p name and 
@@ -122,7 +119,7 @@ namespace TREX {
        * If this method is called as many time as @c load for 
        * @p name. It will then unload this plug-in
        *
-       * @throw PluginError unable to unload the plug-in @a name
+       * @throw SYSTEM_ERROR unable to unload the plug-in @a name
        *
        * @retval true The plug-in was unloaded
        * @retval false the plug-in was not unloaded. It can be
@@ -133,7 +130,7 @@ namespace TREX {
       
     private:
       /** @brief Constructor */
-      PluginLoader() {}
+      plugin_loader() {}
       /** @brief Destructor
        *
        * @note this destructor is @b not unloading the plug-ins 
@@ -141,7 +138,7 @@ namespace TREX {
        *   one critical plug-in is unloaded before its code is 
        *   still needed.
        */
-      ~PluginLoader();
+      ~plugin_loader();
 			
       /** @brief Loaded plug-in storage type
        * 
@@ -169,36 +166,9 @@ namespace TREX {
        */ 
       singleton::use<log_manager> m_log;
       
-      friend class singleton::wrapper<PluginLoader>;
+      friend class singleton::wrapper<plugin_loader>;
     }; // class TREX::utils::PluginLoader
 		
-    /** @brief Plugin management related error
-     *
-     * This exception is thrown by PluginLoader when a plug-in 
-     * related problem occurs.
-     *
-     * @relates Pluginloader
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup utils
-     */
-    class PluginError :public Exception {
-    public:
-      /** @brief Destructor */
-      ~PluginError() throw() {}
-    private:
-      /** @brief Constructor
-       * 
-       * @param[in] name A plug-in symbolic name
-       * @param[in] msg  An error message
-       * 
-       * Creates an exception associated to the plug-in @p name 
-       * with the error @p msg
-       */
-      PluginError(symbol const &name,
-                  std::string const &msg) throw();
-			
-      friend class PluginLoader;
-    }; // class TREX::utils::PluginError
 		
   } // TREX::utils 
 } // TREX
