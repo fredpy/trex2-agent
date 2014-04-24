@@ -16,28 +16,28 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::xml_factory::declare<TimelineProxy> decl("TimelineProxy");
+  reactor::factory::declare<TimelineProxy> decl("TimelineProxy");
 
 }
 
 TimelineProxy::TimelineProxy(reactor::xml_arg_type arg)
 :reactor(arg)
 {
-  m_destport = parse_attr<int>(6001, reactor::xml_factory::node(arg),
+  m_destport = parse_attr<int>(6001, reactor::factory::node(arg),
                                "destport");
   m_destaddr = parse_attr<std::string>("127.0.0.1",
-                                       reactor::xml_factory::node(arg),
+                                       reactor::factory::node(arg),
                                        "destaddr");
-  m_localport = parse_attr<int>(6006, reactor::xml_factory::node(arg),
+  m_localport = parse_attr<int>(6006, reactor::factory::node(arg),
                                 "localport");
 
-  m_goalProxy = parse_attr<bool>(true, reactor::xml_factory::node(arg),
+  m_goalProxy = parse_attr<bool>(true, reactor::factory::node(arg),
                                  "goal_forwarding");
 
-  m_timeline = parse_attr<std::string>("", reactor::xml_factory::node(arg),
+  m_timeline = parse_attr<std::string>("", reactor::factory::node(arg),
                                        "timeline");
 
-  m_useIridium = parse_attr<bool>(false, reactor::xml_factory::node(arg),
+  m_useIridium = parse_attr<bool>(false, reactor::factory::node(arg),
                                         "iridium");
 }
 

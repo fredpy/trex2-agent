@@ -220,7 +220,7 @@ namespace TREX
         if (attr->name == "start" || attr->name == "end")
         {
           int_domain::bound
-            min_v = m_graph->getCurrentTick(), max_v = int_domain::plus_inf;
+            min_v = m_graph->current_tick(), max_v = int_domain::plus_inf;
           if (!attr->min.empty())
             min_v = m_graph->as_date(attr->min);
           if (!attr->max.empty())

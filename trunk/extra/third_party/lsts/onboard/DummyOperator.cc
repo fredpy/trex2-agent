@@ -15,7 +15,7 @@ namespace
 {
 
   /** @brief DummyOperator reactor declaration */
-  reactor::xml_factory::declare<DummyOperator> decl("DummyOperator");
+  reactor::factory::declare<DummyOperator> decl("DummyOperator");
 
 }
 

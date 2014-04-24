@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
+  reactor::factory::declare<TimelineReporter> decl("TimelineReporter");
 
 }
 
@@ -32,13 +32,13 @@ namespace TREX {
 TimelineReporter::TimelineReporter(reactor::xml_arg_type arg)
 :reactor(arg), graph::timelines_listener(arg), aborted(false)
 {
-  m_hostport = parse_attr<int>(-1, reactor::xml_factory::node(arg),
+  m_hostport = parse_attr<int>(-1, reactor::factory::node(arg),
                                "hostport");
   m_hostaddr = parse_attr<std::string>("127.0.0.1",
-                                       reactor::xml_factory::node(arg),
+                                       reactor::factory::node(arg),
                                        "hostaddr");
   m_output = parse_attr<bool>(false,
-                              reactor::xml_factory::node(arg),
+                              reactor::factory::node(arg),
                               "output");
 }
 

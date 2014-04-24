@@ -16,7 +16,7 @@ namespace
 {
 
 	/** @brief SafetyBug reactor declaration */
-	reactor::xml_factory::declare<SafetyBug> decl("SafetyBug");
+	reactor::factory::declare<SafetyBug> decl("SafetyBug");
 
 }
 

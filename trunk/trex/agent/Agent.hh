@@ -355,14 +355,14 @@ namespace TREX {
        */
       size_t sendRequests(boost::property_tree::ptree &g);
 
-      duration_type tickDuration() const {
+      duration_type tick_duration() const {
 	return m_clock->tickDuration();
       }
       
-      TREX::transaction::TICK timeToTick(date_type const &date) const {
+      TREX::transaction::TICK time_to_tick(date_type const &date) const {
 	return m_clock->timeToTick(date);
       }
-      date_type tickToTime(TREX::transaction::TICK cur) const {
+      date_type tick_to_time(TREX::transaction::TICK cur) const {
 	return m_clock->tickToTime(cur);
       }
       std::string date_str(TREX::transaction::TICK cur) const {
@@ -372,7 +372,7 @@ namespace TREX {
         return m_clock->duration_str(dur);
       }
       
-      transaction::TICK finalTick() const {
+      transaction::TICK final_tick() const {
         return m_finalTick;
       }
 
@@ -524,7 +524,7 @@ namespace TREX {
        */
       void loadConf(std::string const &file_name);
 
-      static TREX::transaction::TICK initialTick(clock_ref clk);
+      static TREX::transaction::TICK initial_tick(clock_ref clk);
 
       typedef TREX::transaction::reactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;

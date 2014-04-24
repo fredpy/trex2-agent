@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
 
   /** @brief Platform reactor declaration */
-  reactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
+  reactor::factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
 
 }
 

@@ -72,20 +72,20 @@ namespace {
 
 EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
   :reactor(arg, false),
-   Assembly(parse_attr<std::string>(xml_factory::node(arg), "name"),
-            parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
-            parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
+   Assembly(parse_attr<std::string>(factory::node(arg), "name"),
+            parse_attr<size_t>(0, factory::node(arg), "maxSteps"),
+            parse_attr<size_t>(0, factory::node(arg), "maxDepth")),
    m_completed_this_tick(false),
    m_stats(manager().service()),
-   m_old_plan_style(parse_attr<bool>(true, xml_factory::node(arg),
+   m_old_plan_style(parse_attr<bool>(true, factory::node(arg),
                                   "relation_gv")),
-   m_full_log(parse_attr<bool>(false, xml_factory::node(arg),
+   m_full_log(parse_attr<bool>(false, factory::node(arg),
 			       "all_plans")) {
   bool found;
   std::string nddl;
 
 
-  boost::property_tree::ptree::value_type &cfg = xml_factory::node(arg);
+  boost::property_tree::ptree::value_type &cfg = factory::node(arg);
   boost::optional<std::string>
     model = parse_attr< boost::optional<std::string> >(cfg, "model");
 
@@ -316,7 +316,7 @@ void EuropaReactor::handle_init() {
     
     syslog(info)<<"Restricting reactor final tick to Europa's "
       "largest finite integer.";
-    setMaxTick(max_int);
+    set_max_tick(max_int);
     init_clock_vars();
   }
 }

@@ -39,8 +39,8 @@ namespace TREX {
     template<class Iter>
     size_t graph::add_reactors(Iter from, Iter to) {
       graph *me = this;
-      typename xml_factory::iter_traits<Iter>::type
-	it = xml_factory::iter_traits<Iter>::build(from, me);
+      typename factory::iter_traits<Iter>::type
+	it = factory::iter_traits<Iter>::build(from, me);
       SHARED_PTR<reactor> r;
       size_t count = 0;
       

@@ -195,11 +195,11 @@ void export_transactions() {
   
   
   
-  c_graph.def("name", &graph::getName, bp::return_internal_reference<>())
+  c_graph.def("name", &graph::name, bp::return_internal_reference<>())
   .add_property("empty", &graph::empty)
   .add_property("reactors_count", &graph::count_reactors)
   .add_property("relations_count", &graph::count_relations)
-  .add_property("current_tick", &graph::getCurrentTick, "current tick date")
+  .add_property("current_tick", &graph::current_tick, "current tick date")
   .def("date_str", &graph::date_str, "convert a tick into a date string")
   ;
 

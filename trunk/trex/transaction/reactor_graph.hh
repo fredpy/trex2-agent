@@ -175,7 +175,7 @@ namespace TREX {
        * input.
        */
       typedef TREX::utils::xml_factory<reactor, SHARED_PTR<reactor>,
-				      graph *> xml_factory;
+				       graph *> factory;
 
       /** @brief Reverse of a reactor graph
        * 
@@ -243,7 +243,7 @@ namespace TREX {
 
       protected:
         timelines_listener(graph &g);
-        timelines_listener(graph::xml_factory::argument_type const &arg);
+        timelines_listener(graph::factory::argument_type const &arg);
         void initialize();
 
         virtual void declared(details::timeline const &timeline) {}
@@ -338,7 +338,7 @@ namespace TREX {
        *
        * @return The name of the graph
        */
-      TREX::utils::symbol const &getName() const;
+      TREX::utils::symbol const &name() const;
       /** @brief Constructor
        *
        * @param[in] name A symbolic name
@@ -363,7 +363,7 @@ namespace TREX {
        *
        * @sa add_reactors(ext_iterator)
        */
-      graph(TREX::utils::symbol const &name,
+      graph(TREX::utils::symbol const &name_str,
 	    boost::property_tree::ptree &conf,
 	    TICK init =0, bool verbose=false);
       /** @brief Destructor
@@ -497,8 +497,8 @@ namespace TREX {
        *       the Agent. It may be refactored in roder to keep the graph class
        *       as simple as possible.
        */
-      TICK getCurrentTick() const;
-      virtual TICK finalTick() const {
+      TICK current_tick() const;
+      virtual TICK final_tick() const {
         return std::numeric_limits<TICK>::max();
       }
       
@@ -514,7 +514,7 @@ namespace TREX {
        * @sa tickToTime(TICK) const
        * @sa timeToTick(time_t, suseconds_t) const
        */
-      virtual duration_type tickDuration() const {
+      virtual duration_type tick_duration() const {
 	return CHRONO::seconds(1);
       }
       /** @brief convert real-time into a TICK
@@ -534,8 +534,8 @@ namespace TREX {
        * @sa tickDuration() const
        * @sa tickToTime(TICK) const
        */
-      virtual TICK timeToTick(date_type const &date) const {
-        return date.since_epoch().to_chrono<duration_type>().count()/tickDuration().count();
+      virtual TICK time_to_tick(date_type const &date) const {
+        return date.since_epoch().to_chrono<duration_type>().count()/tick_duration().count();
       }
       /** @brief convert a TICK into its real-time equivalent
        *
@@ -553,8 +553,8 @@ namespace TREX {
        * @sa tickDuration() const
        * @sa timeToTick(time_t, suseconds_t) const
        */
-      virtual date_type tickToTime(TICK cur) const {
-        return date_type::epoch().add(utils::rt_duration(tickDuration()*cur));
+      virtual date_type tick_to_time(TICK cur) const {
+        return date_type::epoch().add(utils::rt_duration(tick_duration()*cur));
       }
   
       virtual std::string date_str(TICK cur) const;
@@ -666,9 +666,9 @@ namespace TREX {
 
       graph();
 
-      bool hasTick() const;
+      bool has_tick() const;
 
-      void updateTick(TICK value, bool started=true);
+      void update_tick(TICK value, bool started=true);
       void set_name(TREX::utils::symbol const &name);
 
       utils::log::stream syslog(utils::log::id_type const &context, 
@@ -754,7 +754,7 @@ namespace TREX {
       listen_set m_listeners;
 
       bool m_verbose;
-      TREX::utils::singleton::use<xml_factory>             m_factory;
+      TREX::utils::singleton::use<factory>             m_factory;
 
       mutable details::reactor_set m_quarantined;
 

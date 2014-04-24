@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief GoalPipe reactor declaration */
-  reactor::xml_factory::declare<ControlInterface> decl("GoalPipe");
+  reactor::factory::declare<ControlInterface> decl("GoalPipe");
 
 }
 
@@ -56,7 +56,7 @@ shared_var<size_t> ControlInterface::s_id;
 ControlInterface::ControlInterface(reactor::xml_arg_type arg)
 :reactor(arg, false), m_running(false),
  m_need_fifo(utils::parse_attr<bool>(false, 
-				     reactor::xml_factory::node(arg),
+				     reactor::factory::node(arg),
 				     "local_queue")),
  m_fifo(0) {
   //use("estimator", true, true);

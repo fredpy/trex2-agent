@@ -444,14 +444,14 @@ AgentException::AgentException(graph const &agent, std::string const &msg) throw
 
 // static
 
-TICK Agent::initialTick(clock_ref clk) {
+TICK Agent::initial_tick(clock_ref clk) {
   return clk?clk->initialTick():0;
 }
 
 // structors :
 
 Agent::Agent(symbol const &name, TICK final, clock_ref clk, bool verbose)
-  :graph(name, initialTick(clk), verbose),
+  :graph(name, initial_tick(clk), verbose),
    m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
@@ -460,7 +460,7 @@ Agent::Agent(symbol const &name, TICK final, clock_ref clk, bool verbose)
 Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 :m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  updateTick(initialTick(m_clock), false);
+  update_tick(initial_tick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
@@ -484,7 +484,7 @@ Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool verbose)
   :m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  updateTick(initialTick(m_clock), false);
+  update_tick(initial_tick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
@@ -526,7 +526,7 @@ bool Agent::missionCompleted() {
     syslog(null, info)<<"No reactor left.";
     return true;
   }
-  return getCurrentTick()>m_finalTick;
+  return current_tick()>m_finalTick;
 }
 
 void Agent::internal_check(reactor_id r,
@@ -578,7 +578,7 @@ void Agent::external_check(reactor_id r,
 bool Agent::setClock(clock_ref clock) {
   if( NULL==m_clock ) {
     m_clock = clock;
-    updateTick(initialTick(m_clock), false);
+    update_tick(initial_tick(m_clock), false);
     return true;
   } else {
     // delete clock;
@@ -732,7 +732,7 @@ std::list<Agent::reactor_id> Agent::init_dfs_sync() {
 
 
 void Agent::initComplete() {
-  if( getName().empty() )
+  if( name().empty() )
     throw AgentException(*this, "Agent has no name :"
 			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
@@ -802,7 +802,7 @@ void Agent::initComplete() {
   syslog(null, TREX::utils::log::info)<<"Final tick: "<<date_str(m_finalTick)
     <<" ("<<m_finalTick<<").";
   syslog(null, "START")<<"\t=========================================================";
-  updateTick(m_clock->tick());
+  update_tick(m_clock->tick());
 }
 
 void Agent::run() {
@@ -832,7 +832,7 @@ void Agent::synchronize() {
 
   stat_clock::duration delta;
   rt_clock::duration delta_rt;
-  TICK const now = getCurrentTick();
+  TICK const now = current_tick();
   
   {
     utils::chronograph<rt_clock> rt_chron(delta_rt);
@@ -938,7 +938,7 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
-  TICK const now = getCurrentTick();
+  TICK const now = current_tick();
   
   size_t count = 0; //slp_count = 0;
   bool completed = false;
@@ -975,7 +975,7 @@ bool Agent::doNext() {
     
     
     if( valid() )
-      updateTick(m_clock->tick());
+      update_tick(m_clock->tick());
   } catch(Clock::Error const &err) {
     syslog(null, error)<<"error from the clock: "<<err;
     m_valid = false;

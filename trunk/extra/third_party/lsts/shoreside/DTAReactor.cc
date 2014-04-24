@@ -15,7 +15,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::xml_factory::declare<DTAReactor> decl("DTAReactor");
+  reactor::factory::declare<DTAReactor> decl("DTAReactor");
 }
 
 
@@ -35,8 +35,8 @@ namespace
 DTAReactor::DTAReactor(reactor::xml_arg_type arg)
   :reactor(arg, false),
    m_active(false),
-m_proxy_timeline(parse_attr<symbol>(xml_factory::node(arg), "proxy")),
-m_asset_id(parse_attr<symbol>(xml_factory::node(arg), "id")) {
+m_proxy_timeline(parse_attr<symbol>(factory::node(arg), "proxy")),
+m_asset_id(parse_attr<symbol>(factory::node(arg), "id")) {
   m_survey_tl = m_asset_id.str() + "_follow";
   m_state_tl = m_asset_id.str() + "_state";
   provide(m_survey_tl);

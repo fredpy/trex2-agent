@@ -12,7 +12,7 @@ using namespace TREX::transaction;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::xml_factory::declare<YesMan> decl("YesMan");
+  reactor::factory::declare<YesMan> decl("YesMan");
 }
 
 #define SPOT_SIM_TL "spotSim" // internal
