@@ -120,6 +120,8 @@ void details::graph_impl::declare(SHARED_PTR<details::node_impl> n,
   strand().dispatch(boost::bind(&graph_impl::decl_sync, me, n, name, flag));
 }
 
+
+
 void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
                                     symbol const &name,
                                     details::transaction_flags flag) {
@@ -129,6 +131,24 @@ void details::graph_impl::subscribe(SHARED_PTR<details::node_impl> n,
 
 
 // strand protected calls
+
+details::tl_ref details::graph_impl::get_timeline_sync(symbol const &tl_name) {
+  tl_map::iterator i = m_timelines.lower_bound(tl_name);
+  
+  if( m_timelines.end()==i || tl_name!=i->first ) {
+    tl_ref tl = MAKE_SHARED<internal_impl>(tl_name, shared_from_this());
+    i = m_timelines.insert(i, tl_map::value_type(tl_name, tl));
+    m_failed.insert(*i);
+    // scehdule creation event for later
+    strand().post(boost::bind(&graph_impl::notify_new,
+                              shared_from_this(), tl));
+  }
+  return i->second;
+}
+
+void details::graph_impl::notify_new(details::tl_ref tl) {
+  syslog(tlog::null, tlog::info)<<"New timline \""<<tl->name()<<"\"";
+}
 
 void details::graph_impl::set_date_sync(details::graph_impl::date_type date) {
   // This may not look thread safe but it is : there's a mutex lock happening
@@ -147,23 +167,43 @@ void details::graph_impl::rm_node_sync(SHARED_PTR<details::node_impl> n) {
 }
 
 void details::graph_impl::decl_sync(SHARED_PTR<details::node_impl> n,
-                                    symbol name, details::transaction_flags flag) {
+                                    symbol tl_name,
+                                    details::transaction_flags flag) {
   SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
-    
+    tl_ref tl = get_timeline_sync(tl_name);
+    if( tl->set_sync(n, flag) ) {
+      m_failed.erase(tl_name);
+      n->assigned_sync(tl);
+    }
   } else
-    syslog(tlog::null, tlog::warn)<<"Ignoring creation request of timeline \""<<name
-    <<"\" as it was requested by a reactor that is no longer part of this graph.";
+    syslog(tlog::null, tlog::warn)<<"Ignoring creation request of timeline \""
+    <<tl_name<<"\" as it was requested by a reactor that is no longer"
+    " part of this graph.";
 }
 
+void details::graph_impl::undecl_sync(SHARED_PTR<details::node_impl> n,
+                                      details::tl_ref tl) {
+  if( tl->owner().lock()==n ) {
+    m_failed.insert(tl_map::value_type(tl->name(), tl));
+    tl->reset_sync();
+  }
+}
+
+
 void details::graph_impl::use_sync(SHARED_PTR<details::node_impl> n,
-                                   symbol name, details::transaction_flags flag) {
+                                   symbol tl_name,
+                                   details::transaction_flags flag) {
   
   SHARED_PTR<graph_impl> owned = n->graph();
   if( shared_from_this()==owned ) {
+    tl_ref tl = get_timeline_sync(tl_name);
     
+    SHARED_PTR<external_impl> ext = MAKE_SHARED<external_impl>(n, tl, flag);
+    n->subscribed_sync(ext);
   } else
-    syslog(tlog::null, tlog::warn)<<"Ignoring subscription request to timeline \""<<name
-    <<"\" as it was requested by a reactor that is no longer part of this graph.";
+    syslog(tlog::null, tlog::warn)<<"Ignoring subscription request to "
+    "timeline \""<<tl_name<<"\" as it was requested by a reactor that "
+    "is no longer part of this graph.";
 }
 

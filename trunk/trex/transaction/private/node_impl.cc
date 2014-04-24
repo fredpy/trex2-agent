@@ -34,6 +34,8 @@
 #include "node_impl.hh"
 #include "graph_impl.hh"
 
+#include <trex/utils/asio_runner.hh>
+
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 namespace tlog=utils::log;
@@ -57,6 +59,29 @@ details::node_impl::node_impl(WEAK_PTR<details::graph_impl> const &g):m_graph(g)
 
 details::node_impl::~node_impl() {
 }
+
+// observers
+
+bool details::node_impl::internal(symbol const &tl) const {
+  SHARED_PTR<graph_impl> g = graph();
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&node_impl::check_internal_sync,
+                                            this, tl));
+    return utils::strand_run(g->strand(), fn);
+  }
+  return false;
+}
+
+bool details::node_impl::external(symbol const &tl) const {
+  SHARED_PTR<graph_impl> g = graph();
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&node_impl::check_external_sync,
+                                            this, tl));
+    return utils::strand_run(g->strand(), fn);
+  }
+  return false;
+}
+
 
 // public manipulators
 
@@ -99,6 +124,15 @@ void details::node_impl::provide(symbol const &tl, bool read_only, bool publish_
   }
 }
 
+void details::node_impl::unprovide(symbol const &tl) {
+  SHARED_PTR<graph_impl> g = graph();
+
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::unprovide_sync,
+                                     shared_from_this(), g, tl));
+}
+
+
 void details::node_impl::use(symbol const &tl, bool read_only, bool listen_plan) {
   SHARED_PTR<graph_impl> g = graph();
   
@@ -110,9 +144,63 @@ void details::node_impl::use(symbol const &tl, bool read_only, bool listen_plan)
   }
 }
 
+void details::node_impl::unuse(symbol const &tl) {
+  SHARED_PTR<graph_impl> g = graph();
+  
+  if( g )
+    g->strand().dispatch(boost::bind(&node_impl::unuse_sync,
+                                     shared_from_this(), tl));
+}
 
+
+void details::node_impl::notify(TICK date, symbol tl,
+                                boost::optional<Observation> o) {
+  if( o )
+    syslog(tlog::null, tlog::info)<<'['<<date<<"] "<<o;
+  else
+    syslog(tlog::null, tlog::info)<<'['<<date<<"] synchronisation event for timeline "<<tl;
+}
 
 // strand protected calls
+
+bool details::node_impl::check_internal_sync(symbol tl) const {
+  return graph() && m_internals.find(tl)!=m_internals.end();
+}
+
+bool details::node_impl::check_external_sync(symbol tl) const {
+  return graph() && m_externals.find(tl)!=m_externals.end();
+}
+
+void details::node_impl::assigned_sync(details::tl_ref const &tl) {
+  utils::symbol tl_name = tl->name();
+  
+  syslog(tlog::null, tlog::info)<<"declared \""<<tl_name<<"\" as Internal";
+  m_internals.insert(internal_set::value_type(tl_name, tl));
+}
+
+void details::node_impl::subscribed_sync(details::ext_ref const &tl) {
+  utils::symbol tl_name = tl->name();
+  syslog(tlog::null, tlog::info)<<"subscribed to "<<tl_name<<" as External";
+  m_externals.insert(external_set::value_type(tl_name, tl));
+  tl->connect();
+}
+
+
+void details::node_impl::unprovide_sync(SHARED_PTR<details::graph_impl> g,
+                                        symbol tl) {
+  internal_set::iterator i = m_internals.find(tl);
+  if( m_internals.end()!=i ) {
+    tl_ref timeline = i->second;
+    m_internals.erase(i);
+    g->undecl_sync(shared_from_this(), timeline);
+    syslog(tlog::null, tlog::info)<<"Undeclared timeline "<<tl;
+  }
+}
+
+void details::node_impl::unuse_sync(symbol tl) {
+  if( m_externals.erase(tl) )
+    syslog(tlog::null, tlog::info)<<"Unsubscribed from timline "<<tl;
+}
 
 void details::node_impl::isolate(SHARED_PTR<details::graph_impl> const &g) {
   // Disable all connections

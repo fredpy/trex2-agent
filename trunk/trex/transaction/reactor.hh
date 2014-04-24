@@ -100,9 +100,12 @@ namespace TREX {
       typedef utils::cpu_clock stat_clock;
       
 # if defined(CPP11_HAS_CHRONO)
+      // C++11 do not define a steady clock so high resolution clock
+      // is our best bet
       typedef CHRONO::high_resolution_clock rt_clock;
 # else
-      typedef CHRONO::steady_clock     rt_clock;
+      // boost on the other hand do define a steady clock
+      typedef CHRONO::steady_clock          rt_clock;
 # endif // CPP11_HAS_CHRONO      
       
       typedef stat_clock::duration stat_duration;
@@ -1073,7 +1076,7 @@ namespace TREX {
       bool m_firstTick;
       graph &m_graph;
       
-      class Logger;
+      class logger;
     
       void queue(std::list<goal_id> &l, goal_id g);
       
@@ -1120,7 +1123,7 @@ namespace TREX {
        * @sa Logger
        * @sa TransactionPlayer
        */
-      Logger *m_trLog;
+      logger *m_trLog;
       
       /** @brief Reactor name
        *
