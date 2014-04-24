@@ -209,13 +209,13 @@ void python_reactor::resume() {
  */
 
 producer::producer(symbol const &name)
-:reactor::xml_factory::factory_type::producer(name) {
-  reactor::xml_factory::factory_type::producer::notify();
+:reactor::factory::factory_type::producer(name) {
+  reactor::factory::factory_type::producer::notify();
 }
 
 producer::result_type producer::produce(producer::argument_type arg) const {
   // Extract the target python type name
-  boost::property_tree::ptree::value_type &node = reactor::xml_factory::node(arg);
+  boost::property_tree::ptree::value_type &node = reactor::factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
   bp::object my_class = bp::eval(bp::str(class_name));
     

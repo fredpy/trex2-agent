@@ -89,7 +89,7 @@ namespace TREX {
     
     }; // TREX::python::python_reactor
     
-    class producer:public transaction::reactor::xml_factory::factory_type::producer {
+    class producer:public transaction::reactor::factory::factory_type::producer {
     public:
       explicit producer(utils::symbol const &name);
       ~producer() {}

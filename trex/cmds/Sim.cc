@@ -339,8 +339,8 @@ int main(int argc, char **argv) {
 	s_log->syslog("sim", info)<<"Mission completed.";
 	break;
       }
-      TICK tick = my_agent->getCurrentTick();
-      std::cout<<'['<<my_agent->getName()<<':'<<tick<<"]> ";
+      TICK tick = my_agent->current_tick();
+      std::cout<<'['<<my_agent->name()<<':'<<tick<<"]> ";
       std::string cmdString;
       std::cin>>cmdString;
      
@@ -350,7 +350,7 @@ int main(int argc, char **argv) {
 	s_log->syslog("sim", info)<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
-	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() ) {
+	while( my_agent->current_tick()==tick && !my_agent->missionCompleted() ) {
 	  my_agent->doNext();
           s_log->flush();
         }
@@ -363,7 +363,7 @@ int main(int argc, char **argv) {
             // <<"\nYou can use W to wrap the agent to its initial tick."
             <<std::endl;
 	  else {
-	    while( my_agent->getCurrentTick()<targetTick &&
+	    while( my_agent->current_tick()<targetTick &&
                   !my_agent->missionCompleted() ) {
 	      my_agent->doNext();
               s_log->flush();

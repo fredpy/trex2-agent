@@ -433,7 +433,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   
-  reactor::xml_factory::declare<LogPlayer> decl("LogPlayer");
+  reactor::factory::declare<LogPlayer> decl("LogPlayer");
   
   details::tr_event::factory::declare<details::tr_use> 
     d_use("use");
@@ -492,7 +492,7 @@ symbol const LogPlayer::s_step("step");
 
 reactor::xml_arg_type &LogPlayer::alter_cfg(reactor::xml_arg_type &arg) {
   // force logging to false
-  utils::set_attr(xml_factory::node(arg), "log", false);
+  utils::set_attr(factory::node(arg), "log", false);
   return arg;
 }
 
@@ -502,7 +502,7 @@ LogPlayer::LogPlayer(reactor::xml_arg_type arg)
   :reactor(arg, false, false) {
   std::string 
     file_name = utils::parse_attr<std::string>(name().str()+".tr.log",
-					xml_factory::node(arg),
+					factory::node(arg),
 					"file");
   bool found;
   file_name = manager().use(file_name, found).string();

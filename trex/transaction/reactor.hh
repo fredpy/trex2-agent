@@ -122,7 +122,7 @@ namespace TREX {
        *
        * The type of the factory used to generate reactors from XML
        */
-      typedef graph::xml_factory                  xml_factory;
+      typedef graph::factory                  factory;
       /** @brief XML construction info
        *
        * The argument passed by xml_factory while calling reactor classes
@@ -134,7 +134,7 @@ namespace TREX {
        * @sa TREX::utils::XmlFactory::arg_traits;
        * @sa TREX::transaction::graph
        */
-      typedef xml_factory::argument_type          xml_arg_type;
+      typedef factory::argument_type          xml_arg_type;
       
       /** @brief XML based constructor
        *
@@ -219,7 +219,7 @@ namespace TREX {
        * @sa class TREX::transaction::graph
        */
       TREX::utils::symbol const &graph_name() const {
-        return m_graph.getName();
+        return m_graph.name();
       }
       /** @brief Get graph
        *
@@ -258,7 +258,7 @@ namespace TREX {
        * @return the duration of a single tick
        */
       duration_type tick_duration() const {
-        return m_graph.tickDuration();
+        return m_graph.tick_duration();
       }
       
       /** @brief unix time to tick conversion
@@ -277,7 +277,7 @@ namespace TREX {
        * (as if the mission started on January 1st 1970)
        */
       TICK time_to_tick(date_type const &date) const {
-        return m_graph.timeToTick(date);
+        return m_graph.time_to_tick(date);
       }
       /** @brief tick to unix time conversion
        * @param[in] cur A tick value
@@ -294,7 +294,7 @@ namespace TREX {
        * (as if the mission started on January 1st 1970)
        */
       date_type tick_to_time(TICK cur) const {
-        return m_graph.tickToTime(cur);
+        return m_graph.tick_to_time(cur);
       }
       std::string date_str(TICK cur) const {
         return m_graph.date_str(cur);
@@ -312,7 +312,7 @@ namespace TREX {
        * @sa graph::getInitialTick() const
        */
       TICK current_tick() const {
-        return m_graph.getCurrentTick();
+        return m_graph.current_tick();
       }
       /** @brief Get final tick
        *
@@ -1038,7 +1038,7 @@ namespace TREX {
         return m_graph;
       }
       
-      void setMaxTick(TICK max); 
+      void set_max_tick(TICK max);
 
     private:
       stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
@@ -1104,7 +1104,7 @@ namespace TREX {
        * @sa postObservation()
        * @sa notify(Obserbvation const &)
        */
-      void   doNotify();
+      void   do_notify();
       
       bool m_verbose;
       

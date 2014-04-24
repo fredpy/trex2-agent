@@ -37,13 +37,6 @@
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-#undef WITH_MAKE_SHARED
-
-#ifdef WITH_MAKE_SHARED
-# include <boost/make_shared.hpp>
-#endif
-
-
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
 
@@ -76,9 +69,9 @@ namespace {
           hi(int_domain::plus_inf);
       boost::posix_time::ptime date;
       if( min )
-        lo = m_owner.timeToTick(*min);
+        lo = m_owner.time_to_tick(*min);
       if( max )
-        hi = m_owner.timeToTick(*max);
+        hi = m_owner.time_to_tick(*max);
       return result_type(new int_domain(lo, hi));
     }
 
@@ -105,7 +98,7 @@ namespace {
       max = utils::parse_attr< boost::optional<utils::rt_duration> >(arg.second, "max");
       int_domain::bound lo(int_domain::minus_inf),
           hi(int_domain::plus_inf);
-      CHRONO::duration<double> ratio = m_owner.tickDuration();
+      CHRONO::duration<double> ratio = m_owner.tick_duration();
       
       if( min ) {
         CHRONO::duration<double> min_s = min->to_chrono< CHRONO::duration<double> >();
@@ -130,11 +123,11 @@ namespace {
  * class TREX::transaction::GraphException
  */
 GraphException::GraphException(graph const &g, std::string const &msg) throw()
-      :TREX::utils::Exception(g.getName().str()+": "+msg) {}
+      :TREX::utils::Exception(g.name().str()+": "+msg) {}
 
 GraphException::GraphException(graph const &g, std::string const &who,
     std::string const &msg) throw()
-      :TREX::utils::Exception(g.getName().str()+"."+who+": "+msg) {}
+      :TREX::utils::Exception(g.name().str()+"."+who+": "+msg) {}
 
 
 /*
@@ -151,29 +144,17 @@ MultipleReactors::MultipleReactors(graph const &g, reactor const &r) throw()
 // structors :
 
 graph::graph()
-#ifdef WITH_MAKE_SHARED
-:m_impl(boost::make_shared<details::graph_impl>())
-#else 
-:m_impl(new details::graph_impl)
-#endif
+:m_impl(MAKE_SHARED<details::graph_impl>())
 {}
 
 graph::graph(utils::symbol const &name, TICK init, bool verbose)
-#ifdef WITH_MAKE_SHARED
-:m_impl(boost::make_shared<details::graph_impl>(name))
-#else 
-:m_impl(new details::graph_impl(name))
-#endif
+:m_impl(MAKE_SHARED<details::graph_impl>(name))
 , m_currentTick(init)
 , m_verbose(verbose) {}
 
 graph::graph(utils::symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
-#ifdef WITH_MAKE_SHARED
-:m_impl(boost::make_shared<details::graph_impl>(name))
-#else
-:m_impl(new details::graph_impl(name))
-#endif
+:m_impl(MAKE_SHARED<details::graph_impl>(name))
 , m_currentTick(init), m_verbose(verbose) {
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
@@ -203,7 +184,7 @@ std::string graph::duration_str(TICK dur) const {
   return date_str(dur);
 }
 
-TREX::utils::symbol const &graph::getName() const {
+TREX::utils::symbol const &graph::name() const {
   return m_impl->name();
 }
 
@@ -211,11 +192,11 @@ void graph::set_name(TREX::utils::symbol const &name) {
   m_impl->name(name);
 }
 
-bool graph::hasTick() const {
+bool graph::has_tick() const {
   return m_impl->get_date();
 }
 
-void graph::updateTick(TICK value, bool started) {
+void graph::update_tick(TICK value, bool started) {
   if( started ) {
     m_tick_updated = true;
     m_impl->set_date(value);
@@ -223,7 +204,7 @@ void graph::updateTick(TICK value, bool started) {
     m_currentTick = value;
 }
 
-TICK graph::getCurrentTick() const {
+TICK graph::current_tick() const {
   if( tick_updated() ) {
     boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
     m_tick_updated = false;
@@ -264,7 +245,7 @@ long graph::index(graph::reactor_id id) const {
 graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
   graph *me = this;
   reactor::xml_arg_type
-  arg = xml_factory::arg_traits::build(description, me);
+  arg = factory::arg_traits::build(description, me);
   SHARED_PTR<reactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
@@ -430,13 +411,13 @@ namespace TREX {
 }
 
 TICK graph::as_date(std::string const &str) const {
-  return timeToTick(boost::lexical_cast<date_type>(str));
+  return time_to_tick(boost::lexical_cast<date_type>(str));
 }
 
 TICK graph::as_duration(std::string const &str, bool up) const {
   utils::rt_duration tmp = boost::lexical_cast<utils::rt_duration>(str);
   
-  CHRONO::duration<double> ratio = tickDuration(),
+  CHRONO::duration<double> ratio = tick_duration(),
   val = tmp.to_chrono< CHRONO::duration<double> >();
   
   double value = val.count()/ratio.count();
@@ -489,7 +470,7 @@ graph::timelines_listener::timelines_listener(graph &g)
   m_graph.m_listeners.insert(this);
 }
 
-graph::timelines_listener::timelines_listener(graph::xml_factory::argument_type const &arg)
+graph::timelines_listener::timelines_listener(graph::factory::argument_type const &arg)
 :m_graph(*(arg.second)){
   m_graph.m_listeners.insert(this);  
 }

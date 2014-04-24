@@ -68,7 +68,7 @@ namespace {
   singleton::use<log_manager> s_log;
 
   /** @brief Light reactor declaration */
-  reactor::xml_factory::declare<Light> decl("Light");
+  reactor::factory::declare<Light> decl("Light");
   
 }
 
@@ -105,9 +105,9 @@ symbol const Light::switchObj("switch");
 
 Light::Light(reactor::xml_arg_type arg)
   :reactor(arg, false),
-   m_on(parse_attr<bool>(false, reactor::xml_factory::node(arg),
+   m_on(parse_attr<bool>(false, reactor::factory::node(arg),
 			 "state")),
-   m_verbose(parse_attr<bool>(false, reactor::xml_factory::node(arg),
+   m_verbose(parse_attr<bool>(false, reactor::factory::node(arg),
 			      "verbose")),
    m_firstTick(true) {
   syslog(null, info)<<"I want to own "<<lightObj;

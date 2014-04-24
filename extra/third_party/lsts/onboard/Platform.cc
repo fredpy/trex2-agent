@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
   
   /** @brief Platform reactor declaration */
-  reactor::xml_factory::declare<TREX::LSTS::Platform> decl("Platform");
+  reactor::factory::declare<TREX::LSTS::Platform> decl("Platform");
   
 }
 
@@ -55,18 +55,18 @@ namespace TREX
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
       
-      duneport = parse_attr<int>(6002, reactor::xml_factory::node(arg),
+      duneport = parse_attr<int>(6002, reactor::factory::node(arg),
                                  "duneport");
       duneip = parse_attr<std::string>("127.0.0.1",
-                                       reactor::xml_factory::node(arg),
+                                       reactor::factory::node(arg),
                                        "duneip");
-      debug = parse_attr<bool>(false, reactor::xml_factory::node(arg),
+      debug = parse_attr<bool>(false, reactor::factory::node(arg),
                                "debug");
 
-      m_auv = parse_attr<bool>(false, reactor::xml_factory::node(arg),
+      m_auv = parse_attr<bool>(false, reactor::factory::node(arg),
                                "auv");
 
-      localport = parse_attr<int>(false, reactor::xml_factory::node(arg),
+      localport = parse_attr<int>(false, reactor::factory::node(arg),
                                   "localport");
       //m_links = std::map<std::string, Announce*>();
       
@@ -80,7 +80,7 @@ namespace TREX
       // Timelines that can be controlled by other reactors
       provide("reference");
       
-      bool is_uav = parse_attr<bool>(false, reactor::xml_factory::node(arg),
+      bool is_uav = parse_attr<bool>(false, reactor::factory::node(arg),
                                      "uav");
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";

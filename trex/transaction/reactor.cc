@@ -317,15 +317,15 @@ reactor::reactor(reactor::xml_arg_type &arg, bool loadTL, bool log_default)
   :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
    m_have_goals(0),
    m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
-                                     xml_factory::node(arg), "verbose")),
+                                     factory::node(arg), "verbose")),
    m_trLog(NULL),
-   m_name(utils::parse_attr<symbol>(xml_factory::node(arg), "name")),
-   m_latency(utils::parse_attr<TICK>(xml_factory::node(arg), "latency")),
+   m_name(utils::parse_attr<symbol>(factory::node(arg), "name")),
+   m_latency(utils::parse_attr<TICK>(factory::node(arg), "latency")),
    m_maxDelay(0),
-   m_lookahead(utils::parse_attr<TICK>(xml_factory::node(arg), "lookahead")),
+   m_lookahead(utils::parse_attr<TICK>(factory::node(arg), "lookahead")),
    m_nSteps(0), m_past_deadline(false), m_validSteps(0),
    m_stat_log(m_log->service()) {
-  boost::property_tree::ptree::value_type &node(xml_factory::node(arg));
+  boost::property_tree::ptree::value_type &node(factory::node(arg));
 
   utils::log_manager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.c_str());
@@ -724,7 +724,7 @@ void reactor::cancel_plan_token(goal_id const &g) {
 
 
 TICK reactor::final_tick() const {
-  TICK g_final = m_graph.finalTick();
+  TICK g_final = m_graph.final_tick();
   
   if( !m_finalTick || g_final<*m_finalTick )
     return g_final;
@@ -733,7 +733,7 @@ TICK reactor::final_tick() const {
 }
 
 
-void reactor::setMaxTick(TICK max) {
+void reactor::set_max_tick(TICK max) {
   if( !m_finalTick || max<*m_finalTick ) {
     syslog(warn)<<"Restricted reactor final tick to "<<max;
     m_finalTick = max;
@@ -781,7 +781,7 @@ bool reactor::new_tick() {
     reset_deadline();
     TICK final = final_tick();
     
-    if( final < m_graph.finalTick() )
+    if( final < m_graph.final_tick() )
       syslog(warn)<<"Reactor final tick is before agent's one:\n\t"
         <<date_str(final)<<" ("<<final<<").";
     
@@ -846,7 +846,7 @@ void reactor::collect_obs_sync(std::list<Observation> &l) {
 }
 
 
-void reactor::doNotify() {
+void reactor::do_notify() {
   std::list<Observation> obs;
   boost::function<void ()> fn(boost::bind(&reactor::collect_obs_sync,
                                           this, boost::ref(obs)));
@@ -869,7 +869,7 @@ bool reactor::do_synchronize() {
     bool success;
     {
       // collect information from external timelines 
-      doNotify();
+      do_notify();
       {
         // measure timing only for synchronization call
         utils::chronograph<rt_clock> real_time(m_synch_rt);

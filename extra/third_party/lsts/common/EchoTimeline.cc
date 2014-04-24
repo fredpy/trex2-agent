@@ -13,7 +13,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief EchoTimeline reactor declaration */
-  reactor::xml_factory::declare<EchoTimeline> decl("EchoTimeline");
+  reactor::factory::declare<EchoTimeline> decl("EchoTimeline");
 }
 
 namespace TREX
@@ -24,10 +24,10 @@ namespace TREX
     EchoTimeline::EchoTimeline(TREX::transaction::reactor::xml_arg_type arg):
         LstsReactor(arg)
     {
-      m_timeline = parse_attr<std::string>("params", reactor::xml_factory::node(arg),
+      m_timeline = parse_attr<std::string>("params", reactor::factory::node(arg),
                                              "timeline");
 
-      m_initial_state = parse_attr<std::string>("Boot", reactor::xml_factory::node(arg),
+      m_initial_state = parse_attr<std::string>("Boot", reactor::factory::node(arg),
                                            "initial");
       m_first_tick = true;
     }
