@@ -34,7 +34,7 @@
 #ifndef H_reactor_graph
 # define H_reactor_graph
 
-# include "TeleoReactor_fwd.hh"
+# include "reactor_fwd.hh"
 # include "bits/timeline.hh"
 
 # include <trex/utils/timing/posix_utils.hh>
@@ -81,7 +81,7 @@ namespace TREX {
        * Create a new instance indicating that multiple reactors with the same
        * name as @p r were declared in the graph @p g
        */
-      explicit MultipleReactors(graph const &g, TeleoReactor const &r) throw();
+      explicit MultipleReactors(graph const &g, reactor const &r) throw();
       /** @brief Destructor */
       ~MultipleReactors() throw() {}
     }; // TREX::transaction::MultipleReactors
@@ -174,7 +174,7 @@ namespace TREX {
        * A factory used ot produce new reactor in a graph using XML
        * input.
        */
-      typedef TREX::utils::xml_factory<TeleoReactor, SHARED_PTR<TeleoReactor>,
+      typedef TREX::utils::xml_factory<reactor, SHARED_PTR<reactor>,
 				      graph *> xml_factory;
 
       /** @brief Reverse of a reactor graph
@@ -255,7 +255,7 @@ namespace TREX {
       private:
         graph &m_graph;
 
-        friend class TeleoReactor;
+        friend class reactor;
       }; // TREX::transaction::graph::timeline_listener
 
 
@@ -758,7 +758,7 @@ namespace TREX {
 
       mutable details::reactor_set m_quarantined;
 
-      friend class TeleoReactor;
+      friend class reactor;
       friend class timelines_listener;
     };
 

@@ -57,7 +57,7 @@
 namespace TREX {
   namespace transaction {
 
-    class TeleoReactor;
+    class reactor;
     class graph;
 
     /** @brief Graph Exception
@@ -98,7 +98,7 @@ namespace TREX {
        * this exception is due to the TeleoReactor @p r and that the error can
        * be described as @p msg.
        */
-      ReactorException(TeleoReactor const &r, std::string const &msg) throw();
+      ReactorException(reactor const &r, std::string const &msg) throw();
       /** @brief Destructor */
       virtual ~ReactorException() throw() {}
 
@@ -127,7 +127,7 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup transaction
        */
-      template<class PtrType = TeleoReactor *>
+      template<class PtrType = reactor *>
       struct reactor_id_traits {
 	typedef PtrType base_type;
 	typedef utils::symbol id_type;
@@ -147,7 +147,7 @@ namespace TREX {
 	 * @relates reactor_set
 	 */
 	static id_type const &get_id(base_type r) {
-	  return r->getName();
+	  return r->name();
 	}
       }; // TREX::transaction::details::reactor_id_traits
 
@@ -161,7 +161,7 @@ namespace TREX {
        * @sa class TREX::utils::list_set
        */
       typedef utils::list_set<
-	reactor_id_traits< SHARED_PTR<TeleoReactor> > > reactor_set;
+	reactor_id_traits< SHARED_PTR<reactor> > > reactor_set;
 
 
       /** @brief timeline client helper

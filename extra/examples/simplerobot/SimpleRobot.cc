@@ -13,8 +13,8 @@ using namespace TREX::simpleRobot;
 // navigator corresponds to the  Navigator navigator; declaration inside the SimpleRobot class in SimpleRobot-model.nddl
 symbol const SimpleRobot::navigatorObj("rover.navigator");
 
-SimpleRobot::SimpleRobot(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false)
+SimpleRobot::SimpleRobot(reactor::xml_arg_type arg)
+    :reactor(arg,false)
 {
     syslog()<<"I want to own "<<navigatorObj;
     //provide(navigatorObj, false); // declare the navigator timeline --> internal
@@ -26,7 +26,7 @@ SimpleRobot::SimpleRobot(TeleoReactor::xml_arg_type arg)
 
 SimpleRobot::~SimpleRobot() {}
 
-void SimpleRobot::handleInit()
+void SimpleRobot::handle_init()
 {
 }
 
@@ -41,12 +41,12 @@ bool SimpleRobot::synchronize()
     return true;
 }
 
-void SimpleRobot::handleRequest(goal_id const &g)
+void SimpleRobot::handle_request(goal_id const &g)
 {
 	syslog()<<"handleRequest";
 }
 
-void SimpleRobot::handleRecall(goal_id const &g)
+void SimpleRobot::handle_recall(goal_id const &g)
 {
 	syslog()<<"handleRecall";
 }

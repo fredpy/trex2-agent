@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  TeleoReactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
+  reactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
 
 }
 
@@ -29,16 +29,16 @@ namespace TREX {
   }
 }
 
-TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg), graph::timelines_listener(arg), aborted(false)
+TimelineReporter::TimelineReporter(reactor::xml_arg_type arg)
+:reactor(arg), graph::timelines_listener(arg), aborted(false)
 {
-  m_hostport = parse_attr<int>(-1, TeleoReactor::xml_factory::node(arg),
+  m_hostport = parse_attr<int>(-1, reactor::xml_factory::node(arg),
                                "hostport");
   m_hostaddr = parse_attr<std::string>("127.0.0.1",
-                                       TeleoReactor::xml_factory::node(arg),
+                                       reactor::xml_factory::node(arg),
                                        "hostaddr");
   m_output = parse_attr<bool>(false,
-                              TeleoReactor::xml_factory::node(arg),
+                              reactor::xml_factory::node(arg),
                               "output");
 }
 
@@ -54,7 +54,7 @@ TimelineReporter::declared(tr_details::timeline const &timeline)
     std::cout << "Timeline has been declared: " << timeline.name() << std::endl;
 
   //syslog(log::warn) << "Timeline has been declared: " << timeline.name();
-  if( !isExternal(timeline.name()) )
+  if( !is_external(timeline.name()) )
 	  use(timeline.name(), false, true);
 }
 
@@ -67,7 +67,7 @@ TimelineReporter::undeclared(tr_details::timeline const &timeline)
   unuse(timeline.name());
 }
 
-void TimelineReporter::newPlanToken(goal_id const &g)
+void TimelineReporter::new_plan_token(goal_id const &g)
 {
   Goal * goal = g.get();
 
@@ -80,7 +80,7 @@ void TimelineReporter::newPlanToken(goal_id const &g)
   //syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
 }
 
-void TimelineReporter::cancelledPlanToken(goal_id const &g)
+void TimelineReporter::cancelled_plan_token(goal_id const &g)
 {
   Goal * goal = g.get();
 
@@ -150,7 +150,7 @@ void TimelineReporter::notify(Observation const &obs)
   if (m_output)
   {
 
-    std::cout << "[" << getCurrentTick() << "] " << obs << std::endl;
+    std::cout << "[" << current_tick() << "] " << obs << std::endl;
   }
   op.token.set(token);
   if (m_hostport != -1)

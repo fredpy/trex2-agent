@@ -34,7 +34,7 @@
 #ifndef FWD_Agent
 # define FWD_Agent
 
-# include <trex/transaction/TeleoReactor_fwd.hh>
+# include <trex/transaction/reactor_fwd.hh>
 
 namespace TREX {
   namespace agent {

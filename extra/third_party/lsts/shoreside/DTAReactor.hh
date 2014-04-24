@@ -1,20 +1,20 @@
 #ifndef H_lsts_DTAReactor
 # define H_lsts_DTAReactor
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 namespace TREX {
   namespace LSTS {
     
 
-    class DTAReactor :public TREX::transaction::TeleoReactor {
+    class DTAReactor :public TREX::transaction::reactor {
     public:
-      DTAReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      DTAReactor(TREX::transaction::reactor::xml_arg_type arg);
       ~DTAReactor();
 
     private:
       bool synchronize();
-      void handleRequest(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::goal_id const &g);
       void notify(TREX::transaction::Observation const &obs);
 
       bool m_active;

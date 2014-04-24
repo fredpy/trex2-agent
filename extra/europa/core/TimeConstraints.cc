@@ -70,14 +70,14 @@ void TickFromDate::handleExecute() {
   m_tick->getBounds(t_lo, t_hi);
   
   if( d_hi < std::numeric_limits<EUROPA::edouble>::infinity() ) {
-    tmp = a.date_to_tick(d_hi);
+    tmp = a.eu_date_to_tick(d_hi);
     if( tmp < t_hi ) {
       t_hi = tmp;
       up_hi = false;
     }
   }
   if( std::numeric_limits<EUROPA::edouble>::minus_infinity() < d_lo ) {
-    tmp = a.date_to_tick(d_lo);
+    tmp = a.eu_date_to_tick(d_lo);
     if( t_lo < tmp ) {
       t_lo = tmp;
       up_lo = false;
@@ -88,9 +88,9 @@ void TickFromDate::handleExecute() {
      && m_tick->isEmpty() )
     return;
   if( up_hi && t_hi < std::numeric_limits<EUROPA::eint>::infinity() )
-    d_hi = a.tick_to_date(t_hi);
+    d_hi = a.eu_tick_to_date(t_hi);
   
   if( up_lo && std::numeric_limits<EUROPA::eint>::minus_infinity() < t_lo )
-    d_lo = a.tick_to_date(t_lo);
+    d_lo = a.eu_tick_to_date(t_lo);
   m_date->intersect(d_lo, d_hi);
 }

@@ -42,7 +42,7 @@
 #ifndef H_LightSwitch
 # define H_LightSwitch
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 namespace TREX {
   /** @brief lightswitch plug-in utilities
@@ -65,7 +65,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup lightswitch
      */
-    class Light :public TREX::transaction::TeleoReactor {
+    class Light :public TREX::transaction::reactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -82,14 +82,14 @@ namespace TREX {
        * @li @c verbose is a boolean used to indicate whther we should 
        *     repeat the light state at every tick or not (default is @c false)
        */
-      Light(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      Light(TREX::transaction::reactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Light();      
 
     private:
       bool synchronize();
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::goal_id const &g);
+      void handle_recall(TREX::transaction::goal_id const &g);
 
       /** @brief State of the timeline */
       bool m_on, m_verbose;

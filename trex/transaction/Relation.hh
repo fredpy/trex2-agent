@@ -34,7 +34,7 @@
 #ifndef H_Relation
 # define H_Relation
 
-# include "TeleoReactor_fwd.hh"
+# include "reactor_fwd.hh"
 
 # include <boost/iterator/iterator_facade.hpp>
 
@@ -61,8 +61,8 @@ namespace TREX {
        * Create a new instance that indicates that @p faulty attempted to declare the
        * timeline named @p timeline while it is alread oewned by @p owner
        */
-      MultipleInternals(TeleoReactor const &faulty, utils::symbol const &timeline,
-			TeleoReactor const &owner) throw();
+      MultipleInternals(reactor const &faulty, utils::symbol const &timeline,
+			reactor const &owner) throw();
       /** @brief Destructor */
       ~MultipleInternals() throw() {}
     }; // TREX::transaction::MultipleInternals
@@ -293,7 +293,7 @@ namespace TREX {
        *
        * @sa Relation::valid() const
        */
-      TeleoReactor &client() const {
+      reactor &client() const {
 	return *(m_pos->first);
       }
       /** @brief Timeline name
@@ -319,7 +319,7 @@ namespace TREX {
        * @sa Relation::active() const
        * @sa details::timeline::owner() const
        */
-      TeleoReactor &server() const;
+      reactor &server() const;
       
       /** @brief Equality test
        *
@@ -407,7 +407,7 @@ namespace TREX {
       details::client_set::iterator m_pos;
 
       friend class details::timeline;
-      friend class TeleoReactor;
+      friend class reactor;
     }; // TREX::transaction::Relation     
 
   } // TREX::transaction

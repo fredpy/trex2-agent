@@ -1,7 +1,7 @@
 #ifndef H_ControlInterface
 # define H_ControlInterface
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 # include <boost/thread.hpp>
 # include <boost/thread/recursive_mutex.hpp>
@@ -24,7 +24,7 @@ namespace TREX {
      *
      * @author Frederic Py
      */
-    class ControlInterface :public TREX::transaction::TeleoReactor {
+    class ControlInterface :public TREX::transaction::reactor {
     public:
       /** @brief Constructor 
        *
@@ -40,7 +40,7 @@ namespace TREX {
        *   the lookahaded and latency are meaningless and can be
        *   set to 0.
        */
-      ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      ControlInterface(TREX::transaction::reactor::xml_arg_type arg);
       /** @brief Destructor 
        *
        * Terminates the listener thread, and destory this 
@@ -133,11 +133,11 @@ namespace TREX {
        * @li set the agent ControlInterface singleton to this 
        *    instance 
        */ 
-      void handleInit();
-      void handleTickStart();
+      void handle_init();
+      void handle_tick_start();
       bool synchronize();
-      void newPlanToken(TREX::transaction::goal_id const &t);
-      void cancelledPlanToken(TREX::transaction::goal_id const &t);
+      void new_plan_token(TREX::transaction::goal_id const &t);
+      void cancelled_plan_token(TREX::transaction::goal_id const &t);
       
 
       /** @brief Add a goal

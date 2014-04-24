@@ -8,7 +8,7 @@
 #ifndef TIMELINENORMALIZER_H_
 #define TIMELINENORMALIZER_H_
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 using namespace TREX::transaction;
 
@@ -17,10 +17,10 @@ namespace TREX
   namespace LSTS
   {
 
-    class LstsReactor : public TeleoReactor
+    class LstsReactor : public reactor
     {
     public:
-      LstsReactor(TeleoReactor::xml_arg_type arg);
+      LstsReactor(reactor::xml_arg_type arg);
       virtual ~LstsReactor();
       bool isObservationNew(TREX::transaction::Observation obs);
       bool postUniqueObservation(TREX::transaction::Observation obs);

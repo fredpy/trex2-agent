@@ -8,7 +8,7 @@
 #ifndef ECHOTIMELINE_HPP_
 #define ECHOTIMELINE_HPP_
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/log_manager.hh>
 # include <DUNE/DUNE.hpp>
@@ -22,13 +22,13 @@ namespace TREX {
     {
     public:
       // constructor
-      EchoTimeline(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      EchoTimeline(TREX::transaction::reactor::xml_arg_type arg);
       // called before first tick
       bool synchronize();
       // called before first tick
-      void handleInit();
+      void handle_init();
       // called when a goal is requested
-      void handleRequest(goal_id const &g);
+      void handle_request(goal_id const &g);
       // destructor
       ~EchoTimeline();
 

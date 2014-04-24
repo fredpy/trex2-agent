@@ -267,14 +267,14 @@ void Assembly::init_clock_vars() {
   if( m_clock.isNoId() )
     throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
 
-  mission_start->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
-							      initial_tick()));
-  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
-							    final_tick()));
-  tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),
-							    tick_duration()));
-  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
-                                                        final_tick()));
+  mission_start->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_initial_tick(),
+							      eu_initial_tick()));
+  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_final_tick(),
+							    eu_final_tick()));
+  tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_tick_duration(),
+							    eu_tick_duration()));
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_initial_tick(),
+                                                        eu_final_tick()));
 }
 
 void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
@@ -299,13 +299,13 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
   }
 }
 
-void Assembly::new_tick() {
+void Assembly::eu_new_tick() {
   bool auto_prop = constraint_engine()->getAutoPropagation();
   constraint_engine()->setAutoPropagation(false);
   
   debugMsg("trex:tick", "START new_tick["<<now()<< "]-----------------------------------------------------");
-  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]");
-  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
+  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<eu_final_tick()<<"]");
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), eu_final_tick()));
 
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now());
   boost::filter_iterator<details::is_rejectable,
@@ -486,7 +486,7 @@ EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
 
-  if( is_internal(obj_name) ) {
+  if( check_internal(obj_name) ) {
     debugMsg("trex:notify", "Post observation "<<state.timeline()->toString()
              <<'.'<<state.current()->getUnqualifiedPredicateName().toString()<<":\n"
              <<state.current()->toLongString());
@@ -528,7 +528,7 @@ bool Assembly::commit_externals() {
   return true;
 }
 
-bool Assembly::do_synchronize() {
+bool Assembly::eu_do_synchronize() {
   m_in_synchronization = true;
 
   BOOST_SCOPE_EXIT((&m_in_synchronization)) {
@@ -911,7 +911,7 @@ void Assembly::archive(EUROPA::eint date) {
           EUROPA::ObjectId obj = dom.makeObjectList().front();
           state_iterator pos = m_agent_timelines.find(obj->getKey());
           if( m_agent_timelines.end()==pos ||
-              !((*pos)->external() && 0==look_ahead(obj)) ) {
+              !((*pos)->external() && 0==tl_look_ahead(obj)) ) {
             if( can_delete ) {
               debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
                        <<tok->getPredicateName().toString()<<'('
@@ -1108,7 +1108,7 @@ bool Assembly::internal(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::internal(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && is_internal(obj->getName());
+  return is_agent_timeline(obj) && check_internal(obj->getName());
 }
 
 bool Assembly::external(EUROPA::TokenId const &tok) const {
@@ -1123,13 +1123,13 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::external(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && is_external(obj->getName());
+  return is_agent_timeline(obj) && check_external(obj->getName());
 }
 
-size_t Assembly::look_ahead(EUROPA::ObjectId const &obj) {
+size_t Assembly::tl_look_ahead(EUROPA::ObjectId const &obj) {
   if( !is_agent_timeline(obj) )
     return 0;
-  return look_ahead(obj->getName());
+  return tl_look_ahead(obj->getName());
 }
 
 

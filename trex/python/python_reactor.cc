@@ -70,15 +70,15 @@ void python_reactor::ext_use(symbol const &tl, bool control) {
 }
 
 bool python_reactor::ext_check(symbol const &tl) const {
-  return isExternal(tl);
+  return is_external(tl);
 }
 
 void python_reactor::post_request(goal_id const &g) {
-  postGoal(g);
+  post_goal(g);
 }
 
 bool python_reactor::cancel_request(goal_id const &g) {
-  return postRecall(g);
+  return post_recall(g);
 }
 
 bool python_reactor::ext_unuse(symbol const &tl) {
@@ -90,11 +90,11 @@ void python_reactor::int_decl(symbol const &tl, bool control) {
 }
 
 bool python_reactor::int_check(symbol const &tl) const {
-  return isInternal(tl);
+  return is_internal(tl);
 }
 
 void python_reactor::post_obs(Observation const &obs, bool verb) {
-  postObservation(obs, verb);
+  post_observation(obs, verb);
 }
 
 bool python_reactor::int_undecl(symbol const &tl) {
@@ -109,33 +109,33 @@ void python_reactor::notify(Observation const &o) {
     if( fn )
       fn(obs);
     else
-      TeleoReactor::notify(o);
+      reactor::notify(o);
   } catch(bp::error_already_set const &e) {
     log_error(e);
     throw;
   }
 }
 
-void python_reactor::handleRequest(goal_id const &g) {
+void python_reactor::handle_request(goal_id const &g) {
   try {
     bp::override fn = this->get_override("handle_request");
     if( fn )
       fn(g);
     else
-      TeleoReactor::handleRequest(g);
+      reactor::handle_request(g);
   } catch(bp::error_already_set const &e) {
     log_error(e);
     throw;
   }
 }
 
-void python_reactor::handleRecall(goal_id const &g) {
+void python_reactor::handle_recall(goal_id const &g) {
   try {
     bp::override fn = this->get_override("handle_recall");
     if( fn )
       fn(g);
     else
-      TeleoReactor::handleRecall(g);
+      reactor::handle_recall(g);
   } catch(bp::error_already_set const &e) {
     log_error(e);
     throw;
@@ -143,25 +143,25 @@ void python_reactor::handleRecall(goal_id const &g) {
 }
 
 // execution callbacks
-void python_reactor::handleInit() {
+void python_reactor::handle_init() {
   try {
     bp::override fn = this->get_override("handle_init");
     if( fn )
       fn();
     else
-      TeleoReactor::handleInit();
+      reactor::handle_init();
   } catch(bp::error_already_set const &e) {
     log_error(e);
   }
 }
 
-void python_reactor::handleTickStart() {
+void python_reactor::handle_tick_start() {
   try {
     bp::override fn = this->get_override("handle_new_tick");
     if( fn )
       fn();
     else
-      TeleoReactor::handleTickStart();
+      reactor::handle_tick_start();
   } catch(bp::error_already_set const &e) {
     log_error(e);
   }
@@ -178,14 +178,14 @@ bool python_reactor::synchronize() {
   }
 }
 
-bool python_reactor::hasWork() {
+bool python_reactor::has_work() {
   try {
     bp::override fn = this->get_override("has_work");
     if( fn ) {
       bool ret = fn();
       return ret;
     } else
-      return TeleoReactor::hasWork(); // false
+      return reactor::has_work(); // false
   } catch(bp::error_already_set const &e) {
     log_error(e);
     return false;
@@ -198,7 +198,7 @@ void python_reactor::resume() {
     if( fn )
       fn();
     else
-      TeleoReactor::resume();
+      reactor::resume();
   } catch(bp::error_already_set const &e) {
     log_error(e);
   }
@@ -209,13 +209,13 @@ void python_reactor::resume() {
  */
 
 producer::producer(symbol const &name)
-:TeleoReactor::xml_factory::factory_type::producer(name) {
-  TeleoReactor::xml_factory::factory_type::producer::notify();
+:reactor::xml_factory::factory_type::producer(name) {
+  reactor::xml_factory::factory_type::producer::notify();
 }
 
 producer::result_type producer::produce(producer::argument_type arg) const {
   // Extract the target python type name
-  boost::property_tree::ptree::value_type &node = TeleoReactor::xml_factory::node(arg);
+  boost::property_tree::ptree::value_type &node = reactor::xml_factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
   bp::object my_class = bp::eval(bp::str(class_name));
     
@@ -229,7 +229,7 @@ producer::result_type producer::produce(producer::argument_type arg) const {
     s_log->syslog("python", TREX::utils::log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
     result_type r = bp::extract<result_type>(obj);
     
-    s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->getName();
+    s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->name();
     return r;
   } catch(bp::error_already_set const &e) {
     log_error(e);

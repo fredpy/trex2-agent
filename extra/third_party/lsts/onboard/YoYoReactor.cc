@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
 
   /** @brief Platform reactor declaration */
-  TeleoReactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
+  reactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
 
 }
 
@@ -32,7 +32,7 @@ namespace TREX {
     utils::symbol const YoYoReactor::s_yoyo_tl("yoyo");
     utils::symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
 
-    YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
+    YoYoReactor::YoYoReactor(reactor::xml_arg_type arg) :
       LstsReactor(arg),
       m_lastRefState(s_refstate_tl, "Failed"),
       m_lastControl(s_control_tl, "Failed"),
@@ -53,13 +53,13 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handleInit()
+    YoYoReactor::handle_init()
     {
       Observation yoyo(s_yoyo_tl, "Idle");
-      postObservation(yoyo);
+      post_observation(yoyo);
 
       Observation yoyo_state(s_yoyo_state_tl, "Idle");
-      postObservation(yoyo_state);
+      post_observation(yoyo_state);
 
       m_lastSeenRef.lat = m_lastSeenRef.lon = m_lastSeenRef.speed =
           m_lastSeenRef.z = m_lastSeenRef.tick = 0;
@@ -69,7 +69,7 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handleTickStart()
+    YoYoReactor::handle_tick_start()
     {
     }
 
@@ -246,18 +246,18 @@ namespace TREX {
 
       //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
-      postGoal(g);
+      post_goal(g);
 
       m_lastSentRef.lat = lat;
       m_lastSentRef.lon = lon;
       m_lastSentRef.z = z;
       m_lastSentRef.speed = speed;
-      m_lastSentRef.tick = getCurrentTick();
+      m_lastSentRef.tick = current_tick();
       m_cmdz = z;
     }
 
     void
-    YoYoReactor::handleRequest(TREX::transaction::goal_id const &goal)
+    YoYoReactor::handle_request(TREX::transaction::goal_id const &goal)
     {
       if ( s_trex_pred != m_lastControl.predicate() )
       {
@@ -302,7 +302,7 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handleRecall(TREX::transaction::goal_id const &g)
+    YoYoReactor::handle_recall(TREX::transaction::goal_id const &g)
     {
       //std::cerr << "[YOYO] handleRecall(" << *(g.get()) << ")" << std::endl;
     }
@@ -319,7 +319,7 @@ namespace TREX {
           m_lastSeenRef.lon = obs.getAttribute("longitude").domain().get_typed_singleton<double,true>();
           m_lastSeenRef.speed = obs.getAttribute("speed").domain().get_typed_singleton<double,true>();
           m_lastSeenRef.z = obs.getAttribute("z").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.tick = getCurrentTick();
+          m_lastSeenRef.tick = current_tick();
         }
         else {
 

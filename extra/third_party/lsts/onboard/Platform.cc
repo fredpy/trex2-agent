@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
   
   /** @brief Platform reactor declaration */
-  TeleoReactor::xml_factory::declare<TREX::LSTS::Platform> decl("Platform");
+  reactor::xml_factory::declare<TREX::LSTS::Platform> decl("Platform");
   
 }
 
@@ -45,7 +45,7 @@ namespace TREX
       Reference m_ref;
     } // Hide this crap from outside this file ....
     
-    Platform::Platform(TeleoReactor::xml_arg_type arg) :
+    Platform::Platform(reactor::xml_arg_type arg) :
     LstsReactor(arg), m_reference_initialized(false)
     {
       m_firstTick = true;
@@ -55,18 +55,18 @@ namespace TREX
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
       
-      duneport = parse_attr<int>(6002, TeleoReactor::xml_factory::node(arg),
+      duneport = parse_attr<int>(6002, reactor::xml_factory::node(arg),
                                  "duneport");
       duneip = parse_attr<std::string>("127.0.0.1",
-                                       TeleoReactor::xml_factory::node(arg),
+                                       reactor::xml_factory::node(arg),
                                        "duneip");
-      debug = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+      debug = parse_attr<bool>(false, reactor::xml_factory::node(arg),
                                "debug");
 
-      m_auv = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+      m_auv = parse_attr<bool>(false, reactor::xml_factory::node(arg),
                                "auv");
 
-      localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
+      localport = parse_attr<int>(false, reactor::xml_factory::node(arg),
                                   "localport");
       //m_links = std::map<std::string, Announce*>();
       
@@ -80,7 +80,7 @@ namespace TREX
       // Timelines that can be controlled by other reactors
       provide("reference");
       
-      bool is_uav = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+      bool is_uav = parse_attr<bool>(false, reactor::xml_factory::node(arg),
                                      "uav");
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";
@@ -96,7 +96,7 @@ namespace TREX
     }
     
     void
-    Platform::handleInit()
+    Platform::handle_init()
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
       m_adapter.bind(localport);
@@ -140,7 +140,7 @@ namespace TREX
 
 
   void
-  Platform::handleTickStart()
+  Platform::handle_tick_start()
   {
 
     // Do not process goals if you still have observations to post
@@ -250,10 +250,10 @@ namespace TREX
       if (msg_count < 1)
       {
         if( m_firstTick ) {
-          m_last_msg = getCurrentTick()-1;
+          m_last_msg = current_tick()-1;
           m_firstTick = false;
         }
-        TICK delta = getCurrentTick()-m_last_msg;
+        TICK delta = current_tick()-m_last_msg;
 
 
         if( delta>=m_max_delta ) {
@@ -278,7 +278,7 @@ namespace TREX
           syslog(log::warn) << "Now connected to DUNE";
         }
         m_connected = true;
-        m_last_msg = getCurrentTick();
+        m_last_msg = current_tick();
       }
     }
     catch (std::runtime_error& e)
@@ -325,7 +325,7 @@ namespace TREX
     
     
     void
-    Platform::handleRequest(goal_id const &g)
+    Platform::handle_request(goal_id const &g)
     {
       
       goal_id goal = g;
@@ -340,7 +340,7 @@ namespace TREX
     }
     
     void
-    Platform::handleRecall(goal_id const &g)
+    Platform::handle_recall(goal_id const &g)
     {
        goal_id goal = g;
       
@@ -352,7 +352,7 @@ namespace TREX
         std::cout << "handleRecall(" << g << ", " << *goal << ")";
       
       m_goals_pending.remove(g);
-      handleRequest(g);
+      handle_request(g);
       
       //if (gname == "reference" && gpred == "Going")
         //handleGoingRecall(g);
@@ -379,7 +379,7 @@ namespace TREX
       // obs_map::iterator it = postedObservations.find(token.timeline); //< unused variable
 
       // If no such timeline has ever been posted, a new timeline will now be provided
-      if ( !isInternal(token.timeline))
+      if ( !is_internal(token.timeline))
         provide(token.timeline, false, false);
       //Observation obs = m_adapter.genericObservation(&token);
       //std::cerr << "Posting observation: " << obs << "\n";
@@ -535,7 +535,7 @@ namespace TREX
       
       // force posting of position observations (duration == 1)
       if (estate != NULL)
-        postObservation(m_adapter.estimatedStateObservation(estate));
+        post_observation(m_adapter.estimatedStateObservation(estate));
 
       VehicleMedium * medium =
       dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);

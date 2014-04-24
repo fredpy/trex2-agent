@@ -68,8 +68,8 @@ void TokenFilter::set_assembly(EUROPA::EngineComponentId const &component) {
 
 bool TokenFilter::tokenCheck(EUROPA::TokenId const &token) {
   return assembly().ignored(token) ||
-    token->start()->lastDomain().getLowerBound() >= assembly().final_tick() ||
-    token->end()->lastDomain().getUpperBound() <= assembly().initial_tick();
+    token->start()->lastDomain().getLowerBound() >= assembly().eu_final_tick() ||
+    token->end()->lastDomain().getUpperBound() <= assembly().eu_initial_tick();
 }
 
 bool TokenFilter::test(EUROPA::EntityId const &entity) {
@@ -96,7 +96,7 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::IntervalIntDomain const &t_start(tok->start()->lastDomain());
   EUROPA::IntervalIntDomain const &t_end(tok->end()->lastDomain());
   EUROPA::IntervalIntDomain horizon = assembly().plan_scope();
-  EUROPA::eint initial = assembly().initial_tick();
+  EUROPA::eint initial = assembly().eu_initial_tick();
   
   if( t_start.getLowerBound() >= horizon.getUpperBound() ) {
     debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") starts "<<t_start.toString()
@@ -118,7 +118,7 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
 
 bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
   EUROPA::eint cur = assembly().now(), 
-    initial = assembly().initial_tick();
+    initial = assembly().eu_initial_tick();
     
   // debugMsg("trex:filt:synch", "Checking if "<<tok->toString()<<" overlaps "<<cur);
   

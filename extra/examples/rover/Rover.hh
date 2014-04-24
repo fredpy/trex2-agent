@@ -1,24 +1,24 @@
 #ifndef H_Rover
 #define H_Rover
 
-#include <trex/transaction/TeleoReactor.hh>
+#include <trex/transaction/reactor.hh>
 #include <iostream>
 
 namespace TREX {
 
     namespace rover {
 
-        class Rover :public TREX::transaction::TeleoReactor
+        class Rover :public TREX::transaction::reactor
         {
             public:
-                Rover(TREX::transaction::TeleoReactor::xml_arg_type arg);
+                Rover(TREX::transaction::reactor::xml_arg_type arg);
                 ~Rover();
 
             private:
-                void handleInit();
+                void handle_init();
                 bool synchronize();
-                void handleRequest(TREX::transaction::goal_id const &g);
-                void handleRecall(TREX::transaction::goal_id const &g);
+                void handle_request(TREX::transaction::goal_id const &g);
+                void handle_recall(TREX::transaction::goal_id const &g);
 
                 /** @brief State of the timeline */
                 std::string location;

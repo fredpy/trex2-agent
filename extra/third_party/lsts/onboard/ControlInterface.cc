@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief GoalPipe reactor declaration */
-  TeleoReactor::xml_factory::declare<ControlInterface> decl("GoalPipe");
+  reactor::xml_factory::declare<ControlInterface> decl("GoalPipe");
 
 }
 
@@ -53,10 +53,10 @@ shared_var<size_t> ControlInterface::s_id;
 
 // structors 
 
-ControlInterface::ControlInterface(TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg, false), m_running(false),
+ControlInterface::ControlInterface(reactor::xml_arg_type arg)
+:reactor(arg, false), m_running(false),
  m_need_fifo(utils::parse_attr<bool>(false, 
-				     TeleoReactor::xml_factory::node(arg), 
+				     reactor::xml_factory::node(arg),
 				     "local_queue")),
  m_fifo(0) {
   //use("estimator", true, true);
@@ -79,7 +79,7 @@ ControlInterface::~ControlInterface() {
 std::string ControlInterface::fifo_name() const {
   std::ostringstream oss;
   // file name is <agent>.<reactor>.in
-  oss<<getAgentName()<<'.'<<getName()<<".in";
+  oss<<agent_name()<<'.'<<name()<<".in";
   // Position the file into our log directory
   return manager().log_file(oss.str()).string();
 }
@@ -141,18 +141,18 @@ bool ControlInterface::next(std::set<goal_id> &l, goal_id &g) {
 }
 
 std::string ControlInterface::log_message(std::string const &content) {
-  std::ostringstream name;
+  std::ostringstream name_s;
   // Build unique message name
-  name<<"msg.";
+  name_s<<"msg.";
   {
     shared_var<size_t>::scoped_lock cs(s_id);
-    name<<(++(*s_id))<<".rcvd";
+    name_s<<(++(*s_id))<<".rcvd";
   }
   // Log the message
-  std::string full_name = file_name(name.str()).string();
+  std::string full_name = file_name(name_s.str()).string();
   std::ofstream out(full_name.c_str(), std::ofstream::binary);
   out.write(content.c_str(), content.length());
-  return name.str();
+  return name_s.str();
 }
 
 void ControlInterface::create_fifo() {
@@ -296,7 +296,7 @@ void ControlInterface::stop() {
 
 // TREX callbacks 
 
-void ControlInterface::handleInit() {
+void ControlInterface::handle_init() {
   // Create the new fifo queue
   if( m_need_fifo ) {
     create_fifo();
@@ -306,21 +306,21 @@ void ControlInterface::handleInit() {
   //Platform::setControlInterface(this);
 }
 
-void ControlInterface::handleTickStart() {
+void ControlInterface::handle_tick_start() {
   goal_id g;
 
   // get pending recalls
   while( next(m_pending_recalls, g) ) {
-    postRecall(g);
+    post_recall(g);
   }
 
   // get pending goals
   while( next(m_pending_goals, g) ) {
     // First attempt to subscribe to the timeline
-    if( !isExternal(g->object()) )
+    if( !is_external(g->object()) )
       use(g->object(), true, true);
-    if( isExternal(g->object()) ) {
-      if( !postGoal(g) )
+    if( is_external(g->object()) ) {
+      if( !post_goal(g) )
 	syslog(log::warn)<<"["<<g<<"] was already posted ... ?";
     } else
       syslog(log::warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
@@ -344,7 +344,7 @@ bool ControlInterface::synchronize() {
 
 
 
-void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
+void ControlInterface::new_plan_token(TREX::transaction::goal_id const &t)
 {
   syslog(log::info) << "new plan token: " << *t;
 
@@ -357,7 +357,7 @@ void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
   }
 }
 
-void ControlInterface::cancelledPlanToken(TREX::transaction::goal_id const &t)
+void ControlInterface::cancelled_plan_token(TREX::transaction::goal_id const &t)
 {
   syslog(log::info) << "token has been canceled: " << *t;
 

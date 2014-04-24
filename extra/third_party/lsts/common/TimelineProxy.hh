@@ -8,7 +8,7 @@
 #ifndef TIMELINEPROXY_HH_
 #define TIMELINEPROXY_HH_
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/log_manager.hh>
 # include <DUNE/DUNE.hpp>
@@ -17,21 +17,21 @@
 namespace TREX {
   namespace LSTS {
 
-    class TimelineProxy :public TREX::transaction::TeleoReactor {
+    class TimelineProxy :public TREX::transaction::reactor {
     public:
-      TimelineProxy(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      TimelineProxy(TREX::transaction::reactor::xml_arg_type arg);
       virtual ~TimelineProxy();
 
     private:
 
       // called before first tick
-      void handleInit();
+      void handle_init();
 
       // called each tick
       bool synchronize();
 
       // called when a goal is requested
-      void handleRequest(goal_id const &g);
+      void handle_request(goal_id const &g);
 
       // called when an observation is posted
       void notify(Observation const &obs);

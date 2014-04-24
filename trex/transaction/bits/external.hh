@@ -230,7 +230,7 @@ namespace TREX {
 	bool equal(external const &other) const;
 	Relation const &dereference() const;
         
-        friend class TREX::transaction::TeleoReactor;
+        friend class TREX::transaction::reactor;
 	friend class boost::iterator_core_access;
       }; // TREX::transaction::details::external
       

@@ -107,7 +107,7 @@ namespace TREX {
 	 * @sa owned() const
 	 * @sa owner() const
 	 */
-	timeline(TICK date, utils::symbol const &name, TeleoReactor &serv,
+	timeline(TICK date, utils::symbol const &name, reactor &serv,
                  transaction_flags const &flags);
 	/** @brief Destructor */
 	~timeline();
@@ -148,7 +148,7 @@ namespace TREX {
 	 * @sa owned() const
 	 * @sa owner() const
 	 */
-	bool owned_by(TeleoReactor const &r) const {
+	bool owned_by(reactor const &r) const {
 	  return &r==m_owner;
 	}
 	/** @brief Timeline owner
@@ -164,7 +164,7 @@ namespace TREX {
 	 * @sa owned_by(TeleoReactor const &) const
 	 * @sa assign(TeleoReactor &)
 	 */
-	TeleoReactor &owner() const {
+	reactor &owner() const {
 	  return *m_owner;
 	}
 
@@ -339,7 +339,7 @@ namespace TREX {
 	 * @sa unassign(TICK)
 	 * @sa TeleoReactor::assigned(timeline const &)
 	 */
-	bool assign(TeleoReactor &r, transaction_flags const &flags);
+	bool assign(reactor &r, transaction_flags const &flags);
         
         /** @brief Remove ownership
          *
@@ -359,7 +359,7 @@ namespace TREX {
          * @sa assign(TeleoReactor &, bool)
          * @sa TeleoReactor::unassigned(timeline const &)
          */
-        TeleoReactor *unassign(TICK date);
+        reactor *unassign(TICK date);
         /** @brief timeline demotion
          *
          * @param[in] date the current tick
@@ -403,7 +403,7 @@ namespace TREX {
 	 * @sa unsubscribe(Relation const &)
 	 * @sa TeleoReactor::subscribed(Relation const &)
 	 */
-	bool subscribe(TeleoReactor &r, transaction_flags const &flags);
+	bool subscribe(reactor &r, transaction_flags const &flags);
 	/** @brief Remove a relation
 	 *
 	 * @param[in] rel A relation
@@ -466,7 +466,7 @@ namespace TREX {
          * A pointer to the reactor currently decalring this timeline as 
          * Internal or @c NULL if this timeline is currently not owned
          */
-	TeleoReactor *m_owner;
+	reactor *m_owner;
         /** @brief Request acceptance flag
          * 
          * A flag that indicates if the timeline is currently accepting request 
@@ -515,7 +515,7 @@ namespace TREX {
 	 */
 	static utils::symbol const  s_failed;
 	
-	friend class TREX::transaction::TeleoReactor;
+	friend class TREX::transaction::reactor;
 	friend class TREX::transaction::Relation;
 	friend class TREX::transaction::graph;
       }; //TREX::transaction::details::timeline

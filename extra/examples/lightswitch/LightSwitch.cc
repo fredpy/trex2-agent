@@ -68,7 +68,7 @@ namespace {
   singleton::use<log_manager> s_log;
 
   /** @brief Light reactor declaration */
-  TeleoReactor::xml_factory::declare<Light> decl("Light");
+  reactor::xml_factory::declare<Light> decl("Light");
   
 }
 
@@ -103,17 +103,17 @@ symbol const Light::brokenPred("Broken");
 symbol const Light::switchObj("switch");
 
 
-Light::Light(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false), 
-   m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+Light::Light(reactor::xml_arg_type arg)
+  :reactor(arg, false),
+   m_on(parse_attr<bool>(false, reactor::xml_factory::node(arg),
 			 "state")),
-   m_verbose(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
+   m_verbose(parse_attr<bool>(false, reactor::xml_factory::node(arg),
 			      "verbose")),
    m_firstTick(true) {
   syslog(null, info)<<"I want to own "<<lightObj;
   provide(lightObj, false); // declare the light timeline ... no goal accepted here
   syslog(null, info)<<"I want to own "<<switchObj;
-  provide(switchObj); // declare the switch timeline 
+  provide(switchObj); // declare the switch timeline
   syslog(null, info)<<"I am done";
 }
 
@@ -132,11 +132,11 @@ void Light::setValue(bool val) {
   }
   m_light_state.reset(new Observation(lightObj, light_v));
   //syslog()<<"Posting "<<*m_light_state;
-  postObservation(*m_light_state);
+  post_observation(*m_light_state);
   Observation switch_state(switchObj, switch_v);
   switch_state.restrictAttribute("foo", boolean_domain(m_on));
   //syslog()<<"Posting "<<switch_state;
-  postObservation(switch_state);
+  post_observation(switch_state);
 } 
 
 
@@ -148,9 +148,9 @@ bool Light::synchronize() {
     setValue(m_on);
     need_post = false;
     m_firstTick = false;
-    m_nextSwitch = getCurrentTick()+1;
+    m_nextSwitch = current_tick()+1;
   } else {
-    TICK cur = getCurrentTick();
+    TICK cur = current_tick();
 
     //syslog()<<"Testing next goal switch "<<m_nextSwitch<<"<="<<cur;
     if( m_nextSwitch<=cur ) {
@@ -169,7 +169,7 @@ bool Light::synchronize() {
 	    } else {
 	      Observation obs(*m_pending.front());
 //              syslog()<<"Posting "<<obs<<" as an observation";
-	      postObservation(obs);
+	      post_observation(obs);
 	    }
 	    m_nextSwitch = cur+m_pending.front()->getDuration().lower_bound().value();
 	    m_pending.pop_front();
@@ -193,12 +193,12 @@ bool Light::synchronize() {
   }
   // check if I still need to post the ligh state
   if( need_post ) 
-    postObservation(*m_light_state);
+    post_observation(*m_light_state);
   // always succeed
   return true;
 }
 
-void Light::handleRequest(goal_id const &g) {
+void Light::handle_request(goal_id const &g) {
   if( g->predicate()==upPred || g->predicate()==downPred || g->predicate()==brokenPred ) {
     // I insert it on my list
     int_domain::bound lo = g->getStart().lower_bound();
@@ -222,7 +222,7 @@ void Light::handleRequest(goal_id const &g) {
 //  }
 }
 
-void Light::handleRecall(goal_id const &g) {
+void Light::handle_recall(goal_id const &g) {
   std::list<goal_id>::iterator i = m_pending.begin();
   for( ; m_pending.end()!=i; ++i ) {
     if( *i==g ) {

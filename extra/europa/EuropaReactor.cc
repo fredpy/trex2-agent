@@ -70,8 +70,8 @@ namespace {
 
 // structors
 
-EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false),
+EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
+  :reactor(arg, false),
    Assembly(parse_attr<std::string>(xml_factory::node(arg), "name"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxSteps"),
             parse_attr<size_t>(0, xml_factory::node(arg), "maxDepth")),
@@ -101,8 +101,8 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
     if( !locate_nddl(nddl) )
       throw boost::property_tree::ptree_bad_data("Unable to locate model file \""+(*model)+"\"", cfg);
   } else {
-    std::string short_nddl = getName().str()+".nddl",
-      long_nddl = getGraphName().str()+"."+short_nddl;
+    std::string short_nddl = name().str()+".nddl",
+      long_nddl = graph_name().str()+"."+short_nddl;
 
     syslog(null, info)<<"No model specified: attempting to load "<<long_nddl;
     nddl = long_nddl;
@@ -237,7 +237,7 @@ void EuropaReactor::notify(Observation const &obs) {
   // logPlan("notify");
 }
 
-void EuropaReactor::handleRequest(goal_id const &request) {
+void EuropaReactor::handle_request(goal_id const &request) {
   setStream();
 
   EUROPA::ObjectId obj = plan_db()->getObject(request->object().str());
@@ -272,7 +272,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
   // logPlan("request");
 }
 
-void EuropaReactor::handleRecall(goal_id const &request) {
+void EuropaReactor::handle_recall(goal_id const &request) {
   setStream();
   // Remove the goal if it exists
   goal_map::right_iterator i = m_active_requests.right.find(request);
@@ -295,21 +295,21 @@ void EuropaReactor::handleRecall(goal_id const &request) {
   // logPlan("recall");
 }
 
-void EuropaReactor::newPlanToken(goal_id const &t) {
+void EuropaReactor::new_plan_token(goal_id const &t) {
   syslog(info)<<"Receive token ["<<t<<"] on timeline "<<t->object();
   // treat it as a request for now
-  handleRequest(t);
+  handle_request(t);
 }
 
-void EuropaReactor::cancelledPlanToken(goal_id const &t) {
+void EuropaReactor::cancelled_plan_token(goal_id const &t) {
   syslog(info)<<"Receive cancel for token ["<<t<<"]";
   // treat it as a recall for now
-  handleRecall(t);
+  handle_recall(t);
 }
 
 
 // TREX execution callbacks
-void EuropaReactor::handleInit() {
+void EuropaReactor::handle_init() {
   setStream();
   {
     TICK max_int = EUROPA::cast_basis(std::numeric_limits<EUROPA::eint>::max());
@@ -321,12 +321,12 @@ void EuropaReactor::handleInit() {
   }
 }
 
-void EuropaReactor::handleTickStart() {
+void EuropaReactor::handle_tick_start() {
   setStream();
   m_plan_counter = 0;
   // Updating the clock
-  clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
-  new_tick();
+  clock()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), eu_final_tick()));
+  eu_new_tick();
   // logPlan("tick");
 }
 
@@ -358,7 +358,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 	my_goal.restrictAttribute(attr);
       }
     }
-    goal_id request = postGoal(my_goal);
+    goal_id request = post_goal(my_goal);
     syslog(info)<<"Request ["<<request<<"] created from europa token "
 		<<tok->getKey();
     if( request ) {
@@ -379,7 +379,7 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
     Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
     restrict_goal(my_goal, tok);
 
-    goal_id request = postPlanToken(my_goal);
+    goal_id request = post_plan_token(my_goal);
     if( request ) {
       m_plan_tokens.insert(goal_map::value_type(tok->getKey(), request));
       setStream();
@@ -445,7 +445,7 @@ bool EuropaReactor::synch() {
   stat_clock::time_point start = stat_clock::now();
   bool ret = false;
   if( commit_externals() ) {
-    ret = do_synchronize();
+    ret = eu_do_synchronize();
   }
 
   print_stats("synch", synchronizer()->getStepCount(), 
@@ -544,14 +544,14 @@ void EuropaReactor::cancel(EUROPA::TokenId const &tok) {
 
   if( m_dispatched.left.end()!=i ) {
     syslog(info)<<"Recall ["<<i->second<<"]";
-    postRecall(i->second);
+    post_recall(i->second);
     sent_cmd = true;
     m_dispatched.left.erase(i);
   }
 
   i = m_plan_tokens.left.find(tok->getKey());
   if( m_plan_tokens.left.end()!=i ) {
-    cancelPlanToken(i->second);
+    cancel_plan_token(i->second);
     sent_cmd = true;
     m_plan_tokens.left.erase(i);
   }
@@ -567,7 +567,7 @@ void EuropaReactor::rejected(EUROPA::TokenId const &tok) {
 }
 
 
-bool EuropaReactor::hasWork() {
+bool EuropaReactor::has_work() {
   setStream();
   if( constraint_engine()->provenInconsistent() ) {
     syslog(null, error)<<"Plan database is inconsistent.";
@@ -597,19 +597,19 @@ bool EuropaReactor::hasWork() {
 
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
-        TeleoReactor::external_iterator
+        reactor::external_iterator
         j=find_external((*from)->timeline()->getName().c_str());
         EUROPA::eint e_lo, e_hi;
-        debugMsg("trex:dispatch", getName()<<'['<<getCurrentTick()<<"]: Looking for the dispatch of "
+        debugMsg("trex:dispatch", name()<<'['<<current_tick()<<"]: Looking for the dispatch of "
         		<<(*from)->timeline()->getName().c_str()<<" valid:"<<j.valid()
         		<<" goals:"<<j->accept_goals());
         if( j.valid() && j->accept_goals() ) {
-          int_domain window = j->dispatch_window(getCurrentTick()+1);
+          int_domain window = j->dispatch_window(current_tick()+1);
           int_domain::bound lo = window.lower_bound(),
 	    hi = window.upper_bound();
           e_lo = static_cast<EUROPA::eint::basis_type>(lo.value());
           if( hi.is_infinity() )
-            e_hi = final_tick();
+            e_hi = eu_final_tick();
           else
             e_hi = static_cast<EUROPA::eint::basis_type>(hi.value());
           (*from)->do_dispatch(e_lo, e_hi);
@@ -714,7 +714,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
       obs.restrictAttribute(v);
     }
   }
-  postObservation(obs);
+  post_observation(obs);
 }
 
 
@@ -749,19 +749,19 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
 
 // Observers
 
-EUROPA::edouble EuropaReactor::tick_to_date(EUROPA::eint tick) const {
-  return tickToTime(EUROPA::cast_basis(tick)).since_epoch().to_chrono<duration_type>().count();
+EUROPA::edouble EuropaReactor::eu_tick_to_date(EUROPA::eint tick) const {
+  return tick_to_time(EUROPA::cast_basis(tick)).since_epoch().to_chrono<duration_type>().count();
 }
 
-EUROPA::eint EuropaReactor::date_to_tick(EUROPA::edouble date) const {
+EUROPA::eint EuropaReactor::eu_date_to_tick(EUROPA::edouble date) const {
   CHRONO::duration<EUROPA::edouble::basis_type> rdate(EUROPA::cast_basis(date));
   utils::rt_duration delta(rdate);
   
-  return static_cast<EUROPA::eint::basis_type>(timeToTick(date_type::epoch().add(delta)));
+  return static_cast<EUROPA::eint::basis_type>(time_to_tick(date_type::epoch().add(delta)));
 }
 
 EUROPA::IntervalIntDomain EuropaReactor::plan_scope() const {
-  EUROPA::eint scope_duration(static_cast<EUROPA::eint::basis_type>(getExecLatency()+getLookAhead()));
+  EUROPA::eint scope_duration(static_cast<EUROPA::eint::basis_type>(exec_latency()+look_ahead()));
   return EUROPA::IntervalIntDomain(now(), std::min(now()+scope_duration,
 						   final_tick()));
 }
@@ -791,11 +791,11 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
 }
 
 
-size_t EuropaReactor::look_ahead(EUROPA::LabelStr const &name) {
-  if( isInternal(name.toString()) )
-    return getLookAhead();
+size_t EuropaReactor::tl_look_ahead(EUROPA::LabelStr const &name) {
+  if( is_internal(name.toString()) )
+    return look_ahead();
   else {
-    TeleoReactor::external_iterator pos = find_external(name.toString());
+    reactor::external_iterator pos = find_external(name.toString());
     if( ext_end()==pos || !( pos.active() && (*pos)->accept_goals() ) )
       return 0;
     else 

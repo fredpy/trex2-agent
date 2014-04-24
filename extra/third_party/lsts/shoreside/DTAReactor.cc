@@ -15,7 +15,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  TeleoReactor::xml_factory::declare<DTAReactor> decl("DTAReactor");
+  reactor::xml_factory::declare<DTAReactor> decl("DTAReactor");
 }
 
 
@@ -32,17 +32,17 @@ namespace
 
 // structors 
 
-DTAReactor::DTAReactor(TeleoReactor::xml_arg_type arg) 
-  :TeleoReactor(arg, false), 
+DTAReactor::DTAReactor(reactor::xml_arg_type arg)
+  :reactor(arg, false),
    m_active(false),
 m_proxy_timeline(parse_attr<symbol>(xml_factory::node(arg), "proxy")),
 m_asset_id(parse_attr<symbol>(xml_factory::node(arg), "id")) {
   m_survey_tl = m_asset_id.str() + "_follow";
   m_state_tl = m_asset_id.str() + "_state";
   provide(m_survey_tl);
-  postObservation(Observation(m_survey_tl, "None"));
+  post_observation(Observation(m_survey_tl, "None"));
   provide(m_state_tl, false);
-  postObservation(Observation(m_state_tl, "Nothing"));
+  post_observation(Observation(m_state_tl, "Nothing"));
   use(m_proxy_timeline, true);
 }
 
@@ -86,21 +86,21 @@ bool DTAReactor::synchronize() {
       tmp.restrictAttribute(var("size", float_domain(m_factor)));
       tmp.restrictAttribute(var("lagrangian", boolean_domain(m_lagrangian)));
     
-      postGoal(tmp);
+      post_goal(tmp);
       m_trex_state = GOAL_SENT;
-      postObservation(sent);
+      post_observation(sent);
     }
   }
   return true;
 }
 
-void DTAReactor::handleRequest(goal_id const &g) {
+void DTAReactor::handle_request(goal_id const &g) {
   if( g->object()==m_survey_tl ) {
     if( g->predicate()=="None" ) {
       if( m_active ) {
         m_active=false;
-        postObservation(Observation(m_survey_tl, g->predicate()));
-        postObservation(Observation(m_state_tl, "Nothing"));
+        post_observation(Observation(m_survey_tl, g->predicate()));
+        post_observation(Observation(m_state_tl, "Nothing"));
         unuse(m_drifter);
       }
     }
@@ -143,8 +143,8 @@ void DTAReactor::handleRequest(goal_id const &g) {
       }
       m_path = path;
       m_factor = factor;
-      postObservation(*g);
-      postObservation(Observation(m_state_tl, "Wait"));
+      post_observation(*g);
+      post_observation(Observation(m_state_tl, "Wait"));
     }
   }
 }
@@ -176,7 +176,7 @@ void DTAReactor::notify(Observation const &obs) {
       syslog(info)<<"dorado execute a goal !!!";
       m_trex_state = RUNNING;
       if( m_active )
-      postObservation(Observation(m_state_tl, "Wait"));
+      post_observation(Observation(m_state_tl, "Wait"));
     }
   }
 }

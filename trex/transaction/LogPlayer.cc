@@ -433,7 +433,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   
-  TeleoReactor::xml_factory::declare<LogPlayer> decl("LogPlayer");
+  reactor::xml_factory::declare<LogPlayer> decl("LogPlayer");
   
   details::tr_event::factory::declare<details::tr_use> 
     d_use("use");
@@ -490,7 +490,7 @@ symbol const LogPlayer::s_synchronize("synchronize");
 symbol const LogPlayer::s_has_work("has_work");
 symbol const LogPlayer::s_step("step");
 
-TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg) {
+reactor::xml_arg_type &LogPlayer::alter_cfg(reactor::xml_arg_type &arg) {
   // force logging to false
   utils::set_attr(xml_factory::node(arg), "log", false);
   return arg;
@@ -498,10 +498,10 @@ TeleoReactor::xml_arg_type &LogPlayer::alter_cfg(TeleoReactor::xml_arg_type &arg
 
 // structors 
 
-LogPlayer::LogPlayer(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false, false) {
+LogPlayer::LogPlayer(reactor::xml_arg_type arg)
+  :reactor(arg, false, false) {
   std::string 
-    file_name = utils::parse_attr<std::string>(getName().str()+".tr.log",
+    file_name = utils::parse_attr<std::string>(name().str()+".tr.log",
 					xml_factory::node(arg),
 					"file");
   bool found;
@@ -603,17 +603,17 @@ bool LogPlayer::in_tick(TICK tck) const {
 
 // callbacks
 
-void LogPlayer::handleInit() {
-  m_inited = next_phase(getCurrentTick(), s_init);
+void LogPlayer::handle_init() {
+  m_inited = next_phase(current_tick(), s_init);
 }
 
-void LogPlayer::handleTickStart() {
+void LogPlayer::handle_tick_start() {
   if( !m_inited ) 
-    handleInit(); // try to emulate the reactor staring at a later tick
-  if( !next_phase(getCurrentTick(), s_new_tick) ) {
+    handle_init(); // try to emulate the reactor staring at a later tick
+  if( !next_phase(current_tick(), s_new_tick) ) {
     size_t skipped =0;
     std::ostringstream oss;
-    while( !m_log.empty() && m_log.front().first<getCurrentTick() ) {
+    while( !m_log.empty() && m_log.front().first<current_tick() ) {
       oss<<"\n\t- ["<<m_log.front().first<<"]: "
 	 <<m_log.front().second->type();
       size_t n = m_log.front().second->execute();
@@ -626,20 +626,20 @@ void LogPlayer::handleTickStart() {
       syslog(null, warn)<<"Replayed "<<skipped
 			<<" past events after the tick started !!!:"<<oss.str();
       m_inited = true;
-      next_phase(getCurrentTick(), s_new_tick);
+      next_phase(current_tick(), s_new_tick);
     } 
   } else 
     m_inited = true;
 }
 
 bool LogPlayer::synchronize() {
-  if( next_phase(getCurrentTick(), s_synchronize) )
+  if( next_phase(current_tick(), s_synchronize) )
     m_inited = true;
   return true;
 }
 
-bool LogPlayer::hasWork() {
-  TICK cur = getCurrentTick();
+bool LogPlayer::has_work() {
+  TICK cur = current_tick();
   
   if( !next_phase(cur, s_has_work) ) {
     if( m_inited && in_tick(cur) )
@@ -651,7 +651,7 @@ bool LogPlayer::hasWork() {
 }
 
 void LogPlayer::resume() {
-  if( next_phase(getCurrentTick(), s_step) )
+  if( next_phase(current_tick(), s_step) )
     m_inited = true;
 }
 
@@ -674,23 +674,23 @@ void LogPlayer::play_unprovide(utils::symbol const &tl) {
 }
 
 void LogPlayer::play_obs(Observation const &obs) {
-  postObservation(obs);
+  post_observation(obs);
 }
 
 void LogPlayer::play_request(goal_id const &g) {
-  postGoal(g);
+  post_goal(g);
 }
 
 void LogPlayer::play_recall(goal_id const &g) {
-  postRecall(g);
+  post_recall(g);
 }
 
 void LogPlayer::play_add(goal_id const &g) {
-  postPlanToken(g);
+  post_plan_token(g);
 }
 
 void LogPlayer::play_cancel(goal_id const &g) {
-  cancelPlanToken(g);
+  cancel_plan_token(g);
 }
 
 using namespace TREX::transaction::details;

@@ -389,17 +389,17 @@ namespace TREX {
        * @ingroup agent
        * @author Frederic Py <fpy@mbari.org>
        */
-      class AgentProxy :public TREX::transaction::TeleoReactor {
+      class AgentProxy :public TREX::transaction::reactor {
       public:
 	AgentProxy(Agent &agent)
-          :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
+          :TREX::transaction::reactor(&agent, "", 0, 0) {}
 	~AgentProxy() {}
 	
-	bool postRequest(TREX::transaction::goal_id const &g) {
-          if( !isExternal(g->object()) )
+	bool post_request(TREX::transaction::goal_id const &g) {
+          if( !is_external(g->object()) )
             use(g->object());
-          if( isExternal(g->object()) )
-            return postGoal(g);
+          if( is_external(g->object()) )
+            return post_goal(g);
           else
             syslog(null, error)<<"Unable to subscribe to "<<g->object();
           return false;
@@ -526,9 +526,9 @@ namespace TREX {
 
       static TREX::transaction::TICK initialTick(clock_ref clk);
 
-      typedef TREX::transaction::TeleoReactor::stat_clock stat_clock;
+      typedef TREX::transaction::reactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;
-      typedef TREX::transaction::TeleoReactor::rt_clock   rt_clock;
+      typedef TREX::transaction::reactor::rt_clock   rt_clock;
 
       TREX::utils::async_ofstream m_stat_log;
 
