@@ -56,6 +56,10 @@ namespace TREX {
        *     to the reactor
        */
       typedef std::bitset<2> transaction_flags;
+
+      class internal_impl;
+      typedef SHARED_PTR<internal_impl> tl_ref;
+
     }
 
   }

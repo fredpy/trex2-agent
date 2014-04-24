@@ -55,10 +55,10 @@ namespace utils=TREX::utils;
 namespace TREX {
   namespace transaction {
     
-    class reactor::Logger {
+    class reactor::logger {
     public:
-      Logger(std::string const &dest, boost::asio::io_service &io);
-      ~Logger();
+      logger(std::string const &dest, boost::asio::io_service &io);
+      ~logger();
       
       void provide(symbol const &name, bool goals, bool plan);
       void unprovide(symbol const &name);
@@ -67,7 +67,7 @@ namespace TREX {
       void unuse(symbol const &name);
       
       void init(TICK val);
-      void newTick(TICK val);
+      void new_tick(TICK val);
       void synchronize();
       
       void failed();
@@ -80,8 +80,8 @@ namespace TREX {
       void recall(goal_id const &goal);
       
       void comment(std::string const &msg);
-      void notifyPlan(goal_id const &tok);
-      void cancelPlan(goal_id const &tok);
+      void notify_plan(goal_id const &tok);
+      void cancel_plan(goal_id const &tok);
       
     private:
       boost::asio::strand           m_strand;
@@ -334,7 +334,7 @@ reactor::reactor(reactor::xml_arg_type &arg, bool loadTL, bool log_default)
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
     std::string base = name().str()+".tr.log";
     fname = manager().log_file(base);
-    m_trLog = new Logger(fname.string(), manager().service());
+    m_trLog = new logger(fname.string(), manager().service());
     utils::log_manager::path_type cfg = manager().log_file("cfg"),
       pwd = boost::filesystem::current_path(), 
       short_name(base), location("../"+base);
@@ -381,7 +381,7 @@ reactor::reactor(graph *owner, symbol const &name_str,
      
   if( log ) {
     fname = manager().log_file(name().str()+".tr.log");
-    m_trLog = new Logger(fname.string(), manager().service());
+    m_trLog = new logger(fname.string(), manager().service());
     syslog(info)<<"Transactions logged to "<<fname;
 
   }
@@ -679,7 +679,7 @@ bool reactor::plan_sync(goal_id t) {
     throw boost::enable_current_exception(DispatchError(*this, t, "plan tokens can only be posted on Internal timelines."));
   else if( t->getEnd().upper_bound() > current_tick() ) {
     if( NULL!=m_trLog )
-      m_trLog->notifyPlan(t);
+      m_trLog->notify_plan(t);
     return (*tl)->notifyPlan(t);
   }
   return false;
@@ -690,7 +690,7 @@ void reactor::cancel_sync(goal_id tok) {
   if( m_internals.end()!=tl ) {
     // do something
     if( NULL!=m_trLog )
-      m_trLog->cancelPlan(tok);
+      m_trLog->cancel_plan(tok);
     
     (*tl)->cancelPlan(tok);
   } 
@@ -803,7 +803,7 @@ bool reactor::new_tick() {
   m_delib_rt = rt_clock::duration::zero();
   
   if( NULL!=m_trLog )
-    m_trLog->newTick(current_tick());
+    m_trLog->new_tick(current_tick());
 
   try {
     {
@@ -1012,7 +1012,7 @@ bool reactor::unprovide(TREX::utils::symbol const &timeline) {
 
 void reactor::isolate(bool failed) {
   if( NULL!=m_trLog && failed ) {
-    Logger *tmp = NULL;
+    logger *tmp = NULL;
     std::swap(tmp, m_trLog);
     tmp->failed();
     delete tmp;
@@ -1143,20 +1143,20 @@ void reactor::unblock(symbol const &name) {
 
 // structors
 
-reactor::Logger::Logger(std::string const &dest, boost::asio::io_service &io)
+reactor::logger::logger(std::string const &dest, boost::asio::io_service &io)
 :m_strand(io), m_active(io), m_file(io, dest) {
   m_flags.set(header);
-  m_strand.post(boost::bind(&Logger::direct_write, this, "<Log>\n <header>",
+  m_strand.post(boost::bind(&logger::direct_write, this, "<Log>\n <header>",
                             true));
 }
 
-reactor::Logger::~Logger() {
+reactor::logger::~logger() {
   //std::cerr<<"Destroy logger "<<std::endl;
   //std::cerr<<" - schedulle : close potential tick tag"<<std::endl;
   
-  m_strand.post(boost::bind(&Logger::close_tick, this));
+  m_strand.post(boost::bind(&logger::close_tick, this));
   //std::cerr<<" - build task : close the main tag"<<std::endl;
-  boost::packaged_task<void> close_xml(boost::bind(&Logger::direct_write,
+  boost::packaged_task<void> close_xml(boost::bind(&logger::direct_write,
                                                    this, "</Log>",
                                                    true));
   //std::cerr<<" - get future of the task"<<std::endl;
@@ -1172,105 +1172,105 @@ reactor::Logger::~Logger() {
 
 // interface
 
-void reactor::Logger::comment(std::string const &msg) {
-  m_strand.post(boost::bind(&Logger::direct_write, this, "<!-- "+msg+" -->",
+void reactor::logger::comment(std::string const &msg) {
+  m_strand.post(boost::bind(&logger::direct_write, this, "<!-- "+msg+" -->",
                             true));
 }
 
-void reactor::Logger::init(TICK val) {
-  m_strand.post(boost::bind(&Logger::set_tick, this, val, in_init));
+void reactor::logger::init(TICK val) {
+  m_strand.post(boost::bind(&logger::set_tick, this, val, in_init));
 }
 
-void reactor::Logger::newTick(TICK val) {
-  m_strand.post(boost::bind(&Logger::set_tick, this, val, in_new_tick));
+void reactor::logger::new_tick(TICK val) {
+  m_strand.post(boost::bind(&logger::set_tick, this, val, in_new_tick));
 }
 
-void reactor::Logger::synchronize() {
-  m_strand.post(boost::bind(&Logger::set_phase, this, in_synchronize));
+void reactor::logger::synchronize() {
+  m_strand.post(boost::bind(&logger::set_phase, this, in_synchronize));
 }
 
-void reactor::Logger::failed() {
-  post_event(boost::bind(&Logger::direct_write,
+void reactor::logger::failed() {
+  post_event(boost::bind(&logger::direct_write,
                          this, "   <failed/>", true));
 }
 
-void reactor::Logger::has_work() {
-  m_strand.post(boost::bind(&Logger::set_phase, this, in_work));
+void reactor::logger::has_work() {
+  m_strand.post(boost::bind(&logger::set_phase, this, in_work));
 }
 
-void reactor::Logger::step() {
-  m_strand.post(boost::bind(&Logger::set_phase, this, in_step));
+void reactor::logger::step() {
+  m_strand.post(boost::bind(&logger::set_phase, this, in_step));
 }
 
-void reactor::Logger::work(bool ret) {
+void reactor::logger::work(bool ret) {
   std::ostringstream oss;
   oss<<"   <work value=\""<<ret<<"\" />";
-  post_event(boost::bind(&Logger::direct_write,
+  post_event(boost::bind(&logger::direct_write,
                          this, oss.str(), true));
 }
 
-void reactor::Logger::provide(symbol const &name, bool goals, bool plan) {
+void reactor::logger::provide(symbol const &name, bool goals, bool plan) {
   std::ostringstream oss;
   oss<<"   <provide name=\""<<name
   <<"\" goals=\""<<goals
   <<"\" plan=\""<<plan<<"\" />";
-  post_event(boost::bind(&Logger::direct_write,
+  post_event(boost::bind(&logger::direct_write,
                          this, oss.str(), true));
 }
 
-void reactor::Logger::unprovide(symbol const &name) {
+void reactor::logger::unprovide(symbol const &name) {
   std::ostringstream oss;
   oss<<"   <unprovide name=\""<<name<<"\" />";
-  post_event(boost::bind(&Logger::direct_write,
+  post_event(boost::bind(&logger::direct_write,
                          this, oss.str(), true));  
 }
 
-void reactor::Logger::use(symbol const &name, bool goals, bool plan) {
+void reactor::logger::use(symbol const &name, bool goals, bool plan) {
   std::ostringstream oss;
   oss<<"   <use name=\""<<name
   <<"\" goals=\""<<goals
   <<"\" plan=\""<<plan<<"\" />";
-  post_event(boost::bind(&Logger::direct_write,
+  post_event(boost::bind(&logger::direct_write,
                          this, oss.str(), true));
 }
 
-void reactor::Logger::unuse(symbol const &name) {
+void reactor::logger::unuse(symbol const &name) {
   std::ostringstream oss;
   oss<<"   <unuse name=\""<<name<<"\" />";
-  post_event(boost::bind(&Logger::direct_write,
+  post_event(boost::bind(&logger::direct_write,
                          this, oss.str(), true));
 }
 
-void reactor::Logger::observation(Observation const &o) {
-  post_event(boost::bind(&Logger::obs, this, o));
+void reactor::logger::observation(Observation const &o) {
+  post_event(boost::bind(&logger::obs, this, o));
 }
 
-void reactor::Logger::request(goal_id const &goal) {
-  post_event(boost::bind(&Logger::goal_event, this, "request", goal, true));
+void reactor::logger::request(goal_id const &goal) {
+  post_event(boost::bind(&logger::goal_event, this, "request", goal, true));
 }
 
-void reactor::Logger::recall(goal_id const &goal) {
-  post_event(boost::bind(&Logger::goal_event, this, "recall", goal, false));
+void reactor::logger::recall(goal_id const &goal) {
+  post_event(boost::bind(&logger::goal_event, this, "recall", goal, false));
 }
 
-void reactor::Logger::notifyPlan(goal_id const &tok) {
-  post_event(boost::bind(&Logger::goal_event, this, "token", tok, true));
+void reactor::logger::notify_plan(goal_id const &tok) {
+  post_event(boost::bind(&logger::goal_event, this, "token", tok, true));
 }
 
-void reactor::Logger::cancelPlan(goal_id const &tok) {
-  post_event(boost::bind(&Logger::goal_event, this, "cancel", tok, false));
+void reactor::logger::cancel_plan(goal_id const &tok) {
+  post_event(boost::bind(&logger::goal_event, this, "cancel", tok, false));
 }
 
 
 // asio methods
 
-void reactor::Logger::obs(Observation o) {
+void reactor::logger::obs(Observation o) {
   utils::async_ofstream::entry e = m_file.new_entry();
   o.to_xml(e.stream())<<'\n';
 }
 
 
-void reactor::Logger::goal_event(std::string tag, goal_id g, bool full) {
+void reactor::logger::goal_event(std::string tag, goal_id g, bool full) {
   m_file<<"   <"<<tag<<" id=\""<<g<<"\" ";
   if( full )
     g->to_xml(m_file<<">\n")<<"\n   </"<<tag<<">\n";
@@ -1278,16 +1278,16 @@ void reactor::Logger::goal_event(std::string tag, goal_id g, bool full) {
     direct_write("/>", true);
 }
 
-void reactor::Logger::post_event(boost::function<void ()> fn) {
-  m_strand.post(boost::bind(&Logger::phase_event, this, fn));
+void reactor::logger::post_event(boost::function<void ()> fn) {
+  m_strand.post(boost::bind(&logger::phase_event, this, fn));
 }
 
-void reactor::Logger::phase_event(boost::function<void ()> fn) {
+void reactor::logger::phase_event(boost::function<void ()> fn) {
   open_phase();
   fn();
 }
 
-void reactor::Logger::set_tick(TICK val, reactor::Logger::tick_phase p) {
+void reactor::logger::set_tick(TICK val, reactor::logger::tick_phase p) {
   close_tick();
   m_current = val;
   m_phase = p;
@@ -1295,13 +1295,13 @@ void reactor::Logger::set_tick(TICK val, reactor::Logger::tick_phase p) {
   m_flags.set(in_phase);
 }
 
-void reactor::Logger::set_phase(reactor::Logger::tick_phase p) {
+void reactor::logger::set_phase(reactor::logger::tick_phase p) {
   close_phase();
   m_phase = p;
   m_flags.set(in_phase);
 }
 
-void reactor::Logger::open_phase() {
+void reactor::logger::open_phase() {
   if( m_flags.test(in_phase) && !m_flags.test(has_data) ) {
     open_tick();
     switch( m_phase ) {
@@ -1327,7 +1327,7 @@ void reactor::Logger::open_phase() {
   }
 }
 
-void reactor::Logger::close_phase() {
+void reactor::logger::close_phase() {
   if( m_flags.test(in_phase) ) {
     if( m_flags.test(has_data) ) {
       switch( m_phase ) {
@@ -1355,14 +1355,14 @@ void reactor::Logger::close_phase() {
   }
 }
 
-void reactor::Logger::open_tick() {
+void reactor::logger::open_tick() {
   if( m_flags.test(tick) && !m_flags.test(tick_opened) ) {
     m_file<<" <tick value=\""<<m_current<<"\">";
     m_flags.set(tick_opened);
   }
 }
 
-void reactor::Logger::close_tick() {
+void reactor::logger::close_tick() {
   if( m_flags.test(tick) ) {
     if( m_flags.test(tick_opened) ) {
       close_phase();
@@ -1378,7 +1378,7 @@ void reactor::Logger::close_tick() {
   m_flags.reset(tick_opened);
 }
 
-void reactor::Logger::direct_write(std::string const &content, bool nl) {
+void reactor::logger::direct_write(std::string const &content, bool nl) {
   utils::async_ofstream::entry e = m_file.new_entry();
   
   e.stream().write(content.c_str(), content.length());

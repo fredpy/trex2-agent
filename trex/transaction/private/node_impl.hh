@@ -34,7 +34,7 @@
 #ifndef H_trex_transaction_node_impl
 # define H_trex_transaction_node_impl
 
-# include "../bits/transaction_fwd.hh"
+# include "timeline_impl.hh"
 
 namespace TREX {
   namespace transaction {
@@ -65,15 +65,39 @@ namespace TREX {
           return m_graph.lock();
         }
         
+        bool internal(utils::symbol const &tl) const;
+        bool external(utils::symbol const &tl) const;
+        
         void provide(utils::symbol const &tl, bool read_only, bool publish_plan);
+        void unprovide(utils::symbol const &tl);
+        
         void use(utils::symbol const &tl, bool read_only, bool listen_plan);
+        void unuse(utils::symbol const &tl);
+        
+        void notify(TICK date, utils::symbol tl,
+                    boost::optional<Observation> o);
         
       private:
         explicit node_impl(WEAK_PTR<graph_impl> const &g);
         
         void isolate(SHARED_PTR<graph_impl> const &g);
         
-        utils::symbol               m_name;
+        typedef std::map<utils::symbol, tl_ref>  internal_set;
+        typedef std::map<utils::symbol, ext_ref> external_set;
+        
+        internal_set m_internals;
+        external_set m_externals;
+        
+        void assigned_sync(tl_ref const &tl);
+        void subscribed_sync(ext_ref const &tl);
+        
+        bool check_internal_sync(utils::symbol tl) const;
+        bool check_external_sync(utils::symbol tl) const;
+        
+        void unprovide_sync(SHARED_PTR<graph_impl> g, utils::symbol tl);
+        void unuse_sync(utils::symbol tl);
+        
+        utils::symbol        m_name;
         WEAK_PTR<graph_impl> m_graph;
         
         friend class graph_impl;
