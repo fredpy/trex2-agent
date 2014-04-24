@@ -33,7 +33,7 @@
  */
 #include "reactor_graph.hh"
 #include "private/graph_impl.hh"
-#include "TeleoReactor.hh"
+#include "reactor.hh"
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
@@ -140,9 +140,9 @@ GraphException::GraphException(graph const &g, std::string const &who,
 /*
  * class TREX::transaction::MultipleReactors
  */
-MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw()
+MultipleReactors::MultipleReactors(graph const &g, reactor const &r) throw()
       :GraphException(g, "Multiple reactors with the same name \""+
-          r.getName().str()+"\"") {}
+          r.name().str()+"\"") {}
 
 /*
  * class TREX::transaction::graph
@@ -190,7 +190,7 @@ TREX::utils::log::stream graph::syslog(utils::symbol const &context,
 }
 
 bool graph::is_isolated(graph::reactor_id r) const {
-  return m_quarantined.find(r->getName())!=m_quarantined.end();
+  return m_quarantined.find(r->name())!=m_quarantined.end();
 }
 
 std::string graph::date_str(TICK cur) const {
@@ -244,7 +244,7 @@ TREX::utils::log_manager &graph::manager() const {
 
 void graph::clear() {
   while( !m_reactors.empty() ) {
-    syslog(info)<<"Disconnecting \""<<m_reactors.front()->getName()
+    syslog(info)<<"Disconnecting \""<<m_reactors.front()->name()
 		    <<"\" from the graph.";
     m_reactors.front()->isolate(false);
     m_reactors.pop_front();
@@ -263,20 +263,20 @@ long graph::index(graph::reactor_id id) const {
 
 graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
   graph *me = this;
-  TeleoReactor::xml_arg_type 
+  reactor::xml_arg_type
   arg = xml_factory::arg_traits::build(description, me);
-  SHARED_PTR<TeleoReactor> tmp(m_factory->produce(arg));
+  SHARED_PTR<reactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
   if( ret.second ) 
-    syslog(info)<<"Reactor \""<<tmp->getName()<<"\" created.";
+    syslog(info)<<"Reactor \""<<tmp->name()<<"\" created.";
   else
     throw MultipleReactors(*this, **(ret.first));			   
   return ret.first->get();
 }
 
 graph::reactor_id graph::add_reactor(graph::reactor_id r) {
-  SHARED_PTR<TeleoReactor> tmp(r);
+  SHARED_PTR<reactor> tmp(r);
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
   // As it is an internal call make is silent for now ...
   return ret.first->get();
@@ -292,12 +292,12 @@ bool graph::is_member(graph::reactor_id r) const {
 
 bool graph::kill_reactor(graph::reactor_id r) {
   if( null_reactor()!=r ) {
-    details::reactor_set::iterator pos = m_reactors.find(r->getName()),
-        pos_q = m_quarantined.find(r->getName());
+    details::reactor_set::iterator pos = m_reactors.find(r->name()),
+        pos_q = m_quarantined.find(r->name());
 
     if( pos->get()==r ) {
       // clean up relations
-      syslog(warn)<<"Destroying reactor \""<<r->getName()<<"\".";
+      syslog(warn)<<"Destroying reactor \""<<r->name()<<"\".";
       if( pos_q->get()==r )
         m_quarantined.erase(pos_q);
       else 
@@ -313,9 +313,9 @@ bool graph::kill_reactor(graph::reactor_id r) {
 
 graph::reactor_id graph::isolate(graph::reactor_id r) const {
   if( null_reactor()!=r ) {
-    details::reactor_set::const_iterator pos = m_reactors.find(r->getName());
+    details::reactor_set::const_iterator pos = m_reactors.find(r->name());
     if( pos->get()==r ) {
-      syslog(info)<<"Putting reactor\""<<r->getName()<<"\" in quarantine.";
+      syslog(info)<<"Putting reactor\""<<r->name()<<"\" in quarantine.";
       r->isolate();
       m_quarantined.insert(*pos);
       return r;

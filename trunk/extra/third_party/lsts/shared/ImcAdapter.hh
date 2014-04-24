@@ -9,7 +9,7 @@
 #define IMCADAPTER_HH_
 
 # include <DUNE/DUNE.hpp>
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/domain/float_domain.hh>
 # include <trex/domain/boolean_domain.hh>
 # include <trex/domain/string_domain.hh>

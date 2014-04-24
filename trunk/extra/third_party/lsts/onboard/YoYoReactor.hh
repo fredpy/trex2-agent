@@ -8,7 +8,7 @@
 #ifndef YOYOREACTOR_HH_
 #define YOYOREACTOR_HH_
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/log_manager.hh>
 # include <trex/domain/int_domain.hh>
@@ -51,7 +51,7 @@ namespace TREX {
     class YoYoReactor : public LstsReactor
     {
     public:
-      YoYoReactor(TeleoReactor::xml_arg_type arg);
+      YoYoReactor(reactor::xml_arg_type arg);
       EXEC_STATE state;
       TREX::transaction::Observation m_lastRefState;
       TREX::transaction::Observation m_lastControl;
@@ -62,11 +62,11 @@ namespace TREX {
       int m_time_at_surface;
       ReferenceRequest m_lastSentRef, m_lastSeenRef;
 
-      void handleInit();
-      void handleTickStart();
+      void handle_init();
+      void handle_tick_start();
       bool synchronize();
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::goal_id const &g);
+      void handle_recall(TREX::transaction::goal_id const &g);
       void notify(TREX::transaction::Observation const &obs);
 
       void requestReference(double lat, double lon, double speed, double z);

@@ -34,7 +34,7 @@
 #ifndef H_AgentLocation
 #define H_AgentLocation
 
-#include <trex/transaction/TeleoReactor.hh>
+#include <trex/transaction/reactor.hh>
 #include <trex/utils/platform/memory.hh>
 
 namespace TREX {
@@ -48,7 +48,7 @@ namespace TREX {
    */
   namespace AgentLocation {
 
-    class AgentLocation :public TREX::transaction::TeleoReactor {
+    class AgentLocation :public TREX::transaction::reactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -59,15 +59,15 @@ namespace TREX {
        * <AgentLocation name="<name>" latency="<int>" lookahead="<int>" />
        * @endcode
        */
-      AgentLocation(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      AgentLocation(TREX::transaction::reactor::xml_arg_type arg);
       /** @brief Destructor */
       ~AgentLocation();
 
     private:
-      void handleInit();
+      void handle_init();
       bool synchronize();
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::goal_id const &g);
+      void handle_recall(TREX::transaction::goal_id const &g);
 
       /** @brief State of the timeline */
       TREX::transaction::TICK m_nextSwitch;

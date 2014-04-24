@@ -34,7 +34,7 @@
 #ifndef H_trex_python_python_reactor
 # define H_trex_python_python_reactor
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 # include <boost/python.hpp>
 
@@ -43,10 +43,10 @@ namespace TREX {
     void log_error(boost::python::error_already_set const &e);
     
     struct python_reactor
-    :transaction::TeleoReactor,
-    boost::python::wrapper<transaction::TeleoReactor> {
-      explicit python_reactor(transaction::TeleoReactor::xml_arg_type &arg)
-      :transaction::TeleoReactor(arg) {}
+    :transaction::reactor,
+    boost::python::wrapper<transaction::reactor> {
+      explicit python_reactor(transaction::reactor::xml_arg_type &arg)
+      :transaction::reactor(arg) {}
       virtual ~python_reactor() {}
       
       // logging
@@ -77,19 +77,19 @@ namespace TREX {
       
       // transaction callbacks
       void notify(transaction::Observation const &o);
-      void handleRequest(transaction::goal_id const &g);
-      void handleRecall(transaction::goal_id const &g);
+      void handle_request(transaction::goal_id const &g);
+      void handle_recall(transaction::goal_id const &g);
       
       // exec callbacks
-      void handleInit();
-      void handleTickStart();
+      void handle_init();
+      void handle_tick_start();
       bool synchronize();
-      bool hasWork();
+      bool has_work();
       void resume();
     
     }; // TREX::python::python_reactor
     
-    class producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
+    class producer:public transaction::reactor::xml_factory::factory_type::producer {
     public:
       explicit producer(utils::symbol const &name);
       ~producer() {}

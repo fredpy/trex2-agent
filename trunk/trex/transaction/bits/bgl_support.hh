@@ -128,15 +128,15 @@ namespace boost {
      * 
      * @sa Relation::active() const
      */
-    typedef TREX::transaction::TeleoReactor::external_iterator  out_edge_iterator;
+    typedef TREX::transaction::reactor::external_iterator  out_edge_iterator;
     /** @brief type gfor the number of external timelines
      * 
      * The type used to indciate the number of external relations of a reactor
      */
-    typedef TREX::transaction::TeleoReactor::size_type          degree_size_type;
+    typedef TREX::transaction::reactor::size_type          degree_size_type;
 
     // Bidirectional Graph Concept
-    typedef TREX::transaction::TeleoReactor::internal_iterator in_edge_iterator;
+    typedef TREX::transaction::reactor::internal_iterator in_edge_iterator;
 
     // Adjacency Graph Concept
     /** @brief Adjacency list iterator
@@ -195,14 +195,14 @@ namespace boost {
    * @sa out_degree(TREX::transaction::graph::reactor_id, TREX::transaction::graph const &)
    * @sa adjacent_vertices(TREX::transaction::graph::reactor_id, TREX::transaction::graph const &)
    */
-  inline std::pair< TREX::transaction::TeleoReactor::external_iterator, 
-		    TREX::transaction::TeleoReactor::external_iterator >
+  inline std::pair< TREX::transaction::reactor::external_iterator,
+		    TREX::transaction::reactor::external_iterator >
   out_edges(TREX::transaction::graph::reactor_id r,
 	    TREX::transaction::graph const &g) {
     if( TREX::transaction::graph::null_reactor()!=r )
       return std::make_pair(r->ext_begin(), r->ext_end());
     else {
-      TREX::transaction::TeleoReactor::external_iterator null;
+      TREX::transaction::reactor::external_iterator null;
       return std::make_pair(null, null);
     }
   }
@@ -272,7 +272,7 @@ namespace boost {
    * @ingroup transaction
    * @relates TREX::transaction::graph
    */
-  inline TREX::transaction::TeleoReactor::size_type 
+  inline TREX::transaction::reactor::size_type
   out_degree(TREX::transaction::graph::reactor_id r,
 	     TREX::transaction::graph const &g) {
     return TREX::transaction::graph::null_reactor()==r?0:r->count_externals();
@@ -281,14 +281,14 @@ namespace boost {
   /*
    * Bidirectional Graph Concept
    */
-  inline std::pair<TREX::transaction::TeleoReactor::internal_iterator, 
-		   TREX::transaction::TeleoReactor::internal_iterator>   
+  inline std::pair<TREX::transaction::reactor::internal_iterator,
+		   TREX::transaction::reactor::internal_iterator>
   in_edges(TREX::transaction::graph::reactor_id r, 
 	   TREX::transaction::graph const &g) {
     return std::make_pair(r->int_begin(), r->int_end());
   }
 
-  inline TREX::transaction::TeleoReactor::size_type 
+  inline TREX::transaction::reactor::size_type
   in_degree(TREX::transaction::graph::reactor_id r, 
 	    TREX::transaction::graph const &g) {
     if( TREX::transaction::graph::null_reactor()==r )
@@ -296,7 +296,7 @@ namespace boost {
     return r->count_internal_relations();
   }
 
-  inline TREX::transaction::TeleoReactor::size_type 
+  inline TREX::transaction::reactor::size_type
   degree(TREX::transaction::graph::reactor_id r, TREX::transaction::graph const &g) {
     return out_degree(r, g)+in_degree(r,g);
   }
@@ -323,8 +323,8 @@ namespace boost {
 		    graph_traits<TREX::transaction::graph>::adjacency_iterator >
   adjacent_vertices(TREX::transaction::graph::reactor_id r,
 		    TREX::transaction::graph const &g) {
-    std::pair< TREX::transaction::TeleoReactor::external_iterator, 
-	       TREX::transaction::TeleoReactor::external_iterator >
+    std::pair< TREX::transaction::reactor::external_iterator,
+	       TREX::transaction::reactor::external_iterator >
       tmp = out_edges(r, g);
     return std::make_pair
       (graph_traits<TREX::transaction::graph>::adjacency_iterator(tmp.first, &g),
@@ -466,7 +466,7 @@ namespace TREX {
 	  if( graph::null_reactor()==r )
 	    return null_name;
 	  else
-	    return r->getName();
+	    return r->name();
 	}
       }; // TREX::transaction::details::graph_vertex_name_map
       
@@ -543,7 +543,7 @@ namespace TREX {
        */
       void operator()(std::ostream &out, graph::reactor_id r) const {
 	if( graph::null_reactor()!=r )
-	  label(out, r->getName());	
+	  label(out, r->name());
       }
       /** @brief label for a timeline relation
        *

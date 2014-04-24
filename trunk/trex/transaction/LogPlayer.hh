@@ -34,7 +34,7 @@
 #ifndef H_trex_transaction_LogPlayer
 # define H_trex_transaction_LogPlayer
 
-# include "TeleoReactor.hh"
+# include "reactor.hh"
 
 namespace TREX {
   namespace transaction {
@@ -136,7 +136,7 @@ namespace TREX {
      * @ingroup transaction
      * @author Frederic Py
      */
-    class LogPlayer :public TeleoReactor {
+    class LogPlayer :public reactor {
     public:
       /** @brief Constructor 
        * 
@@ -163,7 +163,7 @@ namespace TREX {
        * this constructor will automatically force it to 0 in order 
        * to not relog the transaction that are being played.
        */
-      LogPlayer(TeleoReactor::xml_arg_type arg);
+      LogPlayer(reactor::xml_arg_type arg);
       /** @brief Destructor */
       ~LogPlayer(); 
 
@@ -259,10 +259,10 @@ namespace TREX {
       void play_cancel(goal_id const &g);
 
     private:
-      void handleInit();
-      void handleTickStart();
+      void handle_init();
+      void handle_tick_start();
       bool synchronize();
-      bool hasWork();
+      bool has_work();
       void resume();
       
 
@@ -313,7 +313,7 @@ namespace TREX {
       bool next_phase(TICK tck, utils::symbol const &kind);
       bool in_tick(TICK tck) const;
       
-      static TeleoReactor::xml_arg_type &alter_cfg(TeleoReactor::xml_arg_type &arg);
+      static reactor::xml_arg_type &alter_cfg(reactor::xml_arg_type &arg);
 
       bool m_work, m_inited;
       

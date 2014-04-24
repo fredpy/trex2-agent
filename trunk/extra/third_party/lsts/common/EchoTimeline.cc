@@ -13,7 +13,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief EchoTimeline reactor declaration */
-  TeleoReactor::xml_factory::declare<EchoTimeline> decl("EchoTimeline");
+  reactor::xml_factory::declare<EchoTimeline> decl("EchoTimeline");
 }
 
 namespace TREX
@@ -21,19 +21,19 @@ namespace TREX
   namespace LSTS
   {
     // constructor
-    EchoTimeline::EchoTimeline(TREX::transaction::TeleoReactor::xml_arg_type arg):
+    EchoTimeline::EchoTimeline(TREX::transaction::reactor::xml_arg_type arg):
         LstsReactor(arg)
     {
-      m_timeline = parse_attr<std::string>("params", TeleoReactor::xml_factory::node(arg),
+      m_timeline = parse_attr<std::string>("params", reactor::xml_factory::node(arg),
                                              "timeline");
 
-      m_initial_state = parse_attr<std::string>("Boot", TeleoReactor::xml_factory::node(arg),
+      m_initial_state = parse_attr<std::string>("Boot", reactor::xml_factory::node(arg),
                                            "initial");
       m_first_tick = true;
     }
 
     void
-    EchoTimeline::handleInit()
+    EchoTimeline::handle_init()
     {
       provide(m_timeline, true, false);
     }
@@ -52,7 +52,7 @@ namespace TREX
 
     // called when a goal is requested
     void
-    EchoTimeline::handleRequest(goal_id const &g)
+    EchoTimeline::handle_request(goal_id const &g)
     {
       if (g.get()->object().str() == m_timeline)
       {

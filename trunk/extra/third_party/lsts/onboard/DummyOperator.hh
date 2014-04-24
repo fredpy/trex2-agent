@@ -8,7 +8,7 @@
 #ifndef DUMMYOP_HH_
 #define DUMMYOP_HH_
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <DUNE/DUNE.hpp>
 # include"SharedEnvironment.hh"
 
@@ -22,9 +22,9 @@ namespace TREX {
    */
   namespace LSTS {
 
-    class DummyOperator :public TREX::transaction::TeleoReactor {
+    class DummyOperator :public TREX::transaction::reactor {
     public:
-      DummyOperator(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      DummyOperator(TREX::transaction::reactor::xml_arg_type arg);
       virtual ~DummyOperator();
 
     private:

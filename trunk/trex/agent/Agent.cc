@@ -207,7 +207,7 @@ namespace TREX {
 	  //   - inform him that a new tick has started
 	  //        this will result on dispatching its goals if possible
 	  if( is_valid(r,g) )
-	    if( !r->newTick() )
+	    if( !r->new_tick() )
               g.isolate(r);
 	}
 
@@ -313,10 +313,10 @@ namespace TREX {
             return;
 
           if(timelineType==internal) {
-            std::pair< TREX::transaction::TeleoReactor::external_iterator,
-            TREX::transaction::TeleoReactor::external_iterator > edges = boost::out_edges(r, g);
+            std::pair< TREX::transaction::reactor::external_iterator,
+            TREX::transaction::reactor::external_iterator > edges = boost::out_edges(r, g);
             
-            for(TREX::transaction::TeleoReactor::external_iterator temp = edges.first; temp!=edges.second; ++temp) {
+            for(TREX::transaction::reactor::external_iterator temp = edges.first; temp!=edges.second; ++temp) {
               if(temp->name()==name) {
                 std::stringstream msg;
                 
@@ -753,7 +753,7 @@ void Agent::initComplete() {
     
 //    std::cerr<<r->getName()<<".initialize("<<m_finalTick<<")."<<std::endl;
     if( !r->initialize(m_finalTick) ) {
-      syslog(null, error)<<r->getName()<<" failed to initialize";
+      syslog(null, error)<<r->name()<<" failed to initialize";
       kill_reactor(r);
       ++n_failed;
     }
@@ -852,8 +852,8 @@ void Agent::synchronize() {
         reactor_id r = queue.front();
         queue.pop_front();
         // synchronization
-        if( r->doSynchronize() ) {
-          double wr = r->workRatio();
+        if( r->do_synchronize() ) {
+          double wr = r->work_ratio();
 
           if( !std::isnan(wr) ) {
             // this reactor has deliberation :
@@ -901,7 +901,7 @@ bool Agent::executeReactor() {
     m_edf.erase(m_edf.begin());
     m_idle.push_back(r);
     try {
-      id = r->getName();
+      id = r->name();
       r->step();
       
       std::list<reactor_id>::iterator i = m_idle.begin();
@@ -909,7 +909,7 @@ bool Agent::executeReactor() {
       while( m_idle.end()!=i ) {
         // Check if the reactor is still valid 
         if( is_member(*i) ) {
-          wr = (*i)->workRatio();
+          wr = (*i)->work_ratio();
           if( !std::isnan(wr) ) {
             m_edf.insert(std::make_pair(wr, *i));
             i = m_idle.erase(i);
@@ -991,7 +991,7 @@ void Agent::sendRequest(goal_id const &g) {
   if( !has_timeline(g->object()) )
     syslog(null, warn)<<"Posting goal on a unknnown timeline \""
 		      <<g->object()<<"\".";
-  m_proxy->postRequest(g);
+  m_proxy->post_request(g);
 }
 
 size_t Agent::sendRequests(boost::property_tree::ptree &g) {

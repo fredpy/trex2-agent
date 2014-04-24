@@ -441,7 +441,7 @@ namespace TREX {
        * @retval 0 if @p obj is not @pExternal or do not accept goals
        * @retval the look-ahead of the owner of @p obj otherwise
        */
-      size_t look_ahead(EUROPA::ObjectId const &obj);
+      size_t tl_look_ahead(EUROPA::ObjectId const &obj);
       /** @Brief Check if ignored
        * @param[in] tok A token
        *
@@ -521,7 +521,7 @@ namespace TREX {
        * @return the expected latency (in tick) for this engine
        *         to resolve its objectives.
        */
-      virtual EUROPA::eint latency()          const =0;
+      virtual EUROPA::eint eu_latency()          const =0;
       /** @brief planning look ahead
        *
        * This indicates how many ticks ahead in the future this engine is
@@ -529,7 +529,7 @@ namespace TREX {
        *
        * @return the planning  look-ahead for this engine
        */
-      virtual EUROPA::eint look_ahead()       const =0;
+      virtual EUROPA::eint eu_look_ahead()       const =0;
       /** @brief Initial mission tick
        *
        * Indicate the first tick of the mission for this engine.
@@ -537,7 +537,7 @@ namespace TREX {
        * @sa now()
        * @sa final_tick()
        */
-      virtual EUROPA::eint initial_tick()     const =0;
+      virtual EUROPA::eint eu_initial_tick()     const =0;
       /** @brief Final tick of the mission
        *
        * Indicate the last tick of the mission for this engine.
@@ -545,7 +545,7 @@ namespace TREX {
        * @sa intial_tick()
        * @sa now()
        */
-      virtual EUROPA::eint final_tick()       const =0;
+      virtual EUROPA::eint eu_final_tick()       const =0;
       /** @brief Tick duration
        *
        * An arbitrary value that allow to convert a tick into a real-time value
@@ -555,7 +555,7 @@ namespace TREX {
        * @note As it is a duration, we assume that this value is strictly
        *      positive.
        */
-      virtual EUROPA::edouble tick_duration() const =0;
+      virtual EUROPA::edouble eu_tick_duration() const =0;
 
       /** @brief Tick to date
        * @param[in] tick A Europa tick
@@ -567,7 +567,7 @@ namespace TREX {
        * @note While the conversion is highly dependent on the Clock used by
        * the agent. This conversion is often into a unix time tag format.
        */
-      virtual EUROPA::edouble tick_to_date(EUROPA::eint tick) const =0;
+      virtual EUROPA::edouble eu_tick_to_date(EUROPA::eint tick) const =0;
       /** @brief Date to tick
        * @param[in] date A real-time date
        *
@@ -578,7 +578,7 @@ namespace TREX {
        * @note While the conversion is highly dependent on the Clock used by
        * the agent. This conversion is often from a unix time tag format.
        */
-      virtual EUROPA::eint date_to_tick(EUROPA::edouble date) const =0;
+      virtual EUROPA::eint eu_date_to_tick(EUROPA::edouble date) const =0;
 
       /** @brief Clock variable
        *
@@ -613,9 +613,9 @@ namespace TREX {
        * @sa DeliberationFilter
        */
       EUROPA::IntervalIntDomain plan_scope() const {
-        EUROPA::eint end_plan(now()+latency()+look_ahead());
+        EUROPA::eint end_plan(now()+eu_latency()+eu_look_ahead());
         return EUROPA::IntervalIntDomain(now(), std::min(end_plan,
-                                                         final_tick()));
+                                                         eu_final_tick()));
       }
 
     protected:
@@ -837,7 +837,7 @@ namespace TREX {
        * @retval false otherwise
        * @sa is_external(EUROPA::LabelStr const &) const
        */
-      virtual bool is_internal(EUROPA::LabelStr const &name) const =0;
+      virtual bool check_internal(EUROPA::LabelStr const &name) const =0;
       /** @brief Check for external timeline
        *
        * @param[in] name A timeline name
@@ -849,7 +849,7 @@ namespace TREX {
        * @retval false otherwise
        * @sa is_internal(EUROPA::LabelStr const &) const
        */
-      virtual bool is_external(EUROPA::LabelStr const &name) const =0;
+      virtual bool check_external(EUROPA::LabelStr const &name) const =0;
       /** @brief planning look-ahead
        *
        * @param[in] name A agent timeline name
@@ -860,7 +860,7 @@ namespace TREX {
        *
        * @return the look-ahead of the owner of @p name
        */
-      virtual size_t look_ahead(EUROPA::LabelStr const &name) =0;
+      virtual size_t tl_look_ahead(EUROPA::LabelStr const &name) =0;
 
       /** @brief New internal state notification
        *
@@ -1132,7 +1132,7 @@ namespace TREX {
        * @sa clock()
        * @sa now()
        */
-      void new_tick();
+      void eu_new_tick();
       /** @brief Synchronizer
        *
        * Give acces to the solver dedicated for synchronization.
@@ -1190,7 +1190,7 @@ namespace TREX {
        *
        * @sa relax(bool)
        */
-      bool do_synchronize();
+      bool eu_do_synchronize();
       /** @brief relax plan database
        *
        * @param[in] aggressive A boolean flag

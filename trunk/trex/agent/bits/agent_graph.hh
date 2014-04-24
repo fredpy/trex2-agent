@@ -47,7 +47,7 @@
 # define H_agent_graph
 
 # include "../Agent_fwd.hh"
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 # if defined(__clang__)
 // clang annoys me by putting plenty of warnings on unused variables from boost

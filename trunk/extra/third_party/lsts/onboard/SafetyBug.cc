@@ -16,12 +16,12 @@ namespace
 {
 
 	/** @brief SafetyBug reactor declaration */
-	TeleoReactor::xml_factory::declare<SafetyBug> decl("SafetyBug");
+	reactor::xml_factory::declare<SafetyBug> decl("SafetyBug");
 
 }
 
-SafetyBug::SafetyBug(TREX::transaction::TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg), aborted(false)
+SafetyBug::SafetyBug(TREX::transaction::reactor::xml_arg_type arg)
+:reactor(arg), aborted(false)
 {
 
 }
@@ -30,7 +30,7 @@ SafetyBug::~SafetyBug() {
 	// TODO Auto-generated destructor stub
 }
 
-void SafetyBug::newPlanToken(TREX::transaction::goal_id const &g)
+void SafetyBug::new_plan_token(TREX::transaction::goal_id const &g)
 {
   Goal * goal = g.get();
 

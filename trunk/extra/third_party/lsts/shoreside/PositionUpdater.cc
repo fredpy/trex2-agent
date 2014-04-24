@@ -15,7 +15,7 @@ using DUNE_NAMESPACES;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  TeleoReactor::xml_factory::declare<PositionUpdater> decl("PositionUpdater");
+  reactor::xml_factory::declare<PositionUpdater> decl("PositionUpdater");
 }
 
 
@@ -27,15 +27,15 @@ namespace TREX {
   }
 
   namespace LSTS {
-    PositionUpdater::PositionUpdater(TeleoReactor::xml_arg_type arg) :
+    PositionUpdater::PositionUpdater(reactor::xml_arg_type arg) :
       LstsReactor(arg)
     {
-      m_bind_port = parse_attr<int>(-1, TeleoReactor::xml_factory::node(arg),
+      m_bind_port = parse_attr<int>(-1, reactor::xml_factory::node(arg),
                                     "bindport");
     }
 
     void
-    PositionUpdater::handleInit()
+    PositionUpdater::handle_init()
     {
 
       if (m_bind_port != -1)
@@ -45,7 +45,7 @@ namespace TREX {
     }
 
     void
-    PositionUpdater::handleTickStart()
+    PositionUpdater::handle_tick_start()
     {
       Message * msg = NULL;
       while((msg = m_adapter.poll()) != NULL)

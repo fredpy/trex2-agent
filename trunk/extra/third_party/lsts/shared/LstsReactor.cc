@@ -14,8 +14,8 @@ namespace TREX
   namespace LSTS
   {
 
-    LstsReactor::LstsReactor(TeleoReactor::xml_arg_type arg)
-    : TeleoReactor(arg, false)
+    LstsReactor::LstsReactor(reactor::xml_arg_type arg)
+    : reactor(arg, false)
     {
 
     }
@@ -42,11 +42,11 @@ namespace TREX
       if (it == postedObservations.end() || !it->second->consistentWith(obs))
       {
         // If timeline wasn't previously created, create a new internal timeline
-        if (!isInternal(timeline) && !isExternal(timeline))
+        if (!is_internal(timeline) && !is_external(timeline))
           provide(timeline, false);
 
         postedObservations[timeline.str()].reset(new Observation(obs));
-        postObservation(obs, true);
+        post_observation(obs, true);
         return true;
       }
 

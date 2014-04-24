@@ -41,14 +41,14 @@ namespace TREX {
       graph *me = this;
       typename xml_factory::iter_traits<Iter>::type
 	it = xml_factory::iter_traits<Iter>::build(from, me);
-      SHARED_PTR<TeleoReactor> reactor;
+      SHARED_PTR<reactor> r;
       size_t count = 0;
       
-      while( m_factory->iter_produce(it, to, reactor) ) {
+      while( m_factory->iter_produce(it, to, r) ) {
 	std::pair<details::reactor_set::iterator, bool>
-	  ret = m_reactors.insert(reactor);
+	  ret = m_reactors.insert(r);
 	if( ret.second )
-	  syslog(null, info)<<"Reactor \""<<reactor->getName()<<"\" created.";
+	  syslog(null, info)<<"Reactor \""<<r->name()<<"\" created.";
 	else 
 	  throw MultipleReactors(*this, **(ret.first));
 	++count;

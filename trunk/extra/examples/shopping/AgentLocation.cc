@@ -48,8 +48,8 @@ symbol const AgentLocation::GoPred("Go");
 
 symbol const AgentLocation::AgentLocationObj("auvLocation");
 
-AgentLocation::AgentLocation(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false)
+AgentLocation::AgentLocation(reactor::xml_arg_type arg)
+  :reactor(arg, false)
 {
   syslog(null, info)<<"I want to own "<<AgentLocationObj;
   provide(AgentLocationObj);
@@ -61,25 +61,25 @@ AgentLocation::~AgentLocation() {}
 void AgentLocation::setAt(std::string location) {
     m_state.reset(new Observation(AgentLocationObj, AtPred));
     m_state->restrictAttribute("loc", enum_domain(location));
-    postObservation(*m_state);
+    post_observation(*m_state);
 }
 
 void AgentLocation::setGo(std::string origin, std::string destination){
     m_state.reset(new Observation(AgentLocationObj, GoPred));
     m_state->restrictAttribute("from", enum_domain(origin));
     m_state->restrictAttribute("to", enum_domain(destination));
-    postObservation(*m_state);
+    post_observation(*m_state);
 }
 
-void AgentLocation::handleInit(){
+void AgentLocation::handle_init(){
     m_state.reset(new Observation(AgentLocationObj, AtPred));
     m_state->restrictAttribute("loc", enum_domain("Ship"));
-    postObservation(*m_state);
-    m_nextSwitch = getCurrentTick() + 1;
+    post_observation(*m_state);
+    m_nextSwitch = current_tick() + 1;
 }
 
 bool AgentLocation::synchronize() {
-    TICK cur = getCurrentTick();
+    TICK cur = current_tick();
 
     if( m_nextSwitch<=cur )
     {
@@ -109,7 +109,7 @@ bool AgentLocation::synchronize() {
   return true;
 }
 
-void AgentLocation::handleRequest(goal_id const &g) {
+void AgentLocation::handle_request(goal_id const &g) {
   if( g->predicate()==AtPred || g->predicate()==GoPred ) {
     // I insert it on my list
     int_domain::bound lo = g->getStart().lower_bound();
@@ -128,7 +128,7 @@ void AgentLocation::handleRequest(goal_id const &g) {
   }
 }
 
-void AgentLocation::handleRecall(goal_id const &g) {
+void AgentLocation::handle_recall(goal_id const &g) {
     std::list<goal_id>::iterator i = m_pending.begin();
     for( ; m_pending.end()!=i; ++i )
     {

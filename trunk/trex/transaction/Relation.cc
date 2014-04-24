@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "bits/timeline.hh"
-#include "TeleoReactor.hh"
+#include "reactor.hh"
 
 using namespace TREX;
 using namespace TREX::transaction;
@@ -42,10 +42,11 @@ using namespace TREX::transaction::details;
  * class TREX::transaction::MultipleInternals
  */
 
-MultipleInternals::MultipleInternals(TeleoReactor const &faulty, utils::symbol const &timeline,
-				     TeleoReactor const &owner) throw() 
+MultipleInternals::MultipleInternals(reactor const &faulty,
+                                     utils::symbol const &timeline,
+				     reactor const &owner) throw()
   :ReactorException(faulty, "timeline "+timeline.str()+" already Internal to "
-		    +owner.getName().str()) {}
+		    +owner.name().str()) {}
 
 /*
  * class TREX::transaction::details::timeline
@@ -59,7 +60,7 @@ timeline::timeline(TICK date, utils::symbol const &name)
   :m_name(name), m_owner(NULL), m_plan_listeners(0),
    m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false) {}
 
-timeline::timeline(TICK date, utils::symbol const &name, TeleoReactor &serv, transaction_flags const &flags)
+timeline::timeline(TICK date, utils::symbol const &name, reactor &serv, transaction_flags const &flags)
   :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
    m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false)  {}
 
@@ -75,11 +76,11 @@ bool timeline::should_publish() const {
 
 
 TICK timeline::look_ahead() const {
-  return (accept_goals())?owner().getLookAhead():0;
+  return (accept_goals())?owner().look_ahead():0;
 }
 
 TICK timeline::latency() const {
-  return accept_goals()?owner().getExecLatency():0;
+  return accept_goals()?owner().exec_latency():0;
 }
 
 std::string TREX::transaction::details::access_str(bool g, bool p) {
@@ -91,11 +92,11 @@ std::string TREX::transaction::details::access_str(bool g, bool p) {
 
 // modifiers :
 
-bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
+bool timeline::assign(reactor &r, transaction_flags const &flags) {
   bool ret = true;
   
   if( NULL==m_owner ) {
-    client_set::iterator pos = m_clients.find(r.getName());
+    client_set::iterator pos = m_clients.find(r.name());
     
     if( m_clients.end()!=pos ) {
       unsubscribe(Relation(this, pos));
@@ -108,7 +109,7 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
   } else if( owned_by(r) ) {
     TICK update = 0;
     if( !flags.test(0) )
-      update = r.getExecLatency();
+      update = r.exec_latency();
     r.syslog(name(), warn)<<"Updated transaction rights to "<<rights();
     m_transactions = flags;
     r.assigned(this);
@@ -119,8 +120,8 @@ bool timeline::assign(TeleoReactor &r, transaction_flags const &flags) {
   return ret;
 }
 
-TeleoReactor *timeline::unassign(TICK date) {
-  TeleoReactor *ret = NULL;
+reactor *timeline::unassign(TICK date) {
+  reactor *ret = NULL;
   if( owned() ) {
     ret = m_owner;
     
@@ -129,18 +130,18 @@ TeleoReactor *timeline::unassign(TICK date) {
     m_transactions.reset();
     postObservation(Observation(name(), Predicate::failed_pred()));
     synchronize(date);
-    latency_update(ret->getExecLatency());
+    latency_update(ret->exec_latency());
   }
   return ret;
 }
 
 void timeline::demote(TICK date, transaction_flags const &flags) {
-  TeleoReactor *r = unassign(date);
+  reactor *r = unassign(date);
   if( NULL!=r )
     subscribe(*r, flags);
 }
 
-bool timeline::subscribe(TeleoReactor &r, transaction_flags const &flags) {
+bool timeline::subscribe(reactor &r, transaction_flags const &flags) {
   if( owned_by(r) )
     return false;
   else {
@@ -195,7 +196,7 @@ void timeline::synchronize(TICK date) {
     m_obs_date = date;
     m_next_obs.reset();
     if( owned() )
-      owner().syslog(name(), TeleoReactor::obs)<<(*m_last_obs);
+      owner().syslog(name(), reactor::obs)<<(*m_last_obs);
     else {
       static utils::singleton::use<utils::log_manager> s_log;
       s_log->syslog(date, name(), utils::log::error)<<(*m_last_obs);
@@ -220,7 +221,7 @@ void timeline::recall(goal_id const &g) {
 
 bool timeline::notifyPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog(TeleoReactor::plan)<<"Added ["<<t<<"] "<<*t;
+    owner().syslog(reactor::plan)<<"Added ["<<t<<"] "<<*t;
     if( m_plan_listeners>0 ) {
       for(client_set::const_iterator i=m_clients.begin(); m_clients.end()!=i; ++i)
         if( i->second.test(1) )
@@ -233,7 +234,7 @@ bool timeline::notifyPlan(goal_id const &t) {
 
 bool timeline::cancelPlan(goal_id const &t) {
   if( m_transactions.test(1) && owned() ) {
-    owner().syslog(TeleoReactor::plan)<<"Removed ["<<t<<"] from "
+    owner().syslog(reactor::plan)<<"Removed ["<<t<<"] from "
 				      <<t->object()<<" to the "
 				      <<m_plan_listeners<<" plan clients.";
     if( m_plan_listeners>0 ) {
@@ -345,7 +346,7 @@ utils::symbol const &Relation::name() const {
   return m_timeline->name();
 }
 
-TeleoReactor &Relation::server() const {
+reactor &Relation::server() const {
   return m_timeline->owner();
 }
 

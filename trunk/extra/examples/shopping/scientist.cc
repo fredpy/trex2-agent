@@ -52,15 +52,12 @@ symbol const Scientist::Objective("objective");
 std::string const Scientist::Vent1("Vent1");
 std::string const Scientist::Vent2("Vent2");
 
-Scientist::Scientist(TeleoReactor::xml_arg_type arg)
-  :TeleoReactor(arg, false)
-{
-
-}
+Scientist::Scientist(reactor::xml_arg_type arg):reactor(arg, false)
+{}
 
 Scientist::~Scientist() {}
 
-void Scientist::handleInit() {
+void Scientist::handle_init() {
     use(auv, true, false);
     srand( time(NULL) );
     //number = rand() % (Horizon-50) + 1;
@@ -68,13 +65,13 @@ void Scientist::handleInit() {
 
 bool Scientist::synchronize() {
 
-    if(getCurrentTick()==100)
+    if(current_tick()==100)
     {
         Goal goal(auv,Sample);
         transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
         goal.restrictAttribute(temp);
-        goal.restrictEnd(TREX::transaction::int_domain(getCurrentTick()+1, Horizon));
-        postGoal(goal);
+        goal.restrictEnd(TREX::transaction::int_domain(current_tick()+1, Horizon));
+        post_goal(goal);
     }
     return true;
 }

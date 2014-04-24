@@ -24,8 +24,8 @@ symbol const Rover::navigatorObj("Navigator");
 symbol const Rover::instrumentLocationObj("InstrumentLocation");
 symbol const Rover::instrumentStateObj("InstrumentState");
 
-Rover::Rover(TeleoReactor::xml_arg_type arg)
-    :TeleoReactor(arg,false), m_firstTick(true)
+Rover::Rover(reactor::xml_arg_type arg)
+    :reactor(arg,false), m_firstTick(true)
 {
     syslog()<<"I want to own "<<navigatorObj;
     provide(navigatorObj); // declare the navigator timeline
@@ -38,7 +38,7 @@ Rover::Rover(TeleoReactor::xml_arg_type arg)
 
 Rover::~Rover() {}
 
-void Rover::handleInit()
+void Rover::handle_init()
 {
     location = "Unknown";
 }
@@ -50,22 +50,22 @@ void Rover::setValue(TREX::transaction::goal_id const &g)
         location = g->getAttribute(locationPred).domain().get_singleton_as_string();
         m_navigator_state.reset(new Observation(navigatorObj, AtPred));
         (*m_navigator_state).restrictAttribute(locationPred, string_domain(location));
-        postObservation(*m_navigator_state);
+        post_observation(*m_navigator_state);
     } else if(g->predicate()==GoingPred) {
         location = g->getAttribute(pathPred).domain().get_singleton_as_string();
         m_navigator_state.reset(new Observation(navigatorObj, GoingPred));
         (*m_navigator_state).restrictAttribute(pathPred, string_domain(location));
-        postObservation(*m_navigator_state);
+        post_observation(*m_navigator_state);
     } else if(g->predicate()==StowedPred || g->predicate()==StowingPred ||
               g->predicate()==UnstowedPred || g->predicate()==UnstowingPred)
     {
         m_InstrumentLocation_state.reset(new Observation(instrumentLocationObj,g->predicate()));
-        postObservation(*m_InstrumentLocation_state);
+        post_observation(*m_InstrumentLocation_state);
     } else if(g->predicate()==PlacedPred || g->predicate()==SamplingPred
               || g->predicate()==FreePred)
     {
         m_Instrument_state.reset(new Observation(instrumentStateObj,g->predicate()));
-        postObservation(*m_Instrument_state);
+        post_observation(*m_Instrument_state);
     }
 }
 
@@ -75,15 +75,15 @@ bool Rover::synchronize()
     {
         m_navigator_state.reset(new Observation(navigatorObj, AtPred));
         (*m_navigator_state).restrictAttribute(locationPred, string_domain(location));
-        postObservation(*m_navigator_state);
+        post_observation(*m_navigator_state);
         m_InstrumentLocation_state.reset(new Observation(instrumentLocationObj, StowedPred));
-        postObservation(*m_InstrumentLocation_state);
+        post_observation(*m_InstrumentLocation_state);
         m_Instrument_state.reset(new Observation(instrumentStateObj, FreePred));
-        postObservation(*m_Instrument_state);
+        post_observation(*m_Instrument_state);
         m_firstTick = false;
-        m_nextTick = getCurrentTick()+1;
+        m_nextTick = current_tick()+1;
     } else {
-        TICK cur = getCurrentTick();
+        TICK cur = current_tick();
         if(m_nextTick<=cur)
         {
             while(!m_pending.empty())
@@ -106,7 +106,7 @@ bool Rover::synchronize()
     return true;
 }
 
-void Rover::handleRequest(goal_id const &g)
+void Rover::handle_request(goal_id const &g)
 {
     if(g->predicate()==AtPred || g->predicate()==GoingPred || g->predicate()==PlacedPred
        || g->predicate()==SamplingPred || g->predicate()==FreePred)
@@ -128,7 +128,7 @@ void Rover::handleRequest(goal_id const &g)
     }
 }
 
-void Rover::handleRecall(goal_id const &g)
+void Rover::handle_recall(goal_id const &g)
 {
     std::list<goal_id>::iterator i = m_pending.begin();
     for(; i!=m_pending.end(); ++i)

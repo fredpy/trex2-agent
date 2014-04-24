@@ -37,9 +37,9 @@ add_library(TREXtransaction SHARED
   Goal.cc
   Observation.cc
   Predicate.cc
+  reactor.cc
   reactor_graph.cc
   Relation.cc
-  TeleoReactor.cc
   LogPlayer.cc
   private/graph_impl.cc
   private/node_impl.cc
@@ -49,10 +49,10 @@ add_library(TREXtransaction SHARED
   Goal.hh
   Observation.hh
   Predicate.hh
+  reactor.hh
+  reactor_fwd.hh
   reactor_graph.hh
   Relation.hh
-  TeleoReactor_fwd.hh
-  TeleoReactor.hh
   Tick.hh
   bits/timeline.hh
   LogPlayer.hh

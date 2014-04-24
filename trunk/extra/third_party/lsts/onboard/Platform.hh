@@ -10,7 +10,7 @@
 
 # include <iostream>
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/log_manager.hh>
 # include <trex/domain/int_domain.hh>
@@ -67,7 +67,7 @@ namespace TREX {
        * <Platform name="<name>" latency="<int>" lookahead="<int>" state="<bool>" duneport="<int>" localport="<int>"/>
        * @endcode
        */
-      Platform(TeleoReactor::xml_arg_type arg);
+      Platform(reactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Platform();
 
@@ -79,10 +79,10 @@ namespace TREX {
     private:
       
       bool synchronize();
-      void handleRequest(TREX::transaction::goal_id const &g);
-      void handleRecall(TREX::transaction::goal_id const &g);
-      void handleTickStart();
-      void handleInit();
+      void handle_request(TREX::transaction::goal_id const &g);
+      void handle_recall(TREX::transaction::goal_id const &g);
+      void handle_tick_start();
+      void handle_init();
       bool sendMsg(Message& msg, std::string ip, int port);
 
       void processState();

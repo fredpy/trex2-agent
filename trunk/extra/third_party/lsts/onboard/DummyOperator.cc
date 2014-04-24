@@ -15,12 +15,12 @@ namespace
 {
 
   /** @brief DummyOperator reactor declaration */
-  TeleoReactor::xml_factory::declare<DummyOperator> decl("DummyOperator");
+  reactor::xml_factory::declare<DummyOperator> decl("DummyOperator");
 
 }
 
-DummyOperator::DummyOperator(TREX::transaction::TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg)
+DummyOperator::DummyOperator(TREX::transaction::reactor::xml_arg_type arg)
+:reactor(arg)
 {
 
 }
