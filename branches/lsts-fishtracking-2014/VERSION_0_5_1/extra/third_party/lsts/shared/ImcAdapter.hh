@@ -27,7 +27,7 @@ using DUNE_NAMESPACES;
 using namespace TREX::transaction;
 using namespace TREX::utils;
 
-//#define ASYNC_COMMS
+#define ASYNC_COMMS
 
 namespace TREX {
   namespace LSTS {
