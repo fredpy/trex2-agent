@@ -743,13 +743,6 @@ namespace TREX {
 
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
-      mutable TICK             m_currentTick;
-      
-      mutable utils::SharedVar<bool>   m_tick_updated;
-      bool tick_updated() const {
-        utils::SharedVar<bool>::scoped_lock lck(m_tick_updated);
-        return *m_tick_updated;
-      }
       
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
       listen_set m_listeners;
