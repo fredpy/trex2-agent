@@ -275,7 +275,7 @@ namespace TREX
           if (min == "")
             min_i = IntegerDomain::minus_inf;
           else
-            min_i = strtoll(max.c_str(), NULL, 10);
+            min_i = strtoll(min.c_str(), NULL, 10);
 
           if (max == "")
             max_i = IntegerDomain::plus_inf;
