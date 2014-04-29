@@ -55,6 +55,8 @@ include_directories(${DUNE_INCLUDE_DIR})
 include_directories(${EUROPA_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
 
+install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
+
 add_subdirectory(shared)
 add_subdirectory(common)
 add_subdirectory(onboard)
