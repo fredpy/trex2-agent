@@ -34,8 +34,7 @@
 #ifndef H_trex_transaction_graph_impl
 # define H_trex_transaction_graph_impl
 
-# include "../bits/transaction_fwd.hh"
-
+# include "clock_impl.hh"
 # include <set>
 
 
@@ -59,7 +58,7 @@ namespace TREX {
       class graph_impl :boost::noncopyable,
       public ENABLE_SHARED_FROM_THIS<graph_impl> {
       public:
-        typedef utils::log::entry::date_type date_type;
+        typedef clock::date_type date_type;
                 
         /** @brief Default constructor
          *
@@ -93,13 +92,23 @@ namespace TREX {
         void name(utils::Symbol const &name) {
           m_name = name;
         }
+        
+        void start() {
+          m_date->set_started(true);
+        }
+        bool is_started() const {
+          return m_date->started();
+        }
+        
         /** @brief Update date
          *
          * @param[in] d A date value
          *
          * Update the datum of the graph to @p d
          */
-        void set_date(date_type const &d);
+        void set_date(date_type const &d) {
+          m_date->set_date(d);
+        }
         /** @brief Get date
          *
          * @param[in] fast Access flag
@@ -111,7 +120,9 @@ namespace TREX {
          *
          * @return The date associated to this graph
          */
-        boost::optional<date_type> get_date(bool fast=false) const;
+        boost::optional<date_type> get_date() const {
+          return m_date->get_date();
+        }
         
         /** @brief Log method
          *
@@ -174,14 +185,8 @@ namespace TREX {
         void declare(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
         void subscribe(SHARED_PTR<node_impl> n, utils::Symbol const &name, transaction_flags flag);
 
-        /** @brief graph date local storage
-         *
-         * The attribute where the graph date is locally stored. While this 
-         * attribute is updated through the starnd it is still mutex protected
-         * in order to allow quick access when Hasving Accurate date is not 
-         * critical
-         */
-        mutable utils::SharedVar< boost::optional<date_type> > m_date;
+        SHARED_PTR<clock>                      m_date;
+        
         /** @brief graph name local storage
          *
          * The attrobute that stroes the graph assocaited name. This attribute 
@@ -203,7 +208,6 @@ namespace TREX {
 
         std::set< SHARED_PTR<node_impl> > m_nodes;
         
-        void set_date_sync(date_type date);
         void add_node_sync(SHARED_PTR<node_impl> n);
         void rm_node_sync(SHARED_PTR<node_impl> n);
         

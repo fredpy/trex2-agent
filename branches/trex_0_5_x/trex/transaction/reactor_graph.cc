@@ -155,7 +155,7 @@ MultipleReactors::MultipleReactors(graph const &g, TeleoReactor const &r) throw(
 
 graph::graph()
 #ifdef WITH_MAKE_SHARED
-:m_impl(boost::make_shared<details::graph_impl>())
+:m_impl(MAKE_SHARED<details::graph_impl>())
 #else 
 :m_impl(new details::graph_impl)
 #endif
@@ -163,12 +163,13 @@ graph::graph()
 
 graph::graph(utils::Symbol const &name, TICK init, bool verbose)
 #ifdef WITH_MAKE_SHARED
-:m_impl(boost::make_shared<details::graph_impl>(name))
+:m_impl(MAKE_SHARED<details::graph_impl>(name))
 #else 
 :m_impl(new details::graph_impl(name))
 #endif
-, m_currentTick(init)
-, m_verbose(verbose) {}
+, m_verbose(verbose) {
+  m_impl->set_date(init);
+}
 
 graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
@@ -177,7 +178,9 @@ graph::graph(utils::Symbol const &name, boost::property_tree::ptree &conf,
 #else
 :m_impl(new details::graph_impl(name))
 #endif
-, m_currentTick(init), m_verbose(verbose) {
+, m_verbose(verbose) {
+  m_impl->set_date(init);
+  
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }
@@ -219,21 +222,13 @@ bool graph::hasTick() const {
 }
 
 void graph::updateTick(TICK value, bool started) {
-  if( started ) {
-    m_tick_updated = true;
-    m_impl->set_date(value);
-  } else
-    m_currentTick = value;
+  if( started )
+    m_impl->start();
+  m_impl->set_date(value);
 }
 
 TICK graph::getCurrentTick() const {
-  if( tick_updated() ) {
-    boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
-    m_tick_updated = false;
-    if( cur )
-      m_currentTick = *cur;
-  }
-  return m_currentTick;
+  return *m_impl->get_date();
 }
 
 boost::asio::strand &graph::strand() {
@@ -335,7 +330,7 @@ size_t graph::cleanup() {
 }  
 
 details::timeline_set::iterator graph::get_timeline(utils::Symbol const &tl) {
-  details::timeline *cand = new details::timeline(m_currentTick, tl);
+  details::timeline *cand = new details::timeline(*m_impl->get_date(), tl);
   std::pair<details::timeline_set::iterator, bool>
   ret = m_timelines.insert(cand);
   if( ret.second ) 
