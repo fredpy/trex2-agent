@@ -409,13 +409,13 @@ namespace TREX
       struct LocaleBool {
           bool data;
           LocaleBool() {}
-          LocaleBool( bool data ) : data(data) {}
-          operator bool() const { return data; }
+          explicit LocaleBool( bool data ) : data(data) {}
 
         // unused method
-//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
-//              out << std::boolalpha << b.data;
-//              return out;
+//          friend std::ostream & operator << ( std::ostream &out,
+//                                             LocaleBool const &b ) {
+//             out << std::boolalpha << b.data;
+//             return out;
 //          }
           friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
               in >> std::boolalpha >> b.data;
