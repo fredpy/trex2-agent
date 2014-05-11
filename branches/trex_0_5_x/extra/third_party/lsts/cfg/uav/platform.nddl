@@ -55,6 +55,10 @@ class Reference extends AgentTimeline {
 		float speed;
 		float z;
 		float radius;
+		float latitude_deg, longitude_deg;
+		
+        latitude == to_rad(latitude_deg);
+        longitude == to_rad(longitude_deg);
 	}
 	
 	action Going {
