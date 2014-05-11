@@ -595,6 +595,7 @@ bool EuropaReactor::hasWork() {
         print_stats("archive", 0, 0, stat_clock::now()-start);
       }
 
+      // handle dispatching of external goals if needed:
       Assembly::external_iterator from(begin(), end()), to(end(), end());
       for(; to!=from; ++from) {
         TeleoReactor::external_iterator
