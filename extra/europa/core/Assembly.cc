@@ -566,6 +566,28 @@ void Assembly::erase(EUROPA::TokenSet &set, EUROPA::TokenId const &tok) {
 }
 
 
+namespace {
+
+  void deep_cancel(EUROPA::DbClientId cli, EUROPA::TokenId tok) {
+
+    if( tok->isActive() ) {
+      EUROPA::TokenSet slaves = tok->slaves(), to_del;
+      for(EUROPA::TokenSet::iterator i=slaves.begin(); slaves.end()!=i; ++i) {
+	if( !(*i)->isFact() ) {
+	  deep_cancel(cli, *i);
+	  to_del.insert(*i);
+	}
+      }
+      for(EUROPA::TokenSet::iterator i=to_del.begin(); to_del.end()!=i; ++i) 
+	cli->deleteToken(*i);
+    } 
+    if( !tok->isInactive() )
+      cli->cancel(tok);
+  }
+
+}
+
+
 bool Assembly::relax(bool aggressive) {
   details::is_rejectable rejectable;
   EUROPA::DbClientId cli = plan_db()->getClient();
@@ -612,15 +634,8 @@ bool Assembly::relax(bool aggressive) {
         if( aggressive ) {
           debugMsg("trex:relax", "\t- destroying "<<tok->getKey()
                    <<" (aggressive)");
-          if( !tok->isInactive() ) {
-	    EUROPA::TokenSet slaves = tok->slaves();
-	    for(EUROPA::TokenSet::const_iterator s=slaves.begin();
-		slaves.end()!=s; ++s) {
-	      if( !(*s)->isInactive() )
-		cli->cancel(*s);
-	    }
-            cli->cancel(tok);
-	  }
+          if( !tok->isInactive() ) 
+	    deep_cancel(cli, tok);
           cli->deleteToken(tok);
         } else if( tok->isMerged() ) {
 
@@ -644,7 +659,7 @@ bool Assembly::relax(bool aggressive) {
                      <<" (aggressive)");
           }
           if( !tok->isInactive() )
-            cli->cancel(tok);
+            deep_cancel(cli, tok);
           cli->deleteToken(tok);
         }
       }
@@ -666,7 +681,16 @@ bool Assembly::relax(bool aggressive) {
             }*/
       } else if( !tok->isInactive() ) {
         debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
-        cli->cancel(tok);
+        deep_cancel(cli, tok);
+	if( is_action(tok) ) {
+	  debugMsg("trex:relax", "\t- delete action "<<tok->getKey());
+	  cli->deleteToken(tok);
+	} else if( rejectable(tok) ) {
+	  if( tok->start()->lastDomain().getUpperBound()>=now() ) {
+	    tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), 
+								       std::numeric_limits<EUROPA::eint>::infinity()));
+	  }
+	}
       }
     }
   }

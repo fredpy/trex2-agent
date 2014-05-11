@@ -119,8 +119,8 @@ namespace TREX
      */
     void Platform::insertIntoReceived(IMC::Message* msg)
     {
-      if (debug)
-        std::cout << "received " << msg->getName() << std::endl;
+      //if (debug)
+        //std::cout << "received " << msg->getName() << std::endl;
       if (received.count(msg->getId()))
         received.erase(msg->getId());
 
@@ -412,10 +412,9 @@ namespace TREX
           explicit LocaleBool( bool data ) : data(data) {}
 
         // unused method
-//          friend std::ostream & operator << ( std::ostream &out,
-//                                             LocaleBool const &b ) {
-//             out << std::boolalpha << b.data;
-//             return out;
+//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
+//              out << std::boolalpha << b.data;
+//              return out;
 //          }
           friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
               in >> std::boolalpha >> b.data;
@@ -570,8 +569,8 @@ namespace TREX
         m_ref.lon = estate->lon;
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
 
-        if (!m_auv)
-          setUavRefZ(estate->height-estate->z);
+        //if (!m_auv)
+          //setUavRefZ(estate->height-estate->z);
         //enqueueReferenceAtObs();
         m_reference_initialized = true;
       }
