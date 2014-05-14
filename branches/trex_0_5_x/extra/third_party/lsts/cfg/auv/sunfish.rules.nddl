@@ -47,16 +47,18 @@ YoYoController::Done {
 }
 
 Navigator::At {
-	//float min_dist;
-	//min_dist == 3.0;
+  //float min_dist;
+  //min_dist == 3.0;
 	
-	starts(YoYoController.Done arr);
-		arr.speed == speed;
-		arr.latitude == latitude;
-		arr.longitude == longitude;
-		arr.min_z == object.min_z;
-		arr.max_z == object.max_z;
-		//ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
+  starts(YoYoController.Done arr);
+
+  arr.speed == speed;
+  arr.latitude == latitude;
+  arr.longitude == longitude;
+  arr.min_z == object.min_z;
+  arr.max_z == object.max_z;	   
+
+  //ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
 }
 
 class NavActions {
@@ -97,15 +99,22 @@ NavActions::DoGoing {
     my_start >= c.start;
 
     dist == ll_distance(orig_lat, orig_lon, go.latitude, go.longitude);
+
     
     if( c.start <= AGENT_CLOCK ) {
+      starts_during(Medium.Water surface);
+      surface.start + 30 <= start;
+      if( surface.start ) {
 	// Gather my intial position only when I know I can take control
 	met_by(EstimatedState.Position origin);
 	orig_lat == origin.latitude;
 	orig_lon == origin.longitude;
 	orig_z == origin.z;
 
+
+
 	my_start == max(c.start, origin.start);
+      }
     }
     if( my_start <= AGENT_CLOCK ) {
 	contains(condition YoYoController.Exec cmd);
