@@ -62,14 +62,16 @@ Navigator::At {
 }
 
 class NavActions {
+    int time_at_surface;
     
     action DoGoing {
 	float orig_lat, orig_lon, orig_z;
 	float dist;
     }
     
-    NavActions() {
-	super();
+    NavActions(int _time_at_surface) {
+      super();
+	  time_at_surface = _time_at_surface;
     }
 }
 
@@ -98,32 +100,22 @@ NavActions::DoGoing {
     int my_start;
     my_start >= c.start;
 
-    dist == ll_distance(orig_lat, orig_lon, go.latitude, go.longitude);
-
-    
     if( c.start <= AGENT_CLOCK ) {
+      int early_start;
       starts_during(Medium.Water surface);
-      surface.start + 30 <= start;
-      if( surface.start ) {
-	// Gather my intial position only when I know I can take control
-	met_by(EstimatedState.Position origin);
-	orig_lat == origin.latitude;
-	orig_lon == origin.longitude;
-	orig_z == origin.z;
-
-
-
-	my_start == max(c.start, origin.start);
-      }
+      early_start == surface.start + object.time_at_surface;
+      early_start <= start;
+      my_start == max(c.start, early_start);
     }
+
     if( my_start <= AGENT_CLOCK ) {
-	contains(condition YoYoController.Exec cmd);
-	cmd.latitude == go.latitude;
-	cmd.longitude == go.longitude;
-	cmd.min_z == go.object.min_z;
-	cmd.max_z == go.object.max_z;
-	cmd.speed == go.speed;
-	concurrent(end, cmd.end);
+	  contains(condition YoYoController.Exec cmd);
+	  cmd.latitude == go.latitude;
+	  cmd.longitude == go.longitude;
+	  cmd.min_z == go.object.min_z;
+	  cmd.max_z == go.object.max_z;
+	  cmd.speed == go.speed;
+	  concurrent(end, cmd.end);
     }
 
 }

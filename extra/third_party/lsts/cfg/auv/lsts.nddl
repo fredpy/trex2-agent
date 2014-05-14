@@ -8,7 +8,8 @@ ControlMode control = new ControlMode(Observe);
 Medium medium = new Medium(Observe);
 OperationalLimits oplimits = new OperationalLimits(Observe);
 Navigator navigator = new Navigator(Internal);
-NavActions nav_act = new NavActions();
+// replace with time to spend at surface in seconds
+NavActions nav_act = new NavActions(30);
 
 
 Reference reference = new Reference(External);
