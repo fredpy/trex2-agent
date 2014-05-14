@@ -328,7 +328,9 @@ namespace TREX
     bool
     ImcAdapter::sendAsynchronous(Message * msg, std::string addr, int port)
     {
-      if (messenger == NULL)
+       if (msg->getTimeStamp() == 0)
+    	 msg->setTimeStamp();
+       if (messenger == NULL)
         messenger = new ImcMessenger();
       messenger->post(msg, port, addr);
       return true;
@@ -338,6 +340,9 @@ namespace TREX
     ImcAdapter::sendViaIridium(Message * msg, const std::string address,
         int port)
     {
+      if (msg->getTimeStamp() == 0)
+    	  msg->setTimeStamp();
+
       uint8_t buffer[65635];
       ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
@@ -363,6 +368,7 @@ namespace TREX
           IridiumMsgTx * tx = new IridiumMsgTx();
           tx->ttl = 1800; // try sending this update for 30 minutes
           tx->data.assign(buff, buff + length);
+          tx->setTimeStamp();
           if (!send(tx, address, port))
             return false;
         }
@@ -371,6 +377,7 @@ namespace TREX
       else
       {
         IridiumMsgTx * tx = new IridiumMsgTx();
+        tx->setTimeStamp();
         tx->data.assign(buffer, buffer + len);
         return send(tx, address, port);
       }
@@ -409,6 +416,9 @@ namespace TREX
     bool
     ImcAdapter::sendSynchronous(Message * msg, std::string addr, int port)
     {
+       if (msg->getTimeStamp() == 0)
+    	 msg->setTimeStamp();
+
       DUNE::Utils::ByteBuffer bb;
       try
       {
