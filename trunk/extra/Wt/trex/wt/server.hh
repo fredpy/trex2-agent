@@ -38,7 +38,7 @@
 # include <Wt/WServer>
 
 # include <trex/utils/platform/memory.hh>
-# include <trex/utils/SingletonUse.hh>
+# include <trex/utils/singleton/use.hh>
 
 namespace TREX {
   namespace wt {
@@ -88,7 +88,7 @@ namespace TREX {
       
       UNIQ_PTR< ::Wt::WServer > m_server;
 
-      friend class TREX::utils::SingletonWrapper<server>;
+      friend class TREX::utils::singleton::wrapper<server>;
     };
     
   } // TREX::Wt

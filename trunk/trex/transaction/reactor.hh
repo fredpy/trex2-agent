@@ -234,7 +234,10 @@ namespace TREX {
       graph const &get_graph() const {
         return m_graph;
       }
-      
+      graph &get_graph() {
+        return m_graph;
+      }
+     
       
       /** @brief reactor initial tick
        *
@@ -1037,9 +1040,6 @@ namespace TREX {
       external_iterator find_external(TREX::utils::symbol const &name);
       
     protected:
-      graph &get_graph() {
-        return m_graph;
-      }
       
       void set_max_tick(TICK max);
 

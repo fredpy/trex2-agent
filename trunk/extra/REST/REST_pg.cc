@@ -39,10 +39,10 @@ using namespace TREX::utils;
 using namespace TREX::REST;
 
 namespace {
-  using TREX::transaction::TeleoReactor;
+  using TREX::transaction::reactor;
 
-  SingletonUse<LogManager> s_log;
-  TeleoReactor::xml_factory::declare<REST_reactor> decl("REST_api");
+  singleton::use<log_manager> s_log;
+  reactor::factory::declare<REST_reactor> decl("REST_api");
 }
 
 namespace TREX {

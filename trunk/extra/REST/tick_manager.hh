@@ -34,7 +34,7 @@
 #ifndef H_trex_rest_tick_manager 
 # define H_trex_rest_tick_manager 
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include "REST_service.hh"
 
 # include <boost/signals2/signal.hpp>
@@ -54,7 +54,7 @@ namespace TREX {
       void new_tick(transaction::TICK cur);
       transaction::TICK current();
       
-      transaction::TICK tick_at(transaction::TeleoReactor::date_type const &date) const;
+      transaction::TICK tick_at(transaction::reactor::date_type const &date) const;
       
       boost::property_tree::ptree json_tick(transaction::TICK val) const;
       boost::property_tree::ptree json_initial(rest_request const &) const;

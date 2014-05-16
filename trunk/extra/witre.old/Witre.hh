@@ -75,10 +75,10 @@
 #include <queue>
 #include <map>
 #include <list>
-#include <trex/domain/IntegerDomain.hh>
-#include <trex/domain/FloatDomain.hh>
-#include <trex/domain/Variable.hh>
-#include <trex/utils/XmlUtils.hh>
+#include <trex/domain/int_domain.hh>
+#include <trex/domain/float_domain.hh>
+#include <trex/domain/var.hh>
+#include <trex/utils/xml_utils.hh>
 
 #include <boost/version.hpp>
 #include <iostream>
@@ -123,7 +123,7 @@ namespace TREX {
       std::queue<std::string> observations;
 
       typedef std::vector<Wt::WStandardItem *> entry;
-      typedef TREX::utils::SharedVar< std::queue<entry> > log_queue;
+      typedef TREX::utils::shared_var< std::queue<entry> > log_queue;
       
       log_queue m_logs;
       
@@ -151,8 +151,8 @@ namespace TREX {
       void timeLineChange(); //Updates when user changes what timelines to view
       void syncObservations(); //Syncs with server observations
       void attributePopup();
-      void clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
-                            std::map<string,transaction::FloatDomain> attributes);
+      void clientPostGoal(std::map<string, transaction::int_domain> standards,
+                            std::map<string,transaction::float_domain> attributes);
       void addTimeline(std::string name);
       void addMenuItems();
       void newPlanToken(const WitreServer::timed_goal& t);

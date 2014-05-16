@@ -34,7 +34,7 @@
 #ifndef H_trex_rest_timeline_wrap
 # define H_trex_rest_timeline_wrap
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 
 namespace TREX {
   namespace REST {
@@ -52,7 +52,7 @@ namespace TREX {
         timeline_wrap(transaction::details::timeline const &tl):m_tl(tl),m_count(0) {}
         ~timeline_wrap() {}
         
-        utils::Symbol const &name() const {
+        utils::symbol const &name() const {
           return m_tl.name();
         }
         

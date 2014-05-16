@@ -71,7 +71,8 @@ namespace {
     
     
     try {
-      graph::date_type date = TREX::utils::string_cast<graph::date_type>(date_str);
+      graph::date_type date = boost::lexical_cast<graph::date_type>(date_str);
+      
       return mgr->json_tick(mgr->tick_at(date));
     } catch(...) {
       throw std::runtime_error("Failed to parse \""+date_str+" as a date.");
@@ -175,8 +176,8 @@ TICK tick_manager::current() {
   return utils::strand_run(m_strand, fn);
 }
 
-TICK tick_manager::tick_at(TeleoReactor::date_type const &date) const {
-  return m_agent.timeToTick(date);
+TICK tick_manager::tick_at(reactor::date_type const &date) const {
+  return m_agent.time_to_tick(date);
 }
 
 
@@ -204,11 +205,11 @@ bp::ptree tick_manager::json_initial(rest_request const &) const {
 }
 
 bp::ptree tick_manager::json_final(rest_request const &) const {
-  return json_tick(m_agent.finalTick());
+  return json_tick(m_agent.final_tick());
 }
 
 bp::ptree tick_manager::tick_period(rest_request const &) const {
-  graph::duration_type rate = m_agent.tickDuration();
+  graph::duration_type rate = m_agent.tick_duration();
   CHRONO::nanoseconds
   ns = CHRONO::duration_cast<CHRONO::nanoseconds>(rate);
   bp::ptree ret;

@@ -36,7 +36,7 @@
 
 # include "REST_service.hh"
 
-# include <trex/utils/SharedVar.hh>
+# include <trex/utils/shared_var.hh>
 
 namespace TREX {
   namespace REST {
@@ -115,7 +115,7 @@ namespace TREX {
       
       WEAK_PTR<TimelineHistory> m_entry;
       std::string const m_prefix;
-      TREX::utils::SharedVar<size_t> m_counter;
+      TREX::utils::shared_var<size_t> m_counter;
     };
   }
 }

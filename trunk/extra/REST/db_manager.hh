@@ -74,7 +74,7 @@ namespace TREX {
         void add_token(transaction::TICK start, transaction::TICK end,
                        std::string const &tl, std::string const &json);
         
-        typedef transaction::IntegerDomain::bound bound;
+        typedef transaction::int_domain::bound bound;
         
         size_t get_tokens(std::string const &tl, bound &min, bound const &max,
                           std::ostream &out, size_t max_count=100);
