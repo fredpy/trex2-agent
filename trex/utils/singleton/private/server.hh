@@ -44,7 +44,8 @@
 #ifndef H_SingletonServer
 # define H_SingletonServer
 
-# include <boost/thread/shared_mutex.hpp>
+# include <boost/thread/recursive_mutex.hpp>
+# include <boost/thread/once.hpp>
 
 # include <map>
 
@@ -106,14 +107,12 @@ namespace TREX {
          bool detach(std::string const &id);
         
         private:
+         
           server() throw();
           ~server() throw();
           
-          typedef boost::shared_mutex mutex_type;
-          
-          typedef boost::shared_lock<mutex_type> read_lock;
-          typedef boost::upgrade_lock<mutex_type> check_lock;
-          typedef boost::upgrade_to_unique_lock<mutex_type> write_lock;
+          typedef boost::recursive_mutex mutex_type;
+          typedef mutex_type::scoped_lock lock_type;
           
           typedef std::map<std::string, dummy *> single_map;
         

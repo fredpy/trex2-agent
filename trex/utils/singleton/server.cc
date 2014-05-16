@@ -39,14 +39,19 @@
  */
 
 #include "private/server.hh"
+#include <boost/bind.hpp>
 
-#include <boost/thread/once.hpp>
 
 namespace {
   boost::once_flag o_flag = BOOST_ONCE_INIT;
 }
 
 using namespace TREX::utils::singleton::internal;
+
+
+/*
+ * class TREX::utils::singleton::internal::server
+ */
 
 // static
 
@@ -73,43 +78,25 @@ server::~server() throw() {}
 
 dummy *server::attach(std::string const &id,
                       sdummy_factory const &factory) {
-  // Get an upgradable access: in theory multiple threads can still access
-  // to protected variables for reading
-  check_lock lock(m_mtx);
-  // Just to be safe for now: this should never happen if call_once works
-  assert(this==s_instance);
-  
-  // look for the instance
+  lock_type lock(m_mtx);
   single_map::iterator i = m_singletons.find(id);
-  {
-    // Now I modify the list and the element: better get exclusive access
-    write_lock uniq_lock(lock);
-    if( m_singletons.end()==i ) {
-      // did not exist => create it
-      single_map::value_type val(id, factory.create());
-      // created without exception => insert it
-      i = m_singletons.insert(val).first;
-    }
-    // increase reference counter
-    i->second->incr_ref();
+  
+  if( m_singletons.end()==i ) {
+    single_map::value_type val(id, factory.create());
+    i = m_singletons.insert(val).first;
   }
+  i->second->incr_ref();
   return i->second;
 }
 
+
 bool server::detach(std::string const &id) {
-  // Get an upgradable access: in theory multiple threads can still access
-  // to protected variables for reading
-  check_lock lock(m_mtx);
-  // Just to be safe for now: this should never happen if call_once works
-  assert(this==s_instance);
+  lock_type lock(m_mtx);
   
   single_map::iterator i = m_singletons.find(id);
   if( m_singletons.end()!=i ) {
-    // Now I modify the list and the element: better get exclusive access
-   write_lock uniq_lock(lock);
     dummy *ptr = i->second;
     if( ptr->decr_ref() ) {
-      // nobody points to it anymore => remove and destroy it
       m_singletons.erase(i);
       delete ptr;
       return true;
