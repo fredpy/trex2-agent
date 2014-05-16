@@ -78,7 +78,6 @@ namespace TREX {
         Ty *operator->() const;
         /** @} */
       
-        static void disable();
       private:
         Ty *m_instance; //!< Singleton_reference
       }; // TREX::utils::singleton::use<>

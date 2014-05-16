@@ -88,9 +88,7 @@ namespace TREX {
          * @sa wrapper::attach
          */
         static void detach();
-      
-        static void disable_server();
-      
+            
       private:
         /** @brief Constructor
          *

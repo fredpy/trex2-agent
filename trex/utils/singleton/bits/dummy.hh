@@ -60,7 +60,6 @@ namespace TREX {
           static dummy *attach(std::string const &name,
                                sdummy_factory const &factory);
           static void detach(std::string const &name);
-          static void disable();
 
         private:
           void incr_ref() const;

@@ -46,9 +46,6 @@ void dummy::detach(std::string const &name) {
   server::instance().detach(name);
 }
 
-void dummy::disable() {
-}
-
 
 // structors
 

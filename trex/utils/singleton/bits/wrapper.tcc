@@ -76,11 +76,6 @@ namespace TREX {
         return typeid(Ty).name();
       }
     
-      template<typename Ty>
-      void wrapper<Ty>::disable_server() {
-        internal::dummy::disable();
-      }
-
       // structors :
       template<typename Ty>
       wrapper<Ty>::wrapper() {}

@@ -41,15 +41,6 @@
 namespace TREX {
   namespace utils {
     namespace singleton {
-      
-      /*
-       * class TREX::utils::singleton::use<>
-       */
-      template<typename Ty>
-      void use<Ty>::disable() {
-        wrapper<Ty>::disable_server();
-      }
-    
     
       template<typename Ty>
       use<Ty>::use():m_instance(wrapper<Ty>::attach()) {}
