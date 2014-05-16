@@ -44,7 +44,7 @@
 #ifndef H_SingletonServer
 # define H_SingletonServer
 
-# include <boost/thread/recursive_mutex.hpp>
+# include <boost/thread/shared_mutex.hpp>
 
 # include <map>
 
@@ -55,21 +55,66 @@ namespace TREX {
     namespace singleton {
       namespace internal {
       
+        /** @brief Singletons server
+         *
+         * This class manages the life times of all the singleton
+         * manipulated through TREX::utils::singleton::use. It is 
+         * in fact the only true singleton and its lifetime is 
+         * guaranted from its first access to the end of the program.
+         *
+         * @note All operations from this class are thread safe.
+         *
+         * @author Frederic Py
+         */
         class server :boost::noncopyable {
         public:
+          /** @brief Access server
+           *
+           * Give access ot the unique instance of server and create it 
+           * on its first call.
+           *
+           * @return the server unique instance 
+           */
           static server &instance();
         
+          /** @brief Attach new singleton reference 
+           *
+           * @param[in] id A unique identifier
+           * @param[in] factory A method to creat the instance 
+           *
+           * Give access and increment the reference counter to the 
+           * singleton named @p id and create it with @p factory if 
+           * @p id do not exist.
+           *
+           * @return A pointer to the singleton @p id
+           *
+           * @sa server::detach(std::string const &)
+           */
           dummy *attach(std::string const &id,
                         sdummy_factory const &factory);
-          bool detach(std::string const &id);
+          /** @brief Detach singleton reference
+           *
+           * @param[in] id A unique identifier
+           *
+           * Notifies that the singleton associated to @p id lost a 
+           * reference. If this was the last reference then the singleton 
+           * @p id is destroyed.
+           *
+           * @retval true if @p id has been destroyed
+           * @retval false if @p id still have more references
+           */
+         bool detach(std::string const &id);
         
         private:
           server();
           ~server();
-        
-          typedef boost::recursive_mutex mutex_type;
-          typedef mutex_type::scoped_lock lock_type;
-               
+          
+          typedef boost::shared_mutex mutex_type;
+          
+          typedef boost::shared_lock<mutex_type> read_lock;
+          typedef boost::upgrade_lock<mutex_type> check_lock;
+          typedef boost::upgrade_to_unique_lock<mutex_type> write_lock;
+          
           typedef std::map<std::string, dummy *> single_map;
         
           mutex_type m_mtx;

@@ -73,31 +73,44 @@ server::~server() {}
 
 dummy *server::attach(std::string const &id,
                       sdummy_factory const &factory) {
-  // Just to be safe for now
+  // Get an upgradable access: in theory multiple threads can still access
+  // to protected variables for reading
+  check_lock lock(m_mtx);
+  // Just to be safe for now: this should never happen if call_once works
   assert(this==s_instance);
+  
+  // look for the instance
+  single_map::iterator i = m_singletons.find(id);
   {
-    lock_type lock(m_mtx);
-    single_map::iterator i = m_singletons.find(id);
+    // Now I modify the list and the element: better get exclusive access
+    write_lock uniq_lock(lock);
     if( m_singletons.end()==i ) {
-      i = m_singletons.insert(single_map::value_type(id, factory.create())).first;
+      // did not exist => create it
+      i = m_singletons.insert(single_map::value_type(id, factory.create())).  first;
     }
+    // increase reference counter
     i->second->incr_ref();
-    return i->second;
   }
+  return i->second;
 }
 
 bool server::detach(std::string const &id) {
+  // Get an upgradable access: in theory multiple threads can still access
+  // to protected variables for reading
+  check_lock lock(m_mtx);
+  // Just to be safe for now: this should never happen if call_once works
   assert(this==s_instance);
-  {
-    lock_type lock(m_mtx);
-    single_map::iterator i = m_singletons.find(id);
-    if( m_singletons.end()!=i ) {
-      dummy *ptr = i->second;
-      if( ptr->decr_ref() ) {
-        m_singletons.erase(i);
-        delete ptr;
-        return true;
-      }
+  
+  single_map::iterator i = m_singletons.find(id);
+  if( m_singletons.end()!=i ) {
+    // Now I modify the list and the element: better get exclusive access
+   write_lock uniq_lock(lock);
+    dummy *ptr = i->second;
+    if( ptr->decr_ref() ) {
+      // nobody points to it anymore => remove and destroy it
+      m_singletons.erase(i);
+      delete ptr;
+      return true;
     }
   }
   return false;
