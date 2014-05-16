@@ -75,7 +75,7 @@ namespace TREX {
            *
            * @return the server unique instance 
            */
-          static server &instance();
+          static server &instance() throw();
         
           /** @brief Attach new singleton reference 
            *
@@ -106,8 +106,8 @@ namespace TREX {
          bool detach(std::string const &id);
         
         private:
-          server();
-          ~server();
+          server() throw();
+          ~server() throw();
           
           typedef boost::shared_mutex mutex_type;
           
@@ -120,7 +120,7 @@ namespace TREX {
           mutex_type m_mtx;
           single_map m_singletons;
         
-          static void make_instance();
+          static void make_instance() throw();
           static server *s_instance;
         };
         

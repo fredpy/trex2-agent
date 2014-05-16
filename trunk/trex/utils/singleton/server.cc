@@ -52,12 +52,12 @@ using namespace TREX::utils::singleton::internal;
 
 server *server::s_instance = 0x0;
 
-void server::make_instance() {
+void server::make_instance() throw() {
   if( 0x0==s_instance )
     s_instance = new server;
 }
 
-server &server::instance() {
+server &server::instance() throw() {
   // Use the C++11 like format
   boost::call_once(o_flag, &server::make_instance);
   return *s_instance;
@@ -65,9 +65,9 @@ server &server::instance() {
 
 // *structors
 
-server::server() {}
+server::server() throw() {}
 
-server::~server() {}
+server::~server() throw() {}
 
 // manipulators 
 
@@ -86,7 +86,9 @@ dummy *server::attach(std::string const &id,
     write_lock uniq_lock(lock);
     if( m_singletons.end()==i ) {
       // did not exist => create it
-      i = m_singletons.insert(single_map::value_type(id, factory.create())).  first;
+      single_map::value_type val(id, factory.create());
+      // created without exception => insert it
+      i = m_singletons.insert(val).first;
     }
     // increase reference counter
     i->second->incr_ref();
