@@ -1,0 +1,202 @@
+hub trecake for fishtrack experiment.
+
+This program connect to the hub webserver, collect and parse all the iridium messages from trex in the vehicle.
+It repeats this periodically (~ every 5mn) unitl it is interrupted or an error occurs
+
+Dependencies:
+  dune library
+  boost library
+
+To use the program just run "hub_tracker" in  a terminal
+
+Author: Frederic Py
+Copyright (C) 2014 Universidade do Porto - LSTS
+
+
+
+
+
+
+
+
+
+
+=========== How to interpret data =======================
+
+hub_tracker display on a text stream all the message received from the AUV 
+through Iridium
+
+Each message is displayed as follow:
+>> 2014-05-07T13:14:58Z =================================================
+{
+  <message content>
+}
+
+Where:
+  - the first line (with all the ====) gives the UTC date when the message 
+    was received on shore
+  - the <message content> describe wither a request or observation from trex
+
+A trex request reflects that operator did request trex to do a specific task
+A trex observation reflects that trex is in a specific state (which can be the one requested above)
+
+<message content> reflects these with the following format:
+{
+  “timestamp”: “<an UTC date>”, // optional
+  “op”: “<either observation or request>”,
+  “goal_id”: “<an id for this message>”, // optional
+  “timeline”: “drifter”,
+  “predicate”: “either Idle, DoSurvey or Survey”,
+  “attributes”: [ <a list of extra attributes> ] // optional
+}
+
+“predicate” is the state wither requested or observed (depending on op). 
+In this mission it can be 3 different values:
+  - “Idle” the AUV jus not doing a survey at this time
+  - “DoSurvey” the AUV is in the process to do a survey 
+  - “Survey” the survey completed (returns immediately after to Idle)
+
+Both DoSurvey and Survey have a bunch of attributes the relevant ones are:
+  - “center_lat” and “center_lon” which indicate the latitude and longitude 
+	of the center of the survey in radian
+  - “path” the type of path for the survey (often square)
+  - “size” the size of the survey in meters (e.g. 1000 means that the AUV does 
+	a 1kmx1km square)
+  - all the others are extra information not useful to understand for the 
+    program purpose
+
+Finally the last line displayed by this program indicates when it will poll 
+data next (every 5mn)
+
+
+
+
+
+
+
+
+
+
+
+
+
+   =========== Example of a trace =======================
+
+here’s a trace from Monday with 3 messages:
+
+>> 2014-05-07T11:58:34Z =================================================
+{
+    "op": "observation",
+    "timeline": "drifter",
+    "predicate": "Inactive"
+}
+
+>> 2014-05-07T11:59:00Z =================================================
+{
+    "timestamp": "2014-05-07T11:58:59",
+    "op": "request",
+    "goal_id": "N_1399463939680",
+    "timeline": "drifter",
+    "predicate": "Survey",
+    "attributes":
+    [
+        {
+            "name": "center_lat",
+            "value": "0.6449578886525994"
+        },
+        {
+            "name": "center_lon",
+            "value": "-0.1343733283315512"
+        },
+        {
+            "name": "size",
+            "value": "1000.0"
+        },
+        {
+            "name": "lagrangian",
+            "value": "false"
+        },
+        {
+            "name": "path",
+            "min": "square",
+            "max": ""
+        },
+        {
+            "name": "heading",
+            "value": "0.0"
+        }
+    ]
+}
+
+>> 2014-05-07T13:14:50Z =================================================
+{
+    "op": "observation",
+    "timeline": "drifter",
+    "predicate": "Survey",
+    "attributes":
+    [
+        {
+            "name": "center_lat",
+            "value": "0.6449603576934786"
+        },
+        {
+            "name": "center_lon",
+            "value": "-0.1343689746873473"
+        },
+        {
+            "name": "heading",
+            "value": "0.0000000000000000"
+        },
+        {
+            "name": "heading_deg",
+            "value": "0.0000000000000000"
+        },
+        {
+            "name": "lagrangian",
+            "value": "0"
+        },
+        {
+            "name": "path",
+            "value": "square"
+        },
+        {
+            "name": "size",
+            "value": "1000.0000000000000000"
+        },
+        {
+            "name": "speed_east",
+            "value": "0.0000000000000000"
+        },
+        {
+            "name": "speed_north",
+            "value": "0.0000000000000000"
+        },
+        {
+            "name": "u",
+            "value": "0.0000000000000000"
+        },
+        {
+            "name": "v",
+            "value": "0.0000000000000000"
+        }
+    ]
+}
+
+>> 2014-05-07T13:14:58Z =================================================
+{
+    "op": "observation",
+    "timeline": "drifter",
+    "predicate": "Inactive"
+}
+
+=====================================================
+  - Next poll at 2014-May-07 17:22:24.596850
+
+
+The first message at 2014-05-07T11:58:34Z is an observation indicating that the vehicle was Inactive at this time
+The second message at 2014-05-07T11:59:00Z is a request sent from the operator to do a Survey which was a square of 1000m
+The third message at 2014-05-07T13:14:50Z is an observation of the Survey which was requested above (confirming its completion)
+The last message at 2014-05-07T13:14:58Z is an observation indicating they vehicle went back to its inactive state (until either 
+       the operator post a new goal or the mission is aborted)
+
+Finally the last line indicates that the program will refresh this data at the given time 
