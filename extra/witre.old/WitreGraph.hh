@@ -9,7 +9,7 @@
 
 #include "WitreServer.hh"
 
-#include <trex/transaction/TeleoReactor.hh>
+#include <trex/transaction/reactor.hh>
 
 # if defined(__clang__)
 // clang annoys me by putting plenty of warnings on unused variables from boost
@@ -38,7 +38,7 @@ namespace TREX {
     class WitreGraph :public boost::dfs_visitor<> {
         public:
 
-            WitreGraph(std::map<utils::Symbol, int> &rel)
+            WitreGraph(std::map<utils::symbol, int> &rel)
                 :relation(rel) {};
             virtual ~WitreGraph() {};
 
@@ -54,7 +54,7 @@ namespace TREX {
                     graph::reactor_id source = boost::source(rel,g);
                     graph::reactor_id target = boost::target(rel, g);
                     vertex[target] = vertex[source]+1;
-                    relation.insert( std::pair<utils::Symbol, int>(rel->name(), vertex[source]));
+                    relation.insert( std::pair<utils::symbol, int>(rel->name(), vertex[source]));
                 }
             };
 
@@ -66,7 +66,7 @@ namespace TREX {
 
         private:
             std::map<graph::reactor_id, int> vertex;
-            std::map<utils::Symbol, int>& relation;
+            std::map<utils::symbol, int>& relation;
 
     };
 
@@ -76,23 +76,23 @@ namespace TREX {
                 class nodeObject
                 {
                     public:
-                        utils::Symbol name;
-                        std::list<utils::Symbol> connections;
+                        utils::symbol name;
+                        std::list<utils::symbol> connections;
                         int level;
 
-                        nodeObject(utils::Symbol name, int level)
+                        nodeObject(utils::symbol name, int level)
                         {
                             this->name = name;
                             this->level = level;
                         }
 
-                        void addConnection(utils::Symbol name)
+                        void addConnection(utils::symbol name)
                         {
                             connections.push_back(name);
                         }
                 };
 
-                typedef std::map<utils::Symbol, nodeObject> GraphMap;
+                typedef std::map<utils::symbol, nodeObject> GraphMap;
 
                 WitrePaintSearch(GraphMap& temp)
                     :graphMap(temp), level(0), highestLevel(0) {};
@@ -103,23 +103,23 @@ namespace TREX {
                 {
                     if(is_valid(r))
                     {
-                        std::pair<TREX::transaction::TeleoReactor::internal_iterator,
-                                    TREX::transaction::TeleoReactor::internal_iterator> internal;
+                        std::pair<TREX::transaction::reactor::internal_iterator,
+                                    TREX::transaction::reactor::internal_iterator> internal;
                         internal = boost::in_edges(r,g);
-                        TREX::transaction::TeleoReactor::internal_iterator it;
+                        TREX::transaction::reactor::internal_iterator it;
                         for(it = internal.first; it!=internal.second; ++it)
                         {
-                            utils::Symbol name = it->name();
+                            utils::symbol name = it->name();
                             if(graphMap.find(name)==graphMap.end())
                             {
                                 nodeObject node(name,0);
-                                graphMap.insert(std::pair<utils::Symbol,nodeObject>(name, node));
+                                graphMap.insert(std::pair<utils::symbol,nodeObject>(name, node));
                             }
-                            for(TeleoReactor::external_iterator temp = r->ext_begin(); temp!=r->ext_end(); ++temp)
+                            for(reactor::external_iterator temp = r->ext_begin(); temp!=r->ext_end(); ++temp)
                             {
                                 if(temp->active())
                                 {
-                                    utils::Symbol externalName = temp->name();
+                                    utils::symbol externalName = temp->name();
                                     if(!findName(graphMap.find(name)->second.connections,externalName))
                                     {
                                         graphMap.find(name)->second.addConnection(externalName);
@@ -127,7 +127,7 @@ namespace TREX {
                                     if(graphMap.find(externalName)==graphMap.end())
                                     {
                                         nodeObject node(externalName, graphMap.find(name)->second.level+1);
-                                        graphMap.insert(std::pair<utils::Symbol,nodeObject>(externalName, node));
+                                        graphMap.insert(std::pair<utils::symbol,nodeObject>(externalName, node));
                                     }
                                     else
                                     {
@@ -147,12 +147,12 @@ namespace TREX {
                     }
                 }
 
-                void upLevel(utils::Symbol name, int difference)
+                void upLevel(utils::symbol name, int difference)
                 {
-                    std::list<utils::Symbol> called;
+                    std::list<utils::symbol> called;
                     graphMap.find(name)->second.level += difference;
                     nodeObject* temp = &graphMap.find(name)->second;
-                    std::list<utils::Symbol>::iterator it;
+                    std::list<utils::symbol>::iterator it;
                     for(it = temp->connections.begin(); it!= temp->connections.end(); it++)
                     {
                         if(!findName(called,*it))
@@ -163,9 +163,10 @@ namespace TREX {
                     }
                 }
 
-                bool findName(std::list<utils::Symbol> list, utils::Symbol name)
+                bool findName(std::list<utils::symbol> list,
+                              utils::symbol name)
                 {
-                    std::list<utils::Symbol>::iterator it;
+                    std::list<utils::symbol>::iterator it;
                     for(it = list.begin(); it!=list.end(); it++)
                     {
                         if(*it==name)
@@ -202,7 +203,7 @@ namespace TREX {
     {
         private:
             const graph& pGraph;
-            std::map<utils::Symbol, Wt::WRectF> placement;
+            std::map<utils::symbol, Wt::WRectF> placement;
             // Wt::WPainter* paint;
 
         protected:
@@ -238,9 +239,9 @@ namespace TREX {
                 //Drawing the lines and the arrows
                 for(it = graphMap.begin(); it!=graphMap.end(); it++)
                 {
-                    std::list<utils::Symbol>& connections = (*it).second.connections;
+                    std::list<utils::symbol>& connections = (*it).second.connections;
 
-                    std::list<utils::Symbol>::iterator connect;
+                    std::list<utils::symbol>::iterator connect;
                     for(connect = connections.begin(); connect!=connections.end(); connect++)
                     {
                         Wt::WPointF tCenter = placement[(*it).first].center();
@@ -325,7 +326,7 @@ namespace TREX {
                 Wt::WPointF nullPoint;
                 Wt::WPointF topPoint;
                 Wt::WPointF bottomPoint;
-                std::map<utils::Symbol, Wt::WRectF>::iterator it;
+                std::map<utils::symbol, Wt::WRectF>::iterator it;
                 for(it=placement.begin(); it!=placement.end(); it++)
                 {
                     //True if the rect does not contain the two points and any points in slope
@@ -447,7 +448,7 @@ namespace TREX {
 
             void addInteractiveAreas()
             {
-                std::map<utils::Symbol, Wt::WRectF>::iterator it;
+                std::map<utils::symbol, Wt::WRectF>::iterator it;
                 for(it=placement.begin(); it!=placement.end(); it++)
                 {
                     Wt::WRectArea* area = new Wt::WRectArea((*it).second);

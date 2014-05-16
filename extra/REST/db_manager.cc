@@ -162,17 +162,17 @@ size_t db_manager::get_tokens(std::string const &tl,
                                        bound &min, bound const &max,
                                        std::ostream &out,
                                        size_t max_count) {
-  if( max<min || min==transaction::IntegerDomain::plus_inf ) {
-    min = transaction::IntegerDomain::plus_inf; // set min to +inf so caller know that he is done
+  if( max<min || min==transaction::int_domain::plus_inf ) {
+    min = transaction::int_domain::plus_inf; // set min to +inf so caller know that he is done
     return 0;
   } else {
     // Build the query : get all the tokens for thsi timeline ordered by their end ...
     dbo::Query< dbo::ptr<db_token> > req = m_session.find<db_token>().where("timeline_name = ?").bind(tl).orderBy("end");
     // with end >= min
-    if( !min.isInfinity() )
+    if( !min.is_infinity() )
       req.where("end >= ?").bind(min.value());
     // and start <= max
-    if( !max.isInfinity() )
+    if( !max.is_infinity() )
       req.where("start <= ?").bind(max.value());
     // Initiate the transaction
     size_t cpt = 0, count;
@@ -193,7 +193,7 @@ size_t db_manager::get_tokens(std::string const &tl,
     }
     if( count<max_count ) {
       // if count is less than our max then we know that we are done
-      min = transaction::IntegerDomain::plus_inf; // set min to +inf so caller know that he is done
+      min = transaction::int_domain::plus_inf; // set min to +inf so caller know that he is done
     }
     return count;
   }
@@ -201,10 +201,10 @@ size_t db_manager::get_tokens(std::string const &tl,
 
 unsigned long long db_manager::count(std::string const &name, bound const &min, bound const &max) {
   dbo::Query<int> req = m_session.query<int>("select count(1) from token").where("timeline_name = ?").bind(name);
-  if( !min.isInfinity() )
+  if( !min.is_infinity() )
     req.where("end >= ?").bind(min.value());
   // and start <= max
-  if( !max.isInfinity() )
+  if( !max.is_infinity() )
     req.where("start <= ?").bind(max.value());
   {
     dbo::Transaction tr(m_session);

@@ -70,11 +70,11 @@ bp::ptree TimelineHistory::get_goal(goal_id g) const {
 
 
 bp::ptree TimelineHistory::get_token(goal_id const &tok) const {
-  return m_reactor.getGraph().export_goal(tok).get_child("Goal");
+  return m_reactor.get_graph().export_goal(tok).get_child("Goal");
 }
 
 TICK TimelineHistory::get_date(std::string const &date) {
-  return m_reactor.timeToTick(utils::string_cast<REST_reactor::date_type>(date));
+  return m_reactor.time_to_tick(boost::lexical_cast<REST_reactor::date_type>(date));
 }
 
 
@@ -100,10 +100,10 @@ void TimelineHistory::declared(details::timeline const &timeline) {
 void TimelineHistory::list_timelines(std::ostream &out,
                                      std::set<std::string> const &select,
                                      bool hidden,
-                                     IntegerDomain const &range) {
+                                     int_domain const &range) {
   // I build the json by hand
   out<<"{ \"requested_tick_range\": ";
-  if( range.isFull() )
+  if( range.is_full() )
     out<<"{}";
   else
     utils::write_json(out, range.as_tree(), fancy());
@@ -119,11 +119,11 @@ void TimelineHistory::list_timelines(std::ostream &out,
 }
 
 void TimelineHistory::get_tokens(std::string const &timeline,
-                                 IntegerDomain::bound &lo,
-                                 IntegerDomain::bound const &hi,
+                                 int_domain::bound &lo,
+                                 int_domain::bound const &hi,
                                  std::ostream &dest, bool first,
                                  size_t max) {
-  utils::Symbol tl(timeline);
+  utils::symbol tl(timeline);
   
   boost::function<size_t ()>
   fn(boost::bind(&TimelineHistory::get_tok_sync, this,
@@ -136,7 +136,7 @@ void TimelineHistory::get_tokens(std::string const &timeline,
 }
 
 bool TimelineHistory::exists(std::string const &name) {
-  utils::Symbol tl(name);
+  utils::symbol tl(name);
   boost::function<bool ()> fn(boost::bind(&TimelineHistory::exists_sync,
                                           this, tl));
   return utils::strand_run(m_strand, fn);
@@ -165,10 +165,10 @@ goal_id TimelineHistory::add_goal(std::string const &file) {
   
   goal_id g = m_reactor.parse_goal(g_desc);
   
-  if( !m_reactor.isExternal(g->object()) )
+  if( !m_reactor.is_external(g->object()) )
     throw std::runtime_error("Goal associated to unknown timeline \""+g->object().str()+"\"");
   
-  m_reactor.postGoal(g);
+  m_reactor.post_goal(g);
   
   m_strand.dispatch(boost::bind(&TimelineHistory::add_goal_sync, this, g));
   
@@ -186,7 +186,7 @@ bool TimelineHistory::delete_goal(std::string const &id) {
   goal_id g = utils::strand_run(m_strand, fn);
   
   if( g )
-    return m_reactor.postRecall(g); // Not sure if postRecall is thread safe ... 
+    return m_reactor.post_recall(g); // Not sure if postRecall is thread safe ...
   else
     return false;
 }
@@ -215,7 +215,7 @@ void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
       // Do the export in json so the data is already formatted for the services
       std::ostringstream oss;
       helpers::json_stream json(oss);
-      prev->restrictEnd(IntegerDomain(date));
+      prev->restrictEnd(int_domain(date));
       utils::write_json(json, get_token(prev), fancy());
       m_db.add_token(start, date, (*pos)->name().str(), oss.str());
     }
@@ -226,7 +226,7 @@ void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
 
 void TimelineHistory::ext_obs_sync(TICK date) {
   m_cur = date;
-  IntegerDomain future(date+1, IntegerDomain::plus_inf);
+  int_domain future(date+1, int_domain::plus_inf);
   
   for(helpers::rest_tl_set::iterator i=m_timelines.begin();
       m_timelines.end()!=i; ++i)
@@ -235,11 +235,11 @@ void TimelineHistory::ext_obs_sync(TICK date) {
 }
 
 unsigned long long TimelineHistory::count_tokens(helpers::timeline_wrap const &tl,
-                                                 IntegerDomain const &dom,
+                                                 int_domain const &dom,
                                                  transaction::TICK &delta_t) {
   if( tl.has_observation() ) {
-    IntegerDomain::bound lo, hi;
-    dom.getBounds(lo, hi);
+    int_domain::bound lo, hi;
+    dom.get_bounds(lo, hi);
     
     if( lo>=tl.obs_date() ) {
       // should evolve in the future : as of now we just look at observations
@@ -276,7 +276,7 @@ unsigned long long TimelineHistory::count_tokens(helpers::timeline_wrap const &t
 
 
 size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> const &select,
-                                     bool hidden, IntegerDomain rng) {
+                                     bool hidden, int_domain rng) {
   size_t count =0;
   
   for(helpers::rest_tl_set::const_iterator i=m_timelines.begin(); m_timelines.end()!=i;
@@ -308,8 +308,8 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
          <<"\n    \"publish_plan\": \""<<(*i)->publish_plan()<<"\","
          <<"\n    \"total_obs\": "<<cnt<<",";
 
-      typedef utils::chrono_posix_convert<TeleoReactor::duration_type> convert;
-      convert::posix_duration period = convert::to_posix(m_reactor.tickDuration());
+      typedef utils::internals::chrono_posix_convert<reactor::duration_type> convert;
+      convert::posix_duration period = convert::to_posix(m_reactor.tick_duration());
       long double factor = 0.0;
       if( cnt>0 ) {
         factor = n_ticks;
@@ -327,14 +327,14 @@ size_t TimelineHistory::list_tl_sync(std::ostream &out, std::set<std::string> co
   return count;
 }
 
-bool TimelineHistory::exists_sync(TREX::utils::Symbol name) {
+bool TimelineHistory::exists_sync(TREX::utils::symbol name) {
   return m_timelines.end()!=m_timelines.find(name);
 }
 
 
-size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
-                                     IntegerDomain::bound &lo,
-                                     IntegerDomain::bound hi,
+size_t TimelineHistory::get_tok_sync(TREX::utils::symbol tl,
+                                     int_domain::bound &lo,
+                                     int_domain::bound hi,
                                      std::ostream &out,
                                      bool first, size_t max) {
   size_t ret = 0;
@@ -345,7 +345,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
     if( !first )
       out.put(',');
     if( (*pos)->has_observation() ) {
-      IntegerDomain::bound date = (*pos)->obs_date();
+      int_domain::bound date = (*pos)->obs_date();
       if( date>=lo ) {
         // access the database
         ret = m_db.get_tokens(tl.str(), lo, hi, out, max);
@@ -362,7 +362,7 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
         else
           first = false;
         utils::write_json(out, get_token((*pos)->obs()), fancy());
-        lo = IntegerDomain::plus_inf;
+        lo = int_domain::plus_inf;
         ret += 1;
       }
       // TODO : repeat this for the planned tokens

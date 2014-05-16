@@ -54,12 +54,12 @@ namespace TREX {
       void update_tick(transaction::TICK cur);
       
       void list_timelines(std::ostream &out, std::set<std::string> const &select, bool hidden,
-                          transaction::IntegerDomain const &range);
+                          transaction::int_domain const &range);
       
       transaction::TICK get_date(std::string const &date);
       void get_tokens(std::string const &timeline,
-                      transaction::IntegerDomain::bound &lo,
-                      transaction::IntegerDomain::bound const &hi,
+                      transaction::int_domain::bound &lo,
+                      transaction::int_domain::bound const &hi,
                       std::ostream &dest, bool first,
                       size_t max);
       bool exists(std::string const &name);
@@ -81,7 +81,7 @@ namespace TREX {
     private:
       boost::property_tree::ptree get_token(transaction::goal_id const &tok) const;
       unsigned long long count_tokens(helpers::timeline_wrap const &tl,
-                                      transaction::IntegerDomain const &dom,
+                                      transaction::int_domain const &dom,
                                       transaction::TICK &delta_t);
       
       void declared(transaction::details::timeline const &timeline);
@@ -91,11 +91,11 @@ namespace TREX {
                         transaction::TICK date);
       void ext_obs_sync(transaction::TICK date);
       void add_tl_sync(transaction::details::timeline const &tl);
-      size_t get_tok_sync(utils::Symbol tl,
-                          transaction::IntegerDomain::bound &lo,
-                          transaction::IntegerDomain::bound hi,
+      size_t get_tok_sync(utils::symbol tl,
+                          transaction::int_domain::bound &lo,
+                          transaction::int_domain::bound hi,
                           std::ostream &out, bool first, size_t max);
-      bool exists_sync(utils::Symbol name);
+      bool exists_sync(utils::symbol name);
             
       boost::property_tree::ptree goals_sync();
       
@@ -105,7 +105,7 @@ namespace TREX {
       
       
       size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden,
-                          transaction::IntegerDomain rng);
+                          transaction::int_domain rng);
       
       bool const m_fancy;
       

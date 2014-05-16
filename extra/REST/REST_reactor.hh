@@ -34,7 +34,7 @@
 #ifndef H_trex_REST_reactor
 # define H_trex_REST_reactor
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/transaction/reactor.hh>
 # include <trex/Wt/server.hh>
 
 # include <boost/signals2/signal.hpp>
@@ -46,21 +46,21 @@ namespace TREX {
     class TimelineHistory;
     class tick_manager;
     
-    class REST_reactor :public transaction::TeleoReactor {
+    class REST_reactor :public transaction::reactor {
     public:
-      REST_reactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
+      REST_reactor(TREX::transaction::reactor::xml_arg_type arg);
       ~REST_reactor();
       
     private:
       //reactor handlers
-      void handleInit();
-      void handleTickStart();
+      void handle_init();
+      void handle_tick_start();
       void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
-      void newPlanToken(transaction::goal_id const &t);
-      void cancelledPlanToken(transaction::goal_id const &t);
+      void new_plan_token(transaction::goal_id const &t);
+      void cancelled_plan_token(transaction::goal_id const &t);
       
-      TREX::utils::SingletonUse<TREX::wt::server> m_server;
+      TREX::utils::singleton::use<TREX::wt::server> m_server;
       
       // UNIQ_PTR<Wt::WServer>     m_server;
       

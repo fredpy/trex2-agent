@@ -166,16 +166,32 @@ void Goalpopup::valRange(int bottom, int top)
 
 void Goalpopup::done()
 {
-    std::map<string, transaction::IntegerDomain> values;
-    std::map<string, transaction::FloatDomain> etcValues;
+    std::map<string, transaction::int_domain> values;
+    std::map<string, transaction::float_domain> etcValues;
     typedef std::map<string, pair<Wt::WLineEdit*,Wt::WLineEdit*> >::iterator pairMap;
     for(pairMap it = standards.begin(); it!= standards.end(); it++)
     {
         Wt::WLineEdit* first = it->second.first;
         Wt::WLineEdit* second = it->second.second;
         string name = it->first;
-        values.insert(make_pair(name,transaction::IntegerDomain(string_cast(IntegerDomain::minus_inf,first->text().toUTF8()),
-                                                                   string_cast(IntegerDomain::plus_inf,second->text().toUTF8()))));
+      
+      int_domain::bound hi=int_domain::plus_inf, lo=int_domain::minus_inf;
+      try {
+        std::string txt = first->text().toUTF8();
+        if( !txt.empty() )
+          lo = boost::lexical_cast<int_domain::bound>(txt);
+        
+        txt = second->text().toUTF8();
+        if( !txt.empty() )
+          hi = boost::lexical_cast<int_domain::bound>(txt);
+
+        values.insert(make_pair(name, int_domain(lo, hi)));
+      } catch(boost::bad_lexical_cast const &e) {
+        stringstream msg;
+        msg<<"alert('Exception caught with "<<name<<": could not convert input to correct format');";
+        this->doJavaScript(msg.str());
+      }
+      
     }
     typedef std::list<std::pair<Wt::WInPlaceEdit*,Wt::WLineEdit*> >::iterator additionMap;
     for(additionMap it = additions.begin(); it!=additions.end(); it++)
@@ -184,7 +200,7 @@ void Goalpopup::done()
         Wt::WLineEdit* first = it->second;
         try
         {
-            etcValues.insert(make_pair(name,transaction::FloatDomain(boost::lexical_cast<double>(first->text().toUTF8()))));
+            etcValues.insert(make_pair(name,transaction::float_domain(boost::lexical_cast<double>(first->text().toUTF8()))));
         }catch(boost::bad_lexical_cast bad)
         {
             stringstream msg;
