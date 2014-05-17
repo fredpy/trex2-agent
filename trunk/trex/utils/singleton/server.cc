@@ -39,11 +39,14 @@
  */
 
 #include "private/server.hh"
-#include <boost/bind.hpp>
+
+# include <boost/thread/once.hpp>
 
 
 namespace {
   boost::once_flag o_flag = BOOST_ONCE_INIT;
+  
+  
 }
 
 using namespace TREX::utils::singleton::internal;
