@@ -44,12 +44,11 @@
 #ifndef H_SingletonServer
 # define H_SingletonServer
 
+# include "../bits/dummy.hh"
+
 # include <boost/thread/recursive_mutex.hpp>
-# include <boost/thread/once.hpp>
 
 # include <map>
-
-# include "../bits/dummy.hh"
 
 namespace TREX {
   namespace utils {

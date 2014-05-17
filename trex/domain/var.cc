@@ -71,7 +71,12 @@ namespace TREX {
         return m_name;
       }
       bool has_domain() const {
-        return m_domain;
+        // C++11 requires explicit conversion
+        // and if allow to bypass that
+        if( m_domain )
+          return true;
+        else
+          return false;
       }
       abstract_domain &domain() {
         return *m_domain;

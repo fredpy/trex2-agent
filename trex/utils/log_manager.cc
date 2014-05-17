@@ -299,6 +299,8 @@ using namespace TREX::utils;
 
 log_manager::log_manager():m_impl(new details::mgmt_impl) {}
 
+log_manager::~log_manager() {}
+
 log_manager::path_type log_manager::log_path() {
   boost::function<path_type ()> fn = boost::bind(&details::mgmt_impl::init, m_impl.get());
   return strand_run(m_impl->strand(), fn);

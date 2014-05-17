@@ -85,7 +85,12 @@ namespace TREX {
         }
         
         bool has_observation() const {
-          return m_obs;
+          // C++11 requires explicit conversion to bool
+          // the if does such explicit conversion
+          if( m_obs )
+            return true;
+          else
+            return false;
         }
         transaction::TICK obs_date() const {
           return m_date;

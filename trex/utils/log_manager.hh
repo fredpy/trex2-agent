@@ -410,7 +410,7 @@ namespace TREX {
       
     private:
       log_manager();
-      ~log_manager() {}
+      ~log_manager();
       
       UNIQ_PTR<details::mgmt_impl> m_impl;
       
