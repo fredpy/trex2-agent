@@ -154,8 +154,10 @@ add_executable(hub_tracker
   # sources 
   src/main.cc
   src/server.cc
+  src/msg_board.cc
   # headers
   include/server.hh
+  include/msg_board.hh
 )
 
 target_link_libraries(hub_tracker hub_lib 
