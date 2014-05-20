@@ -12,6 +12,9 @@
 #include <Wt/WGoogleMap>
 #include <Wt/WBorderLayout>
 #include <Wt/WText>
+#include <Wt/WToolBar>
+#include <Wt/WPushButton>
+#include <Wt/WOverlayLoadingIndicator>
 
 #include <DUNE/Coordinates/WGS84.hpp>
 
@@ -38,12 +41,19 @@ namespace {
                     boost::shared_ptr<server> const &s)
     :Wt::WApplication(env), m_server(s) {
       m_update_timer = new Wt::WTimer(this);
-      m_update_timer->setInterval(1000);
+      m_update_timer->setInterval(100);
       m_update_timer->timeout().connect(this, &hub_application::page_update);
+    
+      this->setLoadingIndicator(new Wt::WOverlayLoadingIndicator);
 
       Wt::WBorderLayout *layout = new Wt::WBorderLayout;
-      
       root()->setLayout(layout);
+      this->setCssTheme("polished");
+      styleSheet().addRule(".hub-time",
+                           "font-family: Verdana;"
+                           "font-size: 10pt;"
+                           "font-weight: bold;"
+                           "color: grey;");
       
       Wt::WTabWidget *tabs = new Wt::WTabWidget;
       
@@ -58,9 +68,32 @@ namespace {
       tabs->addTab(map, "Map");
       layout->addWidget(tabs, Wt::WBorderLayout::Center);
       
-      date = new Wt::WText;
-      layout->addWidget(date, Wt::WBorderLayout::South);
+      Wt::WToolBar *bar = new Wt::WToolBar;
       
+      time = new Wt::WText;
+      bar->addWidget(time);
+      time->setSelectable(false);
+      time->setToolTip("Current UTC date");
+      time->addStyleClass("hub-time");
+      bar->addSeparator();
+      
+      date = new Wt::WText;
+      date->setSelectable(false);
+      date->setToolTip("Duration since last message");
+      date->addStyleClass("hub-time");
+      bar->addWidget(date, Wt::AlignRight);
+      
+      poll = new Wt::WPushButton("Polling");
+      poll->setDisabled(true);
+      poll->clicked().connect(this, &hub_application::send_poll);
+      poll->addStyleClass("hub-time");
+      poll->Wt::WWebWidget::setToolTip("Trigger polling from hub");
+      
+      // bar->addButton(poll, Wt::AlignRight);
+      
+      layout->addWidget(bar, Wt::WBorderLayout::North);
+      layout->addWidget(poll, Wt::WBorderLayout::South);
+      layout->setSpacing(0);
       
       setTitle("LSTS hub tracker for TREX operation");
       
@@ -71,10 +104,15 @@ namespace {
       m_update_timer->stop();
       m_server->disconnect(this);
     }
+                              
+    void send_poll() {
+      m_server->poll();
+    }
    
   private:
     boost::recursive_mutex m_mtx;
-    client::date_type m_date;
+    client::date_type m_date, m_next;
+    bool m_state_updated;
     
     typedef std::vector<Wt::WGoogleMap::Coordinate> line;
     
@@ -106,19 +144,42 @@ namespace {
     
     circle_map m_circles;
     
-    
-    
     boost::shared_ptr<server> m_server;
     msg_board      *messages;
     Wt::WGoogleMap *map;
+    Wt::WText      *time;
     Wt::WText      *date;
+    Wt::WPushButton    *poll;
     Wt::WTimer     *m_update_timer;
     
     
     
     void page_update() {
       boost::recursive_mutex::scoped_lock lock(m_mtx);
-      date->setText(boost::posix_time::to_iso_extended_string(m_date));
+      std::ostringstream oss;
+      client::date_type cur = boost::posix_time::second_clock::universal_time();
+      
+      
+      if( m_state_updated ) {
+        m_state_updated = false;
+        if( m_next.is_special() ) {
+          poll->setDisabled(true);
+          poll->setText("Polling");
+          this->loadingIndicator()->widget()->show();
+        } else {
+          oss<<m_next<<" UTC";
+          poll->setText(oss.str());
+          poll->setDisabled(false);
+          oss.str(std::string());
+          this->loadingIndicator()->widget()->hide();
+        }
+      }
+      oss<<cur<<" UTC&nbsp;";
+      time->setText(oss.str());
+      
+      oss.str(std::string());
+      oss<<"&nbsp;Last msg: "<<(cur-m_date)<<" ago&nbsp;";
+      date->setText(oss.str());
       
       while( !m_circles.empty() ) {
         circle_map::iterator i = m_circles.begin();
@@ -128,7 +189,9 @@ namespace {
     }
     
     void set_state(client::date_type const &next) {
-      
+      boost::recursive_mutex::scoped_lock lock(m_mtx);
+      m_next = next;
+      m_state_updated = true;
     }
     void new_date(client::date_type const &d) {
       boost::recursive_mutex::scoped_lock lock(m_mtx);
