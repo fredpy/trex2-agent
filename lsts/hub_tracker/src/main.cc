@@ -85,6 +85,7 @@ namespace {
       
       poll = new Wt::WPushButton("Polling");
       poll->setDisabled(true);
+      poll->setSelectable(false);
       poll->clicked().connect(this, &hub_application::send_poll);
       poll->addStyleClass("hub-time");
       poll->Wt::WWebWidget::setToolTip("Trigger polling from hub");
