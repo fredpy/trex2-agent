@@ -13,6 +13,8 @@
 #include <Wt/WBorderLayout>
 #include <Wt/WText>
 
+#include <DUNE/Coordinates/WGS84.hpp>
+
 using namespace lsts_hub;
 namespace bpt=boost::property_tree;
 namespace json=bpt::json_parser;
@@ -74,7 +76,33 @@ namespace {
     boost::recursive_mutex m_mtx;
     client::date_type m_date;
     
-    typedef std::map< client::date_type, std::pair<Wt::WGoogleMap::Coordinate, double> > circle_map;
+    typedef std::vector<Wt::WGoogleMap::Coordinate> line;
+    
+    
+    void set_point(line &l, double scale, double sin_a, double cos_a,
+                   Wt::WGoogleMap::Coordinate &center) {
+      double x, y, n, e, dummy;
+      
+      for(line::iterator i=l.begin(); l.end()!=i; ++i) {
+        double lat_rad = center.latitude(), lon_rad = center.longitude();
+        x = i->longitude()*scale;
+        y = i->latitude()*scale;
+        n = x*cos_a + y*sin_a;
+        e = y*cos_a - x*sin_a;
+        lat_rad *= M_PI/180.0;
+        lon_rad *= M_PI/180.0;
+        
+        DUNE::Coordinates::WGS84::displace(n, e, 0,
+                                           &lat_rad, &lon_rad, &dummy);
+        i->setLatitude(lat_rad*180.0/M_PI);
+        i->setLongitude(lon_rad*180.0/M_PI);
+        std::cerr<<"Rotated point: ("<<i->latitude()<<", "<<i->longitude()<<")"<<std::endl;
+      }
+    }
+
+    
+    typedef std::map< client::date_type,
+                      std::pair<line, Wt::WColor> > circle_map;
     
     circle_map m_circles;
     
@@ -94,9 +122,7 @@ namespace {
       
       while( !m_circles.empty() ) {
         circle_map::iterator i = m_circles.begin();
-        map->addCircle(i->second.first, i->second.second,
-                       Wt::WColor(255, 0, 0), 3,
-                       Wt::WColor(255, 0, 0, 64));
+        map->addPolyline(i->second.first, i->second.second);
         m_circles.erase(i);
       }
     }
@@ -115,42 +141,79 @@ namespace {
     }
     void trex_update(client::date_type const &when,
                      bpt::ptree const &what) {
+      std::cerr<<"Send op to message view"<<std::endl;
       messages->trex_update(when, what);
+      
+      
       try {
         // Extract data
         std::string type = what.get<std::string>("op");
-        if( type=="request" ) {
-          boost::optional<bpt::ptree const &> attrs = what.get_child_optional("attributes");
-          boost::optional<double> radius, lat, lon;
+        Wt::WColor color;
+        if( type=="request" )
+          color = Wt::WColor(255, 0, 0);
+        else if( type=="observation" ) {
+          std::string pred = what.get<std::string>("predicate");
+          if( pred=="Survey" )
+            color = Wt::WColor(0, 255, 0);
+          else if( pred=="DoSurvey" )
+            color = Wt::WColor(255, 255, 0);
+          else
+            return;
+        } else
+          return;
+        boost::optional<bpt::ptree const &> attrs = what.get_child_optional("attributes");
+        boost::optional<double> radius, lat, lon, sin_a, cos_a;
+        double angle=0.0;
           
-          if( attrs ) {
-            for(bpt::ptree::const_iterator i=attrs->begin();
-                attrs->end()!=i; ++i) {
-              std::string name = i->second.get<std::string>("name");
-              if( "size"==name ) {
-                radius = i->second.get<double>("value");
-              } else if( "center_lat"==name ) {
-                double tmp;
-                std::istringstream iss(i->second.get<std::string>("value"));
-                iss>>tmp;
-                lat = tmp;
-              } else if( "center_lon"==name ) {
-                double tmp;
-                std::istringstream iss(i->second.get<std::string>("value"));
-                iss>>tmp;
-                lon = tmp;
-              }
-            }
-            if( radius && lat && lon ) {
-              boost::recursive_mutex::scoped_lock lock(m_mtx);
+        if( attrs ) {
+          for(bpt::ptree::const_iterator i=attrs->begin();
+              attrs->end()!=i; ++i) {
+            std::string name = i->second.get<std::string>("name");
+            
+            if( "size"==name )
+              radius = i->second.get<double>("value");
+            else if( "center_lat"==name ) {
+              double tmp;
+              std::istringstream iss(i->second.get<std::string>("value"));
+              iss>>tmp;
+              lat = tmp;
+            } else if( "center_lon"==name ) {
+              double tmp;
+              std::istringstream iss(i->second.get<std::string>("value"));
+              iss>>tmp;
+              lon = tmp;
+            } else if( "heading"==name ) {
+              double tmp;
+              std::istringstream iss(i->second.get<std::string>("value"));
+              iss>>tmp;
+              angle = tmp*M_PI/180.0;
+              sin_a = std::sin(angle);
+              cos_a = std::cos(angle);
+            } else if( "sin_angle"==name )
+              sin_a = i->second.get<double>("value");
+            else if( "cos_angle"==name )
+              cos_a = i->second.get<double>("value");
+          }
+          if( radius && lat && lon && sin_a && cos_a ) {
+            line tmp(5);
+            tmp[0] = Wt::WGoogleMap::Coordinate(-0.5, 0.5);
+            tmp[1] = Wt::WGoogleMap::Coordinate(0.5, 0.5);
+            tmp[2] = Wt::WGoogleMap::Coordinate(0.5, -0.5);
+            tmp[3] = Wt::WGoogleMap::Coordinate(-0.5, -0.5);
+            tmp[4] = tmp[0];
               
-              Wt::WGoogleMap::Coordinate center(*lat, *lon);
-              circle_map::mapped_type tmp(center, *radius);
-              m_circles[when] = tmp;
+            Wt::WGoogleMap::Coordinate center(*lat, *lon);
+            set_point(tmp, *radius, *sin_a, *cos_a, center);
+            {
+              boost::recursive_mutex::scoped_lock lock(m_mtx);
+              m_circles[when].first = tmp;
+              m_circles[when].second = color;
             }
           }
         }
-      } catch(...) {}
+      } catch(...) {
+        std::cerr<<"Something something BAD ..."<<std::endl;
+      }
     }
     
   };
