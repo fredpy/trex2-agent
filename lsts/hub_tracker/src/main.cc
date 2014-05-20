@@ -15,6 +15,7 @@
 #include <Wt/WToolBar>
 #include <Wt/WPushButton>
 #include <Wt/WOverlayLoadingIndicator>
+#include <Wt/WStackedWidget>
 
 #include <DUNE/Coordinates/WGS84.hpp>
 
@@ -56,6 +57,7 @@ namespace {
                            "color: grey;");
       
       Wt::WTabWidget *tabs = new Wt::WTabWidget;
+      tabs->contentsStack()->setTransitionAnimation(Wt::WAnimation(Wt::WAnimation::Fade|Wt::WAnimation::SlideInFromTop, Wt::WAnimation::EaseIn));
       
       messages = new msg_board;
       tabs->addTab(messages, "Messages");
@@ -190,9 +192,21 @@ namespace {
     }
     
     void set_state(client::date_type const &next) {
-      boost::recursive_mutex::scoped_lock lock(m_mtx);
-      m_next = next;
-      m_state_updated = true;
+      client::date_type::date_type day = next.date();
+      client::date_type::time_duration_type
+        hour = next.time_of_day();
+      
+      // Filter out subsecond info
+      hour = client::date_type::time_duration_type(hour.hours(),
+                                                   hour.minutes(),
+                                                   hour.seconds());
+      
+      {
+        boost::recursive_mutex::scoped_lock lock(m_mtx);
+      
+        m_next = client::date_type(day, hour);
+        m_state_updated = true;
+      }
     }
     void new_date(client::date_type const &d) {
       boost::recursive_mutex::scoped_lock lock(m_mtx);
