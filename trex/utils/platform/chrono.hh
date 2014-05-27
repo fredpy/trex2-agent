@@ -55,7 +55,7 @@
 /** @brief chrono class namespace 
  *
  * This macro defines the namespace where the chrono template class 
- * is defined. This nemespace is either @c boost or @c std depending 
+ * is defined. This namespace is either @c boost or @c std depending 
  * on whether c++11 support is active or not
  */
 #  define CHRONO_NS platform-dependent

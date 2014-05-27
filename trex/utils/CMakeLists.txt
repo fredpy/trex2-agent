@@ -115,6 +115,7 @@ add_library(TREXutils SHARED
   log/text_log.hh
   log/out_file.hh
   log/log_pipe.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   # platform specific information
   platform/chrono.hh 
   platform/memory.hh
@@ -177,6 +178,7 @@ source_group("Source\ Files\\log" FILES
 )
 
 source_group("Header\ Files\\bits" FILES 
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh

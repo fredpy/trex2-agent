@@ -32,9 +32,23 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "asio_runner.hh"
+#include "cpu_clock.hh"
+#include "chrono_helper.hh"
 
 using namespace TREX::utils;
 using namespace boost::asio;
+
+
+namespace {
+  
+#if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_HREAD_CLOCK)
+  typedef CHRONO::thread_clock perf_clock;
+#else
+  typedef cpu_clock perf_clock;
+#endif
+  
+  typedef CHRONO::high_resolution_clock rt_clock;
+}
 
 /*
  * class TREX::utils::asio_runner
@@ -85,7 +99,44 @@ size_t asio_runner::thread_count(size_t n, bool override) {
 
 void asio_runner::spawn(size_t n) {
   for(size_t i=0; i<n; ++i) 
-    m_threads.create_thread(boost::bind(&io_service::run, boost::ref(m_io)));
+    m_threads.create_thread(boost::bind(&asio_runner::thread_task, this));
+}
+
+
+void asio_runner::thread_task() {
+  do {
+    try {
+#ifdef BOOST_ASIO_ENABLE_HANDLER_TRACKING
+      size_t work_tasks;
+      perf_clock::duration cpu_time;
+      rt_clock::duration   real_time;
+  
+      do {
+        {
+          chronograph<perf_clock> perf(cpu_time);
+          chronograph<rt_clock>   real(real_time);
+        
+          work_tasks = m_io.poll_one();
+        }
+        // TODO make the display better and thread safe
+        std::cerr<<rt_clock::now()<<", "<<boost::this_thread::get_id()
+                 <<", "<<cpu_time<<", "<<real_time<<", "<<work_tasks
+                 <<std::endl;
+        
+        
+        // Let the thread slow down a bit
+        boost::this_thread::yield();
+      } while( work_tasks>0 );
+#else  // !BOOST_ASIO_ENABLE_HANDLER_TRACKING
+
+      m_io.run();
+
+#endif // BOOST_ASIO_ENABLE_HANDLER_TRACKING
+    } catch(...) {
+      // capture silently any exception
+    }
+    // double check that m_io is still running
+  } while( !m_io.stopped() );
 }
 
 

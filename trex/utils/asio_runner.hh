@@ -134,6 +134,10 @@ namespace TREX {
     private:
       void spawn(size_t n_threads);
       
+      
+      void thread_task();
+      
+      
       boost::asio::io_service m_io;
       boost::scoped_ptr<boost::asio::io_service::work> m_active;
       boost::thread_group m_threads;
