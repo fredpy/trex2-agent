@@ -38,6 +38,8 @@
 using namespace TREX::utils;
 using namespace boost::asio;
 
+# ifdef BOOST_ASIO_ENABLE_HANDLER_TRACKING
+# include "asio_fstream.hh"
 
 namespace {
   
@@ -48,7 +50,36 @@ namespace {
 #endif
   
   typedef CHRONO::high_resolution_clock rt_clock;
+
+
+  class timing_thread_log {
+  public:
+    timing_thread_log(std::string const &fname)
+    :m_file(m_service),
+    m_thread(boost::bind(&io_service::run, &m_service)) {
+      m_file.open(fname);
+    }
+    ~timing_thread_log() {
+      m_thread.join();
+    }
+    
+    async_ofstream &out() {
+      return m_file;
+    }
+    async_ofstream &operator *() {
+      return out();
+    }
+  private:
+    io_service m_service;
+    async_ofstream    m_file;
+    boost::thread    m_thread;
+  };
+  
+  timing_thread_log io_log("trex_asio.log");
+  
 }
+
+# endif 
 
 /*
  * class TREX::utils::asio_runner
@@ -118,11 +149,12 @@ void asio_runner::thread_task() {
         
           work_tasks = m_io.poll_one();
         }
-        // TODO make the display better and thread safe
-        std::cerr<<rt_clock::now()<<", "<<boost::this_thread::get_id()
-                 <<", "<<cpu_time<<", "<<real_time<<", "<<work_tasks
-                 <<std::endl;
-        
+        if( work_tasks ) {
+          (*io_log)<<rt_clock::now().time_since_epoch().count()
+                  <<", "<<boost::this_thread::get_id()
+                  <<", "<<cpu_time.count()<<", "<<real_time.count()
+                  <<", "<<work_tasks<<std::endl;
+        }
         
         // Let the thread slow down a bit
         boost::this_thread::yield();
