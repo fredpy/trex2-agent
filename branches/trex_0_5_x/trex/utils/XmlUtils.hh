@@ -51,7 +51,6 @@
 # include <boost/property_tree/xml_parser.hpp>
 
 # include "StringExtract.hh"
-# include "Exception.hh"
 # include "LogManager.hh"
 
 namespace TREX {

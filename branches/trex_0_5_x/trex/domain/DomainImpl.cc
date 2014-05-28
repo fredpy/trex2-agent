@@ -40,9 +40,6 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <iterator>
-#include <algorithm>
-
 #include <cmath>
 
 #include "BooleanDomain.hh"

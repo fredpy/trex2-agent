@@ -46,7 +46,6 @@
 # define H_XmlFactory
 
 # include <utility>
-# include <iostream>
 
 # include "XmlUtils.hh" 
 # include "Factory.hh"
