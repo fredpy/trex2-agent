@@ -86,7 +86,6 @@ namespace TREX {
       
     private:
       boost::asio::strand           m_strand;
-      boost::asio::io_service::work m_active;
       utils::async_ofstream         m_file;
       
       enum {
@@ -1145,7 +1144,7 @@ void TeleoReactor::unblock(Symbol const &name) {
 // structors
 
 TeleoReactor::Logger::Logger(std::string const &dest, boost::asio::io_service &io)
-:m_strand(io), m_active(io), m_file(io, dest) {
+:m_strand(io), m_file(io, dest) {
   m_flags.set(header);
   m_strand.post(boost::bind(&Logger::direct_write, this, "<Log>\n <header>",
                             true));
