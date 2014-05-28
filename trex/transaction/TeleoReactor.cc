@@ -44,7 +44,6 @@
 
 #include "TeleoReactor.hh"
 #include <trex/domain/FloatDomain.hh>
-#include <trex/utils/chrono_helper.hh>
 
 #include <boost/scope_exit.hpp>
 

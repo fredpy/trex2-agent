@@ -49,9 +49,8 @@
 # define FWD_TeleoReactor
 
 # include "bits/transaction_fwd.hh"
-
-# include "Observation.hh"
 # include "Goal.hh"
+
 # include <trex/utils/id_mapper.hh>
 
 namespace TREX {

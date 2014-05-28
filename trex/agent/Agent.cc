@@ -40,7 +40,6 @@
 
 #include "Agent.hh"
 
-#include <iostream>
 #include <iterator>
 #include <limits>
 
@@ -51,7 +50,6 @@
 // #define BOOST_EXCEPTION_DISABLE
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/topological_sort.hpp>
-#include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/reverse_graph.hpp>
 
 #include <boost/thread.hpp>

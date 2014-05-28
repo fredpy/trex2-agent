@@ -44,10 +44,7 @@
 # define H_Variable 
 
 # include <functional>
-# include <boost/static_assert.hpp>
-# include <boost/type_traits.hpp>
 
-# include <trex/utils/Symbol.hh>
 # include "DomainBase.hh"
 
 namespace TREX {

@@ -49,15 +49,12 @@
 
 # include <trex/utils/platform/memory.hh>
 
-# include <trex/utils/TimeUtils.hh>
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/StringExtract.hh>
 
 # include <trex/utils/tick_clock.hh>
-# include <trex/utils/chrono_helper.hh>
 
 # include <boost/thread/recursive_mutex.hpp>
-# include <boost/date_time/posix_time/posix_time_io.hpp>
 
 # include <boost/math/common_factor_rt.hpp>
 
