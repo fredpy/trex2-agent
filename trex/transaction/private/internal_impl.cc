@@ -31,9 +31,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "timeline_impl.hh"
-#include "graph_impl.hh"
 #include "node_impl.hh"
+#include "graph_impl.hh"
+#include "internal_impl.hh"
+#include "external_impl.hh"
 
 #include <trex/utils/asio_runner.hh>
 
@@ -61,15 +62,15 @@ details::internal_impl::~internal_impl() {}
 
 // observers
 
-details::node_id details::internal_impl::owner() const {
+WEAK_PTR<details::node_impl> details::internal_impl::owner() const {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
-    boost::function<node_id ()> fn(boost::bind(&internal_impl::owner_sync,
+    boost::function<WEAK_PTR<node_impl> ()> fn(boost::bind(&internal_impl::owner_sync,
                                                this));
     return utils::strand_run(g->strand(), fn);
   } else {
-    node_id empty;
+    WEAK_PTR<node_impl> empty;
     return empty;
   }
 }
@@ -115,7 +116,7 @@ Observation details::internal_impl::create_obs(utils::symbol const &pred) {
   return Observation(name(), pred);
 }
 
-void details::internal_impl::connect(details::ext_ref client) {
+void details::internal_impl::connect(SHARED_PTR<details::external_impl> client) {
   SHARED_PTR<graph_impl> g = graph();
 
   if( g )
@@ -150,7 +151,7 @@ void details::internal_impl::synchronize(TICK date) {
 
 // Strand protected manipulators
 
-details::node_id details::internal_impl::owner_sync() const {
+WEAK_PTR<details::node_impl> details::internal_impl::owner_sync() const {
   return m_owner;
 }
 
@@ -190,7 +191,7 @@ boost::optional<TICK> details::internal_impl::last_update_sync() const {
   return ret;
 }
 
-void details::internal_impl::connect_sync(details::ext_ref client) {
+void details::internal_impl::connect_sync(SHARED_PTR<details::external_impl> client) {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
@@ -267,58 +268,6 @@ void details::internal_impl::notify_sync(TICK date) {
   }
 }
 
-/*
- * class TREX::transaction::details::external_impl
- */
-
-// structors
-
-details::external_impl::external_impl(SHARED_PTR<details::node_impl> cli,
-                                      details::tl_ref tl,
-                                      details::transaction_flags const  &fl)
-:m_timeline(tl), m_client(cli), m_flags(fl) {}
-
-// observers
-
-SHARED_PTR<details::graph_impl> details::external_impl::graph() const {
-  SHARED_PTR<graph_impl> ret;
-  SHARED_PTR<node_impl> node = m_client.lock();
-  
-  if( node )
-    ret = node->graph();
-  return ret;
-}
-
-bool details::external_impl::accept_goals() const {
-  SHARED_PTR<graph_impl> g = graph();
-  
-  if( g ) {
-    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
-                                            &m_flags, 0));
-    if( utils::strand_run(g->strand(), fn) )
-      return m_timeline->accept_goals();
-  }
-  return false;
-}
-
-bool details::external_impl::publish_plan() const {
-  SHARED_PTR<graph_impl> g = graph();
-  
-  if( g ) {
-    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
-                                            &m_flags, 1));
-    if( utils::strand_run(g->strand(), fn) )
-      return m_timeline->publish_plan();
-  }
-  return false;
-}
-
-void details::external_impl::on_synch(TICK date,
-                                      boost::optional<Observation> o) {
-  SHARED_PTR<node_impl> node = m_client.lock();
-  if( node )
-    node->notify(date, name(), o);
-}
 
 
 

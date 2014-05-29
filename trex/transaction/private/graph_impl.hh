@@ -35,194 +35,206 @@
 # define H_trex_transaction_graph_impl
 
 # include "../bits/transaction_fwd.hh"
-# include "trex/utils/shared_var.hh"
 
-# include <set>
+# include <trex/utils/log_manager.hh>
+# include <boost/thread/shared_mutex.hpp>
+# include <boost/signals2/signal.hpp>
 
 
 namespace TREX {
   namespace transaction {
     namespace details {
-            
-      /** @breif Graph internal implementation
+      
+      
+      /** @brief Transaction graph
        *
-       * This class handles the implementation details of the transaction graph.
-       * It maintins the graph states along with the control of its modification
-       * and access through a specific strabdnd which can be seen as a virtual 
-       * thread.
+       * This class implement the graph used by T-REX to manage 
+       * transaction between each reactors through timelines.
        *
-       * @note This class is not part of trex public API and is not accessible 
-       * when trex is installed.
+       * It handle the creation and lifetime of a reactor along 
+       * with its connection with other reactors through 
+       * timelines. This is the new implementation with a more 
+       * asynchronous approach than what was doe up to T-REX v 
+       * 0.5.x
        *
-       * @author Frederic Py <fpy@mbari.org>
-       * @ingroup transaction
+       * @note This implementation is private and is not meant to 
+       * be used directly outiside of libTREXtransaction.
+       *
+       * @author Frederic Py <fredpy@gmail.com>
        */
       class graph_impl :boost::noncopyable,
       public ENABLE_SHARED_FROM_THIS<graph_impl> {
       public:
-        typedef utils::log::entry::date_type date_type;
-                
         /** @brief Default constructor
          *
-         * Create a nameless graph
+         * Create a new nameless graph.
          */
         graph_impl();
-        /** @brief Constructor 
+        /** @brief Constructor
          *
-         * @param[in] name A symbolic name
+         * @param[in] name A name identifier
          *
-         * Create a graph named @p name
+         * Create a new graph named @p name
          */
         explicit graph_impl(utils::symbol const &name);
         /** @brief Destructor 
          */
         ~graph_impl();
         
-        /** @brief graph name
-         * 
+        /** @brief Set graph name
+         *
+         * @param[in] name A name
+         *
+         * Set this graph's name to @p name
+         *
+         * @return The updated name of the graph
+         *
+         * @sa graph_impl::name() const
+         */
+        utils::symbol const &set_name(utils::symbol const &name);
+        /** @brief Get graph name
+         *
          * @return The name of the graph
+         *
+         * @sa graph_impl::set_name(utils::symbol const &)
          */
-        utils::symbol const &name() const {
-          return m_name;
-        }
-        /** @brief set graph name
-         *
-         * @param[in] name A symbolic name
-         *
-         * Change the graph names to @p name
-         */
-        void name(utils::symbol const &name) {
-          m_name = name;
-        }
-        /** @brief Update date
-         *
-         * @param[in] d A date value
-         *
-         * Update the datum of the graph to @p d
-         */
-        void set_date(date_type const &d);
-        /** @brief Get date
-         *
-         * @param[in] fast Access flag
-         *
-         * Get the date associated to the graph if any.
-         * The @p fast flag indicates whether the access to this date should 
-         * be quick or potentially slower wbut with the added insurance that 
-         * any pending date update will be resolved before reading it.
-         *
-         * @return The date associated to this graph
-         */
-        boost::optional<date_type> get_date(bool fast=false) const;
+        utils::symbol const &name() const;
         
-        /** @brief Log method
+        /** @brief Get log manager
          *
-         * @param[in] ctx A symbol indicating the local producer
-         * @param[in] kind A symbol indicating the type of message (error, warn,...)
+         * Give acces to the log_manager instance for this graph
          *
-         * Create a new log stream for the context @p ctx, associated message
-         * type @p kind and datum associated to current graph date
+         * @return The log_manager for this graph
          *
-         * @return A stream that can receive the log message
+         * @note The class log_manager being tha singleton this 
+         * instance is the same for any existing graphs within 
+         * the same program.
+         */
+        utils::log_manager &manager() const;
+        
+        /** @rbief Update current tick
+         *
+         * @param[in] date A tick value
+         *
+         * Notify the class that the new desired tick value is 
+         * @p date. This call just scheudlle the update of the 
+         * date and is not guaranteed to be immediately effective 
+         * after completion. 
+         *
+         * Indeed, the update is just schedulled asynchronously and
+         * will happen only when the thread schedulling can allow it. 
+         * Additionally, the update of the clock can occur if and 
+         * only if @p date is not less or equal to the previous tick 
+         * date
+         *
+         * @sa date(bool) const
+         */
+        void set_date(date_type const &date);
+        /** Get current tick date
+         *
+         * @param fast fast access flag
+         *
+         * Gather the current tick date. The @p fast flag indicate 
+         * whether this access should wait for all previous updates 
+         * to be done or just directly access the current date value 
+         * with faster but less accurate result.
+         *
+         * For example the @c syslog method gather the date ussettinc @p fast
+         * to @c true. As the date for logging is not necessarily critical
+         * and we do not want the logging to block the rest of the execution.
+         *
+         * @return The current tick date if any
+         *
+         * @sa set_date(date_type const &)
+         */
+        boost::optional<date_type> date(bool fast=false) const;
+        
+        /** @brief Create new log entry
+         *
+         * @param[in] ctx  Log context (or source)
+         * @param[in] kind Log message type
+         *
+         * Create a new log entry to be logged to TREX.log
+         *
+         * @return The stream for the new log entry
          */
         utils::log::stream syslog(utils::symbol const &ctx,
                                   utils::symbol const &kind) const;
-        /** @brief graph log manager
+        
+        /** @brief Create new node
          *
-         * @return The log manager for this graph
+         * @param[in] desired_name Node name
          *
-         * @note As of today the LogManager is handled as a singleton. Therefore 
-         * all the graphs within one process will share the same manager. Still 
-         * this could change in the future, therefore it is better to access the 
-         * log manager through this method.
+         * Create and add an  new node to this graph named @p name.
+         *
+         * A node is the connection of a reactor to its graph and handle 
+         * all the transaction of this reactor. This include: 
+         * @li its internal timelines
+         * @li its external timelines
+         * @li the current tick date
+         * @li all transaction (ie observations, goal request/recalls, ...)
+         * with other nodes
+         *
+         * @return A reference to the newly created node
+         *
+         * @note while up to version 0.5.x T-REX did not allow for 
+         *       multiple reactors with the same name, this is not
+         *       the case anymore: at the current stage the graph 
+         *       will allow multiples reactors with same name and 
+         *       we plan for the future to dynamically rename 
+         *       duplicate names.
          */
-        utils::log_manager &manager() const {
-          return *m_log;
-        }
-        /** @bief Transaction strand
+        WEAK_PTR<node_impl> add_node(utils::symbol const &desired_name);
+        /** @brtief Remove a node for the graph
          *
-         * @return The strand associated to this graph and used to any 
-         * access or update oof this grsah structure
+         * @param[in] n A node
+         *
+         * Remove @p n for this graph and notifes it that no longer 
+         * belongs to a graph.
+         */
+        void rm_node(WEAK_PTR<node_impl> n);
+        
+        /** @brief Transaction pseudo thread
+         *
+         * The execution thread used to manage transaction operation 
+         * for this graph. This is implemented as a boost.asio strand 
+         * to which one can post new tasks that will be executed in 
+         * sequence as they are posted.
+         *
+         * This thread is used for all transactions operations of this 
+         * graph  which include:
+         * @li Update of the graph structure 
+         * @li Communication through edges (observations, goal requests/recalls)
+         * @li Tick updates from the clock
+         *
+         * @return The strand used by this graph for transaction operation
          */
         boost::asio::strand &strand() const {
           return *m_strand;
         }
-        /** @brief Create a new transaction node
-         *
-         * This method creates a new node that is associated 
-         * to this graph. The newly created node has no name.
-         *
-         * @return The newly created node
-         */
-        node_id create_node();
-        /** @brief Remove node from the graph
-         *
-         * @param[in] n A transaction node
-         *
-         * This method remove the node @p n from this graph if and only 
-         * if @p n was associated to this graph. In such case it also  
-         * schedule the cleanup of the node connections
-         *
-         * @retval true if @p n was attached to this graph
-         * @retval false otherwise
-         *
-         * @post @p n is not attached to this graph. If it was before the call,
-         * the node is now attached to no graph and scheduled for cleaning.
-         */
-        bool remove_node(node_id const &n);
         
       private:
-        
-        tl_ref get_timeline_sync(utils::symbol const &name);
-        
-        void declare(SHARED_PTR<node_impl> n, utils::symbol const &name, transaction_flags flag);
-        
-        void subscribe(SHARED_PTR<node_impl> n, utils::symbol const &name, transaction_flags flag);
+        utils::singleton::use<utils::log_manager> m_mgr;
 
-        /** @brief graph date local storage
-         *
-         * The attribute where the graph date is locally stored. While this 
-         * attribute is updated through the starnd it is still mutex protected
-         * in order to allow quick access when Hasving Accurate date is not 
-         * critical
-         */
-        mutable utils::shared_var< boost::optional<date_type> > m_date;
-        /** @brief graph name local storage
-         *
-         * The attrobute that stroes the graph assocaited name. This attribute 
-         * is not thread protected as it is assumed that it won't be updated 
-         * during the agent execution
-         */
-        utils::symbol                          m_name;
-        /** @brief Log manager
-         *
-         * A reference to the global LogManager singleton.
-         */
-        utils::singleton::use<utils::log_manager> m_log;
-        /** @brief Acess/update strand
-         *
-         * The strand which is used by this graph for accesses and updates
-         * of its structure
-         */
-        UNIQ_PTR<boost::asio::strand>          m_strand;
-
+        typedef boost::shared_mutex mutex_type;
+        
+        mutable mutex_type          m_mutex;
+        utils::symbol               m_name;
+        boost::optional<date_type>  m_date;
+        
+        tick_sig m_tick;
+        
         std::set< SHARED_PTR<node_impl> > m_nodes;
-        typedef std::map<utils::symbol, tl_ref> tl_map;
         
-        tl_map m_timelines;
-        tl_map m_failed;
+        // async management
+        UNIQ_PTR<boost::asio::strand> m_strand;
         
-        void set_date_sync(date_type date);
-        void add_node_sync(SHARED_PTR<node_impl> n);
-        void rm_node_sync(SHARED_PTR<node_impl> n);
+        void set_date_sync(date_type d);
+        void notify_date(date_type d);
+        void add_node_sync(SHARED_PTR<node_impl> node,
+                           utils::symbol desired_name);
+        void rm_node_sync(SHARED_PTR<node_impl> node);
         
-        
-        void decl_sync(SHARED_PTR<node_impl> n, utils::symbol name, transaction_flags flag);
-        void undecl_sync(SHARED_PTR<node_impl> n, tl_ref tl);
-        void use_sync(SHARED_PTR<node_impl> n, utils::symbol name, transaction_flags flag);
-        
-        void notify_new(tl_ref tl);
-        
-        friend class node_impl;
       }; // TREX::transaction::details::graph_impl
       
     } // TREX::transaction::details

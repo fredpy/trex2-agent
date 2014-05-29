@@ -359,7 +359,7 @@ namespace TREX {
       }
       template<typename Handler>
       boost::signals2::connection on_new_log(Handler fn,
-                                             boost::asio::strand s) {
+                                             boost::asio::strand &s) {
         return syslog().connect(fn, s);
       }
       template<typename Handler>

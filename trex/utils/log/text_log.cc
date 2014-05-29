@@ -165,7 +165,7 @@ void out_file::operator()(entry::pointer msg) {
       (*m_file)<<msg->kind()<<": ";
     else if( prefixed )
       m_file->put(' ');
-    (*m_file)<<msg->content()<<std::endl; // change this to dt::endl if you awnt to flush
+    (*m_file)<<msg->content()<<std::endl; // change this to dt::endl if you want to flush
   }
 }
 

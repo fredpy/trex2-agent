@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2013, MBARI.
+ *
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,41 +31,49 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_bits_transaction
-# define FWD_trex_transaction_bits_transaction
+#ifndef H_trex_transaction_private_external_impl
+# define H_trex_transaction_private_external_impl
 
-# include <bitset>
-
-# include <trex/utils/platform/memory.hh>
-# include <trex/utils/log/entry.hh>
-
-# include <boost/signals2/signal.hpp>
-
+# include "internal_impl.hh"
 
 namespace TREX {
   namespace transaction {
     namespace details {
+      
+      class external_impl
+      :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<external_impl> {
+      public:
+        external_impl(SHARED_PTR<node_impl> cli,
+                      SHARED_PTR<internal_impl> tl,
+                      transaction_flags const &fl);
+        ~external_impl() {}
+        
+        utils::symbol const &name() const {
+          return m_timeline->name();
+        }
+        SHARED_PTR<graph_impl> graph() const;
+        
+        bool accept_goals() const;
+        bool publish_plan() const;
+        
+        void on_synch(TICK date, boost::optional<Observation> o);
+        void connect() {
+          m_timeline->connect(shared_from_this());
+        }
+        
+        void reset();
+        
+      private:
+        SHARED_PTR<internal_impl>  m_timeline;
+        WEAK_PTR<node_impl>      m_client;
 
-      class graph_impl;
-      class node_impl;
-      class internal_impl;
-      
-      /** @brief Reactor transaction flags
-       *
-       * This type contains the different flags used to handle a reactor
-       * transaction for a specific timeline. The flags are as follow :
-       * @li @c 0 indicates if the timeline accept goals otr not
-       * @li @c 1 indicates if the timeline should broadcast plan tokens
-       *     to the reactor
-       */
-      typedef std::bitset<2> transaction_flags;
-      typedef utils::log::entry::date_type              date_type;
-      typedef boost::signals2::signal<void (date_type)> tick_sig;
-      
+        transaction_flags m_flags;
+        
+        external_impl() DELETED;
+      }; // TREX::transaction::details::external_impl
 
     }
-
   }
 }
 
-#endif // FWD_trex_transaction_bits_transaction
+#endif // H_trex_transaction_private_external_impl

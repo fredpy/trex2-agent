@@ -189,11 +189,11 @@ TREX::utils::symbol const &graph::name() const {
 }
 
 void graph::set_name(TREX::utils::symbol const &name) {
-  m_impl->name(name);
+  m_impl->set_name(name);
 }
 
 bool graph::has_tick() const {
-  return m_impl->get_date();
+  return m_impl->date();
 }
 
 void graph::update_tick(TICK value, bool started) {
@@ -206,7 +206,7 @@ void graph::update_tick(TICK value, bool started) {
 
 TICK graph::current_tick() const {
   if( tick_updated() ) {
-    boost::optional<details::graph_impl::date_type> cur = m_impl->get_date();
+    boost::optional<details::date_type> cur = m_impl->date();
     m_tick_updated = false;
     if( cur )
       m_currentTick = *cur;

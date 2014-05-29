@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, MBARI.
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,86 +33,71 @@
  */
 #include "node_impl.hh"
 #include "graph_impl.hh"
+#include "external_impl.hh"
 
-using namespace TREX::transaction::details;
-using namespace TREX;
+#include <trex/utils/asio_runner.hh>
 
-namespace tlog=TREX::utils::log;
-namespace bs2=boost::signals2;
-
-using TREX::utils::symbol;
-
-namespace {
-  
-  utils::singleton::use<utils::log_manager> s_log;
-
-}
+using namespace TREX::transaction;
+namespace utils=TREX::utils;
+namespace tlog=utils::log;
 
 /*
- * class TREX::transaction::details::node_impl
+ * class TREX::transaction::details::external_impl
  */
 
 // structors
 
-node_impl::node_impl(WEAK_PTR<graph_impl> const &g)
-:m_graph(g) {}
-
-node_impl::~node_impl() {}
+details::external_impl::external_impl(SHARED_PTR<details::node_impl> cli,
+                                      SHARED_PTR<details::internal_impl> tl,
+                                      details::transaction_flags const  &fl)
+:m_timeline(tl), m_client(cli), m_flags(fl) {}
 
 // observers
 
-symbol const &node_impl::name() const {
-  return m_name;
+SHARED_PTR<details::graph_impl> details::external_impl::graph() const {
+  SHARED_PTR<graph_impl> ret;
+  SHARED_PTR<node_impl> node = m_client.lock();
+  
+  if( node )
+    ret = node->graph();
+  return ret;
 }
 
-SHARED_PTR<graph_impl> node_impl::graph() const {
-  return m_graph.lock();
+bool details::external_impl::accept_goals() const {
+  SHARED_PTR<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
+                                            &m_flags, 0));
+    if( utils::strand_run(g->strand(), fn) )
+      return m_timeline->accept_goals();
+  }
+  return false;
 }
 
+bool details::external_impl::publish_plan() const {
+  SHARED_PTR<graph_impl> g = graph();
+  
+  if( g ) {
+    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
+                                            &m_flags, 1));
+    if( utils::strand_run(g->strand(), fn) )
+      return m_timeline->publish_plan();
+  }
+  return false;
+}
+
+void details::external_impl::on_synch(TICK date,
+                                      boost::optional<Observation> o) {
+  SHARED_PTR<node_impl> node = m_client.lock();
+  if( node )
+    node->notify(date, name(), o);
+}
 
 // modifiers
 
-void node_impl::set_name(symbol const &n) {
-  if( m_name.empty() )
-    m_name = n;
-}
-
-void node_impl::reset() {
-  // disconnect from the graph
-  m_graph.reset();
-}
-
-// manipulators
-
-tlog::stream node_impl::syslog(symbol const &ctx,
-                               symbol const &kind) const {
-  SHARED_PTR<graph_impl> g = m_graph.lock();
-  symbol who = name();
-  
-  if( !ctx.empty() )
-    who = who.str()+"."+ctx.str();
-  
-  if( g )
-    return g->syslog(who, kind);
-  else {
-    // handle the situation where the node is no longer attached to a graph
-    who = "(nil)."+who.str();
-    return s_log->syslog(who, kind);
-  }
-}
-
-void node_impl::notify(TICK date, utils::symbol const &tl,
-                       boost::optional<Observation> const &o) {
-  // TODO report to the node through a signal
+void details::external_impl::reset() {
+  m_client.reset();
 }
 
 
-// Executed by graph strand
-
-void node_impl::tick(bs2::connection const &c, date_type const &date) {
-  SHARED_PTR<graph_impl> g = m_graph.lock();
-  if( g ) {
-    syslog(tlog::null, tlog::info)<<"Tick("<<date<<")";
-  } else
-    c.disconnect();
-}

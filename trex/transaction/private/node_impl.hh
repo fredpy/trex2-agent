@@ -34,7 +34,12 @@
 #ifndef H_trex_transaction_node_impl
 # define H_trex_transaction_node_impl
 
-# include "timeline_impl.hh"
+# include "../bits/transaction_fwd.hh"
+# include <trex/utils/symbol.hh>
+# include <boost/noncopyable.hpp>
+
+# include "../Observation.hh"
+# include "../Tick.hh"
 
 namespace TREX {
   namespace transaction {
@@ -43,67 +48,29 @@ namespace TREX {
       class node_impl :boost::noncopyable,
       public ENABLE_SHARED_FROM_THIS<node_impl> {
       public:
+        node_impl(WEAK_PTR<graph_impl> const &g);
         ~node_impl();
 
+        void set_name(utils::symbol const &name);
+        utils::symbol const &name() const;
         
-        node_id id() {
-          return shared_from_this();
-        }
-        
-        void set_name(utils::symbol const &name) {
-          m_name = name;
-        }
-        utils::symbol const &name() const {
-          return m_name;
-        }
+        void reset();
+        void tick(boost::signals2::connection const &c,
+                  date_type const &date);
         
         utils::log::stream syslog(utils::symbol const &ctx,
                                   utils::symbol const &kind) const;
-        utils::log_manager &manager() const;
+        SHARED_PTR<graph_impl> graph() const;
+        void notify(TICK date, utils::symbol const &tl,
+                    boost::optional<Observation> const &o);
         
-        SHARED_PTR<graph_impl> graph() const {
-          return m_graph.lock();
-        }
+        void removed();
         
-        bool internal(utils::symbol const &tl) const;
-        bool external(utils::symbol const &tl) const;
-        
-        void provide(utils::symbol const &tl, bool read_only, bool publish_plan);
-        void unprovide(utils::symbol const &tl);
-        
-        void use(utils::symbol const &tl, bool read_only, bool listen_plan);
-        void unuse(utils::symbol const &tl);
-        
-        void notify(TICK date, utils::symbol tl,
-                    boost::optional<Observation> o);
-        
-      private:
-        explicit node_impl(WEAK_PTR<graph_impl> const &g);
-        
-        void isolate(SHARED_PTR<graph_impl> const &g);
-        
-        typedef std::map<utils::symbol, tl_ref>  internal_set;
-        typedef std::map<utils::symbol, ext_ref> external_set;
-        
-        internal_set m_internals;
-        external_set m_externals;
-        
-        void assigned_sync(tl_ref const &tl);
-        void subscribed_sync(ext_ref const &tl);
-        
-        bool check_internal_sync(utils::symbol tl) const;
-        bool check_external_sync(utils::symbol tl) const;
-        
-        void unprovide_sync(SHARED_PTR<graph_impl> g, utils::symbol tl);
-        void unuse_sync(utils::symbol tl);
-        
-        utils::symbol        m_name;
+     private:
         WEAK_PTR<graph_impl> m_graph;
-        
-        friend class graph_impl;
-
-        node_impl() DELETED;
-      }; // TREX::transaction::details::node_impl
+        utils::symbol        m_name;
+      
+      }; // node_impl
       
     } // TREX::transaction::details
   } // TREX::transaction
