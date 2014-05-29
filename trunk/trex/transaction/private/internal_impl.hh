@@ -31,14 +31,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_transaction_private_timeline_impl
-# define H_trex_transaction_private_timeline_impl
+#ifndef H_trex_transaction_private_internal_impl
+# define H_trex_transaction_private_internal_impl
 
 # include "../bits/transaction_fwd.hh"
 # include "../Observation.hh"
 # include "../Goal.hh"
-
-# include <trex/utils/platform/memory.hh>
 
 # include <boost/signals2/signal.hpp>
 
@@ -47,8 +45,6 @@ namespace TREX {
     namespace details {
       
       class external_impl;
-      
-      typedef SHARED_PTR<external_impl> ext_ref;
       
       class internal_impl
       :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<internal_impl> {
@@ -63,7 +59,7 @@ namespace TREX {
         utils::symbol const &name() const {
           return m_name;
         }
-        node_id owner() const;
+        WEAK_PTR<node_impl> owner() const;
         SHARED_PTR<graph_impl> graph() const {
           return m_graph.lock();
         }
@@ -78,11 +74,11 @@ namespace TREX {
         void post_observation(Observation const &obs, bool echo=false);
         void synchronize(TICK date);
         
-        void connect(ext_ref client);
+        void connect(SHARED_PTR<external_impl> client);
         
       private:
         // owner management
-        node_id owner_sync() const;
+        WEAK_PTR<node_impl> owner_sync() const;
         bool    reset_sync();
         bool    set_sync(SHARED_PTR<node_impl> node,
                          transaction_flags const &fl);
@@ -91,7 +87,7 @@ namespace TREX {
         void post_obs_sync(SHARED_PTR<node_impl> node,
                            Observation obs, bool echo);
         
-        void connect_sync(ext_ref client);
+        void connect_sync(SHARED_PTR<external_impl> client);
         void notify_sync(TICK date);
         boost::optional<TICK> last_update_sync() const;
         
@@ -99,13 +95,14 @@ namespace TREX {
         WEAK_PTR<graph_impl> m_graph;
         
         transaction_flags    m_access;
-        node_id              m_owner;
+        WEAK_PTR<node_impl>  m_owner;
         
         boost::optional<Observation> m_last_obs, m_next_obs;
         TICK  m_last_synch, m_obs_date;
         bool  m_echo;
         
-        typedef boost::signals2::signal<void (TICK, boost::optional<Observation>)> synch_event;
+        typedef boost::signals2::signal<void (TICK,
+                                              boost::optional<Observation>)> synch_event;
         
         synch_event m_synch;
         static utils::symbol const s_assert;
@@ -116,38 +113,9 @@ namespace TREX {
         
       }; // TREX::transaction::details::internal_impl
       
-      class external_impl
-      :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<external_impl> {
-      public:
-        external_impl(SHARED_PTR<node_impl> cli,
-                      tl_ref tl, transaction_flags const &fl);
-        ~external_impl() {}
-        
-        utils::symbol const &name() const {
-          return m_timeline->name();
-        }
-        SHARED_PTR<graph_impl> graph() const;
-      
-        bool accept_goals() const;
-        bool publish_plan() const;
-       
-        void on_synch(TICK date, boost::optional<Observation> o);
-        void connect() {
-          m_timeline->connect(shared_from_this());
-        }
-        
-        
-      private:
-        tl_ref            m_timeline;
-        node_id           m_client;
-        transaction_flags m_flags;
-        
-        external_impl() DELETED;
-        
-      }; // TREX::transaction::details::external_impl
       
     } // TREX::transaction::details
   } // TREX::transaction
 } // TREX
 
-#endif // H_trex_transaction_private_timeline_impl
+#endif // H_trex_transaction_private_internal_impl

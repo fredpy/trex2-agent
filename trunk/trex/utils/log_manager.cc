@@ -297,7 +297,7 @@ using namespace TREX::utils;
  * class LogManager
  */
 
-log_manager::log_manager():m_impl(new details::mgmt_impl) {}
+log_manager::log_manager():m_impl(new details::mgmt_impl) { }
 
 log_manager::~log_manager() {}
 
