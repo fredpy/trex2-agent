@@ -127,7 +127,7 @@ namespace TREX {
     
       void enqueue_sync(task *tsk);
       void dequeue_sync();
-    }; // TREX::utils::priority_queue
+    }; // TREX::utils::priority_strand
 
 # define IN_trex_utils_priority_strand
 #  include "bits/priority_strand.tcc"
