@@ -41,7 +41,7 @@ namespace asio=boost::asio;
  */
 
 bool priority_strand::task::operator< (priority_strand::task const &other) const {
-  return other.m_level && ( !m_level || *other.m_level<*m_level );
+  return other.m_level && ( !m_level || (*other.m_level)<(*m_level) );
 }
 
 /*
@@ -74,7 +74,7 @@ void priority_strand::enqueue(priority_strand::task *t) {
 
 void priority_strand::enqueue_sync(priority_strand::task *t) {
   m_tasks.push(t);
-  m_strand.dispatch(boost::bind(&priority_strand::dequeue_sync, this));
+  m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
 }
 
 void priority_strand::dequeue_sync() {
