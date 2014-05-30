@@ -45,9 +45,7 @@
 
 namespace TREX {
   namespace utils {
- 
-    class priority_strand;
-    
+     
     namespace details {
       
       template<typename Fn>
@@ -55,24 +53,6 @@ namespace TREX {
         typedef typename boost::result_of<Fn()>::type return_type;
         typedef boost::shared_future<return_type>     future;
       }; // TREX::utils::details::task_helper<>
-      
-      class priority_task :boost::noncopyable {
-      public:
-        typedef size_t priority_type;
-        bool operator< (priority_task const &other) const;
-        
-      protected:
-        priority_task();
-        priority_task(priority_type p);
-        virtual ~priority_task() {}
-
-        virtual void execute() =0;
-        
-      private:
-        boost::optional<priority_type> m_priority;
-        
-        friend class priority_strand;
-      }; // TREX::utils::details::priority_task
       
     } // TREX::utils::details
     
