@@ -66,6 +66,7 @@ add_library(TREXutils SHARED
   TREXversion.cc
   xml_utils.cc
   ptree_io.cc
+  priority_strand.cc
   asio_runner.cc
   asio_fstream.cc
   log/entry.cc
@@ -75,6 +76,7 @@ add_library(TREXutils SHARED
   timing/cpu_clock.cc
   timing/posix_utils.cc
   # headers
+  priority_strand.hh
   asio_fstream.hh
   asio_signal.hh
   asio_signal_n.hh
@@ -120,6 +122,7 @@ add_library(TREXutils SHARED
   platform/cpp11_deleted.hh
   platform/system_error.hh
   # template source code
+  bits/priority_strand.tcc
   bits/generic_factory.tcc
   singleton/bits/use.tcc
   singleton/bits/wrapper.tcc
@@ -238,6 +241,7 @@ source_group("Template Files\\bits" FILES
   bits/generic_factory.tcc
   bits/basic_symbol.tcc
   bits/xml_factory.tcc
+  bits/priority_strand.tcc
 )
 
 source_group("Template Files\\singleton\\bits" FILES  
