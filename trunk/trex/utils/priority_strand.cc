@@ -64,22 +64,41 @@ priority_strand::priority_strand(asio::io_service &io)
 
 priority_strand::~priority_strand() {}
 
+// observers
+
+size_t priority_strand::tasks() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_tasks.size();
+}
+
+bool priority_strand::empty() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_tasks.empty();
+}
+
 // manipulators
 
 void priority_strand::enqueue(priority_strand::task *t) {
-  m_strand.dispatch(boost::bind(&priority_strand::enqueue_sync, this, t));
-}
-
-// strand protected methods
-
-void priority_strand::enqueue_sync(priority_strand::task *t) {
-  m_tasks.push(t);
+  {
+    boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+    m_tasks.push(t);
+  }
   m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
 }
 
 void priority_strand::dequeue_sync() {
-  task *nxt = m_tasks.top();
-  m_tasks.pop();
+  task *nxt;
+  {
+    boost::upgrade_lock<boost::shared_mutex> test(m_mutex);
+    
+    if( m_tasks.empty() )
+      return;
+    else {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      nxt = m_tasks.top();
+      m_tasks.pop();
+    }
+  }
   nxt->execute();
   delete nxt;
 }

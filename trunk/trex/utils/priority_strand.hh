@@ -39,6 +39,7 @@
 # include <boost/asio/strand.hpp>
 # include <boost/optional.hpp>
 # include <boost/thread/future.hpp>
+# include <boost/thread/shared_mutex.hpp>
 # include <boost/utility/result_of.hpp>
 
 # include <queue>
@@ -56,6 +57,24 @@ namespace TREX {
       
     } // TREX::utils::details
     
+    /** @brief Priority based strand
+     *
+     * This class implements an asynchronous task scheduller that will 
+     * execute tasks based on their given priority. All the tasks are 
+     * executed through the same strand ensuring they are not ran 
+     * concurrently but the selection of the next task to be executed 
+     * is based on a simple priority queue ensuring that when multiple
+     * tasks are pending the one with the lowest priority value will 
+     * be executed next.
+     *
+     * Tasks are functions with no argument and any returned type. They 
+     * can be ever queued through @c post or @c send. The difference is that
+     * while post return a future that allow the caller to gather the 
+     * returned value, send provide no such synchronization mechanism 
+     * and is meant for situation where the result of the task do not matter
+     *
+     * @author Frederic Py
+     */
     class priority_strand {
     public:
       
@@ -80,17 +99,88 @@ namespace TREX {
       
       typedef task::priority priority_type;
     
-      priority_strand(boost::asio::io_service &io);
+      /** @brief Constructor 
+       *
+       * @param[in] io An asio io_service
+       *
+       * Create a new instance the execution of the tasks will be 
+       * managed by @p io
+       */
+      explicit priority_strand(boost::asio::io_service &io);
+      /** @brief Detructor */
       ~priority_strand();
       
+      /** @{
+       * @brief Post a task
+       *
+       * @tparam Fn A functor or function type
+       *
+       * @param[in] f The task to execute
+       * @param[in] p A priority value
+       *
+       * Schedule @p f to be executed with the priority @p p. If @p p 
+       * is not provided then the tasl priority is set to the lowest 
+       * priority. The highest priority is 0 follewed by 1, ... 
+       *
+       * This call return immediately with the task @p f being scheduled 
+       * for execution
+       *
+       * @pre Fn is a functor with no argument (ie @p f() is valid)
+       * @return A future refering to the asynchronous result of @p f
+       *
+       * @sa priority_strand::send
+       */
       template<typename Fn>
       typename details::task_helper<Fn>::future post(Fn f);
       template<typename Fn>
       typename details::task_helper<Fn>::future post(Fn f, priority_type p);
+      /** @} */
+      /** @{
+       * @brief Send a task
+       *
+       * @tparam Fn A functor or function type
+       *
+       * @param[in] f The task to execute
+       * @param[in] p A priority value
+       *
+       * Schedule @p f to be executed with the priority @p p. If @p p
+       * is not provided then the tasl priority is set to the lowest
+       * priority. The highest priority is 0 follewed by 1, ...
+       *
+       * This call return immediately with the task @p f being scheduled
+       * for execution. 
+       *
+       * @note This method do not give any way to synchronize directly 
+       * with the completion of @p f. If such synchronization is needed 
+       * please uses @c priority_starnd::post instead
+       *
+       * @pre Fn is a functor with no argument (ie @p f() is valid)
+       *
+       * @sa priority_strand::post
+       */
       template<typename Fn>
-      void async(Fn f);
+      void send(Fn f);
       template<typename Fn>
-      void async(Fn f, priority_type p);
+      void send(Fn f, priority_type p);
+      /** @} */
+      
+      /** @brief Number of pending tasks
+       *
+       * @return  The number of tasks waiting un the queue
+       *
+       * @sa empty() const
+       */
+      size_t tasks() const;
+      /** @brief Check if empty
+       *
+       * Test if this instance has no more task to execute
+       *
+       * @retval true if there's no task in the queue
+       * @retval false otherwise
+       *
+       * @sa tasks() const
+       */
+      bool empty() const;
       
     private:
       struct tsk_cmp {
@@ -99,13 +189,12 @@ namespace TREX {
 
       typedef std::priority_queue<task *,std::vector<task *>, tsk_cmp> task_queue;
 
-      boost::asio::strand m_strand;
-      task_queue          m_tasks;
       
+      boost::asio::strand m_strand;
+      mutable boost::shared_mutex m_mutex;
+      task_queue          m_tasks;      
       
       void enqueue(task *tsk);
-    
-      void enqueue_sync(task *tsk);
       void dequeue_sync();
     }; // TREX::utils::priority_strand
 
