@@ -126,13 +126,13 @@ typename details::task_helper<Fn>::future priority_strand::post(Fn f, priority_s
 }
 
 template<typename Fn>
-void priority_strand::async(Fn f) {
+void priority_strand::send(Fn f) {
   typedef typename details::task_helper<Fn>::return_type return_type;
   enqueue(new details::async_task<return_type>(f));
 }
 
 template<typename Fn>
-void priority_strand::async(Fn f, priority_strand::priority_type p) {
+void priority_strand::send(Fn f, priority_strand::priority_type p) {
   typedef typename details::task_helper<Fn>::return_type return_type;
   enqueue(new details::async_task<return_type>(f, p));
 }
