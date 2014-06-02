@@ -62,7 +62,9 @@ bool priority_strand::tsk_cmp::operator()(priority_strand::task *a,
 priority_strand::priority_strand(asio::io_service &io)
 :m_strand(io) {}
 
-priority_strand::~priority_strand() {}
+priority_strand::~priority_strand() {
+  clear();
+}
 
 // observers
 
@@ -102,3 +104,17 @@ void priority_strand::dequeue_sync() {
   nxt->execute();
   delete nxt;
 }
+
+void priority_strand::clear() {
+  task_queue tmp;
+  {
+    boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+    std::swap(tmp, m_tasks);
+  }
+  while( !tmp.empty() ) {
+    task *nxt = tmp.top();
+    tmp.pop();
+    delete nxt;
+  }
+}
+

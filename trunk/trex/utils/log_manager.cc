@@ -54,8 +54,6 @@
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/time_formatters.hpp>
 
-#include <boost/system/error_code.hpp>
-
 using namespace boost::filesystem;
 namespace bpt=boost::posix_time;
 using bpt::ptime;
