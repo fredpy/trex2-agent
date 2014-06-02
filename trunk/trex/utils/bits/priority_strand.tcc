@@ -78,8 +78,10 @@ namespace details {
     future_task() DELETED;
   }; // TREX::utils::details::future_task<>
   
+  // Handle the special case where the function returns void
   template<>
-  void future_task<void>::execute() {
+  inline void future_task<void>::execute() {
+    m_set = true;
     try {
       m_function();
       m_result.set_value();
