@@ -42,6 +42,8 @@
 # include <boost/thread/shared_mutex.hpp>
 # include <boost/utility/result_of.hpp>
 
+# include "platform/system_error.hh"
+
 # include <queue>
 
 namespace TREX {
@@ -181,6 +183,8 @@ namespace TREX {
        * @sa tasks() const
        */
       bool empty() const;
+      
+      void clear();
       
     private:
       struct tsk_cmp {

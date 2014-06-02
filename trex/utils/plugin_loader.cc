@@ -42,9 +42,6 @@
 #include "private/Pdlfcn.hh"
 #include "Plugin.hh"
 
-#include <boost/system/error_code.hpp>
-
-
 using namespace TREX::utils;
 using namespace TREX::utils::internals;
 

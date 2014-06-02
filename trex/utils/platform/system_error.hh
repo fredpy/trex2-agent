@@ -34,7 +34,7 @@
 #ifndef H_trex_system_error
 # define H_trex_system_error
 
-# include <bits/cpp11.hh>
+# include "bits/cpp11.hh"
 
 # ifdef DOXYGEN
 

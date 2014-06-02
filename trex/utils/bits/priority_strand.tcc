@@ -45,10 +45,17 @@ namespace details {
     
     
     template<typename Fn>
-    explicit future_task(Fn f):m_function(f) {}
+    explicit future_task(Fn f):m_function(f), m_set(false) {}
     template<typename Fn>
     future_task(Fn f, priority p):priority_strand::task(p), m_function(f) {}
-    ~future_task() {}
+    ~future_task() {
+      if( !m_set ) {
+        try {
+          ERROR_CODE ec = make_error_code(ERRC::operation_canceled);
+          m_result.set_exception(SYSTEM_ERROR(ec));
+        } catch(...) {}
+      }
+    }
     
     future get_future() {
       return m_result.get_future();
@@ -56,9 +63,11 @@ namespace details {
     
   private:
     fn_type              m_function;
+    bool                 m_set;
     boost::promise<Ret>  m_result;
     
     void execute() {
+      m_set = true;
       try {
         m_result.set_value(m_function());
       } catch(...) {
