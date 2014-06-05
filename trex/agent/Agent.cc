@@ -987,7 +987,7 @@ bool Agent::doNext() {
   return valid();
 }
 
-void Agent::sendRequest(goal_id const &g) {
+void Agent::sendRequest(token_id const &g) {
   if( !has_timeline(g->object()) )
     syslog(null, warn)<<"Posting goal on a unknnown timeline \""
 		      <<g->object()<<"\".";

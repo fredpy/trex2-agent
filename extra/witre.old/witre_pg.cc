@@ -42,7 +42,7 @@ namespace tlog=TREX::utils::log;
 
 namespace {
   singleton::use<log_manager> s_log;
-    reactor::factory::declare<WitreServer> decl("WitreReactor");
+    reactor::declare<WitreServer> decl("WitreReactor");
 }
 
 namespace TREX {

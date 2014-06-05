@@ -24,28 +24,28 @@ namespace TREX
 
 
     bool
-    LstsReactor::isObservationNew(TREX::transaction::Observation obs)
+    LstsReactor::isObservationNew(TREX::transaction::token obs)
     {
       std::string timeline = obs.object().str();
       obs_map::iterator it = postedObservations.find(timeline);
 
-      return (it == postedObservations.end() || !it->second->consistentWith(obs));
+      return (it == postedObservations.end() || !it->second->consistent_with(obs));
     }
 
     bool
-    LstsReactor::postUniqueObservation(TREX::transaction::Observation obs)
+    LstsReactor::postUniqueObservation(TREX::transaction::token obs)
     {
 
       utils::symbol timeline = obs.object();
       obs_map::iterator it = postedObservations.find(timeline.str());
 
-      if (it == postedObservations.end() || !it->second->consistentWith(obs))
+      if (it == postedObservations.end() || !it->second->consistent_with(obs))
       {
         // If timeline wasn't previously created, create a new internal timeline
         if (!is_internal(timeline) && !is_external(timeline))
           provide(timeline, false);
 
-        postedObservations[timeline.str()].reset(new Observation(obs));
+        postedObservations[timeline.str()].reset(new token(obs));
         post_observation(obs, true);
         return true;
       }

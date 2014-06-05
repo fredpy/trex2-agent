@@ -88,8 +88,8 @@ namespace TREX {
 
     private:
       bool synchronize();
-      void handle_request(TREX::transaction::goal_id const &g);
-      void handle_recall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::token_id const &g);
+      void handle_recall(TREX::transaction::token_id const &g);
 
       /** @brief State of the timeline */
       bool m_on, m_verbose;
@@ -99,8 +99,8 @@ namespace TREX {
 
       void setValue(bool val);
       
-      std::list<TREX::transaction::goal_id> m_pending;
-      UNIQ_PTR<TREX::transaction::Observation> m_light_state;
+      std::list<TREX::transaction::token_id> m_pending;
+      UNIQ_PTR<TREX::transaction::token> m_light_state;
 
       /** @brief Name of the predicate on */
       static TREX::utils::symbol const onPred;

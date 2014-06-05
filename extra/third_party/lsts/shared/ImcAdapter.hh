@@ -103,32 +103,32 @@ namespace TREX {
 
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
-      Observation vehicleMediumObservation(VehicleMedium * msg);
+      token vehicleMediumObservation(VehicleMedium * msg);
 
       //@brief Translates EstimatedState messages into "estate" timeline observations
-      Observation estimatedStateObservation(EstimatedState * msg);
+      token estimatedStateObservation(EstimatedState * msg);
 
       //@brief Translates FollowRefState messages into "frefstate" timeline observations
-      Observation followRefStateObservation(FollowRefState * msg);
+      token followRefStateObservation(FollowRefState * msg);
 
       //@brief Translates PlanControlState messages into "vstate" timeline observations
-      Observation planControlStateObservation(PlanControlState * msg);
+      token planControlStateObservation(PlanControlState * msg);
 
       //@brief Translates OperationalLimits messages into "oplimits" timeline observations
-      Observation opLimitsObservation(OperationalLimits * msg);
+      token opLimitsObservation(OperationalLimits * msg);
 
       //@brief Translates TrexToken messages into a generic observation
-      Observation genericObservation(TrexToken * msg);
+      token genericObservation(TrexToken * msg);
 
       //@brief Translates TrexToken messages into a goal
-      Goal genericGoal(TrexToken * msg);
+      token_id genericGoal(TrexToken * msg);
 
       //@brief Translates TrexToken messages into a generic observation
-      Observation announceObservation(Announce * msg);
+      token announceObservation(Announce * msg);
 
-      void asImcMessage(Predicate const &obs, TrexToken * result);
+      void asImcMessage(token const &obs, TrexToken * result);
 
-      void fillInExtraGoalAttributes(goal_id &goal, TrexToken * result);
+      void fillInExtraGoalAttributes(token_id &goal, TrexToken * result);
 
       virtual
       ~ImcAdapter();
@@ -137,7 +137,7 @@ namespace TREX {
       const int c_imc_header_length;
       const int c_max_iridium_payload_length;
       void variableToImc(var const &v, TrexAttribute * attr);
-      void setAttribute(Predicate &pred, TrexAttribute const &attr);
+      void setAttribute(token &pred, TrexAttribute const &attr);
       int m_trex_id;
       UDPSocket sock_send, sock_receive;
       uint8_t* bfr;

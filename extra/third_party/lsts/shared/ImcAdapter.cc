@@ -22,7 +22,7 @@ namespace TREX
       messenger = NULL;
     }
 
-    Observation
+    token
     ImcAdapter::vehicleMediumObservation(VehicleMedium * msg)
     {
 
@@ -31,54 +31,54 @@ namespace TREX
         switch (msg->medium)
         {
           case (VehicleMedium::VM_WATER):
-            return Observation("medium", "Water");
+            return token("medium", "Water");
             break;
           case (VehicleMedium::VM_UNDERWATER):
-            return Observation("medium", "Underwater");
+            return token("medium", "Underwater");
             break;
           case (VehicleMedium::VM_AIR):
-            return Observation("medium", "Air");
+            return token("medium", "Air");
             break;
           case (VehicleMedium::VM_GROUND):
-            return Observation("medium", "Ground");
+            return token("medium", "Ground");
             break;
           default:
             break;
         }
       }
-      return Observation("medium", "Unknown");
+      return token("medium", "Unknown");
     }
 
-    Observation
+    token
     ImcAdapter::estimatedStateObservation(EstimatedState * msg)
     {
       if (msg == NULL)
-        return Observation("estate", "Boot");
+        return token("estate", "Boot");
 
-      Observation obs("estate", "Position");
+      token obs("estate", "Position");
 
       double latitude, longitude;
       latitude = msg->lat;
       longitude = msg->lon;
       WGS84::displace(msg->x, msg->y, &latitude, &longitude);
-      obs.restrictAttribute("latitude", float_domain(latitude));
-      obs.restrictAttribute("longitude", float_domain(longitude));
+      obs.restrict_attribute("latitude", float_domain(latitude));
+      obs.restrict_attribute("longitude", float_domain(longitude));
 
       //msg->toText(std::cout);
       if (msg->depth > 0)
-        obs.restrictAttribute("z", float_domain(msg->depth));
+        obs.restrict_attribute("z", float_domain(msg->depth));
       else if (msg->alt > 0)
-        obs.restrictAttribute("z", float_domain(-msg->alt));
+        obs.restrict_attribute("z", float_domain(-msg->alt));
       else if (msg->height != -1)
-        obs.restrictAttribute("z", float_domain(msg->height + (-msg->z)));
+        obs.restrict_attribute("z", float_domain(msg->height + (-msg->z)));
 
       if (msg->depth > 0)
-        obs.restrictAttribute("depth",
+        obs.restrict_attribute("depth",
                               float_domain(msg->depth /*+ (- msg->z)*/));
       if (msg->alt > 0)
-        obs.restrictAttribute("altitude", float_domain(msg->alt));
+        obs.restrict_attribute("altitude", float_domain(msg->alt));
       if (msg->height != -1)
-        obs.restrictAttribute("height", float_domain(msg->height + (-msg->z)));
+        obs.restrict_attribute("height", float_domain(msg->height + (-msg->z)));
 
       return obs;
     }
@@ -89,38 +89,38 @@ namespace TREX
       m_graph = &g;
     }
 
-    Observation
+    token
     ImcAdapter::followRefStateObservation(FollowRefState * msg)
     {
       if (msg == NULL || msg->reference.isNull()
           || msg->control_src != m_trex_id
           || msg->state == FollowRefState::FR_TIMEOUT
           || msg->state == FollowRefState::FR_WAIT)
-        return Observation("reference", "Boot");
+        return token("reference", "Boot");
 
       bool xy_near = (msg->proximity & FollowRefState::PROX_XY_NEAR) != 0;
       bool z_near = (msg->proximity & FollowRefState::PROX_Z_NEAR) != 0;
 
-      Observation obs("refstate", "Going");
+      token obs("refstate", "Going");
 
-      obs.restrictAttribute("near_z", boolean_domain((z_near)));
-      obs.restrictAttribute("near_xy", boolean_domain((xy_near)));
+      obs.restrict_attribute("near_z", boolean_domain((z_near)));
+      obs.restrict_attribute("near_xy", boolean_domain((xy_near)));
 
-      obs.restrictAttribute("latitude", float_domain(msg->reference->lat));
-      obs.restrictAttribute("longitude", float_domain(msg->reference->lon));
+      obs.restrict_attribute("latitude", float_domain(msg->reference->lat));
+      obs.restrict_attribute("longitude", float_domain(msg->reference->lon));
 
       if (!msg->reference->z.isNull())
       {
         switch (msg->reference->z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", float_domain(msg->reference->z->value));
+            obs.restrict_attribute("z", float_domain(msg->reference->z->value));
             break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", float_domain(-msg->reference->z->value));
+            obs.restrict_attribute("z", float_domain(-msg->reference->z->value));
             break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", float_domain(msg->reference->z->value));
+            obs.restrict_attribute("z", float_domain(msg->reference->z->value));
             break;
           default:
             break;
@@ -129,14 +129,14 @@ namespace TREX
 
       if (!msg->reference->speed.isNull())
       {
-        obs.restrictAttribute("speed",
+        obs.restrict_attribute("speed",
                               float_domain((msg->reference->speed->value)));
       }
 
       return obs;
     }
 
-    Observation
+    token
     ImcAdapter::planControlStateObservation(PlanControlState * msg)
     {
       if (msg != NULL)
@@ -145,44 +145,44 @@ namespace TREX
         if (msg->state == PlanControlState::PCS_EXECUTING
             && msg->plan_id == "trex_plan")
         {
-          Observation obs = Observation("control", "TREX");
+          token obs("control", "TREX");
           return obs;
         }
-        return Observation("control", "DUNE");
+        return token("control", "DUNE");
       }
 
-      return Observation("control", "Boot");
+      return token("control", "Boot");
     }
 
-    Observation
+    token
     ImcAdapter::opLimitsObservation(OperationalLimits * msg)
     {
       if (msg == NULL)
-        return Observation("oplimits", "Boot");
+        return token("oplimits", "Boot");
 
-      Observation obs("oplimits", "Limits");
+      token obs("oplimits", "Limits");
 
       if (msg->mask & IMC::OPL_MAX_DEPTH)
-        obs.restrictAttribute("max_depth", float_domain(msg->max_depth));
+        obs.restrict_attribute("max_depth", float_domain(msg->max_depth));
 
       if ((msg->mask & IMC::OPL_MAX_ALT))
-        obs.restrictAttribute("max_altitude", float_domain(msg->max_altitude));
+        obs.restrict_attribute("max_altitude", float_domain(msg->max_altitude));
 
       if (msg->mask & IMC::OPL_MIN_ALT)
-        obs.restrictAttribute("min_altitude", float_domain(msg->min_altitude));
+        obs.restrict_attribute("min_altitude", float_domain(msg->min_altitude));
 
       if (msg->mask & IMC::OPL_MAX_SPEED)
-        obs.restrictAttribute("max_speed", float_domain(msg->max_speed));
+        obs.restrict_attribute("max_speed", float_domain(msg->max_speed));
 
       if (msg->mask & IMC::OPL_MIN_SPEED)
-        obs.restrictAttribute("min_speed", float_domain(msg->min_speed));
+        obs.restrict_attribute("min_speed", float_domain(msg->min_speed));
 
       InsideOpLimits::set_oplimits(msg);
 
       return obs;
     }
 
-    Observation
+    token
     ImcAdapter::announceObservation(Announce * msg)
     {
       std::string system = msg->sys_name;
@@ -192,25 +192,25 @@ namespace TREX
 
       if (age > 15)
       {
-        Observation obs(system, "position");
-        obs.restrictAttribute("latitude", float_domain(msg->lat));
-        obs.restrictAttribute("longitude", float_domain(msg->lon));
-        obs.restrictAttribute("height", float_domain(msg->height));
+        token obs(system, "position");
+        obs.restrict_attribute("latitude", float_domain(msg->lat));
+        obs.restrict_attribute("longitude", float_domain(msg->lon));
+        obs.restrict_attribute("height", float_domain(msg->height));
         return obs;
       }
 
-      Observation obs(system, "connected");
-      obs.restrictAttribute("latitude", float_domain(msg->lat));
-      obs.restrictAttribute("longitude", float_domain(msg->lon));
-      obs.restrictAttribute("height", float_domain(msg->height));
+      token obs(system, "connected");
+      obs.restrict_attribute("latitude", float_domain(msg->lat));
+      obs.restrict_attribute("longitude", float_domain(msg->lon));
+      obs.restrict_attribute("height", float_domain(msg->height));
 
       return obs;
     }
 
-    Goal
+    token_id
     ImcAdapter::genericGoal(TrexToken * msg)
     {
-      Goal g(msg->timeline, msg->predicate);
+      token_id g = token::goal(msg->timeline, msg->predicate);
 
       MessageList<TrexAttribute>::const_iterator it;
       for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
@@ -227,9 +227,9 @@ namespace TREX
             max_v = m_graph->as_date(attr->max);
 
           if (attr->name == "start")
-            g.restrictStart(int_domain(min_v, max_v));
+            g->restrict_start(int_domain(min_v, max_v));
           else
-            g.restrictEnd(int_domain(min_v, max_v));
+            g->restrict_end(int_domain(min_v, max_v));
         }
         else if (attr->name == "duration")
         {
@@ -239,17 +239,17 @@ namespace TREX
           if (!attr->max.empty())
             max_v = m_graph->as_duration(attr->max);
 
-          g.restrictDuration(int_domain(min_v, max_v));
+          g->restrict_duration(int_domain(min_v, max_v));
         }
         else
-          setAttribute(g, *attr);
+          setAttribute(*g, *attr);
       }
 
       return g;
     }
 
     void
-    ImcAdapter::setAttribute(Predicate &pred, TrexAttribute const &attr)
+    ImcAdapter::setAttribute(token &pred, TrexAttribute const &attr)
     {
       int_domain::bound min_i, max_i;
       float_domain::bound min_f, max_f;
@@ -260,15 +260,15 @@ namespace TREX
       switch (attr.attr_type)
       {
         case TrexAttribute::TYPE_STRING:
-          pred.restrictAttribute(attr.name, string_domain(min_v));
+          pred.restrict_attribute(attr.name, string_domain(min_v));
           break;
 
         case TrexAttribute::TYPE_BOOL:
           if (min_v == max_v && min_v != "")
-            pred.restrictAttribute(attr.name,
+            pred.restrict_attribute(attr.name,
                                    boolean_domain(min_v != "false" || min_v != "0"));
           else
-            pred.restrictAttribute(attr.name, boolean_domain());
+            pred.restrict_attribute(attr.name, boolean_domain());
           break;
 
         case TrexAttribute::TYPE_INT:
@@ -282,7 +282,7 @@ namespace TREX
           else
             max_i = strtoll(max_v.c_str(), NULL, 10);
 
-          pred.restrictAttribute(attr.name, int_domain(min_i, max_i));
+          pred.restrict_attribute(attr.name, int_domain(min_i, max_i));
           break;
 
         case TrexAttribute::TYPE_FLOAT:
@@ -296,14 +296,14 @@ namespace TREX
           else
             max_f = strtod(max_v.c_str(), NULL);
 
-          pred.restrictAttribute(attr.name, float_domain(min_f, max_f));
+          pred.restrict_attribute(attr.name, float_domain(min_f, max_f));
           break;
 
         case TrexAttribute::TYPE_ENUM:
           if (min_v == "" || max_v == "")
-            pred.restrictAttribute(attr.name, enum_domain());
+            pred.restrict_attribute(attr.name, enum_domain());
           else
-            pred.restrictAttribute(attr.name, enum_domain(min_v));
+            pred.restrict_attribute(attr.name, enum_domain(min_v));
           break;
 
         default:
@@ -311,10 +311,10 @@ namespace TREX
       }
     }
 
-    Observation
+    token
     ImcAdapter::genericObservation(TrexToken * msg)
     {
-      Observation obs(msg->timeline, msg->predicate);
+      token obs(msg->timeline, msg->predicate);
 
       MessageList<TrexAttribute>::const_iterator it;
       for (it = msg->attributes.begin(); it != msg->attributes.end(); it++)
@@ -577,7 +577,7 @@ namespace TREX
     }
 
     void
-    ImcAdapter::asImcMessage(Predicate const &obs, TrexToken * result)
+    ImcAdapter::asImcMessage(token const &obs, TrexToken * result)
     {
       result->timeline = obs.object().str();
       result->predicate = obs.predicate().str();
@@ -585,12 +585,12 @@ namespace TREX
 
       std::list<TREX::utils::symbol> attrs;
 
-      obs.listAttributes(attrs);
+      obs.list_attributes(attrs);
       std::list<TREX::utils::symbol>::iterator it;
       for (it = attrs.begin(); it != attrs.end(); it++)
       {
         TrexAttribute attr;
-        var v = obs.getAttribute(*it);
+        var const &v = obs.attribute(*it);
         variableToImc(v, &attr);
         result->attributes.push_back(attr);
       }

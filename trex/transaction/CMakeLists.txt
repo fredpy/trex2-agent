@@ -34,9 +34,6 @@
 #######################################################################
 
 add_library(TREXtransaction SHARED
-  Goal.cc
-  Observation.cc
-  Predicate.cc
   reactor.cc
   reactor_graph.cc
   Relation.cc
@@ -48,9 +45,6 @@ add_library(TREXtransaction SHARED
   # headers
   bits/bgl_support.hh
   bits/external.hh
-  Goal.hh
-  Observation.hh
-  Predicate.hh
   reactor.hh
   reactor_fwd.hh
   reactor_graph.hh

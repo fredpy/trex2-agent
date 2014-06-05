@@ -79,7 +79,7 @@ namespace {
       return this->get_override("__eq__")(other);
     }
     
-    tt::abstract_domain &restrict_with(tt::abstract_domain const &other) {
+    bool restrict_with(tt::abstract_domain const &other) {
       return this->get_override("restrict")(other);
     }
   
@@ -136,7 +136,7 @@ namespace {
     boost::any get_upper() const {
       return boost::any();
     }
-    tt::abstract_domain &restrict_with(tt::abstract_domain const &other) {
+    bool restrict_with(tt::abstract_domain const &other) {
       return this->get_override("restrict")(other);
     }
     void parse_lower(std::string const &val) {
@@ -186,7 +186,7 @@ namespace {
     boost::any element(size_t) const {
       return boost::any();
     }
-    tt::abstract_domain &restrict_with(tt::abstract_domain const &other) {
+    bool restrict_with(tt::abstract_domain const &other) {
       return this->get_override("restrict")(other);
     }
     
@@ -264,8 +264,7 @@ void export_domain() {
   .def("is_singleton", pure_virtual(&tt::abstract_domain::is_singleton))
   .def("intersect", pure_virtual(&tt::abstract_domain::intersect))
   .def("__eq__", pure_virtual(&tt::abstract_domain::equals))
-  .def("restrict", pure_virtual(&tt::abstract_domain::restrict_with),
-       return_internal_reference<>())
+  .def("restrict", pure_virtual(&tt::abstract_domain::restrict_with))
   .def("as_tree", &tt::abstract_domain::as_tree)
   .def("build_tree", pure_virtual(&tt::abstract_domain::build_tree))
   .def("xml", &xml_str<tt::abstract_domain>)
@@ -345,8 +344,8 @@ void export_domain() {
   .def("__init__", &collection_init<tt::enum_domain, tu::symbol>)
   ;
   
-  tt::var &(tt::var::* restrict_domain)(tt::abstract_domain const &) = &tt::var::restrict_with;
-  tt::var &(tt::var::* restrict_var)(tt::var const &) = &tt::var::restrict_with;
+  bool (tt::var::* restrict_domain)(tt::abstract_domain const &) = &tt::var::restrict_with;
+  bool (tt::var::* restrict_var)(tt::var const &) = &tt::var::restrict_with;
   
   // class trex.domains.var
   //   A trex variable
@@ -361,8 +360,8 @@ void export_domain() {
                   init<tu::symbol, tt::abstract_domain const &>())
   .def("name", &tt::var::name)
   .def("domain", &tt::var::domain, return_internal_reference<>())
-  .def("restrict", restrict_domain, return_internal_reference<>())
-  .def("restrict", restrict_var, return_internal_reference<>())
+  .def("restrict", restrict_domain)
+  .def("restrict", restrict_var)
   .def("xml", &xml_str<tt::var>)
   .def("json", &json_str<tt::var>)
   .def("__str__", &str_impl<tt::var>)

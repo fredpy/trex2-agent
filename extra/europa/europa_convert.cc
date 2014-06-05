@@ -185,7 +185,8 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
         throw tr::EmptyDomain(*dom, "Europa object domain "+m_dom->toString()+
                           " became empty.");
       EUROPA::ObjectDomain tmp(m_type, objs);
-      m_dom->intersect(tmp);
+      if( m_dom->intersect(tmp) )
+        *m_updated = true;
     }
     
   } else if( m_dom->isEnumerated() ) {
@@ -202,7 +203,8 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
 			" became empty.");
     // Apply the intersection
     EUROPA::EnumeratedDomain tmp(m_type, values);
-    m_dom->intersect(tmp);
+    if( m_dom->intersect(tmp) )
+      *m_updated = true;
   } else 
     throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not enumerated.");
 }
@@ -251,7 +253,8 @@ void details::europa_domain::visit(tr::basic_interval const *dom) {
     if( tmp->isEmpty() )
       throw tr::EmptyDomain(*dom, "Europa Interval domain "+m_dom->toString()
 			+" became empty.");
-    m_dom->intersect(*tmp);
+    if( m_dom->intersect(*tmp) )
+      *m_updated = true;
   } else 
     throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not an interval.");
 }
@@ -263,8 +266,10 @@ void details::europa_domain::visit(tr::abstract_domain const *dom, bool) {
     // EuropaDomain has a europa Domain directly available
     EuropaDomain const &ed = dynamic_cast<EuropaDomain const &>(*dom);
     
-    if( !m_dom->intersect(ed.europaDomain()) ) 
-      throw tr::EmptyDomain(*dom, "EUROPA domain "+m_dom->toString()+" became empty.");    
+    if( !m_dom->intersects(ed.europaDomain()) )
+      throw tr::EmptyDomain(*dom, "EUROPA domain "+m_dom->toString()+" became empty.");
+    else if( m_dom->intersect(ed.europaDomain()) )
+      *m_updated = true;
   } else 
     // I have no way to know at this stage
     throw tr::DomainAccess(*dom, "Don't know how to convert domains "+

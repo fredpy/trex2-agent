@@ -16,7 +16,7 @@ namespace
 {
 
 	/** @brief SafetyBug reactor declaration */
-	reactor::factory::declare<SafetyBug> decl("SafetyBug");
+	reactor::declare<SafetyBug> decl("SafetyBug");
 
 }
 
@@ -30,17 +30,15 @@ SafetyBug::~SafetyBug() {
 	// TODO Auto-generated destructor stub
 }
 
-void SafetyBug::new_plan_token(TREX::transaction::goal_id const &g)
+void SafetyBug::new_plan_token(TREX::transaction::token_id const &g)
 {
-  Goal * goal = g.get();
-
-  std::string gname = (goal->object()).str();
-  std::string gpred = (goal->predicate()).str();
+  std::string gname = (g->object()).str();
+  std::string gpred = (g->predicate()).str();
 
   syslog(utils::log::info) << "newPlanToken(" << gname << " , " << gpred << ")\n";
 }
 
-void SafetyBug::notify(TREX::transaction::Observation const &obs)
+void SafetyBug::notify(TREX::transaction::token const &obs)
 {
   if (obs.predicate() == "Failed" && !aborted)
   {

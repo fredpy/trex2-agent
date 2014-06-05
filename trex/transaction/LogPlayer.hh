@@ -45,7 +45,7 @@ namespace TREX {
 
       /** @brief Transaction event
        * 
-       * And abstarct class that decibe a transaction event to be 
+       * And abstract class that decibe a transaction event to be 
        * replayed from a log.
        *
        * @relates LogPlayer
@@ -96,7 +96,7 @@ namespace TREX {
 	 * @sa set_goal(std::string const &, goal_id const &)
 	 * @sa LogPLayer::m_goal_map
 	 */
-	goal_id get_goal(std::string const &key);
+	token_id get_goal(std::string const &key);
 	/** @brief Associate goal
 	 * 
 	 * @param[in] key A key 
@@ -110,7 +110,7 @@ namespace TREX {
 	 * @sa get_goal(std::string const &)
 	 * @sa LogPLayer::m_goal_map
 	 */
-	void set_goal(std::string const &key, goal_id const &g);
+	void set_goal(std::string const &key, token_id const &g);
 
 	/** @briefAssociated LogPlayer
 	 * 
@@ -219,7 +219,7 @@ namespace TREX {
        *
        * @pre obs object should  be Internal to this reactor
        */
-      void play_obs(Observation const &obs);
+      void play_obs(token const &obs);
       /** @brief post request
        *
        * @param[in] g A goal
@@ -228,7 +228,7 @@ namespace TREX {
        *
        * @pre g object should  be External to this reactor
        */
-      void play_request(goal_id const &g);
+      void play_request(token_id const &g);
       /** @brief post recall
        *
        * @param[in] g A goal
@@ -237,7 +237,7 @@ namespace TREX {
        *
        * @pre g should have been formerly requested by this reactor
        */
-      void play_recall(goal_id const &g);
+      void play_recall(token_id const &g);
       /** @brief publish plan token
        *
        * @param[in] g A goal
@@ -246,7 +246,7 @@ namespace TREX {
        *
        * @pre g object should  be Internal to this reactor
        */
-      void play_add(goal_id const &g);
+      void play_add(token_id const &g);
       /** @brief cancel plan token
        *
        * @param[in] g A goal
@@ -256,7 +256,7 @@ namespace TREX {
        *
        * @pre g should have be publish as a plan before
        */
-      void play_cancel(goal_id const &g);
+      void play_cancel(token_id const &g);
 
     private:
       void handle_init();
@@ -308,7 +308,7 @@ namespace TREX {
 
       typedef std::pair< TICK, SHARED_PTR<phase> > tick_event;
       std::list<tick_event>    m_log;
-      std::map<std::string, goal_id> m_goal_map;
+      std::map<std::string, token_id> m_goal_map;
 
       bool next_phase(TICK tck, utils::symbol const &kind);
       bool in_tick(TICK tck) const;

@@ -42,7 +42,7 @@ using namespace TREX::Scientist;
 
 namespace {
     singleton::use<log_manager> s_log;
-    reactor::factory::declare<Scientist> decl("Scientist");
+    reactor::declare<Scientist> decl("Scientist");
 }
 
 namespace TREX {

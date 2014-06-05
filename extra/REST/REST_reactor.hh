@@ -55,10 +55,10 @@ namespace TREX {
       //reactor handlers
       void handle_init();
       void handle_tick_start();
-      void notify(TREX::transaction::Observation const &obs);
+      void notify(TREX::transaction::token const &obs);
       bool synchronize();
-      void new_plan_token(transaction::goal_id const &t);
-      void cancelled_plan_token(transaction::goal_id const &t);
+      void new_plan_token(transaction::token_id const &t);
+      void cancelled_plan_token(transaction::token_id const &t);
       
       TREX::utils::singleton::use<TREX::wt::server> m_server;
       

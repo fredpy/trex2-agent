@@ -52,17 +52,17 @@ MultipleInternals::MultipleInternals(reactor const &faulty,
  * class TREX::transaction::details::timeline
  */
 
-utils::symbol const timeline::s_failed(Predicate::failed_pred());
+utils::symbol const timeline::s_failed(token::s_failed);
 
 // structors :
 
 timeline::timeline(TICK date, utils::symbol const &name)
   :m_name(name), m_owner(NULL), m_plan_listeners(0),
-   m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false) {}
+m_last_obs(token::obs(name, token::s_failed)), m_obs_date(date), m_shouldPrint(false) {}
 
 timeline::timeline(TICK date, utils::symbol const &name, reactor &serv, transaction_flags const &flags)
   :m_name(name), m_owner(&serv), m_transactions(flags), m_plan_listeners(0), 
-   m_last_obs(Observation(name, Predicate::failed_pred())), m_obs_date(date), m_shouldPrint(false)  {}
+m_last_obs(token::obs(name, token::s_failed)), m_obs_date(date), m_shouldPrint(false)  {}
 
 timeline::~timeline() {
   // maybe some clean-up to do (?)
@@ -128,7 +128,7 @@ reactor *timeline::unassign(TICK date) {
     m_owner->unassigned(this);
     m_owner = NULL;
     m_transactions.reset();
-    postObservation(Observation(name(), Predicate::failed_pred()));
+    postObservation(token::obs(name(), token::s_failed));
     synchronize(date);
     latency_update(ret->exec_latency());
   }
@@ -177,7 +177,7 @@ void timeline::unsubscribe(Relation const &rel) {
   m_clients.erase(rel.m_pos);
 }
 
-void timeline::postObservation(Observation const &obs,
+void timeline::postObservation(token_id const &obs,
 			       bool verbose) {
   verbose = verbose || ( owned() && owner().is_verbose() );
 
@@ -204,7 +204,7 @@ void timeline::synchronize(TICK date) {
   }
 }
 
-void timeline::request(goal_id const &g) {
+void timeline::request(token_id const &g) {
   if( owned() ) {
     owner().syslog(info)<<"Request received ["<<g<<"] "
 				<<*g;
@@ -212,14 +212,14 @@ void timeline::request(goal_id const &g) {
   }
 }
 
-void timeline::recall(goal_id const &g) {
+void timeline::recall(token_id const &g) {
   if( owned() ) {
     owner().syslog(info)<<"Recall received ["<<g<<"]";
     owner().queue_recall(g);
   }
 }
 
-bool timeline::notifyPlan(goal_id const &t) {
+bool timeline::notifyPlan(token_id const &t) {
   if( m_transactions.test(1) && owned() ) {
     owner().syslog(reactor::plan)<<"Added ["<<t<<"] "<<*t;
     if( m_plan_listeners>0 ) {
@@ -232,7 +232,7 @@ bool timeline::notifyPlan(goal_id const &t) {
   return false;
 }
 
-bool timeline::cancelPlan(goal_id const &t) {
+bool timeline::cancelPlan(token_id const &t) {
   if( m_transactions.test(1) && owned() ) {
     owner().syslog(reactor::plan)<<"Removed ["<<t<<"] from "
 				      <<t->object()<<" to the "
@@ -338,7 +338,7 @@ TICK Relation::lastObsDate() const {
 
 
 
-Observation const &Relation::lastObservation() const {
+token_id Relation::lastObservation() const {
   return m_timeline->lastObservation();
 }
 
@@ -351,10 +351,10 @@ reactor &Relation::server() const {
 }
 
 
-void Relation::recall(goal_id const &g) {
+void Relation::recall(token_id const &g) {
   return m_timeline->recall(g);
 }
 
-void Relation::request(goal_id const &g) {
+void Relation::request(token_id const &g) {
   return m_timeline->request(g);
 }

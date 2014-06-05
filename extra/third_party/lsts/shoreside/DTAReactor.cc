@@ -15,7 +15,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::factory::declare<DTAReactor> decl("DTAReactor");
+  reactor::declare<DTAReactor> decl("DTAReactor");
 }
 
 
@@ -35,14 +35,14 @@ namespace
 DTAReactor::DTAReactor(reactor::xml_arg_type arg)
   :reactor(arg, false),
    m_active(false),
-m_proxy_timeline(parse_attr<symbol>(factory::node(arg), "proxy")),
-m_asset_id(parse_attr<symbol>(factory::node(arg), "id")) {
+m_proxy_timeline(parse_attr<symbol>(xml(arg), "proxy")),
+m_asset_id(parse_attr<symbol>(xml(arg), "id")) {
   m_survey_tl = m_asset_id.str() + "_follow";
   m_state_tl = m_asset_id.str() + "_state";
   provide(m_survey_tl);
-  post_observation(Observation(m_survey_tl, "None"));
+  post_observation(token(m_survey_tl, "None"));
   provide(m_state_tl, false);
-  post_observation(Observation(m_state_tl, "Nothing"));
+  post_observation(token(m_state_tl, "Nothing"));
   use(m_proxy_timeline, true);
 }
 
@@ -53,18 +53,18 @@ DTAReactor::~DTAReactor() {}
 bool DTAReactor::synchronize() {
   if( m_active ) {
     if( m_have_pos && WAITING==m_trex_state ) {
-      Goal tmp(m_proxy_timeline, "Survey");
-      Observation sent(m_state_tl, "Sent");
+      token tmp(m_proxy_timeline, "Survey");
+      token sent(m_state_tl, "Sent");
       
       
-      tmp.restrictAttribute(var("center_lat", float_domain(m_pos.first)));
-      sent.restrictAttribute(var("center_lat", float_domain(m_pos.first)));
-      tmp.restrictAttribute(var("center_lon", float_domain(m_pos.second)));
-      sent.restrictAttribute(var("center_lon", float_domain(m_pos.second)));
+      tmp.restrict_attribute(var("center_lat", float_domain(m_pos.first)));
+      sent.restrict_attribute(var("center_lat", float_domain(m_pos.first)));
+      tmp.restrict_attribute(var("center_lon", float_domain(m_pos.second)));
+      sent.restrict_attribute(var("center_lon", float_domain(m_pos.second)));
       
       enum_domain path_d;
       path_d.add(m_path);
-      tmp.restrictAttribute(var("path", path_d));
+      tmp.restrict_attribute(var("path", path_d));
     
       if( !m_have_speed ) {
         // set default speeds
@@ -73,18 +73,18 @@ bool DTAReactor::synchronize() {
         m_speed.first = 0.0;
         m_speed.second = 0.0;
       }
-      tmp.restrictAttribute(var("speed_north",
+      tmp.restrict_attribute(var("speed_north",
                                      float_domain(m_speed.first)));
-      sent.restrictAttribute(var("speed_north",
+      sent.restrict_attribute(var("speed_north",
                                      float_domain(m_speed.first)));
-      tmp.restrictAttribute(var("speed_east",
+      tmp.restrict_attribute(var("speed_east",
                                      float_domain(m_speed.second)));
-      sent.restrictAttribute(var("speed_east",
+      sent.restrict_attribute(var("speed_east",
                                      float_domain(m_speed.second)));
     
       
-      tmp.restrictAttribute(var("size", float_domain(m_factor)));
-      tmp.restrictAttribute(var("lagrangian", boolean_domain(m_lagrangian)));
+      tmp.restrict_attribute(var("size", float_domain(m_factor)));
+      tmp.restrict_attribute(var("lagrangian", boolean_domain(m_lagrangian)));
     
       post_goal(tmp);
       m_trex_state = GOAL_SENT;
@@ -94,13 +94,13 @@ bool DTAReactor::synchronize() {
   return true;
 }
 
-void DTAReactor::handle_request(goal_id const &g) {
+void DTAReactor::handle_request(token_id const &g) {
   if( g->object()==m_survey_tl ) {
     if( g->predicate()=="None" ) {
       if( m_active ) {
         m_active=false;
-        post_observation(Observation(m_survey_tl, g->predicate()));
-        post_observation(Observation(m_state_tl, "Nothing"));
+        post_observation(token(m_survey_tl, g->predicate()));
+        post_observation(token(m_state_tl, "Nothing"));
         unuse(m_drifter);
       }
     }
@@ -109,22 +109,22 @@ void DTAReactor::handle_request(goal_id const &g) {
       TREX::utils::symbol drifter, path;
       double factor;
 
-      if( g->hasAttribute("drifter") ) 
-        drifter = g->getAttribute("drifter").domain().get_singleton_as_string();
+      if( g->has_attribute("drifter") )
+        drifter = g->attribute("drifter").domain().get_singleton_as_string();
       else 
         return;
 
-      if( g->hasAttribute("path") ) 
-        path = g->getAttribute("path").domain().get_singleton_as_string();
+      if( g->has_attribute("path") )
+        path = g->attribute("path").domain().get_singleton_as_string();
       else 
         return;
-      if( g->hasAttribute("size") )
-        factor = g->getAttribute("size").domain().get_typed_singleton<double, true>();
+      if( g->has_attribute("size") )
+        factor = g->attribute("size").domain().get_typed_singleton<double, true>();
       else
         return;
 
-      if( g->hasAttribute("lagrangian") )
-        m_lagrangian = g->getAttribute("lagrangian").domain().get_typed_singleton<bool, true>();
+      if( g->has_attribute("lagrangian") )
+        m_lagrangian = g->attribute("lagrangian").domain().get_typed_singleton<bool, true>();
       else 
         m_lagrangian = false;
 
@@ -144,25 +144,25 @@ void DTAReactor::handle_request(goal_id const &g) {
       m_path = path;
       m_factor = factor;
       post_observation(*g);
-      post_observation(Observation(m_state_tl, "Wait"));
+      post_observation(token(m_state_tl, "Wait"));
     }
   }
 }
 
-void DTAReactor::notify(Observation const &obs) {
+void DTAReactor::notify(token const &obs) {
   if( obs.object()==m_drifter ) {
     if( obs.predicate()=="position" || obs.predicate()=="connected" ) {
       // Get lat/lon
-      m_pos.first = obs.getAttribute("latitude").domain().get_typed_singleton<double, true>();
-      m_pos.second = obs.getAttribute("longitude").domain().get_typed_singleton<double, true>();
+      m_pos.first = obs.attribute("latitude").domain().get_typed_singleton<double, true>();
+      m_pos.second = obs.attribute("longitude").domain().get_typed_singleton<double, true>();
       if( !m_have_pos ) {
 	syslog()<<"Received a first position from "<<m_drifter;
 	m_have_pos = true;
       }
-      if( obs.hasAttribute("speed_north") ) {
-	m_have_speed = obs.getAttribute("speed_north").domain().is_singleton();
-	m_speed.first = obs.getAttribute("speed_north").domain().get_typed_singleton<double, true>();
-	m_speed.second = obs.getAttribute("speed_east").domain().get_typed_singleton<double, true>();
+      if( obs.has_attribute("speed_north") ) {
+	m_have_speed = obs.attribute("speed_north").domain().is_singleton();
+	m_speed.first = obs.attribute("speed_north").domain().get_typed_singleton<double, true>();
+	m_speed.second = obs.attribute("speed_east").domain().get_typed_singleton<double, true>();
       }
     }
   } else if( obs.object()==m_proxy_timeline ) {
@@ -176,7 +176,7 @@ void DTAReactor::notify(Observation const &obs) {
       syslog(info)<<"dorado execute a goal !!!";
       m_trex_state = RUNNING;
       if( m_active )
-      post_observation(Observation(m_state_tl, "Wait"));
+      post_observation(token(m_state_tl, "Wait"));
     }
   }
 }

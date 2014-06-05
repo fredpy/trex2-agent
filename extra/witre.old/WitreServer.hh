@@ -64,7 +64,7 @@ namespace TREX {
       // WitreApplication const &app() const;
       // WitreApplication &app();
 
-      typedef std::list<goal_id> timed_goal;
+      typedef std::list<token_id> timed_goal;
 
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
@@ -83,9 +83,9 @@ namespace TREX {
       std::string getDependencies(std::string name);
       const timed_goal& plan() { return planTokens; };
 
-      TREX::transaction::goal_id clientGoalPost(boost::property_tree::ptree::value_type const &xml);
-      TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
-      TREX::transaction::Goal getGoal(std::string obs, std::string prd);
+      TREX::transaction::token_id clientGoalPost(boost::property_tree::ptree::value_type const &xml);
+      TREX::transaction::token_id clientGoalPost(TREX::transaction::token const &g);
+      TREX::transaction::token getGoal(std::string obs, std::string prd);
 
       WitreServer(TREX::transaction::reactor::xml_arg_type arg);
       ~WitreServer();
@@ -100,10 +100,10 @@ namespace TREX {
       //Trex functions
       void handle_init();
       void handle_tick_start();
-      void notify(TREX::transaction::Observation const &obs);
+      void notify(TREX::transaction::token const &obs);
       bool synchronize();
-      void new_plan_token(goal_id const &t);
-      void cancelled_plan_token(goal_id const &t);
+      void new_plan_token(token_id const &t);
+      void cancelled_plan_token(token_id const &t);
       //End of Trex functions
 
       struct Connection {

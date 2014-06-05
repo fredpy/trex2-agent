@@ -35,8 +35,7 @@
 # define H_trex_transaction_private_internal_impl
 
 # include "../bits/transaction_fwd.hh"
-# include "../Observation.hh"
-# include "../Goal.hh"
+# include <trex/domain/token.hh>
 
 # include <boost/signals2/signal.hpp>
 
@@ -69,9 +68,9 @@ namespace TREX {
         
         boost::optional<TICK> synch_date() const;
         
-        Observation create_obs(utils::symbol const &pred);
+        token_id create_obs(utils::symbol const &pred);
         
-        void post_observation(Observation const &obs, bool echo=false);
+        void post_observation(token_id const &obs, bool echo=false);
         void synchronize(TICK date);
         
         void connect(SHARED_PTR<external_impl> client);
@@ -85,7 +84,7 @@ namespace TREX {
         
         // observations management
         void post_obs_sync(SHARED_PTR<node_impl> node,
-                           Observation obs, bool echo);
+                           token_id obs, bool echo);
         
         void connect_sync(SHARED_PTR<external_impl> client);
         void notify_sync(TICK date);
@@ -97,12 +96,11 @@ namespace TREX {
         transaction_flags    m_access;
         WEAK_PTR<node_impl>  m_owner;
         
-        boost::optional<Observation> m_last_obs, m_next_obs;
+        token_id m_last_obs, m_next_obs;
         TICK  m_last_synch, m_obs_date;
         bool  m_echo;
         
-        typedef boost::signals2::signal<void (TICK,
-                                              boost::optional<Observation>)> synch_event;
+        typedef boost::signals2::signal<void (TICK, token_id)> synch_event;
         
         synch_event m_synch;
         static utils::symbol const s_assert;

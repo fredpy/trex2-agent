@@ -14,8 +14,8 @@ namespace TREX {
 
     private:
       bool synchronize();
-      void handle_request(TREX::transaction::goal_id const &g);
-      void notify(TREX::transaction::Observation const &obs);
+      void handle_request(TREX::transaction::token_id const &g);
+      void notify(TREX::transaction::token const &obs);
 
       bool m_active;
       TREX::utils::symbol m_drifter;

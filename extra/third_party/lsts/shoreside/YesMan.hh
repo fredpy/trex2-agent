@@ -19,7 +19,7 @@ namespace TREX {
 			virtual ~YesMan();
 		private:
 		      bool synchronize();
-		      void handle_request(TREX::transaction::goal_id const &g);
+		      void handle_request(TREX::transaction::token_id const &g);
 		};
 	}
 }

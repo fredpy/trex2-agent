@@ -49,7 +49,7 @@ namespace TREX {
       TimelineHistory(REST_reactor &creator);
       ~TimelineHistory();
       
-      void new_obs(transaction::Observation const &obs,
+      void new_obs(transaction::token const &obs,
                    transaction::TICK cur);
       void update_tick(transaction::TICK cur);
       
@@ -64,11 +64,11 @@ namespace TREX {
                       size_t max);
       bool exists(std::string const &name);
       
-      boost::property_tree::ptree get_goal(transaction::goal_id g) const;
+      boost::property_tree::ptree get_goal(transaction::token_id g) const;
       boost::property_tree::ptree goals();
       
-      transaction::goal_id add_goal(std::string const &file);
-      transaction::goal_id get_goal(std::string const &id);
+      transaction::token_id add_goal(std::string const &file);
+      transaction::token_id get_goal(std::string const &id);
       bool                 delete_goal(std::string const &id);
       
       bool fancy() const {
@@ -79,7 +79,7 @@ namespace TREX {
       }
       
     private:
-      boost::property_tree::ptree get_token(transaction::goal_id const &tok) const;
+      boost::property_tree::ptree get_token(transaction::token_id const &tok) const;
       unsigned long long count_tokens(helpers::timeline_wrap const &tl,
                                       transaction::int_domain const &dom,
                                       transaction::TICK &delta_t);
@@ -87,7 +87,7 @@ namespace TREX {
       void declared(transaction::details::timeline const &timeline);
       
       // Bunch of internl calls that need to be thread protected
-      void add_obs_sync(transaction::goal_id tok,
+      void add_obs_sync(transaction::token_id tok,
                         transaction::TICK date);
       void ext_obs_sync(transaction::TICK date);
       void add_tl_sync(transaction::details::timeline const &tl);
@@ -99,9 +99,9 @@ namespace TREX {
             
       boost::property_tree::ptree goals_sync();
       
-      void add_goal_sync(transaction::goal_id g);
-      transaction::goal_id get_goal_sync(std::string id);
-      transaction::goal_id del_goal_sync(std::string id);
+      void add_goal_sync(transaction::token_id g);
+      transaction::token_id get_goal_sync(std::string id);
+      transaction::token_id del_goal_sync(std::string id);
       
       
       size_t list_tl_sync(std::ostream &out, std::set<std::string> const &select, bool hidden,
@@ -116,7 +116,7 @@ namespace TREX {
       helpers::db_manager          m_db;
       helpers::rest_tl_set         m_timelines;
       
-      typedef std::map<std::string, transaction::goal_id> goal_map;
+      typedef std::map<std::string, transaction::token_id> goal_map;
       goal_map m_goals;
     };
     

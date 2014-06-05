@@ -17,8 +17,8 @@ namespace TREX {
             private:
                 void handle_init();
                 bool synchronize();
-                void handle_request(TREX::transaction::goal_id const &g);
-                void handle_recall(TREX::transaction::goal_id const &g);
+                void handle_request(TREX::transaction::token_id const &g);
+                void handle_recall(TREX::transaction::token_id const &g);
 
                 /** @brief State of the timeline */
                 std::string location;
@@ -26,12 +26,12 @@ namespace TREX {
                 bool m_firstTick;
                 TREX::transaction::TICK m_nextTick;
 
-                void setValue(TREX::transaction::goal_id const &g);
+                void setValue(TREX::transaction::token_id const &g);
 
-                std::list<TREX::transaction::goal_id> m_pending;
-                UNIQ_PTR<TREX::transaction::Observation> m_navigator_state;
-                UNIQ_PTR<TREX::transaction::Observation> m_InstrumentLocation_state;
-                UNIQ_PTR<TREX::transaction::Observation> m_Instrument_state;
+                std::list<TREX::transaction::token_id> m_pending;
+                UNIQ_PTR<TREX::transaction::token> m_navigator_state;
+                UNIQ_PTR<TREX::transaction::token> m_InstrumentLocation_state;
+                UNIQ_PTR<TREX::transaction::token> m_Instrument_state;
 
                 /** Timeline Navigator */
                 static TREX::utils::symbol const navigatorObj;

@@ -15,7 +15,7 @@ using DUNE_NAMESPACES;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::factory::declare<PositionUpdater> decl("PositionUpdater");
+  reactor::declare<PositionUpdater> decl("PositionUpdater");
 }
 
 
@@ -30,7 +30,7 @@ namespace TREX {
     PositionUpdater::PositionUpdater(reactor::xml_arg_type arg) :
       LstsReactor(arg)
     {
-      m_bind_port = parse_attr<int>(-1, reactor::factory::node(arg),
+      m_bind_port = parse_attr<int>(-1, xml(arg),
                                     "bindport");
     }
 
@@ -71,7 +71,7 @@ namespace TREX {
 
       for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
       {
-        Observation obs = m_adapter.announceObservation(it->second);
+        token obs = m_adapter.announceObservation(it->second);
         postUniqueObservation(obs);
       }
       return true;

@@ -53,10 +53,10 @@ namespace TREX {
     public:
       YoYoReactor(reactor::xml_arg_type arg);
       EXEC_STATE state;
-      TREX::transaction::Observation m_lastRefState;
-      TREX::transaction::Observation m_lastControl;
-      TREX::transaction::Observation m_lastReference;
-      TREX::transaction::Observation m_lastPosition;
+      TREX::transaction::token m_lastRefState;
+      TREX::transaction::token m_lastControl;
+      TREX::transaction::token m_lastReference;
+      TREX::transaction::token m_lastPosition;
 
       double m_lat, m_lon, m_minz, m_maxz, m_speed, m_cmdz;
       int m_time_at_surface;
@@ -65,9 +65,9 @@ namespace TREX {
       void handle_init();
       void handle_tick_start();
       bool synchronize();
-      void handle_request(TREX::transaction::goal_id const &g);
-      void handle_recall(TREX::transaction::goal_id const &g);
-      void notify(TREX::transaction::Observation const &obs);
+      void handle_request(TREX::transaction::token_id const &g);
+      void handle_recall(TREX::transaction::token_id const &g);
+      void notify(TREX::transaction::token const &obs);
 
       void requestReference(double lat, double lon, double speed, double z);
 

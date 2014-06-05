@@ -46,7 +46,7 @@ namespace {
 
   singleton::use<log_manager> s_log;
 
-  reactor::factory::declare<EuropaReactor> decl("EuropaReactor");
+  reactor::declare<EuropaReactor> decl("EuropaReactor");
 
 }
 

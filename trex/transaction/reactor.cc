@@ -47,6 +47,9 @@
 
 #include <boost/scope_exit.hpp>
 
+#include "private/node_impl.hh"
+#include "private/graph_impl.hh"
+
 #include <bitset>
 
 using TREX::utils::symbol;
@@ -75,13 +78,13 @@ namespace TREX {
       void work(bool ret);
       void step();
       
-      void observation(Observation const &obs);
-      void request(goal_id const &goal);
-      void recall(goal_id const &goal);
+      void observation(token const &obs);
+      void request(token_id const &goal);
+      void recall(token_id const &goal);
       
       void comment(std::string const &msg);
-      void notify_plan(goal_id const &tok);
-      void cancel_plan(goal_id const &tok);
+      void notify_plan(token_id const &tok);
+      void cancel_plan(token_id const &tok);
       
     private:
       boost::asio::strand           m_strand;
@@ -109,8 +112,8 @@ namespace TREX {
       tick_phase m_phase;
       TICK m_current;
       
-      void obs(Observation o);
-      void goal_event(std::string tag, goal_id g, bool full);
+      void obs(token o);
+      void goal_event(std::string tag, token_id g, bool full);
       
       void post_event(boost::function<void ()> fn);
       void phase_event(boost::function<void ()> fn);
@@ -134,6 +137,16 @@ namespace TREX {
 using namespace TREX::transaction;
 
 /*
+ * TREX::transaction::instance_scope_exec
+ */
+
+// statics
+instance_scope_exec::exec_ref instance_scope_exec::init_exec(boost::asio::io_service &io) {
+  return MAKE_SHARED<utils::priority_strand>(boost::ref(io));
+}
+
+
+/*
  * class TREX::transaction::ReactorException
  */
 ReactorException::ReactorException(reactor const &r,
@@ -145,7 +158,7 @@ ReactorException::ReactorException(reactor const &r,
  * class TREX::transaction::DispatchError
  */
 // statics
-std::string DispatchError::build_msg(goal_id const &g, std::string const &msg) throw() {
+std::string DispatchError::build_msg(token_id const &g, std::string const &msg) throw() {
   std::ostringstream oss;
   oss<<"While dispatching ";
   if( !!g )
@@ -190,19 +203,19 @@ TREX::transaction::details::external::external(details::external_set::iterator c
 details::goal_queue::iterator details::external::lower_bound(int_domain const &dom) {
   details::goal_queue::iterator i = m_pos->second.begin();
 
-  for(; m_pos->second.end()!=i && cmp_goals(i->first->getStart(), dom); ++i);
+  for(; m_pos->second.end()!=i && cmp_goals(i->first->start(), dom); ++i);
   return i;
 }
 
 // modifiers
 
-bool details::external::post_goal(goal_id const &g) {
-  int_domain const &g_start(g->getStart());
+bool details::external::post_goal(token_id const &g) {
+  int_domain const &g_start(g->start());
   // locate goal position
   details::goal_queue::iterator i = lower_bound(g_start);
 
   // check that it is not already posted
-  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->getStart()); ++i)
+  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->start()); ++i)
     if( g==i->first )
       return false;
   // insert the new goal
@@ -219,10 +232,10 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
   details::goal_queue::iterator i=m_pos->second.begin();
   int_domain dispatch_w = m_pos->first.dispatch_window(current);
 
-  for( ; m_pos->second.end()!=i && i->first->startsBefore(dispatch_w.upper_bound());  ) {
-    bool future = i->first->startsAfter(current);
+  for( ; m_pos->second.end()!=i && i->first->starts_before(dispatch_w.upper_bound());  ) {
+    bool future = i->first->starts_after(current);
 
-    if( future || i->first->endsAfter(current+1) ) {
+    if( future || i->first->ends_after(current+1) ) {
       // Need to check for dispatching
         if( i->second && m_pos->first.accept_goals() ) {
           if( m_pos->first.client().is_verbose() )
@@ -264,11 +277,11 @@ void details::external::unblock() {
     i->second = true;
 }
 
-void details::external::recall(goal_id const &g) {
-  int_domain const &g_start(g->getStart());
+void details::external::recall(token_id const &g) {
+  int_domain const &g_start(g->start());
   // locate goal position
   details::goal_queue::iterator i = lower_bound(g_start);
-  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->getStart()); 
+  for( ; m_pos->second.end()!=i && !cmp_goals(g_start, i->first->start());
        ++i) {
     if( g==i->first ) {
       // was still pending => just remove it
@@ -310,34 +323,40 @@ Relation const &details::external::dereference() const {
 utils::symbol const reactor::obs("ASSERT");
 utils::symbol const reactor::plan("PLAN");
 
-
 // structors
 
 reactor::reactor(reactor::xml_arg_type &arg, bool loadTL, bool log_default)
-  :m_inited(false), m_firstTick(true), m_graph(*(arg.second)),
-   m_have_goals(0),
-   m_verbose(utils::parse_attr<bool>(arg.second->is_verbose(),
-                                     factory::node(arg), "verbose")),
-   m_trLog(NULL),
-   m_name(utils::parse_attr<symbol>(factory::node(arg), "name")),
-   m_latency(utils::parse_attr<TICK>(factory::node(arg), "latency")),
-   m_maxDelay(0),
-   m_lookahead(utils::parse_attr<TICK>(factory::node(arg), "lookahead")),
-   m_nSteps(0), m_past_deadline(false), m_validSteps(0),
-   m_stat_log(m_log->service()) {
-  boost::property_tree::ptree::value_type &node(factory::node(arg));
-
+:m_exec(arg.get<2>()), m_inited(false), m_firstTick(true),
+m_graph(*reactor::arg_graph(arg)), m_have_goals(0),
+m_verbose(utils::parse_attr<bool>(reactor::arg_graph(arg)->is_verbose(),
+                                  reactor::xml(arg), "verbose")),
+m_trLog(NULL),
+m_latency(utils::parse_attr<TICK>(reactor::xml(arg), "latency")),
+m_maxDelay(0),
+m_lookahead(utils::parse_attr<TICK>(reactor::xml(arg), "lookahead")),
+m_nSteps(0), m_past_deadline(false), m_validSteps(0),
+m_stat_log(m_log->service()) {
+  boost::property_tree::ptree::value_type &node(reactor::xml(arg));
+  utils::symbol name_str = utils::parse_attr<utils::symbol>(node, "name");
+     
+  m_impl = get_graph().m_impl->add_node(name_str).lock();
+  
   utils::log_manager::path_type fname = file_name("stat.csv");
+  
   m_stat_log.open(fname.c_str());
   m_stat_log<<"tick, tick_ns, tick_rt_ns, synch_ns, synch_rt_ns, delib_ns, delib_rt_ns, n_steps\n";
-     
+  
   if( utils::parse_attr<bool>(log_default, node, "log") ) {
-    std::string base = name().str()+".tr.log";
-    fname = manager().log_file(base);
+    std::string log_base = name().str()+".tr.log";
+    
+    fname = manager().log_file(log_base);
     m_trLog = new logger(fname.string(), manager().service());
+    
     utils::log_manager::path_type cfg = manager().log_file("cfg"),
-      pwd = boost::filesystem::current_path(), 
-      short_name(base), location("../"+base);
+    pwd = boost::filesystem::current_path(),
+    short_name(log_base), location("../"+log_base);
+    
+    // This change of directory is bad ...
     boost::filesystem::current_path(cfg);
     try {
       create_symlink(location, short_name);
@@ -345,12 +364,11 @@ reactor::reactor(reactor::xml_arg_type &arg, bool loadTL, bool log_default)
     boost::filesystem::current_path(pwd);
     syslog(info)<<"Transactions logged to "<<fname;
   }
-
+  
   if( loadTL ) {
     utils::symbol tl_name;
     // Add external file content
     utils::ext_xml(node.second, "config");
-
     for(boost::property_tree::ptree::iterator i=node.second.begin();
         node.second.end()!=i; ++i) {
       if( utils::is_tag(*i, "External") ) {
@@ -369,15 +387,19 @@ reactor::reactor(reactor::xml_arg_type &arg, bool loadTL, bool log_default)
   }
 }
 
-reactor::reactor(graph *owner, symbol const &name_str,
+reactor::reactor(graph *owner, exec_type exec, symbol const &name_str,
                  TICK lat, TICK lookahead, bool log)
-  :m_inited(false), m_firstTick(true), m_graph(*owner),
+  :m_exec(exec), m_inited(false), m_firstTick(true), m_graph(*owner),
    m_have_goals(0),
-   m_verbose(owner->is_verbose()), m_trLog(NULL), m_name(name_str),
+   m_verbose(owner->is_verbose()), m_trLog(NULL),
    m_latency(lat), m_maxDelay(0), m_lookahead(lookahead),
    m_nSteps(0), m_stat_log(m_log->service()) {
+  m_impl = get_graph().m_impl->add_node(name_str).lock();
+
+     
   utils::log_manager::path_type fname = file_name("stat.csv");
   m_stat_log.open(fname.string());
+  
      
   if( log ) {
     fname = manager().log_file(name().str()+".tr.log");
@@ -402,6 +424,20 @@ reactor::~reactor() {
 }
 
 // observers
+
+utils::symbol const &reactor::name() const {
+  return m_impl->name();
+}
+
+utils::log_manager &reactor::manager() const {
+  return m_impl->manager();
+}
+
+utils::log::stream reactor::syslog(utils::log::id_type const &ctx,
+                                   utils::log::id_type const &kind) const {
+  return m_impl->syslog(ctx, kind);
+}
+
 
 reactor::size_type reactor::count_internal_relations() const {
   size_type result(0);
@@ -457,7 +493,7 @@ bool reactor::have_goals() {
   return 0 < *m_have_goals;
 }
 
-void reactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
+void reactor::goal_flush(std::list<token_id> &a, std::list<token_id> &dest) {
   {
     utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals -= a.size();
@@ -466,7 +502,7 @@ void reactor::goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest) {
 }
 
 
-void reactor::queue(std::list<goal_id> &l, goal_id g) {
+void reactor::queue(std::list<token_id> &l, token_id g) {
   {
     utils::shared_var<size_t>::scoped_lock lock(m_have_goals);
     *m_have_goals += 1;
@@ -475,29 +511,29 @@ void reactor::queue(std::list<goal_id> &l, goal_id g) {
 }
 
 
-void reactor::queue_goal(goal_id g) {
+void reactor::queue_goal(token_id g) {
   m_graph.strand().dispatch(boost::bind(&reactor::queue, this,
                                         boost::ref(m_sync_goals), g));
 }
 
-void reactor::queue_recall(goal_id g) {
+void reactor::queue_recall(token_id g) {
   m_graph.strand().dispatch(boost::bind(&reactor::queue, this,
                                         boost::ref(m_sync_recalls), g));
 }
 
-void reactor::queue_token(goal_id g) {
+void reactor::queue_token(token_id g) {
   m_graph.strand().dispatch(boost::bind(&reactor::queue, this,
                                         boost::ref(m_sync_toks), g));
 }
 
-void reactor::queue_cancel(goal_id g) {
+void reactor::queue_cancel(token_id g) {
   m_graph.strand().dispatch(boost::bind(&reactor::queue, this,
                                         boost::ref(m_sync_cancels), g));
 }
 
 
 double reactor::work_ratio() {
-  std::list<goal_id> tmp;
+  std::list<token_id> tmp;
 
   if( have_goals() ) {
     // Start to flush goals
@@ -597,25 +633,27 @@ double reactor::work_ratio() {
   return NAN;
 }
 
-void reactor::observation_sync(Observation o, bool verbose) {
-  internal_set::iterator i = m_internals.find(o.object());
+void reactor::observation_sync(token_id o, bool verbose) {
+  internal_set::iterator i = m_internals.find(o->object());
   
   if( m_internals.end()==i )
     throw boost::enable_current_exception(SynchronizationError(*this, "attempted to post observation on "+
-                               o.object().str()+" which is not Internal."));
+                               o->object().str()+" which is not Internal."));
   
   (*i)->postObservation(o, verbose);
   m_updates.insert(*i);
 }
 
-void reactor::post_observation(Observation const &obs, bool verbose) {
+void reactor::post_observation(token const &obs, bool verbose) {
+  token_id tmp = MAKE_SHARED<token>(boost::ref(obs));
+  
   boost::function<void ()> fn(boost::bind(&reactor::observation_sync,
-                                          this, obs, verbose));
+                                          this, tmp, verbose));
   // m_graph.strand().dispatch(fn);
   utils::strand_run(m_graph.strand(), fn);
 }
 
-bool reactor::goal_sync(goal_id g) {
+bool reactor::goal_sync(token_id g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
   if( tl.valid() ) {
     if( NULL!=m_trLog )
@@ -626,7 +664,7 @@ bool reactor::goal_sync(goal_id g) {
 }
 
 
-bool reactor::post_goal(goal_id const &g) {
+bool reactor::post_goal(token_id const &g) {
   if( !g )
     throw DispatchError(*this, g, "Invalid goal Id");
 
@@ -635,22 +673,22 @@ bool reactor::post_goal(goal_id const &g) {
   return utils::strand_run(m_graph.strand(), fn);
 }
 
-goal_id reactor::post_goal(Goal const &g) {
-  goal_id tmp(new Goal(g));
+token_id reactor::post_goal(token const &g) {
+  token_id tmp = MAKE_SHARED<token>(g);
 
   if( post_goal(tmp) )
     return tmp;
   else {
     // should never happen !?
-    return goal_id();
+    return token_id();
   }
 }
 
-goal_id reactor::parse_goal(boost::property_tree::ptree::value_type const &g) {
+token_id reactor::parse_goal(boost::property_tree::ptree::value_type const &g) {
   return get_graph().parse_goal(g);
 }
 
-bool reactor::recall_sync(goal_id g) {
+bool reactor::recall_sync(token_id g) {
   details::external tl(m_externals.find(g->object()), m_externals.end());
   
   if( tl.valid() ) {
@@ -663,7 +701,7 @@ bool reactor::recall_sync(goal_id g) {
 }
 
 
-bool reactor::post_recall(goal_id const &g) {
+bool reactor::post_recall(token_id const &g) {
   if( !g )
     return false;
   boost::function<bool ()> fn(boost::bind(&reactor::recall_sync,
@@ -671,13 +709,13 @@ bool reactor::post_recall(goal_id const &g) {
   return utils::strand_run(m_graph.strand(), fn);
 }
 
-bool reactor::plan_sync(goal_id t) {
+bool reactor::plan_sync(token_id t) {
   
   // Look for the internal timeline
   internal_set::const_iterator tl = m_internals.find(t->object());
   if( m_internals.end()==tl )
     throw boost::enable_current_exception(DispatchError(*this, t, "plan tokens can only be posted on Internal timelines."));
-  else if( t->getEnd().upper_bound() > current_tick() ) {
+  else if( t->end().upper_bound() > current_tick() ) {
     if( NULL!=m_trLog )
       m_trLog->notify_plan(t);
     return (*tl)->notifyPlan(t);
@@ -685,7 +723,7 @@ bool reactor::plan_sync(goal_id t) {
   return false;
 }
 
-void reactor::cancel_sync(goal_id tok) {
+void reactor::cancel_sync(token_id tok) {
   internal_set::const_iterator tl = m_internals.find(tok->object());
   if( m_internals.end()!=tl ) {
     // do something
@@ -696,7 +734,7 @@ void reactor::cancel_sync(goal_id tok) {
   } 
 }
 
-bool reactor::post_plan_token(goal_id const &t) {
+bool reactor::post_plan_token(token_id const &t) {
   if( !t )
     throw DispatchError(*this, t, "Invalid token id");
   
@@ -705,16 +743,16 @@ bool reactor::post_plan_token(goal_id const &t) {
   return utils::strand_run(m_graph.strand(), fn);
 }
 
-goal_id reactor::post_plan_token(Goal const &g) {
-  goal_id tmp(new Goal(g));
+token_id reactor::post_plan_token(token const &g) {
+  token_id tmp = MAKE_SHARED<token>(g);
   
   if( post_plan_token(tmp) )
     return tmp;
   else 
-    return goal_id();
+    return token_id();
 }
 
-void reactor::cancel_plan_token(goal_id const &g) {
+void reactor::cancel_plan_token(token_id const &g) {
   if( g ) {
     boost::function<void ()> fn(boost::bind(&reactor::cancel_sync,
                                             this, g));
@@ -832,7 +870,7 @@ bool reactor::new_tick() {
   return false;
 }
 
-void reactor::collect_obs_sync(std::list<Observation> &l) {
+void reactor::collect_obs_sync(std::list<token_id> &l) {
   for(external_set::iterator i = m_externals.begin();
       m_externals.end()!=i; ++i) {
     // syslog(info)<<"Checking for new observation on "<<i->first.name();
@@ -847,13 +885,13 @@ void reactor::collect_obs_sync(std::list<Observation> &l) {
 
 
 void reactor::do_notify() {
-  std::list<Observation> obs;
+  std::list<token_id> obs;
   boost::function<void ()> fn(boost::bind(&reactor::collect_obs_sync,
                                           this, boost::ref(obs)));
   utils::strand_run(m_graph.strand(), fn);
-  for(std::list<Observation>::const_iterator i=obs.begin(); obs.end()!=i; ++i) {
+  for(std::list<token_id>::const_iterator i=obs.begin(); obs.end()!=i; ++i) {
     // syslog("NOTIFY")<<(*i);
-    notify(*i);
+    notify(**i);
   }
 }
 
@@ -891,7 +929,7 @@ bool reactor::do_synchronize() {
                                                 *i, now));
         utils::strand_run(m_graph.strand(), fn);
 
-        Observation const &observ = (*i)->lastObservation(echo);
+        token const &observ = *((*i)->lastObservation(echo));
         
         // if( echo || is_verbose() || NULL==m_trLog )
         //   syslog(obs)<<observ;
@@ -1241,36 +1279,36 @@ void reactor::logger::unuse(symbol const &name) {
                          this, oss.str(), true));
 }
 
-void reactor::logger::observation(Observation const &o) {
+void reactor::logger::observation(token const &o) {
   post_event(boost::bind(&logger::obs, this, o));
 }
 
-void reactor::logger::request(goal_id const &goal) {
+void reactor::logger::request(token_id const &goal) {
   post_event(boost::bind(&logger::goal_event, this, "request", goal, true));
 }
 
-void reactor::logger::recall(goal_id const &goal) {
+void reactor::logger::recall(token_id const &goal) {
   post_event(boost::bind(&logger::goal_event, this, "recall", goal, false));
 }
 
-void reactor::logger::notify_plan(goal_id const &tok) {
+void reactor::logger::notify_plan(token_id const &tok) {
   post_event(boost::bind(&logger::goal_event, this, "token", tok, true));
 }
 
-void reactor::logger::cancel_plan(goal_id const &tok) {
+void reactor::logger::cancel_plan(token_id const &tok) {
   post_event(boost::bind(&logger::goal_event, this, "cancel", tok, false));
 }
 
 
 // asio methods
 
-void reactor::logger::obs(Observation o) {
+void reactor::logger::obs(token o) {
   utils::async_ofstream::entry e = m_file.new_entry();
   o.to_xml(e.stream())<<'\n';
 }
 
 
-void reactor::logger::goal_event(std::string tag, goal_id g, bool full) {
+void reactor::logger::goal_event(std::string tag, token_id g, bool full) {
   m_file<<"   <"<<tag<<" id=\""<<g<<"\" ";
   if( full )
     g->to_xml(m_file<<">\n")<<"\n   </"<<tag<<">\n";

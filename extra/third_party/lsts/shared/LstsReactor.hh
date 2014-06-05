@@ -22,10 +22,10 @@ namespace TREX
     public:
       LstsReactor(reactor::xml_arg_type arg);
       virtual ~LstsReactor();
-      bool isObservationNew(TREX::transaction::Observation obs);
-      bool postUniqueObservation(TREX::transaction::Observation obs);
+      bool isObservationNew(TREX::transaction::token obs);
+      bool postUniqueObservation(TREX::transaction::token obs);
     private:
-      typedef std::map<std::string, SHARED_PTR<TREX::transaction::Observation> > obs_map;
+      typedef std::map<std::string, SHARED_PTR<TREX::transaction::token> > obs_map;
       obs_map postedObservations;
     };
 

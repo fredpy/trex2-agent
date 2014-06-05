@@ -29,7 +29,7 @@ namespace TREX {
 
     private:
       TREX::utils::singleton::use<SharedEnvironment> m_env;
-      void notify(TREX::transaction::Observation const &obs);
+      void notify(TREX::transaction::token const &obs);
       bool synchronize() {return true;}
     };
   }

@@ -265,11 +265,12 @@ namespace TREX {
        * values that are shared by this domain and @e other.
        *
        * @pre this domain intersect @e other
-       * @return this domain after the operation
+       * @retval true if the domain changed
+       * @retval false otherwise
        * @throw EmptyDomain resulting domain is empty
        * @sa bool intersect(DomainBase const &) const
        */
-      virtual abstract_domain &restrict_with(abstract_domain const &other) =0;
+      virtual bool restrict_with(abstract_domain const &other) =0;
       /** @brief Restrict domain possible values
        * @param other Another domain
        *
@@ -282,7 +283,8 @@ namespace TREX {
        * @sa bool intersect(DomainBase const &) const
        */
       abstract_domain &operator*=(abstract_domain const &other) {
-	return restrict_with(other);
+	restrict_with(other);
+        return *this;
       }
 
       /** @brief check for full domain

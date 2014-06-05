@@ -67,10 +67,10 @@ bool Scientist::synchronize() {
 
     if(current_tick()==100)
     {
-        Goal goal(auv,Sample);
+        token goal(auv,Sample);
         transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
-        goal.restrictAttribute(temp);
-        goal.restrictEnd(TREX::transaction::int_domain(current_tick()+1, Horizon));
+        goal.restrict_attribute(temp);
+        goal.restrict_end(TREX::transaction::int_domain(current_tick()+1, Horizon));
         post_goal(goal);
     }
     return true;

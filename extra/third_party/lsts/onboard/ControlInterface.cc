@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief GoalPipe reactor declaration */
-  reactor::factory::declare<ControlInterface> decl("GoalPipe");
+  reactor::declare<ControlInterface> decl("GoalPipe");
 
 }
 
@@ -56,7 +56,7 @@ shared_var<size_t> ControlInterface::s_id;
 ControlInterface::ControlInterface(reactor::xml_arg_type arg)
 :reactor(arg, false), m_running(false),
  m_need_fifo(utils::parse_attr<bool>(false, 
-				     reactor::factory::node(arg),
+				     xml(arg),
 				     "local_queue")),
  m_fifo(0) {
   //use("estimator", true, true);
@@ -96,7 +96,8 @@ bool ControlInterface::is_open() const {
 
 // manipulators
 
-void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> const &id) {
+void ControlInterface::add_goal(token_id const &g,
+                                boost::optional<std::string> const &id) {
   {
     scoped_lock cs(m_mutex);
     m_pending_goals.insert(g);
@@ -120,7 +121,7 @@ void ControlInterface::add_recall(std::string const &id) {
   scoped_lock cs(m_mutex);
   goal_map::left_iterator i = m_goals.left.find(id);
   if( m_goals.left.end()!=i ) {
-    goal_id g = i->second;
+    token_id g = i->second;
     m_goals.left.erase(i);
     if( 0==m_pending_goals.erase(g) )
       m_pending_recalls.insert(g);
@@ -128,9 +129,9 @@ void ControlInterface::add_recall(std::string const &id) {
     syslog(log::warn)<<"No goal to recall with id \""<<id<<'\"';
 }
 
-bool ControlInterface::next(std::set<goal_id> &l, goal_id &g) {
+bool ControlInterface::next(std::set<token_id> &l, token_id &g) {
   scoped_lock cs(m_mutex);
-  std::set<goal_id>::iterator i=l.begin();
+  std::set<token_id>::iterator i=l.begin();
   if( l.end()==i )
     return false;
   else {
@@ -268,7 +269,7 @@ void ControlInterface::proccess_message(std::string const &msg) {
   boost::tie(i,last) = xml_tree.equal_range("Goal");
   for( ; last!=i; ++i) {
     try {
-      goal_id tmp = parse_goal(*i);
+      token_id tmp = parse_goal(*i);
       add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
       had_cmd = true;
     } catch(TREX::utils::Exception const &e) {
@@ -307,7 +308,7 @@ void ControlInterface::handle_init() {
 }
 
 void ControlInterface::handle_tick_start() {
-  goal_id g;
+  token_id g;
 
   // get pending recalls
   while( next(m_pending_recalls, g) ) {
@@ -327,7 +328,7 @@ void ControlInterface::handle_tick_start() {
   }
 }
 
-void ControlInterface::notify(TREX::transaction::Observation const &obs)
+void ControlInterface::notify(TREX::transaction::token const &obs)
 {
   if (obs.predicate() == "Failed")
   {
@@ -344,7 +345,7 @@ bool ControlInterface::synchronize() {
 
 
 
-void ControlInterface::new_plan_token(TREX::transaction::goal_id const &t)
+void ControlInterface::new_plan_token(TREX::transaction::token_id const &t)
 {
   syslog(log::info) << "new plan token: " << *t;
 
@@ -357,7 +358,7 @@ void ControlInterface::new_plan_token(TREX::transaction::goal_id const &t)
   }
 }
 
-void ControlInterface::cancelled_plan_token(TREX::transaction::goal_id const &t)
+void ControlInterface::cancelled_plan_token(TREX::transaction::token_id const &t)
 {
   syslog(log::info) << "token has been canceled: " << *t;
 

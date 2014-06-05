@@ -72,20 +72,20 @@ namespace {
 
 EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
   :reactor(arg, false),
-   Assembly(parse_attr<std::string>(factory::node(arg), "name"),
-            parse_attr<size_t>(0, factory::node(arg), "maxSteps"),
-            parse_attr<size_t>(0, factory::node(arg), "maxDepth")),
+   Assembly(parse_attr<std::string>(xml(arg), "name"),
+            parse_attr<size_t>(0, xml(arg), "maxSteps"),
+            parse_attr<size_t>(0, xml(arg), "maxDepth")),
    m_completed_this_tick(false),
    m_stats(manager().service()),
-   m_old_plan_style(parse_attr<bool>(true, factory::node(arg),
+   m_old_plan_style(parse_attr<bool>(true, xml(arg),
                                   "relation_gv")),
-   m_full_log(parse_attr<bool>(false, factory::node(arg),
+   m_full_log(parse_attr<bool>(false, xml(arg),
 			       "all_plans")) {
   bool found;
   std::string nddl;
 
 
-  boost::property_tree::ptree::value_type &cfg = factory::node(arg);
+  boost::property_tree::ptree::value_type &cfg = xml(arg);
   boost::optional<std::string>
     model = parse_attr< boost::optional<std::string> >(cfg, "model");
 
@@ -217,7 +217,7 @@ EuropaReactor::~EuropaReactor() {
 
 //  - TREX transaction callback
 
-void EuropaReactor::notify(Observation const &obs) {
+void EuropaReactor::notify(token const &obs) {
   setStream();
 
   //syslog(null, info)<<"Integrating observation "<<obs;
@@ -237,7 +237,7 @@ void EuropaReactor::notify(Observation const &obs) {
   // logPlan("notify");
 }
 
-void EuropaReactor::handle_request(goal_id const &request) {
+void EuropaReactor::handle_request(token_id const &request) {
   setStream();
 
   EUROPA::ObjectId obj = plan_db()->getObject(request->object().str());
@@ -272,7 +272,7 @@ void EuropaReactor::handle_request(goal_id const &request) {
   // logPlan("request");
 }
 
-void EuropaReactor::handle_recall(goal_id const &request) {
+void EuropaReactor::handle_recall(token_id const &request) {
   setStream();
   // Remove the goal if it exists
   goal_map::right_iterator i = m_active_requests.right.find(request);
@@ -295,13 +295,13 @@ void EuropaReactor::handle_recall(goal_id const &request) {
   // logPlan("recall");
 }
 
-void EuropaReactor::new_plan_token(goal_id const &t) {
+void EuropaReactor::new_plan_token(token_id const &t) {
   syslog(info)<<"Receive token ["<<t<<"] on timeline "<<t->object();
   // treat it as a request for now
   handle_request(t);
 }
 
-void EuropaReactor::cancelled_plan_token(goal_id const &t) {
+void EuropaReactor::cancelled_plan_token(token_id const &t) {
   syslog(info)<<"Receive cancel for token ["<<t<<"]";
   // treat it as a recall for now
   handle_recall(t);
@@ -334,7 +334,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
                              EUROPA::TokenId const &tok) {
   if( m_dispatched.left.find(tok->getKey())==m_dispatched.left.end() ) {
     TREX::utils::symbol name(tl->getName().toString());
-    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
+    token my_goal(name, tok->getUnqualifiedPredicateName().toString());
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
 
     // Get start, duration and end
@@ -343,7 +343,7 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
 
-    my_goal.restrictTime(*dynamic_cast<int_domain *>(d_start.get()),
+    my_goal.restrict_time(*dynamic_cast<int_domain *>(d_start.get()),
                          *dynamic_cast<int_domain *>(d_duration.get()),
                          *dynamic_cast<int_domain *>(d_end.get()));
 
@@ -355,10 +355,10 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
 						implicit_var) ) {
 	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
 	var attr((*a)->getName().toString(), *dom);
-	my_goal.restrictAttribute(attr);
+	my_goal.restrict_attribute(attr);
       }
     }
-    goal_id request = post_goal(my_goal);
+    token_id request = post_goal(my_goal);
     syslog(info)<<"Request ["<<request<<"] created from europa token "
 		<<tok->getKey();
     if( request ) {
@@ -376,10 +376,10 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
 {
   if( m_plan_tokens.left.find(tok->getKey()) == m_plan_tokens.left.end() ) {
     TREX::utils::symbol name(tl->getName().toString());
-    Goal my_goal(name, tok->getUnqualifiedPredicateName().toString());
+    token my_goal(name, tok->getUnqualifiedPredicateName().toString());
     restrict_goal(my_goal, tok);
 
-    goal_id request = post_plan_token(my_goal);
+    token_id request = post_plan_token(my_goal);
     if( request ) {
       m_plan_tokens.insert(goal_map::value_type(tok->getKey(), request));
       setStream();
@@ -390,7 +390,7 @@ void EuropaReactor::plan_dispatch(EUROPA::TimelineId const &tl, EUROPA::TokenId 
   }
 }
 
-void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
+void EuropaReactor::restrict_goal(token& goal, EUROPA::TokenId const &tok)
 {
     std::vector<EUROPA::ConstrainedVariableId> const &attrs = tok->parameters();
     UNIQ_PTR<abstract_domain>
@@ -398,7 +398,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
         d_duration(details::trex_domain(tok->duration()->lastDomain())),
         d_end(details::trex_domain(tok->end()->lastDomain()));
 
-    goal.restrictTime(*dynamic_cast<int_domain *>(d_start.get()),
+    goal.restrict_time(*dynamic_cast<int_domain *>(d_start.get()),
                        *dynamic_cast<int_domain *>(d_duration.get()),
                        *dynamic_cast<int_domain *>(d_end.get()));
 
@@ -410,7 +410,7 @@ void EuropaReactor::restrict_goal(Goal& goal, EUROPA::TokenId const &tok)
 						implicit_var)) {
 	UNIQ_PTR<abstract_domain> dom(details::trex_domain((*a)->lastDomain()));
 	var attr((*a)->getName().toString(), *dom);
-	goal.restrictAttribute(attr);
+	goal.restrict_attribute(attr);
       }
     }
 }
@@ -698,8 +698,8 @@ void EuropaReactor::resume() {
 
 void EuropaReactor::notify(EUROPA::LabelStr const &object,
 			   EUROPA::TokenId const &tok) {
-  Observation obs(object.c_str(),
-		  tok->getUnqualifiedPredicateName().toString());
+  token obs(object.c_str(),
+            tok->getUnqualifiedPredicateName().toString());
 
   std::vector<EUROPA::ConstrainedVariableId> const &attr = tok->parameters();
 
@@ -711,7 +711,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
       UNIQ_PTR<TREX::transaction::abstract_domain>
 	dom(details::trex_domain((*a)->lastDomain()));
       TREX::transaction::var v((*a)->getName().toString(), *dom);
-      obs.restrictAttribute(v);
+      obs.restrict_attribute(v);
     }
   }
   post_observation(obs);
@@ -721,10 +721,10 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
 // manipulators
 
 bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
-				   Predicate const &pred) {
+				   token const &pred) {
   bool no_empty = true;
   std::list<symbol> attrs;
-  pred.listAttributes(attrs, false);
+  pred.list_attributes(attrs, false);
 
   for(std::list<symbol>::const_iterator v=attrs.begin(); attrs.end()!=v; ++v) {
     EUROPA::ConstrainedVariableId param = tok->getVariable(v->str());

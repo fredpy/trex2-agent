@@ -42,7 +42,7 @@ namespace {
   using TREX::transaction::reactor;
 
   singleton::use<log_manager> s_log;
-  reactor::factory::declare<REST_reactor> decl("REST_api");
+  reactor::declare<REST_reactor> decl("REST_api");
 }
 
 namespace TREX {

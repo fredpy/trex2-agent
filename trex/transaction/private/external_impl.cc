@@ -87,8 +87,7 @@ bool details::external_impl::publish_plan() const {
   return false;
 }
 
-void details::external_impl::on_synch(TICK date,
-                                      boost::optional<Observation> o) {
+void details::external_impl::on_synch(TICK date, token_id o) {
   SHARED_PTR<node_impl> node = m_client.lock();
   if( node )
     node->notify(date, name(), o);

@@ -245,7 +245,7 @@ void goal_service::handleRequest(rest_request const &req,
       std::ofstream tmp(file.c_str());
       tmp<<req.request().in().rdbuf();
     }
-    TREX::transaction::goal_id g = ptr->add_goal(file);
+    TREX::transaction::token_id g = ptr->add_goal(file);
     ans.setMimeType("application/json");
     utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else if( "DELETE"==kind ) {
@@ -254,7 +254,7 @@ void goal_service::handleRequest(rest_request const &req,
     data<<"{ \"id\": \""<<id<<"\",\n"
       <<"  \"deleted\": \""<<ptr->delete_goal(id)<<"\"\n}";
   } else if( "GET"==kind ) {
-    TREX::transaction::goal_id g = ptr->get_goal(req.arg_path().dump());
+    TREX::transaction::token_id g = ptr->get_goal(req.arg_path().dump());
     ans.setMimeType("application/json");
     utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else

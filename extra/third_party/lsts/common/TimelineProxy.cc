@@ -16,28 +16,28 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::factory::declare<TimelineProxy> decl("TimelineProxy");
+  reactor::declare<TimelineProxy> decl("TimelineProxy");
 
 }
 
 TimelineProxy::TimelineProxy(reactor::xml_arg_type arg)
 :reactor(arg)
 {
-  m_destport = parse_attr<int>(6001, reactor::factory::node(arg),
+  m_destport = parse_attr<int>(6001, xml(arg),
                                "destport");
   m_destaddr = parse_attr<std::string>("127.0.0.1",
-                                       reactor::factory::node(arg),
+                                       xml(arg),
                                        "destaddr");
-  m_localport = parse_attr<int>(6006, reactor::factory::node(arg),
+  m_localport = parse_attr<int>(6006, xml(arg),
                                 "localport");
 
-  m_goalProxy = parse_attr<bool>(true, reactor::factory::node(arg),
+  m_goalProxy = parse_attr<bool>(true, xml(arg),
                                  "goal_forwarding");
 
-  m_timeline = parse_attr<std::string>("", reactor::factory::node(arg),
+  m_timeline = parse_attr<std::string>("", xml(arg),
                                        "timeline");
 
-  m_useIridium = parse_attr<bool>(false, reactor::factory::node(arg),
+  m_useIridium = parse_attr<bool>(false, xml(arg),
                                         "iridium");
 }
 
@@ -74,7 +74,7 @@ TimelineProxy::handle_init()
 }
 
 void
-TimelineProxy::handle_request(goal_id const &g)
+TimelineProxy::handle_request(token_id const &g)
 {
 
   syslog(log::info) << "handleRequest(" << g <<")";
@@ -105,7 +105,7 @@ TimelineProxy::handle_request(goal_id const &g)
 }
 
 void
-TimelineProxy::notify(Observation const &obs)
+TimelineProxy::notify(token const &obs)
 {
   if (m_goalProxy)
   {
@@ -121,7 +121,7 @@ TimelineProxy::notify(Observation const &obs)
   TrexOperation op;
   TrexToken tok;
 
-  m_adapter.asImcMessage(Observation(obs), &tok);
+  m_adapter.asImcMessage(token(obs), &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_TOKEN;
 
@@ -161,8 +161,9 @@ TimelineProxy::synchronize()
         break;
         case (TrexOperation::OP_POST_GOAL):
             {
-          goal_id gid = post_goal(m_adapter.genericGoal(top->token.get()));
-          m_goals[top->goal_id] = gid;
+              token_id gid = m_adapter.genericGoal(top->token.get());
+              if( post_goal(gid) )
+                m_goals[top->goal_id] = gid;
             }
         break;
         case (TrexOperation::OP_RECALL_GOAL):

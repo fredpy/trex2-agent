@@ -87,10 +87,11 @@ bool details::EuropaDomain::is_full() const {
 
 bool details::EuropaDomain::intersect(abstract_domain const &other) const {
   try {  // this try/catch is not very efficient ... should find a way to avoid this
-    europa_domain visit(europaDomain().getDataType());
+    bool updated;
+    europa_domain visit(europaDomain().getDataType(), updated);
     other.accept(visit);
     
-    return europaDomain().intersects(visit.domain());
+    return updated && europaDomain().intersects(visit.domain());
   } catch(...) {
     return false;
   }
@@ -98,7 +99,8 @@ bool details::EuropaDomain::intersect(abstract_domain const &other) const {
 
 bool details::EuropaDomain::equals(abstract_domain const &other) const {
   try { // this try/catch is not very efficient ... should find a way to avoid this
-    europa_domain visit(europaDomain().getDataType());
+    bool ignore;
+    europa_domain visit(europaDomain().getDataType(), ignore);
     other.accept(visit);
     
     return europaDomain()==visit.domain();
@@ -150,10 +152,11 @@ std::ostream &details::EuropaDomain::print_domain(std::ostream &out) const {
 
 // modifiers 
 
-tr::abstract_domain &details::EuropaDomain::restrict_with(tr::abstract_domain const &other) {
-  europa_domain visit(m_dom);
+bool details::EuropaDomain::restrict_with(tr::abstract_domain const &other) {
+  bool updated = false;
+  europa_domain visit(m_dom, updated);
   other.accept(visit);
-  return *this;
+  return updated;
 }
 
 

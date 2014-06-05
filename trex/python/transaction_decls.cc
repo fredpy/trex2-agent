@@ -56,7 +56,7 @@ namespace {
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.toXml(oss);
+    dom.to_xml(oss);
     return oss.str();
   }
 
@@ -75,7 +75,7 @@ namespace {
   template<class Obj>
   std::string json_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.toJSON(oss);
+    dom.to_json(oss);
     return oss.str();
   }
   /** @brief Print A domain value
@@ -103,8 +103,8 @@ namespace {
    *
    * @return A predicate correspinding to the description in @p pred
    */
-  SHARED_PTR<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::singleton::use<Predicate::xml_factory> fact;
+  token_id pred_factory(boost::property_tree::ptree::value_type &decl) {
+    TREX::utils::singleton::use<token::factory> fact;
     return fact->produce(decl);
   }
 }
@@ -127,8 +127,8 @@ void export_transactions() {
   bp::scope my_scope = module;
   // from now on everything is under trex.transaction
   
-  void (Predicate::* attr_1)(var const &) = &Predicate::restrictAttribute;
-  void (Predicate::* attr_2)(symbol const &, abstract_domain const &) = &Predicate::restrictAttribute;
+  void (token::* attr_1)(var const &) = &token::restrict_attribute;
+  void (token::* attr_2)(symbol const &, abstract_domain const &) = &token::restrict_attribute;
   
   /*
    * class predicate:
@@ -141,40 +141,19 @@ void export_transactions() {
    *    - restrict(self, var)
    *    - restrict(self, name, domain)
    */
-  bp::class_<Predicate, boost::shared_ptr<Predicate>, boost::noncopyable>
-  ("predicate", "trex timeline predicate", bp::no_init)
-  .add_property("object", bp::make_function(&Predicate::object, bp::return_internal_reference<>()))
-  .add_property("name", bp::make_function(&Predicate::predicate, bp::return_internal_reference<>()))
-  .def("has_attribute", &Predicate::hasAttribute, (bp::arg("name")))
-  .def("attribute", &Predicate::getAttribute, bp::return_internal_reference<>(), (bp::arg("name")))
+  bp::class_<token, boost::shared_ptr<token>, boost::noncopyable>
+  ("token", "trex timeline predicate", bp::no_init)
+  .add_property("object", bp::make_function(&token::object, bp::return_internal_reference<>()))
+  .add_property("name", bp::make_function(&token::predicate, bp::return_internal_reference<>()))
+  .def("has_attribute", &token::has_attribute, (bp::arg("name")))
+  .def("attribute", &token::attribute, bp::return_internal_reference<>(), (bp::arg("name")))
   .def("restrict", attr_1, (bp::arg("var")))
   .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
-  .def("xml", &xml_str<Predicate>)
-  .def("json", &json_str<Predicate>)
+  .def("xml", &xml_str<token>)
+  .def("json", &json_str<token>)
   .def("from_xml", &pred_factory).staticmethod("from_xml");
   ;
   
-  
-  /*
-   * class obs(predicate):
-   *  methods
-   *    - __init__(self, predicate)
-   *    - __init__(self, symbol, symbol)
-   */
-  bp::class_<Observation, observation_id, bp::bases<Predicate> >
-  ("obs", "trex observation", bp::init<Predicate const &>(bp::args("pred"), "Convert pred into an observation"))
-  .def(bp::init<symbol, symbol>(bp::args("timeline", "pred"),
-                                "Create new observation pred on timeline"))
-  ;
-  
-  /*
-   * class goal(predicate):
-   *  methods
-   *    - __init__(self, symbol, symbol)
-   */
-  bp::class_<Goal, goal_id, bp::bases<Predicate> >
-  ("goal", "trex goal", bp::init<symbol, symbol>(bp::args("timeline", "pred"),
-                                                 "Create new goal pred on timeline"));
 
   
   bp::class_<TICK, boost::noncopyable>("tick", "trex tick date", bp::init<>())

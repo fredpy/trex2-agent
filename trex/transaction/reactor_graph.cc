@@ -148,14 +148,17 @@ graph::graph()
 {}
 
 graph::graph(utils::symbol const &name, TICK init, bool verbose)
-:m_impl(MAKE_SHARED<details::graph_impl>(name))
+:m_impl(MAKE_SHARED<details::graph_impl>())
 , m_currentTick(init)
-, m_verbose(verbose) {}
+, m_verbose(verbose) {
+  m_impl->set_name(name);
+}
 
 graph::graph(utils::symbol const &name, boost::property_tree::ptree &conf,
     TICK init, bool verbose)
-:m_impl(MAKE_SHARED<details::graph_impl>(name))
+:m_impl(MAKE_SHARED<details::graph_impl>())
 , m_currentTick(init), m_verbose(verbose) {
+  m_impl->set_name(name);
   size_t number = add_reactors(conf);
   syslog(info)<<"Created "<<number<<" reactors.";
 }
@@ -244,8 +247,7 @@ long graph::index(graph::reactor_id id) const {
 
 graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &description) {
   graph *me = this;
-  reactor::xml_arg_type
-  arg = factory::arg_traits::build(description, me);
+  factory::argument_type arg = factory::arg_traits::build(description, me);
   SHARED_PTR<reactor> tmp(m_factory->produce(arg));
   std::pair<details::reactor_set::iterator, bool> ret = m_reactors.insert(tmp);
 
@@ -352,11 +354,13 @@ bool graph::subscribe(reactor_id r, utils::symbol const &timeline, details::tran
   }
 }
 
-goal_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
+token_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
   DateHandler date_parser("date", *this);
   DurationHandler duration_parser("duration", *this);
 
-  return goal_id(new Goal(goal));
+  token_id g = MAKE_SHARED<token>(boost::ref(goal));
+  g->pred_tag(token::goal_tag);
+  return g;
 }
 
 namespace bp=boost::property_tree;
@@ -429,7 +433,7 @@ TICK graph::as_duration(std::string const &str, bool up) const {
 }
 
 
-boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
+boost::property_tree::ptree graph::export_goal(token_id const &g) const {
   bp::ptree ret = g->as_tree(false);
   bp::ptree &attr = ret.front().second;
   boost::optional<bp::ptree &> vars = attr.get_child_optional("Variable");
@@ -437,19 +441,19 @@ boost::property_tree::ptree graph::export_goal(goal_id const &g) const {
   if( !vars )
     vars = attr.add_child("Variable", bp::ptree());
 
-  if( !g->getStart().is_full() ) {
-    bp::ptree domain = date_export(*this, g->getStart());
+  if( !g->start().is_full() ) {
+    bp::ptree domain = date_export(*this, g->start());
     TREX::utils::set_attr(domain, "name", "start");
     vars->push_back(bp::ptree::value_type("", domain));
   }
-  if( !g->getEnd().is_full() ) {
-    bp::ptree domain = date_export(*this, g->getEnd());
+  if( !g->end().is_full() ) {
+    bp::ptree domain = date_export(*this, g->end());
     TREX::utils::set_attr(domain, "name", "end");
     vars->push_back(bp::ptree::value_type("", domain));
   }
-  if( g->getDuration().has_upper() ||
-      g->getDuration().lower_bound()!=Goal::s_durationDomain.lower_bound() ) {
-    bp::ptree domain = duration_export(*this, g->getDuration());
+  if( g->duration().has_upper() ||
+      g->duration().lower_bound()!=token::s_duration_full.lower_bound() ) {
+    bp::ptree domain = duration_export(*this, g->duration());
     TREX::utils::set_attr(domain, "name", "duration");
     vars->push_back(bp::ptree::value_type("", domain));    
   }

@@ -28,7 +28,7 @@ namespace TREX {
       // called before first tick
       void handle_init();
       // called when a goal is requested
-      void handle_request(goal_id const &g);
+      void handle_request(token_id const &g);
       // destructor
       ~EchoTimeline();
 

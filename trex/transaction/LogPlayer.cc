@@ -242,7 +242,7 @@ namespace TREX {
 	void play() {
 	  m_reactor.play_obs(m_obs);
 	}
-	Observation m_obs;
+	token m_obs;
       }; // TREX::transaction::details::tr_notify
 
       /** @brief Goal related event base class
@@ -296,11 +296,11 @@ namespace TREX {
 	 *
 	 * @return the goal associated to this operation
 	 */
-	goal_id const &goal() const {
+	token_id const &goal() const {
 	  return m_goal;
 	}
       private:
-	goal_id m_goal;
+	token_id m_goal;
       }; // TREX::transaction::details::tr_goal_event
 
       /** @brief Request event
@@ -433,7 +433,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
   
-  reactor::factory::declare<LogPlayer> decl("LogPlayer");
+  reactor::declare<LogPlayer> decl("LogPlayer");
   
   details::tr_event::factory::declare<details::tr_use> 
     d_use("use");
@@ -492,7 +492,7 @@ symbol const LogPlayer::s_step("step");
 
 reactor::xml_arg_type &LogPlayer::alter_cfg(reactor::xml_arg_type &arg) {
   // force logging to false
-  utils::set_attr(factory::node(arg), "log", false);
+  utils::set_attr(reactor::xml(arg), "log", false);
   return arg;
 }
 
@@ -502,7 +502,7 @@ LogPlayer::LogPlayer(reactor::xml_arg_type arg)
   :reactor(arg, false, false) {
   std::string 
     file_name = utils::parse_attr<std::string>(name().str()+".tr.log",
-					factory::node(arg),
+                                               reactor::xml(arg),
 					"file");
   bool found;
   file_name = manager().use(file_name, found).string();
@@ -673,23 +673,23 @@ void LogPlayer::play_unprovide(utils::symbol const &tl) {
   unprovide(tl);
 }
 
-void LogPlayer::play_obs(Observation const &obs) {
+void LogPlayer::play_obs(token const &obs) {
   post_observation(obs);
 }
 
-void LogPlayer::play_request(goal_id const &g) {
+void LogPlayer::play_request(token_id const &g) {
   post_goal(g);
 }
 
-void LogPlayer::play_recall(goal_id const &g) {
+void LogPlayer::play_recall(token_id const &g) {
   post_recall(g);
 }
 
-void LogPlayer::play_add(goal_id const &g) {
+void LogPlayer::play_add(token_id const &g) {
   post_plan_token(g);
 }
 
-void LogPlayer::play_cancel(goal_id const &g) {
+void LogPlayer::play_cancel(token_id const &g) {
   cancel_plan_token(g);
 }
 
@@ -706,17 +706,17 @@ tr_event::tr_event(tr_event::factory::argument_type const &arg)
 
 // manipulators
 
-goal_id tr_event::get_goal(std::string const &key) {
-  std::map<std::string, goal_id>::const_iterator 
+token_id tr_event::get_goal(std::string const &key) {
+  std::map<std::string, token_id>::const_iterator
     i =  m_reactor.m_goal_map.find(key);
   if( m_reactor.m_goal_map.end()!=i )
     return i->second;
-  return goal_id();
+  return token_id();
 }
 
 
-void tr_event::set_goal(std::string const &key, goal_id const &g) {
-  std::map<std::string, goal_id>::iterator i;
+void tr_event::set_goal(std::string const &key, token_id const &g) {
+  std::map<std::string, token_id>::iterator i;
   bool inserted;
   boost::tie(i, inserted) = m_reactor.m_goal_map.insert(std::make_pair(key, g));
   if( !inserted )
@@ -752,7 +752,7 @@ tr_goal_event::tr_goal_event(tr_goal_event::factory::argument_type const &arg,
       desc = factory::node(arg).second.find("Goal");
     if( factory::node(arg).second.not_found()==desc )
       throw boost::property_tree::ptree_bad_data("Unable to find token description.", factory::node(arg));
-    m_goal.reset(new Goal(*desc));
+    m_goal.reset(new token(*desc));
     set_goal(id, m_goal);
   } else {
     m_goal = get_goal(id);

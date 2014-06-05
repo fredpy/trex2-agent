@@ -73,9 +73,9 @@ namespace TREX {
           return m_tl.look_ahead();
         }
         
-        std::pair<transaction::TICK, transaction::goal_id>
-        new_obs(transaction::TICK cur, transaction::goal_id tok) {
-          std::pair<transaction::TICK, transaction::goal_id> ret(m_date, m_obs);
+        std::pair<transaction::TICK, transaction::token_id>
+        new_obs(transaction::TICK cur, transaction::token_id tok) {
+          std::pair<transaction::TICK, transaction::token_id> ret(m_date, m_obs);
           m_date = cur;
           if( 0==m_count )
             m_initial = m_date;
@@ -99,7 +99,7 @@ namespace TREX {
           return m_initial;
         }
         
-        transaction::goal_id obs() const {
+        transaction::token_id obs() const {
           return m_obs;
         }
         unsigned long long count() const {
@@ -111,7 +111,7 @@ namespace TREX {
         transaction::details::timeline const &m_tl;
         
         transaction::TICK    m_initial, m_date;
-        transaction::goal_id m_obs;
+        transaction::token_id m_obs;
         unsigned long long   m_count;
       };
       

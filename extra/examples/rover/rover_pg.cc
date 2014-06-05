@@ -42,7 +42,7 @@ using namespace TREX::rover;
 
 namespace {
     singleton::use<log_manager> s_log;
-    reactor::factory::declare<Rover> decl("Rover");
+    reactor::declare<Rover> decl("Rover");
 }
 
 namespace TREX {

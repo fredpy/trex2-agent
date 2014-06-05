@@ -94,8 +94,10 @@ namespace TREX {
 	 * @post The new instance is temporary which means that the europa domain
 	 * will be deleted with this instance
 	 */
-	explicit europa_domain(EUROPA::DataTypeId const &type)
-	  :m_temporary(true), m_dom(type->baseDomain().copy()), m_type(type) {}
+	explicit europa_domain(EUROPA::DataTypeId const &type,
+                               bool &updated)
+	  :m_temporary(true), m_updated(&updated),
+           m_dom(type->baseDomain().copy()), m_type(type) {}
 	/** @brief Constructor 
 	 * 
 	 * @param[in] dom An europa domain
@@ -107,8 +109,9 @@ namespace TREX {
 	 * @post The new instance is temporary which means that the europa domain
 	 * will be deleted with this instance
 	 */
-	explicit europa_domain(EUROPA::Domain const &dom) 
-	  :m_temporary(true), m_dom(dom.copy()), m_type(dom.getDataType()) {}
+	explicit europa_domain(EUROPA::Domain const &dom, bool &updated)
+	  :m_temporary(true), m_updated(&updated),
+           m_dom(dom.copy()), m_type(dom.getDataType()) {}
 	/** @brief Constructor 
 	 *
 	 * @param[in] dom A pointer to en europa domain
@@ -124,8 +127,9 @@ namespace TREX {
 	 * @post The new insatnce is @e not temporary and the referred domain will
 	 *     not be deleted on destruction
 	 */
-	explicit europa_domain(EUROPA::Domain *dom)
-	  :m_temporary(false), m_dom(dom), m_type(dom->getDataType()) {}
+	explicit europa_domain(EUROPA::Domain *dom, bool &updated)
+	  :m_temporary(false), m_updated(&updated),
+           m_dom(dom), m_type(dom->getDataType()) {}
 	/** @brief Copy constructor 
 	 * 
 	 * @param[in] other Another instance
@@ -140,8 +144,8 @@ namespace TREX {
 	 * @post the temporary state of the new instance is the same oas @p other
 	 */
 	europa_domain(europa_domain const &other) 
-	  :m_temporary(other.m_temporary), m_dom(other.m_dom), 
-	   m_type(other.m_type) {
+	  :m_temporary(other.m_temporary), m_updated(other.m_updated),
+           m_dom(other.m_dom), m_type(other.m_type) {
 	  if( m_temporary ) 
 	    // Create a copy of temporary domains to avoid double delete
 	    m_dom = m_dom->copy();
@@ -192,6 +196,7 @@ namespace TREX {
 	 * should be deleted on detsruction or not.
 	 */
 	bool               m_temporary;
+        bool              *m_updated;
 	/** @brief Europa domain
 	 *
 	 * The pointer to the domain to be restricted every time this instance
@@ -226,9 +231,11 @@ namespace TREX {
        */
       inline void europa_restrict(EUROPA::ConstrainedVariableId &var,
 				  TREX::transaction::abstract_domain const &dom) {
-	europa_domain convert(var->lastDomain());
+        bool updated;
+	europa_domain convert(var->lastDomain(), updated);
 	dom.accept(convert);
-	var->restrictBaseDomain(convert.domain());
+        if( updated )
+          var->restrictBaseDomain(convert.domain());
       }
       
     } // TREX::europa::details

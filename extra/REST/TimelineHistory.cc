@@ -60,7 +60,7 @@ TimelineHistory::~TimelineHistory() {}
 
 // manipulators
 
-bp::ptree TimelineHistory::get_goal(goal_id g) const {
+bp::ptree TimelineHistory::get_goal(token_id g) const {
   bp::ptree tmp;
   tmp.put("id", g);
   tmp.put("href", "/rest/goal/"+tmp.get<std::string>("id"));
@@ -69,7 +69,7 @@ bp::ptree TimelineHistory::get_goal(goal_id g) const {
 }
 
 
-bp::ptree TimelineHistory::get_token(goal_id const &tok) const {
+bp::ptree TimelineHistory::get_token(token_id const &tok) const {
   return m_reactor.get_graph().export_goal(tok).get_child("Goal");
 }
 
@@ -80,8 +80,9 @@ TICK TimelineHistory::get_date(std::string const &date) {
 
 // TREX updates callbacks
 
-void TimelineHistory::new_obs(Observation const &obs, TICK cur) {
-  goal_id tok(new Goal(obs, cur));
+void TimelineHistory::new_obs(token const &obs, TICK cur) {
+  token_id tok(new token(obs));
+  tok->restrict_start(int_domain(cur));
   m_strand.post(boost::bind(&TimelineHistory::add_obs_sync, this, tok, cur));
 }
 
@@ -147,7 +148,7 @@ bp::ptree TimelineHistory::goals() {
   return utils::strand_run(m_strand, fn);
 }
 
-goal_id TimelineHistory::add_goal(std::string const &file) {
+token_id TimelineHistory::add_goal(std::string const &file) {
   bp::ptree data;
   try {
     std::ifstream in(file.c_str());
@@ -163,7 +164,7 @@ goal_id TimelineHistory::add_goal(std::string const &file) {
     throw std::runtime_error("goal json description is empty.");
   bp::ptree::value_type g_desc("goal", data);
   
-  goal_id g = m_reactor.parse_goal(g_desc);
+  token_id g = m_reactor.parse_goal(g_desc);
   
   if( !m_reactor.is_external(g->object()) )
     throw std::runtime_error("Goal associated to unknown timeline \""+g->object().str()+"\"");
@@ -176,14 +177,14 @@ goal_id TimelineHistory::add_goal(std::string const &file) {
 }
 
 
-goal_id TimelineHistory::get_goal(std::string const &id) {
-  boost::function<goal_id ()> fn(boost::bind(&TimelineHistory::get_goal_sync, this, id));
+token_id TimelineHistory::get_goal(std::string const &id) {
+  boost::function<token_id ()> fn(boost::bind(&TimelineHistory::get_goal_sync, this, id));
   return utils::strand_run(m_strand, fn);
 }
 
 bool TimelineHistory::delete_goal(std::string const &id) {
-  boost::function<goal_id ()> fn(boost::bind(&TimelineHistory::del_goal_sync, this, id));
-  goal_id g = utils::strand_run(m_strand, fn);
+  boost::function<token_id ()> fn(boost::bind(&TimelineHistory::del_goal_sync, this, id));
+  token_id g = utils::strand_run(m_strand, fn);
   
   if( g )
     return m_reactor.post_recall(g); // Not sure if postRecall is thread safe ...
@@ -202,10 +203,10 @@ void TimelineHistory::add_tl_sync(details::timeline const &tl) {
     delete entry;
 }
 
-void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
+void TimelineHistory::add_obs_sync(token_id tok, TICK date) {
   helpers::rest_tl_set::iterator pos = m_timelines.find(tok->object());
   if( m_timelines.end()!=pos ) {    
-    goal_id prev;
+    token_id prev;
     TICK start;
     
     // Set in memory the new observation
@@ -215,7 +216,7 @@ void TimelineHistory::add_obs_sync(goal_id tok, TICK date) {
       // Do the export in json so the data is already formatted for the services
       std::ostringstream oss;
       helpers::json_stream json(oss);
-      prev->restrictEnd(int_domain(date));
+      prev->restrict_end(int_domain(date));
       utils::write_json(json, get_token(prev), fancy());
       m_db.add_token(start, date, (*pos)->name().str(), oss.str());
     }
@@ -231,7 +232,7 @@ void TimelineHistory::ext_obs_sync(TICK date) {
   for(helpers::rest_tl_set::iterator i=m_timelines.begin();
       m_timelines.end()!=i; ++i)
     if( (*i)->has_observation() )
-      (*i)->obs()->restrictEnd(future);
+      (*i)->obs()->restrict_end(future);
 }
 
 unsigned long long TimelineHistory::count_tokens(helpers::timeline_wrap const &tl,
@@ -380,24 +381,24 @@ bp::ptree TimelineHistory::goals_sync() {
   return ret;
 }
 
-void TimelineHistory::add_goal_sync(goal_id g) {
+void TimelineHistory::add_goal_sync(token_id g) {
   std::ostringstream oss;
   oss<<g;
   
   m_goals[oss.str()] = g;
 }
 
-goal_id TimelineHistory::get_goal_sync(std::string id) {
+token_id TimelineHistory::get_goal_sync(std::string id) {
   goal_map::iterator i = m_goals.find(id);
   if( m_goals.end()==i )
-    return goal_id();
+    return token_id();
   else
     return i->second;
 }
 
-goal_id TimelineHistory::del_goal_sync(std::string id) {
+token_id TimelineHistory::del_goal_sync(std::string id) {
   goal_map::iterator i = m_goals.find(id);
-  goal_id result;
+  token_id result;
   if( m_goals.end()!=i ) {
     result = i->second;
     m_goals.erase(i);

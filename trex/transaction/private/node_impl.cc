@@ -33,6 +33,7 @@
  */
 #include "node_impl.hh"
 #include "graph_impl.hh"
+#include "external_impl.hh"
 
 using namespace TREX::transaction::details;
 using namespace TREX;
@@ -41,6 +42,7 @@ namespace tlog=TREX::utils::log;
 namespace bs2=boost::signals2;
 
 using TREX::utils::symbol;
+using TREX::transaction::TICK;
 
 namespace {
   
@@ -69,6 +71,23 @@ SHARED_PTR<graph_impl> node_impl::graph() const {
   return m_graph.lock();
 }
 
+boost::optional<TICK> node_impl::external_date() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_external_date;
+}
+
+
+boost::optional<TICK> node_impl::internal_date() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_internal_date;
+  
+}
+
+boost::optional<TICK> node_impl::current_tick() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_execution_frontier;
+}
+
 
 // modifiers
 
@@ -82,28 +101,105 @@ void node_impl::reset() {
   m_graph.reset();
 }
 
+void node_impl::synchronized(TICK date) {
+  // I probably shoudl make this occur in the graph strand
+  bool updated = false;
+  {
+    boost::upgrade_lock<boost::shared_mutex> test(m_mutex);
+  
+    // Not ideally I should enforce that
+    // m_internal_date < date <= m_external_date <= m_execution_frontier
+    
+    if( !m_internal_date || *m_internal_date<date ) {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      m_internal_date = date;
+    }
+  }
+  if( updated ) {
+    // TODO notify all the internal timelines of their update
+    
+  }
+}
+
+
+bool node_impl::use(symbol const &tl, transaction_flags fl) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  
+  if( g ) {
+    SHARED_PTR<internal_impl> obj = g->get_tl(tl).lock();
+    if( obj ) {
+      SHARED_PTR<external_impl>
+        ext = MAKE_SHARED<external_impl>(shared_from_this(),
+                                         obj, fl);
+      // TODO: attach it to the node
+      return bool(ext);
+    }
+  }
+  return false;
+}
+
+
+bool node_impl::provide(symbol const &tl, transaction_flags fl) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  
+  if( g ) {
+    // TODO: declare_tl need to associate this timeline to this node
+    WEAK_PTR<internal_impl> obj = g->declare_tl(tl, shared_from_this(), fl);
+    return bool(obj.lock());
+  }
+  return false;
+}
+
+
 // manipulators
+
+utils::log_manager &node_impl::manager() const {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+
+  if( g )
+    return g->manager();
+  else
+    return *s_log;
+}
 
 tlog::stream node_impl::syslog(symbol const &ctx,
                                symbol const &kind) const {
   SHARED_PTR<graph_impl> g = m_graph.lock();
   symbol who = name();
   
+  
   if( !ctx.empty() )
     who = who.str()+"."+ctx.str();
   
-  if( g )
+  boost::optional<TICK> now = internal_date();
+  
+  if( g ) {
+    if( now && *now<(*g->date(true))) {
+      std::ostringstream oss;
+      oss<<who<<"]["<<*now;
+      who = oss.str();
+    }
+    
     return g->syslog(who, kind);
-  else {
+  } else {
     // handle the situation where the node is no longer attached to a graph
     who = "(nil)."+who.str();
-    return s_log->syslog(who, kind);
+    if( now )
+      return s_log->syslog(*now, who, kind);
+    else
+      return s_log->syslog(who, kind);
   }
 }
 
 void node_impl::notify(TICK date, utils::symbol const &tl,
-                       boost::optional<Observation> const &o) {
-  // TODO report to the node through a signal
+                       token_id const &o) {
+  SHARED_PTR<graph_impl> g = m_graph.lock();
+  if( g ) {
+    // TODO update this timeline observation, notify the reactor,
+    // and check if m_external_date has been updated
+  } else {
+    // TODO disconnect
+  }
 }
 
 
@@ -112,7 +208,8 @@ void node_impl::notify(TICK date, utils::symbol const &tl,
 void node_impl::tick(bs2::connection const &c, date_type const &date) {
   SHARED_PTR<graph_impl> g = m_graph.lock();
   if( g ) {
-    syslog(tlog::null, tlog::info)<<"Tick("<<date<<")";
+    boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+    m_execution_frontier = date;
   } else
     c.disconnect();
 }

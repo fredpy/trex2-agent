@@ -40,8 +40,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Variable 
-# define H_Variable 
+#ifndef H_trex_domain_var
+# define H_trex_domain_var
 
 # include <functional>
 # include <boost/static_assert.hpp>
@@ -52,8 +52,6 @@
 
 namespace TREX {
   namespace transaction {
-
-    class Predicate;
 
     /** @brief Variable related exception
      *
@@ -219,7 +217,7 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      var &restrict_with(abstract_domain const &dom);
+      bool restrict_with(abstract_domain const &dom);
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -234,7 +232,8 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       var &operator*=(abstract_domain const &dom) {
-	return restrict_with(dom);
+	restrict_with(dom);
+        return *this;
       }
       /** @brief Merge variable
        * @param var another variable
@@ -249,7 +248,7 @@ namespace TREX {
        * @return current insatnce after being merged with @e var
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
-      var &restrict_with(var const &v);
+      bool restrict_with(var const &v);
       /** @brief Merge variable
        * @param var another variable
        *
@@ -264,7 +263,8 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       var &operator*=(var const &v) {
-	return restrict_with(v);
+	restrict_with(v);
+        return *this;
       }
 
       boost::property_tree::ptree as_tree() const;

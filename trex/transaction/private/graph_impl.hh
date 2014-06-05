@@ -70,13 +70,6 @@ namespace TREX {
          * Create a new nameless graph.
          */
         graph_impl();
-        /** @brief Constructor
-         *
-         * @param[in] name A name identifier
-         *
-         * Create a new graph named @p name
-         */
-        explicit graph_impl(utils::symbol const &name);
         /** @brief Destructor 
          */
         ~graph_impl();
@@ -185,6 +178,15 @@ namespace TREX {
          *       duplicate names.
          */
         WEAK_PTR<node_impl> add_node(utils::symbol const &desired_name);
+        
+        WEAK_PTR<internal_impl> get_tl(utils::symbol const &tl) {
+          return declare_tl(tl, SHARED_PTR<node_impl>(),
+                            transaction_flags());
+        }
+        WEAK_PTR<internal_impl> declare_tl(utils::symbol const &tl,
+                                           SHARED_PTR<node_impl> const &n,
+                                           transaction_flags const &fl);
+        
         /** @brtief Remove a node for the graph
          *
          * @param[in] n A node
@@ -213,6 +215,8 @@ namespace TREX {
           return *m_strand;
         }
         
+        void detached(SHARED_PTR<internal_impl> const &tl);
+        
       private:
         utils::singleton::use<utils::log_manager> m_mgr;
 
@@ -225,6 +229,9 @@ namespace TREX {
         tick_sig m_tick;
         
         std::set< SHARED_PTR<node_impl> > m_nodes;
+        typedef std::map<utils::symbol, SHARED_PTR<internal_impl> > tl_map;
+        
+        tl_map m_timelines, m_failed;
         
         // async management
         UNIQ_PTR<boost::asio::strand> m_strand;
@@ -234,6 +241,10 @@ namespace TREX {
         void add_node_sync(SHARED_PTR<node_impl> node,
                            utils::symbol desired_name);
         void rm_node_sync(SHARED_PTR<node_impl> node);
+        
+        SHARED_PTR<internal_impl> decl_tl_sync(utils::symbol tl,
+                                               SHARED_PTR<node_impl> n,
+                                               transaction_flags fl);
         
       }; // TREX::transaction::details::graph_impl
       

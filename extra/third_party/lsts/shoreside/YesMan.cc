@@ -12,7 +12,7 @@ using namespace TREX::transaction;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::factory::declare<YesMan> decl("YesMan");
+  reactor::declare<YesMan> decl("YesMan");
 }
 
 #define SPOT_SIM_TL "spotSim" // internal
@@ -20,7 +20,7 @@ namespace
 
 YesMan::YesMan(reactor::xml_arg_type arg)
 	:reactor(arg){
-	  post_observation(Observation(SPOT_SIM_TL, "None"));
+	  post_observation(token(SPOT_SIM_TL, "None"));
 }
 
 YesMan::~YesMan() { }
@@ -32,9 +32,9 @@ bool YesMan::synchronize() {
 /**
  * Getting the ___ from Rest
  */
-void YesMan::handle_request(goal_id const &g) {
+void YesMan::handle_request(token_id const &g) {
 	if( g->object()==SPOT_SIM_TL ) {
-		TREX::transaction::Observation observation(*g);
+		TREX::transaction::token observation(*g);
 		post_observation(observation);
 	}
 }
