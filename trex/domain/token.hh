@@ -221,7 +221,6 @@ namespace TREX {
     }
 
     std::ostream &operator<<(std::ostream &out, token const &tok);
-    std::ostream &operator<<(std::ostream &out, token_id id);
     
   }
 }

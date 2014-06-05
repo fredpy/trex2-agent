@@ -233,8 +233,9 @@ bpt::ptree token::as_tree(bool full) const {
   
   for(attr_iterator i = attr_begin(full);
       last!=i; ++i) {
-    if( !is_full(i) )
+    if( !is_full(i) ) {
       vars.push_back(bpt::ptree::value_type("", i->second.as_tree()));
+    }
   }
   if( !vars.empty() )
     val.add_child("Variable", vars);
@@ -420,11 +421,6 @@ std::ostream &TREX::transaction::operator<<(std::ostream &out, token const &tok)
     out.put('}');
   return out;
 }
-
-std::ostream &TREX::transaction::operator<<(std::ostream &out, token_id id) {
-  return out<<id;
-}
-
 
 namespace {
 
