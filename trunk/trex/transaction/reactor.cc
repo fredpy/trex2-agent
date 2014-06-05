@@ -78,7 +78,7 @@ namespace TREX {
       void work(bool ret);
       void step();
       
-      void observation(token const &obs);
+      void observation(token &obs);
       void request(token_id const &goal);
       void recall(token_id const &goal);
       
@@ -646,6 +646,7 @@ void reactor::observation_sync(token_id o, bool verbose) {
 
 void reactor::post_observation(token const &obs, bool verbose) {
   token_id tmp = MAKE_SHARED<token>(boost::ref(obs));
+  tmp->pred_tag(token::obs_tag);
   
   boost::function<void ()> fn(boost::bind(&reactor::observation_sync,
                                           this, tmp, verbose));
@@ -668,6 +669,7 @@ bool reactor::post_goal(token_id const &g) {
   if( !g )
     throw DispatchError(*this, g, "Invalid goal Id");
 
+  g->pred_tag(token::goal_tag);
   boost::function<bool ()> fn(boost::bind(&reactor::goal_sync,
                                           this, g));
   return utils::strand_run(m_graph.strand(), fn);
@@ -685,7 +687,9 @@ token_id reactor::post_goal(token const &g) {
 }
 
 token_id reactor::parse_goal(boost::property_tree::ptree::value_type const &g) {
-  return get_graph().parse_goal(g);
+  token_id ret = get_graph().parse_goal(g);
+  ret->pred_tag(token::goal_tag);
+  return ret;
 }
 
 bool reactor::recall_sync(token_id g) {
@@ -929,7 +933,7 @@ bool reactor::do_synchronize() {
                                                 *i, now));
         utils::strand_run(m_graph.strand(), fn);
 
-        token const &observ = *((*i)->lastObservation(echo));
+        token &observ = *((*i)->lastObservation(echo));
         
         // if( echo || is_verbose() || NULL==m_trLog )
         //   syslog(obs)<<observ;
@@ -1279,23 +1283,28 @@ void reactor::logger::unuse(symbol const &name) {
                          this, oss.str(), true));
 }
 
-void reactor::logger::observation(token const &o) {
+void reactor::logger::observation(token &o) {
+  o.pred_tag(token::obs_tag);
   post_event(boost::bind(&logger::obs, this, o));
 }
 
 void reactor::logger::request(token_id const &goal) {
+  goal->pred_tag(token::goal_tag);
   post_event(boost::bind(&logger::goal_event, this, "request", goal, true));
 }
 
 void reactor::logger::recall(token_id const &goal) {
+  goal->pred_tag(token::goal_tag);
   post_event(boost::bind(&logger::goal_event, this, "recall", goal, false));
 }
 
 void reactor::logger::notify_plan(token_id const &tok) {
+  tok->pred_tag(token::goal_tag);
   post_event(boost::bind(&logger::goal_event, this, "token", tok, true));
 }
 
 void reactor::logger::cancel_plan(token_id const &tok) {
+  tok->pred_tag(token::goal_tag);
   post_event(boost::bind(&logger::goal_event, this, "cancel", tok, false));
 }
 
