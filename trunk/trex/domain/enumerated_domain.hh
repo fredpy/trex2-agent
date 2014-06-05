@@ -199,7 +199,7 @@ namespace TREX {
       }
       bool intersect(abstract_domain const &other) const;
       bool equals(abstract_domain const &other) const;
-      abstract_domain &restrict_with(abstract_domain const &other);
+      bool restrict_with(abstract_domain const &other);
       
       size_t size() const {
         return m_elements.size();
@@ -337,7 +337,7 @@ namespace TREX {
     }
     
     template<class Ty, class Cmp>
-    abstract_domain &enumerated_domain<Ty, Cmp>::restrict_with
+    bool enumerated_domain<Ty, Cmp>::restrict_with
     (abstract_domain const &other) {
       if( type_name()!=other.type_name() )
         throw EmptyDomain(*this, "Incompatible types");
@@ -350,9 +350,12 @@ namespace TREX {
                               m_elements.key_comp());
         if( tmp.empty() ) 
           throw EmptyDomain(*this, "intersection is empty.");
-        m_elements.swap(tmp);
+        if( tmp.size()!=m_elements.size() ) {
+          m_elements.swap(tmp);
+          return true;
+        }
       }
-      return *this;
+      return false;
     }
     
     

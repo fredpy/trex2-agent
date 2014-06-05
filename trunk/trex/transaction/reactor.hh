@@ -42,6 +42,7 @@
 #ifndef H_TeleoReactor
 # define H_TeleoReactor
 
+
 # include <cmath>
 
 # include "bits/external.hh"
@@ -52,12 +53,47 @@
 # include <trex/utils/timing/cpu_clock.hh>
 # include <trex/utils/asio_fstream.hh>
 
-# if !defined(CPP11_HAS_CHRONO) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
-#  include <boost/chrono/thread_clock.hpp>
-# endif
+# include <trex/utils/priority_strand.hh>
+# include <boost/thread/once.hpp>
+# include <boost/tuple/tuple.hpp>
 
 namespace TREX {
   namespace transaction {
+    
+    struct instance_scope_exec {
+      typedef SHARED_PTR<utils::priority_strand> exec_ref;
+      
+      static exec_ref init_exec(boost::asio::io_service &io);
+    };
+    
+    template<class Ty>
+    struct class_scope_exec {
+      typedef SHARED_PTR<utils::priority_strand> exec_ref;
+
+      static exec_ref init_exec(boost::asio::io_service &io) {
+        boost::call_once(s_once, boost::bind(&class_scope_exec::global_init,
+                                            boost::ref(io)));
+        return s_exec;
+      }
+    private:
+      static boost::once_flag s_once;
+      static exec_ref         s_exec;
+      
+      static void global_init(boost::asio::io_service &io) {
+        s_exec = instance_scope_exec::init_exec(io);
+      }
+    };
+    
+    template<class Ty>
+    boost::once_flag class_scope_exec<Ty>::s_once = BOOST_ONCE_INIT;
+    
+    template<class Ty>
+    typename class_scope_exec<Ty>::exec_ref class_scope_exec<Ty>::s_exec;
+    
+    template<class Ty>
+    struct exec_policy :public instance_scope_exec {};
+    
+    
     
     /** @brief TeleoReactor abstract interface
      *
@@ -98,6 +134,7 @@ namespace TREX {
       
     public:
       typedef utils::cpu_clock stat_clock;
+      typedef SHARED_PTR<utils::priority_strand>    exec_type;
       
 # if defined(CPP11_HAS_CHRONO)
       // C++11 do not define a steady clock so high resolution clock
@@ -121,11 +158,15 @@ namespace TREX {
        * The type used to refer to specific reactor
        */
       typedef graph::reactor_id                   ref_type;
+      
+    private:
       /** @brief XML based factory
        *
        * The type of the factory used to generate reactors from XML
        */
       typedef graph::factory                  factory;
+      
+    public:
       /** @brief XML construction info
        *
        * The argument passed by xml_factory while calling reactor classes
@@ -137,7 +178,41 @@ namespace TREX {
        * @sa TREX::utils::XmlFactory::arg_traits;
        * @sa TREX::transaction::graph
        */
-      typedef factory::argument_type          xml_arg_type;
+      typedef boost::tuple<factory::argument_type::first_type,
+                           factory::argument_type::second_type,
+                           exec_type> xml_arg_type;
+      
+      static boost::property_tree::ptree::value_type &xml(xml_arg_type &arg) {
+        return *arg.get<0>();
+      }
+      static graph *arg_graph(xml_arg_type &arg) {
+        return arg.get<1>();
+      }
+      
+      
+      template<class Reactor>
+      class declare :public factory::factory_type::producer {
+      public:
+        typedef factory::factory_type::id_param id_param;
+        
+        declare(id_param id)
+        :factory::factory_type::producer(id) {
+          factory::factory_type::producer::notify();
+        }
+        ~declare() {}
+        
+      private:
+        typedef exec_policy<Reactor> policy;
+        
+        result_type produce(argument_type arg) const {
+          boost::asio::io_service &io = arg.second->manager().service();
+          xml_arg_type inject(arg.first, arg.second, policy::init_exec(io));
+          
+          result_type ret(new Reactor(inject));
+          return ret;
+        }
+      }; // TREX::transaction::reactor::declare<>
+      
       
       /** @brief XML based constructor
        *
@@ -185,7 +260,7 @@ namespace TREX {
        * @throw TREX::utils::XmlError An error occured while extracting reactors
        *        information from the XML structure
        */
-      explicit reactor(xml_arg_type &arg, bool loadTL=true,
+      reactor(xml_arg_type &arg, bool loadTL=true,
                        bool log_default=true);
       /** @brief Destructor */
       virtual ~reactor();
@@ -193,9 +268,7 @@ namespace TREX {
       /** @brief Reactor name
        * @return the anme of the reactor
        */
-      TREX::utils::symbol const &name() const {
-        return m_name;
-      }
+      TREX::utils::symbol const &name() const;
       /** @brief get \"agent\" name
        *
        * Gets the name of the agent that controls this reactor.
@@ -388,7 +461,7 @@ namespace TREX {
        *          the tick duration.
        * @sa synchronize()
        */
-      virtual void notify(Observation const &obs) {}
+      virtual void notify(token const &obs) {}
       
       /** @brief Final initialization
        *
@@ -552,16 +625,14 @@ namespace TREX {
        * Create a new reactor named @p name with a latency of @p latency and a
        * look-ahead of @p lookahead and associate it to the graph @p owner
        */
-      reactor(graph *owner, TREX::utils::symbol const &name,
-                   TICK latency, TICK lookahead, bool log=false);
+      reactor(graph *owner, exec_type exec, TREX::utils::symbol const &name,
+              TICK latency, TICK lookahead, bool log=false);
       
       /** @brief LogManager access point
        *
        * @return the LogManager instance for this run
        */
-      TREX::utils::log_manager &manager() const {
-        return m_graph.manager();
-      }
+      TREX::utils::log_manager &manager() const;
       typedef utils::log_manager::path_type path_type;
       
       path_type file_name(std::string const &short_name) const {
@@ -646,7 +717,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa doNotify()
        */
-      void post_observation(Observation const &o, bool verbose=false);
+      void post_observation(token const &o, bool verbose=false);
       
       /** @brief Post a goal
        *
@@ -674,7 +745,7 @@ namespace TREX {
        * @sa isExternal(TREX::utils::Symbol const &) const
        * @sa postRecall(goal_id const &)
        */
-      bool post_goal(goal_id const &g);
+      bool post_goal(token_id const &g);
       /** @brief Post a goal
        *
        * @param[in] g A goal
@@ -690,16 +761,16 @@ namespace TREX {
        * @sa postGoal(goal_id const &)
        * @sa isExternal(TREX::utils::Symbol const &) const
        */
-      goal_id post_goal(Goal const &g);
+      token_id post_goal(token const &g);
       
-      goal_id post_goal(boost::property_tree::ptree::value_type const &g) {
-        goal_id gl=parse_goal(g);
+      token_id post_goal(boost::property_tree::ptree::value_type const &g) {
+        token_id gl=parse_goal(g);
         if( post_goal(gl) )
           return gl;
-        return goal_id();
+        return token_id();
       }
       
-      goal_id parse_goal(boost::property_tree::ptree::value_type const &g);
+      token_id parse_goal(boost::property_tree::ptree::value_type const &g);
       
       /** @brief Goal completion
        *
@@ -713,7 +784,7 @@ namespace TREX {
        *             system is much more able to identify that a goal did
        *             complete
        */
-      bool completed_goal(goal_id g);
+      bool completed_goal(token_id g);
       
       /** @brief Post a planned token
        *
@@ -734,7 +805,7 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa cancelPlanToken(goal_id const &)
        */
-      bool post_plan_token(goal_id const &g);
+      bool post_plan_token(token_id const &g);
       /** @brief Post a planned token
        *
        * @param[in] g A goal
@@ -752,8 +823,8 @@ namespace TREX {
        * @sa isInternal(TREX::utils::Symbol const &) const
        * @sa postPlanToken(goal_id const &)
        */
-      goal_id post_plan_token(Goal const &g);
-      void cancel_plan_token(goal_id const &g);
+      token_id post_plan_token(token const &g);
+      void cancel_plan_token(token_id const &g);
       
       
       /** @brief Recall a goal
@@ -775,7 +846,7 @@ namespace TREX {
        * @sa postGoal(Goal const &)
        * @sa isExternal(TREX::utils::Symbol const &) const
        */
-      bool post_recall(goal_id const &g);
+      bool post_recall(token_id const &g);
       
       /** @brief reactor initialiszation callback
        *
@@ -843,7 +914,7 @@ namespace TREX {
        * @warning the duration of this call should  be neglectable in comparison to
        *          the tick duration.
        */
-      virtual void handle_request(goal_id const &g) {}
+      virtual void handle_request(token_id const &g) {}
       /** @brief Goal recall callback
        * @param[in] g a goal
        *
@@ -853,10 +924,10 @@ namespace TREX {
        * @warning the duration of this call should  be neglectable in comparison to
        *          the tick duration.
        */
-      virtual void handle_recall(goal_id const &g) {}
+      virtual void handle_recall(token_id const &g) {}
       
-      virtual void new_plan_token(goal_id const &t) {}
-      virtual void cancelled_plan_token(goal_id const &t) {}
+      virtual void new_plan_token(token_id const &t) {}
+      virtual void cancelled_plan_token(token_id const &t) {}
       
       /** @brief External timeline declaration
        *
@@ -1019,15 +1090,10 @@ namespace TREX {
        * @sa TREX::utils::TextLog
        */
       utils::log::stream
-      syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const {
-        if( context.empty() )
-          return m_graph.syslog(name(), kind);
-        else
-          return m_graph.syslog(name().str()+"."+context.str(), kind);
-      }
+      syslog(utils::log::id_type const &context, utils::log::id_type const &kind) const;
       utils::log::stream
       syslog(utils::log::id_type const &kind=null) const {
-        return m_graph.syslog(name(), kind);
+        return syslog(utils::log::null, kind);
       }
       
       /** @brief Find an external timeline
@@ -1044,6 +1110,9 @@ namespace TREX {
       void set_max_tick(TICK max);
 
     private:
+      exec_type m_exec;
+      SHARED_PTR<details::node_impl> m_impl;
+      
       stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
       rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
@@ -1062,12 +1131,12 @@ namespace TREX {
       void provide_sync(TREX::utils::symbol name, details::transaction_flags f);
       bool unprovide_sync(TREX::utils::symbol name);
      
-      void observation_sync(Observation o, bool verbose);
-      bool goal_sync(goal_id g);
-      bool recall_sync(goal_id g);
+      void observation_sync(token_id o, bool verbose);
+      bool goal_sync(token_id g);
+      bool recall_sync(token_id g);
       
-      bool plan_sync(goal_id tok);
-      void cancel_sync(goal_id tok);
+      bool plan_sync(token_id tok);
+      void cancel_sync(token_id tok);
       
       void clear_internals();
       void clear_externals();
@@ -1078,22 +1147,22 @@ namespace TREX {
       
       class logger;
     
-      void queue(std::list<goal_id> &l, goal_id g);
+      void queue(std::list<token_id> &l, token_id g);
       
-      void queue_goal(goal_id g);
-      void queue_recall(goal_id g);
-      void queue_token(goal_id g);
-      void queue_cancel(goal_id g);
+      void queue_goal(token_id g);
+      void queue_recall(token_id g);
+      void queue_token(token_id g);
+      void queue_cancel(token_id g);
       
       
-      void goal_flush(std::list<goal_id> &a, std::list<goal_id> &dest);
+      void goal_flush(std::list<token_id> &a, std::list<token_id> &dest);
       
-      std::list<goal_id>     m_sync_goals, m_sync_recalls, m_sync_toks, m_sync_cancels;
+      std::list<token_id>     m_sync_goals, m_sync_recalls, m_sync_toks, m_sync_cancels;
       utils::shared_var<size_t> m_have_goals;
       
       bool have_goals();
       
-      void collect_obs_sync(std::list<Observation> &l);
+      void collect_obs_sync(std::list<token_id> &l);
       
       /** @brief Request new observations
        *
@@ -1124,15 +1193,6 @@ namespace TREX {
        * @sa TransactionPlayer
        */
       logger *m_trLog;
-      
-      /** @brief Reactor name
-       *
-       * This is the name of the reactor. It is used to idenitify the
-       * reactor in the agent and for displaying log messages.
-       *
-       * @sa getName() const
-       */
-      TREX::utils::symbol m_name;
       
       /** @brief Deliberation latency
        *
@@ -1268,7 +1328,7 @@ namespace TREX {
        * @param[in] g The goal that triggered the error
        * @param[in] msg The error msg
        */
-      DispatchError(reactor const &r, goal_id const &g, std::string const &msg) throw()
+      DispatchError(reactor const &r, token_id const &g, std::string const &msg) throw()
       :ReactorException(r, build_msg(g, msg)) {}
       /** @brief Destructor */
       ~DispatchError() throw() {}
@@ -1280,7 +1340,7 @@ namespace TREX {
        * 
        * @return A string that depicts that the error @p msg did occur with the goal @p g
        */
-      static std::string build_msg(goal_id const &g, std::string const &msg) throw();
+      static std::string build_msg(token_id const &g, std::string const &msg) throw();
     };
     
     

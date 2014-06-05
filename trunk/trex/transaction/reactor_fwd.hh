@@ -50,9 +50,10 @@
 
 # include "bits/transaction_fwd.hh"
 
-# include "Observation.hh"
-# include "Goal.hh"
+# include <trex/domain/token.hh>
 # include <trex/utils/id_mapper.hh>
+
+# include "Tick.hh"
 
 namespace TREX {
   namespace transaction {

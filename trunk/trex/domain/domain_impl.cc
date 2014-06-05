@@ -196,17 +196,18 @@ bool boolean_domain::equals(abstract_domain const &other) const {
   } 
 }
       
-abstract_domain &boolean_domain::restrict_with(abstract_domain const &other) {
+bool boolean_domain::restrict_with(abstract_domain const &other) {
   if( other.type_name()!=type_name() )
     throw EmptyDomain(*this, "Incompatible types");
   else {
     boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
-    if( m_full ) {
-      m_full = ref.m_full;
+    if( m_full && !ref.m_full ) {
+      m_full = false;
       m_val = ref.m_val;
+      return true;
     } else if( !ref.m_full && m_val!=ref.m_val ) 
       throw EmptyDomain(*this, "intersection is empty.");
   }
-  return *this;
+  return false;
 }
 

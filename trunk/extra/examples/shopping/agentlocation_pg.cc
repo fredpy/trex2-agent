@@ -42,7 +42,7 @@ using namespace TREX::AgentLocation;
 
 namespace {
     singleton::use<log_manager> s_log;
-    reactor::factory::declare<AgentLocation> decl("AgentLocation");
+    reactor::declare<AgentLocation> decl("AgentLocation");
 }
 
 namespace TREX {

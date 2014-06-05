@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::factory::declare<TimelineReporter> decl("TimelineReporter");
+  reactor::declare<TimelineReporter> decl("TimelineReporter");
 
 }
 
@@ -30,16 +30,11 @@ namespace TREX {
 }
 
 TimelineReporter::TimelineReporter(reactor::xml_arg_type arg)
-:reactor(arg), graph::timelines_listener(arg), aborted(false)
+:reactor(arg), graph::timelines_listener(std::make_pair(arg.get<0>(), arg.get<1>())), aborted(false)
 {
-  m_hostport = parse_attr<int>(-1, reactor::factory::node(arg),
-                               "hostport");
-  m_hostaddr = parse_attr<std::string>("127.0.0.1",
-                                       reactor::factory::node(arg),
-                                       "hostaddr");
-  m_output = parse_attr<bool>(false,
-                              reactor::factory::node(arg),
-                              "output");
+  m_hostport = parse_attr<int>(-1, xml(arg), "hostport");
+  m_hostaddr = parse_attr<std::string>("127.0.0.1", xml(arg), "hostaddr");
+  m_output = parse_attr<bool>(false, xml(arg), "output");
 }
 
 TimelineReporter::~TimelineReporter() {
@@ -67,33 +62,29 @@ TimelineReporter::undeclared(tr_details::timeline const &timeline)
   unuse(timeline.name());
 }
 
-void TimelineReporter::new_plan_token(goal_id const &g)
+void TimelineReporter::new_plan_token(token_id const &g)
 {
-  Goal * goal = g.get();
-
-  std::string gname = (goal->object()).str();
-  std::string gpred = (goal->predicate()).str();
+  std::string gname = g->object().str();
+  std::string gpred = g->predicate().str();
 
   if (m_output)
-    std::cout << "GOAL: " << *goal << std::endl;
+    std::cout << "GOAL: " << *g << std::endl;
 
   //syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
 }
 
-void TimelineReporter::cancelled_plan_token(goal_id const &g)
+void TimelineReporter::cancelled_plan_token(token_id const &g)
 {
-  Goal * goal = g.get();
-
-   std::string gname = (goal->object()).str();
-   std::string gpred = (goal->predicate()).str();
+   std::string gname = (g->object()).str();
+   std::string gpred = (g->predicate()).str();
 
    if (m_output)
-     std::cout << "RECALL: " << *goal << std::endl;
+     std::cout << "RECALL: " << *g << std::endl;
 
    //syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
 }
 
-void TimelineReporter::notify(Observation const &obs)
+void TimelineReporter::notify(token const &obs)
 {
   std::list<TREX::utils::symbol> attrs;
 
@@ -105,12 +96,12 @@ void TimelineReporter::notify(Observation const &obs)
 
   op.op = TrexOperation::OP_POST_TOKEN;
 
-  obs.listAttributes(attrs);
+  obs.list_attributes(attrs);
   std::list<TREX::utils::symbol>::iterator it;
   for (it = attrs.begin(); it != attrs.end(); it++)
   {
     TrexAttribute attr;
-    var v = obs.getAttribute(*it);
+    var v = obs.attribute(*it);
     symbol type = v.domain().type_name();
 
     if (type.str() == "float") {

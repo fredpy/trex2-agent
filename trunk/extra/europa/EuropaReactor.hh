@@ -92,12 +92,12 @@ namespace TREX {
 
     protected:
       // TREX transaction callbacks
-      void notify(TREX::transaction::Observation const &obs);
-      void handle_request(TREX::transaction::goal_id const &request);
-      void handle_recall(TREX::transaction::goal_id const &request);
+      void notify(TREX::transaction::token const &obs);
+      void handle_request(TREX::transaction::token_id const &request);
+      void handle_recall(TREX::transaction::token_id const &request);
 
-      void new_plan_token(TREX::transaction::goal_id const &t);
-      void cancelled_plan_token(TREX::transaction::goal_id const &t);
+      void new_plan_token(TREX::transaction::token_id const &t);
+      void cancelled_plan_token(TREX::transaction::token_id const &t);
 
       // TREX execution callbacks
       bool has_work();
@@ -117,11 +117,11 @@ namespace TREX {
       void plan_dispatch(EUROPA::TimelineId const &tl,
                          EUROPA::TokenId const &tok);
 
-      void restrict_goal(TREX::transaction::Goal& goal,
-                             EUROPA::TokenId const &tok);
+      void restrict_goal(TREX::transaction::token& goal,
+                          EUROPA::TokenId const &tok);
 
       bool restrict_token(EUROPA::TokenId &tok,
-			  TREX::transaction::Predicate const &pred);
+			  TREX::transaction::token const &pred);
 
       bool check_internal(EUROPA::LabelStr const &tl) const {
 	return is_internal(TREX::utils::symbol(tl.c_str()));
@@ -162,7 +162,7 @@ namespace TREX {
 
       void logPlan(std::string const &base_name) const;
 
-      typedef boost::bimap<EUROPA::eint, TREX::transaction::goal_id> goal_map;
+      typedef boost::bimap<EUROPA::eint, TREX::transaction::token_id> goal_map;
       goal_map m_active_requests;
       goal_map m_dispatched;
       goal_map m_plan_tokens;
@@ -178,6 +178,14 @@ namespace TREX {
     }; // TREX::europa::EuropaReactor
 
   } // TREX::europa
+  
+  namespace transaction {
+    
+    template<>
+    struct exec_policy<europa::EuropaReactor> :public class_scope_exec<europa::EuropaReactor> {};
+    
+    
+  } // TREX::transaction
 } // TREX
 
 #endif // H_trex_EuropaReactor

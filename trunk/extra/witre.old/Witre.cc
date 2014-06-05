@@ -574,7 +574,7 @@ void WitreApplication::attributePopup()
                 msg<<"alert(\"";
                 for(; last!=i; ++i, count++)
                 {
-                  TREX::transaction::goal_id 
+                  TREX::transaction::token_id
                     g = wServer->clientGoalPost(*i);
                   if( g )
                     msg<<"Goal: "<<*g<<"\\n";
@@ -616,18 +616,18 @@ void WitreApplication::clientPostGoal(std::map<string, transaction::int_domain> 
     std::string predicate = input->text().toUTF8();
     if(!object.empty() && !predicate.empty())
     {
-        TREX::transaction::Goal goal = wServer->getGoal(object,predicate);
-        goal.restrictStart(standards.find("Start")->second);
-        goal.restrictDuration(standards.find("Duration")->second);
-        goal.restrictEnd(standards.find("End")->second);
+        TREX::transaction::token goal = wServer->getGoal(object,predicate);
+        goal.restrict_start(standards.find("Start")->second);
+        goal.restrict_duration(standards.find("Duration")->second);
+        goal.restrict_end(standards.find("End")->second);
 
         std::map<string,transaction::float_domain>::iterator etc;
         for(etc = attributes.begin(); etc!=attributes.end(); etc++)
         {
             transaction::var temp(etc->first, etc->second);
-            goal.restrictAttribute(temp);
+            goal.restrict_attribute(temp);
         }
-        TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
+        TREX::transaction::token_id goalid = wServer->clientGoalPost(goal);
         if(goalid!=NULL)
         {
             std::stringstream oss;
@@ -713,12 +713,12 @@ void WitreApplication::newPlanToken(const WitreServer::timed_goal& plan)
     WitreServer::timed_goal::const_iterator t;
     for(t = plan.begin(); t!=plan.end(); ++t)
     {
-        const goal_id& goal = (*t);
+        const token_id& goal = (*t);
         std::ostringstream planStr;
         planStr <<"<Token timeline=\'"<<goal->object()<<"\' pred=\'"<<goal->predicate()
              <<"\' value=\'"<<goal<<"\'>"
              <<"["<<goal->object()<<"."<<goal->predicate()<<"] plan: "
-             <<"Start = "<<goal->getStart()<<" Duration = "<<goal->getDuration()<<" End = "<<goal->getEnd()
+             <<"Start = "<<goal->start()<<" Duration = "<<goal->duration()<<" End = "<<goal->end()
              <<"</Token>";
         ostringstream stime;
         stime<< wServer->current_tick();

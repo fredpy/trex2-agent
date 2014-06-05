@@ -66,8 +66,8 @@ namespace TREX {
     private:
       void handle_init();
       bool synchronize();
-      void handle_request(TREX::transaction::goal_id const &g);
-      void handle_recall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::token_id const &g);
+      void handle_recall(TREX::transaction::token_id const &g);
 
       /** @brief State of the timeline */
       TREX::transaction::TICK m_nextSwitch;
@@ -75,8 +75,8 @@ namespace TREX {
       void setAt(std::string location);
       void setGo(std::string origin, std::string destination);
 
-      std::list<TREX::transaction::goal_id> m_pending;
-      UNIQ_PTR<TREX::transaction::Observation> m_state;
+      std::list<TREX::transaction::token_id> m_pending;
+      UNIQ_PTR<TREX::transaction::token> m_state;
 
       /** @brief Name of the predicate At */
       static TREX::utils::symbol const AtPred;

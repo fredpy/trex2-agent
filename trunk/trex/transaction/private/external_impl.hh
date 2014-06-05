@@ -56,7 +56,7 @@ namespace TREX {
         bool accept_goals() const;
         bool publish_plan() const;
         
-        void on_synch(TICK date, boost::optional<Observation> o);
+        void on_synch(TICK date, token_id o);
         void connect() {
           m_timeline->connect(shared_from_this());
         }

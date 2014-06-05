@@ -328,7 +328,7 @@ namespace TREX {
        * This method will add the goal @p g to the agent. This goal will be posted
        * to whichever reactor owns the timeline associated to @p g
        */
-      void sendRequest(TREX::transaction::goal_id const &g);
+      void sendRequest(TREX::transaction::token_id const &g);
       /** @brief Post a goal from xml 
        *
        * @param[in] g A goal in xml
@@ -340,7 +340,7 @@ namespace TREX {
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
       void sendRequest(boost::property_tree::ptree::value_type &g) {
-	TREX::transaction::goal_id tmp = parse_goal(g);
+	TREX::transaction::token_id tmp = parse_goal(g);
 	sendRequest(tmp);
       }
       /** @brief Post a goals from xml 
@@ -392,10 +392,10 @@ namespace TREX {
       class AgentProxy :public TREX::transaction::reactor {
       public:
 	AgentProxy(Agent &agent)
-          :TREX::transaction::reactor(&agent, "", 0, 0) {}
+        :TREX::transaction::reactor(&agent, transaction::instance_scope_exec::init_exec(agent.strand().get_io_service()), "", 0, 0) {}
 	~AgentProxy() {}
 	
-	bool post_request(TREX::transaction::goal_id const &g) {
+	bool post_request(TREX::transaction::token_id const &g) {
           if( !is_external(g->object()) )
             use(g->object());
           if( is_external(g->object()) )

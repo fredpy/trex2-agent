@@ -200,21 +200,24 @@ void interval_domain<Ty, Prot, Cmp>::parse_upper(std::string const &val) {
 }
 
 template<typename Ty, bool Prot, class Cmp>
-abstract_domain &interval_domain<Ty, Prot, Cmp>::restrict_with
+bool interval_domain<Ty, Prot, Cmp>::restrict_with
 (interval_domain<Ty, Prot, Cmp>::bound const &lo,
  interval_domain<Ty, Prot, Cmp>::bound const &hi) {
   bound const &low = m_lower.max(lo);
   bound const &up = m_upper.min(hi);
   if( up<low )
     throw EmptyDomain(*this, "intersection is empty.");
-  m_lower = low;
-  m_upper = up;
-  return *this;
+  if(low!=m_lower || up!=m_upper) {
+    m_lower = low;
+    m_upper = up;
+    return true;
+  }
+  return false;
 }
 
 
 template<typename Ty, bool Prot, class Cmp>
-abstract_domain &interval_domain<Ty, Prot, Cmp>::restrict_with
+bool interval_domain<Ty, Prot, Cmp>::restrict_with
 (abstract_domain const &other) {
   if( type_name()!=other.type_name() )
     throw EmptyDomain(*this, "Incompatible types");
@@ -223,7 +226,7 @@ abstract_domain &interval_domain<Ty, Prot, Cmp>::restrict_with
       = dynamic_cast<interval_domain<Ty, Prot, Cmp> const &>(other);
     return restrict_with(ref.lower_bound(), ref.upper_bound());
   }
-  return *this;
+  return false;
 }
 
 

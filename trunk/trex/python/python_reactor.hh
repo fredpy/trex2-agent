@@ -66,19 +66,19 @@ namespace TREX {
       bool ext_check(utils::symbol const &tl) const;
       bool ext_unuse(utils::symbol const &tl);
 
-      void post_request(transaction::goal_id const &g);
-      bool cancel_request(transaction::goal_id const &g);
+      void post_request(transaction::token_id const &g);
+      bool cancel_request(transaction::token_id const &g);
     
       void int_decl(utils::symbol const &tl, bool control);
       bool int_check(utils::symbol const &tl) const;
       bool int_undecl(utils::symbol const &tl);
 
-      void post_obs(transaction::Observation const &obs, bool verb);
+      void post_obs(transaction::token const &obs, bool verb);
       
       // transaction callbacks
-      void notify(transaction::Observation const &o);
-      void handle_request(transaction::goal_id const &g);
-      void handle_recall(transaction::goal_id const &g);
+      void notify(transaction::token const &o);
+      void handle_request(transaction::token_id const &g);
+      void handle_recall(transaction::token_id const &g);
       
       // exec callbacks
       void handle_init();
@@ -88,17 +88,26 @@ namespace TREX {
       void resume();
     
     }; // TREX::python::python_reactor
+  
     
-    class producer:public transaction::reactor::factory::factory_type::producer {
-    public:
-      explicit producer(utils::symbol const &name);
-      ~producer() {}
-      
-    private:
-      result_type produce(argument_type arg) const;
-    };
+    
+//    class producer:public transaction::reactor::factory::factory_type::producer {
+//    public:
+//      explicit producer(utils::symbol const &name);
+//      ~producer() {}
+//      
+//    private:
+//      result_type produce(argument_type arg) const;
+//    };
     
   } // TREX::python
+  
+  namespace transaction {
+    template<>
+    struct exec_policy<python::python_reactor>
+      :public class_scope_exec<python::python_reactor> {};
+  
+  }
 } // TREX
 
 #endif // H_trex_python_python_reactor

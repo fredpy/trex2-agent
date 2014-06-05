@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
 
   /** @brief Platform reactor declaration */
-  reactor::factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
+  reactor::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
 
 }
 
@@ -55,10 +55,10 @@ namespace TREX {
     void
     YoYoReactor::handle_init()
     {
-      Observation yoyo(s_yoyo_tl, "Idle");
+      token yoyo(s_yoyo_tl, "Idle");
       post_observation(yoyo);
 
-      Observation yoyo_state(s_yoyo_state_tl, "Idle");
+      token yoyo_state(s_yoyo_state_tl, "Idle");
       post_observation(yoyo_state);
 
       m_lastSeenRef.lat = m_lastSeenRef.lon = m_lastSeenRef.speed =
@@ -99,9 +99,9 @@ namespace TREX {
       var v;
       // int secs_at_surface = 60; //< unused variable
 
-      if (m_lastPosition.hasAttribute("altitude"))
+      if (m_lastPosition.has_attribute("altitude"))
       {
-        v = m_lastPosition.getAttribute("altitude");
+        v = m_lastPosition.attribute("altitude");
         float_domain const &alt = dynamic_cast<float_domain const &>(v.domain());
 
         double alt_ = v.domain().get_typed_singleton<double, true>();
@@ -124,18 +124,18 @@ namespace TREX {
       }*/
 
       double atZ = -1000;
-      if (m_lastPosition.hasAttribute("z"))
+      if (m_lastPosition.has_attribute("z"))
       {
-        var vz = m_lastPosition.getAttribute("z");
+        var vz = m_lastPosition.attribute("z");
         if (vz.is_complete() && vz.domain().is_singleton())
         {
           atZ = vz.domain().get_typed_singleton<double,true>();
         }
       }
 
-      if (m_lastRefState.hasAttribute("near_z"))
+      if (m_lastRefState.has_attribute("near_z"))
       {
-        v = m_lastRefState.getAttribute("near_z");
+        v = m_lastRefState.attribute("near_z");
         boolean_domain const &nearz = dynamic_cast<boolean_domain const &>(v.domain());
 
         if (nearz.is_singleton())
@@ -147,9 +147,9 @@ namespace TREX {
       nearZ = nearZ && abs(atZ - m_cmdz) < 2;
       //std::cerr << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", m_cmdz: "<< m_cmdz<< std::endl;
 
-      if (m_lastRefState.hasAttribute("near_xy"))
+      if (m_lastRefState.has_attribute("near_xy"))
       {
-        v = m_lastRefState.getAttribute("near_xy");
+        v = m_lastRefState.attribute("near_xy");
 
         boolean_domain const &near_XY = dynamic_cast<boolean_domain const &>(v.domain());
 
@@ -199,35 +199,35 @@ namespace TREX {
         if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
         {
           syslog(log::info)<< "Finished executing yoyo...";
-          Observation obs = Observation(s_yoyo_tl, "Done");
-          obs.restrictAttribute("latitude", float_domain(m_lat));
-          obs.restrictAttribute("longitude", float_domain(m_lon));
-          obs.restrictAttribute("speed", float_domain(m_speed));
-          obs.restrictAttribute("max_z", float_domain(m_maxz));
-          obs.restrictAttribute("min_z", float_domain(m_minz));
+          token obs(s_yoyo_tl, "Done");
+          obs.restrict_attribute("latitude", float_domain(m_lat));
+          obs.restrict_attribute("longitude", float_domain(m_lon));
+          obs.restrict_attribute("speed", float_domain(m_speed));
+          obs.restrict_attribute("max_z", float_domain(m_maxz));
+          obs.restrict_attribute("min_z", float_domain(m_minz));
           postUniqueObservation(obs);
           state = IDLE;
         }
         break;
         default:
           syslog(log::info)<< "Just idling...";
-          postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
+          postUniqueObservation(token(s_yoyo_tl, "Idle"));
           break;
       }
 
       switch (state)
       {
         case (DESCEND):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Descending"));
+          postUniqueObservation(token(s_yoyo_state_tl, "Descending"));
           break;
         case (ASCEND):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Ascending"));
+          postUniqueObservation(token(s_yoyo_state_tl, "Ascending"));
           break;
         case (SURFACE):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Surfacing"));
+          postUniqueObservation(token(s_yoyo_state_tl, "Surfacing"));
           break;
         case (IDLE):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Idle"));
+          postUniqueObservation(token(s_yoyo_state_tl, "Idle"));
           break;
       }
 
@@ -237,12 +237,12 @@ namespace TREX {
     void
     YoYoReactor::requestReference(double lat, double lon, double speed, double z)
     {
-      Goal g(s_reference_tl, "Going");
+      token g(s_reference_tl, "Going");
 
-      g.restrictAttribute(var("latitude", float_domain(lat)));
-      g.restrictAttribute(var("longitude", float_domain(lon)));
-      g.restrictAttribute(var("z", float_domain(z)));
-      g.restrictAttribute(var("speed", float_domain(speed)));
+      g.restrict_attribute(var("latitude", float_domain(lat)));
+      g.restrict_attribute(var("longitude", float_domain(lon)));
+      g.restrict_attribute(var("z", float_domain(z)));
+      g.restrict_attribute(var("speed", float_domain(speed)));
 
       //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
@@ -257,7 +257,7 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handle_request(TREX::transaction::goal_id const &goal)
+    YoYoReactor::handle_request(TREX::transaction::token_id const &goal)
     {
       if ( s_trex_pred != m_lastControl.predicate() )
       {
@@ -266,28 +266,28 @@ namespace TREX {
       }
 
       // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
-      goal_id g = goal;
+      token_id g = goal;
       var v;
 
       if ( g->predicate() == s_exec_pred )
       {
-        v = g->getAttribute("latitude");
+        v = g->attribute("latitude");
         if (v.domain().is_singleton())
           m_lat = v.domain().get_typed_singleton<double, true>();
 
-        v = g->getAttribute("longitude");
+        v = g->attribute("longitude");
         if (v.domain().is_singleton())
           m_lon = v.domain().get_typed_singleton<double, true>();
 
-        v = g->getAttribute("speed");
+        v = g->attribute("speed");
         if (v.domain().is_singleton())
           m_speed = v.domain().get_typed_singleton<double, true>();
 
-        v = g->getAttribute("min_z");
+        v = g->attribute("min_z");
         if (v.domain().is_singleton())
           m_minz = v.domain().get_typed_singleton<double, true>();
 
-        v = g->getAttribute("max_z");
+        v = g->attribute("max_z");
         if (v.domain().is_singleton())
           m_maxz = v.domain().get_typed_singleton<double, true>();
 
@@ -302,23 +302,23 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handle_recall(TREX::transaction::goal_id const &g)
+    YoYoReactor::handle_recall(TREX::transaction::token_id const &g)
     {
       //std::cerr << "[YOYO] handleRecall(" << *(g.get()) << ")" << std::endl;
     }
 
     void
-    YoYoReactor::notify(TREX::transaction::Observation const &obs)
+    YoYoReactor::notify(TREX::transaction::token const &obs)
     {
       if (s_reference_tl == obs.object())
       {
         m_lastReference = obs;
         if (m_lastReference.predicate() == "Going")
         {
-          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.speed = obs.getAttribute("speed").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.z = obs.getAttribute("z").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.lat = obs.attribute("latitude").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.lon = obs.attribute("longitude").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.speed = obs.attribute("speed").domain().get_typed_singleton<double,true>();
+          m_lastSeenRef.z = obs.attribute("z").domain().get_typed_singleton<double,true>();
           m_lastSeenRef.tick = current_tick();
         }
         else {

@@ -197,7 +197,7 @@ void REST_reactor::handle_init() {
 void REST_reactor::handle_tick_start() {
 }
 
-void REST_reactor::notify(Observation const &obs) {
+void REST_reactor::notify(token const &obs) {
   m_timelines->new_obs(obs, current_tick());
 }
 
@@ -206,10 +206,10 @@ bool REST_reactor::synchronize() {
   return true;
 }
 
-void REST_reactor::new_plan_token(goal_id const &t) {
+void REST_reactor::new_plan_token(token_id const &t) {
   
 }
 
-void REST_reactor::cancelled_plan_token(goal_id const &t) {
+void REST_reactor::cancelled_plan_token(token_id const &t) {
   
 }

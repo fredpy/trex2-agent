@@ -82,11 +82,12 @@ namespace TREX {
         return *m_domain;
       }
       
-      void restrict_with(abstract_domain const &dom) {
-        if( !m_domain )
+      bool restrict_with(abstract_domain const &dom) {
+        if( !m_domain ) {
           m_domain.reset(dom.copy());
-        else
-          m_domain->restrict_with(dom);
+          return true;
+        } else
+          return m_domain->restrict_with(dom);
       }
       
       bp::ptree as_tree() const;
@@ -196,22 +197,22 @@ var &var::operator= (var const &other) {
   return *this;
 }
 
-var &var::restrict_with(abstract_domain const &dom) {
+bool var::restrict_with(abstract_domain const &dom) {
   if( NULL==m_impl.get() )
     throw VariableException("Cannot restrict a variable with no name");
-  m_impl->restrict_with(dom);
-  return *this;
+  return m_impl->restrict_with(dom);
 }
 
-var &var::restrict_with(var const &v) {
-  if( NULL==m_impl.get() )
-    return operator=(v);
-  else if( NULL!=v.m_impl.get() ) {
+bool var::restrict_with(var const &v) {
+  if( NULL==m_impl.get() ) {
+    operator=(v);
+    return NULL!=m_impl.get();
+  } else if( NULL!=v.m_impl.get() ) {
     if( name()!=v.name() )
       throw VariableException("Cannot merge variables with different names");
-    m_impl->restrict_with(v.domain());
+    return m_impl->restrict_with(v.domain());
   }
-  return *this;
+  return false;
 }
 
 // Observers :

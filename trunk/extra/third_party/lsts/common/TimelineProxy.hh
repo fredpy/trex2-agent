@@ -31,10 +31,10 @@ namespace TREX {
       bool synchronize();
 
       // called when a goal is requested
-      void handle_request(goal_id const &g);
+      void handle_request(token_id const &g);
 
       // called when an observation is posted
-      void notify(Observation const &obs);
+      void notify(token const &obs);
 
       /**
        * @brief should this reactor be used for posting goals (true) or observations (false)?
@@ -67,7 +67,7 @@ namespace TREX {
        */
       std::string m_timeline;
 
-      typedef std::map<std::string, transaction::goal_id> goal_map;
+      typedef std::map<std::string, transaction::token_id> goal_map;
       goal_map m_goals;
     };
   }

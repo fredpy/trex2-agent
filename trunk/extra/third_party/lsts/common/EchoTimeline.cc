@@ -13,7 +13,7 @@ using namespace TREX::utils;
 namespace
 {
   /** @brief EchoTimeline reactor declaration */
-  reactor::factory::declare<EchoTimeline> decl("EchoTimeline");
+  reactor::declare<EchoTimeline> decl("EchoTimeline");
 }
 
 namespace TREX
@@ -24,10 +24,10 @@ namespace TREX
     EchoTimeline::EchoTimeline(TREX::transaction::reactor::xml_arg_type arg):
         LstsReactor(arg)
     {
-      m_timeline = parse_attr<std::string>("params", reactor::factory::node(arg),
+      m_timeline = parse_attr<std::string>("params", xml(arg),
                                              "timeline");
 
-      m_initial_state = parse_attr<std::string>("Boot", reactor::factory::node(arg),
+      m_initial_state = parse_attr<std::string>("Boot", xml(arg),
                                            "initial");
       m_first_tick = true;
     }
@@ -44,7 +44,7 @@ namespace TREX
     {
       if (m_first_tick)
       {
-        postUniqueObservation(Observation(m_timeline, m_initial_state));
+        postUniqueObservation(token(m_timeline, m_initial_state));
       }
       m_first_tick = false;
       return true;
@@ -52,11 +52,11 @@ namespace TREX
 
     // called when a goal is requested
     void
-    EchoTimeline::handle_request(goal_id const &g)
+    EchoTimeline::handle_request(token_id const &g)
     {
       if (g.get()->object().str() == m_timeline)
       {
-        TREX::transaction::Observation observation(*g);
+        TREX::transaction::token observation(*g);
         postUniqueObservation(observation);
       }
       else

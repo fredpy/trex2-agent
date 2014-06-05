@@ -33,6 +33,7 @@
  */
 #include "graph_impl.hh"
 #include "node_impl.hh"
+#include "internal_impl.hh"
 
 #include "trex/utils/asio_runner.hh"
 
@@ -47,11 +48,6 @@ using TREX::utils::symbol;
  */
 
 graph_impl::graph_impl() {
-  m_strand.reset(new asio::strand(m_mgr->service()));
-}
-
-graph_impl::graph_impl(symbol const &name_str)
-:m_name(name_str) {
   m_strand.reset(new asio::strand(m_mgr->service()));
 }
 
@@ -110,6 +106,15 @@ void graph_impl::rm_node(WEAK_PTR<node_impl> n) {
   }
 }
 
+WEAK_PTR<internal_impl> graph_impl::declare_tl(symbol const &tl,
+                                               SHARED_PTR<node_impl> const &n,
+                                               transaction_flags const &fl) {
+  boost::function<SHARED_PTR<internal_impl> ()>
+  fn(boost::bind(&graph_impl::decl_tl_sync, this, tl, n, fl));
+  return utils::strand_run(strand(), fn);
+}
+
+
 // Manipulators
 
 utils::log_manager &graph_impl::manager() const {
@@ -129,6 +134,19 @@ utils::log::stream graph_impl::syslog(symbol const &ctx,
   else
     return m_mgr->syslog(who, kind);
 }
+
+void graph_impl::detached(SHARED_PTR<internal_impl> const &tl) {
+  tl_map::iterator i = m_timelines.find(tl->name());
+
+  if( m_timelines.end()!=i ) {
+    // do something to notify its failure
+
+    if( m_failed.insert(*i).second ) {
+      syslog(utils::log::null, utils::log::warn)<<"Failed timeline "<<i->first;
+    }
+  }
+}
+
 
 // Thread protected operations
 
@@ -169,3 +187,22 @@ void graph_impl::rm_node_sync(SHARED_PTR<node_impl> node) {
     node->reset();
   }
 }
+
+SHARED_PTR<internal_impl> graph_impl::decl_tl_sync(symbol tl,
+                                                   SHARED_PTR<node_impl> n,
+                                                   transaction_flags fl) {
+  tl_map::iterator pos = m_timelines.lower_bound(tl);
+  
+  if( m_timelines.end()==pos || pos->first!=tl ) {
+    SHARED_PTR<internal_impl> obj = MAKE_SHARED<internal_impl>(tl, shared_from_this());
+    pos = m_timelines.insert(pos, tl_map::value_type(tl, obj));
+    // TODO handle the case where this timeline is not assigned yet
+  }
+  // TODO I also need to check for cycles
+  if( n && !pos->second->set_sync(n, fl) ) {
+    // throw an exception here but for now just return NULL
+    return SHARED_PTR<internal_impl>();
+  }
+  return pos->second;
+}
+

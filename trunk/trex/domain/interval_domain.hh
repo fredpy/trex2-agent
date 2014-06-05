@@ -441,11 +441,12 @@ namespace TREX {
        * 
        * @pre [lo, hi] is a valid interval
        * @pre this domain intersect [lo, hi]
-       * @return this domain after the operation
+       * @retval true if the domain changed
+       * @retval false otherwise
        * @throw EmptyDomain resulting domain is empty
        */
-      abstract_domain &restrict_with(bound const &lo, bound const &hi);
-      abstract_domain &restrict_with(abstract_domain const &other);
+      bool restrict_with(bound const &lo, bound const &hi);
+      bool restrict_with(abstract_domain const &other);
 
       /** @brief interval lower bound
        *

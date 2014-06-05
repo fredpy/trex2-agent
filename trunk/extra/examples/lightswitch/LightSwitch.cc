@@ -68,7 +68,7 @@ namespace {
   singleton::use<log_manager> s_log;
 
   /** @brief Light reactor declaration */
-  reactor::factory::declare<Light> decl("Light");
+  reactor::declare<Light> decl("Light");
   
 }
 
@@ -105,9 +105,9 @@ symbol const Light::switchObj("switch");
 
 Light::Light(reactor::xml_arg_type arg)
   :reactor(arg, false),
-   m_on(parse_attr<bool>(false, reactor::factory::node(arg),
+   m_on(parse_attr<bool>(false, reactor::xml(arg),
 			 "state")),
-   m_verbose(parse_attr<bool>(false, reactor::factory::node(arg),
+   m_verbose(parse_attr<bool>(false, reactor::xml(arg),
 			      "verbose")),
    m_firstTick(true) {
   syslog(null, info)<<"I want to own "<<lightObj;
@@ -130,11 +130,11 @@ void Light::setValue(bool val) {
     light_v = offPred;
     switch_v = upPred;
   }
-  m_light_state.reset(new Observation(lightObj, light_v));
+  m_light_state.reset(new token(lightObj, light_v));
   //syslog()<<"Posting "<<*m_light_state;
   post_observation(*m_light_state);
-  Observation switch_state(switchObj, switch_v);
-  switch_state.restrictAttribute("foo", boolean_domain(m_on));
+  token switch_state(switchObj, switch_v);
+  switch_state.restrict_attribute("foo", boolean_domain(m_on));
   //syslog()<<"Posting "<<switch_state;
   post_observation(switch_state);
 } 
@@ -157,9 +157,9 @@ bool Light::synchronize() {
       while( !m_pending.empty() ){
 //        syslog()<<"Checking "<<m_pending.front()->object()<<"."
 //        <<m_pending.front()->predicate()<<".start="<<m_pending.front()->getStart();
-	if( m_pending.front()->startsAfter(cur) ) {
+	if( m_pending.front()->starts_after(cur) ) {
 	  // it can start after cur
-	  if( m_pending.front()->startsBefore(cur+1) ) {
+	  if( m_pending.front()->starts_before(cur+1) ) {
 	    
 	    // it can also starts before cur => it can be set to cur 
 	    if( brokenPred!=m_pending.front()->predicate() ) {
@@ -167,11 +167,11 @@ bool Light::synchronize() {
 	      setValue(downPred==m_pending.front()->predicate());
 	      need_post = false;
 	    } else {
-	      Observation obs(*m_pending.front());
+	      token obs(*m_pending.front());
 //              syslog()<<"Posting "<<obs<<" as an observation";
 	      post_observation(obs);
 	    }
-	    m_nextSwitch = cur+m_pending.front()->getDuration().lower_bound().value();
+	    m_nextSwitch = cur+m_pending.front()->duration().lower_bound().value();
 	    m_pending.pop_front();
 	  } // else {
 //            syslog()<<"This goal is still in the future ("<<m_pending.front()->getStart()
@@ -198,19 +198,19 @@ bool Light::synchronize() {
   return true;
 }
 
-void Light::handle_request(goal_id const &g) {
+void Light::handle_request(token_id const &g) {
   if( g->predicate()==upPred || g->predicate()==downPred || g->predicate()==brokenPred ) {
     // I insert it on my list
-    int_domain::bound lo = g->getStart().lower_bound();
+    int_domain::bound lo = g->start().lower_bound();
     if( lo.is_infinity() ) {
 //      syslog()<<"Adding "<<*g<<" to front of pending goals";
       m_pending.push_front(g);
     } else {
-      std::list<goal_id>::iterator i = m_pending.begin();
+      std::list<token_id>::iterator i = m_pending.begin();
 //      size_t pos = 1;
       TICK val = lo.value();
       for(; m_pending.end()!=i; ++i ) {
-	if( (*i)->startsAfter(val) )
+	if( (*i)->starts_after(val) )
 	  break;
 //        ++pos;
       }
@@ -222,8 +222,8 @@ void Light::handle_request(goal_id const &g) {
 //  }
 }
 
-void Light::handle_recall(goal_id const &g) {
-  std::list<goal_id>::iterator i = m_pending.begin();
+void Light::handle_recall(token_id const &g) {
+  std::list<token_id>::iterator i = m_pending.begin();
   for( ; m_pending.end()!=i; ++i ) {
     if( *i==g ) {
       m_pending.erase(i);

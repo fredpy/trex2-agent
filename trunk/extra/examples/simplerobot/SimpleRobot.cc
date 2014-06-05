@@ -30,7 +30,7 @@ void SimpleRobot::handle_init()
 {
 }
 
-void SimpleRobot::setValue(TREX::transaction::goal_id const &g)
+void SimpleRobot::setValue(TREX::transaction::token_id const &g)
 {
 	syslog()<<"setValue";
 }
@@ -41,12 +41,12 @@ bool SimpleRobot::synchronize()
     return true;
 }
 
-void SimpleRobot::handle_request(goal_id const &g)
+void SimpleRobot::handle_request(token_id const &g)
 {
 	syslog()<<"handleRequest";
 }
 
-void SimpleRobot::handle_recall(goal_id const &g)
+void SimpleRobot::handle_recall(token_id const &g)
 {
 	syslog()<<"handleRecall";
 }

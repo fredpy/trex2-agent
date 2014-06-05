@@ -75,7 +75,7 @@ namespace TREX {
 
     private:
 
-      void notify(TREX::transaction::Observation const &obs);
+      void notify(TREX::transaction::token const &obs);
 
       /** @brief Message listeenign thread.
        *
@@ -136,8 +136,8 @@ namespace TREX {
       void handle_init();
       void handle_tick_start();
       bool synchronize();
-      void new_plan_token(TREX::transaction::goal_id const &t);
-      void cancelled_plan_token(TREX::transaction::goal_id const &t);
+      void new_plan_token(TREX::transaction::token_id const &t);
+      void cancelled_plan_token(TREX::transaction::token_id const &t);
       
 
       /** @brief Add a goal
@@ -148,12 +148,12 @@ namespace TREX {
        *
        * @post the pending goal queue is not empty
        */
-      void add_goal(TREX::transaction::goal_id const &g,
+      void add_goal(TREX::transaction::token_id const &g,
                     boost::optional<std::string> const &id);
       void add_recall(std::string const &id);
 
-      bool next(std::set<TREX::transaction::goal_id> &l,
-                TREX::transaction::goal_id &g);
+      bool next(std::set<TREX::transaction::token_id> &l,
+                TREX::transaction::token_id &g);
 
       
       /** @brief Thead listening execution loop
@@ -209,10 +209,10 @@ namespace TREX {
       
       
       bool m_running;
-      std::set<TREX::transaction::goal_id> m_pending_goals,
+      std::set<TREX::transaction::token_id> m_pending_goals,
         m_pending_recalls;
       
-      typedef boost::bimap<std::string, TREX::transaction::goal_id> goal_map; 
+      typedef boost::bimap<std::string, TREX::transaction::token_id> goal_map;
       goal_map m_goals;
       
       bool m_need_fifo;

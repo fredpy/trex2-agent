@@ -80,7 +80,7 @@ namespace TREX {
 	bool intersect(TREX::transaction::abstract_domain const &other) const;
 	bool equals(TREX::transaction::abstract_domain const &other) const;
 
-	TREX::transaction::abstract_domain &restrict_with(TREX::transaction::abstract_domain const &other);
+	bool restrict_with(TREX::transaction::abstract_domain const &other);
 	EUROPA::Domain const &europaDomain() const {
 	  return *m_dom;
 	}

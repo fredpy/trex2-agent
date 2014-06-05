@@ -79,8 +79,8 @@ namespace TREX {
     private:
       
       bool synchronize();
-      void handle_request(TREX::transaction::goal_id const &g);
-      void handle_recall(TREX::transaction::goal_id const &g);
+      void handle_request(TREX::transaction::token_id const &g);
+      void handle_recall(TREX::transaction::token_id const &g);
       void handle_tick_start();
       void handle_init();
       bool sendMsg(Message& msg, std::string ip, int port);
@@ -89,15 +89,15 @@ namespace TREX {
       void handleTrexOperation(TrexOperation trexOp);
       void enqueueGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
-      typedef std::map<std::string, SHARED_PTR<Observation> > obs_map;
+      typedef std::map<std::string, token_id> obs_map;
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      bool handleGoingRequest(goal_id const & g);
-      bool handleAtRequest(goal_id const & g);
-      bool handleYoYoRequest(goal_id const &goal);
-      void handleGoingRecall(goal_id const & g);
-      bool handleSurveilRequest(goal_id const &g);
+      bool handleGoingRequest(token_id const & g);
+      bool handleAtRequest(token_id const & g);
+      bool handleYoYoRequest(token_id const &goal);
+      void handleGoingRecall(token_id const & g);
+      bool handleSurveilRequest(token_id const &g);
 
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);
@@ -136,20 +136,20 @@ namespace TREX {
 
       /** @brif vector of received goals */
       std::queue<std::string> receivedGoals;
-      std::queue<Observation> referenceObservations;
+      std::queue<token> referenceObservations;
 
       IMC::Reference goingRef;
       bool m_reference_initialized;
 
-      boost::function<bool (goal_id)> m_going_platform;
+      boost::function<bool (token_id)> m_going_platform;
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
 
       void setValue(bool val);
       
-      bool goingAUV(goal_id goal);
-      bool goingUAV(goal_id g);
+      bool goingAUV(token_id goal);
+      bool goingUAV(token_id g);
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
       void insertIntoReceived(IMC::Message* msg);
       void postGoalToken();
@@ -158,8 +158,8 @@ namespace TREX {
       void enqueueReferenceAtObs();
       DesiredZ setUavRefZ(const double z);
 
-      std::list<TREX::transaction::goal_id> m_goals_pending;
-      std::list<TREX::transaction::Observation> m_observations_pending;
+      std::list<TREX::transaction::token_id> m_goals_pending;
+      std::list<TREX::transaction::token> m_observations_pending;
 
       /** @brief received announces since last tick */
       std::map<std::string, Announce *> m_receivedAnnounces;

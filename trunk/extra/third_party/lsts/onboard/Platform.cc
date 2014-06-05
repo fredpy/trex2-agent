@@ -14,7 +14,7 @@ namespace
   singleton::use<log_manager> s_log;
   
   /** @brief Platform reactor declaration */
-  reactor::factory::declare<TREX::LSTS::Platform> decl("Platform");
+  reactor::declare<TREX::LSTS::Platform> decl("Platform");
   
 }
 
@@ -55,18 +55,18 @@ namespace TREX
       // connect with Safety bug through a singleton object
       m_env->setPlatformReactor(this);
       
-      duneport = parse_attr<int>(6002, reactor::factory::node(arg),
+      duneport = parse_attr<int>(6002, xml(arg),
                                  "duneport");
       duneip = parse_attr<std::string>("127.0.0.1",
-                                       reactor::factory::node(arg),
+                                       xml(arg),
                                        "duneip");
-      debug = parse_attr<bool>(false, reactor::factory::node(arg),
+      debug = parse_attr<bool>(false, xml(arg),
                                "debug");
 
-      m_auv = parse_attr<bool>(false, reactor::factory::node(arg),
+      m_auv = parse_attr<bool>(false, xml(arg),
                                "auv");
 
-      localport = parse_attr<int>(false, reactor::factory::node(arg),
+      localport = parse_attr<int>(false, xml(arg),
                                   "localport");
       //m_links = std::map<std::string, Announce*>();
       
@@ -80,7 +80,7 @@ namespace TREX
       // Timelines that can be controlled by other reactors
       provide("reference");
       
-      bool is_uav = parse_attr<bool>(false, reactor::factory::node(arg),
+      bool is_uav = parse_attr<bool>(false, xml(arg),
                                      "uav");
       if( is_uav ) {
         syslog(log::info)<< "Setting platform Going handler for UAVs (aerial)";
@@ -148,7 +148,7 @@ namespace TREX
     // First deal with requests
     if( !m_blocked && !m_goals_pending.empty() )
     {
-      goal_id goal = m_goals_pending.front();
+      token_id goal = m_goals_pending.front();
       std::string gname = (goal->object()).str();
       std::string gpred = (goal->predicate()).str();
       std::string man_name;
@@ -230,9 +230,9 @@ namespace TREX
           ///////////////////////////////////
           PlanControlState * previous_pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
           PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(msg);
-          /*bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
-          bool isActive = isActiveInPlanControlStateMsg(pcstate);
-          if(wasActive!=isActive) m_create_new_ref = true;*//*
+          //bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
+          //bool isActive = isActiveInPlanControlStateMsg(pcstate);
+          // if(wasActive!=isActive) m_create_new_ref = true;
           // keep to test if creating new ref is working
           if(isActiveInPlanControlStateMsg(pcstate) && !m_create_new_ref)
             //std::cout << "new ref:" << (wasActive?"true":"false") << " + " << (isActive?"true":"false") << " ==> " << (m_create_new_ref?"true":"false") << "\n";
@@ -325,13 +325,11 @@ namespace TREX
     
     
     void
-    Platform::handle_request(goal_id const &g)
+    Platform::handle_request(token_id const &g)
     {
       
-      goal_id goal = g;
-      
-      std::string gname = (goal->object()).str();
-      std::string gpred = (goal->predicate()).str();
+      std::string gname = (g->object()).str();
+      std::string gpred = (g->predicate()).str();
       std::string man_name;
       
       syslog(log::info)  << "handleRequest(" << gpred << ")" << std::endl;
@@ -340,16 +338,14 @@ namespace TREX
     }
     
     void
-    Platform::handle_recall(goal_id const &g)
+    Platform::handle_recall(token_id const &g)
     {
-       goal_id goal = g;
-      
-      std::string gname = (goal->object()).str();
-      std::string gpred = (goal->predicate()).str();
+      std::string gname = (g->object()).str();
+      std::string gpred = (g->predicate()).str();
       std::string man_name;
-      syslog(log::error) << "handleRecall(" << g << ", " << *goal << ")";
+      syslog(log::error) << "handleRecall(" << g << ", " << *g << ")";
       if (debug)
-        std::cout << "handleRecall(" << g << ", " << *goal << ")";
+        std::cout << "handleRecall(" << g << ", " << *g << ")";
       
       m_goals_pending.remove(g);
       handle_request(g);
@@ -487,21 +483,21 @@ namespace TREX
     void
     Platform::enqueueReferenceAtObs()
     {
-      Observation obs("reference", "At");
-      obs.restrictAttribute("latitude", float_domain(m_ref.lat));
-      obs.restrictAttribute("longitude", float_domain(m_ref.lon));
+      token obs("reference", "At");
+      obs.restrict_attribute("latitude", float_domain(m_ref.lat));
+      obs.restrict_attribute("longitude", float_domain(m_ref.lon));
       if (!m_ref.z.isNull())
       {
         switch (m_ref.z->z_units)
         {
           case (Z_DEPTH):
-            obs.restrictAttribute("z", float_domain(m_ref.z->value));
+            obs.restrict_attribute("z", float_domain(m_ref.z->value));
             break;
           case (Z_ALTITUDE):
-            obs.restrictAttribute("z", float_domain(-m_ref.z->value));
+            obs.restrict_attribute("z", float_domain(-m_ref.z->value));
             break;
           case (Z_HEIGHT):
-            obs.restrictAttribute("z", float_domain(m_ref.z->value));
+            obs.restrict_attribute("z", float_domain(m_ref.z->value));
             break;
           default:
             break;
@@ -509,7 +505,7 @@ namespace TREX
       }
       if (!m_ref.speed.isNull())
       {
-        obs.restrictAttribute("speed", float_domain((m_ref.speed->value)));
+        obs.restrict_attribute("speed", float_domain((m_ref.speed->value)));
       }
       //postUniqueObservation(obs);
       referenceObservations.push(obs);
@@ -525,7 +521,7 @@ namespace TREX
       }
 
       PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
-      TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
+      TREX::transaction::token planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
       m_blocked = !isActiveInPlanControlStateMsg(pcstate);
       
@@ -553,7 +549,7 @@ namespace TREX
       
       for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
       {
-        Observation obs = m_adapter.announceObservation(it->second);
+        token obs = m_adapter.announceObservation(it->second);
         postUniqueObservation(obs);
       }
 
@@ -595,23 +591,22 @@ namespace TREX
     }
     
     bool
-    Platform::handleAtRequest(goal_id const &goal)
+    Platform::handleAtRequest(token_id const &g)
     {
       
-      goal_id g = goal;
       double my_lat = 0, my_lon = 0, my_z = 0, req_lat = 0, req_lon = 0, req_z = 0;
       
-      if(g->getAttribute("latitude").domain().is_singleton())
+      if(g->attribute("latitude").domain().is_singleton())
       {
-        req_lat = g->getAttribute("latitude").domain().get_typed_singleton<double, true>();
+        req_lat = g->attribute("latitude").domain().get_typed_singleton<double, true>();
       }
-      if(g->getAttribute("longitude").domain().is_singleton())
+      if(g->attribute("longitude").domain().is_singleton())
       {
-        req_lon = g->getAttribute("longitude").domain().get_typed_singleton<double, true>();
+        req_lon = g->attribute("longitude").domain().get_typed_singleton<double, true>();
       }
-      if(g->getAttribute("z").domain().is_singleton())
+      if(g->attribute("z").domain().is_singleton())
       {
-        req_z = g->getAttribute("z").domain().get_typed_singleton<double, true>();
+        req_z = g->attribute("z").domain().get_typed_singleton<double, true>();
       }
       
       EstimatedState * estate =
@@ -646,14 +641,14 @@ namespace TREX
       return desZ;
     }
 
-    bool Platform::goingUAV(goal_id g) {
+    bool Platform::goingUAV(token_id g) {
       // double minz, maxz, z;
       // int max_secs_underwater = 30000;
       var lat, lon, z, v;
       
-      lat = g->getAttribute("latitude");
-      lon = g->getAttribute("longitude");
-      z = g->getAttribute("z");
+      lat = g->attribute("latitude");
+      lon = g->attribute("longitude");
+      z = g->attribute("z");
       
       if( lat.domain().is_singleton() &&
           lon.domain().is_singleton() &&
@@ -666,7 +661,7 @@ namespace TREX
       
         DesiredZ desZ = setUavRefZ(z.domain().get_typed_singleton<double, true>());
         // Deal with the optional attributes
-        v = g->getAttribute("radius");
+        v = g->attribute("radius");
         if (v.domain().is_singleton())
         {
           m_ref.radius = v.domain().get_typed_singleton<double, true>();
@@ -695,18 +690,17 @@ namespace TREX
     }
     
     bool
-    Platform::handleYoYoRequest(goal_id const &goal)
+    Platform::handleYoYoRequest(token_id const &goal)
     {
       return handleGoingRequest(goal);
     }
     
-    bool Platform::goingAUV(goal_id goal) {
+    bool Platform::goingAUV(token_id g) {
 
-      goal_id g = goal;
       var lat, lon, v;
       
-      lat = g->getAttribute("latitude");
-      lon = g->getAttribute("longitude");
+      lat = g->attribute("latitude");
+      lon = g->attribute("longitude");
       
       // Double check that lat and lon are singleton just to be
       // on the safe side
@@ -716,7 +710,7 @@ namespace TREX
         m_ref.lat = lat.domain().get_typed_singleton<double, true>();
         m_ref.lon = lon.domain().get_typed_singleton<double, true>();
       
-        v = g->getAttribute("z");
+        v = g->attribute("z");
         if(v.domain().is_singleton()) {
           double z = v.domain().get_typed_singleton<double, true>();
           DesiredZ desZ;
@@ -733,7 +727,7 @@ namespace TREX
           syslog(log::warn)<<"AUV going : Z was not set keeping old value ...";
         }
         m_ref.flags = flags;
-        v = g->getAttribute("speed");
+        v = g->attribute("speed");
         if (v.domain().is_singleton()) {
           double speed = v.domain().get_typed_singleton<double, true>();
           DesiredSpeed desSpeed;
@@ -750,13 +744,13 @@ namespace TREX
     }
     
     bool
-    Platform::handleGoingRequest(goal_id const &goal)
+    Platform::handleGoingRequest(token_id const &goal)
     {
       //goingAUV(goal);
       var lat, lon;
       
-      lat = goal->getAttribute("latitude");
-      lon = goal->getAttribute("longitude");
+      lat = goal->attribute("latitude");
+      lon = goal->attribute("longitude");
       
       if( lat.domain().is_singleton() &&
           lon.domain().is_singleton() ) {

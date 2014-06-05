@@ -112,8 +112,10 @@ boost::optional<TICK> details::internal_impl::synch_date() const {
 
 // manipulators
 
-Observation details::internal_impl::create_obs(utils::symbol const &pred) {
-  return Observation(name(), pred);
+token_id details::internal_impl::create_obs(utils::symbol const &pred) {
+  token_id ret = MAKE_SHARED<token>(name(), pred);
+  ret->pred_tag(token::obs_tag);
+  return ret;
 }
 
 void details::internal_impl::connect(SHARED_PTR<details::external_impl> client) {
@@ -126,8 +128,7 @@ void details::internal_impl::connect(SHARED_PTR<details::external_impl> client) 
 
 // modifiers
 
-void details::internal_impl::post_observation(Observation const &obs,
-                                              bool echo) {
+void details::internal_impl::post_observation(token_id const &obs, bool echo) {
   SHARED_PTR<graph_impl> g = graph();
   
   if( g ) {
@@ -160,6 +161,10 @@ bool details::internal_impl::reset_sync() {
     m_owner.reset();
     m_access.reset();
     m_next_obs = create_obs(s_failed);
+    SHARED_PTR<graph_impl> g = m_graph.lock();
+    
+    if( g )
+      g->detached(shared_from_this());
     return true;
   }
   return false;
@@ -202,7 +207,7 @@ void details::internal_impl::connect_sync(SHARED_PTR<details::external_impl> cli
       g->strand().post(boost::bind(&external_impl::on_synch,
                                    client, m_obs_date, m_last_obs));
       if( m_obs_date<m_last_synch ) {
-        boost::optional<Observation> empty;
+        token_id empty;
         // update to last tick date
         g->strand().post(boost::bind(&external_impl::on_synch,
                                      client, m_last_synch, empty));
@@ -213,7 +218,7 @@ void details::internal_impl::connect_sync(SHARED_PTR<details::external_impl> cli
 
 
 void details::internal_impl::post_obs_sync(SHARED_PTR<details::node_impl> node,
-                                           Observation obs, bool echo) {
+                                           token_id obs, bool echo) {
   SHARED_PTR<node_impl> owner = m_owner.lock();
   
   if( node==owner ) {
@@ -249,7 +254,7 @@ void details::internal_impl::notify_sync(TICK date) {
   //       is not stupid
   
   if( g ) {
-    boost::optional<Observation> obs(m_next_obs);
+    token_id obs = m_next_obs;
     
     if( m_next_obs ) {
       // if m_next_obs is not empty then it is a nerw observation

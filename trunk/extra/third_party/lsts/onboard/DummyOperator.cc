@@ -15,7 +15,7 @@ namespace
 {
 
   /** @brief DummyOperator reactor declaration */
-  reactor::factory::declare<DummyOperator> decl("DummyOperator");
+  reactor::declare<DummyOperator> decl("DummyOperator");
 
 }
 
@@ -29,7 +29,7 @@ DummyOperator::~DummyOperator() {
   // TODO Auto-generated destructor stub
 }
 
-void DummyOperator::notify(TREX::transaction::Observation const &obs)
+void DummyOperator::notify(TREX::transaction::token const &obs)
 {
   if (obs.object().str() == "control" && obs.predicate() == "DUNE")
   {

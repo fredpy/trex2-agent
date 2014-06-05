@@ -655,8 +655,8 @@ namespace TREX {
         m_verbose = flag;
       }
       
-      goal_id parse_goal(boost::property_tree::ptree::value_type goal) const;
-      boost::property_tree::ptree export_goal(goal_id const &g) const;
+      token_id parse_goal(boost::property_tree::ptree::value_type goal) const;
+      boost::property_tree::ptree export_goal(token_id const &g) const;
       
       
       boost::asio::strand &strand();

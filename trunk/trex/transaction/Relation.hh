@@ -173,8 +173,8 @@ namespace TREX {
       
       bool accept_plan_tokens() const;
 
-      void recall(goal_id const &g);
-      void request(goal_id const &g);
+      void recall(token_id const &g);
+      void request(token_id const &g);
       
       /** @brief Relation latency
        * 
@@ -280,7 +280,7 @@ namespace TREX {
        * @sa Relation::lastObsDate() const
        * @sa details::timeline::lastObservation() const
        */
-      Observation const &lastObservation() const; 
+      token_id lastObservation() const;
 
       /** @brief client for this relation
        *
@@ -385,7 +385,7 @@ namespace TREX {
 	return *this;
       }
       std::string rights() const;
-
+      
     private:
       /** @brief Constructor
        *

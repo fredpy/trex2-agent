@@ -57,7 +57,8 @@ namespace xml = boost::property_tree::xml_parser;
 // structors
 
 WitreServer::WitreServer(tr::reactor::xml_arg_type arg)
-:tr::reactor(arg, false), graph::timelines_listener(arg),
+:tr::reactor(arg, false),
+graph::timelines_listener(std::make_pair(arg.get<0>(), arg.get<1>())),
  m_server(NULL), m_entry(NULL) {
    // Attempt to locate wt_config.xml first
    bool found;
@@ -259,7 +260,7 @@ void WitreServer::searchGraph()
     boost::depth_first_search(get_graph(), boost::visitor(vis2));
 }
 
-void WitreServer::notify(Observation const &obs)
+void WitreServer::notify(token const &obs)
 {
     boost::mutex::scoped_lock lock(mutex_);
     // time_t now = (tickToTime(getCurrentTick())-boost::posix_time::from_time_t(0)).total_seconds();
@@ -316,14 +317,14 @@ bool WitreServer::synchronize()
     return true;
 }
 
-void WitreServer::new_plan_token(goal_id const &t)
+void WitreServer::new_plan_token(token_id const &t)
 {
     planTokens.remove(t);
     planTokens.push_back(t);
     dispatchPlanTokens();
 }
 
-void WitreServer::cancelled_plan_token(goal_id const &t)
+void WitreServer::cancelled_plan_token(token_id const &t)
 {
 
 }
@@ -334,8 +335,8 @@ void WitreServer::dispatchPlanTokens()
     timed_goal::iterator plan;
     for(plan = planTokens.begin(); plan!=planTokens.end(); ++plan)
     {
-        goal_id const& t = (*plan);
-        if(t->getEnd().upper_bound()<current_tick())
+        token_id const& t = (*plan);
+        if(t->end().upper_bound()<current_tick())
         {
             pastTokens.push_front((*plan));
             eraselist.push_back(plan);
@@ -353,30 +354,30 @@ void WitreServer::dispatchPlanTokens()
     }
 }
 
-goal_id WitreServer::clientGoalPost(boost::property_tree::ptree::value_type const &xml) {
+token_id WitreServer::clientGoalPost(boost::property_tree::ptree::value_type const &xml) {
   boost::mutex::scoped_lock lock(mutex_);
-  goal_id g = parse_goal(xml);
+  token_id g = parse_goal(xml);
   if( post_goal(g) )
     return g;
-  return goal_id();
+  return token_id();
 }
 
 
-goal_id WitreServer::clientGoalPost(Goal const &g)
+token_id WitreServer::clientGoalPost(token const &g)
 {
     boost::mutex::scoped_lock lock(mutex_);
     if(is_external(g.object()))
     {
-        goal_id id = post_goal(g);
+        token_id id = post_goal(g);
         return id;
     }
-    return goal_id();
+    return token_id();
 }
 
-TREX::transaction::Goal WitreServer::getGoal(std::string obs, std::string prd)
+TREX::transaction::token WitreServer::getGoal(std::string obs, std::string prd)
 {
     boost::mutex::scoped_lock lock(mutex_);
-    TREX::transaction::Goal clientGoal(obs,prd);
+    TREX::transaction::token clientGoal(obs,prd);
     return clientGoal;
 }
 

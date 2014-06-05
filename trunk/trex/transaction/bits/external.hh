@@ -43,7 +43,7 @@
 #ifndef H_BITS_external
 # define H_BITS_external
 
-# include "../Goal.hh"
+# include <trex/domain/token.hh>
 # include "timeline.hh"
 
 # include <boost/iterator_adaptors.hpp>
@@ -62,7 +62,7 @@ namespace TREX {
        * @ingroup transaction
        * @relates class external
        */
-      typedef std::list< std::pair<goal_id, bool> >  goal_queue;
+      typedef std::list< std::pair<token_id, bool> >  goal_queue;
       /** @brief A external timeline proxy
        *
        * This type by a external class to represent an external timeline
@@ -170,7 +170,7 @@ namespace TREX {
          * @sa dispatch(TICK, goal_queue &)
          * @sa recall(goal_id const &)
          */
-        bool post_goal(goal_id const &g);
+        bool post_goal(token_id const &g);
         /** @brief Goal dispatching management
          *
          * @param[in] current The current tick
@@ -203,7 +203,7 @@ namespace TREX {
          * @sa valid() const
          * @sa post_goal(goal_id const &)
          */
-        void recall(goal_id const &g);
+        void recall(token_id const &g);
 
 	/** @brief releas all blocked goals 
 	 *

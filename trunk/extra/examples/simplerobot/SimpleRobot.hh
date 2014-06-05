@@ -17,12 +17,12 @@ namespace TREX {
             private:
                 void handle_init();
                 bool synchronize();
-                void handle_request(TREX::transaction::goal_id const &g);
-                void handle_recall(TREX::transaction::goal_id const &g);
+                void handle_request(TREX::transaction::token_id const &g);
+                void handle_recall(TREX::transaction::token_id const &g);
 
 
 
-                void setValue(TREX::transaction::goal_id const &g);
+                void setValue(TREX::transaction::token_id const &g);
 
                 /** Timeline Navigator */
                 static TREX::utils::symbol const navigatorObj;

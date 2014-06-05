@@ -39,6 +39,7 @@ add_library(TREXdomain SHARED
   basic_interval.cc
   domain_impl.cc
   var.cc
+  token.cc
 
   # headers 
   abstract_domain.hh
@@ -54,6 +55,7 @@ add_library(TREXdomain SHARED
   int_domain.hh
   string_domain.hh
   var.hh
+  token.hh
 
   # template source
   bits/interval_domain.tcc

@@ -242,13 +242,13 @@ namespace TREX {
 	 * @sa lastObsDate() const
 	 * @sa postObservation(TICK, Observation const &)
 	 */
-	Observation const &lastObservation() const {
-	  return *m_last_obs;
+	token_id lastObservation() const {
+	  return m_last_obs;
 	}
-	Observation const &lastObservation(bool &print) {
+	token_id lastObservation(bool &print) {
 	  print = m_shouldPrint;
 	  m_shouldPrint = false;
-	  return *m_last_obs;
+	  return m_last_obs;
 	}
 
 	/** @brief Timeline look ahead
@@ -292,7 +292,7 @@ namespace TREX {
          * @sa request(goal_id const &)
          * @sa TeleoReactor::handleRecall(goal_id const &);
          */
-	void recall(goal_id const &g);
+	void recall(token_id const &g);
         /** @brief Request a new goal
          *
          * @param[in] g A goal
@@ -303,7 +303,7 @@ namespace TREX {
          * @sa recall(goal_id const &)
          * @sa TeleoReactor::handleRequest(goal_id const &);
          */
-	void request(goal_id const &g);
+	void request(token_id const &g);
 
 	bool accept_goals() const {
 	  return owned() && m_transactions.test(0); 
@@ -447,12 +447,12 @@ namespace TREX {
 	 * @sa lastObservation() const
 	 * @sa lastObsDate() const
 	 */
-	void postObservation(Observation const &obs, 
+	void postObservation(token_id const &obs,
 			     bool verbose = false);
         void synchronize(TICK date);
         
-        bool notifyPlan(goal_id const &t);
-        bool cancelPlan(goal_id const &t);
+        bool notifyPlan(token_id const &t);
+        bool cancelPlan(token_id const &t);
 
 	void latency_update(TICK prev);
 
@@ -484,8 +484,7 @@ namespace TREX {
 	client_set    m_clients;
 	
 
-        boost::optional<Observation> m_last_obs;
-        boost::optional<Observation> m_next_obs;
+        token_id m_last_obs, m_next_obs;
         TICK m_last_synch;
         TICK m_obs_date;
 

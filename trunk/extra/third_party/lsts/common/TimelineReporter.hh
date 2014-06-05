@@ -46,9 +46,9 @@ namespace TREX {
         return !aborted;
       }
 
-      void notify(TREX::transaction::Observation const &obs);
-      void new_plan_token(TREX::transaction::goal_id const &t);
-      void cancelled_plan_token(goal_id const &t);
+      void notify(TREX::transaction::token const &obs);
+      void new_plan_token(TREX::transaction::token_id const &t);
+      void cancelled_plan_token(token_id const &t);
 
     };
   }
