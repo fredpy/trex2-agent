@@ -174,8 +174,9 @@ void priority_strand::send(Fn f) {
   enqueue(new details::async_task<return_type>(f));
 }
 
-template<typename Fn, typename Handler>
-void priority_strand::send(Fn f, Handler handle) {
+template<typename Fn>
+void priority_strand::send(Fn f,
+                           typename details::task_helper<Fn>::handler handle) {
   typedef typename details::task_helper<Fn>::return_type return_type;
   details::async_task<return_type> *tsk;
   tsk = new details::async_task<return_type>(f);
@@ -190,8 +191,9 @@ void priority_strand::send(Fn f, priority_strand::priority_type p) {
   enqueue(new details::async_task<return_type>(f, p));
 }
 
-template<typename Fn, typename Handler>
-void priority_strand::send(Fn f, Handler handle,
+template<typename Fn>
+void priority_strand::send(Fn f,
+                           typename details::task_helper<Fn>::handler handle,
                            priority_strand::priority_type p) {
   typedef typename details::task_helper<Fn>::return_type return_type;
   details::async_task<return_type> *tsk;
