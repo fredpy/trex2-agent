@@ -42,9 +42,11 @@ generic_factory<P, I, C, R, O>::get
 (typename generic_factory<P, I, C, R, O>::id_param id) const {
     typename generic_factory<P, I, C, R, O>::catalog_type::const_iterator
     i = m_producers.find(id);
-    if( m_producers.end()==i )
-        throw UnknownFactoryType("No producer associated to this ID");
-    return *(i->second); 
+    if( m_producers.end()==i ) {
+      ERROR_CODE ec = factory_error::make_error(factory_error::unknown_id);
+      throw SYSTEM_ERROR(ec);
+    }
+    return *(i->second);
 }
 
 template<class P, class I, class C, class R, class O>

@@ -163,7 +163,8 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
     EUROPA::edouble val;
         
     if( NULL==o_dom )
-      throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is an entity but not an object.\nDo not know how to handle this.");
+      throw SYSTEM_ERROR(make_error(tr::domain_error::domain_access),
+                         m_dom->toString()+" is an europa entity but not an object.");
     else {
       EUROPA::ObjectId obj; 
       EUROPA::PlanDatabaseId p_db; 
@@ -171,7 +172,8 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
       // Need to identify the plan database 
       std::list<EUROPA::ObjectId> objs = o_dom->makeObjectList();
       if( objs.empty() )
-        throw tr::DomainAccess(*dom, "Europa domain "+o_dom->toString()+" was empty before the operation");
+        throw SYSTEM_ERROR(make_error(tr::domain_error::empty_domain),
+                           "Europa domain is empty");
       else
         p_db = objs.front()->getPlanDatabase();
       objs.clear();
@@ -182,8 +184,7 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
           objs.push_back(obj);
       }
       if( objs.empty() ) // the intersection is empty
-        throw tr::EmptyDomain(*dom, "Europa object domain "+m_dom->toString()+
-                          " became empty.");
+        throw SYSTEM_ERROR(make_error(tr::domain_error::empty_domain));
       EUROPA::ObjectDomain tmp(m_type, objs);
       if( m_dom->intersect(tmp) )
         *m_updated = true;
@@ -199,14 +200,14 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
         values.push_back(val);
     }
     if( values.empty() ) // the intersection is empty
-      throw tr::EmptyDomain(*dom, "Europa enumerated domain "+m_dom->toString()+
-			" became empty.");
+      throw SYSTEM_ERROR(make_error(tr::domain_error::empty_domain));
     // Apply the intersection
     EUROPA::EnumeratedDomain tmp(m_type, values);
     if( m_dom->intersect(tmp) )
       *m_updated = true;
-  } else 
-    throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not enumerated.");
+  } else
+    throw SYSTEM_ERROR(make_error(tr::domain_error::incompatible_types),
+                       "Europa domain is not enumerated");
 }
 
 namespace {
@@ -251,12 +252,12 @@ void details::europa_domain::visit(tr::basic_interval const *dom) {
       tmp->intersect(elo, ehi);
     }
     if( tmp->isEmpty() )
-      throw tr::EmptyDomain(*dom, "Europa Interval domain "+m_dom->toString()
-			+" became empty.");
+      throw SYSTEM_ERROR(make_error(tr::domain_error::empty_domain));
     if( m_dom->intersect(*tmp) )
       *m_updated = true;
-  } else 
-    throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not an interval.");
+  } else
+    SYSTEM_ERROR(make_error(tr::domain_error::incompatible_types),
+                 "Europa domain is not an interval");
 }
 
 void details::europa_domain::visit(tr::abstract_domain const *dom, bool) {
@@ -267,13 +268,12 @@ void details::europa_domain::visit(tr::abstract_domain const *dom, bool) {
     EuropaDomain const &ed = dynamic_cast<EuropaDomain const &>(*dom);
     
     if( !m_dom->intersects(ed.europaDomain()) )
-      throw tr::EmptyDomain(*dom, "EUROPA domain "+m_dom->toString()+" became empty.");
+      throw SYSTEM_ERROR(make_error(tr::domain_error::empty_domain));
     else if( m_dom->intersect(ed.europaDomain()) )
       *m_updated = true;
-  } else 
-    // I have no way to know at this stage
-    throw tr::DomainAccess(*dom, "Don't know how to convert domains "+
-		       type.str()+" for Europa.");
+  } else
+    throw SYSTEM_ERROR(make_error(tr::domain_error::domain_access),
+                       "Do not know Europa equivalent to "+type.str());
 }
 
 

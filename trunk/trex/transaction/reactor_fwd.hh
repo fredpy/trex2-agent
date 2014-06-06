@@ -55,6 +55,8 @@
 
 # include "Tick.hh"
 
+#include <trex/utils/Exception.hh>
+
 namespace TREX {
   namespace transaction {
 

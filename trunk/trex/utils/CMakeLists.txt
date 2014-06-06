@@ -60,6 +60,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_library(TREXutils SHARED
   # real source
   Exception.cc
+  factory_error.cc
   log_manager.cc
   Pdlfcn.cc
   plugin_loader.cc

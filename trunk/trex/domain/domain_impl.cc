@@ -128,8 +128,8 @@ void boolean_domain::parse_singleton(std::string const &val) {
     m_full = false;
     m_val = bv;
   } else if( m_val!=bv )
-    throw EmptyDomain(*this, "setting to singleton resulted in boolean empty domain");
-
+    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                       "parsing singleton(bool)");
 }
 
 void boolean_domain::parse_lower(std::string const &val) {
@@ -140,7 +140,8 @@ void boolean_domain::parse_lower(std::string const &val) {
       m_full = false;
       m_val = bv;
     } else if( m_val!=bv )
-      throw EmptyDomain(*this, "setting to lower bound to true resulted in boolean empty domain");
+      throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                         "parsing lower bound(bool)");
   }
 }
 
@@ -153,7 +154,8 @@ void boolean_domain::parse_upper(std::string const &val)  {
       m_full = false;
       m_val = bv;
     } else if( m_val!=bv )
-      throw EmptyDomain(*this, "setting to upper bound to false resulted in boolean empty domain");
+      throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                         "parsing upper bound(bool)");
   }
 }
 
@@ -198,15 +200,15 @@ bool boolean_domain::equals(abstract_domain const &other) const {
       
 bool boolean_domain::restrict_with(abstract_domain const &other) {
   if( other.type_name()!=type_name() )
-    throw EmptyDomain(*this, "Incompatible types");
+    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types));
   else {
     boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
     if( m_full && !ref.m_full ) {
       m_full = false;
       m_val = ref.m_val;
       return true;
-    } else if( !ref.m_full && m_val!=ref.m_val ) 
-      throw EmptyDomain(*this, "intersection is empty.");
+    } else if( !ref.m_full && m_val!=ref.m_val )
+      throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
   }
   return false;
 }

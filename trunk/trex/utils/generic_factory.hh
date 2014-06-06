@@ -53,37 +53,29 @@
 
 # include "singleton.hh"
 # include "platform/cpp11_deleted.hh"
-# include "Exception.hh"
+# include "platform/system_error.hh"
 
 namespace TREX {
   namespace utils {
 		
-    class FactoryException :public Exception {
+    namespace factory_error {
+      enum factory_error_t {
+        ok           = 0,
+        unknown_id,
+        multiple_ids
+      }; // TREX::utils::factory_error::factory_error_t
+      
+      ERROR_CODE make_error(factory_error_t e);
+    
+    } // TREX::utils::factory_error
+    
+    class factory_category :public ERROR_CATEGORY {
     public:
-      virtual ~FactoryException() throw() =0;
-    protected:
-      FactoryException(std::string const &msg) throw()
-	:Exception(msg) {}
-    }; // class TREX::utils::FactoryException
-		
-    inline FactoryException::~FactoryException() throw() {}
-		
-    class UnknownFactoryType :public FactoryException {
-    public:
-      UnknownFactoryType(std::string const &msg) throw()
-	:FactoryException(msg) {}
-      ~UnknownFactoryType() throw() {}
-			
-    }; // class TREX::utils::UnknownFactoryType
-
-    class MultipleFactoryDecl :public FactoryException {
-    public:
-      MultipleFactoryDecl(std::string const &msg) throw()
-	:FactoryException(msg) {}
-      ~MultipleFactoryDecl() throw() {}
-    }; // class TREX::utils::MultipleFactoryDecl
-		
-		
+      virtual char const *name() const;
+      virtual std::string message(int ev) const;
+    };
+    
+    
     template< class AbstractProduct, class Id, class ConsArg,
 	      class ProductRef = AbstractProduct *,
 	      class IdComp = std::less<Id> >

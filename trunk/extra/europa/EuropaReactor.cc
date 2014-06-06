@@ -734,10 +734,10 @@ bool EuropaReactor::restrict_token(EUROPA::TokenId &tok,
       //syslog("INFO")<<"Apply "<<tok->toString()<<"."<<var;
       try {
 	details::europa_restrict(param, attr.domain());
-      } catch(DomainExcept const &e) {
+      } catch(SYSTEM_ERROR const &e) {
 	syslog(null, warn)<<"Failed to restrict attribute "<<(*v)
 		      <<" on token "<<pred.object()<<'.'<<pred.predicate()
-		      <<": "<<e;
+                      <<": "<<e.code()<<": "<<e.what();
 	no_empty = false;
       }
     } else

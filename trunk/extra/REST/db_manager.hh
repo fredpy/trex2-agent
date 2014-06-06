@@ -39,6 +39,8 @@
 # include <Wt/Dbo/SqlConnection>
 # include <Wt/Dbo/Session>
 
+# include <trex/utils/Exception.hh>
+
 namespace TREX {
   namespace REST {
     namespace helpers {

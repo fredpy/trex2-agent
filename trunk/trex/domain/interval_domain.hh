@@ -380,7 +380,7 @@ namespace TREX {
 	:basic_interval(type), m_lower(lb), m_upper(ub) {
 	if( m_upper<m_lower || ( m_lower.is_infinity()
 				 && m_upper==m_lower ) ) {
-	  throw EmptyDomain(*this, "interval domain is empty");
+          throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
 	}
       }
       /** @brief Constructor
