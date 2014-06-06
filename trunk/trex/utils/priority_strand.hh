@@ -228,7 +228,8 @@ namespace TREX {
         typedef typename boost::result_of<Fn()>::type return_type;
         typedef boost::shared_future<return_type>     future;
         
-        typedef async_result<return_type>             wrapper;
+        typedef async_result<return_type>                wrapper;
+        typedef boost::function<void (wrapper const &)>  handler;
       }; // TREX::utils::details::task_helper<>
       
     } // TREX::utils::details
@@ -342,12 +343,13 @@ namespace TREX {
        */
       template<typename Fn>
       void send(Fn f);
-      template<typename Fn, typename Handler>
-      void send(Fn f, Handler handle);
+      template<typename Fn>
+      void send(Fn f, typename details::task_helper<Fn>::handler handle);
       template<typename Fn>
       void send(Fn f, priority_type p);
-      template<typename Fn, typename Handler>
-      void send(Fn f, Handler handle, priority_type p);
+      template<typename Fn>
+      void send(Fn f, typename details::task_helper<Fn>::handler handle,
+                priority_type p);
       /** @} */
       
       /** @brief Number of pending tasks
