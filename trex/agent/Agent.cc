@@ -465,9 +465,9 @@ Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
   add_reactor(m_proxy);
   try {
     loadConf(file_name);
-  } catch(TREX::utils::Exception const &e) {
-    syslog(null, error)<<"Exception caught while loading "<<file_name<<":\n"
-		       <<e;
+  } catch(SYSTEM_ERROR const &e) {
+    syslog(null, error)<<"Error caught while loading "<<file_name<<":\n"
+		       <<e.code()<<": "<<e.what();
     throw;
   } catch(std::exception const &se) {
     syslog(null, error)<<"C++ exception caught while loading "
@@ -489,9 +489,9 @@ Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool 
   add_reactor(m_proxy);
   try {
     loadConf(conf);
-  } catch(TREX::utils::Exception const &e) {
-    syslog(null, error)<<"Exception caught while loading XML:\n"
-		       <<e;
+  } catch(SYSTEM_ERROR const &e) {
+    syslog(null, error)<<"Error caught while loading XML:\n"
+                       <<e.code()<<": "<<e.what();
     throw;
   } catch(std::exception const &se) {
     syslog(null, error)<<"C++ exception caught while loading XML:\n"

@@ -151,10 +151,10 @@ namespace {
 	  trex.sendRequests(config);
 	}
 	return true;
-      } catch(Exception const &te) {
-	s_log->syslog("sim", error)<<"TREX error while loading \""<<name
-				   <<"\": "<<te;
-	std::cerr<<"TREX error "<<te<<std::endl;
+      } catch(SYSTEM_ERROR const &se) {
+	s_log->syslog("sim", error)<<"Error while loading \""<<name<<"\":\n"
+                                  <<se.code()<<": "<<se.what();
+	std::cerr<<"error: "<<se.code()<<": "<<se.what()<<std::endl;
       } catch( std::exception const &e ) {
 	s_log->syslog("sim", error)<<"Exception while loading \""<<name
 				   <<"\": "<<e.what();
@@ -404,9 +404,9 @@ int main(int argc, char **argv) {
 	printHelp();
       }
     }
-  } catch(Exception const &e) {
-    std::cerr<<"Caught a TREX exception: "<<e<<std::endl;
-    s_log->syslog("sim", error)<<"Exception caught: "<<e;
+  } catch(SYSTEM_ERROR const &e) {
+    std::cerr<<"Caught an error: "<<e.code()<<": "<<e.what()<<std::endl;
+    s_log->syslog("sim", error)<<"Error caught:\n"<<e.code()<<": "<<e.what();
     ret = -2;
   } catch(std::exception const &se) {
     std::cerr<<"Caught a C++ exception: "<<se.what()<<std::endl;

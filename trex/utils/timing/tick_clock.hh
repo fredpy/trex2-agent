@@ -35,7 +35,6 @@
 # define H_TREX_utils_tick_clock
 
 # include "../platform/chrono.hh"
-# include "../Exception.hh"
 
 namespace TREX {
   namespace utils {
