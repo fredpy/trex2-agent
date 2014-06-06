@@ -47,7 +47,7 @@ namespace {
     char const *name() const throw() {
       return "trex domain";
     }
-    std::string message(int ev) const throw() ;
+    std::string message(int ev) const throw();
   };
 
   std::string domain_category_impl::message(int ev) const throw() {
