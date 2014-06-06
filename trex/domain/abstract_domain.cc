@@ -42,12 +42,38 @@
 
 using namespace TREX::transaction;
 
-std::string DomainExcept::build_message(abstract_domain const &d,
-                                        std::string const &msg) throw() {
-  std::ostringstream oss;
-  oss<<"Domain "<<d.type_name()<<" "<<d<<" : "<<msg;
-  return oss.str();
+namespace {
+  class domain_category_impl :public ERROR_CATEGORY {
+    char const *name() const {
+      return "trex domain";
+    }
+    std::string message(int ev) const;
+  };
+
+  std::string domain_category_impl::message(int ev) const {
+    switch (ev) {
+      case domain_error::ok:
+        return "OK";
+      case domain_error::empty_domain:
+        return "Empty domain";
+      case domain_error::not_a_singleton:
+        return "Not a singleton domain";
+      case domain_error::incompatible_types:
+        return "Incompatible domain types";
+      case domain_error::domain_access:
+        return "Cannot access domain";
+      case domain_error::unnamed_var:
+        return "Invalid var name";
+      default:
+        return "Unknown error";
+    }
+  }
 }
+
+ERROR_CODE TREX::transaction::domain_error::make_error(domain_error::domain_error_t e) {
+  return ERROR_CODE(static_cast<int>(e), domain_category_impl());
+}
+
 
 /*
  * class TREX::transaction::abstract_domain
@@ -57,13 +83,13 @@ std::string DomainExcept::build_message(abstract_domain const &d,
 
 boost::any abstract_domain::get_singleton() const {
   if( !is_singleton() )
-    throw DomainAccess(*this, ": not a singleton");
+    throw SYSTEM_ERROR(make_error(domain_error::not_a_singleton));
   return singleton();
 }
 
 std::string abstract_domain::get_singleton_as_string() const {
   if( !is_singleton() )
-    throw DomainAccess(*this, ": not a singleton");
+    throw SYSTEM_ERROR(make_error(domain_error::not_a_singleton));
   return string_singleton();
 }
 

@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2013, Frederic Py.
+ *
+ *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,38 +31,32 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_system_error
-# define H_trex_system_error
+#include "generic_factory.hh"
 
-# include "bits/cpp11.hh"
+using namespace TREX::utils;
 
-# ifdef DOXYGEN
+/*
+ * class TREX::utils::factory_category
+ */
 
-#  define ERROR_CODE     computed_type
-#  define ERROR_CATEGORY computed_type
-#  define ERRC           computed_type
-#  define SYSTEM_ERROR   computed_type
-#  define ERROR_NS       computed_ns
+char const *factory_category::name() const {
+  return "factory";
+}
 
-# else // !DOXYGEN
 
-#  ifdef CPP11_HAS_SYSTEM_ERROR
+std::string factory_category::message(int ev) const {
+  switch (ev) {
+    case factory_error::ok:
+      return "OK";
+    case factory_error::unknown_id:
+      return "Unknown producer id";
+    case factory_error::multiple_ids:
+      return "Producer id used multiple times";
+    default:
+      return "unknown error";
+  }
+}
 
-#   include <system_error>
-#   define ERROR_NS ::std
-
-#  else // !CPP11_HAS_SYSTEM_ERROR
-
-#   include <boost/system/system_error.hpp>
-#   define ERROR_NS ::boost::system
-
-#  endif // CPP11_HAS_SYSTEM_ERROR
-
-#  define ERROR_CODE     ERROR_NS::error_code
-#  define SYSTEM_ERROR   ERROR_NS::system_error
-#  define ERROR_CATEGORY ERROR_NS::error_category
-#  define ERRC           ERROR_NS::errc
-
-# endif // DOXYGEN
-
-#endif // H_trex_system_error
+ERROR_CODE TREX::utils::factory_error::make_error(factory_error::factory_error_t e) {
+  return ERROR_CODE(static_cast<int>(e), factory_category());
+}

@@ -53,28 +53,6 @@
 namespace TREX {
   namespace transaction {
 
-    /** @brief Variable related exception
-     *
-     * This exception is thrown when a problem is detected during a
-     * Variable manipulation
-     *
-     * @relates Variable
-     * @ingroup domains
-     */
-    class VariableException :public TREX::utils::Exception {
-    public:
-      /** @brief Constructor
-       * @param msg A message
-       *
-       * Creat a new instance with the associated message @e msg
-       */
-      VariableException(std::string const &msg) throw()
-	:TREX::utils::Exception(msg) {}
-      /** @brief Destructor */
-      ~VariableException() throw() {}
-    }; // TREX::transaction::VariableException
-    
-
     /** @brief TREX variable representation
      *
      * This class implements a TREX variable. variables are

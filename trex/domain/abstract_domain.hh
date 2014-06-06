@@ -78,76 +78,21 @@ namespace TREX {
   namespace transaction {      
     
     class abstract_domain;
-
-    /** @brief Empty domain
-     *
-     * This exception is thrown after an invalid domain operation
-     *
-     * @relates DomainBase
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup domains
-     */
-    class DomainExcept :public TREX::utils::Exception {
-    public:
-      /** @brief Constructor
-       * @param d A domain
-       * @param msg A message
-       *
-       * Create new instance with the message @e msg
-       */
-      DomainExcept(abstract_domain const &d, std::string const &msg) throw()
-	:TREX::utils::Exception(build_message(d, msg)) {}
-      /** @brief Destructor */
-      ~DomainExcept() throw() {}
+    
+    namespace domain_error {
+      enum domain_error_t {
+        ok                = 0,
+        empty_domain      = 1,
+        not_a_singleton,
+        incompatible_types,
+        domain_access,
+        unnamed_var
+      }; // TREX::transaction::domain_error::domain_error_t
       
-    private:
-      static std::string build_message(abstract_domain const &d,
-				       std::string const &msg) throw();
-    }; // TREX::transaction::DomainExcept
-
-    /** @brief Empty domain
-     *
-     * This exception is thrown when a domain operation makes
-     * it empty.
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup domains
-     */
-    class EmptyDomain :public DomainExcept {
-    public:
-      /** @brief Constructor
-       * @param d A domain
-       * @param msg A message
-       *
-       * Create new instance with the message @e msg
-       */
-      EmptyDomain(abstract_domain const &d, std::string const &msg) throw()
-	:DomainExcept(d, msg) {}
-      /** @brief Destructor */
-      ~EmptyDomain() throw() {}
-    }; // TREX::transaction::EmptyDomain
-
-    /** @brief  domain access error
-     *
-     * This exception is thrown by invalid access operation on a domain.
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup domains
-     */
-    class DomainAccess :public DomainExcept {
-    public:
-      /** @brief Constructor
-       * @param d A domain
-       * @param msg A message
-       *
-       * Create new instance with the message @e msg
-       */
-      DomainAccess(abstract_domain const &d, std::string const &msg) throw()
-	:DomainExcept(d, msg) {}
-      /** @brief Destructor */
-      ~DomainAccess() throw() {}
-    }; // TREX::transaction::EmptyDomain
-
+      ERROR_CODE make_error(domain_error_t e);
+      
+    }
+    
     /** @brief Abstract domain definition
      *
      * This class is an abstract representation of a domain as manipulated

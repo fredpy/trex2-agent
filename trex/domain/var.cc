@@ -53,12 +53,12 @@ namespace TREX {
       impl(symbol const &name, abstract_domain *dom)
       :m_name(name), m_domain(dom) {
         if( m_name.empty() )
-          throw VariableException("Empty var names are not allowed");
+          throw SYSTEM_ERROR(make_error(domain_error::unnamed_var));
       }
       impl(symbol const &name, abstract_domain const &dom)
       :m_name(name), m_domain(dom.copy()) {
         if( m_name.empty() )
-          throw VariableException("Empty var names are not allowed");
+          throw SYSTEM_ERROR(make_error(domain_error::unnamed_var));
       }
       impl(bp::ptree &node);
       impl(impl const &other):m_name(other.name()) {
@@ -185,7 +185,7 @@ symbol var::name() const {
 
 abstract_domain const &var::domain() const {
   if( !is_complete() )
-    throw VariableException("Variable's domain cannot be accessed");
+    throw SYSTEM_ERROR(make_error(domain_error::domain_access));
   return m_impl->domain();
 }
 
@@ -199,7 +199,8 @@ var &var::operator= (var const &other) {
 
 bool var::restrict_with(abstract_domain const &dom) {
   if( NULL==m_impl.get() )
-    throw VariableException("Cannot restrict a variable with no name");
+    throw SYSTEM_ERROR(make_error(domain_error::domain_access),
+                       "Variable is not initialized");
   return m_impl->restrict_with(dom);
 }
 
@@ -209,7 +210,8 @@ bool var::restrict_with(var const &v) {
     return NULL!=m_impl.get();
   } else if( NULL!=v.m_impl.get() ) {
     if( name()!=v.name() )
-      throw VariableException("Cannot merge variables with different names");
+      throw SYSTEM_ERROR(make_error(domain_error::domain_access),
+                         "Attempted to merge variables with different names");
     return m_impl->restrict_with(v.domain());
   }
   return false;

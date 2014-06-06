@@ -48,7 +48,7 @@
 # include <boost/utility.hpp>
 # include <boost/thread/recursive_mutex.hpp>
 
-# include "Exception.hh"
+# include <stdexcept>
 
 namespace TREX {
   namespace utils {
@@ -66,8 +66,7 @@ namespace TREX {
      * that this condition is respected. (?)
      * @ingroup utils
      */
-    class bad_access
-      :public Exception {
+    class bad_access:public std::logic_error {
     public:
       /** @brief Constructor.
        *
@@ -76,10 +75,9 @@ namespace TREX {
        * Create a new instance with associated message @p message
        */
       bad_access(std::string const &message) throw()
-	:Exception(message) {}
+      :std::logic_error(message) {}
       /** @brief Destructor. */
       ~bad_access() throw() {}
-      
     }; // TREX::utils::bad_access
     
     /** @brief multi-thread shared variable

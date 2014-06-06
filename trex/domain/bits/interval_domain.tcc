@@ -175,7 +175,8 @@ template<typename Ty, bool Prot, class Cmp>
 void interval_domain<Ty, Prot, Cmp>::parse_singleton(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( tmp.is_infinity() )
-    throw EmptyDomain(*this, "trying to set domain to an infinity singleton.");
+    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                       "attempt to set as singleton to infinity");
   m_lower = tmp;
   m_upper = tmp;
 }
@@ -186,7 +187,8 @@ void interval_domain<Ty, Prot, Cmp>::parse_lower(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( m_upper<tmp || 
       ( m_upper==tmp && m_upper.is_infinity() ) )
-    throw EmptyDomain(*this, "trying to set lower bound above upper bound");
+    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                       "attempt to set lower bound above upper");
   m_lower = tmp;
 }
 
@@ -195,7 +197,8 @@ void interval_domain<Ty, Prot, Cmp>::parse_upper(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( m_lower>tmp || 
       ( m_lower==tmp && m_lower.is_infinity() ) )
-    throw EmptyDomain(*this, "trying to set upper bound below upper bound");
+    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                       "attempt to set upper bound below lower");
   m_upper = tmp;
 }
 
@@ -206,7 +209,8 @@ bool interval_domain<Ty, Prot, Cmp>::restrict_with
   bound const &low = m_lower.max(lo);
   bound const &up = m_upper.min(hi);
   if( up<low )
-    throw EmptyDomain(*this, "intersection is empty.");
+    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+                       "intervals do not overlap");
   if(low!=m_lower || up!=m_upper) {
     m_lower = low;
     m_upper = up;
@@ -220,7 +224,7 @@ template<typename Ty, bool Prot, class Cmp>
 bool interval_domain<Ty, Prot, Cmp>::restrict_with
 (abstract_domain const &other) {
   if( type_name()!=other.type_name() )
-    throw EmptyDomain(*this, "Incompatible types");
+    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types));
   else {
     interval_domain<Ty, Prot, Cmp> const &ref
       = dynamic_cast<interval_domain<Ty, Prot, Cmp> const &>(other);
