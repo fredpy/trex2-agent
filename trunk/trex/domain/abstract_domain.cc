@@ -44,13 +44,13 @@ using namespace TREX::transaction;
 
 namespace {
   class domain_category_impl :public ERROR_CATEGORY {
-    char const *name() const {
+    char const *name() const throw() {
       return "trex domain";
     }
-    std::string message(int ev) const;
+    std::string message(int ev) const throw() ;
   };
 
-  std::string domain_category_impl::message(int ev) const {
+  std::string domain_category_impl::message(int ev) const throw() {
     switch (ev) {
       case domain_error::ok:
         return "OK";

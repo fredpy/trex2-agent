@@ -35,27 +35,37 @@
 
 using namespace TREX::utils;
 
-/*
- * class TREX::utils::factory_category
- */
-
-char const *factory_category::name() const {
-  return "factory";
-}
-
-
-std::string factory_category::message(int ev) const {
-  switch (ev) {
-    case factory_error::ok:
-      return "OK";
-    case factory_error::unknown_id:
-      return "Unknown producer id";
-    case factory_error::multiple_ids:
-      return "Producer id used multiple times";
-    default:
-      return "unknown error";
+namespace  {
+  
+  class factory_category :public ERROR_CATEGORY {
+  public:
+    virtual char const *name() const throw();
+    virtual std::string message(int ev) const throw();
+  };
+  
+  /*
+   * class ::factory_category
+   */
+  
+  char const *factory_category::name() const throw() {
+    return "factory";
   }
+  
+  std::string factory_category::message(int ev) const throw() {
+    switch (ev) {
+      case factory_error::ok:
+        return "OK";
+      case factory_error::unknown_id:
+        return "Unknown producer id";
+      case factory_error::multiple_ids:
+        return "Producer id used multiple times";
+      default:
+        return "unknown error";
+    }
+  }
+
 }
+
 
 ERROR_CODE TREX::utils::factory_error::make_error(factory_error::factory_error_t e) {
   return ERROR_CODE(static_cast<int>(e), factory_category());
