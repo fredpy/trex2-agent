@@ -69,12 +69,6 @@ namespace TREX {
     
     } // TREX::utils::factory_error
     
-    class factory_category :public ERROR_CATEGORY {
-    public:
-      virtual char const *name() const;
-      virtual std::string message(int ev) const;
-    };
-    
     
     template< class AbstractProduct, class Id, class ConsArg,
 	      class ProductRef = AbstractProduct *,
