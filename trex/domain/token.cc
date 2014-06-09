@@ -375,12 +375,64 @@ void token::restrict_attribute(var const &v) {
   }
 }
 
+void token::merge_with(token const &other) {
+  if( object()!=other.object() )
+    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types),
+                       "Not the same token object ("
+                       +object().str()+"!="+other.object().str()+")");
+  if( predicate()!=other.predicate() )
+    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types),
+                       "Not the same token predicate type ("
+                       +predicate().str()+"!="+other.predicate().str()+")");
+
+  attr_set::iterator i = m_attrs.begin();
+  attr_set::const_iterator j = attr_begin(false); // skip start,duration,end
+                                                  // as we want to handle them
+                                                  // differently later
+  attr_set::value_compare cmp(m_attrs.value_comp());
+  std::list<var> merged;
+  
+  
+  while( m_attrs.end()!=i && other.m_attrs.end()!=j ) {
+    if( cmp(*i, *j) )
+      i = m_attrs.lower_bound(j->first);
+    else if( cmp(*j, *i) ) {
+      merged.push_back(j->second);
+      ++j;
+    } else {
+      var tmp = i->second;
+      if( tmp.restrict_with(j->second) ) // May throw an exception
+        merged.push_back(tmp); // domain was updated => queue it
+      ++i; ++j;
+    }
+  }
+  
+  // Now merge temporal domains
+  //   temporal domain are a special case as they are constraned together
+  //   hence we need to do the propagation this specific way
+  restrict_time(other.start(), other.duration(), other.end()); // May throw and exception
+  
+  bool updated; // this guy is simply ignored as all the merges we
+                // do here trigger an update
+  // OK now I can do the merging
+  while( !merged.empty() ) {
+    i = constrain(merged.front(), updated);
+    merged.pop_front();
+    m_updated(*this, i->second); // Notify on attribute update
+  }
+  for( ;other.m_attrs.end()!=j; ++j) {
+    i = constrain(j->second, updated);
+    m_updated(*this, i->second); // Notify on attribute addition
+  }
+}
+
 token::attr_set::iterator token::constrain(var const &v, bool &updated) {
   attr_set::iterator pos = m_attrs.lower_bound(v.name());
   updated = false;
 
   if( m_attrs.end()!=pos && v.name()==pos->first ) {
-    pos->second.restrict_with(v);
+    if( pos->second.restrict_with(v) )
+      updated = true;
   } else {
     pos = m_attrs.insert(pos, std::make_pair(v.name(), v));
     updated = true;
