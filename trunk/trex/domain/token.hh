@@ -148,6 +148,32 @@ namespace TREX {
                               abstract_domain const &d) {
         return restrict_attribute(var(name, d));
       }
+      /** @brief "Merge" 2 tokens
+       *
+       * @tparam[in] other Another token
+       *
+       * This method constrain current instance with @p other. 
+       * This constraint is in the sense that it changes this instance 
+       * as the intersecetion between the current instance and @p other
+       *
+       * @pre consistent_with(other)
+       * @throw SYSTEM_ERROR @p other was not consistent with this instance
+       *  which  means that either:
+       *   @li the 2 tokens are not on the same object
+       *   @li the 2 tokens are not the seme predicate
+       *   @li one attribute intersection domain between other and this 
+       *       token is empty
+       *
+       * @sa consistent_with(token const &)
+       * @post this token attributes have been restricted with 
+       *       the attributes of other
+       *
+       * @note At the current stage the merge operation do not maintain 
+       *   the tokens it is merged to. Which mean that if @p other 
+       *   is updated later on these updates will not propagate to this 
+       *   instance unless this method is called again explicitely.
+       */
+      void merge_with(token const &other);
       
       void restrict_time(int_domain const &s,
                          int_domain const &d,
