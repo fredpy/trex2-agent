@@ -35,14 +35,15 @@
 
 add_library(TREXdomain SHARED
   abstract_domain.cc
+  domain_errors.cc
   basic_enumerated.cc
   basic_interval.cc
   domain_impl.cc
   var.cc
   token.cc
-
   # headers 
   abstract_domain.hh
+  domain_errors.hh
   basic_enumerated.hh
   basic_interval.hh
   boolean_domain.hh

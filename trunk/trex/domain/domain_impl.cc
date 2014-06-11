@@ -128,7 +128,7 @@ void boolean_domain::parse_singleton(std::string const &val) {
     m_full = false;
     m_val = bv;
   } else if( m_val!=bv )
-    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+    throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                        "parsing singleton(bool)");
 }
 
@@ -140,7 +140,7 @@ void boolean_domain::parse_lower(std::string const &val) {
       m_full = false;
       m_val = bv;
     } else if( m_val!=bv )
-      throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+      throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                          "parsing lower bound(bool)");
   }
 }
@@ -154,7 +154,7 @@ void boolean_domain::parse_upper(std::string const &val)  {
       m_full = false;
       m_val = bv;
     } else if( m_val!=bv )
-      throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+      throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                          "parsing upper bound(bool)");
   }
 }
@@ -198,18 +198,23 @@ bool boolean_domain::equals(abstract_domain const &other) const {
   } 
 }
       
-bool boolean_domain::restrict_with(abstract_domain const &other) {
+bool boolean_domain::restrict_with(abstract_domain const &other,
+                                   ERROR_CODE &ec) {
   if( other.type_name()!=type_name() )
-    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types));
+    ec = domain_error_code(domain_error::incompatible_types);
   else {
     boolean_domain const &ref = dynamic_cast<boolean_domain const &>(other);
-    if( m_full && !ref.m_full ) {
-      m_full = false;
-      m_val = ref.m_val;
-      return true;
-    } else if( !ref.m_full && m_val!=ref.m_val )
-      throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
+    ec = domain_error_code(domain_error::ok);
+    if( !ref.m_full ) {
+      if( m_full ) {
+        m_full = false;
+        m_val = ref.m_val;
+        return true;
+      } else if( m_val!=ref.m_val )
+        ec = domain_error_code(domain_error::empty_domain);
+    }
   }
   return false;
 }
+
 

@@ -195,7 +195,9 @@ namespace TREX {
        *
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
+      bool restrict_with(abstract_domain const &dom, ERROR_CODE &ec);
       bool restrict_with(abstract_domain const &dom);
+      
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -226,6 +228,7 @@ namespace TREX {
        * @return current insatnce after being merged with @e var
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
+      bool restrict_with(var const &v, ERROR_CODE &ec);
       bool restrict_with(var const &v);
       /** @brief Merge variable
        * @param var another variable

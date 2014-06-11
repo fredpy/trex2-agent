@@ -175,7 +175,7 @@ template<typename Ty, bool Prot, class Cmp>
 void interval_domain<Ty, Prot, Cmp>::parse_singleton(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( tmp.is_infinity() )
-    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+    throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                        "attempt to set as singleton to infinity");
   m_lower = tmp;
   m_upper = tmp;
@@ -187,7 +187,7 @@ void interval_domain<Ty, Prot, Cmp>::parse_lower(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( m_upper<tmp || 
       ( m_upper==tmp && m_upper.is_infinity() ) )
-    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+    throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                        "attempt to set lower bound above upper");
   m_lower = tmp;
 }
@@ -197,7 +197,7 @@ void interval_domain<Ty, Prot, Cmp>::parse_upper(std::string const &val) {
   bound tmp = boost::lexical_cast<bound>(val);
   if( m_lower>tmp || 
       ( m_lower==tmp && m_lower.is_infinity() ) )
-    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
+    throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain),
                        "attempt to set upper bound below lower");
   m_upper = tmp;
 }
@@ -205,33 +205,48 @@ void interval_domain<Ty, Prot, Cmp>::parse_upper(std::string const &val) {
 template<typename Ty, bool Prot, class Cmp>
 bool interval_domain<Ty, Prot, Cmp>::restrict_with
 (interval_domain<Ty, Prot, Cmp>::bound const &lo,
- interval_domain<Ty, Prot, Cmp>::bound const &hi) {
+ interval_domain<Ty, Prot, Cmp>::bound const &hi,
+ ERROR_CODE &ec) {
   bound const &low = m_lower.max(lo);
   bound const &up = m_upper.min(hi);
   if( up<low )
-    throw SYSTEM_ERROR(make_error(domain_error::empty_domain),
-                       "intervals do not overlap");
-  if(low!=m_lower || up!=m_upper) {
-    m_lower = low;
-    m_upper = up;
-    return true;
+    ec = domain_error_code(domain_error::empty_domain);
+  else {
+    ec = domain_error_code(domain_error::ok);
+    if(low!=m_lower || up!=m_upper) {
+      m_lower = low;
+      m_upper = up;
+      return true;
+    }
   }
   return false;
 }
-
 
 template<typename Ty, bool Prot, class Cmp>
 bool interval_domain<Ty, Prot, Cmp>::restrict_with
-(abstract_domain const &other) {
+(abstract_domain const &other, ERROR_CODE &ec) {
   if( type_name()!=other.type_name() )
-    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types));
+    ec = domain_error_code(domain_error::incompatible_types);
   else {
     interval_domain<Ty, Prot, Cmp> const &ref
       = dynamic_cast<interval_domain<Ty, Prot, Cmp> const &>(other);
-    return restrict_with(ref.lower_bound(), ref.upper_bound());
+    return restrict_with(ref.lower_bound(), ref.upper_bound(), ec);
   }
   return false;
 }
 
+template<typename Ty, bool Prot, class Cmp>
+bool interval_domain<Ty, Prot, Cmp>::restrict_with
+(interval_domain<Ty, Prot, Cmp>::bound const &lo,
+ interval_domain<Ty, Prot, Cmp>::bound const &hi) {
+  ERROR_CODE ec;
+  bool ret = restrict_with(lo, hi, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<(*this)<<" *= ["<<lo<<", "<<hi<<"]";
+    throw SYSTEM_ERROR(ec, oss.str());
+  }
+  return ret;
+}
 
 #endif 

@@ -380,7 +380,7 @@ namespace TREX {
 	:basic_interval(type), m_lower(lb), m_upper(ub) {
 	if( m_upper<m_lower || ( m_lower.is_infinity()
 				 && m_upper==m_lower ) ) {
-          throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
+          throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain));
 	}
       }
       /** @brief Constructor
@@ -445,8 +445,9 @@ namespace TREX {
        * @retval false otherwise
        * @throw EmptyDomain resulting domain is empty
        */
+      bool restrict_with(bound const &lo, bound const &hi, ERROR_CODE &ec);
       bool restrict_with(bound const &lo, bound const &hi);
-      bool restrict_with(abstract_domain const &other);
+      bool restrict_with(abstract_domain const &other, ERROR_CODE &ec);
 
       /** @brief interval lower bound
        *

@@ -97,7 +97,7 @@ namespace TREX {
       
       bool intersect(abstract_domain const &other) const;
       bool equals(abstract_domain const &other) const;
-      bool restrict_with(abstract_domain const &other);
+      bool restrict_with(abstract_domain const &other, ERROR_CODE &ec);
 
     private:
       boost::property_tree::ptree build_tree() const;
