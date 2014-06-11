@@ -73,6 +73,9 @@ namespace TREX {
       bool is_exception() const {
         return bool(m_error);
       }
+      bool operator! () const {
+        return is_exception();
+      }
       boost::exception_ptr const &exception() const {
         return m_error;
       }
@@ -118,6 +121,9 @@ namespace TREX {
       
       bool is_exception() const {
         return m_except.is_exception();
+      }
+      bool operator! () const {
+        return is_exception();
       }
       boost::exception_ptr const &exception() const {
         return m_except.exception();
@@ -174,6 +180,7 @@ namespace TREX {
     template<typename Ty>
     class async_result {
     public:
+      /** @{ */
       /** @brief Check if exception
        *
        * Check if this result is an excpetion
@@ -182,6 +189,8 @@ namespace TREX {
        * @retval false otherwise
        */
       bool is_exception() const;
+      bool operator! () const;
+      /** @} */
       /** @brief Get exception 
        *
        * If this instance holds an exception it returns a 
