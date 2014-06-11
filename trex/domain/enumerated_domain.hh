@@ -126,7 +126,7 @@ namespace TREX {
                        Iter from, Iter to)
       :basic_enumerated(type), m_elements(from, to) {
         if( m_elements.empty() )
-          throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
+          throw SYSTEM_ERROR(domain_error_code(domain_error::empty_domain));
       }
       
       /** @brief Constructor
@@ -199,7 +199,7 @@ namespace TREX {
       }
       bool intersect(abstract_domain const &other) const;
       bool equals(abstract_domain const &other) const;
-      bool restrict_with(abstract_domain const &other);
+      bool restrict_with(abstract_domain const &other, ERROR_CODE &ec);
       
       size_t size() const {
         return m_elements.size();
@@ -338,9 +338,9 @@ namespace TREX {
     
     template<class Ty, class Cmp>
     bool enumerated_domain<Ty, Cmp>::restrict_with
-    (abstract_domain const &other) {
+    (abstract_domain const &other, ERROR_CODE &ec) {
       if( type_name()!=other.type_name() )
-        throw SYSTEM_ERROR(make_error(domain_error::incompatible_types));
+        ec = domain_error_code(domain_error::incompatible_types);
       else {
         enumerated_domain<Ty, Cmp> const &ref
         = dynamic_cast<enumerated_domain<Ty, Cmp> const &>(other);
@@ -349,10 +349,13 @@ namespace TREX {
                               std::inserter(tmp, tmp.begin()), 
                               m_elements.key_comp());
         if( tmp.empty() )
-          throw SYSTEM_ERROR(make_error(domain_error::empty_domain));
-        if( tmp.size()!=m_elements.size() ) {
-          m_elements.swap(tmp);
-          return true;
+          ec = domain_error_code(domain_error::empty_domain);
+        else {
+          ec = domain_error_code(domain_error::ok);
+          if( tmp.size()!=m_elements.size() ) {
+            m_elements.swap(tmp);
+            return true;
+          }
         }
       }
       return false;

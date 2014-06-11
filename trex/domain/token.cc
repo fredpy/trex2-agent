@@ -67,6 +67,24 @@ bool token::attr_comp::operator()(symbol const &a, symbol const &b) const {
 }
 
 /*
+ * class TREX::transaction::token::declare
+ */
+
+// structors
+
+token::declare::declare(token::declare::id_param id)
+:factory::factory_type::producer(id) {}
+
+// manipulators
+
+token::declare::result_type token::declare::produce
+(token::declare::argument_type arg) const {
+  token_ref ret = MAKE_SHARED<token>(boost::ref(arg));
+  ret->pred_tag(get_id());
+  return ret; 
+}
+
+/*
  * class TREX::transaction::token
  */
 
@@ -249,7 +267,13 @@ bool token::starts_after(int_domain::base_type date,
   int_domain test_window(date+delay, int_domain::plus_inf),
     cstr_window(date, int_domain::plus_inf);
   if( m_start->second.domain().intersect(test_window) ) {
-    restrict_start(cstr_window);
+    ERROR_CODE ec;
+    restrict_start(cstr_window, ec);
+    if( ec ) {
+      std::ostringstream oss;
+      oss<<object()<<"."<<predicate()<<".start *= "<<test_window;
+      throw SYSTEM_ERROR(ec, oss.str());
+    }
     return true;
   }
   return false;
@@ -258,7 +282,8 @@ bool token::starts_after(int_domain::base_type date,
 
 void token::restrict_time(int_domain const &s,
                           int_domain const &d,
-                          int_domain const &e) {
+                          int_domain const &e,
+                          ERROR_CODE &ec) {
   int_domain::bound lo_s, hi_s, lo_d, hi_d, lo_e, hi_e;
   int_domain::bound lo, hi;
   
@@ -267,7 +292,8 @@ void token::restrict_time(int_domain const &s,
   if( !( m_start->second.domain().intersect(s) &&
          m_duration->second.domain().intersect(d) &&
         m_end->second.domain().intersect(e) ) ) {
-    // TODO throw an empty domain
+    ec = domain_error_code(domain_error::empty_domain);
+    return;
   }
   
   // Get new initial bounds for start domain
@@ -317,7 +343,8 @@ void token::restrict_time(int_domain const &s,
     hi_e = hi;
   }
   if( lo_e>hi_e ) {
-    // TODO throw an empty domain error
+    ec = domain_error_code(domain_error::empty_domain);
+    return;
   }
   
   // start = start "inter" end-duration
@@ -329,7 +356,8 @@ void token::restrict_time(int_domain const &s,
     hi_s = hi;
   }
   if( lo_s>hi_s ) {
-    // TODO throw an empty domain error
+    ec = domain_error_code(domain_error::empty_domain);
+    return;
   }
   
   // duration = duration "inter" start-end
@@ -341,100 +369,125 @@ void token::restrict_time(int_domain const &s,
     hi_d = hi;
   }
   if( lo_d>hi_d ) {
-    // TODO throw an empty domain error
+    ec = domain_error_code(domain_error::empty_domain);
+    return;
   }
+  ec = domain_error_code(domain_error::ok);
   
   if( s_changed ) {
-    m_start->second.restrict_with(int_domain(lo_s, hi_s));
+    m_start->second.restrict_with(int_domain(lo_s, hi_s), ec);
+    assert(!ec); // must be always true at this point
     m_updated(*this, m_start->second);
   }
   if( d_changed ) {
-    m_duration->second.restrict_with(int_domain(lo_d, hi_d));
+    m_duration->second.restrict_with(int_domain(lo_d, hi_d), ec);
+    assert(!ec); // must be always true at this point
     m_updated(*this, m_duration->second);
   }
   if( e_changed ) {
-    m_end->second.restrict_with(int_domain(lo_e, hi_e));
+    m_end->second.restrict_with(int_domain(lo_e, hi_e), ec);
+    assert(!ec); // must be always true at this point
     m_updated(*this, m_end->second);
   }
 }
 
-void token::restrict_attribute(var const &v) {
+void token::restrict_attribute(var const &v, ERROR_CODE &ec) {
   symbol const &name = v.name();
-  
   if( s_start==name )
-    restrict_start(v.typed_domain<int_domain>());
+    restrict_start(v.typed_domain<int_domain>(), ec);
   else if( s_duration==name )
-    restrict_duration(v.typed_domain<int_domain>());
-  if( s_end==name )
-    restrict_end(v.typed_domain<int_domain>());
+    restrict_duration(v.typed_domain<int_domain>(), ec);
+  else if( s_end==name )
+    restrict_end(v.typed_domain<int_domain>(), ec);
   else {
     bool updated;
-    attr_set::iterator i = constrain(v, updated);
+    attr_set::iterator i = constrain(v, updated, ec);
     if( updated )
       m_updated(*this, i->second);
   }
 }
 
-void token::merge_with(token const &other) {
-  if( object()!=other.object() )
-    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types),
-                       "Not the same token object ("
-                       +object().str()+"!="+other.object().str()+")");
-  if( predicate()!=other.predicate() )
-    throw SYSTEM_ERROR(make_error(domain_error::incompatible_types),
-                       "Not the same token predicate type ("
-                       +predicate().str()+"!="+other.predicate().str()+")");
 
-  attr_set::iterator i = m_attrs.begin();
-  attr_set::const_iterator j = attr_begin(false); // skip start,duration,end
-                                                  // as we want to handle them
-                                                  // differently later
-  attr_set::value_compare cmp(m_attrs.value_comp());
-  std::list<var> merged;
-  
-  
-  while( m_attrs.end()!=i && other.m_attrs.end()!=j ) {
-    if( cmp(*i, *j) )
-      i = m_attrs.lower_bound(j->first);
-    else if( cmp(*j, *i) ) {
-      merged.push_back(j->second);
-      ++j;
-    } else {
-      var tmp = i->second;
-      if( tmp.restrict_with(j->second) ) // May throw an exception
-        merged.push_back(tmp); // domain was updated => queue it
-      ++i; ++j;
-    }
-  }
-  
-  // Now merge temporal domains
-  //   temporal domain are a special case as they are constraned together
-  //   hence we need to do the propagation this specific way
-  restrict_time(other.start(), other.duration(), other.end()); // May throw and exception
-  
-  bool updated; // this guy is simply ignored as all the merges we
-                // do here trigger an update
-  // OK now I can do the merging
-  while( !merged.empty() ) {
-    i = constrain(merged.front(), updated);
-    merged.pop_front();
-    m_updated(*this, i->second); // Notify on attribute update
-  }
-  for( ;other.m_attrs.end()!=j; ++j) {
-    i = constrain(j->second, updated);
-    m_updated(*this, i->second); // Notify on attribute addition
+void token::restrict_attribute(var const &v) {
+  ERROR_CODE ec;
+  restrict_attribute(v, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<object()<<'.'<<predicate()<<".restrict("<<v<<")";
+    throw SYSTEM_ERROR(ec, oss.str());
   }
 }
 
-token::attr_set::iterator token::constrain(var const &v, bool &updated) {
+void token::merge_with(token const &other, ERROR_CODE &ec) {
+  if( object()!=other.object() || predicate()!=other.predicate() ) {
+    ec = domain_error_code(domain_error::incompatible_tokens);
+  } else {
+    attr_set::iterator i = m_attrs.begin();
+    attr_set::const_iterator j = attr_begin(false); // skip start,duration,end
+                                                    // as we want to handle them
+                                                    // differently later
+    attr_set::value_compare cmp(m_attrs.value_comp());
+    std::list<var> merged;
+  
+  
+    while( m_attrs.end()!=i && other.m_attrs.end()!=j ) {
+      if( cmp(*i, *j) )
+        i = m_attrs.lower_bound(j->first);
+      else if( cmp(*j, *i) ) {
+        merged.push_back(j->second);
+        ++j;
+      } else {
+        var tmp = i->second;
+        bool ret = tmp.restrict_with(j->second, ec);
+        if( ec )
+          return;
+        else if( ret )
+          merged.push_back(tmp); // domain was updated => queue it
+        ++i; ++j;
+      }
+    }
+    restrict_time(other.start(), other.duration(), other.end(), ec);
+    if( !ec ) {
+      ERROR_CODE must_be_ok;
+      bool ignore;
+      while( !merged.empty() ) {
+        i = constrain(merged.front(), ignore, must_be_ok);
+        assert(!must_be_ok);
+        merged.pop_front();
+        m_updated(*this, i->second);
+      }
+      for( ;other.m_attrs.end()!=j; ++j) {
+        i = constrain(j->second, ignore, must_be_ok);
+        assert(!must_be_ok);
+        m_updated(*this, i->second); // Notify on attribute addition
+      }
+    }
+  }
+}
+
+void token::merge_with(token const &other) {
+  ERROR_CODE ec;
+  merge_with(other, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<(*this)<<" *= "<<other;
+    throw SYSTEM_ERROR(ec, oss.str());
+  }
+}
+
+
+token::attr_set::iterator token::constrain(var const &v,
+                                           bool &updated,
+                                           ERROR_CODE &ec) {
   attr_set::iterator pos = m_attrs.lower_bound(v.name());
   updated = false;
 
   if( m_attrs.end()!=pos && v.name()==pos->first ) {
-    if( pos->second.restrict_with(v) )
+    if( pos->second.restrict_with(v, ec) )
       updated = true;
   } else {
     pos = m_attrs.insert(pos, std::make_pair(v.name(), v));
+    ec = domain_error_code(domain_error::ok);
     updated = true;
   }
   return pos;
@@ -442,10 +495,11 @@ token::attr_set::iterator token::constrain(var const &v, bool &updated) {
 
 void token::init_time() {
   bool ignore;
+  ERROR_CODE ec;
   
-  m_start = constrain(var(s_start, s_date_full), ignore);
-  m_duration = constrain(var(s_duration, s_duration_full), ignore);
-  m_end = constrain(var(s_end, s_date_full), ignore);
+  m_start = constrain(var(s_start, s_date_full), ignore, ec);
+  m_duration = constrain(var(s_duration, s_duration_full), ignore, ec);
+  m_end = constrain(var(s_end, s_date_full), ignore, ec);
 }
 
 // related

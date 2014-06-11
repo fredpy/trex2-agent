@@ -1,19 +1,13 @@
-/** @file DomainBase.cc
- * @brief Basic domain utilities implementation
- *
- * @author Frederic Py <fpy@mbari.org>
- * @ingroup domains
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2011, MBARI.
+ *
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -23,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -37,54 +31,32 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sstream>
-#include "domain_visitor.hh"
+#ifndef H_trex_domain_domain_errors
+# define H_trex_domain_domain_errors
 
-using namespace TREX::transaction;
+# include <trex/utils/platform/system_error.hh>
 
-/*
- * class TREX::transaction::abstract_domain
- */
+namespace TREX {
+  namespace transaction {
 
-// observers
+    namespace domain_error {
+    
+      enum domain_error_t {
+        ok                = 0,
+        empty_domain      = 1,
+        not_a_singleton,
+        incompatible_types,
+        domain_access,
+        not_the_same_var,
+        unnamed_var,
+        incompatible_tokens
+      }; // TREX::transaction::domain_error::domain_error_t
 
-boost::any abstract_domain::get_singleton() const {
-  if( !is_singleton() )
-    throw SYSTEM_ERROR(domain_error_code(domain_error::not_a_singleton));
-  return singleton();
-}
+    } // TREX::transaction::domain_error
+    
+    ERROR_CODE domain_error_code(domain_error::domain_error_t e);
+    
+  } // TREX::transaction
+} // TREX
 
-std::string abstract_domain::get_singleton_as_string() const {
-  if( !is_singleton() )
-    throw SYSTEM_ERROR(domain_error_code(domain_error::not_a_singleton));
-  return string_singleton();
-}
-
-boost::property_tree::ptree abstract_domain::as_tree() const {
-  boost::property_tree::ptree ret;
-  ret.push_back(boost::property_tree::ptree::value_type(type_name().str(), build_tree()));
-  return ret;
-}
-
-// manipulators
-
-void abstract_domain::accept(domain_visitor &visitor) const {
-  visitor.visit(this, true);
-}
-
-// modifiers
-
-bool abstract_domain::restrict_with(abstract_domain const &other) {
-  ERROR_CODE ec;
-  bool ret = restrict_with(other, ec);
-  if( ec ) {
-    std::ostringstream oss;
-    oss<<(*this)<<" *= "<<other;
-    throw SYSTEM_ERROR(ec, oss.str());
-  }
-  return ret;
-}
-
-
-
-
+#endif // H_trex_domain_domain_errors

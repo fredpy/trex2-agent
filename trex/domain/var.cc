@@ -53,12 +53,12 @@ namespace TREX {
       impl(symbol const &name, abstract_domain *dom)
       :m_name(name), m_domain(dom) {
         if( m_name.empty() )
-          throw SYSTEM_ERROR(make_error(domain_error::unnamed_var));
+          throw SYSTEM_ERROR(domain_error_code(domain_error::unnamed_var));
       }
       impl(symbol const &name, abstract_domain const &dom)
       :m_name(name), m_domain(dom.copy()) {
         if( m_name.empty() )
-          throw SYSTEM_ERROR(make_error(domain_error::unnamed_var));
+          throw SYSTEM_ERROR(domain_error_code(domain_error::unnamed_var));
       }
       impl(bp::ptree &node);
       impl(impl const &other):m_name(other.name()) {
@@ -82,12 +82,14 @@ namespace TREX {
         return *m_domain;
       }
       
-      bool restrict_with(abstract_domain const &dom) {
+      bool restrict_with(abstract_domain const &dom,
+                         ERROR_CODE &ec) {
         if( !m_domain ) {
+          ec = domain_error_code(domain_error::ok);
           m_domain.reset(dom.copy());
           return true;
         } else
-          return m_domain->restrict_with(dom);
+          return m_domain->restrict_with(dom, ec);
       }
       
       bp::ptree as_tree() const;
@@ -185,7 +187,7 @@ symbol var::name() const {
 
 abstract_domain const &var::domain() const {
   if( !is_complete() )
-    throw SYSTEM_ERROR(make_error(domain_error::domain_access));
+    throw SYSTEM_ERROR(domain_error_code(domain_error::domain_access));
   return m_impl->domain();
 }
 
@@ -197,27 +199,51 @@ var &var::operator= (var const &other) {
   return *this;
 }
 
-bool var::restrict_with(abstract_domain const &dom) {
-  if( NULL==m_impl.get() )
-    throw SYSTEM_ERROR(make_error(domain_error::domain_access),
-                       "Variable is not initialized");
-  return m_impl->restrict_with(dom);
+bool var::restrict_with(abstract_domain const &dom, ERROR_CODE &ec) {
+  if( NULL==m_impl.get() ) {
+    ec = domain_error_code(domain_error::domain_access);
+    return false;
+  } else
+    return m_impl->restrict_with(dom,ec);
 }
 
-bool var::restrict_with(var const &v) {
+bool var::restrict_with(abstract_domain const &dom) {
+  ERROR_CODE ec;
+  bool ret = restrict_with(dom, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<"var("<<(*this)<<")*= "<<dom;
+    throw SYSTEM_ERROR(ec, oss.str());
+  }
+  return ret;
+}
+
+
+bool var::restrict_with(var const &v, ERROR_CODE &ec) {
   if( NULL==m_impl.get() ) {
+    ec = domain_error_code(domain_error::ok);
     operator=(v);
     return NULL!=m_impl.get();
   } else if( NULL!=v.m_impl.get() ) {
     if( name()!=v.name() )
-      throw SYSTEM_ERROR(make_error(domain_error::domain_access),
-                         "Attempted to merge variables with different names");
-    return m_impl->restrict_with(v.domain());
+      ec = domain_error_code(domain_error::not_the_same_var);
+    else
+      return m_impl->restrict_with(v.domain(), ec);
   }
   return false;
 }
 
-// Observers :
+bool var::restrict_with(var const &v) {
+  ERROR_CODE ec;
+  bool ret = restrict_with(v, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<"var("<<(*this)<<")*= var("<<v<<')';
+    throw SYSTEM_ERROR(ec, oss.str());
+  }
+  return ret;
+}
+  // Observers :
 
 bp::ptree var::as_tree() const {
   if( is_complete() )

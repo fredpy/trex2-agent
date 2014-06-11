@@ -57,6 +57,7 @@
 # include <trex/utils/platform/cpp11_deleted.hh>
 
 # include "domain_visitor_fwd.hh"
+# include "domain_errors.hh"
 
 namespace TREX {
   /** @brief TREX transaction framework
@@ -75,23 +76,7 @@ namespace TREX {
    * @note This namespace is shared between @ref domains and
    * @ref transaction This should change in the future
    */
-  namespace transaction {      
-    
-    class abstract_domain;
-    
-    namespace domain_error {
-      enum domain_error_t {
-        ok                = 0,
-        empty_domain      = 1,
-        not_a_singleton,
-        incompatible_types,
-        domain_access,
-        unnamed_var
-      }; // TREX::transaction::domain_error::domain_error_t
-      
-      ERROR_CODE make_error(domain_error_t e);
-      
-    }
+  namespace transaction {
     
     /** @brief Abstract domain definition
      *
@@ -215,7 +200,10 @@ namespace TREX {
        * @throw EmptyDomain resulting domain is empty
        * @sa bool intersect(DomainBase const &) const
        */
-      virtual bool restrict_with(abstract_domain const &other) =0;
+      virtual bool restrict_with(abstract_domain const &other,
+                                 ERROR_CODE &ec) =0;
+      bool restrict_with(abstract_domain const &other);
+      
       /** @brief Restrict domain possible values
        * @param other Another domain
        *

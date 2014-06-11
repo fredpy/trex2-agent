@@ -44,10 +44,12 @@
 namespace TREX {
   namespace transaction {
     
-    class token;
-    typedef SHARED_PTR<token> token_id;
     
-
+    class token;
+    typedef SHARED_PTR<token const> token_id;
+    typedef SHARED_PTR<token> token_ref;
+    
+    
     class token: public TREX::utils::ptree_convertible,
     public ENABLE_SHARED_FROM_THIS<token> {
     public:
@@ -66,18 +68,19 @@ namespace TREX {
       typedef boost::signals2::signal<void (token const &,
                                             var const &)> update_sig;
       
+      
       static utils::symbol const obs_tag;
       static utils::symbol const goal_tag;
       
-      static token_id obs(utils::symbol const &obj,
-                          utils::symbol const &pred) {
-        token_id ret = MAKE_SHARED<token>(obj, pred);
+      static token_ref obs(utils::symbol const &obj,
+                           utils::symbol const &pred) {
+        token_ref ret = MAKE_SHARED<token>(obj, pred);
         ret->pred_tag(obs_tag);
         return ret;
       }
-      static token_id goal(utils::symbol const &obj,
-                           utils::symbol const &pred) {
-        token_id ret = MAKE_SHARED<token>(obj, pred);
+      static token_ref goal(utils::symbol const &obj,
+                            utils::symbol const &pred) {
+        token_ref ret = MAKE_SHARED<token>(obj, pred);
         ret->pred_tag(goal_tag);
         return ret;
       }
@@ -108,7 +111,7 @@ namespace TREX {
       attr_iterator attr_begin(bool all=true) const;
       attr_iterator attr_end(bool all=true) const;
       
-      token_id id() {
+      token_id id() const {
         return shared_from_this();
       }
       
@@ -143,6 +146,7 @@ namespace TREX {
       bool is_temporal(attr_iterator const &i) const;
       bool is_full(attr_iterator const &i) const;
 
+      void restrict_attribute(var const &v, ERROR_CODE &ec);
       void restrict_attribute(var const &v);
       void restrict_attribute(utils::symbol const &name,
                               abstract_domain const &d) {
@@ -173,19 +177,21 @@ namespace TREX {
        *   is updated later on these updates will not propagate to this 
        *   instance unless this method is called again explicitely.
        */
+      void merge_with(token const &other, ERROR_CODE &ec);
       void merge_with(token const &other);
       
       void restrict_time(int_domain const &s,
                          int_domain const &d,
-                         int_domain const &e);
-      void restrict_start(int_domain const &d) {
-        restrict_time(d, s_duration_full, s_date_full);
+                         int_domain const &e,
+                         ERROR_CODE &ec);
+      void restrict_start(int_domain const &d, ERROR_CODE &ec) {
+        restrict_time(d, s_duration_full, s_date_full, ec);
       }
-      void restrict_duration(int_domain const &d) {
-        restrict_time(s_date_full, d, s_date_full);
+      void restrict_duration(int_domain const &d, ERROR_CODE &ec) {
+        restrict_time(s_date_full, d, s_date_full, ec);
       }
-      void restrict_end(int_domain const &d) {
-        restrict_time(s_date_full, s_duration_full, d);
+      void restrict_end(int_domain const &d, ERROR_CODE &ec) {
+        restrict_time(s_date_full, s_duration_full, d, ec);
       }
       
       void pred_tag(utils::symbol const &p) {
@@ -202,21 +208,17 @@ namespace TREX {
       
       bool consistent_with(token const &other) const;
       
-      typedef utils::xml_factory<token, token_id> factory;
+      typedef utils::xml_factory<token, token_ref> factory;
       
       
       class declare :public factory::factory_type::producer {
       public:
         typedef factory::factory_type::id_param id_param;
         
-        declare(id_param id):factory::factory_type::producer(id) {}
+        declare(id_param id);
         
-        result_type produce(argument_type arg) const {
-          token_id ret = MAKE_SHARED<token>(boost::ref(arg));
-          ret->pred_tag(get_id());
-          return ret;
-        }
-      };
+        result_type produce(argument_type arg) const;
+      }; // class TREX::transaction::token::declare
       
       bool starts_after(int_domain::base_type date,
                         int_domain::base_type delay=0);
@@ -236,7 +238,7 @@ namespace TREX {
       attr_set::iterator m_start, m_duration, m_end;
       
       void init_time();
-      attr_set::iterator constrain(var const &v, bool &updated);
+      attr_set::iterator constrain(var const &v, bool &updated, ERROR_CODE &ec);
       
       token() DELETED;
     }; // TREX::transaction::token
