@@ -43,7 +43,7 @@ generic_factory<P, I, C, R, O>::get
     typename generic_factory<P, I, C, R, O>::catalog_type::const_iterator
     i = m_producers.find(id);
     if( m_producers.end()==i ) {
-      ERROR_CODE ec = factory_error::make_error(factory_error::unknown_id);
+      ERROR_CODE ec = factory_error_code(factory_error::unknown_id);
       throw SYSTEM_ERROR(ec);
     }
     return *(i->second);
@@ -62,8 +62,9 @@ void generic_factory<P, I, C, R, O>::add
     to_ins(prod->get_id(), prod);
     if( !m_producers.insert(to_ins).second ) {
 # if 0 // I have a weird bug some time with that ... to be checked
-        throw MultipleFactoryDecl("ID multiply used.");
-# endif 
+      ERROR_CODE ec = factory_error_code(factory_error::multiple_ids);
+      throw SYSTEM_ERROR(ec);
+# endif
     }
 }
 
@@ -75,14 +76,5 @@ void generic_factory<P, I, C, R, O>::remove
     if( m_producers.end()!=i && i->second==prod ) 
         m_producers.erase(i);
 }
-
-template<class P, class I, class C, class R, class O>
-void generic_factory<P, I, C, R, O>::get_ids(std::list<I> &ids) const {
-    typename generic_factory<P, I, C, R, O>::catalog_type::const_iterator
-    i = m_producers.begin();
-    for( ; m_producers.end()!=i; ++i)
-        ids.push_back(i->first);
-}
-
 
 #endif // In_H_Factory

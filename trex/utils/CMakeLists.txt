@@ -86,6 +86,7 @@ add_library(TREXutils SHARED
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
   Exception.hh
+  factory_error.hh
   generic_factory.hh
   id_mapper.hh
   log_manager.hh

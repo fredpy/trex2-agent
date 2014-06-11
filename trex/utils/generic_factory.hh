@@ -42,9 +42,11 @@
 #ifndef H_trex_utils_generic_factory
 # define H_trex_utils_generic_factory
 
-# include <map>
+# include <algorithm>
 # include <iostream>
+# include <iterator>
 # include <list>
+# include <map>
 
 # include <boost/call_traits.hpp>
 # include <boost/static_assert.hpp>
@@ -53,22 +55,11 @@
 
 # include "singleton.hh"
 # include "platform/cpp11_deleted.hh"
-# include "platform/system_error.hh"
+# include "factory_error.hh"
 
 namespace TREX {
   namespace utils {
 		
-    namespace factory_error {
-      enum factory_error_t {
-        ok           = 0,
-        unknown_id,
-        multiple_ids
-      }; // TREX::utils::factory_error::factory_error_t
-      
-      ERROR_CODE make_error(factory_error_t e);
-    
-    } // TREX::utils::factory_error
-    
     
     template< class AbstractProduct, class Id, class ConsArg,
 	      class ProductRef = AbstractProduct *,
@@ -80,7 +71,15 @@ namespace TREX {
       typedef AbstractProduct product_type;
       typedef ProductRef      returned_type;
 			
-      void get_ids(std::list<Id> &ids) const;
+      template<class OutputIterator>
+      void get_ids(OutputIterator out) const {
+        std::transform(m_producers.begin(), m_producers.end(), out,
+                       boost::bind(&catalog_type::value_type::first, _1));
+      }
+      
+      void get_ids(std::list<Id> &ids) const {
+        get_ids(std::back_inserter(ids));
+      }
       
       class producer: boost::noncopyable {
       public:
