@@ -33,6 +33,8 @@
  */
 #include "factory_error.hh"
 
+#include <string>
+
 using namespace TREX::utils;
 
 namespace  {

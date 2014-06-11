@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "domain_errors.hh"
+#include <string>
 
 using namespace TREX::transaction;
 
