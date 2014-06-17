@@ -221,25 +221,28 @@ namespace TREX {
       class tr_latency:public tr_event {
       public:
         tr_latency(factory::argument_type const &arg)
-        :tr_event(arg), m_value(utils::parse_attr<TICK>(arg, "value")) {}
+        :tr_event(arg), m_value(utils::parse_attr<TICK>(factory::node(arg),
+                                                        "value")) {}
         ~tr_latency() {}
         
       private:
         TICK m_value;
         void play() {
-          m_reactor->getGraph().update_latency(m_reactor, m_value);
+          m_reactor.play_latency(m_value);
         }
       };
+      
       class tr_horizon:public tr_event {
       public:
-        tr_latency(factory::argument_type const &arg)
-        :tr_event(arg), m_value(utils::parse_attr<TICK>(arg, "value")) {}
-        ~tr_latency() {}
+        tr_horizon(factory::argument_type const &arg)
+        :tr_event(arg), m_value(utils::parse_attr<TICK>(factory::node(arg),
+                                                        "value")) {}
+        ~tr_horizon() {}
         
       private:
         TICK m_value;
         void play() {
-          m_reactor->getGraph().update_horizon(m_reactor, m_value);
+          m_reactor.play_horizon(m_value);
         }
       };
 
@@ -691,7 +694,17 @@ void LogPlayer::resume() {
 }
 
 
-// events 
+// events
+
+void LogPlayer::play_latency(TICK val) {
+  update_latency(val);
+}
+
+void LogPlayer::play_horizon(TICK val) {
+  update_horizon(val);
+}
+
+
 void LogPlayer::play_use(utils::Symbol const &tl, bool goals, bool plan) {
   use(tl, goals, plan);
 }

@@ -281,22 +281,24 @@ graph::reactor_id graph::add_reactor(graph::reactor_id r) {
 }
 
 TICK graph::update_latency(reactor_id r, TICK val) {
-  details::reactor_set::iterator i = m_reactors.find(r);
-  if( m_reactors.end()!=i )
-    return (*i)->update_latency(val);
-  if( r )
-    syslog(tlog::warn)<<"Failed to update latency of \""<<r->name()
-      <<"\" as it does not belong to this graph.";
+  if( r ) {
+    details::reactor_set::iterator i = m_reactors.find(r->getName());
+    if( m_reactors.end()!=i )
+      return (*i)->update_latency(val);
+    syslog(warn)<<"Failed to update latency of \""<<r->getName()
+                <<"\" as it does not belong to this graph.";
+  }
   return 0;
 }
 
 TICK graph::update_horizon(reactor_id r, TICK val) {
-  details::reactor_set::iterator i = m_reactors.find(r);
-  if( m_reactors.end()!=i )
-    return (*i)->update_horizon(val);
-  if( r )
-    syslog(tlog::warn)<<"Failed to update horizon of \""<<r->name()
-    <<"\" as it does not belong to this graph.";
+  if( r ) {
+    details::reactor_set::iterator i = m_reactors.find(r->getName());
+    if( m_reactors.end()!=i )
+      return (*i)->update_horizon(val);
+    syslog(warn)<<"Failed to update horizon of \""<<r->getName()
+                <<"\" as it does not belong to this graph.";
+  }
   return 0;
 }
 

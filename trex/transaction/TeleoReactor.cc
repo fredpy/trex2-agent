@@ -746,8 +746,8 @@ TICK TeleoReactor::update_latency(TICK new_latency) {
   // NOTE: this is not thread_safe
   std::swap(m_latency, new_latency);
   if( new_latency!=m_latency ) {
-    syslog(tlog::info)<<"latency updated from "<<new_latency
-                      <<" to "<<m_latency;
+    syslog(info)<<"latency updated from "<<new_latency
+                <<" to "<<m_latency;
     for(internal_set::iterator i=m_internals.begin();
         m_internals.end()!=i; ++i)
       (*i)->latency_update(new_latency+m_maxDelay);
@@ -759,12 +759,12 @@ TICK TeleoReactor::update_latency(TICK new_latency) {
 
 TICK TeleoReactor::update_horizon(TICK new_horizon) {
   // NOTE: this is not thread safe
-  std::swap(m_horizon, new_horizon);
-  if( m_horizon!=new_horizon ) {
-    syslog(tlog::info)<<"horizon updated from "<<new_horizon
-                      <<" to "<<m_horizon;
+  std::swap(m_lookahead, new_horizon);
+  if( m_lookahead!=new_horizon ) {
+    syslog(info)<<"horizon updated from "<<new_horizon
+                <<" to "<<m_lookahead;
     if( m_trLog )
-      m_trLog->horizon_updated(m_latency);
+      m_trLog->horizon_updated(m_lookahead);
   }
   return new_horizon;
 }

@@ -257,6 +257,9 @@ namespace TREX {
        * @pre g should have be publish as a plan before
        */
       void play_cancel(goal_id const &g);
+      
+      void play_latency(TICK val);
+      void play_horizon(TICK val);
 
     private:
       void handleInit();
