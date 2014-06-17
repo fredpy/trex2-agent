@@ -1044,14 +1044,14 @@ namespace TREX {
       stat_duration m_start_usage, m_synch_usage, m_deliberation_usage;
       rt_clock::duration m_start_rt, m_synch_rt, m_delib_rt;
       
+      TICK update_latency(TICK new_latency);
+      TICK update_horizon(TICK new_horizon);
       
       bool internal_sync(TREX::utils::Symbol name) const;
       bool external_sync(TREX::utils::Symbol name) const;
       
       void clear_int_sync();
       void clear_ext_sync();
-      
-      
       
       void use_sync(TREX::utils::Symbol name, details::transaction_flags f);
       bool unuse_sync(TREX::utils::Symbol name);

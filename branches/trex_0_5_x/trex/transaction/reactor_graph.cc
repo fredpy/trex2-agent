@@ -280,6 +280,26 @@ graph::reactor_id graph::add_reactor(graph::reactor_id r) {
   return ret.first->get();
 }
 
+TICK graph::update_latency(reactor_id r, TICK val) {
+  details::reactor_set::iterator i = m_reactors.find(r);
+  if( m_reactors.end()!=i )
+    return (*i)->update_latency(val);
+  if( r )
+    syslog(tlog::warn)<<"Failed to update latency of \""<<r->name()
+      <<"\" as it does not belong to this graph.";
+  return 0;
+}
+
+TICK graph::update_horizon(reactor_id r, TICK val) {
+  details::reactor_set::iterator i = m_reactors.find(r);
+  if( m_reactors.end()!=i )
+    return (*i)->update_horizon(val);
+  if( r )
+    syslog(tlog::warn)<<"Failed to update horizon of \""<<r->name()
+    <<"\" as it does not belong to this graph.";
+  return 0;
+}
+
 bool graph::is_member(graph::reactor_id r) const {
   for(details::reactor_set::const_iterator i=m_reactors.begin();
       m_reactors.end()!=i; ++i)

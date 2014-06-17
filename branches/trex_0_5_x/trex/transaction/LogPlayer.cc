@@ -120,6 +120,8 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_use
 
+      
+      
       /** @brief timeline unuse operation
        *
        * This class describe an External timeline undeclaration operation 
@@ -215,7 +217,34 @@ namespace TREX {
 	}
       }; // TREX::transaction::details::tr_fail
 
-      /** @brief New observation event 
+
+      class tr_latency:public tr_event {
+      public:
+        tr_latency(factory::argument_type const &arg)
+        :tr_event(arg), m_value(utils::parse_attr<TICK>(arg, "value")) {}
+        ~tr_latency() {}
+        
+      private:
+        TICK m_value;
+        void play() {
+          m_reactor->getGraph().update_latency(m_reactor, m_value);
+        }
+      };
+      class tr_horizon:public tr_event {
+      public:
+        tr_latency(factory::argument_type const &arg)
+        :tr_event(arg), m_value(utils::parse_attr<TICK>(arg, "value")) {}
+        ~tr_latency() {}
+        
+      private:
+        TICK m_value;
+        void play() {
+          m_reactor->getGraph().update_horizon(m_reactor, m_value);
+        }
+      };
+
+      
+      /** @brief New observation event
        *
        * Describe an observation posting event from the log
        *
@@ -435,7 +464,12 @@ namespace {
   
   TeleoReactor::xml_factory::declare<LogPlayer> decl("LogPlayer");
   
-  details::tr_event::factory::declare<details::tr_use> 
+  details::tr_event::factory::declare<details::tr_latency>
+  d_latency("latency");
+  details::tr_event::factory::declare<details::tr_horizon>
+  d_horizon("horizon");
+
+  details::tr_event::factory::declare<details::tr_use>
     d_use("use");
   details::tr_event::factory::declare<details::tr_unuse> 
     d_unuse("unuse");
