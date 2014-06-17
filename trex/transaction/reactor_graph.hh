@@ -452,6 +452,11 @@ namespace TREX {
        * @sa isolate()
        */
       bool kill_reactor(reactor_id r);
+      
+      TICK update_latency(reactor_id r, TICK val);
+      TICK update_horizon(reactor_id r, TICK val);
+      
+      
       /** @brief Isolate a reactor
        *
        * @param[in] r A reactor
