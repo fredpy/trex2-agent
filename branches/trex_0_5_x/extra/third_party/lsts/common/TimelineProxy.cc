@@ -150,7 +150,7 @@ TimelineProxy::synchronize()
   {
     if (msg->getId() == TrexOperation::getIdStatic())
     {
-      TrexOperation * top = dynamic_cast<TrexOperation *>(msg);
+      TrexOperation * top = static_cast<TrexOperation *>(msg);
 
      // std::cerr << "just received this: " << std::endl;
      // top->toText(std::cerr);

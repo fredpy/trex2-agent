@@ -52,7 +52,7 @@ namespace TREX {
       {
         if (msg->getId() == Announce::getIdStatic())
         {
-          Announce * ann = (Announce *) dynamic_cast<Announce *>(msg);
+          Announce * ann = static_cast<Announce *>(msg);
 
           if (m_receivedAnnounces[ann->sys_name] != NULL)
             delete m_receivedAnnounces[ann->sys_name];
