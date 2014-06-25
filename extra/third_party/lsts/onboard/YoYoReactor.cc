@@ -195,7 +195,6 @@ namespace TREX {
         break;
 
         case (SURFACE):
-
         if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
         {
           syslog(log::info)<< "Finished executing yoyo...";

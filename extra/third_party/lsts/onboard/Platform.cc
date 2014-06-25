@@ -214,7 +214,7 @@ namespace TREX
 
         if (msg->getId() == Announce::getIdStatic())
         {
-          ann = (Announce *) dynamic_cast<Announce *>(msg);
+          ann = (Announce *) static_cast<Announce *>(msg);
 
           if (m_receivedAnnounces[ann->sys_name] != NULL)
             delete m_receivedAnnounces[ann->sys_name];
@@ -222,23 +222,9 @@ namespace TREX
         }
         else if (msg->getId() == TrexOperation::getIdStatic())
         {
-          TrexOperation * command = dynamic_cast<TrexOperation*>(msg);
+          TrexOperation * command = static_cast<TrexOperation*>(msg);
           handleTrexOperation(*command);
         }
-        /*else if (msg->getId() == PlanControlState::getIdStatic())
-        {
-          ///////////////////////////////////
-          PlanControlState * previous_pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
-          PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(msg);
-          /*bool wasActive = isActiveInPlanControlStateMsg(previous_pcstate);
-          bool isActive = isActiveInPlanControlStateMsg(pcstate);
-          if(wasActive!=isActive) m_create_new_ref = true;*//*
-          // keep to test if creating new ref is working
-          if(isActiveInPlanControlStateMsg(pcstate) && !m_create_new_ref)
-            //std::cout << "new ref:" << (wasActive?"true":"false") << " + " << (isActive?"true":"false") << " ==> " << (m_create_new_ref?"true":"false") << "\n";
-            std::cout << "create new reference \n";
-          insertIntoReceived(msg);
-        }*/
         else {
           // substitute previously received message
           insertIntoReceived(msg);
@@ -295,19 +281,7 @@ namespace TREX
       processState();
       Heartbeat hb;
       sendMsg(hb);
-//      if(getCurrentTick() % 10 == 0)
-//      {
-//        if (received.count(EstimatedState::getIdStatic()) != 0)
-//        {
-//          // Translate incoming messages into observations
-//           EstimatedState * estate =
-//               dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
-//
-//           double lat = estate->lat, lon = estate->lon;
-//           WGS84::displace(estate->x, estate->y, &lat, &lon);
-//           announce(lat, lon);
-//        }
-//      }
+
       IMC::CpuUsage cpu_usage;
       int value = m_sys_resources.getProcessorUsage();
       if (value >= 0 && value <= 100)
@@ -524,29 +498,29 @@ namespace TREX
         received.clear();
       }
 
-      PlanControlState * pcstate = dynamic_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
+      PlanControlState * pcstate = static_cast<IMC::PlanControlState *>(received[PlanControlState::getIdStatic()]);
       TREX::transaction::Observation planControlStateObservation = m_adapter.planControlStateObservation(pcstate);
       postUniqueObservation(planControlStateObservation);
       m_blocked = !isActiveInPlanControlStateMsg(pcstate);
       
       // Translate incoming messages into observations
       EstimatedState * estate =
-      dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+    		  static_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       
       // force posting of position observations (duration == 1)
       if (estate != NULL)
         postObservation(m_adapter.estimatedStateObservation(estate));
 
       VehicleMedium * medium =
-      dynamic_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
+    		  static_cast<VehicleMedium *>(received[VehicleMedium::getIdStatic()]);
       postUniqueObservation(m_adapter.vehicleMediumObservation(medium));
       
       FollowRefState * frefstate =
-      dynamic_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
+    		  static_cast<IMC::FollowRefState *>(received[FollowRefState::getIdStatic()]);
       postUniqueObservation(m_adapter.followRefStateObservation(frefstate));
       
       OperationalLimits * oplims =
-      dynamic_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
+    		  static_cast<IMC::OperationalLimits *>(received[OperationalLimits::getIdStatic()]);
       postUniqueObservation(m_adapter.opLimitsObservation(oplims));
       
       std::map<std::string, Announce *>::iterator it;
@@ -615,7 +589,7 @@ namespace TREX
       }
       
       EstimatedState * estate =
-      dynamic_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
+      static_cast<EstimatedState *>(received[EstimatedState::getIdStatic()]);
       if (estate != NULL)
       {
         my_lat = estate->lat;
