@@ -56,10 +56,5 @@ add_subdirectory(europa)
 # 3rd party plug-ins
 add_subdirectory(third_party)
 
-# backward compatibility stuff
-add_subdirectory(backward)
-
 # examples 
 add_subdirectory(examples)
-
-
