@@ -35,7 +35,7 @@
 #include "trex/europa/Assembly.hh"
 #include "trex/europa/bits/europa_helpers.hh"
 
-#include <trex/utils/platform/memory.hh>
+#include <trex/config/memory.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/TokenVariable.hh>

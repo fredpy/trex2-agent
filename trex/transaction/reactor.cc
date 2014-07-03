@@ -645,7 +645,7 @@ void reactor::observation_sync(token_id o, bool verbose) {
 }
 
 void reactor::post_observation(token const &obs, bool verbose) {
-  token_id tmp = MAKE_SHARED<token>(boost::ref(obs));
+  token_ref tmp = MAKE_SHARED<token>(boost::ref(obs));
   tmp->pred_tag(token::obs_tag);
   
   boost::function<void ()> fn(boost::bind(&reactor::observation_sync,

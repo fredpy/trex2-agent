@@ -342,7 +342,6 @@ bool EuropaReactor::dispatch(EUROPA::TimelineId const &tl,
       d_start(details::trex_domain(tok->start()->lastDomain())),
       d_duration(details::trex_domain(tok->duration()->lastDomain())),
       d_end(details::trex_domain(tok->end()->lastDomain()));
-
     my_goal.restrict_time(*dynamic_cast<int_domain *>(d_start.get()),
                          *dynamic_cast<int_domain *>(d_duration.get()),
                          *dynamic_cast<int_domain *>(d_end.get()));

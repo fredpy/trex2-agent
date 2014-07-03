@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "TREXversion.hh"
-#include <trex/version.hh>
+#include <trex/config/version.hh>
 
 #include <sstream>
 

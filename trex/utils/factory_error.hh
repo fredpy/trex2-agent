@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_factory_error
 # define H_trex_utils_factory_error
 
-# include "platform/system_error.hh"
+# include <trex/config/system_error.hh>
 
 namespace TREX {
   namespace utils {

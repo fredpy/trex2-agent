@@ -33,7 +33,7 @@
  */
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/Agent.hh>
-#include <trex/utils/platform/memory.hh>
+#include <trex/config/memory.hh>
 
 #include <boost/python.hpp>
 

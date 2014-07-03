@@ -34,7 +34,7 @@
 #ifndef H_TimeUtils
 # define H_TimeUtils
 
-# include "../platform/chrono.hh"
+# include <trex/config/chrono.hh>
 
 # include <boost/date_time/posix_time/ptime.hpp>
 # include <boost/config.hpp>

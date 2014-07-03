@@ -41,7 +41,7 @@
 # define TREX_PP_SYSTEM_FILE <PLASMA/PlanDatabaseWriter.hh>
 # include <trex/europa/bits/system_header.hh>
 
-#include <trex/utils/platform/chrono.hh>
+#include <trex/config/chrono.hh>
 #include <boost/unordered_map.hpp>
 
 using namespace TREX::europa;

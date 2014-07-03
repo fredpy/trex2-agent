@@ -46,7 +46,7 @@
 
 # include "bits/agent_graph.hh"
 
-# include <trex/utils/platform/system_error.hh>
+# include <trex/config/system_error.hh>
 # include <trex/transaction/Tick.hh>
 # include <trex/utils/asio_fstream.hh>
 

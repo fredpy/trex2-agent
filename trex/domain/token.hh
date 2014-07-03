@@ -46,7 +46,7 @@ namespace TREX {
     
     
     class token;
-    typedef SHARED_PTR<token const> token_id;
+    typedef SHARED_PTR<token /*const*/> token_id;
     typedef SHARED_PTR<token> token_ref;
     
     
@@ -111,7 +111,7 @@ namespace TREX {
       attr_iterator attr_begin(bool all=true) const;
       attr_iterator attr_end(bool all=true) const;
       
-      token_id id() const {
+      token_id id() {
         return shared_from_this();
       }
       
@@ -184,14 +184,26 @@ namespace TREX {
                          int_domain const &d,
                          int_domain const &e,
                          ERROR_CODE &ec);
+      void restrict_time(int_domain const &s,
+                         int_domain const &d,
+                         int_domain const &e);
       void restrict_start(int_domain const &d, ERROR_CODE &ec) {
         restrict_time(d, s_duration_full, s_date_full, ec);
+      }
+      void restrict_start(int_domain const &d) {
+        restrict_time(d, s_duration_full, s_date_full);
       }
       void restrict_duration(int_domain const &d, ERROR_CODE &ec) {
         restrict_time(s_date_full, d, s_date_full, ec);
       }
+      void restrict_duration(int_domain const &d) {
+        restrict_time(s_date_full, d, s_date_full);
+      }
       void restrict_end(int_domain const &d, ERROR_CODE &ec) {
         restrict_time(s_date_full, s_duration_full, d, ec);
+      }
+      void restrict_end(int_domain const &d) {
+        restrict_time(s_date_full, s_duration_full, d);
       }
       
       void pred_tag(utils::symbol const &p) {

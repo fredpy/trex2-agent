@@ -40,11 +40,11 @@
 # include "entry.hh"
 # include "stream.hh"
 
-# include <trex/utils/bits/asio_conf.hh>
+# include <trex/config/bits/asio_conf.hh>
 # include "bits/log_sig.hh"
 
-# include "../platform/memory.hh"
-# include "../platform/cpp11_deleted.hh"
+# include <trex/config/memory.hh>
+# include <trex/config/cpp11_deleted.hh>
 
 # include <boost/asio/io_service.hpp>
 # include <boost/asio/strand.hpp>

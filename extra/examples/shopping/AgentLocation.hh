@@ -35,7 +35,7 @@
 #define H_AgentLocation
 
 #include <trex/transaction/reactor.hh>
-#include <trex/utils/platform/memory.hh>
+#include <trex/config/memory.hh>
 
 namespace TREX {
   /** @brief AgentLocation plug-in utilities

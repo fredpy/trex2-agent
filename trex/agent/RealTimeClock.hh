@@ -47,7 +47,7 @@
 
 # include "Clock.hh"
 
-# include <trex/utils/platform/memory.hh>
+# include <trex/config/memory.hh>
 
 # include <trex/utils/timing/posix_utils.hh>
 # include <trex/utils/log_manager.hh>

@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_priority_strand
 # define H_trex_utils_priority_strand
 
-# include "platform/cpp11_deleted.hh"
+# include <trex/config/cpp11_deleted.hh>
 
 # include <boost/asio/strand.hpp>
 # include <boost/optional.hpp>
@@ -44,7 +44,7 @@
 # include <boost/utility/result_of.hpp>
 # include <boost/tuple/tuple.hpp>
 
-# include "platform/system_error.hh"
+# include <trex/config/system_error.hh>
 
 # include <queue>
 
