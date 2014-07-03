@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2014, Frederic Py
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,18 +31,9 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_cpp11
-# define H_trex_cpp11
+#ifndef H_trex_config_version
+# define H_trex_config_version
 
-#cmakedefine CPP11_ENABLED 
+# include "bits/version.hh"
 
-#ifdef CPP11_ENABLED
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_SHARED_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
-#cmakedefine CPP11_BOOST_GET_POINTER_STD
-#cmakedefine CPP11_HAS_SYSTEM_ERROR
-#endif // CPP11_ENABLED
-
-#endif // H_trex_cpp11
+#endif // H_trex_config_version
