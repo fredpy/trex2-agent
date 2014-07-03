@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_version
-# define H_trex_version
+#ifndef H_trex_config_bits_version
+# define H_trex_config_bits_version
 
 # define TREX_MAJOR @TREX_MAJOR@
 # define TREX_MINOR @TREX_MINOR@
@@ -41,4 +41,4 @@
 
 # define TREX_VERSION "@VERSION@"
 
-#endif // H_trex_version
+#endif // H_trex_config_bits_version
