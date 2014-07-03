@@ -113,7 +113,7 @@ boost::optional<TICK> details::internal_impl::synch_date() const {
 // manipulators
 
 token_id details::internal_impl::create_obs(utils::symbol const &pred) {
-  token_id ret = MAKE_SHARED<token>(name(), pred);
+  token_ref ret = MAKE_SHARED<token>(name(), pred);
   ret->pred_tag(token::obs_tag);
   return ret;
 }

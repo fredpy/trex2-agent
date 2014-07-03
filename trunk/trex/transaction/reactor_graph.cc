@@ -358,7 +358,7 @@ token_id graph::parse_goal(boost::property_tree::ptree::value_type goal) const {
   DateHandler date_parser("date", *this);
   DurationHandler duration_parser("duration", *this);
 
-  token_id g = MAKE_SHARED<token>(boost::ref(goal));
+  token_ref g = MAKE_SHARED<token>(boost::ref(goal));
   g->pred_tag(token::goal_tag);
   return g;
 }

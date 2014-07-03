@@ -37,7 +37,7 @@
 
 # include <Wt/WServer>
 
-# include <trex/utils/platform/memory.hh>
+# include <trex/config/memory.hh>
 # include <trex/utils/singleton/use.hh>
 
 namespace TREX {

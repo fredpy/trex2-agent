@@ -34,7 +34,7 @@
 #include "asio_fstream.hh"
 
 #include <boost/bind.hpp>
-#include "platform/chrono.hh"
+#include <trex/config/chrono.hh>
 
 #include <fstream>
 

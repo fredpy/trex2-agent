@@ -42,7 +42,7 @@
 # define H_trex_utils_log_entry
 
 # include "log_fwd.hh"
-# include "../platform/memory.hh"
+# include <trex/config/memory.hh>
 
 # include <boost/optional.hpp>
 

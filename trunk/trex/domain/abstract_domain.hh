@@ -54,7 +54,7 @@
 
 # include <trex/utils/xml_factory.hh>
 # include <trex/utils/ptree_io.hh>
-# include <trex/utils/platform/cpp11_deleted.hh>
+# include <trex/config/cpp11_deleted.hh>
 
 # include "domain_visitor_fwd.hh"
 # include "domain_errors.hh"

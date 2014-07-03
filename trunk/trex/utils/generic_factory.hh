@@ -54,7 +54,7 @@
 # include <boost/utility.hpp>
 
 # include "singleton.hh"
-# include "platform/cpp11_deleted.hh"
+# include <trex/config/cpp11_deleted.hh>
 # include "factory_error.hh"
 
 namespace TREX {

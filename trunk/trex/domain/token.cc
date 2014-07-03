@@ -279,6 +279,19 @@ bool token::starts_after(int_domain::base_type date,
   return false;
 }
 
+void token::restrict_time(int_domain const &s,
+                          int_domain const &d,
+                          int_domain const &e) {
+  ERROR_CODE ec;
+  restrict_time(s, d, e, ec);
+  if( ec ) {
+    std::ostringstream oss;
+    oss<<object()<<'.'<<predicate()<<".restrict("<<s<<", "<<d<<", "<<e<<")";
+    throw SYSTEM_ERROR(ec, oss.str());
+  }
+ 
+}
+
 
 void token::restrict_time(int_domain const &s,
                           int_domain const &d,

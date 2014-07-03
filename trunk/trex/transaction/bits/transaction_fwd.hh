@@ -36,7 +36,7 @@
 
 # include <bitset>
 
-# include <trex/utils/platform/memory.hh>
+# include <trex/config/memory.hh>
 # include <trex/utils/log/entry.hh>
 
 # include <boost/signals2/signal.hpp>

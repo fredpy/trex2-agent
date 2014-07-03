@@ -34,7 +34,7 @@
 #ifndef H_TREX_utils_tick_clock
 # define H_TREX_utils_tick_clock
 
-# include "../platform/chrono.hh"
+# include <trex/config/chrono.hh>
 
 namespace TREX {
   namespace utils {

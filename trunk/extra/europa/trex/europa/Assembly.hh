@@ -38,7 +38,7 @@
 # include "config.hh"
 
 # include <trex/utils/id_mapper.hh>
-# include <trex/utils/platform/memory.hh>
+# include <trex/config/memory.hh>
 # include <trex/utils/timing/cpu_clock.hh>
 # include <trex/utils/asio_fstream.hh>
 
@@ -58,7 +58,7 @@
 # include <fstream>
 # include <memory>
 
-#include <trex/utils/platform/chrono.hh>
+#include <trex/config/chrono.hh>
 
 namespace TREX {
   namespace europa {

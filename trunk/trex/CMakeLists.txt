@@ -33,18 +33,11 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-configure_file(version.hh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/version.hh @ONLY)
-
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/version.hh 
-  DESTINATION include/trex
-)
-
 add_custom_target(core COMMENT "TREX core libraries")
 
 # Core libraries 
 
+add_subdirectory(config)
 add_subdirectory(utils)
 add_subdirectory(domain)
 add_subdirectory(transaction)

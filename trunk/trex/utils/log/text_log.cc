@@ -36,7 +36,7 @@
 #include "out_file.hh"
 #include "bits/log_stream.hh" 
 
-#include "../platform/chrono.hh"
+#include <trex/config/chrono.hh>
 
 #include <boost/smart_ptr.hpp>
 #include <boost/signals2/shared_connection_block.hpp>

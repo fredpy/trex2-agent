@@ -34,7 +34,7 @@
 #ifndef H_trex_domain_domain_errors
 # define H_trex_domain_domain_errors
 
-# include <trex/utils/platform/system_error.hh>
+# include <trex/config/system_error.hh>
 
 namespace TREX {
   namespace transaction {

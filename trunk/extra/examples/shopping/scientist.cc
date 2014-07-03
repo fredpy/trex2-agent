@@ -65,13 +65,15 @@ void Scientist::handle_init() {
 
 bool Scientist::synchronize() {
 
-    if(current_tick()==100)
-    {
-        token goal(auv,Sample);
-        transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
-        goal.restrict_attribute(temp);
-        goal.restrict_end(TREX::transaction::int_domain(current_tick()+1, Horizon));
-        post_goal(goal);
-    }
-    return true;
+  if(current_tick()==100)
+  {
+    ERROR_CODE ignore;
+    
+    token goal(auv,Sample);
+    transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
+    goal.restrict_attribute(temp);
+    goal.restrict_end(TREX::transaction::int_domain(current_tick()+1, Horizon), ignore);
+    post_goal(goal);
+  }
+  return true;
 }

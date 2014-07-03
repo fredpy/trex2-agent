@@ -46,8 +46,8 @@
 # include <list>
 # include <boost/filesystem.hpp>
 
-# include "platform/memory.hh"
-# include "platform/system_error.hh"
+# include <trex/config/memory.hh>
+# include <trex/config/system_error.hh>
 
 # include "log/log_pipe.hh"
 # include "log/out_file.hh"

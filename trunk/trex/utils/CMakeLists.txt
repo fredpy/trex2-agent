@@ -33,30 +33,6 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-configure_file(platform/bits/cpp11.hh.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
-  DESTINATION include/trex/utils/platform/bits
-)
-
-
-option(ASIO_DEBUG "enable debug of asio" OFF)
-mark_as_advanced(ASIO_DEBUG)
-
-configure_file(bits/asio_conf.hh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
-  DESTINATION include/trex/utils/bits
-)
-
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-
-
-
 add_library(TREXutils SHARED
   # real source
   Exception.cc
@@ -118,11 +94,6 @@ add_library(TREXutils SHARED
   timing/cpu_clock.hh
   timing/tick_clock.hh
   timing/posix_utils.hh
-  # platform specific information
-  platform/chrono.hh 
-  platform/memory.hh
-  platform/cpp11_deleted.hh
-  platform/system_error.hh
   # template source code
   bits/priority_strand.tcc
   bits/generic_factory.tcc
@@ -195,13 +166,6 @@ source_group("Header\ Files\\bits" FILES
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
-)
-
-source_group("Header\ Files\\platform" FILES
-  platform/chrono.hh 
-  platform/memory.hh
-  platform/cpp11_deleted.hh
-  platform/system_error.hh
 )
 
 source_group("Header\ Files\\singleton" FILES 

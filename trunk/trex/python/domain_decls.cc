@@ -79,8 +79,8 @@ namespace {
       return this->get_override("__eq__")(other);
     }
     
-    bool restrict_with(tt::abstract_domain const &other) {
-      return this->get_override("restrict")(other);
+    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
+      return this->get_override("restrict")(other, ec);
     }
   
     boost::property_tree::ptree build_tree() const {
@@ -136,8 +136,8 @@ namespace {
     boost::any get_upper() const {
       return boost::any();
     }
-    bool restrict_with(tt::abstract_domain const &other) {
-      return this->get_override("restrict")(other);
+    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
+      return this->get_override("restrict")(other, ec);
     }
     void parse_lower(std::string const &val) {
       this->get_override("parse_low")(val);
@@ -186,8 +186,8 @@ namespace {
     boost::any element(size_t) const {
       return boost::any();
     }
-    bool restrict_with(tt::abstract_domain const &other) {
-      return this->get_override("restrict")(other);
+    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
+      return this->get_override("restrict")(other, ec);
     }
     
     virtual void add_string_value(std::string const &val) {
@@ -264,7 +264,7 @@ void export_domain() {
   .def("is_singleton", pure_virtual(&tt::abstract_domain::is_singleton))
   .def("intersect", pure_virtual(&tt::abstract_domain::intersect))
   .def("__eq__", pure_virtual(&tt::abstract_domain::equals))
-  .def("restrict", pure_virtual(&tt::abstract_domain::restrict_with))
+//  .def("restrict", pure_virtual(&tt::abstract_domain::restrict_with))
   .def("as_tree", &tt::abstract_domain::as_tree)
   .def("build_tree", pure_virtual(&tt::abstract_domain::build_tree))
   .def("xml", &xml_str<tt::abstract_domain>)

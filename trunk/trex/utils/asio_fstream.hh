@@ -34,8 +34,8 @@
 #ifndef H_trex_utils_asio_fstream
 # define H_trex_utils_asio_fstream
 
-# include "platform/memory.hh"
-# include "platform/cpp11_deleted.hh"
+# include <trex/config/memory.hh>
+# include <trex/config/cpp11_deleted.hh>
 # include "shared_var.hh"
 # include "asio_runner.hh"
 

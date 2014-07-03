@@ -62,7 +62,7 @@ namespace TREX {
        * @ingroup transaction
        * @relates class external
        */
-      typedef std::list< std::pair<token_id, bool> >  goal_queue;
+      typedef std::list< std::pair<token_ref, bool> >  goal_queue;
       /** @brief A external timeline proxy
        *
        * This type by a external class to represent an external timeline
