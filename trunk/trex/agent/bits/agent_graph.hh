@@ -82,42 +82,6 @@ namespace boost {
 namespace TREX {
   namespace agent {
 
-    /** @brief Cyclic dependency exception
-     *
-     * EXcveption thrown when the agent dtects a cycli dependcy between
-     * two reactors of its graph
-     *
-     * Such cyclic dependency cannot be allowed in an agent
-     * as it implies that both reactors require the other to complete
-     * its synchronization in order to complete their. Resulting on
-     * a chicken and egg problem during xynchronization which can only
-     * be reolved by computing a fixed point for synchronization of both
-     * @p a and @p b which is not even guraranteed to converge.
-     *
-     * @author Frederic Py
-     * @relates class Agent
-     * @ingroup agent
-     */
-    class CycleDetected :public AgentException {
-    public:
-      /** @brief Constructor
-       * @param[in] g A graph
-       * @param[in] a A reactor
-       * @param[in] b A reatcor
-       *
-       * Create a new instance stating that a dependency cycle has
-       * been detected between the tow reactors @p a and @p b in
-       * the graph @p g
-       */
-      CycleDetected(TREX::transaction::graph const &g,
-		    TREX::transaction::graph::reactor_id a,
-		    TREX::transaction::graph::reactor_id b) throw()
-	:AgentException(g, "Cyclic dependency between reactor \""+
-			boost::get(boost::get(boost::vertex_name_t(), g), a).str()+"\" and \""+
-			boost::get(boost::get(boost::vertex_name_t(), g), b).str()+"\".") {}
-      /** @brief Destructor */
-      ~CycleDetected() throw() {}
-    };
 
     /** @brief Cycle detector
      *
@@ -156,7 +120,7 @@ namespace TREX {
 		     TREX::transaction::graph const &g) {
         if( is_valid(boost::source(rel, g), g) &&
             is_valid(boost::target(rel, g), g) )
-          throw CycleDetected(g, boost::source(rel, g), boost::target(rel, g));
+          throw SYSTEM_ERROR(transaction::graph_error_code(transaction::graph_error::cycle_detected));
       }
 
 

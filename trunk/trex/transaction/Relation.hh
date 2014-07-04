@@ -41,31 +41,6 @@
 namespace TREX {
   namespace transaction {
 
-    /** @brief Exception for timeline ownership conflict
-     *
-     * This exception is udsed when more than one reactor attyempt to declare
-     * a timeline as internal
-     *
-     * @relates class details::timeline
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     */
-    class MultipleInternals :public ReactorException {
-    public:
-      /** @brief Constructor
-       *
-       * @param[in] faulty   The reactor that attempted to steal the timeline
-       * @param[in] timeline The name of the timeline
-       * @param[in] owner    The reactor that currenlty owns the timeline
-       *
-       * Create a new instance that indicates that @p faulty attempted to declare the
-       * timeline named @p timeline while it is alread oewned by @p owner
-       */
-      MultipleInternals(reactor const &faulty, utils::symbol const &timeline,
-			reactor const &owner) throw();
-      /** @brief Destructor */
-      ~MultipleInternals() throw() {}
-    }; // TREX::transaction::MultipleInternals
 
     namespace details {
 

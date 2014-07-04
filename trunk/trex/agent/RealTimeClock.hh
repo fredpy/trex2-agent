@@ -117,7 +117,7 @@ namespace TREX {
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
         if( percent_use<5 || percent_use>100 )
-          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
+          throw std::runtime_error("Only accept clock percent_use between 5 and 100%");
         m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
@@ -126,7 +126,7 @@ namespace TREX {
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
         if( percent_use<5 || percent_use>100 )
-          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
+          throw std::runtime_error("Only accept clock percent_use between 5 and 100%");
         m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
@@ -215,7 +215,7 @@ namespace TREX {
         check_tick();
         unsigned sleep_ratio = utils::parse_attr<unsigned>(100, node, "percent_use");
         if( sleep_ratio<5 || sleep_ratio>100 )
-          throw utils::Exception("Only accept clock precent_use between 5 and 100%");
+          throw std::runtime_error("Only accept clock precent_use between 5 and 100%");
         m_sleep_watchdog = 
 	  sleep_ratio*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
@@ -389,7 +389,7 @@ namespace TREX {
     
       void check_tick() const {
         if( m_period <= tick_rate::zero() )
-          throw TREX::utils::Exception("[clock] tick rate must be greater than 0");
+          throw Error("[clock] tick rate must be greater than 0");
       }
       
       typedef boost::recursive_mutex mutex_type;

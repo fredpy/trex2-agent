@@ -78,7 +78,7 @@ namespace TREX {
        * @relates Clock
        * @ingroup agent
        */
-      class Error :public TREX::utils::Exception {
+      class Error :public std::runtime_error {
       public:
         /** @brief Constructor
          *
@@ -87,7 +87,7 @@ namespace TREX {
          * Create a new instance  withe associated message @p msg
          */
         Error(std::string const &msg) throw()
-          :TREX::utils::Exception(msg) {}
+        :std::runtime_error(msg) {}
         /** @brief Destructor */
         ~Error() throw() {}
       }; // TREX::agent::Clock::Error

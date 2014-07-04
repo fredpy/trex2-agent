@@ -47,6 +47,7 @@
 
 # include "bits/external.hh"
 # include "reactor_graph.hh"
+# include "reactor_error.hh"
 
 # include <trex/utils/timing/posix_utils.hh>
 # include <trex/utils/timing/chrono_helper.hh>
@@ -1035,8 +1036,8 @@ namespace TREX {
        * @sa failed_internal(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
       virtual bool failed_external(TREX::utils::symbol const &timeline,
-                                   graph::timeline_failure const &err) {
-        throw err;
+                                   ERROR_CODE const &ec) {
+          throw SYSTEM_ERROR(ec, "Failed to declare \""+timeline.str()+"\"");
       }
       /** @brief Request for internal failed
        *
@@ -1052,8 +1053,8 @@ namespace TREX {
        * @sa failed_external(TREX::utils::symbol const &, graph::timeline_failure const &)
        */
       virtual bool failed_internal(TREX::utils::symbol const &timeline,
-                                   graph::timeline_failure const &err) {
-        throw err;
+                                   ERROR_CODE const &ec) {
+        throw SYSTEM_ERROR(ec, "Failed to use \""+timeline.str()+"\"");
       }
       /** @brief Check for internal timeline
        *
@@ -1290,60 +1291,7 @@ namespace TREX {
       
       friend class graph;
     }; // TREX::transaction::TeleoReactor
-    
-    /** @brief Synchronization related exception
-     *
-     * This exception will be throwned when an operation related to
-     * synchronization failed.
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @relates class TeleoReactor
-     * @ingroup transaction
-     */
-    class SynchronizationError :public ReactorException {
-    public:
-      /** @brief Constructor
-       *
-       * @param[in] r The reactor where the error did happen
-       * @param[in] msg The error message
-       */
-      SynchronizationError(reactor const &r, std::string const &msg) throw()
-      :ReactorException(r, msg) {}
-      /** @brief Desturctor */
-      ~SynchronizationError() throw() {}
-    }; // TREX::transaction::SynchronizationError
-    
-    /** @brief Goal posting error
-     *
-     * This execption will be thrown when a goal posting was invalid
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @relates class TeleoReactor
-     * @ingroup transaction
-     */
-    class DispatchError :public ReactorException {
-    public:
-      /** brief Constructor
-       * @param[in] r The reactor where the error did occur
-       * @param[in] g The goal that triggered the error
-       * @param[in] msg The error msg
-       */
-      DispatchError(reactor const &r, token_id const &g, std::string const &msg) throw()
-      :ReactorException(r, build_msg(g, msg)) {}
-      /** @brief Destructor */
-      ~DispatchError() throw() {}
-      
-    private:
-      /** @brief Construct the error message
-       * @param[in] g   A goal
-       * @param[in] msg An error message
-       * 
-       * @return A string that depicts that the error @p msg did occur with the goal @p g
-       */
-      static std::string build_msg(token_id const &g, std::string const &msg) throw();
-    };
-    
-    
+        
   } // TREX::transaction
 } // TREX
 

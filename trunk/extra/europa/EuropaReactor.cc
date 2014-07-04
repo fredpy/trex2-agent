@@ -111,13 +111,16 @@ EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
 			<<short_nddl;
       nddl = short_nddl;
       if( !locate_nddl(nddl) )
-	throw ReactorException(*this, "Unable to locate "+long_nddl+" or "+short_nddl);
+        throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                         "Unable to locate "+long_nddl+" or "+short_nddl);
+        
     }
   }
   // Load the nddl model
   if( !playTransaction(nddl) ) {
     syslog(null,error)<<"Model is inconsistent.";
-    throw ReactorException(*this, "model in "+nddl+" is inconsistent.");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "model in "+nddl+" is inconsistent.");
   }
 
   if( !plan_db()->isClosed() ) {
@@ -143,7 +146,8 @@ EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
   planner_cfg = manager().use(*tmp, found).string();
   if( !found ) {
     syslog(null, error)<<"Unable to locate planner cfg file \""<<*tmp<<"\"";
-    throw ReactorException(*this, "Unable to locate planner cfg \""+(*tmp)+"\"");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Unable to locate planner cfg \""+(*tmp)+"\"");
   }
   // Getting synchronizer configuration
   tmp = parse_attr< boost::optional<std::string> >(cfg, "synch_cfg");
@@ -154,7 +158,8 @@ EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
     synch_cfg = manager().use(*tmp, found).string();
     if( !found ) {
       syslog(null, error)<<"Unable to locate synch cfg file \""<<*tmp<<"\"";
-      throw ReactorException(*this, "Unable to locate synch cfg \""+(*tmp)+"\"");
+      throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                         "Unable to locate synch cfg \""+(*tmp)+"\"");
     }
   }
     
@@ -179,7 +184,8 @@ EuropaReactor::EuropaReactor(reactor::xml_arg_type arg)
       EUROPA::ConstrainedVariableId o_mode = mode(*o);
       
       if( !o_mode->lastDomain().isSingleton() )
-	throw ReactorException(*this, "The mode of the "+TREX_TIMELINE.toString()
+        throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                           "The mode of the "+TREX_TIMELINE.toString()
 			       +" \""+trex_name.str()+"\" is not a singleton.");
       else {
 	mode_val = o_mode->lastDomain().getSingletonValue();
@@ -686,7 +692,8 @@ void EuropaReactor::resume() {
       syslog(null, warn)<<"Failed to relax => forgetting past.";
       if( !do_relax(true) ) {
         syslog(null, error)<<"Unable to recover from plan inconsistency.";
-	throw TREX::transaction::ReactorException(*this, "Unable to recover from plan inconsistency.");
+        throw SYSTEM_ERROR(reactor_error_code(reactor_error::unexpected_exception),
+                           "Unable to recover from plan inconsistency.");
       }
   }
   print_stats("delib", planner()->getStepCount(), 

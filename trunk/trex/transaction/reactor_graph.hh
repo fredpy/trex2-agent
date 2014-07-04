@@ -40,6 +40,8 @@
 # include <trex/utils/timing/posix_utils.hh>
 # include <trex/utils/shared_var.hh>
 
+# include "graph_error.hh"
+
 # include <boost/graph/graph_traits.hpp>
 # include <boost/graph/adjacency_iterator.hpp>
 # include <boost/graph/properties.hpp>
@@ -55,37 +57,6 @@ namespace TREX {
     using utils::log::info;
     using utils::log::warn;
     using utils::log::error;
-
-    /** @brief Conflicting reactor names
-     *
-     * This mthod is throwned when multiple reactors in a graph have the
-     * same name.
-     *
-     * Indeed, while reactors are identified internally using their memory
-     * address, we also did enforce that it is not possible to have
-     * multiples reactors with the same name in a transaction graph. This choice
-     * was made to avoid confusion on the different logs produced by TREX.
-     *
-     * @author Frederic Py <fpy@mbari.org>
-     * @relates class graph
-     * @ingroup transaction
-     */
-    class MultipleReactors :public GraphException {
-    public:
-      /** @brief Constructor
-       *
-       * @param[in] g A graph
-       * @param[in] r A reactor
-       *
-
-       * Create a new instance indicating that multiple reactors with the same
-       * name as @p r were declared in the graph @p g
-       */
-      explicit MultipleReactors(graph const &g, reactor const &r) throw();
-      /** @brief Destructor */
-      ~MultipleReactors() throw() {}
-    }; // TREX::transaction::MultipleReactors
-
 
 
     /** @brief Transactions graph
@@ -136,32 +107,6 @@ namespace TREX {
        */
       typedef details::reactor_id reactor_id;
 
-      /** @brief Timeline relation creation failure
-       *
-       * This class is used to indicate when a timeline operation -- such as
-       * declaring an Internal or External timeline --  in the
-       * @c graph failed. It is used to indicate the nature of the
-       * error and will be reported to the reactor that made the request
-       * through failed_internal and failed_external callbacks
-       *
-       * @relates graph
-       * @sa TeleoReactor::failed_external
-       * @sa TeleoReactor::failed_internal
-       *
-       * @author Frederic Py <fpy@mbari.org>
-       */
-      struct timeline_failure: public ReactorException {
-      public:
-        /** @brief Destructor */
-        virtual ~timeline_failure() throw() {}
-        /** @brief Constructor
-         * @param[in] r The reactor that requested the operation
-         * @param[in] msg The associated error message
-         */
-        timeline_failure(graph::reactor_id r,
-                         std::string const &msg) throw()
-        :ReactorException(*r, msg) {}
-      }; // TREX::transaction::graph::timeline_failure
 
       /** @brief reactor relation type
        *

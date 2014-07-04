@@ -49,8 +49,11 @@ namespace TREX {
 	  ret = m_reactors.insert(r);
 	if( ret.second )
 	  syslog(null, info)<<"Reactor \""<<r->name()<<"\" created.";
-	else 
-	  throw MultipleReactors(*this, **(ret.first));
+        else {
+          throw SYSTEM_ERROR(graph_error_code(graph_error::reactor_already_exist),
+                             "Reactor with name \""+r->name().str()
+                             +"\" already exists");
+        }
 	++count;
       }
       return count;

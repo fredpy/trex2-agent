@@ -39,16 +39,6 @@ using namespace TREX::transaction;
 using namespace TREX::transaction::details;
 
 /*
- * class TREX::transaction::MultipleInternals
- */
-
-MultipleInternals::MultipleInternals(reactor const &faulty,
-                                     utils::symbol const &timeline,
-				     reactor const &owner) throw()
-  :ReactorException(faulty, "timeline "+timeline.str()+" already Internal to "
-		    +owner.name().str()) {}
-
-/*
  * class TREX::transaction::details::timeline
  */
 
@@ -115,7 +105,9 @@ bool timeline::assign(reactor &r, transaction_flags const &flags) {
     r.assigned(this);
     latency_update(update);
   } else {
-    throw MultipleInternals(r, name(), owner());
+    throw SYSTEM_ERROR(graph_error_code(graph_error::already_owned),
+                       "Failed to assign \""+name().str()+
+                       "\" to \""+r.name().str()+"\"");
   }
   return ret;
 }

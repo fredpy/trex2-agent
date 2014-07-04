@@ -34,7 +34,7 @@
 #ifndef H_trex_EuropaException
 # define H_trex_EuropaException
 
-# include <trex/utils/Exception.hh>
+# include <stdexcept>
 
 namespace TREX {
   namespace europa {
@@ -46,13 +46,13 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup europa 
      */
-    class EuropaException :public TREX::utils::Exception {
+    class EuropaException :public std::runtime_error {
     public:
       /** @brief Constructor 
        * @param[in] msg Error message
        */
       EuropaException(std::string const &msg) throw() 
-	:TREX::utils::Exception(msg) {}
+      :std::runtime_error(msg) {}
       /** @brief Destructor */ 
       virtual ~EuropaException() throw() {}
     }; // TREX::europa::EuropaException

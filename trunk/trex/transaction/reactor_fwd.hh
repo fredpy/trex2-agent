@@ -55,57 +55,11 @@
 
 # include "Tick.hh"
 
-#include <trex/utils/Exception.hh>
-
 namespace TREX {
   namespace transaction {
 
     class reactor;
     class graph;
-
-    /** @brief Graph Exception
-     *
-     * An exception due to a graph related issue
-     *
-     * @relates graph
-     * @author Frederic Py <fpy@mbari.org>
-     * @ingroup transaction
-     */
-    class GraphException :public TREX::utils::Exception {
-    public:
-      GraphException(graph const &g, std::string const &msg) throw();
-      virtual ~GraphException() throw() {}
-
-    protected:
-      GraphException(graph const &g, std::string const &who,
-		     std::string const &msg) throw();
-    }; // TREX::transaction::GraphException
-
-
-    /** @brief TeleoReactor related exception
-     *
-     * An exception produced while manipulating a reactor.
-     *
-     * @relates TeleoReactor
-     * @author  Frederic Py <fpy@mbari.org>
-     * @ingroup transaction
-     */
-    class ReactorException :public GraphException {
-    public:
-      /** @brief Constructor
-       *
-       * @param[in] r    The source of the exception
-       * @param[in] msg  The associated message
-       *
-       * Create a new instance with an ossociated message that indicates that
-       * this exception is due to the TeleoReactor @p r and that the error can
-       * be described as @p msg.
-       */
-      ReactorException(reactor const &r, std::string const &msg) throw();
-      /** @brief Destructor */
-      virtual ~ReactorException() throw() {}
-
-    }; // TREX::transaction::ReactorException
 
     /** @brief Implementation details for transaction
      *

@@ -35,7 +35,9 @@
 
 add_library(TREXtransaction SHARED
   reactor.cc
+  reactor_error.cc
   reactor_graph.cc
+  graph_error.cc
   Relation.cc
   LogPlayer.cc
   private/graph_impl.cc
@@ -46,8 +48,10 @@ add_library(TREXtransaction SHARED
   bits/bgl_support.hh
   bits/external.hh
   reactor.hh
+  reactor_error.hh
   reactor_fwd.hh
   reactor_graph.hh
+  graph_error.hh
   Relation.hh
   Tick.hh
   bits/timeline.hh

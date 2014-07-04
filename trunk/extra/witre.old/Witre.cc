@@ -584,9 +584,6 @@ void WitreApplication::attributePopup()
             } else {
             doJavaScript("alert('File ("+file+") is empty!');");
             }
-        } catch(Exception const &te) {
-            err<<"alert('TREX error ("<<te<<")');";
-            doJavaScript(err.str());
         } catch( std::exception const &e ) {
             err<<"alert('Exception: ("<<e.what()<<")');";
             doJavaScript(err.str());
