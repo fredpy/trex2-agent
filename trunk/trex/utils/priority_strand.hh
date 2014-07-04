@@ -37,211 +37,18 @@
 # include <trex/config/cpp11_deleted.hh>
 
 # include <boost/asio/strand.hpp>
-# include <boost/optional.hpp>
-# include <boost/thread/future.hpp>
 # include <boost/thread/mutex.hpp>
 # include <boost/thread/shared_mutex.hpp>
-# include <boost/utility/result_of.hpp>
 # include <boost/tuple/tuple.hpp>
 
 # include <trex/config/system_error.hh>
+# include "bits/async_result.hh"
 
 # include <queue>
 
 namespace TREX {
   namespace utils {
     
-    namespace details {
-      
-      template<typename Ret>
-      class async_task;
-      
-    } // TREX::utils::details
-   
-    
-#ifndef DOXYGEN
-    
-    template<typename Ret>
-    class async_result;
-    
-  
-    template<>
-    class async_result<void> {
-    public:
-      ~async_result() {}
-      
-      bool is_exception() const {
-        return bool(m_error);
-      }
-      bool operator! () const {
-        return is_exception();
-      }
-      boost::exception_ptr const &exception() const {
-        return m_error;
-      }
-      void get() const {
-        if( m_error )
-          rethrow_exception(m_error);
-      }
-      void get(boost::promise<void> &p) const {
-        if( m_error )
-          p.set_exception(m_error);
-        else
-          p.set_value();
-      }
-
-    private:
-      async_result() {}
-      
-      void set_exception(boost::exception_ptr const &e) {
-        m_error = e;
-      }
-      
-      void set(boost::function<void ()> const &fn) {
-        try {
-          fn();
-        } catch(...) {
-          set_exception(boost::current_exception());
-        }
-      }
-      
-      boost::exception_ptr m_error;
-      
-      friend details::async_task<void>;
-      
-      template<typename Ret>
-      friend class async_result;
-    }; // TREX::utils::async_result<void>
-    
-    
-    template<typename Ret>
-    class async_result {
-    public:
-      ~async_result() {}
-      
-      bool is_exception() const {
-        return m_except.is_exception();
-      }
-      bool operator! () const {
-        return is_exception();
-      }
-      boost::exception_ptr const &exception() const {
-        return m_except.exception();
-      }
-      Ret const &get() const {
-        m_except.get();
-        return *m_value;
-      }
-      void get(boost::promise<Ret> &p) const {
-        if( is_exception() )
-          p.set_exception(exception());
-        else
-          p.set_value(*m_value);
-      }
-      
-    private:
-      async_result() {}
-      
-      void set(boost::function<Ret ()> const &fn) {
-        m_except.set(boost::bind(&async_result::set_value, this,
-                                 boost::bind(fn)));
-      }
-      void set_value(Ret const &v) {
-        m_value = v;
-      }
-      void set_exception(boost::exception_ptr const &e) {
-        m_except.set_exception(e);
-      }
-      
-      
-      async_result<void>   m_except;
-      boost::optional<Ret> m_value;
-      
-      friend details::async_task<Ret>;
-    }; // TREX::utils::async_result<>
-    
-# else // DOXYGEN
-    
-    /** @brief Asynchronous task result placeholder
-     *
-     * This class is used by @c priority_strand to pass the 
-     * result of the asynchronously executed task to a potential 
-     * handling callback.
-     *
-     * The class itself present aninterface largely inspired from
-     * boost::future or std::future from C++11. It can embed either
-     * the retruned value from the asynchronous call or the exception 
-     * that was produced by this call.
-     *
-     * @tparam Ty the return type of the function
-     *
-     * @relates priority_strand
-     */
-    template<typename Ty>
-    class async_result {
-    public:
-      /** @{ */
-      /** @brief Check if exception
-       *
-       * Check if this result is an excpetion
-       *
-       * @retval true if the result is an exception
-       * @retval false otherwise
-       */
-      bool is_exception() const;
-      bool operator! () const;
-      /** @} */
-      /** @brief Get exception 
-       *
-       * If this instance holds an exception it returns a 
-       * pointer to this exception or an empty pointer 
-       * otherwise.
-       *
-       * @return A pointer to the exception if any
-       * @sa is_exception() const
-       */
-      boost::exception_ptr const &exception() const;
-      /** @brief Get outcome of the function
-       *
-       * This function reporduces the outcome of the
-       * asynchronous fucntion. If the function threw 
-       * an exception then this call will rethrow it 
-       * otherwise it returns the value of the function 
-       * if any.
-       *
-       * @note computed_type is convertible into Ty
-       *
-       * @throw an exception if is_excpetion() is true
-       *
-       * @return The returned value of the function
-       * @sa is_exception() const
-       */
-      computed_type get() const;
-      /** @brief transfert the value to a boost::promise
-       *
-       * @param[out] promise the promise to update
-       *
-       * Updates @p promise with the value or exception 
-       * wrapped by this instance.
-       */
-      void get(boost::promise<Ty> &promise) const;
-    };
-    
-# endif // DOXYGEN
-    
-    
-    namespace details {
-      
-      template<typename Fn>
-      struct task_helper {
-        typedef typename boost::result_of<Fn()>::type return_type;
-        typedef boost::shared_future<return_type>     future;
-        
-        typedef async_result<return_type>                wrapper;
-        typedef boost::function<void (wrapper const &)>  handler;
-      }; // TREX::utils::details::task_helper<>
-      
-    } // TREX::utils::details
     
     /** @brief Priority based strand
      *
@@ -286,12 +93,16 @@ namespace TREX {
     
       /** @brief Constructor 
        *
-       * @param[in] io An asio io_service
+       * @param[in] io     An asio io_service
+       * @param[in] active should the service starts right away
        *
        * Create a new instance the execution of the tasks will be 
-       * managed by @p io
+       * managed by @p io. If @p active is true (the default) then 
+       * this queue will be active right away otherwise it will stay 
+       * inactive until explicitely started
        */
-      explicit priority_strand(boost::asio::io_service &io);
+      explicit priority_strand(boost::asio::io_service &io,
+                               bool active = true);
       /** @brief Detructor 
        *
        * clear the queue of pending tasks for this instance and 
@@ -300,6 +111,46 @@ namespace TREX {
        * @dsa clear()
        */
       ~priority_strand();
+      
+      /** @brief Check if active
+       *
+       * Indiactes if thei instance is currently active or not. An 
+       * inactive queue enqueue the tasks to be executed but do not 
+       * process them until made active.
+       *
+       * @retval true if the queue is currently active
+       * @retval false if the queue is currently inactive
+       *
+       * @sa start()
+       * @sa stop()
+       */
+      bool is_active() const;
+      /** @brief Make the queue active
+       *
+       * Initiate the queue tasks processing loop. All tasks 
+       * previously inserted will be dequeues and executed until 
+       * the queue is ever emptied or topped
+       *
+       * @post the queue is active
+       *
+       * @sa bool is_active() const
+       * @sa stop()
+       * @sa clear()
+       */
+      void start();
+      /** @brief Deactivate the queue
+       *
+       * Stops the queue tasks processing loop. Any tasks still in 
+       * the queue are put on hold untile the queue is either cleared 
+       * or started
+       *
+       * @post the queue is active
+       *
+       * @sa bool is_active() const
+       * @sa start()
+       * @sa clear()
+       */
+      void stop();
       
       /** @{
        * @brief Post a task
@@ -393,12 +244,14 @@ namespace TREX {
         bool operator()(task *a, task *b) const;
       };
 
-      typedef std::priority_queue<task *,std::vector<task *>, tsk_cmp> task_queue;
+      typedef std::priority_queue<task *,std::vector<task *>,
+                                  tsk_cmp> task_queue;
 
       
-      boost::asio::strand m_strand;
+      boost::asio::strand         m_strand;
       mutable boost::shared_mutex m_mutex;
-      task_queue          m_tasks;      
+      task_queue                  m_tasks;
+      bool                        m_active;
       
       void enqueue(task *tsk);
       void dequeue_sync();

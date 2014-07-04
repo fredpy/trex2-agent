@@ -59,11 +59,15 @@ bool priority_strand::tsk_cmp::operator()(priority_strand::task *a,
 
 // structors
 
-priority_strand::priority_strand(asio::io_service &io)
-:m_strand(io) {}
+priority_strand::priority_strand(asio::io_service &io, bool active)
+:m_strand(io), m_active(false) {
+  if( active )
+    start();
+}
 
 priority_strand::~priority_strand() {
   clear();
+  stop();
 }
 
 // observers
@@ -78,31 +82,67 @@ bool priority_strand::empty() const {
   return m_tasks.empty();
 }
 
+bool priority_strand::is_active() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mutex);
+  return m_active;
+}
+
+// modifiers
+
+void priority_strand::start() {
+  bool was_active = true, queued_tasks;
+  {
+    boost::upgrade_lock<boost::shared_mutex> test(m_mutex);
+    queued_tasks = !m_tasks.empty();
+    {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      std::swap(m_active, was_active);
+    }
+  }
+  if( queued_tasks && !was_active )
+    m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
+}
+
+void priority_strand::stop() {
+  boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+  m_active = false;
+}
+
+
+
 // manipulators
 
 void priority_strand::enqueue(priority_strand::task *t) {
+  bool should_post = false;
+  
   {
     boost::unique_lock<boost::shared_mutex> lock(m_mutex);
+    should_post = m_tasks.empty() && m_active;
     m_tasks.push(t);
   }
-  m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
+  if( should_post )
+    m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
 }
 
 void priority_strand::dequeue_sync() {
   task *nxt;
+  bool should_post = false;
   {
     boost::upgrade_lock<boost::shared_mutex> test(m_mutex);
     
-    if( m_tasks.empty() )
+    if( m_tasks.empty() || !m_active )
       return;
     else {
       boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
       nxt = m_tasks.top();
       m_tasks.pop();
     }
+    should_post = !m_tasks.empty();
   }
   nxt->execute();
   delete nxt;
+  if( should_post )
+    m_strand.post(boost::bind(&priority_strand::dequeue_sync, this));
 }
 
 void priority_strand::clear() {

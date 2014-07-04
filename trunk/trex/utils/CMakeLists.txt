@@ -33,9 +33,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+
 add_library(TREXutils SHARED
   # real source
-  Exception.cc
   factory_error.cc
   log_manager.cc
   Pdlfcn.cc
@@ -58,10 +58,10 @@ add_library(TREXutils SHARED
   asio_signal.hh
   asio_signal_n.hh
   asio_signal_fwd.hh
+  bits/async_result.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
-  Exception.hh
   factory_error.hh
   generic_factory.hh
   id_mapper.hh
@@ -163,6 +163,7 @@ source_group("Source\ Files\\timing" FILES
 )
 
 source_group("Header\ Files\\bits" FILES 
+  bits/async_result.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
