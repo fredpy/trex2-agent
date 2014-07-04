@@ -58,6 +58,7 @@ add_library(TREXutils SHARED
   asio_signal.hh
   asio_signal_n.hh
   asio_signal_fwd.hh
+  bits/stranded_service.hh
   bits/async_result.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
@@ -167,6 +168,7 @@ source_group("Header\ Files\\bits" FILES
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
+  bits/stranded_service.hh
 )
 
 source_group("Header\ Files\\singleton" FILES 

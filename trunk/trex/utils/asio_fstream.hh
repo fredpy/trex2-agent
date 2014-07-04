@@ -34,10 +34,10 @@
 #ifndef H_trex_utils_asio_fstream
 # define H_trex_utils_asio_fstream
 
-# include <trex/config/memory.hh>
 # include <trex/config/cpp11_deleted.hh>
 # include "shared_var.hh"
 # include "asio_runner.hh"
+# include "bits/stranded_service.hh"
 
 # include <boost/ref.hpp>
 # include <boost/iostreams/stream.hpp>
@@ -48,58 +48,6 @@
 namespace TREX {
   namespace utils {
     
-    template<class Worker>
-    class stranded_service :public boost::asio::io_service::service {
-    public:
-      static boost::asio::io_service::id id;
-      typedef SHARED_PTR<boost::asio::io_service::work> work_ref;
-      
-      explicit stranded_service(boost::asio::io_service &io)
-      :boost::asio::io_service::service(io),m_strand(io) {}
-      
-      ~stranded_service() {
-        shutdown_service();
-      }
-      
-      template<typename Handler>
-      void post(Handler const &fn) {
-        m_strand.post(fn);
-      }
-      template<typename Handler>
-      void dispatch(Handler const &fn) {
-        m_strand.dispatch(fn);
-      }
-      
-      work_ref reserve() {
-        work_ref ret = m_work.lock();
-        if( !ret ) {
-          boost::asio::io_service &io = get_io_service();
-          ret = MAKE_SHARED<boost::asio::io_service::work>(boost::ref(io));
-          m_work = ret;
-        }
-        return ret;
-      }
-      
-      template<typename Handler>
-      void async_reserve(Handler fn) {
-        boost::function<void (work_ref)> handle(fn);
-        post(boost::bind(&stranded_service::reserve_sync, this, handle));
-      }
-      
-      void reserve_sync(boost::function<void (work_ref)> handle) {
-        handle(reserve());
-      }
-      
-    private:
-      void shutdown_service() {}
-      
-      WEAK_PTR<boost::asio::io_service::work> m_work;
-      boost::asio::io_service::strand m_strand;
-    };
-    
-    template<class Worker>
-    boost::asio::io_service::id stranded_service<Worker>::id;
-
     
     /** @brief Asynchronous text output stream
      *
@@ -111,7 +59,7 @@ namespace TREX {
     class async_ofstream :boost::noncopyable {
       class pimpl;
     public:
-      typedef stranded_service<pimpl> service;
+      typedef stranded_service<pimpl> service_type;
       
       explicit async_ofstream(boost::asio::io_service &service)
       :m_io(service) {}
