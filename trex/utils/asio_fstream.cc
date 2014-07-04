@@ -46,7 +46,7 @@ namespace TREX {
     
     class async_ofstream::pimpl:public ENABLE_SHARED_FROM_THIS<async_ofstream::pimpl> {
     public:
-      typedef async_ofstream::service service;
+      typedef async_ofstream::service_type service_type;
       typedef CHRONO::system_clock    clock;
       
       
@@ -59,8 +59,8 @@ namespace TREX {
         m_work.reset();
       }
     
-      service &get_service() {
-        return boost::asio::use_service<service>(m_io);
+      service_type &get_service() {
+        return boost::asio::use_service<service_type>(m_io);
       }
       
       void async_write(std::string const &buffer) {
