@@ -1,5 +1,5 @@
-#ifndef H_trex_utils_asio_signal_base
-# define H_trex_utils_asio_signal_base
+#ifndef H_trex_utils_bits_asio_signal_base
+# define H_trex_utils_bits_asio_signal_base
 
 # include "asio_conf.hh"
 
@@ -85,4 +85,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_trex_utils_asio_signal_base
+#endif // H_trex_utils_bits_asio_signal_base

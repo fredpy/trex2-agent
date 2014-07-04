@@ -35,6 +35,8 @@
 # define H_trex_utils_bits_stranded_service
 
 # include <trex/config/memory.hh>
+# include <trex/config/bits/asio_conf.hh>
+
 # include <boost/asio/io_service.hpp>
 
 namespace TREX {

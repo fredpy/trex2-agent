@@ -41,8 +41,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SingletonServer
-# define H_SingletonServer
+#ifndef H_trex_utils_singleton_private_server
+# define H_trex_utils_singleton_private_server
 
 # include "../bits/dummy.hh"
 
@@ -127,4 +127,4 @@ namespace TREX {
   }
 }
 
-#endif // H_SingletonServer
+#endif //H_trex_utils_singleton_private_server

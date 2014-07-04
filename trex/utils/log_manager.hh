@@ -40,8 +40,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_LogManager
-# define H_LogManager
+#ifndef H_trex_utils_log_manager
+# define H_trex_utils_log_manager
 
 # include <list>
 # include <boost/filesystem.hpp>
@@ -420,5 +420,5 @@ namespace TREX {
   } // TREX::utils 
 } // TREX
 
-#endif // H_LogManager
+#endif // H_trex_utils_log_manager
 

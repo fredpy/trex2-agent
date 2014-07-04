@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_TREXversion
-# define H_TREXversion
+#ifndef H_trex_utils_trex_version
+# define H_trex_utils_trex_version
 
 # include <string> 
 
@@ -119,4 +119,4 @@ namespace TREX {
   
 } // TREX
 
-#endif // H_TREXversion
+#endif // H_trex_utils_trex_version

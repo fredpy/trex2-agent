@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_cpu_clock
-# define H_trex_utils_cpu_clock
+#ifndef H_trex_utils_timing_cpu_clock
+# define H_trex_utils_timing_cpu_clock
 
 # include <trex/config/chrono.hh>
 
@@ -112,4 +112,4 @@ namespace boost {
 
 # endif // CPP11_HAS_CHRONO
 
-#endif // H_trex_utils_cpu_clock
+#endif // H_trex_utils_timing_cpu_clock

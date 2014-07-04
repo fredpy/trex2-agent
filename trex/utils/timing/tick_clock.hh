@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_TREX_utils_tick_clock
-# define H_TREX_utils_tick_clock
+#ifndef H_trex_utils_timing_tick_clock
+# define H_trex_utils_timing_tick_clock
 
 # include <trex/config/chrono.hh>
 
@@ -249,4 +249,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_TREX_utils_tick_clock 
+#endif // H_TREX_utils_timing_tick_clock 

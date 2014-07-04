@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SingletonWrapper
-# define H_SingletonWrapper
+#ifndef H_trex_utils_singleton_bits_wrapper
+# define H_trex_utils_singleton_bits_wrapper
 
 # include "dummy.hh"
 
@@ -122,8 +122,8 @@ namespace TREX {
   }
 }
 
-# define In_H_SingletonWrapper
+# define In_H_trex_utils_singleton_bits_wrapper
 #  include "wrapper.tcc"
-# undef In_H_SingletonWrapper
+# undef In_H_trex_utils_singleton_bits_wrapper
 
-#endif // H_SingletonWrapper
+#endif // H_trex_utils_singleton_bits_wrapper

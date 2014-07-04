@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_chrono_helper
-# define H_trex_utils_chrono_helper
+#ifndef H_trex_utils_timing_chrono_helper
+# define H_trex_utils_timing_chrono_helper
 
 # include <trex/config/chrono.hh>
 # include <trex/config/cpp11_deleted.hh>
@@ -128,4 +128,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_trex_utils_chrono_helper
+#endif //  H_trex_utils_timing_chrono_helper

@@ -56,8 +56,8 @@ add_library(TREXutils SHARED
   priority_strand.hh
   asio_fstream.hh
   asio_signal.hh
-  asio_signal_n.hh
   asio_signal_fwd.hh
+  bits/asio_signal_n.hh
   bits/stranded_service.hh
   bits/async_result.hh
   bits/asio_signal_base.hh
@@ -166,6 +166,7 @@ source_group("Source\ Files\\timing" FILES
 source_group("Header\ Files\\bits" FILES 
   bits/async_result.hh
   bits/asio_signal_base.hh
+  bits/asio_signal_n.hh
   bits/asio_signal_iter.hh
   bits/asio_signal_template.hh
   bits/stranded_service.hh

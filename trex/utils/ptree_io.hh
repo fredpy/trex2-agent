@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_utils_ptree_utils
-# define H_utils_ptree_utils
+#ifndef H_utils_ptree_io
+# define H_utils_ptree_io
 
 # include <boost/property_tree/ptree.hpp>
 
@@ -64,4 +64,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_utils_json_utils
+#endif // H_utils_ptree_io

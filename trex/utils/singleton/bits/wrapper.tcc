@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef In_H_SingletonWrapper
+#ifndef In_H_trex_utils_singleton_bits_wrapper
 # error "Cannot include tcc file outside of its corresponding header"
 #else
 

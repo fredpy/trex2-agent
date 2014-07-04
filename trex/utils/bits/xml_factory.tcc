@@ -38,7 +38,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef In_H_XmlFactory
+#ifndef In_H_trex_utils_xml_factory
 # error "tcc files cannot be included outside of their corresponding header"
 #else 
 
