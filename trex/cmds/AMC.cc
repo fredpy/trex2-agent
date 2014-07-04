@@ -80,7 +80,7 @@
 #include <trex/agent/Agent.hh>
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/StepClock.hh>
-#include <trex/utils/TREXversion.hh>
+#include <trex/utils/trex_version.hh>
 
 #include <boost/date_time/posix_time/time_formatters.hpp>
 

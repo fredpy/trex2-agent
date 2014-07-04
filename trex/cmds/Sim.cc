@@ -51,7 +51,7 @@
 #include <cctype>
 #include <csignal>
 
-#include <trex/utils/TREXversion.hh>
+#include <trex/utils/trex_version.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/agent/StepClock.hh>
 
