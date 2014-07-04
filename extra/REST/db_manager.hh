@@ -39,8 +39,6 @@
 # include <Wt/Dbo/SqlConnection>
 # include <Wt/Dbo/Session>
 
-# include <trex/utils/Exception.hh>
-
 namespace TREX {
   namespace REST {
     namespace helpers {
@@ -49,12 +47,12 @@ namespace TREX {
       public:
         static std::string const db_ext;
         
-        class exception : utils::Exception {
+        class exception : public std::runtime_error {
         public:
           ~exception() throw() {}
           
         protected:
-          exception(std::string const &msg) throw():utils::Exception(msg) {}
+          exception(std::string const &msg) throw():std::runtime_error(msg) {}
           
           friend class db_manager;
         }; // TREX::REST::helpers::db_manager::exception

@@ -36,7 +36,7 @@
 #include "timeline_services.hh"
 #include "tick_manager.hh"
 
-#include <trex/utils/TREXversion.hh>
+#include <trex/utils/trex_version.hh>
 
 #include <boost/algorithm/string.hpp>
 
@@ -90,7 +90,8 @@ REST_reactor::REST_reactor(reactor::xml_arg_type arg)
     
     xml::read_xml(wt_cfg.string(), cfg);
     if( cfg.empty() )
-      throw ReactorException(*this, "Wt XML config "+wt_cfg.string()+" is empty");
+      throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                         "Wt XML config "+wt_cfg.string()+" is empty");
     // Add log redirection to the file and then save it
     syslog(utils::log::info)<<"redirecting Wt server logs to "<<log_dest.string();
     cfg.put("server.application-settings.log-file", log_dest.string());
@@ -107,12 +108,14 @@ REST_reactor::REST_reactor(reactor::xml_arg_type arg)
   wt_cfg = manager().use("rest.xml", found);
   
   if( !found )
-    throw ReactorException(*this, "Failed to locate "+wt_cfg.string()+" required for Wt server arguments");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Failed to locate "+wt_cfg.string()+" required for Wt server arguments");
   // Extarct argument list to be given to the server
   bp::ptree doc;
   xml::read_xml(wt_cfg.string(), doc);
   if( doc.empty() )
-    throw ReactorException(*this, "Server arguments XML file "+wt_cfg.string()+" is empty");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Server arguments XML file "+wt_cfg.string()+" is empty");
   
   
   size_t argc;
@@ -185,11 +188,12 @@ void REST_reactor::handle_init() {
     try {
       // the final thing to do is start my server
       if( !m_server->start() )
-        throw ReactorException(*this, "Unable to start Wt REST server");
+        throw SYSTEM_ERROR(reactor_error_code(reactor_error::unexpected_exception),
+                           "Unable to start Wt REST server");
       syslog(utils::log::info)<<"Wt REST server started on port "<<m_server->impl().httpPort();
     } catch(Wt::WServer::Exception const &e) {
       syslog(utils::log::error)<<"Server initialization error: "<<e.what();
-      throw ReactorException(*this, e.what());
+      throw e;
     }
   }
 }
