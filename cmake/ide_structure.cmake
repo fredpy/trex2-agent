@@ -81,8 +81,6 @@ macro(trex_organize_target target)
       else(source)
 	string(REGEX MATCH "^\\.tcc$" template ${ext})
 	if(template)
-	  message(STATUS "Template ${target}:${file} to ${dir}"
-	    "Source: ${tmp}")
 	  source_group("Template\ Files\\${dir}" FILES ${file})
 	else(template)
 	  source_group("Other\ Files\\${dir}" FILES ${file})	  
