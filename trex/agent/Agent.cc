@@ -435,9 +435,6 @@ namespace TREX {
   }
 }
 
-AgentException::AgentException(graph const &agent, std::string const &msg) throw()
-  :GraphException(agent, msg) {}
-
 /*
  * class TREX::agent::Agent
  */
@@ -715,11 +712,11 @@ void Agent::loadConf(std::string const &file_name) {
   read_xml(name, agent, xml::no_comments|xml::trim_whitespace);
 
   if( agent.empty() )
-    throw TREX::utils::Exception(std::string("Configuration file : \"")+
-				 file_name+"\" is empty.");
+    throw std::runtime_error(std::string("Configuration file : \"")+
+                            file_name+"\" is empty.");
   if( agent.size()!=1 )
-    throw TREX::utils::Exception(std::string("Configuration file : \"")+
-				 file_name+"\" have multiple roots.");
+    throw std::runtime_error(std::string("Configuration file : \"")+
+                            file_name+"\" have multiple roots.");
   loadConf(agent.front());
 }
 
@@ -733,10 +730,12 @@ std::list<Agent::reactor_id> Agent::init_dfs_sync() {
 
 void Agent::initComplete() {
   if( name().empty() )
-    throw AgentException(*this, "Agent has no name :"
-			 " You probably forgot to initialize it.");
+    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_graph),
+                       "Agent has no name :"
+                        " You probably forgot to initialize it.");
   if( NULL==m_clock )
-    throw AgentException(*this, "Agent is not connected to a clock");
+    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_graph),
+                       "Agent is not connected to a clock");
   
   details::sync_scheduller::reactor_queue queue;
   boost::function<details::init_visitor::reactor_queue ()>
@@ -918,10 +917,8 @@ bool Agent::executeReactor() {
         } else 
           i = m_idle.erase(i);
       }
-    } catch(Exception const &e) {
-      syslog(id, warn)<<"Exception caught while executing reactor step:\n"<<e;
     } catch(std::exception const &se) {
-      syslog(id, warn)<<"C++ exception caught while executing reactor step:\n"
+      syslog(id, warn)<<"Exception caught while executing reactor step:\n"
 			<<se.what();      
     } catch(...) {
       syslog(id, warn)<<"Unknown exception caught while executing reactor step.";
@@ -977,7 +974,7 @@ bool Agent::doNext() {
     if( valid() )
       update_tick(m_clock->tick());
   } catch(Clock::Error const &err) {
-    syslog(null, error)<<"error from the clock: "<<err;
+    syslog(null, error)<<"error from the clock: "<<err.what();
     m_valid = false;
   }
   if( print_delib )

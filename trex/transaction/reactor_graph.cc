@@ -120,24 +120,6 @@ namespace {
 }
 
 /*
- * class TREX::transaction::GraphException
- */
-GraphException::GraphException(graph const &g, std::string const &msg) throw()
-      :TREX::utils::Exception(g.name().str()+": "+msg) {}
-
-GraphException::GraphException(graph const &g, std::string const &who,
-    std::string const &msg) throw()
-      :TREX::utils::Exception(g.name().str()+"."+who+": "+msg) {}
-
-
-/*
- * class TREX::transaction::MultipleReactors
- */
-MultipleReactors::MultipleReactors(graph const &g, reactor const &r) throw()
-      :GraphException(g, "Multiple reactors with the same name \""+
-          r.name().str()+"\"") {}
-
-/*
  * class TREX::transaction::graph
  */
 
@@ -254,7 +236,9 @@ graph::reactor_id graph::add_reactor(boost::property_tree::ptree::value_type &de
   if( ret.second ) 
     syslog(info)<<"Reactor \""<<tmp->name()<<"\" created.";
   else
-    throw MultipleReactors(*this, **(ret.first));			   
+    throw SYSTEM_ERROR(graph_error_code(graph_error::reactor_already_exist),
+                       "Failed to add reactor \""+tmp->name().str()
+                       +"\" to this agent");
   return ret.first->get();
 }
 
@@ -339,8 +323,8 @@ bool graph::assign(graph::reactor_id r, utils::symbol const &timeline, details::
   try {
     internal_check(r, **tl);
     return (*tl)->assign(*r, flags);
-  } catch(timeline_failure const &err) {
-    return r->failed_internal(timeline, err);
+  } catch(SYSTEM_ERROR const &err) {
+    return r->failed_internal(timeline, err.code());
   }
 }
 
@@ -349,8 +333,8 @@ bool graph::subscribe(reactor_id r, utils::symbol const &timeline, details::tran
   try {
     external_check(r, **tl);
     return (*tl)->subscribe(*r, flags);
-  } catch(timeline_failure const &err) {
-    return r->failed_external(timeline, err);
+  } catch(SYSTEM_ERROR const &err) {
+    return r->failed_external(timeline, err.code());
   }
 }
 

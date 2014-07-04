@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "LogPlayer.hh"
+#include "reactor_error.hh"
 #include <set>
 
 
@@ -211,7 +212,8 @@ namespace TREX {
 	~tr_fail() {}
       private:
 	void play() {
-	  throw ReactorException(m_reactor, "Played failed log event.");
+          throw SYSTEM_ERROR(reactor_error_code(reactor_error::unexpected_exception),
+                             "Played failed log event");
 	}
       }; // TREX::transaction::details::tr_fail
 
@@ -509,20 +511,22 @@ LogPlayer::LogPlayer(reactor::xml_arg_type arg)
   if( !found ) {
     syslog(null, error)<<"Unable to locate transaction log \""
 		       <<file_name<<"\".";
-    throw ReactorException(*this, 
-			   "Unable to locate specified transaction log file.");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Unable to locate specified transaction log file.");
   }
   boost::property_tree::ptree pt;
   read_xml(file_name, pt, xml::no_comments|xml::trim_whitespace);
   
   if( pt.empty() ) {
     syslog(null, error)<<"Transaction log \""<<file_name<<"\" is empty.";
-    throw ReactorException(*this, "Empty transaction log file.");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Empty transaction log file.");
   }
   if( pt.size()!=1 ) {
     syslog(null, error)<<"Transaction log \""<<file_name
 		       <<"\" has multiple xml trees.";
-    throw ReactorException(*this, "Invalid transaction log file.");
+    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
+                       "Invalid transaction log file.");
   }
   if( pt.front().first!="Log" )
     syslog(null, warn)<<"root tag \""<<pt.front().first<<"\" is not Log.";

@@ -272,8 +272,8 @@ void ControlInterface::proccess_message(std::string const &msg) {
       token_id tmp = parse_goal(*i);
       add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
       had_cmd = true;
-    } catch(TREX::utils::Exception const &e) {
-      syslog(log::warn)<<"Exception while building new goal: "<<e;
+    } catch(std::exception const &e) {
+      syslog(log::warn)<<"Exception while building new goal: "<<e.what();
     }
   }
 
@@ -282,8 +282,8 @@ void ControlInterface::proccess_message(std::string const &msg) {
     try {
       add_recall(TREX::utils::parse_attr<std::string>(*i, "id"));
       had_cmd = true;
-    } catch(TREX::utils::Exception const &e) {
-      syslog(log::warn)<<"Exception while building recall: "<<e;
+    } catch(std::exception const &e) {
+      syslog(log::warn)<<"Exception while building recall: "<<e.what();
     }
   }
   if( !had_cmd )
@@ -401,8 +401,6 @@ void ControlInterface::run() {
       // sleep a little
       boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
-  } catch(TREX::utils::Exception const &te) {
-    syslog(log::error)<<"In fifo listener thread: "<<te;
   } catch(std::exception const &se) {
     syslog(log::error)<<"In fifo listener thread: "<<se.what();
   } catch(...) {

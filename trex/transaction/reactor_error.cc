@@ -55,6 +55,8 @@ namespace {
         return "Unexpected exception caught";
       case reactor_error::not_in_graph:
         return "Not belonging to a graph";
+      case reactor_error::configuration_error:
+        return "Error while loading configuration"; 
       default:
         return "Unknown error";
     }

@@ -375,11 +375,6 @@ int main(int argc, char *argv[]) {
     my_agent.reset(); // destroy
   
     exit(0);
-  } catch(TREX::utils::Exception const &e) {
-    // receved a trex error ...
-    amc_log->syslog("amc", error)<<"TREX exception :"<<e;
-    my_agent.reset();
-    throw;
   } catch(std::exception const &se) {
     // received a standard C++ exception
     amc_log->syslog("amc", error)<<"exception :"<<se.what();

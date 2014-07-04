@@ -41,7 +41,7 @@ public:
 	void setPlatformReactor(TREX::LSTS::Platform * platf)
 	{
             if( NULL!=platf && NULL!=m_platform )
-              throw TREX::utils::Exception("Attempt to have more than one platform.");
+              throw std::runtime_error("Attempt to have more than one platform.");
             m_platform = platf;
 	}
 

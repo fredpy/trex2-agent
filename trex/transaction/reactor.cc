@@ -145,30 +145,6 @@ instance_scope_exec::exec_ref instance_scope_exec::init_exec(boost::asio::io_ser
   return MAKE_SHARED<utils::priority_strand>(boost::ref(io));
 }
 
-
-/*
- * class TREX::transaction::ReactorException
- */
-ReactorException::ReactorException(reactor const &r,
-                                   std::string const &msg) throw()
-  :GraphException(r.m_graph, r.name().str(), msg) {}
-
-
-/*
- * class TREX::transaction::DispatchError
- */
-// statics
-std::string DispatchError::build_msg(token_id const &g, std::string const &msg) throw() {
-  std::ostringstream oss;
-  oss<<"While dispatching ";
-  if( !!g )
-    oss<<g->object()<<'.'<<g->predicate();
-  oss<<'['<<g<<"]: "<<msg;
-  return oss.str();
-}
-
-
-
 /*
  * class TREX::transaction::details::external
  */
@@ -247,10 +223,8 @@ void details::external::dispatch(TICK current, details::goal_queue &sent) {
             m_pos->first.request(i->first);
             posted = true;
             i = m_pos->second.erase(i);
-          } catch(utils::Exception const &e) {
-            syslog(warn)<<"Exception received while sending request: "<<e;
           } catch(std::exception const &se) {
-            syslog(warn)<<"C++ exception received while sending request: "
+            syslog(warn)<<"Exception received while sending request: "
                         <<se.what();
           } catch(...) {
             syslog(warn)<<"Unknown exception received while sending request.";
@@ -636,9 +610,13 @@ double reactor::work_ratio() {
 void reactor::observation_sync(token_id o, bool verbose) {
   internal_set::iterator i = m_internals.find(o->object());
   
-  if( m_internals.end()==i )
-    throw boost::enable_current_exception(SynchronizationError(*this, "attempted to post observation on "+
-                               o->object().str()+" which is not Internal."));
+  if( m_internals.end()==i ) {
+    SYSTEM_ERROR err(graph_error_code(graph_error::invalid_post_object),
+                    "\""+name().str()+
+                    "\" cannot post on non internal timeline \""+
+                    o->object().str()+"\"");
+    throw boost::enable_current_exception(err);
+  }
   
   (*i)->postObservation(o, verbose);
   m_updates.insert(*i);
@@ -660,14 +638,20 @@ bool reactor::goal_sync(token_id g) {
     if( NULL!=m_trLog )
       m_trLog->request(g);
     return tl.post_goal(g);
-  } else
-    throw boost::enable_current_exception(DispatchError(*this, g, "Goals can only be posted on External timelines"));
+  } else {
+    SYSTEM_ERROR err(graph_error_code(graph_error::invalid_request_object),
+                     "\""+name().str()+
+                     "\" cannot request on non external timeline \""+
+                     g->object().str()+"\"");
+    throw boost::enable_current_exception(err);
+  }
 }
 
 
 bool reactor::post_goal(token_id const &g) {
   if( !g )
-    throw DispatchError(*this, g, "Invalid goal Id");
+    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_request_object),
+                       "Requested goal is null");
 
   g->pred_tag(token::goal_tag);
   boost::function<bool ()> fn(boost::bind(&reactor::goal_sync,
@@ -717,9 +701,14 @@ bool reactor::plan_sync(token_id t) {
   
   // Look for the internal timeline
   internal_set::const_iterator tl = m_internals.find(t->object());
-  if( m_internals.end()==tl )
-    throw boost::enable_current_exception(DispatchError(*this, t, "plan tokens can only be posted on Internal timelines."));
-  else if( t->end().upper_bound() > current_tick() ) {
+  if( m_internals.end()==tl ) {
+    SYSTEM_ERROR err(graph_error_code(graph_error::invalid_post_object),
+                     "\""+name().str()+
+                     "\" cannot post a plan token on non internal \""+
+                     t->object().str()+"\"");
+    
+    throw boost::enable_current_exception(err);
+  } else if( t->end().upper_bound() > current_tick() ) {
     if( NULL!=m_trLog )
       m_trLog->notify_plan(t);
     return (*tl)->notifyPlan(t);
@@ -739,9 +728,10 @@ void reactor::cancel_sync(token_id tok) {
 }
 
 bool reactor::post_plan_token(token_id const &t) {
-  if( !t )
-    throw DispatchError(*this, t, "Invalid token id");
-  
+  if( !t ) {
+    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_post_object),
+                       "Attempted to post null plan token");
+  }
   boost::function<bool ()> fn(boost::bind(&reactor::plan_sync,
                                           this, t));
   return utils::strand_run(m_graph.strand(), fn);
@@ -802,10 +792,8 @@ bool reactor::initialize(TICK final) {
     m_firstTick = true;
     m_inited = true;
     return true;
-  } catch(TREX::utils::Exception const &e) {
-    syslog(error)<<"Exception caught during init :\n"<<e;
   } catch( std::exception const &se) {
-    syslog(error)<<"C++ exception caught during init :\n"<<se.what();
+    syslog(error)<<"Exception caught during init :\n"<<se.what();
   } catch(...) {
     syslog(error)<<"Unknown exception caught during init";
   }
@@ -864,10 +852,8 @@ bool reactor::new_tick() {
     for( ; i.valid(); ++i )
       i.dispatch(current_tick(), dispatched);
     return true;
-  } catch(TREX::utils::Exception const &e) {
-    syslog(error)<<"Exception caught during new tick:\n"<<e;
   } catch(std::exception const &se) {
-    syslog(error)<<"C++ exception caught during new tick:\n"<<se.what();
+    syslog(error)<<"Exception caught during new tick:\n"<<se.what();
   } catch(...) {
     syslog(error)<<"Unknown exception caught during new tick";    
   }
@@ -949,8 +935,6 @@ bool reactor::do_synchronize() {
       <<", "<<m_synch_rt.count();
     }
    return success;
-  } catch(utils::Exception const &e) {
-    syslog(error)<<"Exception caught: "<<e;
   } catch(std::exception const &se) {
     syslog(error)<<"C++ exception caught: "<<se.what();
   } catch(...) {

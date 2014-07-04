@@ -54,11 +54,11 @@ namespace TREX {
     
     public:
 
-      class Error :public TREX::utils::Exception {
-            public:
-                Error(std::string const &what) throw()
-                    :TREX::utils::Exception(what) {}
-                virtual ~Error() throw() {}
+      class Error :public std::runtime_error {
+      public:
+        Error(std::string const &what) throw()
+        :std::runtime_error(what) {}
+        virtual ~Error() throw() {}
       };
 
       // WitreApplication const &app() const;

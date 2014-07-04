@@ -61,6 +61,8 @@ namespace {
         return "Invalid timeline identifier";
       case graph_error::invalid_graph:
         return "Graph is not valid";
+      case graph_error::reactor_already_exist:
+        return "Attempted to have multiple reactor with same name";
       default:
         return "Unknown error";
     }

@@ -48,7 +48,8 @@ namespace TREX {
         invalid_timeline,
         invalid_request_object,
         invalid_post_object,
-        invalid_graph
+        invalid_graph,
+        reactor_already_exist
       }; // TREX::transaction::graph_error::graph_error_t
       
     } // TREX::transaction::graph_error
