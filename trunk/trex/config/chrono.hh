@@ -45,8 +45,8 @@
  * @ingroup utils 
  * @author Frederic Py <fpy@mbari.org>
  */
-#ifndef H_trex_utils_platform_chrono
-# define H_trex_utils_platform_chrono
+#ifndef H_trex_config_chrono
+# define H_trex_config_chrono
 
 # include "bits/cpp11.hh"
 
@@ -83,4 +83,4 @@
  */
 # define CHRONO CHRONO_NS::chrono
 
-#endif // H_trex_utils_platform_chrono
+#endif // H_trex_config_chrono

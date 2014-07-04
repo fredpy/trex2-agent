@@ -50,8 +50,8 @@
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup utils
  */
-#ifndef H_trex_memory
-# define H_trex_memory
+#ifndef H_trex_config_memory
+# define H_trex_config_memory
 
 # include <memory>
 # include "bits/cpp11.hh"
@@ -178,4 +178,4 @@ namespace boost {
  */
 # define ENABLE_SHARED_FROM_THIS SHARED_NS::enable_shared_from_this
 
-#endif // H_trex_memory
+#endif // H_trex_config_memory
