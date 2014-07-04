@@ -40,7 +40,7 @@ add_library(TREXutils SHARED
   log_manager.cc
   Pdlfcn.cc
   plugin_loader.cc
-  TREXversion.cc
+  trex_version.cc
   xml_utils.cc
   ptree_io.cc
   priority_strand.cc
@@ -71,7 +71,7 @@ add_library(TREXutils SHARED
   shared_var.hh
   symbol.hh
   basic_symbol.hh
-  TREXversion.hh
+  trex_version.hh
   xml_factory.hh
   xml_utils.hh
   ptree_io.hh

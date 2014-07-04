@@ -41,7 +41,7 @@
 // trex headers
 #include "log_manager.hh"
 #include "shared_var.hh"
-#include "TREXversion.hh"
+#include "trex_version.hh"
 #include "asio_runner.hh"
 
 // C++ standard headers

@@ -34,7 +34,7 @@
 #include "Witre.hh"
 #include "WitreGraph.hh"
 
-#include <trex/utils/TREXversion.hh>
+#include <trex/utils/trex_version.hh>
 #include <trex/utils/Plugin.hh>
 
 #include <Wt/WFileResource>

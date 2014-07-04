@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "TREXversion.hh"
+#include "trex_version.hh"
 #include <trex/config/version.hh>
 
 #include <sstream>
