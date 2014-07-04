@@ -45,8 +45,8 @@
  * This is especially usefull when we ndo not want the compiler to generate 
  * a default or copy contstructor for this class.
  */
-#ifndef H_trex_cpp11_deleted
-# define H_trex_cpp11_deleted
+#ifndef H_trex_config_cpp11_deleted
+# define H_trex_config_cpp11_deleted
 
 # include "bits/cpp11.hh"
 
@@ -94,5 +94,5 @@
 
 # endif // CPP11_HAS_DELETED_FUNCTIONS
 
-#endif  // H_trex_cpp11_deleted
+#endif  // H_trex_config_cpp11_deleted
 

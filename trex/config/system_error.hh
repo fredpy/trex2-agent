@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_system_error
-# define H_trex_system_error
+#ifndef H_trex_config_system_error
+# define H_trex_config_system_error
 
 # include "bits/cpp11.hh"
 
@@ -65,4 +65,4 @@
 
 # endif // DOXYGEN
 
-#endif // H_trex_system_error
+#endif // H_trex_config_system_error
