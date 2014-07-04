@@ -85,6 +85,7 @@ namespace TREX {
       public:
 	typedef typename boost::call_traits<ConsArg>::param_type argument_type;
 	typedef ProductRef result_type;
+        typedef typename generic_factory::id_param id_param;
 
 	result_type operator()(argument_type arg) const {
 	  return produce(arg);
