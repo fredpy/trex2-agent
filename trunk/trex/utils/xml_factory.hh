@@ -42,8 +42,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_XmlFactory
-# define H_XmlFactory
+#ifndef H_trex_utils_xml_factory
+# define H_trex_utils_xml_factory
 
 # include <utility>
 # include <iostream>
@@ -233,11 +233,11 @@ namespace TREX {
     }; // TREX::utils::XmlFactory<>
 
 
-# define In_H_XmlFactory
+# define In_H_trex_utils_xml_factory
 #  include "bits/xml_factory.tcc"
-# undef In_H_XmlFactory
+# undef In_H_trex_utils_xml_factory
 
   } // TREX::utils
 } // TREX
 
-#endif // H_XmlFactory
+#endif // H_trex_utils_xml_factory

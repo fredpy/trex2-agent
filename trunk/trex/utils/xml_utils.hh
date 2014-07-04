@@ -41,8 +41,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_XmlUtils 
-# define H_XmlUtils
+#ifndef H_trex_utils_xml_utils
+# define H_trex_utils_xml_utils
 
 # include <boost/shared_ptr.hpp>
 # include <boost/property_tree/ptree.hpp>
@@ -261,4 +261,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_XmlUtils
+#endif //H_trex_utils_xml_utils 

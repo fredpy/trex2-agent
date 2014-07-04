@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_SingletonDummy
-# define H_SingletonDummy
+#ifndef H_trex_utils_sigleton_bits_dummy
+# define H_trex_utils_sigleton_bits_dummy
 
 # include <string>
 
@@ -74,4 +74,4 @@ namespace TREX {
   }
 }
 
-#endif // H_SingletonDummy
+#endif // H_trex_utils_sigleton_bits_dummy

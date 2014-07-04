@@ -41,8 +41,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Plugin 
-# define H_Plugin 
+#ifndef H_trex_utils_Plugin
+# define H_trex_utils_Plugin
 
 namespace TREX {
 	
@@ -66,4 +66,4 @@ namespace TREX {
   }
 } 
 
-#endif 
+#endif // H_trex_utils_Plugin

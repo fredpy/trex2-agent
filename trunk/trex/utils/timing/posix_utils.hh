@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_TimeUtils
-# define H_TimeUtils
+#ifndef H_trex_utils_timing_posix_utils
+# define H_trex_utils_timing_posix_utils
 
 # include <trex/config/chrono.hh>
 
@@ -218,4 +218,4 @@ namespace TREX {
   } // utils
 } // TREX
 
-#endif // H_TimeUtils
+#endif // H_trex_utils_timing_posix_utils

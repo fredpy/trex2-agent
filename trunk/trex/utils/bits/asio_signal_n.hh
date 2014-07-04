@@ -35,8 +35,8 @@
 # error "Need to set ASIO_SIGNAL_NUM_ARGS before including this file"
 #else 
 
-# include "asio_signal_fwd.hh"
-# include "bits/asio_signal_base.hh"
-# include "bits/asio_signal_template.hh"
+# include "../asio_signal_fwd.hh"
+# include "asio_signal_base.hh"
+# include "asio_signal_template.hh"
 
 #endif

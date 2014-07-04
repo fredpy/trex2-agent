@@ -37,8 +37,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_SingletonServer
-# define FWD_SingletonServer
+#ifndef FWD_trex_utils_singleton_bits_server
+# define FWD_trex_utils_singleton_bits_server
 
 namespace TREX {
   namespace utils {
@@ -52,4 +52,4 @@ namespace TREX {
   }
 }
 
-#endif // FWD_SingletonServer
+#endif //FWD_trex_utils_singleton_bits_server

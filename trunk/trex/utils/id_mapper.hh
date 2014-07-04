@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_id_mapper 
-# define H_id_mapper
+#ifndef H_trex_utils_id_mapper
+# define H_trex_utils_id_mapper
 
 # include <functional>
 # include <list>
@@ -794,4 +794,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_id_mapper
+#endif // H_trex_utils_id_mapper

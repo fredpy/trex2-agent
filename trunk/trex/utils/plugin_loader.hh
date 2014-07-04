@@ -40,8 +40,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_PluginLoader
-# define H_PluginLoader
+#ifndef H_trex_utils_plugin_loader
+# define H_trex_utils_plugin_loader
 
 # include <boost/unordered_map.hpp>
 
@@ -173,4 +173,4 @@ namespace TREX {
   } // TREX::utils 
 } // TREX
 
-#endif // H_PluginLoader
+#endif // H_trex_utils_plugin_loader
