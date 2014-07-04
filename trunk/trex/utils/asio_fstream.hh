@@ -34,10 +34,10 @@
 #ifndef H_trex_utils_asio_fstream
 # define H_trex_utils_asio_fstream
 
+# include <trex/config/memory.hh>
 # include <trex/config/cpp11_deleted.hh>
 # include "shared_var.hh"
 # include "asio_runner.hh"
-# include "bits/stranded_service.hh"
 
 # include <boost/ref.hpp>
 # include <boost/iostreams/stream.hpp>
@@ -53,14 +53,12 @@ namespace TREX {
      *
      * This class implements a text output stream that will do write operations
      * asynchronously. All the write operations of the different instances are 
-     * manage by a single strand service eensuring that all the ourtputs are 
+     * manage by a single strand service ensuring that all the outputs are
      * written in a sequence with limited risk of IO block in the main thread.
      */
     class async_ofstream :boost::noncopyable {
       class pimpl;
     public:
-      typedef stranded_service<pimpl> service_type;
-      
       explicit async_ofstream(boost::asio::io_service &service)
       :m_io(service) {}
       async_ofstream(boost::asio::io_service &service, std::string const &fname)

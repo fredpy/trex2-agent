@@ -32,6 +32,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "asio_fstream.hh"
+# include "bits/stranded_service.hh"
+
 
 #include <boost/bind.hpp>
 #include <trex/config/chrono.hh>
@@ -46,7 +48,7 @@ namespace TREX {
     
     class async_ofstream::pimpl:public ENABLE_SHARED_FROM_THIS<async_ofstream::pimpl> {
     public:
-      typedef async_ofstream::service_type service_type;
+      typedef stranded_service<pimpl> service_type;
       typedef CHRONO::system_clock    clock;
       
       
