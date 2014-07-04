@@ -62,9 +62,6 @@ add_library(TREXdomain SHARED
   bits/interval_domain.tcc
 )
 
-source_group("Template Files\\bits" FILES
-  bits/interval_domain.tcc)
-
 add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)
 trex_lib(TREXdomain core)

@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2011, MBARI.                                         #
+#  Copyright (c) 2014, Frederic Py.                                   #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -32,46 +32,65 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
+include(CMakeParseArguments)
 
-add_library(TREXtransaction SHARED
-  reactor.cc
-  reactor_error.cc
-  reactor_graph.cc
-  graph_error.cc
-  Relation.cc
-  LogPlayer.cc
-  private/graph_impl.cc
-  private/node_impl.cc
-  private/external_impl.cc
-  private/internal_impl.cc
-  # headers
-  bits/bgl_support.hh
-  bits/external.hh
-  reactor.hh
-  reactor_error.hh
-  reactor_fwd.hh
-  reactor_graph.hh
-  graph_error.hh
-  Relation.hh
-  Tick.hh
-  bits/timeline.hh
-  LogPlayer.hh
-  bits/transaction_fwd.hh
-  private/graph_impl.hh
-  private/node_impl.hh
-  private/external_impl.hh
-  private/internal_impl.hh
-  # template source
-  bits/reactor_graph.tcc
-)
+macro(trex_organize_target target)
+  get_target_property(src ${target} SOURCES)
+  string(LENGTH ${CMAKE_CURRENT_SOURCE_DIR} src_len)
+  string(LENGTH ${CMAKE_CURRENT_BINARY_DIR} bin_len)
+      
 
-add_dependencies(core TREXtransaction)
-target_link_libraries(TREXtransaction TREXdomain 
-  ${CHRONO_LIB})
-trex_lib(TREXtransaction core)
+  foreach(file ${src})
+    get_filename_component(dir ${file} PATH)
+    get_filename_component(ext ${file} EXT)
 
-install(DIRECTORY . DESTINATION include/trex/transaction
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN "deprecated" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+    if(dir)
+      string(LENGTH ${dir} dir_len)
+      if(dir_len GREATER ${src_len})
+	string(SUBSTRING ${dir} 0 ${src_len} tmp)
+
+	if(tmp STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
+	  math(EXPR len "${dir_len} - ${src_len}")
+	  string(SUBSTRING "${dir}" ${src_len} ${len} dir)
+	endif()
+      elseif(dir_len GREATER ${bin_len})
+	string(SUBSTRING ${dir} 0 ${bin_len} tmp)
+
+	if(tmp STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+	  math(EXPR len "${dir_len} - ${bin_len}")
+	  string(SUBSTRING "${dir}" ${bin_len} ${len} dir)
+	endif()
+      endif()
+    endif(dir)
+    if(dir)
+      string(REPLACE "/" "\\" dir ${dir})
+    endif(dir)
+
+    # Check if header
+    string(REGEX MATCH "^\\.h" header ${ext})
+    if(header) 
+      if(dir)
+	source_group("Header\ Files\\${dir}" FILES ${file})
+      endif(dir)
+    else(header)
+      string(REGEX MATCH "^\\.c" source ${ext})
+      if(source) 
+	if(dir)
+	  source_group("Source\ Files\\${dir}" FILES ${file})
+	endif(dir)
+      else(source)
+	string(REGEX MATCH "^\\.tcc$" template ${ext})
+	if(template)
+	  message(STATUS "Template ${target}:${file} to ${dir}"
+	    "Source: ${tmp}")
+	  source_group("Template\ Files\\${dir}" FILES ${file})
+	else(template)
+	  source_group("Other\ Files\\${dir}" FILES ${file})	  
+	endif(template)
+      endif(source)
+    endif(header)
+  endforeach(file ${src})
+  
+  
+
+endmacro(trex_organize_target)

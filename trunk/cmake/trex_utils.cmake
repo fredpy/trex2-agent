@@ -33,6 +33,8 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+include(ide_structure)
+
 macro(trex_cfg dir dest)
   install(DIRECTORY ${dir} DESTINATION ${dest} OPTIONAL
     FILES_MATCHING PATTERN "*"
@@ -75,6 +77,8 @@ function(trex_lib target kind)
   get_property(tmp DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   set_property(TARGET ${target} APPEND PROPERTY INCLUDE_DIRECTORIES ${tmp})
   unset(tmp)
+
+  trex_organize_target(${target})
   
   if(kind) 
     # update global include path for installed trex
@@ -109,6 +113,8 @@ endfunction(trex_lib)
 function(trex_py target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  trex_organize_target(${target})
+
   if(CPP11_ENABLED) 
     set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
   endif(CPP11_ENABLED)
@@ -121,6 +127,8 @@ macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
     ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  trex_organize_target(${target})
+
   if(CPP11_ENABLED) 
     set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
   endif(CPP11_ENABLED)
