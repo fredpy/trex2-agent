@@ -44,6 +44,19 @@ configure_file(generated/cpp11.hh.in
 configure_file(generated/version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
 
+# I need to make this target visible in Xcode and all 
+add_custom_target(TREXconfig ALL SOURCES 
+  chrono.hh
+  cpp11_deleted.hh
+  memory.hh
+  system_error.hh
+  version.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
+trex_organize_target(TREXconfig)
+  
+
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bits 
   DESTINATION include/trex/config/
