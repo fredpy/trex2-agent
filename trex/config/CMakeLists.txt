@@ -41,8 +41,44 @@ configure_file(generated/asio_conf.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh)
 configure_file(generated/cpp11.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
+
+set(TREX_SVN_INFO FALSE)
+
+if(TREX_FROM_PKG)
+  set(SVN_HH "bits/svn/version.hh")
+  if(EXISTS ${TREX_EXTRA_DIR}/svn/version.hh)
+    set(TREX_SVN_INFO TRUE)
+    set(SVN_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    copy_if_different(${TREX_EXTRA_DIR} ${SVN_DIR}/${SVN_DIR})
+  endif()
+else(TREX_FROM_PKG)
+ option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
+ mark_as_advanced(WITH_SVN_TRACK)
+ 
+ if(WITH_SVN_TRACK)
+   set(TREX_SVN_INFO TRUE)
+   set(SVN_HH "bits/svn/version.hh")   
+
+   add_custom_target(svnheader ALL 
+      DEPENDS ${SVN_HH})
+   add_dependencies(trex_prep svnheader)
+   add_custom_command(OUTPUT ${SVN_HH}
+     PRE_BUILD
+     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+     -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
+     -DOUTPUT_DIR=${TREX_EXTRA_DIR}
+      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      "${TREX_EXTRA_DIR}/svn/version.hh" 
+      "${CMAKE_CURRENT_BINARY_DIR}/${SVN_HH}")
+  set(SVN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+ endif(WITH_SVN_TRACK)
+endif(TREX_FROM_PKG)
+
 configure_file(generated/version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
+set_source_files_properties(verison.hh
+   PROPERTIES OBJECT_DEPENDS ${SVN_HH})
 
 # I need to make this target visible in Xcode and all 
 add_custom_target(TREXconfig ALL SOURCES 
@@ -51,12 +87,16 @@ add_custom_target(TREXconfig ALL SOURCES
   memory.hh
   system_error.hh
   version.hh
+  ${SVN_DIR}/${SVN_HH}
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
 trex_organize_target(TREXconfig)
-  
 
+if(WITH_SVN_TRACK)
+  add_custom_target(svn_header ALL DEPENDS ${SVN_HH})
+  add_dependencies(TREXconfig svn_header)
+endif(WITH_SVN_TRACK)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bits 
   DESTINATION include/trex/config/

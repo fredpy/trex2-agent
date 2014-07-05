@@ -31,6 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/* @CMAKE_GENERATED_MESSAGE@ */
+
 #ifndef H_trex_config_bits_cpp11
 # define H_trex_config_bits_cpp11
 
