@@ -104,49 +104,6 @@ add_library(TREXutils SHARED
   bits/xml_factory.tcc
 )
 
-if(TREX_FROM_PKG)
-  # svn data is given by the package
-  set(SVN_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh)
-
-  if(EXISTS ${SVN_HH})
-    include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
-    add_definitions(-DWITH_SVN_TRACK)
-  endif()
-else(TREX_FROM_PKG)
- # I need to generate the file
-
- option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
- mark_as_advanced(WITH_SVN_TRACK)
-
- if(WITH_SVN_TRACK)
-    set(SVN_HH svn/version.hh)
-    add_custom_target(svnheader ALL 
-      DEPENDS ${SVN_HH})
-    add_dependencies(trex_prep svnheader)
-
-    # this run my svn script
-    add_custom_command(OUTPUT ${SVN_HH}
-      PRE_BUILD
-      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
-      -DOUTPUT_DIR=${TREX_EXTRA_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
-    
-    include_directories(${TREX_EXTRA_DIR})
-    set_source_files_properties(${SVN_HH}
-      PROPERTIES GENERATED TRUE
-     # HEADER_FILE_ONLY TRUE
-     LOCATION ${TREX_EXTRA_DIR}
-     )
-
-    add_dependencies(TREXutils svnheader)
-
-    set_source_files_properties(TREXversion.cc
-      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${SVN_HH})
-    add_definitions(-DWITH_SVN_TRACK)
- endif(WITH_SVN_TRACK)
-endif(TREX_FROM_PKG)
-
 add_dependencies(core TREXutils)
 target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
   ${Boost_FILESYSTEM_LIBRARY} 

@@ -31,8 +31,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+/* @CMAKE_GENERATED_MESSAGE@ */
+
 #ifndef H_trex_config_bits_version
 # define H_trex_config_bits_version
+
+#cmakedefine TREX_SVN_INFO
 
 # define TREX_MAJOR @TREX_MAJOR@
 # define TREX_MINOR @TREX_MINOR@
