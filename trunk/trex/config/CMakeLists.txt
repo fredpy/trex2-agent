@@ -44,12 +44,16 @@ configure_file(generated/cpp11.hh.in
 
 set(TREX_SVN_INFO FALSE)
 
+message(STATUS "Check for TREX_FROM_PKG: ${TREX_FROM_PKG}")
 if(TREX_FROM_PKG)
-  set(SVN_HH "bits/svn/version.hh")
-  if(EXISTS ${TREX_EXTRA_DIR}/svn/version.hh)
+  set(SVN_HH "${CMAKE_CURRENT_BINARY_DIR}/bits/svn/version.hh")
+  message(STATUS "Check for ${TREX_EXTRA_SRC}/svn/version.hh")
+  if(EXISTS "${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh")
     set(TREX_SVN_INFO TRUE)
-    set(SVN_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-    copy_if_different(${TREX_EXTRA_DIR} ${SVN_DIR}/${SVN_DIR})
+    message(STATUS "Copy ${TREX_EXTRA_SRC}/svn/version.hh to ${SVN_HH}")
+    configure_file(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh
+      ${SVN_HH}
+      COPYONLY)
   endif()
 else(TREX_FROM_PKG)
  option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
@@ -57,8 +61,8 @@ else(TREX_FROM_PKG)
  
  if(WITH_SVN_TRACK)
    set(TREX_SVN_INFO TRUE)
-   set(SVN_HH "bits/svn/version.hh")   
-
+   set(SVN_HH "${CMAKE_CURRENT_BINARY_DIR}/bits/svn/version.hh")
+ 
    add_custom_target(svnheader ALL 
       DEPENDS ${SVN_HH})
    add_dependencies(trex_prep svnheader)
@@ -66,19 +70,18 @@ else(TREX_FROM_PKG)
      PRE_BUILD
      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
-     -DOUTPUT_DIR=${TREX_EXTRA_DIR}
+     -DOUTPUT_DIR=${TREX_EXTRA_SRC}
       -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "${TREX_EXTRA_DIR}/svn/version.hh" 
-      "${CMAKE_CURRENT_BINARY_DIR}/${SVN_HH}")
-  set(SVN_DIR ${CMAKE_CURRENT_BINARY_DIR})
+      "${TREX_EXTRA_SRC}/svn/version.hh" 
+      ${SVN_HH})
  endif(WITH_SVN_TRACK)
 endif(TREX_FROM_PKG)
 
 configure_file(generated/version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
-set_source_files_properties(verison.hh
-   PROPERTIES OBJECT_DEPENDS ${SVN_HH})
+set_source_files_properties(version.hh
+   PROPERTIES DEPENDS ${SVN_HH})
 
 # I need to make this target visible in Xcode and all 
 add_custom_target(TREXconfig ALL SOURCES 
@@ -87,7 +90,7 @@ add_custom_target(TREXconfig ALL SOURCES
   memory.hh
   system_error.hh
   version.hh
-  ${SVN_DIR}/${SVN_HH}
+  ${SVN_HH}
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
