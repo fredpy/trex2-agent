@@ -81,7 +81,7 @@ endif(TREX_FROM_PKG)
 configure_file(generated/version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
 set_source_files_properties(version.hh
-   PROPERTIES DEPENDS ${SVN_HH})
+   PROPERTIES DEPENDS trex_prep)
 
 # I need to make this target visible in Xcode and all 
 add_custom_target(TREXconfig ALL SOURCES 
