@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file "trex/utils/platform/memory.hh"
+/** @file "trex/config/memory.hh"
  * @brief C++11 Unique pointer adapter header
  *
  * This header provide macros that uses either std::auto_ptr or

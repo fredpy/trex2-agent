@@ -44,6 +44,7 @@ add_library(TREXutils SHARED
   xml_utils.cc
   ptree_io.cc
   priority_strand.cc
+  private/priority_strand_impl.cc
   asio_runner.cc
   asio_fstream.cc
   log/entry.cc
@@ -54,6 +55,7 @@ add_library(TREXutils SHARED
   timing/posix_utils.cc
   # headers
   priority_strand.hh
+  private/priority_strand_impl.hh
   asio_fstream.hh
   asio_signal.hh
   asio_signal_fwd.hh
