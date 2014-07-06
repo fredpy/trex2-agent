@@ -47,6 +47,7 @@ add_library(TREXutils SHARED
   private/priority_strand_impl.cc
   asio_runner.cc
   asio_fstream.cc
+  private/async_ofstream_impl.cc
   log/entry.cc
   log/text_log.cc
   singleton/dummy.cc
@@ -57,6 +58,7 @@ add_library(TREXutils SHARED
   priority_strand.hh
   private/priority_strand_impl.hh
   asio_fstream.hh
+  private/async_ofstream_impl.hh
   asio_signal.hh
   asio_signal_fwd.hh
   bits/asio_signal_n.hh
