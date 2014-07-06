@@ -110,7 +110,9 @@ add_library(TREXutils SHARED
 )
 
 add_dependencies(core TREXutils)
-target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
+add_dependencies(TREXutils TREXconfig)
+
+target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY} 
   ${Boost_SYSTEM_LIBRARY}
   ${CHRONO_LIB}
