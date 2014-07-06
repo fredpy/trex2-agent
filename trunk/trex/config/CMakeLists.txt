@@ -65,16 +65,18 @@ else(TREX_FROM_PKG)
  
    add_custom_target(svnheader ALL 
       DEPENDS ${SVN_HH})
-   add_dependencies(trex_prep svnheader)
    add_custom_command(OUTPUT ${SVN_HH}
      PRE_BUILD
      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
-     -DOUTPUT_DIR=${TREX_EXTRA_SRC}
+     -DOUTPUT_DIR=${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
       -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "${TREX_EXTRA_SRC}/svn/version.hh" 
+      "${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}/svn/version.hh" 
       ${SVN_HH})
+   set_source_files_properties(${SVN_HH}
+      PROPERTIES GENERATED TRUE)
+   add_dependencies(trex_prep svnheader)
  endif(WITH_SVN_TRACK)
 endif(TREX_FROM_PKG)
 
@@ -97,8 +99,7 @@ add_custom_target(TREXconfig ALL SOURCES
 trex_organize_target(TREXconfig)
 
 if(WITH_SVN_TRACK)
-  add_custom_target(svn_header ALL DEPENDS ${SVN_HH})
-  add_dependencies(TREXconfig svn_header)
+  add_dependencies(TREXconfig svnheader)
 endif(WITH_SVN_TRACK)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bits 
