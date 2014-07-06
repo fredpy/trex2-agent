@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-/** @file "trex/utils/platform/cpp11_deleted.hh"
+/** @file "trex/config/cpp11_deleted.hh"
  *
  * @brief Support of C++11 "=delete" keyword.
  *

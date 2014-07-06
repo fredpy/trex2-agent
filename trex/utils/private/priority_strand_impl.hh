@@ -31,73 +31,56 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "priority_strand.hh"
-#include "private/priority_strand_impl.hh"
+#ifndef H_trex_utils_private_priority_stand_impl
+# define H_trex_utils_private_priority_stand_impl
 
-using namespace TREX::utils;
-namespace asio=boost::asio;
+# include "../priority_strand.hh"
 
-/*
- * class TREX::utils::priority_strand::task
- */
+# include <boost/thread/mutex.hpp>
+# include <boost/thread/shared_mutex.hpp>
 
-bool priority_strand::task::operator< (priority_strand::task const &other) const {
-  return other.m_level && ( !m_level || (*other.m_level)<(*m_level) );
-}
+# include <queue>
 
-/*
- * class TREX::utils::priority_strand
- */
+namespace TREX {
+  namespace utils {
+    
+    class priority_strand::pimpl: boost::noncopyable,
+    public ENABLE_SHARED_FROM_THIS<priority_strand::pimpl> {
+    public:
+      typedef priority_strand::task *task_ref;
+      
+      pimpl(SHARED_PTR<boost::asio::strand> const &s);
+      ~pimpl();
+      
+      void enqueue(task_ref tsk);
+      
+      bool active() const;
+      void start();
+      void stop();
+      
+      size_t tasks() const;
+      bool empty() const;
+      void clear();
+      
+    private:
+      struct task_cmp {
+        bool operator()(task_ref a, task_ref b) const;
+      };
+      typedef std::priority_queue<task_ref, std::vector<task_ref>,
+                                  task_cmp> task_queue;
+      
+      SHARED_PTR<boost::asio::strand> m_strand;
+      mutable boost::shared_mutex     m_mutex;
+      task_queue                      m_queue;
+      bool                            m_active;
+      
+      
+      void dequeue_sync();
+      pimpl() DELETED;
+    }; // TREX::utils::priority_strand::pimpl
+    
+  } // TREX::utils
+} // TREX
 
-// structors
 
-priority_strand::priority_strand(asio::io_service &io, bool active)
-:m_impl(MAKE_SHARED<pimpl>(MAKE_SHARED<asio::strand>(boost::ref(io)))) {
-  if( active )
-    m_impl->start();
-}
-
-priority_strand::priority_strand(SHARED_PTR<asio::strand> const &s,
-                                 bool active)
-:m_impl(MAKE_SHARED<pimpl>(s)) {
-  if( active )
-    m_impl->start();
-}
-
-
-priority_strand::~priority_strand() {}
-
-// observers
-
-size_t priority_strand::tasks() const {
-  return m_impl->tasks();
-}
-
-bool priority_strand::empty() const {
-  return m_impl->empty();
-}
-
-bool priority_strand::is_active() const {
-  return m_impl->active();
-}
-
-// modifiers
-
-void priority_strand::start() {
-  m_impl->start();
-}
-
-void priority_strand::stop() {
-  m_impl->stop();
-}
-
-// manipulators
-
-void priority_strand::enqueue(priority_strand::task *t) {
-  m_impl->enqueue(t);
-}
-
-void priority_strand::clear() {
-  m_impl->clear();
-}
-
+#endif // H_trex_utils_private_priority_stand_impl

@@ -202,6 +202,4 @@ void priority_strand::send(Fn f,
   enqueue(tsk);
 }
 
-
-
 #endif

@@ -35,20 +35,17 @@
 # define H_trex_utils_priority_strand
 
 # include <trex/config/cpp11_deleted.hh>
+# include <trex/config/memory.hh>
 
 # include <boost/asio/strand.hpp>
-# include <boost/thread/mutex.hpp>
-# include <boost/thread/shared_mutex.hpp>
 # include <boost/tuple/tuple.hpp>
 
 # include <trex/config/system_error.hh>
 # include "bits/async_result.hh"
 
-# include <queue>
 
 namespace TREX {
   namespace utils {
-    
     
     /** @brief Priority based strand
      *
@@ -68,7 +65,8 @@ namespace TREX {
      *
      * @author Frederic Py
      */
-    class priority_strand {
+    class priority_strand :boost::noncopyable {
+      class pimpl;
     public:
       class task {
       public:
@@ -102,6 +100,8 @@ namespace TREX {
        * inactive until explicitely started
        */
       explicit priority_strand(boost::asio::io_service &io,
+                               bool active = true);
+      explicit priority_strand(SHARED_PTR<boost::asio::strand> const &s,
                                bool active = true);
       /** @brief Detructor 
        *
@@ -240,21 +240,9 @@ namespace TREX {
       void clear();
       
     private:
-      struct tsk_cmp {
-        bool operator()(task *a, task *b) const;
-      };
-
-      typedef std::priority_queue<task *,std::vector<task *>,
-                                  tsk_cmp> task_queue;
-
-      
-      boost::asio::strand         m_strand;
-      mutable boost::shared_mutex m_mutex;
-      task_queue                  m_tasks;
-      bool                        m_active;
+      SHARED_PTR<pimpl> m_impl;
       
       void enqueue(task *tsk);
-      void dequeue_sync();
     }; // TREX::utils::priority_strand
 
 # define IN_trex_utils_priority_strand

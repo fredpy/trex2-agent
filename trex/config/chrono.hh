@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-/** @file "trex/utils/platform/chrono.hh"
+/** @file "trex/config/chrono.hh"
  * @brief chrono class integration helper header
  *
  * This header allows to include either @chrono or its C++11 
