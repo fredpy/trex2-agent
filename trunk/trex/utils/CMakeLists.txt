@@ -38,7 +38,7 @@ add_library(TREXutils SHARED
   # real source
   factory_error.cc
   log_manager.cc
-  Pdlfcn.cc
+  private/Pdlfcn.cc
   plugin_loader.cc
   trex_version.cc
   xml_utils.cc
@@ -71,6 +71,7 @@ add_library(TREXutils SHARED
   log_manager.hh
   Plugin.hh
   plugin_loader.hh
+  private/Pdlfcn.hh
   shared_var.hh
   symbol.hh
   basic_symbol.hh
@@ -115,7 +116,7 @@ target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${Boost_THREAD_LIBRARY})
 trex_lib(TREXutils core)
 
-set_property(SOURCE Pdlfcn.cc 
+set_property(SOURCE private/Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 install(DIRECTORY . DESTINATION include/trex/utils
