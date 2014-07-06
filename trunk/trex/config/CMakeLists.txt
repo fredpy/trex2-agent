@@ -61,29 +61,25 @@ else(TREX_FROM_PKG)
  
  if(WITH_SVN_TRACK)
    set(TREX_SVN_INFO TRUE)
-   set(SVN_HH "${CMAKE_CURRENT_BINARY_DIR}/bits/svn/version.hh")
+   set(SVN_HH "bits/svn/version.hh")
  
-   add_custom_target(svnheader ALL 
-      DEPENDS ${SVN_HH})
-   add_custom_command(OUTPUT ${SVN_HH}
-     PRE_BUILD
+   add_custom_target(svnheader ALL
      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
      -DOUTPUT_DIR=${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
       -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}/svn/version.hh" 
+      "${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}/svn/version.hh"
       ${SVN_HH})
    set_source_files_properties(${SVN_HH}
-      PROPERTIES GENERATED TRUE)
+      PROPERTIES GENERATED TRUE
+      LOCATION ${CMAKE_CURRENT_BINARY_DIR})
    add_dependencies(trex_prep svnheader)
  endif(WITH_SVN_TRACK)
 endif(TREX_FROM_PKG)
 
 configure_file(generated/version.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
-set_source_files_properties(version.hh
-   PROPERTIES DEPENDS trex_prep)
 
 # I need to make this target visible in Xcode and all 
 add_custom_target(TREXconfig ALL SOURCES 
