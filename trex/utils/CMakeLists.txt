@@ -111,6 +111,11 @@ add_library(TREXutils SHARED
 
 add_dependencies(core TREXutils)
 add_dependencies(TREXutils TREXconfig)
+set_source_files_properties(trex_version.cc
+  PROPERTIES OBJECT_DEPENDS 
+    ${CMAKE_BINARY_DIR}/trex/config/bits/svn/version.hh)
+
+
 
 target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${Boost_FILESYSTEM_LIBRARY} 
