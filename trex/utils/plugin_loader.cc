@@ -39,7 +39,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "plugin_loader.hh"
-#include "private/Pdlfcn.hh"
+#include "private/dl_func.hh"
 #include "Plugin.hh"
 
 using namespace TREX::utils;

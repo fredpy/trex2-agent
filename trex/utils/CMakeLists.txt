@@ -33,12 +33,17 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+# Check for dynamic load functions
+
+configure_file(generated/dl_info.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/private/dl_info.hh)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(TREXutils SHARED
   # real source
   factory_error.cc
   log_manager.cc
-  private/Pdlfcn.cc
+  private/platform/${DL_TYPE}/dl_func.cc
   plugin_loader.cc
   trex_version.cc
   xml_utils.cc
@@ -73,7 +78,9 @@ add_library(TREXutils SHARED
   log_manager.hh
   Plugin.hh
   plugin_loader.hh
-  private/Pdlfcn.hh
+  private/dl_func.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/private/dl_info.hh
+  private/platform/${DL_TYPE}/dl_func.hh
   shared_var.hh
   symbol.hh
   basic_symbol.hh
