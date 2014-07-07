@@ -10,16 +10,10 @@
  * @note Taken from Europa 
  * @ingroup utils
  */
-#ifndef _H_Pdlfcn
-#define _H_Pdlfcn
+#ifndef H_trex_utils_private_dl_func
+#define H_trex_utils_private_dl_func
 
-#ifndef __MINGW32__
-#include <dlfcn.h>
-#else
-#define RTLD_NOW 0
-#endif
-
-# include <string>
+# include <private/dl_info.hh>
 
 namespace TREX {
   namespace utils {
@@ -103,8 +97,8 @@ namespace TREX {
        * This function helps to identify the usual extension of dynamic
        * libraries for the current platform. Indeed, depending on the OS this
        * extension differ. 
-			 * 
-			 * The cases that are supported now are:
+       *
+       * The cases that are supported now are:
        * @li @c .so for linux and most of the UNIXes
        * @li @c .dylib under MacOS X
        * @li @c .dll under Windows
@@ -116,8 +110,11 @@ namespace TREX {
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup utils
        */
-      std::string const &p_dlext();
+      inline char const *p_dlext() {
+        return DL_LIB_EXTENSION;
+      }
     }
   }
 }
-#endif
+
+#endif // H_trex_utils_private_dl_func
