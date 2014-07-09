@@ -43,6 +43,7 @@ add_library(TREXutils SHARED
   # real source
   factory_error.cc
   log_manager.cc
+  private/log_mgmt_impl.cc
   private/platform/${DL_TYPE}/dl_func.cc
   plugin_loader.cc
   trex_version.cc
@@ -76,6 +77,7 @@ add_library(TREXutils SHARED
   generic_factory.hh
   id_mapper.hh
   log_manager.hh
+  private/log_mgmt_impl.hh
   Plugin.hh
   plugin_loader.hh
   private/dl_func.hh
