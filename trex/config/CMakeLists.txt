@@ -85,6 +85,7 @@ configure_file(generated/version.hh.in
 add_custom_target(TREXconfig ALL SOURCES 
   chrono.hh
   cpp11_deleted.hh
+  decl.hh
   memory.hh
   system_error.hh
   version.hh
