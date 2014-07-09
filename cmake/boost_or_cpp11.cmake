@@ -76,6 +76,8 @@ if(WITH_CPP11)
   cpp11_feature_detection(SHARED_PTR) 
   cpp11_feature_detection(DELETED_FUNCTIONS)
   cpp11_feature_detection(SYSTEM_ERROR)
+  cpp11_feature_detection(VARIADIC_MACROS)
+  cpp11_feature_detection(VARIADIC_TEMPLATES)
   #cpp11_feature_detection(THREAD)
 
   if(CPP11_ENABLED) 

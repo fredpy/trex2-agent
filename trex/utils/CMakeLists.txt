@@ -72,6 +72,7 @@ add_library(TREXutils SHARED
   bits/async_result.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
+  bits/asio_signal_cpp11.hh
   bits/asio_signal_template.hh
   factory_error.hh
   generic_factory.hh
