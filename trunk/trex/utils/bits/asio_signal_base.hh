@@ -1,12 +1,12 @@
 #ifndef H_trex_utils_bits_asio_signal_base
 # define H_trex_utils_bits_asio_signal_base
 
-# include "asio_conf.hh"
+# include <trex/config/bits/asio_conf.hh>
+# include <trex/config/cpp11_deleted.hh>
 
 # include <boost/asio/io_service.hpp>
 # include <boost/signals2/signal.hpp>
 
-# include "../platform/cpp11_deleted.hh"
 
 namespace TREX {
   namespace utils {

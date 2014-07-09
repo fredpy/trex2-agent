@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,22 +31,34 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-/* @CMAKE_GENERATED_MESSAGE@ */
+#ifndef H_trex_utils_bits_asio_signal_cpp11
+# define H_trex_utils_bits_asio_signal_cpp11
 
-#ifndef H_trex_config_bits_cpp11
-# define H_trex_config_bits_cpp11
+# include "asio_signal_base.hh"
 
-#cmakedefine CPP11_ENABLED 
+namespace TREX {
+  namespace utils {
 
-#ifdef CPP11_ENABLED
-#cmakedefine CPP11_HAS_CHRONO
-#cmakedefine CPP11_HAS_UNIQUE_PTR
-#cmakedefine CPP11_HAS_SHARED_PTR
-#cmakedefine CPP11_HAS_DELETED_FUNCTIONS
-#cmakedefine CPP11_BOOST_GET_POINTER_STD
-#cmakedefine CPP11_HAS_SYSTEM_ERROR
-#cmakedefine CPP11_HAS_VARIADIC_MACROS
-#cmakedefine CPP11_HAS_VARIADIC_TEMPLATES
-#endif // CPP11_ENABLED
+    template<typename... Args>
+    class asio_signal<void (Args...)>
+    :public details::asio_signal_base<void (Args...)> {
+      typedef details::asio_signal_base<void (Args...)> base_type;
+    public:
+      enum {
+        arity = sizeof...(Args)
+      };
+      explicit asio_signal(boost::asio::io_service &io):base_type(io) {}
+      ~asio_signal() {}
+      
+      void operator()(Args... args) {
+        this->m_signal(args...);
+      }
+      
+    }; // TREX::utils::asio_signal<>
+    
+    
+  } // TREX::utils
+} // TREX
 
-#endif // H_trex_config_bits_cpp11
+
+#endif // H_trex_utils_bits_asio_signal_cpp11

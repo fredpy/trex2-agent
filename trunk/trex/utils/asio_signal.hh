@@ -47,8 +47,14 @@
 # include "asio_signal_fwd.hh"
 
 # ifndef DOXYGEN
-    
-#  include "bits/asio_signal_iter.hh"
+
+#  include <trex/config/cpp11_support.hh>
+
+#  ifndef CPP11_HAS_VARIADIC_TEMPLATES
+#    include "bits/asio_signal_iter.hh"
+#  else // CPP11_HAS_VARIADIC_TEMPLATES
+#    include "bits/asio_signal_cpp11.hh"
+#  endif // CPP11_HAS_VARIADIC_TEMPLATES
 
 # else // DOXYGEN
        // Note: all the code below is purelly for documentation puspose and
