@@ -93,6 +93,11 @@ void priority_strand::stop() {
 
 // manipulators
 
+boost::asio::strand &priority_strand::strand() {
+  return m_impl->strand();
+}
+
+
 void priority_strand::enqueue(priority_strand::task *t) {
   m_impl->enqueue(t);
 }

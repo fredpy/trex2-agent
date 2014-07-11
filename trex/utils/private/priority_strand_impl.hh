@@ -52,6 +52,10 @@ namespace TREX {
       pimpl(SHARED_PTR<boost::asio::strand> const &s);
       ~pimpl();
       
+      boost::asio::strand &strand() {
+        return *m_strand;
+      }
+      
       void enqueue(task_ref tsk);
       
       bool active() const;

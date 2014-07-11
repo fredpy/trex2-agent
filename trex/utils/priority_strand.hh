@@ -112,6 +112,8 @@ namespace TREX {
        */
       ~priority_strand();
       
+      boost::asio::strand &strand();
+      
       /** @brief Check if active
        *
        * Indiactes if thei instance is currently active or not. An 
