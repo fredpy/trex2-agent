@@ -87,75 +87,11 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-/** @brief TREX default log file name
- *
- * This macro is used by LogManager. It gives the name of the log
- * file to create for logging text messages.
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- */
 # define TREX_LOG_FILE "TREX.log"
-
-/** @brief Home environment variable
- *
- * The name of the environment variable that indicates where TREX is located.
- * If valid, the value of this variable will be automatically added to the
- * search path used by LogManager to @c locate new files
- *
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- * @sa LogManager::m_searchPath
- */
-# define TREX_ENV    "TREX_HOME"
-
-/** @brief Search path environment variable
- *
- * The name of the environment variable that indicates where TREX can search for
- * files to locate them. The format fro this variable is a list of directories
- * separated by a column (':')
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- * @sa LogManager::m_searchPath
- */
-# define SEARCH_ENV  "TREX_PATH"
-
-/** @brief log directory environment variable
- *
- * This macro gives the name of the environment variable to read
- * for knowing in what path the log files should be placed.
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- */
-# define LOG_DIR_ENV "TREX_LOG_DIR"
-/** @brief Name of the symbolic link to "latest" logs
- *
- * This macro gives the name to give to the symbolic link that
- * will be created in the log directory to point to the logs of
- * the latest/current session
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- */
-# define LATEST_DIR "latest"
-/** @brief Maximum log directory creation attempts
- *
- * This macro indicates how much attempt to create a new log directory
- * should be done before giving up and generating an error.
- *
- * @note This value @b do @b not mean that TREX can only execute up to
- *       @c MAX_LOG_ATTEMPT missions in a single day. Indeed if one look
- *       at the code of LogManager::createLatest he will see that it makes this
- *       number of attempt stariung from the directory referred by @c LATEST_DIR
- *       link. Such behavior should really happen if the symbolic link
- *       @c LATEST_DIR is not set properly.
- *
- * @relates TREX::utils::LogManager
- * @author Frederic Py <fpy@mbari.org>
- */
+# define TREX_ENV      "TREX_HOME"
+# define SEARCH_ENV    "TREX_PATH"
+# define LOG_DIR_ENV   "TREX_LOG_DIR"
+# define LATEST_DIR    "latest"
 # define MAX_LOG_ATTEMPT 1024
 
 
