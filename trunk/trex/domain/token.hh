@@ -46,7 +46,7 @@ namespace TREX {
     
     
     class token;
-    typedef SHARED_PTR<token /*const*/> token_id;
+    typedef SHARED_PTR<token const> token_id;
     typedef SHARED_PTR<token> token_ref;
     
     
@@ -111,7 +111,7 @@ namespace TREX {
       attr_iterator attr_begin(bool all=true) const;
       attr_iterator attr_end(bool all=true) const;
       
-      token_id id() {
+      token_id id() const {
         return shared_from_this();
       }
       

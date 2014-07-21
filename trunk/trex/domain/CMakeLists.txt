@@ -41,7 +41,7 @@ add_library(TREXdomain SHARED
   domain_impl.cc
   var.cc
   token.cc
-  # headers 
+  # headers
   abstract_domain.hh
   domain_errors.hh
   basic_enumerated.hh
