@@ -110,7 +110,8 @@ add_library(TREXutils SHARED
   timing/cpu_clock.hh
   timing/tick_clock.hh
   timing/posix_utils.hh
-  timing/bits/asio_tick_timer.hh
+  timing/asio_tick_timer.hh
+  timing/bits/asio_chrono_timer.hh
   # template source code
   bits/priority_strand.tcc
   bits/generic_factory.tcc
