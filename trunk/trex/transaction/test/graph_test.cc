@@ -100,22 +100,21 @@ reactor::declare<simple_reactor> tmp("simple");
 
 int main(int argc, char *argv[]) {
   utils::singleton::use<utils::log_manager> log;
-  std::cerr<<"Output logged to "<<log->log_path()<<std::endl;
-  
-  
-  std::istringstream iss("<Agent name=\"foo\">"
-                         "<simple name=\"bar\" lookahead=\"0\" latency=\"1\" />"
-                         "<simple name=\"bar2\" lookahead=\"0\" latency=\"1\" />"
-                         "<simple name=\"toto\" lookahead=\"0\" latency=\"1\" />"
-                         "</Agent>");
-  
-  bpt::ptree cfg;
-  bpt::xml_parser::read_xml(iss, cfg);
   try {
-    utils::singleton::use<utils::log_manager> s_log;
-    s_log->log_path();
+    utils::log_manager::path_type p = log->log_path();
     
-
+    std::cerr<<"Output logged to "<<p<<std::endl;
+  
+  
+    std::istringstream iss("<Agent name=\"foo\">"
+                           "<simple name=\"bar\" lookahead=\"0\" latency=\"1\" />"
+                           "<simple name=\"bar2\" lookahead=\"0\" latency=\"1\" />"
+                           "<simple name=\"toto\" lookahead=\"0\" latency=\"1\" />"
+                           "</Agent>");
+  
+    bpt::ptree cfg;
+    bpt::xml_parser::read_xml(iss, cfg);
+    
     graph g(cfg.get_child("Agent"));
     // g.manager().thread_count(6);
   
@@ -129,11 +128,12 @@ int main(int argc, char *argv[]) {
     sleep(1);
     g.tick(4);
     sleep(10);
+    return 0;
   } catch(std::exception const &e) {
     std::cerr<<"exception: "<<e.what()<<std::endl;
   } catch(...) {
     std::cerr<<"exception: something something"<<std::endl;
   }
   
-  return 0;
+  return 1;
 }
