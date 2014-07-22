@@ -33,8 +33,8 @@
  */
 #include <iostream>
 
-#include <trex/domain/enum_domain.hh>
-#include <trex/domain/string_domain.hh>
+#include <trex/domain/EnumDomain.hh>
+#include <trex/domain/StringDomain.hh>
 
 #include "AgentLocation.hh"
 
@@ -42,14 +42,14 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::AgentLocation;
 
-symbol const AgentLocation::AtPred("At");
+Symbol const AgentLocation::AtPred("At");
 
-symbol const AgentLocation::GoPred("Go");
+Symbol const AgentLocation::GoPred("Go");
 
-symbol const AgentLocation::AgentLocationObj("auvLocation");
+Symbol const AgentLocation::AgentLocationObj("auvLocation");
 
-AgentLocation::AgentLocation(reactor::xml_arg_type arg)
-  :reactor(arg, false)
+AgentLocation::AgentLocation(TeleoReactor::xml_arg_type arg)
+  :TeleoReactor(arg, false)
 {
   syslog(null, info)<<"I want to own "<<AgentLocationObj;
   provide(AgentLocationObj);
@@ -59,41 +59,41 @@ AgentLocation::AgentLocation(reactor::xml_arg_type arg)
 AgentLocation::~AgentLocation() {}
 
 void AgentLocation::setAt(std::string location) {
-  m_state.reset(new token(AgentLocationObj, AtPred));
-  m_state->restrict_attribute("loc", enum_domain(location));
-  post_observation(*m_state);
+    m_state.reset(new Observation(AgentLocationObj, AtPred));
+    m_state->restrictAttribute("loc", EnumDomain(location));
+    postObservation(*m_state);
 }
 
 void AgentLocation::setGo(std::string origin, std::string destination){
-    m_state.reset(new token(AgentLocationObj, GoPred));
-    m_state->restrict_attribute("from", enum_domain(origin));
-    m_state->restrict_attribute("to", enum_domain(destination));
-    post_observation(*m_state);
+    m_state.reset(new Observation(AgentLocationObj, GoPred));
+    m_state->restrictAttribute("from", EnumDomain(origin));
+    m_state->restrictAttribute("to", EnumDomain(destination));
+    postObservation(*m_state);
 }
 
-void AgentLocation::handle_init(){
-    m_state.reset(new token(AgentLocationObj, AtPred));
-    m_state->restrict_attribute("loc", enum_domain("Ship"));
-    post_observation(*m_state);
-    m_nextSwitch = current_tick() + 1;
+void AgentLocation::handleInit(){
+    m_state.reset(new Observation(AgentLocationObj, AtPred));
+    m_state->restrictAttribute("loc", EnumDomain("Ship"));
+    postObservation(*m_state);
+    m_nextSwitch = getCurrentTick() + 1;
 }
 
 bool AgentLocation::synchronize() {
-    TICK cur = current_tick();
+    TICK cur = getCurrentTick();
 
     if( m_nextSwitch<=cur )
     {
       while(!m_pending.empty())
       {
-        if( m_pending.front()->starts_after(cur) ) {
-          if( m_pending.front()->starts_before(cur+1) ) {
+        if( m_pending.front()->startsAfter(cur) ) {
+          if( m_pending.front()->startsBefore(cur+1) ) {
             if(AtPred==m_pending.front()->predicate()) {
-                setAt(m_pending.front()->attribute("loc").domain().get_singleton_as_string());
+                setAt(m_pending.front()->getAttribute("loc").domain().getStringSingleton());
             } else {
-                setGo(m_pending.front()->attribute("from").domain().get_singleton_as_string(),
-                      m_pending.front()->attribute("to").domain().get_singleton_as_string());
+                setGo(m_pending.front()->getAttribute("from").domain().getStringSingleton(),
+                      m_pending.front()->getAttribute("to").domain().getStringSingleton());
             }
-            m_nextSwitch = cur+m_pending.front()->duration().lower_bound().value();
+            m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
             m_pending.pop_front();
           }
           // if we reached this point that means that the goal
@@ -109,18 +109,18 @@ bool AgentLocation::synchronize() {
   return true;
 }
 
-void AgentLocation::handle_request(token_id const &g) {
+void AgentLocation::handleRequest(goal_id const &g) {
   if( g->predicate()==AtPred || g->predicate()==GoPred ) {
     // I insert it on my list
-    int_domain::bound lo = g->start().lower_bound();
-    if( lo.is_infinity() ) {
+    IntegerDomain::bound lo = g->getStart().lowerBound();
+    if( lo.isInfinity() ) {
       m_pending.push_front(g);
     } else {
-      std::list<token_id>::iterator i = m_pending.begin();
+      std::list<goal_id>::iterator i = m_pending.begin();
       TICK val = lo.value();
       for(; m_pending.end()!=i; ++i )
       {
-        if( (*i)->starts_after(val) )
+        if( (*i)->startsAfter(val) )
             break;
       }
       m_pending.insert(i, g);
@@ -128,8 +128,8 @@ void AgentLocation::handle_request(token_id const &g) {
   }
 }
 
-void AgentLocation::handle_recall(token_id const &g) {
-    std::list<token_id>::iterator i = m_pending.begin();
+void AgentLocation::handleRecall(goal_id const &g) {
+    std::list<goal_id>::iterator i = m_pending.begin();
     for( ; m_pending.end()!=i; ++i )
     {
         if( *i==g )

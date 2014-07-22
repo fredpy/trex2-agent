@@ -18,7 +18,7 @@ namespace
 {
 
   /** @brief GoalPipe reactor declaration */
-  reactor::declare<ControlInterface> decl("GoalPipe");
+  TeleoReactor::xml_factory::declare<ControlInterface> decl("GoalPipe");
 
 }
 
@@ -49,14 +49,14 @@ void ControlInterface::thread_proxy::operator()() {
 
 // statics 
 
-shared_var<size_t> ControlInterface::s_id;
+SharedVar<size_t> ControlInterface::s_id;
 
 // structors 
 
-ControlInterface::ControlInterface(reactor::xml_arg_type arg)
-:reactor(arg, false), m_running(false),
+ControlInterface::ControlInterface(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg, false), m_running(false),
  m_need_fifo(utils::parse_attr<bool>(false, 
-				     xml(arg),
+				     TeleoReactor::xml_factory::node(arg), 
 				     "local_queue")),
  m_fifo(0) {
   //use("estimator", true, true);
@@ -79,9 +79,9 @@ ControlInterface::~ControlInterface() {
 std::string ControlInterface::fifo_name() const {
   std::ostringstream oss;
   // file name is <agent>.<reactor>.in
-  oss<<agent_name()<<'.'<<name()<<".in";
+  oss<<getAgentName()<<'.'<<getName()<<".in";
   // Position the file into our log directory
-  return manager().log_file(oss.str()).string();
+  return manager().file_name(oss.str()).string();
 }
 
 bool ControlInterface::is_running() const {
@@ -96,8 +96,7 @@ bool ControlInterface::is_open() const {
 
 // manipulators
 
-void ControlInterface::add_goal(token_id const &g,
-                                boost::optional<std::string> const &id) {
+void ControlInterface::add_goal(goal_id const &g, boost::optional<std::string> const &id) {
   {
     scoped_lock cs(m_mutex);
     m_pending_goals.insert(g);
@@ -121,7 +120,7 @@ void ControlInterface::add_recall(std::string const &id) {
   scoped_lock cs(m_mutex);
   goal_map::left_iterator i = m_goals.left.find(id);
   if( m_goals.left.end()!=i ) {
-    token_id g = i->second;
+    goal_id g = i->second;
     m_goals.left.erase(i);
     if( 0==m_pending_goals.erase(g) )
       m_pending_recalls.insert(g);
@@ -129,9 +128,9 @@ void ControlInterface::add_recall(std::string const &id) {
     syslog(log::warn)<<"No goal to recall with id \""<<id<<'\"';
 }
 
-bool ControlInterface::next(std::set<token_id> &l, token_id &g) {
+bool ControlInterface::next(std::set<goal_id> &l, goal_id &g) {
   scoped_lock cs(m_mutex);
-  std::set<token_id>::iterator i=l.begin();
+  std::set<goal_id>::iterator i=l.begin();
   if( l.end()==i )
     return false;
   else {
@@ -142,18 +141,18 @@ bool ControlInterface::next(std::set<token_id> &l, token_id &g) {
 }
 
 std::string ControlInterface::log_message(std::string const &content) {
-  std::ostringstream name_s;
+  std::ostringstream name;
   // Build unique message name
-  name_s<<"msg.";
+  name<<"msg.";
   {
-    shared_var<size_t>::scoped_lock cs(s_id);
-    name_s<<(++(*s_id))<<".rcvd";
+    SharedVar<size_t>::scoped_lock cs(s_id);
+    name<<(++(*s_id))<<".rcvd";
   }
   // Log the message
-  std::string full_name = file_name(name_s.str()).string();
+  std::string full_name = file_name(name.str()).string();
   std::ofstream out(full_name.c_str(), std::ofstream::binary);
   out.write(content.c_str(), content.length());
-  return name_s.str();
+  return name.str();
 }
 
 void ControlInterface::create_fifo() {
@@ -177,17 +176,14 @@ void ControlInterface::create_fifo() {
             <<"\n\tI'll assume it is a unix pipe.";
       } else {
         syslog(log::error)<<"Failed to create fifo";
-        
-        throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
-                           "mkfifo("+queue_name+")");
+        throw TREX::utils::ErrnoExcept("mkfifo("+queue_name+")");
       }
     }
     syslog(log::info)<<"Opening the pipe...";
     fid = open(queue_name.c_str(), O_RDONLY|O_NONBLOCK);
     if( fid<0 ) {
       syslog(log::error)<<"Failed to open fifo";
-      throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
-                         "open("+queue_name+")");
+      throw TREX::utils::ErrnoExcept("open("+queue_name+")");
     } else { // critical section
       scoped_lock cs(m_mutex);
       // update the file id to the newly opened fifo
@@ -238,8 +234,7 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
         int len = read(m_fifo, buff, buff_size*sizeof(char));
 
         if( len<0 )
-          throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
-                             "Error while reading fifo");
+          throw TREX::utils::ErrnoExcept("Error while reading fifo");
         return len;
       }
     }
@@ -269,11 +264,11 @@ void ControlInterface::proccess_message(std::string const &msg) {
   boost::tie(i,last) = xml_tree.equal_range("Goal");
   for( ; last!=i; ++i) {
     try {
-      token_id tmp = parse_goal(*i);
+      goal_id tmp = parse_goal(*i);
       add_goal(tmp, TREX::utils::parse_attr< boost::optional<std::string> >(*i, "id"));
       had_cmd = true;
-    } catch(std::exception const &e) {
-      syslog(log::warn)<<"Exception while building new goal: "<<e.what();
+    } catch(TREX::utils::Exception const &e) {
+      syslog(log::warn)<<"Exception while building new goal: "<<e;
     }
   }
 
@@ -282,8 +277,8 @@ void ControlInterface::proccess_message(std::string const &msg) {
     try {
       add_recall(TREX::utils::parse_attr<std::string>(*i, "id"));
       had_cmd = true;
-    } catch(std::exception const &e) {
-      syslog(log::warn)<<"Exception while building recall: "<<e.what();
+    } catch(TREX::utils::Exception const &e) {
+      syslog(log::warn)<<"Exception while building recall: "<<e;
     }
   }
   if( !had_cmd )
@@ -297,7 +292,7 @@ void ControlInterface::stop() {
 
 // TREX callbacks 
 
-void ControlInterface::handle_init() {
+void ControlInterface::handleInit() {
   // Create the new fifo queue
   if( m_need_fifo ) {
     create_fifo();
@@ -307,28 +302,28 @@ void ControlInterface::handle_init() {
   //Platform::setControlInterface(this);
 }
 
-void ControlInterface::handle_tick_start() {
-  token_id g;
+void ControlInterface::handleTickStart() {
+  goal_id g;
 
   // get pending recalls
   while( next(m_pending_recalls, g) ) {
-    post_recall(g);
+    postRecall(g);
   }
 
   // get pending goals
   while( next(m_pending_goals, g) ) {
     // First attempt to subscribe to the timeline
-    if( !is_external(g->object()) )
+    if( !isExternal(g->object()) )
       use(g->object(), true, true);
-    if( is_external(g->object()) ) {
-      if( !post_goal(g) )
+    if( isExternal(g->object()) ) {
+      if( !postGoal(g) )
 	syslog(log::warn)<<"["<<g<<"] was already posted ... ?";
     } else
       syslog(log::warn)<<"Unable to subscribe to timeline \""<<g->object()<<"\".";
   }
 }
 
-void ControlInterface::notify(TREX::transaction::token const &obs)
+void ControlInterface::notify(TREX::transaction::Observation const &obs)
 {
   if (obs.predicate() == "Failed")
   {
@@ -345,7 +340,7 @@ bool ControlInterface::synchronize() {
 
 
 
-void ControlInterface::new_plan_token(TREX::transaction::token_id const &t)
+void ControlInterface::newPlanToken(TREX::transaction::goal_id const &t)
 {
   syslog(log::info) << "new plan token: " << *t;
 
@@ -358,7 +353,7 @@ void ControlInterface::new_plan_token(TREX::transaction::token_id const &t)
   }
 }
 
-void ControlInterface::cancelled_plan_token(TREX::transaction::token_id const &t)
+void ControlInterface::cancelledPlanToken(TREX::transaction::goal_id const &t)
 {
   syslog(log::info) << "token has been canceled: " << *t;
 
@@ -401,6 +396,8 @@ void ControlInterface::run() {
       // sleep a little
       boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
+  } catch(TREX::utils::Exception const &te) {
+    syslog(log::error)<<"In fifo listener thread: "<<te;
   } catch(std::exception const &se) {
     syslog(log::error)<<"In fifo listener thread: "<<se.what();
   } catch(...) {

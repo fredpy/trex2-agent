@@ -38,11 +38,11 @@
 #include "EuropaEntity.hh"
 #include "private/EuropaDomain.hh"
 
-#include <trex/domain/boolean_domain.hh>
-#include <trex/domain/int_domain.hh>
-#include <trex/domain/float_domain.hh>
-#include <trex/domain/string_domain.hh>
-#include <trex/domain/enum_domain.hh>
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/IntegerDomain.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/StringDomain.hh>
+#include <trex/domain/EnumDomain.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domains.hh>
@@ -56,13 +56,13 @@
 
 using namespace TREX::europa;
 using namespace TREX;
-using TREX::utils::symbol;
+using TREX::utils::Symbol;
 
 namespace tr=TREX::transaction;
 
-tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
+tr::DomainBase *TREX::europa::details::trex_domain(EUROPA::Domain const &dom) {
   EUROPA::DataTypeId const &type(dom.getDataType());
-  UNIQ_PTR<tr::abstract_domain> result;
+  UNIQ_PTR<tr::DomainBase> result;
 
   // There should be a less hard-coded way to do it ...
   // this current implementation is not really open to the addition of
@@ -70,9 +70,9 @@ tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &do
   if( type->isBool() ) {
     // boolean 
     if( dom.isSingleton() )
-      result.reset(new tr::boolean_domain(0.0!=dom.getSingletonValue()));
+      result.reset(new tr::BooleanDomain(0.0!=dom.getSingletonValue()));
     else
-      result.reset(new tr::boolean_domain());
+      result.reset(new tr::BooleanDomain());
   } else if( type->isNumeric() ) {
     EUROPA::edouble e_lb, e_ub;
     
@@ -87,30 +87,30 @@ tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &do
     if( 1.0==type->minDelta() ) {
       // integer
       EUROPA::eint i_lb(e_lb), i_ub(e_ub);
-      tr::int_domain::bound t_lb = tr::int_domain::minus_inf,
-        t_ub = tr::int_domain::plus_inf;
+      tr::IntegerDomain::bound t_lb = tr::IntegerDomain::minus_inf,
+        t_ub = tr::IntegerDomain::plus_inf;
 
       // Assign the bounds only if they are not infinity
       if( std::numeric_limits<EUROPA::eint>::minus_infinity()<i_lb )
 	t_lb = EUROPA::cast_basis(i_lb);
       if( std::numeric_limits<EUROPA::eint>::infinity()>i_ub )
 	t_ub = EUROPA::cast_basis(i_ub);
-      result.reset(new tr::int_domain(t_lb, t_ub));
+      result.reset(new tr::IntegerDomain(t_lb, t_ub));
     } else {
       // should be float 
-      tr::float_domain::bound t_lb = tr::float_domain::minus_inf,
-	t_ub = tr::float_domain::plus_inf;
+      tr::FloatDomain::bound t_lb = tr::FloatDomain::minus_inf,
+	t_ub = tr::FloatDomain::plus_inf;
 
       // Assign the bounds only if they are not infinity
       if( std::numeric_limits<EUROPA::edouble>::minus_infinity()<e_lb )
 	t_lb = EUROPA::cast_basis(e_lb);
       if( std::numeric_limits<EUROPA::edouble>::infinity()>e_ub )
 	t_ub = EUROPA::cast_basis(e_ub);
-      result.reset(new tr::float_domain(t_lb, t_ub));
+      result.reset(new tr::FloatDomain(t_lb, t_ub));
     }
   } else {
     std::list<EUROPA::edouble> values;
-    tr::basic_enumerated *tmp = NULL;
+    tr::BasicEnumerated *tmp = NULL;
     
     if( type->isEntity() ) {
       tmp = new EuropaEntity();
@@ -122,16 +122,16 @@ tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &do
 	// remove the (id) at the end
 	if( str[str.length()-1]==')' ) 
 	  str = str.substr(0, str.rfind('('));
-	tmp->add_string_value(str);
+	tmp->addTextValue(str);
       }
     } else {
       // It should be an enumerated domain 
       if( type->isString() ) {
 	// A bag of strings
-	tmp = new tr::string_domain();
+	tmp = new tr::StringDomain();
       } else if( type->isSymbolic() ) {
 	// A set of symbols/an enum
-	tmp = new tr::enum_domain();
+	tmp = new tr::EnumDomain();
       } else {
 	// don't know what it is
 	throw EuropaException("Don't know how to convert Europa type "+
@@ -143,7 +143,7 @@ tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &do
       dom.getValues(values);
       for(std::list<EUROPA::edouble>::const_iterator i=values.begin();
 	  values.end()!=i; ++i) 
-	tmp->add_string_value(type->toString(*i));
+	tmp->addTextValue(type->toString(*i));
     }
   }
   return result.release(); // release the resulting domain
@@ -155,7 +155,7 @@ tr::abstract_domain *TREX::europa::details::trex_domain(EUROPA::Domain const &do
 
 // manipulators
 
-void details::europa_domain::visit(tr::basic_enumerated const *dom) {
+void details::europa_domain::visit(tr::BasicEnumerated const *dom) {
   if( m_dom->isEntity() ) {
     // I assume that only objects are entity ... should be fine I think
     EUROPA::ObjectDomain *o_dom = dynamic_cast<EUROPA::ObjectDomain *>(m_dom);
@@ -163,8 +163,7 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
     EUROPA::edouble val;
         
     if( NULL==o_dom )
-      throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::domain_access),
-                         m_dom->toString()+" is an europa entity but not an object.");
+      throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is an entity but not an object.\nDo not know how to handle this.");
     else {
       EUROPA::ObjectId obj; 
       EUROPA::PlanDatabaseId p_db; 
@@ -172,22 +171,21 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
       // Need to identify the plan database 
       std::list<EUROPA::ObjectId> objs = o_dom->makeObjectList();
       if( objs.empty() )
-        throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::empty_domain),
-                           "Europa domain is empty");
+        throw tr::DomainAccess(*dom, "Europa domain "+o_dom->toString()+" was empty before the operation");
       else
         p_db = objs.front()->getPlanDatabase();
       objs.clear();
       
-      for(size_t i=0; i<dom->size(); ++i) {
-        obj = p_db->getObject(dom->element_as_string(i));
+      for(size_t i=0; i<dom->getSize(); ++i) {
+        obj = p_db->getObject(dom->getStringValue(i));
         if( obj.isId() && o_dom->isMember(obj) )
           objs.push_back(obj);
       }
       if( objs.empty() ) // the intersection is empty
-        throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::empty_domain));
+        throw tr::EmptyDomain(*dom, "Europa object domain "+m_dom->toString()+
+                          " became empty.");
       EUROPA::ObjectDomain tmp(m_type, objs);
-      if( m_dom->intersect(tmp) )
-        *m_updated = true;
+      m_dom->intersect(tmp);
     }
     
   } else if( m_dom->isEnumerated() ) {
@@ -195,19 +193,18 @@ void details::europa_domain::visit(tr::basic_enumerated const *dom) {
     
     EUROPA::edouble val;
     
-    for(size_t i=0; i<dom->size(); ++i) {
-      if( m_dom->convertToMemberValue(dom->element_as_string(i), val) )
+    for(size_t i=0; i<dom->getSize(); ++i) {
+      if( m_dom->convertToMemberValue(dom->getStringValue(i), val) )
         values.push_back(val);
     }
     if( values.empty() ) // the intersection is empty
-      throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::empty_domain));
+      throw tr::EmptyDomain(*dom, "Europa enumerated domain "+m_dom->toString()+
+			" became empty.");
     // Apply the intersection
     EUROPA::EnumeratedDomain tmp(m_type, values);
-    if( m_dom->intersect(tmp) )
-      *m_updated = true;
-  } else
-    throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::incompatible_types),
-                       "Europa domain is not enumerated");
+    m_dom->intersect(tmp);
+  } else 
+    throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not enumerated.");
 }
 
 namespace {
@@ -218,27 +215,27 @@ namespace {
 }
 
 
-void details::europa_domain::visit(tr::basic_interval const *dom) {
+void details::europa_domain::visit(tr::BasicInterval const *dom) {
   if( m_dom->isInterval() ) {
     UNIQ_PTR<EUROPA::Domain> tmp(m_dom->copy());
     
     if( m_dom->isBool() ) {
       // Handle the boolean special case: we assume here that the T-REX 
       // interval domain is convertible to double
-      if( dom->is_singleton() ) {
-        double val = dom->get_typed_singleton<double, true>();
+      if( dom->isSingleton() ) {
+        double val = dom->getTypedSingleton<double, true>();
         EUROPA::edouble eval(val!=0.0);
         tmp->intersect(eval, eval);
-      } else if( !dom->is_full() ) {
-        double lo = dom->get_typed_lower<double, true>(),
-           hi = dom->get_typed_upper<double, true>();
+      } else if( !dom->isFull() ) {
+        double lo = dom->getTypedLower<double, true>(),
+           hi = dom->getTypedUpper<double, true>();
         if( lo>0.0 || hi<0.0 ) {
           EUROPA::eint true_val(1);
           tmp->intersect(true_val, true_val);
         }
       }
     } else {
-      std::string lo = dom->lower_as_string(), hi = dom->upper_as_string();
+      std::string lo = dom->getStringLower(), hi = dom->getStringUpper();
       EUROPA::edouble elo = m_type->createValue(lo),
         ehi = m_type->createValue(hi);
       
@@ -252,28 +249,26 @@ void details::europa_domain::visit(tr::basic_interval const *dom) {
       tmp->intersect(elo, ehi);
     }
     if( tmp->isEmpty() )
-      throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::empty_domain));
-    if( m_dom->intersect(*tmp) )
-      *m_updated = true;
-  } else
-    SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::incompatible_types),
-                 "Europa domain is not an interval");
+      throw tr::EmptyDomain(*dom, "Europa Interval domain "+m_dom->toString()
+			+" became empty.");
+    m_dom->intersect(*tmp);
+  } else 
+    throw tr::DomainAccess(*dom, "Europa domain "+m_dom->toString()+" is not an interval.");
 }
 
-void details::europa_domain::visit(tr::abstract_domain const *dom, bool) {
-  symbol const &type = dom->type_name();
+void details::europa_domain::visit(tr::DomainBase const *dom, bool) {
+  Symbol const &type = dom->getTypeName();
 
-  if( EuropaDomain::type_str==type ) {
+  if( EuropaDomain::type_name==type ) {
     // EuropaDomain has a europa Domain directly available
     EuropaDomain const &ed = dynamic_cast<EuropaDomain const &>(*dom);
     
-    if( !m_dom->intersects(ed.europaDomain()) )
-      throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::empty_domain));
-    else if( m_dom->intersect(ed.europaDomain()) )
-      *m_updated = true;
-  } else
-    throw SYSTEM_ERROR(tr::domain_error_code(tr::domain_error::domain_access),
-                       "Do not know Europa equivalent to "+type.str());
+    if( !m_dom->intersect(ed.europaDomain()) ) 
+      throw tr::EmptyDomain(*dom, "EUROPA domain "+m_dom->toString()+" became empty.");    
+  } else 
+    // I have no way to know at this stage
+    throw tr::DomainAccess(*dom, "Don't know how to convert domains "+
+		       type.str()+" for Europa.");
 }
 
 

@@ -59,8 +59,8 @@ namespace {
   }
   
   void temporal_bounds(Wt::Http::Request const &req,
-                       TREX::transaction::int_domain::bound &lo,
-                       TREX::transaction::int_domain::bound &hi,
+                       TREX::transaction::IntegerDomain::bound &lo,
+                       TREX::transaction::IntegerDomain::bound &hi,
                        SHARED_PTR<TimelineHistory> ptr) {
     bool as_date = true;
     std::string const *value;
@@ -96,11 +96,11 @@ void timeline_list_service::handleRequest(rest_request const &req,
     throw std::runtime_error("Entry point to trex has been destroyed.\n"
                              "This probaly means that trex is terminating.");
   
-  transaction::int_domain::bound lo = transaction::int_domain::minus_inf,
-  hi = transaction::int_domain::plus_inf;
+  transaction::IntegerDomain::bound lo = transaction::IntegerDomain::minus_inf,
+  hi = transaction::IntegerDomain::plus_inf;
   
   temporal_bounds(req.request(), lo, hi, ptr);
-  transaction::int_domain initial(lo, hi);
+  transaction::IntegerDomain initial(lo, hi);
 
   ans.setMimeType("application/json");
   std::set<std::string> subset;
@@ -137,30 +137,30 @@ void timeline_service::handleRequest(rest_request const &req,
   
   Wt::Http::ResponseContinuation *cont = req.request().continuation();
   
-  transaction::int_domain::bound lo = transaction::int_domain::minus_inf,
-  hi = transaction::int_domain::plus_inf,
+  transaction::IntegerDomain::bound lo = transaction::IntegerDomain::minus_inf,
+  hi = transaction::IntegerDomain::plus_inf,
   now = ptr->now();
   
   bool first = true;
   if( cont ) {
-    SHARED_PTR<transaction::int_domain> range;
-    range = boost::any_cast< SHARED_PTR<transaction::int_domain> >(cont->data());
+    SHARED_PTR<transaction::IntegerDomain> range;
+    range = boost::any_cast< SHARED_PTR<transaction::IntegerDomain> >(cont->data());
     
-    range->get_bounds(lo, hi);
+    range->getBounds(lo, hi);
     first = false;
   } else {
     temporal_bounds(req.request(), lo, hi, ptr);
-    if( lo.is_infinity() ) {
+    if( lo.isInfinity() ) {
       if( hi>=now )
         lo = now;
     }
     
     ans.setMimeType("application/json");
-    transaction::int_domain initial(lo, hi);
+    transaction::IntegerDomain initial(lo, hi);
     // As it is the start I need to add initial info to the stream
     data<<"{\n \"name\": \""<<req.arg_path().dump()
     <<"\",\"requested_tick_range\": ";
-    if( initial.is_full() )
+    if( initial.isFull() )
       data<<"{}";
     else
       utils::write_json(data, initial.as_tree(), ptr->fancy());
@@ -169,10 +169,10 @@ void timeline_service::handleRequest(rest_request const &req,
   
   ptr->get_tokens(req.arg_path().dump(), lo, hi,
                   data, first, 10);
-  if( transaction::int_domain::plus_inf==lo || hi<lo ) {
+  if( transaction::IntegerDomain::plus_inf==lo || hi<lo ) {
     data<<" ]\n}";
   } else {
-    SHARED_PTR<transaction::int_domain> range(new transaction::int_domain(lo, hi));
+    SHARED_PTR<transaction::IntegerDomain> range(new transaction::IntegerDomain(lo, hi));
     cont = ans.createContinuation();
     cont->setData(range);
   }
@@ -213,7 +213,7 @@ void goals_service::handleRequest(rest_request const &req,
 std::string goal_service::file_name() {
   size_t id;
   {
-    TREX::utils::shared_var<size_t>::scoped_lock l(m_counter);
+    TREX::utils::SharedVar<size_t>::scoped_lock l(m_counter);
     id = *m_counter;
     *m_counter = id+1;
   }
@@ -245,7 +245,7 @@ void goal_service::handleRequest(rest_request const &req,
       std::ofstream tmp(file.c_str());
       tmp<<req.request().in().rdbuf();
     }
-    TREX::transaction::token_id g = ptr->add_goal(file);
+    TREX::transaction::goal_id g = ptr->add_goal(file);
     ans.setMimeType("application/json");
     utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else if( "DELETE"==kind ) {
@@ -254,7 +254,7 @@ void goal_service::handleRequest(rest_request const &req,
     data<<"{ \"id\": \""<<id<<"\",\n"
       <<"  \"deleted\": \""<<ptr->delete_goal(id)<<"\"\n}";
   } else if( "GET"==kind ) {
-    TREX::transaction::token_id g = ptr->get_goal(req.arg_path().dump());
+    TREX::transaction::goal_id g = ptr->get_goal(req.arg_path().dump());
     ans.setMimeType("application/json");
     utils::write_json(json, ptr->get_goal(g), ptr->fancy());
   } else

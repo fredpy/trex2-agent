@@ -33,7 +33,7 @@
  */
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/Agent.hh>
-#include <trex/config/memory.hh>
+#include <trex/utils/platform/memory.hh>
 
 #include <boost/python.hpp>
 
@@ -75,12 +75,12 @@ void export_agent() {
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
-
-  implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
+  
+  implicitly_convertible<boost::shared_ptr<ta::RealTimeClock>, ta::clock_ref>();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
-   init<tu::symbol const &, tt::TICK>())
+   init<tu::Symbol const &, tt::TICK>())
   .def(init<std::string const &>())
   .def(init<boost::property_tree::ptree::value_type &>())
   // need to find a way to take ownership of the clock passed as argument

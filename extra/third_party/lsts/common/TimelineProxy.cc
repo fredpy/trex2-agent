@@ -16,28 +16,28 @@ namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::declare<TimelineProxy> decl("TimelineProxy");
+  TeleoReactor::xml_factory::declare<TimelineProxy> decl("TimelineProxy");
 
 }
 
-TimelineProxy::TimelineProxy(reactor::xml_arg_type arg)
-:reactor(arg)
+TimelineProxy::TimelineProxy(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg)
 {
-  m_destport = parse_attr<int>(6001, xml(arg),
+  m_destport = parse_attr<int>(6001, TeleoReactor::xml_factory::node(arg),
                                "destport");
   m_destaddr = parse_attr<std::string>("127.0.0.1",
-                                       xml(arg),
+                                       TeleoReactor::xml_factory::node(arg),
                                        "destaddr");
-  m_localport = parse_attr<int>(6006, xml(arg),
+  m_localport = parse_attr<int>(6006, TeleoReactor::xml_factory::node(arg),
                                 "localport");
 
-  m_goalProxy = parse_attr<bool>(true, xml(arg),
+  m_goalProxy = parse_attr<bool>(true, TeleoReactor::xml_factory::node(arg),
                                  "goal_forwarding");
 
-  m_timeline = parse_attr<std::string>("", xml(arg),
+  m_timeline = parse_attr<std::string>("", TeleoReactor::xml_factory::node(arg),
                                        "timeline");
 
-  m_useIridium = parse_attr<bool>(false, xml(arg),
+  m_useIridium = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                         "iridium");
 }
 
@@ -47,7 +47,7 @@ TimelineProxy::~TimelineProxy()
 }
 
 void
-TimelineProxy::handle_init()
+TimelineProxy::handleInit()
 {
   if (m_goalProxy)
   {
@@ -58,7 +58,7 @@ TimelineProxy::handle_init()
     use(m_timeline);
   }
 
-  m_adapter.setReactorGraph(this->get_graph());
+  m_adapter.setReactorGraph(this->getGraph());
   m_adapter.bind(m_localport);
 
   if (m_goalProxy)
@@ -74,7 +74,7 @@ TimelineProxy::handle_init()
 }
 
 void
-TimelineProxy::handle_request(token_id const &g)
+TimelineProxy::handleRequest(goal_id const &g)
 {
 
   syslog(log::info) << "handleRequest(" << g <<")";
@@ -105,7 +105,7 @@ TimelineProxy::handle_request(token_id const &g)
 }
 
 void
-TimelineProxy::notify(token const &obs)
+TimelineProxy::notify(Observation const &obs)
 {
   if (m_goalProxy)
   {
@@ -121,7 +121,7 @@ TimelineProxy::notify(token const &obs)
   TrexOperation op;
   TrexToken tok;
 
-  m_adapter.asImcMessage(token(obs), &tok);
+  m_adapter.asImcMessage(Observation(obs), &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_TOKEN;
 
@@ -150,27 +150,26 @@ TimelineProxy::synchronize()
   {
     if (msg->getId() == TrexOperation::getIdStatic())
     {
-      TrexOperation * top = dynamic_cast<TrexOperation *>(msg);
+      TrexOperation * top = static_cast<TrexOperation *>(msg);
 
      // std::cerr << "just received this: " << std::endl;
      // top->toText(std::cerr);
       switch(top->op)
       {
         case (TrexOperation::OP_POST_TOKEN):
-              post_observation(m_adapter.genericObservation(top->token.get()), true);
+              postObservation(m_adapter.genericObservation(top->token.get()), true);
         break;
         case (TrexOperation::OP_POST_GOAL):
             {
-              token_id gid = m_adapter.genericGoal(top->token.get());
-              if( post_goal(gid) )
-                m_goals[top->goal_id] = gid;
+          goal_id gid = postGoal(m_adapter.genericGoal(top->token.get()));
+          m_goals[top->goal_id] = gid;
             }
         break;
         case (TrexOperation::OP_RECALL_GOAL):
               goal_map::iterator found = m_goals.find(top->goal_id);
         if (found != m_goals.end())
         {
-          post_recall(found->second);
+          postRecall(found->second);
           m_goals.erase(found);
         }
         break;

@@ -34,7 +34,7 @@
 #ifndef H_trex_rest_timeline_wrap
 # define H_trex_rest_timeline_wrap
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   namespace REST {
@@ -52,7 +52,7 @@ namespace TREX {
         timeline_wrap(transaction::details::timeline const &tl):m_tl(tl),m_count(0) {}
         ~timeline_wrap() {}
         
-        utils::symbol const &name() const {
+        utils::Symbol const &name() const {
           return m_tl.name();
         }
         
@@ -73,9 +73,9 @@ namespace TREX {
           return m_tl.look_ahead();
         }
         
-        std::pair<transaction::TICK, transaction::token_id>
-        new_obs(transaction::TICK cur, transaction::token_id tok) {
-          std::pair<transaction::TICK, transaction::token_id> ret(m_date, m_obs);
+        std::pair<transaction::TICK, transaction::goal_id>
+        new_obs(transaction::TICK cur, transaction::goal_id tok) {
+          std::pair<transaction::TICK, transaction::goal_id> ret(m_date, m_obs);
           m_date = cur;
           if( 0==m_count )
             m_initial = m_date;
@@ -85,12 +85,7 @@ namespace TREX {
         }
         
         bool has_observation() const {
-          // C++11 requires explicit conversion to bool
-          // the if does such explicit conversion
-          if( m_obs )
-            return true;
-          else
-            return false;
+          return m_obs;
         }
         transaction::TICK obs_date() const {
           return m_date;
@@ -99,7 +94,7 @@ namespace TREX {
           return m_initial;
         }
         
-        transaction::token_id obs() const {
+        transaction::goal_id obs() const {
           return m_obs;
         }
         unsigned long long count() const {
@@ -111,7 +106,7 @@ namespace TREX {
         transaction::details::timeline const &m_tl;
         
         transaction::TICK    m_initial, m_date;
-        transaction::token_id m_obs;
+        transaction::goal_id m_obs;
         unsigned long long   m_count;
       };
       

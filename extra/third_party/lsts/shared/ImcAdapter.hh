@@ -9,15 +9,15 @@
 #define IMCADAPTER_HH_
 
 # include <DUNE/DUNE.hpp>
-# include <trex/transaction/reactor.hh>
-# include <trex/domain/float_domain.hh>
-# include <trex/domain/boolean_domain.hh>
-# include <trex/domain/string_domain.hh>
-# include <trex/domain/int_domain.hh>
-# include <trex/domain/enum_domain.hh>
+# include <trex/transaction/TeleoReactor.hh>
+# include <trex/domain/FloatDomain.hh>
+# include <trex/domain/BooleanDomain.hh>
+# include <trex/domain/StringDomain.hh>
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/EnumDomain.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
-# include <trex/utils/symbol.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/Symbol.hh>
 # include <DUNE/Network.hpp>
 # include <DUNE/Network/Fragments.hpp>
 # include "EuropaExtensions.hh"
@@ -103,32 +103,32 @@ namespace TREX {
 
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
-      token vehicleMediumObservation(VehicleMedium * msg);
+      Observation vehicleMediumObservation(VehicleMedium * msg);
 
       //@brief Translates EstimatedState messages into "estate" timeline observations
-      token estimatedStateObservation(EstimatedState * msg);
+      Observation estimatedStateObservation(EstimatedState * msg);
 
       //@brief Translates FollowRefState messages into "frefstate" timeline observations
-      token followRefStateObservation(FollowRefState * msg);
+      Observation followRefStateObservation(FollowRefState * msg);
 
       //@brief Translates PlanControlState messages into "vstate" timeline observations
-      token planControlStateObservation(PlanControlState * msg);
+      Observation planControlStateObservation(PlanControlState * msg);
 
       //@brief Translates OperationalLimits messages into "oplimits" timeline observations
-      token opLimitsObservation(OperationalLimits * msg);
+      Observation opLimitsObservation(OperationalLimits * msg);
 
       //@brief Translates TrexToken messages into a generic observation
-      token genericObservation(TrexToken * msg);
+      Observation genericObservation(TrexToken * msg);
 
       //@brief Translates TrexToken messages into a goal
-      token_id genericGoal(TrexToken * msg);
+      Goal genericGoal(TrexToken * msg);
 
       //@brief Translates TrexToken messages into a generic observation
-      token announceObservation(Announce * msg);
+      Observation announceObservation(Announce * msg);
 
-      void asImcMessage(token const &obs, TrexToken * result);
+      void asImcMessage(Predicate const &obs, TrexToken * result);
 
-      void fillInExtraGoalAttributes(token_id &goal, TrexToken * result);
+      void fillInExtraGoalAttributes(goal_id &goal, TrexToken * result);
 
       virtual
       ~ImcAdapter();
@@ -136,8 +136,8 @@ namespace TREX {
     private:
       const int c_imc_header_length;
       const int c_max_iridium_payload_length;
-      void variableToImc(var const &v, TrexAttribute * attr);
-      void setAttribute(token &pred, TrexAttribute const &attr);
+      void variableToImc(Variable const &v, TrexAttribute * attr);
+      void setAttribute(Predicate &pred, TrexAttribute const &attr);
       int m_trex_id;
       UDPSocket sock_send, sock_receive;
       uint8_t* bfr;

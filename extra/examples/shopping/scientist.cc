@@ -34,8 +34,8 @@
 #include <iostream>
 #include <ctime>
 
-#include <trex/domain/enum_domain.hh>
-#include <trex/domain/string_domain.hh>
+#include <trex/domain/EnumDomain.hh>
+#include <trex/domain/StringDomain.hh>
 
 #include "scientist.hh"
 
@@ -45,19 +45,22 @@ using namespace TREX::Scientist;
 
 static int Horizon = 200;
 
-symbol const Scientist::auv("auv");
-symbol const Scientist::Sample("Sample");
+Symbol const Scientist::auv("auv");
+Symbol const Scientist::Sample("Sample");
 
-symbol const Scientist::Objective("objective");
+Symbol const Scientist::Objective("objective");
 std::string const Scientist::Vent1("Vent1");
 std::string const Scientist::Vent2("Vent2");
 
-Scientist::Scientist(reactor::xml_arg_type arg):reactor(arg, false)
-{}
+Scientist::Scientist(TeleoReactor::xml_arg_type arg)
+  :TeleoReactor(arg, false)
+{
+
+}
 
 Scientist::~Scientist() {}
 
-void Scientist::handle_init() {
+void Scientist::handleInit() {
     use(auv, true, false);
     srand( time(NULL) );
     //number = rand() % (Horizon-50) + 1;
@@ -65,15 +68,13 @@ void Scientist::handle_init() {
 
 bool Scientist::synchronize() {
 
-  if(current_tick()==100)
-  {
-    ERROR_CODE ignore;
-    
-    token goal(auv,Sample);
-    transaction::var temp(Objective, TREX::transaction::string_domain(Vent1));
-    goal.restrict_attribute(temp);
-    goal.restrict_end(TREX::transaction::int_domain(current_tick()+1, Horizon), ignore);
-    post_goal(goal);
-  }
-  return true;
+    if(getCurrentTick()==100)
+    {
+        Goal goal(auv,Sample);
+        transaction::Variable temp(Objective, TREX::transaction::StringDomain(Vent1));
+        goal.restrictAttribute(temp);
+        goal.restrictEnd(TREX::transaction::IntegerDomain(getCurrentTick()+1, Horizon));
+        postGoal(goal);
+    }
+    return true;
 }

@@ -8,9 +8,9 @@
 #ifndef ECHOTIMELINE_HPP_
 #define ECHOTIMELINE_HPP_
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
 # include "../shared/ImcAdapter.hh"
 # include "../shared/LstsReactor.hh"
@@ -22,13 +22,13 @@ namespace TREX {
     {
     public:
       // constructor
-      EchoTimeline(TREX::transaction::reactor::xml_arg_type arg);
+      EchoTimeline(TREX::transaction::TeleoReactor::xml_arg_type arg);
       // called before first tick
       bool synchronize();
       // called before first tick
-      void handle_init();
+      void handleInit();
       // called when a goal is requested
-      void handle_request(token_id const &g);
+      void handleRequest(goal_id const &g);
       // destructor
       ~EchoTimeline();
 

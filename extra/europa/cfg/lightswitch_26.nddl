@@ -34,8 +34,7 @@
 #include "TREX.nddl"
 
 class Light extends AgentTimeline {
-    predicate On {
-    }
+    predicate On {}
     predicate Off {}
 
     Light(Mode _mode) {
@@ -86,12 +85,12 @@ LightSwitch::turnOff {
 
 Luminance::Bright {
     starts(Light.On);
-    meets(Light.Off);
+    //meets(Light.Off);
 }
 
 Luminance::Dim {
     starts(Light.Off);
-    meets(Light.On);
+    //meets(Light.On);
 }
 
 Light::On {
@@ -105,11 +104,11 @@ Light::Off {
 
 Switch::Up {
   contained_by(Light.Off);
-  meets(Down);
+  // meets(Down);
 }
 
 Switch::Down {
-  meets(Up);
+  // meets(Up);
 }
 
 

@@ -10,14 +10,14 @@
 
 # include <iostream>
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
-# include <trex/domain/int_domain.hh>
-# include <trex/domain/float_domain.hh>
-# include <trex/domain/string_domain.hh>
-# include <trex/domain/boolean_domain.hh>
-# include <trex/domain/enum_domain.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/FloatDomain.hh>
+# include <trex/domain/StringDomain.hh>
+# include <trex/domain/BooleanDomain.hh>
+# include <trex/domain/EnumDomain.hh>
 # include <boost/thread/thread.hpp>
 
 # include <DUNE/DUNE.hpp>
@@ -67,7 +67,7 @@ namespace TREX {
        * <Platform name="<name>" latency="<int>" lookahead="<int>" state="<bool>" duneport="<int>" localport="<int>"/>
        * @endcode
        */
-      Platform(reactor::xml_arg_type arg);
+      Platform(TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Platform();
 
@@ -79,30 +79,30 @@ namespace TREX {
     private:
       
       bool synchronize();
-      void handle_request(TREX::transaction::token_id const &g);
-      void handle_recall(TREX::transaction::token_id const &g);
-      void handle_tick_start();
-      void handle_init();
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void handleRecall(TREX::transaction::goal_id const &g);
+      void handleTickStart();
+      void handleInit();
       bool sendMsg(Message& msg, std::string ip, int port);
 
       void processState();
       void handleTrexOperation(TrexOperation trexOp);
       void enqueueGoalToken(std::string goal_id, TrexToken token);
       void postObservationToken(TrexToken token);
-      typedef std::map<std::string, token_id> obs_map;
+      typedef std::map<std::string, SHARED_PTR<Observation> > obs_map;
       typedef std::map<std::string, Announce *> m_links;
       obs_map postedObservations;
       void handleEntityStates(std::vector<IMC::EntityState> entityStates, IMC::EntityList lastEntityList);
-      bool handleGoingRequest(token_id const & g);
-      bool handleAtRequest(token_id const & g);
-      bool handleYoYoRequest(token_id const &goal);
-      void handleGoingRecall(token_id const & g);
-      bool handleSurveilRequest(token_id const &g);
+      bool handleGoingRequest(goal_id const & g);
+      bool handleAtRequest(goal_id const & g);
+      bool handleYoYoRequest(goal_id const &goal);
+      void handleGoingRecall(goal_id const & g);
+      bool handleSurveilRequest(goal_id const &g);
 
       bool atDestination(FollowRefState * frefstate);
       bool sameReference(const IMC::Reference *msg1, const IMC::Reference *msg2);
 
-      TREX::utils::singleton::use<SharedEnvironment> m_env;
+      TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       //static ControlInterface * controlInterfaceInstance;
 
@@ -136,20 +136,20 @@ namespace TREX {
 
       /** @brif vector of received goals */
       std::queue<std::string> receivedGoals;
-      std::queue<token> referenceObservations;
+      std::queue<Observation> referenceObservations;
 
       IMC::Reference goingRef;
       bool m_reference_initialized;
 
-      boost::function<bool (token_id)> m_going_platform;
+      boost::function<bool (goal_id)> m_going_platform;
 
       /** @brief map of received messages (aggregated) */
       std::map<uint16_t, IMC::Message *> aggregate;
 
       void setValue(bool val);
       
-      bool goingAUV(token_id goal);
-      bool goingUAV(token_id g);
+      bool goingAUV(goal_id goal);
+      bool goingUAV(goal_id g);
       //Observation* updateRefAtObservation(FollowRefState* frefstate);
       void insertIntoReceived(IMC::Message* msg);
       void postGoalToken();
@@ -158,8 +158,8 @@ namespace TREX {
       void enqueueReferenceAtObs();
       DesiredZ setUavRefZ(const double z);
 
-      std::list<TREX::transaction::token_id> m_goals_pending;
-      std::list<TREX::transaction::token> m_observations_pending;
+      std::list<TREX::transaction::goal_id> m_goals_pending;
+      std::list<TREX::transaction::Observation> m_observations_pending;
 
       /** @brief received announces since last tick */
       std::map<std::string, Announce *> m_receivedAnnounces;

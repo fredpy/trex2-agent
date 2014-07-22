@@ -15,7 +15,7 @@ using DUNE_NAMESPACES;
 namespace
 {
   /** @brief PositionUpdater reactor declaration */
-  reactor::declare<PositionUpdater> decl("PositionUpdater");
+  TeleoReactor::xml_factory::declare<PositionUpdater> decl("PositionUpdater");
 }
 
 
@@ -27,15 +27,15 @@ namespace TREX {
   }
 
   namespace LSTS {
-    PositionUpdater::PositionUpdater(reactor::xml_arg_type arg) :
+    PositionUpdater::PositionUpdater(TeleoReactor::xml_arg_type arg) :
       LstsReactor(arg)
     {
-      m_bind_port = parse_attr<int>(-1, xml(arg),
+      m_bind_port = parse_attr<int>(-1, TeleoReactor::xml_factory::node(arg),
                                     "bindport");
     }
 
     void
-    PositionUpdater::handle_init()
+    PositionUpdater::handleInit()
     {
 
       if (m_bind_port != -1)
@@ -45,14 +45,14 @@ namespace TREX {
     }
 
     void
-    PositionUpdater::handle_tick_start()
+    PositionUpdater::handleTickStart()
     {
       Message * msg = NULL;
       while((msg = m_adapter.poll()) != NULL)
       {
         if (msg->getId() == Announce::getIdStatic())
         {
-          Announce * ann = (Announce *) dynamic_cast<Announce *>(msg);
+          Announce * ann = static_cast<Announce *>(msg);
 
           if (m_receivedAnnounces[ann->sys_name] != NULL)
             delete m_receivedAnnounces[ann->sys_name];
@@ -71,7 +71,7 @@ namespace TREX {
 
       for (it = m_receivedAnnounces.begin(); it != m_receivedAnnounces.end(); it++)
       {
-        token obs = m_adapter.announceObservation(it->second);
+        Observation obs = m_adapter.announceObservation(it->second);
         postUniqueObservation(obs);
       }
       return true;

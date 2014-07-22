@@ -34,8 +34,8 @@
 #ifndef H_AgentLocation
 #define H_AgentLocation
 
-#include <trex/transaction/reactor.hh>
-#include <trex/config/memory.hh>
+#include <trex/transaction/TeleoReactor.hh>
+#include <trex/utils/platform/memory.hh>
 
 namespace TREX {
   /** @brief AgentLocation plug-in utilities
@@ -48,7 +48,7 @@ namespace TREX {
    */
   namespace AgentLocation {
 
-    class AgentLocation :public TREX::transaction::reactor {
+    class AgentLocation :public TREX::transaction::TeleoReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -59,15 +59,15 @@ namespace TREX {
        * <AgentLocation name="<name>" latency="<int>" lookahead="<int>" />
        * @endcode
        */
-      AgentLocation(TREX::transaction::reactor::xml_arg_type arg);
+      AgentLocation(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~AgentLocation();
 
     private:
-      void handle_init();
+      void handleInit();
       bool synchronize();
-      void handle_request(TREX::transaction::token_id const &g);
-      void handle_recall(TREX::transaction::token_id const &g);
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void handleRecall(TREX::transaction::goal_id const &g);
 
       /** @brief State of the timeline */
       TREX::transaction::TICK m_nextSwitch;
@@ -75,16 +75,16 @@ namespace TREX {
       void setAt(std::string location);
       void setGo(std::string origin, std::string destination);
 
-      std::list<TREX::transaction::token_id> m_pending;
-      UNIQ_PTR<TREX::transaction::token> m_state;
+      std::list<TREX::transaction::goal_id> m_pending;
+      UNIQ_PTR<TREX::transaction::Observation> m_state;
 
       /** @brief Name of the predicate At */
-      static TREX::utils::symbol const AtPred;
+      static TREX::utils::Symbol const AtPred;
       /** @brief Name of the predicate Go */
-      static TREX::utils::symbol const GoPred;
+      static TREX::utils::Symbol const GoPred;
 
       /** @brief Name of the Timeline AgentLocation */
-      static TREX::utils::symbol const AgentLocationObj;
+      static TREX::utils::Symbol const AgentLocationObj;
 
     };
 

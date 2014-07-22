@@ -51,7 +51,7 @@
 #include <cctype>
 #include <csignal>
 
-#include <trex/utils/trex_version.hh>
+#include <trex/utils/TREXversion.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/agent/StepClock.hh>
 
@@ -68,7 +68,7 @@ namespace pco=po::command_line_style;
 namespace {
 
   /** @brief entry point to TREX system log */
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
   UNIQ_PTR<Agent> my_agent;
 
@@ -125,7 +125,7 @@ namespace {
 
     if( !found ) {
       // try to add the .req extension
-      file = s_log->use(name+".req", found).string();
+      file = s_log->use(name+".req", found);
     } else {
       s_log->use(file, found);
     }
@@ -151,10 +151,10 @@ namespace {
 	  trex.sendRequests(config);
 	}
 	return true;
-      } catch(SYSTEM_ERROR const &se) {
-	s_log->syslog("sim", error)<<"Error while loading \""<<name<<"\":\n"
-                                  <<se.code()<<": "<<se.what();
-	std::cerr<<"error: "<<se.code()<<": "<<se.what()<<std::endl;
+      } catch(Exception const &te) {
+	s_log->syslog("sim", error)<<"TREX error while loading \""<<name
+				   <<"\": "<<te;
+	std::cerr<<"TREX error "<<te<<std::endl;
       } catch( std::exception const &e ) {
 	s_log->syslog("sim", error)<<"Exception while loading \""<<name
 				   <<"\": "<<e.what();
@@ -297,9 +297,9 @@ int main(int argc, char **argv) {
   
   // Initialize trex log path
   if( opt_val.count("log-dir") ) {
-    s_log->log_path(opt_val["log-dir"].as<std::string>());
+    s_log->setLogPath(opt_val["log-dir"].as<std::string>());
   } else // use default
-    s_log->log_path();
+    s_log->logPath();
   
   std::cout<<"This is TREX v"<<TREX::version::str()<<std::endl;
   
@@ -308,7 +308,7 @@ int main(int argc, char **argv) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
     for(std::vector<std::string>::const_iterator i=incs.begin();
         incs.end()!=i; ++i) {
-      if( s_log->add_search_path(*i) )
+      if( s_log->addSearchPath(*i) )
         s_log->syslog("sim", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
@@ -339,8 +339,8 @@ int main(int argc, char **argv) {
 	s_log->syslog("sim", info)<<"Mission completed.";
 	break;
       }
-      TICK tick = my_agent->current_tick();
-      std::cout<<'['<<my_agent->name()<<':'<<tick<<"]> ";
+      TICK tick = my_agent->getCurrentTick();
+      std::cout<<'['<<my_agent->getName()<<':'<<tick<<"]> ";
       std::string cmdString;
       std::cin>>cmdString;
      
@@ -350,26 +350,26 @@ int main(int argc, char **argv) {
 	s_log->syslog("sim", info)<<"User requested exit.";
 	break;
       } else if( 'N'==cmd ) {
-	while( my_agent->current_tick()==tick && !my_agent->missionCompleted() ) {
+	while( my_agent->getCurrentTick()==tick && !my_agent->missionCompleted() ) {
 	  my_agent->doNext();
           s_log->flush();
         }
       } else if( 'G'==cmd ) {
 	try {
-	  TICK targetTick = boost::lexical_cast<TICK>(cmdString.substr(1));
+	  TICK targetTick = string_cast<TICK>(cmdString.substr(1));
 	  
 	  if( targetTick<=tick )
 	    std::cout<<"Tick "<<targetTick<<" is in the past."
             // <<"\nYou can use W to wrap the agent to its initial tick."
             <<std::endl;
 	  else {
-	    while( my_agent->current_tick()<targetTick &&
+	    while( my_agent->getCurrentTick()<targetTick &&
                   !my_agent->missionCompleted() ) {
 	      my_agent->doNext();
               s_log->flush();
             }
 	  }
-	}catch(boost::bad_lexical_cast const &e) {
+	}catch(bad_string_cast const &e) {
 	  std::cout<<"Ill-formed g command"<<std::endl;
 	}
       } else if( 'P'==cmd ) {
@@ -404,9 +404,9 @@ int main(int argc, char **argv) {
 	printHelp();
       }
     }
-  } catch(SYSTEM_ERROR const &e) {
-    std::cerr<<"Caught an error: "<<e.code()<<": "<<e.what()<<std::endl;
-    s_log->syslog("sim", error)<<"Error caught:\n"<<e.code()<<": "<<e.what();
+  } catch(Exception const &e) {
+    std::cerr<<"Caught a TREX exception: "<<e<<std::endl;
+    s_log->syslog("sim", error)<<"Exception caught: "<<e;
     ret = -2;
   } catch(std::exception const &se) {
     std::cerr<<"Caught a C++ exception: "<<se.what()<<std::endl;

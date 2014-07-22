@@ -42,7 +42,7 @@
 # define H_trex_utils_log_entry
 
 # include "log_fwd.hh"
-# include <trex/config/memory.hh>
+# include "../platform/memory.hh"
 
 # include <boost/optional.hpp>
 
@@ -52,7 +52,7 @@ namespace TREX {
 
       /** @brief A log entry
        *
-       * This class is used to store and transfert log emssages entries.
+       * This class is used to stroe and transfert log emssages entries. 
        * It provides :
        * @li An optional date expressed as an integer
        * @li A source which describes the generator of this entry

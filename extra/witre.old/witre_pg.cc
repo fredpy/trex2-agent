@@ -38,17 +38,15 @@
 using namespace TREX::utils;
 using namespace TREX::witre;
 
-namespace tlog=TREX::utils::log;
-
 namespace {
-  singleton::use<log_manager> s_log;
-    reactor::declare<WitreServer> decl("WitreReactor");
+    SingletonUse<LogManager> s_log;
+    TeleoReactor::xml_factory::declare<WitreServer> decl("WitreReactor");
 }
 
 namespace TREX {
 
   void initPlugin() {
-    ::s_log->syslog("plugin.witre", tlog::info)<<"Witre loaded."<<std::endl;
+    ::s_log->syslog("plugin.witre", info)<<"Witre loaded."<<std::endl;
     // ::decl;
   }
 

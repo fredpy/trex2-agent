@@ -38,9 +38,8 @@ using namespace TREX::utils::log;
 
 // manipulators
 
-std::streamsize
-details::entry_sink::write(details::entry_sink::char_type const *s,
-                           std::streamsize n) {
+std::streamsize details::entry_sink::write(details::entry_sink::char_type const *s, 
+                                           std::streamsize n) {
   if( m_entry )
     return m_entry->write(s, n);
   return 0;

@@ -8,18 +8,18 @@
 #ifndef H_lsts_YESMAN
 #define H_lsts_YESMAN
 
-#include <trex/transaction/reactor.hh>
+#include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
 	namespace LSTS {
 
-		class YesMan :public TREX::transaction::reactor {
+		class YesMan :public TREX::transaction::TeleoReactor {
 		public:
-			YesMan(TREX::transaction::reactor::xml_arg_type arg);
+			YesMan(TREX::transaction::TeleoReactor::xml_arg_type arg);
 			virtual ~YesMan();
 		private:
 		      bool synchronize();
-		      void handle_request(TREX::transaction::token_id const &g);
+		      void handleRequest(TREX::transaction::goal_id const &g);
 		};
 	}
 }

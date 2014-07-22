@@ -42,7 +42,7 @@
 #ifndef H_LightSwitch
 # define H_LightSwitch
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   /** @brief lightswitch plug-in utilities
@@ -65,7 +65,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup lightswitch
      */
-    class Light :public TREX::transaction::reactor {
+    class Light :public TREX::transaction::TeleoReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -82,14 +82,14 @@ namespace TREX {
        * @li @c verbose is a boolean used to indicate whther we should 
        *     repeat the light state at every tick or not (default is @c false)
        */
-      Light(TREX::transaction::reactor::xml_arg_type arg);
+      Light(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Light();      
 
     private:
       bool synchronize();
-      void handle_request(TREX::transaction::token_id const &g);
-      void handle_recall(TREX::transaction::token_id const &g);
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void handleRecall(TREX::transaction::goal_id const &g);
 
       /** @brief State of the timeline */
       bool m_on, m_verbose;
@@ -99,24 +99,24 @@ namespace TREX {
 
       void setValue(bool val);
       
-      std::list<TREX::transaction::token_id> m_pending;
-      UNIQ_PTR<TREX::transaction::token> m_light_state;
+      std::list<TREX::transaction::goal_id> m_pending;
+      UNIQ_PTR<TREX::transaction::Observation> m_light_state;
 
       /** @brief Name of the predicate on */
-      static TREX::utils::symbol const onPred;
+      static TREX::utils::Symbol const onPred;
       /** @brief Name of the predicate off */
-      static TREX::utils::symbol const offPred;
+      static TREX::utils::Symbol const offPred;
       /** @brief Name of the predicate up */
-      static TREX::utils::symbol const upPred;
+      static TREX::utils::Symbol const upPred;
       /** @brief Name of the predicate down */
-      static TREX::utils::symbol const downPred;
+      static TREX::utils::Symbol const downPred;
       /** @brief Name of the predicate broken */
-      static TREX::utils::symbol const brokenPred;
+      static TREX::utils::Symbol const brokenPred;
 
       /** @brief Name of the timeline for light */
-      static TREX::utils::symbol const lightObj;
+      static TREX::utils::Symbol const lightObj;
       /** @brief Name of the timeline for light */
-      static TREX::utils::symbol const switchObj;
+      static TREX::utils::Symbol const switchObj;
     };
 
   }

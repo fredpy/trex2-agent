@@ -10,7 +10,7 @@
 
 # include <DUNE/DUNE.hpp>
 # include "../shared/ImcAdapter.hh"
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include "../shared/LstsReactor.hh"
 
@@ -24,7 +24,7 @@ namespace TREX {
     class PositionUpdater: public LstsReactor
     {
     public:
-      PositionUpdater(reactor::xml_arg_type arg);
+      PositionUpdater(TeleoReactor::xml_arg_type arg);
       virtual
       ~PositionUpdater();
 
@@ -34,8 +34,8 @@ namespace TREX {
       ImcAdapter m_adapter, m_discovery;
       std::map<std::string, Announce *> m_receivedAnnounces;
       bool synchronize();
-      void handle_init();
-      void handle_tick_start();
+      void handleInit();
+      void handleTickStart();
     };
   }
 }

@@ -16,12 +16,12 @@ namespace
 {
 
 	/** @brief SafetyBug reactor declaration */
-	reactor::declare<SafetyBug> decl("SafetyBug");
+	TeleoReactor::xml_factory::declare<SafetyBug> decl("SafetyBug");
 
 }
 
-SafetyBug::SafetyBug(TREX::transaction::reactor::xml_arg_type arg)
-:reactor(arg), aborted(false)
+SafetyBug::SafetyBug(TREX::transaction::TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg), aborted(false)
 {
 
 }
@@ -30,15 +30,17 @@ SafetyBug::~SafetyBug() {
 	// TODO Auto-generated destructor stub
 }
 
-void SafetyBug::new_plan_token(TREX::transaction::token_id const &g)
+void SafetyBug::newPlanToken(TREX::transaction::goal_id const &g)
 {
-  std::string gname = (g->object()).str();
-  std::string gpred = (g->predicate()).str();
+  Goal * goal = g.get();
+
+  std::string gname = (goal->object()).str();
+  std::string gpred = (goal->predicate()).str();
 
   syslog(utils::log::info) << "newPlanToken(" << gname << " , " << gpred << ")\n";
 }
 
-void SafetyBug::notify(TREX::transaction::token const &obs)
+void SafetyBug::notify(TREX::transaction::Observation const &obs)
 {
   if (obs.predicate() == "Failed" && !aborted)
   {

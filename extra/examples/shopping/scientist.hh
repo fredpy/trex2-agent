@@ -34,7 +34,7 @@
 #ifndef H_Scientist
 #define H_Scientist
 
-#include <trex/transaction/reactor.hh>
+#include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   /** @brief AgentLocation plug-in utilities
@@ -47,7 +47,7 @@ namespace TREX {
    */
   namespace Scientist {
 
-    class Scientist :public TREX::transaction::reactor {
+    class Scientist :public TREX::transaction::TeleoReactor {
     public:
       /** @brief XML constructor
        * @param arg An XML node definition
@@ -58,21 +58,21 @@ namespace TREX {
        * <Scientist name="<name>" latency="<int>" lookahead="<int>" />
        * @endcode
        */
-      Scientist(TREX::transaction::reactor::xml_arg_type arg);
+      Scientist(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~Scientist();
 
     private:
-      void handle_init();
+      void handleInit();
       bool synchronize();
 
       /** @brief Name of the timeline auv */
-      static TREX::utils::symbol const auv;
+      static TREX::utils::Symbol const auv;
       /** @brief Name of the predicate Sample */
-      static TREX::utils::symbol const Sample;
+      static TREX::utils::Symbol const Sample;
 
       /** @brief Name of the pred for Locations */
-      static TREX::utils::symbol const Objective;
+      static TREX::utils::Symbol const Objective;
       /** @brief Name of the Locations */
       static std::string const Vent1;
       static std::string const Vent2;

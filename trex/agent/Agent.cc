@@ -40,18 +40,16 @@
 
 #include "Agent.hh"
 
-#include <iostream>
 #include <iterator>
 #include <limits>
 
-#include <trex/utils/timing/chrono_helper.hh>
+#include <trex/utils/chrono_helper.hh>
 
 // #define below is needed in bosst 1.47 under xcode 4.2
 // overwise it fails to compile and get confused ???
 // #define BOOST_EXCEPTION_DISABLE
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/topological_sort.hpp>
-#include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/reverse_graph.hpp>
 
 #include <boost/thread.hpp>
@@ -207,7 +205,7 @@ namespace TREX {
 	  //   - inform him that a new tick has started
 	  //        this will result on dispatching its goals if possible
 	  if( is_valid(r,g) )
-	    if( !r->new_tick() )
+	    if( !r->newTick() )
               g.isolate(r);
 	}
 
@@ -292,7 +290,7 @@ namespace TREX {
          * by declaring the timeline @p name as @p type.
          */
         cycle_checker(graph::reactor_id const& goal, graph::reactor_id const& root, 
-                      Cycle_Type type, utils::symbol name="" )
+                      Cycle_Type type, utils::Symbol name="" )
         :root(root), node(goal), name(name), timelineType(type) {};
 
         /** @brief New reactor discovered 
@@ -313,15 +311,15 @@ namespace TREX {
             return;
 
           if(timelineType==internal) {
-            std::pair< TREX::transaction::reactor::external_iterator,
-            TREX::transaction::reactor::external_iterator > edges = boost::out_edges(r, g);
+            std::pair< TREX::transaction::TeleoReactor::external_iterator,
+            TREX::transaction::TeleoReactor::external_iterator > edges = boost::out_edges(r, g);
             
-            for(TREX::transaction::reactor::external_iterator temp = edges.first; temp!=edges.second; ++temp) {
+            for(TREX::transaction::TeleoReactor::external_iterator temp = edges.first; temp!=edges.second; ++temp) {
               if(temp->name()==name) {
                 std::stringstream msg;
                 
                 msg<<"Found a potential cycle going from ";
-                for(std::list<utils::symbol>::iterator it = path.begin(); it!=path.end(); it++) {
+                for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
                   msg<<"("<<*it<<")->";
                 }
                 msg<<"("<<name<<")";
@@ -361,7 +359,7 @@ namespace TREX {
             if(boost::target(rel, g)==node) {
               std::stringstream msg;
               msg<<"Found a potential cycle going from ("<<name<<")->";
-              for(std::list<utils::symbol>::iterator it = path.begin(); it!=path.end(); it++) {
+              for(std::list<utils::Symbol>::iterator it = path.begin(); it!=path.end(); it++) {
                 msg<<"("<<*it<<")->";
               }
               msg<<"("<<rel->name()<<")";
@@ -418,13 +416,13 @@ namespace TREX {
          *
          * The name of the timeline the reactor node attempts to declare
          */
-        utils::symbol name;
+        utils::Symbol name;
         /** @brief current timelines path
          *
          * The list of all the timlines currently traversed by the search. 
          * If a cycle is detected this path describes it.
          */
-        std::list<utils::symbol> path;
+        std::list<utils::Symbol> path;
         /** @brief Type of attempted connection
          */
         Cycle_Type timelineType;
@@ -435,20 +433,23 @@ namespace TREX {
   }
 }
 
+AgentException::AgentException(graph const &agent, std::string const &msg) throw()
+  :GraphException(agent, msg) {}
+
 /*
  * class TREX::agent::Agent
  */
 
 // static
 
-TICK Agent::initial_tick(clock_ref clk) {
+TICK Agent::initialTick(clock_ref clk) {
   return clk?clk->initialTick():0;
 }
 
 // structors :
 
-Agent::Agent(symbol const &name, TICK final, clock_ref clk, bool verbose)
-  :graph(name, initial_tick(clk), verbose),
+Agent::Agent(Symbol const &name, TICK final, clock_ref clk, bool verbose)
+  :graph(name, initialTick(clk), verbose),
    m_stat_log(manager().service()), m_clock(clk), m_finalTick(final), m_valid(true) {
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
@@ -457,14 +458,14 @@ Agent::Agent(symbol const &name, TICK final, clock_ref clk, bool verbose)
 Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 :m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  update_tick(initial_tick(m_clock), false);
+  updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
     loadConf(file_name);
-  } catch(SYSTEM_ERROR const &e) {
-    syslog(null, error)<<"Error caught while loading "<<file_name<<":\n"
-		       <<e.code()<<": "<<e.what();
+  } catch(TREX::utils::Exception const &e) {
+    syslog(null, error)<<"Exception caught while loading "<<file_name<<":\n"
+		       <<e;
     throw;
   } catch(std::exception const &se) {
     syslog(null, error)<<"C++ exception caught while loading "
@@ -481,14 +482,14 @@ Agent::Agent(std::string const &file_name, clock_ref clk, bool verbose)
 Agent::Agent(boost::property_tree::ptree::value_type &conf, clock_ref clk, bool verbose)
   :m_stat_log(manager().service()), m_clock(clk), m_valid(true) {
   set_verbose(verbose);
-  update_tick(initial_tick(m_clock), false);
+  updateTick(initialTick(m_clock), false);
   m_proxy = new AgentProxy(*this);
   add_reactor(m_proxy);
   try {
     loadConf(conf);
-  } catch(SYSTEM_ERROR const &e) {
-    syslog(null, error)<<"Error caught while loading XML:\n"
-                       <<e.code()<<": "<<e.what();
+  } catch(TREX::utils::Exception const &e) {
+    syslog(null, error)<<"Exception caught while loading XML:\n"
+		       <<e;
     throw;
   } catch(std::exception const &se) {
     syslog(null, error)<<"C++ exception caught while loading XML:\n"
@@ -523,7 +524,7 @@ bool Agent::missionCompleted() {
     syslog(null, info)<<"No reactor left.";
     return true;
   }
-  return current_tick()>m_finalTick;
+  return getCurrentTick()>m_finalTick;
 }
 
 void Agent::internal_check(reactor_id r,
@@ -575,7 +576,7 @@ void Agent::external_check(reactor_id r,
 bool Agent::setClock(clock_ref clock) {
   if( NULL==m_clock ) {
     m_clock = clock;
-    update_tick(initial_tick(m_clock), false);
+    updateTick(initialTick(m_clock), false);
     return true;
   } else {
     // delete clock;
@@ -617,7 +618,7 @@ void Agent::loadPlugin(boost::property_tree::ptree::value_type &pg,
 void Agent::subConf(boost::property_tree::ptree &conf, 
                     std::string const &path) {
   boost::property_tree::ptree::assoc_iterator i, last;
-  singleton::use<Clock::xml_factory> clk_f;
+  SingletonUse<Clock::xml_factory> clk_f;
   
   if( path.empty() ) {
     // On the root we need to load plug-ins before the clock 
@@ -675,23 +676,27 @@ void Agent::subConf(boost::property_tree::ptree &conf,
 
 void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
   if( !is_tag(config, "Agent") )
-    throw boost::property_tree::ptree_bad_data("Not an Agent node", config);
+    throw XmlError(config, "Not an Agent node");
   // Extract attributes
-  symbol name(parse_attr<std::string>(config, "name"));
+  try {
+    Symbol name(parse_attr<std::string>(config, "name"));
 
-  if( name.empty() )
-    throw boost::property_tree::ptree_bad_data("Agent name is empty.", config);
-  set_name(name);
+    if( name.empty() )
+      throw XmlError(config, "Agent name is empty.");
+    set_name(name);
     
-  m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
-  if( m_finalTick<=0 )
-    throw boost::property_tree::ptree_bad_data("agent life time should be greater than 0", config);
+    m_finalTick = parse_attr<TICK>(std::numeric_limits<TICK>::max(), config, "finalTick");
+    if( m_finalTick<=0 )
+      throw XmlError(config, "agent life time should be greater than 0");
+  } catch(bad_string_cast const &e) {
+    throw XmlError(config, e.what());
+  }
   // Populate with external configuration
   ext_xml(config.second, "config");
 
   // Now iterate through the sub-tags
   if( config.second.empty() )
-    throw boost::property_tree::ptree_bad_data("Agent node does not have sub nodes.", config);
+    throw XmlError(config, "Agent node does not have sub nodes.");
 
   subConf(config.second, "");
   syslog(null, info)<<"End of init.";
@@ -699,24 +704,21 @@ void Agent::loadConf(boost::property_tree::ptree::value_type &config) {
 
 void Agent::loadConf(std::string const &file_name) {
   bool found;
-  std::string name = manager().use(file_name, found).string();
+  std::string name = manager().use(file_name, found);
   if( !found ) {
-    name = manager().use(file_name+".cfg", found).string();
-    if( !found ) {
-      ERROR_CODE ec = make_error_code(ERRC::no_such_file_or_directory);
-    
-      throw SYSTEM_ERROR(ec, "Unable to locate "+file_name);
-    }
+    name = manager().use(file_name+".cfg", found);
+    if( !found )
+      throw ErrnoExcept("Unable to locate "+file_name);
   }
   boost::property_tree::ptree agent;
   read_xml(name, agent, xml::no_comments|xml::trim_whitespace);
 
   if( agent.empty() )
-    throw std::runtime_error(std::string("Configuration file : \"")+
-                            file_name+"\" is empty.");
+    throw TREX::utils::Exception(std::string("Configuration file : \"")+
+				 file_name+"\" is empty.");
   if( agent.size()!=1 )
-    throw std::runtime_error(std::string("Configuration file : \"")+
-                            file_name+"\" have multiple roots.");
+    throw TREX::utils::Exception(std::string("Configuration file : \"")+
+				 file_name+"\" have multiple roots.");
   loadConf(agent.front());
 }
 
@@ -729,13 +731,11 @@ std::list<Agent::reactor_id> Agent::init_dfs_sync() {
 
 
 void Agent::initComplete() {
-  if( name().empty() )
-    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_graph),
-                       "Agent has no name :"
-                        " You probably forgot to initialize it.");
+  if( getName().empty() )
+    throw AgentException(*this, "Agent has no name :"
+			 " You probably forgot to initialize it.");
   if( NULL==m_clock )
-    throw SYSTEM_ERROR(graph_error_code(graph_error::invalid_graph),
-                       "Agent is not connected to a clock");
+    throw AgentException(*this, "Agent is not connected to a clock");
   
   details::sync_scheduller::reactor_queue queue;
   boost::function<details::init_visitor::reactor_queue ()>
@@ -752,7 +752,7 @@ void Agent::initComplete() {
     
 //    std::cerr<<r->getName()<<".initialize("<<m_finalTick<<")."<<std::endl;
     if( !r->initialize(m_finalTick) ) {
-      syslog(null, error)<<r->name()<<" failed to initialize";
+      syslog(null, error)<<r->getName()<<" failed to initialize";
       kill_reactor(r);
       ++n_failed;
     }
@@ -775,10 +775,10 @@ void Agent::initComplete() {
 
 
   // Create initial graph file
-  log_manager::path_type graph_dot = manager().log_file("reactors.gv");
+  LogManager::path_type graph_dot = manager().file_name("reactors.gv");
   async_ofstream dotf(manager().service(), graph_dot.string());
   
-  m_stat_log.open(manager().log_file("agent_stats.csv").c_str());
+  m_stat_log.open(manager().file_name("agent_stats.csv").c_str());
   m_stat_log<<"tick, synch_ns, synch_rt_ns,"
     " delib_ns, delib_rt_ns, delib_steps,"
   " planned_sleep, sleep_cnt, sleep_ns\n";
@@ -801,7 +801,7 @@ void Agent::initComplete() {
   syslog(null, TREX::utils::log::info)<<"Final tick: "<<date_str(m_finalTick)
     <<" ("<<m_finalTick<<").";
   syslog(null, "START")<<"\t=========================================================";
-  update_tick(m_clock->tick());
+  updateTick(m_clock->tick());
 }
 
 void Agent::run() {
@@ -831,7 +831,7 @@ void Agent::synchronize() {
 
   stat_clock::duration delta;
   rt_clock::duration delta_rt;
-  TICK const now = current_tick();
+  TICK const now = getCurrentTick();
   
   {
     utils::chronograph<rt_clock> rt_chron(delta_rt);
@@ -851,8 +851,8 @@ void Agent::synchronize() {
         reactor_id r = queue.front();
         queue.pop_front();
         // synchronization
-        if( r->do_synchronize() ) {
-          double wr = r->work_ratio();
+        if( r->doSynchronize() ) {
+          double wr = r->workRatio();
 
           if( !std::isnan(wr) ) {
             // this reactor has deliberation :
@@ -875,7 +875,7 @@ void Agent::synchronize() {
     std::ostringstream name;
     name<<"reactors."<<now<<".gv";
     
-    log_manager::path_type graph_dot = manager().log_file(name.str());
+    LogManager::path_type graph_dot = manager().file_name(name.str());
     async_ofstream dotf(manager().service(), graph_dot.string());
     
     {
@@ -888,7 +888,7 @@ void Agent::synchronize() {
 }
 
 bool Agent::executeReactor() {
-  symbol id = null;
+  Symbol id = null;
   
   if( m_edf.empty() )
     return false;
@@ -900,7 +900,7 @@ bool Agent::executeReactor() {
     m_edf.erase(m_edf.begin());
     m_idle.push_back(r);
     try {
-      id = r->name();
+      id = r->getName();
       r->step();
       
       std::list<reactor_id>::iterator i = m_idle.begin();
@@ -908,7 +908,7 @@ bool Agent::executeReactor() {
       while( m_idle.end()!=i ) {
         // Check if the reactor is still valid 
         if( is_member(*i) ) {
-          wr = (*i)->work_ratio();
+          wr = (*i)->workRatio();
           if( !std::isnan(wr) ) {
             m_edf.insert(std::make_pair(wr, *i));
             i = m_idle.erase(i);
@@ -917,8 +917,10 @@ bool Agent::executeReactor() {
         } else 
           i = m_idle.erase(i);
       }
+    } catch(Exception const &e) {
+      syslog(id, warn)<<"Exception caught while executing reactor step:\n"<<e;
     } catch(std::exception const &se) {
-      syslog(id, warn)<<"Exception caught while executing reactor step:\n"
+      syslog(id, warn)<<"C++ exception caught while executing reactor step:\n"
 			<<se.what();      
     } catch(...) {
       syslog(id, warn)<<"Unknown exception caught while executing reactor step.";
@@ -935,7 +937,7 @@ bool Agent::doNext() {
     return false;
   }
   synchronize();
-  TICK const now = current_tick();
+  TICK const now = getCurrentTick();
   
   size_t count = 0; //slp_count = 0;
   bool completed = false;
@@ -972,9 +974,9 @@ bool Agent::doNext() {
     
     
     if( valid() )
-      update_tick(m_clock->tick());
+      updateTick(m_clock->tick());
   } catch(Clock::Error const &err) {
-    syslog(null, error)<<"error from the clock: "<<err.what();
+    syslog(null, error)<<"error from the clock: "<<err;
     m_valid = false;
   }
   if( print_delib )
@@ -984,11 +986,11 @@ bool Agent::doNext() {
   return valid();
 }
 
-void Agent::sendRequest(token_id const &g) {
+void Agent::sendRequest(goal_id const &g) {
   if( !has_timeline(g->object()) )
     syslog(null, warn)<<"Posting goal on a unknnown timeline \""
 		      <<g->object()<<"\".";
-  m_proxy->post_request(g);
+  m_proxy->postRequest(g);
 }
 
 size_t Agent::sendRequests(boost::property_tree::ptree &g) {

@@ -40,54 +40,19 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 namespace {
-  
-  /** @brief Convert domain to XML
-   *
-   * @tparam Obj The domain type
-   *
-   * @param[in] dom A domain
-   *
-   * Print the domain @p dom into its XML form
-   *
-   * @return The xml representation of @p dom
-   *
-   * @sa json_str
-   */
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.to_xml(oss);
+    dom.toXml(oss);
     return oss.str();
   }
 
-  /** @brief Convert domain to JSON
-   *
-   * @tparam Obj The domain type
-   *
-   * @param[in] dom A domain
-   *
-   * Print the domain @p dom into its JSON form
-   *
-   * @return The JSON representation of @p dom
-   *
-   * @sa xml_str
-   */
   template<class Obj>
   std::string json_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.to_json(oss);
+    dom.toJSON(oss);
     return oss.str();
   }
-  /** @brief Print A domain value
-   *
-   * @tparam Obj A domain type
-   *
-   * @param[in] dom A domain
-   *
-   * Print the value of @p dom into a human readable string 
-   *
-   * @return A string representing the value of @p dom
-   */
   template<class Obj>
   std::string str_impl(Obj const &dom) {
     std::ostringstream oss;
@@ -95,31 +60,12 @@ namespace {
     return oss.str();
   }
 
-  /** @brief Predicate deserialization
-   *
-   * @param decl A ptree serialization for a predicate
-   *
-   * Parse the tree @pred ato create the corresponding predicate instance
-   *
-   * @return A predicate correspinding to the description in @p pred
-   */
-  token_id pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::singleton::use<token::factory> fact;
+  boost::shared_ptr<Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
+    TREX::utils::SingletonUse<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
 }
 
-/** @brief Python declaration for trex.transaction module
- *
- * This function populates the python namespace trex.transaction with 
- * several classes and utilities corresponding to the TREX::transaction 
- * C++ namespace. It includes the following:
- * @li predicate A trex predicate
- * @li obs A trex observation (extends predicate)
- * @li goal A trex goal (extends predicate)
- * @li tick A trex tick date
- * @li graph A reactor transaction graph
- */
 void export_transactions() {
   // Setup my submodule
   bp::object module(bp::handle<>(bp::borrowed(PyImport_AddModule("trex.transaction"))));
@@ -127,8 +73,8 @@ void export_transactions() {
   bp::scope my_scope = module;
   // from now on everything is under trex.transaction
   
-  void (token::* attr_1)(var const &) = &token::restrict_attribute;
-  void (token::* attr_2)(symbol const &, abstract_domain const &) = &token::restrict_attribute;
+  void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
+  void (Predicate::* attr_2)(Symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
   
   /*
    * class predicate:
@@ -141,19 +87,40 @@ void export_transactions() {
    *    - restrict(self, var)
    *    - restrict(self, name, domain)
    */
-  bp::class_<token, boost::shared_ptr<token>, boost::noncopyable>
-  ("token", "trex timeline predicate", bp::no_init)
-  .add_property("object", bp::make_function(&token::object, bp::return_internal_reference<>()))
-  .add_property("name", bp::make_function(&token::predicate, bp::return_internal_reference<>()))
-  .def("has_attribute", &token::has_attribute, (bp::arg("name")))
-  .def("attribute", &token::attribute, bp::return_internal_reference<>(), (bp::arg("name")))
+  bp::class_<Predicate, boost::shared_ptr<Predicate>, boost::noncopyable>
+  ("predicate", "trex timeline predicate", bp::no_init)
+  .add_property("object", bp::make_function(&Predicate::object, bp::return_internal_reference<>()))
+  .add_property("name", bp::make_function(&Predicate::predicate, bp::return_internal_reference<>()))
+  .def("has_attribute", &Predicate::hasAttribute, (bp::arg("name")))
+  .def("attribute", &Predicate::getAttribute, bp::return_internal_reference<>(), (bp::arg("name")))
   .def("restrict", attr_1, (bp::arg("var")))
   .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
-  .def("xml", &xml_str<token>)
-  .def("json", &json_str<token>)
+  .def("xml", &xml_str<Predicate>)
+  .def("json", &json_str<Predicate>)
   .def("from_xml", &pred_factory).staticmethod("from_xml");
   ;
   
+  
+  /*
+   * class obs(predicate):
+   *  methods
+   *    - __init__(self, predicate)
+   *    - __init__(self, symbol, symbol)
+   */
+  bp::class_<Observation, observation_id, bp::bases<Predicate> >
+  ("obs", "trex observation", bp::init<Predicate const &>(bp::args("pred"), "Convert pred into an observation"))
+  .def(bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+                                "Create new observation pred on timeline"))
+  ;
+  
+  /*
+   * class goal(predicate):
+   *  methods
+   *    - __init__(self, symbol, symbol)
+   */
+  bp::class_<Goal, goal_id, bp::bases<Predicate> >
+  ("goal", "trex goal", bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+                                                 "Create new goal pred on timeline"));
 
   
   bp::class_<TICK, boost::noncopyable>("tick", "trex tick date", bp::init<>())
@@ -174,11 +141,11 @@ void export_transactions() {
   
   
   
-  c_graph.def("name", &graph::name, bp::return_internal_reference<>())
+  c_graph.def("name", &graph::getName, bp::return_internal_reference<>())
   .add_property("empty", &graph::empty)
   .add_property("reactors_count", &graph::count_reactors)
   .add_property("relations_count", &graph::count_relations)
-  .add_property("current_tick", &graph::current_tick, "current tick date")
+  .add_property("current_tick", &graph::getCurrentTick, "current tick date")
   .def("date_str", &graph::date_str, "convert a tick into a date string")
   ;
 
@@ -220,7 +187,7 @@ namespace {
   
   
   boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::singleton::use<tt::Predicate::xml_factory> fact;
+    TREX::utils::SingletonUse<tt::Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
   

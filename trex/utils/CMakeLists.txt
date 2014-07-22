@@ -33,65 +33,80 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-# Check for dynamic load functions
+configure_file(platform/bits/cpp11.hh.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
+  DESTINATION include/trex/utils/platform/bits
+)
 
-configure_file(generated/dl_info.hh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/private/dl_info.hh)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
+option(ASIO_DEBUG "enable debug of asio" OFF)
+mark_as_advanced(ASIO_DEBUG)
+
+configure_file(bits/asio_conf.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh)
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
+  DESTINATION include/trex/utils/bits
+)
+
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+
+
 
 add_library(TREXutils SHARED
   # real source
-  factory_error.cc
-  log_manager.cc
-  private/log_mgmt_impl.cc
-  private/platform/${DL_TYPE}/dl_func.cc
-  plugin_loader.cc
-  trex_version.cc
-  xml_utils.cc
+  ErrnoExcept.cc
+  Exception.cc
+  LogManager.cc
+  Pdlfcn.cc
+  PluginLoader.cc
+  SingletonDummy.cc
+  SingletonServer.cc
+  TREXversion.cc
+  XmlUtils.cc
   ptree_io.cc
-  priority_strand.cc
-  private/priority_strand_impl.cc
   asio_runner.cc
   asio_fstream.cc
-  private/async_ofstream_impl.cc
   log/entry.cc
   log/text_log.cc
-  singleton/dummy.cc
-  singleton/server.cc
-  timing/cpu_clock.cc
-  timing/posix_utils.cc
+  cpu_clock.cc
   # headers
-  priority_strand.hh
-  private/priority_strand_impl.hh
   asio_fstream.hh
-  private/async_ofstream_impl.hh
   asio_signal.hh
+  asio_signal_n.hh
   asio_signal_fwd.hh
-  bits/asio_signal_n.hh
-  bits/stranded_service.hh
-  bits/async_result.hh
   bits/asio_signal_base.hh
   bits/asio_signal_iter.hh
-  bits/asio_signal_cpp11.hh
   bits/asio_signal_template.hh
-  factory_error.hh
-  generic_factory.hh
+  chrono_helper.hh
+  ErrnoExcept.hh
+  Exception.hh
+  Factory.hh
+  Hashable.hh
   id_mapper.hh
-  log_manager.hh
-  private/log_mgmt_impl.hh
+  IOstreamable.hh
+  LogManager.hh
   Plugin.hh
-  plugin_loader.hh
-  private/dl_func.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/private/dl_info.hh
-  private/platform/${DL_TYPE}/dl_func.hh
-  shared_var.hh
-  symbol.hh
-  basic_symbol.hh
-  trex_version.hh
-  xml_factory.hh
-  xml_utils.hh
+  PluginLoader.hh
+  SharedVar.hh
+  SingletonUse.hh
+  bits/SingletonDummy.hh
+  bits/SingletonServer_fwd.hh
+  bits/SingletonWrapper.hh
+  StringExtract.hh
+  Symbol.hh
+  tick_clock.hh
+  TimeUtils.hh
+  TREXversion.hh
+  XmlFactory.hh
+  XmlUtils.hh
   ptree_io.hh
   asio_runner.hh
+  cpu_clock.hh
   log/log_fwd.hh
   log/entry.hh
   log/stream.hh
@@ -100,35 +115,108 @@ add_library(TREXutils SHARED
   log/text_log.hh
   log/out_file.hh
   log/log_pipe.hh
-  singleton.hh
-  singleton/use.hh
-  singleton/bits/dummy.hh
-  singleton/bits/server_fwd.hh
-  singleton/bits/wrapper.hh
-  singleton/private/server.hh
-  timing/chrono_helper.hh
-  timing/cpu_clock.hh
-  timing/tick_clock.hh
-  timing/posix_utils.hh
-  timing/bits/asio_tick_timer.hh
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
+  # platform specific information
+  platform/chrono.hh 
+  platform/memory.hh
+  platform/cpp11_deleted.hh
   # template source code
-  bits/priority_strand.tcc
-  bits/generic_factory.tcc
-  singleton/bits/use.tcc
-  singleton/bits/wrapper.tcc
-  bits/basic_symbol.tcc
-  bits/xml_factory.tcc
+  bits/Factory.tcc
+  bits/SingletonUse.tcc
+  bits/SingletonWrapper.tcc
+  bits/Symbol.tcc
+  bits/XmlFactory.tcc
+)
+
+if(TREX_FROM_PKG)
+  # svn data is given by the package
+  set(SVN_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh)
+
+  if(EXISTS ${SVN_HH})
+    include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
+    add_definitions(-DWITH_SVN_TRACK)
+  endif()
+else(TREX_FROM_PKG)
+ # I need to generate the file
+
+ option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
+ mark_as_advanced(WITH_SVN_TRACK)
+
+ if(WITH_SVN_TRACK)
+    set(SVN_HH svn/version.hh)
+    add_custom_target(svnheader ALL 
+      DEPENDS ${SVN_HH})
+    add_dependencies(trex_prep svnheader)
+
+    # this run my svn script
+    add_custom_command(OUTPUT ${SVN_HH}
+      PRE_BUILD
+      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
+      -DOUTPUT_DIR=${TREX_EXTRA_DIR}
+      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
+    
+    include_directories(${TREX_EXTRA_DIR})
+    set_source_files_properties(${SVN_HH}
+      PROPERTIES GENERATED TRUE
+     # HEADER_FILE_ONLY TRUE
+     LOCATION ${TREX_EXTRA_DIR}
+     )
+
+    add_dependencies(TREXutils svnheader)
+
+    set_source_files_properties(TREXversion.cc
+      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${SVN_HH})
+    add_definitions(-DWITH_SVN_TRACK)
+ endif(WITH_SVN_TRACK)
+endif(TREX_FROM_PKG)
+
+# map ditectory structure for XCode 
+source_group("Source\ Files\\log" FILES 
+  log/entry.cc
+  log/text_log.cc
+)
+
+source_group("Header\ Files\\bits" FILES 
+  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
+  bits/asio_signal_base.hh
+  bits/asio_signal_iter.hh
+  bits/asio_signal_template.hh
+  bits/SingletonDummy.hh
+  bits/SingletonServer_fwd.hh
+  bits/SingletonWrapper.hh
+)
+
+source_group("Header\ Files\\platform" FILES
+  platform/chrono.hh 
+  platform/memory.hh
+  platform/cpp11_deleted.hh
+)
+
+source_group("Header\ Files\\log" FILES 
+  log/log_fwd.hh
+  log/entry.hh
+  log/stream.hh
+  log/text_log.hh
+  log/out_file.hh
+  log/log_pipe.hh
+)
+
+source_group("Header\ Files\\log\\bits" FILES 
+  log/bits/log_stream.hh
+  log/bits/log_sig.hh
+)
+
+source_group("Template Files\\bits" FILES  
+  bits/Factory.tcc
+  bits/SingletonUse.tcc
+  bits/SingletonWrapper.tcc
+  bits/Symbol.tcc
+  bits/XmlFactory.tcc
 )
 
 add_dependencies(core TREXutils)
-add_dependencies(TREXutils TREXconfig)
-set_source_files_properties(trex_version.cc
-  PROPERTIES OBJECT_DEPENDS 
-    ${CMAKE_BINARY_DIR}/trex/config/bits/svn/version.hh)
-
-
-
-target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
+target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
   ${Boost_FILESYSTEM_LIBRARY} 
   ${Boost_SYSTEM_LIBRARY}
   ${CHRONO_LIB}
@@ -136,7 +224,7 @@ target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}
   ${Boost_THREAD_LIBRARY})
 trex_lib(TREXutils core)
 
-set_property(SOURCE private/Pdlfcn.cc 
+set_property(SOURCE Pdlfcn.cc 
   PROPERTY COMPILE_DEFINITIONS SUFSHARE="${CMAKE_SHARED_LIBRARY_SUFFIX}")
 
 install(DIRECTORY . DESTINATION include/trex/utils
