@@ -31,62 +31,60 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_transaction_private_external_impl
-# define H_trex_transaction_private_external_impl
+#ifndef H_trex_transaction_private_external_handler
+# define H_trex_transaction_private_external_handler
 
-# include "internal_impl.hh"
+# include "external_impl.hh"
+# include <boost/thread/shared_mutex.hpp>
 
 namespace TREX {
   namespace transaction {
     namespace details {
-      
-      class external_impl :boost::noncopyable,
-      public ENABLE_SHARED_FROM_THIS<external_impl> {
+
+      struct ext_cmp {
+        bool operator()(SHARED_PTR<external_impl> const &a,
+                        SHARED_PTR<external_impl> const &b) const {
+          return a->name()<b->name();
+        }
+      };
+
+      class external_handler {
       public:
-        external_impl(SHARED_PTR<node_impl>     const &cli,
-                      SHARED_PTR<internal_impl> const &tl,
-                      transaction_flags gp);
-        ~external_impl();
+        explicit external_handler();
+        ~external_handler();
         
-        void g_strand_connect();
+        bool r_queue_tick(date_type date);
+        bool r_queue_synchronized(date_type date, bool &changed);
         
-        utils::symbol const &name() const {
-          return m_timeline->name();
-        }
-        bool accept_goals() const;
-        bool publish_plan() const;
-        date_type latency() const {
-          return m_timeline->latency();
-        }
-        date_type lookahead() const {
-          return m_timeline->lookahead();
-        }
-        boost::optional<date_type> now() const {
-          return m_timeline->now();
-        }
-        boost::optional<date_type> last_synch() const {
-          return m_timeline->last_synch();
-        }
-        utils::log::stream syslog(utils::symbol const &kind) const;
-        token_ref goal(utils::symbol const &pred) const;
+        bool should_synch() const;
+        
+        boost::optional<date_type> initial() const;
+        boost::optional<date_type> synch_date() const;
+        boost::optional<date_type> next_synch() const;
+        boost::optional<date_type> synch_target() const;
+        boost::optional<date_type> ext_date()   const;
+        boost::optional<date_type> graph_date() const;
+        
+        bool external(utils::symbol const &tl) const;
+        
+        bool empty() const;
+        bool insert(SHARED_PTR<external_impl> const &tl);
+        bool update(utils::symbol const &tl, date_type tick,
+                    ERROR_CODE &ec);
+        
+        void clear();
         
       private:
-        WEAK_PTR<node_impl>       m_client;
-        SHARED_PTR<internal_impl> const m_timeline;
+        typedef std::map<SHARED_PTR<external_impl>,
+                         boost::optional<date_type>, ext_cmp> tl_map;
         
         mutable boost::shared_mutex m_mtx;
-        transaction_flags           m_gp;
-        boost::optional<date_type>  m_last_tick;
-        token_id                    m_state;
-        
-        void g_strand_obs(boost::signals2::connection const &c,
-                          date_type tick, token_id obs);
-        
-      }; // TREX::transaction::details::external_impl
-      
+        boost::optional<date_type> m_initial, m_synch, m_ext, m_graph;
+        tl_map    m_externals;
+      };
       
     } // TREX::transaction::details
   } // TREX::transaction
 } // TREX
 
-#endif // H_trex_transaction_private_external_impl
+#endif // H_trex_transaction_private_external_handler

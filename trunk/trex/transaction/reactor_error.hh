@@ -46,7 +46,8 @@ namespace TREX {
         failed_to_synchronize = 1,
         unexpected_exception,
         configuration_error,
-        not_in_graph
+        not_in_graph,
+        not_external
       }; // TREX::transaction::reactor_error::reactor_error_t
       
     } // TREX::transaction::reactor_error

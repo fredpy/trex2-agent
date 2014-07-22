@@ -35,6 +35,8 @@
 # define H_trex_transaction_graph_impl
 
 # include "../bits/transaction_fwd.hh"
+# include "../bits/reactor_policies.hh"
+# include "../Tick.hh"
 
 # include <trex/utils/log_manager.hh>
 # include <boost/thread/shared_mutex.hpp>
@@ -44,209 +46,73 @@
 namespace TREX {
   namespace transaction {
     namespace details {
-      
-      
-      /** @brief Transaction graph
-       *
-       * This class implement the graph used by T-REX to manage 
-       * transaction between each reactors through timelines.
-       *
-       * It handle the creation and lifetime of a reactor along 
-       * with its connection with other reactors through 
-       * timelines. This is the new implementation with a more 
-       * asynchronous approach than what was doe up to T-REX v 
-       * 0.5.x
-       *
-       * @note This implementation is private and is not meant to 
-       * be used directly outiside of libTREXtransaction.
-       *
-       * @author Frederic Py <fredpy@gmail.com>
-       */
+        
       class graph_impl :boost::noncopyable,
       public ENABLE_SHARED_FROM_THIS<graph_impl> {
       public:
-        /** @brief Default constructor
-         *
-         * Create a new nameless graph.
-         */
-        graph_impl();
-        /** @brief Destructor 
-         */
+        explicit graph_impl(utils::symbol const &name);
         ~graph_impl();
         
-        /** @brief Set graph name
-         *
-         * @param[in] name A name
-         *
-         * Set this graph's name to @p name
-         *
-         * @return The updated name of the graph
-         *
-         * @sa graph_impl::name() const
-         */
-        utils::symbol const &set_name(utils::symbol const &name);
-        /** @brief Get graph name
-         *
-         * @return The name of the graph
-         *
-         * @sa graph_impl::set_name(utils::symbol const &)
-         */
-        utils::symbol const &name() const;
-        
-        /** @brief Get log manager
-         *
-         * Give acces to the log_manager instance for this graph
-         *
-         * @return The log_manager for this graph
-         *
-         * @note The class log_manager being tha singleton this 
-         * instance is the same for any existing graphs within 
-         * the same program.
-         */
-        utils::log_manager &manager() const;
-        
-        /** @rbief Update current tick
-         *
-         * @param[in] date A tick value
-         *
-         * Notify the class that the new desired tick value is 
-         * @p date. This call just scheudlle the update of the 
-         * date and is not guaranteed to be immediately effective 
-         * after completion. 
-         *
-         * Indeed, the update is just schedulled asynchronously and
-         * will happen only when the thread schedulling can allow it. 
-         * Additionally, the update of the clock can occur if and 
-         * only if @p date is not less or equal to the previous tick 
-         * date
-         *
-         * @sa date(bool) const
-         */
-        void set_date(date_type const &date);
-        /** Get current tick date
-         *
-         * @param fast fast access flag
-         *
-         * Gather the current tick date. The @p fast flag indicate 
-         * whether this access should wait for all previous updates 
-         * to be done or just directly access the current date value 
-         * with faster but less accurate result.
-         *
-         * For example the @c syslog method gather the date ussettinc @p fast
-         * to @c true. As the date for logging is not necessarily critical
-         * and we do not want the logging to block the rest of the execution.
-         *
-         * @return The current tick date if any
-         *
-         * @sa set_date(date_type const &)
-         */
-        boost::optional<date_type> date(bool fast=false) const;
-        
-        /** @brief Create new log entry
-         *
-         * @param[in] ctx  Log context (or source)
-         * @param[in] kind Log message type
-         *
-         * Create a new log entry to be logged to TREX.log
-         *
-         * @return The stream for the new log entry
-         */
-        utils::log::stream syslog(utils::symbol const &ctx,
-                                  utils::symbol const &kind) const;
-        
-        /** @brief Create new node
-         *
-         * @param[in] desired_name Node name
-         *
-         * Create and add an  new node to this graph named @p name.
-         *
-         * A node is the connection of a reactor to its graph and handle 
-         * all the transaction of this reactor. This include: 
-         * @li its internal timelines
-         * @li its external timelines
-         * @li the current tick date
-         * @li all transaction (ie observations, goal request/recalls, ...)
-         * with other nodes
-         *
-         * @return A reference to the newly created node
-         *
-         * @note while up to version 0.5.x T-REX did not allow for 
-         *       multiple reactors with the same name, this is not
-         *       the case anymore: at the current stage the graph 
-         *       will allow multiples reactors with same name and 
-         *       we plan for the future to dynamically rename 
-         *       duplicate names.
-         */
-        WEAK_PTR<node_impl> add_node(utils::symbol const &desired_name);
-        
-        WEAK_PTR<internal_impl> get_tl(utils::symbol const &tl) {
-          return declare_tl(tl, SHARED_PTR<node_impl>(),
-                            transaction_flags());
+        utils::symbol const &name() const {
+          return m_name;
         }
-        WEAK_PTR<internal_impl> declare_tl(utils::symbol const &tl,
-                                           SHARED_PTR<node_impl> const &n,
-                                           transaction_flags const &fl);
-        
-        /** @brtief Remove a node for the graph
-         *
-         * @param[in] n A node
-         *
-         * Remove @p n for this graph and notifes it that no longer 
-         * belongs to a graph.
-         */
-        void rm_node(WEAK_PTR<node_impl> n);
-        
-        /** @brief Transaction pseudo thread
-         *
-         * The execution thread used to manage transaction operation 
-         * for this graph. This is implemented as a boost.asio strand 
-         * to which one can post new tasks that will be executed in 
-         * sequence as they are posted.
-         *
-         * This thread is used for all transactions operations of this 
-         * graph  which include:
-         * @li Update of the graph structure 
-         * @li Communication through edges (observations, goal requests/recalls)
-         * @li Tick updates from the clock
-         *
-         * @return The strand used by this graph for transaction operation
-         */
+        boost::optional<date_type> now() const;
+
+        utils::log_manager &manager() const {
+          return *m_log;
+        }
         boost::asio::strand &strand() const {
           return *m_strand;
         }
+        utils::log::stream syslog(utils::symbol const &who,
+                                  utils::symbol const &kind) const;
         
-        void detached(SHARED_PTR<internal_impl> const &tl);
+        size_t reactors_size() const;
+        SHARED_PTR<node_impl> new_node(utils::symbol const &name,
+                                       exec_ref const &queue);
+        
+        void tick(date_type const &date) {
+          strand().dispatch(boost::bind(&graph_impl::g_strand_tick,
+                                        shared_from_this(), date));
+        }
+        tick_sig &on_tick() {
+          return m_tick;
+        }
         
       private:
-        utils::singleton::use<utils::log_manager> m_mgr;
-
-        typedef boost::shared_mutex mutex_type;
+        typedef std::set< SHARED_PTR<reactor> >             reactor_set;
+        typedef std::set<SHARED_PTR<internal_impl>, tl_cmp> internal_set;
         
-        mutable mutex_type          m_mutex;
-        utils::symbol               m_name;
+        tick_sig            m_tick;
+        utils::symbol const m_name;
+        utils::singleton::use<utils::log_manager> m_log;
+        UNIQ_PTR<boost::asio::strand>             m_strand;
+        
+        mutable boost::shared_mutex m_date_mtx;
         boost::optional<date_type>  m_date;
+
         
-        tick_sig m_tick;
+        mutable boost::shared_mutex m_mtx;
+        reactor_set                 m_reactors;
+        internal_set                m_internals;
         
-        std::set< SHARED_PTR<node_impl> > m_nodes;
-        typedef std::map<utils::symbol, SHARED_PTR<internal_impl> > tl_map;
+        void g_strand_tick(date_type date);
         
-        tl_map m_timelines, m_failed;
+        ERROR_CODE g_strand_add(SHARED_PTR<reactor> const &r);
+        void g_strand_rm(SHARED_PTR<reactor> r);
         
-        // async management
-        UNIQ_PTR<boost::asio::strand> m_strand;
+        SHARED_PTR<internal_impl>
+        g_strand_decl(SHARED_PTR<node_impl> const &r,
+                     utils::symbol const &tl,
+                     transaction_flags gp,
+                     ERROR_CODE &ec);
         
-        void set_date_sync(date_type d);
-        void notify_date(date_type d);
-        void add_node_sync(SHARED_PTR<node_impl> node,
-                           utils::symbol desired_name);
-        void rm_node_sync(SHARED_PTR<node_impl> node);
+        graph_impl() DELETED;
         
-        SHARED_PTR<internal_impl> decl_tl_sync(utils::symbol tl,
-                                               SHARED_PTR<node_impl> n,
-                                               transaction_flags fl);
-        
+        friend class node_impl;
       }; // TREX::transaction::details::graph_impl
+      
+            
       
     } // TREX::transaction::details
   } // TREX::transaction
