@@ -31,8 +31,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_timing_asio_tick_timer
-# define H_trex_utils_timing_asio_tick_timer
+#ifndef H_trex_utils_timing_bits_asio_chrono_timer
+# define H_trex_utils_timing_bits_asio_chrono_timer
 
 # include "../posix_utils.hh"
 
@@ -43,17 +43,6 @@ namespace TREX {
   namespace utils {
     namespace internals {
       
-      /** @brief Asio timer traits for TREX::utils::tick_clock
-       *
-       * This traits specifies the definition requirement to instantiate 
-       * A boost.asio deadline_timer for a TREX::utils::tick_clock -- or in 
-       * fact any clock relying on chrono representation of time.
-       *
-       * @relates TREX::utils::tick_clock
-       * @sa TREX::utils::tick_clock::async_timer
-       *
-       * @author Frederic Py
-       */
       template<typename Clock>
       struct tick_clock_traits {
         typedef typename Clock::time_point time_type;
@@ -65,7 +54,7 @@ namespace TREX {
         static time_type add(time_type t, duration_type d) {
           return t + d;
         }
-        static duration_type substract(time_type t1, time_type t2) {
+        static duration_type subtract(time_type t1, time_type t2) {
           return t1 - t2;
         }
         static bool less_than(time_type t1, time_type t2) {
@@ -73,7 +62,7 @@ namespace TREX {
         }
         static boost::posix_time::time_duration
         to_posix_duration(duration_type d) {
-          return chrono_posix_duration<duration_type>::to_posix(d);
+          return chrono_posix_convert<duration_type>::to_posix(d);
         }
         
       }; // TREX::utils::internals::tick_clock_traits<>
@@ -84,5 +73,5 @@ namespace TREX {
 } // TREX
 
 
-#endif // H_trex_utils_timing_asio_tick_timer
+#endif // H_trex_utils_timing_bits_asio_chrono_timer
 

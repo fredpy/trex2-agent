@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_timing_tick_clock
 # define H_trex_utils_timing_tick_clock
 
-# include "bits/asio_tick_timer.hh"
+# include <trex/config/chrono.hh>
 
 namespace TREX {
   namespace utils {
@@ -65,9 +65,6 @@ namespace TREX {
      */
     template<typename Period, class Clock=CHRONO::high_resolution_clock>
     class tick_clock {
-      typedef tick_clock<Period, Clock>                this_clock;
-      typedef internals::tick_clock_traits<this_clock> asio_traits;
-      
     public:
       /** @brief Subjacent clock type 
        *
@@ -110,16 +107,6 @@ namespace TREX {
       
 
       static bool const is_steady = base_clock::is_steady;
-
-      /** @brief Async deadline timer
-       *
-       * This define the type that can be used to implement a deadline 
-       * timer relying on this clock type. The implementation is just 
-       * a specialization of a boost.asio deadline_timer for this clock
-       *
-       * @sa TREX::utils::internals::tick_clock_traits
-       */
-      typedef boost::asio::basic_deadline_timer<this_clock, asio_traits> async_timer;
       
       
       /** @brief Constructor 

@@ -6,7 +6,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/random.hpp>
 
-#include <trex/config/chrono.hh>
+#include <trex/utils/timing/asio_tick_timer.hh>
 
 using namespace TREX::transaction;
 namespace utils=TREX::utils;
@@ -98,6 +98,11 @@ private:
 
 reactor::declare<simple_reactor> tmp("simple");
 
+typedef utils::tick_clock<CHRONO::milliseconds::period> fast_clock;
+void print_clock(fast_clock const &c) {
+  std::cout<<"Tick "<<c.now().time_since_epoch().count()<<std::endl;
+}
+
 int main(int argc, char *argv[]) {
   utils::singleton::use<utils::log_manager> log;
   try {
@@ -120,6 +125,13 @@ int main(int argc, char *argv[]) {
   
     std::cout<<"Created agent \""<<g.name()<<"\""<<std::endl;
     g.syslog(tlog::info)<<"Created agent \""<<g.name()<<"\"";
+    
+    // Make a clock
+    utils::asio_tick_timer<fast_clock> timer(g.service());
+    
+    timer.expires_from_now(fast_clock::duration(100));
+    timer.async_wait(boost::bind(&print_clock, boost::ref(timer.clock())));
+    
     g.tick(0);
     g.tick(1);
     sleep(1);
