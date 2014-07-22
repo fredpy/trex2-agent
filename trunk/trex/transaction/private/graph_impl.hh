@@ -79,6 +79,8 @@ namespace TREX {
           return m_tick;
         }
         
+        bool add_reactor(SHARED_PTR<reactor> r);
+        
       private:
         typedef std::set< SHARED_PTR<reactor> >             reactor_set;
         typedef std::set<SHARED_PTR<internal_impl>, tl_cmp> internal_set;

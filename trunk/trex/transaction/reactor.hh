@@ -135,7 +135,7 @@ namespace TREX {
       
       reactor() DELETED;
       
-      friend class graph;
+      friend class details::graph_impl;
       friend class details::node_impl;
     }; // class TREX::transaction::reactor
     

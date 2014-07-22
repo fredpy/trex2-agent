@@ -93,11 +93,7 @@ bool graph::add_reactor(bpt::ptree::value_type &xml) {
 }
 
 bool graph::add_reactor(SHARED_PTR<reactor> r) {
-  if( r ) {
-    r->attached(); // Notify the reactor that it is attached
-    return true;
-  }
-  return false;
+  return m_impl->add_reactor(r);
 }
 
 // manipulators
