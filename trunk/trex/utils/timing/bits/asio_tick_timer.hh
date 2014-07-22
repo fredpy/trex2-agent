@@ -43,6 +43,17 @@ namespace TREX {
   namespace utils {
     namespace internals {
       
+      /** @brief Asio timer traits for TREX::utils::tick_clock
+       *
+       * This traits specifies the definition requirement to instantiate 
+       * A boost.asio deadline_timer for a TREX::utils::tick_clock -- or in 
+       * fact any clock relying on chrono representation of time.
+       *
+       * @relates TREX::utils::tick_clock
+       * @sa TREX::utils::tick_clock::async_timer
+       *
+       * @author Frederic Py
+       */
       template<typename Clock>
       struct tick_clock_traits {
         typedef typename Clock::time_point time_type;
