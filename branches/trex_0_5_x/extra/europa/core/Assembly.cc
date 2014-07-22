@@ -216,12 +216,12 @@ Assembly::Assembly(std::string const &name, size_t steps,
 
   // complete base class Initialization
   doStart();
-
+     
   // gather europa entry points
   m_schema = ((EUROPA::Schema *)getComponent("Schema"))->getId();
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
   m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
-
+     
 
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
