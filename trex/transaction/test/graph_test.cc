@@ -98,7 +98,8 @@ private:
 
 reactor::declare<simple_reactor> tmp("simple");
 
-typedef utils::tick_clock<CHRONO::milliseconds::period> fast_clock;
+typedef utils::tick_clock<CHRONO_NS::milli> fast_clock;
+
 void print_clock(fast_clock const &c) {
   std::cout<<"Tick "<<c.now().time_since_epoch().count()<<std::endl;
 }
