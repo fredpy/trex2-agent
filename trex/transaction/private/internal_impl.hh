@@ -35,82 +35,87 @@
 # define H_trex_transaction_private_internal_impl
 
 # include "../bits/transaction_fwd.hh"
+
 # include <trex/domain/token.hh>
 
-# include <boost/signals2/signal.hpp>
+# include <boost/thread/shared_mutex.hpp>
+
 
 namespace TREX {
   namespace transaction {
     namespace details {
       
-      class external_impl;
-      
-      class internal_impl
-      :boost::noncopyable, public ENABLE_SHARED_FROM_THIS<internal_impl> {
+      class internal_impl :boost::noncopyable,
+      public ENABLE_SHARED_FROM_THIS<internal_impl> {
       public:
+        typedef boost::signals2::signal<void(date_type, token_id)> synch_event;
         static utils::symbol const s_failed;
-
         
-        internal_impl(utils::symbol const &tl_name,
-                      WEAK_PTR<graph_impl> const &g);
+        internal_impl(SHARED_PTR<graph_impl> const &g,
+                      utils::symbol const &name);
         ~internal_impl();
         
         utils::symbol const &name() const {
           return m_name;
         }
-        WEAK_PTR<node_impl> owner() const;
-        SHARED_PTR<graph_impl> graph() const {
-          return m_graph.lock();
+        SHARED_PTR<node_impl> owner() const {
+          return m_owner.lock();
         }
-        
+        bool owned() const {
+          return bool(owner());
+        }
         bool accept_goals() const;
         bool publish_plan() const;
+        date_type latency() const;
+        date_type lookahead() const;
         
-        boost::optional<TICK> synch_date() const;
+        boost::optional<date_type> now() const;
+        boost::optional<date_type> last_synch(token_id &obs) const;
+        boost::optional<date_type> last_synch() const {
+          token_id ignore;
+          return last_synch(ignore);
+        }
+        utils::log::stream syslog(utils::symbol const &kind) const;
+        token_ref obs(utils::symbol const &pred) const;
         
-        token_id create_obs(utils::symbol const &pred);
+        ERROR_CODE g_strand_post(token_ref obs);
+        void synchronized(date_type tick);
+        synch_event &on_synch() {
+          return m_synch;
+        }
         
-        void post_observation(token_id const &obs, bool echo=false);
-        void synchronize(TICK date);
+        std::string access_str() const;
         
-        void connect(SHARED_PTR<external_impl> client);
-        
+        ERROR_CODE g_strand_reset(SHARED_PTR<node_impl> const &r);
       private:
-        // owner management
-        WEAK_PTR<node_impl> owner_sync() const;
-        bool    reset_sync();
-        bool    set_sync(SHARED_PTR<node_impl> node,
-                         transaction_flags const &fl);
+        WEAK_PTR<graph_impl> const m_graph;
+        WEAK_PTR<node_impl>        m_owner;
+        utils::symbol        const m_name;
         
-        // observations management
-        void post_obs_sync(SHARED_PTR<node_impl> node,
-                           token_id obs, bool echo);
+        mutable boost::shared_mutex m_mtx;
+        boost::optional<date_type> m_synch_date;
+        token_ref         m_last_obs, m_next_obs;
+        synch_event       m_synch;
+        transaction_flags m_gp;
         
-        void connect_sync(SHARED_PTR<external_impl> client);
-        void notify_sync(TICK date);
-        boost::optional<TICK> last_update_sync() const;
-        
-        utils::symbol        m_name;
-        WEAK_PTR<graph_impl> m_graph;
-        
-        transaction_flags    m_access;
-        WEAK_PTR<node_impl>  m_owner;
-        
-        token_id m_last_obs, m_next_obs;
-        TICK  m_last_synch, m_obs_date;
-        bool  m_echo;
-        
-        typedef boost::signals2::signal<void (TICK, token_id)> synch_event;
-        
-        synch_event m_synch;
-        static utils::symbol const s_assert;
-        
-        friend class graph_impl;
+        // graph strand calls
+        ERROR_CODE g_strand_set_owner(SHARED_PTR<node_impl> const &r,
+                                      transaction_flags const &gp);
+        void g_strand_tick(boost::signals2::connection const &c,
+                           date_type tick);
+        void g_strand_synch(date_type date);
         
         internal_impl() DELETED;
         
-      }; // TREX::transaction::details::internal_impl
-      
+        friend class graph_impl;
+      };
+
+      template<class Iter>
+      Iter name_lower_bound(Iter from, Iter const to,
+                            utils::symbol const &n) {
+        for( ; to!=from && (*from)->name()<n; ++from);
+        return from;
+      }
       
     } // TREX::transaction::details
   } // TREX::transaction

@@ -68,9 +68,11 @@ namespace {
     }
   }
   
+  graph_category_impl gr_error;
+  
 } // ::
 
 ERROR_CODE TREX::transaction::graph_error_code
 (graph_error::graph_error_t e) {
-  return ERROR_CODE(static_cast<int>(e), graph_category_impl());
+  return ERROR_CODE(static_cast<int>(e), gr_error);
 }

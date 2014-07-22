@@ -1,27 +1,14 @@
-/** @file TeleoReactor_fwd.hh
- * @brief Forward decalrions for TeleoReactor
- *
- * This file declares some basic lasses that are used for TeleoReactor
- * manipulation.
- *
- * Many of these declarations are incomplete and just used in order to refer
- * to certain objects without manipulating them. For a more complete definition
- * use TeleoReactor.hh
- *
- * @author  Frederic Py <fpy@mbari.org>
- * @ingroup transaction
- * @sa TeleoReactor.hh
- */
+/* -*- C++ -*- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -31,7 +18,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -45,20 +32,22 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_reactor
-# define FWD_trex_transaction_reactor
+#ifndef IN_trex_transaction_graph
+# error "tcc files cannot be included outside of their corresponding header"
+#else // IN_trex_transaction_graph
 
-# include "bits/transaction_fwd.hh"
-# include "reactor_error.hh"
-# include "graph_error.hh"
+template<class Iter>
+size_t graph::add_reactors(Iter from, Iter to) {
+  typename details::reactor_factory::iter_traits<Iter>::type it = details::reactor_factory::iter_traits<Iter>::build(from, m_impl);
+  SHARED_PTR<reactor> r;
+  size_t count = 0;
+  
+  while( m_factory->iter_produce(it, to, r) ) {
+    if( add_reactor(r) )
+      ++count; 
+  }
+  return count;
+}
 
-namespace TREX {
-  namespace transaction {
 
-    class reactor;
-    class graph;
-
-  } // TREX::transaction
-} // TREX
-
-#endif // FWD_trex_transaction_reactor
+#endif // IN_trex_transaction_graph

@@ -1,21 +1,7 @@
-/** @file TeleoReactor_fwd.hh
- * @brief Forward decalrions for TeleoReactor
- *
- * This file declares some basic lasses that are used for TeleoReactor
- * manipulation.
- *
- * Many of these declarations are incomplete and just used in order to refer
- * to certain objects without manipulating them. For a more complete definition
- * use TeleoReactor.hh
- *
- * @author  Frederic Py <fpy@mbari.org>
- * @ingroup transaction
- * @sa TeleoReactor.hh
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -45,20 +31,45 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_reactor
-# define FWD_trex_transaction_reactor
+#ifndef  IN_H_trex_transaction_reactor
+# error "tcc files cannot be included outside of their corresponding header"
+#else //  IN_H_trex_transaction_reactor
 
-# include "bits/transaction_fwd.hh"
-# include "reactor_error.hh"
-# include "graph_error.hh"
+template<class Ty>
+class reactor::declare :public reactor::factory::factory_type::producer {
+  // ensure that only reactor derived classes can instantiate this
+  BOOST_STATIC_ASSERT(boost::is_base_of<reactor, Ty>::value);
+  
+  using reactor::factory::factory_type::producer::argument_type;
+  using reactor::factory::factory_type::producer::result_type;
+  using reactor::factory::factory_type::producer::id_param;
+public:
+  declare(id_param id);
+  ~declare() {}
+  
+private:
+  typedef exec_policy<Ty> policy;
+  
+  result_type produce(argument_type arg) const;
+}; // class TREX::transaction::reactor::declare<>
 
-namespace TREX {
-  namespace transaction {
+template<class Ty>
+reactor::declare<Ty>::declare(typename reactor::declare<Ty>::id_param id)
+:reactor::factory::factory_type::producer(id) {
+  reactor::factory::factory_type::producer::notify();
+}
 
-    class reactor;
-    class graph;
+template<class Ty>
+typename reactor::declare<Ty>::result_type
+reactor::declare<Ty>::produce(typename reactor::declare<Ty>::argument_type arg) const {
+  // Idenitfy the execution policy for this reactor type
+  details::exec_ref exec = policy::init_exec(details::service_of(arg.second));
+  // inject this policy in the argument
+  xml_arg_type rarg(arg.first, arg.second, exec);
+  
+  // create the new reactor
+  return MAKE_SHARED<Ty>(boost::ref(rarg));
+}
 
-  } // TREX::transaction
-} // TREX
+#endif //  IN_H_trex_transaction_reactor
 
-#endif // FWD_trex_transaction_reactor

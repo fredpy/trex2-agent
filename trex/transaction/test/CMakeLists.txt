@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2011, MBARI.                                         #
+#  Copyright (c) 2014, Frederic Py                                    #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -33,49 +33,12 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_library(TREXtransaction SHARED
-  reactor.cc
-  reactor_policies.cc
-  reactor_error.cc
-  graph_error.cc
-  graph.cc
-  private/graph_impl.cc
-  private/node_impl.cc
-  private/external_impl.cc
-  private/external_handler.cc
-  private/internal_impl.cc
 
-  # headers
-  reactor.hh
-  reactor_error.hh
-  graph_error.hh
-  reactor_fwd.hh
-  graph.hh
-  Tick.hh
-  bits/reactor_policies.hh
-  bits/transaction_fwd.hh
-  private/graph_impl.hh
-  private/node_impl.hh
-  private/external_impl.hh
-  private/external_handler.hh
-  private/internal_impl.hh
+enable_testing()
+add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
+add_executable(graph_test EXCLUDE_FROM_ALL
+      graph_test.cc)
+target_link_libraries(graph_test TREXtransaction)
+add_test(graph_test graph_test)
+add_dependencies(check graph_test)
 
-  # template source
-  bits/graph.tcc
-  bits/reactor_declare.tcc
-  bits/reactor_policies.tcc
-)
-
-
-add_dependencies(core TREXtransaction)
-target_link_libraries(TREXtransaction TREXdomain 
-  ${CHRONO_LIB})
-trex_lib(TREXtransaction core)
-
-install(DIRECTORY . DESTINATION include/trex/transaction
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN "test" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
-
-add_subdirectory(test)

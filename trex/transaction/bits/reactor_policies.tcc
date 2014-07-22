@@ -1,21 +1,7 @@
-/** @file TeleoReactor_fwd.hh
- * @brief Forward decalrions for TeleoReactor
- *
- * This file declares some basic lasses that are used for TeleoReactor
- * manipulation.
- *
- * Many of these declarations are incomplete and just used in order to refer
- * to certain objects without manipulating them. For a more complete definition
- * use TeleoReactor.hh
- *
- * @author  Frederic Py <fpy@mbari.org>
- * @ingroup transaction
- * @sa TeleoReactor.hh
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -45,20 +31,34 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_reactor
-# define FWD_trex_transaction_reactor
+#ifndef IN_H_trex_transaction_bits_reactor_policies
+# error "tcc files cannot be included outside of their corresponding header"
+#else // IN_H_trex_transaction_bits_reactor_policies
 
-# include "bits/transaction_fwd.hh"
-# include "reactor_error.hh"
-# include "graph_error.hh"
+/*
+ * class TREX::transaction::class_scope_exec<>
+ */
 
-namespace TREX {
-  namespace transaction {
+// statics
 
-    class reactor;
-    class graph;
+template<class Ty>
+boost::once_flag class_scope_exec<Ty>::s_once = BOOST_ONCE_INIT;
 
-  } // TREX::transaction
-} // TREX
+template<class Ty>
+SHARED_PTR<boost::asio::strand> class_scope_exec<Ty>::s_strand;
 
-#endif // FWD_trex_transaction_reactor
+
+template<class Ty>
+void class_scope_exec<Ty>::global_init(boost::asio::io_service &io) {
+  if( !s_strand )
+    s_strand = MAKE_SHARED<boost::asio::strand>(boost::ref(io));
+}
+
+template<class Ty>
+details::exec_ref class_scope_exec<Ty>::init_exec(boost::asio::io_service &io) {
+  boost::call_once(s_once, boost::bind(&class_scope_exec::global_init,
+                                       boost::ref(io)));
+  return MAKE_SHARED<utils::priority_strand>(s_strand, false);
+}
+
+#endif // IN_H_trex_transaction_bits_reactor_policies

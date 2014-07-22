@@ -41,62 +41,112 @@ using namespace TREX::transaction;
 namespace utils=TREX::utils;
 namespace tlog=utils::log;
 
+using utils::symbol;
+using details::external_impl;
+
 /*
  * class TREX::transaction::details::external_impl
  */
 
 // structors
 
-details::external_impl::external_impl(SHARED_PTR<details::node_impl> cli,
-                                      SHARED_PTR<details::internal_impl> tl,
-                                      details::transaction_flags const  &fl)
-:m_timeline(tl), m_client(cli), m_flags(fl) {}
+external_impl::external_impl(SHARED_PTR<details::node_impl> const &cli,
+                             SHARED_PTR<details::internal_impl> const &tl,
+                             details::transaction_flags gp)
+:m_client(cli), m_timeline(tl), m_gp(gp) {}
+
+external_impl::~external_impl() {
+  m_client.reset();
+}
 
 // observers
 
-SHARED_PTR<details::graph_impl> details::external_impl::graph() const {
-  SHARED_PTR<graph_impl> ret;
-  SHARED_PTR<node_impl> node = m_client.lock();
-  
-  if( node )
-    ret = node->graph();
+bool external_impl::accept_goals() const {
+  bool ret = m_timeline->accept_goals();
+  if( ret ) {
+    boost::shared_lock<boost::shared_mutex> read(m_mtx);
+    ret = m_gp[0];
+  }
   return ret;
 }
 
-bool details::external_impl::accept_goals() const {
-  SHARED_PTR<graph_impl> g = graph();
-  
-  if( g ) {
-    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
-                                            &m_flags, 0));
-    if( utils::strand_run(g->strand(), fn) )
-      return m_timeline->accept_goals();
+bool external_impl::publish_plan() const {
+  bool ret = m_timeline->publish_plan();
+  if( ret ) {
+    boost::shared_lock<boost::shared_mutex> read(m_mtx);
+    ret = m_gp[1];
   }
-  return false;
+  return ret;
 }
 
-bool details::external_impl::publish_plan() const {
-  SHARED_PTR<graph_impl> g = graph();
+// manipulators
+
+
+tlog::stream external_impl::syslog(utils::symbol const &kind) const {
+  SHARED_PTR<node_impl> r = m_client.lock();
+  if( r )
+    return r->syslog(name(), kind);
+  else // this should never happen
+    return m_timeline->syslog("!!"+kind.str());
+}
+
+token_ref external_impl::goal(symbol const &pred) const {
+  token_ref tok = token::goal(name(), pred);
+  boost::optional<date_type> cur = now();
   
-  if( g ) {
-    boost::function<bool ()> fn(boost::bind(&details::transaction_flags::test,
-                                            &m_flags, 1));
-    if( utils::strand_run(g->strand(), fn) )
-      return m_timeline->publish_plan();
+  if( cur ) // goals necessarily end in the future
+    tok->restrict_end(int_domain(1+*cur, int_domain::plus_inf));
+  return tok;
+}
+
+// Graph strand events
+
+void external_impl::g_strand_connect() {
+  SHARED_PTR<node_impl> r = m_client.lock();
+
+  if( r ) {
+    internal_impl::synch_event::extended_slot_type
+    slot(&external_impl::g_strand_obs, this, _1, _2, _3);
+    slot.track_foreign(shared_from_this());
+    m_timeline->on_synch().connect_extended(slot.track_foreign(m_client));
+    bool fresh = false;
+    date_type tick;
+    token_id  obs;
+    {
+      boost::unique_lock<boost::shared_mutex> write(m_mtx);
+      m_last_tick = m_timeline->last_synch(m_state);
+      if( m_last_tick ) {
+        fresh = true;
+        tick = *m_last_tick;
+        obs = m_state;
+      }
+    }
+    if( fresh )
+      r->g_strand_notify(tick, obs, fresh);
   }
-  return false;
 }
 
-void details::external_impl::on_synch(TICK date, token_id o) {
-  SHARED_PTR<node_impl> node = m_client.lock();
-  if( node )
-    node->notify(date, name(), o);
+
+void external_impl::g_strand_obs(boost::signals2::connection const &c,
+                                 date_type tick, token_id obs) {
+  SHARED_PTR<node_impl> r = m_client.lock();
+  if( r ) {
+    bool fresh = false;
+    {
+      boost::unique_lock<boost::shared_mutex> write(m_mtx);
+      m_last_tick = tick;
+      if( obs!=m_state ) {
+        fresh = true;
+        m_state = obs;
+      }
+    }
+    r->g_strand_notify(tick, obs, fresh);
+  } else
+    c.disconnect();
 }
 
-// modifiers
 
-void details::external_impl::reset() {
-  m_client.reset();
-}
+
+
 
 

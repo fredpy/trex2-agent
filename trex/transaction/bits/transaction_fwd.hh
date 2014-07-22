@@ -37,10 +37,11 @@
 # include <bitset>
 
 # include <trex/config/memory.hh>
+# include <trex/config/bits/asio_conf.hh>
 # include <trex/utils/log/entry.hh>
 
 # include <boost/signals2/signal.hpp>
-
+# include <boost/asio/io_service.hpp>
 
 namespace TREX {
   namespace transaction {
@@ -49,6 +50,14 @@ namespace TREX {
       class graph_impl;
       class node_impl;
       class internal_impl;
+      class external_impl;
+      
+      struct tl_cmp {
+        bool operator()(SHARED_PTR<internal_impl> const &a,
+                        SHARED_PTR<internal_impl> const &b) const;
+      };
+
+      boost::asio::io_service &service_of(SHARED_PTR<graph_impl> const &g);
       
       /** @brief Reactor transaction flags
        *
@@ -62,7 +71,8 @@ namespace TREX {
       typedef utils::log::entry::date_type              date_type;
       typedef boost::signals2::signal<void (date_type)> tick_sig;
       
-
+      std::string access_str(transaction_flags const &gp);
+      
     }
 
   }

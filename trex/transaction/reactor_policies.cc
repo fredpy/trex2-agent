@@ -1,21 +1,7 @@
-/** @file TeleoReactor_fwd.hh
- * @brief Forward decalrions for TeleoReactor
- *
- * This file declares some basic lasses that are used for TeleoReactor
- * manipulation.
- *
- * Many of these declarations are incomplete and just used in order to refer
- * to certain objects without manipulating them. For a more complete definition
- * use TeleoReactor.hh
- *
- * @author  Frederic Py <fpy@mbari.org>
- * @ingroup transaction
- * @sa TeleoReactor.hh
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2011, MBARI.
+ *  Copyright (c) 2014, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -45,20 +31,19 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_reactor
-# define FWD_trex_transaction_reactor
+#include "bits/reactor_policies.hh"
 
-# include "bits/transaction_fwd.hh"
-# include "reactor_error.hh"
-# include "graph_error.hh"
+using namespace TREX::transaction;
+namespace asio=boost::asio;
+namespace utils=TREX::utils;
 
-namespace TREX {
-  namespace transaction {
+/*
+ * class TREX::transaction::instance_scope_exec
+ */
 
-    class reactor;
-    class graph;
+// statics
 
-  } // TREX::transaction
-} // TREX
+details::exec_ref instance_scope_exec::init_exec(asio::io_service &io) {
+  return MAKE_SHARED<utils::priority_strand>(boost::ref(io), false);
+}
 
-#endif // FWD_trex_transaction_reactor

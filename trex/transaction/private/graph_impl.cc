@@ -34,175 +34,191 @@
 #include "graph_impl.hh"
 #include "node_impl.hh"
 #include "internal_impl.hh"
+#include "../reactor.hh"
+#include "../graph_error.hh"
 
 #include "trex/utils/asio_runner.hh"
 
-using namespace TREX::transaction::details;
-namespace asio=boost::asio;
-using namespace TREX;
+using namespace TREX::transaction;
+namespace utils = TREX::utils;
+namespace asio = boost::asio;
+namespace tlog = utils::log;
 
-using TREX::utils::symbol;
+using details::graph_impl;
+using utils::symbol;
+
+asio::io_service &TREX::transaction::details::service_of(SHARED_PTR<graph_impl> const &g) {
+  return g->manager().service();
+}
 
 /*
  * class TREX::transaction::details::graph_impl
  */
 
-graph_impl::graph_impl() {
-  m_strand.reset(new asio::strand(m_mgr->service()));
+// structors
+
+graph_impl::graph_impl(symbol const &n):m_name(n) {
+  m_strand.reset(new asio::strand(manager().service()));
 }
 
-graph_impl::~graph_impl() {}
-
-// Observers
-
-symbol const &graph_impl::name() const {
-  boost::shared_lock<mutex_type> lock(m_mutex);
-  return m_name;
+graph_impl::~graph_impl() {
+  // TODO cleanup the graph
 }
 
-boost::optional<date_type> graph_impl::date(bool fast) const {
-  if( fast ) {
-    boost::shared_lock<mutex_type> lock(m_mutex);
-    return m_date;
-  } else {
-    // Non fast approach ensure sequencing with set_date in case it is posted
-    boost::function<boost::optional<date_type> ()>
-      fn(boost::bind(&graph_impl::date, this, true));
-    return utils::strand_run(strand(), fn);
-  }
+// observers
+
+boost::optional<details::date_type> graph_impl::now() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_date_mtx);
+  return m_date;
 }
 
-// Modifiers
-
-symbol const &graph_impl::set_name(symbol const &n) {
-  boost::upgrade_lock<mutex_type> lock(m_mutex);
-  if( m_name.empty() ) {
-    boost::upgrade_to_unique_lock<mutex_type> w_lock(lock);
-    m_name = n;
-  }
-  return m_name;
+size_t graph_impl::reactors_size() const {
+  boost::shared_lock<boost::shared_mutex> lock(m_mtx);
+  return m_reactors.size();
 }
 
-void graph_impl::set_date(date_type const &d) {
-  strand().dispatch(boost::bind(&graph_impl::set_date_sync,
-                                 shared_from_this(), d));
+// manipulators
+
+tlog::stream graph_impl::syslog(symbol const &who,
+                                symbol const &kind) const {
+  symbol source = name();
+  boost::optional<date_type> date = now();
+  
+  if( !who.empty() )
+    source = source.str()+"."+who.str();
+
+  if( date )
+    return m_log->syslog(*date, source, kind);
+  else
+    return m_log->syslog(source, kind);
 }
 
-WEAK_PTR<node_impl> graph_impl::add_node(symbol const &desired_name) {
-  SHARED_PTR<graph_impl> me = shared_from_this();
-  SHARED_PTR<node_impl> ret = MAKE_SHARED<node_impl>(me);
-
-  strand().dispatch(boost::bind(&graph_impl::add_node_sync,
-                                 me, ret, desired_name));
+SHARED_PTR<details::node_impl> graph_impl::new_node
+(symbol const &n, details::exec_ref const &queue) {
+  WEAK_PTR<graph_impl> me = shared_from_this();
+  // Create the new node
+  SHARED_PTR<node_impl> ret = MAKE_SHARED<node_impl>(me, n, queue);  
   return ret;
 }
 
-void graph_impl::rm_node(WEAK_PTR<node_impl> n) {
-  SHARED_PTR<node_impl> node = n.lock();
-  if( node ) {
-    node->reset();
-    strand().dispatch(boost::bind(&graph_impl::rm_node_sync,
-                                   shared_from_this(), node));
-  }
-}
+// graph strand calls
 
-WEAK_PTR<internal_impl> graph_impl::declare_tl(symbol const &tl,
-                                               SHARED_PTR<node_impl> const &n,
-                                               transaction_flags const &fl) {
-  boost::function<SHARED_PTR<internal_impl> ()>
-  fn(boost::bind(&graph_impl::decl_tl_sync, this, tl, n, fl));
-  return utils::strand_run(strand(), fn);
-}
-
-
-// Manipulators
-
-utils::log_manager &graph_impl::manager() const {
-  return *m_mgr;
-}
-
-utils::log::stream graph_impl::syslog(symbol const &ctx,
-                                      symbol const &kind) const {
-  symbol who = name();
- 
-  if( !ctx.empty() )
-    who = who.str()+"."+ctx.str();
-
-  boost::optional<date_type> when = date(true);
-  if( when )
-    return m_mgr->syslog(*when, who, kind);
-  else
-    return m_mgr->syslog(who, kind);
-}
-
-void graph_impl::detached(SHARED_PTR<internal_impl> const &tl) {
-  tl_map::iterator i = m_timelines.find(tl->name());
-
-  if( m_timelines.end()!=i ) {
-    // do something to notify its failure
-
-    if( m_failed.insert(*i).second ) {
-      syslog(utils::log::null, utils::log::warn)<<"Failed timeline "<<i->first;
-    }
-  }
-}
-
-
-// Thread protected operations
-
-void graph_impl::set_date_sync(date_type d) {
+void graph_impl::g_strand_tick(details::date_type date) {
   bool updated = false;
+  boost::optional<date_type> prev;
+  
   {
-    boost::upgrade_lock<mutex_type> lock(m_mutex);
-    if( !m_date || d>*m_date ) {
-      boost::upgrade_to_unique_lock<mutex_type> w_lock(lock);
-      m_date = d;
+    boost::upgrade_lock<boost::shared_mutex> test(m_date_mtx);
+    
+    prev = m_date;
+    if( !m_date || (*m_date)<date ) {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      
+      m_date =  date;
       updated = true;
     }
   }
-  if( updated )
-    m_tick(d); // announce the tick update
-}
-
-void graph_impl::add_node_sync(SHARED_PTR<node_impl> node,
-                               symbol desired_name) {
-  // For now I do not worry about mutiple reactors with
-  // the same name
-  node->set_name(desired_name);
   
-  tick_sig::extended_slot_type slot(&node_impl::tick,
-                                    node.get(), _1, _2);
-  m_tick.connect_extended(slot.track_foreign(node));
-  m_nodes.insert(node);
+  if( updated ) {
+    if( prev ) {
+      date_type delta = date - *prev;
+      if( delta>1 )
+        m_log->syslog(date, name(),
+                      tlog::warn)<<"Clock skipped "<<(delta-1)<<" tick"
+                                 <<(delta==2?"":"s");
+    }
+    m_tick(date);
+  } else if( date==*prev )
+    m_log->syslog(date, name(),
+                  tlog::warn)<<"Ignoring redundant tick event"
+                             <<" for current date";
+  else
+    m_log->syslog(date, name(),
+                  tlog::error)<<"Ignoring erroneous past tick event ("
+                              <<date<<")";
 }
 
-void graph_impl::rm_node_sync(SHARED_PTR<node_impl> node) {
-  std::set< SHARED_PTR<node_impl> >::iterator pos = m_nodes.find(node);
+ERROR_CODE graph_impl::g_strand_add(SHARED_PTR<reactor> const &r) {
+  bool inserted = false;
+  ERROR_CODE ec = graph_error_code(graph_error::ok);
+  {
+    boost::upgrade_lock<boost::shared_mutex> test(m_mtx);
+    reactor_set::iterator pos = m_reactors.lower_bound(r);
+    
+    if( m_reactors.end()==pos || r!=*pos ) {
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      
+      pos = m_reactors.insert(pos, r);
+      inserted = true;
+    }
+  }
+  if( inserted ) {
+    // Insertion succeeded => connect this reactor to the clock
+    SHARED_PTR<details::node_impl> impl = r->impl();
+    tick_sig::extended_slot_type slot(&details::node_impl::g_strand_tick,
+                                      impl.get(), _1, _2);
+    m_tick.connect_extended(slot.track_foreign(impl));
+  } else {
+    syslog(tlog::null, tlog::warn)<<"Attempted to insert reactor \""
+                                  <<r->name()<<"\" multiple times.";
+    ec = graph_error_code(graph_error::reactor_already_exist);
+  }
+  return ec;
+}
+
+void graph_impl::g_strand_rm(SHARED_PTR<reactor> r) {
+  bool removed = false;
+  {
+    boost::unique_lock<boost::shared_mutex> lock(m_mtx);
+    removed = (0!=m_reactors.erase(r));
+  }
+  if( !removed )
+    syslog(tlog::null, tlog::error)<<"Attempted to remove reactor \""
+    <<r->name()<<"\" which was ot listed for this graph.";
+}
+
+
+SHARED_PTR<details::internal_impl>
+graph_impl::g_strand_decl(SHARED_PTR<details::node_impl> const &r,
+                          symbol const &tl, details::transaction_flags gp,
+                          ERROR_CODE &ec) {
+  bool fresh = false;
+  SHARED_PTR<internal_impl> ret;
+  SHARED_PTR<graph_impl> me = shared_from_this();
+  ec = graph_error_code(graph_error::ok);
+  {
+    boost::upgrade_lock<boost::shared_mutex> test(m_mtx);
+    internal_set::iterator const endi = m_internals.end();
+    internal_set::iterator i = name_lower_bound(m_internals.begin(), endi, tl);
   
-  if( m_nodes.end()!=pos ) {
-    syslog(utils::log::null,
-           utils::log::info)<<"Removing reactor \""<<node->name()
-                            <<"\" from the graph.";
-    m_nodes.erase(pos);
-    node->reset();
+    if( endi!=i && (*i)->name()==tl ) {
+      ret = *i;
+      if( r ) {
+        boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+        ec = ret->g_strand_set_owner(r, gp);
+        if( ec ) {
+          ret.reset();
+          return ret;
+        }
+      }
+    } else {
+      fresh = true;
+      ret = MAKE_SHARED<internal_impl>(me, tl);
+      boost::upgrade_to_unique_lock<boost::shared_mutex> lock(test);
+      if( r ) {
+        ec = ret->g_strand_set_owner(r, gp);
+        if( ec ) {
+          ret.reset();
+          return ret;
+        }
+      }
+      m_internals.insert(i, ret);
+    }
   }
+  if( fresh ) {
+    tick_sig::extended_slot_type slot(&internal_impl::g_strand_tick,
+                                      ret.get(), _1, _2);
+    m_tick.connect_extended(slot.track_foreign(ret).track_foreign(me));
+  }
+  return ret;
 }
-
-SHARED_PTR<internal_impl> graph_impl::decl_tl_sync(symbol tl,
-                                                   SHARED_PTR<node_impl> n,
-                                                   transaction_flags fl) {
-  tl_map::iterator pos = m_timelines.lower_bound(tl);
-  
-  if( m_timelines.end()==pos || pos->first!=tl ) {
-    SHARED_PTR<internal_impl> obj = MAKE_SHARED<internal_impl>(tl, shared_from_this());
-    pos = m_timelines.insert(pos, tl_map::value_type(tl, obj));
-    // TODO handle the case where this timeline is not assigned yet
-  }
-  // TODO I also need to check for cycles
-  if( n && !pos->second->set_sync(n, fl) ) {
-    // throw an exception here but for now just return NULL
-    return SHARED_PTR<internal_impl>();
-  }
-  return pos->second;
-}
-

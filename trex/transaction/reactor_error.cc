@@ -55,6 +55,8 @@ namespace {
         return "Unexpected exception caught";
       case reactor_error::not_in_graph:
         return "Not belonging to a graph";
+      case reactor_error::not_external:
+        return "Not an external timeline";
       case reactor_error::configuration_error:
         return "Error while loading configuration"; 
       default:
@@ -62,9 +64,10 @@ namespace {
     }
   }
   
+  reactor_category_impl re_error;
 } // ::
 
 ERROR_CODE TREX::transaction::reactor_error_code
 (reactor_error::reactor_error_t e) {
-  return ERROR_CODE(static_cast<int>(e), reactor_category_impl());
+  return ERROR_CODE(static_cast<int>(e), re_error);
 }

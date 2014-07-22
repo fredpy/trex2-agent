@@ -111,7 +111,7 @@ add_subdirectory(trex)
 trex_cfg(cfg ${TREX_SHARED})
 
 # include extra/plugins
-add_subdirectory(extra) 
+#add_subdirectory(extra) 
 
 ########################################################################
 # Finalize                                                             #

@@ -1,27 +1,13 @@
-/** @file TeleoReactor_fwd.hh
- * @brief Forward decalrions for TeleoReactor
- *
- * This file declares some basic lasses that are used for TeleoReactor
- * manipulation.
- *
- * Many of these declarations are incomplete and just used in order to refer
- * to certain objects without manipulating them. For a more complete definition
- * use TeleoReactor.hh
- *
- * @author  Frederic Py <fpy@mbari.org>
- * @ingroup transaction
- * @sa TeleoReactor.hh
- */
 /*********************************************************************
  * Software License Agreement (BSD License)
- *
+ * 
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- *
+ * 
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -31,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -45,20 +31,82 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef FWD_trex_transaction_reactor
-# define FWD_trex_transaction_reactor
+#include "graph.hh"
+#include "reactor.hh"
+#include "private/graph_impl.hh"
 
-# include "bits/transaction_fwd.hh"
-# include "reactor_error.hh"
-# include "graph_error.hh"
 
-namespace TREX {
-  namespace transaction {
+using namespace TREX::transaction;
 
-    class reactor;
-    class graph;
+namespace utils=TREX::utils;
+namespace tlog=utils::log;
+namespace asio=boost::asio;
+namespace bpt=boost::property_tree;
 
-  } // TREX::transaction
-} // TREX
+using utils::symbol;
 
-#endif // FWD_trex_transaction_reactor
+/*
+ * class TREX::transaction::graph
+ */
+
+// structors
+
+graph::graph(utils::symbol const &n) {
+  m_impl = MAKE_SHARED<details::graph_impl>(n);
+}
+
+graph::graph(bpt::ptree &xml) {
+  symbol n = utils::parse_attr<symbol>(xml, "name");
+  m_impl = MAKE_SHARED<details::graph_impl>(n);
+  
+  size_t count = add_reactors(xml);
+  syslog(tlog::info)<<"Created "<<count<<" reactors.";
+}
+
+graph::~graph() {}
+
+// observers
+
+symbol const &graph::name() const {
+  return m_impl->name();
+}
+
+utils::log_manager &graph::manager() const {
+  return m_impl->manager();
+}
+
+asio::io_service &graph::service() const {
+  return manager().service();
+}
+
+size_t graph::count_reactors() const {
+  return m_impl->reactors_size();
+}
+
+// modifiers
+
+bool graph::add_reactor(bpt::ptree::value_type &xml) {
+  details::reactor_factory::argument_type arg = details::reactor_factory::arg_traits::build(xml, m_impl);
+  
+  SHARED_PTR<reactor> tmp(m_factory->produce(arg));
+  return add_reactor(tmp);
+}
+
+bool graph::add_reactor(SHARED_PTR<reactor> r) {
+  if( r ) {
+    r->attached(); // Notify the reactor that it is attached
+    return true;
+  }
+  return false;
+}
+
+// manipulators
+
+tlog::stream graph::syslog(symbol const &kind) const {
+  return m_impl->syslog(tlog::null, kind);
+}
+
+void graph::tick(TICK date) {
+  m_impl->tick(date);
+}
+
