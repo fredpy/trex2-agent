@@ -1,0 +1,5 @@
+<Mission>
+ <Goal on="auv" pred="Sample">
+  <Variable name="objective"><enum><elem value="Vent2"/></enum></Variable>
+ </Goal>
+</Mission>

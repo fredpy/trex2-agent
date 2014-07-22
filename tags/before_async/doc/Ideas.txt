@@ -1,0 +1,19 @@
+Further developement ideas and "issues"
+
+- Logging for multithreaded execution :
+
+  current log is centered around the fact that sequencing of call is deterministic and each phase of a reactor will be called at the same point as the others.
+
+  in a ultithrade approach it becomes more complex and require a more general view with the transaction logs being synchronized according to their relative time from one to the other.
+
+ A call should cannot be batsrateced as instantenous anymore inthese logs and should be marked by its start and end 
+
+  all start and end of all the tasks then shoudl be put in a global stn that order all the calls :
+for example 
+  sinch(r1).start -------------------------------------------------+-> synch(r1).end
+                                                                                                                            |
+         singh(r2).start --> synch(r2).end | delib(r2).start --> delib(r2).end | obs(r2)
+
+in that case obs(r2) ocurs before synch(r1).end and my well be the reason synch(r1) took so long. Therfore logs of r1 and r2 shoudl be able to give this information in order to reproduce this.
+
+
