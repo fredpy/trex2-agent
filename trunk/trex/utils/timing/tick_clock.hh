@@ -34,7 +34,7 @@
 #ifndef H_trex_utils_timing_tick_clock
 # define H_trex_utils_timing_tick_clock
 
-# include <trex/config/chrono.hh>
+# include "bits/asio_tick_timer.hh"
 
 namespace TREX {
   namespace utils {
@@ -65,12 +65,16 @@ namespace TREX {
      */
     template<typename Period, class Clock=CHRONO::high_resolution_clock>
     class tick_clock {
+      typedef tick_clock<Period, Clock>                this_clock;
+      typedef internals::tick_clock_traits<this_clock> asio_traits;
+      
     public:
       /** @brief Subjacent clock type 
        *
        * The chrono clock type used to measure time
        */
       typedef Clock                                  base_clock;
+      
       /** @brief Subjacent duration
        *
        * The duration used by the subjacent clock. This type is 
@@ -79,7 +83,7 @@ namespace TREX {
       typedef typename base_clock::duration          base_duration;
       /** @brief Epoch time point type
        *
-       * The type used to repsresent the epocjh of this clock
+       * The type used to repsresent the epoch of this clock
        */
       typedef typename base_clock::time_point        base_time_point;
 
@@ -103,9 +107,13 @@ namespace TREX {
        * The type used to represent time points for this clock
        */
       typedef CHRONO::time_point<tick_clock, duration>  time_point;
+      
 
       static bool const is_steady = base_clock::is_steady;
 
+      typedef boost::asio::basic_deadline_timer<this_clock, asio_traits> async_timer;
+      
+      
       /** @brief Constructor 
        *
        * Create a new clock and set its epoch to the current time 
