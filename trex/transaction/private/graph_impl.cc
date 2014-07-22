@@ -63,6 +63,24 @@ graph_impl::graph_impl(symbol const &n):m_name(n) {
 
 graph_impl::~graph_impl() {
   // TODO cleanup the graph
+  reactor_set tmp;
+  syslog(tlog::null, tlog::info)<<"Shutting down the graph";
+  {
+    boost::unique_lock<boost::shared_mutex> lock;
+    std::swap(tmp, m_reactors);
+  }
+  while( !tmp.empty() ) {
+    reactor_set::iterator i = tmp.begin();
+    SHARED_PTR<reactor> r = *i;
+    tmp.erase(i);
+    if( r )
+      r->isolate();
+  }
+  
+  
+  for(reactor_set::iterator i=tmp.begin(); tmp.end()!=i; ++i) {
+    
+  }
 }
 
 // observers
@@ -100,6 +118,15 @@ SHARED_PTR<details::node_impl> graph_impl::new_node
   SHARED_PTR<node_impl> ret = MAKE_SHARED<node_impl>(me, n, queue);  
   return ret;
 }
+
+bool graph_impl::add_reactor(SHARED_PTR<reactor> r) {
+  if( r ) {
+    r->attached(); // Notify the reactor that it is attached
+    return true;
+  }
+  return false;
+}
+
 
 // graph strand calls
 
