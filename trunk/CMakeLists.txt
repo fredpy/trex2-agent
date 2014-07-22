@@ -41,8 +41,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_SOURCE_DIR}/cmake/Modul
 ########################################################################
 project(trex)
 
-set(TREX_MAJOR 0)
-set(TREX_MINOR 6)
+set(TREX_MAJOR 1)
+set(TREX_MINOR 0)
 set(TREX_PATCH 0)
 set(TREX_RC 1)
 
