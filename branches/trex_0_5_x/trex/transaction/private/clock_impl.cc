@@ -62,12 +62,10 @@ boost::optional<details::clock::date_type> details::clock::read_date() const {
 // modifiers
 
 void details::clock::set_date(details::clock::date_type const &val) {
-  // TODO: this may be overkill and could present a risk on
-  //       thread starvation. It may be better to just do the
-  //       update call directly instread of transiting through
-  //       a strand
-  m_strand.dispatch(boost::bind(&clock::set_date_sync,
-                                shared_from_this(), val));
+  boost::function<void ()> fn(boost::bind(&clock::set_date_sync,
+                                          shared_from_this(), val));
+  
+  utils::strand_run(m_strand, fn);
 }
 
 void details::clock::set_started(bool flag) {
