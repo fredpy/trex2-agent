@@ -1,0 +1,62 @@
+#include "TREX.nddl"
+
+class Pose extends AgentTimeline
+{
+    Pose(Mode _mode)
+    {
+        super(_mode);
+    }
+
+    predicate position{float x; float y;}
+}
+
+class Turtle extends AgentTimeline
+{
+    Turtle(Mode _mode)
+	{
+		super(_mode);
+	}
+
+    predicate move{
+        float ang_vel;
+        float lin_vel; }
+    predicate stop{}
+}
+
+class Controller extends AgentTimeline
+{
+    Turtle turtle;
+
+    Controller(Mode _mode, Turtle t)
+	{
+		super(_mode);
+		turtle = t;
+	}
+
+    action move{ duration=1; }
+    action stop{ duration=1; }
+    action circle { duration =1; }
+}
+
+Controller::circle
+{
+    met_by(condition object.turtle.stop m);
+    contains_start(effect object.turtle.move m);
+    eq(m.ang_vel, 3);
+    eq(m.lin_vel, 5);
+}
+
+Controller::move
+{
+    met_by(condition object.turtle.stop m);
+    contains_start(effect object.turtle.move m);
+    eq(m.ang_vel, 0);
+    eq(m.lin_vel, 1);
+}
+
+Controller::stop
+{
+    met_by(condition object.turtle.move);
+    contains_start(effect object.turtle.stop);
+}
+

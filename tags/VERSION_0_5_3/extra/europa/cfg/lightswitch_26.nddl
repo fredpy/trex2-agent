@@ -1,0 +1,202 @@
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ * 
+ *  Copyright (c) 2011, MBARI.
+ *  All rights reserved.
+ * 
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the TREX Project nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+#include "TREX.nddl"
+
+/*
+ * The light timeline represent the state of the lightbulb
+ *   - On the lightbulb is bright
+ *   - Off the lightbulb is not bright
+ */
+class Light extends AgentTimeline {
+    predicate On {}
+    predicate Off {}
+
+    Light(Mode _mode) {
+	super(_mode);
+    }
+}
+
+/*
+ * A simple switch that controls the light 
+ *
+ * If it is Up thelight is Off
+ * The light can On only if the sawitch is Down
+ *
+ * Note: we can have case in theory where the switch is Down and the light is still Off 
+ *     indeed there maybe no power or the lightbulb maybe broken
+ */
+class Switch extends AgentTimeline {
+    predicate Up { }
+    predicate Down { }
+
+    Switch(Mode _mode) {
+	super(_mode);
+    }
+}
+
+/*
+ * The action to change the switch state
+ *
+ * These action will be deduced based on a requested Light 
+ * state
+ * To have a Light.On I need to set the Switch.Down
+ * To have the Lifght.Off I need to set the switch.Up
+ */
+class LightSwitch extends Timeline {
+    Switch controlled;
+    
+    action turnOff { duration = 1; }
+    action turnOn { duration = 1; }
+
+    LightSwitch(Switch sw) {
+	controlled = sw;
+    }
+}
+
+/*
+ * The room luminance as deduced by the reactor 
+ *
+ * It relates Light state to a more abstract Luminance state
+ *
+ * The relation is also done through action so trex can deduce the urgency 
+ * of the action and dipatch them as early as possible
+ */
+class Luminance extends AgentTimeline {
+    predicate Bright {}
+    predicate Dim {}
+    
+    Luminance(Mode _mode) {
+	super(_mode, true);
+    }
+}
+
+// Abstraction rules 
+Light::On {
+  contained_by(Luminance.Bright);
+}
+
+
+Light::Off {
+  contained_by(Luminance.Dim);
+}
+
+Luminance::Bright {
+  starts(Light.On l_on);
+  precedes(l_on.end, end);
+}
+
+Luminance::Dim {
+  starts(Light.Off l_off);
+  precedes(l_off.end, end);
+}
+
+// Relation between Switch and Light
+
+Switch::Up {
+  contained_by(Light.Off);
+}
+
+// Actions for setting Luminance 
+
+LightSwitch::turnOn {
+  // The condition is that I change the state of the switch to down
+  ends(condition object.controlled.Up);
+  meets(condition object.controlled.Down down);
+  
+  // The effect is that eventually he luminance will be bright
+  starts_before(effect Luminance.Bright bright);
+  down contains bright;
+}
+
+LightSwitch::turnOff {
+  // The condition again is that I change the state to Up
+  ends(condition object.controlled.Down);
+  meets(condition object.controlled.Up up);
+
+  // The effect is that the room will become Dim
+  starts_before_end(effect Luminance.Dim dim);
+  dim contains up;
+}
+
+
+
+// /* rulle for turning on a switch
+//  *
+//  * condition the controller will be down 
+//  * condition the controller should been done in the first place
+//  * effect the light will be On
+//  */
+// LightSwitch::turnOn {
+//     ends(condition object.controlled.Up);
+//     meets(condition object.controlled.Down down);
+//     starts_before(effect Light.On l_on);
+//     down contains l_on;
+// }
+
+// /* rulle for turning off a switch
+//  *
+//  * effect the controller will be down 
+//  * condition the controller should been done in the first place
+//  */
+// LightSwitch::turnOff {
+//     ends(condition object.controlled.Down);
+//     meets(condition object.controlled.Up);
+//     meets(effect Light.Off l_off);
+// }
+
+// LumHandler::makeBright {
+//    starts(effect Luminance.Bright);
+//    starts(condition Light.On);
+// }
+
+// LumHandler::makeDim {
+//    starts(effect Luminance.Dim);
+//    starts(condition Light.Off);
+// }
+
+// Light::On {
+//    contained_by(Switch.Down);
+//    contained_by(Luminance.Bright);    
+// }
+
+// Light::Off {
+//   contained_by(Luminance.Dim);
+// }
+
+// Switch::Up {
+//   contained_by(Light.Off);
+// }
+
+
+
