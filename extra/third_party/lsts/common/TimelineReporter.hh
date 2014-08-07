@@ -8,9 +8,9 @@
 #ifndef TIMELINEREPORTER_HH_
 #define TIMELINEREPORTER_HH_
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
 # include "../shared/ImcAdapter.hh"
 
@@ -24,10 +24,10 @@ namespace TREX {
    */
   namespace LSTS {
 
-    class TimelineReporter :public TREX::transaction::reactor,
+    class TimelineReporter :public TREX::transaction::TeleoReactor,
     TREX::transaction::graph::timelines_listener {
     public:
-      TimelineReporter(TREX::transaction::reactor::xml_arg_type arg);
+      TimelineReporter(TREX::transaction::TeleoReactor::xml_arg_type arg);
       virtual ~TimelineReporter();
 
 
@@ -46,9 +46,9 @@ namespace TREX {
         return !aborted;
       }
 
-      void notify(TREX::transaction::token const &obs);
-      void new_plan_token(TREX::transaction::token_id const &t);
-      void cancelled_plan_token(token_id const &t);
+      void notify(TREX::transaction::Observation const &obs);
+      void newPlanToken(TREX::transaction::goal_id const &t);
+      void cancelledPlanToken(goal_id const &t);
 
     };
   }

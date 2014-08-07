@@ -31,12 +31,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include <trex/domain/boolean_domain.hh>
-#include <trex/domain/int_domain.hh>
-#include <trex/domain/float_domain.hh>
-#include <trex/domain/enum_domain.hh>
-#include <trex/domain/string_domain.hh>
-#include <trex/domain/var.hh>
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/IntegerDomain.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/EnumDomain.hh>
+#include <trex/domain/StringDomain.hh>
+#include <trex/domain/Variable.hh>
 
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
@@ -48,39 +48,39 @@ namespace tt=TREX::transaction;
 
 namespace {
   
-  struct domain_wrapper:tt::abstract_domain, wrapper<tt::abstract_domain> {
-    domain_wrapper(tu::symbol const &name)
-    :TREX::transaction::abstract_domain(name) {}
+  struct domain_wrapper:tt::DomainBase, wrapper<tt::DomainBase> {
+    domain_wrapper(tu::Symbol const &name)
+    :TREX::transaction::DomainBase(name) {}
     ~domain_wrapper() {}
     
-    tt::abstract_domain *copy() const {
+    tt::DomainBase *copy() const {
       return this->get_override("copy")();
     }
 
-    bool is_interval() const {
+    bool isInterval() const {
       return this->get_override("is_interval")();
     }
-    bool is_enumerated() const {
+    bool isEnumerated() const {
       return this->get_override("is_enumerated")();
     }
     
-    bool is_full() const {
+    bool isFull() const {
       return this->get_override("is_full")();
     }
-    bool is_singleton() const {
+    bool isSingleton() const {
       return this->get_override("is_singleton")();
     }
 
-    bool intersect(tt::abstract_domain const &other) const {
+    bool intersect(tt::DomainBase const &other) const {
       return this->get_override("intersect")(other);
     }
 
-    bool equals(tt::abstract_domain const &other) const {
+    bool equals(tt::DomainBase const &other) const {
       return this->get_override("__eq__")(other);
     }
     
-    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
-      return this->get_override("restrict")(other, ec);
+    tt::DomainBase &restrictWith(tt::DomainBase const &other) {
+      return this->get_override("restrict")(other);
     }
   
     boost::property_tree::ptree build_tree() const {
@@ -99,53 +99,53 @@ namespace {
       return boost::any();
     }
     
-    std::string string_singleton() const {
-      if( is_singleton() )
+    std::string stringSingleton() const {
+      if( isSingleton() )
         return str();
       return std::string();
     }
   };
   
   
-  struct interval_wrap:tt::basic_interval, wrapper<tt::basic_interval> {
-    interval_wrap(tu::symbol const &type):tt::basic_interval(type) {}
+  struct interval_wrap:tt::BasicInterval, wrapper<tt::BasicInterval> {
+    interval_wrap(tu::Symbol const &type):tt::BasicInterval(type) {}
     
-    tt::abstract_domain *copy() const {
+    tt::DomainBase *copy() const {
       return this->get_override("copy")();
     }
-    bool is_singleton() const {
+    bool isSingleton() const {
       return this->get_override("is_singleton")();
     }
-    bool has_lower()  const {
+    bool hasLower()  const {
       return this->get_override("has_lower")();
     }
-    bool has_upper()  const {
+    bool hasUpper()  const {
       return this->get_override("has_upper")();
     }
-    bool equals(tt::abstract_domain const &other) const {
+    bool equals(tt::DomainBase const &other) const {
       return this->get_override("__eq__")(other);
     }
     
-    bool intersect(tt::abstract_domain const &other) const {
+    bool intersect(tt::DomainBase const &other) const {
       return this->get_override("intersect")(other);
     }
 
-    boost::any get_lower() const {
+    boost::any getLower() const {
       return boost::any();
     }
-    boost::any get_upper() const {
+    boost::any getUpper() const {
       return boost::any();
     }
-    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
-      return this->get_override("restrict")(other, ec);
+    tt::DomainBase &restrictWith(tt::DomainBase const &other) {
+      return this->get_override("restrict")(other);
     }
-    void parse_lower(std::string const &val) {
+    void parseLower(std::string const &val) {
       this->get_override("parse_low")(val);
     }
-    void parse_upper(std::string const &val) {
+    void parseUpper(std::string const &val) {
       this->get_override("parse_up")(val);
     }
-    void parse_singleton(std::string const &val) {
+    void parseSingleton(std::string const &val) {
       this->get_override("parse_singleton")(val);
     }
 
@@ -166,31 +166,31 @@ namespace {
     
   };
   
-  struct enum_wrap: tt::basic_enumerated, wrapper<tt::basic_enumerated> {
-    enum_wrap(tu::symbol const &type):tt::basic_enumerated(type) {}
+  struct enum_wrap: tt::BasicEnumerated, wrapper<tt::BasicEnumerated> {
+    enum_wrap(tu::Symbol const &type):tt::BasicEnumerated(type) {}
     
-    tt::abstract_domain *copy() const {
+    tt::DomainBase *copy() const {
       return this->get_override("copy")();
     }
-    bool intersect(tt::abstract_domain const &other) const {
+    bool intersect(tt::DomainBase const &other) const {
       return this->get_override("intersect")(other);
     }
     
-    bool equals(tt::abstract_domain const &other) const {
+    bool equals(tt::DomainBase const &other) const {
       return this->get_override("__eq__")(other);
     }
 
-    size_t size() const {
+    size_t getSize() const {
       return this->get_override("__len__")();
     }
-    boost::any element(size_t) const {
+    boost::any getElement(size_t) const {
       return boost::any();
     }
-    bool restrict_with(tt::abstract_domain const &other, ERROR_CODE &ec) {
-      return this->get_override("restrict")(other, ec);
+    tt::DomainBase &restrictWith(tt::DomainBase const &other) {
+      return this->get_override("restrict")(other);
     }
     
-    virtual void add_string_value(std::string const &val) {
+    virtual void addTextValue(std::string const &val) {
       this->get_override("add")(val);
     }
     
@@ -209,14 +209,14 @@ namespace {
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.to_xml(oss);
+    dom.toXml(oss);
     return oss.str();
   }
   
   template<class Obj>
   std::string json_str(Obj const &dom) {
     std::ostringstream oss;
-    dom.to_json(oss);
+    dom.toJSON(oss);
     return oss.str();
   }
 
@@ -256,38 +256,39 @@ void export_domain() {
   //    - xml()             gives xml repredsentation
   //    - __str__()         gives the string representation
   class_<domain_wrapper, boost::noncopyable>("domain", "Abstract trex domain",
-                                             init<tu::symbol>())
-  .def("type", &tt::abstract_domain::type_name, return_internal_reference<>())
-  .def("is_interval", pure_virtual(&tt::abstract_domain::is_interval))
-  .def("is_enumerated", pure_virtual(&tt::abstract_domain::is_enumerated))
-  .def("is_full", pure_virtual(&tt::abstract_domain::is_full))
-  .def("is_singleton", pure_virtual(&tt::abstract_domain::is_singleton))
-  .def("intersect", pure_virtual(&tt::abstract_domain::intersect))
-  .def("__eq__", pure_virtual(&tt::abstract_domain::equals))
-//  .def("restrict", pure_virtual(&tt::abstract_domain::restrict_with))
-  .def("as_tree", &tt::abstract_domain::as_tree)
-  .def("build_tree", pure_virtual(&tt::abstract_domain::build_tree))
-  .def("xml", &xml_str<tt::abstract_domain>)
-  .def("json", &json_str<tt::abstract_domain>)
-  .def("__str__", pure_virtual(&str_impl<tt::abstract_domain>))
+                                             init<tu::Symbol>())
+  .def("type", &tt::DomainBase::getTypeName, return_internal_reference<>())
+  .def("is_interval", pure_virtual(&tt::DomainBase::isInterval))
+  .def("is_enumerated", pure_virtual(&tt::DomainBase::isEnumerated))
+  .def("is_full", pure_virtual(&tt::DomainBase::isFull))
+  .def("is_singleton", pure_virtual(&tt::DomainBase::isSingleton))
+  .def("intersect", pure_virtual(&tt::DomainBase::intersect))
+  .def("__eq__", pure_virtual(&tt::DomainBase::equals))
+  .def("restrict", pure_virtual(&tt::DomainBase::restrictWith),
+       return_internal_reference<>())
+  .def("as_tree", &tt::DomainBase::as_tree)
+  .def("build_tree", pure_virtual(&tt::DomainBase::build_tree))
+  .def("xml", &xml_str<tt::DomainBase>)
+  .def("json", &json_str<tt::DomainBase>)
+  .def("__str__", pure_virtual(&str_impl<tt::DomainBase>))
   ;
   
   // class trex.domains.interval: trex.domains.domain
   //  abstract interval interface
   //    - has_lower() check if interval has a non infinite lower bound
   //    - has_upper() check if interval has a non infinite upper bound
-  class_<interval_wrap, bases<tt::abstract_domain>,
+  class_<interval_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("interval", "Abstract trex interval",
-                             init<tu::symbol>())
-  .def("has_lower", pure_virtual(&tt::basic_interval::has_lower))
-  .def("has_upper", pure_virtual(&tt::basic_interval::has_upper))
+                             init<tu::Symbol>())
+  .def("has_lower", pure_virtual(&tt::BasicInterval::hasLower))
+  .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper))
   ;
   
   // class trex.domains.bool: trex.domains.interval
   //  boolean domain
   //   - __init__()     create a full boolean domain
   //   - __init__(bool) create a domain with the single value arg
-  class_<tt::boolean_domain, bases<tt::basic_interval> >("bool", "Boolean domain",
+  class_<tt::BooleanDomain, bases<tt::BasicInterval> >("bool", "Boolean domain",
                                                     init<>())
   .def(init<bool>())
   ;
@@ -297,7 +298,7 @@ void export_domain() {
   //   - __init__()     create a full int domain
   //   - __init__(long) create a domain with the single value arg
   //   - __init__(long, long) create a domain with interval [arg1, arg2]
-  class_<tt::int_domain, bases<tt::basic_interval> >("int", "Integer domain", init<>())
+  class_<tt::IntegerDomain, bases<tt::BasicInterval> >("int", "Integer domain", init<>())
   .def(init<long>())
   .def(init<long,long>())
   ;
@@ -307,7 +308,7 @@ void export_domain() {
   //   - __init__()     create a full int domain
   //   - __init__(double) create a domain with the single value arg
   //   - __init__(double, double) create a domain with interval [arg1, arg2]
-  class_<tt::float_domain, bases<tt::basic_interval> >("float", "Float domain", init<>())
+  class_<tt::FloatDomain, bases<tt::BasicInterval> >("float", "Float domain", init<>())
   .def(init<double>())
   .def(init<double,double>())
   ;
@@ -315,10 +316,10 @@ void export_domain() {
   // class trex.domains.enumerated: trex.domains.domain
   // abstract enumerated domain interface
   //   - __len__()    number of elements
-  class_<enum_wrap, bases<tt::abstract_domain>,
+  class_<enum_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("enumerated", "Abstract trex Enumerated domain",
-                             init<tu::symbol>())
-  .def("__len__", pure_virtual(&tt::basic_enumerated::size))
+                             init<tu::Symbol>())
+  .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize))
   // TODO need to implement __iter__
   ;
   
@@ -328,9 +329,9 @@ void export_domain() {
   //    - __init__()           create the full domain
   //    - __init__(string)     create a domain with the single value arg
   //    - __init__(collection) create a domain with the elements given in colllection
-  class_<tt::string_domain, bases<tt::basic_enumerated> >("string", "string domain", init<>())
+  class_<tt::StringDomain, bases<tt::BasicEnumerated> >("string", "string domain", init<>())
   .def(init<std::string>())
-  .def("__init__", &collection_init<tt::string_domain, std::string>)
+  .def("__init__", &collection_init<tt::StringDomain, std::string>)
   ;
 
   
@@ -339,13 +340,13 @@ void export_domain() {
   //    - __init__()                  create the full domain
   //    - __init__(trex.utils.symbol) create a domain with the single value arg
   //    - __init__(collection)        create a domain with the elements given in collection
-  class_<tt::enum_domain, bases<tt::basic_enumerated> >("enum", "enum domain", init<>())
-  .def(init<tu::symbol>())
-  .def("__init__", &collection_init<tt::enum_domain, tu::symbol>)
+  class_<tt::EnumDomain, bases<tt::BasicEnumerated> >("enum", "enum domain", init<>())
+  .def(init<tu::Symbol>())
+  .def("__init__", &collection_init<tt::EnumDomain, tu::Symbol>)
   ;
   
-  bool (tt::var::* restrict_domain)(tt::abstract_domain const &) = &tt::var::restrict_with;
-  bool (tt::var::* restrict_var)(tt::var const &) = &tt::var::restrict_with;
+  tt::Variable &(tt::Variable::* restrict_domain)(tt::DomainBase const &) = &tt::Variable::restrict;
+  tt::Variable &(tt::Variable::* restrict_var)(tt::Variable const &) = &tt::Variable::restrict;
   
   // class trex.domains.var
   //   A trex variable
@@ -356,15 +357,14 @@ void export_domain() {
   //    - restrict(var) restrict variable with var.domain()
   //    - xml()     xml representation
   //    - __str__() string representation
-  class_<tt::var>("var", "trex variable",
-                  init<tu::symbol, tt::abstract_domain const &>())
-  .def("name", &tt::var::name)
-  .def("domain", &tt::var::domain, return_internal_reference<>())
-  .def("restrict", restrict_domain)
-  .def("restrict", restrict_var)
-  .def("xml", &xml_str<tt::var>)
-  .def("json", &json_str<tt::var>)
-  .def("__str__", &str_impl<tt::var>)
+  class_<tt::Variable>("var", "trex variable", init<tu::Symbol, tt::DomainBase const &>())
+  .def("name", &tt::Variable::name, return_internal_reference<>())
+  .def("domain", &tt::Variable::domain, return_internal_reference<>())
+  .def("restrict", restrict_domain, return_internal_reference<>())
+  .def("restrict", restrict_var, return_internal_reference<>())
+  .def("xml", &xml_str<tt::Variable>)
+  .def("json", &json_str<tt::Variable>)
+  .def("__str__", &str_impl<tt::Variable>)
   ;
 
 }

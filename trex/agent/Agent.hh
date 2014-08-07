@@ -52,7 +52,7 @@
 # define H_Agent
 
 # include "Clock.hh"
-# include <trex/utils/plugin_loader.hh>
+# include <trex/utils/PluginLoader.hh>
 # include <trex/utils/asio_fstream.hh>
 
 namespace TREX {
@@ -121,7 +121,7 @@ namespace TREX {
        *
        * @post the agent has no reactor
        */
-      explicit Agent(TREX::utils::symbol const &name,
+      explicit Agent(TREX::utils::Symbol const &name,
 		     TREX::transaction::TICK final = 0,
 		     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Constructor
@@ -328,7 +328,7 @@ namespace TREX {
        * This method will add the goal @p g to the agent. This goal will be posted
        * to whichever reactor owns the timeline associated to @p g
        */
-      void sendRequest(TREX::transaction::token_id const &g);
+      void sendRequest(TREX::transaction::goal_id const &g);
       /** @brief Post a goal from xml 
        *
        * @param[in] g A goal in xml
@@ -340,7 +340,7 @@ namespace TREX {
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
       void sendRequest(boost::property_tree::ptree::value_type &g) {
-	TREX::transaction::token_id tmp = parse_goal(g);
+	TREX::transaction::goal_id tmp = parse_goal(g);
 	sendRequest(tmp);
       }
       /** @brief Post a goals from xml 
@@ -355,14 +355,14 @@ namespace TREX {
        */
       size_t sendRequests(boost::property_tree::ptree &g);
 
-      duration_type tick_duration() const {
+      duration_type tickDuration() const {
 	return m_clock->tickDuration();
       }
       
-      TREX::transaction::TICK time_to_tick(date_type const &date) const {
+      TREX::transaction::TICK timeToTick(date_type const &date) const {
 	return m_clock->timeToTick(date);
       }
-      date_type tick_to_time(TREX::transaction::TICK cur) const {
+      date_type tickToTime(TREX::transaction::TICK cur) const {
 	return m_clock->tickToTime(cur);
       }
       std::string date_str(TREX::transaction::TICK cur) const {
@@ -372,7 +372,7 @@ namespace TREX {
         return m_clock->duration_str(dur);
       }
       
-      transaction::TICK final_tick() const {
+      transaction::TICK finalTick() const {
         return m_finalTick;
       }
 
@@ -389,17 +389,17 @@ namespace TREX {
        * @ingroup agent
        * @author Frederic Py <fpy@mbari.org>
        */
-      class AgentProxy :public TREX::transaction::reactor {
+      class AgentProxy :public TREX::transaction::TeleoReactor {
       public:
 	AgentProxy(Agent &agent)
-        :TREX::transaction::reactor(&agent, transaction::instance_scope_exec::init_exec(agent.strand().get_io_service()), "", 0, 0) {}
+          :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
 	~AgentProxy() {}
 	
-	bool post_request(TREX::transaction::token_id const &g) {
-          if( !is_external(g->object()) )
+	bool postRequest(TREX::transaction::goal_id const &g) {
+          if( !isExternal(g->object()) )
             use(g->object());
-          if( is_external(g->object()) )
-            return post_goal(g);
+          if( isExternal(g->object()) )
+            return postGoal(g);
           else
             syslog(null, error)<<"Unable to subscribe to "<<g->object();
           return false;
@@ -524,11 +524,11 @@ namespace TREX {
        */
       void loadConf(std::string const &file_name);
 
-      static TREX::transaction::TICK initial_tick(clock_ref clk);
+      static TREX::transaction::TICK initialTick(clock_ref clk);
 
-      typedef TREX::transaction::reactor::stat_clock stat_clock;
+      typedef TREX::transaction::TeleoReactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;
-      typedef TREX::transaction::reactor::rt_clock   rt_clock;
+      typedef TREX::transaction::TeleoReactor::rt_clock   rt_clock;
 
       TREX::utils::async_ofstream m_stat_log;
 
@@ -537,10 +537,10 @@ namespace TREX {
       priority_queue             m_edf;
       std::list<reactor_id>      m_idle;
       
-      mutable utils::shared_var<bool> m_valid;
+      mutable utils::SharedVar<bool> m_valid;
       
       bool valid() const {
-        utils::shared_var<bool>::scoped_lock lck(m_valid);
+        utils::SharedVar<bool>::scoped_lock lck(m_valid);
         return *m_valid;
       }
 
@@ -552,7 +552,7 @@ namespace TREX {
                       std::string path);
 
       /** @brief plug-in loader entry point */
-      TREX::utils::singleton::use<TREX::utils::plugin_loader> m_pg;
+      TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;
 
     }; // TREX::agent::Agent
 

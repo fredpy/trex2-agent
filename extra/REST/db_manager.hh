@@ -47,12 +47,12 @@ namespace TREX {
       public:
         static std::string const db_ext;
         
-        class exception : public std::runtime_error {
+        class exception : utils::Exception {
         public:
           ~exception() throw() {}
           
         protected:
-          exception(std::string const &msg) throw():std::runtime_error(msg) {}
+          exception(std::string const &msg) throw():utils::Exception(msg) {}
           
           friend class db_manager;
         }; // TREX::REST::helpers::db_manager::exception
@@ -74,7 +74,7 @@ namespace TREX {
         void add_token(transaction::TICK start, transaction::TICK end,
                        std::string const &tl, std::string const &json);
         
-        typedef transaction::int_domain::bound bound;
+        typedef transaction::IntegerDomain::bound bound;
         
         size_t get_tokens(std::string const &tl, bound &min, bound const &max,
                           std::ostream &out, size_t max_count=100);

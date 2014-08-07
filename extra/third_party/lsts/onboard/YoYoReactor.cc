@@ -11,10 +11,10 @@ namespace
 {
 
   /** @brief TREX log entry point */
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
   /** @brief Platform reactor declaration */
-  reactor::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
+  TeleoReactor::xml_factory::declare<TREX::LSTS::YoYoReactor> decl("YoYoReactor");
 
 }
 
@@ -22,17 +22,17 @@ namespace TREX {
   namespace LSTS {
 
     // Symbol equality test is faster than string : use global Symbols to improve performances
-    utils::symbol const YoYoReactor::s_trex_pred("TREX");
-    utils::symbol const YoYoReactor::s_exec_pred("Exec");
+    utils::Symbol const YoYoReactor::s_trex_pred("TREX");
+    utils::Symbol const YoYoReactor::s_exec_pred("Exec");
 
-    utils::symbol const YoYoReactor::s_reference_tl("reference");
-    utils::symbol const YoYoReactor::s_refstate_tl("refstate");
-    utils::symbol const YoYoReactor::s_control_tl("control");
-    utils::symbol const YoYoReactor::s_position_tl("estate");
-    utils::symbol const YoYoReactor::s_yoyo_tl("yoyo");
-    utils::symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
+    utils::Symbol const YoYoReactor::s_reference_tl("reference");
+    utils::Symbol const YoYoReactor::s_refstate_tl("refstate");
+    utils::Symbol const YoYoReactor::s_control_tl("control");
+    utils::Symbol const YoYoReactor::s_position_tl("estate");
+    utils::Symbol const YoYoReactor::s_yoyo_tl("yoyo");
+    utils::Symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
 
-    YoYoReactor::YoYoReactor(reactor::xml_arg_type arg) :
+    YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
       LstsReactor(arg),
       m_lastRefState(s_refstate_tl, "Failed"),
       m_lastControl(s_control_tl, "Failed"),
@@ -53,13 +53,13 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handle_init()
+    YoYoReactor::handleInit()
     {
-      token yoyo(s_yoyo_tl, "Idle");
-      post_observation(yoyo);
+      Observation yoyo(s_yoyo_tl, "Idle");
+      postObservation(yoyo);
 
-      token yoyo_state(s_yoyo_state_tl, "Idle");
-      post_observation(yoyo_state);
+      Observation yoyo_state(s_yoyo_state_tl, "Idle");
+      postObservation(yoyo_state);
 
       m_lastSeenRef.lat = m_lastSeenRef.lon = m_lastSeenRef.speed =
           m_lastSeenRef.z = m_lastSeenRef.tick = 0;
@@ -69,7 +69,7 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handle_tick_start()
+    YoYoReactor::handleTickStart()
     {
     }
 
@@ -96,15 +96,15 @@ namespace TREX {
     YoYoReactor::synchronize()
     {
       bool nearXY = false, nearZ = false, nearBottom = false;
-      var v;
+      Variable v;
       // int secs_at_surface = 60; //< unused variable
 
-      if (m_lastPosition.has_attribute("altitude"))
+      if (m_lastPosition.hasAttribute("altitude"))
       {
-        v = m_lastPosition.attribute("altitude");
-        float_domain const &alt = dynamic_cast<float_domain const &>(v.domain());
+        v = m_lastPosition.getAttribute("altitude");
+        FloatDomain const &alt = dynamic_cast<FloatDomain const &>(v.domain());
 
-        double alt_ = v.domain().get_typed_singleton<double, true>();
+        double alt_ = v.domain().getTypedSingleton<double, true>();
         if (alt_ > 0 && alt_ < 2)
         {
           nearBottom = true;
@@ -124,38 +124,38 @@ namespace TREX {
       }*/
 
       double atZ = -1000;
-      if (m_lastPosition.has_attribute("z"))
+      if (m_lastPosition.hasAttribute("z"))
       {
-        var vz = m_lastPosition.attribute("z");
-        if (vz.is_complete() && vz.domain().is_singleton())
+        Variable vz = m_lastPosition.getAttribute("z");
+        if (vz.isComplete() && vz.domain().isSingleton())
         {
-          atZ = vz.domain().get_typed_singleton<double,true>();
+          atZ = vz.domain().getTypedSingleton<double,true>();
         }
       }
 
-      if (m_lastRefState.has_attribute("near_z"))
+      if (m_lastRefState.hasAttribute("near_z"))
       {
-        v = m_lastRefState.attribute("near_z");
-        boolean_domain const &nearz = dynamic_cast<boolean_domain const &>(v.domain());
+        v = m_lastRefState.getAttribute("near_z");
+        BooleanDomain const &nearz = dynamic_cast<BooleanDomain const &>(v.domain());
 
-        if (nearz.is_singleton())
+        if (nearz.isSingleton())
         {
-          nearZ = nearz.get_singleton_as_string() == "true" || nearz.get_singleton_as_string() == "1";
+          nearZ = nearz.getStringSingleton() == "true" || nearz.getStringSingleton() == "1";
         }
       }
 
       nearZ = nearZ && abs(atZ - m_cmdz) < 2;
       //std::cerr << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", m_cmdz: "<< m_cmdz<< std::endl;
 
-      if (m_lastRefState.has_attribute("near_xy"))
+      if (m_lastRefState.hasAttribute("near_xy"))
       {
-        v = m_lastRefState.attribute("near_xy");
+        v = m_lastRefState.getAttribute("near_xy");
 
-        boolean_domain const &near_XY = dynamic_cast<boolean_domain const &>(v.domain());
+        BooleanDomain const &near_XY = dynamic_cast<BooleanDomain const &>(v.domain());
 
-        if (near_XY.is_singleton())
+        if (near_XY.isSingleton())
         {
-          nearXY = near_XY.get_singleton_as_string() == "true" || near_XY.get_singleton_as_string() == "1";
+          nearXY = near_XY.getStringSingleton() == "true" || near_XY.getStringSingleton() == "1";
         }
       }
 
@@ -195,39 +195,38 @@ namespace TREX {
         break;
 
         case (SURFACE):
-
         if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
         {
           syslog(log::info)<< "Finished executing yoyo...";
-          token obs(s_yoyo_tl, "Done");
-          obs.restrict_attribute("latitude", float_domain(m_lat));
-          obs.restrict_attribute("longitude", float_domain(m_lon));
-          obs.restrict_attribute("speed", float_domain(m_speed));
-          obs.restrict_attribute("max_z", float_domain(m_maxz));
-          obs.restrict_attribute("min_z", float_domain(m_minz));
+          Observation obs = Observation(s_yoyo_tl, "Done");
+          obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
+          obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
+          obs.restrictAttribute("speed", FloatDomain(m_speed, m_speed));
+          obs.restrictAttribute("max_z", FloatDomain(m_maxz, m_maxz));
+          obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
           postUniqueObservation(obs);
           state = IDLE;
         }
         break;
         default:
           syslog(log::info)<< "Just idling...";
-          postUniqueObservation(token(s_yoyo_tl, "Idle"));
+          postUniqueObservation(Observation(s_yoyo_tl, "Idle"));
           break;
       }
 
       switch (state)
       {
         case (DESCEND):
-          postUniqueObservation(token(s_yoyo_state_tl, "Descending"));
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Descending"));
           break;
         case (ASCEND):
-          postUniqueObservation(token(s_yoyo_state_tl, "Ascending"));
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Ascending"));
           break;
         case (SURFACE):
-          postUniqueObservation(token(s_yoyo_state_tl, "Surfacing"));
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Surfacing"));
           break;
         case (IDLE):
-          postUniqueObservation(token(s_yoyo_state_tl, "Idle"));
+          postUniqueObservation(Observation(s_yoyo_state_tl, "Idle"));
           break;
       }
 
@@ -237,27 +236,27 @@ namespace TREX {
     void
     YoYoReactor::requestReference(double lat, double lon, double speed, double z)
     {
-      token g(s_reference_tl, "Going");
+      Goal g(s_reference_tl, "Going");
 
-      g.restrict_attribute(var("latitude", float_domain(lat)));
-      g.restrict_attribute(var("longitude", float_domain(lon)));
-      g.restrict_attribute(var("z", float_domain(z)));
-      g.restrict_attribute(var("speed", float_domain(speed)));
+      g.restrictAttribute(Variable("latitude", FloatDomain(lat)));
+      g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
+      g.restrictAttribute(Variable("z", FloatDomain(z)));
+      g.restrictAttribute(Variable("speed", FloatDomain(speed)));
 
       //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
-      post_goal(g);
+      postGoal(g);
 
       m_lastSentRef.lat = lat;
       m_lastSentRef.lon = lon;
       m_lastSentRef.z = z;
       m_lastSentRef.speed = speed;
-      m_lastSentRef.tick = current_tick();
+      m_lastSentRef.tick = getCurrentTick();
       m_cmdz = z;
     }
 
     void
-    YoYoReactor::handle_request(TREX::transaction::token_id const &goal)
+    YoYoReactor::handleRequest(TREX::transaction::goal_id const &goal)
     {
       if ( s_trex_pred != m_lastControl.predicate() )
       {
@@ -266,30 +265,30 @@ namespace TREX {
       }
 
       // Make a local copy to increase my reference counter instead of accessing the raw pointer directly !!!!!
-      token_id g = goal;
-      var v;
+      goal_id g = goal;
+      Variable v;
 
       if ( g->predicate() == s_exec_pred )
       {
-        v = g->attribute("latitude");
-        if (v.domain().is_singleton())
-          m_lat = v.domain().get_typed_singleton<double, true>();
+        v = g->getAttribute("latitude");
+        if (v.domain().isSingleton())
+          m_lat = v.domain().getTypedSingleton<double, true>();
 
-        v = g->attribute("longitude");
-        if (v.domain().is_singleton())
-          m_lon = v.domain().get_typed_singleton<double, true>();
+        v = g->getAttribute("longitude");
+        if (v.domain().isSingleton())
+          m_lon = v.domain().getTypedSingleton<double, true>();
 
-        v = g->attribute("speed");
-        if (v.domain().is_singleton())
-          m_speed = v.domain().get_typed_singleton<double, true>();
+        v = g->getAttribute("speed");
+        if (v.domain().isSingleton())
+          m_speed = v.domain().getTypedSingleton<double, true>();
 
-        v = g->attribute("min_z");
-        if (v.domain().is_singleton())
-          m_minz = v.domain().get_typed_singleton<double, true>();
+        v = g->getAttribute("min_z");
+        if (v.domain().isSingleton())
+          m_minz = v.domain().getTypedSingleton<double, true>();
 
-        v = g->attribute("max_z");
-        if (v.domain().is_singleton())
-          m_maxz = v.domain().get_typed_singleton<double, true>();
+        v = g->getAttribute("max_z");
+        if (v.domain().isSingleton())
+          m_maxz = v.domain().getTypedSingleton<double, true>();
 
         requestReference(m_lat, m_lon, m_speed, m_maxz);
         state = DESCEND;
@@ -302,24 +301,24 @@ namespace TREX {
     }
 
     void
-    YoYoReactor::handle_recall(TREX::transaction::token_id const &g)
+    YoYoReactor::handleRecall(TREX::transaction::goal_id const &g)
     {
       //std::cerr << "[YOYO] handleRecall(" << *(g.get()) << ")" << std::endl;
     }
 
     void
-    YoYoReactor::notify(TREX::transaction::token const &obs)
+    YoYoReactor::notify(TREX::transaction::Observation const &obs)
     {
       if (s_reference_tl == obs.object())
       {
         m_lastReference = obs;
         if (m_lastReference.predicate() == "Going")
         {
-          m_lastSeenRef.lat = obs.attribute("latitude").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.lon = obs.attribute("longitude").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.speed = obs.attribute("speed").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.z = obs.attribute("z").domain().get_typed_singleton<double,true>();
-          m_lastSeenRef.tick = current_tick();
+          m_lastSeenRef.lat = obs.getAttribute("latitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.lon = obs.getAttribute("longitude").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.speed = obs.getAttribute("speed").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.z = obs.getAttribute("z").domain().getTypedSingleton<double,true>();
+          m_lastSeenRef.tick = getCurrentTick();
         }
         else {
 

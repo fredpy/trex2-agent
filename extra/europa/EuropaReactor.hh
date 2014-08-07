@@ -36,7 +36,7 @@
 
 # include <trex/europa/Assembly.hh>
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/asio_fstream.hh>
 
 
@@ -54,7 +54,7 @@ namespace TREX {
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup europa
      */
-    class EuropaReactor:public TREX::transaction::reactor, protected Assembly {
+    class EuropaReactor:public TREX::transaction::TeleoReactor, protected Assembly {
     public:
       /** @brief XML constructor
        *
@@ -86,24 +86,24 @@ namespace TREX {
        * @throw TREX::transaction::ReactorException An error occured while trying to intialize this reactor
        * @throw EuropaException europa related error while trying to load the model or solver configuration
        */
-      explicit EuropaReactor(TREX::transaction::reactor::xml_arg_type arg);
+      explicit EuropaReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor */
       ~EuropaReactor();
 
     protected:
       // TREX transaction callbacks
-      void notify(TREX::transaction::token const &obs);
-      void handle_request(TREX::transaction::token_id const &request);
-      void handle_recall(TREX::transaction::token_id const &request);
+      void notify(TREX::transaction::Observation const &obs);
+      void handleRequest(TREX::transaction::goal_id const &request);
+      void handleRecall(TREX::transaction::goal_id const &request);
 
-      void new_plan_token(TREX::transaction::token_id const &t);
-      void cancelled_plan_token(TREX::transaction::token_id const &t);
+      void newPlanToken(TREX::transaction::goal_id const &t);
+      void cancelledPlanToken(TREX::transaction::goal_id const &t);
 
       // TREX execution callbacks
-      bool has_work();
+      bool hasWork();
 
-      void handle_init();
-      void handle_tick_start();
+      void handleInit();
+      void handleTickStart();
       bool synchronize();
       void resume();
 
@@ -117,52 +117,52 @@ namespace TREX {
       void plan_dispatch(EUROPA::TimelineId const &tl,
                          EUROPA::TokenId const &tok);
 
-      void restrict_goal(TREX::transaction::token& goal,
-                          EUROPA::TokenId const &tok);
+      void restrict_goal(TREX::transaction::Goal& goal,
+                             EUROPA::TokenId const &tok);
 
       bool restrict_token(EUROPA::TokenId &tok,
-			  TREX::transaction::token const &pred);
+			  TREX::transaction::Predicate const &pred);
 
-      bool check_internal(EUROPA::LabelStr const &tl) const {
-	return is_internal(TREX::utils::symbol(tl.c_str()));
+      bool is_internal(EUROPA::LabelStr const &name) const {
+	return isInternal(TREX::utils::Symbol(name.c_str()));
       }
-      bool check_external(EUROPA::LabelStr const &tl) const {
-	return is_external(TREX::utils::symbol(tl.c_str()));
+      bool is_external(EUROPA::LabelStr const &name) const {
+	return isExternal(TREX::utils::Symbol(name.c_str()));
       }
-      size_t tl_look_ahead(EUROPA::LabelStr const &name);
+      size_t look_ahead(EUROPA::LabelStr const &name); 
 
       bool do_relax(bool full);
       bool synch();
 
       EUROPA::eint now() const {
-	return static_cast<EUROPA::eint::basis_type>(current_tick());
+	return static_cast<EUROPA::eint::basis_type>(getCurrentTick());
       }
-      EUROPA::eint eu_latency() const {
-        return static_cast<EUROPA::eint::basis_type>(exec_latency());
+      EUROPA::eint latency() const {
+        return static_cast<EUROPA::eint::basis_type>(getExecLatency());
       }
-      EUROPA::eint eu_look_ahead() const {
-        return static_cast<EUROPA::eint::basis_type>(look_ahead());
+      EUROPA::eint look_ahead() const {
+        return static_cast<EUROPA::eint::basis_type>(getLookAhead());
       }
-      EUROPA::edouble eu_tick_to_date(EUROPA::eint tick) const;
-      EUROPA::eint eu_date_to_tick(EUROPA::edouble date) const;
+      EUROPA::edouble tick_to_date(EUROPA::eint tick) const;
+      EUROPA::eint date_to_tick(EUROPA::edouble date) const;
 
 
 
       EUROPA::IntervalIntDomain plan_scope() const;
-      EUROPA::eint eu_initial_tick() const {
-	return static_cast<EUROPA::eint::basis_type>(initial_tick());
+      EUROPA::eint initial_tick() const {
+	return static_cast<EUROPA::eint::basis_type>(getInitialTick());
       }
-      EUROPA::eint eu_final_tick() const {
-	return static_cast<EUROPA::eint::basis_type>(final_tick());
+      EUROPA::eint final_tick() const {
+	return static_cast<EUROPA::eint::basis_type>(getFinalTick());
       }
-      EUROPA::edouble eu_tick_duration() const {
-	return CHRONO::duration<EUROPA::edouble::basis_type>(tick_duration()).count();
+      EUROPA::edouble tick_duration() const {
+	return CHRONO::duration<EUROPA::edouble::basis_type>(tickDuration()).count();
       }
       void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
 
       void logPlan(std::string const &base_name) const;
 
-      typedef boost::bimap<EUROPA::eint, TREX::transaction::token_id> goal_map;
+      typedef boost::bimap<EUROPA::eint, TREX::transaction::goal_id> goal_map;
       goal_map m_active_requests;
       goal_map m_dispatched;
       goal_map m_plan_tokens;
@@ -178,14 +178,6 @@ namespace TREX {
     }; // TREX::europa::EuropaReactor
 
   } // TREX::europa
-  
-  namespace transaction {
-    
-    template<>
-    struct exec_policy<europa::EuropaReactor> :public class_scope_exec<europa::EuropaReactor> {};
-    
-    
-  } // TREX::transaction
 } // TREX
 
 #endif // H_trex_EuropaReactor

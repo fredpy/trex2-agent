@@ -46,11 +46,9 @@
 
 # include "bits/agent_graph.hh"
 
-# include <trex/config/system_error.hh>
 # include <trex/transaction/Tick.hh>
+# include <trex/utils/ErrnoExcept.hh>
 # include <trex/utils/asio_fstream.hh>
-
-# include <trex/utils/timing/posix_utils.hh>
 
 namespace TREX {
   namespace agent {
@@ -78,7 +76,7 @@ namespace TREX {
        * @relates Clock
        * @ingroup agent
        */
-      class Error :public std::runtime_error {
+      class Error :public TREX::utils::Exception {
       public:
         /** @brief Constructor
          *
@@ -87,12 +85,13 @@ namespace TREX {
          * Create a new instance  withe associated message @p msg
          */
         Error(std::string const &msg) throw()
-        :std::runtime_error(msg) {}
+          :TREX::utils::Exception(msg) {}
         /** @brief Destructor */
         ~Error() throw() {}
       }; // TREX::agent::Clock::Error
             
       typedef transaction::graph::duration_type          duration_type;
+      typedef utils::chrono_posix_convert<duration_type> dur_converter;
       typedef transaction::graph::date_type              date_type;
     
       /** @brief Destructor */
@@ -137,11 +136,10 @@ namespace TREX {
 	return CHRONO::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
-        return initialTick()+(date.since(epoch()).to_chrono<duration_type>().count()/tickDuration().count());
-      }
+        return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
+      }	
       virtual date_type tickToTime(TREX::transaction::TICK cur) const {
-        utils::rt_duration delta(tickDuration()*(cur-initialTick()));
-        return epoch().add(delta);
+        return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
       }
       
       /** @brief Sleep until next tick
@@ -179,7 +177,7 @@ namespace TREX {
       virtual std::string duration_str(TREX::transaction::TICK dur) const;
 
       /** @brief XML factory for clocks. */
-      typedef TREX::utils::xml_factory<Clock, SHARED_PTR<Clock> > xml_factory;
+      typedef TREX::utils::XmlFactory<Clock, SHARED_PTR<Clock> > xml_factory;
       
       /** @brief Clock basic information 
        *
@@ -265,7 +263,7 @@ namespace TREX {
 
     private:
       duration_type const m_sleep;
-      utils::singleton::use<utils::log_manager> m_log;
+      utils::SingletonUse<utils::LogManager> m_log;
       
       void log_tick() const ;
       

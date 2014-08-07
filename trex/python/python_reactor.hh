@@ -34,7 +34,7 @@
 #ifndef H_trex_python_python_reactor
 # define H_trex_python_python_reactor
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 
 # include <boost/python.hpp>
 
@@ -43,14 +43,14 @@ namespace TREX {
     void log_error(boost::python::error_already_set const &e);
     
     struct python_reactor
-    :transaction::reactor,
-    boost::python::wrapper<transaction::reactor> {
-      explicit python_reactor(transaction::reactor::xml_arg_type &arg)
-      :transaction::reactor(arg) {}
+    :transaction::TeleoReactor,
+    boost::python::wrapper<transaction::TeleoReactor> {
+      explicit python_reactor(transaction::TeleoReactor::xml_arg_type &arg)
+      :transaction::TeleoReactor(arg) {}
       virtual ~python_reactor() {}
       
       // logging
-      void log_msg(utils::symbol const &type, std::string const &msg);
+      void log_msg(utils::Symbol const &type, std::string const &msg);
       void info(std::string const &msg) {
         log_msg(utils::log::info, msg);
       }
@@ -62,52 +62,43 @@ namespace TREX {
       }
       
       // timeline management
-      void ext_use(utils::symbol const &tl, bool control);
-      bool ext_check(utils::symbol const &tl) const;
-      bool ext_unuse(utils::symbol const &tl);
+      void ext_use(utils::Symbol const &tl, bool control);
+      bool ext_check(utils::Symbol const &tl) const;
+      bool ext_unuse(utils::Symbol const &tl);
 
-      void post_request(transaction::token_id const &g);
-      bool cancel_request(transaction::token_id const &g);
+      void post_request(transaction::goal_id const &g);
+      bool cancel_request(transaction::goal_id const &g);
     
-      void int_decl(utils::symbol const &tl, bool control);
-      bool int_check(utils::symbol const &tl) const;
-      bool int_undecl(utils::symbol const &tl);
+      void int_decl(utils::Symbol const &tl, bool control);
+      bool int_check(utils::Symbol const &tl) const;
+      bool int_undecl(utils::Symbol const &tl);
 
-      void post_obs(transaction::token const &obs, bool verb);
+      void post_obs(transaction::Observation const &obs, bool verb);
       
       // transaction callbacks
-      void notify(transaction::token const &o);
-      void handle_request(transaction::token_id const &g);
-      void handle_recall(transaction::token_id const &g);
+      void notify(transaction::Observation const &o);
+      void handleRequest(transaction::goal_id const &g);
+      void handleRecall(transaction::goal_id const &g);
       
       // exec callbacks
-      void handle_init();
-      void handle_tick_start();
+      void handleInit();
+      void handleTickStart();
       bool synchronize();
-      bool has_work();
+      bool hasWork();
       void resume();
     
     }; // TREX::python::python_reactor
-  
     
-    
-//    class producer:public transaction::reactor::factory::factory_type::producer {
-//    public:
-//      explicit producer(utils::symbol const &name);
-//      ~producer() {}
-//      
-//    private:
-//      result_type produce(argument_type arg) const;
-//    };
+    class producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
+    public:
+      explicit producer(utils::Symbol const &name);
+      ~producer() {}
+      
+    private:
+      result_type produce(argument_type arg) const;
+    };
     
   } // TREX::python
-  
-  namespace transaction {
-    template<>
-    struct exec_policy<python::python_reactor>
-      :public class_scope_exec<python::python_reactor> {};
-  
-  }
 } // TREX
 
 #endif // H_trex_python_python_reactor

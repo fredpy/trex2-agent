@@ -36,7 +36,7 @@
 #include "out_file.hh"
 #include "bits/log_stream.hh" 
 
-#include <trex/config/chrono.hh>
+#include "../platform/chrono.hh"
 
 #include <boost/smart_ptr.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
@@ -165,7 +165,7 @@ void out_file::operator()(entry::pointer msg) {
       (*m_file)<<msg->kind()<<": ";
     else if( prefixed )
       m_file->put(' ');
-    (*m_file)<<msg->content()<<std::endl; // change this to dt::endl if you want to flush
+    (*m_file)<<msg->content()<<std::endl; // change this to dt::endl if you awnt to flush
   }
 }
 
@@ -176,8 +176,8 @@ void out_file::operator()(entry::pointer msg) {
 // structors 
 
 log_pipe::log_pipe(text_log &log, std::ostream &os, 
-		   TREX::utils::symbol const &who,
-                   TREX::utils::symbol const &what)
+		   TREX::utils::Symbol const &who,
+                   TREX::utils::Symbol const &what)
   :m_who(who), m_what(what), m_log(log.m_new_log), m_dest(os), m_flush(log.service()) {
   m_initial = m_dest.rdbuf();
   m_me = new boost::iostreams::stream_buffer<pipe_sink>(*this);

@@ -33,7 +33,7 @@
  */
 #include <boost/python.hpp>
 
-#include <trex/utils/trex_version.hh>
+#include <trex/utils/TREXversion.hh>
 
 
 void export_utils();

@@ -45,7 +45,8 @@
 # define H_StepClock
 
 # include "Clock.hh"
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/StringExtract.hh>
 
 namespace TREX {
   namespace agent {
@@ -146,7 +147,7 @@ namespace TREX {
       /** @brief default maximum allowed number of steps  */
       unsigned int const m_stepsPerTickDefault;
       /** @brief TREX log entry point */ 
-      static TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
+      static TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
     }; // TREX::agent::StepClock
 
   } // TREX::agent 

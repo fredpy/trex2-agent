@@ -8,33 +8,33 @@
 #ifndef TIMELINEPROXY_HH_
 #define TIMELINEPROXY_HH_
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
 # include "../shared/ImcAdapter.hh"
 
 namespace TREX {
   namespace LSTS {
 
-    class TimelineProxy :public TREX::transaction::reactor {
+    class TimelineProxy :public TREX::transaction::TeleoReactor {
     public:
-      TimelineProxy(TREX::transaction::reactor::xml_arg_type arg);
+      TimelineProxy(TREX::transaction::TeleoReactor::xml_arg_type arg);
       virtual ~TimelineProxy();
 
     private:
 
       // called before first tick
-      void handle_init();
+      void handleInit();
 
       // called each tick
       bool synchronize();
 
       // called when a goal is requested
-      void handle_request(token_id const &g);
+      void handleRequest(goal_id const &g);
 
       // called when an observation is posted
-      void notify(token const &obs);
+      void notify(Observation const &obs);
 
       /**
        * @brief should this reactor be used for posting goals (true) or observations (false)?
@@ -67,7 +67,7 @@ namespace TREX {
        */
       std::string m_timeline;
 
-      typedef std::map<std::string, transaction::token_id> goal_map;
+      typedef std::map<std::string, transaction::goal_id> goal_map;
       goal_map m_goals;
     };
   }

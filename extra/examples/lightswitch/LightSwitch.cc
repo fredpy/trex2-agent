@@ -50,11 +50,11 @@
 #include <iostream>
 
 #include <trex/utils/Plugin.hh>
-#include <trex/utils/log_manager.hh>
+#include <trex/utils/LogManager.hh>
 
-#include <trex/domain/boolean_domain.hh>
-#include <trex/domain/float_domain.hh>
-#include <trex/domain/enum_domain.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/EnumDomain.hh>
+#include <trex/domain/BooleanDomain.hh>
 
 #include "LightSwitch.hh"
 
@@ -65,10 +65,10 @@ using namespace TREX::lightswitch;
 namespace {
 
   /** @brief TREX log entry point */
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
   /** @brief Light reactor declaration */
-  reactor::declare<Light> decl("Light");
+  TeleoReactor::xml_factory::declare<Light> decl("Light");
   
 }
 
@@ -88,39 +88,39 @@ namespace TREX {
 
 } // TREX
 
-symbol const Light::onPred("On");
+Symbol const Light::onPred("On");
 
-symbol const Light::offPred("Off");
+Symbol const Light::offPred("Off");
 
-symbol const Light::lightObj("light");
+Symbol const Light::lightObj("light");
 
-symbol const Light::upPred("Up");
+Symbol const Light::upPred("Up");
 
-symbol const Light::downPred("Down");
+Symbol const Light::downPred("Down");
 
-symbol const Light::brokenPred("Broken");
+Symbol const Light::brokenPred("Broken");
 
-symbol const Light::switchObj("switch");
+Symbol const Light::switchObj("switch");
 
 
-Light::Light(reactor::xml_arg_type arg)
-  :reactor(arg, false),
-   m_on(parse_attr<bool>(false, reactor::xml(arg),
+Light::Light(TeleoReactor::xml_arg_type arg)
+  :TeleoReactor(arg, false), 
+   m_on(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			 "state")),
-   m_verbose(parse_attr<bool>(false, reactor::xml(arg),
+   m_verbose(parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
 			      "verbose")),
    m_firstTick(true) {
   syslog(null, info)<<"I want to own "<<lightObj;
   provide(lightObj, false); // declare the light timeline ... no goal accepted here
   syslog(null, info)<<"I want to own "<<switchObj;
-  provide(switchObj); // declare the switch timeline
+  provide(switchObj); // declare the switch timeline 
   syslog(null, info)<<"I am done";
 }
 
 Light::~Light() {}
 
 void Light::setValue(bool val) {
-  symbol light_v, switch_v;
+  Symbol light_v, switch_v;
   m_on = val;
 
   if( m_on ) {
@@ -130,13 +130,13 @@ void Light::setValue(bool val) {
     light_v = offPred;
     switch_v = upPred;
   }
-  m_light_state.reset(new token(lightObj, light_v));
+  m_light_state.reset(new Observation(lightObj, light_v));
   //syslog()<<"Posting "<<*m_light_state;
-  post_observation(*m_light_state);
-  token switch_state(switchObj, switch_v);
-  switch_state.restrict_attribute("foo", boolean_domain(m_on));
+  postObservation(*m_light_state);
+  Observation switch_state(switchObj, switch_v);
+//  switch_state.restrictAttribute("foo", BooleanDomain(m_on));
   //syslog()<<"Posting "<<switch_state;
-  post_observation(switch_state);
+  postObservation(switch_state);
 } 
 
 
@@ -148,18 +148,18 @@ bool Light::synchronize() {
     setValue(m_on);
     need_post = false;
     m_firstTick = false;
-    m_nextSwitch = current_tick()+1;
+    m_nextSwitch = getCurrentTick()+1;
   } else {
-    TICK cur = current_tick();
+    TICK cur = getCurrentTick();
 
     //syslog()<<"Testing next goal switch "<<m_nextSwitch<<"<="<<cur;
     if( m_nextSwitch<=cur ) {
       while( !m_pending.empty() ){
 //        syslog()<<"Checking "<<m_pending.front()->object()<<"."
 //        <<m_pending.front()->predicate()<<".start="<<m_pending.front()->getStart();
-	if( m_pending.front()->starts_after(cur) ) {
+	if( m_pending.front()->startsAfter(cur) ) {
 	  // it can start after cur
-	  if( m_pending.front()->starts_before(cur+1) ) {
+	  if( m_pending.front()->startsBefore(cur+1) ) {
 	    
 	    // it can also starts before cur => it can be set to cur 
 	    if( brokenPred!=m_pending.front()->predicate() ) {
@@ -167,11 +167,11 @@ bool Light::synchronize() {
 	      setValue(downPred==m_pending.front()->predicate());
 	      need_post = false;
 	    } else {
-	      token obs(*m_pending.front());
+	      Observation obs(*m_pending.front());
 //              syslog()<<"Posting "<<obs<<" as an observation";
-	      post_observation(obs);
+	      postObservation(obs);
 	    }
-	    m_nextSwitch = cur+m_pending.front()->duration().lower_bound().value();
+	    m_nextSwitch = cur+m_pending.front()->getDuration().lowerBound().value();
 	    m_pending.pop_front();
 	  } // else {
 //            syslog()<<"This goal is still in the future ("<<m_pending.front()->getStart()
@@ -193,24 +193,24 @@ bool Light::synchronize() {
   }
   // check if I still need to post the ligh state
   if( need_post ) 
-    post_observation(*m_light_state);
+    postObservation(*m_light_state);
   // always succeed
   return true;
 }
 
-void Light::handle_request(token_id const &g) {
+void Light::handleRequest(goal_id const &g) {
   if( g->predicate()==upPred || g->predicate()==downPred || g->predicate()==brokenPred ) {
     // I insert it on my list
-    int_domain::bound lo = g->start().lower_bound();
-    if( lo.is_infinity() ) {
+    IntegerDomain::bound lo = g->getStart().lowerBound();
+    if( lo.isInfinity() ) {
 //      syslog()<<"Adding "<<*g<<" to front of pending goals";
       m_pending.push_front(g);
     } else {
-      std::list<token_id>::iterator i = m_pending.begin();
+      std::list<goal_id>::iterator i = m_pending.begin();
 //      size_t pos = 1;
       TICK val = lo.value();
       for(; m_pending.end()!=i; ++i ) {
-	if( (*i)->starts_after(val) )
+	if( (*i)->startsAfter(val) )
 	  break;
 //        ++pos;
       }
@@ -222,8 +222,8 @@ void Light::handle_request(token_id const &g) {
 //  }
 }
 
-void Light::handle_recall(token_id const &g) {
-  std::list<token_id>::iterator i = m_pending.begin();
+void Light::handleRecall(goal_id const &g) {
+  std::list<goal_id>::iterator i = m_pending.begin();
   for( ; m_pending.end()!=i; ++i ) {
     if( *i==g ) {
       m_pending.erase(i);

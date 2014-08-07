@@ -43,7 +43,7 @@
 #ifndef H_Tick
 # define H_Tick
 
-# include <trex/domain/int_domain.hh>
+# include <trex/domain/IntegerDomain.hh>
 
 namespace TREX {
   namespace transaction {
@@ -51,7 +51,7 @@ namespace TREX {
     /** @brief TREX unit of time
      * @ingroup transaction
      */
-    typedef int_domain::base_type TICK;
+    typedef IntegerDomain::base_type TICK;
 
   } // TREX::transaction
 } // TREX

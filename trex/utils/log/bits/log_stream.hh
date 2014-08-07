@@ -32,13 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_log_bits_log_stream
-# define H_trex_utils_log_bits_log_stream
+#ifndef H_trex_utils_log_log_stream
+# define H_trex_utils_log_log_stream
 
 # include "log_sig.hh"
 
 # include <boost/iostreams/stream.hpp>
-# include <trex/config/memory.hh>
+# include "../../platform/memory.hh"
 
 namespace TREX {
   namespace utils {
@@ -151,4 +151,4 @@ namespace TREX {
   } // TREX:utils
 } // TREX
 
-#endif // H_trex_utils_log_bits_log_stream
+#endif // H_trex_utils_log_log_stream

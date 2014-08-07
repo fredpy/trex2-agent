@@ -34,33 +34,30 @@
 #######################################################################
 
 add_library(TREXdomain SHARED
-  abstract_domain.cc
-  domain_errors.cc
-  basic_enumerated.cc
-  basic_interval.cc
-  domain_impl.cc
-  var.cc
-  token.cc
-  # headers
-  abstract_domain.hh
-  domain_errors.hh
-  basic_enumerated.hh
-  basic_interval.hh
-  boolean_domain.hh
-  domain_visitor.hh
-  domain_visitor_fwd.hh
-  enumerated_domain.hh
-  enum_domain.hh
-  float_domain.hh
-  interval_domain.hh
-  int_domain.hh
-  string_domain.hh
-  var.hh
-  token.hh
-
+  BasicInterval.cc
+  BasicEnumerated.cc
+  DomainBase.cc
+  DomainImpl.cc
+  Variable.cc
+  # headers 
+  BasicEnumerated.hh
+  BasicInterval.hh
+  DomainBase.hh
+  DomainVisitor_fwd.hh
+  DomainVisitor.hh
+  EnumDomain.hh
+  EnumeratedDomain.hh
+  FloatDomain.hh
+  IntegerDomain.hh
+  IntervalDomain.hh
+  StringDomain.hh
+  Variable.hh
   # template source
-  bits/interval_domain.tcc
+  bits/IntervalDomain.tcc
 )
+
+source_group("Template Files\\bits" FILES
+  bits/IntervalDomain.tcc)
 
 add_dependencies(core TREXdomain)
 target_link_libraries(TREXdomain TREXutils)

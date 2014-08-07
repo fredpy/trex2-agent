@@ -1,25 +1,25 @@
 #ifndef H_lsts_DTAReactor
 # define H_lsts_DTAReactor
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 
 namespace TREX {
   namespace LSTS {
     
 
-    class DTAReactor :public TREX::transaction::reactor {
+    class DTAReactor :public TREX::transaction::TeleoReactor {
     public:
-      DTAReactor(TREX::transaction::reactor::xml_arg_type arg);
+      DTAReactor(TREX::transaction::TeleoReactor::xml_arg_type arg);
       ~DTAReactor();
 
     private:
       bool synchronize();
-      void handle_request(TREX::transaction::token_id const &g);
-      void notify(TREX::transaction::token const &obs);
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void notify(TREX::transaction::Observation const &obs);
 
       bool m_active;
-      TREX::utils::symbol m_drifter;
-      TREX::utils::symbol m_path;
+      TREX::utils::Symbol m_drifter;
+      TREX::utils::Symbol m_path;
       double              m_factor;
       bool                m_lagrangian;
       
@@ -27,9 +27,9 @@ namespace TREX {
       bool m_have_pos;
       bool m_have_speed;
       
-      TREX::utils::symbol m_proxy_timeline;
-      TREX::utils::symbol m_asset_id;
-      TREX::utils::symbol m_survey_tl, m_state_tl;
+      TREX::utils::Symbol m_proxy_timeline;
+      TREX::utils::Symbol m_asset_id;
+      TREX::utils::Symbol m_survey_tl, m_state_tl;
 
       enum vehicle_mode {
 	UNKNOWN =0,

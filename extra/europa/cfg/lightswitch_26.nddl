@@ -33,9 +33,13 @@
  */
 #include "TREX.nddl"
 
+/*
+ * The light timeline represent the state of the lightbulb
+ *   - On the lightbulb is bright
+ *   - Off the lightbulb is not bright
+ */
 class Light extends AgentTimeline {
-    predicate On {
-    }
+    predicate On {}
     predicate Off {}
 
     Light(Mode _mode) {
@@ -43,6 +47,15 @@ class Light extends AgentTimeline {
     }
 }
 
+/*
+ * A simple switch that controls the light 
+ *
+ * If it is Up thelight is Off
+ * The light can On only if the sawitch is Down
+ *
+ * Note: we can have case in theory where the switch is Down and the light is still Off 
+ *     indeed there maybe no power or the lightbulb maybe broken
+ */
 class Switch extends AgentTimeline {
     predicate Up { }
     predicate Down { }
@@ -52,6 +65,14 @@ class Switch extends AgentTimeline {
     }
 }
 
+/*
+ * The action to change the switch state
+ *
+ * These action will be deduced based on a requested Light 
+ * state
+ * To have a Light.On I need to set the Switch.Down
+ * To have the Lifght.Off I need to set the switch.Up
+ */
 class LightSwitch extends Timeline {
     Switch controlled;
     
@@ -63,6 +84,14 @@ class LightSwitch extends Timeline {
     }
 }
 
+/*
+ * The room luminance as deduced by the reactor 
+ *
+ * It relates Light state to a more abstract Luminance state
+ *
+ * The relation is also done through action so trex can deduce the urgency 
+ * of the action and dipatch them as early as possible
+ */
 class Luminance extends AgentTimeline {
     predicate Bright {}
     predicate Dim {}
@@ -72,44 +101,102 @@ class Luminance extends AgentTimeline {
     }
 }
 
-LightSwitch::turnOn {
-    ends(condition object.controlled.Up);
-    meets(effect object.controlled.Down);
-}
-
-LightSwitch::turnOff {
-    ends(condition object.controlled.Down);
-    meets(effect object.controlled.Up);
-    starts_before(effect Light.Off l_off);
-    precedes(end, l_off.end);
-}
-
-Luminance::Bright {
-    starts(Light.On);
-    meets(Light.Off);
-}
-
-Luminance::Dim {
-    starts(Light.Off);
-    meets(Light.On);
-}
-
+// Abstraction rules 
 Light::On {
-   contained_by(Switch.Down);
-   contained_by(Luminance.Bright);    
+  contained_by(Luminance.Bright);
 }
+
 
 Light::Off {
   contained_by(Luminance.Dim);
 }
 
-Switch::Up {
-  contained_by(Light.Off);
-  meets(Down);
+Luminance::Bright {
+  starts(Light.On l_on);
+  precedes(l_on.end, end);
 }
 
-Switch::Down {
-  meets(Up);
+Luminance::Dim {
+  starts(Light.Off l_off);
+  precedes(l_off.end, end);
 }
+
+// Relation between Switch and Light
+
+Switch::Up {
+  contained_by(Light.Off);
+}
+
+// Actions for setting Luminance 
+
+LightSwitch::turnOn {
+  // The condition is that I change the state of the switch to down
+  ends(condition object.controlled.Up);
+  meets(condition object.controlled.Down down);
+  
+  // The effect is that eventually he luminance will be bright
+  starts_before(effect Luminance.Bright bright);
+  down contains bright;
+}
+
+LightSwitch::turnOff {
+  // The condition again is that I change the state to Up
+  ends(condition object.controlled.Down);
+  meets(condition object.controlled.Up up);
+
+  // The effect is that the room will become Dim
+  starts_before_end(effect Luminance.Dim dim);
+  dim contains up;
+}
+
+
+
+// /* rulle for turning on a switch
+//  *
+//  * condition the controller will be down 
+//  * condition the controller should been done in the first place
+//  * effect the light will be On
+//  */
+// LightSwitch::turnOn {
+//     ends(condition object.controlled.Up);
+//     meets(condition object.controlled.Down down);
+//     starts_before(effect Light.On l_on);
+//     down contains l_on;
+// }
+
+// /* rulle for turning off a switch
+//  *
+//  * effect the controller will be down 
+//  * condition the controller should been done in the first place
+//  */
+// LightSwitch::turnOff {
+//     ends(condition object.controlled.Down);
+//     meets(condition object.controlled.Up);
+//     meets(effect Light.Off l_off);
+// }
+
+// LumHandler::makeBright {
+//    starts(effect Luminance.Bright);
+//    starts(condition Light.On);
+// }
+
+// LumHandler::makeDim {
+//    starts(effect Luminance.Dim);
+//    starts(condition Light.Off);
+// }
+
+// Light::On {
+//    contained_by(Switch.Down);
+//    contained_by(Luminance.Bright);    
+// }
+
+// Light::Off {
+//   contained_by(Luminance.Dim);
+// }
+
+// Switch::Up {
+//   contained_by(Light.Off);
+// }
+
 
 

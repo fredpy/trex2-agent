@@ -1,31 +1,31 @@
 #ifndef H_Rover
 #define H_Rover
 
-#include <trex/transaction/reactor.hh>
+#include <trex/transaction/TeleoReactor.hh>
 #include <iostream>
 
 namespace TREX {
 
     namespace simpleRobot {
 
-        class SimpleRobot :public TREX::transaction::reactor
+        class SimpleRobot :public TREX::transaction::TeleoReactor
         {
             public:
-                SimpleRobot(TREX::transaction::reactor::xml_arg_type arg);
+                SimpleRobot(TREX::transaction::TeleoReactor::xml_arg_type arg);
                 ~SimpleRobot();
 
             private:
-                void handle_init();
+                void handleInit();
                 bool synchronize();
-                void handle_request(TREX::transaction::token_id const &g);
-                void handle_recall(TREX::transaction::token_id const &g);
+                void handleRequest(TREX::transaction::goal_id const &g);
+                void handleRecall(TREX::transaction::goal_id const &g);
 
 
 
-                void setValue(TREX::transaction::token_id const &g);
+                void setValue(TREX::transaction::goal_id const &g);
 
                 /** Timeline Navigator */
-                static TREX::utils::symbol const navigatorObj;
+                static TREX::utils::Symbol const navigatorObj;
         };
 
     }

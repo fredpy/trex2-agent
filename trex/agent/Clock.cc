@@ -59,9 +59,8 @@ void Clock::sleep(Clock::duration_type const &delay){
       if( 0==nanosleep(&tv, &tv) )
         return;
       if( EINTR!=errno )
-        throw SYSTEM_ERROR(errno, ERROR_NS::system_category(),
-                           "Clock::sleep");
-    }
+        throw ErrnoExcept("Clock:sleep");
+    } 
   }
 }
 
@@ -82,11 +81,11 @@ void Clock::doStart() {
   m_count = 0;
   m_free_count = 0;
   start();
-  m_data.open(m_log->log_file("clock.xml").c_str());
+  m_data.open(m_log->file_name("clock.xml").c_str());
   m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
   m_first = true;
   syslog(TREX::utils::log::info)<<"Clock started at "<<epoch()
-  <<' '<<epoch().value.zone_name()
+  <<' '<<epoch().zone_name()
     <<"\n\t"<<info();
 }
 
@@ -134,7 +133,7 @@ Clock::duration_type Clock::doSleep() {
   return delay;
 }
 
-TREX::utils::log::stream Clock::syslog(utils::symbol const &kind) const {
+TREX::utils::log::stream Clock::syslog(utils::Symbol const &kind) const {
   if( m_started )
     return m_log->syslog(m_last, "clock", kind);
   else 

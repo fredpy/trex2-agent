@@ -34,7 +34,7 @@
 #ifndef H_trex_europa_EuropaDomain
 # define H_trex_europa_EuropaDomain
 
-# include <trex/domain/abstract_domain.hh>
+# include <trex/domain/DomainBase.hh>
 
 // include plasma header as system files in order to disable warnings
 # define TREX_PP_SYSTEM_FILE <PLASMA/Domain.hh>
@@ -55,32 +55,32 @@ namespace TREX {
        *
        * @author Frederic Py <fpy@mbari.org>
        */
-      class EuropaDomain :public TREX::transaction::abstract_domain {
+      class EuropaDomain :public TREX::transaction::DomainBase {
       public:
-	static TREX::utils::symbol const type_str;
+	static TREX::utils::Symbol const type_name;
 
 	explicit EuropaDomain(EUROPA::Domain const &dom);
 	EuropaDomain(EuropaDomain const &other);
 	~EuropaDomain();
 	
-	TREX::transaction::abstract_domain *copy() const;
+	TREX::transaction::DomainBase *copy() const;
 	// std::ostream &toXml(std::ostream &out, size_t tabs) const;
       
 	
-	bool is_interval() const {
+	bool isInterval() const {
 	  return m_dom->isInterval();
 	}
-	bool is_enumerated() const {
+	bool isEnumerated() const {
 	  return m_dom->isEnumerated();
 	}
-	bool is_full() const;
-	bool is_singleton() const {
+	bool isFull() const;
+	bool isSingleton() const {
 	  return m_dom->isSingleton();
 	}
-	bool intersect(TREX::transaction::abstract_domain const &other) const;
-	bool equals(TREX::transaction::abstract_domain const &other) const;
+	bool intersect(TREX::transaction::DomainBase const &other) const;
+	bool equals(TREX::transaction::DomainBase const &other) const;
 
-	bool restrict_with(TREX::transaction::abstract_domain const &other);
+	TREX::transaction::DomainBase &restrictWith(TREX::transaction::DomainBase const &other);
 	EUROPA::Domain const &europaDomain() const {
 	  return *m_dom;
 	}
@@ -94,7 +94,7 @@ namespace TREX {
 
 	std::ostream &print_domain(std::ostream &out) const;
 	boost::any singleton() const;
-	std::string string_singleton() const;
+	std::string stringSingleton() const;
 
       }; // TREX::europa::details::EuropaDomain
 

@@ -33,16 +33,24 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+configure_file(version.hh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/version.hh @ONLY)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/version.hh 
+  DESTINATION include/trex
+)
+
 add_custom_target(core COMMENT "TREX core libraries")
 
 # Core libraries 
 
-add_subdirectory(config)
 add_subdirectory(utils)
 add_subdirectory(domain)
 add_subdirectory(transaction)
-# add_subdirectory(agent)
+add_subdirectory(agent)
 
+# pyhton support disbaled for now as it is incomplete anyway 
 # add_subdirectory(python)
 
 # utility commands 
@@ -57,16 +65,16 @@ configure_file(cmds/nice_flags.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/nice_flags.h @ONLY)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-#add_executable(amc cmds/AMC.cc)
-#target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
-#add_dependencies(core amc)
-#install(TARGETS amc DESTINATION bin)
+add_executable(amc cmds/AMC.cc)
+target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
+add_dependencies(core amc)
+install(TARGETS amc DESTINATION bin)
 
-#trex_cmd(amc)
+trex_cmd(amc)
 
-#add_executable(sim cmds/Sim.cc)
-#target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
-#add_dependencies(core sim)
-#install(TARGETS sim DESTINATION bin)
+add_executable(sim cmds/Sim.cc)
+target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
+add_dependencies(core sim)
+install(TARGETS sim DESTINATION bin)
 
-#trex_cmd(sim)
+trex_cmd(sim)

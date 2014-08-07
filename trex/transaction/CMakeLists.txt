@@ -34,36 +34,57 @@
 #######################################################################
 
 add_library(TREXtransaction SHARED
-  reactor.cc
-  reactor_policies.cc
-  reactor_error.cc
-  graph_error.cc
-  graph.cc
+  Goal.cc
+  Observation.cc
+  Predicate.cc
+  reactor_graph.cc
+  Relation.cc
+  TeleoReactor.cc
+  LogPlayer.cc
+  private/clock_impl.cc
   private/graph_impl.cc
   private/node_impl.cc
-  private/external_impl.cc
-  private/external_handler.cc
-  private/internal_impl.cc
-
   # headers
-  reactor.hh
-  reactor_error.hh
-  graph_error.hh
-  reactor_fwd.hh
-  graph.hh
+  bits/bgl_support.hh
+  bits/external.hh
+  Goal.hh
+  Observation.hh
+  Predicate.hh
+  reactor_graph.hh
+  Relation.hh
+  TeleoReactor_fwd.hh
+  TeleoReactor.hh
   Tick.hh
-  bits/reactor_policies.hh
+  bits/timeline.hh
+  LogPlayer.hh
   bits/transaction_fwd.hh
+  private/clock_impl.hh
   private/graph_impl.hh
   private/node_impl.hh
-  private/external_impl.hh
-  private/external_handler.hh
-  private/internal_impl.hh
-
   # template source
-  bits/graph.tcc
-  bits/reactor_declare.tcc
-  bits/reactor_policies.tcc
+  bits/reactor_graph.tcc
+)
+
+source_group("Template Files\\bits" FILES
+  bits/reactor_graph.tcc)
+
+source_group("Header\ Files\\bits" FILES 
+  bits/transaction_fwd.hh
+  bits/bgl_support.hh
+  bits/external.hh
+  bits/timeline.hh
+)
+
+source_group("Header\ Files\\private" FILES 
+  private/clock_impl.hh
+  private/graph_impl.hh
+  private/node_impl.hh
+)
+
+source_group("Source\ Files\\private" FILES 
+  private/clock_impl.cc
+  private/graph_impl.cc
+  private/node_impl.cc
 )
 
 
@@ -75,7 +96,5 @@ trex_lib(TREXtransaction core)
 install(DIRECTORY . DESTINATION include/trex/transaction
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
   PATTERN "private" EXCLUDE
-  PATTERN "test" EXCLUDE
+  PATTERN "deprecated" EXCLUDE
   PATTERN ".svn" EXCLUDE)
-
-add_subdirectory(test)

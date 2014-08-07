@@ -34,11 +34,11 @@
 #ifndef H_WitreServer
 # define H_WitreServer
 
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
 #include <Wt/WApplication>
 #include <Wt/WServer>
 #include <boost/thread.hpp>
-#include <trex/transaction/reactor.hh>
+#include <trex/transaction/TeleoReactor.hh>
 #include "WitreGraph.hh"
 
 
@@ -49,22 +49,22 @@ namespace TREX {
     class WitreReactor;
     class WitreGraph;
 
-    class WitreServer :public TREX::transaction::reactor,
+    class WitreServer :public TREX::transaction::TeleoReactor, 
     public TREX::transaction::graph::timelines_listener {
     
     public:
 
-      class Error :public std::runtime_error {
-      public:
-        Error(std::string const &what) throw()
-        :std::runtime_error(what) {}
-        virtual ~Error() throw() {}
+      class Error :public TREX::utils::Exception {
+            public:
+                Error(std::string const &what) throw()
+                    :TREX::utils::Exception(what) {}
+                virtual ~Error() throw() {}
       };
 
       // WitreApplication const &app() const;
       // WitreApplication &app();
 
-      typedef std::list<token_id> timed_goal;
+      typedef std::list<goal_id> timed_goal;
 
       Wt::WServer const &wt() const;
       Wt::WServer &wt();
@@ -75,19 +75,19 @@ namespace TREX {
       std::string extTimelinesName(int i) { return externalTimelines[i].str(); }
       int extTimelinesSize() { return externalTimelines.size(); };
       const std::queue<std::string> receiveObs() { return observations; };
-      bool acceptsGoal(TREX::utils::symbol const &name) { return find_external(name)->accept_goals(); }
+      bool acceptsGoal(TREX::utils::Symbol const &name) { return find_external(name)->accept_goals(); }
       time_t getTime_t() { 
-        time_t now = (tick_to_time(current_tick())-boost::posix_time::from_time_t(0)).value.total_seconds();
+        time_t now = (tickToTime(getCurrentTick())-boost::posix_time::from_time_t(0)).total_seconds();
         return now; 
       }
       std::string getDependencies(std::string name);
       const timed_goal& plan() { return planTokens; };
 
-      TREX::transaction::token_id clientGoalPost(boost::property_tree::ptree::value_type const &xml);
-      TREX::transaction::token_id clientGoalPost(TREX::transaction::token const &g);
-      TREX::transaction::token getGoal(std::string obs, std::string prd);
+      TREX::transaction::goal_id clientGoalPost(boost::property_tree::ptree::value_type const &xml);
+      TREX::transaction::goal_id clientGoalPost(TREX::transaction::Goal const &g);
+      TREX::transaction::Goal getGoal(std::string obs, std::string prd);
 
-      WitreServer(TREX::transaction::reactor::xml_arg_type arg);
+      WitreServer(TREX::transaction::TeleoReactor::xml_arg_type arg);
       ~WitreServer();
 
       bool attached() const {
@@ -98,12 +98,12 @@ namespace TREX {
       }
     private:
       //Trex functions
-      void handle_init();
-      void handle_tick_start();
-      void notify(TREX::transaction::token const &obs);
+      void handleInit();
+      void handleTickStart();
+      void notify(TREX::transaction::Observation const &obs);
       bool synchronize();
-      void new_plan_token(token_id const &t);
-      void cancelled_plan_token(token_id const &t);
+      void newPlanToken(goal_id const &t);
+      void cancelledPlanToken(goal_id const &t);
       //End of Trex functions
 
       struct Connection {
@@ -126,8 +126,8 @@ namespace TREX {
       mutable boost::mutex mutex_;
       boost::thread thread_;
       std::vector<Connection> connections;
-      std::set<utils::symbol> pendingTimelines;
-      std::vector<utils::symbol> externalTimelines;
+      std::set<utils::Symbol> pendingTimelines;
+      std::vector<utils::Symbol> externalTimelines;
       std::queue<std::string> observations;
       timed_goal pastTokens;
       timed_goal planTokens;
@@ -158,10 +158,10 @@ namespace TREX {
       // UNIQ_PTR<WitreApplication> m_app;
       Wt::WServer *    m_server;
 
-      TREX::utils::singleton::use<TREX::utils::log_manager> m_log;
+      TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
       WitreReactor *m_entry;
 
-      friend class TREX::utils::singleton::wrapper<WitreServer>;
+      friend class TREX::utils::SingletonWrapper<WitreServer>;
       friend class WitreReactor;
     }; // TREX::witre::WitreServer
 

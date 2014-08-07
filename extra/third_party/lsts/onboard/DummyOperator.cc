@@ -15,12 +15,12 @@ namespace
 {
 
   /** @brief DummyOperator reactor declaration */
-  reactor::declare<DummyOperator> decl("DummyOperator");
+  TeleoReactor::xml_factory::declare<DummyOperator> decl("DummyOperator");
 
 }
 
-DummyOperator::DummyOperator(TREX::transaction::reactor::xml_arg_type arg)
-:reactor(arg)
+DummyOperator::DummyOperator(TREX::transaction::TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg)
 {
 
 }
@@ -29,7 +29,7 @@ DummyOperator::~DummyOperator() {
   // TODO Auto-generated destructor stub
 }
 
-void DummyOperator::notify(TREX::transaction::token const &obs)
+void DummyOperator::notify(TREX::transaction::Observation const &obs)
 {
   if (obs.object().str() == "control" && obs.predicate() == "DUNE")
   {

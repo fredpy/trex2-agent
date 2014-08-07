@@ -1,7 +1,7 @@
 #ifndef H_ControlInterface
 # define H_ControlInterface
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 
 # include <boost/thread.hpp>
 # include <boost/thread/recursive_mutex.hpp>
@@ -24,7 +24,7 @@ namespace TREX {
      *
      * @author Frederic Py
      */
-    class ControlInterface :public TREX::transaction::reactor {
+    class ControlInterface :public TREX::transaction::TeleoReactor {
     public:
       /** @brief Constructor 
        *
@@ -40,7 +40,7 @@ namespace TREX {
        *   the lookahaded and latency are meaningless and can be
        *   set to 0.
        */
-      ControlInterface(TREX::transaction::reactor::xml_arg_type arg);
+      ControlInterface(TREX::transaction::TeleoReactor::xml_arg_type arg);
       /** @brief Destructor 
        *
        * Terminates the listener thread, and destory this 
@@ -75,7 +75,7 @@ namespace TREX {
 
     private:
 
-      void notify(TREX::transaction::token const &obs);
+      void notify(TREX::transaction::Observation const &obs);
 
       /** @brief Message listeenign thread.
        *
@@ -133,11 +133,11 @@ namespace TREX {
        * @li set the agent ControlInterface singleton to this 
        *    instance 
        */ 
-      void handle_init();
-      void handle_tick_start();
+      void handleInit();
+      void handleTickStart();
       bool synchronize();
-      void new_plan_token(TREX::transaction::token_id const &t);
-      void cancelled_plan_token(TREX::transaction::token_id const &t);
+      void newPlanToken(TREX::transaction::goal_id const &t);
+      void cancelledPlanToken(TREX::transaction::goal_id const &t);
       
 
       /** @brief Add a goal
@@ -148,12 +148,12 @@ namespace TREX {
        *
        * @post the pending goal queue is not empty
        */
-      void add_goal(TREX::transaction::token_id const &g,
+      void add_goal(TREX::transaction::goal_id const &g,
                     boost::optional<std::string> const &id);
       void add_recall(std::string const &id);
 
-      bool next(std::set<TREX::transaction::token_id> &l,
-                TREX::transaction::token_id &g);
+      bool next(std::set<TREX::transaction::goal_id> &l,
+                TREX::transaction::goal_id &g);
 
       
       /** @brief Thead listening execution loop
@@ -209,10 +209,10 @@ namespace TREX {
       
       
       bool m_running;
-      std::set<TREX::transaction::token_id> m_pending_goals,
+      std::set<TREX::transaction::goal_id> m_pending_goals,
         m_pending_recalls;
       
-      typedef boost::bimap<std::string, TREX::transaction::token_id> goal_map;
+      typedef boost::bimap<std::string, TREX::transaction::goal_id> goal_map; 
       goal_map m_goals;
       
       bool m_need_fifo;
@@ -226,10 +226,10 @@ namespace TREX {
       /**
        * @brief pointer to singleton class
        */
-      TREX::utils::singleton::use<SharedEnvironment> m_env;
+      TREX::utils::SingletonUse<SharedEnvironment> m_env;
 
       std::string log_message(std::string const &content);
-      static TREX::utils::shared_var<size_t> s_id;
+      static TREX::utils::SharedVar<size_t> s_id;
       
       // TODO : put a bimap to associate goals to their id
 

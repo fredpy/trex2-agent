@@ -7,7 +7,7 @@
 
 #ifndef SHAREDENVIRONMENT_HH_
 #define SHAREDENVIRONMENT_HH_
-#include <trex/utils/singleton.hh>
+#include <trex/utils/SingletonUse.hh>
 
 namespace TREX {
 	namespace LSTS {
@@ -41,7 +41,7 @@ public:
 	void setPlatformReactor(TREX::LSTS::Platform * platf)
 	{
             if( NULL!=platf && NULL!=m_platform )
-              throw std::runtime_error("Attempt to have more than one platform.");
+              throw TREX::utils::Exception("Attempt to have more than one platform.");
             m_platform = platf;
 	}
 
@@ -55,7 +55,7 @@ public:
 		m_controlInterface = citf;
 	}
 
-  friend class TREX::utils::singleton::wrapper<SharedEnvironment>;
+	friend class TREX::utils::SingletonWrapper<SharedEnvironment>;
 };
 
 #endif /* SHAREDENVIRONMENT_HH_ */

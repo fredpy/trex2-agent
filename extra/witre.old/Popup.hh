@@ -29,8 +29,8 @@
 #include <string>
 #include <iostream>
 #include <boost/version.hpp>
-#include <trex/domain/int_domain.hh>
-#include <trex/domain/float_domain.hh>
+#include <trex/domain/IntegerDomain.hh>
+#include <trex/domain/FloatDomain.hh>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
@@ -45,8 +45,8 @@ namespace TREX {
             Wt::WPushButton* ok;
             Wt::WIntValidator* numRange;
             Wt::WIntValidator* middleRange;
-            Wt::Signal<std::map<string, transaction::int_domain>,
-                        std::map<string,transaction::float_domain> > finished_;
+            Wt::Signal<std::map<string, transaction::IntegerDomain>,
+                        std::map<string,transaction::FloatDomain> > finished_;
             Wt::Signal< > cancelled_;
             Wt::JSlot* script;
             Wt::JSlot* disableScript;
@@ -62,8 +62,8 @@ namespace TREX {
             void deleteAttribute(string container, string name, string input);
 
             public:
-            Wt::Signal<std::map<string, transaction::int_domain>,
-                        std::map<string,transaction::float_domain> >& finished() { return finished_; };
+            Wt::Signal<std::map<string, transaction::IntegerDomain>,
+                        std::map<string,transaction::FloatDomain> >& finished() { return finished_; };
             Wt::Signal< >& cancelled() { return cancelled_; };
             Wt::JSignal<string, string, string>& delSignal() { return delSignal_; };
             void setPosition(Wt::WWidget* input) { this->positionAt(input, Wt::Vertical); };
