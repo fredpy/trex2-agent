@@ -185,7 +185,7 @@ void asio_runner::thread_task() {
       // the stopped method
       interrupted = true;
     }
-  } while( interrupted );
+  } while( !interrupted );
 
 #endif // BOOST_VERSION
 }
