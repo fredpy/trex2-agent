@@ -133,9 +133,10 @@ void asio_runner::spawn(size_t n) {
     m_threads.create_thread(boost::bind(&asio_runner::thread_task, this));
 }
 
-
 void asio_runner::thread_task() {
+  bool interrupted;
   do {
+    interrupted = false;
     try {
 #ifdef BOOST_ASIO_ENABLE_HANDLER_TRACKING
       size_t work_tasks;
@@ -166,9 +167,27 @@ void asio_runner::thread_task() {
 #endif // BOOST_ASIO_ENABLE_HANDLER_TRACKING
     } catch(...) {
       // capture silently any exception
+      
+#if (BOOST_VERSION >= 104700)
+      // regular case with boost>=1.47.0
+      // I just chack that io_service is not stopped
+      // to continue the loop
     }
     // double check that m_io is still running
   } while( !m_io.stopped() );
+  
+#else // BOOST_VERSION < 104700
+# warning Your boost version is deprecated. Update to 1.47 or later
+      // In this case I just assume that if we received an exception
+      // then this mean that io_service is still running but just got
+      // interrupted by the exception
+      // We need to do this as before 1.47 io_service did not implement
+      // the stopped method
+      interrupted = true;
+    }
+  } while( interrupted );
+
+#endif // BOOST_VERSION
 }
 
 
