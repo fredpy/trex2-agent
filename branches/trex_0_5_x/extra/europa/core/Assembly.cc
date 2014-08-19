@@ -610,7 +610,7 @@ bool Assembly::relax(bool aggressive) {
   debugMsg("trex:relax", "Cancelling current decisions");
   // We can just clear them as we just goinfg to do the cleaning ourselve
   synchronizer()->clear();
-  planner()->reset();
+  planner()->clear();
   m_updated_commit = m_updated_commit || aggressive; // ask for archiving whenever we have a full relax
 
   // Use m_iter for robust iteration
