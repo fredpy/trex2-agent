@@ -1217,6 +1217,7 @@ namespace TREX {
        * plan
        */
       bool should_archive() const {
+        // return false;
         return m_updated_commit;
       }
       void archive() {

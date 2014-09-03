@@ -151,10 +151,10 @@ namespace TREX {
 			  EUROPA::TiXmlElement const &configData,
 			  EUROPA::LabelStr const &explanation = "trex")
 	:default_oc_dp(client, flawed, configData, explanation) {
-        flawed->incRefCount();
+        //flawed->incRefCount();
       }
       ~TrexOpenConditionDP() {
-        m_flawedToken->decRefCount();
+        //m_flawedToken->decRefCount();
       }
 
       // std::string toShortString() const {
