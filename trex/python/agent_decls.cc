@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include <trex/agent/RealTimeClock.hh>
+#include <trex/agent/StepClock.hh>
 #include <trex/agent/Agent.hh>
 #include <trex/utils/platform/memory.hh>
 
@@ -70,13 +71,20 @@ void export_agent() {
   .def("__str__", &ta::Clock::info)
   ;
   
-  class_<ta::RealTimeClock, bases<ta::Clock>, boost::shared_ptr<ta::RealTimeClock>,
+  class_<ta::RealTimeClock, bases<ta::Clock>, SHARED_PTR<ta::RealTimeClock>,
 	 boost::noncopyable>
   ("rt_clock", "real time clock at 1000Hz resolution",
    init<ta::RealTimeClock::rep const &, optional<unsigned> >(args("period", "percent_use")))
   ;
   
-  implicitly_convertible<boost::shared_ptr<ta::RealTimeClock>, ta::clock_ref>();
+  implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
+  
+  class_<ta::StepClock, bases<ta::Clock>, SHARED_PTR<ta::StepClock>,
+         boost::noncopyable>("sim_clock", "simulated clock",
+                             init<unsigned int>(args("nsteps")))
+  ;
+  
+  implicitly_convertible<SHARED_PTR<ta::StepClock>, ta::clock_ref>();
   
   class_<ta::Agent, bases<tt::graph>, boost::noncopyable>
   ("agent", "TREX agent class",
