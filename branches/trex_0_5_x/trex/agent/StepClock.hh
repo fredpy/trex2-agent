@@ -73,6 +73,7 @@ namespace TREX {
        */
       StepClock(duration_type const &slp, 
                 unsigned int stepsPerTick);
+      StepClock(unsigned int stepsPerTick);
       /** @brief XML parsing constructor
        * @param node A XML clock definition
        *

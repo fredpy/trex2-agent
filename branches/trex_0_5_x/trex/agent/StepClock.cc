@@ -93,7 +93,12 @@ StepClock::StepClock(StepClock::duration_type const &sleepSeconds, unsigned int 
   m_stepsPerTick = m_stepsPerTickDefault;
 }
 
-StepClock::StepClock(boost::property_tree::ptree::value_type &node) 
+StepClock::StepClock(unsigned int stepsPerTick)
+:Clock(duration_type(0)), m_tick(0), m_currentStep(0),
+m_stepsPerTickDefault(selectStep(stepsPerTick)) {
+  m_stepsPerTick = m_stepsPerTickDefault;
+}
+StepClock::StepClock(boost::property_tree::ptree::value_type &node)
   :Clock(Clock::duration_type(0)), m_tick(0), m_currentStep(0),
    m_stepsPerTickDefault(parseStep(node.second)) {}
 
