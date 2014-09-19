@@ -114,11 +114,13 @@ Light::Off {
 Luminance::Bright {
   starts(Light.On l_on);
   precedes(l_on.end, end);
+  start + duration == end;
 }
 
 Luminance::Dim {
   starts(Light.Off l_off);
   precedes(l_off.end, end);
+  start + duration == end;
 }
 
 // Relation between Switch and Light
