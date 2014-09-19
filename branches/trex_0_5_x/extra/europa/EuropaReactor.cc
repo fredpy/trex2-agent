@@ -209,6 +209,34 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 }
 
 EuropaReactor::~EuropaReactor() {
+  // Checking current goals
+  
+  if( !m_active_requests.empty() ) {
+    syslog(null, warn)<<"Reactor destroyed with "<<m_active_requests.size()
+    <<" pending requests:";
+    
+    goal_map::right_const_iterator i = m_active_requests.right.begin();
+    for( ; m_active_requests.right.end()!=i; ++i) {
+      EUROPA::TokenId tok = plan_db()->getEntityByKey(i->second.asLong());
+      
+      if( !tok.isId() )
+        syslog(null, error)<<"Request ["<<i->first<<"] as not present in europa";
+      else {
+        EUROPA::TokenId active = tok->getId();
+        if( tok->isMerged() )
+          active = tok->getActiveToken();
+        EUROPA::StateVarId state = tok->getState();
+      
+        syslog(null, warn)<<"Request ["<<i->first<<"] with last europa state "
+          <<state->toString()
+          <<"\n\t "<<active->getObject()->toString()<<'.'
+          <<active->getUnqualifiedPredicateName().toString()
+          <<" start="<<active->start()->toString()
+          <<", duration="<<active->duration()->toString()
+          <<", end="<<active->end()->toString();
+      }
+    }
+  }
   m_stats.close();
 }
 
@@ -516,16 +544,32 @@ bool EuropaReactor::synchronize() {
 bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   goal_map::left_iterator i = m_active_requests.left.find(tok->getKey());
   bool ret = false;
-
+  EUROPA::TokenId active = tok;
+  if( tok->isMerged() )
+    active = tok->getActiveToken();
+  
   //syslog(null, info)<<"Discarding "<<tok->getUnqualifiedPredicateName().toString()<<'('<<tok->getKey()<<')';
   
   if( m_active_requests.left.end()!=i ) {
-    syslog(null, info)<<"Discarded completed request ["<<i->second<<"]";
+    EUROPA::StateVarId state = tok->getState();
+    
+    if( constraint_engine()->constraintConsistent() ) {
+      syslog(null, info)<<"Discarded completed request ["<<i->second<<"] with last europa state "<<state->toString()
+        <<"\n\t "<<active->getObject()->toString()<<'.'
+        <<active->getUnqualifiedPredicateName().toString()
+        <<" start="<<active->start()->toString()
+        <<", duration="<<active->duration()->toString()
+        <<", end="<<active->end()->toString();
+    } else {
+        syslog(null, warn)<<"Discarding request ["<<i->second<<"] while reactor's plan is in a inconsitent state";
+    }
     m_active_requests.left.erase(i);
     ret = true;
   }
   i = m_dispatched.left.find(tok->getKey());
   if( m_dispatched.left.end()!=i ) {
+    EUROPA::StateVarId state = tok->getState();
+
     syslog(null, info)<<"Discarded past goal ["<<i->second<<"]";
     m_dispatched.left.erase(i);
     ret = true;
