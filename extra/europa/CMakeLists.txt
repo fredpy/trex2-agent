@@ -57,7 +57,7 @@ if(WITH_EUROPA)
   
   # plan archival options
   
-  set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy")
+  set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy;None")
 
   set(EUROPA_ARCHIVAL "Greedy" CACHE STRING
     "Europa archival technique used (${EUROPA_ARCHIVALValues})")

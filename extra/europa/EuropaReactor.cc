@@ -60,6 +60,7 @@ using namespace TREX::utils;
 
 namespace {
   std::string const implicit_var("implicit_var_");
+  Symbol const midca("MIDCA");
 }
 
 
@@ -206,37 +207,32 @@ EuropaReactor::EuropaReactor(TeleoReactor::xml_arg_type arg)
 		      <<" found in the model.";
   m_stats.open(file_name("europa_stat.csv").c_str());
   m_stats<<"tick , what, dur_ns, tokens, steps, depth\n";
+  syslog(midca)<<"LOG "<<manager().logPath();
 }
 
 EuropaReactor::~EuropaReactor() {
   // Checking current goals
   
-  if( !m_active_requests.empty() ) {
-    syslog(null, warn)<<"Reactor destroyed with "<<m_active_requests.size()
-    <<" pending requests:";
-    
-    goal_map::right_const_iterator i = m_active_requests.right.begin();
-    for( ; m_active_requests.right.end()!=i; ++i) {
-      EUROPA::TokenId tok = plan_db()->getEntityByKey(i->second.asLong());
+  syslog(null, midca)<<"END "<<m_active_requests.size()<<" request(s) pending";
+  goal_map::right_const_iterator i = m_active_requests.right.begin();
+  
+  for( ; m_active_requests.right.end()!=i; ++i) {
+    EUROPA::TokenId tok = plan_db()->getEntityByKey(i->second.asLong());
+
+    if( tok.isId() ) {
+      EUROPA::TokenId active = tok;
+      EUROPA::StateVarId state = tok->getState();
       
-      if( !tok.isId() )
-        syslog(null, error)<<"Request ["<<i->first<<"] as not present in europa";
-      else {
-        EUROPA::TokenId active = tok->getId();
-        if( tok->isMerged() )
-          active = tok->getActiveToken();
-        EUROPA::StateVarId state = tok->getState();
+      if( tok->isMerged() )
+        active = tok->getActiveToken();
       
-        syslog(null, warn)<<"Request ["<<i->first<<"] with last europa state "
-          <<state->toString()
-          <<"\n\t "<<active->getObject()->toString()<<'.'
-          <<active->getUnqualifiedPredicateName().toString()
-          <<" start="<<active->start()->toString()
-          <<", duration="<<active->duration()->toString()
-          <<", end="<<active->end()->toString();
-      }
-    }
+      syslog(null, midca)<<"UNCONFIRMED ["<<i->first<<"] "<<state->toString()
+        <<", start="<<active->start()->toString()
+        <<", end="<<active->end()->toString();
+    } else
+      syslog(null, midca)<<"ERROR ["<<i->first<<"] not in europa";
   }
+  
   m_stats.close();
 }
 
@@ -287,6 +283,7 @@ void EuropaReactor::handleRequest(goal_id const &request) {
       syslog(info)<<"Integrated request "<<request
 		  <<" as the token with Europa ID "
 		  <<goal->getKey();
+      syslog(midca)<<"REQUESTED ["<<request<<"] "<<(*request);
       debugMsg("trex:request", "New goal:\n"<<goal->toLongString());
 
       m_active_requests.insert(goal_map::value_type(goal->getKey(), request));
@@ -318,6 +315,7 @@ void EuropaReactor::handleRecall(goal_id const &request) {
       planner()->reset();
     }
     syslog(info)<<"Cancel europa goal "<<key<<" due to recall ["<<request<<"]";    
+    syslog(midca)<<"RECALLED ["<<request<<"]";
     recalled(EUROPA::Entity::getTypedEntity<EUROPA::Token>(key));
   }
   // logPlan("recall");
@@ -551,18 +549,27 @@ bool EuropaReactor::discard(EUROPA::TokenId const &tok) {
   //syslog(null, info)<<"Discarding "<<tok->getUnqualifiedPredicateName().toString()<<'('<<tok->getKey()<<')';
   
   if( m_active_requests.left.end()!=i ) {
-    EUROPA::StateVarId state = tok->getState();
-    
-    if( constraint_engine()->constraintConsistent() ) {
-      syslog(null, info)<<"Discarded completed request ["<<i->second<<"] with last europa state "<<state->toString()
-        <<"\n\t "<<active->getObject()->toString()<<'.'
-        <<active->getUnqualifiedPredicateName().toString()
-        <<" start="<<active->start()->toString()
-        <<", duration="<<active->duration()->toString()
-        <<", end="<<active->end()->toString();
+    if( constraint_engine()->provenInconsistent() ) {
+      syslog(null, midca)<<"INCONSITENT ["<<i->second<<"]";
     } else {
-        syslog(null, warn)<<"Discarding request ["<<i->second<<"] while reactor's plan is in a inconsitent state";
+      EUROPA::StateVarId state = tok->getState();
+      syslog(null, midca)<<"CONFIRMED ["<<i->second<<"] "<<state->toString()
+      <<", start="<<active->start()->toString()
+      <<", end="<<active->end()->toString();
     }
+    
+//    EUROPA::StateVarId state = tok->getState();
+//    
+//    if( !constraint_engine()->provenInconsistent() ) {
+//      syslog(null, info)<<"Discarded completed request ["<<i->second<<"] with last europa state "<<state->toString()
+//        <<"\n\t "<<active->getObject()->toString()<<'.'
+//        <<active->getUnqualifiedPredicateName().toString()
+//        <<" start="<<active->start()->toString()
+//        <<", duration="<<active->duration()->toString()
+//        <<", end="<<active->end()->toString();
+//    } else {
+//        syslog(null, warn)<<"Discarding request ["<<i->second<<"] while reactor's plan is in a inconsistent state";
+//    }
     m_active_requests.left.erase(i);
     ret = true;
   }
@@ -759,6 +766,7 @@ void EuropaReactor::notify(EUROPA::LabelStr const &object,
       obs.restrictAttribute(var);
     }
   }
+  syslog(midca)<<"ASSERT "<<obs;
   postObservation(obs);
 }
 
