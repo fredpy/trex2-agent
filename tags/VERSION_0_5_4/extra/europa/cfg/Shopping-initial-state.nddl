@@ -1,0 +1,36 @@
+#include "Shopping-model.nddl"
+
+int horizonEnd = 100;
+
+// Allocate instances
+//Location Home = new Location("Home");
+//Location SuperMarket = new Location("SuperMarket");
+//Location HardwareStore = new Location("HardwareStore");
+
+//Product Banana = new Product("Banana");
+//Product Milk = new Product("Milk");
+//Product Drill = new Product("Drill");
+
+ProductLocation appleLocation = new ProductLocation(GroceryStore, Apple);
+ProductLocation milkLocation = new ProductLocation(GroceryStore, Milk);
+ProductLocation shirtLocation = new ProductLocation(ClothingStore, Shirt);
+
+Path street1 = new Path(Home, ClothingStore);
+Path street2 = new Path(ClothingStore, Home);
+Path street3 = new Path(ClothingStore, GroceryStore);
+Path street4 = new Path(GroceryStore, ClothingStore);
+
+AgentLocation location = new AgentLocation(External);
+Agent agent = new Agent(Internal);
+
+// Indicate that the database is closed - no new objects can be created
+close();
+
+goal(location.At finish);
+finish.loc.specify(Home);
+finish.start >= 1;
+finish.start <= 99;
+finish.duration >= 10;
+finish.end.specify(100);
+
+// The planner should take it form here!

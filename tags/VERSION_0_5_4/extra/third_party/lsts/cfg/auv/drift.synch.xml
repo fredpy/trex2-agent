@@ -1,0 +1,21 @@
+<Solver name="LstsSynchCfg">
+  <ThreatManager defaultPriority="10">
+    <FlawHandler component="TrexThreatHandler"/>
+  </ThreatManager>
+
+  <OpenConditionManager defaultPriority="100">
+    <FlawFilter component="goals"/>
+    <!-- uncomment if trex still crash on 2nd goal posting -->
+    <FlawFilter predicate-match="Waypoint" />
+    <FlawHandler component="TrexOpenConditionHandler"/>
+  </OpenConditionManager>
+  
+  <!-- any mgr with a priority above 2000 will happen 
+       after states are resolved -->
+
+  <!-- add this if you wan to resolve goals during synch (costful) -->
+  <!-- OpenConditionManager defaultPriority="2500">
+       <FlawFilter component="notGoals"/>
+       <FlawHandler component="StandardOpenConditionHandler"/>
+  </OpenConditionManager -->
+</Solver>
