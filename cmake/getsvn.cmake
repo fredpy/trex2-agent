@@ -59,13 +59,10 @@ endif(Subversion_FOUND)
 # message("svn version is ${MY_WC_REV}")
 
 file(WRITE svn_version.hh.txt 
-  "/* DO NOT EDIT: File automatically generated */\n\n"
   "#define SVN_INFO ${MY_FLAG}\n"
   "#define SVN_ROOT \"${MY_WC_PATH}\"\n"
   "#define SVN_REV \"${MY_WC_REV}\"\n"
 )
-
-message(STATUS "SVN version: [${MY_WC_PATH}:${MY_WC_REV}]")
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different
   svn_version.hh.txt ${OUTPUT_DIR}/svn/version.hh)

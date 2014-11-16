@@ -36,7 +36,7 @@
 #include "timeline_services.hh"
 #include "tick_manager.hh"
 
-#include <trex/utils/trex_version.hh>
+#include <trex/utils/TREXversion.hh>
 
 #include <boost/algorithm/string.hpp>
 
@@ -75,8 +75,8 @@ namespace {
 
 // structors 
 
-REST_reactor::REST_reactor(reactor::xml_arg_type arg)
-:reactor(arg, false) {
+REST_reactor::REST_reactor(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg, false) {
   // Initialize web server
   bool found;
   
@@ -90,12 +90,11 @@ REST_reactor::REST_reactor(reactor::xml_arg_type arg)
     
     xml::read_xml(wt_cfg.string(), cfg);
     if( cfg.empty() )
-      throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
-                         "Wt XML config "+wt_cfg.string()+" is empty");
+      throw ReactorException(*this, "Wt XML config "+wt_cfg.string()+" is empty");
     // Add log redirection to the file and then save it
     syslog(utils::log::info)<<"redirecting Wt server logs to "<<log_dest.string();
     cfg.put("server.application-settings.log-file", log_dest.string());
-    wt_cfg = manager().log_file("cfg/wt_trex.xml");
+    wt_cfg = manager().file_name("cfg/wt_trex.xml");
     xml::write_xml(wt_cfg.string(), cfg);
   
     wt_cfg_arg = wt_cfg.string(); 
@@ -108,14 +107,12 @@ REST_reactor::REST_reactor(reactor::xml_arg_type arg)
   wt_cfg = manager().use("rest.xml", found);
   
   if( !found )
-    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
-                       "Failed to locate "+wt_cfg.string()+" required for Wt server arguments");
+    throw ReactorException(*this, "Failed to locate "+wt_cfg.string()+" required for Wt server arguments");
   // Extarct argument list to be given to the server
   bp::ptree doc;
   xml::read_xml(wt_cfg.string(), doc);
   if( doc.empty() )
-    throw SYSTEM_ERROR(reactor_error_code(reactor_error::configuration_error),
-                       "Server arguments XML file "+wt_cfg.string()+" is empty");
+    throw ReactorException(*this, "Server arguments XML file "+wt_cfg.string()+" is empty");
   
   
   size_t argc;
@@ -133,7 +130,7 @@ REST_reactor::REST_reactor(reactor::xml_arg_type arg)
     argv = new char*[argc+1];
     
     // Make a fake app name
-    argv[0] = strdup(name().str().c_str());
+    argv[0] = strdup(getName().str().c_str());
     for(size_t i=0; i<argc; ++i)
       argv[i+1] = strdup(args[i].c_str());
   }
@@ -161,7 +158,7 @@ REST_reactor::~REST_reactor() {
 
 // TREX callbacks
 
-void REST_reactor::handle_init() {
+void REST_reactor::handleInit() {
   // First create my timelien observer
   m_timelines.reset(new TimelineHistory(*this));
   m_tick.reset(new tick_manager(get_graph(), manager().service()));
@@ -188,32 +185,31 @@ void REST_reactor::handle_init() {
     try {
       // the final thing to do is start my server
       if( !m_server->start() )
-        throw SYSTEM_ERROR(reactor_error_code(reactor_error::unexpected_exception),
-                           "Unable to start Wt REST server");
+        throw ReactorException(*this, "Unable to start Wt REST server");
       syslog(utils::log::info)<<"Wt REST server started on port "<<m_server->impl().httpPort();
     } catch(Wt::WServer::Exception const &e) {
       syslog(utils::log::error)<<"Server initialization error: "<<e.what();
-      throw e;
+      throw ReactorException(*this, e.what());
     }
   }
 }
 
-void REST_reactor::handle_tick_start() {
+void REST_reactor::handleTickStart() {
 }
 
-void REST_reactor::notify(token const &obs) {
-  m_timelines->new_obs(obs, current_tick());
+void REST_reactor::notify(Observation const &obs) {
+  m_timelines->new_obs(obs, getCurrentTick());
 }
 
 bool REST_reactor::synchronize() {
-  m_tick->new_tick(current_tick());
+  m_tick->new_tick(getCurrentTick());
   return true;
 }
 
-void REST_reactor::new_plan_token(token_id const &t) {
+void REST_reactor::newPlanToken(goal_id const &t) {
   
 }
 
-void REST_reactor::cancelled_plan_token(token_id const &t) {
+void REST_reactor::cancelledPlanToken(goal_id const &t) {
   
 }

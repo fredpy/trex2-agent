@@ -9,15 +9,15 @@
 #define IMCMESSENGER_HH_
 
 # include <DUNE/DUNE.hpp>
-# include <trex/transaction/reactor.hh>
-# include <trex/domain/float_domain.hh>
-# include <trex/domain/boolean_domain.hh>
-# include <trex/domain/string_domain.hh>
-# include <trex/domain/int_domain.hh>
-# include <trex/domain/enum_domain.hh>
+# include <trex/transaction/TeleoReactor.hh>
+# include <trex/domain/FloatDomain.hh>
+# include <trex/domain/BooleanDomain.hh>
+# include <trex/domain/StringDomain.hh>
+# include <trex/domain/IntegerDomain.hh>
+# include <trex/domain/EnumDomain.hh>
 # include <trex/utils/Plugin.hh>
-# include <trex/utils/log_manager.hh>
-# include <trex/utils/symbol.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/Symbol.hh>
 
 # include <boost/thread/thread.hpp>
 

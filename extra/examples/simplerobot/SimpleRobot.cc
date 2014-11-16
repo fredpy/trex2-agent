@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <trex/domain/string_domain.hh>
+#include <trex/domain/StringDomain.hh>
 
 #include "SimpleRobot.hh"
 
@@ -11,10 +11,10 @@ using namespace TREX::simpleRobot;
 // rover.navigator
 // rover corresponds to "SimpleRobot rover" declared in SimpleRobot-initial-state.nddl
 // navigator corresponds to the  Navigator navigator; declaration inside the SimpleRobot class in SimpleRobot-model.nddl
-symbol const SimpleRobot::navigatorObj("rover.navigator");
+Symbol const SimpleRobot::navigatorObj("rover.navigator");
 
-SimpleRobot::SimpleRobot(reactor::xml_arg_type arg)
-    :reactor(arg,false)
+SimpleRobot::SimpleRobot(TeleoReactor::xml_arg_type arg)
+    :TeleoReactor(arg,false)
 {
     syslog()<<"I want to own "<<navigatorObj;
     //provide(navigatorObj, false); // declare the navigator timeline --> internal
@@ -26,11 +26,11 @@ SimpleRobot::SimpleRobot(reactor::xml_arg_type arg)
 
 SimpleRobot::~SimpleRobot() {}
 
-void SimpleRobot::handle_init()
+void SimpleRobot::handleInit()
 {
 }
 
-void SimpleRobot::setValue(TREX::transaction::token_id const &g)
+void SimpleRobot::setValue(TREX::transaction::goal_id const &g)
 {
 	syslog()<<"setValue";
 }
@@ -41,12 +41,12 @@ bool SimpleRobot::synchronize()
     return true;
 }
 
-void SimpleRobot::handle_request(token_id const &g)
+void SimpleRobot::handleRequest(goal_id const &g)
 {
 	syslog()<<"handleRequest";
 }
 
-void SimpleRobot::handle_recall(token_id const &g)
+void SimpleRobot::handleRecall(goal_id const &g)
 {
 	syslog()<<"handleRecall";
 }

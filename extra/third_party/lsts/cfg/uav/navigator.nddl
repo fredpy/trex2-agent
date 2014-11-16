@@ -22,7 +22,11 @@ class Navigator extends AgentTimeline {
 	
   predicate At {
     float latitude, longitude, z, speed;
+    float latitude_deg, longitude_deg;
     int secs, radius;    
+    
+    latitude == to_rad(latitude_deg);
+    longitude == to_rad(longitude_deg);
   }
   
   predicate Visit {

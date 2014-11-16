@@ -37,8 +37,8 @@
 
 # include "log_fwd.hh"
 # include "bits/log_stream.hh"
-# include <trex/config/memory.hh>
-# include <trex/config/cpp11_deleted.hh>
+# include "../platform/memory.hh"
+# include "../platform/cpp11_deleted.hh"
 
 # include <iostream>
 # include <memory>

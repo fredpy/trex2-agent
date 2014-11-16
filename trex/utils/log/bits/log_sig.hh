@@ -32,8 +32,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_utils_log_bits_log_sig
-# define H_trex_utils_log_bits_log_sig
+#ifndef H_trex_utils_log_sig
+# define H_trex_utils_log_sig
 
 # include "../entry.hh"
 
@@ -57,4 +57,4 @@ namespace TREX {
   } // TREX::utils
 } // TREX
 
-#endif // H_trex_utils_log_bits_log_sig
+#endif // H_trex_utils_log_sig

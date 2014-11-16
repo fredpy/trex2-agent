@@ -12,13 +12,11 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 using DUNE_NAMESPACES;
 
-namespace tr_details=TREX::transaction::details;
-
 namespace
 {
 
   /** @brief TimelineReporter reactor declaration */
-  reactor::declare<TimelineReporter> decl("TimelineReporter");
+  TeleoReactor::xml_factory::declare<TimelineReporter> decl("TimelineReporter");
 
 }
 
@@ -29,32 +27,36 @@ namespace TREX {
   }
 }
 
-TimelineReporter::TimelineReporter(reactor::xml_arg_type arg)
-:reactor(arg), graph::timelines_listener(std::make_pair(arg.get<0>(), arg.get<1>())), aborted(false)
+TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
+:TeleoReactor(arg), graph::timelines_listener(arg), aborted(false)
 {
-  m_hostport = parse_attr<int>(-1, xml(arg), "hostport");
-  m_hostaddr = parse_attr<std::string>("127.0.0.1", xml(arg), "hostaddr");
-  m_output = parse_attr<bool>(false, xml(arg), "output");
+  m_hostport = parse_attr<int>(-1, TeleoReactor::xml_factory::node(arg),
+                               "hostport");
+  m_hostaddr = parse_attr<std::string>("127.0.0.1",
+                                       TeleoReactor::xml_factory::node(arg),
+                                       "hostaddr");
+  m_output = parse_attr<bool>(false,
+                              TeleoReactor::xml_factory::node(arg),
+                              "output");
 }
 
 TimelineReporter::~TimelineReporter() {
 	// TODO Auto-generated destructor stub
 }
 
-
 void
-TimelineReporter::declared(tr_details::timeline const &timeline)
+TimelineReporter::declared(details::timeline const &timeline)
 {
   if (m_output)
     std::cout << "Timeline has been declared: " << timeline.name() << std::endl;
 
   //syslog(log::warn) << "Timeline has been declared: " << timeline.name();
-  if( !is_external(timeline.name()) )
+  if( !isExternal(timeline.name()) )
 	  use(timeline.name(), false, true);
 }
 
 void
-TimelineReporter::undeclared(tr_details::timeline const &timeline)
+TimelineReporter::undeclared(details::timeline const &timeline)
 {
   if (m_output)
     std::cout << "Timeline has been undeclared: " << timeline.name() << std::endl;
@@ -62,31 +64,35 @@ TimelineReporter::undeclared(tr_details::timeline const &timeline)
   unuse(timeline.name());
 }
 
-void TimelineReporter::new_plan_token(token_id const &g)
+void TimelineReporter::newPlanToken(goal_id const &g)
 {
-  std::string gname = g->object().str();
-  std::string gpred = g->predicate().str();
+  Goal * goal = g.get();
+
+  std::string gname = (goal->object()).str();
+  std::string gpred = (goal->predicate()).str();
 
   if (m_output)
-    std::cout << "GOAL: " << *g << std::endl;
+    std::cout << "GOAL: " << *goal << std::endl;
 
   //syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
 }
 
-void TimelineReporter::cancelled_plan_token(token_id const &g)
+void TimelineReporter::cancelledPlanToken(goal_id const &g)
 {
-   std::string gname = (g->object()).str();
-   std::string gpred = (g->predicate()).str();
+  Goal * goal = g.get();
+
+   std::string gname = (goal->object()).str();
+   std::string gpred = (goal->predicate()).str();
 
    if (m_output)
-     std::cout << "RECALL: " << *g << std::endl;
+     std::cout << "RECALL: " << *goal << std::endl;
 
    //syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
 }
 
-void TimelineReporter::notify(token const &obs)
+void TimelineReporter::notify(Observation const &obs)
 {
-  std::list<TREX::utils::symbol> attrs;
+  std::list<TREX::utils::Symbol> attrs;
 
   TrexOperation op;
   TrexToken token;
@@ -96,13 +102,13 @@ void TimelineReporter::notify(token const &obs)
 
   op.op = TrexOperation::OP_POST_TOKEN;
 
-  obs.list_attributes(attrs);
-  std::list<TREX::utils::symbol>::iterator it;
+  obs.listAttributes(attrs);
+  std::list<TREX::utils::Symbol>::iterator it;
   for (it = attrs.begin(); it != attrs.end(); it++)
   {
     TrexAttribute attr;
-    var v = obs.attribute(*it);
-    symbol type = v.domain().type_name();
+    Variable v = obs.getAttribute(*it);
+    Symbol type = v.domain().getTypeName();
 
     if (type.str() == "float") {
       attr.attr_type = TrexAttribute::TYPE_FLOAT;
@@ -122,9 +128,9 @@ void TimelineReporter::notify(token const &obs)
 
     attr.name = (*it).str();
 
-    if (v.domain().is_singleton()) {
-      attr.max = v.domain().get_singleton_as_string();
-      attr.min = v.domain().get_singleton_as_string();
+    if (v.domain().isSingleton()) {
+      attr.max = v.domain().getStringSingleton();
+      attr.min = v.domain().getStringSingleton();
     }
     //FIXME add support for interval domains
     //else if (v.domain().isInterval())
@@ -141,7 +147,7 @@ void TimelineReporter::notify(token const &obs)
   if (m_output)
   {
 
-    std::cout << "[" << current_tick() << "] " << obs << std::endl;
+    std::cout << "[" << getCurrentTick() << "] " << obs << std::endl;
   }
   op.token.set(token);
   if (m_hostport != -1)

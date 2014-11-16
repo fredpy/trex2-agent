@@ -16,7 +16,7 @@ class Navigator extends AgentTimeline {
     
   predicate Idle {}
 	
-  action Going {
+  predicate Going {
     float latitude, longitude, z, speed;
   }
 	

@@ -31,13 +31,75 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "private/async_ofstream_impl.hh"
+#include "asio_fstream.hh"
 
 #include <boost/bind.hpp>
+#include "platform/chrono.hh"
+#include <boost/optional.hpp>
 
 #include <fstream>
 
 namespace asio=boost::asio;
+
+namespace TREX {
+  namespace utils {
+  
+    
+    class async_ofstream::pimpl:public ENABLE_SHARED_FROM_THIS<async_ofstream::pimpl> {
+    public:
+      typedef async_ofstream::service service;
+      typedef CHRONO::system_clock    clock;
+      
+      
+      pimpl(asio::io_service &io, std::string const &path)
+      :m_io(io), m_file(MAKE_SHARED<std::ofstream>()) {
+        get_service().post(boost::bind(&pimpl::open, m_file, path));
+      }
+      ~pimpl() {
+        get_service().post(boost::bind(&std::ofstream::close, m_file));
+        m_work.reset();
+      }
+    
+      service &get_service() {
+        return boost::asio::use_service<service>(m_io);
+      }
+      
+      void async_write(std::string const &buffer) {
+        get_service().post(boost::bind(&pimpl::write, shared_from_this(), buffer, clock::now()));
+      }
+      void write(std::string buffer, clock::time_point tp) {
+        
+        m_file->write(buffer.c_str(), buffer.length());
+        if( !m_last ) {
+          m_last = tp;
+        }
+
+        CHRONO::milliseconds const limit(10), // force flush only at ~100Hz
+          delta = CHRONO::duration_cast<CHRONO::milliseconds>(clock::now()-*m_last);
+        if( delta>limit ) {
+          std::flush(*m_file);
+          m_last = tp;
+        }
+      }
+      
+      static void open(SHARED_PTR<std::ofstream> f, std::string p) {
+        f->open(p.c_str());
+      }
+      
+      void set_work(SHARED_PTR<asio::io_service::work> wk) {
+        m_work = wk;
+      }
+      
+    private:
+      asio::io_service   &m_io;
+      SHARED_PTR<std::ofstream> m_file;
+      SHARED_PTR<asio::io_service::work>    m_work;
+      
+      boost::optional<clock::time_point> m_last;
+    };
+        
+  }
+}
 
 using namespace TREX::utils;
 

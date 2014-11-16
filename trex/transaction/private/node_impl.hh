@@ -35,121 +35,50 @@
 # define H_trex_transaction_node_impl
 
 # include "../bits/transaction_fwd.hh"
-# include "../bits/reactor_policies.hh"
-
-# include "external_handler.hh"
-
-# include <trex/domain/token.hh>
-
-# include <trex/utils/symbol.hh>
-# include <trex/utils/log_manager.hh>
 
 namespace TREX {
   namespace transaction {
-    
-    class reactor;
-    
     namespace details {
 
       class node_impl :boost::noncopyable,
       public ENABLE_SHARED_FROM_THIS<node_impl> {
       public:
-        node_impl(WEAK_PTR<graph_impl> const &g,
-                  utils::symbol const &name,
-                  exec_ref const &e);
         ~node_impl();
+
         
-        void attach(SHARED_PTR<reactor> r);
+        node_id id() {
+          return shared_from_this();
+        }
         
-        utils::symbol const &name() const {
+        void set_name(utils::Symbol const &name) {
+          m_name = name;
+        }
+        utils::Symbol const &name() const {
           return m_name;
         }
-        date_type latency()              const;
-        date_type lookahead()            const;
-        boost::optional<date_type> now()        const;
-        boost::optional<date_type> last_synch() const;
         
-        void set_latency(date_type const &val);
-        void set_lookahead(date_type const &val);
+        utils::log::stream syslog(utils::Symbol const &ctx,
+                                  utils::Symbol const &kind) const;
+        utils::LogManager &manager() const;
         
-        bool is_internal(utils::symbol const &tl) const;
-        token_ref obs(utils::symbol const &tl,
-                      utils::symbol const &pred) const;
-        void post(token_ref obs);
+        SHARED_PTR<graph_impl> graph() const {
+          return m_graph.lock();
+        }
         
-        bool is_external(utils::symbol const &tl) const;
-
-        void provide(utils::symbol const &tl, bool g, bool p);
-        void use(utils::symbol const &tl, bool g, bool p);
-
+        void provide(utils::Symbol const &tl, bool read_only, bool publish_plan);
+        void use(utils::Symbol const &tl, bool read_only, bool listen_plan);
         
-        utils::log::stream syslog(utils::symbol const &who,
-                                  utils::symbol const &kind) const;
- 
-        void isolate();
-        void g_strand_notify(date_type tick, token_id const &obs,
-                             bool fresh);        
       private:
+        explicit node_impl(WEAK_PTR<graph_impl> const &g);
         
-        bool root() const;
+        void isolate(SHARED_PTR<graph_impl> const &g);
         
-        typedef std::set<SHARED_PTR<internal_impl>, tl_cmp> internal_set;
-       
-        friend class external_handler;
-
-        external_handler m_externals;
-
-        enum reactor_priorities {
-          tick_event,
-          obs_event,
-          synch_event
-        };
-        
-        bool dead() const;
-        void kill();
-        bool start();
-        
-        utils::singleton::use<utils::log_manager> m_log;
-        
+        utils::Symbol               m_name;
         WEAK_PTR<graph_impl> m_graph;
-        WEAK_PTR<reactor>    m_reactor;
-        utils::symbol const  m_name;
-        exec_ref             m_exec;
-        
-        mutable boost::shared_mutex m_mtx;
-        bool                        m_dead;
-        date_type                   m_latency;
-        date_type                   m_lookahead;
-        internal_set                m_internals;
-        
-        // All methods prefixed by g_strand MUST be executed
-        // by m_graph.lock()->strand()
-        void g_strand_attach(SHARED_PTR<reactor> r);
-        void g_strand_latency(date_type val);
-        void g_strand_lookahead(date_type val);
-        void g_strand_tick(boost::signals2::connection const &c,
-                           date_type tick);
-        void g_strand_isolate();
-        void g_strand_synchronized(date_type date);
-        void g_strand_declare(utils::symbol tl,
-                              transaction_flags gp);
-        void g_strand_use(utils::symbol tl,
-                          transaction_flags gp);
-        void g_strand_lost(SHARED_PTR<internal_impl> tl);
-        void g_strand_post(token_ref obs);
-        
-        // All methods prefixed by r_queue must be executed
-        // by m_exec
-        void r_queue_init();              // executed before m_exec->start()
-        void r_queue_tick(date_type val); // priority: tick_event
-        void r_queue_notify(date_type val, token_id obs, bool fresh);
-        void r_queue_synch();             // priority: synch_event
-        
-        
-        node_impl() DELETED;
         
         friend class graph_impl;
-        friend class internal_impl;
+
+        node_impl() DELETED;
       }; // TREX::transaction::details::node_impl
       
     } // TREX::transaction::details

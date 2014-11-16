@@ -57,7 +57,7 @@ if(WITH_EUROPA)
   
   # plan archival options
   
-  set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy")
+  set(EUROPA_ARCHIVALValues "EuropaDefault;Greedy;None")
 
   set(EUROPA_ARCHIVAL "Greedy" CACHE STRING
     "Europa archival technique used (${EUROPA_ARCHIVALValues})")
@@ -109,6 +109,28 @@ if(WITH_EUROPA)
     extensions/Trigonometry.hh
     )
   target_link_libraries(europa_pg TREXeuropa_core TREXtransaction)
+
+  source_group("Source\ Files\\extensions" FILES
+    extensions/Bind.cc
+    extensions/DoNotMatchFilter.cc
+    extensions/extensions.cc
+    extensions/EarliestFirstFlawManager.cc
+    extensions/GoalFilter.cc
+    extensions/Numeric.cc
+    extensions/Trigonometry.cc)
+
+  source_group("Header\ Files\\bits" FILES
+    bits/europa_convert.hh
+    )
+
+  source_group("Header\ Files\\extensions" FILES
+    extensions/Bind.hh
+    extensions/DoNotMatchFilter.hh
+    extensions/EarliestFirstFlawManager.hh
+    extensions/GoalFilter.hh
+    extensions/Numeric.hh
+    extensions/Trigonometry.hh)
+    
 
   install(DIRECTORY trex/ DESTINATION include/trex/
     FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"

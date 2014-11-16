@@ -40,7 +40,7 @@
 #ifndef H_trex_utils_asio_runner
 # define H_trex_utils_asio_runner
 
-# include <trex/config/bits/asio_conf.hh>
+# include "bits/asio_conf.hh"
 
 # include <boost/asio.hpp>
 # include <boost/smart_ptr.hpp>
@@ -133,6 +133,10 @@ namespace TREX {
       
     private:
       void spawn(size_t n_threads);
+      
+      
+      void thread_task();
+      
       
       boost::asio::io_service m_io;
       boost::scoped_ptr<boost::asio::io_service::work> m_active;

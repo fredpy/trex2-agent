@@ -47,15 +47,15 @@ function(cpp11_feature_detection FEATURE_NAME)
     if(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
       set(CPP11_HAS_${FEATURE_NAME} TRUE)
     else(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
-      file(WRITE ${CMAKE_BINARY_DIR}/has_${FEATURE_NAME}.exec ${RUN_OUT})
+      file(WRITE has_${FEATURE_NAME}.exec ${RUN_OUT})
       message(WARNING "Failed to run test for c++11 ${FEATURE_NAME}: ${CPP11_RAN_${FEATURE_NAME}}"
 	"Failed execution output stored in has_${FEATURE_NAME}.exec")
     endif(CPP11_RAN_${FEATURE_NAME} EQUAL 0)
 
   else(CPP11_COMPILED_${FEATURE_NAME})
-    file(WRITE ${CMAKE_BINARY_DIR}/has_${FEATURE_NAME}.comp "${COMP_OUT}")
+    file(WRITE has_${FEATURE_NAME}.comp ${COMP_OUT})
     message(WARNING "Failed to compile test for c++11 ${FEATURE_NAME}"
-      "\ncompilation output is in has_${FEATURE_NAME}.comp")
+      "compilation output is in ${has_${FEATURE_NAME}.comp")
   endif(CPP11_COMPILED_${FEATURE_NAME})
 
   message(STATUS "Detecting support for c++11 feature '${FEATURE_NAME}': ${CPP11_HAS_${FEATURE_NAME}}")

@@ -47,16 +47,14 @@
 
 # include "Clock.hh"
 
-# include <trex/config/memory.hh>
+# include <trex/utils/platform/memory.hh>
 
-# include <trex/utils/timing/posix_utils.hh>
-# include <trex/utils/log_manager.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/StringExtract.hh>
 
-# include <trex/utils/timing/tick_clock.hh>
-# include <trex/utils/timing/chrono_helper.hh>
+# include <trex/utils/tick_clock.hh>
 
 # include <boost/thread/recursive_mutex.hpp>
-# include <boost/date_time/posix_time/posix_time_io.hpp>
 
 # include <boost/math/common_factor_rt.hpp>
 
@@ -117,7 +115,7 @@ namespace TREX {
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
         if( percent_use<5 || percent_use>100 )
-          throw std::runtime_error("Only accept clock percent_use between 5 and 100%");
+          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
         m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
@@ -126,7 +124,7 @@ namespace TREX {
         :Clock(duration_type::zero()), m_period(period) {
         check_tick();
         if( percent_use<5 || percent_use>100 )
-          throw std::runtime_error("Only accept clock percent_use between 5 and 100%");
+          throw utils::Exception("Only accept clock percent_use between 5 and 100%");
         m_sleep_watchdog = percent_use*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
       }
@@ -207,7 +205,7 @@ namespace TREX {
             std::ostringstream oss;
             oss<<"No tick duration attribute found. Specify one or more of the following:\n"
             <<" - hours,minutes,seconds,millis,nanos";
-            throw boost::property_tree::ptree_bad_data(oss.str(), node);
+            throw utils::XmlError(node, oss.str());
           }
           
           m_period = CHRONO::duration_cast<tick_rate>(ns_tick);
@@ -215,7 +213,7 @@ namespace TREX {
         check_tick();
         unsigned sleep_ratio = utils::parse_attr<unsigned>(100, node, "percent_use");
         if( sleep_ratio<5 || sleep_ratio>100 )
-          throw std::runtime_error("Only accept clock precent_use between 5 and 100%");
+          throw utils::Exception("Only accept clock precent_use between 5 and 100%");
         m_sleep_watchdog = 
 	  sleep_ratio*CHRONO::duration_cast<typename clock_type::base_duration>(m_period);
         m_sleep_watchdog /= 100;
@@ -252,45 +250,66 @@ namespace TREX {
       }
       
       transaction::TICK timeToTick(date_type const &date) const {
-        tick_rate delta = date.since(epoch()).template to_chrono<tick_rate>();
-        
-        return initialTick()+(delta.count()/m_period.count());
+        typedef utils::chrono_posix_convert<tick_rate> convert;
+    
+        return initialTick()+(convert::to_chrono(date-epoch()).count()/m_period.count());
       }
       
       date_type tickToTime(TREX::transaction::TICK cur) const {
-        transaction::TICK const max_t = max_tick();
+        typedef utils::chrono_posix_convert<tick_rate> convert;
+        typedef typename convert::posix_duration conv_dur;
+        static boost::posix_time::ptime const max_date(boost::posix_time::max_date_time);
+        conv_dur delta /*, max_delta = max_date-epoch()*/;
         
-        utils::rt_duration delta;
+        transaction::TICK max_t = max_tick();
         
         if( cur>max_t ) {
-          syslog(warn)<<"Tick "<<cur<<" is larger than max delay until "<<date_type::max()
-          <<".\n\tReducing it to "<<max_t;
+          syslog(warn)<<"Tick "<<cur<<" is larger than max delay until "
+          <<max_date<<".\n\tReducing it to "<<max_t;
           cur = max_t;
         }
+        
         rep const t_max = std::numeric_limits<rep>::max()/(2*m_period.count());
         
-        if( t_max<=cur ) {
-          utils::rt_duration const base(m_period*t_max);
-          rep factor = cur/t_max, remains = cur%t_max;
+        if( t_max<=cur ) {          
           
-          delta.value = base.value*factor;
-          delta.value += utils::rt_duration(m_period*remains).value;
-        } else
-          delta = utils::rt_duration(m_period*cur);
-        return epoch().add(delta);
+          conv_dur const base = convert::to_posix(m_period*t_max);
+          rep factor = cur/t_max, remains=cur%t_max;
+          
+          
+          
+          delta = base*factor;
+          
+          delta += convert::to_posix(m_period*remains);
+        } else {
+          // Do the same for the min just in case
+          rep const t_min = std::numeric_limits<rep>::min()/(2*m_period.count());
+          
+          if( t_min>=cur ) {
+            conv_dur const base = convert::to_posix(m_period*t_min);
+            rep factor = cur/t_min, remains = cur%t_min;
+            
+            delta = base*factor;
+            delta += convert::to_posix(m_period*remains);
+          } else {
+            delta = convert::to_posix(m_period*cur);
+          }
+        }
+        
+        return epoch()+delta;
       }
-      
       std::string date_str(TREX::transaction::TICK const &tick) const {
-        std::ostringstream oss;
-        oss<<tickToTime(tick);
-        return oss.str();
+        return boost::posix_time::to_iso_extended_string(tickToTime(tick));
       }
       std::string duration_str(TREX::transaction::TICK dur) const {
-        utils::rt_duration p_dur(tickDuration()*dur);
+        duration_type dt = tickDuration()*dur;
+        typedef TREX::utils::chrono_posix_convert<duration_type> cvt;
+        
+        typename cvt::posix_duration p_dur = cvt::to_posix(dt);
         std::ostringstream oss;
         oss<<p_dur;
         return oss.str();
-      }
+      }      
       
       std::string info() const {
         std::ostringstream oss;
@@ -389,7 +408,7 @@ namespace TREX {
     
       void check_tick() const {
         if( m_period <= tick_rate::zero() )
-          throw Error("[clock] tick rate must be greater than 0");
+          throw TREX::utils::Exception("[clock] tick rate must be greater than 0");
       }
       
       typedef boost::recursive_mutex mutex_type;

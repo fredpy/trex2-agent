@@ -34,7 +34,7 @@
 #include "Witre.hh"
 #include "WitreGraph.hh"
 
-#include <trex/utils/trex_version.hh>
+#include <trex/utils/TREXversion.hh>
 #include <trex/utils/Plugin.hh>
 
 #include <Wt/WFileResource>
@@ -47,7 +47,7 @@ namespace xml = boost::property_tree::xml_parser;
 
 namespace {
 
-  singleton::use<log_manager> s_log;
+  SingletonUse<LogManager> s_log;
 
 }
 
@@ -56,7 +56,7 @@ TREX::witre::WitreApplication *TREX::witre::createWitre(Wt::WEnvironment const &
       // hard coded for now
 
       bool found;
-      std::string file = s_log->use("witre_loc.xml", found).string();
+      std::string file = s_log->use("witre_loc.xml", found);
 
       if( found ) {
             file.erase(file.end()-4, file.end());
@@ -246,14 +246,14 @@ void WitreApplication::urlPage(const std::string& path)
     }
     else if(internalPathMatches("/graph"))
     {
-        WitreGraphContainer* image = new WitreGraphContainer(webpage, wServer->get_graph());
+        WitreGraphContainer* image = new WitreGraphContainer(webpage, wServer->getGraph());
         webpage->setCurrentWidget(image->getWidget());
     }
     else if(internalPathMatches("/log") && !internalPathNextPart("/log/").empty())
     {
         bool found;
         string path = internalPathNextPart("/log/");
-        std::string file = s_log->locate(s_log->log_file(path).string(), found).string();
+        std::string file = s_log->locate(s_log->file_name(path).string(), found).string();
         if(found)
         {
           // file = s_log->locate(file, found).string();
@@ -574,7 +574,7 @@ void WitreApplication::attributePopup()
                 msg<<"alert(\"";
                 for(; last!=i; ++i, count++)
                 {
-                  TREX::transaction::token_id
+                  TREX::transaction::goal_id 
                     g = wServer->clientGoalPost(*i);
                   if( g )
                     msg<<"Goal: "<<*g<<"\\n";
@@ -584,6 +584,9 @@ void WitreApplication::attributePopup()
             } else {
             doJavaScript("alert('File ("+file+") is empty!');");
             }
+        } catch(Exception const &te) {
+            err<<"alert('TREX error ("<<te<<")');";
+            doJavaScript(err.str());
         } catch( std::exception const &e ) {
             err<<"alert('Exception: ("<<e.what()<<")');";
             doJavaScript(err.str());
@@ -596,7 +599,7 @@ void WitreApplication::attributePopup()
     else if(!object.empty() && !predicate.empty())
     {
         popup->setPosition(input);
-        popup->valRange(wServer->current_tick(),wServer->final_tick());
+        popup->valRange(wServer->getCurrentTick(),wServer->getFinalTick());
         popup->setVisable();
     }
     else {
@@ -606,29 +609,29 @@ void WitreApplication::attributePopup()
     }
 }
 
-void WitreApplication::clientPostGoal(std::map<string, transaction::int_domain> standards,
-                                        std::map<string,transaction::float_domain> attributes)
+void WitreApplication::clientPostGoal(std::map<string, transaction::IntegerDomain> standards,
+                                        std::map<string,transaction::FloatDomain> attributes)
 {
     std::string object = menu->currentText().toUTF8();
     std::string predicate = input->text().toUTF8();
     if(!object.empty() && !predicate.empty())
     {
-        TREX::transaction::token goal = wServer->getGoal(object,predicate);
-        goal.restrict_start(standards.find("Start")->second);
-        goal.restrict_duration(standards.find("Duration")->second);
-        goal.restrict_end(standards.find("End")->second);
+        TREX::transaction::Goal goal = wServer->getGoal(object,predicate);
+        goal.restrictStart(standards.find("Start")->second);
+        goal.restrictDuration(standards.find("Duration")->second);
+        goal.restrictEnd(standards.find("End")->second);
 
-        std::map<string,transaction::float_domain>::iterator etc;
+        std::map<string,transaction::FloatDomain>::iterator etc;
         for(etc = attributes.begin(); etc!=attributes.end(); etc++)
         {
-            transaction::var temp(etc->first, etc->second);
-            goal.restrict_attribute(temp);
+            transaction::Variable temp(etc->first, etc->second);
+            goal.restrictAttribute(temp);
         }
-        TREX::transaction::token_id goalid = wServer->clientGoalPost(goal);
+        TREX::transaction::goal_id goalid = wServer->clientGoalPost(goal);
         if(goalid!=NULL)
         {
             std::stringstream oss;
-            oss<<"<Token on=\""<<object<<"\" tick=\""<<wServer->current_tick()<<"\" level=\"-1\" >"
+            oss<<"<Token on=\""<<object<<"\" tick=\""<<wServer->getCurrentTick()<<"\" level=\"-1\" >"
                <<"On Timeline <on><b>"<<goalid->object()<<"</b></on>, placed goal "
                <<"<pred><b>"<<goalid->predicate()<<"</b></pred> "
                <<"at the time: "<<wServer->getTime_t()<<"<br />"
@@ -710,15 +713,15 @@ void WitreApplication::newPlanToken(const WitreServer::timed_goal& plan)
     WitreServer::timed_goal::const_iterator t;
     for(t = plan.begin(); t!=plan.end(); ++t)
     {
-        const token_id& goal = (*t);
+        const goal_id& goal = (*t);
         std::ostringstream planStr;
         planStr <<"<Token timeline=\'"<<goal->object()<<"\' pred=\'"<<goal->predicate()
              <<"\' value=\'"<<goal<<"\'>"
              <<"["<<goal->object()<<"."<<goal->predicate()<<"] plan: "
-             <<"Start = "<<goal->start()<<" Duration = "<<goal->duration()<<" End = "<<goal->end()
+             <<"Start = "<<goal->getStart()<<" Duration = "<<goal->getDuration()<<" End = "<<goal->getEnd()
              <<"</Token>";
         ostringstream stime;
-        stime<< wServer->current_tick();
+        stime<< wServer->getCurrentTick();
         string time = stime.str();
         string name = goal->object().str();
         Wt::WPanel* panel = new Wt::WPanel();

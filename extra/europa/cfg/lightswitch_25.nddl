@@ -82,10 +82,12 @@ LightSwitch::turnOff {
 
 Luminance::Bright {
     met_by(LightSwitch.turnOn);
+    start + duration == end;
 }
 
 Luminance::Dim {
     met_by(LightSwitch.turnOff);
+    start + duration == end;
 }
 
 Light::On {

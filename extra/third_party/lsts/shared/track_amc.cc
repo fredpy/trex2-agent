@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include <trex/config/chrono.hh>
+#include <trex/utils/platform/chrono.hh>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>

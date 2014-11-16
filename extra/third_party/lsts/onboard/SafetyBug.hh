@@ -8,7 +8,7 @@
 #ifndef SAFETYBUG_HH_
 #define SAFETYBUG_HH_
 
-# include <trex/transaction/reactor.hh>
+# include <trex/transaction/TeleoReactor.hh>
 # include <DUNE/DUNE.hpp>
 # include"SharedEnvironment.hh"
 
@@ -22,13 +22,13 @@ namespace TREX {
  */
 namespace LSTS {
 
-class SafetyBug :public TREX::transaction::reactor {
+class SafetyBug :public TREX::transaction::TeleoReactor {
 public:
-	SafetyBug(TREX::transaction::reactor::xml_arg_type arg);
+	SafetyBug(TREX::transaction::TeleoReactor::xml_arg_type arg);
 	virtual ~SafetyBug();
 
 private:
-  TREX::utils::singleton::use<SharedEnvironment> m_env;
+	TREX::utils::SingletonUse<SharedEnvironment> m_env;
 	bool aborted;
 
 	bool synchronize()
@@ -36,8 +36,8 @@ private:
 		// nothing to do
 		return !aborted;
 	}
-	void notify(TREX::transaction::token const &obs);
-	void new_plan_token(TREX::transaction::token_id const &t);
+	void notify(TREX::transaction::Observation const &obs);
+	void newPlanToken(TREX::transaction::goal_id const &t);
 
 };
 }

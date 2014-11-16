@@ -80,7 +80,7 @@
 #include <trex/agent/Agent.hh>
 #include <trex/agent/RealTimeClock.hh>
 #include <trex/agent/StepClock.hh>
-#include <trex/utils/trex_version.hh>
+#include <trex/utils/TREXversion.hh>
 
 #include <boost/date_time/posix_time/time_formatters.hpp>
 
@@ -107,7 +107,7 @@ namespace {
                               "  amc <mission>[.cfg] [options]\n\n"
                               "Allowed options");
   
-  singleton::use<log_manager> amc_log;
+  SingletonUse<LogManager> amc_log;
   UNIQ_PTR<Agent> my_agent;
  
 }
@@ -117,7 +117,7 @@ namespace {
 extern "C" {
   
   void amc_cleanup(int sig) {
-    singleton::use<log_manager> amc_log;
+    SingletonUse<LogManager> amc_log;
     
     boost::posix_time::ptime now(boost::posix_time::second_clock::universal_time());
     
@@ -131,7 +131,7 @@ extern "C" {
   }
   
   void amc_terminate() {
-    singleton::use<log_manager> amc_log;
+    SingletonUse<LogManager> amc_log;
     
     amc_log->syslog("amc", error)<<" Received a terminate";
     amc_log->flush();
@@ -219,8 +219,8 @@ int main(int argc, char *argv[]) {
     char *priority_env = getenv("TREX_NICE");
     if( NULL!=priority_env ) {
       try {
-        nice_val = boost::lexical_cast<size_t>(priority_env);
-      } catch (boost::bad_lexical_cast const &e) {
+        nice_val = string_cast<size_t>(priority_env);
+      } catch (bad_string_cast const &e) {
         std::cerr<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"'<<std::endl;
         amc_log->syslog("amc", tlog::error)<<"Ignoring invalid priority $TREX_NICE=\""<<priority_env<<'\"';
       }
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
     }
     if( pid>0 ) {
       // Disable singleton management for this process
-      singleton::use<LogManager>::disable();
+      SingletonUse<LogManager>::disable();
       exit(0);
     }
     
@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
     if( (pid = fork()) )  {
       if( pid>0 ) {
         // Disable singleton management for this process
-        singleton::use<LogManager>::disable();
+        SingletonUse<LogManager>::disable();
         // I am the parent : I can die
         std::cout<<"Daemon spawned (pid="<<pid<<")\n"
         <<"All messages should now be reported in:\n  ";
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> const &incs = opt_val["include-path"].as< std::vector<std::string> >();
     for(std::vector<std::string>::const_iterator i=incs.begin();
         incs.end()!=i; ++i) {
-      if( amc_log->add_search_path(*i) )
+      if( amc_log->addSearchPath(*i) )
         amc_log->syslog("amc", info)<<"Added \""<<*i<<"\" to search path";
     }
   }
@@ -287,9 +287,9 @@ int main(int argc, char *argv[]) {
   
   // Initialize all the log environment
   if( opt_val.count("log-dir") )
-    amc_log->log_path(opt_val["log-dir"].as<std::string>());
+    amc_log->setLogPath(opt_val["log-dir"].as<std::string>());
   // Create log directory and all
-  amc_log->log_path();
+  amc_log->logPath();
   
 
 #ifdef DAEMON
@@ -375,6 +375,11 @@ int main(int argc, char *argv[]) {
     my_agent.reset(); // destroy
   
     exit(0);
+  } catch(TREX::utils::Exception const &e) {
+    // receved a trex error ...
+    amc_log->syslog("amc", error)<<"TREX exception :"<<e;
+    my_agent.reset();
+    throw;
   } catch(std::exception const &se) {
     // received a standard C++ exception
     amc_log->syslog("amc", error)<<"exception :"<<se.what();

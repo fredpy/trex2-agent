@@ -216,12 +216,12 @@ Assembly::Assembly(std::string const &name, size_t steps,
 
   // complete base class Initialization
   doStart();
-
+     
   // gather europa entry points
   m_schema = ((EUROPA::Schema *)getComponent("Schema"))->getId();
   m_cstr_engine = ((EUROPA::ConstraintEngine *)getComponent("ConstraintEngine"))->getId();
   m_plan = ((EUROPA::PlanDatabase *)getComponent("PlanDatabase"))->getId();
-
+     
 
   // Register the new propagator used for reactor related constraints
   new ReactorPropagator(*this, EUROPA::LabelStr("trex"), m_cstr_engine);
@@ -267,14 +267,14 @@ void Assembly::init_clock_vars() {
   if( m_clock.isNoId() )
     throw EuropaException("Unable to find variable "+CLOCK_VAR.toString());
 
-  mission_start->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_initial_tick(),
-							      eu_initial_tick()));
-  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_final_tick(),
-							    eu_final_tick()));
-  tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_tick_duration(),
-							    eu_tick_duration()));
-  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(eu_initial_tick(),
-                                                        eu_final_tick()));
+  mission_start->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
+							      initial_tick()));
+  mission_end->restrictBaseDomain(EUROPA::IntervalIntDomain(final_tick(),
+							    final_tick()));
+  tick_factor->restrictBaseDomain(EUROPA::IntervalIntDomain(tick_duration(),
+							    tick_duration()));
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(initial_tick(),
+                                                        final_tick()));
 }
 
 void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
@@ -299,13 +299,13 @@ void Assembly::add_state_var(EUROPA::TimelineId const &tl) {
   }
 }
 
-void Assembly::eu_new_tick() {
+void Assembly::new_tick() {
   bool auto_prop = constraint_engine()->getAutoPropagation();
   constraint_engine()->setAutoPropagation(false);
   
   debugMsg("trex:tick", "START new_tick["<<now()<< "]-----------------------------------------------------");
-  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<eu_final_tick()<<"]");
-  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), eu_final_tick()));
+  debugMsg("trex:tick", "Updating clock to ["<<now()<<", "<<final_tick()<<"]");
+  m_clock->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), final_tick()));
 
   debugMsg("trex:tick", "Updating non-started goals to start after "<<now());
   boost::filter_iterator<details::is_rejectable,
@@ -486,7 +486,7 @@ EUROPA::ConstrainedVariableId Assembly::get_tick_const() {
 void Assembly::notify(details::CurrentState const &state) {
   EUROPA::LabelStr obj_name = state.timeline()->getName();
 
-  if( check_internal(obj_name) ) {
+  if( is_internal(obj_name) ) {
     debugMsg("trex:notify", "Post observation "<<state.timeline()->toString()
              <<'.'<<state.current()->getUnqualifiedPredicateName().toString()<<":\n"
              <<state.current()->toLongString());
@@ -528,7 +528,7 @@ bool Assembly::commit_externals() {
   return true;
 }
 
-bool Assembly::eu_do_synchronize() {
+bool Assembly::do_synchronize() {
   m_in_synchronization = true;
 
   BOOST_SCOPE_EXIT((&m_in_synchronization)) {
@@ -563,6 +563,28 @@ void Assembly::erase(EUROPA::TokenSet &set, EUROPA::TokenId const &tok) {
       ++m_iter;
     set.erase(i);
   }
+}
+
+
+namespace {
+
+  void deep_cancel(EUROPA::DbClientId cli, EUROPA::TokenId tok) {
+
+    if( tok->isActive() ) {
+      EUROPA::TokenSet slaves = tok->slaves(), to_del;
+      for(EUROPA::TokenSet::iterator i=slaves.begin(); slaves.end()!=i; ++i) {
+	if( !(*i)->isFact() ) {
+	  deep_cancel(cli, *i);
+	  to_del.insert(*i);
+	}
+      }
+      for(EUROPA::TokenSet::iterator i=to_del.begin(); to_del.end()!=i; ++i) 
+	cli->deleteToken(*i);
+    } 
+    if( !tok->isInactive() )
+      cli->cancel(tok);
+  }
+
 }
 
 
@@ -612,15 +634,8 @@ bool Assembly::relax(bool aggressive) {
         if( aggressive ) {
           debugMsg("trex:relax", "\t- destroying "<<tok->getKey()
                    <<" (aggressive)");
-          if( !tok->isInactive() ) {
-	    EUROPA::TokenSet slaves = tok->slaves();
-	    for(EUROPA::TokenSet::const_iterator s=slaves.begin();
-		slaves.end()!=s; ++s) {
-	      if( !(*s)->isInactive() )
-		cli->cancel(*s);
-	    }
-            cli->cancel(tok);
-	  }
+          if( !tok->isInactive() ) 
+	    deep_cancel(cli, tok);
           cli->deleteToken(tok);
         } else if( tok->isMerged() ) {
 
@@ -644,7 +659,7 @@ bool Assembly::relax(bool aggressive) {
                      <<" (aggressive)");
           }
           if( !tok->isInactive() )
-            cli->cancel(tok);
+            deep_cancel(cli, tok);
           cli->deleteToken(tok);
         }
       }
@@ -666,7 +681,16 @@ bool Assembly::relax(bool aggressive) {
             }*/
       } else if( !tok->isInactive() ) {
         debugMsg("trex:relax", "\t- cancelling non fact "<<tok->getKey());
-        cli->cancel(tok);
+        deep_cancel(cli, tok);
+	if( is_action(tok) ) {
+	  debugMsg("trex:relax", "\t- delete action "<<tok->getKey());
+	  cli->deleteToken(tok);
+	} else if( rejectable(tok) ) {
+	  if( tok->start()->lastDomain().getUpperBound()>=now() ) {
+	    tok->start()->restrictBaseDomain(EUROPA::IntervalIntDomain(now(), 
+								       std::numeric_limits<EUROPA::eint>::infinity()));
+	  }
+	}
       }
     }
   }
@@ -911,7 +935,7 @@ void Assembly::archive(EUROPA::eint date) {
           EUROPA::ObjectId obj = dom.makeObjectList().front();
           state_iterator pos = m_agent_timelines.find(obj->getKey());
           if( m_agent_timelines.end()==pos ||
-              !((*pos)->external() && 0==tl_look_ahead(obj)) ) {
+              !((*pos)->external() && 0==look_ahead(obj)) ) {
             if( can_delete ) {
               debugMsg("trex:archive", "Cannot delete "<<(is_action(tok)?"action":"predicate")<<" "
                        <<tok->getPredicateName().toString()<<'('
@@ -977,11 +1001,10 @@ void Assembly::archive(EUROPA::eint date) {
 
   // plan_db()->archive(now()-1);
 
-#else // TREX_ARCHIVE_EuropaDefault
+#elsif defined(TREX_ARCHIVE_EuropaDefault)
 
   // Just rely on the europa archival : safe but inefficient
   plan_db()->archive(date-1);
-
 #endif
 }
 
@@ -1108,7 +1131,7 @@ bool Assembly::internal(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::internal(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && check_internal(obj->getName());
+  return is_agent_timeline(obj) && is_internal(obj->getName());
 }
 
 bool Assembly::external(EUROPA::TokenId const &tok) const {
@@ -1123,13 +1146,13 @@ bool Assembly::external(EUROPA::TokenId const &tok) const {
 }
 
 bool Assembly::external(EUROPA::ObjectId const &obj) const {
-  return is_agent_timeline(obj) && check_external(obj->getName());
+  return is_agent_timeline(obj) && is_external(obj->getName());
 }
 
-size_t Assembly::tl_look_ahead(EUROPA::ObjectId const &obj) {
+size_t Assembly::look_ahead(EUROPA::ObjectId const &obj) {
   if( !is_agent_timeline(obj) )
     return 0;
-  return tl_look_ahead(obj->getName());
+  return look_ahead(obj->getName());
 }
 
 

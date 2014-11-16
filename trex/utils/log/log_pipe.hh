@@ -48,7 +48,7 @@ namespace TREX {
       class log_pipe : boost::noncopyable {
       public:
 	log_pipe(text_log &log, std::ostream &os,
-		 symbol const &who, symbol const &what=null);
+		 Symbol const &who, Symbol const &what=null);
 	~log_pipe();
 	
 	  
@@ -68,7 +68,7 @@ namespace TREX {
         };
         
         
-        symbol m_who, m_what;
+        Symbol m_who, m_what;
         WEAK_PTR<details::sig_impl>         m_log;
 	std::ostream                               &m_dest;
 	std::streambuf                             *m_initial;
