@@ -35,6 +35,7 @@
 
 #include <boost/bind.hpp>
 #include "platform/chrono.hh"
+#include <boost/optional.hpp>
 
 #include <fstream>
 

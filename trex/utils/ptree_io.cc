@@ -95,15 +95,35 @@ void TREX::utils::read_xml(std::istream &in, bp::ptree &p) {
   xml::read_xml(in, p, xml::no_comments|xml::trim_whitespace);
 }
 
+namespace {
+  /*
+   * Note: the way the xml_writer_settings  from internals of
+   * boost.PropertyTree is instantiated changed between 1.55 and 
+   * 1.56
+   * This quick macro handle this still it would be better if 
+   * we do not access this class directly instead
+   */
+  typedef xml::xml_writer_settings<
+#if BOOST_VERSION<=105500
+  bp::ptree::key_type::value_type
+#else
+  bp::ptree::key_type
+#endif
+  > xml_settings;
+  
+}
+
+
 void TREX::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
   // Clean up the mess for json
   flatten_json_arrays(p);
   if( header )
     xml::write_xml(out, p);
   else {
+
     // Hacky way to get ridd of the XML header
     xml::write_xml_element(out, bp::ptree::key_type(), p, -1,
-                           xml::xml_writer_settings<bp::ptree::key_type::value_type>());
+                           xml_settings());
   } 
 }
 
