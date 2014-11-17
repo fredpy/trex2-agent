@@ -218,7 +218,7 @@ void graph::set_name(TREX::utils::Symbol const &name) {
 }
 
 bool graph::hasTick() const {
-  return m_impl->get_date();
+  return (bool)m_impl->get_date();
 }
 
 void graph::updateTick(TICK value, bool started) {
