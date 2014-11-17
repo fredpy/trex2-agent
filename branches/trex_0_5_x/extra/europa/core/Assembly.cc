@@ -1001,7 +1001,7 @@ void Assembly::archive(EUROPA::eint date) {
 
   // plan_db()->archive(now()-1);
 
-#elsif defined(TREX_ARCHIVE_EuropaDefault)
+#elif defined(TREX_ARCHIVE_EuropaDefault)
 
   // Just rely on the europa archival : safe but inefficient
   plan_db()->archive(date-1);
