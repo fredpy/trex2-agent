@@ -34,17 +34,17 @@
 #ifndef H_trex_config_version
 # define H_trex_config_version
 
-# undef TREX_SVN_INFO
+# undef TREX_GIT_INFO
 
 # include "bits/version.hh"
 
-# ifdef TREX_SVN_INFO
-#  include "bits/svn/version.hh"
+# ifdef TREX_GIT_INFO
+#  include "bits/git/version.hh"
 # else
 // Make the default similar to when we do not find svn
-#  define SVN_INFO false
-#  define SVN_ROOT "unknown"
-#  define SVN_REV  "exported"
-# endif // TREX_SVN_INFO
+#  define GIT_INFO false
+#  define GIT_BRANCH "unknown"
+#  define GIT_REV  "exported"
+# endif // TREX_GIT_INFO
 
 #endif // H_trex_config_version

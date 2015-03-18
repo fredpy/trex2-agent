@@ -111,10 +111,9 @@ namespace TREX {
 
     static std::string full_str();
 
-    static bool svn_info();
-    static std::string svn_root();
-    static std::string svn_revision();
-    
+    static bool git_info();
+    static std::string git_branch();
+    static std::string git_revision();
   }; // TREX::version
   
 } // TREX

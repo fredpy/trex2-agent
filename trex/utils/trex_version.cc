@@ -69,21 +69,21 @@ std::string TREX::version::str() {
   return TREX_VERSION;
 }
 
-bool TREX::version::svn_info() {
-  return SVN_INFO;
+bool TREX::version::git_info() {
+  return GIT_INFO;
 }
 
-std::string TREX::version::svn_root() {
-  return SVN_ROOT;
+std::string TREX::version::git_branch() {
+  return GIT_BRANCH;
 }
 
-std::string TREX::version::svn_revision() {
-  return SVN_REV;
+std::string TREX::version::git_revision() {
+  return GIT_REV;
 }
 
 std::string TREX::version::full_str() {
-  if( svn_info() ) 
-    return str()+" (svn:"+svn_root()+"["+svn_revision()+"])";
+  if( git_info() )
+    return str()+" (git:"+git_branch()+"["+git_revision()+"])";
   else
     return str();
 }
