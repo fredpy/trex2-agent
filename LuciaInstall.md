@@ -1,0 +1,169 @@
+
+# Introduction #
+
+In order to install T-REX for the Lucia winter school you will need the following:
+  * A ubuntu linux box 12.04 64 bits (32 bits supported)
+  * administration rights in the box
+  * ROS hydra installed
+
+Additionally you will need europa\_pso which is provided.
+
+# ubuntu packages to install #
+## Required ##
+
+ROS hydro is needed for the exercises we will do, If you do not have installed it already follow [these steps](http://wiki.ros.org/hydro/Installation/Ubuntu)
+
+Also while not critical we recommend to install turtlebot gazebo simulator as it is used for the final test
+of this compilation and will be used as an initial example during the lecture/exercises.
+
+```
+$ sudo apt-get install ros-hydro-turtlebot-simulator
+```
+
+The europa planner requires to have libantlr3c (for parsing its nddl domain files):
+```
+$ sudo apt-get install libantlr3c-3.2.0 libantlr3c-dev 
+```
+
+## Recommended ##
+It is highly recommended to have ccmake or cmake-gui installed as this documentation assume that you have at least ccmake (cmake-gui being just the more fancy version of it). To install
+
+For installing ccmake:
+```
+$ sudo apt-get install cmake-curses-gui 
+```
+Or for installing cmake-gui
+```
+$ sudo apt-get install cmake-qt-gui 
+```
+
+Another tool which can be useful to see later on t-rex plans is graphviz and its graphical viewer xdot
+```
+$ sudo apt-get install xdot 
+```
+
+
+# Installing Europa #
+  1. check if your linux is 32 or 64 bits. You can do this by running :
+```
+$ arch 
+```
+> > If it writes `x86_64` then your system is 64 bits, otherwise (`i386`) it is 32 bits
+  1. Download the [64 bits binary](http://code.google.com/p/trex2-agent/downloads/detail?name=europa-ubuntu-12.10-64.tar.gz&can=2&q=) or [32 bits binary](https://code.google.com/p/europa-pso/downloads/detail?name=europa-2.6-linux.zip&can=2&q=)
+  1. Unpack the europa archive
+    * 64 bits:
+```
+$ cd ~/
+$ tar zxvf europa-ubuntu-12.10-64.tar.gz
+```
+    * 32 bits:
+```
+$ cd ~/
+$ mkdir europa; cd europa
+$ unzip europa-2.6-linux.zip
+```
+After this you should have a ~/europa directory which include all the europa binaries and headers required for T-REX compilation.
+
+# Installing T-REX #
+  1. Get the source of T-REX [here](http://code.google.com/p/trex2-agent/downloads/detail?name=trex-0.5.1.tar.gz&can=2&q=)
+  1. unpack the source
+```
+$ cd ~/
+$ tar zxvf trex-0.5.1.tar.gz
+```
+  1. Set EUROPA\_HOME to where europa was unpacked
+```
+$ export EUROPA_HOME=~/europa
+```
+  1. Create build directory and run ccmake (alt.cmake-gui on it) with the source location as argument
+```
+$ mkdir ~/trex.build
+$ cd ~/trex.build
+$ ccmake ~/trex-0.5.1 -DWITH_CPP11=ON
+```
+**Note** the WITH\_CPP11 option is required as ubuntu 12.xx uses a version of boost anterior to 1.47. Setting it up beforehand avoid to have the trex cmake scripts  display an error message.
+
+At this point you should be facing an interface similar to this:
+![https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-init.png](https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-init.png)
+
+Hit the key 'c' (or the configure button on cmake-gui) to do the first configuration:
+![https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-first.png](https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-first.png)
+
+Then we can set up extra options:
+  * set CMAKE\_INSTALL\_PREFIX to ~/trex (or whatever you want)
+  * set WITH\_ROS to ON
+
+To set a field on ccmake navigate your cursor to the field (with up and down arrow) and hit enter in order to edit it. You should have the following:
+![https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-edit.png](https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-edit.png)
+
+From there you can hit 'c' which will detect ROS. Then if no error occur you will hit 'c' again and should end up with no more fields prefixed by a `*` :
+
+![https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-final.png](https://trex2-agent.googlecode.com/svn/wiki/imgs/ccmake-final.png)
+
+From there just hit 'g' which will generate your compilation environment for T-REX.
+
+The only thing remaining is to compile and install T-REX
+```
+$ cd ~/trex.build
+$ make 
+```
+After a while the compilation should complete without issue. You can then install T-REX:
+```
+$ make install
+```
+
+## Setting up your T-REX environment ##
+
+The final step is to set up your environment for T-REX the easiest way is to run this command
+(assuming that you installed trex on ~/trex):
+```
+$ echo "source ${HOME}/trex/share/trex/trex_init.bash" >> ~/.bashrc
+```
+
+The either open a new terminal or run the command on  your terminal :
+```
+$ source ~/.bashrc
+```
+
+## T-REX extension for Lucia ##
+
+This extra package is an extension of T-REX that includes some basic materials and relevant connections to ROS topics. Consider it later on as the place where you will work to understand a simple T-REX agent connected to turtlebot and try to extend its capabilities during the exercises of the lecture.
+
+  1. Get the source through svn (may change before tuesday)
+```
+$ svn checkout http://trex2-agent.googlecode.com/svn/orebro ~/trex_orebro
+```
+  1. Create a build directory and run cmake as before
+```
+$ mkdir ~/trex_orebro.build
+$ cd ~/trex_orebro.build
+$ ccmake ~/trex_orebro
+```
+The ccmake should go seamlessly if your trex environment is set and you have already installed go\_turtle ros package (even without go\_turlte this should just display a warning).
+The only option I recommend is to set CMAKE\_INSTALL\_PREFIX to  the same value as fro trex (~/trex in this document)
+The hit 'c' as required and 'g;' to generate the makefiles. Finally just compile :
+```
+$ cd ~/trex_orebro.build
+$ make 
+$ make install
+```
+## A simple test ##
+You  are set and can do a simple test with a gazebo simulation (has instructed at http://wiki.ros.org/turtlebot_simulator)
+  1. On one terminal start gazebo:
+```
+$ roslaunch turtlebot_gazebo turtlebot_empty_world.launch   
+```
+  1. When the simulation is started  (i.e. you should axe a gazebo window with the robot). You can start a sample trex mission provided in trex\_orebro:
+```
+$ amc turtlebot &
+```
+  1. This mission will make the robot move after 10 seconds trex is started for 15 seconds in one direction
+  1. You can track the activity of TREX by looking at $TREX\_LOG\_DIR/latest/TREX.log. The command below will show you the content of the file as it is updated:
+```
+$ tail -f $TREX_LOG_DIR/latest/TREX.log
+```
+  1. Finally you can shutdown the mission by killing trex:
+```
+$ killall amc
+```
+> > and of course shutdown ROS simulation (hitting ^C on the window where roslaunch is running should be enough)

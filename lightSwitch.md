@@ -1,0 +1,209 @@
+# Introduction #
+
+In this paper we are going to look at the simple light switch model provided in TREX 0.1.4. This example is very simple but there's more than meets the eyes in it. It is largely inspired from the model featured in europa [quick start guide](http://code.google.com/p/europa-pso/wiki/QuickStart) but was redesigned according to TREX philosophy and requirements.
+
+In this page we will focus mostly in the model design walking through the nddl code and emphasizing some aspect of it relevant to TREX.
+
+# The domain specification #
+
+The domain we have here is a simple light switch along with this light which is provided by the lightswitch reactor. We want to build a reactor on top of that that can :
+  * identify whether the room is Bright or Dim according to the light state
+  * change the light state in order to make the room Bright or Dim when it is requested to do so
+We therefore define these timelines :
+```java
+
+// lightswitch.nddl
+#include "TREX.nddl"
+
+class Light extends AgentTimeline {
+predicate On {}
+predicate Off {}
+
+Light(Mode _mode) {
+super(_mode);
+}
+}
+
+class Switch extends AgentTimeline {
+predicate Up {}
+predicate Down {}
+
+Switch(Mode _mode) {
+super(_mode);
+}
+}
+
+class LightSwitch extends Timeline {
+Switch controlled;
+
+predicate turnOff { duration = 1; }
+predicate turnOn { duration = 1; }
+
+LightSwitch(Switch sw) {
+controlled = sw;
+}
+}
+
+class Luminance extends AgentTimeline {
+predicate Bright {}
+predicate Dim {}
+
+Luminance(Mode _mode) {
+super(_mode);
+}
+}
+```
+
+First thing to note is the inclusion of TREX.nddl. This file is often required for TREX model as it specifies the AgentTimeline class that is used by TREX to idenitify timelines that will be shared with other reactors.
+
+There's in this model 3 AgentTimelines :
+  * Light    gives the light state (On  or Off)
+  * Switch gives the switch state (Up or Down)
+  * Luminance gives the room "luminance" information (Bright or Dim)
+These three classes can be shared with other reactors by being specified as Internal or External but we will speak about that later.
+
+The other  class defined here is the LightSwitch class that will allow to turn on (turnOn) or off (turnOff)  the light. Do note that this timeline ids _not_ an AgentTimeline but simply a europa Timeline. Therefore, this timeline won't be publicly available and is mostly part of the internal model of the reactor. This is an important aspect that will give to this timeline more flexibility during execution. Indeed, public timelines are tied by TREX assumption that past is monotonic, this implies that all tokens that were produced in the past becomes factual and therefore cannot be changed easily. On the other hand nothing prohibits to change the past on internal constructs of the reactor.
+
+This LightSwitch class is also tied to a specific Switch which will be the one this timeline control.
+
+We can after that design first the part of the model that will allow our reactor to deduce the Luminance of the room based on the Light and Switch states :
+```java
+
+Light::On {
+contained_by(Luminance.Bright);   // if the light is on then the room is bright
+}
+
+
+Light::Off {
+contained_by(Luminance.Dim); // if the light is off then the room is dim
+}
+
+```
+
+This part of the models relates the Light states to Luminance do note the contained\_by as opposed to a more strict equals constraint. This is an important aspect as we have selected a more relaxed constraint in order to have a more robust model to unexpected observations on the Light timeline.
+
+In the model we also specified extra rules that relates the Light to the Switch. As both of these timelines are meant to be External this part is not only useless in this example but restrict the model which can become problematic if this model does not capture a potential situation. This is the case for this model
+as we purposely  forgot to specify that the Switch can be Broken but we are using this model "bug" to both test and illustrate some aspects of the europa reactor.
+
+Here's a set of simple rules that relates the switch sate to the light state:
+```java
+
+Light::On {
+starts(Switch.Down); // the light on starts at the same time the switch is down
+}
+
+Switch::Up {
+contained_by(Light.Off); // if the switch is up then the light is off
+met_by(Down); // the previous state of the switch is necessarily Down
+}
+
+Switch::Down {
+met_by(Up); // the previous state of the switch is necessarily Up
+}
+```
+
+First rule enforces that Light On is triggered by the switch being set in its Down position -- we are aware that in practice it is the other way around but our LightSwitch reactor was implemented this way.
+
+The second rule specifies that whenever the Switch is up the light will necessarily be OfF.
+
+At this point we have descent representation of the relation of between light and switch. But we then introduced 2 extra constraints that are actually buggy even though they may appear as sound design. These rules just state that Up is necessarily preceded by Down and Down is necessarily preceded by Up. These will be problematic as our switch reactor gives much more liberty to this and also provide this extra Broken state we "forgot" to model.
+
+The overal idea here is that even though the rules above appears to be a good design in classical planning (more constraints often helps the planner to find the solution) they are also restricting the
+model of things we do not necessarily control (External timelines are not controlled by the reactor) and therefore an unexpected situation may occurs that may breaks these constraints and possibly put our model in jeopardy.
+
+Hence it is important while adding constraints to the model to :
+  * see if they are really necessary and/or useful fro the reactor
+  * check that they reflect the reality ... and won't make the plan inconsistent on unexpected situations
+
+The last thing we need to do is to model how the reactor can turn on or off the light when requested to do so. This is the point were we are going to use our LightSwitch timeline. In this part we will assume that we will control the switch as the light usually is observed.
+```java
+
+LightSwitch::turnOn {
+meets(object.controlled.Down); // right after turning On the switch is Down
+}
+
+LightSwitch::turnOff {
+meets(object.controlled.Up); // right after tuning Off the switch is Up
+}
+
+Luminance::Bright {
+met_by(LightSwitch.turnOn); // In order to be Bright I need to turn the light on
+}
+
+Luminance::Dim {
+met_by(LightSwitch.turnOff); // In order to be Dim I need turn the light off
+}
+```
+
+This part of the model allows the model to identify how it could make the room Bright our Dim by changing the Switch state. The LightSwitch timeline here represent the action of turning on or off the light by changing the switch state. In term of pure modeling this timeline would not be necessary but it was useful to illustrate that a europa reactor in this version of trex supports other europa contructs than the AgentTimeline (which is not the case in former versions) and will be useful during execution as we will describe in another page.
+
+## Using the model in TREX ##
+The last thing to do is to instantiate the model and specify our agent with this new europa reactor.
+
+The model instance for our example is a this final nddl file :
+```java
+
+#include "lightswitch.nddl"
+
+Light light = new Light(Observe);        // Observe : this timeline is external and I won't post goal on it
+Switch switch = new Switch(External);// External : this timeline is external and I will post goals on it
+
+LightSwitch sw = new LightSwitch(switch);
+
+Luminance lum = new Luminance(Internal); // Internal : I will control this timeline and it will be
+// declared as Internal to TREX
+
+close(); // close the world
+```
+
+In this file we just have created a new instance of each of our timelines and then closed the world.
+Closing the world is important as it simplifies the inference ( the planner then assume that what is
+not true  is false ) . If you do not close the world TREX will do it anyway with a warning message in the log.
+
+In this instance we also specifies the Mode of our AgentTimelines this will be used to declare timelines as Internal or External to TREX. The mode selected for this reactor are the following :
+  * light is an Observed timeline meaning that it should be provided by another reactor and our europa reactor won't be able to post goals on it
+  * switch is External which means that this timeline is provided by another reactor and our europa reactor _expects_ to post goals on it
+  * lum is Internal which means that this reactor will _attempt_ to provide this timeline to other reactors and will deduce its state internally.
+The name of the variables will be used as the name of the timelines for TREX.
+
+Note the words in italic on the items above. They reflect an important aspect of TREX and the fact that you won't necessarily control how things will happen while attempting to declare timelines as Internal or External:
+  * For External timelines you cannot guarantee that the provider of this timeline will accept goals
+  * For Internal timelines a reactor may have already declared the same timeline as Internal in which case you cannot provide it. The way it is handled now by the EuropaReactor is to demote this timeline as Private which allow him to still deliberate on this timeline but do not show it to other reactors.
+
+Finally we can specify our agent that will embed our newly designed test reactor
+```
+<!-- file : light.cfg -->
+<Agent name="light" finalTick="100" >
+      
+       <Plugin name="TREXvitre"/>
+       <Plugin name="TREXlightswitch"/>
+       <Plugin name="TREXeuropa"/>
+       <!-- the light controller -->
+       <Light name="light" latency="0" lookahead="1" log="1" state="1"/>
+       <!-- our test europa reactor -->
+       <EuropaReactor name="test" lookahead="20" latency="3" 
+		      solverConfig="test.solver.xml" />
+       <!-- the vitre visual interface -->
+       <VitreReactor name="switchView" latency="0" lookahead="0"
+                     log="0" port="31415">
+         <External name="light" goals="0"/>
+         <External name="switch" goals="0"/>
+         <External name="lum" goals="0"/>
+       </VitreReactor>
+
+      <!-- make the room bright for at least 5 ticks and ending somewhere after the tick 50 -->
+      <Goal on="lum" pred="Bright">
+        <Variable name="duration"><int min="5"/></Variable>
+        <Variable name="end"><int min="50"/></Variable>
+      </Goal>
+</Agent>
+```
+
+This mission has 3 reactors :
+  * light which is a piece of C++ code that just simulate our light switch and therefore is the one providing both light and switch timelines
+  * test which is the reactor that will load our test.nddl model. Do not that the name of the reactor reflects the name of the nddl file to be loaded
+  * switchView which observes the 3 timelines of our agent and send their updates through a socket to our Vitre java interface
+
+It also have a goal on the timeline lum (provided by the test reactor) to keep the room bright for at least 5 ticks and ending sometime in the second half of our agent lifetime.
+
+We can now run the model using either amc or sim and be happy to have designed our first model inside TREX.

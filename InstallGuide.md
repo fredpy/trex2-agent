@@ -1,0 +1,111 @@
+# Introduction #
+
+This is the documentation of TREX codename barreleye. This version is the first TREX version that do not rely on Europa for its core functionalities as a result one can use TREX with which ever planner he wants - as long as this one can hanlde properly the goal representation expected by TREX.
+
+This page describes what are this framework dependencies and how to install it.
+
+# External dependencies #
+
+The number of third party dependency has been kept relatively small still we use few libraries and programs  :
+  * [cmake](http://www.cmake.org/) newly added which -- among other things -- allows to integrate trex2 in multiple IDEs such as Eclipse, Xcode, ...
+  * [boost libraries](http://www.boost.org) This library is widely used for basic utilities and compatibilty with the TR1 C++0x standard. We use some of the recent addition to the library such as boost graph , flyweight and property trees. Therefor we recommend to take a recent version (at least 1.41.0 -- we tested it with 1.47.0)
+
+It is also recommended to use gcc version 4.1.x or above for compiling the overall project
+
+Others utilies are of interrest but not necessary to use TREX:
+  * [doxygen](http://www.doxygen.org/)  This utility is needed only if you want to generate this documentation.
+  * [graphviz](http://www.graphviz.org/) Recommended for documentation but it may also be used for plan visualization by showing tokens and their relations as a graph.
+
+For europa plug-in :
+  * [europa-pso](http://code.google.com/p/europa-pso/) version 2.4 or above.
+> > this is the core libaray used for planning on the EuropaReactor
+> > Simply install the binary distribution provided for your platform.
+> > The version we use is europa 2.5 (binary package)
+
+# Installing TREX #
+
+## Setting up your environment ##
+
+For compilation the only varaible really required in EUROPA\_HOME if you want to use the europa plug-in.
+For example :
+```
+> export EUROPA_HOME=${HOME}/europa
+```
+The expected structure from cmake is the following :
+```
+  $EUROPA_HOME
+    + lib        # europa libraries (we use the _o versions)
+    + include    # PS*.hh headers
+      + PLASMA   # plasma headers
+```
+This should be the case if you installed the binary package of europa
+
+## Compiling and generating documentation ##
+
+More details can be found on [cmake official documentation](http://www.cmake.org/cmake/help/runningcmake.html). But here's a quick tutorial to use make as the end compilation tool :
+
+Create your working directory :
+```
+> mkdir trex2.build
+> cd trex2.build
+```
+
+run cmake by passing the location of the source tree as argument (we'll assume
+that trex2.build is ate the same level as trex2-agent source directory)
+```
+> cmake ../trex2-agent/
+```
+If no error occured, you can just run make as usual
+```
+> make
+```
+### Note ###
+
+> Right now cmake compiles everything by default. This is a first integration
+> and we will make sure in the future that the behavior is closer to what we
+> have with jam where plug-ins are only compiled on demand.
+
+You can generate the documentation from doxygen using :
+```
+> make doc
+```
+
+And finally install the binaries (by default under /usr/local) using
+```
+make install
+```
+
+## running TREX ##
+
+The core library provide two simples executables :
+  * **amc** execute the agent in batch mode
+  * **sim** execute the agent in small interactive mode with a simulated clock to help debugging a mission
+
+TREX use 2 environment variables :
+  * TREX\_LOG\_DIR : indicates in which directory the logs should be put
+  * TREX\_PATH : indicates where to look for files that are not in the current path
+
+You can easily set them up with default values by sourcing the file
+```
+> source /usr/local/shared/trex/trex_init.bash
+```
+
+---
+
+### Note ###
+In version 0.1.4 there's a bug on trex\_init.bash. It has been corrected in svn but if you download the source package just replace any mention of TREX\_HOME by TREX\_SHARED in trex\_init.bash.in
+
+---
+
+When your environment is set up you can then run the commands.
+all of them takes a mission file as argument and one `sample` mission is given under `cfg/` to run it just type :
+```
+amc sample 
+```
+or
+```
+sim  sample
+```
+
+Further details on this should be provided the documentation generated through `make doc` compilation command and will be included in the future on this wiki
+
