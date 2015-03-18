@@ -42,40 +42,40 @@ configure_file(generated/asio_conf.hh.in
 configure_file(generated/cpp11.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh)
 
-set(TREX_SVN_INFO FALSE)
+set(TREX_GIT_INFO FALSE)
 
 message(STATUS "Check for TREX_FROM_PKG: ${TREX_FROM_PKG}")
 if(TREX_FROM_PKG)
-  set(SVN_HH "${CMAKE_CURRENT_BINARY_DIR}/bits/svn/version.hh")
-  message(STATUS "Check for ${TREX_EXTRA_SRC}/svn/version.hh")
-  if(EXISTS "${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh")
-    set(TREX_SVN_INFO TRUE)
-    message(STATUS "Copy ${TREX_EXTRA_SRC}/svn/version.hh to ${SVN_HH}")
-    configure_file(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh
-      ${SVN_HH}
+  set(GIT_HH "${CMAKE_CURRENT_BINARY_DIR}/bits/git/version.hh")
+  message(STATUS "Check for ${TREX_EXTRA_SRC}/git/version.hh")
+  if(EXISTS "${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh")
+    set(TREX_GIT_INFO TRUE)
+    message(STATUS "Copy ${TREX_EXTRA_SRC}/git/version.hh to ${GIT_HH}")
+    configure_file(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh
+      ${GIT_HH}
       COPYONLY)
   endif()
 else(TREX_FROM_PKG)
- option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
- mark_as_advanced(WITH_SVN_TRACK)
+ option(WITH_GIT_TRACK "Enable tracking of git compiled version in TREXversion" ON)
+ mark_as_advanced(WITH_GIT_TRACK)
  
- if(WITH_SVN_TRACK)
-   set(TREX_SVN_INFO TRUE)
-   set(SVN_HH "bits/svn/version.hh")
+ if(WITH_GIT_TRACK)
+   set(TREX_GIT_INFO TRUE)
+   set(GIT_HH "bits/git/version.hh")
  
-   add_custom_target(svnheader ALL
+   add_custom_target(githeader ALL
      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-     -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
+     -DMY_GIT_TRUNK=trex2-agent.googlecode.com/git/trunk
      -DOUTPUT_DIR=${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
-      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake
+      -P ${CMAKE_SOURCE_DIR}/cmake/getgit.cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}/svn/version.hh"
-      ${SVN_HH})
-   set_source_files_properties(${SVN_HH}
+      "${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}/git/version.hh"
+      ${GIT_HH})
+   set_source_files_properties(${GIT_HH}
       PROPERTIES GENERATED TRUE
       LOCATION ${CMAKE_CURRENT_BINARY_DIR})
-   add_dependencies(trex_prep svnheader)
- endif(WITH_SVN_TRACK)
+   add_dependencies(trex_prep githeader)
+ endif(WITH_GIT_TRACK)
 endif(TREX_FROM_PKG)
 
 configure_file(generated/version.hh.in
@@ -90,15 +90,15 @@ add_custom_target(TREXconfig ALL SOURCES
   memory.hh
   system_error.hh
   version.hh
-  ${SVN_HH}
+  ${GIT_HH}
   ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/cpp11.hh
   ${CMAKE_CURRENT_BINARY_DIR}/bits/version.hh)
 trex_organize_target(TREXconfig)
 
-if(WITH_SVN_TRACK)
-  add_dependencies(TREXconfig svnheader)
-endif(WITH_SVN_TRACK)
+if(WITH_GIT_TRACK)
+  add_dependencies(TREXconfig githeader)
+endif(WITH_GIT_TRACK)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bits 
   DESTINATION include/trex/config/

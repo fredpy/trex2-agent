@@ -125,7 +125,7 @@ add_dependencies(core TREXutils)
 add_dependencies(TREXutils TREXconfig)
 set_source_files_properties(trex_version.cc
   PROPERTIES OBJECT_DEPENDS 
-    ${CMAKE_BINARY_DIR}/trex/config/bits/svn/version.hh)
+    ${CMAKE_BINARY_DIR}/trex/config/bits/git/version.hh)
 
 
 
