@@ -1,0 +1,446 @@
+\section{Executing a Flexible Temporal Plan}
+\label{sec: defs}
+
+The focus of this paper is on the study of unanticipated threats due
+to new goals arising \emph{during} mission execution, while preserving
+room for their inclusion and subsequent execution.  Our robot
+generates and dispatches a partial plan, with a lower level controller
+that further decomposes these plans towards atomic actions; these
+tasks ultimately actuate hardware on our AUV. The world responds by
+sending sensory feedback as \emph{observations} up through the
+hierarchical controller \cite{mcgann08a,rajan12}. Details of the
+controller are beyond the scope of this paper and are not directly
+relevant to the concepts described.
+
+In order to explain our execution method, we first consider some basic
+definitions related to a plan consistent with \cite{Nau:2004}. A plan
+has a given set of operators and states.  Operators link a set of
+states, conditions, to a new set of states, effects. We refer to this
+link as a causal link in the plan. Recursive causal links build a path
+in the plan from an initial state into a goal state. The plan
+structure is similar to the \texttt{STRIPS} model in the definition of
+a plan.
+
+Within the plan, each state has a {\em start}, $T_s$ and {\em end},
+$T_e$ time. We refer to these as {\em timepoints}. Each timepoint is
+therefore a \emph{flexible} interval of time $[t, T]$, which includes
+all possible values between $t$ and $T$.  A \emph{token} is a property
+that holds within two such timepoints, which represents a state
+\cite{py10}; one to start and the other to end the state.  Such
+flexible temporal plans are in a dispatchable form as defined by
+\cite{mus98a}.  The role of the executive is to identify and decide as
+time advances, which timepoint within the dispatched plan can be
+properly instantiated without generating inconsistency within the
+plan. If no solution exists, the executive can only report to the
+planner and wait for a new plan. In the literature, this decision was
+often supported by a strict policy for every timepoint. However, as
+noted in the example this can lead to issues in when to dispatch
+actions.
+
+To handle such problems, we assume that some states have a defined
+execution policy. This execution policy impacts how their start time
+will be handled by the executive. For example, an early execution
+policy implies a preference to set the token's start with the smallest
+possible value without breaking the plan. We consider that these
+execution policies are determined beforehand by a user for a limited
+number of tokens. Typically, the tokens that have a defined execution
+policy are the goal states of the plan. This leaves states without an
+execution policy, in which case we either derive a policy or use a
+default. In the rest of this paper our default policy is set to a
+strict latest start; however any policy can be used.
+
+
+%\begin{definition}
+%  \label{def:domain}
+%  A temporal planning domain is a triple $D = ( \Lambda_\Phi, O, X )$, where:
+%  \begin{itemize}
+%  \item $\Lambda_\Phi$ is the set of all temporal databases that can
+%    be defined with constraint, constant, variable, and relation
+%    symbols in the representation.
+%  \item $O$ is a set of temporal planning operators.
+%  \item $X$ is a set of domain axioms.
+%  \end{itemize}
+%\end{definition}
+
+%A temporal plan is a partially order graph of tasks where nodes
+%are defined in metric time.
+%Each task consists of when it starts and ends or its start
+%and end timepoint in the plan. A \emph{token} is a task that holds over the 
+%flexible temporal interval consisting of a start and end timepoint.
+
+%A \emph{token} is a property that holds within a flexible temporal
+%interval which represents an action or a state associated with $O$ or
+%$X$ \cite{py10dup}. A temporal interval is delimited by two {\em
+%  timepoints} \cite{Boddy93} marking the possible values of its {\em
+%  start} and {\em end}.
+
+%\begin{definition}
+%  \label{def:problem}
+%  A temporal planning problem in $D$ is a tuple $P = ( D, \Phi_{obs}, \Phi_g )$, where:
+%  \begin{itemize}
+%  \item $\Phi_{obs} = (F, C)$ is a database in $\Lambda_\Phi$ that
+%    satisfies the axioms of $X$.  $\Phi_{obs}$ represents an initial
+%    scenario that describes initial state of the domain and
+%    observations.
+%  \item $\Phi_g = (G, C_g)$ is a database that represents the goals of
+%    the problem as a set $G$ of tokens together with a set $C_g$ of
+%    objects  and temporal constraints   on variables of $G$.
+%  \end{itemize}
+%\end{definition}
+
+%\begin{definition}
+%  \label{def:plan}
+%  A plan is a set $\pi = \{a_1,...,a_k\}$ of actions, each being a
+%  partial instance of some operator in $O$.  We define $\lambda$ as
+%  the state-transition function.  $\pi$ is a solution of a problem $P
+%  = (D, \Phi_{obs}, \Phi_g)$ iff there is a database in $\lambda(\Phi_{obs},
+%  \pi)$ that entails $\Phi_g$.
+%\end{definition}
+ 
+% While our focus is on executing a plan, to reflect the dynamic
+% interaction of the agent with the environment, we need to refine the
+% definition of the flexible plan given to us. As the world evolves, new
+% (or a refinement of existing) observations are added to the
+% plan. Similarly, the operator can request new goals to be added to the
+% agent's plan as mission time advances. For the sake of simplicity, we
+% consider that the alterations to the plan are purely additive with
+% time\footnote{In practice, their evolution is more complex as
+%   completed goals becomes observation; even a goal previously
+%   requested can be cancelled by the operator. While this assumption
+%   largely simplifies problem description, our algorithm works
+%   regardless.}
+%\[ \forall \{t, t'\}: t \le t' \Rightarrow \Phi_{obs}(t) \subseteq \Phi_{obs}(t')
+%\wedge \Phi_g(t) \subseteq \Phi_g(t') \] 
+%
+%where $\Phi_{obs}(t)$ and $\Phi_g(t)$ are the value of these sets at
+%time $t$.
+
+% \kcomment{This para starts very similarly to text above.}The plan gets
+% updated as observations are made from the plan being executed. In
+% nominal situations, these new observations are refinements of the plan
+% -- for example by asserting that a planned command has just
+% started\footnote{We exclude situations where new observations
+%   invalidate the plan rather than merely refining it.}. The agent can
+% also receive new objectives at any time which are added to the
+% plan. Therefore after refinements or changes are made, the plan is
+% dispatched again to the executive with an up to date and valid
+% solution.
+
+We also assume that the plan can evolve in the future due to the
+introduction of new goals. This has an impact on how to handle plan
+execution. While deciding when to initiate a state transition within
+the plan, one needs to ensure that execution will not limit the
+ability of the agent to treat emergent goals. In light of this, the
+agent should attempt to balance the impact of execution on the next
+available action. We choose to execute as early as possible or delay
+with the eventuality that new goals might occur. Going to \emph{Vent2}
+early is viable; however, going back to the surface too early would
+result in blocking the AUV at the Surface until 20:00. The solution
+which provides the most flexibility is for the agent to alternate
+between the two policies.
+
+%The nature of the goals are better characterized by inclusion of their
+%priority. For that purpose, we define $\Phi_g$ to be partitioned in two:
+%
+%\begin{itemize}
+%
+%\item \emph{internal} goals $\Phi_{gi}$ which represent goals the
+%  agent {\em needs} to maintain internally. These goals will be
+%  considered as objectives that can be deferred during execution.
+%
+%\item \emph{external} goals $\Phi_{ge}$ which represents the goal
+%  received by the agent from an external source, like a user. These are
+%  considered to be of higher importance -- \ie the agent {\em wants}
+%  to execute them. Therefore, their execution should preferably be
+%  proactive.
+%
+%\end{itemize}
+%
+%At any time $t$ during action evaluating by the executive within
+%$\pi$, the plan is an up to date and valid solution to the set of
+%goals in $\Phi_g$.
+
+% At any point we need to evaluate an action within plan $\pi$ we
+% consider that this plan is up to date and provide a solution of all
+% the goals of both $\Phi_{gi}$ and $\Phi_{ge}$ that can reasonably be
+% done within the current mission scope.
+
+
+\section{Algorithmic Description}
+\label{sec:algo}
+
+As a new token's start-timepoint is to be executed, the executive needs
+to evaluate how it relates to the policies of other states in the
+plan. Intuitively, if a state $S_1$ was generated by (or causally
+linked to) another state $S_2$, which has a defined policy, then $S_1$
+should be executed using the policy of $S_2$. Therefore, while
+evaluating the token within the partial plan representing $S_1$, the
+executive needs to do a forward search of the causal links related to
+the token to see if it leads to another token with a defined
+policy. Algorithm \ref{SearchForGoal} will discuss the case when a
+token is connected to two or more different policies. Note that our
+example only uses two policies for execution.  % Therefore,
+% this issue will not occur in our example.
+
+% as implemented in
+% Algorithm \ref{DispatchToken}.
+
+%\begin{definition}
+%  \label{def:subgoalLink}
+%  A goal $g$ is causally linked to a state value $c_i$ if
+%  $g$ is an effect of an action $a$ and $c_i$ is a condition of $a$.
+%  \footnote{For metric temporal plans, Allen Algebra
+%    \cite{allen84} is the basis for determining relationships between
+%    actions and is more general than pre-conditions in classical
+%    planning.}.
+%\end{definition}
+
+%Consequently, all conditions of this action can be assumed to be
+%subgoals with a similar policy as $g$.
+
+\begin{algorithm}[!h]
+  \caption{\small The function $ExecutionPolicy$ uses the
+    $SearchForPolicy$ to determine the execution policy for Token
+    $T$. We use the two policies of earliest and latest start.}
+  \label{alg:dispatch}
+\label{ExecutionPolicy}
+\begin{algorithmic}
+\small 
+\Function{ExecutionPolicy}{Token $T$}
+\State Policy $P = \textsc{SearchForPolicy}( T )$
+\If{ $P$ $=$ Policy(EarliestStart)}
+	\State \Return Dispatch $T$
+\ElsIf{ $T$ start upper bound $ \leq $ current tick}
+	\State \Return Dispatch $T$
+\Else
+	\State \Return Don't dispatch $T$
+\EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm \ref{alg:dispatch} is key in determining how a token should
+be executed, and is called at every execution cycle while evaluating
+the next set of tokens to be executed. It also plays the role of the
+executive and, while specific to our example, does not impact the
+generality of Algorithm \ref{SearchForGoal}.
+
+% Finding a token is connected
+% to a goal in $\Phi_{ge}$, we conclude that the token is a sub-goal,
+% and thus dispatch it proactively.  Conversely, if the token is not
+% connected to a goal then we defer dispatching until necessary.  This
+% demonstrates our distinction between how we dispatch tokens,
+% proactive or deferred.
+
+\begin{algorithm} [htb]
+  \caption{\small The function $SearchForPolicy$ does a forward search
+    along the causal links to determine a policy for Token $T$.}
+  \label{SearchForGoal}
+\begin{algorithmic}
+  \small
+  \Function{SearchForPolicy}{ Token $T$ }
+  \If{$T$ has Policy}
+  \State \Return $T \to Policy$
+  \Else 
+  \State Set $Policies$ = \{\}
+  \State List $Fringe$ = \{ Actions that $T$ is Condition of \}
+  \State Mark $T$
+  \ForAll{Action(s), $A$, in $Fringe$ }
+  \State Mark $A$
+  \ForAll{Effects, $E$ of $A; \neg Marked(E)$}
+  \State Mark $E$
+  \If{$E.Policy \neq \emptyset$}
+    \State $Policies$ =  $\{ E.Policy \} \cup Policies$
+  \EndIf
+  \State List $L$ = \{ Action(s) that $E$ is Condition of \}
+  \State $Fringe$ = $Fringe \cup \{a \in L; \neg Marked(a) \}$ 
+  \EndFor
+  \EndFor
+  \State \Return SelectPolicy($Policies$)
+  \EndIf
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+
+% Algorithm \ref{SearchForGoal} is used to search for a causal link
+% between the token $T$ and token $G$ of $\Phi_{ge}$ using
+% forward-search. If $G$ is found, then token $T$ is part of the
+% solution for completing $G$.  As such, we want to be proactive in
+% order to dispatch $G$ as early as possible.  If a $G$ is not found,
+% then token $T$ has no connection to an external request and therefore
+% there is no motivation to execute this action earlier than
+% necessary. This algorithm is equivalent to a breadth first search
+% along the planning structure starting from the action we need to
+% evaluate. Its complexity is $O(N+E)$ \cite{corman} where $N$ is the
+% number of tokens within the plan and $E$ the number of causal links
+% that connect these tokens.
+
+To inform Algorithm \ref{alg:dispatch}, we use Algorithm
+\ref{SearchForGoal} which searches the causal links connected to token
+$T$ using a forward-search.  If a token with a defined policy is
+found, then it is added onto the set of potential execution policies
+for $T$.  After searching all the tokens connected to $T$, we call
+$SelectPolicy$ to determine which execution policy should be
+returned. The $SelectPolicy$ function takes the set of all policies
+found during the search and returns the resulting unique policy in
+order to arbitrate conflicts. In our current implementation we always
+return {\em LateStart} policy if this set is empty, otherwise we
+select the element of the set with the highest fixed priority
+($EarliestStart > LateStart$); an alternate implementation could be
+introduced without impacting the generality of our algorithm.  The
+algorithmic complexity of Algorithm \ref{SearchForGoal} is $O(N+E)$
+where $N$ is the number of tokens and $E$ the number of causal links
+that connect these tokens in the plan.
+
+An alternate version of Algorithm \ref{alg:dispatch} that propagated
+policies through causal links during planning was also
+attempted. While functionally equivalent, the overhead during
+backtracking--requiring removal of propagated information during
+search--along with continuous plan refinement process in our system,
+did not demonstrate any significant performance benefit for
+evaluation.
+
+% any significant benefit in term of performance and could ben create
+% important extra cost should the search for plan been misleader by the
+% heuristic.
+
+
+%\subsection{Dynamic solution during planning}
+%
+%Searching for a goal as Algorithm \ref{SearchForGoal} does can be
+%quite computational expensive particularly if there are many tokens
+%that are continuously being dispatched. Completing a full search every
+%time a token needs to be dispatched can severely slow down the
+%execution process, which needs to remain quick to ensure proper
+%execution. Therefore, our next algorithmic approach distributes the
+%full search within the creation of the plan.  Resulting in spreading
+%out the full cost of the search. In order to not repeatedly search the
+%plan, we save the tokens that are connected to a goal in $\Phi_{ge}$
+%found during the search. In this way, we acquire a list of tokens,
+%$List_{goals}$, that should be dispatched early.
+%
+%An alternative solution is to embed the propagation of these value
+%during the planning search. The algorithm uses the same dispatching
+%method as algorithm \ref{DispatchToken}.  The difference is that
+%rather than searching for the goal using algorithm
+%\ref{SearchForGoal}, it only searches the list, $List_{goals}$, to see
+%if the token is in it. The actually searching for the goals and
+%causally connected tokens happens in algorithms \ref{NotifyActivated},
+%\ref{NotifyMerged}.
+%
+%\begin{algorithm}[H]
+%\caption{\small Saves goals as they are added to plan}
+%\label{NotifyAdded}
+%\begin{algorithmic}
+%\Function{NotifyAdded}{ Token $T$ }
+%\If{$T$ is a Goal in $\Phi_{ge}$}
+%	\State Insert $T$ into $List_{goals}$
+%\EndIf 
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm} [H]
+%\caption{\small Removes the token after it is removed from the plan}
+%\label{NotifyRemoved}
+%\begin{algorithmic}
+%\Function{NotifyRemoved}{ Token $T$ }
+%	\State Remove $T$ from $List_{goals}$
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Searches for tokens connected to goals}
+%\label{NotifyActivated}
+%\begin{algorithmic}
+%\Function{NotifyActivated}{ Token $T$ }
+%\If{$T$ is a goal in $\Phi_{ge}$ or $T$ is linked to a goal through one causal link}
+%	\State Recursively search the reverse causal link and add the tokens into $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Deactivates token in plan}
+%\label{NotifyDeactivated}
+%\begin{algorithmic}
+%\Function{NotifyDeactivated}{ Token $T$ }
+%\If{$T$ is not a goal and not one causally linked to a goal}
+%	\State Remove $T$ from $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Searches plan when tokens are merged}
+%\label{NotifyMerged}
+%\begin{algorithmic}
+%\Function{NotifyMerged}{ Token $T$ }
+%\If{$T$ is goal in $List_{goals}$}
+%	\State Recursively search the reverse causal link of the active token merged with $T$ and add tokens to $List_{goals}$
+%\ElsIf{The active token of $T$ is in $List_{goals}$}
+%	\State Recursively search the reverse causal link of $T$ and add tokens to $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{algorithm}[H]
+%\caption{\small Removes token when split}
+%\label{NotifySplit}
+%\begin{algorithmic}
+%\Function{NotifySplit}{ Token $T$ }
+%\If{$T$ is not a goal or not one causally linked to a goal}
+%	\State Remove $T$ from $List_{goals}$
+%\EndIf
+%\EndFunction
+%\end{algorithmic}
+%\end{algorithm}
+%
+%In order to distribute the search, we situate our algorithm within the
+%planning search of the Europa Planner,\cite{frank2003}, which offers 
+%callback functions for when a token in the plan is altered. The majority
+%of the searching happens when tokens are either activated or 
+%merged. For a token to merge with another token it has to be compatible with
+%another token already in the plan. Splitting happens when they are
+%no longer compatible. We have designed our algorithm around the
+%Europa Planner, however, we believe that the general approach
+%can work on any other planner. 
+%
+%Taking full advantage of the planning search, we
+%use a backwards search from the goal following the reverse causal link
+%to the connected tokens.  We fully search from the goals because we
+%know that all the tokens connected through the causal link are
+%sub-goals. By contrast, fully searching each token could be
+%wasteful because there is no certainty that it will be linked to a
+%goal and, therefore, could bring little value to our search. However,
+%some tokens may get added to the plan or linked to a goal after we
+%have already searched the goals. Therefore, for every token we do a
+%local forward search of one causal link to verify if it is connected
+%to a goal in our saved list.  If so, we do a full backwards search
+%from the token since it has now proven to be valuable. After the plan
+%has been searched, it is as easy as searching a list for a token to
+%see if it should be dispatched early or be deferred to later.
+%
+%This approach is potentially more costly than the previous algorithm 
+%as it needs to do local updates whenever the plan is altered by the search
+%including retracting past updates if a backtrack occur during the
+%search. Still it is compelling in the fact that this cost occurs during
+%planning reducing the decision problem during execution to simply
+%check if the given action has been marked during planning. It has
+%been the solution we have preferred within our system for this reason
+%as it is functionally equivalent to previous algorithm while reducing
+%extra computation cost as the plan is executed. Planning phases occur
+%within the plan only when either the initial plan failed to execute or
+%the set of goals has been altered. Therefore, it is safe to assume that
+%planning should occur more sporadically than execution decisions 
+%which then give an edge to this latter algorithmic solution. 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 

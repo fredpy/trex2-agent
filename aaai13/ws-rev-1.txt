@@ -1,0 +1,24 @@
+# An Issue in Goal Addition in Continuous Robotic Plan Execution
+
+Philip Cooksey, Frederic Py, Paul Morris Kanna Rajan
+
+## Comments to Authors
+
+This paper presents an algorithm for accomadating additional goals into a robot's plan, being sensitive to the need to not only make room for possible additional goals, but to also execute existing goals in such a way that makes it easier to achieve newly added goals. The paper is written in a relatively dense technical style, and would benefit from spending a little more time (for this WS at least) trying to communicate the intuition behind the algorithm. Overall the work is interesting and fits well in the WS as it is a clear case where AI and robotics work well together, and where AI can improve overall task performance. 
+
+In terms of related work, there are other related examples of systems which can cope with additional goals being generated at runtime, e.g. 
+
+Klenk, M., Molineaux, M., and Aha, D. 2012. Goal-driven autonomy for responding to unexpected events in complex environments. Computational Intelligence
+
+Nick Hawes. A Survey of Motivation Frameworks for Intelligent Systems. Artificial Intelligence, 175(5-6), pages 1020 - 1036, Elsevier.
+
+Nick Hawes, Marc Hanheide, Jack Hargreaves, Ben Page, Hendrik Zender and Patric Jensfelt. Home Alone: Autonomous Extension and Correction of Spatial Representations. In Proceedings of the IEEE International Conference on Robotics and Automation (ICRA `11). May 2011.
+
+Some minor typos:
+
+"goal to collects data"
+"reduce Makespan" -> unnecessary capitalisation
+
+## Recommendation
+
+Weak Accept

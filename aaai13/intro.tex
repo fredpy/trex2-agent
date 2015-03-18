@@ -1,0 +1,100 @@
+\section{Introduction}
+\label{sec:intro}
+
+As autonomous robots become more robust and persistent, the likelihood
+of receiving new or modified objectives \emph{during} an ongoing
+mission is high. Generative continuous planning, integrated within the
+robot's architecture, is one approach to enhance persistence while
+dealing with evolving objectives and unanticipated situations.
+Earlier works,
+\cite{AmbrosIngerson88,Haigh98,alami:1998p820,mus98,chien99,mus04,py10},
+have contributed control architectures, which embed planning engines.
+They support a rich representation dealing with durative actions,
+while ensuring partial plans are flexible for robust execution
+\cite{lemai-chenevier2004}.
+
+% such as \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
+% \cite{Haigh98}, and the LAAS architecture \cite{alami:1998p820} have
+% all contributed to this field of research. Results from such work have
+% lead to goal directed architectures that have sucessfully worked in
+% the real-world such as the Remote Agent Experiment \cite{mus98}, the
+% Autonomous Spacecraft Experiment \cite{chien99} and more recently the
+% Teleo Reactive Executive \cite{py10}. Often these architectures embed
+% planning engines that support a rich representation dealing with
+% durative actions and resources while ensuring partial plans are
+% flexible for robust execution \cite{lemai04}.  % A resulting consequence
+% has been results in efficient approaches to temporal plan dispatch to
+% ensure robust and sound execution \cite{mus98a,morris01}. 
+
+While these approaches have been necessary to correctly execute a
+\emph{flexible temporal plan}, they view the agent itself as
+synchronously fulfilling goals provided a priori. They do not take
+into account the introduction of new goals which could alter the
+mission state and execution during mission execution.  Consequently,
+the natural choice was to make the agent execute its actions as early
+as the temporal plan would allow, so that the the robot would finish
+its plan as early as possible providing more ``temporal room'' for
+potential change in the plan. Such an assumption has proved to be very
+efficient in dealing with unanticipated execution threats with an
+exception in dealing with dynamic controllability \cite{morris01} ---
+acting as early as possible keeps the remaining partial plan
+flexible. Moreover, should the plan break, the robot has more time
+left to identify and execute an alternate recovery strategy. An early
+dispatch policy has therefore proved to be the most efficient
+approach for the robot to robustly execute its plan when the set of
+goals for the mission are fully instantiated.
+
+Our experience in marine robotics shows that in a number of instances,
+the full set of objectives of the robot is not known a priori. While
+our missions last on the order of a day, it is often feasible to have
+an initial plan that could be executed in a few hours. For example, a
+typical mission can start with the scientific goal of collecting data on
+an area for half of the mission and an operational goal to be at the
+recovery location by the end of the mission. During this time, a
+scientist receives and analyzes data collected by the robot, which
+allow him to produce new goal(s) for dispatch to the robot, while
+still in the water.  While starting an action proactively can often
+add flexibility to the current plan, it can also at times negatively
+impact the outcome should a new goal directly conflict with an action
+undergoing execution.
+
+In this paper we focus on a study demonstrating that strict execution
+policies can present problems when new goals can emerge at any time
+within mission scope; we are agnostic to the planning process
+itself. We provide a simple solution that exploits temporal plan
+structure to identify the execution policy of the next potential set
+of actions. % based on the goals they are contributing to
+% motivated by our domain.
+
+
+
+% Our work is situated between the planner and the executive. Therefore,
+% we are working with an already generated plan and are helping to determine
+% an execution policy for every action. 
+% The novelty of our work is twofold. First, we allow the agent to make
+% such a distinction \emph{during} execution, for each action, by
+% tracking causal relationships between goals. Second, while the initial
+% approach is simple yet elegant, it is motivated by our real-world
+% domain in the context of a continuously planning and executing robotic
+% explorer with focus on execution rather than plan synthesis.
+
+% This
+% allows us to determine an appropriate dispatch strategy for execution,
+% based on the nature of the goals this action contributes to. While our
+% approach manipulates the plan structure, it focuses on plan execution
+% within the agent rather than plan synthesis.  For the purposes of this
+% paper, we consider planning in abstraction while providing an
+% anticipatory approach to continuous robotic plan execution.
+
+% The structure of this paper is as follows. We motivate with a
+% scenario illustrating the problem of flexible plan execution, discuss
+% previous efforts with robotic controllers for planning and dispatching
+% for execution. We then present the algorithmic detail to enable the
+% agent to decide at execution time when previously planned actions 
+% should be started. Finally, after presenting experimental results, 
+% we conclude and discuss potential directions for future research.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 

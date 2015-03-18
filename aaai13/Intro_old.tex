@@ -1,0 +1,183 @@
+\section{Introduction}
+\label{sec:intro}
+
+\fcomment{Intro is too long should be less than a page (1.5 column) and is
+  currently more than one. Also we need to speak more about 
+  execution task span and less about planning itself}
+Substantial research effort in robot planning has revolved around how
+plans are executed and how threats to robust execution can be dealt
+with in-situ \kcomment{citations needed}. This is particularly
+important in dynamic and unpredictable real-world environments where
+plans can and do change rapidly and the robotic agent is expected to
+be responsive to such exogenous change. Often this focus has been
+driven by the need to replan given a fixed set of goals a priori,
+where such objectives are known and do not perturb the planning and
+execution process.
+
+In this paper, we argue that the impact of asynchronous arrival of
+goals and their consequent impact on execution is important 
+in dynamic and unpredictable environments especially during robotic
+exploration. Our robotic domain deals with benthic as well as upper
+water-column exploration using autonomous underwater vehicles (AUVs),
+which are untethered and propelled. For instance, in bathymetric
+surveys of subduction zones, AUVs are used to augment limited ship
+time to deal with largely unexplored areas of coverage. Even so
+finding hydrothermal vents is challenging given large spatial areas,
+noisy sensors and low signal/noise ratio as also the harsh environment
+in which the AUV has to survive. Identifying vents is painstaking;
+inadequate sensors and lack of closed loop bathymetric control,
+requires scientists on ship analyse previous surveys to inform the
+current AUV deployment. This often means that the vehicle can be
+re-tasked with new goals while executing one or more current mission
+objectives.  AUV deployment in such cases often occurs over multiple
+phases \cite{Yoerger01012007}; to minimize station time on site, the
+AUV is redeployed after each phase after a vehicle recharge while data
+analysis from the past survey continues. Consequent analysis then
+provides the impetus to retarget when new scientific targets are
+generated on ship.
+
+While substantial literature exists to deal with agent reactivity and
+replanning in the face of execution uncertainty \kcomment{citations
+  needed}, the ability of a robotic agent to systematically deal with
+dynamic goal is less well studied. In this context, we emphasize the
+need for planning and plan execution in-situ to enable tight closure
+of control loops for the robot's responsiveness.
+% In order for an agent to operate in a dynamic environment, the agent
+% needs to be constantly observing the external world so that it can
+% keep up to date with how the world is changing. Therefore, a robotic
+% agent needs to be planning in situ so that it can alter, or update,
+% its plan according to the changes. The actual execution of the plan
+% will also need to change accordingly. The execution also provide
+% constant feedback on how the world is evolving.  Thus as a result of
+% the dynamic environment, the robotic agent will need to anticipate
+% constant changes in the plan and need to evaluate how to properly
+% execute the plan.
+Doing so, leverages the ability to dynamically add new objectives to
+the agent during mission execution instead of being forced to specify
+them beforehand and is the context of this paper.  While such
+capabilities allow for more flexible and autonomous missions it also
+makes the overall misson execution more challenging.
+
+In the pursuit of planning in a dynamic environment, earlier work done
+in \texttt{IPEM} \cite{AmbrosIngerson88}, \texttt{ROGUE}
+\cite{Haigh98}, and the LAAS Architecture \cite{alami:1998p820} have
+all helped to make real-world planning possible. Based on these past
+successes, there have been multiple experiments that have successfully
+functioned in the real-world, the Remote Agent Experiment \texttt{RAX}
+\cite{mus98}, the Autonomous Spacecraft Experiment \texttt{ASE}
+\cite{chien99} and more recently the Teleo Reactive Execution \rxe
+\cite{mcgann08b,py10}. In all these systems, generative plans are
+dispatched for execution using rich representations that deal with
+durative actions and resources \cite{lemai-chenevier2004}, the focus of our work
+here.
+
+In particular, our focus is on constraint-based temporal planning
+\cite{frank2003,lemai04} with a demonstrated capability for real-world
+planning and execution.
+% Most of these modern systems are using at the high-level 
+% constraint-based planner with rich representation of resources 
+% and time such as the ones presented in \cite{frank2003,lemai04}. 
+Most of these approaches often implement  least-commitment 
+planning and generate a solution that does not commit to specific 
+values (\eg action start and end
+times) unless explicitly required by the model. Such flexibility puts
+the burden on the plan executive to decide at which time within all
+possible values, a specific action can be  dispatched. 
+% Resolving this problem resulted on a large amount of research both
+% considering how to represent the plan to be dispatched to the
+% executive with a compact yet complete representation, along with more
+% refinements on how to deal with uncontrollable constraints. Still,
+The challenge is deciding whether the next possible set of action(s)
+should be started immediately or if it should be postponed for a later
+start date.
+
+Starting actions as early as possible avoids procrastination and tends
+to reduce plan brittleness. This choice
+is motivated by the intuition that starting actions early provides more
+room in the future to deal with worst case execution scenarios. While
+this solution works in the classical case where all the goals of the
+agent are known a priori, it can be problematical when new objectives
+are added during the course of mission execution. For example, the
+agent may prematurely leave an area before new objective for this area
+are formulated. On the other hand, waiting inordinately could wast
+time and leave less flexibility for coping with diverse execution
+scenarios. 
+% the agent in a
+% situation where the new goal received is not integrated as efficiently
+% as it would have been should the agent have waited before taking
+% action.
+In this context, it is important for the agent to make a distinction
+between actions that can be taken proactively versus other actions
+that may not be urgent.  
+
+In this work, we propose a systematic approach to allow the agent to
+make such a distinction for each action by tracing the causal relations
+between goals within the current plan.  This allow us to determine the
+best dispatch strategy based on the nature of the goals this action
+contributes to.
+
+% \fcomment{Plan for the paper here}
+The structure of this paper is as follow. We introduce an example
+illustrating the problem of flexible plan execution. We then discuss
+previous works and how they tend to focus on a single policy or not
+consider the possibile emergence of new goals during the mission. We
+then present algorithmic solutions that allow to decide at execution
+when actions should be started. Finally, after presenting the results,
+we conclude and discuss potential directions for future research.
+
+
+
+% this can have a
+% negative impact when consider that new goals for the agent could
+% emerge as it execute its mission.
+
+	
+% \fcomment{I need to rework the following section, started here}
+% At the highest level of abstraction, constraint-based temporal
+% planning uses a temporal plan to organize how the world works. A
+% temporal plan is made up of multiple timelines which each describe the
+% evolution of a subsystem in chronological order. An example of a
+% subsystem would be the navigator for a robotic agent. Each timeline is
+% simply the encapsulation of all the possible state values for a
+% subsystem, within the parameters of a plan.  Therefore, a timeline can
+% be broken down into its state values along with their temporal
+% extents, which are defined as tokens. As the base unit for a timeline,
+% tokens describe the simplest behavior of a subsystem e.g. turn
+% right. THis kind of representation as it follows least commitment
+% planning strategy. It herefore allow to have a plan which is partailly
+% grounded and especially tokens star, duration anfd end times are
+% represented as intervals depiciting all the acceptable values for
+% each. By doing so this leave  mroe flexiblity during execution to
+% decided when -- within the specified domains -- an event should
+% occur accroding to the current context. This also raises the probelem
+% that thids decision should then be taken after the plan was produced
+% by the executive. A lot of exitiing work ahas been made in the area on
+% the best approach to send the plan to dispach the produced plan to an
+% executive so it is easier for it to maintin the temporla constraints
+% within this plan at execution (references). This still leave an issue
+% open : how does one decide at execution whether a plan actitivy (or
+% token) should be started as soon as possible or can be postponed
+% later. This problem can become imporatnt when you see the plan being
+% produced within a situated agent. Indeed, while the current set of
+% objectives fr the agent is known these can evolve as time advance and
+% the poperators or other agents give it new objectives to be
+% fullfilled.
+% It becomes therefore important for the agent to be
+% proactive when required while being able to disitinguish actions that
+% are not yet urgent.
+% It is understood that grounding the start and end times of a
+% token decrease the robustness of a robotic agent while in a dynamic
+% environment (citations). Therefore, the tokens have flexible intervals
+% for their start, duration, and end times.  As an example, the turn
+% right behavior could start from a lower bound time of 12pm to an upper
+% bound time of 3pm. This means it can start anytime between its lower
+% and upper bound, keeping it flexible.  Consequently, it is the agents
+% task to choose exactly when to execute such behaviors. We define the
+% task of choosing a token and sending it to its appropriate subsystem,
+% to be executed, as dispatching.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "aaai13"
+%%% End: 

@@ -1,0 +1,86 @@
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+
+% comment out this line to disable inline comments
+\def\draft{}
+\linespread{0.975}
+
+\input{preamble}
+
+\begin{document}
+
+% \title{Anticipatory Continuous Robotic Plan Execution}
+% \title{Unanticipated Goals Inclusion Issue in Continuous Robotic Plan Execution}
+\title{An Issue in Goal Addition in Continuous Robotic Plan Execution}
+%\author{Paper \# 88}
+% \author{Philip Cooksey \And Fr\'ed\'eric Py \And Paul Morris \And Kanna Rajan}
+\author{Philip Cooksey\\
+\small{California State University}\\ 
+\small{Monterey Bay}\\
+\small{Seaside, California, 93955}\\
+\small{\emph{pcooksey@csumb.edu}}\\
+\And Fr\'ed\'eric Py\\
+\small{MBARI}\\
+\small{7700 Sandholdt Road,}\\
+\small{Moss Landing, California, 95039}\\
+\small{\emph{fpy@mbari.org}}\\
+\And Paul Morris\\
+\small{NASA Ames Research Center}\\
+\small{Moffett Field, California, 94035}\\
+\small{\emph{Paul.H.Morris@nasa.gov}}\\
+\And Kanna Rajan\\
+\small{MBARI}\\
+\small{7700 Sandholdt Road,}\\
+\small{Moss Landing, California, 95039}\\
+\small{\emph{Kanna.Rajan@mbari.org}}\\
+}
+
+\maketitle{}
+
+\begin{abstract}
+
+  Robotic plan execution has traditionally assumed that goals are
+  articulated prior to mission execution. As robots have become
+  persistent and increasingly moved into real-world environments, this
+  assumption is not necessarily true; for instance a user can decide
+  to give a new objective to the robot for inclusion in the plan being
+  formulated, add newer goals, or modify others queued for
+  execution. In most systems this leads, at best, to a suboptimal
+  final plan or possibly to the exclusion of objectives, either of
+  which could have been avoided, should the robot have executed its
+  initial plan differently.  We first articulate and then demonstrate
+  a preliminary approach to this problem motivated by a marine
+  robotics domain. We do so with an execution policy that is
+  sufficient to disambiguate actions for execution within a flexible
+  temporal continuous plan execution system.  The resulting
+  algorithmic complexity is linear in the number of actions and causal
+  links of an existing partial plan.
+
+\end{abstract}
+
+\input{intro.tex}
+
+\input{example.tex}
+
+\input{Background.tex}
+ 
+\input{Arch.tex}
+
+\input{Results.tex}
+
+\input{Conclude.tex}
+
+%\twocolumn 
+\footnotesize{
+\bibliographystyle{aaai}
+\bibliography{references}
+}
+\end{document}
