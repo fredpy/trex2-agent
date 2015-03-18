@@ -130,45 +130,44 @@ add_library(TREXutils SHARED
 
 if(TREX_FROM_PKG)
   # svn data is given by the package
-  set(SVN_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/svn/version.hh)
+  set(GIT_HH ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC}/git/version.hh)
 
-  if(EXISTS ${SVN_HH})
+  if(EXISTS ${GIT_HH})
     include_directories(${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
-    add_definitions(-DWITH_SVN_TRACK)
+    add_definitions(-DWITH_GIT_TRACK)
   endif()
 else(TREX_FROM_PKG)
  # I need to generate the file
 
- option(WITH_SVN_TRACK "Enable tracking of svn compiled version in TREXversion" ON)
- mark_as_advanced(WITH_SVN_TRACK)
+ option(WITH_GIT_TRACK "Enable tracking of git compiled version in TREXversion" ON)
+ mark_as_advanced(WITH_GIT_TRACK)
 
- if(WITH_SVN_TRACK)
-    set(SVN_HH svn/version.hh)
-    add_custom_target(svnheader ALL 
-      DEPENDS ${SVN_HH})
-    add_dependencies(trex_prep svnheader)
+ if(WITH_GIT_TRACK)
+    set(GIT_HH git/version.hh)
+    add_custom_target(githeader ALL 
+      DEPENDS ${GIT_HH})
+    add_dependencies(trex_prep githeader)
 
     # this run my svn script
-    add_custom_command(OUTPUT ${SVN_HH}
+    add_custom_command(OUTPUT ${GIT_HH}
       PRE_BUILD
       COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DMY_SVN_TRUNK=trex2-agent.googlecode.com/svn/trunk
       -DOUTPUT_DIR=${TREX_EXTRA_DIR}
-      -P ${CMAKE_SOURCE_DIR}/cmake/getsvn.cmake)
+      -P ${CMAKE_SOURCE_DIR}/cmake/getgit.cmake)
     
     include_directories(${TREX_EXTRA_DIR})
-    set_source_files_properties(${SVN_HH}
+    set_source_files_properties(${GIT_HH}
       PROPERTIES GENERATED TRUE
      # HEADER_FILE_ONLY TRUE
      LOCATION ${TREX_EXTRA_DIR}
      )
 
-    add_dependencies(TREXutils svnheader)
+    add_dependencies(TREXutils githeader)
 
     set_source_files_properties(TREXversion.cc
-      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${SVN_HH})
-    add_definitions(-DWITH_SVN_TRACK)
- endif(WITH_SVN_TRACK)
+      PROPERTIES OBJECT_DEPENDS ${TREX_EXTRA_DIR}/${GIT_HH})
+    add_definitions(-DWITH_GIT_TRACK)
+ endif(WITH_GIT_TRACK)
 endif(TREX_FROM_PKG)
 
 # map ditectory structure for XCode 

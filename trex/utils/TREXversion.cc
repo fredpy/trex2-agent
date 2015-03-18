@@ -36,13 +36,13 @@
 
 #include <sstream>
 
-#ifdef WITH_SVN_TRACK
-# include "svn/version.hh"
+#ifdef WITH_GIT_TRACK
+# include "git/version.hh"
 #else
 // Make the default dimilar to when we do not find svn
-# define SVN_INFO false
-# define SVN_ROOT "unknown"
-# define SVN_REV  "exported"
+# define GIT_INFO   false
+# define GIT_BRANCH "unknown"
+# define GIT_REV    "exported"
 #endif 
 
 unsigned short TREX::version::major() {
@@ -78,20 +78,32 @@ std::string TREX::version::str() {
 }
 
 bool TREX::version::svn_info() {
-  return SVN_INFO;
+  return false;
 }
 
 std::string TREX::version::svn_root() {
-  return SVN_ROOT;
+  return std::string();
 }
 
 std::string TREX::version::svn_revision() {
-  return SVN_REV;
+  return std::string();
+}
+
+bool TREX::version::git_info() {
+  return GIT_INFO;
+}
+
+std::string TREX::version::git_branch() {
+  return GIT_BRANCH;
+}
+
+std::string TREX::version::git_revision() {
+  return GIT_REV;
 }
 
 std::string TREX::version::full_str() {
-  if( svn_info() ) 
-    return str()+" (svn:"+svn_root()+"["+svn_revision()+"])";
+  if( git_info() ) 
+    return str()+" (git:"+git_branch()+"["+git_revision()+"])";
   else
     return str();
 }
