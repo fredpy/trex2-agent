@@ -1,0 +1,291 @@
+<Log>
+ <header>
+   <use name="position" goals="0" plan="0" />
+   <use name="velocity" goals="0" plan="0" />
+   <provide name="move" goals="1" plan="0" />
+ </header>
+ <tick value="0">  <synchronize>
+<Observation on="move" pred="At"><Variable type="float" name="x"><float value="0.0000206835308240"/></Variable><Variable type="float" name="y"><float value="-0.0000000634021641"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <token id="0x21f24a0" >
+<Goal on="move" pred="Go"><Variable type="int" name="start"><int min="10"/></Variable><Variable type="int" name="duration"><int min="5" max="15"/></Variable><Variable type="int" name="end"><int min="15"/></Variable><Variable type="float" name="angular_z"><float value="0.0000000000000000"/></Variable><Variable type="float" name="linear_x"><float min="0.3000000119209290" max="1.0000000000000000"/></Variable><Variable type="float" name="linear_y"><float value="0.0000000000000000"/></Variable></Goal>
+   </token>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="1">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="2">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="3">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="4">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="5">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="6">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="7">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <request id="0x2201160" >
+<Goal on="velocity" pred="Hold"><Variable type="int" name="start"><int min="10"/></Variable><Variable type="int" name="duration"><int min="5" max="15"/></Variable><Variable type="int" name="end"><int min="15"/></Variable><Variable type="float" name="angular_z"><float value="0.0000000000000000"/></Variable><Variable type="float" name="linear_x"><float min="0.3000000119209290" max="1.0000000000000000"/></Variable><Variable type="float" name="linear_y"><float value="0.0000000000000000"/></Variable></Goal>
+   </request>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="8">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="9">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="10">  <synchronize>
+<Observation on="move" pred="Go"><Variable type="float" name="angular_z"><float value="0.0000000000000000"/></Variable><Variable type="float" name="linear_x"><float value="0.3000000119209290"/></Variable><Variable type="float" name="linear_y"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="11">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="12">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="13">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="14">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="15">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="16">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="17">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="18">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="19">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="20">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="21">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="22">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="23">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="24">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="25">  <synchronize>
+<Observation on="move" pred="At"><Variable type="float" name="x"><float value="2.6512823906129319"/></Variable><Variable type="float" name="y"><float value="-0.0046642842484485"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="26">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="27">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="28">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="29">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="30">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="31">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="32">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="33">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="34">  <has_work>
+   <work value="1" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+   <unprovide name="move" />
+   <unuse name="position" />
+   <unuse name="velocity" />
+  </has_work>
+ </tick>
+</Log>

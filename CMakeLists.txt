@@ -33,110 +33,97 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+# indicate the cmake version we need
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake;${CMAKE_SOURCE_DIR}/cmake/Modules/")
+# tell cmake that some files it may need can be found here
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
-########################################################################
-# Project definitions                                                  #
-########################################################################
-project(trex)
+# Name of the project
+project(trex_turtle)
 
-set(TREX_MAJOR 1)
-set(TREX_MINOR 0)
-set(TREX_PATCH 0)
-set(TREX_RC 1)
+# some extra things to easilly generate a tarball from the source or binaries 
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX ROS integration example")
+set(CPACK_PACKAGE_VENDOR "TREX2 development team")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
+set(CPACK_GENERATOR "TGZ" CACHE STRING "Packaging method for binary")
+set(
+CPACK_SOURCE_PACKAGE_FILE_NAME
+"${CMAKE_PROJECT_NAME}"
+CACHE INTERNAL "tarball basename"
+)
+set(CPACK_SOURCE_GENERATOR "TGZ" CACHE STRING "Packaging method for source")
+set(CPACK_SOURCE_IGNORE_FILES
+"~$"
+"/\\\\.svn/"
+"\\\\.DS_Store$"
+)
 
-# setup the configuration for CPack
-include(package_cfg)
+include(CPack)
+# end of the extra things
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  # Need this for config generated files
-  ${CMAKE_BINARY_DIR}/trex/config
-  )
+#----------------- T-REX ----------------------------
+# locate trex libraries and set up
+find_package(trex REQUIRED)
 
-# look for basic system libraries and configurations
-include(system_cfg)
+# add the location of trex headers to the include path 
+include_directories(${trex_INCLUDE_DIRS})
+# add trex comilation flags to the compilation flags
+add_definitions(${trex_CPPFLAGS})
 
-# look for boost or c++
-include(boost_or_cpp11)
+#----------------- ROS ------------------------------ 
+# locate ros
+find_package(ROS)
+
+if(ROS_CONFIG)
+  # find the ros package roscpp
+  find_ros_pkg(roscpp)
+
+  # add include paths, compilations flags and libraries needed 
+  # to use roscpp
+  include_directories(${ROS_roscpp_INCLUDE_DIRS})
+  add_definitions(${ROS_roscpp_CFLAGS})
+  link_directories(${ROS_roscpp_LINK_PATH})
+
+  # find the ros package go_turtle
+  find_ros_pkg(go_turtle)
+  if(ROS_go_turtle_PACKAGE_PATH)
+    # add the source files dedicated for comm with go_turtle 
+    set(EXTRA_SRC src/nav_adapter.cc)
+
+    # add compile flags for go_turtle 
+    include_directories(${ROS_go_turtle_INCLUDE_DIRS})
+    add_definitions(${ROS_go_turtle_CFLAGS})
+    link_directories(${ROS_go_turtle_LINK_PATH})
+
+  else(ROS_go_turtle_PACKAGE_PATH)
+
+    # go_turtle was not found: print a warning
+    message(WARNING "go_turlte ROS package not detected") 
+  endif(ROS_go_turtle_PACKAGE_PATH)
+else(ROS_CONFIG)
+  # ROS was not found: send an error
+  message(SEND_ERROR "Failed to localize ROS")
+endif(ROS_CONFIG)
 
 
-########################################################################
-# Europa                                                               #
-########################################################################
+#------------------------- My trex plugin -----------------------
 
-option(WITH_EUROPA "Enable Europa plugin." ON) 
+# Define my new trex plugin
+add_library(turtle_pg SHARED 
+  src/turtle_pg.cc          # this file defines the plugin API TREX uses (a function that T_REX neeed to find on any plugin)
+  src/odom_adapter.cc       # define conversion from ros odometry messages to a trex token
+  src/pose_adapter.cc       # define conversion from ros pose...  messages to a trex token
+  src/fail_guard.cc         # define a simple reactor that will kill trex if a reactor is killed
+  ${EXTRA_SRC}              # extra code if go_turtle was found: adapter from go_turtle topics to trex tokens
+)
 
-if(WITH_EUROPA) 
-  find_package(Europa
-    COMPONENTS PlanDatabase ConstraintEngine TemporalNetwork Utils TinyXml 
-    NDDL RulesEngine Solvers System)
-  if(NOT EUROPA_FOUND)
-    message(FATAL_ERROR "Failed to find Europa while WITH_EUROPA is ON")
-  endif(NOT EUROPA_FOUND)
-endif(WITH_EUROPA)
+target_link_libraries(turtle_pg TREXros)
 
-########################################################################
-# Doxygen                                                              #
-########################################################################
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in 
-     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-   set(DOXYGEN_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doc CACHE STRING 
-     "Output directory for doxygen")
-   mark_as_advanced(DOXYGEN_OUTPUT)
-   add_custom_target(doc
-     ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-     COMMENT "Generating API documentation with Doxygen" VERBATIM
-     )
-endif(DOXYGEN_FOUND)
+# Make sure you install this guy in TREX_PATH
+install(TARGETS turtle_pg DESTINATION share/trex/plugins) # install the plugin libarary here 
 
-# TREX utilities functions for cmake compilation
-include(trex_utils)
-
-########################################################################
-# TREX sub directories                                                 #
-########################################################################
-
-set(TREX_SHARED share/trex)
-
-include_directories(${CMAKE_BINARY_DIR})
-
-# core libraries 
-add_subdirectory(trex)
-trex_cfg(cfg ${TREX_SHARED})
-
-# include extra/plugins
-#add_subdirectory(extra) 
-
-########################################################################
-# Finalize                                                             #
-########################################################################
-
-include(trex_finalize)
-
-get_property(TREX_INCS GLOBAL PROPERTY TREX_INCLUDES)
-get_property(trex-core GLOBAL PROPERTY trex-core)
-get_property(trex-extra GLOBAL PROPERTY trex-extra)
-get_property(trex-python GLOBAL PROPERTY trex-python)
-list(REMOVE_DUPLICATES TREX_INCS)
-if(CPP11_ENABLED)
-  set(trex_FLAGS ${CPP11_COMPILER_SWITCH})
-endif(CPP11_ENABLED)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/trex-config.cmake.in 
-  ${CMAKE_BINARY_DIR}/cmake/trex-config.cmake @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/cmake/trex-config.cmake 
-  DESTINATION share/trex/cmake)
-unset(TREX_INCS)
-
-# All the packages are mixed together so older version of cmake are not confused
-install(EXPORT trex-targets DESTINATION share/trex/cmake/imports OPTIONAL)
-
-#include(CMakePackageConfigHelpers)
-# Note I need to do a real version checking
-#write_basic_package_version_file(trexConfigVersion.cmake VERSION ${VERSION} COMPATIBILITY AnyNewerVersion)
+install(DIRECTORY cfg DESTINATION share/trex OPTIONAL # install configuration files (the content of cfg) there
+  FILES_MATCHING PATTERN "*"
+  PATTERN "*~" EXCLUDE
+  PATTERN ".svn" EXCLUDE)
 

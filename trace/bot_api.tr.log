@@ -1,0 +1,382 @@
+<Log>
+ <header>
+   <provide name="position" goals="0" plan="0" />
+   <provide name="velocity" goals="1" plan="0" />
+ </header>
+ <tick value="0">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999948911830181"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0031964993139189"/></Variable><Variable type="float" name="position_x"><float value="0.0000206835308240"/></Variable><Variable type="float" name="position_y"><float value="-0.0000000634021641"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+<Observation on="velocity" pred="undefined"/>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="1">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999940332477593"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0034544853276943"/></Variable><Variable type="float" name="position_x"><float value="0.0000222570999070"/></Variable><Variable type="float" name="position_y"><float value="-0.0000000738707643"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="2">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999932219554368"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0036818532268920"/></Variable><Variable type="float" name="position_x"><float value="0.0000237869437413"/></Variable><Variable type="float" name="position_y"><float value="-0.0000000847960260"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="3">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999922347224094"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0039408748878571"/></Variable><Variable type="float" name="position_x"><float value="0.0000253612467925"/></Variable><Variable type="float" name="position_y"><float value="-0.0000000968070340"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="4">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999911862634374"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0041984991893787"/></Variable><Variable type="float" name="position_x"><float value="0.0000268921488217"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001092690240"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="5">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999901600262275"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0044361977773462"/></Variable><Variable type="float" name="position_x"><float value="0.0000284548039254"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001227302566"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="6">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999890920836395"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0046707294653347"/></Variable><Variable type="float" name="position_x"><float value="0.0000300534575096"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001372771500"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="7">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999878449049933"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0049305215005313"/></Variable><Variable type="float" name="position_x"><float value="0.0000316378002744"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001524972805"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="8">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999865379716865"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0051888221592953"/></Variable><Variable type="float" name="position_x"><float value="0.0000332225653675"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001685404342"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="9">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999851652636618"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0054469489264162"/></Variable><Variable type="float" name="position_x"><float value="0.0000348204365941"/></Variable><Variable type="float" name="position_y"><float value="-0.0000001855412775"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="10">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999988916331080"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0014888695562674"/></Variable><Variable type="float" name="position_x"><float value="0.1770150306843197"/></Variable><Variable type="float" name="position_y"><float value="-0.0018426300595812"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+<Observation on="velocity" pred="Hold"><Variable type="float" name="angular_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="angular_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="angular_z"><float value="0.0000000000000000"/></Variable><Variable type="float" name="linear_x"><float value="0.3000000119209290"/></Variable><Variable type="float" name="linear_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="linear_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="11">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997951638302679"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0202393275977188"/></Variable><Variable type="float" name="position_x"><float value="0.3539448485769859"/></Variable><Variable type="float" name="position_y"><float value="-0.0062558535601292"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="12">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9998992229374992"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0141966182235510"/></Variable><Variable type="float" name="position_x"><float value="0.5307326930046044"/></Variable><Variable type="float" name="position_y"><float value="-0.0148629493677575"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="13">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999056408040603"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0137371572103405"/></Variable><Variable type="float" name="position_x"><float value="0.7076281827765419"/></Variable><Variable type="float" name="position_y"><float value="-0.0209624243558661"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="14">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9995206527668345"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0309590809385708"/></Variable><Variable type="float" name="position_x"><float value="0.8844803162852101"/></Variable><Variable type="float" name="position_y"><float value="-0.0288159321183778"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="15">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997037112782901"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0243411104186557"/></Variable><Variable type="float" name="position_x"><float value="1.0611026534014167"/></Variable><Variable type="float" name="position_y"><float value="-0.0404386272658675"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="16">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997366415016752"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0229488047390498"/></Variable><Variable type="float" name="position_x"><float value="1.2378196526318486"/></Variable><Variable type="float" name="position_y"><float value="-0.0503211638345313"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="17">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9998578111232472"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0168629041338913"/></Variable><Variable type="float" name="position_x"><float value="1.4145841006381883"/></Variable><Variable type="float" name="position_y"><float value="-0.0593491751507532"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="18">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9999998726987471"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="-0.0005045814995111"/></Variable><Variable type="float" name="position_x"><float value="1.5914901980954306"/></Variable><Variable type="float" name="position_y"><float value="-0.0648193530572384"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="19">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9998996597361443"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0141658201154391"/></Variable><Variable type="float" name="position_x"><float value="1.7684953312269116"/></Variable><Variable type="float" name="position_y"><float value="-0.0643952689106313"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="20">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997211831385072"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0236126234066281"/></Variable><Variable type="float" name="position_x"><float value="1.9454425639880388"/></Variable><Variable type="float" name="position_y"><float value="-0.0596057579847527"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="21">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9991446911739240"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0413507690250613"/></Variable><Variable type="float" name="position_x"><float value="2.1221952927066008"/></Variable><Variable type="float" name="position_y"><float value="-0.0504727004776928"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="22">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9986643657755240"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0516670545915909"/></Variable><Variable type="float" name="position_x"><float value="2.2984711888502249"/></Variable><Variable type="float" name="position_y"><float value="-0.0339729461211699"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="23">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9991021219612507"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0423668489803777"/></Variable><Variable type="float" name="position_x"><float value="2.4747072424001044"/></Variable><Variable type="float" name="position_y"><float value="-0.0171920385446816"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="24">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9994443418930697"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0333317784993336"/></Variable><Variable type="float" name="position_x"><float value="2.6512695292467621"/></Variable><Variable type="float" name="position_y"><float value="-0.0046651283375668"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="25">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9995966156179621"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0284008106418834"/></Variable><Variable type="float" name="position_x"><float value="2.6512823906129319"/></Variable><Variable type="float" name="position_y"><float value="-0.0046642842484485"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+<Observation on="velocity" pred="undefined"/>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="26">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9996153788378279"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0277325511070599"/></Variable><Variable type="float" name="position_x"><float value="2.6512840638761399"/></Variable><Variable type="float" name="position_y"><float value="-0.0046641903316928"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="27">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9996335101323256"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0270711178292601"/></Variable><Variable type="float" name="position_x"><float value="2.6512846816307238"/></Variable><Variable type="float" name="position_y"><float value="-0.0046641568277349"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="28">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9996507112381666"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0264283090837763"/></Variable><Variable type="float" name="position_x"><float value="2.6512852755289509"/></Variable><Variable type="float" name="position_y"><float value="-0.0046641249716902"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="29">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9996672379648791"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0257956069839373"/></Variable><Variable type="float" name="position_x"><float value="2.6512867857833378"/></Variable><Variable type="float" name="position_y"><float value="-0.0046640460774368"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="30">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9996853541520191"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0250837137193066"/></Variable><Variable type="float" name="position_x"><float value="2.6512876127535749"/></Variable><Variable type="float" name="position_y"><float value="-0.0046640042401886"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="31">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997006335691898"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0244671870340770"/></Variable><Variable type="float" name="position_x"><float value="2.6512881555858572"/></Variable><Variable type="float" name="position_y"><float value="-0.0046639772640823"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="32">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997159177608880"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0238345080818839"/></Variable><Variable type="float" name="position_x"><float value="2.6512897398615607"/></Variable><Variable type="float" name="position_y"><float value="-0.0046639007392466"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="33">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997313997756213"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0231760286217660"/></Variable><Variable type="float" name="position_x"><float value="2.6512904433617819"/></Variable><Variable type="float" name="position_y"><float value="-0.0046638679726668"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+  </has_work>
+ </tick>
+ <tick value="34">  <synchronize>
+<Observation on="position" pred="Hold"><Variable type="float" name="orientation_w"><float value="0.9997461754670777"/></Variable><Variable type="float" name="orientation_x"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_y"><float value="0.0000000000000000"/></Variable><Variable type="float" name="orientation_z"><float value="0.0225296391216348"/></Variable><Variable type="float" name="position_x"><float value="2.6512911173989635"/></Variable><Variable type="float" name="position_y"><float value="-0.0046638371556742"/></Variable><Variable type="float" name="position_z"><float value="0.0000000000000000"/></Variable></Observation>
+  </synchronize>
+  <has_work>
+   <work value="0" />
+  </has_work>
+  <has_work>
+   <work value="0" />
+   <unprovide name="position" />
+   <unprovide name="velocity" />
+  </has_work>
+ </tick>
+</Log>

@@ -1,0 +1,19 @@
+<Solver name="OrebroSynchSolver">
+  	<ThreatManager defaultPriority="10">
+	  <FlawHandler component="TrexThreatHandler"/>
+  	</ThreatManager>
+
+  	<OpenConditionManager component="EarliestFirst" defaultPriority="100">
+	  <FlawFilter component="goals"/> <!-- exclude goals from synchronization -->
+	  <FlawHandler component="TrexOpenConditionHandler"/>
+  	</OpenConditionManager>
+
+  	<UnboundVariableManager defaultPriority="400">
+	  <FlawFilter component="doNotMatch">
+	    <Choice name="_bind_dx_2"/>
+	    <Choice name="_bind_dy_2"/>
+	  </FlawFilter>
+	  <FlawHandler component="toZero"/>
+  	</UnboundVariableManager>
+
+</Solver>

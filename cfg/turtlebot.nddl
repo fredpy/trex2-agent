@@ -1,0 +1,175 @@
+#include "TREX.nddl"
+
+// Definition of europa objects including trex timelines
+
+/*
+ * odometry timeline as provided by ros
+ *
+ * predicates:
+ *  Hold       the position updated received for this tick
+ * inherited predicates from AgentTimeline
+ *  undefined  means no position updated has been received
+ *  Failed     indicate that this timelien is not managesd by a reactor (either it was killed or never existed)
+ */
+class Odometry extends AgentTimeline {
+    predicate Hold {
+	// (x, y, z) 
+      	float position_x;
+	float position_y;
+	float position_z;
+	// (quaternion for orientation angles) 
+	float orientation_x;
+	float orientation_y;
+	float orientation_z;
+	float orientation_w;
+	duration == 1; // A Hold last only 1 tick 
+    }
+
+    // Constructor 
+    //   _mode the timelien mode for TREX {Internal, Observe, External, ...}
+    Odometry(Mode _mode) {
+	super(_mode);
+    }
+}
+
+
+/* 
+ * twist timeline as provided by ros
+ *
+ * predicates
+ *   Hold the current twist received/commanded it will last as long as the same twist is received at every tick on corresponding Topic
+ * inherited predicates are the same as above
+ */
+class Twist extends AgentTimeline {
+    predicate Hold {
+	float linear_x, linear_y, linear_z;
+	float angular_x, angular_y, angular_z;
+    }
+
+    
+    // Constructor 
+    //   _mode the timelien mode for TREX {Internal, Observe, External, ...}
+    Twist(Mode _mode) {
+	super(_mode);
+    }
+}
+
+/* The timeline identifying current ronbot behavior
+ *
+ * predicates:
+ *   Go Indicate that the robot is commanded to move
+ *   At indictae that the robot is at a location (+/- 50 cm) and not moving
+ * inheritedt predicates
+ *   undefined unable to identify current robot state between the aboves 
+ *   Failed should never happen if this timeline is Internal
+ */
+class Motion extends AgentTimeline {
+    predicate Go {
+      float linear_x, linear_y;
+      float angular_z;
+    }
+    predicate At {
+      float x, y;
+      float yaw;
+      // abs(yaw) <= 180.0; // yaw is an angle in degrees
+    }
+    
+    // Constructor 
+    //   _mode the timelien mode for TREX {Internal, Observe, External, ...}
+    Motion(Mode _mode) {
+      super(_mode);
+    }
+}
+
+// ====================================================================
+// synchronization model : tie External observations to Internal states
+
+// Rule that convert a Twist.undefined into a at state
+Twist::undefined {
+    starts(Odometry.Hold odom);
+    equals(Motion.At pos);
+
+    float dx, dy, _bind_dx_2, _bind_dy_2;
+    
+    pos.x + dx == odom.position_x;
+    pos.y + dy == odom.position_y;
+    
+    abs(dx) == sqrt(_bind_dx_2);
+    abs(dy) == sqrt(_bind_dy_2);
+
+    // Accurate at 10cm
+    sqrt(_bind_dx_2 + _bind_dy_2) <= 0.1; 
+    
+
+    odom.orientation_x == 0.0;
+    odom.orientation_y == 0.0;
+
+    float sin_half_y_2;
+    abs(odom.orientation_z) == sqrt(sin_half_y_2);
+    
+    // orientation_z == sin(yaw/2)
+    // orientation_w == cos(yaw/2)
+    
+    // Trigo identities tells us that 
+    // sin(2*x) == 2 * sin(x) * cos(x)
+    // cos(2*x) == 2* (sin(x)^2) - 1
+    // therefore
+    //
+    // sin(yaw) == 2 * sin(yaw/2) * cos(yaw/2)
+    //    sin(pos.yaw) == 2.0*odom.orientation_w*odom.orientation_z;
+    // cos(yaw) == 2* (sin(yaw/2)^2) - 1
+    //cos(pos.yaw) + 1.0 == 2.0 * sin_half_y_2;
+}
+
+// Rule that convert a Twist.Hold into a go state
+Twist::Hold {
+    equals(Motion.Go go);
+    go.linear_x == linear_x;
+    go.linear_y == linear_y;
+    angular_z == to_rad(go.angular_z);
+}
+
+// ===========================================================================================================
+// Planning model : tie Internal goals to External subgoals through actions
+
+// possible actions for the planner 
+// 
+class NavActions {
+    action DoMove {}
+    action RotateTo {}
+    //    action LinearTo {}
+}
+
+// convert a Motion.Go into its Twist.Hold counterpart for commanding 
+NavActions::DoMove {
+    contained_by(effect Motion.Go go);
+    equals(condition Twist.Hold cmd);
+}
+
+// NavActions::RotateTo {
+//     meets(effect Motion.At location);
+//     equals(condition Motion.Go rotation);
+//     rotation.linear_x == 0.0;
+//     rotation.linear_y == 0.0;
+//     met_by(Odometry.Hold initial);
+
+//     // float dx
+//     initial.linear_x
+    
+// }
+
+
+
+
+
+
+// Instantiation of the model
+
+Odometry position = new Odometry(Observe);
+Twist velocity = new Twist(External);
+
+Motion move = new Motion(Internal);
+
+NavActions mover = new NavActions();
+
+close();
