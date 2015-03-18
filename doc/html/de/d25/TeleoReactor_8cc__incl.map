@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node7" href="$db/d0f/TeleoReactor_8hh.html" title="Declares the main interface for a Teleo&#45;Reactor." alt="" coords="408,83,544,111"/>
-<area shape="rect" id="node22" href="$d9/d1f/FloatDomain_8hh.html" title="Float domain representation." alt="" coords="868,83,1081,111"/>
-<area shape="rect" id="node10" href="$d3/d7b/external_8hh.html" title="external timeline external utilities" alt="" coords="93,161,219,189"/>
-<area shape="rect" id="node12" href="$d2/d09/reactor__graph_8hh_source.html" title="reactor_graph.hh" alt="" coords="243,161,381,189"/>
-<area shape="rect" id="node18" href="$d3/dfa/bgl__support_8hh.html" title="Boost Graph Library support code." alt="" coords="829,161,981,189"/>
-<area shape="rect" id="node20" href="$d8/deb/reactor__graph_8tcc_source.html" title="bits/reactor_graph.tcc" alt="" coords="1005,161,1179,189"/>
-<area shape="rect" id="node24" href="$d6/dca/IntervalDomain_8hh.html" title="Interval based domain deifinition." alt="" coords="1203,161,1347,189"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html#a9a216b700755407ae9d4421db6276673" title="Final tick of the mission." alt="" coords="341,5,605,33"/>
-<area shape="rect" id="node5" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html#a667fbd5f18de46938a7af1b21f112f0d" title="execution latency" alt="" coords="348,55,599,83"/>
-<area shape="rect" id="node7" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html#a141db6749ec008dcbce413a82f2a029f" title="planning look ahead" alt="" coords="333,106,613,134"/>
-<area shape="rect" id="node9" href="$dc/d76/classTREX_1_1europa_1_1Assembly.html#a18e6f3bc95f0e5676dfc52fe88a047cb" title="Current tick." alt="" coords="359,157,588,185"/>
-</map>

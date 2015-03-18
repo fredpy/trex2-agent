@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$d9/dd7/classTREX_1_1transaction_1_1EnumeratedDomain.html" title="TREX::transaction::EnumeratedDomain\&lt; TREX::utils::Symbol \&gt;" alt="" coords="337,18,791,46"/>
-<area shape="rect" id="node4" href="$d1/dfc/classTREX_1_1transaction_1_1BasicEnumerated.html" title="Enumerated Domain base class." alt="" coords="7,5,284,33"/>
-<area shape="rect" id="node6" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="385,94,743,122"/>
-<area shape="rect" id="node8" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="48,55,243,83"/>
-<area shape="rect" id="node10" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="51,106,240,134"/>
-<area shape="rect" id="node12" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="60,157,231,185"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$d0/d04/classTREX_1_1transaction_1_1Goal.html#a2fa4cc0ceba6cc00fcb2d5536b2de370" title="Get start interval." alt="" coords="391,5,649,33"/>
-<area shape="rect" id="node7" href="$dd/d70/classTREX_1_1transaction_1_1IntervalDomain.html#aebb1a1a6f263b12e86a2147bb6c70e1c" title="interval lower bound" alt="" coords="344,55,696,83"/>
-<area shape="rect" id="node5" href="$de/db8/classTREX_1_1transaction_1_1Variable.html#aa1ef7a57b12c0fc81e205f2d187a3a08" title="Variable domain." alt="" coords="745,5,1057,33"/>
-</map>

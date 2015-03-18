@@ -1,7 +1,0 @@
-<map id="structs" name="structs">
-<area shape="rect" id="node1" href="$d0/d0a/group__commands.html" title="Commands for agent execution." alt="" coords="152,5,291,33"/>
-<area shape="rect" id="node2" href="$db/db4/group__transaction.html" title="TREX reactors and messaging types." alt="" coords="151,55,292,83"/>
-<area shape="rect" id="node3" href="$db/d81/group__utils.html" title="simple utilities library" alt="" coords="164,106,279,134"/>
-<area shape="rect" id="node4" href="$d4/d1f/group__agent.html" title="The TREX agent." alt="" coords="171,157,272,185"/>
-<area shape="rect" id="node6" href="$d2/dea/group__domains.html" title="generic constrained variables" alt="" coords="181,207,261,235"/>
-</map>

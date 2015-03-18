@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$d5/dd9/classTREX_1_1transaction_1_1BasicInterval.html" title="Interval Domain base class." alt="" coords="661,9,909,37"/>
-<area shape="rect" id="node4" href="$d1/dc6/classTREX_1_1transaction_1_1DomainBase.html" title="Abstract domain definition." alt="" coords="309,5,552,33"/>
-<area shape="rect" id="node6" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="5,11,200,39"/>
-<area shape="rect" id="node8" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="252,70,609,98"/>
-<area shape="rect" id="node11" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="8,70,197,98"/>
-<area shape="rect" id="node13" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="17,121,188,149"/>
-</map>

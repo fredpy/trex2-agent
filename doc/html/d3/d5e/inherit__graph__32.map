@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$de/d50/classTREX_1_1agent_1_1Clock.html" title="TREX clock." alt="" coords="5,32,160,61"/>
-<area shape="rect" id="node3" href="$d9/dc0/classTREX_1_1agent_1_1RealTimeClock.html" title="Real time default clock for TREX." alt="" coords="209,5,425,35"/>
-<area shape="rect" id="node5" href="$d4/d87/classTREX_1_1agent_1_1StepClock.html" title="Step based pseudo clock." alt="" coords="224,59,411,88"/>
-</map>

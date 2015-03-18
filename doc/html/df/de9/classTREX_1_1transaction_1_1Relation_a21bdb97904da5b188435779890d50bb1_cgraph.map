@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a1b0de9084bf9d66417999aa7e22e0bbc" title="Check if relation active." alt="" coords="408,59,672,88"/>
-<area shape="rect" id="node9" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#afd0f7c90ad1a044fabf7b2d5ac4ffa8b" title="Timeline look ahead." alt="" coords="365,112,715,141"/>
-<area shape="rect" id="node5" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a5f0aad61f68b4818243d5e008597b1a0" title="Check if owned." alt="" coords="781,59,1099,88"/>
-<area shape="rect" id="node7" href="$df/de9/classTREX_1_1transaction_1_1Relation.html#a297c0d2e6164cbb79fe958c5f8519ceb" title="Check for relation validity." alt="" coords="815,5,1065,35"/>
-<area shape="rect" id="node11" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#aa85f8e0c6f77b4f9eff83d829fe3dba6" title="Get reactor look&#45;ahead." alt="" coords="764,112,1116,141"/>
-<area shape="rect" id="node14" href="$d8/d93/classTREX_1_1transaction_1_1details_1_1timeline.html#a8e4ec7793716f877f1971af84aad0644" title="Timeline owner." alt="" coords="783,165,1097,195"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$d8/d62/Agent_8hh.html" title="Definition of an Agent." alt="" coords="377,83,535,111"/>
-<area shape="rect" id="node13" href="$d3/d4e/PluginLoader_8cc.html" title="Implementation of PluginLoader." alt="" coords="559,83,756,111"/>
-<area shape="rect" id="node5" href="$da/d33/GoalManager__PR2_8cc_source.html" title="extra/starfish/GoalManager_PR2.cc" alt="" coords="5,161,267,189"/>
-<area shape="rect" id="node7" href="$d1/d37/Agent_8cc.html" title="Agent implementation." alt="" coords="291,161,448,189"/>
-<area shape="rect" id="node9" href="$de/d98/AMC_8cc.html" title="Autonomous Mission Controller." alt="" coords="472,161,616,189"/>
-<area shape="rect" id="node11" href="$d3/dcc/Sim_8cc.html" title="Agent debugging interface." alt="" coords="640,161,779,189"/>
-</map>

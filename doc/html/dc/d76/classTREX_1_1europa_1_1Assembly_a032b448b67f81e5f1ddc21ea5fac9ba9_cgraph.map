@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a67dd30f0e14b79d9f60643cb4c275de4" title="First path." alt="" coords="397,5,632,35"/>
-<area shape="rect" id="node5" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a1bd090554dbe669e46c81b85676da896" title="End of searh path." alt="" coords="404,59,625,88"/>
-<area shape="rect" id="node7" href="$df/d7a/classTREX_1_1transaction_1_1TeleoReactor.html#a975231dd2846e0a806833f93d79dabb5" title="LogManager acces point." alt="" coords="357,112,672,141"/>
-<area shape="rect" id="node9" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#abd315b6112cd5975b4af4cf710afb629" title="Configuration files management." alt="" coords="404,165,625,195"/>
-<area shape="rect" id="node11" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a6d68266424040e03590698d380a46740" title="Get directory where cfg files should be stored." alt="" coords="720,112,997,141"/>
-<area shape="rect" id="node13" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a61321a663bb542278be8092efb7e0a90" title="Locate a file." alt="" coords="739,165,979,195"/>
-<area shape="rect" id="node15" href="$d2/d8b/classTREX_1_1utils_1_1LogManager.html#a53a0d7d14350f3e3dbe0d7fe4520dc41" title="Named text entry." alt="" coords="740,219,977,248"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$d4/db5/classTREX_1_1transaction_1_1Predicate.html" title="TREX Predicate." alt="" coords="5,86,229,114"/>
-<area shape="rect" id="node4" href="$d2/d06/classTREX_1_1utils_1_1ostreamable.html" title="standard output stream support class" alt="" coords="93,6,288,34"/>
-<area shape="rect" id="node6" href="$dc/de0/classTREX_1_1utils_1_1BasicSymbol.html" title="generic symbol class" alt="" coords="253,86,611,114"/>
-<area shape="rect" id="node9" href="$d5/d6c/classTREX_1_1utils_1_1istreamable.html" title="standard input stream support class" alt="" coords="324,6,513,34"/>
-<area shape="rect" id="node11" href="$da/d64/classTREX_1_1utils_1_1Hashable.html" title="Abstract class that supports hash." alt="" coords="537,6,708,34"/>
-</map>
