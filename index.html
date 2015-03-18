@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Trex2-agent : Automatically exported from code.google.com/p/trex2-agent">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Trex2-agent</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/fredpy/trex2-agent">View on GitHub</a>
+
+          <h1 id="project_title">Trex2-agent</h1>
+          <h2 id="project_tagline">Automatically exported from code.google.com/p/trex2-agent</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/fredpy/trex2-agent/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/fredpy/trex2-agent/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+<a id="high-level-decision-and-control-for-autonomous-agent" class="anchor" href="#high-level-decision-and-control-for-autonomous-agent" aria-hidden="true"><span class="octicon octicon-link"></span></a>High level decision and control for autonomous agent</h3>
+
+<p>This project is taking its roots from the same initial code base as <a href="https://code.google.com/p/trex-autonomy/">trex-autonomy</a> project which was maintained by Willow Garage. Both projects were issued from initial design ideas developed at <a href="http://www.mbari.org">MBARI</a> to bring goal directed control and deliberation on autonomous robots.</p>
+
+<p>The reason to start this new project (initially hosted on <a href="https://code.google.com/p/trex2-agent/">Google code</a>) was 2 folds:</p>
+
+<ul>
+<li>trex-autonomy project became stale when Conor McGann left Willow Garage and is no longer supported</li>
+<li>further this new version wanted to get closer to the formal description of T-REX given in our AAMAS publication (A Systematic Agent Framework for Situated Autonomous Systems. F. Py, K. Rajan &amp; C. McGann 9th Int. Conf. on Autonomous Agents and Multiagent Systems (AAMAS) , May 2010, Toronto, Canada)</li>
+</ul>
+
+<p>Finally while former versions of TREX were tied up to the <a href="https://code.google.com/p/europa-pso/">europa-pso</a> planner, this new version is independent of the planner that being used for the deliberation inside the reactors that are the basic building blocks of an agent. Even though, europa-pso is the only planner publicly supported here, it was moved as a plug-in and compiling the core part of t-rex do not require to install europa.</p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>T-REX code is written mostly in C++ and require a modern compiler with, optionally, support for c++11 (for example it uses new <code>std::chrono</code> classes but will try to uses its <a href="www.boost.org">boost</a> counterpart by default). while the code is trying to remain as system agnostic as possible it may rely on some POSIX constructs and has been only tested on POSIX compliant systems (Linux and MacOS X).</p>
+
+<p>Build management is done using <a href="www.cmake.org">cmake</a></p>
+
+<p>The core library only requires a recent version of the <a href="www.boost.org">boost</a> and the earlier version supported is 1.47.0.</p>
+
+<p>The default build of T-REX will also compile the europa plugin which requires <a href="https://code.google.com/p/europa-pso/">europa-pso</a> version 2.6 (there's some limited support for 2.5 but it has not been tested for a long time and is not as flexible)</p>
+
+<p>Code documentation is done using <a href="www.doxygen.org">doxygen</a> </p>
+
+<p>Other plug-in provided can have further dependencies which we do not detail on this page.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>T-REX code is licensed under the classic 3-clause BSD license.</p>
+
+<h2>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>We have a mailing list that can be used for asking question and/or support <a href="https://groups.google.com/forum/#!forum/trex2-users">trex2-users</a> or you can try  to contact <a href="https://github.com/fredpy" class="user-mention">@fredpy</a> directly.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Trex2-agent maintained by <a href="https://github.com/fredpy">fredpy</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
