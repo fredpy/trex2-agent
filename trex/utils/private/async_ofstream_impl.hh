@@ -38,6 +38,7 @@
 #include "../bits/stranded_service.hh"
 
 #include <trex/config/chrono.hh>
+#include <boost/optional.hpp>
 
 namespace TREX {
   namespace utils {

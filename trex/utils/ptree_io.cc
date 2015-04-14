@@ -103,7 +103,7 @@ void TREX::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
   else {
     // Hacky way to get ridd of the XML header
     xml::write_xml_element(out, bp::ptree::key_type(), p, -1,
-                           xml::xml_writer_settings<bp::ptree::key_type::value_type>());
+                           xml::xml_writer_settings<bp::ptree::key_type>());
   } 
 }
 
