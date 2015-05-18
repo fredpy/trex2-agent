@@ -40,13 +40,13 @@ if(WITH_EUROPA)
   if(EUROPA_HAVE_EFFECT)
     # generate lightswitch.nddl for europa 2.6
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_26.nddl
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPY_ONLY)
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)
   else(EUROPA_HAVE_EFFECT)
     message(WARNING "Your europa version appears to be older than 2.6."
       "Some new trex features have been disabled.")
     # generate lightswitch.nddl for europa 2.5
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cfg/lightswitch_25.nddl
-      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPY_ONLY)    
+      ${CMAKE_CURRENT_BINARY_DIR}/cfg/lightswitch.nddl COPYONLY)    
   endif(EUROPA_HAVE_EFFECT)
 
   # install lightswitch.nddl
