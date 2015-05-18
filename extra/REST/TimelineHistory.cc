@@ -359,8 +359,8 @@ size_t TimelineHistory::get_tok_sync(TREX::utils::Symbol tl,
       if( date<=hi ) {
         if( !first )
           out.put(',');
-        else
-          first = false;
+//        else
+//          first = false;
         utils::write_json(out, get_token((*pos)->obs()), fancy());
         lo = IntegerDomain::plus_inf;
         ret += 1;
