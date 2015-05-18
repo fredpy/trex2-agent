@@ -124,10 +124,10 @@ namespace TREX {
 			  TREX::transaction::Predicate const &pred);
 
       bool is_internal(EUROPA::LabelStr const &name) const {
-	return isInternal(TREX::utils::Symbol(name.c_str()));
+          return isInternal(TREX::utils::Symbol(name.c_str()));
       }
       bool is_external(EUROPA::LabelStr const &name) const {
-	return isExternal(TREX::utils::Symbol(name.c_str()));
+          return isExternal(TREX::utils::Symbol(name.c_str()));
       }
       size_t look_ahead(EUROPA::LabelStr const &name); 
 
@@ -135,7 +135,7 @@ namespace TREX {
       bool synch();
 
       EUROPA::eint now() const {
-	return static_cast<EUROPA::eint::basis_type>(getCurrentTick());
+          return static_cast<EUROPA::eint::basis_type>(getCurrentTick());
       }
       EUROPA::eint latency() const {
         return static_cast<EUROPA::eint::basis_type>(getExecLatency());
@@ -150,13 +150,13 @@ namespace TREX {
 
       EUROPA::IntervalIntDomain plan_scope() const;
       EUROPA::eint initial_tick() const {
-	return static_cast<EUROPA::eint::basis_type>(getInitialTick());
+          return static_cast<EUROPA::eint::basis_type>(getInitialTick());
       }
       EUROPA::eint final_tick() const {
-	return static_cast<EUROPA::eint::basis_type>(getFinalTick());
+          return static_cast<EUROPA::eint::basis_type>(getFinalTick());
       }
       EUROPA::edouble tick_duration() const {
-	return CHRONO::duration<EUROPA::edouble::basis_type>(tickDuration()).count();
+          return CHRONO::duration<EUROPA::edouble::basis_type>(tickDuration()).count();
       }
       void notify(EUROPA::LabelStr const &object, EUROPA::TokenId const &obs);
 

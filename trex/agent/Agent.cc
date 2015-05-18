@@ -940,7 +940,6 @@ bool Agent::doNext() {
   TICK const now = getCurrentTick();
   
   size_t count = 0; //slp_count = 0;
-  bool completed = false;
   stat_clock::duration delib;
   rt_clock::duration delib_rt, sleep_time, sleep_req;
   size_t sl_count = 0;
@@ -956,7 +955,6 @@ bool Agent::doNext() {
             && executeReactor() ) {
         ++count;
       }
-      completed = true;
     }
     
     m_stat_log<<", "<<delib.count()<<", "<<delib_rt.count()

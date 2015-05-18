@@ -9,14 +9,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -26,7 +26,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,10 +40,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_IntegerDomain 
-# define H_IntegerDomain 
+#ifndef H_IntegerDomain
+# define H_IntegerDomain
 
-# include "IntervalDomain.hh" 
+# include "IntervalDomain.hh"
 
 namespace TREX {
   namespace transaction {
@@ -72,20 +72,20 @@ namespace TREX {
        *
        * Create a full integer domain
        */
-      IntegerDomain() 
-	:IntervalDomain<long long, false>(type_name) {}
+      IntegerDomain()
+      :IntervalDomain<long long, false>(type_name) {}
       /** @brief Constructor
        *
        * @param node A XML node
        *
        * Create a integer domain by parsing @e node.
-       * 
+       *
        * @throw TREX::utils::bad_string_cast One of the attributes is
        * not correctly formatted
        * @throw EmptyDomain the resulting interval is empty
        */
       IntegerDomain(boost::property_tree::ptree::value_type &node)
-	:IntervalDomain<long long, false>(node) {}
+      :IntervalDomain<long long, false>(node) {}
       /** @brief Constructor
        * @param lb A lower bound
        * @param ub An upper bound
@@ -95,26 +95,26 @@ namespace TREX {
        * @throw EmptyDomain the resulting domain is empty
        */
       IntegerDomain(IntervalDomain<long long, false>::bound const &lb,
-		    IntervalDomain<long long, false>::bound const ub)
-	:IntervalDomain<long long, false>(type_name, lb, ub) {}
+                    IntervalDomain<long long, false>::bound const ub)
+      :IntervalDomain<long long, false>(type_name, lb, ub) {}
       /** @brief Constructor
        * @param val A value
        *
-       * Create a new integer domain with only the value 
+       * Create a new integer domain with only the value
        * @e val. in other terms the domain is represented by the interval
        * [val, val]
        */
-      IntegerDomain(long long val) 
-	:IntervalDomain<long long, false>(type_name, val) {}
+      IntegerDomain(long long val)
+      :IntervalDomain<long long, false>(type_name, val) {}
       /** @brief Destructor */
       ~IntegerDomain() {}
-
+      
       DomainBase *copy() const {
-	return new IntegerDomain(*this);
+        return new IntegerDomain(*this);
       }
       
-    }; // IntegerDomain 
-
+    }; // IntegerDomain
+    
   } // TREX::utils
 } // TREX
 

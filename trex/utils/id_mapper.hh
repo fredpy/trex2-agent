@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_id_mapper 
+#ifndef H_id_mapper
 # define H_id_mapper
 
 # include <functional>
@@ -42,7 +42,7 @@
 
 namespace TREX {
   namespace utils {
-
+    
     /** @brief list_set sorting functor
      *
      * @tparam IdTraits A traits for identifier extraction
@@ -61,13 +61,13 @@ namespace TREX {
     public:
       typedef typename IdTraits::base_type base_type;
       typedef typename IdTraits::id_type  id_type;
-
+      
       /** @brief Constructor
        *
        * @param[in] cmp A comparison functor
        */
       id_cmp(Cmp const &cmp)
-	:m_cmp(cmp) {}
+      :m_cmp(cmp) {}
       
       /** @brief Element comparison
        *
@@ -80,36 +80,36 @@ namespace TREX {
        * @retval false otherwise
        */
       bool operator()(base_type const &a, base_type const &b) const {
-	return m_cmp(IdTraits::get_id(a), IdTraits::get_id(b));
+        return m_cmp(IdTraits::get_id(a), IdTraits::get_id(b));
       }
       /** @brief Identifer to element comparison
        *
        * @param[in] a An identifier
        * @param[in] b an element
        *
-       * Compare @p a and  the identifier of @p b 
+       * Compare @p a and  the identifier of @p b
        *
        * @retval true if @p a is before the identifier of @p b
        * @retval false otherwise
        */
       bool operator()(id_type const &a, base_type const &b) const {
-	return m_cmp(a, IdTraits::get_id(b));
+        return m_cmp(a, IdTraits::get_id(b));
       }
       /** @brief Element to identifier comparison
        *
        * @param[in] a An element
        * @param[in] b An idenitfier
        *
-       * Compare @p a and  the identifier of @p b 
+       * Compare @p a and  the identifier of @p b
        *
        * @retval true if the identifier of @p a is before @p b
        * @retval false otherwise
        */
       bool operator()(base_type const &a, id_type const &b) const {
-	return m_cmp(IdTraits::get_id(a), b);
+        return m_cmp(IdTraits::get_id(a), b);
       }
     }; // TREX::utils::id_cmp<>
-
+    
     /** @brief Identifier extraction for pair based element
      *
      * @tparam IdTraits An idenitifer extraction traits for the first element
@@ -134,17 +134,17 @@ namespace TREX {
        * @return the identifier associated to @p p
        */
       static return_type get_id(base_type const &p) {
-	return IdTraits::get_id(p.first);
+        return IdTraits::get_id(p.first);
       }
     }; // TREX::utils::map_id_traits<>
-
+    
     /** @brief Identifier extraction for pointer based element
      *
      * @tparam IdTraits An idenitifer extraction traits for the first element
-     * @tparam Ptr      A pointer like type 
+     * @tparam Ptr      A pointer like type
      *
      * A traits used to generate a list_set containing pointer / smart pointer
-     * elements 
+     * elements
      *
      * @author Frderic Py <fpy@mbari.org>
      * @ingroup utils
@@ -156,7 +156,7 @@ namespace TREX {
       typedef typename boost::call_traits<base_type>::param_type argument_type;
       typedef typename IdTraits::id_type  id_type;
       typedef typename boost::call_traits<id_type>::param_type return_type;
-
+      
       /** @brief Extract identifier
        *
        * @param ptr An element
@@ -164,21 +164,21 @@ namespace TREX {
        * @return the identifier associated to @p ptr
        */
       static return_type get_id(argument_type ptr) {
-	return IdTraits::get_id(*ptr);
-      }	
+        return IdTraits::get_id(*ptr);
+      }
     }; // TREX::utils::pointer_id_traits<>
     
     
-      
-
+    
+    
     /** @brief Embedded key comparison helper
      *
      * @tparam IdTraits key extraction traits
      * @tparam Cmp      key comparaison functor
      *
-     * This class is a generalize implementation helper for sorted associative 
+     * This class is a generalize implementation helper for sorted associative
      * containers. It provide the basic methods to find an object in such
-     * container. The generalization is made using : 
+     * container. The generalization is made using :
      * @li @p IdTraits to identify how to extract the key from an object
      * @li @p Cmp      to compare the keys from one to another
      *
@@ -205,7 +205,7 @@ namespace TREX {
      *   }
      * };
      * @endcode
-     * 
+     *
      * The extractor for @c std::set class is even simpler as it maps
      * the object to itself:
      * @code
@@ -219,11 +219,11 @@ namespace TREX {
      *   }
      * };
      * @endcode
-     * 
+     *
      * @ingroup utils
      * @author Frederic Py <fpy@mbari.org>
      * @sa list_set
-     */ 
+     */
     template<class IdTraits, class Cmp=std::less<typename IdTraits::id_type> >
     class id_mapper {
       /** @brief Key comparrison functor
@@ -231,7 +231,7 @@ namespace TREX {
        * The functor used by this instance to sort the elements using their key
        */
       id_cmp<IdTraits, Cmp> m_cmp;
-
+      
     public:
       typedef typename IdTraits::base_type                     base_type;
       /** @brief Type of the key
@@ -254,11 +254,11 @@ namespace TREX {
        * keys
        */
       id_mapper(Cmp const &cmp = Cmp())
-	:m_cmp(cmp) {}
+      :m_cmp(cmp) {}
       /** @brief Destructor */
       ~id_mapper() {}
-
-
+      
+      
       /** @brief iterator comparison to a key
        *
        * @tparam Iter the type of iterator
@@ -276,7 +276,7 @@ namespace TREX {
        */
       template<class Iter>
       bool before(Iter x, reference id) const {
-	return m_cmp(*x, id);
+        return m_cmp(*x, id);
       }
       /** @brief iterator comaparison to a key
        *
@@ -295,9 +295,9 @@ namespace TREX {
        */
       template<class Iter>
       bool after(Iter x, reference id) const {
-	return m_cmp(id, *x);
+        return m_cmp(id, *x);
       }
-
+      
       /** @brief Lower bound of a key
        *
        * @tparam Iter an iterator type
@@ -309,7 +309,7 @@ namespace TREX {
        * whose key is not before @p id
        *
        * @pre [@p from, @p to) is a valid iterator interval
-       * 
+       *
        * @return The first iterator for which the key is not before
        *         @p id or @p to if such iterator does not exist
        *
@@ -318,12 +318,12 @@ namespace TREX {
        */
       template<class Iter>
       Iter lower_bound(Iter from, Iter to, reference id) const {
-	for( ; to!=from && before(from, id); ++from);
-	
-	return from;
+        for( ; to!=from && before(from, id); ++from);
+        
+        return from;
       }
-
-     /** @brief Upper bound of a key
+      
+      /** @brief Upper bound of a key
        *
        * @tparam Iter an iterator type
        * @param[in] from starting point of the search
@@ -334,7 +334,7 @@ namespace TREX {
        * whose key is after @p id
        *
        * @pre [@p from, @p to) is a valid iterator interval
-       * 
+       *
        * @return The first iterator for which the key is after
        *         @p id or @p to if such iterator does not exist
        *
@@ -343,12 +343,12 @@ namespace TREX {
        */
       template<class Iter>
       Iter upper_bound(Iter from , Iter to, reference id) const {
-	for( ; to!=from && !after(from, id); ++from);
-	
-	return from;
+        for( ; to!=from && !after(from, id); ++from);
+        
+        return from;
       }
     }; // TREX::utils::id_mapper
-
+    
     /** @brief List based generalized set
      *
      * @tparam IdTraits A traits that helps element key extraction
@@ -380,8 +380,8 @@ namespace TREX {
        * The type of the key used to dsort the element.
        */
       typedef typename IdTraits::id_type   key_type;
-
-    private: 
+      
+    private:
       /** @brief Subjacent container type
        *
        * The type used internally to stroe the different element
@@ -394,15 +394,15 @@ namespace TREX {
        * of a generic search based on the key would have been much more difficult
        */
       typedef std::list<value_type> container_type;
-
+      
       container_type           m_list;   //!< iternal elements container
       id_mapper<IdTraits, Cmp> m_mapper; //!< Key mapper
     public:
       typedef typename container_type::size_type       size_type;
       typedef typename container_type::difference_type difference_type;
-      typedef typename container_type::iterator        iterator; //!< elements iterator 
+      typedef typename container_type::iterator        iterator; //!< elements iterator
       typedef typename container_type::const_iterator const_iterator; //!< elements const iterator
-
+      
       /** @brief Default constructor
        *
        * Create an empty set
@@ -414,8 +414,8 @@ namespace TREX {
        *
        * Create a copy of @p other
        */
-      list_set(list_set const &other) 
-	:m_list(other.m_list) {}
+      list_set(list_set const &other)
+      :m_list(other.m_list) {}
       /** @brief Constructor
        *
        * @tparam Iter an iterator
@@ -429,50 +429,50 @@ namespace TREX {
        */
       template<class Iter>
       list_set(Iter from, Iter to) {
-	for( ; to!=from; ++from) 
-	  insert(*from);
+        for( ; to!=from; ++from)
+          insert(*from);
       }
       /** @brief Destructor */
       ~list_set() {}
-
+      
       /** @brief Check if empty
        *
        * @retval true if current instance has no element
        * @retval false otherwise
        */
       bool empty() const {
-	return m_list.empty();
+        return m_list.empty();
       }
-
+      
       /** @brief Number of element
        *
        * @return The number of element stored
        */
       size_type size() const {
-	return m_list.size();
+        return m_list.size();
       }
-
+      
       /** @brief Beginning iterator
        *
        * @return An iterator pointing to the beginning of
        * the list
        *
-       * @sa begin() const 
+       * @sa begin() const
        * @sa end()
        */
       iterator begin() {
-	return m_list.begin();
+        return m_list.begin();
       }
       /** @brief End iterator
        *
        * @return An iterator pointing to the end of
        * the list
        *
-       * @sa begin()  
+       * @sa begin()
        * @sa end() const
        */
       iterator end() {
-	return m_list.end();
+        return m_list.end();
       }
       /** @brief Beginning iterator
        *
@@ -483,20 +483,20 @@ namespace TREX {
        * @sa end() const
        */
       const_iterator begin() const {
-	return m_list.begin();
+        return m_list.begin();
       }
       /** @brief End iterator
        *
        * @return An iterator pointing to the end of
        * the list
        *
-       * @sa begin() const 
-       * @sa end() 
+       * @sa begin() const
+       * @sa end()
        */
       const_iterator end() const {
-	return m_list.end();
+        return m_list.end();
       }
-
+      
       /** @brief Lower bound
        *
        * @param[in] k A key
@@ -506,20 +506,20 @@ namespace TREX {
        * @return An iterator refering to the first element that is not
        *         before @p k or end() if such element does not exist
        *
-       * @sa lower_bound(value_type const &)         
+       * @sa lower_bound(value_type const &)
        * @sa upper_bound(key_type const &)
        * @sa id_mapper::lower_bound(Iter,Iter,id_mapper::reference) const
        *
        * @{
        */
       iterator lower_bound(key_type const &k) {
-	return m_mapper.lower_bound(begin(), end(), k);
+        return m_mapper.lower_bound(begin(), end(), k);
       }
       const_iterator lower_bound(key_type const &k) const {
-	return m_mapper.lower_bound(begin(), end(), k);
+        return m_mapper.lower_bound(begin(), end(), k);
       }
       /** @} */
-
+      
       /** @brief Lower bound
        *
        * @param[in] v A value
@@ -529,64 +529,64 @@ namespace TREX {
        * @return An iterator refering to the first element that is not
        *         before @p v or end() if such element does not exist
        *
-       * @sa lower_bound(key_type const &)         
+       * @sa lower_bound(key_type const &)
        * @sa upper_bound(value_type const &)
        * @sa id_mapper::lower_bound(Iter,Iter,id_mapper::reference) const
        *
        * @{
        */
       iterator lower_bound(value_type const &v) {
-	return lower_bound(IdTraits::get_id(v));
+        return lower_bound(IdTraits::get_id(v));
       }
-      const_iterator lower_bound(value_type const &v) const { 
-	return lower_bound(IdTraits::get_id(v));
+      const_iterator lower_bound(value_type const &v) const {
+        return lower_bound(IdTraits::get_id(v));
       }
       /** @} */
-
+      
       /** @brief Upper bound
        *
        * @param[in] k A key
        *
        * Finds the first element whose key is after @p k
        *
-       * @return An iterator refering to the first element that is 
+       * @return An iterator refering to the first element that is
        *         after @p k or end() if such element does not exist
        *
-       * @sa upper_bound(value_type const &)          
+       * @sa upper_bound(value_type const &)
        * @sa lower_bound(key_type const &)
        * @sa id_mapper::upper_bound(Iter,Iter,id_mapper::reference) const
        *
        * @{
        */
       iterator upper_bound(key_type const &k) {
-	return m_mapper.upper_bound(begin(), end(), k);
+        return m_mapper.upper_bound(begin(), end(), k);
       }
       const_iterator upper_bound(key_type const &k) const {
-	return m_mapper.upper_bound(begin(), end(), k);
+        return m_mapper.upper_bound(begin(), end(), k);
       }
       /** @} */
-
-
+      
+      
       /** @brief Upper bound
        *
        * @param[in] v A value
        *
        * Finds the first element whose key is after the key of @p v
        *
-       * @return An iterator refering to the first element that is 
+       * @return An iterator refering to the first element that is
        *         after @p v or end() if such element does not exist
        *
-       * @sa upper_bound(key_type const &)          
+       * @sa upper_bound(key_type const &)
        * @sa lower_bound(value_type const &)
        * @sa id_mapper::upper_bound(Iter,Iter,id_mapper::reference) const
        *
        * @{
        */
       iterator upper_bound(value_type const &v) {
-	return upper_bound(IdTraits::get_id(v));
+        return upper_bound(IdTraits::get_id(v));
       }
       const_iterator upper_bound(value_type const &v) const {
-	return upper_bound(IdTraits::get_id(v));
+        return upper_bound(IdTraits::get_id(v));
       }
       /** @} */
       
@@ -610,17 +610,17 @@ namespace TREX {
        * @{
        */
       std::pair<iterator, iterator> equal_range(key_type const &k) {
-	iterator end_p = end(),
-	  pos = m_mapper.lower_bound(begin(), end_p, k);
-	return std::make_pair(pos, m_mapper.upper_bound(pos, end_p, k));
-      }	
+        iterator end_p = end(),
+        pos = m_mapper.lower_bound(begin(), end_p, k);
+        return std::make_pair(pos, m_mapper.upper_bound(pos, end_p, k));
+      }
       std::pair<const_iterator, const_iterator> equal_range(key_type const &k) const {
-	const_iterator end_p = end(),
-	  pos = m_mapper.lower_bound(begin(), end_p, k);
-	return std::make_pair(pos, m_mapper.upper_bound(pos, end_p, k));
+        const_iterator end_p = end(),
+        pos = m_mapper.lower_bound(begin(), end_p, k);
+        return std::make_pair(pos, m_mapper.upper_bound(pos, end_p, k));
       }
       /** @} */
-
+      
       
       /** @brief Equal range
        *
@@ -642,13 +642,13 @@ namespace TREX {
        * @{
        */
       std::pair<iterator, iterator> equal_range(value_type const &v) {
-	return equal_range(IdTraits::get_id(v));
-      }	
+        return equal_range(IdTraits::get_id(v));
+      }
       std::pair<const_iterator, const_iterator> equal_range(value_type const &v) const {
-	return equal_range(IdTraits::get_id(v));
+        return equal_range(IdTraits::get_id(v));
       }
       /** @} */
-
+      
       /** @brief Element insertion
        *
        * @param[in] v An element value
@@ -665,19 +665,19 @@ namespace TREX {
        * he wants to overwrite the former value with @p v or not
        */
       std::pair<iterator, bool> insert(value_type const &v) {
-	iterator from, to;
-	bool inserted = false;
-
-	boost::tie(from, to) = equal_range(IdTraits::get_id(v));
-	if( from==to ) {
-	  from = m_list.insert(from, v);
-	  inserted = true;
-	}
-	return std::make_pair(from, inserted);
+        iterator from, to;
+        bool inserted = false;
+        
+        boost::tie(from, to) = equal_range(IdTraits::get_id(v));
+        if( from==to ) {
+          from = m_list.insert(from, v);
+          inserted = true;
+        }
+        return std::make_pair(from, inserted);
       }
       
       /** @brief Find element
-       * 
+       *
        * @param[in] k A key
        *
        * Finds the elemnt whose key is @p k
@@ -691,25 +691,25 @@ namespace TREX {
        * @{
        */
       iterator find(key_type const &k) {
-	iterator from, to;
-	
-	boost::tie(from, to) = equal_range(k);
-	if( from==to ) 
-	  return end();
-	return from;
+        iterator from, to;
+        
+        boost::tie(from, to) = equal_range(k);
+        if( from==to )
+          return end();
+        return from;
       }
       const_iterator find(key_type const &k) const {
-	const_iterator from, to;
-	
-	boost::tie(from, to) = equal_range(k);
-	if( from==to ) 
-	  return end();
-	return from;
+        const_iterator from, to;
+        
+        boost::tie(from, to) = equal_range(k);
+        if( from==to )
+          return end();
+        return from;
       }
       /** @} */
       
       /** @brief Find element
-       * 
+       *
        * @param[in] v An element value
        *
        * Finds the element whose key is the same as @p v
@@ -723,23 +723,23 @@ namespace TREX {
        * @{
        */
       iterator find(value_type const &v) {
-	return find(IdTraits::get_id(v));
+        return find(IdTraits::get_id(v));
       }
       const_iterator find(value_type const &v) const {
-	return find(IdTraits::get_id(v));
+        return find(IdTraits::get_id(v));
       }
       /** @} */
-
+      
       /** @brief Remove an element
        *
        * @param[in] pos element to remove
        *
        * @pre @p pos is a valid iterator for this instance
        *
-       * @return the iterator after @p pos 
+       * @return the iterator after @p pos
        */
       iterator erase(iterator pos) {
-	return m_list.erase(pos);
+        return m_list.erase(pos);
       }
       /** @brief Remove elements
        *
@@ -747,15 +747,15 @@ namespace TREX {
        * @param[to] to   first element to not remove after @p from
        *
        * @pre [@p pos, @p to) is a valid iterator interval for this instance
-       * 
+       *
        * @return @p to
        */
       iterator erase(iterator from, iterator to) {
-	return m_list.erase(from, to);
+        return m_list.erase(from, to);
       }
       /** @brief Remove an element
        *
-       * @param[in] k A key 
+       * @param[in] k A key
        *
        * Remove the element whose key is @p k if it exist
        *
@@ -763,34 +763,34 @@ namespace TREX {
        * of element with key @p k
        */
       iterator erase(key_type const &k) {
-	iterator from, to;
-	
-	boost::tie(from ,to) = equal_range(k);
-	return erase(from, to);
+        iterator from, to;
+        
+        boost::tie(from ,to) = equal_range(k);
+        return erase(from, to);
       }
-
+      
       /** @brief clear container
        *
        * Remove all the elements stroed in this instance
        */
       void clear() {
-	m_list.clear();
+        m_list.clear();
       }
-
+      
       value_type const &front() const {
-	return m_list.front();
+        return m_list.front();
       }
       value_type &front() {
-	return m_list.front();
+        return m_list.front();
       }
       void pop_front() {
-	m_list.pop_front();
+        m_list.pop_front();
       }
       
     }; // TREX::utils::list_set
     
     
-
+    
   } // TREX::utils
 } // TREX
 
