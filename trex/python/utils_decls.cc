@@ -311,7 +311,7 @@ namespace {
   
   
   bool has_attribute(bp::ptree::value_type const &t, std::string const &name) {
-    return TREX::utils::parse_attr< boost::optional<std::string> >(t, name);
+    return bool(TREX::utils::parse_attr< boost::optional<std::string> >(t, name));
   }
   
   std::string attribute(bp::ptree::value_type const &t, std::string const &name) {
