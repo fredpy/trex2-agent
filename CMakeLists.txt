@@ -124,9 +124,9 @@ else()
   set(PIC_PROTECT "<LIB>")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-macro(pic_protect lib)
+function(pic_protect lib)
   string(REPLACE "<LIB>" ${lib} lib ${PIC_PROTECT})
-endmacro(pic_protect)
+endfunction(pic_protect)
 
 ########################################################################
 # System libraries                                                     #
