@@ -42,7 +42,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 5)
-set(TREX_PATCH 6)
+set(TREX_PATCH 7)
 set(TREX_RC 0)
 
 set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
@@ -116,6 +116,8 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  message(STATUS "pos indep: ${CMAKE_POSITION_INDEPENDENT_CODE}")
+  
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(PIC_PROTECT "-Wl,--whole-archive <LIB> -Wl,--no-whole-archive")
   message (STATUS "Adding -fPIC to CXX flags")
