@@ -56,6 +56,9 @@ include_directories(${EUROPA_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
 
 install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
+pic_protect(DUNE_CORE_LIB)
+message(STATUS "PIC protection: ${DUNE_CORE_LIB}")
+
 
 add_subdirectory(shared)
 add_subdirectory(common)
