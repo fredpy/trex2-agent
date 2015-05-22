@@ -358,7 +358,7 @@ DrifterController::DoInitial {
     contained_by(cpt.Holds cur);
     if( cur.start<= AGENT_CLOCK ) {
 	// contained_by was often resulting on weird mergeing with previous waypoint
-	// instead we replace it by a meets that ewill force the vehicle to get there 
+	// instead we replace it by a meets that will force the vehicle to get there 
 	// even if it is already there
 	// contained_by(condition Navigator.At dest);
 	meets(condition Navigator.At dest);
