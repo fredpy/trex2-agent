@@ -126,7 +126,6 @@ namespace TREX {
 
       if (m_lastPosition.hasAttribute("latitude") && m_lastPosition.hasAttribute("longitude") && m_lastPosition.hasAttribute("depth"))
       {
-
         Variable lat = m_lastPosition.getAttribute("latitude");
         Variable lon = m_lastPosition.getAttribute("longitude");
         Variable depth = m_lastPosition.getAttribute("depth");
@@ -137,8 +136,6 @@ namespace TREX {
 
         dist_to_target = WGS84::distance(cur_lat, cur_lon, 0, m_lat, m_lon, 0);
         nearEnd = dist_to_target < (cur_depth / std::sin(m_pitch)) * m_speed;
-
-        std::cerr << "check_near " << dist_to_target << " <= " << ((cur_depth / std::sin(m_pitch)) * m_speed) << std::endl;
       }
 
       double atZ = -1000;
@@ -176,7 +173,8 @@ namespace TREX {
           nearXY = near_XY.getStringSingleton() == "true" || near_XY.getStringSingleton() == "1";
         }
       }
-      std::cerr << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
+
+      syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
           nearEnd << ", nearBottom: "<<nearBottom << std::endl;
 
       switch(state)
@@ -262,8 +260,6 @@ namespace TREX {
       g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
-
-      //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
       postGoal(g);
 
