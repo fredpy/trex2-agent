@@ -135,7 +135,7 @@ namespace TREX {
         double cur_depth = depth.domain().getTypedSingleton<double,0>();
 
         dist_to_target = WGS84::distance(cur_lat, cur_lon, 0, m_lat, m_lon, 0);
-        nearEnd = dist_to_target < (cur_depth / std::sin(m_pitch));
+        nearEnd = dist_to_target < (cur_depth / std::tan(m_pitch));
       }
 
       double atZ = -1000;
