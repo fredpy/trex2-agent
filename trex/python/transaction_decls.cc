@@ -64,6 +64,12 @@ namespace {
     TREX::utils::SingletonUse<Predicate::xml_factory> fact;
     return fact->produce(decl);
   }
+  
+  void python_add_reactor(graph &g,
+                          boost::property_tree::ptree::value_type &cfg) {
+    g.add_reactor(cfg);
+  }
+
 }
 
 void export_transactions() {
@@ -149,6 +155,50 @@ void export_transactions() {
   .def("date_str", &graph::date_str, "convert a tick into a date string")
   ;
 
+  bp::class_<python_reactor, boost::shared_ptr<python_reactor>, boost::noncopyable>
+  ("reactor", "abstract reactor interface", bp::no_init)
+  .def(bp::init<TeleoReactor::xml_arg_type &>())
+  .add_property("name", make_function(&TeleoReactor::getName, bp::return_internal_reference<>()))
+  .add_property("agent_name", make_function(&TeleoReactor::getAgentName, bp::return_internal_reference<>()))
+  .add_property("graph", make_function(&TeleoReactor::getGraph, bp::return_internal_reference<>()))
+  .add_property("initial_tick", &TeleoReactor::getInitialTick)
+  .add_property("current_tick", &TeleoReactor::getCurrentTick)
+  .add_property("final_tick", &TeleoReactor::getFinalTick)
+  .def("date_str", &TeleoReactor::date_str)
+  .add_property("latency", &TeleoReactor::getLatency)
+  .add_property("look_ahead", &TeleoReactor::getLookAhead)
+  .add_property("exec_latency", &TeleoReactor::getExecLatency)
+  .add_property("externals_count", &TeleoReactor::count_externals)
+  .add_property("internals_count", &TeleoReactor::count_internals)
+  .def("is_external", &python_reactor::ext_check)
+  .def("use", &python_reactor::ext_use, (bp::arg("tl"),
+                                         bp::arg("control")=true))
+  .def("unuse", &python_reactor::ext_unuse)
+  .def("request", &python_reactor::post_request)
+  .def("recall", &python_reactor::cancel_request)
+  .def("is_internal", &python_reactor::int_check)
+  .def("declare", &python_reactor::int_decl, (bp::arg("tl"),
+                                              bp::arg("control")=true))
+  .def("undeclare", &python_reactor::int_undecl)
+  .def("post", &python_reactor::post_obs, (bp::arg("o"),
+                                           bp::arg("verbose")=false))
+  // logging
+  .def("info", &python_reactor::info)
+  .def("warn", &python_reactor::warn)
+  .def("error", &python_reactor::error)
+  // transactions
+  .def("notify", &TeleoReactor::notify)
+  .def("handle_request", &python_reactor::handleRequest)
+  .def("handle_recall", &python_reactor::handleRecall)
+  // execution
+  .def("handle_init", &python_reactor::handleInit)
+  .def("handle_new_tick", &python_reactor::handleTickStart)
+  .def("synchronize", pure_virtual(&python_reactor::synchronize))
+  .def("has_work", &python_reactor::hasWork)
+  .def("resume", &python_reactor::resume)
+  ;
+  
+  c_graph.def("add_reactor", &python_add_reactor);
 }
 
 /*
