@@ -318,29 +318,29 @@ namespace TREX {
         oss<<"rt_clock based on "
           <<CHRONO::clock_string<Clk, char>::name();
 # else 
-	oss<<"rt_clock";
+        oss<<"rt_clock";
 # endif 
         utils::display(oss<<"\n\ttick period: ", m_period);
         oss<<"\n\tfrequency: ";
-	
-	boost::math::gcd_evaluator<rep> gcd_f;
-
-	rep const base_num(period::num);
-	rep const base_den(period::den);
-	
-	rep x_num(base_num*m_period.count()), x_den(base_den), factor;
-	factor = gcd_f(x_num, x_den);
-	
+        
+        boost::math::gcd_evaluator<rep> gcd_f;
+        
+        rep const base_num(period::num);
+        rep const base_den(period::den);
+        
+        rep x_num(base_num*m_period.count()), x_den(base_den), factor;
+        factor = gcd_f(x_num, x_den);
+        
         x_num /= factor;
-	x_den /= factor;
-
-	if( 1==x_num )
-	  oss<<x_den<<"Hz";
-	else {
-	  long double hz = x_den;
-	  hz /= x_num;
-	  oss<<hz<<"Hz ("<<x_den<<'/'<<x_num<<')';
-	}
+        x_den /= factor;
+        
+        if( 1==x_num )
+          oss<<x_den<<"Hz";
+        else {
+          long double hz = x_den;
+          hz /= x_num;
+          oss<<hz<<"Hz ("<<x_den<<'/'<<x_num<<')';
+        }
         utils::display(oss<<"\n\tsleep timer:", m_sleep_watchdog);
         return oss.str();
       }
