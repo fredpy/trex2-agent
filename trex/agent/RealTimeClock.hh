@@ -85,7 +85,11 @@ namespace TREX {
      * @ingroup agent
      */
     template<class Period, class Clk = CHRONO::high_resolution_clock>
-    struct rt_clock :public Clock {      
+    struct rt_clock :public Clock {
+      // some compilers appear to not like direct access to the type Period
+      // getting around it with a static instance
+      typedef Period period_t;
+      
     public:
       using typename Clock::duration_type;
       using typename Clock::date_type;
@@ -323,9 +327,11 @@ namespace TREX {
         oss<<"\n\tfrequency: ";
         
         boost::math::gcd_evaluator<rep> gcdf;
-        rep factor = gcdf(m_period.count()*Period::num, Period::den),
-          num = (Period::num*m_period.count())/factor,
-          den = Period::den/factor;
+        
+        
+        rep factor = gcdf(m_period.count()*period_t::num, period_t::den),
+          num = (period_t::num*m_period.count())/factor,
+          den = period_t::den/factor;
         if( 1==num ) 
           oss<<den<<"Hz";
         else {
