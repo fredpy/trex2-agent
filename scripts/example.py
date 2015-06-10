@@ -3,7 +3,7 @@ from trex import agent
 from trex import domains
 from trex.utils import xml
 
-class example2(transaction.reactor):
+class example_listener(transaction.reactor):
     "A simple reactor that post observations on sensor timeline"
     def __init__(self, me):
         "Basic constructor for trex reactor factory"
@@ -22,7 +22,7 @@ class example2(transaction.reactor):
         return True
 
 
-class example_reactor(transaction.reactor):
+class example_publisher(transaction.reactor):
     "A simple reactor that post observations on sensor timeline"
     def __init__(self, me):
         "Basic constructor for trex reactor factory"
@@ -62,15 +62,22 @@ if __name__ == "__main__":
     # Now a simple way to create an agent and inject this new reactor in it
 
     # First I need to make sure that I have the logging system active
+    # this is required to do as it also create the threads used for trex execution
     pylog = trex.utils.log('python');
+    # the log directory is always symbolically linked to $TREX_LOG_DIR/latest
+    #   its name is $TREX_LOG_DIR/YYYY.DDD.NN
+    #    with YYYY being the year
+    #         DDD being the day of year
+    #         NN being a two digit number that increase with each new run in the day
     print 'Log messages will be produced in ', pylog.dir
-    pylog.info('Does this message appear in latest/TREX.log ?')
+    # pylog.info('Does this message appear in latest/TREX.log ? YES')
 
-    # here I define a simple xml config for trex
+    # here I define a simple xml config for trex that declares the 2 reactors
+    # in an agent named python_example
     cfg = xml.from_str('<Agent name="python_example" finalTick="200">'
-                       '   <PyReactor name="foo" python_class="example_reactor"'
+                       '   <PyReactor name="foo" python_class="example_publisher"'
                        ' lookahead="0" latency="0"/>'
-                       '   <PyReactor name="bar" python_class="example2"'
+                       '   <PyReactor name="bar" python_class="example_listener"'
                        ' lookahead="0" latency="0"/>'
                        '</Agent>');
 
@@ -82,6 +89,7 @@ if __name__ == "__main__":
     # create the reactor clock updating tick every 500ms (2Hz)
     clk = agent.rt_clock(500)
     print 'Clock created: {}'.format(clk);
+    
     # attach this clock to my agent
     if not my_agent.set_clock(clk):
         print('Agent {} already had a clock'.format(my_agent.name))
