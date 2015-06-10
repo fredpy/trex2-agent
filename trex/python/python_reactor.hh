@@ -41,62 +41,91 @@
 namespace TREX {
   namespace python {
     void log_error(boost::python::error_already_set const &e);
-    
-    struct python_reactor
-    :transaction::TeleoReactor,
-    boost::python::wrapper<transaction::TeleoReactor> {
-      explicit python_reactor(transaction::TeleoReactor::xml_arg_type &arg)
-      :transaction::TeleoReactor(arg) {}
-      virtual ~python_reactor() {}
-      
-      // logging
-      void log_msg(utils::Symbol const &type, std::string const &msg);
-      void info(std::string const &msg) {
-        log_msg(utils::log::info, msg);
-      }
-      void warn(std::string const &msg) {
-        log_msg(utils::log::warn, msg);
-      }
-      void error(std::string const &msg) {
-        log_msg(utils::log::error, msg);
-      }
-      
-      // timeline management
-      void ext_use(utils::Symbol const &tl, bool control);
-      bool ext_check(utils::Symbol const &tl) const;
-      bool ext_unuse(utils::Symbol const &tl);
 
-      void post_request(transaction::goal_id const &g);
-      bool cancel_request(transaction::goal_id const &g);
+    class py_reactor;
     
-      void int_decl(utils::Symbol const &tl, bool control);
-      bool int_check(utils::Symbol const &tl) const;
-      bool int_undecl(utils::Symbol const &tl);
-
-      void post_obs(transaction::Observation const &obs, bool verb);
+    struct py_wrapper {
+      py_wrapper(py_reactor *r):me(r) {}
+      ~py_wrapper() {}
       
-      // transaction callbacks
-      void notify(transaction::Observation const &o);
-      void handleRequest(transaction::goal_id const &g);
-      void handleRecall(transaction::goal_id const &g);
-      
-      // exec callbacks
-      void handleInit();
-      void handleTickStart();
-      bool synchronize();
-      bool hasWork();
-      void resume();
+      py_reactor *me;
+    };
     
-    }; // TREX::python::python_reactor
     
-    class producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
+    class reactor_proxy:boost::noncopyable {
     public:
-      explicit producer(utils::Symbol const &name);
-      ~producer() {}
+      explicit reactor_proxy(py_wrapper const &r);
+      virtual ~reactor_proxy();
+      
+      utils::Symbol const &name() const;
+      transaction::TICK latency() const;
+      transaction::TICK lookahead() const;
+      transaction::TICK exec_latency() const;
+      
+      transaction::TICK initial() const;
+      transaction::TICK final() const;
+      transaction::TICK current() const;
+      std::string date_str(transaction::TICK val) const;
+      
+      void use_tl(utils::Symbol const &tl, bool control);
+      void provide_tl(utils::Symbol const &tl, bool control);
+      bool is_internal(utils::Symbol const &tl) const;
+      bool is_external(utils::Symbol const &tl) const;
+      
+      void post(transaction::Observation const &o, bool verbose);
+      
+      virtual void notify(transaction::Observation const &o) {}
+      virtual bool synchronize() =0;
       
     private:
-      result_type produce(argument_type arg) const;
+      py_reactor *m_impl;
+      reactor_proxy();
     };
+    
+    class py_reactor :public transaction::TeleoReactor {
+    public:
+      py_reactor(xml_arg_type arg);
+      ~py_reactor();
+      
+      void notify(transaction::Observation const &o);
+      bool synchronize();
+      
+    private:
+      boost::python::object m_self;
+      
+      friend class reactor_proxy;
+    };
+    
+    class reactor_wrap:public reactor_proxy,
+    public boost::python::wrapper<reactor_proxy> {
+    public:
+      explicit reactor_wrap(py_wrapper const &r);
+      ~reactor_wrap();
+      
+      void notify(transaction::Observation const &o);
+      void notify_default(transaction::Observation const &o);
+      bool synchronize();
+    };
+    
+    
+    
+    
+    
+//    class py_reactor;
+//    
+//    
+//    class python
+//    
+//    
+//    
+//    class py_producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
+//    public:
+//      explicit py_producer(utils::Symbol const &name);
+//      ~py_producer() {}
+//      
+//    private:
+//      result_type produce(argument_type arg) const;
+//    };
     
   } // TREX::python
 } // TREX

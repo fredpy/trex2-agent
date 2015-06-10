@@ -94,6 +94,7 @@ void export_agent() {
   // need to find a way to take ownership of the clock passed as argument
   .def("set_clock", &set_agent_clock, arg("clock"))
   .add_property("mission_completed", &ta::Agent::missionCompleted)
+  .add_property("final_tick", &ta::Agent::finalTick)
   .def("initialize", &ta::Agent::initComplete)
   .def("run", &ta::Agent::run)
   .def("step", &ta::Agent::doNext)

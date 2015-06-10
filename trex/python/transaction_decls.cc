@@ -154,49 +154,77 @@ void export_transactions() {
   .add_property("current_tick", &graph::getCurrentTick, "current tick date")
   .def("date_str", &graph::date_str, "convert a tick into a date string")
   ;
-
-  bp::class_<python_reactor, boost::shared_ptr<python_reactor>, boost::noncopyable>
-  ("reactor", "abstract reactor interface", bp::no_init)
-  .def(bp::init<TeleoReactor::xml_arg_type &>())
-  .add_property("name", make_function(&TeleoReactor::getName, bp::return_internal_reference<>()))
-  .add_property("agent_name", make_function(&TeleoReactor::getAgentName, bp::return_internal_reference<>()))
-  .add_property("graph", make_function(&TeleoReactor::getGraph, bp::return_internal_reference<>()))
-  .add_property("initial_tick", &TeleoReactor::getInitialTick)
-  .add_property("current_tick", &TeleoReactor::getCurrentTick)
-  .add_property("final_tick", &TeleoReactor::getFinalTick)
-  .def("date_str", &TeleoReactor::date_str)
-  .add_property("latency", &TeleoReactor::getLatency)
-  .add_property("look_ahead", &TeleoReactor::getLookAhead)
-  .add_property("exec_latency", &TeleoReactor::getExecLatency)
-  .add_property("externals_count", &TeleoReactor::count_externals)
-  .add_property("internals_count", &TeleoReactor::count_internals)
-  .def("is_external", &python_reactor::ext_check)
-  .def("use", &python_reactor::ext_use, (bp::arg("tl"),
-                                         bp::arg("control")=true))
-  .def("unuse", &python_reactor::ext_unuse)
-  .def("request", &python_reactor::post_request)
-  .def("recall", &python_reactor::cancel_request)
-  .def("is_internal", &python_reactor::int_check)
-  .def("declare", &python_reactor::int_decl, (bp::arg("tl"),
-                                              bp::arg("control")=true))
-  .def("undeclare", &python_reactor::int_undecl)
-  .def("post", &python_reactor::post_obs, (bp::arg("o"),
-                                           bp::arg("verbose")=false))
-  // logging
-  .def("info", &python_reactor::info)
-  .def("warn", &python_reactor::warn)
-  .def("error", &python_reactor::error)
-  // transactions
-  .def("notify", &TeleoReactor::notify)
-  .def("handle_request", &python_reactor::handleRequest)
-  .def("handle_recall", &python_reactor::handleRecall)
-  // execution
-  .def("handle_init", &python_reactor::handleInit)
-  .def("handle_new_tick", &python_reactor::handleTickStart)
-  .def("synchronize", pure_virtual(&python_reactor::synchronize))
-  .def("has_work", &python_reactor::hasWork)
-  .def("resume", &python_reactor::resume)
+  
+  bp::class_<py_wrapper>
+  ("reactor_anchor", "anchor for a python reactor", bp::no_init);
+  
+  bp::class_<reactor_wrap, boost::noncopyable>
+  ("reactor", "python api for reactor", bp::init<py_wrapper const &>())
+  .add_property("name", bp::make_function(&reactor_proxy::name,
+                                          bp::return_internal_reference<>()))
+  .add_property("latency", &reactor_proxy::latency)
+  .add_property("lookahead", &reactor_proxy::lookahead)
+  .add_property("exec_latency", &reactor_proxy::exec_latency)
+  .add_property("initial_tick", &reactor_proxy::initial)
+  .add_property("final_tick", &reactor_proxy::final)
+  .add_property("tick", &reactor_proxy::current)
+  .def("date_str", &reactor_proxy::date_str)
+  .def("use", &reactor_proxy::use_tl, (bp::arg("tl"),
+                                       bp::arg("control")=true))
+  .def("provide", &reactor_proxy::provide_tl, (bp::arg("tl"),
+                                               bp::arg("control")=true))
+  .def("is_internal", &reactor_proxy::is_internal)
+  .def("is_external", &reactor_proxy::is_external)
+  .def("post", &reactor_proxy::post, (bp::arg("o"),
+                                      bp::arg("verbose")=false))
+  .def("notify", &reactor_proxy::notify, &reactor_wrap::notify_default)
+  .def("synchronize", bp::pure_virtual(&reactor_wrap::synchronize))
   ;
+  
+  
+  
+//  bp::class_<python_reactor, SHARED_PTR<python_reactor>, boost::noncopyable>
+//  ("reactor", "abstract reactor interface", bp::no_init)
+//  .def(bp::init<TeleoReactor::xml_arg_type &>())
+//  .add_property("name", make_function(&python_reactor::getName, bp::return_internal_reference<>()))
+////  .add_property("agent_name", make_function(&TeleoReactor::getAgentName, bp::return_internal_reference<>()))
+////  .add_property("graph", make_function(&TeleoReactor::getGraph, bp::return_internal_reference<>()))
+////  .add_property("initial_tick", &TeleoReactor::getInitialTick)
+////  .add_property("current_tick", &TeleoReactor::getCurrentTick)
+////  .add_property("final_tick", &TeleoReactor::getFinalTick)
+////  .def("date_str", &TeleoReactor::date_str)
+////  .add_property("latency", &TeleoReactor::getLatency)
+////  .add_property("look_ahead", &TeleoReactor::getLookAhead)
+////  .add_property("exec_latency", &TeleoReactor::getExecLatency)
+////  .add_property("externals_count", &TeleoReactor::count_externals)
+////  .add_property("internals_count", &TeleoReactor::count_internals)
+////  .def("is_external", &python_reactor::ext_check)
+////  .def("use", &python_reactor::ext_use, (bp::arg("tl"),
+////                                         bp::arg("control")=true))
+////  .def("unuse", &python_reactor::ext_unuse)
+////  .def("request", &python_reactor::post_request)
+////  .def("recall", &python_reactor::cancel_request)
+////  .def("is_internal", &python_reactor::int_check)
+//  .def("declare", &python_reactor::int_decl, (bp::arg("tl"),
+//                                              bp::arg("control")=true))
+////  .def("undeclare", &python_reactor::int_undecl)
+////  .def("post", &python_reactor::post_obs, (bp::arg("o"),
+////                                           bp::arg("verbose")=false))
+////  // logging
+////  .def("info", &python_reactor::info)
+////  .def("warn", &python_reactor::warn)
+////  .def("error", &python_reactor::error)
+////  // transactions
+////  .def("notify", &TeleoReactor::notify)
+////  .def("handle_request", &python_reactor::handleRequest)
+////  .def("handle_recall", &python_reactor::handleRecall)
+////  // execution
+////  .def("handle_init", &python_reactor::handleInit)
+////  .def("handle_new_tick", &python_reactor::handleTickStart)
+//  .def("synchronize", pure_virtual(&python_reactor::synchronize))
+////  .def("has_work", &python_reactor::hasWork)
+////  .def("resume", &python_reactor::resume)
+//  ;
   
   c_graph.def("add_reactor", &python_add_reactor);
 }

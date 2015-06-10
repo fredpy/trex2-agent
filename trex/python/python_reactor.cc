@@ -41,8 +41,11 @@ namespace bp=boost::python;
 
 namespace  {
   SingletonUse<LogManager> s_log;
-  
-  producer python_decl("PyReactor");
+
+  /** @brief Light reactor declaration */
+  TeleoReactor::xml_factory::declare<py_reactor> decl("PyReactor");
+
+//  py_producer python_decl("PyReactor");
 }
 
 void TREX::python::log_error(bp::error_already_set const &e) {
@@ -58,183 +61,190 @@ void TREX::python::log_error(bp::error_already_set const &e) {
 }
 
 /*
- * class TREX::python::python_reactor
+ * class TREX::python::reactor_proxy
  */
 
-void python_reactor::log_msg(Symbol const &type, std::string const &msg) {
-  syslog(type)<<msg;
+// structors
+
+reactor_proxy::reactor_proxy(py_wrapper const &r)
+:m_impl(r.me) {}
+
+reactor_proxy::~reactor_proxy() {}
+
+// observers
+
+Symbol const &reactor_proxy::name() const {
+  return m_impl->getName();
 }
 
-void python_reactor::ext_use(Symbol const &tl, bool control) {
-  use(tl, control);
+TICK reactor_proxy::latency() const {
+  return m_impl->getLatency();
 }
 
-bool python_reactor::ext_check(Symbol const &tl) const {
-  return isExternal(tl);
+TICK reactor_proxy::lookahead() const {
+  return m_impl->getLookAhead();
 }
 
-void python_reactor::post_request(goal_id const &g) {
-  postGoal(g);
+TICK reactor_proxy::exec_latency() const {
+  return m_impl->getExecLatency();
 }
 
-bool python_reactor::cancel_request(goal_id const &g) {
-  return postRecall(g);
+
+TICK reactor_proxy::initial() const {
+  return m_impl->getInitialTick();
 }
 
-bool python_reactor::ext_unuse(Symbol const &tl) {
-  return unuse(tl);
+TICK reactor_proxy::final() const {
+  return m_impl->getFinalTick();
 }
 
-void python_reactor::int_decl(Symbol const &tl, bool control) {
-  provide(tl, control);
+TICK reactor_proxy::current() const {
+  return m_impl->getCurrentTick();
 }
 
-bool python_reactor::int_check(Symbol const &tl) const {
-  return isInternal(tl);
+std::string reactor_proxy::date_str(TICK val) const {
+  return m_impl->date_str(val);
 }
 
-void python_reactor::post_obs(Observation const &obs, bool verb) {
-  postObservation(obs, verb);
+bool reactor_proxy::is_internal(Symbol const &tl) const {
+  return m_impl->isInternal(tl);
 }
 
-bool python_reactor::int_undecl(Symbol const &tl) {
-  return unprovide(tl);
+bool reactor_proxy::is_external(Symbol const &tl) const {
+  return m_impl->isExternal(tl);
 }
 
-// Now all the methods that can be altered
 
-void python_reactor::notify(Observation const &o) {
-  try {
-    bp::override fn = this->get_override("notify");
-    if( fn )
-      fn(obs);
-    else
-      TeleoReactor::notify(o);
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-    throw;
-  }
+// modifiers
+
+void reactor_proxy::use_tl(Symbol const &tl, bool control) {
+  m_impl->use(tl, control);
 }
 
-void python_reactor::handleRequest(goal_id const &g) {
-  try {
-    bp::override fn = this->get_override("handle_request");
-    if( fn )
-      fn(g);
-    else
-      TeleoReactor::handleRequest(g);
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-    throw;
-  }
+void reactor_proxy::provide_tl(Symbol const &tl, bool control) {
+  m_impl->provide(tl, control);
 }
 
-void python_reactor::handleRecall(goal_id const &g) {
-  try {
-    bp::override fn = this->get_override("handle_recall");
-    if( fn )
-      fn(g);
-    else
-      TeleoReactor::handleRecall(g);
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-    throw;
-  }
+void reactor_proxy::post(Observation const &o, bool verbose) {
+  m_impl->postObservation(o, verbose);
 }
 
-// execution callbacks
-void python_reactor::handleInit() {
-  try {
-    bp::override fn = this->get_override("handle_init");
-    if( fn )
-      fn();
-    else
-      TeleoReactor::handleInit();
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-  }
-}
 
-void python_reactor::handleTickStart() {
-  try {
-    bp::override fn = this->get_override("handle_new_tick");
-    if( fn )
-      fn();
-    else
-      TeleoReactor::handleTickStart();
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-  }
-}
-
-bool python_reactor::synchronize() {
-  try {
-    // pure virtual => it has to exist
-    bool ret = this->get_override("synchronize")();
-    return ret;
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-    return false;
-  }
-}
-
-bool python_reactor::hasWork() {
-  try {
-    bp::override fn = this->get_override("has_work");
-    if( fn ) {
-      bool ret = fn();
-      return ret;
-    } else
-      return TeleoReactor::hasWork(); // false
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-    return false;
-  }
-}
-
-void python_reactor::resume() {
-  try {
-    bp::override fn = this->get_override("resume");
-    if( fn )
-      fn();
-    else
-      TeleoReactor::resume();
-  } catch(bp::error_already_set const &e) {
-    log_error(e);
-  }
-}
 
 /*
- * class TREX::python::python_producer
+ * class TREX::python::reactor_wrap
  */
 
-producer::producer(Symbol const &name)
-:TeleoReactor::xml_factory::factory_type::producer(name) {
-  TeleoReactor::xml_factory::factory_type::producer::notify();
+// structors
+
+reactor_wrap::reactor_wrap(py_wrapper const &r)
+:reactor_proxy(r) {
+  
 }
 
-producer::result_type producer::produce(producer::argument_type arg) const {
-  // Extract the target python type name
-  boost::property_tree::ptree::value_type &node = TeleoReactor::xml_factory::node(arg);
+reactor_wrap::~reactor_wrap() {}
+
+// callbacks
+
+void reactor_wrap::notify(Observation const &o) {
+  bp::override f = this->get_override("notify");
+  if( f )
+    f(o);
+  else
+    notify_default(o);
+}
+
+void reactor_wrap::notify_default(Observation const &o) {
+  this->reactor_proxy::notify(o);
+}
+
+bool reactor_wrap::synchronize() {
+  return this->get_override("synchronize")();
+}
+
+
+
+
+/*
+ * class TREX::python::py_reactor
+ */
+
+// structors
+
+py_reactor::py_reactor(xml_arg_type arg)
+:TeleoReactor(arg) {
+  boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
-  bp::object my_class = bp::eval(bp::str(class_name));
-    
-  if( my_class.is_none() ) {
-    s_log->syslog("python", TREX::utils::log::error)<<"Python class \""<<class_name<<"\" not found";
-    throw XmlError(node, "Python class \""+class_name+"\" not found");
-  }
   
+  syslog()<<"Looking for python class \""<<class_name<<"\"";
   try {
-    bp::object obj = my_class(arg);
-    s_log->syslog("python", TREX::utils::log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
-    SHARED_PTR<TeleoReactor> r = bp::extract< SHARED_PTR<TeleoReactor> >(obj);
-    s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->getName();
-    return r;
+    bp::object my_class = bp::eval(bp::str(class_name));
+  
+    if( my_class.is_none() ) {
+      syslog(log::error)<<"Python class \""<<class_name<<"\" not found.";
+      throw XmlError(node, "Python class \""+class_name+"\" not found.");
+    }
+    syslog()<<"Creating new instance of "<<class_name;
+    py_wrapper wrap(this);
+    m_self = my_class(wrap);
   } catch(bp::error_already_set const &e) {
     log_error(e);
     throw;
-  } catch(...) {
-    s_log->syslog("python", TREX::utils::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
-    throw;
   }
 }
+
+py_reactor::~py_reactor() {}
+
+
+// callbacks
+
+void py_reactor::notify(Observation const &o) {
+  m_self.attr("notify")(o);
+}
+
+
+bool py_reactor::synchronize() {
+  return m_self.attr("synchronize")();
+}
+
+
+
+
+///*
+// * class TREX::python::python_producer
+// */
+//
+//py_producer::py_producer(Symbol const &name)
+//:TeleoReactor::xml_factory::factory_type::producer(name) {
+//  TeleoReactor::xml_factory::factory_type::producer::notify();
+//}
+//
+//py_producer::result_type py_producer::produce(py_producer::argument_type arg) const {
+//  // Extract the target python type name
+//  boost::property_tree::ptree::value_type &node = TeleoReactor::xml_factory::node(arg);
+//  std::string class_name = parse_attr<std::string>(node, "python_class");
+//  s_log->syslog("python")<<"Looking for python class "<<class_name;
+//  bp::object my_class = bp::eval(bp::str(class_name));
+//  
+//  if( my_class.is_none() ) {
+//    s_log->syslog("python", TREX::utils::log::error)<<"Python class \""<<class_name<<"\" not found";
+//    throw XmlError(node, "Python class \""+class_name+"\" not found");
+//  }
+//  
+//  try {
+//    s_log->syslog("python")<<"Create "<<class_name<<" instance";
+//    bp::object obj = my_class(arg);
+//    s_log->syslog("python", TREX::utils::log::info)<<"Created new python object "<<std::string(bp::extract<std::string>(bp::str(obj)));
+//    SHARED_PTR<py_wrap> pr = bp::extract< SHARED_PTR<py_wrap> >(obj);
+//    SHARED_PTR<TeleoReactor> r(pr);
+//    
+//    s_log->syslog("python", TREX::utils::log::info)<<"Object is the reactor "<<r->getName();
+//    return r;
+//  } catch(bp::error_already_set const &e) {
+//    log_error(e);
+//    throw;
+//  } catch(...) {
+//    s_log->syslog("python", TREX::utils::log::error)<<"Unknown error while trying to create python reactor of type \""<<class_name<<"\".";
+//    throw;
+//  }
+//}
