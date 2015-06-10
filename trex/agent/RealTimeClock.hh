@@ -100,6 +100,7 @@ namespace TREX {
        * The  duration represent using Period as a core tick value
        */
       typedef typename clock_type::duration        tick_rate;
+      typedef typename clock_type::period          period;
       typedef typename clock_type::rep             rep;
     
       /** @brief Constructor
@@ -322,18 +323,26 @@ namespace TREX {
         utils::display(oss<<"\n\ttick period: ", m_period);
         oss<<"\n\tfrequency: ";
         
-        boost::math::gcd_evaluator<rep> gcdf;
-        rep factor = gcdf(m_period.count()*Period::num, Period::den),
-          num = (Period::num*m_period.count())/factor,
-          den = Period::den/factor;
-        if( 1==num ) 
-          oss<<den<<"Hz";
-        else {
-          long double hz = den;
-          hz /= num;
-          oss<<hz<<"Hz ("<<den<<"/"<<num<<")";
-        }
-        utils::display(oss<<"\n\tsleep timer:", m_sleep_watchdog);
+    
+	boost::math::gcd_evaluator<rep> gcd_f;
+
+	rep const base_num(period::num);
+	rep const base_den(period::den);
+ 
+	rep x_num(base_num*m_period.count()), x_den(base_den), factor;
+	factor = gcd_f(x_num, x_den); 
+
+	x_num /= factor;
+	x_den /= factor;
+
+	if( 1==x_num )
+	  oss<<x_den<<"Hz";
+	else {
+	  long double hz = x_den;
+	  hz /= x_num;
+	  oss<<hz<<"Hz ("<<x_den<<'/'<<x_num<<')';
+	}
+        utils::display(oss<<"\n\tsleep timer: ", m_sleep_watchdog);
         return oss.str();
       }
       
