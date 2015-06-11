@@ -36,10 +36,10 @@ Code documentation (the little there is...) is formated for doxygen:
 http://www.doxygen.org
 
 Additionally t-rex generates few graphviz files in its log directory.
-downloading graphviz (http://www.graphviz.org/Home.php) or
-compatible graph visualization tools is a good way to visualize
-these graphs.
+Installing graphviz (http://www.graphviz.org/) or compatible graph
+visualization tools is a good way to visualize these graphs even if
+not really required.
 
-Further plugin may require extra dependencies; for example the ROS
-extension if enabled naturally expect ROS to be installed
-(http://www.ros.org) and so on for others.
+Further, optional plug-ins may require extra dependencies;
+for example the ROS extension if enabled naturally expect ROS to
+be installed (http://www.ros.org) and so on for others.
