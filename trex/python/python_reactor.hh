@@ -108,25 +108,6 @@ namespace TREX {
     };
     
     
-    
-    
-    
-//    class py_reactor;
-//    
-//    
-//    class python
-//    
-//    
-//    
-//    class py_producer:public transaction::TeleoReactor::xml_factory::factory_type::producer {
-//    public:
-//      explicit py_producer(utils::Symbol const &name);
-//      ~py_producer() {}
-//      
-//    private:
-//      result_type produce(argument_type arg) const;
-//    };
-    
   } // TREX::python
 } // TREX
 
