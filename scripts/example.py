@@ -93,7 +93,7 @@ if __name__ == "__main__":
     # attach this clock to my agent
     if not my_agent.set_clock(clk):
         print('Agent {} already had a clock'.format(my_agent.name))
-    print 'Running the agent ', my_agent.name(), ' with final tick at ', my_agent.final_tick
+    print 'Running the agent ', my_agent.name, ' with final tick at ', my_agent.final_tick
     # run the agent
     my_agent.run()
 

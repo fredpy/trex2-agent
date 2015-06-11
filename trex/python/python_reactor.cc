@@ -350,7 +350,7 @@ void reactor_wrap::cancelled_plan_default(goal_id const &g) {
 // structors
 
 py_reactor::py_reactor(xml_arg_type arg)
-:TeleoReactor(arg, false, false) {
+:TeleoReactor(arg, false, true) {
   boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
   
