@@ -29,11 +29,12 @@ The compilation is also setup by default to compile the europa
 reactor which the will require:
 * europa-pso 2.6:  https://github.com/nasa/europa
 
+But you can safely disable europa via setting WITH_EUROPA to OFF
+via cmake tools (ccmake or cmake-gui)
+
 Code documentation (the little there is...) is formated for doxygen:
 http://www.doxygen.org
 
-Although one can disable europa via setting WITH_EUROPA to OFF
-via cmake tools (ccmake or cmake-gui)
 
 Further plugin may require extra dependencies; for example the ROS
 extension if enabled naturally expect ROS to be installed
