@@ -7,14 +7,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -24,7 +24,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -60,7 +60,7 @@ namespace TREX {
    * @ingroup utils
    */
   namespace utils {
-		
+    
     /** @brief @c errno handling exception
      *
      * This exception class can be used when a C error that modifies the
@@ -75,21 +75,21 @@ namespace TREX {
       /** @brief Constructor
        * @param[in] from Source of the error
        *
-       * Creates a new instance with the indication that the error came from 
-       * @p from. Extracts automatically the value of @c errno and its 
-       * associated message to build the exception message 
+       * Creates a new instance with the indication that the error came from
+       * @p from. Extracts automatically the value of @c errno and its
+       * associated message to build the exception message
        * "@p from: errno message"
        */
       explicit ErrnoExcept(std::string const &from) throw()
-	:Exception(build_message(from)), _errno(errno) {}
+      :Exception(build_message(from)), _errno(errno) {}
       /** @brief Constructor
        *
        * @param[in] from Source of the error
-       * @param[in] what The message of associated 
+       * @param[in] what The message of associated
        *
        * Creates a new instance with the indication that the
        * error came from @p from and the reason associated is
-       * @p what. 
+       * @p what.
        *
        * @note This constructor does not collect the @c errno
        * value nor its associated message. Instead it considers
@@ -98,7 +98,7 @@ namespace TREX {
        * in the future.
        */
       ErrnoExcept(std::string const &from, std::string const &what) throw()
-	:Exception(build_message(from, what)), _errno(0) {}
+      :Exception(build_message(from, what)), _errno(0) {}
       /** @brief Destructor */
       virtual ~ErrnoExcept() throw() {}
       
@@ -107,38 +107,38 @@ namespace TREX {
        * @return the value of @c errno when this exception was thrown
        */
       int get_errno() const {
-	return _errno;
+        return _errno;
       }
       
     private:
       /** @brief Saved value of @c errno
        *
-       * This attribute is used to storethe @c errno valuee collected during the 
-       * exception construction. 
+       * This attribute is used to storethe @c errno valuee collected during the
+       * exception construction.
        */
       int _errno;
       
       /** @brief Exception message construction.
-       * 
+       *
        * @param[in] from source of the exception
        * @param[in] what message content
-       * 
+       *
        * This method is used internally to create the message during
-       * exception construction. 
-       * 
-       * @note when the @p what argument is not provided the calls collect 
-       * directly the message constent using @c strerror standard function 
-       * 
+       * exception construction.
+       *
+       * @note when the @p what argument is not provided the calls collect
+       * directly the message constent using @c strerror standard function
+       *
        * @{
        */
-      static std::string build_message(std::string const &from, 
-				       std::string const &what) throw();
+      static std::string build_message(std::string const &from,
+                                       std::string const &what) throw();
       
       static std::string build_message(std::string const &from) throw();
       /** @} */
     }; // class TREX::utils::ErrnoExcept
-		
-  } // TREX::utils     
+    
+  } // TREX::utils
 } // TREX
 
 #endif // H_ErrnoExcept
