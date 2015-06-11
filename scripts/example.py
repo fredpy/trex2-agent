@@ -57,6 +57,14 @@ class example_publisher(transaction.reactor):
 
 if __name__ == "__main__":
     import trex
+    import signal
+    import sys
+
+    # Properly handling a ^C allow to avoid crashes
+    # while the agent is running
+    def signal_handler(signal, frame):
+        sys.exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
 
     print('Trex version {}'.format(trex.version.str))
     # Now a simple way to create an agent and inject this new reactor in it
@@ -84,6 +92,8 @@ if __name__ == "__main__":
     #help(example_reactor)
     print 'Loading agent defined as:', cfg
     my_agent = agent.agent(iter(cfg).next());
+
+
     
     print 'Creating clock';
     # create the reactor clock updating tick every 500ms (2Hz)

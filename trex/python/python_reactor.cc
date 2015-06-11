@@ -52,9 +52,14 @@ namespace  {
 // structors
 
 reactor_proxy::reactor_proxy(py_wrapper const &r)
-:m_impl(r.me) {}
+:m_impl(r.me) {
+  m_impl->syslog()<<"Proxy created with address: "<<this;
+  m_impl->set_proxy(this);
+}
 
-reactor_proxy::~reactor_proxy() {}
+reactor_proxy::~reactor_proxy() {
+  m_impl->detach(this);
+}
 
 // observers
 
@@ -335,7 +340,7 @@ void reactor_wrap::cancelled_plan_default(goal_id const &g) {
 // structors
 
 py_reactor::py_reactor(xml_arg_type arg)
-:TeleoReactor(arg, false, true) {
+:TeleoReactor(arg, false, true),m_self(NULL) {
   boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
   
@@ -350,7 +355,16 @@ py_reactor::py_reactor(xml_arg_type arg)
     }
     syslog()<<"Creating new instance of "<<class_name;
     py_wrapper wrap(this);
-    m_self = my_class(wrap);
+    m_obj = my_class(wrap);
+    if( NULL==m_self ) {
+      syslog(log::error)<<"No proxy attached to me\n"
+      <<"\tThis probably mean that \""<<class_name<<"\" is not derived"
+      <<" from trex.transaction.reactor\n"
+      <<"\tor that it did not call reactor.__init__(self,handle) "
+      <<" during its __init__";
+      throw ReactorException(*this,
+                             "python class "+class_name+" is not a reactor");
+    }
   } catch(bp::error_already_set const &e) {
     unpack_error(log::null, e, true);
   }
@@ -372,18 +386,44 @@ void py_reactor::unpack_error(Symbol const &context,
   syslog(context, log::error)<<"Python error: "<<msg;
   // set back error state in python
   PyErr_Restore(py_type, py_val, py_trace);
+  PyErr_Print();
   if( re_throw )
-    throw ReactorException(*this, msg);
+    throw ReactorException(*this, "python error: "+msg);
 }
 
+// modifiers
+
+void py_reactor::set_proxy(reactor_proxy *self) {
+  mutex_type::scoped_lock lock(m_mtx);
+  if( NULL==m_self )
+    m_self = self;
+  else
+    // for now just display an error without exception
+    syslog(log::error)<<"Multiple proxies attempted to attach to me.";
+}
+
+void py_reactor::detach(reactor_proxy *self) {
+  mutex_type::scoped_lock lock(m_mtx);
+  if( self==m_self )
+    m_self = NULL;
+}
+
+// observers
+
+reactor_proxy &py_reactor::self() {
+  mutex_type::scoped_lock lock(m_mtx);
+  if( NULL==m_self )
+    throw ReactorException(*this, "No longer attached to a proxy");
+  return *m_self;
+}
 
 
 // callbacks
 
 void py_reactor::handleInit() {
+  syslog()<<" init";
   try {
-    // scoped_gil_release lock;
-    m_self.attr("handle_init")();
+    self().handle_init();
   } catch(bp::error_already_set const &e) {
     unpack_error("handle_init", e);
   }
@@ -391,8 +431,7 @@ void py_reactor::handleInit() {
 
 void py_reactor::handleRequest(goal_id const &g) {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("handle_request")(g);
+    self().handle_request(g);
   } catch(bp::error_already_set const &e) {
     unpack_error("handle_request", e, false);
   }
@@ -400,8 +439,7 @@ void py_reactor::handleRequest(goal_id const &g) {
 
 void py_reactor::handleRecall(goal_id const &g) {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("handle_recall")(g);
+    self().handle_recall(g);
   } catch(bp::error_already_set const &e) {
     unpack_error("handle_recall", e, false);
   }
@@ -409,8 +447,7 @@ void py_reactor::handleRecall(goal_id const &g) {
 
 void py_reactor::handleTickStart() {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("handle_new_tick")();
+    self().handle_new_tick();
   } catch(bp::error_already_set const &e) {
     unpack_error("handle_new_tick", e, false);
   }
@@ -419,8 +456,7 @@ void py_reactor::handleTickStart() {
 
 void py_reactor::notify(Observation const &o) {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("notify")(o);
+    self().notify(o);
   } catch(bp::error_already_set const &e) {
     unpack_error("notify", e, false);
   }
@@ -429,8 +465,7 @@ void py_reactor::notify(Observation const &o) {
 
 bool py_reactor::synchronize() {
   try {
-    // scoped_gil_release lock;
-    return m_self.attr("synchronize")();
+    return self().synchronize();
   } catch(bp::error_already_set const &e) {
     unpack_error("synchronize", e);
     return false;
@@ -439,8 +474,7 @@ bool py_reactor::synchronize() {
 
 bool py_reactor::hasWork() {
   try {
-    // scoped_gil_release lock;
-    return m_self.attr("has_work")();
+    return self().has_work();
   } catch(bp::error_already_set const &e) {
     unpack_error("has_work", e, false);
     return false;
@@ -449,8 +483,7 @@ bool py_reactor::hasWork() {
 
 void py_reactor::resume() {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("resume")();
+    self().resume();
   } catch(bp::error_already_set const &e) {
     unpack_error("resume", e, false);
   }
@@ -458,8 +491,7 @@ void py_reactor::resume() {
 
 void py_reactor::newPlanToken(goal_id const &g) {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("new_plan")(g);
+    self().new_plan(g);
   } catch(bp::error_already_set const &e) {
     unpack_error("new_plan", e, false);
   }
@@ -467,8 +499,7 @@ void py_reactor::newPlanToken(goal_id const &g) {
 
 void py_reactor::cancelledPlanToken(goal_id const &g) {
   try {
-    // scoped_gil_release lock;
-    m_self.attr("cancelled_plan")(g);
+    self().cancel_plan(g);
   } catch(bp::error_already_set const &e) {
     unpack_error("cancelled_plan", e, false);
   }

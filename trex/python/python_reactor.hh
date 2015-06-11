@@ -117,6 +117,10 @@ namespace TREX {
       ~py_reactor();
       
     private:
+      void set_proxy(reactor_proxy *self);
+      void detach(reactor_proxy *self);
+      reactor_proxy &self();
+      
       void handleInit();
       void handleRequest(transaction::goal_id const &g);
       void handleRecall(transaction::goal_id const &g);
@@ -132,7 +136,10 @@ namespace TREX {
                         boost::python::error_already_set const &e,
                         bool re_throw=true);
       
-      boost::python::object m_self;
+      boost::python::object m_obj;
+      typedef boost::mutex  mutex_type;
+      mutable mutex_type    m_mtx;
+      reactor_proxy         *m_self;
       
       friend class reactor_proxy;
     };

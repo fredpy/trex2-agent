@@ -1,30 +1,30 @@
 /* -*- C++ -*- */
 /** @file "Agent.hh"
  * @brief Definition of an Agent
- * 
+ *
  * Provides declaration for the Agent class. This is basically a composition
  * of TeleoReactors. The Agent will allocate reactors and connect them
  * together according to their configuratiun requirements.
  *
  * It will also play the role of middle-man to route observations from sender
  * to receiver.
- * 
+ *
  * @note The Agent class is not thread safe. If run on a separate thread,
  * it cannot be accessed further.
- * 
+ *
  * @author Conor McGann @& Frederic Py <fpy@mbari.org>
  * @ingroup agent
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -34,7 +34,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -89,7 +89,7 @@ namespace TREX {
      * @li TeleoReactor::step() is called only if a reactor have works (idenitifed by
      *    the fact that is workRatio() was not @c NAN). It allow the reactor to do a
      *    single step in roder to deliberate.
-     * 
+     *
      * Do note that ass all theses called have to be executed in the duration of a
      * TICK all of these should be executed in a duration that is well below the
      * tick granularity of the clock used by the agent.
@@ -108,8 +108,8 @@ namespace TREX {
        * with the largest @c workRatio to the one with smaller @c workRatio
        */
       typedef std::multimap< double, reactor_id,
-			     std::greater<double> > priority_queue;
-
+      std::greater<double> > priority_queue;
+      
       /** @brief Constructor
        *
        * @param[in] name The name of the agent
@@ -122,8 +122,8 @@ namespace TREX {
        * @post the agent has no reactor
        */
       explicit Agent(TREX::utils::Symbol const &name,
-		     TREX::transaction::TICK final = 0,
-		     clock_ref clock = clock_ref(), bool verbose=false);
+                     TREX::transaction::TICK final = 0,
+                     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Constructor
        *
        * @param[in] file_name A configuration file name
@@ -174,14 +174,14 @@ namespace TREX {
        *     further
        * @li The initial goals for this mission. Goals have generic xml format that
        *     is described in TREX::transaction::Goal class documentation
-       * 
+       *
        *
        * This constructor will try first to locate @p file_name and if does
        * not find it will try to locate @p file_name.cfg
        *
        * @pre @p file_name is a a valid file on current directory or accessible
        *      through TREX_PATH
-       * @pre @p file_name is a valid xml file that defines an agent 
+       * @pre @p file_name is a valid xml file that defines an agent
        * @pre the root node of @p file_name needs to be an Agent tag
        *
        *
@@ -194,8 +194,8 @@ namespace TREX {
        * @sa Agent::Agent(rapidxml::xml_node<> &, Clock *)
        * @sa Agent::loadConf(std::string const &)
        */
-      explicit Agent(std::string const &file_name, 
-		     clock_ref clock = clock_ref(), bool verbose=false);
+      explicit Agent(std::string const &file_name,
+                     clock_ref clock = clock_ref(), bool verbose=false);
       
       /** @brief Constructor
        *
@@ -210,7 +210,7 @@ namespace TREX {
        * not find it will try to locate @p file_name.cfg
        *
        * @pre @p config root node is Agent
-       * @pre @p file_name is a valid xml file that defines an agent 
+       * @pre @p file_name is a valid xml file that defines an agent
        *
        * @throw TREX::utils::ErrnoExcept failed to locate the file
        * @throw rapidxml::parse_error parse error while loading the file
@@ -221,10 +221,10 @@ namespace TREX {
        * @sa Agent::Agent(std::string const &, Clock *)
        * @sa Agent::loadConf(rapidxml::xml_node<> &)
        */
-      explicit Agent(boost::property_tree::ptree::value_type &config, 
-		     clock_ref clock = clock_ref(), bool verbose=false);
+      explicit Agent(boost::property_tree::ptree::value_type &config,
+                     clock_ref clock = clock_ref(), bool verbose=false);
       /** @brief Destructor */
-      ~Agent(); 
+      ~Agent();
       
       /** @brief Set agent clock
        *
@@ -232,7 +232,7 @@ namespace TREX {
        *
        * If the agent did not have a clock yet it is then associated to @p clock.
        * Otherwise @p clock will be deleted
-       * 
+       *
        * @retval true @p clock is now the clock of this agent
        * @retval false this agent had already a clock and @e deleted @p clock
        *
@@ -308,7 +308,7 @@ namespace TREX {
        * @sa missionCompleted()
        */
       bool doNext();
-
+      
       /** @brief Check if mission is completed
        *
        * This methods indicates whehter tha mission of this agent has finished or not.
@@ -321,7 +321,7 @@ namespace TREX {
        * @retval false otherwise
        */
       bool missionCompleted();
-
+      
       /** @brief Post a goal
        *
        * @param[in] g A goal
@@ -329,10 +329,10 @@ namespace TREX {
        * to whichever reactor owns the timeline associated to @p g
        */
       void sendRequest(TREX::transaction::goal_id const &g);
-      /** @brief Post a goal from xml 
+      /** @brief Post a goal from xml
        *
        * @param[in] g A goal in xml
-       * 
+       *
        *  This method will insert the goal defined by xml structure @p g
        *
        *  @sa TREX::transaction::Goal::Goal(rapidxml::xml_node<> &)
@@ -340,13 +340,13 @@ namespace TREX {
        *  @sa sendRequests(TREX::utils::ext_iterator &)
        */
       void sendRequest(boost::property_tree::ptree::value_type &g) {
-	TREX::transaction::goal_id tmp = parse_goal(g);
-	sendRequest(tmp);
+        TREX::transaction::goal_id tmp = parse_goal(g);
+        sendRequest(tmp);
       }
-      /** @brief Post a goals from xml 
+      /** @brief Post a goals from xml
        *
        * @param[in] g A xml iterator
-       * 
+       *
        *  This method will insert all the goals that are acessibles by iterating
        *  through @p g
        *
@@ -354,16 +354,16 @@ namespace TREX {
        *  @sa sendRequest(rapidxml::xml_node<> &)
        */
       size_t sendRequests(boost::property_tree::ptree &g);
-
+      
       duration_type tickDuration() const {
-	return m_clock->tickDuration();
+        return m_clock->tickDuration();
       }
       
       TREX::transaction::TICK timeToTick(date_type const &date) const {
-	return m_clock->timeToTick(date);
+        return m_clock->timeToTick(date);
       }
       date_type tickToTime(TREX::transaction::TICK cur) const {
-	return m_clock->tickToTime(cur);
+        return m_clock->tickToTime(cur);
       }
       std::string date_str(TREX::transaction::TICK cur) const {
         return m_clock->date_str(cur);
@@ -375,15 +375,15 @@ namespace TREX {
       transaction::TICK finalTick() const {
         return m_finalTick;
       }
-
-
+      
+      
       
       /** @brief Agent interraction proxy
        *
-       * This reactor class is used by the agent as a proxy to interract with 
+       * This reactor class is used by the agent as a proxy to interract with
        * its reactors. The main use is for the Agent to transparently post goals
-       * or recall them using the same interface as other reactors. It can also 
-       * be extended to provide an interface with the other reactors that -- for example 
+       * or recall them using the same interface as other reactors. It can also
+       * be extended to provide an interface with the other reactors that -- for example
        * -- observe their timelines in order to display it to an end user.
        *
        * @ingroup agent
@@ -391,11 +391,11 @@ namespace TREX {
        */
       class AgentProxy :public TREX::transaction::TeleoReactor {
       public:
-	AgentProxy(Agent &agent)
-          :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
-	~AgentProxy() {}
-	
-	bool postRequest(TREX::transaction::goal_id const &g) {
+        AgentProxy(Agent &agent)
+        :TREX::transaction::TeleoReactor(&agent, "", 0, 0) {}
+        ~AgentProxy() {}
+        
+        bool postRequest(TREX::transaction::goal_id const &g) {
           if( !isExternal(g->object()) )
             use(g->object());
           if( isExternal(g->object()) )
@@ -403,11 +403,11 @@ namespace TREX {
           else
             syslog(null, error)<<"Unable to subscribe to "<<g->object();
           return false;
-	}
+        }
         
       protected:
-	bool synchronize() {
-	  return true;
+        bool synchronize() {
+          return true;
         }
       };
       
@@ -419,21 +419,21 @@ namespace TREX {
       }
       
     private:
-      void internal_check(reactor_id r, 
-			  TREX::transaction::details::timeline const &tl);
-      void external_check(reactor_id r, 
-			  TREX::transaction::details::timeline const &tl);
+      void internal_check(reactor_id r,
+                          TREX::transaction::details::timeline const &tl);
+      void external_check(reactor_id r,
+                          TREX::transaction::details::timeline const &tl);
       
       std::list<reactor_id> init_dfs_sync();
       std::list<reactor_id> sort_reactors_sync();
-
+      
       AgentProxy *m_proxy;
-            
-
+      
+      
       void subConf(boost::property_tree::ptree &conf,
                    std::string const &path);
-
-      /** @brief Load agent configuration 
+      
+      /** @brief Load agent configuration
        *
        * @param[in] conf A xml structure descirbing the agent
        *
@@ -472,9 +472,9 @@ namespace TREX {
        *     </Plugin>
        *     @endcode
        *     and will result on the  attempting to load the dynamic libray @e witre_pg
-       *     as a TREX plugin. If it succeed it will parse the content of this node as 
-       *     it did for the agent root oteherwise it will either throw an exception or 
-       *     parse the Else node  
+       *     as a TREX plugin. If it succeed it will parse the content of this node as
+       *     it did for the agent root oteherwise it will either throw an exception or
+       *     parse the Else node
        * @li Clock definition. These will be parsed only if a clock is not defined and as
        *     a result only the first clock definition may be parsed in this configuration
        *     The tag of the XML depends on the way the clock class declared itself inside
@@ -486,19 +486,19 @@ namespace TREX {
        *     further
        * @li The initial goals for this mission. Goals have generic xml format that
        *     is described in TREX::transaction::Goal class documentation
-       * 
+       *
        *
        * @pre the root node of conf needs to be an Agent tag
        *
        * @throw TREX::utils::XmlError invalid XML content for agent configuration
        * @throw TREX::utils::Exception one exception occured while laoding the agent
-       *      
+       *
        * @sa Agent::Agent(rapidxml::xml_node<> &, Clock *)
        * @sa Agent::loadPlugin(rapidxml::xml_node<> &)
        * @sa TREX::transaction::graph::add_reactors(TREX::utils::ext_iterator
        */
       void loadConf(boost::property_tree::ptree::value_type &conf);
-      /** @brief Load agent configuration 
+      /** @brief Load agent configuration
        *
        * @param[in] file_name A configuration file name
        *
@@ -511,7 +511,7 @@ namespace TREX {
        *
        * @pre @p file_name is a a valid file on current directory or accessible
        *      through TREX_PATH
-       * @pre @p file_name is a valid xml file that defines an agent 
+       * @pre @p file_name is a valid xml file that defines an agent
        *
        * @throw TREX::utils::ErrnoExcept failed to locate the file
        * @throw rapidxml::parse_error parse error while loading the file
@@ -523,15 +523,15 @@ namespace TREX {
        * @sa Agent::loadConf(rapidxml::xml_node<> const &)
        */
       void loadConf(std::string const &file_name);
-
+      
       static TREX::transaction::TICK initialTick(clock_ref clk);
-
+      
       typedef TREX::transaction::TeleoReactor::stat_clock stat_clock;
       typedef stat_clock::duration     stat_duration;
       typedef TREX::transaction::TeleoReactor::rt_clock   rt_clock;
-
+      
       TREX::utils::async_ofstream m_stat_log;
-
+      
       clock_ref                  m_clock;
       TREX::transaction::TICK    m_finalTick;
       priority_queue             m_edf;
@@ -543,19 +543,19 @@ namespace TREX {
         utils::SharedVar<bool>::scoped_lock lck(m_valid);
         return *m_valid;
       }
-
+      
       void synchronize();
       
       bool executeReactor();
-
-      void loadPlugin(boost::property_tree::ptree::value_type &pg,     
+      
+      void loadPlugin(boost::property_tree::ptree::value_type &pg,
                       std::string path);
-
+      
       /** @brief plug-in loader entry point */
       TREX::utils::SingletonUse<TREX::utils::PluginLoader> m_pg;
-
+      
     }; // TREX::agent::Agent
-
+    
   } // TREX::agent
 } // TREX
 
