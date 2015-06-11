@@ -695,20 +695,6 @@ namespace TREX {
       
       goal_id parse_goal(boost::property_tree::ptree::value_type const &g);
       
-      /** @brief Goal completion
-       *
-       * @param[in] g A goal
-       *
-       * This method can be used from the reactor to inform the goal
-       * management system that the goal @p g on one of its external
-       * timeline has completed
-       *
-       * @deprecated This method should become useless as the goal management
-       *             system is much more able to identify that a goal did
-       *             complete
-       */
-      bool completedGoal(goal_id g);
-      
       /** @brief Post a planned token
        *
        * @param[in] g A goal id

@@ -73,8 +73,20 @@ reactor_proxy::~reactor_proxy() {}
 
 // observers
 
+bool reactor_proxy::is_verbose() const {
+  return m_impl->is_verbose();
+}
+
 Symbol const &reactor_proxy::name() const {
   return m_impl->getName();
+}
+
+Symbol const &reactor_proxy::agent_name() const {
+  return m_impl->getAgentName();
+}
+
+graph const &reactor_proxy::graph() const {
+  return m_impl->getGraph();
 }
 
 TICK reactor_proxy::latency() const {
@@ -114,21 +126,91 @@ bool reactor_proxy::is_external(Symbol const &tl) const {
   return m_impl->isExternal(tl);
 }
 
+double reactor_proxy::tick_duration() const {
+  typedef CHRONO::duration<double> fl_secs;
+  return CHRONO::duration_cast<fl_secs>(m_impl->tickDuration()).count();
+}
+
+double reactor_proxy::as_seconds(TICK delta) const {
+  typedef CHRONO::duration<double> fl_secs;
+  return CHRONO::duration_cast<fl_secs>(m_impl->tickDuration()*delta).count();
+}
+
 
 // modifiers
 
-void reactor_proxy::use_tl(Symbol const &tl, bool control) {
-  m_impl->use(tl, control);
+void reactor_proxy::set_verbose(bool value) {
+  if( value )
+    m_impl->set_verbose();
+  else
+    m_impl->reset_verbose();
 }
 
-void reactor_proxy::provide_tl(Symbol const &tl, bool control) {
-  m_impl->provide(tl, control);
+
+void reactor_proxy::set_latency(TICK val) {
+  m_impl->update_latency(val);
+}
+
+void reactor_proxy::set_lookahead(TICK val) {
+  m_impl->update_horizon(val);
+}
+
+void reactor_proxy::use_tl(Symbol const &tl, bool control,
+                           bool plan_listen) {
+  m_impl->use(tl, control, plan_listen);
+}
+
+bool reactor_proxy::unuse_tl(utils::Symbol const &tl) {
+  return m_impl->unuse(tl);
+}
+
+void reactor_proxy::provide_tl(Symbol const &tl, bool control,
+                               bool plan_publish) {
+  m_impl->provide(tl, control, plan_publish);
+}
+
+bool reactor_proxy::unprovide_tl(utils::Symbol const &tl) {
+  return m_impl->unprovide(tl);
 }
 
 void reactor_proxy::post(Observation const &o, bool verbose) {
   m_impl->postObservation(o, verbose);
 }
 
+bool reactor_proxy::request(goal_id const &g) {
+  return m_impl->postGoal(g);
+}
+
+bool reactor_proxy::recall(goal_id const &g) {
+  return m_impl->postRecall(g);
+}
+
+bool reactor_proxy::post_plan(goal_id const &g) {
+  return m_impl->postPlanToken(g);
+}
+
+void reactor_proxy::cancel_plan(goal_id const &g) {
+  m_impl->cancelPlanToken(g);
+}
+
+void reactor_proxy::info(std::string const &msg) {
+  m_impl->syslog(log::info)<<msg;
+}
+
+void reactor_proxy::warning(std::string const &msg) {
+  m_impl->syslog(log::warn)<<msg;
+}
+
+void reactor_proxy::error(std::string const &msg) {
+  m_impl->syslog(log::error)<<msg;
+}
+
+
+// callbacks
+
+bool reactor_proxy::has_work() {
+  return false;
+}
 
 
 /*
@@ -146,6 +228,55 @@ reactor_wrap::~reactor_wrap() {}
 
 // callbacks
 
+void reactor_wrap::handle_init() {
+  bp::override f = this->get_override("handle_init");
+  if( f )
+    f();
+  else
+    handle_init_default();
+}
+
+void reactor_wrap::handle_init_default() {
+  this->reactor_proxy::handle_init();
+}
+
+void reactor_wrap::handle_request(goal_id const &g) {
+  bp::override f = this->get_override("handle_request");
+  if( f )
+    f(g);
+  else
+    handle_request_default(g);
+}
+
+void reactor_wrap::handle_request_default(goal_id const &g) {
+  this->reactor_proxy::handle_request(g);
+}
+
+void reactor_wrap::handle_recall(goal_id const &g) {
+  bp::override f = this->get_override("handle_recall");
+  if( f )
+    f(g);
+  else
+    handle_recall_default(g);
+}
+
+void reactor_wrap::handle_recall_default(goal_id const &g) {
+  this->reactor_proxy::handle_recall(g);
+}
+
+
+void reactor_wrap::handle_new_tick() {
+  bp::override f = this->get_override("handle_new_tick");
+  if( f )
+    f();
+  else
+    handle_new_tick_default();
+}
+
+void reactor_wrap::handle_new_tick_default() {
+  this->reactor_proxy::handle_new_tick();
+}
+
 void reactor_wrap::notify(Observation const &o) {
   bp::override f = this->get_override("notify");
   if( f )
@@ -162,6 +293,53 @@ bool reactor_wrap::synchronize() {
   return this->get_override("synchronize")();
 }
 
+bool reactor_wrap::has_work() {
+  bp::override f = this->get_override("has_work");
+  if( f )
+    return f();
+  else
+    return has_work_default();
+}
+
+bool reactor_wrap::has_work_default() {
+  return this->reactor_proxy::has_work();
+}
+
+void reactor_wrap::resume() {
+  bp::override f = this->get_override("resume");
+  if( f )
+    f();
+  else
+    resume_default();
+}
+
+void reactor_wrap::resume_default() {
+  this->reactor_proxy::resume();
+}
+
+void reactor_wrap::new_plan(goal_id const &g) {
+  bp::override f = this->get_override("new_plan");
+  if( f )
+    f(g);
+  else
+    new_plan_default(g);
+}
+
+void reactor_wrap::new_plan_default(goal_id const &g) {
+  this->reactor_proxy::new_plan(g);
+}
+
+void reactor_wrap::cancelled_plan(goal_id const &g) {
+  bp::override f = this->get_override("cancelled_plan");
+  if( f )
+    f(g);
+  else
+    cancelled_plan_default(g);
+}
+
+void reactor_wrap::cancelled_plan_default(goal_id const &g) {
+  this->reactor_proxy::cancelled_plan(g);
+}
 
 
 
@@ -172,7 +350,7 @@ bool reactor_wrap::synchronize() {
 // structors
 
 py_reactor::py_reactor(xml_arg_type arg)
-:TeleoReactor(arg) {
+:TeleoReactor(arg, false, false) {
   boost::property_tree::ptree::value_type &node = xml_factory::node(arg);
   std::string class_name = parse_attr<std::string>(node, "python_class");
   
@@ -198,6 +376,23 @@ py_reactor::~py_reactor() {}
 
 // callbacks
 
+void py_reactor::handleInit() {
+  m_self.attr("handle_init")();
+}
+
+void py_reactor::handleRequest(goal_id const &g) {
+  m_self.attr("handle_request")(g);
+}
+
+void py_reactor::handleRecall(goal_id const &g) {
+  m_self.attr("handle_recall")(g);  
+}
+
+void py_reactor::handleTickStart() {
+  m_self.attr("handle_new_tick")();
+}
+
+
 void py_reactor::notify(Observation const &o) {
   m_self.attr("notify")(o);
 }
@@ -205,5 +400,21 @@ void py_reactor::notify(Observation const &o) {
 
 bool py_reactor::synchronize() {
   return m_self.attr("synchronize")();
+}
+
+bool py_reactor::hasWork() {
+  return m_self.attr("has_work")();
+}
+
+void py_reactor::resume() {
+  m_self.attr("resume")();
+}
+
+void py_reactor::newPlanToken(goal_id const &g) {
+  m_self.attr("new_plan")(g);
+}
+
+void py_reactor::cancelledPlanToken(goal_id const &g) {
+  m_self.attr("cancelled_plan")(g);
 }
 

@@ -9,17 +9,17 @@
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup transaction
- */ 
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -29,7 +29,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -51,7 +51,7 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     /** @brief TREX goal
      *
      * This class represent a goal as exchanged between reactors a goal
@@ -88,7 +88,7 @@ namespace TREX {
        * state @a pred and all its attributes not constrained
        */
       Goal(TREX::utils::Symbol const &object,
-	   TREX::utils::Symbol const &pred);
+           TREX::utils::Symbol const &pred);
       /** @brief XML parsing constructor
        * @param[in] node An XML node
        *
@@ -111,11 +111,11 @@ namespace TREX {
       Goal(boost::property_tree::ptree::value_type &node);
       /** @brief destructor */
       ~Goal() {}
-
+      
       bool has_temporal_scope() const {
         return true;
       }
-     /** @brief Dispatchability test
+      /** @brief Dispatchability test
        * @param[in] date  current date
        * @param[in] delay A delay
        *
@@ -127,7 +127,7 @@ namespace TREX {
        * @retval true if the domain of @c start intersects
        * @c [date+delay,@c +inf). In this case the @c start time is
        * constrained to be necessarily greater or equal to @a date
-       * @retval false otherwise 
+       * @retval false otherwise
        */
       bool startsAfter(TICK date, TICK delay =0);
       /** @brief Check for possible early start
@@ -137,14 +137,14 @@ namespace TREX {
        * @retval false otherwise
        */
       bool startsBefore(IntegerDomain::bound const &date) const {
-	return getStart().lowerBound()<date;
+        return getStart().lowerBound()<date;
       }
       
       bool endsAfter(TICK date) const {
         return getEnd().lowerBound()>date;
       }
-    
-
+      
+      
       /** @brief Get start interval
        *
        * Identifies the domain of possible start TICK.
@@ -158,12 +158,12 @@ namespace TREX {
        *
        * @sa getDuration() const
        * @sa getEnd() const
-       * @sa getAttribute() const 
+       * @sa getAttribute() const
        */
       IntegerDomain const &getStart() const;
       /** @brief Get duration interval
        *
-       * Identifies the domain of possible furations 
+       * Identifies the domain of possible furations
        *
        * @note This function is strictly equivalent to :
        * @code
@@ -175,7 +175,7 @@ namespace TREX {
        *
        * @sa getStart() const
        * @sa getEnd() const
-       * @sa getAttribute() const 
+       * @sa getAttribute() const
        */
       IntegerDomain const &getDuration() const;
       /** @brief Get end  interval
@@ -191,7 +191,7 @@ namespace TREX {
        *
        * @sa getDuration() const
        * @sa getEnd() const
-       * @sa getAttribute() const 
+       * @sa getAttribute() const
        */
       IntegerDomain const &getEnd() const;
       
@@ -207,21 +207,21 @@ namespace TREX {
        * @note if var refers to one temporal varaibale (@c start, @c duration or
        *        @c end) the method restrictTime will be called instead
        *
-       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
+       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &,
        *                  IntegerDomain const &)
        */
       void restrictAttribute(Variable const &var);
       Variable const &getAttribute(TREX::utils::Symbol const &name) const;
       void listAttributes(std::list<TREX::utils::Symbol> &attr,
-			  bool all) const;
+                          bool all) const;
       
       /** @brief name of start attribute */
       static TREX::utils::Symbol const s_startName;
       /** @brief name of duration attribute */
       static TREX::utils::Symbol const s_durationName;
       /** @brief name of end attribute */
-      static TREX::utils::Symbol const s_endName; 
-
+      static TREX::utils::Symbol const s_endName;
+      
       /** @brief Restrict time variables
        *
        * @param[in] s A start domain
@@ -242,8 +242,8 @@ namespace TREX {
        * @sa restrictAttribute(Variable const &)
        */
       void restrictTime(IntegerDomain const &s,
-			IntegerDomain const &d,
-			IntegerDomain const &e);
+                        IntegerDomain const &d,
+                        IntegerDomain const &e);
       /** @brief Restrict start time domain
        *
        * @param[in] s A domain
@@ -254,11 +254,11 @@ namespace TREX {
        * @throw PredicateException applying this constraint would result on an
        *        empty domain
        *
-       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
+       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &,
        *                  IntegerDomain const &)
        */
       void restrictStart(IntegerDomain const &s) {
-	restrictTime(s, s_durationDomain, s_dateDomain);
+        restrictTime(s, s_durationDomain, s_dateDomain);
       }
       /** @brief Restrict duration domain
        *
@@ -270,11 +270,11 @@ namespace TREX {
        * @throw PredicateException applying this constraint would result on an
        *        empty domain
        *
-       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
+       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &,
        *                  IntegerDomain const &)
        */
       void restrictDuration(IntegerDomain const &d) {
-	restrictTime(s_dateDomain, d, s_dateDomain);
+        restrictTime(s_dateDomain, d, s_dateDomain);
       }
       /** @brief Restrict end domain
        *
@@ -286,21 +286,21 @@ namespace TREX {
        * @throw PredicateException applying this constraint would result on an
        *        empty domain
        *
-       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &, 
+       * @sa restrictTime(IntegerDomain const &, IntegerDomain const &,
        *                  IntegerDomain const &)
        */
       void restrictEnd(IntegerDomain const &e) {
-	restrictTime(s_dateDomain, s_durationDomain, e);
+        restrictTime(s_dateDomain, s_durationDomain, e);
       }
       static IntegerDomain const s_dateDomain;
       static IntegerDomain const s_durationDomain;
-
+      
     private:
       Variable m_start, m_duration, m_end;
       
       TREX::utils::Symbol const &getPredTag() const;
     };
-
+    
     /** @brief A goal identifier
      *
      * This is the type used by TREX to identify and manipulate goals
@@ -309,7 +309,7 @@ namespace TREX {
      * @relates class Goal
      */
     typedef SHARED_PTR<Goal> goal_id;
-
+    
   } // TREX::transaction
 } // TREX
 

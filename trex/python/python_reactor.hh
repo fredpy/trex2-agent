@@ -57,9 +57,16 @@ namespace TREX {
       explicit reactor_proxy(py_wrapper const &r);
       virtual ~reactor_proxy();
       
+      bool is_verbose() const;
+      void set_verbose(bool value);
+      
       utils::Symbol const &name() const;
+      utils::Symbol const &agent_name() const;
+      transaction::graph const &graph() const;
       transaction::TICK latency() const;
+      void set_latency(transaction::TICK val);
       transaction::TICK lookahead() const;
+      void set_lookahead(transaction::TICK val);
       transaction::TICK exec_latency() const;
       
       transaction::TICK initial() const;
@@ -67,15 +74,39 @@ namespace TREX {
       transaction::TICK current() const;
       std::string date_str(transaction::TICK val) const;
       
-      void use_tl(utils::Symbol const &tl, bool control);
-      void provide_tl(utils::Symbol const &tl, bool control);
+      double tick_duration() const;
+      double as_seconds(transaction::TICK delta) const;
+      
+      void use_tl(utils::Symbol const &tl, bool control,
+                  bool plan_listen);
+      bool unuse_tl(utils::Symbol const &tl);
+      void provide_tl(utils::Symbol const &tl, bool control,
+                      bool plan_publish);
+      bool unprovide_tl(utils::Symbol const &tl);
       bool is_internal(utils::Symbol const &tl) const;
       bool is_external(utils::Symbol const &tl) const;
       
       void post(transaction::Observation const &o, bool verbose);
+      bool request(transaction::goal_id const &g);
+      bool recall(transaction::goal_id const &g);
+      bool post_plan(transaction::goal_id const &g);
+      void cancel_plan(transaction::goal_id const &g);
+
+      void info(std::string const &msg);
+      void warning(std::string const &msg);
+      void error(std::string const &msg);
       
+      virtual void handle_init() {}
+      virtual void handle_request(transaction::goal_id const &g) {}
+      virtual void handle_recall(transaction::goal_id const &g) {}
+      virtual void handle_new_tick() {}
       virtual void notify(transaction::Observation const &o) {}
       virtual bool synchronize() =0;
+      virtual bool has_work();
+      virtual void resume() {}
+      virtual void new_plan(transaction::goal_id const &g) {}
+      virtual void cancelled_plan(transaction::goal_id const &g) {}
+      
       
     private:
       py_reactor *m_impl;
@@ -87,10 +118,18 @@ namespace TREX {
       py_reactor(xml_arg_type arg);
       ~py_reactor();
       
+    private:
+      void handleInit();
+      void handleRequest(transaction::goal_id const &g);
+      void handleRecall(transaction::goal_id const &g);
+      void handleTickStart();
       void notify(transaction::Observation const &o);
       bool synchronize();
-      
-    private:
+      bool hasWork();
+      void resume();
+      void newPlanToken(transaction::goal_id const &g);
+      void cancelledPlanToken(transaction::goal_id const &g);
+
       boost::python::object m_self;
       
       friend class reactor_proxy;
@@ -102,9 +141,25 @@ namespace TREX {
       explicit reactor_wrap(py_wrapper const &r);
       ~reactor_wrap();
       
+      void handle_init();
+      void handle_init_default();
+      void handle_request(transaction::goal_id const &g);
+      void handle_request_default(transaction::goal_id const &g);
+      void handle_recall(transaction::goal_id const &g);
+      void handle_recall_default(transaction::goal_id const &g);
+      void handle_new_tick();
+      void handle_new_tick_default();
       void notify(transaction::Observation const &o);
       void notify_default(transaction::Observation const &o);
       bool synchronize();
+      bool has_work();
+      bool has_work_default();
+      void resume();
+      void resume_default();
+      void new_plan(transaction::goal_id const &g);
+      void new_plan_default(transaction::goal_id const &g);
+      void cancelled_plan(transaction::goal_id const &g);
+      void cancelled_plan_default(transaction::goal_id const &g);
     };
     
     

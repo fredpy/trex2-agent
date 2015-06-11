@@ -52,6 +52,15 @@ namespace {
     return false;
   }
   
+  typedef CHRONO::duration<double> fl_secs;
+
+  double tick_duration(ta::Clock const &c) {
+    return CHRONO::duration_cast<fl_secs>(c.tickDuration()).count();
+  }
+  
+  double to_seconds(ta::Clock const &c, tt::TICK t) {
+    return CHRONO::duration_cast<fl_secs>(c.tickDuration()*t).count();
+  }
 }
 
 void export_agent() {
@@ -81,10 +90,14 @@ void export_agent() {
                 "Current tick value\n"
                 "NOTE: This value makes sense only after self.start()\n"
                 "      was called. Although ti is typically 0 before that.")
+  .add_property("tick_duration", &tick_duration,
+                "Duration of a tick in seconds")
   .def("date_str", &ta::Clock::date_str, args("self", "tick"),
        "Convert a tick into a human readable date.\n"
        "NOTE: this function output is valid only after self.start()\n"
        "      is called.")
+  .def("as_seconds", &to_seconds, args("self", "tick"),
+       "Convert a duration in tick into seconds")
   .def("__str__", &ta::Clock::info, arg("self"),
        "Display basic information about this clock.\n")
   ;
