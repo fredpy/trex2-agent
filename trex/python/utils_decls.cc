@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2013, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include <trex/utils/Symbol.hh>
 #include <trex/utils/LogManager.hh>
 #include <trex/utils/XmlUtils.hh>
 
-#include <boost/python.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/signals2/shared_connection_block.hpp>
 
@@ -43,6 +43,7 @@
 #define BOOST_SPIRIT_THREADSAFE
 #include <boost/property_tree/json_parser.hpp>
 
+#include "python_thread.hh"
 
 #include <functional>
 
@@ -50,19 +51,6 @@ using namespace boost::python;
 namespace bp=boost::property_tree;
 
 namespace {
-  
-  class scoped_gil_release:boost::noncopyable {
-  public:
-    scoped_gil_release() {
-      m_gil_state = PyGILState_Ensure();
-    }
-    ~scoped_gil_release() {
-      PyGILState_Release(m_gil_state);
-    }
-    
-  private:
-    PyGILState_STATE m_gil_state;
-  };
   
   TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
 
@@ -144,7 +132,7 @@ namespace {
     
   protected:
     void handle_interface(TREX::utils::log::entry::pointer e) {
-      scoped_gil_release protect;
+      TREX::python::scoped_gil_release protect;
       boost::signals2::shared_connection_block lock(m_conn);
       try {
         new_entry(e);

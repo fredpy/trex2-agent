@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  * 
- *  Copyright (c) 2013, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  * 
  *  Redistribution and use in source and binary forms, with or without

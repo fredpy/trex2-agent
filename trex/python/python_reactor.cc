@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "python_reactor.hh"
+#include "python_thread.hh"
 
 using namespace TREX::python;
 using namespace TREX::transaction;
@@ -40,24 +41,8 @@ using namespace TREX::utils;
 namespace bp=boost::python;
 
 namespace  {
-  SingletonUse<LogManager> s_log;
-
   /** @brief Light reactor declaration */
   TeleoReactor::xml_factory::declare<py_reactor> decl("PyReactor");
-
-//  py_producer python_decl("PyReactor");
-}
-
-void TREX::python::log_error(bp::error_already_set const &e) {
-  PyObject *py_type, *py_val, *py_trace;
-  
-  PyErr_Fetch(&py_type, &py_val, &py_trace);
-  
-  std::string msg = bp::extract<std::string>(py_val);
-  s_log->syslog("<python>", TREX::utils::log::error)<<msg;
-  //Set back error info, display and rethrow
-  PyErr_Restore(py_type, py_val, py_trace);
-  PyErr_Print();
 }
 
 /*
@@ -356,6 +341,7 @@ py_reactor::py_reactor(xml_arg_type arg)
   
   syslog()<<"Looking for python class \""<<class_name<<"\"";
   try {
+    scoped_gil_release lock;
     bp::object my_class = bp::eval(bp::str(class_name));
   
     if( my_class.is_none() ) {
@@ -366,55 +352,125 @@ py_reactor::py_reactor(xml_arg_type arg)
     py_wrapper wrap(this);
     m_self = my_class(wrap);
   } catch(bp::error_already_set const &e) {
-    log_error(e);
-    throw;
+    unpack_error(log::null, e, true);
   }
 }
 
 py_reactor::~py_reactor() {}
 
+// manipulators
+
+void py_reactor::unpack_error(Symbol const &context,
+                              bp::error_already_set const &e,
+                              bool re_throw) {
+  PyObject *py_type, *py_val, *py_trace;
+  // fetch error from python
+  PyErr_Fetch(&py_type, &py_val, &py_trace);
+  
+  std::string msg = bp::extract<std::string>(py_val);
+  // log the error
+  syslog(context, log::error)<<"Python error: "<<msg;
+  // set back error state in python
+  PyErr_Restore(py_type, py_val, py_trace);
+  if( re_throw )
+    throw ReactorException(*this, msg);
+}
+
+
 
 // callbacks
 
 void py_reactor::handleInit() {
-  m_self.attr("handle_init")();
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("handle_init")();
+  } catch(bp::error_already_set const &e) {
+    unpack_error("handle_init", e);
+  }
 }
 
 void py_reactor::handleRequest(goal_id const &g) {
-  m_self.attr("handle_request")(g);
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("handle_request")(g);
+  } catch(bp::error_already_set const &e) {
+    unpack_error("handle_request", e, false);
+  }
 }
 
 void py_reactor::handleRecall(goal_id const &g) {
-  m_self.attr("handle_recall")(g);  
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("handle_recall")(g);
+  } catch(bp::error_already_set const &e) {
+    unpack_error("handle_recall", e, false);
+  }
 }
 
 void py_reactor::handleTickStart() {
-  m_self.attr("handle_new_tick")();
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("handle_new_tick")();
+  } catch(bp::error_already_set const &e) {
+    unpack_error("handle_new_tick", e, false);
+  }
 }
 
 
 void py_reactor::notify(Observation const &o) {
-  m_self.attr("notify")(o);
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("notify")(o);
+  } catch(bp::error_already_set const &e) {
+    unpack_error("notify", e, false);
+  }
 }
 
 
 bool py_reactor::synchronize() {
-  return m_self.attr("synchronize")();
+  try {
+    // scoped_gil_release lock;
+    return m_self.attr("synchronize")();
+  } catch(bp::error_already_set const &e) {
+    unpack_error("synchronize", e);
+    return false;
+  }
 }
 
 bool py_reactor::hasWork() {
-  return m_self.attr("has_work")();
+  try {
+    // scoped_gil_release lock;
+    return m_self.attr("has_work")();
+  } catch(bp::error_already_set const &e) {
+    unpack_error("has_work", e, false);
+    return false;
+  }
 }
 
 void py_reactor::resume() {
-  m_self.attr("resume")();
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("resume")();
+  } catch(bp::error_already_set const &e) {
+    unpack_error("resume", e, false);
+  }
 }
 
 void py_reactor::newPlanToken(goal_id const &g) {
-  m_self.attr("new_plan")(g);
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("new_plan")(g);
+  } catch(bp::error_already_set const &e) {
+    unpack_error("new_plan", e, false);
+  }
 }
 
 void py_reactor::cancelledPlanToken(goal_id const &g) {
-  m_self.attr("cancelled_plan")(g);
+  try {
+    // scoped_gil_release lock;
+    m_self.attr("cancelled_plan")(g);
+  } catch(bp::error_already_set const &e) {
+    unpack_error("cancelled_plan", e, false);
+  }
 }
 

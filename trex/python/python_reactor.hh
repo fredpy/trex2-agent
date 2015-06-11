@@ -1,7 +1,7 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2013, MBARI.
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,6 @@
 
 namespace TREX {
   namespace python {
-    void log_error(boost::python::error_already_set const &e);
-
     class py_reactor;
     
     struct py_wrapper {
@@ -129,7 +127,11 @@ namespace TREX {
       void resume();
       void newPlanToken(transaction::goal_id const &g);
       void cancelledPlanToken(transaction::goal_id const &g);
-
+      
+      void unpack_error(utils::Symbol const &context,
+                        boost::python::error_already_set const &e,
+                        bool re_throw=true);
+      
       boost::python::object m_self;
       
       friend class reactor_proxy;
@@ -161,6 +163,7 @@ namespace TREX {
       void cancelled_plan(transaction::goal_id const &g);
       void cancelled_plan_default(transaction::goal_id const &g);
     };
+    
     
     
   } // TREX::python
