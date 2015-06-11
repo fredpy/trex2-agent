@@ -412,8 +412,12 @@ void py_reactor::detach(reactor_proxy *self) {
 
 reactor_proxy &py_reactor::self() {
   mutex_type::scoped_lock lock(m_mtx);
-  if( NULL==m_self )
+  if( NULL==m_self ) {
+    syslog(log::error)<<"py_reactor not attached to a proxy";
     throw ReactorException(*this, "No longer attached to a proxy");
+  }
+//  else if( -1==PyErr_CheckSignals() )
+//    throw ReactorException(*this, "Python got a SIGINT");
   return *m_self;
 }
 

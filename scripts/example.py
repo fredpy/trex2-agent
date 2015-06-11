@@ -60,10 +60,11 @@ if __name__ == "__main__":
     import signal
     import sys
 
-    # Properly handling a ^C allow to avoid crashes
-    # while the agent is running
+    # Properly handling a ^C allow to more csmoothly stop trex
     def signal_handler(signal, frame):
+        # ideally I should send some stop event to TREX
         sys.exit(0)
+        
     signal.signal(signal.SIGINT, signal_handler)
 
     print('Trex version {}'.format(trex.version.str))
