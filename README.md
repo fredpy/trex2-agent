@@ -24,7 +24,7 @@ level goal directed control.
 The core library of t-rex depends on:
  * cmake: http://www.cmake.org
  * C++ boost libraries 1.47 or above: http://www.boost.org
- And these two are the only strong requirements to install t-rex
+And these two are the only strong requirements to install t-rex
  (although a very bare-bone version of it).
 
 The compilation is also setup by default to compile the europa
