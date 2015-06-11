@@ -368,25 +368,35 @@ void export_transactions() {
        &reactor_wrap::handle_init_default,
        bp::arg("self"),
        "This method is called when the reactor is initialized\n"
-       "and right before it started being executed by the agent.")
+       "and right before it started being executed by the agent.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("handle_request", &reactor_proxy::handle_request,
        bp::args("self", "g"),
        "Notify the reactor that the new goal g has been requested.\n"
        "It is then th responsibility of this reactor to fulfill\n"
-       "this goal.")
+       "this goal.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("handle_recall", &reactor_proxy::handle_recall,
        bp::args("self", "g"),
        "Notify the reactor that the new goal g is no longer requested.\n"
-       "The reactor has no longer the need to try to fulfill this goal.")
+       "The reactor has no longer the need to try to fulfill this goal.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("handle_new_tick", &reactor_proxy::handle_new_tick,
        &reactor_wrap::handle_new_tick_default,
        bp::arg("self"),
-       "This method is called when the tick is updated by the agent")
+       "This method is called when the tick is updated by the agent.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("notify", &reactor_proxy::notify, &reactor_wrap::notify_default,
        bp::args("self", "o"),
        "This method is called whenever a new observation has\n"
        "been published on a external timeline (used) of this\n"
-       "reactor. The observation is given by o")
+       "reactor. The observation is given by o.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("synchronize", bp::pure_virtual(&reactor_wrap::synchronize),
        bp::arg("self"),
        "Method called by the agent at the beginning of any new\n"
@@ -395,12 +405,16 @@ void export_transactions() {
        "If this method return False this will result on the\n"
        "reactor being killed by the agent.\n"
        "NOTE: Implementing this method is required for any new\n"
-       "      derived classes.")
+       "      derived classes.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("has_work", &reactor_proxy::has_work, &reactor_wrap::has_work_default,
        bp::arg("self"),
        "Called by the agent to check if the reactor needs to resume\n"
        "its deliberation. This is the way a reactor can ask to the\n"
-       "agent to execute resume if times allows for it.")
+       "agent to execute resume if times allows for it.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("resume", &reactor_proxy::resume, &reactor_wrap::resume_default,
        bp::arg("self"),
        "Called by the agent if last call to has_work returned True\n"
@@ -409,7 +423,10 @@ void export_transactions() {
        "can take longer than a tick (reflected by the reactor latency)\n"
        "Nonetheless this method code should be short enough that its\n"
        "execution is far below the tick duration. It is more akin to do\n"
-       "a single step towrad the completion of a complex computation.")
+       "a single step towrad the completion of a complex computation.\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically\n"
+       "         as a reconsequence of self.has_work() returning True")
   .def("new_plan", &reactor_proxy::new_plan, &reactor_wrap::new_plan_default,
        bp::args("self", "token"),
        "Notify that token has been added to the plan of the external\n"
@@ -417,7 +434,9 @@ void export_transactions() {
        "This callback will occur only if the reactor subscribed to the\n"
        "timeline with plan_listen set to True.\n"
        "NOTE: this is still experimental and we do not recommend to\n"
-       "      use this functionality")
+       "      use this functionality\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("cancelled_plan", &reactor_proxy::cancelled_plan,
        &reactor_wrap::cancelled_plan_default,
        bp::args("self", "token"),
@@ -426,7 +445,9 @@ void export_transactions() {
        "This callback will occur only if the reactor subscribed to the\n"
        "timeline with plan_listen set to True.\n"
        "NOTE: this is still experimental and we do not recommend to\n"
-       "      use this functionality")
+       "      use this functionality\n"
+       "WARNING: this method is a callback and hence is not meant to\n"
+       "         be called directly. It is called by trex automatically")
   .def("info", &reactor_proxy::info,
        bp::args("self", "msg"),
        "Log msg in TREX.log as an info message")
