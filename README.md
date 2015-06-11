@@ -26,7 +26,7 @@ The core library of t-rex depends on:
  * C++ boost libraries 1.47 or above: http://www.boost.org
 
 The compilation is also setup by default to compile the europa
-reactor which the will require:
+reactor which in turn requires:
 * europa-pso 2.6:  https://github.com/nasa/europa
 
 But you can safely disable europa via setting WITH_EUROPA to OFF
@@ -35,6 +35,10 @@ via cmake tools (ccmake or cmake-gui)
 Code documentation (the little there is...) is formated for doxygen:
 http://www.doxygen.org
 
+Additionally t-rex generates few graphviz files in its log directory.
+downloading graphviz (http://www.graphviz.org/Home.php) or
+compatible graph visualization tools is a good way to visualize
+these graphs.
 
 Further plugin may require extra dependencies; for example the ROS
 extension if enabled naturally expect ROS to be installed
