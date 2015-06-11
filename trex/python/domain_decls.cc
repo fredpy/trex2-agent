@@ -242,6 +242,16 @@ void export_domain() {
   scope my_scope = module;
   // from now on eveerything is under trex.domain
   
+  docstring_options doc_options(true, true, false);
+  
+  module.attr("__doc__") = "Trex domains.\n"
+  "The classes that are used by trex to represent values. Taking its \n"
+  "root from constraint programming many variables in trex -- specifically\n"
+  "the ones in predicates, observations and goals -- are represented as\n"
+  "domains. A domain is a set of possible values either represented as an\n"
+  "interval or set.\n"
+  "All these objects are related to components from TREXdomain C++ library."
+  ;
   
   // class trex.domains.domain
   //  abstract domain interface
@@ -255,22 +265,46 @@ void export_domain() {
   //    - restrict(domain)  instersects with the arg
   //    - xml()             gives xml repredsentation
   //    - __str__()         gives the string representation
-  class_<domain_wrapper, boost::noncopyable>("domain", "Abstract trex domain",
-                                             init<tu::Symbol>())
-  .def("type", &tt::DomainBase::getTypeName, return_internal_reference<>())
-  .def("is_interval", pure_virtual(&tt::DomainBase::isInterval))
-  .def("is_enumerated", pure_virtual(&tt::DomainBase::isEnumerated))
-  .def("is_full", pure_virtual(&tt::DomainBase::isFull))
-  .def("is_singleton", pure_virtual(&tt::DomainBase::isSingleton))
-  .def("intersect", pure_virtual(&tt::DomainBase::intersect))
-  .def("__eq__", pure_virtual(&tt::DomainBase::equals))
+  class_<domain_wrapper, boost::noncopyable>
+  ("domain", "Abstract trex domain",
+   init<tu::Symbol>(args("self")))
+  .add_property("type", make_function(&tt::DomainBase::getTypeName,
+                                      return_internal_reference<>()),
+                "the type represented by this domain")
+  .def("is_interval", pure_virtual(&tt::DomainBase::isInterval),
+       arg("self"),
+       "Check if the domain is implemented as an interval")
+  .def("is_enumerated", pure_virtual(&tt::DomainBase::isEnumerated),
+       arg("self"),
+       "Check if the domain is implemented as an anumeration of values")
+  .def("is_full", pure_virtual(&tt::DomainBase::isFull), arg("self"),
+       "Check if the domain is full (i.e. contains all possible values\n"
+       "for this type).")
+  .def("is_singleton", pure_virtual(&tt::DomainBase::isSingleton), arg("self"),
+       "Check if the domain is a singleton (i.e. contain one and only\n"
+       "one possible value)")
+  .def("intersect", pure_virtual(&tt::DomainBase::intersect),
+       args("self", "other"),
+       "Check that the intersection between self and other is not empty.\n"
+       "NOTE: often the intersection between domains with differents\n"
+       "      types is empty.")
+  .def("__eq__", pure_virtual(&tt::DomainBase::equals),
+       args("self", "other"),
+       "Test that self and other are identicals")
   .def("restrict", pure_virtual(&tt::DomainBase::restrictWith),
-       return_internal_reference<>())
-  .def("as_tree", &tt::DomainBase::as_tree)
-  .def("build_tree", pure_virtual(&tt::DomainBase::build_tree))
-  .def("xml", &xml_str<tt::DomainBase>)
-  .def("json", &json_str<tt::DomainBase>)
-  .def("__str__", pure_virtual(&str_impl<tt::DomainBase>))
+       return_internal_reference<>(),
+       args("self", "other"),
+       "Restrict self by intersecting it with other")
+  .def("as_tree", &tt::DomainBase::as_tree, arg("self"),
+       "serialize self into an xml tree structure")
+//  .def("build_tree", pure_virtual(&tt::DomainBase::build_tree),
+//       arg("self"))
+  .def("xml", &xml_str<tt::DomainBase>, arg("self"),
+       "serialize self into an xml formatted string")
+  .def("json", &json_str<tt::DomainBase>, arg("self"),
+       "serialize self into an json formatted string")
+  .def("__str__", pure_virtual(&str_impl<tt::DomainBase>), arg("self"),
+       "serialize self into a human-readable string")
   ;
   
   // class trex.domains.interval: trex.domains.domain
@@ -279,18 +313,25 @@ void export_domain() {
   //    - has_upper() check if interval has a non infinite upper bound
   class_<interval_wrap, bases<tt::DomainBase>,
          boost::noncopyable>("interval", "Abstract trex interval",
-                             init<tu::Symbol>())
-  .def("has_lower", pure_virtual(&tt::BasicInterval::hasLower))
-  .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper))
+                             init<tu::Symbol>(args("self", "type"),
+                                              "create a full domain of type \"type\""))
+  .def("has_lower", pure_virtual(&tt::BasicInterval::hasLower), arg("self"),
+       "Check if lower bound is a value (as opposed to -inf)")
+  .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper), arg("self"),
+       "Check if upper bound is a value (as opposed to +inf)")
   ;
   
   // class trex.domains.bool: trex.domains.interval
   //  boolean domain
   //   - __init__()     create a full boolean domain
   //   - __init__(bool) create a domain with the single value arg
-  class_<tt::BooleanDomain, bases<tt::BasicInterval> >("bool", "Boolean domain",
-                                                    init<>())
-  .def(init<bool>())
+  class_<tt::BooleanDomain, bases<tt::BasicInterval> >
+  ("bool", "Boolean domain",
+   init<>(arg("self"), "Create a full boolean domain "
+          "(i.e. the domain accept both\n"
+          "True and False)"))
+  .def(init<bool>(args("self", "val"),
+                  "Create a booean domain limited to val"))
   ;
   
   // class trex.domains.int: trex.domains.interval
@@ -298,9 +339,13 @@ void export_domain() {
   //   - __init__()     create a full int domain
   //   - __init__(long) create a domain with the single value arg
   //   - __init__(long, long) create a domain with interval [arg1, arg2]
-  class_<tt::IntegerDomain, bases<tt::BasicInterval> >("int", "Integer domain", init<>())
-  .def(init<long>())
-  .def(init<long,long>())
+  class_<tt::IntegerDomain, bases<tt::BasicInterval> >
+  ("int", "Integer domain",
+   init<>(arg("self"), "Create the [-inf, +inf] int domain]"))
+  .def(init<long>(args("self", "val"),
+                  "Create the domain restricted to the constant val"))
+  .def(init<long,long>(args("self", "lower_bound", "upper_bound"),
+                       "Create the domain [lower_bound, upper_bound]"))
   ;
 
   // class trex.domains.float: trex.domains.interval
@@ -308,18 +353,31 @@ void export_domain() {
   //   - __init__()     create a full int domain
   //   - __init__(double) create a domain with the single value arg
   //   - __init__(double, double) create a domain with interval [arg1, arg2]
-  class_<tt::FloatDomain, bases<tt::BasicInterval> >("float", "Float domain", init<>())
-  .def(init<double>())
-  .def(init<double,double>())
+  class_<tt::FloatDomain, bases<tt::BasicInterval> >
+  ("float", "Float domain",
+   init<>(arg("self"), "Create the [-inf, +inf] int domain]"))
+  .def(init<double>(args("self", "val"),
+                    "Create the domain restricted to the constant val"))
+  .def(init<double,double>(args("self", "lower_bound", "upper_bound"),
+                           "Create the domain [lower_bound, upper_bound]"))
   ;
   
   // class trex.domains.enumerated: trex.domains.domain
   // abstract enumerated domain interface
   //   - __len__()    number of elements
-  class_<enum_wrap, bases<tt::DomainBase>,
-         boost::noncopyable>("enumerated", "Abstract trex Enumerated domain",
-                             init<tu::Symbol>())
-  .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize))
+  class_<enum_wrap, bases<tt::DomainBase>, boost::noncopyable>
+  ("enumerated", "Abstract trex Enumerated domain",
+   init<tu::Symbol>(args("self", "type"),
+                    "Create an enumerated domain of type \"type\""))
+  .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize),
+       arg("self"),
+       "Give the number of possible values in this domain.\n"
+       "NOTE: A domain with a legnth of 0 is actually accepting all\n"
+       "      possible values. Indeed, empty domains cannot exist in\n"
+       "      trex and we decided to reprsent a full enumerated domain\n"
+       "      by a domain with no constrained values as it allows to\n"
+       "      represent domains for types that are not limited (such\n"
+       "      as strings)")
   // TODO need to implement __iter__
   ;
   
@@ -329,9 +387,15 @@ void export_domain() {
   //    - __init__()           create the full domain
   //    - __init__(string)     create a domain with the single value arg
   //    - __init__(collection) create a domain with the elements given in colllection
-  class_<tt::StringDomain, bases<tt::BasicEnumerated> >("string", "string domain", init<>())
-  .def(init<std::string>())
-  .def("__init__", &collection_init<tt::StringDomain, std::string>)
+  class_<tt::StringDomain, bases<tt::BasicEnumerated> >
+  ("string", "string domain",
+   init<>(arg("self"),
+          "Create a new string domain that is full (i.e. accept\n"
+          "any string)"))
+  .def(init<std::string>(args("self", "val"),
+                         "Create a new domain restricted to the single string val"))
+  .def("__init__", &collection_init<tt::StringDomain, std::string>,
+       "Create a string domain based on a collection of strings")
   ;
 
   
@@ -340,9 +404,14 @@ void export_domain() {
   //    - __init__()                  create the full domain
   //    - __init__(trex.utils.symbol) create a domain with the single value arg
   //    - __init__(collection)        create a domain with the elements given in collection
-  class_<tt::EnumDomain, bases<tt::BasicEnumerated> >("enum", "enum domain", init<>())
-  .def(init<tu::Symbol>())
-  .def("__init__", &collection_init<tt::EnumDomain, tu::Symbol>)
+  class_<tt::EnumDomain, bases<tt::BasicEnumerated> >
+  ("enum", "enum domain",
+   init<>(arg("self"),
+          "Create a full enum domain"))
+  .def(init<tu::Symbol>(args("self", "val"),
+                        "Create an enum domain limited to the value val"))
+  .def("__init__", &collection_init<tt::EnumDomain, tu::Symbol>,
+       "Create an enum domain based on a collection of symbols")
   ;
   
   tt::Variable &(tt::Variable::* restrict_domain)(tt::DomainBase const &) = &tt::Variable::restrict;
@@ -357,14 +426,33 @@ void export_domain() {
   //    - restrict(var) restrict variable with var.domain()
   //    - xml()     xml representation
   //    - __str__() string representation
-  class_<tt::Variable>("var", "trex variable", init<tu::Symbol, tt::DomainBase const &>())
-  .def("name", &tt::Variable::name, return_internal_reference<>())
-  .def("domain", &tt::Variable::domain, return_internal_reference<>())
-  .def("restrict", restrict_domain, return_internal_reference<>())
-  .def("restrict", restrict_var, return_internal_reference<>())
-  .def("xml", &xml_str<tt::Variable>)
-  .def("json", &json_str<tt::Variable>)
-  .def("__str__", &str_impl<tt::Variable>)
+  class_<tt::Variable>
+  ("var",
+   "Trex variable.\n"
+   "A variable is a named object with an associated domain.\n"
+   "The domain of a variable can only be restricted to less values\n"
+   "and never be empty.",
+   init<tu::Symbol, tt::DomainBase const &>(args("self", "name", "domain"),
+                                            "Create the new variable \"name\" with the value \"domain\""))
+  .add_property("name", make_function(&tt::Variable::name,
+                                      return_internal_reference<>()),
+                "Variable name")
+  .add_property("domain", make_function(&tt::Variable::domain,
+                                        return_internal_reference<>()),
+                "Variable domain")
+  .def("restrict", restrict_domain, return_internal_reference<>(),
+       args("self", "domain"),
+       "Restrict the domain of this variable by intersecting it with domain")
+  .def("restrict", restrict_var, return_internal_reference<>(),
+       args("self", "other"),
+       "Restrict the domain of this variable by intersecting it with the\n"
+       "domain of other")
+  .def("xml", &xml_str<tt::Variable>, arg("self"),
+       "Serialize this variable as an xml formatted string")
+  .def("json", &json_str<tt::Variable>, arg("self"),
+       "Serialize this variable as a json fomratted string")
+  .def("__str__", &str_impl<tt::Variable>, arg("self"),
+       "Serialize this variable inot a human-readable string")
   ;
 
 }

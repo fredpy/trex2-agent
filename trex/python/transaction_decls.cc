@@ -79,6 +79,15 @@ void export_transactions() {
   bp::scope my_scope = module;
   // from now on everything is under trex.transaction
   
+  bp::docstring_options doc_options(true, true, false);
+  
+  module.attr("__doc__") = "Trex message transaction classes.\n"
+  "The classes that are used to connect and handle Trex reactors\n"
+  "message exchange, including the reactor abstract class itself.\n"
+  "All the components here reflect the C++ library TREXtransaction"
+  ;
+  
+  
   void (Predicate::* attr_1)(Variable const &) = &Predicate::restrictAttribute;
   void (Predicate::* attr_2)(Symbol const &, DomainBase const &) = &Predicate::restrictAttribute;
   
@@ -94,16 +103,48 @@ void export_transactions() {
    *    - restrict(self, name, domain)
    */
   bp::class_<Predicate, boost::shared_ptr<Predicate>, boost::noncopyable>
-  ("predicate", "trex timeline predicate", bp::no_init)
-  .add_property("object", bp::make_function(&Predicate::object, bp::return_internal_reference<>()))
-  .add_property("name", bp::make_function(&Predicate::predicate, bp::return_internal_reference<>()))
-  .def("has_attribute", &Predicate::hasAttribute, (bp::arg("name")))
-  .def("attribute", &Predicate::getAttribute, bp::return_internal_reference<>(), (bp::arg("name")))
-  .def("restrict", attr_1, (bp::arg("var")))
-  .def("restrict", attr_2, (bp::arg("name"), bp::arg("domain")))
-  .def("xml", &xml_str<Predicate>)
-  .def("json", &json_str<Predicate>)
-  .def("from_xml", &pred_factory).staticmethod("from_xml");
+  ("predicate",
+   "Trex timeline predicate.\n\n"
+   "A predicate is the basic message used by trex. It can\n"
+   "be seen as a flat structure with multiple variables as\n"
+   "attributes. A predicate is defined by its type (name here)\n"
+   " and its associated object.", bp::no_init)
+  .add_property("object", bp::make_function(&Predicate::object, bp::
+                                            return_internal_reference<>()),
+                "The object this predicate refers to. In Trex terminology\n"
+                "this object is also referred to as the timeline.")
+  .add_property("name", bp::make_function(&Predicate::predicate, bp::
+                                          return_internal_reference<>()),
+                "The name (or type) of this predicate")
+  .def("has_attribute", &Predicate::hasAttribute, (bp::args("self", "name")),
+       "Check if this predicate has the attribute name.\n"
+       "NOTE: In Trex, having an attribute only means that this attribute\n"
+       "      has been constrained somehow. The lack of an attribute is,\n"
+       "      by convention, similar to have this attribute with no\n"
+       "      constraint on its domain.")
+  .def("attribute", &Predicate::getAttribute,
+       bp::return_internal_reference<>(), (bp::args("self", "name")),
+       "Access the attribute name.\n"
+       "precondition: self.has_attribute(name)")
+  .def("restrict", attr_1, (bp::args("self", "var")),
+       "Restrict the attribute named var.name to var.domain.\n"
+       "if var.name did not exist then just set it to var.domain\n"
+       "otherwise compute the intersection with var.domain\n"
+       "error: if this operation result on var.name attribute's\n"
+       "       domain to become empty")
+  .def("restrict", attr_2, bp::args("self", "name","domain"),
+       "Restrict the attribute named name to domain.\n"
+       "if var.name did not exist then just set it to domain\n"
+       "otherwise compute the intersection with domain\n"
+       "error: if this operation result on name attribute's\n"
+       "       domain to become empty")
+  .def("xml", &xml_str<Predicate>, bp::arg("self"),
+       "Serialize this predicate as an xml formatted string")
+  .def("json", &json_str<Predicate>, bp::arg("self"),
+       "Serialize this predicate as a json formatted string")
+  .def("from_xml", &pred_factory, bp::arg("xml"),
+       "Create a new instance from an xml definition")
+  .staticmethod("from_xml")
   ;
   
   
@@ -114,8 +155,12 @@ void export_transactions() {
    *    - __init__(self, symbol, symbol)
    */
   bp::class_<Observation, observation_id, bp::bases<Predicate> >
-  ("obs", "trex observation", bp::init<Predicate const &>(bp::args("pred"), "Convert pred into an observation"))
-  .def(bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
+  ("obs", "trex observation.\n\n"
+   "A Trex observation is a predicate that applies to the current tick.\n"
+   "It is the state value of the timeline self.object",
+   bp::init<Predicate const &>(bp::args("self", "pred"),
+                               "Convert the predicate pred into an observation"))
+  .def(bp::init<Symbol, Symbol>(bp::args("self", "timeline", "pred"),
                                 "Create new observation pred on timeline"))
   ;
   
@@ -125,13 +170,26 @@ void export_transactions() {
    *    - __init__(self, symbol, symbol)
    */
   bp::class_<Goal, goal_id, bp::bases<Predicate> >
-  ("goal", "trex goal", bp::init<Symbol, Symbol>(bp::args("timeline", "pred"),
-                                                 "Create new goal pred on timeline"));
+  ("goal", "trex goal.\n\n"
+   "A trex goal is a predicate with the special attributes\n"
+   "start, duration and end that indicate its temporal scope.\n"
+   "It repsresent a desired future state for the timeline\n"
+   "self.object and is used for sending requests to the reactor\n"
+   " that provide this timline",
+   bp::init<Symbol, Symbol>(bp::args("self", "timeline", "pred"),
+                            "Create new goal pred on timeline"));
 
   
-  bp::class_<TICK, boost::noncopyable>("tick", "trex tick date", bp::init<>())
-  .def(bp::init<long>())
-  .def("__str__", &str_impl<TICK>)
+  bp::class_<TICK, boost::noncopyable>
+  ("tick", "Trex tick date."
+   "The tick is the basic reprsentaion of time for trex\n"
+   "It is an integer that is updated by the clock as time advance.",
+   bp::init<>(bp::arg("self"),
+              "Create a new instance with the value 0"))
+  .def(bp::init<long>(bp::args("self", "val"),
+                      "Create a new instance with the value val"))
+  .def("__str__", &str_impl<TICK>, bp::arg("self"),
+       "serialize this instance into a human readable string")
   .def(bp::self == bp::self)
   .def(bp::self != bp::self)
   .def(bp::self < bp::self)
@@ -143,42 +201,107 @@ void export_transactions() {
   bp::implicitly_convertible<long, TICK>();
   
   
-  bp::class_<graph, boost::noncopyable> c_graph("graph", "reactors transaction graph", bp::no_init);
+  bp::class_<graph, boost::noncopyable>
+  c_graph("graph",
+          "Reactors transaction graph.\n\n"
+          "The basic structure that connect the reatcors together\n"
+          "into a graph and handle message exchanges between these\n"
+          "reactors based on this graph.\n"
+          "A reactor graph is defined by what timelines each reactor\n"
+          "use (declare as external) and provide (declare as internal).\n"
+          "For each timeline there can be only one reactor providing it\n"
+          "but many can use it as long as it does not generate cyclic\n"
+          "dependency between reactors. This structure is what manage\n"
+          "these connections internally.",
+          bp::no_init);
   
-  
-  
-  c_graph.def("name", &graph::getName, bp::return_internal_reference<>())
-  .add_property("empty", &graph::empty)
-  .add_property("reactors_count", &graph::count_reactors)
-  .add_property("relations_count", &graph::count_relations)
+  c_graph.add_property("name",
+                       bp::make_function(&graph::getName,
+                                         bp::return_internal_reference<>()),
+                       "The name of the graph")
+  .add_property("empty", &graph::empty,
+                "Check if empty (i.e no reactor)")
+  .add_property("reactors_count", &graph::count_reactors,
+                "Number of reactors in this graph")
+  .add_property("relations_count", &graph::count_relations,
+                "Number of connections between reactors in this graph")
   .add_property("current_tick", &graph::getCurrentTick, "current tick date")
-  .def("date_str", &graph::date_str, "convert a tick into a date string")
+  .def("date_str", &graph::date_str, bp::args("self", "tick"),
+       "convert a tick into a date string")
   ;
   
   bp::class_<py_wrapper>
-  ("reactor_anchor", "anchor for a python reactor", bp::no_init);
+  ("reactor_anchor", "Internal anchor for a python reactor", bp::no_init);
   
   bp::class_<reactor_wrap, boost::noncopyable>
-  ("reactor", "python api for reactor", bp::init<py_wrapper const &>())
-  .add_property("name", bp::make_function(&reactor_proxy::name,
-                                          bp::return_internal_reference<>()))
-  .add_property("latency", &reactor_proxy::latency)
-  .add_property("lookahead", &reactor_proxy::lookahead)
-  .add_property("exec_latency", &reactor_proxy::exec_latency)
-  .add_property("initial_tick", &reactor_proxy::initial)
-  .add_property("final_tick", &reactor_proxy::final)
-  .add_property("tick", &reactor_proxy::current)
-  .def("date_str", &reactor_proxy::date_str)
-  .def("use", &reactor_proxy::use_tl, (bp::arg("tl"),
-                                       bp::arg("control")=true))
-  .def("provide", &reactor_proxy::provide_tl, (bp::arg("tl"),
-                                               bp::arg("control")=true))
-  .def("is_internal", &reactor_proxy::is_internal)
-  .def("is_external", &reactor_proxy::is_external)
-  .def("post", &reactor_proxy::post, (bp::arg("o"),
-                                      bp::arg("verbose")=false))
-  .def("notify", &reactor_proxy::notify, &reactor_wrap::notify_default)
-  .def("synchronize", bp::pure_virtual(&reactor_wrap::synchronize))
+  ("reactor", "Python api for reactor.\n"
+   "This class allow user to define their own reactor\n"
+   "class in python. The instance can then be created in\n"
+   "a Trex agent (or graph) through the xml tag of the form:\n"
+   "<PyReactor name=\"name\" python_class=\"<class_type>\"\n"
+   "           latency=\"latency\" lookahead=\"lookahead\"/>\n"
+   "\n"
+   "Where <class_type> is the class that derives from this\n"
+   "abstract reactor class.",
+   bp::init<py_wrapper const &>(bp::args("self", "anchor"),
+                                "Create a new instance.\n"
+                                "NOTE: this constructor needs to be redefined and called on\n"
+                                "       each of its derived classes!"))
+  .add_property("name",
+                bp::make_function(&reactor_proxy::name,
+                                  bp::return_internal_reference<>()),
+                "The reactor name")
+  .add_property("latency", &reactor_proxy::latency,
+                "The reactor latency")
+  .add_property("lookahead", &reactor_proxy::lookahead,
+                "The reactor lookahead")
+  .add_property("exec_latency", &reactor_proxy::exec_latency,
+                "The reactor execution latency (i.e. its latency\n"
+                "increased by the latency of the timelines this\n"
+                "reactor uses.")
+  .add_property("initial_tick", &reactor_proxy::initial,
+                "initial tick (usually 0)")
+  .add_property("final_tick", &reactor_proxy::final,
+                "final tick after which this reactor lifetime will end")
+  .add_property("tick", &reactor_proxy::current,
+                "current tick date")
+  .def("date_str", &reactor_proxy::date_str, bp::args("self", "tick"),
+       "Convert a tick into a human readbale date")
+  .def("use", &reactor_proxy::use_tl, (bp::arg("self"),
+                                       bp::arg("tl"),
+                                       bp::arg("control")=true),
+       "Request to use timeline tl as external")
+  .def("provide", &reactor_proxy::provide_tl, (bp::arg("self"),
+                                               bp::arg("tl"),
+                                               bp::arg("control")=true),
+       "Request to provide timeline tl as internal")
+  .def("is_internal", &reactor_proxy::is_internal, bp::args("self", "tl"),
+       "Check if tl is internal (provided) by this reactor")
+  .def("is_external", &reactor_proxy::is_external, bp::args("self", "tl"),
+       "Check if tl is external (used) by this reactor")
+  .def("post", &reactor_proxy::post, (bp::arg("self"),
+                                      bp::arg("o"),
+                                      bp::arg("verbose")=false),
+       "Post the observation o for being published after the end of\n"
+       " the next synchronization.\n"
+       "precondition: o.object is internal to this reactor\n"
+       "NOTE: in case of multiple posts on the same timeline\n"
+       "      only the last post will be published.")
+  .def("notify", &reactor_proxy::notify, &reactor_wrap::notify_default,
+       bp::args("self", "o"),
+       "This method is called whenever a new observation has\n"
+       "been published on a external timeline (used) of this\n"
+       "reactor. The observation is given by o")
+  .def("synchronize", bp::pure_virtual(&reactor_wrap::synchronize),
+       bp::arg("self"),
+       "Method called by the agent at the beginning of any new\n"
+       "tick. This method is typically used to produce new \n"
+       "observations for this reactor internal timelines.\n"
+       "If this method return False this will result on the\n"
+       "reactor being killed by the agent.\n"
+       "NOTE: Implementing this method is required for any new\n"
+       "      derived classes."
+       )
   ;
   
   
@@ -226,7 +349,7 @@ void export_transactions() {
 ////  .def("resume", &python_reactor::resume)
 //  ;
   
-  c_graph.def("add_reactor", &python_add_reactor);
+  c_graph.def("add_reactor", &python_add_reactor, bp::args("self", "xml"));
 }
 
 /*

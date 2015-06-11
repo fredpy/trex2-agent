@@ -354,11 +354,11 @@ void export_utils() {
   //   can be checked if empty()q
   //   supports str(s) and len(s)
   class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
-                              init<optional<std::string> >(args("name"),
+                              init<optional<std::string> >(args("self", "name"),
                                                            "Create a new symbol with the given name"))
    .add_property("empty", &TREX::utils::Symbol::empty,
         "Test if current instance is the empty symbol")
-   .def("__len__", &TREX::utils::Symbol::length, (arg("self")),
+   .def("__len__", &TREX::utils::Symbol::length, arg("self"),
         "Length in character of the current instance")
    .def(self == self)
    .def(self != self)
@@ -366,12 +366,11 @@ void export_utils() {
    .def(self > self)
    .def(self <= self)
    .def(self >= self)
-   .def("__str__", &TREX::utils::Symbol::str,
+   .def("__str__", &TREX::utils::Symbol::str, arg("self"),
         return_value_policy<copy_const_reference>(),
-        (arg("self")),
         "String representation. This just convert the symbol into a\n"
         "python string.")
-  .def("__repr__", &symbol_rep,(arg("self")),
+  .def("__repr__", &symbol_rep, arg("self"),
        "representation of the symbol. This just alter the usual python\n"
        "__repr__ in order to display the symbol value.")
   ;
@@ -418,25 +417,25 @@ void export_utils() {
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self", "name"), "Create a new logger with the given source name"))
+  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self, ""name"), "Create a new logger with the given source name"))
   .add_property("name", make_getter(&log_wrapper::m_name, return_internal_reference<>()),
                 "Name of this log producer")
   .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir,
                 "TREX log directory")
   .add_property("path", &log_wrapper::path,
                 "TREX file search path")
-  .def("use_file", &log_wrapper::use, (arg("self"), arg("file_name")),
+  .def("use_file", &log_wrapper::use, args("self", "file_name"),
        "Search for a file.\n"
        "This method locate the file file_name in TREX_PATH.\n"
        "If the file is found it copies it in the log directory and\n"
        "return its valid name. Otherwise it returns an empty string")
-  .def("info", &log_wrapper::info, (arg("self"), arg("msg")),
+  .def("info", &log_wrapper::info, args("self","msg"),
        "Produces the log message msg into trex log as an info message")
-  .def("warn", &log_wrapper::warn, (arg("self"), arg("msg")),
+  .def("warn", &log_wrapper::warn, args("self","msg"),
        "Produces the log message msg into trex log as a warning message")
-  .def("error", &log_wrapper::error, (arg("self"), arg("msg")),
+  .def("error", &log_wrapper::error, args("self","msg"),
        "Produces the log message msg into trex log as an error message")
-  .def("add_path", &log_wrapper::add_path, (arg("self"), arg("path")),
+  .def("add_path", &log_wrapper::add_path, args("self","path"),
        "Add the directory path to TREX_PATH")
   ;
   
@@ -468,7 +467,7 @@ void export_utils() {
   .def("disconnect", &py_log_handler::disconnect, (arg("self")),
        "Disconnect this handler making it inactive. As fo today there's \n"
        "no way to reenable a disconnected handler.")
-  .def("new_entry", pure_virtual(&py_log_handler::new_entry), (arg("self"), arg("entry")),
+  .def("new_entry", pure_virtual(&py_log_handler::new_entry), args("self","entry"),
        "New entry callback.\n"
        "This method is called by trex whenever a new log entry has been \n"
        "produced. This method is pure virtual and therefore need to be \n"
@@ -492,20 +491,20 @@ void export_utils() {
                                     no_init);
   tag.add_property("tag", make_getter(&bp::ptree::value_type::first),
           "Name of the tag")
-  .def("has_attribute", &has_attribute, (arg("self"), arg("attr_name")),
+  .def("has_attribute", &has_attribute, args("self","attr_name"),
        "Check if this tag have the attribute attr_name")
-  .def("attribute", &attribute, (arg("self"), arg("attr_name")),
+  .def("attribute", &attribute, args("self", "attr_name"),
        "Extract the value of the tag attribute attr_name")
   ;
 
   class_<bp::ptree>("xml", "XML configuration tree", no_init)
   .def("from_str", &xml_from_string,
-       (arg("xml_text")),
+       arg("xml_text"),
        "Parses the XML string xml_text to a new xml tree").staticmethod("from_str")
   .def("from_file", &xml_from_file,
-       (arg("file_name")),
+       arg("file_name"),
        "Parses the xml file name from_file into a new xml tree").staticmethod("from_file")
-  .def("from_json", &json_from_string, (arg("json_text")),
+  .def("from_json", &json_from_string, arg("json_text"),
        "Parse the JSON text json_text into an xml tree.\n"
        "while JSON is not XML the class we use in trex to parse xml\n"
        "is boost.property_tree. This function iexists just ofr the sake\n"

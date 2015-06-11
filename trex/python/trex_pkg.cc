@@ -89,12 +89,26 @@ BOOST_PYTHON_MODULE(trex)
                         "All its properties are static and indicate version "
                         "informations about the current trex version", no_init)
   // I  do not know how to documment static_properties
-  .add_static_property("major", &version_major)
-  .add_static_property("minor", &version_minor)
-  .add_static_property("release", &TREX::version::release)
-  .add_static_property("is_rc", &TREX::version::is_release_candidate)
-  .add_static_property("rc", &TREX::version::rc_number)
-  .add_static_property("str", &TREX::version::str)
+  .add_static_property("major", &version_major,
+                       "Major number of trex version.\n"
+                       "i.e. A in version A.B.C")
+  .add_static_property("minor", &version_minor,
+                       "Minor number of trex version.\n"
+                       "i.e. B in version A.B.C")
+  .add_static_property("release", &TREX::version::release,
+                       "Release (or patch) number of trex version.\n"
+                       "i.e. C in version A.B.C")
+  .add_static_property("is_rc", &TREX::version::is_release_candidate,
+                       "Check if this version is a release candidate.\n"
+                       "A release candidate version number is A.B.C rc D")
+  .add_static_property("rc", &TREX::version::rc_number,
+                       "The relsease candidate number or 0 if this version\n"
+                       "is not a relsease candidate")
+  .add_static_property("str", &TREX::version::str,
+                       "The version number as a string")
+  .add_static_property("full_str", &TREX::version::full_str,
+                       "The full version number that also include "
+                       "git information")
   ;
 
 
