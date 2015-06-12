@@ -1,7 +1,7 @@
 /* -*- C++ -*- */
 /** @file "XmlUtils.hh"
  * @brief Helpers for xml manipulation
- * 
+ *
  * This file defines a set of utilisties that eas manipulation of
  * rapidxml structures and data extraction
  *
@@ -10,14 +10,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -27,7 +27,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -41,7 +41,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_XmlUtils 
+#ifndef H_XmlUtils
 # define H_XmlUtils
 
 # include <boost/shared_ptr.hpp>
@@ -55,23 +55,23 @@
 
 namespace TREX {
   namespace utils {
-
+    
     /** @brief XML parsing related errors.
      *
      * This exception is used for error related to XML parsing
      * and data extraction
-     * 
-     * @todo As we migrate to Boost.PropertyTree the source fo the 
-     *   tree os not necessarily XML. Which means that I may need 
-     *   to rename this class. 
+     *
+     * @todo As we migrate to Boost.PropertyTree the source fo the
+     *   tree os not necessarily XML. Which means that I may need
+     *   to rename this class.
      *
      * @author Frederic Py <fpy@mbari.org>
      * @ingroup utils
      */
     class XmlError :public Exception {
     public:
-      explicit XmlError(std::string const &msg) throw() 
-	:Exception("XML error: "+msg) {}
+      explicit XmlError(std::string const &msg) throw()
+      :Exception("XML error: "+msg) {}
       /** @brief Constructor
        * @param node A porperty tree node
        * @param msg A message
@@ -80,25 +80,25 @@ namespace TREX {
        * with the error message @a msg
        */
       XmlError(boost::property_tree::ptree::value_type const &node,
-	       std::string const &msg) throw() 
-	:Exception(std::string("On ")+
-		   std::string(node.first)+": "+msg) {}
+               std::string const &msg) throw()
+      :Exception(std::string("On ")+
+                 std::string(node.first)+": "+msg) {}
       /** @brief Destructor */
       virtual ~XmlError() throw() {}
     }; // TREX::utils::FactoryException
     
-    namespace internals { 
+    namespace internals {
       
-      /** @brief XML attribibute parsing helper 
-       * 
-       * @tparam Ty the expected output type
-       * 
-       * This class is used internally as an helper to extract the value of an 
-       * XML attribute and parse it as a @p Ty instance 
+      /** @brief XML attribibute parsing helper
        *
-       * It is used by the parse_attr methods in order to extract and parse an 
+       * @tparam Ty the expected output type
+       *
+       * This class is used internally as an helper to extract the value of an
+       * XML attribute and parse it as a @p Ty instance
+       *
+       * It is used by the parse_attr methods in order to extract and parse an
        * attribute from an XML tag.
-       * 
+       *
        * @author Frederic Py <fpy@mbari.org>
        * @ingroup utils
        */
@@ -106,7 +106,7 @@ namespace TREX {
       struct attr_helper {
         
         static std::string get_str(boost::property_tree::ptree const &pt,
-                               std::string const &name) {
+                                   std::string const &name) {
           std::string path("<xmlattr>."+name);
           
           if( AttrOptional ) {
@@ -120,25 +120,25 @@ namespace TREX {
         }
         
         /** @brief Parse attribute
-         * 
+         *
          * @param[in] pt A xml based property tree
          * @param[in] name An attribute name
-         * 
-         * Extracts the value of the attribute @p name from the property tree 
+         *
+         * Extracts the value of the attribute @p name from the property tree
          * @p pt
-         * 
+         *
          * @pre The path @c "<xmlattr>."+@p name exists or @p Ty is a boost::optional
          * @pre The value of the attribute can be parsed as a @p Ty
-         * 
-         * @return the value of this attribute
-         * @note if @p Ty is a boost::optional and the attribute @p name does 
-         *       not exists the returned value is an empty optional  
          *
-         * @throw bad_string_cast Failed to convert the attribute 
+         * @return the value of this attribute
+         * @note if @p Ty is a boost::optional and the attribute @p name does
+         *       not exists the returned value is an empty optional
+         *
+         * @throw bad_string_cast Failed to convert the attribute
          *     @p name into a @p Ty value
          */
         static Ty get(boost::property_tree::ptree const &pt,
-                          std::string const &name) {
+                      std::string const &name) {
           return string_cast<Ty>(get_str(pt, name));
         }
       }; // TREX::utils::internals::attr_helper<>
@@ -160,14 +160,14 @@ namespace TREX {
           }
           return pt.get_optional<std::string>(path);
         }
-       
+        
         static boost::optional<Ty> get(boost::property_tree::ptree const &pt,
-                                      std::string const &name) {
-	  boost::optional<std::string> tmp = get_str(pt, name);
-	  if( tmp )
-	    return boost::optional<Ty>(string_cast<Ty>(*tmp));
-	  else 
-	    return boost::optional<Ty>();
+                                       std::string const &name) {
+          boost::optional<std::string> tmp = get_str(pt, name);
+          if( tmp )
+            return boost::optional<Ty>(string_cast<Ty>(*tmp));
+          else
+            return boost::optional<Ty>();
         }
       }; // TREX::utils::internals::attr_helper< boost::optional<> >
 #endif // DOXYGEN
@@ -194,18 +194,18 @@ namespace TREX {
      * @{
      */
     template<class Ty>
-    Ty parse_attr(boost::property_tree::ptree const &node, 
-		  std::string const &attr) {
+    Ty parse_attr(boost::property_tree::ptree const &node,
+                  std::string const &attr) {
       try {
         return internals::attr_helper<Ty>::get(node, attr);
       } catch(boost::property_tree::ptree_bad_data const &e) {
         throw XmlError("Failed to parse attribute \""+attr+"\": "+e.what());
       }
     }
-
+    
     template<class Ty>
-    Ty parse_attr(boost::property_tree::ptree::value_type const &node, 
-		  std::string const &attr) {
+    Ty parse_attr(boost::property_tree::ptree::value_type const &node,
+                  std::string const &attr) {
       try {
         return parse_attr<Ty>(node.second, attr);
       } catch(XmlError const &n) {
@@ -222,25 +222,25 @@ namespace TREX {
      *
      * Add the attribute @p attr to the xml node @p node with the value @p value
      *
-     * @pre Ty is a type that supports standard output streams 
-     * 
+     * @pre Ty is a type that supports standard output streams
+     *
      * @ingroup utils
      * @author Frederic Py
      * @{
      */
     template<typename Ty>
     void set_attr(boost::property_tree::ptree &node,
-		  std::string const &attr, Ty const &value) {
+                  std::string const &attr, Ty const &value) {
       node.put("<xmlattr>."+attr, value);
     }
-
+    
     template<typename Ty>
     void set_attr(boost::property_tree::ptree::value_type &node,
-		  std::string const &attr, Ty const &value) {
+                  std::string const &attr, Ty const &value) {
       set_attr(node.second, attr, value);
     }
     /** @} */
-
+    
     /** @brief Optional XML attribute extraction
      * @tparam Ty output type
      * @param on_missing default value if missing
@@ -256,32 +256,32 @@ namespace TREX {
      *
      * @retval @a on_missing If @a attr does not exist in @a node
      * @return The parsed value from @a attr otherwise
-     * 
+     *
      * @sa template<class Ty> Ty const &parse_attr(rapidxml::xml_node<> const &, std::string const &attr)
      * @ingroup utils
-     * @author Frederic Py 
+     * @author Frederic Py
      * @sa parse_attr(boost::property_tree::ptree const &, std::string const &)
      * @{
      */
     template<class Ty>
-    Ty parse_attr(Ty const &on_missing, 
-		  boost::property_tree::ptree const &node, 
-		  std::string const &attr) {
+    Ty parse_attr(Ty const &on_missing,
+                  boost::property_tree::ptree const &node,
+                  std::string const &attr) {
       boost::optional<Ty> ret = parse_attr< boost::optional<Ty> >(node, attr);
       if( !ret )
         ret.reset(on_missing);
       return *ret;
     }
-
+    
     template<class Ty>
-    Ty parse_attr(Ty const &on_missing, 
-		  boost::property_tree::ptree::value_type const &node, 
-		  std::string const &attr) {
+    Ty parse_attr(Ty const &on_missing,
+                  boost::property_tree::ptree::value_type const &node,
+                  std::string const &attr) {
       return parse_attr<Ty>(on_missing, node.second, attr);
     }
     /** @} */
-
-
+    
+    
     /** brief Check for XML tag name
      * @param node A property tree value
      * @param tag A tag name
@@ -290,10 +290,10 @@ namespace TREX {
      * @ingroup utils
      */
     inline bool is_tag(boost::property_tree::ptree::value_type const &node,
-		       std::string const &tag) {
+                       std::string const &tag) {
       return tag==node.first;
     }
-
+    
     /** @brief Extend XML tree with extra file
      *
      * @param[in, out] tree A XML tree
@@ -302,32 +302,32 @@ namespace TREX {
      *
      * Add tha content of the fille referred by the attribute @p conf to @p tree.
      *
-     * This methods parse the XML file referred by the attribute @p vconf of @p tree 
-     * and add its content as sub tags of @p tree. If @p ahead is @c true this content 
+     * This methods parse the XML file referred by the attribute @p vconf of @p tree
+     * and add its content as sub tags of @p tree. If @p ahead is @c true this content
      * will be added before the @p tree sub tags, otherwise it will be added after them.
-     * 
+     *
      * @note If @p conf is not an attribute of @p tree then @p tree is not modified
      *
-     * @pre if @p conf is an attribute of @p tree its value should be the name of a file 
+     * @pre if @p conf is an attribute of @p tree its value should be the name of a file
      *   that can be located by LogManager and is a valid XML file
      *
      * @throw XmlError the @p conf file is not a valid XML file or is empty
      * @throw ErrnoExcept Failed to locate the @p conf file
-     * 
-     * @post If @p conf was an attribute of @p tree then @p tree hass been modified to include the content of  
+     *
+     * @post If @p conf was an attribute of @p tree then @p tree hass been modified to include the content of
      * @p conf file
      *
      * Illustration.
      *
      * Assume that we have a @p tree with this XML content :
-     * @code 
+     * @code
      * <Root file="foo.xml">
      *   <Son/>
      * </Root>
      * @endcode
      *
      * And the file @c foo.xml has the following content:
-     * @code 
+     * @code
      *  <Daughter/>
      *  <Cousin/>
      * @endcode
@@ -340,13 +340,13 @@ namespace TREX {
      *   <Son/>
      * </Root>
      * @endcode
-     * 
-     * @author Frederic Py 
+     *
+     * @author Frederic Py
      * @ingroup utils
      * @sa LogManager
      */ 
     void ext_xml(boost::property_tree::ptree &tree,
-		 std::string const &conf, bool ahead=true);
+                 std::string const &conf, bool ahead=true);
     
   } // TREX::utils
 } // TREX

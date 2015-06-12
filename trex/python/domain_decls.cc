@@ -237,7 +237,18 @@ namespace {
     stl_input_iterator<Base> start(o), finish;
     return Enum(start, finish);
   }
+  
+  std::string get_elem_str(tt::BasicEnumerated const &a,
+                           size_t idx) {
+    if( idx>=a.getSize() ) {
+      std::ostringstream oss;
+      oss<<"Index "<<idx<<" is out of bounds";
+      throw tt::DomainAccess(a, oss.str());
+    }
+    return a.getStringValue(idx);
+  }
 
+  
 }
 
 void export_domain() {
@@ -288,6 +299,10 @@ void export_domain() {
   .def("is_singleton", pure_virtual(&tt::DomainBase::isSingleton), arg("self"),
        "Check if the domain is a singleton (i.e. contain one and only\n"
        "one possible value)")
+  .def("singleton_str", &tt::DomainBase::getStringSingleton, arg("self"),
+       "Get singleton value as a string\n\n"
+       "Raises:\n"
+       "  access_error: self.is_singleton==False")
   .def("intersect", pure_virtual(&tt::DomainBase::intersect),
        args("self", "other"),
        "Check that the intersection between self and other is not empty.\n"
@@ -299,7 +314,11 @@ void export_domain() {
   .def("restrict", pure_virtual(&tt::DomainBase::restrictWith),
        return_internal_reference<>(),
        args("self", "other"),
-       "Restrict self by intersecting it with other")
+       "Restrict self by intersecting it with other\n\n"
+       "Raises:\n"
+       "  empty_domain: The intersection with other is empty.\n\n"
+       "Note: Intersecting domains with differnt type results on"
+       "      an empty domain (including int vs float).")
   .def("as_tree", &tt::DomainBase::as_tree, arg("self"),
        "serialize self into an xml tree structure")
 //  .def("build_tree", pure_virtual(&tt::DomainBase::build_tree),
@@ -341,6 +360,10 @@ void export_domain() {
        "Check if lower bound is a value (as opposed to -inf)")
   .def("has_upper", pure_virtual(&tt::BasicInterval::hasUpper), arg("self"),
        "Check if upper bound is a value (as opposed to +inf)")
+  .def("lower_str", &tt::BasicInterval::getStringLower, arg("self"),
+       "Lower bound as a string\n")
+  .def("upper_str", &tt::BasicInterval::getStringUpper, arg("self"),
+       "Upper bound as a string\n")
   ;
   
   // class trex.domains.bool: trex.domains.interval
@@ -353,7 +376,7 @@ void export_domain() {
           "(i.e. the domain accept both\n"
           "True and False)"))
   .def(init<bool>(args("self", "val"),
-                  "Create a booean domain limited to val"))
+                  "Create a boolean domain limited to val"))
   ;
   
   // class trex.domains.int: trex.domains.interval
@@ -394,12 +417,17 @@ void export_domain() {
   .def("__len__", pure_virtual(&tt::BasicEnumerated::getSize),
        arg("self"),
        "Give the number of possible values in this domain.\n"
-       "NOTE: A domain with a legnth of 0 is actually accepting all\n"
+       "Note: A domain with a legnth of 0 is actually accepting all\n"
        "      possible values. Indeed, empty domains cannot exist in\n"
-       "      trex and we decided to reprsent a full enumerated domain\n"
+       "      trex and we decided to represent a full enumerated domain\n"
        "      by a domain with no constrained values as it allows to\n"
        "      represent domains for types that are not limited (such\n"
        "      as strings)")
+  .def("elem_str", &get_elem_str,
+       args("self", "index"),
+       "Give the string representation of the element index of the domain.\n\n"
+       "Raises:\n"
+       "  access_error: index is out of range")
   // TODO need to implement __iter__
   ;
   
@@ -454,21 +482,31 @@ void export_domain() {
    "A variable is a named object with an associated domain.\n"
    "The domain of a variable can only be restricted to less values\n"
    "and never be empty.",
-   init<tu::Symbol, tt::DomainBase const &>(args("self", "name", "domain"),
-                                            "Create the new variable \"name\" with the value \"domain\""))
+   init<tu::Symbol, tt::DomainBase const &>
+   (args("self", "name", "domain"),
+    "Create the new variable \"name\" with the value \"domain\"\n\n"
+    "Raises:\n"
+    "  variable_exception: name is an empty string"))
   .add_property("name", make_function(&tt::Variable::name,
                                       return_internal_reference<>()),
                 "Variable name")
   .add_property("domain", make_function(&tt::Variable::domain,
                                         return_internal_reference<>()),
-                "Variable domain")
+                "Variable domain\n\n"
+                "Raise:\n"
+                "  variable_exception: domain of this variable is undefined")
   .def("restrict", restrict_domain, return_internal_reference<>(),
        args("self", "domain"),
-       "Restrict the domain of this variable by intersecting it with domain")
+       "Restrict the domain of this variable by intersecting it with domain\n\n"
+       "Raises:\n"
+       "  empty_domain: Intersection with domain is empty")
   .def("restrict", restrict_var, return_internal_reference<>(),
        args("self", "other"),
        "Restrict the domain of this variable by intersecting it with the\n"
-       "domain of other")
+       "domain of other\n\n"
+       "Raises:\n"
+       "  variable_exception: the 2 variables have different names\n"
+       "  empty_domain: the intersection of the 2 domains is empty")
   .def("xml", &xml_str<tt::Variable>, arg("self"),
        "Serialize this variable as an xml formatted string")
   .def("json", &json_str<tt::Variable>, arg("self"),

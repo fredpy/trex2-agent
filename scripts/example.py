@@ -43,10 +43,11 @@ class example_publisher(transaction.reactor):
         # print 'add attribute int int_interval=[5, 10]'
         o.restrict(domains.var('int_interval', domains.int(5, 10)));
         # uncomment this to test exceptions: should work just need more exception types
-        try:
-            o.restrict(domains.var('int_interval', domains.int(11, 20)));
-        except domains.empty_domain as err:
-            self.warning("Expected exception: {}".format(err))
+        #try:
+        #    o.restrict(domains.var('int_interval', domains.int(11, 20)));
+        #except domains.empty_domain as err:
+        #    self.warning("Captured expected exception: {}".format(err))
+
         # if tick is a ,multiple of 3 then post nothing
         if self.tick%3>0:
             # post this observation at any tick that is not divisible by 3

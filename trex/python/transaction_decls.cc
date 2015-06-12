@@ -131,20 +131,28 @@ void export_transactions() {
        "      constraint on its domain.")
   .def("attribute", &Predicate::getAttribute,
        bp::return_internal_reference<>(), (bp::args("self", "name")),
-       "Access the attribute name.\n"
-       "precondition: self.has_attribute(name)")
+       "Access the attribute name.\n\n"
+       "Raises:\n"
+       "  predicate_error: self.has_attribute(name)==False")
+  // iter would be nice but do not work as it is now
+  //  my iter is a pair and python do not understand it
+//  .def("__iter__", bp::iterator<Predicate>(),
+//       "An iterator through predicate attributes")
   .def("restrict", attr_1, (bp::args("self", "var")),
        "Restrict the attribute named var.name to var.domain.\n"
        "if var.name did not exist then just set it to var.domain\n"
-       "otherwise compute the intersection with var.domain\n"
-       "error: if this operation result on var.name attribute's\n"
-       "       domain to become empty")
+       "otherwise compute the intersection with var.domain\n\n"
+       "Raises:\n"
+       "  predicate_error: var does not have a domain or a name"
+       "  empty_domain: intersection with var is empty")
   .def("restrict", attr_2, bp::args("self", "name","domain"),
        "Restrict the attribute named name to domain.\n"
        "if var.name did not exist then just set it to domain\n"
-       "otherwise compute the intersection with domain\n"
-       "error: if this operation result on name attribute's\n"
-       "       domain to become empty")
+       "otherwise compute the intersection with domain\n\n"
+       "Raises:\n"
+       "  variable_exception: name is empty\n"
+       "  empty_domain: intersection of attributte name with\n"
+       "                domain is empty")
   .def("xml", &xml_str<Predicate>, bp::arg("self"),
        "Serialize this predicate as an xml formatted string")
   .def("json", &json_str<Predicate>, bp::arg("self"),
@@ -172,8 +180,11 @@ void export_transactions() {
    "It is the state value of the timeline self.object",
    bp::init<Predicate const &>(bp::args("self", "pred"),
                                "Convert the predicate pred into an observation"))
-  .def(bp::init<Symbol, Symbol>(bp::args("self", "timeline", "pred"),
-                                "Create new observation pred on timeline"))
+  .def(bp::init<Symbol, Symbol>
+       (bp::args("self", "timeline", "pred"),
+        "Create new observation pred on timeline\n\n"
+        "Raises:\n"
+        "  predicate_error: either timeline or pred is empty"))
   ;
   
   /*
@@ -188,8 +199,11 @@ void export_transactions() {
    "It repsresent a desired future state for the timeline\n"
    "self.object and is used for sending requests to the reactor\n"
    " that provide this timline",
-   bp::init<Symbol, Symbol>(bp::args("self", "timeline", "pred"),
-                            "Create new goal pred on timeline"))
+   bp::init<Symbol, Symbol>
+   (bp::args("self", "timeline", "pred"),
+    "Create new goal pred on timeline\n\n"
+    "Raises:\n"
+    "  predicate_error: either timline or pred is empty"))
   .add_property("id", &get_goal_id,
                 "A unique id for this goal");
   
@@ -311,7 +325,9 @@ void export_transactions() {
                                        bp::arg("tl"),
                                        bp::arg("control")=true,
                                        bp::arg("plan_publish")=false),
-       "Request to use timeline tl as external")
+       "Request to use timeline tl as external\n\n"
+       "Raises:\n"
+       "  timeline_failure: the operation failed badly (rare)")
   .def("unuse", &reactor_proxy::unuse_tl, bp::args("self", "tl"),
        "Unsubscribe from the external timeline tl.\n"
        "Return True if the timeline was used, False otehrwise.\n"
@@ -320,7 +336,10 @@ void export_transactions() {
                                                bp::arg("tl"),
                                                bp::arg("control")=true,
                                                bp::arg("plan_listen")=false),
-       "Request to provide timeline tl as internal")
+       "Request to provide timeline tl as internal\n\n"
+       "Raises:\n"
+       "  timeline_failure: the operation failed badly (rare)\n"
+       "  multiple_internals: timleine is already owned by another reactor")
   .def("unprovide", &reactor_proxy::unprovide_tl, bp::args("self", "tl"),
        "Release ownership of the internal timeline tl.\n"
        "Return True if the timeline was provided, False otehrwise\n"
@@ -333,9 +352,10 @@ void export_transactions() {
                                       bp::arg("o"),
                                       bp::arg("verbose")=false),
        "Post the observation o for being published after the end of\n"
-       " the next synchronization.\n"
-       "precondition: o.object is internal to this reactor\n"
-       "NOTE: in case of multiple posts on the same timeline\n"
+       "the next synchronization.\n\n"
+       "Raises:\n"
+       "  synchronization_error: o.object is not internal to this reactor\n\n"
+       "Note: in case of multiple posts on the same timeline\n"
        "      only the last post will be published.")
   .def("request", &reactor_proxy::request,
        bp::args("self", "g"),
@@ -345,10 +365,13 @@ void export_transactions() {
        "Return True on success or False if:\n"
        "  - the timeline is not external (used) by this reactor\n"
        "  - the goal start time is in the past\n"
-       "  - the timeline do not accept goals\n"
-       "NOTE succesfull request do not guarantee that the goal will be\n"
-       "     executed (ie transalted into an observation), it just\n"
-       "     means that the owner should be informed about it.")
+       "  - the timeline do not accept goals\n\n"
+       "Raises:\n"
+       "  dispatch_error: g is not valid or g.object is not external \n"
+       "                  to this reactor\n\n"
+       "Note: succesfull request do not guarantee that the goal will be\n"
+       "      executed (ie transalted into an observation), it just\n"
+       "      means that the owner should be informed about it.")
   .def("recall", &reactor_proxy::recall,
        bp::args("self", "g"),
        "Cancel a previously requested goal g.\n"
@@ -369,8 +392,11 @@ void export_transactions() {
        "plan and is effective only if:\n"
        "  - token.object is internal to this reactor\n"
        "  - self.provide(token.object) was called with plan_publish\n"
-       "    set to True\n"
-       "NOTE: this is still experimental and we do not recommentd to\n"
+       "    set to True\n\n"
+       "Raises:\n"
+       "  dispatch_error: g is not valid or g.object is not internal \n"
+       "                  to this reactor\n\n"
+       "Note: this is still experimental and we do not recommentd to\n"
        "      use this functionality")
   .def("cancel_plan", &reactor_proxy::cancel_plan,
        bp::args("self", "token"),
@@ -382,40 +408,40 @@ void export_transactions() {
        "  - token was published through self.post_plan(token)\n"
        "  - self.provide(token.object) was called with plan_publish\n"
        "    set to True\n"
-       "NOTE: this is still experimental and we do not recommentd to\n"
+       "Note: this is still experimental and we do not recommentd to\n"
        "      use this functionality")
   .def("handle_init", &reactor_proxy::handle_init,
        &reactor_wrap::handle_init_default,
        bp::arg("self"),
        "This method is called when the reactor is initialized\n"
-       "and right before it started being executed by the agent.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "and right before it started being executed by the agent.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("handle_request", &reactor_proxy::handle_request,
        bp::args("self", "g"),
        "Notify the reactor that the new goal g has been requested.\n"
        "It is then th responsibility of this reactor to fulfill\n"
-       "this goal.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "this goal.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("handle_recall", &reactor_proxy::handle_recall,
        bp::args("self", "g"),
        "Notify the reactor that the new goal g is no longer requested.\n"
        "The reactor has no longer the need to try to fulfill this goal.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "Warning: this method is a callback and hence is not meant to\n\n"
        "         be called directly. It is called by trex automatically")
   .def("handle_new_tick", &reactor_proxy::handle_new_tick,
        &reactor_wrap::handle_new_tick_default,
        bp::arg("self"),
-       "This method is called when the tick is updated by the agent.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "This method is called when the tick is updated by the agent.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("notify", &reactor_proxy::notify, &reactor_wrap::notify_default,
        bp::args("self", "o"),
        "This method is called whenever a new observation has\n"
        "been published on a external timeline (used) of this\n"
-       "reactor. The observation is given by o.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "reactor. The observation is given by o.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("synchronize", bp::pure_virtual(&reactor_wrap::synchronize),
        bp::arg("self"),
@@ -423,17 +449,17 @@ void export_transactions() {
        "tick. This method is typically used to produce new \n"
        "observations for this reactor internal timelines.\n"
        "If this method return False this will result on the\n"
-       "reactor being killed by the agent.\n"
-       "NOTE: Implementing this method is required for any new\n"
-       "      derived classes.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "reactor being killed by the agent.\n\n"
+       "Note: Implementing this method is required for any new\n"
+       "      derived classes.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("has_work", &reactor_proxy::has_work, &reactor_wrap::has_work_default,
        bp::arg("self"),
        "Called by the agent to check if the reactor needs to resume\n"
        "its deliberation. This is the way a reactor can ask to the\n"
-       "agent to execute resume if times allows for it.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "agent to execute resume if times allows for it.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("resume", &reactor_proxy::resume, &reactor_wrap::resume_default,
        bp::arg("self"),
@@ -443,8 +469,8 @@ void export_transactions() {
        "can take longer than a tick (reflected by the reactor latency)\n"
        "Nonetheless this method code should be short enough that its\n"
        "execution is far below the tick duration. It is more akin to do\n"
-       "a single step towrad the completion of a complex computation.\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "a single step towrad the completion of a complex computation.\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically\n"
        "         as a reconsequence of self.has_work() returning True")
   .def("new_plan", &reactor_proxy::new_plan, &reactor_wrap::new_plan_default,
@@ -452,10 +478,10 @@ void export_transactions() {
        "Notify that token has been added to the plan of the external\n"
        "timeline token.object.\n"
        "This callback will occur only if the reactor subscribed to the\n"
-       "timeline with plan_listen set to True.\n"
-       "NOTE: this is still experimental and we do not recommend to\n"
-       "      use this functionality\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "timeline with plan_listen set to True.\n\n"
+       "Note: this is still experimental and we do not recommend to\n"
+       "      use this functionality\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("cancelled_plan", &reactor_proxy::cancelled_plan,
        &reactor_wrap::cancelled_plan_default,
@@ -463,10 +489,10 @@ void export_transactions() {
        "Notify that token has been removed from the plan of the external\n"
        "timeline token.object.\n"
        "This callback will occur only if the reactor subscribed to the\n"
-       "timeline with plan_listen set to True.\n"
-       "NOTE: this is still experimental and we do not recommend to\n"
-       "      use this functionality\n"
-       "WARNING: this method is a callback and hence is not meant to\n"
+       "timeline with plan_listen set to True.\n\n"
+       "Note: this is still experimental and we do not recommend to\n"
+       "      use this functionality\n\n"
+       "Warning: this method is a callback and hence is not meant to\n"
        "         be called directly. It is called by trex automatically")
   .def("info", &reactor_proxy::info,
        bp::args("self", "msg"),
@@ -479,7 +505,7 @@ void export_transactions() {
        "Log msg in TREX.log as an error message")
   .def("as_seconds", &reactor_proxy::as_seconds,
        bp::args("self", "ticks"),
-       "VConvert the number of ticks into seconds")
+       "Convert the number of ticks into seconds")
   ;
   
   bp::class_<ReactorException, bp::bases<GraphException> > react_e
@@ -500,6 +526,13 @@ void export_transactions() {
    bp::no_init);
   
   s_py_err->attach<MultipleInternals>(mult_i_e.ptr());
+
+  bp::class_<graph::timeline_failure, bp::bases<ReactorException> > fail_e
+  ("timeline_failure",
+   "Failure on a timeline operation\n"
+   "The operation is usually either use or provide calls from the reactor",
+   bp::no_init);
+  
   
   bp::class_<SynchronizationError, bp::bases<ReactorException> > synch_e
   ("synchronization_error",
@@ -509,205 +542,16 @@ void export_transactions() {
   s_py_err->attach<SynchronizationError>(synch_e.ptr());
   
   
-  
-//  bp::class_<python_reactor, SHARED_PTR<python_reactor>, boost::noncopyable>
-//  ("reactor", "abstract reactor interface", bp::no_init)
-//  .def(bp::init<TeleoReactor::xml_arg_type &>())
-//  .add_property("name", make_function(&python_reactor::getName, bp::return_internal_reference<>()))
-////  .add_property("agent_name", make_function(&TeleoReactor::getAgentName, bp::return_internal_reference<>()))
-////  .add_property("graph", make_function(&TeleoReactor::getGraph, bp::return_internal_reference<>()))
-////  .add_property("initial_tick", &TeleoReactor::getInitialTick)
-////  .add_property("current_tick", &TeleoReactor::getCurrentTick)
-////  .add_property("final_tick", &TeleoReactor::getFinalTick)
-////  .def("date_str", &TeleoReactor::date_str)
-////  .add_property("latency", &TeleoReactor::getLatency)
-////  .add_property("look_ahead", &TeleoReactor::getLookAhead)
-////  .add_property("exec_latency", &TeleoReactor::getExecLatency)
-////  .add_property("externals_count", &TeleoReactor::count_externals)
-////  .add_property("internals_count", &TeleoReactor::count_internals)
-////  .def("is_external", &python_reactor::ext_check)
-////  .def("use", &python_reactor::ext_use, (bp::arg("tl"),
-////                                         bp::arg("control")=true))
-////  .def("unuse", &python_reactor::ext_unuse)
-////  .def("request", &python_reactor::post_request)
-////  .def("recall", &python_reactor::cancel_request)
-////  .def("is_internal", &python_reactor::int_check)
-//  .def("declare", &python_reactor::int_decl, (bp::arg("tl"),
-//                                              bp::arg("control")=true))
-////  .def("undeclare", &python_reactor::int_undecl)
-////  .def("post", &python_reactor::post_obs, (bp::arg("o"),
-////                                           bp::arg("verbose")=false))
-////  // logging
-////  .def("info", &python_reactor::info)
-////  .def("warn", &python_reactor::warn)
-////  .def("error", &python_reactor::error)
-////  // transactions
-////  .def("notify", &TeleoReactor::notify)
-////  .def("handle_request", &python_reactor::handleRequest)
-////  .def("handle_recall", &python_reactor::handleRecall)
-////  // execution
-////  .def("handle_init", &python_reactor::handleInit)
-////  .def("handle_new_tick", &python_reactor::handleTickStart)
-//  .def("synchronize", pure_virtual(&python_reactor::synchronize))
-////  .def("has_work", &python_reactor::hasWork)
-////  .def("resume", &python_reactor::resume)
-//  ;
-  
-  c_graph.def("add_reactor", &python_add_reactor, bp::args("self", "xml"));
+  c_graph.def("add_reactor", &python_add_reactor, bp::args("self", "xml"),
+              "Add a new reactor to the graph based on this xml definition.\n"
+              "This is the typical way to add reactors to t-rex when the agent\n"
+              "is already configured. Reactors are often expected to be created\n"
+              "throuhg an internal xml factory that properly attach them to\n"
+              "the agent.\n\n"
+              "Raises:\n"
+              "  multiple_reactors: the reactor name is already in use\n"
+              "  trex.utils.xml_parse_error: error while parsing XML\n"
+              "  trex.utils.xml_error: an exception occured while trying\n"
+              "                        to create the reactor."
+              );
 }
-
-/*
-using namespace boost::python;
-
-namespace tu=TREX::utils;
-namespace tt=TREX::transaction;
-
-namespace {
- 
-  template<class Obj>
-  std::string xml_str(Obj const &dom) {
-    std::ostringstream oss;
-    dom.toXml(oss);
-    return oss.str();
-  }
-  
-  template<class Obj>
-  std::string str_impl(Obj const &dom) {
-    std::ostringstream oss;
-    oss<<dom;
-    return oss.str();
-  }
-  
-//  bool test_id(tt::graph::reactor_id const &id) {
-//    return id;
-//  }
-//  tt::TeleoReactor const &reactor_id(tt::graph::reactor_id const &id) {
-//    return *id;
-//  }
-//  std::string str_id(tt::graph::reactor_id const &id) {
-//    if( id )
-//      return id->getAgentName().str()+"."+id->getName().str();
-//    return "";
-//  }
-  
-  
-  boost::shared_ptr<tt::Predicate> pred_factory(boost::property_tree::ptree::value_type &decl) {
-    TREX::utils::SingletonUse<tt::Predicate::xml_factory> fact;
-    return fact->produce(decl);
-  }
-  
-  void python_add_reactor(tt::graph &g, boost::property_tree::ptree::value_type &cfg) {
-    g.add_reactor(cfg);
-  }
-
-}
-
-void export_transactions() {
-  // Setup my submodule
-  object module(handle<>(borrowed(PyImport_AddModule("trex.transaction"))));
-  scope().attr("transaction") = module;
-  scope my_scope = module;
-  // from now on everything is under trex.transaction
-  
-  
-  void (tt::Predicate::* attr_1)(tt::Variable const &) = &tt::Predicate::restrictAttribute;
-  void (tt::Predicate::* attr_2)(tu::Symbol const &,tt::DomainBase const &) = &tt::Predicate::restrictAttribute;
-    
-
-  // TODO: need to give an iterator
-  class_<tt::Predicate, boost::shared_ptr<tt::Predicate>,
-         boost::noncopyable>("predicate", "trex timeline predicate", no_init)
-  .def("object", &tt::Predicate::object, return_internal_reference<>())
-  .def("predicate", &tt::Predicate::predicate, return_internal_reference<>())
-  .def("has_attribute", &tt::Predicate::hasAttribute, arg("name"))
-  .def("restrict", attr_1, arg("var"))
-  .def("restrict", attr_2, (arg("name"), arg("domain")))
-  .def("attribute", &tt::Predicate::getAttribute, return_internal_reference<>(), arg("name"))
-  .def("xml", &xml_str<tt::Predicate>)
-  .def("__str__", &str_impl<tt::Predicate>)
-  .def("from_xml", &pred_factory).staticmethod("from_xml");
-  ;
-  
-  class_<tt::Observation, tt::observation_id, bases<tt::Predicate> >("obs", "trex observation", init<tt::Predicate const &>())
-  .def(init<tu::Symbol, tu::Symbol>(args("timeline", "pred"), "Create new observation pred on timeline"))
-  ;
-                                                                     
-  class_<tt::Goal, tt::goal_id, bases<tt::Predicate> >("goal", "trex goal",
-                                                       init<tu::Symbol, tu::Symbol>(args("timeline", "pred"), "Create new goal pred on timeline"))
-  ;
-  
-  class_<tt::TICK, boost::noncopyable>("tick", "trex tick date", init<>())
-  .def(init<long>())
-  .def("__str__", &str_impl<tt::TICK>)
-  .def(self == self)
-  .def(self != self)
-  .def(self < self)
-  .def(self <= self)
-  .def(self > self)
-  .def(self >= self)
-  ;
-  
-  implicitly_convertible<long, tt::TICK>();
-  
-  
-  class_<tt::graph, boost::noncopyable> c_graph("graph", "reactors transaction graph", no_init);
-  
-  
-  
-  c_graph.def("name", &tt::graph::getName, return_internal_reference<>())
-  .def("empty", &tt::graph::empty)
-  .add_property("empty", &tt::graph::empty)
-  .add_property("reactors_count", &tt::graph::count_reactors)
-  .add_property("relations_count", &tt::graph::count_relations)
-  .add_property("current_tick", &tt::graph::getCurrentTick, "current tick date")
-  .def("date_str", &tt::graph::date_str, "convert a tick into a date string")
-  ;
-
-  class_<tt::TeleoReactor::xml_arg_type>("r_init", "type of argument used ofr a reactor init", no_init)
-  .def_readonly("graph", &tt::TeleoReactor::xml_arg_type::second)
-  .def_readonly("xml", &tt::TeleoReactor::xml_arg_type::first)
-  ;
-  
-  class_<python_reactor, boost::shared_ptr<python_reactor>, boost::noncopyable>
-  ("reactor", "abstract reactor interface", no_init)
-  .def(init<tt::TeleoReactor::xml_arg_type &>())
-  .add_property("name", make_function(&tt::TeleoReactor::getName, return_internal_reference<>()))
-  .add_property("agent_name", make_function(&tt::TeleoReactor::getAgentName, return_internal_reference<>()))
-  .add_property("graph", make_function(&tt::TeleoReactor::getGraph, return_internal_reference<>()))
-  .add_property("initial_tick", &tt::TeleoReactor::getInitialTick)
-  .add_property("current_tick", &tt::TeleoReactor::getCurrentTick)
-  .add_property("final_tick", &tt::TeleoReactor::getFinalTick)
-  .def("date_str", &tt::TeleoReactor::date_str)
-  .add_property("latency", &tt::TeleoReactor::getLatency)
-  .add_property("look_ahead", &tt::TeleoReactor::getLookAhead)
-  .add_property("exec_latency", &tt::TeleoReactor::getExecLatency)
-  .add_property("externals_count", &tt::TeleoReactor::count_externals)
-  .add_property("internals_count", &tt::TeleoReactor::count_internals)
-  .def("is_external", &python_reactor::ext_check)
-  .def("use", &python_reactor::ext_use, (arg("tl"), arg("control")=true))
-  .def("unuse", &python_reactor::ext_unuse)
-  .def("request", &python_reactor::post_request)
-  .def("recall", &python_reactor::cancel_request)
-  .def("is_internal", &python_reactor::int_check)
-  .def("declare", &python_reactor::int_decl, (arg("tl"), arg("control")=true))
-  .def("undeclare", &python_reactor::int_undecl)
-  .def("post", &python_reactor::post_obs, (arg("o"), arg("verbose")=false))
-  // logging
-  .def("info", &python_reactor::info)
-  .def("warn", &python_reactor::warn)
-  .def("error", &python_reactor::error)
-  // transactions
-  .def("notify", &tt::TeleoReactor::notify)
-  .def("handle_request", &python_reactor::handleRequest)
-  .def("handle_recall", &python_reactor::handleRecall)
-  // execution
-  .def("handle_init", &python_reactor::handleInit)
-  .def("handle_new_tick", &python_reactor::handleTickStart)
-  .def("synchronize", pure_virtual(&python_reactor::synchronize))
-  .def("has_work", &python_reactor::hasWork)
-  .def("resume", &python_reactor::resume)
-  ;
-  
-  c_graph.def("add_reactor", &python_add_reactor);
-}
-*/

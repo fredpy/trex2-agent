@@ -11,14 +11,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -28,7 +28,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -49,7 +49,7 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     /** @brief Enumerated Domain base class
      *
      * This class provide a unified abstract interface for implementing
@@ -63,23 +63,23 @@ namespace TREX {
     public:
       /** @brief Destructor */
       virtual ~BasicEnumerated() {}
-
+      
       bool isInterval() const {
-	return false;
+        return false;
       }
       bool isEnumerated() const {
-	return true;
+        return true;
       }
-
+      
       bool isFull() const {
-	return 0==getSize();
+        return 0==getSize();
       }
       bool isSingleton() const {
-	return 1==getSize();
+        return 1==getSize();
       }
-//      std::ostream &toXml(std::ostream &out, size_t tabs) const;
-//      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
-
+      //      std::ostream &toXml(std::ostream &out, size_t tabs) const;
+      //      std::ostream &toJSON(std::ostream &out, size_t tabs) const;
+      
       
       /** @brief element count
        *
@@ -93,7 +93,7 @@ namespace TREX {
       /** @brief generic element access
        * @param i index of the element
        *
-       * This method give access to the element @a i of the domain. 
+       * This method give access to the element @a i of the domain.
        *
        * @pre @a i is less than the size of the set
        *
@@ -106,7 +106,7 @@ namespace TREX {
       /** @overload boost::any getElement(size_t i) const
        */
       boost::any operator[](size_t i) const {
-	return getElement(i);
+        return getElement(i);
       }
       /** @brief Typed element access
        * @tparam Ty   expected return type
@@ -138,16 +138,16 @@ namespace TREX {
       template< class Ty, bool Safe >
       Ty getTypedElement(size_t n) const {
         boost::any val = getElement(n);
-	if( Safe ) {
+        if( Safe ) {
           Ty *ret = boost::any_cast<Ty>(&val);
           if( NULL!=ret )
             return *ret;
           else
             return TREX::utils::string_cast<Ty>(getStringValue(n));
-	} else 
-	  return boost::any_cast<Ty>(val);
+        } else
+          return boost::any_cast<Ty>(val);
       }
-           
+      
       /** @brief Get element textual value
        * @param[in] i Index of the element
        *
@@ -162,33 +162,33 @@ namespace TREX {
        * @sa getTypedElement(size_t) const
        */
       virtual std::string getStringValue(size_t i) const;
-
+      
       virtual void addTextValue(std::string const &val) =0;
     protected:
-      explicit BasicEnumerated(TREX::utils::Symbol const &type) 
-	:DomainBase(type) {}
+      explicit BasicEnumerated(TREX::utils::Symbol const &type)
+      :DomainBase(type) {}
       explicit BasicEnumerated(boost::property_tree::ptree::value_type &node)
-	:DomainBase(node) {}
-
+      :DomainBase(node) {}
+      
       void completeParsing(boost::property_tree::ptree::value_type &node);
-
+      
       virtual std::ostream &print_value(std::ostream &out, size_t i) const =0;
       
     private:
       boost::property_tree::ptree build_tree() const;
-
+      
       void accept(DomainVisitor &visitor) const;
       std::ostream &print_domain(std::ostream &out) const;
       
       boost::any singleton() const {
-	return getElement(0);
+        return getElement(0);
       }
       std::string stringSingleton() const {
-	return getStringValue(0);
+        return getStringValue(0);
       }
     }; // TREX::transaction::BasicEnumerated
-
-
+    
+    
   } // TREX::transaction
 } // TREX 
 

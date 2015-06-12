@@ -11,14 +11,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -28,7 +28,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -53,7 +53,7 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     /** @brief Predicate manipulation error
      *
      * This exception is thrown while an error was detected during
@@ -71,12 +71,12 @@ namespace TREX {
        * Create a new instance with associated message @a msg
        */
       PredicateException(std::string const &msg) throw()
-	:TREX::utils::Exception(msg) {}
+      :TREX::utils::Exception(msg) {}
       /** @brief Destructor */
       ~PredicateException() throw() {}
     }; // TREX::transaction::PredicateException
     
-
+    
     /** @brief TREX Predicate
      *
      * This class defines predicate as manipulated by TREX. A predicate is
@@ -98,20 +98,20 @@ namespace TREX {
     protected:
       /** @brief Type used to store predicate attributes */
       typedef std::map<TREX::utils::Symbol, Variable> attr_set;
-
+      
     public:
       /** @brief Predicate attributes' iterator */
-      typedef attr_set::iterator iterator; 
+      typedef attr_set::iterator iterator;
       /** @brief Predicate attributes' const iterator */
       typedef attr_set::const_iterator const_iterator;
       
       
       static utils::Symbol const &undefined_pred();
       static utils::Symbol const &failed_pred();
-
+      
       /** @brief Destructor */
       virtual ~Predicate() =0;
-
+      
       /** @brief Predicate object
        *
        * This method indicates which object this predicate is associated
@@ -121,7 +121,7 @@ namespace TREX {
        * @return the name of the associated object
        */
       TREX::utils::Symbol const &object() const {
-	return m_object;
+        return m_object;
       }
       /** @brief predicate type
        *
@@ -131,9 +131,9 @@ namespace TREX {
        * @return the type of the predicate
        */
       TREX::utils::Symbol const &predicate() const {
-	return m_type;
+        return m_type;
       }
-
+      
       virtual bool has_temporal_scope() const {
         return false;
       }
@@ -148,7 +148,7 @@ namespace TREX {
        * @sa iterator end()
        */
       iterator begin() {
-	return m_vars.begin();
+        return m_vars.begin();
       }
       /** @brief end of the attributes set
        *
@@ -160,7 +160,7 @@ namespace TREX {
        * @sa iterator begin()
        */
       iterator end() {
-	return m_vars.end();
+        return m_vars.end();
       }
       /** @brief beginning of the attributes set
        *
@@ -172,7 +172,7 @@ namespace TREX {
        * @sa const_iterator end() const
        */
       const_iterator begin() const {
-	return m_vars.begin();
+        return m_vars.begin();
       }
       /** @brief end of the attributes set
        *
@@ -184,9 +184,9 @@ namespace TREX {
        * @sa const_iterator begin() const
        */
       const_iterator end() const {
-	return m_vars.end();
+        return m_vars.end();
       }
-
+      
       /** @brief attribute domain restriction
        * @param name A attribute name
        * @param domain A domain
@@ -198,9 +198,9 @@ namespace TREX {
        * @sa void restrictAttribute(Variable const &)
        * @sa Variable &restrict(Variable const &)
        */
-      void restrictAttribute(TREX::utils::Symbol const &name, 
-			     DomainBase const &domain) {
-	return restrictAttribute(Variable(name, domain));
+      void restrictAttribute(TREX::utils::Symbol const &name,
+                             DomainBase const &domain) {
+        return restrictAttribute(Variable(name, domain));
       }
       /** @brief attribute domain restriction
        * @param var A varaible describing the attribute
@@ -230,18 +230,18 @@ namespace TREX {
        * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const
        */
       bool hasAttribute(TREX::utils::Symbol const &name) const {
-	return end()!=m_vars.find(name);
+        return end()!=m_vars.find(name);
       }
       /** @brief Attribute access
        * @param name The name of an attribute
        * @pre an attribute @a name should exist
-       * @return The varaible corresponding to the attribute @e name 
+       * @return The varaible corresponding to the attribute @e name
        * @throw PredicateException Attribute @e name does not exist
        *
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &) const
        */
-      virtual Variable const &getAttribute(TREX::utils::Symbol const &name) 
-	const;
+      virtual Variable const &getAttribute(TREX::utils::Symbol const &name)
+      const;
       /** @brief Attribute domain access
        * @tparam Ty the type of the domain
        * @param name The name of an attribute
@@ -257,26 +257,26 @@ namespace TREX {
        * @sa Variable &getDomain(TREX::utils::Symbol const &) const
        * @sa template<class Ty> Ty const &Variable::typedDomain() const
        */
-      template<class Ty> 
+      template<class Ty>
       Ty const &getDomain(TREX::utils::Symbol const &name) const {
-	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
-			     DomainBase const &>::value));
-	Variable const &attr = getAttribute(name);
-	return attr.typedDomain<Ty>();
+        BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &,
+                             DomainBase const &>::value));
+        Variable const &attr = getAttribute(name);
+        return attr.typedDomain<Ty>();
       }
       /** @brief Attribute access
        * @param name The name of an attribute
        * @pre an attribute @a name should exist
-       * @return The varaible corresponding to the attribute @e name 
+       * @return The varaible corresponding to the attribute @e name
        * @throw PredicateException Attribute @e name does not exist
        *
-       * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const 
+       * @sa Variable const &getAttribute(TREX::utils::Symbol const &) const
        * @sa template<class Ty> Ty const &getDomain(TREX::utils::Symbol const &)
        */
       Variable const &operator[](TREX::utils::Symbol const &name) const {
-	return getAttribute(name);
+        return getAttribute(name);
       }
-    
+      
       /** @brief List predicate's attributes
        * @brief attr A varaible to store the attribute names
        * @brief all A flag used to indicate whether it should list all
@@ -291,7 +291,7 @@ namespace TREX {
        * @post attr list contains all the attributes appendded to it end
        */
       virtual void listAttributes(std::list<TREX::utils::Symbol> &attr,
-				  bool all=true) const;
+                                  bool all=true) const;
       
       boost::property_tree::ptree as_tree() const {
         return as_tree(true);
@@ -317,26 +317,26 @@ namespace TREX {
       std::ostream &toJSON(std::ostream &out) const {
         return to_json(out);
       }
-
+      
       /** @brief XML parsing factory for predicates
        *
        * This defines a factory that allows to parse Predicate classes
        * from XML.
        */
-      typedef TREX::utils::XmlFactory< Predicate, 
-				       SHARED_PTR<Predicate> > xml_factory;
-
+      typedef TREX::utils::XmlFactory< Predicate,
+      SHARED_PTR<Predicate> > xml_factory;
+      
       /** @brief Check for predicate compatibility
        *
-       * @param[in] other Another predicate 
+       * @param[in] other Another predicate
        *
        * test if @p other can be merged with this instance. Which means that both
-       * tokens shares the same domain and predicate and the intersection of all 
+       * tokens shares the same domain and predicate and the intersection of all
        * their domains is not empty.
        *
        
-
-       * @retval true if @p other can be merged 
+       
+       * @retval true if @p other can be merged
        * @retval false otherwise
        *
        * @note This method do not check the temporal attributes (start,
@@ -344,7 +344,7 @@ namespace TREX {
        */
       bool consistentWith(Predicate const &other) const;
       
-            
+      
     protected:
       /** @brief Constructor
        * @param obj An object name
@@ -356,13 +356,13 @@ namespace TREX {
        * @pre both @e obj and @e pred should not be empty symbols
        * @throw PredicateException One of the argument was empty
        */
-      Predicate(TREX::utils::Symbol const &obj, 
-		TREX::utils::Symbol const &pred)
-	:m_object(obj), m_type(pred) {
-	if( obj.empty() )
-	  throw PredicateException("Empty predicate's object names are not allowed");
-	if( pred.empty() )
-	  throw PredicateException("Empty predicate names are not allowed");	
+      Predicate(TREX::utils::Symbol const &obj,
+                TREX::utils::Symbol const &pred)
+      :m_object(obj), m_type(pred) {
+        if( obj.empty() )
+          throw PredicateException("Empty predicate's object names are not allowed");
+        if( pred.empty() )
+          throw PredicateException("Empty predicate names are not allowed");
       }
       /** @brief Constructor
        * @param node A XML node
@@ -384,7 +384,7 @@ namespace TREX {
        * Create a copy of @a other
        */
       Predicate(Predicate const &other);
-
+      
       /** @brief Search for attribute
        * @param name Attribute name
        *
@@ -393,7 +393,7 @@ namespace TREX {
        * @retval end() if the attribute @e name is not found
        */
       iterator find(TREX::utils::Symbol const &name) {
-	return m_vars.find(name);
+        return m_vars.find(name);
       }
       /** @brief removce an attribute
        * @param i An iterator
@@ -401,9 +401,9 @@ namespace TREX {
        * remove the attribute pointed by @e i
        */
       void remove(iterator const &i) {
-	m_vars.erase(i);
+        m_vars.erase(i);
       }
-
+      
       /** @brief XML tag name
        *
        * This method is used internally to determine the tag that should
@@ -427,14 +427,14 @@ namespace TREX {
       TREX::utils::Symbol m_type;
       /** @brief Associated attributes */
       attr_set m_vars;
-
+      
 # ifndef DOXYGEN
       // No code for following methods
       Predicate() DELETED;
 # endif
-
+      
     }; // TREX::transaction::Predicate
-
+    
   } // TREX::transaction
 } // TREX
 

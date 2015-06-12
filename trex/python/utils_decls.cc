@@ -357,7 +357,7 @@ void export_utils() {
   ("errno_except", "Exception with a POSIX errno", no_init);
   
   errno_e.add_property("errno", &TREX::utils::ErrnoExcept::get_errno,
-                "The value of errno during the error")
+                       "The value of errno during the error")
   ;
   s_py_err->attach<TREX::utils::ErrnoExcept>(errno_e.ptr());
   
@@ -367,9 +367,10 @@ void export_utils() {
   //   can be compared to each other with (==,!=,<,>,<=,=>)
   //   can be checked if empty()q
   //   supports str(s) and len(s)
-  class_<TREX::utils::Symbol>("symbol", "Unique instance symbolic value",
-                              init<optional<std::string> >(args("self", "name"),
-                                                           "Create a new symbol with the given name"))
+  class_<TREX::utils::Symbol>
+  ("symbol", "Unique instance symbolic value",
+   init<optional<std::string> >(args("self", "name"),
+                                "Create a new symbol with the given name"))
    .add_property("empty", &TREX::utils::Symbol::empty,
         "Test if current instance is the empty symbol")
    .def("__len__", &TREX::utils::Symbol::length, arg("self"),
@@ -393,6 +394,17 @@ void export_utils() {
   // python string can be implicitly converted into trex.symbol
   implicitly_convertible<std::string, TREX::utils::Symbol>();
   
+  class_<boost::bad_optional_access> opt_e
+  ("bad_optional_access",
+   "Exception on bad access to null optional value",
+   no_init);
+  
+  opt_e.add_property("what", &boost::bad_optional_access::what,
+                     "Error message")
+  .def("__str__", &boost::bad_optional_access::what);
+  
+  s_py_err->attach<boost::bad_optional_access>(opt_e.ptr());
+  
   
   // trex.utils.log_entry class
   // Log message entry
@@ -402,26 +414,28 @@ void export_utils() {
   //   - source() : the source of the entry (symbol)
   //   - kind() : the type of the entry (symbol, either "INFO", "WARN", ...)
   //   - content() : the message content as a string
-  class_<TREX::utils::log::entry, TREX::utils::log::entry::pointer>("log_entry",
-                                                                    "A single log entry message", no_init)
-  .add_property("is_dated", &TREX::utils::log::entry::is_dated, "Check if dated")
+  class_<TREX::utils::log::entry, TREX::utils::log::entry::pointer>
+  ("log_entry", "A single log entry message", no_init)
+  .add_property("is_dated", &TREX::utils::log::entry::is_dated,
+                "A bool indicating fi this message has a date")
   .add_property("date",
                 make_function(&TREX::utils::log::entry::date, return_value_policy<copy_const_reference>()),
-                "entry production date.\n"
-                "valid only if is_dated is True"
+                "Entry production date.\n"
+                "Raises:\n"
+                "  bad_optional_access: self.is_dated is False"
                 )
   .add_property("source",
                 make_function(&TREX::utils::log::entry::source, return_internal_reference<>()),
-                "entry producer name")
+                "Name of the entry producer name")
   .add_property("kind",
                 make_function(&TREX::utils::log::entry::kind,return_internal_reference<>()),
                 "entry type (such as info, warn, error,...)")
   .add_property("content",
                 make_function(&TREX::utils::log::entry::content, return_value_policy<copy_const_reference>()),
-                "entry message content"
+                "Message content for this entry"
                 )
   ;
-
+  
   // trex.utils.log class
   // simple log manager
   //   - constructor takes a symbol which will prefix any log messages produced by this class
@@ -431,10 +445,15 @@ void export_utils() {
   //   - add_path adds the path passed as argument to the trex search path
   //   - use_file locates the file passed as argument in trex search path and return its path if found
   //   - info, wran, error produces the string passed as argument as a log message
-  class_< log_wrapper, boost::shared_ptr<log_wrapper> >("log", "Log message producer for trex", init<TREX::utils::Symbol>(args("self, ""name"), "Create a new logger with the given source name"))
-  .add_property("name", make_getter(&log_wrapper::m_name, return_internal_reference<>()),
+  class_< log_wrapper, boost::shared_ptr<log_wrapper> >
+  ("log", "Log message producer for trex",
+   init<TREX::utils::Symbol>(args("self","name"),
+                             "Create a new logger with the given source name"))
+  .add_property("name", make_getter(&log_wrapper::m_name,
+                                    return_internal_reference<>()),
                 "Name of this log producer")
-  .add_property("dir", &log_wrapper::get_log_dir, &log_wrapper::set_log_dir,
+  .add_property("dir", &log_wrapper::get_log_dir,
+                &log_wrapper::set_log_dir,
                 "TREX log directory")
   .add_property("path", &log_wrapper::path,
                 "TREX file search path")
@@ -442,7 +461,8 @@ void export_utils() {
        "Search for a file.\n"
        "This method locate the file file_name in TREX_PATH.\n"
        "If the file is found it copies it in the log directory and\n"
-       "return its valid name. Otherwise it returns an empty string")
+       "return its valid name.\n"
+       "Otherwise it returns an empty string.")
   .def("info", &log_wrapper::info, args("self","msg"),
        "Produces the log message msg into trex log as an info message")
   .def("warn", &log_wrapper::warn, args("self","msg"),
@@ -479,50 +499,87 @@ void export_utils() {
   .add_property("connected", &py_log_handler::connected,
                 "Checks if the handler is still active")
   .def("disconnect", &py_log_handler::disconnect, (arg("self")),
-       "Disconnect this handler making it inactive. As fo today there's \n"
-       "no way to reenable a disconnected handler.")
+       "Disconnect this handler making it inactive.\n"
+       "As of today there's no way to reenable a disconnected handler.")
   .def("new_entry", pure_virtual(&py_log_handler::new_entry), args("self","entry"),
-       "New entry callback.\n"
+       "New entry callback.\n\n"
        "This method is called by trex whenever a new log entry has been \n"
        "produced. This method is pure virtual and therefore need to be \n"
-       "redefined in a python derived class.\n"
+       "redefined in a python derived class.\n\n"
        "Note also that this method is called in a different thread than \n"
-       "the one where python is running: trex ensure basic thread safety\n"
-       "with python interpreter and guarantee that this method is not \n"
-       "called twice concurrently. Still implementer should consider \n"
-       "that any operation done in this method can be concurrent to any\n"
-       "python code and protect accordingly data shared with this\n"
-       "method.")
+       "the one where python is running:\n"
+       " - trex ensure basic thread safety with python interpreter and\n"
+       "   guarantee that this method is not called twice concurrently.\n"
+       " - Still implementer should consider that any operation done in\n"
+       "   this method can be concurrent to any python code and protect\n"
+       "   accordingly data shared with this method.")
   ;
+  
+  class_<bp::ptree_error> pt_e
+  ("ptree_error", "Exception related to xml tree", no_init);
+  
+  pt_e.add_property("what", &bp::ptree_error::what,
+                    "Error message")
+  .def("__str__", &bp::ptree_error::what);
+  
+  s_py_err->attach<bp::ptree_error>(pt_e.ptr());
+  
+  class_<bp::ptree_bad_path, bases<bp::ptree_error> > pt_path_e
+  ("xml_bad_path", "Exception for inexistent xml path", no_init);
+  
+  s_py_err->attach<bp::ptree_bad_path>(pt_path_e.ptr());
 
   // Very simple classes to manipulate xml property trees
   
-  class_<bp::ptree::value_type> tag("xml_tag",
-                                    "XML configuration tree element.\n"
-                                    "Represent an XML tag as a pair of its tag name and sub xml trees forest.\n"
-                                    "Additionally ot provides utilities to ease the access to the tag\n"
-                                    "attributes",
-                                    no_init);
+  class_<bp::ptree::value_type>
+  tag("xml_tag",
+      "XML configuration tree element.\n\n"
+      "Represent an XML tag as a pair of its tag name and sub xml trees forest.\n", no_init);
+  
   tag.add_property("tag", make_getter(&bp::ptree::value_type::first),
           "Name of the tag")
   .def("has_attribute", &has_attribute, args("self","attr_name"),
        "Check if this tag have the attribute attr_name")
   .def("attribute", &attribute, args("self", "attr_name"),
-       "Extract the value of the tag attribute attr_name")
+       "Extract the value of the tag attribute attr_name\n\n"
+       "Raises:\n"
+       "  xml_bad_path: this attribute does not exist")
   ;
+  
+  class_<bp::xml_parser_error, bases<bp::ptree_error> > xml_parse_e
+  ("xml_parse_error", "Exception for XML parsing error", no_init);
+  
+  s_py_err->attach<bp::xml_parser_error>(xml_parse_e.ptr());
 
+  class_<bp::json_parser_error, bases<bp::ptree_error> > js_parse_e
+  ("json_parse_error", "Exception for JSON parsing error", no_init);
+  
+  s_py_err->attach<bp::json_parser_error>(js_parse_e.ptr());
+
+  class_<TREX::utils::XmlError, bases<TREX::utils::Exception> > xml_e
+  ("xml_error", "Exceptions related to XML handling by TREX",
+   init<bp::ptree::value_type, std::string>(args("self", "tag", "msg"),
+                                            "Create an exception for xml element"
+                                            " tag with the error message msg"));
+  
   class_<bp::ptree>("xml", "XML configuration tree", no_init)
   .def("from_str", &xml_from_string,
        arg("xml_text"),
-       "Parses the XML string xml_text to a new xml tree").staticmethod("from_str")
+       "Parses the XML string xml_text to a new xml tree\n\n"
+       "Raises:\n"
+       "  xml_parse_error: Error while parsing XML").staticmethod("from_str")
   .def("from_file", &xml_from_file,
        arg("file_name"),
-       "Parses the xml file name from_file into a new xml tree").staticmethod("from_file")
+       "Parses the xml file name from_file into a new xml tree\n\n"
+       "Raises:\n"
+       "  xml_parse_error: Error while parsing XML").staticmethod("from_file")
   .def("from_json", &json_from_string, arg("json_text"),
-       "Parse the JSON text json_text into an xml tree.\n"
+       "Parse the JSON text json_text into an xml tree.\n\n"
        "while JSON is not XML the class we use in trex to parse xml\n"
-       "is boost.property_tree. This function iexists just ofr the sake\n"
-       "of testing JSON as an alternate to trex xml format").staticmethod("from_json")
+       "is boost.property_tree. This function exists just for the sake\n"
+       "of testing JSON as an alternate to trex xml format.\n\n"
+       "Raises:\n"
+       "  json_parse_error: Error during JSON parsing").staticmethod("from_json")
   .add_property("content",
                 make_function(static_cast<std::string const &(bp::ptree::*)() const>(&bp::ptree::data),
                               return_value_policy<copy_const_reference>()),
@@ -531,29 +588,31 @@ void export_utils() {
        "String conversion. Display this instance in XML ")
   .def("__iter__", iterator<bp::ptree>(),
        "An iterator through the tree xml_tags")
-  .def("__len__", &bp::ptree::size, (arg("self")), "Number of tags for this tree")
-  .add_property("empty", &bp::ptree::empty, "Check if empty")
+  .def("__len__", &bp::ptree::size, (arg("self")),
+       "Number of tags for this tree")
+  .add_property("empty", &bp::ptree::empty,
+                "Check if empty")
   .def("ext_file", &TREX::utils::ext_xml,
-       (arg("self"), "attribute", arg("ahead")=true),
-       "Inject external content.\n"
+       (arg("self"), arg("attribute"), arg("ahead")=true),
+       "Inject external content.\n\n"
        "This method allow to inject the XML content of the file pointed\n"
        "by the given xml attribute into this tree. The ahead flag\n"
        "allow to inject the new nodes either at the beginning of this \n"
        "instance or toward its end. This function is used heavily in \n"
        "trex code to allow to distribute a mission configuration \n"
-       "between multiple files.")
-  .def("json", &xml_to_json, (arg("self")), "Display the tree as a JSON string")
+       "between multiple files.\n\n"
+       "Raises:\n"
+       "  errno_except: unable to locate the file referred by attribute\n"
+       "  xml_parser_error: Failed to parse file as XML\n"
+       "  xml_error: the file is empty")
+  .def("json", &xml_to_json, (arg("self")),
+       "Display the tree as a JSON string")
   ;
   
   tag.add_property("forest", make_getter(&bp::ptree::value_type::second),
                    "allow to iterate on this tag sub elements.")
   ;
   
-  class_<TREX::utils::XmlError, bases<TREX::utils::Exception> > xml_e
-  ("xml_error", "Exceptions related to XML parsing",
-  init<bp::ptree::value_type, std::string>(args("self", "tag", "msg"),
-                                           "Create an exception for xml element"
-                                           " tag with the error message msg"));
   
   s_py_err->attach<TREX::utils::XmlError>(xml_e.ptr());
 

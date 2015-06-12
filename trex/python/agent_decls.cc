@@ -122,7 +122,10 @@ void export_agent() {
                              "percent_use is internal and indicate how much of a tick\n"
                              "         is allowed for the agent to execute reactors.\n"
                              "          passed this amount the agent will then try to put\n"
-                             "          the reactors to sleep"))
+                             "          the reactors to sleep\n\n"
+                             "Raises:\n"
+                             "  trex.utils.exception: either period or percent use\n"
+                             "                        is invalid"))
   ;
   
   implicitly_convertible<SHARED_PTR<ta::RealTimeClock>, ta::clock_ref>();
@@ -164,14 +167,24 @@ void export_agent() {
   .add_property("final_tick", &ta::Agent::finalTick,
                 "Final tick after which the agent will complete")
   .def("initialize", &ta::Agent::initComplete, arg("self"),
-       "complete agent initialization.\n"
-       "precondition: the agent has a clock")
+       "complete agent initialization.\n\n"
+       "Raises:\n"
+       "  agent_exception: something went wrong during initialization.")
   .def("run", &ta::Agent::run, arg("self"),
-       "run the agent until completion")
+       "run the agent until completion.\n\n"
+       "Note: run calls initialize on its own so you do not need to\n\n"
+       "Raise:\n"
+       "   agent_exception: something went wrong during the init\n"
+       "   trex.util.exception: something went wrong during the run\n"
+       "   ...: any exception that could be trown by a reactor."
+       )
   .def("step", &ta::Agent::doNext, arg("self"),
-       "run one tick for the agent.\n"
-       "NOTE: this method is for simulation purpose and not recommended\n"
-       "      to be used. Often it is better to call self.run() instead."
+       "run one tick for the agent.\n\n"
+       "Note: this method is for simulation purpose and not recommended\n"
+       "      to be used. Often it is better to call self.run() instead.\n\n"
+       "Raise:\n"
+       "   trex.util.exception: something went wrong during the run\n"
+       "   ...: any exception that could be trown by a reactor."
        )
   ;
   
