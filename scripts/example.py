@@ -42,8 +42,8 @@ class example_publisher(transaction.reactor):
         o.restrict(domains.var('test', domains.bool(True)));
         # print 'add attribute int int_interval=[5, 10]'
         o.restrict(domains.var('int_interval', domains.int(5, 10)));
-        # print 'add attribute int int_interval=[9, 20]'
-        o.restrict(domains.var('int_interval', domains.int(9, 20)));
+        # uncomment this to test exceptions: should work just need more exception types
+        # o.restrict(domains.var('int_interval', domains.int(11, 20)));
         # if tick is a ,multiple of 3 then post nothing
         if self.tick%3>0:
             # post this observation at any tick that is not divisible by 3
@@ -60,12 +60,12 @@ if __name__ == "__main__":
     import signal
     import sys
 
-    # Properly handling a ^C allow to more csmoothly stop trex
-    def signal_handler(signal, frame):
-        # ideally I should send some stop event to TREX
-        sys.exit(0)
+    # # Properly handling a ^C allow to more csmoothly stop trex
+    # def signal_handler(signal, frame):
+    #     # ideally I should send some stop event to TREX
+    #     sys.exit(0)
         
-    signal.signal(signal.SIGINT, signal_handler)
+    # signal.signal(signal.SIGINT, signal_handler)
 
     print('Trex version {}'.format(trex.version.str))
     # Now a simple way to create an agent and inject this new reactor in it

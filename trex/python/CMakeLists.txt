@@ -47,11 +47,13 @@ if(WITH_PYTHON)
     # First we need the library that define trex python_reactor class
     add_library(TREXpython SHARED 
       # C++ source
+      exception_helper.cc
       python_reactor.cc
       python_thread.cc
       # headers
       python_reactor.hh
-      python_thread.hh)
+      python_thread.hh
+      exception_helper.hh)
     target_link_libraries(TREXpython TREXtransaction ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
     trex_lib(TREXpython core)
 

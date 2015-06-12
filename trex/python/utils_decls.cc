@@ -44,6 +44,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include "python_thread.hh"
+#include "exception_helper.hh"
 
 #include <functional>
 
@@ -53,6 +54,7 @@ namespace bp=boost::property_tree;
 namespace {
   
   TREX::utils::SingletonUse<TREX::utils::LogManager> s_log;
+  TREX::utils::SingletonUse<TREX::python::exception_table>  s_py_err;
 
   class log_wrapper {
   public:
@@ -309,7 +311,7 @@ namespace {
   std::string symbol_rep(TREX::utils::Symbol const &s) {
     return "<trex.utils.symbol '"+s.str()+"'>";
   }
-
+  
 }
 
 
@@ -335,6 +337,20 @@ void export_utils() {
   "All of these objects are directly related to a class -- or set f classes --\n"
   "from TREXutils C++ library."
   ;
+  
+
+  
+  class_<TREX::utils::Exception> except
+  ("exception", "Exceptions from trex",
+   init<std::string>(args("self", "msg"),
+                     "Create a new exception with the associated message msg"));
+  except.add_property("what", &TREX::utils::Exception::what,
+                      "Message for this exception")
+  .def("__str__", &TREX::utils::Exception::what)
+  .def("__repr__", &TREX::utils::Exception::what);
+  //TREX::python::exception_helper<TREX::utils::Exception>(except.ptr());
+
+  s_py_err->attach<TREX::utils::Exception>(except.ptr());
   
   // trex.utils.symbol class
   //   can be created with a string

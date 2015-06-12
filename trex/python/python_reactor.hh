@@ -35,6 +35,7 @@
 # define H_trex_python_python_reactor
 
 # include <trex/transaction/TeleoReactor.hh>
+# include "exception_helper.hh"
 
 # include <boost/python.hpp>
 
@@ -111,39 +112,6 @@ namespace TREX {
       reactor_proxy();
     };
     
-    class py_reactor :public transaction::TeleoReactor {
-    public:
-      py_reactor(xml_arg_type arg);
-      ~py_reactor();
-      
-    private:
-      void set_proxy(reactor_proxy *self);
-      void detach(reactor_proxy *self);
-      reactor_proxy &self();
-      
-      void handleInit();
-      void handleRequest(transaction::goal_id const &g);
-      void handleRecall(transaction::goal_id const &g);
-      void handleTickStart();
-      void notify(transaction::Observation const &o);
-      bool synchronize();
-      bool hasWork();
-      void resume();
-      void newPlanToken(transaction::goal_id const &g);
-      void cancelledPlanToken(transaction::goal_id const &g);
-      
-      void unpack_error(utils::Symbol const &context,
-                        boost::python::error_already_set const &e,
-                        bool re_throw=true);
-      
-      boost::python::object m_obj;
-      typedef boost::mutex  mutex_type;
-      mutable mutex_type    m_mtx;
-      reactor_proxy         *m_self;
-      
-      friend class reactor_proxy;
-    };
-    
     class reactor_wrap:public reactor_proxy,
     public boost::python::wrapper<reactor_proxy> {
     public:
@@ -170,6 +138,34 @@ namespace TREX {
       void cancelled_plan(transaction::goal_id const &g);
       void cancelled_plan_default(transaction::goal_id const &g);
     };
+   
+    class py_reactor :public transaction::TeleoReactor {
+    public:
+      py_reactor(xml_arg_type arg);
+      ~py_reactor();
+      
+    private:
+      void set_proxy(reactor_proxy *self);
+      void detach(reactor_proxy *self);
+      reactor_proxy &self();
+      
+      void handleInit();
+      void handleRequest(transaction::goal_id const &g);
+      void handleRecall(transaction::goal_id const &g);
+      void handleTickStart();
+      void notify(transaction::Observation const &o);
+      bool synchronize();
+      bool hasWork();
+      void resume();
+      void newPlanToken(transaction::goal_id const &g);
+      void cancelledPlanToken(transaction::goal_id const &g);
+      
+      boost::python::object m_obj;
+      TREX::utils::SingletonUse<exception_table> m_exc;
+      
+      friend class reactor_proxy;
+    };
+    
     
     
     
