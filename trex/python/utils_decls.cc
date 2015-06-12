@@ -347,10 +347,20 @@ void export_utils() {
   except.add_property("what", &TREX::utils::Exception::what,
                       "Message for this exception")
   .def("__str__", &TREX::utils::Exception::what)
-  .def("__repr__", &TREX::utils::Exception::what);
-  //TREX::python::exception_helper<TREX::utils::Exception>(except.ptr());
+//  .def("__repr__", &TREX::utils::Exception::what)
+  ;
 
   s_py_err->attach<TREX::utils::Exception>(except.ptr());
+  
+  
+  class_<TREX::utils::ErrnoExcept, bases<TREX::utils::Exception> > errno_e
+  ("errno_except", "Exception with a POSIX errno", no_init);
+  
+  errno_e.add_property("errno", &TREX::utils::ErrnoExcept::get_errno,
+                "The value of errno during the error")
+  ;
+  s_py_err->attach<TREX::utils::ErrnoExcept>(errno_e.ptr());
+  
   
   // trex.utils.symbol class
   //   can be created with a string
@@ -538,6 +548,15 @@ void export_utils() {
   tag.add_property("forest", make_getter(&bp::ptree::value_type::second),
                    "allow to iterate on this tag sub elements.")
   ;
+  
+  class_<TREX::utils::XmlError, bases<TREX::utils::Exception> > xml_e
+  ("xml_error", "Exceptions related to XML parsing",
+  init<bp::ptree::value_type, std::string>(args("self", "tag", "msg"),
+                                           "Create an exception for xml element"
+                                           " tag with the error message msg"));
+  
+  s_py_err->attach<TREX::utils::XmlError>(xml_e.ptr());
+
   
 } // export_utils()
 

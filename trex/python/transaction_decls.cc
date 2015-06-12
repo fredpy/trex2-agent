@@ -40,6 +40,9 @@ using namespace TREX::transaction;
 using namespace TREX::utils;
 
 namespace {
+  
+  SingletonUse<exception_table>  s_py_err;
+
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
@@ -151,6 +154,11 @@ void export_transactions() {
   .staticmethod("from_xml")
   ;
   
+  bp::class_<PredicateException, bp::bases<Exception> > pred_e
+  ("predicate_error", "Exception related to predicate", bp::no_init);
+  
+  s_py_err->attach<PredicateException>(pred_e.ptr());
+  
   
   /*
    * class obs(predicate):
@@ -234,6 +242,18 @@ void export_transactions() {
   .def("date_str", &graph::date_str, bp::args("self", "tick"),
        "convert a tick into a date string")
   ;
+  
+  bp::class_<GraphException, bp::bases<Exception> > graph_e
+  ("graph_exception", "Exceptions related to graph", bp::no_init);
+  
+  s_py_err->attach<GraphException>(graph_e.ptr());
+  
+  bp::class_<MultipleReactors, bp::bases<GraphException> > mul_r_e
+  ("multiple_reactors",
+   "Exception thrown when multiple reactors in a graph have the same name",
+   bp::no_init);
+  
+  s_py_err->attach<MultipleReactors>(mul_r_e.ptr());
   
   bp::class_<py_wrapper>
   ("reactor_anchor", "Internal anchor for a python reactor", bp::no_init);
@@ -461,6 +481,32 @@ void export_transactions() {
        bp::args("self", "ticks"),
        "VConvert the number of ticks into seconds")
   ;
+  
+  bp::class_<ReactorException, bp::bases<GraphException> > react_e
+  ("reactor_exception", "Exception related to reactor",
+   bp::init<TeleoReactor const &, std::string const &>(bp::args("self", "r", "msg"), "Create a new instance from reactor r with error message msg"));
+  
+  s_py_err->attach<ReactorException>(react_e.ptr());
+  
+  bp::class_<DispatchError, bp::bases<ReactorException> > disp_e
+  ("dispatch_error", "Exception signaling an invalid goal request", bp::no_init);
+  
+  s_py_err->attach<DispatchError>(disp_e.ptr());
+  
+  bp::class_<MultipleInternals, bp::bases<ReactorException> > mult_i_e
+  ("multiple_internals",
+   "Exception signaling that a timeline was declared as internal\n"
+   "by more than one reactor",
+   bp::no_init);
+  
+  s_py_err->attach<MultipleInternals>(mult_i_e.ptr());
+  
+  bp::class_<SynchronizationError, bp::bases<ReactorException> > synch_e
+  ("synchronization_error",
+   "Exception thrown on errors relasted to reactor synchronization",
+   bp::no_init);
+  
+  s_py_err->attach<SynchronizationError>(synch_e.ptr());
   
   
   

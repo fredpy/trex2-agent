@@ -38,12 +38,17 @@
 
 #include <boost/python.hpp>
 
+#include "exception_helper.hh"
+
 using namespace boost::python;
 namespace ta=TREX::agent;
 namespace tt=TREX::transaction;
 namespace tu=TREX::utils;
 
 namespace {
+  
+  tu::SingletonUse<TREX::python::exception_table>  s_py_err;
+
 
   bool set_agent_clock(ta::Agent *agent, ta::clock_ref const &c) {
     if( agent->setClock(c) ) {
@@ -101,6 +106,12 @@ void export_agent() {
   .def("__str__", &ta::Clock::info, arg("self"),
        "Display basic information about this clock.\n")
   ;
+  
+  class_<ta::Clock::Error, bases<tu::Exception> > clock_e
+  ("clock_error", "exception on clock errors", no_init);
+  
+  s_py_err->attach<ta::Clock::Error>(clock_e.ptr());
+  
   
   class_<ta::RealTimeClock, bases<ta::Clock>, SHARED_PTR<ta::RealTimeClock>,
 	 boost::noncopyable>
@@ -163,6 +174,16 @@ void export_agent() {
        "      to be used. Often it is better to call self.run() instead."
        )
   ;
+  
+  class_<ta::AgentException, bases<tt::GraphException> > agent_e
+  ("agent_exception", "Agent related exceptions", no_init);
+  
+  s_py_err->attach<ta::AgentException>(agent_e.ptr());
+  
+  class_<ta::CycleDetected, bases<ta::AgentException> > cycle_e
+  ("cycle_detected", "detected cyclic dependecy between reactors", no_init);
+  
+  s_py_err->attach<ta::CycleDetected>(cycle_e.ptr());
   
   
 }

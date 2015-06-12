@@ -41,12 +41,17 @@
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 
+#include "exception_helper.hh"
+
 using namespace boost::python;
 
 namespace tu=TREX::utils;
 namespace tt=TREX::transaction;
 
 namespace {
+  
+  tu::SingletonUse<TREX::python::exception_table>  s_py_err;
+
   
   struct domain_wrapper:tt::DomainBase, wrapper<tt::DomainBase> {
     domain_wrapper(tu::Symbol const &name)
@@ -307,6 +312,23 @@ void export_domain() {
        "serialize self into a human-readable string")
   ;
   
+  class_<tt::DomainExcept, bases<tu::Exception> > dom_e
+  ("domain_except", "Exceptions related to domains", no_init);
+  
+  s_py_err->attach<tt::DomainExcept>(dom_e.ptr());
+
+  class_<tt::DomainAccess, bases<tt::DomainExcept> > acc_e
+  ("access_error", "Invalid domain access error", no_init);
+  
+  s_py_err->attach<tt::DomainAccess>(acc_e.ptr());
+  
+  class_<tt::EmptyDomain, bases<tt::DomainExcept> > empty_e
+  ("empty_domain", "Domain became empty", no_init);
+  
+  s_py_err->attach<tt::EmptyDomain>(empty_e.ptr());
+  
+  
+  
   // class trex.domains.interval: trex.domains.domain
   //  abstract interval interface
   //    - has_lower() check if interval has a non infinite lower bound
@@ -455,6 +477,11 @@ void export_domain() {
        "Serialize this variable inot a human-readable string")
   ;
 
+  class_<tt::VariableException, bases<tu::Exception> > var_e
+  ("variable_exception", "Exception related to var", no_init);
+  
+  s_py_err->attach<tt::VariableException>(var_e.ptr());
+  
 }
 
 
