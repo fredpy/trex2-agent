@@ -48,6 +48,14 @@
 
 #include <functional>
 
+#undef TX_BOOST_HAS_BAD_OPTIONAL
+
+#if (BOOST_VERSION >= 105600)
+// Bad optional access was introduced on 1.56.0
+# define TX_BOOST_HAS_BAD_OPTIONAL
+#endif // BOOST_VERSION
+
+
 using namespace boost::python;
 namespace bp=boost::property_tree;
 
@@ -393,7 +401,8 @@ void export_utils() {
     
   // python string can be implicitly converted into trex.symbol
   implicitly_convertible<std::string, TREX::utils::Symbol>();
-  
+ 
+#ifdef TX_BOOST_HAS_BAD_OPTIONAL
   class_<boost::bad_optional_access> opt_e
   ("bad_optional_access",
    "Exception on bad access to null optional value",
@@ -404,6 +413,7 @@ void export_utils() {
   .def("__str__", &boost::bad_optional_access::what);
   
   s_py_err->attach<boost::bad_optional_access>(opt_e.ptr());
+#endif // TX_BOOST_HAS_BAD_OPTIONAL
   
   
   // trex.utils.log_entry class
@@ -421,8 +431,14 @@ void export_utils() {
   .add_property("date",
                 make_function(&TREX::utils::log::entry::date, return_value_policy<copy_const_reference>()),
                 "Entry production date.\n"
+#ifdef TX_BOOST_HAS_BAD_OPTIONAL
                 "Raises:\n"
                 "  bad_optional_access: self.is_dated is False"
+#else // !TX_BOOST_HAS_BAD_OPTIONAL
+                "Note:\n"
+                "  If self.is_dated is False that value of this\n"
+                "  attribute is undefined."
+#endif
                 )
   .add_property("source",
                 make_function(&TREX::utils::log::entry::source, return_internal_reference<>()),
