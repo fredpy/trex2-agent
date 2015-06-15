@@ -58,8 +58,8 @@ namespace TREX {
       TREX::transaction::Observation m_lastReference;
       TREX::transaction::Observation m_lastPosition;
 
-      double m_lat, m_lon, m_minz, m_maxz, m_speed, m_cmdz;
-      int m_time_at_surface;
+      double m_lat, m_lon, m_minz, m_maxz, m_speed, m_cmdz, m_pitch;
+      int m_time_at_surface, m_time_underwater;
       ReferenceRequest m_lastSentRef, m_lastSeenRef;
 
       void handleInit();

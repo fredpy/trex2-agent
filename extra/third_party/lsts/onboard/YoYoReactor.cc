@@ -33,16 +33,19 @@ namespace TREX {
     utils::Symbol const YoYoReactor::s_yoyo_state_tl("yoyo_state");
 
     YoYoReactor::YoYoReactor(TeleoReactor::xml_arg_type arg) :
-      LstsReactor(arg),
-      m_lastRefState(s_refstate_tl, "Failed"),
-      m_lastControl(s_control_tl, "Failed"),
-      m_lastReference(s_reference_tl, "Failed"),
-      m_lastPosition(s_position_tl, "Failed")
+              LstsReactor(arg),
+              m_lastRefState(s_refstate_tl, "Failed"),
+              m_lastControl(s_control_tl, "Failed"),
+              m_lastReference(s_reference_tl, "Failed"),
+              m_lastPosition(s_position_tl, "Failed")
     {
+
+      m_pitch = Angles::radians(parse_attr<double>(15, TeleoReactor::xml_factory::node(arg),
+                                                   "pitch"));
+
       m_lat = m_lon = m_speed = m_minz = m_maxz = -1;
       m_time_at_surface = 0;
       m_cmdz = 0;
-
       state = IDLE;
       use(s_reference_tl, true);
       use(s_refstate_tl, false);
@@ -95,9 +98,10 @@ namespace TREX {
     bool
     YoYoReactor::synchronize()
     {
-      bool nearXY = false, nearZ = false, nearBottom = false;
+      bool nearXY = false, nearZ = false, nearBottom = false, nearEnd = false;
+      double dist_to_target = 10000;
+
       Variable v;
-      // int secs_at_surface = 60; //< unused variable
 
       if (m_lastPosition.hasAttribute("altitude"))
       {
@@ -119,9 +123,20 @@ namespace TREX {
         printReference(m_lastSentRef);
         return true;
       }
-      /*else {
-        std::cerr << "Requested at " << m_lastSentRef.tick << " and started at " << m_lastSeenRef.tick << std::endl;
-      }*/
+
+      if (m_lastPosition.hasAttribute("latitude") && m_lastPosition.hasAttribute("longitude") && m_lastPosition.hasAttribute("depth"))
+      {
+        Variable lat = m_lastPosition.getAttribute("latitude");
+        Variable lon = m_lastPosition.getAttribute("longitude");
+        Variable depth = m_lastPosition.getAttribute("depth");
+
+        double cur_lat = lat.domain().getTypedSingleton<double,0>();
+        double cur_lon = lon.domain().getTypedSingleton<double,0>();
+        double cur_depth = depth.domain().getTypedSingleton<double,0>();
+
+        dist_to_target = WGS84::distance(cur_lat, cur_lon, 0, m_lat, m_lon, 0);
+        nearEnd = dist_to_target < (cur_depth / std::tan(m_pitch));
+      }
 
       double atZ = -1000;
       if (m_lastPosition.hasAttribute("z"))
@@ -159,10 +174,13 @@ namespace TREX {
         }
       }
 
+      syslog(log::info) << "nearZ: " << nearZ<< ", atZ: "<< atZ << ", nearXY: " << nearXY << ", nearEnd: " <<
+          nearEnd << ", nearBottom: "<<nearBottom << std::endl;
+
       switch(state)
       {
         case (ASCEND):
-            m_time_at_surface  = 0;
+                    m_time_at_surface  = 0;
 
         if (nearXY)
         {
@@ -179,34 +197,34 @@ namespace TREX {
         break;
 
         case (DESCEND):
-        m_time_at_surface  = 0;
+                m_time_at_surface  = 0;
         if (nearXY)
         {
           syslog(log::info)<< "Arrived. now surfacing...";
           requestReference(m_lat, m_lon, m_speed, 0);
           state = SURFACE;
         }
-        else if (nearZ || nearBottom)
+        else if (nearZ || nearBottom || nearEnd)
         {
-          syslog(log::info)<< "Arrived at max depth, now going up...";
+          syslog(log::info)<< "Now going up...";
           requestReference(m_lat, m_lon, m_speed, m_minz);
           state = ASCEND;
         }
         break;
 
         case (SURFACE):
-        if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
-        {
-          syslog(log::info)<< "Finished executing yoyo...";
-          Observation obs = Observation(s_yoyo_tl, "Done");
-          obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
-          obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
-          obs.restrictAttribute("speed", FloatDomain(m_speed, m_speed));
-          obs.restrictAttribute("max_z", FloatDomain(m_maxz, m_maxz));
-          obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
-          postUniqueObservation(obs);
-          state = IDLE;
-        }
+                if (m_lastReference.predicate() == "At" && nearXY && nearZ) // arrived at destination
+                {
+                  syslog(log::info)<< "Finished executing yoyo...";
+                  Observation obs = Observation(s_yoyo_tl, "Done");
+                  obs.restrictAttribute("latitude", FloatDomain(m_lat, m_lat));
+                  obs.restrictAttribute("longitude", FloatDomain(m_lon, m_lon));
+                  obs.restrictAttribute("speed", FloatDomain(m_speed, m_speed));
+                  obs.restrictAttribute("max_z", FloatDomain(m_maxz, m_maxz));
+                  obs.restrictAttribute("min_z", FloatDomain(m_minz, m_minz));
+                  postUniqueObservation(obs);
+                  state = IDLE;
+                }
         break;
         default:
           syslog(log::info)<< "Just idling...";
@@ -217,17 +235,17 @@ namespace TREX {
       switch (state)
       {
         case (DESCEND):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Descending"));
-          break;
+                  postUniqueObservation(Observation(s_yoyo_state_tl, "Descending"));
+        break;
         case (ASCEND):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Ascending"));
-          break;
+                  postUniqueObservation(Observation(s_yoyo_state_tl, "Ascending"));
+        break;
         case (SURFACE):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Surfacing"));
-          break;
+                  postUniqueObservation(Observation(s_yoyo_state_tl, "Surfacing"));
+        break;
         case (IDLE):
-          postUniqueObservation(Observation(s_yoyo_state_tl, "Idle"));
-          break;
+                  postUniqueObservation(Observation(s_yoyo_state_tl, "Idle"));
+        break;
       }
 
       return true;
@@ -242,8 +260,6 @@ namespace TREX {
       g.restrictAttribute(Variable("longitude", FloatDomain(lon)));
       g.restrictAttribute(Variable("z", FloatDomain(z)));
       g.restrictAttribute(Variable("speed", FloatDomain(speed)));
-
-      //std::cerr << "[YOYO] Sent reference request (" << lat << ", " << lon << ", " << speed << ", " << z << ")" << std::endl;
 
       postGoal(g);
 
