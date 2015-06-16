@@ -33,8 +33,6 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_subdirectory(mbari) # MBARI specific components
-
 # LSTS AUV component
 option(WITH_LSTS "Use LSTS plugin" OFF)
 # mark_as_advanced(WITH_LSTS)
