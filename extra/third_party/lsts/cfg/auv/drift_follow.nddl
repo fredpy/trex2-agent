@@ -31,6 +31,9 @@ PathList upper_line = new PathList(upper_right, upper_left, nilPath);
 PathList square = new PathList(upper_left, lower_left, 
 			       lower_right, upper_line);
 
+PathList square_twice = new PathList(upper_left, lower_left, 
+			       lower_right, upper_right, square);
+
 PathList go_to = new PathList(center, nilPath);
 
 Navigator::Failed {
