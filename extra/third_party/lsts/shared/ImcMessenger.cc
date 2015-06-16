@@ -5,7 +5,7 @@
  *      Author: zp
  */
 
-#include "ImcMessenger.hh"
+#include "trex/lsts/ImcMessenger.hh"
 
 namespace TREX {
   namespace LSTS {

@@ -42,14 +42,19 @@ add_library(LSTSshared SHARED
   ImcMessenger.cc
   # headers
   DuneClock.hh
-  EuropaExtensions.hh
-  ImcAdapter.hh
   LstsUtils.hh
   LstsReactor.hh
-  ImcMessenger.hh
+  trex/lsts/EuropaExtensions.hh
+  trex/lsts/ImcAdapter.hh
+  trex/lsts/ImcMessenger.hh
 )
 
 install(TARGETS LSTSshared DESTINATION lib)
+install(DIRECTORY trex/ DESTINATION include/trex/
+  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
+  PATTERN "private" EXCLUDE
+  PATTERN ".svn" EXCLUDE)
+
 trex_lib(LSTSshared extra)
 target_link_libraries(LSTSshared TREXeuropa_core TREXagent 
   ${DUNE_CORE_LIB})

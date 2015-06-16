@@ -12,7 +12,7 @@
 # include <trex/utils/Plugin.hh>
 # include <trex/utils/LogManager.hh>
 # include <DUNE/DUNE.hpp>
-# include "../shared/ImcAdapter.hh"
+# include <trex/lsts/ImcAdapter.hh>
 # include "../shared/LstsReactor.hh"
 
 namespace TREX {

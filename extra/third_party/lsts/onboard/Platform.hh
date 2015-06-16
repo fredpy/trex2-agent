@@ -24,8 +24,8 @@
 # include <DUNE/Math/Angles.hpp>
 # include <DUNE/Coordinates/WGS84.hpp>
 
-# include "../shared/EuropaExtensions.hh"
-# include "../shared/ImcAdapter.hh"
+# include <trex/lsts/EuropaExtensions.hh>
+# include <trex/lsts/ImcAdapter.hh>
 # include "../shared/LstsReactor.hh"
 # include "ControlInterface.hh"
 # include "SharedEnvironment.hh"

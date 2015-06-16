@@ -5,7 +5,7 @@
  *      Author: zp
  */
 
-#include "ImcAdapter.hh"
+#include "trex/lsts/ImcAdapter.hh"
 
 namespace TREX
 {

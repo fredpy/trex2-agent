@@ -1,4 +1,4 @@
-#include "EuropaExtensions.hh"
+#include "trex/lsts/EuropaExtensions.hh"
 #include "LstsUtils.hh"
 
 #include <PLASMA/CFunctions.hh>

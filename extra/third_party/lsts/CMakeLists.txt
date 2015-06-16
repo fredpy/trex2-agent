@@ -54,6 +54,7 @@ endif(NOT DUNE_INCLUDE_DIR)
 include_directories(${DUNE_INCLUDE_DIR})
 include_directories(${EUROPA_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/extra/europa)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/shared)
 
 install(FILES ${DUNE_CORE_LIB} DESTINATION lib)
 pic_protect(${DUNE_CORE_LIB})

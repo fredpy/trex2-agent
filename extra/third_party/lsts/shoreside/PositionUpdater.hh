@@ -9,7 +9,7 @@
 #define POSITIONUPDATER_HPP_
 
 # include <DUNE/DUNE.hpp>
-# include "../shared/ImcAdapter.hh"
+# include <trex/lsts/ImcAdapter.hh>
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/utils/Plugin.hh>
 # include "../shared/LstsReactor.hh"
