@@ -33,7 +33,7 @@
  */
 #include "EuropaReactor.hh"
 
-#include "bits/europa_convert.hh"
+#include <trex/europa/bits/europa_convert.hh>
 #include "core/private/CurrentState.hh"
 
 #include <trex/utils/chrono_helper.hh>

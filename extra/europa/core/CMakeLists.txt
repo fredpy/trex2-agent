@@ -45,17 +45,21 @@ add_library(TREXeuropa_core SHARED
   Assembly.cc
   core.cc
   CurrentState.cc
+  EuropaDomain.cc
   TrexThreatDecisionPoint.cc
   DeliberationFilter.cc
+  europa_convert.cc
   europa_helpers.cc
   ModeConstraints.cc
   ReactorConstraints.cc
   Schema.cc
   SynchronizationManager.cc
   TimeConstraints.cc
-  # headers 
+  # headers
+  private/EuropaDomain.hh
   ../trex/europa/Assembly.hh
   ../trex/europa/DeliberationFilter.hh
+  ../trex/europa/EuropaEntity.hh
   ../trex/europa/EuropaException.hh
   ../trex/europa/EuropaPlugin.hh
   ../trex/europa/ModeConstraints.hh
@@ -64,6 +68,7 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/SynchronizationManager.hh
   ../trex/europa/TimeConstraints.hh
   ../trex/europa/TrexThreatDecisionPoint.hh
+  ../trex/europa/bits/europa_convert.hh
   ../trex/europa/bits/europa_helpers.hh
   ../trex/europa/config.hh
 )
@@ -72,7 +77,7 @@ source_group("Header\ Files\\bits" FILES
   ../trex/europa/bits/europa_helpers.hh
 )
 
-target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXutils 
+target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXdomain
   ${Boost_REGEX_LIBRARY})
 
 trex_lib(TREXeuropa_core extra)

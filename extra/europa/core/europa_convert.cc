@@ -31,11 +31,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "bits/europa_convert.hh"
+#include <trex/europa/bits/europa_convert.hh>
 
 
 #include <trex/europa/EuropaException.hh>
-#include "EuropaEntity.hh"
+#include <trex/europa/EuropaEntity.hh>
 #include "private/EuropaDomain.hh"
 
 #include <trex/domain/BooleanDomain.hh>

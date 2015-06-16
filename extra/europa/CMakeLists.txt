@@ -88,8 +88,6 @@ if(WITH_EUROPA)
   
   trex_plugin(europa europa_plugin.cc
     EuropaReactor.cc
-    europa_convert.cc
-    EuropaDomain.cc  
     extensions/Bind.cc
     extensions/DoNotMatchFilter.cc
     extensions/extensions.cc
@@ -99,8 +97,6 @@ if(WITH_EUROPA)
     extensions/Trigonometry.cc
     # headers
     EuropaReactor.hh
-    bits/europa_convert.hh
-    EuropaEntity.hh
     extensions/Bind.hh
     extensions/DoNotMatchFilter.hh
     extensions/EarliestFirstFlawManager.hh

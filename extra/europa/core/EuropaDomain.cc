@@ -32,9 +32,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "EuropaEntity.hh"
+#include <trex/europa/EuropaEntity.hh>
 #include "private/EuropaDomain.hh"
-#include "bits/europa_convert.hh"
+#include <trex/europa/bits/europa_convert.hh>
 
 using namespace TREX::europa;
 using namespace TREX;
