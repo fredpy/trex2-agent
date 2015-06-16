@@ -37,6 +37,8 @@ set(trex_INCLUDE_DIRS @TREX_INCS@ CACHE STRING "include paths for trex" FORCE)
 # flags required to use trex : mostly the ones related to c++11 support when enabled
 set(trex_CPPFLAGS @trex_FLAGS@ CACHE STRING "trex extra C++ flags" FORCE)
 
+set(trex_VERSION @VERSION@)
+
 get_filename_component(TREX_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 # Import trex libraries
 include(${TREX_CMAKE_DIR}/imports/trex-targets.cmake)
