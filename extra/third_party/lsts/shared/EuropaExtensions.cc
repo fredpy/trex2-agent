@@ -151,6 +151,10 @@ LatLonDisplace::handleExecute()
   if (!m_lat.isSingleton() || !m_lon.isSingleton() || !m_northing.isSingleton()
       || !m_easting.isSingleton())
     return;
+
+  if (m_latr.isSingleton() && m_lonr.isSingleton())
+    return;
+
 //  if( m_latr.isSingleton() && m_lonr.isSingleton() )
 //    return; // avoid to compute these twice
 
@@ -160,8 +164,8 @@ LatLonDisplace::handleExecute()
   e = cast_basis(m_easting.getSingletonValue());
 
   WGS84::displace(n, e, 0, &lat, &lon, &dummy);
-  intersect(m_latr,lat, lat, 1.7e-8);
-  intersect(m_lonr,lon, lon, 1.7e-8);
+  intersect(m_latr,lat, lat, 5e-7);
+  intersect(m_lonr,lon, lon, 5e-7);
 }
 
 LatLonDisplacement::LatLonDisplacement(EUROPA::LabelStr const &name,

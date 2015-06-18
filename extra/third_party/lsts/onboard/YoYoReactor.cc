@@ -289,10 +289,20 @@ namespace TREX {
         v = g->getAttribute("latitude");
         if (v.domain().isSingleton())
           m_lat = v.domain().getTypedSingleton<double, true>();
+        else
+        {
+        	syslog(log::warn)<< "won't handle this request because latitude is not singleton!";
+        	return;
+        }
 
         v = g->getAttribute("longitude");
         if (v.domain().isSingleton())
           m_lon = v.domain().getTypedSingleton<double, true>();
+        else
+        {
+        	syslog(log::warn)<< "won't handle this request because longitude is not singleton!";
+        	return;
+        }
 
         v = g->getAttribute("speed");
         if (v.domain().isSingleton())
