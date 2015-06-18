@@ -37,6 +37,7 @@ PathList square_twice = new PathList(upper_left, lower_left,
 PathList go_to = new PathList(center, nilPath);
 
 Navigator::Failed {
+  // this implies that the reactor will die if navigator dies
   start >= MISSION_END;
 }
 
@@ -44,7 +45,7 @@ Navigator::Failed {
  * TREX timelines
  */
 Navigator navigator = new Navigator(External, false);
-VerticalControl vc = new VerticalControl(Observe, false);
+VerticalControl vc = new VerticalControl();
 
 DrifterFollow drifter = new DrifterFollow(Internal);
 
@@ -53,3 +54,9 @@ close();
 fact(drifter.counter.Holds initial);
 initial.start.specify(0);
 initial.id.specify(0);
+
+
+fact(vc.Holds v_control); // fact has it will not change
+v_control.start.specify(0);
+v_control.end >= MISSION_END;
+v_control.speed.specify(1.25); // used by drifter to identify the speed used for survey
