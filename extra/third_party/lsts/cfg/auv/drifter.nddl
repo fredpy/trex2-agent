@@ -154,7 +154,7 @@ class DrifterFollow extends AgentTimeline {
 
 	PathList path;
 	float    size;
-	bool     lagrangian;
+	bool     is_lagrangian;
 
 	float center_lat, center_lon;
 	float speed, _speed_2;
@@ -203,7 +203,7 @@ DrifterFollow::DoSurvey {
 DrifterController::EndSurvey {
     DrifterFollow me = object.command;
     Counter cpt = me.counter;
-
+    
     equals(effect me.Survey survey);
     float _bind_u_2, _bind_v_2, _bind_heading;
     
@@ -220,28 +220,38 @@ DrifterController::EndSurvey {
     exec.center_lat == survey.center_lat;
     exec.center_lon == survey.center_lon;
     exec._speed_2 == _bind_u_2+_bind_v_2;
-    exec.speed == sqrt(exec._speed_2);
+    float drift_speed;
+
+    drift_speed == sqrt(exec._speed_2);
+    
+    // exec.speed == sqrt(exec._speed_2);
    
     contained_by(VerticalControl.Holds vc);
     vc contains exec;
     _bind_u_2 < vc._speed_2;
     _bind_v_2 < vc._speed_2;
 
-    // lagrangina with a speed of 0.0
-    // this failed miserably
-    // exec.lagrangian == ( exec.speed >= 0.1 ) && survey.lagrangian;
+    bool s_lag, e_lag;
+    s_lag == survey.lagrangian;
 
-    if( 0.0==exec.speed ) {
-	exec.cos_angle == cos(survey.heading_deg);
-	exec.sin_angle == sin(survey.heading_deg);
+    0.0 <= exec.speed;
+    exec.speed <= drift_speed;
+    
+    if( s_lag==true ) {
+	exec.speed == drift_speed;
     } else {
-	exec.cos_angle * exec.speed == survey.speed_north;
-	exec.sin_angle * exec.speed == survey.speed_east;
+	exec.speed == 0;
     }
-    if( 0.1<=exec.speed )
-	exec.lagrangian == false;
-    else 
-	exec.lagrangian == survey.lagrangian; 
+    testLEQ(e_lag, 0.01, exec.speed);
+    exec.is_lagrangian == e_lag;
+    
+    if( 0.0==drift_speed ) {
+     	exec.cos_angle == cos(survey.heading_deg);
+     	exec.sin_angle == sin(survey.heading_deg);
+    } else {
+     	exec.cos_angle * drift_speed == survey.speed_north;
+     	exec.sin_angle * drift_speed == survey.speed_east;
+    }
 
     equals(condition Waypoint last_wp);
     last_wp.path_id == cur.id;
@@ -251,7 +261,6 @@ DrifterController::EndSurvey {
 
     exec.cos_angle == last_wp.cos_a;
     exec.sin_angle == last_wp.sin_a;
-
 }
 
 DrifterController::Waypoint {
@@ -324,7 +333,7 @@ DrifterController::DoSegment {
     to.shift_y == delta_y + drift;
 
     // Now compute the drift
-    if( exec.lagrangian==false ) {
+    if( exec.is_lagrangian==false ) {
 	drift == 0.0;
     } else {
 	float dspeed_2, px_2, py_2;
