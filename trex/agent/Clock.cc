@@ -116,6 +116,11 @@ TICK Clock::tick() {
 }
 
 Clock::duration_type Clock::sleep() {
+  if( m_free ) {
+    m_free = false;
+    if( m_count>1 )
+      m_free_count = m_count-1;
+  }
   return doSleep();
 }
 
