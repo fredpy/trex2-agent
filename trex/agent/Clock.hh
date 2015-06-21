@@ -112,7 +112,7 @@ namespace TREX {
         return std::numeric_limits<TREX::transaction::TICK>::max();
       }
       bool is_free() const;
-      
+            
       
       /** @brief Initial tick
        *

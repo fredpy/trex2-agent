@@ -108,22 +108,14 @@ TICK Clock::tick() {
     m_count = 0;
     m_free_count = 0;
   } else if( ret!=m_last ) {
-    log_tick();    
+    log_tick();
     m_last = ret;
   }
   ++m_count;
-  if( m_free )
-    m_free_count = m_count;
   return ret;
 }
 
 Clock::duration_type Clock::sleep() {
-  if( m_free ) { // handle the case were sleep did occur naturally
-    m_free_count = m_count;
-    if( m_free_count>0 )
-      --m_free_count;
-    m_free = false;
-  }
   return doSleep();
 }
 
@@ -144,12 +136,19 @@ TREX::utils::log::stream Clock::syslog(utils::Symbol const &kind) const {
 // observers :
 
 bool Clock::is_free() const {
-  m_free = free();
+  if( m_free ) {
+    m_free = free();
+    
+    if( !m_free && m_count>1 )
+      m_free_count = m_count-1;
+  }
   return m_free;
 }
 
 void Clock::log_tick() const {
   if( m_data.is_open() ) {
+    if( m_free )
+      m_free_count = m_count;
     m_data<<"  <tick value=\""<<m_last<<"\" count=\""<<m_count
 	  <<"\" free=\""<<m_free_count<<"\"/>"<<std::endl;
     m_count = 0;
