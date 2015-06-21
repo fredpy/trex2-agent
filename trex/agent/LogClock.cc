@@ -85,8 +85,16 @@ LogClock::LogClock(bpt::ptree::value_type &node)
     throw XmlError(node, "Invalid clock log file");
   }
   tks = tks.get_child("Clock");
-  m_epoch = parse_attr<Clock::date_type>(tks, "epoch");
   m_period = Clock::duration_type(parse_attr<Clock::duration_type::rep>(tks, "rate"));
+  try {
+    m_epoch = parse_attr<Clock::date_type>(tks, "epoch");
+  } catch(utils::bad_string_cast const &e) {
+    Clock::duration_type dur(m_period);
+    dur *= parse_attr<unsigned>(tks, "epoch");
+    typedef utils::chrono_posix_convert<Clock::duration_type> cvt;
+    m_epoch = boost::posix_time::from_time_t(0);
+    m_epoch += cvt::to_posix(dur);
+  }
   bpt::ptree::assoc_iterator i, last;
   boost::tie(i, last) = tks.equal_range("tick");
   boost::optional<transaction::TICK> prev;
