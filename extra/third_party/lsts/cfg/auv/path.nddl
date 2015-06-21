@@ -60,9 +60,14 @@ class PathList {
 
 PathList nilPath = new PathList(); // special value for the end of the path
 
-class VerticalControl extends AgentTimeline {
+class VerticalControl extends Timeline {
     predicate Holds {
-	float speed, horizontal_speed, _hspeed_2;
+	float speed, _speed_2;
+	0.0 < speed;
+	speed == sqrt(_speed_2);
+
+	// removed most of this as xtreme sped is always other the ground
+	/*	float speed, horizontal_speed, _hspeed_2;
 	float min_z, max_z;
 	float pitch_angle, _corrected_pitch;
 	float _deg_pitch, _bind_deg;
@@ -77,25 +82,24 @@ class VerticalControl extends AgentTimeline {
 	_corrected_pitch <= pitch_angle;
 	min_z <= max_z;
 	horizontal_speed == sqrt(_hspeed_2);
+	*/
 
 	start + duration == end;
     }
     
-    VerticalControl(Mode _mode) {
-	super(_mode, "Holds");
-    }
-    VerticalControl(Mode _mode, bool goals) {
-	super(_mode, "Holds", goals);
+    VerticalControl() {
+	super();
     }
 }
 
-VerticalControl::Holds {
-    met_by(Holds prev);
+// VerticalControl::Holds {
+//     met_by(Holds prev);
     
-    if( min_z==max_z ) {
-	_corrected_pitch == 0;
-    } else {
-	_corrected_pitch == pitch_angle;
-    }
-    horizontal_speed == speed * cos(_deg_pitch);
-}
+//     if( min_z==max_z ) {
+// 	_corrected_pitch == 0;
+//     } else {
+// 	_corrected_pitch == pitch_angle;
+//     }
+    
+//     horizontal_speed == speed * cos(_deg_pitch);
+// }

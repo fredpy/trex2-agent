@@ -91,10 +91,11 @@ class DrifterController {
 	    to_complete;  // path to be completed before this waypoint
 	LagrangianPoint loc; // location this waypoint want to reach
 			     // in lagrangian space
-	
-	float           ref_lat, ref_lon; // Location used as space reference
+
+	float           origin_lat, origin_lon;
+	float           ref_x, ref_y;
 	float           shift_x, shift_y; // displacement from reference
-	float           cos_a, sin_a;     // roatation 
+	float           cos_a, sin_a;     // rotation
 	float           lat, lon;         // resulting waypoint location
 
 	int completion_date;              // ewhen didthis waypoint was reached
@@ -153,7 +154,7 @@ class DrifterFollow extends AgentTimeline {
 
 	PathList path;
 	float    size;
-	bool     lagrangian;
+	bool     is_lagrangian;
 
 	float center_lat, center_lon;
 	float speed, _speed_2;
@@ -196,13 +197,13 @@ DrifterFollow::Inactive {
 DrifterFollow::DoSurvey {
     Counter cpt = object.counter;
     contained_by(cpt.Holds cur);
-    id == cur.id;
+    id == cur.id;   
 }
 
 DrifterController::EndSurvey {
     DrifterFollow me = object.command;
     Counter cpt = me.counter;
-
+    
     equals(effect me.Survey survey);
     float _bind_u_2, _bind_v_2, _bind_heading;
     
@@ -218,21 +219,38 @@ DrifterController::EndSurvey {
     exec.size == survey.size;
     exec.center_lat == survey.center_lat;
     exec.center_lon == survey.center_lon;
-    exec.lagrangian == survey.lagrangian;
     exec._speed_2 == _bind_u_2+_bind_v_2;
-    exec.speed == sqrt(exec._speed_2);
+    float drift_speed;
+
+    drift_speed == sqrt(exec._speed_2);
+    
+    // exec.speed == sqrt(exec._speed_2);
    
     contained_by(VerticalControl.Holds vc);
     vc contains exec;
-    _bind_u_2 < vc._hspeed_2;
-    _bind_v_2 < vc._hspeed_2;
+    _bind_u_2 < vc._speed_2;
+    _bind_v_2 < vc._speed_2;
 
-    if( 0.0==exec.speed ) {
-	exec.cos_angle == cos(survey.heading_deg);
-	exec.sin_angle == sin(survey.heading_deg);
+    bool s_lag, e_lag;
+    s_lag == survey.lagrangian;
+
+    0.0 <= exec.speed;
+    exec.speed <= drift_speed;
+    
+    if( s_lag==true ) {
+	exec.speed == drift_speed;
     } else {
-	exec.cos_angle * exec.speed == survey.speed_north;
-	exec.sin_angle * exec.speed == survey.speed_east;
+	exec.speed == 0;
+    }
+    testLEQ(e_lag, 0.01, exec.speed);
+    exec.is_lagrangian == e_lag;
+    
+    if( 0.0==drift_speed ) {
+     	exec.cos_angle == cos(survey.heading_deg);
+     	exec.sin_angle == sin(survey.heading_deg);
+    } else {
+     	exec.cos_angle * drift_speed == survey.speed_north;
+     	exec.sin_angle * drift_speed == survey.speed_east;
     }
 
     equals(condition Waypoint last_wp);
@@ -243,7 +261,6 @@ DrifterController::EndSurvey {
 
     exec.cos_angle == last_wp.cos_a;
     exec.sin_angle == last_wp.sin_a;
-
 }
 
 DrifterController::Waypoint {
@@ -252,83 +269,100 @@ DrifterController::Waypoint {
     contained_by(cpt.Holds count);
     path_id == count.id;
 
-    float shift_n, shift_e;
-    shift_e == (shift_x * cos_a) + (shift_y * sin_a);
-    shift_n == (shift_y * cos_a) - (shift_x * sin_a);
+    float pos_x, pos_y;
+
+    pos_x == ref_x + shift_x;
+    pos_y == ref_y + shift_y;
     
-    wgsdisplace(ref_lat, ref_lon, shift_n, shift_e, lat, lon);
+    
+    float shift_n, shift_e;
+    shift_e == (pos_x * cos_a) + (pos_y * sin_a);
+    shift_n == (pos_y * cos_a) - (pos_x * sin_a);
+
+    wgsdisplace(origin_lat, origin_lon, shift_n, shift_e, lat, lon);
 }
 
 DrifterController::DoSegment {
     DrifterFollow me = object.command;
     Counter cpt = me.counter;
-    
+
+    // condition and effects
     meets(effect Waypoint to);
     false == empty(to.to_complete);
     to.wp_num == count + 1;
-
-    contained_by(me.DoSurvey exec);
-    exec.id == to.path_id;
-    exec.path == to.full_path;
-    exec.cos_angle == to.cos_a;
-    exec.sin_angle == to.sin_a;
-    exec.waypoints > count;
-
-    contained_by(VerticalControl.Holds vc);
-    vc contains exec;
     
     starts(condition Waypoint from);
     from.path_id == to.path_id;
     from.full_path == to.full_path;
     from.completed == to.to_complete;
-    from.lat == to.ref_lat;
-    from.lon == to.ref_lon;
+    from.origin_lat == to.origin_lat;
+    from.origin_lon == to.origin_lon;
     from.wp_num == count;
     from.completion_date <= to.completion_date;
+
+    // initialize my previous location in (X,Y) space
+    to.ref_x == from.ref_x + from.shift_x;
+    to.ref_y == from.ref_y + from.shift_y;    
+
+    contained_by(me.DoSurvey exec);
+    exec.id == to.path_id;
+    exec.path == to.full_path;    
+    exec.cos_angle == to.cos_a;
     exec.cos_angle == from.cos_a;
+    exec.sin_angle == to.sin_a;
     exec.sin_angle == from.sin_a;
+    exec.center_lat == to.origin_lat;
+    exec.center_lon == to.origin_lon;
+    exec.waypoints > count;
 
-    float dx, dy, delta_y;
-    
-    from.loc.x + dx == to.loc.x; 
+    contained_by(VerticalControl.Holds vc);
+    vc contains exec;
+
+   
+    // waypoint computation in (X,Y)
+    float dx, dy, delta_y, drift;
+    drift >= 0.0; // on (X,Y) space the drift is always puyshing forward in Y
+
+    // get the dx and dy without any transformation
+    from.loc.x + dx == to.loc.x;
+    from.loc.y + dy == to.loc.y;
+
+    // scale these by survey size
     to.shift_x == dx * exec.size;
-    from.loc.y + dy == to.loc.y; 
     delta_y == dy * exec.size;
-
-    float drift;
-    drift >= 0.0;
     to.shift_y == delta_y + drift;
 
-    if( exec.lagrangian==false ) {
+    // Now compute the drift
+    if( exec.is_lagrangian==false ) {
 	drift == 0.0;
     } else {
-
 	float dspeed_2, px_2, py_2;
-	
-	dspeed_2 == exec._speed_2 + vc._hspeed_2;
+
+	dspeed_2 == exec._speed_2 + vc._speed_2;
 	abs(to.shift_x) == sqrt(px_2);
 	abs(delta_y) == sqrt(py_2);
-	
-	float vx_2, vy_2, sq_root, upper_frac, vy, main_sum;
-	vx_2 == vc._hspeed_2 * px_2;
-	vy_2 == vc._hspeed_2 * py_2;
+
+	float vx_2, vy_2, vy, main_sum;
+
+	vx_2 == vc._speed_2 * px_2;
+	vy_2 == vc._speed_2 * py_2;
 
 	vy == exec.speed * delta_y;
 	main_sum == sqrt(vx_2 + vy_2) + vy;
 	drift * dspeed_2 == exec.speed * main_sum;
     }
 
-    // Finally send the next At when the previous one did complete
+    // finally send the next AT when the previous one completed
     if( from.completion_date <= AGENT_CLOCK ) {
-	// I will assume that from are to are far enough to require a waypoint
+	// I assume that from and to are far anough to require a waypoint
 	meets(condition Navigator.At dest);
 	dest.latitude == to.lat;
 	dest.longitude == to.lon;
 	dest.speed == vc.speed;
-	dest.secs == 0;
-	dest.z == 0.0; // go at the surface
+	dest.secs == 0.0;
+	dest.z == 0.0;
 	to.completion_date == dest.start;
-   }
+    }   
 }
 
 DrifterController::DoInitial {
@@ -342,17 +376,19 @@ DrifterController::DoInitial {
     meets(me.DoSurvey exec);
     exec.id == to.path_id;
     exec.path == to.full_path;
-    exec.center_lat == to.ref_lat;
-    exec.center_lon == to.ref_lon;
+    to.origin_lat == exec.center_lat;
+    to.origin_lon == exec.center_lon;
+    // initial point location in (X,Y) space (ie not rotated)
+    to.ref_x == to.loc.x * exec.size;
+    to.ref_y == to.loc.y * exec.size;
     exec.cos_angle == to.cos_a;
     exec.sin_angle == to.sin_a;
     contained_by(VerticalControl.Holds vc);
     vc contains exec;
 
-    float x, y;
-
-    to.shift_x == to.loc.x * exec.size;
-    to.shift_y == to.loc.y * exec.size;
+    // No shift needed as we are at the initial waypoint
+    to.shift_x == 0.0;
+    to.shift_y == 0.0;
 
     // Check that I can start 
     contained_by(cpt.Holds cur);
