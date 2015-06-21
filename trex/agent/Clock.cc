@@ -118,8 +118,7 @@ TICK Clock::tick() {
 Clock::duration_type Clock::sleep() {
   if( m_free ) {
     m_free = false;
-    if( m_count>1 )
-      m_free_count = m_count-1;
+    m_free_count = m_count;
   }
   return doSleep();
 }
@@ -144,8 +143,8 @@ bool Clock::is_free() const {
   if( m_free ) {
     m_free = free();
     
-    if( !m_free && m_count>1 )
-      m_free_count = m_count-1;
+    if( !m_free )
+      m_free_count = m_count;
   }
   return m_free;
 }
