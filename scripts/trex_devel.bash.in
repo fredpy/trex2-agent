@@ -34,14 +34,14 @@
 #####################################################################
 
 
-TREX_LIBS=@TREX_LIBRARY_DIRS@:@Boost_LIBRARY_DIRS@
-TREX_BINS=@TREX_BINARY_DIRS@
+TREX_LIBS='@TREX_LIBRARY_DIRS@:@Boost_LIBRARY_DIRS@'
+TREX_BINS='@TREX_BINARY_DIRS@'
 
-EUROPA_HOME=@EUROPA_HOME@
+EUROPA_HOME='@EUROPA_HOME@'
 
 if [ -d "${EUROPA_HOME}" ]; then 
     export EUROPA_HOME
-    TREX_LIBS=${TREX_LIBS}:@EUROPA_LIBRARY_DIRS@
+    TREX_LIBS=${TREX_LIBS}:'@EUROPA_LIBRARY_DIRS@'
 fi
 
 platform='unknown'
@@ -69,7 +69,7 @@ else
     export PATH=${TREX_BINS}
 fi
 
-export TREX_PATH=@TREX_CONFIG_DIRS@
+export TREX_PATH='@TREX_CONFIG_DIRS@'
 
 export TREX_LOG_DIR=@CMAKE_BINARY_DIR@/log
 
