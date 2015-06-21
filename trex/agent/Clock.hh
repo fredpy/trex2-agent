@@ -10,14 +10,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2011, MBARI.
+ *
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -27,7 +27,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -41,8 +41,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Clock
-#define H_Clock
+#ifndef H_trex_agent_Clock
+# define H_trex_agent_Clock
 
 # include "bits/agent_graph.hh"
 
@@ -52,12 +52,12 @@
 
 namespace TREX {
   namespace agent {
-
+    
     using utils::log::null;
     using utils::log::info;
     using utils::log::warn;
     using utils::log::error;
-
+    
     /** @brief TREX clock
      *
      * This class defines the abstract interface to the Clock that
@@ -71,7 +71,7 @@ namespace TREX {
       /** @brief Clock error
        *
        * The basic exception thrown by a clock when an error occurs
-       * 
+       *
        * @author Frederic Py <fpy@mbari.org>
        * @relates Clock
        * @ingroup agent
@@ -85,18 +85,18 @@ namespace TREX {
          * Create a new instance  withe associated message @p msg
          */
         Error(std::string const &msg) throw()
-          :TREX::utils::Exception(msg) {}
+        :TREX::utils::Exception(msg) {}
         /** @brief Destructor */
         ~Error() throw() {}
       }; // TREX::agent::Clock::Error
-            
+      
       typedef transaction::graph::duration_type          duration_type;
       typedef utils::chrono_posix_convert<duration_type> dur_converter;
       typedef transaction::graph::date_type              date_type;
-    
+      
       /** @brief Destructor */
       virtual ~Clock();
-
+      
       /** @brief Start the clock
        *
        * This method is the public interface used to start
@@ -105,25 +105,25 @@ namespace TREX {
        * @sa void start()
        */
       void doStart();
-
-
+      
+      
       TREX::transaction::TICK tick();
       virtual TREX::transaction::TICK max_tick() const {
         return std::numeric_limits<TREX::transaction::TICK>::max();
       }
       bool is_free() const;
-
+            
       
       /** @brief Initial tick
        *
        * @return the value of the initial tick
        */
       virtual TREX::transaction::TICK initialTick() const {
-	return 0;
+        return 0;
       }
       
       virtual date_type epoch() const {
-        return boost::posix_time::from_time_t(initialTick()); 
+        return boost::posix_time::from_time_t(initialTick());
       }
       
       /** @brief tick duration
@@ -133,11 +133,11 @@ namespace TREX {
        * @return tick duration
        */
       virtual duration_type tickDuration() const {
-	return CHRONO::seconds(1);
+        return CHRONO::seconds(1);
       }
       virtual TREX::transaction::TICK timeToTick(date_type const &date) const {
         return initialTick()+(dur_converter::to_chrono(date-epoch()).count()/tickDuration().count());
-      }	
+      }
       virtual date_type tickToTime(TREX::transaction::TICK cur) const {
         return epoch()+dur_converter::to_posix(tickDuration()*(cur-initialTick()));
       }
@@ -153,8 +153,8 @@ namespace TREX {
        * @sa void sleep(double)
        */
       duration_type sleep();
-
-
+      
+      
       /** @brief Process sleep
        * @param sleepDuration number of seconds to sleep
        *
@@ -167,21 +167,21 @@ namespace TREX {
       /** @brief Get tick string
        *
        * @param[in] tick A tick
-       * 
-       * Display @p tick in human readable format. 
+       *
+       * Display @p tick in human readable format.
        *
        * @return A string representation for @p tick
        */
       virtual std::string date_str(TREX::transaction::TICK const &tick) const;
-
+      
       virtual std::string duration_str(TREX::transaction::TICK dur) const;
-
+      
       /** @brief XML factory for clocks. */
       typedef TREX::utils::XmlFactory<Clock, SHARED_PTR<Clock> > xml_factory;
       
-      /** @brief Clock basic information 
+      /** @brief Clock basic information
        *
-       * Give basixc information of the clock used. This information 
+       * Give basixc information of the clock used. This information
        * will be displayed. when the clock will be started by the agent.
        *
        * @return A string describing this clock
@@ -189,14 +189,14 @@ namespace TREX {
       virtual std::string info() const =0;
       
     protected:
-       virtual duration_type doSleep();
-
-
+      virtual duration_type doSleep();
+      
+      
       /** @brief Check if clock free
        *
-       * Check if the clock is currently free. A free clock 
-       * allow reactors to execute steps. If the clock is not 
-       * free the agent will stop to attempt to insert new 
+       * Check if the clock is currently free. A free clock
+       * allow reactors to execute steps. If the clock is not
+       * free the agent will stop to attempt to insert new
        * deliberation steps for this tick
        *
        * @retval true if free
@@ -206,10 +206,10 @@ namespace TREX {
         return true;
       }
       virtual size_t count() const {
-	return m_count;
+        return m_count;
       }
-
-
+      
+      
       /** @brief get time in TICK
        *
        * This method is used to compute the current time.
@@ -219,7 +219,7 @@ namespace TREX {
        * @return current tick value
        */
       virtual TREX::transaction::TICK getNextTick() =0;
- 
+      
       /** @brief Time left before next tick
        *
        * This method indicates how much time is left before the
@@ -228,7 +228,7 @@ namespace TREX {
        * @return time left before next tick
        */
       virtual duration_type getSleepDelay() const {
-	return m_sleep;
+        return m_sleep;
       }
       /** @brief Constructor
        * @param sleepSeconds A default sleep delay
@@ -237,7 +237,7 @@ namespace TREX {
        */
       explicit Clock(duration_type const &sleep)
       :m_sleep(sleep), m_started(false), m_data(m_log->service()) {}
-
+      
       /** @brief Internal start method
        *
        * This method is called internally by @c doStart to allow specialized
@@ -257,10 +257,10 @@ namespace TREX {
        */
       void advanceTick(TREX::transaction::TICK &tick);
       
-      utils::log::stream syslog(utils::log::id_type const &kind=utils::log::null) 
-	const;
-
-
+      utils::log::stream syslog(utils::log::id_type const &kind=utils::log::null)
+      const;
+      
+      
     private:
       duration_type const m_sleep;
       utils::SingletonUse<utils::LogManager> m_log;
@@ -275,8 +275,8 @@ namespace TREX {
       mutable size_t             m_free_count, m_count;
       mutable utils::async_ofstream m_data;
     }; // TREX::agent::Clock
-
+    
   } // TREX::agent   
 } // TREX
 
-#endif // H_Clock
+#endif // H_trex_agent_Clock
