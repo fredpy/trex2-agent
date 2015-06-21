@@ -83,6 +83,14 @@ void Clock::doStart() {
   start();
   m_data.open(m_log->file_name("clock.xml").c_str());
   m_data<<"<Clock epoch=\""<<date_str(m_last)<<"\" rate=\""<<tickDuration().count()<<"\" >"<<std::endl;
+  
+  boost::property_tree::ptree inf;
+  inf.add("Info", info());
+  std::ostringstream oss;
+  
+  utils::write_xml(oss, inf);
+  m_data<<"  "<<oss.str()<<std::endl;
+
   m_first = true;
   syslog(TREX::utils::log::info)<<"Clock started at "<<epoch()
   <<' '<<epoch().zone_name()
