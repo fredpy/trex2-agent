@@ -15,7 +15,6 @@ class SurveyParams extends AgentTimeline {
     SurveyParams(Mode _mode) {
 		super(_mode, "Boot");
     }
-
 }
 
 class YoYoController extends AgentTimeline {
@@ -35,6 +34,13 @@ class YoYoController extends AgentTimeline {
 	}
 }
 
+Navigator::At {
+	met_by(Reference.At at);
+	at.latitude == latitude;
+	at.longitude == longitude;
+	at.z == z;
+}
+
 class NavActions {
     int time_at_surface;
     
@@ -48,7 +54,6 @@ class NavActions {
 	  time_at_surface = _time_at_surface;
     }
 }
-
 
 NavActions::DoGoing {
     contained_by(ControlMode.TREX c);
@@ -102,9 +107,8 @@ NavActions::DoGoing {
     }
 }
 
-
 Navigator::Going {
     sane_pos(latitude, longitude, z);
-    contained_by(ControlMode.TREX); // I am not Going if I am not running
+    contained_by(ControlMode.TREX);
 }
 
