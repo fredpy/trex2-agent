@@ -361,6 +361,7 @@ DrifterController::DoSegment {
 	dest.speed == vc.speed;
 	dest.secs == 0.0;
 	dest.z == 0.0;
+	dest.flat == false;
 	to.completion_date == dest.start;
     }   
 }
@@ -406,6 +407,7 @@ DrifterController::DoInitial {
 	dest.secs == 0;//60; 		// stay at surface for 1 min
 	//dest.z == 0;			// end at surface
 	to.completion_date == dest.start;
+	dest.flat == true;
     }
 }
 

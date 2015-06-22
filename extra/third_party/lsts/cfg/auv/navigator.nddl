@@ -4,7 +4,7 @@
 
 class Navigator extends AgentTimeline {
 
-  float min_z, max_z;
+  float min_z, max_z, flat_z;
   
   Navigator(Mode _mode) {
     super(_mode, "Idle", true);    
@@ -17,10 +17,12 @@ class Navigator extends AgentTimeline {
   predicate Idle {}
 	
   predicate Going {
+    bool flat;
     float latitude, longitude, z, speed;
   }
 	
   predicate At {
+    bool flat;
     float latitude, longitude, z, speed;
     int secs;    
   }

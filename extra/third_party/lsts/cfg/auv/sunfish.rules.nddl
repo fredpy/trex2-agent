@@ -35,32 +35,6 @@ class YoYoController extends AgentTimeline {
 	}
 }
 
-YoYoController::Done {
-	met_by(Exec exec);
-		exec.latitude == latitude;
-		exec.longitude == longitude;
-		exec.speed == speed;
-		exec.max_z == max_z;
-		exec.min_z == min_z;
-	
-	duration == 1;
-}
-
-Navigator::At {
-  //float min_dist;
-  //min_dist == 3.0;
-	
-  starts(YoYoController.Done arr);
-
-  arr.speed == speed;
-  arr.latitude == latitude;
-  arr.longitude == longitude;
-  arr.min_z == object.min_z;
-  arr.max_z == object.max_z;	   
-
-  //ll_distance(latitude, longitude, arr.latitude, arr.longitude) <= min_dist;
-}
-
 class NavActions {
     int time_at_surface;
     
@@ -83,19 +57,22 @@ NavActions::DoGoing {
     contained_by(OperationalLimits.Limits limits);
     ends(condition Navigator.Going go);
     go.start <= start;
-
+ 
+	// Check operational limits
     if( go.z > 0.0 ) {
 	go.z < limits.max_depth;
     } else {
 	-1.0 * go.z < limits.max_altitude;
 	-1.0 * go.z > limits.min_altitude; 
-    }
+    }    
+    
     meets(effect Navigator.At at);
-    go.object == at.object;
-    go.latitude == at.latitude;
-    go.longitude == at.longitude;
-    go.z == at.z;
-    go.speed == at.speed;
+      go.object == at.object;
+      go.latitude == at.latitude;
+      go.longitude == at.longitude;
+      go.z == at.z;
+      go.flat == at.flat;
+      go.speed == at.speed;
 
     int my_start;
     my_start >= c.start;
@@ -112,12 +89,17 @@ NavActions::DoGoing {
 	  contains(condition YoYoController.Exec cmd);
 	  cmd.latitude == go.latitude;
 	  cmd.longitude == go.longitude;
-	  cmd.min_z == go.object.min_z;
-	  cmd.max_z == go.object.max_z;
+	  if (go.flat == false) { 
+	  	cmd.min_z == go.object.min_z;
+	  	cmd.max_z == go.object.max_z;
+	  }
+	  else {
+	    cmd.min_z == go.object.flat_z;
+	  	cmd.max_z == go.object.flat_z;
+	  } 	
 	  cmd.speed == go.speed;
 	  concurrent(end, cmd.end);
     }
-
 }
 
 

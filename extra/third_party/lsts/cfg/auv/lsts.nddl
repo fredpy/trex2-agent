@@ -16,17 +16,7 @@ Reference reference = new Reference(External);
 ReferenceState refstate = new ReferenceState(Observe);
 navigator.min_z.specify(2);
 navigator.max_z.specify(20);
-
-// VerticalControl vc = new VerticalControl(Internal, false); // Do not accept goals for now
-// fact(vc.Holds v_control); // fact has it will not change
-// v_control.start.specify(0);
-
-// v_control.min_z == navigator.min_z;
-// v_control.max_z == navigator.max_z;
-// v_control._deg_pitch.specify(15.0); // specify the expected pitch angle in degree
-// v_control.speed.specify(1.25); // used by drifter to identify the speed used for survey
-
-
+navigator.flat_z.specify(5);
 
 YoYoController yoyo = new YoYoController(External);
 
