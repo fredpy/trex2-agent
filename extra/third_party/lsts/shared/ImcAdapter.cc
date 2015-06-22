@@ -12,12 +12,48 @@ namespace TREX
   namespace LSTS
   {
 
+    namespace {
+      
+      class graph_proxy :public ImcAdapter::tick_proxy {
+      public:
+        graph_proxy(graph const &ref):m_graph(ref) {}
+        ~graph_proxy() {}
+        
+        tick_type current_tick() {
+          return m_graph.getCurrentTick();
+        }
+        date_type tick_to_date(tick_type const &tck) {
+          return m_graph.tickToTime(tck);
+        }
+        tick_type date_to_tick(date_type const &date) {
+          return m_graph.timeToTick(date);
+        }
+        std::string date_str(tick_type const &tck) {
+          return date_export(m_graph, tck);
+        }
+        std::string duration_str(tick_type const &tck) {
+          return duration_export(m_graph, tck);
+        }
+        tick_type as_date(std::string const &date) {
+          return m_graph.as_date(date);
+        }
+        tick_type as_duration(std::string const &date) {
+          return m_graph.as_duration(date);
+        }
+        
+      private:
+        graph const &m_graph;
+        
+      };
+      
+    }
+    
+    
     ImcAdapter::ImcAdapter() :
         c_imc_header_length(sizeof(IMC::Header)),
         c_max_iridium_payload_length(260)
     {
       m_trex_id = 65000;
-      m_graph = NULL;
       bfr = new uint8_t[65535];
       messenger = NULL;
     }
@@ -83,10 +119,9 @@ namespace TREX
       return obs;
     }
 
-    void
-    ImcAdapter::setReactorGraph(graph const &g)
+    void ImcAdapter::setReactorGraph(graph const &g)
     {
-      m_graph = &g;
+      m_cvt.reset(new graph_proxy(g));
     }
 
     Observation
@@ -219,12 +254,12 @@ namespace TREX
 
         if (attr->name == "start" || attr->name == "end")
         {
-          IntegerDomain::bound min = m_graph->getCurrentTick(), max =
-              IntegerDomain::plus_inf;
+          IntegerDomain::bound min = m_cvt->current_tick(),
+            max = IntegerDomain::plus_inf;
           if (!attr->min.empty())
-            min = m_graph->as_date(attr->min);
+            min = m_cvt->as_date(attr->min);
           if (!attr->max.empty())
-            max = m_graph->as_date(attr->max);
+            max = m_cvt->as_date(attr->max);
 
           if (attr->name == "start")
             g.restrictStart(IntegerDomain(min, max));
@@ -235,9 +270,9 @@ namespace TREX
         {
           IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
           if (!attr->min.empty())
-            min = m_graph->as_duration(attr->min);
+            min = m_cvt->as_duration(attr->min);
           if (!attr->max.empty())
-            max = m_graph->as_duration(attr->max);
+            max = m_cvt->as_duration(attr->max);
 
           g.restrictDuration(IntegerDomain(min, max));
         }
@@ -326,8 +361,8 @@ namespace TREX
       graph::date_type
         pdate = boost::posix_time::from_time_t(0)+cvt::to_posix(t_stamp);
       
-      date = m_graph->timeToTick(pdate);
-
+      date = m_cvt->date_to_tick(pdate);
+      
       return obs;
     }
 
@@ -512,7 +547,7 @@ namespace TREX
             dynamic_cast<IntegerDomain const &>(v.domain());
         if (id.isSingleton())
         {
-          std::string s = date_export(*m_graph, id.lowerBound().value());
+          std::string s = m_cvt->date_str(id.lowerBound());
           attr->min = s;
           attr->max = s;
         }
@@ -520,12 +555,12 @@ namespace TREX
         {
           if (id.hasUpper())
           {
-            std::string s = date_export(*m_graph, id.upperBound().value());
+            std::string s = m_cvt->date_str(id.upperBound());
             attr->max = s;
           }
           if (id.hasLower())
           {
-            std::string s = date_export(*m_graph, id.lowerBound().value());
+            std::string s = m_cvt->date_str(id.lowerBound());
             attr->min = s;
           }
         }
@@ -538,7 +573,7 @@ namespace TREX
             dynamic_cast<IntegerDomain const &>(v.domain());
         if (id.isSingleton())
         {
-          std::string s = duration_export(*m_graph, id.lowerBound().value());
+          std::string s = m_cvt->duration_str(id.lowerBound());
           attr->min = s;
           attr->max = s;
         }
@@ -546,14 +581,12 @@ namespace TREX
         {
           if (id.hasUpper())
           {
-            std::string s = duration_export(*m_graph,
-                                            id.upperBound().value() + 1);
+            std::string s = m_cvt->duration_str(id.upperBound().value() + 1);
             attr->max = s;
           }
           if (id.hasLower())
           {
-            std::string s = duration_export(*m_graph,
-                                            id.lowerBound().value() - 1);
+            std::string s = m_cvt->duration_str(id.lowerBound().value() - 1);
             attr->min = s;
           }
         }
@@ -612,7 +645,7 @@ namespace TREX
       }
       
       boost::posix_time::time_duration
-        time = m_graph->tickToTime(date)-boost::posix_time::from_time_t(0);
+        time = m_cvt->tick_to_date(date)-boost::posix_time::from_time_t(0);
       
       long double val = time.total_milliseconds();
       val /= 1000.0;

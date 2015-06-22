@@ -31,7 +31,7 @@ using namespace TREX::utils;
 
 namespace TREX {
   namespace LSTS {
-
+    
 
     /** @brief IMC to TREX translator
      *
@@ -43,6 +43,37 @@ namespace TREX {
     class ImcAdapter
     {
     public:
+      class tick_proxy {
+      public:
+        typedef graph::date_type     date_type;
+        typedef graph::duration_type duration_type;
+        typedef TICK                 tick_type;
+        
+        virtual ~tick_proxy() {}
+        
+        virtual tick_type current_tick() =0;
+        virtual date_type tick_to_date(tick_type const &tck) =0;
+        virtual tick_type date_to_tick(date_type const &date) =0;
+        virtual std::string date_str(tick_type const &tck) =0;
+        virtual std::string duration_str(tick_type const &tck) =0;
+        virtual tick_type as_date(std::string const &date) =0;
+        virtual tick_type as_duration(std::string const &date) =0;
+        
+        
+        std::string date_str(IntegerDomain::bound const &bound) {
+          return date_str(bound.value());
+        }
+        std::string duration_str(IntegerDomain::bound const &bound) {
+          return duration_str(bound.value());
+        }
+        
+        
+      protected:
+        tick_proxy() {}
+
+      };
+      
+      
       ImcAdapter();
 
       bool bindAsynchronous(int port);
@@ -100,6 +131,9 @@ namespace TREX {
       setTrexId(int trex_id);
 
       void setReactorGraph(graph const &g);
+      void set_proxy(tick_proxy *p) {
+        m_cvt.reset(p);
+      }
 
 
       //@brief Translates VehicleMedium messages into "medium" timeline observations
@@ -144,7 +178,9 @@ namespace TREX {
       //IOMultiplexing iom;
       DUNE::IO::Poll m_poll;
       ImcMessenger * messenger;
-      graph const * m_graph;
+      
+      UNIQ_PTR<tick_proxy> m_cvt;
+      //graph const * m_graph;
     };
   }
 }
