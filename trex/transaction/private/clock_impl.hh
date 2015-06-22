@@ -45,26 +45,26 @@ namespace TREX {
       /** @brief tick value holder
        *
        * This class is were the current tick value of the agent
-       * is stored and accessed. 
+       * is stored and accessed.
        *
        * @author Frederic Py <fredpy@gmail.com>
        */
       class clock :boost::noncopyable,public ENABLE_SHARED_FROM_THIS<clock> {
         /** @brief Underlying mutex used
          *
-         * This is the type of mutex used by this class to protect access 
-         * to its attributes. This class uses @c boost::shared_mutex as 
-         * this mutex allows to implement multiple concurrent reads with 
-         * a single exclusive write. 
+         * This is the type of mutex used by this class to protect access
+         * to its attributes. This class uses @c boost::shared_mutex as
+         * this mutex allows to implement multiple concurrent reads with
+         * a single exclusive write.
          *
-         * As a result while the update of the clock values is blocking 
+         * As a result while the update of the clock values is blocking
          * any other access, multiple concurrent processes can read it
-         * concurrently while not being updated. This limits race 
-         * conditions between multiple threads trying to get the current 
+         * concurrently while not being updated. This limits race
+         * conditions between multiple threads trying to get the current
          * tick.
          */
         typedef boost::shared_mutex mutex_type;
-      
+        
       public:
         /** @brief Basic type for a date
          *
@@ -76,7 +76,7 @@ namespace TREX {
          *
          * @param[in] io The service managing clock updates
          *
-         * Create a new instance of this class and assign its updates 
+         * Create a new instance of this class and assign its updates
          * to a strand associated to @p io
          */
         explicit clock(boost::asio::io_service &io);
@@ -89,16 +89,16 @@ namespace TREX {
          *
          * @retval true if the clock is marked as started
          * @retval false otherwise
-         * 
+         *
          * @sa clock::set_started(bool)
          */
         bool      started()  const;
-
+        
         /** @brief Get clock date
          *
          * Get the date value started by this clock if any
          *
-         * @retrun an optional date. If the optional is not set than 
+         * @retrun an optional date. If the optional is not set than
          *         this clock data has yet to be updated, otherwise
          *         it is the value of the date
          *
@@ -148,8 +148,8 @@ namespace TREX {
          *
          * @return the latest date value
          *
-         * @note This method handle the access to date with 
-         *       the proper access control allowing concurrent 
+         * @note This method handle the access to date with
+         *       the proper access control allowing concurrent
          *       reads but blocked by a single write
          */
         boost::optional<date_type> read_date() const;
@@ -161,8 +161,8 @@ namespace TREX {
          * This method will update this clock date to @p date only if
          * @p date is no less or equalt to the currently stored date.
          *
-         * @note this method is executed by a specific strand 
-         * @note this method handle write access to the date and 
+         * @note this method is executed by a specific strand
+         * @note this method handle write access to the date and
          *       block any other operations until completion
          *
          * @post the date of this clock is greater or equal to @p date

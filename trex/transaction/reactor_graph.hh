@@ -49,12 +49,12 @@
 namespace TREX {
   namespace transaction {
     
-
+    
     using utils::log::null;
     using utils::log::info;
     using utils::log::warn;
     using utils::log::error;
-
+    
     /** @brief Conflicting reactor names
      *
      * This mthod is throwned when multiple reactors in a graph have the
@@ -76,7 +76,7 @@ namespace TREX {
        * @param[in] g A graph
        * @param[in] r A reactor
        *
-
+       
        * Create a new instance indicating that multiple reactors with the same
        * name as @p r were declared in the graph @p g
        */
@@ -84,9 +84,9 @@ namespace TREX {
       /** @brief Destructor */
       ~MultipleReactors() throw() {}
     }; // TREX::transaction::MultipleReactors
-
-
-
+    
+    
+    
     /** @brief Transactions graph
      *
      * This class provides and maintain the transactions between reactors
@@ -128,13 +128,13 @@ namespace TREX {
     public:
       typedef CHRONO::nanoseconds        duration_type;
       typedef boost::posix_time::ptime   date_type;
-          
+      
       /** @brief reactor ID type
        *
        * The type used to represent a reactor in the graph
        */
       typedef details::reactor_id reactor_id;
-
+      
       /** @brief Timeline relation creation failure
        *
        * This class is used to indicate when a timeline operation -- such as
@@ -161,7 +161,7 @@ namespace TREX {
                          std::string const &msg) throw()
         :ReactorException(*r, msg) {}
       }; // TREX::transaction::graph::timeline_failure
-
+      
       /** @brief reactor relation type
        *
        * The type used to represent the dependencies between reactors in
@@ -174,18 +174,18 @@ namespace TREX {
        * input.
        */
       typedef TREX::utils::XmlFactory<TeleoReactor, SHARED_PTR<TeleoReactor>,
-				      graph *> xml_factory;
-
+      graph *> xml_factory;
+      
       /** @brief Reverse of a reactor graph
-       * 
-       * This type is the one used in order to refer to this graph with 
+       *
+       * This type is the one used in order to refer to this graph with
        * reversed relations
        */
       typedef boost::reverse_graph<graph, graph const &> reverse_graph;
-
+      
       typedef boost::directed_tag            directed_category;
       typedef boost::allow_parallel_edge_tag edge_parallel_category;
-
+      
       /** @brief Graph traversal category
        *
        * This pseudo-type is used by the boost graph library in order to
@@ -207,22 +207,22 @@ namespace TREX {
        * @relates graph
        */
       struct traversal_category:
-	public virtual boost::bidirectional_graph_tag,
-	public virtual boost::adjacency_graph_tag,
-	public virtual boost::vertex_list_graph_tag,
-	public virtual boost::edge_list_graph_tag {};
+      public virtual boost::bidirectional_graph_tag,
+      public virtual boost::adjacency_graph_tag,
+      public virtual boost::vertex_list_graph_tag,
+      public virtual boost::edge_list_graph_tag {};
       
       /** @brief timelines and relations listener
        *
-       * This abstarct class allows user to implement a listener to all the 
+       * This abstarct class allows user to implement a listener to all the
        * timeline connection events within a reactor graph. The operations are:
        * @li creation of a new internal timeline
        * @li undeclaration of an internal timeline
        * @li decalration of connection through an external timeline
        * @li undeclaration of connection througn an external timeline
        *
-       * All of these operation trelates to the alteration of the agent graph 
-       * structure and give user the ability to tack when the reactor is altering 
+       * All of these operation trelates to the alteration of the agent graph
+       * structure and give user the ability to tack when the reactor is altering
        * itself.
        *
        * @author Frederic Py <fpy@mbari.org>
@@ -233,106 +233,106 @@ namespace TREX {
       public:
         typedef timelines_listener const *id_type;
         typedef timelines_listener base_type;
-
+        
         virtual ~timelines_listener();
-
+        
         static id_type get_id(base_type const &me) {
           return &me;
         }
-
+        
       protected:
         timelines_listener(graph &g);
         timelines_listener(graph::xml_factory::argument_type const &arg);
         void initialize();
-
+        
         virtual void declared(details::timeline const &timeline) {}
         virtual void undeclared(details::timeline const &timeline) {}
         
         virtual void connected(Relation const &r) {}
         virtual void disconnected(Relation const &r) {}
-
+        
       private:
         graph &m_graph;
-
+        
         friend class TeleoReactor;
       }; // TREX::transaction::graph::timeline_listener
-
-
+      
+      
       /** @brief reactors iterator
        *
        * The class used to iterate through the reactors managed by this graph
        */
       class reactor_iterator
-	:public boost::iterator_facade< reactor_iterator,
-					reactor_id,
-					boost::forward_traversal_tag,
-					reactor_id > {
+      :public boost::iterator_facade< reactor_iterator,
+      reactor_id,
+      boost::forward_traversal_tag,
+      reactor_id > {
       public:
-	/** @brief Constructor
-	 *
-	 * Create a new iterator referring to no reactor
-	 */
-	reactor_iterator() {}
-	/** @brief Copy constructor
-	 *
-	 * @param[in] other Another itinstance
-	 *
-	 * Create a copy of @p other
-	 */
-	reactor_iterator(reactor_iterator const &other)
-	  :m_iter(other.m_iter) {}
-	/** @brief Conversion constructor
-	 *
-	 * @param[in] i An iterator to a reactor_set
-	 *
-	 * Create a new instance referring to the same element referred by @p i
-	 */
-	explicit reactor_iterator(details::reactor_set::const_iterator const &i)
-	  :m_iter(i) {}
-	/** @brief Destructor */
-	~reactor_iterator() {}
-
-
+        /** @brief Constructor
+         *
+         * Create a new iterator referring to no reactor
+         */
+        reactor_iterator() {}
+        /** @brief Copy constructor
+         *
+         * @param[in] other Another itinstance
+         *
+         * Create a copy of @p other
+         */
+        reactor_iterator(reactor_iterator const &other)
+        :m_iter(other.m_iter) {}
+        /** @brief Conversion constructor
+         *
+         * @param[in] i An iterator to a reactor_set
+         *
+         * Create a new instance referring to the same element referred by @p i
+         */
+        explicit reactor_iterator(details::reactor_set::const_iterator const &i)
+        :m_iter(i) {}
+        /** @brief Destructor */
+        ~reactor_iterator() {}
+        
+        
       private:
-	friend class boost::iterator_core_access;
-
-	/** @brief advance iterator
-	 *
-	 * Advance the iterator to the next element
-	 *
-	 * @pre The iterator is valid (ie it refers to an existing element)
-	 */
-	void increment() {
-	  ++m_iter;
-	}
-	/** @brief Equality test
-	 *
-	 * @param[in] other Another instance
-	 *
-	 * @retval true if this instance refers to the same element as @p other
-	 * @retval false otherwise
-	 */
-	bool equal(reactor_iterator const &other) const {
-	  return m_iter==other.m_iter;
-	}
-	/** @brief Dereference utility
-	 *
-	 * @pre The iterator is valid
-	 * @return A reactor_id to the reactor referred by this iterator
-	 */
-	reactor_id dereference() const {
-	  return m_iter->get();
-	}
-
-	details::reactor_set::const_iterator m_iter;
+        friend class boost::iterator_core_access;
+        
+        /** @brief advance iterator
+         *
+         * Advance the iterator to the next element
+         *
+         * @pre The iterator is valid (ie it refers to an existing element)
+         */
+        void increment() {
+          ++m_iter;
+        }
+        /** @brief Equality test
+         *
+         * @param[in] other Another instance
+         *
+         * @retval true if this instance refers to the same element as @p other
+         * @retval false otherwise
+         */
+        bool equal(reactor_iterator const &other) const {
+          return m_iter==other.m_iter;
+        }
+        /** @brief Dereference utility
+         *
+         * @pre The iterator is valid
+         * @return A reactor_id to the reactor referred by this iterator
+         */
+        reactor_id dereference() const {
+          return m_iter->get();
+        }
+        
+        details::reactor_set::const_iterator m_iter;
       }; // TREX::transaction::graph::reactor_iterator
-
+      
       typedef details::reactor_set::size_type       size_type;
       typedef details::reactor_set::difference_type difference_type;
-
+      
       typedef boost::edge_name_t edge_property_type;
       typedef boost::vertex_name_t vertex_property_type;
-
+      
       /** @brief Graph name
        *
        * @return The name of the graph
@@ -363,8 +363,8 @@ namespace TREX {
        * @sa add_reactors(ext_iterator)
        */
       graph(TREX::utils::Symbol const &name,
-	    boost::property_tree::ptree &conf,
-	    TICK init =0, bool verbose=false);
+            boost::property_tree::ptree &conf,
+            TICK init =0, bool verbose=false);
       /** @brief Destructor
        *
        * Destroy the graph along with all the reactors attached to it.
@@ -388,9 +388,9 @@ namespace TREX {
        * @retval false otherwise
        */
       bool empty() const {
-	return m_reactors.empty();
+        return m_reactors.empty();
       }
-
+      
       /** @brief Create new reactors for this graph
        * @tparam Iter An iterator type
        * @param[in] from Initial iterator
@@ -403,7 +403,7 @@ namespace TREX {
        */
       template<class Iter>
       size_t add_reactors(Iter from, Iter to);
-
+      
       /** @brief Create new reactors for this graph
        *
        * @param[in] conf A xml configuration tree
@@ -411,7 +411,7 @@ namespace TREX {
        * Create all the reactors defined in @p conf and attach them to this graph
        */
       size_t add_reactors(boost::property_tree::ptree &conf) {
-	return add_reactors(conf.begin(), conf.end());
+        return add_reactors(conf.begin(), conf.end());
       }
       /** @brief Create new reactor for this graph
        *
@@ -421,13 +421,13 @@ namespace TREX {
        */
       reactor_id add_reactor(boost::property_tree::ptree::value_type &description);
       static reactor_id null_reactor() {
-	return reactor_id();
+        return reactor_id();
       }
       
-      /** @brief Check if part of the graph 
+      /** @brief Check if part of the graph
        * @param[in] r A reactor
-       * 
-       * Checks if @p r is currently part of this graph or not. 
+       *
+       * Checks if @p r is currently part of this graph or not.
        * A reactor is not part of the graph if it has been isolated or killed
        *
        * @retval true if the reactor is still part of this graph
@@ -437,7 +437,7 @@ namespace TREX {
        * @sa isolate(reactor_id)
        */
       bool is_member(reactor_id r) const;
-
+      
       /** @brief Kill a reactor
        *
        * @pram [in] r A reactor
@@ -490,7 +490,7 @@ namespace TREX {
       
       TICK as_date(std::string const &str) const;
       TICK as_duration(std::string const &str, bool up=false) const;
-
+      
       /** @brief get current tick
        *
        * This method provides the current tick being executed in the graph.
@@ -519,7 +519,7 @@ namespace TREX {
        * @sa timeToTick(time_t, suseconds_t) const
        */
       virtual duration_type tickDuration() const {
-	return CHRONO::seconds(1);
+        return CHRONO::seconds(1);
       }
       /** @brief convert real-time into a TICK
        *
@@ -540,7 +540,7 @@ namespace TREX {
        */
       virtual TICK timeToTick(date_type const &date) const {
         typedef utils::chrono_posix_convert<duration_type> convert;
-	return convert::to_chrono(date-boost::posix_time::from_time_t(0)).count()/tickDuration().count();
+        return convert::to_chrono(date-boost::posix_time::from_time_t(0)).count()/tickDuration().count();
       }
       /** @brief convert a TICK into its real-time equivalent
        *
@@ -562,7 +562,7 @@ namespace TREX {
         typedef utils::chrono_posix_convert<duration_type> convert;
         return boost::posix_time::from_time_t(0)+convert::to_posix(tickDuration()*cur);
       }
-  
+      
       virtual std::string date_str(TICK cur) const;
       virtual std::string duration_str(TICK dur) const;
       
@@ -571,7 +571,7 @@ namespace TREX {
        * @return the number of reactors in this graph
        */
       size_type count_reactors() const {
-	return m_reactors.size();
+        return m_reactors.size();
       }
       /** @brief Reactor index
        *
@@ -587,8 +587,8 @@ namespace TREX {
        * @sa count_reactors() const
        */
       long index(reactor_id r) const;
-
-
+      
+      
       /** @brief Beginning reactor iterator
        *
        * @return a reactor_iterator pointing to the beginning of the reactors
@@ -596,7 +596,7 @@ namespace TREX {
        * @sa reactor_end() const
        */
       reactor_iterator reactor_begin() const {
-	return reactor_iterator(m_reactors.begin());
+        return reactor_iterator(m_reactors.begin());
       }
       /** @brief End reactor iterator
        *
@@ -605,7 +605,7 @@ namespace TREX {
        * @sa reactor_begin() const
        */
       reactor_iterator reactor_end() const {
-	return reactor_iterator(m_reactors.end());
+        return reactor_iterator(m_reactors.end());
       }
       /** @brief find a reactor
        *
@@ -621,30 +621,30 @@ namespace TREX {
        * @sa TeleoReactor::getName() const
        */
       reactor_iterator find_reactor(TREX::utils::Symbol const &name) const {
-	return reactor_iterator(m_reactors.find(name));
+        return reactor_iterator(m_reactors.find(name));
       }
-
+      
       typedef details::relation_iter edge_iterator;
-
+      
       size_type count_relations() const;
       edge_iterator relation_begin() const {
-	return details::relation_iter(m_timelines.begin(), m_timelines.end());
+        return details::relation_iter(m_timelines.begin(), m_timelines.end());
       }
       edge_iterator relation_end() const {
-	return details::relation_iter(m_timelines.end(), m_timelines.end());
+        return details::relation_iter(m_timelines.end(), m_timelines.end());
       }
-
+      
       graph &me() {
-	return *this;
+        return *this;
       }
       graph const &me() const {
-	return *this;
+        return *this;
       }
-
+      
       /** @brief Check for verbosity level
        *
        * Checks if this graph is set as verbose or not.
-       * This value will be the default verbosity leve lof reactors handled by 
+       * This value will be the default verbosity leve lof reactors handled by
        * this graph
        *
        * @sa set_verbose(bool)
@@ -669,35 +669,35 @@ namespace TREX {
       
     protected:
       reactor_id add_reactor(reactor_id r);
-
+      
       graph();
-
+      
       bool hasTick() const;
-
+      
       void updateTick(TICK value, bool started=true);
       void set_name(TREX::utils::Symbol const &name);
-
-      utils::log::stream syslog(utils::log::id_type const &context, 
+      
+      utils::log::stream syslog(utils::log::id_type const &context,
                                 utils::log::id_type const &kind) const;
       utils::log::stream syslog(utils::log::id_type const &kind=null) const {
-	return syslog(null, kind);
+        return syslog(null, kind);
       }
       
       TREX::utils::LogManager &manager() const;
-
+      
       bool has_timeline(TREX::utils::Symbol const &tl) const {
-	return m_timelines.find(tl)!=m_timelines.end();
+        return m_timelines.find(tl)!=m_timelines.end();
       }
-
+      
       typedef details::timeline_set::const_iterator timeline_iterator;
-
+      
       timeline_iterator timeline_begin() const {
-	return m_timelines.begin();
+        return m_timelines.begin();
       }
       timeline_iterator timeline_end() const {
-	return m_timelines.end();
+        return m_timelines.end();
       }
-
+      
       /** @brief Check for internal timeline creation
        *
        * @param[in] r A reactor
@@ -736,31 +736,31 @@ namespace TREX {
        * @sa internal_check(reactor_id r, details::timeline const &)
        */
       virtual void external_check(reactor_id r, details::timeline const &tl) {}
-
+      
     private:
       
       bool assign(reactor_id r, TREX::utils::Symbol const &timeline,
                   details::transaction_flags const &flags);
       bool subscribe(reactor_id r, TREX::utils::Symbol const &timeline,
-		     details::transaction_flags const &flags);
+                     details::transaction_flags const &flags);
       
       details::timeline_set::iterator get_timeline(TREX::utils::Symbol const &tl);
-
+      
       details::reactor_set     m_reactors;
       details::timeline_set    m_timelines;
       
       typedef TREX::utils::list_set< TREX::utils::pointer_id_traits<graph::timelines_listener> > listen_set;
       listen_set m_listeners;
-
+      
       bool m_verbose;
       TREX::utils::SingletonUse<xml_factory>             m_factory;
-
+      
       mutable details::reactor_set m_quarantined;
-
+      
       friend class TeleoReactor;
       friend class timelines_listener;
     };
-
+    
     std::string date_export(graph const &g, IntegerDomain::bound const &val);
     std::string duration_export(graph const &g, IntegerDomain::bound const &val);
   }
