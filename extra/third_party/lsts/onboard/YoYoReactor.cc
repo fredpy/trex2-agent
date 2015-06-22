@@ -329,7 +329,7 @@ namespace TREX {
     void
     YoYoReactor::handleRecall(TREX::transaction::goal_id const &g)
     {
-      //std::cerr << "[YOYO] handleRecall(" << *(g.get()) << ")" << std::endl;
+      //std::cerr << "[YOYO] handleRecall(" << (*g) << ")" << std::endl;
     }
 
     void

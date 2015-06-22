@@ -84,9 +84,9 @@ TimelineProxy::handleRequest(goal_id const &g)
     syslog(log::warn) << "Cannot post goals to this observation-forwarding proxy";
     return;
   }
-  if (g.get()->object().str() != m_timeline)
+  if (g->object().str() != m_timeline)
   {
-    syslog(log::warn) << "Cannot handle requests on " << g.get()->object().str();
+    syslog(log::warn) << "Cannot handle requests on " << g->object().str();
     return;
   }
 
@@ -96,7 +96,7 @@ TimelineProxy::handleRequest(goal_id const &g)
   op.goal_id = ss.str();
 
   TrexToken tok;
-  m_adapter.asImcMessage(*g.get(), &tok);
+  m_adapter.asImcMessage(*g, &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_GOAL;
   m_adapter.send(&op, m_destaddr, m_destport);
