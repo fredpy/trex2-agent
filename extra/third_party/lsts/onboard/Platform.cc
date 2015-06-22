@@ -541,11 +541,16 @@ namespace TREX
         m_ref.flags = Reference::FLAG_LOCATION;
         m_ref.lat = estate->lat;
         m_ref.lon = estate->lon;
+
         WGS84::displace(estate->x, estate->y, &(m_ref.lat), &(m_ref.lon));
 
-        //if (!m_auv)
-          //setUavRefZ(estate->height-estate->z);
-        //enqueueReferenceAtObs();
+        if (m_auv) {
+          DesiredZ z;
+          z.value = 0;
+          z.z_units =  Z_DEPTH;
+          m_ref.z.set(&z);
+        }
+
         m_reference_initialized = true;
       }
       if (!m_blocked && atDestination(frefstate)) {
