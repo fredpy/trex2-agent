@@ -118,7 +118,7 @@ namespace TREX {
       Observation opLimitsObservation(OperationalLimits * msg);
 
       //@brief Translates TrexToken messages into a generic observation
-      Observation genericObservation(TrexToken * msg);
+      Observation genericObservation(TICK &date, TrexToken * msg);
 
       //@brief Translates TrexToken messages into a goal
       Goal genericGoal(TrexToken * msg);
@@ -126,7 +126,7 @@ namespace TREX {
       //@brief Translates TrexToken messages into a generic observation
       Observation announceObservation(Announce * msg);
 
-      void asImcMessage(Predicate const &obs, TrexToken * result);
+      void asImcMessage(TICK date, Predicate const &obs, TrexToken * result);
 
       void fillInExtraGoalAttributes(goal_id &goal, TrexToken * result);
 

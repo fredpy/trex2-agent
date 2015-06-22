@@ -312,7 +312,7 @@ namespace TREX
     }
 
     Observation
-    ImcAdapter::genericObservation(TrexToken * msg)
+    ImcAdapter::genericObservation(TICK &date, TrexToken * msg)
     {
       Observation obs(msg->timeline, msg->predicate);
 
@@ -321,6 +321,12 @@ namespace TREX
       {
         setAttribute(obs, **it);
       }
+      CHRONO::duration<double> t_stamp(msg->getTimeStamp());
+      typedef chrono_posix_convert< CHRONO::duration<double> > cvt;
+      graph::date_type
+        pdate = boost::posix_time::from_time_t(0)+cvt::to_posix(t_stamp);
+      
+      date = m_graph->timeToTick(pdate);
 
       return obs;
     }
@@ -587,7 +593,7 @@ namespace TREX
     }
 
     void
-    ImcAdapter::asImcMessage(Predicate const &obs, TrexToken * result)
+    ImcAdapter::asImcMessage(TICK date, Predicate const &obs, TrexToken * result)
     {
       result->timeline = obs.object().str();
       result->predicate = obs.predicate().str();
@@ -604,6 +610,15 @@ namespace TREX
         variableToImc(v, &attr);
         result->attributes.push_back(attr);
       }
+      
+      boost::posix_time::time_duration
+        time = m_graph->tickToTime(date)-boost::posix_time::from_time_t(0);
+      
+      long double val = time.total_milliseconds();
+      val /= 1000.0;
+      result->setTimeStamp(static_cast<double>(val));
+      
+      
     }
 
     void

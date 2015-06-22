@@ -96,7 +96,7 @@ TimelineProxy::handleRequest(goal_id const &g)
   op.goal_id = ss.str();
 
   TrexToken tok;
-  m_adapter.asImcMessage(*g, &tok);
+  m_adapter.asImcMessage(getCurrentTick(), *g, &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_GOAL;
   m_adapter.send(&op, m_destaddr, m_destport);
@@ -121,7 +121,7 @@ TimelineProxy::notify(Observation const &obs)
   TrexOperation op;
   TrexToken tok;
 
-  m_adapter.asImcMessage(Observation(obs), &tok);
+  m_adapter.asImcMessage(getCurrentTick(), obs, &tok);
   op.token.set(&tok);
   op.op = TrexOperation::OP_POST_TOKEN;
 
@@ -151,13 +151,16 @@ TimelineProxy::synchronize()
     if (msg->getId() == TrexOperation::getIdStatic())
     {
       TrexOperation * top = static_cast<TrexOperation *>(msg);
+      TICK ignore;
 
      // std::cerr << "just received this: " << std::endl;
      // top->toText(std::cerr);
       switch(top->op)
       {
         case (TrexOperation::OP_POST_TOKEN):
-              postObservation(m_adapter.genericObservation(top->token.get()), true);
+          postObservation(m_adapter.genericObservation(ignore,
+                                                       top->token.get()),
+                          true);
         break;
         case (TrexOperation::OP_POST_GOAL):
             {
