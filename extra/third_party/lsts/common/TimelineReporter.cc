@@ -66,26 +66,22 @@ TimelineReporter::undeclared(details::timeline const &timeline)
 
 void TimelineReporter::newPlanToken(goal_id const &g)
 {
-  Goal * goal = g.get();
-
-  std::string gname = (goal->object()).str();
-  std::string gpred = (goal->predicate()).str();
+  std::string gname = g->object().str();
+  std::string gpred = g->predicate().str();
 
   if (m_output)
-    std::cout << "GOAL: " << *goal << std::endl;
+    std::cout << "GOAL: " << (*g) << std::endl;
 
   //syslog(log::warn) << "newPlanToken(" << gname << " , " << gpred << ")";
 }
 
 void TimelineReporter::cancelledPlanToken(goal_id const &g)
 {
-  Goal * goal = g.get();
-
-   std::string gname = (goal->object()).str();
-   std::string gpred = (goal->predicate()).str();
+   std::string gname = g->object().str();
+   std::string gpred = g->predicate().str();
 
    if (m_output)
-     std::cout << "RECALL: " << *goal << std::endl;
+     std::cout << "RECALL: " << (*g) << std::endl;
 
    //syslog(log::warn) << "cancelledPlanToken(" << gname << " , " << gpred << ")";
 }
