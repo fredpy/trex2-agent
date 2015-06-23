@@ -155,7 +155,7 @@ namespace TREX {
       Observation genericObservation(TICK &date, TrexToken * msg);
 
       //@brief Translates TrexToken messages into a goal
-      Goal genericGoal(TrexToken * msg);
+      Goal genericGoal(TrexToken * msg, bool restrict_to_future=true);
 
       //@brief Translates TrexToken messages into a generic observation
       Observation announceObservation(Announce * msg);

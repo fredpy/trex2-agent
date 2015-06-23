@@ -243,7 +243,7 @@ namespace TREX
     }
 
     Goal
-    ImcAdapter::genericGoal(TrexToken * msg)
+    ImcAdapter::genericGoal(TrexToken * msg, bool restrict_to_future)
     {
       Goal g(msg->timeline, msg->predicate);
 
@@ -254,8 +254,10 @@ namespace TREX
 
         if (attr->name == "start" || attr->name == "end")
         {
-          IntegerDomain::bound min = m_cvt->current_tick(),
+          IntegerDomain::bound min = IntegerDomain::minus_inf,
             max = IntegerDomain::plus_inf;
+          if( restrict_to_future )
+            min = m_cvt->current_tick();
           if (!attr->min.empty())
             min = m_cvt->as_date(attr->min);
           if (!attr->max.empty())
