@@ -166,7 +166,11 @@ namespace TREX {
 
       virtual
       ~ImcAdapter();
-
+      
+      tick_proxy &time_conv() const {
+        return *m_cvt;
+      }
+      
     private:
       const int c_imc_header_length;
       const int c_max_iridium_payload_length;
