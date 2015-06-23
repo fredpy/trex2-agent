@@ -34,13 +34,6 @@ class YoYoController extends AgentTimeline {
 	}
 }
 
-Navigator::At {
-	met_by(Reference.At at);
-	at.latitude == latitude;
-	at.longitude == longitude;
-	at.z == z;
-}
-
 class NavActions {
     int time_at_surface;
     
