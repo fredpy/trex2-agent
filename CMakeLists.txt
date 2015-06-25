@@ -62,7 +62,6 @@ if(CMAKE_MAJOR_VERSION GREATER 2)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-
 include(cmake/trex_requirements.cmake)
 include(cmake/trex_macros.cmake)
 
