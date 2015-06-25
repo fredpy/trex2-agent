@@ -65,29 +65,6 @@ add_library(TREXtransaction SHARED
   bits/reactor_graph.tcc
 )
 
-source_group("Template Files\\bits" FILES
-  bits/reactor_graph.tcc)
-
-source_group("Header\ Files\\bits" FILES 
-  bits/transaction_fwd.hh
-  bits/bgl_support.hh
-  bits/external.hh
-  bits/timeline.hh
-)
-
-source_group("Header\ Files\\private" FILES 
-  private/clock_impl.hh
-  private/graph_impl.hh
-  private/node_impl.hh
-)
-
-source_group("Source\ Files\\private" FILES 
-  private/clock_impl.cc
-  private/graph_impl.cc
-  private/node_impl.cc
-)
-
-
 add_dependencies(core TREXtransaction)
 target_link_libraries(TREXtransaction TREXdomain 
   ${CHRONO_LIB})

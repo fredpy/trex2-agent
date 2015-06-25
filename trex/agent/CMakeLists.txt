@@ -49,10 +49,6 @@ add_library(TREXagent SHARED
     StepClock.hh
 )
 
-source_group("Header\ Files\\bits" FILES 
-    bits/agent_graph.hh
-)  
-
 add_dependencies(core TREXagent)
 target_link_libraries(TREXagent TREXtransaction)
 trex_lib(TREXagent core)

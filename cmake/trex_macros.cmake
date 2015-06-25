@@ -33,13 +33,14 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
+include(ide_structure)
+
 ########################################################################
 # TREX related macros                                                  #
 ########################################################################
 macro(trex_cfg dir dest)
   install(DIRECTORY ${dir} DESTINATION ${dest} OPTIONAL
-    FILES_MATCHING PATTERN "*"
-    PATTERN ".svn" EXCLUDE)
+    FILES_MATCHING PATTERN "*")
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
     ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 endmacro(trex_cfg)
@@ -61,7 +62,6 @@ endfunction(expand_libs)
   
 
 function(trex_lib target kind)
-  # message(STATUS "trex-lib(${target} ${kind})")
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_LIBS 
     ${CMAKE_CURRENT_BINARY_DIR})
   get_property(tmp TARGET ${target} PROPERTY LINK_DEPENDS)
@@ -73,11 +73,12 @@ function(trex_lib target kind)
     set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
   endif(CPP11_ENABLED)
 
-  # message(STATUS "${target}: ${i_incs}")
   # transmit directory include to target include for older cmake
   get_property(tmp DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   set_property(TARGET ${target} APPEND PROPERTY INCLUDE_DIRECTORIES ${tmp})
   unset(tmp)
+
+  trex_organize_target(${target})
   
   if(kind) 
     # update global include path for installed trex
@@ -112,10 +113,11 @@ endfunction(trex_lib)
 function(trex_py target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_PYTHON ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  trex_organize_target(${target})
+  
   if(CPP11_ENABLED) 
     set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
   endif(CPP11_ENABLED)
-  # trex_lib(${target} FALSE)
   install(TARGETS ${target} DESTINATION ${TREX_SHARED}/python OPTIONAL EXPORT trex-targets) 
   set_property(GLOBAL APPEND PROPERTY trex-python ${target})
 endfunction(trex_py)
@@ -124,6 +126,8 @@ macro(trex_cmd target)
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CMDS
     ${CMAKE_CURRENT_BINARY_DIR})
   expand_libs(${target})
+  trex_organize_target(${target})
+  
   if(CPP11_ENABLED) 
     set_target_properties(${target} PROPERTIES LINK_FLAGS ${CPP11_LINK_FLAGS})
   endif(CPP11_ENABLED)

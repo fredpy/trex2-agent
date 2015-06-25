@@ -73,12 +73,9 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/config.hh
 )
 
-source_group("Header\ Files\\bits" FILES 
-  ../trex/europa/bits/europa_helpers.hh
-)
-
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXdomain
   ${Boost_REGEX_LIBRARY})
 
+trex_add_path_filter(TREXeuropa_core ..)
 trex_lib(TREXeuropa_core extra)
 

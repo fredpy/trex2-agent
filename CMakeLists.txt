@@ -34,7 +34,7 @@
 #######################################################################
 
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/;${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 ########################################################################
 # Project definitions                                                  #
@@ -46,7 +46,7 @@ set(TREX_PATCH 1)
 set(TREX_RC 0)
 
 # TREX script for CPack management
-include(cmake/trex_pack.cmake)
+include(trex_pack)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}
@@ -62,8 +62,8 @@ if(CMAKE_MAJOR_VERSION GREATER 2)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-include(cmake/trex_requirements.cmake)
-include(cmake/trex_macros.cmake)
+include(trex_requirements)
+include(trex_macros)
 
 set(TREX_SHARED share/trex)
 include_directories(${CMAKE_BINARY_DIR})
@@ -82,5 +82,5 @@ add_subdirectory(extra)
 ########################################################################
 # Finalize                                                             #
 ########################################################################
-include(cmake/trex_finalize.cmake)
+include(trex_finalize)
 

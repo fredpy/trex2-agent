@@ -170,50 +170,6 @@ else(TREX_FROM_PKG)
  endif(WITH_GIT_TRACK)
 endif(TREX_FROM_PKG)
 
-# map ditectory structure for XCode 
-source_group("Source\ Files\\log" FILES 
-  log/entry.cc
-  log/text_log.cc
-)
-
-source_group("Header\ Files\\bits" FILES 
-  ${CMAKE_CURRENT_BINARY_DIR}/bits/asio_conf.hh
-  bits/asio_signal_base.hh
-  bits/asio_signal_iter.hh
-  bits/asio_signal_template.hh
-  bits/SingletonDummy.hh
-  bits/SingletonServer_fwd.hh
-  bits/SingletonWrapper.hh
-)
-
-source_group("Header\ Files\\platform" FILES
-  platform/chrono.hh 
-  platform/memory.hh
-  platform/cpp11_deleted.hh
-)
-
-source_group("Header\ Files\\log" FILES 
-  log/log_fwd.hh
-  log/entry.hh
-  log/stream.hh
-  log/text_log.hh
-  log/out_file.hh
-  log/log_pipe.hh
-)
-
-source_group("Header\ Files\\log\\bits" FILES 
-  log/bits/log_stream.hh
-  log/bits/log_sig.hh
-)
-
-source_group("Template Files\\bits" FILES  
-  bits/Factory.tcc
-  bits/SingletonUse.tcc
-  bits/SingletonWrapper.tcc
-  bits/Symbol.tcc
-  bits/XmlFactory.tcc
-)
-
 add_dependencies(core TREXutils)
 target_link_libraries(TREXutils ${SYSTEM_LIBRARIES}  
   ${Boost_FILESYSTEM_LIBRARY} 

@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2011, MBARI.                                         #
+#  Copyright (c) 2014, Frederic Py.                                   #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -32,77 +32,83 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-cmake_minimum_required(VERSION 2.8)
+include(CMakeParseArguments)
 
-# locate ROS
-option(ROS_NO_CHECK "Include without checking" OFF)
-mark_as_advanced(ROS_NO_CHECK)
-
-if(ROS_NO_CHECK)
-  message(STATUS "Include ROS in the project with no checking")
-  message(WARNING "Including ROS with no checking result on the "
-    "project not being compilable")
-else(ROS_NO_CHECK)
-  find_package(ROS)
-  if(ROS_CONFIG)
-    find_ros_pkg(roscpp)
-    if(ROS_roscpp_PACKAGE_PATH)
-      include_directories(${ROS_roscpp_INCLUDE_DIRS})
-      add_definitions(${ROS_roscpp_CFLAGS})
-    else(ROS_roscpp_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find roscpp")
-    endif(ROS_roscpp_PACKAGE_PATH)
-
-    find_ros_pkg(actionlib)
-    if(ROS_actionlib_PACKAGE_PATH)
-      include_directories(${ROS_actionlib_INCLUDE_DIRS})
-      add_definitions(${ROS_actionlib_CFLAGS})
-    else(ROS_actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find actionlib")
-    endif(ROS_actionlib_PACKAGE_PATH)
+macro(truncate_dir var dir base)
+  set(result "${dir}")
+  if(IS_DIRECTORY "${base}")
+    string(LENGTH "${dir}" dir_len)
+    string(LENGTH "${base}" base_len)
     
-  else(ROS_CONFIG)
-    message(SEND_ERROR "Failed to loacte ROS configuration file.")
-  endif(ROS_CONFIG)
-endif(ROS_NO_CHECK)
+    if(dir_len GREATER ${base_len})
+      string(SUBSTRING ${dir} 0 ${base_len} tmp)
+      if(tmp STREQUAL "${base}")
+	math(EXPR len "${dir_len} - ${base_len}")
+	string(SUBSTRING ${dir} ${base_len} ${len} result)
+      endif()
+    endif()
+  endif()
+  set(${var} "${result}")
+endmacro(truncate_dir)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
-link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
+macro(trex_add_path_filter target path)
+  get_target_property(filter ${target} TREX_IDE_EXCLUDE)
+  list(APPEND filter ${path})
+  list(REMOVE_DUPLICATES filter)
+  set_target_properties(${target} PROPERTIES TREX_IDE_EXCLUDE "${filter}")
+endmacro(trex_add_path_filter)
 
-add_library(TREXros SHARED
-  # source 
-  ros_reactor.cc 
-  ros_clock.cc
-  ros_timeline.cc
-  ros_client.cc
-  # header
-  ros_reactor.hh
-  trex/ros/ros_client.hh
-  trex/ros/ros_clock.hh
-  trex/ros/ros_convert_traits.hh
-  trex/ros/ros_error.hh
-  trex/ros/ros_subscriber.hh
-  trex/ros/ros_action.hh
-  trex/ros/bits/ros_timeline.hh)
 
-install(DIRECTORY trex/ DESTINATION include/trex/
-  FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
-  PATTERN "private" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+macro(trex_organize_target target)
+  get_target_property(src ${target} SOURCES)
   
-target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
-  ${ROS_actionlib_LINK_FLAGS} 
-  ${ROS_roscpp_LINK_LIBS} 
-  ${ROS_actionlib_LINK_LIBS} 
-  TREXagent)
+  
+  foreach(file ${src})
+    if(NOT IS_DIRECTORY ${file})
+      get_filename_component(dir ${file} PATH)
+      get_filename_component(ext ${file} EXT)
 
-install(TARGETS TREXros DESTINATION lib)
-trex_lib(TREXros extra)
+      if(dir)
+	truncate_dir(short_dir ${dir} ${CMAKE_CURRENT_SOURCE_DIR})
+	if(short_dir STREQUAL ${dir})
+	  truncate_dir(short_dir ${dir} ${CMAKE_CURRENT_BINARY_DIR})
+	endif()
+	get_target_property(filter ${target} TREX_IDE_EXCLUDE)
+	set(dir "${short_dir}")
+	if(filter)
+	  foreach(filt ${filter})
+	    truncate_dir(dir ${short_dir} ${filt})
+	    if(NOT dir STREQUAL ${short_dir})
+	      break()
+	    endif()
+	  endforeach()
+	endif(filter)
+      endif(dir)
+      if(dir)
+	string(REPLACE "/" "\\" dir ${dir})
+      endif(dir)
 
-
-
-# The plugin placeholder : also initialize ros on load
-trex_plugin(ros ros_init.cc)
-target_link_libraries(ros_pg TREXros)
-
+      # Check if header
+      string(REGEX MATCH "^\\.h" header "${ext}")
+      if(header) 
+	if(dir)
+	  source_group("Header\ Files\\${dir}" FILES ${file})
+	endif(dir)
+      else(header)
+	string(REGEX MATCH "^\\.c" source "${ext}")
+	if(source) 
+	  if(dir)
+	    source_group("Source\ Files\\${dir}" FILES ${file})
+	  endif(dir)
+	else(source)
+	  string(REGEX MATCH "^\\.tcc$" template "${ext}")
+	  if(template)
+	    source_group("Template\ Files\\${dir}" FILES ${file})
+	  else(template)
+	    source_group("Other\ Files\\${dir}" FILES ${file})	  
+	  endif(template)
+	endif(source)
+      endif(header)
+    endif()
+  endforeach(file ${src})
+endmacro(trex_organize_target)
