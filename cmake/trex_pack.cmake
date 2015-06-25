@@ -33,55 +33,50 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(VERSION "${TREX_MAJOR}.${TREX_MINOR}.${TREX_PATCH}")
 
-########################################################################
-# Project definitions                                                  #
-########################################################################
-project(trex)
-set(TREX_MAJOR 0)
-set(TREX_MINOR 6)
-set(TREX_PATCH 1)
-set(TREX_RC 0)
+if(TREX_RC GREATER 0)
+  set(VERSION "${VERSION}-rc${TREX_RC}")
+endif(TREX_RC GREATER 0)
 
-# TREX script for CPack management
-include(cmake/trex_pack.cmake)
+# CPack version numbers for release tarball name.
+set(CPACK_PACKAGE_VERSION ${VERSION})
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  # Need this for config generated files
-  ${CMAKE_BINARY_DIR}/trex/utils
-  )
-########################################################################
-# remove annoying warning since cmake 3                                #
-########################################################################
-if(CMAKE_MAJOR_VERSION GREATER 2)
-  cmake_policy(SET CMP0042 NEW)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+message(STATUS "${PROJECT_NAME} VERSION = ${VERSION}")
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "TREX agent executive")
+set(CPACK_PACKAGE_VENDOR "TREX2 development team")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+set(CPACK_GENERATOR "TGZ" CACHE STRING "Packaging method for binary")
+set(
+CPACK_SOURCE_PACKAGE_FILE_NAME
+"${CMAKE_PROJECT_NAME}-${VERSION}"
+CACHE INTERNAL "tarball basename"
+)
+set(CPACK_SOURCE_GENERATOR "TGZ" CACHE STRING "Packaging method for source")
+# The following components are regex's to match anywhere (unless anchored)
+# in absolute path + filename to find files or directories to be excluded
+# from source tarball.
+set(CPACK_SOURCE_IGNORE_FILES
+"~$"
+"log/latest/"
+"log/[1-9][0-9]*\\\\.[0-9][0-9]*\\\\.[0-9][0-9]*/"
+"\\\\.DS_Store$"
+)
+
+set(TREX_EXTRA_SRC pkg)
+set(TREX_FROM_PKG OFF)
+
+if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/${TREX_EXTRA_SRC})
+  # This code is 
+  set(TREX_FROM_PKG ON)
+  add_custom_target(trex_prep)
+else()
+  set(TREX_EXTRA_DIR ${CMAKE_BINARY_DIR}/${TREX_EXTRA_SRC}
+    CACHE INTERNAL "Directory where extra generated source can be put")
+  set(CPACK_SOURCE_INSTALLED_DIRECTORIES
+    "${CMAKE_SOURCE_DIR};/;${TREX_EXTRA_DIR};/${TREX_EXTRA_SRC}")
+  add_custom_target(trex_prep)
 endif()
 
-
-include(cmake/trex_requirements.cmake)
-include(cmake/trex_macros.cmake)
-
-set(TREX_SHARED share/trex)
-include_directories(${CMAKE_BINARY_DIR})
-
-########################################################################
-# TREX sub directories                                                 #
-########################################################################
-
-# core libraries 
-add_subdirectory(trex)
-trex_cfg(cfg ${TREX_SHARED})
-
-# include extra/plugins
-add_subdirectory(extra) 
-
-########################################################################
-# Finalize                                                             #
-########################################################################
-include(cmake/trex_finalize.cmake)
-
+include(CPack)
