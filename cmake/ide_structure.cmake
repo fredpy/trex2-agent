@@ -61,7 +61,7 @@ endmacro(trex_add_path_filter)
 
 macro(trex_organize_target target)
   get_target_property(src ${target} SOURCES)
-  
+  get_target_property(filter ${target} TREX_IDE_EXCLUDE)
   
   foreach(file ${src})
     if(NOT IS_DIRECTORY ${file})
@@ -73,7 +73,6 @@ macro(trex_organize_target target)
 	if(short_dir STREQUAL ${dir})
 	  truncate_dir(short_dir ${dir} ${CMAKE_CURRENT_BINARY_DIR})
 	endif()
-	get_target_property(filter ${target} TREX_IDE_EXCLUDE)
 	set(dir "${short_dir}")
 	if(filter)
 	  foreach(filt ${filter})
