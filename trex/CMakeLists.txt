@@ -70,6 +70,7 @@ target_link_libraries(amc TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
 add_dependencies(core amc)
 install(TARGETS amc DESTINATION bin)
 
+trex_add_path_filter(amc cmds)
 trex_cmd(amc)
 
 add_executable(sim cmds/Sim.cc)
@@ -77,4 +78,5 @@ target_link_libraries(sim TREXagent ${Boost_PROGRAM_OPTIONS_LIBRARY})
 add_dependencies(core sim)
 install(TARGETS sim DESTINATION bin)
 
+trex_add_path_filter(sim cmds)
 trex_cmd(sim)
