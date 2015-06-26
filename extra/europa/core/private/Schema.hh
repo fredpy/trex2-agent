@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -55,7 +55,7 @@ namespace TREX {
     
     class EuropaPlugin;
     class Assembly;
-
+    
     namespace details {
       
       /** @brief Extension and logging management for Europa
@@ -64,35 +64,35 @@ namespace TREX {
        * - inject new Europa extensions that it can then manipulate
        * - redirect the debug output in its own specific file
        *
-       * This class is not meant to be used directly except for Assembly (the europa 
-       * connection of the EuropaReactor) or EuropaPlugin which allow to declare new 
+       * This class is not meant to be used directly except for Assembly (the europa
+       * connection of the EuropaReactor) or EuropaPlugin which allow to declare new
        * europa extensions to be attached to reactors
        *
        * @author Frederic Py <fpy@mbari.org>
-       */       
+       */
       class Schema :boost::noncopyable {
       public:
-	void registerComponents(Assembly const &assembly);
+        void registerComponents(Assembly const &assembly);
         boost::asio::io_service &service() {
           return m_log->service();
         }
         std::string file_name(std::string const &path) {
           return m_log->file_name(path).string();
         }
-	void setStream(std::ostream &out);
-	
-	std::string const &nddl_path();
+        void setStream(std::ostream &out);
+        
+        std::string const &nddl_path();
         /** @brief recursive use for nddl
-         * 
+         *
          * @param[in] file A file name
          * @param[out] found found indication flag
          *
-         * This method locate the file @p file using TREX::utils::LogManager::use 
-         * if the file was found it sets @p found to @c true and also try to 
-         * locate all the files included by this file recursively and copy them 
-         * in the @c cfg/ log directory 
+         * This method locate the file @p file using TREX::utils::LogManager::use
+         * if the file was found it sets @p found to @c true and also try to
+         * locate all the files included by this file recursively and copy them
+         * in the @c cfg/ log directory
          *
-         * @retval The real path name of @p file if @p found is @c true 
+         * @retval The real path name of @p file if @p found is @c true
          * @retval @p file oherwise
          *
          * @sa TREX::utils::LogManager::use
@@ -101,39 +101,39 @@ namespace TREX {
         std::string use(std::string file, bool &found);
         
       private:
-	Schema();
-	~Schema() {}
-
+        Schema();
+        ~Schema() {}
+        
         /** @brief Include files extraction
          * @param[in] input an input stream
          *
-         * Extract all the file names included using a C like @c #include 
+         * Extract all the file names included using a C like @c #include
          * directive in @a input
          *
-         * @return The set of all the file names included 
+         * @return The set of all the file names included
          *
-         * @bug This is a simple implementation that do not check in depth 
+         * @bug This is a simple implementation that do not check in depth
          * if the @c #include is commented or not
-         */ 
+         */
         static std::set<std::string> includes(std::istream &input);
-
-	void registerPlugin(EuropaPlugin &pg);
-	void unregisterPlugin(EuropaPlugin &pg);
+        
+        void registerPlugin(EuropaPlugin &pg);
+        void unregisterPlugin(EuropaPlugin &pg);
         
         void registerFunction(Assembly const &assembly, EUROPA::CFunction *fn);
-
-	std::set<EuropaPlugin *> m_plugins;
-	std::ofstream            m_europa_debug;
-	std::string              m_path;
-
-	TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
-	typedef std::map<std::string, boost::filesystem::path> 
-          include_map;
+        
+        std::set<EuropaPlugin *> m_plugins;
+        std::ofstream            m_europa_debug;
+        std::string              m_path;
+        
+        TREX::utils::SingletonUse<TREX::utils::LogManager> m_log;
+        typedef std::map<std::string, boost::filesystem::path>
+        include_map;
         include_map m_includes;
         
         
-	friend class TREX::utils::SingletonWrapper<Schema>;
-	friend class TREX::europa::EuropaPlugin;
+        friend class TREX::utils::SingletonWrapper<Schema>;
+        friend class TREX::europa::EuropaPlugin;
       }; // TREX::europa::details::Schema
       
     } // TREX::europa::details

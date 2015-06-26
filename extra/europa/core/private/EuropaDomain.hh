@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -44,9 +44,9 @@
 namespace TREX {
   namespace europa {
     namespace details {
-
+      
       /** @brief Proxy between TREX and Europa domains
-       * 
+       *
        * This class acts as a proxy between Europa domain represention
        * and the TREX one.
        *
@@ -57,47 +57,47 @@ namespace TREX {
        */
       class EuropaDomain :public TREX::transaction::DomainBase {
       public:
-	static TREX::utils::Symbol const type_name;
-
-	explicit EuropaDomain(EUROPA::Domain const &dom);
-	EuropaDomain(EuropaDomain const &other);
-	~EuropaDomain();
-	
-	TREX::transaction::DomainBase *copy() const;
-	// std::ostream &toXml(std::ostream &out, size_t tabs) const;
-      
-	
-	bool isInterval() const {
-	  return m_dom->isInterval();
-	}
-	bool isEnumerated() const {
-	  return m_dom->isEnumerated();
-	}
-	bool isFull() const;
-	bool isSingleton() const {
-	  return m_dom->isSingleton();
-	}
-	bool intersect(TREX::transaction::DomainBase const &other) const;
-	bool equals(TREX::transaction::DomainBase const &other) const;
-
-	TREX::transaction::DomainBase &restrictWith(TREX::transaction::DomainBase const &other);
-	EUROPA::Domain const &europaDomain() const {
-	  return *m_dom;
-	}
-	
+        static TREX::utils::Symbol const type_name;
+        
+        explicit EuropaDomain(EUROPA::Domain const &dom);
+        EuropaDomain(EuropaDomain const &other);
+        ~EuropaDomain();
+        
+        TREX::transaction::DomainBase *copy() const;
+        // std::ostream &toXml(std::ostream &out, size_t tabs) const;
+        
+        
+        bool isInterval() const {
+          return m_dom->isInterval();
+        }
+        bool isEnumerated() const {
+          return m_dom->isEnumerated();
+        }
+        bool isFull() const;
+        bool isSingleton() const {
+          return m_dom->isSingleton();
+        }
+        bool intersect(TREX::transaction::DomainBase const &other) const;
+        bool equals(TREX::transaction::DomainBase const &other) const;
+        
+        TREX::transaction::DomainBase &restrictWith(TREX::transaction::DomainBase const &other);
+        EUROPA::Domain const &europaDomain() const {
+          return *m_dom;
+        }
+        
       private:
         boost::property_tree::ptree build_tree() const;
         
-	EUROPA::Domain *m_dom;
-	
-	static EUROPA::Domain *safe_copy(EUROPA::Domain *dom);
-
-	std::ostream &print_domain(std::ostream &out) const;
-	boost::any singleton() const;
-	std::string stringSingleton() const;
-
+        EUROPA::Domain *m_dom;
+        
+        static EUROPA::Domain *safe_copy(EUROPA::Domain *dom);
+        
+        std::ostream &print_domain(std::ostream &out) const;
+        boost::any singleton() const;
+        std::string stringSingleton() const;
+        
       }; // TREX::europa::details::EuropaDomain
-
+      
     } // TREX::europa::details
   } // TREX::europa
 } // TREX

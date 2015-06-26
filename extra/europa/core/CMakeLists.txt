@@ -35,9 +35,9 @@
 
 # put the europa flags under trex/europa/bits
 configure_file(bits/europa_config.hh.in 
-  ${CMAKE_BINARY_DIR}/bits/europa_config.hh)
+  ${CMAKE_BINARY_DIR}/trex/europa/bits/europa_config.hh)
 install(
-  FILES ${CMAKE_BINARY_DIR}/bits/europa_config.hh 
+  FILES ${CMAKE_BINARY_DIR}/trex/europa/bits/europa_config.hh
   DESTINATION include/trex/europa/bits
   )
 
@@ -56,8 +56,13 @@ add_library(TREXeuropa_core SHARED
   SynchronizationManager.cc
   TimeConstraints.cc
   # headers
+  private/CurrentState.hh
   private/EuropaDomain.hh
+  private/Schema.hh
+  private/TimePoint.hh
+  private/UpdateFlawIterator.hh
   ../trex/europa/Assembly.hh
+  ../trex/europa/config.hh
   ../trex/europa/DeliberationFilter.hh
   ../trex/europa/EuropaEntity.hh
   ../trex/europa/EuropaException.hh
@@ -70,12 +75,14 @@ add_library(TREXeuropa_core SHARED
   ../trex/europa/TrexThreatDecisionPoint.hh
   ../trex/europa/bits/europa_convert.hh
   ../trex/europa/bits/europa_helpers.hh
-  ../trex/europa/config.hh
+  ../trex/europa/bits/system_header.hh
+  ${CMAKE_BINARY_DIR}/trex/europa/bits/europa_config.hh
 )
 
 target_link_libraries(TREXeuropa_core ${EUROPA_LIBRARIES} TREXdomain
   ${Boost_REGEX_LIBRARY})
 
 trex_add_path_filter(TREXeuropa_core ..)
+trex_add_path_filter(TREXeuropa_core ${CMAKE_BINARY_DIR})
 trex_lib(TREXeuropa_core extra)
 
