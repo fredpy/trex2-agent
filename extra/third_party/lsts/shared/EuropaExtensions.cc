@@ -214,6 +214,10 @@ LatLonDist::handleExecute()
 //    // otherwise
 //    return;
 //  }
+  
+  if( m_dist.intersect(0, std::numeric_limits<EUROPA::edouble>::infinity())
+     && m_dist.isEmpty() )
+    return;
 
   if (m_lat1.isSingleton())
     lat1 = cast_basis(m_lat1.getSingletonValue());
