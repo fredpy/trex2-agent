@@ -130,6 +130,9 @@ namespace TREX {
       void
       setTrexId(int trex_id);
 
+      void
+      setPlatformId(int platf_id);
+
       void setReactorGraph(graph const &g);
       void set_proxy(tick_proxy *p) {
         m_cvt.reset(p);
@@ -176,7 +179,7 @@ namespace TREX {
       const int c_max_iridium_payload_length;
       void variableToImc(Variable const &v, TrexAttribute * attr);
       void setAttribute(Predicate &pred, TrexAttribute const &attr);
-      int m_trex_id;
+      int m_trex_id, m_platf_id, m_iridium_req;
       UDPSocket sock_send, sock_receive;
       uint8_t* bfr;
       //IOMultiplexing iom;

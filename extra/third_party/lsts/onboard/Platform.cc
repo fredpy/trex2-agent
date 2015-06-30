@@ -807,7 +807,6 @@ namespace TREX
     Platform::sendMsg(Message& msg, std::string ip, int port)
     {
       msg.setTimeStamp();
-      msg.setSource(TREX_ID);
       return m_adapter.send(&msg, ip, port);
     }
     

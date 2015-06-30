@@ -54,6 +54,8 @@ namespace TREX
         c_max_iridium_payload_length(260)
     {
       m_trex_id = 65000;
+      m_platf_id = 0;
+      m_iridium_req = 0;
       bfr = new uint8_t[65535];
       messenger = NULL;
     }
@@ -92,6 +94,8 @@ namespace TREX
         return Observation("estate", "Boot");
 
       Observation obs("estate", "Position");
+
+      m_platf_id = msg->getSource();
 
       double latitude, longitude;
       latitude = msg->lat;
@@ -372,7 +376,11 @@ namespace TREX
     ImcAdapter::sendAsynchronous(Message * msg, std::string addr, int port)
     {
        if (msg->getTimeStamp() == 0)
-    	 msg->setTimeStamp();
+         msg->setTimeStamp();
+
+       if (msg->getSource() == 0 || msg->getSource() == 65535)
+         msg->setSource(m_trex_id);
+
        if (messenger == NULL)
         messenger = new ImcMessenger();
       messenger->post(msg, port, addr);
@@ -389,7 +397,8 @@ namespace TREX
       uint8_t buffer[65635];
       ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
-      irMsg->source = msg->getSource();
+      irMsg->source = m_platf_id;
+
       int len = irMsg->serialize(buffer);
 
       // message needs to be fragmented...
@@ -406,12 +415,13 @@ namespace TREX
               frags.getFragment(i));
           uint8_t buff[512];
           irMsg->destination = msg->getDestination();
-          irMsg->source = msg->getSource();
+          irMsg->source = m_platf_id;
           int length = irMsg->serialize(buff);
           IridiumMsgTx * tx = new IridiumMsgTx();
           tx->ttl = 1800; // try sending this update for 30 minutes
           tx->data.assign(buff, buff + length);
           tx->setTimeStamp();
+          tx->req_id = (++m_iridium_req) % 65535;
           if (!send(tx, address, port))
             return false;
         }
@@ -422,6 +432,7 @@ namespace TREX
         IridiumMsgTx * tx = new IridiumMsgTx();
         tx->setTimeStamp();
         tx->data.assign(buffer, buffer + len);
+        tx->req_id = (++m_iridium_req) % 65535;
         return send(tx, address, port);
       }
     }
@@ -459,8 +470,11 @@ namespace TREX
     bool
     ImcAdapter::sendSynchronous(Message * msg, std::string addr, int port)
     {
-       if (msg->getTimeStamp() == 0)
-    	 msg->setTimeStamp();
+      if (msg->getTimeStamp() == 0)
+         msg->setTimeStamp();
+
+      if (msg->getSource() == 0 || msg->getSource() == 65535)
+        msg->setSource(m_trex_id);
 
       DUNE::Utils::ByteBuffer bb;
       try
@@ -652,14 +666,19 @@ namespace TREX
       long double val = time.total_milliseconds();
       val /= 1000.0;
       result->setTimeStamp(static_cast<double>(val));
-      
-      
+      result->setSource(m_trex_id);
     }
 
     void
     ImcAdapter::setTrexId(int trex_id)
     {
       m_trex_id = trex_id;
+    }
+
+    void
+    ImcAdapter::setPlatformId(int platf_id)
+    {
+      m_platf_id = platf_id;
     }
 
     ImcAdapter::~ImcAdapter()

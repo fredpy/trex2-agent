@@ -46,8 +46,6 @@ namespace TREX {
    */
   namespace LSTS {
 
-    static const int TREX_ID = 65000;
-
     /** @brief LSTS platform reactor definition
      *
      * This class implements a reactor that allows access to an LSTS AUV.
