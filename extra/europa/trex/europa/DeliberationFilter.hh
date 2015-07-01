@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_europa_DeliberationFilter 
+#ifndef H_trex_europa_DeliberationFilter
 # define H_trex_europa_DeliberationFilter
 
 # include "config.hh"
@@ -43,10 +43,10 @@ namespace TREX {
   namespace europa {
     
     class Assembly;
-
+    
     /** @brief T-REX token filter
      *
-     * A europa token filter that is connected to an Assembly in order 
+     * A europa token filter that is connected to an Assembly in order
      * to gather data from it during its filtering.
      *
      * @author Frederic Py <fpy@mbari.org>
@@ -70,7 +70,7 @@ namespace TREX {
        * @retval false otherwise
        */
       bool have_assembly() const {
-	return NULL!=m_assembly;
+        return NULL!=m_assembly;
       }
       /** @brief Get Assembly
        *
@@ -83,7 +83,7 @@ namespace TREX {
        * @sa has_assembly() const
        */
       Assembly const &assembly() const;
-
+      
       /** @brief Token filter specialization
        *
        * @param[in] token A token
@@ -103,7 +103,7 @@ namespace TREX {
        *
        * @retval true if @p token is explicitely ignored by the assembly
        * @retval true if @p token necessarily ends before the mission initial tick
-       * @retval true if @p token necessarily starts beyond the mission final tick 
+       * @retval true if @p token necessarily starts beyond the mission final tick
        * @retval false otherwise
        */
       bool tokenCheck(EUROPA::TokenId const &token);
@@ -124,21 +124,21 @@ namespace TREX {
        *
        * @param[in] component An europa component
        *
-       * Attach this filter to the Assembly @p component only if this filter is not 
+       * Attach this filter to the Assembly @p component only if this filter is not
        * attached to an Assembly yet.
        *
        * @pre @p component is an Assembly
        * @throw EuropaException @p component is not an Assembly
        */
       void set_assembly(EUROPA::EngineComponentId const &component);
-
+      
       Assembly *m_assembly;
     }; // TREX::europa::TokenFilter
-
+    
     /** @brief Reactor deliberation scope
      *
-     * This class is used by Assembluy in order to focus the planning to 
-     * only the tokens within the planning horizon of this reactor. It is 
+     * This class is used by Assembluy in order to focus the planning to
+     * only the tokens within the planning horizon of this reactor. It is
      * automatically added to the planner configuration by the Assembly.
      *
      * @author Frederic Py <fpy@mbari.org>
@@ -152,7 +152,7 @@ namespace TREX {
        * @param[in] cfg Xml configuration
        */
       DeliberationScope(EUROPA::TiXmlElement const &cfg)
-	:TokenFilter(cfg) {}
+      :TokenFilter(cfg) {}
       /** @brief Destructor
        */
       ~DeliberationScope() {}
@@ -160,18 +160,18 @@ namespace TREX {
     private:
       /** @brief Filter test
        *
-       * @param[in] tok A token 
-       * @retval true if @p tok necessarily ends before current tick or starts 
+       * @param[in] tok A token
+       * @retval true if @p tok necessarily ends before current tick or starts
        * after the Assembly planning scope
        * @retval false otherwise
        */
       bool doTest(EUROPA::TokenId const &tok);
     }; // TREX::europa::DeliberationScope
-
+    
     /** @brief synchronization deliberation scope
      *
-     * This class is used by Assembly in order to focus the planning probalem to 
-     * only tokens that can overlap the current tick. It is 
+     * This class is used by Assembly in order to focus the planning probalem to
+     * only tokens that can overlap the current tick. It is
      * automatically added to the synchronizer configuration by the Assembly.
      *
      * @author Frederic Py <fpy@mbari.org>
@@ -185,7 +185,7 @@ namespace TREX {
        * @param[in] cfg Xml configuration
        */
       SynchronizationScope(EUROPA::TiXmlElement const &cfg)
-	:TokenFilter(cfg) {}
+      :TokenFilter(cfg) {}
       /** @brief Destructor
        */
       ~SynchronizationScope() {}
@@ -193,19 +193,19 @@ namespace TREX {
     private:
       /** @brief Filter test
        *
-       * @param[in] tok A token 
-       * @retval true if @p tok necessarily ends before current tick or starts 
+       * @param[in] tok A token
+       * @retval true if @p tok necessarily ends before current tick or starts
        * after the next tick
        * @retval false otherwise
        */
       bool doTest(EUROPA::TokenId const &tok);
     }; // TREX::europa::SynchronizationScope
-
+    
   } // europa
 } // TREX
 
 /** @brief Name of the Deliberation scope filter
- * 
+ *
  * The name used in XML configuration for the DeliberationScope filter
  *
  * @relates TREX::europa::DeliberationScope
@@ -213,7 +213,7 @@ namespace TREX {
  */
 # define TREX_DELIB_FILT TrexDeliberationScope
 /** @brief Name of the Synchronization scope filter
- * 
+ *
  * The name used in XML configuration for the SynchronizationScope filter
  *
  * @relates TREX::europa::SynchronizationScope

@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,7 +47,7 @@ using namespace TREX::europa;
 // structors
 
 TokenFilter::TokenFilter(EUROPA::TiXmlElement const &cfg)
-  :EUROPA::SOLVERS::FlawFilter(cfg, true), m_assembly(NULL) {}
+:EUROPA::SOLVERS::FlawFilter(cfg, true), m_assembly(NULL) {}
 
 // observers
 
@@ -60,7 +60,7 @@ Assembly const &TokenFilter::assembly() const {
 // modifiers
 
 void TokenFilter::set_assembly(EUROPA::EngineComponentId const &component) {
-  if( !have_assembly() && component.isId() ) 
+  if( !have_assembly() && component.isId() )
     m_assembly = &(details::assembly_of(component));
 }
 
@@ -68,20 +68,20 @@ void TokenFilter::set_assembly(EUROPA::EngineComponentId const &component) {
 
 bool TokenFilter::tokenCheck(EUROPA::TokenId const &token) {
   return assembly().ignored(token) ||
-    token->start()->lastDomain().getLowerBound() >= assembly().final_tick() ||
-    token->end()->lastDomain().getUpperBound() <= assembly().initial_tick();
+  token->start()->lastDomain().getLowerBound() >= assembly().final_tick() ||
+  token->end()->lastDomain().getUpperBound() <= assembly().initial_tick();
 }
 
 bool TokenFilter::test(EUROPA::EntityId const &entity) {
   EUROPA::TokenId token;
-
+  
   if( EUROPA::TokenId::convertable(entity)  ) {
     token = EUROPA::TokenId(entity);
     set_assembly(token->getPlanDatabase());
   } else if( EUROPA::ConstrainedVariableId::convertable(entity) ) {
     EUROPA::ConstrainedVariableId var(entity);
     set_assembly(var->getConstraintEngine());
-
+    
     token = details::parent_token(var);
   }
   
@@ -100,14 +100,14 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
   
   if( t_start.getLowerBound() >= horizon.getUpperBound() ) {
     debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") starts "<<t_start.toString()
-              <<" after horizon "<<horizon.toString());
+             <<" after horizon "<<horizon.toString());
     return true;
-  } else if( t_end.getUpperBound() < horizon.getLowerBound() ) {    
+  } else if( t_end.getUpperBound() < horizon.getLowerBound() ) {
     debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") ends "<<t_end.toString()<<" before horizon "<<horizon.toString());
     return true;
   } else if( t_end.getUpperBound() <= initial ) {
     debugMsg("trex:filt:delib", "Exclude: token("<<tok<<") ends "<<t_end.toString()<<" before initial "<<initial);
-    return true;    
+    return true;
   } else
     return false;
 }
@@ -117,26 +117,26 @@ bool DeliberationScope::doTest(EUROPA::TokenId const &tok) {
  */
 
 bool SynchronizationScope::doTest(EUROPA::TokenId const &tok) {
-  EUROPA::eint cur = assembly().now(), 
-    initial = assembly().initial_tick();
-    
+  EUROPA::eint cur = assembly().now(),
+  initial = assembly().initial_tick();
+  
   // debugMsg("trex:filt:synch", "Checking if "<<tok->toString()<<" overlaps "<<cur);
   
   if( tok->start()->lastDomain().getLowerBound() > cur ) {
     debugMsg("trex:filt:synch", tok->toString()<<".start="<<tok->start()->lastDomain().toString()
-             <<" after "<<cur<<" => EXCLUDE"); 
+             <<" after "<<cur<<" => EXCLUDE");
     return true;
   }
-
+  
   EUROPA::eint max_end = tok->end()->lastDomain().getUpperBound();
-
+  
   if( max_end <= initial || max_end < (tok->isFact()?cur:(cur+1)) ) {
     debugMsg("trex:filt:synch", tok->toString()<<".end="
-	     <<tok->end()->lastDomain().toString()
-             <<" before "<<cur<<" => EXCLUDE"); 
+             <<tok->end()->lastDomain().toString()
+             <<" before "<<cur<<" => EXCLUDE");
     return true;
   }
-//  debugMsg("trex:filt:synch", tok->toString()<<" overlaps "<<cur<<" => OK");
+  //  debugMsg("trex:filt:synch", tok->toString()<<" overlaps "<<cur<<" => OK");
   return false;
 }
 

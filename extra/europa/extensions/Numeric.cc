@@ -204,6 +204,8 @@ CeilConstraint::CeilConstraint(EUROPA::LabelStr const &name,
 
 void CeilConstraint::handleExecute() {
   EUROPA::edouble c_lb, c_ub, v_lb, v_ub;
+  EUROPA::edouble const almost_one(1.0-1e-10);
+  
   // restrict m_abs based on m_val
   m_val.getBounds(v_lb, v_ub);
   
@@ -223,8 +225,9 @@ void CeilConstraint::handleExecute() {
   
   if( c_lb<=std::numeric_limits<EUROPA::eint>::minus_infinity() )
     v_lb = std::numeric_limits<EUROPA::edouble>::minus_infinity();
-  else if( (c_lb-1.0)<v_lb )
-    v_lb = c_lb-1.0;
+  else if( (c_lb-almost_one)>v_lb )
+    v_lb = c_lb-almost_one;
+  
   if( c_ub>=std::numeric_limits<EUROPA::eint>::infinity() )
     v_ub = std::numeric_limits<EUROPA::edouble>::infinity();
   else if( v_ub>c_ub )
