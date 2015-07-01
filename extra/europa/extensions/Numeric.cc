@@ -252,6 +252,8 @@ m_val(getCurrentDomain(vars[1])) {
 
 void FloorConstraint::handleExecute() {
   EUROPA::edouble f_lb, f_ub, v_lb, v_ub;
+  EUROPA::edouble const almost_one(1.0-1e-10);
+
   // restrict m_abs based on m_val
   m_val.getBounds(v_lb, v_ub);
   
@@ -275,8 +277,8 @@ void FloorConstraint::handleExecute() {
     v_lb = f_lb;
   if( f_ub>=std::numeric_limits<EUROPA::eint>::infinity() )
     v_ub = std::numeric_limits<EUROPA::edouble>::infinity();
-  else if( v_ub>(f_ub+1.0) )
-    v_ub = f_ub+1.0;
+  else if( v_ub>(f_ub+almost_one) )
+    v_ub = f_ub+almost_one;
   m_val.intersect(v_lb, v_ub);
 }
 
