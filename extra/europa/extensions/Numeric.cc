@@ -204,7 +204,7 @@ CeilConstraint::CeilConstraint(EUROPA::LabelStr const &name,
 
 void CeilConstraint::handleExecute() {
   EUROPA::edouble c_lb, c_ub, v_lb, v_ub;
-  EUROPA::edouble const almost_one(1.0-1e-10);
+  EUROPA::edouble const almost_one(1.0-m_val.minDelta());
   
   // restrict m_abs based on m_val
   m_val.getBounds(v_lb, v_ub);
@@ -252,7 +252,7 @@ m_val(getCurrentDomain(vars[1])) {
 
 void FloorConstraint::handleExecute() {
   EUROPA::edouble f_lb, f_ub, v_lb, v_ub;
-  EUROPA::edouble const almost_one(1.0-1e-10);
+  EUROPA::edouble const almost_one(1.0-m_val.minDelta());
 
   // restrict m_abs based on m_val
   m_val.getBounds(v_lb, v_ub);
