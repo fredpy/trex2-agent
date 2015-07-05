@@ -644,20 +644,55 @@ namespace TREX
     void
     ImcAdapter::asImcMessage(TICK date, Predicate const &obs, TrexToken * result)
     {
+      bool duration_full = true, end_deduced = true;
+      
       result->timeline = obs.object().str();
       result->predicate = obs.predicate().str();
       result->attributes.clear();
 
       std::list<TREX::utils::Symbol> attrs;
 
+      
       obs.listAttributes(attrs);
       std::list<TREX::utils::Symbol>::iterator it;
+      
+      if( obs.has_temporal_scope() ) {
+        IntegerDomain duration(Goal::s_durationDomain);
+        
+        // check if duration is the default [1, +inf]
+        duration.restrictWith(obs.getAttribute(Goal::s_durationName).domain());
+        std::cerr<<"Testing if "<<duration<<"=="<<Goal::s_durationDomain<<std::endl;
+        duration_full = duration.equals(Goal::s_durationDomain);
+      
+        // check if the end is directly deduced from start+duration
+        IntegerDomain start(Goal::s_dateDomain);
+          
+        start.restrictWith(obs.getAttribute(Goal::s_startName).domain());
+        Goal test("foo", "bar");
+        test.restrictTime(start, duration, Goal::s_dateDomain);
+        end_deduced = test.getEnd().equals(obs.getAttribute(Goal::s_endName).domain());
+      }
+      
+      
       for (it = attrs.begin(); it != attrs.end(); it++)
       {
         TrexAttribute attr;
         Variable v = obs.getAttribute(*it);
-        variableToImc(v, &attr);
-        result->attributes.push_back(attr);
+        // test if the domain is not restricted
+        bool full;
+        // special case for duration which is [1, +inf]
+        if( v.name()==Goal::s_durationName )
+          full = duration_full;
+        else if( v.name()==Goal::s_endName )
+          full = end_deduced;
+        else
+          full = v.domain().isFull();
+        
+        // Do not add domains that are not restricted
+        if( !full ) {
+          variableToImc(v, &attr);
+          result->attributes.push_back(attr);
+        }
       }
       
       boost::posix_time::time_duration
