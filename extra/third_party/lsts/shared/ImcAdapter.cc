@@ -661,7 +661,6 @@ namespace TREX
         
         // check if duration is the default [1, +inf]
         duration.restrictWith(obs.getAttribute(Goal::s_durationName).domain());
-        std::cerr<<"Testing if "<<duration<<"=="<<Goal::s_durationDomain<<std::endl;
         duration_full = duration.equals(Goal::s_durationDomain);
       
         // check if the end is directly deduced from start+duration
