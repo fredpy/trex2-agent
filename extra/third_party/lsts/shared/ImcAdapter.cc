@@ -378,8 +378,7 @@ namespace TREX
        if (msg->getTimeStamp() <= 0)
          msg->setTimeStamp();
 
-       std::cout << "TREX ID " << m_trex_id << std::endl;
-       if (msg->getSource() == 0 || msg->getSource() == 65535)
+       if (msg->getSource() <= 0 || msg->getSource() == 65535)
          msg->setSource(m_trex_id);
 
        if (messenger == NULL)
@@ -473,6 +472,11 @@ namespace TREX
     {
       if (msg->getTimeStamp() <= 0)
          msg->setTimeStamp();
+
+      if (msg->getSource() <= 0 || msg->getSource() == 65535)
+        msg->setSource(m_trex_id);
+
+      msg->toText(std::cout);
 
       DUNE::Utils::ByteBuffer bb;
       try

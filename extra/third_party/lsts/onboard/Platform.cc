@@ -68,6 +68,9 @@ namespace TREX
 
       localport = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
                                   "localport");
+
+      imcid = parse_attr<int>(false, TeleoReactor::xml_factory::node(arg),
+                                       "imcid");
       //m_links = std::map<std::string, Announce*>();
       
       // Timelines for posting observations from DUNE
@@ -99,6 +102,7 @@ namespace TREX
     Platform::handleInit()
     {
       syslog(log::info) << "Connecting to dune on " << duneip << ":" << duneport;
+      m_adapter.setTrexId(imcid);
       m_adapter.bind(localport);
       m_last_msg = -1;
       syslog(log::info) << "listening on port " << localport << "...";

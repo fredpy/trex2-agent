@@ -38,6 +38,13 @@ TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
   m_output = parse_attr<bool>(false,
                               TeleoReactor::xml_factory::node(arg),
                               "output");
+
+  m_imcid = parse_attr<int>(false,
+                                TeleoReactor::xml_factory::node(arg),
+                                "imcid");
+
+
+  m_adapter.setTrexId(m_imcid);
 }
 
 TimelineReporter::~TimelineReporter() {

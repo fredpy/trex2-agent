@@ -116,6 +116,9 @@ namespace TREX {
       /** @brief port to be used for listening for incoming IMC messages */
       int localport;
 
+      /** @brief IMC ID to use when sending IMC messages */
+      int imcid;
+
       /** @brief use debug output */
       bool debug;
 

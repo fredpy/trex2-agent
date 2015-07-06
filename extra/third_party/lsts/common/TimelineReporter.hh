@@ -37,7 +37,7 @@ namespace TREX {
       //TREX::utils::SingletonUse<SharedEnvironment> m_env;
       bool aborted;
       bool m_output;
-      int m_hostport;
+      int m_hostport, m_imcid;
       std::string m_hostaddr;
       ImcAdapter m_adapter;
       bool synchronize()
