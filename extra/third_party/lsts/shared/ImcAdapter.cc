@@ -375,9 +375,10 @@ namespace TREX
     bool
     ImcAdapter::sendAsynchronous(Message * msg, std::string addr, int port)
     {
-       if (msg->getTimeStamp() == 0)
+       if (msg->getTimeStamp() <= 0)
          msg->setTimeStamp();
 
+       std::cout << "TREX ID " << m_trex_id << std::endl;
        if (msg->getSource() == 0 || msg->getSource() == 65535)
          msg->setSource(m_trex_id);
 
@@ -470,11 +471,8 @@ namespace TREX
     bool
     ImcAdapter::sendSynchronous(Message * msg, std::string addr, int port)
     {
-      if (msg->getTimeStamp() == 0)
+      if (msg->getTimeStamp() <= 0)
          msg->setTimeStamp();
-
-      if (msg->getSource() == 0 || msg->getSource() == 65535)
-        msg->setSource(m_trex_id);
 
       DUNE::Utils::ByteBuffer bb;
       try
