@@ -260,7 +260,7 @@ namespace TREX
       {
         TrexAttribute * attr = *it;
 
-        log()<< "Parsing attribute " << attr->name
+        std::cerr<< "Parsing attribute " << attr->name
           <<"\n   - min= \""<<attr->min<<'\"'
           <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
 
@@ -314,8 +314,8 @@ namespace TREX
       std::string min = attr.min;
       std::string max = attr.max;
 
-      log()<<"set attribute "<<pred.object()<<"."<<pred.predicate()<<"."
-        <<attr.name;
+      std::cerr<<"set attribute "<<pred.object()<<"."<<pred.predicate()<<"."
+      <<attr.name<<std::endl;
       
       switch (attr.attr_type)
       {
