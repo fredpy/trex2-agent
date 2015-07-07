@@ -667,6 +667,12 @@ namespace TREX {
       
       boost::asio::strand &strand();
       
+      utils::log::stream syslog(utils::log::id_type const &context,
+                                utils::log::id_type const &kind) const;
+      utils::log::stream syslog(utils::log::id_type const &kind=null) const {
+        return syslog(null, kind);
+      }
+
     protected:
       reactor_id add_reactor(reactor_id r);
       
@@ -677,11 +683,6 @@ namespace TREX {
       void updateTick(TICK value, bool started=true);
       void set_name(TREX::utils::Symbol const &name);
       
-      utils::log::stream syslog(utils::log::id_type const &context,
-                                utils::log::id_type const &kind) const;
-      utils::log::stream syslog(utils::log::id_type const &kind=null) const {
-        return syslog(null, kind);
-      }
       
       TREX::utils::LogManager &manager() const;
       

@@ -67,10 +67,11 @@ namespace TREX {
           return duration_str(bound.value());
         }
         
-        
+        virtual utils::log::stream log(utils::Symbol const &kind) =0;
+      
       protected:
         tick_proxy() {}
-
+        
       };
       
       
@@ -173,6 +174,10 @@ namespace TREX {
       tick_proxy &time_conv() const {
         return *m_cvt;
       }
+      utils::log::stream log(utils::Symbol const &kind=utils::log::null) {
+        return time_conv().log(kind);
+      }
+      
       
     private:
       const int c_imc_header_length;

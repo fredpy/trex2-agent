@@ -41,6 +41,10 @@ namespace TREX
           return m_graph.as_duration(date);
         }
         
+        utils::log::stream log(utils::Symbol const &kind) {
+          return m_graph.syslog("imc", kind);
+        }
+
       private:
         graph const &m_graph;
         
@@ -256,7 +260,9 @@ namespace TREX
       {
         TrexAttribute * attr = *it;
 
-        std::cout << "Parsing attribute " << attr->name << std::endl;
+//        std::cerr<< "Parsing attribute " << attr->name
+//          <<"\n   - min= \""<<attr->min<<'\"'
+//          <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
 
         if (attr->name == "start" || attr->name == "end")
         {
@@ -291,6 +297,9 @@ namespace TREX
         }
         else
           setAttribute(g, *attr);
+//        if( g.hasAttribute(attr->name) )
+//          std::cerr<<"  - "<<attr->name<<"="<<g.getAttribute(attr->name).domain()<<std::endl;
+        
       }
 
       return g;
@@ -308,13 +317,16 @@ namespace TREX
       switch (attr.attr_type)
       {
         case TrexAttribute::TYPE_STRING:
-          pred.restrictAttribute(attr.name, StringDomain(min));
+          if( min==max && !min.empty() ) {
+//            std::cerr<<"string("<<attr.name<<")=\""<<min<<"\""<<std::endl;
+            pred.restrictAttribute(attr.name, StringDomain(min));
+          }
           break;
 
         case TrexAttribute::TYPE_BOOL:
           if (min == max && min != "")
             pred.restrictAttribute(attr.name,
-                                   BooleanDomain(min != "false" || min != "0"));
+                                   BooleanDomain(min != "false" && min != "0"));
           else
             pred.restrictAttribute(attr.name, BooleanDomain());
           break;
@@ -348,10 +360,11 @@ namespace TREX
           break;
 
         case TrexAttribute::TYPE_ENUM:
-          if (min == "" || max == "")
-            pred.restrictAttribute(attr.name, EnumDomain());
-          else
+          if( min==max && !min.empty() ) {
+//            std::cerr<<"enum("<<attr.name<<")=\""<<min<<"\""<<std::endl;
             pred.restrictAttribute(attr.name, EnumDomain(min));
+          }
+
           break;
 
         default:
@@ -633,6 +646,9 @@ namespace TREX
       }
       else if (t.str() == "enum")
       {
+        attr->attr_type = TrexAttribute::TYPE_ENUM;
+      } else {
+        // set unknown as enum for now
         attr->attr_type = TrexAttribute::TYPE_ENUM;
       }
 
