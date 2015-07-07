@@ -365,14 +365,21 @@ namespace TREX
     }
     
     void Platform::postGoalToken() {
-      if(receivedGoals.empty()) return;
+      if(receivedGoals.empty())
+        return;
       if (m_env->getControlInterfaceReactor() != NULL) {
-        std::string front = receivedGoals.front();
+        std::string id;
+        goal_id g;
+        
+        boost::tie(id, g) = receivedGoals.front();
+        
         if (debug)
-          std::cout << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<front;
-        syslog(log::info) << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<front;
-        m_env->getControlInterfaceReactor()->proccess_message(
-                                                              front);
+          std::cout << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal: "<<*g;
+        
+        syslog(log::info) << "2. receivedGoals #"<<receivedGoals.size()<<", posting goal:"<<*g;
+        
+        m_env->getControlInterfaceReactor()->handleGoal(id, g);
+                                                              
         receivedGoals.pop();
       } else {
         if (debug)
@@ -383,30 +390,11 @@ namespace TREX
         std::cout << std::endl;
     }
     
-    namespace {
-      struct LocaleBool {
-          bool data;
-          LocaleBool() {}
-          explicit LocaleBool( bool data ) : data(data) {}
-
-        // unused method
-//          friend std::ostream & operator << ( std::ostream &out, LocaleBool b ) {
-//              out << std::boolalpha << b.data;
-//              return out;
-//          }
-          friend std::istream & operator >> ( std::istream &in, LocaleBool &b ) {
-              in >> std::boolalpha >> b.data;
-              return in;
-          }
-      };
-
-    }
-
     void
-    Platform::enqueueGoalToken(std::string goald_id, TrexToken token)
+    Platform::enqueueGoalToken(std::string proxy_id, TrexToken token)
     {
-      goal_id g = new Goal(m_adapter.genericGoal(&token, 0));
-      receivedGoals.push(g);
+      goal_id g(new Goal(m_adapter.genericGoal(&token, 0)));
+      receivedGoals.push(std::make_pair(proxy_id, g));
     }
 
     void

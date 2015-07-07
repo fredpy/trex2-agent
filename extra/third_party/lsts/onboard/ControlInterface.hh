@@ -73,9 +73,7 @@ namespace TREX {
        */
       void proccess_message(std::string const &msg);
 
-      void handleGoal(const TREX::transaction::Goal &g) {
-        postGoal(g);
-      }
+      void handleGoal(std::string const &proxy_id, TREX::transaction::goal_id g);
 
     private:
 

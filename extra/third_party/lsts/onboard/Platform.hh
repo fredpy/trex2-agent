@@ -136,7 +136,7 @@ namespace TREX {
       std::map<uint16_t, IMC::Message *> received;
 
       /** @brif vector of received goals */
-      std::queue<TREX::transaction::goal_id> receivedGoals;
+      std::queue< std::pair<std::string, TREX::transaction::goal_id> > receivedGoals;
       std::queue<Observation> referenceObservations;
 
       IMC::Reference goingRef;

@@ -242,7 +242,12 @@ size_t ControlInterface::retrieve_from_fifo(char *buff, size_t buff_size, int us
   return 0;
 }
 
-void ControlInterface::proccess_message(std::string const &msg) {  
+void ControlInterface::handleGoal(std::string const &proxy_id, TREX::transaction::goal_id g) {
+  add_goal(g, proxy_id);
+}
+
+
+void ControlInterface::proccess_message(std::string const &msg) {
   // First log the message
   std::string msg_id = log_message(msg);
   syslog(log::info)<<"Received message "<<msg_id;
