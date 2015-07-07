@@ -260,9 +260,9 @@ namespace TREX
       {
         TrexAttribute * attr = *it;
 
-//        std::cerr<< "Parsing attribute " << attr->name
-//          <<"\n   - min= \""<<attr->min<<'\"'
-//          <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
+        log()<< "Parsing attribute " << attr->name
+          <<"\n   - min= \""<<attr->min<<'\"'
+          <<"\n   - max= \""<<attr->max<<'\"'<<std::endl;
 
         if (attr->name == "start" || attr->name == "end")
         {
@@ -314,11 +314,13 @@ namespace TREX
       std::string min = attr.min;
       std::string max = attr.max;
 
+      log()<<"set attribute "<<pred.object()<<"."<<pred.predicate()<<"."
+        <<attr.name;
+      
       switch (attr.attr_type)
       {
         case TrexAttribute::TYPE_STRING:
           if( min==max && !min.empty() ) {
-//            std::cerr<<"string("<<attr.name<<")=\""<<min<<"\""<<std::endl;
             pred.restrictAttribute(attr.name, StringDomain(min));
           }
           break;
@@ -570,7 +572,7 @@ namespace TREX
 //      return false;
 //    }
 
-    void
+    bool
     ImcAdapter::variableToImc(Variable const &v, TrexAttribute * attr)
     {
       Symbol t = v.domain().getTypeName();
@@ -600,7 +602,7 @@ namespace TREX
             attr->min = s;
           }
         }
-        return;
+        return true;
       }
       else if (attr->name == "duration")
       {
@@ -626,7 +628,7 @@ namespace TREX
             attr->min = s;
           }
         }
-        return;
+        return true;
       }
       else if (t.str() == "float")
       {
@@ -648,8 +650,14 @@ namespace TREX
       {
         attr->attr_type = TrexAttribute::TYPE_ENUM;
       } else {
-        // set unknown as enum for now
-        attr->attr_type = TrexAttribute::TYPE_ENUM;
+        if( v.domain().isEnumerated() ) {
+          log(utils::log::warn)<<"Unknown enum type "<<t<<" for attribute "<<attr->name;
+          // set unknown as enum for now
+          attr->attr_type = TrexAttribute::TYPE_ENUM;
+        } else {
+          log(utils::log::error)<<"Unknown interval type "<<t<<" for attribute "<<attr->name;
+          return false;
+        }
       }
 
       if (v.domain().isSingleton())
@@ -662,6 +670,7 @@ namespace TREX
         attr->max = "";
         attr->min = "";
       }
+      return true;
     }
 
     void
@@ -712,8 +721,8 @@ namespace TREX
         
         // Do not add domains that are not restricted
         if( !full ) {
-          variableToImc(v, &attr);
-          result->attributes.push_back(attr);
+          if( variableToImc(v, &attr) )
+            result->attributes.push_back(attr);
         }
       }
       
