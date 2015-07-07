@@ -73,6 +73,10 @@ namespace TREX {
        */
       void proccess_message(std::string const &msg);
 
+      void handleGoal(const TREX::transaction::Goal &g) {
+        postGoal(g);
+      }
+
     private:
 
       void notify(TREX::transaction::Observation const &obs);

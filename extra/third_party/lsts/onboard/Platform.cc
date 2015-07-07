@@ -405,61 +405,8 @@ namespace TREX
     void
     Platform::enqueueGoalToken(std::string goald_id, TrexToken token)
     {
-      std::stringstream ss;
-      std::string timeline = token.timeline;
-      std::string predicate = token.predicate;
-      
-      ss << "<Goal on='" << token.timeline << "' pred='"
-      << token.predicate << "' id='" << goald_id << "'>\n";
-      
-      MessageList<TrexAttribute>::const_iterator it;
-      for (it = token.attributes.begin(); it != token.attributes.end(); it++)
-      {
-        ss << "\t<Variable name='" << (*it)->name << "'>\n";
-
-        //FIXME if min == max, use value instead
-
-        switch ((*it)->attr_type)
-        {
-          case TrexAttribute::TYPE_FLOAT:
-            ss << "\t\t<float min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_INT:
-            ss << "\t\t<int min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_STRING:
-            ss << "\t\t<string min='" << (*it)->min << "' max='" << (*it)->max << "'/>\n";
-            break;
-          case TrexAttribute::TYPE_BOOL:
-            {
-                bool min_v = boost::lexical_cast<LocaleBool>((*it)->min).data,
-                    max_v = boost::lexical_cast<LocaleBool>((*it)->max).data;
-
-                if (min_v == max_v)
-                  ss << "\t\t<bool value='" << min_v << "'/>\n";
-                else
-                  ss << "\t\t<bool/>\n";
-            }
-            break;
-          case TrexAttribute::TYPE_ENUM:
-            // <enum value="square"/>
-            ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
-            ss << "\t\t<enum value='" << (*it)->min << "'/>\n";
-            break;
-          default:
-            syslog(log::error) << "Error parsing attribute: ";
-            (*it)->toText(syslog(log::error));
-            break;
-        }
-        
-        ss << "\t</Variable>\n";
-        
-      }
-      ss << "\t</Goal>\n";
-      syslog(log::error) << "Received goal:\n" << ss.str();
-      
-      receivedGoals.push(ss.str());
-
+      goal_id g = new Goal(m_adapter.genericGoal(&token, 0));
+      receivedGoals.push(g);
     }
 
     void

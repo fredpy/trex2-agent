@@ -256,6 +256,8 @@ namespace TREX
       {
         TrexAttribute * attr = *it;
 
+        std::cout << "Parsing attribute " << attr->name << std::endl;
+
         if (attr->name == "start" || attr->name == "end")
         {
           IntegerDomain::bound min = IntegerDomain::minus_inf,
@@ -274,13 +276,18 @@ namespace TREX
         }
         else if (attr->name == "duration")
         {
-          IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
-          if (!attr->min.empty())
-            min = m_cvt->as_duration(attr->min);
-          if (!attr->max.empty())
-            max = m_cvt->as_duration(attr->max);
+          try {
+            IntegerDomain::bound min = 1, max = IntegerDomain::plus_inf;
+            if (!attr->min.empty())
+              min = m_cvt->as_duration(attr->min);
+            if (!attr->max.empty())
+              max = m_cvt->as_duration(attr->max);
 
-          g.restrictDuration(IntegerDomain(min, max));
+            g.restrictDuration(IntegerDomain(min, max));
+          }
+          catch (std::exception &e) {
+            std::cerr << "Error while parsing duration: " << e.what() << std::endl;
+          }
         }
         else
           setAttribute(g, *attr);
@@ -475,8 +482,6 @@ namespace TREX
 
       if (msg->getSource() <= 0 || msg->getSource() == 65535)
         msg->setSource(m_trex_id);
-
-      msg->toText(std::cout);
 
       DUNE::Utils::ByteBuffer bb;
       try
