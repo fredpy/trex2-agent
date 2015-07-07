@@ -82,6 +82,7 @@ namespace TREX
       
       // Timelines that can be controlled by other reactors
       provide("reference");
+      m_adapter.setReactorGraph(getGraph());
       
       bool is_uav = parse_attr<bool>(false, TeleoReactor::xml_factory::node(arg),
                                      "uav");
