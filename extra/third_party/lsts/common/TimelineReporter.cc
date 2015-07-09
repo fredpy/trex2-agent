@@ -44,6 +44,7 @@ TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
                                 "imcid");
 
 
+  m_adapter.setReactorGraph(getGraph());
   m_adapter.setTrexId(m_imcid);
 }
 

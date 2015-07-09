@@ -129,7 +129,8 @@ namespace TREX
 
     void ImcAdapter::setReactorGraph(graph const &g)
     {
-      m_cvt.reset(new graph_proxy(g));
+      if( NULL==m_cvt.get() )
+        m_cvt.reset(new graph_proxy(g));
     }
 
     Observation
