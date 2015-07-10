@@ -839,7 +839,7 @@ void EuropaReactor::logPlan(std::string const &base_name) const {
     LogManager::path_type link_name = file_name(base_name+".dot");
     if( exists(link_name) ) 
       remove(link_name);
-    create_symlink(full_name, link_name);
+    // create_symlink(full_name, link_name);
   }
 }
 

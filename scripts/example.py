@@ -115,3 +115,5 @@ if __name__ == "__main__":
     
 
 
+### Note for ROS integration: this code extract attributes of a class or instance 'x'
+# filter(lambda attr: not (attr.startswith('_') or callable(getattr(x, attr))), dir(x))
