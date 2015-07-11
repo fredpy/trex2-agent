@@ -421,6 +421,7 @@ namespace TREX
       ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
       irMsg->source = m_platf_id;
+      msg->setSource(m_platf_id);
 
       int len = irMsg->serialize(buffer);
 
