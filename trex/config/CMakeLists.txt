@@ -107,6 +107,5 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bits
 install(DIRECTORY . DESTINATION include/trex/config
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
   PATTERN "private" EXCLUDE
-  PATTERN "generated" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+  PATTERN "generated" EXCLUDE)
 

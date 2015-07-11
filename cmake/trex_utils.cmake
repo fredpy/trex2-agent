@@ -37,8 +37,7 @@ include(ide_structure)
 
 macro(trex_cfg dir dest)
   install(DIRECTORY ${dir} DESTINATION ${dest} OPTIONAL
-    FILES_MATCHING PATTERN "*"
-    PATTERN ".svn" EXCLUDE)
+    FILES_MATCHING PATTERN "*")
   set_property(GLOBAL APPEND PROPERTY ${PROJECT_NAME}_CFGS 
     ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 endmacro(trex_cfg)

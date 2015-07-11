@@ -32,7 +32,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE     #
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
-find_package(GIT QUIET)
+find_package(Git QUIET)
 # Now I need to extract the project version info
 message("Looking for git: ${GIT_FOUND}")
 
