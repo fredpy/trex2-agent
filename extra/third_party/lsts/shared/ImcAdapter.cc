@@ -52,6 +52,9 @@ namespace TREX
       
     }
     
+    int ImcAdapter::m_trex_id = 0,
+        ImcAdapter::m_platf_id = 0,
+        ImcAdapter::m_iridium_req = 0;
     
     ImcAdapter::ImcAdapter() :
         c_imc_header_length(sizeof(IMC::Header)),
