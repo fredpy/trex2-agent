@@ -34,6 +34,7 @@
 #include <boost/python.hpp>
 
 #include <trex/utils/TREXversion.hh>
+#include <trex/version.hh>
 
 
 void export_utils();
@@ -50,11 +51,11 @@ namespace {
    * TREX::version
    */
   unsigned long version_major() {
-    return TREX::version::major();
+    return TREX_MAJOR;
   }
   
   unsigned long version_minor() {
-    return TREX::version::minor();
+    return TREX_MINOR;
   }
 }
 
@@ -89,10 +90,10 @@ BOOST_PYTHON_MODULE(trex)
                         "All its properties are static and indicate version "
                         "informations about the current trex version", no_init)
   // I  do not know how to documment static_properties
-  .add_static_property("major", &version_major,
+  .add_static_property("major", &::version_major,
                        "Major number of trex version.\n"
                        "i.e. A in version A.B.C")
-  .add_static_property("minor", &version_minor,
+  .add_static_property("minor", &::version_minor,
                        "Minor number of trex version.\n"
                        "i.e. B in version A.B.C")
   .add_static_property("release", &TREX::version::release,
