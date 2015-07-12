@@ -41,7 +41,11 @@ if(WITH_LSTS)
 endif(WITH_LSTS)
 
 # ROS connection components
-option(WITH_ROS "Use ROS plugin" OFF)
+option(WITH_ROS "Use ROS plugin (python required)" OFF)
 if(WITH_ROS)
-  add_subdirectory(ros) 
+  if(WITH_PYTHON)
+    add_subdirectory(ros) 
+  else(WITH_PYTHON)
+    message(SEND_ERROR "Cannot enable ROS if WITH_PYTHON is OFF")
+  endif(WITH_PYTHON)
 endif(WITH_ROS)
