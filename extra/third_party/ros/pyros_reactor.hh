@@ -53,6 +53,9 @@ namespace TREX {
       utils::SingletonUse<python::python_env>      m_python;
       utils::SingletonUse<python::exception_table> m_exc;
       
+      boost::python::object m_trex;
+      boost::python::object m_rospy;
+      
       boost::python::object m_callback;
     };
     

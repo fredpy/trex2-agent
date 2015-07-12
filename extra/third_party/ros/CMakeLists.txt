@@ -98,7 +98,7 @@ target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS}
   ${ROS_actionlib_LINK_FLAGS} 
   ${ROS_roscpp_LINK_LIBS} 
   ${ROS_actionlib_LINK_LIBS} 
-  TREXagent)
+  TREXagent TREXpython)
 
 install(TARGETS TREXros DESTINATION lib)
 trex_lib(TREXros extra)
