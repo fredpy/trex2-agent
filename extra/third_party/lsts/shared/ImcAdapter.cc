@@ -99,7 +99,7 @@ namespace TREX
 
       Observation obs("estate", "Position");
 
-      m_platf_id = msg->getSource();
+      setPlatformId(msg->getSource());
 
       double latitude, longitude;
       latitude = msg->lat;
@@ -403,6 +403,8 @@ namespace TREX
 
        if (msg->getSource() <= 0 || msg->getSource() == 65535)
          msg->setSource(m_trex_id);
+       else
+         std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
 
        if (messenger == NULL)
         messenger = new ImcMessenger();
@@ -499,6 +501,8 @@ namespace TREX
 
       if (msg->getSource() <= 0 || msg->getSource() == 65535)
         msg->setSource(m_trex_id);
+      else
+        std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
 
       DUNE::Utils::ByteBuffer bb;
       try

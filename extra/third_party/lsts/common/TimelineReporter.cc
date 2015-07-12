@@ -45,7 +45,6 @@ TimelineReporter::TimelineReporter(TeleoReactor::xml_arg_type arg)
 
 
   m_adapter.setReactorGraph(getGraph());
-  m_adapter.setTrexId(m_imcid);
 }
 
 TimelineReporter::~TimelineReporter() {
@@ -154,8 +153,13 @@ void TimelineReporter::notify(Observation const &obs)
     std::cout << "[" << getCurrentTick() << "] " << obs << std::endl;
   }
   op.token.set(token);
-  if (m_hostport != -1)
+  if (m_hostport != -1) {
     m_adapter.send(&op, m_hostaddr, m_hostport);
+    std::cout << " >> forwarded to " << m_hostaddr << ":" << m_hostport << std::endl;
+  }
+  else {
+    std::cout << " || not forwarded." << std::endl;
+  }
 }
 
 
