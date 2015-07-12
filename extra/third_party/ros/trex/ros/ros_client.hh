@@ -43,14 +43,41 @@
 
 namespace TREX {
   namespace ROS {
-    
+
+    /** @brief connection point to ROS
+     * 
+     * This is the class that handle the connection to ROS. It
+     * is a singleton and create a ROS client with an anonymous
+     * name.
+     */
     class ros_client :public boost::noncopyable {
     public:
+      /** @brief check if ok
+       *
+       * Check if ros connection is OK. If it is not it will also 
+       * stop the spinning.
+       *
+       * @retval true if the connection is fine
+       * @retval false otehrwise
+       */
       bool ok() const;
-      
+
+      /** @brief Access to ROS handle
+       *
+       * @return the ROs node handle for this client
+       */
       ::ros::NodeHandle handle() const;
 
+      /** @brief Start the spinning 
+       *
+       * Intiate the ROS spinner to listen to messages from ROS
+       *
+       * @sa void ros_client::stop()
+       */
       void start();
+      /** @brief Stop the spinning
+       * @sa void ros_client::start() 
+       */
       void stop();
       
     private:
