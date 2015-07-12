@@ -67,6 +67,7 @@ else(ROS_NO_CHECK)
 endif(ROS_NO_CHECK)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+  ${PYTHON_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/trex/ros)
 link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 

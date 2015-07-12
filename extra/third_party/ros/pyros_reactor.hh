@@ -50,8 +50,8 @@ namespace TREX {
       void handleInit();
       bool synchronize();
       
-      utils::SingleUse<python::python_env>      m_python;
-      utils::SingleUse<python::exception_table> m_exc;
+      utils::SingletonUse<python::python_env>      m_python;
+      utils::SingletonUse<python::exception_table> m_exc;
       
       boost::python::object m_callback;
     };
