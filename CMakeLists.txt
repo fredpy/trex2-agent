@@ -42,7 +42,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/;${CMAKE_SOURCE_DIR}/cmake/Modu
 project(trex)
 set(TREX_MAJOR 0)
 set(TREX_MINOR 6)
-set(TREX_PATCH 1)
+set(TREX_PATCH 2)
 set(TREX_RC 0)
 
 # TREX script for CPack management
