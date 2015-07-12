@@ -2,7 +2,7 @@
 #######################################################################
 # Software License Agreement (BSD License)                            #
 #                                                                     #
-#  Copyright (c) 2011, MBARI.                                         #
+#  Copyright (c) 2015, Frederic Py.                                   #
 #  All rights reserved.                                               #
 #                                                                     #
 #  Redistribution and use in source and binary forms, with or without #
@@ -33,15 +33,9 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-add_subdirectory(lightswitch)
-add_subdirectory(python)
-add_subdirectory(rover)
-add_subdirectory(shopping)
-add_subdirectory(simplerobot)
+if(WITH_PYTHON)
+  include_directories(${PYTHON_INCLUDE_DIR})
 
-
-# ROS connection components
-option(WITH_ROS "Use ROS plugin" OFF)
-if(WITH_ROS)
-  add_subdirectory(turtlesim)
-endif(WITH_ROS)
+  trex_plugin(python python_reactor.cc python_reactor.hh)
+  target_link_libraries(python_pg TREXtransaction TREXpython)
+endif(WITH_PYTHON)
