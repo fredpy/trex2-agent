@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,65 +31,32 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "python_reactor.hh"
-#include <trex/utils/Plugin.hh>
-#include <trex/python/python_thread.hh>
+#ifndef H_trex_example_python_reactor 
+# define H_trex_example_python_reactor
 
-
-using namespace TREX::example;
-using TREX::transaction::TeleoReactor;
-using TREX::python::scoped_gil_release;
-using namespace TREX::utils;
-namespace bp=boost::python;
-
-namespace {
-  SingletonUse<LogManager> s_log;
-
-  TeleoReactor::xml_factory::declare<python_reactor> decl("PythonExample");
-}
+# include <trex/transaction/TeleoReactor.hh>
+# include <trex/python/exception_helper.hh>
+# include <trex/python/python_env.hh>
 
 namespace TREX {
-  
-  void initPlugin() {
-    ::s_log->syslog("plugin.python", log::info)<<"Plugin loaded";
-  }
+  namespace example {
+    
+    class python_reactor :public transaction::TeleoReactor {
+    public:
+      python_reactor(transaction::TeleoReactor::xml_arg_type arg);
+      ~python_reactor();
+      
+    private:
+      
+      void handleInit();
+      bool synchronize();
 
-}
-
-python_reactor::python_reactor(TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg, false) {}
-
-python_reactor::~python_reactor() {}
-
-void python_reactor::handleInit() {
-  try {
-    scoped_gil_release lock;
-    bp::import("trex");
-    my_var = bp::eval("-1");
-  } catch(bp::error_already_set const e) {
-    m_exc->unwrap_py_error();
+      utils::SingletonUse<python::python_env> m_python;
+      utils::SingletonUse<python::exception_table> m_exc;
+      boost::python::object my_var;
+    };
+    
   }
 }
 
-bool python_reactor::synchronize() {
-  try {
-    scoped_gil_release lock;
-    my_var = my_var + 1;
-  
-    bp::str st(my_var);
-    bp::str val(my_var.attr("__str__")());
-    syslog()<<boost::python::extract<char const *>(val)<<" "
-    <<boost::python::extract<char const *>(st);
-    return true;
-  }catch(bp::error_already_set const e) {
-    m_exc->unwrap_py_error();
-  }
-  return false;
-}
-
-
-
-
-
-
-
+#endif // H_trex_example_python_reactor
