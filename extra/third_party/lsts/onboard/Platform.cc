@@ -135,7 +135,7 @@ namespace TREX
     void
     Platform::announce(double lat, double lon) {
       Announce ann;
-      ann.sys_name = "trex";
+      ann.sys_name = "T-REX";
       ann.sys_type = SYSTEMTYPE_CCU;
       ann.lat = lat;
       ann.lon = lon;

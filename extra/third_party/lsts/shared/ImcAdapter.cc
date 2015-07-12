@@ -52,6 +52,9 @@ namespace TREX
       
     }
     
+    int ImcAdapter::m_trex_id = 0,
+        ImcAdapter::m_platf_id = 0,
+        ImcAdapter::m_iridium_req = 0;
     
     ImcAdapter::ImcAdapter() :
         c_imc_header_length(sizeof(IMC::Header)),
@@ -99,7 +102,7 @@ namespace TREX
 
       Observation obs("estate", "Position");
 
-      m_platf_id = msg->getSource();
+      setPlatformId(msg->getSource());
 
       double latitude, longitude;
       latitude = msg->lat;
@@ -403,6 +406,8 @@ namespace TREX
 
        if (msg->getSource() <= 0 || msg->getSource() == 65535)
          msg->setSource(m_trex_id);
+       else
+         std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
 
        if (messenger == NULL)
         messenger = new ImcMessenger();
@@ -421,6 +426,7 @@ namespace TREX
       ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
       irMsg->source = m_platf_id;
+      msg->setSource(m_platf_id);
 
       int len = irMsg->serialize(buffer);
 
@@ -498,6 +504,8 @@ namespace TREX
 
       if (msg->getSource() <= 0 || msg->getSource() == 65535)
         msg->setSource(m_trex_id);
+      else
+        std::cerr << "Not touching given source id (" << msg->getSource() << ")" << std::endl;
 
       DUNE::Utils::ByteBuffer bb;
       try
