@@ -32,13 +32,28 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "pyros_reactor.hh"
+#include <trex/python/python_thread.hh>
+
 
 using namespace TREX::ROS;
 using namespace TREX::utils;
 using namespace TREX::transaction;
+using namespace TREX::python;
+namespace bp=boost::python;
 
 pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
-:TeleoReactor(arg, false) {}
+:TeleoReactor(arg, false) {
+  try {
+    syslog(log::info)<<"Loading trex into python";
+    bp::import("trex.transaction");
+    syslog(log::info)<<"Loading rospy";
+    bp::import("rospy");
+    
+    
+  } catch(bp::error_already_set const e) {
+    m_exc->unwrap_py_error();
+  }
+}
 
 pyros_reactor::~pyros_reactor() {}
 
