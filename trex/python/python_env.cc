@@ -33,12 +33,29 @@
  */
 #include <boost/python.hpp>
 #include "python_env.hh"
+#include "python_thread.hh"
 
 using namespace TREX::python;
+namespace bp=boost::python;
+
+/*
+ * class TREX::python::python_env
+ */
 
 python_env::python_env() {
   Py_Initialize();
 }
 
 python_env::~python_env() {
+}
+
+bp::object &python_env::import(std::string const &module) {
+  scoped_gil_release lock;
+  object_map::iterator i = m_loaded.find(module);
+  
+  if( m_loaded.end()==i ) {
+    bp::object mod = bp::import(module.c_str());
+    i = m_loaded.insert(object_map::value_type(module, mod)).first;
+  }
+  return i->second;
 }

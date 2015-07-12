@@ -45,9 +45,10 @@ pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false) {
   try {
     syslog(log::info)<<"Loading trex into python";
-    m_trex = bp::import("trex.transaction");
+    m_trex = m_python->import("trex.transaction");
     syslog(log::info)<<"Loading rospy";
-    m_rospy = bp::import("rospy");
+    m_rospy = m_python->import("rospy");
+    
   } catch(bp::error_already_set const e) {
     m_exc->unwrap_py_error();
   }

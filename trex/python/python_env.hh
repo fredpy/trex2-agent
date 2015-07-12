@@ -35,12 +35,20 @@
 # define H_trex_python_python_env
 
 # include <trex/utils/SingletonUse.hh>
+# include <boost/python.hpp>
+# include <map>
 
 namespace TREX {
   namespace python {
     
     class python_env :boost::noncopyable {
+    public:
+      boost::python::object &import(std::string const &module);
+      
     private:
+      typedef std::map<std::string, boost::python::object> object_map;
+      object_map m_loaded;
+      
       python_env();
       ~python_env();
       
