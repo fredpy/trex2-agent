@@ -71,13 +71,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
-  # source 
+  # source
+  pyros_reactor.cc
   ros_reactor.cc 
   ros_clock.cc
   ros_timeline.cc
   ros_client.cc
   # header
   ros_reactor.hh
+  pyros_reactor.hh
   trex/ros/ros_client.hh
   trex/ros/ros_clock.hh
   trex/ros/ros_convert_traits.hh
