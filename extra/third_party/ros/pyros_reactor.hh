@@ -37,6 +37,7 @@
 # include <trex/transaction/TeleoReactor.hh>
 # include <trex/python/python_env.hh>
 # include <trex/python/exception_helper.hh>
+# include "roscpp_inject.hh"
 
 namespace TREX {
   namespace ROS {
@@ -47,15 +48,19 @@ namespace TREX {
       ~pyros_reactor();
       
     private:
+      
+      
+      void add_topic(boost::property_tree::ptree::value_type const &desc);
+      
       void handleInit();
       bool synchronize();
       
+      utils::SingletonUse<roscpp_initializer>      m_ros;
       utils::SingletonUse<python::python_env>      m_python;
       utils::SingletonUse<python::exception_table> m_exc;
       
       // python modules used
-      boost::python::object m_trex, m_transaction, m_domains, m_rospy;
-      boost::python::object m_callback;
+      boost::python::object m_trex, m_transaction, m_domains, m_rospy, m_env;
     };
     
   }

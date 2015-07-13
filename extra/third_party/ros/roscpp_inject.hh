@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
- *  Copyright (c) 2011, MBARI.
+ *
+ *  Copyright (c) 2015, Frederic Py.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -31,62 +31,36 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ros_client.hh"
+#ifndef H_trex_ros_roscpp_inject
+# define H_trex_ros_roscpp_inject
 
-using namespace TREX::ROS;
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/platform/memory.hh>
+# include <ros/ros.h>
 
-/*
- * class TREX::ROS::ros_client
- */
-
-// structors
-
-ros_client::ros_client() {
-  int argc = 0;
-  char **argv = NULL;
-  m_log->syslog("ros", TREX::utils::log::info)<<"Initialize ros connection";
-  ros::init(argc, argv, "trex2",
-            ros::init_options::AnonymousName |ros::init_options::NoSigintHandler);
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Creating 4 threads for ros events handling";
-  m_spinner.reset(new ::ros::AsyncSpinner(4));
-
-  // // Create an extra thread for when the service will be started
-  // m_log->thread_count(m_log->thread_count()+1, true);
-}
-
-ros_client::~ros_client() {
-  if(ros::ok() ) {
-    m_log->syslog("ros", TREX::utils::log::info)<<"Shutting down ros connection";
-    m_spinner.reset();
+namespace TREX {
+  namespace ROS {
+    
+    class roscpp_initializer:boost::noncopyable {
+    public:
+      bool ok() const;
+      bool active() const;
+      ::ros::NodeHandle const &handle() const;
+      
+      void start();
+      void stop();
+      
+    private:
+      roscpp_initializer();
+      ~roscpp_initializer();
+      
+      utils::SingletonUse<utils::LogManager> m_log;
+      UNIQ_PTR< ::ros::NodeHandle >          m_handle;
+      
+      friend utils::SingletonWrapper<roscpp_initializer>;
+    };
+    
   }
 }
 
-// accessors
-
-bool ros_client::ok() const {
-  return ::ros::ok();
-}
-
-::ros::NodeHandle ros_client::handle() const {
-  ros::NodeHandle handle;
-  return handle;
-}
-
-// modifiers
-
-void ros_client::start() {
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Starting ros event handling threads";
-  m_spinner->start();
-}
-
-void ros_client::stop() {
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Stopping ros event handling threads";
-  m_spinner->stop();
-}
-
-
-
-
+# endif // H_trex_ros_roscpp_inject

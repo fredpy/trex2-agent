@@ -17,14 +17,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -34,7 +34,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -48,7 +48,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Symbol 
+#ifndef H_Symbol
 # define H_Symbol
 
 # include <string>
@@ -95,8 +95,8 @@ namespace boost {
 
 namespace TREX {
   namespace utils {
-
-
+    
+    
     /** @brief generic symbol class
      *
      * @param CharT character type
@@ -114,9 +114,9 @@ namespace TREX {
      * @ingroup utils
      */
     template< class CharT, class Traits=std::char_traits<CharT>,
-	      class Alloc=std::allocator<CharT> >
-    class BasicSymbol :public ostreamable, public istreamable, 
-		       public Hashable {
+    class Alloc=std::allocator<CharT> >
+    class BasicSymbol :public ostreamable, public istreamable,
+    public Hashable {
     public:
       /** @brief equivalent string type */
       typedef std::basic_string<CharT, Traits, Alloc> str_type;
@@ -133,11 +133,11 @@ namespace TREX {
        * @note @c intermodule_holder is used to support dynmic
        * libraries loading (and/or plug-ins)
        */
-      typedef typename 
-        boost::flyweight< str_type,
-			  boost::flyweights::no_tracking,
-                         boost::flyweights::holder<trex_holder_specifier> > ref_type;
-
+      typedef typename
+      boost::flyweight< str_type,
+      boost::flyweights::no_tracking,
+      boost::flyweights::holder<trex_holder_specifier> > ref_type;
+      
     public:
       /** @brief Constructor
        *
@@ -145,8 +145,8 @@ namespace TREX {
        *
        * Create a new symbol with the same value as @e str
        */
-      BasicSymbol(str_type const &str = str_type()) 
-	:m_name(create(str)) {}
+      BasicSymbol(str_type const &str = str_type())
+      :m_name(create(str)) {}
       /** @brief Constructor
        *
        * @param str a string
@@ -158,7 +158,7 @@ namespace TREX {
        * @sa BasicSymbol &reset(CharT const *str, size_t len)
        */
       BasicSymbol(CharT const *str, size_t len =str_type::npos)
-	:m_name(create(str, len)) {}
+      :m_name(create(str, len)) {}
       /** @brief Copy constructor
        *
        * @param other another instance
@@ -166,11 +166,11 @@ namespace TREX {
        * Create a new symbol with the same value as @e other
        */
       BasicSymbol(BasicSymbol const &other)
-	:m_name(other.m_name) {}
+      :m_name(other.m_name) {}
       /** @brief Destructor */
       ~BasicSymbol() {
       }
-
+      
       /** @brief Asignment operator
        *
        * @param other another instance
@@ -180,10 +180,10 @@ namespace TREX {
        * @return current instance after operation
        */
       BasicSymbol &operator= (BasicSymbol const &other) {
-	m_name = other.m_name;
-	return *this;
+        m_name = other.m_name;
+        return *this;
       }
-
+      
       /** @brief Eeset value
        *
        * @param str a string
@@ -195,8 +195,8 @@ namespace TREX {
        * @sa BasicSymbol(CharT const *str, size_t len)
        */
       BasicSymbol &reset(CharT const *str=NULL, size_t len=str_type::npos) {
-	m_name = create(str, len);
-	return *this;
+        m_name = create(str, len);
+        return *this;
       }
       
       /** @brief Check for emptyness
@@ -207,14 +207,14 @@ namespace TREX {
        * @sa size_t length() const
        */
       bool empty() const {
-	return m_name.get().empty();
+        return m_name.get().empty();
       }
       /** @brief Symbol length
        *
        * @return the length of the string representing this instance
        */
       size_t length() const {
-	return size_t(empty()?0:m_name.get().size());
+        return size_t(empty()?0:m_name.get().size());
       }
       
       /** @brief Equality test
@@ -231,7 +231,7 @@ namespace TREX {
        * @sa bool operator!=(BasicSymbol const &) const
        */
       bool operator==(BasicSymbol const &other) const {
-	return m_name==other.m_name;
+        return m_name==other.m_name;
       }
       /** @brief Difference test
        *
@@ -247,7 +247,7 @@ namespace TREX {
        * @sa bool operator==(BasicSymbol const &) const
        */
       bool operator!=(BasicSymbol const &other) const {
-	return !operator==(other);
+        return !operator==(other);
       }
       /** @brief Less than test
        *
@@ -273,7 +273,7 @@ namespace TREX {
        * @retval false  otherwise
        */
       bool operator> (BasicSymbol const &other) const {
-	return other.operator< (*this);
+        return other.operator< (*this);
       }
       /** @brief Less or equal to test
        *
@@ -287,7 +287,7 @@ namespace TREX {
        * @retval true  otherwise
        */
       bool operator<=(BasicSymbol const &other) const {
-	return !operator> (other);
+        return !operator> (other);
       }
       /** @brief Greater or equal to test
        *
@@ -301,17 +301,22 @@ namespace TREX {
        * @retval true  otherwise
        */
       bool operator>=(BasicSymbol const &other) const {
-	return !operator< (other);
+        return !operator< (other);
       }
-
+      
       /** @brief String value
        *
        * @return the equivalent string value to this instance
        */
       str_type const &str() const {
-	return m_name.get();
+        return m_name.get();
       }
-
+      
+      CharT const *c_str() const {
+        return str().c_str();
+      }
+      
+      
     private:
       /** @brief symbol value */
       ref_type m_name;
@@ -333,20 +338,20 @@ namespace TREX {
        * Create a new entry into the unique memory corresponding to
        * @e str up to the @e len character.
        *
-       * @return The reference to the cell corresponding 
+       * @return The reference to the cell corresponding
        */
       static ref_type create(CharT const *str, size_t len);
-
+      
       std::ostream &print_to(std::ostream &out) const;
       std::istream &read_from(std::istream &in);
       size_t hash() const;
-
+      
     }; // TREX::utils::BasicSymbol<>
-
+    
 # define In_H_Symbol
 #  include "bits/Symbol.tcc"
 # undef In_H_Symbol
-
+    
     /** @brief char based BasicSymbol
      *
      * This typedef is the default type one would use to
@@ -356,7 +361,7 @@ namespace TREX {
      * @ingroup utils
      */
     typedef BasicSymbol<char> Symbol;
-
+    
     
     /** @brief string casting specialization
      * @param in A string
@@ -367,10 +372,10 @@ namespace TREX {
      *
      * @return a Symbol with the value of @a in
      * @ingroup utils
-     */ 
+     */
     template<>
     inline Symbol string_cast<Symbol>(std::string const &in,
-				      std::ios_base &(*format)(std::ios_base &)) {
+                                      std::ios_base &(*format)(std::ios_base &)) {
       return Symbol(in);
     }
   } // TREX::utils

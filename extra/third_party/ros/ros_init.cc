@@ -32,6 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_reactor.hh"
+#include "pyros_reactor.hh"
 #include "ros_client.hh"
 #include "ros_action.hh"
 
@@ -103,6 +104,8 @@ namespace {
   SingletonUse<ros_client> s_ros; // initate connection to ros
   
   TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
+  TeleoReactor::xml_factory::declare<pyros_reactor> pydecl("PyROSReactor");
+
   // declare the Point subscriber
   ros_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
 }

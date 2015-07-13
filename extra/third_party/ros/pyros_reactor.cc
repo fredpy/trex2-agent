@@ -40,24 +40,86 @@ using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::python;
 namespace bp=boost::python;
+namespace bpt=boost::property_tree;
+
+// structors
 
 pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false) {
+  bpt::ptree::value_type const &node(xml_factory::node(arg));
+
   try {
     syslog(log::info)<<"Loading trex into python";
     m_trex = m_python->import("trex");
     m_transaction = m_trex.attr("transaction");
-    m_domains = m_trex.attr("domain");
+    m_domains = m_trex.attr("domains");
+    
     syslog(log::info)<<"Loading rospy";
     m_rospy = m_python->import("rospy");
     
-  } catch(bp::error_already_set const e) {
+    syslog(log::info)<<"Creating my own environment";
+    bp::object trex_env;
+    if( m_trex.contains("__agents__") )
+      trex_env = m_trex.attr("__agents__");
+    else {
+      bp::scope cur(m_trex);
+      trex_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule("__agents__"))));
+    }
+    
+    if( trex_env.contains(getAgentName().str()) )
+      trex_env = trex_env.attr(getAgentName().c_str());
+    else {
+      bp::scope cur(trex_env);
+      trex_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(getAgentName().c_str()))));
+    }
+    
+    
+    size_t count = 0;
+    for(bpt::ptree::const_iterator i=node.second.begin();
+        node.second.end()!=i; ++i) {
+      if( i->first=="Topic" ) {
+        add_topic(*i);
+        count += 1;
+      }
+    }
+    if( 0==count )
+      syslog(log::warn)<<"No connection created: this reactor is useless";
+  } catch(bp::error_already_set const &e) {
     m_exc->unwrap_py_error();
   }
 }
 
 pyros_reactor::~pyros_reactor() {}
 
+
+// modifiers
+
+void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
+  Symbol tl_name = parse_attr<Symbol>(desc, "name");
+  std::string ros_topic = parse_attr<std::string>(desc, "topic");
+  boost::optional<std::string> py_type = parse_attr< boost::optional<std::string> >(desc, "type");
+  bool write = parse_attr<bool>(false, desc, "accept_goals");
+  
+  if( !py_type )
+    py_type = "genpy.message.Message";
+  
+  // First reserve the timeline
+  provide(tl_name, write);
+  if( isInternal(tl_name) ) {
+    try {
+      m_python->load_module_for(*py_type);
+    
+    
+    
+    } catch(bp::error_already_set const &e) {
+      m_exc->unwrap_py_error();
+    }
+  } else
+    throw XmlError(desc, "Failed to declare \""+tl_name.str()+"\" as internal");
+}
+
+
+// callbacks
 
 void pyros_reactor::handleInit() {
   
