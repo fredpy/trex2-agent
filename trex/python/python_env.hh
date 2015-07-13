@@ -44,6 +44,7 @@ namespace TREX {
     class python_env :boost::noncopyable {
     public:
       boost::python::object &import(std::string const &module);
+      std::string load_module_for(std::string const &type);
       
     private:
       typedef std::map<std::string, boost::python::object> object_map;

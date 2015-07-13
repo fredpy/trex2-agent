@@ -59,3 +59,13 @@ bp::object &python_env::import(std::string const &module) {
   }
   return i->second;
 }
+
+std::string python_env::load_module_for(std::string const &type) {
+  size_t pos = type.find_first_of('.');
+  std::string loaded;
+  if( pos!=std::string::npos ) {
+    loaded = type.substr(0, pos);
+    import(loaded);
+  }
+  return loaded;
+}
