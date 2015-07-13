@@ -460,6 +460,7 @@ namespace TREX
       {
         IridiumMsgTx * tx = new IridiumMsgTx();
         tx->setTimeStamp();
+        tx->ttl = 1800;
         tx->data.assign(buffer, buffer + len);
         tx->req_id = (++m_iridium_req) % 65535;
         return send(tx, address, port);
