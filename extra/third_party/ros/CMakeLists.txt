@@ -53,14 +53,14 @@ else(ROS_NO_CHECK)
       message(SEND_ERROR "Failed to find roscpp")
     endif(ROS_roscpp_PACKAGE_PATH)
 
-    find_ros_pkg(actionlib)
-    if(ROS_actionlib_PACKAGE_PATH)
-      include_directories(${ROS_actionlib_INCLUDE_DIRS})
-      add_definitions(${ROS_actionlib_CFLAGS})
-    else(ROS_actionlib_PACKAGE_PATH)
-      message(SEND_ERROR "Failed to find actionlib")
-    endif(ROS_actionlib_PACKAGE_PATH)
-    
+    find_ros_pkg(roslib)
+    if(ROS_roslib_PACKAGE_PATH)
+      include_directories(${ROS_roslib_INCLUDE_DIRS})
+      add_definitions(${ROS_roslib_CFLAGS})
+    else(ROS_roslib_PACKAGE_PATH)
+      message(SEND_ERROR "Failed to find roslib")
+    endif(ROS_roslib_PACKAGE_PATH)
+
   else(ROS_CONFIG)
     message(SEND_ERROR "Failed to loacte ROS configuration file.")
   endif(ROS_CONFIG)
@@ -99,7 +99,7 @@ install(DIRECTORY trex/ DESTINATION include/trex/
 target_link_libraries(TREXros ${ROS_roscpp_LINK_FLAGS} 
   ${ROS_actionlib_LINK_FLAGS} 
   ${ROS_roscpp_LINK_LIBS} 
-  ${ROS_actionlib_LINK_LIBS} 
+  ${ROS_roslib_LINK_LIBS}
   TREXagent TREXpython)
 
 install(TARGETS TREXros DESTINATION lib)
@@ -109,5 +109,5 @@ trex_lib(TREXros extra)
 
 # The plugin placeholder : also initialize ros on load
 trex_plugin(ros ros_init.cc)
-target_link_libraries(ros_pg TREXros)
+target_link_libraries(ros_pg TREXros ${PYTHON_LIBRARY})
 

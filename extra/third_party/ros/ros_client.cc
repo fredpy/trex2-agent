@@ -42,49 +42,49 @@ using namespace TREX::ROS;
 // structors
 
 ros_client::ros_client() {
-  int argc = 0;
-  char **argv = NULL;
-  m_log->syslog("ros", TREX::utils::log::info)<<"Initialize ros connection";
-  ros::init(argc, argv, "trex2",
-            ros::init_options::AnonymousName |ros::init_options::NoSigintHandler);
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Creating 4 threads for ros events handling";
-  m_spinner.reset(new ::ros::AsyncSpinner(4));
-
-  // // Create an extra thread for when the service will be started
-  // m_log->thread_count(m_log->thread_count()+1, true);
+//  int argc = 0;
+//  char **argv = NULL;
+//  m_log->syslog("ros", TREX::utils::log::info)<<"Initialize ros connection";
+//  ros::init(argc, argv, "trex2",
+//            ros::init_options::AnonymousName |ros::init_options::NoSigintHandler);
+//  m_log->syslog("ros", TREX::utils::log::info)
+//    <<"Creating 4 threads for ros events handling";
+//  m_spinner.reset(new ::ros::AsyncSpinner(4));
+//
+//  // // Create an extra thread for when the service will be started
+//  // m_log->thread_count(m_log->thread_count()+1, true);
 }
 
 ros_client::~ros_client() {
-  if(ros::ok() ) {
-    m_log->syslog("ros", TREX::utils::log::info)<<"Shutting down ros connection";
-    m_spinner.reset();
-  }
+//  if(ros::ok() ) {
+//    m_log->syslog("ros", TREX::utils::log::info)<<"Shutting down ros connection";
+//    m_spinner.reset();
+//  }
 }
 
 // accessors
 
 bool ros_client::ok() const {
-  return ::ros::ok();
+//  return ::ros::ok();
 }
 
 ::ros::NodeHandle ros_client::handle() const {
-  ros::NodeHandle handle;
-  return handle;
+//  ros::NodeHandle handle;
+//  return handle;
 }
 
 // modifiers
 
 void ros_client::start() {
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Starting ros event handling threads";
-  m_spinner->start();
+//  m_log->syslog("ros", TREX::utils::log::info)
+//    <<"Starting ros event handling threads";
+//  m_spinner->start();
 }
 
 void ros_client::stop() {
-  m_log->syslog("ros", TREX::utils::log::info)
-    <<"Stopping ros event handling threads";
-  m_spinner->stop();
+//  m_log->syslog("ros", TREX::utils::log::info)
+//    <<"Stopping ros event handling threads";
+//  m_spinner->stop();
 }
 
 

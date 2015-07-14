@@ -39,7 +39,7 @@ using namespace TREX::utils;
 // structors
 
 roscpp_initializer::roscpp_initializer() {
-  start();
+//  start();
 }
 
 roscpp_initializer::~roscpp_initializer() {

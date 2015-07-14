@@ -40,7 +40,7 @@
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   message(STATUS "pos indep: ${CMAKE_POSITION_INDEPENDENT_CODE}")
   
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Xlinker -export-dynamic")
   set(PIC_PROTECT "-Wl,--whole-archive <LIB> -Wl,--no-whole-archive")
   message (STATUS "Adding -fPIC to CXX flags")
 else()
