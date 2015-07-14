@@ -34,7 +34,7 @@
 #include "exception_helper.hh"
 
 #include <boost/scope_exit.hpp>
-
+#include <pyerrors.h>
 
 using namespace TREX::python::details;
 using namespace TREX::python;

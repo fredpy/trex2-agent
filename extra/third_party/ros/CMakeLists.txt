@@ -109,5 +109,5 @@ trex_lib(TREXros extra)
 
 # The plugin placeholder : also initialize ros on load
 trex_plugin(ros ros_init.cc)
-target_link_libraries(ros_pg TREXros ${PYTHON_LIBRARY})
+target_link_libraries(ros_pg ${PYTHON_LIBRARIES} TREXros)
 

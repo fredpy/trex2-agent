@@ -34,6 +34,7 @@
 #include <boost/python.hpp>
 #include "python_env.hh"
 #include "python_thread.hh"
+#include <iostream>
 
 using namespace TREX::python;
 namespace bp=boost::python;
@@ -43,6 +44,9 @@ namespace bp=boost::python;
  */
 
 python_env::python_env() {
+  static char name[] = {'\0'};
+  
+  Py_SetProgramName(name);
   Py_Initialize();
 }
 

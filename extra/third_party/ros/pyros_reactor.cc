@@ -57,11 +57,34 @@ pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
     
     // m_python->import("sys");
     
-    bp::object main_module = m_python->import("__main__");
-    bp::object main_ns = main_module.attr("__dict__");
+    {
+      bp::object sys = m_python->import("sys");
+      
+      bp::scope current(m_python->import("__main__"));
     
-    syslog(log::info)<<"Loading roslib";
-    bp::exec("import roslib", main_ns);
+      bp::dict sys_d(sys.attr("__dict__"));
+      
+      if( !sys_d.contains("argv") ) {
+        bp::list args;
+        bp::str empty;
+        args.append(empty);
+        syslog()<<"Injecting fake sys.argv for rospy";
+        sys.attr("argv") = args;
+      }
+      
+      
+      syslog(log::info)<<"Loading rospy";
+      m_rospy = m_python->import("rospy");
+
+      syslog(log::info)<<"Loading trex";
+      m_trex = m_python->import("trex");
+      m_transaction = m_trex.attr("transaction");
+      m_domains = m_trex.attr("domains");
+    
+    }
+    
+//    syslog(log::info)<<"Loading roslib";
+//    bp::exec("import roslib", main_ns);
     
 //    m_roslib = m_python->import("roslib");
 //    syslog(log::info)<<"Loading rospy";

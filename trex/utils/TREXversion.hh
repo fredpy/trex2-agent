@@ -46,7 +46,10 @@ namespace TREX {
    * @ingroup utils
    * @author Frederic Py <fpy@mbari.org>
    */
-  struct version {
+  class version {
+  public:
+    version() {}
+    ~version() {}
     /** @brief version number
      * 
      * Indicates the version number of this library. This version number follows 
@@ -70,15 +73,15 @@ namespace TREX {
     /** @brief Major version number
      * @return the major version number
      */
-    static unsigned short major();
+    static unsigned short major_number();
     /** @brief Minor version number
      * @return the minor version number
      */
-    static unsigned short minor();
+    static unsigned short minor_number();
     /** @brief Patch version number
      * @return the patch version number
      */
-    static unsigned short release();
+    static unsigned short release_number();
 
     /** @brief Check if reelase candidate
      *

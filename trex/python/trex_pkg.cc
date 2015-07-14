@@ -34,7 +34,6 @@
 #include <boost/python.hpp>
 
 #include <trex/utils/TREXversion.hh>
-#include <trex/version.hh>
 
 
 void export_utils();
@@ -45,17 +44,19 @@ void export_agent();
 
 namespace {
   
+  TREX::version const _version;
+  
   /*
    * need to encapsulate these two calls like this to avoid a bug on g++ 4.6.3
    * which otherwise complains that major and minor are not declared in 
    * TREX::version
    */
   unsigned long version_major() {
-    return TREX_MAJOR;
+    return _version.major_number();
   }
   
   unsigned long version_minor() {
-    return TREX_MINOR;
+    return TREX::version::minor_number();
   }
 }
 
@@ -96,7 +97,7 @@ BOOST_PYTHON_MODULE(trex)
   .add_static_property("minor", &::version_minor,
                        "Minor number of trex version.\n"
                        "i.e. B in version A.B.C")
-  .add_static_property("release", &TREX::version::release,
+  .add_static_property("release", &TREX::version::release_number,
                        "Release (or patch) number of trex version.\n"
                        "i.e. C in version A.B.C")
   .add_static_property("is_rc", &TREX::version::is_release_candidate,

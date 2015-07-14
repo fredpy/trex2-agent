@@ -45,63 +45,69 @@
 # define GIT_REV    "exported"
 #endif 
 
-unsigned short TREX::version::major() {
+using namespace TREX;
+
+namespace  {
+  TREX::version _version;
+}
+
+unsigned short version::major_number() {
   return TREX_MAJOR;
 }
 
-unsigned short TREX::version::minor() {
+unsigned short version::minor_number() {
   return TREX_MINOR;
 }
 
-unsigned short TREX::version::release() {
+unsigned short version::release_number() {
   return TREX_PATCH;
 }
 
-bool TREX::version::is_release_candidate() {
+bool version::is_release_candidate() {
   return rc_number()>0;
 }
 
-unsigned TREX::version::rc_number() {
+unsigned version::rc_number() {
   return TREX_RC;
 }
 
 
-unsigned long TREX::version::number() {
-  unsigned long version = major();
-  version = 100*version + minor();
-  version = 100*version + release();
+unsigned long version::number() {
+  unsigned long version = major_number();
+  version = 100*version + minor_number();
+  version = 100*version + release_number();
   return version;
 }
 
-std::string TREX::version::str() {
+std::string version::str() {
   return TREX_VERSION;
 }
 
-bool TREX::version::svn_info() {
+bool version::svn_info() {
   return false;
 }
 
-std::string TREX::version::svn_root() {
+std::string version::svn_root() {
   return std::string();
 }
 
-std::string TREX::version::svn_revision() {
+std::string version::svn_revision() {
   return std::string();
 }
 
-bool TREX::version::git_info() {
+bool version::git_info() {
   return GIT_INFO;
 }
 
-std::string TREX::version::git_branch() {
+std::string version::git_branch() {
   return GIT_BRANCH;
 }
 
-std::string TREX::version::git_revision() {
+std::string version::git_revision() {
   return GIT_REV;
 }
 
-std::string TREX::version::full_str() {
+std::string version::full_str() {
   if( git_info() ) 
     return str()+" (git:"+git_branch()+"["+git_revision()+"])";
   else

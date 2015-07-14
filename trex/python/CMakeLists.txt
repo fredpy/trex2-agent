@@ -43,7 +43,8 @@ if(WITH_PYTHON)
     find_package(PythonLibs REQUIRED)
     include_directories(${PYTHON_INCLUDE_DIR})
     message(STATUS "Enabling TREX python adapters.")
-    
+    set(py_libs "${PYTHON_LIBRARIES}" CACHE INTERNAL "Python Libraries" FORCE)
+
     # First we need the library that define trex python_reactor class
     add_library(TREXpython SHARED 
       # C++ source
@@ -67,7 +68,7 @@ if(WITH_PYTHON)
       agent_decls.cc
       )
     add_dependencies(core trex)
-    target_link_libraries(trex TREXagent TREXpython TREXutils)
+target_link_libraries(trex  ${PYTHON_LIBRARIES} TREXagent TREXpython -Wl,--no-as-needed TREXutils)
     trex_py(trex)
     
   else(Boost_PYTHON_LIBRARY)
