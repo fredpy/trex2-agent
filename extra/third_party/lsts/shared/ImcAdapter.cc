@@ -425,8 +425,13 @@ namespace TREX
       uint8_t buffer[65635];
       ImcIridiumMessage * irMsg = new ImcIridiumMessage(msg);
       irMsg->destination = msg->getDestination();
-      irMsg->source = m_platf_id;
-      msg->setSource(m_platf_id);
+      if (msg->getSource() == 0 || msg->getSource() == 65535) {
+        irMsg->source = m_platf_id;
+        msg->setSource(m_platf_id);
+      }
+      else {
+        irMsg->source = msg->getSource();
+      }
 
       int len = irMsg->serialize(buffer);
 
@@ -444,7 +449,7 @@ namespace TREX
               frags.getFragment(i));
           uint8_t buff[512];
           irMsg->destination = msg->getDestination();
-          irMsg->source = m_platf_id;
+          irMsg->source = msg->getSource();
           int length = irMsg->serialize(buff);
           IridiumMsgTx * tx = new IridiumMsgTx();
           tx->ttl = 1800; // try sending this update for 30 minutes
@@ -459,6 +464,7 @@ namespace TREX
       else
       {
         IridiumMsgTx * tx = new IridiumMsgTx();
+        tx->setSource(msg->getSource());
         tx->setTimeStamp();
         tx->ttl = 1800;
         tx->data.assign(buffer, buffer + len);
