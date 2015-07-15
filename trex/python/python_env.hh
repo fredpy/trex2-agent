@@ -34,7 +34,7 @@
 #ifndef H_trex_python_python_env
 # define H_trex_python_python_env
 
-# include <trex/utils/SingletonUse.hh>
+# include <trex/utils/LogManager.hh>
 # include <boost/python.hpp>
 # include <map>
 
@@ -44,7 +44,7 @@ namespace TREX {
     class python_env :boost::noncopyable {
     public:
       boost::python::object &import(std::string const &module);
-      std::string load_module_for(std::string const &type);
+      boost::python::object load_module_for(std::string const &type);
       
     private:
       typedef std::map<std::string, boost::python::object> object_map;
@@ -53,6 +53,7 @@ namespace TREX {
       python_env();
       ~python_env();
       
+      utils::SingletonUse<utils::LogManager> m_log;
       friend TREX::utils::SingletonWrapper<python_env>;
     };
     

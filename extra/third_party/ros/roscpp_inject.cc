@@ -39,7 +39,8 @@ using namespace TREX::utils;
 // structors
 
 roscpp_initializer::roscpp_initializer() {
-//  start();
+  init();
+  start();
 }
 
 roscpp_initializer::~roscpp_initializer() {
@@ -65,21 +66,29 @@ bool roscpp_initializer::active() const {
 
 // Manipulators
 
-void roscpp_initializer::start() {
-  
+void roscpp_initializer::init() {
   if( !::ros::isInitialized() ) {
     int argc = 0;
     char **argv = NULL;
-  
+    
     m_log->syslog("ros", log::info)<<"Initialize ROS connection as trex2";
-    ::ros::init(argc, argv, "trex2", ::ros::init_options::AnonymousName);
+    ::ros::init(argc, argv, "trex2",
+                ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
     m_handle.reset(new ::ros::NodeHandle);
   }
+  m_spinner.reset(new ::ros::AsyncSpinner(4));
+}
+
+void roscpp_initializer::start() {
+  m_log->syslog("ros", log::info)<<"Starting ros even handling thread";
+
+  m_spinner->start();
 }
 
 void roscpp_initializer::stop() {
   if( ::ros::isInitialized() && !::ros::isShuttingDown() ) {
     m_log->syslog("ros", log::info)<<"Shutting down ROS connection";
+    m_spinner->stop();
     m_handle.reset();
   }
 }

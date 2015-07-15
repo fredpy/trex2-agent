@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_clock.hh"
-#include "ros_client.hh"
+#include "roscpp_inject.hh"
 
 #include <ros/time.h>
 #include <boost/thread.hpp>
@@ -46,7 +46,7 @@ namespace {
 using namespace TREX::ROS;
 
 ros_clock::time_point ros_clock::now() {
-  static TREX::utils::SingletonUse<ros_client> client;
+  static TREX::utils::SingletonUse<roscpp_initializer> client;
   
   ros::Time current(ros::Time::now());
 

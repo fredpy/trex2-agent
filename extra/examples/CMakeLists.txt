@@ -41,7 +41,7 @@ add_subdirectory(simplerobot)
 
 
 # ROS connection components
-option(WITH_ROS "Use ROS plugin" OFF)
-if(WITH_ROS)
-  add_subdirectory(turtlesim)
-endif(WITH_ROS)
+#option(WITH_ROS "Use ROS plugin" OFF)
+#if(WITH_ROS)
+#  add_subdirectory(turtlesim)
+#endif(WITH_ROS)

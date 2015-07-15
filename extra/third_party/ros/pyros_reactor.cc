@@ -83,14 +83,6 @@ pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
     
     }
     
-//    syslog(log::info)<<"Loading roslib";
-//    bp::exec("import roslib", main_ns);
-    
-//    m_roslib = m_python->import("roslib");
-//    syslog(log::info)<<"Loading rospy";
-//    m_rospy = m_python->import("rospy");
-    
-    
     syslog(log::info)<<"Creating my own environment (trex.__agents__."<<getAgentName()<<"."
       <<getName()<<")";
     
@@ -149,21 +141,27 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
   provide(tl_name, write);
   if( isInternal(tl_name) ) {
     try {
-      m_python->load_module_for(*py_type);
+      bp::object type = m_python->load_module_for(*py_type);
       std::string f_name(tl_name.str()+"_updated");
+      scoped_gil_release lock;
       {
-        scoped_gil_release lock;
         bp::scope local(m_env);
 
         syslog()<<"Create python callback "<<f_name<<" for topic "<<ros_topic;
-        bp::def(f_name.c_str(),
-                bp::make_function(boost::bind(&pyros_reactor::ros_update,
-                                              this, tl_name, _1),
-                                  bp::default_call_policies(),
-                                  boost::mpl::vector<void, bp::object>()));
-        syslog()<<"Connect callback to topic";
-        bp::exec("");
+          bp::def(f_name.c_str(),
+                  bp::make_function(boost::bind(&pyros_reactor::ros_update,
+                                                this, tl_name, _1),
+                                    bp::default_call_policies(),
+                                    boost::mpl::vector<void, bp::object>()));
         
+        syslog()<<"Subscribe to topic "<<ros_topic;
+
+        bp::object cb = m_env.attr(f_name.c_str());
+        bp::object sub = m_rospy.attr("Subscriber");
+        
+        m_env.attr((tl_name.str()+"_sub").c_str()) = sub(ros_topic.c_str(), type, cb);
+        syslog()<<"done: "<<f_name<<"="
+          <<bp::extract<char const *>(bp::str(m_env.attr((tl_name.str()+"_sub").c_str())));
       }
     
     } catch(bp::error_already_set const &e) {
@@ -186,5 +184,6 @@ bool pyros_reactor::synchronize() {
 
 void pyros_reactor::ros_update(Symbol timeline, bp::object obj) {
   bp::dict attributes(obj.attr("__dict__"));
+  syslog()<<"Received "<<bp::extract<char const *>(bp::str(obj));
 }
 

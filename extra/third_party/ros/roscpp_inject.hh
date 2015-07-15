@@ -51,11 +51,15 @@ namespace TREX {
       void stop();
       
     private:
+      void init();
+      
+      
       roscpp_initializer();
       ~roscpp_initializer();
       
       utils::SingletonUse<utils::LogManager> m_log;
       UNIQ_PTR< ::ros::NodeHandle >          m_handle;
+      UNIQ_PTR< ::ros::AsyncSpinner >        m_spinner;
       
       friend utils::SingletonWrapper<roscpp_initializer>;
     };

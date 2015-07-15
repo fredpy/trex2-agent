@@ -31,10 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "ros_reactor.hh"
 #include "pyros_reactor.hh"
-#include "ros_client.hh"
-#include "ros_action.hh"
 
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
@@ -43,71 +40,16 @@
 
 #include <geometry_msgs/Point.h>
 
-namespace TREX {
-  namespace ROS {
-    
-    template<>
-    struct ros_convert_traits<geometry_msgs::Point> {
-      typedef geometry_msgs::Point    message;
-      typedef message::ConstPtr  message_ptr;
-      enum {
-        accept_goals = true
-      };
-      
-      static transaction::observation_id ros_to_trex(utils::Symbol const &timeline,
-                                                     message_ptr const &msg);
-      
-      static message_ptr trex_to_ros(transaction::goal_id g);
-    };
-    
-    transaction::observation_id ros_convert_traits<geometry_msgs::Point>::ros_to_trex(utils::Symbol const &timeline,
-                                                                                      ros_convert_traits<geometry_msgs::Point>::message_ptr const &msg) {
-      transaction::observation_id obs = MAKE_SHARED<transaction::Observation>(timeline, utils::Symbol("Hold"));
-      
-      obs->restrictAttribute("x", transaction::FloatDomain(msg->x));
-      obs->restrictAttribute("y", transaction::FloatDomain(msg->y));
-      obs->restrictAttribute("z", transaction::FloatDomain(msg->z));
-      return obs;
-    }
-    
-    
-    ros_convert_traits<geometry_msgs::Point>::message_ptr ros_convert_traits<geometry_msgs::Point>::trex_to_ros(transaction::goal_id g) {
-      geometry_msgs::Point::Ptr msg;
-      
-      if( g->predicate()=="Hold" ) {
-        msg.reset(new geometry_msgs::Point);
-        if( g->hasAttribute("x") )
-          msg->x = g->getDomain<transaction::FloatDomain>("x").closestTo(0.0);
-        else
-          msg->x = 0.0;
-        if( g->hasAttribute("y") )
-          msg->y = g->getDomain<transaction::FloatDomain>("y").closestTo(0.0);
-        else
-          msg->y = 0.0;
-        if( g->hasAttribute("z") )
-          msg->z = g->getDomain<transaction::FloatDomain>("z").closestTo(0.0);
-        else
-          msg->z = 0.0;
-      }
-      return msg;
-    }
-    
-  }
-}
-
 using namespace TREX::utils;
 using namespace TREX::transaction;
 using namespace TREX::ROS;
 
 namespace {
   SingletonUse<LogManager> s_log;
-  SingletonUse<ros_client> s_ros; // initate connection to ros
+  SingletonUse<roscpp_initializer> s_ros;
   
-  TeleoReactor::xml_factory::declare<ros_reactor> decl("ROSReactor");
   TeleoReactor::xml_factory::declare<pyros_reactor> pydecl("PyROSReactor");
 
-  // declare the Point subscriber
-  ros_factory::declare< ros_subscriber<geometry_msgs::Point> > pt_decl("Point");
 }
 
 

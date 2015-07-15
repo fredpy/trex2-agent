@@ -61,7 +61,7 @@ namespace TREX {
       utils::SingletonUse<python::exception_table> m_exc;
       
       // python modules used
-      boost::python::object m_trex, m_transaction, m_domains, m_roslib, m_rospy, m_env;
+      boost::python::object m_trex, m_transaction, m_domains, m_rospy, m_env;
     };
     
   }

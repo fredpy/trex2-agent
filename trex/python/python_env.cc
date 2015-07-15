@@ -38,6 +38,7 @@
 
 using namespace TREX::python;
 namespace bp=boost::python;
+namespace tlog=TREX::utils::log;
 
 /*
  * class TREX::python::python_env
@@ -45,7 +46,7 @@ namespace bp=boost::python;
 
 python_env::python_env() {
   static char name[] = {'\0'};
-  
+  m_log->syslog(tlog::info)<<"Initializing python";
   Py_SetProgramName(name);
   Py_Initialize();
 }
@@ -58,18 +59,19 @@ bp::object &python_env::import(std::string const &module) {
   object_map::iterator i = m_loaded.find(module);
   
   if( m_loaded.end()==i ) {
+    m_log->syslog(tlog::info)<<"Loading python module \""<<module<<"\"";
     bp::object mod = bp::import(module.c_str());
     i = m_loaded.insert(object_map::value_type(module, mod)).first;
   }
   return i->second;
 }
 
-std::string python_env::load_module_for(std::string const &type) {
-  size_t pos = type.find_first_of('.');
-  std::string loaded;
+bp::object python_env::load_module_for(std::string const &type) {
+  size_t pos = type.find_last_of('.');
   if( pos!=std::string::npos ) {
-    loaded = type.substr(0, pos);
-    import(loaded);
+    std::string loaded = type.substr(0, pos);
+    bp::object tmp = import(loaded);
+    return tmp.attr(type.substr(pos+1).c_str());
   }
-  return loaded;
+  return bp::object();
 }

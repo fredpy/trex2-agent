@@ -75,21 +75,13 @@ add_library(TREXros SHARED
   # source
   pyros_reactor.cc
   roscpp_inject.cc
-  ros_reactor.cc 
   ros_clock.cc
-  ros_timeline.cc
-  ros_client.cc
   # header
   pyros_reactor.hh
   roscpp_inject.hh
-  ros_reactor.hh
-  trex/ros/ros_client.hh
   trex/ros/ros_clock.hh
   trex/ros/ros_convert_traits.hh
-  trex/ros/ros_error.hh
-  trex/ros/ros_subscriber.hh
-  trex/ros/ros_action.hh
-  trex/ros/bits/ros_timeline.hh)
+  trex/ros/ros_error.hh)
 
 install(DIRECTORY trex/ DESTINATION include/trex/
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
