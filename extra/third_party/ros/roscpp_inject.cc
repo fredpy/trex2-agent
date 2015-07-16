@@ -38,15 +38,12 @@ using namespace TREX::utils;
 
 // structors
 
-roscpp_initializer::roscpp_initializer() {
+roscpp_initializer::roscpp_initializer()
+:m_timer(m_log->service()) {
   init();
-  start();
 }
 
 roscpp_initializer::~roscpp_initializer() {
-  if( ok() ) {
-    stop();
-  }
 }
 
 // observers
@@ -54,11 +51,6 @@ roscpp_initializer::~roscpp_initializer() {
 bool roscpp_initializer::ok() const {
   return ::ros::ok();
 }
-
-bool roscpp_initializer::active() const {
-  return ok() && ::ros::isInitialized() && !::ros::isShuttingDown();
-}
-
 
 ::ros::NodeHandle const &roscpp_initializer::handle() const {
   return *m_handle;
@@ -75,23 +67,17 @@ void roscpp_initializer::init() {
     ::ros::init(argc, argv, "trex2",
                 ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
     m_handle.reset(new ::ros::NodeHandle);
-  }
-  m_spinner.reset(new ::ros::AsyncSpinner(4));
-}
-
-void roscpp_initializer::start() {
-  m_log->syslog("ros", log::info)<<"Starting ros even handling thread";
-
-  m_spinner->start();
-}
-
-void roscpp_initializer::stop() {
-  if( ::ros::isInitialized() && !::ros::isShuttingDown() ) {
-    m_log->syslog("ros", log::info)<<"Shutting down ROS connection";
-    m_spinner->stop();
-    m_handle.reset();
+    
+    m_log->service().post(boost::bind(&roscpp_initializer::async_poll, this));
   }
 }
 
+void roscpp_initializer::async_poll() {
+  if( ok() ) {
+    ::ros::spinOnce();
+    m_timer.expires_from_now(boost::posix_time::millisec(50));
+    m_timer.async_wait(boost::bind(&roscpp_initializer::async_poll, this));
+  }
+}
 
 

@@ -46,6 +46,9 @@ namespace TREX {
       boost::python::object &import(std::string const &module);
       boost::python::object load_module_for(std::string const &type);
       
+      boost::python::object dir(boost::python::object const &obj) const;
+      bool callable(boost::python::object const &obj) const;
+      
     private:
       typedef std::map<std::string, boost::python::object> object_map;
       object_map m_loaded;

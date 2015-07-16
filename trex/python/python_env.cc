@@ -46,9 +46,11 @@ namespace tlog=TREX::utils::log;
 
 python_env::python_env() {
   static char name[] = {'\0'};
+  static char *argv[] = { name };
   m_log->syslog(tlog::info)<<"Initializing python";
-  Py_SetProgramName(name);
   Py_Initialize();
+  // Needed for some python libs inclufing rospy
+  PySys_SetArgv(1, argv);
 }
 
 python_env::~python_env() {
@@ -75,3 +77,14 @@ bp::object python_env::load_module_for(std::string const &type) {
   }
   return bp::object();
 }
+
+
+bp::object python_env::dir(bp::object const &obj) const {
+  bp::handle<> ret(PyObject_Dir(obj.ptr()));
+  return bp::object(ret);  
+}
+
+bool python_env::callable(bp::object const &obj) const {
+  return 1==PyCallable_Check(obj.ptr());
+}
+

@@ -44,22 +44,20 @@ namespace TREX {
     class roscpp_initializer:boost::noncopyable {
     public:
       bool ok() const;
-      bool active() const;
       ::ros::NodeHandle const &handle() const;
       
-      void start();
-      void stop();
       
     private:
       void init();
       
+      void async_poll();
       
       roscpp_initializer();
       ~roscpp_initializer();
       
       utils::SingletonUse<utils::LogManager> m_log;
+      boost::asio::deadline_timer            m_timer;
       UNIQ_PTR< ::ros::NodeHandle >          m_handle;
-      UNIQ_PTR< ::ros::AsyncSpinner >        m_spinner;
       
       friend utils::SingletonWrapper<roscpp_initializer>;
     };
