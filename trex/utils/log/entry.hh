@@ -112,7 +112,7 @@ namespace TREX {
 	 * @sa date()
 	 */
         bool is_dated() const {
-          return m_date;
+          return !!m_date;
         }
 	/** @brief Entry date
 	 *

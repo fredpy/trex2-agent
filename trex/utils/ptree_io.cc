@@ -101,10 +101,15 @@ void TREX::utils::write_xml(std::ostream &out, bp::ptree p, bool header) {
   if( header )
     xml::write_xml(out, p);
   else {
+    bp::ptree::key_type foo;
     // Hacky way to get ridd of the XML header
-    xml::write_xml_element(out, bp::ptree::key_type(), p, -1,
+    xml::write_xml_element(out, foo, p, -1,
+#if BOOST_VERSION > 105400
                            xml::xml_writer_settings<bp::ptree::key_type>());
-  } 
+#else
+                           xml::xml_writer_settings<bp::ptree::key_type::value_type>());
+#endif
+  }
 }
 
 void TREX::utils::read_json(std::istream &in, bp::ptree &p) {
