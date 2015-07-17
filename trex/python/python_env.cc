@@ -44,7 +44,8 @@ namespace tlog=TREX::utils::log;
  * class TREX::python::python_env
  */
 
-python_env::python_env() {
+python_env::python_env()
+:m_strand(m_log->service()) {
   static char name[] = {'\0'};
   static char *argv[] = { name };
   m_log->syslog(tlog::info)<<"Initializing python";

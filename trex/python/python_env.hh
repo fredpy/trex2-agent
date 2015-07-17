@@ -35,6 +35,7 @@
 # define H_trex_python_python_env
 
 # include <trex/utils/LogManager.hh>
+# include <trex/utils/priority_strand.hh>
 # include <boost/python.hpp>
 # include <map>
 
@@ -49,14 +50,21 @@ namespace TREX {
       boost::python::object dir(boost::python::object const &obj) const;
       bool callable(boost::python::object const &obj) const;
       
+      utils::priority_strand &strand() {
+        return m_strand;
+      }
+      
     private:
       typedef std::map<std::string, boost::python::object> object_map;
       object_map m_loaded;
+      
       
       python_env();
       ~python_env();
       
       utils::SingletonUse<utils::LogManager> m_log;
+      utils::priority_strand m_strand;
+
       friend TREX::utils::SingletonWrapper<python_env>;
     };
     
