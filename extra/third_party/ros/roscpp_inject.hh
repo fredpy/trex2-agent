@@ -36,28 +36,46 @@
 
 # include <trex/utils/LogManager.hh>
 # include <trex/utils/platform/memory.hh>
-# include <ros/ros.h>
+# include <trex/python/python_env.hh>
+# include <trex/python/exception_helper.hh>
+
+namespace ros {
+  class NodeHandle;
+  class AsyncSpinner;
+}
 
 namespace TREX {
   namespace ROS {
     
     class roscpp_initializer:boost::noncopyable {
     public:
-      bool ok() const;
-      ::ros::NodeHandle const &handle() const;
       
+      enum priority {
+        init_p = 0,
+        default_p
+      };
+      
+      boost::python::object &rospy() {
+        return m_rospy;
+      }
+      
+      utils::priority_strand &strand() {
+        return m_python->strand();
+      }
       
     private:
-      void init();
+      void init_rospy();
       
       void async_poll();
       
       roscpp_initializer();
       ~roscpp_initializer();
       
-      utils::SingletonUse<utils::LogManager> m_log;
-      boost::asio::deadline_timer            m_timer;
-      UNIQ_PTR< ::ros::NodeHandle >          m_handle;
+      utils::SingletonUse<utils::LogManager>  m_log;
+      utils::SingletonUse<python::python_env> m_python;
+      utils::SingletonUse<python::exception_table> m_err;
+      
+      boost::python::object          m_rospy;
       
       friend utils::SingletonWrapper<roscpp_initializer>;
     };

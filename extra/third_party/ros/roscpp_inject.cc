@@ -32,51 +32,64 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "roscpp_inject.hh"
+#include <trex/python/python_thread.hh>
 
 using namespace TREX::ROS;
+using namespace TREX::python;
 using namespace TREX::utils;
+namespace bp=boost::python;
 
 // structors
 
-roscpp_initializer::roscpp_initializer()
-:m_timer(m_log->service()) {
-  init();
+roscpp_initializer::roscpp_initializer() {
+  strand().send(boost::bind(&roscpp_initializer::init_rospy, this), init_p);
 }
 
 roscpp_initializer::~roscpp_initializer() {
 }
 
-// observers
 
-bool roscpp_initializer::ok() const {
-  return ::ros::ok();
-}
-
-::ros::NodeHandle const &roscpp_initializer::handle() const {
-  return *m_handle;
-}
 
 // Manipulators
 
-void roscpp_initializer::init() {
-  if( !::ros::isInitialized() ) {
-    int argc = 0;
-    char **argv = NULL;
+
+void roscpp_initializer::init_rospy() {
+  try {
+    scoped_gil_release lock;
+    m_rospy = m_python->import("rospy");
     
-    m_log->syslog("ros", log::info)<<"Initialize ROS connection as trex2";
-    ::ros::init(argc, argv, "trex2",
-                ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
-    m_handle.reset(new ::ros::NodeHandle);
-    
-    m_log->service().post(boost::bind(&roscpp_initializer::async_poll, this));
+    m_rospy.attr("init_node")("trex2", bp::object(), true,
+                              bp::object(), false, false,
+                              true);
+  } catch(bp::error_already_set const &e) {
+    m_err->unwrap_py_error();
   }
+  strand().send(boost::bind(&roscpp_initializer::async_poll, this));
 }
 
 void roscpp_initializer::async_poll() {
-  if( ok() ) {
-    ::ros::spinOnce();
-    m_timer.expires_from_now(boost::posix_time::millisec(50));
-    m_timer.async_wait(boost::bind(&roscpp_initializer::async_poll, this));
+//  m_log->syslog("ros", log::info)<<"Polling on rospy";
+  try {
+    try {
+      bool cont = false;
+      scoped_gil_release lock;
+//      m_log->syslog("ros", log::info)<<"Polling on rospy (2)";
+        cont = !bp::extract<bool>(m_rospy.attr("is_shutdown")());
+      if( cont ) {
+     // m_log->syslog("ros", log::info)<<"Polling on rospy (3)";
+       m_rospy.attr("sleep")(0.5);
+        strand().send(boost::bind(&roscpp_initializer::async_poll, this));
+      }
+    } catch(bp::error_already_set const &e) {
+      m_err->unwrap_py_error();
+    }
+    m_log->syslog("ros", log::info)<<"rospy poll done";
+  } catch(utils::Exception const &e) {
+    m_log->syslog("ros", log::error)<<"TREX Exception on poll: "<<e;
+  } catch(std::exception const &se) {
+    m_log->syslog("ros", log::error)<<"Exception on poll: "<<se.what();
+  } catch(...) {
+    m_log->syslog("ros", log::error)<<"Unknown exception on poll";
   }
 }
 

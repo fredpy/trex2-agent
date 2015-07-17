@@ -45,13 +45,15 @@ namespace tlog=TREX::utils::log;
  */
 
 python_env::python_env()
-:m_strand(m_log->service()) {
+:m_strand(m_log->service(), false) {
   static char name[] = {'\0'};
   static char *argv[] = { name };
-  m_log->syslog(tlog::info)<<"Initializing python";
+  m_log->syslog("python", tlog::info)<<"Initializing python";
   Py_Initialize();
   // Needed for some python libs inclufing rospy
   PySys_SetArgv(1, argv);
+  m_log->syslog("python", tlog::info)<<"Starting queue";
+  m_strand.start();
 }
 
 python_env::~python_env() {

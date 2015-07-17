@@ -34,6 +34,7 @@
 #include "pyros_reactor.hh"
 #include <trex/python/python_thread.hh>
 #include <boost/python/def.hpp>
+#include <boost/python/stl_iterator.hpp>
 
 
 using namespace TREX::ROS;
@@ -49,45 +50,15 @@ pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false) {
   bpt::ptree::value_type const &node(xml_factory::node(arg));
 
-  try {        
-    syslog(log::info)<<"Loading rospy";
-    m_rospy = m_python->import("rospy");
-    
-    syslog(log::info)<<"Loading trex";
-    m_trex = m_python->import("trex");
-    m_transaction = m_trex.attr("transaction");
-    m_domains = m_trex.attr("domains");
-    
-    syslog(log::info)<<"Creating my own environment (trex.__agents__."
-    <<getAgentName()<<"."<<getName()<<")";
-    
-    bp::object trex_env;
-    if( m_python->dir(m_trex).contains("__agents__") )
-      trex_env = m_trex.attr("__agents__");
-    else {
-      bp::scope cur(m_trex);
-      trex_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule("__agents__"))));
-    }
-    if( m_python->dir(trex_env).contains(getAgentName().c_str()) )
-      trex_env = trex_env.attr(getAgentName().c_str());
-    else {
-      bp::scope cur(trex_env);
-      trex_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(getAgentName().c_str()))));
-    }
-    if( m_python->dir(trex_env).contains(getName().c_str()) ) {
-      syslog(log::warn)<<"environment trex.__agents__."<<getAgentName()<<"."<<getName()
-        <<" already exist";
-      m_env = trex_env.attr(getName().c_str());
-    } else {
-      bp::scope cur(trex_env);
-      m_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(getName().c_str()))));
-    }
+  try {
+    m_ros->strand().send(boost::bind(&pyros_reactor::init_env, this),
+                         roscpp_initializer::init_p);
     
     size_t count = 0;
     for(bpt::ptree::const_iterator i=node.second.begin();
         node.second.end()!=i; ++i) {
       if( i->first=="Topic" ) {
-        add_topic(*i);
+        m_ros->strand().send(boost::bind(&pyros_reactor::add_topic, this, *i));
         count += 1;
       }
     }
@@ -115,10 +86,10 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
   // First reserve the timeline
   provide(tl_name, write);
   if( isInternal(tl_name) ) {
+    scoped_gil_release lock;
     try {
       bp::object type = m_python->load_module_for(*py_type);
       std::string f_name(tl_name.str()+"_updated");
-      scoped_gil_release lock;
       {
         bp::scope local(m_env);
 
@@ -132,7 +103,7 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
         syslog()<<"Subscribe to topic "<<ros_topic;
 
         bp::object cb = m_env.attr(f_name.c_str());
-        bp::object sub = m_rospy.attr("Subscriber");
+        bp::object sub = m_ros->rospy().attr("Subscriber");
         
         m_env.attr((tl_name.str()+"_sub").c_str()) = sub(ros_topic.c_str(), type, cb);
         syslog()<<"done: "<<f_name<<"="
@@ -146,6 +117,45 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
     throw XmlError(desc, "Failed to declare \""+tl_name.str()+"\" as internal");
 }
 
+// manipulators
+
+void pyros_reactor::init_env() {
+  try {
+    python::scoped_gil_release lock;
+    m_trex = m_python->import("trex");
+    m_domains = m_trex.attr("domains");
+    m_transaction = m_trex.attr("transaction");
+  
+    syslog(log::info)<<"Creating python environment trex._agents_."
+    <<getAgentName()<<"."<<getName();
+  
+    bp::object tmp;
+    if( m_python->dir(m_trex).contains("_agents_") )
+      tmp = m_trex.attr("_agents_");
+    else {
+      bp::scope cur(m_trex);
+      tmp = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule("_agents_"))));
+    }
+  
+    if( m_python->dir(tmp).contains(getAgentName().c_str()) )
+      tmp = m_trex.attr(getAgentName().c_str());
+    else {
+      bp::scope cur(tmp);
+      tmp = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(getAgentName().c_str()))));
+    }
+  
+    if( m_python->dir(tmp).contains(getName().c_str()) )
+      throw transaction::ReactorException(*this,
+                                          "trex._agents_."+getAgentName().str()+
+                                          "."+getName().str()+" already exists");
+    else {
+      bp::scope cur(tmp);
+      m_env = bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(getName().c_str()))));
+    }
+  } catch(bp::error_already_set const &e) {
+    m_exc->unwrap_py_error();
+  }
+}
 
 // callbacks
 
@@ -158,7 +168,21 @@ bool pyros_reactor::synchronize() {
 }
 
 void pyros_reactor::ros_update(Symbol timeline, bp::object obj) {
-  bp::dict attributes(obj.attr("__dict__"));
-  syslog()<<"Received "<<bp::extract<char const *>(bp::str(obj));
+  python::scoped_gil_release lock;
+  std::ostringstream oss;
+
+  for(bp::stl_input_iterator<bp::str> i(m_python->dir(obj)), end;
+      end!=i; ++i) {
+    if( !(i->startswith("_") || (*i)=="header"
+          || (*i)=="child_frame_id" )  ) {
+      bp::object const &a = obj.attr(*i);
+      if( !m_python->callable(a) ) {
+        oss<<"  "<<bp::extract<char const *>(*i)<<": ";
+        oss<<bp::extract<char const *>(bp::str(a))<<std::endl;
+      }
+    }
+  }
+  if( !oss.str().empty() )
+    syslog(timeline, log::info)<<"Received message:\n"<<oss.str();
 }
 
