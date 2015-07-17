@@ -55,7 +55,7 @@ namespace TREX {
       /**
        * Where to receive tokens
        */
-      int m_localport;
+      int m_localport, m_imcid;
 
       /**
        * IMC object used for sending and receiving IMC messages

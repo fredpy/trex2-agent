@@ -15,8 +15,8 @@ NavActions nav_act = new NavActions(30);
 Reference reference = new Reference(External);
 ReferenceState refstate = new ReferenceState(Observe);
 navigator.min_z.specify(2);
-navigator.max_z.specify(20);
-navigator.flat_z.specify(5);
+navigator.max_z.specify(50);
+navigator.flat_z.specify(8);
 
 YoYoController yoyo = new YoYoController(External);
 
