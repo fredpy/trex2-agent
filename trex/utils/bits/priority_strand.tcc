@@ -1,3 +1,4 @@
+// -*- C++ -*-
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -133,7 +134,7 @@ namespace details {
     }
     
     future get_future() {
-      return m_result.get_future();
+      return m_result.get_future().share();
     }
     
   private:
