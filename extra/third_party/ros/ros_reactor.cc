@@ -33,8 +33,13 @@
  */
 #include "ros_reactor.hh"
 #include <trex/python/python_thread.hh>
+#include <trex/domain/FloatDomain.hh>
+#include <trex/domain/IntegerDomain.hh>
+
+
 #include <boost/python/def.hpp>
 #include <boost/python/stl_iterator.hpp>
+
 
 
 using namespace TREX::ROS;
@@ -157,6 +162,52 @@ void ros_reactor::init_env() {
   }
 }
 
+size_t ros_reactor::populate_attributes(Predicate &pred, std::string path,
+                                        bp::object const &obj) {
+  size_t ret = 0;
+
+  for(bp::stl_input_iterator<bp::str> i(m_python->dir(obj)), end;
+      end!=i; ++i) {
+    if( !(i->startswith("_") || (*i)=="header" || (*i)=="child_frame_id") ) {
+      bp::object const &attr = obj.attr(*i);
+      if( !m_python->callable(attr) ) {
+        std::string local = path;
+        local += bp::extract<char const *>(*i);
+        
+        bp::extract<FloatDomain::base_type> is_float(attr);
+        bp::extract<IntegerDomain::base_type> is_int(attr);
+        
+        if( is_float.check() ) {
+          syslog()<<local<<" is float";
+          if( is_int.check() )
+            syslog()<<local<<" is int too *sigh*";
+          pred.restrictAttribute(Variable(local, FloatDomain(is_float)));
+
+          ++ret;
+        } else if ( is_int.check() ) {
+          syslog()<<local<<" is int";
+          pred.restrictAttribute(Variable(local, IntegerDomain(is_int)));
+          ++ret;
+        } else {
+          // TODO: check first if it is an obvious type: int, float, bool, ...
+          // TODO:
+        
+          size_t sub = populate_attributes(pred, local+"_", attr);
+      
+          if( 0==sub ) {
+            // This is not a structure
+            syslog()<<pred.object()<<'.'<<pred.predicate()<<'.'<<path
+            <<"="<<bp::extract<char const *>(bp::str(attr));
+          } else
+            ret += sub;
+        }
+      }
+    }
+  }
+  return ret;
+}
+
+
 // callbacks
 
 void ros_reactor::handleInit() {
@@ -169,20 +220,8 @@ bool ros_reactor::synchronize() {
 
 void ros_reactor::ros_update(Symbol timeline, bp::object obj) {
   python::scoped_gil_release lock;
-  std::ostringstream oss;
-
-  for(bp::stl_input_iterator<bp::str> i(m_python->dir(obj)), end;
-      end!=i; ++i) {
-    if( !(i->startswith("_") || (*i)=="header"
-          || (*i)=="child_frame_id" )  ) {
-      bp::object const &a = obj.attr(*i);
-      if( !m_python->callable(a) ) {
-        oss<<"  "<<bp::extract<char const *>(*i)<<": ";
-        oss<<bp::extract<char const *>(bp::str(a))<<std::endl;
-      }
-    }
-  }
-  if( !oss.str().empty() )
-    syslog(timeline, log::info)<<"Received message:\n"<<oss.str();
+  Observation obs(timeline, "Holds");
+  populate_attributes(obs, "", obj);
+  postObservation(obs);
 }
 

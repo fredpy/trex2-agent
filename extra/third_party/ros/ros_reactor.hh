@@ -57,6 +57,11 @@ namespace TREX {
       void handleInit();
       bool synchronize();
       
+      size_t populate_attributes(transaction::Predicate &pred,
+                                 std::string path,
+                                 boost::python::object const &obj);
+
+      
       utils::SingletonUse<roscpp_initializer>      m_ros;
       utils::SingletonUse<python::python_env>      m_python;
       utils::SingletonUse<python::exception_table> m_exc;
