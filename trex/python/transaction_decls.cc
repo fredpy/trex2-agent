@@ -76,6 +76,13 @@ namespace {
   size_t get_goal_id(goal_id const &g) {
     return reinterpret_cast<unsigned long long>(g.get());
   }
+  
+  observation_id obs_from_xml(boost::property_tree::ptree::value_type &node) {
+    return MAKE_SHARED<Observation>(node);
+  }
+  goal_id goal_from_xml(boost::property_tree::ptree::value_type &node) {
+    return MAKE_SHARED<Goal>(node);
+  }
 
 }
 
@@ -185,6 +192,8 @@ void export_transactions() {
         "Create new observation pred on timeline\n\n"
         "Raises:\n"
         "  predicate_error: either timeline or pred is empty"))
+  .def("from_xml", &obs_from_xml, (bp::arg("xml")),
+       "Create an observation from its xml description").staticmethod("from_xml")
   ;
   
   /*
@@ -204,6 +213,8 @@ void export_transactions() {
     "Create new goal pred on timeline\n\n"
     "Raises:\n"
     "  predicate_error: either timline or pred is empty"))
+  .def("from_xml", &goal_from_xml, (bp::arg("xml")),
+       "Create a goal from its xml description").staticmethod("from_xml")
   .add_property("id", &get_goal_id,
                 "A unique id for this goal");
   

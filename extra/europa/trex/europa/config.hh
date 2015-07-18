@@ -44,4 +44,4 @@
  * @ingroup europa
  * @author Frederic Py <fpy@mbari.org>
  */
-#include "bits/europa_config.hh"
+#include "trex/europa/bits/europa_config.hh"

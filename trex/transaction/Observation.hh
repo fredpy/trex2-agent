@@ -9,17 +9,17 @@
  *
  * @author Frederic Py <fpy@mbari.org>
  * @ingroup transaction
- */ 
+ */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -29,7 +29,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -50,7 +50,7 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     /** @brief Reactor observation
      *
      * This class encapsulate the latest observation on a timeline. Each time a timeline
@@ -74,7 +74,7 @@ namespace TREX {
        * Create a copy of pred as an observation
        */
       Observation(Predicate const &pred)
-	:Predicate(pred) {}
+      :Predicate(pred) {}
       /** @brief Constructor
        * @param obj A timline identifier
        * @param pred   A predicate name
@@ -83,8 +83,8 @@ namespace TREX {
        * state @a pred and all its attributes not constrained.
        */
       Observation(TREX::utils::Symbol const &obj,
-		  TREX::utils::Symbol const &pred)
-	:Predicate(obj, pred) {}
+                  TREX::utils::Symbol const &pred)
+      :Predicate(obj, pred) {}
       /** @brief XML parsing constructor
        * @param node An XML node
        *
@@ -102,30 +102,30 @@ namespace TREX {
        * @sa Variable::Variable(rapidxml::xml_node<> const &)
        * @sa Predicate::Predicate(rapidxml::xml_node<> const &)
        */
-      Observation(boost::property_tree::ptree::value_type &node) 
-	:Predicate(node) {}
+      Observation(boost::property_tree::ptree::value_type &node)
+      :Predicate(node) {}
       /** brief Destructor */
       ~Observation() {}
     private:
       TREX::utils::Symbol const &getPredTag() const;
-
+      
     }; // TREX::transaction::Observation
-
+    
     /** @brief An observation id
-     * 
-     * A type (not yet) used to refer to a specific observation. 
+     *
+     * A type (not yet) used to refer to a specific observation.
      * This class is part of a long term plan t orefactor observations
-     * in a similar way goals are manipulated in ucrrent trex version. 
-     * While there is not plan yet on when this will be done, we do 
-     * believe  that this refactoring would be benefitial for further 
-     * evolutions of the framework such as allowing to post/refine 
+     * in a similar way goals are manipulated in ucrrent trex version.
+     * While there is not plan yet on when this will be done, we do
+     * believe  that this refactoring would be benefitial for further
+     * evolutions of the framework such as allowing to post/refine
      * observations in the past.
      *
      * @relates class Observation
      * @sa goal_id
      */
     typedef SHARED_PTR<Observation> observation_id;
-
+    
   } // TREX::transaction
 } // TREX
 

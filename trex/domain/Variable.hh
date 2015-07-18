@@ -9,14 +9,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -26,7 +26,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,8 +40,8 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_Variable 
-# define H_Variable 
+#ifndef H_Variable
+# define H_Variable
 
 # include <functional>
 
@@ -49,9 +49,9 @@
 
 namespace TREX {
   namespace transaction {
-
+    
     class Predicate;
-
+    
     /** @brief Variable related exception
      *
      * This exception is thrown when a problem is detected during a
@@ -68,12 +68,12 @@ namespace TREX {
        * Creat a new instance with the associated message @e msg
        */
       VariableException(std::string const &msg) throw()
-	:TREX::utils::Exception(msg) {}
+      :TREX::utils::Exception(msg) {}
       /** @brief Destructor */
       ~VariableException() throw() {}
     }; // TREX::transaction::VariableException
     
-
+    
     /** @brief TREX variable representation
      *
      * This class implements a TREX variable. variables are
@@ -106,7 +106,7 @@ namespace TREX {
        * empty name
        */
       Variable(TREX::utils::Symbol const &name,
-	       DomainBase const &domain);
+               DomainBase const &domain);
       /** @brief Constructor
        * @brief var Another instance
        *
@@ -134,7 +134,7 @@ namespace TREX {
       Variable(boost::property_tree::ptree::value_type &node);
       /** @brief Destructor */
       ~Variable();
-
+      
       /** @brief Check for complete varaible definition
        *
        * This method checks if current instance is fully defined with a
@@ -144,7 +144,7 @@ namespace TREX {
        * @retval false else
        */
       bool isComplete() const {
-	return !( m_name.empty() || !m_domain );
+        return !( m_name.empty() || !m_domain );
       }
       
       /** @brief Assignment operator
@@ -163,9 +163,9 @@ namespace TREX {
        * @sa bool isComplete() const
        */
       TREX::utils::Symbol const &name() const {
-	return m_name;
+        return m_name;
       }
-
+      
       /** @brief Variable domain
        *
        * @pre The variable is complete
@@ -194,15 +194,15 @@ namespace TREX {
        */
       template<class Ty>
       Ty const &typedDomain() const {
-	BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &, 
-			     DomainBase const &>::value));
-	return dynamic_cast<Ty const &>(domain());
+        BOOST_STATIC_ASSERT((boost::is_convertible<Ty const &,
+                             DomainBase const &>::value));
+        return dynamic_cast<Ty const &>(domain());
       }
       
       void accept(DomainVisitor &visitor) const {
-	domain().accept(visitor);
+        domain().accept(visitor);
       }
-
+      
       /** @brief Restrict Variable domain
        * @param dom a domain
        *
@@ -231,7 +231,7 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       Variable &operator*=(DomainBase const &dom) {
-	return restrict(dom);
+        return restrict(dom);
       }
       /** @brief Merge variable
        * @param var another variable
@@ -261,11 +261,11 @@ namespace TREX {
        * @sa DomainBase &DomainBase::restrictWith(DomainBase const &)
        */
       Variable &operator*=(Variable const &var) {
-	return restrict(var);
+        return restrict(var);
       }
-
+      
       boost::property_tree::ptree as_tree() const;
-
+      
       
       /** @brief XML output
        * @param out An output stream
@@ -283,19 +283,19 @@ namespace TREX {
         return to_json(out);
       }
       
-	
+      
     private:
       typedef DomainBase::xml_factory::returned_type domain_ptr;
       /** @brief varaible name */
       TREX::utils::Symbol m_name;
       /** @brief Variable domain */
       domain_ptr m_domain;
-
+      
       std::ostream &print_to(std::ostream &out) const;
-
+      
       /** @brief Entry point to domain XML parsing */
       static TREX::utils::SingletonUse< DomainBase::xml_factory > s_dom_factory;
-
+      
       /** @brief Domain duplication helper
        * @param dom A domain
        * This method helps to duplicate a domain pointed by @e dom
@@ -305,17 +305,17 @@ namespace TREX {
       static DomainBase *clone(boost::call_traits<Variable::domain_ptr>::param_type dom);
       
       /** @brief Constructor
-       * @param name A symbolic name 
+       * @param name A symbolic name
        * @param domain A poiunbter to a domain
        *
        * This constructor is used internally to create a variable
        * from a domain that has already been allocated
        */
       explicit Variable(TREX::utils::Symbol const &name,
-			DomainBase *domain = NULL);
+                        DomainBase *domain = NULL);
       friend class Predicate;
-   }; // class TREX::transaction::Variable
-      
+    }; // class TREX::transaction::Variable
+    
   } // TREX::transaction
 } // TREX 
 

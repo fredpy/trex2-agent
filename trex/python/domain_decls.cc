@@ -111,7 +111,6 @@ namespace {
     }
   };
   
-  
   struct interval_wrap:tt::BasicInterval, wrapper<tt::BasicInterval> {
     interval_wrap(tu::Symbol const &type):tt::BasicInterval(type) {}
     
@@ -209,8 +208,6 @@ namespace {
   
   };
   
-  
-  
   template<class Obj>
   std::string xml_str(Obj const &dom) {
     std::ostringstream oss;
@@ -247,8 +244,10 @@ namespace {
     }
     return a.getStringValue(idx);
   }
-
   
+  tt::Variable var_from_xml(boost::property_tree::ptree::value_type &xml) {
+    return tt::Variable(xml);
+  }
 }
 
 void export_domain() {
@@ -495,6 +494,8 @@ void export_domain() {
                 "Variable domain\n\n"
                 "Raise:\n"
                 "  variable_exception: domain of this variable is undefined")
+  .def("from_xml", var_from_xml, (arg("xml")),
+       "Create a variable from its xml description").staticmethod("from_xml")
   .def("restrict", restrict_domain, return_internal_reference<>(),
        args("self", "domain"),
        "Restrict the domain of this variable by intersecting it with domain\n\n"
