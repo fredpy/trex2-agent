@@ -46,7 +46,7 @@ namespace {
   SingletonUse<LogManager> s_log;
   SingletonUse<roscpp_initializer> s_ros;
   
-  TeleoReactor::xml_factory::declare<ros_reactor> pydecl("ROSReactor");
+  TeleoReactor::xml_factory::declare<ros_reactor> pydecl("RosReactor");
 
 }
 
