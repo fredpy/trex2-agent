@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "pyros_reactor.hh"
+#include "ros_reactor.hh"
 #include <trex/python/python_thread.hh>
 #include <boost/python/def.hpp>
 #include <boost/python/stl_iterator.hpp>
@@ -46,19 +46,19 @@ namespace bpt=boost::property_tree;
 
 // structors
 
-pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
+ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
 :TeleoReactor(arg, false) {
   bpt::ptree::value_type const &node(xml_factory::node(arg));
 
   try {
-    m_ros->strand().send(boost::bind(&pyros_reactor::init_env, this),
+    m_ros->strand().send(boost::bind(&ros_reactor::init_env, this),
                          roscpp_initializer::init_p);
     
     size_t count = 0;
     for(bpt::ptree::const_iterator i=node.second.begin();
         node.second.end()!=i; ++i) {
       if( i->first=="Topic" ) {
-        m_ros->strand().send(boost::bind(&pyros_reactor::add_topic, this, *i));
+        m_ros->strand().send(boost::bind(&ros_reactor::add_topic, this, *i));
         count += 1;
       }
     }
@@ -69,12 +69,12 @@ pyros_reactor::pyros_reactor(TeleoReactor::xml_arg_type arg)
   }
 }
 
-pyros_reactor::~pyros_reactor() {}
+ros_reactor::~ros_reactor() {}
 
 
 // modifiers
 
-void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
+void ros_reactor::add_topic(bpt::ptree::value_type const &desc) {
   Symbol tl_name = parse_attr<Symbol>(desc, "name");
   std::string ros_topic = parse_attr<std::string>(desc, "topic");
   boost::optional<std::string> py_type = parse_attr< boost::optional<std::string> >(desc, "type");
@@ -95,7 +95,7 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
 
         syslog()<<"Create python callback "<<f_name<<" for topic "<<ros_topic;
           bp::def(f_name.c_str(),
-                  bp::make_function(boost::bind(&pyros_reactor::ros_update,
+                  bp::make_function(boost::bind(&ros_reactor::ros_update,
                                                 this, tl_name, _1),
                                     bp::default_call_policies(),
                                     boost::mpl::vector<void, bp::object>()));
@@ -119,7 +119,7 @@ void pyros_reactor::add_topic(bpt::ptree::value_type const &desc) {
 
 // manipulators
 
-void pyros_reactor::init_env() {
+void ros_reactor::init_env() {
   try {
     python::scoped_gil_release lock;
     m_trex = m_python->import("trex");
@@ -159,15 +159,15 @@ void pyros_reactor::init_env() {
 
 // callbacks
 
-void pyros_reactor::handleInit() {
+void ros_reactor::handleInit() {
   
 }
 
-bool pyros_reactor::synchronize() {
+bool ros_reactor::synchronize() {
   return true;
 }
 
-void pyros_reactor::ros_update(Symbol timeline, bp::object obj) {
+void ros_reactor::ros_update(Symbol timeline, bp::object obj) {
   python::scoped_gil_release lock;
   std::ostringstream oss;
 

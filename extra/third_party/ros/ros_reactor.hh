@@ -42,10 +42,10 @@
 namespace TREX {
   namespace ROS {
     
-    class pyros_reactor :public transaction::TeleoReactor {
+    class ros_reactor :public transaction::TeleoReactor {
     public:
-      pyros_reactor(transaction::TeleoReactor::xml_arg_type arg);
-      ~pyros_reactor();
+      ros_reactor(transaction::TeleoReactor::xml_arg_type arg);
+      ~ros_reactor();
       
     private:
       void init_env();

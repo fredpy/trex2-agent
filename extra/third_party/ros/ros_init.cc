@@ -31,14 +31,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "pyros_reactor.hh"
+#include "ros_reactor.hh"
 
 #include <trex/utils/Plugin.hh>
 #include <trex/utils/LogManager.hh>
 
 #include <trex/domain/FloatDomain.hh>
-
-#include <geometry_msgs/Point.h>
 
 using namespace TREX::utils;
 using namespace TREX::transaction;
@@ -48,7 +46,7 @@ namespace {
   SingletonUse<LogManager> s_log;
   SingletonUse<roscpp_initializer> s_ros;
   
-  TeleoReactor::xml_factory::declare<pyros_reactor> pydecl("PyROSReactor");
+  TeleoReactor::xml_factory::declare<ros_reactor> pydecl("ROSReactor");
 
 }
 
