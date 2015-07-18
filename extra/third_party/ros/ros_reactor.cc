@@ -220,7 +220,17 @@ bool ros_reactor::synchronize() {
 
 void ros_reactor::ros_update(Symbol timeline, bp::object obj) {
   python::scoped_gil_release lock;
-  Observation obs(timeline, "Holds");
+  std::string pred;
+  // Extract the type for predicate name
+  if( m_python->dir(obj).contains("_type") ) {
+    pred = bp::extract<char const *>(obj.attr("_type"));
+    size_t pos = pred.find_last_of("./");
+    if( std::string::npos!=pos ) {
+      pred = pred.substr(pos+1);
+    }
+  }
+  
+  Observation obs(timeline, pred);
   populate_attributes(obs, "", obj);
   postObservation(obs);
 }
