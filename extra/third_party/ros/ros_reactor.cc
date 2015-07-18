@@ -35,7 +35,8 @@
 #include <trex/python/python_thread.hh>
 #include <trex/domain/FloatDomain.hh>
 #include <trex/domain/IntegerDomain.hh>
-
+#include <trex/domain/BooleanDomain.hh>
+#include <trex/domain/StringDomain.hh>
 
 #include <boost/python/def.hpp>
 #include <boost/python/stl_iterator.hpp>
@@ -165,41 +166,57 @@ void ros_reactor::init_env() {
 size_t ros_reactor::populate_attributes(Predicate &pred, std::string path,
                                         bp::object const &obj) {
   size_t ret = 0;
+  bp::dict type(m_python->dir(obj.attr("__class__")));
+  
 
   for(bp::stl_input_iterator<bp::str> i(m_python->dir(obj)), end;
       end!=i; ++i) {
-    if( !(i->startswith("_") || (*i)=="header" || (*i)=="child_frame_id") ) {
+    if( !(i->startswith("_") || (*i)=="header" || (*i)=="child_frame_id"
+          // check if not static
+          || type.contains(*i)) ) {
       bp::object const &attr = obj.attr(*i);
-      if( !m_python->callable(attr) ) {
+      if( !m_python->callable(attr)  ) {
         std::string local = path;
         local += bp::extract<char const *>(*i);
         
-        bp::extract<FloatDomain::base_type> is_float(attr);
-        bp::extract<IntegerDomain::base_type> is_int(attr);
-        
-        if( is_float.check() ) {
-          syslog()<<local<<" is float";
-          if( is_int.check() )
-            syslog()<<local<<" is int too *sigh*";
-          pred.restrictAttribute(Variable(local, FloatDomain(is_float)));
 
-          ++ret;
-        } else if ( is_int.check() ) {
-          syslog()<<local<<" is int";
-          pred.restrictAttribute(Variable(local, IntegerDomain(is_int)));
+        
+        if( PyString_Check(attr.ptr()) ){
+          std::string val((bp::extract<char const *>(attr)));
+          pred.restrictAttribute(local, StringDomain(val));
           ++ret;
         } else {
-          // TODO: check first if it is an obvious type: int, float, bool, ...
-          // TODO:
+          bp::extract<FloatDomain::base_type> is_float(attr);
+          bp::extract<IntegerDomain::base_type> is_int(attr);
+          bp::extract<bool> is_bool(attr);
         
-          size_t sub = populate_attributes(pred, local+"_", attr);
-      
-          if( 0==sub ) {
-            // This is not a structure
-            syslog()<<pred.object()<<'.'<<pred.predicate()<<'.'<<path
-            <<"="<<bp::extract<char const *>(bp::str(attr));
-          } else
-            ret += sub;
+          if( is_float.check() ) {
+            syslog()<<local<<" is float";
+            //          if( is_int.check() )
+            //            syslog()<<local<<" is int too *sigh*";
+            pred.restrictAttribute(Variable(local, FloatDomain(is_float)));
+            
+            ++ret;
+          } else if( is_bool.check() ) {
+            syslog()<<local<<" is bool";
+            pred.restrictAttribute(Variable(local, BooleanDomain(is_bool)));
+          } else if ( is_int.check() ) {
+            syslog()<<local<<" is int";
+            // TODO: check for enum if possible
+            pred.restrictAttribute(Variable(local, IntegerDomain(is_int)));
+            ++ret;
+          } else {
+            // this iterate through structures and seems to avoid
+            // types such as list etc
+            size_t sub = populate_attributes(pred, local+"_", attr);
+            
+            if( 0==sub ) {
+              // This is not a structure nor a basic type
+              syslog()<<pred.object()<<'.'<<pred.predicate()<<'.'<<path
+              <<"="<<bp::extract<char const *>(bp::str(attr));
+            } else
+              ret += sub;
+          }
         }
       }
     }
