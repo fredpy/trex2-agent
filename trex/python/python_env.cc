@@ -91,3 +91,10 @@ bool python_env::callable(bp::object const &obj) const {
   return 1==PyCallable_Check(obj.ptr());
 }
 
+bool python_env::is_instance(bp::object const &obj,
+                             bp::object const &type) const {
+  return 1==PyObject_IsInstance(obj.ptr(), type.ptr());
+}
+
+
+

@@ -49,6 +49,8 @@ namespace TREX {
       
       boost::python::object dir(boost::python::object const &obj) const;
       bool callable(boost::python::object const &obj) const;
+      bool is_instance(boost::python::object const &obj,
+                       boost::python::object const &type) const;
       
       utils::priority_strand &strand() {
         return m_strand;
