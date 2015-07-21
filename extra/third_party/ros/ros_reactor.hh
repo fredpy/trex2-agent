@@ -38,6 +38,8 @@
 # include <trex/python/python_env.hh>
 # include <trex/python/exception_helper.hh>
 # include "roscpp_inject.hh"
+# include "trex/ros/bits/ros_timeline.hh"
+
 
 namespace TREX {
   namespace ROS {
@@ -69,6 +71,8 @@ namespace TREX {
       // python modules used
       boost::python::object m_trex, m_transaction, m_domains, m_env,
         m_ros_time, m_ros_duration;
+      
+      friend class details::ros_timeline;
     };
     
   }

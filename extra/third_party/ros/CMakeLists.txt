@@ -73,14 +73,17 @@ link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
   # source
-  ros_reactor.cc
   roscpp_inject.cc
   ros_clock.cc
+  ros_reactor.cc
+  ros_timeline.cc
   # header
-  ros_reactor.hh
   roscpp_inject.hh
+  ros_reactor.hh
   trex/ros/ros_clock.hh
-  trex/ros/ros_error.hh)
+  trex/ros/ros_error.hh
+  trex/ros/bits/ros_timeline.hh
+)
 
 install(DIRECTORY trex/ DESTINATION include/trex/
   FILES_MATCHING PATTERN "*.hh" PATTERN "*.tcc"
