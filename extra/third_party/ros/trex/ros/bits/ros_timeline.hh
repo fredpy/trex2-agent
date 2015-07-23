@@ -1,13 +1,13 @@
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2012, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -47,9 +47,9 @@
 
 namespace TREX {
   namespace ROS {
-
+    
     class ros_reactor;
-
+    
     namespace details {
       
       class ros_timeline :boost::noncopyable {
@@ -68,58 +68,58 @@ namespace TREX {
         bool controlable() const {
           return m_controlable;
         }
-
-	bool request(TREX::transaction::goal_id g);
-	void recall(TREX::transaction::goal_id g);
-	void do_init();
-	void do_synchronize();
+        
+        bool request(TREX::transaction::goal_id g);
+        void recall(TREX::transaction::goal_id g);
+        void do_init();
+        void do_synchronize();
       protected:
         ros_timeline(xml_arg arg, bool control);
         ros_timeline(ros_reactor *r, utils::Symbol const &tl, bool init, bool control);
-
-	virtual bool handle_request(TREX::transaction::goal_id g) =0;
-	virtual void handle_recall(TREX::transaction::goal_id g) {}
-
-	virtual void synchronize(transaction::TICK date) {}
-
-	bool updated() const {
-	  return m_updated;
-	}
+        
+        virtual bool handle_request(TREX::transaction::goal_id g) =0;
+        virtual void handle_recall(TREX::transaction::goal_id g) {}
+        
+        virtual void synchronize(transaction::TICK date) {}
+        
+        bool updated() const {
+          return m_updated;
+        }
         
         ::ros::NodeHandle &node();
-	template<typename Msg>
-	::ros::Publisher advertise(std::string const &name) {
-	  ::ros::NodeHandle &n = node();
-	  return n.advertise<Msg>(name, 10, true);
-	}
+        template<typename Msg>
+        ::ros::Publisher advertise(std::string const &name) {
+          ::ros::NodeHandle &n = node();
+          return n.advertise<Msg>(name, 10, true);
+        }
         
         void notify(transaction::Observation const &obs);
         TREX::utils::log::stream syslog(TREX::utils::Symbol const &kind=TREX::utils::log::null);
-	TREX::transaction::Observation new_obs(TREX::utils::Symbol const &pred) const {
-	  return TREX::transaction::Observation(name(), pred);
-	}
+        TREX::transaction::Observation new_obs(TREX::utils::Symbol const &pred) const {
+          return TREX::transaction::Observation(name(), pred);
+        }
         
       private:
-	void init_timeline();
-
+        void init_timeline();
+        
         ros_reactor &m_reactor;
         utils::Symbol const m_name;
         bool const m_controlable;
-	bool const m_init;
-
-	bool m_undefined, m_updated;
+        bool const m_init;
+        
+        bool m_undefined, m_updated;
         
 # ifndef DOXYGEN
         ros_timeline() DELETED; // Non default constructible
 # endif // DOXYGEN
         
         friend class ros_reactor;
-      }; // TREX:ROS::details::ros_timeline 
+      }; // TREX:ROS::details::ros_timeline
       
     } // TREX::ROS::details
-
+    
     typedef details::ros_timeline::xml_factory ros_factory;
-
+    
   } // TREX::ROS
 } // TREX
 
