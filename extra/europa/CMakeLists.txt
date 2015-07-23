@@ -82,7 +82,7 @@ if(WITH_EUROPA)
   
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
   include_directories(${EUROPA_INCLUDE_DIRS})
-  include_directories(${CMAKE_BINARY_DIR})
+  include_directories(${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/trex/europa)
 
   add_subdirectory(core)
   
