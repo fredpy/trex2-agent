@@ -130,8 +130,12 @@ python_topic::python_topic(python_topic::xml_arg arg)
 :details::ros_timeline(arg, parse_attr<bool>(false, xml_factory::node(arg),
                                              "control")),
 m_topic(parse_attr<std::string>(xml_factory::node(arg), "topic")),
-m_type_name(parse_attr<std::string>(xml_factory::node(arg), "type")) {
-  
+m_type_name(parse_attr<std::string>(xml_factory::node(arg), "type")),
+m_pred("Holds") {
+  strand().send(boost::bind(&python_topic::init_env, this),
+                roscpp_initializer::init_p);
+  strand().send(boost::bind(&python_topic::init_topic, this),
+                roscpp_initializer::init_p);
 }
 
 python_topic::~python_topic() {
@@ -141,6 +145,7 @@ python_topic::~python_topic() {
 // manipulators
 
 void python_topic::init_env() {
+  syslog(log::info)<<"init_env";
   try {
     scoped_gil_release lock;
     py::object tmp;
@@ -164,9 +169,27 @@ void python_topic::init_topic() {
     std::string f_name(name().str()+"_updated");
     
     m_msg_type = m_python->load_module_for(m_type_name);
+    if( m_python->dir(m_msg_type).contains("_type") ) {
+      m_pred = py::extract<char const *>(m_msg_type.attr("_type"));
+      size_t pos = m_pred.find_last_of("./");
+      if( std::string::npos!=pos )
+        m_pred = m_pred.substr(pos+1);
+      syslog(log::info)<<"Predicate name identified as "<<m_pred;
+    } else {
+      syslog(log::warn)<<"Type "<<m_type_name<<" does not have a _type attribute.\n"
+        <<"predicates will be published as "<<m_pred<<" instead";
+    }
+    
+    if( controllable() ) {
+      py::object tmp = m_msg_type();
+      syslog()<<"Creating serialization template for "<<m_type_name;
+      Observation foo = new_obs(m_pred);
+      to_trex(foo, tmp);
+    }
 
     // TODO:: examine my type before creating the callback
     
+    py::object cb;
     {
       py::scope local(m_env);
       syslog()<<"Create python callback "<<f_name<<" for topic "<<m_topic;
@@ -175,14 +198,15 @@ void python_topic::init_topic() {
                                 py::default_call_policies(),
                                 boost::mpl::vector<void, py::object>()));
       
-      py::object cb = m_env.attr(f_name.c_str());
+      cb = m_env.attr(f_name.c_str());
     }
     
-    
     py::object sub_class = reactor().rospy().attr("Subscriber");
+    m_env.attr((name().str()+"_sub").c_str()) = sub_class(m_topic.c_str(),
+                                                          m_msg_type, cb);
     
     
-    
+    syslog()<<"Added topic subscription as "<< (name().str()+"_sub");
   } catch(py::error_already_set const &e) {
     m_err->unwrap_py_error();
   }
@@ -202,31 +226,32 @@ bool python_topic::add_attr(python_topic::path_alias const &p,
 size_t python_topic::to_trex(transaction::Predicate &pred, path_alias path,
                              py::object const &msg) {
   size_t ret = 0;
-  py::dict type(m_python->dir(msg.attr("__class__")));
+  
   
   for(py::stl_input_iterator<py::str> i(m_python->dir(msg)), end;
       end!=i; ++i) {
-    if( !( i->startswith("_") || "header"==(*i) || "child_frame_id"==(*i)
-          || type.contains(*i) ) ) {
-      py::object const &attr = msg.attr(*i);
+    path_alias local(path);
+    
+    if( !( i->startswith("_") || "header"==(*i) || "child_frame_id"==(*i) ) ) {
+      py::object attr = msg.attr(*i);
       
       if( !m_python->callable(attr) ) {
-        path /=  std::string(py::extract<char const *>(*i));
+        local /=  std::string(py::extract<char const *>(*i));
         
         // Now check if it is basic type
         if( PyString_Check(attr.ptr()) ) {
           // It is a str
           std::string val((py::extract<char const *>(attr)));
-          pred.restrictAttribute(path.trex(), StringDomain(val));
-          add_attr(path, StringDomain::type_name);
+          pred.restrictAttribute(local.trex(), StringDomain(val));
+          add_attr(local, StringDomain::type_name);
           ++ret;
         } else {
           py::extract<FloatDomain::base_type> is_float(attr);
           
           if( is_float.check() ) {
-            pred.restrictAttribute(path.trex(),
+            pred.restrictAttribute(local.trex(),
                                    FloatDomain(is_float));
-            add_attr(path, FloatDomain::type_name);
+            add_attr(local, FloatDomain::type_name);
             ++ret;
           } else {
             py::extract<IntegerDomain::base_type> is_int(attr);
@@ -235,13 +260,13 @@ size_t python_topic::to_trex(transaction::Predicate &pred, path_alias path,
               py::extract<bool> is_bool(attr);
               
               if( is_bool.check() ) {
-                pred.restrictAttribute(path.trex(),
+                pred.restrictAttribute(local.trex(),
                                        BooleanDomain(is_bool));
-                add_attr(path, BooleanDomain::type_name);
+                add_attr(local, BooleanDomain::type_name);
               } else {
-                pred.restrictAttribute(path.trex(),
+                pred.restrictAttribute(local.trex(),
                                        IntegerDomain(is_int));
-                add_attr(path, IntegerDomain::type_name);
+                add_attr(local, IntegerDomain::type_name);
               }
               ++ret;
             } else if( m_python->is_instance(attr, m_ros_time) ) {
@@ -254,27 +279,27 @@ size_t python_topic::to_trex(transaction::Predicate &pred, path_alias path,
               
               // TODO: ensure that tick is properly rounded
               date += delta.count()/reactor().tickDuration().count();
-              pred.restrictAttribute(path.trex(),
+              pred.restrictAttribute(local.trex(),
                                      IntegerDomain(date));
-              add_attr(path, "date");
+              add_attr(local, "date");
               ++ret;
             } else if( m_python->is_instance(attr, m_ros_duration) ) {
               CHRONO::duration<long double> val(py::extract<long double>(attr.attr("to_sec")()));
               ros_reactor::duration_type dur = CHRONO::duration_cast<ros_reactor::duration_type>(val);
               TICK value = dur.count()/reactor().tickDuration().count();
               // TODO: ensure that duration is properly set to the floor
-              pred.restrictAttribute(path.trex(),
+              pred.restrictAttribute(local.trex(),
                                      IntegerDomain(value));
-              add_attr(path, "duration");
+              add_attr(local, "duration");
               ++ret;
             } else {
               // Try to see if I can recurse deeper on the structure
-              size_t sub = to_trex(pred, path, attr);
+              size_t sub = to_trex(pred, local, attr);
               
               if( 0==sub ) {
-                syslog(log::warn)<<"Not able to convert to trex: "<<pred.object()
-                  <<'.'<<pred.predicate()<<'.'<<path.trex()
-                  <<"="<<py::extract<char const *>(py::str(attr));
+//                syslog(log::warn)<<"Not able to convert to trex: "<<pred.object()
+//                  <<'.'<<pred.predicate()<<'.'<<path.trex()
+//                  <<"="<<py::extract<char const *>(py::str(attr));
               } else
                 ret += sub;
             }
@@ -351,7 +376,14 @@ size_t python_topic::to_msg(Predicate const &pred, boost::python::object &msg) {
 // callbacks
 
 void python_topic::ros_cb(py::object msg) {
-  
+  try {
+    scoped_gil_release lock;
+    Observation obs = new_obs(m_pred);
+    to_trex(obs,msg);
+    notify(obs);
+  } catch(py::error_already_set e) {
+    m_err->unwrap_py_error();
+  }
 }
 
 bool python_topic::handle_request(goal_id g) {

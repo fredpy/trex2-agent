@@ -109,6 +109,7 @@ namespace TREX {
 
       std::string const m_topic;
       std::string const m_type_name;
+      std::string m_pred;
       utils::SingletonUse<python::python_env>      m_python;
       utils::SingletonUse<python::exception_table> m_err;
       

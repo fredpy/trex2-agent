@@ -83,7 +83,7 @@ void roscpp_initializer::async_poll() {
     } catch(bp::error_already_set const &e) {
       m_err->unwrap_py_error();
     }
-    m_log->syslog("ros", log::info)<<"rospy poll done";
+//    m_log->syslog("ros", log::info)<<"rospy poll done";
   } catch(utils::Exception const &e) {
     m_log->syslog("ros", log::error)<<"TREX Exception on poll: "<<e;
   } catch(std::exception const &se) {
