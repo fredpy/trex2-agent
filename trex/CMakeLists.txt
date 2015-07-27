@@ -66,7 +66,7 @@ configure_file(cmds/nice_flags.h.in
 
 if(WITH_PYTHON)
   include_directories(${PYTHON_INCLUDE_DIR})
-  set(extra_libs "${LINK_NO_AS_NEEDED}${py_libs}")
+  set(extra_libs ${LINK_NO_AS_NEEDED} ${py_libs})
 else(WITH_PYTHON)
   set(extra_libs "")
 endif(WITH_PYTHON)

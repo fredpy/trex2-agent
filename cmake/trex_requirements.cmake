@@ -37,8 +37,8 @@ set(LINK_AS_NEEDED)
 set(LINK_NO_AS_NEEDED)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(LINK_AS_NEEDED "-Wl,--as-needed ")
-  set(LINK_NO_AS_NEEDED "-Wl,--no-as-needed ")
+  set(LINK_AS_NEEDED "-Wl,--as-needed")
+  set(LINK_NO_AS_NEEDED "-Wl,--no-as-needed")
 endif()
 
 

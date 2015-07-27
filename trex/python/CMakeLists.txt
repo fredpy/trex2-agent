@@ -68,7 +68,7 @@ if(WITH_PYTHON)
       agent_decls.cc
       )
     add_dependencies(core trex)
-    target_link_libraries(trex  ${PYTHON_LIBRARIES} TREXagent TREXpython "${LINK_NO_AS_NEEDED}TREXutils")
+    target_link_libraries(trex  ${PYTHON_LIBRARIES} TREXagent TREXpython ${LINK_NO_AS_NEEDED} TREXutils)
     trex_py(trex)
     
   else(Boost_PYTHON_LIBRARY)
