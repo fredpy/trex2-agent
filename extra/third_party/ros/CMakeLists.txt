@@ -73,11 +73,13 @@ link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
   # source
+  python_topic.cc
   roscpp_inject.cc
   ros_clock.cc
   ros_reactor.cc
   ros_timeline.cc
   # header
+  python_topic.hh
   roscpp_inject.hh
   ros_reactor.hh
   trex/ros/ros_clock.hh

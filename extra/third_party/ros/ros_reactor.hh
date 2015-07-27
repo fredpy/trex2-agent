@@ -46,31 +46,35 @@ namespace TREX {
     
     class ros_reactor :public transaction::TeleoReactor {
     public:
+      typedef details::ros_timeline::xml_factory tl_factory;
+
       ros_reactor(transaction::TeleoReactor::xml_arg_type arg);
       ~ros_reactor();
       
-    private:
-      void init_env();
+      boost::python::object &rospy() {
+        return m_ros->rospy();
+      }
       
-      void ros_update(utils::Symbol timeline,
-                      boost::python::object obj);
-      void add_topic(boost::property_tree::ptree::value_type const &desc);
+
+    private:
+      utils::SingletonUse<tl_factory> m_factory;
+      
+      
+//      void ros_update(utils::Symbol timeline,
+//                      boost::python::object obj);
+//      void add_topic(boost::property_tree::ptree::value_type const &desc);
       
       void handleInit();
       bool synchronize();
       
-      size_t populate_attributes(transaction::Predicate &pred,
-                                 std::string path,
-                                 boost::python::object const &obj);
-
+//      size_t populate_attributes(transaction::Predicate &pred,
+//                                 std::string path,
+//                                 boost::python::object const &obj);
+//
       
-      utils::SingletonUse<roscpp_initializer>      m_ros;
-      utils::SingletonUse<python::python_env>      m_python;
-      utils::SingletonUse<python::exception_table> m_exc;
-      
-      // python modules used
-      boost::python::object m_trex, m_transaction, m_domains, m_env,
-        m_ros_time, m_ros_duration;
+      utils::SingletonUse<roscpp_initializer>  m_ros;
+      typedef utils::list_set<details::ros_timeline> tl_set;
+      tl_set m_timelines;
       
       friend class details::ros_timeline;
     };

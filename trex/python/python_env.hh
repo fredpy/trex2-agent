@@ -46,11 +46,13 @@ namespace TREX {
     public:
       boost::python::object &import(std::string const &module);
       boost::python::object load_module_for(std::string const &type);
+      boost::python::object add_module(boost::python::object scope, std::string const &name);
       
       boost::python::object dir(boost::python::object const &obj) const;
       bool callable(boost::python::object const &obj) const;
       bool is_instance(boost::python::object const &obj,
                        boost::python::object const &type) const;
+
       
       utils::priority_strand &strand() {
         return m_strand;

@@ -39,11 +39,6 @@
 # include <trex/python/python_env.hh>
 # include <trex/python/exception_helper.hh>
 
-namespace ros {
-  class NodeHandle;
-  class AsyncSpinner;
-}
-
 namespace TREX {
   namespace ROS {
     

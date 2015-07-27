@@ -33,24 +33,15 @@
 # POSSIBILITY OF SUCH DAMAGE.                                         #
 #######################################################################
 
-########################################################################
-# Linux 64 really needs -fPIC                                          #
-########################################################################
+set(LINK_AS_NEEDED)
+set(LINK_NO_AS_NEEDED)
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-#  message(STATUS "pos indep: ${CMAKE_POSITION_INDEPENDENT_CODE}")
-#  
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-#  set(PIC_PROTECT "-Wl,--whole-archive <LIB> -Wl,--no-whole-archive")
-#  message (STATUS "Adding -fPIC to CXX flags")
-#else()
-#  message (STATUS "CXX flags do not need -fPIC (not a linux system)")
-#  set(PIC_PROTECT "<LIB>")
-#endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(LINK_AS_NEEDED "-Wl,--as-needed ")
+  set(LINK_NO_AS_NEEDED "-Wl,--no-as-needed ")
+endif()
 
-function(pic_protect lib)
-#  string(REPLACE "<LIB>" ${lib} lib ${PIC_PROTECT})
-endfunction(pic_protect)
+
 
 ########################################################################
 # System libraries                                                     #

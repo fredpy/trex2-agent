@@ -45,6 +45,15 @@ using TREX::ROS::ros_error;
  * class TREX::ROS::details::ros_timeline
  */
 
+// statics
+
+ros_timeline::id_type ros_timeline::get_id(ros_timeline::base_type const &elem) {
+  if( elem )
+    return elem->name();
+  return id_type();
+}
+
+
 // structors
 
 ros_timeline::ros_timeline(ros_timeline::xml_arg const &arg, bool control)
@@ -89,11 +98,16 @@ log::stream ros_timeline::syslog(log::id_type const &kind) const {
 }
 
 
+priority_strand &ros_timeline::strand() {
+  return m_reactor.m_ros->strand();
+}
+
+
 // modifiers
 
 void ros_timeline::notify(transaction::Observation const &obs) {
   if( obs.object()!=name() ) {
-    syslog(log::error)<<"IAttempted to post an observation which does not belong "
+    syslog(log::error)<<"Attempted to post an observation which does not belong "
     "to this timeline:\n  "<<obs;
   } else {
     m_undefined = (obs.predicate()==Predicate::undefined_pred());

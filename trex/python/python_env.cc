@@ -81,6 +81,19 @@ bp::object python_env::load_module_for(std::string const &type) {
   return bp::object();
 }
 
+bp::object python_env::add_module(bp::object scope, std::string const &name) {
+  if( dir(scope).contains(name.c_str()) )
+    return scope.attr(name.c_str());
+  else {
+    bp::scope cur(scope);
+    m_log->syslog("ros", tlog::info)<<"Creating python module "
+    <<bp::extract<char const *>(bp::str(scope))<<"."<<name;
+    
+    return bp::object(bp::handle<>(bp::borrowed(PyImport_AddModule(name.c_str()))));
+  }
+}
+
+
 
 bp::object python_env::dir(bp::object const &obj) const {
   bp::handle<> ret(PyObject_Dir(obj.ptr()));

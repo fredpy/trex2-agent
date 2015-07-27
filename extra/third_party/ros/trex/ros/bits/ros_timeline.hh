@@ -38,6 +38,8 @@
 # include <trex/transaction/Goal.hh>
 # include <trex/transaction/Observation.hh>
 # include <trex/utils/log/stream.hh>
+# include <trex/utils/priority_strand.hh>
+# include <trex/utils/id_mapper.hh>
 
 namespace TREX {
   namespace ROS {
@@ -53,6 +55,11 @@ namespace TREX {
         typedef utils::XmlFactory<ros_timeline, pointer, ros_reactor *> xml_factory;
         typedef xml_factory::argument_type                              xml_arg;
         
+        typedef pointer       base_type;
+        typedef utils::Symbol id_type;
+        static id_type get_id(base_type const &elem);
+        
+        
         virtual ~ros_timeline();
         
         utils::Symbol const &name() const {
@@ -66,6 +73,8 @@ namespace TREX {
         void recall(transaction::goal_id g);
         void do_init();
         void do_synchronize();
+        
+        utils::priority_strand &strand();
         
       protected:
         ros_timeline(xml_arg const &arg, bool control);
@@ -87,6 +96,10 @@ namespace TREX {
         transaction::Observation new_obs(utils::Symbol const &pred) const {
           return transaction::Observation(name(), pred);
         }
+        
+        ros_reactor &reactor() {
+          return m_reactor;
+        }
       private:
         void init_timeline();
         
@@ -101,9 +114,7 @@ namespace TREX {
         friend class ros_reactor;
       };
       
-      
     }
-    
   }
 }
 
