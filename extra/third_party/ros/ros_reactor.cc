@@ -66,7 +66,7 @@ ros_reactor::ros_reactor(TeleoReactor::xml_arg_type arg)
   while( m_factory->iter_produce(i, node.second.end(), tl) ) {
     std::pair<tl_set::iterator, bool> ret = m_timelines.insert(tl);
     if( ret.second )
-      syslog(null, info)<<"ROS timleine "<<tl->name()<<" created.";
+      syslog(null, info)<<"ROS timeline "<<tl->name()<<" created.";
     else
       // should not happen
       throw MultipleInternals(*this, tl->name(), *this);
