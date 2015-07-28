@@ -46,8 +46,26 @@ roscpp_initializer::roscpp_initializer() {
 }
 
 roscpp_initializer::~roscpp_initializer() {
+  strand().send(boost::bind(&roscpp_initializer::do_shutdown, this), init_p);
 }
 
+// Observers
+
+bool roscpp_initializer::is_shutdown() {
+  return strand().post(boost::bind(&roscpp_initializer::test_shutdown, this)).get();
+}
+
+
+bool roscpp_initializer::test_shutdown() const {
+  try {
+    scoped_gil_release lock;
+    
+    return bp::extract<bool>(m_rospy.attr("is_shutdown")());
+  } catch(bp::error_already_set const &e) {
+    m_err->unwrap_py_error();
+  }
+  return true;
+}
 
 
 // Manipulators
@@ -56,8 +74,10 @@ roscpp_initializer::~roscpp_initializer() {
 void roscpp_initializer::init_rospy() {
   try {
     scoped_gil_release lock;
+    // Load ROS Python API
     m_rospy = m_python->import("rospy");
     
+    // Initialize ROS client node through Python API
     m_rospy.attr("init_node")("trex2", bp::object(), true,
                               bp::object(), false, false,
                               true);
@@ -68,22 +88,18 @@ void roscpp_initializer::init_rospy() {
 }
 
 void roscpp_initializer::async_poll() {
-//  m_log->syslog("ros", log::info)<<"Polling on rospy";
   try {
     try {
       bool cont = false;
       scoped_gil_release lock;
-//      m_log->syslog("ros", log::info)<<"Polling on rospy (2)";
         cont = !bp::extract<bool>(m_rospy.attr("is_shutdown")());
       if( cont ) {
-     // m_log->syslog("ros", log::info)<<"Polling on rospy (3)";
-       m_rospy.attr("sleep")(0.5);
+        m_rospy.attr("sleep")(0.1);
         strand().send(boost::bind(&roscpp_initializer::async_poll, this));
       }
     } catch(bp::error_already_set const &e) {
       m_err->unwrap_py_error();
     }
-//    m_log->syslog("ros", log::info)<<"rospy poll done";
   } catch(utils::Exception const &e) {
     m_log->syslog("ros", log::error)<<"TREX Exception on poll: "<<e;
   } catch(std::exception const &se) {
@@ -92,5 +108,18 @@ void roscpp_initializer::async_poll() {
     m_log->syslog("ros", log::error)<<"Unknown exception on poll";
   }
 }
+
+void roscpp_initializer::do_shutdown() {
+  try {
+    scoped_gil_release lock;
+
+    rospy().attr("signal_shutdown")("end of TREX");
+  } catch(bp::error_already_set const &e) {
+    m_err->unwrap_py_error(m_log->syslog("ros", log::error)<<"Exception during ROS shutdown: ");
+  }
+}
+
+
+
 
 

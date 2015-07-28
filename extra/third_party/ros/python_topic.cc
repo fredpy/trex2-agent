@@ -132,14 +132,15 @@ python_topic::python_topic(python_topic::xml_arg arg)
 m_topic(parse_attr<std::string>(xml_factory::node(arg), "topic")),
 m_type_name(parse_attr<std::string>(xml_factory::node(arg), "type")),
 m_pred("Holds") {
-  strand().send(boost::bind(&python_topic::init_env, this),
-                roscpp_initializer::init_p);
-  strand().send(boost::bind(&python_topic::init_topic, this),
-                roscpp_initializer::init_p);
+  strand().post(boost::bind(&python_topic::init_env, this),
+                roscpp_initializer::init_p).get();
+  strand().post(boost::bind(&python_topic::init_topic, this),
+                roscpp_initializer::init_p).get();
 }
 
 python_topic::~python_topic() {
-  
+  strand().post(boost::bind(&python_topic::terminate, this),
+                roscpp_initializer::init_p).get();
 }
 
 // manipulators
@@ -211,6 +212,18 @@ void python_topic::init_topic() {
     m_err->unwrap_py_error();
   }
 }
+
+void python_topic::terminate() {
+  try {
+    scoped_gil_release lock;
+    
+    syslog()<<"Unsubscribe from topic "<<topic();
+    m_env.attr((name().str()+"_sub").c_str()).attr("unregister")();
+  } catch(py::error_already_set const &e) {
+    m_err->unwrap_py_error(syslog(log::error)<<"Exception caught during topic unsubscribe: ");
+  }
+}
+
 
 bool python_topic::add_attr(python_topic::path_alias const &p,
                             Symbol const &type) {

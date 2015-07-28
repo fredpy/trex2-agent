@@ -100,6 +100,7 @@ namespace TREX {
       
       void init_env();
       void init_topic();
+      void terminate();
       
       bool handle_request(transaction::goal_id g);
       void handle_recall(transaction::goal_id g);

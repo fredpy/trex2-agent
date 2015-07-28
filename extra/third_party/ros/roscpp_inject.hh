@@ -54,11 +54,16 @@ namespace TREX {
         return m_rospy;
       }
       
+      bool is_shutdown();
+      
       utils::priority_strand &strand() {
         return m_python->strand();
       }
       
     private:
+      bool test_shutdown() const;
+      void do_shutdown();
+      
       void init_rospy();
       
       void async_poll();

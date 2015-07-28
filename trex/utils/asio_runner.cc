@@ -109,10 +109,10 @@ asio_runner::~asio_runner() {
 
 // manipulators
 
-size_t asio_runner::thread_count(size_t n, bool override) {  
+size_t asio_runner::thread_count(size_t n, bool override_hw) {
   // correct the number of threads
-  if( !override ) {
-    // Max thread is number of cores minus the main thread
+  if( !override_hw ) {
+    // I allow 2 threads per core
     size_t max_count = 2*boost::thread::hardware_concurrency();
     
     if( n > max_count )
@@ -133,10 +133,13 @@ void asio_runner::spawn(size_t n) {
     m_threads.create_thread(boost::bind(&asio_runner::thread_task, this));
 }
 
-# undef CHECK_INTERRUPTED
+#undef CHECK_INTERRUPTED
+
 #if (BOOST_VERSION < 104700)
+
 # define CHECK_INTERRUPTED
 # warning "Your boost version is deprecated. Update to 1.47 or later"
+
 #endif // BOOST_VERSION
 
 void asio_runner::thread_task() {

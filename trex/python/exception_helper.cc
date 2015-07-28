@@ -112,6 +112,21 @@ void exception_table::unwrap_py_error() {
   }
 }
 
+std::ostream &exception_table::unwrap_py_error(std::ostream &out, bool rethrow) {
+  try {
+    unwrap_py_error();
+  } catch(std::exception const &e) {
+    out<<e.what();
+    if( rethrow )
+      throw;
+  } catch(...) {
+    out<<"unknown exception";
+    if( rethrow )
+      throw;
+  }
+  return out;
+}
+
 
 /*
  * class TREX::python::details::e_cvt_base

@@ -59,18 +59,8 @@ namespace TREX {
     private:
       utils::SingletonUse<tl_factory> m_factory;
       
-      
-//      void ros_update(utils::Symbol timeline,
-//                      boost::python::object obj);
-//      void add_topic(boost::property_tree::ptree::value_type const &desc);
-      
       void handleInit();
       bool synchronize();
-      
-//      size_t populate_attributes(transaction::Predicate &pred,
-//                                 std::string path,
-//                                 boost::python::object const &obj);
-//
       
       utils::SingletonUse<roscpp_initializer>  m_ros;
       typedef utils::list_set<details::ros_timeline> tl_set;
