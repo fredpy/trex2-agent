@@ -32,7 +32,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ros_clock.hh"
-#include "roscpp_inject.hh"
+#include "trex/ros/roscpp_inject.hh"
 
 #include <ros/time.h>
 #include <boost/thread.hpp>

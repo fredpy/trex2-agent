@@ -31,56 +31,58 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_roscpp_inject
-# define H_trex_ros_roscpp_inject
+#include "trex/ros/cpp_topic.hh"
+#include <trex/domain/FloatDomain.hh>
 
-# include <trex/utils/LogManager.hh>
-# include <trex/utils/platform/memory.hh>
-# include <trex/python/python_env.hh>
-# include <trex/python/exception_helper.hh>
+#include <geometry_msgs/Point.h>
 
-namespace TREX {
+using geometry_msgs::Point;
+using namespace TREX::utils;
+using namespace TREX::transaction;
+
+/*
+ * struct TREX::ROS::msg_cvt_traits<geometry_msgs::Point>
+ */
+
+// statics
+
+namespace TREX  {
   namespace ROS {
     
-    class roscpp_initializer:boost::noncopyable {
-    public:
+    template<>
+    void msg_cvt_traits<Point, true>::to_trex(msg_cvt_traits<Point, true>::message_ptr const &msg,
+                                              Predicate &pred) {
+      pred.restrictAttribute("x", FloatDomain(msg->x));
+      pred.restrictAttribute("y", FloatDomain(msg->y));
+      pred.restrictAttribute("z", FloatDomain(msg->z));
+    }
+
+    template<>
+    msg_cvt_traits<Point, true>::message_ptr msg_cvt_traits<Point, true>::to_ros(Predicate const &pred) {
+      Point::Ptr ret(new Point);
       
-      enum priority {
-        init_p = 0,
-        default_p
-      };
+      if( pred.hasAttribute("x") )
+        ret->x = pred.getDomain<FloatDomain>("x").closestTo(0.0);
+      else
+        ret->x = 0.0;
       
-      boost::python::object &rospy() {
-        return m_rospy;
-      }
+      if( pred.hasAttribute("y") )
+        ret->y = pred.getDomain<FloatDomain>("y").closestTo(0.0);
+      else
+        ret->y = 0.0;
       
-      bool is_shutdown();
+      if( pred.hasAttribute("z") )
+        ret->z = pred.getDomain<FloatDomain>("z").closestTo(0.0);
+      else
+        ret->z = 0.0;
       
-      utils::priority_strand &strand() {
-        return m_python->strand();
-      }
-      
-    private:
-      bool test_shutdown() const;
-      void do_shutdown();
-      
-      void init_rospy();
-      
-      void async_poll();
-      
-      roscpp_initializer();
-      ~roscpp_initializer();
-      
-      utils::SingletonUse<utils::LogManager>  m_log;
-      utils::SingletonUse<python::python_env> m_python;
-      utils::SingletonUse<python::exception_table> m_err;
-      
-      boost::python::object          m_rospy;
-      
-      friend utils::SingletonWrapper<roscpp_initializer>;
-    };
-    
+      return ret;
+    }
   }
 }
 
-# endif // H_trex_ros_roscpp_inject
+using namespace TREX::ROS;
+
+namespace {
+  ros_factory::declare< cpp_topic<Point, true> > decl("Point");
+}

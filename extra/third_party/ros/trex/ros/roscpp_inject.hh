@@ -31,46 +31,63 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_pyros_reactor
-# define H_trex_ros_pyros_reactor
+#ifndef H_trex_ros_roscpp_inject
+# define H_trex_ros_roscpp_inject
 
-# include <trex/transaction/TeleoReactor.hh>
+# include <trex/utils/LogManager.hh>
+# include <trex/utils/platform/memory.hh>
 # include <trex/python/python_env.hh>
 # include <trex/python/exception_helper.hh>
 
-# include "trex/ros/roscpp_inject.hh"
-# include "trex/ros/bits/ros_timeline.hh"
-
+# include <ros/ros.h>
 
 namespace TREX {
   namespace ROS {
     
-    class ros_reactor :public transaction::TeleoReactor {
+    class roscpp_initializer:boost::noncopyable {
     public:
-      typedef details::ros_timeline::xml_factory tl_factory;
-
-      ros_reactor(transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
+      
+      enum priority {
+        init_p = 0,
+        default_p
+      };
       
       boost::python::object &rospy() {
-        return m_ros->rospy();
+        return m_rospy;
       }
       
-
+      bool is_shutdown();
+      
+      ::ros::NodeHandle &handle();
+      
+      utils::priority_strand &strand() {
+        return m_python->strand();
+      }
+      
     private:
-      utils::SingletonUse<tl_factory> m_factory;
+      bool test_shutdown() const;
+      void do_shutdown();
       
-      void handleInit();
-      bool synchronize();
+      void init_rospy();
+      void init_cpp();
       
-      utils::SingletonUse<roscpp_initializer>  m_ros;
-      typedef utils::list_set<details::ros_timeline> tl_set;
-      tl_set m_timelines;
+      void async_poll();
       
-      friend class details::ros_timeline;
+      roscpp_initializer();
+      ~roscpp_initializer();
+      
+      boost::scoped_ptr<ros::NodeHandle> m_handle;
+      
+      utils::SingletonUse<utils::LogManager>  m_log;
+      utils::SingletonUse<python::python_env> m_python;
+      utils::SingletonUse<python::exception_table> m_err;
+      
+      boost::python::object          m_rospy;
+      
+      friend utils::SingletonWrapper<roscpp_initializer>;
     };
     
   }
 }
 
-#endif // H_trex_ros_pyros_reactor
+# endif // H_trex_ros_roscpp_inject

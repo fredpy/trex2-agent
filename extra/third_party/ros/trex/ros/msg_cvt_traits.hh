@@ -31,46 +31,61 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_pyros_reactor
-# define H_trex_ros_pyros_reactor
+#ifndef H_trex_ros_msg_cvt_traits
+# define H_trex_ros_msg_cvt_traits
 
-# include <trex/transaction/TeleoReactor.hh>
-# include <trex/python/python_env.hh>
-# include <trex/python/exception_helper.hh>
-
-# include "trex/ros/roscpp_inject.hh"
-# include "trex/ros/bits/ros_timeline.hh"
-
+# include <trex/transaction/Predicate.hh>
+# include <ros/message_traits.h>
 
 namespace TREX {
   namespace ROS {
     
-    class ros_reactor :public transaction::TeleoReactor {
-    public:
-      typedef details::ros_timeline::xml_factory tl_factory;
-
-      ros_reactor(transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
+    namespace details {
       
-      boost::python::object &rospy() {
-        return m_ros->rospy();
-      }
+      template<typename Message>
+      struct cvt_base {
+        typedef Message                    message;
+        typedef typename message::ConstPtr message_ptr;
+        
+        typedef ros::message_traits::DataType<message> data_type;
+        
+        static char const *msg_type() {
+          return data_type::value();
+        }
+      };
       
-
-    private:
-      utils::SingletonUse<tl_factory> m_factory;
+    }
+    
+    
+    template<typename Message, bool Goals>
+    struct msg_cvt_traits: public details::cvt_base<Message> {
+      using typename details::cvt_base<Message>::message;
+      using typename details::cvt_base<Message>::message_ptr;
       
-      void handleInit();
-      bool synchronize();
+      enum {
+        accept_goals = Goals
+      };
       
-      utils::SingletonUse<roscpp_initializer>  m_ros;
-      typedef utils::list_set<details::ros_timeline> tl_set;
-      tl_set m_timelines;
+      static void to_trex(message_ptr const &msg,
+                          transaction::Predicate &pred);
+      static message_ptr to_ros(transaction::Predicate const &pred);
       
-      friend class details::ros_timeline;
     };
     
+    template<typename Message>
+    struct msg_cvt_traits<Message, false>: public details::cvt_base<Message> {
+      using typename details::cvt_base<Message>::message;
+      using typename details::cvt_base<Message>::message_ptr;
+
+      enum {
+        accept_goals = false
+      };
+      
+      static void to_trex(message_ptr const &msg,
+                          transaction::Predicate &pred);
+    };
+        
   }
 }
 
-#endif // H_trex_ros_pyros_reactor
+#endif // H_trex_ros_msg_cvt_traits

@@ -80,11 +80,15 @@ add_library(TREXros SHARED
   ros_timeline.cc
   # header
   python_topic.hh
-  roscpp_inject.hh
   ros_reactor.hh
+  trex/ros/roscpp_inject.hh
   trex/ros/ros_clock.hh
   trex/ros/ros_error.hh
+  trex/ros/msg_cvt_traits.hh
+  trex/ros/cpp_topic.hh
   trex/ros/bits/ros_timeline.hh
+  # template
+  trex/ros/bits/cpp_topic.tcc
 )
 
 install(DIRECTORY trex/ DESTINATION include/trex/
@@ -104,6 +108,8 @@ trex_lib(TREXros extra)
 
 
 # The plugin placeholder : also initialize ros on load
-trex_plugin(ros ros_init.cc)
+trex_plugin(ros ros_init.cc
+  msg_point.cc
+  msg_clock.cc)
 target_link_libraries(ros_pg ${PYTHON_LIBRARIES} TREXros)
 

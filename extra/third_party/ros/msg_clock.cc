@@ -31,46 +31,28 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef H_trex_ros_pyros_reactor
-# define H_trex_ros_pyros_reactor
+#include "trex/ros/cpp_topic.hh"
+#include <trex/domain/FloatDomain.hh>
 
-# include <trex/transaction/TeleoReactor.hh>
-# include <trex/python/python_env.hh>
-# include <trex/python/exception_helper.hh>
+#include <rosgraph_msgs/Clock.h>
 
-# include "trex/ros/roscpp_inject.hh"
-# include "trex/ros/bits/ros_timeline.hh"
-
+using rosgraph_msgs::Clock;
+using namespace TREX::transaction;
 
 namespace TREX {
   namespace ROS {
     
-    class ros_reactor :public transaction::TeleoReactor {
-    public:
-      typedef details::ros_timeline::xml_factory tl_factory;
+    template<>
+    void msg_cvt_traits<Clock, false>::to_trex(msg_cvt_traits<Clock, false>::message_ptr const &msg,
+                                              Predicate &pred) {
+      pred.restrictAttribute("seconds", FloatDomain(msg->clock.toSec()));
+   }
+   
+  } // TREX::ROS
+} // TREX
 
-      ros_reactor(transaction::TeleoReactor::xml_arg_type arg);
-      ~ros_reactor();
-      
-      boost::python::object &rospy() {
-        return m_ros->rospy();
-      }
-      
+using namespace TREX::ROS;
 
-    private:
-      utils::SingletonUse<tl_factory> m_factory;
-      
-      void handleInit();
-      bool synchronize();
-      
-      utils::SingletonUse<roscpp_initializer>  m_ros;
-      typedef utils::list_set<details::ros_timeline> tl_set;
-      tl_set m_timelines;
-      
-      friend class details::ros_timeline;
-    };
-    
-  }
+namespace {
+  ros_factory::declare< cpp_topic<Clock, false> > decl("Clock");
 }
-
-#endif // H_trex_ros_pyros_reactor

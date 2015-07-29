@@ -102,6 +102,10 @@ priority_strand &ros_timeline::strand() {
   return m_reactor.m_ros->strand();
 }
 
+TREX::ROS::roscpp_initializer &ros_timeline::ros() {
+  return *(m_reactor.m_ros);
+}
+
 
 // modifiers
 

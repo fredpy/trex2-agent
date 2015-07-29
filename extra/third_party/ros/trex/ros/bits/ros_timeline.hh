@@ -45,6 +45,7 @@ namespace TREX {
   namespace ROS {
     
     class ros_reactor;
+    class roscpp_initializer;
     
     namespace details {
       
@@ -100,6 +101,8 @@ namespace TREX {
         ros_reactor &reactor() {
           return m_reactor;
         }
+        roscpp_initializer &ros();
+        
       private:
         void init_timeline();
         
@@ -115,6 +118,8 @@ namespace TREX {
       };
       
     }
+    
+    typedef details::ros_timeline::xml_factory ros_factory;
   }
 }
 

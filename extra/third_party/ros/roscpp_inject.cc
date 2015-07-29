@@ -31,7 +31,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-#include "roscpp_inject.hh"
+#include "trex/ros/roscpp_inject.hh"
 #include <trex/python/python_thread.hh>
 
 using namespace TREX::ROS;
@@ -70,6 +70,14 @@ bool roscpp_initializer::test_shutdown() const {
 
 // Manipulators
 
+ros::NodeHandle &roscpp_initializer::handle() {
+  if( !m_handle ) {
+    strand().post(boost::bind(&roscpp_initializer::init_cpp, this),
+                  roscpp_initializer::init_p).get();
+  }
+  return *m_handle;
+}
+
 
 void roscpp_initializer::init_rospy() {
   try {
@@ -87,6 +95,19 @@ void roscpp_initializer::init_rospy() {
   strand().send(boost::bind(&roscpp_initializer::async_poll, this));
 }
 
+void roscpp_initializer::init_cpp() {
+  if( !ros::isInitialized() ) {
+    int argc = 0;
+    char **argv = NULL;
+    
+    m_log->syslog("ros", log::info)<<"Initialize roscpp client";
+    ros::init(argc, argv, "trex2",
+              ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
+    m_handle.reset(new ros::NodeHandle);
+  }
+}
+
+
 void roscpp_initializer::async_poll() {
   try {
     try {
@@ -100,6 +121,9 @@ void roscpp_initializer::async_poll() {
     } catch(bp::error_already_set const &e) {
       m_err->unwrap_py_error();
     }
+    if( m_handle )
+      ros::spinOnce();
+    
   } catch(utils::Exception const &e) {
     m_log->syslog("ros", log::error)<<"TREX Exception on poll: "<<e;
   } catch(std::exception const &se) {
@@ -113,13 +137,11 @@ void roscpp_initializer::do_shutdown() {
   try {
     scoped_gil_release lock;
 
+    m_log->syslog("ros", log::info)<<"Send shutdown to rospy";
     rospy().attr("signal_shutdown")("end of TREX");
   } catch(bp::error_already_set const &e) {
     m_err->unwrap_py_error(m_log->syslog("ros", log::error)<<"Exception during ROS shutdown: ");
   }
 }
-
-
-
 
 
