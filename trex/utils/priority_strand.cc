@@ -81,6 +81,11 @@ bool priority_strand::is_active() const {
   return m_impl->active();
 }
 
+bool priority_strand::completed() const {
+  return m_impl->completed();
+}
+
+
 // modifiers
 
 void priority_strand::start() {

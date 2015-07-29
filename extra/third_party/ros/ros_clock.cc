@@ -47,6 +47,7 @@ using namespace TREX::ROS;
 
 ros_clock::time_point ros_clock::now() {
   static TREX::utils::SingletonUse<roscpp_initializer> client;
+  client->handle();
   
   ros::Time current(ros::Time::now());
 

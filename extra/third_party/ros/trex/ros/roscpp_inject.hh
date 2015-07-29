@@ -65,6 +65,8 @@ namespace TREX {
       }
       
     private:
+      utils::SharedVar<bool> m_active;
+      
       bool test_shutdown() const;
       void do_shutdown();
       

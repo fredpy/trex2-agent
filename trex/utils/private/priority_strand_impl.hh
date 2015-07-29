@@ -59,6 +59,7 @@ namespace TREX {
       void enqueue(task_ref tsk);
       
       bool active() const;
+      bool completed() const;
       void start();
       void stop();
       
@@ -76,8 +77,7 @@ namespace TREX {
       SHARED_PTR<boost::asio::strand> m_strand;
       mutable boost::shared_mutex     m_mutex;
       task_queue                      m_queue;
-      bool                            m_active;
-      
+      bool                            m_active, m_running;
       
       void dequeue_sync();
       pimpl() DELETED;

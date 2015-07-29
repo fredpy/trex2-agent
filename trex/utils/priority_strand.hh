@@ -127,6 +127,8 @@ namespace TREX {
        * @sa stop()
        */
       bool is_active() const;
+      
+      bool completed() const;
       /** @brief Make the queue active
        *
        * Initiate the queue tasks processing loop. All tasks 
