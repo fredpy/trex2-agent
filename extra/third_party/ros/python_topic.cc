@@ -219,6 +219,7 @@ void python_topic::terminate() {
     
     syslog()<<"Unsubscribe from topic "<<topic();
     m_env.attr((name().str()+"_sub").c_str()).attr("unregister")();
+    syslog()<<"disconnected from "<<topic();
   } catch(py::error_already_set const &e) {
     m_err->unwrap_py_error(syslog(log::error)<<"Exception caught during topic unsubscribe: ");
   }

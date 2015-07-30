@@ -51,6 +51,8 @@ details::publisher_proxy<Msg, G, Cvt>(ros()),
 m_merge(utils::parse_attr<bool>(false, xml_factory::node(arg), "merge")),
 m_extend(false),
 m_topic(utils::parse_attr<std::string>(xml_factory::node(arg), "topic")) {
+  publisher::set_log(boost::bind(&details::ros_timeline::syslog, this, _1));
+  
   if( controllable() ) {
     try {
       syslog()<<"Creating publisher to topic "<<m_topic;
@@ -85,7 +87,11 @@ m_topic(utils::parse_attr<std::string>(xml_factory::node(arg), "topic")) {
 }
 
 template<class Msg, bool G, class Cvt>
-cpp_topic<Msg, G, Cvt>::~cpp_topic() {}
+cpp_topic<Msg, G, Cvt>::~cpp_topic() {
+  syslog()<<"close sub to "<<m_topic;
+  m_sub.shutdown();
+  syslog()<<"no more sub to "<<m_topic;
+}
 
 
 // manipulators
@@ -107,6 +113,7 @@ void cpp_topic<Msg, G, Cvt>::message(cpp_topic<Msg, G, Cvt>::message_ptr msg) {
   transaction::observation_id obs = MAKE_SHARED<transaction::Observation>(new_obs(m_pred));
   
   translator::to_trex(msg, *obs);
+  
   if( m_last_obs ) {
     if( m_merge && obs->consistentWith(*m_last_obs) ) {
       m_extend = true;
@@ -122,6 +129,9 @@ template<class Msg, bool G, class Cvt>
 void cpp_topic<Msg,G,Cvt>::synchronize(transaction::TICK date) {
   publisher::update_tick(date);
   
+  if( controllable() )
+    publisher::process_pending(m_last_obs, m_obs_since);
+
   if( updated() )
     m_obs_since = date;
   else if( !m_extend ) {
@@ -132,8 +142,6 @@ void cpp_topic<Msg,G,Cvt>::synchronize(transaction::TICK date) {
   }
   m_extend = false;
   
-  if( controllable() )
-    publisher::process_pending(m_last_obs, m_obs_since);
 }
 
 

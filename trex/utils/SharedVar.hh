@@ -10,14 +10,14 @@
  */
 /*********************************************************************
  * Software License Agreement (BSD License)
- * 
+ *
  *  Copyright (c) 2011, MBARI.
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions
  *  are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above
@@ -27,7 +27,7 @@
  *   * Neither the name of the TREX Project nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -52,7 +52,7 @@
 
 namespace TREX {
   namespace utils {
-
+    
     /** @brief Bad access exception
      * @relates SharedVar
      *
@@ -67,7 +67,7 @@ namespace TREX {
      * @ingroup utils
      */
     class AccessExcept
-      :public Exception {
+    :public Exception {
     public:
       /** @brief Constructor.
        *
@@ -76,7 +76,7 @@ namespace TREX {
        * Create a new instance with associated message @p message
        */
       AccessExcept(std::string const &message) throw()
-	:Exception(message) {}
+      :Exception(message) {}
       /** @brief Destructor. */
       ~AccessExcept() throw() {}
       
@@ -101,7 +101,7 @@ namespace TREX {
     class SharedVar :boost::noncopyable {
     private:
       typedef boost::recursive_timed_mutex mutex_type;
-
+      
     public:
       /** @brief Scoped variable locking type
        *
@@ -128,7 +128,7 @@ namespace TREX {
        * the mutex  associated to @c var. This alows to access to @c var
        * on the next line. Finally, as we leave the function context @c slock
        * will be destroyed and by doing so will release the mutex it locked during
-       * its creation. 
+       * its creation.
        */
       typedef boost::unique_lock< SharedVar<Ty> > scoped_lock;
       
@@ -141,7 +141,7 @@ namespace TREX {
        * @post the newly created instance is not locked
        */
       SharedVar(typename boost::call_traits<Ty>::param_type val=Ty())
-	:m_lockCount(0ul), m_var(val) {}
+      :m_lockCount(0ul), m_var(val) {}
       /** @brief Destructor */
       ~SharedVar() {}
       
@@ -155,13 +155,13 @@ namespace TREX {
        *
        * @post The variable is locked by the current thread.
        *
-       * @throw ErrnoExcept System error 
+       * @throw ErrnoExcept System error
        *
        * @sa unlock() const
        */
       void lock() const {
-	m_mtx.lock();
-	++m_lockCount;
+        m_mtx.lock();
+        ++m_lockCount;
       }
       /** @brief Unlocking method.
        *
@@ -177,18 +177,18 @@ namespace TREX {
        * @sa ownIt() const
        */
       void unlock() const {
-	if( ownIt() ) {
-	  --m_lockCount;
-	  m_mtx.unlock();
-	}
+        if( ownIt() ) {
+          --m_lockCount;
+          m_mtx.unlock();
+        }
       }
       
       
       /** @brief Assignment operator.
        *
        * @param[in] value A value
-       * 
-       * This methods set current instance to @p value. 
+       *
+       * This methods set current instance to @p value.
        *
        * @return @p value
        *
@@ -198,15 +198,15 @@ namespace TREX {
        *
        * @throw ErrnoExcept System error.
        */
-      typename boost::call_traits<Ty>::param_type 
+      typename boost::call_traits<Ty>::param_type
       operator=(typename boost::call_traits<Ty>::param_type value) {
-	scoped_lock lock(*this);
-	m_var = value;
- 	return value;
+        scoped_lock lock(*this);
+        m_var = value;
+        return value;
       }
       
       void swap(Ty &other) {
-	scoped_lock lock(*this);
+        scoped_lock lock(*this);
         std::swap(m_var, other);
       }
       
@@ -225,8 +225,8 @@ namespace TREX {
        * @sa unlock() const
        */
       bool ownIt() const {
-	mutex_type::scoped_try_lock lock(m_mtx);
-	return lock.owns_lock() && m_lockCount>0;
+        mutex_type::scoped_try_lock lock(m_mtx);
+        return lock.owns_lock() && m_lockCount>0;
       }
       
       /** @brief Dereferencing operator
@@ -246,20 +246,20 @@ namespace TREX {
        * @{
        */
       Ty &operator* () {
-	if( !ownIt() )
-	  throw AccessExcept("Cannot access a shared var which I don't own.");
-	return m_var;
+        if( !ownIt() )
+          throw AccessExcept("Cannot access a shared var which I don't own.");
+        return m_var;
       }
-
+      
       Ty const &operator* () const {
-	if( !ownIt() )
-	  throw AccessExcept("Cannot access a shared var which I don't own.");
-	return m_var;
+        if( !ownIt() )
+          throw AccessExcept("Cannot access a shared var which I don't own.");
+        return m_var;
       }
       /** @} */
       
       /** @brief Access operator.
-       * 
+       *
        * Give access to variable and more specifically to its attributes.
        *
        * @pre This instance is locked by current thread
@@ -275,16 +275,16 @@ namespace TREX {
        * @{
        */
       Ty *operator->() {
-	return &operator* ();
+        return &operator* ();
       }
-
+      
       Ty const *operator->() const {
-	return &operator* ();
+        return &operator* ();
       }
       /** @} */
       
     private:
-      /** @brief Mutex to lock/unlock variable */ 
+      /** @brief Mutex to lock/unlock variable */
       mutable mutex_type m_mtx;       //!< @brief System mutex for this variable
       /** @brief mutex lock counter
        *
@@ -293,17 +293,17 @@ namespace TREX {
        * the thread which is currently locking the variable.
        *
        * The variable is not locked by any thread as soon as this counter reaches 0.
-       * 
+       *
        * @sa lock() const
        * @sa unlock() const
        */
-      mutable size_t     m_lockCount; 
+      mutable size_t     m_lockCount;
       
       /** @brief Variable value */
       Ty m_var;
       
     }; // TREX::utils::SharedVar<>
-
+    
   } // TREX::utils
 } // TREX
 

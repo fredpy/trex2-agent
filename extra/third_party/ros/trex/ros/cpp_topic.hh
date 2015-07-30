@@ -52,6 +52,8 @@ namespace TREX {
     
       class handle_proxy:boost::noncopyable {
       public:
+        typedef boost::function<utils::log::stream (utils::Symbol)> log_fn;
+        
         ~handle_proxy() {}
         
         ros::NodeHandle &handle() {
@@ -62,8 +64,18 @@ namespace TREX {
         explicit handle_proxy(roscpp_initializer &init)
         :m_handle(init.handle()) {}
         
+        utils::log::stream log(utils::Symbol const &kind = utils::log::info) {
+          return m_log(kind);
+        }
+        
+        void set_log(log_fn f) {
+          m_log = f;
+        }
+        
         ros::NodeHandle &m_handle;
       private:
+        log_fn m_log;
+        
         handle_proxy() DELETED;
       };
       
@@ -75,11 +87,17 @@ namespace TREX {
         typedef typename translator::message     message_type;
         typedef typename translator::message_ptr message_ptr;
 
-        ~publisher_proxy() {}
+        ~publisher_proxy() {
+          if( m_pub )
+            m_pub.shutdown();
+        }
         
       protected:
         typedef boost::function<void (message_type const &)> dispatch_fn;
 
+        using handle_proxy::set_log;
+        using handle_proxy::log;
+        
         explicit publisher_proxy(roscpp_initializer &init)
         :handle_proxy(init) {}
         
@@ -115,9 +133,9 @@ namespace TREX {
                   // remove previously active goal
                   m_pending.pop_front();
                 }
-                // make this goal the new active one
-                m_pending.push_front(g);
                 m_active = tmp;
+                m_pending.push_front(g);
+                // make this goal the new active one
                 return true; // the goal is now active
               }
               return false; // the goal did not convert somehow
@@ -163,6 +181,7 @@ namespace TREX {
               transaction::TICK end_nxt = cur->getEnd().closestTo(m_next);
               if( end_nxt<m_next ) {
                 // it should have ended in the past ...
+                log(utils::log::warn)<<"Goal ["<<cur<<"] lasted longer than expected";
                 cur.reset();
                 m_active.reset();
               } else if( m_next<end_nxt ) {
@@ -173,13 +192,19 @@ namespace TREX {
               } else {
                 // I know it could end now: but must it ?
                 if( cur->getEnd().closestTo(m_next+1)==m_next ) {
-                  // yes is must finish
+                  log()<<"Stop pusblishing ["<<cur<<"]";
+                  // yes it must finish
                   cur.reset();
                   m_active.reset();
                 }
               }
             } else {
-              // this goal is not consitent with the current state
+              if( obs )
+                log()<<"Goal ["<<cur<<"] is inconsitent with new state: "<<(*obs)
+                  <<" (start="<<obs_since<<")";
+              else
+                log()<<"Goal ["<<cur<<"] is inconsitent with new state: undefined "
+                <<" (start="<<obs_since<<")";
               cur.reset();
               m_active.reset();
             }
@@ -208,13 +233,25 @@ namespace TREX {
             }
           }
           // If I am here and cur is still set: then I can continue publishing m_active
-          if( cur )
+          if( cur ) {
             publish(**m_active);
+            m_pending.push_front(cur);
+          }
         }
         
         
         void set_dispatch(dispatch_fn const &f) {
           m_dispatch = f;
+        }
+        
+        transaction::goal_id active() {
+          transaction::goal_id ret;
+          if( !m_pending.empty() ) {
+            ret = m_pending.front();
+            log()<<"active = ["<<ret<<"]";
+          } else
+            log()<<"empty goal queue";
+          return ret;
         }
         
         
@@ -237,12 +274,15 @@ namespace TREX {
         typedef typename translator::message     message_type;
         typedef typename translator::message_ptr message_ptr;
 
-        ~publisher_proxy();
+        ~publisher_proxy() {}
         
       protected:
         typedef boost::function<void (message_type const &)> dispatch_fn;
 
-        explicit publisher_proxy(roscpp_initializer &init);
+        explicit publisher_proxy(roscpp_initializer &init)
+        :handle_proxy(init) {}
+        
+        using handle_proxy::set_log;
         
         void advertise(std::string const &topic) {
           throw ros_error("Attempted to publish topic \""+topic
@@ -261,6 +301,9 @@ namespace TREX {
                              transaction::TICK obs_since) {}
         
         void set_dispatch(dispatch_fn const &) {}
+        transaction::goal_id active() {
+          return transaction::goal_id();
+        }
       private:
         publisher_proxy() DELETED;
       };

@@ -39,6 +39,7 @@ using namespace TREX::python;
 using namespace TREX::utils;
 namespace bp=boost::python;
 
+
 // structors
 
 roscpp_initializer::roscpp_initializer() {
@@ -46,13 +47,21 @@ roscpp_initializer::roscpp_initializer() {
 }
 
 roscpp_initializer::~roscpp_initializer() {
+  if( m_spin ) {
+    m_log->syslog("ros", log::info)<<"Shutting down ros c++";
+    m_spin->stop();
+    ros::shutdown();
+    m_spin.reset();
+    ros::waitForShutdown();
+    m_log->syslog("ros", log::info)<<"C++ ROS is dead";
+  }
+  
   bool active = strand().is_active();
   m_active = false;
   if( active ) {
     strand().stop();
     
     while( !strand().completed() ) {
-      std::cerr<<"Wait for python to settle"<<std::endl;
       boost::this_thread::yield();
     }
   }
@@ -105,7 +114,6 @@ void roscpp_initializer::init_rospy() {
     m_err->unwrap_py_error();
   }
   m_active = true;
-  strand().send(boost::bind(&roscpp_initializer::async_poll, this));
 }
 
 void roscpp_initializer::init_cpp() {
@@ -117,36 +125,13 @@ void roscpp_initializer::init_cpp() {
     ros::init(argc, argv, "trex_cpp",
               ::ros::init_options::AnonymousName|::ros::init_options::NoSigintHandler);
     m_handle.reset(new ros::NodeHandle);
+    m_cpp = new ros::CallbackQueue;
+    m_handle->setCallbackQueue(m_cpp);
+    m_spin.reset(new ros::AsyncSpinner(1, m_cpp));
+    m_spin->start();
   }
 }
 
-
-void roscpp_initializer::async_poll() {
-  if( *m_active ) {
-    try {
-      try {
-        bool cont = false;
-        scoped_gil_release lock;
-          cont = !bp::extract<bool>(m_rospy.attr("is_shutdown")());
-        if( cont ) {
-          m_rospy.attr("sleep")(0.1);
-          strand().send(boost::bind(&roscpp_initializer::async_poll, this));
-        }
-      } catch(bp::error_already_set const &e) {
-        m_err->unwrap_py_error();
-      }
-      if( m_handle )
-      ros::spinOnce();
-    
-    } catch(utils::Exception const &e) {
-      m_log->syslog("ros", log::error)<<"TREX Exception on poll: "<<e;
-    } catch(std::exception const &se) {
-      m_log->syslog("ros", log::error)<<"Exception on poll: "<<se.what();
-    } catch(...) {
-      m_log->syslog("ros", log::error)<<"Unknown exception on poll";
-    }
-  }
-}
 
 void roscpp_initializer::do_shutdown() {
   try {

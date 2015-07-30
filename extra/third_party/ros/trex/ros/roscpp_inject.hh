@@ -40,6 +40,7 @@
 # include <trex/python/exception_helper.hh>
 
 # include <ros/ros.h>
+# include <ros/callback_queue.h>
 
 namespace TREX {
   namespace ROS {
@@ -73,12 +74,12 @@ namespace TREX {
       void init_rospy();
       void init_cpp();
       
-      void async_poll();
-      
       roscpp_initializer();
       ~roscpp_initializer();
       
       boost::scoped_ptr<ros::NodeHandle> m_handle;
+      SHARED_PTR<ros::AsyncSpinner> m_spin;
+      ros::CallbackQueue *m_cpp;
       
       utils::SingletonUse<utils::LogManager>  m_log;
       utils::SingletonUse<python::python_env> m_python;
@@ -87,6 +88,7 @@ namespace TREX {
       boost::python::object          m_rospy;
       
       friend utils::SingletonWrapper<roscpp_initializer>;
+      friend class lock;
     };
     
   }
