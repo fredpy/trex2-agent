@@ -35,6 +35,7 @@
 # define H_trex_ros_bits_ros_timeline
 
 # include <trex/utils/platform/cpp11_deleted.hh>
+# include <trex/utils/platform/memory.hh>
 # include <trex/transaction/Goal.hh>
 # include <trex/transaction/Observation.hh>
 # include <trex/utils/log/stream.hh>
@@ -49,7 +50,8 @@ namespace TREX {
     
     namespace details {
       
-      class ros_timeline :boost::noncopyable {
+      class ros_timeline :boost::noncopyable,
+      public ENABLE_SHARED_FROM_THIS<ros_timeline> {
       public:
         typedef SHARED_PTR<ros_timeline> pointer;
         // TODO: find a way to replace ros_reactor * by WEAK_PTR
