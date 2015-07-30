@@ -1,3 +1,4 @@
+// -*- C++ -*-
 /*********************************************************************
  * Software License Agreement (BSD License)
  *
@@ -46,23 +47,37 @@ cpp_topic<Msg, G, Cvt>::cpp_topic(cpp_topic<Msg, G, Cvt>::xml_arg arg)
 :details::ros_timeline(arg, Cvt::accept_goals &&
                        utils::parse_attr<bool>(false, xml_factory::node(arg),
                                                "control")),
+details::publisher_proxy<Msg, G, Cvt>(ros()),
 m_merge(utils::parse_attr<bool>(false, xml_factory::node(arg), "merge")),
 m_extend(false),
-m_topic(utils::parse_attr<std::string>(xml_factory::node(arg), "topic")),
-m_handle(ros().handle()) {
+m_topic(utils::parse_attr<std::string>(xml_factory::node(arg), "topic")) {
   if( controllable() ) {
-    // TODO: make the connection for the publisher to the topic if needed
+    try {
+      syslog()<<"Creating publisher to topic "<<m_topic;
+      publisher::advertise(m_topic);
+      publisher::set_dispatch(boost::bind(&cpp_topic::dispatch, this, _1));
+    } catch(ros::Exception const &e) {
+      std::ostringstream oss;
+      oss<<"Publish on topic \""<<m_topic<<"\" failed: "<<e.what();
+      throw ros_error(oss.str());
+    }
   }
   try {
     syslog()<<"Subscribing to ROS topic "<<m_topic;
     // subscribe to topic with a wqueue size of 10
     // TODO: make the queue size as an XML option
-    m_sub = m_handle.subscribe(m_topic, 10, &cpp_topic::message, this);
+    m_sub = handle().subscribe(m_topic, 10, &cpp_topic::message, this);
   } catch(ros::Exception const &e) {
     std::ostringstream oss;
-    oss<<"Subscription ot topic \""<<m_topic<<"\" failed.";
+    oss<<"Subscription ot topic \""<<m_topic<<"\" failed: "<<e.what();
     throw ros_error(oss.str());
   }
+  if( !m_sub ) {
+    std::ostringstream oss;
+    oss<<"subscriber is null aftter its attchement to \""<<m_topic<<"\".";
+    throw ros_error(oss.str());
+  }
+  
   m_pred = Cvt::msg_type();
   size_t pos = m_pred.find_last_of("/.");
   if( pos!=std::string::npos )
@@ -71,6 +86,18 @@ m_handle(ros().handle()) {
 
 template<class Msg, bool G, class Cvt>
 cpp_topic<Msg, G, Cvt>::~cpp_topic() {}
+
+
+// manipulators
+
+template<class Msg, bool G, class Cvt>
+void cpp_topic<Msg, G, Cvt>::dispatch(typename cpp_topic<Msg, G, Cvt>::message_type const &msg) {
+  if( controllable() ) {
+    syslog()<<"Publish message to topic "<<m_topic<<":\n"<<msg;
+    publisher::publish(msg);
+  }
+}
+
 
 
 // callbacks
@@ -93,16 +120,20 @@ void cpp_topic<Msg, G, Cvt>::message(cpp_topic<Msg, G, Cvt>::message_ptr msg) {
 
 template<class Msg, bool G, class Cvt>
 void cpp_topic<Msg,G,Cvt>::synchronize(transaction::TICK date) {
-  if( !( updated() || m_extend ) ) {
+  publisher::update_tick(date);
+  
+  if( updated() )
+    m_obs_since = date;
+  else if( !m_extend ) {
     // did not receive any update => set myself to undefined
     m_last_obs.reset();
+    m_obs_since = date;
     notify(new_obs(transaction::Predicate::undefined_pred()));
   }
   m_extend = false;
   
-  if( controllable() ) {
-    // TODO: handle pending goals if any
-  }
+  if( controllable() )
+    publisher::process_pending(m_last_obs, m_obs_since);
 }
 
 
