@@ -95,3 +95,20 @@ bool ros_reactor::synchronize() {
   return !m_ros->is_shutdown();
 }
 
+void ros_reactor::handleRequest(goal_id const &g) {
+  tl_set::const_iterator i = m_timelines.find(g->object());
+
+  if( m_timelines.end()!=i ) {
+    if( (*i)->controllable() && (*i)->request(g) )
+      syslog()<<"Accepted request ["<<g<<"]";
+  }
+}
+
+void ros_reactor::handleRecall(goal_id const &g) {
+  tl_set::const_iterator i = m_timelines.find(g->object());
+  
+  if( m_timelines.end()!=i )
+    (*i)->recall(g);
+}
+
+

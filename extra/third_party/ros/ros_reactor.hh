@@ -63,6 +63,9 @@ namespace TREX {
       void handleInit();
       bool synchronize();
       
+      void handleRequest(TREX::transaction::goal_id const &g);
+      void handleRecall(TREX::transaction::goal_id const &g);
+      
       utils::SingletonUse<roscpp_initializer>  m_ros;
       typedef utils::list_set<details::ros_timeline> tl_set;
       tl_set m_timelines;
