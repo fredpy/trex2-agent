@@ -123,6 +123,8 @@ void ros_timeline::notify(transaction::Observation const &obs) {
 // callbacks
 
 void ros_timeline::do_init() {
+  handle_init();
+  
   if( m_init ) {
     syslog(log::info)<<"Waiting for first update from ROS";
     do {

@@ -73,6 +73,7 @@ link_directories(${ROS_actionlib_LINK_PATH} ${ROS_roscpp_LINK_PATH})
 
 add_library(TREXros SHARED
   # source
+  cpp_topic.cc
   python_topic.cc
   roscpp_inject.cc
   ros_clock.cc
@@ -86,9 +87,9 @@ add_library(TREXros SHARED
   trex/ros/ros_error.hh
   trex/ros/msg_cvt_traits.hh
   trex/ros/cpp_topic.hh
+  trex/ros/bits/cpp_topic_base.hh
+  trex/ros/bits/handle_proxy.hh
   trex/ros/bits/ros_timeline.hh
-  # template
-  trex/ros/bits/cpp_topic.tcc
 )
 
 install(DIRECTORY trex/ DESTINATION include/trex/

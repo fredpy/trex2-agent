@@ -84,6 +84,7 @@ namespace TREX {
         ros_timeline(ros_reactor *r, utils::Symbol const &tl,
                      bool init, bool control);
         
+        virtual void handle_init() {}
         virtual bool handle_request(transaction::goal_id g) =0;
         virtual void handle_recall(transaction::goal_id g) {}
         

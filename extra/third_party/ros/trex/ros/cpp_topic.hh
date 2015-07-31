@@ -35,12 +35,12 @@
 # define H_trex_ros_cpp_topic
 
 # include "roscpp_inject.hh"
-# include "bits/ros_timeline.hh"
-# include "msg_cvt_traits.hh"
 # include "ros_error.hh"
+# include "bits/cpp_topic_base.hh"
+# include "bits/handle_proxy.hh"
+# include "msg_cvt_traits.hh"
 
 # include <trex/utils/platform/cpp11_deleted.hh>
-
 # include <boost/static_assert.hpp>
 
 # include <ros/ros.h>
@@ -49,107 +49,131 @@ namespace TREX {
   namespace ROS {
     
     namespace details {
-    
-      class handle_proxy:boost::noncopyable {
-      public:
-        typedef boost::function<utils::log::stream (utils::Symbol)> log_fn;
-        
-        ~handle_proxy() {}
-        
-        ros::NodeHandle &handle() {
-          return m_handle;
-        }
-        
-      protected:
-        explicit handle_proxy(roscpp_initializer &init)
-        :m_handle(init.handle()) {}
-        
-        utils::log::stream log(utils::Symbol const &kind = utils::log::info) {
-          return m_log(kind);
-        }
-        
-        void set_log(log_fn f) {
-          m_log = f;
-        }
-        
-        ros::NodeHandle &m_handle;
-      private:
-        log_fn m_log;
-        
-        handle_proxy() DELETED;
-      };
       
       
-      template<class Message, bool Goals, class Cvt>
-      class publisher_proxy :public handle_proxy {
+      template<typename Message, bool Goals, typename Cvt>
+      class publish_proxy :public handle_proxy {
       public:
         typedef Cvt translator;
         typedef typename translator::message     message_type;
         typedef typename translator::message_ptr message_ptr;
-
-        ~publisher_proxy() {
+        
+        ~publish_proxy() {
           if( m_pub )
             m_pub.shutdown();
         }
         
       protected:
-        typedef boost::function<void (message_type const &)> dispatch_fn;
-
-        using handle_proxy::set_log;
-        using handle_proxy::log;
-        
-        explicit publisher_proxy(roscpp_initializer &init)
+        publish_proxy(roscpp_initializer &init)
         :handle_proxy(init) {}
         
         void advertise(std::string const &topic) {
-          m_pub = m_handle.advertise<Message>(topic, 10, true);
-        }
-        void publish(Message const &msg) {
-          m_pub.publish(msg);
+          ros::NodeHandle &h = handle();
+          m_pub = h.advertise<Message>(topic, 10, true);
         }
         
-        void update_tick(transaction::TICK date) {
+        void update_next(transaction::TICK date,
+                         boost::optional<transaction::Observation> const &obs,
+                         transaction::TICK since) {
+          transaction::goal_id cur;
           m_next = date+1;
+          
+          
+          if( m_active_cmd ) {
+            cur = m_pending.front();
+            m_pending.pop_front();
+          
+            // check if my active goal is still compatible
+            if( obs && obs->consistentWith(*cur) &&
+               cur->getStart().contains(since) ) {
+              cur->restrictStart(transaction::IntegerDomain(since));
+              
+              transaction::TICK end_nxt = cur->getEnd().closestTo(m_next);
+              if( end_nxt<m_next ) {
+                log(utils::log::warn)<<"goal ["<<cur<<"] lasted longer than expected.";
+                cur.reset();
+                m_active_cmd.reset();
+              } else if( m_next<end_nxt ) {
+                m_pub.publish(**m_active_cmd);
+                m_pending.push_front(cur);
+                return;
+              } else {
+                // it can end now but can it end later ?
+                if( cur->getEnd().closestTo(m_next+1)==m_next ) {
+                  // no it must end now !
+                  cur.reset();
+                  m_active_cmd.reset();
+                }
+              }
+            } else {
+              log(utils::log::warn)<<"["<<cur<<"] is cinconsitent with current state";
+              cur.reset();
+              m_active_cmd.reset();
+            }
+          }
+          // at this point I need to check if any goal can be started
+          while( !m_pending.empty() ) {
+            transaction::goal_id cand = m_pending.front();
+            transaction::TICK start_nxt = cand->getStart().closestTo(m_next);
+            
+            if( start_nxt<m_next ) {
+              // TODO: make more refined test to see if it could be merged
+              //       with obs
+              m_pending.pop_front();
+            } else if( m_next<start_nxt ) {
+              // TODO: may need to check followers
+              break;
+            } else {
+              message_ptr tmp =  translator::to_ros(*cand);
+              
+              if( tmp ) {
+                log(utils::log::info)<<"Sending ["<<cand<<"] to ROS:\n"<<(*tmp);
+                m_pub.publish(tmp);
+                m_active_cmd = tmp;
+                return;
+              }
+            }
+          }
+          // At this point if cur is still set I can post it
+          if( cur ) {
+            m_pub.publish(**m_active_cmd);
+            m_pending.push_front(cur);
+          }
         }
         
-        bool add_goal(transaction::goal_id g) {
-          // check if the goal can start at next tick
+        bool push_goal(transaction::goal_id g) {
           if( g->getStart().closestTo(m_next)==m_next ) {
             bool should_post = true;
             
-            // is there an active goal ?
-            if( m_active ) {
-              // can the active goal terminate at next tick ?
+            if( m_active_cmd ) {
               if( m_pending.front()->getEnd().closestTo(m_next)==m_next ) {
-                // then I could post it if there are no more pending goals
                 should_post = (1==m_pending.size());
               }
             }
+            
             if( should_post ) {
               message_ptr tmp = translator::to_ros(*g);
-              if( tmp ) {
-                m_dispatch(*tmp);
-                if( m_active ) {
-                  // remove previously active goal
+              
+              if(tmp) {
+                log(utils::log::info)<<"Sending ["<<g<<"] to ROS:\n"<<(*tmp);
+                m_pub.publish(tmp);
+                if( m_active_cmd )
                   m_pending.pop_front();
-                }
-                m_active = tmp;
+                m_active_cmd = tmp;
                 m_pending.push_front(g);
-                // make this goal the new active one
-                return true; // the goal is now active
+                return true;
               }
-              return false; // the goal did not convert somehow
+              return false;
             }
           }
-          m_pending.push_back(g); // goal is queued
+          m_pending.push_back(g);
           return true;
         }
-        
-        void remove_goal(transaction::goal_id g) {
+        void goal_rm(transaction::goal_id g) {
           if( !m_pending.empty() ) {
             if( m_pending.front()==g ) {
               m_pending.pop_front();
-              m_active.reset();
+              m_active_cmd.reset();
             } else {
               for(std::list<transaction::goal_id>::iterator i=m_pending.begin();
                   m_pending.end()!=i; ++i) {
@@ -161,211 +185,116 @@ namespace TREX {
             }
           }
         }
-        
-        void process_pending(transaction::observation_id obs,
-                             transaction::TICK obs_since) {
-          transaction::goal_id cur;
-          
-          if( m_active ) {
-            // A goal is currently active
-            cur = m_pending.front();
-            m_pending.pop_front();
-            
-            // is my active goal consistent with obs
-            if( obs && obs->consistentWith(*cur) &&
-               cur->getStart().contains(obs_since) ) {
-              // constrain my start
-              cur->restrictStart(transaction::IntegerDomain(obs_since));
-              
-              // check if my goal should terminate
-              transaction::TICK end_nxt = cur->getEnd().closestTo(m_next);
-              if( end_nxt<m_next ) {
-                // it should have ended in the past ...
-                log(utils::log::warn)<<"Goal ["<<cur<<"] lasted longer than expected";
-                cur.reset();
-                m_active.reset();
-              } else if( m_next<end_nxt ) {
-                // it has to hold a little longer
-                publish(**m_active);
-                m_pending.push_front(cur);
-                return; // I am done here
-              } else {
-                // I know it could end now: but must it ?
-                if( cur->getEnd().closestTo(m_next+1)==m_next ) {
-                  log()<<"Stop pusblishing ["<<cur<<"]";
-                  // yes it must finish
-                  cur.reset();
-                  m_active.reset();
-                }
-              }
-            } else {
-              if( obs )
-                log()<<"Goal ["<<cur<<"] is inconsitent with new state: "<<(*obs)
-                  <<" (start="<<obs_since<<")";
-              else
-                log()<<"Goal ["<<cur<<"] is inconsitent with new state: undefined "
-                <<" (start="<<obs_since<<")";
-              cur.reset();
-              m_active.reset();
-            }
-          }
-          // At this point I need to check if there is a goal that can be started
-          while( !m_pending.empty() ) {
-            transaction::goal_id cand = m_pending.front();
-            transaction::TICK start_nxt = cand->getStart().closestTo(m_next);
-            
-            if( start_nxt<m_next ) {
-              // It had to start in the past
-              // TODO: make a more complex test that checks if constent with obs
-              m_pending.pop_front();
-            } else if( m_next<start_nxt ) {
-              // it starts in the future
-              break;
-            } else {
-              // it can start now
-              message_ptr tmp = translator::to_ros(*cand);
-              
-              if( tmp ) {
-                m_dispatch(*tmp);
-                m_active = tmp;
-                return;
-              }
-            }
-          }
-          // If I am here and cur is still set: then I can continue publishing m_active
-          if( cur ) {
-            publish(**m_active);
-            m_pending.push_front(cur);
-          }
+
+        transaction::TICK next() const {
+          return m_next;
         }
-        
-        
-        void set_dispatch(dispatch_fn const &f) {
-          m_dispatch = f;
-        }
-        
-        transaction::goal_id active() {
-          transaction::goal_id ret;
-          if( !m_pending.empty() ) {
-            ret = m_pending.front();
-            log()<<"active = ["<<ret<<"]";
-          } else
-            log()<<"empty goal queue";
-          return ret;
-        }
-        
         
       private:
         ros::Publisher m_pub;
-        boost::optional<message_ptr>    m_active;
-        std::list<transaction::goal_id> m_pending;
-        dispatch_fn m_dispatch;
         
         transaction::TICK m_next;
-
-        publisher_proxy() DELETED;
+        boost::optional<message_ptr>    m_active_cmd;
+        std::list<transaction::goal_id> m_pending;
+        
       };
       
       
-      template<class Message, class Cvt>
-      class publisher_proxy<Message, false, Cvt>: public handle_proxy {
+      template<typename Message, typename Cvt>
+      class publish_proxy<Message, false, Cvt> {
       public:
         typedef Cvt translator;
         typedef typename translator::message     message_type;
         typedef typename translator::message_ptr message_ptr;
 
-        ~publisher_proxy() {}
-        
-      protected:
-        typedef boost::function<void (message_type const &)> dispatch_fn;
-
-        explicit publisher_proxy(roscpp_initializer &init)
-        :handle_proxy(init) {}
-        
-        using handle_proxy::set_log;
+        ~publish_proxy() {}
         
         void advertise(std::string const &topic) {
-          throw ros_error("Attempted to publish topic \""+topic
-                          +"\" without implementation for it");
+          throw ros_error("This topic handler do not implement goals to ros");
         }
-        void publish(Message const &msg) {
-          throw ros_error("attempted to publish on a read-only topic");
-        }
+      protected:
+        publish_proxy(roscpp_initializer &) {}
         
-        void update_tick(transaction::TICK) {}
-        bool add_goal(transaction::goal_id) {
-          return false;
-        }
-        void remove_goal(transaction::goal_id g) {}
-        void process_pending(transaction::observation_id obs,
-                             transaction::TICK obs_since) {}
+        void set_log(handle_proxy::log_fn const &) {}
         
-        void set_dispatch(dispatch_fn const &) {}
-        transaction::goal_id active() {
-          return transaction::goal_id();
+        void update_next(transaction::TICK,
+                         boost::optional<transaction::Observation> const &,
+                         transaction::TICK) {}
+        transaction::TICK next() const {
+          return 0;
         }
-      private:
-        publisher_proxy() DELETED;
+        bool push_goal(transaction::goal_id) {}
+        void goal_rm(transaction::goal_id) {}
+        
+        
       };
       
     }
     
     
-    template<typename Message, bool Goals,
-             class Convert = msg_cvt_traits<Message, Goals> >
-    class cpp_topic :public details::ros_timeline,
-    public details::publisher_proxy<Message, Goals, Convert>  {
-      
+    template<typename Message, bool GoalImplemented,
+             class Convert = msg_cvt_traits<Message, GoalImplemented> >
+    class cpp_topic :public details::cpp_topic_base,
+    details::publish_proxy<Message, GoalImplemented, Convert> {
       BOOST_STATIC_ASSERT(::ros::message_traits::IsMessage<Message>::value);
-      typedef details::publisher_proxy<Message, Goals, Convert> publisher;
-        
-      using publisher::handle;
+      typedef details::publish_proxy<Message, GoalImplemented, Convert> publisher;
       using typename publisher::translator;
-    
     public:
       using typename publisher::message_type;
       using typename publisher::message_ptr;
       
-      
-      using details::ros_timeline::xml_factory;
-      using details::ros_timeline::xml_arg;
-
-      cpp_topic(xml_arg arg);
-      ~cpp_topic();
-      
-      std::string const &topic() const {
-        return m_topic;
+      cpp_topic(xml_arg arg)
+      :details::cpp_topic_base(arg, GoalImplemented, Convert::msg_type()),
+      publisher(ros()) {
+        publisher::set_log(boost::bind(&details::cpp_topic_base::syslog, this, _1));
       }
+      
+      ~cpp_topic() {}
+      
+      using details::cpp_topic_base::topic;
       
     private:
-      void message(message_ptr msg);
-      void dispatch(message_type const &msg);
-      
-      bool handle_request(transaction::goal_id g) {
-        if( g && g->predicate()==m_pred )
-          return publisher::add_goal(g);
-        return false;
+      void init_publisher() {
+        publisher::advertise(topic());
       }
-      void handle_recall(transaction::goal_id g) {
-        if( g && g->predicate()==m_pred )
-          publisher::remove_goal(g);
+      void process_pending(transaction::TICK date) {
+        publisher::update_next(date, details::cpp_topic_base::last_obs(),
+                               details::cpp_topic_base::obs_since());
       }
-      void synchronize(transaction::TICK date);
-
-      transaction::observation_id m_last_obs;
-      transaction::TICK           m_obs_since;
-      bool const m_merge;
-      bool m_extend;
       
-      std::string const m_topic;
-      std::string m_pred;
+      void init_subscriber(ros::Subscriber &sub) {
+        WEAK_PTR<details::ros_timeline> me(shared_from_this());
+        boost::function<void (message_ptr const &)> cb = boost::bind(&cpp_topic::message, me, _1);
+        
+        sub = ros().handle().subscribe(topic(), 10, cb);
+      }
       
-      ::ros::Subscriber m_sub;
-    }; // TREX::ROS::cpp_topic<>
+      void add_goal(transaction::goal_id g) {
+        publisher::push_goal(g);
+      }
+      void remove_goal(transaction::goal_id g) {
+        publisher::goal_rm(g);
+      }
+      
+      void handle_message(message_ptr msg) {
+        transaction::Observation obs(new_obs());
+        // syslog()<<"Received ros message: "<<(*msg);
+        translator::to_trex(msg, obs);
+        do_notify(obs);
+      }
+                          
+      static void message(WEAK_PTR<details::ros_timeline> p,
+                          message_ptr const &msg) {
+        SHARED_PTR<details::ros_timeline> ptr = p.lock();
+        if( ptr ) {
+          cpp_topic *me = dynamic_cast<cpp_topic *>(ptr.get());
+          if( NULL!=me )
+            me->handle_message(msg);
+        }
+      }
     
-# define In_H_trex_ros_cpp_topic
-#  include "bits/cpp_topic.tcc"
-# undef In_H_trex_ros_cpp_topic
+    };
+    
   } // TREX::ROS
 } // TREX
 
